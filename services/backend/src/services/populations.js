@@ -39,7 +39,56 @@ const universityEnrolmentDates = async () => {
     .filter(d => d)
     .sort()
 }
+// Progress tab related helper functions.
+const createEmptyCriteriaYear = (criteria, year) => {
+  return {
+    credits: false,
+    totalSatisfied: 0,
+    coursesSatisfied:
+      criteria?.courses && criteria?.courses[year]
+        ? criteria.courses[year].reduce((acc, course) => {
+            acc[course] = null
+            return acc
+          }, {})
+        : {},
+  }
+}
 
+const getCreditAmount = (courseDate, credits, startDate, addition) => {
+  return moment(courseDate).isBetween(moment(startDate), moment(startDate).add(addition, 'year')) ? credits : 0
+}
+
+const updateCourseByYear = (criteria, criteriaYear, course, criteriaChecked, yearToAdd, correctCode) => {
+  if (
+    criteria?.courses &&
+    criteria?.courses[criteriaYear] &&
+    (criteria.courses[criteriaYear].includes(course.course_code) ||
+      criteria.courses[criteriaYear].some(
+        c => criteria.allCourses[c] && criteria.allCourses[c].includes(course.course_code)
+      ))
+  ) {
+    if (
+      !criteriaChecked[yearToAdd].coursesSatisfied[correctCode] ||
+      new Date(criteriaChecked[yearToAdd].coursesSatisfied[correctCode]) > new Date(course.date)
+    ) {
+      criteriaChecked[yearToAdd].coursesSatisfied[correctCode] = course.date
+    }
+  }
+}
+const updateCreditcriteriaInfo = (criteria, criteriaYear, criteriaChecked, yearToAdd, academicYears, academicYear) => {
+  if (criteria.courses) {
+    if (criteriaChecked?.[yearToAdd]) {
+      criteriaChecked[yearToAdd].totalSatisfied +=
+        Object.keys(criteriaChecked?.[yearToAdd].coursesSatisfied).filter(
+          course => criteriaChecked?.[yearToAdd].coursesSatisfied[course] !== null
+        ).length || 0
+    }
+    if (academicYears[academicYear] >= criteria?.credits[criteriaYear]) {
+      criteriaChecked[yearToAdd].credits = true
+      criteriaChecked[yearToAdd].totalSatisfied += 1
+    }
+  }
+}
 const formatStudentForPopulationStatistics = (
   {
     firstnames,
@@ -99,106 +148,42 @@ const formatStudentForPopulationStatistics = (
 
   const toProgressCriteria = () => {
     const criteriaChecked = {
-      year1: {
-        credits: false,
-        totalSatisfied: 0,
-        coursesSatisfied: criteria?.courses?.yearone
-          ? criteria?.courses?.yearOne.reduce((acc, course) => {
-              acc[course] = null
-              return acc
-            }, {})
-          : {},
-      },
-      year2: {
-        credits: false,
-        totalSatisfied: 0,
-        coursesSatisfied: criteria?.courses?.yearTwo
-          ? criteria?.courses?.yearTwo?.reduce((acc, course) => {
-              acc[course] = null
-              return acc
-            }, {})
-          : {},
-      },
-      year3: {
-        credits: false,
-        totalSatisfied: 0,
-        coursesSatisfied: criteria?.courses?.yearThree
-          ? criteria?.courses?.yearThree.reduce((acc, course) => {
-              acc[course] = null
-              return acc
-            }, {})
-          : {},
-      },
+      year1: createEmptyCriteriaYear(criteria, 'yearOne'),
+      year2: createEmptyCriteriaYear(criteria, 'yearTwo'),
+      year3: createEmptyCriteriaYear(criteria, 'yearThree'),
+      year4: createEmptyCriteriaYear(criteria, 'yearFour'),
+      year5: createEmptyCriteriaYear(criteria, 'yearFive'),
+      year6: createEmptyCriteriaYear(criteria, 'yearSix'),
     }
-    let firstAcademic = 0
-    let secondAcademic = 0
-    let thirdAcademic = 0
-    if (criteria !== {}) {
+
+    const academicYears = { first: 0, second: 0, third: 0, fourth: 0, fifth: 0, sixth: 0 }
+    if (criteria.courses || criteria.credits) {
       const courses = credits[studentnumber] ? credits[studentnumber].map(toCourse) : []
       courses.forEach(course => {
         if (course.passed) {
           const correctCode = criteriaCoursesBySubstitutions[course.course_code]
-          if (
-            criteria?.courses?.yearOne.includes(course.course_code) ||
-            criteria?.courses?.yearOne.some(c => criteria?.allCourses[c].includes(course.course_code))
-          ) {
-            if (
-              !criteriaChecked.year1.coursesSatisfied[correctCode] ||
-              new Date(criteriaChecked.year1.coursesSatisfied[correctCode]) > new Date(course.date)
-            ) {
-              criteriaChecked.year1.coursesSatisfied[correctCode] = course.date
-            }
-          }
-          if (
-            criteria?.courses?.yearTwo.includes(course.course_code) ||
-            criteria?.courses?.yearTwo.some(c => criteria?.allCourses[c].includes(course.course_code))
-          ) {
-            if (
-              !criteriaChecked.year2.coursesSatisfied[correctCode] ||
-              new Date(criteriaChecked.year2.coursesSatisfied[correctCode]) > new Date(course.date)
-            ) {
-              criteriaChecked.year2.coursesSatisfied[correctCode] = course.date
-            }
-          }
-          if (
-            criteria?.courses?.yearThree.includes(course.course_code) ||
-            criteria?.courses?.yearThree.some(c => criteria?.allCourses[c].includes(course.course_code))
-          ) {
-            if (
-              !criteriaChecked.year2.coursesSatisfied[correctCode] ||
-              new Date(criteriaChecked.year2.coursesSatisfied[correctCode]) > new Date(course.date)
-            ) {
-              criteriaChecked.year2.coursesSatisfied[correctCode] = course.date
-            }
-          }
-          firstAcademic += moment(course.date).isBetween(moment(startDate), moment(startDate).add(1, 'year'))
-            ? course.credits
-            : 0
-          secondAcademic += moment(course.date).isBetween(moment(startDate), moment(startDate).add(2, 'year'))
-            ? course.credits
-            : 0
-          thirdAcademic += moment(course.date).isBetween(moment(startDate), moment(startDate).add(3, 'year'))
-            ? course.credits
-            : 0
+          updateCourseByYear(criteria, 'yearOne', course, criteriaChecked, 'year1', correctCode)
+          updateCourseByYear(criteria, 'yearTwo', course, criteriaChecked, 'year2', correctCode)
+          updateCourseByYear(criteria, 'yearThree', course, criteriaChecked, 'year3', correctCode)
+          updateCourseByYear(criteria, 'yearFour', course, criteriaChecked, 'year4', correctCode)
+          updateCourseByYear(criteria, 'yearFive', course, criteriaChecked, 'year5', correctCode)
+          updateCourseByYear(criteria, 'yearSix', course, criteriaChecked, 'year6', correctCode)
+          academicYears.first += getCreditAmount(course.date, course.credits, startDate, 1)
+          academicYears.second += getCreditAmount(course.date, course.credits, startDate, 2)
+          academicYears.third += getCreditAmount(course.date, course.credits, startDate, 3)
+          academicYears.fourth += getCreditAmount(course.date, course.credits, startDate, 4)
+          academicYears.fifth += getCreditAmount(course.date, course.credits, startDate, 5)
+          academicYears.sixth += getCreditAmount(course.date, course.credits, startDate, 6)
         }
       })
     }
-    criteriaChecked.year1.totalSatisfied =
-      Object.keys(criteriaChecked?.year1?.coursesSatisfied).filter(
-        course => criteriaChecked?.year1?.coursesSatisfied[course] !== null
-      ).length || 0
-    if (firstAcademic >= criteria?.credits?.yearOne) {
-      criteriaChecked.year1.credits = true
-      criteriaChecked.year1.totalSatisfied += 1
-    }
-    if (secondAcademic >= criteria?.credits?.yearTwo) {
-      criteriaChecked.year2.credits = true
-      criteriaChecked.year2.totalSatisfied += 1
-    }
-    if (thirdAcademic >= criteria?.credits?.yearThree) {
-      criteriaChecked.year3.credits = true
-      criteriaChecked.year3.totalSatisfied += 1
-    }
+
+    updateCreditcriteriaInfo(criteria, 'yearOne', criteriaChecked, 'year1', academicYears, 'first')
+    updateCreditcriteriaInfo(criteria, 'yearTwo', criteriaChecked, 'year2', academicYears, 'second')
+    updateCreditcriteriaInfo(criteria, 'yearThree', criteriaChecked, 'year3', academicYears, 'third')
+    updateCreditcriteriaInfo(criteria, 'yearFour', criteriaChecked, 'year4', academicYears, 'fourth')
+    updateCreditcriteriaInfo(criteria, 'yearFive', criteriaChecked, 'year5', academicYears, 'fifth')
+    updateCreditcriteriaInfo(criteria, 'yearSix', criteriaChecked, 'year6', academicYears, 'sixth')
     return criteriaChecked
   }
 
@@ -1003,6 +988,8 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
     optionData = await getOptionsForStudents(studentnumbers, code, 'MSC')
   } else if (code.includes('KH')) {
     optionData = await getOptionsForStudents(studentnumbers, code, 'BSC')
+  }
+  if (code.includes('KH') || ['MH30_001', 'MH30_003'].includes(code)) {
     criteria = await getCriteria(code)
   }
   const { students, enrollments, credits, extents, semesters, elementdetails, courses } =

@@ -15,35 +15,46 @@ const getSubstitutions = async codes => {
   return courses.reduce((acc, { code, substitutions }) => ({ ...acc, [code]: substitutions }), {})
 }
 
-const formattedData = async updatedData => {
-  const courseCodes = [...updatedData.coursesYearOne, ...updatedData.coursesYearTwo, ...updatedData.coursesYearThree]
+const formattedData = async data => {
+  const yearOne = data.coursesYearOne ? data.coursesYearOne : []
+  const yearTwo = data.coursesYearTwo ? data.coursesYearTwo : []
+  const yearThree = data.coursesYearThree ? data.coursesYearThree : []
+  const yearFour = data.coursesYearFour ? data.coursesYearFour : []
+  const yearFive = data.coursesYearFive ? data.coursesYearFive : []
+  const yearSix = data.coursesYearSix ? data.coursesYearSix : []
+  const courseCodes = [...yearOne, ...yearTwo, ...yearThree, ...yearFour, ...yearFive, ...yearSix]
   const allCourses = await getSubstitutions(courseCodes)
 
   const criteria = {
-    courses: {
-      yearOne: updatedData.coursesYearOne,
-      yearTwo: updatedData.coursesYearTwo,
-      yearThree: updatedData.coursesYearThree,
-    },
+    courses: { yearOne, yearTwo, yearThree, yearFour, yearFive, yearSix },
     allCourses,
     credits: {
-      yearOne: updatedData.creditsYearOne,
-      yearTwo: updatedData.creditsYearTwo,
-      yearThree: updatedData.creditsYearThree,
+      yearOne: data.creditsYearOne ? data.creditsYearOne : 0,
+      yearTwo: data.creditsYearTwo ? data.creditsYearTwo : 0,
+      yearThree: data.creditsYearThree ? data.creditsYearThree : 0,
+      yearFour: data.creditsYearFour ? data.creditsYearFour : 0,
+      yearFive: data.creditsYearFive ? data.creditsYearFive : 0,
+      yearSix: data.creditsYearSix ? data.creditsYearSix : 0,
     },
   }
   return criteria
 }
 
-const createCriteria = async (studyProgramme, coYear1, coYear2, coYear3, crYear1, crYear2, crYear3) => {
+const createCriteria = async (studyProgramme, courseObj, creditsObj) => {
   const newProgrammeCriteria = {
     code: studyProgramme,
-    coursesYearOne: coYear1,
-    coursesYearTwo: coYear2,
-    coursesYearThree: coYear3,
-    creditsYearOne: crYear1,
-    creditsYearTwo: crYear2,
-    creditsYearThree: crYear3,
+    coursesYearOne: courseObj.year1,
+    coursesYearTwo: courseObj.year2,
+    coursesYearThree: courseObj.year3,
+    coursesYearFour: courseObj.year4,
+    coursesYearFive: courseObj.year5,
+    coursesYearSix: courseObj.year6,
+    creditsYearOne: creditsObj.year1,
+    creditsYearTwo: creditsObj.year2,
+    creditsYearThree: creditsObj.year3,
+    creditsYearFour: creditsObj.year1,
+    creditsYearFive: creditsObj.year2,
+    creditsYearSix: creditsObj.year3,
   }
   try {
     const createdData = await ProgressCriteria.create(newProgrammeCriteria)
@@ -56,22 +67,25 @@ const createCriteria = async (studyProgramme, coYear1, coYear2, coYear3, crYear1
 const saveYearlyCreditCriteria = async (studyProgramme, credits) => {
   const studyProgrammeToUpdate = await getCriteriaByStudyProgramme(studyProgramme)
   if (!studyProgrammeToUpdate) {
-    return await createCriteria(
-      studyProgramme,
-      [],
-      [],
-      [],
-      parseInt(credits.year1),
-      parseInt(credits.year2),
-      parseInt(credits.year3)
-    )
+    const courseObj = { year1: [], year2: [], year3: [], year4: [], year5: [], year6: [] }
+    const creditsObj = {
+      year1: parseInt(credits.year1),
+      year2: parseInt(credits.year2),
+      year3: parseInt(credits.year3),
+      year4: parseInt(credits.year4),
+      year5: parseInt(credits.year5),
+      year6: parseInt(credits.year6),
+    }
+    return await createCriteria(studyProgramme, courseObj, creditsObj)
   }
   const yearlyCredits = {
     creditsYearOne: parseInt(credits.year1),
     creditsYearTwo: parseInt(credits.year2),
     creditsYearThree: parseInt(credits.year3),
+    creditsYearFour: parseInt(credits.year4),
+    creditsYearFive: parseInt(credits.year5),
+    creditsYearSix: parseInt(credits.year6),
   }
-
   try {
     const updatedData = await studyProgrammeToUpdate.update({ ...yearlyCredits })
     return await formattedData(updatedData)
@@ -82,17 +96,23 @@ const saveYearlyCreditCriteria = async (studyProgramme, credits) => {
 
 const saveYearlyCourseCriteria = async (studyProgramme, courses, year) => {
   const studyProgrammeToUpdate = await getCriteriaByStudyProgramme(studyProgramme)
-
   if (!studyProgrammeToUpdate) {
-    const courseObj = { year1: [], year2: [], year3: [] }
+    const courseObj = { year1: [], year2: [], year3: [], year4: [], year5: [], year6: [] }
+    const creditObj = { year1: 0, year2: 0, year3: 0, year4: 0, year5: 0, year6: 0 }
     if (year === 1) {
       courseObj.year1 = courses
     } else if (year === 2) {
       courseObj.year2 = courses
-    } else {
+    } else if (year === 3) {
       courseObj.year3 = courses
+    } else if (year === 4) {
+      courseObj.year4 = courses
+    } else if (year === 5) {
+      courseObj.year5 = courses
+    } else {
+      courseObj.year6 = courses
     }
-    return await createCriteria(studyProgramme, courseObj.year1, courseObj.year2, courseObj.year3, 0, 0, 0)
+    return await createCriteria(studyProgramme, courseObj, creditObj)
   }
 
   try {
@@ -100,6 +120,9 @@ const saveYearlyCourseCriteria = async (studyProgramme, courses, year) => {
     if (year === 1) updatedData = await studyProgrammeToUpdate.update({ coursesYearOne: courses })
     if (year === 2) updatedData = await studyProgrammeToUpdate.update({ coursesYearTwo: courses })
     if (year === 3) updatedData = await studyProgrammeToUpdate.update({ coursesYearThree: courses })
+    if (year === 4) updatedData = await studyProgrammeToUpdate.update({ coursesYearFour: courses })
+    if (year === 5) updatedData = await studyProgrammeToUpdate.update({ coursesYearFive: courses })
+    if (year === 6) updatedData = await studyProgrammeToUpdate.update({ coursesYearSix: courses })
     const criteria = formattedData(updatedData)
     return criteria
   } catch (error) {
@@ -109,33 +132,12 @@ const saveYearlyCourseCriteria = async (studyProgramme, courses, year) => {
 
 const getCriteria = async studyProgramme => {
   const studyProgrammeCriteria = await getCriteriaByStudyProgramme(studyProgramme)
-  const coursesOne = studyProgrammeCriteria ? studyProgrammeCriteria.coursesYearOne : []
-  const coursesTwo = studyProgrammeCriteria ? studyProgrammeCriteria.coursesYearTwo : []
-  const coursesThree = studyProgrammeCriteria ? studyProgrammeCriteria.coursesYearThree : []
-  let allCourses = {}
-  if (studyProgrammeCriteria) {
-    const courseCodes = [
-      ...studyProgrammeCriteria.coursesYearOne,
-      ...studyProgrammeCriteria.coursesYearTwo,
-      ...studyProgrammeCriteria.coursesYearThree,
-    ]
-    allCourses = await getSubstitutions(courseCodes)
-  }
-
   const criteria = {
-    courses: {
-      yearOne: coursesOne,
-      yearTwo: coursesTwo,
-      yearThree: coursesThree,
-    },
-    allCourses,
-    credits: {
-      yearOne: studyProgrammeCriteria ? studyProgrammeCriteria.creditsYearOne : 0,
-      yearTwo: studyProgrammeCriteria ? studyProgrammeCriteria.creditsYearTwo : 0,
-      yearThree: studyProgrammeCriteria ? studyProgrammeCriteria.creditsYearThree : 0,
-    },
+    courses: { yearOne: [], yearTwo: [], yearThree: [], yearFour: [], yearFive: [], yearSix: [] },
+    allCourses: [],
+    credits: { yearOne: 0, yearTwo: 0, yearThree: 0, yearFour: 0, yearFive: 0, yearSix: 0 },
   }
-  return criteria
+  return studyProgrammeCriteria ? formattedData(studyProgrammeCriteria) : criteria
 }
 
 module.exports = {
