@@ -1,6 +1,7 @@
 import React, { Suspense } from 'react'
 import { Route, Switch, Redirect } from 'react-router-dom'
 import SegmentDimmer from 'components/SegmentDimmer'
+import CompletedPrerequisites from 'components/PrerequisitesSearch'
 import ProtectedRoute from './ProtectedRoute'
 
 // From https://dev.to/goenning/how-to-retry-when-react-lazy-fails-mb5
@@ -57,6 +58,7 @@ const routes = {
   faculties: '/faculties/:facultyCode?',
   customOpenUniPopulation: '/openunipopulation',
   evaluationOverview: '/evaluationoverview/:level?/:id?',
+  searchPrerequisites: '/courseprerequisites',
 }
 
 const Routes = () => (
@@ -107,6 +109,12 @@ const Routes = () => (
         exact
         path={routes.customOpenUniPopulation}
         component={CustomOpenUniPopulations}
+      />
+      <ProtectedRoute
+        requiredRoles={['admin']}
+        exact
+        path={routes.searchPrerequisites}
+        component={CompletedPrerequisites}
       />
       <ProtectedRoute requiredRoles={['admin']} requireUserHasRights exact path={routes.updater} component={Updater} />
       <ProtectedRoute
