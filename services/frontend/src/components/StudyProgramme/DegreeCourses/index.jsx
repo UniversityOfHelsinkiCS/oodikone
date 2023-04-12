@@ -317,13 +317,13 @@ const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, re
                   <Form.Input
                     type="number"
                     fluid
-                    label={`Fifth year (62 months) last set: ${criteria?.credits?.yearFive}`}
+                    label={`Fifth year (60 months) last set: ${criteria?.credits?.yearFive}`}
                     onChange={e => setCreditsLimit5(e.target.value)}
                   />
                   <Form.Input
                     type="number"
                     fluid
-                    label={`Sixth year (70 months) last set: ${criteria?.credits?.yearSix}`}
+                    label={`Sixth year (72 months) last set: ${criteria?.credits?.yearSix}`}
                     onChange={e => setCreditsLimit6(e.target.value)}
                   />
                 </Form.Group>
