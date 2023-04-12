@@ -160,6 +160,15 @@ const ProgressCriteria = sequelizeKone.define(
     coursesYearThree: {
       type: Sequelize.ARRAY(Sequelize.STRING),
     },
+    coursesYearFour: {
+      type: Sequelize.ARRAY(Sequelize.STRING),
+    },
+    coursesYearFive: {
+      type: Sequelize.ARRAY(Sequelize.STRING),
+    },
+    coursesYearSix: {
+      type: Sequelize.ARRAY(Sequelize.STRING),
+    },
     creditsYearOne: {
       type: Sequelize.INTEGER,
     },
@@ -167,6 +176,15 @@ const ProgressCriteria = sequelizeKone.define(
       type: Sequelize.INTEGER,
     },
     creditsYearThree: {
+      type: Sequelize.INTEGER,
+    },
+    creditsYearFour: {
+      type: Sequelize.INTEGER,
+    },
+    creditsYearFive: {
+      type: Sequelize.INTEGER,
+    },
+    creditsYearSix: {
       type: Sequelize.INTEGER,
     },
   },

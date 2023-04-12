@@ -27,6 +27,9 @@ const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, re
   const [creditsLimit1, setCreditsLimit1] = useState('')
   const [creditsLimit2, setCreditsLimit2] = useState('')
   const [creditsLimit3, setCreditsLimit3] = useState('')
+  const [creditsLimit4, setCreditsLimit4] = useState('')
+  const [creditsLimit5, setCreditsLimit5] = useState('')
+  const [creditsLimit6, setCreditsLimit6] = useState('')
 
   const [addProgressCriteriaCourse, { data: courseData }] = useAddProgressCriteriaCourseMutation()
   const [addProgressCriteriaCredits, { data: creditsData }] = useAddProgressCriteriaCreditsMutation()
@@ -74,11 +77,12 @@ const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, re
   }, [modules])
 
   const getYear = criterionYear => {
-    let year = 'yearOne'
-    if (criterionYear !== 1) {
-      year = criterionYear === 2 ? 'yearTwo' : 'yearThree'
-    }
-    return year
+    if (criterionYear === 1) return 'yearOne'
+    if (criterionYear === 2) return 'yearTwo'
+    if (criterionYear === 3) return 'yearThree'
+    if (criterionYear === 4) return 'yearFour'
+    if (criterionYear === 5) return 'yearFive'
+    return 'yearSix'
   }
 
   const setExclusionButton = course => (
@@ -130,6 +134,39 @@ const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, re
   )
 
   const labelDropdown = course => {
+    if (['MH30_001', 'MH30_003', 'KH90_001'].includes(studyProgramme)) {
+      return (
+        <Dropdown text="Modify labels" className="link item">
+          <Dropdown.Menu>
+            {course.visible.visibility ? setExclusionButton(course) : deleteButton(course)}
+            <Dropdown.Divider />
+            {criteria?.courses?.yearOne?.includes(course.code)
+              ? deleteCriteriaButton(course, 1)
+              : setCriteriaButton(course, 1)}
+            <Dropdown.Divider />
+            {criteria?.courses?.yearTwo?.includes(course.code)
+              ? deleteCriteriaButton(course, 2)
+              : setCriteriaButton(course, 2)}
+            <Dropdown.Divider />
+            {criteria?.courses?.yearThree?.includes(course.code)
+              ? deleteCriteriaButton(course, 3)
+              : setCriteriaButton(course, 3)}
+            <Dropdown.Divider />
+            {criteria?.courses?.yearFour?.includes(course.code)
+              ? deleteCriteriaButton(course, 4)
+              : setCriteriaButton(course, 4)}
+            <Dropdown.Divider />
+            {criteria?.courses?.yearFive?.includes(course.code)
+              ? deleteCriteriaButton(course, 5)
+              : setCriteriaButton(course, 5)}
+            <Dropdown.Divider />
+            {criteria?.courses?.yearSix?.includes(course.code)
+              ? deleteCriteriaButton(course, 6)
+              : setCriteriaButton(course, 6)}
+          </Dropdown.Menu>
+        </Dropdown>
+      )
+    }
     return (
       <Dropdown text="Modify labels" className="link item">
         <Dropdown.Menu>
@@ -156,6 +193,9 @@ const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, re
       year1: creditsLimit1 === '' ? criteria.credits.yearOne : creditsLimit1,
       year2: creditsLimit2 === '' ? criteria.credits.yearTwo : creditsLimit2,
       year3: creditsLimit3 === '' ? criteria.credits.yearThree : creditsLimit3,
+      year4: creditsLimit4 === '' ? criteria.credits.yearOne : creditsLimit4,
+      year5: creditsLimit5 === '' ? criteria.credits.yearTwo : creditsLimit5,
+      year6: creditsLimit6 === '' ? criteria.credits.yearThree : creditsLimit6,
     }
     addProgressCriteriaCredits({ programmeCode: studyProgramme, credits })
   }
@@ -233,7 +273,7 @@ const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, re
 
   return (
     <>
-      {studyProgramme.includes('KH') && (
+      {(studyProgramme.includes('KH') || ['MH30_001', 'MH30_003'].includes(studyProgramme)) && (
         <>
           <Message style={{ fontSize: '16px' }}>
             <Message.Header>Change visibility of degree courses and select criteria for academic years</Message.Header>
@@ -266,6 +306,28 @@ const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, re
                   onChange={e => setCreditsLimit3(e.target.value)}
                 />
               </Form.Group>
+              {['MH30_001', 'MH30_003', 'KH90_001'].includes(studyProgramme) && (
+                <Form.Group widths="equal">
+                  <Form.Input
+                    type="number"
+                    fluid
+                    label={`Fourth year (48 months) last set: ${criteria?.credits?.yearFour}`}
+                    onChange={e => setCreditsLimit4(e.target.value)}
+                  />
+                  <Form.Input
+                    type="number"
+                    fluid
+                    label={`Fifth year (62 months) last set: ${criteria?.credits?.yearFive}`}
+                    onChange={e => setCreditsLimit5(e.target.value)}
+                  />
+                  <Form.Input
+                    type="number"
+                    fluid
+                    label={`Sixth year (70 months) last set: ${criteria?.credits?.yearSix}`}
+                    onChange={e => setCreditsLimit6(e.target.value)}
+                  />
+                </Form.Group>
+              )}
               <Form.Button color="green" content="Save credit changes" onClick={setCreditsLimitCriteria} />
             </Form>
           </Container>
@@ -277,8 +339,14 @@ const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, re
             <Table.HeaderCell>Name</Table.HeaderCell>
             <Table.HeaderCell>Code</Table.HeaderCell>
             <Table.HeaderCell>Visibility Label</Table.HeaderCell>
-            {studyProgramme.includes('KH') && <Table.HeaderCell>Criterion Labels</Table.HeaderCell>}
-            <Table.HeaderCell>{studyProgramme.includes('KH') ? 'Set Labels' : 'Set Visibility'}</Table.HeaderCell>
+            {(studyProgramme.includes('KH') || ['MH30_001', 'MH30_003'].includes(studyProgramme)) && (
+              <Table.HeaderCell>Criterion Labels</Table.HeaderCell>
+            )}
+            <Table.HeaderCell>
+              {studyProgramme.includes('KH') || ['MH30_001', 'MH30_003'].includes(studyProgramme)
+                ? 'Set Labels'
+                : 'Set Visibility'}
+            </Table.HeaderCell>
           </Table.Row>
         </Table.Header>
         <Table.Body>
@@ -296,7 +364,7 @@ const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, re
                     color={moduleVisibilityColor(calculateModuleVisibility(module))}
                   />
                 </Table.Cell>
-                {studyProgramme.includes('KH') && <Table.Cell />}
+                {(studyProgramme.includes('KH') || ['MH30_001', 'MH30_003'].includes(studyProgramme)) && <Table.Cell />}
                 <Table.Cell>
                   {calculateModuleVisibility(module) === 'hidden' ? showAllButton(module) : hideAllButton(module)}
                 </Table.Cell>
@@ -314,16 +382,23 @@ const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, re
                           color={course.visible.visibility ? 'green' : 'red'}
                         />
                       </Table.Cell>
-                      {studyProgramme.includes('KH') && (
+                      {(studyProgramme.includes('KH') || ['MH30_001', 'MH30_003'].includes(studyProgramme)) && (
                         <Table.Cell>
                           {criteria?.courses?.yearOne?.includes(course.code) && <Label content="year 1" color="blue" />}
                           {criteria?.courses?.yearTwo?.includes(course.code) && <Label content="year 2" color="blue" />}
                           {criteria?.courses?.yearThree?.includes(course.code) && (
                             <Label content="year 3" color="blue" />
                           )}
+                          {criteria?.courses?.yearFour?.includes(course.code) && (
+                            <Label content="year 4" color="blue" />
+                          )}
+                          {criteria?.courses?.yearFive?.includes(course.code) && (
+                            <Label content="year 5" color="blue" />
+                          )}
+                          {criteria?.courses?.yearSix?.includes(course.code) && <Label content="year 6" color="blue" />}
                         </Table.Cell>
                       )}
-                      {studyProgramme.includes('KH') ? (
+                      {studyProgramme.includes('KH') || ['MH30_001', 'MH30_003'].includes(studyProgramme) ? (
                         <Table.Cell>{labelDropdown(course)}</Table.Cell>
                       ) : (
                         <Table.Cell>

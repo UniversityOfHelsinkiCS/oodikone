@@ -522,7 +522,10 @@ const PopulationStudentsContainer = ({ ...props }) => {
   const contentByVariant = {
     population: {
       panesToInclude:
-        props.year === 'All' || (props.programmeCode && !props.programmeCode.includes('KH'))
+        props.year === 'All' ||
+        (props.programmeCode &&
+          !props.programmeCode.includes('KH') &&
+          !['MH30_001', 'MH30_003'].includes(props.programmeCode))
           ? ['General', 'Courses', 'Tags']
           : ['General', 'Courses', 'Tags', 'Progress'],
       infotoolTipContent: infotoolTips.PopulationStatistics.StudentsClass,

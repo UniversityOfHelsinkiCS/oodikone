@@ -17,8 +17,8 @@ const PopulationCourses = ({ query = {}, filteredStudents, selectedStudentsByYea
   const progressCriteria = useGetProgressCriteriaQuery({ programmeCode: query?.studyRights?.programme })
   const dispatch = useDispatch()
   const emptyCriteria = {
-    courses: { yearOne: [], yearTwo: [], yearThree: [] },
-    credits: { yearOne: 0, yearTwo: 0, yearThree: 0 },
+    courses: { yearOne: [], yearTwo: [], yearThree: [], yearFour: [], yearFive: [], yearSix: [] },
+    credits: { yearOne: 0, yearTwo: 0, yearThree: 0, yearFour: 0, yearFive: 0, yearSix: 0 },
   }
   const [criteria, setCriteria] = useState(progressCriteria?.data ? progressCriteria.data : emptyCriteria)
   const populationSelectedStudentCourses = useSelector(

@@ -17,7 +17,9 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
         <Icon fitted name="check" title="Checked" color="green" />
       ) : null
     const courses = s.courses.filter(
-      course => course.course_code === courseCode || criteria.allCourses[courseCode].includes(course.course_code)
+      course =>
+        course.course_code === courseCode ||
+        (criteria?.allCourses[courseCode] && criteria?.allCourses[courseCode].includes(course.course_code))
     )
     if (courses && courses.some(course => course.credittypecode === 9))
       return <Icon name="clipboard check" title="Credit transfer" color="green" />
@@ -34,7 +36,9 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
     if (courseCode.includes('Credits'))
       return s.criteriaProgress[year] && s.criteriaProgress[year].credits ? 'Passed' : ''
     const courses = s.courses.filter(
-      course => course.course_code === courseCode || criteria?.allCourses[courseCode].includes(course.course_code)
+      course =>
+        course.course_code === courseCode ||
+        (criteria?.allCourses[courseCode] && criteria?.allCourses[courseCode].includes(course.course_code))
     )
     if (courses && courses.some(course => course.credittypecode === 9)) return 'Credit transfer'
     if (courses && courses.some(course => course.passed)) return 'Passed'
@@ -306,6 +310,166 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
           ],
         }
       )
+    }
+    // Lääkkis and HammasLääkkis do not have separate bachelor programme.
+    // Eläinlääkkis do have separate bachelor and master programmes, but we like to see it as one.
+    if (['MH30_001', 'MH30_003', 'KH90_001'].includes(programme)) {
+      criteriaHeaders.push(
+        { title: months < 48 ? 'Academic Year 4 (in progress)' : 'Academic Year 4', year: 'year4', label: 'yearFour' },
+        { title: months < 60 ? 'Academic Year 5 (in progress)' : 'Academic Year 5', year: 'year5', label: 'yearFive' },
+        { title: months < 72 ? 'Academic Year 6 (in progress)' : 'Academic Year 6', year: 'year6', label: 'yearSix' }
+      )
+      if (months > 32) {
+        columns.push(
+          {
+            key: criteriaHeaders[3].title,
+            title: (
+              <div style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
+                <div>{criteriaHeaders[3].title}</div>
+              </div>
+            ),
+            textTitle: null,
+            parent: true,
+            children: createContent(labelCriteria[criteriaHeaders[3].label], criteriaHeaders[3].year, 6),
+          },
+          {
+            key: 'hidden-4',
+            textTitle: null,
+            mergeHeader: true,
+            parent: true,
+            children: [
+              {
+                key: `absence-fourth-Fall`,
+                export: true,
+                forceToolsMode: 'none',
+                textTitle: `Enrollment Status FALL 4`,
+                cellProps: { style: { display: 'none' } },
+                getRowVal: s => getEnrollmentValue(s.semesterenrollments[6]),
+                child: true,
+              },
+              {
+                key: `absence-fourth-Spring`,
+                export: true,
+                forceToolsMode: 'none',
+                textTitle: `Enrollment Status SPRING 4`,
+                cellProps: { style: { display: 'none' } },
+                getRowVal: s => getEnrollmentValue(s.semesterenrollments[7]),
+                child: true,
+              },
+              {
+                key: 'fifth_academic',
+                export: true,
+                forceToolsMode: 'none',
+                textTitle: ' ',
+                cellProps: { style: { display: 'none' } },
+                getRowVal: () => ' ',
+                child: true,
+              },
+            ],
+          }
+        )
+      }
+
+      if (months > 48) {
+        columns.push(
+          {
+            key: criteriaHeaders[4].title,
+            title: (
+              <div style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
+                <div>{criteriaHeaders[4].title}</div>
+              </div>
+            ),
+            textTitle: null,
+            parent: true,
+            children: createContent(labelCriteria[criteriaHeaders[4].label], criteriaHeaders[4].year, 8),
+          },
+          {
+            key: 'hidden-5',
+            textTitle: null,
+            mergeHeader: true,
+            parent: true,
+            children: [
+              {
+                key: `absence-fifth-Fall`,
+                export: true,
+                forceToolsMode: 'none',
+                textTitle: `Enrollment Status FALL 5`,
+                cellProps: { style: { display: 'none' } },
+                getRowVal: s => getEnrollmentValue(s.semesterenrollments[8]),
+                child: true,
+              },
+              {
+                key: `absence-second-Spring`,
+                export: true,
+                forceToolsMode: 'none',
+                textTitle: `Enrollment Status SPRING 5`,
+                cellProps: { style: { display: 'none' } },
+                getRowVal: s => getEnrollmentValue(s.semesterenrollments[9]),
+                child: true,
+              },
+              {
+                key: 'sixth_academic',
+                export: true,
+                forceToolsMode: 'none',
+                textTitle: '  ',
+                cellProps: { style: { display: 'none' } },
+                getRowVal: () => ' ',
+                child: true,
+              },
+            ],
+          }
+        )
+      }
+      if (months > 60) {
+        columns.push(
+          {
+            key: criteriaHeaders[5].title,
+            title: (
+              <div style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
+                <div>{criteriaHeaders[5].title}</div>
+              </div>
+            ),
+            textTitle: null,
+            parent: true,
+            children: createContent(labelCriteria[criteriaHeaders[5].label], criteriaHeaders[5].year, 10),
+          },
+          {
+            key: 'hidden-6',
+            textTitle: null,
+            mergeHeader: true,
+            parent: true,
+            children: [
+              {
+                key: `absence-sixth-Fall`,
+                export: true,
+                forceToolsMode: 'none',
+                textTitle: `Enrollment Status FALL 6`,
+                cellProps: { style: { display: 'none' } },
+                getRowVal: s => getEnrollmentValue(s.semesterenrollments[10]),
+                child: true,
+              },
+              {
+                key: `absence-sixth-Spring`,
+                export: true,
+                forceToolsMode: 'none',
+                textTitle: `Enrollment Status SPRING 6`,
+                cellProps: { style: { display: 'none' } },
+                getRowVal: s => getEnrollmentValue(s.semesterenrollments[11]),
+                child: true,
+              },
+              {
+                key: 'empty',
+                export: true,
+                forceToolsMode: 'none',
+                textTitle: '   ',
+                cellProps: { style: { display: 'none' } },
+                getRowVal: () => ' ',
+                child: true,
+              },
+            ],
+          }
+        )
+      }
     }
     const columnsToHide = [
       {
