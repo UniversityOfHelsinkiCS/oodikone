@@ -14,8 +14,7 @@ const BachelorHonours = ({ student, absentYears, programmeCode }) => {
   const mandatoryModules = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
   const [studentsModules, setModules] = useState([])
   const [otherModules, setOther] = useState([])
-  const [showMain, setShowMain] = useState(false)
-  const [showOther, setShowOther] = useState(false)
+  const [showHonoursModules, setShowHonoursModules] = useState(false)
   const [studyStartDate, setStartDate] = useState('')
   const [honors, setHonors] = useState(false)
   const [graduated, setGraduated] = useState(false)
@@ -132,31 +131,25 @@ const BachelorHonours = ({ student, absentYears, programmeCode }) => {
       />
       {!honors && reason && <Label tag content={reason} color="red" />}
       {inspection && <Label tag content="Might need further inspection" color="blue" />}
-      {studentsModules.length > 0 ? (
-        <>
-          <Accordion>
-            <Accordion.Title active={showMain} index={0} onClick={() => setShowMain(!showMain)}>
-              <Header as="h4">
-                <Icon name="dropdown" />
-                Main modules
-              </Header>
-            </Accordion.Title>
-            <Accordion.Content active={showMain}>{dataTable(studentsModules)}</Accordion.Content>
-          </Accordion>
-        </>
-      ) : null}
-      {otherModules.length > 0 ? (
-        <>
-          <Accordion>
-            <Accordion.Title active={showOther} index={0} onClick={() => setShowOther(!showOther)}>
-              <Header as="h4">
-                <Icon name="dropdown" />
-                Other modules
-              </Header>
-            </Accordion.Title>
-            <Accordion.Content active={showOther}>{dataTable(otherModules)}</Accordion.Content>
-          </Accordion>
-        </>
+      {honors ? (
+        <Accordion>
+          <Accordion.Title
+            active={showHonoursModules}
+            index={0}
+            onClick={() => setShowHonoursModules(!showHonoursModules)}
+          >
+            <Header as="h4">
+              <Icon name="dropdown" />
+              Main courses and other modules
+            </Header>
+          </Accordion.Title>
+          <Accordion.Content active={showHonoursModules}>
+            <h4>Main Modules</h4>
+            {studentsModules.length > 0 && dataTable(studentsModules)}
+            <h4>Other Modules</h4>
+            {otherModules.length > 0 && dataTable(otherModules)}
+          </Accordion.Content>
+        </Accordion>
       ) : null}
     </>
   )
