@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react'
+import React from 'react'
 import { func, shape, string } from 'prop-types'
 
 import { Divider, Table, Icon, Header, Item, Segment, Button, Popup } from 'semantic-ui-react'
@@ -70,25 +70,25 @@ const StudyrightsTable = ({
     if (c.cancelled)
       return (
         <div style={{ display: 'flex' }}>
-          <p style={{ color: 'black', fontWeight: 'bold' }}>CANCELLED</p>
+          <p style={{ color: 'black', fontWeight: 'bolder' }}>CANCELLED</p>
         </div>
       )
     if (c.graduated)
       return (
         <div>
-          <p style={{ color: 'green', fontWeight: 'bold', marginBottom: 0 }}>GRADUATED</p>
+          <p style={{ color: 'green', fontWeight: 'bolder', marginBottom: 0 }}>GRADUATED</p>
           <p style={{ color: 'grey', marginTop: 0 }}>{reformatDate(c.enddate, 'DD.MM.YYYY')}</p>
         </div>
       )
     if (c.active)
       return (
         <div style={{ display: 'flex' }}>
-          <p style={{ color: 'blue', fontWeight: 'bold' }}>ACTIVE</p>
+          <p style={{ color: 'blue', fontWeight: 'bolder' }}>ACTIVE</p>
         </div>
       )
     return (
       <div style={{ display: 'flex' }}>
-        <p style={{ color: 'red', fontWeight: 'bold' }}>INACTIVE</p>
+        <p style={{ color: 'red', fontWeight: 'bolder' }}>INACTIVE</p>
       </div>
     )
   }
@@ -170,7 +170,33 @@ const StudyrightsTable = ({
           <Table.Row>
             <Table.HeaderCell />
             {studyRightHeaders.map(header => (
-              <Table.HeaderCell key={header}>{header}</Table.HeaderCell>
+              <Table.HeaderCell key={header}>
+                {header}{' '}
+                {header === 'Status' && (
+                  <Popup
+                    hoverable
+                    content={
+                      <>
+                        <p style={{ marginBottom: 0 }}>
+                          <strong>Active:</strong> Student is currently enrolled to the corresponding programme either
+                          present or absent.
+                        </p>
+                        <p style={{ marginBottom: 0, marginTop: 0 }}>
+                          <strong>Inactive:</strong> Student has not enrolled to the corresponding programme.
+                        </p>
+                        <p style={{ marginBottom: 0, marginTop: 0 }}>
+                          <strong>Cancelled:</strong> Sturyright for the corresponding programme is cancelled.
+                        </p>
+                        <p style={{ marginTop: 0 }}>
+                          <strong>Graduated:</strong> Student has graduated from the corresponding programme.
+                        </p>
+                      </>
+                    }
+                    size="mini"
+                    trigger={<Icon name="question circle outline" />}
+                  />
+                )}
+              </Table.HeaderCell>
             ))}
           </Table.Row>
         </Table.Header>
