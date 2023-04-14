@@ -6,6 +6,7 @@ import SortableTable from 'components/SortableTable'
 import sendEvent from 'common/sendEvent'
 import { getTextIn } from 'common'
 import { keyBy } from 'lodash'
+import moment from 'moment'
 
 const sendAnalytics = sendEvent.populationStudents
 const ProgressTable = ({ criteria, students, months, programme }) => {
@@ -22,14 +23,11 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
         (criteria?.allCourses[courseCode] && criteria?.allCourses[courseCode].includes(course.course_code))
     )
     if (courses && courses.some(course => course.credittypecode === 9))
-      return <Icon name="clipboard check" title="Credit transfer" color="green" />
-    if (courses && courses.some(course => course.passed))
-      return <Icon fitted name="check" title="Passed" color="green" />
-    if (courses && courses.some(course => course.passed === false))
-      return <Icon fitted name="times" title="Failed" color="red" />
-    // if (failedManyTimes) return <Icon fitted name="times" color="red" />
+      return <Icon name="clipboard check" color="green" />
+    if (courses && courses.some(course => course.passed)) return <Icon fitted name="check" color="green" />
+    if (courses && courses.some(course => course.passed === false)) return <Icon fitted name="times" color="red" />
     if (s.enrollments && s.enrollments.map(course => course.course_code).includes(courseCode))
-      return <Icon fitted name="minus" title="Unfinished" color="grey" />
+      return <Icon fitted name="minus" color="grey" />
     return null
   }
   const findCsvText = (s, courseCode, year) => {
@@ -40,11 +38,14 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
         course.course_code === courseCode ||
         (criteria?.allCourses[courseCode] && criteria?.allCourses[courseCode].includes(course.course_code))
     )
-    if (courses && courses.some(course => course.credittypecode === 9)) return 'Credit transfer'
-    if (courses && courses.some(course => course.passed)) return 'Passed'
-    if (courses && courses.some(course => course.passed === false)) return 'Failed'
-    // if (failedManyTimes) return <Icon fitted name="times" color="red" />
-    if (s.enrollments && s.enrollments.map(course => course.course_code).includes(courseCode)) return 'Unfinished'
+    if (courses && courses.some(course => course.passed))
+      return `Passed-${moment(courses[0].date).format('YYYY-MM-DD')}`
+    if (courses && courses.some(course => course.passed === false))
+      return `Failed-${moment(courses[0].date).format('YYYY-MM-DD')}`
+    if (s.enrollments && s.enrollments.map(course => course.course_code).includes(courseCode)) {
+      const enrollment = s.enrollments.filter(enrollment => enrollment.course_code === courseCode)
+      return `Enrollment-${moment(enrollment[0].enrollment_date_time).format('YYYY-MM-DD')}`
+    }
     return ''
   }
   const columns = useMemo(() => {
@@ -74,7 +75,7 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
       key: 'studentnumber-parent',
       title: 'Student Number',
       cellProps: { title: 'student number', className: 'studentNumber' },
-      getRowVal: s => (s.total ? '*' : s.studentNumber),
+      getRowVal: s => s.studentNumber,
       getRowContent: s => (
         <div>
           <span>{s.studentNumber}</span>
@@ -93,16 +94,38 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
     })
 
     const courses = keyBy(mandatoryCourses, 'code')
-    const labelCriteria = Object.keys(criteria.courses).reduce((acc, year) => {
+    const labelCriteria = Object.keys(criteria.courses).reduce((acc, year, idx) => {
       acc[year] = [
-        { code: `Credits: ${criteria.credits[year]}`, name: '' },
+        {
+          code: `Credits`,
+          name: {
+            fi: `Year ${idx + 1}: ${criteria.credits[year]}`,
+            en: `Year ${idx + 1}: ${criteria.credits[year]}`,
+            sv: `Year ${idx + 1}: ${criteria.credits[year]}`,
+          },
+        },
         ...[...criteria.courses[year]]
           .sort((a, b) => a.localeCompare(b))
           .map(courseCode => ({
             code: courseCode,
             name: courses[courseCode] ? courses[courseCode].name : '',
           })),
-        { code: `Total`, name: '' },
+        {
+          code: `Criteria`,
+          name: {
+            fi: `Year ${idx + 1}: Fullfilled`,
+            en: `Year ${idx + 1}: Fullfilled`,
+            sv: `Year ${idx + 1}: Fullfilled`,
+          },
+        },
+        {
+          code: `Enrollment`,
+          name: { fi: `Year ${idx + 1}: Fall`, en: `Year ${idx + 1}: Fall`, sv: `Year ${idx + 1}: Fall` },
+        },
+        {
+          code: `Enrollment`,
+          name: { fi: `Year ${idx + 1}: Spring`, en: `Year ${idx + 1}: Spring`, sv: `Year ${idx + 1}: Spring` },
+        },
       ]
       return acc
     }, {})
@@ -117,14 +140,41 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
       if (enrollmentObj?.enrollmenttype === 2) return 'Absent'
       return 'Inactive'
     }
+    const nonCourse = ['Enrollment', 'Criteria', 'Credits']
+    const style = { verticalAlign: 'middle', textAlign: 'center' }
+    const findProp = (courseCode, s) => {
+      const propObj = {
+        title: '',
+        style,
+      }
+      const courses = s.courses.filter(
+        course =>
+          course.course_code === courseCode ||
+          (criteria?.allCourses[courseCode] && criteria?.allCourses[courseCode].includes(course.course_code))
+      )
+      if (nonCourse.includes(courseCode)) return propObj
+      if (courses && courses.some(course => course.passed))
+        return { ...propObj, title: `Passed-${moment(courses[0].date).format('YYYY-MM-DD')}` }
+      if (courses && courses.some(course => course.passed === false))
+        return { ...propObj, title: `Failed-${moment(courses[0].date).format('YYYY-MM-DD')}` }
+      if (s.enrollments && s.enrollments.map(course => course.course_code).includes(courseCode)) {
+        const enrollment = s.enrollments.filter(enrollment => enrollment.course_code === courseCode)
+        return {
+          ...propObj,
+          title: `Enrollment-${moment(enrollment[0].enrollment_date_time).format('YYYY-MM-DD')}`,
+        }
+      }
+      return propObj
+    }
     const columns = []
+
     const createContent = (labels, year, enrollStatusIdx) => {
       return labels.map(m => ({
-        key: `${year}-${m.code}`,
+        key: `${year}-${m.code}-${m.name.fi}`,
         title: (
           <div
             key={`${year}-${m.code}-${getTextIn(m.name)}`}
-            style={{ maxWidth: '8em', whiteSpace: 'normal', overflow: 'hidden', width: 'max-content' }}
+            style={{ maxWidth: '7em', whiteSpace: 'normal', overflow: 'hidden', width: 'max-content' }}
           >
             <div key={`${m.code}-${year}`}>{m.code}</div>
             <div key={`${getTextIn(m.name)}`} style={{ color: 'gray', fontWeight: 'normal' }}>
@@ -137,19 +187,29 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
             ? `${m.code} ${enrollStatusIdx === 0 ? enrollStatusIdx + 1 : enrollStatusIdx}`
             : `${m.code}-${getTextIn(m.name)}`,
         headerProps: { title: `${m.code}, ${year}` },
-        cellProps: {
-          style: { verticalAlign: 'middle', textAlign: 'center' },
-        },
+        cellProps: s => findProp(m.code, s),
         getRowVal: s => {
-          if (m.code.includes('Total')) return s.criteriaProgress[year] ? s.criteriaProgress[year].totalSatisfied : 0
+          if (m.code.includes('Criteria')) return s.criteriaProgress[year] ? s.criteriaProgress[year].totalSatisfied : 0
+          if (m.code.includes('Enrollment') && m.name.fi.includes('Fall'))
+            return getEnrollmentValue(s.semesterenrollments[enrollStatusIdx])
+          if (m.code.includes('Enrollment') && m.name.fi.includes('Spring'))
+            return getEnrollmentValue(s.semesterenrollments[enrollStatusIdx + 1])
           return findCsvText(s, m.code, year)
         },
         getRowExportVal: s => {
-          if (m.code.includes('Total')) return s.criteriaProgress[year] ? s.criteriaProgress[year].totalSatisfied : 0
+          if (m.code.includes('Criteria')) return s.criteriaProgress[year] ? s.criteriaProgress[year].totalSatisfied : 0
+          if (m.code.includes('Enrollment') && m.name.fi.includes('Fall'))
+            return getEnrollmentValue(s.semesterenrollments[enrollStatusIdx])
+          if (m.code.includes('Enrollment') && m.name.fi.includes('Spring'))
+            return getEnrollmentValue(s.semesterenrollments[enrollStatusIdx + 1])
           return findCsvText(s, m.code, year)
         },
         getRowContent: s => {
-          if (m.code.includes('Total')) return s.criteriaProgress[year] ? s.criteriaProgress[year].totalSatisfied : 0
+          if (m.code.includes('Criteria')) return s.criteriaProgress[year] ? s.criteriaProgress[year].totalSatisfied : 0
+          if (m.code.includes('Enrollment') && m.name.fi.includes('Fall'))
+            return getEnrollmentValue(s.semesterenrollments[enrollStatusIdx])
+          if (m.code.includes('Enrollment') && m.name.fi.includes('Spring'))
+            return getEnrollmentValue(s.semesterenrollments[enrollStatusIdx + 1])
           return findRowContent(s, m.code, year)
         },
         child: true,
@@ -182,24 +242,6 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
         parent: true,
         children: [
           {
-            key: `absence-first-Fall`,
-            export: true,
-            forceToolsMode: 'none',
-            textTitle: `Enrollment Status FALL 1`,
-            cellProps: { style: { display: 'none' } },
-            getRowVal: s => getEnrollmentValue(s.semesterenrollments[0]),
-            child: true,
-          },
-          {
-            key: `absence-first-Spring`,
-            export: true,
-            forceToolsMode: 'none',
-            textTitle: `Enrollment Status SPRING 1`,
-            cellProps: { style: { display: 'none' } },
-            getRowVal: s => getEnrollmentValue(s.semesterenrollments[1]),
-            child: true,
-          },
-          {
             key: 'second_academic',
             export: true,
             forceToolsMode: 'none',
@@ -222,7 +264,7 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
           ),
           textTitle: null,
           parent: true,
-          children: createContent(labelCriteria[criteriaHeaders[1].label], criteriaHeaders[1].year, 2),
+          children: createContent(labelCriteria[criteriaHeaders[1].label], criteriaHeaders[1].year, 1),
         },
         {
           key: 'hidden-2',
@@ -230,24 +272,6 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
           mergeHeader: true,
           parent: true,
           children: [
-            {
-              key: `absence-second-Fall`,
-              export: true,
-              forceToolsMode: 'none',
-              textTitle: `Enrollment Status FALL 2`,
-              cellProps: { style: { display: 'none' } },
-              getRowVal: s => getEnrollmentValue(s.semesterenrollments[2]),
-              child: true,
-            },
-            {
-              key: `absence-second-Spring`,
-              export: true,
-              forceToolsMode: 'none',
-              textTitle: `Enrollment Status SPRING 2`,
-              cellProps: { style: { display: 'none' } },
-              getRowVal: s => getEnrollmentValue(s.semesterenrollments[3]),
-              child: true,
-            },
             {
               key: 'third_academic',
               export: true,
@@ -272,7 +296,7 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
           ),
           textTitle: null,
           parent: true,
-          children: createContent(labelCriteria[criteriaHeaders[2].label], criteriaHeaders[2].year, 4),
+          children: createContent(labelCriteria[criteriaHeaders[2].label], criteriaHeaders[2].year, 2),
         },
         {
           key: 'hidden-3',
@@ -280,24 +304,6 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
           mergeHeader: true,
           parent: true,
           children: [
-            {
-              key: `absence-third-Fall`,
-              export: true,
-              forceToolsMode: 'none',
-              textTitle: `Enrollment Status FALL 3`,
-              cellProps: { style: { display: 'none' } },
-              getRowVal: s => getEnrollmentValue(s.semesterenrollments[4]),
-              child: true,
-            },
-            {
-              key: `absence-third-Spring`,
-              export: true,
-              forceToolsMode: 'none',
-              textTitle: `Enrollment Status SPRING 3`,
-              cellProps: { style: { display: 'none' } },
-              getRowVal: s => getEnrollmentValue(s.semesterenrollments[5]),
-              child: true,
-            },
             {
               key: 'empty',
               export: true,
@@ -330,7 +336,7 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
             ),
             textTitle: null,
             parent: true,
-            children: createContent(labelCriteria[criteriaHeaders[3].label], criteriaHeaders[3].year, 6),
+            children: createContent(labelCriteria[criteriaHeaders[3].label], criteriaHeaders[3].year, 3),
           },
           {
             key: 'hidden-4',
@@ -338,24 +344,6 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
             mergeHeader: true,
             parent: true,
             children: [
-              {
-                key: `absence-fourth-Fall`,
-                export: true,
-                forceToolsMode: 'none',
-                textTitle: `Enrollment Status FALL 4`,
-                cellProps: { style: { display: 'none' } },
-                getRowVal: s => getEnrollmentValue(s.semesterenrollments[6]),
-                child: true,
-              },
-              {
-                key: `absence-fourth-Spring`,
-                export: true,
-                forceToolsMode: 'none',
-                textTitle: `Enrollment Status SPRING 4`,
-                cellProps: { style: { display: 'none' } },
-                getRowVal: s => getEnrollmentValue(s.semesterenrollments[7]),
-                child: true,
-              },
               {
                 key: 'fifth_academic',
                 export: true,
@@ -381,7 +369,7 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
             ),
             textTitle: null,
             parent: true,
-            children: createContent(labelCriteria[criteriaHeaders[4].label], criteriaHeaders[4].year, 8),
+            children: createContent(labelCriteria[criteriaHeaders[4].label], criteriaHeaders[4].year, 4),
           },
           {
             key: 'hidden-5',
@@ -389,24 +377,6 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
             mergeHeader: true,
             parent: true,
             children: [
-              {
-                key: `absence-fifth-Fall`,
-                export: true,
-                forceToolsMode: 'none',
-                textTitle: `Enrollment Status FALL 5`,
-                cellProps: { style: { display: 'none' } },
-                getRowVal: s => getEnrollmentValue(s.semesterenrollments[8]),
-                child: true,
-              },
-              {
-                key: `absence-second-Spring`,
-                export: true,
-                forceToolsMode: 'none',
-                textTitle: `Enrollment Status SPRING 5`,
-                cellProps: { style: { display: 'none' } },
-                getRowVal: s => getEnrollmentValue(s.semesterenrollments[9]),
-                child: true,
-              },
               {
                 key: 'sixth_academic',
                 export: true,
@@ -431,7 +401,7 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
             ),
             textTitle: null,
             parent: true,
-            children: createContent(labelCriteria[criteriaHeaders[5].label], criteriaHeaders[5].year, 10),
+            children: createContent(labelCriteria[criteriaHeaders[5].label], criteriaHeaders[5].year, 5),
           },
           {
             key: 'hidden-6',
@@ -439,24 +409,6 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
             mergeHeader: true,
             parent: true,
             children: [
-              {
-                key: `absence-sixth-Fall`,
-                export: true,
-                forceToolsMode: 'none',
-                textTitle: `Enrollment Status FALL 6`,
-                cellProps: { style: { display: 'none' } },
-                getRowVal: s => getEnrollmentValue(s.semesterenrollments[10]),
-                child: true,
-              },
-              {
-                key: `absence-sixth-Spring`,
-                export: true,
-                forceToolsMode: 'none',
-                textTitle: `Enrollment Status SPRING 6`,
-                cellProps: { style: { display: 'none' } },
-                getRowVal: s => getEnrollmentValue(s.semesterenrollments[11]),
-                child: true,
-              },
               {
                 key: 'empty',
                 export: true,
