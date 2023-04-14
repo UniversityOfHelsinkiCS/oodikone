@@ -76,7 +76,8 @@ const StudyrightsTable = ({
     if (c.graduated)
       return (
         <div>
-          <p style={{ color: 'green', fontWeight: 'bold' }}>GRADUATED</p>
+          <p style={{ color: 'green', fontWeight: 'bold', marginBottom: 0 }}>GRADUATED</p>
+          <p style={{ color: 'grey', marginTop: 0 }}>{reformatDate(c.enddate, 'DD.MM.YYYY')}</p>
         </div>
       )
     if (c.active)
