@@ -42,7 +42,7 @@ const StudyGuidanceGroups = React.lazy(() => retry(() => import('../StudyGuidanc
 const FacultyStatistics = React.lazy(() => retry(() => import('../FacultyStatistics')))
 const CustomOpenUniPopulations = React.lazy(() => retry(() => import('../CustomOpenUniPopulation')))
 const EvaluationOverview = React.lazy(() => retry(() => import('../EvaluationOverview')))
-const CompletedPrerequisites = React.lazy(() => retry(() => import('../PrerequisitesSearch')))
+const CompletedCourses = React.lazy(() => retry(() => import('../CompletedCoursesSearch')))
 
 const routes = {
   students: '/students/:studentNumber?',
@@ -58,7 +58,7 @@ const routes = {
   faculties: '/faculties/:facultyCode?',
   customOpenUniPopulation: '/openunipopulation',
   evaluationOverview: '/evaluationoverview/:level?/:id?',
-  searchPrerequisites: '/courseprerequisites',
+  completedCoursesSearch: '/completedcoursessearch',
 }
 
 const Routes = () => (
@@ -114,8 +114,8 @@ const Routes = () => (
         requiredRoles={['admin', 'studyGuidanceGroups']}
         requireUserHasRights
         exact
-        path={routes.searchPrerequisites}
-        component={CompletedPrerequisites}
+        path={routes.completedCoursesSearch}
+        component={CompletedCourses}
       />
       <ProtectedRoute requiredRoles={['admin']} requireUserHasRights exact path={routes.updater} component={Updater} />
       <ProtectedRoute

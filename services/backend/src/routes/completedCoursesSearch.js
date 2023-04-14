@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const { getCompletedCourses } = require('../services/prerequisiteSearch')
+const { getCompletedCourses } = require('../services/completedCoursesSearch')
 const _ = require('lodash')
 
 router.get('/', async (req, res) => {

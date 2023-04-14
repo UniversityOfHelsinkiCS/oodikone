@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Modal, Form, Button, TextArea } from 'semantic-ui-react'
 import qs from 'query-string'
 
-const CompletedPrerequisitesSearch = ({ setValues, history, location }) => {
+const CompletedCoursesSearch = ({ setValues, history, location }) => {
   const [modal, setModal] = useState(false)
   const [courseInput, setCourseInput] = useState('')
   const [studentInput, setStudentInput] = useState('')
@@ -51,6 +51,7 @@ const CompletedPrerequisitesSearch = ({ setValues, history, location }) => {
       .split(/[\s,]+/)
       .map(code => code.trim().toUpperCase())
       .filter(s => s !== '')
+      .map(s => (s.length === 8 ? `0${s}` : s))
 
     setValues({
       studentList,
@@ -65,8 +66,8 @@ const CompletedPrerequisitesSearch = ({ setValues, history, location }) => {
   return (
     <Modal
       trigger={
-        <Button size="small" color="blue" onClick={() => setModal(true)} data-cy="course-prerequisites-search-button">
-          Search completed course prerequisites
+        <Button size="small" color="blue" onClick={() => setModal(true)} data-cy="completed-courses-search-button">
+          Search completed courses of students
         </Button>
       }
       open={modal}
@@ -75,12 +76,12 @@ const CompletedPrerequisitesSearch = ({ setValues, history, location }) => {
     >
       <Modal.Content>
         <Form>
-          <h2>Search completed course prerequisites</h2>
+          <h2>Search completed courses of students</h2>
           <Form.Field>
             <em>Insert one or more student numbers, separated by a space, a newline, or a comma.</em>
             <TextArea
               value={studentInput}
-              placeholder="012345678, 123456789"
+              placeholder="012345678, 12345678"
               onChange={e => setStudentInput(e.target.value)}
             />
           </Form.Field>
@@ -104,4 +105,4 @@ const CompletedPrerequisitesSearch = ({ setValues, history, location }) => {
   )
 }
 
-export default CompletedPrerequisitesSearch
+export default CompletedCoursesSearch
