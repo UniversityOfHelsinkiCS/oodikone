@@ -279,7 +279,9 @@ const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, re
             <Message.Header>Change visibility of degree courses and select criteria for academic years</Message.Header>
             <p>
               Here you can change visibility of degree courses as and set course and credits criteria. Each academic
-              year have their own course and credits criteria.
+              year have their own course and credits criteria. Credits criteria is computed as follows: for first
+              academic year the credits are taken into account if they are completed during the first 12 months. For the
+              second year, we take into account the completions during the first 24 months, for the third year 36.
             </p>
             <p>The progress of the students by these criteria will be shown in class statistics view.</p>
           </Message>
