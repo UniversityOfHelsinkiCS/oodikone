@@ -122,11 +122,11 @@ const getColumns = (labelsToCourses, language) => {
   const findRowValue = (s, courseCode, hidden = false) => {
     if (s.courseInfo[courseCode] === undefined) return ''
     if (s.courseInfo[courseCode].status.passed && hidden)
-      return `Passed: ${moment(s.courseInfo[courseCode].status.passed).format('DD-MM-YYYY')}`
+      return `Passed: ${moment(s.courseInfo[courseCode].status.passed).format('YYYY-MM-DD')}`
     if (s.courseInfo[courseCode].status.failed && hidden)
-      return `Failed: ${moment(s.courseInfo[courseCode].status.failed).format('DD-MM-YYYY')}`
+      return `Failed: ${moment(s.courseInfo[courseCode].status.failed).format('YYYY-MM-DD')}`
     if (s.courseInfo[courseCode].status.unfinished && hidden)
-      return `Enrollment: ${moment(s.courseInfo[courseCode].status.unfinished).format('DD-MM-YYYY')}`
+      return `Enrollment: ${moment(s.courseInfo[courseCode].status.unfinished).format('YYYY-MM-DD')}`
     if (s.courseInfo[courseCode].status.passed) return 'Passed'
     if (s.courseInfo[courseCode].status.failed) return 'Failed'
     if (s.courseInfo[courseCode].status.unfinished) return 'Unfinished'
@@ -139,13 +139,13 @@ const getColumns = (labelsToCourses, language) => {
     }
     if (s.courseInfo[courseCode] === undefined) return propObj
     if (s.courseInfo[courseCode].status.passed)
-      return { ...propObj, title: `Passed: ${moment(s.courseInfo[courseCode].status.passed).format('DD-MM-YYYY')}` }
+      return { ...propObj, title: `Passed: ${moment(s.courseInfo[courseCode].status.passed).format('YYYY-MM-DD')}` }
     if (s.courseInfo[courseCode].status.failed)
-      return { ...propObj, title: `Failed: ${moment(s.courseInfo[courseCode].status.failed).format('DD-MM-YYYY')}` }
-    if (s.courseInfo[courseCode].status.passed)
+      return { ...propObj, title: `Failed: ${moment(s.courseInfo[courseCode].status.failed).format('YYYY-MM-DD')}` }
+    if (s.courseInfo[courseCode].status.unfinished)
       return {
         ...propObj,
-        title: `Enrollment: ${moment(s.courseInfo[courseCode].status.unfinished).format('DD-MM-YYYY')}`,
+        title: `Enrollment: ${moment(s.courseInfo[courseCode].status.unfinished).format('YYYY-MM-DD')}`,
       }
     return propObj
   }
