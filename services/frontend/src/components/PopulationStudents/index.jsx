@@ -199,9 +199,11 @@ const CoursesTable = ({ students }) => {
         .map(e => ({
           key: e.id + e.code,
           title: (
-            <div style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
-              <div>{e.code}</div>
-              <div style={{ color: 'gray', fontWeight: 'normal' }}>{e.id}</div>
+            <div key={e.code} style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
+              <div key={`${e.code}-${e.id}`}>{e.code}</div>
+              <div key={`${e.code}${e.id}`} style={{ color: 'gray', fontWeight: 'normal' }}>
+                {e.id}
+              </div>
             </div>
           ),
           textTitle: e.code,
@@ -216,9 +218,17 @@ const CoursesTable = ({ students }) => {
             .map(m => ({
               key: `${m.label ? m.label.label : 'fix'}-${m.code}`, // really quick and dirty fix
               title: (
-                <div style={{ maxWidth: '15em', whiteSpace: 'normal', overflow: 'hidden', width: 'max-content' }}>
-                  <div>{m.code}</div>
-                  <div style={{ color: 'gray', fontWeight: 'normal' }}>{getTextIn(m.name)}</div>
+                <div
+                  key={`${m.code}-${m.label ? m.label.label : 'fix'}`}
+                  style={{ maxWidth: '15em', whiteSpace: 'normal', overflow: 'hidden', width: 'max-content' }}
+                >
+                  <div key={`${m.label ? m.label.label : 'fix'}-${m.code}`}>{m.code}</div>
+                  <div
+                    key={`${m.label ? m.label.label : 'fix'}-${getTextIn(m.name)}`}
+                    style={{ color: 'gray', fontWeight: 'normal' }}
+                  >
+                    {getTextIn(m.name)}
+                  </div>
                 </div>
               ),
               textTitle: m.code,
