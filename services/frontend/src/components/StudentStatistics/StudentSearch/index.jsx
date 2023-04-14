@@ -214,7 +214,7 @@ const StudentSearch = ({
         getRowContent: s => getStudyrights(s),
         cellProps: {
           style: {
-            padding: '0',
+            padding: '2',
           },
         },
       },
