@@ -122,6 +122,7 @@ const CustomPopulationSearch = sequelizeKone.define('custom_population_searches'
   },
 })
 
+// also used in completed courses search feature
 const OpenUniPopulationSearch = sequelizeKone.define(
   'open_uni_population_searches',
   {

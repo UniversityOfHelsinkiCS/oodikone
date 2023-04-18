@@ -7,7 +7,6 @@ const matomoInit = require('./routes/matomo-init')
 const currentUserMiddleware = require('./middleware/currentUserMiddleware')
 const accessLogger = require('./middleware/accessLogger')
 const auth = require('./middleware/auth')
-
 const courses = require('./routes/courses')
 const students = require('./routes/students')
 const population = require('./routes/population')

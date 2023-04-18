@@ -52,6 +52,9 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
   const getCellProps = (student, courseCode) => {
     const creditDate = student.credits.find(credit => credit.courseCode === courseCode)?.date
     const enrollmentDate = student.enrollments.find(enrollment => enrollment.courseCode === courseCode)?.date
+    if (!creditDate && !enrollmentDate) {
+      return { style }
+    }
     const title = creditDate
       ? `Passed on ${moment(creditDate).format('YYYY-MM-DD')} `
       : `Last enrollment on ${moment(enrollmentDate).format('YYYY-MM-DD')} `
@@ -62,7 +65,7 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
     return {
       key: course.code,
       title: (
-        <div key={course.code} style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
+        <div key={course.code} style={{ maxWidth: '8em', whiteSpace: 'normal', overflow: 'hidden' }}>
           <div key={`key1${course.code}`}>{course.code}</div>
           <div key={`key2${course.code}`} style={{ color: 'gray', fontWeight: 'normal' }}>
             {getTextIn(course.name)}
