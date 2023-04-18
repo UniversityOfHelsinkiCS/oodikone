@@ -12,7 +12,8 @@ const sendAnalytics = sendEvent.populationStudents
 const ProgressTable = ({ criteria, students, months, programme }) => {
   const mandatoryCourses = useSelector(state => state?.populationMandatoryCourses?.data)
   const namesVisible = useSelector(state => state?.settings?.namesVisible)
-  const findRowContent = (s, courseCode, year) => {
+
+  const findRowContent = (s, courseCode, year, start, end) => {
     if (courseCode.includes('Credits'))
       return s.criteriaProgress[year] && s.criteriaProgress[year].credits ? (
         <Icon fitted name="check" title="Checked" color="green" />
@@ -24,12 +25,19 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
     )
     if (courses && courses.some(course => course.credittypecode === 9))
       return <Icon name="clipboard check" color="green" />
-    if (courses && courses.some(course => course.passed)) return <Icon fitted name="check" color="green" />
+    if (
+      courses &&
+      courses.some(course => course.passed) &&
+      courses.some(course => moment(course.date).isBetween(moment(start), moment(end)))
+    )
+      return <Icon fitted name="check" color="green" />
+    if (courses && courses.some(course => course.passed)) return <Icon fitted name="check" color="yellow" />
     if (courses && courses.some(course => course.passed === false)) return <Icon fitted name="times" color="red" />
     if (s.enrollments && s.enrollments.map(course => course.course_code).includes(courseCode))
       return <Icon fitted name="minus" color="grey" />
     return null
   }
+
   const findCsvText = (s, courseCode, year) => {
     if (courseCode.includes('Credits'))
       return s.criteriaProgress[year] && s.criteriaProgress[year].credits ? 'Passed' : ''
@@ -168,7 +176,7 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
     }
     const columns = []
 
-    const createContent = (labels, year, enrollStatusIdx) => {
+    const createContent = (labels, year, start, end, enrollStatusIdx) => {
       return labels.map(m => ({
         key: `${year}-${m.code}-${m.name.fi}`,
         title: (
@@ -210,12 +218,17 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
             return getEnrollmentValue(s.semesterenrollments[enrollStatusIdx])
           if (m.code.includes('Enrollment') && m.name.fi.includes('Spring'))
             return getEnrollmentValue(s.semesterenrollments[enrollStatusIdx + 1])
-          return findRowContent(s, m.code, year)
+          return findRowContent(s, m.code, year, start, end)
         },
         child: true,
       }))
     }
-
+    const acaYearStart = moment()
+      .subtract(months - 1, 'months')
+      .startOf('month')
+    const acaYearEnd = moment()
+      .subtract(months - 12, 'months')
+      .endOf('month')
     columns.push(
       {
         key: 'general',
@@ -233,7 +246,13 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
         ),
         textTitle: null,
         parent: true,
-        children: createContent(labelCriteria[criteriaHeaders[0].label], criteriaHeaders[0].year, 0),
+        children: createContent(
+          labelCriteria[criteriaHeaders[0].label],
+          criteriaHeaders[0].year,
+          acaYearStart,
+          acaYearEnd,
+          0
+        ),
       },
       {
         key: 'hidden-1',
@@ -254,6 +273,8 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
       }
     )
     if (months > 12) {
+      const startAca2 = moment(acaYearStart).add(1, 'years')
+      const endAca2 = moment(acaYearEnd).add(1, 'years')
       columns.push(
         {
           key: criteriaHeaders[1].title,
@@ -264,7 +285,13 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
           ),
           textTitle: null,
           parent: true,
-          children: createContent(labelCriteria[criteriaHeaders[1].label], criteriaHeaders[1].year, 1),
+          children: createContent(
+            labelCriteria[criteriaHeaders[1].label],
+            criteriaHeaders[1].year,
+            startAca2,
+            endAca2,
+            1
+          ),
         },
         {
           key: 'hidden-2',
@@ -286,6 +313,8 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
       )
     }
     if (months > 24) {
+      const startAca3 = moment(acaYearStart).add(24, 'months')
+      const endAca3 = moment(acaYearEnd).add(24, 'months')
       columns.push(
         {
           key: criteriaHeaders[2].title,
@@ -296,7 +325,13 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
           ),
           textTitle: null,
           parent: true,
-          children: createContent(labelCriteria[criteriaHeaders[2].label], criteriaHeaders[2].year, 2),
+          children: createContent(
+            labelCriteria[criteriaHeaders[2].label],
+            criteriaHeaders[2].year,
+            startAca3,
+            endAca3,
+            2
+          ),
         },
         {
           key: 'hidden-3',
@@ -305,7 +340,7 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
           parent: true,
           children: [
             {
-              key: 'empty',
+              key: 'empty-hidden-3',
               export: true,
               forceToolsMode: 'none',
               textTitle: '   ',
@@ -326,6 +361,8 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
         { title: months < 72 ? 'Academic Year 6 (in progress)' : 'Academic Year 6', year: 'year6', label: 'yearSix' }
       )
       if (months > 36) {
+        const startAca4 = moment(acaYearStart).add(3, 'years')
+        const endAca4 = moment(acaYearEnd).add(3, 'years')
         columns.push(
           {
             key: criteriaHeaders[3].title,
@@ -336,7 +373,13 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
             ),
             textTitle: null,
             parent: true,
-            children: createContent(labelCriteria[criteriaHeaders[3].label], criteriaHeaders[3].year, 3),
+            children: createContent(
+              labelCriteria[criteriaHeaders[3].label],
+              criteriaHeaders[3].year,
+              startAca4,
+              endAca4,
+              3
+            ),
           },
           {
             key: 'hidden-4',
@@ -359,6 +402,8 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
       }
 
       if (months > 48) {
+        const startAca5 = moment(acaYearStart).add(4, 'years')
+        const endAca5 = moment(acaYearEnd).add(4, 'years')
         columns.push(
           {
             key: criteriaHeaders[4].title,
@@ -369,7 +414,13 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
             ),
             textTitle: null,
             parent: true,
-            children: createContent(labelCriteria[criteriaHeaders[4].label], criteriaHeaders[4].year, 4),
+            children: createContent(
+              labelCriteria[criteriaHeaders[4].label],
+              criteriaHeaders[4].year,
+              startAca5,
+              endAca5,
+              4
+            ),
           },
           {
             key: 'hidden-5',
@@ -391,17 +442,25 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
         )
       }
       if (months > 60) {
+        const startAca6 = moment(acaYearStart).add(5, 'years')
+        const endAca6 = moment(acaYearEnd).add(5, 'years')
         columns.push(
           {
             key: criteriaHeaders[5].title,
             title: (
-              <div style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
+              <div key={criteriaHeaders[5].title} style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
                 <div>{criteriaHeaders[5].title}</div>
               </div>
             ),
             textTitle: null,
             parent: true,
-            children: createContent(labelCriteria[criteriaHeaders[5].label], criteriaHeaders[5].year, 5),
+            children: createContent(
+              labelCriteria[criteriaHeaders[5].label],
+              criteriaHeaders[5].year,
+              startAca6,
+              endAca6,
+              5
+            ),
           },
           {
             key: 'hidden-6',
@@ -410,7 +469,7 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
             parent: true,
             children: [
               {
-                key: 'empty',
+                key: 'empty-hidden-6',
                 export: true,
                 forceToolsMode: 'none',
                 textTitle: '   ',
