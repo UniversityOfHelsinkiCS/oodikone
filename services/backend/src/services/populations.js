@@ -54,8 +54,12 @@ const createEmptyCriteriaYear = (criteria, year) => {
   }
 }
 
-const getCreditAmount = (courseDate, credits, startDate, addition) => {
-  return moment(courseDate).isBetween(moment(startDate), moment(startDate).add(addition, 'year')) ? credits : 0
+const getCreditAmount = (course, hops, courseCode, startDate, addition) => {
+  return moment(course.date).isBetween(moment(startDate), moment(startDate).add(addition, 'year')) &&
+    hops.length > 0 &&
+    (hops[0].included_courses.includes(courseCode) || hops[0].included_courses.includes(course.course_code))
+    ? course.credits
+    : 0
 }
 
 const updateCourseByYear = (criteria, criteriaYear, course, criteriaChecked, yearToAdd, correctCode) => {
@@ -75,6 +79,7 @@ const updateCourseByYear = (criteria, criteriaYear, course, criteriaChecked, yea
     }
   }
 }
+
 const updateCreditcriteriaInfo = (criteria, criteriaYear, criteriaChecked, yearToAdd, academicYears, academicYear) => {
   if (criteria.courses) {
     if (criteriaChecked?.[yearToAdd]) {
@@ -83,12 +88,13 @@ const updateCreditcriteriaInfo = (criteria, criteriaYear, criteriaChecked, yearT
           course => criteriaChecked?.[yearToAdd].coursesSatisfied[course] !== null
         ).length || 0
     }
-    if (academicYears[academicYear] >= criteria?.credits[criteriaYear]) {
+    if (academicYears[academicYear] >= criteria?.credits[criteriaYear] && criteria?.credits[criteriaYear] > 0) {
       criteriaChecked[yearToAdd].credits = true
       criteriaChecked[yearToAdd].totalSatisfied += 1
     }
   }
 }
+
 const formatStudentForPopulationStatistics = (
   {
     firstnames,
@@ -120,7 +126,8 @@ const formatStudentForPopulationStatistics = (
   startDate,
   startDateMoment,
   endDateMoment,
-  criteria
+  criteria,
+  code
 ) => {
   const toCourse = ({ grade, attainment_date, credits, course_code, credittypecode, isStudyModule, language }) => {
     const attainment_date_normailized =
@@ -155,7 +162,7 @@ const formatStudentForPopulationStatistics = (
       year5: createEmptyCriteriaYear(criteria, 'yearFive'),
       year6: createEmptyCriteriaYear(criteria, 'yearSix'),
     }
-
+    const correctStudyplan = studyplans ? studyplans.filter(plan => plan.programme_code === code) : []
     const academicYears = { first: 0, second: 0, third: 0, fourth: 0, fifth: 0, sixth: 0 }
     if (criteria.courses || criteria.credits) {
       const courses = credits[studentnumber] ? credits[studentnumber].map(toCourse) : []
@@ -168,12 +175,12 @@ const formatStudentForPopulationStatistics = (
           updateCourseByYear(criteria, 'yearFour', course, criteriaChecked, 'year4', correctCode)
           updateCourseByYear(criteria, 'yearFive', course, criteriaChecked, 'year5', correctCode)
           updateCourseByYear(criteria, 'yearSix', course, criteriaChecked, 'year6', correctCode)
-          academicYears.first += getCreditAmount(course.date, course.credits, startDate, 1)
-          academicYears.second += getCreditAmount(course.date, course.credits, startDate, 2)
-          academicYears.third += getCreditAmount(course.date, course.credits, startDate, 3)
-          academicYears.fourth += getCreditAmount(course.date, course.credits, startDate, 4)
-          academicYears.fifth += getCreditAmount(course.date, course.credits, startDate, 5)
-          academicYears.sixth += getCreditAmount(course.date, course.credits, startDate, 6)
+          academicYears.first += getCreditAmount(course, correctStudyplan, correctCode, startDate, 1)
+          academicYears.second += getCreditAmount(course, correctStudyplan, correctCode, startDate, 2)
+          academicYears.third += getCreditAmount(course, correctStudyplan, correctCode, startDate, 3)
+          academicYears.fourth += getCreditAmount(course, correctStudyplan, correctCode, startDate, 4)
+          academicYears.fifth += getCreditAmount(course, correctStudyplan, correctCode, startDate, 5)
+          academicYears.sixth += getCreditAmount(course, correctStudyplan, correctCode, startDate, 6)
         }
       })
     }
@@ -853,7 +860,8 @@ const formatStudentsForApi = async (
   endDate,
   { studyRights },
   optionData,
-  criteria
+  criteria,
+  code
 ) => {
   const startDateMoment = moment(startDate)
   const endDateMoment = moment(endDate)
@@ -896,7 +904,8 @@ const formatStudentsForApi = async (
           startDate,
           startDateMoment,
           endDateMoment,
-          criteria
+          criteria,
+          code
         )
       )
       return stats
@@ -1007,7 +1016,8 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
     endDate,
     formattedQueryParams,
     optionData,
-    criteria
+    criteria,
+    code
   )
 
   return formattedStudents
