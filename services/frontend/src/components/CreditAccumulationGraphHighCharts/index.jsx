@@ -106,13 +106,13 @@ const createGraphOptions = ({
           },
         }))
         .concat(
-          studyRightStartLine.map(start => ({
-            value: start.value,
+          studyRightStartLine.map(value => ({
+            value,
             color: 'red',
             width: 3,
             dashStyle: 'dash',
             label: {
-              text: `Population study start ${start.studyright}`,
+              text: `Population study start`,
               fontSize: 30,
             },
           }))
@@ -473,7 +473,7 @@ const CreditAccumulationGraphHighCharts = ({
   const transfers = singleStudent ? filterTransfers(students[0]) : []
   const studyRightStartLine =
     !singleStudent && studyPlanFilterIsActive
-      ? [{ value: new Date(customStudyStartYear || students[0].studyrightStart).getTime(), studyright: '' }]
+      ? [new Date(customStudyStartYear || students[0].studyrightStart).getTime()]
       : []
 
   const options = createGraphOptions({
