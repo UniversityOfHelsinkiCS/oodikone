@@ -5,6 +5,7 @@ import { Icon, Loader } from 'semantic-ui-react'
 import moment from 'moment'
 import StudentNameVisibilityToggle, { useStudentNameVisibility } from 'components/StudentNameVisibilityToggle'
 import useLanguage from 'components/LanguagePicker/useLanguage'
+import RightsNotification from 'components/RightsNotification'
 
 const getColumns = (courses, showStudentNames, getTextIn) => {
   const isPassed = credit => [4, 7, 9].includes(credit)
@@ -65,7 +66,7 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
     return {
       key: course.code,
       title: (
-        <div key={course.code} style={{ maxWidth: '8em', whiteSpace: 'normal', overflow: 'hidden' }}>
+        <div key={course.code} style={{ marginLeft: '-6px', width: '8em', whiteSpace: 'normal' }}>
           <div key={`key1${course.code}`}>{course.code}</div>
           <div key={`key2${course.code}`} style={{ color: 'gray', fontWeight: 'normal' }}>
             {getTextIn(course.name)}
@@ -76,7 +77,6 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
       headerProps: { title: course.code },
       getRowVal: s => getCompletion(s, course.code, { icon: false }),
       getRowContent: s => getCompletion(s, course.code, { icon: true }),
-      vertical: courses.length > 7,
     }
   })
 
@@ -142,7 +142,7 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
 
 const CompletedCoursesSearchResults = ({ searchValues }) => {
   const { courseList, studentList } = searchValues
-  const [tableData, setData] = useState(null)
+  const [data, setData] = useState(null)
   const showStudentNames = useStudentNameVisibility()
   const completedCoursesTable = useGetCompletedCoursesQuery({ courseList, studentList })
   const isFetchingOrLoading = completedCoursesTable.isLoading || completedCoursesTable.isFetching
@@ -159,12 +159,16 @@ const CompletedCoursesSearchResults = ({ searchValues }) => {
   }, [completedCoursesTable])
 
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
-  if (isFetchingOrLoading || tableData === null) return <Loader active style={{ marginTop: '15em' }} />
+  if (isFetchingOrLoading || data === null) return <Loader active style={{ marginTop: '15em' }} />
 
   return (
     <div>
       <StudentNameVisibilityToggle />
-      <div style={{ maxWidth: '100vh', overflowX: 'auto' }} data-cy="completed-courses-table-div">
+      {data.forbiddenStudents?.length > 0 && <RightsNotification studentNumbers={data.forbiddenStudents} />}
+      <div
+        style={{ maxWidth: '100vh', overflowX: 'auto', paddingBottom: '50px' }}
+        data-cy="completed-courses-table-div"
+      >
         <SortableTable
           title="Completed courses search"
           getRowKey={s => s.studentNumber}
@@ -178,8 +182,8 @@ const CompletedCoursesSearchResults = ({ searchValues }) => {
             singleLine: true,
             textAlign: 'center',
           }}
-          columns={getColumns(tableData.courses, showStudentNames.visible, getTextIn)}
-          data={tableData.students}
+          columns={getColumns(data.courses, showStudentNames.visible, getTextIn)}
+          data={data.students}
         />
       </div>
     </div>
