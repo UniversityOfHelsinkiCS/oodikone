@@ -19,7 +19,8 @@ router.get('/', async (req, res) => {
 
   const filteredStudentNumbers = isAdmin ? studentNumbers : _.intersection(studentNumbers, studentsUserCanAccess)
   const completedCourses = await getCompletedCourses(filteredStudentNumbers, courseCodes)
-  return res.json(completedCourses)
+  const forbiddenStudents = studentNumbers.filter(num => !filteredStudentNumbers.includes(num))
+  return res.json({ forbiddenStudents, ...completedCourses })
 })
 
 router.get('/searches', async (req, res) => {
