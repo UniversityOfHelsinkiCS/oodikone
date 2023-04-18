@@ -95,34 +95,37 @@ const createGraphOptions = ({
       min: startDate,
       max: endDate,
       plotLines: graduations
-        .map(value => ({
-          value,
+        .map(graduation => ({
+          value: graduation.value,
           color: '#a333c8',
           width: 2,
           dashStyle: 'dash',
           label: {
-            text: `Graduation`,
+            text: `Graduation ${graduation.studyright}`,
+            fontSize: 30,
           },
         }))
         .concat(
-          studyRightStartLine.map(value => ({
-            value,
+          studyRightStartLine.map(start => ({
+            value: start.value,
             color: 'red',
             width: 3,
             dashStyle: 'dash',
             label: {
-              text: `Population study start`,
+              text: `Population study start ${start.studyright}`,
+              fontSize: 30,
             },
           }))
         )
         .concat(
-          transfers.map(value => ({
-            value,
+          transfers.map(transfer => ({
+            value: transfer.value,
             color: '#cbd128',
             width: 2,
             dashStyle: 'dash',
             label: {
-              text: `Transfer`,
+              text: `Transfer ${transfer.studyright}`,
+              fontSize: 30,
             },
           }))
         ),
@@ -333,14 +336,38 @@ const createStudentCreditLines = (
 const filterGraduations = (student, selectedStudyRight) => {
   const graduated = student.studyrights.filter(({ graduated }) => graduated)
   // eslint-disable-next-line camelcase
-  if (!selectedStudyRight) return graduated.map(({ enddate }) => new Date(enddate).getTime())
+  if (!selectedStudyRight)
+    return graduated.map(({ enddate, studyright_elements }) => {
+      const studyrightElem = studyright_elements
+        ? studyright_elements.filter(ele => ele.element_detail?.type === 20)
+        : []
+      let elemName = ''
+      if (studyrightElem.length > 0) {
+        elemName = getTextIn(studyrightElem[0].element_detail?.name)
+      }
+      return {
+        value: new Date(enddate).getTime(),
+        studyright: elemName,
+      }
+    })
   const selectedGraduation = graduated.find(({ studyrightid }) => studyrightid === selectedStudyRight.studyrightid)
   if (!selectedGraduation) return []
-  return [new Date(selectedGraduation.enddate).getTime()]
+  const element = selectedGraduation.studyright_elements
+    ? selectedGraduation.studyright_elements.filter(ele => ele.element_detail?.type === 20)
+    : []
+  return [
+    {
+      value: new Date(selectedGraduation.enddate).getTime(),
+      studyright: element.lenght > 0 ? getTextIn(element[0].element_detail?.name) : '',
+    },
+  ]
 }
 
 const filterTransfers = student => {
-  const transferTimes = student.transfers.map(transfer => new Date(transfer.transferdate).getTime())
+  const transferTimes = student.transfers.map(transfer => ({
+    value: new Date(transfer.transferdate).getTime(),
+    studyright: `From ${transfer.sourcecode} to ${transfer.targetcode}`,
+  }))
   const removeOverlapping = transferTimes.filter((transfer, i, a) => a.indexOf(transfer) === i)
   return removeOverlapping
 }
@@ -389,6 +416,7 @@ const CreditAccumulationGraphHighCharts = ({
       programmeCode,
       cutStudyPlanCredits,
       customStudyStartYear,
+      language,
     ]
   )
 
@@ -445,7 +473,7 @@ const CreditAccumulationGraphHighCharts = ({
   const transfers = singleStudent ? filterTransfers(students[0]) : []
   const studyRightStartLine =
     !singleStudent && studyPlanFilterIsActive
-      ? [new Date(customStudyStartYear || students[0].studyrightStart).getTime()]
+      ? [{ value: new Date(customStudyStartYear || students[0].studyrightStart).getTime(), studyright: '' }]
       : []
 
   const options = createGraphOptions({
