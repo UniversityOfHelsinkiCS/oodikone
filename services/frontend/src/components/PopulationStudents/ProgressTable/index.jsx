@@ -568,10 +568,12 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
             </Link>{' '}
             Please refresh page after changes.
           </h5>
-          <Message style={{ maxWidth: '800px', fontSize: '16px' }}>
+          <Message style={{ maxWidth: '840px', fontSize: '16px' }}>
             <p>
               <Icon fitted name="check" color="green" />: Student has passed the course.{' '}
-              <Icon fitted name="clipboard check" color="green" />: Student has credit transfer for the course. <br />
+              <Icon fitted name="check" color="yellow" />: Student has passed the course outside of the corresponding
+              academic year. <Icon fitted name="clipboard check" color="green" />: Student has credit transfer for the
+              course. <br />
               <Icon fitted name="times" color="red" />: Student has failed the course.{' '}
               <Icon fitted name="minus" color="grey" />: Student has enrolled, but has not received any grade from the
               course.
