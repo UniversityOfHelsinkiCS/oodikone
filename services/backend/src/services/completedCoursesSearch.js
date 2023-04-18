@@ -11,7 +11,9 @@ const getCompletedCourses = async (studentNumbers, courseCodes) => {
       },
     },
   })
+
   let fullCourseCodes = [
+    ...courseCodes,
     ...new Set([...courses.reduce((acc, course) => [...acc, course.code, ...course.substitutions], [])]),
   ]
 
@@ -58,10 +60,12 @@ const getCompletedCourses = async (studentNumbers, courseCodes) => {
 
   credits = credits.map(credit => {
     const { course_code, student_studentnumber, credittypecode, attainment_date } = credit
-    const originalCode = courses.find(course => course.substitutions.includes(course_code))?.code
+    const originalCode = courseCodes.includes(course_code)
+      ? null
+      : courses.find(course => course.substitutions.includes(course_code))?.code
     return {
       courseCode: originalCode ? originalCode : course_code,
-      substitution: originalCode ? null : course_code,
+      substitution: originalCode ? course_code : null,
       studentNumber: student_studentnumber,
       creditType: credittypecode,
       date: attainment_date,
@@ -72,7 +76,7 @@ const getCompletedCourses = async (studentNumbers, courseCodes) => {
     const originalCode = courses.find(course => course.substitutions.includes(enrollment.course_code))?.code
     return {
       courseCode: originalCode ? originalCode : enrollment.course_code,
-      substitution: originalCode ? null : enrollment.course_code,
+      substitution: originalCode ? enrollment.course_code : null,
       studentNumber: enrollment.studentnumber,
       date: enrollment.enrollment_date_time,
     }
@@ -110,7 +114,11 @@ const getCompletedCourses = async (studentNumbers, courseCodes) => {
   })
 
   enrollments.forEach(enrollment => {
-    if (credits.find(credit => credit.courseCode === enrollment.courseCode)) {
+    if (
+      credits.find(
+        credit => credit.courseCode === enrollment.courseCode && credit.studentNumber === enrollment.studentNumber
+      )
+    ) {
       return
     }
     studentCredits[enrollment.studentNumber].enrollments.push({

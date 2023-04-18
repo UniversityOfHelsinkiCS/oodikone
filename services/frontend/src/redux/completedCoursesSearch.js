@@ -6,14 +6,42 @@ const completedCoursesSearchApi = RTKApi.injectEndpoints({
       query: ({ courseList, studentList }) =>
         `completedcoursessearch?courselist=${JSON.stringify(courseList)}&studentlist=${JSON.stringify(studentList)}`,
     }),
-    getCourseList: builder.query({
-      query: ({ courseListTitle }) => `completedcoursessearch?courselisttitle=${JSON.stringify(courseListTitle)}`,
+    getSavedCourseLists: builder.query({
+      query: () => `/openunisearch/searches`,
     }),
-    getStudentList: builder.query({
-      query: ({ studentListTitle }) => `completedcoursessearch?studentlisttitle=${JSON.stringify(studentListTitle)}`,
+    createCourseList: builder.mutation({
+      query: ({ courseList, name }) => ({
+        url: '/completedcoursessearch/searches',
+        method: 'POST',
+        body: {
+          courselist: courseList,
+          name,
+        },
+      }),
     }),
+    updateCourseList: builder.mutation({
+      query: ({ id, courseList }) => ({
+        url: `/completedcoursessearch/searches/${id}`,
+        method: 'PUT',
+        body: {
+          courselist: courseList,
+        },
+      }),
+    }),
+    deleteCourseList: builder.mutation({
+      query: ({ id }) => ({
+        url: `/completedcoursessearch/searches/${id}`,
+        method: 'DELETE',
+      }),
+    }),
+    overrideExisting: false,
   }),
-  overrideExisting: false,
 })
 
-export const { useGetCompletedCoursesQuery, useGetStudentListQuery, useGetCourseListQuery } = completedCoursesSearchApi
+export const {
+  useGetCompletedCoursesQuery,
+  useGetSavedCourseListsQuery,
+  useCreateCourseListMutation,
+  useUpdateCourseListMutation,
+  useDeleteCourseListMutation,
+} = completedCoursesSearchApi

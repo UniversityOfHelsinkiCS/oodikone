@@ -1,11 +1,27 @@
 import React, { useState, useEffect } from 'react'
-import { Modal, Form, Button, TextArea } from 'semantic-ui-react'
+import { Modal, Form, Button, TextArea, Loader } from 'semantic-ui-react'
 import qs from 'query-string'
+import {
+  useGetSavedCourseListsQuery,
+  useCreateCourseListMutation,
+  useUpdateCourseListMutation,
+  useDeleteCourseListMutation,
+} from 'redux/completedCoursesSearch'
+import SearchHistory from 'components/SearchHistory'
 
 const CompletedCoursesSearch = ({ setValues, history, location }) => {
   const [modal, setModal] = useState(false)
   const [courseInput, setCourseInput] = useState('')
   const [studentInput, setStudentInput] = useState('')
+  const [name, setName] = useState('')
+  const courseLists = useGetSavedCourseListsQuery()
+  const [searchList, setSearches] = useState(null)
+  const [selectedSearchId, setSelectedSearchId] = useState('')
+  const isFetchingOrLoading = courseLists.isLoading || courseLists.isFetching
+  const isError = courseLists.isError || (courseLists.isSuccess && !courseLists.data)
+  const [updateCourseList, { isLoading: updateIsLoading, data: updatedData }] = useUpdateCourseListMutation()
+  const [createCourseList, { isLoading: createIsLoading, data: createdData }] = useCreateCourseListMutation()
+  const [deleteCourseList, { isLoading: deleteIsLoading, data: deletedData }] = useDeleteCourseListMutation()
 
   const parseQueryFromUrl = () => {
     const query = qs.parse(location.search)
@@ -13,6 +29,33 @@ const CompletedCoursesSearch = ({ setValues, history, location }) => {
     if (!Array.isArray(query.studentList)) query.studentList = [query.studentList]
     return query
   }
+
+  useEffect(() => {
+    if (courseLists.isSuccess && courseLists.data) {
+      setSearches(courseLists.data)
+    }
+  }, [courseLists])
+
+  useEffect(() => {
+    if (updatedData) {
+      const updatedSearches = searchList.map(s => (s.id === updatedData.id ? updatedData : s))
+      setSearches(updatedSearches)
+    }
+  }, [updatedData])
+
+  useEffect(() => {
+    if (createdData && !createdData.error) {
+      const newList = searchList.concat(createdData)
+      setSearches(newList)
+    }
+  }, [createdData])
+
+  useEffect(() => {
+    if (deletedData) {
+      const filteredsearches = searchList.filter(s => s.id !== deletedData)
+      setSearches(filteredsearches)
+    }
+  }, [deletedData])
 
   useEffect(() => {
     setImmediate(() => {
@@ -26,6 +69,7 @@ const CompletedCoursesSearch = ({ setValues, history, location }) => {
   const clearForm = () => {
     setCourseInput('')
     setStudentInput('')
+    setSelectedSearchId('')
   }
 
   const pushQueryToUrl = query => {
@@ -38,6 +82,36 @@ const CompletedCoursesSearch = ({ setValues, history, location }) => {
   const handleClose = () => {
     setModal(false)
     clearForm()
+  }
+
+  const onDelete = () => {
+    deleteCourseList({ id: selectedSearchId })
+    clearForm()
+  }
+
+  const onSave = () => {
+    const courseList = courseInput
+      .split(/[\s,]+/)
+      .map(code => code.trim().toUpperCase())
+      .filter(code => code !== '')
+    if (selectedSearchId !== '') {
+      updateCourseList({ id: selectedSearchId, courseList })
+    } else {
+      createCourseList({ courseList, name })
+    }
+  }
+  const onSelectSearch = selectedId => {
+    if (!selectedId) {
+      clearForm()
+      return
+    }
+    const { id: selectedSearchId } = selectedId
+    const selectedSearch = searchList?.find(search => search.id === selectedSearchId)
+    if (selectedSearch) {
+      setCourseInput(selectedSearch.courseList.join(', '))
+      setName(selectedSearch.name)
+      setSelectedSearchId(selectedSearch.id)
+    }
   }
 
   const onClicker = e => {
@@ -62,6 +136,9 @@ const CompletedCoursesSearch = ({ setValues, history, location }) => {
 
     handleClose()
   }
+
+  if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
+  if (isFetchingOrLoading) return <Loader active style={{ marginTop: '15em' }} />
 
   return (
     <Modal
@@ -93,7 +170,51 @@ const CompletedCoursesSearch = ({ setValues, history, location }) => {
               onChange={e => setCourseInput(e.target.value)}
             />
           </Form.Field>
+          <Form.Field>
+            <Form.Field data-cy="search-name">
+              <em> Insert name for this course list if you wish to save it </em>
+              <Form.Input
+                disabled={selectedSearchId !== ''}
+                value={name}
+                placeholder="name"
+                onChange={e => setName(e.target.value)}
+              />
+            </Form.Field>
+          </Form.Field>
+          <SearchHistory
+            header="Saved courselist"
+            items={
+              searchList
+                ? searchList.map(list => ({
+                    ...list,
+                    text: list.name,
+                    timestamp: list.updatedAt,
+                    params: { id: list.id },
+                  }))
+                : []
+            }
+            updateItem={() => null}
+            handleSearch={onSelectSearch}
+          />
           <Modal.Actions>
+            <Button
+              data-cy="save-courselist"
+              disabled={!name || updateIsLoading || createIsLoading}
+              loading={updateIsLoading || createIsLoading}
+              floated="left"
+              icon="save"
+              onClick={onSave}
+              content="Save"
+            />
+            <Button
+              disabled={!selectedSearchId || deleteIsLoading}
+              negative
+              floated="left"
+              icon="trash"
+              onClick={onDelete}
+              content="Delete"
+            />
+
             <Button onClick={handleClose}>Cancel</Button>
             <Button positive onClick={e => onClicker(e)} data-cy="search-button">
               Search students
