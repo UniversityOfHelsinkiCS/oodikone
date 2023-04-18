@@ -4,19 +4,22 @@ const _ = require('lodash')
 
 const getCompletedCourses = async (studentNumbers, courseCodes) => {
   let courses = await Course.findAll({
-    attributes: ['code', 'name'],
+    attributes: ['code', 'name', 'substitutions'],
     where: {
       code: {
         [Op.in]: courseCodes,
       },
     },
   })
+  let fullCourseCodes = [
+    ...new Set([...courses.reduce((acc, course) => [...acc, course.code, ...course.substitutions], [])]),
+  ]
 
   let credits = await Credit.findAll({
     attributes: ['course_code', 'student_studentnumber', 'credittypecode', 'attainment_date'],
     where: {
       course_code: {
-        [Op.in]: courseCodes,
+        [Op.in]: fullCourseCodes,
       },
       student_studentnumber: {
         [Op.in]: studentNumbers,
@@ -28,7 +31,7 @@ const getCompletedCourses = async (studentNumbers, courseCodes) => {
     attributes: ['course_code', 'enrollment_date_time', 'studentnumber', 'state'],
     where: {
       course_code: {
-        [Op.in]: courseCodes,
+        [Op.in]: fullCourseCodes,
       },
       studentnumber: {
         [Op.in]: studentNumbers,
@@ -49,14 +52,16 @@ const getCompletedCourses = async (studentNumbers, courseCodes) => {
   })
 
   courses = courses.map(course => {
-    const { code, name } = course
-    return { code, name }
+    const { code, name, substitutions } = course
+    return { code, name, substitutions }
   })
 
   credits = credits.map(credit => {
     const { course_code, student_studentnumber, credittypecode, attainment_date } = credit
+    const originalCode = courses.find(course => course.substitutions.includes(course_code))?.code
     return {
-      courseCode: course_code,
+      courseCode: originalCode ? originalCode : course_code,
+      substitution: originalCode ? null : course_code,
       studentNumber: student_studentnumber,
       creditType: credittypecode,
       date: attainment_date,
@@ -64,8 +69,10 @@ const getCompletedCourses = async (studentNumbers, courseCodes) => {
   })
 
   enrollments = enrollments.map(enrollment => {
+    const originalCode = courses.find(course => course.substitutions.includes(enrollment.course_code))?.code
     return {
-      courseCode: enrollment.course_code,
+      courseCode: originalCode ? originalCode : enrollment.course_code,
+      substitution: originalCode ? null : enrollment.course_code,
       studentNumber: enrollment.studentnumber,
       date: enrollment.enrollment_date_time,
     }
@@ -98,6 +105,7 @@ const getCompletedCourses = async (studentNumbers, courseCodes) => {
       date: credit.date,
       courseCode: credit.courseCode,
       creditType: credit.creditType,
+      substitution: credit.substitution,
     })
   })
 

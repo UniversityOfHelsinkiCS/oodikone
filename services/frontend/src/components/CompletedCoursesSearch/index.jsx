@@ -31,8 +31,8 @@ const CompletedCourses = () => {
         <p>
           Here you can search by a list of student and course numbers to see whether students have completed certain
           courses yet. The tool will also show if students have enrolled on the course, if they have not yet completed
-          it. To see the date of last completion or enrollment, hover the mouse on the icon. Clicking the blue button
-          will open the tool.
+          it. Course substitutions are taken into account. To see the date of last completion or enrollment, hover the
+          mouse on the icon. Clicking the blue button will open the tool.
         </p>
         <p>
           Note that if you do not have the required rights to view the data of some students, those rows will omitted
