@@ -73,6 +73,7 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
           </div>
         </div>
       ),
+      textTitle: course.code,
       cellProps: s => getCellProps(s, course.code),
       headerProps: { title: course.code },
       getRowVal: s => getCompletion(s, course.code, { icon: false }),
