@@ -16,7 +16,7 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
     const enrollment = student.enrollments.find(e => e.courseCode === courseCode)
     if (completion === undefined) {
       if (!enrollment) {
-        return icon ? null : 'No completion'
+        return icon ? null : ''
       }
       if (icon) {
         if (moment(enrollment.date) > moment().subtract(6, 'months')) {
