@@ -1,7 +1,7 @@
 /* eslint-disable no-continue */
 /* eslint-disable max-classes-per-file */
 
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import { Modal, Table, Button, Checkbox } from 'semantic-ui-react'
 import _ from 'lodash'
 import xlsx from 'xlsx'
@@ -56,6 +56,10 @@ const ExportModal = ({ open, onOpen, onClose, data, columns }) => {
   const exportColumns = useMemo(() => getExportColumns(columns), [columns])
   const flatData = useMemo(() => flattenData(data), [data])
   const [selected, setSelected] = useState(_.uniq(_.map(exportColumns, 'key')))
+
+  useEffect(() => {
+    setSelected(_.uniq(_.map(exportColumns, 'key')))
+  }, [exportColumns])
 
   const sampledValues = useMemo(
     () => ValueVisitor.visit(data, exportColumns, { exportMode: true }).sample(10),
