@@ -126,8 +126,8 @@ describe('Population Statistics', () => {
   it('Enrollment filter works', () => {
     runTestStepWithPreAndPostParts('EnrollmentStatus', () => {
       cy.cs('enrollmentStatusFilter-status').selectFromDropdown(0)
-      cy.cs('enrollmentStatusFilter-semesters').selectFromDropdown(0)
-      checkFilteringResult(148)
+      cy.cs('enrollmentStatusFilter-semesters').selectFromDropdown(5)
+      checkFilteringResult(147)
       clearSemanticUIMultipleDropDownSelection('enrollmentStatusFilter-semesters')
     })
   })
