@@ -84,7 +84,7 @@ const calculateTotalCreditsFromAttainments = attainments => {
   return totalCredits
 }
 
-const studentMapper = (attainments, studyRights, attainmentsToBeExluced, disclosures) => student => {
+const studentMapper = (attainments, studyRights, attainmentsToBeExluced) => student => {
   const {
     last_name,
     first_names,
@@ -107,11 +107,6 @@ const studentMapper = (attainments, studyRights, attainmentsToBeExluced, disclos
   // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2958
   const country = getCountry(student.country_urn)
   const home_country = student.citizenships ? getCountry(student.citizenships[0]) : null
-  // "hy-luovutusehto-6" = Open University's dissemination of information on its course offerings
-  const openUniDisseminationOfInfo = disclosures.filter(
-    d => d.person_id === id && d.disclosure_category_id === 'hy-luovutusehto-6'
-  )
-  const marketingAllowed = openUniDisseminationOfInfo.length > 0 ? openUniDisseminationOfInfo[0].authorized : null
 
   const studyRightsOfStudent = studyRights.filter(SR => SR.person_id === id)
   const dateofuniversityenrollment =
@@ -142,7 +137,6 @@ const studentMapper = (attainments, studyRights, attainmentsToBeExluced, disclos
     home_country_sv: home_country ? home_country.name.sv : null,
     home_country_en: home_country ? home_country.name.en : null,
     sis_person_id: id,
-    dissemination_info_allowed: marketingAllowed,
   }
 }
 
