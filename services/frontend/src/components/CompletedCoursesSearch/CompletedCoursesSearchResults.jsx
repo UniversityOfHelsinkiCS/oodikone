@@ -28,7 +28,9 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
       return `Latest enrollment: ${moment(enrollment.date).format('YYYY-MM-DD')}`
     }
 
-    return icon ? <Icon fitted name="check" color="green" /> : 'Passed'
+    const substitutionString = completion.substitution ? ` as ${completion.substitution}` : ''
+
+    return icon ? <Icon fitted name="check" color="green" /> : `Passed${substitutionString}`
   }
 
   const getTotalPassed = s => s.credits.filter(c => isPassed(c.creditType)).length
@@ -102,16 +104,6 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
     },
   ]
 
-  const emailColumn = {
-    key: 'email',
-    title: 'Email',
-    cellProps: { style },
-    headerProps: { title: 'Email' },
-    getRowVal: s => (s.email ? s.email : ''),
-    getRowContent: s => (s.email ? s.email : ''),
-    child: true,
-  }
-
   const statisticHeader = {
     key: 'statistics',
     title: <b>Totals:</b>,
@@ -119,6 +111,51 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
     parent: true,
     children: statisticColumns,
   }
+
+  const infoColumnsForCsv = [
+    {
+      key: 'hidden-lastname',
+      title: 'Last name',
+      forceToolsMode: 'none',
+      getRowVal: s => s.lastName,
+      headerProps: { style: { display: 'none' } },
+      cellProps: { style: { display: 'none' } },
+      export: true,
+    },
+    {
+      key: 'hidden-firstnames',
+      title: 'First names',
+      getRowVal: s => s.firstNames,
+      forceToolsMode: 'none',
+      headerProps: { style: { display: 'none' } },
+      cellProps: { style: { display: 'none' } },
+      export: true,
+    },
+    {
+      key: 'hidden-email',
+      title: 'E-mail',
+      getRowVal: s => (s.email ? s.email : ''),
+      forceToolsMode: 'none',
+      headerProps: { style: { display: 'none' } },
+      cellProps: { style: { display: 'none' } },
+      export: true,
+    },
+  ]
+
+  const emailColumn = showStudentNames
+    ? [
+        {
+          key: 'email',
+          title: 'Email',
+          cellProps: { style },
+          headerProps: { title: 'Email' },
+          getRowVal: s => (s.email ? s.email : ''),
+          getRowContent: s => (s.email ? s.email : ''),
+          child: true,
+          export: false,
+        },
+      ]
+    : []
 
   const nameColumns = showStudentNames
     ? [
@@ -128,6 +165,7 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
           cellProps: { style },
           getRowVal: s => s.lastName,
           getRowContent: s => s.lastName,
+          export: false,
         },
         {
           key: 'firstnames',
@@ -135,10 +173,28 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
           cellProps: { style },
           getRowVal: s => s.firstNames,
           getRowContent: s => s.firstNames,
+          export: false,
         },
       ]
     : []
-  return [...nameColumns, ...studentNbrColumn, ...completionStatusColumns, statisticHeader, emailColumn]
+
+  const hiddenParentColumn = {
+    key: 'hiddenFiles',
+    title: '',
+    mergeHeader: true,
+    textTitle: null,
+    parent: true,
+    children: infoColumnsForCsv,
+  }
+
+  return [
+    hiddenParentColumn,
+    ...nameColumns,
+    ...studentNbrColumn,
+    ...completionStatusColumns,
+    statisticHeader,
+    ...emailColumn,
+  ]
 }
 
 const CompletedCoursesSearchResults = ({ searchValues }) => {
