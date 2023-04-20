@@ -13,7 +13,6 @@ const getTableData = studentsData => {
         courseInfo: { ...studentsData[student].courseInfo },
         email: studentsData[student].email,
         secondaryEmail: studentsData[student].secondaryEmail,
-        disseminationInfoAllowed: studentsData[student].disseminationInfoAllowed,
         totals: studentsData[student].totals,
       },
     ],
@@ -75,23 +74,7 @@ const getColumns = (labelsToCourses, language) => {
     },
   ]
 
-  const getDisseminationInfoAllowed = s => {
-    if (s.disseminationInfoAllowed === null) return 'unknown'
-    if (s.disseminationInfoAllowed) return 'yes'
-    return 'no'
-  }
-
   const informationColumns = [
-    {
-      key: 'disseminationInfoAllowed',
-      title: 'Marketing Allowed',
-      getRowVal: s => getDisseminationInfoAllowed(s),
-      getRowContent: s => getDisseminationInfoAllowed(s),
-      headerProps: { title: 'Marketing Allowed' },
-      child: true,
-      childOf: 'Marketing Allowed',
-      cellProps: { style },
-    },
     {
       key: 'email-child',
       title: 'Email',

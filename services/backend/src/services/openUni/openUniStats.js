@@ -51,7 +51,7 @@ const getCustomOpenUniCourses = async (courseCodes, startdate, enddate) => {
     }
   }
 
-  for (const { studentnumber, email, secondary_email, dissemination_info_allowed } of studentInfo) {
+  for (const { studentnumber, email, secondary_email } of studentInfo) {
     // Check if the student has existing studyright: if yes, then stop here
     if (!uniqueStudentsWithCurrentStudyRight.includes(studentnumber)) {
       if (!(studentnumber in studentStats)) {
@@ -59,7 +59,6 @@ const getCustomOpenUniCourses = async (courseCodes, startdate, enddate) => {
           courseInfo: courseCodes.reduce((acc, code) => ({ ...acc, [code]: getEmptyCourseInfo() }), {}),
           email: email,
           secondaryEmail: secondary_email,
-          disseminationInfoAllowed: dissemination_info_allowed,
           totals: { passed: 0, failed: 0, unfinished: 0 },
         }
       }

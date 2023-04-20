@@ -9,12 +9,11 @@ const mapOpenCredits = credit => {
 }
 
 const mapStundentInfo = student => {
-  const { email, secondary_email, studentnumber, dissemination_info_allowed } = student
+  const { email, secondary_email, studentnumber } = student
   return {
     studentnumber,
     email,
     secondary_email,
-    dissemination_info_allowed,
   }
 }
 const mapOpenEnrollments = enrollment => {
