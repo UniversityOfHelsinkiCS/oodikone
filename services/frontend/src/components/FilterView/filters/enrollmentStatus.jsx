@@ -24,11 +24,13 @@ const EnrollmentStatusFilterCard = ({ options, onOptionsChange, allSemesters, la
     return null
   }
 
-  const semesterOptions = semesterCodes.map(code => ({
-    key: `semester-option-${code}`,
-    text: getTextIn(allSemesters[code].name, language),
-    value: code,
-  }))
+  const semesterOptions = semesterCodes
+    .sort((prev, cur) => cur - prev)
+    .map(code => ({
+      key: `semester-option-${code}`,
+      text: getTextIn(allSemesters[code].name, language),
+      value: code,
+    }))
 
   return (
     <div className="card-content">
