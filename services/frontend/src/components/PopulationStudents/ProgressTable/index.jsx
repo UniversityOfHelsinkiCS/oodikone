@@ -31,7 +31,7 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
       courses.some(course => moment(course.date).isBetween(moment(start), moment(end)))
     )
       return <Icon fitted name="check" color="green" />
-    if (courses && courses.some(course => course.passed)) return <Icon fitted name="check" color="yellow" />
+    if (courses && courses.some(course => course.passed)) return <Icon fitted name="check" color="grey" />
     if (courses && courses.some(course => course.passed === false)) return <Icon fitted name="times" color="red" />
     if (s.enrollments && s.enrollments.map(course => course.course_code).includes(courseCode))
       return <Icon fitted name="minus" color="grey" />
@@ -100,16 +100,16 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
       ),
       child: true,
     })
-
+    const credtiMonths = [12, 24, 36, 48, 60, 72]
     const courses = keyBy(mandatoryCourses, 'code')
     const labelCriteria = Object.keys(criteria.courses).reduce((acc, year, idx) => {
       acc[year] = [
         {
           code: `Credits`,
           name: {
-            fi: `Year ${idx + 1}: ${criteria.credits[year]}`,
-            en: `Year ${idx + 1}: ${criteria.credits[year]}`,
-            sv: `Year ${idx + 1}: ${criteria.credits[year]}`,
+            fi: `${credtiMonths[idx]} mo: ${criteria.credits[year]}`,
+            en: `${credtiMonths[idx]} mo: ${criteria.credits[year]}`,
+            sv: `${credtiMonths[idx]} mo: ${criteria.credits[year]}`,
           },
         },
         ...[...criteria.courses[year]]
@@ -568,10 +568,10 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
             </Link>{' '}
             Please refresh page after changes.
           </h5>
-          <Message style={{ maxWidth: '840px', fontSize: '16px' }}>
+          <Message style={{ fontSize: '16px' }}>
             <p>
-              <Icon fitted name="check" color="green" />: Student has passed the course.{' '}
-              <Icon fitted name="check" color="yellow" />: Student has passed the course outside of the corresponding
+              <Icon fitted name="check" color="green" />: Student has passed the course in the academic year.{' '}
+              <Icon fitted name="check" color="grey" />: Student has passed the course outside of the corresponding
               academic year. <Icon fitted name="clipboard check" color="green" />: Student has credit transfer for the
               course. <br />
               <Icon fitted name="times" color="red" />: Student has failed the course.{' '}
