@@ -179,6 +179,7 @@ const CustomPopulationContent = ({ students, custompop }) => {
       content: {
         content: (
           <div ref={coursesRef}>
+            <InfoBox content={infotooltips.PopulationStatistics.CoursesOfPopulation} />
             <CustomPopulationCourses filteredStudents={students} courses={courseStats} />
           </div>
         ),

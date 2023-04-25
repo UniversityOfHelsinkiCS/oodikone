@@ -49,27 +49,45 @@ export default {
 
   **Cumulative**-valinnan ollessa käytössä kunkin opiskelijan kaikki aiemmat opintopisteet lasketaan mukaan opintopistemäärään. Muutoin vain pylvästä vastaavalla aikavälillä kirjatut opintopisteet otetaan huomioon.
   `,
-  CoursesOfPopulation: `**Courses of class**
+  CoursesOfClass: `**Courses of class**
 
   Tämä taulukko sisältää näkyvissä olevien opiskelijoiden kaikki kurssisuoritukset.
   
   Opiskelijat on mahdollista suodattaa kurssin perusteella käyttämällä kurssirivin vasemmassa laidassa olevaa suodatinpainiketta.
   Kurssisuodatin aukeaa ikkunan vasempaan laitaan ja tarjoaa lisää vaihtoehtoja suodatukseen. Voit myös valita monta kurssia kerralla suodattimeen.
   
-  Klikkaamalla kurssin nimen vieressä olevaa sinistä nuolta, siirryt ko. kurssin *Course Statistics* -näkymään.
+  Klikkaamalla kurssin nimen vieressä olevaa sinistä nuolta, siirryt ko. kurssin **Course Statistics** -näkymään.
   
   Taulukon tietoja voi suodattaa antamalla opiskelijoiden vähimmäismäärän kurssilla kenttään *Limit to courses where student number at least*.
-  Lisäksi kurssin nimi- ja koodisarakkeissa on hakukentät *("filter here")* suodattamista varten.
-  Suodattimet saa tyhjennettyä painamalla kentän vieressä olevaa ruksia.
+  Lisäksi kurssin nimi **name** ja koodisarakkeissa **code** suodatinkuvaketta  klikkaamalla tulee esiin hakukentät suodattamista varten.
+  Suodattimet saa tyhjennettyä painamalla kentän vieressä olevaa ruksia tai valitsemall valikon alaosasta **Reset column filter**.
   
   **Huom! Nämä suodattimet vaikuttavat vain tähän taulukkoon, eivät koko populatioon.**
   
   **Taulukot**
-  
-
-  - **pass/fail** - näkymä sisältää kurssisuoritukset, hylätyt sekä yritykset sekä ilmoittautumistiedot. Huom.! ilmoittautumistiedot ovat saatavilla vain Sisun käyttöönoton jälkeiseltä ajalta.
+  - **pass/fail** - näkymä sisältää kurssisuoritukset, hylätyt, yritykset sekä ilmoittautumistiedot. Huom.! ilmoittautumistiedot ovat saatavilla vain Sisun käyttöönoton jälkeiseltä ajalta.
   - **grades** - arvosanajakauma.
   - **when passed** - kurssisuorituksen ajankohta. Huom.! *Passed*-sarakkeen kokonaissumma ei välttämättä täsmää puolivuosittaisten lukumäärien summan kanssa johtuen tuplakirjauksista Oodissa.
+  - **students** - opiskelijan arvosanat kursseittain.
+  `,
+  CoursesOfPopulation: `**Courses of Population**
+
+  Tämä taulukko sisältää näkyvissä olevien opiskelijoiden kaikki kurssisuoritukset.
+  
+  Opiskelijat on mahdollista suodattaa kurssin perusteella käyttämällä kurssirivin vasemmassa laidassa olevaa suodatinpainiketta.
+  Kurssisuodatin aukeaa ikkunan vasempaan laitaan ja tarjoaa lisää vaihtoehtoja suodatukseen. Voit myös valita monta kurssia kerralla suodattimeen.
+  
+  Klikkaamalla kurssin nimen vieressä olevaa sinistä nuolta, siirryt ko. kurssin **Course Statistics** -näkymään.
+  
+  Taulukon tietoja voi suodattaa antamalla opiskelijoiden vähimmäismäärän kurssilla kenttään *Limit to courses where student number at least*.
+  Lisäksi kurssin nimi **name** ja koodisarakkeissa **code** suodatinkuvaketta  klikkaamalla tulee esiin hakukentät suodattamista varten.
+  Suodattimet saa tyhjennettyä painamalla kentän vieressä olevaa ruksia tai valitsemall valikon alaosasta **Reset column filter**.
+  
+  **Huom! Nämä suodattimet vaikuttavat vain tähän taulukkoon, eivät koko populatioon.**
+  
+  **Taulukot**
+  - **pass/fail** - näkymä sisältää kurssisuoritukset, hylätyt, yritykset sekä ilmoittautumistiedot. Huom.! ilmoittautumistiedot ovat saatavilla vain Sisun käyttöönoton jälkeiseltä ajalta.
+  - **grades** - arvosanajakauma.
   `,
   Search: `Tässä osiossa voi tarkastella koulutusohjelmakohtaisia populaatioita sisäänotto-lukuvuoden mukaisesti,
   vuosikurssi kerrallaan. Uudet koulutusohjelmat ovat pääsääntöisesti alkaneet 1.8.2017,
