@@ -242,7 +242,7 @@ const CoursePopulation = ({
       content: {
         content: (
           <div ref={programmeRef}>
-            <CustomPopulationCoursesWrapper filteredStudents={filtered} showFilter={false} />
+            <CustomPopulationCoursesWrapper filteredStudents={filtered} showFilter />
           </div>
         ),
       },
@@ -372,7 +372,12 @@ const CustomPopulationCoursesWrapper = props => {
 
   if (isLoading) return null
 
-  return <CustomPopulationCourses {...props} courses={courseStatistics} />
+  return (
+    <>
+      <InfoBox content={infotooltips.PopulationStatistics.CoursesOfPopulation} />
+      <CustomPopulationCourses {...props} courses={courseStatistics} />
+    </>
+  )
 }
 
 const mapStateToProps = ({ singleCourseStats, populations, courseSearch }) => {

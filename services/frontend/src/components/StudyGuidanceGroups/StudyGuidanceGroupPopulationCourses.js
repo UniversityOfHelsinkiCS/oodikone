@@ -29,7 +29,11 @@ const StudyGuidanceGroupPopulationCourses = ({
 
   return (
     <Segment basic>
-      <InfoBox content={infotooltips.PopulationStatistics.CoursesOfPopulation} />
+      {studyProgramme && showStructured ? (
+        <InfoBox content={infotooltips.PopulationStatistics.CoursesOfClass} />
+      ) : (
+        <InfoBox content={infotooltips.PopulationStatistics.CoursesOfPopulation} />
+      )}
       {studyProgramme && (
         <Button primary onClick={() => toggleShowStructured()} style={{ marginLeft: '1em' }}>
           {showStructured ? 'Show courses as flat list' : 'Show by programme structure'}
