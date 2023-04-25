@@ -8,9 +8,9 @@ import './populationCourseStats.css'
 import { PopulationCourseContext } from './PopulationCourseContext'
 import TSA from '../../common/tsa'
 import GradeDistribution from './GradeDistribution'
-import PassFail from './PassFail'
 import { getTextIn } from '../../common'
 import useLanguage from '../LanguagePicker/useLanguage'
+import PassFailEnrollments from './PassFailEnrollments'
 
 const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent('Population statistics', action, name, value)
 
@@ -220,7 +220,7 @@ const PopulationCourseStatsFlat = ({ courses, pending, filteredStudents, showFil
       menuItem: 'pass/fail',
       render: () => (
         <Tab.Pane>
-          <PassFail flat />
+          <PassFailEnrollments flat />
         </Tab.Pane>
       ),
     },
