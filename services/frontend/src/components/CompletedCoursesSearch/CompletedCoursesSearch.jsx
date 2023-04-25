@@ -143,7 +143,7 @@ const CompletedCoursesSearch = ({ setValues, history, location }) => {
   return (
     <Modal
       trigger={
-        <Button size="small" color="blue" onClick={() => setModal(true)} data-cy="completed-courses-search-button">
+        <Button size="small" color="blue" onClick={() => setModal(true)} data-cy="open-completed-courses-modal-button">
           Search completed courses of students
         </Button>
       }
@@ -160,6 +160,7 @@ const CompletedCoursesSearch = ({ setValues, history, location }) => {
               value={studentInput}
               placeholder="012345678, 12345678"
               onChange={e => setStudentInput(e.target.value)}
+              data-cy="student-no-input"
             />
           </Form.Field>
           <Form.Field>
@@ -168,6 +169,7 @@ const CompletedCoursesSearch = ({ setValues, history, location }) => {
               value={courseInput}
               placeholder="TKT12345, PSYK-123"
               onChange={e => setCourseInput(e.target.value)}
+              data-cy="course-list-input"
             />
           </Form.Field>
           <Form.Field>
@@ -182,7 +184,7 @@ const CompletedCoursesSearch = ({ setValues, history, location }) => {
             </Form.Field>
           </Form.Field>
           <SearchHistory
-            header="Saved courselist"
+            header="Saved courselists"
             items={
               searchList
                 ? searchList.map(list => ({
@@ -216,8 +218,8 @@ const CompletedCoursesSearch = ({ setValues, history, location }) => {
             />
 
             <Button onClick={handleClose}>Cancel</Button>
-            <Button positive onClick={e => onClicker(e)} data-cy="search-button">
-              Search students
+            <Button positive onClick={e => onClicker(e)} data-cy="completed-courses-search-button">
+              Search
             </Button>
           </Modal.Actions>
         </Form>
