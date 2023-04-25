@@ -124,13 +124,7 @@ const Routes = () => (
         path={routes.studyGuidanceGroups}
         component={StudyGuidanceGroups}
       />
-      <ProtectedRoute
-        requiredRoles={['admin']}
-        requireUserHasRights
-        exact
-        path={routes.evaluationOverview}
-        component={EvaluationOverview}
-      />
+      <ProtectedRoute requireUserHasRights exact path={routes.evaluationOverview} component={EvaluationOverview} />
       <Redirect from="/cool-data-science" to="/trends" />
       <Redirect to="/" />
     </Switch>
