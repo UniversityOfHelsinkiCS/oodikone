@@ -221,7 +221,7 @@ const CompletedCoursesSearchResults = ({ searchValues }) => {
   return (
     <div>
       <StudentNameVisibilityToggle />
-      {data.forbiddenStudents?.length > 0 && <RightsNotification studentNumbers={data.forbiddenStudents} />}
+      {data.discardedStudentNumbers?.length > 0 && <RightsNotification studentNumbers={data.discardedStudentNumbers} />}
       <div
         style={{ maxWidth: '100vh', overflowX: 'auto', paddingBottom: '50px' }}
         data-cy="completed-courses-table-div"

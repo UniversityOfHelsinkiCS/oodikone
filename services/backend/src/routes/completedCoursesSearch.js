@@ -19,11 +19,11 @@ router.get('/', async (req, res) => {
 
   const filteredStudentNumbers = isAdmin ? studentNumbers : _.intersection(studentNumbers, studentsUserCanAccess)
   const completedCourses = await getCompletedCourses(filteredStudentNumbers, courseCodes)
-  const forbiddenStudents = _.difference(
+  const discardedStudentNumbers = _.difference(
     studentNumbers,
     completedCourses.students.map(s => s.studentNumber)
   )
-  return res.json({ forbiddenStudents, ...completedCourses })
+  return res.json({ discardedStudentNumbers, ...completedCourses })
 })
 
 router.get('/searches', async (req, res) => {
@@ -37,12 +37,12 @@ router.post('/searches', async (req, res) => {
   const userId = req.user.id
   const name = req.body?.name
 
-  if (!name) return res.status(400).json({ error: 'Name missing' })
+  if (!name) return res.status(400).json({ error: 'Courselist name missing' })
   if (courseCodes && !Array.isArray(courseCodes))
     return res.status(400).json({ error: 'Course codes must be type of array' })
 
   const createdSearch = await createNewSearch(userId, name, courseCodes)
-  if (!createdSearch) return res.status(400).json({ error: '' })
+  if (!createdSearch) return res.status(400).json({ error: 'Failed to create courselist' })
   return res.status(201).json({
     id: createdSearch.id,
     userId: createdSearch.userId,
@@ -59,7 +59,7 @@ router.put('/searches/:id', async (req, res) => {
   if (!id || !userId) return res.status(422).end()
   const updatedSearch = await updateSearch(userId, id, courseCodes)
 
-  if (!updatedSearch) return res.status(404).json({ error: `Courselist search could not be found` })
+  if (!updatedSearch) return res.status(404).json({ error: 'Courselist could not be found' })
   return res.json({
     id: updatedSearch.id,
     userId: updatedSearch.userId,
@@ -75,7 +75,7 @@ router.delete('/searches/:id', async (req, res) => {
   if (!id || !userId) return res.status(422).end()
 
   const deletedSearch = await deleteSearch(userId, id)
-  if (!deletedSearch) return res.status(404).json({ error: `Courselist search could not be found` })
+  if (!deletedSearch) return res.status(404).json({ error: 'Courselist could not be found' })
   return res.json(id)
 })
 

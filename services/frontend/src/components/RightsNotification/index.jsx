@@ -9,15 +9,15 @@ const RightsNotification = ({ studentNumbers }) => {
   }
 
   return (
-    <Message>
+    <Message data-cy="rights-notification">
       <Message.Header>Invalid or forbidden student numbers</Message.Header>
       <p style={{ maxWidth: '50em' }}>
         The following students information could not be displayed. This could be either because they do not exist, or
         you do not have the right to view their information.
       </p>
       <ul>
-        {studentNumbers.map(num => (
-          <li>{num}</li>
+        {[...new Set(studentNumbers)].map(num => (
+          <li key={num}>{num}</li>
         ))}
       </ul>
       <Button onClick={() => setVisible(false)}>Hide notification</Button>
