@@ -158,7 +158,10 @@ const PopulationCourseStatsFlat = ({ courses, pending, filteredStudents, showFil
           'Courses of Population student count filter change',
           value
         )
-        setState({ ...state, studentAmountLimit: value }) // , () => this.handleCourseStatisticsCriteriaChange())
+        setState({
+          ...state,
+          studentAmountLimit: typeof Number(value) === 'number' ? Number(value) : state.studentAmountLimit,
+        })
       }, 1000)
     )
   }

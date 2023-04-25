@@ -210,7 +210,7 @@ const PassFailEnrollments = ({ flat, onlyIamRights }) => {
     if (onlyIamRights) columns[0].children[0].children.pop()
 
     return columns
-  }, [onGoToCourseStatisticsClick])
+  }, [onGoToCourseStatisticsClick, courseStatistics])
 
   const data = useMemo(() => {
     if (flat) {
@@ -230,7 +230,7 @@ const PassFailEnrollments = ({ flat, onlyIamRights }) => {
         )
       )
       .value()
-  }, [modules])
+  }, [modules, courseStatistics])
 
   return (
     <>
