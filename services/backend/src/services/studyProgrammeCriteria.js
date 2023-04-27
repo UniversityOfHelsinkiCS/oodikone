@@ -2,12 +2,14 @@ const { ProgressCriteria } = require('../models/models_kone')
 const { Course } = require('../models')
 const logger = require('../util/logger')
 
-const getCriteriaByStudyProgramme = code =>
-  ProgressCriteria.findOne({
+const getCriteriaByStudyProgramme = async code => {
+  if (code === '') return null
+  return await ProgressCriteria.findOne({
     where: {
       code: code,
     },
   })
+}
 
 const getSubstitutions = async codes => {
   if (codes === []) return []
@@ -123,8 +125,7 @@ const saveYearlyCourseCriteria = async (studyProgramme, courses, year) => {
     if (year === 4) updatedData = await studyProgrammeToUpdate.update({ coursesYearFour: courses })
     if (year === 5) updatedData = await studyProgrammeToUpdate.update({ coursesYearFive: courses })
     if (year === 6) updatedData = await studyProgrammeToUpdate.update({ coursesYearSix: courses })
-    const criteria = formattedData(updatedData)
-    return criteria
+    return await formattedData(updatedData)
   } catch (error) {
     logger.error(`Update yearly credit criteria failed: ${error}`)
   }
@@ -137,7 +138,7 @@ const getCriteria = async studyProgramme => {
     allCourses: [],
     credits: { yearOne: 0, yearTwo: 0, yearThree: 0, yearFour: 0, yearFive: 0, yearSix: 0 },
   }
-  return studyProgrammeCriteria ? formattedData(studyProgrammeCriteria) : criteria
+  return studyProgrammeCriteria ? await formattedData(studyProgrammeCriteria) : criteria
 }
 
 module.exports = {
