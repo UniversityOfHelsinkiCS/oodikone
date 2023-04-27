@@ -64,9 +64,9 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
       {
         code: `Credits`,
         name: {
-          fi: `${credtiMonths[idx]} mo: ${criteria.credits[year]}`,
-          en: `${credtiMonths[idx]} mo: ${criteria.credits[year]}`,
-          sv: `${credtiMonths[idx]} mo: ${criteria.credits[year]}`,
+          fi: `${credtiMonths[idx]} mos.: ${criteria.credits[year]}`,
+          en: `${credtiMonths[idx]} mos.: ${criteria.credits[year]}`,
+          sv: `${credtiMonths[idx]} mos.: ${criteria.credits[year]}`,
         },
       },
       ...[...criteria.courses[year]]
@@ -573,56 +573,64 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
     return students
   }, [students])
   return (
-    <Tab.Pane>
-      <div style={{ display: 'flex' }}>
-        <div style={{ maxHeight: '80vh', width: '100%' }}>
-          <h5>
-            Criteria can be changed{' '}
-            <Link
-              to={`/study-programme/${programme}?p_m_tab=0&p_tab=3`}
-              onClick={() => {
-                sendAnalytics('No criteria defined button clicked', 'Degree courses tab')
-              }}
-            >
-              here.
-            </Link>{' '}
-            Please refresh page after changes.
-          </h5>
-          <Message style={{ fontSize: '16px' }}>
-            <p>
-              <Icon fitted name="check" color="green" />: Student has passed the course in the academic year.{' '}
-              <Icon fitted name="check" color="grey" />: Student has passed the course outside of the corresponding
-              academic year. <Icon fitted name="clipboard check" color="green" />: Student has credit transfer for the
-              course. <br />
-              <Icon fitted name="times" color="red" />: Student has failed the course.{' '}
-              <Icon fitted name="minus" color="grey" />: Student has enrolled, but has not received any grade from the
-              course.
-            </p>
-          </Message>
-          {isCriteriaSet ? (
-            <SortableTable
-              style={{ height: '80vh' }}
-              tableId="progress-of-population-students"
-              title={`Progress of population's students after predefined criteria`}
-              getRowKey={s => s.studentNumber}
-              tableProps={{
-                collapsing: true,
-                basic: true,
-                compact: 'very',
-                padded: false,
-                celled: true,
-              }}
-              columns={columns}
-              data={data}
-            />
-          ) : (
-            <div>
-              <h3>There is no criteria set for this programme.</h3>
-            </div>
-          )}
+    <>
+      <h5>
+        Criteria can be changed{' '}
+        <Link
+          to={`/study-programme/${programme}?p_m_tab=0&p_tab=3`}
+          onClick={() => {
+            sendAnalytics('No criteria defined button clicked', 'Degree courses tab')
+          }}
+        >
+          here.
+        </Link>{' '}
+        Please refresh page after changes.
+      </h5>
+      <Message style={{ fontSize: '16px', maxWidth: '700px' }}>
+        <p>
+          <Icon fitted name="check" color="green" />: Student has passed the course in the academic year. <br />
+          <Icon fitted name="check" color="grey" />: Student has passed the course outside of the corresponding academic
+          year. <br /> <Icon fitted name="clipboard check" color="green" />: Student has credit transfer for the course.
+          <br />
+          <Icon fitted name="times" color="red" />: Student has failed the course. <br />
+          <Icon fitted name="minus" color="grey" />: Student has enrolled, but has not received any grade from the
+          course.
+        </p>
+        <div className="enrollment-label label-present">Student has an active semester enrollment.</div>
+        <br />
+        <div className="enrollment-label label-absent">Student has enrolled as absent.</div>
+        <br />
+        <div className="enrollment-label label-passive">Student has no semester enrollment.</div>
+        <br />
+      </Message>
+      <Tab.Pane>
+        <div style={{ display: 'flex' }}>
+          <div style={{ maxHeight: '80vh', width: '100%' }}>
+            {isCriteriaSet ? (
+              <SortableTable
+                style={{ height: '80vh' }}
+                tableId="progress-of-population-students"
+                title={`Progress of population's students after predefined criteria`}
+                getRowKey={s => s.studentNumber}
+                tableProps={{
+                  collapsing: true,
+                  basic: true,
+                  compact: 'very',
+                  padded: false,
+                  celled: true,
+                }}
+                columns={columns}
+                data={data}
+              />
+            ) : (
+              <div>
+                <h3>There is no criteria set for this programme.</h3>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-    </Tab.Pane>
+      </Tab.Pane>
+    </>
   )
 }
 
