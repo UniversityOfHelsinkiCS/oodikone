@@ -127,6 +127,10 @@ const CompletedCoursesSearch = ({ setValues, history, location }) => {
       .filter(s => s !== '')
       .map(s => (s.length === 8 ? `0${s}` : s))
 
+    if (courseList.length === 0 || studentList.length === 0 || studentList[0] === null) {
+      return
+    }
+
     setValues({
       studentList,
       courseList,
