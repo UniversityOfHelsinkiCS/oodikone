@@ -56,7 +56,10 @@ const getCustomOpenUniCourses = async (courseCodes, startdate, enddate) => {
     if (!uniqueStudentsWithCurrentStudyRight.includes(studentnumber)) {
       if (!(studentnumber in studentStats)) {
         studentStats[studentnumber] = {
-          courseInfo: courseCodes.reduce((acc, code) => ({ ...acc, [code]: getEmptyCourseInfo() }), {}),
+          courseInfo: courseCodes.reduce(
+            (acc, code) => ({ ...acc, [code.replace('AY', '')]: getEmptyCourseInfo() }),
+            {}
+          ),
           email: email,
           secondaryEmail: secondary_email,
           totals: { passed: 0, failed: 0, unfinished: 0 },
