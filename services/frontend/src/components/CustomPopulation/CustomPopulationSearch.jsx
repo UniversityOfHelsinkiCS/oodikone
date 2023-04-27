@@ -25,6 +25,7 @@ const CustomPopulationSearch = ({
   loading,
   customPopulationSearches,
   customPopulationSearchSaving,
+  setStudentsInput,
 }) => {
   const [modal, setModal] = useState(false)
   const [input, setInput] = useState('')
@@ -54,8 +55,15 @@ const CustomPopulationSearch = ({
     clearForm()
   }
 
+  const parseInput = studentNumbers =>
+    studentNumbers
+      .split(/[\s,]+/)
+      .map(code => code.trim())
+      .filter(s => s !== '')
+      .map(s => (s.length === 8 ? `0${s}` : s))
+
   const onSave = () => {
-    const studentnumberlist = input.match(/[0-9]+/g)
+    const studentnumberlist = parseInput(input)
     if (selectedSearchId) {
       updateCustomPopulationSearchDispatch({ id: selectedSearchId, studentnumberlist })
     } else {
@@ -87,7 +95,8 @@ const CustomPopulationSearch = ({
 
   const onClicker = e => {
     e.preventDefault()
-    const studentnumbers = input.match(/[0-9]+/g).map(sNumber => (sNumber.length === 8 ? `0${sNumber}` : sNumber))
+    const studentnumbers = parseInput(input)
+    setStudentsInput(studentnumbers)
     getCustomPopulationDispatch({ studentnumberlist: studentnumbers, onProgress })
     getCustomPopulationCoursesByStudentnumbers({ studentnumberlist: studentnumbers })
     selectCustomPopulationSearchDispatch(selectedSearchId || null)

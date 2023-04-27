@@ -5,6 +5,7 @@ import { Segment, Header, Accordion, Message } from 'semantic-ui-react'
 import _ from 'lodash'
 import scrollToComponent from 'react-scroll-to-component'
 import semestersApi from 'redux/semesters'
+import RightsNotification from 'components/RightsNotification'
 import { useProgress, useTitle } from '../../common/hooks'
 import infotooltips from '../../common/InfoToolTips'
 import { getCustomPopulationSearches } from '../../redux/customPopulationSearch'
@@ -89,12 +90,13 @@ const CustomPopulationContent = ({ students, custompop }) => {
   const { language } = useLanguage()
   const [activeIndex, setIndex] = useState([])
   const [newestIndex, setNewest] = useState(null)
+  const [studentsInput, setStudentsInput] = useState(null)
+  const [discardedStudentNumbers, setDiscarded] = useState([])
   const creditGainRef = useRef()
   const programmeRef = useRef()
   const coursesRef = useRef()
   const studentRef = useRef()
   const refs = [creditGainRef, programmeRef, coursesRef, studentRef]
-
   const { customPopulationSearches, searchedCustomPopulationSearchId } = useSelector(
     state => state.customPopulationSearch
   )
@@ -107,6 +109,15 @@ const CustomPopulationContent = ({ students, custompop }) => {
   const { data: courseStats } = useGetStudentListCourseStatisticsQuery({
     studentNumbers: students.map(s => s.studentNumber),
   })
+
+  useEffect(() => {
+    setDiscarded(
+      _.difference(
+        studentsInput,
+        students.map(s => s.studentNumber)
+      )
+    )
+  }, [studentsInput, students])
 
   useEffect(() => {
     if (newestIndex) {
@@ -237,7 +248,10 @@ const CustomPopulationContent = ({ students, custompop }) => {
           studentnumbers you have access rights to i.e. you have rights to the programme they are in.
         </p>
       </Message>
-      <CustomPopulationSearch />
+      {discardedStudentNumbers?.length > 0 && !populations.pending && (
+        <RightsNotification discardedStudentNumbers={discardedStudentNumbers} />
+      )}
+      <CustomPopulationSearch setStudentsInput={setStudentsInput} />
       {custompop.length > 0 && customPopulationFlag ? (
         <Segment className="contentSegment">{renderCustomPopulation(students)}</Segment>
       ) : (
