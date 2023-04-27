@@ -123,7 +123,7 @@ const CompletedCoursesSearch = ({ setValues, history, location }) => {
       .filter(c => c !== '')
     const studentList = studentInput
       .split(/[\s,]+/)
-      .map(code => code.trim().toUpperCase())
+      .map(code => code.trim())
       .filter(s => s !== '')
       .map(s => (s.length === 8 ? `0${s}` : s))
 
