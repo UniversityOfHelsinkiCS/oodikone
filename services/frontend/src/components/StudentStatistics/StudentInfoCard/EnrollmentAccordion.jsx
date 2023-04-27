@@ -8,13 +8,14 @@ import './studentInfoCard.css'
 const enrolmentTypes = {
   1: { text: 'Present', className: 'label-present' },
   2: { text: 'Absent', className: 'label-absent' },
-  3: { text: 'Passive', className: 'label-passive' },
+  3: { text: 'Inactive', className: 'label-passive' },
   STATUTORY: { text: 'Absent, statutory', className: 'label-absent-statutory' },
 }
+
 const helpTexts = {
   1: '',
   2: 'The registration has been done and the student is not attending to the study term.',
-  3: 'The registration has not been done and the student is counted as passive.',
+  3: 'The registration has not been done and the student is counted as inactive.',
   STATUTORY: 'This absence is statutory e.g. parental leave or military service',
 }
 const curDate = new Date()
