@@ -1,12 +1,10 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
-import _, { orderBy, uniqBy, sortBy, isNumber } from 'lodash'
+import React, { useState, useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Icon, Tab, Grid, Item, Dropdown } from 'semantic-ui-react'
+import { Tab, Grid, Dropdown } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
-
 import scrollToComponent from 'react-scroll-to-component'
 import { useGetAuthorizedUserQuery } from 'redux/auth'
-import useLanguage from 'components/LanguagePicker/useLanguage'
+import moment from 'moment'
 import { useTabChangeAnalytics, usePrevious } from '../../common/hooks'
 
 import { getTagsByStudytrackAction } from '../../redux/tags'
@@ -14,7 +12,6 @@ import { getStudentTagsByStudytrackAction } from '../../redux/tagstudent'
 
 import StudentNameVisibilityToggle from '../StudentNameVisibilityToggle'
 import '../PopulationCourseStats/populationCourseStats.css'
-import SortableTable, { row } from '../SortableTable'
 import InfoBox from '../Info/InfoBox'
 import CheckStudentList from './CheckStudentList'
 import TagPopulation from '../TagPopulation'
@@ -24,317 +21,9 @@ import './populationStudents.css'
 import GeneralTab from './StudentTable/GeneralTab'
 import sendEvent, { ANALYTICS_CATEGORIES } from '../../common/sendEvent'
 import infotoolTips from '../../common/InfoToolTips'
+import CoursesTable from './StudentTable/CourseTab'
 
 const sendAnalytics = sendEvent.populationStudents
-
-const getMandatoryPassed = (mandatoryCourses, populationCourses) => {
-  if (!mandatoryCourses || !populationCourses) return {}
-  const mandatoryCodes = mandatoryCourses.filter(course => course.visible && course.visible.visibility).map(c => c.code)
-  let mandatoryPassed = {}
-
-  if (populationCourses.coursestatistics) {
-    const mandatorycodesMapCourseCodeToCourseID = new Map()
-    mandatoryCourses
-      .filter(course => course.visible && course.visible.visibility)
-      .forEach(c => mandatorycodesMapCourseCodeToCourseID.set(c.code, c.id))
-
-    const courses = populationCourses.coursestatistics
-    mandatoryPassed = mandatoryCodes.reduce((obj, code) => {
-      const foundCourse = !!courses.find(c => c.course.code === code)
-
-      const searchCode = mandatorycodesMapCourseCodeToCourseID.get(code)
-
-      let foundSubsCourse
-      if (searchCode) {
-        foundSubsCourse = courses.find(c => {
-          if (!c.course.substitutions) return false
-          if (c.course.substitutions.length === null) return false
-          return c.course.substitutions.includes(searchCode)
-        })
-      }
-
-      let passedArray = foundCourse ? Object.keys(courses.find(c => c.course.code === code).students.passed) : null
-
-      if (foundSubsCourse) {
-        passedArray = passedArray
-          ? [...passedArray, ...Object.keys(foundSubsCourse.students.passed)]
-          : Object.keys(foundSubsCourse.students.passed)
-      }
-      obj[code] = passedArray
-      return obj
-    }, {})
-  }
-
-  return mandatoryPassed
-}
-
-const CoursesTable = ({ students }) => {
-  const { getTextIn } = useLanguage()
-  const namesVisible = useSelector(state => state?.settings?.namesVisible)
-  const mandatoryCourses = useSelector(state => state?.populationMandatoryCourses?.data)
-  const { data: populationCourses, pending } = useSelector(state => state?.populationSelectedStudentCourses)
-
-  const mandatoryPassed = useMemo(
-    () => getMandatoryPassed(mandatoryCourses, populationCourses),
-    [mandatoryCourses, populationCourses]
-  )
-
-  const hasPassedMandatory = useCallback(
-    (studentNumber, code) => mandatoryPassed[code] && mandatoryPassed[code].includes(studentNumber),
-    [mandatoryPassed]
-  )
-
-  const totalMandatoryPassed = useCallback(
-    studentNumber => _.sumBy(mandatoryCourses, ({ code }) => hasPassedMandatory(studentNumber, code)),
-    [mandatoryCourses, hasPassedMandatory]
-  )
-
-  const columns = useMemo(() => {
-    const nameColumns = []
-
-    if (namesVisible) {
-      nameColumns.push(
-        {
-          key: 'lastname',
-          title: 'Last name',
-          getRowVal: s => (s.total ? null : s.lastname),
-          cellProps: { title: 'last name' },
-          child: true,
-        },
-        {
-          key: 'firstname',
-          title: 'Given names',
-          getRowVal: s => (s.total ? null : s.firstnames),
-          cellProps: { title: 'first names' },
-          child: true,
-        }
-      )
-    }
-
-    nameColumns.push(
-      {
-        key: 'studentnumber-parent',
-        title: 'Student Number',
-        cellProps: { title: 'student number', className: 'studentNumber' },
-        getRowVal: s => (s.total ? '*' : s.studentNumber),
-        getRowContent: s =>
-          s.total ? (
-            'Summary:'
-          ) : (
-            <div>
-              <span>{s.studentNumber}</span>
-              <Item
-                as={Link}
-                to={`/students/${s.studentNumber}`}
-                onClick={() => {
-                  sendAnalytics('Student details button clicked', 'Mandatory courses table')
-                }}
-              >
-                <Icon style={{ borderLeft: '1em' }} name="user outline" />
-              </Item>
-            </div>
-          ),
-        child: true,
-      },
-      {
-        key: 'totalpassed',
-        title: 'Total Passed',
-        filterType: 'range',
-        vertical: true,
-        getRowVal: s =>
-          s.total
-            ? Object.values(s)
-                .filter(isNumber)
-                .reduce((acc, e) => acc + e, 0)
-            : totalMandatoryPassed(s.studentNumber),
-        cellProps: { title: 'total passed' },
-        child: true,
-      }
-    )
-
-    const mandatoryCourseLabels = []
-
-    const labelToMandatoryCourses = mandatoryCourses.reduce((acc, e) => {
-      const label = e.label ? e.label.label : ''
-      acc[label] = acc[label] || []
-      if (acc[label].some(l => l.code === e.code)) return acc
-      acc[label].push(e)
-      if (e.label) mandatoryCourseLabels.push({ ...e.label, code: e.label_code })
-      else mandatoryCourseLabels.push({ id: 'null', label: '', code: '' })
-      return acc
-    }, {})
-
-    const sortedlabels = orderBy(
-      uniqBy(mandatoryCourseLabels, l => l.label),
-      [e => e.orderNumber],
-      ['asc']
-    )
-
-    const { visibleLabels, visibleCourseCodes } = mandatoryCourses.reduce(
-      (acc, cur) => {
-        if (cur.visible && cur.visible.visibility) {
-          acc.visibleLabels.add(cur.label_code)
-          acc.visibleCourseCodes.add(cur.code)
-        }
-
-        return acc
-      },
-      { visibleLabels: new Set(), visibleCourseCodes: new Set() }
-    )
-
-    const getTotalRowVal = (t, m) => t[m.code]
-
-    const columns = []
-
-    columns.push(
-      {
-        key: 'general',
-        title: <b>Labels:</b>,
-        textTitle: null,
-        parent: true,
-        children: nameColumns,
-      },
-      ...sortedlabels
-        .filter(({ code }) => visibleLabels.has(code))
-        .map(e => ({
-          key: e.id + e.code,
-          title: (
-            <div key={e.code} style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
-              <div key={`${e.code}-${e.id}`}>{e.code}</div>
-              <div key={`${e.code}${e.id}`} style={{ color: 'gray', fontWeight: 'normal' }}>
-                {e.id}
-              </div>
-            </div>
-          ),
-          textTitle: e.code,
-          children: sortBy(labelToMandatoryCourses[e.label], [
-            m => {
-              const res = m.code.match(/\d+/)
-              return res ? Number(res[0]) : Number.MAX_VALUE
-            },
-            'code',
-          ])
-            .filter(course => visibleCourseCodes.has(course.code))
-            .map(m => ({
-              key: `${m.label ? m.label.label : 'fix'}-${m.code}`, // really quick and dirty fix
-              title: (
-                <div
-                  key={`${m.code}-${m.label ? m.label.label : 'fix'}`}
-                  style={{ maxWidth: '15em', whiteSpace: 'normal', overflow: 'hidden', width: 'max-content' }}
-                >
-                  <div key={`${m.label ? m.label.label : 'fix'}-${m.code}`}>{m.code}</div>
-                  <div
-                    key={`${m.label ? m.label.label : 'fix'}-${getTextIn(m.name)}`}
-                    style={{ color: 'gray', fontWeight: 'normal' }}
-                  >
-                    {getTextIn(m.name)}
-                  </div>
-                </div>
-              ),
-              textTitle: m.code,
-              vertical: true,
-              forceToolsMode: 'dangling',
-              cellProps: s => {
-                let grade = s.courses
-                  ? s.courses.find(course => course.course_code === m.code || course.course_code === `AY${m.code}`)
-                      ?.grade
-                  : null
-                grade =
-                  s.courses && !grade && hasPassedMandatory(s.studentNumber, m.code)
-                    ? s.courses.find(course => course.course_code === m.label_code)?.grade
-                    : grade
-                const gradeText = grade ? `\nGrade: ${grade}` : ''
-                const studentCode = s.studentNumber ? `\nStudent number:  ${s.studentNumber}` : ``
-                return {
-                  title: `${m.code}, ${getTextIn(m.name)}${studentCode} ${gradeText}`,
-                  style: {
-                    verticalAlign: 'middle',
-                    textAlign: 'center',
-                  },
-                }
-              },
-              headerProps: { title: `${m.code}, ${getTextIn(m.name)}` },
-              getRowVal: s => {
-                if (s.total) {
-                  return getTotalRowVal(s, m)
-                }
-
-                return hasPassedMandatory(s.studentNumber, m.code) ? 'Passed' : ''
-              },
-              getRowExportVal: s => {
-                if (s.total) {
-                  return getTotalRowVal(s, m)
-                }
-
-                return hasPassedMandatory(s.studentNumber, m.code) ? 'Passed' : ''
-              },
-              getRowContent: s => {
-                if (s.total) return getTotalRowVal(s, m)
-                return hasPassedMandatory(s.studentNumber, m.code) ? <Icon fitted name="check" color="green" /> : null
-              },
-              child: true,
-              childOf: e.label,
-              code: m.code,
-            })),
-        }))
-    )
-
-    columns.push({
-      key: 'email',
-      title: 'Email',
-      getRowVal: s => (s.total ? null : s.email),
-      cellProps: { title: 'emails' },
-      child: true,
-    })
-
-    return columns
-  }, [namesVisible, mandatoryCourses, getTextIn])
-
-  const data = useMemo(() => {
-    const totals = students.reduce(
-      (acc, s) => {
-        const passedCourses = new Set()
-        mandatoryCourses.forEach(m => {
-          if (passedCourses.has(m.code)) return
-          passedCourses.add(m.code)
-          if (hasPassedMandatory(s.studentNumber, m.code)) ++acc[m.code]
-        })
-        return acc
-      },
-      mandatoryCourses.reduce((acc, e) => ({ ...acc, [e.code]: 0 }), { total: true })
-    )
-
-    return [row(totals, { ignoreFilters: true }), ...students]
-  }, [students, mandatoryCourses, hasPassedMandatory])
-
-  return (
-    <Tab.Pane loading={pending}>
-      <div style={{ display: 'flex' }}>
-        <div style={{ maxHeight: '80vh', width: '100%' }}>
-          {mandatoryCourses.length > 0 && (
-            <SortableTable
-              tableId="course-of-population-students"
-              title={`Courses of population's students`}
-              getRowKey={s => (s.total ? 'totals' : s.studentNumber)}
-              tableProps={{
-                celled: true,
-                compact: 'very',
-                padded: false,
-                collapsing: true,
-                basic: true,
-                striped: true,
-                singleLine: true,
-                textAlign: 'center',
-              }}
-              columns={columns}
-              data={data}
-            />
-          )}
-        </div>
-      </div>
-    </Tab.Pane>
-  )
-}
 
 const Panes = ({
   filteredStudents,
@@ -356,6 +45,7 @@ const Panes = ({
     'Change students table tab'
   )
 
+  const programme = studyGuidanceGroup?.tags?.studyProgramme || ''
   const panesAvailable = [
     {
       menuItem: 'General',
@@ -375,7 +65,9 @@ const Panes = ({
     },
     {
       menuItem: 'Courses',
-      render: () => <CoursesTable students={filteredStudents} />,
+      render: () => (
+        <CoursesTable students={filteredStudents} variant={variant} studyGuidanceGroup={studyGuidanceGroup} />
+      ),
     },
     {
       menuItem: 'Tags',
@@ -393,18 +85,22 @@ const Panes = ({
                   alignItems: 'center',
                 }}
               >
-                <h3>
-                  No tags defined. You can define them{' '}
-                  <Link
-                    to={`/study-programme/${queryStudyrights[0]}?p_m_tab=0&p_tab=4`}
-                    onClick={() => {
-                      sendAnalytics('No tags defined button clicked', 'Tags tab')
-                    }}
-                  >
-                    here
-                  </Link>
-                  .
-                </h3>
+                {queryStudyrights[0] ? (
+                  <h3>
+                    No tags defined. You can define them{' '}
+                    <Link
+                      to={`/study-programme/${queryStudyrights[0]}?p_m_tab=0&p_tab=4`}
+                      onClick={() => {
+                        sendAnalytics('No tags defined button clicked', 'Tags tab')
+                      }}
+                    >
+                      here
+                    </Link>
+                    .
+                  </h3>
+                ) : (
+                  <h3>No tags defined</h3>
+                )}
               </div>
             )}
             {tags.length > 0 && (
@@ -412,9 +108,9 @@ const Panes = ({
                 <TagPopulation
                   tags={tags}
                   selectedStudents={filteredStudents.map(stu => stu.studentNumber)}
-                  studytrack={queryStudyrights[0]}
+                  studytrack={queryStudyrights[0] || programme}
                 />
-                <TagList studytrack={queryStudyrights[0]} selectedStudents={filteredStudents} />
+                <TagList studytrack={queryStudyrights[0] || programme} selectedStudents={filteredStudents} />
               </>
             )}
           </div>
@@ -428,7 +124,7 @@ const Panes = ({
           students={filteredStudents}
           criteria={criteria}
           months={months}
-          programme={queryStudyrights[0]}
+          programme={queryStudyrights[0] || programme}
         />
       ),
     },
@@ -474,7 +170,10 @@ const PopulationStudents = ({
   const { data: tags } = useSelector(({ tags }) => tags)
   const { query } = useSelector(({ populations }) => populations)
   const queryStudyrights = query ? Object.values(query.studyRights) : []
-  const months = query ? query.months : 0
+  let months = query ? query.months : 0
+  if (studyGuidanceGroup && studyGuidanceGroup?.tags?.year) {
+    months = moment(`${studyGuidanceGroup?.tags?.year}-08-01`).diff(moment(), 'months')
+  }
   const prevShowList = usePrevious(showList)
   const { isAdmin } = useGetAuthorizedUserQuery()
   const admin = isAdmin
@@ -523,12 +222,18 @@ const PopulationStudents = ({
   )
 }
 
+const getTabs = programmeCode => {
+  if (programmeCode && (programmeCode.includes('KH') || ['MH30_001', 'MH30_003'].includes(programmeCode)))
+    return ['General', 'Courses', 'Tags', 'Progress']
+  if (programmeCode) return ['General', 'Tags', 'Courses']
+  return ['General']
+}
+
 const PopulationStudentsContainer = ({ ...props }) => {
   const { variant } = props
   if (!['population', 'customPopulation', 'coursePopulation', 'studyGuidanceGroupPopulation'].includes(variant)) {
     throw new Error(`${variant} is not a proper variant!`)
   }
-
   const contentByVariant = {
     population: {
       panesToInclude:
@@ -549,7 +254,7 @@ const PopulationStudentsContainer = ({ ...props }) => {
       infotoolTipContent: infotoolTips.PopulationStatistics.StudentsCustom,
     },
     studyGuidanceGroupPopulation: {
-      panesToInclude: ['General'],
+      panesToInclude: getTabs(props.studyGuidanceGroup?.tags?.studyProgramme),
       infotoolTipContent: infotoolTips.PopulationStatistics.StudentsGuidanceGroups,
     },
   }
