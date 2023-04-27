@@ -196,6 +196,7 @@ const formatStudentForPopulationStatistics = (
 
   studyrights = studyrights || []
   const started = dateofuniversityenrollment
+
   return {
     firstnames,
     lastname,
@@ -212,7 +213,9 @@ const formatStudentForPopulationStatistics = (
     email,
     secondaryEmail: secondary_email,
     phoneNumber: phone_number,
-    semesterenrollments: semester_enrollments || [],
+    semesterenrollments: semester_enrollments
+      ? semester_enrollments.sort((a, b) => a.semestercode - b.semestercode)
+      : [],
     updatedAt: updatedAt || createdAt,
     tags: tags || [],
     studyrightStart: startDate,

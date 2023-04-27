@@ -7,12 +7,12 @@ import sendEvent from 'common/sendEvent'
 import { getTextIn } from 'common'
 import { keyBy } from 'lodash'
 import moment from 'moment'
+import '../../StudentStatistics/StudentInfoCard/studentInfoCard.css'
 
 const sendAnalytics = sendEvent.populationStudents
 const ProgressTable = ({ criteria, students, months, programme }) => {
   const mandatoryCourses = useSelector(state => state?.populationMandatoryCourses?.data)
   const namesVisible = useSelector(state => state?.settings?.namesVisible)
-
   const findRowContent = (s, courseCode, year, start, end) => {
     if (courseCode.includes('Credits'))
       return s.criteriaProgress[year] && s.criteriaProgress[year].credits ? (
@@ -56,6 +56,154 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
     }
     return ''
   }
+
+  const credtiMonths = [12, 24, 36, 48, 60, 72]
+  const courses = keyBy(mandatoryCourses, 'code')
+  const labelCriteria = Object.keys(criteria.courses).reduce((acc, year, idx) => {
+    acc[year] = [
+      {
+        code: `Credits`,
+        name: {
+          fi: `${credtiMonths[idx]} mo: ${criteria.credits[year]}`,
+          en: `${credtiMonths[idx]} mo: ${criteria.credits[year]}`,
+          sv: `${credtiMonths[idx]} mo: ${criteria.credits[year]}`,
+        },
+      },
+      ...[...criteria.courses[year]]
+        .sort((a, b) => a.localeCompare(b))
+        .map(courseCode => ({
+          code: courseCode,
+          name: courses[courseCode] ? courses[courseCode].name : '',
+        })),
+      {
+        code: `Criteria`,
+        name: {
+          fi: `Year ${idx + 1}: Fullfilled`,
+          en: `Year ${idx + 1}: Fullfilled`,
+          sv: `Year ${idx + 1}: Fullfilled`,
+        },
+      },
+      {
+        code: `Enrollment`,
+        name: { fi: `Year ${idx + 1}: Fall`, en: `Year ${idx + 1}: Fall`, sv: `Year ${idx + 1}: Fall` },
+      },
+      {
+        code: `Enrollment`,
+        name: { fi: `Year ${idx + 1}: Spring`, en: `Year ${idx + 1}: Spring`, sv: `Year ${idx + 1}: Spring` },
+      },
+    ]
+    return acc
+  }, {})
+  const criteriaHeaders = [
+    { title: months < 12 ? 'Academic Year 1 (in progress)' : 'Academic Year 1', year: 'year1', label: 'yearOne' },
+    { title: months < 24 ? 'Academic Year 2 (in progress)' : 'Academic Year 2', year: 'year2', label: 'yearTwo' },
+    { title: months < 36 ? 'Academic Year 3 (in progress)' : 'Academic Year 3', year: 'year3', label: 'yearThree' },
+  ]
+
+  const getEnrollmentValue = enrollmentObj => {
+    if (enrollmentObj?.enrollmenttype === 1) return 'Present'
+    if (enrollmentObj?.enrollmenttype === 2) return 'Absent'
+    return 'Inactive'
+  }
+
+  const nonCourse = ['Criteria', 'Credits']
+  const style = { verticalAlign: 'middle', textAlign: 'center' }
+
+  const helpTexts = {
+    1: 'Active',
+    2: 'Student has enrolled as absent.',
+    3: 'Student has not enrolled to semester and is counted as inactive.',
+  }
+
+  const findProp = (info, s, enrollStatusIdx) => {
+    const propObj = {
+      title: '',
+      style,
+    }
+    const courses = s.courses.filter(
+      course =>
+        course.course_code === info.code ||
+        (criteria?.allCourses[info.code] && criteria?.allCourses[info.code].includes(course.course_code))
+    )
+    if (nonCourse.includes(info.code)) return propObj
+    // Semester Enrollment - naming things is hard
+    if (info.code === 'Enrollment') {
+      const { enrollmenttype } = info.name.en.includes('Fall')
+        ? s.semesterenrollments[enrollStatusIdx]
+        : s.semesterenrollments[enrollStatusIdx + 1]
+      return { ...propObj, title: helpTexts[enrollmenttype] }
+    }
+    if (courses && courses.some(course => course.passed))
+      return { ...propObj, title: `Passed-${moment(courses[0].date).format('YYYY-MM-DD')}` }
+    if (courses && courses.some(course => course.passed === false))
+      return { ...propObj, title: `Failed-${moment(courses[0].date).format('YYYY-MM-DD')}` }
+    if (s.enrollments && s.enrollments.map(course => course.course_code).includes(info.code)) {
+      const enrollment = s.enrollments.filter(enrollment => enrollment.course_code === info.code)
+      return {
+        ...propObj,
+        title: `Enrollment-${moment(enrollment[0].enrollment_date_time).format('YYYY-MM-DD')}`,
+      }
+    }
+    return propObj
+  }
+
+  const enrolmentTypes = {
+    1: { className: 'label-present' },
+    2: { className: 'label-absent' },
+    3: { className: 'label-passive' },
+  }
+
+  const renderSemester = ({ enrollmenttype }) => {
+    const { className } = enrolmentTypes[enrollmenttype]
+    return <div className={`enrollment-label ${className}`}> </div>
+  }
+
+  const createContent = (labels, year, start, end, enrollStatusIdx) => {
+    return labels.map(m => ({
+      key: `${year}-${m.code}-${m.name.fi}`,
+      title: (
+        <div
+          key={`${year}-${m.code}-${getTextIn(m.name)}`}
+          style={{ maxWidth: '7em', whiteSpace: 'normal', overflow: 'hidden', width: 'max-content' }}
+        >
+          <div key={`${m.code}-${year}`}>{m.code}</div>
+          <div key={`${getTextIn(m.name)}`} style={{ color: 'gray', fontWeight: 'normal' }}>
+            {getTextIn(m.name)}
+          </div>
+        </div>
+      ),
+      textTitle:
+        m.name === ''
+          ? `${m.code} ${enrollStatusIdx === 0 ? enrollStatusIdx + 1 : enrollStatusIdx}`
+          : `${m.code}-${getTextIn(m.name)}`,
+      headerProps: { title: `${m.code}, ${year}` },
+      cellProps: s => findProp(m, s, enrollStatusIdx),
+      getRowVal: s => {
+        if (m.code.includes('Criteria')) return s.criteriaProgress[year] ? s.criteriaProgress[year].totalSatisfied : 0
+        if (m.code.includes('Enrollment') && m.name.en.includes('Fall'))
+          return getEnrollmentValue(s.semesterenrollments[enrollStatusIdx])
+        if (m.code.includes('Enrollment') && m.name.en.includes('Spring'))
+          return getEnrollmentValue(s.semesterenrollments[enrollStatusIdx + 1])
+        return findCsvText(s, m.code, year)
+      },
+      getRowContent: s => {
+        if (m.code.includes('Criteria')) return s.criteriaProgress[year] ? s.criteriaProgress[year].totalSatisfied : 0
+        if (m.code.includes('Enrollment') && m.name.en.includes('Fall'))
+          return renderSemester(s.semesterenrollments[enrollStatusIdx])
+        if (m.code.includes('Enrollment') && m.name.en.includes('Spring'))
+          return renderSemester(s.semesterenrollments[enrollStatusIdx + 1])
+        return findRowContent(s, m.code, year, start, end)
+      },
+      child: true,
+    }))
+  }
+  const acaYearStart = moment()
+    .subtract(months - 1, 'months')
+    .startOf('month')
+  const acaYearEnd = moment()
+    .subtract(months - 12, 'months')
+    .endOf('month')
+
   const columns = useMemo(() => {
     const studentColumns = []
     if (namesVisible) {
@@ -78,7 +226,6 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
         }
       )
     }
-
     studentColumns.push({
       key: 'studentnumber-parent',
       title: 'Student Number',
@@ -100,135 +247,8 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
       ),
       child: true,
     })
-    const credtiMonths = [12, 24, 36, 48, 60, 72]
-    const courses = keyBy(mandatoryCourses, 'code')
-    const labelCriteria = Object.keys(criteria.courses).reduce((acc, year, idx) => {
-      acc[year] = [
-        {
-          code: `Credits`,
-          name: {
-            fi: `${credtiMonths[idx]} mo: ${criteria.credits[year]}`,
-            en: `${credtiMonths[idx]} mo: ${criteria.credits[year]}`,
-            sv: `${credtiMonths[idx]} mo: ${criteria.credits[year]}`,
-          },
-        },
-        ...[...criteria.courses[year]]
-          .sort((a, b) => a.localeCompare(b))
-          .map(courseCode => ({
-            code: courseCode,
-            name: courses[courseCode] ? courses[courseCode].name : '',
-          })),
-        {
-          code: `Criteria`,
-          name: {
-            fi: `Year ${idx + 1}: Fullfilled`,
-            en: `Year ${idx + 1}: Fullfilled`,
-            sv: `Year ${idx + 1}: Fullfilled`,
-          },
-        },
-        {
-          code: `Enrollment`,
-          name: { fi: `Year ${idx + 1}: Fall`, en: `Year ${idx + 1}: Fall`, sv: `Year ${idx + 1}: Fall` },
-        },
-        {
-          code: `Enrollment`,
-          name: { fi: `Year ${idx + 1}: Spring`, en: `Year ${idx + 1}: Spring`, sv: `Year ${idx + 1}: Spring` },
-        },
-      ]
-      return acc
-    }, {})
-    const criteriaHeaders = [
-      { title: months < 12 ? 'Academic Year 1 (in progress)' : 'Academic Year 1', year: 'year1', label: 'yearOne' },
-      { title: months < 24 ? 'Academic Year 2 (in progress)' : 'Academic Year 2', year: 'year2', label: 'yearTwo' },
-      { title: months < 36 ? 'Academic Year 3 (in progress)' : 'Academic Year 3', year: 'year3', label: 'yearThree' },
-    ]
 
-    const getEnrollmentValue = enrollmentObj => {
-      if (enrollmentObj?.enrollmenttype === 1) return 'Present'
-      if (enrollmentObj?.enrollmenttype === 2) return 'Absent'
-      return 'Inactive'
-    }
-    const nonCourse = ['Enrollment', 'Criteria', 'Credits']
-    const style = { verticalAlign: 'middle', textAlign: 'center' }
-    const findProp = (courseCode, s) => {
-      const propObj = {
-        title: '',
-        style,
-      }
-      const courses = s.courses.filter(
-        course =>
-          course.course_code === courseCode ||
-          (criteria?.allCourses[courseCode] && criteria?.allCourses[courseCode].includes(course.course_code))
-      )
-      if (nonCourse.includes(courseCode)) return propObj
-      if (courses && courses.some(course => course.passed))
-        return { ...propObj, title: `Passed-${moment(courses[0].date).format('YYYY-MM-DD')}` }
-      if (courses && courses.some(course => course.passed === false))
-        return { ...propObj, title: `Failed-${moment(courses[0].date).format('YYYY-MM-DD')}` }
-      if (s.enrollments && s.enrollments.map(course => course.course_code).includes(courseCode)) {
-        const enrollment = s.enrollments.filter(enrollment => enrollment.course_code === courseCode)
-        return {
-          ...propObj,
-          title: `Enrollment-${moment(enrollment[0].enrollment_date_time).format('YYYY-MM-DD')}`,
-        }
-      }
-      return propObj
-    }
     const columns = []
-
-    const createContent = (labels, year, start, end, enrollStatusIdx) => {
-      return labels.map(m => ({
-        key: `${year}-${m.code}-${m.name.fi}`,
-        title: (
-          <div
-            key={`${year}-${m.code}-${getTextIn(m.name)}`}
-            style={{ maxWidth: '7em', whiteSpace: 'normal', overflow: 'hidden', width: 'max-content' }}
-          >
-            <div key={`${m.code}-${year}`}>{m.code}</div>
-            <div key={`${getTextIn(m.name)}`} style={{ color: 'gray', fontWeight: 'normal' }}>
-              {getTextIn(m.name)}
-            </div>
-          </div>
-        ),
-        textTitle:
-          m.name === ''
-            ? `${m.code} ${enrollStatusIdx === 0 ? enrollStatusIdx + 1 : enrollStatusIdx}`
-            : `${m.code}-${getTextIn(m.name)}`,
-        headerProps: { title: `${m.code}, ${year}` },
-        cellProps: s => findProp(m.code, s),
-        getRowVal: s => {
-          if (m.code.includes('Criteria')) return s.criteriaProgress[year] ? s.criteriaProgress[year].totalSatisfied : 0
-          if (m.code.includes('Enrollment') && m.name.fi.includes('Fall'))
-            return getEnrollmentValue(s.semesterenrollments[enrollStatusIdx])
-          if (m.code.includes('Enrollment') && m.name.fi.includes('Spring'))
-            return getEnrollmentValue(s.semesterenrollments[enrollStatusIdx + 1])
-          return findCsvText(s, m.code, year)
-        },
-        getRowExportVal: s => {
-          if (m.code.includes('Criteria')) return s.criteriaProgress[year] ? s.criteriaProgress[year].totalSatisfied : 0
-          if (m.code.includes('Enrollment') && m.name.fi.includes('Fall'))
-            return getEnrollmentValue(s.semesterenrollments[enrollStatusIdx])
-          if (m.code.includes('Enrollment') && m.name.fi.includes('Spring'))
-            return getEnrollmentValue(s.semesterenrollments[enrollStatusIdx + 1])
-          return findCsvText(s, m.code, year)
-        },
-        getRowContent: s => {
-          if (m.code.includes('Criteria')) return s.criteriaProgress[year] ? s.criteriaProgress[year].totalSatisfied : 0
-          if (m.code.includes('Enrollment') && m.name.fi.includes('Fall'))
-            return getEnrollmentValue(s.semesterenrollments[enrollStatusIdx])
-          if (m.code.includes('Enrollment') && m.name.fi.includes('Spring'))
-            return getEnrollmentValue(s.semesterenrollments[enrollStatusIdx + 1])
-          return findRowContent(s, m.code, year, start, end)
-        },
-        child: true,
-      }))
-    }
-    const acaYearStart = moment()
-      .subtract(months - 1, 'months')
-      .startOf('month')
-    const acaYearEnd = moment()
-      .subtract(months - 12, 'months')
-      .endOf('month')
     columns.push(
       {
         key: 'general',
