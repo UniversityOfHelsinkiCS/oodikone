@@ -595,13 +595,11 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
           <Icon fitted name="times" color="red" />: Student has failed the course. <br />
           <Icon fitted name="minus" color="grey" />: Student has enrolled, but has not received any grade from the
           course.
+          <br />
+          <span className="enrollment-label label-present" />: Student has an active semester enrollment. <br />
+          <span className="enrollment-label label-absent" />: Student has enrolled as absent. <br />
+          <span className="enrollment-label label-passive" />: Student has no semester enrollment.
         </p>
-        <div className="enrollment-label label-present">Student has an active semester enrollment.</div>
-        <br />
-        <div className="enrollment-label label-absent">Student has enrolled as absent.</div>
-        <br />
-        <div className="enrollment-label label-passive">Student has no semester enrollment.</div>
-        <br />
       </Message>
       <Tab.Pane>
         <div style={{ display: 'flex' }}>
