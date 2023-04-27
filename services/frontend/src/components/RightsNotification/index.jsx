@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Message, Button } from 'semantic-ui-react'
 
-const RightsNotification = ({ studentNumbers }) => {
+const RightsNotification = ({ discardedStudentNumbers }) => {
   const [visible, setVisible] = useState(true)
 
   if (!visible) {
@@ -16,7 +16,7 @@ const RightsNotification = ({ studentNumbers }) => {
         you do not have the right to view their information.
       </p>
       <ul>
-        {[...new Set(studentNumbers)].map(num => (
+        {[...new Set(discardedStudentNumbers)].map(num => (
           <li key={num}>{num}</li>
         ))}
       </ul>
