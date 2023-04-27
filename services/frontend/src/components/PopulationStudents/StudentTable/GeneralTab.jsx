@@ -592,7 +592,8 @@ const GeneralTab = ({
 // backend returns with population query below (so caching works)
 const StudyGuidanceGroupGeneralTabContainer = ({ group, ...props }) => {
   const groupStudentNumbers = group?.members?.map(({ personStudentNumber }) => personStudentNumber) || []
-  const populations = useGetStudyGuidanceGroupPopulationQuery(groupStudentNumbers)
+  const { tags } = group
+  const populations = useGetStudyGuidanceGroupPopulationQuery({ studentnumberlist: groupStudentNumbers, tags })
   return <GeneralTab populations={populations} group={group} {...props} />
 }
 

@@ -19,6 +19,7 @@ import {
 import { useHistory } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { useToggle } from 'common/hooks'
+import { useGetProgressCriteriaQuery } from 'redux/programmeProgressCriteria'
 import StudyGuidanceGroupPopulationCourses from './StudyGuidanceGroupPopulationCourses'
 import { startYearToAcademicYear, Wrapper, StyledMessage } from './common'
 import { useGetSemestersQuery } from '../../redux/semesters'
@@ -54,6 +55,9 @@ const SingleStudyGroupContent = ({ filteredStudents, population, group, language
   const [activeIndex, setActiveIndex] = useState([])
   const [newestIndex, setNewestIndex] = useState(null)
   const isMounted = useIsMounted()
+  const criteria = useGetProgressCriteriaQuery({
+    programmeCode: group?.tags?.studyProgramme ? group?.tags?.studyProgramme : '',
+  }).data
 
   const { data: courses, isLoading: coursesAreLoading } = useGetStudyGuidanceGroupPopulationCoursesQuery(
     _.map(filteredStudents, 'studentNumber')
@@ -177,6 +181,7 @@ const SingleStudyGroupContent = ({ filteredStudents, population, group, language
               variant="studyGuidanceGroupPopulation"
               language={language}
               filteredStudents={students}
+              criteria={criteria}
               studyGuidanceGroup={group}
             />
           </div>
@@ -186,14 +191,14 @@ const SingleStudyGroupContent = ({ filteredStudents, population, group, language
   ]
 
   return (
-    <div style={{ overflow: 'hidden', flexGrow: 1, padding: '1px' }}>
+    <div style={{ overflowX: 'auto', flexGrow: 1, padding: '1px' }}>
       <Accordion
         activeIndex={activeIndex}
         exclusive={false}
         styled
         fluid
         panels={createPanels(filteredStudents)}
-        style={{ overflow: 'hidden' }}
+        style={{ overflowX: 'auto' }}
       />
     </div>
   )
@@ -313,7 +318,8 @@ const SingleStudyGuidanceGroupContainer = ({ group }) => {
   const { language } = useSelector(({ settings }) => settings)
   const groupStudentNumbers = group?.members?.map(({ personStudentNumber }) => personStudentNumber) || []
   const studyProgrammes = useFilteredAndFormattedElementDetails(language)
-  const { data, isLoading } = useGetStudyGuidanceGroupPopulationQuery(groupStudentNumbers)
+  const { tags } = group
+  const { data, isLoading } = useGetStudyGuidanceGroupPopulationQuery({ studentnumberlist: groupStudentNumbers, tags })
   const { data: courses, isLoading: coursesAreLoading } =
     useGetStudyGuidanceGroupPopulationCoursesQuery(groupStudentNumbers)
 

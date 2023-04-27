@@ -389,17 +389,16 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
 })
 
 router.post('/v3/populationstatisticsbystudentnumbers', async (req, res) => {
-  const { studentnumberlist } = req.body
+  const { studentnumberlist, tags } = req.body
   const {
     user: { isAdmin, id, studentsUserCanAccess },
   } = req
-
   const filteredStudentNumbers = isAdmin ? studentnumberlist : _.intersection(studentnumberlist, studentsUserCanAccess)
 
   const result = await Population.optimizedStatisticsOf(
     {
-      year: 1900,
-      studyRights: [],
+      year: tags?.year || 1900,
+      studyRights: tags?.studyProgramme ? [tags.studyProgramme] : [],
       semesters: ['FALL', 'SPRING'],
       months: 10000,
     },
