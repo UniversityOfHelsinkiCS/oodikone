@@ -8,6 +8,7 @@ import { useLocation } from 'react-router-dom'
 import { useGetSemestersQuery } from 'redux/semesters'
 import useLanguage from 'components/LanguagePicker/useLanguage'
 import { studentNumberFilter } from 'components/FilterView/filters'
+import { getTargetCreditsForProgramme } from 'common'
 import { getMonths } from '../../../common/query'
 import useFilters from '../../FilterView/useFilters'
 
@@ -65,7 +66,6 @@ export const splitStudentCredits = (student, timeSlots, cumulative) => {
 }
 
 const LIMITS_NON_CUMULATIVE = [15, 30, 45, 60]
-const LIMITS_CUMULATIVE = [30, 60, 90, 120, 150, 180]
 
 const hasGraduatedBefore = (student, programme, date) => {
   const sr = student.studyrights
@@ -81,8 +81,21 @@ const hasGraduatedBefore = (student, programme, date) => {
 
 const GRADUATED = Symbol('GRADUATED')
 
-const getChartData = (students, timeSlots, order, programme, limitScale, cumulative) => {
-  const limitBreaks = (cumulative ? LIMITS_CUMULATIVE : LIMITS_NON_CUMULATIVE).map(lb => lb * limitScale)
+const getChartData = (students, timeSlots, order, programme, timeDivision, cumulative) => {
+  const programmeCredits = getTargetCreditsForProgramme(programme)
+
+  // In calendar-year mode, minus 30 from target credits because programmers (usually) start in autumn,
+  // also if current date is before august, minus 30
+  const isCalendar = timeDivision === TimeDivision.CALENDAR_YEAR
+  const isPastAugust = new Date().getMonth() > 6
+  const calendarModifier = 30 + (isPastAugust ? 0 : 30)
+  const creditsByTimeslots =
+    timeSlots.length * (timeDivision === TimeDivision.SEMESTER ? 30 : 60) - (isCalendar ? calendarModifier : 0)
+  const maxCredits = creditsByTimeslots > programmeCredits ? programmeCredits : creditsByTimeslots
+
+  const limitBreaks = cumulative
+    ? [1, 2, 3, 4, 5, 6].map(num => Math.round((num * maxCredits) / 6))
+    : LIMITS_NON_CUMULATIVE.map(limit => limit * (timeDivision === TimeDivision.SEMESTER ? 0.5 : 1))
 
   let limits = _.range(0, limitBreaks.length + 1).map(i => [limitBreaks[i - 1], limitBreaks[i]])
 
@@ -208,13 +221,11 @@ const CreditDistributionDevelopment = ({ students, query }) => {
   }, [timeDivision, months, semestersQuery, getTextIn])
 
   const seriesList = useMemo(() => {
-    const limitScale = timeDivision === TimeDivision.SEMESTER ? 0.5 : 1.0
-
     return [
-      getChartData(students, timeSlots, stackOrdering, programme, limitScale, false),
-      getChartData(students, timeSlots, stackOrdering, programme, limitScale, true),
+      getChartData(students, timeSlots, stackOrdering, programme, timeDivision, false),
+      getChartData(students, timeSlots, stackOrdering, programme, timeDivision, true),
     ]
-  }, [students, timeSlots, stackOrdering, programme])
+  }, [students, timeSlots, stackOrdering, programme, timeDivision, cumulative])
 
   const labels = timeSlots.map(ts => ts.label)
   const series = seriesList[0 + cumulative]
