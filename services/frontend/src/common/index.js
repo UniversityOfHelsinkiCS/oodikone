@@ -284,6 +284,8 @@ export const getTargetCreditsForProgramme = code => {
   if (code === 'MH90_001') return 180
   if (code.includes('MH')) return 120
   return 180
+  // There are also doctoral degrees of 40, but probably not necessary
+  // Those codes begin with 'LIS' or 'T'
 }
 
 const getMonthsForDegree = code => getTargetCreditsForProgramme(code) / (60 / 12)
