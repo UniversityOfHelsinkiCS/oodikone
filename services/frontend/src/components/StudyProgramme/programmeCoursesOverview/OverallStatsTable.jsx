@@ -12,6 +12,7 @@ const toolTips = InfoToolTips.Studyprogramme
 
 const getColumns = (language, showStudents) => {
   let columns = null
+
   if (showStudents) {
     columns = [
       {
@@ -182,8 +183,13 @@ const getColumns = (language, showStudents) => {
       {
         key: 'name',
         title: 'Name',
+        helpText: toolTips.Name,
         getRowVal: course => course.name[language],
-        getRowContent: course => course.name[language],
+        getRowContent: course =>
+          course.name[language].length > 46 ? `${course.name[language].slice(0, 44)}...` : course.name[language],
+        cellProps: course => {
+          return { title: course.name[language] }
+        },
       },
       {
         key: 'total',

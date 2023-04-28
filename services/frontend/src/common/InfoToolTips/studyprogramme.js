@@ -96,6 +96,9 @@ export default {
 
   Mikäli yläosan valikosta valittuna on jokin tietty opintosuunta, myös nämä graafit ja taulukot kuvaavat kyseisen opintosuunnan opiskelijoita.    
   `,
+  Name: `
+  Pitkät kurssinimet on lyhennetty. Näet ne kokonaan laittamalla hiiren nimen yläpuolelle.
+  `,
   NonDegree: `
   Opiskelijat, joilla ei ole tutkinto-oikeutta Helsingin yliopistossa.
   `,
