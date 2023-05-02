@@ -525,7 +525,6 @@ const studentnumbersWithAllStudyrightElements = async (
   graduatedStudents
 ) => {
   // eslint-disable-line
-
   // db startdate is formatted to utc so need to change it when querying
   const formattedStartDate = new Date(moment.tz(startDate, 'Europe/Helsinki').format()).toUTCString()
 

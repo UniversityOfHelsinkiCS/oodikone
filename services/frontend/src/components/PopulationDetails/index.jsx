@@ -87,10 +87,6 @@ const PopulationDetails = ({
     return null
   }
 
-  /* if (filteredStudents.length === 0) {
-    return <Message negative content="No statistics found for the given query." />
-  } */
-
   const onlyIamRights = !authLoading && !isAdmin && !rights.includes(query?.studyRights?.programme)
 
   const panels = [

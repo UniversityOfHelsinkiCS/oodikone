@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import useFilters from 'components/FilterView/useFilters'
 import { hopsFilter } from 'components/FilterView/filters'
+import Toggle from 'components/StudyProgramme/Toggle'
 import PopulationSearchForm from './PopulationSearchForm'
 import PopulationSearchHistory from './PopulationSearchHistory'
 import ProgressBar from '../ProgressBar'
@@ -11,7 +12,7 @@ import InfoBox from '../Info/InfoBox'
 import { useProgress } from '../../common/hooks'
 import infotoolTips from '../../common/InfoToolTips'
 
-const PopulationSearch = ({ populationFound, history, location, loading }) => {
+const PopulationSearch = ({ populationFound, history, location, loading, unifiedProgramme }) => {
   const { onProgress, progress } = useProgress(loading)
   const { filterDispatch, useFilterSelector } = useFilters()
 
@@ -49,7 +50,17 @@ const PopulationSearch = ({ populationFound, history, location, loading }) => {
               label="Show only credits included in study plan"
             />
           </Form.Field>
-
+          {unifiedProgramme && unifiedProgramme.combinedProgrammeCode && (
+            <div className="toggle-container">
+              <Toggle
+                cypress="programmeToggle"
+                firstLabel={`Filter by graduated and studyplan credits by ${unifiedProgramme.combinedProgrammeCode} `}
+                secondLabel={unifiedProgramme.programmeCode}
+                value={unifiedProgramme.filterByBachelor}
+                setValue={unifiedProgramme.setFilterByBachelor}
+              />
+            </div>
+          )}
           <PopulationSearchHistory history={history} />
         </Form>
       )}

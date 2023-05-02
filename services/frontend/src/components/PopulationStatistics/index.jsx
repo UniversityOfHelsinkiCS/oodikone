@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useLocation, useHistory } from 'react-router-dom'
 import { Header, Segment } from 'semantic-ui-react'
@@ -43,23 +43,25 @@ const PopulationStatistics = () => {
   const { query, queryIsSet, isLoading, selectedStudentsByYear, samples } = useSelector(
     populationToData.makePopulationsToData
   )
-
+  // Option to set other Study programme in cases of combined view (e.g., eläinlääkkis)
+  const [filterByBachelor, setFilterByBachelor] = useState(true)
   useTitle('Class statistics')
 
   const { data: allSemesters } = useGetSemestersQuery()
-
   const programmeCode = query?.studyRights?.programme
+  const combinedProgrammeCode = query?.studyRights?.combinedProgramme
   const programmes = useSelector(store => store.populationProgrammes?.data?.programmes)
   const programmeName = programmes && programmeCode ? programmes[programmeCode]?.name : ''
-
+  const combinedProgrammeName = programmes && combinedProgrammeCode ? programmes[combinedProgrammeCode]?.name : ''
+  const chosenProgrammeCode = filterByBachelor || !combinedProgrammeCode ? programmeCode : combinedProgrammeCode
   const filters = [
     studentNumberFilter,
-    hopsFilter({ programmeCode }),
+    hopsFilter({ chosenProgrammeCode }),
     genderFilter,
     ageFilter,
     courseFilter({ courses }),
     creditsEarnedFilter,
-    graduatedFromProgrammeFilter({ code: programmeCode }),
+    graduatedFromProgrammeFilter({ code: chosenProgrammeCode }),
     transferredToProgrammeFilter,
     startYearAtUniFilter,
     tagsFilter,
@@ -68,14 +70,14 @@ const PopulationStatistics = () => {
       allSemesters: allSemesters?.semesters ?? [],
       language,
     }),
-    studyTrackFilter({ code: programmeCode }),
-    studyrightStatusFilter({ code: programmeCode }),
+    studyTrackFilter({ code: chosenProgrammeCode }),
+    studyrightStatusFilter({ code: chosenProgrammeCode }),
   ]
 
   if (parseInt(query?.year, 10) >= 2020) {
     filters.push(
       admissionTypeFilter({
-        programme: programmeCode,
+        programme: chosenProgrammeCode,
       })
     )
   }
@@ -86,7 +88,8 @@ const PopulationStatistics = () => {
     }
 
     return samples.map(student => {
-      const hopsCredits = student.studyplans.find(plan => plan.programme_code === programmeCode)?.completed_credits ?? 0
+      const hopsCredits =
+        student.studyplans.find(plan => plan.programme_code === chosenProgrammeCode)?.completed_credits ?? 0
       const studyrightStartDate = new Date(student.studyrightStart)
       const courses = student.courses.filter(({ date }) => new Date(date) >= studyrightStartDate)
       const credits = getStudentTotalCredits({ courses })
@@ -97,10 +100,24 @@ const PopulationStatistics = () => {
         credits,
       }
     })
-  }, [samples, programmeCode])
+  }, [samples, chosenProgrammeCode])
 
-  const title =
-    location.search === '' ? 'Class statistics' : `${getTextIn(programmeName, language)} ${getYearText(query?.year)}`
+  const unifyProgrammeName = (bachelor, masterLisenciate) => {
+    if (language === 'fi')
+      return `${bachelor} ja ${
+        masterLisenciate?.includes('lisensiaatin') ? 'lisensiaatin koulutusojelma' : 'maisterin koulutusohjelma'
+      }`
+    if (language === 'en') return `${bachelor?.split(' ')[0]} and ${masterLisenciate}`
+    if (language === 'sv') return `${bachelor?.split('programmet')[0]}- and ${masterLisenciate}`
+    return bachelor
+  }
+
+  const programmeText =
+    query?.studyRights?.combinedProgramme !== undefined
+      ? unifyProgrammeName(getTextIn(programmeName, language), getTextIn(combinedProgrammeName, language))
+      : getTextIn(programmeName, language)
+  const title = location.search === '' ? 'Class statistics' : `${programmeText} ${getYearText(query?.year)}`
+
   return (
     <FilterView
       name="PopulationStatistics"
@@ -131,13 +148,23 @@ const PopulationStatistics = () => {
           </Header>
 
           <Segment className="contentSegment">
-            <PopulationSearch history={history} location={location} />
+            <PopulationSearch
+              history={history}
+              location={location}
+              unifiedProgramme={{ programmeCode, combinedProgrammeCode, filterByBachelor, setFilterByBachelor }}
+            />
             {location.search !== '' ? (
               <PopulationDetails
                 queryIsSet={queryIsSet}
                 query={query}
                 isLoading={isLoading}
-                dataExport={<DataExport students={filteredStudents} programmeCode={query?.studyRights?.programme} />}
+                dataExport={
+                  <DataExport
+                    students={filteredStudents}
+                    programmeCode={query?.studyRights?.programme}
+                    combinedProgrammeCode={combinedProgrammeCode}
+                  />
+                }
                 allStudents={samples}
                 selectedStudentsByYear={selectedStudentsByYear}
                 filteredStudents={filteredStudents}
