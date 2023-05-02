@@ -10,9 +10,10 @@ import moment from 'moment'
 import '../../StudentStatistics/StudentInfoCard/studentInfoCard.css'
 
 const sendAnalytics = sendEvent.populationStudents
-const ProgressTable = ({ criteria, students, months, programme }) => {
+const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGroupProgramme }) => {
   const mandatoryCourses = useSelector(state => state?.populationMandatoryCourses?.data)
   const namesVisible = useSelector(state => state?.settings?.namesVisible)
+  const isStudyGuidanceGroupProgramme = studyGuidanceGroupProgramme !== ''
   const findRowContent = (s, courseCode, year, start, end) => {
     if (courseCode.includes('Credits'))
       return s.criteriaProgress[year] && s.criteriaProgress[year].credits ? (
@@ -574,18 +575,20 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
   }, [students])
   return (
     <>
-      <h5>
-        Criteria can be changed{' '}
-        <Link
-          to={`/study-programme/${programme}?p_m_tab=0&p_tab=3`}
-          onClick={() => {
-            sendAnalytics('No criteria defined button clicked', 'Degree courses tab')
-          }}
-        >
-          here.
-        </Link>{' '}
-        Please refresh page after changes.
-      </h5>
+      {!isStudyGuidanceGroupProgramme && (
+        <h5>
+          Criteria can be changed{' '}
+          <Link
+            to={`/study-programme/${programme}?p_m_tab=0&p_tab=3`}
+            onClick={() => {
+              sendAnalytics('No criteria defined button clicked', 'Degree courses tab')
+            }}
+          >
+            here.
+          </Link>{' '}
+          Please refresh page after changes.
+        </h5>
+      )}
       <Message style={{ fontSize: '16px', maxWidth: '700px' }}>
         <p>
           <Icon fitted name="check" color="green" />: Student has passed the course in the academic year. <br />
