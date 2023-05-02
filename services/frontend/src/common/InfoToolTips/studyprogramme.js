@@ -34,6 +34,21 @@ export default {
   esimerkiksi vaihto-opiskelijat ja erillis-opinto-oikeudella opiskelevat. Sisältää myös opintopisteet, jotka opiskelija on suorittanut koulutusohjelmaan ennen opintojen aloittamista koulutusohjelmassa tai opintojen päätyttyä.
   
   **Transferred credits**: Sisältää opintopisteet, jotka on suoritettu kyseisenä vuonna, ja hyväksiluettu tähän koulutusohjelmaan. Mukana ovat kaikenlaisilla opinto-oikeuksilla hyväksiluetut opintopisteet.
+  **Non-degree students**: Opiskelijat, joilla ei ole tutkinto-oikeutta Helsingin yliopistossa.
+    
+  **Transferred credits**: Sisältää opintopisteet, jotka ovat suoritettu kyseisenä vuonna, ja hyväksiluettu tähän koulutusohjelmaan. Mukana ovat kaikenlaisilla opinto-oikeuksilla hyväksiluetut opintopisteet
+  `,
+  StudentsOfProgrammeCourses: `
+  Sisältää kurssien opiskelijat.
+
+  **Not completed**: Sisältää opiskelijat, jotka ovat ilmoittautuneet kurssille, mutta eivät ole suorittaneet sitä ja opiskelijat, jotka ovat saaneet hylätyn arvosanan.
+
+  **Major students**: Sisältää opiskelijat, joilla on ensisijainen opinto-oikeus kyseiseen koulutusohjelmaan.
+
+  **Non-major students**: Sisältää kurssin opiskelijat, joilla EI ole ollut suoritushetkellä ensisijaista opinto-oikeutta kyseiseen koulutusohjelmaan. Sisältää
+  esimerkiksi vaihto-opiskelijat ja erillis-opinto-oikeudella opiskelevat.
+
+  **Transferred students**: Sisältää opiskelijat, jotka ovat suorittaneet kyseisenä vuonna hyväksiluettuja opintopisteitä tähän koulutusohjelmaan. Mukana ovat kaikenlaisilla opinto-oikeuksilla hyväksiluetut opintopisteet
   `,
   GraduatedAndThesisWritersOfTheProgramme: `
   **Wrote thesis**: Sisältää kyseisenä vuonna kandidaatintutkielman tai pro gradu-tutkielman hyväksytysti suorittaneet opiskelijat. Mukana ei ole mahdollisia arvosanan korotuksia.
@@ -98,15 +113,6 @@ export default {
   `,
   Name: `
   Pitkät kurssinimet on lyhennetty. Näet ne kokonaan laittamalla hiiren nimen yläpuolelle.
-  `,
-  NonDegree: `
-  Opiskelijat, joilla ei ole tutkinto-oikeutta Helsingin yliopistossa.
-  `,
-  TransferredCourses: `
-  Sisältää opiskelijat, jotka ovat suorittaneet kyseisenä vuonna hyväksiluettuja opintopisteitä tähän koulutusohjelmaan. Mukana ovat kaikenlaisilla opinto-oikeuksilla hyväksiluetut opintopisteet
-  `,
-  TransferredCredits: `
-  Sisältää opintopisteet, jotka ovat suoritettu kyseisenä vuonna, ja hyväksiluettu tähän koulutusohjelmaan. Mukana ovat kaikenlaisilla opinto-oikeuksilla hyväksiluetut opintopisteet
   `,
   NotCompleted: `
   Sisältää opiskelijat, jotka ovat ilmoittautuneet kurssille, mutta eivät ole suorittaneet sitä ja opiskelijat, jotka ovat saaneet hylätyn arvosanan.
