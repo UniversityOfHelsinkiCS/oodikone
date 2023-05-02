@@ -239,7 +239,13 @@ router.get('/v3/populationstatistics', async (req, res) => {
 
     res.json(filterPersonalTags(result, user.id))
   } else {
-    const result = await Population.optimizedStatisticsOf({ ...req.query, studyRights })
+    // If two studyprogrammes are given, query does not work just right
+    // This solution is temporal
+    const result = await Population.optimizedStatisticsOf({
+      ...req.query,
+      studyRights: { programme: studyRights.programme },
+    })
+
     if (result.error) {
       Sentry.captureException(new Error(result.error))
       res.status(400).end()
