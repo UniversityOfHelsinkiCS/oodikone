@@ -121,6 +121,7 @@ const Panes = ({
           criteria={criteria}
           months={months}
           programme={queryStudyrights[0] || programme}
+          studyGuidanceGroupProgramme={programme}
         />
       ),
     },
@@ -220,8 +221,8 @@ const PopulationStudents = ({
 
 const getTabs = programmeCode => {
   if (programmeCode && (programmeCode.includes('KH') || ['MH30_001', 'MH30_003'].includes(programmeCode)))
-    return ['General', 'Courses', 'Tags', 'Progress']
-  if (programmeCode) return ['General', 'Tags', 'Courses']
+    return ['General', 'Courses', 'Progress']
+  if (programmeCode) return ['General', 'Courses']
   return ['General']
 }
 
@@ -237,8 +238,8 @@ const PopulationStudentsContainer = ({ ...props }) => {
         (props.programmeCode &&
           !props.programmeCode.includes('KH') &&
           !['MH30_001', 'MH30_003'].includes(props.programmeCode))
-          ? ['General', 'Courses']
-          : ['General', 'Courses', 'Progress'],
+          ? ['General', 'Courses', 'Tags']
+          : ['General', 'Courses', 'Tags', 'Progress'],
       infotoolTipContent: infotoolTips.PopulationStatistics.StudentsClass,
     },
     coursePopulation: {
