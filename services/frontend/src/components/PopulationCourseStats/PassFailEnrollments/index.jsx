@@ -95,7 +95,6 @@ const PassFailEnrollments = ({ flat, onlyIamRights }) => {
           {
             key: 'total',
             title: 'Total\nstudents',
-            helpText: 'Total count of students, including enrolled students with no grade.',
             cellStyle: { textAlign: 'right' },
             filterType: 'range',
             getRowVal: row => row.stats?.totalStudents ?? 0,
@@ -117,7 +116,6 @@ const PassFailEnrollments = ({ flat, onlyIamRights }) => {
           {
             key: 'totalEnrolledNoGrade',
             title: 'Enrolled, \nno grade',
-            helpText: 'Students with a valid enrollment and no passing or failing grade.',
             cellStyle: { textAlign: 'right' },
             filterType: 'range',
             getRowVal: row => row.stats?.totalEnrolledNoGrade ?? 0,
