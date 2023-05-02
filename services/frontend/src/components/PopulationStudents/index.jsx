@@ -85,22 +85,18 @@ const Panes = ({
                   alignItems: 'center',
                 }}
               >
-                {queryStudyrights[0] ? (
-                  <h3>
-                    No tags defined. You can define them{' '}
-                    <Link
-                      to={`/study-programme/${queryStudyrights[0]}?p_m_tab=0&p_tab=4`}
-                      onClick={() => {
-                        sendAnalytics('No tags defined button clicked', 'Tags tab')
-                      }}
-                    >
-                      here
-                    </Link>
-                    .
-                  </h3>
-                ) : (
-                  <h3>No tags defined</h3>
-                )}
+                <h3>
+                  No tags defined. You can define them{' '}
+                  <Link
+                    to={`/study-programme/${queryStudyrights[0]}?p_m_tab=0&p_tab=4`}
+                    onClick={() => {
+                      sendAnalytics('No tags defined button clicked', 'Tags tab')
+                    }}
+                  >
+                    here
+                  </Link>
+                  .
+                </h3>
               </div>
             )}
             {tags.length > 0 && (
@@ -108,9 +104,9 @@ const Panes = ({
                 <TagPopulation
                   tags={tags}
                   selectedStudents={filteredStudents.map(stu => stu.studentNumber)}
-                  studytrack={queryStudyrights[0] || programme}
+                  studytrack={queryStudyrights[0]}
                 />
-                <TagList studytrack={queryStudyrights[0] || programme} selectedStudents={filteredStudents} />
+                <TagList studytrack={queryStudyrights[0]} selectedStudents={filteredStudents} />
               </>
             )}
           </div>
@@ -241,8 +237,8 @@ const PopulationStudentsContainer = ({ ...props }) => {
         (props.programmeCode &&
           !props.programmeCode.includes('KH') &&
           !['MH30_001', 'MH30_003'].includes(props.programmeCode))
-          ? ['General', 'Courses', 'Tags']
-          : ['General', 'Courses', 'Tags', 'Progress'],
+          ? ['General', 'Courses']
+          : ['General', 'Courses', 'Progress'],
       infotoolTipContent: infotoolTips.PopulationStatistics.StudentsClass,
     },
     coursePopulation: {
