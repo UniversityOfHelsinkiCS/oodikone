@@ -2,18 +2,17 @@ import React, { useState, useEffect, useRef } from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import qs from 'query-string'
-import { Form, Button, Message, Icon, Grid } from 'semantic-ui-react'
+import { Form, Button, Message, Icon, Grid, Radio } from 'semantic-ui-react'
 import { v4 as uuidv4 } from 'uuid'
 import Datetime from 'react-datetime'
 import { sortBy, isEqual } from 'lodash'
 import moment from 'moment'
-
+import { useGetAuthorizedUserQuery } from 'redux/auth'
 import infoTooltips from 'common/InfoToolTips'
 import { getPopulationStatistics, clearPopulations } from '../../redux/populations'
 import { getPopulationCourses } from '../../redux/populationCourses'
 import { getPopulationSelectedStudentCourses, clearSelected } from '../../redux/populationSelectedStudentCourses'
 import { getMandatoryCourses } from '../../redux/populationMandatoryCourses'
-
 import { getProgrammes } from '../../redux/populationProgrammes'
 import { momentFromFormat, reformatDate, textAndDescriptionSearch, getTextIn, cancelablePromise } from '../../common'
 import { useSearchHistory } from '../../common/hooks'
@@ -38,6 +37,7 @@ const initialQuery = () => ({
 })
 
 const PopulationSearchForm = props => {
+  const { isAdmin } = useGetAuthorizedUserQuery()
   const [totalState, setTotalState] = useState({
     query: initialQuery(),
     isLoading: false,
@@ -45,7 +45,7 @@ const PopulationSearchForm = props => {
   })
   const [didMount, setDidMount] = useState(false)
   const [searchHistory, addItemToSearchHistory, updateItemInSearchHistory] = useSearchHistory('populationSearch', 8)
-
+  const [filterProgrammes, setFilterProgrammes] = useState(isAdmin)
   const fetchPopulationPromises = useRef()
 
   const setState = newState => setTotalState({ ...totalState, ...newState })
@@ -325,11 +325,25 @@ const PopulationSearchForm = props => {
             onChange={handleYearSelection}
           />
         </Form.Field>
+
         <Form.Field className="yearControl">
           <Button.Group basic vertical className="yearControlButtonGroup">
             <Button type="button" icon="plus" className="yearControlButton" onClick={addYear} tabIndex="-1" />
             <Button type="button" icon="minus" className="yearControlButton" onClick={subtractYear} tabIndex="-1" />
           </Button.Group>
+        </Form.Field>
+        <Form.Field>
+          <div>
+            {isAdmin && (
+              <Radio
+                data-cy="toggleFilterProgrammes"
+                toggle
+                label="Filter out old and specialized programmes"
+                checked={filterProgrammes}
+                onChange={() => setFilterProgrammes(!filterProgrammes)}
+              />
+            )}
+          </div>
         </Form.Field>
       </Form.Group>
     )
@@ -385,7 +399,12 @@ const PopulationSearchForm = props => {
 
     let programmesToRender
     if (Object.values(studyProgrammes).length !== 0) {
-      const sortedStudyProgrammes = sortBy(studyProgrammes, s => getTextIn(s.name, language))
+      let sortedStudyProgrammes = sortBy(studyProgrammes, s => getTextIn(s.name, language))
+      if (filterProgrammes) {
+        sortedStudyProgrammes = sortedStudyProgrammes.filter(
+          programme => programme.code.slice(0, 2) === 'MH' || programme.code.slice(0, 2) === 'KH'
+        )
+      }
       programmesToRender = renderableList(sortedStudyProgrammes)
     }
 
