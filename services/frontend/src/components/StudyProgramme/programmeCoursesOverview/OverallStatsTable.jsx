@@ -2,6 +2,7 @@ import React from 'react'
 import { Item, Icon } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import InfoToolTips from 'common/InfoToolTips'
+import InfoBox from 'components/Info/InfoBox'
 import sendEvent from '../../../common/sendEvent'
 import useLanguage from '../../LanguagePicker/useLanguage'
 import SortableTable from '../../SortableTable'
@@ -90,7 +91,6 @@ const getColumns = (language, showStudents) => {
           {
             key: 'not-completed',
             title: 'Not Completed',
-            helpText: toolTips.NotCompleted,
             cellStyle: { textAlign: 'right' },
             filterType: 'range',
             getRowVal: course => course.totalAllNotCompleted,
@@ -122,7 +122,6 @@ const getColumns = (language, showStudents) => {
           {
             key: 'totalWithoutStudyright',
             title: 'Non-degree students',
-            helpText: toolTips.NonDegree,
             cellStyle: { textAlign: 'right' },
             filterType: 'range',
             getRowVal: course => course.totalWithoutStudyrightStudents,
@@ -218,7 +217,6 @@ const getColumns = (language, showStudents) => {
       {
         key: 'totalWithoutStudyright',
         title: 'Non-degree credits',
-        helpText: toolTips.NonDegree,
         cellStyle: { textAlign: 'right' },
         filterType: 'range',
         getRowVal: course => course.totalWithoutStudyrightCredits,
@@ -227,7 +225,6 @@ const getColumns = (language, showStudents) => {
       {
         key: 'totalTransfer',
         title: 'Transferred credits',
-        helpText: toolTips.TransferredCredits,
         cellStyle: { textAlign: 'right' },
         filterType: 'range',
         getRowVal: course => course.totalTransferCredits,
@@ -242,17 +239,23 @@ const getColumns = (language, showStudents) => {
 const OverallStatsTable = ({ data, showStudents }) => {
   const { language } = useLanguage()
   return (
-    <div data-cy="CoursesSortableTable">
-      <SortableTable
-        title={`Student statistics for studyprogramme courses `}
-        defaultSort={['name', 'asc']}
-        defaultdescending
-        getRowKey={course => course.code}
-        tableProps={{ celled: true, fixed: true }}
-        columns={getColumns(language, showStudents)}
-        data={data}
+    <>
+      <InfoBox
+        content={showStudents ? toolTips.StudentsOfProgrammeCourses : toolTips.CreditsProducedByTheStudyprogramme}
+        cypress="programme-courses"
       />
-    </div>
+      <div data-cy="CoursesSortableTable">
+        <SortableTable
+          title={`Student statistics for studyprogramme courses `}
+          defaultSort={['name', 'asc']}
+          defaultdescending
+          getRowKey={course => course.code}
+          tableProps={{ celled: true, fixed: true }}
+          columns={getColumns(language, showStudents)}
+          data={data}
+        />
+      </div>
+    </>
   )
 }
 
