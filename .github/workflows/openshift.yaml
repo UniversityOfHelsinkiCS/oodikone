@@ -12,56 +12,64 @@ jobs:
       username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
       password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
 
-  release_images:
-    name: 'Release built images'
+  release_frontend:
+    name: 'Build and release frontend'
+    runs-on: ubuntu-latest
+    # needs: test
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build frontend image
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: oodikone-frontend
+          tags: staging ${{ github.sha }}
+          context: services/frontend
+          containerfiles: |
+            ./Dockerfile
+          build-args: |
+            BASE_PATH=/oodikone
+            GIT_SHA=${{ github.sha }}
+            STAGING=true
+
+      - name: Push to quay.io
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: quay.io/toska
+          username: toska+github
+          password: ${{ secrets.QUAY_IO_TOKEN }}
+
+  release_backend:
+    name: 'Build and release backend'
     runs-on: ubuntu-latest
     needs: test
 
     steps:
       - uses: actions/checkout@v3
 
-      - name: 'Download images'
-        uses: actions/download-artifact@v3
-        with:
-          path: /tmp/
-
-      - name: 'Load built images'
-        run: |
-          docker load --input /tmp/artifact/backend.tar
-          docker load --input /tmp/artifact/frontend.tar
-
-      # - name: 'Create a container from frontend'
-      #  run: docker create --name frontend oodikone-frontend:staging
-      # - name: 'Copy assets from the container'
-      #  run: docker cp frontend:/opt/app-root/src/build ./build
-      # - name: 'Create Sentry release'
-      #  uses: getsentry/action-release@v1
-      #  env:
-      #    SENTRY_URL: ${{ secrets.SENTRY_URL }}
-      #    SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-      #    SENTRY_ORG: toska
-      #    SENTRY_PROJECT: oodikone
-      #  with:
-      #    environment: staging
-      #    set_commits: 'skip'
-      #    sourcemaps: './build/static/js'
-      #    url_prefix: '~/static/js'
-      #    version: ${{ github.sha }}
-
-      - name: Push frontend to quay.io
-        uses: redhat-actions/push-to-registry@v2
-        with:
-          image: oodikone-frontend
-          tags: staging
-          registry: quay.io/toska
-          username: toska+github
-          password: ${{ secrets.QUAY_IO_TOKEN }}
-
-      - name: Push backend to quay.io
-        uses: redhat-actions/push-to-registry@v2
+      - name: Build backend image
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
         with:
           image: oodikone-backend
-          tags: staging
+          tags: staging ${{ github.sha }}
+          context: services/backend
+          containerfiles: |
+            ./Dockerfile
+          build-args: |
+            BASE_PATH=/oodikone
+            GIT_SHA=${{ github.sha }}
+            STAGING=true
+
+      - name: Push to quay.io
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
           registry: quay.io/toska
           username: toska+github
           password: ${{ secrets.QUAY_IO_TOKEN }}
