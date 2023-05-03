@@ -56,7 +56,7 @@ const PopulationStatistics = () => {
   const chosenProgrammeCode = filterByBachelor || !combinedProgrammeCode ? programmeCode : combinedProgrammeCode
   const filters = [
     studentNumberFilter,
-    hopsFilter({ chosenProgrammeCode }),
+    hopsFilter({ programmeCode: chosenProgrammeCode }),
     genderFilter,
     ageFilter,
     courseFilter({ courses }),
@@ -86,10 +86,9 @@ const PopulationStatistics = () => {
     if (!samples) {
       return []
     }
-
     return samples.map(student => {
       const hopsCredits =
-        student.studyplans.find(plan => plan.programme_code === chosenProgrammeCode)?.completed_credits ?? 0
+        student.studyplans?.find(plan => plan.programme_code === chosenProgrammeCode)?.completed_credits ?? 0
       const studyrightStartDate = new Date(student.studyrightStart)
       const courses = student.courses.filter(({ date }) => new Date(date) >= studyrightStartDate)
       const credits = getStudentTotalCredits({ courses })
@@ -101,14 +100,13 @@ const PopulationStatistics = () => {
       }
     })
   }, [samples, chosenProgrammeCode])
-
   const unifyProgrammeName = (bachelor, masterLisenciate) => {
     if (language === 'fi')
       return `${bachelor} ja ${
         masterLisenciate?.includes('lisensiaatin') ? 'lisensiaatin koulutusojelma' : 'maisterin koulutusohjelma'
       }`
     if (language === 'en') return `${bachelor?.split(' ')[0]} and ${masterLisenciate}`
-    if (language === 'sv') return `${bachelor?.split('programmet')[0]}- and ${masterLisenciate}`
+    if (language === 'sv') return `${bachelor?.split('programmet')[0]}- och ${masterLisenciate}`
     return bachelor
   }
 
