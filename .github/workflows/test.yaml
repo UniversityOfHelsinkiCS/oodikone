@@ -1,6 +1,14 @@
 name: Lint and test
 
-on: [workflow_call]
+on:
+  workflow_call:
+    secrets:
+      username:
+        required: true
+        description: 'Toska registry username'
+      password:
+        required: true
+        description: 'Toska registry password'
 
 jobs:
   # === Static tests / linting ===
