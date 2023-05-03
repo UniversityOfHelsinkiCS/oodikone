@@ -13,7 +13,7 @@ ARG SENTRY_RELEASE
 ENV SENTRY_RELEASE=$SENTRY_RELEASE
 
 COPY ./package* ./
-RUN npm ci --omit-dev && microdnf- y install vim curl nano && microdnf clean all
+RUN npm ci --omit-dev
 COPY . .
 
 CMD ["npm", "start"]
