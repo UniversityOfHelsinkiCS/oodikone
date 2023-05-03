@@ -28,7 +28,7 @@ const currentUserMiddleware = async (req, _res, next) => {
   }
 
   const iamGroups = parseIamGroups(hygroupcn)
-  const { access = {}, specialGroup = {} } = await getOrganizationAccess({ iamGroups })
+  const { access = {}, specialGroup = {} } = await getOrganizationAccess({ id: sisId, iamGroups })
   const iamRights = Object.keys(access)
 
   if (!hasRequiredIamGroup(iamGroups, iamRights)) {
