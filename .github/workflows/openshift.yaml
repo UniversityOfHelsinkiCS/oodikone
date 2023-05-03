@@ -8,6 +8,9 @@ on:
 jobs:
   test:
     uses: ./.github/workflows/test.yaml
+    secrets:
+      username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
+      password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
 
   release_images:
     name: 'Release built images'
