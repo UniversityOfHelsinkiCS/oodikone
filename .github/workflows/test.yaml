@@ -101,8 +101,8 @@ jobs:
         uses: docker/login-action@v2
         with:
           registry: registry.toska.cs.helsinki.fi
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
       - name: 'Let sis-updater-worker run migrations, then push new version of image to toska hub'
         if: steps.check_migrations.outputs.migrations == 'true'
         run: |
@@ -134,8 +134,8 @@ jobs:
         uses: docker/login-action@v2
         with:
           registry: registry.toska.cs.helsinki.fi
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
       - name: 'Let backend run migrations, then push new version of image to toska hub'
         if: steps.check_migrations.outputs.migrations == 'true'
         run: |
@@ -167,8 +167,8 @@ jobs:
         uses: docker/login-action@v2
         with:
           registry: registry.toska.cs.helsinki.fi
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
       - name: 'Let backend run migrations, then push new version of image to toska hub'
         if: steps.check_migrations.outputs.migrations == 'true'
         run: |
@@ -191,8 +191,8 @@ jobs:
       - name: 'Run tests'
         uses: ./.github/actions/run-tests
         with:
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
           spec: cypress/e2e/Course_statistics.js
 
   test_custom_population:
@@ -209,8 +209,8 @@ jobs:
       - name: 'Run tests'
         uses: ./.github/actions/run-tests
         with:
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
           spec: cypress/e2e/Custom_population.js
 
   test_population_statistics:
@@ -227,8 +227,8 @@ jobs:
       - name: 'Run tests'
         uses: ./.github/actions/run-tests
         with:
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
           spec: cypress/e2e/Population_statistics.js
 
   test_filters:
@@ -245,8 +245,8 @@ jobs:
       - name: 'Run tests'
         uses: ./.github/actions/run-tests
         with:
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
           spec: cypress/e2e/Filters.js
 
   test_student_statistics:
@@ -263,8 +263,8 @@ jobs:
       - name: 'Run tests'
         uses: ./.github/actions/run-tests
         with:
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
           spec: cypress/e2e/Student_statistics.js
 
   test_completed_courses:
@@ -281,8 +281,8 @@ jobs:
       - name: 'Run tests'
         uses: ./.github/actions/run-tests
         with:
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
           spec: cypress/e2e/Completed_courses.js
 
   test_studyprogramme_overview:
@@ -299,8 +299,8 @@ jobs:
       - name: 'Run tests'
         uses: ./.github/actions/run-tests
         with:
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
           spec: cypress/e2e/Studyprogramme_overview.js
 
   test_teachers_and_users:
@@ -317,8 +317,8 @@ jobs:
       - name: 'Run tests'
         uses: ./.github/actions/run-tests
         with:
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
           spec: |
             cypress/e2e/Teachers.js
             cypress/e2e/Users.js
@@ -337,8 +337,8 @@ jobs:
       - name: 'Run tests'
         uses: ./.github/actions/run-tests
         with:
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
           spec: cypress/e2e/Faculty_statistics.js
 
   test_open_uni_search:
@@ -355,8 +355,8 @@ jobs:
       - name: 'Run tests'
         uses: ./.github/actions/run-tests
         with:
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
           spec: cypress/e2e/Openuni.js
 
   # === Other tests ===
@@ -383,8 +383,8 @@ jobs:
         uses: docker/login-action@v2
         with:
           registry: registry.toska.cs.helsinki.fi
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
       - name: 'Run services, pull rest of the needed images'
         run: docker-compose --file docker-compose.ci.yml up --detach --no-recreate
       - name: 'Check that exit statuses are not errors'
