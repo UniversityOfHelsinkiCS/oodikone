@@ -18,6 +18,8 @@ jobs:
     # needs: test
 
     steps:
+      - uses: actions/checkout@v3
+
       - name: Build frontend image
         id: build-image
         uses: redhat-actions/buildah-build@v2
@@ -26,7 +28,7 @@ jobs:
           tags: staging ${{ github.sha }}
           context: services/frontend
           containerfiles: |
-            ./Dockerfile
+            services/frontend/Dockerfile
           build-args: |
             BASE_PATH=/oodikone
             GIT_SHA=${{ github.sha }}
@@ -47,6 +49,8 @@ jobs:
     # needs: test
 
     steps:
+      - uses: actions/checkout@v3
+
       - name: Build backend image
         id: build-image
         uses: redhat-actions/buildah-build@v2
@@ -55,7 +59,7 @@ jobs:
           tags: staging ${{ github.sha }}
           context: services/backend
           containerfiles: |
-            ./Dockerfile
+            services/backend/Dockerfile
           build-args: |
             BASE_PATH=/oodikone
             GIT_SHA=${{ github.sha }}
