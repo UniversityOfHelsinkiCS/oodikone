@@ -50,13 +50,12 @@ jobs:
             SENTRY_RELEASE=${{ github.sha }}
             SENTRY_ENVIRONMENT=staging
           cache-from: |
-            type=registry,ref=toska/oodikone2-backend:staging
+            type=registry,ref=toska/oodikone2-backend:openshift
             type=registry,ref=toska/oodikone2-backend:latest
           cache-to: type=inline
           context: services/backend
           push: false
-          tags: toska/oodikone2-backend:staging
-          target: production
+          tags: toska/oodikone2-backend:openshift
           outputs: type=docker,dest=/tmp/backend.tar
       - name: 'Upload image for other jobs'
         uses: actions/upload-artifact@v3
@@ -80,13 +79,12 @@ jobs:
             SENTRY_ENVIRONMENT=staging
             BUILT_AT=${{ steps.get_current_time.outputs.NOW }}
           cache-from: |
-            type=registry,ref=toska/oodikone2-frontend:staging
+            type=registry,ref=toska/oodikone2-frontend:openshift
             type=registry,ref=toska/oodikone2-frontend:latest
           cache-to: type=inline
           context: services/frontend
           push: false
-          tags: toska/oodikone2-frontend:staging
-          target: production
+          tags: toska/oodikone2-frontend:openshift
           outputs: type=docker,dest=/tmp/frontend.tar
       - name: 'Upload image for other jobs'
         uses: actions/upload-artifact@v3
@@ -440,7 +438,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: 'Create a container from frontend'
-        run: docker create --name frontend toska/oodikone2-frontend:staging
+        run: docker create --name frontend toska/oodikone2-frontend:openshift
       - name: 'Copy assets from the container'
         run: docker cp frontend:/usr/src/app/build ./build
       - name: 'Create Sentry release'
@@ -458,46 +456,5 @@ jobs:
           version: ${{ github.sha }}
       - name: 'Push to docker hub'
         run: |
-          docker push toska/oodikone2-backend:staging
-          docker push toska/oodikone2-frontend:staging
-      - name: 'Send deployment success notification to slack'
-        if: success()
-        uses: UniversityOfHelsinkiCS/slackbot-action@v1.4.2
-        with:
-          webhook-url: ${{ secrets.WEBHOOK_URL }}
-          message-type: deployment
-          softa-url: https://oodikone-staging.cs.helsinki.fi/
-          deployment-target: staging
-      - name: 'Send deployment failure notification to slack'
-        if: failure()
-        uses: UniversityOfHelsinkiCS/slackbot-action@v1.4.2
-        with:
-          webhook-url: ${{ secrets.WEBHOOK_URL }}
-          message-type: deployment-failure
-          deployment-target: staging
-
-  report_test_failure:
-    runs-on: ubuntu-latest
-    name: 'Report test failure to oodikone notifications'
-    needs:
-      - lint_backend
-      - lint_frontend
-      - test_course_statistics
-      - test_custom_population
-      - test_filters
-      - test_population_statistics
-      - test_student_statistics
-      - test_completed_courses
-      - test_studyprogramme_overview
-      - test_teachers_and_users
-      - test_faculty_statistics
-      - test_open_uni_search
-      - test_service_exit_statuses
-    if: failure()
-    steps:
-      - uses: actions/checkout@v3
-      - name: 'Send notification to slack'
-        uses: UniversityOfHelsinkiCS/slackbot-action@v1.4.2
-        with:
-          webhook-url: ${{ secrets.WEBHOOK_URL }}
-          message-type: test-failure
+          docker push toska/oodikone2-backend:openshift
+          docker push toska/oodikone2-frontend:openshift
