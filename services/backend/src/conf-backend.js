@@ -1,7 +1,7 @@
 // Node env to use
 const isDev = process.env.NODE_ENV === 'development'
-const isProduction = process.env.NODE_ENV === 'production'
-const isStaging = !isProduction && process.env.REACT_APP_STAGING === 'true'
+const isStaging = process.env.REACT_APP_STAGING === 'true'
+const isProduction = !isStaging && process.env.NODE_ENV === 'production'
 
 // Sentry
 const sentryRelease = process.env.SENTRY_RELEASE || ''
