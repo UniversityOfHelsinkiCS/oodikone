@@ -20,6 +20,7 @@ const pateToken = process.env.PATE_API_TOKEN || ''
 const jamiUrl = isDev || runningInCI ? 'http://jami:3003/' : 'https://importer.cs.helsinki.fi/api/auth'
 
 // Importer client
+const importerUrl = process.env.IMPORTER_DB_API_URL || ''
 const importerToken = process.env.IMPORTER_DB_API_TOKEN || ''
 
 // Networking: Urls & ports
@@ -86,5 +87,6 @@ module.exports = {
   baseUrl,
   frontUrl,
   backendPort,
+  importerUrl,
   importerToken,
 }
