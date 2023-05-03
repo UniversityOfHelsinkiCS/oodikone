@@ -17,7 +17,7 @@ const requiredGroup = isStaging
 const pateToken = process.env.PATE_API_TOKEN || ''
 
 // Jami
-const jamiUrl = isDev || runningInCI ? 'http://jami:3003/' : 'https://importer.cs.helsinki.fi/api/auth'
+const jamiUrl = process.env.JAMI_URL || ''
 
 // Importer client
 const importerUrl = process.env.IMPORTER_DB_API_URL || ''
