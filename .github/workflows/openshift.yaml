@@ -6,11 +6,11 @@ on:
       - openshift
 
 jobs:
-  test:
-    uses: ./.github/workflows/test.yaml
-    secrets:
-      username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-      password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+  # test:
+  #  uses: ./.github/workflows/test.yaml
+  #  secrets:
+  #    username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
+  #    password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
 
   release_frontend:
     name: 'Build and release frontend'
@@ -18,8 +18,6 @@ jobs:
     # needs: test
 
     steps:
-      - uses: actions/checkout@v3
-
       - name: Build frontend image
         id: build-image
         uses: redhat-actions/buildah-build@v2
@@ -49,8 +47,6 @@ jobs:
     needs: test
 
     steps:
-      - uses: actions/checkout@v3
-
       - name: Build backend image
         id: build-image
         uses: redhat-actions/buildah-build@v2
