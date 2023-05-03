@@ -286,6 +286,7 @@ jobs:
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
           spec: cypress/e2e/Student_statistics.js
+
   test_completed_courses:
     name: 'Test completed courses'
     needs:
@@ -303,6 +304,7 @@ jobs:
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
           spec: cypress/e2e/Completed_courses.js
+
   test_studyprogramme_overview:
     name: 'Test studyprogramme overview'
     needs:
