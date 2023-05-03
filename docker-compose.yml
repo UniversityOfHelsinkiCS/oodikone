@@ -39,6 +39,7 @@ services:
       SECRET_TOKEN: dev
       SIS_DB_URL: postgres://postgres@sis-db:5432/sis-db
       SIS_UPDATER_URL: http://sis-updater-scheduler:8082
+      IMPORTER_DB_API_URL: 'https://importer.cs.helsinki.fi/api/importer'
     ports:
       - 8080:8080
     profiles:
