@@ -50,12 +50,11 @@ jobs:
             SENTRY_RELEASE=${{ github.sha }}
             SENTRY_ENVIRONMENT=staging
           cache-from: |
-            type=registry,ref=toska/oodikone2-backend:openshift
-            type=registry,ref=toska/oodikone2-backend:latest
+            type=registry,ref=quay.io/toska/oodikone-backend:staging
           cache-to: type=inline
           context: services/backend
           push: false
-          tags: toska/oodikone2-backend:openshift
+          tags: toska/oodikone-backend:staging
           outputs: type=docker,dest=/tmp/backend.tar
       - name: 'Upload image for other jobs'
         uses: actions/upload-artifact@v3
@@ -79,12 +78,11 @@ jobs:
             SENTRY_ENVIRONMENT=staging
             BUILT_AT=${{ steps.get_current_time.outputs.NOW }}
           cache-from: |
-            type=registry,ref=toska/oodikone2-frontend:openshift
-            type=registry,ref=toska/oodikone2-frontend:latest
+            type=registry,ref=toska/oodikone-frontend:staging
           cache-to: type=inline
           context: services/frontend
           push: false
-          tags: toska/oodikone2-frontend:openshift
+          tags: toska/oodikone-frontend:staging
           outputs: type=docker,dest=/tmp/frontend.tar
       - name: 'Upload image for other jobs'
         uses: actions/upload-artifact@v3
@@ -272,6 +270,7 @@ jobs:
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
           spec: cypress/e2e/Student_statistics.js
+
   test_completed_courses:
     name: 'Test completed courses'
     needs:
@@ -289,6 +288,7 @@ jobs:
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
           spec: cypress/e2e/Completed_courses.js
+
   test_studyprogramme_overview:
     name: 'Test studyprogramme overview'
     needs:
@@ -438,23 +438,35 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: 'Create a container from frontend'
-        run: docker create --name frontend toska/oodikone2-frontend:openshift
+        run: docker create --name frontend oodikone-frontend:staging
       - name: 'Copy assets from the container'
-        run: docker cp frontend:/usr/src/app/build ./build
-      - name: 'Create Sentry release'
-        uses: getsentry/action-release@v1
-        env:
-          SENTRY_URL: ${{ secrets.SENTRY_URL }}
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: toska
-          SENTRY_PROJECT: oodikone
+        run: docker cp frontend:/opt/app-root/src/build ./build
+      # - name: 'Create Sentry release'
+      #  uses: getsentry/action-release@v1
+      #  env:
+      #    SENTRY_URL: ${{ secrets.SENTRY_URL }}
+      #    SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      #    SENTRY_ORG: toska
+      #    SENTRY_PROJECT: oodikone
+      #  with:
+      #    environment: staging
+      #    set_commits: 'skip'
+      #    sourcemaps: './build/static/js'
+      #    url_prefix: '~/static/js'
+      #    version: ${{ github.sha }}
+      - name: Push frontend to quay.io
+        uses: redhat-actions/push-to-registry@v2
         with:
-          environment: staging
-          set_commits: 'skip'
-          sourcemaps: './build/static/js'
-          url_prefix: '~/static/js'
-          version: ${{ github.sha }}
-      - name: 'Push to docker hub'
-        run: |
-          docker push toska/oodikone2-backend:openshift
-          docker push toska/oodikone2-frontend:openshift
+          image: oodikone-frontend
+          tags: staging
+          registry: quay.io/toska
+          username: toska+github
+          password: ${{ secrets.QUAY_IO_TOKEN }}
+      - name: Push backend to quay.io
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: oodikone-backend
+          tags: staging
+          registry: quay.io/toska
+          username: toska+github
+          password: ${{ secrets.QUAY_IO_TOKEN }}
