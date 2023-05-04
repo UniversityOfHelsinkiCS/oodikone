@@ -35,7 +35,6 @@ jobs:
           context: services/backend
           push: true
           tags: toska/oodikone2-backend:latest
-          target: production
 
   build_and_release_frontend:
     name: 'Build and release frontend'
@@ -71,7 +70,6 @@ jobs:
           context: services/frontend
           push: true
           tags: toska/oodikone2-frontend:latest
-          target: production
       - name: 'Create a container from built image '
         run: docker create --name frontend toska/oodikone2-frontend:latest
       - name: 'Copy assets from the container'
