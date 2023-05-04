@@ -15,6 +15,12 @@ import InfotoolTips from '../../../common/InfoToolTips'
 import '../studyprogramme.css'
 
 const isNewProgramme = code => code.includes('KH') || code.includes('MH') || /^(T)[0-9]{6}$/.test(code)
+const getGraduatedText = code => {
+  if (code.slice(0, 1) === 'T' || code.slice(0, 3) === 'LIS') {
+    return 'Graduated of the programme'
+  }
+  return 'Graduated and thesis writers of the programme'
+}
 
 const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYear, setAcademicYear }) => {
   const [showMedian, setShowMedian] = useState(false)
@@ -147,7 +153,7 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
           )}
           {graduations.isSuccess && graduations.data && (
             <>
-              {getDivider('Graduated and thesis writers of the programme', 'GraduatedAndThesisWritersOfTheProgramme')}
+              {getDivider(getGraduatedText(studyprogramme), 'GraduatedAndThesisWritersOfTheProgramme')}
               <div className="section-container">
                 <BarChart cypress="GraduatedAndThesisWritersOfTheProgramme" data={graduations?.data} />
                 <DataTable
