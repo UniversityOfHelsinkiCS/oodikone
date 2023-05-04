@@ -60,7 +60,7 @@ const CreditsGainedTable = ({ filteredStudents, type, year, creditDateFilterOpti
     months = getMonths(start, endDate)
     title = `${moment(start).format('DD.MM.YYYY')} and ${moment(endDate).format('DD.MM.YYYY')}`
     creditList = filteredStudents.map(student =>
-      student.courses.lenght > 0
+      student.courses.length > 0
         ? student.courses.reduce(
             (results, course) =>
               results + (course.passed && endDate.isSameOrAfter(course.date, 'day')) ? course.credits : 0,
