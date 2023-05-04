@@ -389,10 +389,14 @@ const createStudentCreditLines = (
     }
   })
 
-const filterTransfers = student => {
+const findTransferName = (student, transfer) =>
+  student.studyrights.flatMap(right => right.studyright_elements).find(elem => elem.code === transfer.targetcode)
+    .element_detail.name
+
+const filterTransfers = (student, language) => {
   const transferTimes = student.transfers.map(transfer => ({
     value: new Date(transfer.transferdate).getTime(),
-    studyright: `From ${transfer.sourcecode} to ${transfer.targetcode}`,
+    studyright: `to ${getTextIn(findTransferName(student, transfer), language)}`,
   }))
   const removeOverlapping = transferTimes.filter((transfer, i, a) => a.indexOf(transfer) === i)
   return removeOverlapping
@@ -495,7 +499,7 @@ const CreditAccumulationGraphHighCharts = ({
     return studyRightStart
   }
   const graduations = singleStudent ? filterGraduations(students[0], selectedStudyRight) : []
-  const transfers = singleStudent ? filterTransfers(students[0]) : []
+  const transfers = singleStudent ? filterTransfers(students[0], language) : []
   const studyRightStartLine =
     !singleStudent && studyPlanFilterIsActive
       ? [new Date(customStudyStartYear || students[0].studyrightStart).getTime()]
