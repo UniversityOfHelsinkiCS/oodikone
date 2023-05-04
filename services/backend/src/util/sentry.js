@@ -1,10 +1,10 @@
 const Sentry = require('@sentry/node')
 const Tracing = require('@sentry/tracing')
 
-const { sentryRelease, sentryEnvironment, runningInCI } = require('../conf-backend')
+const { sentryRelease, sentryEnvironment, runningInCI, isStaging } = require('../conf-backend')
 
 const initializeSentry = app => {
-  if (!sentryRelease || !sentryEnvironment || runningInCI) return
+  if (!sentryRelease || !sentryEnvironment || runningInCI || isStaging) return
 
   Sentry.init({
     dsn: 'https://020b79f0cbb14aad94cc9d69a1ea9d52@sentry.cs.helsinki.fi/2',

@@ -1,12 +1,12 @@
 const axios = require('axios')
-const { importerToken } = require('../conf-backend')
+const { importerUrl, importerToken } = require('../conf-backend')
 const logger = require('./logger')
 
 const importerClient = axios.create({
   headers: {
     token: importerToken,
   },
-  baseURL: 'https://importer.cs.helsinki.fi/api/importer',
+  baseURL: importerUrl,
 })
 
 const getImporterClient = () => {
