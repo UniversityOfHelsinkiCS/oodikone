@@ -287,6 +287,36 @@ const resolveStudyRightElement = ({ studyright_elements }) => {
   )
 }
 
+const filterGraduations = (student, selectedStudyRight) => {
+  const graduated = student.studyrights.filter(({ graduated }) => graduated)
+  // eslint-disable-next-line camelcase
+  if (!selectedStudyRight)
+    return graduated.map(({ enddate, studyright_elements }) => {
+      const studyrightElem = studyright_elements
+        ? studyright_elements.filter(ele => ele.element_detail?.type === 20)
+        : []
+      let elemName = ''
+      if (studyrightElem.length > 0) {
+        elemName = getTextIn(studyrightElem[0].element_detail?.name)
+      }
+      return {
+        value: new Date(enddate).getTime(),
+        studyright: elemName,
+      }
+    })
+  const selectedGraduation = graduated.find(({ studyrightid }) => studyrightid === selectedStudyRight.studyrightid)
+  if (!selectedGraduation) return []
+  const element = selectedGraduation.studyright_elements
+    ? selectedGraduation.studyright_elements.filter(ele => ele.element_detail?.type === 20)
+    : []
+  return [
+    {
+      value: new Date(selectedGraduation.enddate).getTime(),
+      studyright: element.length > 0 ? getTextIn(element[0].element_detail?.name) : '',
+    },
+  ]
+}
+
 const createStudentCreditLines = (
   students,
   singleStudent,
@@ -322,6 +352,32 @@ const createStudentCreditLines = (
       courses => courses.reduce(reduceCreditsToPoints, { credits: 0, points: [], singleStudent })
     )(student.courses)
 
+    const graduation =
+      points.length === 0
+        ? null
+        : student.studyrights
+            .filter(({ graduated }) => graduated)
+            .find(({ studyright_elements }) =>
+              studyright_elements.find(
+                ({ element_detail }) => element_detail.code === programmeCode && element_detail.type === 20
+              )
+            )
+
+    if (graduation) {
+      const graduationX = new Date(graduation.enddate).getTime()
+      const index = points.findIndex(point => point.x > graduationX)
+      let graduationY
+      if (index <= 0) {
+        graduationY = graduationX > points[0].x ? points[points.length - 1].y : points[0].y
+      } else {
+        const yBefore = points[index - 1].y
+        const yAfter = points[index].y
+        graduationY = Math.round((yBefore + yAfter) / 2)
+      }
+      points.push({ x: graduationX, y: graduationY, marker: { enabled: true, radius: 10, symbol: 'diamond' } })
+      points.sort((a, b) => a.x - b.x)
+    }
+
     return {
       name: student.studentNumber,
       data: points,
@@ -332,36 +388,6 @@ const createStudentCreditLines = (
       },
     }
   })
-
-const filterGraduations = (student, selectedStudyRight) => {
-  const graduated = student.studyrights.filter(({ graduated }) => graduated)
-  // eslint-disable-next-line camelcase
-  if (!selectedStudyRight)
-    return graduated.map(({ enddate, studyright_elements }) => {
-      const studyrightElem = studyright_elements
-        ? studyright_elements.filter(ele => ele.element_detail?.type === 20)
-        : []
-      let elemName = ''
-      if (studyrightElem.length > 0) {
-        elemName = getTextIn(studyrightElem[0].element_detail?.name)
-      }
-      return {
-        value: new Date(enddate).getTime(),
-        studyright: elemName,
-      }
-    })
-  const selectedGraduation = graduated.find(({ studyrightid }) => studyrightid === selectedStudyRight.studyrightid)
-  if (!selectedGraduation) return []
-  const element = selectedGraduation.studyright_elements
-    ? selectedGraduation.studyright_elements.filter(ele => ele.element_detail?.type === 20)
-    : []
-  return [
-    {
-      value: new Date(selectedGraduation.enddate).getTime(),
-      studyright: element.lenght > 0 ? getTextIn(element[0].element_detail?.name) : '',
-    },
-  ]
-}
 
 const filterTransfers = student => {
   const transferTimes = student.transfers.map(transfer => ({
@@ -468,7 +494,6 @@ const CreditAccumulationGraphHighCharts = ({
       return Math.min(..._.flatten(students.map(({ courses }) => courses.map(({ date }) => new Date(date).getTime()))))
     return studyRightStart
   }
-
   const graduations = singleStudent ? filterGraduations(students[0], selectedStudyRight) : []
   const transfers = singleStudent ? filterTransfers(students[0]) : []
   const studyRightStartLine =
