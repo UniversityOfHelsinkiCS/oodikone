@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - openshift
     paths:
       - '.github/workflows/test-oodikone.yaml'
       - '.github/actions/**'
