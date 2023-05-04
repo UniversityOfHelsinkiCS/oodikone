@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { func, object, string } from 'prop-types'
-import { Button, Icon, Modal } from 'semantic-ui-react'
+import { Button, Icon, Modal, Container } from 'semantic-ui-react'
 import DegreeCoursesTable from '../StudyProgramme/DegreeCourses'
 import sendEvent from '../../common/sendEvent'
 
@@ -30,13 +30,13 @@ const FilterDegreeCoursesModal = ({ studyProgramme, criteria, setCriteria }) => 
     >
       <Modal.Header>Hide degree courses</Modal.Header>
       <Modal.Content image>
-        <Modal.Description>
+        <Container>
           <DegreeCoursesTable studyProgramme={studyProgramme} criteria={criteria} setCriteria={setCriteria} />
-          <Button onClick={() => setModalOpenState(false)} icon labelPosition="left">
+          <Button onClick={() => setModalOpenState(false)} icon labelPosition="left" style={{ marginTop: '10px' }}>
             <Icon name="save" />
             Save & Close
           </Button>
-        </Modal.Description>
+        </Container>
       </Modal.Content>
     </Modal>
   )

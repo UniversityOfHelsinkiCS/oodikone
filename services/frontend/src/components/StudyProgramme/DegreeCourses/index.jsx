@@ -272,20 +272,22 @@ const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, re
   }
 
   return (
-    <>
+    <Container>
       {(studyProgramme.includes('KH') || ['MH30_001', 'MH30_003'].includes(studyProgramme)) && (
         <>
-          <Message style={{ fontSize: '16px' }}>
-            <Message.Header>Change visibility of degree courses and select criteria for academic years</Message.Header>
-            <p>
-              Here you can change visibility of degree courses as and set course and credits criteria, fore each year
-              their own. Credits criteria is computed as follows: for the first academic year the credits are taken into
-              account if they are completed during the first 12 months. For the second year, we take into account the
-              completions during the first 24 months, for the third year the first 36 months.
-            </p>
-            <p>The progress of the students by these criteria will be shown in class statistics view.</p>
-          </Message>
           <Container>
+            <Message style={{ fontSize: '16px' }}>
+              <Message.Header>
+                Change visibility of degree courses and select criteria for academic years
+              </Message.Header>
+              <p>
+                Here you can change visibility of degree courses as and set course and credits criteria, for each year
+                their own. Credits criteria is computed as follows: for the first academic year the credits are taken
+                into account if they are completed during the first 12 months. For the second year, we take into account
+                the completions during the first 24 months, for the third year the first 36 months.
+              </p>
+              <p>The progress of the students by these criteria will be shown in class statistics view.</p>
+            </Message>
             <h5>Credit criteria</h5>
             <Form>
               <Form.Group widths="equal">
@@ -413,7 +415,7 @@ const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, re
           ))}
         </Table.Body>
       </Table>
-    </>
+    </Container>
   )
 }
 
