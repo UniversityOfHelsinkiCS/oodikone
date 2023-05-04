@@ -175,6 +175,7 @@ export default ({ students, programmeCode }) => {
         }),
         'phone number': s.phoneNumber,
         email: s.email,
+        secondaryEmail: s.secondaryEmail,
         'transferred from': s.transferredStudyright ? transferFrom(s) : '',
         priority: priorityText(s.studyrights),
         extent: extentCodes(s.studyrights),
