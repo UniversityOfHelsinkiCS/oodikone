@@ -1,25 +1,17 @@
-name: 'Test oodikone and release to staging'
+name: Lint and test
 
 on:
-  push:
-    branches:
-      - master
-    paths:
-      - '.github/workflows/test-oodikone.yaml'
-      - '.github/actions/**'
-      - 'cypress/**'
-      - 'cypress.config.json'
-      - 'services/**'
-      - '!services/backend/src/rapodiff.js'
-      - 'docker-compose.ci.yml'
-      - 'docker-compose.test.yml'
-      - 'nginx.conf'
-      - 'package*.json'
-      - 'updater/sis-updater-worker/src/db/migrations/**'
+  workflow_call:
+    secrets:
+      username:
+        required: true
+        description: 'Toska registry username'
+      password:
+        required: true
+        description: 'Toska registry password'
 
 jobs:
   # === Static tests / linting ===
-
   lint_backend:
     name: 'Lint backend'
     runs-on: ubuntu-latest
@@ -62,13 +54,11 @@ jobs:
             SENTRY_RELEASE=${{ github.sha }}
             SENTRY_ENVIRONMENT=staging
           cache-from: |
-            type=registry,ref=toska/oodikone2-backend:staging
-            type=registry,ref=toska/oodikone2-backend:latest
+            type=registry,ref=quay.io/toska/oodikone-backend:staging
           cache-to: type=inline
           context: services/backend
           push: false
-          tags: toska/oodikone2-backend:staging
-          target: production
+          tags: oodikone-backend:staging
           outputs: type=docker,dest=/tmp/backend.tar
       - name: 'Upload image for other jobs'
         uses: actions/upload-artifact@v3
@@ -92,13 +82,11 @@ jobs:
             SENTRY_ENVIRONMENT=staging
             BUILT_AT=${{ steps.get_current_time.outputs.NOW }}
           cache-from: |
-            type=registry,ref=toska/oodikone2-frontend:staging
-            type=registry,ref=toska/oodikone2-frontend:latest
+            type=registry,ref=toska/oodikone-frontend:staging
           cache-to: type=inline
           context: services/frontend
           push: false
-          tags: toska/oodikone2-frontend:staging
-          target: production
+          tags: oodikone-frontend:staging
           outputs: type=docker,dest=/tmp/frontend.tar
       - name: 'Upload image for other jobs'
         uses: actions/upload-artifact@v3
@@ -121,8 +109,8 @@ jobs:
         uses: docker/login-action@v2
         with:
           registry: registry.toska.cs.helsinki.fi
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
       - name: 'Let sis-updater-worker run migrations, then push new version of image to toska hub'
         if: steps.check_migrations.outputs.migrations == 'true'
         run: |
@@ -154,8 +142,8 @@ jobs:
         uses: docker/login-action@v2
         with:
           registry: registry.toska.cs.helsinki.fi
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
       - name: 'Let backend run migrations, then push new version of image to toska hub'
         if: steps.check_migrations.outputs.migrations == 'true'
         run: |
@@ -187,8 +175,8 @@ jobs:
         uses: docker/login-action@v2
         with:
           registry: registry.toska.cs.helsinki.fi
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
       - name: 'Let backend run migrations, then push new version of image to toska hub'
         if: steps.check_migrations.outputs.migrations == 'true'
         run: |
@@ -211,8 +199,8 @@ jobs:
       - name: 'Run tests'
         uses: ./.github/actions/run-tests
         with:
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
           spec: cypress/e2e/Course_statistics.js
 
   test_custom_population:
@@ -229,8 +217,8 @@ jobs:
       - name: 'Run tests'
         uses: ./.github/actions/run-tests
         with:
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
           spec: cypress/e2e/Custom_population.js
 
   test_population_statistics:
@@ -247,8 +235,8 @@ jobs:
       - name: 'Run tests'
         uses: ./.github/actions/run-tests
         with:
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
           spec: cypress/e2e/Population_statistics.js
 
   test_filters:
@@ -265,8 +253,8 @@ jobs:
       - name: 'Run tests'
         uses: ./.github/actions/run-tests
         with:
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
           spec: cypress/e2e/Filters.js
 
   test_student_statistics:
@@ -283,9 +271,10 @@ jobs:
       - name: 'Run tests'
         uses: ./.github/actions/run-tests
         with:
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
           spec: cypress/e2e/Student_statistics.js
+
   test_completed_courses:
     name: 'Test completed courses'
     needs:
@@ -300,9 +289,10 @@ jobs:
       - name: 'Run tests'
         uses: ./.github/actions/run-tests
         with:
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
           spec: cypress/e2e/Completed_courses.js
+
   test_studyprogramme_overview:
     name: 'Test studyprogramme overview'
     needs:
@@ -317,8 +307,8 @@ jobs:
       - name: 'Run tests'
         uses: ./.github/actions/run-tests
         with:
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
           spec: cypress/e2e/Studyprogramme_overview.js
 
   test_teachers_and_users:
@@ -335,8 +325,8 @@ jobs:
       - name: 'Run tests'
         uses: ./.github/actions/run-tests
         with:
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
           spec: |
             cypress/e2e/Teachers.js
             cypress/e2e/Users.js
@@ -355,8 +345,8 @@ jobs:
       - name: 'Run tests'
         uses: ./.github/actions/run-tests
         with:
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
           spec: cypress/e2e/Faculty_statistics.js
 
   test_open_uni_search:
@@ -373,12 +363,11 @@ jobs:
       - name: 'Run tests'
         uses: ./.github/actions/run-tests
         with:
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
           spec: cypress/e2e/Openuni.js
 
   # === Other tests ===
-
   test_service_exit_statuses:
     name: 'Check services run correctly'
     needs:
@@ -402,8 +391,8 @@ jobs:
         uses: docker/login-action@v2
         with:
           registry: registry.toska.cs.helsinki.fi
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
       - name: 'Run services, pull rest of the needed images'
         run: docker-compose --file docker-compose.ci.yml up --detach --no-recreate
       - name: 'Check that exit statuses are not errors'
@@ -416,100 +405,3 @@ jobs:
       - name: 'Print logs on failure'
         if: failure()
         run: docker-compose --file docker-compose.ci.yml logs
-
-  # === Release ===
-
-  release_images:
-    name: 'Release built images'
-    runs-on: ubuntu-latest
-    needs:
-      - lint_backend
-      - lint_frontend
-      - test_course_statistics
-      - test_custom_population
-      - test_filters
-      - test_population_statistics
-      - test_student_statistics
-      - test_completed_courses
-      - test_studyprogramme_overview
-      - test_teachers_and_users
-      - test_faculty_statistics
-      - test_open_uni_search
-      - test_service_exit_statuses
-    steps:
-      - uses: actions/checkout@v3
-      - name: 'Download images'
-        uses: actions/download-artifact@v3
-        with:
-          path: /tmp/
-      - name: 'Load built images'
-        run: |
-          docker load --input /tmp/artifact/backend.tar
-          docker load --input /tmp/artifact/frontend.tar
-      - name: 'Login to DockerHub'
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: 'Create a container from frontend'
-        run: docker create --name frontend toska/oodikone2-frontend:staging
-      - name: 'Copy assets from the container'
-        run: docker cp frontend:/usr/src/app/build ./build
-      - name: 'Create Sentry release'
-        uses: getsentry/action-release@v1
-        env:
-          SENTRY_URL: ${{ secrets.SENTRY_URL }}
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: toska
-          SENTRY_PROJECT: oodikone
-        with:
-          environment: staging
-          set_commits: 'skip'
-          sourcemaps: './build/static/js'
-          url_prefix: '~/static/js'
-          version: ${{ github.sha }}
-      - name: 'Push to docker hub'
-        run: |
-          docker push toska/oodikone2-backend:staging
-          docker push toska/oodikone2-frontend:staging
-      - name: 'Send deployment success notification to slack'
-        if: success()
-        uses: UniversityOfHelsinkiCS/slackbot-action@v1.4.2
-        with:
-          webhook-url: ${{ secrets.WEBHOOK_URL }}
-          message-type: deployment
-          softa-url: https://oodikone-staging.cs.helsinki.fi/
-          deployment-target: staging
-      - name: 'Send deployment failure notification to slack'
-        if: failure()
-        uses: UniversityOfHelsinkiCS/slackbot-action@v1.4.2
-        with:
-          webhook-url: ${{ secrets.WEBHOOK_URL }}
-          message-type: deployment-failure
-          deployment-target: staging
-
-  report_test_failure:
-    runs-on: ubuntu-latest
-    name: 'Report test failure to oodikone notifications'
-    needs:
-      - lint_backend
-      - lint_frontend
-      - test_course_statistics
-      - test_custom_population
-      - test_filters
-      - test_population_statistics
-      - test_student_statistics
-      - test_completed_courses
-      - test_studyprogramme_overview
-      - test_teachers_and_users
-      - test_faculty_statistics
-      - test_open_uni_search
-      - test_service_exit_statuses
-    if: failure()
-    steps:
-      - uses: actions/checkout@v3
-      - name: 'Send notification to slack'
-        uses: UniversityOfHelsinkiCS/slackbot-action@v1.4.2
-        with:
-          webhook-url: ${{ secrets.WEBHOOK_URL }}
-          message-type: test-failure

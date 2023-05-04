@@ -4,7 +4,7 @@ x-defaults: &defaults
   restart: unless-stopped
 
 x-build_defaults: &build_defaults
-  target: development
+  dockerfile: dev.Dockerfile
 
 services:
   adminer:
@@ -39,13 +39,15 @@ services:
       SECRET_TOKEN: dev
       SIS_DB_URL: postgres://postgres@sis-db:5432/sis-db
       SIS_UPDATER_URL: http://sis-updater-scheduler:8082
+      IMPORTER_DB_API_URL: 'https://importer.cs.helsinki.fi/api/importer'
+      JAMI_URL: 'http://jami:3003/'
     ports:
       - 8080:8080
     profiles:
       - oodikone
     volumes:
-      - backend-nodemod:/usr/src/app/node_modules
-      - ./services/backend/:/usr/src/app
+      - backend-nodemod:/opt/app-root/src/node_modules
+      - ./services/backend/:/opt/app-root/src
 
   frontend:
     <<: *defaults
@@ -58,8 +60,8 @@ services:
     profiles:
       - oodikone
     volumes:
-      - frontend-nodemod:/usr/src/app/node_modules
-      - ./services/frontend/:/usr/src/app
+      - frontend-nodemod:/opt/app-root/src/node_modules
+      - ./services/frontend/:/opt/app-root/src
 
   kone-db:
     <<: *defaults
@@ -108,7 +110,7 @@ services:
   sis-updater-scheduler:
     <<: *defaults
     build:
-      <<: *build_defaults
+      target: development
       context: updater/sis-updater-scheduler
     container_name: sis-updater-scheduler
     depends_on:
@@ -137,7 +139,7 @@ services:
   sis-updater-worker:
     <<: *defaults
     build:
-      <<: *build_defaults
+      target: development
       context: updater/sis-updater-worker
     depends_on:
       - redis

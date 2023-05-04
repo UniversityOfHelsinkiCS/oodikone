@@ -1,7 +1,7 @@
 // Node env to use
-const isStaging = process.env.NODE_ENV === 'staging'
 const isDev = process.env.NODE_ENV === 'development'
-const isProduction = process.env.NODE_ENV === 'production'
+const isStaging = process.env.REACT_APP_STAGING === 'true'
+const isProduction = !isStaging && process.env.NODE_ENV === 'production'
 
 // Sentry
 const sentryRelease = process.env.SENTRY_RELEASE || ''
@@ -17,9 +17,10 @@ const requiredGroup = isStaging
 const pateToken = process.env.PATE_API_TOKEN || ''
 
 // Jami
-const jamiUrl = isDev || runningInCI ? 'http://jami:3003/' : 'https://importer.cs.helsinki.fi/api/auth'
+const jamiUrl = process.env.JAMI_URL || ''
 
 // Importer client
+const importerUrl = process.env.IMPORTER_DB_API_URL || ''
 const importerToken = process.env.IMPORTER_DB_API_TOKEN || ''
 
 // Networking: Urls & ports
@@ -86,5 +87,6 @@ module.exports = {
   baseUrl,
   frontUrl,
   backendPort,
+  importerUrl,
   importerToken,
 }
