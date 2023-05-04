@@ -513,11 +513,14 @@ const GeneralTab = ({
               />
             </>
           ),
+          textTitle: 'Email',
           getRowVal: s => s.email,
         },
         {
           key: 'copyEmail',
-          getRowVal: s =>
+          textTitle: 'Secondary email',
+          getRowVal: s => s.secondaryEmail,
+          getRowContent: s =>
             s.email && !s.obfuscated ? (
               <Popup
                 trigger={
