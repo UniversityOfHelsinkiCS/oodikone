@@ -8,15 +8,18 @@ const deleteTag = name => {
 }
 
 const getEmptyYears = isAcademicYear => {
-  const thisYear = new Date().getFullYear()
+  const today = new Date()
+  const latestYear = isAcademicYear && today.getMonth() < 7 ? today.getFullYear() - 1 : today.getFullYear()
+
   const years = []
-  for (let year = thisYear; year > 2021; year--) {
+  for (let year = latestYear; year > 2021; year--) {
     if (isAcademicYear) {
       years.push(`${year} - ${year + 1}`)
     } else {
       years.push(year)
     }
   }
+  console.log({ years, latestYear, isAcademicYear })
   return years
 }
 

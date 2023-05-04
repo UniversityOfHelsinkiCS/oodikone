@@ -103,7 +103,9 @@ const getYearsArray = (since, isAcademicYear, yearsCombined) => {
   const years = []
   const allYears = 'Total'
   if (yearsCombined) years.push(allYears)
-  for (let i = since; i <= new Date().getFullYear(); i++) {
+  const today = new Date()
+  const until = isAcademicYear && today.getMonth() < 7 ? today.getFullYear() - 1 : today.getFullYear()
+  for (let i = since; i <= until; i++) {
     const year = isAcademicYear ? `${i} - ${i + 1}` : i
     years.push(year)
   }
