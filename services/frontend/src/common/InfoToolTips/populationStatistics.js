@@ -26,8 +26,10 @@ export default {
 
   Taulukko kertoo opintopistekertymän valitulle opiskelijapopulaatiolle. Opintopisteluokat on suhteutettu tarkasteltavan populaation aloitusvuoteen. 
   Ylin luokka kertoo siksi aina tavoiteajassa etenevien määrän ja suhteellisen osuuden. 
-  
-  Huom! nollasuorittajissa on mukana myös poissaolevaksi ilmoittautuneet, ellei heitä ole erikseen suodatettu populaatiosta pois.
+
+  Opintopisteet sisältävät opiskelijoiden **kaikki opintopisteet**, eli siis myös ennen valitun tutkinnon alkamista suoritetut opinnot.
+
+  Huom! Nollasuorittajissa on mukana myös poissaolevaksi ilmoittautuneet, ellei heitä ole erikseen suodatettu populaatiosta pois.
 
   Kategorioita voi myös itsessään käyttää suodattimina. Klikkaamalla rivin vasemmassa reunassa olevaa suodatinta jäävät näkyviin vain sen kategorian opiskelijat.
   Suodatin aukeaa samalla ikkunan vasempaan laitaan, josta sitä voi käyttää vapaavalintaisilla arvoilla.
