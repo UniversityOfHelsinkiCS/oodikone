@@ -156,7 +156,7 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
 
   const renderSemester = ({ enrollmenttype }) => {
     const { className } = enrolmentTypes[enrollmenttype]
-    return <div className={`enrollment-label ${className}`}> </div>
+    return <div className={`enrollment-label-no-margin ${className}`}> </div>
   }
 
   const createContent = (labels, year, start, end, enrollStatusIdx) => {
@@ -599,9 +599,10 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
           <Icon fitted name="minus" color="grey" />: Student has enrolled, but has not received any grade from the
           course.
           <br />
-          <span className="enrollment-label label-present" />: Student has an active semester enrollment. <br />
-          <span className="enrollment-label label-absent" />: Student has enrolled as absent. <br />
-          <span className="enrollment-label label-passive" />: Student has no semester enrollment.
+          <span className="enrollment-label-no-margin label-present" />: Student has an active semester enrollment.{' '}
+          <br />
+          <span className="enrollment-label-no-margin label-absent" />: Student has enrolled as absent. <br />
+          <span className="enrollment-label-no-margin label-passive" />: Student has no semester enrollment.
         </p>
       </Message>
       <Tab.Pane>
