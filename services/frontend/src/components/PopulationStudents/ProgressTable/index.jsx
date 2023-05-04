@@ -102,6 +102,7 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
   ]
 
   const getEnrollmentValue = enrollmentObj => {
+    if (enrollmentObj?.enrollmenttype === 1) return 'No info'
     if (enrollmentObj?.enrollmenttype === 1) return 'Present'
     if (enrollmentObj?.enrollmenttype === 2) return 'Absent'
     return 'Inactive'
@@ -111,6 +112,7 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
   const style = { verticalAlign: 'middle', textAlign: 'center' }
 
   const helpTexts = {
+    0: 'no info',
     1: 'Active',
     2: 'Student has enrolled as absent.',
     3: 'Student has not enrolled to semester and is counted as inactive.',
@@ -129,11 +131,15 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
     if (nonCourse.includes(info.code)) return propObj
     // Semester Enrollment - naming things is hard
     if (info.code === 'Enrollment') {
-      const { enrollmenttype } = info.name.en.includes('Fall')
-        ? s.semesterenrollments[enrollStatusIdx]
-        : s.semesterenrollments[enrollStatusIdx + 1]
-      return { ...propObj, title: helpTexts[enrollmenttype] }
+      if (info.name.en.includes('Fall') && s.semesterenrollments?.length > enrollStatusIdx) {
+        return { ...propObj, title: helpTexts[s.semesterenrollments[enrollStatusIdx]] }
+      }
+      if (s.semesterenrollments?.length < enrollStatusIdx + 1) {
+        return { ...propObj, title: helpTexts[s.semesterenrollments[enrollStatusIdx + 1]] }
+      }
+      return { ...propObj, title: helpTexts[0] }
     }
+
     if (courses && courses.some(course => course.passed))
       return { ...propObj, title: `Passed-${moment(courses[0].date).format('YYYY-MM-DD')}` }
     if (courses && courses.some(course => course.passed === false))
@@ -154,8 +160,9 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
     3: { className: 'label-passive' },
   }
 
-  const renderSemester = ({ enrollmenttype }) => {
-    const { className } = enrolmentTypes[enrollmenttype]
+  const renderSemester = enrollmentObj => {
+    if (!enrollmentObj) return ''
+    const { className } = enrolmentTypes[enrollmentObj.enrollmenttype]
     return <div className={`enrollment-label-no-margin ${className}`}> </div>
   }
 
@@ -181,18 +188,28 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
       cellProps: s => findProp(m, s, enrollStatusIdx),
       getRowVal: s => {
         if (m.code.includes('Criteria')) return s.criteriaProgress[year] ? s.criteriaProgress[year].totalSatisfied : 0
-        if (m.code.includes('Enrollment') && m.name.en.includes('Fall'))
-          return getEnrollmentValue(s.semesterenrollments[enrollStatusIdx])
-        if (m.code.includes('Enrollment') && m.name.en.includes('Spring'))
-          return getEnrollmentValue(s.semesterenrollments[enrollStatusIdx + 1])
+        if (m.code.includes('Enrollment') && m.name.en.includes('Fall')) {
+          return s.semesterenrollments.length > enrollStatusIdx
+            ? getEnrollmentValue(s.semesterenrollments[enrollStatusIdx])
+            : 'No info'
+        }
+        if (m.code.includes('Enrollment') && m.name.en.includes('Spring')) {
+          return s.semesterenrollments.length > enrollStatusIdx + 1
+            ? getEnrollmentValue(s.semesterenrollments[enrollStatusIdx + 1])
+            : 'No info'
+        }
         return findCsvText(s, m.code, year)
       },
       getRowContent: s => {
         if (m.code.includes('Criteria')) return s.criteriaProgress[year] ? s.criteriaProgress[year].totalSatisfied : 0
         if (m.code.includes('Enrollment') && m.name.en.includes('Fall'))
-          return renderSemester(s.semesterenrollments[enrollStatusIdx])
+          return s.semesterenrollments.length > enrollStatusIdx
+            ? renderSemester(s.semesterenrollments[enrollStatusIdx])
+            : ''
         if (m.code.includes('Enrollment') && m.name.en.includes('Spring'))
-          return renderSemester(s.semesterenrollments[enrollStatusIdx + 1])
+          return s.semesterenrollments.length > enrollStatusIdx + 1
+            ? renderSemester(s.semesterenrollments[enrollStatusIdx + 1])
+            : ''
         return findRowContent(s, m.code, year, start, end)
       },
       child: true,
