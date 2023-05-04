@@ -7,7 +7,7 @@ on:
       - openshift
     paths:
       - '.github/workflows/test-oodikone.yaml'
-      - '.github/actions/**'
+      - '.github/**'
       - 'cypress/**'
       - 'cypress.config.json'
       - 'services/**'
