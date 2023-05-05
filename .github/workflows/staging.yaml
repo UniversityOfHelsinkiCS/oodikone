@@ -86,3 +86,39 @@ jobs:
           registry: quay.io/toska
           username: toska+github
           password: ${{ secrets.QUAY_IO_TOKEN }}
+
+  report_success:
+    name: 'Report deployment success to oodikone notifications'
+    runs-on: ubuntu-latest
+    needs:
+      - release_frontend
+      - release_backend
+
+    if: success()
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: 'Send notification to slack'
+        uses: UniversityOfHelsinkiCS/slackbot-action@v1.4.2
+        with:
+          webhook-url: ${{ secrets.WEBHOOK_URL }}
+          message-type: deployment
+          deployment-target: staging
+
+  report_failure:
+    name: 'Report deployment failure to oodikone notifications'
+    runs-on: ubuntu-latest
+    needs:
+      - release_frontend
+      - release_backend
+
+    if: failure()
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: 'Send notification to slack'
+        uses: UniversityOfHelsinkiCS/slackbot-action@v1.4.2
+        with:
+          webhook-url: ${{ secrets.WEBHOOK_URL }}
+          message-type: deployment-failure
+          deployment-target: staging
