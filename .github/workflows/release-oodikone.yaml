@@ -73,7 +73,7 @@ jobs:
       - name: 'Create a container from built image '
         run: docker create --name frontend toska/oodikone2-frontend:latest
       - name: 'Copy assets from the container'
-        run: docker cp frontend:/usr/src/app/build ./build
+        run: docker cp frontend:/opt/app-root/src/build ./build
       - name: 'Create Sentry release'
         uses: getsentry/action-release@v1
         env:
