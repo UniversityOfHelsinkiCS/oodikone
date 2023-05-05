@@ -405,3 +405,31 @@ jobs:
       - name: 'Print logs on failure'
         if: failure()
         run: docker-compose --file docker-compose.ci.yml logs
+
+  # === Report failure ===
+  report_test_failure:
+    runs-on: ubuntu-latest
+    name: 'Report test failure to oodikone notifications'
+    needs:
+      - lint_backend
+      - lint_frontend
+      - test_course_statistics
+      - test_custom_population
+      - test_filters
+      - test_population_statistics
+      - test_student_statistics
+      - test_studyprogramme_overview
+      - test_teachers_and_users
+      - test_faculty_statistics
+      - test_open_uni_search
+      - test_service_exit_statuses
+
+    if: failure()
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: 'Send notification to slack'
+        uses: UniversityOfHelsinkiCS/slackbot-action@v1.4.2
+        with:
+          webhook-url: ${{ secrets.WEBHOOK_URL }}
+          message-type: test-failure
