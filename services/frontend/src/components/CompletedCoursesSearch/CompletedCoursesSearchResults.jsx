@@ -1,13 +1,15 @@
 import SortableTable from 'components/SortableTable'
 import React, { useEffect, useState } from 'react'
 import { useGetCompletedCoursesQuery } from 'redux/completedCoursesSearch'
-import { Icon, Loader } from 'semantic-ui-react'
+import { Link } from 'react-router-dom'
+import { Icon, Loader, Item } from 'semantic-ui-react'
 import moment from 'moment'
 import StudentNameVisibilityToggle, { useStudentNameVisibility } from 'components/StudentNameVisibilityToggle'
 import useLanguage from 'components/LanguagePicker/useLanguage'
 import RightsNotification from 'components/RightsNotification'
+import sendEvent from '../../common/sendEvent'
 
-const getColumns = (courses, showStudentNames, getTextIn) => {
+const getColumns = (courses, showStudentNames, getTextIn, sendAnalytics) => {
   const isPassed = credit => [4, 7, 9].includes(credit)
   // 4=completed, 7=improved, 9=transferred, 10=failed
 
@@ -48,7 +50,31 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
       title: 'Student Number',
       cellProps: { style },
       getRowVal: s => s.studentNumber,
-      getRowContent: s => s.studentNumber,
+      getRowContent: s => (
+        <div style={{ display: 'inline-flex' }}>
+          <div>{s.studentNumber}</div>
+          <Item
+            as={Link}
+            to={`/students/${s.studentNumber}`}
+            onClick={() => {
+              sendAnalytics('Student details button clicked', 'Completed courses search tool')
+            }}
+            style={{ marginLeft: '10px', marginRight: '10px' }}
+          >
+            <Icon name="user outline" />
+          </Item>
+          <div data-cy="sisulink">
+            <Item
+              as="a"
+              href={`https://sisu.helsinki.fi/tutor/role/staff/student/${s.sis_person_id}/basic/basic-info`}
+              target="_blank"
+            >
+              <Icon name="external alternate" />
+              Sisu
+            </Item>
+          </div>
+        </div>
+      ),
     },
   ]
 
@@ -205,6 +231,7 @@ const CompletedCoursesSearchResults = ({ searchValues }) => {
   const isFetchingOrLoading = completedCoursesTable.isLoading || completedCoursesTable.isFetching
   const isError = completedCoursesTable.isError || (completedCoursesTable.isSuccess && !completedCoursesTable.data)
   const { getTextIn } = useLanguage()
+  const sendAnalytics = sendEvent.populationStudents
 
   useEffect(() => {
     if (!isError && !isFetchingOrLoading) {
@@ -241,7 +268,7 @@ const CompletedCoursesSearchResults = ({ searchValues }) => {
             singleLine: true,
             textAlign: 'center',
           }}
-          columns={getColumns(data.courses, showStudentNames.visible, getTextIn)}
+          columns={getColumns(data.courses, showStudentNames.visible, getTextIn, sendAnalytics)}
           data={data.students}
         />
       </div>

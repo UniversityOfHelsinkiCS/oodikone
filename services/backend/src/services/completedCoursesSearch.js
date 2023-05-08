@@ -45,7 +45,7 @@ const getCompletedCourses = async (studentNumbers, courseCodes) => {
   })
 
   const studentInfo = await Student.findAll({
-    attributes: ['studentnumber', 'firstnames', 'lastname', 'email'],
+    attributes: ['studentnumber', 'firstnames', 'lastname', 'email', 'sis_person_id'],
     where: {
       studentnumber: {
         [Op.in]: studentNumbers,
@@ -94,7 +94,7 @@ const getCompletedCourses = async (studentNumbers, courseCodes) => {
   })
 
   credits.forEach(credit => {
-    if (credit.creditType === 9) {
+    if (credit.creditType === 10) {
       return
     }
     const previous = studentCredits[credit.studentNumber].credits?.find(c => credit.courseCode === c.courseCode)
@@ -133,6 +133,7 @@ const getCompletedCourses = async (studentNumbers, courseCodes) => {
       ...acc,
       {
         studentNumber: student,
+        sis_person_id: studentCredits[student].sis_person_id,
         credits: studentCredits[student].credits,
         enrollments: studentCredits[student].enrollments,
         firstNames: studentCredits[student].firstNames,
