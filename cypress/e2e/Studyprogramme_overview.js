@@ -27,6 +27,8 @@ describe('Studyprogramme overview', () => {
     cy.init('/study-programme', 'admin')
     cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click({ force: true })
     cy.get('.attached').contains('Update statistics').click()
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(10000)
     cy.get('[data-cy="updatebasicinfo"]').click({ force: true })
     // eslint-disable-next-line cypress/no-unnecessary-waiting
     cy.wait(10000)
