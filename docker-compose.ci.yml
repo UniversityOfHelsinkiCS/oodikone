@@ -39,8 +39,8 @@ services:
 
   redis:
     <<: *defaults
-    command: 'redis-server --appendonly yes'
-    container_name: redis
+    command: >
+      sh -c 'redis-server --appendonly yes && redis-cli flushall'
     image: redis
     ports:
       - 6379:6379
