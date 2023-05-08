@@ -19,14 +19,24 @@ const NewUpdateView = ({ studyprogramme }) => {
     <div className="update-view">
       <div className="button-container">
         <h4>Update data on Basic Information -view</h4>
-        <Button disabled={basicstats.isLoading} color="blue" onClick={() => setSkipBasic(false)}>
+        <Button
+          disabled={basicstats.isLoading}
+          color="blue"
+          data-cy="updatebasicinfo"
+          onClick={() => setSkipBasic(false)}
+        >
           Update
         </Button>
         {getStatusIcon(basicstats)}
       </div>
       <div className="button-container">
         <h4>Update data on Populations and Studytracks -view</h4>
-        <Button disabled={studytrackstats.isLoading} color="blue" onClick={() => setSkipStudytrack()}>
+        <Button
+          disabled={studytrackstats.isLoading}
+          color="blue"
+          data-cy="updatepopulations"
+          onClick={() => setSkipStudytrack()}
+        >
           Update
         </Button>
         {getStatusIcon(studytrackstats)}

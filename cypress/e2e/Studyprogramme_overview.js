@@ -23,7 +23,7 @@ const getEmptyYears = isAcademicYear => {
 }
 
 describe('Studyprogramme overview', () => {
-  /* before(() => {
+  before(() => {
     cy.init('/study-programme', 'admin')
     cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click({ force: true })
     cy.get('.attached').contains('Update statistics').click()
@@ -33,7 +33,7 @@ describe('Studyprogramme overview', () => {
     cy.get('[data-cy="updatepopulations"]').click({ force: true })
     // eslint-disable-next-line cypress/no-unnecessary-waiting
     cy.wait(10000)
-  }) */
+  })
 
   /* Basic information overview -tests*/
   describe('Basic information -view works for basic user', () => {
@@ -99,17 +99,19 @@ describe('Studyprogramme overview', () => {
       cy.checkTableStats(tableContents, 'GraduatedAndThesisWritersOfTheProgramme')
     })
 
-    it.skip('Special studyrights can be excluded and basic data changes accordingly', () => {
+    it('Special studyrights can be excluded and basic data changes accordingly', () => {
       cy.get('[data-cy=StudentToggle]').click()
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
+      cy.wait(15000)
       const years = getEmptyYears()
       const studentTableContents = [
         // [Year, Started, Graduated]
         ...years.map(year => [year, 0, 0]),
         [2021, 0, 0],
-        [2020, 22, 0],
-        [2019, 12, 0],
-        [2018, 0, 0],
-        [2017, 0, 0],
+        [2020, 10, 35],
+        [2019, 85, 17],
+        [2018, 159, 1],
+        [2017, 170, 0],
       ]
 
       cy.checkTableStats(studentTableContents, 'StudentsOfTheStudyprogramme')
@@ -118,10 +120,10 @@ describe('Studyprogramme overview', () => {
         // [Year, Total, Major students credits, Transferred credits]
         ...years.map(year => [year, 0, 0, 0]),
         [2021, 0, 0, 0],
-        [2020, 117.5, 0, 7.5],
-        [2019, 67, 0, 0],
-        [2018, 0, 0, 0],
-        [2017, 0, 0, 0],
+        [2020, 4999, 4675, 167],
+        [2019, 6182, 5699, 349],
+        [2018, 4884, 4537, 272],
+        [2017, 1988, 1600, 388],
       ]
 
       cy.checkTableStats(creditTableContents, 'CreditsProducedByTheStudyprogramme')
@@ -130,9 +132,9 @@ describe('Studyprogramme overview', () => {
         // [Year, Graduated, Wrote thesis]
         ...years.map(year => [year, 0, 0]),
         [2021, 0, 0],
-        [2020, 0, 0],
-        [2019, 0, 0],
-        [2018, 0, 0],
+        [2020, 35, 35],
+        [2019, 17, 25],
+        [2018, 1, 5],
         [2017, 0, 0],
       ]
 
@@ -140,9 +142,10 @@ describe('Studyprogramme overview', () => {
       cy.get('[data-cy=StudentToggle]').click()
     })
 
-    it.skip('Year can be changed to academic year, and data changes accordingly', () => {
-      // eslint-disable-next-line cypress/no-unnecessary-waiting
+    it('Year can be changed to academic year, and data changes accordingly', () => {
       cy.get('[data-cy=YearToggle]').click({ force: true })
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
+      cy.wait(15000)
       const isAcademicYear = true
       const years = getEmptyYears(isAcademicYear)
       const studentTableContents = [
@@ -183,8 +186,8 @@ describe('Studyprogramme overview', () => {
         .should('contain', 'Major students credits')
         .should('contain', 'Non-major students credits')
         .should('contain', 'Transferred credits')
-        .should('contain', 852)
-        .should('contain', 577)
+        .should('contain', 7737)
+        .should('contain', 6584)
 
       cy.get('[data-cy=Graph-GraduatedAndThesisWritersOfTheProgramme')
         .should('contain', 'Graduated students')
@@ -276,7 +279,7 @@ describe('Studyprogramme overview', () => {
       cy.checkTableStats(tableContents, 'StudytrackOverview')
     })
 
-    it.skip('Student progress data is shown correctly', () => {
+    it('Student progress data is shown correctly', () => {
       const tableContents = [
         ['2020 - 2021', 12, 12, 0, 0, 0, 0, 0, 0, 0],
         ['2019 - 2020', 86, 10, 16, 34, 21, 5, 0, 0, 0],
@@ -288,7 +291,7 @@ describe('Studyprogramme overview', () => {
       cy.checkTableStats(tableContents, 'StudytrackProgress')
     })
 
-    it.skip('Studytrack overview graphs render', () => {
+    it('Studytrack overview graphs render', () => {
       cy.get('[data-cy=Graph-StudytrackProgress]')
         .should('contain', 'Less than 15 credits')
         .should('contain', '30-59 credits')
