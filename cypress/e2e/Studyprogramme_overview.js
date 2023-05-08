@@ -19,7 +19,6 @@ const getEmptyYears = isAcademicYear => {
       years.push(year)
     }
   }
-  console.log({ years, latestYear, isAcademicYear })
   return years
 }
 
@@ -268,10 +267,10 @@ describe('Studyprogramme overview', () => {
     it('Student progress data is shown correctly', () => {
       const tableContents = [
         ['2020 - 2021', 12, 12, 0, 0, 0, 0, 0, 0, 0],
-        ['2019 - 2020', 86, 11, 15, 35, 20, 5, 0, 0, 0],
-        ['2018 - 2019', 162, 3, 9, 28, 50, 33, 25, 11, 3],
-        ['2017 - 2018', 171, 7, 13, 22, 32, 18, 23, 32, 24],
-        ['Total', 431, 33, 37, 85, 102, 56, 48, 43, 27],
+        ['2019 - 2020', 86, 10, 16, 34, 21, 5, 0, 0, 0],
+        ['2018 - 2019', 162, 2, 8, 27, 47, 36, 26, 12, 4],
+        ['2017 - 2018', 171, 5, 15, 21, 26, 22, 22, 33, 27],
+        ['Total', 431, 29, 39, 82, 94, 63, 48, 45, 31],
       ]
 
       cy.checkTableStats(tableContents, 'StudytrackProgress')
@@ -282,9 +281,9 @@ describe('Studyprogramme overview', () => {
         .should('contain', 'Less than 15 credits')
         .should('contain', '30-59 credits')
         .should('contain', '180 or more credits')
-        .should('contain', '4.1%') // The percentage for less than 15 credits in 2017-2018, to check that the graph renders
-        .should('contain', '5.6%') // The percentage for 15-29 credits in 2018-2019
-        .should('contain', '12.8%') // The percentage for less than 15 credits in 2019-2020
+        .should('contain', '2.9%') // The percentage for less than 15 credits in 2017-2018, to check that the graph renders
+        .should('contain', '4.9%') // The percentage for 15-29 credits in 2018-2019
+        .should('contain', '11.6%') // The percentage for less than 15 credits in 2019-2020
 
       cy.get('[data-cy=graduation-times-graph-breakdown]')
       cy.get('[data-cy=GraduationTimeToggle]').click()
