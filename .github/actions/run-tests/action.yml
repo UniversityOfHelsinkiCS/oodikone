@@ -32,7 +32,7 @@ runs:
         password: ${{ inputs.password }}
     - name: 'Run services, pull rest of the needed images'
       shell: bash
-      run: docker-compose --file docker-compose.ci.yml up --detach --no-recreate
+      run: docker-compose --file docker-compose.ci.yml up --detach --build
     - name: 'Run cypress'
       uses: cypress-io/github-action@v4
       with:
