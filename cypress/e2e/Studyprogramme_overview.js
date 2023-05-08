@@ -28,11 +28,11 @@ describe('Studyprogramme overview', () => {
     cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click({ force: true })
     cy.get('.attached').contains('Update statistics').click()
     // eslint-disable-next-line cypress/no-unnecessary-waiting
-    cy.wait(10000)
-    cy.get('[data-cy="updatebasicinfo"]').click({ force: true })
+    cy.wait(5000)
+    cy.get('button').eq(0).click({ force: true })
     // eslint-disable-next-line cypress/no-unnecessary-waiting
     cy.wait(10000)
-    cy.get('[data-cy="updatepopulations"]').click({ force: true })
+    cy.get('button').eq(1).click({ force: true })
     // eslint-disable-next-line cypress/no-unnecessary-waiting
     cy.wait(10000)
   })
