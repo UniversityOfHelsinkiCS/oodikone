@@ -21,12 +21,14 @@ services:
       SIS_UPDATER_URL: http://sis-updater-scheduler:8082
       IMPORTER_DB_API_URL: 'https://importer.cs.helsinki.fi/api/importer'
       JAMI_URL: 'http://jami:3003/'
-    image: toska/oodikone2-backend:staging
+    build:
+      context: services/backend
 
   frontend:
     <<: *defaults
     container_name: frontend
-    image: toska/oodikone2-frontend:staging
+    build:
+      context: services/frontend
 
   kone-db:
     <<: *defaults
