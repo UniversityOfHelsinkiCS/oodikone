@@ -53,9 +53,9 @@ jobs:
           build-args: |
             SENTRY_RELEASE=${{ github.sha }}
             SENTRY_ENVIRONMENT=staging
-          # cache-from: |
-          #   type=registry,ref=quay.io/toska/oodikone-backend:staging
-          # cache-to: type=inline
+          cache-from: |
+            type=registry,ref=quay.io/toska/oodikone-backend:staging
+          cache-to: type=inline
           context: services/backend
           push: false
           tags: oodikone-backend:staging
@@ -81,9 +81,9 @@ jobs:
             SENTRY_RELEASE=${{ github.sha }}
             SENTRY_ENVIRONMENT=staging
             BUILT_AT=${{ steps.get_current_time.outputs.NOW }}
-          # cache-from: |
-          #   type=registry,ref=toska/oodikone-frontend:staging
-          # cache-to: type=inline
+          cache-from: |
+            type=registry,ref=quay.io/toska/oodikone-frontend:staging
+          cache-to: type=inline
           context: services/frontend
           push: false
           tags: oodikone-frontend:staging
