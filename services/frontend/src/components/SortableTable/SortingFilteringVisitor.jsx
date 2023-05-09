@@ -23,9 +23,12 @@ export default class SortingFilteringVisitor extends DataVisitor {
 
     if (sort === 'desc') {
       return (a, b) => {
-        const va = getColumnValue(pCtx.withItem(a), column)
-        const vb = getColumnValue(pCtx.withItem(b), column)
-
+        let va = getColumnValue(pCtx.withItem(a), column)
+        let vb = getColumnValue(pCtx.withItem(b), column)
+        if (typeof va === 'string' && typeof vb === 'string') {
+          va = va.toLowerCase()
+          vb = vb.toLowerCase()
+        }
         if (va === 'Not saved') {
           return 0
         }
