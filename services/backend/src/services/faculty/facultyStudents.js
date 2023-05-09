@@ -152,6 +152,7 @@ const getFacultyDataForYear = async ({
     const inactive = await inactiveStudyrights(code, studentNbrs)
     const graduatedStudents = studyrights.filter(sr => sr.graduated === 1)
     const absent = await absentStudents(code, studentNbrs)
+
     const enrolled = students.filter(
       s =>
         s.semesters.filter(semester => semester.semestercode === currentSemester.semestercode)[0]?.enrollmenttype === 1
@@ -254,9 +255,7 @@ const combineFacultyStudents = async (code, programmes, allProgrammeCodes, speci
       programmeNames,
     }
     const totals = await getFacultyDataForYear(queryParams)
-    if (totals.total !== 0) {
-      addTotals(facultyTableStats, year, totals)
-    }
+    addTotals(facultyTableStats, year, totals)
   }
 
   addTotals(facultyTableStats, 'Total', allTotals)
