@@ -15,21 +15,13 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: 'Download images'
-      uses: actions/download-artifact@v3
-      with:
-        path: /tmp/
-    - name: 'Load built images'
-      shell: bash
-      run: |
-        docker load --input /tmp/artifact/backend.tar
-        docker load --input /tmp/artifact/frontend.tar
     - name: 'Login to toska docker registry'
       uses: docker/login-action@v2
       with:
         registry: registry.toska.cs.helsinki.fi
         username: ${{ inputs.username }}
         password: ${{ inputs.password }}
+
     - name: 'Run services, pull rest of the needed images'
       shell: bash
       run: docker-compose --file docker-compose.ci.yml up --detach --build
@@ -40,6 +32,7 @@ runs:
         spec: ${{ inputs.spec }}
       env:
         CYPRESS_baseUrl: http://localhost:1337
+
     - name: 'Upload video if tests fail'
       uses: actions/upload-artifact@v3
       if: failure()
