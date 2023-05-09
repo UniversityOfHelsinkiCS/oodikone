@@ -110,6 +110,7 @@ describe('Population Statistics', () => {
       checkFilteringResult(defaultAmountOfStudents - graduated)
       getCard().cs('option-all').click()
     })
+    cy.cs('reset-all-filters').click()
   })
 
   it('Transfer filter works', () => {
@@ -121,13 +122,14 @@ describe('Population Statistics', () => {
       checkFilteringResult(defaultAmountOfStudents + transferred)
       cy.cs('TransferredToProgramme-filter-card').cs('option-havenot').click()
     })
+    cy.cs('reset-all-filters').click()
   })
 
   it('Enrollment filter works', () => {
     runTestStepWithPreAndPostParts('EnrollmentStatus', () => {
       cy.cs('enrollmentStatusFilter-status').selectFromDropdown(0)
       cy.cs('enrollmentStatusFilter-semesters').selectFromDropdown(5)
-      checkFilteringResult(147)
+      checkFilteringResult(148)
       clearSemanticUIMultipleDropDownSelection('enrollmentStatusFilter-semesters')
     })
   })
@@ -262,9 +264,10 @@ describe('Course Statistics', () => {
       programmeDropdown.get('i.delete').click()
     })
   })
-  // FIX THIS SOON!
-  it.skip('Age filter works', () => {
+
+  it('Age filter works', () => {
     cy.clock(MOCKED_DATE, ['Date'])
+    cy.cs('reset-all-filters').click()
     runTestStepWithPreAndPostParts('Age', () => {
       testRangeFilter('Age-filter-card', 20, 40, 33)
     })
