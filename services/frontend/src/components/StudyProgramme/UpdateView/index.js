@@ -25,7 +25,7 @@ const NewUpdateView = ({ studyprogramme }) => {
           data-cy="updatebasicinfo"
           onClick={() => setSkipBasic(false)}
         >
-          Update
+          Update Basic Information
         </Button>
         {getStatusIcon(basicstats)}
       </div>
@@ -37,7 +37,7 @@ const NewUpdateView = ({ studyprogramme }) => {
           data-cy="updatepopulations"
           onClick={() => setSkipStudytrack()}
         >
-          Update
+          Update Populations and Studytracks
         </Button>
         {getStatusIcon(studytrackstats)}
       </div>
