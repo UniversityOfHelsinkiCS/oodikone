@@ -1,4 +1,4 @@
-name: Lint and test
+name: 'Lint and test'
 
 on:
   workflow_call:
@@ -40,9 +40,105 @@ jobs:
           'eslint --ext .jsx,.js services/frontend' \
           'stylelint services/frontend/src/**/*.css'
 
+  # === Build database images ===
+  build_and_push_anon_sis_db:
+    name: 'Build anon sis-db and push to toska hub if new migrations have been added'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dorny/paths-filter@v2
+        id: check_migrations
+        with:
+          filters: |
+            migrations:
+              - 'updater/sis-updater-worker/src/db/migrations/**'
+              - '.github/workflows/test.yaml'
+      - name: 'Login to toska docker registry'
+        uses: docker/login-action@v2
+        with:
+          registry: registry.toska.cs.helsinki.fi
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
+      - name: 'Let sis-updater-worker run migrations, then push new version of image to toska hub'
+        if: steps.check_migrations.outputs.migrations == 'true'
+        run: |
+          docker-compose --file docker-compose.ci.yml up --detach sis-updater-worker
+          sleep 30 # wait for sis-updater-worker to start and run migrations
+          ./anonyymioodi/commit_and_push_to_toska_hub.sh sis-db
+
+  build_and_push_anon_kone_db:
+    name: 'Build anon kone-db and push to toska hub if new migrations have been added'
+    needs:
+      - build_backend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dorny/paths-filter@v2
+        id: check_migrations
+        with:
+          filters: |
+            migrations:
+              - 'services/backend/src/database/migrations_kone/**'
+              - '.github/workflows/test.yaml'
+      - name: 'Download images'
+        uses: actions/download-artifact@v3
+        with:
+          path: /tmp/
+      - name: 'Load built backend image'
+        run: docker load --input /tmp/artifact/backend.tar
+      - name: 'Login to toska docker registry'
+        uses: docker/login-action@v2
+        with:
+          registry: registry.toska.cs.helsinki.fi
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
+      - name: 'Let backend run migrations, then push new version of image to toska hub'
+        if: steps.check_migrations.outputs.migrations == 'true'
+        run: |
+          docker-compose --file docker-compose.ci.yml up --detach backend
+          sleep 30 # wait for sis-updater-worker to start and run migrations
+          ./anonyymioodi/commit_and_push_to_toska_hub.sh kone-db
+
+  build_and_push_anon_user_db:
+    name: 'Build anon user-db and push to toska hub if new migrations have been added'
+    needs:
+      - build_backend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dorny/paths-filter@v2
+        id: check_migrations
+        with:
+          filters: |
+            migrations:
+              - 'services/backend/src/database/migrations_user/**'
+              - '.github/workflows/test.yaml'
+      - name: 'Download images'
+        uses: actions/download-artifact@v3
+        with:
+          path: /tmp/
+      - name: 'Load built backend image'
+        run: docker load --input /tmp/artifact/backend.tar
+      - name: 'Login to toska docker registry'
+        uses: docker/login-action@v2
+        with:
+          registry: registry.toska.cs.helsinki.fi
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
+      - name: 'Let backend run migrations, then push new version of image to toska hub'
+        if: steps.check_migrations.outputs.migrations == 'true'
+        run: |
+          docker-compose --file docker-compose.ci.yml up --detach backend
+          sleep 30 # wait for sis-updater-worker to start and run migrations
+          ./anonyymioodi/commit_and_push_to_toska_hub.sh user-db
+
   # === End-to-end tests ===
   test_course_statistics:
     name: 'Test course statistics'
+    needs:
+      - build_and_push_anon_sis_db
+      - build_and_push_anon_kone_db
+      - build_and_push_anon_user_db
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -55,6 +151,10 @@ jobs:
 
   test_custom_population:
     name: 'Test custom population'
+    needs:
+      - build_and_push_anon_sis_db
+      - build_and_push_anon_kone_db
+      - build_and_push_anon_user_db
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -68,6 +168,10 @@ jobs:
   test_population_statistics:
     name: 'Test population statistics'
     runs-on: ubuntu-latest
+    needs:
+      - build_and_push_anon_sis_db
+      - build_and_push_anon_kone_db
+      - build_and_push_anon_user_db
     steps:
       - uses: actions/checkout@v3
       - name: 'Run tests'
@@ -80,6 +184,10 @@ jobs:
   test_filters:
     name: 'Test filters'
     runs-on: ubuntu-latest
+    needs:
+      - build_and_push_anon_sis_db
+      - build_and_push_anon_kone_db
+      - build_and_push_anon_user_db
     steps:
       - uses: actions/checkout@v3
       - name: 'Run tests'
@@ -91,6 +199,10 @@ jobs:
 
   test_student_statistics:
     name: 'Test student statistics'
+    needs:
+      - build_and_push_anon_sis_db
+      - build_and_push_anon_kone_db
+      - build_and_push_anon_user_db
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -103,6 +215,10 @@ jobs:
 
   test_completed_courses:
     name: 'Test completed courses'
+    needs:
+      - build_and_push_anon_sis_db
+      - build_and_push_anon_kone_db
+      - build_and_push_anon_user_db
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -115,6 +231,10 @@ jobs:
 
   test_studyprogramme_overview:
     name: 'Test studyprogramme overview'
+    needs:
+      - build_and_push_anon_sis_db
+      - build_and_push_anon_kone_db
+      - build_and_push_anon_user_db
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -127,6 +247,10 @@ jobs:
 
   test_teachers_and_users:
     name: 'Test teachers and users'
+    needs:
+      - build_and_push_anon_sis_db
+      - build_and_push_anon_kone_db
+      - build_and_push_anon_user_db
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -141,6 +265,10 @@ jobs:
 
   test_faculty_statistics:
     name: 'Test faculty statistics'
+    needs:
+      - build_and_push_anon_sis_db
+      - build_and_push_anon_kone_db
+      - build_and_push_anon_user_db
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -153,6 +281,10 @@ jobs:
 
   test_open_uni_search:
     name: 'Test open uni search'
+    needs:
+      - build_and_push_anon_sis_db
+      - build_and_push_anon_kone_db
+      - build_and_push_anon_user_db
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -162,3 +294,35 @@ jobs:
           username: ${{ secrets.username }}
           password: ${{ secrets.password }}
           spec: cypress/e2e/Openuni.js
+
+  # === Other tests ===
+  test_service_exit_statuses:
+    name: 'Check services run correctly'
+    needs:
+      - build_and_push_anon_sis_db
+      - build_and_push_anon_kone_db
+      - build_and_push_anon_user_db
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: 'Login to toska docker registry'
+        uses: docker/login-action@v2
+        with:
+          registry: registry.toska.cs.helsinki.fi
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
+
+      - name: 'Run services, pull rest of the needed images'
+        run: docker-compose --file docker-compose.ci.yml up --detach
+
+      - name: 'Check that exit statuses are not errors'
+        run: |
+          docker ps -a
+          if [[ $(docker ps --all | grep -Eo '(Exited|Restarting) \([0-9]+\)' | grep -Eo '[0-9]+' | awk 'BEGIN {sum=0} { sum += $1 } END { print sum }') != '0' ]]; then
+            echo 'Some process had nonzero exit code';
+            exit 1;
+          fi
+
+      - name: 'Print logs on failure'
+        if: failure()
+        run: docker-compose --file docker-compose.ci.yml logs
