@@ -41,7 +41,7 @@ const StudentInfoCard = ({ student }) => {
             <div data-cy="sisulink">
               <Item
                 as="a"
-                href={`https://sis-helsinki.funidata.fi/tutor/role/staff/student/${student.sis_person_id}/basic/basic-info`}
+                href={`https://sisu.helsinki.fi/tutor/role/staff/student/${student.sis_person_id}/basic/basic-info`}
                 target="_blank"
               >
                 <Icon name="external alternate" />
