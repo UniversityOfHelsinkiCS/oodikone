@@ -35,7 +35,9 @@ const BachelorHonours = ({ student, absentYears, programmeCode }) => {
   }, [programmeCode, student])
 
   useEffect(() => {
-    const mandatoryModuleCodes = mandatoryModules.map(mod => mod.code)
+    const mandatoryModuleCodes = mandatoryModules.defaultProgrammeResults
+      ? mandatoryModules.defaultProgrammeResults.map(mod => mod.code)
+      : []
     const degreeModule = student.courses.find(mod => bachelorCodes.includes(mod.course_code))
     const basicModules = student.courses.filter(mod => basicHonoursModules[programmeCode].includes(mod.course_code))
     const intermediateModules = student.courses.filter(mod =>
@@ -116,7 +118,14 @@ const BachelorHonours = ({ student, absentYears, programmeCode }) => {
     </Table>
   )
 
-  if (!programmeCode || !student || !student.courses || !student.studyrights || !mandatoryModules?.length) return null
+  if (
+    !programmeCode ||
+    !student ||
+    !student.courses ||
+    !student.studyrights ||
+    !mandatoryModules?.defaultProgrammeResults?.length
+  )
+    return null
 
   return (
     <>

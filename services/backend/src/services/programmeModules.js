@@ -2,6 +2,7 @@ const Sequelize = require('sequelize')
 const { ExcludedCourse } = require('../models/models_kone')
 const { Op } = Sequelize
 const logger = require('../util/logger')
+const { combinedStudyprogrammes } = require('./studyprogrammeHelpers.js')
 
 const { dbConnections } = require('../database/connection')
 
@@ -27,6 +28,21 @@ const recursivelyGetModuleAndChildren = async (code, type) => {
   }
 }
 
+// Why only finnish is used???
+const labelProgammes = (filteredProgrammes, excludedProgrammes) => {
+  return filteredProgrammes.map(module => {
+    const label = {
+      id: module.label_name.fi,
+      label: `${module.label_code}\n${module.label_name.fi}`,
+      orderNumber: module.module_order,
+    }
+    // check if course is excluded, and hide if it is
+    const foundCourse = excludedProgrammes.find(course => course.course_code === module.code)
+    const visible = { visibility: !foundCourse, id: foundCourse ? foundCourse.id : null }
+
+    return { ...module, label, visible }
+  })
+}
 const byProgrammeCode = async code => {
   const result = await recursivelyGetModuleAndChildren(code, 'course')
   if (!result.length) return []
@@ -45,27 +61,52 @@ const byProgrammeCode = async code => {
   )
 
   // this labels the modules to match the old system in frontend
-  const labeled = filtered.map(module => {
-    const label = {
-      id: module.label_name.fi,
-      label: `${module.label_code}\n${module.label_name.fi}`,
-      orderNumber: module.module_order,
+  const labeled = labelProgammes(filtered, excluded)
+
+  // Some studyprogrammes (e.g. eläinlääkis) are combined as bachelor-master
+  const isCombined = Object.keys(combinedStudyprogrammes).includes(code)
+  let secondProgrammelabeled = []
+  if (isCombined) {
+    const secondProgCode = combinedStudyprogrammes[code][1]
+    const secondProgrammeResult = await recursivelyGetModuleAndChildren(secondProgCode, 'course')
+    // Now do the same things for the second set of results as for the first
+    if (secondProgrammeResult.length) {
+      const excludedSecondProgrammes = await ExcludedCourse.findAll({
+        where: {
+          programme_code: {
+            [Op.eq]: secondProgCode,
+          },
+        },
+      })
+
+      // filter out possible duplicates
+      const secondFiltered = secondProgrammeResult.filter(
+        (course, index, array) =>
+          array.findIndex(c => c.id == course.id && c.code == course.code && c.label_code == course.label_code) == index
+      )
+
+      // this labels the modules to match the old system in frontend
+      secondProgrammelabeled = labelProgammes(secondFiltered, excludedSecondProgrammes)
     }
-    // check if course is excluded, and hide if it is
-    const foundCourse = excluded.find(course => course.course_code === module.code)
-    const visible = { visibility: !foundCourse, id: foundCourse ? foundCourse.id : null }
-
-    return { ...module, label, visible }
-  })
-
-  return labeled
+  }
+  // The second results are for combined programme views
+  return { defaultProgrammeCourses: labeled, secondProgrammeCourses: secondProgrammelabeled }
 }
 
 const addExcludedCourses = async (programmecode, coursecodes) => {
   return ExcludedCourse.bulkCreate(coursecodes.map(c => ({ programme_code: programmecode, course_code: c })))
 }
+
 const modulesByProgrammeCode = async code => {
-  return await recursivelyGetModuleAndChildren(code, 'module')
+  const programmeResults = await recursivelyGetModuleAndChildren(code, 'module')
+
+  let secondProgrammeResults = []
+  if (Object.keys(combinedStudyprogrammes).includes(code)) {
+    const masterProgCode = combinedStudyprogrammes[code]
+    secondProgrammeResults = await recursivelyGetModuleAndChildren(masterProgCode, 'module')
+  }
+  // The second results are for combined programme views
+  return { defaultProgrammeResults: programmeResults, secondProgrammeResults: secondProgrammeResults }
 }
 
 const removeExcludedCourses = async ids => {

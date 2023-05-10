@@ -62,6 +62,7 @@ const GeneralTab = ({
   const queryStudyrights = query ? Object.values(query.studyRights) : []
   const cleanedQueryStudyrights = queryStudyrights.filter(sr => !!sr)
   const programmeCode = cleanedQueryStudyrights[0] || group?.tags?.studyProgramme
+  const combinedProgrammeCode = cleanedQueryStudyrights.length > 1 ? cleanedQueryStudyrights[1] : ''
 
   const popupTimeoutLength = 1000
   let timeout = null
@@ -191,6 +192,14 @@ const GeneralTab = ({
   const studentToStudyrightEndMap = selectedStudents.reduce((res, sn) => {
     const targetStudyright = students[sn].studyrights.find(studyright =>
       studyright.studyright_elements.some(e => e.code === programmeCode)
+    )
+    res[sn] = targetStudyright && targetStudyright.graduated === 1 ? targetStudyright.enddate : null
+    return res
+  }, {})
+
+  const studentToSecondStudyrightEndMap = selectedStudents.reduce((res, sn) => {
+    const targetStudyright = students[sn].studyrights.find(studyright =>
+      studyright.studyright_elements.some(e => e.code === combinedProgrammeCode)
     )
     res[sn] = targetStudyright && targetStudyright.graduated === 1 ? targetStudyright.enddate : null
     return res
@@ -366,7 +375,7 @@ const GeneralTab = ({
             !s.obfuscated && (
               <Item
                 as="a"
-                href={`https://sis-helsinki.funidata.fi/tutor/role/staff/student/${s.sis_person_id}/basic/basic-info`}
+                href={`https://sisu.helsinki.funidata.fi/tutor/role/staff/student/${s.sis_person_id}/basic/basic-info`}
                 target="_blank"
                 onClick={() => {
                   sendAnalytics('Student link to Sisu clicked', 'General tab')
@@ -417,6 +426,19 @@ const GeneralTab = ({
       getRowContent: s =>
         studentToStudyrightEndMap[s.studentNumber]
           ? reformatDate(studentToStudyrightEndMap[s.studentNumber], 'YYYY-MM-DD')
+          : '',
+    },
+    endDateSecondPhase: {
+      key: 'endDateSecondPhase',
+      title: '2nd Graduation date',
+      filterType: 'date',
+      getRowVal: s =>
+        studentToSecondStudyrightEndMap[s.studentNumber]
+          ? new Date(studentToSecondStudyrightEndMap[s.studentNumber])
+          : '',
+      getRowContent: s =>
+        studentToSecondStudyrightEndMap[s.studentNumber]
+          ? reformatDate(studentToSecondStudyrightEndMap[s.studentNumber], 'YYYY-MM-DD')
           : '',
     },
     semesterEnrollments: {
@@ -590,7 +612,7 @@ const GeneralTab = ({
 }
 
 // study guidance groups -feature uses different population + rtk query, so it needs to
-// be rendered differently. TODO: should rafactor this, maybe with using allStudents
+// be rendered differently. TODO: should refactor this, maybe with using allStudents
 // from useFilters and making sure that it contains same students than the population
 // backend returns with population query below (so caching works)
 const StudyGuidanceGroupGeneralTabContainer = ({ group, ...props }) => {
@@ -635,7 +657,8 @@ const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
     ],
     studyGuidanceGroupPopulation: getStudyGuidanceGroupColumns(),
   }
-
+  if (populations?.query?.studyRights?.combinedProgramme && variant === 'population')
+    columnsByVariant[variant].push('endDateSecondPhase')
   const baseColumns = ['credits', 'credits.all', 'studentnumber-parent', 'tags', 'updatedAt', 'option']
   const nameColumnsToAdd = namesVisible ? ['email', 'lastname', 'firstname'] : []
   const adminColumnsToFilter = isAdmin ? [] : ['priority', 'extent', 'updatedAt']

@@ -61,7 +61,12 @@ const updateCourseStatisticsCriteria = (courseStats, language, state, mandatoryC
   }
 
   const mandatoryFilter = ({ course }) => {
-    return mandatoryCourses.some(c => c.code === course.code)
+    return (
+      (mandatoryCourses.defaultProgrammeCourses &&
+        mandatoryCourses.defaultProgrammeCourses.some(c => c.code === course.code)) ||
+      (mandatoryCourses.secondProgrammeCourses &&
+        mandatoryCourses.secondProgrammeCourses.some(c => c.code === course.code))
+    )
   }
 
   const filteredCourses =
@@ -154,7 +159,12 @@ const PopulationCourseStats = props => {
     }
 
     const visibleCoursesFilter = ({ course }) => {
-      return mandatoryCourses.some(c => c.code === course.code && c.visible && c.visible.visibility)
+      return (
+        (mandatoryCourses.defaultProgrammeCourses &&
+          mandatoryCourses.defaultProgrammeCourses.some(c => c.code === course.code)) ||
+        (mandatoryCourses.secondProgrammeCourses &&
+          mandatoryCourses.secondProgrammeCourses.some(c => c.code === course.code))
+      )
     }
 
     const studentAmountFilter = ({ stats }) => {
@@ -173,8 +183,14 @@ const PopulationCourseStats = props => {
         // because there can be many mandatoryCourses with the same course code
         // as they can belong to many categories
         .flatMap(c => {
-          const courses = mandatoryCourses.filter(mc => mc.code === c.course.code)
-          return courses.map(course => ({ ...c, ...course }))
+          const defaultProgrammeCourses = mandatoryCourses.defaultProgrammeCourses.filter(
+            mc => mc.code === c.course.code
+          )
+          const secondProgrammeCourses = mandatoryCourses.secondProgrammeCourses.filter(mc => mc.code === c.course.code)
+          return [
+            ...defaultProgrammeCourses.map(course => ({ ...c, ...course })),
+            ...secondProgrammeCourses.map(course => ({ ...c, ...course })),
+          ]
         })
 
     const lodashSortOrder = reversed ? lodashSortOrderTypes.DESC : lodashSortOrderTypes.ASC

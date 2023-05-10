@@ -22,7 +22,7 @@ const StudyGuidanceGroupPopulationCourses = ({
 
   useEffect(() => {
     // ensure mandatory courses are available for course stats structured
-    if (showStructured && studyProgramme && mandatoryCourses.length === 0) {
+    if (showStructured && studyProgramme && !mandatoryCourses?.defaultProgrammeCourses) {
       dispatch(getMandatoryCourses(studyProgramme))
     }
   }, [showStructured])

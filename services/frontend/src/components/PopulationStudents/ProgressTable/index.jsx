@@ -14,6 +14,7 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
   const mandatoryCourses = useSelector(state => state?.populationMandatoryCourses?.data)
   const namesVisible = useSelector(state => state?.settings?.namesVisible)
   const isStudyGuidanceGroupProgramme = studyGuidanceGroupProgramme !== ''
+
   const findRowContent = (s, courseCode, year, start, end) => {
     if (courseCode.includes('Credits'))
       return s.criteriaProgress[year] && s.criteriaProgress[year].credits ? (
@@ -59,7 +60,13 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
   }
 
   const credtiMonths = [12, 24, 36, 48, 60, 72]
-  const courses = keyBy(mandatoryCourses, 'code')
+  const defaultCourses = keyBy(mandatoryCourses.defaultProgrammeCourses, 'code')
+  const coursesSecondProgramme = keyBy(mandatoryCourses.secondProgrammeCourses, 'code')
+  const getCourseName = courseCode => {
+    if (defaultCourses[courseCode]) return defaultCourses[courseCode].name
+    if (coursesSecondProgramme[courseCode]) return coursesSecondProgramme[courseCode].name
+    return ''
+  }
   const labelCriteria = Object.keys(criteria.courses).reduce((acc, year, idx) => {
     acc[year] = [
       {
@@ -74,7 +81,7 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
         .sort((a, b) => a.localeCompare(b))
         .map(courseCode => ({
           code: courseCode,
-          name: courses[courseCode] ? courses[courseCode].name : '',
+          name: getCourseName(courseCode),
         })),
       {
         code: `Criteria`,
@@ -139,7 +146,6 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
       }
       return { ...propObj, title: helpTexts[0] }
     }
-
     if (courses && courses.some(course => course.passed))
       return { ...propObj, title: `Passed-${moment(courses[0].date).format('YYYY-MM-DD')}` }
     if (courses && courses.some(course => course.passed === false))

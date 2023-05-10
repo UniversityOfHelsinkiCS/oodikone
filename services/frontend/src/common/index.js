@@ -22,6 +22,21 @@ export const checkUserAccess = (requiredRoles, roles) => {
   return intersection(requiredRoles, roles).length > 0
 }
 
+export const studentToStudyrightStartMap = (students, programmeCode) => {
+  students.reduce((res, sn) => {
+    const currentStudyright = sn.studyrights?.find(studyright =>
+      studyright.studyright_elements.some(e => e.code === programmeCode)
+    )
+    if (currentStudyright?.studyrightid && currentStudyright.studyrightid.slice(-2) === '-2') {
+      const bachelorId = currentStudyright.studyrightid.replace(/-2$/, '-1')
+      const bacherlorStudyright = sn.studyrights.find(studyright => studyright.studyrightid === bachelorId)
+      res[sn.studentNumber] = bacherlorStudyright?.startdate || null
+    } else {
+      res[sn.studentNumber] = currentStudyright?.startdate || null
+    }
+    return res
+  }, {})
+}
 export const containsOnlyNumbers = str => str.match('^\\d+$')
 
 export const momentFromFormat = (date, format) => moment(date, format)

@@ -13,49 +13,37 @@ import sendEvent from '../../../common/sendEvent'
 const sendAnalytics = sendEvent.populationStudents
 
 const getMandatoryPassed = (mandatoryCourses, populationCourses, studyGuidanceCourses) => {
-  if (!mandatoryCourses || (!populationCourses && !studyGuidanceCourses)) return {}
-  const mandatoryCodes = mandatoryCourses.filter(course => course.visible && course.visible.visibility).map(c => c.code)
+  if (!mandatoryCourses || !mandatoryCourses.defaultProgrammeCourses || (!populationCourses && !studyGuidanceCourses))
+    return {}
+  const mandatoryCodes = [
+    ...mandatoryCourses.defaultProgrammeCourses
+      .filter(course => course.visible && course.visible.visibility)
+      .map(c => c.code),
+    ...mandatoryCourses.secondProgrammeCourses
+      .filter(course => course.visible && course.visible.visibility)
+      .map(c => c.code),
+  ]
+
   let mandatoryPassed = {}
   const popCourses = populationCourses || studyGuidanceCourses
   if (popCourses.coursestatistics) {
-    const mandatorycodesMapCourseCodeToCourseID = new Map()
-    mandatoryCourses
-      .filter(course => course.visible && course.visible.visibility)
-      .forEach(c => mandatorycodesMapCourseCodeToCourseID.set(c.code, c.id))
-
-    const courses = popCourses.coursestatistics
+    const courseStats = popCourses.coursestatistics
     mandatoryPassed = mandatoryCodes.reduce((obj, code) => {
-      const foundCourse = !!courses.find(c => c.course.code === code)
+      const foundCourse = !!courseStats.find(c => c.course.code === code)
 
-      const searchCode = mandatorycodesMapCourseCodeToCourseID.get(code)
-
-      let foundSubsCourse
-      if (searchCode) {
-        foundSubsCourse = courses.find(c => {
-          if (!c.course.substitutions) return false
-          if (c.course.substitutions.length === null) return false
-          return c.course.substitutions.includes(searchCode)
-        })
-      }
-      let passedArray = foundCourse ? Object.keys(courses.find(c => c.course.code === code).students.passed) : null
-      if (foundSubsCourse) {
-        passedArray = passedArray
-          ? [...passedArray, ...Object.keys(foundSubsCourse.students.passed)]
-          : Object.keys(foundSubsCourse.students.passed)
-      }
+      const passedArray = foundCourse ? Object.keys(courseStats.find(c => c.course.code === code).students.passed) : []
       obj[code] = passedArray
       return obj
     }, {})
   }
-
   return mandatoryPassed
 }
+
 const CoursesTable = ({ students, studyGuidanceCourses }) => {
   const { getTextIn } = useLanguage()
   const namesVisible = useSelector(state => state?.settings?.namesVisible)
-  const mandatoryCourses = useSelector(state => state?.populationMandatoryCourses?.data)
+  const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses?.data)
   const { data: populationCourses, pending } = useSelector(state => state?.populationSelectedStudentCourses)
-
   const mandatoryPassed = useMemo(
     () => getMandatoryPassed(mandatoryCourses, populationCourses, studyGuidanceCourses),
     [mandatoryCourses, populationCourses, studyGuidanceCourses]
@@ -67,7 +55,9 @@ const CoursesTable = ({ students, studyGuidanceCourses }) => {
   )
 
   const totalMandatoryPassed = useCallback(
-    studentNumber => _.sumBy(mandatoryCourses, ({ code }) => hasPassedMandatory(studentNumber, code)),
+    studentNumber =>
+      _.sumBy(mandatoryCourses.defaultProgrammeCourses, ({ code }) => hasPassedMandatory(studentNumber, code)) +
+      _.sumBy(mandatoryCourses.secondProgrammeCourses, ({ code }) => hasPassedMandatory(studentNumber, code)),
     [mandatoryCourses, hasPassedMandatory]
   )
 
@@ -135,16 +125,18 @@ const CoursesTable = ({ students, studyGuidanceCourses }) => {
     )
 
     const mandatoryCourseLabels = []
-
-    const labelToMandatoryCourses = mandatoryCourses.reduce((acc, e) => {
-      const label = e.label ? e.label.label : ''
-      acc[label] = acc[label] || []
-      if (acc[label].some(l => l.code === e.code)) return acc
-      acc[label].push(e)
-      if (e.label) mandatoryCourseLabels.push({ ...e.label, code: e.label_code })
-      else mandatoryCourseLabels.push({ id: 'null', label: '', code: '' })
-      return acc
-    }, {})
+    // REVISIT ELÄINLÄÄKIS
+    const labelToMandatoryCourses = mandatoryCourses.defaultProgrammeCourses
+      ? mandatoryCourses.defaultProgrammeCourses.reduce((acc, e) => {
+          const label = e.label ? e.label.label : ''
+          acc[label] = acc[label] || []
+          if (acc[label].some(l => l.code === e.code)) return acc
+          acc[label].push(e)
+          if (e.label) mandatoryCourseLabels.push({ ...e.label, code: e.label_code })
+          else mandatoryCourseLabels.push({ id: 'null', label: '', code: '' })
+          return acc
+        }, {})
+      : []
 
     const sortedlabels = orderBy(
       uniqBy(mandatoryCourseLabels, l => l.label),
@@ -152,17 +144,19 @@ const CoursesTable = ({ students, studyGuidanceCourses }) => {
       ['asc']
     )
 
-    const { visibleLabels, visibleCourseCodes } = mandatoryCourses.reduce(
-      (acc, cur) => {
-        if (cur.visible && cur.visible.visibility) {
-          acc.visibleLabels.add(cur.label_code)
-          acc.visibleCourseCodes.add(cur.code)
-        }
+    const { visibleLabels, visibleCourseCodes } = mandatoryCourses.defaultProgrammeCourses
+      ? mandatoryCourses.defaultProgrammeCourses.reduce(
+          (acc, cur) => {
+            if (cur.visible && cur.visible.visibility) {
+              acc.visibleLabels.add(cur.label_code)
+              acc.visibleCourseCodes.add(cur.code)
+            }
 
-        return acc
-      },
-      { visibleLabels: new Set(), visibleCourseCodes: new Set() }
-    )
+            return acc
+          },
+          { visibleLabels: new Set(), visibleCourseCodes: new Set() }
+        )
+      : [{ visibleLabels: new Set(), visibleCourseCodes: new Set() }]
 
     const getTotalRowVal = (t, m) => t[m.code]
 
@@ -276,24 +270,28 @@ const CoursesTable = ({ students, studyGuidanceCourses }) => {
     const totals = students.reduce(
       (acc, s) => {
         const passedCourses = new Set()
-        mandatoryCourses.forEach(m => {
-          if (passedCourses.has(m.code)) return
-          passedCourses.add(m.code)
-          if (hasPassedMandatory(s.studentNumber, m.code)) ++acc[m.code]
-        })
+        if (mandatoryCourses.defaultProgrammeCourses) {
+          mandatoryCourses.defaultProgrammeCourses.forEach(m => {
+            if (passedCourses.has(m.code)) return
+            passedCourses.add(m.code)
+            if (hasPassedMandatory(s.studentNumber, m.code)) ++acc[m.code]
+          })
+        }
         return acc
       },
-      mandatoryCourses.reduce((acc, e) => ({ ...acc, [e.code]: 0 }), { total: true })
+      mandatoryCourses.defaultProgrammeCourses
+        ? mandatoryCourses.defaultProgrammeCourses.reduce((acc, e) => ({ ...acc, [e.code]: 0 }), { total: true })
+        : { total: true }
     )
 
-    return [row(totals, { ignoreFilters: true }), ...students]
-  }, [students, mandatoryCourses, hasPassedMandatory])
-
+    return [row(totals, { ignoreFilters: false }), ...students]
+  }, [students, mandatoryCourses, hasPassedMandatory, mandatoryPassed])
+  // ELÄINLÄÄKKIS REVISIT
   return (
     <Tab.Pane loading={pending}>
       <div style={{ display: 'flex' }}>
         <div style={{ maxHeight: '80vh', width: '100%' }}>
-          {mandatoryCourses.length > 0 && (
+          {mandatoryCourses.defaultProgrammeCourses && mandatoryCourses.defaultProgrammeCourses.length > 0 && (
             <SortableTable
               tableId="course-of-population-students"
               title={`Courses of population's students`}
