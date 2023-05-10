@@ -60,7 +60,7 @@ const PopulationStatisticsLink = ({ studytrack, studyprogramme, combinedProgramm
 const TotalPopulationLink = ({ studytrack, studyprogramme, combinedProgramme, years }) => {
   const yearsString = years.join('&years=')
   const months = getMonths(Math.min(...years.map(year => Number(year))))
-  const href = getTotalPopulationLink(studytrack, studyprogramme, combinedProgramme, years, months, yearsString)
+  const href = getTotalPopulationLink(studytrack, studyprogramme, combinedProgramme, months, yearsString)
   return (
     <Link title="Population statistics of all years" to={href}>
       <Icon name="level up alternate" />
