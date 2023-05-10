@@ -3,7 +3,7 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { Dropdown } from 'semantic-ui-react'
 import xlsx from 'xlsx'
-import { getTextIn, reformatDate, getStudentTotalCredits } from '../../common'
+import { getTextIn, reformatDate, getStudentTotalCredits, studentToStudyrightStartMap } from '../../common'
 import sendEvent from '../../common/sendEvent'
 import { PRIORITYCODE_TEXTS } from '../../constants'
 import useLanguage from '../LanguagePicker/useLanguage'
@@ -22,16 +22,26 @@ export default ({ students, programmeCode }) => {
   const queryYear = useSelector(({ populations }) => populations?.query?.year)
 
   const mandatoryPassed = () => {
-    const mandatoryCodes = mandatoryCourses
+    const mandatoryCodes = mandatoryCourses?.defaultProgrammeCourses
+      .filter(course => course.visible && course.visible.visibility)
+      .map(c => c.code)
+    const mandatoryCodesSecondProgramme = mandatoryCourses.secondProgrammeCourses
       .filter(course => course.visible && course.visible.visibility)
       .map(c => c.code)
     let mandatoryPassedCourses = {}
     if (courses) {
-      mandatoryPassedCourses = mandatoryCodes.reduce((obj, code) => {
-        const foundCourse = courses.find(c => c.course.code === code)
-        obj[code] = foundCourse ? Object.keys(courses.find(c => c.course.code === code).students.passed) : null
-        return obj
-      }, {})
+      mandatoryPassedCourses = {
+        ...mandatoryCodes.reduce((obj, code) => {
+          const foundCourse = courses.find(c => c.course.code === code)
+          obj[code] = foundCourse ? Object.keys(courses.find(c => c.course.code === code).students.passed) : null
+          return obj
+        }, {}),
+        ...mandatoryCodesSecondProgramme.reduce((obj, code) => {
+          const foundCourse = courses.find(c => c.course.code === code)
+          obj[code] = foundCourse ? Object.keys(courses.find(c => c.course.code === code).students.passed) : null
+          return obj
+        }, {}),
+      }
     }
     return mandatoryPassedCourses
   }
@@ -133,20 +143,6 @@ export default ({ students, programmeCode }) => {
         return res ? Number(res[0]) : Number.MAX_VALUE
       },
     ])
-    // Exact same code in GeneralTab REFACTOR (function in common/index.js file?)
-    const studentToStudyrightStartMap = students.reduce((res, sn) => {
-      const currentStudyright = sn.studyrights?.find(studyright =>
-        studyright.studyright_elements.some(e => e.code === programmeCode)
-      )
-      if (currentStudyright?.studyrightid && currentStudyright.studyrightid.slice(-2) === '-2') {
-        const bachelorId = currentStudyright.studyrightid.replace(/-2$/, '-1')
-        const bacherlorStudyright = sn.studyrights.find(studyright => studyright.studyrightid === bachelorId)
-        res[sn.studentNumber] = bacherlorStudyright?.startdate || null
-      } else {
-        res[sn.studentNumber] = currentStudyright?.startdate || null
-      }
-      return res
-    }, {})
 
     const studentToProgrammeStartMap = students.reduce((res, sn) => {
       const targetStudyright = flatten(
@@ -157,7 +153,10 @@ export default ({ students, programmeCode }) => {
       ).filter(e => e.code === programmeCode)
       // clean up odd bachelor start dates, (givendate)
       res[sn.studentNumber] = new Date(
-        Math.max(new Date(targetStudyright[0]?.startdate), new Date(studentToStudyrightStartMap[sn.studentNumber]))
+        Math.max(
+          new Date(targetStudyright[0]?.startdate),
+          new Date(studentToStudyrightStartMap(students, programmeCode)[sn.studentNumber])
+        )
       )
       return res
     }, {})

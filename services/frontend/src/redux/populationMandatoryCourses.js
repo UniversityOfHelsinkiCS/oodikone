@@ -52,7 +52,7 @@ export const deleteMandatoryCourse = (id, course) => {
   return callController(route, prefix, data, method)
 }
 
-const reducer = (state = { data: [] }, action) => {
+const reducer = (state = { data: {} }, action) => {
   switch (action.type) {
     case 'GET_MANDATORY_COURSES_ATTEMPT':
       return {

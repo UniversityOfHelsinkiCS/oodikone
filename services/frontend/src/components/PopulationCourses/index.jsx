@@ -55,9 +55,14 @@ const PopulationCourses = ({ query = {}, filteredStudents, selectedStudentsByYea
       !mandatoryCourses.pending &&
       !queryHasBeenUpdated() &&
       !populationSelectedStudentCourses.pending &&
-      mandatoryCourses.data.length > 0
-    )
-      fetch(mandatoryCourses.data.map(({ code }) => code))
+      mandatoryCourses?.data?.defaultProgrammeCourses
+    ) {
+      // Mandatory courses is an object due to possibility of combined programmes (e.g. eläinlääkis)
+      const mandatoryCourseCodes = mandatoryCourses.data.defaultProgrammeCourses.map(({ code }) => code)
+      const mandatoryCourseCodesSecondProg = mandatoryCourses.data.secondProgrammeCourses.map(({ code }) => code)
+      const programmeCodesToFetch = [...mandatoryCourseCodes, ...mandatoryCourseCodesSecondProg]
+      fetch(programmeCodesToFetch)
+    }
   }, [query, filteredStudents, mandatoryCourses, populationSelectedStudentCourses])
 
   const selectedPopulationCourses = populationSelectedStudentCourses.data

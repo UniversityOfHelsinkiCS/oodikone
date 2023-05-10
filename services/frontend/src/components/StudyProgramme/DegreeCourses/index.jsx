@@ -51,9 +51,10 @@ const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, re
   }, [creditsData])
 
   useEffect(() => {
-    if (!mandatoryCourses || !mandatoryCourses.length) return
+    // ELÄINLÄÄKKIS REVISIT
+    if (!mandatoryCourses || !mandatoryCourses?.defaultProgrammeCourses?.length) return
     const modules = {}
-    mandatoryCourses.forEach(course => {
+    mandatoryCourses.defaultProgrammeCourses.forEach(course => {
       const code = course.label_code
       if (!modules[code]) {
         modules[code] = []
