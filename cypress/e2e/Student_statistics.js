@@ -78,7 +78,7 @@ describe('Student Statistics tests', () => {
     cy.contains('td a', student.studentnumber).click()
     cy.get('[data-cy=sisulink] > a')
       .should('have.attr', 'href')
-      .and('include', 'https://sis-helsinki.funidata.fi/tutor/role/staff/student/hy-hlo-84830887/basic/basic-info')
+      .and('include', 'https://sisu.helsinki.fi/tutor/role/staff/student/hy-hlo-84830887/basic/basic-info')
   })
 
   it('Searching with bad inputs doesnt yield results', () => {
