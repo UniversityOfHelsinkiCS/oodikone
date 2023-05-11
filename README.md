@@ -30,6 +30,7 @@ npm run cli
 
 _Please use a terminal at least 80 characters wide, the CLI is a bit rudimentary_ 😊
 
+
 What different CLI options do:
 
 1. Set up oodikone from scratch:
