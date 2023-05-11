@@ -148,7 +148,7 @@ const GeneralTab = ({
       populationStatistics.elementdetails.data
     )
     if (programme && programme.code !== '00000') {
-      return programme.name
+      return programme
     }
     const filteredEnrollments = enrollments
       // eslint-disable-next-line camelcase
@@ -160,7 +160,7 @@ const GeneralTab = ({
       studentNumber,
       { [studentNumber]: filteredEnrollments[0].enrollment_date_time },
       populationStatistics.elementdetails.data
-    ).name
+    )
   }
 
   const studentToStudyrightStartMap = selectedStudents.reduce((res, sn) => {
@@ -414,12 +414,25 @@ const GeneralTab = ({
       key: 'studyStartDate',
       title: 'Started in\nprogramme',
       filterType: 'date',
-      getRowVal: s => studentToProgrammeStartMap[s.studentNumber],
-      formatValue: value => reformatDate(new Date(value), 'YYYY-MM-DD'),
+      getRowVal: s => {
+        if (programmeCode !== undefined) {
+          return studentToProgrammeStartMap[s.studentNumber]
+        }
+
+        const programme = mainProgramme(s.studyrights, s.studentNumber, s.enrollments)
+        if (programme?.startdate) {
+          return programme.startdate
+        }
+        return '-'
+      },
+      formatValue: value => {
+        if (value === '-') return value
+        return reformatDate(new Date(value), 'YYYY-MM-DD')
+      },
     },
     endDate: {
       key: 'endDate',
-      title: 'Graduation date',
+      title: 'Graduation\ndate',
       filterType: 'date',
       getRowVal: s =>
         studentToStudyrightEndMap[s.studentNumber] ? new Date(studentToStudyrightEndMap[s.studentNumber]) : '',
@@ -440,6 +453,12 @@ const GeneralTab = ({
         studentToSecondStudyrightEndMap[s.studentNumber]
           ? reformatDate(studentToSecondStudyrightEndMap[s.studentNumber], 'YYYY-MM-DD')
           : '',
+    },
+    programme: {
+      key: 'programme',
+      title: 'Study Programme',
+      getRowVal: s =>
+        getTextIn(mainProgramme(s.studyrights, s.studentNumber, s.enrollments)?.name, language) || 'No programme',
     },
     semesterEnrollments: {
       key: 'semesterEnrollments',
@@ -464,12 +483,7 @@ const GeneralTab = ({
         return studyright && studyright.admission_type ? studyright.admission_type : 'Ei valintatapaa'
       },
     },
-    programme: {
-      key: 'programme',
-      title: 'Study Programme',
-      getRowVal: s =>
-        getTextIn(mainProgramme(s.studyrights, s.studentNumber, s.enrollments), language) || 'No programme',
-    },
+
     passDate: {
       key: 'passDate',
       title: 'Attainment date',
@@ -495,7 +509,7 @@ const GeneralTab = ({
     },
     startYear: {
       key: 'startYear',
-      title: 'Start Year at Uni',
+      title: 'Start Year\nat Uni',
       filterType: 'range',
       getRowVal: s => getStarted(s),
     },
@@ -640,7 +654,15 @@ const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
 
   const columnsByVariant = {
     customPopulation: ['programme', 'startYear'],
-    coursePopulation: ['gradeForSingleCourse', 'programme', 'passDate', 'enrollmentDate', 'language', 'startYear'],
+    coursePopulation: [
+      'gradeForSingleCourse',
+      'programme',
+      'passDate',
+      'studyStartDate',
+      'enrollmentDate',
+      'language',
+      'startYear',
+    ],
     population: [
       'transferredFrom',
       'credits.hops',
