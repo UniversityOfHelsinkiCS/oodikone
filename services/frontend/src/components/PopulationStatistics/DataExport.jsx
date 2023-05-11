@@ -23,11 +23,15 @@ export default ({ students, programmeCode }) => {
 
   const mandatoryPassed = () => {
     const mandatoryCodes = mandatoryCourses?.defaultProgrammeCourses
-      .filter(course => course.visible && course.visible.visibility)
-      .map(c => c.code)
-    const mandatoryCodesSecondProgramme = mandatoryCourses.secondProgrammeCourses
-      .filter(course => course.visible && course.visible.visibility)
-      .map(c => c.code)
+      ? mandatoryCourses?.defaultProgrammeCourses
+          .filter(course => course.visible && course.visible.visibility)
+          .map(c => c.code)
+      : []
+    const mandatoryCodesSecondProgramme = mandatoryCourses?.secondProgrammeCourses
+      ? mandatoryCourses.secondProgrammeCourses
+          .filter(course => course.visible && course.visible.visibility)
+          .map(c => c.code)
+      : []
     let mandatoryPassedCourses = {}
     if (courses) {
       mandatoryPassedCourses = {
@@ -132,7 +136,8 @@ export default ({ students, programmeCode }) => {
   const hasPassedMandatory = (studentNumber, code, codes) => {
     return codes[code] && codes[code].includes(studentNumber)
   }
-  const totalMandatoryPassed = (studentNumber, codes) => {
+  const totalMandatoryPassed = (studentNumber, codes, programmeCode) => {
+    if (!programmeCode) return 0
     return (
       mandatoryCourses.defaultProgrammeCourses.reduce(
         (acc, m) => (hasPassedMandatory(studentNumber, m.code, codes) ? acc + 1 : acc),
@@ -146,15 +151,18 @@ export default ({ students, programmeCode }) => {
   }
   const generateWorkbook = () => {
     const codes = mandatoryPassed()
-    const sortedMandatory = sortBy(
-      [...mandatoryCourses.defaultProgrammeCourses, ...mandatoryCourses.secondProgrammeCourses],
-      [
-        m => {
-          const res = m.code.match(/\d+/)
-          return res ? Number(res[0]) : Number.MAX_VALUE
-        },
-      ]
-    )
+    const sortedMandatory = programmeCode
+      ? sortBy(
+          [...mandatoryCourses.defaultProgrammeCourses, ...mandatoryCourses.secondProgrammeCourses],
+          [
+            m => {
+              const res = m.code.match(/\d+/)
+              return res ? Number(res[0]) : Number.MAX_VALUE
+            },
+          ]
+        )
+      : []
+
     const studentToStudyrightStarts = studentToStudyrightStartMap(students, programmeCode)
     const studentToProgrammeStartMap = students.reduce((res, sn) => {
       const targetStudyright = flatten(
@@ -195,7 +203,7 @@ export default ({ students, programmeCode }) => {
         'admission type': parseInt(queryYear, 10 >= 2020) ? getAdmissionType(s.studyrights) : undefined,
         bachelor: s.option ? getTextIn(s.option.name, language) : '',
         'updated at': reformatDate(s.updatedAt, 'YYYY-MM-DD  hh:mm:ss'),
-        'mandatory total passed': totalMandatoryPassed(s.studentNumber, codes),
+        'mandatory total passed': totalMandatoryPassed(s.studentNumber, codes, programmeCode),
         ...sortedMandatory.reduce((acc, m) => {
           acc[`${getTextIn(m.name, language)} ${m.code}`] = hasPassedMandatory(s.studentNumber, m.code, codes)
           return acc
