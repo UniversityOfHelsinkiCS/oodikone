@@ -133,17 +133,29 @@ export default ({ students, programmeCode }) => {
     return codes[code] && codes[code].includes(studentNumber)
   }
   const totalMandatoryPassed = (studentNumber, codes) => {
-    return mandatoryCourses.reduce((acc, m) => (hasPassedMandatory(studentNumber, m.code, codes) ? acc + 1 : acc), 0)
+    return (
+      mandatoryCourses.defaultProgrammeCourses.reduce(
+        (acc, m) => (hasPassedMandatory(studentNumber, m.code, codes) ? acc + 1 : acc),
+        0
+      ) +
+      mandatoryCourses.secondProgrammeCourses.reduce(
+        (acc, m) => (hasPassedMandatory(studentNumber, m.code, codes) ? acc + 1 : acc),
+        0
+      )
+    )
   }
   const generateWorkbook = () => {
     const codes = mandatoryPassed()
-    const sortedMandatory = sortBy(mandatoryCourses, [
-      m => {
-        const res = m.code.match(/\d+/)
-        return res ? Number(res[0]) : Number.MAX_VALUE
-      },
-    ])
-
+    const sortedMandatory = sortBy(
+      [...mandatoryCourses.defaultProgrammeCourses, ...mandatoryCourses.secondProgrammeCourses],
+      [
+        m => {
+          const res = m.code.match(/\d+/)
+          return res ? Number(res[0]) : Number.MAX_VALUE
+        },
+      ]
+    )
+    const studentToStudyrightStarts = studentToStudyrightStartMap(students, programmeCode)
     const studentToProgrammeStartMap = students.reduce((res, sn) => {
       const targetStudyright = flatten(
         sn.studyrights.reduce((acc, curr) => {
@@ -153,10 +165,7 @@ export default ({ students, programmeCode }) => {
       ).filter(e => e.code === programmeCode)
       // clean up odd bachelor start dates, (givendate)
       res[sn.studentNumber] = new Date(
-        Math.max(
-          new Date(targetStudyright[0]?.startdate),
-          new Date(studentToStudyrightStartMap(students, programmeCode)[sn.studentNumber])
-        )
+        Math.max(new Date(targetStudyright[0]?.startdate), new Date(studentToStudyrightStarts[sn.studentNumber]))
       )
       return res
     }, {})
