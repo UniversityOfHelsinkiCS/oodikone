@@ -14,6 +14,7 @@ import {
   reformatDate,
   copyToClipboard,
   getHighestGradeOfCourseBetweenRange,
+  getAllProgrammesOfStudent,
 } from 'common'
 import { useGetStudyGuidanceGroupPopulationQuery } from 'redux/studyGuidanceGroups'
 import { useGetAuthorizedUserQuery } from 'redux/auth'
@@ -136,6 +137,29 @@ const GeneralTab = ({
   const tags = tags => {
     const studentTags = tags.map(t => t.tag.tagname)
     return studentTags.join(', ')
+  }
+
+  const getStudentsProgrammeNames = s => {
+    const programmes = getAllProgrammesOfStudent(
+      s.studyrights,
+      s.studentNumber,
+      studentToTargetCourseDateMap,
+      populationStatistics.elementdetails.data
+    )
+    if (programmes[0].code !== '00000' || !s.enrollments) {
+      return programmes.map(prog => getTextIn(prog.name, language))
+    }
+    const filteredEnrollments = s.enrollments
+      // eslint-disable-next-line camelcase
+      .filter(({ course_code }) => coursecode.includes(course_code))
+      .sort((a, b) => new Date(b.enrollment_date_time) - new Date(a.enrollment_date_time))
+    if (!filteredEnrollments.length) return programmes.map(prog => getTextIn(prog.name, language))
+    return getAllProgrammesOfStudent(
+      s.studyrights,
+      s.studentNumber,
+      { [s.studentNumber]: filteredEnrollments[0].enrollment_date_time },
+      populationStatistics.elementdetails.data
+    ).map(prog => getTextIn(prog.name, language))
   }
 
   const semesterEnrollments = enrollments => enrollments.filter(e => e.enrollmenttype === 1).length
@@ -419,7 +443,7 @@ const GeneralTab = ({
           return studentToProgrammeStartMap[s.studentNumber]
         }
 
-        const programme = mainProgramme(s.studyrights, s.studentNumber, s.enrollments)
+        const programme = mainProgramme(s.studyrights, s.studentNumber, s.enrollments) // enrollment = semester enrollment
         if (programme?.startdate) {
           return programme.startdate
         }
@@ -457,19 +481,19 @@ const GeneralTab = ({
     programme: {
       key: 'programme',
       title: 'Study Programme',
-      getRowVal: s =>
+      getRowContent: s =>
         getTextIn(mainProgramme(s.studyrights, s.studentNumber, s.enrollments)?.name, language) || 'No programme',
+      getRowVal: s => getStudentsProgrammeNames(s).join('; '),
+      cellProps: s => {
+        return { title: getStudentsProgrammeNames(s).join('\n') }
+      },
     },
     semesterEnrollments: {
       key: 'semesterEnrollments',
       title: 'Semesters\npresent',
       getRowVal: s => semesterEnrollments(s.semesterenrollments),
     },
-    tags: {
-      key: 'tags',
-      title: 'Tags',
-      getRowVal: s => (!s.obfuscated ? tags(s.tags) : ''),
-    },
+
     transferredFrom: {
       key: 'transferredFrom',
       title: 'Transferred\nfrom',
@@ -582,6 +606,11 @@ const GeneralTab = ({
           cellProps: { className: 'iconCellNoPointer' },
         },
       ],
+    },
+    tags: {
+      key: 'tags',
+      title: 'Tags',
+      getRowVal: s => (!s.obfuscated ? tags(s.tags) : ''),
     },
     updatedAt: {
       key: 'updatedAt',

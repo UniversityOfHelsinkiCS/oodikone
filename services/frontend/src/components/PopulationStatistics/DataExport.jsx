@@ -3,7 +3,7 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { Dropdown } from 'semantic-ui-react'
 import xlsx from 'xlsx'
-import { getTextIn, reformatDate, getStudentTotalCredits, studentToStudyrightStartMap } from '../../common'
+import { getTextIn, reformatDate, getStudentTotalCredits, getStudentToStudyrightStartMap } from '../../common'
 import sendEvent from '../../common/sendEvent'
 import { PRIORITYCODE_TEXTS } from '../../constants'
 import useLanguage from '../LanguagePicker/useLanguage'
@@ -163,7 +163,7 @@ export default ({ students, programmeCode }) => {
         )
       : []
 
-    const studentToStudyrightStarts = studentToStudyrightStartMap(students, programmeCode)
+    const studentToStudyrightStarts = getStudentToStudyrightStartMap(students, programmeCode)
     const studentToProgrammeStartMap = students.reduce((res, sn) => {
       const targetStudyright = flatten(
         sn.studyrights.reduce((acc, curr) => {

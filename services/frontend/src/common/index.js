@@ -22,21 +22,22 @@ export const checkUserAccess = (requiredRoles, roles) => {
   return intersection(requiredRoles, roles).length > 0
 }
 
-export const studentToStudyrightStartMap = (students, programmeCode) => {
-  return students.reduce((res, sn) => {
-    const currentStudyright = sn.studyrights?.find(studyright =>
+export const getStudentToStudyrightStartMap = (students, programmeCode) => {
+  students.reduce((res, student) => {
+    const currentStudyright = student.studyrights?.find(studyright =>
       studyright.studyright_elements.some(e => e.code === programmeCode)
     )
     if (currentStudyright?.studyrightid && currentStudyright.studyrightid.slice(-2) === '-2') {
       const bachelorId = currentStudyright.studyrightid.replace(/-2$/, '-1')
-      const bacherlorStudyright = sn.studyrights.find(studyright => studyright.studyrightid === bachelorId)
-      res[sn.studentNumber] = bacherlorStudyright?.startdate || null
+      const bacherlorStudyright = student.studyrights.find(studyright => studyright.studyrightid === bachelorId)
+      res[student.studentNumber] = bacherlorStudyright?.startdate || null
     } else {
-      res[sn.studentNumber] = currentStudyright?.startdate || null
+      res[student.studentNumber] = currentStudyright?.startdate || null
     }
     return res
   }, {})
 }
+
 export const containsOnlyNumbers = str => str.match('^\\d+$')
 
 export const momentFromFormat = (date, format) => moment(date, format)
@@ -212,7 +213,7 @@ export const getStudentToTargetCourseDateMap = (students, codes) => {
   }, {})
 }
 
-export const getNewestProgramme = (studyrights, studentNumber, studentToTargetCourseDateMap, elementDetails) => {
+export const getAllProgrammesOfStudent = (studyrights, studentNumber, studentToTargetCourseDateMap, elementDetails) => {
   const studyprogrammes = []
   studyrights.forEach(sr => {
     const facultyCode = sr.faculty_code
@@ -241,20 +242,27 @@ export const getNewestProgramme = (studyrights, studentNumber, studentToTargetCo
       })
     }
   })
-  const programme = studyprogrammes.sort((a, b) => new Date(b.startdate) - new Date(a.startdate))[0]
-  if (programme) {
-    return programme
+
+  studyprogrammes.sort((a, b) => new Date(b.startdate) - new Date(a.startdate))
+  if (studyprogrammes.length > 0) {
+    return studyprogrammes
   }
 
   if (studentToTargetCourseDateMap) {
-    return {
-      name: { en: 'No programme at the time of attainment', fi: 'Ei ohjelmaa suorituksen hetkellä' },
-      startdate: '',
-      code: '00000',
-    }
+    return [
+      {
+        name: { en: 'No programme at the time of attainment', fi: 'Ei ohjelmaa suorituksen hetkellä' },
+        startdate: '',
+        code: '00000',
+      },
+    ]
   }
 
-  return { name: { en: 'No programme', fi: 'Ei ohjelmaa' }, startdate: '', code: '00000' }
+  return [{ name: { en: 'No programme', fi: 'Ei ohjelmaa' }, startdate: '', code: '00000' }]
+}
+
+export const getNewestProgramme = (studyrights, studentNumber, studentToTargetCourseDateMap, elementDetails) => {
+  return getAllProgrammesOfStudent(studyrights, studentNumber, studentToTargetCourseDateMap, elementDetails)[0]
 }
 
 export const getHighestGradeOfCourseBetweenRange = (courses, lowerBound, upperBound) => {
