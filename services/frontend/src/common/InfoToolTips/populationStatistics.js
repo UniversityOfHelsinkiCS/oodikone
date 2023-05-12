@@ -121,8 +121,8 @@ export default {
     - **All**  listaa opiskelijan suoritetut opintopisteet valitun tarkastelujakson  ajalta.
     - **Since ... ** listaa opiskelijan suoritetut opintopisteet määritellystä ajankohdasta alkaen
   - **Start of studyright**: Opiskelijan valittuun ohjelmaan liittyvän opinto-oikeuden alkupäivä
+  - **Programme**: Näyttää opiskelijan uusimman opinto-oikeuden. Jos opiskelijalla on opinto-oikeuksia muihinkin koulutusohjelmiin, ne näkyvät aikajärjestyksessä uusimmasta vanhimpaan Excel-tiedostossa, sekä laittamalla hiiri koulutusohjelman päälle.
   - **Started in programme**: Opiskelijan valitussa ohjelmassa aloituspäivämäärä. Kandi+maisteriopiskelijoille kandiksi valmistumispäivämäärä +1.
-  
   `,
   StudentsClass: `**Students**
 
@@ -173,6 +173,9 @@ export default {
   Klikkaamalla "Sisu"-nuolta, siirryt tarkastelemaan opiskelijan tietoja Sisu-järjestelmässä.
   
   **All credits** listaa opiskelijan kaikki opintopisteet (myös aiemmat suoritukset, eli ne jotka tehty ennen valittuun tarkastelujaksoon ja populaatioon kuulumista)
+
+
+  **Programme**-sarake näyttää opiskelijan uusimman opinto-oikeuden. Jos opiskelijalla on opinto-oikeuksia muihinkin koulutusohjelmiin, ne näkyvät aikajärjestyksessä uusimmasta vanhimpaan Excel-tiedostossa, sekä laittamalla hiiri koulutusohjelman päälle.
 
   `,
   Filters: {

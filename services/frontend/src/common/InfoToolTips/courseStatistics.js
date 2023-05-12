@@ -24,6 +24,8 @@ export default {
       myöhemmin keväällä 2019, tulisi merkityksi lukuvuodelle 2017-2018 sarakkeeseen "passed eventually".  
       
       Total-rivillä näkyy niiden opiskelijoiden kokonaismäärä, jotka ovat kurssista joskus arvosanan saaneet.
+
+      **Programme**-sarake näyttää opiskelijan uusimman opinto-oikeuden sillä hetkellä, kun hän ilmoittautui valitulle kurssille. Jos opiskelijalla on ollut silloin opinto-oikeuksia muihinkin koulutusohjelmiin, ne näkyvät aikajärjestyksessä uusimmasta vanhimpaan Excel-tiedostossa, sekä laittamalla hiiri koulutusohjelman päälle.
     `,
   },
   PassRate: {
