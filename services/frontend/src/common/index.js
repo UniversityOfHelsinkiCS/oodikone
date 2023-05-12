@@ -23,7 +23,7 @@ export const checkUserAccess = (requiredRoles, roles) => {
 }
 
 export const getStudentToStudyrightStartMap = (students, programmeCode) => {
-  students.reduce((res, student) => {
+  return students.reduce((res, student) => {
     const currentStudyright = student.studyrights?.find(studyright =>
       studyright.studyright_elements.some(e => e.code === programmeCode)
     )
