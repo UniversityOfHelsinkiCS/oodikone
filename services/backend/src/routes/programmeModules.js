@@ -30,8 +30,8 @@ router.delete('/v3/programme_modules', async (req, res) => {
 })
 
 router.post('/v3/programme_modules/:programmecode/', async (req, res) => {
-  const { programmecode, coursecodes } = req.body
-  await addExcludedCourses(programmecode, coursecodes)
+  const { programmecode, excludeFromProgramme, coursecodes } = req.body
+  await addExcludedCourses(excludeFromProgramme, coursecodes)
   const result = await byProgrammeCode(programmecode)
   if (!result) {
     res.status(400).end()

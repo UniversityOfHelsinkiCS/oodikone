@@ -8,7 +8,6 @@ import { getStudentTotalCredits } from 'common'
 import PopulationDetails from '../PopulationDetails'
 import { useTitle } from '../../common/hooks'
 import useLanguage from '../LanguagePicker/useLanguage'
-import { getTextIn } from '../../common'
 import FilterView from '../FilterView'
 import PopulationSearch from '../PopulationSearch'
 import DataExport from './DataExport'
@@ -36,7 +35,7 @@ const getYearText = year => {
 }
 const PopulationStatistics = () => {
   const location = useLocation()
-  const { language } = useLanguage()
+  const { language, getTextIn } = useLanguage()
   const history = useHistory()
   // const { query, queryIsSet, isLoading, students } = useSelector(selectPopulations)
   const courses = useSelector(store => store.populationSelectedStudentCourses.data?.coursestatistics)
@@ -100,6 +99,7 @@ const PopulationStatistics = () => {
       }
     })
   }, [samples, chosenProgrammeCode])
+
   const unifyProgrammeName = (bachelor, masterLisenciate) => {
     if (language === 'fi')
       return `${bachelor} ja ${
@@ -112,8 +112,8 @@ const PopulationStatistics = () => {
 
   const programmeText =
     query?.studyRights?.combinedProgramme !== undefined
-      ? unifyProgrammeName(getTextIn(programmeName, language), getTextIn(combinedProgrammeName, language))
-      : getTextIn(programmeName, language)
+      ? unifyProgrammeName(getTextIn(programmeName), getTextIn(combinedProgrammeName))
+      : getTextIn(programmeName)
   const title = location.search === '' ? 'Class statistics' : `${programmeText} ${getYearText(query?.year)}`
 
   return (
@@ -156,13 +156,7 @@ const PopulationStatistics = () => {
                 queryIsSet={queryIsSet}
                 query={query}
                 isLoading={isLoading}
-                dataExport={
-                  <DataExport
-                    students={filteredStudents}
-                    programmeCode={query?.studyRights?.programme}
-                    combinedProgrammeCode={combinedProgrammeCode}
-                  />
-                }
+                dataExport={<DataExport students={filteredStudents} programmeCode={query?.studyRights?.programme} />}
                 allStudents={samples}
                 selectedStudentsByYear={selectedStudentsByYear}
                 filteredStudents={filteredStudents}
