@@ -284,7 +284,7 @@ const CoursesTable = ({ students, studyGuidanceCourses }) => {
         : { total: true }
     )
 
-    return [row(totals, { ignoreFilters: false }), ...students]
+    return [row(totals, { ignoreFilters: true }), ...students]
   }, [students, mandatoryCourses, hasPassedMandatory, mandatoryPassed])
   // ELÄINLÄÄKKIS REVISIT
   return (
@@ -317,7 +317,6 @@ const CoursesTable = ({ students, studyGuidanceCourses }) => {
 }
 // study guidance groups -feature uses different population + rtk query, so it needs to
 // be rendered differently also here: TODO: refactor things nicely
-
 const StudyGuidanceGroupCoursesTabContainer = ({ students, group }) => {
   const groupStudentNumbers = group?.members?.map(({ personStudentNumber }) => personStudentNumber) || []
   const populationsCourses = useGetStudyGuidanceGroupPopulationCoursesQuery(groupStudentNumbers).data
