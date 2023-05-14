@@ -23,7 +23,7 @@ export const checkUserAccess = (requiredRoles, roles) => {
 }
 
 export const getStudentToStudyrightStartMap = (students, programmeCode) => {
-  return students.reduce((res, student) => {
+  students.reduce((res, student) => {
     const currentStudyright = student.studyrights?.find(studyright =>
       studyright.studyright_elements.some(e => e.code === programmeCode)
     )
@@ -36,6 +36,21 @@ export const getStudentToStudyrightStartMap = (students, programmeCode) => {
     }
     return res
   }, {})
+}
+// Combined study programmes: key bachelor programme, item master/licenciate programme
+export const getCombinedProgrammeId = progId => {
+  const combinedProgrammes = { KH90_001: 'MH90_001' }
+  return Object.keys(combinedProgrammes).includes(progId) ? combinedProgrammes[progId] : null
+}
+
+export const getUnifiedProgrammeName = (bachelor, masterLisenciate, language) => {
+  if (language === 'fi')
+    return `${bachelor} ja ${
+      masterLisenciate?.includes('lisensiaatin') ? 'lisensiaatin koulutusojelma' : 'maisterin koulutusohjelma'
+    }`
+  if (language === 'en') return `${bachelor?.split(' ')[0]} and ${masterLisenciate}`
+  if (language === 'sv') return `${bachelor?.split('programmet')[0]}- och ${masterLisenciate}`
+  return bachelor
 }
 
 export const containsOnlyNumbers = str => str.match('^\\d+$')

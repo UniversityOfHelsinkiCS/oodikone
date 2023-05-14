@@ -4,7 +4,7 @@ import { useLocation, useHistory } from 'react-router-dom'
 import { Header, Segment } from 'semantic-ui-react'
 import { useGetSemestersQuery } from 'redux/semesters'
 import populationToData from 'selectors/populationDetails'
-import { getStudentTotalCredits } from 'common'
+import { getStudentTotalCredits, getUnifiedProgrammeName } from 'common'
 import PopulationDetails from '../PopulationDetails'
 import { useTitle } from '../../common/hooks'
 import useLanguage from '../LanguagePicker/useLanguage'
@@ -100,19 +100,9 @@ const PopulationStatistics = () => {
     })
   }, [samples, chosenProgrammeCode])
 
-  const unifyProgrammeName = (bachelor, masterLisenciate) => {
-    if (language === 'fi')
-      return `${bachelor} ja ${
-        masterLisenciate?.includes('lisensiaatin') ? 'lisensiaatin koulutusojelma' : 'maisterin koulutusohjelma'
-      }`
-    if (language === 'en') return `${bachelor?.split(' ')[0]} and ${masterLisenciate}`
-    if (language === 'sv') return `${bachelor?.split('programmet')[0]}- och ${masterLisenciate}`
-    return bachelor
-  }
-
   const programmeText =
     query?.studyRights?.combinedProgramme !== undefined
-      ? unifyProgrammeName(getTextIn(programmeName), getTextIn(combinedProgrammeName))
+      ? getUnifiedProgrammeName(getTextIn(programmeName), getTextIn(combinedProgrammeName), language)
       : getTextIn(programmeName)
   const title = location.search === '' ? 'Class statistics' : `${programmeText} ${getYearText(query?.year)}`
 
@@ -156,7 +146,13 @@ const PopulationStatistics = () => {
                 queryIsSet={queryIsSet}
                 query={query}
                 isLoading={isLoading}
-                dataExport={<DataExport students={filteredStudents} programmeCode={query?.studyRights?.programme} />}
+                dataExport={
+                  <DataExport
+                    students={filteredStudents}
+                    programmeCode={query?.studyRights?.programme}
+                    combinedProgrammeCode={combinedProgrammeCode}
+                  />
+                }
                 allStudents={samples}
                 selectedStudentsByYear={selectedStudentsByYear}
                 filteredStudents={filteredStudents}
