@@ -11,17 +11,22 @@ const shouldBeHidden = (showPercentages, value) => !showPercentages && typeof va
 
 const getCellClass = value => (value === 'Total' ? 'total-row-cell' : '')
 
-const getFirstCell = ({ yearlyData, year, show, studyprogramme, calendarYears }) => {
+const getFirstCell = ({ yearlyData, year, show, studyprogramme, calendarYears, combinedProgramme }) => {
   return (
     <Table.Cell key={getKey(year)} className={getCellClass(year)}>
       {yearlyData.length > 1 && <Icon name={`${show ? 'angle down' : 'angle right'}`} />}
       {year}
-      <PopulationLink studyprogramme={studyprogramme} year={year} years={calendarYears} />
+      <PopulationLink
+        studyprogramme={studyprogramme}
+        year={year}
+        years={calendarYears}
+        combinedProgramme={combinedProgramme}
+      />
     </Table.Cell>
   )
 }
 
-const getSingleTrackRow = ({ row, studyprogramme, code, showPercentages, calendarYears }) => {
+const getSingleTrackRow = ({ row, studyprogramme, code, showPercentages, calendarYears, combinedProgramme }) => {
   return (
     <Table.Row key={getKey(row[0])} className="regular-row">
       {row.map((value, index) => (
@@ -30,7 +35,13 @@ const getSingleTrackRow = ({ row, studyprogramme, code, showPercentages, calenda
             <Table.Cell textAlign="left" className={getCellClass(row[0])} key={getKey(row[0])}>
               {value}
               {index === 0 && (
-                <PopulationLink studyprogramme={studyprogramme} year={row[0]} studytrack={code} years={calendarYears} />
+                <PopulationLink
+                  studyprogramme={studyprogramme}
+                  year={row[0]}
+                  studytrack={code}
+                  years={calendarYears}
+                  combinedProgramme={combinedProgramme}
+                />
               )}
             </Table.Cell>
           )}
@@ -50,16 +61,16 @@ const getRow = ({
   showPercentages,
   years,
   calendarYears,
+  combinedProgramme,
 }) => {
   const year = yearlyData && yearlyData[0] && yearlyData[0][0]
-
   // Get row for the studyprogramme
   if (years.includes(row[0])) {
     return (
       <Table.Row key={getKey(row[0])} className="header-row" onClick={() => setShow(!show)}>
         {row.map((value, index) =>
           index === 0 ? (
-            getFirstCell({ yearlyData, year: row[0], show, studyprogramme, calendarYears })
+            getFirstCell({ yearlyData, year: row[0], show, studyprogramme, calendarYears, combinedProgramme })
           ) : (
             <>
               {shouldBeHidden(showPercentages, value) ? null : (
@@ -87,6 +98,7 @@ const getRow = ({
                 year={year}
                 years={calendarYears}
                 studytrack={_.findKey(studytracks, s => s === value.split(',')[0])}
+                combinedProgramme={combinedProgramme}
               />
             </Table.Cell>
           ) : (
@@ -152,6 +164,7 @@ const StudytrackDataTable = ({
   dataOfSingleTrack,
   titles,
   years,
+  combinedProgramme,
 }) => {
   const [show, setShow] = useState(false)
   const [showPercentages, setShowPercentages] = useState(false)
@@ -192,7 +205,15 @@ const StudytrackDataTable = ({
           <Table.Body>
             {singleTrack
               ? sortedTrackStats.map(row =>
-                  getSingleTrackRow({ row, studyprogramme, code: singleTrack, showPercentages, years, calendarYears })
+                  getSingleTrackRow({
+                    row,
+                    studyprogramme,
+                    code: singleTrack,
+                    showPercentages,
+                    years,
+                    calendarYears,
+                    combinedProgramme,
+                  })
                 )
               : sortedMainStats?.map(yearlyData =>
                   yearlyData.map(row =>
@@ -206,6 +227,7 @@ const StudytrackDataTable = ({
                       showPercentages,
                       years,
                       calendarYears,
+                      combinedProgramme,
                     })
                   )
                 )}

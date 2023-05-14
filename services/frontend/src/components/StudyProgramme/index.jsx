@@ -11,7 +11,7 @@ import StudytrackOverview from './StudytrackOverview'
 import ProgrammeCoursesOverview from './programmeCoursesOverview'
 import UpdateView from './UpdateView'
 import '../PopulationQueryCard/populationQueryCard.css'
-import { getTextIn } from '../../common'
+import { getCombinedProgrammeId, getUnifiedProgrammeName } from '../../common'
 import { useTabs, useTitle } from '../../common/hooks'
 import TSA from '../../common/tsa'
 import Tags from './Tags'
@@ -20,12 +20,22 @@ import { getProgrammes } from '../../redux/populationProgrammes'
 
 import useLanguage from '../LanguagePicker/useLanguage'
 
+const createName = (studyProgrammeId, combibedProgrammeId, programmes, language, getTextIn) => {
+  if (combibedProgrammeId && programmes?.[studyProgrammeId] && programmes?.[combibedProgrammeId])
+    return getUnifiedProgrammeName(
+      getTextIn(programmes?.[studyProgrammeId].name),
+      getTextIn(programmes?.[combibedProgrammeId].name),
+      language
+    )
+  return programmes?.[studyProgrammeId] && getTextIn(programmes?.[studyProgrammeId].name)
+}
+
 const StudyProgramme = props => {
   const dispatch = useDispatch()
   const history = useHistory()
   const programmes = useSelector(state => state.populationProgrammes?.data?.programmes)
   const progressCriteria = useGetProgressCriteriaQuery({ programmeCode: props.match.params.studyProgrammeId })
-  const { language } = useLanguage()
+  const { language, getTextIn } = useLanguage()
   const { isAdmin, rights } = useGetAuthorizedUserQuery()
   const [tab, setTab] = useTabs('p_tab', 0, history)
   const [academicYear, setAcademicYear] = useState(false)
@@ -48,9 +58,11 @@ const StudyProgramme = props => {
     }
   }, [progressCriteria.data])
 
+  const { match } = props
+  const { studyProgrammeId } = match.params
+  const secondProgrammeId = getCombinedProgrammeId(studyProgrammeId)
+
   const getPanes = () => {
-    const { match } = props
-    const { studyProgrammeId } = match.params
     const panes = []
     panes.push({
       menuItem: 'Basic information',
@@ -62,6 +74,7 @@ const StudyProgramme = props => {
           setSpecialGroups={setSpecialGroups}
           academicYear={academicYear}
           setAcademicYear={setAcademicYear}
+          combinedProgramme={secondProgrammeId}
         />
       ),
     })
@@ -75,6 +88,7 @@ const StudyProgramme = props => {
           setSpecialGroups={setSpecialGroups}
           graduated={graduated}
           setGraduated={setGraduated}
+          combinedProgramme={secondProgrammeId}
         />
       ),
     })
@@ -87,18 +101,24 @@ const StudyProgramme = props => {
             academicYear={academicYear}
             studyProgramme={studyProgrammeId}
             setAcademicYear={setAcademicYear}
+            combinedProgramme={secondProgrammeId}
           />
         ),
       })
       panes.push({
         menuItem: 'Degree Courses',
         render: () => (
-          <DegreeCoursesTable studyProgramme={studyProgrammeId} criteria={criteria} setCriteria={setCriteria} />
+          <DegreeCoursesTable
+            studyProgramme={studyProgrammeId}
+            combinedProgramme={secondProgrammeId}
+            criteria={criteria}
+            setCriteria={setCriteria}
+          />
         ),
       })
       panes.push({
         menuItem: 'Tags',
-        render: () => <Tags studyprogramme={studyProgrammeId} />,
+        render: () => <Tags studyprogramme={studyProgrammeId} combinedProgramme={secondProgrammeId} />,
       })
     }
     if (isAdmin) {
@@ -117,10 +137,9 @@ const StudyProgramme = props => {
     [history]
   )
 
-  const { match } = props
-  const { studyProgrammeId } = match.params
-  const programmeName = programmes?.[studyProgrammeId] && getTextIn(programmes?.[studyProgrammeId].name, language)
+  const programmeName = createName(studyProgrammeId, secondProgrammeId, programmes, language, getTextIn)
   const programmeLetterId = programmes?.[studyProgrammeId]?.progId
+  const secondProgrammeLetterId = programmes?.[secondProgrammeId]?.progId
   const panes = getPanes()
 
   useEffect(() => {
@@ -156,6 +175,12 @@ const StudyProgramme = props => {
           <span>
             {programmeLetterId ? `${programmeLetterId} - ` : ''} {studyProgrammeId}
           </span>
+          <br />
+          {secondProgrammeId && (
+            <span>
+              {secondProgrammeLetterId ? `${secondProgrammeLetterId} - ` : ''} {secondProgrammeId}
+            </span>
+          )}
         </div>
         <Tab panes={panes} activeIndex={tab} onTabChange={setTab} />
       </Segment>

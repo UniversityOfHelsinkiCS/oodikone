@@ -14,7 +14,14 @@ import BreakdownBarChart from '../BreakdownBarChart'
 import InfotoolTips from '../../../common/InfoToolTips'
 import '../studyprogramme.css'
 
-const StudytrackOverview = ({ studyprogramme, specialGroups, setSpecialGroups, graduated, setGraduated }) => {
+const StudytrackOverview = ({
+  studyprogramme,
+  specialGroups,
+  setSpecialGroups,
+  graduated,
+  setGraduated,
+  combinedProgramme,
+}) => {
   const toolTips = InfotoolTips.Studyprogramme
   const [showMedian, setShowMedian] = useState(false)
   const [track, setTrack] = useState(studyprogramme)
@@ -92,6 +99,7 @@ const StudytrackOverview = ({ studyprogramme, specialGroups, setSpecialGroups, g
             dataOfAllTracks={stats?.data?.mainStatsByYear}
             dataOfSingleTrack={track && track !== studyprogramme ? stats?.data?.mainStatsByTrack[track] : null}
             years={stats?.data?.years}
+            combinedProgramme={combinedProgramme}
           />
           {getDivider(
             `Progress of students of ${

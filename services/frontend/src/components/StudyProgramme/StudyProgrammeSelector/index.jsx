@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom'
 import { debounce } from 'lodash'
 import { arrayOf, string, bool, shape } from 'prop-types'
 import { Loader, Message, Header, Form } from 'semantic-ui-react'
-import { getTextIn } from '../../../common'
 import SortableTable from '../../SortableTable'
 import useLanguage from '../../LanguagePicker/useLanguage'
 
@@ -14,11 +13,12 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected }) => {
   const [masterProgrammes, setMasterProgrammes] = useState([])
   const [doctoralProgrammes, setDoctoralProgrammes] = useState([])
   const [otherProgrammes, setOtherProgrammes] = useState([])
+  const [combinedProgrammes, setCombinedProgrammes] = useState([])
   const handleFilterChange = debounce(value => {
     setFilter(value)
   }, 500)
 
-  const { language } = useLanguage()
+  const { language, getTextIn } = useLanguage()
 
   useEffect(() => {
     if (studyprogrammes?.length > 0) studyprogrammes.sort((a, b) => (a.code > b.code ? 1 : -1))
@@ -30,7 +30,8 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected }) => {
       const filteredMasterProgrammes = []
       const filtereDoctoralProgrammes = []
       const filteredOtherProgrammes = []
-
+      const filteredCombinedProgrammes = []
+      const combinations = { KH90_001: 'MH90_001' }
       const filteredStudyprogrammes = studyprogrammes.filter(programme => {
         if (programme.name[language])
           return (
@@ -46,7 +47,26 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected }) => {
       })
 
       filteredStudyprogrammes.forEach(programme => {
-        if (programme.code.includes('MH')) {
+        if (programme.code === 'KH90_001') {
+          const secondProgrammeCode = combinations[programme.code]
+          const secondProgramme = studyprogrammes.filter(programme => programme.code === secondProgrammeCode)
+          const combinedName = {
+            fi: `${programme.name.fi} ja ${
+              secondProgramme[0]?.name.fi?.includes('lisensiaatin')
+                ? 'lisensiaatin koulutusojelma'
+                : 'maisterin koulutusohjelma'
+            }`,
+            en: `${programme.name.en.split(' ')[0]} and ${secondProgramme[0]?.name?.en}`,
+            sv: `${programme.name.sv.split('programmet')[0]}- och ${secondProgramme[0]?.name?.en}`,
+          }
+
+          filteredCombinedProgrammes.push({
+            code: programme.code,
+            combinedCode: `${programme.code} - ${secondProgramme[0]?.code}`,
+            name: combinedName,
+            progId: `${programme.progId} - ${secondProgramme[0]?.progId}`,
+          })
+        } else if (programme.code.includes('MH')) {
           filteredMasterProgrammes.push(programme)
         } else if (programme.code.includes('KH')) {
           filteredBachelorProgrammes.push(programme)
@@ -60,6 +80,7 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected }) => {
       setMasterProgrammes(filteredMasterProgrammes)
       setDoctoralProgrammes(filtereDoctoralProgrammes)
       setOtherProgrammes(filteredOtherProgrammes)
+      setCombinedProgrammes(filteredCombinedProgrammes)
     }
   }, [filter, studyprogrammes])
 
@@ -70,7 +91,7 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected }) => {
     {
       key: 'programmecode',
       title: 'code',
-      getRowVal: prog => prog.code,
+      getRowVal: prog => (prog.combinedCode ? prog.combinedCode : prog.code),
       getRowContent: prog => (
         <Link
           style={{
@@ -82,7 +103,7 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected }) => {
           }}
           to={`/study-programme/${prog.code}`}
         >
-          {prog.code}
+          {prog.combinedCode ? prog.combinedCode : prog.code}
         </Link>
       ),
       cellProps: {
@@ -151,6 +172,17 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected }) => {
           Filter programmes:
           <Form.Input onChange={e => handleFilterChange(e.target.value)} width="4" />
         </Form>
+      ) : null}
+      {combinedProgrammes.length > 0 ? (
+        <>
+          <Header>Combined programmes</Header>
+          <SortableTable
+            figure={false}
+            columns={headers}
+            getRowKey={programme => programme.code}
+            data={combinedProgrammes}
+          />
+        </>
       ) : null}
       {bachelorProgrammes.length > 0 ? (
         <>
