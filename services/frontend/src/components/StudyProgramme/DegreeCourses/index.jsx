@@ -16,13 +16,12 @@ import {
 import CreditCriteriaForm from './CreditCriteriaForm'
 import DegreeCourseTableView from './DegreeCourseTableView'
 
-const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, removeExclusion }) => {
+const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, removeExclusion, combinedProgramme }) => {
   const dispatch = useDispatch()
   const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
   const [defaultModules, setDefaultModules] = useState([])
   // Second programme modules are for combined studyprogrammes
   const [secondProgrammeModules, setSecondProgrammeModules] = useState([])
-
   const [addProgressCriteriaCourse, { data: courseData }] = useAddProgressCriteriaCourseMutation()
   const [addProgressCriteriaCredits, { data: creditsData }] = useAddProgressCriteriaCreditsMutation()
   useEffect(() => {
@@ -109,7 +108,7 @@ const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, re
           modules={secondProgrammeModules}
           criteria={criteria}
           studyProgramme={studyProgramme}
-          combinedStudyProgramme="MH90_001" // CHANGE hardcoded one to generic variable WHEN combined code is available
+          combinedStudyProgramme={combinedProgramme}
           setExclusion={setExclusion}
           removeExclusion={removeExclusion}
           addProgressCriteriaCourse={addProgressCriteriaCourse}
