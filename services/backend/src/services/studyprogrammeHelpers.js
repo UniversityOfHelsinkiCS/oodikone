@@ -414,6 +414,15 @@ const tableTitles = {
   basics: {
     SPECIAL_EXCLUDED: ['', 'Started studying', 'Graduated'],
     SPECIAL_INCLUDED: ['', 'Started studying', 'Graduated', 'Transferred away', 'Transferred to'],
+    SPECIAL_EXCLUDED_COMBINED_PROGRAMME: ['', 'Started studying', 'Graduated', 'Graduated 2nd phase'],
+    SPECIAL_INCLUDED_COMBINED_PROGRAMME: [
+      '',
+      'Started studying',
+      'Graduated',
+      'Graduated 2nd phase',
+      'Transferred away',
+      'Transferred to',
+    ],
   },
   credits: {
     SPECIAL_EXCLUDED: ['', 'Total', 'Major students credits', 'Transferred credits'],
@@ -462,6 +471,7 @@ const tableTitles = {
     ],
     doctoral: ['', 'All', '< 10 credits', '10-19 credits', '20-29 credits', '30-39 credits', '40 ≤ credits'],
   },
+  // Unify these when faculty and studytrack have the same table structure
   studytracks: [
     '',
     'All',
