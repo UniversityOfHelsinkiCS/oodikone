@@ -399,7 +399,7 @@ const GeneralTab = ({
             !s.obfuscated && (
               <Item
                 as="a"
-                href={`https://sisu.helsinki.funidata.fi/tutor/role/staff/student/${s.sis_person_id}/basic/basic-info`}
+                href={`https://sisu.helsinki.fi/tutor/role/staff/student/${s.sis_person_id}/basic/basic-info`}
                 target="_blank"
                 onClick={() => {
                   sendAnalytics('Student link to Sisu clicked', 'General tab')
