@@ -23,7 +23,7 @@ export const checkUserAccess = (requiredRoles, roles) => {
 }
 
 export const getStudentToStudyrightStartMap = (students, programmeCode) => {
-  students.reduce((res, student) => {
+  return students.reduce((res, student) => {
     const currentStudyright = student.studyrights?.find(studyright =>
       studyright.studyright_elements.some(e => e.code === programmeCode)
     )
@@ -80,7 +80,7 @@ export const getStudentTotalCredits = (student, includeTransferredCredits = true
   const passedCourses = includeTransferredCredits
     ? student.courses.filter(c => c.passed && !c.isStudyModuleCredit)
     : student.courses.filter(c => c.passed && !c.isStudyModuleCredit && c.credittypecode !== 9)
-  return passedCourses.reduce((a, b) => a + b.credits, 0)
+  return Math.round(100 * passedCourses.reduce((a, b) => a + b.credits, 0)) / 100
 }
 
 const getGradedCourses = (student, includeTransferredCredits = true) =>
