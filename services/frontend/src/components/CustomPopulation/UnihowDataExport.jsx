@@ -4,7 +4,6 @@ import xlsx from 'xlsx'
 import { Dropdown } from 'semantic-ui-react'
 import { getStudentGradeMean, getStudentGradeMeanWeightedByCredits, getStudentTotalCredits } from '../../common'
 import sendEvent from '../../common/sendEvent'
-import DataExport from '../PopulationStatistics/DataExport'
 
 const sendAnalytics = sendEvent.populationStudents
 
@@ -28,7 +27,6 @@ export default ({ students }) => {
 
   return (
     <>
-      <DataExport students={students} />
       <Dropdown.Item
         onClick={() => {
           xlsx.writeFile(getXlsx(), filename)
