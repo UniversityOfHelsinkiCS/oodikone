@@ -248,6 +248,23 @@ const GeneralTab = ({
     }
   }
 
+  const getCreditsBetween = s => {
+    if (group?.tags?.year) {
+      return getStudentTotalCredits({
+        ...s,
+        courses: s.courses.filter(c => new Date(c.date) > new Date(group?.tags?.year, 7, 1)),
+      })
+    }
+    const sinceDate = creditDateFilterOptions?.startDate || new Date('1.1.1970')
+    const untilDate = creditDateFilterOptions?.endDate || new Date()
+
+    const credits = getStudentTotalCredits({
+      ...s,
+      courses: s.courses.filter(c => new Date(c.date) >= sinceDate && new Date(c.date) <= untilDate),
+    })
+    return credits
+  }
+
   const getEnrollmentDate = s => {
     const enrollments =
       s.enrollments
@@ -300,6 +317,21 @@ const GeneralTab = ({
     }
   }
 
+  const getTitleForCreditsSince = sole => {
+    let title = sole ? 'Credits ' : ''
+    const since = creditDateFilterOptions?.startDate
+    const until = creditDateFilterOptions?.endDate
+    if (group?.tags?.year && !since) {
+      title += `Since 1.8.${group.tags.year}`
+    } else {
+      title += since ? `Since ${moment(since).format('DD.MM.YYYY')}` : 'Since 1.1.1970'
+    }
+    if (until) {
+      title += `\nuntil ${moment(until).format('DD.MM.YYYY')}`
+    }
+    return title
+  }
+
   let creditsColumn = null
   const creditColumnKeys = columnKeysToInclude.filter(k => k.indexOf('credits.') === 0)
 
@@ -330,17 +362,13 @@ const GeneralTab = ({
         return credits
       },
     }),
-    startYear: sole => ({
-      key: 'credits-startYear',
-      title: `${sole ? 'Credits ' : ''}Since ${group?.tags?.year}`,
+    since: sole => ({
+      // If a year is associated and no filters exist, this will act differently
+      key: 'credits-since',
+      title: getTitleForCreditsSince(sole),
+      textTitle: getTitleForCreditsSince(sole).replace('\n', ' '),
       filterType: 'range',
-      getRowVal: s => {
-        const credits = getStudentTotalCredits({
-          ...s,
-          courses: s.courses.filter(c => new Date(c.date) > new Date(group?.tags?.year, 7, 1)),
-        })
-        return credits
-      },
+      getRowVal: s => getCreditsBetween(s),
     }),
   }
 
@@ -671,8 +699,7 @@ const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
   const { isAdmin } = useGetAuthorizedUserQuery()
 
   const getStudyGuidanceGroupColumns = () => {
-    const cols = ['programme', 'startYear']
-    if (studyGuidanceGroup?.tags?.year) cols.push('credits.startYear')
+    const cols = ['credits.since', 'programme', 'startYear']
     if (studyGuidanceGroup?.tags?.studyProgramme)
       cols.push('studyrightStart', 'studyStartDate', 'studyStartDateActual', 'endDate')
     if (studyGuidanceGroup?.tags?.studyProgramme && studyGuidanceGroup?.tags?.year) {
@@ -682,7 +709,7 @@ const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
   }
 
   const columnsByVariant = {
-    customPopulation: ['programme', 'startYear'],
+    customPopulation: ['credits.since', 'programme', 'startYear'],
     coursePopulation: [
       'gradeForSingleCourse',
       'programme',
