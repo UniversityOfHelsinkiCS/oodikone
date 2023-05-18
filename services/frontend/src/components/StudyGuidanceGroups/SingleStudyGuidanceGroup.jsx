@@ -215,7 +215,6 @@ const SingleStudyGroupFilterView = props => {
       language: props.language,
     }),
     filters.ageFilter,
-    filters.hopsFilter({ programmeCode: props.group?.tags?.studyProgramme }),
     filters.genderFilter,
     filters.startYearAtUniFilter,
     filters.tagsFilter,
@@ -260,6 +259,7 @@ const SingleStudyGroupFilterView = props => {
         programme: props.group.tags.studyProgramme,
       })
     )
+    viewFilters.push(filters.hopsFilter({ programmeCode: props.group?.tags?.studyProgramme }))
   }
 
   const initialOptions = {}
