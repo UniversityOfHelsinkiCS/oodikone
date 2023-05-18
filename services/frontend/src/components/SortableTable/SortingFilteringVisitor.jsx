@@ -25,6 +25,10 @@ export default class SortingFilteringVisitor extends DataVisitor {
       return (a, b) => {
         let va = getColumnValue(pCtx.withItem(a), column)
         let vb = getColumnValue(pCtx.withItem(b), column)
+
+        if (getRowOptions(a).ignoreSorting) return -1
+        if (getRowOptions(b).ignoreSorting) return 1
+
         if (typeof va === 'string' && typeof vb === 'string') {
           va = va.toLowerCase()
           vb = vb.toLowerCase()
@@ -46,9 +50,18 @@ export default class SortingFilteringVisitor extends DataVisitor {
         return -1
       }
     }
+
     return (a, b) => {
-      const va = getColumnValue(pCtx.withItem(a), column)
-      const vb = getColumnValue(pCtx.withItem(b), column)
+      let va = getColumnValue(pCtx.withItem(a), column)
+      let vb = getColumnValue(pCtx.withItem(b), column)
+
+      if (getRowOptions(a).ignoreSorting) return -1
+      if (getRowOptions(b).ignoreSorting) return 1
+
+      if (typeof va === 'string' && typeof vb === 'string') {
+        va = va.toLowerCase()
+        vb = vb.toLowerCase()
+      }
 
       if (va === vb) {
         return 0
@@ -61,9 +74,7 @@ export default class SortingFilteringVisitor extends DataVisitor {
   }
 
   visitRow(ctx) {
-    if (getRowOptions(ctx.item).ignoreFilters) {
-      return ctx.item
-    }
+    if (getRowOptions(ctx.item).ignoreFilters) return ctx.item
 
     const passes = _.chain(this.state.columnOptions)
       .toPairs()
@@ -84,7 +95,6 @@ export default class SortingFilteringVisitor extends DataVisitor {
 
   visitItems(pItems, pCtx) {
     const items = super.visitItems(pItems, pCtx)
-
     const func = this.createRowSortingFunction(pCtx)
 
     return items.filter(i => i !== this.sentinel).sort(func)
