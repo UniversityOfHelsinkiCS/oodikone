@@ -284,7 +284,7 @@ const CoursesTable = ({ students, studyGuidanceCourses }) => {
         : { total: true }
     )
 
-    return [row(totals, { ignoreFilters: true }), ...students]
+    return [row(totals, { ignoreFilters: true, ignoreSorting: true }), ...students]
   }, [students, mandatoryCourses, hasPassedMandatory, mandatoryPassed])
   // ELÄINLÄÄKKIS REVISIT
   return (
