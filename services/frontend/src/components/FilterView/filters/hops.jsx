@@ -68,7 +68,7 @@ export default createFilter({
     active: false,
   },
 
-  isActive: ({ active }) => active,
+  isActive: arg => arg?.active,
 
   filter: (student, { active }, { args }) => {
     const { studyrightStart, studyplans } = student
