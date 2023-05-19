@@ -200,9 +200,9 @@ describe('Studyprogramme overview', () => {
         .should('contain', 25)
         .should('contain', 35)
 
-      cy.get('[data-cy=graduation-times-graph-breakdown]')
+      cy.get('[data-cy=graduation-times-graph-breakdownBachelor]')
       cy.get('[data-cy=GraduationTimeToggle]').click()
-      cy.get('[data-cy=graduation-times-graph]').within(() => {
+      cy.get('[data-cy=graduation-times-graphBachelor]').within(() => {
         cy.contains('Graduation year')
         cy.contains('2019')
         cy.contains('17 graduated').trigger('mouseover')
