@@ -67,7 +67,7 @@ const byProgrammeCode = async code => {
   const isCombined = Object.keys(combinedStudyprogrammes).includes(code)
   let secondProgrammelabeled = []
   if (isCombined) {
-    const secondProgCode = combinedStudyprogrammes[code][1]
+    const secondProgCode = combinedStudyprogrammes[code]
     const secondProgrammeResult = await recursivelyGetModuleAndChildren(secondProgCode, 'course')
     // Now do the same things for the second set of results as for the first
     if (secondProgrammeResult.length) {

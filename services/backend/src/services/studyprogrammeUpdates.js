@@ -10,7 +10,7 @@ const {
 } = require('../services/analyticsService')
 const logger = require('../util/logger')
 
-const updateBasicView = async code => {
+const updateBasicView = async (code, combinedProgramme) => {
   const specialCalendar = {
     yearType: 'CALENDAR_YEAR',
     specialGroups: 'SPECIAL_INCLUDED',
@@ -34,6 +34,7 @@ const updateBasicView = async code => {
     try {
       const basicStats = await getBasicStatsForStudytrack({
         studyprogramme: code,
+        combinedProgramme,
         settings: {
           isAcademicYear: option.yearType === 'ACADEMIC_YEAR',
           includeAllSpecials: option.specialGroups === 'SPECIAL_INCLUDED',
@@ -43,6 +44,7 @@ const updateBasicView = async code => {
 
       const creditStats = await getCreditStatsForStudytrack({
         studyprogramme: code,
+        combinedProgramme,
         settings: {
           isAcademicYear: option.yearType === 'ACADEMIC_YEAR',
           includeAllSpecials: option.specialGroups === 'SPECIAL_INCLUDED',
@@ -52,6 +54,7 @@ const updateBasicView = async code => {
 
       const graduationStats = await getGraduationStatsForStudytrack({
         studyprogramme: code,
+        combinedProgramme,
         settings: {
           isAcademicYear: option.yearType === 'ACADEMIC_YEAR',
           includeAllSpecials: option.specialGroups === 'SPECIAL_INCLUDED',
@@ -65,7 +68,7 @@ const updateBasicView = async code => {
   return 'OK'
 }
 
-const updateStudytrackView = async code => {
+const updateStudytrackView = async (code, combinedProgramme) => {
   const specialGraduated = {
     graduated: 'GRADUATED_INCLUDED',
     specialGroups: 'SPECIAL_INCLUDED',
@@ -94,6 +97,7 @@ const updateStudytrackView = async code => {
     try {
       const stats = await getStudytrackStatsForStudyprogramme({
         studyprogramme: code,
+        combinedProgramme,
         settings: {
           specialGroups: option.specialGroups === 'SPECIAL_INCLUDED',
           graduated: option.graduated === 'GRADUATED_INCLUDED',

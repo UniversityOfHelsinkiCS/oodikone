@@ -10,9 +10,11 @@ const createRedisKeyForGraduationStats = (id, yearType, specialGroups) =>
 const createRedisKeyForStudytrackStats = (id, graduated, specialGroups) =>
   `STUDYTRACK_STATS_${id}_${graduated}_${specialGroups}`
 
-const getBasicStats = async (id, yearType, specialGroups) => {
+const getBasicStats = async (id, combinedProgramme, yearType, specialGroups) => {
   if (!isUpdatedNewProgramme(id)) return null
-  const redisKey = createRedisKeyForBasicStats(id, yearType, specialGroups)
+  let searchkey = id
+  if (combinedProgramme) searchkey = `${id}-${combinedProgramme}`
+  const redisKey = createRedisKeyForBasicStats(searchkey, yearType, specialGroups)
   const dataFromRedis = await redisClient.getAsync(redisKey)
   if (!dataFromRedis) return null
   return JSON.parse(dataFromRedis)
@@ -54,9 +56,11 @@ const setCreditStats = async (data, yearType, specialGroups) => {
   return dataToRedis
 }
 
-const getGraduationStats = async (id, yearType, specialGroups) => {
+const getGraduationStats = async (id, combinedProgramme, yearType, specialGroups) => {
   if (!isUpdatedNewProgramme(id)) return null
-  const redisKey = createRedisKeyForGraduationStats(id, yearType, specialGroups)
+  let searchkey = id
+  if (combinedProgramme) searchkey = `${id}-${combinedProgramme}`
+  const redisKey = createRedisKeyForGraduationStats(searchkey, yearType, specialGroups)
   const dataFromRedis = await redisClient.getAsync(redisKey)
   if (!dataFromRedis) return null
   return JSON.parse(dataFromRedis)
@@ -76,9 +80,11 @@ const setGraduationStats = async (data, yearType, specialGroups) => {
   return dataToRedis
 }
 
-const getStudytrackStats = async (id, graduated, specialGroups) => {
+const getStudytrackStats = async (id, combinedProgramme, graduated, specialGroups) => {
   if (!isUpdatedNewProgramme(id)) return null
-  const redisKey = createRedisKeyForStudytrackStats(id, graduated, specialGroups)
+  let searchkey = id
+  if (combinedProgramme) searchkey = `${id}-${combinedProgramme}`
+  const redisKey = createRedisKeyForStudytrackStats(searchkey, graduated, specialGroups)
   const dataFromRedis = await redisClient.getAsync(redisKey)
   if (!dataFromRedis) return null
   return JSON.parse(dataFromRedis)

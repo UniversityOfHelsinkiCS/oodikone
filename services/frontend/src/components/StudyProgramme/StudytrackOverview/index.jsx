@@ -29,6 +29,7 @@ const StudytrackOverview = ({
   const grad = graduated ? 'GRADUATED_EXCLUDED' : 'GRADUATED_INCLUDED'
   const stats = useGetStudytrackStatsQuery({
     id: studyprogramme,
+    combinedProgramme,
     specialGroups: special,
     graduated: grad,
   })
@@ -55,7 +56,6 @@ const StudytrackOverview = ({
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
 
   const noData = stats.isSuccess && stats.mainStatsByYear && !stats.mainStatsByYear.Total.length
-
   if (noData) return <h3>There is no data available for the selected programme between 2017-2022</h3>
 
   return (

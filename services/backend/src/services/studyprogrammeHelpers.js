@@ -193,7 +193,7 @@ const alltimeStartDate = new Date('1900-01-01')
 const alltimeEndDate = new Date()
 
 // In the array programmes should be [bachelorCode, masterCode]
-const combinedStudyprogrammes = { KH90_001: ['KH90_001', 'MH90_001'] }
+const combinedStudyprogrammes = { KH90_001: 'MH90_001' }
 
 // There are 9 course_unit_types
 // 1. urn:code:course-unit-type:regular
@@ -261,7 +261,7 @@ const getBachelorCreditGraphStats = years => ({
   },
 })
 
-const getMasterCreditGraphStats = years => ({
+const getBachelorMasterCreditGraphStats = years => ({
   lte200: {
     name: 'Less than 200 credits',
     data: getEmptyArray(years.length),
@@ -291,6 +291,7 @@ const getMasterCreditGraphStats = years => ({
     data: getEmptyArray(years.length),
   },
 })
+
 const getVetenaryCreditGraphStats = years => ({
   lte210: {
     name: 'Less than 210 credits',
@@ -322,7 +323,42 @@ const getVetenaryCreditGraphStats = years => ({
   },
 })
 
-const getOnlyMasterCreditGraphStats = years => ({
+const getCombinedVetenaryCreditGraphStats = years => ({
+  lte30: {
+    name: 'Less than 30 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte60: {
+    name: '30-59 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte120: {
+    name: '60-179 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte180: {
+    name: '180-239 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte240: {
+    name: '240-299 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte300: {
+    name: '300-359 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte360: {
+    name: '300-359 credits',
+    data: getEmptyArray(years.length),
+  },
+  mte360: {
+    name: '360 or more credits',
+    data: getEmptyArray(years.length),
+  },
+})
+
+const getMasterCreditGraphStats = years => ({
   lte15: {
     name: 'Less than 15 credits',
     data: getEmptyArray(years.length),
@@ -372,32 +408,34 @@ const getDoctoralCreditGraphStats = years => ({
   },
 })
 
-const getCreditGraphStats = (studyprogramme, years, studyprog = false) => {
+const getCreditGraphStats = (studyprogramme, years, combinedVetenary, masterStudyRightOnly = false) => {
+  if (combinedVetenary) return getCombinedVetenaryCreditGraphStats(years)
   if (studyprogramme.includes('KH')) return getBachelorCreditGraphStats(years)
   if (studyprogramme === 'MH90_001')
-    return studyprog ? getBachelorCreditGraphStats(years) : getVetenaryCreditGraphStats(years)
-  if (studyprogramme.includes('MH')) return getOnlyMasterCreditGraphStats(years)
+    return masterStudyRightOnly ? getBachelorCreditGraphStats(years) : getVetenaryCreditGraphStats(years)
+  if (studyprogramme.includes('MH'))
+    return masterStudyRightOnly ? getMasterCreditGraphStats(years) : getBachelorMasterCreditGraphStats(years)
   return getDoctoralCreditGraphStats(years)
 }
 
 const bachelorCreditThresholds = ['lte15', 'lte30', 'lte60', 'lte90', 'lte120', 'lte150', 'lte180', 'mte180']
-const masterCreditThresholds = ['lte200', 'lte220', 'lte240', 'lte260', 'lte280', 'lte300', 'mte300']
-const onlyMasterCreditThresholds = ['lte15', 'lte30', 'lte60', 'lte90', 'lte120', 'mte120']
+const bachelorMasterCreditThresholds = ['lte200', 'lte220', 'lte240', 'lte260', 'lte280', 'lte300', 'mte300']
+const masterCreditThresholds = ['lte15', 'lte30', 'lte60', 'lte90', 'lte120', 'mte120']
 const doctoralCreditThresholds = ['lte10', 'lte20', 'lte30', 'lte40', 'mte40']
 const bachelorCreditAmounts = [15, 30, 60, 90, 120, 150, 180, 180]
-const masterCreditAmounts = [200, 220, 240, 260, 280, 300, 300]
-const onlyMasterCreditAmounts = [15, 30, 60, 90, 120, 120]
+const bachelorMasterCreditAmounts = [200, 220, 240, 260, 280, 300, 300]
+const masterCreditAmounts = [15, 30, 60, 90, 120, 120]
 const doctoralCreditAmounts = [10, 20, 30, 40, 40]
 const vetenaryCreditThresholds = ['lte210', 'lte240', 'lte270', 'lte300', 'lte330', 'lte360', 'mte360']
 const vetenaryCreditAmounts = [210, 240, 270, 300, 330, 360, 360]
-const getBcMsThresholds = programmeCode => {
-  if (programmeCode === 'MH90_001')
-    return { creditThresholdKeysBcMs: vetenaryCreditThresholds, creditThresholdAmountsBcMs: vetenaryCreditAmounts }
-  return { creditThresholdKeysBcMs: masterCreditThresholds, creditThresholdAmountsBcMs: masterCreditAmounts }
-}
-const getCreditThresholds = (studyprogramme, studyProg = false) => {
+const combinedVetenaryThresholds = ['lte30', 'lte60', 'lte120', 'lte180', 'lte240', 'lte300', 'lte360', 'mte360']
+const combinedVetenaryAmounts = [30, 60, 120, 180, 240, 300, 360, 360]
+
+const getCreditThresholds = (studyprogramme, combinedVetenary, masterStudyRightOnly = false) => {
+  if (combinedVetenary)
+    return { creditThresholdKeys: combinedVetenaryThresholds, creditThresholdAmounts: combinedVetenaryAmounts }
   if (studyprogramme === 'MH90_001') {
-    return studyProg
+    return masterStudyRightOnly
       ? { creditThresholdKeys: bachelorCreditThresholds, creditThresholdAmounts: bachelorCreditAmounts }
       : { creditThresholdKeys: vetenaryCreditThresholds, creditThresholdAmounts: vetenaryCreditAmounts }
   }
@@ -405,7 +443,9 @@ const getCreditThresholds = (studyprogramme, studyProg = false) => {
     return { creditThresholdKeys: bachelorCreditThresholds, creditThresholdAmounts: bachelorCreditAmounts }
   }
   if (studyprogramme.includes('MH')) {
-    return { creditThresholdKeys: onlyMasterCreditThresholds, creditThresholdAmounts: onlyMasterCreditAmounts }
+    return masterStudyRightOnly
+      ? { creditThresholdKeys: masterCreditThresholds, creditThresholdAmounts: masterCreditAmounts }
+      : { creditThresholdKeys: bachelorMasterCreditThresholds, creditThresholdAmounts: bachelorMasterCreditAmounts }
   }
   return { creditThresholdKeys: doctoralCreditThresholds, creditThresholdAmounts: doctoralCreditAmounts }
 }
@@ -417,9 +457,10 @@ const tableTitles = {
     SPECIAL_EXCLUDED_COMBINED_PROGRAMME: ['', 'Started studying', 'Graduated', 'Graduated 2nd phase'],
     SPECIAL_INCLUDED_COMBINED_PROGRAMME: [
       '',
-      'Started studying',
-      'Graduated',
-      'Graduated 2nd phase',
+      'Started studying bachelor',
+      'Started studying master',
+      'Graduated bachelor',
+      'Graduated licenciate',
       'Transferred away',
       'Transferred to',
     ],
@@ -448,7 +489,7 @@ const tableTitles = {
       '150-179 credits',
       '180 ≤ credits',
     ],
-    master: [
+    bachelorMaster: [
       '',
       'All',
       '< 200 credits',
@@ -459,7 +500,7 @@ const tableTitles = {
       '280-299 credits',
       '300 ≤ credits',
     ],
-    masterOnly: [
+    master: [
       '',
       'All',
       '< 15 credits',
@@ -468,6 +509,18 @@ const tableTitles = {
       '60-89 credits',
       '90-119 credits',
       '120 ≤ credits',
+    ],
+    combinedVetenary: [
+      '',
+      'All',
+      '< 30 credits',
+      '30-59 credits',
+      '60-119 credits',
+      '120-179 credits',
+      '180-239 credits',
+      '240-299 credits',
+      '300-359 credits',
+      '360 ≤ credits',
     ],
     doctoral: ['', 'All', '< 10 credits', '10-19 credits', '20-29 credits', '30-39 credits', '40 ≤ credits'],
   },
@@ -500,9 +553,11 @@ const tableTitles = {
   ],
 }
 
-const getCreditProgressTableTitles = studyprogramme => {
+const getCreditProgressTableTitles = (studyprogramme, combinedVetenaryProgramme, masterProgrammeOnly = false) => {
+  if (combinedVetenaryProgramme) return tableTitles.creditProgress.combinedVetenary
   if (studyprogramme.includes('KH')) return tableTitles.creditProgress.bachelor
-  if (studyprogramme.includes('MH')) return tableTitles.creditProgress.masterOnly
+  if (studyprogramme.includes('MH'))
+    return masterProgrammeOnly ? tableTitles.creditProgress.master : tableTitles.creditProgress.bachelorMaster
   return tableTitles.creditProgress.doctoral
 }
 
@@ -567,15 +622,14 @@ module.exports = {
   getThesisType,
   getPercentage,
   getBachelorCreditGraphStats,
+  getBachelorMasterCreditGraphStats,
   getMasterCreditGraphStats,
   getVetenaryCreditGraphStats,
   getDoctoralCreditGraphStats,
-  getOnlyMasterCreditGraphStats,
   getCreditGraphStats,
   getCreditThresholds,
   tableTitles,
   getCreditProgressTableTitles,
-  getBcMsThresholds,
   isNonMajorCredit,
   mapCodesToIds,
   getId,

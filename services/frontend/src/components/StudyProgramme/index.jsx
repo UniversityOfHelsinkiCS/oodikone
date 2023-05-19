@@ -11,7 +11,7 @@ import StudytrackOverview from './StudytrackOverview'
 import ProgrammeCoursesOverview from './programmeCoursesOverview'
 import UpdateView from './UpdateView'
 import '../PopulationQueryCard/populationQueryCard.css'
-import { getCombinedProgrammeId, getUnifiedProgrammeName } from '../../common'
+import { getUnifiedProgrammeName } from '../../common'
 import { useTabs, useTitle } from '../../common/hooks'
 import TSA from '../../common/tsa'
 import Tags from './Tags'
@@ -60,7 +60,9 @@ const StudyProgramme = props => {
 
   const { match } = props
   const { studyProgrammeId } = match.params
-  const secondProgrammeId = getCombinedProgrammeId(studyProgrammeId)
+  const programmeId =
+    studyProgrammeId && studyProgrammeId.includes('-') ? studyProgrammeId.split('-')[0] : studyProgrammeId
+  const secondProgrammeId = studyProgrammeId && studyProgrammeId.includes('-') ? studyProgrammeId.split('-')[1] : ''
 
   const getPanes = () => {
     const panes = []
@@ -68,7 +70,7 @@ const StudyProgramme = props => {
       menuItem: 'Basic information',
       render: () => (
         <BasicOverview
-          studyprogramme={studyProgrammeId}
+          studyprogramme={programmeId}
           history={history}
           specialGroups={specialGroups}
           setSpecialGroups={setSpecialGroups}
@@ -82,7 +84,7 @@ const StudyProgramme = props => {
       menuItem: 'Studytracks and class statistics',
       render: () => (
         <StudytrackOverview
-          studyprogramme={studyProgrammeId}
+          studyprogramme={programmeId}
           history={history}
           specialGroups={specialGroups}
           setSpecialGroups={setSpecialGroups}
@@ -93,13 +95,14 @@ const StudyProgramme = props => {
       ),
     })
 
-    if (isAdmin || rights.includes(studyProgrammeId)) {
+    if (isAdmin || rights.includes(programmeId)) {
       panes.push({
         menuItem: <Menu.Item key="Programme courses">Programme courses</Menu.Item>,
         render: () => (
           <ProgrammeCoursesOverview
             academicYear={academicYear}
-            studyProgramme={studyProgrammeId}
+            studyProgramme={programmeId}
+            combibedProgramme={secondProgrammeId}
             setAcademicYear={setAcademicYear}
             combinedProgramme={secondProgrammeId}
           />
@@ -109,7 +112,7 @@ const StudyProgramme = props => {
         menuItem: 'Degree Courses',
         render: () => (
           <DegreeCoursesTable
-            studyProgramme={studyProgrammeId}
+            studyProgramme={programmeId}
             combinedProgramme={secondProgrammeId}
             criteria={criteria}
             setCriteria={setCriteria}
@@ -118,13 +121,13 @@ const StudyProgramme = props => {
       })
       panes.push({
         menuItem: 'Tags',
-        render: () => <Tags studyprogramme={studyProgrammeId} combinedProgramme={secondProgrammeId} />,
+        render: () => <Tags studyprogramme={programmeId} combinedProgramme={secondProgrammeId} />,
       })
     }
     if (isAdmin) {
       panes.push({
         menuItem: 'Update statistics',
-        render: () => <UpdateView studyprogramme={studyProgrammeId} />,
+        render: () => <UpdateView studyprogramme={programmeId} combinedProgramme={secondProgrammeId} />,
       })
     }
     return panes

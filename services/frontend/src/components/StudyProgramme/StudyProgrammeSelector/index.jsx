@@ -61,7 +61,7 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected }) => {
           }
 
           filteredCombinedProgrammes.push({
-            code: programme.code,
+            code: `${programme.code}-${secondProgramme[0]?.code}`,
             combinedCode: `${programme.code} - ${secondProgramme[0]?.code}`,
             name: combinedName,
             progId: `${programme.progId} - ${secondProgramme[0]?.progId}`,

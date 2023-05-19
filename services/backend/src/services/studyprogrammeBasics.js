@@ -8,7 +8,6 @@ const {
   tableTitles,
   alltimeStartDate,
   alltimeEndDate,
-  combinedStudyprogrammes,
 } = require('./studyprogrammeHelpers')
 const { graduatedStudyRights, startedStudyrights, transfersAway, transfersTo } = require('./studyprogramme')
 const { getYearStartAndEndDates } = require('../util/semester')
@@ -107,6 +106,7 @@ const initializeGraphStats = (
   includeAllSpecials,
   combinedProgramme,
   started,
+  startedSecondProg,
   graduated,
   transferredAway,
   transferredTo,
@@ -115,15 +115,19 @@ const initializeGraphStats = (
   if (includeAllSpecials && combinedProgramme) {
     return [
       {
-        name: 'Started',
+        name: 'Started bachelor',
         data: started.graphStats,
       },
       {
-        name: 'Graduated',
+        name: 'Started licenciate',
+        data: startedSecondProg.graphStats,
+      },
+      {
+        name: 'Graduated bachelor',
         data: graduated.graphStats,
       },
       {
-        name: 'Graduated 2nd phase',
+        name: 'Graduated licenciate',
         data: graduatedSecondProg.graphStats,
       },
       {
@@ -138,15 +142,19 @@ const initializeGraphStats = (
   } else if (combinedProgramme) {
     return [
       {
-        name: 'Started',
+        name: 'Started bachelor',
         data: started.graphStats,
       },
       {
-        name: 'Graduated',
+        name: 'Started licenciate',
+        data: startedSecondProg.graphStats,
+      },
+      {
+        name: 'Graduated bachelor',
         data: graduated.graphStats,
       },
       {
-        name: 'Graduated 2nd phase',
+        name: 'Graduated licenciate',
         data: graduatedSecondProg.graphStats,
       },
     ]
@@ -187,6 +195,7 @@ const initializeTableStats = (
   combinedProgramme,
   includeAllSpecials,
   started,
+  startedSecondProg,
   graduated,
   graduatedSecondProg,
   transferredAway,
@@ -196,6 +205,7 @@ const initializeTableStats = (
     return [
       year,
       started.tableStats[year],
+      startedSecondProg.tableStats[year],
       graduated.tableStats[year],
       graduatedSecondProg.tableStats[year],
       transferredAway.tableStats[year],
@@ -203,7 +213,13 @@ const initializeTableStats = (
     ]
   }
   if (combinedProgramme) {
-    return [year, started.tableStats[year], graduated.tableStats[year], graduatedSecondProg.tableStats[year]]
+    return [
+      year,
+      started.tableStats[year],
+      startedSecondProg.tableStats[year],
+      graduated.tableStats[year],
+      graduatedSecondProg.tableStats[year],
+    ]
   }
   if (includeAllSpecials) {
     return [
@@ -217,13 +233,10 @@ const initializeTableStats = (
   return [year, started.tableStats[year], graduated.tableStats[year]]
 }
 
-const getBasicStatsForStudytrack = async ({ studyprogramme, settings }) => {
+const getBasicStatsForStudytrack = async ({ studyprogramme, combinedProgramme, settings }) => {
   const { includeAllSpecials, isAcademicYear } = settings
   const since = getStartDate(studyprogramme, isAcademicYear)
   const years = getYearsArray(since.getFullYear(), isAcademicYear)
-
-  const combinedProgramme = combinedStudyprogrammes[studyprogramme] ? combinedStudyprogrammes[studyprogramme][1] : null
-
   const queryParameters = { studyprogramme, since, years, isAcademicYear, includeAllSpecials, combinedProgramme }
   const queryParametersCombinedProg = {
     studyprogramme: combinedProgramme,
@@ -233,6 +246,7 @@ const getBasicStatsForStudytrack = async ({ studyprogramme, settings }) => {
     includeAllSpecials,
   }
   const started = await getStartedStats(queryParameters)
+  const startedSecondProg = await getStartedStats(queryParametersCombinedProg)
   const graduated = await getGraduatedStats(queryParameters)
   const graduatedSecondProg = await getGraduatedStats(queryParametersCombinedProg)
   const transferredAway = await getTransferredAwayStats(queryParameters)
@@ -247,6 +261,7 @@ const getBasicStatsForStudytrack = async ({ studyprogramme, settings }) => {
       combinedProgramme,
       includeAllSpecials,
       started,
+      startedSecondProg,
       graduated,
       graduatedSecondProg,
       transferredAway,
@@ -261,6 +276,7 @@ const getBasicStatsForStudytrack = async ({ studyprogramme, settings }) => {
       includeAllSpecials,
       combinedProgramme,
       started,
+      startedSecondProg,
       graduated,
       transferredAway,
       transferredTo,

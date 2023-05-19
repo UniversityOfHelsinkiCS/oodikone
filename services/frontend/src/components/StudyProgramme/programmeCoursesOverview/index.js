@@ -5,9 +5,10 @@ import { Loader, Segment, Header } from 'semantic-ui-react'
 import CourseTabs from './CourseTabs'
 import CoursesYearFilter from './CourseYearFilter'
 
-const ProgrammeCoursesOverview = ({ studyProgramme, academicYear, setAcademicYear }) => {
+const ProgrammeCoursesOverview = ({ studyProgramme, combinedProgramme, academicYear, setAcademicYear }) => {
   const { data, error, isLoading } = useGetProgrammeCoursesStatsQuery({
     id: studyProgramme,
+    combinedProgramme,
     academicyear: academicYear,
   })
   const [fromYear, setFromYear] = useState(null)

@@ -6,6 +6,7 @@ const { getAllProgrammes } = require('./services/studyrights')
 const { updateBasicView, updateStudytrackView } = require('./services/studyprogrammeUpdates')
 const { findAndSaveTeachers } = require('./services/topteachers')
 const { faculties } = require('./services/organisations')
+const { combinedStudyprogrammes } = require('./services/studyprogrammeHelpers')
 const { updateFacultyOverview, updateFacultyProgressOverview } = require('./services/faculty/facultyUpdates')
 const { isProduction } = require('./conf-backend')
 const { getCurrentSemester } = require('./services/semesters')
@@ -50,12 +51,23 @@ const refreshNewOverviews = async () => {
     )
   let ready = 0
   for (const code of codes) {
+    let combinedProgramme = ''
     try {
-      await updateBasicView(code)
-      await updateStudytrackView(code)
+      await updateBasicView(code, combinedProgramme)
+      await updateStudytrackView(code, combinedProgramme)
       ready += 1
     } catch (e) {
       logger.error({ message: `Failed to update overview stats for programme ${code}`, meta: e })
+    }
+    combinedProgramme = combinedStudyprogrammes[code]
+    if (combinedProgramme) {
+      try {
+        await updateBasicView(code, combinedProgramme)
+        await updateStudytrackView(code, combinedProgramme)
+        ready += 1
+      } catch (e) {
+        logger.error({ message: `Failed to update overview stats for programme ${code}`, meta: e })
+      }
     }
     logger.info(`${ready}/${codes.length} programmes done`)
   }
