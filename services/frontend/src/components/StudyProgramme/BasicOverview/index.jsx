@@ -21,6 +21,12 @@ const getGraduatedText = code => {
   }
   return 'Graduated and thesis writers of the programme'
 }
+const getTitle = code => {
+  if (code.includes('KH')) return 'Bachelor studyright'
+  if (['MH90_001', 'MH30_001', 'MH30_003'].includes(code)) return 'Licenciate studyright'
+  if (code.includes('MH')) return 'Master studyright'
+  return 'Doctoral studyright'
+}
 
 const Overview = ({
   studyprogramme,
@@ -55,6 +61,7 @@ const Overview = ({
       <InfoBox content={toolTips[toolTipText]} />
     </>
   )
+
   const displayMedian = () => (
     <>
       {doCombo && (
@@ -68,14 +75,14 @@ const Overview = ({
       <MedianTimeBarChart
         data={timesData?.medians}
         goal={graduations?.data.graduationTimes?.goal}
-        title={doCombo ? 'Master studyright' : ' '}
+        title={getTitle(studyprogramme)}
         byStartYear={false}
       />
       {combinedProgramme && (
         <MedianTimeBarChart
           data={timesDataSecondProgramme?.medians}
           goal={graduations?.data.graduationTimesSecondProgramme?.goal}
-          title={doCombo ? 'Master studyright' : ' '}
+          title="Bachelor + Licenciate studyright"
           byStartYear={false}
         />
       )}
@@ -87,8 +94,10 @@ const Overview = ({
       {doCombo && (
         <BreakdownBarChart data={graduations?.data?.comboTimes?.medians} title="Bachelor + Master studyright" />
       )}
-      <BreakdownBarChart data={timesData?.medians} title={doCombo ? 'Master studyright' : ' '} />
-      {combinedProgramme && <BreakdownBarChart data={timesDataSecondProgramme?.medians} title={' '} />}
+      <BreakdownBarChart data={timesData?.medians} title={getTitle(studyprogramme)} />
+      {combinedProgramme && (
+        <BreakdownBarChart data={timesDataSecondProgramme?.medians} title="Bachelor and Licenciate studyrights" />
+      )}
     </>
   )
 
