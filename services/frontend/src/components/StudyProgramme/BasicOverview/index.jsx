@@ -68,21 +68,23 @@ const Overview = ({
         <MedianTimeBarChart
           data={graduations?.data?.comboTimes?.medians}
           goal={graduations?.data?.comboTimes?.goal}
-          title="Bachelor + Master studyright"
+          title={studyprogramme === 'MH90_001' ? 'Bachelor + Licenciate studyright' : 'Bachelor + Master studyright'}
           byStartYear={false}
         />
       )}
-      <MedianTimeBarChart
-        data={timesData?.medians}
-        goal={graduations?.data.graduationTimes?.goal}
-        title={getTitle(studyprogramme)}
-        byStartYear={false}
-      />
+      {studyprogramme !== 'MH90_001' && (
+        <MedianTimeBarChart
+          data={timesData?.medians}
+          goal={graduations?.data.graduationTimes?.goal}
+          title={getTitle(studyprogramme)}
+          byStartYear={false}
+        />
+      )}
       {combinedProgramme && (
         <MedianTimeBarChart
           data={timesDataSecondProgramme?.medians}
           goal={graduations?.data.graduationTimesSecondProgramme?.goal}
-          title="Bachelor + Licenciate studyright"
+          title={combinedProgramme === 'MH90_001' ? 'Bachelor + Licenciate studyright' : 'Bachelor + Master studyright'}
           byStartYear={false}
         />
       )}
@@ -92,11 +94,19 @@ const Overview = ({
   const displayBreakdown = () => (
     <>
       {doCombo && (
-        <BreakdownBarChart data={graduations?.data?.comboTimes?.medians} title="Bachelor + Master studyright" />
+        <BreakdownBarChart
+          data={graduations?.data?.comboTimes?.medians}
+          title={studyprogramme === 'MH90_001' ? 'Bachelor + Licenciate studyright' : 'Bachelor + Master studyright'}
+        />
       )}
-      <BreakdownBarChart data={timesData?.medians} title={getTitle(studyprogramme)} />
+      {studyprogramme !== 'MH90_001' && (
+        <BreakdownBarChart data={timesData?.medians} title={getTitle(studyprogramme)} />
+      )}
       {combinedProgramme && (
-        <BreakdownBarChart data={timesDataSecondProgramme?.medians} title="Bachelor and Licenciate studyrights" />
+        <BreakdownBarChart
+          data={timesDataSecondProgramme?.medians}
+          title={combinedProgramme === 'MH90_001' ? 'Bachelor + Licenciate studyright' : 'Bachelor + Master studyright'}
+        />
       )}
     </>
   )
