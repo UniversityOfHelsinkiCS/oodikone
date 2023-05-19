@@ -112,35 +112,9 @@ const initializeGraphStats = (
   transferredTo,
   graduatedSecondProg
 ) => {
-  if (includeAllSpecials && combinedProgramme) {
-    return [
-      {
-        name: 'Started bachelor',
-        data: started.graphStats,
-      },
-      {
-        name: 'Started licenciate',
-        data: startedSecondProg.graphStats,
-      },
-      {
-        name: 'Graduated bachelor',
-        data: graduated.graphStats,
-      },
-      {
-        name: 'Graduated licenciate',
-        data: graduatedSecondProg.graphStats,
-      },
-      {
-        name: 'Transferred away',
-        data: transferredAway.graphStats,
-      },
-      {
-        name: 'Transferred To',
-        data: transferredTo.graphStats,
-      },
-    ]
-  } else if (combinedProgramme) {
-    return [
+  let basicTable = []
+  if (combinedProgramme) {
+    basicTable = [
       {
         name: 'Started bachelor',
         data: started.graphStats,
@@ -158,8 +132,8 @@ const initializeGraphStats = (
         data: graduatedSecondProg.graphStats,
       },
     ]
-  } else if (includeAllSpecials) {
-    return [
+  } else {
+    basicTable = [
       {
         name: 'Started',
         data: started.graphStats,
@@ -168,26 +142,20 @@ const initializeGraphStats = (
         name: 'Graduated',
         data: graduated.graphStats,
       },
-      {
-        name: 'Transferred away',
-        data: transferredAway.graphStats,
-      },
-      {
-        name: 'Transferred To',
-        data: transferredTo.graphStats,
-      },
     ]
   }
-  return [
-    {
-      name: 'Started',
-      data: started.graphStats,
-    },
-    {
-      name: 'Graduated',
-      data: graduated.graphStats,
-    },
-  ]
+
+  if (includeAllSpecials) {
+    basicTable.push({
+      name: 'Transferred away',
+      data: transferredAway.graphStats,
+    })
+    basicTable.push({
+      name: 'Transferred To',
+      data: transferredTo.graphStats,
+    })
+  }
+  return basicTable
 }
 
 const initializeTableStats = (
@@ -270,7 +238,7 @@ const getBasicStatsForStudytrack = async ({ studyprogramme, combinedProgramme, s
   )
 
   return {
-    id: studyprogramme,
+    id: combinedProgramme ? `${studyprogramme}-${combinedProgramme}` : studyprogramme,
     years,
     graphStats: initializeGraphStats(
       includeAllSpecials,
