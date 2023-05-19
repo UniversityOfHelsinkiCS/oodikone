@@ -19,6 +19,54 @@ const {
   getCourseCodesForStudyProgramme,
 } = require('./studyprogramme')
 
+const createGraphStats = (majors, nonMajors, nonDegree, transferred) => {
+  return [
+    {
+      name: 'Major students credits',
+      data: majors.graphStats,
+    },
+    {
+      name: 'Non-major students credits',
+      data: nonMajors.graphStats,
+    },
+    {
+      name: 'Non-degree credits',
+      data: nonDegree.graphStats,
+    },
+    {
+      name: 'Transferred credits',
+      data: transferred.graphStats,
+    },
+  ]
+}
+
+const createTableStats = (reversedYears, includeAllSpecials, majors, nonMajors, transferred, nonDegree) => {
+  const tableStats = reversedYears.map(year =>
+    includeAllSpecials
+      ? [
+          year,
+          majors.tableStats[year] +
+            nonMajors.tableStats[year] +
+            transferred.tableStats[year] +
+            nonDegree.tableStats[year],
+          majors.tableStats[year],
+          nonMajors.tableStats[year],
+          nonDegree.tableStats[year],
+          transferred.tableStats[year],
+        ]
+      : [
+          year,
+          majors.tableStats[year] +
+            nonMajors.tableStats[year] +
+            transferred.tableStats[year] +
+            nonDegree.tableStats[year],
+          majors.tableStats[year],
+          transferred.tableStats[year],
+        ]
+  )
+  return tableStats
+}
+
 // Fetches all the credits for the studyprogramme and divides them into major-students and non-major students credits
 // Division is done on the basis that whether the student had a primary studyright to the programme on the attainment_date
 // If special groups are excluded, the transfer students are filtered away from the major-students as well
@@ -96,69 +144,55 @@ const getTransferredCreditStats = async ({ studyprogramme, since, years, isAcade
 // Fetches all credits for the studytrack and combines them into the statistics for the table
 // and graph in the studyprogramme overview
 // const getCreditStatsForStudytrack = async ({ studyprogramme, combinedProgramme, settings }) => {
-const getCreditStatsForStudytrack = async ({ studyprogramme, settings }) => {
+const getCreditStatsForStudytrack = async ({ studyprogramme, combinedProgramme, settings }) => {
   const { isAcademicYear, includeAllSpecials } = settings
   const since = getStartDate(studyprogramme, isAcademicYear)
   const years = getYearsArray(since.getFullYear(), isAcademicYear)
 
   const queryParameters = { studyprogramme, since, years, isAcademicYear, includeAllSpecials }
+  const queryParametersSecondProg = {
+    studyprogramme: combinedProgramme,
+    since,
+    years,
+    isAcademicYear,
+    includeAllSpecials,
+  }
   const { majors, nonMajors, nonDegree } = await getRegularCreditStats(queryParameters)
   const transferred = await getTransferredCreditStats(queryParameters)
+
+  const {
+    majors: majorsSecondProg,
+    nonMajors: nonMajorsSecondProg,
+    nonDegree: nonDegreeSecondProg,
+  } = await getRegularCreditStats(queryParametersSecondProg)
+  const transferredSecondProg = await getTransferredCreditStats(queryParametersSecondProg)
 
   const reversedYears = getYearsArray(since.getFullYear(), isAcademicYear).reverse()
   const titles = tableTitles['credits'][includeAllSpecials ? 'SPECIAL_INCLUDED' : 'SPECIAL_EXCLUDED']
   const dataFound = [majors, nonMajors, transferred].some(d => d.graphStats.length)
 
   if (!dataFound) return null
-
-  const tableStats = reversedYears.map(year =>
-    includeAllSpecials
-      ? [
-          year,
-          majors.tableStats[year] +
-            nonMajors.tableStats[year] +
-            transferred.tableStats[year] +
-            nonDegree.tableStats[year],
-          majors.tableStats[year],
-          nonMajors.tableStats[year],
-          nonDegree.tableStats[year],
-          transferred.tableStats[year],
-        ]
-      : [
-          year,
-          majors.tableStats[year] +
-            nonMajors.tableStats[year] +
-            transferred.tableStats[year] +
-            nonDegree.tableStats[year],
-          majors.tableStats[year],
-          transferred.tableStats[year],
-        ]
+  const dataFoundSecondProg = [majorsSecondProg, nonMajorsSecondProg, transferredSecondProg].some(
+    d => d.graphStats.length
   )
-
-  const graphStats = [
-    {
-      name: 'Major students credits',
-      data: majors.graphStats,
-    },
-    {
-      name: 'Non-major students credits',
-      data: nonMajors.graphStats,
-    },
-    {
-      name: 'Non-degree credits',
-      data: nonDegree.graphStats,
-    },
-    {
-      name: 'Transferred credits',
-      data: transferred.graphStats,
-    },
-  ]
-
   return {
-    id: studyprogramme,
+    id: combinedProgramme ? `${studyprogramme}-${combinedProgramme}` : studyprogramme,
     years,
-    tableStats,
-    graphStats,
+    tableStats: createTableStats(reversedYears, includeAllSpecials, majors, nonMajors, transferred, nonDegree),
+    graphStats: createGraphStats(majors, nonMajors, nonDegree, transferred),
+    tableStatsSecondProg: dataFoundSecondProg
+      ? createTableStats(
+          reversedYears,
+          includeAllSpecials,
+          majorsSecondProg,
+          nonMajorsSecondProg,
+          transferredSecondProg,
+          nonDegreeSecondProg
+        )
+      : [],
+    graphStatsSecondProg: dataFoundSecondProg
+      ? createGraphStats(majorsSecondProg, nonMajorsSecondProg, nonDegreeSecondProg, transferredSecondProg)
+      : [],
     titles,
   }
 }
