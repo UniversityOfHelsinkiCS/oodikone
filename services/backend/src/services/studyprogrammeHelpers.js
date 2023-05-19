@@ -454,7 +454,13 @@ const tableTitles = {
   basics: {
     SPECIAL_EXCLUDED: ['', 'Started studying', 'Graduated'],
     SPECIAL_INCLUDED: ['', 'Started studying', 'Graduated', 'Transferred away', 'Transferred to'],
-    SPECIAL_EXCLUDED_COMBINED_PROGRAMME: ['', 'Started studying', 'Graduated', 'Graduated 2nd phase'],
+    SPECIAL_EXCLUDED_COMBINED_PROGRAMME: [
+      '',
+      'Started studying bachelor',
+      'Started studying master',
+      'Graduated bachelor',
+      'Graduated licenciate',
+    ],
     SPECIAL_INCLUDED_COMBINED_PROGRAMME: [
       '',
       'Started studying bachelor',
