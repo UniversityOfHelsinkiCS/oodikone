@@ -140,8 +140,8 @@ const StudyProgramme = props => {
     [history]
   )
 
-  const programmeName = createName(studyProgrammeId, secondProgrammeId, programmes, language, getTextIn)
-  const programmeLetterId = programmes?.[studyProgrammeId]?.progId
+  const programmeName = createName(programmeId, secondProgrammeId, programmes, language, getTextIn)
+  const programmeLetterId = programmes?.[programmeId]?.progId
   const secondProgrammeLetterId = programmes?.[secondProgrammeId]?.progId
   const panes = getPanes()
 
@@ -176,7 +176,7 @@ const StudyProgramme = props => {
         <div align="center" style={{ padding: '30px' }}>
           <Header textAlign="center">{programmeName}</Header>
           <span>
-            {programmeLetterId ? `${programmeLetterId} - ` : ''} {studyProgrammeId}
+            {programmeLetterId ? `${programmeLetterId} - ` : ''} {programmeId}
           </span>
           <br />
           {secondProgrammeId && (
