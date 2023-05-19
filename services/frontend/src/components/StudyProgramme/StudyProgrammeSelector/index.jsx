@@ -66,10 +66,11 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected }) => {
             name: combinedName,
             progId: `${programme.progId} - ${secondProgramme[0]?.progId}`,
           })
+        }
+        if (programme.code.includes('KH')) {
+          filteredBachelorProgrammes.push(programme)
         } else if (programme.code.includes('MH')) {
           filteredMasterProgrammes.push(programme)
-        } else if (programme.code.includes('KH')) {
-          filteredBachelorProgrammes.push(programme)
         } else if (/^(T)[0-9]{6}$/.test(programme.code)) {
           filtereDoctoralProgrammes.push(programme)
         } else {
