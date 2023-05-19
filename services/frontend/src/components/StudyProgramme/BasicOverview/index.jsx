@@ -44,7 +44,7 @@ const Overview = ({
   })
   const doCombo = graduations?.data?.doCombo
   const timesData = graduations?.data?.graduationTimes
-
+  const timesDataSecondProgramme = graduations?.data?.graduationTimesSecondProgramme
   const getDivider = (title, toolTipText) => (
     <>
       <div className="divider">
@@ -55,7 +55,6 @@ const Overview = ({
       <InfoBox content={toolTips[toolTipText]} />
     </>
   )
-
   const displayMedian = () => (
     <>
       {doCombo && (
@@ -72,6 +71,14 @@ const Overview = ({
         title={doCombo ? 'Master studyright' : ' '}
         byStartYear={false}
       />
+      {combinedProgramme && (
+        <MedianTimeBarChart
+          data={timesDataSecondProgramme?.medians}
+          goal={graduations?.data.graduationTimesSecondProgramme?.goal}
+          title={doCombo ? 'Master studyright' : ' '}
+          byStartYear={false}
+        />
+      )}
     </>
   )
 
@@ -81,6 +88,7 @@ const Overview = ({
         <BreakdownBarChart data={graduations?.data?.comboTimes?.medians} title="Bachelor + Master studyright" />
       )}
       <BreakdownBarChart data={timesData?.medians} title={doCombo ? 'Master studyright' : ' '} />
+      {combinedProgramme && <BreakdownBarChart data={timesDataSecondProgramme?.medians} title={' '} />}
     </>
   )
 

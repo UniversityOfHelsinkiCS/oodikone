@@ -101,6 +101,7 @@ const getThesisStats = async ({ studyprogramme, since, years, isAcademicYear, in
 const getGraduationTimeStats = async ({ studyprogramme, since, years, isAcademicYear, includeAllSpecials }) => {
   let graduationAmounts = getYearsObject({ years })
   let graduationTimes = getYearsObject({ years, emptyArrays: true })
+  if (!studyprogramme) return { times: { medians: [], goal: 0 }, doCombo: false, comboTimes: { medians: [], goal: 0 } }
   // for bc+ms combo
   const doCombo = studyprogramme.startsWith('MH') && !['MH30_001', 'MH30_003'].includes(studyprogramme)
   let graduationAmountsCombo = getYearsObject({ years })
@@ -264,6 +265,7 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, combinedProgram
   const graduatedSecondProgramme = await getGraduatedStats(combinedQueryParameters)
 
   const graduationTimeStats = await getGraduationTimeStats(queryParameters)
+  const graduationTimeStatsSecondProg = await getGraduationTimeStats(combinedQueryParameters)
 
   const programmesBeforeOrAfter = await getProgrammesBeforeOrAfter(studyprogramme, queryParameters)
 
@@ -325,8 +327,9 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, combinedProgram
           data: thesis.graphStats,
         },
       ]
+
   return {
-    id: studyprogramme,
+    id: combinedProgramme ? `${studyprogramme}-${combinedProgramme}` : studyprogramme,
     years,
     tableStats,
     titles: combinedProgramme ? combinedTitles : titles,
@@ -342,6 +345,7 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, combinedProgram
     graduationTimes: graduationTimeStats.times,
     doCombo: graduationTimeStats.doCombo,
     comboTimes: graduationTimeStats.comboTimes,
+    graduationTimesSecondProgramme: graduationTimeStatsSecondProg.comboTimes,
     programmesBeforeOrAfterTableStats: programmesBeforeOrAfter?.tableStats,
     programmesBeforeOrAfterGraphStats: programmesBeforeOrAfter?.graphStats,
     programmesBeforeOrAfterTitles,
