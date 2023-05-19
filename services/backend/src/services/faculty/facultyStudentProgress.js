@@ -6,11 +6,10 @@ const {
   getCreditThresholds,
   getBachelorCreditGraphStats,
   getMasterCreditGraphStats,
+  getBachelorMasterCreditGraphStats,
   getDoctoralCreditGraphStats,
   getYearsArray,
   tableTitles,
-  getOnlyMasterCreditGraphStats,
-  getBcMsThresholds,
   getVetenaryCreditGraphStats,
 } = require('../studyprogrammeHelpers')
 const { studytrackStudents } = require('../studyprogramme')
@@ -115,13 +114,14 @@ const combineFacultyStudentProgress = async (faculty, programmes, allProgrammeCo
     mastersTableStats: new Array(yearsArray.length),
     doctoralTableStats: new Array(yearsArray.length),
     bachelorsGraphStats: getBachelorCreditGraphStats(yearsArray),
-    bcMsGraphStats: faculty === 'H90' ? getVetenaryCreditGraphStats(yearsArray) : getMasterCreditGraphStats(yearsArray),
+    bcMsGraphStats:
+      faculty === 'H90' ? getVetenaryCreditGraphStats(yearsArray) : getBachelorMasterCreditGraphStats(yearsArray),
     mastersGraphStats:
-      faculty === 'H90' ? getBachelorCreditGraphStats(yearsArray) : getOnlyMasterCreditGraphStats(yearsArray),
+      faculty === 'H90' ? getBachelorCreditGraphStats(yearsArray) : getMasterCreditGraphStats(yearsArray),
     doctoralGraphStats: getDoctoralCreditGraphStats(yearsArray),
     bachelorTitles: tableTitles.creditProgress.bachelor,
-    bcMsTitles: faculty === 'H90' ? titlesVet : tableTitles.creditProgress.master,
-    mastersTitles: faculty === 'H90' ? tableTitles.creditProgress.bachelor : tableTitles.creditProgress.masterOnly,
+    bcMsTitles: faculty === 'H90' ? titlesVet : tableTitles.creditProgress.bachelorMaster,
+    mastersTitles: faculty === 'H90' ? tableTitles.creditProgress.bachelor : tableTitles.creditProgress.master,
     doctoralTitles: tableTitles.creditProgress.doctoral,
     yearlyBachelorTitles: [],
     yearlyBcMsTitles: [],
@@ -190,7 +190,9 @@ const combineFacultyStudentProgress = async (faculty, programmes, allProgrammeCo
         },
       }
       let studyrights = await getStudyRightsByExtent(faculty, {}, startDateWhere, code, extentcodes, graduationStatus)
-      let { creditThresholdKeys, creditThresholdAmounts } = getCreditThresholds(code, true)
+      // Get credit threshold values: 'combined study programme' is false and 'only master studyright' is true
+      let { creditThresholdKeys, creditThresholdAmounts } = getCreditThresholds(code, false, true)
+
       if (!creditThresholdKeys) continue
       if (!(progId in progressStats.programmeNames)) {
         progressStats.programmeNames[progId] = { code: code, ...name }
@@ -239,7 +241,11 @@ const combineFacultyStudentProgress = async (faculty, programmes, allProgrammeCo
         progressStats.mastersTableStats[indexOf(reversedYears, 'Total')][1] += msStudents.length || 0
         progressStats.bcMsTableStats[indexOf(reversedYears, year)][1] += bcMsStudents.length || 0
         progressStats.bcMsTableStats[indexOf(reversedYears, 'Total')][1] += bcMsStudents.length || 0
-        const { creditThresholdKeysBcMs, creditThresholdAmountsBcMs } = getBcMsThresholds(code)
+        // Get credit threshold values both 'combined study programme' and 'only master studyright' are false
+
+        const { creditThresholdKeys: creditThresholdKeysBcMs, creditThresholdAmounts: creditThresholdAmountsBcMs } =
+          getCreditThresholds(code, false, false)
+
         const { data: bcMsStudentdata, progData: bcMsProgdata } = getStudentData(
           startDate,
           bcMsStudents,
@@ -249,7 +255,6 @@ const combineFacultyStudentProgress = async (faculty, programmes, allProgrammeCo
           limitKeys,
           'MH'
         )
-
         const { data: msStudentdata, progData: msProgdata } = getStudentData(
           startDate,
           msStudents,

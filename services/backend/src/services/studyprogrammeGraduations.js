@@ -15,7 +15,6 @@ const {
   alltimeEndDate,
   getId,
   getGoal,
-  combinedStudyprogrammes,
 } = require('./studyprogrammeHelpers')
 const {
   graduatedStudyRights,
@@ -246,11 +245,10 @@ const getProgrammesBeforeOrAfter = async (studyprogramme, queryParameters) => {
   return null
 }
 
-const getGraduationStatsForStudytrack = async ({ studyprogramme, settings }) => {
+const getGraduationStatsForStudytrack = async ({ studyprogramme, combinedProgramme, settings }) => {
   const { isAcademicYear, includeAllSpecials } = settings
   const since = getStartDate(studyprogramme, isAcademicYear)
   const years = getYearsArray(since.getFullYear(), isAcademicYear)
-  const combinedProgramme = combinedStudyprogrammes[studyprogramme] ? combinedStudyprogrammes[studyprogramme][1] : null
   const queryParameters = { studyprogramme, since, years, isAcademicYear, includeAllSpecials }
   const combinedQueryParameters = {
     studyprogramme: combinedProgramme,
@@ -275,7 +273,13 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, settings }) => 
     studyprogramme.includes('LIS') || studyprogramme.includes('T')
       ? ['', 'Graduated']
       : ['', 'Graduated', 'Wrote thesis']
-  const titlesSecondProg = ['Graduated 2nd phase', 'Wrote thesis 2nd phase']
+  const combinedTitles = [
+    '',
+    'Graduated bachelor',
+    'Wrote thesis bachelor',
+    'Graduated licenciate',
+    'Wrote thesis licenciate',
+  ]
   const programmesBeforeOrAfterTitles = ['Code', 'Id', 'Programme', ...years]
   const tableStatsDefault = combinedProgramme
     ? reversedYears.map(year => [
@@ -295,19 +299,19 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, settings }) => 
   const graphStats = combinedProgramme
     ? [
         {
-          name: 'Graduated students',
+          name: 'Graduated bachelor',
           data: graduated.graphStats,
         },
         {
-          name: 'Wrote thesis',
+          name: 'Wrote thesis bachelor',
           data: thesis.graphStats,
         },
         {
-          name: 'Graduated 2nd phase',
+          name: 'Graduated licenciate',
           data: graduatedSecondProgramme.graphStats,
         },
         {
-          name: 'Wrote thesis 2nd phase',
+          name: 'Wrote thesis licenciate',
           data: thesisSecondProgramme.graphStats,
         },
       ]
@@ -325,7 +329,7 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, settings }) => 
     id: studyprogramme,
     years,
     tableStats,
-    titles: combinedProgramme ? [...titles, ...titlesSecondProg] : titles,
+    titles: combinedProgramme ? combinedTitles : titles,
     graphStats:
       studyprogramme.includes('LIS') || studyprogramme.includes('T')
         ? [

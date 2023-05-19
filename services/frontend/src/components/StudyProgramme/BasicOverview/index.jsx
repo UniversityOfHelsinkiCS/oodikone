@@ -22,14 +22,26 @@ const getGraduatedText = code => {
   return 'Graduated and thesis writers of the programme'
 }
 
-const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYear, setAcademicYear }) => {
+const Overview = ({
+  studyprogramme,
+  combinedProgramme,
+  specialGroups,
+  setSpecialGroups,
+  academicYear,
+  setAcademicYear,
+}) => {
   const [showMedian, setShowMedian] = useState(false)
   const toolTips = InfotoolTips.Studyprogramme
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
   const special = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
-  const basics = useGetBasicStatsQuery({ id: studyprogramme, yearType, specialGroups: special })
-  const credits = useGetCreditStatsQuery({ id: studyprogramme, yearType, specialGroups: special })
-  const graduations = useGetGraduationStatsQuery({ id: studyprogramme, yearType, specialGroups: special })
+  const basics = useGetBasicStatsQuery({ id: studyprogramme, combinedProgramme, yearType, specialGroups: special })
+  const credits = useGetCreditStatsQuery({ id: studyprogramme, combinedProgramme, yearType, specialGroups: special })
+  const graduations = useGetGraduationStatsQuery({
+    id: studyprogramme,
+    combinedProgramme,
+    yearType,
+    specialGroups: special,
+  })
   const doCombo = graduations?.data?.doCombo
   const timesData = graduations?.data?.graduationTimes
 
