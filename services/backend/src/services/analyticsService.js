@@ -34,9 +34,11 @@ const setBasicStats = async (data, yearType, specialGroups) => {
   return dataToRedis
 }
 
-const getCreditStats = async (id, yearType, specialGroups) => {
+const getCreditStats = async (id, combinedProgramme, yearType, specialGroups) => {
   if (!isUpdatedNewProgramme(id)) return null
-  const redisKey = createRedisKeyForCreditStats(id, yearType, specialGroups)
+  let searchkey = id
+  if (combinedProgramme) searchkey = `${id}-${combinedProgramme}`
+  const redisKey = createRedisKeyForCreditStats(searchkey, yearType, specialGroups)
   const dataFromRedis = await redisClient.getAsync(redisKey)
   if (!dataFromRedis) return null
   return JSON.parse(dataFromRedis)

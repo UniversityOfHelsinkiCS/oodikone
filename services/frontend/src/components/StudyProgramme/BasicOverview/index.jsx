@@ -178,6 +178,27 @@ const Overview = ({
                   titles={credits?.data?.titles}
                 />
               </div>
+              {combinedProgramme && credits?.data?.graphStatsSecondProg?.length > 0 && (
+                <>
+                  <h4>
+                    {combinedProgramme === 'MH90_001'
+                      ? 'Credits produced by the licenciate programme'
+                      : 'Credits produced by the master programme'}
+                  </h4>
+                  <div className="section-container">
+                    <StackedBarChart
+                      cypress="CreditsProducedByTheSecondProg"
+                      data={credits?.data?.graphStatsSecondProg}
+                      labels={credits?.data?.years}
+                    />
+                    <DataTable
+                      cypress="CreditsProducedByTheSecondProg"
+                      data={credits?.data?.tableStatsSecondProg}
+                      titles={credits?.data?.titles}
+                    />
+                  </div>
+                </>
+              )}
             </>
           )}
           {graduations.isSuccess && graduations.data && (
