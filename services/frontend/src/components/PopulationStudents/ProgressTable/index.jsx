@@ -4,61 +4,76 @@ import { Link } from 'react-router-dom'
 import { Tab, Item, Icon, Message } from 'semantic-ui-react'
 import SortableTable from 'components/SortableTable'
 import sendEvent from 'common/sendEvent'
-import { getTextIn } from 'common'
 import { keyBy } from 'lodash'
 import moment from 'moment'
+import useLanguage from '../../LanguagePicker/useLanguage'
 import '../../StudentStatistics/StudentInfoCard/studentInfoCard.css'
 
 const sendAnalytics = sendEvent.populationStudents
+
+const findRowContent = (student, courseCode, year, start, end, criteria) => {
+  if (courseCode.includes('Credits'))
+    return student.criteriaProgress[year] && student.criteriaProgress[year].credits ? (
+      <Icon fitted name="check" title="Checked" color="green" />
+    ) : null
+  const courses = student.courses.filter(
+    course =>
+      course.course_code === courseCode ||
+      (criteria?.allCourses[courseCode] && criteria?.allCourses[courseCode].includes(course.course_code))
+  )
+
+  if (courses && courses.some(course => course.credittypecode === 9))
+    return <Icon name="clipboard check" color="green" />
+  if (
+    courses &&
+    courses.some(course => course.passed) &&
+    courses.some(course => moment(course.date).isBetween(moment(start), moment(end)))
+  )
+    return <Icon fitted name="check" color="green" />
+  if (courses && courses.some(course => course.passed)) return <Icon fitted name="check" color="grey" />
+  if (courses && courses.some(course => course.passed === false)) return <Icon fitted name="times" color="red" />
+  if (student.enrollments && student.enrollments.map(course => course.course_code).includes(courseCode))
+    return <Icon fitted name="minus" color="grey" />
+  return null
+}
+
+const findCsvText = (student, courseCode, year, criteria) => {
+  if (courseCode.includes('Credits'))
+    return student.criteriaProgress[year] && student.criteriaProgress[year].credits ? 'Passed' : ''
+  const courses = student.courses.filter(
+    course =>
+      course.course_code === courseCode ||
+      (criteria?.allCourses[courseCode] && criteria?.allCourses[courseCode].includes(course.course_code))
+  )
+  if (courses && courses.some(course => course.passed)) return `Passed-${moment(courses[0].date).format('YYYY-MM-DD')}`
+  if (courses && courses.some(course => course.passed === false))
+    return `Failed-${moment(courses[0].date).format('YYYY-MM-DD')}`
+  if (student.enrollments && student.enrollments.map(course => course.course_code).includes(courseCode)) {
+    const enrollment = student.enrollments.filter(enrollment => enrollment.course_code === courseCode)
+    return `Enrollment-${moment(enrollment[0].enrollment_date_time).format('YYYY-MM-DD')}`
+  }
+  return ''
+}
+
+const createEmptyHidden = nthHiddenColumn => {
+  return [
+    {
+      key: `empty-hidden-${nthHiddenColumn}`,
+      export: true,
+      forceToolsMode: 'none',
+      textTitle: '   ',
+      cellProps: { style: { display: 'none' } },
+      getRowVal: () => ' ',
+      child: true,
+    },
+  ]
+}
+
 const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGroupProgramme }) => {
   const mandatoryCourses = useSelector(state => state?.populationMandatoryCourses?.data)
   const namesVisible = useSelector(state => state?.settings?.namesVisible)
+  const { getTextIn } = useLanguage()
   const isStudyGuidanceGroupProgramme = studyGuidanceGroupProgramme !== ''
-
-  const findRowContent = (s, courseCode, year, start, end) => {
-    if (courseCode.includes('Credits'))
-      return s.criteriaProgress[year] && s.criteriaProgress[year].credits ? (
-        <Icon fitted name="check" title="Checked" color="green" />
-      ) : null
-    const courses = s.courses.filter(
-      course =>
-        course.course_code === courseCode ||
-        (criteria?.allCourses[courseCode] && criteria?.allCourses[courseCode].includes(course.course_code))
-    )
-    if (courses && courses.some(course => course.credittypecode === 9))
-      return <Icon name="clipboard check" color="green" />
-    if (
-      courses &&
-      courses.some(course => course.passed) &&
-      courses.some(course => moment(course.date).isBetween(moment(start), moment(end)))
-    )
-      return <Icon fitted name="check" color="green" />
-    if (courses && courses.some(course => course.passed)) return <Icon fitted name="check" color="grey" />
-    if (courses && courses.some(course => course.passed === false)) return <Icon fitted name="times" color="red" />
-    if (s.enrollments && s.enrollments.map(course => course.course_code).includes(courseCode))
-      return <Icon fitted name="minus" color="grey" />
-    return null
-  }
-
-  const findCsvText = (s, courseCode, year) => {
-    if (courseCode.includes('Credits'))
-      return s.criteriaProgress[year] && s.criteriaProgress[year].credits ? 'Passed' : ''
-    const courses = s.courses.filter(
-      course =>
-        course.course_code === courseCode ||
-        (criteria?.allCourses[courseCode] && criteria?.allCourses[courseCode].includes(course.course_code))
-    )
-    if (courses && courses.some(course => course.passed))
-      return `Passed-${moment(courses[0].date).format('YYYY-MM-DD')}`
-    if (courses && courses.some(course => course.passed === false))
-      return `Failed-${moment(courses[0].date).format('YYYY-MM-DD')}`
-    if (s.enrollments && s.enrollments.map(course => course.course_code).includes(courseCode)) {
-      const enrollment = s.enrollments.filter(enrollment => enrollment.course_code === courseCode)
-      return `Enrollment-${moment(enrollment[0].enrollment_date_time).format('YYYY-MM-DD')}`
-    }
-    return ''
-  }
-
   const credtiMonths = [12, 24, 36, 48, 60, 72]
   const defaultCourses = keyBy(mandatoryCourses.defaultProgrammeCourses, 'code')
   const coursesSecondProgramme = keyBy(mandatoryCourses.secondProgrammeCourses, 'code')
@@ -102,6 +117,7 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
     ]
     return acc
   }, {})
+
   const criteriaHeaders = [
     { title: months < 12 ? 'Academic Year 1 (in progress)' : 'Academic Year 1', year: 'year1', label: 'yearOne' },
     { title: months < 24 ? 'Academic Year 2 (in progress)' : 'Academic Year 2', year: 'year2', label: 'yearTwo' },
@@ -119,7 +135,7 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
   const style = { verticalAlign: 'middle', textAlign: 'center' }
 
   const helpTexts = {
-    0: 'no info',
+    0: 'No information',
     1: 'Active',
     2: 'Student has enrolled as absent.',
     3: 'Student has not enrolled to semester and is counted as inactive.',
@@ -204,7 +220,7 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
             ? getEnrollmentValue(s.semesterenrollments[enrollStatusIdx + 1])
             : 'No info'
         }
-        return findCsvText(s, m.code, year)
+        return findCsvText(s, m.code, year, criteria)
       },
       getRowContent: s => {
         if (m.code.includes('Criteria')) return s.criteriaProgress[year] ? s.criteriaProgress[year].totalSatisfied : 0
@@ -216,7 +232,7 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
           return s.semesterenrollments.length > enrollStatusIdx + 1
             ? renderSemester(s.semesterenrollments[enrollStatusIdx + 1])
             : ''
-        return findRowContent(s, m.code, year, start, end)
+        return findRowContent(s, m.code, year, start, end, criteria)
       },
       child: true,
     }))
@@ -229,57 +245,60 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
     .endOf('month')
 
   const columns = useMemo(() => {
-    const studentColumns = []
-    if (namesVisible) {
-      studentColumns.push(
-        {
-          key: 'lastname_visible',
-          title: 'Last name',
-          getRowVal: s => s.lastname,
-          cellProps: { title: 'last name' },
-          export: false,
-          child: true,
-        },
-        {
-          key: 'firstname_visible',
-          title: 'Given names',
-          getRowVal: s => s.firstnames,
-          cellProps: { title: 'first names' },
-          export: false,
-          child: true,
-        }
-      )
-    }
-    studentColumns.push({
-      key: 'studentnumber-parent',
-      title: 'Student Number',
-      cellProps: { title: 'student number', className: 'studentNumber' },
-      getRowVal: s => s.studentNumber,
-      getRowContent: s => (
-        <div>
-          <span>{s.studentNumber}</span>
-          <Item
-            as={Link}
-            to={`/students/${s.studentNumber}`}
-            onClick={() => {
-              sendAnalytics('Student details button clicked', 'Student progress table')
-            }}
-          >
-            <Icon style={{ borderLeft: '1em' }} name="user outline" />
-          </Item>
-        </div>
-      ),
-      child: true,
-    })
-
-    const columns = []
-    columns.push(
+    const columns = [
       {
         key: 'general',
-        title: <b>Labels:</b>,
+        title: <b>Student</b>,
         textTitle: null,
         parent: true,
-        children: studentColumns,
+        children: [
+          {
+            key: 'studentnumber-parent',
+            title: 'Student Number',
+            cellProps: { title: 'student number', className: 'studentNumber' },
+            getRowVal: s => s.studentNumber,
+            getRowContent: s => (
+              <div>
+                <span>{s.studentNumber}</span>
+                <Item
+                  as={Link}
+                  to={`/students/${s.studentNumber}`}
+                  onClick={() => {
+                    sendAnalytics('Student details button clicked', 'Student progress table')
+                  }}
+                >
+                  <Icon style={{ borderLeft: '1em' }} name="user outline" />
+                </Item>
+              </div>
+            ),
+            child: true,
+          },
+        ],
+      },
+      {
+        key: 'names',
+        title: '',
+        mergeHeader: !namesVisible,
+        textTitle: null,
+        parent: true,
+        children: [
+          {
+            key: 'lastname-hidden',
+            title: 'Last Name',
+            export: true,
+            forceToolsMode: namesVisible ? '' : 'none',
+            getRowVal: s => s.lastname,
+            cellProps: namesVisible ? '' : { style: { display: 'none' } },
+          },
+          {
+            key: 'firstname-hidden',
+            title: 'First Names',
+            export: true,
+            forceToolsMode: namesVisible ? '' : 'none',
+            getRowVal: s => s.firstnames,
+            cellProps: namesVisible ? '' : { style: { display: 'none' } },
+          },
+        ],
       },
       {
         key: criteriaHeaders[0].title,
@@ -303,19 +322,9 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
         textTitle: null,
         mergeHeader: true,
         parent: true,
-        children: [
-          {
-            key: 'second_academic',
-            export: true,
-            forceToolsMode: 'none',
-            textTitle: ' ',
-            cellProps: { style: { display: 'none' } },
-            getRowVal: () => ' ',
-            child: true,
-          },
-        ],
-      }
-    )
+        children: createEmptyHidden(1),
+      },
+    ]
     if (months > 12) {
       const startAca2 = moment(acaYearStart).add(1, 'years')
       const endAca2 = moment(acaYearEnd).add(1, 'years')
@@ -342,17 +351,7 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
           textTitle: null,
           mergeHeader: true,
           parent: true,
-          children: [
-            {
-              key: 'third_academic',
-              export: true,
-              forceToolsMode: 'none',
-              textTitle: '  ',
-              cellProps: { style: { display: 'none' } },
-              getRowVal: () => ' ',
-              child: true,
-            },
-          ],
+          children: createEmptyHidden(2),
         }
       )
     }
@@ -382,17 +381,7 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
           textTitle: null,
           mergeHeader: true,
           parent: true,
-          children: [
-            {
-              key: 'empty-hidden-3',
-              export: true,
-              forceToolsMode: 'none',
-              textTitle: '   ',
-              cellProps: { style: { display: 'none' } },
-              getRowVal: () => ' ',
-              child: true,
-            },
-          ],
+          children: createEmptyHidden(3),
         }
       )
     }
@@ -430,17 +419,7 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
             textTitle: null,
             mergeHeader: true,
             parent: true,
-            children: [
-              {
-                key: 'fifth_academic',
-                export: true,
-                forceToolsMode: 'none',
-                textTitle: ' ',
-                cellProps: { style: { display: 'none' } },
-                getRowVal: () => ' ',
-                child: true,
-              },
-            ],
+            children: createEmptyHidden(4),
           }
         )
       }
@@ -471,17 +450,7 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
             textTitle: null,
             mergeHeader: true,
             parent: true,
-            children: [
-              {
-                key: 'sixth_academic',
-                export: true,
-                forceToolsMode: 'none',
-                textTitle: '  ',
-                cellProps: { style: { display: 'none' } },
-                getRowVal: () => ' ',
-                child: true,
-              },
-            ],
+            children: createEmptyHidden(5),
           }
         )
       }
@@ -511,73 +480,11 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
             textTitle: null,
             mergeHeader: true,
             parent: true,
-            children: [
-              {
-                key: 'empty-hidden-6',
-                export: true,
-                forceToolsMode: 'none',
-                textTitle: '   ',
-                cellProps: { style: { display: 'none' } },
-                getRowVal: () => ' ',
-                child: true,
-              },
-            ],
+            children: createEmptyHidden(6),
           }
         )
       }
     }
-    const columnsToHide = [
-      {
-        key: 'hidden-phoneNumber',
-        export: true,
-        forceToolsMode: 'none',
-        textTitle: `Phone number`,
-        headerProps: { style: { display: 'none' } },
-        cellProps: { style: { display: 'none' } },
-        getRowVal: s => s.phoneNumber,
-        child: true,
-      },
-      {
-        key: 'hidden-email',
-        export: true,
-        forceToolsMode: 'none',
-        textTitle: 'Email',
-        headerProps: { style: { display: 'none' } },
-        cellProps: { style: { display: 'none' } },
-        getRowVal: s => s.email,
-        child: true,
-      },
-      {
-        key: 'hidden-secondary-email',
-        export: true,
-        forceToolsMode: 'none',
-        textTitle: 'Secondary Email',
-        headerProps: { style: { display: 'none' } },
-        cellProps: { style: { display: 'none' } },
-        getRowVal: s => s.secondaryEmail,
-        child: true,
-      },
-      {
-        key: 'lastname-hidden',
-        textTitle: 'Last Name',
-        export: true,
-        forceToolsMode: 'none',
-        headerProps: { style: { display: 'none' } },
-        getRowVal: s => s.lastname,
-        cellProps: { style: { display: 'none' } },
-        child: true,
-      },
-      {
-        key: 'firstname-hidden',
-        textTitle: 'First Names',
-        export: true,
-        forceToolsMode: 'none',
-        headerProps: { style: { display: 'none' } },
-        getRowVal: s => s.firstnames,
-        cellProps: { style: { display: 'none' } },
-        child: true,
-      },
-    ]
 
     columns.push({
       key: 'hiddenFiles',
@@ -585,7 +492,38 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
       mergeHeader: true,
       textTitle: null,
       parent: true,
-      children: columnsToHide,
+      children: [
+        {
+          key: 'hidden-phoneNumber',
+          export: true,
+          forceToolsMode: 'none',
+          textTitle: `Phone number`,
+          headerProps: { style: { display: 'none' } },
+          cellProps: { style: { display: 'none' } },
+          getRowVal: s => s.phoneNumber,
+          child: true,
+        },
+        {
+          key: 'hidden-email',
+          export: true,
+          forceToolsMode: 'none',
+          textTitle: 'Email',
+          headerProps: { style: { display: 'none' } },
+          cellProps: { style: { display: 'none' } },
+          getRowVal: s => s.email,
+          child: true,
+        },
+        {
+          key: 'hidden-secondary-email',
+          export: true,
+          forceToolsMode: 'none',
+          textTitle: 'Secondary Email',
+          headerProps: { style: { display: 'none' } },
+          cellProps: { style: { display: 'none' } },
+          getRowVal: s => s.secondaryEmail,
+          child: true,
+        },
+      ],
     })
 
     return columns
