@@ -169,7 +169,7 @@ const PopulationStudents = ({
   const queryStudyrights = query ? Object.values(query.studyRights) : []
   let months = query ? query.months : 0
   if (studyGuidanceGroup && studyGuidanceGroup?.tags?.year) {
-    months = moment(`${studyGuidanceGroup?.tags?.year}-08-01`).diff(moment(), 'months')
+    months = moment().diff(moment(`${studyGuidanceGroup?.tags?.year}-08-01`), 'months')
   }
   const prevShowList = usePrevious(showList)
   const { isAdmin } = useGetAuthorizedUserQuery()
