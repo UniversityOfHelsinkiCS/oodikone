@@ -457,16 +457,16 @@ const tableTitles = {
     SPECIAL_EXCLUDED_COMBINED_PROGRAMME: [
       '',
       'Started studying bachelor',
-      'Started studying licenciate',
+      'Started studying licentiate',
       'Graduated bachelor',
-      'Graduated licenciate',
+      'Graduated licentiate',
     ],
     SPECIAL_INCLUDED_COMBINED_PROGRAMME: [
       '',
       'Started studying bachelor',
-      'Started studying licenciate',
+      'Started studying licentiate',
       'Graduated bachelor',
-      'Graduated licenciate',
+      'Graduated licentiate',
       'Transferred away',
       'Transferred to',
     ],
@@ -533,7 +533,7 @@ const tableTitles = {
   studytracksStart: ['', 'All', 'Started studying', 'Currently enrolled', 'Absent', 'Inactive'],
   studytracksBasic: ['Graduated'],
   studytracksCombined: {
-    licenciate: ['Graduated Bachelor', 'Graduated Licenciate'],
+    licentiate: ['Graduated Bachelor', 'Graduated Licentiate'],
     master: ['Graduated Bachelor', 'Graduated master'],
   },
   studytracksEnd: ['Men', 'Women', 'Finland'],
@@ -586,7 +586,7 @@ const getGoal = programme => {
     return 36
   }
   if (programme.startsWith('MH') || programme.endsWith('-ma')) {
-    if (programme === 'MH90_001') return 36 // vetenary programme's licenciate is 36 months.
+    if (programme === 'MH90_001') return 36 // vetenary programme's licentiate is 36 months.
     if (['MH30_004', '420420-ma'].includes(programme)) {
       return 24 + 6
     }

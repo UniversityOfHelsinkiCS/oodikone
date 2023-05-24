@@ -412,7 +412,7 @@ const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, combinedPro
   }
 
   const getCorrectCombinedTitles = () => {
-    if (['MH90_001'].includes(combinedProgramme)) return tableTitles.studytracksCombined.licenciate
+    if (['MH90_001'].includes(combinedProgramme)) return tableTitles.studytracksCombined.licentiate
     return tableTitles.studytracksCombined.master
   }
   const studytrackOptions = getStudytrackOptions(studyprogramme, studytrackNames, studytracks, data.emptyTracks, years)

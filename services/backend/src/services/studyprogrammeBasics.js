@@ -120,7 +120,7 @@ const initializeGraphStats = (
         data: started.graphStats,
       },
       {
-        name: 'Started licenciate',
+        name: 'Started licentiate',
         data: startedSecondProg.graphStats,
       },
       {
@@ -128,7 +128,7 @@ const initializeGraphStats = (
         data: graduated.graphStats,
       },
       {
-        name: 'Graduated licenciate',
+        name: 'Graduated licentiate',
         data: graduatedSecondProg.graphStats,
       },
     ]
