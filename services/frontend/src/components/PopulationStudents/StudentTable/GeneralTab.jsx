@@ -701,7 +701,7 @@ const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
   const getStudyGuidanceGroupColumns = () => {
     const cols = ['credits.since', 'programme', 'startYear']
     if (studyGuidanceGroup?.tags?.studyProgramme)
-      cols.push('studyrightStart', 'studyStartDate', 'studyStartDateActual', 'endDate')
+      cols.push('studyrightStart', 'studyStartDate', 'studyStartDateActual', 'endDate', 'semesterEnrollments')
     if (studyGuidanceGroup?.tags?.studyProgramme && studyGuidanceGroup?.tags?.year) {
       cols.push('admissionType')
     }
