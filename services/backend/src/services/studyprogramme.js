@@ -53,7 +53,7 @@ const studytrackStudents = async studentnumbers =>
     })
   ).map(formatStudent)
 
-const enrolledStudents = async (studytrack, since, studentnumbers) => {
+const enrolledStudents = async (studytrack, studentnumbers) => {
   const currentSemester = await getCurrentSemester()
 
   const students = await Student.findAll({
@@ -71,6 +71,9 @@ const enrolledStudents = async (studytrack, since, studentnumbers) => {
           },
         ],
         attributes: ['studyrightid'],
+        where: {
+          graduated: 0,
+        },
       },
       {
         model: SemesterEnrollment,
@@ -185,6 +188,37 @@ const startedStudyrights = async (studytrack, since, studentnumbers) =>
         },
       ],
       where: {
+        studystartdate: {
+          [Op.gte]: since,
+        },
+        student_studentnumber: whereStudents(studentnumbers),
+      },
+    })
+  ).map(formatStudyright)
+
+const graduatedStudyRightsByStartDate = async (studytrack, since, studentnumbers) =>
+  (
+    await Studyright.findAll({
+      include: [
+        {
+          model: StudyrightElement,
+          required: true,
+          include: {
+            model: ElementDetail,
+            required: true,
+            where: {
+              code: studytrack,
+            },
+          },
+        },
+        {
+          model: Student,
+          attributes: ['studentnumber'],
+          required: true,
+        },
+      ],
+      where: {
+        graduated: 1,
         studystartdate: {
           [Op.gte]: since,
         },
@@ -851,6 +885,7 @@ module.exports = {
   allStudyrights,
   startedStudyrights,
   graduatedStudyRights,
+  graduatedStudyRightsByStartDate,
   inactiveStudyrights,
   previousStudyrights,
   followingStudyrights,
