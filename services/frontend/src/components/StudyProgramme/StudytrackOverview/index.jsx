@@ -130,14 +130,33 @@ const StudytrackOverview = ({
               />
               <div className="section-container-centered">
                 {showMedian ? (
-                  <MedianTimeBarChart
-                    data={stats?.data?.graduationTimes[track].medians}
-                    goal={stats?.data?.graduationTimes.goal}
-                    title={' '}
-                    byStartYear
-                  />
+                  <div className="section-container">
+                    <MedianTimeBarChart
+                      data={stats?.data?.graduationTimes[track].medians}
+                      goal={stats?.data?.graduationTimes.goal}
+                      title={' '}
+                      byStartYear
+                    />
+                    {combinedProgramme && (
+                      <MedianTimeBarChart
+                        data={stats?.data?.graduationTimesSecondProg[combinedProgramme]?.medians}
+                        goal={stats?.data?.graduationTimes.goal}
+                        title={' '}
+                        byStartYear
+                      />
+                    )}{' '}
+                  </div>
                 ) : (
-                  <BreakdownBarChart data={stats?.data?.graduationTimes[track].medians} title={' '} byStartYear />
+                  <div className="section-container">
+                    <BreakdownBarChart data={stats?.data?.graduationTimes[track].medians} title={' '} byStartYear />
+                    {combinedProgramme && (
+                      <BreakdownBarChart
+                        data={stats?.data?.graduationTimesSecondProg[combinedProgramme]?.medians}
+                        title={' '}
+                        byStartYear
+                      />
+                    )}
+                  </div>
                 )}
               </div>
             </>

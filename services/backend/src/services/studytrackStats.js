@@ -22,7 +22,7 @@ const {
   inactiveStudyrights,
   enrolledStudents,
   absentStudents,
-  graduatedStudyRights,
+  graduatedStudyRightsByStartDate,
 } = require('./studyprogramme')
 const { getAcademicYearDates } = require('../util/semester')
 const { countTimeCategories } = require('./graduationHelpers')
@@ -73,18 +73,26 @@ const getGraduationTimeStats = async ({ year, graduated, track, graduationAmount
     graduationAmounts[track][year] += 1
     times = [...times, timeToGraduation]
   })
-
   const median = getMedian(times)
   const statistics = countTimeCategories(times, graduationTimes.goal)
-
   graduationTimes[track].medians = [
     ...graduationTimes[track].medians,
     { y: median, amount: graduationAmounts[track][year], name: year, statistics, classSize },
   ]
 }
 
-const getStats = (all, started, enrolled, absent, inactive, graduated, studentData) => {
-  return [
+const getStats = (
+  all,
+  started,
+  enrolled,
+  absent,
+  inactive,
+  graduated,
+  graduatedSecondProg,
+  studentData,
+  combinedProgramme
+) => {
+  const beginTablestats = [
     all.length,
     getPercentage(all.length, all.length),
     started.length,
@@ -97,6 +105,11 @@ const getStats = (all, started, enrolled, absent, inactive, graduated, studentDa
     getPercentage(inactive.length, all.length),
     graduated.length,
     getPercentage(graduated.length, all.length),
+  ]
+  const combinedTableStats = combinedProgramme
+    ? [graduatedSecondProg.length, getPercentage(graduatedSecondProg.length, all.length)]
+    : []
+  const endTableStats = [
     studentData.male,
     getPercentage(studentData.male, all.length),
     studentData.female,
@@ -104,11 +117,13 @@ const getStats = (all, started, enrolled, absent, inactive, graduated, studentDa
     studentData.finnish,
     getPercentage(studentData.finnish, all.length),
   ]
+  return [...beginTablestats, ...combinedTableStats, ...endTableStats]
 }
 
 // Goes through the programme and all its studytracks for the said year and adds the wanted stats to the data objects
 const getStudytrackDataForTheYear = async ({
-  studyprogramme, //combinedProgramme,
+  studyprogramme,
+  combinedProgramme,
   since,
   settings,
   studytracks,
@@ -129,6 +144,8 @@ const getStudytrackDataForTheYear = async ({
     creditTableStats,
     graduationAmounts,
     graduationTimes,
+    graduationTimesSecondProg,
+    graduationAmountsSecondProg,
     totalAmounts,
     emptyTracks,
     totals,
@@ -153,15 +170,19 @@ const getStudytrackDataForTheYear = async ({
       let absent = []
       let inactive = []
       let graduated = []
+      let graduatedSecondProg = []
       // Get all the studyrights and students for the calculations
       if (year !== 'Total') {
         all = await allStudyrights(track, studentnumbers)
         studentData = getStudentData(startDate, students, creditThresholdKeys, creditThresholdAmounts)
         started = await startedStudyrights(track, startDate, studentnumbers)
-        enrolled = await enrolledStudents(track, startDate, studentnumbers)
+        enrolled = await enrolledStudents(track, studentnumbers)
         absent = await absentStudents(track, studentnumbers)
         inactive = await inactiveStudyrights(track, studentnumbers)
-        graduated = await graduatedStudyRights(track, startDate, studentnumbers)
+        graduated = await graduatedStudyRightsByStartDate(track, startDate, studentnumbers)
+        if (combinedProgramme)
+          graduatedSecondProg = await graduatedStudyRightsByStartDate(combinedProgramme, startDate, studentnumbers)
+
         totals[track].all = [...totals[track].all, ...all]
         totals[track].studentData.male += studentData.male
         totals[track].studentData.female += studentData.female
@@ -171,6 +192,7 @@ const getStudytrackDataForTheYear = async ({
         totals[track].absent = [...totals[track].absent, ...absent]
         totals[track].inactive = [...totals[track].inactive, ...inactive]
         totals[track].graduated = [...totals[track].graduated, ...graduated]
+        totals[track].graduatedSecondProg = [...totals[track].graduatedSecondProg, ...graduatedSecondProg]
       } else {
         all = totals[track].all
         studentData = totals[track].studentData
@@ -179,6 +201,7 @@ const getStudytrackDataForTheYear = async ({
         absent = totals[track].absent
         inactive = totals[track].inactive
         graduated = totals[track].graduated
+        graduatedSecondProg = totals[track].graduatedSecondProg
       }
 
       // If the track has no stats for that year, it should be removed from the table and dropdown options
@@ -209,7 +232,20 @@ const getStudytrackDataForTheYear = async ({
       }
       // Count stats for the main studytrack table grouped by tracks
       mainStatsByTrack[track] = [
-        [year, ...getStats(all, started, enrolled, absent, inactive, graduated, studentData)],
+        [
+          year,
+          ...getStats(
+            all,
+            started,
+            enrolled,
+            absent,
+            inactive,
+            graduated,
+            graduatedSecondProg,
+            studentData,
+            combinedProgramme
+          ),
+        ],
         ...mainStatsByTrack[track],
       ]
 
@@ -217,7 +253,17 @@ const getStudytrackDataForTheYear = async ({
       mainStatsByYear[year] = [
         [
           studytrackNames[track]?.name['fi'] ? `${studytrackNames[track]?.name['fi']}, ${track}` : year,
-          ...getStats(all, started, enrolled, absent, inactive, graduated, studentData),
+          ...getStats(
+            all,
+            started,
+            enrolled,
+            absent,
+            inactive,
+            graduated,
+            graduatedSecondProg,
+            studentData,
+            combinedProgramme
+          ),
         ],
         ...mainStatsByYear[year],
       ]
@@ -235,12 +281,29 @@ const getStudytrackDataForTheYear = async ({
         graduationTimes,
         classSize: totalAmounts[track][year],
       })
+      if (combinedProgramme) {
+        await getGraduationTimeStats({
+          year,
+          graduated: graduatedSecondProg,
+          track: combinedProgramme,
+          graduationAmounts: graduationAmountsSecondProg,
+          graduationTimes: graduationTimesSecondProg,
+          classSize: totalAmounts[studyprogramme][year],
+        })
+      }
     })
   )
   Object.keys(graduationTimes).forEach(track => {
     if (track !== 'goal') {
       const sortedMedians = graduationTimes[track].medians.sort((a, b) => b.name.localeCompare(a.name))
       graduationTimes[track].medians = sortedMedians
+    }
+  })
+
+  Object.keys(graduationTimesSecondProg).forEach(track => {
+    if (track !== 'goal') {
+      const sortedMedians = graduationTimesSecondProg[track].medians.sort((a, b) => b.name.localeCompare(a.name))
+      graduationTimesSecondProg[track].medians = sortedMedians
     }
   })
 }
@@ -250,7 +313,7 @@ const getStudytrackDataForTheYear = async ({
 const getStudytrackOptions = (studyprogramme, studytrackNames, studytracks, emptyTracks, years) => {
   const names = { [studyprogramme]: 'All students of the programme' }
   studytracks.forEach(track => {
-    const trackName = studytrackNames[track]?.name['fi']
+    const trackName = studytrackNames[track]?.name
     if (trackName && emptyTracks.get(track) !== years.length) {
       names[track] = trackName
     }
@@ -266,6 +329,11 @@ const getEmptyStatsObjects = (years, studytracks, studyprogramme, combinedProgra
   const creditTableStats = {}
   const graduationAmounts = {}
   const graduationTimes = { goal: getGoal(studyprogramme) }
+  const graduationTimesSecondProg = {
+    [combinedProgramme]: { medians: [] },
+    goal: getGoal(studyprogramme) + getGoal(combinedProgramme),
+  }
+  const graduationAmountsSecondProg = { [combinedProgramme]: getYearsObject({ years }) }
   const totalAmounts = {}
   const emptyTracks = new Map()
   const totals = {}
@@ -283,6 +351,7 @@ const getEmptyStatsObjects = (years, studytracks, studyprogramme, combinedProgra
       absent: [],
       inactive: [],
       graduated: [],
+      graduatedSecondProg: [],
       studentData: { male: 0, female: 0, finnish: 0 },
     }
   })
@@ -294,6 +363,8 @@ const getEmptyStatsObjects = (years, studytracks, studyprogramme, combinedProgra
     creditTableStats,
     graduationAmounts,
     graduationTimes,
+    graduationAmountsSecondProg,
+    graduationTimesSecondProg,
     totalAmounts,
     emptyTracks,
     totals,
@@ -301,6 +372,7 @@ const getEmptyStatsObjects = (years, studytracks, studyprogramme, combinedProgra
 }
 
 // Combines all the data for the Populations and Studytracks -view
+// At the moment combined programme is thought to have only one track, the programme itself
 const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, combinedProgramme, settings }) => {
   const isAcademicYear = true
   const includeYearsCombined = true
@@ -313,7 +385,6 @@ const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, combinedPro
     : [studyprogramme]
 
   const studytrackNames = associations.studyTracks
-
   const data = getEmptyStatsObjects(years, studytracks, studyprogramme, combinedProgramme)
   const onlyMasterStudyrights = true
 
@@ -340,14 +411,19 @@ const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, combinedPro
     })
   }
 
+  const getCorrectCombinedTitles = () => {
+    if (['MH90_001'].includes(combinedProgramme)) return tableTitles.studytracksCombined.licenciate
+    return tableTitles.studytracksCombined.master
+  }
   const studytrackOptions = getStudytrackOptions(studyprogramme, studytrackNames, studytracks, data.emptyTracks, years)
+  const graduatedTitles = combinedProgramme ? getCorrectCombinedTitles() : tableTitles.studytracksBasic
   return {
     id: combinedProgramme ? `${studyprogramme}-${combinedProgramme}` : studyprogramme,
     years: years,
     ...data,
     studytrackOptions,
     includeGraduated: settings.graduated,
-    populationTitles: tableTitles['studytracks'],
+    populationTitles: [...tableTitles.studytracksStart, ...graduatedTitles, ...tableTitles.studytracksEnd],
     creditTableTitles:
       studyprogramme === 'MH90_001'
         ? tableTitles['creditProgress']['bachelor']

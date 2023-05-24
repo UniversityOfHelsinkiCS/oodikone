@@ -52,6 +52,7 @@ const refreshNewOverviews = async () => {
   let ready = 0
   for (const code of codes) {
     let combinedProgramme = ''
+    // Update only the bachelor programme
     try {
       await updateBasicView(code, combinedProgramme)
       await updateStudytrackView(code, combinedProgramme)
@@ -59,7 +60,8 @@ const refreshNewOverviews = async () => {
     } catch (e) {
       logger.error({ message: `Failed to update overview stats for programme ${code}`, meta: e })
     }
-    combinedProgramme = combinedStudyprogrammes[code]
+    combinedProgramme = combinedStudyprogrammes[code] || ''
+    // If bachelor programme is combined with master programme, then update the combination.
     if (combinedProgramme) {
       try {
         await updateBasicView(code, combinedProgramme)

@@ -530,19 +530,13 @@ const tableTitles = {
     ],
     doctoral: ['', 'All', '< 10 credits', '10-19 credits', '20-29 credits', '30-39 credits', '40 ≤ credits'],
   },
-  // Unify these when faculty and studytrack have the same table structure
-  studytracks: [
-    '',
-    'All',
-    'Started studying',
-    'Currently enrolled',
-    'Absent',
-    'Inactive',
-    'Graduated',
-    'Men',
-    'Women',
-    'Finland',
-  ],
+  studytracksStart: ['', 'All', 'Started studying', 'Currently enrolled', 'Absent', 'Inactive'],
+  studytracksBasic: ['Graduated'],
+  studytracksCombined: {
+    licenciate: ['Graduated Bachelor', 'Graduated Licenciate'],
+    master: ['Graduated Bachelor', 'Graduated master'],
+  },
+  studytracksEnd: ['Men', 'Women', 'Finland'],
   programmes: [
     '',
     'All',
@@ -587,6 +581,7 @@ const getId = code => {
 }
 
 const getGoal = programme => {
+  if (!programme) return 0
   if (programme.startsWith('KH') || programme.endsWith('-ba')) {
     return 36
   }
