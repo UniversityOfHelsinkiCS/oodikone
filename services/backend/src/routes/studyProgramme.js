@@ -163,12 +163,12 @@ router.get('/v2/studyprogrammes/:id/evaluationstats', async (req, res) => {
   if (!code) return res.status(422).end()
 
   // Statistics for Tilannekuvalomake view
-
-  let gradData = await getGraduationStats(code, yearType, specialGroups)
+  const combinedProgramme = ''
+  let gradData = await getGraduationStats(code, combinedProgramme, yearType, specialGroups)
   if (!gradData) {
     const updatedStats = await getGraduationStatsForStudytrack({
       studyprogramme: req.params.id,
-      combinedProgramme: null,
+      combinedProgramme,
       settings: {
         isAcademicYear: yearType === 'ACADEMIC_YEAR',
         includeAllSpecials: specialGroups === 'SPECIAL_INCLUDED',
@@ -180,11 +180,11 @@ router.get('/v2/studyprogrammes/:id/evaluationstats', async (req, res) => {
     }
   }
 
-  let progressData = await getStudytrackStats(code, graduated, specialGroups)
+  let progressData = await getStudytrackStats(code, combinedProgramme, graduated, specialGroups)
   if (!progressData) {
     const updated = await getStudytrackStatsForStudyprogramme({
       studyprogramme: code,
-      combinedProgramme: null,
+      combinedProgramme,
       settings: {
         graduated: graduated === 'GRADUATED_INCLUDED',
         specialGroups: specialGroups === 'SPECIAL_INCLUDED',
@@ -201,7 +201,6 @@ router.get('/v2/studyprogrammes/:id/evaluationstats', async (req, res) => {
   delete gradData.tableStats
   delete gradData.graphStats
   delete gradData.titles
-
   const data = {
     id: code,
     programmeName: programmeName?.name,
