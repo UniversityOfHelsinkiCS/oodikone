@@ -265,9 +265,6 @@ const SingleStudyGroupFilterView = props => {
   const initialOptions = {}
 
   if (props.group?.tags?.year) {
-    initialOptions[filters.creditDateFilter.key] = {
-      startDate: moment(createAcademicYearStartDate(props.group.tags?.year)),
-    }
     initialOptions[filters.hopsFilter.key] = {
       studyStart: props.group?.tags?.year ? `${props.group.tags.year}-07-31` : null,
       clearCreditDate: true,
