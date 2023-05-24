@@ -346,9 +346,10 @@ const GeneralTab = ({
       key: 'credits-hops',
       title: sole ? 'Credits in HOPS' : 'HOPS',
       filterType: 'range',
-      getRowVal: s => {
-        return s.hopsCredits
-      },
+      getRowVal: s =>
+        s.hopsCredits !== undefined
+          ? s.hopsCredits
+          : s.studyplans?.find(plan => plan.programme_code === programmeCode)?.completed_credits ?? 0,
     }),
     studyright: sole => ({
       key: 'credits-studyright',
@@ -362,6 +363,7 @@ const GeneralTab = ({
         return credits
       },
     }),
+
     since: sole => ({
       // If a year is associated and no filters exist, this will act differently
       key: 'credits-since',
@@ -379,7 +381,11 @@ const GeneralTab = ({
     creditsColumn = {
       key: 'credits-parent',
       title: 'Credits',
-      children: creditColumnKeys.map(key => availableCreditsColumns[key.split('.')[1]](false)),
+      children: Object.keys(availableCreditsColumns)
+        .map(name => availableCreditsColumns[name](false))
+        .filter(col => creditColumnKeys.includes(col.key.replace('-', '.'))),
+
+      // creditColumnKeys.map(key => availableCreditsColumns[key.split('.')[1]](false)),
     }
   }
 
@@ -701,7 +707,14 @@ const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
   const getStudyGuidanceGroupColumns = () => {
     const cols = ['credits.since', 'programme', 'startYear']
     if (studyGuidanceGroup?.tags?.studyProgramme)
-      cols.push('studyrightStart', 'studyStartDate', 'studyStartDateActual', 'endDate', 'semesterEnrollments')
+      cols.push(
+        'credits.hops',
+        'studyrightStart',
+        'studyStartDate',
+        'studyStartDateActual',
+        'endDate',
+        'semesterEnrollments'
+      )
     if (studyGuidanceGroup?.tags?.studyProgramme && studyGuidanceGroup?.tags?.year) {
       cols.push('admissionType')
     }
