@@ -37,7 +37,7 @@ export const getStudentToStudyrightStartMap = (students, programmeCode) => {
     return res
   }, {})
 }
-// Combined study programmes: key bachelor programme, item master/licenciate programme
+// Combined study programmes: key bachelor programme, item master/licentiate programme
 export const getCombinedProgrammeId = progId => {
   const combinedProgrammes = { KH90_001: 'MH90_001' }
   return Object.keys(combinedProgrammes).includes(progId) ? combinedProgrammes[progId] : ''

@@ -23,7 +23,7 @@ const getGraduatedText = code => {
 }
 const getTitle = code => {
   if (code.includes('KH')) return 'Bachelor studyright'
-  if (['MH90_001', 'MH30_001', 'MH30_003'].includes(code)) return 'Licenciate studyright'
+  if (['MH90_001', 'MH30_001', 'MH30_003'].includes(code)) return 'Licentiate studyright'
   if (code.includes('MH')) return 'Master studyright'
   return 'Doctoral studyright'
 }
@@ -68,7 +68,7 @@ const Overview = ({
         <MedianTimeBarChart
           data={graduations?.data?.comboTimes?.medians}
           goal={graduations?.data?.comboTimes?.goal}
-          title={studyprogramme === 'MH90_001' ? 'Bachelor + Licenciate studyright' : 'Bachelor + Master studyright'}
+          title={studyprogramme === 'MH90_001' ? 'Bachelor + Licentiate studyright' : 'Bachelor + Master studyright'}
           byStartYear={false}
         />
       )}
@@ -84,7 +84,7 @@ const Overview = ({
         <MedianTimeBarChart
           data={timesDataSecondProgramme?.medians}
           goal={graduations?.data.graduationTimesSecondProgramme?.goal}
-          title={combinedProgramme === 'MH90_001' ? 'Bachelor + Licenciate studyright' : 'Bachelor + Master studyright'}
+          title={combinedProgramme === 'MH90_001' ? 'Bachelor + Licentiate studyright' : 'Bachelor + Master studyright'}
           byStartYear={false}
         />
       )}
@@ -96,7 +96,7 @@ const Overview = ({
       {doCombo && (
         <BreakdownBarChart
           data={graduations?.data?.comboTimes?.medians}
-          title={studyprogramme === 'MH90_001' ? 'Bachelor + Licenciate studyright' : 'Bachelor + Master studyright'}
+          title={studyprogramme === 'MH90_001' ? 'Bachelor + Licentiate studyright' : 'Bachelor + Master studyright'}
         />
       )}
       {studyprogramme !== 'MH90_001' && (
@@ -105,7 +105,7 @@ const Overview = ({
       {combinedProgramme && (
         <BreakdownBarChart
           data={timesDataSecondProgramme?.medians}
-          title={combinedProgramme === 'MH90_001' ? 'Bachelor + Licenciate studyright' : 'Bachelor + Master studyright'}
+          title={combinedProgramme === 'MH90_001' ? 'Bachelor + Licentiate studyright' : 'Bachelor + Master studyright'}
         />
       )}
     </>
@@ -192,7 +192,7 @@ const Overview = ({
                 <>
                   <h4>
                     {combinedProgramme === 'MH90_001'
-                      ? 'Credits produced by the licenciate programme'
+                      ? 'Credits produced by the licentiate programme'
                       : 'Credits produced by the master programme'}
                   </h4>
                   <div className="section-container">

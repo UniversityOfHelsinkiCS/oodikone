@@ -279,8 +279,8 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, combinedProgram
     '',
     'Graduated bachelor',
     'Wrote thesis bachelor',
-    'Graduated licenciate',
-    'Wrote thesis licenciate',
+    'Graduated licentiate',
+    'Wrote thesis licentiate',
   ]
   const programmesBeforeOrAfterTitles = ['Code', 'Id', 'Programme', ...years]
   const tableStatsDefault = combinedProgramme
@@ -309,11 +309,11 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, combinedProgram
           data: thesis.graphStats,
         },
         {
-          name: 'Graduated licenciate',
+          name: 'Graduated licentiate',
           data: graduatedSecondProgramme.graphStats,
         },
         {
-          name: 'Wrote thesis licenciate',
+          name: 'Wrote thesis licentiate',
           data: thesisSecondProgramme.graphStats,
         },
       ]
