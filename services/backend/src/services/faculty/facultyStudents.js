@@ -3,9 +3,9 @@ const { Op } = require('sequelize')
 const { getStartDate, getYearsArray, getPercentage, getYearsObject, tableTitles } = require('../studyprogrammeHelpers')
 const { getAcademicYearDates } = require('../../util/semester')
 const { getStudyRightsByExtent, getStudentsByStudentnumbers, getTransfers } = require('./faculty')
-const { getCurrentSemester } = require('../semesters')
 const { checkTransfers } = require('./facultyHelpers')
-const { inactiveStudyrights, absentStudents } = require('../studyprogramme')
+const { inactiveStudyrights, absentStudents, enrolledStudents } = require('../studyprogramme')
+const { graduatedStudyRights } = require('../studyprogramme')
 const emptyTotals = () => {
   return {
     total: 0,
@@ -139,24 +139,18 @@ const getFacultyDataForYear = async ({
 
     studyrights = allStudyrights.filter(s => !checkTransfers(s, allTransfers, allTransfers))
     if (includeAllSpecials) {
-      allStudents = [...new Set([...allTransfers.map(sr => sr.studentnumber).filter(smbr => smbr !== null)])]
+      allStudents = [...new Set([...allTransfers.map(sr => sr.studentnumber).filter(student => student !== null)])]
     }
     // Get all the studyrights and students for the calculations
-    const currentSemester = await getCurrentSemester()
     const studentNbrs = studyrights.map(sr => sr.studentnumber)
     allStudents = [...studentNbrs, ...allStudents]
-
     const students = await getStudentsByStudentnumbers(allStudents)
     const studentData = getStudentData(students, facultyExtra, year, code)
     const started = await getStudentsByStudentnumbers(studentNbrs)
-    const inactive = await inactiveStudyrights(code, studentNbrs)
-    const graduatedStudents = studyrights.filter(sr => sr.graduated === 1)
-    const absent = await absentStudents(code, studentNbrs)
-
-    const enrolled = students.filter(
-      s =>
-        s.semesters.filter(semester => semester.semestercode === currentSemester.semestercode)[0]?.enrollmenttype === 1
-    )
+    const inactive = await inactiveStudyrights(code, allStudents)
+    const graduatedStudents = await graduatedStudyRights(code, start, allStudents)
+    const absent = await absentStudents(code, allStudents)
+    const enrolled = await enrolledStudents(code, allStudents)
     // Count stats for the programme
     if (students.length === 0) continue
     if (!(progId in programmeTableStats)) {

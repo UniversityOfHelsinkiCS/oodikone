@@ -119,6 +119,9 @@ const absentStudents = async (studytrack, studentnumbers) => {
           },
         ],
         attributes: ['studyrightid'],
+        where: {
+          graduated: 0,
+        },
       },
       {
         model: SemesterEnrollment,
@@ -257,37 +260,45 @@ const graduatedStudyRights = async (studytrack, since, studentnumbers) =>
   ).map(formatStudyright)
 
 const inactiveStudyrights = async (studytrack, studentnumbers) => {
-  const now = moment(new Date())
-  const inactiveOrExpired = (
-    await Studyright.findAll({
-      include: [
-        {
-          model: StudyrightElement,
-          required: true,
-          include: {
-            model: ElementDetail,
+  const currentSemester = await getCurrentSemester()
+  const students = await Student.findAll({
+    attributes: ['studentnumber'],
+    include: [
+      {
+        model: Studyright,
+        required: true,
+        include: [
+          {
+            model: StudyrightElement,
             required: true,
             where: {
               code: studytrack,
             },
           },
+        ],
+        attributes: ['studyrightid'],
+        where: {
+          graduated: 0,
+          active: 0,
         },
-        {
-          model: Student,
-          attributes: ['studentnumber'],
-          required: true,
-        },
-      ],
-      where: {
-        student_studentnumber: whereStudents(studentnumbers),
-        graduated: 0,
       },
-    })
-  )
-    .filter(s => s.active === 0 || (s.enddate && moment(s.enddate).isBefore(now)))
-    .map(formatStudyright)
-
-  return inactiveOrExpired
+      {
+        model: SemesterEnrollment,
+        attributes: ['semestercode'],
+        required: true,
+        where: {
+          enrollmenttype: 3,
+          semestercode: currentSemester.semestercode,
+        },
+      },
+    ],
+    where: {
+      studentnumber: {
+        [Op.in]: studentnumbers,
+      },
+    },
+  })
+  return students
 }
 
 const followingStudyrights = async (since, programmes, studentnumbers) =>
