@@ -1,8 +1,9 @@
 import React from 'react'
-import { Card, Icon, Button, Item } from 'semantic-ui-react'
+import { Card, Icon, Button } from 'semantic-ui-react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import { useGetAuthorizedUserQuery } from 'redux/auth'
+import SisuLinkItem from 'components/common/SisuLinkItem'
 import { reformatDate } from '../../../common'
 import { DISPLAY_DATE_FORMAT, DISPLAY_DATE_FORMAT_DEV } from '../../../constants'
 import './studentInfoCard.css'
@@ -38,16 +39,7 @@ const StudentInfoCard = ({ student }) => {
           <div>
             {name}
             {student.studentNumber}
-            <div data-cy="sisulink">
-              <Item
-                as="a"
-                href={`https://sisu.helsinki.fi/tutor/role/staff/student/${student.sis_person_id}/basic/basic-info`}
-                target="_blank"
-              >
-                <Icon name="external alternate" />
-                Sisu
-              </Item>
-            </div>
+            <SisuLinkItem id={student.sis_person_id} />
           </div>
           <Icon name="remove" className="controlIcon" onClick={onRemove} />
         </Card.Header>
