@@ -7,6 +7,7 @@ import moment from 'moment'
 import StudentNameVisibilityToggle, { useStudentNameVisibility } from 'components/StudentNameVisibilityToggle'
 import useLanguage from 'components/LanguagePicker/useLanguage'
 import RightsNotification from 'components/RightsNotification'
+import SisuLinkItem from 'components/common/SisuLinkItem'
 import sendEvent from '../../common/sendEvent'
 
 const getColumns = (courses, showStudentNames, getTextIn, sendAnalytics) => {
@@ -63,16 +64,7 @@ const getColumns = (courses, showStudentNames, getTextIn, sendAnalytics) => {
           >
             <Icon name="user outline" />
           </Item>
-          <div data-cy="sisulink">
-            <Item
-              as="a"
-              href={`https://sisu.helsinki.fi/tutor/role/staff/student/${s.sis_person_id}/basic/basic-info`}
-              target="_blank"
-            >
-              <Icon name="external alternate" />
-              Sisu
-            </Item>
-          </div>
+          <SisuLinkItem id={s.sis_person_id} />
         </div>
       ),
     },

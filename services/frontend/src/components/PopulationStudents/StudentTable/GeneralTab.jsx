@@ -19,6 +19,7 @@ import {
 import { useGetStudyGuidanceGroupPopulationQuery } from 'redux/studyGuidanceGroups'
 import { useGetAuthorizedUserQuery } from 'redux/auth'
 import { useGetSemestersQuery } from 'redux/semesters'
+import SisuLinkItem from 'components/common/SisuLinkItem'
 import { PRIORITYCODE_TEXTS } from '../../../constants'
 import sendEvent from '../../../common/sendEvent'
 import useLanguage from '../../LanguagePicker/useLanguage'
@@ -429,20 +430,7 @@ const GeneralTab = ({
         {
           key: 'sisulink',
           export: false,
-          getRowVal: s =>
-            !s.obfuscated && (
-              <Item
-                as="a"
-                href={`https://sisu.helsinki.fi/tutor/role/staff/student/${s.sis_person_id}/basic/basic-info`}
-                target="_blank"
-                onClick={() => {
-                  sendAnalytics('Student link to Sisu clicked', 'General tab')
-                }}
-              >
-                <Icon name="external alternate" />
-                Sisu
-              </Item>
-            ),
+          getRowVal: s => !s.obfuscated && <SisuLinkItem id={s.sis_person_id} tab="General Tab" />,
           cellProps: { className: 'iconCellNoPointer' },
         },
       ],
