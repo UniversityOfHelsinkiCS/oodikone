@@ -11,7 +11,7 @@ export default class ExportVisitor extends DataVisitor {
 
   visitRow(ctx) {
     const row = _.chain(this.columns)
-      .map(column => [getColumnTitle(column), getColumnValue(ctx, column, true)])
+      .map(column => [getColumnTitle(column).replace('\n', ' '), getColumnValue(ctx, column, true)])
       .fromPairs()
       .value()
 
