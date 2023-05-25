@@ -305,7 +305,7 @@ describe('Studyprogramme overview', () => {
       cy.get('[data-cy=graduation-times-graph-breakdownBachelor]')
       cy.get('[data-cy=GraduationTimeToggle]').click()
 
-      cy.get('[data-cy=graduation-times-graph]').within(() => {
+      cy.get('[data-cy=graduation-times-graphBachelor]').within(() => {
         cy.contains('Start year')
         cy.contains('2019 - 2020')
         cy.contains('42 graduated').trigger('mouseover')
