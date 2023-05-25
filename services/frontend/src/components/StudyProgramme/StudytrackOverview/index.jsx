@@ -12,6 +12,7 @@ import MedianTimeBarChart from '../MedianTimeBarChart'
 import BreakdownBarChart from '../BreakdownBarChart'
 
 import InfotoolTips from '../../../common/InfoToolTips'
+import { getGraduationGraphTitle } from '../../../common'
 import '../studyprogramme.css'
 
 const StudytrackOverview = ({
@@ -33,7 +34,6 @@ const StudytrackOverview = ({
     specialGroups: special,
     graduated: grad,
   })
-
   useEffect(() => {
     if (!track && stats?.data?.mainStatsByTrack[studyprogramme]) {
       setTrack(studyprogramme)
@@ -57,7 +57,7 @@ const StudytrackOverview = ({
 
   const noData = stats.isSuccess && stats.mainStatsByYear && !stats.mainStatsByYear.Total.length
   if (noData) return <h3>There is no data available for the selected programme between 2017-2022</h3>
-
+  const doCombo = true
   return (
     <div className="studytrack-overview">
       {stats.isLoading || stats.isFetching ? (
@@ -134,25 +134,29 @@ const StudytrackOverview = ({
                     <MedianTimeBarChart
                       data={stats?.data?.graduationTimes[track].medians}
                       goal={stats?.data?.graduationTimes.goal}
-                      title={' '}
+                      title={getGraduationGraphTitle(track)}
                       byStartYear
                     />
                     {combinedProgramme && (
                       <MedianTimeBarChart
                         data={stats?.data?.graduationTimesSecondProg[combinedProgramme]?.medians}
                         goal={stats?.data?.graduationTimes.goal}
-                        title={' '}
+                        title={getGraduationGraphTitle(combinedProgramme, doCombo)}
                         byStartYear
                       />
-                    )}{' '}
+                    )}
                   </div>
                 ) : (
                   <div className="section-container">
-                    <BreakdownBarChart data={stats?.data?.graduationTimes[track].medians} title={' '} byStartYear />
+                    <BreakdownBarChart
+                      data={stats?.data?.graduationTimes[track].medians}
+                      title={getGraduationGraphTitle(studyprogramme)}
+                      byStartYear
+                    />
                     {combinedProgramme && (
                       <BreakdownBarChart
                         data={stats?.data?.graduationTimesSecondProg[combinedProgramme]?.medians}
-                        title={' '}
+                        title={getGraduationGraphTitle(combinedProgramme, doCombo)}
                         byStartYear
                       />
                     )}

@@ -12,6 +12,7 @@ import Toggle from '../Toggle'
 import InfoBox from '../../Info/InfoBox'
 
 import InfotoolTips from '../../../common/InfoToolTips'
+import { getGraduationGraphTitle } from '../../../common'
 import '../studyprogramme.css'
 
 const isNewProgramme = code => code.includes('KH') || code.includes('MH') || /^(T)[0-9]{6}$/.test(code)
@@ -20,12 +21,6 @@ const getGraduatedText = code => {
     return 'Graduated of the programme'
   }
   return 'Graduated and thesis writers of the programme'
-}
-const getTitle = code => {
-  if (code.includes('KH')) return 'Bachelor studyright'
-  if (['MH90_001', 'MH30_001', 'MH30_003'].includes(code)) return 'Licentiate studyright'
-  if (code.includes('MH')) return 'Master studyright'
-  return 'Doctoral studyright'
 }
 
 const Overview = ({
@@ -68,7 +63,7 @@ const Overview = ({
         <MedianTimeBarChart
           data={graduations?.data?.comboTimes?.medians}
           goal={graduations?.data?.comboTimes?.goal}
-          title={studyprogramme === 'MH90_001' ? 'Bachelor + Licentiate studyright' : 'Bachelor + Master studyright'}
+          title={getGraduationGraphTitle(studyprogramme, doCombo)}
           byStartYear={false}
         />
       )}
@@ -76,7 +71,7 @@ const Overview = ({
         <MedianTimeBarChart
           data={timesData?.medians}
           goal={graduations?.data.graduationTimes?.goal}
-          title={getTitle(studyprogramme)}
+          title={getGraduationGraphTitle(studyprogramme)}
           byStartYear={false}
         />
       )}
@@ -84,7 +79,7 @@ const Overview = ({
         <MedianTimeBarChart
           data={timesDataSecondProgramme?.medians}
           goal={graduations?.data.graduationTimesSecondProgramme?.goal}
-          title={combinedProgramme === 'MH90_001' ? 'Bachelor + Licentiate studyright' : 'Bachelor + Master studyright'}
+          title={getGraduationGraphTitle(combinedProgramme, true)}
           byStartYear={false}
         />
       )}
@@ -96,16 +91,16 @@ const Overview = ({
       {doCombo && (
         <BreakdownBarChart
           data={graduations?.data?.comboTimes?.medians}
-          title={studyprogramme === 'MH90_001' ? 'Bachelor + Licentiate studyright' : 'Bachelor + Master studyright'}
+          title={getGraduationGraphTitle(studyprogramme, doCombo)}
         />
       )}
       {studyprogramme !== 'MH90_001' && (
-        <BreakdownBarChart data={timesData?.medians} title={getTitle(studyprogramme)} />
+        <BreakdownBarChart data={timesData?.medians} title={getGraduationGraphTitle(studyprogramme)} />
       )}
       {combinedProgramme && (
         <BreakdownBarChart
           data={timesDataSecondProgramme?.medians}
-          title={combinedProgramme === 'MH90_001' ? 'Bachelor + Licentiate studyright' : 'Bachelor + Master studyright'}
+          title={getGraduationGraphTitle(combinedProgramme, true)}
         />
       )}
     </>

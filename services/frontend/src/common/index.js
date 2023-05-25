@@ -37,10 +37,22 @@ export const getStudentToStudyrightStartMap = (students, programmeCode) => {
     return res
   }, {})
 }
+
 // Combined study programmes: key bachelor programme, item master/licentiate programme
 export const getCombinedProgrammeId = progId => {
   const combinedProgrammes = { KH90_001: 'MH90_001' }
   return Object.keys(combinedProgrammes).includes(progId) ? combinedProgrammes[progId] : ''
+}
+
+//  Graph titles for graduation graphs used in studyprogramme Basic info -tab and Programmes and student pop. -tab
+export const getGraduationGraphTitle = (studyProgramme, doCombo = false) => {
+  if (!studyProgramme) return ''
+  if (['MH30_001', 'MH30_003'].includes(studyProgramme)) return 'Licenciate studyright'
+  if (doCombo && studyProgramme === 'MH90_001') return 'Bachelor + licentiate studyright'
+  if (doCombo && studyProgramme.includes('MH')) return 'Bachelor + master studyright'
+  if (studyProgramme.includes('KH')) return 'Bachelor studyright'
+  if (studyProgramme.includes('MH')) return 'Master studyright'
+  return 'Doctoral studyright'
 }
 
 export const getUnifiedProgrammeName = (bachelor, masterLisenciate, language) => {
@@ -321,9 +333,9 @@ export const getTargetCreditsForProgramme = code => {
   if (code === 'MH30_004') return 150
   if (code === 'MH90_001') return 180
   if (code.includes('MH')) return 120
+  if (code.includes('T')) return 40
   return 180
-  // There are also doctoral degrees of 40, but probably not necessary
-  // Those codes begin with 'LIS' or 'T'
+  // Those codes begin with 'LIS' is it 40 credits or something else?
 }
 
 const getMonthsForDegree = code => getTargetCreditsForProgramme(code) / (60 / 12)
