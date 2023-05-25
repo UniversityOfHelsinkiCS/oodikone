@@ -1,12 +1,12 @@
 import React, { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Tab, Item, Icon, Message } from 'semantic-ui-react'
+import { Tab, Icon, Message } from 'semantic-ui-react'
 import SortableTable from 'components/SortableTable'
 import sendEvent from 'common/sendEvent'
 import { keyBy } from 'lodash'
 import moment from 'moment'
-import SisuLinkItem from 'components/common/SisuLinkItem'
+import StudentInfoCard from 'components/StudentStatistics/StudentInfoCard'
 import useLanguage from '../../LanguagePicker/useLanguage'
 import '../../StudentStatistics/StudentInfoCard/studentInfoCard.css'
 
@@ -259,20 +259,7 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
             cellProps: { title: 'student number', className: 'studentNumber' },
             getRowVal: s => s.studentNumber,
             getRowContent: s => (
-              <div style={{ display: 'inline-flex' }}>
-                <span>{s.studentNumber}</span>
-                <Item
-                  as={Link}
-                  to={`/students/${s.studentNumber}`}
-                  onClick={() => {
-                    sendAnalytics('Student details button clicked', 'Student progress table')
-                  }}
-                  style={{ marginLeft: '10px', marginRight: '10px' }}
-                >
-                  <Icon style={{ borderLeft: '1em' }} name="user outline" />
-                </Item>
-                <SisuLinkItem id={s.sis_person_id} tab="Progress tab" />
-              </div>
+              <StudentInfoCard student={s} view="Student progress table" tab="Progress tab" showSisuLink />
             ),
             child: true,
           },
