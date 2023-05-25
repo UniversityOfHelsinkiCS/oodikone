@@ -414,37 +414,33 @@ const GeneralTab = ({
     studyrightStart: {
       key: 'studyrightStart',
       title: 'Start of\nstudyright',
+      textTitle: 'Start of studyright',
       filterType: 'date',
-      getRowVal: s => studentToStudyrightStartMap[s.studentNumber],
-      formatValue: value => reformatDate(new Date(value), 'YYYY-MM-DD'),
+      getRowVal: s => reformatDate(studentToStudyrightStartMap[s.studentNumber], 'YYYY-MM-DD'),
     },
     studyStartDate: {
       key: 'studyStartDate',
       title: 'Started in\nprogramme',
+      textTitle: 'Started in programme',
       filterType: 'date',
       getRowVal: s => {
         if (programmeCode !== undefined) {
-          return studentToProgrammeStartMap[s.studentNumber]
+          return reformatDate(studentToProgrammeStartMap[s.studentNumber], 'YYYY-MM-DD')
         }
 
         const programme = mainProgramme(s.studyrights, s.studentNumber, s.enrollments) // enrollment = semester enrollment
         if (programme?.startdate) {
-          return programme.startdate
+          return reformatDate(programme.startdate, 'YYYY-MM-DD')
         }
         return '-'
-      },
-      formatValue: value => {
-        if (value === '-') return value
-        return reformatDate(new Date(value), 'YYYY-MM-DD')
       },
     },
     endDate: {
       key: 'endDate',
       title: 'Graduation\ndate',
+      textTitle: 'Graduation date',
       filterType: 'date',
       getRowVal: s =>
-        studentToStudyrightEndMap[s.studentNumber] ? new Date(studentToStudyrightEndMap[s.studentNumber]) : '',
-      getRowContent: s =>
         studentToStudyrightEndMap[s.studentNumber]
           ? reformatDate(studentToStudyrightEndMap[s.studentNumber], 'YYYY-MM-DD')
           : '',
@@ -454,10 +450,6 @@ const GeneralTab = ({
       title: '2nd Graduation date',
       filterType: 'date',
       getRowVal: s =>
-        studentToSecondStudyrightEndMap[s.studentNumber]
-          ? new Date(studentToSecondStudyrightEndMap[s.studentNumber])
-          : '',
-      getRowContent: s =>
         studentToSecondStudyrightEndMap[s.studentNumber]
           ? reformatDate(studentToSecondStudyrightEndMap[s.studentNumber], 'YYYY-MM-DD')
           : '',
@@ -475,12 +467,14 @@ const GeneralTab = ({
     semesterEnrollments: {
       key: 'semesterEnrollments',
       title: 'Semesters\npresent',
+      textTitle: 'Semesters present',
       getRowVal: s => semesterEnrollments(s.semesterenrollments),
     },
 
     transferredFrom: {
       key: 'transferredFrom',
       title: 'Transferred\nfrom',
+      textTitle: 'Transferred from',
       getRowVal: s => (s.transferredStudyright ? transferFrom(s) : ''),
     },
     admissionType: shouldShowAdmissionType && {
@@ -491,21 +485,21 @@ const GeneralTab = ({
         return studyright && studyright.admission_type ? studyright.admission_type : 'Ei valintatapaa'
       },
     },
-
     passDate: {
       key: 'passDate',
       title: 'Attainment date',
       getRowVal: s => {
         const { date } = getGradeAndDate(s)
-        return date
+        return date ? reformatDate(date, 'YYYY-MM-DD') : 'No attainment'
       },
-      formatValue: value => (value ? reformatDate(new Date(value), 'YYYY-MM-DD') : 'No attainment'),
     },
     enrollmentDate: {
       key: 'enrollmentDate',
       title: 'Enrollment date',
-      getRowVal: s => getEnrollmentDate(s),
-      formatValue: value => (value ? reformatDate(new Date(value), 'YYYY-MM-DD') : 'No enrollment'),
+      getRowVal: s => {
+        const date = getEnrollmentDate(s)
+        return date ? reformatDate(date, 'YYYY-MM-DD') : 'No enrollment'
+      },
     },
     language: {
       key: 'language',
@@ -518,6 +512,7 @@ const GeneralTab = ({
     startYear: {
       key: 'startYear',
       title: 'Start Year\nat Uni',
+      textTitle: 'Start Year at Uni',
       filterType: 'range',
       getRowVal: s => getStarted(s),
     },
@@ -600,8 +595,7 @@ const GeneralTab = ({
       key: 'updatedAt',
       title: 'Last Updated At',
       filterType: 'date',
-      getRowVal: s => new Date(s.updatedAt),
-      formatValue: value => reformatDate(value, 'YYYY-MM-DD  HH:mm:ss'),
+      getRowVal: s => reformatDate(s.updatedAt, 'YYYY-MM-DD  HH:mm:ss'),
     },
   }
   // Columns are shown in order they're declared above. JS guarantees this order of keys
