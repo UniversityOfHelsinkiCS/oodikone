@@ -6,7 +6,7 @@ import SortableTable from 'components/SortableTable'
 import sendEvent from 'common/sendEvent'
 import { keyBy } from 'lodash'
 import moment from 'moment'
-import StudentInfoCard from 'components/StudentStatistics/StudentInfoCard'
+import StudentInfoItem from 'components/common/StudentInfoItem'
 import useLanguage from '../../LanguagePicker/useLanguage'
 import '../../StudentStatistics/StudentInfoCard/studentInfoCard.css'
 
@@ -259,7 +259,7 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
             cellProps: { title: 'student number', className: 'studentNumber' },
             getRowVal: s => s.studentNumber,
             getRowContent: s => (
-              <StudentInfoCard student={s} view="Student progress table" tab="Progress tab" showSisuLink />
+              <StudentInfoItem student={s} view="Student progress table" tab="Progress tab" showSisuLink />
             ),
             child: true,
           },

@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
-import { Item, Icon, Popup } from 'semantic-ui-react'
-import { Link } from 'react-router-dom'
+import { Icon, Popup } from 'semantic-ui-react'
 import _ from 'lodash'
 import moment from 'moment'
 import { useSelector } from 'react-redux'
@@ -19,7 +18,7 @@ import {
 import { useGetStudyGuidanceGroupPopulationQuery } from 'redux/studyGuidanceGroups'
 import { useGetAuthorizedUserQuery } from 'redux/auth'
 import { useGetSemestersQuery } from 'redux/semesters'
-import SisuLinkItem from 'components/common/SisuLinkItem'
+import StudentInfoItem from 'components/common/StudentInfoItem'
 import { PRIORITYCODE_TEXTS } from '../../../constants'
 import sendEvent from '../../../common/sendEvent'
 import useLanguage from '../../LanguagePicker/useLanguage'
@@ -385,8 +384,6 @@ const GeneralTab = ({
       children: Object.keys(availableCreditsColumns)
         .map(name => availableCreditsColumns[name](false))
         .filter(col => creditColumnKeys.includes(col.key.replace('-', '.'))),
-
-      // creditColumnKeys.map(key => availableCreditsColumns[key.split('.')[1]](false)),
     }
   }
 
@@ -394,46 +391,11 @@ const GeneralTab = ({
   const columnsAvailable = {
     lastname: { key: 'lastname', title: 'Last name', getRowVal: s => s.lastname },
     firstname: { key: 'firstname', title: 'Given names', getRowVal: s => s.firstnames },
-    'studentnumber-parent': {
-      key: 'studentnumber-parent',
-      mergeHeader: true,
-      merge: true,
-      children: [
-        {
-          key: 'studentnumber',
-          title: 'Student Number',
-          getRowVal: s => (!s.obfuscated ? s.studentNumber : 'hidden'),
-          getRowContent: s => (
-            <span style={s.obfuscated ? { fontStyle: 'italic', color: 'graytext' } : {}}>
-              {!s.obfuscated ? s.studentNumber : 'hidden'}
-            </span>
-          ),
-          headerProps: { colSpan: 2 },
-        },
-        {
-          key: 'oodikonelink',
-          export: false,
-          getRowVal: s =>
-            !s.obfuscated && (
-              <Item
-                as={Link}
-                to={`/students/${s.studentNumber}`}
-                onClick={() => {
-                  sendAnalytics('Student details button clicked', 'General tab')
-                }}
-              >
-                <Icon name="user outline" />
-              </Item>
-            ),
-          cellProps: { className: 'iconCellNoPointer' },
-        },
-        {
-          key: 'sisulink',
-          export: false,
-          getRowVal: s => !s.obfuscated && <SisuLinkItem id={s.sis_person_id} tab="General Tab" />,
-          cellProps: { className: 'iconCellNoPointer' },
-        },
-      ],
+    studentnumber: {
+      key: 'studentnumber',
+      title: 'Student Number',
+      getRowVal: s => (!s.obfuscated ? s.studentNumber : 'hidden'),
+      getRowContent: s => <StudentInfoItem student={s} showSisuLink tab="General Tab" />,
     },
     credits: creditsColumn,
     gradeForSingleCourse: {
@@ -453,7 +415,7 @@ const GeneralTab = ({
       key: 'studyrightStart',
       title: 'Start of\nstudyright',
       filterType: 'date',
-      getRowVal: s => studentToStudyrightStartMap[s.studentNumber], // new Date(studentToStudyrightStartMap[s.studentNumber]),
+      getRowVal: s => studentToStudyrightStartMap[s.studentNumber],
       formatValue: value => reformatDate(new Date(value), 'YYYY-MM-DD'),
     },
     studyStartDate: {
@@ -738,7 +700,7 @@ const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
   }
   if (populations?.query?.studyRights?.combinedProgramme && variant === 'population')
     columnsByVariant[variant].push('endDateSecondPhase')
-  const baseColumns = ['credits', 'credits.all', 'studentnumber-parent', 'tags', 'updatedAt', 'option']
+  const baseColumns = ['credits', 'credits.all', 'studentnumber', 'tags', 'updatedAt', 'option']
   const nameColumnsToAdd = namesVisible ? ['email', 'lastname', 'firstname'] : []
   const adminColumnsToFilter = isAdmin ? [] : ['priority', 'extent', 'updatedAt']
 
