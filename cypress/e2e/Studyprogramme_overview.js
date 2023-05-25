@@ -270,12 +270,12 @@ describe('Studyprogramme overview', () => {
 
     it('Students of the studyprogramme are shown correctly', () => {
       const tableContents = [
-        // [Year, All, Started studying, Currently enrolled, Absent, Cancelled, Graduated, Men, Women, Finnish]
+        // [Year, All, Started studying, Currently enrolled, Absent, Inactive, Graduated, Men, Women, Finnish]
         ['2020 - 2021', 12, 10, 0, 0, 0, 0, 10, 2, 12],
-        ['2019 - 2020', 86, 86, 0, 0, 1, 1, 65, 21, 86],
+        ['2019 - 2020', 86, 86, 0, 0, 0, 1, 65, 21, 86],
         ['2018 - 2019', 162, 161, 0, 0, 0, 11, 118, 44, 161],
-        ['2017 - 2018', 171, 171, 0, 0, 4, 42, 135, 36, 166],
-        ['Total', 431, 428, 0, 0, 5, 54, 328, 103, 425],
+        ['2017 - 2018', 171, 171, 0, 0, 0, 42, 135, 36, 166],
+        ['Total', 431, 428, 0, 0, 0, 54, 328, 103, 425],
       ]
 
       cy.checkTableStats(tableContents, 'StudytrackOverview')
