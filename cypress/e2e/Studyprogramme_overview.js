@@ -302,7 +302,7 @@ describe('Studyprogramme overview', () => {
         .should('contain', '4.9%') // The percentage for 15-29 credits in 2018-2019
         .should('contain', '11.6%') // The percentage for less than 15 credits in 2019-2020
 
-      cy.get('[data-cy=graduation-times-graph-breakdown]')
+      cy.get('[data-cy=graduation-times-graph-breakdownBachelor]')
       cy.get('[data-cy=GraduationTimeToggle]').click()
 
       cy.get('[data-cy=graduation-times-graph]').within(() => {
