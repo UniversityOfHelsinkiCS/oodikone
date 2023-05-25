@@ -7,6 +7,7 @@ import StudentNameVisibilityToggle, { useStudentNameVisibility } from 'component
 import useLanguage from 'components/LanguagePicker/useLanguage'
 import RightsNotification from 'components/RightsNotification'
 import StudentInfoItem from 'components/common/StudentInfoItem'
+import { hiddenNameAndEmailForCsv } from 'common'
 import sendEvent from '../../common/sendEvent'
 
 const getColumns = (courses, showStudentNames, getTextIn) => {
@@ -112,36 +113,6 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
     children: statisticColumns,
   }
 
-  const infoColumnsForCsv = [
-    {
-      key: 'hidden-lastname',
-      title: 'Last name',
-      forceToolsMode: 'none',
-      getRowVal: s => s.lastname,
-      headerProps: { style: { display: 'none' } },
-      cellProps: { style: { display: 'none' } },
-      export: true,
-    },
-    {
-      key: 'hidden-firstnames',
-      title: 'First names',
-      getRowVal: s => s.firstnames,
-      forceToolsMode: 'none',
-      headerProps: { style: { display: 'none' } },
-      cellProps: { style: { display: 'none' } },
-      export: true,
-    },
-    {
-      key: 'hidden-email',
-      title: 'E-mail',
-      getRowVal: s => (s.email ? s.email : ''),
-      forceToolsMode: 'none',
-      headerProps: { style: { display: 'none' } },
-      cellProps: { style: { display: 'none' } },
-      export: true,
-    },
-  ]
-
   const emailColumn = showStudentNames
     ? [
         {
@@ -175,17 +146,8 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
       ]
     : []
 
-  const hiddenParentColumn = {
-    key: 'hiddenFiles',
-    title: '',
-    mergeHeader: true,
-    textTitle: null,
-    parent: true,
-    children: infoColumnsForCsv,
-  }
-
   return [
-    hiddenParentColumn,
+    ...hiddenNameAndEmailForCsv,
     ...nameColumns,
     ...studentNbrColumn,
     ...completionStatusColumns,

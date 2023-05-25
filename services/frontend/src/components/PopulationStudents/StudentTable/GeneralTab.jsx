@@ -14,6 +14,7 @@ import {
   copyToClipboard,
   getHighestGradeOfCourseBetweenRange,
   getAllProgrammesOfStudent,
+  hiddenNameAndEmailForCsv,
 } from 'common'
 import { useGetStudyGuidanceGroupPopulationQuery } from 'redux/studyGuidanceGroups'
 import { useGetAuthorizedUserQuery } from 'redux/auth'
@@ -619,7 +620,7 @@ const GeneralTab = ({
         padded: false,
         celled: true,
       }}
-      columns={columns}
+      columns={[...hiddenNameAndEmailForCsv, ...columns]}
       data={selectedStudents.map(sn => students[sn])}
     />
   )

@@ -6,6 +6,7 @@ import useLanguage from 'components/LanguagePicker/useLanguage'
 import '../../PopulationCourseStats/populationCourseStats.css'
 import { useGetStudyGuidanceGroupPopulationCoursesQuery } from 'redux/studyGuidanceGroups'
 import StudentInfoItem from 'components/common/StudentInfoItem'
+import { hiddenNameAndEmailForCsv } from 'common'
 import SortableTable, { row } from '../../SortableTable'
 import '../populationStudents.css'
 
@@ -82,11 +83,12 @@ const CoursesTable = ({ students, studyGuidanceCourses }) => {
 
     nameColumns.push(
       {
-        key: 'studentnumber-parent',
+        key: 'studentnumber',
         title: 'Student Number',
-        cellProps: { title: 'student number', className: 'studentNumber' },
+        cellProps: { title: 'Student number' },
         getRowVal: s => (s.total ? '*' : s.studentNumber),
-        getRowContent: s => (s.total ? 'Summary:' : <StudentInfoItem student={s} tab="Mandatory courses table" />),
+        getRowContent: s =>
+          s.total ? 'Summary:' : <StudentInfoItem student={s} tab="Mandatory courses table" showSisuLink />,
         child: true,
       },
       {
@@ -100,7 +102,7 @@ const CoursesTable = ({ students, studyGuidanceCourses }) => {
                 .filter(isNumber)
                 .reduce((acc, e) => acc + e, 0)
             : totalMandatoryPassed(s.studentNumber),
-        cellProps: { title: 'total passed' },
+        cellProps: { title: 'Total passed' },
         child: true,
       }
     )
@@ -285,9 +287,9 @@ const CoursesTable = ({ students, studyGuidanceCourses }) => {
                 basic: true,
                 striped: true,
                 singleLine: true,
-                textAlign: 'center',
+                //                textAlign: 'center',
               }}
-              columns={columns}
+              columns={[...hiddenNameAndEmailForCsv, ...columns]}
               data={data}
             />
           )}

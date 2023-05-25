@@ -190,6 +190,36 @@ export const getUnifyTextIn = unifyCourses => {
   }
 }
 
+export const hiddenNameAndEmailForCsv = [
+  {
+    key: 'hidden-lastname',
+    title: 'Last name',
+    forceToolsMode: 'none',
+    getRowVal: s => s.lastname,
+    headerProps: { style: { display: 'none' } },
+    cellProps: { style: { display: 'none' } },
+    export: true,
+  },
+  {
+    key: 'hidden-firstnames',
+    title: 'First names',
+    getRowVal: s => s.firstnames,
+    forceToolsMode: 'none',
+    headerProps: { style: { display: 'none' } },
+    cellProps: { style: { display: 'none' } },
+    export: true,
+  },
+  {
+    key: 'hidden-email',
+    title: 'E-mail',
+    getRowVal: s => (s.email ? s.email : ''),
+    forceToolsMode: 'none',
+    headerProps: { style: { display: 'none' } },
+    cellProps: { style: { display: 'none' } },
+    export: true,
+  },
+]
+
 export const cancelablePromise = promise => {
   let hasCanceled = false
 

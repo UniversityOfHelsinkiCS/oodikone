@@ -89,7 +89,7 @@ const getCompletedCourses = async (studentNumbers, courseCodes) => {
       studentCredits[s.studentnumber] = { credits: [], enrollments: [] }
     }
     studentCredits[s.studentnumber].firstnames = s.firstnames
-    studentCredits[s.studentnumber].lastName = s.lastname
+    studentCredits[s.studentnumber].lastname = s.lastname
     studentCredits[s.studentnumber].email = s.email
     studentCredits[s.studentnumber].sis_person_id = s.sis_person_id
   })
@@ -138,7 +138,7 @@ const getCompletedCourses = async (studentNumbers, courseCodes) => {
         credits: studentCredits[student].credits,
         enrollments: studentCredits[student].enrollments,
         firstnames: studentCredits[student].firstnames,
-        lastName: studentCredits[student].lastName,
+        lastname: studentCredits[student].lastname,
         email: studentCredits[student].email,
       },
     ],

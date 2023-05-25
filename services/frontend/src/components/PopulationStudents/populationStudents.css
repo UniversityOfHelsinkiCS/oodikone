@@ -20,18 +20,6 @@
   padding: 1px;
 }
 
-table#course-of-population-students td.studentNumber:not(:first-child) {
-  padding: 0 !important;
-}
-
-table#course-of-population-students .studentNumber div span {
-  padding-left: 0.1em;
-}
-
-table#course-of-population-students .studentNumber div a {
-  padding-left: 0.7em;
-}
-
 table#course-of-population-students tbody tr td:nth-child(n + 1) {
   z-index: -1;
 }
