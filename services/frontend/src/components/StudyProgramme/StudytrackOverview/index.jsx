@@ -57,7 +57,6 @@ const StudytrackOverview = ({
 
   const noData = stats.isSuccess && stats.mainStatsByYear && !stats.mainStatsByYear.Total.length
   if (noData) return <h3>There is no data available for the selected programme between 2017-2022</h3>
-  const doCombo = true
   return (
     <div className="studytrack-overview">
       {stats.isLoading || stats.isFetching ? (
@@ -131,32 +130,47 @@ const StudytrackOverview = ({
               <div className="section-container-centered">
                 {showMedian ? (
                   <div className="section-container">
+                    {stats?.data.doCombo && (
+                      <MedianTimeBarChart
+                        data={stats?.data?.graduationTimes[track].medians.combo}
+                        goal={stats?.data?.graduationTimes.goals.combo}
+                        title={getGraduationGraphTitle(track, stats?.data.doCombo)}
+                        byStartYear
+                      />
+                    )}
                     <MedianTimeBarChart
-                      data={stats?.data?.graduationTimes[track].medians}
-                      goal={stats?.data?.graduationTimes.goal}
-                      title={getGraduationGraphTitle(track)}
+                      data={stats?.data?.graduationTimes[track].medians.basic}
+                      goal={stats?.data?.graduationTimes.goals.basic}
+                      title={getGraduationGraphTitle(track, false)}
                       byStartYear
                     />
                     {combinedProgramme && (
                       <MedianTimeBarChart
-                        data={stats?.data?.graduationTimesSecondProg[combinedProgramme]?.medians}
-                        goal={stats?.data?.graduationTimes.goal}
-                        title={getGraduationGraphTitle(combinedProgramme, doCombo)}
+                        data={stats?.data?.graduationTimesSecondProg[combinedProgramme]?.medians?.combo}
+                        goal={stats?.data?.graduationTimesSecondProg.goals.combo}
+                        title={getGraduationGraphTitle(combinedProgramme, true)}
                         byStartYear
                       />
                     )}
                   </div>
                 ) : (
                   <div className="section-container">
+                    {stats?.data.doCombo && (
+                      <BreakdownBarChart
+                        data={stats?.data?.graduationTimes[track]?.medians?.combo}
+                        title={getGraduationGraphTitle(studyprogramme, stats?.data.doCombo)}
+                        byStartYear
+                      />
+                    )}
                     <BreakdownBarChart
-                      data={stats?.data?.graduationTimes[track].medians}
-                      title={getGraduationGraphTitle(studyprogramme)}
+                      data={stats?.data?.graduationTimes[track]?.medians?.basic}
+                      title={getGraduationGraphTitle(studyprogramme, false)}
                       byStartYear
                     />
                     {combinedProgramme && (
                       <BreakdownBarChart
-                        data={stats?.data?.graduationTimesSecondProg[combinedProgramme]?.medians}
-                        title={getGraduationGraphTitle(combinedProgramme, doCombo)}
+                        data={stats?.data?.graduationTimesSecondProg[combinedProgramme]?.medians?.combo}
+                        title={getGraduationGraphTitle(combinedProgramme, true)}
                         byStartYear
                       />
                     )}
