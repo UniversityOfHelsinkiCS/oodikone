@@ -6,6 +6,7 @@ import SortableTable from 'components/SortableTable'
 import sendEvent from 'common/sendEvent'
 import { keyBy } from 'lodash'
 import moment from 'moment'
+import SisuLinkItem from 'components/common/SisuLinkItem'
 import useLanguage from '../../LanguagePicker/useLanguage'
 import '../../StudentStatistics/StudentInfoCard/studentInfoCard.css'
 
@@ -258,7 +259,7 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
             cellProps: { title: 'student number', className: 'studentNumber' },
             getRowVal: s => s.studentNumber,
             getRowContent: s => (
-              <div>
+              <div style={{ display: 'inline-flex' }}>
                 <span>{s.studentNumber}</span>
                 <Item
                   as={Link}
@@ -266,9 +267,11 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
                   onClick={() => {
                     sendAnalytics('Student details button clicked', 'Student progress table')
                   }}
+                  style={{ marginLeft: '10px', marginRight: '10px' }}
                 >
                   <Icon style={{ borderLeft: '1em' }} name="user outline" />
                 </Item>
+                <SisuLinkItem id={s.sis_person_id} tab="Progress tab" />
               </div>
             ),
             child: true,
