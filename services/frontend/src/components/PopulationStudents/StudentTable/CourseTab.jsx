@@ -1,16 +1,13 @@
 import React, { useMemo, useCallback } from 'react'
 import _, { orderBy, uniqBy, sortBy, isNumber } from 'lodash'
 import { useSelector } from 'react-redux'
-import { Icon, Tab, Item } from 'semantic-ui-react'
-import { Link } from 'react-router-dom'
+import { Icon, Tab } from 'semantic-ui-react'
 import useLanguage from 'components/LanguagePicker/useLanguage'
 import '../../PopulationCourseStats/populationCourseStats.css'
 import { useGetStudyGuidanceGroupPopulationCoursesQuery } from 'redux/studyGuidanceGroups'
+import StudentInfoItem from 'components/common/StudentInfoItem'
 import SortableTable, { row } from '../../SortableTable'
 import '../populationStudents.css'
-import sendEvent from '../../../common/sendEvent'
-
-const sendAnalytics = sendEvent.populationStudents
 
 const getMandatoryPassed = (mandatoryCourses, populationCourses, studyGuidanceCourses) => {
   if (!mandatoryCourses || !mandatoryCourses.defaultProgrammeCourses || (!populationCourses && !studyGuidanceCourses))
@@ -89,23 +86,7 @@ const CoursesTable = ({ students, studyGuidanceCourses }) => {
         title: 'Student Number',
         cellProps: { title: 'student number', className: 'studentNumber' },
         getRowVal: s => (s.total ? '*' : s.studentNumber),
-        getRowContent: s =>
-          s.total ? (
-            'Summary:'
-          ) : (
-            <div>
-              <span>{s.studentNumber}</span>
-              <Item
-                as={Link}
-                to={`/students/${s.studentNumber}`}
-                onClick={() => {
-                  sendAnalytics('Student details button clicked', 'Mandatory courses table')
-                }}
-              >
-                <Icon style={{ borderLeft: '1em' }} name="user outline" />
-              </Item>
-            </div>
-          ),
+        getRowContent: s => (s.total ? 'Summary:' : <StudentInfoItem student={s} tab="Mandatory courses table" />),
         child: true,
       },
       {
