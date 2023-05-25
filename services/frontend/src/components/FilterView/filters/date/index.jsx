@@ -1,6 +1,6 @@
 import React from 'react'
 import 'moment/locale/fi'
-import DateRangeSelector from 'components/DateRangeSelector'
+import DateRangeSelector from 'components/common/DateRangeSelector'
 import createFilter from '../createFilter'
 import filterInfo from '../../../../common/InfoToolTips/filters'
 
