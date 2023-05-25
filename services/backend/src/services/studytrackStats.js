@@ -23,6 +23,7 @@ const {
   enrolledStudents,
   absentStudents,
   graduatedStudyRightsByStartDate,
+  graduatedStudyRights,
 } = require('./studyprogramme')
 const { getAcademicYearDates } = require('../util/semester')
 const { countTimeCategories, getStatutoryAbsences } = require('./graduationHelpers')
@@ -205,10 +206,9 @@ const getStudytrackDataForTheYear = async ({
   await Promise.all(
     studytracks.map(async track => {
       const codes = studyprogramme === track ? [studyprogramme] : [studyprogramme, track]
-      const startdate = moment(startDate)
       const studentnumbers = await getCorrectStudentnumbers({
         codes,
-        startDate: startdate,
+        startDate,
         endDate,
         includeAllSpecials,
         includeGraduated,
@@ -223,6 +223,8 @@ const getStudytrackDataForTheYear = async ({
       let inactive = []
       let graduated = []
       let graduatedSecondProg = []
+      let graduatedByStartdate = []
+      let graduatedByStartSecondProg = []
       // Get all the studyrights and students for the calculations
       if (year !== 'Total') {
         all = await allStudyrights(track, studentnumbers)
@@ -231,10 +233,17 @@ const getStudytrackDataForTheYear = async ({
         enrolled = await enrolledStudents(track, studentnumbers)
         absent = await absentStudents(track, studentnumbers)
         inactive = await inactiveStudyrights(track, studentnumbers)
-        graduated = await graduatedStudyRightsByStartDate(track, startDate, studentnumbers)
-        if (combinedProgramme)
-          graduatedSecondProg = await graduatedStudyRightsByStartDate(combinedProgramme, startDate, studentnumbers)
+        graduated = await graduatedStudyRights(track, startDate, studentnumbers)
+        graduatedByStartdate = await graduatedStudyRightsByStartDate(track, startDate, studentnumbers)
 
+        if (combinedProgramme) {
+          graduatedSecondProg = await graduatedStudyRights(combinedProgramme, startDate, studentnumbers)
+          graduatedByStartSecondProg = await graduatedStudyRightsByStartDate(
+            combinedProgramme,
+            startDate,
+            studentnumbers
+          )
+        }
         totals[track].all = [...totals[track].all, ...all]
         totals[track].studentData.male += studentData.male
         totals[track].studentData.female += studentData.female
@@ -326,7 +335,7 @@ const getStudytrackDataForTheYear = async ({
       totalAmounts[track][year] = all.length
       await getGraduationTimeStats({
         year,
-        graduated,
+        graduated: graduatedByStartdate,
         track,
         graduationAmounts,
         graduationTimes,
@@ -336,7 +345,7 @@ const getStudytrackDataForTheYear = async ({
       if (combinedProgramme) {
         await getGraduationTimeStats({
           year,
-          graduated: graduatedSecondProg,
+          graduated: graduatedByStartSecondProg,
           track: combinedProgramme,
           graduationAmounts: graduationAmountsSecondProg,
           graduationTimes: graduationTimesSecondProg,
