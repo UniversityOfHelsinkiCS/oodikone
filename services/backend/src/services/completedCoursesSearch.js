@@ -91,6 +91,7 @@ const getCompletedCourses = async (studentNumbers, courseCodes) => {
     studentCredits[s.studentnumber].firstNames = s.firstnames
     studentCredits[s.studentnumber].lastName = s.lastname
     studentCredits[s.studentnumber].email = s.email
+    studentCredits[s.studentnumber].sis_person_id = s.sis_person_id
   })
 
   credits.forEach(credit => {
