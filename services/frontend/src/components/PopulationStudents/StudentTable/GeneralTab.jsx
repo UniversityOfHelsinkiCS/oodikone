@@ -368,7 +368,6 @@ const GeneralTab = ({
       // If a year is associated and no filters exist, this will act differently
       key: 'credits-since',
       title: getTitleForCreditsSince(sole),
-      textTitle: getTitleForCreditsSince(sole).replace('\n', ' '),
       filterType: 'range',
       getRowVal: s => getCreditsBetween(s),
     }),
@@ -414,14 +413,12 @@ const GeneralTab = ({
     studyrightStart: {
       key: 'studyrightStart',
       title: 'Start of\nstudyright',
-      textTitle: 'Start of studyright',
       filterType: 'date',
       getRowVal: s => reformatDate(studentToStudyrightStartMap[s.studentNumber], 'YYYY-MM-DD'),
     },
     studyStartDate: {
       key: 'studyStartDate',
       title: 'Started in\nprogramme',
-      textTitle: 'Started in programme',
       filterType: 'date',
       getRowVal: s => {
         if (programmeCode !== undefined) {
@@ -438,7 +435,6 @@ const GeneralTab = ({
     endDate: {
       key: 'endDate',
       title: 'Graduation\ndate',
-      textTitle: 'Graduation date',
       filterType: 'date',
       getRowVal: s =>
         studentToStudyrightEndMap[s.studentNumber]
@@ -467,14 +463,12 @@ const GeneralTab = ({
     semesterEnrollments: {
       key: 'semesterEnrollments',
       title: 'Semesters\npresent',
-      textTitle: 'Semesters present',
       getRowVal: s => semesterEnrollments(s.semesterenrollments),
     },
 
     transferredFrom: {
       key: 'transferredFrom',
       title: 'Transferred\nfrom',
-      textTitle: 'Transferred from',
       getRowVal: s => (s.transferredStudyright ? transferFrom(s) : ''),
     },
     admissionType: shouldShowAdmissionType && {
@@ -512,7 +506,6 @@ const GeneralTab = ({
     startYear: {
       key: 'startYear',
       title: 'Start Year\nat Uni',
-      textTitle: 'Start Year at Uni',
       filterType: 'range',
       getRowVal: s => getStarted(s),
     },
