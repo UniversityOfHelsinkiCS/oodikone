@@ -6,6 +6,13 @@ import SisuLinkItem from './SisuLinkItem'
 
 const StudentInfoItem = ({ student, view, tab, showSisuLink }) => {
   const sendAnalytics = sendEvent[view] ?? sendEvent.common
+  if (student.obfuscated) {
+    return (
+      <span style={student.obfuscated ? { fontStyle: 'italic', color: 'graytext' } : {}}>
+        {!student.obfuscated ? student.studentNumber : 'hidden'}
+      </span>
+    )
+  }
   return (
     <div style={{ display: 'inline-flex' }}>
       <div>{student.studentNumber}</div>
