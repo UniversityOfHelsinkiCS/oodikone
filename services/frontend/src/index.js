@@ -10,7 +10,7 @@ import './styles/custom.css'
 import store from './redux'
 import ErrorBoundary from './components/ErrorBoundary'
 import App from './components/App'
-import CommonContext from './CommonContext'
+import CommonContext from './components/common/CommonContext'
 import initializeSentry from './util/sentry'
 import { basePath } from './conf'
 

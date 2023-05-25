@@ -1,5 +1,5 @@
 import React from 'react'
-import DateRangeSelector from 'components/DateRangeSelector'
+import DateRangeSelector from 'components/common/DateRangeSelector'
 import moment from 'moment'
 import { getColumnValue } from './common'
 
