@@ -953,7 +953,7 @@ const SortableTable = ({
 
   const contextMenuItems = [
     {
-      label: 'Export to CSV',
+      label: 'Export to Excel',
       onClick: () => setExportModalOpen(true),
     },
     {
