@@ -454,8 +454,14 @@ const GeneralTab = ({
     programme: {
       key: 'programme',
       title: 'Study Programme',
-      getRowContent: s =>
-        getTextIn(mainProgramme(s.studyrights, s.studentNumber, s.enrollments)?.name, language) || 'No programme',
+      getRowContent: s => {
+        const programme = getTextIn(mainProgramme(s.studyrights, s.studentNumber, s.enrollments)?.name, language)
+        if (!programme) return 'No programme'
+        if (getStudentsProgrammeNames(s).length > 1) {
+          return `${programme} ...`
+        }
+        return programme
+      },
       getRowVal: s => getStudentsProgrammeNames(s).join('; '),
       cellProps: s => {
         return { title: getStudentsProgrammeNames(s).join('\n') }
