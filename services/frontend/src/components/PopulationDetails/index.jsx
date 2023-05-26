@@ -27,6 +27,7 @@ const PopulationDetails = ({
   query,
   dataExport,
   selectedStudentsByYear,
+  programmeCodes,
 }) => {
   const { language } = useLanguage()
   const [activeIndex, setActiveIndex] = useLocalStorage('populationActiveIndex', [])
@@ -71,8 +72,8 @@ const PopulationDetails = ({
         title="Id"
         trayOpen={() => {}}
         language={language}
-        programmeCode={query?.studyRights?.programme}
         studyPlanFilterIsActive={studyPlanFilterIsActive}
+        programmeCodes={programmeCodes}
       />
     )
     return (

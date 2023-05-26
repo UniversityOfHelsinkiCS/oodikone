@@ -317,6 +317,56 @@ const filterGraduations = (student, selectedStudyRight) => {
   ]
 }
 
+const addGraduation = (points, graduation, notFirst) => {
+  const graduationX = new Date(graduation.enddate).getTime()
+  const index = points.findIndex(point => point.x > graduationX)
+  let graduationY
+  if (index <= 0) {
+    graduationY = graduationX > points[0].x ? points[points.length - 1].y : points[0].y
+  } else {
+    const yBefore = points[index - 1].y
+    const yAfter = points[index].y
+    graduationY = Math.round((yBefore + yAfter) / 2)
+  }
+
+  const marker = {
+    radius: 10,
+    symbol: 'diamond',
+    enabled: true,
+  }
+
+  const masterMarker = {
+    radius: 12,
+    symbol: 'circle',
+    lineWidth: 2,
+    lineColor: '#ffffff',
+    enabled: true,
+  }
+
+  points.push({
+    x: graduationX,
+    y: graduationY,
+    marker: notFirst ? masterMarker : marker,
+  })
+  points.sort((a, b) => a.x - b.x)
+}
+
+const findGraduationsByCodes = (student, programmeCodes) => {
+  const graduations = student.studyrights
+    .filter(({ graduated }) => graduated)
+    .filter(({ studyright_elements }) =>
+      studyright_elements.find(
+        ({ element_detail }) => programmeCodes.includes(element_detail.code) && element_detail.type === 20
+      )
+    )
+  graduations.sort((a, b) => {
+    if (a.enddate > b.enddate) return 1
+    if (a.enddate === b.enddate) return 0
+    return -1
+  })
+  return graduations ?? []
+}
+
 const createStudentCreditLines = (
   students,
   singleStudent,
@@ -324,17 +374,16 @@ const createStudentCreditLines = (
   studyRightId,
   studyPlanFilterIsActive,
   cutStudyPlanCredits,
-  programmeCode,
+  programmeCodes,
   customStudyStartYear
 ) =>
   students.map(student => {
     const { studyrightStart } = student
-
     const startDate = singleStudent ? selectedStartDate : studyrightStart
     const { code } = resolveStudyRightElement(
       student.studyrights.find(({ studyrightid }) => studyrightid === studyRightId) || {}
     )
-    const studyPlanProgrammeCode = singleStudent ? code : studyPlanFilterIsActive && programmeCode
+    const studyPlanProgrammeCode = singleStudent ? code : studyPlanFilterIsActive && programmeCodes[0]
 
     const { points } = _.flow(
       () =>
@@ -352,30 +401,10 @@ const createStudentCreditLines = (
       courses => courses.reduce(reduceCreditsToPoints, { credits: 0, points: [], singleStudent })
     )(student.courses)
 
-    const graduation =
-      points.length === 0
-        ? null
-        : student.studyrights
-            .filter(({ graduated }) => graduated)
-            .find(({ studyright_elements }) =>
-              studyright_elements.find(
-                ({ element_detail }) => element_detail.code === programmeCode && element_detail.type === 20
-              )
-            )
+    const graduations = programmeCodes ? findGraduationsByCodes(student, programmeCodes) : []
 
-    if (graduation) {
-      const graduationX = new Date(graduation.enddate).getTime()
-      const index = points.findIndex(point => point.x > graduationX)
-      let graduationY
-      if (index <= 0) {
-        graduationY = graduationX > points[0].x ? points[points.length - 1].y : points[0].y
-      } else {
-        const yBefore = points[index - 1].y
-        const yAfter = points[index].y
-        graduationY = Math.round((yBefore + yAfter) / 2)
-      }
-      points.push({ x: graduationX, y: graduationY, marker: { enabled: true, radius: 10, symbol: 'diamond' } })
-      points.sort((a, b) => a.x - b.x)
+    if (points?.length > 0) {
+      graduations.forEach((graduation, index) => addGraduation(points, graduation, index > 0))
     }
 
     return {
@@ -409,7 +438,7 @@ const CreditAccumulationGraphHighCharts = ({
   startDate,
   endDate,
   studyRightId,
-  programmeCode,
+  programmeCodes,
   customPopulation = false,
   studyPlanFilterIsActive,
   customStudyStartYear,
@@ -434,7 +463,7 @@ const CreditAccumulationGraphHighCharts = ({
         studyRightId,
         studyPlanFilterIsActive,
         cutStudyPlanCredits,
-        programmeCode,
+        programmeCodes,
         customStudyStartYear
       ),
     [
@@ -443,7 +472,7 @@ const CreditAccumulationGraphHighCharts = ({
       startDate,
       studyRightId,
       studyPlanFilterIsActive,
-      programmeCode,
+      programmeCodes,
       cutStudyPlanCredits,
       customStudyStartYear,
       language,
