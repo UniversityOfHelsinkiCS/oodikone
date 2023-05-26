@@ -86,7 +86,6 @@ const getRegularCreditStats = async ({ studyprogramme, since, years, isAcademicY
   let majors = getStatsBasis(years)
   let nonMajors = getStatsBasis(years)
   let nonDegree = getStatsBasis(years)
-
   credits.forEach(({ student_studentnumber, attainment_date, credits }) => {
     const studentStudyrights = studyrights.filter(studyright => studyright.studentnumber === student_studentnumber)
     const attainmentYear = defineYear(attainment_date, isAcademicYear)
@@ -107,18 +106,6 @@ const getRegularCreditStats = async ({ studyprogramme, since, years, isAcademicY
     }
   })
 
-  if (
-    majors.graphStats.every(year => year === 0) &&
-    nonMajors.graphStats.every(year => year === 0) &&
-    nonDegree.graphStats.every(year => year === 0)
-  ) {
-    return {
-      majors: { graphStats: [], tableStats: {} },
-      nonMajors: { graphStats: [], tableStats: {} },
-      nonDegree: { graphStats: [], tablestats: {} },
-    }
-  }
-
   return { majors, nonMajors, nonDegree }
 }
 
@@ -133,10 +120,6 @@ const getTransferredCreditStats = async ({ studyprogramme, since, years, isAcade
     graphStats[indexOf(years, attainmentYear)] += credits || 0
     tableStats[attainmentYear] += credits || 0
   })
-
-  if (graphStats.every(year => year === 0)) {
-    return { graphStats: [], tableStats: {} }
-  }
 
   return { graphStats, tableStats }
 }
