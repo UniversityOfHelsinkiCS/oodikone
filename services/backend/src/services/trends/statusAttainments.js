@@ -346,7 +346,7 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
     if (!regexresult) return code
     return regexresult[1]
   }
-  // console.log('yearly open uni acc credits: ', yearlyOpenUniAccCredits)
+
   const fromAyToNormalCourses = [
     ...new Set(_.flatten(yearlyOpenUniAccCredits).map(c => unifyOpenUniversity(c.code))),
     ...new Set(_.flatten(yearlyOpenUniTotalCredits).map(c => unifyOpenUniversity(c.code))),
