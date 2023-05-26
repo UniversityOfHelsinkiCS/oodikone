@@ -161,7 +161,8 @@ export default {
 
 
   **Huomaa**, että klikkaamalla taulukon yläreunassa olevaa kolme pistettä sisältävää kuvaketta, voit ladata itsellesi Excel tiedoston. Tiedosto sisältää lisäksi muita sarakkeita, kuten läsnäolon lukukausittain sekä yhteystiedot.
-  Yhteystietojen käyttö on kuitenkin sallittua vain opintoneuvontaan liittyvissä asiossa. 
+  
+  ***Yhteystietojen käyttö on kuitenkin sallittua vain opintoneuvontaan liittyvissä asiossa.*** 
   
   `,
   StudentsCustom: `**Students**
