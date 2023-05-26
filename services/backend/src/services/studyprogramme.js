@@ -528,6 +528,7 @@ const getAllProgrammeCourses = async providerCode => {
 }
 
 const getStudentsForProgrammeCourses = async (from, to, programmeCourses) => {
+  if (!programmeCourses.length) return []
   try {
     const res = await sequelize.query(
       `
@@ -658,6 +659,7 @@ const getNotCompletedForProgrammeCourses = async (from, to, programmeCourses) =>
   }
 }
 const getOwnStudentsForProgrammeCourses = async (from, to, programmeCourses, studyprogramme) => {
+  if (!programmeCourses.length) return []
   const res = await sequelize.query(
     `
     WITH Dist AS (
@@ -695,6 +697,7 @@ const getOwnStudentsForProgrammeCourses = async (from, to, programmeCourses, stu
 }
 
 const getOtherStudentsForProgrammeCourses = async (from, to, programmeCourses, studyprogramme) => {
+  if (!programmeCourses.length) return []
   const res = await sequelize.query(
     `
     WITH Dist AS (
@@ -737,6 +740,7 @@ const getOtherStudentsForProgrammeCourses = async (from, to, programmeCourses, s
 }
 
 const getTransferStudentsForProgrammeCourses = async (from, to, programmeCourses) => {
+  if (!programmeCourses.length) return []
   const res = await sequelize.query(
     `
     WITH Dist AS (
@@ -767,6 +771,7 @@ const getTransferStudentsForProgrammeCourses = async (from, to, programmeCourses
 }
 
 const getStudentsWithoutStudyrightForProgrammeCourses = async (from, to, programmeCourses) => {
+  if (!programmeCourses.length) return []
   const res = await sequelize.query(
     `
     WITH Dist AS (
