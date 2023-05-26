@@ -4,12 +4,12 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import { useGetAuthorizedUserQuery } from 'redux/auth'
 import SisuLinkItem from 'components/common/SisuLinkItem'
+import { ANALYTICS_CATEGORIES } from 'common/sendEvent'
 import { reformatDate } from '../../../common'
 import { DISPLAY_DATE_FORMAT, DISPLAY_DATE_FORMAT_DEV } from '../../../constants'
 import './studentInfoCard.css'
 import { removeStudentSelection, resetStudent } from '../../../redux/students'
 import { callApi } from '../../../apiConnection'
-
 import EnrollmentAccordion from './EnrollmentAccordion'
 
 const StudentInfoCard = ({ student }) => {
@@ -39,7 +39,7 @@ const StudentInfoCard = ({ student }) => {
           <div>
             {name}
             {student.studentNumber}
-            <SisuLinkItem id={student.sis_person_id} />
+            <SisuLinkItem id={student.sis_person_id} view={ANALYTICS_CATEGORIES.studentStatistics} />
           </div>
           <Icon name="remove" className="controlIcon" onClick={onRemove} />
         </Card.Header>

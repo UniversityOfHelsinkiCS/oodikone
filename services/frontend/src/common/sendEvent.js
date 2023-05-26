@@ -6,6 +6,7 @@ const { sendEvent } = TSA.Matomo
 export const ANALYTICS_CATEGORIES = {
   populationStudents: 'Population students',
   populationStatistics: 'Population statistics',
+  studentStatistics: 'Student statistics',
   degreeCourses: 'Degree courses',
   common: 'Common',
 }
