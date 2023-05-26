@@ -212,7 +212,16 @@ export const hiddenNameAndEmailForCsv = [
   {
     key: 'hidden-email',
     title: 'E-mail',
-    getRowVal: s => (s.email ? s.email : ''),
+    getRowVal: s => s.email ?? '',
+    forceToolsMode: 'none',
+    headerProps: { style: { display: 'none' } },
+    cellProps: { style: { display: 'none' } },
+    export: true,
+  },
+  {
+    key: 'hidden-secondary-email',
+    title: 'Secondary E-mail',
+    getRowVal: s => s.secondaryEmail ?? '',
     forceToolsMode: 'none',
     headerProps: { style: { display: 'none' } },
     cellProps: { style: { display: 'none' } },

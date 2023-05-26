@@ -238,14 +238,6 @@ const CoursesTable = ({ students, studyGuidanceCourses }) => {
         }))
     )
 
-    columns.push({
-      key: 'email',
-      title: 'Email',
-      getRowVal: s => (s.total ? null : s.email),
-      cellProps: { title: 'emails' },
-      child: true,
-    })
-
     return columns
   }, [namesVisible, mandatoryCourses, getTextIn])
 
