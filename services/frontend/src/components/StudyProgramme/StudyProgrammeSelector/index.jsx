@@ -53,7 +53,7 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected }) => {
           const combinedName = {
             fi: `${programme.name.fi} ja ${
               secondProgramme[0]?.name.fi?.includes('lisensiaatin')
-                ? 'lisensiaatin koulutusojelma'
+                ? 'lisensiaatin koulutusohjelma'
                 : 'maisterin koulutusohjelma'
             }`,
             en: `${programme.name.en.split(' ')[0]} and ${secondProgramme[0]?.name?.en}`,
