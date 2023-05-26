@@ -58,7 +58,7 @@ export const getGraduationGraphTitle = (studyProgramme, doCombo = false) => {
 export const getUnifiedProgrammeName = (bachelor, masterLisenciate, language) => {
   if (language === 'fi')
     return `${bachelor} ja ${
-      masterLisenciate?.includes('lisensiaatin') ? 'lisensiaatin koulutusojelma' : 'maisterin koulutusohjelma'
+      masterLisenciate?.includes('lisensiaatin') ? 'lisensiaatin koulutusohjelma' : 'maisterin koulutusohjelma'
     }`
   if (language === 'en') return `${bachelor?.split(' ')[0]} and ${masterLisenciate}`
   if (language === 'sv') return `${bachelor?.split('programmet')[0]}- och ${masterLisenciate}`
