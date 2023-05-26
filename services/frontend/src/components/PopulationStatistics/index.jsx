@@ -81,6 +81,10 @@ const PopulationStatistics = () => {
     )
   }
 
+  const programmeCodes = []
+  if (programmeCode) programmeCodes.push(programmeCode)
+  if (combinedProgrammeCode) programmeCodes.push(combinedProgrammeCode)
+
   const students = useMemo(() => {
     if (!samples) {
       return []
@@ -146,6 +150,7 @@ const PopulationStatistics = () => {
                 queryIsSet={queryIsSet}
                 query={query}
                 isLoading={isLoading}
+                programmeCodes={programmeCodes}
                 dataExport={
                   <DataExport
                     students={filteredStudents}
