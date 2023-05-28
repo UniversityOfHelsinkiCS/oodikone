@@ -27,8 +27,10 @@ const studyprogrammeApi = RTKApi.injectEndpoints({
         `/v2/studyprogrammes/${id}/update_studytrackview?combined_programme=${combinedProgramme}`,
     }),
     getProgrammeCoursesStats: builder.query({
-      query: ({ id, academicyear }) => `/v2/studyprogrammes/${id}/coursestats?academicyear=${academicyear}`,
+      query: ({ id, academicyear, combinedProgramme }) =>
+        `/v2/studyprogrammes/${id}/coursestats?academicyear=${academicyear}&combined_programme=${combinedProgramme}`,
     }),
+    // Tilannekuvalomake
     getEvaluationStats: builder.query({
       query: ({ id, yearType, specialGroups, graduated }) =>
         `/v2/studyprogrammes/${id}/evaluationstats?year_type=${yearType}&special_groups=${specialGroups}&graduated=${graduated}`,
