@@ -11,7 +11,7 @@ const sendAnalytics = sendEvent.populationStatistics
 
 const toolTips = InfoToolTips.Studyprogramme
 
-const getColumns = (language, showStudents) => {
+const getColumns = (getTextIn, showStudents) => {
   let columns = null
 
   if (showStudents) {
@@ -55,8 +55,12 @@ const getColumns = (language, showStudents) => {
           {
             key: 'name',
             title: 'Name',
-            getRowVal: course => course.name[language],
-            getRowContent: course => course.name[language],
+            getRowVal: course => getTextIn(course.name),
+            getRowContent: course =>
+              getTextIn(course.name).length > 46 ? `${getTextIn(course.name).slice(0, 44)}...` : getTextIn(course.name),
+            cellProps: course => {
+              return { title: getTextIn(course.name) }
+            },
           },
         ],
       },
@@ -183,11 +187,11 @@ const getColumns = (language, showStudents) => {
         key: 'name',
         title: 'Name',
         helpText: toolTips.Name,
-        getRowVal: course => course.name[language],
+        getRowVal: course => getTextIn(course.name),
         getRowContent: course =>
-          course.name[language].length > 46 ? `${course.name[language].slice(0, 44)}...` : course.name[language],
+          getTextIn(course.name).length > 46 ? `${getTextIn(course.name).slice(0, 44)}...` : getTextIn(course.name),
         cellProps: course => {
-          return { title: course.name[language] }
+          return { title: getTextIn(course.name) }
         },
       },
       {
@@ -237,7 +241,7 @@ const getColumns = (language, showStudents) => {
 }
 
 const OverallStatsTable = ({ data, showStudents }) => {
-  const { language } = useLanguage()
+  const { getTextIn } = useLanguage()
   return (
     <>
       <InfoBox
@@ -246,12 +250,12 @@ const OverallStatsTable = ({ data, showStudents }) => {
       />
       <div data-cy="CoursesSortableTable">
         <SortableTable
-          title={`Student statistics for studyprogramme courses `}
+          title={`Student statistics for study programme courses `}
           defaultSort={['name', 'asc']}
           defaultdescending
           getRowKey={course => course.code}
           tableProps={{ celled: true, fixed: true }}
-          columns={getColumns(language, showStudents)}
+          columns={getColumns(getTextIn, showStudents)}
           data={data}
         />
       </div>
