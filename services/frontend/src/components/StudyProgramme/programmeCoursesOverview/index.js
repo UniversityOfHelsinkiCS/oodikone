@@ -8,8 +8,8 @@ import CoursesYearFilter from './CourseYearFilter'
 const ProgrammeCoursesOverview = ({ studyProgramme, combinedProgramme, academicYear, setAcademicYear }) => {
   const { data, error, isLoading } = useGetProgrammeCoursesStatsQuery({
     id: studyProgramme,
-    combinedProgramme,
     academicyear: academicYear,
+    combinedProgramme,
   })
   const [fromYear, setFromYear] = useState(null)
   const [toYear, setToYear] = useState(null)

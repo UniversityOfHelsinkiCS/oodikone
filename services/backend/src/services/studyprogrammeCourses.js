@@ -72,11 +72,13 @@ const makeYearlyPromises = (years, academicYear, type, programmeCourses, studypr
   )
 }
 
-const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme, academicYear) => {
+const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme, academicYear, combinedProgramme) => {
   const startDate = academicYear == 'true' ? await getCurrentStudyYearStartDate(unixMillis) : getCurrentYearStartDate()
   const startYear = startDate.getFullYear()
   const yearRange = _.range(2017, startYear + 1)
-  const programmeCourses = await getAllStudyprogrammeCourses(studyprogramme)
+  const mainProgrammeCourses = await getAllStudyprogrammeCourses(studyprogramme)
+  const secondProgrammeCourses = combinedProgramme ? await getAllStudyprogrammeCourses(combinedProgramme) : []
+  const programmeCourses = [...mainProgrammeCourses, ...secondProgrammeCourses]
 
   const yearlyPassedStudentByCoursePromises = makeYearlyPromises(yearRange, academicYear, 'passed', programmeCourses)
   const yearlyNotCompletedStudentByCoursePromises = makeYearlyPromises(
