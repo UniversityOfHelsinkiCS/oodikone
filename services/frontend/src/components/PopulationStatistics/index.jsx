@@ -48,7 +48,7 @@ const PopulationStatistics = () => {
 
   const { data: allSemesters } = useGetSemestersQuery()
   const programmeCode = query?.studyRights?.programme
-  const combinedProgrammeCode = query?.studyRights?.combinedProgramme
+  const combinedProgrammeCode = query?.studyRights?.combinedProgramme ? query?.studyRights?.combinedProgramme : ''
   const programmes = useSelector(store => store.populationProgrammes?.data?.programmes)
   const programmeName = programmes && programmeCode ? programmes[programmeCode]?.name : ''
   const combinedProgrammeName = programmes && combinedProgrammeCode ? programmes[combinedProgrammeCode]?.name : ''
