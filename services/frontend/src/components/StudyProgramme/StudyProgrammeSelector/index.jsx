@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { debounce } from 'lodash'
 import { arrayOf, string, bool, shape } from 'prop-types'
 import { Loader, Message, Header, Form } from 'semantic-ui-react'
+import { getTextIn, getUnifiedProgrammeName } from 'common'
 import SortableTable from '../../SortableTable'
 import useLanguage from '../../LanguagePicker/useLanguage'
 
@@ -18,7 +19,7 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected }) => {
     setFilter(value)
   }, 500)
 
-  const { language, getTextIn } = useLanguage()
+  const { language } = useLanguage()
 
   useEffect(() => {
     if (studyprogrammes?.length > 0) studyprogrammes.sort((a, b) => (a.code > b.code ? 1 : -1))
@@ -45,23 +46,31 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected }) => {
           (programme.progId && programme.progId.toLowerCase().includes(filter.toLocaleLowerCase()))
         )
       })
-
       filteredStudyprogrammes.forEach(programme => {
         if (programme.code === 'KH90_001') {
           const secondProgrammeCode = combinations[programme.code]
           const secondProgramme = studyprogrammes.filter(programme => programme.code === secondProgrammeCode)
+
           const combinedName = {
-            fi: `${programme.name.fi} ja ${
-              secondProgramme[0]?.name.fi?.includes('lisensiaatin')
-                ? 'lisensiaatin koulutusohjelma'
-                : 'maisterin koulutusohjelma'
-            }`,
-            en: `${programme.name.en.split(' ')[0]} and ${secondProgramme[0]?.name?.en}`,
-            sv: `${programme.name.sv.split('programmet')[0]}- och ${secondProgramme[0]?.name?.en}`,
+            fi: getUnifiedProgrammeName(
+              getTextIn(programme.name, 'fi'),
+              getTextIn(secondProgramme[0]?.name, 'fi'),
+              'fi'
+            ),
+            en: getUnifiedProgrammeName(
+              getTextIn(programme.name, 'en'),
+              getTextIn(secondProgramme[0]?.name, 'en'),
+              'en'
+            ),
+            sv: getUnifiedProgrammeName(
+              getTextIn(programme.name, 'sv'),
+              getTextIn(secondProgramme[0]?.name, 'sv'),
+              'sv'
+            ),
           }
 
           filteredCombinedProgrammes.push({
-            code: `${programme.code}-${secondProgramme[0]?.code}`,
+            code: `${programme.code}+${secondProgramme[0]?.code}`,
             combinedCode: `${programme.code} - ${secondProgramme[0]?.code}`,
             name: combinedName,
             progId: `${programme.progId} - ${secondProgramme[0]?.progId}`,
