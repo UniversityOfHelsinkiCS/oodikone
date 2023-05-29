@@ -209,7 +209,7 @@ router.get('/v3/populationstatistics', async (req, res) => {
     return
   }
 
-  if (req.query.months == null) {
+  if (req.query.months === null) {
     req.query.months = 12
   }
 
@@ -220,7 +220,7 @@ router.get('/v3/populationstatistics', async (req, res) => {
         const newMonths = (upperYearBound - Number(year)) * 12
         const populationStudents = Population.optimizedStatisticsOf({
           ...req.query,
-          studyRights,
+          studyRights: { programme: studyRights.programme },
           year,
           months: newMonths,
         })
@@ -239,8 +239,6 @@ router.get('/v3/populationstatistics', async (req, res) => {
 
     res.json(filterPersonalTags(result, user.id))
   } else {
-    // If two studyprogrammes are given, query does not work just right
-    // This solution is temporal
     const result = await Population.optimizedStatisticsOf({
       ...req.query,
       studyRights: { programme: studyRights.programme },
