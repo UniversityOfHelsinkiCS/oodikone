@@ -142,8 +142,17 @@ export default {
   - **Transferred from:** opiskelijan vanha koulutusohjelma, josta opiskelija on siirtynyt uuteen.
   - **Start of studyright**: Opiskelijan valittuun ohjelmaan liittyvän opinto-oikeuden alkupäivä
   - **Started in programme**: Opiskelijan ko. ohjelmassa aloituspäivämäärä. Kandi+maisteriopiskelijoille kandiksi valmistumispäivämäärä +1
-  - **Semesters**: Läsnäololukukausien lukumäärä
-  
+  - **Semesters present**: Näyttää opiskelijan ilmoittautumiset lukukausittain. Laita hiiri solun yläpuolelle nähdäksesi tekstimuotoisen selityksen ilmoittautumisista.
+    - Värikoodit:
+      - Vihreä = Läsnäoleva
+      - Keltainen = Ilmoittautunut poissaolevaksi
+      - Punainen = Ei ilmoittautumista, mutta opiskelijalla on ollut opinto-oikeus
+      - Harmaa = Opiskelijalla ei ollut tällöin opinto-oikeutta
+    - Excel-versiossa sarakkeessa näkyy tieto opiskelijan ensimmäisestä ilmoittautumisesta, jonka jälkeen ilmoittautumiset esitettynä symbolein:
+      - \\+ = Ilmoittautunut läsnäolevaksi
+      - o = Ilmoittautunut poissaolevaksi
+      - _ = Ei ilmoittautumista
+
   **Courses**
   
   Tällä välilehdellä näkyy, mitä pakollisiksi määriteltyjä kursseja opiskelija on suorittanut.
