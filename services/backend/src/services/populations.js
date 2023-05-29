@@ -26,6 +26,7 @@ const { getPassingSemester, semesterEnd, semesterStart } = require('../util/seme
 const { getAllProgrammes } = require('./studyrights')
 const { encrypt } = require('../services/encrypt')
 const { getCriteria } = require('./studyProgrammeCriteria')
+const { getCurrentSemester } = require('./semesters')
 
 const enrolmentDates = () => {
   const query = 'SELECT DISTINCT s.dateOfUniversityEnrollment as date FROM Student s'
@@ -127,7 +128,8 @@ const formatStudentForPopulationStatistics = (
   startDateMoment,
   endDateMoment,
   criteria,
-  code
+  code,
+  currentSemester
 ) => {
   const toCourse = ({ grade, attainment_date, credits, course_code, credittypecode, isStudyModule, language }) => {
     const attainment_date_normailized =
@@ -214,7 +216,9 @@ const formatStudentForPopulationStatistics = (
     secondaryEmail: secondary_email,
     phoneNumber: phone_number,
     semesterenrollments: semester_enrollments
-      ? semester_enrollments.sort((a, b) => a.semestercode - b.semestercode)
+      ? semester_enrollments
+          .sort((a, b) => a.semestercode - b.semestercode)
+          .filter(enrollment => enrollment.semestercode <= currentSemester + (currentSemester % 2))
       : [],
     updatedAt: updatedAt || createdAt,
     tags: tags || [],
@@ -867,6 +871,8 @@ const formatStudentsForApi = async (
 ) => {
   const startDateMoment = moment(startDate)
   const endDateMoment = moment(endDate)
+  const currentSemester = (await getCurrentSemester()).semestercode
+
   elementdetails = elementdetails.reduce(
     (acc, e) => {
       acc.data[e.code] = e
@@ -907,7 +913,8 @@ const formatStudentsForApi = async (
           startDateMoment,
           endDateMoment,
           criteria,
-          code
+          code,
+          currentSemester
         )
       )
       return stats
