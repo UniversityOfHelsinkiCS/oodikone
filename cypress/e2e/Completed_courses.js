@@ -91,6 +91,8 @@ describe('When search modal is opened', () => {
       )
     })
     it('Finds correct students and courses', () => {
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
+      cy.wait(5000)
       cy.fixture('completedCoursesData').then(({ studentSet1, coursesSet1 }) => {
         cy.get('[data-cy="completed-courses-table-div"]').should('contain.text', studentSet1[0])
         cy.get('[data-cy="completed-courses-table-div"]').should('contain.text', studentSet1[1])
