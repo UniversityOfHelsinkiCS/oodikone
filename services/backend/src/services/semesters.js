@@ -43,16 +43,7 @@ const getSemestersAndYears = async () => {
   return result
 }
 
-const getMaxYearcode = async () => {
-  const aa = await Semester.findAll({
-    attributes: [[sequelize.fn('max', sequelize.col('yearcode')), 'maxYearCode']],
-    raw: true,
-  })
-  return aa[0].maxYearCode
-}
-
 module.exports = {
   getSemestersAndYears,
-  getMaxYearcode,
   getCurrentSemester,
 }
