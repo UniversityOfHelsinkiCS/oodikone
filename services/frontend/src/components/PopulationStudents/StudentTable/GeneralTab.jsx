@@ -39,6 +39,7 @@ const GeneralTab = ({
   const [popupStates, setPopupStates] = useState({})
   const sendAnalytics = sendEvent.populationStudents
   const { data: semesterData } = useGetSemestersQuery()
+  const allSemesters = semesterData?.semesters ?? []
 
   const fromSemester = from
     ? Object.values(semesterData.semesters)
@@ -163,7 +164,14 @@ const GeneralTab = ({
     ).map(prog => getTextIn(prog.name, language))
   }
 
-  const semesterEnrollments = enrollments => enrollments.filter(e => e.enrollmenttype === 1).length
+  const { first: firstSemester, last: lastSemester } = filteredStudents.reduce(
+    ({ first, last }, student) => {
+      const newFirst = Math.min(first, ...student.semesterenrollments.map(e => e.semestercode))
+      const newLast = Math.max(last, ...student.semesterenrollments.map(e => e.semestercode))
+      return { first: newFirst, last: newLast }
+    },
+    { first: 9999, last: 0 }
+  )
 
   const mainProgramme = (studyrights, studentNumber, enrollments = []) => {
     const programme = getNewestProgramme(
@@ -302,6 +310,13 @@ const GeneralTab = ({
 
   const shouldShowAdmissionType = parseInt(query?.year, 10) >= 2020 || parseInt(group?.tags?.year, 10) >= 2020
 
+  const enrollmentTypeText = type => {
+    if (type === 1) return 'Present'
+    if (type === 2) return 'Absent'
+    if (type === 3) return 'Inactive'
+    return 'Unknown enrollment type'
+  }
+
   let creditColumnTitle = 'Since start\nin programme'
 
   if (creditDateFilterOptions) {
@@ -331,6 +346,51 @@ const GeneralTab = ({
       title += `\nuntil ${moment(until).format('DD.MM.YYYY')}`
     }
     return title
+  }
+
+  const getSemesterEnrollmentsContent = student => {
+    const semesterIcons = []
+    const getSemesterJSX = enrollmenttype => {
+      let type = 'none'
+      if (enrollmenttype === 1) type = 'present'
+      if (enrollmenttype === 2) type = 'absent'
+      if (enrollmenttype === 3) type = 'passive'
+      return <span className={`enrollment-label-no-margin label-${type}`} />
+    }
+    const semesterEnrollmentsMap = student.semesterenrollments.reduce((enrollments, enrollment) => {
+      const newEnrollmentsObject = { ...enrollments }
+      newEnrollmentsObject[enrollment.semestercode] = enrollment.enrollmenttype
+      return newEnrollmentsObject
+    }, {})
+    for (let sem = firstSemester; sem <= lastSemester; sem++) {
+      semesterIcons.push(getSemesterJSX(semesterEnrollmentsMap[sem]))
+    }
+    return <div style={{ display: 'flex', gap: '4px' }}>{semesterIcons}</div>
+  }
+
+  const getSemesterEnrollmentsProps = student => {
+    if (allSemesters?.length === 0) return {}
+    const title = student.semesterenrollments.reduce(
+      (enrollmentsString, current) =>
+        `${enrollmentsString}${enrollmentTypeText(current.enrollmenttype)} in ${getTextIn(
+          allSemesters[current.semestercode].name,
+          language
+        )} \n`,
+      ''
+    )
+    return { title }
+  }
+
+  const getSemesterEnrollmentsForExcel = student => {
+    if (allSemesters?.length === 0) return 'Data not loaded'
+    return student.semesterenrollments.reduce((enrollmentsString, current) => {
+      const type = current.enrollmenttype
+      let sign = '?'
+      if (type === 1) sign = '+'
+      if (type === 2) sign = 'o'
+      if (type === 3) sign = '_'
+      return enrollmentsString + sign
+    }, `Starting from ${getTextIn(allSemesters[student.semesterenrollments[0].semestercode].name, language)}: `)
   }
 
   let creditsColumn = null
@@ -470,9 +530,10 @@ const GeneralTab = ({
     semesterEnrollments: {
       key: 'semesterEnrollments',
       title: 'Semesters\npresent',
-      getRowVal: s => semesterEnrollments(s.semesterenrollments),
+      getRowContent: s => getSemesterEnrollmentsContent(s),
+      cellProps: s => getSemesterEnrollmentsProps(s),
+      getRowVal: s => getSemesterEnrollmentsForExcel(s),
     },
-
     transferredFrom: {
       key: 'transferredFrom',
       title: 'Transferred\nfrom',

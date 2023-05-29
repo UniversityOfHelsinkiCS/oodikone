@@ -63,3 +63,7 @@
 .label-passive {
   background-color: #e53935;
 }
+
+.label-none {
+  background-color: gray;
+}
