@@ -105,7 +105,7 @@ const PopulationStatistics = () => {
   }, [samples, chosenProgrammeCode])
 
   const programmeText =
-    query?.studyRights?.combinedProgramme !== undefined
+    query?.studyRights?.combinedProgramme !== '' && query?.studyRights?.combinedProgramme !== undefined
       ? getUnifiedProgrammeName(getTextIn(programmeName), getTextIn(combinedProgrammeName), language)
       : getTextIn(programmeName)
   const title = location.search === '' ? 'Class statistics' : `${programmeText} ${getYearText(query?.year)}`
