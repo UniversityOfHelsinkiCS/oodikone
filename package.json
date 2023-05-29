@@ -16,6 +16,7 @@
     "both": "./run.sh both anon up --detach",
     "both:real": "./run.sh both real up --detach",
     "docker:down": "./run.sh both anon down --remove-orphans; ./run.sh both real down --remove-orphans",
+    "flushredis": "docker exec -it redis redis-cli flushall",
     "prepare": "husky install",
     "rapodiff": "docker exec backend node /usr/src/app/src/rapodiff.js"
   },
