@@ -61,8 +61,8 @@ const StudyProgramme = props => {
   const { match } = props
   const { studyProgrammeId } = match.params
   const programmeId =
-    studyProgrammeId && studyProgrammeId.includes('-') ? studyProgrammeId.split('-')[0] : studyProgrammeId
-  const secondProgrammeId = studyProgrammeId && studyProgrammeId.includes('-') ? studyProgrammeId.split('-')[1] : ''
+    studyProgrammeId && studyProgrammeId.includes('+') ? studyProgrammeId.split('+')[0] : studyProgrammeId
+  const secondProgrammeId = studyProgrammeId && studyProgrammeId.includes('+') ? studyProgrammeId.split('+')[1] : ''
 
   const getPanes = () => {
     const panes = []
