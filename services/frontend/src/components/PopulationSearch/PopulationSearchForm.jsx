@@ -53,6 +53,16 @@ const PopulationSearchForm = props => {
   const { query, isLoading, momentYear } = totalState
 
   const { studyProgrammes, location, queries, history, language, onProgress } = props
+  if (studyProgrammes.KH90_001 && !Object.keys(studyProgrammes).includes('KH90_001+MH90_001')) {
+    const vetenaryCombined = { ...studyProgrammes.KH90_001 }
+    vetenaryCombined.name = {
+      fi: 'Eläinlääketieteen kandiohjelma ja lisensiaatin koulutusohjelma',
+      en: "Bachelor's and Degree Programme in Vetenary Medicine",
+      sv: 'Kandidats- och Utbildningsprogrammet i veterinärmedicin',
+    }
+    vetenaryCombined.code = 'KH90_001+MH90_001'
+    studyProgrammes['KH90_001+MH90_001'] = vetenaryCombined
+  }
 
   const parseQueryFromUrl = () => {
     const initial = initialQuery()
@@ -190,6 +200,14 @@ const PopulationSearchForm = props => {
     // Just to be sure that the previous population's data has been cleared
     setImmediate(() => {
       const { studyRights, ...rest } = query
+      studyRights.programme =
+        studyRights.programme && studyRights.programme.includes('+')
+          ? studyRights.programme.split('+')[0]
+          : studyRights.programme
+      studyRights.combinedProgramme =
+        studyRights.programme && studyRights.programme.includes('+')
+          ? studyRights.programme.split('+')[1]
+          : studyRights.programme
       const queryObject = { ...rest, studyRights: JSON.stringify(studyRights) }
       const searchString = qs.stringify(queryObject)
       history.push({ search: searchString })
