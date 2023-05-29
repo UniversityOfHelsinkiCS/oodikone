@@ -596,6 +596,7 @@ const GeneralTab = ({
       mergeHeader: true,
       merge: true,
       key: 'email',
+      export: false,
       children: [
         {
           key: 'emailValue',
