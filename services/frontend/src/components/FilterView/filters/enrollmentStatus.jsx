@@ -12,11 +12,7 @@ const STATUS_OPTIONS = [
 ]
 
 const EnrollmentStatusFilterCard = ({ options, onOptionsChange, allSemesters, language, semesterCodes }) => {
-  // const [status, setStatus] = useState(null)
-  // const [semesters, setSemesters] = useState([])
-  // const { allStudents, addFilter, removeFilter } = useFilters()
   const name = 'enrollmentStatusFilter'
-  // const active = !!status && !!semesters.length
 
   const { semesters, status } = options
 

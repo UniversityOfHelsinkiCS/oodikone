@@ -370,6 +370,7 @@ const GeneralTab = ({
 
   const getSemesterEnrollmentsProps = student => {
     if (allSemesters?.length === 0) return {}
+    if (!student.semesterenrollments) return {}
     const title = student.semesterenrollments.reduce(
       (enrollmentsString, current) =>
         `${enrollmentsString}${enrollmentTypeText(current.enrollmenttype)} in ${getTextIn(
@@ -382,7 +383,8 @@ const GeneralTab = ({
   }
 
   const getSemesterEnrollmentsForExcel = student => {
-    if (allSemesters?.length === 0) return 'Data not loaded'
+    if (allSemesters?.length === 0) return ''
+    if (!student.semesterenrollments) return ''
     return student.semesterenrollments.reduce((enrollmentsString, current) => {
       const type = current.enrollmenttype
       let sign = '?'
