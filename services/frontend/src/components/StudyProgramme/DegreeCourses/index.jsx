@@ -25,7 +25,7 @@ const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, re
   const [addProgressCriteriaCourse, { data: courseData }] = useAddProgressCriteriaCourseMutation()
   const [addProgressCriteriaCredits, { data: creditsData }] = useAddProgressCriteriaCreditsMutation()
   useEffect(() => {
-    dispatch(getMandatoryCourses(studyProgramme, true))
+    dispatch(getMandatoryCourses(studyProgramme))
   }, [])
 
   useEffect(() => {
@@ -51,17 +51,15 @@ const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, re
       }
       defaultModules[code].push(course)
     })
-
-    mandatoryCourses.secondProgrammeCourses.forEach(
-      course => {
+    if (combinedProgramme) {
+      mandatoryCourses.secondProgrammeCourses.forEach(course => {
         const code = course.label_code
         if (!secondProgrammeModules[code]) {
           secondProgrammeModules[code] = []
         }
         secondProgrammeModules[code].push(course)
-      },
-      [mandatoryCourses]
-    )
+      })
+    }
 
     setDefaultModules(
       Object.entries(defaultModules)
@@ -108,7 +106,7 @@ const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, re
           modules={secondProgrammeModules}
           criteria={criteria}
           studyProgramme={studyProgramme}
-          combinedStudyProgramme={combinedProgramme}
+          combinedProgramme={combinedProgramme}
           setExclusion={setExclusion}
           removeExclusion={removeExclusion}
           addProgressCriteriaCourse={addProgressCriteriaCourse}

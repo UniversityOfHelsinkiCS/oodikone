@@ -28,7 +28,7 @@ const moduleVisibilityColor = visibility => {
 const DegreeCourseTableView = ({
   modules,
   studyProgramme,
-  combinedStudyProgramme,
+  combinedProgramme,
   criteria,
   setExclusion,
   removeExclusion,
@@ -39,7 +39,7 @@ const DegreeCourseTableView = ({
 
   const excludeAll = code => {
     const module = modules.find(({ module }) => module === code)
-    const excludeFromProgramme = combinedStudyProgramme === '' ? studyProgramme : combinedStudyProgramme
+    const excludeFromProgramme = combinedProgramme === '' ? studyProgramme : combinedProgramme
     setExclusion(
       studyProgramme,
       excludeFromProgramme,
@@ -100,7 +100,7 @@ const DegreeCourseTableView = ({
   }
 
   const setExclusionButton = course => {
-    const excludeFromProgramme = combinedStudyProgramme === '' ? studyProgramme : combinedStudyProgramme
+    const excludeFromProgramme = combinedProgramme === '' ? studyProgramme : combinedProgramme
     return (
       <Button
         color="blue"
