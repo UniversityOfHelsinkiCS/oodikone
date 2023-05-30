@@ -57,6 +57,9 @@ const StudytrackOverview = ({
 
   const noData = stats.isSuccess && stats.mainStatsByYear && !stats.mainStatsByYear.Total.length
   if (noData) return <h3>There is no data available for the selected programme between 2017-2022</h3>
+  const infoText = studyprogramme.includes('MH')
+    ? 'AverageGraduationTimesStudytracksMaster'
+    : 'AverageGraduationTimesStudytracks'
   return (
     <div className="studytrack-overview">
       {stats.isLoading || stats.isFetching ? (
@@ -119,7 +122,7 @@ const StudytrackOverview = ({
           </div>
           {stats?.isSuccess && stats?.data?.includeGraduated && stats?.data?.graduationTimes[track] && (
             <>
-              {getDivider('Average graduation times', 'AverageGraduationTimesStudytracks')}
+              {getDivider('Average graduation times', infoText)}
               <Toggle
                 cypress="GraduationTimeToggle"
                 firstLabel="Breakdown"

@@ -199,7 +199,7 @@ const startedStudyrights = async (studytrack, since, studentnumbers) =>
     })
   ).map(formatStudyright)
 
-const graduatedStudyRightsByStartDate = async (studytrack, since, studentnumbers) =>
+const graduatedStudyRightsByStartDate = async (studytrack, since, academicEnddate) =>
   (
     await Studyright.findAll({
       include: [
@@ -208,7 +208,6 @@ const graduatedStudyRightsByStartDate = async (studytrack, since, studentnumbers
           required: true,
           include: {
             model: ElementDetail,
-            required: true,
             where: {
               code: studytrack,
             },
@@ -222,10 +221,12 @@ const graduatedStudyRightsByStartDate = async (studytrack, since, studentnumbers
       ],
       where: {
         graduated: 1,
-        studystartdate: {
-          [Op.gte]: since,
+        startdate: {
+          [Op.between]: [since, academicEnddate],
         },
-        student_studentnumber: whereStudents(studentnumbers),
+        student_studentnumber: {
+          [Op.not]: null,
+        },
       },
     })
   ).map(formatStudyright)
