@@ -28,7 +28,6 @@ import courseStats from './coursestats'
 import courseSummaryForm from './coursesSummaryForm'
 import accessGroups from './accessGroups'
 import feedback from './feedback'
-import mandatoryCourseLabels from './mandatoryCourseLabels'
 import tags from './tags'
 import tagstudent from './tagstudent'
 import singleCourseStats from './singleCourseStats'
@@ -41,7 +40,6 @@ const store = configureStore({
   reducer: {
     actionHistory,
     users,
-    mandatoryCourseLabels,
     populations,
     populationCourses,
     populationSelectedStudentCourses,

@@ -33,18 +33,6 @@ const ExcludedCourse = sequelizeKone.define(
   }
 )
 
-const MandatoryCourse = sequelizeKone.define('mandatory_courses', {
-  course_code: {
-    type: Sequelize.STRING,
-  },
-  studyprogramme_id: {
-    type: Sequelize.STRING,
-  },
-  label: {
-    type: Sequelize.BIGINT,
-  },
-})
-
 const TagStudent = sequelizeKone.define(
   'tag_student',
   {
@@ -87,23 +75,6 @@ const Tag = sequelizeKone.define(
     tableName: 'tag',
   }
 )
-
-const MandatoryCourseLabels = sequelizeKone.define('mandatory_course_labels', {
-  id: {
-    primaryKey: true,
-    type: Sequelize.BIGINT,
-    autoIncrement: true,
-  },
-  studyprogramme_id: {
-    type: Sequelize.STRING,
-  },
-  label: {
-    type: Sequelize.STRING,
-  },
-  orderNumber: {
-    type: Sequelize.INTEGER,
-  },
-})
 
 const CustomPopulationSearch = sequelizeKone.define('custom_population_searches', {
   id: {
@@ -214,24 +185,13 @@ const StudyGuidanceGroupTag = sequelizeKone.define(
   { underscored: true, timestamps: true }
 )
 
-MandatoryCourse.belongsTo(MandatoryCourseLabels, {
-  foreignKey: 'label',
-  sourceKey: 'id',
-})
-MandatoryCourseLabels.hasMany(MandatoryCourse, {
-  foreignKey: 'label',
-  sourceKey: 'id',
-})
-
 TagStudent.belongsTo(Tag, { foreignKey: 'tag_id', sourceKey: 'tag_id' })
 Tag.hasMany(TagStudent, { foreignKey: 'tag_id', sourceKey: 'tag_id' })
 
 module.exports = {
-  MandatoryCourse,
   TagStudent,
   Tag,
   ThesisTypeEnums,
-  MandatoryCourseLabels,
   CustomPopulationSearch,
   OpenUniPopulationSearch,
   sequelizeKone,

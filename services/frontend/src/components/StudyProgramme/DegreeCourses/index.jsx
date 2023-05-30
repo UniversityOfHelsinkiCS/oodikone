@@ -6,7 +6,6 @@ import {
   useAddProgressCriteriaCourseMutation,
   useAddProgressCriteriaCreditsMutation,
 } from 'redux/programmeProgressCriteria'
-import { GetMandatoryCourseLabels } from '../../../redux/mandatoryCourseLabels'
 import {
   setCourseExclusion,
   removeCourseExclusion,
@@ -124,15 +123,10 @@ DegreeCourses.propTypes = {
   setCriteria: func.isRequired,
 }
 
-const mapStateToProps = ({ mandatoryCourseLabels }) => ({
-  labels: mandatoryCourseLabels.data,
-})
-
 const mapDispatchToProps = dispatch => ({
-  getLabels: studyProgramme => dispatch(GetMandatoryCourseLabels(studyProgramme)),
   setExclusion: (programmecode, excludeFromProgramme, coursecode) =>
     dispatch(setCourseExclusion(programmecode, excludeFromProgramme, coursecode)),
   removeExclusion: (programmecode, coursecode, id) => dispatch(removeCourseExclusion(programmecode, coursecode, id)),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(DegreeCourses)
+export default connect(null, mapDispatchToProps)(DegreeCourses)
