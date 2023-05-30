@@ -80,6 +80,19 @@ export default {
   
   
   Valmistumisajoista on vähennetty lakisääteiset poissaolot.`,
+  AverageGraduationTimesStudytracksMaster: `
+  Yksittäinen palkki kertoo, kuinka moni kyseisenä **lukuvuotena ALOITTANEISTA** opiskelijoista on valmistunut.
+  **Bachelor + master studyright** kuvaajassa vuosi on kandiohjelman aloitusvuosi.
+
+  Vihreä **vaakapalkki** kuvaa tavoiteajassa (tai alle) valmistuneita, keltainen palkki korkeintaan vuoden tavoiteajasta myöhässä valmistuneita
+  ja punainen yli vuoden tavoiteajan ylittäneitä.
+
+  **Breakdown**: Näyttää, kuinka moni kyseisenä lukuvuotena aloittaneista, jo valmistuneista, opiskelijoista on valmistui ajallaan, korkeintaan vuoden myöhässä tavoiteajasta tai tätä myöhemmin.
+
+  **Median time**: Näyttää valmistuneiden opiskelijoiden opintojen keston **mediaanin** kuukausina sekä heidän prosentuaalisen osuutensa koko vuosikurssista.
+  Vihreä **katkoviiva** kuvastaa tavoiteaikaa. Keltainen katkoviiva on tavoiteaika + yksi vuosi.
+  
+  Valmistumisajoista on vähennetty lakisääteiset poissaolot.`,
   ProgrammesBeforeOrAfter: `
   **Mikäli valittuna on kandiohjelma:** Sisältää maisteriohjelmat, joissa tämän kandiohjelman opiskelijat ovat aloittaneet valmistuttuaan kandeiksi. Vuosijaottelu on tehty maisteriohjelmassa aloittamisen perusteella.
 

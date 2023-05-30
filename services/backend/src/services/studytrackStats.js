@@ -234,14 +234,17 @@ const getStudytrackDataForTheYear = async ({
         absent = await absentStudents(track, studentnumbers)
         inactive = await inactiveStudyrights(track, studentnumbers)
         graduated = await graduatedStudyRights(track, startDate, studentnumbers)
-        graduatedByStartdate = await graduatedStudyRightsByStartDate(track, startDate, studentnumbers)
 
+        // Studentnumbers are fetched based on studystartdate, if it is greater than startdate
+        // Thus computing the bc+ms graduated by startdate based on these studentnumbers does not work.
+        const academicEnddate = `${year.slice(-4)}-07-31T23:59:59`
+        graduatedByStartdate = await graduatedStudyRightsByStartDate(track, startDate, academicEnddate)
         if (combinedProgramme) {
-          graduatedSecondProg = await graduatedStudyRights(combinedProgramme, startDate, studentnumbers)
+          graduatedSecondProg = await graduatedStudyRights(combinedProgramme, startDate)
           graduatedByStartSecondProg = await graduatedStudyRightsByStartDate(
             combinedProgramme,
             startDate,
-            studentnumbers
+            academicEnddate
           )
         }
         totals[track].all = [...totals[track].all, ...all]
