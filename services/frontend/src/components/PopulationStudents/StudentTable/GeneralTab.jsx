@@ -59,9 +59,24 @@ const GeneralTab = ({
 
   if (!populationStatistics || !populationStatistics.elementdetails) return null
 
-  const selectedStudents = filteredStudents.map(stu => stu.studentNumber)
+  const createSemesterEnrollmentsMap = student =>
+    student.semesterenrollments.reduce((enrollments, enrollment) => {
+      const newEnrollmentsObject = { ...enrollments }
+      newEnrollmentsObject[enrollment.semestercode] = enrollment.enrollmenttype
+      return newEnrollmentsObject
+    }, {})
 
-  const students = Object.fromEntries(filteredStudents.map(stu => [stu.studentNumber, stu]))
+  const selectedStudents = filteredStudents.map(stu => stu.studentNumber)
+  const students = Object.fromEntries(
+    filteredStudents
+      .map(stu => {
+        return {
+          ...stu,
+          semesterEnrollmentsMap: createSemesterEnrollmentsMap(stu),
+        }
+      })
+      .map(stu => [stu.studentNumber, stu])
+  )
   const queryStudyrights = query ? Object.values(query.studyRights) : []
   const cleanedQueryStudyrights = queryStudyrights.filter(sr => !!sr)
   const programmeCode = cleanedQueryStudyrights[0] || group?.tags?.studyProgramme
@@ -348,23 +363,47 @@ const GeneralTab = ({
     return title
   }
 
+  const graduatedOnSemester = (student, sem) => {
+    return moment(studentToStudyrightEndMap[student.studentNumber]).isBetween(
+      allSemesters[sem].startdate,
+      allSemesters[sem].enddate
+    )
+  }
+
   const getSemesterEnrollmentsContent = student => {
     const semesterIcons = []
-    const getSemesterJSX = enrollmenttype => {
+
+    const getSemesterJSX = (enrollmenttype, graduated) => {
       let type = 'none'
       if (enrollmenttype === 1) type = 'present'
       if (enrollmenttype === 2) type = 'absent'
       if (enrollmenttype === 3) type = 'passive'
-      return <span className={`enrollment-label-no-margin label-${type}`} />
+
+      const graduationCrown = (
+        <svg
+          style={{ overflow: 'visible' }}
+          width="23"
+          height="23"
+          viewBox="17 44 70 70"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M69.8203 29.1952L61.0704 56.1246H18.7499L10 29.1952L27.2632 38.9284L39.9102 15L52.5571 38.9284L69.8203 29.1952Z"
+            stroke="#fff238"
+            fill="#fff238"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      )
+      return <div className={`enrollment-label-no-margin label-${type}`}>{graduated ? graduationCrown : null}</div>
     }
-    const semesterEnrollmentsMap = student.semesterenrollments.reduce((enrollments, enrollment) => {
-      const newEnrollmentsObject = { ...enrollments }
-      newEnrollmentsObject[enrollment.semestercode] = enrollment.enrollmenttype
-      return newEnrollmentsObject
-    }, {})
+
     for (let sem = firstSemester; sem <= lastSemester; sem++) {
-      semesterIcons.push(getSemesterJSX(semesterEnrollmentsMap[sem]))
+      semesterIcons.push(getSemesterJSX(student.semesterEnrollmentsMap[sem], graduatedOnSemester(student, sem)))
     }
+
     return <div style={{ display: 'flex', gap: '4px' }}>{semesterIcons}</div>
   }
 
@@ -376,7 +415,7 @@ const GeneralTab = ({
         `${enrollmentsString}${enrollmentTypeText(current.enrollmenttype)} in ${getTextIn(
           allSemesters[current.semestercode].name,
           language
-        )} \n`,
+        )} ${graduatedOnSemester(student, current.semestercode) ? '(graduated) ' : ''} \n`,
       ''
     )
     return { title }
@@ -385,14 +424,19 @@ const GeneralTab = ({
   const getSemesterEnrollmentsForExcel = student => {
     if (allSemesters?.length === 0) return ''
     if (!student.semesterenrollments) return ''
-    return student.semesterenrollments.reduce((enrollmentsString, current) => {
-      const type = current.enrollmenttype
-      let sign = '?'
+    let enrollmentsString = `Starting from ${getTextIn(
+      allSemesters[student.semesterenrollments[0].semestercode].name,
+      language
+    )}: `
+    for (let sem = firstSemester; sem <= lastSemester; sem++) {
+      const type = student.semesterEnrollmentsMap[sem]
+      let sign = '_'
       if (type === 1) sign = '+'
-      if (type === 2) sign = 'o'
-      if (type === 3) sign = '_'
-      return enrollmentsString + sign
-    }, `Starting from ${getTextIn(allSemesters[student.semesterenrollments[0].semestercode].name, language)}: `)
+      if (type === 2) sign = '-'
+      enrollmentsString += sign
+    }
+
+    return enrollmentsString
   }
 
   let creditsColumn = null
