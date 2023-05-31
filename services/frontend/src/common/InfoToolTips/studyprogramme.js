@@ -104,10 +104,30 @@ export default {
   Kuvaa koulutusohjelman kyseiseen ohjelmaan opinto-oikeudella varustettujen opiskelijoiden etenemistä opintopisteissä mitattuna. Esimerkiksi 2020-2021 aloittaneiden opintopistejakaumaa.
   
   HUOM!
-  **All** Sisältää kaikki opiskelijat, joiden opinto-oikeudella on aloituspäivä kyseisenä vuonna, riippumatta siitä, onko opiskelija aloittanut opiskelemaan ko. vuonna.
-  **Started studying** Sisältää kaikki opiskelijat, jotka ovat aloittaneet opiskelemaan koulutusohjelmassa kyseisenä lukuvuonna.
-  **Inactive** Sisältää kaikki opinto-oikeudet, jotka ovat alkaneet kyseisenä vuonna, mutta jotka ovat sittemmin vanhentuneet ilman, että opiskelija on valmistunut ohjelmasta. Sisältää myös opinto-oikeudet,
+  - **All** Sisältää kaikki opiskelijat, joiden opinto-oikeudella on aloituspäivä kyseisenä vuonna, riippumatta siitä, onko opiskelija aloittanut opiskelemaan ko. vuonna. 
+  - **Started studying** Sisältää kaikki opiskelijat, jotka ovat aloittaneet opiskelemaan koulutusohjelmassa kyseisenä lukuvuonna.
+  - **Inactive** Sisältää kaikki opinto-oikeudet, jotka ovat alkaneet kyseisenä vuonna, mutta jotka ovat sittemmin vanhentuneet ilman, että opiskelija on valmistunut ohjelmasta. Sisältää myös opinto-oikeudet,
   joissa opiskelija on laiminlyönyt ilmoittautumisen tälle lukukaudelle.
+
+  Kenttien **Currently enrolled, Absent, Inactive** ja **Graduated** arvot tuottavat yhteenlaskettuna kentän **All** arvon.
+  
+  Mukana ovat oletusarvoisesti myös vaihto-opiskelijat, ohjelmaan ja siitä pois siirtyneet opiskelijat sekä erillisopinto-oikeudella opiskelevat.
+  Taulukko näyttää myös näistä opiskelijoista miesten, naisten ja suomalaisten osuudet sekä valmistuneiden määrän. 
+
+  Yläosan valikosta on mahdollista valita tarkasteluun yhden opintosuunnan opiskelijat. Sekä opiskelijoiden yleistiedot että edistyminen opintopisteittäin
+  kuvaavat tällöin kyseisen opintosuunnan opiskelijoita.
+  `,
+  StudytrackOverviewCombinedProgramme: `  
+  Kuvaa koulutusohjelman kyseiseen ohjelmaan opinto-oikeudella varustettujen opiskelijoiden etenemistä opintopisteissä mitattuna. Esimerkiksi 2020-2021 aloittaneiden opintopistejakaumaa.
+  
+  HUOM!
+  - **All** Sisältää kaikki opiskelijat, joiden opinto-oikeudella on aloituspäivä kyseisenä vuonna, riippumatta siitä, onko opiskelija aloittanut opiskelemaan ko. vuonna. 
+  - **Started studying** Sisältää kaikki opiskelijat, jotka ovat aloittaneet opiskelemaan koulutusohjelmassa kyseisenä lukuvuonna.
+  - **Inactive** Sisältää kaikki opinto-oikeudet, jotka ovat alkaneet kyseisenä vuonna, mutta jotka ovat sittemmin vanhentuneet ilman, että opiskelija on valmistunut ohjelmasta. Sisältää myös opinto-oikeudet,
+  joissa opiskelija on laiminlyönyt ilmoittautumisen tälle lukukaudelle.
+
+  - Kenttien **Currently enrolled, Absent, Inactive** ja **Graduated licentiate** (tai **Graduated master**) arvot tuottavat yhteenlaskettuna kentän **All** arvon.
+  - Lisäksi kenttien **Currently enrolled, Absent, Inactive** arvot sisältävät opiskelijat, joilla on kyseinen status riippumatta siitä, onko opiskelija kandi- vai maisterivaiheen opiskelija.
   
   Mukana ovat oletusarvoisesti myös vaihto-opiskelijat, ohjelmaan ja siitä pois siirtyneet opiskelijat sekä erillisopinto-oikeudella opiskelevat.
   Taulukko näyttää myös näistä opiskelijoista miesten, naisten ja suomalaisten osuudet sekä valmistuneiden määrän. 
