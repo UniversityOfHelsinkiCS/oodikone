@@ -148,6 +148,7 @@ export default {
       - Keltainen = Ilmoittautunut poissaolevaksi
       - Punainen = Ei ilmoittautumista, mutta opiskelijalla on ollut opinto-oikeus
       - Harmaa = Opiskelijalla ei ollut tällöin opinto-oikeutta
+      - Kruunu kertoo opiskelijan valmistuneen kyseisenä lukukautena.
     - Excel-versiossa sarakkeessa näkyy tieto opiskelijan ensimmäisestä ilmoittautumisesta, jonka jälkeen ilmoittautumiset esitettynä symbolein:
       - \\+ = Ilmoittautunut läsnäolevaksi
       - o = Ilmoittautunut poissaolevaksi
