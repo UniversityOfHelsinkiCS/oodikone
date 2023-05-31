@@ -7,8 +7,8 @@ const getCorrectStudentnumbers = async ({ codes, startDate, endDate, includeAllS
   const exchangeStudents = includeAllSpecials
   const nondegreeStudents = includeAllSpecials
   const transferredOutStudents = includeAllSpecials
-  const transferredToStudents = !includeAllSpecials
-  const graduatedStudents = !includeGraduated
+  const transferredToStudents = includeAllSpecials
+  const graduatedStudents = includeGraduated
 
   studentnumbers = await studentnumbersWithAllStudyrightElements(
     codes,

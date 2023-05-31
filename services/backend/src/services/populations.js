@@ -685,7 +685,7 @@ const studentnumbersWithAllStudyrightElements = async (
   }
 
   // fetch students that have transferred to the programme and filter out these studentnumbers
-  if (transferredToStudents) {
+  if (!transferredToStudents) {
     const transfersTo = (
       await Transfer.findAll({
         attributes: ['studentnumber'],
@@ -707,7 +707,7 @@ const studentnumbersWithAllStudyrightElements = async (
   }
 
   // fetch students that have graduated from the programme and filter out these studentnumbers
-  if (graduatedStudents) {
+  if (!graduatedStudents) {
     const graduated = (
       await Student.findAll({
         attributes: ['studentnumber'],
@@ -997,7 +997,10 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
         endDate,
         exchangeStudents,
         nondegreeStudents,
-        transferredStudents
+        transferredStudents,
+        null,
+        !transferredStudents,
+        true
       )
   const code = studyRights[0] || ''
   let optionData = {}
@@ -1175,7 +1178,9 @@ const bottlenecksOf = async (query, studentnumberlist, encryptdata = false) => {
         exchangeStudents,
         nondegreeStudents,
         transferredStudents,
-        query.tag
+        query.tag,
+        !transferredStudents,
+        true
       )
       const disallowedRequest = checkThatSelectedStudentsAreUnderRequestedStudyright(
         query.selectedStudents,
@@ -1199,7 +1204,9 @@ const bottlenecksOf = async (query, studentnumberlist, encryptdata = false) => {
           exchangeStudents,
           nondegreeStudents,
           transferredStudents,
-          tag
+          tag,
+          !transferredStudents,
+          true
         ))
 
       const allstudents = studentnumbers.reduce((numbers, num) => {
