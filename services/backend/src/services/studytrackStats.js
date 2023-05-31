@@ -28,6 +28,7 @@ const {
 const { getAcademicYearDates } = require('../util/semester')
 const { countTimeCategories, getStatutoryAbsences } = require('./graduationHelpers')
 
+const getUnique = studentnumbers => [...new Set(studentnumbers)]
 const getStudentData = (startDate, students, thresholdKeys, thresholdAmounts) => {
   let data = { female: 0, male: 0, finnish: 0 }
   thresholdKeys.forEach(t => (data[t] = 0))
@@ -228,7 +229,6 @@ const getStudytrackDataForTheYear = async ({
       // Get all the studyrights and students for the calculations
       if (year !== 'Total') {
         all = await allStudyrights(track, studentnumbers)
-
         studentData = getStudentData(startDate, students, creditThresholdKeys, creditThresholdAmounts)
         started = await startedStudyrights(track, startDate, studentnumbers)
         enrolled = await enrolledStudents(track, studentnumbers)
@@ -236,11 +236,21 @@ const getStudytrackDataForTheYear = async ({
         inactive = await inactiveStudyrights(track, studentnumbers)
         graduated = await graduatedStudyRights(track, startDate, studentnumbers)
 
+        const enrolledSecondProgramme = combinedProgramme
+          ? await enrolledStudents(combinedProgramme, studentnumbers)
+          : []
+        const absentSecondProgramme = combinedProgramme ? await absentStudents(combinedProgramme, studentnumbers) : []
+        const inactiveSecondProgramme = combinedProgramme
+          ? await inactiveStudyrights(combinedProgramme, studentnumbers)
+          : []
         // Studentnumbers are fetched based on studystartdate, if it is greater than startdate
         // Thus, computing the bc+ms graduated by startdate based on these studentnumbers does not work.
         const academicEnddate = `${year.slice(-4)}-07-31T23:59:59`
         graduatedByStartdate = await graduatedStudyRightsByStartDate(track, startDate, academicEnddate)
         if (combinedProgramme) {
+          enrolled = getUnique([...enrolled, ...enrolledSecondProgramme].map(student => student.studentnumber))
+          absent = getUnique([...absent, ...absentSecondProgramme].map(student => student.studentnumber))
+          inactive = getUnique([...inactive, ...inactiveSecondProgramme].map(student => student.studentnumber))
           graduatedSecondProg = await graduatedStudyRights(combinedProgramme, startDate, studentnumbers)
           graduatedByStartSecondProg = await graduatedStudyRightsByStartDate(
             combinedProgramme,
