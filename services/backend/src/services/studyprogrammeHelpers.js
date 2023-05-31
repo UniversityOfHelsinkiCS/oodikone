@@ -536,21 +536,7 @@ const tableTitles = {
     licentiate: ['Graduated Bachelor', 'Graduated Licentiate'],
     master: ['Graduated Bachelor', 'Graduated master'],
   },
-  studytracksEnd: ['Men', 'Women', 'Finland'],
-  programmes: [
-    '',
-    'All',
-    'Started studying',
-    'Currently enrolled',
-    'Absent',
-    'Inactive',
-    'Graduated',
-    'Men',
-    'Women',
-    'Other/Unknown',
-    'Finland',
-    'Other',
-  ],
+  studytracksEnd: ['Men', 'Women', 'Other/\nUnknown', 'Finland', 'Other'],
 }
 
 const getCreditProgressTableTitles = (studyprogramme, combinedVetenaryProgramme, masterProgrammeOnly = false) => {

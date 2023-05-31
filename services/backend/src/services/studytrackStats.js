@@ -30,7 +30,7 @@ const { countTimeCategories, getStatutoryAbsences } = require('./graduationHelpe
 
 const getUnique = studentnumbers => [...new Set(studentnumbers)]
 const getStudentData = (startDate, students, thresholdKeys, thresholdAmounts) => {
-  let data = { female: 0, male: 0, finnish: 0 }
+  let data = { female: 0, male: 0, otherUnkown: 0, finnish: 0, otherCountries: 0 }
   thresholdKeys.forEach(t => (data[t] = 0))
   students.forEach(({ gender_code, home_country_en, credits }) => {
     const creditcount = credits
@@ -39,7 +39,9 @@ const getStudentData = (startDate, students, thresholdKeys, thresholdAmounts) =>
 
     data.male += gender_code === '1' ? 1 : 0
     data.female += gender_code === '2' ? 1 : 0
+    data.otherUnkown += ['0', '3'].includes(gender_code) ? 1 : 0
     data.finnish += home_country_en === 'Finland' ? 1 : 0
+    data.otherCountries += home_country_en !== 'Finland' ? 1 : 0
     data[thresholdKeys[0]] += creditcount < thresholdAmounts[0] ? 1 : 0
     data[thresholdKeys[1]] += creditcount >= thresholdAmounts[0] && creditcount < thresholdAmounts[1] ? 1 : 0
     data[thresholdKeys[2]] += creditcount >= thresholdAmounts[1] && creditcount < thresholdAmounts[2] ? 1 : 0
@@ -146,7 +148,6 @@ const getStats = (
 ) => {
   const beginTablestats = [
     all.length,
-    getPercentage(all.length, all.length),
     started.length,
     getPercentage(started.length, all.length),
     enrolled.length,
@@ -166,8 +167,12 @@ const getStats = (
     getPercentage(studentData.male, all.length),
     studentData.female,
     getPercentage(studentData.female, all.length),
+    studentData.otherUnkown,
+    getPercentage(studentData.otherUnkown, all.length),
     studentData.finnish,
     getPercentage(studentData.finnish, all.length),
+    studentData.otherCountries,
+    getPercentage(studentData.otherCountries, all.length),
   ]
   return [...beginTablestats, ...combinedTableStats, ...endTableStats]
 }
@@ -261,7 +266,9 @@ const getStudytrackDataForTheYear = async ({
         totals[track].all = [...totals[track].all, ...all]
         totals[track].studentData.male += studentData.male
         totals[track].studentData.female += studentData.female
+        totals[track].studentData.otherUnkown += studentData.otherUnkown
         totals[track].studentData.finnish += studentData.finnish
+        totals[track].studentData.otherCountries += studentData.otherCountries
         totals[track].started = [...totals[track].started, ...started]
         totals[track].enrolled = [...totals[track].enrolled, ...enrolled]
         totals[track].absent = [...totals[track].absent, ...absent]
@@ -436,7 +443,7 @@ const getEmptyStatsObjects = (years, studytracks, studyprogramme, combinedProgra
       inactive: [],
       graduated: [],
       graduatedSecondProg: [],
-      studentData: { male: 0, female: 0, finnish: 0 },
+      studentData: { male: 0, female: 0, otherUnkown: 0, finnish: 0, otherCountries: 0 },
     }
   })
 
