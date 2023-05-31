@@ -60,7 +60,7 @@ const GeneralTab = ({
   if (!populationStatistics || !populationStatistics.elementdetails) return null
 
   const createSemesterEnrollmentsMap = student =>
-    student.semesterenrollments.reduce((enrollments, enrollment) => {
+    student.semesterenrollments?.reduce((enrollments, enrollment) => {
       const newEnrollmentsObject = { ...enrollments }
       newEnrollmentsObject[enrollment.semestercode] = enrollment.enrollmenttype
       return newEnrollmentsObject
@@ -181,6 +181,7 @@ const GeneralTab = ({
 
   const { first: firstSemester, last: lastSemester } = filteredStudents.reduce(
     ({ first, last }, student) => {
+      if (!student.semesterenrollments) return { first: 9999, last: 0 }
       const newFirst = Math.min(first, ...student.semesterenrollments.map(e => e.semestercode))
       const newLast = Math.max(last, ...student.semesterenrollments.map(e => e.semestercode))
       return { first: newFirst, last: newLast }
