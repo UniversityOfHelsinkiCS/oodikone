@@ -48,7 +48,7 @@ const getSingleTrackRow = ({ row, studyprogramme, code, showPercentages, calenda
   return (
     <Table.Row key={getKey(row[0])} className="regular-row">
       {row.map((value, index) => (
-        <React.Fragment key={`${row[0]}-${code}`}>
+        <React.Fragment key={`${row[0]}-${code}-${getKey(value)}`}>
           {shouldBeHidden(showPercentages, value) ? null : (
             <Table.Cell
               textAlign="left"
@@ -132,7 +132,12 @@ const getRow = ({
           ) : (
             <>
               {shouldBeHidden(showPercentages, value) ? null : (
-                <Table.Cell className={getCellClass(row[0])} textAlign="left" key={getKey(row[0])}>
+                <Table.Cell
+                  className={getCellClass(row[0])}
+                  textAlign="left"
+                  key={getKey(row[0])}
+                  style={combinedProgramme ? getStyleForCombined(index) : getStyleForBasic(index)}
+                >
                   {value}
                 </Table.Cell>
               )}
