@@ -146,14 +146,7 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
       ]
     : []
 
-  return [
-    ...hiddenNameAndEmailForCsv,
-    ...nameColumns,
-    ...studentNbrColumn,
-    ...completionStatusColumns,
-    statisticHeader,
-    ...emailColumn,
-  ]
+  return [...nameColumns, ...studentNbrColumn, ...completionStatusColumns, statisticHeader, ...emailColumn]
 }
 
 const CompletedCoursesSearchResults = ({ searchValues }) => {
@@ -202,6 +195,7 @@ const CompletedCoursesSearchResults = ({ searchValues }) => {
             textAlign: 'center',
           }}
           columns={getColumns(data.courses, showStudentNames.visible, getTextIn, sendAnalytics)}
+          onlyExportColumns={hiddenNameAndEmailForCsv}
           data={data.students}
         />
       </div>

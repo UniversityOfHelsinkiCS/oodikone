@@ -496,8 +496,8 @@ const GeneralTab = ({
 
   // All columns components user is able to use
   const columnsAvailable = {
-    lastname: { key: 'lastname', title: 'Last name', getRowVal: s => s.lastname },
-    firstname: { key: 'firstname', title: 'Given names', getRowVal: s => s.firstnames },
+    lastname: { key: 'lastname', title: 'Last name', getRowVal: s => s.lastname, export: false },
+    firstname: { key: 'firstname', title: 'Given names', getRowVal: s => s.firstnames, export: false },
     studentnumber: {
       key: 'studentnumber',
       title: 'Student Number',
@@ -735,7 +735,8 @@ const GeneralTab = ({
         padded: false,
         celled: true,
       }}
-      columns={[...hiddenNameAndEmailForCsv, ...columns]}
+      columns={columns}
+      onlyExportColumns={hiddenNameAndEmailForCsv}
       data={selectedStudents.map(sn => students[sn])}
     />
   )

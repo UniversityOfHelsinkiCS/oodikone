@@ -62,6 +62,16 @@ const CoursesTable = ({ students, studyGuidanceCourses }) => {
   const columns = useMemo(() => {
     const nameColumns = []
 
+    nameColumns.push({
+      key: 'studentnumber',
+      title: 'Student Number',
+      cellProps: { title: 'Student number' },
+      getRowVal: s => (s.total ? '*' : s.studentNumber),
+      getRowContent: s =>
+        s.total ? 'Summary:' : <StudentInfoItem student={s} tab="Mandatory courses table" showSisuLink />,
+      child: true,
+    })
+
     if (namesVisible) {
       nameColumns.push(
         {
@@ -70,6 +80,7 @@ const CoursesTable = ({ students, studyGuidanceCourses }) => {
           getRowVal: s => (s.total ? null : s.lastname),
           cellProps: { title: 'last name' },
           child: true,
+          export: false,
         },
         {
           key: 'firstname',
@@ -77,35 +88,25 @@ const CoursesTable = ({ students, studyGuidanceCourses }) => {
           getRowVal: s => (s.total ? null : s.firstnames),
           cellProps: { title: 'first names' },
           child: true,
+          export: false,
         }
       )
     }
 
-    nameColumns.push(
-      {
-        key: 'studentnumber',
-        title: 'Student Number',
-        cellProps: { title: 'Student number' },
-        getRowVal: s => (s.total ? '*' : s.studentNumber),
-        getRowContent: s =>
-          s.total ? 'Summary:' : <StudentInfoItem student={s} tab="Mandatory courses table" showSisuLink />,
-        child: true,
-      },
-      {
-        key: 'totalpassed',
-        title: 'Total Passed',
-        filterType: 'range',
-        vertical: true,
-        getRowVal: s =>
-          s.total
-            ? Object.values(s)
-                .filter(isNumber)
-                .reduce((acc, e) => acc + e, 0)
-            : totalMandatoryPassed(s.studentNumber),
-        cellProps: { title: 'Total passed' },
-        child: true,
-      }
-    )
+    nameColumns.push({
+      key: 'totalpassed',
+      title: 'Total Passed',
+      filterType: 'range',
+      vertical: true,
+      getRowVal: s =>
+        s.total
+          ? Object.values(s)
+              .filter(isNumber)
+              .reduce((acc, e) => acc + e, 0)
+          : totalMandatoryPassed(s.studentNumber),
+      cellProps: { title: 'Total passed' },
+      child: true,
+    })
 
     const mandatoryCourseLabels = []
     // REVISIT ELÄINLÄÄKIS
@@ -281,7 +282,8 @@ const CoursesTable = ({ students, studyGuidanceCourses }) => {
                 singleLine: true,
                 //                textAlign: 'center',
               }}
-              columns={[...hiddenNameAndEmailForCsv, ...columns]}
+              columns={columns}
+              onlyExportColumns={hiddenNameAndEmailForCsv}
               data={data}
             />
           )}
