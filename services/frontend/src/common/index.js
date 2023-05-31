@@ -190,7 +190,7 @@ export const getUnifyTextIn = unifyCourses => {
   }
 }
 
-export const hiddenNameAndEmailForCsv = [
+export const hiddenNameAndEmailForExcel = [
   {
     key: 'hidden-lastname',
     title: 'Last name',
