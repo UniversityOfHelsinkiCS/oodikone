@@ -817,6 +817,7 @@ const SortableTable = ({
   figure = true,
   toggleGroupExpansion,
   expandedGroups,
+  onlyExportColumns = [],
 }) => {
   const [exportModalOpen, setExportModalOpen] = useState(false)
   const [state, dispatch] = useReducer(
@@ -977,7 +978,12 @@ const SortableTable = ({
 
   return (
     <>
-      <ExportModal open={exportModalOpen} onClose={() => setExportModalOpen(false)} data={data} columns={columns} />
+      <ExportModal
+        open={exportModalOpen}
+        onClose={() => setExportModalOpen(false)}
+        data={data}
+        columns={[...onlyExportColumns, ...columns]}
+      />
       <SortableTableContext.Provider value={context}>
         <FigureContainer style={figureStyles}>
           <FigureContainer.Header actions={actions} contextItems={contextMenuItems}>
