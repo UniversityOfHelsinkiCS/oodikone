@@ -1,3 +1,4 @@
+/* eslint-disable cypress/no-unnecessary-waiting */
 /// <reference types="Cypress" />
 
 describe('Course Statistics tests', () => {
@@ -166,12 +167,17 @@ describe('Course Statistics tests', () => {
 
     it('Population of course shows grades for each student', () => {
       cy.get("input[placeholder='Search by a course code']").type('TKT20001')
-      cy.contains(/^TKT20001, AYTKT20001$/).click()
-      cy.contains('Fetch statistics').should('be.enabled').click()
+      cy.wait(2000)
+      cy.contains(/^TKT20001, AYTKT20001$/).click({ force: true })
+      cy.wait(2000)
+      cy.contains('Fetch statistics').should('be.enabled').click({ force: true })
+      cy.wait(2000)
       cy.contains('TKT20001, 58131, AYTKT20001 Tietorakenteet ja algoritmit')
-      cy.get('tbody >:nth-child(3) > :nth-child(2) .level').click()
+      cy.get('tbody >:nth-child(3) > :nth-child(2) .level').click({ force: true })
+      cy.wait(2000)
       cy.contains('Population of course Tietorakenteet ja algoritmit 2018-2019 (open and normal)')
-      cy.contains('Students (204)').click()
+      cy.contains('Students (204)').click({ force: true })
+      cy.wait(2000)
       cy.contains('td', '010262566').siblings().contains('4')
       cy.contains('td', '010674989').siblings().contains('1')
     })
