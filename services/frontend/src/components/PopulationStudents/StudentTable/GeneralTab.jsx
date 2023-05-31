@@ -584,10 +584,6 @@ const GeneralTab = ({
       cellProps: s => getSemesterEnrollmentsProps(s),
       getRowVal: s => s.semesterenrollments?.filter(e => e.enrollmenttype === 1).length ?? 0,
       getRowExportVal: s => getSemesterEnrollmentsForExcel(s),
-      /* getSortingValue: s => {
-        console.log(s)
-        return s.semesterenrollments?.map(e => e.enrollmenttype === 1).length ?? 0
-      }, */
     },
     transferredFrom: {
       key: 'transferredFrom',
