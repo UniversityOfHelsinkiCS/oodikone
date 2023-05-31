@@ -73,15 +73,15 @@ const enrolledStudents = async (studytrack, studentnumbers) => {
         attributes: ['studyrightid'],
         where: {
           graduated: 0,
+          active: 1,
         },
       },
       {
         model: SemesterEnrollment,
-        attributes: ['semestercode'],
+        attributes: ['semestercode', 'enrollmenttype'],
         include: [
           {
             model: Semester,
-            required: true,
             where: {
               semestercode: currentSemester.semestercode,
             },
@@ -121,6 +121,7 @@ const absentStudents = async (studytrack, studentnumbers) => {
         attributes: ['studyrightid'],
         where: {
           graduated: 0,
+          active: 1,
         },
       },
       {
@@ -165,6 +166,9 @@ const allStudyrights = async (studytrack, studentnumbers) =>
       ],
       where: {
         student_studentnumber: whereStudents(studentnumbers),
+        cancelled: {
+          [Op.not]: true,
+        },
       },
     })
   ).map(formatStudyright)
@@ -193,6 +197,9 @@ const startedStudyrights = async (studytrack, since, studentnumbers) =>
       where: {
         studystartdate: {
           [Op.gte]: since,
+        },
+        cancelled: {
+          [Op.not]: true,
         },
         student_studentnumber: whereStudents(studentnumbers),
       },
@@ -256,6 +263,9 @@ const graduatedStudyRights = async (studytrack, since, studentnumbers) =>
         graduated: 1,
         enddate: sinceDate(since),
         student_studentnumber: whereStudents(studentnumbers),
+        cancelled: {
+          [Op.not]: true,
+        },
       },
     })
   ).map(formatStudyright)
@@ -277,20 +287,18 @@ const inactiveStudyrights = async (studytrack, studentnumbers) => {
             },
           },
         ],
-        attributes: ['studyrightid'],
+        attributes: ['studyrightid', 'enddate'],
         where: {
           graduated: 0,
           active: 0,
+          cancelled: {
+            [Op.not]: true,
+          },
         },
       },
       {
         model: SemesterEnrollment,
-        attributes: ['semestercode'],
-        required: true,
-        where: {
-          enrollmenttype: 3,
-          semestercode: currentSemester.semestercode,
-        },
+        attributes: ['semestercode', 'enrollmenttype'],
       },
     ],
     where: {
@@ -299,7 +307,13 @@ const inactiveStudyrights = async (studytrack, studentnumbers) => {
       },
     },
   })
-  return students
+
+  return students.filter(
+    student =>
+      student.studyrights[0].enddate <= new Date() ||
+      !student.semester_enrollments.find(enrollment => enrollment.semestercode === currentSemester) ||
+      student.semester_enrollments.find(enrollment => enrollment.semestercode === currentSemester).enrollmenttype === 3
+  )
 }
 
 const followingStudyrights = async (since, programmes, studentnumbers) =>
@@ -560,7 +574,6 @@ const getStudentsForProgrammeCourses = async (from, to, programmeCourses) => {
       type: 'passed',
     }))
   } catch (e) {
-    // eslint-disable-next-line no-console
     logger.log(e)
   }
 }
@@ -655,7 +668,6 @@ const getNotCompletedForProgrammeCourses = async (from, to, programmeCourses) =>
         type: 'notCompleted',
       }))
   } catch (e) {
-    // eslint-disable-next-line no-console
     logger.log(e)
   }
 }

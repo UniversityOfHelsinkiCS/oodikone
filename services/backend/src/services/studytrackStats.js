@@ -228,6 +228,7 @@ const getStudytrackDataForTheYear = async ({
       // Get all the studyrights and students for the calculations
       if (year !== 'Total') {
         all = await allStudyrights(track, studentnumbers)
+
         studentData = getStudentData(startDate, students, creditThresholdKeys, creditThresholdAmounts)
         started = await startedStudyrights(track, startDate, studentnumbers)
         enrolled = await enrolledStudents(track, studentnumbers)
@@ -236,11 +237,11 @@ const getStudytrackDataForTheYear = async ({
         graduated = await graduatedStudyRights(track, startDate, studentnumbers)
 
         // Studentnumbers are fetched based on studystartdate, if it is greater than startdate
-        // Thus computing the bc+ms graduated by startdate based on these studentnumbers does not work.
+        // Thus, computing the bc+ms graduated by startdate based on these studentnumbers does not work.
         const academicEnddate = `${year.slice(-4)}-07-31T23:59:59`
         graduatedByStartdate = await graduatedStudyRightsByStartDate(track, startDate, academicEnddate)
         if (combinedProgramme) {
-          graduatedSecondProg = await graduatedStudyRights(combinedProgramme, startDate)
+          graduatedSecondProg = await graduatedStudyRights(combinedProgramme, startDate, studentnumbers)
           graduatedByStartSecondProg = await graduatedStudyRightsByStartDate(
             combinedProgramme,
             startDate,
