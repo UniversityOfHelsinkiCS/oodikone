@@ -383,7 +383,7 @@ const createStudentCreditLines = (
     const { code } = resolveStudyRightElement(
       student.studyrights.find(({ studyrightid }) => studyrightid === studyRightId) || {}
     )
-    const studyPlanProgrammeCode = singleStudent ? code : studyPlanFilterIsActive && programmeCodes[0]
+    const studyPlanProgrammeCode = singleStudent ? code : studyPlanFilterIsActive && programmeCodes && programmeCodes[0]
 
     const { points } = _.flow(
       () =>
