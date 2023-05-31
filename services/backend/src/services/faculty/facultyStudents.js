@@ -263,7 +263,7 @@ const combineFacultyStudents = async (code, programmes, allProgrammeCodes, speci
     facultyTableStats: facultyTableStats,
     facultyTableStatsExtra: facultyExtra,
     programmeStats: programmeTableStats,
-    titles: tableTitles['programmes'],
+    titles: [...tableTitles.studytracksStart, ...tableTitles.studytracksBasic, ...tableTitles.studytracksEnd],
     programmeNames: programmeNames,
   }
   return studentsData

@@ -11,6 +11,24 @@ const shouldBeHidden = (showPercentages, value) => !showPercentages && typeof va
 
 const getCellClass = value => (value === 'Total' ? 'total-row-cell' : '')
 
+const getSpanValue = (idx, showPercentages, combinedProgramme) => {
+  if (combinedProgramme && showPercentages) return idx + 2
+  if (combinedProgramme) return idx + 1
+  return idx
+}
+const getStyleForBasic = idx => {
+  if ([4, 12].includes(idx)) return { backgroundColor: '#f9f9f9', borderLeftWidth: 'thick' }
+  if ([1, 5, 8, 9, 12, 13, 16, 17, 20, 21].includes(idx)) return { backgroundColor: '#f9f9f9' }
+  if (idx === 18) return { borderLeftWidth: 'thick' }
+  return {}
+}
+const getStyleForCombined = idx => {
+  if ([4, 20].includes(idx)) return { backgroundColor: '#f9f9f9', borderLeftWidth: 'thick' }
+  if ([1, 5, 8, 9, 12, 13, 16, 17, 21].includes(idx)) return { backgroundColor: '#f9f9f9' }
+  if ([14].includes(idx)) return { borderLeftWidth: 'thick' }
+  return {}
+}
+
 const getFirstCell = ({ yearlyData, year, show, studyprogramme, calendarYears, combinedProgramme }) => {
   return (
     <Table.Cell key={getKey(year)} className={getCellClass(year)}>
@@ -30,9 +48,14 @@ const getSingleTrackRow = ({ row, studyprogramme, code, showPercentages, calenda
   return (
     <Table.Row key={getKey(row[0])} className="regular-row">
       {row.map((value, index) => (
-        <>
+        <React.Fragment key={`${row[0]}-${code}`}>
           {shouldBeHidden(showPercentages, value) ? null : (
-            <Table.Cell textAlign="left" className={getCellClass(row[0])} key={getKey(row[0])}>
+            <Table.Cell
+              textAlign="left"
+              className={getCellClass(row[0])}
+              style={combinedProgramme ? getStyleForCombined(index) : getStyleForBasic(index)}
+              key={getKey(row[0])}
+            >
               {value}
               {index === 0 && (
                 <PopulationLink
@@ -45,7 +68,7 @@ const getSingleTrackRow = ({ row, studyprogramme, code, showPercentages, calenda
               )}
             </Table.Cell>
           )}
-        </>
+        </React.Fragment>
       ))}
     </Table.Row>
   )
@@ -72,13 +95,18 @@ const getRow = ({
           index === 0 ? (
             getFirstCell({ yearlyData, year: row[0], show, studyprogramme, calendarYears, combinedProgramme })
           ) : (
-            <>
+            <React.Fragment key={`${studyprogramme}-${year}-${getKey(value)}`}>
               {shouldBeHidden(showPercentages, value) ? null : (
-                <Table.Cell className={getCellClass(row[0])} key={getKey(value)} textAlign="left">
+                <Table.Cell
+                  className={getCellClass(row[0])}
+                  key={getKey(value)}
+                  style={combinedProgramme ? getStyleForCombined(index) : getStyleForBasic(index)}
+                  textAlign="left"
+                >
                   {value}
                 </Table.Cell>
               )}
-            </>
+            </React.Fragment>
           )
         )}
       </Table.Row>
@@ -177,7 +205,7 @@ const StudytrackDataTable = ({
     if (year === 'Total') return all
     return all.concat(Number(year.slice(0, 4)))
   }, [])
-
+  const borderStyleArray = combinedProgramme ? [3, 8, 11] : [3, 7, 10]
   return (
     <div className="datatable">
       <Toggle
@@ -188,13 +216,36 @@ const StudytrackDataTable = ({
       />
       <Table data-cy="Table-StudytrackOverview" celled>
         <Table.Header>
+          <Table.Row key="FirstHeader">
+            <Table.HeaderCell colSpan={!showPercentages ? 3 : 4} />
+            <Table.HeaderCell
+              colSpan={
+                !showPercentages
+                  ? getSpanValue(4, showPercentages, combinedProgramme)
+                  : getSpanValue(8, showPercentages, combinedProgramme)
+              }
+              style={{ borderLeftWidth: 'thick' }}
+            >
+              Status
+            </Table.HeaderCell>
+            <Table.HeaderCell colSpan={!showPercentages ? 3 : 6} style={{ borderLeftWidth: 'thick' }}>
+              Gender
+            </Table.HeaderCell>
+            <Table.HeaderCell colSpan={!showPercentages ? 2 : 4} style={{ borderLeftWidth: 'thick' }}>
+              Country
+            </Table.HeaderCell>
+          </Table.Row>
           <Table.Row key="Table-Studytrack-Titles">
             {titles.map((title, index) => (
               <Table.HeaderCell
                 key={title}
-                colSpan={index === 0 || !showPercentages ? 1 : 2}
+                colSpan={index === 0 || index === 1 || !showPercentages ? 1 : 2}
                 textAlign="left"
-                style={{ fontWeight: 'bold' }}
+                style={
+                  borderStyleArray.includes(index)
+                    ? { fontWeight: 'bold', borderLeftWidth: 'thick' }
+                    : { fontWeight: 'bold' }
+                }
               >
                 {title}
               </Table.HeaderCell>

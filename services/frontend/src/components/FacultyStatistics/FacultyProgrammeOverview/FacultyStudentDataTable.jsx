@@ -137,7 +137,7 @@ const FacultyStudentDataTable = ({
           {years.map((year, yearIndex) => {
             return (
               <>
-                <Table.Row key={`${year}-faculty-row}`} className="header-row">
+                <Table.Row key={`${year}-faculty-row}`} className={year === 'Total' ? 'total-row-cell' : ''}>
                   {tableStats[year].map((value, valueIdx) => {
                     if (valueIdx === 0)
                       return (
