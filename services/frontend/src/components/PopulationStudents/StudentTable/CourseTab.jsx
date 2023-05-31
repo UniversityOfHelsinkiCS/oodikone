@@ -6,7 +6,7 @@ import useLanguage from 'components/LanguagePicker/useLanguage'
 import '../../PopulationCourseStats/populationCourseStats.css'
 import { useGetStudyGuidanceGroupPopulationCoursesQuery } from 'redux/studyGuidanceGroups'
 import StudentInfoItem from 'components/common/StudentInfoItem'
-import { hiddenNameAndEmailForCsv } from 'common'
+import { hiddenNameAndEmailForExcel } from 'common'
 import SortableTable, { row } from '../../SortableTable'
 import '../populationStudents.css'
 
@@ -283,7 +283,7 @@ const CoursesTable = ({ students, studyGuidanceCourses }) => {
                 //                textAlign: 'center',
               }}
               columns={columns}
-              onlyExportColumns={hiddenNameAndEmailForCsv}
+              onlyExportColumns={hiddenNameAndEmailForExcel}
               data={data}
             />
           )}

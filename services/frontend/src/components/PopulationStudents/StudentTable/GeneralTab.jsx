@@ -14,7 +14,7 @@ import {
   copyToClipboard,
   getHighestGradeOfCourseBetweenRange,
   getAllProgrammesOfStudent,
-  hiddenNameAndEmailForCsv,
+  hiddenNameAndEmailForExcel,
 } from 'common'
 import { useGetStudyGuidanceGroupPopulationQuery } from 'redux/studyGuidanceGroups'
 import { useGetAuthorizedUserQuery } from 'redux/auth'
@@ -365,9 +365,12 @@ const GeneralTab = ({
   }
 
   const graduatedOnSemester = (student, sem) => {
-    return moment(studentToStudyrightEndMap[student.studentNumber]).isBetween(
-      allSemesters[sem].startdate,
-      allSemesters[sem].enddate
+    const firstGraduation = studentToStudyrightEndMap[student.studentNumber]
+    const secondGraduation = studentToSecondStudyrightEndMap[student.studentNumber]
+
+    return (
+      (firstGraduation && moment(firstGraduation).isBetween(allSemesters[sem].startdate, allSemesters[sem].enddate)) ||
+      (secondGraduation && moment(secondGraduation).isBetween(allSemesters[sem].startdate, allSemesters[sem].enddate))
     )
   }
 
@@ -385,7 +388,7 @@ const GeneralTab = ({
           style={{ overflow: 'visible' }}
           width="23"
           height="23"
-          viewBox="17 44 70 70"
+          viewBox="17 54 70 70"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
@@ -433,7 +436,7 @@ const GeneralTab = ({
       const type = student.semesterEnrollmentsMap[sem]
       let sign = '_'
       if (type === 1) sign = '+'
-      if (type === 2) sign = '-'
+      if (type === 2) sign = 'o'
       enrollmentsString += sign
     }
 
@@ -579,7 +582,12 @@ const GeneralTab = ({
       title: 'Semesters\npresent',
       getRowContent: s => getSemesterEnrollmentsContent(s),
       cellProps: s => getSemesterEnrollmentsProps(s),
-      getRowVal: s => getSemesterEnrollmentsForExcel(s),
+      getRowVal: s => s.semesterenrollments?.filter(e => e.enrollmenttype === 1).length ?? 0,
+      getRowExportVal: s => getSemesterEnrollmentsForExcel(s),
+      /* getSortingValue: s => {
+        console.log(s)
+        return s.semesterenrollments?.map(e => e.enrollmenttype === 1).length ?? 0
+      }, */
     },
     transferredFrom: {
       key: 'transferredFrom',
@@ -736,7 +744,7 @@ const GeneralTab = ({
         celled: true,
       }}
       columns={columns}
-      onlyExportColumns={hiddenNameAndEmailForCsv}
+      onlyExportColumns={hiddenNameAndEmailForExcel}
       data={selectedStudents.map(sn => students[sn])}
     />
   )

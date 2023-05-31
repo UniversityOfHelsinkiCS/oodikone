@@ -7,7 +7,7 @@ import StudentNameVisibilityToggle, { useStudentNameVisibility } from 'component
 import useLanguage from 'components/LanguagePicker/useLanguage'
 import RightsNotification from 'components/RightsNotification'
 import StudentInfoItem from 'components/common/StudentInfoItem'
-import { hiddenNameAndEmailForCsv } from 'common'
+import { hiddenNameAndEmailForExcel } from 'common'
 import sendEvent from '../../common/sendEvent'
 
 const getColumns = (courses, showStudentNames, getTextIn) => {
@@ -195,7 +195,7 @@ const CompletedCoursesSearchResults = ({ searchValues }) => {
             textAlign: 'center',
           }}
           columns={getColumns(data.courses, showStudentNames.visible, getTextIn, sendAnalytics)}
-          onlyExportColumns={hiddenNameAndEmailForCsv}
+          onlyExportColumns={hiddenNameAndEmailForExcel}
           data={data.students}
         />
       </div>
