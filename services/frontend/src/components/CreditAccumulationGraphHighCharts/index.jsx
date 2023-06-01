@@ -544,6 +544,7 @@ const CreditAccumulationGraphHighCharts = ({
     tooltipFormatter: point => singleStudent && singleStudentTooltipFormatter(point, students[0], language),
     onPointClicked: point => {
       if (!singleStudent) {
+        if (point.series.name.length > 10) return
         history.push(`/students/${point.series.name}`)
       }
     },
