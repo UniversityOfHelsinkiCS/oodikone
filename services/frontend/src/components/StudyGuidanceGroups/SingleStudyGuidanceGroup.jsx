@@ -129,7 +129,7 @@ const SingleStudyGroupContent = ({ filteredStudents, population, group, language
             <CreditAccumulationGraphHighCharts
               students={students}
               studyPlanFilterIsActive={studyPlanFilterIsActive}
-              programmeCode={group?.tags?.studyProgramme}
+              programmeCodes={group?.tags?.studyProgramme ? [group.tags.studyProgramme] : []}
               customStudyStartYear={customStudyStartYear}
             />
           </div>

@@ -375,6 +375,8 @@ const GeneralTab = ({
   }
 
   const getSemesterEnrollmentsContent = student => {
+    if (allSemesters.length === 0) return ''
+    if (!student.semesterenrollments) return ''
     const semesterIcons = []
 
     const getSemesterJSX = (enrollmenttype, graduated) => {

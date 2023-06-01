@@ -383,7 +383,9 @@ const createStudentCreditLines = (
     const { code } = resolveStudyRightElement(
       student.studyrights.find(({ studyrightid }) => studyrightid === studyRightId) || {}
     )
-    const studyPlanProgrammeCode = singleStudent ? code : studyPlanFilterIsActive && programmeCodes && programmeCodes[0]
+    const studyPlanProgrammeCode = singleStudent
+      ? code
+      : studyPlanFilterIsActive && programmeCodes?.length > 0 && programmeCodes[0]
 
     const { points } = _.flow(
       () =>
@@ -446,7 +448,6 @@ const CreditAccumulationGraphHighCharts = ({
   const history = useHistory()
   const chartRef = useRef()
   const language = useLanguage()
-
   const [graphHeight, setGraphHeight] = useState(700)
   const [cutStudyPlanCredits, setCutStudyPlanCredits] = useState(false)
   const selectedStudyRight =
