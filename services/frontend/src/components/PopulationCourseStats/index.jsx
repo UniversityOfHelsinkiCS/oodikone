@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { connect, useSelector } from 'react-redux'
-import { Table, Input, Tab, Icon, Form } from 'semantic-ui-react'
+import { Table, Input, Tab, Icon } from 'semantic-ui-react'
 import { orderBy, debounce } from 'lodash'
 import { withRouter } from 'react-router-dom'
 import { clearCourseStats } from '../../redux/coursestats'
@@ -44,12 +44,7 @@ const updateCourseStatisticsCriteria = (courseStats, language, state, mandatoryC
     return []
   }
 
-  const { studentAmountLimit, sortCriteria, codeFilter, nameFilter, reversed } = state
-
-  const studentAmountFilter = ({ stats }) => {
-    const { students } = stats
-    return studentAmountLimit === 0 || students >= studentAmountLimit
-  }
+  const { sortCriteria, codeFilter, nameFilter, reversed } = state
 
   const courseCodeFilter = ({ course }) => {
     const { code } = course
@@ -74,7 +69,6 @@ const updateCourseStatisticsCriteria = (courseStats, language, state, mandatoryC
     mandatoryCourses &&
     courseStats
       .filter(mandatoryFilter)
-      .filter(studentAmountFilter)
       .filter(c => !codeFilter || courseCodeFilter(c))
       .filter(c => !nameFilter || courseNameFilter(c))
 
@@ -94,7 +88,6 @@ const initialState = props => ({
   reversed: true,
   codeFilter: '',
   nameFilter: '',
-  studentAmountLimit: Math.round((props?.filteredStudents?.length ?? 0) * 0.3),
   activeView: null,
   filteredStudentsLength: props.filteredStudentsLength || 0,
 })
@@ -112,7 +105,6 @@ const PopulationCourseStats = props => {
   const [filterFields, setFilterFields] = useState({ codeFilter: '', nameFilter: '' })
   const [modules, setModules] = useState([])
   const [state, setState] = useState(initialState(props))
-  const [timer, setTimer] = useState(null)
   const [expandedGroups, setExpandedGroups] = useState(new Set())
   const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
 
@@ -167,16 +159,11 @@ const PopulationCourseStats = props => {
       )
     }
 
-    const studentAmountFilter = ({ stats }) => {
-      const { students } = stats
-      return state.studentAmountLimit === 0 || students >= state.studentAmountLimit
-    }
     const filteredCourses =
       coursestatistics &&
       mandatoryCourses &&
       coursestatistics
         .filter(visibleCoursesFilter)
-        .filter(studentAmountFilter)
         .filter(courseCodeFilter)
         .filter(courseNameFilter)
         // it needs to be with flatMap and filter and not map and find
@@ -238,20 +225,7 @@ const PopulationCourseStats = props => {
     setFilterFields({ ...filterFields, [field]: value })
     sendAnalytics('Courses of Population filter changed', field, value)
   }
-  const onStudentAmountLimitChange = e => {
-    const {
-      target: { value },
-    } = e
-    clearTimeout(timer)
-    setTimer(
-      setTimeout(() => {
-        setState({
-          ...state,
-          studentAmountLimit: typeof Number(value) === 'number' ? Number(value) : state.studentAmountLimit,
-        })
-      }, 1000)
-    )
-  }
+
   const setFilters = useCallback(
     debounce(({ codeFilter, nameFilter }) => {
       setState({ ...state, codeFilter, nameFilter })
@@ -414,12 +388,6 @@ const PopulationCourseStats = props => {
   }
   return (
     <div>
-      <Form>
-        <Form.Field inline>
-          <label>Limit to courses where student number at least</label>
-          <Input defaultValue={state.studentAmountLimit} onChange={onStudentAmountLimitChange} />
-        </Form.Field>
-      </Form>
       <PopulationCourseContext.Provider value={contextValue}>
         <Tab panes={panes} onTabChange={handleTabChange} />
       </PopulationCourseContext.Provider>

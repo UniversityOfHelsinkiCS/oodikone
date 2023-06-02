@@ -60,11 +60,10 @@ export default {
   Kurssisuodatin aukeaa ikkunan vasempaan laitaan ja tarjoaa lisää vaihtoehtoja suodatukseen. Voit myös valita monta kurssia kerralla suodattimeen.
   
   Klikkaamalla kurssin nimen vieressä olevaa sinistä nuolta, siirryt ko. kurssin **Course Statistics** -näkymään.
-  
-  Taulukon tietoja voi suodattaa antamalla opiskelijoiden vähimmäismäärän kurssilla kenttään *Limit to courses where student number at least*.
+
   Lisäksi kurssin nimi **name** ja koodisarakkeissa **code** suodatinkuvaketta  klikkaamalla tulee esiin hakukentät suodattamista varten.
   Suodattimet saa tyhjennettyä painamalla kentän vieressä olevaa ruksia tai valitsemall valikon alaosasta **Reset column filter**.
-  
+
   **Huom! Nämä suodattimet vaikuttavat vain tähän taulukkoon, eivät koko populatioon.**
   
   **Taulukot**
