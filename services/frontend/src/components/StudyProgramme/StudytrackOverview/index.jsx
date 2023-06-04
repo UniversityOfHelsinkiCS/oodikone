@@ -101,6 +101,7 @@ const StudytrackOverview = ({
             titles={stats?.data?.populationTitles}
             dataOfAllTracks={stats?.data?.mainStatsByYear}
             dataOfSingleTrack={track && track !== studyprogramme ? stats?.data?.mainStatsByTrack[track] : null}
+            otherCountriesStats={stats?.data?.otherCountriesCount}
             years={stats?.data?.years}
             combinedProgramme={combinedProgramme}
           />

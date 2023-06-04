@@ -30,7 +30,7 @@ const { countTimeCategories, getStatutoryAbsences } = require('./graduationHelpe
 
 const getUnique = studentnumbers => [...new Set(studentnumbers)]
 const getStudentData = (startDate, students, thresholdKeys, thresholdAmounts) => {
-  let data = { female: 0, male: 0, otherUnkown: 0, finnish: 0, otherCountries: 0 }
+  let data = { female: 0, male: 0, otherUnkown: 0, finnish: 0, otherCountries: 0, otherCountriesCounts: {} }
   thresholdKeys.forEach(t => (data[t] = 0))
   students.forEach(({ gender_code, home_country_en, credits }) => {
     const creditcount = credits
@@ -42,6 +42,12 @@ const getStudentData = (startDate, students, thresholdKeys, thresholdAmounts) =>
     data.otherUnkown += ['0', '3'].includes(gender_code) ? 1 : 0
     data.finnish += home_country_en === 'Finland' ? 1 : 0
     data.otherCountries += home_country_en !== 'Finland' ? 1 : 0
+    if (home_country_en !== 'Finland') {
+      if (!(home_country_en in data.otherCountriesCounts)) {
+        data.otherCountriesCounts[home_country_en] = 0
+      }
+      data.otherCountriesCounts[home_country_en] += 1
+    }
     data[thresholdKeys[0]] += creditcount < thresholdAmounts[0] ? 1 : 0
     data[thresholdKeys[1]] += creditcount >= thresholdAmounts[0] && creditcount < thresholdAmounts[1] ? 1 : 0
     data[thresholdKeys[2]] += creditcount >= thresholdAmounts[1] && creditcount < thresholdAmounts[2] ? 1 : 0
@@ -207,6 +213,7 @@ const getStudytrackDataForTheYear = async ({
     totalAmounts,
     emptyTracks,
     totals,
+    otherCountriesCount,
   } = data
 
   await Promise.all(
@@ -217,6 +224,13 @@ const getStudytrackDataForTheYear = async ({
         startDate,
         endDate,
         includeAllSpecials,
+        includeGraduated,
+      })
+      const startedStudentnumbers = await getCorrectStudentnumbers({
+        codes,
+        startDate,
+        endDate,
+        includeAllSpecials: !includeAllSpecials,
         includeGraduated,
       })
       const students = await studytrackStudents(studentnumbers)
@@ -235,7 +249,8 @@ const getStudytrackDataForTheYear = async ({
       if (year !== 'Total') {
         all = await allStudyrights(track, studentnumbers)
         studentData = getStudentData(startDate, students, creditThresholdKeys, creditThresholdAmounts)
-        started = await startedStudyrights(track, startDate, studentnumbers)
+        otherCountriesCount[track][year] = studentData.otherCountriesCounts
+        started = await startedStudyrights(track, startDate, startedStudentnumbers)
         enrolled = await enrolledStudents(track, studentnumbers)
         absent = await absentStudents(track, studentnumbers)
         inactive = await inactiveStudyrights(track, studentnumbers)
@@ -284,6 +299,19 @@ const getStudytrackDataForTheYear = async ({
         inactive = totals[track].inactive
         graduated = totals[track].graduated
         graduatedSecondProg = totals[track].graduatedSecondProg
+        const countryStatsFromYears = years.reduce((acc, year) => {
+          if (year === 'Total') return acc
+          const countries = otherCountriesCount[track][year]
+          Object.keys(countries).forEach(country => {
+            if (!(country in acc)) {
+              acc[country] = 0
+            }
+            acc[country] += countries[country]
+          })
+          return acc
+        }, {})
+
+        otherCountriesCount[track]['Total'] = countryStatsFromYears
       }
 
       // If the track has no stats for that year, it should be removed from the table and dropdown options
@@ -421,6 +449,7 @@ const getEmptyStatsObjects = (years, studytracks, studyprogramme, combinedProgra
     [combinedProgramme]: { medians: { basic: [], combo: [] } },
     goals: { basic: goal, combo: goal + goalSecondProg },
   }
+  const otherCountriesCount = {}
   const graduationAmountsSecondProg = {
     [combinedProgramme]: { basic: getYearsObject({ years }), combo: getYearsObject({ years }) },
   }
@@ -430,6 +459,7 @@ const getEmptyStatsObjects = (years, studytracks, studyprogramme, combinedProgra
   const totals = {}
 
   studytracks.forEach(async track => {
+    otherCountriesCount[track] = {}
     mainStatsByTrack[track] = []
     creditGraphStats[track] = getCreditGraphStats(studyprogramme, years, combinedProgramme, true)
     creditTableStats[track] = []
@@ -459,6 +489,7 @@ const getEmptyStatsObjects = (years, studytracks, studyprogramme, combinedProgra
     totalAmounts,
     emptyTracks,
     totals,
+    otherCountriesCount,
   }
 }
 

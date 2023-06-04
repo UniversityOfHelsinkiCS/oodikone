@@ -166,9 +166,6 @@ const allStudyrights = async (studytrack, studentnumbers) =>
       ],
       where: {
         student_studentnumber: whereStudents(studentnumbers),
-        cancelled: {
-          [Op.not]: true,
-        },
       },
     })
   ).map(formatStudyright)
@@ -197,9 +194,6 @@ const startedStudyrights = async (studytrack, since, studentnumbers) =>
       where: {
         studystartdate: {
           [Op.gte]: since,
-        },
-        cancelled: {
-          [Op.not]: true,
         },
         student_studentnumber: whereStudents(studentnumbers),
       },
@@ -263,9 +257,6 @@ const graduatedStudyRights = async (studytrack, since, studentnumbers) =>
         graduated: 1,
         enddate: sinceDate(since),
         student_studentnumber: whereStudents(studentnumbers),
-        cancelled: {
-          [Op.not]: true,
-        },
       },
     })
   ).map(formatStudyright)
@@ -291,9 +282,6 @@ const inactiveStudyrights = async (studytrack, studentnumbers) => {
         where: {
           graduated: 0,
           active: 0,
-          cancelled: {
-            [Op.not]: true,
-          },
         },
       },
       {
