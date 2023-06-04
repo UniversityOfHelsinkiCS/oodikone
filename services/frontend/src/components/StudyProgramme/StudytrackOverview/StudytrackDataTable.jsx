@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Icon, Table } from 'semantic-ui-react'
+import { Icon, Popup, Table } from 'semantic-ui-react'
 import * as _ from 'lodash'
 
 import PopulationLink from './PopulationLink'
@@ -24,9 +24,41 @@ const getStyleForBasic = idx => {
 }
 const getStyleForCombined = idx => {
   if ([4, 20].includes(idx)) return { backgroundColor: '#f9f9f9', borderLeftWidth: 'thick' }
-  if ([1, 5, 8, 9, 12, 13, 16, 17, 21].includes(idx)) return { backgroundColor: '#f9f9f9' }
+  if ([1, 5, 8, 9, 12, 13, 16, 17, 21, 22].includes(idx)) return { backgroundColor: '#f9f9f9' }
   if ([14].includes(idx)) return { borderLeftWidth: 'thick' }
   return {}
+}
+
+const createCountriesContent = ({ year, studyprogramme, otherCountriesStats }) => {
+  if (!otherCountriesStats || !otherCountriesStats[studyprogramme] || !otherCountriesStats[studyprogramme][year])
+    return ''
+  return otherCountriesStats[studyprogramme][year]
+    ? Object.keys(otherCountriesStats[studyprogramme][year])
+        .sort()
+        .reduce((acc, res) => `${acc} | ${res}: ${otherCountriesStats[studyprogramme][year][res]}`, '')
+    : ''
+}
+
+const getBasicTableCell = ({ row, value, combinedProgramme, index }) => {
+  return (
+    <Table.Cell
+      textAlign="left"
+      className={getCellClass(row[0])}
+      key={getKey(value)}
+      style={combinedProgramme ? getStyleForCombined(index) : getStyleForBasic(index)}
+    >
+      {value}
+    </Table.Cell>
+  )
+}
+
+const getCountriesPopup = ({ index, combinedProgramme, value, row, studyprogramme, otherCountriesStats }) => {
+  return (
+    <Popup
+      content={createCountriesContent({ year: row[0], studyprogramme, otherCountriesStats }).slice(3)}
+      trigger={getBasicTableCell({ row, value, combinedProgramme, index })}
+    />
+  )
 }
 
 const getFirstCell = ({ yearlyData, year, show, studyprogramme, calendarYears, combinedProgramme }) => {
@@ -44,32 +76,48 @@ const getFirstCell = ({ yearlyData, year, show, studyprogramme, calendarYears, c
   )
 }
 
-const getSingleTrackRow = ({ row, studyprogramme, code, showPercentages, calendarYears, combinedProgramme }) => {
+const getSingleTrackRow = ({
+  row,
+  studyprogramme,
+  code,
+  showPercentages,
+  calendarYears,
+  combinedProgramme,
+  otherCountriesStats,
+}) => {
   return (
     <Table.Row key={getKey(row[0])} className="regular-row">
-      {row.map((value, index) => (
-        <React.Fragment key={`${row[0]}-${code}-${getKey(value)}`}>
-          {shouldBeHidden(showPercentages, value) ? null : (
-            <Table.Cell
-              textAlign="left"
-              className={getCellClass(row[0])}
-              style={combinedProgramme ? getStyleForCombined(index) : getStyleForBasic(index)}
-              key={getKey(row[0])}
-            >
-              {value}
-              {index === 0 && (
-                <PopulationLink
-                  studyprogramme={studyprogramme}
-                  year={row[0]}
-                  studytrack={code}
-                  years={calendarYears}
-                  combinedProgramme={combinedProgramme}
-                />
-              )}
-            </Table.Cell>
-          )}
-        </React.Fragment>
-      ))}
+      {row.map((value, index) => {
+        if (shouldBeHidden(showPercentages, value)) return null
+        if (index === row.length - 2 && otherCountriesStats)
+          return getCountriesPopup({
+            index,
+            combinedProgramme,
+            value,
+            row,
+            studyprogramme,
+            otherCountriesStats,
+          })
+        return (
+          <Table.Cell
+            textAlign="left"
+            className={getCellClass(row[0])}
+            style={combinedProgramme ? getStyleForCombined(index) : getStyleForBasic(index)}
+            key={getKey(row[0])}
+          >
+            {value}
+            {index === 0 && (
+              <PopulationLink
+                studyprogramme={studyprogramme}
+                year={row[0]}
+                studytrack={code}
+                years={calendarYears}
+                combinedProgramme={combinedProgramme}
+              />
+            )}
+          </Table.Cell>
+        )
+      })}
     </Table.Row>
   )
 }
@@ -85,30 +133,21 @@ const getRow = ({
   years,
   calendarYears,
   combinedProgramme,
+  otherCountriesStats,
 }) => {
   const year = yearlyData && yearlyData[0] && yearlyData[0][0]
   // Get row for the studyprogramme
   if (years.includes(row[0])) {
     return (
       <Table.Row key={getKey(row[0])} className="header-row" onClick={() => setShow(!show)}>
-        {row.map((value, index) =>
-          index === 0 ? (
-            getFirstCell({ yearlyData, year: row[0], show, studyprogramme, calendarYears, combinedProgramme })
-          ) : (
-            <React.Fragment key={`${studyprogramme}-${year}-${getKey(value)}`}>
-              {shouldBeHidden(showPercentages, value) ? null : (
-                <Table.Cell
-                  className={getCellClass(row[0])}
-                  key={getKey(value)}
-                  style={combinedProgramme ? getStyleForCombined(index) : getStyleForBasic(index)}
-                  textAlign="left"
-                >
-                  {value}
-                </Table.Cell>
-              )}
-            </React.Fragment>
-          )
-        )}
+        {row.map((value, index) => {
+          if (shouldBeHidden(showPercentages, value)) return null
+          if (index === 0)
+            return getFirstCell({ yearlyData, year: row[0], show, studyprogramme, calendarYears, combinedProgramme })
+          if (index === row.length - 2 && otherCountriesStats)
+            return getCountriesPopup({ index, combinedProgramme, value, row, studyprogramme, otherCountriesStats })
+          return getBasicTableCell({ row, value, combinedProgramme, index })
+        })}
       </Table.Row>
     )
   }
@@ -131,16 +170,9 @@ const getRow = ({
             </Table.Cell>
           ) : (
             <>
-              {shouldBeHidden(showPercentages, value) ? null : (
-                <Table.Cell
-                  className={getCellClass(row[0])}
-                  textAlign="left"
-                  key={getKey(row[0])}
-                  style={combinedProgramme ? getStyleForCombined(index) : getStyleForBasic(index)}
-                >
-                  {value}
-                </Table.Cell>
-              )}
+              {shouldBeHidden(showPercentages, value)
+                ? null
+                : getBasicTableCell({ row, value, combinedProgramme, index })}
             </>
           )
         )}
@@ -198,10 +230,10 @@ const StudytrackDataTable = ({
   titles,
   years,
   combinedProgramme,
+  otherCountriesStats,
 }) => {
   const [show, setShow] = useState(false)
   const [showPercentages, setShowPercentages] = useState(false)
-
   if (!dataOfAllTracks && !dataOfSingleTrack) return null
 
   const sortedMainStats = sortMainDataByYear(Object.values(dataOfAllTracks))
@@ -269,6 +301,7 @@ const StudytrackDataTable = ({
                     years,
                     calendarYears,
                     combinedProgramme,
+                    otherCountriesStats,
                   })
                 )
               : sortedMainStats?.map(yearlyData =>
@@ -284,6 +317,7 @@ const StudytrackDataTable = ({
                       years,
                       calendarYears,
                       combinedProgramme,
+                      otherCountriesStats,
                     })
                   )
                 )}
