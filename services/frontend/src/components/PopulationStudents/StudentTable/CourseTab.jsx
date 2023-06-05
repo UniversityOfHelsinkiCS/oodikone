@@ -109,18 +109,18 @@ const CoursesTable = ({ students, studyGuidanceCourses }) => {
     })
 
     const mandatoryCourseLabels = []
-    // REVISIT ELÄINLÄÄKIS
-    const labelToMandatoryCourses = mandatoryCourses.defaultProgrammeCourses
-      ? mandatoryCourses.defaultProgrammeCourses.reduce((acc, e) => {
-          const label = e.label ? e.label.label : ''
-          acc[label] = acc[label] || []
-          if (acc[label].some(l => l.code === e.code)) return acc
-          acc[label].push(e)
-          if (e.label) mandatoryCourseLabels.push({ ...e.label, code: e.label_code })
-          else mandatoryCourseLabels.push({ id: 'null', label: '', code: '' })
-          return acc
-        }, {})
-      : []
+    const defaultCourses = mandatoryCourses?.defaultProgrammeCourses || []
+    const combinedCourses = mandatoryCourses?.secondProgrammeCourses || []
+    const coursesList = [...defaultCourses, ...combinedCourses]
+    const labelToMandatoryCourses = coursesList.reduce((acc, e) => {
+      const label = e.label ? e.label.label : ''
+      acc[label] = acc[label] || []
+      if (acc[label].some(l => l.code === e.code)) return acc
+      acc[label].push(e)
+      if (e.label) mandatoryCourseLabels.push({ ...e.label, code: e.label_code })
+      else mandatoryCourseLabels.push({ id: 'null', label: '', code: '' })
+      return acc
+    }, {})
 
     const sortedlabels = orderBy(
       uniqBy(mandatoryCourseLabels, l => l.label),
@@ -128,19 +128,17 @@ const CoursesTable = ({ students, studyGuidanceCourses }) => {
       ['asc']
     )
 
-    const { visibleLabels, visibleCourseCodes } = mandatoryCourses.defaultProgrammeCourses
-      ? mandatoryCourses.defaultProgrammeCourses.reduce(
-          (acc, cur) => {
-            if (cur.visible && cur.visible.visibility) {
-              acc.visibleLabels.add(cur.label_code)
-              acc.visibleCourseCodes.add(cur.code)
-            }
+    const { visibleLabels, visibleCourseCodes } = coursesList.reduce(
+      (acc, cur) => {
+        if (cur.visible && cur.visible.visibility) {
+          acc.visibleLabels.add(cur.label_code)
+          acc.visibleCourseCodes.add(cur.code)
+        }
 
-            return acc
-          },
-          { visibleLabels: new Set(), visibleCourseCodes: new Set() }
-        )
-      : [{ visibleLabels: new Set(), visibleCourseCodes: new Set() }]
+        return acc
+      },
+      { visibleLabels: new Set(), visibleCourseCodes: new Set() }
+    )
 
     const getTotalRowVal = (t, m) => t[m.code]
 
@@ -262,7 +260,6 @@ const CoursesTable = ({ students, studyGuidanceCourses }) => {
 
     return [row(totals, { ignoreFilters: true, ignoreSorting: true }), ...students]
   }, [students, mandatoryCourses, hasPassedMandatory, mandatoryPassed])
-  // ELÄINLÄÄKKIS REVISIT
   return (
     <Tab.Pane loading={pending}>
       <div style={{ display: 'flex' }}>
