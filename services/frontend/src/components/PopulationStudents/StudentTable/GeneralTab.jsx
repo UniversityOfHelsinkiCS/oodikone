@@ -570,7 +570,11 @@ const GeneralTab = ({
         const programme = getTextIn(mainProgramme(s.studyrights, s.studentNumber, s.enrollments)?.name, language)
         if (!programme) return 'No programme'
         if (getStudentsProgrammeNames(s).length > 1) {
-          return `${programme} ...`
+          return (
+            <div>
+              {programme} <Icon name="plus square outline" color="grey" size="large" />
+            </div>
+          )
         }
         return programme
       },
