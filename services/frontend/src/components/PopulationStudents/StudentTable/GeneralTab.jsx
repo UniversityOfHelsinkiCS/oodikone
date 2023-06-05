@@ -505,7 +505,7 @@ const GeneralTab = ({
     firstname: { key: 'firstname', title: 'Given names', getRowVal: s => s.firstnames, export: false },
     studentnumber: {
       key: 'studentnumber',
-      title: 'Student Number',
+      title: 'Student number',
       getRowVal: s => (!s.obfuscated ? s.studentNumber : 'hidden'),
       getRowContent: s => <StudentInfoItem student={s} showSisuLink tab="General Tab" />,
     },
@@ -520,7 +520,7 @@ const GeneralTab = ({
     },
     studyTrack: containsStudyTracks && {
       key: 'studyTrack',
-      title: 'Study Track',
+      title: 'Study track',
       getRowVal: s => studytrack(s.studyrights).map(st => st.name)[0],
     },
     studyrightStart: {
@@ -556,7 +556,7 @@ const GeneralTab = ({
     },
     endDateSecondPhase: {
       key: 'endDateSecondPhase',
-      title: '2nd Graduation date',
+      title: '2nd\ngraduation\ndate',
       filterType: 'date',
       getRowVal: s =>
         studentToSecondStudyrightEndMap[s.studentNumber]
@@ -565,7 +565,7 @@ const GeneralTab = ({
     },
     programme: {
       key: 'programme',
-      title: 'Study Programme',
+      title: 'Study programmes',
       getRowContent: s => {
         const programme = getTextIn(mainProgramme(s.studyrights, s.studentNumber, s.enrollments)?.name, language)
         if (!programme) return 'No programme'
@@ -630,7 +630,7 @@ const GeneralTab = ({
     },
     startYear: {
       key: 'startYear',
-      title: 'Start Year\nat Uni',
+      title: 'Start year\nat uni',
       filterType: 'range',
       getRowVal: s => getStarted(s),
     },
