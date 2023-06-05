@@ -24,7 +24,7 @@ const getMandatoryPassed = (mandatoryCourses, populationCourses, studyGuidanceCo
 
   let mandatoryPassed = {}
   const popCourses = populationCourses || studyGuidanceCourses
-  if (popCourses.coursestatistics) {
+  if (popCourses?.coursestatistics) {
     const courseStats = popCourses.coursestatistics
     mandatoryPassed = mandatoryCodes.reduce((obj, code) => {
       const foundCourse = !!courseStats.find(c => c.course.code === code)
