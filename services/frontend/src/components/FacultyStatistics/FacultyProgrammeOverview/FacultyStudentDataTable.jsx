@@ -2,6 +2,7 @@
 import PopulationLink from 'components/StudyProgramme/StudytrackOverview/PopulationLink'
 import React, { useState } from 'react'
 import { Table, Button, Icon, Label, Popup } from 'semantic-ui-react'
+import useLanguage from 'components/LanguagePicker/useLanguage'
 import Toggle from '../../StudyProgramme/Toggle'
 
 const getStyle = idx => {
@@ -24,75 +25,116 @@ const getTitlePopup = idx => {
   if ([11, 12].includes(idx)) return <p>Men</p>
   if ([13, 14].includes(idx)) return <p>Women</p>
   if ([15, 16].includes(idx)) return <p>Other/Unknown</p>
-  if ([17, 18].includes(idx)) return <p>Finnish</p>
+  if ([17, 18].includes(idx)) return <p>Finland</p>
   return <p>Other</p>
+}
+
+const getRowStyle = (idx, tableLinePlaces, dark = false) => {
+  if (tableLinePlaces.length >= 3 && tableLinePlaces[2][0] <= idx)
+    return dark
+      ? { backgroundColor: backgroundColorsDarks[tableLinePlaces[2][1]] }
+      : { backgroundColor: backgroundColors[tableLinePlaces[2][1]] }
+  if (tableLinePlaces.length >= 3 && tableLinePlaces[2][0] > idx && tableLinePlaces[1][0] <= idx)
+    return dark
+      ? { backgroundColor: backgroundColorsDarks[tableLinePlaces[1][1]] }
+      : { backgroundColor: backgroundColors[tableLinePlaces[1][1]] }
+  if (tableLinePlaces.length >= 2 && tableLinePlaces[1][0] > idx && tableLinePlaces[0][0] <= idx)
+    return dark
+      ? { backgroundColor: backgroundColorsDarks[tableLinePlaces[0][1]] }
+      : { backgroundColor: backgroundColors[tableLinePlaces[0][1]] }
+  return dark
+    ? { backgroundColor: backgroundColorsDarks[tableLinePlaces[0][1]] }
+    : { backgroundColor: backgroundColors[tableLinePlaces[0][1]] }
+}
+
+const getTableCell = ({ year, programme, valIdx, rowIdx, tableLinePlaces, value }) => {
+  return (
+    <Table.Cell
+      key={`${year}-${programme}-color-${valIdx}`}
+      style={
+        getStyle(valIdx + 1)?.backgroundColor
+          ? {
+              borderLeftWidth: getStyle(valIdx + 1).borderLeftWidth,
+              ...getRowStyle(rowIdx, tableLinePlaces, true),
+            }
+          : { ...getStyle(valIdx + 1), ...getRowStyle(rowIdx, tableLinePlaces) }
+      }
+    >
+      {value}
+    </Table.Cell>
+  )
+}
+
+const getOtherCountriesString = ({ year, code, extraTableStats }) => {
+  if (
+    !extraTableStats ||
+    !extraTableStats[year] ||
+    !extraTableStats[year][code] ||
+    !extraTableStats[year][code]?.countries
+  )
+    return ''
+  const countriesData = extraTableStats[year][code].countries
+  return Object.keys(countriesData)
+    .sort()
+    .reduce((acc, key) => `${acc} | ${key}: ${countriesData[key]}`, '')
+}
+
+const getRows = ({
+  idx,
+  programme,
+  year,
+  showPercentages,
+  programmeStats,
+  extraTableStats,
+  tableLinePlaces,
+  programmeNames,
+}) => {
+  return programmeStats[programme][year].map((value, valIdx) => {
+    if (!showPercentages && typeof value === 'string' && (value.includes('%') || value.includes('NA'))) return null
+    if (valIdx === 19) {
+      return (
+        <Popup
+          key={`${valIdx}-${programme}-${idx}`}
+          content={getOtherCountriesString({ year, code: programmeNames[programme].code, extraTableStats }).slice(3)}
+          trigger={getTableCell({ year, programme, valIdx, rowIdx: idx, tableLinePlaces, value })}
+        />
+      )
+    }
+    return (
+      <Popup
+        key={`${valIdx}-${idx}-${programme}`}
+        content={getTitlePopup(valIdx)}
+        trigger={getTableCell({ year, programme, valIdx, rowIdx: idx, tableLinePlaces, value })}
+      />
+    )
+  })
 }
 
 const FacultyStudentDataTable = ({
   tableStats,
+  extraTableStats,
   programmeStats,
   programmeNames,
   tableLinePlaces,
   titles,
   years,
   sortedKeys,
-  language,
   cypress,
   requiredRights,
 }) => {
   const [yearsVisible, setVisible] = useState(new Array(years.length).fill(false))
   const [showPercentages, setShowPercentages] = useState(false)
+  const { getTextIn } = useLanguage()
   const toggleVisibility = yearIndex => {
     const arrayToModify = [...yearsVisible]
     arrayToModify[yearIndex] = !yearsVisible[yearIndex]
     setVisible(arrayToModify)
   }
 
-  const getRowStyle = (idx, dark = false) => {
-    if (tableLinePlaces.length >= 3 && tableLinePlaces[2][0] <= idx)
-      return dark
-        ? { backgroundColor: backgroundColorsDarks[tableLinePlaces[2][1]] }
-        : { backgroundColor: backgroundColors[tableLinePlaces[2][1]] }
-    if (tableLinePlaces.length >= 3 && tableLinePlaces[2][0] > idx && tableLinePlaces[1][0] <= idx)
-      return dark
-        ? { backgroundColor: backgroundColorsDarks[tableLinePlaces[1][1]] }
-        : { backgroundColor: backgroundColors[tableLinePlaces[1][1]] }
-    if (tableLinePlaces.length >= 2 && tableLinePlaces[1][0] > idx && tableLinePlaces[0][0] <= idx)
-      return dark
-        ? { backgroundColor: backgroundColorsDarks[tableLinePlaces[0][1]] }
-        : { backgroundColor: backgroundColors[tableLinePlaces[0][1]] }
-    return dark
-      ? { backgroundColor: backgroundColorsDarks[tableLinePlaces[0][1]] }
-      : { backgroundColor: backgroundColors[tableLinePlaces[0][1]] }
-  }
-
   const calendarYears = years.reduce((all, year) => {
     if (year === 'Total') return all
     return all.concat(Number(year.slice(0, 4)))
   }, [])
-
-  const getRows = (idx, programme, year) => {
-    return programmeStats[programme][year].map((value, valIdx) => {
-      if (!showPercentages && typeof value === 'string' && (value.includes('%') || value.includes('NA'))) return null
-      return (
-        <Popup
-          content={getTitlePopup(valIdx)}
-          trigger={
-            <Table.Cell
-              key={`${year}-${programme}-color-${valIdx}`}
-              style={
-                getStyle(valIdx + 1)?.backgroundColor
-                  ? { borderLeftWidth: getStyle(valIdx + 1).borderLeftWidth, ...getRowStyle(idx, true) }
-                  : { ...getStyle(valIdx + 1), ...getRowStyle(idx) }
-              }
-            >
-              {value}
-            </Table.Cell>
-          }
-        />
-      )
-    })
-  }
 
   return (
     <div className="datatable">
@@ -114,7 +156,14 @@ const FacultyStudentDataTable = ({
               Gender
             </Table.HeaderCell>
             <Table.HeaderCell colSpan={!showPercentages ? 2 : 4} style={{ borderLeftWidth: 'thick' }}>
-              Country
+              <Popup
+                trigger={
+                  <div>
+                    Countries <Icon name="question circle" />
+                  </div>
+                }
+                content="Hover over 'Other' cell to see from which countries students are coming. Shown only for study programmes."
+              />
             </Table.HeaderCell>
           </Table.Row>
           <Table.Row key="secondHeader">
@@ -178,19 +227,13 @@ const FacultyStudentDataTable = ({
                         <Table.Cell
                           textAlign="left"
                           key={`${year}-${programme}`}
-                          style={{ paddingLeft: '50px', ...getRowStyle(idx) }}
+                          style={{ paddingLeft: '50px', ...getRowStyle(idx, tableLinePlaces) }}
                         >
                           <Popup
                             content={
-                              programmeNames[programme][language] ? (
-                                <p>
-                                  {programmeNames[programme].code} - {programmeNames[programme][language]}
-                                </p>
-                              ) : (
-                                <p>
-                                  {programmeNames[programme].code} - {programmeNames[programme].fi}
-                                </p>
-                              )
+                              <p>
+                                {programmeNames[programme].code} - {getTextIn(programmeNames[programme])}
+                              </p>
                             }
                             trigger={<b>{programme}</b>}
                           />
@@ -204,7 +247,16 @@ const FacultyStudentDataTable = ({
                             />
                           )}
                         </Table.Cell>
-                        {getRows(idx, programme, year)}
+                        {getRows({
+                          idx,
+                          programme,
+                          year,
+                          showPercentages,
+                          programmeStats,
+                          extraTableStats,
+                          tableLinePlaces,
+                          programmeNames,
+                        })}
                       </Table.Row>
                     )
                   })}

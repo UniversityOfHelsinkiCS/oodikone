@@ -65,12 +65,14 @@ const getStudentData = (students, facultyExtra, year, code) => {
     facultyExtra['Total'][code].unknownG += gender_code === '0' ? 1 : 0
     data.finnish += home_country_en === 'Finland' ? 1 : 0
     data.otherCountries += home_country_en !== 'Finland' ? 1 : 0
-    if (!Object.keys(facultyExtra[year][code].countries).includes(home_country_en))
+    if (!Object.keys(facultyExtra[year][code].countries).includes(home_country_en) && home_country_en !== 'Finland')
       facultyExtra[year][code].countries[home_country_en] = 0
-    if (!Object.keys(facultyExtra['Total'][code].countries).includes(home_country_en))
+    if (!Object.keys(facultyExtra['Total'][code].countries).includes(home_country_en) && home_country_en !== 'Finland')
       facultyExtra['Total'][code].countries[home_country_en] = 0
-    facultyExtra[year][code].countries[home_country_en] += 1
-    facultyExtra['Total'][code].countries[home_country_en] += 1
+    if (home_country_en !== 'Finland') {
+      facultyExtra[year][code].countries[home_country_en] += 1
+      facultyExtra['Total'][code].countries[home_country_en] += 1
+    }
   })
   return data
 }
