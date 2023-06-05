@@ -59,6 +59,7 @@ const FacultyProgrammeOverview = ({
     (studentStats.isSuccess && !studentStats.data)
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
 
+  // These are for color coding the rows based on the programme; bachelor, master, doctor
   const getTableLinePlaces = programmeKeys => {
     if (programmeKeys.length === 0) return []
     const key = getKey(programmeKeys, 0)
@@ -110,6 +111,7 @@ const FacultyProgrammeOverview = ({
               <div>
                 <FacultyStudentDataTable
                   tableStats={studentStats?.data.facultyTableStats}
+                  extraTableStats={studentStats?.data.facultyTableStatsExtra}
                   programmeStats={studentStats?.data.programmeStats}
                   programmeNames={studentStats?.data.programmeNames}
                   titles={studentStats?.data.titles}
@@ -130,7 +132,6 @@ const FacultyProgrammeOverview = ({
                       faculty.code
                     )
                   )}
-                  language={language}
                   cypress="FacultyStudentStatsTable"
                   requiredRights={requiredRights}
                 />
