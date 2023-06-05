@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Icon, Popup, Table } from 'semantic-ui-react'
-import * as _ from 'lodash'
 
+import useLanguage from 'components/LanguagePicker/useLanguage'
 import PopulationLink from './PopulationLink'
 import Toggle from '../Toggle'
 
@@ -52,10 +52,11 @@ const getBasicTableCell = ({ row, value, combinedProgramme, index }) => {
   )
 }
 
-const getCountriesPopup = ({ index, combinedProgramme, value, row, studyprogramme, otherCountriesStats }) => {
+const getCountriesPopup = ({ index, combinedProgramme, value, row, year, studyprogramme, otherCountriesStats }) => {
   return (
     <Popup
-      content={createCountriesContent({ year: row[0], studyprogramme, otherCountriesStats }).slice(3)}
+      key={`${row[0]}-${getKey(value)}`}
+      content={createCountriesContent({ year, studyprogramme, otherCountriesStats }).slice(3)}
       trigger={getBasicTableCell({ row, value, combinedProgramme, index })}
     />
   )
@@ -95,7 +96,8 @@ const getSingleTrackRow = ({
             combinedProgramme,
             value,
             row,
-            studyprogramme,
+            year: row[0],
+            studyprogramme: code,
             otherCountriesStats,
           })
         return (
@@ -134,6 +136,7 @@ const getRow = ({
   calendarYears,
   combinedProgramme,
   otherCountriesStats,
+  getTextIn,
 }) => {
   const year = yearlyData && yearlyData[0] && yearlyData[0][0]
   // Get row for the studyprogramme
@@ -145,7 +148,15 @@ const getRow = ({
           if (index === 0)
             return getFirstCell({ yearlyData, year: row[0], show, studyprogramme, calendarYears, combinedProgramme })
           if (index === row.length - 2 && otherCountriesStats)
-            return getCountriesPopup({ index, combinedProgramme, value, row, studyprogramme, otherCountriesStats })
+            return getCountriesPopup({
+              index,
+              combinedProgramme,
+              value,
+              row,
+              year: row[0],
+              studyprogramme,
+              otherCountriesStats,
+            })
           return getBasicTableCell({ row, value, combinedProgramme, index })
         })}
       </Table.Row>
@@ -154,28 +165,39 @@ const getRow = ({
 
   // Get row for any possible studytrack under the header studyprogramme row, if they are folded open
   if (show) {
+    const correctStudytrack = row[0].split(', ')[1]
+    const title = `${getTextIn(studytracks[correctStudytrack])}, ${correctStudytrack}`
     return (
       <Table.Row key={getKey(row[0])} className="regular-row">
-        {row.map((value, index) =>
-          index === 0 ? (
-            <Table.Cell textAlign="left" style={{ paddingLeft: '50px' }} key={getKey(row[0])}>
-              {value} {_.findKey(studytracks, value.split(',')[0])}
-              <PopulationLink
-                studyprogramme={studyprogramme}
-                year={year}
-                years={calendarYears}
-                studytrack={_.findKey(studytracks, s => s === value.split(',')[0])}
-                combinedProgramme={combinedProgramme}
-              />
-            </Table.Cell>
-          ) : (
-            <>
-              {shouldBeHidden(showPercentages, value)
-                ? null
-                : getBasicTableCell({ row, value, combinedProgramme, index })}
-            </>
-          )
-        )}
+        {row.map((value, index) => {
+          if (shouldBeHidden(showPercentages, value)) return null
+          if (index === 0) {
+            return (
+              <Table.Cell textAlign="left" style={{ paddingLeft: '50px' }} key={getKey(row[0])}>
+                {title}
+                <PopulationLink
+                  studyprogramme={studyprogramme}
+                  year={year}
+                  years={calendarYears}
+                  studytrack={correctStudytrack}
+                  combinedProgramme={combinedProgramme}
+                />
+              </Table.Cell>
+            )
+          }
+          if (index === row.length - 2 && otherCountriesStats) {
+            return getCountriesPopup({
+              index,
+              combinedProgramme,
+              value,
+              row,
+              year,
+              studyprogramme: correctStudytrack,
+              otherCountriesStats,
+            })
+          }
+          return getBasicTableCell({ row, value, combinedProgramme, index })
+        })}
       </Table.Row>
     )
   }
@@ -234,6 +256,7 @@ const StudytrackDataTable = ({
 }) => {
   const [show, setShow] = useState(false)
   const [showPercentages, setShowPercentages] = useState(false)
+  const { getTextIn } = useLanguage()
   if (!dataOfAllTracks && !dataOfSingleTrack) return null
 
   const sortedMainStats = sortMainDataByYear(Object.values(dataOfAllTracks))
@@ -325,6 +348,7 @@ const StudytrackDataTable = ({
                       calendarYears,
                       combinedProgramme,
                       otherCountriesStats,
+                      getTextIn,
                     })
                   )
                 )}
