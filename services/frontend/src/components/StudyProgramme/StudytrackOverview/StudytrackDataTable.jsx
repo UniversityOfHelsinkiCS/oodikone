@@ -24,7 +24,7 @@ const getStyleForBasic = idx => {
 }
 const getStyleForCombined = idx => {
   if ([4, 20].includes(idx)) return { backgroundColor: '#f9f9f9', borderLeftWidth: 'thick' }
-  if ([1, 5, 8, 9, 12, 13, 16, 17, 21, 22].includes(idx)) return { backgroundColor: '#f9f9f9' }
+  if ([1, 5, 8, 9, 12, 13, 16, 17, 21].includes(idx)) return { backgroundColor: '#f9f9f9' }
   if ([14].includes(idx)) return { borderLeftWidth: 'thick' }
   return {}
 }
@@ -269,7 +269,14 @@ const StudytrackDataTable = ({
               Gender
             </Table.HeaderCell>
             <Table.HeaderCell colSpan={!showPercentages ? 2 : 4} style={{ borderLeftWidth: 'thick' }}>
-              Country
+              <Popup
+                trigger={
+                  <div>
+                    Countries <Icon name="question circle" />
+                  </div>
+                }
+                content="Hover over 'Other' cell to see from which countries students are coming."
+              />
             </Table.HeaderCell>
           </Table.Row>
           <Table.Row key="Table-Studytrack-Titles">
