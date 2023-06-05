@@ -46,6 +46,10 @@
   height: 15px;
 }
 
+.margin-right:not(:last-child) {
+  margin-right: 0.75rem;
+}
+
 .label-present {
   background-color: #03cc0d;
 }

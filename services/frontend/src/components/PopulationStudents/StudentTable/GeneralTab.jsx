@@ -379,7 +379,7 @@ const GeneralTab = ({
     if (!student.semesterenrollments) return ''
     const semesterIcons = []
 
-    const getSemesterJSX = (enrollmenttype, graduated) => {
+    const getSemesterJSX = (enrollmenttype, graduated, isSpring) => {
       let type = 'none'
       if (enrollmenttype === 1) type = 'present'
       if (enrollmenttype === 2) type = 'absent'
@@ -403,11 +403,17 @@ const GeneralTab = ({
           />
         </svg>
       )
-      return <div className={`enrollment-label-no-margin label-${type}`}>{graduated ? graduationCrown : null}</div>
+      return (
+        <div className={`enrollment-label-no-margin label-${type} ${isSpring ? 'margin-right' : ''}`}>
+          {graduated ? graduationCrown : null}
+        </div>
+      )
     }
 
     for (let sem = firstSemester; sem <= lastSemester; sem++) {
-      semesterIcons.push(getSemesterJSX(student.semesterEnrollmentsMap[sem], graduatedOnSemester(student, sem)))
+      semesterIcons.push(
+        getSemesterJSX(student.semesterEnrollmentsMap[sem], graduatedOnSemester(student, sem), sem % 2 === 0)
+      )
     }
 
     return <div style={{ display: 'flex', gap: '4px' }}>{semesterIcons}</div>
