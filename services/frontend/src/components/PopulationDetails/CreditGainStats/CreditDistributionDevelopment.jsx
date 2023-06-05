@@ -67,22 +67,22 @@ export const splitStudentCredits = (student, timeSlots, cumulative) => {
 
 const LIMITS_NON_CUMULATIVE = [15, 30, 45, 60]
 
-const hasGraduatedBefore = (student, programme, date) => {
+const hasGraduatedAfter = (student, programme, slot) => {
   const sr = student.studyrights
     .filter(sr => sr.studyright_elements.findIndex(sre => sre.code === programme) > -1)
     .pop()
-
   if (sr === undefined) {
     return false
   }
-
-  return sr.graduated && moment(date).isAfter(sr.enddate)
+  return sr.graduated && (moment(slot.end).isAfter(sr.enddate) || moment(sr.enddate).isBetween(slot.start, slot.end))
 }
 
 const GRADUATED = Symbol('GRADUATED')
 
-const getChartData = (students, timeSlots, order, programme, timeDivision, cumulative) => {
-  const programmeCredits = getTargetCreditsForProgramme(programme)
+const getChartData = (students, timeSlots, order, programme, timeDivision, cumulative, combinedProgramme) => {
+  const programmeCredits = combinedProgramme
+    ? getTargetCreditsForProgramme(programme) + 180
+    : getTargetCreditsForProgramme(programme)
 
   // In calendar-year mode, minus 30 from target credits because programmers (usually) start in autumn,
   // also if current date is before august, minus 30
@@ -108,7 +108,6 @@ const getChartData = (students, timeSlots, order, programme, timeDivision, cumul
     limits = _.reverse(limits)
     colors = _.reverse(colors)
   }
-
   const data = new Array(limits.length)
     .fill()
     .map(() => new Array(timeSlots.length).fill().map(() => ({ y: 0, custom: { students: [] } })))
@@ -119,7 +118,7 @@ const getChartData = (students, timeSlots, order, programme, timeDivision, cumul
     students
       .map((student, i) => [student, i])
       .forEach(([student, studentIndex]) => {
-        const hasGraduated = programme && hasGraduatedBefore(student, programme, slot.start)
+        const hasGraduated = programme && hasGraduatedAfter(student, programme, slot)
         const credits = studentCredits[studentIndex][timeSlotIndex]
 
         const rangeIndex = hasGraduated
@@ -167,7 +166,7 @@ function tooltipFormatter() {
   return `<div style="text-align: center; width: 100%"><b>${this.x}</b>, ${this.series.name}<br/>${this.y}/${this.total} students (${Math.round(this.percentage)}%)</div>`;
 }
 
-const CreditDistributionDevelopment = ({ students, query }) => {
+const CreditDistributionDevelopment = ({ students, programme, combinedProgramme }) => {
   const [cumulative, setCumulative] = useState(true)
   const [timeDivision, setTimeDivision] = useState(TimeDivision.SEMESTER)
   const [stackOrdering, setStackOrdering] = useState(StackOrdering.ASCENDING)
@@ -175,8 +174,6 @@ const CreditDistributionDevelopment = ({ students, query }) => {
   const semestersQuery = useGetSemestersQuery()
   const { getTextIn } = useLanguage()
   const { filterDispatch } = useFilters()
-
-  const programme = query?.studyRights?.programme
 
   const timeSlots = useMemo(() => {
     const startDate = moment().subtract({ months }).endOf('year')
@@ -222,17 +219,18 @@ const CreditDistributionDevelopment = ({ students, query }) => {
 
   const seriesList = useMemo(() => {
     return [
-      getChartData(students, timeSlots, stackOrdering, programme, timeDivision, false),
-      getChartData(students, timeSlots, stackOrdering, programme, timeDivision, true),
+      getChartData(students, timeSlots, stackOrdering, programme, timeDivision, false, combinedProgramme),
+      getChartData(students, timeSlots, stackOrdering, programme, timeDivision, true, combinedProgramme),
     ]
   }, [students, timeSlots, stackOrdering, programme, timeDivision, cumulative])
 
   const labels = timeSlots.map(ts => ts.label)
   const series = seriesList[0 + cumulative]
-
+  const bcMsTitle = combinedProgramme === 'MH90_001' ? 'Bachelor + Licentiate' : 'Bachelor + Master'
+  const title = combinedProgramme ? bcMsTitle : ''
   const config = {
     series,
-    title: { text: '' },
+    title: { text: title },
     credits: {
       text: 'oodikone | TOSKA',
     },

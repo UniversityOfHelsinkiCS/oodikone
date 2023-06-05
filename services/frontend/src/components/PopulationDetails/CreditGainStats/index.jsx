@@ -9,6 +9,7 @@ import infotooltips from '../../../common/InfoToolTips'
 import './creditGainStats.css'
 
 const CreditGainStats = ({ filteredStudents, query, creditDateFilterOptions }) => {
+  const combinedProgramme = query?.studyRights?.combinedProgramme || ''
   const renderCreditsGainTab = useCallback(() => {
     return (
       <Tab.Pane attached={false}>
@@ -32,7 +33,18 @@ const CreditGainStats = ({ filteredStudents, query, creditDateFilterOptions }) =
   const renderDistributionDevelopment = useCallback(() => {
     return (
       <Tab.Pane attached={false}>
-        <CreditDistributionDevelopment students={filteredStudents} query={query} />
+        <CreditDistributionDevelopment
+          students={filteredStudents}
+          programme={query?.studyRights?.programme}
+          combinedProgramme=""
+        />
+        {combinedProgramme && (
+          <CreditDistributionDevelopment
+            students={filteredStudents}
+            programme={combinedProgramme}
+            combinedProgramme={combinedProgramme}
+          />
+        )}
       </Tab.Pane>
     )
   }, [filteredStudents])
