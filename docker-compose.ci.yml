@@ -112,7 +112,6 @@ services:
   sis-updater-worker:
     <<: *defaults
     build:
-      target: development
       context: updater/sis-updater-worker
     depends_on:
       - redis
@@ -134,7 +133,6 @@ services:
   sis-updater-scheduler:
     <<: *defaults
     build:
-      target: development
       context: updater/sis-updater-scheduler
     container_name: sis-updater-scheduler
     depends_on:
