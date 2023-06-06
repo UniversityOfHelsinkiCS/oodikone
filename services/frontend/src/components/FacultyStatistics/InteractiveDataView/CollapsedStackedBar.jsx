@@ -1,19 +1,12 @@
 /* eslint-disable react/no-this-in-sfc */
+import useLanguage from 'components/LanguagePicker/useLanguage'
 import React from 'react'
 import ReactHighcharts from 'react-highcharts'
 
 const colors = ['#7cb5ec', '#90ed7d', '#434348', '#f7a35c', '#FFF000', '#2b908f', '#f45b5b', '#91e8e1']
 
-const CollapsedStackedBar = ({
-  data,
-  labels,
-  longLabels,
-  names,
-  plotLinePlaces,
-  language,
-  differenceData,
-  extraHeight,
-}) => {
+const CollapsedStackedBar = ({ data, labels, longLabels, names, plotLinePlaces, differenceData, extraHeight }) => {
+  const { getTextIn } = useLanguage()
   const transpose = matrix => {
     return matrix.reduce((prev, next) => next.map((_item, i) => (prev[i] || []).concat(next[i])), [])
   }
@@ -136,9 +129,9 @@ const CollapsedStackedBar = ({
       backgroundColor: 'white',
       fontSize: '25px',
       formatter() {
-        let tooltipString = `<b>${
-          longLabels[this.x] && longLabels[this.x][language] ? longLabels[this.x][language] : longLabels[this.x].fi
-        }</b><br /><p>${this.x} - ${longLabels[this.x]?.code}</p><br />`
+        let tooltipString = `<b>${getTextIn(longLabels[this.x])}</b><br /><p>${this.x} - ${
+          longLabels[this.x]?.code
+        }</p><br />`
         const diffArray = differenceArray[this.x]
         this.points.forEach(point => {
           tooltipString += `<span style="color:${point.color}">●</span> <b>${point.series.name}: ${point.y}</b>

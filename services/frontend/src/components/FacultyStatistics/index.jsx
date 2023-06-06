@@ -79,7 +79,6 @@ const FacultyStatistics = props => {
         render: () => (
           <ProgrammeOverview
             faculty={faculty}
-            language={language}
             graduatedGroup={graduatedGroup}
             setGraduatedGroup={setGraduatedGroup}
             specialGroups={specialGroups}
