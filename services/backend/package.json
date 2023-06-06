@@ -4,7 +4,7 @@
   "scripts": {
     "start": "node --max_old_space_size=4096 index.js",
     "dev": "nodemon --max_old_space_size=4096 index.js",
-    "rapodiff": "node /usr/src/app/src/rapodiff.js"
+    "rapodiff": "node /opt/app-root/src/src/rapodiff.js"
   },
   "dependencies": {
     "@sentry/node": "^5.30.0",
