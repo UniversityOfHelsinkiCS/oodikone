@@ -1,0 +1,168 @@
+name: 'Test and release Updater to staging'
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - '.github/workflows/updater-staging.yaml'
+      - 'updater/sis-updater-worker/**'
+      - 'updater/sis-updater-scheduler/**'
+
+jobs:
+  build_worker:
+    name: 'Build Updater worker'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/setup-buildx-action@v2
+      - name: 'Build the image'
+        uses: docker/build-push-action@v3
+        with:
+          context: updater/sis-updater-worker/
+          push: false
+          outputs: type=docker,dest=/tmp/worker.tar
+          tags: toska/sis-updater-worker:staging
+      - name: 'Store built image'
+        uses: actions/upload-artifact@v3
+        with:
+          path: /tmp/worker.tar
+
+  build_scheduler:
+    name: 'Build Updater scheduler'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/setup-buildx-action@v2
+      - name: 'Build the image'
+        uses: docker/build-push-action@v3
+        with:
+          context: updater/sis-updater-scheduler/
+          push: false
+          outputs: type=docker,dest=/tmp/scheduler.tar
+          tags: toska/sis-updater-scheduler:staging
+      - name: 'Store built image'
+        uses: actions/upload-artifact@v3
+        with:
+          path: /tmp/scheduler.tar
+
+  test_updater:
+    name: 'Test Updater'
+    runs-on: ubuntu-latest
+    needs:
+      - build_worker
+      - build_scheduler
+    steps:
+      - uses: actions/checkout@v3
+      - name: 'Login to toska docker registry'
+        uses: docker/login-action@v2
+        with:
+          registry: registry.toska.cs.helsinki.fi
+          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
+          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+      - name: 'Download built images'
+        uses: actions/download-artifact@v3
+        with:
+          path: /tmp/
+      - name: 'Load worker image'
+        run: docker load --input /tmp/artifact/worker.tar
+      - name: 'Load scheduler image'
+        run: docker load --input /tmp/artifact/scheduler.tar
+      - name: 'Start worker'
+        run: docker-compose --file docker-compose.ci.yml up --detach --no-recreate sis-updater-worker
+      - name: 'Run hourly jobs'
+        run: docker-compose --file docker-compose.ci.yml run sis-updater-scheduler npm start
+        env:
+          SCHEDULE_IMMEDIATE: hourly
+          EXIT_AFTER_IMMEDIATES: yes
+      - name: 'Run daily jobs'
+        run: docker-compose --file docker-compose.ci.yml run sis-updater-scheduler npm start
+        env:
+          SCHEDULE_IMMEDIATE: daily
+          EXIT_AFTER_IMMEDIATES: yes
+      - name: 'Run weekly jobs'
+        run: docker-compose --file docker-compose.ci.yml run sis-updater-scheduler npm start
+        env:
+          SCHEDULE_IMMEDIATE: weekly
+          EXIT_AFTER_IMMEDIATES: yes
+      - name: 'Run prepurge'
+        run: docker-compose --file docker-compose.ci.yml run sis-updater-scheduler npm start
+        env:
+          SCHEDULE_IMMEDIATE: prepurge
+          EXIT_AFTER_IMMEDIATES: yes
+      - name: 'Run purge'
+        run: docker-compose --file docker-compose.ci.yml run sis-updater-scheduler npm start
+        env:
+          SCHEDULE_IMMEDIATE: purge
+          EXIT_AFTER_IMMEDIATES: yes
+
+  release_worker:
+    name: 'Build and release Updater worker'
+    runs-on: ubuntu-latest
+    needs: test_updater
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build worker image
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: updater-worker
+          tags: staging ${{ github.sha }}
+          context: updater/sis-updater-worker
+          containerfiles: |
+            updater/sis-updater-worker/Dockerfile
+
+      - name: Push to quay.io
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: quay.io/toska
+          username: toska+github
+          password: ${{ secrets.QUAY_IO_TOKEN }}
+
+  release_scheduler:
+    name: 'Build and release Updater scheduler'
+    runs-on: ubuntu-latest
+    needs: test_updater
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build scheduler image
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: updater-scheduler
+          tags: staging ${{ github.sha }}
+          context: updater/sis-updater-scheduler
+          containerfiles: |
+            updater/sis-updater-scheduler/Dockerfile
+
+      - name: Push to quay.io
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: quay.io/toska
+          username: toska+github
+          password: ${{ secrets.QUAY_IO_TOKEN }}
+
+  slack_notification:
+    name: 'Send deployment notification to Slack'
+    runs-on: ubuntu-latest
+    needs:
+      - release_worker
+      - release_scheduler
+
+    steps:
+      - name: 'Send notification to slack'
+        uses: UniversityOfHelsinkiCS/slackbot-action@v1.4.2
+        with:
+          webhook-url: ${{ secrets.WEBHOOK_URL }}
+          message-type: deployment
+          softa-url: https://toska-staging.cs.helsinki.fi/oodikone
+          deployment-target: staging
+          softa-to-deploy: sis-updater
