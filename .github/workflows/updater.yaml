@@ -3,7 +3,7 @@ name: 'Test and release updater'
 on:
   push:
     branches:
-      - openshift
+      - openshift-updater
     paths:
       - '.github/workflows/release-updater.yaml'
       - 'updater/sis-updater-worker/**'
