@@ -1,23 +1,19 @@
-FROM node:10-alpine as base
+FROM registry.access.redhat.com/ubi8/nodejs-10
 
-WORKDIR /usr/src/app
-EXPOSE 8082
+WORKDIR /opt/app-root/src
 
-FROM base as development
-ENV NODE_ENV=development
-COPY ./package* /usr/src/app/
-RUN npm ci
-COPY . /usr/src/app
-CMD ["npm", "run", "dev"]
-
-FROM base as production
 ENV NODE_ENV=production
+
 ARG SENTRY_ENVIRONMENT
 ENV SENTRY_ENVIRONMENT=$SENTRY_ENVIRONMENT
+
 ARG SENTRY_RELEASE
 ENV SENTRY_RELEASE=$SENTRY_RELEASE
-COPY --chown=node:node ./package* /usr/src/app/
-RUN npm ci --production
-COPY --chown=node:node . /usr/src/app/
-USER node
+
+COPY ./package* ./
+RUN npm ci --omit-dev
+COPY . .
+
+EXPOSE 8082
+
 CMD ["npm", "start"]
