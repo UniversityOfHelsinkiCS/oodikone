@@ -60,6 +60,12 @@ jobs:
       - build_scheduler
     steps:
       - uses: actions/checkout@v3
+      - name: 'Login to toska docker registry'
+        uses: docker/login-action@v2
+        with:
+          registry: registry.toska.cs.helsinki.fi
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
       - name: 'Download built images'
         uses: actions/download-artifact@v3
         with:
