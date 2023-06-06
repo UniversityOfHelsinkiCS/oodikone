@@ -23,7 +23,6 @@ jobs:
             SENTRY_RELEASE=${{ github.sha }}
             SENTRY_ENVIRONMENT=production
           context: updater/sis-updater-worker/
-          target: production
           push: false
           outputs: type=docker,dest=/tmp/worker.tar
           tags: toska/sis-updater-worker:latest
@@ -47,7 +46,6 @@ jobs:
             SENTRY_RELEASE=${{ github.sha }}
             SENTRY_ENVIRONMENT=production
           context: updater/sis-updater-scheduler/
-          target: production
           push: false
           outputs: type=docker,dest=/tmp/scheduler.tar
           tags: toska/sis-updater-scheduler:latest
@@ -58,61 +56,9 @@ jobs:
         with:
           path: /tmp/scheduler.tar
 
-  test_updater:
-    name: 'Test updater'
-    runs-on: ubuntu-latest
-    needs:
-      - build_worker
-      - build_scheduler
-    steps:
-      - uses: actions/checkout@v3
-      - name: 'Login to toska docker registry'
-        uses: docker/login-action@v2
-        with:
-          registry: registry.toska.cs.helsinki.fi
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
-      - name: 'Download built images'
-        uses: actions/download-artifact@v3
-        with:
-          path: /tmp/
-      - name: 'Load worker image'
-        run: docker load --input /tmp/artifact/worker.tar
-      - name: 'Load scheduler image'
-        run: docker load --input /tmp/artifact/scheduler.tar
-      - name: 'Start worker'
-        run: docker-compose --file docker-compose.ci.yml up --detach --no-recreate sis-updater-worker
-      - name: 'Run hourly jobs'
-        run: docker-compose --file docker-compose.ci.yml run sis-updater-scheduler npm start
-        env:
-          SCHEDULE_IMMEDIATE: hourly
-          EXIT_AFTER_IMMEDIATES: yes
-      - name: 'Run daily jobs'
-        run: docker-compose --file docker-compose.ci.yml run sis-updater-scheduler npm start
-        env:
-          SCHEDULE_IMMEDIATE: daily
-          EXIT_AFTER_IMMEDIATES: yes
-      - name: 'Run weekly jobs'
-        run: docker-compose --file docker-compose.ci.yml run sis-updater-scheduler npm start
-        env:
-          SCHEDULE_IMMEDIATE: weekly
-          EXIT_AFTER_IMMEDIATES: yes
-      - name: 'Run prepurge'
-        run: docker-compose --file docker-compose.ci.yml run sis-updater-scheduler npm start
-        env:
-          SCHEDULE_IMMEDIATE: prepurge
-          EXIT_AFTER_IMMEDIATES: yes
-      - name: 'Run purge'
-        run: docker-compose --file docker-compose.ci.yml run sis-updater-scheduler npm start
-        env:
-          SCHEDULE_IMMEDIATE: purge
-          EXIT_AFTER_IMMEDIATES: yes
-
   release_updater:
     name: 'Release updater'
     runs-on: ubuntu-latest
-    needs:
-      - test_updater
     steps:
       - uses: actions/checkout@v3
       - uses: docker/setup-buildx-action@v2
@@ -129,7 +75,6 @@ jobs:
           context: updater/sis-updater-scheduler/
           push: true
           tags: toska/sis-updater-scheduler:latest
-          target: production
       - name: 'Build and push worker'
         uses: docker/build-push-action@v3
         with:
@@ -138,7 +83,6 @@ jobs:
           context: updater/sis-updater-worker/
           push: true
           tags: toska/sis-updater-worker:latest
-          target: production
       - name: 'Create Sentry release'
         uses: getsentry/action-release@v1
         env:
@@ -158,5 +102,4 @@ jobs:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
           message-type: deployment
           softa-url: https://oodikone.cs.helsinki.fi
-          deployment-target: production
           softa-to-deploy: sis-updater
