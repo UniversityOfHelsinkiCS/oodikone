@@ -8,6 +8,7 @@ import {
 } from 'redux/facultyStats'
 import LineGraph from 'components/StudyProgramme/BasicOverview/LineGraph'
 import StackedBarChart from 'components/StudyProgramme/BasicOverview/StackedBarChart'
+import useLanguage from 'components/LanguagePicker/useLanguage'
 import InteractiveDataTable from '../InteractiveDataView'
 import Toggle from '../../StudyProgramme/Toggle'
 import InfoBox from '../../Info/InfoBox'
@@ -23,7 +24,6 @@ const Overview = ({
   setStudyProgrammes,
   specialGroups,
   setSpecialGroups,
-  language,
 }) => {
   const toolTips = InfotoolTips.Faculty
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
@@ -47,6 +47,7 @@ const Overview = ({
     studyProgrammeFilter,
     specialGroups: special,
   })
+  const { getTextIn } = useLanguage()
 
   const downloadCsv = (titles, tableStats, programmeStats, programmeNames, toolTipText) => {
     const headers = titles.map(title => ({ label: title === '' ? 'Year' : title, key: title === '' ? 'Year' : title }))
@@ -56,9 +57,7 @@ const Overview = ({
         ...programmeStats[programme].map(yearRow => {
           return {
             Programme: programme,
-            Name: programmeNames[programme][language]
-              ? programmeNames[programme][language]
-              : programmeNames[programme].fi,
+            Name: getTextIn(programmeNames[programme]),
             ...yearRow.reduce((result, value, valueIndex) => ({ ...result, [headers[valueIndex].key]: value }), {}),
           }
         }),
@@ -265,7 +264,6 @@ const Overview = ({
                     )}
                     titles={basics?.data?.studentInfo.titles}
                     sliceStart={1}
-                    language={language}
                     yearsVisible={Array(basics?.data?.studentInfo.tableStats.length).fill(false)}
                     shortNames={transferShortTitles}
                   />
@@ -314,7 +312,6 @@ const Overview = ({
                     )}
                     titles={basics?.data?.graduationInfo.titles}
                     sliceStart={2}
-                    language={language}
                     yearsVisible={Array(basics?.data?.graduationInfo.tableStats.length).fill(false)}
                   />
                 </div>
@@ -363,7 +360,6 @@ const Overview = ({
                     titles={thesisWriters?.data?.titles}
                     sliceStart={2}
                     extraHeight="EXTRA HEIGHT"
-                    language={language}
                     yearsVisible={Array(thesisWriters?.data.tableStats.length).fill(false)}
                   />
                 </div>
@@ -414,7 +410,6 @@ const Overview = ({
                     titles={credits?.data?.titles}
                     extraHeight="EXTRA HEIGHT"
                     sliceStart={2}
-                    language={language}
                     yearsVisible={Array(credits?.data?.tableStats.length).fill(false)}
                     shortNames={creditShortTitles}
                   />

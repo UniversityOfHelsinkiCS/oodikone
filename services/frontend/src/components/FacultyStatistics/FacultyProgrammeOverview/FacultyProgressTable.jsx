@@ -10,7 +10,6 @@ const FacultyProgressTable = ({
   sortedKeys,
   progressYearsVisible,
   programmeNames,
-  language,
   cypress,
   progressTitles,
   needsExtra = 'NO EXTRA',
@@ -63,7 +62,6 @@ const FacultyProgressTable = ({
                       data={sortedKeys?.map(programme => programmeStats[programme][yearIndex])}
                       longLabels={programmeNames}
                       labels={sortedKeys}
-                      language={language}
                       names={progressTitles ? progressTitles[yearIndex] : titles?.slice(2)}
                       needsExtra={needsExtra === 'EXTRA HEIGHT'}
                     />

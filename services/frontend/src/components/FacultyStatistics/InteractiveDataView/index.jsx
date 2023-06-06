@@ -11,7 +11,6 @@ const InteractiveDataTable = ({
   sortedKeys,
   plotLinePlaces,
   titles,
-  language,
   sliceStart,
   extraHeight,
   yearsVisible,
@@ -160,7 +159,6 @@ const InteractiveDataTable = ({
                       {}
                     )}
                     longLabels={programmeNames}
-                    language={language}
                     names={titles?.slice(sliceStart)}
                     extraHeight={extraHeight}
                     studentsTable={studentsTable}

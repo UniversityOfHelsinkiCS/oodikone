@@ -2,6 +2,7 @@
 import React from 'react'
 import Highcharts from 'highcharts'
 import ReactHighcharts from 'react-highcharts'
+import useLanguage from 'components/LanguagePicker/useLanguage'
 
 const getColors = len => {
   if (len < 6) return ['#fba678', '#dbda7d', '#9ec27c', '#60a866', '#008c59']
@@ -20,7 +21,8 @@ const getFlexHeight = (len, needsExtra) => {
   if (len <= 4) return `${len * 24 * 3}px`
   return `${len * 24}px`
 }
-const ProgrammeProgressChart = ({ data, labels, longLabels, names, language, needsExtra }) => {
+const ProgrammeProgressChart = ({ data, labels, longLabels, names, needsExtra }) => {
+  const { getTextIn } = useLanguage()
   if (!data || data.length === 0)
     return (
       <>
@@ -81,9 +83,9 @@ const ProgrammeProgressChart = ({ data, labels, longLabels, names, language, nee
       backgroundColor: 'white',
       fontSize: '25px',
       formatter() {
-        let tooltipString = `<b>${
-          longLabels[this.x] && longLabels[this.x][language] ? longLabels[this.x][language] : longLabels[this.x].fi
-        } </b><br /><p>${this.x} - ${longLabels[this.x]?.code}</p><br />`
+        let tooltipString = `<b>${getTextIn(longLabels[this.x])}</b><br /><p>${this.x} - ${
+          longLabels[this.x]?.code
+        }</p><br />`
         this.points.forEach(point => {
           tooltipString += `<span style="color:${point.color}">●</span> <b>${point.series.name}: ${point.y}</b>
           </span><br />`

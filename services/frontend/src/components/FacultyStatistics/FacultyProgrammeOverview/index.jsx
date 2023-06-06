@@ -25,7 +25,6 @@ const getKey = (programmeKeys, idx) => {
 }
 const FacultyProgrammeOverview = ({
   faculty,
-  language,
   graduatedGroup,
   setGraduatedGroup,
   specialGroups,
@@ -173,7 +172,6 @@ const FacultyProgrammeOverview = ({
                     ).map(listObj => listObj[0])}
                     progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
                     programmeNames={progressStats?.data.programmeNames}
-                    language={language}
                     cypress="FacultyBachelorsProgressTable"
                     progressTitles={progressStats?.data.yearlyBachelorTitles}
                   />
@@ -210,7 +208,6 @@ const FacultyProgrammeOverview = ({
                     ).map(listObj => listObj[0])}
                     progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
                     programmeNames={progressStats?.data.programmeNames}
-                    language={language}
                     cypress="FacultyBachelorMasterProgressTable"
                     progressTitles={progressStats?.data.yearlyBcMsTitles}
                     needsExtra={faculty.code === 'H60' ? 'NO EXTRA' : 'EXTRA HEIGHT'}
@@ -245,7 +242,6 @@ const FacultyProgrammeOverview = ({
                         ).map(listObj => listObj[0])}
                         progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
                         programmeNames={progressStats?.data.programmeNames}
-                        language={language}
                         cypress="FacultyMastersProgressTable"
                         progressTitles={progressStats?.data.yearlyMasterTitles}
                         needsExtra={faculty.code === 'H60' ? 'NO EXTRA' : 'EXTRA HEIGHT'}
@@ -280,7 +276,6 @@ const FacultyProgrammeOverview = ({
                     ).map(listObj => listObj[0])}
                     progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
                     programmeNames={progressStats?.data.programmeNames}
-                    language={language}
                     cypress="FacultyDoctoralProgressTable"
                   />
                 </div>
