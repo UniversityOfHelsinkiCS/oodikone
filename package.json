@@ -18,7 +18,7 @@
     "docker:down": "./run.sh both anon down --remove-orphans; ./run.sh both real down --remove-orphans",
     "flushredis": "docker exec -it redis redis-cli flushall",
     "prepare": "husky install",
-    "rapodiff": "docker exec backend node /usr/src/app/src/rapodiff.js"
+    "rapodiff": "docker exec backend node /opt/app-root/src/src/rapodiff.js"
   },
   "repository": {
     "type": "git",

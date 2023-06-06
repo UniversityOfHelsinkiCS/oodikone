@@ -110,7 +110,7 @@ services:
   sis-updater-scheduler:
     <<: *defaults
     build:
-      target: development
+      <<: *build_defaults
       context: updater/sis-updater-scheduler
     container_name: sis-updater-scheduler
     depends_on:
@@ -133,13 +133,13 @@ services:
     profiles:
       - updater
     volumes:
-      - sis-updater-scheduler-nodemod:/usr/src/app/node_modules
-      - ./updater/sis-updater-scheduler/:/usr/src/app
+      - sis-updater-scheduler-nodemod:/opt/app-root/src/node_modules
+      - ./updater/sis-updater-scheduler/:/opt/app-root/src
 
   sis-updater-worker:
     <<: *defaults
     build:
-      target: development
+      <<: *build_defaults
       context: updater/sis-updater-worker
     depends_on:
       - redis
@@ -158,8 +158,8 @@ services:
     profiles:
       - updater
     volumes:
-      - sis-updater-worker-nodemod:/usr/src/app/node_modules
-      - ./updater/sis-updater-worker/:/usr/src/app
+      - sis-updater-worker-nodemod:/opt/app-root/src/node_modules
+      - ./updater/sis-updater-worker/:/opt/app-root/src
 
   user-db:
     <<: *defaults
