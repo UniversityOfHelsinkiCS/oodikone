@@ -58,6 +58,9 @@ jobs:
 
   release_updater:
     name: 'Release updater'
+    needs:
+      - build_worker
+      - build_scheduler
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
