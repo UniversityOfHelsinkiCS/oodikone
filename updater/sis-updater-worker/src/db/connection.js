@@ -3,7 +3,7 @@ const Sequelize = require('sequelize')
 const EventEmitter = require('events')
 const Umzug = require('umzug')
 const { lock } = require('../utils/redis')
-const { MIGRATIONS_LOCK } = require('../config')
+const { MIGRATIONS_LOCK, isDev, runningInCI } = require('../config')
 const { DB_URL, SIS_IMPORTER_HOST, SIS_IMPORTER_USER, SIS_IMPORTER_PASSWORD, SIS_IMPORTER_DATABASE } = process.env
 const { logger } = require('../utils/logger')
 
@@ -42,6 +42,7 @@ class DbConnections extends EventEmitter {
             user: SIS_IMPORTER_USER,
             password: SIS_IMPORTER_PASSWORD,
             database: SIS_IMPORTER_DATABASE,
+            ssl: !isDev && !runningInCI,
           },
           pool: {
             min: 0,
