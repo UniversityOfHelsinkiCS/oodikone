@@ -11,7 +11,7 @@ on:
 
 jobs:
   build_worker:
-    name: 'Build sis-updater-worker'
+    name: 'Build Updater worker'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -32,7 +32,7 @@ jobs:
           path: /tmp/worker.tar
 
   build_scheduler:
-    name: 'Build sis-updater-scheduler'
+    name: 'Build Updater scheduler'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -53,7 +53,7 @@ jobs:
           path: /tmp/scheduler.tar
 
   test_updater:
-    name: 'Test updater'
+    name: 'Test Updater'
     runs-on: ubuntu-latest
     needs:
       - build_worker
@@ -64,8 +64,8 @@ jobs:
         uses: docker/login-action@v2
         with:
           registry: registry.toska.cs.helsinki.fi
-          username: ${{ secrets.username }}
-          password: ${{ secrets.password }}
+          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
+          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
       - name: 'Download built images'
         uses: actions/download-artifact@v3
         with:
