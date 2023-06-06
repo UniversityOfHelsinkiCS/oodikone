@@ -259,7 +259,9 @@ const SingleStudyGroupFilterView = props => {
         programme: props.group.tags.studyProgramme,
       })
     )
-    viewFilters.push(filters.hopsFilter({ programmeCode: props.group?.tags?.studyProgramme }))
+    viewFilters.push(
+      filters.hopsFilter({ programmeCode: props.group?.tags?.studyProgramme, combinedProgrammeCode: '' })
+    )
   }
 
   const initialOptions = {}

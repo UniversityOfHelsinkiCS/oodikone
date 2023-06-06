@@ -4,7 +4,6 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import useFilters from 'components/FilterView/useFilters'
 import { hopsFilter } from 'components/FilterView/filters'
-import Toggle from 'components/StudyProgramme/Toggle'
 import PopulationSearchForm from './PopulationSearchForm'
 import PopulationSearchHistory from './PopulationSearchHistory'
 import ProgressBar from '../ProgressBar'
@@ -14,10 +13,12 @@ import infotoolTips from '../../common/InfoToolTips'
 
 const PopulationSearch = ({ populationFound, history, location, loading, unifiedProgramme }) => {
   const { onProgress, progress } = useProgress(loading)
+  const combinedProgrammeCode = unifiedProgramme?.combinedProgrammeCode || ''
   const { filterDispatch, useFilterSelector } = useFilters()
+  const onlyHopsCredit = useFilterSelector(hopsFilter.selectors.isActive)
+  const combinedHopsSelected = useFilterSelector(hopsFilter.selectors.isCombinedSelected(combinedProgrammeCode))
 
   const title = populationFound && history.location.search ? null : 'Search for class'
-  const onlyHopsCredits = useFilterSelector(hopsFilter.selectors.isActive)
 
   return (
     <Segment>
@@ -43,23 +44,28 @@ const PopulationSearch = ({ populationFound, history, location, loading, unified
           <Form.Field>
             <Form.Radio
               toggle
-              checked={onlyHopsCredits}
+              checked={onlyHopsCredit && !combinedHopsSelected}
               onClick={() => {
                 filterDispatch(hopsFilter.actions.toggle())
               }}
-              label="Show only credits included in study plan"
+              label={
+                combinedProgrammeCode
+                  ? 'Show only credits included in bachelor study plan'
+                  : 'Show only credits included in study plan'
+              }
             />
           </Form.Field>
-          {unifiedProgramme && unifiedProgramme.combinedProgrammeCode && (
-            <div className="toggle-container">
-              <Toggle
-                cypress="programmeToggle"
-                firstLabel={`Filter by graduated and studyplan credits by ${unifiedProgramme.combinedProgrammeCode} `}
-                secondLabel={unifiedProgramme.programmeCode}
-                value={unifiedProgramme.filterByBachelor}
-                setValue={unifiedProgramme.setFilterByBachelor}
+          {combinedProgrammeCode && (
+            <Form.Field>
+              <Form.Radio
+                toggle
+                checked={onlyHopsCredit && combinedHopsSelected}
+                onClick={() => {
+                  filterDispatch(hopsFilter.actions.toggleCombinedProgramme(combinedProgrammeCode))
+                }}
+                label="Show only credits included in licentiate study plan"
               />
-            </div>
+            </Form.Field>
           )}
           <PopulationSearchHistory history={history} />
         </Form>

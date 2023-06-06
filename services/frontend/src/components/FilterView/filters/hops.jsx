@@ -5,7 +5,7 @@ import moment from 'moment'
 import createFilter from './createFilter'
 import creditDateFilter, { selectedStartDate } from './date'
 
-const HopsFilterCard = ({ options, onOptionsChange }) => {
+const HopsFilterCard = ({ options, onOptionsChange, combinedProgramme }) => {
   const { filterDispatch, useFilterSelector } = useFilters()
   const selectedCreditStartDate = useFilterSelector(selectedStartDate(''))
 
@@ -19,7 +19,7 @@ const HopsFilterCard = ({ options, onOptionsChange }) => {
             options.studyStart &&
             options.clearCreditDate &&
             new Date(selectedCreditStartDate) > new Date(options.studyStart) &&
-            !options.active
+            !options.activeDefaultProgramme
           )
             filterDispatch(
               creditDateFilter.actions.setOptions({
@@ -27,12 +27,50 @@ const HopsFilterCard = ({ options, onOptionsChange }) => {
                 endDate: null,
               })
             )
-          onOptionsChange({ ...options, active: !options.active })
+          onOptionsChange({
+            ...options,
+            activeDefaultProgramme: !options.activeDefaultProgramme,
+            activeCombinedProgramme: false,
+            combinedIsSelected: 'default',
+          })
         }}
       >
-        <Radio style={{ width: '3.5rem', flexShrink: 0 }} toggle checked={options.active} />
-        <div>Show only credits included in study plan</div>
+        <Radio style={{ width: '3.5rem', flexShrink: 0 }} toggle checked={options.activeDefaultProgramme} />
+        {combinedProgramme ? (
+          <div>Show only credits included in bachelor study plan</div>
+        ) : (
+          <div>Show only credits included in study plan</div>
+        )}
       </div>
+      {combinedProgramme && (
+        <div
+          style={{ display: 'flex', alignItems: 'center', gap: '1em', cursor: 'pointer' }}
+          onClick={() => {
+            if (
+              selectedCreditStartDate &&
+              options.studyStart &&
+              options.clearCreditDate &&
+              new Date(selectedCreditStartDate) > new Date(options.studyStart) &&
+              !options.activeCombinedProgramme
+            )
+              filterDispatch(
+                creditDateFilter.actions.setOptions({
+                  startDate: null,
+                  endDate: null,
+                })
+              )
+            onOptionsChange({
+              ...options,
+              activeCombinedProgramme: !options.activeCombinedProgramme,
+              activeDefaultProgramme: false,
+              combinedIsSelected: combinedProgramme,
+            })
+          }}
+        >
+          <Radio style={{ width: '3.5rem', flexShrink: 0 }} toggle checked={options.activeCombinedProgramme} />
+          <div>Show only credits included in licentiate study plan</div>
+        </div>
+      )}
       {options.studyStart ? (
         <Button
           content="Cut credits to study start"
@@ -44,7 +82,7 @@ const HopsFilterCard = ({ options, onOptionsChange }) => {
               })
             )
           }
-          disabled={!options.active}
+          disabled={!options.activeDefaultProgramme && !options.activeCombinedProgramme}
           className="credit-date-filter-input"
           size="mini"
           style={{
@@ -65,20 +103,27 @@ export default createFilter({
   priority: -200,
 
   defaultOptions: {
-    active: false,
+    activeDefaultProgramme: false,
+    activeCombinedProgramme: false,
+    combinedIsSelected: 'default',
   },
 
-  isActive: arg => arg?.active,
+  precompute: ({ args }) => {
+    return args.combinedProgrammeCode
+  },
 
-  filter: (student, { active }, { args }) => {
+  isActive: arg => arg?.activeDefaultProgramme || arg?.activeCombinedProgramme,
+
+  filter: (student, { activeDefaultProgramme, activeCombinedProgramme }, { args }) => {
     const { studyrightStart, studyplans } = student
     const studyrightStartDate = new Date(studyrightStart)
     const studyrights = student.studyrights.filter(sr => !sr.cancelled)?.map(sr => sr.studyrightid)
+    const chosenProgrammeCode = activeCombinedProgramme ? args.combinedProgrammeCode : args.programmeCode
     const hops = studyplans.find(
-      plan => plan.programme_code === args.programmeCode && studyrights.includes(plan.studyrightid)
+      plan => plan.programme_code === chosenProgrammeCode && studyrights.includes(plan.studyrightid)
     )
 
-    if (active) {
+    if (activeDefaultProgramme || activeCombinedProgramme) {
       if (!hops) {
         student.courses = []
         student.credits = 0
@@ -95,11 +140,25 @@ export default createFilter({
     return true
   },
 
-  actions: {
-    toggle: options => {
-      options.active = !options.active
+  selectors: {
+    isCombinedSelected: ({ combinedIsSelected }, code) => {
+      return combinedIsSelected === code
     },
   },
 
+  actions: {
+    toggle: options => {
+      options.activeDefaultProgramme = !options.activeDefaultProgramme
+      options.activeCombinedProgramme = false
+      options.combinedIsSelected = 'default'
+    },
+    toggleCombinedProgramme: (options, combinedProgrammeCode) => {
+      options.activeDefaultProgramme = false
+      options.activeCombinedProgramme = !options.activeCombinedProgramme
+      options.combinedIsSelected = combinedProgrammeCode
+    },
+  },
+
+  render: (props, { precomputed }) => <HopsFilterCard {...props} combinedProgramme={precomputed} />,
   component: HopsFilterCard,
 })

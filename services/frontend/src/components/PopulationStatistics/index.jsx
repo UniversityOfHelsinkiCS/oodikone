@@ -52,15 +52,15 @@ const PopulationStatistics = () => {
   const programmes = useSelector(store => store.populationProgrammes?.data?.programmes)
   const programmeName = programmes && programmeCode ? programmes[programmeCode]?.name : ''
   const combinedProgrammeName = programmes && combinedProgrammeCode ? programmes[combinedProgrammeCode]?.name : ''
-  const chosenProgrammeCode = filterByBachelor || !combinedProgrammeCode ? programmeCode : combinedProgrammeCode
+
   const filters = [
     studentNumberFilter,
-    hopsFilter({ programmeCode: chosenProgrammeCode }),
+    hopsFilter({ programmeCode, combinedProgrammeCode }),
     genderFilter,
     ageFilter,
     courseFilter({ courses }),
     creditsEarnedFilter,
-    graduatedFromProgrammeFilter({ code: chosenProgrammeCode }),
+    graduatedFromProgrammeFilter({ code: programmeCode }),
     transferredToProgrammeFilter,
     startYearAtUniFilter,
     tagsFilter,
@@ -69,14 +69,15 @@ const PopulationStatistics = () => {
       allSemesters: allSemesters?.semesters ?? [],
       language,
     }),
-    studyTrackFilter({ code: chosenProgrammeCode }),
-    studyrightStatusFilter({ code: chosenProgrammeCode }),
+    studyTrackFilter({ code: programmeCode }),
+    studyrightStatusFilter({ code: programmeCode }),
   ]
 
+  // For combined programme admission type is the same as they started in bachelor programme
   if (parseInt(query?.year, 10) >= 2020) {
     filters.push(
       admissionTypeFilter({
-        programme: chosenProgrammeCode,
+        programme: programmeCode,
       })
     )
   }
@@ -91,7 +92,9 @@ const PopulationStatistics = () => {
     }
     return samples.map(student => {
       const hopsCredits =
-        student.studyplans?.find(plan => plan.programme_code === chosenProgrammeCode)?.completed_credits ?? 0
+        student.studyplans?.find(plan => plan.programme_code === programmeCode)?.completed_credits ?? 0
+      const hopsCombinedProgrammeCredits =
+        student.studyplans?.find(plan => plan.programme_code === combinedProgrammeCode)?.completed_credits ?? 0
       const studyrightStartDate = new Date(student.studyrightStart)
       const courses = student.courses.filter(({ date }) => new Date(date) >= studyrightStartDate)
       const credits = getStudentTotalCredits({ courses })
@@ -99,10 +102,11 @@ const PopulationStatistics = () => {
         ...student,
         allCredits: student.credits,
         hopsCredits,
+        hopsCombinedProgrammeCredits,
         credits,
       }
     })
-  }, [samples, chosenProgrammeCode])
+  }, [samples, programmeCode, combinedProgrammeCode])
 
   const programmeText =
     query?.studyRights?.combinedProgramme !== '' && query?.studyRights?.combinedProgramme !== undefined

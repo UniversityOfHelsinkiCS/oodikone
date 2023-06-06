@@ -78,7 +78,7 @@ const createFilter = options => {
     defaultOptions: options.defaultOptions,
 
     /**
-     * Returns wether the filer is active or not, based on the current options.
+     * Returns whether the filter is active or not, based on the current options.
      *
      * The filter is evaluated over the student list only when this function
      * returns true. Activity of the filter is also reflected in the user
