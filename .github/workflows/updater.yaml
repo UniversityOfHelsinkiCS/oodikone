@@ -3,9 +3,9 @@ name: 'Test and release updater'
 on:
   push:
     branches:
-      - master
+      - openshift
     paths:
-      - '.github/workflows/test-and-release-updater.yaml'
+      - '.github/workflows/release-updater.yaml'
       - 'updater/sis-updater-worker/**'
       - 'updater/sis-updater-scheduler/**'
 
@@ -23,12 +23,9 @@ jobs:
             SENTRY_RELEASE=${{ github.sha }}
             SENTRY_ENVIRONMENT=production
           context: updater/sis-updater-worker/
-          target: production
           push: false
           outputs: type=docker,dest=/tmp/worker.tar
-          tags: toska/sis-updater-worker:latest
-          cache-from: type=registry,ref=toska/sis-updater-worker:latest
-          cache-to: type=inline
+          tags: toska/sis-updater-worker:production
       - name: 'Store built image'
         uses: actions/upload-artifact@v3
         with:
@@ -47,12 +44,9 @@ jobs:
             SENTRY_RELEASE=${{ github.sha }}
             SENTRY_ENVIRONMENT=production
           context: updater/sis-updater-scheduler/
-          target: production
           push: false
           outputs: type=docker,dest=/tmp/scheduler.tar
-          tags: toska/sis-updater-scheduler:latest
-          cache-from: type=registry,ref=toska/sis-updater-scheduler:latest
-          cache-to: type=inline
+          tags: toska/sis-updater-scheduler:production
       - name: 'Store built image'
         uses: actions/upload-artifact@v3
         with:
@@ -66,12 +60,6 @@ jobs:
       - build_scheduler
     steps:
       - uses: actions/checkout@v3
-      - name: 'Login to toska docker registry'
-        uses: docker/login-action@v2
-        with:
-          registry: registry.toska.cs.helsinki.fi
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
       - name: 'Download built images'
         uses: actions/download-artifact@v3
         with:
@@ -108,37 +96,75 @@ jobs:
           SCHEDULE_IMMEDIATE: purge
           EXIT_AFTER_IMMEDIATES: yes
 
-  release_updater:
-    name: 'Release updater'
+  release_worker:
+    name: 'Build and release Updater worker'
     runs-on: ubuntu-latest
-    needs:
-      - test_updater
+    needs: test_updater
+
     steps:
       - uses: actions/checkout@v3
-      - uses: docker/setup-buildx-action@v2
-      - name: 'Login to DockerHub'
-        uses: docker/login-action@v2
+
+      - name: Build worker image
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: 'Build and push scheduler'
-        uses: docker/build-push-action@v3
+          image: updater-worker
+          tags: production ${{ github.sha }}
+          context: updater/sis-updater-worker
+          containerfiles: |
+            updater/sis-updater-worker/Dockerfile
+          build-args: |
+            SENTRY_RELEASE=${{ github.sha }}
+            SENTRY_ENVIRONMENT=production
+
+      - name: Push to quay.io
+        uses: redhat-actions/push-to-registry@v2
         with:
-          cache-from: type=registry,ref=toska/sis-updater-scheduler:latest
-          cache-to: type=inline
-          context: updater/sis-updater-scheduler/
-          push: true
-          tags: toska/sis-updater-scheduler:latest
-          target: production
-      - name: 'Build and push worker'
-        uses: docker/build-push-action@v3
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: quay.io/toska
+          username: toska+github
+          password: ${{ secrets.QUAY_IO_TOKEN }}
+
+  release_scheduler:
+    name: 'Build and release Updater scheduler'
+    runs-on: ubuntu-latest
+    needs: test_updater
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build scheduler image
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
         with:
-          cache-from: type=registry,ref=toska/sis-updater-worker:latest
-          cache-to: type=inline
-          context: updater/sis-updater-worker/
-          push: true
-          tags: toska/sis-updater-worker:latest
-          target: production
+          image: updater-scheduler
+          tags: production ${{ github.sha }}
+          context: updater/sis-updater-scheduler
+          containerfiles: |
+            updater/sis-updater-scheduler/Dockerfile
+          build-args: |
+            SENTRY_RELEASE=${{ github.sha }}
+            SENTRY_ENVIRONMENT=production
+
+      - name: Push to quay.io
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: quay.io/toska
+          username: toska+github
+          password: ${{ secrets.QUAY_IO_TOKEN }}
+
+  sentry_release:
+    name: 'Create Sentry release'
+    runs-on: ubuntu-latest
+    needs:
+      - release_worker
+      - release_scheduler
+
+    steps:
+      - uses: actions/checkout@v3
       - name: 'Create Sentry release'
         uses: getsentry/action-release@v1
         env:
@@ -152,6 +178,7 @@ jobs:
           sourcemaps: './build/static/js'
           url_prefix: '~/static/js'
           version: ${{ github.sha }}
+
       - name: 'Send notification to slack'
         uses: UniversityOfHelsinkiCS/slackbot-action@v1.4.2
         with:
