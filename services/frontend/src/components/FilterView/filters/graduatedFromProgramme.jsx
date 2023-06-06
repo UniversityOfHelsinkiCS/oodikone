@@ -5,14 +5,17 @@ import createFilter from './createFilter'
 const GraduatedFromProgrammeFilterCard = ({ options, onOptionsChange, isCombinedExtent }) => {
   const { mode } = options
 
-  const modeOptions = [{ key: 'graduated-false', text: `Not Graduated`, value: 0 }].concat(
-    isCombinedExtent
-      ? [
-          { key: 'graduated-bachelor', text: `Graduated with Bachelor's`, value: 1 },
-          { key: 'graduated-master', text: `Graduated with Master's`, value: 2 },
-        ]
-      : [{ key: 'graduated-true', text: `Graduated`, value: 1 }]
-  )
+  const modeOptions = isCombinedExtent
+    ? [
+        { key: 'not-graduated-bachelor', text: `Not graduated with Bachelor's`, value: 0 },
+        { key: 'not-graduated-master', text: `Not graduated with Master's`, value: -1 },
+        { key: 'graduated-bachelor', text: `Graduated with Bachelor's`, value: 1 },
+        { key: 'graduated-master', text: `Graduated with Master's`, value: 2 },
+      ]
+    : [
+        { key: 'graduated-false', text: `Not Graduated`, value: 0 },
+        { key: 'graduated-true', text: `Graduated`, value: 1 },
+      ]
 
   return (
     <Form>
@@ -52,7 +55,7 @@ export default createFilter({
   },
 
   precompute: ({ args }) => ({
-    isCombinedExtent: args.code && !args.code.includes('_'),
+    isCombinedExtent: args.code && (!args.code.includes('_') || args.combinedProgrammeCode),
   }),
 
   isActive: ({ mode }) => mode !== null,
@@ -65,13 +68,14 @@ export default createFilter({
     }
 
     const keepGraduated = mode > 0
-
+    const chosenProgrammeCode =
+      (mode === 2 || mode === -1) && args.combinedProgrammeCode ? args.combinedProgrammeCode : args.code
     return (
       keepGraduated ===
       examinedStudyRights.some(sr =>
         sr.studyright_elements.some(sre => {
           const dateMatch = new Date(sre.enddate) >= new Date(sr.enddate)
-          return sre.code === args.code && dateMatch && sr.graduated
+          return sre.code === chosenProgrammeCode && dateMatch && sr.graduated
         })
       )
     )
