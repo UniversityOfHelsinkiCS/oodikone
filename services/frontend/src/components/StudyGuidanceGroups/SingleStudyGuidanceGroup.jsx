@@ -223,7 +223,6 @@ const SingleStudyGroupFilterView = props => {
     }),
     filters.creditDateFilter,
     filters.creditsEarnedFilter,
-    filters.studyTrackFilter,
     filters.programmeFilter({
       additionalModes: props.group?.tags?.year
         ? [
@@ -256,12 +255,14 @@ const SingleStudyGroupFilterView = props => {
   if (props.group?.tags?.studyProgramme) {
     viewFilters.push(
       filters.graduatedFromProgrammeFilter({
-        programme: props.group.tags.studyProgramme,
+        code: props.group.tags.studyProgramme,
+        combinedProgrammeCode: '',
       })
     )
     viewFilters.push(
       filters.hopsFilter({ programmeCode: props.group?.tags?.studyProgramme, combinedProgrammeCode: '' })
     )
+    viewFilters.push(filters.studyTrackFilter({ code: props.group.tags.studyProgramme }))
   }
 
   const initialOptions = {}

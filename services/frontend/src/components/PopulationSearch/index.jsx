@@ -11,9 +11,8 @@ import InfoBox from '../Info/InfoBox'
 import { useProgress } from '../../common/hooks'
 import infotoolTips from '../../common/InfoToolTips'
 
-const PopulationSearch = ({ populationFound, history, location, loading, unifiedProgramme }) => {
+const PopulationSearch = ({ populationFound, history, location, loading, combinedProgrammeCode }) => {
   const { onProgress, progress } = useProgress(loading)
-  const combinedProgrammeCode = unifiedProgramme?.combinedProgrammeCode || ''
   const { filterDispatch, useFilterSelector } = useFilters()
   const onlyHopsCredit = useFilterSelector(hopsFilter.selectors.isActive)
   const combinedHopsSelected = useFilterSelector(hopsFilter.selectors.isCombinedSelected(combinedProgrammeCode))

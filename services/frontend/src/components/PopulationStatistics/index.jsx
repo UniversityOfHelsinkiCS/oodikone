@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { useLocation, useHistory } from 'react-router-dom'
 import { Header, Segment } from 'semantic-ui-react'
@@ -37,13 +37,11 @@ const PopulationStatistics = () => {
   const location = useLocation()
   const { language, getTextIn } = useLanguage()
   const history = useHistory()
-  // const { query, queryIsSet, isLoading, students } = useSelector(selectPopulations)
   const courses = useSelector(store => store.populationSelectedStudentCourses.data?.coursestatistics)
   const { query, queryIsSet, isLoading, selectedStudentsByYear, samples } = useSelector(
     populationToData.makePopulationsToData
   )
-  // Option to set other Study programme in cases of combined view (e.g., eläinlääkkis)
-  const [filterByBachelor, setFilterByBachelor] = useState(true)
+
   useTitle('Class statistics')
 
   const { data: allSemesters } = useGetSemestersQuery()
@@ -60,7 +58,7 @@ const PopulationStatistics = () => {
     ageFilter,
     courseFilter({ courses }),
     creditsEarnedFilter,
-    graduatedFromProgrammeFilter({ code: programmeCode }),
+    graduatedFromProgrammeFilter({ code: programmeCode, combinedProgrammeCode }),
     transferredToProgrammeFilter,
     startYearAtUniFilter,
     tagsFilter,
@@ -144,11 +142,7 @@ const PopulationStatistics = () => {
           </Header>
 
           <Segment className="contentSegment">
-            <PopulationSearch
-              history={history}
-              location={location}
-              unifiedProgramme={{ programmeCode, combinedProgrammeCode, filterByBachelor, setFilterByBachelor }}
-            />
+            <PopulationSearch history={history} location={location} combinedProgramme={combinedProgrammeCode} />
             {location.search !== '' ? (
               <PopulationDetails
                 queryIsSet={queryIsSet}
