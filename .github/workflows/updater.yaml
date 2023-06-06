@@ -5,7 +5,7 @@ on:
     branches:
       - openshift-updater
     paths:
-      - '.github/workflows/release-updater.yaml'
+      - '.github/workflows/updater.yaml'
       - 'updater/sis-updater-worker/**'
       - 'updater/sis-updater-scheduler/**'
 
