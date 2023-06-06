@@ -1,4 +1,4 @@
-name: 'Test and release updater '
+name: 'Test and release updater'
 
 on:
   push:
