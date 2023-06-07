@@ -1,0 +1,66 @@
+name: 'Release to production'
+
+on:
+  push:
+    branches:
+      - master # Switch to on release
+
+jobs:
+  release_frontend:
+    name: 'Build and release frontend'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build frontend image
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: oodikone-frontend
+          tags: production ${{ github.sha }}
+          context: services/frontend
+          containerfiles: |
+            services/frontend/Dockerfile
+          build-args: |
+            SENTRY_RELEASE=${{ steps.extract_version.outputs.VERSION }}
+            SENTRY_ENVIRONMENT=production
+
+      - name: Push to quay.io
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: quay.io/toska
+          username: toska+github
+          password: ${{ secrets.QUAY_IO_TOKEN }}
+
+  release_backend:
+    name: 'Build and release backend'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build backend image
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: oodikone-backend
+          tags: staging ${{ github.sha }}
+          context: services/backend
+          containerfiles: |
+            services/backend/Dockerfile
+          build-args: |
+            SENTRY_RELEASE=${{ steps.extract_version.outputs.VERSION }}
+            SENTRY_ENVIRONMENT=production
+            BUILT_AT=${{ steps.get_current_time.outputs.NOW }}
+
+      - name: Push to quay.io
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: quay.io/toska
+          username: toska+github
+          password: ${{ secrets.QUAY_IO_TOKEN }}
