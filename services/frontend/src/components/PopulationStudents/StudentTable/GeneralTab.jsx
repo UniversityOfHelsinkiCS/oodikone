@@ -561,6 +561,12 @@ const GeneralTab = ({
           ? s.hopsCredits
           : s.studyplans?.find(plan => plan.programme_code === programmeCode)?.completed_credits ?? 0,
     }),
+    hopsCombinedProg: () => ({
+      key: 'credits-hopsCombinedProg',
+      title: combinedProgrammeCode === 'MH90_001' ? 'Licentiate\nHOPS' : 'Master\nHOPS',
+      filterType: 'range',
+      getRowVal: s => s.studyplans?.find(plan => plan.programme_code === combinedProgrammeCode)?.completed_credits ?? 0,
+    }),
     studyright: sole => ({
       key: 'credits-studyright',
       title: sole ? `Credits ${creditColumnTitle}` : creditColumnTitle,
@@ -666,16 +672,16 @@ const GeneralTab = ({
     },
     endDate: {
       key: 'endDate',
-      title: 'Graduation\ndate',
+      title: combinedProgrammeCode ? 'Bachelor\ngraduation\ndate' : 'Graduation\ndate',
       filterType: 'date',
       getRowVal: s =>
         studentToStudyrightEndMap[s.studentNumber]
           ? reformatDate(studentToStudyrightEndMap[s.studentNumber], 'YYYY-MM-DD')
           : '',
     },
-    endDateSecondPhase: {
-      key: 'endDateSecondPhase',
-      title: '2nd\ngraduation\ndate',
+    endDateCombinedProg: {
+      key: 'endDateCombinedProg',
+      title: combinedProgrammeCode === 'MH90_001' ? 'Licentiate\ngraduation\ndate' : 'Master\ngraduation\ndate',
       filterType: 'date',
       getRowVal: s =>
         studentToSecondStudyrightEndMap[s.studentNumber]
@@ -935,8 +941,9 @@ const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
     ],
     studyGuidanceGroupPopulation: getStudyGuidanceGroupColumns(),
   }
+
   if (populations?.query?.studyRights?.combinedProgramme && variant === 'population')
-    columnsByVariant[variant].push('endDateSecondPhase')
+    columnsByVariant[variant].push('credits.hopsCombinedProg', 'endDateCombinedProg')
   const baseColumns = ['credits', 'credits.all', 'studentnumber', 'tags', 'updatedAt', 'option', 'phoneNumber']
   const nameColumnsToAdd = namesVisible ? ['email', 'lastname', 'firstname'] : []
   const adminColumnsToFilter = isAdmin ? [] : ['priority', 'extent', 'updatedAt']
