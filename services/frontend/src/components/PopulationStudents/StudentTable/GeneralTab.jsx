@@ -39,8 +39,11 @@ const GeneralTab = ({
   const [popupStates, setPopupStates] = useState({})
   const sendAnalytics = sendEvent.populationStudents
   const { data: semesterData } = useGetSemestersQuery()
-  const allSemesters = semesterData?.semesters ?? []
-
+  const allSemesters = semesterData?.semesters ? Object.entries(semesterData.semesters).map(item => item[1]) : []
+  const allSemestersMap = allSemesters.reduce((obj, cur, index) => {
+    obj[index] = cur
+    return obj
+  }, {})
   const fromSemester = from
     ? Object.values(semesterData.semesters)
         .filter(({ startdate }) => new Date(startdate) <= new Date(from))
@@ -156,15 +159,37 @@ const GeneralTab = ({
     return studentTags.join(', ')
   }
 
-  const { first: firstSemester, last: lastSemester } = filteredStudents.reduce(
-    ({ first, last }, student) => {
-      if (!student.semesterenrollments) return { first: 9999, last: 0 }
-      const newFirst = Math.min(first, ...student.semesterenrollments.map(e => e.semestercode))
-      const newLast = Math.max(last, ...student.semesterenrollments.map(e => e.semestercode))
-      return { first: newFirst, last: newLast }
-    },
-    { first: 9999, last: 0 }
-  )
+  const currentSemesterCode = (() => {
+    const now = new Date()
+    const isSpring = now.getMonth() > 7
+    return allSemesters.find(sem => sem.name.en === `${isSpring ? 'Spring' : 'Autumn'} ${new Date().getFullYear()}`)
+      ?.semestercode
+  })()
+
+  const getFirstAndLastSemester = () => {
+    const { first, last } = filteredStudents.reduce(
+      ({ first, last }, student) => {
+        if (!student.semesterenrollments) return { first: 9999, last: 0 }
+        const newFirst = Math.min(first, ...student.semesterenrollments.map(e => e.semestercode))
+        const newLast = Math.max(last, ...student.semesterenrollments.map(e => e.semestercode))
+        return { first: newFirst, last: newLast }
+      },
+      { first: 9999, last: 0 }
+    )
+
+    if (group?.tags?.year) {
+      return {
+        first: allSemesters.find(
+          semester => `${semester.yearcode + 1949}` === group.tags.year && semester.semestercode % 2 === 1
+        )?.semestercode,
+        last: Math.min(currentSemesterCode, last),
+      }
+    }
+    return { first: last - first > 14 ? last - 13 : first, last: Math.min(currentSemesterCode, last) }
+  }
+
+  const { first: firstSemester, last: lastSemester } =
+    allSemesters.length > 0 ? getFirstAndLastSemester() : { first: 9999, last: 0 }
 
   const mainProgramme = (studyrights, studentNumber, enrollments = []) => {
     const programme = getNewestProgramme(
@@ -412,8 +437,10 @@ const GeneralTab = ({
     const secondGraduation = studentToSecondStudyrightEndMap[student.studentNumber]
 
     return (
-      (firstGraduation && moment(firstGraduation).isBetween(allSemesters[sem].startdate, allSemesters[sem].enddate)) ||
-      (secondGraduation && moment(secondGraduation).isBetween(allSemesters[sem].startdate, allSemesters[sem].enddate))
+      (firstGraduation &&
+        moment(firstGraduation).isBetween(allSemestersMap[sem].startdate, allSemestersMap[sem].enddate)) ||
+      (secondGraduation &&
+        moment(secondGraduation).isBetween(allSemestersMap[sem].startdate, allSemestersMap[sem].enddate))
     )
   }
 
@@ -422,7 +449,7 @@ const GeneralTab = ({
     if (!student.semesterenrollments) return ''
     const semesterIcons = []
 
-    const getSemesterJSX = (enrollmenttype, graduated, isSpring) => {
+    const getSemesterJSX = (enrollmenttype, graduated, isSpring, key) => {
       let type = 'none'
       if (enrollmenttype === 1) type = 'present'
       if (enrollmenttype === 2) type = 'absent'
@@ -447,7 +474,7 @@ const GeneralTab = ({
         </svg>
       )
       return (
-        <div className={`enrollment-label-no-margin label-${type} ${isSpring ? 'margin-right' : ''}`}>
+        <div key={key} className={`enrollment-label-no-margin label-${type} ${isSpring ? 'margin-right' : ''}`}>
           {graduated ? graduationCrown : null}
         </div>
       )
@@ -455,7 +482,12 @@ const GeneralTab = ({
 
     for (let sem = firstSemester; sem <= lastSemester; sem++) {
       semesterIcons.push(
-        getSemesterJSX(student.semesterEnrollmentsMap[sem], graduatedOnSemester(student, sem), sem % 2 === 0)
+        getSemesterJSX(
+          student.semesterEnrollmentsMap[sem],
+          graduatedOnSemester(student, sem),
+          sem % 2 === 0,
+          `${student.studentNumber}-${sem}`
+        )
       )
     }
 
@@ -467,10 +499,12 @@ const GeneralTab = ({
     if (!student.semesterenrollments?.length > 0) return {}
     const title = student.semesterenrollments.reduce(
       (enrollmentsString, current) =>
-        `${enrollmentsString}${enrollmentTypeText(current.enrollmenttype)} in ${getTextIn(
-          allSemesters[current.semestercode].name,
-          language
-        )} ${graduatedOnSemester(student, current.semestercode) ? '(graduated) ' : ''} \n`,
+        current.semestercode >= firstSemester && current.semestercode <= lastSemester
+          ? `${enrollmentsString}${enrollmentTypeText(current.enrollmenttype)} in ${getTextIn(
+              allSemestersMap[current.semestercode].name,
+              language
+            )} ${graduatedOnSemester(student, current.semestercode) ? '(graduated) ' : ''} \n`
+          : enrollmentsString,
       ''
     )
     return { title }
@@ -480,7 +514,7 @@ const GeneralTab = ({
     if (allSemesters?.length === 0) return ''
     if (!student.semesterenrollments?.length > 0) return ''
     let enrollmentsString = `Starting from ${getTextIn(
-      allSemesters[student.semesterenrollments[0].semestercode].name,
+      allSemestersMap[student.semesterenrollments[0].semestercode].name,
       language
     )}: `
     for (let sem = firstSemester; sem <= lastSemester; sem++) {
