@@ -435,13 +435,17 @@ const GeneralTab = ({
   const graduatedOnSemester = (student, sem) => {
     const firstGraduation = studentToStudyrightEndMap[student.studentNumber]
     const secondGraduation = studentToSecondStudyrightEndMap[student.studentNumber]
-
-    return (
-      (firstGraduation &&
-        moment(firstGraduation).isBetween(allSemestersMap[sem].startdate, allSemestersMap[sem].enddate)) ||
-      (secondGraduation &&
-        moment(secondGraduation).isBetween(allSemestersMap[sem].startdate, allSemestersMap[sem].enddate))
+    if (
+      firstGraduation &&
+      moment(firstGraduation).isBetween(allSemestersMap[sem].startdate, allSemestersMap[sem].enddate)
     )
+      return 1
+    if (
+      secondGraduation &&
+      moment(secondGraduation).isBetween(allSemestersMap[sem].startdate, allSemestersMap[sem].enddate)
+    )
+      return 2
+    return 0
   }
 
   const getSemesterEnrollmentsContent = student => {
@@ -473,9 +477,10 @@ const GeneralTab = ({
           />
         </svg>
       )
+
       return (
         <div key={key} className={`enrollment-label-no-margin label-${type} ${isSpring ? 'margin-right' : ''}`}>
-          {graduated ? graduationCrown : null}
+          {graduated > 0 ? graduationCrown : null}
         </div>
       )
     }
@@ -497,16 +502,17 @@ const GeneralTab = ({
   const getSemesterEnrollmentsProps = student => {
     if (allSemesters?.length === 0) return {}
     if (!student.semesterenrollments?.length > 0) return {}
-    const title = student.semesterenrollments.reduce(
-      (enrollmentsString, current) =>
-        current.semestercode >= firstSemester && current.semestercode <= lastSemester
-          ? `${enrollmentsString}${enrollmentTypeText(current.enrollmenttype)} in ${getTextIn(
-              allSemestersMap[current.semestercode].name,
-              language
-            )} ${graduatedOnSemester(student, current.semestercode) ? '(graduated) ' : ''} \n`
-          : enrollmentsString,
-      ''
-    )
+    const title = student.semesterenrollments.reduce((enrollmentsString, current) => {
+      if (current.semestercode >= firstSemester && current.semestercode <= lastSemester) {
+        const graduation = graduatedOnSemester(student, current.semestercode)
+        const graduationText = `(graduated as ${graduation === 1 ? 'Bachelor' : 'Master'})`
+        return `${enrollmentsString}${enrollmentTypeText(current.enrollmenttype)} in ${getTextIn(
+          allSemestersMap[current.semestercode].name,
+          language
+        )} ${graduation > 0 ? graduationText : ''} \n`
+      }
+      return enrollmentsString
+    }, '')
     return { title }
   }
 
