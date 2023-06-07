@@ -55,7 +55,6 @@ const GeneralTab = ({
         .filter(({ enddate }) => new Date(enddate) >= new Date(to))
         .sort((a, b) => new Date(a.enddate) - new Date(b.enddate))[0]?.semestercode
     : null
-
   const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions)
 
   const { data: populationStatistics, query } = populations
@@ -80,6 +79,7 @@ const GeneralTab = ({
       })
       .map(stu => [stu.studentNumber, stu])
   )
+
   const queryStudyrights = query ? Object.values(query.studyRights) : []
   const cleanedQueryStudyrights = queryStudyrights.filter(sr => !!sr)
   const programmeCode = cleanedQueryStudyrights[0] || group?.tags?.studyProgramme
@@ -605,6 +605,15 @@ const GeneralTab = ({
   const columnsAvailable = {
     lastname: { key: 'lastname', title: 'Last name', getRowVal: s => s.lastname, export: false },
     firstname: { key: 'firstname', title: 'Given names', getRowVal: s => s.firstnames, export: false },
+    phoneNumber: {
+      key: 'phoneNumber',
+      title: 'Phone number',
+      export: true,
+      forceToolsMode: 'none',
+      headerProps: { style: { display: 'none' } },
+      cellProps: { style: { display: 'none' } },
+      getRowVal: s => s.phoneNumber,
+    },
     studentnumber: {
       key: 'studentnumber',
       title: 'Student number',
@@ -919,7 +928,7 @@ const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
   }
   if (populations?.query?.studyRights?.combinedProgramme && variant === 'population')
     columnsByVariant[variant].push('endDateSecondPhase')
-  const baseColumns = ['credits', 'credits.all', 'studentnumber', 'tags', 'updatedAt', 'option']
+  const baseColumns = ['credits', 'credits.all', 'studentnumber', 'tags', 'updatedAt', 'option', 'phoneNumber']
   const nameColumnsToAdd = namesVisible ? ['email', 'lastname', 'firstname'] : []
   const adminColumnsToFilter = isAdmin ? [] : ['priority', 'extent', 'updatedAt']
 
