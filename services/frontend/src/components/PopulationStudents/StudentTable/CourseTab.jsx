@@ -293,7 +293,10 @@ const CoursesTable = ({ students, studyGuidanceCourses }) => {
 // be rendered differently also here: TODO: refactor things nicely
 const StudyGuidanceGroupCoursesTabContainer = ({ students, group }) => {
   const groupStudentNumbers = group?.members?.map(({ personStudentNumber }) => personStudentNumber) || []
-  const populationsCourses = useGetStudyGuidanceGroupPopulationCoursesQuery(groupStudentNumbers).data
+  const populationsCourses = useGetStudyGuidanceGroupPopulationCoursesQuery({
+    studentnumberlist: groupStudentNumbers,
+    year: group?.tags?.year,
+  }).data
   if (populationsCourses.pending) return null
   return <CoursesTable students={students} studyGuidanceCourses={populationsCourses} />
 }

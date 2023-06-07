@@ -1327,7 +1327,6 @@ const bottlenecksOf = async (query, studentnumberlist, encryptdata = false) => {
     if (!stats[maincourse.code]) {
       stats[maincourse.code] = new CourseStatsCounter(maincourse.code, maincourse.name, allstudentslength)
     }
-
     const coursestats = stats[maincourse.code]
     coursestats.addCourseType(course_type.coursetypecode, course_type.name)
     coursestats.addCourseSubstitutions(course.substitutions)
