@@ -688,6 +688,7 @@ const GeneralTab = ({
       key: 'semesterEnrollmentsAmount',
       title: 'Semesters present amount',
       export: true,
+      forceToolsMode: 'none',
       headerProps: { style: { display: 'none' } },
       cellProps: { style: { display: 'none' } },
       getRowVal: s => (s.semesterenrollments ? s.semesterenrollments.filter(e => e.enrollmenttype === 1).length : 0),
