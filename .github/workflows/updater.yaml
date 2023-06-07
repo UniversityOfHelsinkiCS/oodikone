@@ -1,11 +1,11 @@
-name: 'Test and release Updater to staging'
+name: 'Test and release Updater'
 
 on:
   push:
     branches:
       - master
     paths:
-      - '.github/workflows/updater-staging.yaml'
+      - '.github/workflows/updater.yaml'
       - 'updater/sis-updater-worker/**'
       - 'updater/sis-updater-scheduler/**'
 
@@ -22,7 +22,7 @@ jobs:
           context: updater/sis-updater-worker/
           push: false
           outputs: type=docker,dest=/tmp/worker.tar
-          tags: toska/sis-updater-worker:staging
+          tags: toska/sis-updater-worker:latest
       - name: 'Store built image'
         uses: actions/upload-artifact@v3
         with:
@@ -40,7 +40,7 @@ jobs:
           context: updater/sis-updater-scheduler/
           push: false
           outputs: type=docker,dest=/tmp/scheduler.tar
-          tags: toska/sis-updater-scheduler:staging
+          tags: toska/sis-updater-scheduler:latest
       - name: 'Store built image'
         uses: actions/upload-artifact@v3
         with:
@@ -109,7 +109,7 @@ jobs:
         uses: redhat-actions/buildah-build@v2
         with:
           image: updater-worker
-          tags: staging ${{ github.sha }}
+          tags: staging production ${{ github.sha }}
           context: updater/sis-updater-worker
           containerfiles: |
             updater/sis-updater-worker/Dockerfile
@@ -136,7 +136,7 @@ jobs:
         uses: redhat-actions/buildah-build@v2
         with:
           image: updater-scheduler
-          tags: staging ${{ github.sha }}
+          tags: staging production ${{ github.sha }}
           context: updater/sis-updater-scheduler
           containerfiles: |
             updater/sis-updater-scheduler/Dockerfile
@@ -164,5 +164,5 @@ jobs:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
           message-type: deployment
           softa-url: https://toska-staging.cs.helsinki.fi/oodikone
-          deployment-target: staging
+          deployment-target: production
           softa-to-deploy: sis-updater
