@@ -2,19 +2,19 @@ import React from 'react'
 import { Form, Radio } from 'semantic-ui-react'
 import createFilter from './createFilter'
 
-const GraduatedFromProgrammeFilterCard = ({ options, onOptionsChange, isCombinedExtent }) => {
+const GraduatedFromProgrammeFilterCard = ({ options, onOptionsChange, isCombinedExtent, isLicentiate }) => {
   const { mode } = options
-
+  const typeOfCombined = isLicentiate ? 'Licentiate' : 'Master'
   const modeOptions = isCombinedExtent
     ? [
-        { key: 'not-graduated-bachelor', text: `Not graduated with Bachelor's`, value: 0 },
-        { key: 'not-graduated-master', text: `Not graduated with Master's`, value: -1 },
         { key: 'graduated-bachelor', text: `Graduated with Bachelor's`, value: 1 },
-        { key: 'graduated-master', text: `Graduated with Master's`, value: 2 },
+        { key: 'graduated-master', text: `Graduated with ${typeOfCombined}'s`, value: 2 },
+        { key: 'not-graduated-bachelor', text: `Not graduated with Bachelor's`, value: 0 },
+        { key: 'not-graduated-master', text: `Not graduated with ${typeOfCombined}'s`, value: -1 },
       ]
     : [
-        { key: 'graduated-false', text: `Not Graduated`, value: 0 },
         { key: 'graduated-true', text: `Graduated`, value: 1 },
+        { key: 'graduated-false', text: `Not graduated`, value: 0 },
       ]
 
   return (
@@ -56,6 +56,7 @@ export default createFilter({
 
   precompute: ({ args }) => ({
     isCombinedExtent: args.code && (!args.code.includes('_') || args.combinedProgrammeCode),
+    isLicentiate: args.combinedProgrammeCode === 'MH90_001',
   }),
 
   isActive: ({ mode }) => mode !== null,
@@ -82,6 +83,10 @@ export default createFilter({
   },
 
   render: (props, { precomputed }) => (
-    <GraduatedFromProgrammeFilterCard {...props} isCombinedExtent={precomputed.isCombinedExtent} />
+    <GraduatedFromProgrammeFilterCard
+      {...props}
+      isCombinedExtent={precomputed.isCombinedExtent}
+      isLicentiate={precomputed.isLicentiate}
+    />
   ),
 })
