@@ -33,6 +33,7 @@ const GeneralTab = ({
   filteredStudents,
   from,
   to,
+  year,
 }) => {
   const { language } = useLanguage()
   const { useFilterSelector } = useFilters()
@@ -41,9 +42,10 @@ const GeneralTab = ({
   const { data: semesterData } = useGetSemestersQuery()
   const allSemesters = semesterData?.semesters ? Object.entries(semesterData.semesters).map(item => item[1]) : []
   const allSemestersMap = allSemesters.reduce((obj, cur, index) => {
-    obj[index] = cur
+    obj[index + 1] = cur
     return obj
   }, {})
+
   const fromSemester = from
     ? Object.values(semesterData.semesters)
         .filter(({ startdate }) => new Date(startdate) <= new Date(from))
@@ -161,31 +163,37 @@ const GeneralTab = ({
 
   const currentSemesterCode = (() => {
     const now = new Date()
-    const isSpring = now.getMonth() > 7
+    const isSpring = now.getMonth() <= 7
     return allSemesters.find(sem => sem.name.en === `${isSpring ? 'Spring' : 'Autumn'} ${new Date().getFullYear()}`)
       ?.semestercode
   })()
 
-  const getFirstAndLastSemester = () => {
-    const { first, last } = filteredStudents.reduce(
-      ({ first, last }, student) => {
-        if (!student.semesterenrollments) return { first: 9999, last: 0 }
-        const newFirst = Math.min(first, ...student.semesterenrollments.map(e => e.semestercode))
-        const newLast = Math.max(last, ...student.semesterenrollments.map(e => e.semestercode))
-        return { first: newFirst, last: newLast }
-      },
-      { first: 9999, last: 0 }
-    )
+  const isFall = semester => semester % 2 === 1
 
-    if (group?.tags?.year) {
+  const getFirstAndLastSemester = () => {
+    const associatedYear = group?.tags?.year || (year !== 'All' && year)
+    if (associatedYear) {
       return {
         first: allSemesters.find(
-          semester => `${semester.yearcode + 1949}` === group.tags.year && semester.semestercode % 2 === 1
+          semester => `${semester.yearcode + 1949}` === associatedYear && isFall(semester.semestercode)
         )?.semestercode,
-        last: Math.min(currentSemesterCode, last),
+        last: isFall(currentSemesterCode) ? currentSemesterCode + 1 : currentSemesterCode,
       }
     }
-    return { first: last - first > 14 ? last - 13 : first, last: Math.min(currentSemesterCode, last) }
+
+    const { first } = filteredStudents.reduce(
+      ({ first }, student) => {
+        if (!student.semesterenrollments) return { first: 9999, last: 0 }
+        const newFirst = Math.min(first, ...student.semesterenrollments.map(e => e.semestercode))
+        return { first: isFall(newFirst) ? newFirst : newFirst - 1 }
+      },
+      { first: 9999 }
+    )
+    const last = isFall(currentSemesterCode) ? currentSemesterCode - 2 : currentSemesterCode
+    return {
+      first: last - first > 14 ? last - 13 : first,
+      last,
+    }
   }
 
   const { first: firstSemester, last: lastSemester } =
@@ -694,6 +702,7 @@ const GeneralTab = ({
     semesterEnrollments: {
       key: 'semesterEnrollments',
       title: 'Semesters\npresent',
+      filterType: 'range',
       getRowContent: s => getSemesterEnrollmentsContent(s),
       cellProps: s => getSemesterEnrollmentsProps(s),
       getRowVal: s => s.semesterenrollments?.filter(e => e.enrollmenttype === 1).length ?? 0,

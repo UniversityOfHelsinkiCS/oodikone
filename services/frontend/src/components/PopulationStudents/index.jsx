@@ -39,6 +39,7 @@ const Panes = ({
   to,
   criteria,
   months,
+  year,
 }) => {
   const { handleTabChange } = useTabChangeAnalytics(
     ANALYTICS_CATEGORIES.populationStudents,
@@ -59,6 +60,7 @@ const Panes = ({
             studyGuidanceGroup={studyGuidanceGroup}
             from={from}
             to={to}
+            year={year}
           />
         </Tab.Pane>
       ),
@@ -159,6 +161,7 @@ const PopulationStudents = ({
   from,
   to,
   criteria,
+  year,
 }) => {
   const [state, setState] = useState({})
   const studentRef = useRef()
@@ -214,6 +217,7 @@ const PopulationStudents = ({
         from={from}
         to={to}
         months={months}
+        year={year}
       />
     </>
   )
