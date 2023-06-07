@@ -156,29 +156,6 @@ const GeneralTab = ({
     return studentTags.join(', ')
   }
 
-  const getStudentsProgrammeNames = s => {
-    const programmes = getAllProgrammesOfStudent(
-      s.studyrights,
-      s.studentNumber,
-      studentToTargetCourseDateMap,
-      populationStatistics.elementdetails.data
-    )
-    if (programmes[0].code !== '00000' || !s.enrollments) {
-      return programmes.map(prog => getTextIn(prog.name, language))
-    }
-    const filteredEnrollments = s.enrollments
-      // eslint-disable-next-line camelcase
-      .filter(({ course_code }) => coursecode.includes(course_code))
-      .sort((a, b) => new Date(b.enrollment_date_time) - new Date(a.enrollment_date_time))
-    if (!filteredEnrollments.length) return programmes.map(prog => getTextIn(prog.name, language))
-    return getAllProgrammesOfStudent(
-      s.studyrights,
-      s.studentNumber,
-      { [s.studentNumber]: filteredEnrollments[0].enrollment_date_time },
-      populationStatistics.elementdetails.data
-    ).map(prog => getTextIn(prog.name, language))
-  }
-
   const { first: firstSemester, last: lastSemester } = filteredStudents.reduce(
     ({ first, last }, student) => {
       if (!student.semesterenrollments) return { first: 9999, last: 0 }
@@ -251,6 +228,72 @@ const GeneralTab = ({
       studyright.studyright_elements.some(e => e.code === combinedProgrammeCode)
     )
     res[sn] = targetStudyright && targetStudyright.graduated === 1 ? targetStudyright.enddate : null
+    return res
+  }, {})
+
+  const getProgrammesAtTimeOfCourse = student => {
+    const filteredEnrollments = student.enrollments
+      // eslint-disable-next-line camelcase
+      .filter(({ course_code }) => coursecode.includes(course_code))
+      .sort((a, b) => new Date(b.enrollment_date_time) - new Date(a.enrollment_date_time))
+    if (!filteredEnrollments.length) return null
+    return getAllProgrammesOfStudent(
+      student.studyrights,
+      student.studentNumber,
+      { [student.studentNumber]: filteredEnrollments[0].enrollment_date_time },
+      populationStatistics.elementdetails.data
+    )
+  }
+
+  const getProgrammeNames = (student, programmes) => {
+    if (programmes[0].code !== '00000' || !student.enrollments) {
+      return programmes.map(prog => getTextIn(prog.name, language))
+    }
+    const programmesAtTimeOfCourse = getProgrammesAtTimeOfCourse(student)?.map(prog => getTextIn(prog.name, language))
+    if (!programmesAtTimeOfCourse || programmesAtTimeOfCourse.length === 0) {
+      return getTextIn({ en: 'No programme at time of course enrollment', fi: 'Ei ohjelmaa ilmoittautumisen hetkellä' })
+    }
+    return programmesAtTimeOfCourse
+  }
+
+  const getProgrammeToShow = (student, programmes) => {
+    // For course statistics (student.enrollments exists) show newest programme at the time of course enrollment
+    // For other views: If programme associated, show that programme, if does exist or no programme associated, show newest.
+    if (!programmes)
+      return { en: 'No programme at time of course enrollment', fi: 'Ei ohjelmaa ilmoittautumisen hetkellä' }
+    if (programmeCode) {
+      const associatedProgramme = programmes.find(p => p.code === programmeCode)?.name
+      if (associatedProgramme) return associatedProgramme
+    }
+    return getTextIn(mainProgramme(student.studyrights, student.studentNumber), language)
+  }
+
+  const studentProgrammesMap = selectedStudents.reduce((res, sn) => {
+    res[sn] = {
+      programmes: getAllProgrammesOfStudent(
+        students[sn].studyrights,
+        sn,
+        studentToTargetCourseDateMap,
+        populationStatistics.elementdetails.data
+      ),
+    }
+
+    const programmeToShow = getProgrammeToShow(students[sn], res[sn].programmes)
+    if (programmeToShow) res[sn].programmeToShow = getTextIn(programmeToShow, language)
+
+    res[sn].programmeNames = getProgrammeNames(students[sn], res[sn].programmes)
+    res[sn].getProgrammesList = delimiter =>
+      res[sn].programmes
+        .map(p => {
+          if (p.graduated) {
+            return `${getTextIn(p.name, language)} (graduated)`
+          }
+          if (!p.active) {
+            return `${getTextIn(p.name, language)} (inactive)`
+          }
+          return getTextIn(p.name, language)
+        })
+        .join(delimiter)
     return res
   }, {})
 
@@ -505,6 +548,19 @@ const GeneralTab = ({
     }
   }
 
+  const getStudyProgrammeContent = s => {
+    const programme = studentProgrammesMap[s.studentNumber]?.programmeToShow
+    if (!programme) return 'No programme'
+    if (studentProgrammesMap[s.studentNumber]?.programmeNames.length > 1) {
+      return (
+        <div>
+          {programme} <Icon name="plus square outline" color="grey" size="large" />
+        </div>
+      )
+    }
+    return programme
+  }
+
   // All columns components user is able to use
   const columnsAvailable = {
     lastname: { key: 'lastname', title: 'Last name', getRowVal: s => s.lastname, export: false },
@@ -572,21 +628,12 @@ const GeneralTab = ({
     programme: {
       key: 'programme',
       title: 'Study programmes',
-      getRowContent: s => {
-        const programme = getTextIn(mainProgramme(s.studyrights, s.studentNumber, s.enrollments)?.name, language)
-        if (!programme) return 'No programme'
-        if (getStudentsProgrammeNames(s).length > 1) {
-          return (
-            <div>
-              {programme} <Icon name="plus square outline" color="grey" size="large" />
-            </div>
-          )
-        }
-        return programme
+      getRowContent: s => getStudyProgrammeContent(s),
+      getRowVal: s => {
+        return studentProgrammesMap[s.studentNumber]?.getProgrammesList('; ')
       },
-      getRowVal: s => getStudentsProgrammeNames(s).join('; '),
       cellProps: s => {
-        return { title: getStudentsProgrammeNames(s).join('\n') }
+        return { title: studentProgrammesMap[s.studentNumber]?.getProgrammesList('\n') }
       },
     },
     semesterEnrollments: {
