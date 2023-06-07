@@ -68,7 +68,7 @@ const PopulationStatistics = () => {
       language,
     }),
     studyTrackFilter({ code: programmeCode }),
-    studyrightStatusFilter({ code: programmeCode }),
+    studyrightStatusFilter({ code: programmeCode, combinedProgrammeCode }),
   ]
 
   // For combined programme admission type is the same as they started in bachelor programme
