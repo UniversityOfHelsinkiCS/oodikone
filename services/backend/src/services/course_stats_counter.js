@@ -59,7 +59,6 @@ class CourseStatsCounter {
       passingSemesters[fall[i]] = initialValue
       passingSemesters[spring[i]] = initialValue
     }
-
     return passingSemesters
   }
 
@@ -214,7 +213,6 @@ class CourseStatsCounter {
     stats.totalStudents = stats.students
     stats.totalEnrolledNoGrade = lengthOf(fileredEnrolledNoGrade)
     stats.percentageWithEnrollments = percentageOf(stats.passed, stats.totalStudents)
-
     return {
       stats,
       students,

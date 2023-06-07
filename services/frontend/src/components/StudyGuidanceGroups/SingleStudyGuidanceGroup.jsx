@@ -59,9 +59,10 @@ const SingleStudyGroupContent = ({ filteredStudents, population, group, language
     programmeCode: group?.tags?.studyProgramme ? group?.tags?.studyProgramme : '',
   }).data
 
-  const { data: courses, isLoading: coursesAreLoading } = useGetStudyGuidanceGroupPopulationCoursesQuery(
-    _.map(filteredStudents, 'studentNumber')
-  )
+  const { data: courses, isLoading: coursesAreLoading } = useGetStudyGuidanceGroupPopulationCoursesQuery({
+    studentnumberlist: _.map(filteredStudents, 'studentNumber'),
+    year: group?.tags?.year,
+  })
 
   const creditDateFilterActive = useFilterSelector(creditDateFilter.selectors.isActive)
   const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive)
@@ -320,8 +321,10 @@ const SingleStudyGuidanceGroupContainer = ({ group }) => {
   const studyProgrammes = useFilteredAndFormattedElementDetails(language)
   const { tags } = group
   const { data, isLoading } = useGetStudyGuidanceGroupPopulationQuery({ studentnumberlist: groupStudentNumbers, tags })
-  const { data: courses, isLoading: coursesAreLoading } =
-    useGetStudyGuidanceGroupPopulationCoursesQuery(groupStudentNumbers)
+  const { data: courses, isLoading: coursesAreLoading } = useGetStudyGuidanceGroupPopulationCoursesQuery({
+    studentnumberlist: groupStudentNumbers,
+    year: group?.tags?.year,
+  })
 
   if (!group) {
     return (
