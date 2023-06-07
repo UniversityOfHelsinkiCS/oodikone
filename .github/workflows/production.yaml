@@ -47,7 +47,7 @@ jobs:
         uses: redhat-actions/buildah-build@v2
         with:
           image: oodikone-backend
-          tags: staging ${{ github.sha }}
+          tags: production ${{ github.sha }}
           context: services/backend
           containerfiles: |
             services/backend/Dockerfile
