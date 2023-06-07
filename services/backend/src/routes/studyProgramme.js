@@ -36,7 +36,7 @@ router.get('/v2/studyprogrammes/:id/basicstats', async (req, res) => {
       includeAllSpecials: specialGroups === 'SPECIAL_INCLUDED',
     },
   })
-  if (updated) await setBasicStats(updated, combinedProgramme, yearType, specialGroups)
+  if (updated) await setBasicStats(updated, yearType, specialGroups)
   return res.json(updated)
 })
 
