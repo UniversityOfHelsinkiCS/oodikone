@@ -6,8 +6,6 @@ import { useTitle } from '../../common/hooks'
 const Updater = () => {
   const [messages, setMessages] = useState([])
   const [SISNums, setSISNums] = useState('')
-  const [SISProgrammeName, setSISProgrammeName] = useState('')
-  const [SISProgrammeYear, setSISProgrammeYear] = useState('')
   const [SISCourses, setSISCourses] = useState('')
   useTitle('Updater')
 
@@ -24,11 +22,6 @@ const Updater = () => {
   const updateSISStudents = () => apiCall('/updater/update/v2/students', 'get')
   const updateSISProgrammes = () => apiCall('/updater/update/v2/programmes')
   const updateSISPopulationStudents = () => apiCall('/updater/update/v2/students', 'post', SISNums.trim().split('\n'))
-  const updateSISPopulationStudentsByProgramme = () =>
-    apiCall('/updater/update/v2/students_by_programme', 'post', {
-      programme: SISProgrammeName.trim(),
-      year: Number(SISProgrammeYear.trim()),
-    })
   const refreshStatisticsV2 = () => apiCall('/updater/refresh_statistic_v2', 'post')
   const abortSisUpdater = () => apiCall('/updater/abort', 'get')
   const refreshSISRedisCache = () => apiCall('/updater/refresh_redis_cache', 'get')
@@ -57,29 +50,6 @@ const Updater = () => {
           <Form.Button
             onClick={updateSISPopulationStudents}
             content="Update students by student number"
-            icon="refresh"
-          />
-        </Form.Group>
-        <Form.Group>
-          <Form.Input
-            placeholder="programme"
-            fluid
-            name="programme"
-            value={SISProgrammeName}
-            onChange={(_, { value }) => setSISProgrammeName(value)}
-            style={{ marginBottom: 10 }}
-          />
-          <Form.Input
-            fluid
-            placeholder="year"
-            name="year"
-            value={SISProgrammeYear}
-            onChange={(_, { value }) => setSISProgrammeYear(value)}
-            style={{ marginBottom: 10 }}
-          />
-          <Form.Button
-            onClick={updateSISPopulationStudentsByProgramme}
-            content="Update all students by programme & year"
             icon="refresh"
           />
         </Form.Group>
