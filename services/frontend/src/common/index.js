@@ -305,6 +305,8 @@ export const getAllProgrammesOfStudent = (studyrights, studentNumber, studentToT
         startdate: newestStudyrightElement.startdate,
         code: newestStudyrightElement.code,
         facultyCode,
+        graduated: sr.graduated,
+        active: sr.active,
       })
     }
   })
