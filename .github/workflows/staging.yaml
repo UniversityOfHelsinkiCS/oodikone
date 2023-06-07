@@ -4,6 +4,17 @@ on:
   push:
     branches:
       - master
+    paths:
+      - '.github/workflows/test.yaml'
+      - '.github/workflows/staging.yaml'
+      - '.github/actions/**'
+      - 'cypress/**'
+      - 'cypress.config.json'
+      - 'services/**'
+      - '!services/backend/src/rapodiff.js'
+      - 'docker-compose.ci.yml'
+      - 'package*.json'
+      - 'updater/sis-updater-worker/src/db/migrations/**'
 
 jobs:
   test:
