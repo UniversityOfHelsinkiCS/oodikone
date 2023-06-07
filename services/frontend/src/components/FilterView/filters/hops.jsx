@@ -8,7 +8,7 @@ import creditDateFilter, { selectedStartDate } from './date'
 const HopsFilterCard = ({ options, onOptionsChange, combinedProgramme }) => {
   const { filterDispatch, useFilterSelector } = useFilters()
   const selectedCreditStartDate = useFilterSelector(selectedStartDate(''))
-
+  const typeOfCombined = combinedProgramme === 'MH90_001' ? 'Licentiate' : 'Master'
   return (
     <div>
       <div
@@ -19,7 +19,7 @@ const HopsFilterCard = ({ options, onOptionsChange, combinedProgramme }) => {
             options.studyStart &&
             options.clearCreditDate &&
             new Date(selectedCreditStartDate) > new Date(options.studyStart) &&
-            !options.activeDefaultProgramme
+            !options.activeProgramme
           )
             filterDispatch(
               creditDateFilter.actions.setOptions({
@@ -29,15 +29,15 @@ const HopsFilterCard = ({ options, onOptionsChange, combinedProgramme }) => {
             )
           onOptionsChange({
             ...options,
-            activeDefaultProgramme: !options.activeDefaultProgramme,
+            activeProgramme: !options.activeProgramme,
             activeCombinedProgramme: false,
             combinedIsSelected: 'default',
           })
         }}
       >
-        <Radio style={{ width: '3.5rem', flexShrink: 0 }} toggle checked={options.activeDefaultProgramme} />
+        <Radio style={{ width: '3.5rem', flexShrink: 0 }} toggle checked={options.activeProgramme} />
         {combinedProgramme ? (
-          <div>Show only credits included in bachelor study plan</div>
+          <div>Show only credits included in Bachelor study plan</div>
         ) : (
           <div>Show only credits included in study plan</div>
         )}
@@ -62,13 +62,13 @@ const HopsFilterCard = ({ options, onOptionsChange, combinedProgramme }) => {
             onOptionsChange({
               ...options,
               activeCombinedProgramme: !options.activeCombinedProgramme,
-              activeDefaultProgramme: false,
+              activeProgramme: false,
               combinedIsSelected: combinedProgramme,
             })
           }}
         >
           <Radio style={{ width: '3.5rem', flexShrink: 0 }} toggle checked={options.activeCombinedProgramme} />
-          <div>Show only credits included in licentiate study plan</div>
+          <div>Show only credits included in {typeOfCombined} study plan</div>
         </div>
       )}
       {options.studyStart ? (
@@ -82,7 +82,7 @@ const HopsFilterCard = ({ options, onOptionsChange, combinedProgramme }) => {
               })
             )
           }
-          disabled={!options.activeDefaultProgramme && !options.activeCombinedProgramme}
+          disabled={!options.activeProgramme && !options.activeCombinedProgramme}
           className="credit-date-filter-input"
           size="mini"
           style={{
@@ -103,7 +103,7 @@ export default createFilter({
   priority: -200,
 
   defaultOptions: {
-    activeDefaultProgramme: false,
+    activeProgramme: false,
     activeCombinedProgramme: false,
     combinedIsSelected: 'default',
   },
@@ -112,9 +112,9 @@ export default createFilter({
     return args.combinedProgrammeCode
   },
 
-  isActive: arg => arg?.activeDefaultProgramme || arg?.activeCombinedProgramme,
+  isActive: arg => arg?.activeProgramme || arg?.activeCombinedProgramme,
 
-  filter: (student, { activeDefaultProgramme, activeCombinedProgramme }, { args }) => {
+  filter: (student, { activeProgramme, activeCombinedProgramme }, { args }) => {
     const { studyrightStart, studyplans } = student
     const studyrightStartDate = new Date(studyrightStart)
     const studyrights = student.studyrights.filter(sr => !sr.cancelled)?.map(sr => sr.studyrightid)
@@ -123,7 +123,7 @@ export default createFilter({
       plan => plan.programme_code === chosenProgrammeCode && studyrights.includes(plan.studyrightid)
     )
 
-    if (activeDefaultProgramme || activeCombinedProgramme) {
+    if (activeProgramme || activeCombinedProgramme) {
       if (!hops) {
         student.courses = []
         student.credits = 0
@@ -148,17 +148,18 @@ export default createFilter({
 
   actions: {
     toggle: options => {
-      options.activeDefaultProgramme = !options.activeDefaultProgramme
+      options.activeProgramme = !options.activeProgramme
       options.activeCombinedProgramme = false
       options.combinedIsSelected = 'default'
     },
     toggleCombinedProgramme: (options, combinedProgrammeCode) => {
-      options.activeDefaultProgramme = false
+      options.activeProgramme = false
       options.activeCombinedProgramme = !options.activeCombinedProgramme
       options.combinedIsSelected = combinedProgrammeCode
     },
   },
 
-  render: (props, { precomputed }) => <HopsFilterCard {...props} combinedProgramme={precomputed} />,
   component: HopsFilterCard,
+
+  render: (props, { precomputed }) => <HopsFilterCard {...props} combinedProgramme={precomputed} />,
 })
