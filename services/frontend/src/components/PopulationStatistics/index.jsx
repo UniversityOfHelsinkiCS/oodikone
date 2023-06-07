@@ -142,7 +142,7 @@ const PopulationStatistics = () => {
           </Header>
 
           <Segment className="contentSegment">
-            <PopulationSearch history={history} location={location} combinedProgramme={combinedProgrammeCode} />
+            <PopulationSearch history={history} location={location} combinedProgrammeCode={combinedProgrammeCode} />
             {location.search !== '' ? (
               <PopulationDetails
                 queryIsSet={queryIsSet}
