@@ -168,6 +168,7 @@ const associatedStudyrightElements = async (offset, limit) => {
     },
     limit,
     offset,
+    subQuery: false, // Do not include sub queries to count towards the limit
   })
   const groupings = studyrights.map(({ studyright_elements: sres }) =>
     sres.map(sre => ({
