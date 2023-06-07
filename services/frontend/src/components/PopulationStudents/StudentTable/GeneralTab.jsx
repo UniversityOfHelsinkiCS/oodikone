@@ -670,6 +670,12 @@ const GeneralTab = ({
         return { title: studentProgrammesMap[s.studentNumber]?.getProgrammesList('\n') }
       },
     },
+    startYear: {
+      key: 'startYear',
+      title: 'Start year\nat uni',
+      filterType: 'range',
+      getRowVal: s => getStarted(s),
+    },
     semesterEnrollments: {
       key: 'semesterEnrollments',
       title: 'Semesters\npresent',
@@ -715,12 +721,7 @@ const GeneralTab = ({
         return language
       },
     },
-    startYear: {
-      key: 'startYear',
-      title: 'Start year\nat uni',
-      filterType: 'range',
-      getRowVal: s => getStarted(s),
-    },
+
     option: containsOption && {
       key: 'option',
       title: cleanedQueryStudyrights.some(code => code.startsWith('MH')) ? 'Bachelor' : 'Master',
