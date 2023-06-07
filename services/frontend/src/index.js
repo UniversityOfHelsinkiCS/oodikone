@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
-import { Router } from 'react-router-dom'
+import { BrowserRouter } from 'react-router-dom'
 import { createBrowserHistory } from 'history'
 import TSA from './common/tsa'
 import 'semantic-ui-css/semantic.min.css'
@@ -21,11 +21,11 @@ const history = TSA.Matomo.connectToHistory(createBrowserHistory())
 ReactDOM.render(
   <Provider store={store}>
     <CommonContext>
-      <Router basename={basePath} history={history}>
+      <BrowserRouter basename={basePath} history={history}>
         <ErrorBoundary>
           <App />
         </ErrorBoundary>
-      </Router>
+      </BrowserRouter>
     </CommonContext>
   </Provider>,
   document.getElementById('root')
