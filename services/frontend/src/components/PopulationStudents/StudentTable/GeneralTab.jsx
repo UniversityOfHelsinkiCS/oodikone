@@ -684,6 +684,14 @@ const GeneralTab = ({
       getRowVal: s => s.semesterenrollments?.filter(e => e.enrollmenttype === 1).length ?? 0,
       getRowExportVal: s => getSemesterEnrollmentsForExcel(s),
     },
+    semesterEnrollmentsAmount: {
+      key: 'semesterEnrollmentsAmount',
+      title: 'Semesters present amount',
+      export: true,
+      headerProps: { style: { display: 'none' } },
+      cellProps: { style: { display: 'none' } },
+      getRowVal: s => (s.semesterenrollments ? s.semesterenrollments.filter(e => e.enrollmenttype === 1).length : 0),
+    },
     transferredFrom: {
       key: 'transferredFrom',
       title: 'Transferred\nfrom',
@@ -865,7 +873,8 @@ const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
         'studyStartDate',
         'studyStartDateActual',
         'endDate',
-        'semesterEnrollments'
+        'semesterEnrollments',
+        'semesterEnrollmentsAmount'
       )
     if (studyGuidanceGroup?.tags?.studyProgramme && studyGuidanceGroup?.tags?.year) {
       cols.push('admissionType')
@@ -891,6 +900,7 @@ const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
       'priority',
       'extent',
       'semesterEnrollments',
+      'semesterEnrollmentsAmount',
       'studyrightStart',
       'studyStartDate',
       'studyStartDateActual',
