@@ -44,16 +44,22 @@ app.use(auth)
 
 app.get('/v1/meta', async (_, res) => {
   await scheduleMeta()
+
+  logger.info('Scheduled meta')
   res.locals.msg('Scheduled meta')
 })
 
 app.get('/v1/students', async (_, res) => {
   await scheduleStudents()
+
+  logger.info('Scheduled students')
   res.locals.msg('Scheduled students')
 })
 
 app.get('/v1/programmes', async (_, res) => {
   await scheduleProgrammes()
+
+  logger.info('Scheduled programmes')
   res.locals.msg('Scheduled programmes')
 })
 
@@ -61,6 +67,7 @@ app.post('/v1/students', async (req, res) => {
   const studentnumbers = req.body.studentnumbers.map(n => (n[0] === '0' ? n : `0${n}`))
 
   logger.info(JSON.stringify(studentnumbers))
+  logger.info('Scheduling studentnumbers')
 
   await scheduleByStudentNumbers(studentnumbers)
   res.locals.msg('Scheduled studentnumbers')
@@ -72,6 +79,7 @@ app.get('/v1/rediscache', async (req, res) => {
       return res.locals.msg('Error sending reloading msg?')
     }
 
+    logger.info('Scheduled redis cache reloading')
     res.locals.msg('Scheduled redis cache reloading')
   })
 })
@@ -82,6 +90,7 @@ app.get('/v1/abort', async (req, res) => {
       return res.locals.msg('Error sending abort msg?')
     }
 
+    logger.info('Abort message sent')
     res.locals.msg('Abort message sent')
   })
 })
@@ -108,6 +117,8 @@ app.get('/v1/courses/:code', async (req, res) => {
 
 app.post('/v1/courses', async (req, res) => {
   await scheduleByCourseCodes(req.body.coursecodes)
+
+  logger.info('Scheduled courses')
   res.locals.msg('Scheduled courses')
 })
 
