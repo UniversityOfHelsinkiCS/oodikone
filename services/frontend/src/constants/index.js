@@ -190,6 +190,7 @@ export const CHART_COLORS = [
 export const PRIORITYCODE_TEXTS = {
   1: 'Main',
   2: 'Secondary',
+  6: 'Option',
   30: 'Graduated',
 }
 
