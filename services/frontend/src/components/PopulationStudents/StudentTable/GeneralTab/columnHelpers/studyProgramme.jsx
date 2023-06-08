@@ -104,7 +104,7 @@ const getStudyProgrammeFunctions = ({
       return reformatDate(studentToProgrammeStartMap[s.studentNumber], 'YYYY-MM-DD')
     }
 
-    const programme = studentProgrammesMap[s.studentNumber].programmes[0]
+    const programme = studentProgrammesMap[s.studentNumber]?.programmes[0]
     if (programme?.startdate) {
       return reformatDate(programme.startdate, 'YYYY-MM-DD')
     }
