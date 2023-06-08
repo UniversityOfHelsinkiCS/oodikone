@@ -7,7 +7,7 @@ import StudentNameVisibilityToggle, { useStudentNameVisibility } from 'component
 import useLanguage from 'components/LanguagePicker/useLanguage'
 import RightsNotification from 'components/RightsNotification'
 import StudentInfoItem from 'components/common/StudentInfoItem'
-import { hiddenNameAndEmailForExcel } from 'common'
+import { hiddenNameAndEmailForExcel } from 'common/columns'
 import sendEvent from '../../common/sendEvent'
 
 const getColumns = (courses, showStudentNames, getTextIn) => {

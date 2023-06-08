@@ -7,8 +7,8 @@ import sendEvent from 'common/sendEvent'
 import { keyBy } from 'lodash'
 import moment from 'moment'
 import StudentInfoItem from 'components/common/StudentInfoItem'
-import useLanguage from '../../LanguagePicker/useLanguage'
-import '../../StudentStatistics/StudentInfoCard/studentInfoCard.css'
+import useLanguage from '../../../LanguagePicker/useLanguage'
+import '../../../StudentStatistics/StudentInfoCard/studentInfoCard.css'
 
 const sendAnalytics = sendEvent.populationStudents
 

@@ -190,45 +190,6 @@ export const getUnifyTextIn = unifyCourses => {
   }
 }
 
-export const hiddenNameAndEmailForExcel = [
-  {
-    key: 'hidden-lastname',
-    title: 'Last name',
-    forceToolsMode: 'none',
-    getRowVal: s => s.lastname,
-    headerProps: { style: { display: 'none' } },
-    cellProps: { style: { display: 'none' } },
-    export: true,
-  },
-  {
-    key: 'hidden-firstnames',
-    title: 'First names',
-    getRowVal: s => s.firstnames,
-    forceToolsMode: 'none',
-    headerProps: { style: { display: 'none' } },
-    cellProps: { style: { display: 'none' } },
-    export: true,
-  },
-  {
-    key: 'hidden-email',
-    title: 'E-mail',
-    getRowVal: s => s.email ?? '',
-    forceToolsMode: 'none',
-    headerProps: { style: { display: 'none' } },
-    cellProps: { style: { display: 'none' } },
-    export: true,
-  },
-  {
-    key: 'hidden-secondary-email',
-    title: 'Secondary E-mail',
-    getRowVal: s => s.secondaryEmail ?? '',
-    forceToolsMode: 'none',
-    headerProps: { style: { display: 'none' } },
-    cellProps: { style: { display: 'none' } },
-    export: true,
-  },
-]
-
 export const cancelablePromise = promise => {
   let hasCanceled = false
 
@@ -268,6 +229,7 @@ export const flattenStudyrights = (studyrights, programme) => {
   return studyrightcodes
 }
 
+// Gives students course completion date
 export const getStudentToTargetCourseDateMap = (students, codes) => {
   const codeSet = new Set(codes)
   return students.reduce((acc, student) => {
@@ -312,6 +274,7 @@ export const getAllProgrammesOfStudent = (studyrights, studentNumber, studentToT
   })
 
   studyprogrammes.sort((a, b) => new Date(b.startdate) - new Date(a.startdate))
+
   if (studyprogrammes.length > 0) {
     return studyprogrammes
   }
