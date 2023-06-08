@@ -6,7 +6,7 @@ import useLanguage from 'components/LanguagePicker/useLanguage'
 import '../../PopulationCourseStats/populationCourseStats.css'
 import { useGetStudyGuidanceGroupPopulationCoursesQuery } from 'redux/studyGuidanceGroups'
 import StudentInfoItem from 'components/common/StudentInfoItem'
-import { hiddenNameAndEmailForExcel } from 'common'
+import { hiddenNameAndEmailForExcel } from 'common/columns'
 import SortableTable, { row } from '../../SortableTable'
 import '../populationStudents.css'
 
