@@ -106,12 +106,15 @@ const getSemestersPresentFunctions = ({
             strokeLinecap="round"
             strokeLinejoin="round"
           />
+          {graduated === 2 && (
+            <path d="M 40 52.5 l 9 -12 l -9 -12 l -9 12 l 9 12" fill="rgb(97, 218, 255)" stroke="rgb(232, 116, 14)" />
+          )}
         </svg>
       )
 
       return (
         <div key={key} className={`enrollment-label-no-margin label-${type} ${isSpring ? 'margin-right' : ''}`}>
-          {graduated > 0 ? graduationCrown : null}
+          {graduated > 0 && graduationCrown}
         </div>
       )
     }
