@@ -1,5 +1,9 @@
+const os = require('os')
+
 const winston = require('winston')
-const { isDev } = require('../conf-backend')
+const { WinstonGelfTransporter } = require('winston-gelf-transporter')
+
+const { isDev, isProduction } = require('../conf-backend')
 const { combine, timestamp, printf, splat } = winston.format
 
 let transports = []
@@ -34,6 +38,22 @@ if (isDev) {
   )
 
   transports.push(new winston.transports.Console({ format: prodFormat }))
+
+  if (isProduction) {
+    transports.push(
+      new WinstonGelfTransporter({
+        handleExceptions: true,
+        host: 'toska-tmp.cs.helsinki.fi',
+        port: 9503,
+        protocol: 'udp',
+        hostName: os.hostname(),
+        additional: {
+          app: 'oodikone',
+          environment: 'production',
+        },
+      })
+    )
+  }
 }
 
 const logger = winston.createLogger({ transports })

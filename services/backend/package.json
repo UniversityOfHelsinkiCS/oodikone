@@ -28,7 +28,8 @@
     "umzug": "^2.3.0",
     "unfuck-utf8-headers-middleware": "^1.0.1",
     "uuid": "^3.4.0",
-    "winston": "^3.8.2"
+    "winston": "^3.8.2",
+    "winston-gelf-transporter": "^1.0.2"
   },
   "devDependencies": {
     "nodemon": "^1.19.4"
