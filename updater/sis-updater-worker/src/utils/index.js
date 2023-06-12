@@ -1,6 +1,6 @@
 const { maxBy } = require('lodash')
 
-const logger = require('./logger')
+const { logger } = require('./logger')
 
 const getLatestSnapshot = entities => {
   return maxBy(
