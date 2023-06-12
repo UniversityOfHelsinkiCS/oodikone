@@ -65,18 +65,24 @@ const getTableCell = ({ year, programme, valIdx, rowIdx, tableLinePlaces, value 
   )
 }
 
-const getOtherCountriesString = ({ year, code, extraTableStats }) => {
+const getOtherCountriesList = ({ year, code, extraTableStats }) => {
   if (
     !extraTableStats ||
     !extraTableStats[year] ||
     !extraTableStats[year][code] ||
     !extraTableStats[year][code]?.countries
   )
-    return ''
+    return <p>No data</p>
   const countriesData = extraTableStats[year][code].countries
   return Object.keys(countriesData)
     .sort()
-    .reduce((acc, key) => `${acc} | ${key}: ${countriesData[key]}`, '')
+    .map(key => (
+      <>
+        <p key={Math.random()} style={{ padding: 0, margin: 0 }}>
+          {key}: <b>{countriesData[key]}</b>
+        </p>
+      </>
+    ))
 }
 
 const getRows = ({
@@ -95,7 +101,7 @@ const getRows = ({
       return (
         <Popup
           key={`${valIdx}-${programme}-${idx}`}
-          content={getOtherCountriesString({ year, code: programmeNames[programme].code, extraTableStats }).slice(3)}
+          content={getOtherCountriesList({ year, code: programmeNames[programme].code, extraTableStats })}
           trigger={getTableCell({ year, programme, valIdx, rowIdx: idx, tableLinePlaces, value })}
         />
       )

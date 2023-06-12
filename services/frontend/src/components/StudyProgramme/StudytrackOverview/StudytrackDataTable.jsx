@@ -31,12 +31,17 @@ const getStyleForCombined = idx => {
 
 const createCountriesContent = ({ year, studyprogramme, otherCountriesStats }) => {
   if (!otherCountriesStats || !otherCountriesStats[studyprogramme] || !otherCountriesStats[studyprogramme][year])
-    return ''
-  return otherCountriesStats[studyprogramme][year]
-    ? Object.keys(otherCountriesStats[studyprogramme][year])
-        .sort()
-        .reduce((acc, res) => `${acc} | ${res}: ${otherCountriesStats[studyprogramme][year][res]}`, '')
-    : ''
+    return <p>No data</p>
+  const countriesData = otherCountriesStats[studyprogramme][year]
+  return Object.keys(countriesData)
+    .sort()
+    .map(key => (
+      <>
+        <p key={Math.random()} style={{ margin: 0 }}>
+          {key}: <b>{countriesData[key]}</b>
+        </p>
+      </>
+    ))
 }
 
 const getBasicTableCell = ({ row, value, combinedProgramme, index }) => {
