@@ -49,10 +49,10 @@ export default createFilter({
   title: 'Starting Year',
 
   defaultOptions: {
-    selected: null,
+    selected: [],
   },
 
-  isActive: ({ selected }) => selected !== null && selected.length > 0,
+  isActive: ({ selected }) => selected.length > 0,
 
   filter: (student, { selected }) => selected.includes(new Date(student.started).getFullYear()),
 
