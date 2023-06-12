@@ -23,6 +23,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Extract release version
+        id: extract_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
       - name: Build frontend image
         id: build-image
         uses: redhat-actions/buildah-build@v2
@@ -51,6 +55,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+
+      - name: Extract release version
+        id: extract_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: 'Get current time'
+        id: get_current_time
+        run: echo "NOW=$(date --iso-8601=seconds)" >> $GITHUB_OUTPUT
 
       - name: Build backend image
         id: build-image
