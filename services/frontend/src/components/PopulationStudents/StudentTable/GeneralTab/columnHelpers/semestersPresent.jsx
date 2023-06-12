@@ -17,6 +17,7 @@ const getSemestersPresentFunctions = ({
       getSemesterEnrollmentsContent: () => {},
       getSemesterEnrollmentsProps: () => {},
       getSemesterEnrollmentsForExcel: () => {},
+      getSemesterEnrollmentsVal: () => {},
     }
 
   const currentSemesterCode = (() => {
@@ -168,7 +169,19 @@ const getSemestersPresentFunctions = ({
     return enrollmentsString
   }
 
-  return { getSemesterEnrollmentsContent, getSemesterEnrollmentsProps, getSemesterEnrollmentsForExcel }
+  const getSemesterEnrollmentsVal = s =>
+    s.semesterenrollments?.reduce(
+      (prev, cur) =>
+        prev +
+        (cur.semestercode >= firstSemester && cur.semestercode <= lastSemester && cur.enrollmenttype === 1 ? 1 : 0),
+      0
+    ) ?? 0
+  return {
+    getSemesterEnrollmentsContent,
+    getSemesterEnrollmentsProps,
+    getSemesterEnrollmentsForExcel,
+    getSemesterEnrollmentsVal,
+  }
 }
 
 export default getSemestersPresentFunctions
