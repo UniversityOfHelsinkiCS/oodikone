@@ -4,6 +4,16 @@ on:
   push:
     branches:
       - master # Switch to on release
+    paths:
+      - '.github/workflows/test-oodikone.yaml'
+      - '.github/actions/**'
+      - 'cypress/**'
+      - 'cypress.config.json'
+      - 'services/**'
+      - '!services/backend/src/rapodiff.js'
+      - 'docker-compose.ci.yml'
+      - 'package*.json'
+      - 'updater/sis-updater-worker/src/db/migrations/**'
 
 jobs:
   release_frontend:
