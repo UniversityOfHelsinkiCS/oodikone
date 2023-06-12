@@ -262,16 +262,20 @@ const GeneralTab = ({ group, populations, columnKeysToInclude, coursecode, filte
   let creditsColumn = null
   const creditColumnKeys = columnKeysToInclude.filter(k => k.indexOf('credits.') === 0)
 
-  const { getSemesterEnrollmentsContent, getSemesterEnrollmentsProps, getSemesterEnrollmentsForExcel } =
-    getSemestersPresentFunctions({
-      filteredStudents,
-      language,
-      allSemesters,
-      allSemestersMap,
-      year,
-      studentToStudyrightEndMap,
-      studentToSecondStudyrightEndMap,
-    })
+  const {
+    getSemesterEnrollmentsContent,
+    getSemesterEnrollmentsProps,
+    getSemesterEnrollmentsForExcel,
+    getSemesterEnrollmentsVal,
+  } = getSemestersPresentFunctions({
+    filteredStudents,
+    language,
+    allSemesters,
+    allSemestersMap,
+    year,
+    studentToStudyrightEndMap,
+    studentToSecondStudyrightEndMap,
+  })
 
   const { getStudyProgrammeContent, studentProgrammesMap, getStudyStartDate } = getStudyProgrammeFunctions({
     selectedStudents,
@@ -426,7 +430,7 @@ const GeneralTab = ({ group, populations, columnKeysToInclude, coursecode, filte
       filterType: 'range',
       getRowContent: s => getSemesterEnrollmentsContent(s),
       cellProps: s => getSemesterEnrollmentsProps(s),
-      getRowVal: s => s.semesterenrollments?.filter(e => e.enrollmenttype === 1).length ?? 0,
+      getRowVal: s => getSemesterEnrollmentsVal(s),
       getRowExportVal: s => getSemesterEnrollmentsForExcel(s),
     },
     semesterEnrollmentsAmount: {
