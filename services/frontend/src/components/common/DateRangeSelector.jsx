@@ -3,25 +3,17 @@ import { Form } from 'semantic-ui-react'
 import DateTimeSelector from '../DateTimeSelector'
 
 const DateRangeSelector = ({ value, onChange, ...rest }) => {
+  const start = value ? value[0] : null
+  const end = value ? value[1] : null
   return (
     <Form style={{}}>
       <Form.Field>
         <label>Beginning:</label>
-        <DateTimeSelector
-          value={value?.[0]}
-          before={value?.[1]}
-          onChange={date => onChange([date, value?.[1]])}
-          {...rest}
-        />
+        <DateTimeSelector value={start} before={end} onChange={date => onChange([date, end])} {...rest} />
       </Form.Field>
       <Form.Field>
         <label>Ending:</label>
-        <DateTimeSelector
-          value={value?.[1]}
-          after={value?.[0]}
-          onChange={date => onChange([value?.[0], date])}
-          {...rest}
-        />
+        <DateTimeSelector value={end} after={start} onChange={date => onChange([start, date])} {...rest} />
       </Form.Field>
     </Form>
   )
