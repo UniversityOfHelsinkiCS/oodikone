@@ -16,17 +16,17 @@ const backgroundColors = { KH: '#ffffff', MH: '#f2f6f7', T: '#e7edee' }
 const backgroundColorsDarks = { KH: '#f9f9f9', MH: '#eeeeee', T: '#dddddd' }
 
 const getTitlePopup = idx => {
-  if (idx === 0) return <p>All</p>
-  if ([1, 2].includes(idx)) return <p>Started studying</p>
-  if ([3, 4].includes(idx)) return <p>Currently enrolled</p>
-  if ([5, 6].includes(idx)) return <p>Absent</p>
-  if ([7, 8].includes(idx)) return <p>Inactive</p>
-  if ([9, 10].includes(idx)) return <p>Graduated</p>
-  if ([11, 12].includes(idx)) return <p>Men</p>
-  if ([13, 14].includes(idx)) return <p>Women</p>
-  if ([15, 16].includes(idx)) return <p>Other/Unknown</p>
-  if ([17, 18].includes(idx)) return <p>Finland</p>
-  return <p>Other</p>
+  if (idx === 0) return 'All'
+  if ([1, 2].includes(idx)) return 'Started studying'
+  if ([3, 4].includes(idx)) return 'Currently enrolled'
+  if ([5, 6].includes(idx)) return 'Absent'
+  if ([7, 8].includes(idx)) return 'Inactive'
+  if ([9, 10].includes(idx)) return 'Graduated'
+  if ([11, 12].includes(idx)) return 'Men'
+  if ([13, 14].includes(idx)) return 'Women'
+  if ([15, 16].includes(idx)) return 'Other/Unknown'
+  if ([17, 18].includes(idx)) return 'Finland'
+  return 'Other'
 }
 
 const getRowStyle = (idx, tableLinePlaces, dark = false) => {
@@ -50,7 +50,7 @@ const getRowStyle = (idx, tableLinePlaces, dark = false) => {
 const getTableCell = ({ year, programme, valIdx, rowIdx, tableLinePlaces, value }) => {
   return (
     <Table.Cell
-      key={`${year}-${programme}-color-${valIdx}`}
+      key={`${year}-${programme}-color-${Math.random()}`}
       style={
         getStyle(valIdx + 1)?.backgroundColor
           ? {
@@ -72,16 +72,14 @@ const getOtherCountriesList = ({ year, code, extraTableStats }) => {
     !extraTableStats[year][code] ||
     !extraTableStats[year][code]?.countries
   )
-    return <p>No data</p>
+    return <p key={`${Math.random()}-nodata`}>No data</p>
   const countriesData = extraTableStats[year][code].countries
   return Object.keys(countriesData)
     .sort()
     .map(key => (
-      <>
-        <p key={Math.random()} style={{ padding: 0, margin: 0 }}>
-          {key}: <b>{countriesData[key]}</b>
-        </p>
-      </>
+      <p key={`${Math.random()}-${key}`} style={{ padding: 0, margin: 0 }}>
+        {key}: <b>{countriesData[key]}</b>
+      </p>
     ))
 }
 
@@ -100,7 +98,7 @@ const getRows = ({
     if (valIdx === 19) {
       return (
         <Popup
-          key={`${valIdx}-${programme}-${idx}`}
+          key={`${year}-${programme}-${Math.random()}`}
           content={getOtherCountriesList({ year, code: programmeNames[programme].code, extraTableStats })}
           trigger={getTableCell({ year, programme, valIdx, rowIdx: idx, tableLinePlaces, value })}
         />
@@ -108,7 +106,7 @@ const getRows = ({
     }
     return (
       <Popup
-        key={`${valIdx}-${idx}-${programme}`}
+        key={`${programme}-${year}-${Math.random()}`}
         content={getTitlePopup(valIdx)}
         trigger={getTableCell({ year, programme, valIdx, rowIdx: idx, tableLinePlaces, value })}
       />
@@ -191,7 +189,7 @@ const FacultyStudentDataTable = ({
         <Table.Body>
           {years.map((year, yearIndex) => {
             return (
-              <>
+              <React.Fragment key={`${year}-fragment`}>
                 <Table.Row key={`${year}-faculty-row}`} className={year === 'Total' ? 'total-row-cell' : ''}>
                   {tableStats[year].map((value, valueIdx) => {
                     if (valueIdx === 0)
@@ -266,7 +264,7 @@ const FacultyStudentDataTable = ({
                       </Table.Row>
                     )
                   })}
-              </>
+              </React.Fragment>
             )
           })}
         </Table.Body>
