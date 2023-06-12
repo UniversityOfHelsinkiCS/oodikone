@@ -16,7 +16,7 @@ const PopulationSearch = ({ populationFound, history, location, loading, combine
   const { filterDispatch, useFilterSelector } = useFilters()
   const onlyHopsCredit = useFilterSelector(hopsFilter.selectors.isActive)
   const combinedHopsSelected = useFilterSelector(hopsFilter.selectors.isCombinedSelected(combinedProgrammeCode))
-
+  const bothHopsSelected = useFilterSelector(hopsFilter.selectors.isBothSelected(combinedProgrammeCode))
   const title = populationFound && history.location.search ? null : 'Search for class'
 
   return (
@@ -43,7 +43,7 @@ const PopulationSearch = ({ populationFound, history, location, loading, combine
           <Form.Field>
             <Form.Radio
               toggle
-              checked={onlyHopsCredit && !combinedHopsSelected}
+              checked={onlyHopsCredit && (bothHopsSelected || !combinedHopsSelected)}
               onClick={() => {
                 filterDispatch(hopsFilter.actions.toggle())
               }}
@@ -58,7 +58,7 @@ const PopulationSearch = ({ populationFound, history, location, loading, combine
             <Form.Field>
               <Form.Radio
                 toggle
-                checked={onlyHopsCredit && combinedHopsSelected}
+                checked={combinedHopsSelected}
                 onClick={() => {
                   filterDispatch(hopsFilter.actions.toggleCombinedProgramme(combinedProgrammeCode))
                 }}

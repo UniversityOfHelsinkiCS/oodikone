@@ -1,14 +1,116 @@
 import React from 'react'
-import { Radio, Button } from 'semantic-ui-react'
+import { Radio, Button, Form } from 'semantic-ui-react'
 import useFilters from 'components/FilterView/useFilters'
 import moment from 'moment'
 import createFilter from './createFilter'
 import creditDateFilter, { selectedStartDate } from './date'
 
+const getCutStudyStart = ({ options, filterDispatch }) => {
+  return (
+    <Button
+      content="Cut credits to study start"
+      onClick={() =>
+        filterDispatch(
+          creditDateFilter.actions.setOptions({
+            startDate: moment(options.studyStart),
+            endDate: null,
+          })
+        )
+      }
+      disabled={!options.activeProgramme && !options.activeCombinedProgramme}
+      className="credit-date-filter-input"
+      size="mini"
+      primary
+      style={{
+        margin: '0.5rem',
+        whiteSpace: 'nowrap',
+      }}
+    />
+  )
+}
+
 const HopsFilterCard = ({ options, onOptionsChange, combinedProgramme }) => {
   const { filterDispatch, useFilterSelector } = useFilters()
   const selectedCreditStartDate = useFilterSelector(selectedStartDate(''))
-  const typeOfCombined = combinedProgramme === 'MH90_001' ? 'Licentiate' : 'Master'
+
+  if (combinedProgramme) {
+    // For combined programme, we show radiobuttons due to many possible options
+    const typeOfCombined = combinedProgramme === 'MH90_001' ? 'Licentiate' : 'Master'
+    return (
+      <Form>
+        <div className="card-content">
+          <Form.Field style={{ display: 'flex', flexDirection: 'column' }}>
+            <Radio
+              label="None"
+              name="radioGroup"
+              checked={
+                !options.activeProgramme ||
+                (options.activeProgramme === false && options.activeCombinedProgramme === false)
+              }
+              onChange={() =>
+                onOptionsChange({
+                  ...options,
+                  activeProgramme: false,
+                  activeCombinedProgramme: false,
+                  combinedIsSelected: 'default',
+                })
+              }
+              data-cy="option-hops-bachelor"
+              style={{ margin: '0.5rem 0' }}
+            />
+            <Radio
+              label="Bachelor studyright"
+              name="radioGroup"
+              checked={options.activeProgramme === true && options.activeCombinedProgramme === false}
+              onChange={() =>
+                onOptionsChange({
+                  ...options,
+                  activeProgramme: true,
+                  activeCombinedProgramme: false,
+                  combinedIsSelected: 'default',
+                })
+              }
+              data-cy="option-hops-bachelor"
+              style={{ margin: '0.5rem 0' }}
+            />
+            <Radio
+              label={`${typeOfCombined} studyright`}
+              name="radioGroup"
+              checked={options.activeProgramme === false && options.activeCombinedProgramme === true}
+              onChange={() =>
+                onOptionsChange({
+                  ...options,
+                  activeProgramme: false,
+                  activeCombinedProgramme: true,
+                  combinedIsSelected: combinedProgramme,
+                })
+              }
+              data-cy="option-hops-combined"
+              style={{ margin: '0.5rem 0' }}
+            />
+            <Radio
+              label="Both studyrights"
+              name="radioGroup"
+              checked={options.activeProgramme === true && options.activeCombinedProgramme === true}
+              onChange={() =>
+                onOptionsChange({
+                  ...options,
+                  activeProgramme: true,
+                  activeCombinedProgramme: true,
+                  combinedIsSelected: combinedProgramme,
+                })
+              }
+              data-cy="option-hops-both"
+              style={{ margin: '0.5rem 0' }}
+            />
+            {options.studyStart ? getCutStudyStart({ options, filterDispatch }) : null}
+          </Form.Field>
+        </div>
+      </Form>
+    )
+  }
+
+  // For a single programme
   return (
     <div>
       <div
@@ -30,67 +132,14 @@ const HopsFilterCard = ({ options, onOptionsChange, combinedProgramme }) => {
           onOptionsChange({
             ...options,
             activeProgramme: !options.activeProgramme,
-            activeCombinedProgramme: false,
             combinedIsSelected: 'default',
           })
         }}
       >
         <Radio style={{ width: '3.5rem', flexShrink: 0 }} toggle checked={options.activeProgramme} />
-        {combinedProgramme ? (
-          <div>Show only credits included in Bachelor study plan</div>
-        ) : (
-          <div>Show only credits included in study plan</div>
-        )}
+        <div>Show only credits included in study plan</div>
       </div>
-      {combinedProgramme && (
-        <div
-          style={{ display: 'flex', alignItems: 'center', gap: '1em', cursor: 'pointer' }}
-          onClick={() => {
-            if (
-              selectedCreditStartDate &&
-              options.studyStart &&
-              options.clearCreditDate &&
-              new Date(selectedCreditStartDate) > new Date(options.studyStart) &&
-              !options.activeCombinedProgramme
-            )
-              filterDispatch(
-                creditDateFilter.actions.setOptions({
-                  startDate: null,
-                  endDate: null,
-                })
-              )
-            onOptionsChange({
-              ...options,
-              activeCombinedProgramme: !options.activeCombinedProgramme,
-              activeProgramme: false,
-              combinedIsSelected: combinedProgramme,
-            })
-          }}
-        >
-          <Radio style={{ width: '3.5rem', flexShrink: 0 }} toggle checked={options.activeCombinedProgramme} />
-          <div>Show only credits included in {typeOfCombined} study plan</div>
-        </div>
-      )}
-      {options.studyStart ? (
-        <Button
-          content="Cut credits to study start"
-          onClick={() =>
-            filterDispatch(
-              creditDateFilter.actions.setOptions({
-                startDate: moment(options.studyStart),
-                endDate: null,
-              })
-            )
-          }
-          disabled={!options.activeProgramme && !options.activeCombinedProgramme}
-          className="credit-date-filter-input"
-          size="mini"
-          style={{
-            margin: '0.5rem',
-            whiteSpace: 'nowrap',
-          }}
-        />
-      ) : null}
+      {options.studyStart ? getCutStudyStart({ options, filterDispatch }) : null}
     </div>
   )
 }
@@ -118,19 +167,27 @@ export default createFilter({
     const { studyrightStart, studyplans } = student
     const studyrightStartDate = new Date(studyrightStart)
     const studyrights = student.studyrights.filter(sr => !sr.cancelled)?.map(sr => sr.studyrightid)
-    const chosenProgrammeCode = activeCombinedProgramme ? args.combinedProgrammeCode : args.programmeCode
+
     const hops = studyplans.find(
-      plan => plan.programme_code === chosenProgrammeCode && studyrights.includes(plan.studyrightid)
+      plan => plan.programme_code === args.programmeCode && studyrights.includes(plan.studyrightid)
     )
+    const secondHops = args.combinedProgrammeCode
+      ? studyplans.find(
+          plan => plan.programme_code === args.combinedProgrammeCode && studyrights.includes(plan.studyrightid)
+        )
+      : null
 
     if (activeProgramme || activeCombinedProgramme) {
-      if (!hops) {
+      if (!hops && !secondHops) {
         student.courses = []
         student.credits = 0
         return true
       }
-      const courses = new Set(hops ? hops.included_courses : [])
-      const hopsCourses = student.courses.filter(course => courses.has(course.course_code))
+      const courses = new Set(hops && activeProgramme ? hops.included_courses : [])
+      const secondProgrammeCourses = new Set(secondHops && activeCombinedProgramme ? secondHops.included_courses : [])
+      const hopsCourses = student.courses.filter(
+        course => courses.has(course.course_code) || secondProgrammeCourses.has(course.course_code)
+      )
       student.courses = hopsCourses
       student.credits = hops.completed_credits
       return true
@@ -143,6 +200,9 @@ export default createFilter({
   selectors: {
     isCombinedSelected: ({ combinedIsSelected }, code) => {
       return combinedIsSelected === code
+    },
+    isBothSelected: ({ combinedIsSelected, activeProgramme }, code) => {
+      return combinedIsSelected === code && activeProgramme
     },
   },
 
