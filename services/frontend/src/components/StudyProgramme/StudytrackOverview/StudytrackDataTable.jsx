@@ -31,16 +31,14 @@ const getStyleForCombined = idx => {
 
 const createCountriesContent = ({ year, studyprogramme, otherCountriesStats }) => {
   if (!otherCountriesStats || !otherCountriesStats[studyprogramme] || !otherCountriesStats[studyprogramme][year])
-    return <p>No data</p>
+    return <p key={Math.random()}>No data</p>
   const countriesData = otherCountriesStats[studyprogramme][year]
   return Object.keys(countriesData)
     .sort()
     .map(key => (
-      <>
-        <p key={Math.random()} style={{ margin: 0 }}>
-          {key}: <b>{countriesData[key]}</b>
-        </p>
-      </>
+      <p key={Math.random()} style={{ margin: 0 }}>
+        {key}: <b>{countriesData[key]}</b>
+      </p>
     ))
 }
 
@@ -61,7 +59,7 @@ const getCountriesPopup = ({ index, combinedProgramme, value, row, year, studypr
   return (
     <Popup
       key={`${row[0]}-${getKey(value)}`}
-      content={createCountriesContent({ year, studyprogramme, otherCountriesStats }).slice(3)}
+      content={createCountriesContent({ year, studyprogramme, otherCountriesStats })}
       trigger={getBasicTableCell({ row, value, combinedProgramme, index })}
     />
   )
