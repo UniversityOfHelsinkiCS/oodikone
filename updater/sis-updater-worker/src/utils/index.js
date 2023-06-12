@@ -1,7 +1,5 @@
 const { maxBy } = require('lodash')
 
-const { logger } = require('./logger')
-
 const getLatestSnapshot = entities => {
   return maxBy(
     entities.filter(e => e.document_state !== 'DELETED'),
@@ -18,13 +16,7 @@ const getActiveSnapshot = entities => {
 }
 
 const isActive = entity => {
-  try {
-    return entity.document_state === 'ACTIVE'
-  } catch (e) {
-    logger.info(entity)
-    logger.info(JSON.stringify(entity, null, 2))
-    return false
-  }
+  return entity.document_state === 'ACTIVE'
 }
 
 const isBaMa = education =>
