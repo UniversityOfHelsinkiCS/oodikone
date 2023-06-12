@@ -524,10 +524,16 @@ const CreditAccumulationGraphHighCharts = ({
       )
     const studyRightStart = getStudyRightStart()
     if (studyPlanFilterIsActive && cutStudyPlanCredits) return studyRightStart
-    if (studyPlanFilterIsActive)
-      return Math.min(..._.flatten(students.map(({ courses }) => courses.map(({ date }) => new Date(date).getTime()))))
+    if (studyPlanFilterIsActive) {
+      // math.min may return a infinite value, if beginning of course credits is selected and student's courses are filtered accordingly.
+      const startPoint = Math.min(
+        ..._.flatten(students.map(({ courses }) => courses.map(({ date }) => new Date(date).getTime())))
+      )
+      return startPoint !== Infinity ? startPoint : studyRightStart
+    }
     return studyRightStart
   }
+
   const graduations = singleStudent ? filterGraduations(students[0], selectedStudyRight) : []
   const transfers = singleStudent ? filterTransfers(students[0], language) : []
   const studyRightStartLine =
