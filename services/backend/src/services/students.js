@@ -55,11 +55,6 @@ const byId = async id => {
               },
             },
           },
-          where: {
-            prioritycode: {
-              [Op.not]: 6,
-            },
-          },
         },
         {
           model: SemesterEnrollment,
@@ -103,8 +98,10 @@ const byId = async id => {
       startYear: semester.startYear,
     }
   })
-
   student.semester_enrollments = mappedEnrollments
+
+  const filteredStudyrights = student.studyrights.filter(sr => sr.prioritycode !== 6)
+  student.studyrights = filteredStudyrights
 
   student.tags = tags.map(t => ({
     ...t.get(),
@@ -250,6 +247,8 @@ const formatStudent = async ({
   }
 
   studyrights = studyrights || []
+  // const secondaryStudyRights = studyrights.filter(sr => sr.prioritycode === 2))
+
   semester_enrollments = semester_enrollments || []
   studyplans = studyplans || []
   const semesterenrollments = semester_enrollments.map(
