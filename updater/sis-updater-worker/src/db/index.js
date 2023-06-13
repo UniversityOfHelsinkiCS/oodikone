@@ -25,6 +25,7 @@ const selectAllFromSnapshots = async table =>
       .groupBy('id')
   )
     .map(({ data }) => getLatestSnapshot(data))
+    .filter(s => !!s)
     .filter(isActive)
 
 const selectFromSnapshotsByIds = async (table, ids, col = 'id') =>
