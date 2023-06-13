@@ -4,8 +4,8 @@ const moment = require('moment')
 const createRedisKeyForFacultyProgrammes = (id, programmeFilter) => `FACULTY_PROGRAMMES_${id}_${programmeFilter}`
 const createRedisKeyForBasicStats = (id, yearType, programmeFilter, specialGroups) =>
   `FACULTY_BASIC_STATS_${id}_${yearType}_${programmeFilter}_${specialGroups}`
-const createRedisKeyForCreditStats = (id, yearType, programmeFilter, specialGroups) =>
-  `FACULTY_CREDIT_STATS_${id}_${yearType}_${programmeFilter}_${specialGroups}`
+const createRedisKeyForCreditStats = (id, yearType, programmeFilter) =>
+  `FACULTY_CREDIT_STATS_${id}_${yearType}_${programmeFilter}`
 const createRedisKeyForThesiswriters = (id, yearType, programmeFilter, specialGroups) =>
   `FACULTY_THESIS_WRITERS_STATS_${id}_${yearType}_${programmeFilter}_${specialGroups}`
 const createRedisKeyForGraduationTimeStats = (id, programmeFilter) =>
