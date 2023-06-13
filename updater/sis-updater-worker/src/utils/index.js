@@ -16,8 +16,6 @@ const getActiveSnapshot = entities => {
 }
 
 const isActive = entity => {
-  if (!entity.document_state) return false
-
   return entity.document_state === 'ACTIVE'
 }
 
