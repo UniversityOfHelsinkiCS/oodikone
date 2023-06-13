@@ -34,7 +34,6 @@ const { dbConnections } = require('../../db/connection')
 const { isBaMa } = require('../../utils')
 const { updateStudyRights, updateStudyRightElements, updateElementDetails } = require('./studyRightUpdaters')
 const { getAttainmentsToBeExcluded } = require('./excludedPartialAttainments')
-const { logger } = require('../../utils/logger')
 
 // Check if studyright is degree leading or not
 const studyRightHasDegreeEducation = studyRight => {
@@ -197,7 +196,6 @@ const updateStudents = async personIds => {
   const parsedStudyrightSnapshots = parseStudyrightSnapshots(studyrightSnapshots)
 
   const groupedStudyRightSnapshots = groupStudyrightSnapshots(parsedStudyrightSnapshots)
-  logger.info(JSON.stringify(groupedStudyRightSnapshots, null, 2))
 
   const personIdToStudentNumber = students.reduce((res, curr) => {
     res[curr.id] = curr.student_number
