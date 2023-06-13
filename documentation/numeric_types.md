@@ -19,7 +19,7 @@ These are actually defined in db table studyright_extents. Tells studyright leve
 
 5: Rescinded (Seemingly not in use anymore)
 
-6: Option
+6: Option (Bachelor+master studyright students can add a master programme to their study plan before graduation in bachelor programme: marked as option in Oodikone)
 
 30: Graduated
 
