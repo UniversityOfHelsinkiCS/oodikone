@@ -55,6 +55,11 @@ const byId = async id => {
               },
             },
           },
+          where: {
+            prioritycode: {
+              [Op.not]: 6,
+            },
+          },
         },
         {
           model: SemesterEnrollment,
@@ -362,6 +367,11 @@ const bySearchTerm = async searchterm => {
               [Op.in]: [10, 20, 30],
             },
           },
+        },
+      },
+      where: {
+        prioritycode: {
+          [Op.not]: 6,
         },
       },
     },

@@ -446,6 +446,9 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
             student_studentnumber: {
               [Op.in]: studentnumbers,
             },
+            prioritycode: {
+              [Op.not]: 6,
+            },
           },
         },
       ],
@@ -536,6 +539,9 @@ const studentnumbersWithAllStudyrightElements = async (
   let studyrightWhere = {
     extentcode: {
       [Op.notIn]: filteredExtents,
+    },
+    prioritycode: {
+      [Op.not]: 6,
     },
   }
   if (!exchangeStudents) {
