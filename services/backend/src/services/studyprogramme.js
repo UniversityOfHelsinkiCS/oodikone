@@ -21,7 +21,7 @@ const {
 } = require('../models')
 const { formatStudyright, formatStudent, formatTransfer } = require('./studyprogrammeHelpers')
 const { getCurrentSemester } = require('./semesters')
-const logger = require('../util/logger')
+const { logger } = require('../util/logger')
 
 const whereStudents = studentnumbers => {
   return studentnumbers ? studentnumbers : { [Op.not]: null }
@@ -645,6 +645,16 @@ const getNotCompletedForProgrammeCourses = async (from, to, programmeCourses) =>
         notCompletedByCourseCodes[course.code].push(course.studentnumber)
       }
     }
+    // If student has only an enrollment, but no attainment, they have no credit info.
+    programmeCourses.forEach(courseCode => {
+      if (allEnrollments[courseCode]) {
+        allEnrollments[courseCode].forEach(studentnumber => {
+          if (passedByCourseCodes[courseCode] && !passedByCourseCodes[courseCode].includes(studentnumber)) {
+            notCompletedByCourseCodes[courseCode].push(studentnumber)
+          }
+        })
+      }
+    })
 
     return Object.keys(courses)
       .reduce((acc, val) => [...acc, { ...courses[val] }], [])
