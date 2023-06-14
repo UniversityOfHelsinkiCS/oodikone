@@ -98,14 +98,10 @@ const updateStudyRights = async (
       OPTION: 6,
     }
 
-    // Logic still a bit repetitive, plz make this better!
-    if (!isBaMa) {
-      if (studyright.state === 'GRADUATED') return PRIORITYCODES.GRADUATED
-      if (studyright.state === 'RESCINDED') return PRIORITYCODES.RESCINDED
-      return isPrimality ? PRIORITYCODES.MAIN : PRIORITYCODES.SECONDARY
-    }
-
-    if (phase_number === 1) {
+    // It seems that studyright.state is always null in importer db. Reason why rescinded is not visible anywhere
+    // Discuss, how this should be done! Now we have 'cancelled' field in studyright table in sis-db, which is used in code
+    // to have the information if studyprogramme is cancelled.
+    if (!isBaMa || phase_number === 1) {
       if (get(studyright, 'study_right_graduation.phase1GraduationDate')) return PRIORITYCODES.GRADUATED
       if (studyright.state === 'RESCINDED') return PRIORITYCODES.RESCINDED
       return isPrimality ? PRIORITYCODES.MAIN : PRIORITYCODES.SECONDARY
@@ -120,7 +116,9 @@ const updateStudyRights = async (
     if (isPrimality) {
       return get(studyright, 'study_right_graduation.phase1GraduationDate') ? PRIORITYCODES.MAIN : PRIORITYCODES.OPTION
     }
-    return PRIORITYCODES.SECONDARY
+    return get(studyright, 'study_right_graduation.phase1GraduationDate')
+      ? PRIORITYCODES.SECONDARY
+      : PRIORITYCODES.OPTION
   }
 
   const admissionNamesById = (await selectAllFrom('admission_types')).reduce(
