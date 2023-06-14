@@ -247,8 +247,6 @@ const formatStudent = async ({
   }
 
   studyrights = studyrights || []
-  // const secondaryStudyRights = studyrights.filter(sr => sr.prioritycode === 2))
-
   semester_enrollments = semester_enrollments || []
   studyplans = studyplans || []
   const semesterenrollments = semester_enrollments.map(
