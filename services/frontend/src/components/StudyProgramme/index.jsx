@@ -109,7 +109,7 @@ const StudyProgramme = props => {
         ),
       })
       panes.push({
-        menuItem: 'Degree Courses',
+        menuItem: 'Degree courses',
         render: () => (
           <DegreeCoursesTable
             studyProgramme={programmeId}

@@ -533,8 +533,8 @@ const tableTitles = {
   studytracksStart: ['', 'All', 'Started studying', 'Currently enrolled', 'Absent', 'Inactive'],
   studytracksBasic: ['Graduated'],
   studytracksCombined: {
-    licentiate: ['Graduated Bachelor', 'Graduated Licentiate'],
-    master: ['Graduated Bachelor', 'Graduated master'],
+    licentiate: ['Graduated bachelor', 'Graduated licentiate'],
+    master: ['Graduated bachelor', 'Graduated master'],
   },
   studytracksEnd: ['Men', 'Women', 'Other/\nUnknown', 'Finland', 'Other'],
 }

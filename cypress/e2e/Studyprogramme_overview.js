@@ -474,7 +474,7 @@ describe('Studyprogramme overview', () => {
       cy.contains('Studytracks and class statistics')
 
       cy.contains('Update statistics').should('not.exist')
-      cy.contains('Degree Courses').should('not.exist')
+      cy.contains('Degree courses').should('not.exist')
     })
 
     it('can access basic information', () => {
