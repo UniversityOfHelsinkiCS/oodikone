@@ -21,7 +21,7 @@ const {
 } = require('../models')
 const { formatStudyright, formatStudent, formatTransfer } = require('./studyprogrammeHelpers')
 const { getCurrentSemester } = require('./semesters')
-const { logger } = require('../util/logger')
+const logger = require('../util/logger')
 
 const whereStudents = studentnumbers => {
   return studentnumbers ? studentnumbers : { [Op.not]: null }
@@ -562,7 +562,7 @@ const getStudentsForProgrammeCourses = async (from, to, programmeCourses) => {
       type: 'passed',
     }))
   } catch (e) {
-    logger.log(e)
+    logger.log(`getStudentsForProgrammeCourses() function failed ${e}`)
   }
 }
 const getNotCompletedForProgrammeCourses = async (from, to, programmeCourses) => {
@@ -666,7 +666,7 @@ const getNotCompletedForProgrammeCourses = async (from, to, programmeCourses) =>
         type: 'notCompleted',
       }))
   } catch (e) {
-    logger.log(e)
+    logger.log(`getNotCompletedForProgrammeCourses failed ${e}`)
   }
 }
 const getOwnStudentsForProgrammeCourses = async (from, to, programmeCourses, studyprogramme) => {

@@ -8,7 +8,7 @@ const {
   setGraduationStats,
   setStudytrackStats,
 } = require('../services/analyticsService')
-const { logger } = require('../util/logger')
+const logger = require('../util/logger')
 
 const updateBasicView = async (code, combinedProgramme) => {
   const specialCalendar = {
@@ -62,7 +62,7 @@ const updateBasicView = async (code, combinedProgramme) => {
       })
       await setGraduationStats(graduationStats, option.yearType, option.specialGroups)
     } catch (e) {
-      logger.error(e)
+      logger.error(`Studytrack graduation stats failed: ${e}`)
     }
   }
   return 'OK'
@@ -106,7 +106,7 @@ const updateStudytrackView = async (code, combinedProgramme, associations) => {
       })
       await setStudytrackStats(stats, option.graduated, option.specialGroups)
     } catch (e) {
-      logger.error(e)
+      logger.error(`Studytrack stats update failed ${e}`)
     }
   }
 
