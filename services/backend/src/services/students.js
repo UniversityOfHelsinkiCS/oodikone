@@ -306,7 +306,7 @@ const withId = async id => {
     const result = await byId(id)
     return await formatStudent(result)
   } catch (e) {
-    logger.error({ message: 'error when fetching single student', meta: e })
+    logger.error(`Error when fetching single student ${e}`)
     return {
       error: e,
     }
