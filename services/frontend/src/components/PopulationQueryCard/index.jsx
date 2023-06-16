@@ -24,7 +24,7 @@ const PopulationQueryCard = ({ population, query, removeSampleFn, units, tags })
             <div>Result details</div>
           </Card.Header>
           <Card.Meta>
-            {tag ? <div>{`Tagged with: ${tagname}`}</div> : null}
+            {tag ? <div style={{ color: 'black', fontWeight: 'bold' }}>{`Tagged with: ${tagname}`}</div> : null}
             <div>{`Updated at ${reformatDate(minBy(students, 'updatedAt').updatedAt, DISPLAY_DATE_FORMAT)} `}</div>
             <div>{studentStatuses.includes('EXCHANGE') ? 'Includes' : 'Excludes'} exchange students</div>
             <div>
