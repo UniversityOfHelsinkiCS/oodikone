@@ -121,7 +121,6 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
           cellProps: { style },
           headerProps: { title: 'Email' },
           getRowVal: s => (s.email ? s.email : ''),
-          child: true,
           export: false,
         },
       ]
