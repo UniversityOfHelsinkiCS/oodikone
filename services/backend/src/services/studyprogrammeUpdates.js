@@ -8,7 +8,7 @@ const {
   setGraduationStats,
   setStudytrackStats,
 } = require('../services/analyticsService')
-const logger = require('../util/logger')
+const { logger } = require('../util/logger')
 
 const updateBasicView = async (code, combinedProgramme) => {
   const specialCalendar = {
@@ -68,7 +68,7 @@ const updateBasicView = async (code, combinedProgramme) => {
   return 'OK'
 }
 
-const updateStudytrackView = async (code, combinedProgramme) => {
+const updateStudytrackView = async (code, combinedProgramme, associations) => {
   const specialGraduated = {
     graduated: 'GRADUATED_INCLUDED',
     specialGroups: 'SPECIAL_INCLUDED',
@@ -102,6 +102,7 @@ const updateStudytrackView = async (code, combinedProgramme) => {
           specialGroups: option.specialGroups === 'SPECIAL_INCLUDED',
           graduated: option.graduated === 'GRADUATED_INCLUDED',
         },
+        associations,
       })
       await setStudytrackStats(stats, option.graduated, option.specialGroups)
     } catch (e) {

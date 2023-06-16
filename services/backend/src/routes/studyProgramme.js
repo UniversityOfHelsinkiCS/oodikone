@@ -16,7 +16,8 @@ const {
 } = require('../services/analyticsService')
 const { updateBasicView, updateStudytrackView } = require('../services/studyprogrammeUpdates')
 const { getProgrammeName } = require('../services/studyprogramme')
-const logger = require('../util/logger')
+const { logger } = require('../util/logger')
+const { getAssociations } = require('../services/studyrights')
 
 router.get('/v2/studyprogrammes/:id/basicstats', async (req, res) => {
   const code = req.params.id
@@ -110,6 +111,7 @@ router.get('/v2/studyprogrammes/:id/studytrackstats', async (req, res) => {
   const data = await getStudytrackStats(code, combinedProgramme, graduated, specialGroups)
   if (data) return res.json(data)
 
+  const associations = await getAssociations()
   const updated = await getStudytrackStatsForStudyprogramme({
     studyprogramme: code,
     combinedProgramme,
@@ -117,6 +119,7 @@ router.get('/v2/studyprogrammes/:id/studytrackstats', async (req, res) => {
       graduated: graduated === 'GRADUATED_INCLUDED',
       specialGroups: specialGroups === 'SPECIAL_INCLUDED',
     },
+    associations,
   })
   if (updated) await setStudytrackStats(updated, graduated, specialGroups)
   return res.json(updated)
@@ -144,7 +147,8 @@ router.get('/v2/studyprogrammes/:id/update_studytrackview', async (req, res) => 
   if (code) {
     let result = null
     try {
-      result = await updateStudytrackView(code, combinedProgramme)
+      const associations = await getAssociations()
+      result = await updateStudytrackView(code, combinedProgramme, associations)
     } catch (e) {
       logger.error(`Failed to update code ${code} - ${combinedProgramme || 'not combined'} studytrack stats: ${e}`)
     }
@@ -182,6 +186,7 @@ router.get('/v2/studyprogrammes/:id/evaluationstats', async (req, res) => {
 
   let progressData = await getStudytrackStats(code, combinedProgramme, graduated, specialGroups)
   if (!progressData) {
+    const associations = await getAssociations()
     const updated = await getStudytrackStatsForStudyprogramme({
       studyprogramme: code,
       combinedProgramme,
@@ -189,6 +194,7 @@ router.get('/v2/studyprogrammes/:id/evaluationstats', async (req, res) => {
         graduated: graduated === 'GRADUATED_INCLUDED',
         specialGroups: specialGroups === 'SPECIAL_INCLUDED',
       },
+      associations,
     })
     if (updated) {
       await setStudytrackStats(updated, graduated, specialGroups)
