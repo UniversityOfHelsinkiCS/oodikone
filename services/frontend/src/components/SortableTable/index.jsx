@@ -17,6 +17,8 @@ import GroupKeyVisitor from './GroupKeyVisitor'
 import ValueVisitor from './ValueVisitor'
 import './style.css'
 
+const thickBorderStyles = { borderRightWidth: '4px', borderRightColor: '#a8a8a8', borderRightStyle: 'solid' }
+
 const getKey = data => {
   if (data.studentnumber) return data.studentnumber
   if (data.id) return data.id
@@ -110,6 +112,10 @@ const Row = ({ data, isGroup, parents }) => {
       })
     }
 
+    if (column.isLast && column.parent?.thickBorders) {
+      cellProps.style = { ...cellProps.style, ...thickBorderStyles }
+    }
+
     if (column.cellStyle) {
       cellProps = _.merge(cellProps, {
         style: column.cellStyle,
@@ -125,7 +131,7 @@ const Row = ({ data, isGroup, parents }) => {
         </td>
       )
     } else if (column.children && column.children.length > 0) {
-      stack.splice(0, 0, ...column.children.map((c, i) => ({ ...c, childIndex: i })))
+      stack.splice(0, 0, ...column.children.map((c, i, arr) => ({ ...c, childIndex: i, isLast: i === arr.length - 1 })))
     } else {
       cells.push(<td key={`${column.key}-else-${cellProps.title}`} {...cellProps} />)
     }
@@ -316,6 +322,11 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
   const [dynamicToolsMode, setToolsMode] = useState('fixed')
   const [forcedTitleWidth, setForcedTitleWidth] = useState()
 
+  const borderStyles =
+    (column.thickBorders && !column.child) || (column.child && column.parent.thickBorders && column.isLast)
+      ? thickBorderStyles
+      : {}
+
   let toolsMode = dynamicToolsMode
 
   if (column.forceToolsMode) {
@@ -403,6 +414,7 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
 
   return (
     <th
+      id={column.key}
       colSpan={colSpan}
       rowSpan={rowSpan}
       className={filterMenuOpen ? 'filter-menu-open' : 'filter-menu-closed'}
@@ -413,6 +425,7 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
         position: 'relative',
         overflow: toolsMode === 'floating' ? 'hidden' : '',
         display: toolsMode === 'none' ? 'none' : '',
+        ...borderStyles,
       }}
       onClick={() => {
         if (sortable) {
@@ -568,7 +581,12 @@ const createHeaders = (columns, columnDepth, dispatch) => {
 
   const rows = _.range(0, columnDepth).map(() => [])
   let i = 0
-
+  columns.forEach(col => {
+    if (!col.children) return
+    col.children = col.children.map((child, index, arr) => {
+      return { ...child, isLast: index === arr.length - 1 }
+    })
+  })
   while (stack.length > 0) {
     i += 1
 

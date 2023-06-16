@@ -165,6 +165,7 @@ const CoursesTable = ({ students, studyGuidanceCourses }) => {
             </div>
           ),
           textTitle: e.code,
+          thickBorders: true,
           children: sortBy(labelToMandatoryCourses[e.label], [
             m => {
               const res = m.code.match(/\d+/)
