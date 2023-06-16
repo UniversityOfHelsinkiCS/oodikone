@@ -8,4 +8,5 @@
 .routeViewContainer {
   flex: 1 0 auto;
   position: relative;
+  padding-bottom: 2em;
 }
