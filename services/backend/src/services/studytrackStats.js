@@ -1,7 +1,6 @@
 const { indexOf } = require('lodash')
 const moment = require('moment')
 
-const { getAssociations } = require('./studyrights')
 const {
   getMedian,
   getStartDate,
@@ -495,13 +494,12 @@ const getEmptyStatsObjects = (years, studytracks, studyprogramme, combinedProgra
 
 // Combines all the data for the Populations and Studytracks -view
 // At the moment combined programme is thought to have only one track, the programme itself
-const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, combinedProgramme, settings }) => {
+const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, combinedProgramme, settings, associations }) => {
   const isAcademicYear = true
   const includeYearsCombined = true
   const since = getStartDate(studyprogramme, isAcademicYear)
   const years = getYearsArray(since.getFullYear(), isAcademicYear, includeYearsCombined)
 
-  const associations = await getAssociations()
   const studytracks = associations.programmes[studyprogramme]
     ? [studyprogramme, ...associations.programmes[studyprogramme].studytracks]
     : [studyprogramme]

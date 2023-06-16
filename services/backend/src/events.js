@@ -11,6 +11,7 @@ const { updateFacultyOverview, updateFacultyProgressOverview } = require('./serv
 const { isProduction } = require('./conf-backend')
 const { getCurrentSemester } = require('./services/semesters')
 const logger = require('./util/logger')
+const { getAssociations } = require('./services/studyrights')
 
 const schedule = (cronTime, func) => new CronJob({ cronTime, onTick: func, start: true, timeZone: 'Europe/Helsinki' })
 
@@ -49,13 +50,14 @@ const refreshNewOverviews = async () => {
         (code.includes('MH') && !code.startsWith('2_MH') && !code.endsWith('_2')) ||
         /^(T)[0-9]{6}$/.test(code)
     )
+  const associations = await getAssociations()
   let ready = 0
   for (const code of codes) {
     let combinedProgramme = ''
-    // Update only the bachelor programme
+    // If combined programme is given, this updates only the bachelor programme
     try {
       await updateBasicView(code, combinedProgramme)
-      await updateStudytrackView(code, combinedProgramme)
+      await updateStudytrackView(code, combinedProgramme, associations)
       ready += 1
     } catch (e) {
       logger.error({ message: `Failed to update overview stats for programme ${code}`, meta: e })
@@ -65,7 +67,7 @@ const refreshNewOverviews = async () => {
     if (combinedProgramme) {
       try {
         await updateBasicView(code, combinedProgramme)
-        await updateStudytrackView(code, combinedProgramme)
+        await updateStudytrackView(code, combinedProgramme, associations)
         ready += 1
       } catch (e) {
         logger.error({ message: `Failed to update overview stats for programme ${code}`, meta: e })
