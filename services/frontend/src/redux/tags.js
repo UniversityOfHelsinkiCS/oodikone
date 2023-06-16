@@ -6,12 +6,14 @@ export const getTagsAction = () => {
   return callController(route, prefix)
 }
 
+// Combined programme is included to studytrack in form KHxx_xxx-MHxx_xxx
 export const getTagsByStudytrackAction = studytrack => {
   const route = `/tags/${studytrack}`
   const prefix = 'GET_TAGS_BY_ST_'
   return callController(route, prefix)
 }
 
+// Tag object includes all the information. Possible combined programme is included in the tag.
 export const createTagAction = tag => {
   const route = '/tags'
   const prefix = 'CREATE_TAG_'

@@ -9,13 +9,14 @@ import { getTagsByStudytrackAction } from '../../redux/tags'
 import { getStudentTagsByStudytrackAction } from '../../redux/tagstudent'
 
 const Row = memo(
-  ({ studentsTags, sn, studytrack, tagOptions, name }) => (
+  ({ studentsTags, sn, studytrack, tagOptions, name, combinedProgramme }) => (
     <TagStudent
       studentnumber={sn}
       studentname={name}
       studentstags={studentsTags}
       studytrack={studytrack}
       tagOptions={tagOptions}
+      combinedProgramme={combinedProgramme}
     />
   ),
   (prevProps, newProps) => prevProps.studentsTags.length === newProps.studentsTags.length
@@ -27,6 +28,7 @@ Row.propTypes = {
   studytrack: string.isRequired,
   tagOptions: arrayOf(shape({})).isRequired,
   name: string.isRequired,
+  combinedProgramme: string.isRequired,
 }
 
 const TagList = ({
@@ -37,10 +39,12 @@ const TagList = ({
   getStudentTagsStudyTrack,
   getTagsByStudytrack,
   namesVisible,
+  combinedProgramme,
 }) => {
   useEffect(() => {
-    getTagsByStudytrack(studytrack)
-    getStudentTagsStudyTrack(studytrack)
+    const studytrackCode = combinedProgramme ? `${studytrack}-${combinedProgramme}` : studytrack
+    getTagsByStudytrack(studytrackCode)
+    getStudentTagsStudyTrack(studytrackCode)
   }, [])
 
   const tagRows = selectedStudents.map(({ studentNumber: sn, name }) => {
@@ -62,6 +66,7 @@ const TagList = ({
         name={name}
         studytrack={studytrack}
         tagOptions={studentTagOptions}
+        combinedProgramme={combinedProgramme}
       />
     )
   })
@@ -101,6 +106,7 @@ TagList.propTypes = {
   studytrack: string.isRequired,
   tagstudent: arrayOf(shape({})).isRequired,
   namesVisible: bool.isRequired,
+  combinedProgramme: string.isRequired,
 }
 
 export default connect(mapStateToProps, {

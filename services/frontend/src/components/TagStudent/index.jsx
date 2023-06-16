@@ -15,6 +15,7 @@ const TagStudent = ({
   tagOptions,
   studentname,
   namesVisible,
+  combinedProgramme,
 }) => {
   const handleChange = (event, { value }) => {
     event.preventDefault()
@@ -22,11 +23,11 @@ const TagStudent = ({
       tag_id: value,
       studentnumber,
     }
-    createStudentTag(tag, studytrack)
+    createStudentTag(tag, studytrack, combinedProgramme)
   }
 
   const deleteTag = (event, tag) => {
-    deleteStudentTag(tag.tag_id, studentnumber, studytrack)
+    deleteStudentTag(tag.tag_id, studentnumber, studytrack, combinedProgramme)
   }
 
   const studentsTags = studentstags.map(t => (
@@ -64,6 +65,7 @@ TagStudent.propTypes = {
   studytrack: string.isRequired,
   tagOptions: arrayOf(shape({})).isRequired,
   namesVisible: bool.isRequired,
+  combinedProgramme: string.isRequired,
 }
 
 const mapStateToProps = ({ settings }) => ({

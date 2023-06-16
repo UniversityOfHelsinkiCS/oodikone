@@ -14,7 +14,7 @@ import { getTagsByStudytrackAction, createTagAction, deleteTagAction } from '../
 
 const YEAR_DATE_FORMAT = 'YYYY'
 
-const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme }) => {
+const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme, combinedProgramme }) => {
   const [tagname, setTagname] = useState('')
   const [confirm, setConfirm] = useState(null)
   const [year, setYear] = useState(null)
@@ -22,7 +22,8 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme 
   const { id: userId } = useGetAuthorizedUserQuery()
 
   useEffect(() => {
-    getTagsByStudytrack(studyprogramme)
+    const studytrack = combinedProgramme ? `${studyprogramme}-${combinedProgramme}` : studyprogramme
+    getTagsByStudytrack(studytrack)
   }, [])
 
   const handleDeleteTag = (event, tag) => {
@@ -39,7 +40,7 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme 
     event.preventDefault()
     const newTag = {
       tagname: tagname.trim(),
-      studytrack: studyprogramme,
+      studytrack: combinedProgramme ? `${studyprogramme}-${combinedProgramme}` : studyprogramme,
       year: year ? reformatDate(year, YEAR_DATE_FORMAT) : null,
       personal_user_id: personal ? userId : null,
     }
@@ -172,7 +173,7 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme 
               {' '}
               Create new tag{' '}
             </Button>
-            <TagModal tags={tags} studytrack={studyprogramme} />
+            <TagModal tags={tags} studytrack={studyprogramme} combinedProgramme={combinedProgramme} />
           </Form.Group>
         </Segment>
       </Form>
@@ -192,6 +193,7 @@ Tags.propTypes = {
   deleteTag: func.isRequired,
   tags: arrayOf(shape({ tag_id: string, tagname: string, studytrack: string })).isRequired,
   studyprogramme: string.isRequired,
+  combinedProgramme: string.isRequired,
 }
 
 export default withRouter(

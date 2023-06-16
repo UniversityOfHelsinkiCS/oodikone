@@ -5,7 +5,14 @@ import { arrayOf, string, shape, func } from 'prop-types'
 
 import { createMultipleStudentTagAction, deleteMultipleStudentTagAction } from '../../redux/tagstudent'
 
-const TagPopulation = ({ createMultipleStudentTag, tags, studytrack, selectedStudents, deleteMultipleStudentTag }) => {
+const TagPopulation = ({
+  createMultipleStudentTag,
+  tags,
+  studytrack,
+  selectedStudents,
+  deleteMultipleStudentTag,
+  combinedProgramme,
+}) => {
   const [options, setOptions] = useState([])
   const [selectedValue, setSelected] = useState('')
   const [selectedTag, setSelectedTag] = useState(null)
@@ -25,7 +32,7 @@ const TagPopulation = ({ createMultipleStudentTag, tags, studytrack, selectedStu
   }
 
   const handleDelete = () => {
-    deleteMultipleStudentTag(selectedValue, selectedStudents, studytrack)
+    deleteMultipleStudentTag(selectedValue, selectedStudents, studytrack, combinedProgramme)
     setSelected('')
     setConfirmDelete(false)
   }
@@ -40,7 +47,7 @@ const TagPopulation = ({ createMultipleStudentTag, tags, studytrack, selectedStu
       tagList.push(tag)
     })
     setSelected('')
-    createMultipleStudentTag(tagList, studytrack)
+    createMultipleStudentTag(tagList, studytrack, combinedProgramme)
     setConfirmAdd(false)
   }
 
@@ -102,6 +109,7 @@ TagPopulation.propTypes = {
   tags: arrayOf(shape({ tag_id: string, tagname: string, studytrack: string })).isRequired,
   studytrack: string.isRequired,
   selectedStudents: arrayOf(string).isRequired,
+  combinedProgramme: string.isRequired,
 }
 
 const mapStateToProps = ({ tagstudent }) => ({

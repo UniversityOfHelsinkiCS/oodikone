@@ -6,7 +6,7 @@ import { Button, Modal, Form, TextArea, Dropdown, Message } from 'semantic-ui-re
 
 import { createMultipleStudentTagAction } from '../../../redux/tagstudent'
 
-const TagModal = ({ tags, studytrack, createMultipleStudentTag, pending, success, error }) => {
+const TagModal = ({ tags, studytrack, createMultipleStudentTag, pending, success, error, combinedProgramme }) => {
   const [modalOpen, setModalOpen] = useState(false)
   const [input, setInput] = useState('')
   const [selectedValue, setSelected] = useState('')
@@ -29,7 +29,8 @@ const TagModal = ({ tags, studytrack, createMultipleStudentTag, pending, success
         tag_id: selectedValue,
         studentnumber: sn,
       })),
-      studytrack
+      studytrack,
+      combinedProgramme
     )
   }
 
@@ -97,6 +98,7 @@ TagModal.propTypes = {
   createMultipleStudentTag: func.isRequired,
   tags: arrayOf(shape({ tag_id: string, tagname: string, studytrack: string })).isRequired,
   studytrack: string.isRequired,
+  combinedProgramme: string.isRequired,
   pending: bool.isRequired,
   success: bool.isRequired,
   error: string,
