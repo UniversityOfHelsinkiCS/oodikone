@@ -70,7 +70,8 @@ const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
 
   if (populations?.query?.studyRights?.combinedProgramme && variant === 'population')
     columnsByVariant[variant].push('credits.hopsCombinedProg', 'endDateCombinedProg')
-  const baseColumns = ['credits', 'credits.all', 'studentnumber', 'tags', 'updatedAt', 'option', 'phoneNumber']
+  const baseColumns = ['credits', 'credits.all', 'studentnumber', 'tags', 'updatedAt', 'phoneNumber']
+  if (!populations?.query?.studyRights?.combinedProgramme) baseColumns.push('option')
   const nameColumnsToAdd = namesVisible ? ['email', 'lastname', 'firstname'] : []
   const adminColumnsToFilter = isAdmin ? [] : ['priority', 'extent', 'updatedAt']
 
