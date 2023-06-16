@@ -11,7 +11,7 @@ import useLanguage from '../LanguagePicker/useLanguage'
 const PopulationQueryCard = ({ population, query, removeSampleFn, units, tags }) => {
   const { language } = useLanguage()
   const { uuid, year, semesters, months, studentStatuses, tag } = query
-  const tagname = tag && tags.length > 0 ? tags.find(t => t.tag_id === tag).tagname : ''
+  const tagname = tag && tags.length > 0 ? tags.find(t => t.tag_id === tag)?.tagname : ''
   const { students } = population
   const header = units.map(u => getTextIn(u.name, language)).join(', ')
   const semesterList = semesters.map(s => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase()).join(', ')
