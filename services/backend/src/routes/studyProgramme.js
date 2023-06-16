@@ -16,7 +16,7 @@ const {
 } = require('../services/analyticsService')
 const { updateBasicView, updateStudytrackView } = require('../services/studyprogrammeUpdates')
 const { getProgrammeName } = require('../services/studyprogramme')
-const { logger } = require('../util/logger')
+const logger = require('../util/logger')
 const { getAssociations } = require('../services/studyrights')
 
 router.get('/v2/studyprogrammes/:id/basicstats', async (req, res) => {
@@ -96,7 +96,7 @@ router.get('/v2/studyprogrammes/:id/coursestats', async (req, res) => {
     const data = await getStudyprogrammeCoursesForStudytrack(date.getTime(), code, showByYear, combinedProgramme)
     return res.json(data)
   } catch (e) {
-    logger.error(`Failed to get code ${code} programme courses stats: ${e}`)
+    logger.error({ message: `Failed to get code ${code} programme courses stats`, meta: `${e}` })
   }
 })
 
@@ -133,7 +133,7 @@ router.get('/v2/studyprogrammes/:id/update_basicview', async (req, res) => {
     try {
       result = await updateBasicView(code, combinedProgramme)
     } catch (e) {
-      logger.error(`Failed to update code ${code} - ${combinedProgramme || 'not combined'} basic stats: ${e}`)
+      logger.error({ message: `Failed to update code ${code} ${combinedProgramme} basic stats`, meta: `${e}` })
     }
     return res.json(result)
   } else {
@@ -150,7 +150,7 @@ router.get('/v2/studyprogrammes/:id/update_studytrackview', async (req, res) => 
       const associations = await getAssociations()
       result = await updateStudytrackView(code, combinedProgramme, associations)
     } catch (e) {
-      logger.error(`Failed to update code ${code} - ${combinedProgramme || 'not combined'} studytrack stats: ${e}`)
+      logger.error({ message: `Failed to update code ${code} ${combinedProgramme} studytrack stats`, meta: `${e}` })
     }
     return res.json(result)
   } else {
