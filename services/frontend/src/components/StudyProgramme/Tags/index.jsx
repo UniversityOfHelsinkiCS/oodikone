@@ -64,15 +64,19 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme,
     if (!tag.year) {
       const year = new Date().getFullYear()
       const months = Math.ceil(moment.duration(moment().diff(`${year}-08-01`)).asMonths())
-      const href =
-        `/populations?months=${months}&semesters=FALL&semesters=` +
-        `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&year=${year}&tag=${tag.tag_id}`
+      const href = combinedProgramme
+        ? `/populations?months=${months}&semesters=FALL&semesters=` +
+          `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%2C"combinedProgramme"%3A"${combinedProgramme}"%7D&year=${year}&tag=${tag.tag_id}`
+        : `/populations?months=${months}&semesters=FALL&semesters=` +
+          `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&year=${year}&tag=${tag.tag_id}`
       return href
     }
     const months = Math.ceil(moment.duration(moment().diff(`${tag.year}-08-01`)).asMonths())
-    const href =
-      `/populations?months=${months}&semesters=FALL&semesters=` +
-      `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&year=${tag.year}&tag=${tag.tag_id}`
+    const href = combinedProgramme
+      ? `/populations?months=${months}&semesters=FALL&semesters=` +
+        `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%2C"combinedProgramme"%3A"${combinedProgramme}"%7D&year=${tag.year}&tag=${tag.tag_id}`
+      : `/populations?months=${months}&semesters=FALL&semesters=` +
+        `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&year=${tag.year}&tag=${tag.tag_id}`
     return href
   }
 
