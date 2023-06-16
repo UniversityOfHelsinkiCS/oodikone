@@ -6,30 +6,30 @@ export const getStudentTagsAction = () => {
   return callController(route, prefix)
 }
 
-export const createStudentTagAction = (tag, studytrack) => {
+export const createStudentTagAction = (tag, studytrack, combinedProgramme) => {
   const route = `/studenttags/${tag.studentnumber}`
   const prefix = 'CREATE_STUDENT_TAG_'
   const method = 'post'
-  const data = { tag, studytrack }
+  const data = { tag, studytrack, combinedProgramme }
   return callController(route, prefix, data, method)
 }
 
-export const createMultipleStudentTagAction = (tags, studytrack) => {
+export const createMultipleStudentTagAction = (tags, studytrack, combinedProgramme) => {
   const route = '/studenttags'
   const prefix = 'CREATE_MULTIPLE_TAGS_'
   const method = 'post'
-  const data = { tags, studytrack }
+  const data = { tags, studytrack, combinedProgramme }
   return callController(route, prefix, data, method)
 }
 
-export const deleteMultipleStudentTagAction = (tagId, studentnumbers, studytrack) => {
+export const deleteMultipleStudentTagAction = (tagId, studentnumbers, studytrack, combinedProgramme) => {
   const route = '/studenttags/delete_many'
   const prefix = 'DELETE_MULTIPLE_TAGS_'
   const method = 'delete'
-  const data = { tagId, studentnumbers, studytrack }
+  const data = { tagId, studentnumbers, studytrack, combinedProgramme }
   return callController(route, prefix, data, method)
 }
-
+// Combined programme is included to studytrack in form KHxx_xxx-MHxx_xxx
 export const getStudentTagsByStudytrackAction = studytrack => {
   const route = `/studenttags/${studytrack}`
   const prefix = 'GET_STUDENT_TAGS_BY_ST_'
@@ -43,11 +43,11 @@ export const getStudentTagsByStudentnumberAction = studentnumber => {
   return callController(route, prefix)
 }
 
-export const deleteStudentTagAction = (tagId, studentnumber, studytrack) => {
+export const deleteStudentTagAction = (tagId, studentnumber, studytrack, combinedProgramme) => {
   const route = '/studenttags/delete_one'
   const prefix = 'DELETE_STUDENT_TAG_'
   const method = 'delete'
-  const data = { tag_id: tagId, studentnumber, studytrack }
+  const data = { tag_id: tagId, studentnumber, studytrack, combinedProgramme }
   return callController(route, prefix, data, method)
 }
 

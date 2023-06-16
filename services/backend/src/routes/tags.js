@@ -22,8 +22,9 @@ router.get('/tags/:studytrack', async (req, res) => {
   const {
     user: { rights, roles, id },
   } = req
-
-  if (!rights.includes(studytrack) && !roles?.includes('admin')) return res.status(403).end()
+  const programmeCodes = studytrack.includes('KH') && studytrack.includes('MH') ? studytrack.split('-') : [studytrack]
+  if (!rights.includes(programmeCodes[0]) && !rights.includes(programmeCodes[1]) && !roles?.includes('admin'))
+    return res.status(403).end()
 
   const tags = await Tags.findTagsByStudytrack(studytrack)
   res.status(200).json(filterRelevantTags(tags, id))
@@ -37,7 +38,9 @@ router.post('/tags', async (req, res) => {
     user: { rights, roles, id },
   } = req
 
-  if (!rights.includes(studytrack) && !roles?.includes('admin')) return res.status(403).end()
+  const programmeCodes = studytrack.includes('KH') && studytrack.includes('MH') ? studytrack.split('-') : [studytrack]
+  if (!rights.includes(programmeCodes[0]) && !rights.includes(programmeCodes[1]) && !roles?.includes('admin'))
+    return res.status(403).end()
 
   await Tags.createNewTag({ studytrack, tagname, year, personal_user_id })
   const tags = await Tags.findTagsByStudytrack(studytrack)
@@ -50,7 +53,15 @@ router.delete('/tags', async (req, res) => {
     user: { rights, roles, id },
   } = req
 
-  if (!rights.includes(tag.studytrack) && !roles?.includes('admin') && !(tag.personal_user_id === id))
+  const programmeCodes =
+    tag.studytrack.includes('KH') && tag.studytrack.includes('MH') ? tag.studytrack.split('-') : [tag.studytrack]
+
+  if (
+    !rights.includes(programmeCodes[0]) &&
+    !rights.includes(programmeCodes[1]) &&
+    !roles?.includes('admin') &&
+    !(tag.personal_user_id === id)
+  )
     return res.status(403).end()
 
   await Tags.deleteTag(tag)
@@ -69,7 +80,9 @@ router.get('/studenttags/:studytrack', async (req, res) => {
     user: { rights, roles, id },
   } = req
 
-  if (!rights.includes(studytrack) && !roles?.includes('admin')) return res.status(403).end()
+  const programmeCodes = studytrack.includes('KH') && studytrack.includes('MH') ? studytrack.split('-') : [studytrack]
+  if (!rights.includes(programmeCodes[0]) && !rights.includes(programmeCodes[1]) && !roles?.includes('admin'))
+    return res.status(403).end()
 
   const result = await TagStudent.getStudentTagsByStudytrack(studytrack)
   res.status(200).json(filterRelevantStudentTags(result, id))
@@ -83,33 +96,38 @@ router.get('/studenttags/:studentnumber', async (req, res) => {
 })
 
 router.post('/studenttags/:studentnumber', async (req, res) => {
-  const { tag, studytrack } = req.body
+  const { tag, studytrack, combinedProgramme } = req.body
   const {
     user: { roles, rights, id },
   } = req
 
-  if (!rights.includes(studytrack) && !roles?.includes('admin')) return res.status(403).end()
+  if (!rights.includes(studytrack) && !rights.includes(combinedProgramme) && !roles?.includes('admin'))
+    return res.status(403).end()
 
   await TagStudent.createStudentTag(tag)
-  const result = await TagStudent.getStudentTagsByStudytrack(studytrack)
+  const studytrackCode = combinedProgramme ? `${studytrack}-${combinedProgramme}` : studytrack
+  const result = await TagStudent.getStudentTagsByStudytrack(studytrackCode)
   res.status(200).json(filterRelevantStudentTags(result, id))
 })
 
 router.post('/studenttags', async (req, res) => {
-  const { tags, studytrack } = req.body
+  const { tags, studytrack, combinedProgramme } = req.body
   const {
     user: { rights, roles, id },
   } = req
 
-  if (!rights.includes(studytrack) && !roles?.includes('admin')) return res.status(403).end()
+  if (!rights.includes(studytrack) && !rights.includes(combinedProgramme) && !roles?.includes('admin'))
+    return res.status(403).end()
 
-  const existingtags = await Tags.findTagsByStudytrack(studytrack)
-  const existingTagids = existingtags.map(t => t.tag_id)
+  const studytrackCode = combinedProgramme ? `${studytrack}-${combinedProgramme}` : studytrack
+  const existingTags = await Tags.findTagsByStudytrack(studytrackCode)
+  const existingTagids = existingTags.map(t => t.tag_id)
   const tagids = [...new Set(tags.map(t => t.tag_id))]
   if (!tagids.find(t => existingTagids.includes(t))) return res.status(400).json({ error: 'The tag does not exist' })
 
   const studentnumbers = tags.map(t => t.studentnumber)
-  const students = await Students.filterStudentnumbersByAccessrights(studentnumbers, [studytrack])
+  const studentFromProgrammes = combinedProgramme ? [studytrack, combinedProgramme] : [studytrack]
+  const students = await Students.filterStudentnumbersByAccessrights(studentnumbers, studentFromProgrammes)
   const missingStudents = difference(studentnumbers, students)
   if (missingStudents.length !== 0)
     return res
@@ -117,39 +135,39 @@ router.post('/studenttags', async (req, res) => {
       .json({ error: `Could not find the following students from the programme: ${missingStudents.join(', ')}` })
 
   await TagStudent.createMultipleStudentTags(tags)
-  const result = await TagStudent.getStudentTagsByStudytrack(studytrack)
+  const result = await TagStudent.getStudentTagsByStudytrack(studytrackCode)
   res.status(200).json(filterRelevantStudentTags(result, id))
 })
 
 router.delete('/studenttags/delete_one', async (req, res) => {
-  const { tag_id, studentnumber, studytrack } = req.body
+  const { tag_id, studentnumber, studytrack, combinedProgramme } = req.body
   const {
     user: { rights, roles, id },
   } = req
 
   if (!rights.includes(studytrack) && !roles?.includes('admin')) return res.status(403).end()
-
-  const tags = await Tags.findTagsFromStudytrackById(studytrack, [tag_id])
+  const studytrackCode = combinedProgramme ? `${studytrack}-${combinedProgramme}` : studytrack
+  const tags = await Tags.findTagsFromStudytrackById(studytrackCode, [tag_id])
   if (tags.length === 0) return res.status(403).json({ error: 'The tag does not exist' })
 
   await TagStudent.deleteStudentTag(studentnumber, tag_id)
-  const result = await TagStudent.getStudentTagsByStudytrack(studytrack)
+  const result = await TagStudent.getStudentTagsByStudytrack(studytrackCode)
   res.status(200).json(filterRelevantStudentTags(result, id))
 })
 
 router.delete('/studenttags/delete_many', async (req, res) => {
-  const { tagId, studentnumbers, studytrack } = req.body
+  const { tagId, studentnumbers, studytrack, combinedProgramme } = req.body
   const {
     user: { rights, roles, id },
   } = req
 
   if (!rights.includes(studytrack) && !roles?.includes('admin')) return res.status(403).end()
-
-  const tags = await Tags.findTagsFromStudytrackById(studytrack, [tagId])
+  const studytrackCode = combinedProgramme ? `${studytrack}-${combinedProgramme}` : studytrack
+  const tags = await Tags.findTagsFromStudytrackById(studytrackCode, [tagId])
   if (tags.length === 0) return res.status(403).json({ error: 'The tag does not exist' })
 
   await TagStudent.deleteMultipleStudentTags(tagId, studentnumbers)
-  const result = await TagStudent.getStudentTagsByStudytrack(studytrack)
+  const result = await TagStudent.getStudentTagsByStudytrack(studytrackCode)
   res.status(200).json(filterRelevantStudentTags(result, id))
 })
 

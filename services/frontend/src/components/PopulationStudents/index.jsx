@@ -45,7 +45,8 @@ const Panes = ({
     ANALYTICS_CATEGORIES.populationStudents,
     'Change students table tab'
   )
-
+  const programmeForTagsLink =
+    queryStudyrights?.length > 1 ? `${queryStudyrights[0]}+${queryStudyrights[1]}` : queryStudyrights[0]
   const programme = studyGuidanceGroup?.tags?.studyProgramme || ''
   const panesAvailable = [
     {
@@ -90,7 +91,7 @@ const Panes = ({
                 <h3>
                   No tags defined. You can define them{' '}
                   <Link
-                    to={`/study-programme/${queryStudyrights[0]}?p_m_tab=0&p_tab=4`}
+                    to={`/study-programme/${programmeForTagsLink}?p_m_tab=0&p_tab=4`}
                     onClick={() => {
                       sendAnalytics('No tags defined button clicked', 'Tags tab')
                     }}
@@ -107,8 +108,13 @@ const Panes = ({
                   tags={tags}
                   selectedStudents={filteredStudents.map(stu => stu.studentNumber)}
                   studytrack={queryStudyrights[0]}
+                  combinedProgramme={queryStudyrights[1]}
                 />
-                <TagList studytrack={queryStudyrights[0]} selectedStudents={filteredStudents} />
+                <TagList
+                  studytrack={queryStudyrights[0]}
+                  combinedProgramme={queryStudyrights[1]}
+                  selectedStudents={filteredStudents}
+                />
               </>
             )}
           </div>
@@ -180,11 +186,13 @@ const PopulationStudents = ({
 
   useEffect(() => {
     if (tags && tags.length > 0) return
-    const queryStudyright = queryStudyrights[0]
+    // Create study
+    const studytrack =
+      queryStudyrights.length > 1 ? `${queryStudyrights[0]}-${queryStudyrights[1]}` : queryStudyrights[0]
 
-    if (queryStudyright) {
-      dispatch(getTagsByStudytrackAction(queryStudyright))
-      dispatch(getStudentTagsByStudytrackAction(queryStudyright))
+    if (studytrack) {
+      dispatch(getTagsByStudytrackAction(studytrack))
+      dispatch(getStudentTagsByStudytrackAction(studytrack))
     }
 
     setState({ ...state, admin })
