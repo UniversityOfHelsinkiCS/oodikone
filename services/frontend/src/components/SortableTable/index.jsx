@@ -323,7 +323,7 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
   const [forcedTitleWidth, setForcedTitleWidth] = useState()
 
   const borderStyles =
-    (column.thickBorders && !column.child) || (column.child && column.parent.thickBorders && column.isLast)
+    (column.thickBorders && !column.child) || (column.child && column.parent?.thickBorders && column.isLast)
       ? thickBorderStyles
       : {}
 
