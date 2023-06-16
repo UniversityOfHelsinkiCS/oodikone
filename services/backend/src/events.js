@@ -68,9 +68,8 @@ const refreshNewOverviews = async () => {
       try {
         await updateBasicView(code, combinedProgramme)
         await updateStudytrackView(code, combinedProgramme, associations)
-        ready += 1
       } catch (e) {
-        logger.error({ message: `Failed to update overview stats for programme ${code}`, meta: e })
+        logger.error({ message: `Failed to update overview stats for combined programme ${code}`, meta: e })
       }
     }
     logger.info(`${ready}/${codes.length} programmes done`)
