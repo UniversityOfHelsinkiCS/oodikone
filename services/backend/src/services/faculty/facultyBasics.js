@@ -1,4 +1,4 @@
-const { indexOf } = require('lodash')
+const { indexOf, isArray } = require('lodash')
 const moment = require('moment')
 const {
   startedStudyrights,
@@ -254,7 +254,7 @@ const getFacultyTransfers = async (
   for (const { transferdate, targetcode } of insideTransfers) {
     const transferYear = defineYear(transferdate, isAcademicYear)
     transferGraphStats[0][indexOf(yearsArray, transferYear)] += 1
-    if (isAcademicYear || !(transferYear > moment().year())) {
+    if (isAcademicYear && isArray(transferTableStats[transferYear])) {
       transferTableStats[transferYear][0] += 1
       await addProgramme(
         programmeTableStats,
@@ -274,7 +274,7 @@ const getFacultyTransfers = async (
 
     for (const { transferdate, sourcecode } of awayTransfers) {
       const transferYear = defineYear(transferdate, isAcademicYear)
-      if (isAcademicYear || !(transferYear > moment().year())) {
+      if (isArray(transferTableStats[transferYear])) {
         transferGraphStats[1][indexOf(yearsArray, transferYear)] += 1
         transferTableStats[transferYear][1] += 1
         await addProgramme(
@@ -292,7 +292,7 @@ const getFacultyTransfers = async (
 
     for (const { transferdate, targetcode } of toTransfers) {
       const transferYear = defineYear(transferdate, isAcademicYear)
-      if (isAcademicYear || !(transferYear > moment().year())) {
+      if (isArray(transferTableStats[transferYear])) {
         transferGraphStats[2][indexOf(yearsArray, transferYear)] += 1
         transferTableStats[transferYear][2] += 1
         await addProgramme(
