@@ -31,9 +31,9 @@ const refreshFaculties = async () => {
       await updateFacultyProgressOverview(faculty.code)
       ready += 1
     } catch (e) {
-      logger.error({ message: `Failed to update stats for faculty ${faculty?.code} with type ALL`, meta: e })
+      logger.error({ message: `Failed to update stats for faculty ${faculty?.code} with type ALL`, meta: `${e}` })
     }
-    logger.info(`${ready}/${facultyList.length} faculties done`)
+    logger.info(`${ready}/${facultyList.length} faculties done; faculty ${faculty}`)
   }
   logger.info('Faculty stats refreshed!')
 }
@@ -60,7 +60,7 @@ const refreshNewOverviews = async () => {
       await updateStudytrackView(code, combinedProgramme, associations)
       ready += 1
     } catch (e) {
-      logger.error({ message: `Failed to update overview stats for programme ${code}`, meta: e })
+      logger.error({ message: `Failed to update overview stats for programme ${code}`, meta: `${e}` })
     }
     combinedProgramme = combinedStudyprogrammes[code] || ''
     // If bachelor programme is combined with master programme, then update the combination.
@@ -69,10 +69,10 @@ const refreshNewOverviews = async () => {
         await updateBasicView(code, combinedProgramme)
         await updateStudytrackView(code, combinedProgramme, associations)
       } catch (e) {
-        logger.error({ message: `Failed to update overview stats for combined programme ${code}`, meta: e })
+        logger.error({ message: `Failed to update overview stats for combined programme ${code}`, meta: `${e}` })
       }
     }
-    logger.info(`${ready}/${codes.length} programmes done`)
+    logger.info(`${ready}/${codes.length} programmes done: code ${code}`)
   }
   logger.info('Studyprogramme and studytrack overview stats refreshed!')
 }
@@ -113,7 +113,7 @@ const refreshUberToRedis = async () => {
       await refreshUber(oldAttainmentsQuery)
       logger.info(`Refreshing CDS uber year ${formattedYear} doned`)
     } catch (e) {
-      logger.error({ message: `Error when refreshing CDS uber year ${formattedYear}`, meta: e })
+      logger.error({ message: `Error when refreshing CDS uber year ${formattedYear}`, meta: `${e}` })
     }
   }
   logger.info(`Refreshing CDS Uber data doned`)
