@@ -409,7 +409,7 @@ const GeneralTab = ({ group, populations, columnKeysToInclude, coursecode, filte
     },
     programme: {
       key: 'programme',
-      title: 'Study programmes',
+      title: programmeCode ? 'Other programmes' : 'Study programmes',
       getRowContent: s => getStudyProgrammeContent(s),
       getRowVal: s => {
         return studentProgrammesMap[s.studentNumber]?.getProgrammesList('; ')
