@@ -69,10 +69,20 @@ const GeneralTab = ({ group, populations, columnKeysToInclude, coursecode, filte
       .map(stu => [stu.studentNumber, stu])
   )
 
+  const getCombinedProgrammeCode = (cleanedQueryStudyrights, studyGuidangeGroupProgrammes) => {
+    if (cleanedQueryStudyrights.length > 1) return cleanedQueryStudyrights[1]
+    if (studyGuidangeGroupProgrammes.length > 1) return studyGuidangeGroupProgrammes[1]
+    return ''
+  }
+
   const queryStudyrights = query ? Object.values(query.studyRights) : []
   const cleanedQueryStudyrights = queryStudyrights.filter(sr => !!sr)
-  const programmeCode = cleanedQueryStudyrights[0] || group?.tags?.studyProgramme
-  const combinedProgrammeCode = cleanedQueryStudyrights.length > 1 ? cleanedQueryStudyrights[1] : ''
+  const studyGuidangeGroupProgrammes =
+    group?.tags?.studyProgramme && group?.tags?.studyProgramme.includes('+')
+      ? group?.tags?.studyProgramme.split('+')
+      : [group?.tags?.studyProgramme]
+  const programmeCode = cleanedQueryStudyrights[0] || studyGuidangeGroupProgrammes[0]
+  const combinedProgrammeCode = getCombinedProgrammeCode(cleanedQueryStudyrights, studyGuidangeGroupProgrammes)
 
   const {
     studentToStudyrightStartMap,

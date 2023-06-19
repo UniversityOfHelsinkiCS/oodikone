@@ -107,7 +107,10 @@ const SingleStudyGroupContent = ({ filteredStudents, population, group, language
   }, [population])
 
   const customStudyStartYear = group?.tags?.year ? new Date(`${group.tags.year}-07-31`) : null
-
+  const programmeCodes =
+    group?.tags?.studyProgramme && group?.tags?.studyProgramme.includes('+')
+      ? group?.tags?.studyProgramme.split('+')
+      : [group?.tags?.studyProgramme]
   const createPanels = students => [
     {
       key: 0,
@@ -130,7 +133,7 @@ const SingleStudyGroupContent = ({ filteredStudents, population, group, language
             <CreditAccumulationGraphHighCharts
               students={students}
               studyPlanFilterIsActive={studyPlanFilterIsActive}
-              programmeCodes={group?.tags?.studyProgramme ? [group.tags.studyProgramme] : []}
+              programmeCodes={group?.tags?.studyProgramme ? programmeCodes : []}
               customStudyStartYear={customStudyStartYear}
             />
           </div>
@@ -158,7 +161,7 @@ const SingleStudyGroupContent = ({ filteredStudents, population, group, language
                 filteredStudents={students}
                 showStructured={coursesStructuredByProgramme}
                 toggleShowStructured={toggleCoursesStructuredByProgramme}
-                studyProgramme={group.tags?.studyProgramme}
+                studyProgramme={group.tags?.studyProgramme ? programmeCodes[0] : null}
               />
             )}
           </div>
@@ -254,16 +257,22 @@ const SingleStudyGroupFilterView = props => {
   }
 
   if (props.group?.tags?.studyProgramme) {
+    const programmes = props.group?.tags?.studyProgramme.includes('+')
+      ? props.group?.tags?.studyProgramme.split('+')
+      : [props.group?.tags?.studyProgramme]
     viewFilters.push(
       filters.graduatedFromProgrammeFilter({
-        code: props.group.tags.studyProgramme,
-        combinedProgrammeCode: '',
+        code: programmes[0],
+        combinedProgrammeCode: programmes.length > 1 ? programmes[1] : '',
       })
     )
     viewFilters.push(
-      filters.hopsFilter({ programmeCode: props.group?.tags?.studyProgramme, combinedProgrammeCode: '' })
+      filters.hopsFilter({
+        programmeCode: programmes[0],
+        combinedProgrammeCode: programmes.length > 1 ? programmes[1] : '',
+      })
     )
-    viewFilters.push(filters.studyTrackFilter({ code: props.group.tags.studyProgramme }))
+    viewFilters.push(filters.studyTrackFilter({ code: programmes[0] }))
   }
 
   const initialOptions = {}

@@ -175,16 +175,17 @@ const PopulationStudents = ({
   const { studentlistVisible: showList } = useSelector(({ settings }) => settings)
   const { data: tags } = useSelector(({ tags }) => tags)
   const { query } = useSelector(({ populations }) => populations)
-  const queryStudyrights = query ? Object.values(query.studyRights) : []
+  let queryStudyrights = query ? Object.values(query.studyRights) : []
   let months = query ? query.months : 0
   if (studyGuidanceGroup && studyGuidanceGroup?.tags?.year) {
     months = moment().diff(moment(`${studyGuidanceGroup?.tags?.year}-08-01`), 'months')
   }
-  // if (studyGuidanceGroup && studyGuidanceGroup?.tags?.studyProgramme) {
-  //   queryStudyrights = studyGuidanceGroup.tags.studyProgramme.includes('+')
-  //     ? studyGuidanceGroup.tags.studyProgramme.split('+')
-  //     : studyGuidanceGroup.tags.studyProgramme
-  // }
+
+  if (studyGuidanceGroup && studyGuidanceGroup?.tags?.studyProgramme) {
+    queryStudyrights = studyGuidanceGroup.tags.studyProgramme.includes('+')
+      ? studyGuidanceGroup.tags.studyProgramme.split('+')
+      : [studyGuidanceGroup.tags.studyProgramme]
+  }
   const prevShowList = usePrevious(showList)
   const { isAdmin } = useGetAuthorizedUserQuery()
   const admin = isAdmin
@@ -196,7 +197,6 @@ const PopulationStudents = ({
       queryStudyrights.length > 1 && queryStudyrights[1] !== ''
         ? `${queryStudyrights[0]}-${queryStudyrights[1]}`
         : queryStudyrights[0]
-
     if (studytrack) {
       dispatch(getTagsByStudytrackAction(studytrack))
       dispatch(getStudentTagsByStudytrackAction(studytrack))
