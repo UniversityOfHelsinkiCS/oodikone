@@ -170,7 +170,10 @@ const PopulationDetails = ({
         ),
       },
     },
-    !onlyIamRights && {
+  ]
+
+  if (!onlyIamRights) {
+    panels.push({
       key: 4,
       title: {
         content: (
@@ -195,9 +198,8 @@ const PopulationDetails = ({
           </div>
         ),
       },
-    },
-  ]
-
+    })
+  }
   return (
     <>
       <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={panels} />

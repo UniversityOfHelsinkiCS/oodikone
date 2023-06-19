@@ -67,8 +67,13 @@ const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
     ],
     studyGuidanceGroupPopulation: getStudyGuidanceGroupColumns(),
   }
+  const studyGuidanceGroupCombinedProg =
+    studyGuidanceGroup?.tags?.studyProgramme && studyGuidanceGroup?.tags?.studyProgramme.includes('+')
 
-  if (populations?.query?.studyRights?.combinedProgramme && variant === 'population')
+  if (
+    (populations?.query?.studyRights?.combinedProgramme && variant === 'population') ||
+    (studyGuidanceGroupCombinedProg && variant === 'studyGuidanceGroupPopulation')
+  )
     columnsByVariant[variant].push('credits.hopsCombinedProg', 'endDateCombinedProg')
   const baseColumns = ['credits', 'credits.all', 'studentnumber', 'tags', 'updatedAt', 'phoneNumber']
   if (!populations?.query?.studyRights?.combinedProgramme) baseColumns.push('option')

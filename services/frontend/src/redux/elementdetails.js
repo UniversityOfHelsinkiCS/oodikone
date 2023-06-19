@@ -1,5 +1,5 @@
 import { RTKApi } from 'apiConnection'
-import { getTextIn } from 'common'
+import { getTextIn, getUnifiedProgrammeName } from 'common'
 import { callController } from '../apiConnection'
 
 // original elementdetail stuff
@@ -35,7 +35,6 @@ const reducer = (state = { data: [] }, action) => {
 }
 
 // RTK query based stuff
-
 const elementDetailsApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
     getAllElementDetails: builder.query({
@@ -65,8 +64,31 @@ export const useFilteredAndFormattedElementDetails = language => {
           description: elem.code,
           text: getTextIn(elem.name, language),
         }))
+  // create options for combined programmes
+  const combinedProgrammeCodes = ['KH90_001', 'MH90_001']
+  const dataForCombined = isLoading
+    ? {}
+    : data
+        .filter(elem => combinedProgrammeCodes.includes(elem.code))
+        .reduce((acc, elem) => ({ ...acc, [elem.code]: elem.name }), {})
 
-  return filteredAndFormatted
+  const combinedOptions =
+    isLoading && !dataForCombined
+      ? []
+      : [
+          {
+            key: 'KH90_001+MH90_001',
+            value: 'KH90_001+MH90_001',
+            description: 'KH90_001+MH90_001',
+            text: getUnifiedProgrammeName(
+              getTextIn(dataForCombined.KH90_001, language),
+              getTextIn(dataForCombined.MH90_001, language),
+              language
+            ),
+          },
+        ]
+
+  return [...filteredAndFormatted, ...combinedOptions]
 }
 
 export default reducer
