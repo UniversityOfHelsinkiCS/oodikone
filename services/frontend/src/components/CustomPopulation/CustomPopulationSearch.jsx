@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Button, Modal, Form, TextArea } from 'semantic-ui-react'
 import { shape, func, arrayOf, bool } from 'prop-types'
-import { useProgress, useTitle } from '../../common/hooks'
+import { textAndDescriptionSearch } from 'common'
+import { useFilteredAndFormattedElementDetails } from 'redux/elementdetails'
+import { useLanguage, useProgress, useTitle } from '../../common/hooks'
 import { getCustomPopulation } from '../../redux/populations'
 import {
   getCustomPopulationSearches,
@@ -30,8 +32,10 @@ const CustomPopulationSearch = ({
   const [modal, setModal] = useState(false)
   const [input, setInput] = useState('')
   const [name, setName] = useState('')
+  const [programme, setProgramme] = useState('')
   const [selectedSearchId, setSelectedSearchId] = useState('')
-
+  const language = useLanguage()
+  const programmes = useFilteredAndFormattedElementDetails(language)
   const { onProgress } = useProgress(loading)
 
   useTitle('Custom population')
@@ -97,7 +101,7 @@ const CustomPopulationSearch = ({
     e.preventDefault()
     const studentnumbers = parseInput(input)
     setStudentsInput(studentnumbers)
-    getCustomPopulationDispatch({ studentnumberlist: studentnumbers, onProgress })
+    getCustomPopulationDispatch({ studentnumberlist: studentnumbers, onProgress, associatedProgramme: programme })
     getCustomPopulationCoursesByStudentnumbers({ studentnumberlist: studentnumbers })
     selectCustomPopulationSearchDispatch(selectedSearchId || null)
     handleClose()
@@ -130,6 +134,16 @@ const CustomPopulationSearch = ({
               data-cy="student-no-input"
             />
           </Form.Field>
+          <Form.Select
+            name="Associated programme"
+            search={textAndDescriptionSearch}
+            options={programmes}
+            onChange={(_, value) => setProgramme(value?.value)}
+            value={programme}
+            closeOnChange
+            clearable
+            placeholder="Select associated study programme for the population"
+          />
         </Form>
         <SearchHistory
           header="Saved populations"

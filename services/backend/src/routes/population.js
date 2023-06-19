@@ -412,6 +412,9 @@ router.post('/v3/populationstatisticsbystudentnumbers', async (req, res) => {
     Sentry.captureException(new Error(result.error))
     return
   }
+
+  result.studyProgramme = tags?.studyProgramme
+
   res.status(200).json(filterPersonalTags(result, id))
 })
 

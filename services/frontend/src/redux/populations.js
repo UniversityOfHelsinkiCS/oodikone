@@ -53,10 +53,15 @@ export const getCoursePopulation = ({ coursecodes, from, to, onProgress, separat
   return callController(route, prefix, null, 'get', query, params, onProgress)
 }
 
-export const getCustomPopulation = ({ studentnumberlist, onProgress, usingStudyGuidanceGroups }) => {
+export const getCustomPopulation = ({
+  studentnumberlist,
+  onProgress,
+  usingStudyGuidanceGroups,
+  associatedProgramme,
+}) => {
   const route = '/v3/populationstatisticsbystudentnumbers'
   const prefix = 'GET_CUSTOM_POP_'
-  const tags = { studyProgramme: '', year: 1900 } // This nonsense is added here becaus of the studyguidance groups
+  const tags = { studyProgramme: associatedProgramme, year: 1900 }
   const params = { studentnumberlist, usingStudyGuidanceGroups }
   const query = { studentnumberlist, studyRights: { programme: 'KH555' } }
   const body = { studentnumberlist, usingStudyGuidanceGroups, tags }
