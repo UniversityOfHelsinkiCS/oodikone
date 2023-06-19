@@ -427,6 +427,8 @@ const GeneralTab = ({ group, populations, columnKeysToInclude, coursecode, filte
       cellProps: s => {
         return { title: studentProgrammesMap[s.studentNumber]?.getProgrammesList('\n') }
       },
+      helpText:
+        'Three dots indicate more programmes than one. Hover your mouse on the cell to see the rest. They are also displayed in the exported Excel-file.',
     },
     startYear: {
       key: 'startYear',

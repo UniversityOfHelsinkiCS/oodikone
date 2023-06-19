@@ -2,9 +2,9 @@ import React from 'react'
 import { Icon } from 'semantic-ui-react'
 import { getTextIn, reformatDate, getAllProgrammesOfStudent } from 'common'
 
-const noProgrammeAtEnrollment = {
-  en: 'No programme at time of course enrollment',
-  fi: 'Ei ohjelmaa ilmoittautumisen hetkellä',
+const noProgrammeDuringCourse = {
+  en: 'No programme at time of course',
+  fi: 'Ei ohjelmaa kurssin aikana',
 }
 
 const noProgramme = {
@@ -24,13 +24,15 @@ const getStudyProgrammeFunctions = ({
   if (!students || !selectedStudents || !elementDetails) return {}
 
   const getProgrammesAtEnrollment = student => {
+    // returns null if no enrollment was found
     const filteredEnrollments = student.enrollments
       ? student.enrollments
           // eslint-disable-next-line camelcase
           .filter(({ course_code }) => coursecode.includes(course_code))
           .sort((a, b) => new Date(b.enrollment_date_time) - new Date(a.enrollment_date_time))
-      : []
-    if (!filteredEnrollments.length) return [noProgrammeAtEnrollment]
+      : null
+    if (filteredEnrollments === null) return null
+    if (!filteredEnrollments.length) return null
     return getAllProgrammesOfStudent(
       student.studyrights,
       student.studentNumber,
@@ -39,18 +41,46 @@ const getStudyProgrammeFunctions = ({
     )
   }
 
+  const getProgrammesAtCompletion = student => {
+    const courseCompletions = student.courses
+      // eslint-disable-next-line camelcase
+      .filter(({ course_code }) => coursecode.includes(course_code))
+      .toSorted((a, b) => {
+        if (a.date < b.date) return 1
+        if (a.date > b.date) return -1
+        return 0
+      })
+
+    if (courseCompletions.length === 0) return [noProgrammeDuringCourse]
+
+    const { date } = courseCompletions[0]
+
+    const allProgs = getAllProgrammesOfStudent(
+      student.studyrights,
+      student.studentNumber,
+      { [student.studentNumber]: date },
+      elementDetails
+    )
+
+    return allProgs
+  }
+
   const getStudentsProgrammes = student => {
-    if (coursecode?.length > 0) return getProgrammesAtEnrollment(student)
+    if (coursecode?.length > 0) {
+      const programmesAtEnrollment = getProgrammesAtEnrollment(student)
+
+      if (programmesAtEnrollment !== null) return programmesAtEnrollment
+      return getProgrammesAtCompletion(student)
+    }
     return getAllProgrammesOfStudent(student.studyrights, student.studentNumber, null, elementDetails)
   }
 
-  const getProgrammeToShow = (student, programmes) => {
+  const getProgrammeToShow = programmes => {
     // For course statistics (student.enrollments exists) show newest programme at the time of course enrollment
     // For other views: If programme associated, show newest OTHER programme (And the rest on hover), if no programme associated, show newest.
-    if (!programmes) return coursecode ? noProgrammeAtEnrollment : noProgramme
+    if (!programmes) return coursecode ? noProgrammeDuringCourse : noProgramme
     if (coursecode?.length > 0) {
-      const programmesAtEnrollment = getProgrammesAtEnrollment(student)
-      if (programmesAtEnrollment) return programmesAtEnrollment[0].name
+      if (programmes.length > 0) return programmes[0].name
     }
     if (programmeCode) {
       const otherProgrammes = programmes.filter(prog => prog.code !== programmeCode)
@@ -64,9 +94,10 @@ const getStudyProgrammeFunctions = ({
     res[sn] = {
       programmes: getStudentsProgrammes(students[sn]),
     }
-    if (coursecode?.length > 0) res[sn].programmes = res[sn].programmes.filter(p => p.active)
 
-    const programmeToShow = getProgrammeToShow(students[sn], res[sn].programmes)
+    // if (coursecode?.length > 0) res[sn].programmes = res[sn].programmes.filter(p => p.active)
+
+    const programmeToShow = getProgrammeToShow(res[sn].programmes)
 
     if (programmeToShow) res[sn].programmeToShow = getTextIn(programmeToShow, language)
     res[sn].getProgrammesList = delimiter =>
@@ -91,7 +122,7 @@ const getStudyProgrammeFunctions = ({
     if (studentProgrammesMap[s.studentNumber]?.programmes.length > 1) {
       return (
         <div>
-          {programme} <Icon name="plus square outline" color="grey" size="large" />
+          {programme} <Icon name="ellipsis horizontal" color="grey" size="large" />
         </div>
       )
     }
