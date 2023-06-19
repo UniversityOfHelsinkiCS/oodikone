@@ -230,21 +230,21 @@ const CustomPopulationContent = ({ students, custompop }) => {
   const renderCustomPopulation = () => (
     <div>
       {custompop && (
-        <div style={{ width: '40%', margin: 'auto', display: 'flex', gap: '8px', alignItems: 'baseline' }}>
+        <div style={{ margin: 'auto' }}>
           <Header className="segmentTitle" size="large" textAlign="center">
             Custom population
             {searchedCustomPopulationSearchId
               ? ` "${customPopulationSearches.find(({ id }) => id === searchedCustomPopulationSearchId).name}"`
               : ''}
-          </Header>{' '}
-          {populations.data.studyProgramme && (
-            <Label
-              style={{ marginLeft: '2em' }}
-              tag
-              color="blue"
-              content={studyProgrammes.find(p => p.key === populations.data.studyProgramme).text}
-            />
-          )}
+            {populations.data.studyProgramme && (
+              <Label
+                style={{ marginLeft: '2em' }}
+                tag
+                color="blue"
+                content={studyProgrammes.find(p => p.key === populations.data.studyProgramme).text}
+              />
+            )}
+          </Header>
         </div>
       )}
       <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={createPanels()} />
