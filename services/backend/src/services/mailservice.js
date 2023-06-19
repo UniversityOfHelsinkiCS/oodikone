@@ -3,7 +3,7 @@ const { isProduction, pateToken } = require('../conf-backend')
 const { ApplicationError } = require('../util/customErrors')
 
 const pateClient = axios.create({
-  baseURL: 'https://importer.cs.helsinki.fi/api/pate/',
+  baseURL: 'https://api-toska.apps.ocp-prod-0.k8s.it.helsinki.fi/pate/',
   params: {
     token: pateToken,
   },
