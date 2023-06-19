@@ -108,12 +108,12 @@ const Panes = ({
                   tags={tags}
                   selectedStudents={filteredStudents.map(stu => stu.studentNumber)}
                   studytrack={queryStudyrights[0]}
-                  combinedProgramme={queryStudyrights[1]}
+                  combinedProgramme={queryStudyrights.length > 1 ? queryStudyrights[1] : ''}
                 />
                 <TagList
                   studytrack={queryStudyrights[0]}
-                  combinedProgramme={queryStudyrights[1]}
                   selectedStudents={filteredStudents}
+                  combinedProgramme={queryStudyrights.length > 1 ? queryStudyrights[1] : ''}
                 />
               </>
             )}
@@ -180,15 +180,22 @@ const PopulationStudents = ({
   if (studyGuidanceGroup && studyGuidanceGroup?.tags?.year) {
     months = moment().diff(moment(`${studyGuidanceGroup?.tags?.year}-08-01`), 'months')
   }
+  // if (studyGuidanceGroup && studyGuidanceGroup?.tags?.studyProgramme) {
+  //   queryStudyrights = studyGuidanceGroup.tags.studyProgramme.includes('+')
+  //     ? studyGuidanceGroup.tags.studyProgramme.split('+')
+  //     : studyGuidanceGroup.tags.studyProgramme
+  // }
   const prevShowList = usePrevious(showList)
   const { isAdmin } = useGetAuthorizedUserQuery()
   const admin = isAdmin
 
   useEffect(() => {
     if (tags && tags.length > 0) return
-    // Create study
+    // Create studytrack for fetching tags for class statistics
     const studytrack =
-      queryStudyrights.length > 1 ? `${queryStudyrights[0]}-${queryStudyrights[1]}` : queryStudyrights[0]
+      queryStudyrights.length > 1 && queryStudyrights[1] !== ''
+        ? `${queryStudyrights[0]}-${queryStudyrights[1]}`
+        : queryStudyrights[0]
 
     if (studytrack) {
       dispatch(getTagsByStudytrackAction(studytrack))
