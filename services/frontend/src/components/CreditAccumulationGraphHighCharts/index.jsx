@@ -550,7 +550,7 @@ const CreditAccumulationGraphHighCharts = ({
   const graduations = singleStudent ? filterGraduations(students[0], selectedStudyRight) : []
   const transfers = singleStudent ? filterTransfers(students[0], language) : []
   const studyRightStartLine =
-    !singleStudent && studyPlanFilterIsActive
+    !singleStudent && studyPlanFilterIsActive && (customStudyStartYear || students[0]?.studyrightStart)
       ? [new Date(customStudyStartYear || students[0].studyrightStart).getTime()]
       : []
 
