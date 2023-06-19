@@ -42,7 +42,7 @@ const settingDefinitions = _.map(
     {
       key: 'showCountingFrom',
       type: 'date',
-      defaultValue: () => moment(),
+      defaultValue: () => moment().endOf('day'),
       persist: false,
     },
   ],
@@ -202,9 +202,9 @@ const Status = () => {
     let date
 
     if (!showCountingFrom) {
-      date = moment().valueOf()
+      date = moment().endOf('day').valueOf()
     } else if (isValidDate(showCountingFrom)) {
-      date = moment(showCountingFrom).valueOf()
+      date = moment(showCountingFrom).endOf('day').valueOf()
     } else {
       return
     }
