@@ -120,7 +120,8 @@ export default {
     - **All**  listaa opiskelijan suoritetut opintopisteet valitun tarkastelujakson  ajalta.
     - **Since ... ** listaa opiskelijan suoritetut opintopisteet määritellystä ajankohdasta alkaen
   - **Start of studyright**: Opiskelijan valittuun ohjelmaan liittyvän opinto-oikeuden alkupäivä
-  - **Programme**: Näyttää opiskelijan uusimman opinto-oikeuden. Jos opiskelijalla on opinto-oikeuksia muihinkin koulutusohjelmiin, ne näkyvät aikajärjestyksessä uusimmasta vanhimpaan Excel-tiedostossa, sekä laittamalla hiiri koulutusohjelman päälle.
+  - **Study programme**: Näyttää opiskelijan uusimman opinto-oikeuden. Opiskelijan kaikki opinto-oikeudet näkyvät uusimmasta vanhimpaan Excel-tiedostossa, sekä laittamalla hiiri solun päälle.
+  - **Other programme**: Näkyy, jos ryhmälle on asetettu opinto-oikeus. Tämä korvaa Study programme -sarakkeen, ja toimii muuten samoin mutta näyttää opiskelijan muista opinto-oikeuksista uusimman.
   - **Started in programme**: Opiskelijan valitussa ohjelmassa aloituspäivämäärä. Kandi+maisteriopiskelijoille kandiksi valmistumispäivämäärä +1.
   `,
   StudentsClass: `**Students**

@@ -46,19 +46,17 @@ const getStudyProgrammeFunctions = ({
 
   const getProgrammeToShow = (student, programmes) => {
     // For course statistics (student.enrollments exists) show newest programme at the time of course enrollment
-    // For other views: If programme associated, show that programme, if does exist or no programme associated, show newest.
-    if (!programmes)
-      return { en: 'No programme at time of course enrollment', fi: 'Ei ohjelmaa ilmoittautumisen hetkellä' }
-    if (programmeCode) {
-      const associatedProgramme = programmes.find(p => p.code === programmeCode)
-      if (associatedProgramme) return associatedProgramme.name
-      if (programmes.length > 0) return programmes[0].name
-      return noProgramme
-    }
+    // For other views: If programme associated, show newest OTHER programme (And the rest on hover), if no programme associated, show newest.
+    if (!programmes) return coursecode ? noProgrammeAtEnrollment : noProgramme
     if (coursecode?.length > 0) {
       const programmesAtEnrollment = getProgrammesAtEnrollment(student)
       if (programmesAtEnrollment) return programmesAtEnrollment[0].name
     }
+    if (programmeCode) {
+      const otherProgrammes = programmes.filter(prog => prog.code !== programmeCode)
+      return otherProgrammes.length > 0 ? otherProgrammes[0].name : programmes[0].name
+    }
+    if (programmes.length > 0) return programmes[0].name
     return noProgramme
   }
 
