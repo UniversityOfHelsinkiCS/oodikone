@@ -1,13 +1,14 @@
 import React, { useRef, useState } from 'react'
 import { Form, Checkbox, Divider, Popup, Button, Icon } from 'semantic-ui-react'
 import moment from 'moment'
+import 'moment/locale/fi'
 import ReactMarkdown from 'react-markdown'
 import Datetime from 'react-datetime'
 import WithHelpTooltip from './WithHelpTooltip'
 
 const unindent = s => s.replace(/(^|\n)[ \t]+/g, '\n')
 
-const isValidDate = d => moment().diff(moment(d)) > 0
+const isValidDate = d => moment(d).isValid() && moment().endOf('day').diff(moment(d)) >= 0
 
 const DateSetting = ({ onChange, value, onOpenDetails, tooltip, placeholder }) => {
   const DATE_FORMAT = 'DD.MM.YYYY'
@@ -15,7 +16,13 @@ const DateSetting = ({ onChange, value, onOpenDetails, tooltip, placeholder }) =
   return (
     <div style={{ marginRight: '0.3rem' }}>
       <Form>
-        <Form.Field error={value !== null && !isValidDate(value)} style={{ display: 'flex', alignItems: 'center' }}>
+        <Form.Field
+          error={value !== null && !isValidDate(value)}
+          style={{ display: 'flex', alignItems: 'center' }}
+          onKeyDown={e => {
+            e.preventDefault() // prevents user for typing the date
+          }}
+        >
           <WithHelpTooltip
             tooltip={tooltip}
             onOpenDetails={onOpenDetails}
@@ -41,10 +48,8 @@ const DateSetting = ({ onChange, value, onOpenDetails, tooltip, placeholder }) =
               isValidDate={isValidDate}
               inputProps={{ placeholder }}
               onChange={value => {
-                if (value === '') {
-                  onChange(null)
-                } else if (isValidDate(value)) {
-                  onChange(value.format(DATE_FORMAT) === moment().format(DATE_FORMAT) ? null : value)
+                if ((typeof value === 'string' && value !== '' && value.length === 10) || isValidDate(value)) {
+                  onChange(value) // Change value only if it is valid
                 }
               }}
             />
