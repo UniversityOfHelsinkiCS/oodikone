@@ -460,12 +460,6 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
         >
           <SizeMeasurer onSizeChange={onTitleSizeChange} style={{ display: 'inline-flex', alignItems: 'center' }}>
             {typeof column.title === 'string' ? <p style={{ whiteSpace: 'pre' }}>{column.title}</p> : column.title}
-            {column.helpText && !forcedTitleWidth && (
-              <Icon
-                name="question circle outline"
-                style={{ opacity: 0.5, display: 'inline-block', marginRight: 0, marginLeft: '0.5em', flexShrink: 0 }}
-              />
-            )}
           </SizeMeasurer>
           {column.helpText && forcedTitleWidth && (
             <>
