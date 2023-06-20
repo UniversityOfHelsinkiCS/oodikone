@@ -399,6 +399,15 @@ const GeneralTab = ({ group, populations, columnKeysToInclude, coursecode, filte
       filterType: 'date',
       getRowVal: s => getStudyStartDate(s),
     },
+    semesterEnrollments: {
+      key: 'semesterEnrollments',
+      title: 'Semesters\npresent',
+      filterType: 'range',
+      getRowContent: s => getSemesterEnrollmentsContent(s),
+      cellProps: s => getSemesterEnrollmentsProps(s),
+      getRowVal: s => getSemesterEnrollmentsVal(s),
+      getRowExportVal: s => getSemesterEnrollmentsForExcel(s),
+    },
     endDate: {
       key: 'endDate',
       title: combinedProgrammeCode ? 'Bachelor\ngraduation\ndate' : 'Graduation\ndate',
@@ -435,15 +444,6 @@ const GeneralTab = ({ group, populations, columnKeysToInclude, coursecode, filte
       title: 'Start year\nat uni',
       filterType: 'range',
       getRowVal: s => getStarted(s),
-    },
-    semesterEnrollments: {
-      key: 'semesterEnrollments',
-      title: 'Semesters\npresent',
-      filterType: 'range',
-      getRowContent: s => getSemesterEnrollmentsContent(s),
-      cellProps: s => getSemesterEnrollmentsProps(s),
-      getRowVal: s => getSemesterEnrollmentsVal(s),
-      getRowExportVal: s => getSemesterEnrollmentsForExcel(s),
     },
     semesterEnrollmentsAmount: {
       key: 'semesterEnrollmentsAmount',
