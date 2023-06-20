@@ -426,6 +426,12 @@ const GeneralTab = ({ group, populations, columnKeysToInclude, coursecode, filte
           ? reformatDate(studentToSecondStudyrightEndMap[s.studentNumber], 'YYYY-MM-DD')
           : '',
     },
+    startYear: {
+      key: 'startYear',
+      title: 'Start year\nat uni',
+      filterType: 'range',
+      getRowVal: s => getStarted(s),
+    },
     programme: {
       key: 'programme',
       title: programmeCode ? 'Other programmes' : 'Study programmes',
@@ -438,12 +444,6 @@ const GeneralTab = ({ group, populations, columnKeysToInclude, coursecode, filte
       },
       helpText:
         'Three dots indicate more programmes than one. Hover your mouse on the cell to see the rest. They are also displayed in the exported Excel-file.',
-    },
-    startYear: {
-      key: 'startYear',
-      title: 'Start year\nat uni',
-      filterType: 'range',
-      getRowVal: s => getStarted(s),
     },
     semesterEnrollmentsAmount: {
       key: 'semesterEnrollmentsAmount',
