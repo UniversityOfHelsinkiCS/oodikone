@@ -443,7 +443,7 @@ const GeneralTab = ({ group, populations, columnKeysToInclude, coursecode, filte
         return { title: studentProgrammesMap[s.studentNumber]?.getProgrammesList('\n') }
       },
       helpText:
-        'Three dots indicate more programmes than one. Hover your mouse on the cell to see the rest. They are also displayed in the exported Excel-file.',
+        'If students has more than one programme, hover your mouse on the cell to see the rest. They are also displayed in the exported Excel-file.',
     },
     semesterEnrollmentsAmount: {
       key: 'semesterEnrollmentsAmount',
