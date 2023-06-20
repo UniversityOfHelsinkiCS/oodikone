@@ -10,7 +10,6 @@ import _ from 'lodash'
 import boost from 'highcharts/modules/boost'
 import ReactHighstock from 'react-highcharts/ReactHighstock'
 import './creditAccumulationGraphHC.css'
-import { useGetAuthorizedUserQuery } from 'redux/auth'
 import CreditGraphTooltip from '../CreditGraphTooltip'
 import { reformatDate, getTextIn, getStudyRightElementTargetDates } from '../../common'
 import useLanguage from '../LanguagePicker/useLanguage'
@@ -376,8 +375,7 @@ const createStudentCreditLines = (
   studyPlanFilterIsActive,
   cutStudyPlanCredits,
   programmeCodes,
-  customStudyStartYear,
-  creditLineStart
+  customStudyStartYear
 ) =>
   students.map(student => {
     const { studyrightStart } = student
@@ -408,7 +406,7 @@ const createStudentCreditLines = (
     const graduations = programmeCodes ? findGraduationsByCodes(student, programmeCodes) : []
 
     if (points?.length > 0) {
-      if (points[0].y !== 0 && creditLineStart) {
+      if (points[0].y !== 0 && students.length < 100) {
         const xMinusTwoMonths = moment(new Date(points[0].x)).subtract(2, 'months').toDate().getTime()
         points.unshift({
           x: studyPlanFilterIsActive ? xMinusTwoMonths : Math.max(new Date(studyrightStart), xMinusTwoMonths),
@@ -459,8 +457,6 @@ const CreditAccumulationGraphHighCharts = ({
   const language = useLanguage()
   const [graphHeight, setGraphHeight] = useState(700)
   const [cutStudyPlanCredits, setCutStudyPlanCredits] = useState(false)
-  const { isAdmin } = useGetAuthorizedUserQuery()
-  const [creditLineStart, setCreditLineStart] = useState(false)
   const selectedStudyRight =
     singleStudent && studyRightId
       ? students[0].studyrights.find(({ studyrightid }) => studyrightid === studyRightId)
@@ -476,8 +472,7 @@ const CreditAccumulationGraphHighCharts = ({
         studyPlanFilterIsActive,
         cutStudyPlanCredits,
         programmeCodes,
-        customStudyStartYear,
-        creditLineStart
+        customStudyStartYear
       ),
     [
       students,
@@ -489,7 +484,6 @@ const CreditAccumulationGraphHighCharts = ({
       cutStudyPlanCredits,
       customStudyStartYear,
       language,
-      creditLineStart,
     ]
   )
 
@@ -588,16 +582,6 @@ const CreditAccumulationGraphHighCharts = ({
               toggle
             />
           ) : null}
-          {!singleStudent && isAdmin && (
-            <Radio
-              style={{ marginLeft: '20px' }}
-              data-cy="toggleCreditLineStart"
-              toggle
-              label="Start lines from zero"
-              checked={creditLineStart}
-              onClick={() => setCreditLineStart(!creditLineStart)}
-            />
-          )}
         </div>
 
         <div>
