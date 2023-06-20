@@ -1,5 +1,4 @@
 import React from 'react'
-import { Icon } from 'semantic-ui-react'
 import { getTextIn, reformatDate, getAllProgrammesOfStudent } from 'common'
 
 const noProgrammeDuringCourse = {
@@ -122,7 +121,7 @@ const getStudyProgrammeFunctions = ({
     if (studentProgrammesMap[s.studentNumber]?.programmes.length > 1) {
       return (
         <div>
-          {programme} <Icon name="ellipsis horizontal" color="grey" size="large" />
+          {programme} + {studentProgrammesMap[s.studentNumber].programmes.length - 1}
         </div>
       )
     }
