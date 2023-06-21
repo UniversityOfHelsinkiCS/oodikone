@@ -362,9 +362,7 @@ const GeneralTab = ({ group, populations, columnKeysToInclude, coursecode, filte
       key: 'phoneNumber',
       title: 'Phone number',
       export: true,
-      forceToolsMode: 'none',
-      headerProps: { style: { display: 'none' } },
-      cellProps: { style: { display: 'none' } },
+      displayColumn: false,
       getRowVal: s => s.phoneNumber,
     },
     studentnumber: {
@@ -449,9 +447,7 @@ const GeneralTab = ({ group, populations, columnKeysToInclude, coursecode, filte
       key: 'semesterEnrollmentsAmount',
       title: 'Semesters present amount',
       export: true,
-      forceToolsMode: 'none',
-      headerProps: { style: { display: 'none' } },
-      cellProps: { style: { display: 'none' } },
+      displayColumn: false,
       getRowVal: s => (s.semesterenrollments ? s.semesterenrollments.filter(e => e.enrollmenttype === 1).length : 0),
     },
     transferredFrom: {

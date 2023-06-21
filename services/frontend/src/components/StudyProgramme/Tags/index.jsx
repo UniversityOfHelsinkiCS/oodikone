@@ -132,7 +132,6 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme,
           />
         </Form.Field>
       ),
-      headerProps: { onClick: null, sorted: null },
     },
   ]
 

@@ -149,18 +149,10 @@ const getColumns = (labelsToCourses, language) => {
   const columnsToHide = labelsToCourses.map(course => ({
     key: `hidden-${course.label}-${course.name[language]}`,
     export: true,
-    forceToolsMode: 'none',
+    displayColumn: false,
     textTitle: `Dates-${course.label}-${course.name[language]}`,
     headerProps: {
       title: `Dates-${course.label}-${course.name[language]}`,
-      style: {
-        display: 'none',
-      },
-    },
-    cellProps: {
-      style: {
-        display: 'none',
-      },
     },
     getRowVal: s => {
       return findRowValue(s, course.label, true)
