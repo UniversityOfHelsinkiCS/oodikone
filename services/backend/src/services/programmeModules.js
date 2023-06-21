@@ -28,7 +28,6 @@ const recursivelyGetModuleAndChildren = async (code, type) => {
   }
 }
 
-// Why only finnish is used???
 const labelProgammes = (filteredProgrammes, excludedProgrammes) => {
   return filteredProgrammes.map(module => {
     const label = {

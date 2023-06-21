@@ -192,7 +192,7 @@ const getStartDate = (studyprogramme, isAcademicYear) => {
 const alltimeStartDate = new Date('1900-01-01')
 const alltimeEndDate = new Date()
 
-// In the array programmes should be [bachelorCode, masterCode]
+// In the object programmes should be {bachelorCode: masterCode}
 const combinedStudyprogrammes = { KH90_001: 'MH90_001' }
 
 // There are 9 course_unit_types
