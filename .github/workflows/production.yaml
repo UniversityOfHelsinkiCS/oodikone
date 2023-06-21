@@ -5,7 +5,7 @@ on:
     branches:
       - master # Switch to on release
     paths:
-      - '.github/workflows/test-oodikone.yaml'
+      - '.github/workflows/production.yaml'
       - '.github/actions/**'
       - 'cypress/**'
       - 'cypress.config.json'
