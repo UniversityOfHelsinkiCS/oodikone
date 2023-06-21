@@ -18,10 +18,10 @@ on:
 
 jobs:
   test:
-   uses: ./.github/workflows/test.yaml
-   secrets:
-     username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-     password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+    uses: ./.github/workflows/test.yaml
+    secrets:
+      username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
+      password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
 
   release_frontend:
     name: 'Build and release frontend'
@@ -30,6 +30,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+
+      - name: Get current time
+        id: get_current_time
+        run: echo "NOW=$(date --iso-8601=seconds)" >> $GITHUB_OUTPUT
 
       - name: Build frontend image
         id: build-image
