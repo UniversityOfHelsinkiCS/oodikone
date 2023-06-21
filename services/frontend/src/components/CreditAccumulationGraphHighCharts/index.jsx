@@ -406,7 +406,7 @@ const createStudentCreditLines = (
     const graduations = programmeCodes ? findGraduationsByCodes(student, programmeCodes) : []
 
     if (points?.length > 0) {
-      if (points[0].y !== 0 && students.length < 100) {
+      if (!singleStudent && points[0].y !== 0 && students.length < 100) {
         const xMinusTwoMonths = moment(new Date(points[0].x)).subtract(2, 'months').toDate().getTime()
         points.unshift({
           x: studyPlanFilterIsActive ? xMinusTwoMonths : Math.max(new Date(studyrightStart), xMinusTwoMonths),
