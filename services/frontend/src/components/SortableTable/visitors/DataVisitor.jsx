@@ -1,7 +1,7 @@
 /* eslint-disable max-classes-per-file */
 /* eslint-disable class-methods-use-this */
 
-import { getDataItemType, DataItemType } from './common'
+import { getDataItemType, DataItemType } from '../common'
 
 class DataVisitorContext {
   constructor(visitor, item, parents = [], isGroup = false) {

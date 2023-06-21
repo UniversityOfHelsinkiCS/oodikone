@@ -1,7 +1,7 @@
 import React from 'react'
 import DateRangeSelector from 'components/common/DateRangeSelector'
 import moment from 'moment'
-import { getColumnValue } from './common'
+import { getColumnValue } from '../common'
 
 const DateColumnFilterComponent = ({ options, dispatch }) => {
   return (

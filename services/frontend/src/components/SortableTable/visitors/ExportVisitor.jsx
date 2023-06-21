@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import DataVisitor from './DataVisitor'
-import { getColumnTitle, getColumnValue } from './common'
+import { getColumnTitle, getColumnValue } from '../common'
 
 export default class ExportVisitor extends DataVisitor {
   constructor(columns) {

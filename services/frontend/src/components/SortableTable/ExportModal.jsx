@@ -7,8 +7,8 @@ import _ from 'lodash'
 import xlsx from 'xlsx'
 import { v4 as uuidv4 } from 'uuid'
 import { getColumnTitle, getDataItemType, DataItemType } from './common'
-import ValueVisitor from './ValueVisitor'
-import ExportVisitor from './ExportVisitor'
+import ValueVisitor from './visitors/ValueVisitor'
+import ExportVisitor from './visitors/ExportVisitor'
 
 const getExportColumns = columns => {
   const stack = _.cloneDeep(columns)
