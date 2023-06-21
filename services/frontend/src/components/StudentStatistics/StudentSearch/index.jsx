@@ -276,7 +276,7 @@ const StudentSearch = ({
     }
     return (
       <SortableTable
-        figure={false}
+        hideHeaderBar
         getRowKey={s => s.studentNumber}
         tableProps={{ celled: false }}
         columns={columns}

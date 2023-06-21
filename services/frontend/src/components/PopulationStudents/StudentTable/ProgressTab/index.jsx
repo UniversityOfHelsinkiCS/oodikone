@@ -65,7 +65,6 @@ const createEmptyHidden = nthHiddenColumn => {
       textTitle: '   ',
       cellProps: { style: { display: 'none' } },
       getRowVal: () => ' ',
-      child: true,
     },
   ]
 }
@@ -235,7 +234,6 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
             : ''
         return findRowContent(s, m.code, year, start, end, criteria)
       },
-      child: true,
     }))
   }
   const acaYearStart = moment()
@@ -251,7 +249,6 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
         key: 'general',
         title: <b>Student</b>,
         textTitle: null,
-        parent: true,
         children: [
           {
             key: 'studentnumber-parent',
@@ -261,7 +258,6 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
             getRowContent: s => (
               <StudentInfoItem student={s} view="Student progress table" tab="Progress tab" showSisuLink />
             ),
-            child: true,
           },
         ],
       },
@@ -270,7 +266,6 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
         title: '',
         mergeHeader: !namesVisible,
         textTitle: null,
-        parent: true,
         children: [
           {
             key: 'lastname-hidden',
@@ -298,7 +293,6 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
           </div>
         ),
         textTitle: null,
-        parent: true,
         children: createContent(
           labelCriteria[criteriaHeaders[0].label],
           criteriaHeaders[0].year,
@@ -311,7 +305,6 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
         key: 'hidden-1',
         textTitle: null,
         mergeHeader: true,
-        parent: true,
         children: createEmptyHidden(1),
       },
     ]
@@ -327,7 +320,6 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
             </div>
           ),
           textTitle: null,
-          parent: true,
           children: createContent(
             labelCriteria[criteriaHeaders[1].label],
             criteriaHeaders[1].year,
@@ -340,7 +332,6 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
           key: 'hidden-2',
           textTitle: null,
           mergeHeader: true,
-          parent: true,
           children: createEmptyHidden(2),
         }
       )
@@ -357,7 +348,6 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
             </div>
           ),
           textTitle: null,
-          parent: true,
           children: createContent(
             labelCriteria[criteriaHeaders[2].label],
             criteriaHeaders[2].year,
@@ -370,7 +360,6 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
           key: 'hidden-3',
           textTitle: null,
           mergeHeader: true,
-          parent: true,
           children: createEmptyHidden(3),
         }
       )
@@ -395,7 +384,6 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
               </div>
             ),
             textTitle: null,
-            parent: true,
             children: createContent(
               labelCriteria[criteriaHeaders[3].label],
               criteriaHeaders[3].year,
@@ -408,7 +396,6 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
             key: 'hidden-4',
             textTitle: null,
             mergeHeader: true,
-            parent: true,
             children: createEmptyHidden(4),
           }
         )
@@ -426,7 +413,6 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
               </div>
             ),
             textTitle: null,
-            parent: true,
             children: createContent(
               labelCriteria[criteriaHeaders[4].label],
               criteriaHeaders[4].year,
@@ -439,7 +425,6 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
             key: 'hidden-5',
             textTitle: null,
             mergeHeader: true,
-            parent: true,
             children: createEmptyHidden(5),
           }
         )
@@ -456,7 +441,6 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
               </div>
             ),
             textTitle: null,
-            parent: true,
             children: createContent(
               labelCriteria[criteriaHeaders[5].label],
               criteriaHeaders[5].year,
@@ -469,7 +453,6 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
             key: 'hidden-6',
             textTitle: null,
             mergeHeader: true,
-            parent: true,
             children: createEmptyHidden(6),
           }
         )
@@ -481,7 +464,6 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
       title: '',
       mergeHeader: true,
       textTitle: null,
-      parent: true,
       children: [
         {
           key: 'hidden-phoneNumber',
@@ -491,7 +473,6 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
           headerProps: { style: { display: 'none' } },
           cellProps: { style: { display: 'none' } },
           getRowVal: s => s.phoneNumber,
-          child: true,
         },
         {
           key: 'hidden-email',
@@ -501,7 +482,6 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
           headerProps: { style: { display: 'none' } },
           cellProps: { style: { display: 'none' } },
           getRowVal: s => s.email,
-          child: true,
         },
         {
           key: 'hidden-secondary-email',
@@ -511,7 +491,6 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
           headerProps: { style: { display: 'none' } },
           cellProps: { style: { display: 'none' } },
           getRowVal: s => s.secondaryEmail,
-          child: true,
         },
       ],
     })

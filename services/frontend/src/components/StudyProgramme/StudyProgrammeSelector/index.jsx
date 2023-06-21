@@ -187,7 +187,7 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected }) => {
         <>
           <Header>Combined programmes</Header>
           <SortableTable
-            figure={false}
+            hideHeaderBar
             columns={headers}
             getRowKey={programme => programme.code}
             data={combinedProgrammes}
@@ -198,7 +198,7 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected }) => {
         <>
           <Header>Bachelor programmes</Header>
           <SortableTable
-            figure={false}
+            hideHeaderBar
             columns={headers}
             getRowKey={programme => programme.code}
             data={bachelorProgrammes}
@@ -209,7 +209,7 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected }) => {
         <>
           <Header>Master programmes</Header>
           <SortableTable
-            figure={false}
+            hideHeaderBar
             columns={headers}
             getRowKey={programme => programme.code}
             data={masterProgrammes}
@@ -220,7 +220,7 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected }) => {
         <>
           <Header>Doctoral programmes</Header>
           <SortableTable
-            figure={false}
+            hideHeaderBar
             columns={headers}
             getRowKey={programme => programme.code}
             data={doctoralProgrammes}
@@ -231,7 +231,7 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected }) => {
         <>
           <Header>Specialization programmes and old programmes</Header>
           <SortableTable
-            figure={false}
+            hideHeaderBar
             columns={headers}
             getRowKey={programme => programme.code}
             data={otherProgrammes}

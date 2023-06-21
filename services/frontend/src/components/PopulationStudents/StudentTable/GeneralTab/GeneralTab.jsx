@@ -546,13 +546,6 @@ const GeneralTab = ({ group, populations, columnKeysToInclude, coursecode, filte
       style={{ height: '80vh' }}
       title="General student information"
       getRowKey={s => s.studentNumber}
-      tableProps={{
-        collapsing: true,
-        basic: true,
-        compact: 'very',
-        padded: false,
-        celled: true,
-      }}
       columns={columns}
       onlyExportColumns={hiddenNameAndEmailForExcel}
       data={selectedStudents.map(sn => students[sn])}

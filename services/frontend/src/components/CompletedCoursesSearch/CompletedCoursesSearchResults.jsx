@@ -93,7 +93,6 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
       cellProps: { style },
       headerProps: { title: 'Passed' },
       getRowVal: s => getTotalPassed(s),
-      child: true,
     },
     {
       key: 'unfinished',
@@ -101,15 +100,14 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
       headerProps: { title: 'Unfinished' },
       getRowVal: s => getTotalUnfinished(s),
       cellProps: { style },
-      child: true,
     },
   ]
 
   const statisticHeader = {
     key: 'statistics',
     title: <b>Totals:</b>,
+    export: false,
     textTitle: null,
-    parent: true,
     children: statisticColumns,
   }
 
@@ -177,22 +175,12 @@ const CompletedCoursesSearchResults = ({ searchValues }) => {
         <RightsNotification discardedStudentNumbers={data.discardedStudentNumbers} />
       )}
       <div
-        style={{ maxWidth: '100vh', overflowX: 'auto', paddingBottom: '50px' }}
+        style={{ maxWidth: '100vh', overflowX: 'auto', paddingBottom: '50px', padding: '0.5em' }}
         data-cy="completed-courses-table-div"
       >
         <SortableTable
           title="Completed courses search"
           getRowKey={s => s.studentNumber}
-          tableProps={{
-            celled: true,
-            compact: 'very',
-            padded: false,
-            collapsing: true,
-            basic: true,
-            striped: true,
-            singleLine: true,
-            textAlign: 'center',
-          }}
           columns={getColumns(data.courses, showStudentNames.visible, getTextIn, sendAnalytics)}
           onlyExportColumns={hiddenNameAndEmailForExcel}
           data={data.students}
