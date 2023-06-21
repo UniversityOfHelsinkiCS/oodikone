@@ -21,10 +21,10 @@ USER_DB_NAME="user-db"
 DATABASES=("$KONE_DB_NAME" "$SIS_DB_NAME" "$SIS_IMPORTER_DB_NAME" "$USER_DB_NAME")
 
 ## Urls should be in same order as databases as both are iterated through by indexes.
-KONE_DB_REAL_DUMP_URL="svm-101.cs.helsinki.fi:/home/oodikone_user/backups/latest-kone-db.sqz"
-SIS_DB_REAL_DUMP_URL="svm-96.cs.helsinki.fi:/home/updater_user/backups/latest-sis.sqz"
-SIS_IMPORTER_DB_REAL_DUMP_URL="svm-92.cs.helsinki.fi:/home/importer_user/importer-db/backup/importer-db.sqz"
-USER_DB_REAL_DUMP_URL="svm-101.cs.helsinki.fi:/home/oodikone_user/backups/latest-user-db.sqz"
+KONE_DB_REAL_DUMP_URL="svm-116.cs.helsinki.fi:/home/toska_user/most_recent_backup_store/oodikone-kone-db.sql.gz"
+SIS_DB_REAL_DUMP_URL="svm-116.cs.helsinki.fi:/home/toska_user/most_recent_backup_store/oodikone-sis-db.sql.gz"
+SIS_IMPORTER_DB_REAL_DUMP_URL="svm-116.cs.helsinki.fi:/home/toska_user/most_recent_backup_store/importer.sql.gz"
+USER_DB_REAL_DUMP_URL="svm-116.cs.helsinki.fi:/home/toska_user/most_recent_backup_store/oodikone-user-db.sql.gz"
 REAL_DUMP_URLS=("$KONE_DB_REAL_DUMP_URL" "$SIS_DB_REAL_DUMP_URL" "$SIS_IMPORTER_DB_REAL_DUMP_URL" "$USER_DB_REAL_DUMP_URL")
 
 # Source utility functions
@@ -56,7 +56,7 @@ retry() {
 download_real_dump() {
   local database=$1
   local pannu_url=$2
-  local dump_destination="$DUMP_DIR/$database.sqz"
+  local dump_destination="$DUMP_DIR/$database.sql.gz"
   scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" "$username@$pannu_url" "$dump_destination"
 }
 
@@ -76,7 +76,7 @@ reset_databases() {
   docker-compose up -d "${databases[@]}"
 
   for database in "${databases[@]}"; do
-    local database_dump="$database_dump_dir/$database.sqz"
+    local database_dump="$database_dump_dir/$database.sql.gz"
     local database_container="$database"
     local database_name="$database-real"
 
@@ -91,10 +91,8 @@ reset_databases() {
     docker exec -u postgres "$database_container" createdb "$database_name" || warningmsg "This is okay, continuing"
 
     infomsg "Restoring database from dump database"
-    msg "1. Copying dump..."
-    docker cp "$database_dump" "$database_container:/asd.sqz"
-    msg "2. Writing database..."
-    docker exec "$database_container" pg_restore -U postgres --no-owner -F c --dbname="$database_name" -j4 /asd.sqz
+    msg "Writing database..."
+    docker exec -i "$database_container" /bin/bash  -c "gunzip | psql -U postgres -d $database_name" < "$database_dump" 2> /dev/null
     msg ""
   done
 
@@ -103,8 +101,8 @@ reset_databases() {
 
 reset_jami_data() {
   local database="jami-db"
-  local pannu_url="svm-85.cs.helsinki.fi:/home/toska_user/most_recent_backup_store/jami.sql.gz"
-  local dump_destination="$DUMP_DIR/$database.sqz"
+  local pannu_url="svm-116.cs.helsinki.fi:/home/toska_user/most_recent_backup_store/jami.sql.gz"
+  local dump_destination="$DUMP_DIR/$database.sql.gz"
 
   infomsg "Downloading Jami data"
   scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" "$username@$pannu_url" "$dump_destination"
@@ -118,7 +116,7 @@ reset_jami_data() {
   retry docker-compose -f "$DOCKER_COMPOSE" exec "$database" pg_isready --dbname="postgres"
 
   infomsg "Populating Jami"
-  docker exec -i "$database" /bin/bash -c "gunzip | psql -U postgres" < "$dump_destination"
+  docker exec -i "$database" /bin/bash -c "gunzip | psql -U postgres" < "$dump_destination" 2> /dev/null
   docker-compose stop "$database"
   msg ""
 }
@@ -130,8 +128,8 @@ reset_all_real_data() {
     local url="${REAL_DUMP_URLS[$i]}"
     download_real_dump "$database" "$url"
   done
-  reset_databases "${DATABASES[@]}"
   reset_jami_data
+  reset_databases "${DATABASES[@]}"
 }
 
 reset_single_database() {
