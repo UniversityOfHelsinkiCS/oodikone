@@ -69,7 +69,6 @@ const CoursesTable = ({ students, studyGuidanceCourses }) => {
       getRowVal: s => (s.total ? '*' : s.studentNumber),
       getRowContent: s =>
         s.total ? 'Summary:' : <StudentInfoItem student={s} tab="Mandatory courses table" showSisuLink />,
-      child: true,
     })
 
     if (namesVisible) {
@@ -79,7 +78,6 @@ const CoursesTable = ({ students, studyGuidanceCourses }) => {
           title: 'Last name',
           getRowVal: s => (s.total ? null : s.lastname),
           cellProps: { title: 'last name' },
-          child: true,
           export: false,
         },
         {
@@ -87,7 +85,6 @@ const CoursesTable = ({ students, studyGuidanceCourses }) => {
           title: 'Given names',
           getRowVal: s => (s.total ? null : s.firstnames),
           cellProps: { title: 'first names' },
-          child: true,
           export: false,
         }
       )
@@ -105,7 +102,6 @@ const CoursesTable = ({ students, studyGuidanceCourses }) => {
               .reduce((acc, e) => acc + e, 0)
           : totalMandatoryPassed(s.studentNumber),
       cellProps: { title: 'Total passed' },
-      child: true,
     })
 
     const mandatoryCourseLabels = []
@@ -149,7 +145,6 @@ const CoursesTable = ({ students, studyGuidanceCourses }) => {
         key: 'general',
         title: <b>Labels:</b>,
         textTitle: null,
-        parent: true,
         children: nameColumns,
       },
       ...sortedlabels
@@ -231,8 +226,6 @@ const CoursesTable = ({ students, studyGuidanceCourses }) => {
                 if (s.total) return getTotalRowVal(s, m)
                 return hasPassedMandatory(s.studentNumber, m.code) ? <Icon fitted name="check" color="green" /> : null
               },
-              child: true,
-              childOf: e.label,
               code: m.code,
             })),
         }))
@@ -270,16 +263,8 @@ const CoursesTable = ({ students, studyGuidanceCourses }) => {
               tableId="course-of-population-students"
               title={`Courses of population's students`}
               getRowKey={s => (s.total ? 'totals' : s.studentNumber)}
-              tableProps={{
-                celled: true,
-                compact: 'very',
-                padded: false,
-                collapsing: true,
-                basic: true,
-                striped: true,
-                singleLine: true,
-                //                textAlign: 'center',
-              }}
+              celled
+              padded={false}
               columns={columns}
               onlyExportColumns={hiddenNameAndEmailForExcel}
               data={data}

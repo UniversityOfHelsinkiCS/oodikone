@@ -98,7 +98,7 @@ const TeacherSearch = ({ icon, teachers, onClick, setTimeout, clearTimeout, find
             ) : (
               <SortableTable
                 defaultSort={['name', 'desc']}
-                figure={false}
+                hideHeaderBar
                 getRowKey={s => s.id}
                 getRowProps={teacher => ({
                   className: 'clickable',

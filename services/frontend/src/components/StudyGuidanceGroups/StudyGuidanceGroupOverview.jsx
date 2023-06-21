@@ -240,7 +240,7 @@ const StudyGuidanceGroupOverview = ({ groups }) => {
           lisäominaisuuksia.{' '}
         </p>
       </StyledMessage>
-      <SortableTable figure={false} columns={headers} getRowKey={group => group.id} data={groups} singleLine={false} />
+      <SortableTable hideHeaderBar columns={headers} getRowKey={group => group.id} data={groups} singleLine={false} />
     </>
   )
 }

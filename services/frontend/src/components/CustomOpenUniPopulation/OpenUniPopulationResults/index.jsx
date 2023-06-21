@@ -38,7 +38,6 @@ const getColumns = (labelsToCourses, language) => {
           cellProps: { style },
           getRowVal: s => s.studentnumber,
           getRowContent: s => s.studentnumber,
-          child: true,
         },
       ],
     },
@@ -52,7 +51,6 @@ const getColumns = (labelsToCourses, language) => {
       headerProps: { title: 'Passed' },
       getRowVal: s => s.totals.passed,
       getRowContent: s => s.totals.passed,
-      child: true,
     },
     {
       key: 'failed',
@@ -61,7 +59,6 @@ const getColumns = (labelsToCourses, language) => {
       getRowVal: s => s.totals.failed,
       getRowContent: s => s.totals.failed,
       cellProps: { style },
-      child: true,
     },
     {
       key: 'unfinished',
@@ -70,7 +67,6 @@ const getColumns = (labelsToCourses, language) => {
       getRowVal: s => s.totals.unfinished,
       getRowContent: s => s.totals.unfinished,
       cellProps: { style },
-      child: true,
     },
   ]
 
@@ -81,8 +77,6 @@ const getColumns = (labelsToCourses, language) => {
       getRowVal: s => (s.email ? s.email : ''),
       getRowContent: s => (s.email ? s.email : ''),
       headerProps: { title: 'Email' },
-      childOf: 'Email',
-      child: true,
     },
     {
       key: 'secondary_email-child',
@@ -90,8 +84,6 @@ const getColumns = (labelsToCourses, language) => {
       getRowVal: s => (s.secondaryEmail ? s.secondaryEmail : ''),
       getRowContent: s => (s.secondaryEmail ? s.secondaryEmail : ''),
       headerProps: { title: 'Secondary Email' },
-      childOf: 'Secondary Email',
-      child: true,
     },
   ]
   const findRowContent = (s, courseCode) => {
@@ -151,8 +143,6 @@ const getColumns = (labelsToCourses, language) => {
     getRowContent: s => {
       return findRowContent(s, course.label)
     },
-    child: true,
-    childOf: course.label,
     code: course.label,
   }))
 
@@ -175,7 +165,6 @@ const getColumns = (labelsToCourses, language) => {
     getRowVal: s => {
       return findRowValue(s, course.label, true)
     },
-    child: true,
     code: `hidden ${course.label}`,
   }))
 
@@ -185,28 +174,24 @@ const getColumns = (labelsToCourses, language) => {
       key: 'general',
       title: <b>Labels:</b>,
       textTitle: null,
-      parent: true,
       children: studentNbrColumn,
     },
     {
       key: 'Courses',
       title: <b>Courses:</b>,
       textTitle: null,
-      parent: true,
       children: columnsToShow,
     },
     {
       key: 'statistics',
       title: <b>Total of:</b>,
       textTitle: null,
-      parent: true,
       children: statisticColumns,
     },
     {
       key: 'information',
       title: <b>Information:</b>,
       textTitle: null,
-      parent: true,
       children: informationColumns,
     }
   )
@@ -216,7 +201,6 @@ const getColumns = (labelsToCourses, language) => {
       title: '',
       mergeHeader: true,
       textTitle: null,
-      parent: true,
       children: columnsToHide,
     })
   }
@@ -253,16 +237,6 @@ const OpenUniPopulationResults = ({ fieldValues, language }) => {
           <SortableTable
             title={`Open Uni Student Population (${Object.keys(openUniStudentStats?.data.students).length} students)`}
             getRowKey={s => s.studentNumber}
-            tableProps={{
-              celled: true,
-              compact: 'very',
-              padded: false,
-              collapsing: true,
-              basic: true,
-              striped: true,
-              singleLine: true,
-              textAlign: 'center',
-            }}
             columns={tableData.columns}
             data={tableData.data}
           />

@@ -17,7 +17,7 @@ const UserSearchList = ({ enabledOnly, users, error, elementdetails }) => {
       <SortableTable
         stretch
         singleLine={false}
-        figure={false}
+        hideHeaderBar
         getRowKey={user => user.id}
         tableProps={{ celled: true, structured: true }}
         columns={[

@@ -17,6 +17,75 @@ import GroupKeyVisitor from './GroupKeyVisitor'
 import ValueVisitor from './ValueVisitor'
 import './style.css'
 
+/*
+*** SortableTable documentation ***
+Please update this when making changes inside SortableTable,
+if they affect how the table and its columns are used.
+Future uusihenkilö's will thank you.
+
+
+
+--- SortableTable usage ---
+
+tableId: id-property of the <table> tag
+title: Table title
+*data: Array of data items
+*columns: Array of columns, see fields of columns below
+onlyExportColumns: Array of columns, never shown but always added to export as the first columns
+singleLine: default true, set to false to allow line wrapping (may make lines different size)
+stretch: sets table's css width to 100%
+actions: JSX to add in the top right corner of the table, for example buttons
+contextMenuItems: Array of items added into the menu that has by default "Export Excel" and "Reset filters"
+hideHeaderBar: Hides the header bar that has a table icon, title, fullscreen button and menu/buttons
+style: css style object of the whole table
+defaultSort: [columnkey, order] of default sort column and order. For example ['name', 'desc']
+toggleGroupExpansion: Function which is called when group of rows is collapsed or expanded
+expandedGroups: Array (or set?) of keys of rows are supposed to be expanded. These two are used
+    only in population of courses
+
+
+--- Column usage: (* = required field) ---
+
+- Fields that concern whole column or header
+
+*key: Column key, unique
+*title: Column header title (<th>). Can be either string or JSX. For string title, newlines are replaced
+        by space for export.
+textTitle: Required for excel, if title is JSX. Set to null to exclude a parent header from export
+headerProps: These are given to header as: <th {...headerProps}>
+sortable: set to false if you want to disable column sorting. If multiple columns merged, set it to all
+filterable: same as sortable but for filter
+forceToolsMode: Forces the filter and sort tools in header to either 'dangling', 'floating' or 'fixed'
+helpText: If defined, shows question mark in header, which displays the helpText on hover
+thickBorders: if true, adds thicker border to right side of column
+export: set to false to omit this AND children from excel export. Notice: To only hide parent header, use textTitle: null
+children: column objects. If this is defined, the column object is only a header, and you should only
+          use cell value getters (getRowVal etc) in columns where children is undefined
+displayColumn: set to false to hide whole column. Does not affect exporting
+vertical: If true, header is vertical
+
+- Fields that set cell content or properties. Can receive either a value, or a function that takes data
+  item as an argument, and returns value for specific row (for example s => s.studentNumber)
+
+cellProps: given to each cell like <td {...cellProps}>. Use for style, hover title, etc.
+filterType: set to 'date' or 'range' to make the filter work differently
+getRowVal: Get single cell value. This will be used for sorting and filtering, and displayed unless overridden.
+getRowContent: Single cell JSX: Overrides getRowVal for value to display, but does not affect excel
+getRowExport: Overrides getRowVal for excel
+formatValue: Same as getRowContent, but avoids recalculating value already calculated in getRowVal.
+
+
+
+--- Miscellaneous information ---
+
+* Single rows can ignore filters or sorting by row options. To do this, import row-function
+  from SortableTable-folder, and create data row with it (instead of just value as normally).
+  For example, data can be set like this to have a totals-row on the top:
+    [row(totals, { ignoreFilters: true, ignoreSorting: true }), ...students]
+
+
+*/
+
 const thickBorderStyles = { borderRightWidth: '4px', borderRightColor: '#a8a8a8', borderRightStyle: 'solid' }
 
 const getKey = data => {
@@ -120,6 +189,10 @@ const Row = ({ data, isGroup, parents }) => {
       cellProps = _.merge(cellProps, {
         style: column.cellStyle,
       })
+    }
+
+    if (column.displayColumn === false) {
+      cellProps.style = { ...cellProps.style, display: 'none' }
     }
 
     const content = getCellContent(column, data, isGroup, parents)
@@ -322,10 +395,7 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
   const [dynamicToolsMode, setToolsMode] = useState('fixed')
   const [forcedTitleWidth, setForcedTitleWidth] = useState()
 
-  const borderStyles =
-    (column.thickBorders && !column.child) || (column.child && column.parent?.thickBorders && column.isLast)
-      ? thickBorderStyles
-      : {}
+  const borderStyles = column.thickBorders || (column.parent?.thickBorders && column.isLast) ? thickBorderStyles : {}
 
   let toolsMode = dynamicToolsMode
 
@@ -424,7 +494,7 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
         verticalAlign: column.vertical ? 'top' : 'center',
         position: 'relative',
         overflow: toolsMode === 'floating' ? 'hidden' : '',
-        display: toolsMode === 'none' ? 'none' : '',
+        display: column.displayColumn === false ? 'none' : '',
         ...borderStyles,
       }}
       onClick={() => {
@@ -435,6 +505,7 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
           })
         }
       }}
+      {...column.headerProps}
     >
       <SizeMeasurer onSizeChange={onCellSizeChange} style={{ display: 'flex', alignItems: 'center' }}>
         {toolsMode !== 'fixed' && (isFilterActive || isSortingActive) && (
@@ -821,12 +892,10 @@ const SortableTable = ({
   defaultSort,
   style,
   actions,
-  noHeader,
   stretch,
-  collapsing,
   contextMenuItems: pContextMenuItems,
   singleLine = true,
-  figure = true,
+  hideHeaderBar,
   toggleGroupExpansion,
   expandedGroups,
   onlyExportColumns = [],
@@ -912,11 +981,7 @@ const SortableTable = ({
 
   const figureStyles = { ...style }
 
-  if (collapsing) {
-    figureStyles.width = 'fit-content'
-  }
-
-  if (figure) {
+  if (!hideHeaderBar) {
     Object.assign(tableStyles, {
       borderRadius: 0,
       borderLeft: 'none',
@@ -931,7 +996,7 @@ const SortableTable = ({
     classNames.push('single', 'line')
   }
 
-  if (figure) {
+  if (!hideHeaderBar) {
     classNames.push('basic')
   }
 
@@ -946,10 +1011,6 @@ const SortableTable = ({
     </table>
   )
 
-  if (noHeader) {
-    return content
-  }
-
   const context = {
     state,
     dispatch,
@@ -960,7 +1021,7 @@ const SortableTable = ({
     columnDepth,
   }
 
-  if (!figure) {
+  if (hideHeaderBar) {
     return <SortableTableContext.Provider value={context}>{content}</SortableTableContext.Provider>
   }
 

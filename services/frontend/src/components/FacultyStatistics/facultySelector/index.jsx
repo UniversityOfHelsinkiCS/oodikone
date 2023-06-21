@@ -100,12 +100,7 @@ const FacultySelector = ({ faculties, selected }) => {
       {filteredFaculties.length > 0 ? (
         <>
           <Header>Faculties</Header>
-          <SortableTable
-            figure={false}
-            columns={headers}
-            getRowKey={faculty => faculty.code}
-            data={filteredFaculties}
-          />
+          <SortableTable hideHeaderBar columns={headers} getRowKey={faculty => faculty.code} data={filteredFaculties} />
         </>
       ) : null}
     </div>

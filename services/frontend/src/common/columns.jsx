@@ -14,9 +14,11 @@ export const getCopyableEmailColumn = ({
     merge: true,
     key: 'email',
     export: false,
+    sortable: false,
     children: [
       {
         key: 'emailValue',
+        sortable: false,
         title: (
           <>
             Email
@@ -46,6 +48,7 @@ export const getCopyableEmailColumn = ({
       {
         key: 'copyEmail',
         textTitle: 'Secondary email',
+        sortable: false,
         getRowVal: s => s.secondaryEmail,
         getRowContent: s =>
           s.email && !s.obfuscated ? (
@@ -69,7 +72,6 @@ export const getCopyableEmailColumn = ({
               position="top right"
             />
           ) : null,
-        headerProps: { onClick: null, sorted: null },
         cellProps: { className: 'iconCellNoPointer' },
       },
     ],
@@ -80,37 +82,25 @@ export const hiddenNameAndEmailForExcel = [
   {
     key: 'hidden-lastname',
     title: 'Last name',
-    forceToolsMode: 'none',
     getRowVal: s => s.lastname,
-    headerProps: { style: { display: 'none' } },
-    cellProps: { style: { display: 'none' } },
     export: true,
   },
   {
     key: 'hidden-firstnames',
     title: 'First names',
     getRowVal: s => s.firstnames,
-    forceToolsMode: 'none',
-    headerProps: { style: { display: 'none' } },
-    cellProps: { style: { display: 'none' } },
     export: true,
   },
   {
     key: 'hidden-email',
     title: 'E-mail',
     getRowVal: s => s.email ?? '',
-    forceToolsMode: 'none',
-    headerProps: { style: { display: 'none' } },
-    cellProps: { style: { display: 'none' } },
     export: true,
   },
   {
     key: 'hidden-secondary-email',
     title: 'Secondary E-mail',
     getRowVal: s => s.secondaryEmail ?? '',
-    forceToolsMode: 'none',
-    headerProps: { style: { display: 'none' } },
-    cellProps: { style: { display: 'none' } },
     export: true,
   },
 ]
