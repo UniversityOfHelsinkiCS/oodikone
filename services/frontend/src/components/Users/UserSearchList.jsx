@@ -130,7 +130,6 @@ const UserSearchList = ({ enabledOnly, users, error, elementdetails }) => {
             getRowVal: user => (
               <Button circular size="tiny" basic icon="spy" onClick={() => showAsUser(user.username)} />
             ),
-            headerProps: { onClick: null, sorted: null },
           },
           {
             key: 'EDIT',
@@ -150,7 +149,6 @@ const UserSearchList = ({ enabledOnly, users, error, elementdetails }) => {
                 </Button>
               </Button.Group>
             ),
-            headerProps: { onClick: null, sorted: null },
           },
         ]}
         data={usersToRender}
