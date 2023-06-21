@@ -24,7 +24,7 @@ export const getHeaders = () => {
   return headers
 }
 
-export const api = axios.create({ baseURL: apiBasePath, headers: getHeaders() })
+export const api = axios.create({ baseURL: apiBasePath, headers: getHeaders(), timeout: 120_000 })
 
 export const actionSuffixes = {
   attempt: `ATTEMPT`,
