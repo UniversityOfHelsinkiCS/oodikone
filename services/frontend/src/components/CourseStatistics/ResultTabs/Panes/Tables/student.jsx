@@ -220,8 +220,6 @@ const StudentTable = ({
       <SortableTable
         title={`Student statistics for group ${name}`}
         defaultSort={['TIME', 'desc']}
-        defaultdescending
-        tableProps={{ celled: true, fixed: true }}
         columns={columns}
         data={data}
       />

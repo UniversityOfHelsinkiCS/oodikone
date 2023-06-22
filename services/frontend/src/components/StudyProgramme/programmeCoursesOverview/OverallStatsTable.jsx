@@ -252,8 +252,6 @@ const OverallStatsTable = ({ data, showStudents }) => {
         <SortableTable
           title={`Student statistics for study programme courses `}
           defaultSort={['name', 'asc']}
-          defaultdescending
-          tableProps={{ celled: true, fixed: true }}
           columns={getColumns(getTextIn, showStudents)}
           data={data}
         />

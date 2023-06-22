@@ -274,15 +274,7 @@ const StudentSearch = ({
 
       columns.splice(0, 0, ...nameColumns)
     }
-    return (
-      <SortableTable
-        hideHeaderBar
-        tableProps={{ celled: false }}
-        columns={columns}
-        data={studentsSorted.slice(0, 200)}
-        chunkifyBy="studentNumber"
-      />
-    )
+    return <SortableTable hideHeaderBar columns={columns} data={studentsSorted.slice(0, 200)} />
   }
 
   if (studentNumber) {

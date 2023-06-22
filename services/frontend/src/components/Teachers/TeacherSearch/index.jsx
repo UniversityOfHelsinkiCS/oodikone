@@ -96,17 +96,7 @@ const TeacherSearch = ({ icon, teachers, onClick, setTimeout, clearTimeout, find
             {teachers.length <= 0 ? (
               <div>No teachers matched your search</div>
             ) : (
-              <SortableTable
-                defaultSort={['name', 'desc']}
-                hideHeaderBar
-                getRowProps={teacher => ({
-                  className: 'clickable',
-                  onClick: () => onClick(teacher),
-                })}
-                tableProps={{ celled: false, sortable: false }}
-                columns={columns}
-                data={teachers}
-              />
+              <SortableTable defaultSort={['name', 'desc']} hideHeaderBar columns={columns} data={teachers} />
             )}
           </Segment>
         )}
