@@ -536,13 +536,6 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
                 style={{ height: '80vh' }}
                 tableId="progress-of-population-students"
                 title={`Progress of population's students after predefined criteria`}
-                tableProps={{
-                  collapsing: true,
-                  basic: true,
-                  compact: 'very',
-                  padded: false,
-                  celled: true,
-                }}
                 columns={columns}
                 data={data}
               />

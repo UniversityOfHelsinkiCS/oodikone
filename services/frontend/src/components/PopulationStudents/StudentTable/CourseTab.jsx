@@ -262,8 +262,6 @@ const CoursesTable = ({ students, studyGuidanceCourses }) => {
             <SortableTable
               tableId="course-of-population-students"
               title={`Courses of population's students`}
-              celled
-              padded={false}
               columns={columns}
               onlyExportColumns={hiddenNameAndEmailForExcel}
               data={data}
