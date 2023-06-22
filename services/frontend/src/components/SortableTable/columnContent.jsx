@@ -7,7 +7,6 @@ import { SortableTableContext, getDataItemType, DataItemType, thickBorderStyles 
 
 export const getKey = data => {
   if (data.studentnumber) return data.studentnumber
-  if (data.studentNumber) return data.studentNumber
   if (data.id) return data.id
   return uuidv4()
 }
