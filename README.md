@@ -1,6 +1,6 @@
 # Oodikone
 
-An application for analyzing university data, running at [https://oodikone.cs.helsinki.fi/](https://oodikone.cs.helsinki.fi/).
+An application for analyzing university data, running at [https://oodikone.helsinki.fi/](https://oodikone.helsinki.fi/).
 
 ## ✔️ Requirements
 
