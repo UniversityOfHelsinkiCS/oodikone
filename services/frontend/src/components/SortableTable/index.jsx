@@ -7,7 +7,6 @@ import _ from 'lodash'
 import ExportModal from './ExportModal'
 import { row, group, SortableTableContext } from './common'
 import SortingFilteringVisitor from './visitors/SortingFilteringVisitor'
-import GroupKeyVisitor from './visitors/GroupKeyVisitor'
 import ValueVisitor from './visitors/ValueVisitor'
 import './style.css'
 import {
@@ -40,7 +39,6 @@ onlyExportColumns: Array of columns, never shown but always added to export as t
 singleLine: default true, set to false to allow line wrapping (may make lines different size)
 stretch: sets table's css width to 100%
 actions: JSX to add in the top right corner of the table, for example buttons
-contextMenuItems: Array of items added into the menu that has by default "Export Excel" and "Reset filters"
 hideHeaderBar: Hides the header bar that has a table icon, title, fullscreen button and menu/buttons
 style: css style object of the whole table
 defaultSort: [columnkey, order] of default sort column and order. For example ['name', 'desc']
@@ -100,7 +98,6 @@ const SortableTable = ({
   style,
   actions,
   stretch,
-  contextMenuItems: pContextMenuItems,
   singleLine = true,
   hideHeaderBar,
   toggleGroupExpansion,
@@ -127,28 +124,6 @@ const SortableTable = ({
     },
     [dispatch]
   )
-
-  const handleUnfoldAllGroups = useCallback(() => {
-    const { groups } = GroupKeyVisitor.visit(data)
-
-    dispatch({
-      type: 'SET_UNFOLDED_GROUPS',
-      payload: { groups },
-    })
-    if (toggleGroupExpansion) {
-      toggleGroupExpansion('', false, groups)
-    }
-  }, [data])
-
-  const handleFoldAllGroups = useCallback(() => {
-    dispatch({
-      type: 'SET_UNFOLDED_GROUPS',
-      payload: { groups: [] },
-    })
-    if (toggleGroupExpansion) {
-      toggleGroupExpansion('', true)
-    }
-  }, [data])
 
   const [columns, columnsByKey] = useMemo(() => {
     const columns = _.cloneDeep(pColumns)
@@ -232,30 +207,6 @@ const SortableTable = ({
     return <SortableTableContext.Provider value={context}>{content}</SortableTableContext.Provider>
   }
 
-  const contextMenuItems = [
-    {
-      label: 'Export to Excel',
-      onClick: () => setExportModalOpen(true),
-    },
-    {
-      label: 'Reset filters',
-      onClick: () => dispatch({ type: 'RESET_FILTERS' }),
-    },
-    ...(groupDepth > 0
-      ? [
-          {
-            label: 'Unfold all groups',
-            onClick: handleUnfoldAllGroups,
-          },
-          {
-            label: 'Fold all groups',
-            onClick: handleFoldAllGroups,
-          },
-        ]
-      : []),
-    ...(pContextMenuItems ?? []),
-  ]
-
   return (
     <>
       <ExportModal
@@ -266,7 +217,7 @@ const SortableTable = ({
       />
       <SortableTableContext.Provider value={context}>
         <FigureContainer style={figureStyles}>
-          <FigureContainer.Header actions={actions} contextItems={contextMenuItems}>
+          <FigureContainer.Header actions={actions} onClickExport={() => setExportModalOpen(true)}>
             <Icon style={{ color: '#c2c2c2', position: 'relative', top: '1px', marginRight: '0.5em' }} name="table" />{' '}
             {title}
           </FigureContainer.Header>

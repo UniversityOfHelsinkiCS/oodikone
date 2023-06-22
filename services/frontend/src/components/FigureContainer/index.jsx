@@ -1,12 +1,12 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react'
-import { Icon, Card, Dropdown, Portal, Popup } from 'semantic-ui-react'
+import { Icon, Card, Portal, Popup, Button } from 'semantic-ui-react'
 import { createHtmlPortalNode, InPortal, OutPortal } from 'react-reverse-portal'
 
 import './styles.css'
 
 const FigureContext = createContext(null)
 
-const Header = ({ children, actions, contextItems }) => {
+const Header = ({ children, actions, onClickExport }) => {
   const { isFullscreen, setFullscreen } = useContext(FigureContext)
 
   return (
@@ -14,6 +14,15 @@ const Header = ({ children, actions, contextItems }) => {
       <div style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>{children}</div>
       <div style={{ flexGrow: 1 }} />
       <div style={{ marginRight: '1em' }}>{actions}</div>
+      <Button
+        onClick={onClickExport}
+        icon="save"
+        size="tiny"
+        style={{ marginRight: '1em', paddingLeft: '1em', paddingRight: '1em' }}
+      >
+        <Icon name="save" />
+        Export to Excel
+      </Button>
       <Popup
         trigger={
           <Icon
@@ -27,19 +36,6 @@ const Header = ({ children, actions, contextItems }) => {
       >
         Toggle Fullscreen
       </Popup>
-      {contextItems && (
-        <div>
-          <Dropdown position="bottom center" direction="left" icon="ellipsis vertical">
-            <Dropdown.Menu>
-              {contextItems.map(({ label, onClick }) => (
-                <Dropdown.Item key={label} onClick={onClick}>
-                  {label}
-                </Dropdown.Item>
-              ))}
-            </Dropdown.Menu>
-          </Dropdown>
-        </div>
-      )}
     </Card.Content>
   )
 }
