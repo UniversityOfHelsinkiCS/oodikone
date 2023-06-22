@@ -142,7 +142,7 @@ const ExportModal = ({ open, onOpen, onClose, data, columns }) => {
                           color: '#555',
                         }}
                       >
-                        {column.formatValue ? column.formatValue(value) : `${value}`}
+                        {value}
                       </span>
                     ))}
                   </div>
