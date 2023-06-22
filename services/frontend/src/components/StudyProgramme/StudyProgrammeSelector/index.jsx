@@ -186,56 +186,31 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected }) => {
       {combinedProgrammes.length > 0 ? (
         <>
           <Header>Combined programmes</Header>
-          <SortableTable
-            hideHeaderBar
-            columns={headers}
-            getRowKey={programme => programme.code}
-            data={combinedProgrammes}
-          />
+          <SortableTable hideHeaderBar columns={headers} data={combinedProgrammes} />
         </>
       ) : null}
       {bachelorProgrammes.length > 0 ? (
         <>
           <Header>Bachelor programmes</Header>
-          <SortableTable
-            hideHeaderBar
-            columns={headers}
-            getRowKey={programme => programme.code}
-            data={bachelorProgrammes}
-          />
+          <SortableTable hideHeaderBar columns={headers} data={bachelorProgrammes} />
         </>
       ) : null}
       {masterProgrammes.length > 0 ? (
         <>
           <Header>Master programmes</Header>
-          <SortableTable
-            hideHeaderBar
-            columns={headers}
-            getRowKey={programme => programme.code}
-            data={masterProgrammes}
-          />
+          <SortableTable hideHeaderBar columns={headers} data={masterProgrammes} />
         </>
       ) : null}
       {doctoralProgrammes.length > 0 ? (
         <>
           <Header>Doctoral programmes</Header>
-          <SortableTable
-            hideHeaderBar
-            columns={headers}
-            getRowKey={programme => programme.code}
-            data={doctoralProgrammes}
-          />
+          <SortableTable hideHeaderBar columns={headers} data={doctoralProgrammes} />
         </>
       ) : null}
       {otherProgrammes.length > 0 ? (
         <>
           <Header>Specialization programmes and old programmes</Header>
-          <SortableTable
-            hideHeaderBar
-            columns={headers}
-            getRowKey={programme => programme.code}
-            data={otherProgrammes}
-          />
+          <SortableTable hideHeaderBar columns={headers} data={otherProgrammes} />
         </>
       ) : null}
     </>

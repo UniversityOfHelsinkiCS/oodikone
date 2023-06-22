@@ -262,7 +262,6 @@ const CoursesTable = ({ students, studyGuidanceCourses }) => {
             <SortableTable
               tableId="course-of-population-students"
               title={`Courses of population's students`}
-              getRowKey={s => (s.total ? 'totals' : s.studentNumber)}
               celled
               padded={false}
               columns={columns}

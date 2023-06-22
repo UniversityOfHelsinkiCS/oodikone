@@ -253,7 +253,6 @@ const OverallStatsTable = ({ data, showStudents }) => {
           title={`Student statistics for study programme courses `}
           defaultSort={['name', 'asc']}
           defaultdescending
-          getRowKey={course => course.code}
           tableProps={{ celled: true, fixed: true }}
           columns={getColumns(getTextIn, showStudents)}
           data={data}

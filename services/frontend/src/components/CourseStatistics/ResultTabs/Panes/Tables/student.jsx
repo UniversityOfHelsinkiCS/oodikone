@@ -221,7 +221,6 @@ const StudentTable = ({
         title={`Student statistics for group ${name}`}
         defaultSort={['TIME', 'desc']}
         defaultdescending
-        getRowKey={s => s.code}
         tableProps={{ celled: true, fixed: true }}
         columns={columns}
         data={data}

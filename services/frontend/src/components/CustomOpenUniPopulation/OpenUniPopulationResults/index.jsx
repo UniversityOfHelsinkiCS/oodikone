@@ -228,7 +228,6 @@ const OpenUniPopulationResults = ({ fieldValues, language }) => {
         {courseList.length > 0 && (
           <SortableTable
             title={`Open Uni Student Population (${Object.keys(openUniStudentStats?.data.students).length} students)`}
-            getRowKey={s => s.studentNumber}
             columns={tableData.columns}
             data={tableData.data}
           />

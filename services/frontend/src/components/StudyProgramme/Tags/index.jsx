@@ -181,7 +181,7 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme,
         </Segment>
       </Form>
       <Header size="medium">Study programme tags</Header>
-      <SortableTable columns={columns} data={tags} getRowKey={row => row.tag_id} />
+      <SortableTable columns={columns} data={tags} />
     </List>
   )
 }
