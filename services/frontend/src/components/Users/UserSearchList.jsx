@@ -18,7 +18,6 @@ const UserSearchList = ({ enabledOnly, users, error, elementdetails }) => {
         stretch
         singleLine={false}
         hideHeaderBar
-        getRowKey={user => user.id}
         tableProps={{ celled: true, structured: true }}
         columns={[
           {

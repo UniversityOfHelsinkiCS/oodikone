@@ -22,7 +22,6 @@ const TagsTable = ({ student, language }) => {
       <Header content="Tags" />
       <SortableTable
         data={data}
-        getRowKey={t => t.programme.code}
         columns={[
           {
             key: 'PROGRAMME',

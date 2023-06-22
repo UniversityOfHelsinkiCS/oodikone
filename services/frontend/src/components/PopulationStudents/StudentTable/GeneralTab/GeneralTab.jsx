@@ -541,7 +541,6 @@ const GeneralTab = ({ group, populations, columnKeysToInclude, coursecode, filte
     <SortableTable
       style={{ height: '80vh' }}
       title="General student information"
-      getRowKey={s => s.studentNumber}
       columns={columns}
       onlyExportColumns={hiddenNameAndEmailForExcel}
       data={selectedStudents.map(sn => students[sn])}

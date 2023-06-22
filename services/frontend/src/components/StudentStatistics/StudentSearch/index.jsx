@@ -277,7 +277,6 @@ const StudentSearch = ({
     return (
       <SortableTable
         hideHeaderBar
-        getRowKey={s => s.studentNumber}
         tableProps={{ celled: false }}
         columns={columns}
         data={studentsSorted.slice(0, 200)}

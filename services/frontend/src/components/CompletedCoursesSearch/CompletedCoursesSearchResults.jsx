@@ -180,7 +180,6 @@ const CompletedCoursesSearchResults = ({ searchValues }) => {
       >
         <SortableTable
           title="Completed courses search"
-          getRowKey={s => s.studentNumber}
           columns={getColumns(data.courses, showStudentNames.visible, getTextIn, sendAnalytics)}
           onlyExportColumns={hiddenNameAndEmailForExcel}
           data={data.students}
