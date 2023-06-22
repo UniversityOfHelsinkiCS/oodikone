@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Segment, Form, Button, TextArea, Header } from 'semantic-ui-react'
+import { Segment, Form, Button, TextArea, Header, Message } from 'semantic-ui-react'
 import { callApi } from '../../apiConnection'
 import { useTitle } from '../../common/hooks'
 
@@ -30,6 +30,27 @@ const Updater = () => {
   const refreshTrends = () => apiCall('/updater/refresh_trends', 'post')
   return (
     <Segment>
+      <Message style={{ fontSize: '16px' }}>
+        <Message.Header>Update data</Message.Header>
+        <p>
+          <b>Updater sis-db - Update meta</b> Updates organisations, study modules, course units, study levels,
+          education types, credit types <br />
+          <b>Updater sis-db - Update students</b> Updates 1000 students at one click in development and all in
+          production environment.
+          <br />
+          <b>Updater sis-db - Update Programmes</b> Updates all study programmes and programme modules, see more details
+          'updater/sis-updater-worker/src/updater/updateProgrammeModules.js'.
+          <br />
+          <b>Updater redis - Update redis</b> Updates updater redis. <br />
+          <b>Oodikone redis - Refresh oodikone statistics</b> Refresh studyright associations and the last two years of
+          teacher leaderboard
+          <br />
+          <b>Oodikone redis - Refresh all teacher leaderboards</b> Refresh all leaderboar statistics from 1963 until
+          today. Might take some time.
+          <br />
+          <b>Oodikone redis - Refresh trends</b> Refresh uber data from 2017-until now, status and graduated.
+        </p>
+      </Message>
       <Form>
         <Form.Group>
           <Form.Button content="Update meta" onClick={() => updateSISMeta()} />
