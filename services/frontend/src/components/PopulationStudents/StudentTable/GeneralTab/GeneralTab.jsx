@@ -491,6 +491,12 @@ const GeneralTab = ({ group, populations, columnKeysToInclude, coursecode, filte
       key: 'option',
       title: cleanedQueryStudyrights.some(code => code.startsWith('MH')) ? 'Bachelor' : 'Master',
       getRowVal: s => (s.option ? getTextIn(s.option.name, language) : ''),
+      formatValue: val => (val.length > 45 ? `${val.substring(0, 43)}...` : val),
+      cellProps: s => {
+        return {
+          title: s.option ? getTextIn(s.option.name, language) : '',
+        }
+      },
     },
     priority: {
       key: 'priority',

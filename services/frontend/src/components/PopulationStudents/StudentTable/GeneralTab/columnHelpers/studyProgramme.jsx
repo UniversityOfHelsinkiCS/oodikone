@@ -118,14 +118,15 @@ const getStudyProgrammeFunctions = ({
     const programme = studentProgrammesMap[s.studentNumber]?.programmeToShow
 
     if (!programme) return getTextIn(noProgramme, language)
+    const formattedProgramme = programme.length > 45 ? `${programme.substring(0, 43)}...` : programme
     if (studentProgrammesMap[s.studentNumber]?.programmes.length > 1) {
       return (
         <div>
-          {programme} + {studentProgrammesMap[s.studentNumber].programmes.length - 1}
+          {formattedProgramme} + {studentProgrammesMap[s.studentNumber].programmes.length - 1}
         </div>
       )
     }
-    return programme
+    return formattedProgramme
   }
   const getStudyStartDate = s => {
     if (programmeCode !== undefined) {
