@@ -103,8 +103,8 @@ export const createHeaders = (columns, columnDepth, dispatch) => {
   let i = 0
   columns.forEach(col => {
     if (!col.children) return
-    col.children = col.children.map((child, index, arr) => {
-      return { ...child, isLast: index === arr.length - 1 }
+    col.children = col.children.map((child, index) => {
+      return { ...child, childIndex: index }
     })
   })
   while (stack.length > 0) {
@@ -357,7 +357,8 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
   const [dynamicToolsMode, setToolsMode] = useState('fixed')
   const [forcedTitleWidth, setForcedTitleWidth] = useState()
 
-  const borderStyles = column.thickBorders || (column.parent?.thickBorders && column.isLast) ? thickBorderStyles : {}
+  const borderStyles =
+    column.thickBorders || (column.parent?.thickBorders && column.childIndex === 0) ? thickBorderStyles : {}
 
   let toolsMode = dynamicToolsMode
 
