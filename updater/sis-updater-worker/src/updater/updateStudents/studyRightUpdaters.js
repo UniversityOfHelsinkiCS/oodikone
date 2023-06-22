@@ -217,7 +217,7 @@ const updateStudyRightElements = async (
       if (code === transfer.sourcecode) {
         enddate = new Date(transfer.transferdate)
       } else if (code === transfer.targetcode) {
-        startdate = transfer.transferdate
+        realStartDate = transfer.transferdate
       }
     }
 
@@ -271,20 +271,20 @@ const updateStudyRightElements = async (
 
       orderedSnapshots.sort(possibleBscFirst).forEach(snapshot => {
         const studentnumber = personIdToStudentNumber[mainStudyRight.person_id]
-
+        // console.log({ snapshot })
         // according to Eija Airio this is the right way to get the date... at least when studyright has changed
         // clarification: when education changes in the study right we need to get the start date from
         // the _first_ snapshot as it is the date when the transfer is happened.
         let startDate = snapshot.first_snapshot_date_time || snapshot.valid.startDate
-
+        // console.log({ startDate })
         // fix for varhaiskasvatus, see https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2741
         if (
           snapshot.accepted_selection_path &&
           snapshot.accepted_selection_path.educationPhase1GroupId === 'hy-DP-114256570' &&
           snapshot.accepted_selection_path.educationPhase1ChildGroupId === 'otm-ebd2a5bb-190b-49cc-bccf-44c7e5eef14b'
         ) {
-          if (orderedSnapshots.sort(possibleBscFirst)[0].state === 'PASSIVE') {
-            startDate = snapshot.valid.startDate
+          if (snapshot.study_right_graduation && snapshot.study_right_graduation.phase1GraduationDate) {
+            startDate = snapshot.study_right_graduation.phase1GraduationDate
           }
         }
 
@@ -298,7 +298,6 @@ const updateStudyRightElements = async (
             transfersByStudyRightId,
             formattedStudyRightsById
           )
-
           const [maProgramme, maStudytrack] = mapStudyrightElements(
             `${mainStudyRight.id}-2`,
             startDate,
@@ -308,11 +307,18 @@ const updateStudyRightElements = async (
             transfersByStudyRightId,
             formattedStudyRightsById
           )
-
+          if (maProgramme.startdate !== baProgramme.startdate) {
+            if (startDate !== baProgramme.startdate) {
+              maProgramme.startdate = baProgramme.startdate
+            } else {
+              baProgramme.startdate = maProgramme.startdate
+            }
+          }
           const possibleBScDuplicate = snapshotStudyRightElements.find(element => element.code === baProgramme.code)
           if (possibleBScDuplicate) {
             snapshotStudyRightElements.push(maProgramme, maStudytrack)
           } else {
+            // console.log(baProgramme, maProgramme)
             snapshotStudyRightElements.push(baProgramme, baStudytrack, maProgramme, maStudytrack)
           }
         } else {
