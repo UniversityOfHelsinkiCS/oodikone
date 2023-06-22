@@ -26,8 +26,8 @@ function customFlatten(arr) {
   return result
 }
 
-async function creditResolver(rule, n) {
-  const data = await resolver(rule.rule, n + 1)
+async function creditResolver(rule) {
+  const data = await resolver(rule.rule)
   if (!superFlatten && rule.credits.min < 100 && rule.credits.min > 0) {
     return [
       {
@@ -40,12 +40,12 @@ async function creditResolver(rule, n) {
   return data
 }
 
-async function moduleRuleResolver(mod, n) {
-  const result = await resolver(mod.rule, n + 1)
+async function moduleRuleResolver(mod) {
+  const result = await resolver(mod.rule)
   return customFlatten(result)
 }
 
-async function moduleResolver(rule, n) {
+async function moduleResolver(rule) {
   const { knex } = dbConnections
   const id = rule.moduleGroupId
 
@@ -55,8 +55,8 @@ async function moduleResolver(rule, n) {
     return { error: 'Could not find module' }
   }
 
-  if (mod.type == 'StudyModule') {
-    const result = await resolver(mod.rule, n)
+  if (mod.type === 'StudyModule') {
+    const result = await resolver(mod.rule)
     if (mod.code.slice(0, 3) === 'KK-') return null
     const moduleCourses = {
       id: mod.group_id,
@@ -69,8 +69,8 @@ async function moduleResolver(rule, n) {
     return moduleCourses
   }
 
-  if (mod.type == 'GroupingModule') {
-    const module = await moduleRuleResolver(mod, n)
+  if (mod.type === 'GroupingModule') {
+    const module = await moduleRuleResolver(mod)
     if (superFlatten) return customFlatten(module)
     return {
       id: mod.group_id,
@@ -88,8 +88,8 @@ async function moduleResolver(rule, n) {
   }
 }
 
-async function compositeResolver(rule, n) {
-  const result = await Promise.all(rule.rules.map(r => resolver(r, n + 1)))
+async function compositeResolver(rule) {
+  const result = await Promise.all(rule.rules.map(r => resolver(r)))
   return customFlatten(result.filter(Boolean))
 }
 
@@ -112,25 +112,25 @@ async function courseResolver(rule) {
   }
 }
 
-async function resolver(rule, n) {
-  if (rule.type == 'CreditsRule') {
-    return creditResolver(rule, n + 1)
+async function resolver(rule) {
+  if (rule.type === 'CreditsRule') {
+    return creditResolver(rule)
   }
-  if (rule.type == 'CompositeRule') {
-    return compositeResolver(rule, n)
+  if (rule.type === 'CompositeRule') {
+    return compositeResolver(rule)
   }
-  if (rule.type == 'ModuleRule') {
-    return moduleResolver(rule, n)
+  if (rule.type === 'ModuleRule') {
+    return moduleResolver(rule)
   }
-  if (rule.type == 'CourseUnitRule') {
+  if (rule.type === 'CourseUnitRule') {
     return courseResolver(rule)
   }
 
-  if (rule.type == 'AnyCourseUnitRule') {
+  if (rule.type === 'AnyCourseUnitRule') {
     return { id: rule.localId, name: 'Any course' }
   }
 
-  if (rule.type == 'AnyModuleRule') {
+  if (rule.type === 'AnyModuleRule') {
     return { id: rule.localId, name: 'Any module' }
   }
 
@@ -167,17 +167,14 @@ const recursiveWrite = async (module, parentId) => {
 
   if (!module.children) return
   for (const child of module.children) {
-    let childOrder = 0
-    await recursiveWrite(child, module.id, childOrder++)
+    await recursiveWrite(child, module.id)
   }
 }
 
 const updateProgrammeModules = async (entityIds = []) => {
   programmes = {}
   joins = {}
-
   const topModules = await selectFromByIds('modules', entityIds)
-
   for (const module of topModules) {
     const responsibleOrg = module.organisations
       ? module.organisations.find(o => o.roleUrn === 'urn:code:organisation-role:responsible-organisation')
