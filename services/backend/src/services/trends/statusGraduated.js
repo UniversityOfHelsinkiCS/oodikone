@@ -100,30 +100,33 @@ const calculateStatusGraduated = async (unixMillis, showByYear) => {
           Sentry.captureException(new Error(`Failed to find org for faculty code: ${curr.faculty_code}`))
         }
       }
-      if (!acc[curr.faculty_code]['yearly'][data.year]) {
-        acc[curr.faculty_code]['yearly'][data.year] = { acc: 0, total: 0 }
-      }
-      // init programme
-      if (!acc[curr.faculty_code]['drill'][curr.code]) {
-        const element = elements.find(e => e.code === curr.code)
-
-        acc[curr.faculty_code]['drill'][curr.code] = {
-          code: curr.code,
-          name: element.name,
-          current: 0,
-          previous: 0,
-          yearly: {},
+      // run following only if the faculty code is there
+      if (acc[curr.faculty_code]) {
+        if (!acc[curr.faculty_code]['yearly'][data.year]) {
+          acc[curr.faculty_code]['yearly'][data.year] = { acc: 0, total: 0 }
         }
-      }
-      acc[curr.faculty_code]['drill'][curr.code]['yearly'][data.year] = { acc: Number(curr.sum) }
-      acc[curr.faculty_code]['drill'][curr.code]['current'] =
-        _.get(acc, [curr.faculty_code, 'drill', curr.code, 'yearly', startYear, 'acc']) || 0
-      acc[curr.faculty_code]['drill'][curr.code]['previous'] =
-        _.get(acc, [curr.faculty_code, 'drill', curr.code, 'yearly', startYear - 1, 'acc']) || 0
+        // init programme
+        if (!acc[curr.faculty_code]['drill'][curr.code]) {
+          const element = elements.find(e => e.code === curr.code)
 
-      acc[curr.faculty_code]['yearly'][data.year].acc += Number(curr.sum)
-      acc[curr.faculty_code]['current'] = _.get(acc, [curr.faculty_code, 'yearly', startYear, 'acc']) || 0
-      acc[curr.faculty_code]['previous'] = _.get(acc, [curr.faculty_code, 'yearly', startYear - 1, 'acc']) || 0
+          acc[curr.faculty_code]['drill'][curr.code] = {
+            code: curr.code,
+            name: element.name,
+            current: 0,
+            previous: 0,
+            yearly: {},
+          }
+        }
+        acc[curr.faculty_code]['drill'][curr.code]['yearly'][data.year] = { acc: Number(curr.sum) }
+        acc[curr.faculty_code]['drill'][curr.code]['current'] =
+          _.get(acc, [curr.faculty_code, 'drill', curr.code, 'yearly', startYear, 'acc']) || 0
+        acc[curr.faculty_code]['drill'][curr.code]['previous'] =
+          _.get(acc, [curr.faculty_code, 'drill', curr.code, 'yearly', startYear - 1, 'acc']) || 0
+
+        acc[curr.faculty_code]['yearly'][data.year].acc += Number(curr.sum)
+        acc[curr.faculty_code]['current'] = _.get(acc, [curr.faculty_code, 'yearly', startYear, 'acc']) || 0
+        acc[curr.faculty_code]['previous'] = _.get(acc, [curr.faculty_code, 'yearly', startYear - 1, 'acc']) || 0
+      }
     })
     return acc
   }, {})
@@ -141,20 +144,22 @@ const calculateStatusGraduated = async (unixMillis, showByYear) => {
         }
       }
       // if no accumulated init programme
-      if (!mankeled[curr.faculty_code]['drill'][curr.code]) {
-        const element = elements.find(e => e.code === curr.code)
-        mankeled[curr.faculty_code]['drill'][curr.code] = { name: element.name, code: curr.code, yearly: {} }
-      }
-      // if no year in programme yearly add year
-      if (!mankeled[curr.faculty_code]['drill'][curr.code]['yearly'][data.year])
-        mankeled[curr.faculty_code]['drill'][curr.code]['yearly'][data.year] = { total: 0, acc: 0 }
-      // if no year in yearly total for faculty
-      if (!mankeled[curr.faculty_code]['yearly'][data.year])
-        mankeled[curr.faculty_code]['yearly'][data.year] = { total: 0, acc: 0 }
-      // do not add anything to total if current year. might fuck up in fall :D
-      if (data.year !== startYear) {
-        mankeled[curr.faculty_code]['yearly'][data.year].total += Number(curr.sum)
-        mankeled[curr.faculty_code]['drill'][curr.code]['yearly'][data.year].total = Number(curr.sum)
+      if (mankeled[curr.faculty_code]) {
+        if (!mankeled[curr.faculty_code]['drill'][curr.code]) {
+          const element = elements.find(e => e.code === curr.code)
+          mankeled[curr.faculty_code]['drill'][curr.code] = { name: element.name, code: curr.code, yearly: {} }
+        }
+        // if no year in programme yearly add year
+        if (!mankeled[curr.faculty_code]['drill'][curr.code]['yearly'][data.year])
+          mankeled[curr.faculty_code]['drill'][curr.code]['yearly'][data.year] = { total: 0, acc: 0 }
+        // if no year in yearly total for faculty
+        if (!mankeled[curr.faculty_code]['yearly'][data.year])
+          mankeled[curr.faculty_code]['yearly'][data.year] = { total: 0, acc: 0 }
+        // do not add anything to total if current year. might fuck up in fall :D
+        if (data.year !== startYear) {
+          mankeled[curr.faculty_code]['yearly'][data.year].total += Number(curr.sum)
+          mankeled[curr.faculty_code]['drill'][curr.code]['yearly'][data.year].total = Number(curr.sum)
+        }
       }
     })
   })
