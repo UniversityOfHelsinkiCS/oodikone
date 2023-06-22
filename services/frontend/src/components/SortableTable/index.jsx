@@ -49,7 +49,7 @@ defaultSort: [columnkey, order] of default sort column and order. For example ['
 toggleGroupExpansion: Function which is called when group of rows is collapsed or expanded
 expandedGroups: Array (or set?) of keys of rows are supposed to be expanded. These two are used
     only in population of courses
-
+getRowKey: Gets a key for the table rows from your data array. Example: getRowKey={s => s.studentNumber}
 
 --- Column usage: (* = required field) ---
 
