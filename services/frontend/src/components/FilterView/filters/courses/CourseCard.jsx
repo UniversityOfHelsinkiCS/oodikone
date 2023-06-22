@@ -9,7 +9,6 @@ const filterTexts = {
   [FilterType.PASSED]: { label: 'Passed' },
   [FilterType.FAILED]: { label: 'Failed' },
   [FilterType.ENROLLED_NO_GRADE]: { label: 'Enrolled, No Grade' },
-  // [FilterType.NOT_PARTICIPATED]: { label: 'Not Participated'},
 }
 // a bandaid solution to prevent oodikone crashing
 const translate = {
@@ -17,7 +16,6 @@ const translate = {
   PASSED: 'passed',
   FAILED: 'failed',
   ENROLLED_NO_GRADE: 'enrolledNoGrade',
-  // NOT_PARTICIPATED: 'notParticipated',
 }
 
 const CourseCard = ({ course, filterType, onChange }) => {
