@@ -182,7 +182,7 @@ export const Row = ({ data, isGroup, parents }) => {
       })
     }
 
-    if (column.isLast && column.parent?.thickBorders) {
+    if (column.childIndex === 0 && column.parent?.thickBorders) {
       cellProps.style = { ...cellProps.style, ...thickBorderStyles }
     }
 
@@ -205,7 +205,7 @@ export const Row = ({ data, isGroup, parents }) => {
         </td>
       )
     } else if (column.children && column.children.length > 0) {
-      stack.splice(0, 0, ...column.children.map((c, i, arr) => ({ ...c, childIndex: i, isLast: i === arr.length - 1 })))
+      stack.splice(0, 0, ...column.children.map((c, i) => ({ ...c, childIndex: i })))
     } else {
       cells.push(<td key={`${column.key}-else-${cellProps.title}`} {...cellProps} />)
     }

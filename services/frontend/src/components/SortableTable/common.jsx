@@ -5,7 +5,11 @@ import { createContext } from 'use-context-selector'
 
 const DataItemTypeKey = Symbol('DATA_ITEM_TYPE')
 const RowOptionsKey = Symbol('ROW_OPTIONS')
-export const thickBorderStyles = { borderRightWidth: '4px', borderRightColor: '#a8a8a8', borderRightStyle: 'solid' }
+export const thickBorderStyles = {
+  borderLeftWidth: '4px',
+  borderLeftColor: '#a8a8a8',
+  borderLeftStyle: 'solid',
+}
 
 export const SortableTableContext = createContext(null)
 
