@@ -11,7 +11,6 @@ import GroupKeyVisitor from './visitors/GroupKeyVisitor'
 import ValueVisitor from './visitors/ValueVisitor'
 import './style.css'
 import {
-  computeColumnSpans,
   insertGroupColumns,
   injectParentPointers,
   extractColumnKeys,
@@ -19,10 +18,9 @@ import {
   createHeaders,
   tableStateReducer,
   getInitialState,
-  DataItem,
   ColumnFilters,
-  getKey,
 } from './columnHeader'
+import { DataItem, getKey, computeColumnSpans } from './columnContent'
 
 /*
 *** SortableTable documentation ***
@@ -49,7 +47,6 @@ defaultSort: [columnkey, order] of default sort column and order. For example ['
 toggleGroupExpansion: Function which is called when group of rows is collapsed or expanded
 expandedGroups: Array (or set?) of keys of rows are supposed to be expanded. These two are used
     only in population of courses
-getRowKey: Gets a key for the table rows from your data array. Example: getRowKey={s => s.studentNumber}
 
 --- Column usage: (* = required field) ---
 
