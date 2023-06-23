@@ -45,11 +45,7 @@ const JOB_TYPES = {
 
 const scheduleJob = async type => {
   if (!JOB_TYPES[type]) {
-    logger.error({
-      message: `Cannot schedule unknown job type '${type}'.`,
-      job: type,
-    })
-
+    logger.info(`Cannot schedule unknown job type '${type}'.`)
     return
   }
 
