@@ -239,7 +239,7 @@ const updateStudents = async personIds => {
     updateTermRegistrations(termRegistrations, personIdToStudentNumber),
     updateEnrollments(enrollments, personIdToStudentNumber),
     updateStudyplans(studyplans, personIds, personIdToStudentNumber, groupedStudyRightSnapshots),
-    await bulkCreate(Transfer, mappedTransfers, null, ['studyrightid']),
+    bulkCreate(Transfer, mappedTransfers, null, ['studyrightid']),
   ])
 }
 
@@ -602,6 +602,37 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
   // This mayhem fixes missing course_unit references for CustomCourseUnitAttainments.
   const fixCustomCourseUnitAttainments = async attainments => {
     const addCourseUnitToCustomCourseUnitAttainments = (courses, attIdToCourseCode) => async att => {
+      if (
+        (att.type === 'ModuleAttainment' || att.type === 'DegreeProgrammeAttainment') &&
+        att.module_id === 'hy-DP-65295180-ma'
+      ) {
+        // To solve this problem, investigate if this module's state is draft or deleted in Sisu
+        // this instance is not found from the modules table
+        coursesToBeCreated.set('520097-ma', {
+          id: 'hy-DP-65295180-ma',
+          name: {
+            en: "Master's Degree Programme in Neuroscience (MNEURO) (higher)",
+            fi: "Master's Degree Programme in Neuroscience (MNEURO) (ylempi)",
+            sv: "Master's Degree Programme in Neuroscience (MNEURO) (högre)",
+          },
+          code: '520097-ma',
+          main_course_code: '520097-ma',
+          coursetypecode: att.study_level_urn,
+          is_study_module: false,
+          course_unit_type: att.course_unit_type_urn,
+          max_attainment_date: new Date(2019, 8, 26), // based on old similar programme
+          min_attainment_date: new Date(1900, 0, 1), // based on education table
+          enddate: new Date(1900, 0, 1), // based on old similar programmes
+          latest_instance_date: new Date(2019, 8, 26), // based on old similar programmes
+          substitutions: [],
+        })
+        // courseprovider exists so no need to search for that
+        // Add the course to the mapping objects for creditMapper to work properly.
+        courseUnitIdToCourseGroupId['hy-DP-65295180-ma'] = 'hy-DP-65295180-ma'
+        courseGroupIdToCourseCode['hy-DP-65295180-ma'] = '520097-ma'
+        return { ...att, course_unit_id: 'hy-DP-65295180-ma' }
+      }
+
       if (att.type !== 'CustomCourseUnitAttainment' && att.type !== 'CustomModuleAttainment') return att
       const courseUnits = courses.filter(c => c.code === attIdToCourseCode[att.id])
       let courseUnit = courseUnits.find(cu => {
@@ -747,7 +778,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
     studyrightIdToOrganisationsName,
     courseCodeToAyCodelessId
   )
-
+  // console.log('fixedAttainments:', fixedAttainments)
   const credits = fixedAttainments
     .filter(a => a !== null)
     .filter(a => a.id !== null)
@@ -770,7 +801,6 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
     .filter(c => !!c)
 
   const courses = Array.from(coursesToBeCreated.values())
-
   await bulkCreate(Course, courses)
   await bulkCreate(Credit, credits)
   await bulkCreate(
