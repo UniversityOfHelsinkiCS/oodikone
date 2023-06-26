@@ -42,8 +42,39 @@ const sortMainCode = codeArray => {
   })
 }
 
+const getDeltaTimeSeconds = (start, end) => Math.round(((end - start) / 1000) * 100) / 100
+
+const loggerData = []
+
+const customLogger = {
+  start: name => {
+    loggerData[name] = [{ msg: 'Started', time: new Date().getTime() }]
+  },
+  log: (name, msg) => {
+    loggerData[name].push({ msg, time: new Date().getTime() })
+  },
+  end: (name, print) => {
+    if (!print) {
+      loggerData[name] = []
+      return
+    }
+    loggerData[name].push({ msg: 'Ended', time: new Date().getTime() })
+    loggerData[name].forEach((item, index, arr) =>
+      // eslint-disable-next-line no-console
+      console.log(
+        `customLog: ${name} - ${index === 0 ? 0 : getDeltaTimeSeconds(arr[index - 1].time, item.time)} s - ${item.msg}`
+      )
+    )
+    const arr = loggerData[name]
+    // eslint-disable-next-line no-console
+    console.log(`customLog: ${name} Total time ${getDeltaTimeSeconds(arr[0].time, arr[arr.length - 1].time)} s`)
+    loggerData[name] = []
+  },
+}
+
 module.exports = {
   mapToProviders,
   sortMainCode,
   getSortRank,
+  customLogger,
 }

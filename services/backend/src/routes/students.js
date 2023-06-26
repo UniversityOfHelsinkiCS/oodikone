@@ -1,6 +1,7 @@
 const router = require('express').Router()
 const Student = require('../services/students')
 const { ApplicationError } = require('../util/customErrors')
+const { customLogger } = require('../util/utils')
 
 const filterStudentTags = (student, userId) => {
   return {
@@ -36,6 +37,7 @@ router.get('/students', async (req, res) => {
 })
 
 router.get('/students/:id', async (req, res) => {
+  customLogger.start('StudentFetchLog')
   const { id: studentId } = req.params
   const {
     user: { id, isAdmin, studentsUserCanAccess },
@@ -44,9 +46,12 @@ router.get('/students/:id', async (req, res) => {
   if (!isAdmin && !studentsUserCanAccess.includes(studentId)) {
     throw new ApplicationError('Error finding student', 400)
   }
-
+  customLogger.log('StudentFetchLog', 'starting withId')
   const student = await Student.withId(studentId)
-  res.json(filterStudentTags(student, id))
+  customLogger.log('StudentFetchLog', 'ended withId')
+  const filteredTags = filterStudentTags(student, id)
+  customLogger.end('StudentFetchLog', isAdmin)
+  res.json(filteredTags)
 })
 
 module.exports = router
