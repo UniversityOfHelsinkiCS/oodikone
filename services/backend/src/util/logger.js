@@ -43,7 +43,7 @@ if (isDev) {
     transports.push(
       new WinstonGelfTransporter({
         handleExceptions: true,
-        host: 'toska-tmp.cs.helsinki.fi',
+        host: 'svm-116.cs.helsinki.fi',
         port: 9503,
         protocol: 'udp',
         hostName: os.hostname(),
