@@ -389,6 +389,7 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
   }
 
   const getAttainmentsFromAttainment = attainment => {
+    if (!attainment) return []
     if (attainment.nodes && attainment.nodes.length)
       return flatten(
         attainment.nodes
@@ -778,7 +779,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
     studyrightIdToOrganisationsName,
     courseCodeToAyCodelessId
   )
-  // console.log('fixedAttainments:', fixedAttainments)
+
   const credits = fixedAttainments
     .filter(a => a !== null)
     .filter(a => a.id !== null)

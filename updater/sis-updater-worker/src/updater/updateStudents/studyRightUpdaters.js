@@ -271,21 +271,20 @@ const updateStudyRightElements = async (
 
       orderedSnapshots.sort(possibleBscFirst).forEach(snapshot => {
         const studentnumber = personIdToStudentNumber[mainStudyRight.person_id]
-        // console.log({ snapshot })
         // according to Eija Airio this is the right way to get the date... at least when studyright has changed
         // clarification: when education changes in the study right we need to get the start date from
-        // the _first_ snapshot as it is the date when the transfer is happened.
+        // the _first_ snapshot as it is the date when the transfer is happened. However, this causes sometimes huge caps
         let startDate = snapshot.first_snapshot_date_time || snapshot.valid.startDate
-        // console.log({ startDate })
-        // fix for varhaiskasvatus, see https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2741
+        // fix was made for varhaiskasvatus at first place, see https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2741
+        // However, there were gaps between other programmes too. Now ALL in all ba-ma studyrights master start date is bachelor graduation  date + 1
         if (
           snapshot.accepted_selection_path &&
-          snapshot.accepted_selection_path.educationPhase1GroupId === 'hy-DP-114256570' &&
-          snapshot.accepted_selection_path.educationPhase1ChildGroupId === 'otm-ebd2a5bb-190b-49cc-bccf-44c7e5eef14b'
+          snapshot.accepted_selection_path.educationPhase2GroupId &&
+          snapshot.study_right_graduation &&
+          snapshot.study_right_graduation.phase1GraduationDate
         ) {
-          if (snapshot.study_right_graduation && snapshot.study_right_graduation.phase1GraduationDate) {
-            startDate = snapshot.study_right_graduation.phase1GraduationDate
-          }
+          const phase1GraduationDate = new Date(snapshot.study_right_graduation.phase1GraduationDate)
+          startDate = phase1GraduationDate.setDate(phase1GraduationDate.getDate() + 1)
         }
 
         if (isBaMa(mainStudyRightEducation)) {
@@ -307,6 +306,9 @@ const updateStudyRightElements = async (
             transfersByStudyRightId,
             formattedStudyRightsById
           )
+          // In some transferred study rights start date is not correct due to first snapshot date
+          // This should fix cases, if a student has started in master programme after graduation in bachelor's and
+          // change the start date to transfer date instead of the study right snapshot date.
           if (maProgramme.startdate !== baProgramme.startdate) {
             if (startDate !== baProgramme.startdate) {
               maProgramme.startdate = baProgramme.startdate
@@ -318,7 +320,6 @@ const updateStudyRightElements = async (
           if (possibleBScDuplicate) {
             snapshotStudyRightElements.push(maProgramme, maStudytrack)
           } else {
-            // console.log(baProgramme, maProgramme)
             snapshotStudyRightElements.push(baProgramme, baStudytrack, maProgramme, maStudytrack)
           }
         } else {
