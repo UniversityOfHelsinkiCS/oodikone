@@ -51,9 +51,11 @@ const customLogger = {
     loggerData[name] = [{ msg: 'Started', time: new Date().getTime() }]
   },
   log: (name, msg) => {
+    if (!loggerData[name]) return
     loggerData[name].push({ msg, time: new Date().getTime() })
   },
   end: (name, print) => {
+    if (!loggerData[name]) return
     if (!print) {
       loggerData[name] = []
       return
