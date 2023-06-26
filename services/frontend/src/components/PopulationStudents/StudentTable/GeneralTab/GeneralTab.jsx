@@ -175,7 +175,7 @@ const GeneralTab = ({ group, populations, columnKeysToInclude, coursecode, filte
         courses: s.courses.filter(c => new Date(c.date) > new Date(group?.tags?.year, 7, 1)),
       })
     }
-    const sinceDate = creditDateFilterOptions?.startDate || new Date('1.1.1970')
+    const sinceDate = creditDateFilterOptions?.startDate || new Date(1970, 0, 1)
     const untilDate = creditDateFilterOptions?.endDate || new Date()
 
     const credits = getStudentTotalCredits({
