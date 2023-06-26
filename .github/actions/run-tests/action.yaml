@@ -18,7 +18,7 @@ runs:
     - name: 'Login to toska Docker registry'
       uses: docker/login-action@v2
       with:
-        registry: registry.toska.cs.helsinki.fi
+        registry: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi
         username: ${{ inputs.username }}
         password: ${{ inputs.password }}
 

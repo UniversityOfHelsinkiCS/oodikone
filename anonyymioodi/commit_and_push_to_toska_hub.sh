@@ -43,6 +43,6 @@ fi
 
 infomsg "Committing and pushing to registry"
 database=${args[0]}
-docker commit "$database" "registry.toska.cs.helsinki.fi/$database"
-docker push "registry.toska.cs.helsinki.fi/$database"
+docker commit "$database" "registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/$database"
+docker push "registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/$database"
 successmsg "Succesfully pushed"

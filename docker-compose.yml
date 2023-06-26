@@ -66,7 +66,7 @@ services:
   kone-db:
     <<: *defaults
     container_name: kone-db
-    image: registry.toska.cs.helsinki.fi/kone-db
+    image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/kone-db
     profiles:
       - oodikone
     volumes:
@@ -85,7 +85,7 @@ services:
   sis-db:
     <<: *defaults
     container_name: sis-db
-    image: registry.toska.cs.helsinki.fi/sis-db
+    image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/sis-db
     volumes:
       - sis-db-data:/data
     shm_size: 2gb
@@ -93,7 +93,7 @@ services:
   sis-importer-db:
     <<: *defaults
     container_name: sis-importer-db
-    image: registry.toska.cs.helsinki.fi/sis-importer-db
+    image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/sis-importer-db
     profiles:
       - updater
     volumes:
@@ -164,7 +164,7 @@ services:
   user-db:
     <<: *defaults
     container_name: user-db
-    image: registry.toska.cs.helsinki.fi/user-db
+    image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/user-db
     profiles:
       - oodikone
     volumes:
