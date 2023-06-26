@@ -37,7 +37,7 @@ services:
       PGDATA: /data
       POSTGRES_DB: kone-db
       POSTGRES_HOST_AUTH_METHOD: trust
-    image: registry.toska.cs.helsinki.fi/kone-db
+    image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/kone-db
 
   redis:
     <<: *defaults
@@ -50,7 +50,7 @@ services:
   sis-db:
     <<: *defaults
     container_name: sis-db
-    image: registry.toska.cs.helsinki.fi/sis-db
+    image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/sis-db
     environment:
       PGDATA: /data
       POSTGRES_DB: sis-db
@@ -64,18 +64,15 @@ services:
       PGDATA: /data
       POSTGRES_DB: user-db
       POSTGRES_HOST_AUTH_METHOD: trust
-    image: registry.toska.cs.helsinki.fi/user-db
+    image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/user-db
 
   jami:
     <<: *defaults
-    image: toska/jami
+    image: quay.io/toska/jami:production
     environment:
       - PORT=3003
       - NODE_ENV=production
-      - POSTGRES_HOST=jami-db
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DATABASE=postgres
+      - DATABASE_URL=postgres://postgres:postgres@jami-db:5432/postgres
     ports:
       - 3003:3003
     container_name: jami
@@ -105,7 +102,7 @@ services:
   sis-importer-db:
     <<: *defaults
     container_name: sis-importer-db
-    image: registry.toska.cs.helsinki.fi/sis-importer-db
+    image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/sis-importer-db
     profiles:
       - updater
 
