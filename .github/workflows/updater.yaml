@@ -149,20 +149,3 @@ jobs:
           registry: quay.io/toska
           username: toska+github
           password: ${{ secrets.QUAY_IO_TOKEN }}
-
-  slack_notification:
-    name: 'Send deployment notification to Slack'
-    runs-on: ubuntu-latest
-    needs:
-      - release_worker
-      - release_scheduler
-
-    steps:
-      - name: 'Send notification to slack'
-        uses: UniversityOfHelsinkiCS/slackbot-action@v1.4.2
-        with:
-          webhook-url: ${{ secrets.WEBHOOK_URL }}
-          message-type: deployment
-          softa-url: https://toska-staging.cs.helsinki.fi/oodikone
-          deployment-target: production
-          softa-to-deploy: sis-updater
