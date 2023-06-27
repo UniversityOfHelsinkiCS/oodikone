@@ -46,6 +46,7 @@ const getDeltaTimeSeconds = (start, end) => Math.round(((end - start) / 1000) * 
 
 const loggerData = []
 
+// this customLogger can be used to debug slow routes to see which part takes too long.
 const customLogger = {
   start: name => {
     loggerData[name] = [{ msg: 'Started', time: new Date().getTime() }]
