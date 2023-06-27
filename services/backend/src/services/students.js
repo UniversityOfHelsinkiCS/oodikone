@@ -17,7 +17,6 @@ const {
 } = require('../models')
 const { TagStudent, Tag } = require('../models/models_kone')
 const Op = Sequelize.Op
-const { customLogger } = require('../util/utils')
 const logger = require('../util/logger')
 
 const createStudent = student => Student.create(student)
@@ -68,8 +67,6 @@ const byId = async id => {
           model: Transfer,
         },
       ],
-      benchmark: true,
-      logging: (sqlString, time) => customLogger.log('StudentFetchLog', `findByPk timed: ${time} ms`),
     }),
     TagStudent.findAll({
       include: [
@@ -80,8 +77,6 @@ const byId = async id => {
       where: {
         studentnumber: id,
       },
-      benchmark: true,
-      logging: (sqlString, time) => customLogger.log('StudentFetchLog', `tagstudent timed: ${time} ms`),
     }),
   ])
   const tagprogrammes = await ElementDetail.findAll({
@@ -90,12 +85,8 @@ const byId = async id => {
         [Op.in]: tags.map(t => t.tag.studytrack),
       },
     },
-    benchmark: true,
-    logging: (sqlString, time) => customLogger.log('StudentFetchLog', `tagprogrammes query timed: ${time} ms`),
   })
-  customLogger.log('StudentFetchLog', 'ended queries')
   const semesters = await Semester.findAll()
-  customLogger.log('StudentFetchLog', 'ended semesters query')
   const mappedEnrollments = student.semester_enrollments.map(enrollment => {
     const semester = semesters.find(sem => sem.semestercode === enrollment.semestercode)
     return {
@@ -280,17 +271,6 @@ const formatStudent = async ({
     .map(toCourse)
     .filter(c => c.course.name !== 'missing')
 
-  const hopsCourses = studyplans.map(sp => sp.included_courses).flat()
-
-  const allCourses = await sequelize.query(
-    'SELECT DISTINCT ON(course_code) course_code, credits FROM credit WHERE course_code IN (:hopsCourses)',
-    {
-      replacements: { hopsCourses: hopsCourses.concat('id-to-fill-array') },
-      benchmark: true,
-      logging: (sqlString, time) => customLogger.log('StudentFetchLog', `allcourses query timed: ${time}`),
-    }
-  )
-
   return {
     firstnames,
     lastname,
@@ -306,7 +286,6 @@ const formatStudent = async ({
     semesterenrollments,
     updatedAt: updatedAt || createdAt,
     studyplans,
-    allCourses: allCourses[0],
     tags,
     sis_person_id: sis_person_id,
   }
@@ -315,9 +294,7 @@ const formatStudent = async ({
 const withId = async id => {
   try {
     const result = await byId(id)
-    customLogger.log('StudentFetchLog', 'returned to withId from byId')
     const formattedStudent = await formatStudent(result)
-    customLogger.log('StudentFetchLog', 'returned to withId from formatStudent')
     return formattedStudent
   } catch (e) {
     logger.error(`Error when fetching single student ${e}`)
