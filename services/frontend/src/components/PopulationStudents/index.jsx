@@ -34,6 +34,7 @@ const Panes = ({
   studentToTargetCourseDateMap,
   coursecode,
   studyGuidanceGroup,
+  customPopulationProgramme,
   queryStudyrights,
   from,
   to,
@@ -58,6 +59,7 @@ const Panes = ({
             filteredStudents={filteredStudents}
             studentToTargetCourseDateMap={studentToTargetCourseDateMap}
             coursecode={coursecode}
+            customPopulationProgramme={customPopulationProgramme}
             studyGuidanceGroup={studyGuidanceGroup}
             from={from}
             to={to}
@@ -164,6 +166,7 @@ const PopulationStudents = ({
   coursecode = [],
   variant,
   studyGuidanceGroup,
+  customPopulationProgramme,
   from,
   to,
   criteria,
@@ -228,6 +231,7 @@ const PopulationStudents = ({
         tags={tags}
         criteria={criteria}
         studyGuidanceGroup={studyGuidanceGroup}
+        customPopulationProgramme={customPopulationProgramme}
         coursecode={coursecode}
         from={from}
         to={to}

@@ -216,10 +216,9 @@ const CustomPopulationContent = ({ students, custompop }) => {
           <div ref={studentRef}>
             <PopulationStudents
               variant="customPopulation"
-              language={language}
               filteredStudents={students}
               dataExport={<UnihowDataExport students={students} />}
-              customPopulation
+              customPopulationProgramme={populations.data.studyProgramme || ''}
             />
           </div>
         ),
@@ -253,7 +252,7 @@ const CustomPopulationContent = ({ students, custompop }) => {
 
   return (
     <div className="segmentContainer">
-      <Message style={{ maxWidth: '800px' }}>
+      <Message style={{ maxWidth: '800px', fontSize: '16px' }}>
         <Message.Header>Custom population</Message.Header>
         <p>
           Here you can create custom population using a list of studentnumbers. Clicking the blue custom population
