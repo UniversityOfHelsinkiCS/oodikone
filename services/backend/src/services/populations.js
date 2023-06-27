@@ -114,9 +114,6 @@ const formatStudentForPopulationStatistics = (
     updatedAt,
     createdAt,
     gender_code,
-    gender_fi,
-    gender_sv,
-    gender_en,
     tags,
     option,
     birthdate,
@@ -211,7 +208,6 @@ const formatStudentForPopulationStatistics = (
     name: abbreviatedname,
     transfers: transfers || [],
     gender_code,
-    gender: { gender_en, gender_fi, gender_sv },
     email,
     secondaryEmail: secondary_email,
     phoneNumber: phone_number,
@@ -354,9 +350,6 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
         'gender_code',
         'birthdate',
         'sis_person_id',
-        /* 'gender_fi',
-        'gender_sv',
-        'gender_en' */
       ],
       include: [
         {
