@@ -401,7 +401,8 @@ const studyplanMapper =
     studyPlanIdToDegrees,
     educationStudyrights,
     getCourseCodesFromAttainment,
-    getAttainmentsFromAttainment
+    getAttainmentsFromAttainment,
+    attainments
   ) =>
   studyplan => {
     const studentnumber = personIdToStudentNumber[studyplan.user_id]
@@ -434,6 +435,7 @@ const studyplanMapper =
           )
           .map(({ moduleId }) => getCourseCodesFromAttainment(moduleAttainments[moduleId][studyplan.user_id]))
       )
+
       const attainmentsToCalculate = uniqBy(
         graduated
           ? getAttainmentsFromAttainment(moduleAttainments[programmeId][studyplan.user_id])
@@ -450,6 +452,16 @@ const studyplanMapper =
                         return courseUnitIdToAttainment[substitutedBy[0]]
                           ? courseUnitIdToAttainment[substitutedBy[0]][studyplan.user_id]
                           : []
+                      if (!courseUnitIdToAttainment[courseUnitId]) {
+                        // Sometimes course_unit_id is not the same in attainment and hops courses.
+                        // Filter by comparing the codes and change course_unit_id to attainment course_unit_id
+                        const attainment = attainments.filter(
+                          att => courseUnitIdToCode[att.course_unit_id] === courseUnitIdToCode[courseUnitId]
+                        )
+                        if (attainment.length > 0) {
+                          courseUnitId = attainment[0].course_unit_id
+                        }
+                      }
                       return courseUnitIdToAttainment[courseUnitId]
                         ? courseUnitIdToAttainment[courseUnitId][studyplan.user_id]
                         : []
