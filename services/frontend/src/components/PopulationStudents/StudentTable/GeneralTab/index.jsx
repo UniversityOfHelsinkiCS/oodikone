@@ -38,9 +38,24 @@ const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
     }
     return cols
   }
+  const getCustomPopulationColumns = () => {
+    const cols = ['credits.since', 'programme', 'startYear']
+    if (props.customPopulationProgramme) {
+      cols.push(
+        'credits.hops',
+        'studyrightStart',
+        'studyStartDate',
+        'studyStartDateActual',
+        'endDate',
+        'semesterEnrollments',
+        'semesterEnrollmentsAmount'
+      )
+    }
+    return cols
+  }
 
   const columnsByVariant = {
-    customPopulation: ['credits.since', 'programme', 'startYear'],
+    customPopulation: getCustomPopulationColumns(),
     coursePopulation: [
       'gradeForSingleCourse',
       'programme',

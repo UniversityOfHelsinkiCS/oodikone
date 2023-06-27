@@ -21,7 +21,17 @@ import createMaps from './columnHelpers/createMaps'
 import getSemestersPresentFunctions from './columnHelpers/semestersPresent'
 import getStudyProgrammeFunctions from './columnHelpers/studyProgramme'
 
-const GeneralTab = ({ group, populations, columnKeysToInclude, coursecode, filteredStudents, from, to, year }) => {
+const GeneralTab = ({
+  group,
+  populations,
+  customPopulationProgramme,
+  columnKeysToInclude,
+  coursecode,
+  filteredStudents,
+  from,
+  to,
+  year,
+}) => {
   const { language } = useLanguage()
   const { useFilterSelector } = useFilters()
   const [popupStates, setPopupStates] = useState({})
@@ -81,7 +91,8 @@ const GeneralTab = ({ group, populations, columnKeysToInclude, coursecode, filte
     group?.tags?.studyProgramme && group?.tags?.studyProgramme.includes('+')
       ? group?.tags?.studyProgramme.split('+')
       : [group?.tags?.studyProgramme]
-  const programmeCode = cleanedQueryStudyrights[0] || studyGuidangeGroupProgrammes[0]
+
+  const programmeCode = cleanedQueryStudyrights[0] || studyGuidangeGroupProgrammes[0] || customPopulationProgramme
   const combinedProgrammeCode = getCombinedProgrammeCode(cleanedQueryStudyrights, studyGuidangeGroupProgrammes)
 
   const {
