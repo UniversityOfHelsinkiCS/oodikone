@@ -289,8 +289,6 @@ const CoursePopulation = ({
               variant="coursePopulation"
               studentToTargetCourseDateMap={studentToTargetCourseDateMap}
               filteredStudents={filtered}
-              coursePopulation
-              language={language}
               coursecode={codes}
               from={dateFrom}
               to={dateTo}

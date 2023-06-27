@@ -49,7 +49,7 @@ const useToggleAndSetNewestIndex = ({ defaultValue, indexOfPanelToScroll, setNew
   return [state, toggle]
 }
 
-const SingleStudyGroupContent = ({ filteredStudents, population, group, language }) => {
+const SingleStudyGroupContent = ({ filteredStudents, population, group }) => {
   const { useFilterSelector, filterDispatch } = useFilters()
   const refs = [useRef(), useRef(), useRef(), useRef()]
   const [activeIndex, setActiveIndex] = useState([])
@@ -183,7 +183,6 @@ const SingleStudyGroupContent = ({ filteredStudents, population, group, language
           <div ref={refs[2]}>
             <PopulationStudents
               variant="studyGuidanceGroupPopulation"
-              language={language}
               filteredStudents={students}
               criteria={criteria}
               studyGuidanceGroup={group}
