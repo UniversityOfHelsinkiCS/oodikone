@@ -39,7 +39,6 @@ const isFacultyNonMajorCredit = (studyrights, attainment_date, facultyProgrammes
 const getFacultyRegularCreditStats = async ({ studyprogramme, since, years, isAcademicYear, facultyProgrammes }) => {
   const providercode = mapToProviders([studyprogramme])[0]
   const courses = await getCourseCodesForStudyProgramme(providercode)
-  // console.log(JSON.stringify(courses))
   const credits = await getCreditsForStudyProgramme(courses, since)
   const students = [...new Set(credits.map(({ student_studentnumber }) => student_studentnumber))]
 
