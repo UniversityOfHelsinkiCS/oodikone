@@ -180,7 +180,6 @@ export default createFilter({
     if (activeProgramme || activeCombinedProgramme) {
       if (!hops && !secondHops) {
         student.courses = []
-        student.credits = 0
         return true
       }
       const courses = new Set(hops && activeProgramme ? hops.included_courses : [])
@@ -188,8 +187,7 @@ export default createFilter({
       const hopsCourses = student.courses.filter(
         course => courses.has(course.course_code) || secondProgrammeCourses.has(course.course_code)
       )
-      student.courses = hopsCourses
-      student.credits = hops.completed_credits
+      student.courses = [...new Set(hopsCourses)]
       return true
     }
     const courses = student.courses.filter(({ date }) => new Date(date) >= studyrightStartDate)
