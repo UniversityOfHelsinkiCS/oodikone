@@ -4,6 +4,7 @@ module.exports.SIS_MISC_SCHEDULE_CHANNEL = 'SIS_MISC_SCHEDULE_CHANNEL'
 module.exports.SIS_PURGE_CHANNEL = 'SIS_PURGE_CHANNEL'
 module.exports.CHUNK_SIZE = 100
 module.exports.isDev = process.env.NODE_ENV === 'development'
+module.exports.isStaging = process.env.STAGING || false
 module.exports.SECRET_TOKEN = process.env.SECRET_TOKEN
 module.exports.REDIS_TOTAL_META_KEY = 'TOTAL_META'
 module.exports.REDIS_TOTAL_STUDENTS_KEY = 'TOTAL_STUDENTS'
