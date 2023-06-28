@@ -1,6 +1,10 @@
+const os = require('os')
+
 const winston = require('winston')
+const { WinstonGelfTransporter } = require('winston-gelf-transporter')
 const sentry = require('winston-sentry-log')
-const { isDev, sentryRelease, sentryEnvironment, runningInCI } = require('../config')
+
+const { isDev, isStaging, sentryRelease, sentryEnvironment, runningInCI } = require('../config')
 const { combine, timestamp, printf, splat } = winston.format
 
 let transports = []
@@ -46,7 +50,24 @@ if (isDev) {
       ...rest,
     })
   )
+
   transports.push(new winston.transports.Console({ format: prodFormat }))
+
+  if (!isStaging) {
+    transports.push(
+      new WinstonGelfTransporter({
+        handleExceptions: true,
+        host: 'svm-116.cs.helsinki.fi',
+        port: 9503,
+        protocol: 'udp',
+        hostName: os.hostname(),
+        additional: {
+          app: 'updater-scheduler',
+          environment: 'production',
+        },
+      })
+    )
+  }
 }
 
 const logger = winston.createLogger({ transports })

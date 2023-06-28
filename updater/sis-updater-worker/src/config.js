@@ -1,4 +1,5 @@
 module.exports.isDev = process.env.NODE_ENV === 'development'
+module.exports.isStaging = process.env.STAGING || false
 module.exports.NATS_GROUP = 'sis-updater-nats.workers'
 module.exports.SIS_UPDATER_SCHEDULE_CHANNEL = 'SIS_UPDATER_SCHEDULE_CHANNEL'
 module.exports.SIS_MISC_SCHEDULE_CHANNEL = 'SIS_MISC_SCHEDULE_CHANNEL'
