@@ -44,7 +44,7 @@ const getStudyProgrammeFunctions = ({
     const courseCompletions = student.courses
       // eslint-disable-next-line camelcase
       .filter(({ course_code }) => coursecode.includes(course_code))
-      .toSorted((a, b) => {
+      .sort((a, b) => {
         if (a.date < b.date) return 1
         if (a.date > b.date) return -1
         return 0
