@@ -65,9 +65,9 @@ const getCountriesPopup = ({ index, combinedProgramme, value, row, year, studypr
   )
 }
 
-const getFirstCell = ({ yearlyData, year, show, studyprogramme, calendarYears, combinedProgramme }) => {
+const getFirstCell = ({ yearlyData, year, show, studyprogramme, calendarYears, combinedProgramme, setShow }) => {
   return (
-    <Table.Cell key={getKey(year)} className={getCellClass(year)}>
+    <Table.Cell key={getKey(year)} className={getCellClass(year)} onClick={setShow}>
       {yearlyData.length > 1 && <Icon name={`${show ? 'angle down' : 'angle right'}`} />}
       {year}
       <PopulationLink
@@ -145,11 +145,19 @@ const getRow = ({
   // Get row for the studyprogramme
   if (years.includes(row[0])) {
     return (
-      <Table.Row key={getKey(row[0])} className="header-row" onClick={() => setShow(!show)}>
+      <Table.Row key={getKey(row[0])} className="header-row">
         {row.map((value, index) => {
           if (shouldBeHidden(showPercentages, value)) return null
           if (index === 0)
-            return getFirstCell({ yearlyData, year: row[0], show, studyprogramme, calendarYears, combinedProgramme })
+            return getFirstCell({
+              yearlyData,
+              year: row[0],
+              show,
+              studyprogramme,
+              calendarYears,
+              combinedProgramme,
+              setShow,
+            })
           if (index === row.length - 2 && otherCountriesStats)
             return getCountriesPopup({
               index,
@@ -257,10 +265,16 @@ const StudytrackDataTable = ({
   combinedProgramme,
   otherCountriesStats,
 }) => {
-  const [show, setShow] = useState(false)
+  const [show, setShow] = useState([])
   const [showPercentages, setShowPercentages] = useState(false)
   const { getTextIn } = useLanguage()
   if (!dataOfAllTracks && !dataOfSingleTrack) return null
+
+  const firstCellClicked = index => {
+    const newShow = [...show]
+    show[index] = newShow[index] === undefined ? true : !show[index]
+    setShow([...show])
+  }
 
   const sortedMainStats = sortMainDataByYear(Object.values(dataOfAllTracks))
   const sortedTrackStats = sortTrackDataByYear(dataOfSingleTrack)
@@ -337,14 +351,14 @@ const StudytrackDataTable = ({
                     otherCountriesStats,
                   })
                 )
-              : sortedMainStats?.map(yearlyData =>
+              : sortedMainStats?.map((yearlyData, index) =>
                   yearlyData.map(row =>
                     getRow({
                       yearlyData,
                       row,
                       studyprogramme,
-                      show,
-                      setShow,
+                      show: show[index],
+                      setShow: () => firstCellClicked(index),
                       studytracks,
                       showPercentages,
                       years,
@@ -352,6 +366,7 @@ const StudytrackDataTable = ({
                       combinedProgramme,
                       otherCountriesStats,
                       getTextIn,
+                      index,
                     })
                   )
                 )}
