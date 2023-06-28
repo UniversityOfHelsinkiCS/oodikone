@@ -36,7 +36,7 @@ const lodashSortOrderTypes = {
   DESC: 'desc',
 }
 
-const updateCourseStatisticsCriteria = (courseStats, language, state, getTextIn) => {
+const updateCourseStatisticsCriteria = (courseStats, state, getTextIn) => {
   if (!courseStats) {
     return []
   }

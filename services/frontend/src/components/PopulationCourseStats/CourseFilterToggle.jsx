@@ -1,12 +1,12 @@
 import React from 'react'
 import { Popup } from 'semantic-ui-react'
-import { useSelector } from 'react-redux'
 import { isCourseSelected, toggleCourseSelection } from 'components/FilterView/filters/courses'
 import FilterToggleIcon from 'components/FilterToggleIcon'
 import useFilters from 'components/FilterView/useFilters'
+import useLanguage from 'components/LanguagePicker/useLanguage'
 
 const CourseFilterToggle = ({ course }) => {
-  const { getTextIn } = useSelector(({ settings }) => settings)
+  const { getTextIn } = useLanguage()
   const { useFilterSelector, filterDispatch } = useFilters()
 
   const isActive = useFilterSelector(isCourseSelected(course.code))
