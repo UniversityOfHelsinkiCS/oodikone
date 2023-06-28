@@ -19,6 +19,8 @@ import { useHistory } from 'react-router-dom'
 import { useToggle } from 'common/hooks'
 import { useGetProgressCriteriaQuery } from 'redux/programmeProgressCriteria'
 import useLanguage from 'components/LanguagePicker/useLanguage'
+import AgeStats from 'components/PopulationDetails/AgeStats'
+import CreditGainStats from 'components/PopulationDetails/CreditGainStats'
 import StudyGuidanceGroupPopulationCourses from './StudyGuidanceGroupPopulationCourses'
 import { startYearToAcademicYear, Wrapper, StyledMessage } from './common'
 import { useGetSemestersQuery } from '../../redux/semesters'
@@ -50,13 +52,24 @@ const useToggleAndSetNewestIndex = ({ defaultValue, indexOfPanelToScroll, setNew
 
 const SingleStudyGroupContent = ({ filteredStudents, population, group }) => {
   const { useFilterSelector, filterDispatch } = useFilters()
-  const refs = [useRef(), useRef(), useRef(), useRef()]
+  const refs = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef()]
   const [activeIndex, setActiveIndex] = useState([])
   const [newestIndex, setNewestIndex] = useState(null)
   const isMounted = useIsMounted()
   const criteria = useGetProgressCriteriaQuery({
     programmeCode: group?.tags?.studyProgramme ? group?.tags?.studyProgramme : '',
   }).data
+  const year = group?.tags?.year
+
+  const programmeCodes = group?.tags?.studyProgramme?.includes('+')
+    ? group?.tags?.studyProgramme.split('+')
+    : [group?.tags?.studyProgramme]
+  const query = {
+    studyRights: {
+      programme: programmeCodes[0],
+      combinedProgramme: programmeCodes[1] ? programmeCodes[1] : undefined,
+    },
+  }
 
   const { data: courses, isLoading: coursesAreLoading } = useGetStudyGuidanceGroupPopulationCoursesQuery({
     studentnumberlist: _.map(filteredStudents, 'studentNumber'),
@@ -64,6 +77,7 @@ const SingleStudyGroupContent = ({ filteredStudents, population, group }) => {
   })
 
   const creditDateFilterActive = useFilterSelector(creditDateFilter.selectors.isActive)
+  const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions)
   const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive)
 
   const [coursesStructuredByProgramme, toggleCoursesStructuredByProgramme] = useToggleAndSetNewestIndex({
@@ -105,92 +119,127 @@ const SingleStudyGroupContent = ({ filteredStudents, population, group }) => {
     togglePanel(0)
   }, [population])
 
-  const customStudyStartYear = group?.tags?.year ? new Date(`${group.tags.year}-07-31`) : null
-  const programmeCodes =
-    group?.tags?.studyProgramme && group?.tags?.studyProgramme.includes('+')
-      ? group?.tags?.studyProgramme.split('+')
-      : [group?.tags?.studyProgramme]
-  const createPanels = students => [
-    {
-      key: 0,
-      title: {
-        content: (
-          <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-            Credit accumulation (for {students.length} students)
-          </span>
-        ),
-      },
-      onTitleClick: () => togglePanel(0),
-      content: {
-        content: (
-          <div ref={refs[0]}>
-            {group.tags?.year && (
-              <Button primary onClick={() => toggleCreditDateFilter()}>
-                {creditDateFilterActive ? 'Show all credits' : 'Show starting from associated year'}
-              </Button>
-            )}
-            <CreditAccumulationGraphHighCharts
-              students={students}
-              studyPlanFilterIsActive={studyPlanFilterIsActive}
-              programmeCodes={group?.tags?.studyProgramme ? programmeCodes : []}
-              customStudyStartYear={customStudyStartYear}
-            />
-          </div>
-        ),
-      },
-    },
-    {
-      key: 1,
-      title: {
-        content: (
-          <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-            Courses of population
-          </span>
-        ),
-      },
-      onTitleClick: () => togglePanel(1),
-      content: {
-        content: (
-          <div ref={refs[1]}>
-            {coursesAreLoading ? (
-              <SegmentDimmer isLoading={coursesAreLoading} />
-            ) : (
-              <StudyGuidanceGroupPopulationCourses
-                courses={courses}
-                filteredStudents={students}
-                showStructured={coursesStructuredByProgramme}
-                toggleShowStructured={toggleCoursesStructuredByProgramme}
-                studyProgramme={group.tags?.studyProgramme ? programmeCodes[0] : null}
+  const customStudyStartYear = year ? new Date(`${year}-07-31`) : null
+
+  const createPanels = students =>
+    [
+      {
+        title: {
+          content: (
+            <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
+              Credit accumulation (for {students.length} students)
+            </span>
+          ),
+        },
+        content: {
+          content: (
+            <div ref={refs[0]}>
+              {group.tags?.year && (
+                <Button primary onClick={() => toggleCreditDateFilter()}>
+                  {creditDateFilterActive ? 'Show all credits' : 'Show starting from associated year'}
+                </Button>
+              )}
+              <CreditAccumulationGraphHighCharts
+                students={students}
+                studyPlanFilterIsActive={studyPlanFilterIsActive}
+                programmeCodes={group?.tags?.studyProgramme ? programmeCodes : []}
+                customStudyStartYear={customStudyStartYear}
               />
-            )}
-          </div>
-        ),
+            </div>
+          ),
+        },
       },
-    },
-    {
-      key: 2,
-      title: {
-        content: (
-          <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-            Students ({students.length})
-          </span>
-        ),
+      programmeCodes && year
+        ? {
+            title: {
+              content: (
+                <span
+                  style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}
+                  data-cy="credit-statistics"
+                >
+                  Credit statistics
+                </span>
+              ),
+            },
+            content: {
+              content: !query?.years ? (
+                <div ref={refs[1]}>
+                  <CreditGainStats
+                    query={query}
+                    filteredStudents={filteredStudents}
+                    creditDateFilterOptions={creditDateFilterOptions}
+                    year={group.tags.year}
+                  />
+                </div>
+              ) : (
+                <div>This table is omitted when searching population of multiple years</div>
+              ),
+            },
+          }
+        : null,
+      {
+        title: {
+          content: (
+            <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
+              Age distribution
+            </span>
+          ),
+        },
+        content: {
+          content: <AgeStats filteredStudents={filteredStudents} query={query} />,
+        },
       },
-      onTitleClick: () => togglePanel(2),
-      content: {
-        content: (
-          <div ref={refs[2]}>
-            <PopulationStudents
-              variant="studyGuidanceGroupPopulation"
-              filteredStudents={students}
-              criteria={criteria}
-              studyGuidanceGroup={group}
-            />
-          </div>
-        ),
+      {
+        key: 3,
+        title: {
+          content: (
+            <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
+              Courses of population
+            </span>
+          ),
+        },
+        content: {
+          content: (
+            <div ref={refs[3]}>
+              {coursesAreLoading ? (
+                <SegmentDimmer isLoading={coursesAreLoading} />
+              ) : (
+                <StudyGuidanceGroupPopulationCourses
+                  courses={courses}
+                  filteredStudents={students}
+                  showStructured={coursesStructuredByProgramme}
+                  toggleShowStructured={toggleCoursesStructuredByProgramme}
+                  studyProgramme={group.tags?.studyProgramme ? programmeCodes[0] : null}
+                />
+              )}
+            </div>
+          ),
+        },
       },
-    },
-  ]
+      {
+        title: {
+          content: (
+            <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
+              Students ({students.length})
+            </span>
+          ),
+        },
+        content: {
+          content: (
+            <div ref={refs[4]}>
+              <PopulationStudents
+                variant="studyGuidanceGroupPopulation"
+                filteredStudents={students}
+                criteria={criteria}
+                studyGuidanceGroup={group}
+              />
+            </div>
+          ),
+        },
+      },
+    ]
+      .filter(item => item !== null)
+      .map((panel, index) => ({ ...panel, index, onTitleClick: () => togglePanel(index) }))
 
   return (
     <div style={{ overflowX: 'auto', flexGrow: 1, padding: '1px' }}>

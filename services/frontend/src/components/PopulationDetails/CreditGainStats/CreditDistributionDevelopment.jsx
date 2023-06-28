@@ -166,7 +166,7 @@ function tooltipFormatter() {
   return `<div style="text-align: center; width: 100%"><b>${this.x}</b>, ${this.series.name}<br/>${this.y}/${this.total} students (${Math.round(this.percentage)}%)</div>`;
 }
 
-const CreditDistributionDevelopment = ({ students, programme, combinedProgramme }) => {
+const CreditDistributionDevelopment = ({ students, programme, combinedProgramme, year }) => {
   const [cumulative, setCumulative] = useState(true)
   const [timeDivision, setTimeDivision] = useState(TimeDivision.SEMESTER)
   const [stackOrdering, setStackOrdering] = useState(StackOrdering.ASCENDING)
@@ -174,13 +174,13 @@ const CreditDistributionDevelopment = ({ students, programme, combinedProgramme 
   const semestersQuery = useGetSemestersQuery()
   const { getTextIn } = useLanguage()
   const { filterDispatch } = useFilters()
-
   const timeSlots = useMemo(() => {
-    const startDate = moment().subtract({ months }).endOf('year')
+    const startDate = year ? moment([year]).endOf('year') : moment().subtract({ months }).endOf('year')
     const semesters = semestersQuery.data?.semesters ?? []
 
     if (timeDivision === TimeDivision.CALENDAR_YEAR) {
-      return _.range(moment().year() - Math.ceil(months / 12), moment().year() + 1).map(year => ({
+      const startYear = months === undefined ? year : moment().year() - Math.ceil(months / 12)
+      return _.range(startYear, moment().year() + 1).map(year => ({
         start: moment({ year }),
         end: moment({ year }).endOf('year'),
         label: year,
@@ -215,7 +215,7 @@ const CreditDistributionDevelopment = ({ students, programme, combinedProgramme 
     }
 
     return []
-  }, [timeDivision, months, semestersQuery, getTextIn])
+  }, [timeDivision, months, year, semestersQuery, getTextIn])
 
   const seriesList = useMemo(() => {
     return [
