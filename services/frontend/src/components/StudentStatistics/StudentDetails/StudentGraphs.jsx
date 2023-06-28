@@ -3,8 +3,9 @@ import { Menu, Tab, Input, Message } from 'semantic-ui-react'
 import { flattenDeep } from 'lodash'
 import Highcharts from 'highcharts/highstock'
 import ReactHighcharts from 'react-highcharts'
+import useLanguage from 'components/LanguagePicker/useLanguage'
 import CreditAccumulationGraphHighCharts from '../../CreditAccumulationGraphHighCharts'
-import { byDateDesc, reformatDate, getTextIn, getStudyRightElementTargetDates } from '../../../common'
+import { byDateDesc, reformatDate, getStudyRightElementTargetDates } from '../../../common'
 import TSA from '../../../common/tsa'
 
 const ANALYTICS_CATEGORY = 'Student stats'
@@ -85,7 +86,7 @@ const chunkifyArray = (array, size = 1) => {
   return [firstChunk].concat(chunkifyArray(array.slice(size, array.length), size))
 }
 
-const semesterChunkify = (courses, semesterenrollments, semesters, language) => {
+const semesterChunkify = (courses, semesterenrollments, semesters, getTextIn) => {
   const semesterChunks = semesterenrollments.reduce((acc, curr) => {
     const currSemester = semesters.semesters[curr.semestercode]
     const filteredcourses = courses.filter(
@@ -99,7 +100,7 @@ const semesterChunkify = (courses, semesterenrollments, semesters, language) => 
     const sum = curr.data.reduce((a, b) => a + b.grade, 0)
     if (curr.numOfCourses > 0)
       acc.push({
-        name: getTextIn(curr.semester.name, language),
+        name: getTextIn(curr.semester.name),
         y: sum / curr.numOfCourses,
         x: new Date(curr.data[curr.numOfCourses - 1].date).getTime(),
       })
@@ -110,7 +111,7 @@ const semesterChunkify = (courses, semesterenrollments, semesters, language) => 
 }
 
 // probably needs some fixing to be done
-const gradeMeanSeries = (student, chunksize, semesters, language) => {
+const gradeMeanSeries = (student, chunksize, semesters, getTextIn) => {
   const sortedCourses = student.courses.sort(byDateDesc).reverse()
   const filterCourses = sortedCourses.filter(c => Number(c.grade) && !c.isStudyModuleCredit && c.passed)
   const data = filterCourses.reduce(
@@ -131,7 +132,7 @@ const gradeMeanSeries = (student, chunksize, semesters, language) => {
   )
   const size = Number(chunksize) ? chunksize : 3
   const chunks = chunkifyArray(data.grades, size)
-  data.semesterMeans = semesterChunkify(data.grades, student.semesterenrollments, semesters, language)
+  data.semesterMeans = semesterChunkify(data.grades, student.semesterenrollments, semesters, getTextIn)
   const chunkMeans = chunks.reduce((acc, curr) => {
     const sum = curr.reduce((a, b) => a + b.grade, 0)
     if (curr.length > 0)
@@ -146,12 +147,13 @@ const gradeMeanSeries = (student, chunksize, semesters, language) => {
   return data
 }
 
-const GradeGraph = ({ student, semesters, language }) => {
+const GradeGraph = ({ student, semesters }) => {
   const [chunky, setChunky] = useState(false)
+  const { getTextIn } = useLanguage()
   const [chunksize, setChunkSize] = useState(5)
   const [semester, setSemester] = useState(false)
   sendAnalytics('Clicked grade graph', 'Student')
-  const series = gradeMeanSeries(student, chunksize, semesters, language)
+  const series = gradeMeanSeries(student, chunksize, semesters, getTextIn)
   const { mean, chunkMeans, semesterMeans } = series
 
   const defaultOptions = {
@@ -234,7 +236,7 @@ const GradeGraph = ({ student, semesters, language }) => {
   )
 }
 
-const StudentGraphs = ({ student, absences, graphYearStart, semesters, language, studyRightId }) => {
+const StudentGraphs = ({ student, absences, graphYearStart, semesters, studyRightId }) => {
   const panes = [
     {
       menuItem: 'Credit graph',
@@ -253,7 +255,7 @@ const StudentGraphs = ({ student, absences, graphYearStart, semesters, language,
       menuItem: 'Grade graph',
       render: () => (
         <Tab.Pane>
-          <GradeGraph student={student} semesters={semesters} language={language} />
+          <GradeGraph student={student} semesters={semesters} />
         </Tab.Pane>
       ),
     },

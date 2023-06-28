@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { Divider, Message } from 'semantic-ui-react'
 import MedianBarChart from './MedianBarChart'
 import BreakdownBarChart from './BreakdownBarChart'
-import useLanguage from '../../LanguagePicker/useLanguage'
 import '../faculty.css'
 
 const MedianDisplay = ({
@@ -17,7 +16,6 @@ const MedianDisplay = ({
   groupBy,
   goalExceptions,
   year,
-  language,
   programmeData,
 }) => {
   return (
@@ -60,7 +58,6 @@ const MedianDisplay = ({
             year={year}
             label={label}
             programmeNames={programmeNames}
-            language={language}
             classSizes={classSizes?.programmes}
             level={level}
             goalExceptions={goalExceptions}
@@ -71,16 +68,7 @@ const MedianDisplay = ({
   )
 }
 
-const BreakdownDislay = ({
-  handleClick,
-  data,
-  label,
-  levelProgrammeData,
-  programmeNames,
-  year,
-  language,
-  programmeData,
-}) => {
+const BreakdownDislay = ({ handleClick, data, label, levelProgrammeData, programmeNames, year, programmeData }) => {
   return (
     <div>
       <div className="graduations-chart-container">
@@ -97,7 +85,6 @@ const BreakdownDislay = ({
             year={year}
             label={label}
             programmeNames={programmeNames}
-            language={language}
           />
         )}
       </div>
@@ -120,7 +107,6 @@ const GraduationTimes = ({
 }) => {
   const [programmeData, setProgrammeData] = useState(false)
   const [year, setYear] = useState(null)
-  const { language } = useLanguage()
   if (!data.some(a => a.amount > 0)) return null
 
   const handleClick = (e, isFacultyGraph, seriesCategory = null) => {
@@ -145,7 +131,6 @@ const GraduationTimes = ({
           levelProgrammeData={levelProgrammeData}
           programmeNames={programmeNames}
           year={year}
-          language={language}
           programmeData={programmeData}
         />
       ) : (
@@ -161,7 +146,6 @@ const GraduationTimes = ({
           groupBy={groupBy}
           goalExceptions={goalExceptions}
           year={year}
-          language={language}
           programmeData={programmeData}
         />
       )}

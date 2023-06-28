@@ -3,7 +3,7 @@ import _ from 'lodash'
 import { Link } from 'react-router-dom'
 import { Item, Icon, Button } from 'semantic-ui-react'
 import SortableTable, { group } from 'components/SortableTable'
-import { getTextIn } from '../../../common'
+import useLanguage from 'components/LanguagePicker/useLanguage'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
 import CourseFilterToggle from '../CourseFilterToggle'
 
@@ -37,6 +37,7 @@ const yearColumn = (year, cumulative) => ({
 const PassingSemesters = ({ onlyIamRights }) => {
   const { modules, onGoToCourseStatisticsClick, toggleGroupExpansion, expandedGroups } = UsePopulationCourseContext()
   const [cumulativeStats, setCumulativeStats] = useState(false)
+  const { getTextIn } = useLanguage()
 
   const columns = useMemo(() => {
     const columns = [

@@ -3,9 +3,9 @@ import _ from 'lodash'
 import SortableTable, { group } from 'components/SortableTable'
 import { Item, Icon } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
+import useLanguage from 'components/LanguagePicker/useLanguage'
 import CourseFilterToggle from '../CourseFilterToggle'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
-import { getTextIn } from '../../../common'
 import './passFailEnrollments.css'
 
 const createModuleAggregateRow = ({ definition, children }) => ({
@@ -30,6 +30,7 @@ const createModuleAggregateRow = ({ definition, children }) => ({
 const PassFailEnrollments = ({ flat, onlyIamRights }) => {
   const { modules, courseStatistics, onGoToCourseStatisticsClick, toggleGroupExpansion, expandedGroups } =
     UsePopulationCourseContext()
+  const { getTextIn } = useLanguage()
 
   const columns = useMemo(() => {
     const columns = [

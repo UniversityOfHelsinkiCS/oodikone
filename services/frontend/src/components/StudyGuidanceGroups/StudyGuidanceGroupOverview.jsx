@@ -1,18 +1,19 @@
 import React from 'react'
-import { useSelector } from 'react-redux'
 import { Link, useHistory } from 'react-router-dom'
 import { Formik } from 'formik'
 import { Form, Button, Icon, Modal } from 'semantic-ui-react'
 import Datetime from 'react-datetime'
-import { getTextIn, textAndDescriptionSearch } from 'common'
+import { textAndDescriptionSearch } from 'common'
 import { useChangeStudyGuidanceGroupTagsMutation } from 'redux/studyGuidanceGroups'
 import { useFilteredAndFormattedElementDetails } from 'redux/elementdetails'
 import { useToggle } from 'common/hooks'
+import useLanguage from 'components/LanguagePicker/useLanguage'
 import SortableTable from 'components/SortableTable'
 import { startYearToAcademicYear, StyledMessage } from './common'
 import './StudyGuidanceGroupOverview.css'
 
-const LinkToGroup = ({ group, language }) => {
+const LinkToGroup = ({ group }) => {
+  const { getTextIn } = useLanguage()
   const history = useHistory()
   const dest = `/studyguidancegroups/${group.id}`
   return (
@@ -26,7 +27,7 @@ const LinkToGroup = ({ group, language }) => {
       }}
       to={dest}
     >
-      {getTextIn(group.name, language)}
+      {getTextIn(group.name)}
       <Icon color="blue" name="level up alternate" onClick={() => history.push(dest)} />
     </Link>
   )
@@ -42,7 +43,7 @@ const cellContent = { flexGrow: 1 }
 
 const EditTagModal = ({ group, tagName, toggleEdit, selectFieldItems, open }) => {
   const [changeStudyGuidanceGroupTags, { isLoading }] = useChangeStudyGuidanceGroupTagsMutation()
-  const { language } = useSelector(({ settings }) => settings)
+  const { getTextIn } = useLanguage()
 
   const onSubmit = values => {
     changeStudyGuidanceGroupTags({ groupId: group.id, tags: values })
@@ -58,7 +59,7 @@ const EditTagModal = ({ group, tagName, toggleEdit, selectFieldItems, open }) =>
       >
         {formik => (
           <>
-            <Modal.Header>{getTextIn(group.name, language)}</Modal.Header>
+            <Modal.Header>{getTextIn(group.name)}</Modal.Header>
             <Modal.Content>
               <AssociateTagForm group={group} tagName={tagName} selectFieldItems={selectFieldItems} formik={formik} />
             </Modal.Content>
@@ -183,15 +184,15 @@ const TagCell = ({ tagName, group, studyProgrammes }) => {
 }
 
 const StudyGuidanceGroupOverview = ({ groups }) => {
-  const { language } = useSelector(({ settings }) => settings)
-  const studyProgrammes = useFilteredAndFormattedElementDetails(language)
+  const { getTextIn } = useLanguage()
+  const studyProgrammes = useFilteredAndFormattedElementDetails()
 
   const headers = [
     {
       key: 'name',
       title: 'Name',
-      getRowVal: group => getTextIn(group.name, language),
-      getRowContent: group => <LinkToGroup group={group} language={language} />,
+      getRowVal: group => getTextIn(group.name),
+      getRowContent: group => <LinkToGroup group={group} />,
       cellProps: {
         style: {
           padding: '0',

@@ -3,7 +3,7 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { Dropdown } from 'semantic-ui-react'
 import xlsx from 'xlsx'
-import { getTextIn, reformatDate, getStudentTotalCredits, getStudentToStudyrightStartMap } from '../../common'
+import { reformatDate, getStudentTotalCredits, getStudentToStudyrightStartMap } from '../../common'
 import sendEvent from '../../common/sendEvent'
 import { PRIORITYCODE_TEXTS } from '../../constants'
 import useLanguage from '../LanguagePicker/useLanguage'
@@ -11,7 +11,7 @@ import useLanguage from '../LanguagePicker/useLanguage'
 const sendAnalytics = sendEvent.populationStudents
 
 export default ({ students, programmeCode }) => {
-  const { language } = useLanguage()
+  const { getTextIn } = useLanguage()
   const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
   const populationStatistics = useSelector(({ populations }) => populations.data)
   const courses = useSelector(store => store.populationSelectedStudentCourses.data?.coursestatistics)
@@ -50,7 +50,7 @@ export default ({ students, programmeCode }) => {
     return mandatoryPassedCourses
   }
 
-  const transferFrom = s => getTextIn(populationStatistics.elementdetails.data[s.transferSource].name, language)
+  const transferFrom = s => getTextIn(populationStatistics.elementdetails.data[s.transferSource].name)
 
   const studyrightCodes = (studyrights, value) => {
     return studyrights
@@ -201,11 +201,11 @@ export default ({ students, programmeCode }) => {
         'start of studyright': reformatDate(getStartOfStudyright(s.studyrights), 'YYYY-MM-DD'),
         'started in programme': reformatDate(getStartedInProgramme(s.studyrights), 'YYYY-MM-DD'),
         'admission type': parseInt(queryYear, 10 >= 2020) ? getAdmissionType(s.studyrights) : undefined,
-        bachelor: s.option ? getTextIn(s.option.name, language) : '',
+        bachelor: s.option ? getTextIn(s.option.name) : '',
         'updated at': reformatDate(s.updatedAt, 'YYYY-MM-DD  hh:mm:ss'),
         'mandatory total passed': totalMandatoryPassed(s.studentNumber, codes, programmeCode),
         ...sortedMandatory.reduce((acc, m) => {
-          acc[`${getTextIn(m.name, language)} ${m.code}`] = hasPassedMandatory(s.studentNumber, m.code, codes)
+          acc[`${getTextIn(m.name)} ${m.code}`] = hasPassedMandatory(s.studentNumber, m.code, codes)
           return acc
         }, {}),
       }))

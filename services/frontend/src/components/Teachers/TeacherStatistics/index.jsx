@@ -8,11 +8,10 @@ import { getProviders } from '../../../redux/providers'
 import { useGetSemestersQuery } from '../../../redux/semesters'
 import { getTeacherStatistics } from '../../../redux/teacherStatistics'
 import TeacherStatisticsTable from '../TeacherStatisticsTable'
-import { getTextIn } from '../../../common'
 import useLanguage from '../../LanguagePicker/useLanguage'
 
 const TeacherStatistics = ({ getProviders, getTeacherStatistics, providers, statistics, pending, history }) => {
-  const { language } = useLanguage()
+  const { getTextIn } = useLanguage()
   const [semesterStart, setSemesterStart] = useState(null)
   const [semesterEnd, setSemesterEnd] = useState(null)
   const [display, setDisplay] = useState(false)
@@ -91,7 +90,7 @@ const TeacherStatistics = ({ getProviders, getTeacherStatistics, providers, stat
   const providerOptions = isAdmin ? providers : providers.filter(p => userProviders.includes(p.value))
   const localizedProviderOptions = providerOptions.map(({ name, ...rest }) => ({
     ...rest,
-    text: getTextIn(name, language),
+    text: getTextIn(name),
   }))
   const filteredOptions = semesters.filter(sem => {
     const options =

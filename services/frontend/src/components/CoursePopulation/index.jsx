@@ -19,7 +19,7 @@ import CoursePopulationCreditGainTable from './CoursePopulationCreditGainTable'
 import CustomPopulationProgrammeDist from '../CustomPopulation/CustomPopulationProgrammeDist'
 import CustomPopulationCourses from '../CustomPopulation/CustomPopulationCourses'
 import ProgressBar from '../ProgressBar'
-import { getStudentToTargetCourseDateMap, getTextIn, getUnifyTextIn } from '../../common'
+import { getStudentToTargetCourseDateMap, getUnifyTextIn } from '../../common'
 import { useProgress, useTitle } from '../../common/hooks'
 import infotooltips from '../../common/InfoToolTips'
 import {
@@ -54,14 +54,13 @@ const CoursePopulation = ({
   getFacultiesDispatch,
   unifyCourses,
 }) => {
-  const { language } = useLanguage()
+  const { getTextIn } = useLanguage()
   const [codes, setCodes] = useState([])
   const [headerYears, setYears] = useState('')
   const [dateFrom, setDateFrom] = useState(null)
   const [dateTo, setDateTo] = useState(null)
   const [activeIndex, setIndex] = useState([])
   const [newestIndex, setNewest] = useState(null)
-
   const gradeDistRef = useRef()
   const languageDistRef = useRef()
   const programmeRef = useRef()
@@ -131,7 +130,7 @@ const CoursePopulation = ({
   }, [semesters])
 
   const avoin = getUnifyTextIn(unifyCourses)
-  const header = courseData ? `${getTextIn(courseData.name, language)} ${headerYears} ${avoin}` : null
+  const header = courseData ? `${getTextIn(courseData.name)} ${headerYears} ${avoin}` : null
 
   const subHeader = codes.join(', ')
 

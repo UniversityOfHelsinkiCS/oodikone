@@ -6,16 +6,18 @@ import { Form, Button } from 'semantic-ui-react'
 import moment from 'moment'
 import qs from 'query-string'
 import { get as lodashGet } from 'lodash'
+import useLanguage from 'components/LanguagePicker/useLanguage'
 import PopulationQueryCard from '../PopulationQueryCard'
 import { removePopulation } from '../../redux/populations'
 import TSA from '../../common/tsa'
 import './populationSearch.css'
 import infotooltips from '../../common/InfoToolTips'
-import { getTextIn } from '../../common'
 import InfoBox from '../Info/InfoBox'
 import FilterActiveNote from './FilterActiveNote'
 
 const PopulationsQueryTSA = ({ programmeCode, unitData }) => {
+  const { getTextIn } = useLanguage()
+
   // hack: I wanna use useEffect because it's handy but PopulationSearchHistory is not a function component
   // so here's a component that renders nothing that we can just plug in
   useEffect(() => {

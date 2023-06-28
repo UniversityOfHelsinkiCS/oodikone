@@ -12,7 +12,6 @@ import sendEvent from '../../common/sendEvent'
 import GradeDistribution from './GradeDistribution'
 import PassFailEnrollments from './PassFailEnrollments'
 import Students from './Students'
-import { getTextIn } from '../../common'
 import useLanguage from '../LanguagePicker/useLanguage'
 
 const sendAnalytics = sendEvent.populationStatistics
@@ -39,7 +38,7 @@ const lodashSortOrderTypes = {
   DESC: 'desc',
 }
 
-const updateCourseStatisticsCriteria = (courseStats, language, state, mandatoryCourses) => {
+const updateCourseStatisticsCriteria = (courseStats, state, mandatoryCourses, getTextIn) => {
   if (!courseStats) {
     return []
   }
@@ -52,7 +51,7 @@ const updateCourseStatisticsCriteria = (courseStats, language, state, mandatoryC
   }
   const courseNameFilter = ({ course }) => {
     const { name } = course
-    return getTextIn(name, language).toLowerCase().includes(nameFilter.toLowerCase())
+    return getTextIn(name).toLowerCase().includes(nameFilter.toLowerCase())
   }
 
   const mandatoryFilter = ({ course }) => {
@@ -101,7 +100,7 @@ const useDelayedMemo = (fn, watch) => {
 }
 
 const PopulationCourseStats = props => {
-  const { language } = useLanguage()
+  const { getTextIn } = useLanguage()
   const [filterFields, setFilterFields] = useState({ codeFilter: '', nameFilter: '' })
   const [modules, setModules] = useState([])
   const [state, setState] = useState(initialState(props))
@@ -111,8 +110,8 @@ const PopulationCourseStats = props => {
   const { handleTabChange } = useTabChangeAnalytics('Population statistics', 'Courses of Population tab changed')
 
   const courseStatistics = useDelayedMemo(
-    () => updateCourseStatisticsCriteria(props.courses?.coursestatistics, language, state, mandatoryCourses),
-    [props.courses, state, language]
+    () => updateCourseStatisticsCriteria(props.courses?.coursestatistics, state, mandatoryCourses, getTextIn),
+    [props.courses, state]
   )
 
   useEffect(() => {

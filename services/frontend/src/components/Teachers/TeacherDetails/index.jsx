@@ -5,7 +5,6 @@ import { Card, Tab, Icon } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 import TeacherStatisticsTable from '../TeacherStatisticsTable'
 import CoursesTab from './CoursesTab'
-import { getTextIn } from '../../../common'
 import '../../PopulationQueryCard/populationQueryCard.css'
 import useLanguage from '../../LanguagePicker/useLanguage'
 
@@ -14,19 +13,19 @@ const statisticsTableTab = (title, statistics) => ({
   render: () => <TeacherStatisticsTable statistics={statistics} onClickFn={() => {}} />,
 })
 
-const formatStatisticsForTable = (statistics, language) => {
+const formatStatisticsForTable = (statistics, getTextIn) => {
   if (!statistics) {
     return []
   }
   return Object.values(statistics).map(({ name, stats, ...rest }) => ({
     ...rest,
     ...stats,
-    name: isString(name) ? name : getTextIn(name, language),
+    name: isString(name) ? name : getTextIn(name),
   }))
 }
 
 const TeacherDetails = ({ teacher, history }) => {
-  const { language } = useLanguage()
+  const { getTextIn } = useLanguage()
   const { courses, years, semesters } = teacher.statistics
 
   const panes = [
@@ -34,8 +33,8 @@ const TeacherDetails = ({ teacher, history }) => {
       menuItem: 'Courses',
       render: () => <CoursesTab courses={courses} semesters={semesters} />,
     },
-    statisticsTableTab('Semesters', formatStatisticsForTable(semesters, language)),
-    statisticsTableTab('Years', formatStatisticsForTable(years, language)),
+    statisticsTableTab('Semesters', formatStatisticsForTable(semesters, getTextIn)),
+    statisticsTableTab('Years', formatStatisticsForTable(years, getTextIn)),
   ]
 
   return (

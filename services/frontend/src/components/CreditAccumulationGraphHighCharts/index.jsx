@@ -11,7 +11,7 @@ import boost from 'highcharts/modules/boost'
 import ReactHighstock from 'react-highcharts/ReactHighstock'
 import './creditAccumulationGraphHC.css'
 import CreditGraphTooltip from '../CreditGraphTooltip'
-import { reformatDate, getTextIn, getStudyRightElementTargetDates } from '../../common'
+import { reformatDate, getStudyRightElementTargetDates } from '../../common'
 import useLanguage from '../LanguagePicker/useLanguage'
 import { DISPLAY_DATE_FORMAT, API_DATE_FORMAT } from '../../constants'
 
@@ -197,7 +197,7 @@ const reduceCreditsToPoints = ({ credits, points, singleStudent }, course) => {
 const getXAxisMonth = (date, startDate) =>
   Math.max(moment(date, API_DATE_FORMAT).diff(moment(startDate, API_DATE_FORMAT), 'days') / 30, 0)
 
-const singleStudentTooltipFormatter = (point, student, language) => {
+const singleStudentTooltipFormatter = (point, student, getTextIn) => {
   if (point.series.name === SINGLE_GRAPH_GOAL_SERIES_NAME) {
     return null
   }
@@ -216,7 +216,7 @@ const singleStudentTooltipFormatter = (point, student, language) => {
       payload: {
         ...targetCourse,
         date: reformatDate(targetCourse.date, DISPLAY_DATE_FORMAT),
-        title: getTextIn(targetCourse.course.name, language),
+        title: getTextIn(targetCourse.course.name),
       },
     },
   ]
@@ -287,7 +287,7 @@ const resolveStudyRightElement = ({ studyright_elements }) => {
   )
 }
 
-const filterGraduations = (student, selectedStudyRight) => {
+const filterGraduations = (student, selectedStudyRight, getTextIn) => {
   const graduated = student.studyrights.filter(({ graduated }) => graduated)
   // eslint-disable-next-line camelcase
   if (!selectedStudyRight)
@@ -431,10 +431,10 @@ const findTransferName = (student, transfer) =>
   student.studyrights.flatMap(right => right.studyright_elements).find(elem => elem.code === transfer.targetcode)
     .element_detail.name
 
-const filterTransfers = (student, language) => {
+const filterTransfers = (student, getTextIn) => {
   const transferTimes = student.transfers.map(transfer => ({
     value: new Date(transfer.transferdate).getTime(),
-    studyright: `to ${getTextIn(findTransferName(student, transfer), language)}`,
+    studyright: `to ${getTextIn(findTransferName(student, transfer))}`,
   }))
   const removeOverlapping = transferTimes.filter((transfer, i, a) => a.indexOf(transfer) === i)
   return removeOverlapping
@@ -454,7 +454,7 @@ const CreditAccumulationGraphHighCharts = ({
 }) => {
   const history = useHistory()
   const chartRef = useRef()
-  const language = useLanguage()
+  const { getTextIn } = useLanguage()
   const [graphHeight, setGraphHeight] = useState(700)
   const [cutStudyPlanCredits, setCutStudyPlanCredits] = useState(false)
   const selectedStudyRight =
@@ -483,7 +483,7 @@ const CreditAccumulationGraphHighCharts = ({
       programmeCodes,
       cutStudyPlanCredits,
       customStudyStartYear,
-      language,
+      getTextIn,
     ]
   )
 
@@ -542,7 +542,7 @@ const CreditAccumulationGraphHighCharts = ({
   }
 
   const graduations = singleStudent ? filterGraduations(students[0], selectedStudyRight) : []
-  const transfers = singleStudent ? filterTransfers(students[0], language) : []
+  const transfers = singleStudent ? filterTransfers(students[0], getTextIn) : []
   const studyRightStartLine =
     !singleStudent && studyPlanFilterIsActive && (customStudyStartYear || students[0]?.studyrightStart)
       ? [new Date(customStudyStartYear || students[0].studyrightStart).getTime()]
@@ -554,7 +554,7 @@ const CreditAccumulationGraphHighCharts = ({
     graphHeight,
     startDate: getGraphStart(),
     endDate,
-    tooltipFormatter: point => singleStudent && singleStudentTooltipFormatter(point, students[0], language),
+    tooltipFormatter: point => singleStudent && singleStudentTooltipFormatter(point, students[0], getTextIn),
     onPointClicked: point => {
       if (!singleStudent) {
         if (point.series.name.length > 10) return

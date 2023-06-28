@@ -2,10 +2,9 @@ import React from 'react'
 import { Table, Icon } from 'semantic-ui-react'
 import { func, arrayOf, object, number, instanceOf } from 'prop-types'
 import useLanguage from '../LanguagePicker/useLanguage'
-import { getTextIn } from '../../common'
 
 const CollapsibleModuleTable = ({ modules, emptyColSpan, children, expandedGroups, toggleGroupExpansion }) => {
-  const { language } = useLanguage()
+  const { getTextIn } = useLanguage()
 
   if (!modules) return null
 
@@ -21,7 +20,7 @@ const CollapsibleModuleTable = ({ modules, emptyColSpan, children, expandedGroup
               data-cy={`expand-${module.code}`}
             >
               <Icon name={expandedGroups.has(module.code) ? 'angle down' : 'angle right'} />
-              <b>{getTextIn(module.name, language)}</b>
+              <b>{getTextIn(module.name)}</b>
             </Table.Cell>
             <Table.Cell>
               <b>{module.code}</b>

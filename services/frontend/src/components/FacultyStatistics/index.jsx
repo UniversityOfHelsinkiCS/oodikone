@@ -3,7 +3,6 @@ import { withRouter, useHistory } from 'react-router-dom'
 import { Segment, Header, Tab, Loader } from 'semantic-ui-react'
 import { useGetFacultiesQuery } from 'redux/facultyStats'
 import { useGetAuthorizedUserQuery } from 'redux/auth'
-import { getTextIn } from 'common'
 import { useTabs, useTitle } from '../../common/hooks'
 import FacultySelector from './facultySelector'
 import BasicOverview from './BasicOverview'
@@ -16,14 +15,14 @@ import TSA from '../../common/tsa'
 const FacultyStatistics = props => {
   useTitle('Faculties')
   const history = useHistory()
-  const { language } = useLanguage()
+  const { getTextIn } = useLanguage()
   const allFaculties = useGetFacultiesQuery()
   const faculties = allFaculties?.data
 
   const { match } = props
   const { facultyCode } = match.params
   const faculty = faculties && facultyCode && faculties.find(f => f.code === facultyCode)
-  const facultyName = faculty && getTextIn(faculty.name, language)
+  const facultyName = faculty && getTextIn(faculty.name)
 
   const { isAdmin, rights, iamRights } = useGetAuthorizedUserQuery()
   const [tab, setTab] = useTabs('p_tab', 0, history)
@@ -70,7 +69,6 @@ const FacultyStatistics = props => {
             setStudyProgrammes={setStudyProgrammes}
             specialGroups={specialGroups}
             setSpecialGroups={setSpecialGroups}
-            language={language}
           />
         ),
       },

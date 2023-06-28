@@ -4,9 +4,8 @@ import { Icon, Button } from 'semantic-ui-react'
 import moment from 'moment'
 import 'moment/locale/fi'
 import { useGetSemestersQuery } from 'redux/semesters'
-import { getTextIn } from '../../common'
-
 import './style.css'
+import useLanguage from 'components/LanguagePicker/useLanguage'
 
 const semesterListStyles = {
   maxHeight: '10em',
@@ -21,6 +20,7 @@ const DateTime = ({ value, onChange, before, after, showSemesters }) => {
   const semesterRequest = useGetSemestersQuery()
   const allSemesters = semesterRequest.data?.semesters ?? []
   const today = moment().endOf('day')
+  const { getTextIn } = useLanguage()
   // Do not allow to select dates after today. At least some cases program just crashed.
   const startdate = before || today
   return (

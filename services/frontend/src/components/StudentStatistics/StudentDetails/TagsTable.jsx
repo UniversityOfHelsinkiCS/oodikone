@@ -1,12 +1,12 @@
 import React, { Fragment } from 'react'
-import { shape, string } from 'prop-types'
+import { shape } from 'prop-types'
 import { Label, Header } from 'semantic-ui-react'
 import { sortBy } from 'lodash'
-import { getTextIn } from '../../../common'
-
+import useLanguage from 'components/LanguagePicker/useLanguage'
 import SortableTable from '../../SortableTable'
 
-const TagsTable = ({ student, language }) => {
+const TagsTable = ({ student }) => {
+  const { getTextIn } = useLanguage()
   if (!student) return null
 
   const data = Object.values(
@@ -26,7 +26,7 @@ const TagsTable = ({ student, language }) => {
           {
             key: 'PROGRAMME',
             title: 'Programme',
-            getRowVal: t => getTextIn(t.programme.name, language),
+            getRowVal: t => getTextIn(t.programme.name),
           },
           {
             key: 'CODE',
@@ -50,7 +50,6 @@ const TagsTable = ({ student, language }) => {
 
 TagsTable.propTypes = {
   student: shape({}).isRequired,
-  language: string.isRequired,
 }
 
 export default TagsTable

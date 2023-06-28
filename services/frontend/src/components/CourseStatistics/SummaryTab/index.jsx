@@ -8,7 +8,6 @@ import { fields, setValue } from '../../../redux/coursesSummaryForm'
 import AttemptsTable from '../AttemptsTable'
 import ProgrammeDropdown from '../ProgrammeDropdown'
 import useLanguage from '../../LanguagePicker/useLanguage'
-import { getTextIn } from '../../../common'
 import { userHasAccessToAllCourseStats } from '../courseStatisticsUtils'
 
 // Certified JavaScript moment but basically this was crashing
@@ -38,7 +37,7 @@ const SummaryTab = ({ setValue, onClickCourse }) => {
   )
   const queryInfo = useSelector(state => selectors.getQueryInfo(state))
 
-  const { language } = useLanguage()
+  const { getTextIn } = useLanguage()
   const handleChange = (_, { name, value }) => {
     let selected = [...value].filter(v => v !== ALL.value)
     if ((!form[fields.programmes].includes(ALL.value) && value.includes(ALL.value)) || value.length === 0) {
@@ -52,7 +51,7 @@ const SummaryTab = ({ setValue, onClickCourse }) => {
     const { passed, failed, passrate } = summary
     return {
       id: coursecode,
-      category: getTextIn(name, language),
+      category: getTextIn(name),
       passed,
       failed,
       passrate,
@@ -65,7 +64,7 @@ const SummaryTab = ({ setValue, onClickCourse }) => {
   const options = programmes
     .map(e => ({ ...e, size: new Set(flatten(Object.values(e.students))).size }))
     .filter(e => e.size > 0)
-    .map(({ text, ...rest }) => ({ text: typeof text === 'string' ? text : getTextIn(text, language), ...rest }))
+    .map(({ text, ...rest }) => ({ text: typeof text === 'string' ? text : getTextIn(text), ...rest }))
     .map(prog => ({ ...prog, name: prog.text }))
 
   return (

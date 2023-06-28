@@ -9,12 +9,13 @@ import { sortBy, isEqual } from 'lodash'
 import moment from 'moment'
 import { useGetAuthorizedUserQuery } from 'redux/auth'
 import infoTooltips from 'common/InfoToolTips'
+import useLanguage from 'components/LanguagePicker/useLanguage'
 import { getPopulationStatistics, clearPopulations } from '../../redux/populations'
 import { getPopulationCourses } from '../../redux/populationCourses'
 import { getPopulationSelectedStudentCourses, clearSelected } from '../../redux/populationSelectedStudentCourses'
 import { getMandatoryCourses } from '../../redux/populationMandatoryCourses'
 import { getProgrammes } from '../../redux/populationProgrammes'
-import { momentFromFormat, reformatDate, textAndDescriptionSearch, getTextIn, cancelablePromise } from '../../common'
+import { momentFromFormat, reformatDate, textAndDescriptionSearch, cancelablePromise } from '../../common'
 import { useSearchHistory } from '../../common/hooks'
 import { setLoading } from '../../redux/graphSpinner'
 import './populationSearch.css'
@@ -38,6 +39,7 @@ const initialQuery = () => ({
 
 const PopulationSearchForm = props => {
   const { isAdmin } = useGetAuthorizedUserQuery()
+  const { getTextIn } = useLanguage()
   const [totalState, setTotalState] = useState({
     query: initialQuery(),
     isLoading: false,
@@ -214,9 +216,7 @@ const PopulationSearchForm = props => {
 
   const getSearchHistoryTextFromQuery = () => {
     const { studyRights, semesters, months, year, studentStatuses } = query
-    const studyRightsText = `${getTextIn(studyProgrammes[studyRights.programme].name, language)} ${Object.values(
-      studyRights
-    )
+    const studyRightsText = `${getTextIn(studyProgrammes[studyRights.programme].name)} ${Object.values(studyRights)
       .filter(s => s)
       .join(', ')}`
     const timeText = `${semesters.join(', ')}/${year}-${parseInt(year, 10) + 1}, ${months} months`
@@ -415,7 +415,7 @@ const PopulationSearchForm = props => {
 
     let programmesToRender
     if (Object.values(studyProgrammes).length !== 0) {
-      let sortedStudyProgrammes = sortBy(studyProgrammes, s => getTextIn(s.name, language))
+      let sortedStudyProgrammes = sortBy(studyProgrammes, s => getTextIn(s.name))
       if (filterProgrammes) {
         sortedStudyProgrammes = sortedStudyProgrammes.filter(
           programme => programme.code.slice(0, 2) === 'MH' || programme.code.slice(0, 2) === 'KH'

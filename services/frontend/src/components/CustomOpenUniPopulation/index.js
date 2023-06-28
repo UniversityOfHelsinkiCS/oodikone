@@ -5,14 +5,12 @@ import moment from 'moment'
 import { useGetSavedSearchesQuery } from 'redux/openUniPopulations'
 import OpenUniPopulationResults from './OpenUniPopulationResults'
 import { useTitle } from '../../common/hooks'
-import useLanguage from '../LanguagePicker/useLanguage'
 import CustomOpenUniSearch from './CustomOpenUniSearch'
 import TSA from '../../common/tsa'
 
 const CustomOpenUniPopulation = () => {
   useTitle('Custom open uni population')
   const [fieldValues, setValues] = useState({})
-  const { language } = useLanguage()
   const location = useLocation()
   const history = useHistory()
   const savedSearches = useGetSavedSearchesQuery()
@@ -68,9 +66,7 @@ const CustomOpenUniPopulation = () => {
         )}
       </div>
       <div style={{ paddingTop: '25px' }}>
-        {fieldValues && fieldValues.courseList?.length > 0 && (
-          <OpenUniPopulationResults fieldValues={fieldValues} language={language} />
-        )}
+        {fieldValues && fieldValues.courseList?.length > 0 && <OpenUniPopulationResults fieldValues={fieldValues} />}
       </div>
     </div>
   )

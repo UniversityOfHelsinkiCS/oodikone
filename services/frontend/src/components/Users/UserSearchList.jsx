@@ -2,12 +2,12 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { Button, Icon, Label } from 'semantic-ui-react'
 import { useShowAsUser } from 'redux/auth'
-import { getTextIn, reformatDate } from '../../common'
+import { reformatDate } from '../../common'
 import useLanguage from '../LanguagePicker/useLanguage'
 import SortableTable from '../SortableTable'
 
 const UserSearchList = ({ enabledOnly, users, error, elementdetails }) => {
-  const { language } = useLanguage()
+  const { getTextIn } = useLanguage()
 
   const usersToRender = enabledOnly ? users.filter(u => u.is_enabled) : users
   const showAsUser = useShowAsUser()
@@ -59,7 +59,7 @@ const UserSearchList = ({ enabledOnly, users, error, elementdetails }) => {
               const nameInLanguage = code => {
                 const elem = elementdetails.find(e => e.code === code)
                 if (!elem) return null
-                return getTextIn(elem.name, language)
+                return getTextIn(elem.name)
               }
 
               return user.elementdetails.map(element => nameInLanguage(element))
@@ -68,7 +68,7 @@ const UserSearchList = ({ enabledOnly, users, error, elementdetails }) => {
               const nameInLanguage = code => {
                 const elem = elementdetails.find(e => e.code === code)
                 if (!elem) return null
-                return getTextIn(elem.name, language)
+                return getTextIn(elem.name)
               }
 
               if (!user.elementdetails || user.elementdetails.length === 0) return null

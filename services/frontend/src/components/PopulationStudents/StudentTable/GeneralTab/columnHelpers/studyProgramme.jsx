@@ -1,5 +1,5 @@
 import React from 'react'
-import { getTextIn, reformatDate, getAllProgrammesOfStudent } from 'common'
+import { reformatDate, getAllProgrammesOfStudent } from 'common'
 
 const noProgrammeDuringCourse = {
   en: 'No programme at time of course',
@@ -18,7 +18,7 @@ const getStudyProgrammeFunctions = ({
   coursecode,
   studentToProgrammeStartMap,
   elementDetails,
-  language,
+  getTextIn,
 }) => {
   if (!students || !selectedStudents || !elementDetails) return {}
 
@@ -98,17 +98,17 @@ const getStudyProgrammeFunctions = ({
 
     const programmeToShow = getProgrammeToShow(res[sn].programmes)
 
-    if (programmeToShow) res[sn].programmeToShow = getTextIn(programmeToShow, language)
+    if (programmeToShow) res[sn].programmeToShow = getTextIn(programmeToShow)
     res[sn].getProgrammesList = delimiter =>
       res[sn].programmes
         .map(p => {
           if (p.graduated) {
-            return `${getTextIn(p.name, language)} (graduated)`
+            return `${getTextIn(p.name)} (graduated)`
           }
           if (!p.active) {
-            return `${getTextIn(p.name, language)} (inactive)`
+            return `${getTextIn(p.name)} (inactive)`
           }
-          return getTextIn(p.name, language)
+          return getTextIn(p.name)
         })
         .join(delimiter)
     return res
@@ -117,7 +117,7 @@ const getStudyProgrammeFunctions = ({
   const getStudyProgrammeContent = s => {
     const programme = studentProgrammesMap[s.studentNumber]?.programmeToShow
 
-    if (!programme) return getTextIn(noProgramme, language)
+    if (!programme) return getTextIn(noProgramme)
     const formattedProgramme = programme.length > 45 ? `${programme.substring(0, 43)}...` : programme
     if (studentProgrammesMap[s.studentNumber]?.programmes.length > 1) {
       return (

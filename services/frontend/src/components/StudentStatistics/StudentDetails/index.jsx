@@ -18,7 +18,6 @@ import StudyrightsTable from './StudyrightsTable'
 import TagsTable from './TagsTable'
 import CourseParticipationTable from './CourseParticipationTable'
 import StudentGraphs from './StudentGraphs'
-import useLanguage from '../../LanguagePicker/useLanguage'
 import { getMandatoryCourseModules } from '../../../redux/populationMandatoryCourses'
 
 const StudentDetails = ({
@@ -36,7 +35,6 @@ const StudentDetails = ({
   clearCourseStats,
 }) => {
   const dispatch = useDispatch()
-  const { language } = useLanguage()
   const [graphYearStart, setGraphYear] = useState(null)
   const [studyrightid, setStudyrightid] = useState('')
   const [honoursCode, setHonoursCode] = useState(null)
@@ -193,25 +191,18 @@ const StudentDetails = ({
         absences={getAbsentYears()}
         graphYearStart={graphYearStart}
         semesters={semesters}
-        language={language}
         studyRightId={studyrightid}
       />
-      <TagsTable student={student} language={language} />
+      <TagsTable student={student} />
       <StudyrightsTable
         Programmes={Programmes}
         student={student}
-        language={language}
         handleStartDateChange={handleStartDateChange}
         showPopulationStatistics={showPopulationStatistics}
         studyrightid={studyrightid}
       />
       {honoursCode && <BachelorHonours student={student} absentYears={getAbsentYears()} programmeCode={honoursCode} />}
-      <CourseParticipationTable
-        student={student}
-        language={language}
-        clearCourseStats={clearCourseStats}
-        studyrightid={studyrightid}
-      />
+      <CourseParticipationTable student={student} clearCourseStats={clearCourseStats} studyrightid={studyrightid} />
     </Segment>
   )
 }

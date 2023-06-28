@@ -1,26 +1,18 @@
 import React from 'react'
 import { func, shape, string } from 'prop-types'
-
 import { Divider, Table, Icon, Header, Item, Segment, Button, Popup } from 'semantic-ui-react'
 import { sortBy } from 'lodash'
-
 import { Link } from 'react-router-dom'
+import useLanguage from 'components/LanguagePicker/useLanguage'
+import { reformatDate, getTargetCreditsForProgramme } from '../../../common'
 
-import { reformatDate, getTextIn, getTargetCreditsForProgramme } from '../../../common'
-
-const StudyrightsTable = ({
-  Programmes,
-  student,
-  language,
-  handleStartDateChange,
-  showPopulationStatistics,
-  studyrightid,
-}) => {
-  if (!student) return null
-
+const StudyrightsTable = ({ Programmes, student, handleStartDateChange, showPopulationStatistics, studyrightid }) => {
+  const { getTextIn } = useLanguage()
   const { programmes } = Programmes
   const programmeCodes = programmes ? Object.keys(programmes) : []
   const studyRightHeaders = ['Programme', 'Study Track', 'Status', 'Completed']
+
+  if (!student) return null
 
   const studyRightRows = student.studyrights.map(studyright => {
     const programmes = sortBy(studyright.studyright_elements, 'enddate')
@@ -30,7 +22,7 @@ const StudyrightsTable = ({
         startdate: programme.startdate,
         studystartdate: studyright.studystartdate,
         enddate: programme.enddate,
-        name: getTextIn(programme.element_detail.name, language),
+        name: getTextIn(programme.element_detail.name),
         isFilterable:
           !studyright.cancelled &&
           student.studyplans.map(plan => plan.programme_code).includes(programme.element_detail.code),
@@ -40,7 +32,7 @@ const StudyrightsTable = ({
       .map(studytrack => ({
         startdate: studytrack.startdate,
         enddate: studytrack.enddate,
-        name: getTextIn(studytrack.element_detail.name, language),
+        name: getTextIn(studytrack.element_detail.name),
       }))
     return {
       studyrightid: studyright.studyrightid,
@@ -258,7 +250,6 @@ StudyrightsTable.defaultProps = {
 StudyrightsTable.propTypes = {
   Programmes: shape({}).isRequired,
   student: shape({}).isRequired,
-  language: string.isRequired,
   handleStartDateChange: func.isRequired,
   showPopulationStatistics: func.isRequired,
   studyrightid: string,

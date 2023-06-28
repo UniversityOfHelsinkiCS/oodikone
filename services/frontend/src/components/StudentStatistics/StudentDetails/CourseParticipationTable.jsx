@@ -1,16 +1,17 @@
 import React, { Fragment } from 'react'
-import { func, shape, string } from 'prop-types'
+import { func, shape } from 'prop-types'
 import { Divider, Icon, Header, Item } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
-
+import useLanguage from 'components/LanguagePicker/useLanguage'
 import { byDateDesc, reformatDate, getTextInWithOpen, resolveStudyPlan } from '../../../common'
 import StudentCourseTable from '../StudentCourseTable'
 
 const isInStudyPlan = (plan, code) => plan && plan.included_courses.includes(code)
 
-const CourseParticipationTable = ({ student, language, clearCourseStats, studyrightid }) => {
-  if (!student) return null
+const CourseParticipationTable = ({ student, clearCourseStats, studyrightid }) => {
+  const { language } = useLanguage()
 
+  if (!student) return null
   const courseHeaders = ['Date', 'Course', 'Grade', 'Credits', '']
 
   const courseRowsByAcademicYear = {}
@@ -113,7 +114,6 @@ const CourseParticipationTable = ({ student, language, clearCourseStats, studyri
 
 CourseParticipationTable.propTypes = {
   student: shape({}).isRequired,
-  language: string.isRequired,
   clearCourseStats: func.isRequired,
 }
 

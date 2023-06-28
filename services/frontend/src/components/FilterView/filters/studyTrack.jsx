@@ -1,13 +1,14 @@
 /* eslint-disable camelcase */
 import React from 'react'
 import { Form, Dropdown } from 'semantic-ui-react'
-import { getTextIn } from 'common'
 import moment from 'moment'
 import _ from 'lodash'
+import useLanguage from 'components/LanguagePicker/useLanguage'
 import createFilter from './createFilter'
 
 const StudyTrackFilterCard = ({ options, onOptionsChange, withoutSelf, activeAt, code }) => {
   const { selected } = options
+  const { getTextIn } = useLanguage()
 
   const activeAtMoment = activeAt && moment(activeAt)
 

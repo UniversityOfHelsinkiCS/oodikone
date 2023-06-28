@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { Tab, Form } from 'semantic-ui-react'
 import { shape, string, arrayOf, func, number, oneOfType, bool } from 'prop-types'
 import TeacherStatisticsTable from '../TeacherStatisticsTable'
-import { getTextIn } from '../../../common'
 import useLanguage from '../../LanguagePicker/useLanguage'
 
 const CourseStatsTab = ({ statistics, options, doSelect, selected, renderCourseLink }) => (
@@ -37,7 +36,7 @@ CourseStatsTab.defaultProps = {
 }
 
 const CoursesTab = ({ courses, semesters }) => {
-  const { language } = useLanguage()
+  const { getTextIn } = useLanguage()
   const [selectedSemester, setSelectedSemester] = useState(null)
   const [selectedCourse, setSelectedCourse] = useState(null)
   const [semesterOptions, setSemesterOptions] = useState([])
@@ -48,7 +47,7 @@ const CoursesTab = ({ courses, semesters }) => {
       .map(({ name, id }) => ({
         key: id,
         value: id,
-        text: getTextIn(name, language),
+        text: getTextIn(name),
       }))
       .sort((s1, s2) => s2.value - s1.value)
   }
@@ -59,7 +58,7 @@ const CoursesTab = ({ courses, semesters }) => {
       key: id,
       value: id,
       description: id,
-      text: getTextIn(name, language),
+      text: getTextIn(name),
     }))
   }
   useEffect(() => {
@@ -86,7 +85,7 @@ const CoursesTab = ({ courses, semesters }) => {
     const course = courses[courseid]
     return Object.entries(course.semesters).map(([semesterid, stats]) => ({
       id: semesterid,
-      name: getTextIn(semesters[semesterid].name, language),
+      name: getTextIn(semesters[semesterid].name),
       ...stats,
     }))
   }
@@ -99,7 +98,7 @@ const CoursesTab = ({ courses, semesters }) => {
       .filter(course => !!course.semesters[semesterid])
       .map(({ id, name, semesters }) => ({
         id,
-        name: getTextIn(name, language),
+        name: getTextIn(name),
         ...semesters[semesterid],
       }))
   }

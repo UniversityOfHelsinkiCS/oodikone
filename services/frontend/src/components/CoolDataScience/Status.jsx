@@ -3,12 +3,11 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Loader } from 'semantic-ui-react'
 import _ from 'lodash'
 import moment from 'moment'
+import useLanguage from 'components/LanguagePicker/useLanguage'
 import DrillStack from './DrillStack'
-
 import StatusCard from './StatusCard'
 import Toolbar from './Toolbar'
 import TSA from '../../common/tsa'
-import { getTextIn } from '../../common'
 import { useLocalStorage } from '../../common/hooks'
 import InfoToolTips from '../../common/InfoToolTips'
 import { getStatus } from '../../redux/coolDataScience'
@@ -64,6 +63,7 @@ const StatusContainer = ({
   showStudentCounts,
   clickable,
 }) => {
+  const { getTextIn } = useLanguage()
   const title = getTextIn(stats.name)
 
   let current
@@ -161,13 +161,13 @@ const getDefaultSettings = () =>
     .fromPairs()
     .value()
 
-const createDrillData = (storeData, showRelativeValues) => {
+const createDrillData = (storeData, showRelativeValues, getTextIn) => {
   if (!storeData) return null
 
   return Object.values(storeData).map(item => ({
     key: item.code,
     label: getTextIn(item.name),
-    children: createDrillData(item.drill),
+    children: createDrillData(item.drill, getTextIn),
     currentValue: showRelativeValues ? item.current / item.currentStudents : item.current,
     previousValue: showRelativeValues ? item.previous / item.previousStudents : item.previous,
     ..._.omit(item, 'drill'),
@@ -179,7 +179,7 @@ const isValidDate = d => moment().diff(moment(d)) > 0
 const Status = () => {
   const [explicitSettings, setSettings] = useLocalStorage('trendsStatusSettings', {})
   const [nonpersistentExplicitSettings, setNonpersistentSettings] = useState({})
-
+  const { getTextIn } = useLanguage()
   const storeData = useSelector(state => state.coolDataScience.data.status)
   const loading = useSelector(state => state.coolDataScience.pending.status)
   const dispatch = useDispatch()
@@ -190,7 +190,7 @@ const Status = () => {
   )
 
   const data = useMemo(
-    () => createDrillData(storeData, settings.showRelativeValues),
+    () => createDrillData(storeData, settings.showRelativeValues, getTextIn),
     [storeData, settings.showRelativeValues]
   )
 

@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { sortBy } from 'lodash'
 import { withRouter } from 'react-router-dom'
 import { useGetAuthorizedUserQuery, useShowAsUser } from 'redux/auth'
-import { getTextIn, textAndDescriptionSearch } from '../../common'
+import { textAndDescriptionSearch } from '../../common'
 import { removeUserUnits, setFaculties } from '../../redux/users'
 import { getAccessGroups } from '../../redux/accessGroups'
 import { getFaculties } from '../../redux/faculties'
@@ -30,7 +30,7 @@ const UserPage = ({
   getFaculties,
   getProgrammesUnfiltered,
 }) => {
-  const { language } = useLanguage()
+  const { getTextIn } = useLanguage()
   const { userId: currentUserId, isAdmin } = useGetAuthorizedUserQuery()
   const showAsUser = useShowAsUser()
 
@@ -47,7 +47,7 @@ const UserPage = ({
 
   const renderUnitList = (usersElementdetailCodes, elementdetails, user) => {
     if (!usersElementdetailCodes) return null
-    const nameInLanguage = element => getTextIn(element.name, language)
+    const nameInLanguage = element => getTextIn(element.name)
     const elementDetailCodesAvailable = new Set(elementdetails.map(({ code }) => code))
     const usersElementdetailCodesAvailable = usersElementdetailCodes.filter(obj =>
       elementDetailCodesAvailable.has(obj.elementDetailCode)
@@ -141,7 +141,7 @@ const UserPage = ({
             options={sortBy(
               faculties.map(f => ({
                 key: f.code,
-                text: getTextIn(f.name, language),
+                text: getTextIn(f.name),
                 description: f.code,
                 value: f.code,
               })),

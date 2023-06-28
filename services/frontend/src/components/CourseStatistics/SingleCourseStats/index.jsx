@@ -14,7 +14,6 @@ import {
 import ProgrammeDropdown from '../ProgrammeDropdown'
 import selectors, { ALL } from '../../../selectors/courseStats'
 import YearFilter from '../SearchForm/YearFilter'
-import { getTextIn } from '../../../common'
 import { useGetSemestersQuery } from '../../../redux/semesters'
 import TSA from '../../../common/tsa'
 import useLanguage from '../../LanguagePicker/useLanguage'
@@ -47,7 +46,7 @@ const SingleCourseStats = ({
   getMaxYearsToCreatePopulationFrom,
   userHasAccessToAllStats,
 }) => {
-  const { language } = useLanguage()
+  const { getTextIn } = useLanguage()
   const [primary, setPrimary] = useState([ALL.value])
   const [comparison, setComparison] = useState([])
   const [fromYear, setFromYear] = useState(0)
@@ -122,7 +121,7 @@ const SingleCourseStats = ({
       return 'Excluded'
     }
     const { name } = stats.programmes[progcode]
-    return getTextIn(name, language)
+    return getTextIn(name)
   }
 
   const setExcludedToComparison = () => setComparison(primary.includes(ALL.value) ? [] : ['EXCLUDED'])
@@ -177,7 +176,7 @@ const SingleCourseStats = ({
     const filteredSemesters = semesters.filter(timeFilter)
     const filteredYears = years.filter(timeFilter)
     return separate
-      ? filteredSemesters.find(year => year.texts.includes(getTextIn(name, language)))
+      ? filteredSemesters.find(year => year.texts.includes(getTextIn(name)))
       : filteredYears.find(year => year.text === name)
   }
 
@@ -295,7 +294,7 @@ const SingleCourseStats = ({
           const attemptsEnrollments = countAttemptEnrollmentStats(filteredAllEnrollments, displayEnrollments)
           const studentsEnrollments = countStudentEnrollmentStats(allAttempts, filteredEnrollments, displayEnrollments)
           const students = countStudentStats(allStudents, studentsEnrollments.enrolledStudentsWithNoGrade, filter)
-          const parsedName = separate ? getTextIn(name, language) : name
+          const parsedName = separate ? getTextIn(name) : name
 
           return {
             name: parsedName,
@@ -432,7 +431,7 @@ const SingleCourseStats = ({
   if (stats.statistics.length < 1) return <Segment>No data for selected course</Segment>
 
   const options = filteredProgrammes
-    .map(({ text, ...rest }) => ({ text: typeof text === 'string' ? text : getTextIn(text, language), ...rest }))
+    .map(({ text, ...rest }) => ({ text: typeof text === 'string' ? text : getTextIn(text), ...rest }))
     .map(prog => ({ ...prog, name: prog.text }))
 
   return (

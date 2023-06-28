@@ -1,8 +1,6 @@
 import React, { useCallback, useState, useEffect, useRef } from 'react'
 import { chunk, isEqual } from 'lodash'
 import qs from 'query-string'
-import { useSelector } from 'react-redux'
-
 import { SEARCH_HISTORY_VERSION } from '../constants'
 import TSA from './tsa'
 
@@ -264,11 +262,6 @@ export const useLocalStorage = (key, initialValue) => {
   )
 
   return [storedValue, setValue]
-}
-
-export const useLanguage = () => {
-  const { language } = useSelector(({ settings }) => settings)
-  return language
 }
 
 export const useDebounce = (value, timeout, onChange) => {

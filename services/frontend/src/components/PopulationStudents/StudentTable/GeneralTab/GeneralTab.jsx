@@ -4,13 +4,7 @@ import moment from 'moment'
 import SortableTable from 'components/SortableTable'
 import useFilters from 'components/FilterView/useFilters'
 import creditDateFilter from 'components/FilterView/filters/date'
-import {
-  getStudentTotalCredits,
-  getTextIn,
-  reformatDate,
-  copyToClipboard,
-  getHighestGradeOfCourseBetweenRange,
-} from 'common'
+import { getStudentTotalCredits, reformatDate, copyToClipboard, getHighestGradeOfCourseBetweenRange } from 'common'
 import { hiddenNameAndEmailForExcel, getCopyableEmailColumn } from 'common/columns'
 import { useGetSemestersQuery } from 'redux/semesters'
 import StudentInfoItem from 'components/common/StudentInfoItem'
@@ -32,7 +26,7 @@ const GeneralTab = ({
   to,
   year,
 }) => {
-  const { language } = useLanguage()
+  const { getTextIn } = useLanguage()
   const { useFilterSelector } = useFilters()
   const [popupStates, setPopupStates] = useState({})
   const sendAnalytics = sendEvent.populationStudents
@@ -102,7 +96,7 @@ const GeneralTab = ({
     studentToSecondStudyrightEndMap,
   } = createMaps({ students, selectedStudents, programmeCode, combinedProgrammeCode })
 
-  const transferFrom = s => getTextIn(populationStatistics.elementdetails.data[s.transferSource].name, language)
+  const transferFrom = s => getTextIn(populationStatistics.elementdetails.data[s.transferSource].name)
 
   const studyrightCodes = (studyrights, value) => {
     return studyrights
@@ -239,7 +233,7 @@ const GeneralTab = ({
         studyrightCodes(studyrights, 'studyright_elements').reduce((acc, elemArr) => {
           elemArr
             .filter(el => populationStatistics.elementdetails.data[el.code].type === 30)
-            .forEach(el => acc.push(getTextIn(populationStatistics.elementdetails.data[el.code].name, language)))
+            .forEach(el => acc.push(getTextIn(populationStatistics.elementdetails.data[el.code].name)))
           return acc
         }, []).length > 0
     )
@@ -290,12 +284,12 @@ const GeneralTab = ({
     getSemesterEnrollmentsVal,
   } = getSemestersPresentFunctions({
     filteredStudents,
-    language,
     allSemesters,
     allSemestersMap,
     year,
     studentToStudyrightEndMap,
     studentToSecondStudyrightEndMap,
+    getTextIn,
   })
 
   const { getStudyProgrammeContent, studentProgrammesMap, getStudyStartDate } = getStudyProgrammeFunctions({
@@ -305,7 +299,7 @@ const GeneralTab = ({
     coursecode,
     studentToProgrammeStartMap,
     elementDetails: populationStatistics.elementdetails.data,
-    language,
+    getTextIn,
   })
 
   const availableCreditsColumns = {
@@ -501,11 +495,11 @@ const GeneralTab = ({
     option: containsOption && {
       key: 'option',
       title: cleanedQueryStudyrights.some(code => code.startsWith('MH')) ? 'Bachelor' : 'Master',
-      getRowVal: s => (s.option ? getTextIn(s.option.name, language) : ''),
+      getRowVal: s => (s.option ? getTextIn(s.option.name) : ''),
       formatValue: val => (val.length > 45 ? `${val.substring(0, 43)}...` : val),
       cellProps: s => {
         return {
-          title: s.option ? getTextIn(s.option.name, language) : '',
+          title: s.option ? getTextIn(s.option.name) : '',
         }
       },
     },

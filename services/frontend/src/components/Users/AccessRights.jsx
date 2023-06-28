@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import { Form, Divider } from 'semantic-ui-react'
 import { isEqual } from 'lodash'
-import { textAndDescriptionSearch, getTextIn } from '../../common'
+import { textAndDescriptionSearch } from '../../common'
 import selectors from '../../selectors/programmes'
 import { addUserUnits } from '../../redux/users'
 import useLanguage from '../LanguagePicker/useLanguage'
@@ -13,7 +13,7 @@ const initialState = {
 }
 
 const AccessRights = ({ uid, programmes, pending, ...props }) => {
-  const { language } = useLanguage()
+  const { getTextIn } = useLanguage()
   const [state, setState] = useState({ ...initialState })
   const { programme } = state
 
@@ -27,7 +27,7 @@ const AccessRights = ({ uid, programmes, pending, ...props }) => {
     .map(({ code, name }) => ({
       key: code,
       value: code,
-      text: getTextIn(name, language),
+      text: getTextIn(name),
       description: code,
     }))
     .sort((p1, p2) => p1.text.localeCompare(p2.text))

@@ -9,7 +9,7 @@ import { clearCourses, findCoursesV2 } from '../../../redux/coursesearch'
 import { getCourseStats, clearCourseStats } from '../../../redux/coursestats'
 import { getCourseSearchResults } from '../../../selectors/courses'
 import { useSearchHistory, usePrevious } from '../../../common/hooks'
-import { validateInputLength, getTextIn } from '../../../common'
+import { validateInputLength } from '../../../common'
 import TSA from '../../../common/tsa'
 import AutoSubmitSearchInput from '../../AutoSubmitSearchInput'
 import CourseTable from '../CourseTable'
@@ -53,7 +53,7 @@ const useTSASearchResultsHook = (coursesLoading, courseName, courseCode, matchin
 }
 
 const SearchForm = props => {
-  const { language } = useLanguage()
+  const { getTextIn } = useLanguage()
   const dispatch = useDispatch()
   const isLoading = useSelector(state => state.courseStats.pending)
   const coursesLoading = useSelector(state => state.courseSearch.pending)
@@ -148,7 +148,7 @@ const SearchForm = props => {
       courseCodes: codes,
       separate,
     }
-    const searchHistoryText = codes.map(code => `${getTextIn(selectedCourses[code].name, language)} ${code}`)
+    const searchHistoryText = codes.map(code => `${getTextIn(selectedCourses[code].name)} ${code}`)
     addItemToSearchHistory({
       text: searchHistoryText.join(', '),
       params,
