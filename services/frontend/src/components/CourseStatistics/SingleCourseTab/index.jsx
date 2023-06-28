@@ -5,11 +5,10 @@ import { oneOfType, number, string, bool } from 'prop-types'
 import SingleCourseStats from '../SingleCourseStats'
 import useLanguage from '../../LanguagePicker/useLanguage'
 import selectors from '../../../selectors/courseStats'
-import { getTextIn } from '../../../common'
 
 const SingleCourseTab = ({ selected, userHasAccessToAllStats }) => {
   const [selection, setSelection] = useState(selected)
-  const { language } = useLanguage()
+  const { getTextIn } = useLanguage()
   const stats = useSelector(selectors.getCourseStats)
   const availableStats = useSelector(selectors.getAvailableStats)
   const courses = useSelector(selectors.getCourses).map(({ code, name }) => ({
@@ -45,10 +44,7 @@ const SingleCourseTab = ({ selected, userHasAccessToAllStats }) => {
           <Label.Group>
             <Label
               key={stats[selection].coursecode}
-              content={`${stats[selection].alternatives.map(code => ` ${code}`)} ${getTextIn(
-                stats[selection].name,
-                language
-              )} `}
+              content={`${stats[selection].alternatives.map(code => ` ${code}`)} ${getTextIn(stats[selection].name)} `}
             />
           </Label.Group>
         </Form>

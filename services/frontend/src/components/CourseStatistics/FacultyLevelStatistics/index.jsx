@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux'
 import { Table, Header, Dropdown } from 'semantic-ui-react'
 import { flatten, uniq } from 'lodash'
 import { shape, string, number } from 'prop-types'
-import { getTextIn } from '../../../common'
 import useLanguage from '../../LanguagePicker/useLanguage'
 
 const CourseTableRow = ({ facultyCode, students, credits, facultyName }) => {
@@ -18,9 +17,11 @@ const CourseTableRow = ({ facultyCode, students, credits, facultyName }) => {
   )
 }
 
-const CourseTable = ({ course, courseInstance, language, selectedYear }) => {
+const CourseTable = ({ course, courseInstance, selectedYear }) => {
   const { coursecode } = course
-  const name = getTextIn(course.name, language)
+  const { getTextIn } = useLanguage()
+
+  const name = getTextIn(course.name)
 
   const rows = courseInstance ? (
     Object.entries(courseInstance.faculties)
@@ -29,7 +30,7 @@ const CourseTable = ({ course, courseInstance, language, selectedYear }) => {
         <CourseTableRow
           key={`${coursecode}-${facultyCode}`}
           facultyCode={facultyCode}
-          facultyName={getTextIn(instanceFaculty.name, language)}
+          facultyName={getTextIn(instanceFaculty.name)}
           students={instanceFaculty.students.length}
           credits={instanceFaculty.credits}
         />
@@ -85,7 +86,7 @@ const CourseTable = ({ course, courseInstance, language, selectedYear }) => {
 const FacultyLevelStatistics = () => {
   const { language: activeLanguage } = useLanguage()
   const openOrReqular = useSelector(state => state.courseSearch.openOrReqular)
-  const { courseStats, language } = useSelector(({ courseStats }) => ({
+  const { courseStats } = useSelector(({ courseStats }) => ({
     courseStats: courseStats.data,
     language: activeLanguage,
   }))
@@ -113,7 +114,6 @@ const FacultyLevelStatistics = () => {
     <CourseTable
       course={course[openOrReqular]}
       courseInstance={courseInstance}
-      language={language}
       key={course.coursecode}
       selectedYear={selectedYear}
     />
@@ -146,7 +146,6 @@ CourseTableRow.propTypes = {
 CourseTable.propTypes = {
   course: shape({}).isRequired,
   courseInstance: shape({}),
-  language: string.isRequired,
   selectedYear: string.isRequired,
 }
 

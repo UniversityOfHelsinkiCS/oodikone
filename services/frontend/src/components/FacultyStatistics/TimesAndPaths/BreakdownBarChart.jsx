@@ -1,8 +1,11 @@
 /* eslint-disable react/no-this-in-sfc */
+import useLanguage from 'components/LanguagePicker/useLanguage'
 import React from 'react'
 import ReactHighcharts from 'react-highcharts'
 
-const BarChart = ({ data, handleClick, facultyGraph = true, year = null, label, programmeNames, language = null }) => {
+const BarChart = ({ data, handleClick, facultyGraph = true, year = null, label, programmeNames }) => {
+  const { language } = useLanguage()
+
   const statData = [
     { name: 'On time', color: '#90A959', data: [] },
     { name: 'Max. year overtime', color: '#FEE191', data: [] },

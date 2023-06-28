@@ -4,7 +4,7 @@ import { Button, Modal, Form, TextArea } from 'semantic-ui-react'
 import { shape, func, arrayOf, bool } from 'prop-types'
 import { textAndDescriptionSearch } from 'common'
 import { useFilteredAndFormattedElementDetails } from 'redux/elementdetails'
-import { useLanguage, useProgress, useTitle } from '../../common/hooks'
+import { useProgress, useTitle } from '../../common/hooks'
 import { getCustomPopulation } from '../../redux/populations'
 import {
   getCustomPopulationSearches,
@@ -34,8 +34,7 @@ const CustomPopulationSearch = ({
   const [name, setName] = useState('')
   const [programme, setProgramme] = useState('')
   const [selectedSearchId, setSelectedSearchId] = useState('')
-  const language = useLanguage()
-  const programmes = useFilteredAndFormattedElementDetails(language)
+  const programmes = useFilteredAndFormattedElementDetails()
   const { onProgress } = useProgress(loading)
 
   useTitle('Custom population')

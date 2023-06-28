@@ -5,15 +5,15 @@ import { Card, Icon } from 'semantic-ui-react'
 import { minBy } from 'lodash'
 import './populationQueryCard.css'
 import { DISPLAY_DATE_FORMAT } from '../../constants'
-import { reformatDate, getTextIn } from '../../common'
+import { reformatDate } from '../../common'
 import useLanguage from '../LanguagePicker/useLanguage'
 
 const PopulationQueryCard = ({ population, query, removeSampleFn, units, tags }) => {
-  const { language } = useLanguage()
+  const { getTextIn } = useLanguage()
   const { uuid, year, semesters, months, studentStatuses, tag } = query
   const tagname = tag && tags.length > 0 ? tags.find(t => t.tag_id === tag)?.tagname : ''
   const { students } = population
-  const header = units.map(u => getTextIn(u.name, language)).join(', ')
+  const header = units.map(u => getTextIn(u.name)).join(', ')
   const semesterList = semesters.map(s => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase()).join(', ')
 
   if (students.length > 0) {

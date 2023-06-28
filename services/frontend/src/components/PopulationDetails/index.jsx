@@ -13,7 +13,6 @@ import PopulationCourses from '../PopulationCourses'
 import InfoBox from '../Info/InfoBox'
 import CreditGainStats from './CreditGainStats'
 import AgeStats from './AgeStats'
-import useLanguage from '../LanguagePicker/useLanguage'
 import sendEvent from '../../common/sendEvent'
 import infotooltips from '../../common/InfoToolTips'
 
@@ -29,7 +28,6 @@ const PopulationDetails = ({
   selectedStudentsByYear,
   programmeCodes,
 }) => {
-  const { language } = useLanguage()
   const [activeIndex, setActiveIndex] = useLocalStorage('populationActiveIndex', [])
   const { isLoading: authLoading, rights, isAdmin } = useGetAuthorizedUserQuery()
   const creditGraphRef = useRef()
@@ -71,7 +69,6 @@ const PopulationDetails = ({
         students={filteredStudents}
         title="Id"
         trayOpen={() => {}}
-        language={language}
         studyPlanFilterIsActive={studyPlanFilterIsActive}
         programmeCodes={programmeCodes}
       />
@@ -188,7 +185,6 @@ const PopulationDetails = ({
           <div ref={studentTableRef}>
             <PopulationStudents
               variant="population"
-              language={language}
               filteredStudents={filteredStudents}
               dataExport={dataExport}
               criteria={criteria?.data}

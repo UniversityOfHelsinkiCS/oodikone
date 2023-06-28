@@ -5,12 +5,11 @@ import { func, arrayOf, shape, string, bool } from 'prop-types'
 import { getActiveYears } from '../courseStatisticsUtils'
 import useLanguage from '../../LanguagePicker/useLanguage'
 import './courseTable.css'
-import { getTextIn } from '../../../common'
 
 const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, mandatory = false, controlIcon }) => {
-  const { language } = useLanguage()
+  const { getTextIn } = useLanguage()
   const noContent = courses.length === 0
-  const sortCourses = courses => sortBy(courses, course => getTextIn(course.name, language))
+  const sortCourses = courses => sortBy(courses, course => getTextIn(course.name))
 
   const getEmptyListRow = () => (
     <Table.Row>
@@ -25,7 +24,7 @@ const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, ma
       onClick={() => (course.min_attainment_date || mandatory ? onSelectCourse(course) : null)}
     >
       <Table.Cell width={10}>
-        <div>{getTextIn(course.name, language)}</div>
+        <div>{getTextIn(course.name)}</div>
         <div>{getActiveYears(course)}</div>
       </Table.Cell>
       <Table.Cell content={!course.alternatives ? course.code : course.alternatives.map(a => a.code).join(', ')} />

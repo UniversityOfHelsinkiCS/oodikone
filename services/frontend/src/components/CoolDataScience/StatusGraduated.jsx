@@ -5,10 +5,10 @@ import { Loader } from 'semantic-ui-react'
 import _ from 'lodash'
 import moment from 'moment'
 
+import useLanguage from 'components/LanguagePicker/useLanguage'
 import StatusCard from './StatusCard'
 import Toolbar from './Toolbar'
 import TSA from '../../common/tsa'
-import { getTextIn } from '../../common'
 import { useLocalStorage } from '../../common/hooks'
 import InfoToolTips from '../../common/InfoToolTips'
 import DrillStack from './DrillStack'
@@ -93,7 +93,7 @@ StatusContainer.defaultProps = {
   previous: 0,
 }
 
-const createDrillData = data => {
+const createDrillData = (data, getTextIn) => {
   if (!data) return null
 
   return Object.entries(data).map(([key, item]) => ({
@@ -101,7 +101,7 @@ const createDrillData = data => {
     label: getTextIn(item.name),
     currentValue: item.current,
     previousValue: item.previous,
-    children: createDrillData(item.drill),
+    children: createDrillData(item.drill, getTextIn),
     ..._.omit(item, 'drill'),
   }))
 }
@@ -115,6 +115,7 @@ const getDefaultSettings = () =>
 const Status = ({ getStatusGraduatedDispatch, data, loading }) => {
   const [explicitSettings, setSettings] = useLocalStorage('trendsGraduationStatusSettings', {})
   const [nonpersistentExplicitSettings, setNonpersistentSettings] = useState({})
+  const { getTextIn } = useLanguage()
 
   const settings = useMemo(
     () => _.defaults({ ...explicitSettings, ...nonpersistentExplicitSettings }, getDefaultSettings()),
@@ -138,7 +139,7 @@ const Status = ({ getStatusGraduatedDispatch, data, loading }) => {
     }
   }, [showCountingFrom, showByYear])
 
-  const drillData = useMemo(() => createDrillData(data), [data])
+  const drillData = useMemo(() => createDrillData(data, getTextIn), [data])
 
   const changeSetting = (property, value) => {
     sendAnalytics(`S Set setting "${property}" to ${value}`, 'Status')

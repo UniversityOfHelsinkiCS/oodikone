@@ -4,11 +4,12 @@ import { Link } from 'react-router-dom'
 import { debounce } from 'lodash'
 import { arrayOf, string, bool, shape } from 'prop-types'
 import { Loader, Message, Header, Form } from 'semantic-ui-react'
-import { getTextIn, getUnifiedProgrammeName } from 'common'
+import { getUnifiedProgrammeName } from 'common'
 import SortableTable from '../../SortableTable'
 import useLanguage from '../../LanguagePicker/useLanguage'
 
 const StudyProgrammeSelector = ({ studyprogrammes, selected }) => {
+  const { getTextIn, language } = useLanguage()
   const [filter, setFilter] = useState('')
   const [bachelorProgrammes, setBachelorProgrammes] = useState([])
   const [masterProgrammes, setMasterProgrammes] = useState([])
@@ -18,8 +19,6 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected }) => {
   const handleFilterChange = debounce(value => {
     setFilter(value)
   }, 500)
-
-  const { language } = useLanguage()
 
   useEffect(() => {
     if (studyprogrammes?.length > 0) studyprogrammes.sort((a, b) => (a.code > b.code ? 1 : -1))
@@ -149,7 +148,7 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected }) => {
     {
       key: 'programmename',
       title: 'name',
-      getRowVal: prog => getTextIn(prog.name, language),
+      getRowVal: prog => getTextIn(prog.name),
       getRowContent: prog => (
         <Link
           style={{
@@ -161,7 +160,7 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected }) => {
           }}
           to={`/study-programme/${prog.code}`}
         >
-          {getTextIn(prog.name, language)}
+          {getTextIn(prog.name)}
         </Link>
       ),
       cellProps: {

@@ -1,7 +1,6 @@
 import React, { Fragment } from 'react'
 import { Table, Popup } from 'semantic-ui-react'
 import { number, shape, string, bool } from 'prop-types'
-import { getTextIn } from '../../../common'
 import FilterToggleIcon from '../../FilterToggleIcon'
 import '../populationCourseStats.css'
 import useFilters from '../../FilterView/useFilters'
@@ -64,7 +63,7 @@ const renderCumulativeStatistics = passingSemesters => (
 )
 
 const PassingSemesterRow = ({ statistics, cumulative }) => {
-  const { language } = useLanguage()
+  const { getTextIn } = useLanguage()
   const { useFilterSelector, filterDispatch } = useFilters()
 
   const { stats, course } = statistics
@@ -84,18 +83,18 @@ const PassingSemesterRow = ({ statistics, cumulative }) => {
         content={
           isActive ? (
             <span>
-              Poista rajaus kurssin <b>{getTextIn(course.name, language)}</b> perusteella
+              Poista rajaus kurssin <b>{getTextIn(course.name)}</b> perusteella
             </span>
           ) : (
             <span>
-              Rajaa opiskelijat kurssin <b>{getTextIn(course.name, language)}</b> perusteella
+              Rajaa opiskelijat kurssin <b>{getTextIn(course.name)}</b> perusteella
             </span>
           )
         }
         position="top right"
       />
       <Table.Cell colSpan="2" className="nameCell">
-        {getTextIn(course.name, language)}
+        {getTextIn(course.name)}
       </Table.Cell>
       <Table.Cell>{course.code}</Table.Cell>
       <Table.Cell>{stats.students}</Table.Cell>

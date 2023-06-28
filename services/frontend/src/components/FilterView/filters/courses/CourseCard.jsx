@@ -1,6 +1,5 @@
 import React from 'react'
 import { Label, Dropdown, Button, Icon, Popup } from 'semantic-ui-react'
-import { getTextIn } from '../../../../common'
 import useLanguage from '../../../LanguagePicker/useLanguage'
 import { FilterType } from './filterType'
 
@@ -19,7 +18,7 @@ const translate = {
 }
 
 const CourseCard = ({ course, filterType, onChange }) => {
-  const { language } = useLanguage()
+  const { getTextIn } = useLanguage()
   const name = 'courseFilter'
 
   const onClick = (_, { value }) => onChange(value)
@@ -31,7 +30,7 @@ const CourseCard = ({ course, filterType, onChange }) => {
   return (
     <>
       <Label style={{ marginTop: '0.5rem' }}>
-        {getTextIn(course?.course?.name, language)}
+        {getTextIn(course?.course?.name)}
 
         <Dropdown
           text={filterTexts[filterType].label}

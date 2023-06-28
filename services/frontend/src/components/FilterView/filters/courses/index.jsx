@@ -3,7 +3,6 @@ import produce from 'immer'
 import _ from 'lodash'
 import { Dropdown } from 'semantic-ui-react'
 import CourseCard from './CourseCard'
-import { getTextIn } from '../../../../common'
 import { FilterType } from './filterType'
 import './courseFilter.css'
 import createFilter from '../createFilter'
@@ -13,12 +12,11 @@ export const contextKey = 'coursesFilter'
 
 const CourseFilterCard = ({ courseStats, options, onOptionsChange }) => {
   const { courseFilters } = options
-  const { language } = useLanguage()
+  const { getTextIn } = useLanguage()
   const name = 'course-filter-card'
   // Wrestle course stats into something semantic-ui eats without throwing up.
-  const makeLabel = cs => `${cs.course.code} - ${getTextIn(cs.course.name, language)}`
+  const makeLabel = cs => `${cs.course.code} - ${getTextIn(cs.course.name)}`
   const dropdownOptions = Object.values(courseStats)
-    // .filter(cs => cs.stats.students > Math.round(filteredStudents.length * 0.3))
     .filter(cs => !courseFilters[cs.course.code])
     .sort((a, b) => makeLabel(a).localeCompare(makeLabel(b)))
     .map(cs => ({

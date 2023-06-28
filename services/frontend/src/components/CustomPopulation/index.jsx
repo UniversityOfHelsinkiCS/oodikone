@@ -91,12 +91,11 @@ const CustomPopulation = () => {
 }
 
 const CustomPopulationContent = ({ students, custompop }) => {
-  const { language } = useLanguage()
   const [activeIndex, setIndex] = useState([])
   const [newestIndex, setNewest] = useState(null)
   const [studentsInput, setStudentsInput] = useState(null)
   const [discardedStudentNumbers, setDiscarded] = useState([])
-  const studyProgrammes = useFilteredAndFormattedElementDetails(language)
+  const studyProgrammes = useFilteredAndFormattedElementDetails()
   const creditGainRef = useRef()
   const programmeRef = useRef()
   const coursesRef = useRef()

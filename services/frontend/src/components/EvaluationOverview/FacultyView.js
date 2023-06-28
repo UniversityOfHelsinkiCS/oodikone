@@ -5,11 +5,8 @@ import {
   useGetFacultyProgressStatsQuery,
   useGetFacultyGraduationTimesQuery,
 } from 'redux/facultyStats'
-import { getTextIn } from 'common'
-
 import FacultyGraduations from './FacultyGraduations'
 import FacultyProgress from './FacultyProgress'
-
 import Toggle from '../StudyProgramme/Toggle'
 import InfoBox from '../Info/InfoBox'
 import InfotoolTips from '../../common/InfoToolTips'
@@ -23,12 +20,12 @@ const FacultyView = ({ faculty }) => {
   const studyProgrammeFilter = 'NEW_STUDY_PROGRAMMES'
   const specials = 'SPECIAL_EXCLUDED'
   const graduated = graduatedGroup ? 'GRADUATED_EXCLUDED' : 'GRADUATED_INCLUDED'
-  const { language } = useLanguage()
+  const { getTextIn } = useLanguage()
 
   const allFaculties = useGetFacultiesQuery()
   const faculties = allFaculties?.data
   const facultyDetails = faculties && faculty && faculties.find(f => f.code === faculty)
-  const facultyName = facultyDetails && getTextIn(facultyDetails.name, language)
+  const facultyName = facultyDetails && getTextIn(facultyDetails.name)
 
   const progressStats = useGetFacultyProgressStatsQuery({
     id: faculty,
@@ -107,12 +104,7 @@ const FacultyView = ({ faculty }) => {
                     setValue={setGraduatedGroup}
                   />
                 </div>
-                <FacultyProgress
-                  faculty={faculty}
-                  progressStats={progressStats}
-                  language={language}
-                  getDivider={getDivider}
-                />
+                <FacultyProgress faculty={faculty} progressStats={progressStats} getDivider={getDivider} />
               </>
             )}
             {graduationStats.isSuccess && graduationStats.data && (

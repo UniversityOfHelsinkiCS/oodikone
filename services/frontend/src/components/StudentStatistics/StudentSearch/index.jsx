@@ -5,13 +5,14 @@ import { connect } from 'react-redux'
 
 import { Search, Segment, Container } from 'semantic-ui-react'
 import moment from 'moment'
+import useLanguage from 'components/LanguagePicker/useLanguage'
 import { findStudents, getStudent } from '../../../redux/students'
 import SegmentDimmer from '../../SegmentDimmer'
 import SortableTable from '../../SortableTable'
 import Timeout from '../../Timeout'
 import { makeFormatStudentRows } from '../../../selectors/students'
 
-import { containsOnlyNumbers, validateInputLength, splitByEmptySpace, getTextIn } from '../../../common'
+import { containsOnlyNumbers, validateInputLength, splitByEmptySpace } from '../../../common'
 
 const StudentSearch = ({
   getStudent,
@@ -22,8 +23,8 @@ const StudentSearch = ({
   findStudents,
   showNames,
   pending,
-  language,
 }) => {
+  const { getTextIn } = useLanguage()
   const [loading, setLoading] = useState(false)
   const [showResults, setShowResults] = useState(false)
   const [searchStr, setSearchStr] = useState('')
@@ -89,10 +90,7 @@ const StudentSearch = ({
     if (s.studyrights) {
       const elements = s.studyrights
         .filter(sr => sr.active && !sr.graduated)
-        .reduce(
-          (res, sr) => [...res, ...sr.studyright_elements.map(elem => getTextIn(elem.element_detail.name, language))],
-          []
-        )
+        .reduce((res, sr) => [...res, ...sr.studyright_elements.map(elem => getTextIn(elem.element_detail.name))], [])
       const sorted = elements.sort()
       return sorted.reduce((res, name) => `${res}; ${name}`, '').slice(1)
     }

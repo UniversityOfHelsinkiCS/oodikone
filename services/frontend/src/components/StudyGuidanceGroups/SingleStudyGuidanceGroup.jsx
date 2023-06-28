@@ -3,7 +3,6 @@ import { Button, Header, Accordion, Divider, Label } from 'semantic-ui-react'
 import moment from 'moment'
 import CreditAccumulationGraphHighCharts from 'components/CreditAccumulationGraphHighCharts'
 import _ from 'lodash'
-import { getTextIn } from 'common'
 import PopulationStudents from 'components/PopulationStudents'
 import React, { useCallback, useEffect, useState, useRef } from 'react'
 import scrollToComponent from 'react-scroll-to-component'
@@ -17,9 +16,9 @@ import {
   useGetStudyGuidanceGroupPopulationCoursesQuery,
 } from 'redux/studyGuidanceGroups'
 import { useHistory } from 'react-router-dom'
-import { useSelector } from 'react-redux'
 import { useToggle } from 'common/hooks'
 import { useGetProgressCriteriaQuery } from 'redux/programmeProgressCriteria'
+import useLanguage from 'components/LanguagePicker/useLanguage'
 import StudyGuidanceGroupPopulationCourses from './StudyGuidanceGroupPopulationCourses'
 import { startYearToAcademicYear, Wrapper, StyledMessage } from './common'
 import { useGetSemestersQuery } from '../../redux/semesters'
@@ -210,12 +209,12 @@ const SingleStudyGroupContent = ({ filteredStudents, population, group }) => {
 const SingleStudyGroupFilterView = props => {
   const semesterQuery = useGetSemestersQuery()
   const allSemesters = semesterQuery.data?.semesters
-
+  const { language } = useLanguage()
   const viewFilters = [
     filters.studentNumberFilter,
     filters.enrollmentStatusFilter({
       allSemesters: allSemesters ?? [],
-      language: props.language,
+      language,
     }),
     filters.ageFilter,
     filters.genderFilter,
@@ -295,8 +294,9 @@ const SingleStudyGroupFilterView = props => {
   )
 }
 
-const SingleStudyGroupViewWrapper = ({ group, language, isLoading, studyProgrammes, children }) => {
+const SingleStudyGroupViewWrapper = ({ group, isLoading, studyProgrammes, children }) => {
   const history = useHistory()
+  const { getTextIn } = useLanguage()
   const handleBack = () => {
     history.push('/studyguidancegroups')
   }
@@ -310,7 +310,7 @@ const SingleStudyGroupViewWrapper = ({ group, language, isLoading, studyProgramm
         <Divider />
         <div style={{ display: 'flex', gap: '8px', alignItems: 'baseline' }}>
           <Header size="medium" style={{ marginRight: 'auto' }}>
-            {group && group.name && language && getTextIn(group.name, language)}
+            {group && group.name && getTextIn(group.name)}
           </Header>
           {group.tags?.studyProgramme && (
             <Label tag content={studyProgrammes.find(p => p.value === group.tags.studyProgramme)?.text} color="blue" />
@@ -324,9 +324,8 @@ const SingleStudyGroupViewWrapper = ({ group, language, isLoading, studyProgramm
 }
 
 const SingleStudyGuidanceGroupContainer = ({ group }) => {
-  const { language } = useSelector(({ settings }) => settings)
   const groupStudentNumbers = group?.members?.map(({ personStudentNumber }) => personStudentNumber) || []
-  const studyProgrammes = useFilteredAndFormattedElementDetails(language)
+  const studyProgrammes = useFilteredAndFormattedElementDetails()
   const { tags } = group
   const { data, isLoading } = useGetStudyGuidanceGroupPopulationQuery({ studentnumberlist: groupStudentNumbers, tags })
   const { data: courses, isLoading: coursesAreLoading } = useGetStudyGuidanceGroupPopulationCoursesQuery({
@@ -348,17 +347,12 @@ const SingleStudyGuidanceGroupContainer = ({ group }) => {
   }
 
   return (
-    <SingleStudyGroupViewWrapper
-      group={group}
-      language={language}
-      isLoading={isLoading}
-      studyProgrammes={studyProgrammes}
-    >
+    <SingleStudyGroupViewWrapper group={group} isLoading={isLoading} studyProgrammes={studyProgrammes}>
       {isLoading || coursesAreLoading ? (
         <SegmentDimmer isLoading />
       ) : (
         <div style={{ marginTop: '1rem' }}>
-          <SingleStudyGroupFilterView population={data} language={language} group={group} courses={courses} />
+          <SingleStudyGroupFilterView population={data} group={group} courses={courses} />
         </div>
       )}
     </SingleStudyGroupViewWrapper>

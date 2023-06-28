@@ -1,6 +1,5 @@
 import React from 'react'
 import moment from 'moment'
-import { getTextIn } from 'common'
 
 const getSemestersPresentFunctions = ({
   allSemesters,
@@ -10,7 +9,7 @@ const getSemestersPresentFunctions = ({
   filteredStudents,
   studentToStudyrightEndMap,
   studentToSecondStudyrightEndMap,
-  language,
+  getTextIn,
 }) => {
   if (allSemesters?.length === 0 || !filteredStudents)
     return {
@@ -142,8 +141,7 @@ const getSemestersPresentFunctions = ({
         const graduation = graduatedOnSemester(student, current.semestercode)
         const graduationText = `(graduated as ${graduation === 1 ? 'Bachelor' : 'Master'})`
         return `${enrollmentsString}${enrollmentTypeText(current.enrollmenttype)} in ${getTextIn(
-          allSemestersMap[current.semestercode].name,
-          language
+          allSemestersMap[current.semestercode].name
         )} ${graduation > 0 ? graduationText : ''} \n`
       }
       return enrollmentsString
@@ -155,8 +153,7 @@ const getSemestersPresentFunctions = ({
     if (allSemesters?.length === 0) return ''
     if (!student.semesterenrollments?.length > 0) return ''
     let enrollmentsString = `Starting from ${getTextIn(
-      allSemestersMap[student.semesterenrollments[0].semestercode].name,
-      language
+      allSemestersMap[student.semesterenrollments[0].semestercode].name
     )}: `
     for (let sem = firstSemester; sem <= lastSemester; sem++) {
       const type = student.semesterEnrollmentsMap[sem]

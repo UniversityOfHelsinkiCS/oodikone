@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { Divider, Header, Loader, Message, Segment } from 'semantic-ui-react'
 import { useGetEvaluationStatsQuery } from 'redux/studyProgramme'
-import { getTextIn } from '../../common'
 import useLanguage from '../LanguagePicker/useLanguage'
 import Toggle from '../StudyProgramme/Toggle'
 import InfoBox from '../Info/InfoBox'
@@ -15,7 +14,7 @@ import InfotoolTips from '../../common/InfoToolTips'
 import '../StudyProgramme/studyprogramme.css'
 
 const ProgrammeView = ({ studyprogramme }) => {
-  const { language } = useLanguage()
+  const { getTextIn } = useLanguage()
   const [showMedian, setShowMedian] = useState(false)
   const [academicYear, setAcademicYear] = useState(false)
   const [graduated, setGraduated] = useState(false)
@@ -31,7 +30,7 @@ const ProgrammeView = ({ studyprogramme }) => {
     graduated: grad,
   })
 
-  const programmeName = statistics?.data?.programmeName && getTextIn(statistics?.data?.programmeName, language)
+  const programmeName = statistics?.data?.programmeName && getTextIn(statistics?.data?.programmeName)
 
   const graduationData = statistics?.data?.graduations
   const progressData = statistics?.data?.progress

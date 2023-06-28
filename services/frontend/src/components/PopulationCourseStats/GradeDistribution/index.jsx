@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { Icon, Item } from 'semantic-ui-react'
 import SortableTable, { group } from 'components/SortableTable'
 import _ from 'lodash'
-import { getTextIn } from '../../../common'
+import useLanguage from 'components/LanguagePicker/useLanguage'
 import CourseFilterToggle from '../CourseFilterToggle'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
 
@@ -32,6 +32,7 @@ const mapCourseData = course => ({
 const GradeDistribution = ({ flat, onlyIamRights }) => {
   const { modules, courseStatistics, onGoToCourseStatisticsClick, toggleGroupExpansion, expandedGroups } =
     UsePopulationCourseContext()
+  const { getTextIn } = useLanguage()
 
   const columns = useMemo(() => {
     const columns = [

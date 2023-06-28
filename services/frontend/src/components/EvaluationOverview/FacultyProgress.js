@@ -1,11 +1,10 @@
 import React from 'react'
 import { Message } from 'semantic-ui-react'
-
 import FacultyProgressTable from '../FacultyStatistics/FacultyProgrammeOverview/FacultyProgressTable'
 import FacultyBarChart from '../FacultyStatistics/FacultyProgrammeOverview/FacultyBarChart'
 import sortProgrammeKeys from '../FacultyStatistics/facultyHelpers'
 
-const FacultyProgress = ({ faculty, progressStats, language, getDivider }) => {
+const FacultyProgress = ({ faculty, progressStats, getDivider }) => {
   return (
     <>
       {getDivider('Bachelor', 'BachelorStudentsOfTheFacultyByStartingYear', 'no-infobox')}
@@ -34,7 +33,6 @@ const FacultyProgress = ({ faculty, progressStats, language, getDivider }) => {
             ).map(listObj => listObj[0])}
             progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
             programmeNames={progressStats?.data.programmeNames}
-            language={language}
             cypress="FacultyBachelorsProgressTable"
             progressTitles={progressStats?.data.yearlyBachelorTitles}
           />
@@ -71,7 +69,6 @@ const FacultyProgress = ({ faculty, progressStats, language, getDivider }) => {
             ).map(listObj => listObj[0])}
             progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
             programmeNames={progressStats?.data.programmeNames}
-            language={language}
             cypress="FacultyBachelorMasterProgressTable"
             progressTitles={progressStats?.data.yearlyBcMsTitles}
             needsExtra={faculty === 'H60' ? 'NO EXTRA' : 'EXTRA HEIGHT'}
@@ -106,7 +103,6 @@ const FacultyProgress = ({ faculty, progressStats, language, getDivider }) => {
                 ).map(listObj => listObj[0])}
                 progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
                 programmeNames={progressStats?.data.programmeNames}
-                language={language}
                 cypress="FacultyMastersProgressTable"
                 progressTitles={progressStats?.data.yearlyMasterTitles}
                 needsExtra={faculty === 'H60' ? 'NO EXTRA' : 'EXTRA HEIGHT'}
@@ -141,7 +137,6 @@ const FacultyProgress = ({ faculty, progressStats, language, getDivider }) => {
             ).map(listObj => listObj[0])}
             progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
             programmeNames={progressStats?.data.programmeNames}
-            language={language}
             cypress="FacultyDoctoralProgressTable"
           />
         </div>

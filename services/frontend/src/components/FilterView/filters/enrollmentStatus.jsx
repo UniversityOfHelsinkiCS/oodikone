@@ -1,7 +1,7 @@
 import React from 'react'
 import fp from 'lodash/fp'
 import { Form, Dropdown } from 'semantic-ui-react'
-import { getTextIn } from '../../../common'
+import useLanguage from 'components/LanguagePicker/useLanguage'
 import filterInfo from '../../../common/InfoToolTips/filters'
 import createFilter from './createFilter'
 
@@ -11,8 +11,9 @@ const STATUS_OPTIONS = [
   { key: 'enrl-status-inactive', text: 'Passive', value: 3 },
 ]
 
-const EnrollmentStatusFilterCard = ({ options, onOptionsChange, allSemesters, language, semesterCodes }) => {
+const EnrollmentStatusFilterCard = ({ options, onOptionsChange, allSemesters, semesterCodes }) => {
   const name = 'enrollmentStatusFilter'
+  const { getTextIn } = useLanguage()
 
   const { semesters, status } = options
 
@@ -24,7 +25,7 @@ const EnrollmentStatusFilterCard = ({ options, onOptionsChange, allSemesters, la
     .sort((prev, cur) => cur - prev)
     .map(code => ({
       key: `semester-option-${code}`,
-      text: getTextIn(allSemesters[code].name, language),
+      text: getTextIn(allSemesters[code].name),
       value: code,
     }))
 
@@ -105,11 +106,6 @@ export default createFilter({
   },
 
   render: (props, { precomputed, args }) => (
-    <EnrollmentStatusFilterCard
-      {...props}
-      semesterCodes={precomputed.semesterCodes}
-      allSemesters={args.allSemesters}
-      language={args.language}
-    />
+    <EnrollmentStatusFilterCard {...props} semesterCodes={precomputed.semesterCodes} allSemesters={args.allSemesters} />
   ),
 })

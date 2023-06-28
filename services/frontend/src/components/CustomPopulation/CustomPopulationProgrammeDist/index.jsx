@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { Progress } from 'semantic-ui-react'
 import { arrayOf, string, shape } from 'prop-types'
 import SearchResultTable from '../../SearchResultTable'
-import { getNewestProgramme, getTextIn } from '../../../common'
+import { getNewestProgramme } from '../../../common'
 import useLanguage from '../../LanguagePicker/useLanguage'
 import useFilters from '../../FilterView/useFilters'
 import { isProgrammeSelected, toggleProgrammeSelection } from '../../FilterView/filters/programmes'
@@ -16,7 +16,7 @@ const CustomPopulationProgrammeDist = ({
   populationStatistics,
   coursecode,
 }) => {
-  const { language } = useLanguage()
+  const { getTextIn } = useLanguage()
 
   const [tableRows, setRows] = useState([])
 
@@ -59,7 +59,7 @@ const CustomPopulationProgrammeDist = ({
         }
       })
       const rows = Object.entries(allProgrammes).map(([code, { programme, students }]) => [
-        getTextIn(programme.name, language),
+        getTextIn(programme.name),
         code,
         students.length,
         <Progress

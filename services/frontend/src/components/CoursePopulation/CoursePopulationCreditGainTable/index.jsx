@@ -5,16 +5,16 @@ import { Table, Tab } from 'semantic-ui-react'
 import { maxBy } from 'lodash'
 import InfoBox from '../../Info/InfoBox'
 import infotooltips from '../../../common/InfoToolTips'
-import { getNewestProgramme, getTextIn } from '../../../common'
+import { getNewestProgramme } from '../../../common'
 import useLanguage from '../../LanguagePicker/useLanguage'
 
 const CreditGainTableRow = ({ statistics, code }) => {
-  const { language } = useLanguage()
+  const { getTextIn } = useLanguage()
 
   return (
     <Table.Row key={code} value={statistics.students.length}>
       <Table.Cell>
-        {code}, {getTextIn(statistics.name, language)}
+        {code}, {getTextIn(statistics.name)}
       </Table.Cell>
       <Table.Cell>{statistics.students.length}</Table.Cell>
       <Table.Cell>{statistics.credits}</Table.Cell>

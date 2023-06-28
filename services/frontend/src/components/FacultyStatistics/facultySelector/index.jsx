@@ -3,13 +3,12 @@ import { Link } from 'react-router-dom'
 import { debounce } from 'lodash'
 import { Message, Header, Form } from 'semantic-ui-react'
 import useLanguage from 'components/LanguagePicker/useLanguage'
-import { getTextIn } from '../../../common'
 import SortableTable from '../../SortableTable'
 
 const FacultySelector = ({ faculties, selected }) => {
   const [filter, setFilter] = useState('')
   const [filteredFaculties, setFilteredFaculties] = useState([])
-  const { language } = useLanguage()
+  const { getTextIn, language } = useLanguage()
 
   const handleFilterChange = debounce(value => {
     setFilter(value)
@@ -64,7 +63,7 @@ const FacultySelector = ({ faculties, selected }) => {
     {
       key: 'facultyname',
       title: 'name',
-      getRowVal: faculty => getTextIn(faculty.name, language),
+      getRowVal: faculty => getTextIn(faculty.name),
       getRowContent: faculty => (
         <Link
           style={{
@@ -76,7 +75,7 @@ const FacultySelector = ({ faculties, selected }) => {
           }}
           to={`/faculties/${faculty.code}`}
         >
-          {getTextIn(faculty.name, language)}
+          {getTextIn(faculty.name)}
         </Link>
       ),
       cellProps: {

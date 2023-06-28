@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { withRouter, useLocation, useHistory } from 'react-router-dom'
 import { Message, Icon } from 'semantic-ui-react'
-import useLanguage from 'components/LanguagePicker/useLanguage'
 import { useTitle } from '../../common/hooks'
 import CompletedCoursesSearch from './CompletedCoursesSearch'
 import CompletedCoursesSearchResults from './CompletedCoursesSearchResults'
@@ -9,7 +8,6 @@ import TSA from '../../common/tsa'
 
 const CompletedCourses = () => {
   useTitle('Search completed courses')
-  const { language } = useLanguage()
   const [searchValues, setValues] = useState({})
   const location = useLocation()
   const history = useHistory()
@@ -46,7 +44,7 @@ const CompletedCourses = () => {
 
       <div style={{ paddingTop: '25px' }}>
         {searchValues && searchValues.courseList?.length > 0 && searchValues.studentList?.length > 0 && (
-          <CompletedCoursesSearchResults searchValues={searchValues} language={language} />
+          <CompletedCoursesSearchResults searchValues={searchValues} />
         )}
       </div>
     </div>

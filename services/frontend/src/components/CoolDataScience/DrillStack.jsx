@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { useLocation, useHistory } from 'react-router-dom'
 import { Breadcrumb, Icon } from 'semantic-ui-react'
 import _ from 'lodash'
-import { getTextIn } from '../../common'
+import useLanguage from 'components/LanguagePicker/useLanguage'
 import TSA from '../../common/tsa'
 
 const ANALYTICS_CATEGORY = 'Trends'
@@ -14,6 +14,7 @@ const getP = (a, b) => {
 }
 
 const DrillStack = ({ data, renderCard, historyKey }) => {
+  const { getTextIn } = useLanguage()
   const history = useHistory()
   const location = useLocation()
 

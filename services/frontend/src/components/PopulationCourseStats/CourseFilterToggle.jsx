@@ -4,10 +4,9 @@ import { useSelector } from 'react-redux'
 import { isCourseSelected, toggleCourseSelection } from 'components/FilterView/filters/courses'
 import FilterToggleIcon from 'components/FilterToggleIcon'
 import useFilters from 'components/FilterView/useFilters'
-import { getTextIn } from '../../common'
 
 const CourseFilterToggle = ({ course }) => {
-  const { language } = useSelector(({ settings }) => settings)
+  const { getTextIn } = useSelector(({ settings }) => settings)
   const { useFilterSelector, filterDispatch } = useFilters()
 
   const isActive = useFilterSelector(isCourseSelected(course.code))
@@ -24,11 +23,11 @@ const CourseFilterToggle = ({ course }) => {
       content={
         isActive ? (
           <span>
-            Poista rajaus kurssin <b>{getTextIn(course.name, language)}</b> perusteella
+            Poista rajaus kurssin <b>{getTextIn(course.name)}</b> perusteella
           </span>
         ) : (
           <span>
-            Rajaa opiskelijat kurssin <b>{getTextIn(course.name, language)}</b> perusteella
+            Rajaa opiskelijat kurssin <b>{getTextIn(course.name)}</b> perusteella
           </span>
         )
       }

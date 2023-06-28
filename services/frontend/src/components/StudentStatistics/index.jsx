@@ -2,7 +2,6 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Segment, Header } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
-import useLanguage from 'components/LanguagePicker/useLanguage'
 import { findStudents, getStudent, selectStudent } from '../../redux/students'
 import StudentSearch from './StudentSearch'
 import StudentDetails from './StudentDetails'
@@ -13,7 +12,6 @@ import { toggleStudentNameVisibility } from '../../redux/settings'
 const StudentStatistics = props => {
   const { match } = props
   const { studentNumber } = match.params
-  const { language } = useLanguage()
   useTitle('Student statistics')
 
   return (
@@ -23,7 +21,7 @@ const StudentStatistics = props => {
       </Header>
       <StudentNameVisibilityToggle />
       <Segment className="contentSegment">
-        <StudentSearch studentNumber={studentNumber} language={language} />
+        <StudentSearch studentNumber={studentNumber} />
         <StudentDetails studentNumber={studentNumber} />
       </Segment>
     </div>

@@ -3,7 +3,6 @@ import { Dropdown } from 'semantic-ui-react'
 import fp from 'lodash/fp'
 import _ from 'lodash'
 import moment from 'moment'
-import { getTextIn } from '../../../common'
 import useLanguage from '../../LanguagePicker/useLanguage'
 import createFilter from './createFilter'
 
@@ -22,7 +21,7 @@ const ProgrammeFilterCard = ({
   studentToProgrammeMap,
   additionalModes,
 }) => {
-  const { language } = useLanguage()
+  const { getTextIn } = useLanguage()
   const { selectedProgrammes } = options
   const name = 'programmeFilterCard'
 
@@ -58,11 +57,11 @@ const ProgrammeFilterCard = ({
           const studentCount = program?.studentCount ?? -1
           return {
             key: `programme-filter-value-${code}`,
-            text: getTextIn(name, language),
+            text: getTextIn(name),
             value: code,
             content: (
               <>
-                {getTextIn(name, language)}{' '}
+                {getTextIn(name)}{' '}
                 <span style={{ color: 'rgb(136, 136, 136)', whiteSpace: 'nowrap' }}>({studentCount} students)</span>
               </>
             ),
@@ -71,7 +70,7 @@ const ProgrammeFilterCard = ({
         .uniqBy('value')
         .sort((a, b) => a.text.localeCompare(b.text))
         .value(),
-    [programmes, language]
+    [programmes]
   )
 
   const handleChange = (_, { value }) => {

@@ -8,7 +8,6 @@ import './populationCourseStats.css'
 import { PopulationCourseContext } from './PopulationCourseContext'
 import TSA from '../../common/tsa'
 import GradeDistribution from './GradeDistribution'
-import { getTextIn } from '../../common'
 import useLanguage from '../LanguagePicker/useLanguage'
 import PassFailEnrollments from './PassFailEnrollments'
 
@@ -37,7 +36,7 @@ const lodashSortOrderTypes = {
   DESC: 'desc',
 }
 
-const updateCourseStatisticsCriteria = (courseStats, language, state) => {
+const updateCourseStatisticsCriteria = (courseStats, language, state, getTextIn) => {
   if (!courseStats) {
     return []
   }
@@ -54,7 +53,7 @@ const updateCourseStatisticsCriteria = (courseStats, language, state) => {
   }
   const courseNameFilter = ({ course }) => {
     const { name } = course
-    return getTextIn(name, language).toLowerCase().includes(nameFilter.toLowerCase())
+    return getTextIn(name).toLowerCase().includes(nameFilter.toLowerCase())
   }
 
   const filteredCourses =
@@ -88,7 +87,7 @@ const initialState = props => ({
 const PopulationCourseStatsFlat = ({ courses, pending, filteredStudents, showFilter = true }) => {
   const dispatch = useDispatch()
   const semesterRequest = useGetSemestersQuery()
-  const { language } = useLanguage()
+  const { getTextIn } = useLanguage()
 
   const years = semesterRequest.isLoading ? [] : semesterRequest.data.years
 
@@ -107,8 +106,8 @@ const PopulationCourseStatsFlat = ({ courses, pending, filteredStudents, showFil
   const [state, setState] = useState(initialState(props))
 
   const courseStatistics = useMemo(
-    () => updateCourseStatisticsCriteria(courses?.coursestatistics, language, state),
-    [courses, language, state]
+    () => updateCourseStatisticsCriteria(courses?.coursestatistics, state, getTextIn),
+    [courses, state]
   )
 
   useEffect(() => {

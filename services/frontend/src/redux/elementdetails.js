@@ -1,5 +1,6 @@
 import { RTKApi } from 'apiConnection'
-import { getTextIn, getUnifiedProgrammeName } from 'common'
+import { getUnifiedProgrammeName } from 'common'
+import useLanguage from 'components/LanguagePicker/useLanguage'
 import { callController } from '../apiConnection'
 
 // original elementdetail stuff
@@ -52,8 +53,9 @@ const elementDetailsApi = RTKApi.injectEndpoints({
 export const { useGetAllElementDetailsQuery } = elementDetailsApi
 
 // Returns only newest studyprogrammes and formats them to be used in semantic ui dropdowns
-export const useFilteredAndFormattedElementDetails = language => {
+export const useFilteredAndFormattedElementDetails = () => {
   const { data, isLoading } = useGetAllElementDetailsQuery()
+  const { language, getTextIn } = useLanguage()
   const filteredAndFormatted = isLoading
     ? []
     : data
@@ -62,7 +64,7 @@ export const useFilteredAndFormattedElementDetails = language => {
           key: elem.code,
           value: elem.code,
           description: elem.code,
-          text: getTextIn(elem.name, language),
+          text: getTextIn(elem.name),
         }))
   // create options for combined programmes
   const combinedProgrammeCodes = ['KH90_001', 'MH90_001']
@@ -81,8 +83,8 @@ export const useFilteredAndFormattedElementDetails = language => {
             value: 'KH90_001+MH90_001',
             description: 'KH90_001+MH90_001',
             text: getUnifiedProgrammeName(
-              getTextIn(dataForCombined.KH90_001, language),
-              getTextIn(dataForCombined.MH90_001, language),
+              getTextIn(dataForCombined.KH90_001),
+              getTextIn(dataForCombined.MH90_001),
               language
             ),
           },
