@@ -3,6 +3,7 @@ import moment from 'moment'
 import { Loader, Icon } from 'semantic-ui-react'
 import { useGetOpenUniCourseStudentsQuery } from 'redux/openUniPopulations'
 import SortableTable from 'components/SortableTable'
+import useLanguage from 'components/LanguagePicker/useLanguage'
 
 const getTableData = studentsData => {
   return Object.keys(studentsData).reduce(
@@ -20,7 +21,7 @@ const getTableData = studentsData => {
   )
 }
 
-const getColumns = (labelsToCourses, language) => {
+const getColumns = (labelsToCourses, getTextIn) => {
   const style = {
     verticalAlign: 'middle',
     textAlign: 'center',
@@ -126,17 +127,17 @@ const getColumns = (labelsToCourses, language) => {
   }
 
   const columnsToShow = labelsToCourses.map(course => ({
-    key: `${course.label}-${course.name[language]}`,
+    key: `${course.label}-${getTextIn(course.name)}`,
     title: (
       <div style={{ maxWidth: '15em', whiteSpace: 'normal', overflow: 'hidden', width: 'max-content' }}>
         <div>{course.label}</div>
       </div>
     ),
-    textTitle: `${course.label}-${course.name[language]}`,
+    textTitle: `${course.label}-${getTextIn(course.name)}`,
     vertical: false,
     forceToolsMode: 'dangling',
     cellProps: s => findProp(s, course.label),
-    headerProps: { title: `${course.label}-${course.name[language]}` },
+    headerProps: { title: `${course.label}-${getTextIn(course.name)}` },
     getRowVal: s => {
       return findRowValue(s, course.label)
     },
@@ -147,12 +148,12 @@ const getColumns = (labelsToCourses, language) => {
   }))
 
   const columnsToHide = labelsToCourses.map(course => ({
-    key: `hidden-${course.label}-${course.name[language]}`,
+    key: `hidden-${course.label}-${getTextIn(course.name)}`,
     export: true,
     displayColumn: false,
-    textTitle: `Dates-${course.label}-${course.name[language]}`,
+    textTitle: `Dates-${course.label}-${getTextIn(course.name)}`,
     headerProps: {
-      title: `Dates-${course.label}-${course.name[language]}`,
+      title: `Dates-${course.label}-${getTextIn(course.name)}`,
     },
     getRowVal: s => {
       return findRowValue(s, course.label, true)
@@ -199,10 +200,10 @@ const getColumns = (labelsToCourses, language) => {
   return columns
 }
 
-const OpenUniPopulationResults = ({ fieldValues, language }) => {
+const OpenUniPopulationResults = ({ fieldValues }) => {
   const { courseList, startdate, enddate } = fieldValues
   const [tableData, setData] = useState({ data: [], columns: [] })
-
+  const { getTextIn, language } = useLanguage()
   const openUniStudentStats = useGetOpenUniCourseStudentsQuery({ courseList, startdate, enddate })
   const isFetchingOrLoading = openUniStudentStats.isLoading || openUniStudentStats.isFetching
   const isError = openUniStudentStats.isError || (openUniStudentStats.isSuccess && !openUniStudentStats.data)
@@ -213,11 +214,11 @@ const OpenUniPopulationResults = ({ fieldValues, language }) => {
       const labelsToCourses = [...unOrderedlabels].sort((a, b) => a.label.localeCompare(b.label))
       setImmediate(() => {
         const data = getTableData(openUniStudentStats?.data.students)
-        const columns = getColumns(labelsToCourses, language)
+        const columns = getColumns(labelsToCourses, getTextIn)
         setData({ data, columns })
       })
     }
-  }, [openUniStudentStats])
+  }, [openUniStudentStats, language])
 
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
   if (isFetchingOrLoading) return <Loader active style={{ marginTop: '15em' }} />
