@@ -448,18 +448,34 @@ const studyplanMapper =
                     .filter(courseUnit => moduleIdToParentModuleCode[courseUnit.parentModuleId] === code)
                     .filter(({ substituteFor }) => !substituteFor.length) // Filter out CUs used to substitute another CU
                     .map(({ substitutedBy, courseUnitId }) => {
-                      if (substitutedBy.length)
-                        return courseUnitIdToAttainment[substitutedBy[0]]
-                          ? courseUnitIdToAttainment[substitutedBy[0]][studyplan.user_id]
-                          : []
-                      if (!courseUnitIdToAttainment[courseUnitId]) {
-                        // Sometimes course_unit_id is not the same in attainment and hops courses.
-                        // Filter by comparing the codes and change course_unit_id to attainment course_unit_id
+                      if (substitutedBy.length) {
+                        let substitutedId = substitutedBy[0]
                         const attainment = attainments.filter(
-                          att => courseUnitIdToCode[att.course_unit_id] === courseUnitIdToCode[courseUnitId]
+                          att => courseUnitIdToCode[att.course_unit_id] === courseUnitIdToCode[substitutedId]
                         )
                         if (attainment.length > 0) {
-                          courseUnitId = attainment[0].course_unit_id
+                          const correctAttainment = attainment.filter(
+                            att => att.state === 'ATTAINED' && att.type === 'CourseUnitAttainment'
+                          )
+                          if (correctAttainment.length > 0) {
+                            substitutedId = correctAttainment[0].course_unit_id
+                          }
+                        }
+                        return courseUnitIdToAttainment[substitutedId]
+                          ? courseUnitIdToAttainment[substitutedId][studyplan.user_id]
+                          : []
+                      }
+                      // Sometimes course_unit_id is not the same in attainment and hops courses.
+                      // Filter by comparing the codes and change course_unit_id to attainment course_unit_id
+                      const attainment = attainments.filter(
+                        att => courseUnitIdToCode[att.course_unit_id] === courseUnitIdToCode[courseUnitId]
+                      )
+                      if (attainment.length > 0) {
+                        const correctAttainment = attainment.filter(
+                          att => att.state === 'ATTAINED' && att.type === 'CourseUnitAttainment'
+                        )
+                        if (correctAttainment.length > 0) {
+                          courseUnitId = correctAttainment[0].course_unit_id
                         }
                       }
                       return courseUnitIdToAttainment[courseUnitId]
