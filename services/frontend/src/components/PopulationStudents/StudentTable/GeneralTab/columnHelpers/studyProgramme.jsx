@@ -68,7 +68,12 @@ const getStudyProgrammeFunctions = ({
     if (coursecode?.length > 0) {
       const programmesAtEnrollment = getProgrammesAtEnrollment(student)
 
-      if (programmesAtEnrollment !== null) return programmesAtEnrollment
+      if (
+        programmesAtEnrollment !== null &&
+        programmesAtEnrollment?.length > 0 &&
+        !programmesAtEnrollment[0].code.startsWith('0000')
+      )
+        return programmesAtEnrollment
       return getProgrammesAtCompletion(student)
     }
     return getAllProgrammesOfStudent(student.studyrights, student.studentNumber, null, elementDetails)
@@ -93,8 +98,6 @@ const getStudyProgrammeFunctions = ({
     res[sn] = {
       programmes: getStudentsProgrammes(students[sn]),
     }
-
-    // if (coursecode?.length > 0) res[sn].programmes = res[sn].programmes.filter(p => p.active)
 
     const programmeToShow = getProgrammeToShow(res[sn].programmes)
 
