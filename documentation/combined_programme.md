@@ -8,7 +8,7 @@ Basic rule of thumb is that for the master/licentiate programme I used names `co
 
 ## Study programme
 
-**Needs manual work** in the function `getCombinedProgrammeId` in `services/frontend/src/common/index.js` if new programmes is added.
+**Needs manual work** in the function `getCombinedProgrammeId` in `services/frontend/src/common/index.js` if new programmes is added. For showing the both programme data correctly, the filtering mechanism is changed to add both programmes and it is not caring for which programme user has acual rights or IAMrights. However, the links for the class stats level are hidden in studytrack tables, if the user has no rights for the programme.
 
 - Search by class
   - **Needs manual work** Combine programmes here
@@ -19,7 +19,7 @@ Basic rule of thumb is that for the master/licentiate programme I used names `co
 
 - Updates automatically combined programme stats. **Needs manual work** here `services/backend/src/services/studyprogrammeHelpers.js` in the constant `combinedStudyprogrammes`. This might needs refactoring if bachelor programme can have many separate master programmes. Then remember to change function `refreshNewOverview` in `services/backend/src/events.js` accordingly to handle lists.
 
-**NOTE:** `combinedStudyprogrammes` is also used to fetch course modules (mandatory courses). If the logic of this constant is changed in `studyProgrammeHelpers.js` -> the needed changes must be done also here `services/backend/src/services/programmeModules.js`. While writing this, the cleverer idea of doing this might have been to send `code` in form `KHxx_xxx+MHxx_xxx` and do the splitting into two codes in the backend as done in Study guidance groups logic.
+**NOTE:** `combinedStudyprogrammes` is also used to fetch course modules (mandatory courses). If the logic of this constant is changed in `studyProgrammeHelpers.js` -> the needed changes must be done also here `services/backend/src/services/programmeModules.js`. While writing this, the cleverer idea of doing this might have been to send `code` in form `KHxx_xxx+MHxx_xxx` and do the splitting into two codes in the backend as done in Study guidance groups logic. Changes were done here 'services/backend/src/routes/population.js', acual place is near `getFilteredAssociations` function.
 
 **Basic information**
 
