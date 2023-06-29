@@ -41,6 +41,12 @@ const studyRightHasDegreeEducation = studyRight => {
   if (!education) return false
   const educationType = getEducationType(education.education_type)
   if (!educationType) return false
+  if (
+    educationType.id === 'urn:code:education-type:non-degree-education:exchange-studies-postgraduate' ||
+    educationType.id === 'urn:code:education-type:non-degree-education:exchange-studies'
+  ) {
+    return true
+  }
   return educationType.parent_id !== 'urn:code:education-type:non-degree-education'
 }
 
@@ -194,7 +200,6 @@ const updateStudents = async personIds => {
   ])
 
   const parsedStudyrightSnapshots = parseStudyrightSnapshots(studyrightSnapshots)
-
   const groupedStudyRightSnapshots = groupStudyrightSnapshots(parsedStudyrightSnapshots)
 
   const personIdToStudentNumber = students.reduce((res, curr) => {
