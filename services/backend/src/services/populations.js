@@ -955,6 +955,7 @@ const formatStudentsForApi = async (
     courses,
     elementdetails,
   }
+
   return returnvalue
 }
 
@@ -1001,6 +1002,7 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
         !transferredStudents,
         true
       )
+
   const code = studyRights[0] || ''
   let optionData = {}
   let criteria = {}

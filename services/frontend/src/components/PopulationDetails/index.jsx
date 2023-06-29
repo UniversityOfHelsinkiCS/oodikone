@@ -85,7 +85,11 @@ const PopulationDetails = ({
     return null
   }
 
-  const onlyIamRights = !authLoading && !isAdmin && !rights.includes(query?.studyRights?.programme)
+  const onlyIamRights =
+    !authLoading &&
+    !isAdmin &&
+    !rights.includes(query?.studyRights?.programme) &&
+    !rights.includes(query?.studyRights?.combinedProgramme)
 
   const panels = [
     {

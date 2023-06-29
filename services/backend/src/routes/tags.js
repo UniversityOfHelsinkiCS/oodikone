@@ -145,7 +145,8 @@ router.delete('/studenttags/delete_one', async (req, res) => {
     user: { rights, roles, id },
   } = req
 
-  if (!rights.includes(studytrack) && !roles?.includes('admin')) return res.status(403).end()
+  if (!rights.includes(studytrack) && !rights.includes(combinedProgramme) && !roles?.includes('admin'))
+    return res.status(403).end()
   const studytrackCode = combinedProgramme ? `${studytrack}-${combinedProgramme}` : studytrack
   const tags = await Tags.findTagsFromStudytrackById(studytrackCode, [tag_id])
   if (tags.length === 0) return res.status(403).json({ error: 'The tag does not exist' })
@@ -161,7 +162,8 @@ router.delete('/studenttags/delete_many', async (req, res) => {
     user: { rights, roles, id },
   } = req
 
-  if (!rights.includes(studytrack) && !roles?.includes('admin')) return res.status(403).end()
+  if (!rights.includes(studytrack) && !rights.includes(combinedProgramme) && !roles?.includes('admin'))
+    return res.status(403).end()
   const studytrackCode = combinedProgramme ? `${studytrack}-${combinedProgramme}` : studytrack
   const tags = await Tags.findTagsFromStudytrackById(studytrackCode, [tagId])
   if (tags.length === 0) return res.status(403).json({ error: 'The tag does not exist' })

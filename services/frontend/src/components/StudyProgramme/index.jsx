@@ -95,7 +95,7 @@ const StudyProgramme = props => {
       ),
     })
 
-    if (isAdmin || rights.includes(programmeId)) {
+    if (isAdmin || rights.includes(programmeId) || rights.includes(secondProgrammeId)) {
       panes.push({
         menuItem: <Menu.Item key="Programme courses">Programme courses</Menu.Item>,
         render: () => (

@@ -55,7 +55,10 @@ const PopulationSearchForm = props => {
   const { query, isLoading, momentYear } = totalState
 
   const { studyProgrammes, location, queries, history, language, onProgress } = props
-  if (studyProgrammes.KH90_001 && !Object.keys(studyProgrammes).includes('KH90_001+MH90_001')) {
+  if (
+    (studyProgrammes.KH90_001 || studyProgrammes.MH90_001) &&
+    !Object.keys(studyProgrammes).includes('KH90_001+MH90_001')
+  ) {
     const vetenaryCombined = { ...studyProgrammes.KH90_001 }
     vetenaryCombined.name = {
       fi: 'Eläinlääketieteen kandiohjelma ja lisensiaatin koulutusohjelma',
