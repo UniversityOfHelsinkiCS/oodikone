@@ -75,12 +75,13 @@ const getFirstCell = ({
   combinedProgramme,
   setShow,
   allRights,
+  isAdmin,
 }) => {
   return (
     <Table.Cell key={getKey(year)} className={getCellClass(year)} onClick={setShow}>
       {yearlyData.length > 1 && <Icon name={`${show ? 'angle down' : 'angle right'}`} />}
       {year}
-      {(allRights.includes(studyprogramme) || allRights.includes(combinedProgramme)) && (
+      {(isAdmin || allRights.includes(studyprogramme) || allRights.includes(combinedProgramme)) && (
         <PopulationLink
           studyprogramme={studyprogramme}
           year={year}
@@ -101,6 +102,7 @@ const getSingleTrackRow = ({
   combinedProgramme,
   otherCountriesStats,
   allRights,
+  isAdmin,
 }) => {
   return (
     <Table.Row key={getKey(row[0])} className="regular-row">
@@ -124,15 +126,16 @@ const getSingleTrackRow = ({
             key={getKey(row[0])}
           >
             {value}
-            {index === 0 && (allRights.includes(studyprogramme) || allRights.includes(combinedProgramme)) && (
-              <PopulationLink
-                studyprogramme={studyprogramme}
-                year={row[0]}
-                studytrack={code}
-                years={calendarYears}
-                combinedProgramme={combinedProgramme}
-              />
-            )}
+            {index === 0 &&
+              (isAdmin || allRights.includes(studyprogramme) || allRights.includes(combinedProgramme)) && (
+                <PopulationLink
+                  studyprogramme={studyprogramme}
+                  year={row[0]}
+                  studytrack={code}
+                  years={calendarYears}
+                  combinedProgramme={combinedProgramme}
+                />
+              )}
           </Table.Cell>
         )
       })}
@@ -154,6 +157,7 @@ const getRow = ({
   otherCountriesStats,
   getTextIn,
   allRights,
+  isAdmin,
 }) => {
   const year = yearlyData && yearlyData[0] && yearlyData[0][0]
   // Get row for the studyprogramme
@@ -172,6 +176,7 @@ const getRow = ({
               combinedProgramme,
               setShow,
               allRights,
+              isAdmin,
             })
           if (index === row.length - 2 && otherCountriesStats)
             return getCountriesPopup({
@@ -201,7 +206,7 @@ const getRow = ({
             return (
               <Table.Cell textAlign="left" style={{ paddingLeft: '50px' }} key={getKey(row[0])}>
                 {title}
-                {(allRights.includes(studyprogramme) || allRights.includes(combinedProgramme)) && (
+                {(isAdmin || allRights.includes(studyprogramme) || allRights.includes(combinedProgramme)) && (
                   <PopulationLink
                     studyprogramme={studyprogramme}
                     year={year}
@@ -285,7 +290,7 @@ const StudytrackDataTable = ({
   const [show, setShow] = useState([])
   const [showPercentages, setShowPercentages] = useState(false)
   const { getTextIn } = useLanguage()
-  const { rights, iamRights } = useGetAuthorizedUserQuery()
+  const { rights, iamRights, isAdmin } = useGetAuthorizedUserQuery()
   const allRights = rights.concat(iamRights)
   if (!dataOfAllTracks && !dataOfSingleTrack) return null
   const firstCellClicked = index => {
@@ -368,6 +373,7 @@ const StudytrackDataTable = ({
                     combinedProgramme,
                     otherCountriesStats,
                     allRights,
+                    isAdmin,
                   })
                 )
               : sortedMainStats?.map((yearlyData, index) =>
@@ -387,6 +393,7 @@ const StudytrackDataTable = ({
                       getTextIn,
                       index,
                       allRights,
+                      isAdmin,
                     })
                   )
                 )}
