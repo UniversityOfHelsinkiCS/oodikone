@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Icon, Popup, Table } from 'semantic-ui-react'
 
 import useLanguage from 'components/LanguagePicker/useLanguage'
+import { useGetAuthorizedUserQuery } from 'redux/auth'
 import PopulationLink from './PopulationLink'
 import Toggle from '../Toggle'
 
@@ -65,17 +66,28 @@ const getCountriesPopup = ({ index, combinedProgramme, value, row, year, studypr
   )
 }
 
-const getFirstCell = ({ yearlyData, year, show, studyprogramme, calendarYears, combinedProgramme, setShow }) => {
+const getFirstCell = ({
+  yearlyData,
+  year,
+  show,
+  studyprogramme,
+  calendarYears,
+  combinedProgramme,
+  setShow,
+  allRights,
+}) => {
   return (
     <Table.Cell key={getKey(year)} className={getCellClass(year)} onClick={setShow}>
       {yearlyData.length > 1 && <Icon name={`${show ? 'angle down' : 'angle right'}`} />}
       {year}
-      <PopulationLink
-        studyprogramme={studyprogramme}
-        year={year}
-        years={calendarYears}
-        combinedProgramme={combinedProgramme}
-      />
+      {(allRights.includes(studyprogramme) || allRights.includes(combinedProgramme)) && (
+        <PopulationLink
+          studyprogramme={studyprogramme}
+          year={year}
+          years={calendarYears}
+          combinedProgramme={combinedProgramme}
+        />
+      )}
     </Table.Cell>
   )
 }
@@ -88,6 +100,7 @@ const getSingleTrackRow = ({
   calendarYears,
   combinedProgramme,
   otherCountriesStats,
+  allRights,
 }) => {
   return (
     <Table.Row key={getKey(row[0])} className="regular-row">
@@ -111,7 +124,7 @@ const getSingleTrackRow = ({
             key={getKey(row[0])}
           >
             {value}
-            {index === 0 && (
+            {index === 0 && (allRights.includes(studyprogramme) || allRights.includes(combinedProgramme)) && (
               <PopulationLink
                 studyprogramme={studyprogramme}
                 year={row[0]}
@@ -140,6 +153,7 @@ const getRow = ({
   combinedProgramme,
   otherCountriesStats,
   getTextIn,
+  allRights,
 }) => {
   const year = yearlyData && yearlyData[0] && yearlyData[0][0]
   // Get row for the studyprogramme
@@ -157,6 +171,7 @@ const getRow = ({
               calendarYears,
               combinedProgramme,
               setShow,
+              allRights,
             })
           if (index === row.length - 2 && otherCountriesStats)
             return getCountriesPopup({
@@ -186,13 +201,15 @@ const getRow = ({
             return (
               <Table.Cell textAlign="left" style={{ paddingLeft: '50px' }} key={getKey(row[0])}>
                 {title}
-                <PopulationLink
-                  studyprogramme={studyprogramme}
-                  year={year}
-                  years={calendarYears}
-                  studytrack={correctStudytrack}
-                  combinedProgramme={combinedProgramme}
-                />
+                {(allRights.includes(studyprogramme) || allRights.includes(combinedProgramme)) && (
+                  <PopulationLink
+                    studyprogramme={studyprogramme}
+                    year={year}
+                    years={calendarYears}
+                    studytrack={correctStudytrack}
+                    combinedProgramme={combinedProgramme}
+                  />
+                )}
               </Table.Cell>
             )
           }
@@ -268,8 +285,9 @@ const StudytrackDataTable = ({
   const [show, setShow] = useState([])
   const [showPercentages, setShowPercentages] = useState(false)
   const { getTextIn } = useLanguage()
+  const { rights, iamRights } = useGetAuthorizedUserQuery()
+  const allRights = rights.concat(iamRights)
   if (!dataOfAllTracks && !dataOfSingleTrack) return null
-
   const firstCellClicked = index => {
     const newShow = [...show]
     show[index] = newShow[index] === undefined ? true : !show[index]
@@ -349,6 +367,7 @@ const StudytrackDataTable = ({
                     calendarYears,
                     combinedProgramme,
                     otherCountriesStats,
+                    allRights,
                   })
                 )
               : sortedMainStats?.map((yearlyData, index) =>
@@ -367,6 +386,7 @@ const StudytrackDataTable = ({
                       otherCountriesStats,
                       getTextIn,
                       index,
+                      allRights,
                     })
                   )
                 )}

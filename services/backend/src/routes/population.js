@@ -200,7 +200,13 @@ router.get('/v3/populationstatistics', async (req, res) => {
   } = req
 
   try {
-    if (!isAdmin && !rights.includes(studyRights.programme) && !iamRights.includes(studyRights.programme)) {
+    if (
+      !isAdmin &&
+      !rights.includes(studyRights.programme) &&
+      !rights.includes(studyRights.combinedProgramme) &&
+      !iamRights.includes(studyRights.programme) &&
+      !iamRights.includes(studyRights.combinedProgramme)
+    ) {
       res.status(403).json([])
       return
     }
@@ -218,12 +224,15 @@ router.get('/v3/populationstatistics', async (req, res) => {
     const multipopulationstudentPromises = Promise.all(
       req.query.years.map(year => {
         const newMonths = (upperYearBound - Number(year)) * 12
-        const populationStudents = Population.optimizedStatisticsOf({
-          ...req.query,
-          studyRights: { programme: studyRights.programme },
-          year,
-          months: newMonths,
-        })
+        const populationStudents = Population.optimizedStatisticsOf(
+          {
+            ...req.query,
+            studyRights: { programme: studyRights.programme },
+            year,
+            months: newMonths,
+          },
+          null
+        )
         return populationStudents
       })
     )
@@ -251,7 +260,7 @@ router.get('/v3/populationstatistics', async (req, res) => {
     }
 
     // Obfuscate if user has only iam rights
-    if (!isAdmin && !rights.includes(studyRights.programme)) {
+    if (!isAdmin && !rights.includes(studyRights.programme) && !rights.includes(studyRights.combinedProgramme)) {
       result.students = result.students.map(student => {
         const { iv, encryptedData } = encrypt(student.studentNumber)
         const obfuscatedBirthDate = new Date(new Date(student.birthdate).setMonth(0, 0)) // only birth year for age distribution
@@ -431,7 +440,11 @@ router.get('/v3/populationstatistics/studyprogrammes', async (req, res) => {
     mapCodesToIds(studyrights.programmes)
     res.json(studyrights)
   } else {
-    const studyrights = await StudyrightService.getFilteredAssociations(rights.concat(iamRights))
+    const allRights = rights.concat(iamRights)
+    // For combined programme
+    // If more programmes are combined, then a function might be a better idea to add moar rights
+    if (allRights.includes('KH90_001') || allRights.includes('MH90_001')) allRights.push('KH90_001', 'MH90_001')
+    const studyrights = await StudyrightService.getFilteredAssociations(allRights)
     mapCodesToIds(studyrights.programmes)
     res.json(studyrights)
   }
