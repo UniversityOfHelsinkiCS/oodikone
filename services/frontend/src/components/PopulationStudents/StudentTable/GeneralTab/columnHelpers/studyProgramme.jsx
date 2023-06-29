@@ -105,7 +105,7 @@ const getStudyProgrammeFunctions = ({
           if (p.graduated) {
             return `${getTextIn(p.name)} (graduated)`
           }
-          if (!p.active) {
+          if (!p.active && !p.code?.startsWith('0000')) {
             return `${getTextIn(p.name)} (inactive)`
           }
           return getTextIn(p.name)
