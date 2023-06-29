@@ -167,7 +167,7 @@ const createDrillData = (storeData, showRelativeValues, getTextIn) => {
   return Object.values(storeData).map(item => ({
     key: item.code,
     label: getTextIn(item.name),
-    children: createDrillData(item.drill, getTextIn),
+    children: createDrillData(item.drill, showRelativeValues, getTextIn),
     currentValue: showRelativeValues ? item.current / item.currentStudents : item.current,
     previousValue: showRelativeValues ? item.previous / item.previousStudents : item.previous,
     ..._.omit(item, 'drill'),
