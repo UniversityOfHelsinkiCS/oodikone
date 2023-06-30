@@ -18,6 +18,17 @@ const { updateBasicView, updateStudytrackView } = require('../services/studyprog
 const { getProgrammeName } = require('../services/studyprogramme')
 const logger = require('../util/logger')
 const { getAssociations } = require('../services/studyrights')
+const { ElementDetail } = require('../models')
+
+// For grafana statistics (idea stolen from Norppa)
+const logInfoForGrafana = async (code, combinedProgramme) => {
+  const programme = await ElementDetail.findOne({ where: { code: code } })
+  const programmeCode = combinedProgramme ? `${programme.code}-${combinedProgramme}` : programme.code
+  logger.info('Study Programme', {
+    studyprogrammeName: combinedProgramme ? `{$programme.name.fi} + maisteri` : programme.name.fi,
+    studyprogrammeCode: programmeCode,
+  })
+}
 
 router.get('/v2/studyprogrammes/:id/basicstats', async (req, res) => {
   const code = req.params.id
@@ -26,6 +37,7 @@ router.get('/v2/studyprogrammes/:id/basicstats', async (req, res) => {
   const combinedProgramme = req.query?.combined_programme
   if (!code) return res.status(422).end()
 
+  logInfoForGrafana(code, combinedProgramme)
   const data = await getBasicStats(code, combinedProgramme, yearType, specialGroups)
   if (data) return res.json(data)
 
@@ -92,6 +104,7 @@ router.get('/v2/studyprogrammes/:id/coursestats', async (req, res) => {
   const date = new Date()
   date.setHours(23, 59, 59, 999)
 
+  logInfoForGrafana(code, combinedProgramme)
   try {
     const data = await getStudyprogrammeCoursesForStudytrack(date.getTime(), code, showByYear, combinedProgramme)
     return res.json(data)
@@ -108,6 +121,7 @@ router.get('/v2/studyprogrammes/:id/studytrackstats', async (req, res) => {
 
   if (!code) return res.status(422).end()
 
+  logInfoForGrafana(code, combinedProgramme)
   const data = await getStudytrackStats(code, combinedProgramme, graduated, specialGroups)
   if (data) return res.json(data)
 
