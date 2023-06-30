@@ -3,11 +3,8 @@ import { Item, Icon } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import InfoToolTips from 'common/InfoToolTips'
 import InfoBox from 'components/Info/InfoBox'
-import sendEvent from '../../../common/sendEvent'
 import useLanguage from '../../LanguagePicker/useLanguage'
 import SortableTable from '../../SortableTable'
-
-const sendAnalytics = sendEvent.populationStatistics
 
 const toolTips = InfoToolTips.Studyprogramme
 
@@ -43,10 +40,7 @@ const getColumns = (getTextIn, showStudents) => {
                       course.code
                     )}"]&separate=false&unifyOpenUniCourses=false`}
                   >
-                    <Icon
-                      name="level up alternate"
-                      onClick={() => sendAnalytics('Courses of Population course stats button clicked', course.code)}
-                    />
+                    <Icon name="level up alternate" />
                   </Item>
                 ),
               },
@@ -174,10 +168,7 @@ const getColumns = (getTextIn, showStudents) => {
                   course.code
                 )}"]&separate=false&unifyOpenUniCourses=false`}
               >
-                <Icon
-                  name="level up alternate"
-                  onClick={() => sendAnalytics('Courses of Population course stats button clicked', course.code)}
-                />
+                <Icon name="level up alternate" />
               </Item>
             ),
           },

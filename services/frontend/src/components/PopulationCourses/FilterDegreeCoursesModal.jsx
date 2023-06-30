@@ -2,16 +2,12 @@ import React, { useState } from 'react'
 import { func, object, string } from 'prop-types'
 import { Button, Icon, Modal, Container } from 'semantic-ui-react'
 import DegreeCoursesTable from '../StudyProgramme/DegreeCourses'
-import sendEvent from '../../common/sendEvent'
-
-const sendAnalytics = sendEvent.common
 
 const FilterDegreeCoursesModal = ({ studyProgramme, criteria, setCriteria }) => {
   const [open, setOpen] = useState(false)
 
   const setModalOpenState = state => {
     setOpen(state)
-    sendAnalytics('FilterDegreeCoursesModal visibility toggled', state)
   }
 
   return (

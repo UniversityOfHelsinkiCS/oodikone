@@ -2,13 +2,7 @@ import React from 'react'
 import { Popup, Icon } from 'semantic-ui-react'
 import { copyToClipboard } from 'common'
 
-export const getCopyableEmailColumn = ({
-  popupStates,
-  copyToClipboardAll,
-  sendAnalytics,
-  handlePopupOpen,
-  handlePopupClose,
-}) => {
+export const getCopyableEmailColumn = ({ popupStates, copyToClipboardAll, handlePopupOpen, handlePopupClose }) => {
   return {
     mergeHeader: true,
     merge: true,
@@ -59,7 +53,6 @@ export const getCopyableEmailColumn = ({
                   name="copy outline"
                   onClick={() => {
                     copyToClipboard(s.email)
-                    sendAnalytics("Copy student's email to clipboard", "Copy student's email to clipboard")
                   }}
                   style={{ float: 'right' }}
                 />

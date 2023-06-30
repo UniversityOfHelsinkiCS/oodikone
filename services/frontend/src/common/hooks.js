@@ -2,7 +2,6 @@ import React, { useCallback, useState, useEffect, useRef } from 'react'
 import { chunk, isEqual } from 'lodash'
 import qs from 'query-string'
 import { SEARCH_HISTORY_VERSION } from '../constants'
-import TSA from './tsa'
 
 export const usePrevious = value => {
   const ref = useRef()
@@ -12,19 +11,18 @@ export const usePrevious = value => {
   return ref.current
 }
 
-export const useTabChangeAnalytics = (category, action) => {
+export const useTabChangeAnalytics = () => {
   const previousTabIndex = React.useRef(0)
 
   const handleTabChange = useCallback(
     (_, data) => {
-      const { activeIndex, panes } = data
+      const { activeIndex } = data
 
       if (previousTabIndex.current !== activeIndex) {
-        TSA.Matomo.sendEvent(category, action, panes[activeIndex].menuItem)
         previousTabIndex.current = activeIndex
       }
     },
-    [category, action, previousTabIndex]
+    [previousTabIndex]
   )
 
   return { handleTabChange }

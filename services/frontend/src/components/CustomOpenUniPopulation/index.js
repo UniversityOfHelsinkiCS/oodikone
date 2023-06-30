@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { withRouter, useLocation, useHistory } from 'react-router-dom'
 import { Message, Icon, Loader } from 'semantic-ui-react'
 import moment from 'moment'
@@ -6,7 +6,6 @@ import { useGetSavedSearchesQuery } from 'redux/openUniPopulations'
 import OpenUniPopulationResults from './OpenUniPopulationResults'
 import { useTitle } from '../../common/hooks'
 import CustomOpenUniSearch from './CustomOpenUniSearch'
-import TSA from '../../common/tsa'
 
 const CustomOpenUniPopulation = () => {
   useTitle('Custom open uni population')
@@ -16,17 +15,6 @@ const CustomOpenUniPopulation = () => {
   const savedSearches = useGetSavedSearchesQuery()
   const isFetchingOrLoading = savedSearches.isLoading || savedSearches.isFetching
   const isError = savedSearches.isError || (savedSearches.isSuccess && !savedSearches.data)
-
-  useEffect(() => {
-    if (fieldValues && fieldValues.courseList?.length > 0) {
-      TSA.Influx.sendEvent({
-        group: 'Custom Open Uni Usage',
-        name: 'open uni populations',
-        label: 'openUniPopulations',
-        value: 1,
-      })
-    }
-  }, [fieldValues])
 
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
   if (isFetchingOrLoading) return <Loader active style={{ marginTop: '15em' }} />

@@ -51,7 +51,7 @@ const CreditGainStats = ({ filteredStudents, query, creditDateFilterOptions, yea
     )
   }, [filteredStudents])
 
-  const { handleTabChange } = useTabChangeAnalytics('Population statistics', 'Change Credit statistics tab')
+  const { handleTabChange } = useTabChangeAnalytics()
 
   return (
     <div id="credit-gain-stats">

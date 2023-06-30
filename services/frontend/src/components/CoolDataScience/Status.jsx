@@ -7,14 +7,10 @@ import useLanguage from 'components/LanguagePicker/useLanguage'
 import DrillStack from './DrillStack'
 import StatusCard from './StatusCard'
 import Toolbar from './Toolbar'
-import TSA from '../../common/tsa'
 import { useLocalStorage } from '../../common/hooks'
 import InfoToolTips from '../../common/InfoToolTips'
 import { getStatus } from '../../redux/coolDataScience'
 import './status.css'
-
-const ANALYTICS_CATEGORY = 'Trends'
-const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CATEGORY, action, name, value)
 
 const settingDefinitions = _.map(
   [
@@ -218,8 +214,6 @@ const Status = () => {
   }, [settings.showCountingFrom, settings.showByYear])
 
   const changeSetting = (property, value) => {
-    sendAnalytics(`S Set setting "${property}" to ${value}`, 'Status')
-
     if (settingDefinitions.find(s => s.key === property).persist === false) {
       setNonpersistentSettings({
         ...nonpersistentExplicitSettings,

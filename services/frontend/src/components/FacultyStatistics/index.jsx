@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { withRouter, useHistory } from 'react-router-dom'
 import { Segment, Header, Tab, Loader } from 'semantic-ui-react'
 import { useGetFacultiesQuery } from 'redux/facultyStats'
@@ -10,7 +10,6 @@ import ProgrammeOverview from './FacultyProgrammeOverview'
 import TimesAndPathsView from './TimesAndPaths'
 import UpdateView from './UpdateView'
 import useLanguage from '../LanguagePicker/useLanguage'
-import TSA from '../../common/tsa'
 
 const FacultyStatistics = props => {
   useTitle('Faculties')
@@ -31,19 +30,6 @@ const FacultyStatistics = props => {
   const [specialGroups, setSpecialGroups] = useState(false)
   const [graduatedGroup, setGraduatedGroup] = useState(false)
   const requiredRights = { rights, iamRights, isAdmin }
-  useEffect(() => {
-    if (!facultyName) {
-      return
-    }
-
-    TSA.Matomo.sendEvent('Faculty Usage', 'faculty overview', facultyName)
-    TSA.Influx.sendEvent({
-      group: 'Faculty Usage',
-      name: 'faculty overview',
-      label: facultyName,
-      value: 1,
-    })
-  }, [facultyName])
 
   const handleSelect = useCallback(
     faculty => {

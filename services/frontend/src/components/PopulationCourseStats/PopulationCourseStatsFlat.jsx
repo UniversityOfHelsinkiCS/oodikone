@@ -6,12 +6,9 @@ import { useGetSemestersQuery } from 'redux/semesters'
 import { clearCourseStats } from '../../redux/coursestats'
 import './populationCourseStats.css'
 import { PopulationCourseContext } from './PopulationCourseContext'
-import TSA from '../../common/tsa'
 import GradeDistribution from './GradeDistribution'
 import useLanguage from '../LanguagePicker/useLanguage'
 import PassFailEnrollments from './PassFailEnrollments'
-
-const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent('Population statistics', action, name, value)
 
 export const tableColumnNames = {
   STUDENTS: 'students',
@@ -152,11 +149,6 @@ const PopulationCourseStatsFlat = ({ courses, pending, filteredStudents, showFil
     clearTimeout(timer)
     setTimer(
       setTimeout(() => {
-        sendAnalytics(
-          'Courses of Population student count filter change',
-          'Courses of Population student count filter change',
-          value
-        )
         setState({
           ...state,
           studentAmountLimit: typeof Number(value) === 'number' ? Number(value) : state.studentAmountLimit,
@@ -177,8 +169,7 @@ const PopulationCourseStatsFlat = ({ courses, pending, filteredStudents, showFil
     })
   }
 
-  const onGoToCourseStatisticsClick = courseCode => {
-    sendAnalytics('Courses of Population course stats button clicked', courseCode)
+  const onGoToCourseStatisticsClick = () => {
     dispatch(clearCourseStats())
   }
 

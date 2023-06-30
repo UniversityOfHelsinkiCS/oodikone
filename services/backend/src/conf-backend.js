@@ -28,16 +28,6 @@ const baseUrl = isDev ? '/api' : ''
 const frontUrl = process.env.FRONT_URL
 const backendPort = 8080
 
-// Analytics
-const ANALYTICS_INFLUXDB_URL = process.env.ANALYTICS_INFLUXDB_URL
-const ANALYTICS_INFLUXDB_USER = process.env.ANALYTICS_INFLUXDB_USER
-const ANALYTICS_INFLUXDB_PASSWORD = process.env.ANALYTICS_INFLUXDB_PASSWORD
-const ANALYTICS_INFLUXDB_DB = process.env.ANALYTICS_INFLUXDB_DB
-
-// Matomo
-const MATOMO_SITE_ID = process.env.MATOMO_SITE_ID
-const MATOMO_URL = process.env.MATOMO_URL
-
 // Other stuff
 const DB_URL_KONE = process.env.DB_URL_KONE
 const DB_URL_USER = process.env.DB_URL_USER
@@ -56,12 +46,6 @@ const SECRET_TOKEN = process.env.SECRET_TOKEN
 const DB_SCHEMA_KONE = process.env.DB_SCHEMA_KONE || 'public'
 const SIS_UPDATER_URL = process.env.SIS_UPDATER_URL
 
-const formatURL = url => {
-  return !!url && !url.startsWith('http') ? `http://${url}` : url
-}
-
-const addSlashToEnd = url => (url.endsWith('/') ? url : url + '/')
-
 module.exports = {
   DB_URL_USER,
   DB_URL_KONE,
@@ -72,12 +56,6 @@ module.exports = {
   DB_SCHEMA_KONE,
   requiredGroup,
   SIS_UPDATER_URL,
-  ANALYTICS_INFLUXDB_URL: formatURL(ANALYTICS_INFLUXDB_URL),
-  ANALYTICS_INFLUXDB_USER,
-  ANALYTICS_INFLUXDB_PASSWORD,
-  ANALYTICS_INFLUXDB_DB,
-  MATOMO_SITE_ID,
-  MATOMO_URL: MATOMO_URL && addSlashToEnd(MATOMO_URL),
   runningInCI,
   sentryRelease,
   sentryEnvironment,

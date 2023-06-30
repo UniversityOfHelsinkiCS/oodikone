@@ -19,11 +19,8 @@ import TagList from '../TagList'
 import ProgressTable from './StudentTable/ProgressTab'
 import './populationStudents.css'
 import GeneralTab from './StudentTable/GeneralTab'
-import sendEvent, { ANALYTICS_CATEGORIES } from '../../common/sendEvent'
 import infotoolTips from '../../common/InfoToolTips'
 import CoursesTable from './StudentTable/CourseTab'
-
-const sendAnalytics = sendEvent.populationStudents
 
 const Panes = ({
   filteredStudents,
@@ -42,10 +39,7 @@ const Panes = ({
   months,
   year,
 }) => {
-  const { handleTabChange } = useTabChangeAnalytics(
-    ANALYTICS_CATEGORIES.populationStudents,
-    'Change students table tab'
-  )
+  const { handleTabChange } = useTabChangeAnalytics()
   const programmeForTagsLink =
     queryStudyrights?.length > 1 ? `${queryStudyrights[0]}+${queryStudyrights[1]}` : queryStudyrights[0]
   const programme = studyGuidanceGroup?.tags?.studyProgramme || ''
@@ -92,12 +86,7 @@ const Panes = ({
               >
                 <h3>
                   No tags defined. You can define them{' '}
-                  <Link
-                    to={`/study-programme/${programmeForTagsLink}?p_m_tab=0&p_tab=4`}
-                    onClick={() => {
-                      sendAnalytics('No tags defined button clicked', 'Tags tab')
-                    }}
-                  >
+                  <Link to={`/study-programme/${programmeForTagsLink}?p_m_tab=0&p_tab=4`} onClick={() => {}}>
                     here
                   </Link>
                   .

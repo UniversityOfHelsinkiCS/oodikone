@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react'
 import { initShibbolethPinger } from 'unfuck-spa-shibboleth-session'
 import * as Sentry from '@sentry/browser'
-import TSA from 'common/tsa'
 import Header from 'components/Header'
 import Routes from 'components/Routes'
 import SegmentDimmer from 'components/SegmentDimmer'
@@ -17,10 +16,6 @@ const addUserDetailsToLoggers = ({ id, userId, mockedBy }) => {
     username: userId,
     mockedBy,
   })
-  TSA.Matomo.setUserId(mockedBy || userId)
-  if (mockedBy) {
-    TSA.Matomo.sendEvent('Admin', 'Mocking user', userId)
-  }
 }
 
 const Layout = ({ children }) => (

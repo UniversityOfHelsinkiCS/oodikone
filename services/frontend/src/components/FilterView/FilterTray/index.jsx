@@ -1,7 +1,6 @@
 import React, { useContext } from 'react'
 import { Segment, Header, Button } from 'semantic-ui-react'
 import './filterTray.css'
-import TSA from '../../../common/tsa'
 import FilterViewContext from '../FilterViewContext'
 import FilterCard from '../filters/common/FilterCard'
 
@@ -17,7 +16,6 @@ const FilterTray = () => {
     resetFilters,
     getContextByKey,
     areOptionsDirty,
-    viewName,
   } = useContext(FilterViewContext)
 
   const haveOptionsBeenChanged = filters.some(({ key }) => areOptionsDirty(key))
@@ -32,13 +30,6 @@ const FilterTray = () => {
         options: ctx.options,
         onOptionsChange: options => {
           setFilterOptions(key, options)
-
-          TSA.Influx.sendEvent({
-            group: 'Filter usage',
-            name: key,
-            label: viewName,
-            value: 1,
-          })
         },
         withoutSelf: () => withoutFilter(key),
       }

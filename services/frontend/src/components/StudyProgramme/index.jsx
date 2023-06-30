@@ -13,7 +13,6 @@ import UpdateView from './UpdateView'
 import '../PopulationQueryCard/populationQueryCard.css'
 import { getUnifiedProgrammeName } from '../../common'
 import { useTabs, useTitle } from '../../common/hooks'
-import TSA from '../../common/tsa'
 import Tags from './Tags'
 
 import { getProgrammes } from '../../redux/populationProgrammes'
@@ -144,20 +143,6 @@ const StudyProgramme = props => {
   const programmeLetterId = programmes?.[programmeId]?.progId
   const secondProgrammeLetterId = programmes?.[secondProgrammeId]?.progId
   const panes = getPanes()
-
-  useEffect(() => {
-    if (!programmeName) {
-      return
-    }
-
-    TSA.Matomo.sendEvent('Programme Usage', 'study programme overview', programmeName)
-    TSA.Influx.sendEvent({
-      group: 'Programme Usage',
-      name: 'study programme overview',
-      label: programmeName,
-      value: 1,
-    })
-  }, [programmeName])
 
   if (!studyProgrammeId)
     return (

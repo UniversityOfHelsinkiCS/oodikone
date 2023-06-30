@@ -3,10 +3,6 @@ import { useLocation, useHistory } from 'react-router-dom'
 import { Breadcrumb, Icon } from 'semantic-ui-react'
 import _ from 'lodash'
 import useLanguage from 'components/LanguagePicker/useLanguage'
-import TSA from '../../common/tsa'
-
-const ANALYTICS_CATEGORY = 'Trends'
-const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CATEGORY, action, name, value)
 
 const getP = (a, b) => {
   if (a === 0 || b === 0) return 1
@@ -92,8 +88,6 @@ const DrillStack = ({ data, renderCard, historyKey }) => {
     history.push(location.pathname, {
       [historyKey]: newPath,
     })
-
-    sendAnalytics('S Drillup clicked', 'Status')
   }
 
   const stats = useMemo(() => {

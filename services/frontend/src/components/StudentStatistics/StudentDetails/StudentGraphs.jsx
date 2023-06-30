@@ -6,10 +6,6 @@ import ReactHighcharts from 'react-highcharts'
 import useLanguage from 'components/LanguagePicker/useLanguage'
 import CreditAccumulationGraphHighCharts from '../../CreditAccumulationGraphHighCharts'
 import { byDateDesc, reformatDate, getStudyRightElementTargetDates } from '../../../common'
-import TSA from '../../../common/tsa'
-
-const ANALYTICS_CATEGORY = 'Student stats'
-const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CATEGORY, action, name, value)
 
 const getEarliestAttainmentDate = ({ courses }) => {
   if (!courses) return null
@@ -152,7 +148,6 @@ const GradeGraph = ({ student, semesters }) => {
   const { getTextIn } = useLanguage()
   const [chunksize, setChunkSize] = useState(5)
   const [semester, setSemester] = useState(false)
-  sendAnalytics('Clicked grade graph', 'Student')
   const series = gradeMeanSeries(student, chunksize, semesters, getTextIn)
   const { mean, chunkMeans, semesterMeans } = series
 
@@ -202,7 +197,6 @@ const GradeGraph = ({ student, semesters }) => {
           onClick={() => {
             setChunky(false)
             setSemester(false)
-            sendAnalytics('Clicked total mean', 'Student')
           }}
         />
         <Menu.Item
@@ -211,7 +205,6 @@ const GradeGraph = ({ student, semesters }) => {
           onClick={() => {
             setChunky(true)
             setSemester(false)
-            sendAnalytics('Clicked group mean', 'Student')
           }}
         />
         <Menu.Item
@@ -220,7 +213,6 @@ const GradeGraph = ({ student, semesters }) => {
           onClick={() => {
             setChunky(false)
             setSemester(true)
-            sendAnalytics('Clicked semester mean', 'Student')
           }}
         />
       </Menu>

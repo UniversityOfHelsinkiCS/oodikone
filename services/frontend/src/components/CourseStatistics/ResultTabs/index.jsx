@@ -10,10 +10,6 @@ import { Tables, TablesSettings } from './Panes/tables'
 import { useProgress, useTabs } from '../../../common/hooks'
 
 import './resultTabs.css'
-import TSA from '../../../common/tsa'
-
-const ANALYTICS_CATEGORY = 'Course Statistics'
-const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CATEGORY, action, name, value)
 
 const PaneContent = ({
   component: Component,
@@ -81,9 +77,6 @@ const ResultTabs = ({ primary, comparison, history, separate, availableStats, lo
   const dispatch = useDispatch()
 
   const handleTabChange = (...params) => {
-    const { activeIndex } = params[1]
-    const currentTab = params[1].panes[activeIndex]
-    sendAnalytics(`Current tab '${currentTab.menuItem.content}'`, 'Course statistics')
     setTab(...params)
   }
 
