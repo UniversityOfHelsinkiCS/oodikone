@@ -1,9 +1,6 @@
 import React, { useState } from 'react'
 import { Button, Label, Table, Icon, Dropdown } from 'semantic-ui-react'
 import useLanguage from '../../LanguagePicker/useLanguage'
-import sendEvent from '../../../common/sendEvent'
-
-const sendAnalytics = sendEvent.degreeCourses
 
 const getYear = criterionYear => {
   if (criterionYear === 1) return 'yearOne'
@@ -60,7 +57,6 @@ const DegreeCourseTableView = ({
       color="blue"
       onClick={() => {
         deleteAll(module)
-        sendAnalytics('ShowAllButton pressed', module)
       }}
     >
       Set visible
@@ -72,7 +68,6 @@ const DegreeCourseTableView = ({
       color="blue"
       onClick={() => {
         excludeAll(module)
-        sendAnalytics('HideAllButton pressed', module)
       }}
     >
       Set hidden
@@ -82,7 +77,6 @@ const DegreeCourseTableView = ({
   const toggleVisible = code => {
     const newState = !visible[code]
     setVisible({ ...visible, [code]: newState })
-    sendAnalytics(newState ? 'Expanded group' : 'Collapsed group', code)
   }
 
   const calculateModuleVisibility = code => {
@@ -106,7 +100,6 @@ const DegreeCourseTableView = ({
         color="blue"
         onClick={() => {
           setExclusion(studyProgramme, excludeFromProgramme, [course.code])
-          sendAnalytics('Set hidden button pressed', studyProgramme, course.name.fi)
         }}
       >
         Set hidden
@@ -118,7 +111,6 @@ const DegreeCourseTableView = ({
       color="blue"
       onClick={() => {
         removeExclusion(studyProgramme, [course.visible.id])
-        sendAnalytics('Set visible button pressed', studyProgramme, course.name.fi)
       }}
     >
       Set visible

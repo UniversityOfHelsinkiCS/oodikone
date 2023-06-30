@@ -4,11 +4,8 @@ import { useSelector } from 'react-redux'
 import { Dropdown } from 'semantic-ui-react'
 import xlsx from 'xlsx'
 import { reformatDate, getStudentTotalCredits, getStudentToStudyrightStartMap } from '../../common'
-import sendEvent from '../../common/sendEvent'
 import { PRIORITYCODE_TEXTS } from '../../constants'
 import useLanguage from '../LanguagePicker/useLanguage'
-
-const sendAnalytics = sendEvent.populationStudents
 
 export default ({ students, programmeCode }) => {
   const { getTextIn } = useLanguage()
@@ -225,7 +222,6 @@ export default ({ students, programmeCode }) => {
       <Dropdown.Item
         onClick={() => {
           xlsx.writeFile(generateWorkbook(), 'students.xlsx')
-          sendAnalytics('Download excel button clicked', 'Download excel button clicked')
         }}
         text="Excel Workbook"
         icon="file excel"

@@ -2,8 +2,6 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import { BrowserRouter } from 'react-router-dom'
-import { createBrowserHistory } from 'history'
-import TSA from './common/tsa'
 import 'semantic-ui-css/semantic.min.css'
 import 'react-datetime/css/react-datetime.css'
 import './styles/custom.css'
@@ -16,12 +14,10 @@ import { basePath } from './conf'
 
 initializeSentry()
 
-const history = TSA.Matomo.connectToHistory(createBrowserHistory())
-
 ReactDOM.render(
   <Provider store={store}>
     <CommonContext>
-      <BrowserRouter basename={basePath} history={history}>
+      <BrowserRouter basename={basePath}>
         <ErrorBoundary>
           <App />
         </ErrorBoundary>

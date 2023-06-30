@@ -3,9 +3,6 @@ import moment from 'moment'
 import xlsx from 'xlsx'
 import { Dropdown } from 'semantic-ui-react'
 import { getStudentGradeMean, getStudentGradeMeanWeightedByCredits, getStudentTotalCredits } from '../../common'
-import sendEvent from '../../common/sendEvent'
-
-const sendAnalytics = sendEvent.populationStudents
 
 export default ({ students }) => {
   const getXlsx = () => {
@@ -30,7 +27,6 @@ export default ({ students }) => {
       <Dropdown.Item
         onClick={() => {
           xlsx.writeFile(getXlsx(), filename)
-          sendAnalytics('Download excel button clicked', 'Download excel button clicked (UniHow)')
         }}
         text="Excel Workbook (UniHow)"
         icon="file excel"

@@ -3,14 +3,11 @@ import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Tab, Icon, Message } from 'semantic-ui-react'
 import SortableTable from 'components/SortableTable'
-import sendEvent from 'common/sendEvent'
 import { keyBy } from 'lodash'
 import moment from 'moment'
 import StudentInfoItem from 'components/common/StudentInfoItem'
 import useLanguage from '../../../LanguagePicker/useLanguage'
 import '../../../StudentStatistics/StudentInfoCard/studentInfoCard.css'
-
-const sendAnalytics = sendEvent.populationStudents
 
 const findRowContent = (student, courseCode, year, start, end, criteria) => {
   if (courseCode.includes('Credits'))
@@ -500,16 +497,8 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
     <>
       {!isStudyGuidanceGroupProgramme && (
         <h5>
-          Criteria can be changed{' '}
-          <Link
-            to={`/study-programme/${programme}?p_m_tab=0&p_tab=3`}
-            onClick={() => {
-              sendAnalytics('No criteria defined button clicked', 'Degree courses tab')
-            }}
-          >
-            here.
-          </Link>{' '}
-          Please refresh page after changes.
+          Criteria can be changed <Link to={`/study-programme/${programme}?p_m_tab=0&p_tab=3`}>here.</Link> Please
+          refresh page after changes.
         </h5>
       )}
       <Message style={{ fontSize: '16px', maxWidth: '700px' }}>

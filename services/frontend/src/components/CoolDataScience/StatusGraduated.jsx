@@ -8,15 +8,11 @@ import moment from 'moment'
 import useLanguage from 'components/LanguagePicker/useLanguage'
 import StatusCard from './StatusCard'
 import Toolbar from './Toolbar'
-import TSA from '../../common/tsa'
 import { useLocalStorage } from '../../common/hooks'
 import InfoToolTips from '../../common/InfoToolTips'
 import DrillStack from './DrillStack'
 import { getStatusGraduated } from '../../redux/coolDataScience'
 import './status.css'
-
-const ANALYTICS_CATEGORY = 'Trends'
-const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CATEGORY, action, name, value)
 
 const settingDefinitions = [
   {
@@ -142,8 +138,6 @@ const Status = ({ getStatusGraduatedDispatch, data, loading }) => {
   const drillData = useMemo(() => createDrillData(data, getTextIn), [data])
 
   const changeSetting = (property, value) => {
-    sendAnalytics(`S Set setting "${property}" to ${value}`, 'Status')
-
     if (settingDefinitions.find(s => s.key === property).persist === false) {
       setNonpersistentSettings({
         ...nonpersistentExplicitSettings,

@@ -8,7 +8,6 @@ import useLanguage from 'components/LanguagePicker/useLanguage'
 import RightsNotification from 'components/RightsNotification'
 import StudentInfoItem from 'components/common/StudentInfoItem'
 import { hiddenNameAndEmailForExcel } from 'common/columns'
-import sendEvent from '../../common/sendEvent'
 
 const getColumns = (courses, showStudentNames, getTextIn) => {
   const isPassed = credit => [4, 7, 9].includes(credit)
@@ -154,7 +153,6 @@ const CompletedCoursesSearchResults = ({ searchValues }) => {
   const isFetchingOrLoading = completedCoursesTable.isLoading || completedCoursesTable.isFetching
   const isError = completedCoursesTable.isError || (completedCoursesTable.isSuccess && !completedCoursesTable.data)
   const { getTextIn } = useLanguage()
-  const sendAnalytics = sendEvent.populationStudents
 
   useEffect(() => {
     if (!isError && !isFetchingOrLoading) {
@@ -180,7 +178,7 @@ const CompletedCoursesSearchResults = ({ searchValues }) => {
       >
         <SortableTable
           title="Completed courses search"
-          columns={getColumns(data.courses, showStudentNames.visible, getTextIn, sendAnalytics)}
+          columns={getColumns(data.courses, showStudentNames.visible, getTextIn)}
           onlyExportColumns={hiddenNameAndEmailForExcel}
           data={data.students}
         />

@@ -13,10 +13,6 @@ import { useProgress, useTitle } from '../../common/hooks'
 import { clearCourseStats } from '../../redux/coursestats'
 import { checkUserAccess } from '../../common'
 import { userHasAccessToAllCourseStats } from './courseStatisticsUtils'
-import TSA from '../../common/tsa'
-
-const ANALYTICS_CATEGORY = 'Course Statistics'
-const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CATEGORY, action, name, value)
 
 const MENU = {
   SUM: 'Summary',
@@ -92,7 +88,6 @@ const CourseStatistics = () => {
           icon: 'search',
           position: 'right',
           onClick: () => {
-            sendAnalytics('Clicked new query', 'Course stats')
             history.push('/coursestatistics')
             dispatch(clearCourseStats)
           },

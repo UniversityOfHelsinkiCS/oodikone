@@ -1,9 +1,6 @@
 import React, { useState } from 'react'
 import PropTypes, { shape } from 'prop-types'
 import { Table, Progress, Radio, Icon } from 'semantic-ui-react'
-import sendEvent from '../../common/sendEvent'
-
-const sendAnalytics = sendEvent.populationStatistics
 
 // https://stackoverflow.com/a/7091965
 const getAge = toDate => {
@@ -59,7 +56,6 @@ const AgeStats = ({ filteredStudents, query }) => {
       setExpandedGroups(expandedGroups.filter(val => val !== index))
     } else {
       setExpandedGroups(expandedGroups.concat(index))
-      sendAnalytics('Age group expanded')
     }
   }
 

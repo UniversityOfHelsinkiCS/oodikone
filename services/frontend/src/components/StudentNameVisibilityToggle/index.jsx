@@ -1,8 +1,6 @@
 import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Radio } from 'semantic-ui-react'
-
-import TSA from '../../common/tsa'
 import { toggleStudentNameVisibility } from '../../redux/settings'
 
 export const useStudentNameVisibility = () => {
@@ -20,7 +18,6 @@ const StudentNameVisibilityToggle = ({ style = {} }) => {
   const { visible, toggle } = useStudentNameVisibility()
 
   const handleChange = useCallback(() => {
-    TSA.Matomo.sendEvent('Common', 'Toggle student name visibility', visible ? 'hide' : 'show')
     toggle()
   }, [visible, toggle])
 

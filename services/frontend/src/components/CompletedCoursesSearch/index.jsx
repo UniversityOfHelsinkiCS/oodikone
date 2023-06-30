@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { withRouter, useLocation, useHistory } from 'react-router-dom'
 import { Message, Icon } from 'semantic-ui-react'
 import { useTitle } from '../../common/hooks'
 import CompletedCoursesSearch from './CompletedCoursesSearch'
 import CompletedCoursesSearchResults from './CompletedCoursesSearchResults'
-import TSA from '../../common/tsa'
 
 const CompletedCourses = () => {
   useTitle('Search completed courses')
@@ -12,16 +11,6 @@ const CompletedCourses = () => {
   const location = useLocation()
   const history = useHistory()
 
-  useEffect(() => {
-    if (searchValues && searchValues.courseList?.length > 0) {
-      TSA.Influx.sendEvent({
-        group: 'Completed Courses Tool Usage',
-        name: 'completed courses tool',
-        label: 'completedCoursesTool',
-        value: 1,
-      })
-    }
-  }, [searchValues])
   return (
     <div className="segmentContainer">
       <Message style={{ maxWidth: '800px', fontSize: '16px' }}>

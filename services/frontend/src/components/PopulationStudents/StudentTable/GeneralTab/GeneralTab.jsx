@@ -9,7 +9,6 @@ import { hiddenNameAndEmailForExcel, getCopyableEmailColumn } from 'common/colum
 import { useGetSemestersQuery } from 'redux/semesters'
 import StudentInfoItem from 'components/common/StudentInfoItem'
 import { PRIORITYCODE_TEXTS } from '../../../../constants'
-import sendEvent from '../../../../common/sendEvent'
 import useLanguage from '../../../LanguagePicker/useLanguage'
 import createMaps from './columnHelpers/createMaps'
 import getSemestersPresentFunctions from './columnHelpers/semestersPresent'
@@ -29,7 +28,6 @@ const GeneralTab = ({
   const { getTextIn } = useLanguage()
   const { useFilterSelector } = useFilters()
   const [popupStates, setPopupStates] = useState({})
-  const sendAnalytics = sendEvent.populationStudents
   const { data: semesterData } = useGetSemestersQuery()
   const allSemesters = semesterData?.semesters ? Object.entries(semesterData.semesters).map(item => item[1]) : []
   const allSemestersMap = allSemesters.reduce((obj, cur, index) => {
@@ -205,7 +203,6 @@ const GeneralTab = ({
     const emails = studentsInfo.filter(s => s.email && !s.obfuscated).map(s => s.email)
     const clipboardString = emails.join('; ')
     copyToClipboard(clipboardString)
-    sendAnalytics('Copy all student emails to clipboard', 'Copy all student emails to clipboard')
   }
 
   const popupTimeoutLength = 1000
@@ -516,7 +513,6 @@ const GeneralTab = ({
     email: getCopyableEmailColumn({
       popupStates,
       copyToClipboardAll,
-      sendAnalytics,
       handlePopupOpen,
       handlePopupClose,
     }),

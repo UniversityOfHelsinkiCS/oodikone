@@ -8,14 +8,10 @@ import ReactMarkdown from 'react-markdown'
 import HighchartsCustomEvents from 'highcharts-custom-events'
 
 import moment from 'moment'
-import TSA from '../../common/tsa'
 import InfoToolTips from '../../common/InfoToolTips'
 import { useGetProtoCQuery, useGetProtoCProgrammeQuery } from '../../redux/coolDataScience'
 
 HighchartsCustomEvents(Highcharts)
-
-const ANALYTICS_CATEGORY = 'Trends'
-const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CATEGORY, action, name, value)
 
 const upToYear = moment().isBefore({ day: 1, month: 7 }) ? moment().year() - 2 : moment().year() - 1
 
@@ -172,7 +168,6 @@ const makeConfig = (data, sorter, type = 'column', clickHandler) => {
             chart.myLabel.destroy()
             const clickedLabel = data.find(entry => entry.name === this.value)
             if (clickedLabel) clickHandler(clickedLabel)
-            sendAnalytics('Drilldown clicked', 'ProtoC2')
           },
           mouseover() {
             const findLabel = (x, ticks) => {
@@ -249,7 +244,6 @@ const makeConfig = (data, sorter, type = 'column', clickHandler) => {
               const { point } = e
               if (point.custom && point.custom.code) {
                 // clicked on top-level, drill down
-                sendAnalytics('Org drilldown clicked', 'ProtoC2')
                 const datapoint = data.find(entry => entry.code === point.custom.code)
                 clickHandler(datapoint)
               }
@@ -350,12 +344,10 @@ const ProtoC = ({ programme = 'KH50_005' }) => {
 
   const handleOldAttainmentToggled = useCallback(() => {
     setIncludeOldAttainments(previous => !previous)
-    sendAnalytics('C2 Toggled old attainments', 'ProtoC2')
   }, [])
 
   const handleExcludeNonEnrolledToggled = useCallback(() => {
     setExcludeNonEnrolled(previous => !previous)
-    sendAnalytics('C2 Toggled non enrolled', 'ProtoC2')
   }, [])
 
   const currentSorter = useCallback((a, b) => sorters[sorter](a, b) * sortDir, [sorter, sortDir])
@@ -387,7 +379,6 @@ const ProtoC = ({ programme = 'KH50_005' }) => {
   const handleClick = sorterName => {
     if (sorterName === sorter) setSortDir(-1 * sortDir)
     setSorter(sorterName)
-    sendAnalytics('C2 Sorter clicked', 'ProtoC2')
   }
 
   const DrilldownMessage = () => (

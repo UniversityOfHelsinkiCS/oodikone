@@ -13,10 +13,7 @@ import PopulationCourses from '../PopulationCourses'
 import InfoBox from '../Info/InfoBox'
 import CreditGainStats from './CreditGainStats'
 import AgeStats from './AgeStats'
-import sendEvent from '../../common/sendEvent'
 import infotooltips from '../../common/InfoToolTips'
-
-const sendAnalytics = sendEvent.populationStatistics
 
 const PopulationDetails = ({
   allStudents,
@@ -49,10 +46,7 @@ const PopulationDetails = ({
       indexes.push(index)
     }
     setActiveIndex(indexes)
-    sendAnalytics(
-      'Population statistics tab clicked',
-      ['Credit accumulation', 'Credit statistics', 'Age distribution', 'Courses of population', 'Students'][index]
-    )
+
     /**
      * Here used to be a :tunkki: that scrolled to the component that was opened. However,
      * it does not work with the way this view is now rendered. This is left here just as a

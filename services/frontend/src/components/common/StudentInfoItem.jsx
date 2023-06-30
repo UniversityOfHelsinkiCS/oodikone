@@ -1,11 +1,9 @@
 import React from 'react'
-import sendEvent from 'common/sendEvent'
 import { Icon, Item } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import SisuLinkItem from './SisuLinkItem'
 
-const StudentInfoItem = ({ student, view, tab, showSisuLink }) => {
-  const sendAnalytics = sendEvent[view] ?? sendEvent.common
+const StudentInfoItem = ({ student, showSisuLink }) => {
   if (student.obfuscated) {
     return (
       <span style={student.obfuscated ? { fontStyle: 'italic', color: 'graytext' } : {}}>
@@ -16,17 +14,10 @@ const StudentInfoItem = ({ student, view, tab, showSisuLink }) => {
   return (
     <div style={{ display: 'inline-flex' }}>
       <div>{student.studentNumber}</div>
-      <Item
-        as={Link}
-        to={`/students/${student.studentNumber}`}
-        onClick={() => {
-          sendAnalytics('Student details button clicked', view)
-        }}
-        style={{ marginLeft: '10px', marginRight: '10px' }}
-      >
+      <Item as={Link} to={`/students/${student.studentNumber}`} style={{ marginLeft: '10px', marginRight: '10px' }}>
         <Icon name="user outline" />
       </Item>
-      {showSisuLink && <SisuLinkItem id={student.sis_person_id} tab={tab} />}
+      {showSisuLink && <SisuLinkItem id={student.sis_person_id} />}
     </div>
   )
 }

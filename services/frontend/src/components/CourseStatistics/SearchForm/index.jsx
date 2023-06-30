@@ -8,15 +8,12 @@ import { func, shape } from 'prop-types'
 import { clearCourses, findCoursesV2 } from '../../../redux/coursesearch'
 import { getCourseStats, clearCourseStats } from '../../../redux/coursestats'
 import { getCourseSearchResults } from '../../../selectors/courses'
-import { useSearchHistory, usePrevious } from '../../../common/hooks'
+import { useSearchHistory } from '../../../common/hooks'
 import { validateInputLength } from '../../../common'
-import TSA from '../../../common/tsa'
 import AutoSubmitSearchInput from '../../AutoSubmitSearchInput'
 import CourseTable from '../CourseTable'
 import SearchHistory from '../../SearchHistory'
 import useLanguage from '../../LanguagePicker/useLanguage'
-
-const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent('Course statistics search', action, name, value)
 
 const INITIAL = {
   courseName: '',
@@ -32,31 +29,10 @@ const searchBoxStyle = {
   boxShadow: '0 2px 4px 0 rgb(34 36 38 / 12%), 0 2px 10px 0 rgb(34 36 38 / 15%)',
 }
 
-const useTSASearchResultsHook = (coursesLoading, courseName, courseCode, matchingCoursesLength) => {
-  const prevCoursesLoading = usePrevious(coursesLoading)
-
-  useEffect(() => {
-    const wasLoadingButFinished = prevCoursesLoading && !coursesLoading
-    if (!wasLoadingButFinished) {
-      // only send events after user has seen results
-      return
-    }
-
-    if (courseName && courseCode) {
-      sendAnalytics('Search with both name and code', `${courseName}, ${courseCode}`, matchingCoursesLength)
-    } else if (courseName) {
-      sendAnalytics('Search with name', courseName, matchingCoursesLength)
-    } else if (courseCode) {
-      sendAnalytics('Search with code', courseCode, matchingCoursesLength)
-    }
-  }, [coursesLoading, courseName, courseCode, matchingCoursesLength])
-}
-
 const SearchForm = props => {
   const { getTextIn } = useLanguage()
   const dispatch = useDispatch()
   const isLoading = useSelector(state => state.courseStats.pending)
-  const coursesLoading = useSelector(state => state.courseSearch.pending)
   const matchingCourses = useSelector(getCourseSearchResults)
   const [state, setState] = useState({
     ...INITIAL,
@@ -101,21 +77,17 @@ const SearchForm = props => {
     }
   }, [props.location.search])
 
-  useTSASearchResultsHook(coursesLoading, courseName, courseCode, matchingCourses.length)
-
   const onSelectCourse = course => {
     course.selected = !course.selected
     const isSelected = !!selectedCourses[course.code]
 
     if (isSelected) {
       const { [course.code]: omit, ...rest } = selectedCourses
-      sendAnalytics('Unselected course', course.name)
       setState({
         ...state,
         selectedCourses: rest,
       })
     } else {
-      sendAnalytics('Selected course', course.name)
       setState({
         ...state,
         selectedCourses: {
@@ -135,10 +107,6 @@ const SearchForm = props => {
   }
 
   const onSearchHistorySelected = historyItem => {
-    sendAnalytics(
-      'Select Previous Search',
-      historyItem && historyItem.courseCodes && historyItem.courseCodes.join && historyItem.courseCodes.join(',')
-    )
     pushQueryToUrl(historyItem)
   }
 

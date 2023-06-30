@@ -1,47 +1,15 @@
-/* eslint-disable babel/no-invalid-this, class-methods-use-this */
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import { func, shape, object, bool, arrayOf } from 'prop-types'
 import { Form, Button } from 'semantic-ui-react'
 import moment from 'moment'
 import qs from 'query-string'
-import { get as lodashGet } from 'lodash'
-import useLanguage from 'components/LanguagePicker/useLanguage'
 import PopulationQueryCard from '../PopulationQueryCard'
 import { removePopulation } from '../../redux/populations'
-import TSA from '../../common/tsa'
 import './populationSearch.css'
 import infotooltips from '../../common/InfoToolTips'
 import InfoBox from '../Info/InfoBox'
 import FilterActiveNote from './FilterActiveNote'
-
-const PopulationsQueryTSA = ({ programmeCode, unitData }) => {
-  const { getTextIn } = useLanguage()
-
-  // hack: I wanna use useEffect because it's handy but PopulationSearchHistory is not a function component
-  // so here's a component that renders nothing that we can just plug in
-  useEffect(() => {
-    if (!programmeCode) {
-      return
-    }
-
-    const programmeNameData = lodashGet(unitData, ['programmes', programmeCode, 'name'])
-    const programme = programmeNameData && getTextIn(unitData.programmes[programmeCode].name, 'fi')
-
-    if (!programme) {
-      return
-    }
-
-    TSA.Matomo.sendEvent('Programme Usage', 'populations query', programme)
-    TSA.Influx.sendEvent({
-      group: 'Programme Usage',
-      name: 'populations query',
-      label: programme,
-      value: 1,
-    })
-  }, [programmeCode])
-  return null
-}
 
 const getMonths = (year, term) => {
   const start = term === 'FALL' ? `${year}-08-01` : moment(`${year}-01-01`).add(1, 'years')
@@ -175,7 +143,6 @@ const PopulationSearchHistory = props => {
     return (
       <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
         <div>
-          <PopulationsQueryTSA programmeCode={programmeCode} unitData={units.data} />
           <PopulationQueryCard
             key={`population-${populations.query.uuid}`}
             population={populations.data}
