@@ -1,6 +1,7 @@
 import React from 'react'
-import { Divider, Loader, Message } from 'semantic-ui-react'
+import { Button, Divider, Loader, Message, Popup } from 'semantic-ui-react'
 import { useGetFacultyProgressStatsQuery, useGetFacultyStudentStatsQuery } from 'redux/facultyStats'
+import useLanguage from 'components/LanguagePicker/useLanguage'
 import FacultyProgressTable from './FacultyProgressTable'
 import FacultyBarChart from './FacultyBarChart'
 import Toggle from '../../StudyProgramme/Toggle'
@@ -9,6 +10,7 @@ import InfotoolTips from '../../../common/InfoToolTips'
 import '../faculty.css'
 import FacultyStudentDataTable from './FacultyStudentDataTable'
 import sortProgrammeKeys from '../facultyHelpers'
+import { downloadProgressTableCsv, downloadStudentTableCsv } from '../xlsxFileDownloadHelper'
 
 const getDivider = (title, toolTipText, content, cypress) => (
   <>
@@ -35,6 +37,7 @@ const FacultyProgrammeOverview = ({
   const studyProgrammeFilter = 'NEW_STUDY_PROGRAMMES'
   const specials = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
   const graduated = graduatedGroup ? 'GRADUATED_EXCLUDED' : 'GRADUATED_INCLUDED'
+  const { getTextIn } = useLanguage()
   const progressStats = useGetFacultyProgressStatsQuery({
     id: faculty?.code,
     studyProgrammeFilter,
@@ -74,6 +77,19 @@ const FacultyProgrammeOverview = ({
     }
     return plotLinePlaces
   }
+  const sortedProgrammeKeysStudents = studentStats?.data?.programmeStats
+    ? sortProgrammeKeys(
+        Object.keys(studentStats?.data.programmeStats).map(obj => [obj, studentStats?.data?.programmeNames[obj]?.code]),
+        faculty.code
+      )
+    : []
+
+  const getSortedProgrammeKeysProgress = studyLevelStats => {
+    return sortProgrammeKeys(
+      Object.keys(studyLevelStats).map(obj => [obj, progressStats?.data?.programmeNames[obj].code]),
+      faculty.code
+    )
+  }
 
   return (
     <div className="faculty-overview">
@@ -107,6 +123,25 @@ const FacultyProgrammeOverview = ({
                 toolTips.StudentsStatsOfTheFaculty,
                 'InfoFacultyStudentTable'
               )}
+              <Popup
+                content="Download student table statistics as xlsx."
+                trigger={
+                  <Button
+                    icon="download"
+                    floated="right"
+                    onClick={() =>
+                      downloadStudentTableCsv(
+                        studentStats,
+                        studentStats?.data?.programmeNames,
+                        faculty,
+                        sortedProgrammeKeysStudents.map(listObj => listObj[0]),
+                        getTextIn
+                      )
+                    }
+                    style={{ backgroundColor: 'white', borderRadius: 0 }}
+                  />
+                }
+              />
               <div>
                 <FacultyStudentDataTable
                   tableStats={studentStats?.data.facultyTableStats}
@@ -115,22 +150,8 @@ const FacultyProgrammeOverview = ({
                   programmeNames={studentStats?.data.programmeNames}
                   titles={studentStats?.data.titles}
                   years={studentStats?.data.years}
-                  sortedKeys={sortProgrammeKeys(
-                    Object.keys(studentStats?.data.programmeStats).map(obj => [
-                      obj,
-                      studentStats?.data?.programmeNames[obj]?.code,
-                    ]),
-                    faculty.code
-                  ).map(listObj => listObj[0])}
-                  tableLinePlaces={getTableLinePlaces(
-                    sortProgrammeKeys(
-                      Object.keys(studentStats?.data?.programmeStats).map(obj => [
-                        obj,
-                        studentStats?.data?.programmeNames[obj].code,
-                      ]),
-                      faculty.code
-                    )
-                  )}
+                  sortedKeys={sortedProgrammeKeysStudents.map(listObj => listObj[0])}
+                  tableLinePlaces={getTableLinePlaces(sortedProgrammeKeysStudents)}
                   cypress="FacultyStudentStatsTable"
                   requiredRights={requiredRights}
                 />
@@ -146,6 +167,19 @@ const FacultyProgrammeOverview = ({
                 toolTips.StudentProgress,
                 'InfoFacultyProgress'
               )}
+              <Popup
+                content="Download progress statistics as xlsx."
+                trigger={
+                  <Button
+                    icon="download"
+                    floated="right"
+                    onClick={() =>
+                      downloadProgressTableCsv(progressStats, progressStats?.data?.programmeNames, faculty, getTextIn)
+                    }
+                    style={{ backgroundColor: 'white', borderRadius: 0 }}
+                  />
+                }
+              />
               {getDivider('Bachelor', 'BachelorStudentsOfTheFacultyByStartingYear', 'no-infobox')}
               <div className="section-container">
                 <div className="graph-container">
@@ -163,13 +197,9 @@ const FacultyProgrammeOverview = ({
                     data={progressStats?.data.bachelorsTableStats}
                     programmeStats={progressStats?.data.bachelorsProgStats}
                     titles={progressStats?.data.bachelorTitles}
-                    sortedKeys={sortProgrammeKeys(
-                      Object.keys(progressStats?.data.bachelorsProgStats).map(obj => [
-                        obj,
-                        progressStats?.data?.programmeNames[obj].code,
-                      ]),
-                      faculty.code
-                    ).map(listObj => listObj[0])}
+                    sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.bachelorsProgStats).map(
+                      listObj => listObj[0]
+                    )}
                     progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
                     programmeNames={progressStats?.data.programmeNames}
                     cypress="FacultyBachelorsProgressTable"
@@ -199,13 +229,9 @@ const FacultyProgrammeOverview = ({
                     data={progressStats?.data.bcMsTableStats}
                     programmeStats={progressStats?.data.bcMsProgStats}
                     titles={progressStats?.data.bcMsTitles}
-                    sortedKeys={sortProgrammeKeys(
-                      Object.keys(progressStats?.data.bcMsProgStats).map(obj => [
-                        obj,
-                        progressStats?.data?.programmeNames[obj].code,
-                      ]),
-                      faculty.code
-                    ).map(listObj => listObj[0])}
+                    sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.bcMsProgStats).map(
+                      listObj => listObj[0]
+                    )}
                     progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
                     programmeNames={progressStats?.data.programmeNames}
                     cypress="FacultyBachelorMasterProgressTable"
@@ -233,13 +259,9 @@ const FacultyProgrammeOverview = ({
                         data={progressStats?.data.mastersTableStats}
                         programmeStats={progressStats?.data.mastersProgStats}
                         titles={progressStats?.data.mastersTitles}
-                        sortedKeys={sortProgrammeKeys(
-                          Object.keys(progressStats?.data.mastersProgStats).map(obj => [
-                            obj,
-                            progressStats?.data?.programmeNames[obj].code,
-                          ]),
-                          faculty.code
-                        ).map(listObj => listObj[0])}
+                        sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.mastersProgStats).map(
+                          listObj => listObj[0]
+                        )}
                         progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
                         programmeNames={progressStats?.data.programmeNames}
                         cypress="FacultyMastersProgressTable"
@@ -267,13 +289,9 @@ const FacultyProgrammeOverview = ({
                     data={progressStats?.data.doctoralTableStats}
                     programmeStats={progressStats?.data.doctoralProgStats}
                     titles={progressStats?.data.doctoralTitles}
-                    sortedKeys={sortProgrammeKeys(
-                      Object.keys(progressStats?.data.doctoralProgStats).map(obj => [
-                        obj,
-                        progressStats?.data?.programmeNames[obj].code,
-                      ]),
-                      faculty.code
-                    ).map(listObj => listObj[0])}
+                    sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.doctoralProgStats).map(
+                      listObj => listObj[0]
+                    )}
                     progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
                     programmeNames={progressStats?.data.programmeNames}
                     cypress="FacultyDoctoralProgressTable"
