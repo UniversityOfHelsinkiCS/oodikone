@@ -36,6 +36,7 @@ const allNavigationItems = {
       { path: '/custompopulation', key: 'customSearch', label: 'Search by Studentnumbers' },
       { path: '/openunipopulation', key: 'openUniSearch', label: 'Fetch Open Uni Students by Courses' },
       { path: '/completedcoursessearch', key: 'completedCoursesSearch', label: 'Search completed courses of students' },
+      { path: '/languagecenterview', key: 'languageCenterView', label: 'Language center view' },
     ],
   },
   updater: { path: '/updater', key: 'updater', label: 'Updater', reqRights: ['admin'] },
@@ -93,6 +94,7 @@ const NavigationBar = () => {
       item.key === 'completedCoursesSearch'
     )
       return true
+    if (checkUserAccess(['admin'], roles) && item.key === 'languageCenterView') return true
     return false
   }
 
