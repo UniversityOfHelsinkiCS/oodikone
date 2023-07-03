@@ -59,13 +59,13 @@ const getLanguageCenterData = async () => {
   const studyrightElements = await StudyrightElement.findAll({
     attributes: ['studentnumber', 'startdate', 'enddate', 'code'],
     where: {
-      studentnumber: { [Op.in]: studentList },
+      studentnumber: { [Op.in]: Array.from(studentList.values()) },
     },
   })
-
+  console.log({length: studyrightElements.length})
   const studyrightMap = studyrightElements.reduce((obj, cur) => {
     if (!obj[cur.studentnumber]) {
-      obj[cur.studentnumber] = { startdate: cur.startdate, enddate: cur.enddate, code: cur.code }
+      obj[cur.studentnumber] = [{ startdate: cur.startdate, enddate: cur.enddate, code: cur.code }]
     } else {
       obj[cur.studentnumber].push({ startdate: cur.startdate, enddate: cur.enddate, code: cur.code })
     }
@@ -93,6 +93,7 @@ const getLanguageCenterData = async () => {
     if (item.studentumber === '015068668') console.log(item)
   })
   console.log(attemptsArray[0])
+  console.log(studyrightMap['015068668'])
   customLogger.end('lcdata', true)
   return { attempts: attemptsArray, courses }
 }

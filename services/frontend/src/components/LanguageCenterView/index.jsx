@@ -17,7 +17,7 @@ const getRows = data => {
       obj[cur.courseCode] = newStats
       return obj
     }
-    obj[cur.courseCode] = { total: 1, incomplete: cur.incomplete ? 0 : 1, completed: cur.completed ? 1 : 0 }
+    obj[cur.courseCode] = { total: 1, incomplete: cur.completed ? 0 : 1, completed: cur.completed ? 1 : 0 }
     return obj
   }, {})
   // console.log({ courseStats })
