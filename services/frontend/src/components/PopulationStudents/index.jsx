@@ -32,7 +32,8 @@ const Panes = ({
   coursecode,
   studyGuidanceGroup,
   customPopulationProgramme,
-  queryStudyrights,
+  mainProgramme,
+  combinedProgramme,
   from,
   to,
   criteria,
@@ -40,8 +41,7 @@ const Panes = ({
   year,
 }) => {
   const { handleTabChange } = useTabChangeAnalytics()
-  const programmeForTagsLink =
-    queryStudyrights?.length > 1 ? `${queryStudyrights[0]}+${queryStudyrights[1]}` : queryStudyrights[0]
+  const programmeForTagsLink = combinedProgramme ? `${mainProgramme}+${combinedProgramme}` : mainProgramme
   const programme = studyGuidanceGroup?.tags?.studyProgramme || ''
   const panesAvailable = [
     {
@@ -98,13 +98,13 @@ const Panes = ({
                 <TagPopulation
                   tags={tags}
                   selectedStudents={filteredStudents.map(stu => stu.studentNumber)}
-                  studytrack={queryStudyrights[0]}
-                  combinedProgramme={queryStudyrights.length > 1 ? queryStudyrights[1] : ''}
+                  mainProgramme={mainProgramme}
+                  combinedProgramme={combinedProgramme}
                 />
                 <TagList
-                  studytrack={queryStudyrights[0]}
+                  mainProgramme={mainProgramme}
                   selectedStudents={filteredStudents}
-                  combinedProgramme={queryStudyrights.length > 1 ? queryStudyrights[1] : ''}
+                  combinedProgramme={combinedProgramme}
                 />
               </>
             )}
@@ -119,7 +119,7 @@ const Panes = ({
           students={filteredStudents}
           criteria={criteria}
           months={months}
-          programme={queryStudyrights[0] || programme}
+          programme={mainProgramme || programme}
           studyGuidanceGroupProgramme={programme}
         />
       ),
@@ -167,16 +167,20 @@ const PopulationStudents = ({
   const { studentlistVisible: showList } = useSelector(({ settings }) => settings)
   const { data: tags } = useSelector(({ tags }) => tags)
   const { query } = useSelector(({ populations }) => populations)
-  let queryStudyrights = query ? Object.values(query.studyRights) : []
+  let mainProgramme = query?.studyRights?.programme || ''
+  let combinedProgramme = query?.studyRights?.combinedProgramme || ''
   let months = query ? query.months : 0
   if (studyGuidanceGroup && studyGuidanceGroup?.tags?.year) {
     months = moment().diff(moment(`${studyGuidanceGroup?.tags?.year}-08-01`), 'months')
   }
 
   if (studyGuidanceGroup && studyGuidanceGroup?.tags?.studyProgramme) {
-    queryStudyrights = studyGuidanceGroup.tags.studyProgramme.includes('+')
+    const programmes = studyGuidanceGroup.tags.studyProgramme.includes('+')
       ? studyGuidanceGroup.tags.studyProgramme.split('+')
       : [studyGuidanceGroup.tags.studyProgramme]
+    // eslint-disable-next-line prefer-destructuring
+    mainProgramme = programmes[0]
+    combinedProgramme = programmes.length > 1 ? programmes[1] : ''
   }
   const prevShowList = usePrevious(showList)
   const { isAdmin } = useGetAuthorizedUserQuery()
@@ -185,13 +189,10 @@ const PopulationStudents = ({
   useEffect(() => {
     if (tags && tags.length > 0) return
     // Create studytrack for fetching tags for class statistics
-    const studytrack =
-      queryStudyrights.length > 1 && queryStudyrights[1] !== ''
-        ? `${queryStudyrights[0]}-${queryStudyrights[1]}`
-        : queryStudyrights[0]
-    if (studytrack) {
-      dispatch(getTagsByStudytrackAction(studytrack))
-      dispatch(getStudentTagsByStudytrackAction(studytrack))
+    const correctCode = combinedProgramme ? `${mainProgramme}+${combinedProgramme}` : mainProgramme
+    if (correctCode) {
+      dispatch(getTagsByStudytrackAction(correctCode))
+      dispatch(getStudentTagsByStudytrackAction(correctCode))
     }
 
     setState({ ...state, admin })
@@ -212,7 +213,8 @@ const PopulationStudents = ({
       {admin ? <CheckStudentList students={filteredStudents.map(stu => stu.studentNumber)} /> : null}
       <Panes
         filteredStudents={filteredStudents}
-        queryStudyrights={queryStudyrights}
+        mainProgramme={mainProgramme}
+        combinedProgramme={combinedProgramme}
         visiblePanes={contentToInclude.panesToInclude}
         dataExport={dataExport}
         variant={variant}
