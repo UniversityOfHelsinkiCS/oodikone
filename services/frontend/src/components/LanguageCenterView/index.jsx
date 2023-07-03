@@ -67,11 +67,11 @@ const LanguageCenterView = () => {
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
   if (isFetchingOrLoading || !data) return <Loader active style={{ marginTop: '15em' }} />
 
-  // console.log({ data })
+  console.log({ data })
 
   const rows = getRows(data)
 
-  //  console.log({ rows })
+  console.log({ rows })
 
   return (
     <div className="languagecenterview">

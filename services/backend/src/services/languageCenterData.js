@@ -63,14 +63,38 @@ const getLanguageCenterData = async () => {
     },
   })
 
-  const getFaculty = (studentNumber, date) =>
-    studyrightElements.find(sr => sr.studentnumber === studentNumber && sr.startdate < date && sr.enddate > date)?.code
+  const studyrightMap = studyrightElements.reduce((obj, cur) => {
+    if (!obj[cur.studentnumber]) {
+      obj[cur.studentnumber] = { startdate: cur.startdate, enddate: cur.enddate, code: cur.code }
+    } else {
+      obj[cur.studentnumber].push({ startdate: cur.startdate, enddate: cur.enddate, code: cur.code })
+    }
+    if (cur.studentnumber === '015068668') console.log({cur})
+    return obj
+  }, {})
 
-  const attempts = Object.values(attemptsByStudents)
-    .flat(1)
-    .reduce((acc, cur) => [...acc, { ...cur, faculty: getFaculty(cur.studentNumber, cur.date) }], [])
+  const getFaculty = (studentNumber, date) =>
+    studyrightMap[studentNumber]?.find(sr => sr.startdate <= date && sr.enddate >= date)?.code
+
+  customLogger.log('lcdata', 'third stop: starting to flatten')
+
+  const attemptsArray = []
+  studentList.forEach(sn => attemptsArray.push(...attemptsByStudents[sn]))
+  customLogger.log('lcdata', 'fourth stop: ended flattening, final phase starting')
+
+  /*
+  const attempts = attemptsArray.reduce(
+    (acc, cur) => [...acc, { ...cur, faculty: getFaculty(cur.studentNumber, cur.date) }],
+    []
+  ) */
+
+  attemptsArray.forEach(item => {
+    item.faculty = getFaculty(item.studentNumber, item.date)
+    if (item.studentumber === '015068668') console.log(item)
+  })
+  console.log(attemptsArray[0])
   customLogger.end('lcdata', true)
-  return { attempts, courses }
+  return { attempts: attemptsArray, courses }
 }
 
 module.exports = { getLanguageCenterData }
