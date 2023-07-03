@@ -12,6 +12,11 @@ const {
   getSemesterByDate,
 } = require('../shared')
 
+// work on progress
+const isCancelled = studyright => {
+  if (studyright.study_right_cancellation !== null) return true
+  return false
+}
 const updateStudyRights = async (
   groupedStudyRightSnapshots,
   personIdToStudentNumber,
@@ -20,6 +25,7 @@ const updateStudyRights = async (
 ) => {
   const currentSemester = getSemesterByDate(new Date())
   const studyrightMapper = (personIdToStudentNumber, admissionNamesById) => (studyright, overrideProps) => {
+    const cancelled = isCancelled(studyright)
     const defaultProps = {
       studyrightid: `${studyright.id}-1`, // duplikaattifix
       facultyCode: getOrganisationCode(studyright.organisation_id),
@@ -29,7 +35,7 @@ const updateStudyRights = async (
       graduated: studyright.study_right_graduation ? 1 : 0,
       studystartdate: studyright.valid.startDate,
       admissionType: admissionNamesById[studyright.admission_type_urn],
-      cancelled: studyright.study_right_cancellation !== null,
+      cancelled,
     }
     return {
       ...defaultProps,
@@ -93,25 +99,18 @@ const updateStudyRights = async (
     const PRIORITYCODES = {
       MAIN: 1,
       SECONDARY: 2,
-      RESCINDED: 5,
       GRADUATED: 30,
       OPTION: 6,
     }
 
-    // It seems that studyright.state is always null in importer db. Reason why rescinded is not visible anywhere
-    // Discuss, how this should be done! Now we have 'cancelled' field in studyright table in sis-db, which is used in code
-    // to have the information if studyprogramme is cancelled.
     if (!isBaMa || phase_number === 1) {
       if (get(studyright, 'study_right_graduation.phase1GraduationDate')) return PRIORITYCODES.GRADUATED
-      if (studyright.state === 'RESCINDED') return PRIORITYCODES.RESCINDED
       return isPrimality ? PRIORITYCODES.MAIN : PRIORITYCODES.SECONDARY
     }
 
     if (get(studyright, 'studyright.study_right_graduation.phase2GraduationDate')) {
       return PRIORITYCODES.GRADUATED
     }
-
-    if (studyright.state === 'RESCINDED') return PRIORITYCODES.RESCINDED
 
     if (isPrimality) {
       return get(studyright, 'study_right_graduation.phase1GraduationDate') ? PRIORITYCODES.MAIN : PRIORITYCODES.OPTION
@@ -370,6 +369,30 @@ const updateElementDetails = async studyRights => {
     [...groupedEducationPhases[20]].filter(a => !!a),
     'group_id'
   )
+  // Find the educations instead of module if module information not there
+  // add also the wanted information to programmes.
+  // Note: the modules and educations are differs from each other. However, both entities contains
+  // code, (programme) name and type that are necessary for the elementDetail table.
+  const foundProgrammeGroupIds = programmes.map(prog => prog.group_id)
+  if ([...new Set(foundProgrammeGroupIds)].length < [...groupedEducationPhases[20]].filter(a => !!a).length) {
+    const programmeGroupIds = [...new Set(foundProgrammeGroupIds)]
+    const notFoundGroupIds = [...groupedEducationPhases[20]]
+      .filter(a => !!a)
+      .filter(id => programmeGroupIds.includes(id))
+    const educationIds = studyRights
+      .filter(
+        sr =>
+          !notFoundGroupIds.includes(sr.accepted_selection_path.educationPhase1GroupId) &&
+          !notFoundGroupIds.includes(sr.accepted_selection_path.educationPhase2GroupId)
+      )
+      .map(sr => sr.education_id)
+    const educationInfo = await selectFromByIds('educations', educationIds)
+    const mappedEducationInfo = educationInfo.map(education => {
+      return { ...education, group_id: education.group_id.replace('EDU', 'DP'), type: 20 }
+    })
+    if (educationIds.length > 0) programmes.push(...mappedEducationInfo)
+  }
+
   const studytracks = await selectFromByIds(
     'modules',
     [...groupedEducationPhases[30]].filter(a => !!a),
