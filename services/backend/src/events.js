@@ -33,7 +33,7 @@ const refreshFaculties = async () => {
     } catch (e) {
       logger.error({ message: `Failed to update stats for faculty ${faculty?.code} with type ALL`, meta: `${e}` })
     }
-    logger.info(`${ready}/${facultyList.length} faculties done; faculty ${faculty}`)
+    logger.info(`${ready}/${facultyList.length} faculties done; faculty ${faculty?.code}`)
   }
   logger.info('Faculty stats refreshed!')
 }
@@ -154,4 +154,5 @@ module.exports = {
   refreshStatistics,
   refreshTrends,
   refreshFaculties,
+  refreshNewOverviews,
 }

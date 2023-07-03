@@ -28,6 +28,9 @@ const Updater = () => {
   const updateSISCourses = () => apiCall('/updater/update/v2/courses', 'post', SISCourses.trim().split('\n'))
   const refreshAllTeacherLeaderboards = () => apiCall('/teachers/top', 'post')
   const refreshTrends = () => apiCall('/updater/refresh_trends', 'post')
+  const refreshFaculties = () => apiCall('/updater/refresh_faculties_v2', 'post')
+  const refreshStudyProgrammes = () => apiCall('/updater/refresh_study_programmes_v2', 'post')
+
   return (
     <Segment>
       <Message style={{ fontSize: '16px' }}>
@@ -49,6 +52,11 @@ const Updater = () => {
           today. Might take some time.
           <br />
           <b>Oodikone redis - Refresh trends</b> Refresh uber data from 2017-until now, status and graduated.
+          <br />
+          <b>Oodikone redis - Refresh faculties</b> Refresh data for all faculties for all tabs (time consuming).
+          <br />
+          <b>Oodikone redis - Refresh study programmes</b> Refresh data for new studyp programmes for basic and
+          studytrack tabs (time consuming).
         </p>
       </Message>
       <Form>
@@ -60,6 +68,8 @@ const Updater = () => {
           <Form.Button content="Refresh oodikone statistics" onClick={() => refreshStatisticsV2()} />
           <Form.Button content="Refresh all teacher leaderboards" onClick={() => refreshAllTeacherLeaderboards()} />
           <Form.Button content="Refresh trends" onClick={() => refreshTrends()} />
+          <Form.Button content="Refresh faculties" onClick={() => refreshFaculties()} />
+          <Form.Button content="Refresh study programmes" onClick={() => refreshStudyProgrammes()} />
         </Form.Group>
         <Form.Group>
           <Form.Button content="Stop Updating" negative onClick={abortSisUpdater} />
