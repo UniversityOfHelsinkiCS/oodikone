@@ -8,7 +8,7 @@ import { createMultipleStudentTagAction, deleteMultipleStudentTagAction } from '
 const TagPopulation = ({
   createMultipleStudentTag,
   tags,
-  studytrack,
+  mainProgramme,
   selectedStudents,
   deleteMultipleStudentTag,
   combinedProgramme,
@@ -32,7 +32,7 @@ const TagPopulation = ({
   }
 
   const handleDelete = () => {
-    deleteMultipleStudentTag(selectedValue, selectedStudents, studytrack, combinedProgramme)
+    deleteMultipleStudentTag(selectedValue, selectedStudents, mainProgramme, combinedProgramme)
     setSelected('')
     setConfirmDelete(false)
   }
@@ -47,7 +47,7 @@ const TagPopulation = ({
       tagList.push(tag)
     })
     setSelected('')
-    createMultipleStudentTag(tagList, studytrack, combinedProgramme)
+    createMultipleStudentTag(tagList, mainProgramme, combinedProgramme)
     setConfirmAdd(false)
   }
 
@@ -107,7 +107,7 @@ TagPopulation.propTypes = {
   createMultipleStudentTag: func.isRequired,
   deleteMultipleStudentTag: func.isRequired,
   tags: arrayOf(shape({ tag_id: string, tagname: string, studytrack: string })).isRequired,
-  studytrack: string.isRequired,
+  mainProgramme: string.isRequired,
   selectedStudents: arrayOf(string).isRequired,
   combinedProgramme: string.isRequired,
 }

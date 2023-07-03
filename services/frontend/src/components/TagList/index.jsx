@@ -35,14 +35,14 @@ const TagList = ({
   selectedStudents,
   tagstudent,
   tags,
-  studytrack,
+  mainProgramme,
+  combinedProgramme,
   getStudentTagsStudyTrack,
   getTagsByStudytrack,
   namesVisible,
-  combinedProgramme,
 }) => {
   useEffect(() => {
-    const studytrackCode = combinedProgramme ? `${studytrack}-${combinedProgramme}` : studytrack
+    const studytrackCode = combinedProgramme ? `${mainProgramme}-${combinedProgramme}` : mainProgramme
     getTagsByStudytrack(studytrackCode)
     getStudentTagsStudyTrack(studytrackCode)
   }, [])
@@ -64,7 +64,7 @@ const TagList = ({
         studentsTags={studentsTags}
         sn={sn}
         name={name}
-        studytrack={studytrack}
+        studytrack={mainProgramme}
         tagOptions={studentTagOptions}
         combinedProgramme={combinedProgramme}
       />
@@ -103,7 +103,7 @@ TagList.propTypes = {
   getStudentTagsStudyTrack: func.isRequired,
   selectedStudents: arrayOf(shape({})).isRequired,
   tags: arrayOf(shape({})).isRequired,
-  studytrack: string.isRequired,
+  mainProgramme: string.isRequired,
   tagstudent: arrayOf(shape({})).isRequired,
   namesVisible: bool.isRequired,
   combinedProgramme: string.isRequired,
