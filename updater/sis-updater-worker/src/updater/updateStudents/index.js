@@ -201,7 +201,6 @@ const updateStudents = async personIds => {
 
   const parsedStudyrightSnapshots = parseStudyrightSnapshots(studyrightSnapshots)
   const groupedStudyRightSnapshots = groupStudyrightSnapshots(parsedStudyrightSnapshots)
-
   const personIdToStudentNumber = students.reduce((res, curr) => {
     res[curr.id] = curr.student_number
     return res
@@ -251,7 +250,6 @@ const updateStudents = async personIds => {
 const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumber, groupedStudyRightSnapshots) => {
   const studyplans = studyplansAll.filter(plan => plan.primary)
   const attainments = await selectFromByIds('attainments', personIds, 'person_id')
-
   const programmeModules = (
     await selectFromByIds(
       'modules',
@@ -617,38 +615,58 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
   const coursesToBeCreated = new Map()
   const courseProvidersToBeCreated = []
 
+  // These modules cause problems, if credits are updated
+  const modulesNotAvailable = [
+    'hy-DP-65295180-ma',
+    'hy-DP-141512970',
+    'hy-DP-141513052',
+    'hy-SM-89304486',
+    'hy-SM-96923271',
+    'hy-SM-100017957',
+    'hy-SM-93788863',
+  ]
   // This mayhem fixes missing course_unit references for CustomCourseUnitAttainments.
   const fixCustomCourseUnitAttainments = async attainments => {
     const addCourseUnitToCustomCourseUnitAttainments = (courses, attIdToCourseCode) => async att => {
-      if (
-        (att.type === 'ModuleAttainment' || att.type === 'DegreeProgrammeAttainment') &&
-        att.module_id === 'hy-DP-65295180-ma'
-      ) {
-        // To solve this problem, investigate if this module's state is draft or deleted in Sisu
-        // this instance is not found from the modules table
-        coursesToBeCreated.set('520097-ma', {
-          id: 'hy-DP-65295180-ma',
+      // Fix attainments with missing modules
+      if (modulesNotAvailable.includes(att.module_group_id) || modulesNotAvailable.includes(att.module_id)) {
+        if (att.module_group_id === 'hy-SM-89304486') {
+          const course = await Course.findOne({ where: { code: '71066' } })
+          return { ...att, module_group_id: course.id }
+        }
+        if (att.module_group_id === 'hy-SM-100017957') {
+          const course = await Course.findOne({ where: { code: '523102' } })
+          return { ...att, module_group_id: course.id }
+        }
+        if (['hy-DP-65295180-ma', 'hy-DP-141512970', 'hy-DP-141513052'].includes(att.module_group_id)) {
+          const education = await selectFromByIds('educations', [att.module_group_id.replace('DP', 'EDU')])
+          if (education.length > 0) {
+            coursesToBeCreated.set(education[0].code, {
+              id: att.module_group_id,
+              name: education[0].name,
+              code: education[0].code,
+              main_course_code: education[0].code,
+              coursetypecode: att.study_level_urn,
+              course_unit_type: att.course_unit_type_urn,
+              substitutions: [],
+            })
+            return att
+          }
+        }
+        coursesToBeCreated.set(att.module_group_id, {
+          id: att.module_group_id,
           name: {
-            en: "Master's Degree Programme in Neuroscience (MNEURO) (higher)",
-            fi: "Master's Degree Programme in Neuroscience (MNEURO) (ylempi)",
-            sv: "Master's Degree Programme in Neuroscience (MNEURO) (högre)",
+            fi: 'Tuntematon opintokokonaisuus',
+            en: 'Unknown study module',
+            sv: 'Okänd studiehelhet',
           },
-          code: '520097-ma',
-          main_course_code: '520097-ma',
+          code: att.module_group_id,
+          main_course_code: att.module_group_id,
           coursetypecode: att.study_level_urn,
-          is_study_module: false,
           course_unit_type: att.course_unit_type_urn,
-          max_attainment_date: new Date(2019, 8, 26), // based on old similar programme
-          min_attainment_date: new Date(1900, 0, 1), // based on education table
-          enddate: new Date(1900, 0, 1), // based on old similar programmes
-          latest_instance_date: new Date(2019, 8, 26), // based on old similar programmes
           substitutions: [],
         })
-        // courseprovider exists so no need to search for that
-        // Add the course to the mapping objects for creditMapper to work properly.
-        courseUnitIdToCourseGroupId['hy-DP-65295180-ma'] = 'hy-DP-65295180-ma'
-        courseGroupIdToCourseCode['hy-DP-65295180-ma'] = '520097-ma'
-        return { ...att, course_unit_id: 'hy-DP-65295180-ma' }
+        return att
       }
 
       if (att.type !== 'CustomCourseUnitAttainment' && att.type !== 'CustomModuleAttainment') return att
