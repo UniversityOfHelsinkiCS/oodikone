@@ -110,7 +110,7 @@ app.get('/v1/courses/:code', async (req, res) => {
     const studyModule = await getCourses(req.params.code, superFlatten)
     res.json(studyModule)
   } catch (e) {
-    logger.error({ message: 'gailed to get courses codes recursively', meta: e.stack })
+    logger.error({ message: 'Failed to get courses codes recursively', meta: e.stack })
     res.json({ error: e })
   }
 })
