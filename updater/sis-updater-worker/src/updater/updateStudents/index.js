@@ -301,24 +301,13 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
     )
   )
 
-  // Add also studyplan courses to course units to resolve counting of hops credits in studyplanMapper
-  const courseUnitIdsFromStudyPlans = filteredPlans.reduce(
-    (acc, curr) =>
-      acc.concat([
-        ...curr.course_unit_selections.filter(obj => obj.courseUnitId),
-        ...curr.custom_course_unit_attainment_selections.filter(a => a.courseUnitId).map(a => a.courseUnitId),
-      ]),
-    []
-  )
-
   const courseUnits = await selectFromByIds(
     'course_units',
     Array.from(
       new Set(
         courseUnitSelections
           .concat(courseUnitSelectionSubstitutedBy)
-          .concat(...attainments.filter(a => a.course_unit_id).map(a => a.course_unit_id))
-          .concat(...courseUnitIdsFromStudyPlans)
+          .concat(...attainments.filter(a => !!a.course_unit_id).map(a => a.course_unit_id))
       )
     )
   )

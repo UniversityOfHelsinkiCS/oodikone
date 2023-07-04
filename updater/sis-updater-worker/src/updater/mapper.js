@@ -450,34 +450,40 @@ const studyplanMapper =
                     .map(({ substitutedBy, courseUnitId }) => {
                       if (substitutedBy.length) {
                         let substitutedId = substitutedBy[0]
-                        const attainment = attainments.filter(
-                          att => courseUnitIdToCode[att.course_unit_id] === courseUnitIdToCode[substitutedId]
-                        )
-                        if (attainment.length > 0) {
-                          const correctAttainment = attainment.filter(
-                            att => att.state === 'ATTAINED' && att.type === 'CourseUnitAttainment'
+                        if (courseUnitIdToAttainment[substitutedId]) {
+                          // Sometimes course_unit_id is not the same in attainment and course marked in hos.
+                          // Filter by comparing the codes and change course_unit_id to attainment course_unit_id
+                          // Until now, I have not seen cases that this if statement should be removed (line 453).
+                          const attainment = attainments.filter(
+                            att =>
+                              courseUnitIdToCode[att.course_unit_id] === courseUnitIdToCode[substitutedId] &&
+                              validStates.includes(att.state) &&
+                              att.type === 'CourseUnitAttainment' &&
+                              !att.misregistration &&
+                              att.person_id === studyplan.user_id
                           )
-                          if (correctAttainment.length > 0) {
-                            substitutedId = correctAttainment[0].course_unit_id
+                          if (attainment.length > 0) {
+                            substitutedId = attainment[0].course_unit_id
                           }
                         }
                         return courseUnitIdToAttainment[substitutedId]
                           ? courseUnitIdToAttainment[substitutedId][studyplan.user_id]
                           : []
                       }
-                      // Sometimes course_unit_id is not the same in attainment and hops courses.
-                      // Filter by comparing the codes and change course_unit_id to attainment course_unit_id
+                      // Some cases course_unit_id is not the same in attainment and course in hops. In attainments may be different
+                      // course_uni_id between types AssesmentItemAttainment and CourseUnitAttainment.
                       const attainment = attainments.filter(
-                        att => courseUnitIdToCode[att.course_unit_id] === courseUnitIdToCode[courseUnitId]
+                        att =>
+                          courseUnitIdToCode[att.course_unit_id] === courseUnitIdToCode[courseUnitId] &&
+                          validStates.includes(att.state) &&
+                          att.type === 'CourseUnitAttainment' &&
+                          !att.misregistration &&
+                          att.person_id === studyplan.user_id
                       )
                       if (attainment.length > 0) {
-                        const correctAttainment = attainment.filter(
-                          att => att.state === 'ATTAINED' && att.type === 'CourseUnitAttainment'
-                        )
-                        if (correctAttainment.length > 0) {
-                          courseUnitId = correctAttainment[0].course_unit_id
-                        }
+                        courseUnitId = attainment[0].course_unit_id
                       }
+
                       return courseUnitIdToAttainment[courseUnitId]
                         ? courseUnitIdToAttainment[courseUnitId][studyplan.user_id]
                         : []
