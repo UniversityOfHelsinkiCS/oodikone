@@ -65,6 +65,7 @@ children: column objects. If this is defined, the column object is only a header
           use cell value getters (getRowVal etc) in columns where children is undefined
 displayColumn: set to false to hide whole column. Does not affect exporting
 vertical: If true, header is vertical
+noHeader: Just removes header, I think (not sure of the point of this, since you can just omit title)
 
 - Fields that set cell content or properties. Can receive either a value, or a function that takes data
   item as an argument, and returns value for specific row (for example s => s.studentNumber)
