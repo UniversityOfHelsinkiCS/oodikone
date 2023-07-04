@@ -11,3 +11,31 @@
   margin-top: 4em;
   width: 1200px;
 }
+
+.toggle-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 1em;
+}
+
+.radio-toggle {
+  display: flex;
+  justify-content: center;
+  margin: 20px 35px;
+}
+
+.toggle-label {
+  cursor: pointer;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  font-weight: bold;
+}
+
+.toggle-label-checked {
+  cursor: pointer;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  font-weight: bold;
+  opacity: 0.5;
+}

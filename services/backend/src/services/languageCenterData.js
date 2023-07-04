@@ -62,14 +62,14 @@ const getLanguageCenterData = async () => {
       studentnumber: { [Op.in]: Array.from(studentList.values()) },
     },
   })
-  console.log({length: studyrightElements.length})
+  console.log({ length: studyrightElements.length })
   const studyrightMap = studyrightElements.reduce((obj, cur) => {
     if (!obj[cur.studentnumber]) {
       obj[cur.studentnumber] = [{ startdate: cur.startdate, enddate: cur.enddate, code: cur.code }]
     } else {
       obj[cur.studentnumber].push({ startdate: cur.startdate, enddate: cur.enddate, code: cur.code })
     }
-    if (cur.studentnumber === '015068668') console.log({cur})
+    if (cur.studentnumber === '015068668') console.log({ cur })
     return obj
   }, {})
 
@@ -89,7 +89,12 @@ const getLanguageCenterData = async () => {
   ) */
 
   attemptsArray.forEach(item => {
-    item.faculty = getFaculty(item.studentNumber, item.date)
+    const faculty = getFaculty(item.studentNumber, item.date)
+    if (faculty?.startsWith('MH') || faculty?.startsWith('KH')) {
+      item.faculty = faculty.substring(1, 4)
+    } else {
+      item.faculty = faculty
+    }
     if (item.studentumber === '015068668') console.log(item)
   })
   console.log(attemptsArray[0])
