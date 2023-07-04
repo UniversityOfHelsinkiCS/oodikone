@@ -459,6 +459,7 @@ const studyplanMapper =
                               courseUnitIdToCode[att.course_unit_id] === courseUnitIdToCode[substitutedId] &&
                               validStates.includes(att.state) &&
                               att.type === 'CourseUnitAttainment' &&
+                              att.primary &&
                               !att.misregistration &&
                               att.person_id === studyplan.user_id
                           )
@@ -478,6 +479,7 @@ const studyplanMapper =
                           validStates.includes(att.state) &&
                           att.type === 'CourseUnitAttainment' &&
                           !att.misregistration &&
+                          att.primary &&
                           att.person_id === studyplan.user_id
                       )
                       if (attainment.length > 0) {
