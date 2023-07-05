@@ -222,6 +222,7 @@ const educationTypeToExtentcode = {
   'urn:code:education-type:non-degree-education:separate-studies:specialisation-studies': 18,
   'urn:code:education-type:non-degree-education:separate-studies:separate-special-education-teacher-pedagogical-studies': 22,
   'urn:code:education-type:degree-education:specialisation-in-medicine-and-dentistry': 23,
+  'urn:code:education-type:degree-education:specialisation-in-veterinary': 23,
   'urn:code:education-type:non-degree-education:summer-winter-school': 31,
   'urn:code:education-type:non-degree-education:exchange-studies-postgraduate': 34,
   'urn:code:education-type:non-degree-education:separate-studies': 99,
