@@ -34,9 +34,8 @@ const makeYearlyPromises = (years, academicYear, type, programmeCourses, studypr
   return years.map(
     year =>
       new Promise(async res => {
-        const from = academicYear == 'true' ? new Date(year, 7, 1, 0, 0, 0) : new Date(year, 0, 1, 0, 0, 0)
-        const to = academicYear == 'true' ? new Date(year + 1, 6, 31, 23, 59, 59) : new Date(year, 11, 31, 23, 59, 59)
-
+        const from = academicYear === 'true' ? new Date(year, 7, 1, 0, 0, 0) : new Date(year, 0, 1, 0, 0, 0)
+        const to = academicYear === 'true' ? new Date(year + 1, 6, 31, 23, 59, 59) : new Date(year, 11, 31, 23, 59, 59)
         let result = null
 
         switch (type) {
@@ -107,7 +106,6 @@ const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme,
     programmeCourses,
     studyprogramme
   )
-
   const yearlyTransferStudentsPromises = makeYearlyPromises(
     yearRange,
     academicYear,
