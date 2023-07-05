@@ -54,8 +54,12 @@ const CoursesTable = ({ students, studyGuidanceCourses }) => {
 
   const totalMandatoryPassed = useCallback(
     studentNumber =>
-      _.sumBy(mandatoryCourses.defaultProgrammeCourses, ({ code }) => hasPassedMandatory(studentNumber, code)) +
-      _.sumBy(mandatoryCourses.secondProgrammeCourses, ({ code }) => hasPassedMandatory(studentNumber, code)),
+      _.sumBy(Array.from(new Set(mandatoryCourses.defaultProgrammeCourses.map(({ code }) => code))), code =>
+        hasPassedMandatory(studentNumber, code)
+      ) +
+      _.sumBy(Array.from(new Set(mandatoryCourses.secondProgrammeCourses.map(({ code }) => code))), code =>
+        hasPassedMandatory(studentNumber, code)
+      ),
     [mandatoryCourses, hasPassedMandatory]
   )
 
