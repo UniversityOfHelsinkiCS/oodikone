@@ -66,14 +66,9 @@ const getTableCell = ({ year, programme, valIdx, rowIdx, tableLinePlaces, value 
 }
 
 const getOtherCountriesList = ({ year, code, extraTableStats }) => {
-  if (
-    !extraTableStats ||
-    !extraTableStats[year] ||
-    !extraTableStats[year][code] ||
-    !extraTableStats[year][code]?.countries
-  )
+  if (!extraTableStats || !extraTableStats[year] || !extraTableStats[year][code])
     return <p key={`${Math.random()}-nodata`}>No data</p>
-  const countriesData = extraTableStats[year][code].countries
+  const countriesData = extraTableStats[year][code]
   return Object.keys(countriesData)
     .sort()
     .map(key => (

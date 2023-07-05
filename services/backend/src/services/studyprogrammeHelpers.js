@@ -67,7 +67,7 @@ const formatStudyright = studyright => {
     active,
     prioritycode,
     extentcode,
-    studentnumber: student.studentnumber,
+    studentNumber: student.studentnumber,
     code: resolveStudyRightCode(studyright_elements),
     studyrightElements: studyright_elements,
     cancelled,
@@ -81,11 +81,21 @@ const formatStudyright = studyright => {
 const formatStudent = student => {
   const { studentnumber, gender_code, home_country_en, creditcount, credits } = student
   return {
-    studentnumber,
-    gender_code,
-    home_country_en,
+    studentNumber: studentnumber,
+    genderCode: gender_code,
+    homeCountryEn: home_country_en,
     creditcount,
     credits,
+  }
+}
+
+const formatCredit = credit => {
+  const { student_studentnumber, course_code, credits, attainment_date } = credit
+  return {
+    studentNumber: student_studentnumber,
+    courseCode: course_code,
+    credits,
+    attainmentDate: attainment_date,
   }
 }
 
@@ -139,21 +149,23 @@ const isMajorStudentCredit = (studyrights, attainment_date, code) =>
   studyrights.some(studyright => {
     if (!studyright) return false
     if (studyright.code !== code) return false
-    if (!studyright.graduated) return new Date(attainment_date) >= new Date(studyright.studystartdate)
-    return (
-      new Date(attainment_date) >= new Date(studyright.studystartdate) &&
-      new Date(attainment_date) <= new Date(studyright.enddate)
-    )
+    const startDate =
+      studyright.studyrightid.slice(-2) === '-2' && studyright.extentcode === 2
+        ? studyright.studystartdate
+        : studyright.startdate
+    if (!studyright.graduated) return new Date(attainment_date) >= new Date(startDate)
+    return new Date(attainment_date) >= new Date(startDate) && new Date(attainment_date) <= new Date(studyright.enddate)
   })
 
-const isNonMajorCredit = (studyrights, attainment_date) =>
+const isNonMajorCredit = (studyrights, attainmentDate) =>
   studyrights.some(studyright => {
     if (!studyright) return false
-    if (!studyright.graduated) return new Date(attainment_date) >= new Date(studyright.studystartdate)
-    return (
-      new Date(attainment_date) >= new Date(studyright.studystartdate) &&
-      new Date(attainment_date) <= new Date(studyright.enddate)
-    )
+    const startDate =
+      studyright.studyrightid.slice(-2) === '-2' && studyright.extentcode === 2
+        ? studyright.studystartdate
+        : studyright.startdate
+    if (!studyright.graduated) return new Date(attainmentDate) >= new Date(startDate)
+    return new Date(attainmentDate) >= new Date(startDate) && new Date(attainmentDate) <= new Date(studyright.enddate)
   })
 
 const isSpecialGroupCredit = (studyrights, attainment_date, transfers) =>
@@ -595,6 +607,7 @@ module.exports = {
   formatStudyright,
   formatStudent,
   formatTransfer,
+  formatCredit,
   getYearsArray,
   getYearsObject,
   getAcademicYearsObject,

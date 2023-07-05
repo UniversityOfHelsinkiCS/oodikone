@@ -31,21 +31,21 @@ const getUnique = studentnumbers => [...new Set(studentnumbers)]
 const getStudentData = (startDate, students, thresholdKeys, thresholdAmounts) => {
   let data = { female: 0, male: 0, otherUnkown: 0, finnish: 0, otherCountries: 0, otherCountriesCounts: {} }
   thresholdKeys.forEach(t => (data[t] = 0))
-  students.forEach(({ gender_code, home_country_en, credits }) => {
+  students.forEach(({ genderCode, homeCountryEn, credits }) => {
     const creditcount = credits
       .filter(credit => moment(credit.attainment_date).isAfter(startDate))
       .reduce((prev, curr) => (prev += curr.credits), 0)
 
-    data.male += gender_code === '1' ? 1 : 0
-    data.female += gender_code === '2' ? 1 : 0
-    data.otherUnkown += ['0', '3'].includes(gender_code) ? 1 : 0
-    data.finnish += home_country_en === 'Finland' ? 1 : 0
-    data.otherCountries += home_country_en !== 'Finland' ? 1 : 0
-    if (home_country_en !== 'Finland') {
-      if (!(home_country_en in data.otherCountriesCounts)) {
-        data.otherCountriesCounts[home_country_en] = 0
+    data.male += genderCode === '1' ? 1 : 0
+    data.female += genderCode === '2' ? 1 : 0
+    data.otherUnkown += ['0', '3'].includes(genderCode) ? 1 : 0
+    data.finnish += homeCountryEn === 'Finland' ? 1 : 0
+    data.otherCountries += homeCountryEn !== 'Finland' ? 1 : 0
+    if (homeCountryEn !== 'Finland') {
+      if (!(homeCountryEn in data.otherCountriesCounts)) {
+        data.otherCountriesCounts[homeCountryEn] = 0
       }
-      data.otherCountriesCounts[home_country_en] += 1
+      data.otherCountriesCounts[homeCountryEn] += 1
     }
     data[thresholdKeys[0]] += creditcount < thresholdAmounts[0] ? 1 : 0
     data[thresholdKeys[1]] += creditcount >= thresholdAmounts[0] && creditcount < thresholdAmounts[1] ? 1 : 0
@@ -70,9 +70,9 @@ const getStudentData = (startDate, students, thresholdKeys, thresholdAmounts) =>
   return data
 }
 // type: either Bc + Ms combo or Bc/Ms/T/anything else
-const addGraduation = async ({ studentnumber, startdate, enddate, graduationAmounts, times, track, type, year }) => {
+const addGraduation = async ({ studentNumber, startdate, enddate, graduationAmounts, times, track, type, year }) => {
   const totalTimeToGraduation = moment(enddate).diff(moment(startdate), 'months')
-  const statutoryAbsences = await getStatutoryAbsences(studentnumber, startdate, enddate)
+  const statutoryAbsences = await getStatutoryAbsences(studentNumber, startdate, enddate)
   const timeToGraduation = totalTimeToGraduation - statutoryAbsences
   graduationAmounts[track][type][year] += 1
   times[type] = [...times[type], timeToGraduation]
@@ -93,10 +93,10 @@ const getGraduationTimeStats = async ({
   // Count how long each student took to graduate
   // Separate Bc + Ms and other
   const times = { combo: [], basic: [] }
-  for (const { enddate, startdate, studyrightid, studentnumber } of graduated) {
+  for (const { enddate, startdate, studyrightid, studentNumber } of graduated) {
     if (doCombo && studyrightid.slice(-2) === '-2') {
       await addGraduation({
-        studentnumber,
+        studentNumber,
         startdate,
         enddate,
         graduationAmounts,
@@ -107,7 +107,7 @@ const getGraduationTimeStats = async ({
       })
     } else {
       await addGraduation({
-        studentnumber,
+        studentNumber,
         startdate,
         enddate,
         graduationAmounts,

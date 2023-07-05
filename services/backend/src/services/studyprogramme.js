@@ -3,7 +3,6 @@ const Sequelize = require('sequelize')
 const {
   dbConnections: { sequelize },
 } = require('../database/connection')
-const moment = require('moment')
 const { Op } = Sequelize
 const {
   Credit,
@@ -19,7 +18,7 @@ const {
   Semester,
   Enrollment,
 } = require('../models')
-const { formatStudyright, formatStudent, formatTransfer } = require('./studyprogrammeHelpers')
+const { formatStudyright, formatStudent, formatTransfer, formatCredit } = require('./studyprogrammeHelpers')
 const { getCurrentSemester } = require('./semesters')
 const logger = require('../util/logger')
 
@@ -462,30 +461,29 @@ const getStudyRights = async students =>
     })
   ).map(formatStudyright)
 
-const getCreditsForStudyProgramme = async (codes, since) => {
-  const res = await Credit.findAll({
-    attributes: ['id', 'course_code', 'credits', 'attainment_date', 'student_studentnumber'],
-    include: {
-      model: Course,
-      attributes: ['code'],
-      required: true,
+const getCreditsForStudyProgramme = async (codes, since) =>
+  (
+    await Credit.findAll({
+      attributes: ['id', 'course_code', 'credits', 'attainment_date', 'student_studentnumber'],
+      include: {
+        model: Course,
+        attributes: ['code'],
+        required: true,
+        where: {
+          code: codes,
+        },
+      },
       where: {
-        is_study_module: false,
-        code: codes,
+        credittypecode: 4,
+        isStudyModule: {
+          [Op.not]: true,
+        },
+        attainment_date: {
+          [Op.gte]: since,
+        },
       },
-    },
-    where: {
-      credittypecode: 4,
-      isStudyModule: {
-        [Op.not]: true,
-      },
-      attainment_date: {
-        [Op.gte]: since,
-      },
-    },
-  })
-  return res
-}
+    })
+  ).map(formatCredit)
 
 const getCourseCodesForStudyProgramme = async provider => {
   const coursesByProvider = await Course.findAll({
@@ -546,7 +544,7 @@ const getStudentsForProgrammeCourses = async (from, to, programmeCourses) => {
          )
          SELECT COUNT(student) AS total_students, SUM(credits) AS total_credits, code, course_name
          FROM Dist
-         GROUP BY dist.code, course_name;
+         GROUP BY dist.code, dist.course_name;
       `,
       {
         type: sequelize.QueryTypes.SELECT,
@@ -556,15 +554,15 @@ const getStudentsForProgrammeCourses = async (from, to, programmeCourses) => {
     return res.map(course => ({
       code: course.code,
       name: course.course_name,
-      year: course.year,
       totalPassed: parseInt(course.total_students),
       totalAllcredits: parseInt(course.total_credits),
       type: 'passed',
     }))
   } catch (e) {
-    logger.log(`getStudentsForProgrammeCourses() function failed ${e}`)
+    logger.error(`getStudentsForProgrammeCourses() function failed ${e}`)
   }
 }
+
 const getNotCompletedForProgrammeCourses = async (from, to, programmeCourses) => {
   try {
     const enrollmentsCourses = await Enrollment.findAll({
@@ -582,27 +580,31 @@ const getNotCompletedForProgrammeCourses = async (from, to, programmeCourses) =>
         state: 'ENROLLED',
       },
     })
+    const getCourseCode = code => {
+      if (code.startsWith('AY')) return code.replace('AY', '')
+      if (code.startsWith('A')) return code.replace('AY', '')
+      return code
+    }
     const allEnrollments = {}
     for (const { studentnumber, course_code } of enrollmentsCourses) {
-      if (!(course_code in allEnrollments)) {
-        allEnrollments[course_code] = []
+      const code = getCourseCode(course_code)
+      if (!(code in allEnrollments)) {
+        allEnrollments[code] = []
       }
-      allEnrollments[course_code].push(studentnumber)
+      if (!allEnrollments[code].includes(studentnumber)) allEnrollments[code].push(studentnumber)
     }
 
     const credits = await Credit.findAll({
-      attributes: ['id', 'course_code', 'student_studentnumber', 'credittypecode', 'attainment_date'],
+      attributes: ['course_code', 'student_studentnumber', 'credittypecode'],
       include: {
         model: Course,
         attributes: ['code', 'name'],
         required: true,
         where: {
-          is_study_module: false,
           code: programmeCourses,
         },
       },
       where: {
-        credittypecode: [4, 7, 10],
         isStudyModule: {
           [Op.not]: true,
         },
@@ -611,13 +613,13 @@ const getNotCompletedForProgrammeCourses = async (from, to, programmeCourses) =>
         },
       },
     })
+
     const creditsObj = credits.map(credit => {
       return {
-        code: credit.course_code,
+        code: getCourseCode(credit.course_code),
         studentnumber: credit.student_studentnumber,
         credittype: credit.credittypecode,
         courseName: credit.course.name,
-        year: moment(credit.attainment_date).year(),
       }
     })
 
@@ -629,23 +631,19 @@ const getNotCompletedForProgrammeCourses = async (from, to, programmeCourses) =>
         courses[course.code] = {
           code: course.code,
           name: course.courseName,
-          year: course.year,
         }
 
         passedByCourseCodes[course.code] = []
         notCompletedByCourseCodes[course.code] = []
       }
-      if ([4, 7].includes(course.credittype)) {
+      if ([4, 7, 9].includes(course.credittype)) {
         passedByCourseCodes[course.code].push(course.studentnumber)
       }
-      if (
-        (allEnrollments[course.code]?.includes(course.studentnumber) || course.credittype === 10) &&
-        !passedByCourseCodes[course.code].includes(course.studentnumber)
-      ) {
+      if (course.credittype === 10 && !passedByCourseCodes[course.code].includes(course.studentnumber)) {
         notCompletedByCourseCodes[course.code].push(course.studentnumber)
       }
     }
-    // If student has only an enrollment, but no attainment, they have no credit info.
+    // If student has enrollments, but no attainment for a particular course, they have no credit info.
     programmeCourses.forEach(courseCode => {
       if (allEnrollments[courseCode]) {
         allEnrollments[courseCode].forEach(studentnumber => {
@@ -661,12 +659,11 @@ const getNotCompletedForProgrammeCourses = async (from, to, programmeCourses) =>
       .map(course => ({
         code: course.code,
         name: course.name,
-        year: course.year,
         totalNotCompleted: [...new Set(notCompletedByCourseCodes[course.code])].length,
         type: 'notCompleted',
       }))
   } catch (e) {
-    logger.log(`getNotCompletedForProgrammeCourses failed ${e}`)
+    logger.error(`getNotCompletedForProgrammeCourses failed ${e}`)
   }
 }
 const getOwnStudentsForProgrammeCourses = async (from, to, programmeCourses, studyprogramme) => {

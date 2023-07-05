@@ -41,7 +41,7 @@ const addGraduation = async (studyright, isAcademicYear, amounts, times) => {
   const graduationYear = defineYear(studyright.enddate, isAcademicYear)
 
   const totalTimeToGraduation = moment(studyright.enddate).diff(moment(startdate), 'months')
-  const statutoryAbsences = await getStatutoryAbsences(studyright.studentnumber, startdate, studyright.enddate)
+  const statutoryAbsences = await getStatutoryAbsences(studyright.studentNumber, startdate, studyright.enddate)
   const timeToGraduation = totalTimeToGraduation - statutoryAbsences
 
   amounts[graduationYear] += 1
@@ -169,7 +169,7 @@ const formatStats = (stats, years) => {
 
 const getProgrammesBeforeStarting = async ({ studyprogramme, since, years, isAcademicYear, includeAllSpecials }) => {
   const all = await allStudyrights(studyprogramme)
-  const allStudents = all.map(s => s.studentnumber)
+  const allStudents = all.map(s => s.studentNumber)
 
   // Get studyrights for bachelor studyprogrammes. This excludes studytracks.
   const programmes = await getAllProgrammes()
@@ -181,8 +181,8 @@ const getProgrammesBeforeStarting = async ({ studyprogramme, since, years, isAca
   // Map transfers to the Master's programme
   const transfers = await getTransferStudyrightMap(studyprogramme, since)
 
-  studyrightsBeforeMasters.forEach(({ studentnumber, code, givendate }) => {
-    const masterStudyright = all.find(s => s.studentnumber === studentnumber)
+  studyrightsBeforeMasters.forEach(({ studentNumber, code, givendate }) => {
+    const masterStudyright = all.find(s => s.studentNumber === studentNumber)
     const transfer = transfers.get(masterStudyright.studyrightid)
 
     // If special studyrights are excluded, transfers to the master's programme should be excluded
@@ -207,7 +207,7 @@ const getProgrammesBeforeStarting = async ({ studyprogramme, since, years, isAca
 
 const getProgrammesAfterGraduation = async ({ studyprogramme, since, years, isAcademicYear, includeAllSpecials }) => {
   const graduated = await graduatedStudyRights(studyprogramme, since)
-  const graduatedStudents = graduated.map(s => s.studentnumber)
+  const graduatedStudents = graduated.map(s => s.studentNumber)
 
   // Get studyrights for masters studyprogramme. This excludes studytracks.
   const programmes = await getAllProgrammes()
@@ -218,8 +218,8 @@ const getProgrammesAfterGraduation = async ({ studyprogramme, since, years, isAc
 
   const transfers = await getTransferStudyrightMap(studyprogramme, since)
 
-  studyrightsAfterThisProgramme.forEach(({ studentnumber, studystartdate, code, givendate }) => {
-    const bachelorStudyright = graduated.find(s => s.studentnumber === studentnumber)
+  studyrightsAfterThisProgramme.forEach(({ studentNumber, studystartdate, code, givendate }) => {
+    const bachelorStudyright = graduated.find(s => s.studentNumber === studentNumber)
 
     // If special studyrights are excluded, transfers to the bachelor programme should be excluded
     if (!includeAllSpecials && transfers.get(bachelorStudyright.studyrightid)) {

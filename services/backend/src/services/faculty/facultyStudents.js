@@ -55,23 +55,19 @@ const addTotalsProgramme = (programmeTableStats, progId, year, totals) => {
 
 const getStudentData = (students, facultyExtra, year, code) => {
   let data = { female: 0, male: 0, finnish: 0, otherCountries: 0, otherUnknown: 0 }
-  students.forEach(({ gender_code, home_country_en }) => {
-    data.male += gender_code === '1' ? 1 : 0
-    data.female += gender_code === '2' ? 1 : 0
-    data.otherUnknown += ['0', '3'].includes(gender_code) ? 1 : 0
-    facultyExtra[year][code].otherG += gender_code === '3' ? 1 : 0
-    facultyExtra[year][code].unknownG += gender_code === '0' ? 1 : 0
-    facultyExtra['Total'][code].otherG += gender_code === '3' ? 1 : 0
-    facultyExtra['Total'][code].unknownG += gender_code === '0' ? 1 : 0
-    data.finnish += home_country_en === 'Finland' ? 1 : 0
-    data.otherCountries += home_country_en !== 'Finland' ? 1 : 0
-    if (!Object.keys(facultyExtra[year][code].countries).includes(home_country_en) && home_country_en !== 'Finland')
-      facultyExtra[year][code].countries[home_country_en] = 0
-    if (!Object.keys(facultyExtra['Total'][code].countries).includes(home_country_en) && home_country_en !== 'Finland')
-      facultyExtra['Total'][code].countries[home_country_en] = 0
-    if (home_country_en !== 'Finland') {
-      facultyExtra[year][code].countries[home_country_en] += 1
-      facultyExtra['Total'][code].countries[home_country_en] += 1
+  students.forEach(({ genderCode, homeCountryEn }) => {
+    data.male += genderCode === '1' ? 1 : 0
+    data.female += genderCode === '2' ? 1 : 0
+    data.otherUnknown += ['0', '3'].includes(genderCode) ? 1 : 0
+    data.finnish += homeCountryEn === 'Finland' ? 1 : 0
+    data.otherCountries += homeCountryEn !== 'Finland' ? 1 : 0
+    if (!Object.keys(facultyExtra[year][code]).includes(homeCountryEn) && homeCountryEn !== 'Finland')
+      facultyExtra[year][code][homeCountryEn] = 0
+    if (!Object.keys(facultyExtra['Total'][code]).includes(homeCountryEn) && homeCountryEn !== 'Finland')
+      facultyExtra['Total'][code][homeCountryEn] = 0
+    if (homeCountryEn !== 'Finland') {
+      facultyExtra[year][code][homeCountryEn] += 1
+      facultyExtra['Total'][code][homeCountryEn] += 1
     }
   })
   return data
@@ -98,7 +94,7 @@ const getFacultyDataForYear = async ({
   let extents = [1, 2, 3, 4]
   let graduated = [0]
   if (includeAllSpecials) {
-    extents = [...extents, ...[7, 9, 34, 22, 99, 14, 13]]
+    extents = [...extents, ...[6, 7, 9, 13, 14, 18, 22, 23, 34, 99]] // 16 is always excluded
   }
   if (includeGraduated) {
     graduated = [...graduated, 1]
@@ -111,10 +107,8 @@ const getFacultyDataForYear = async ({
     const start = moment(`${year.slice(0, 4)}-08-01`, 'YYYY-MM-DD')
     const end = moment(`${year.slice(-4)}-07-31`, 'YYYY-MM-DD').endOf('day')
     const allTransfers = await getTransfers(code, allProgrammeCodes, start, end)
-    if (!Object.keys(facultyExtra[year]).includes(code))
-      facultyExtra[year][code] = { unknownG: 0, otherG: 0, countries: {} }
-    if (!Object.keys(facultyExtra['Total']).includes(code))
-      facultyExtra['Total'][code] = { unknownG: 0, otherG: 0, countries: {} }
+    if (!Object.keys(facultyExtra[year]).includes(code)) facultyExtra[year][code] = {}
+    if (!Object.keys(facultyExtra['Total']).includes(code)) facultyExtra['Total'][code] = {}
     const startDateWhere = {
       startdate: {
         [Op.and]: {
