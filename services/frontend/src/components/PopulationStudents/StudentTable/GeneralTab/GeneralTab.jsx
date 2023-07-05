@@ -71,8 +71,8 @@ const GeneralTab = ({
       .map(stu => [stu.studentNumber, stu])
   )
 
-  const getCombinedProgrammeCode = (cleanedQueryStudyrights, studyGuidangeGroupProgrammes) => {
-    if (cleanedQueryStudyrights.length > 1) return cleanedQueryStudyrights[1]
+  const getCombinedProgrammeCode = (query, studyGuidangeGroupProgrammes) => {
+    if (query && query?.studyRights?.combinedProgramme) return query.combinedProgramme
     if (studyGuidangeGroupProgrammes.length > 1) return studyGuidangeGroupProgrammes[1]
     return ''
   }
@@ -84,8 +84,8 @@ const GeneralTab = ({
       ? group?.tags?.studyProgramme.split('+')
       : [group?.tags?.studyProgramme]
 
-  const programmeCode = cleanedQueryStudyrights[0] || studyGuidangeGroupProgrammes[0] || customPopulationProgramme
-  const combinedProgrammeCode = getCombinedProgrammeCode(cleanedQueryStudyrights, studyGuidangeGroupProgrammes)
+  const programmeCode = query?.studyRights?.programme || studyGuidangeGroupProgrammes[0] || customPopulationProgramme
+  const combinedProgrammeCode = getCombinedProgrammeCode(query, studyGuidangeGroupProgrammes)
 
   const {
     studentToStudyrightStartMap,
