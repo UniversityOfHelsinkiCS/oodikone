@@ -114,8 +114,8 @@ const getTransferredCreditStats = async ({ studyprogramme, since, years, isAcade
   const credits = await getTransferredCredits(providercode, since)
   const { graphStats, tableStats } = getStatsBasis(years)
 
-  credits.forEach(({ attainmentDate, credits }) => {
-    const attainmentYear = defineYear(attainmentDate, isAcademicYear)
+  credits.forEach(({ attainment_date, credits }) => {
+    const attainmentYear = defineYear(attainment_date, isAcademicYear)
     graphStats[indexOf(years, attainmentYear)] += credits || 0
     tableStats[attainmentYear] += credits || 0
   })
