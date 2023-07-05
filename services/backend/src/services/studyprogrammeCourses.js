@@ -34,8 +34,9 @@ const makeYearlyPromises = (years, academicYear, type, programmeCourses, studypr
   return years.map(
     year =>
       new Promise(async res => {
-        const from = academicYear === 'true' ? new Date(year, 7, 1, 0, 0, 0) : new Date(year, 0, 1, 0, 0, 0)
-        const to = academicYear === 'true' ? new Date(year + 1, 6, 31, 23, 59, 59) : new Date(year, 11, 31, 23, 59, 59)
+        const from = academicYear === 'ACADEMIC_YEAR' ? new Date(year, 7, 1, 0, 0, 0) : new Date(year, 0, 1, 0, 0, 0)
+        const to =
+          academicYear === 'ACADEMIC_YEAR' ? new Date(year + 1, 6, 31, 23, 59, 59) : new Date(year, 11, 31, 23, 59, 59)
         let result = null
 
         switch (type) {
@@ -72,7 +73,8 @@ const makeYearlyPromises = (years, academicYear, type, programmeCourses, studypr
 }
 
 const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme, academicYear, combinedProgramme) => {
-  const startDate = academicYear == 'true' ? await getCurrentStudyYearStartDate(unixMillis) : getCurrentYearStartDate()
+  const startDate =
+    academicYear === 'ACADEMIC_YEAR' ? await getCurrentStudyYearStartDate(unixMillis) : getCurrentYearStartDate()
   const startYear = startDate.getFullYear()
   const yearRange = _.range(2017, startYear + 1)
   const mainProgrammeCourses = await getAllStudyprogrammeCourses(studyprogramme)

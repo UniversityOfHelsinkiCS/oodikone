@@ -101,7 +101,6 @@ const StudyProgramme = props => {
           <ProgrammeCoursesOverview
             academicYear={academicYear}
             studyProgramme={programmeId}
-            combibedProgramme={secondProgrammeId}
             setAcademicYear={setAcademicYear}
             combinedProgramme={secondProgrammeId}
           />
