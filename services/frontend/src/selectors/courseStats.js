@@ -101,12 +101,12 @@ const getAllStudyProgrammes = createSelector(
   (courseStats, selectedCourseCode) => {
     const studentsIncluded = new Set(
       selectedCourseCode
-        ? courseStats[selectedCourseCode].statistics.reduce(
+        ? courseStats[selectedCourseCode]?.statistics?.reduce(
             (res, curr) => [...res, ...curr.students.studentnumbers],
             []
           )
         : Object.values(courseStats).reduce((totalStudents, programme) => {
-            const programmeStudents = programme.statistics.reduce(
+            const programmeStudents = programme?.statistics?.reduce(
               (res, curr) => [...res, ...curr.students.studentnumbers],
               []
             )

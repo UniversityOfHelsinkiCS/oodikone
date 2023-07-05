@@ -4,13 +4,14 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import './courseStatistics.css'
 import { useGetAuthorizedUserQuery } from 'redux/auth'
+import qs from 'query-string'
 import SearchForm from './SearchForm'
 import SingleCourseTab from './SingleCourseTab'
 import FacultyLevelStatistics from './FacultyLevelStatistics'
 import SummaryTab from './SummaryTab'
 import ProgressBar from '../ProgressBar'
 import { useProgress, useTitle } from '../../common/hooks'
-import { clearCourseStats } from '../../redux/coursestats'
+import { clearCourseStats, getCourseStats } from '../../redux/coursestats'
 import { checkUserAccess } from '../../common'
 import { userHasAccessToAllCourseStats } from './courseStatisticsUtils'
 
@@ -25,7 +26,8 @@ const CourseStatistics = () => {
   const history = useHistory()
   const dispatch = useDispatch()
   const { rights, roles } = useGetAuthorizedUserQuery()
-  const courseStats = useSelector(({ courseStats }) => courseStats)
+  const state = useSelector(state => state)
+  const { courseStats } = state
   const { pending: loading } = courseStats
   const courses = Object.keys(courseStats.data)
   const statsIsEmpty = courses.length === 0
@@ -40,6 +42,16 @@ const CourseStatistics = () => {
   useEffect(() => {
     setSelected(initCourseCode)
   }, [initCourseCode])
+
+  useEffect(() => {
+    const { courseCodes, ...params } = qs.parse(history.location.search)
+    if (!courseCodes) return
+    const query = {
+      ...params,
+      courseCodes: JSON.parse(courseCodes),
+    }
+    dispatch(getCourseStats(query, onProgress))
+  }, [history.location.search])
 
   useEffect(() => {
     if (statsIsEmpty) {
