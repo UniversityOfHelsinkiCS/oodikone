@@ -61,7 +61,7 @@ export const downloadStudentTableCsv = (studentStats, programmeNames, faculty, s
       [year]: [
         ...new Set(
           Object.keys(countriesExtra[year]).reduce(
-            (acc, prog) => [...acc, ...Object.keys(countriesExtra[year][prog].countries)].sort(),
+            (acc, prog) => [...acc, ...Object.keys(countriesExtra[year][prog])].sort(),
             []
           )
         ),
@@ -93,7 +93,7 @@ export const downloadStudentTableCsv = (studentStats, programmeNames, faculty, s
           ...countriesHeadersForEachYear[year].reduce(
             (stats, country) => ({
               ...stats,
-              [country]: countriesExtra[year][programme].countries[country] || '',
+              [country]: countriesExtra[year][programme][country] || '',
             }),
             {}
           ),
