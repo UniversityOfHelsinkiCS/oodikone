@@ -59,9 +59,9 @@ const facultyFormatStudyright = studyright => {
 const facultyProgrammeStudents = student => {
   const { studentnumber, home_country_en, gender_code, semester_enrollments } = student
   return {
-    studentnumber,
-    home_country_en,
-    gender_code,
+    stundetNumber: studentnumber,
+    homeCountryEn: home_country_en,
+    genderCode: gender_code,
     semesters: semester_enrollments.map(s => s.dataValues),
   }
 }
