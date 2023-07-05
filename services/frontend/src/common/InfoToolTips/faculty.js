@@ -31,7 +31,9 @@ export default {
   **Non-major other faculty students credits**: Sisältää tiedekunnan koulutusohjelmien tuottamat opintopisteet, joiden suorittajalla EI ole ollut suoritushetkellä ensisijaista opinto-oikeutta kyseiseen koulutusohjelmaan tai mihinkään muuhun kyseisen tiedekunnan koulutusohjelmaan.
   Sisältää esimerkiksi vaihto-opiskelijat ja erillis-opinto-oikeudella opiskelevat. Sisältää myös opintopisteet, jotka opiskelija on suorittanut koulutusohjelmaan ennen opintojen aloittamista koulutusohjelmassa tai opintojen päätyttyä.
   
-  **Non-degree student credits**: Sisältää tiedekuntaan suoritetut opintopisteet, joiden suorittajilla ei ole tutkinto-oikeutta Helsingin yliopistossa.
+  **Non-degree student credits**: Sisältää tiedekuntaan suoritetut opintopisteet, joiden suorittajilla ei ole tutkinto-oikeutta Helsingin yliopistossa ja jotka on suoritettu  Avoimessa yliopistossa, erillisoikeudella, erikoistumiskoulutuksessa tai korkeakoulujen välisessä yhteistyöopinnoissa.
+  
+  **Other non-degree credits**: Sisältää tiedekuntaan suoritetut opintopisteet, joiden suorittajilla ei ole tutkinto-oikeutta Helsingin yliopistossa ja jotka on suoritettu täydennys- tai erikoislääkärikoulutuksessa, sekä vaihto-opiskelijat.
   `,
   GraduatedOfTheFaculty: `Sisältää kyseisenä vuonna tiedekunnasta valmistuneet opiskelijat riippumatta siitä, minä vuonna opiskeluoikeus ohjelmaan on myönnetty. Jaottelu on tehty opinto-oikeuden päättymispäivän (=valmistumispäivän) perusteella.`,
   ThesisWritersOfTheFaculty: `Sisältää kyseisenä vuonna kandidaatintutkielman tai pro gradu -tutkielman suorittaneet opiskelijat. Mukana ei ole mahdollisia arvosanan korotuksia.`,
