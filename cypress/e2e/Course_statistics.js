@@ -155,7 +155,7 @@ describe('Course Statistics tests', () => {
       cy.contains('Fetch statistics').should('be.enabled').click()
       cy.contains('Käyttöjärjestelmät')
       cy.contains('TKT20003')
-
+      cy.wait(5000)
       cy.get('tbody > :nth-child(3) > :nth-child(2) .level').click()
       cy.contains('Population of course Käyttöjärjestelmät 2019-2020 (open and normal')
       cy.contains('TKT20003')
@@ -188,6 +188,7 @@ describe('Course Statistics tests', () => {
       cy.contains('Fetch statistics').should('be.enabled').click()
       cy.contains('TKT20003, 582219 Käyttöjärjestelmät')
       cy.get('[data-cy=unify_radio_reqular]').click()
+      cy.wait(5000)
       cy.get('tbody > :nth-child(3) > :nth-child(2) .level').click()
       cy.contains('Population of course Käyttöjärjestelmät 2019-2020')
       cy.contains('Language distribution').click()
