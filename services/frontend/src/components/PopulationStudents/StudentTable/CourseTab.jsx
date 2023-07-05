@@ -262,7 +262,7 @@ const CoursesTable = ({ students, studyGuidanceCourses }) => {
     <Tab.Pane loading={pending}>
       <div style={{ display: 'flex' }}>
         <div style={{ maxHeight: '80vh', width: '100%' }}>
-          {mandatoryCourses.defaultProgrammeCourses && mandatoryCourses.defaultProgrammeCourses.length > 0 && (
+          {mandatoryCourses?.defaultProgrammeCourses.length > 0 && (
             <SortableTable
               tableId="course-of-population-students"
               title={`Courses of population's students`}
