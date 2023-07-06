@@ -194,7 +194,7 @@ const CompletedCoursesSearch = ({ setValues, history, location }) => {
                 ? searchList.map(list => ({
                     ...list,
                     text: list.name,
-                    timestamp: list.updatedAt,
+                    timestamp: new Date(list.updatedAt),
                     params: { id: list.id },
                   }))
                 : []

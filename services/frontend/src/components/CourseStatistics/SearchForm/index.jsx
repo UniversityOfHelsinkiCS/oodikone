@@ -241,7 +241,10 @@ const SearchForm = props => {
       <SearchHistory
         disabled={isLoading}
         handleSearch={onSearchHistorySelected}
-        items={searchHistory}
+        items={searchHistory.map(item => {
+          item.timestamp = new Date(item.timestamp)
+          return item
+        })}
         updateItem={updateItemInSearchHistory}
       />
     </>

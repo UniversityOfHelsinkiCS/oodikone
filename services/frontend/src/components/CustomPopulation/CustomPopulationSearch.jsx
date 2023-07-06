@@ -149,7 +149,7 @@ const CustomPopulationSearch = ({
           items={customPopulationSearches.map(s => ({
             ...s,
             text: s.name,
-            timestamp: s.updatedAt,
+            timestamp: new Date(s.updatedAt),
             params: { id: s.id },
           }))}
           updateItem={() => null}
