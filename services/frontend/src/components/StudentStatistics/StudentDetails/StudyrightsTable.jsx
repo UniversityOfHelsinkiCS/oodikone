@@ -122,7 +122,7 @@ const StudyrightsTable = ({ Programmes, student, handleStartDateChange, showPopu
         const studytrack = studytracks.find(studytrack => studytrack.startdate === programme.startdate)
 
         return studytrack ? (
-          <p key={studytrack.name}>
+          <p key={`${studytrack.name}-${studytrack.startdate}`}>
             {`${studytrack.name} (${reformatDate(studytrack.startdate, 'DD.MM.YYYY')} - ${reformatDate(
               getAcualEndDate(studytrack.enddate, c.graduated),
               'DD.MM.YYYY'
@@ -130,7 +130,7 @@ const StudyrightsTable = ({ Programmes, student, handleStartDateChange, showPopu
             <br />{' '}
           </p>
         ) : (
-          <p>
+          <p key="empty-row">
             <br />{' '}
           </p>
         )
