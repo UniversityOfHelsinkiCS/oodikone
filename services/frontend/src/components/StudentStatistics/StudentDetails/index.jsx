@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { func, shape, string, arrayOf, integer, bool } from 'prop-types'
+import { func, shape, string, arrayOf, number, bool } from 'prop-types'
 import { connect, useDispatch } from 'react-redux'
 import { Segment, Loader } from 'semantic-ui-react'
 import { isEmpty, sortBy } from 'lodash'
@@ -221,13 +221,13 @@ StudentDetails.propTypes = {
           code: string,
           name: Object,
         }),
-        credits: integer,
+        credits: number,
         date: string,
         grade: string,
         passed: bool,
       })
     ),
-    credits: integer,
+    credits: number,
     fetched: bool,
     started: string,
     studentNumber: string,
