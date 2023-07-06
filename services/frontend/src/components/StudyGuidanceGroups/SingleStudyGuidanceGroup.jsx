@@ -124,6 +124,7 @@ const SingleStudyGroupContent = ({ filteredStudents, population, group }) => {
   const createPanels = students =>
     [
       {
+        key: 'credit-accumulation-panel',
         title: {
           content: (
             <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
@@ -151,6 +152,7 @@ const SingleStudyGroupContent = ({ filteredStudents, population, group }) => {
       },
       programmeCodes && year
         ? {
+            key: 'credit-statistics-panel',
             title: {
               content: (
                 <span
@@ -178,6 +180,7 @@ const SingleStudyGroupContent = ({ filteredStudents, population, group }) => {
           }
         : null,
       {
+        key: 'age-distribution-panel',
         title: {
           content: (
             <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
@@ -190,7 +193,7 @@ const SingleStudyGroupContent = ({ filteredStudents, population, group }) => {
         },
       },
       {
-        key: 3,
+        key: 'courses-panel',
         title: {
           content: (
             <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
@@ -217,6 +220,7 @@ const SingleStudyGroupContent = ({ filteredStudents, population, group }) => {
         },
       },
       {
+        key: 'students-of-population-panel',
         title: {
           content: (
             <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
@@ -239,7 +243,7 @@ const SingleStudyGroupContent = ({ filteredStudents, population, group }) => {
       },
     ]
       .filter(item => item !== null)
-      .map((panel, index) => ({ ...panel, index, onTitleClick: () => togglePanel(index) }))
+      .map((panel, index) => ({ ...panel, onTitleClick: () => togglePanel(index) }))
 
   return (
     <div style={{ overflowX: 'auto', flexGrow: 1, padding: '1px' }}>
