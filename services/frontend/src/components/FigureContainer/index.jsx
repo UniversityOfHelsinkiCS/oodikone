@@ -16,7 +16,6 @@ const Header = ({ children, actions, onClickExport }) => {
       <div style={{ marginRight: '1em' }}>{actions}</div>
       <Button
         onClick={onClickExport}
-        icon="save"
         size="tiny"
         style={{ marginRight: '1em', paddingLeft: '1em', paddingRight: '1em' }}
       >
