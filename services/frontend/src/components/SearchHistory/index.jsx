@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import moment from 'moment'
 import { sortBy } from 'lodash'
 import { Segment, Form, Header, Icon } from 'semantic-ui-react'
-import { arrayOf, func, shape, string, bool } from 'prop-types'
+import { arrayOf, func, shape, string, bool, instanceOf, oneOfType } from 'prop-types'
 
 const SearchHistory = ({ items, handleSearch, updateItem, disabled, header }) => {
   const [selected, setSelected] = useState(null)
@@ -65,7 +65,7 @@ SearchHistory.propTypes = {
     shape({
       text: string,
       params: shape({}),
-      timestamp: string,
+      timestamp: oneOfType([instanceOf(Date), string]),
     })
   ).isRequired,
   handleSearch: func.isRequired,

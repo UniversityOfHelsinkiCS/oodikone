@@ -15,7 +15,6 @@ const ProgrammeCoursesOverview = ({ studyProgramme, combinedProgramme, academicY
   const [toYear, setToYear] = useState(null)
   const [years, setYears] = useState({})
   const [showStudents, setShowStudents] = useState(false)
-
   // fromYear and toYear initial values are calculated from data and hence useEffect
   useEffect(() => {
     if (data) {

@@ -476,7 +476,14 @@ const PopulationSearchForm = props => {
         <Form.Button color="blue" onClick={handleSubmit} disabled={isQueryInvalid || query.months < 0}>
           See class
         </Form.Button>
-        <SearchHistory items={searchHistory} updateItem={updateItemInSearchHistory} handleSearch={pushQueryToUrl} />
+        <SearchHistory
+          items={searchHistory.map(item => {
+            item.date = new Date(item.date)
+            return item
+          })}
+          updateItem={updateItemInSearchHistory}
+          handleSearch={pushQueryToUrl}
+        />
       </Form>
     </div>
   )
