@@ -190,7 +190,9 @@ const defineYear = (date, isAcademicYear) => {
   if (!date) return ''
   const year = date.getFullYear()
   if (!isAcademicYear) return year
-  if (date < new Date(`${year}-07-31`)) return `${year - 1} - ${year}`
+  // Some dates are given in utc time in database, some not.
+  if (new Date(date).toISOString() < new Date(`${year}-07-31T21:00:00.000Z`).toISOString())
+    return `${year - 1} - ${year}`
   return `${year} - ${year + 1}`
 }
 
