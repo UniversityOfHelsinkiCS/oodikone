@@ -225,11 +225,12 @@ const getStudytrackDataForTheYear = async ({
         includeAllSpecials,
         includeGraduated,
       })
+
       const startedStudentnumbers = await getCorrectStudentnumbers({
         codes,
         startDate,
         endDate,
-        includeAllSpecials: !includeAllSpecials,
+        includeAllSpecials: false,
         includeGraduated,
       })
       const students = await studytrackStudents(studentnumbers)
