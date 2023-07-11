@@ -150,7 +150,12 @@ const updateStudyRights = async (
         active: parseActivity(studyright, termRegistrations),
         enddate: parseEndDate(studyright, 1, true),
       })
-
+      const phase1GraduationDate = studyright.study_right_graduation
+        ? new Date(studyright.study_right_graduation.phase1GraduationDate)
+        : null
+      const studyStartDate = phase1GraduationDate
+        ? phase1GraduationDate.setDate(phase1GraduationDate.getDate() + 1)
+        : null
       const studyRightMast = mapStudyright(studyright, {
         extentcode: 2,
         prioritycode: parsePriorityCode(studyright, 2, true),
@@ -158,9 +163,7 @@ const updateStudyRights = async (
         enddate: parseEndDate(studyright, 2, true),
         studyrightid: `${studyright.id}-2`,
         graduated: studyright.study_right_graduation && studyright.study_right_graduation.phase2GraduationDate ? 1 : 0,
-        studystartdate: studyright.study_right_graduation
-          ? studyright.study_right_graduation.phase1GraduationDate
-          : null,
+        studystartdate: studyStartDate,
       })
 
       acc.push(studyRightMast, studyRightBach)
@@ -216,7 +219,7 @@ const updateStudyRightElements = async (
       if (code === transfer.sourcecode) {
         enddate = new Date(transfer.transferdate)
       } else if (code === transfer.targetcode) {
-        realStartDate = transfer.transferdate
+        realStartDate = new Date(transfer.transferdate)
       }
     }
 
@@ -305,16 +308,7 @@ const updateStudyRightElements = async (
             transfersByStudyRightId,
             formattedStudyRightsById
           )
-          // In some transferred study rights start date is not correct due to first snapshot date
-          // This should fix cases, if a student has started in master programme after graduation in bachelor's and
-          // change the start date to transfer date instead of the study right snapshot date.
-          if (maProgramme.startdate !== baProgramme.startdate) {
-            if (startDate !== baProgramme.startdate) {
-              maProgramme.startdate = baProgramme.startdate
-            } else {
-              baProgramme.startdate = maProgramme.startdate
-            }
-          }
+
           const possibleBScDuplicate = snapshotStudyRightElements.find(element => element.code === baProgramme.code)
           if (possibleBScDuplicate) {
             snapshotStudyRightElements.push(maProgramme, maStudytrack)
@@ -323,7 +317,7 @@ const updateStudyRightElements = async (
           }
         } else {
           const [programme, studytrack] = mapStudyrightElements(
-            `${mainStudyRight.id}-1`, //mainStudyRight.id, duplikaattiifx
+            `${mainStudyRight.id}-1`, //mainStudyRight.id, duplikaattifix
             startDate,
             studentnumber,
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase1GroupId],
