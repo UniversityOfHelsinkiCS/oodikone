@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Table, Menu } from 'semantic-ui-react'
+import { Table, Menu, Popup, Icon } from 'semantic-ui-react'
 import CollapsedStackedBar from './CollapsedStackedBar'
 import BasicRow from './BasicRow'
 
@@ -107,7 +107,14 @@ const InteractiveDataTable = ({
     <div>
       <Menu compact attached="top">
         <Menu.Item style={{ cursor: 'default', borderRadius: '1px', padding: '5px' }} active color="black">
-          Sort by:
+          <Popup
+            trigger={
+              <div>
+                Sort by: <Icon name="question circle" />
+              </div>
+            }
+            content="Sort bars in the yearly charts by programme code or other column values. Sort is done inside the degree group."
+          />
         </Menu.Item>
         {sorterNames.map((sorterName, nameIndex) => (
           <Menu.Item
