@@ -12,8 +12,8 @@ const semesterStart = {
 }
 
 const semesterEnd = {
-  SPRING: '07-31',
-  FALL: '12-31',
+  SPRING: '07-31T23:59:59.000Z',
+  FALL: '12-31T23:59:59.000Z',
 }
 const getPassingSemester = (startYear, date) => {
   const mDate = moment(date).add(1, 'day')
@@ -58,7 +58,7 @@ const getYearStartAndEndDates = (year, isAcademicYear) => {
 
   return {
     startDate: new Date(`${year}-01-01`).toISOString(),
-    endDate: new Date(`${year}-12-31`).toISOString(),
+    endDate: new Date(`${year}-12-31T23:59:59.000Z`).toISOString(),
   }
 }
 
