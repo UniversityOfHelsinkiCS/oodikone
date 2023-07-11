@@ -86,7 +86,7 @@ const Overview = ({
       </div>
       <InfoBox content={toolTips[toolTipText]} cypress={toolTipText} />
       <Popup
-        content="Download statistics as csv"
+        content="Download statistics as xlsx file"
         trigger={
           <Button
             icon="download"
@@ -117,7 +117,7 @@ const Overview = ({
 
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
 
-  const creditShortTitles = ['Code', 'Total', 'Major', 'Non-major', 'Non-major other', 'Non-degree']
+  const creditShortTitles = ['Code', 'Total', 'Major', 'Non-major', 'Non-major other', 'Non-degree', 'Other Non-degree']
   let transferShortTitles = []
   if (special === 'SPECIAL_INCLUDED') {
     transferShortTitles = ['Code', 'Started', 'Graduated', 'Transferred in', 'Transferred away', 'Transferred to']
