@@ -47,6 +47,8 @@ const studyRightHasDegreeEducation = studyRight => {
   ) {
     return true
   }
+  // continuous education
+  if (educationType.id === 'urn:code:education-type:non-degree-education:updating-training') return true
   return educationType.parent_id !== 'urn:code:education-type:non-degree-education'
 }
 
