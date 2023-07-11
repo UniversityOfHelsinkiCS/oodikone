@@ -12,27 +12,25 @@ const {
 const { graduatedStudyRights, startedStudyrights, transfersAway, transfersTo } = require('./studyprogramme')
 const { getYearStartAndEndDates } = require('../util/semester')
 
-const getStartedStats = async ({ studyprogramme, since, years, isAcademicYear, includeAllSpecials }) => {
+const getStartedStats = async ({ studyprogramme, years, isAcademicYear }) => {
   const { graphStats, tableStats } = getStatsBasis(years)
 
-  await Promise.all(
-    years.map(async year => {
-      const { startDate, endDate } = getYearStartAndEndDates(year, isAcademicYear)
-      const studentnumbersOfTheYear = await getCorrectStudentnumbers({
-        codes: [studyprogramme],
-        startDate,
-        endDate,
-        includeAllSpecials,
-      })
-      const studyrights = await startedStudyrights(studyprogramme, since, studentnumbersOfTheYear)
-
-      studyrights.forEach(({ studystartdate }) => {
-        const startYear = defineYear(studystartdate, isAcademicYear)
-        graphStats[indexOf(years, startYear)] += 1
-        tableStats[startYear] += 1
-      })
+  for (const year of years) {
+    const { startDate, endDate } = getYearStartAndEndDates(year, isAcademicYear)
+    const studentnumbersOfTheYear = await getCorrectStudentnumbers({
+      codes: [studyprogramme],
+      startDate,
+      endDate,
+      includeAllSpecials: false,
+      includeGraduated: true,
     })
-  )
+    const studyrights = await startedStudyrights(studyprogramme, startDate, studentnumbersOfTheYear)
+    studyrights.forEach(({ studystartdate }) => {
+      const startYear = defineYear(studystartdate, isAcademicYear)
+      graphStats[indexOf(years, startYear)] += 1
+      tableStats[startYear] += 1
+    })
+  }
   return { graphStats, tableStats }
 }
 
