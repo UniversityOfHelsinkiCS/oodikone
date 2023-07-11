@@ -24,6 +24,7 @@ const InteractiveDataTable = ({
   const [columnIndex, setSelectedIndex] = useState(0)
   const [visible, setVisible] = useState(yearsVisible)
 
+  // Note: sorting is happening inside of the degree levels, e.g. bachelors, masters, etc...
   const sortBySelectedColumn = () => {
     const keys = {}
     if (!(columnIndex === 0)) {
