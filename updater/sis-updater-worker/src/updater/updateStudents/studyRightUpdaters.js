@@ -12,9 +12,28 @@ const {
   getSemesterByDate,
 } = require('../shared')
 
-// work on progress
-const isCancelled = studyright => {
-  if (studyright.study_right_cancellation !== null) return true
+const isCancelled = (studyright, extentcode) => {
+  if (
+    extentcode === 1 &&
+    studyright.study_right_cancellation &&
+    ['RESCINDED', 'CANCELLED_BY_ADMINISTRATION', 'PASSIVE'].includes(
+      studyright.study_right_cancellation.cancellationType
+    ) &&
+    !studyright.study_right_graduation
+  ) {
+    return true
+  }
+  if (
+    extentcode === 2 &&
+    studyright.study_right_cancellation &&
+    ['RESCINDED', 'CANCELLED_BY_ADMINISTRATION', 'PASSIVE'].includes(
+      studyright.study_right_cancellation.cancellationType
+    ) &&
+    (!studyright.study_right_graduation ||
+      (studyright.study_right_graduation && !studyright.study_right_graduation.phase2GraduationDate))
+  ) {
+    return true
+  }
   return false
 }
 const updateStudyRights = async (
@@ -25,7 +44,7 @@ const updateStudyRights = async (
 ) => {
   const currentSemester = getSemesterByDate(new Date())
   const studyrightMapper = (personIdToStudentNumber, admissionNamesById) => (studyright, overrideProps) => {
-    const cancelled = isCancelled(studyright)
+    const cancelled = isCancelled(studyright, 1)
     const defaultProps = {
       studyrightid: `${studyright.id}-1`, // duplikaattifix
       facultyCode: getOrganisationCode(studyright.organisation_id),
@@ -44,8 +63,14 @@ const updateStudyRights = async (
   }
 
   const parseActivity = (studyright, termRegistrations) => {
-    // These are the states which indicate that the studyright has been cancelled by student or administration, thus studyright is not active
-    if (['RESCINDED', 'CANCELLED_BY_ADMINISTRATION', 'PASSIVE'].includes(studyright.state)) {
+    // These are the states which indicate that the study right has been cancelled by student or administration, thus studyright is not active
+    // NOT_STARTED means that study right starts in the future.
+    if (
+      studyright.study_right_cancellation &&
+      ['RESCINDED', 'CANCELLED_BY_ADMINISTRATION', 'PASSIVE', 'NOT_STARTED', 'EXPIRED'].includes(
+        studyright.study_right_cancellation.cancellationType
+      )
+    ) {
       return 0
     }
     // If the student has registered to be absent or attending for this semester, the studyright is active
@@ -164,6 +189,7 @@ const updateStudyRights = async (
         studyrightid: `${studyright.id}-2`,
         graduated: studyright.study_right_graduation && studyright.study_right_graduation.phase2GraduationDate ? 1 : 0,
         studystartdate: studyStartDate,
+        cancelled: isCancelled(studyright, 2),
       })
 
       acc.push(studyRightMast, studyRightBach)
