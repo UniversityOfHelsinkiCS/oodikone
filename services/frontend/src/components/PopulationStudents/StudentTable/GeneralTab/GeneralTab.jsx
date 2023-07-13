@@ -72,7 +72,7 @@ const GeneralTab = ({
   )
 
   const getCombinedProgrammeCode = (query, studyGuidangeGroupProgrammes) => {
-    if (query && query?.studyRights?.combinedProgramme) return query.combinedProgramme
+    if (query && query?.studyRights?.combinedProgramme) return query.studyRights.combinedProgramme
     if (studyGuidangeGroupProgrammes.length > 1) return studyGuidangeGroupProgrammes[1]
     return ''
   }
