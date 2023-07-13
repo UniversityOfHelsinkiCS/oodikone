@@ -399,7 +399,7 @@ export const resolveStudyPlan = (studyPlans, studyRight) => {
   const { code } =
     studyRight.studyright_elements
       .filter(e => e.element_detail.type === 20)
-      .sort((a, b) => new Date(b.startdate) - new Date(a.startdate))[0] || {}
+      .sort((a, b) => new Date(a.startdate) - new Date(b.startdate))[0] || {}
   if (!code) return null
   return studyPlans.find(p => p.programme_code === code && p.studyrightid === studyRight.studyrightid)
 }
