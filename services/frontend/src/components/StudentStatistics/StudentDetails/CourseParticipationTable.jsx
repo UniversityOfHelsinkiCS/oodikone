@@ -6,7 +6,9 @@ import useLanguage from 'components/LanguagePicker/useLanguage'
 import { byDateDesc, reformatDate, getTextInWithOpen, resolveStudyPlan } from '../../../common'
 import StudentCourseTable from '../StudentCourseTable'
 
-const isInStudyPlan = (plan, code) => plan && plan.included_courses.includes(code)
+// Some courses are without AY in the beginning in the studyplan even though the credits are registered with AY.
+const isInStudyPlan = (plan, code) =>
+  plan && (plan.included_courses.includes(code) || plan.included_courses.includes(code.replace('AY', '')))
 
 const CourseParticipationTable = ({ student, clearCourseStats, studyrightid }) => {
   const { language } = useLanguage()
