@@ -127,11 +127,11 @@ const StudyrightsTable = ({ Programmes, student, handleStartDateChange, showPopu
               getAcualEndDate(studytrack.enddate, c.graduated),
               'DD.MM.YYYY'
             )})`}
-            <br />{' '}
+            <br />
           </p>
         ) : (
-          <p key="empty-row">
-            <br />{' '}
+          <p key={`empty-row-${Math.random()}`}>
+            <br />
           </p>
         )
       })
@@ -163,7 +163,7 @@ const StudyrightsTable = ({ Programmes, student, handleStartDateChange, showPopu
             <Table.HeaderCell />
             {studyRightHeaders.map(header => (
               <Table.HeaderCell key={header}>
-                {header}{' '}
+                {header}
                 {header === 'Status' && (
                   <Popup
                     hoverable
