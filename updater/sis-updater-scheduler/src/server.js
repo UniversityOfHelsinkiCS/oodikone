@@ -9,8 +9,6 @@ const {
   scheduleByStudentNumbers,
   scheduleByCourseCodes,
 } = require('./scheduler')
-const { getStructure } = require('./explorer')
-const { getCourses } = require('./courseParser')
 const { SECRET_TOKEN } = require('./config')
 
 const bakeMessage =
@@ -93,26 +91,6 @@ app.get('/v1/abort', async (req, res) => {
     logger.info('Abort message sent')
     res.locals.msg('Abort message sent')
   })
-})
-
-app.get('/v1/structure/:code', async (req, res) => {
-  try {
-    const studyModule = await getStructure(req.params.code)
-    res.json(studyModule)
-  } catch (e) {
-    res.json({ error: e })
-  }
-})
-
-app.get('/v1/courses/:code', async (req, res) => {
-  try {
-    const superFlatten = Boolean(req.query.superFlatten)
-    const studyModule = await getCourses(req.params.code, superFlatten)
-    res.json(studyModule)
-  } catch (e) {
-    logger.error({ message: 'Failed to get courses codes recursively', meta: e.stack })
-    res.json({ error: e })
-  }
 })
 
 app.post('/v1/courses', async (req, res) => {
