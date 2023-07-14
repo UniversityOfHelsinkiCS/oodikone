@@ -193,9 +193,9 @@ describe('Population Statistics', () => {
   })
 
   it('Courses filter works', () => {
-    // courses takes long time to load, wait for it to complete
-    cy.wait(25000)
     runTestStepWithPreAndPostParts('Courses', () => {
+      // courses takes long time to load, wait for it to complete
+      cy.wait(25000)
       cy.contains('Courses of class').click()
       cy.cs('Courses-filter-card').click()
       cy.cs('courseFilter-course-dropdown').click()
@@ -211,8 +211,8 @@ describe('Population Statistics', () => {
       checkFilteringResult(50)
       cy.cs(`courseFilter-${courses[1]}-dropdown`).selectFromDropdown(2)
       checkFilteringResult(1)
-      courses.forEach(course => cy.cs(`courseFilter-${course}-clear`).click())
       cy.contains('Courses of class').click()
+      courses.forEach(course => cy.cs(`courseFilter-${course}-clear`).click())
     })
   })
 
