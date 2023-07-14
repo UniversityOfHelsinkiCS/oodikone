@@ -99,34 +99,25 @@ describe('Population Statistics tests', () => {
       cy.contains('Create new tag')
     })
 
-    // TODO: this fails in CI, but not locally. Investigate and fix
-    it.skip('Advanced settings work', () => {
+    it('Advanced settings work', () => {
       cy.visit(pathToCSBach2017)
       cy.get('[data-cy=advanced-toggle]').click()
       // only spring
       cy.cs('toggle-fall').click()
       cy.contains('Fetch class').click()
-
-      // moar waiting hack
       // eslint-disable-next-line cypress/no-unnecessary-waiting
       cy.wait(10000)
-
-      cy.contains('No statistics found for the given query.')
-
+      cy.contains('Students (0)')
       // only fall
       cy.get('[data-cy=advanced-toggle]').click()
       cy.cs('toggle-fall').click()
       cy.cs('toggle-spring').click()
-
       cy.contains('Fetch class').click()
-
       cy.contains('Credit accumulation (for 170 students)')
-
       // spring + fall
       cy.get('[data-cy=advanced-toggle]').click()
       cy.cs('toggle-spring').click()
       cy.contains('Fetch class').click()
-
       cy.contains('Credit accumulation (for 170 students)')
     })
 
@@ -158,7 +149,6 @@ describe('Population Statistics tests', () => {
 
       cy.get("[data-cy='credits-gained-table-body'] td:nth-child(3)").then($els => {
         const sum = [...$els].map($el => parseInt($el.innerText)).reduce((a, b) => a + b, 0)
-
         expect(sum).to.equal(170)
       })
 
