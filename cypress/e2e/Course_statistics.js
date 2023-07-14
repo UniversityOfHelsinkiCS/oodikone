@@ -367,7 +367,7 @@ describe('Course Statistics tests', () => {
     })
   })
 
-  it.skip('Some features of Course Statistics are hidden for courseStatistics-users without other rights', () => {
+  it('Some features of Course Statistics are hidden for courseStatistics-users without other rights', () => {
     cy.init('/coursestatistics', 'onlycoursestatistics')
     cy.get('[data-cy=navbar-courseStatistics]').click()
     cy.get('[data-cy=course-code-input]').type('TKT20003')
@@ -381,10 +381,8 @@ describe('Course Statistics tests', () => {
 
     const attemptsTableContents = [
       // [time, passed, failed, passrate]
-      ['Total', 288, 213, 75, '73.96 %'], //Somehow cypress in CI can't find the number even if it is present in the artifact video
-      ['2020-2021', '5 or less students', 'NA', 'NA', 'NA'],
-      // ['Total', null, 295, 216, 79, '73.22 %'],
-      // ['2020-2021', null, 5, 2, 3, '40.00 %'],
+      ['Total', null, 295, 216, 79, '73.22 %', 0, 0, 0, 0],
+      ['2020-2021', null, 5, 2, 3, '40.00 %'],
       ['2019-2020', null, 164, 121, 43, '73.78 %'],
       ['2018-2019', null, 85, 60, 25, '70.59 %'],
       ['2017-2018', null, 39, 32, 7, '82.05 %'],
