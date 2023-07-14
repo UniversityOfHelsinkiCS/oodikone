@@ -68,6 +68,25 @@ const createRunTestStepWithPreAndPostPartsFunction = amountWithoutFiltering => {
   }
 }
 
+describe('Population Statistics with CS master', () => {
+  const pathToCSMast2019 =
+    '/populations?months=36&semesters=FALL&semesters=SPRING&studyRights={%22programme%22%3A%22MH50_009%22}&tag&year=2019'
+  const defaultAmountOfStudents = 27
+  const runTestStepWithPreAndPostParts = createRunTestStepWithPreAndPostPartsFunction(defaultAmountOfStudents)
+  before(() => {
+    cy.init(pathToCSMast2019)
+  })
+
+  it('Study track filter works', () => {
+    runTestStepWithPreAndPostParts('StudyTrack', () => {
+      const card = cy.cs('StudyTrack-filter-card')
+      const programmeDropdown = card.cs('StudyTrack-filter-dropdown').selectFromDropdown(0)
+      checkFilteringResult(1)
+      programmeDropdown.get('i.delete').click()
+    })
+  })
+})
+
 describe('Population Statistics', () => {
   const pathToCSBach2018 =
     '/populations?months=36&semesters=FALL&semesters=SPRING&studyRights={%22programme%22%3A%22KH50_005%22}&tag&year=2018'
@@ -84,18 +103,6 @@ describe('Population Statistics', () => {
     runTestStepWithPreAndPostParts('TransferredToProgramme', () => {
       const card = cy.cs('TransferredToProgramme-filter-card')
       card.get('[data-cy="option-havenot"] input').should('be.checked')
-    })
-  })
-
-  // The test does not work since it tries to filter by "Ravitsemustiede"-studytrack when checking
-  // CS Bachelor students. Now that the irrelevant studytracks have been removed, the test fails.
-  // So fix this
-  it.skip('Study track filter works', () => {
-    runTestStepWithPreAndPostParts('StudyTrack', () => {
-      const card = cy.cs('StudyTrack-filter-card')
-      const programmeDropdown = card.cs('StudyTrack-filter-dropdown').selectFromDropdown(0)
-      checkFilteringResult(1)
-      programmeDropdown.get('i.delete').click()
     })
   })
 
@@ -185,21 +192,24 @@ describe('Population Statistics', () => {
     })
   })
 
-  // plz fix
-  it.skip('Courses filter works', () => {
+  it('Courses filter works', () => {
     // courses takes some time to load, wait for it to complete
     cy.wait(10000)
     runTestStepWithPreAndPostParts('Courses', () => {
+      cy.cs('Courses-filter-card').click()
       cy.cs('courseFilter-course-dropdown').click()
-      const courses = ['TKT20001', 'MAT11002']
-      cy.cs('courseFilter-course-dropdown').click().contains(courses[0]).click()
-      checkFilteringResult(140)
+      const courses = ['TKT20002', 'MAT11002']
+      cy.cs('courseFilter-course-dropdown').click().contains(`${courses[0]} - Ohjelmistotekniikka`).click()
+      checkFilteringResult(118)
       cy.cs(`courseFilter-${courses[0]}-dropdown`).selectFromDropdown(1)
-      checkFilteringResult(131)
-      cy.cs('courseFilter-course-dropdown').click().contains(courses[1]).click()
-      checkFilteringResult(56)
+      checkFilteringResult(117)
+      cy.cs('courseFilter-course-dropdown')
+        .click()
+        .contains(`${courses[1]} - Lineaarialgebra ja matriisilaskenta I`)
+        .click()
+      checkFilteringResult(50)
       cy.cs(`courseFilter-${courses[1]}-dropdown`).selectFromDropdown(2)
-      checkFilteringResult(2)
+      checkFilteringResult(1)
       courses.forEach(course => cy.cs(`courseFilter-${course}-clear`).click())
     })
   })
@@ -371,22 +381,16 @@ describe('Custom Population Statistics', () => {
     })
   })
 
-  it.skip('Courses filter works', () => {
+  it('Courses filter works', () => {
     runTestStepWithPreAndPostParts('Courses', () => {
       const courses = ['MAT11001', 'TKT20004']
-      cy.cs('courseFilter-course-dropdown')
-        .click()
-        .contains(courses[0] + ' ')
-        .click()
-      checkFilteringResult(5)
+      cy.cs('courseFilter-course-dropdown').click().contains(`${courses[0]} - Johdatus yliopistomatematiikkaan`).click()
+      checkFilteringResult(4)
       cy.cs(`courseFilter-${courses[0]}-dropdown`).selectFromDropdown(1)
-      checkFilteringResult(5)
-      cy.cs('courseFilter-course-dropdown')
-        .click()
-        .contains(courses[1] + ' ')
-        .click()
+      checkFilteringResult(4)
+      cy.cs('courseFilter-course-dropdown').click().contains(`${courses[1]} - Tietoliikenteen perusteet`).click()
       checkFilteringResult(3)
-      cy.cs(`courseFilter-${courses[1]}-dropdown`).selectFromDropdown(3)
+      cy.cs(`courseFilter-${courses[1]}-dropdown`).selectFromDropdown(2)
       checkFilteringResult(1)
       courses.forEach(course => cy.cs(`courseFilter-${course}-clear`).click())
     })
