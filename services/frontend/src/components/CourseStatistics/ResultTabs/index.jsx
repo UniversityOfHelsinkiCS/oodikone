@@ -57,7 +57,7 @@ const PaneContent = ({
           {datasets
             .filter(i => i)
             .map(data => (
-              <div style={{ flexGrow: 1, flexBasis: 1, width: '100%' }}>
+              <div key={data.name} style={{ flexGrow: 1, flexBasis: 1, width: '100%' }}>
                 <h3>{data.name}</h3>
                 <Component data={data} settings={settings} {...rest} />
               </div>
@@ -118,7 +118,7 @@ const ResultTabs = ({ primary, comparison, history, separate, availableStats, lo
 
   const panes = paneTypes.map(
     ({ icon, label, initialSettings, component: Component, settings: SettingsComponent }) => ({
-      menuItem: { icon, content: label },
+      menuItem: { icon, content: label, key: label },
       render: () => (
         <PaneContent
           component={Component}
