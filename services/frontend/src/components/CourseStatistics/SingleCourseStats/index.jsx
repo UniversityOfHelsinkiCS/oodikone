@@ -428,9 +428,9 @@ const SingleCourseStats = ({
   return (
     <div>
       <Segment>
+        <Header as="h4">Statistics by time range</Header>
+        <YearFilter years={filteredYears} fromYear={fromYear} toYear={toYear} handleChange={handleYearChange} />
         <Form>
-          <Header as="h4">Statistics by time range</Header>
-          <YearFilter years={filteredYears} fromYear={fromYear} toYear={toYear} handleChange={handleYearChange} />
           {maxYearsToCreatePopulationFrom < toYear - fromYear + 1 ? (
             <Popup
               content={`Max years to create a population from for this course is ${Math.max(
@@ -525,7 +525,7 @@ SingleCourseStats.propTypes = {
   history: shape({
     push: func,
   }).isRequired,
-  getMaxYearsToCreatePopulationFrom: Number.isRequired,
+  getMaxYearsToCreatePopulationFrom: func.isRequired,
   maxYearsToCreatePopulationFrom: number.isRequired,
   userHasAccessToAllStats: bool.isRequired,
 }
@@ -533,7 +533,7 @@ SingleCourseStats.propTypes = {
 const mapStateToProps = state => {
   return {
     programmes: selectors.getAllStudyProgrammes(state),
-    maxYearsToCreatePopulationFrom: selectors.getMaxYearsToCreatePopulationFrom(state),
+    maxYearsToCreatePopulationFrom: selectors.getMaxYearsToCreatePopulationFrom(state) || 0,
   }
 }
 
