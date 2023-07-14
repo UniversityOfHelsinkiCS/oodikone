@@ -14,7 +14,6 @@ import units from './units'
 import elementdetails from './elementdetails'
 import students from './students'
 import errors from './errors'
-import courses from './courses'
 import courseInstances from './courseInstances'
 import graphSpinner from './graphSpinner'
 import settings from './settings'
@@ -50,7 +49,6 @@ const store = configureStore({
     units,
     students,
     errors,
-    courses,
     courseInstances,
     graphSpinner,
     settings,
