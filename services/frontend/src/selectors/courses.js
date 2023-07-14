@@ -1,6 +1,6 @@
 import { createSelector } from '@reduxjs/toolkit'
 import { orderBy } from 'lodash'
-import { byDateDesc, reformatDate } from '../common'
+import { byDateDesc } from '../common'
 
 const sortAlternatives = alternatives => {
   const result = orderBy(
@@ -66,20 +66,7 @@ const filterCourseSearchResults = (courses /*  unifyOpenUniCourses */) => {
 }
 
 const getData = obj => obj
-const getInstanceData = obj => obj.data
 const getCourseSearchSelector = state => state.courseSearch.data.courses
-
-export const sortInstances = courseInstances => {
-  if (courseInstances) {
-    return courseInstances.sort(byDateDesc).map(instance => ({
-      key: instance.id,
-      text: `${reformatDate(instance.date, 'DD.MM.YYYY')} (${instance.students} students)`,
-      value: instance.id,
-      ...instance,
-    }))
-  }
-  return []
-}
 
 export const sortCourses = courseList =>
   Object.values(courseList.data)
@@ -90,8 +77,6 @@ export const sortCourses = courseList =>
       key: `${course.name}-${course.code}`,
       selected: courseList.selected.some(c => course.code === c.code),
     }))
-
-export const makeSortCourseInstances = () => createSelector(getInstanceData, sortInstances)
 
 export const makeSortCourses = () => createSelector(getData, sortCourses)
 
