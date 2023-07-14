@@ -193,8 +193,8 @@ describe('Population Statistics', () => {
   })
 
   it('Courses filter works', () => {
-    // courses takes some time to load, wait for it to complete
-    cy.wait(10000)
+    // courses takes long time to load, wait for it to complete
+    cy.wait(20000)
     runTestStepWithPreAndPostParts('Courses', () => {
       cy.cs('Courses-filter-card').click()
       cy.cs('courseFilter-course-dropdown').click()
