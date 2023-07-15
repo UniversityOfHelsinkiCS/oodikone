@@ -49,6 +49,6 @@ export default {
   GradeDistribution: `
     **Grade distribution**
 
-    Graafi näyttää suorituskertojen arvosanajakauman eri lukuvuosille. Mahdollinen kategoria
+    Graafi näyttää suorituskertojen arvosanajakauman eri lukuvuosille.
   `,
 }
