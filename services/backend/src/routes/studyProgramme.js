@@ -25,7 +25,7 @@ const logInfoForGrafana = async (code, combinedProgramme) => {
   const programme = await ElementDetail.findOne({ where: { code: code } })
   const programmeCode = combinedProgramme ? `${programme.code}-${combinedProgramme}` : programme.code
   logger.info('Study Programme', {
-    studyprogrammeName: combinedProgramme ? `{$programme.name.fi} + maisteri` : programme.name.fi,
+    studyprogrammeName: combinedProgramme ? `${programme.name.fi} + maisteri` : programme.name.fi,
     studyprogrammeCode: programmeCode,
   })
 }
