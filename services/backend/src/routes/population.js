@@ -86,42 +86,6 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
   }
 })
 
-router.post('/v2/populationstatistics/coursesbycoursecode', async (req, res) => {
-  const { from, to, coursecodes } = req.body
-  if (!from || !to || !coursecodes) {
-    return res.status(400).json({ error: 'The body should have a yearcode and coursecode defined' })
-  }
-  const maxYearsToCreatePopulationFrom = await CourseService.maxYearsToCreatePopulationFrom(coursecodes)
-  if (Math.abs(to - from + 1) > maxYearsToCreatePopulationFrom) {
-    return res.status(400).json({ error: `Max years to create population from is ${maxYearsToCreatePopulationFrom}` })
-  }
-
-  const {
-    user: { isAdmin, studentsUserCanAccess },
-  } = req
-
-  const studentnumbers = await Student.findByCourseAndSemesters(coursecodes, from, to)
-  const studentnumberlist = isAdmin ? studentnumbers : _.intersection(studentnumbers, studentsUserCanAccess)
-
-  const result = await Population.bottlenecksOf(
-    {
-      year: 1900,
-      studyRights: [],
-      semesters: ['FALL', 'SPRING'],
-      months: 10000,
-    },
-    studentnumberlist
-  )
-
-  if (result.error) {
-    Sentry.captureException(new Error(result.error))
-    res.status(400).json(result)
-    return
-  }
-
-  res.json(result)
-})
-
 router.post('/v2/populationstatistics/coursesbytag', async (req, res) => {
   const { tag } = req.body
   if (!tag) {

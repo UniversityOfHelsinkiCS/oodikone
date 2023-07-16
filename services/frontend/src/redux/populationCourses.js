@@ -39,16 +39,6 @@ export const getPopulationCourses = ({
   return callController(route, prefix, body, 'post', query)
 }
 
-export const getCoursePopulationCourses = ({ coursecodes, from, to }) => {
-  const route = '/v2/populationstatistics/coursesbycoursecode'
-  const prefix = 'GET_COURSES_OF_COURSE_POP_'
-  const params = { coursecodes, from, to }
-  const query = { coursecodes, from, to }
-  const body = { coursecodes, from, to }
-
-  return callController(route, prefix, body, 'post', query, params)
-}
-
 const courseStatisticsApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
     getStudentListCourseStatistics: builder.query({
