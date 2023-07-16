@@ -1,4 +1,4 @@
-const { indexOf } = require('lodash')
+const { indexOf, uniqBy } = require('lodash')
 const { mapToProviders } = require('../../util/utils')
 const {
   getStatsBasis,
@@ -10,10 +10,10 @@ const {
 } = require('../studyprogrammeHelpers')
 const { getStudyRights, getCreditsForStudyProgramme, getCourseCodesForStudyProgramme } = require('../studyprogramme')
 
-const isFacultyNonMajorCredit = (studyrights, attainmentDate, facultyProgrammes) => {
+const isFacultyNonMajorCredit = (studyrights, attainmentDate, facultyProgrammes, facultyCode) => {
   let right = ''
   studyrights.forEach(studyright => {
-    if (studyright) {
+    if (studyright && studyright.facultyCode === facultyCode) {
       const startDate =
         studyright.studyrightid.slice(-2) === '-2' && studyright.extentcode === 2
           ? studyright.studystartdate
@@ -36,12 +36,12 @@ const isFacultyNonMajorCredit = (studyrights, attainmentDate, facultyProgrammes)
   })
   return facultyProgrammes.includes(right)
 }
-const isExchangeStudentCredit = (studyrights, attainment_date) => {
+const isFacultyOtherCredit = (studyrights, attainmentDate) => {
   return studyrights.some(studyright => {
     return (
       studyright &&
-      [6, 7, 23, 34].includes(studyright.extentcode) &&
-      new Date(attainment_date) >= new Date(studyright.startdate)
+      [6, 7, 23, 34, 99].includes(studyright.extentcode) &&
+      new Date(attainmentDate) >= new Date(studyright.startdate)
     )
   })
 }
@@ -49,41 +49,45 @@ const isExchangeStudentCredit = (studyrights, attainment_date) => {
 // Fetches all the credits for the studyprogramme and divides them into major-students, non-major faculty students,
 // non-major other faculty students, other (exhange students) and non-degree student credits.
 // Division is done on the basis that whether the student had a primary studyright to the programme on the attainment_date
-const getFacultyRegularCreditStats = async ({ studyprogramme, since, years, isAcademicYear, facultyProgrammes }) => {
+const getFacultyRegularCreditStats = async ({
+  studyprogramme,
+  since,
+  years,
+  isAcademicYear,
+  facultyProgrammes,
+  facultyCode,
+}) => {
   const providercode = mapToProviders([studyprogramme])[0]
-  const courses = await getCourseCodesForStudyProgramme(providercode)
-  const credits = await getCreditsForStudyProgramme(courses, since)
+  const providedByProgramme = await getCourseCodesForStudyProgramme(providercode)
+  const allCredits = await getCreditsForStudyProgramme(providedByProgramme, since)
+  const credits = uniqBy(allCredits, 'id')
   const students = [...new Set(credits.map(({ studentNumber }) => studentNumber))]
 
-  let studyrights = await getStudyRights(students)
+  let studyRights = await getStudyRights(students)
   let majors = getStatsBasis(years) // Has studyright to programme
-  let allNonMajors = getStatsBasis(years)
   let facultyNonMajors = getStatsBasis(years) // Has studyright in the same faculty but not in the programme from which credits are
   let facultyOthers = getStatsBasis(years) // Exchange students, specialization education in Medicine, Dentistry and vetenary medicine, continuous education
   let otherNonMajors = getStatsBasis(years) // Has studyright in different faculty
-  let nonDegree = getStatsBasis(years) // open uni, non-degree study rights, contract studies, (other) specialisation education
+  let nonDegree = getStatsBasis(years) // open uni, non-degree study rights, contract studies, (other) specialisation education, credits outside of the studyright
 
   credits.forEach(({ studentNumber, attainmentDate, credits }) => {
-    const studentStudyrights = studyrights.filter(studyright => studyright.studentNumber === studentNumber)
+    const studentStudyrights = studyRights.filter(studyright => studyright.studentNumber === studentNumber)
     const attainmentYear = defineYear(attainmentDate, isAcademicYear)
 
     if (isMajorStudentCredit(studentStudyrights, attainmentDate, studyprogramme)) {
       majors.graphStats[indexOf(years, attainmentYear)] += credits || 0
       majors.tableStats[attainmentYear] += credits || 0
     } else if (isNonMajorCredit(studentStudyrights, attainmentDate)) {
-      allNonMajors.graphStats[indexOf(years, attainmentYear)] += credits || 0
-      allNonMajors.tableStats[attainmentYear] += credits || 0
-
-      if (isExchangeStudentCredit(studentStudyrights, attainmentDate)) {
-        facultyOthers.graphStats[indexOf(years, attainmentYear)] += credits || 0
-        facultyOthers.tableStats[attainmentYear] += credits || 0
-      } else if (isFacultyNonMajorCredit(studentStudyrights, attainmentDate, facultyProgrammes)) {
+      if (isFacultyNonMajorCredit(studentStudyrights, attainmentDate, facultyProgrammes, facultyCode)) {
         facultyNonMajors.graphStats[indexOf(years, attainmentYear)] += credits || 0
         facultyNonMajors.tableStats[attainmentYear] += credits || 0
       } else {
         otherNonMajors.graphStats[indexOf(years, attainmentYear)] += credits || 0
         otherNonMajors.tableStats[attainmentYear] += credits || 0
       }
+    } else if (isFacultyOtherCredit(studentStudyrights, attainmentDate)) {
+      facultyOthers.graphStats[indexOf(years, attainmentYear)] += credits || 0
+      facultyOthers.tableStats[attainmentYear] += credits || 0
     } else {
       nonDegree.graphStats[indexOf(years, attainmentYear)] += credits || 0
       nonDegree.tableStats[attainmentYear] += credits || 0
@@ -110,11 +114,16 @@ const getFacultyRegularCreditStats = async ({ studyprogramme, since, years, isAc
 // Fetches all credits for the studytrack and combines them into statistics
 // These are for the faculty view which differs from study programme overview
 // (no transfers, non majors split to in- and outside-faculty)
-const getFacultyCreditStatsForStudytrack = async ({ studyprogramme, facultyProgrammes, isAcademicYear }) => {
+const getFacultyCreditStatsForStudytrack = async ({
+  studyprogramme,
+  facultyProgrammes,
+  isAcademicYear,
+  facultyCode,
+}) => {
   const since = getStartDate(studyprogramme, isAcademicYear)
   const years = getYearsArray(since.getFullYear(), isAcademicYear)
 
-  const queryParameters = { studyprogramme, since, years, isAcademicYear, facultyProgrammes }
+  const queryParameters = { studyprogramme, since, years, isAcademicYear, facultyProgrammes, facultyCode }
   const { majors, facultyNonMajors, otherNonMajors, facultyOthers, nonDegree } = await getFacultyRegularCreditStats(
     queryParameters
   )
@@ -169,8 +178,9 @@ const getFacultyCreditStatsForStudytrack = async ({ studyprogramme, facultyProgr
   }
 }
 
-const getProgrammeCredits = async (code, yearType, facultyProgrammes) => {
+const getProgrammeCredits = async (code, yearType, facultyProgrammes, faculty) => {
   const updatedStats = await getFacultyCreditStatsForStudytrack({
+    facultyCode: faculty,
     studyprogramme: code,
     facultyProgrammes,
     isAcademicYear: yearType === 'ACADEMIC_YEAR',
@@ -205,7 +215,7 @@ const combineFacultyCredits = async (faculty, programmes, allProgrammes, yearTyp
   const progCodes = allProgrammes.map(p => p.code)
   for (const prog of programmes) {
     if (prog.code === 'MH70_008_2') continue
-    const data = await getProgrammeCredits(prog.code, yearType, progCodes)
+    const data = await getProgrammeCredits(prog.code, yearType, progCodes, faculty)
     if (data) {
       allCredits.programmeNames[prog.progId] = { code: prog.code, ...prog.name }
       allCredits.programmeTableStats[prog.progId] = data.tableStats

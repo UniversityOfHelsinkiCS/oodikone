@@ -40,6 +40,7 @@ const facultyFormatStudyright = studyright => {
     student,
     studyright_elements,
     startdate,
+    facultyCode,
   } = studyright
 
   return {
@@ -52,16 +53,17 @@ const facultyFormatStudyright = studyright => {
     active,
     prioritycode,
     extentcode,
+    facultyCode,
     studentnumber: student.studentnumber,
     studyrightElements: studyright_elements,
   }
 }
 const facultyProgrammeStudents = student => {
-  const { studentnumber, home_country_en, gender_code, semester_enrollments } = student
+  const { studentnumber, homeCountryEn, genderCode, semester_enrollments } = student
   return {
     stundetNumber: studentnumber,
-    homeCountryEn: home_country_en,
-    genderCode: gender_code,
+    homeCountryEn,
+    genderCode,
     semesters: semester_enrollments.map(s => s.dataValues),
   }
 }
@@ -119,7 +121,7 @@ const checkTransfers = (s, insideTransfersStudyrights, transfersToOrAwayStudyrig
 const getExtentFilter = includeAllSpecials => {
   const filteredExtents = [16] // always filter out secondary subject students
   if (!includeAllSpecials) {
-    filteredExtents.push(7, 34, 22, 99, 14, 13, 9)
+    filteredExtents.push(6, 7, 9, 13, 14, 18, 22, 23, 34, 99)
   }
   let studyrightWhere = {
     extentcode: {
@@ -135,7 +137,7 @@ const mapCodesToIds = data => {
   for (const prog of data) {
     if (keys.includes(prog.code)) {
       prog.progId = codes[prog.code].toUpperCase()
-      if (prog.code === 'T923103') {
+      if (prog.code === 'T923103' && !prog.progId.includes('-DP')) {
         prog.progId = prog.progId + '-DP'
       }
     } else {

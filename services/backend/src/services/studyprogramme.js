@@ -403,29 +403,6 @@ const allTransfers = async (studytrack, since) => {
   return [...transferredTo, ...transferredAway]
 }
 
-const getProgrammesStudyrights = async studyprogramme =>
-  (
-    await Studyright.findAll({
-      attributes: ['studyrightid', 'studystartdate', 'enddate', 'graduated', 'prioritycode', 'extentcode', 'cancelled'],
-      include: [
-        {
-          model: StudyrightElement,
-          required: true,
-          where: {
-            code: {
-              [Op.in]: [studyprogramme],
-            },
-          },
-        },
-        {
-          model: Student,
-          attributes: ['studentnumber'],
-          required: true,
-        },
-      ],
-    })
-  ).map(formatStudyright)
-
 const getStudyRights = async students =>
   (
     await Studyright.findAll({
@@ -438,6 +415,7 @@ const getStudyRights = async students =>
         'prioritycode',
         'extentcode',
         'cancelled',
+        'facultyCode',
       ],
       where: {
         studentStudentnumber: students,
@@ -464,7 +442,7 @@ const getStudyRights = async students =>
 const getCreditsForStudyProgramme = async (codes, since) =>
   (
     await Credit.findAll({
-      attributes: ['id', 'course_code', 'credits', 'attainment_date', 'student_studentnumber'],
+      attributes: ['course_code', 'credits', 'attainment_date', 'student_studentnumber'],
       include: {
         model: Course,
         attributes: ['code'],
@@ -487,33 +465,57 @@ const getCreditsForStudyProgramme = async (codes, since) =>
 
 const getCourseCodesForStudyProgramme = async provider => {
   const coursesByProvider = await Course.findAll({
-    attributes: ['code', 'substitutions'],
-    where: {
-      is_study_module: false,
-    },
+    attributes: ['id', 'code', 'substitutions'],
     include: {
       model: Organization,
       required: true,
       where: {
         code: provider,
       },
+      through: {
+        attributes: [],
+      },
     },
   })
+  // here is work in progress
+  // const courseIds = coursesByProvider.map(course => course.id)
+  // const coursesWithManyProviders = await CourseProvider.findAll({
+  //   attributes: ['coursecode', [sequelize.fn('COUNT', sequelize.col('organizationcode')), 'n_courses']],
+  //   where: {
+  //     coursecode: {
+  //       [Op.in]: courseIds,
+  //     },
+  //   },
+  //   group: 'coursecode',
+  // })
+
+  // const coursesProvidedByManyProgrammes = coursesWithManyProviders
+  //   .filter(course => course.n_courses >= 2)
+  //   .map(course => course.coursecode)
+  // // We are basically not interested other substitutions than those with open uni ones.
+  // const coursesToHave = coursesByProvider.filter(course => !coursesProvidedByManyProgrammes.includes(course.id))
   const coursesWithOpenUniSubstitutions = coursesByProvider.map(({ code, substitutions }) => {
     if (!substitutions || !substitutions.length) return [code]
     const alternatives = [`AY-${code}`, `AY${code}`, `A-${code}`]
     return [code].concat(substitutions.filter(sub => alternatives.includes(sub)))
   })
+  // const providedByManyProgrammes = coursesByProvider
+  //   .filter(course => coursesProvidedByManyProgrammes.includes(course.id))
+  //   .map(({ code, substitutions }) => {
+  //     if (!substitutions || !substitutions.length) return [code]
+  //     const alternatives = [`AY-${code}`, `AY${code}`, `A-${code}`]
+  //     return [code].concat(substitutions.filter(sub => alternatives.includes(sub)))
+  //   })
   return coursesWithOpenUniSubstitutions.flat()
 }
 
 const getAllProgrammeCourses = async providerCode => {
   const res = await Course.findAll({
-    attributes: ['code', 'substitutions'],
+    attributes: ['id', 'code', 'substitutions'],
     include: [
       {
         model: Organization,
-        attributes: [],
+        attributes: ['id'],
         required: true,
         where: {
           code: providerCode,
@@ -916,7 +918,6 @@ module.exports = {
   transfersAway,
   transfersTo,
   allTransfers,
-  getProgrammesStudyrights,
   getCreditsForStudyProgramme,
   getTransferredCredits,
   getThesisCredits,
