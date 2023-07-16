@@ -92,7 +92,7 @@ const StudyrightsTable = ({ Programmes, student, handleStartDateChange, showPopu
   const getAcualEndDate = (endDate, graduated) => {
     if (!endDate) return null
     if (graduated) return new Date(endDate)
-    return new Date(endDate).setDate(new Date(endDate).getDate() - 1)
+    return new Date(new Date(endDate).setDate(new Date(endDate).getDate() - 1))
   }
 
   const renderProgrammes = c =>
