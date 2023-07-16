@@ -10,26 +10,19 @@ const getCorrectStudentnumbers = async ({ codes, startDate, endDate, includeAllS
   const transferredToStudents = includeAllSpecials
   const graduatedStudents = includeGraduated
 
-  studentnumbers = await studentnumbersWithAllStudyrightElements(
-    codes,
+  studentnumbers = await studentnumbersWithAllStudyrightElements({
+    studyRights: codes,
     startDate,
     endDate,
     exchangeStudents,
     nondegreeStudents,
     transferredOutStudents,
-    null,
+    tag: null,
     transferredToStudents,
-    graduatedStudents
-  )
+    graduatedStudents,
+  })
 
   return studentnumbers
-}
-
-const defineStartDate = (studyright_elements, studystartdate) => {
-  if (studyright_elements?.length && studyright_elements[0].startdate > studystartdate) {
-    return studyright_elements[0].startdate
-  }
-  return studystartdate
 }
 
 const resolveStudyRightCode = studyright_elements => {
@@ -55,12 +48,13 @@ const formatStudyright = studyright => {
     student,
     studyright_elements,
     cancelled,
+    facultyCode,
   } = studyright
 
   return {
     studyrightid,
     startdate,
-    studystartdate: defineStartDate(studyright_elements, studystartdate),
+    studystartdate,
     enddate,
     givendate,
     graduated,
@@ -71,6 +65,7 @@ const formatStudyright = studyright => {
     code: resolveStudyRightCode(studyright_elements),
     studyrightElements: studyright_elements,
     cancelled,
+    facultyCode,
     name:
       studyright_elements?.length && studyright_elements[0].element_detail && studyright_elements[0].element_detail.name
         ? studyright_elements[0].element_detail.name
@@ -91,9 +86,11 @@ const formatStudent = student => {
 
 const formatCredit = credit => {
   const { student_studentnumber, course_code, credits, attainment_date } = credit
+  const code = course_code.replace('AY', '')
   return {
+    id: `${student_studentnumber}-${code}`, // For getting unique credits for each course code and student number
     studentNumber: student_studentnumber,
-    courseCode: course_code,
+    courseCode: code,
     credits,
     attainmentDate: attainment_date,
   }
@@ -144,36 +141,40 @@ const getStatsBasis = years => {
     tableStats: getYearsObject({ years }),
   }
 }
+// Take studystartdate for master students with Bachelor-Master studyright.
+const getCorrectStartDate = studyright => {
+  return studyright.studyrightid.slice(-2) === '-2' && studyright.extentcode === 2
+    ? studyright.studystartdate
+    : studyright.startdate
+}
 
-const isMajorStudentCredit = (studyrights, attainment_date, code) =>
+const isMajorStudentCredit = (studyrights, attainmentDate, code) =>
   studyrights.some(studyright => {
     if (!studyright) return false
     if (studyright.code !== code) return false
-    const startDate =
-      studyright.studyrightid.slice(-2) === '-2' && studyright.extentcode === 2
-        ? studyright.studystartdate
-        : studyright.startdate
-    if (!studyright.graduated) return new Date(attainment_date) >= new Date(startDate)
-    return new Date(attainment_date) >= new Date(startDate) && new Date(attainment_date) <= new Date(studyright.enddate)
-  })
-
-const isNonMajorCredit = (studyrights, attainmentDate) =>
-  studyrights.some(studyright => {
-    if (!studyright) return false
-    const startDate =
-      studyright.studyrightid.slice(-2) === '-2' && studyright.extentcode === 2
-        ? studyright.studystartdate
-        : studyright.startdate
+    if ([6, 7, 9, 13, 14, 16, 18, 22, 23, 34, 99].includes(studyright.extentcode)) return false
+    const startDate = getCorrectStartDate(studyright)
     if (!studyright.graduated) return new Date(attainmentDate) >= new Date(startDate)
     return new Date(attainmentDate) >= new Date(startDate) && new Date(attainmentDate) <= new Date(studyright.enddate)
   })
 
+const isNonMajorCredit = (studyrights, attainmentDate) => {
+  return studyrights.some(studyright => {
+    if (!studyright) return false
+    if ([6, 7, 9, 13, 14, 16, 18, 22, 23, 34, 99].includes(studyright.extentcode)) return false
+    const startDate = getCorrectStartDate(studyright)
+    if (!studyright.graduated) return new Date(attainmentDate) >= new Date(startDate)
+    return new Date(attainmentDate) >= new Date(startDate) && new Date(attainmentDate) <= new Date(studyright.enddate)
+  })
+}
+
 const isSpecialGroupCredit = (studyrights, attainment_date, transfers) =>
   studyrights.some(studyright => {
     if (!studyright) return true // If there is no studyright matching the credit, is not a major student credit
-    if (studyright.studystartdate && new Date(studyright.studystartdate) > new Date(attainment_date)) return true // Credits before the studyright started are not major student credits
+    const startDate = getCorrectStartDate(studyright)
+    if (new Date(startDate) > new Date(attainment_date)) return true // Credits before the studyright started are not major student credits
     if (studyright.enddate && new Date(attainment_date) > new Date(studyright.enddate)) return true // Credits after studyright are not major student credits
-    if ([7, 9, 16, 34, 22, 99, 14, 13].includes(studyright.extentcode)) return true // Excludes non-degree studyrights and exchange students
+    if ([6, 7, 9, 13, 14, 16, 18, 22, 23, 34, 99].includes(studyright.extentcode)) return true // Excludes non-degree studyrights and exchange students
     if (transfers.includes(studyright.studyrightid)) return true // Excludes both transfers in and out of the programme
     return false
   })
@@ -197,10 +198,11 @@ const defineYear = (date, isAcademicYear) => {
 }
 
 const getStartDate = (studyprogramme, isAcademicYear) => {
-  if ((studyprogramme.includes('KH') || studyprogramme.includes('MH')) && isAcademicYear) return new Date('2017-08-01')
-  if (studyprogramme.includes('KH') || studyprogramme.includes('MH')) return new Date('2017-01-01')
-  if (isAcademicYear) return new Date('2017-08-01')
-  return new Date('2017-01-01')
+  if ((studyprogramme.includes('KH') || studyprogramme.includes('MH')) && isAcademicYear)
+    return new Date('2017-08-01').toUTCString()
+  if (studyprogramme.includes('KH') || studyprogramme.includes('MH')) return new Date('2017-01-01').toUTCString()
+  if (isAcademicYear) return new Date('2017-08-01').toUTCString()
+  return new Date('2017-01-01').toUTCString()
 }
 
 const alltimeStartDate = new Date('1900-01-01')

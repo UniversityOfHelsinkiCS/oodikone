@@ -513,7 +513,7 @@ const getEarliestYear = async (studentnumberlist, studyRights) => {
   return Math.min(...startyears)
 }
 
-const studentnumbersWithAllStudyrightElements = async (
+const studentnumbersWithAllStudyrightElements = async ({
   studyRights,
   startDate,
   endDate,
@@ -522,8 +522,8 @@ const studentnumbersWithAllStudyrightElements = async (
   transferredOutStudents,
   tag,
   transferredToStudents,
-  graduatedStudents
-) => {
+  graduatedStudents,
+}) => {
   // eslint-disable-line
   // db startdate is formatted to utc so need to change it when querying
   const formattedStartDate = new Date(moment.tz(startDate, 'Europe/Helsinki').format()).toUTCString()
@@ -541,7 +541,7 @@ const studentnumbersWithAllStudyrightElements = async (
     filteredExtents.push(7, 34)
   }
   if (!nondegreeStudents) {
-    filteredExtents.push(22, 99, 14, 13)
+    filteredExtents.push(6, 9, 13, 14, 18, 22, 23, 99)
   }
 
   let studentWhere = {}
@@ -991,17 +991,17 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
 
   const studentnumbers = studentnumberlist
     ? studentnumberlist
-    : await studentnumbersWithAllStudyrightElements(
+    : await studentnumbersWithAllStudyrightElements({
         studyRights,
-        formattedStartDate,
+        startDate: formattedStartDate,
         endDate,
         exchangeStudents,
         nondegreeStudents,
         transferredStudents,
-        null,
-        !transferredStudents,
-        true
-      )
+        tag: null,
+        transferredToStudents: true,
+        graduatedStudents: true,
+      })
 
   const code = studyRights[0] || ''
   let optionData = {}
@@ -1041,7 +1041,7 @@ const getSubstitutions = async codes => {
   return [...new Set(courses.map(({ code, substitutions }) => [code, ...substitutions]).flat())]
 }
 // This duplicate code is added here to ensure that we get the enrollments in cases no credits found for the selected students.
-const findCourseEnrollments = async (studentnumbers, beforeDate, courses = [], studentCountLimit = 0) => {
+const findCourseEnrollments = async (studentnumbers, beforeDate, courses = []) => {
   const courseCodes = courses.length > 0 ? await getSubstitutions(courses) : ['DUMMY']
   const res = await sequelize.query(
     `
@@ -1066,7 +1066,6 @@ const findCourseEnrollments = async (studentnumbers, beforeDate, courses = [], s
         FROM enrollment
         WHERE enrollment.studentnumber IN (:studentnumbers) AND enrollment.enrollment_date_time < :beforeDate
         GROUP BY enrollment.course_id
-        HAVING COUNT(DISTINCT enrollment.studentnumber) >= :studentCountLimit
       ) enrollment ON enrollment.course_id = course.id 
       WHERE :skipCourseCodeFilter OR course.code IN (:courseCodes)
       -- GROUP BY 1, 2, 3, 4, 5, 6
@@ -1075,7 +1074,6 @@ const findCourseEnrollments = async (studentnumbers, beforeDate, courses = [], s
       replacements: {
         studentnumbers: studentnumbers.length > 0 ? studentnumbers : ['DUMMY'],
         beforeDate,
-        studentCountLimit,
         courseCodes,
         skipCourseCodeFilter: courses.length === 0,
       },
@@ -1084,7 +1082,7 @@ const findCourseEnrollments = async (studentnumbers, beforeDate, courses = [], s
   )
   return res
 }
-const findCourses = async (studentnumbers, beforeDate, courses = [], studentCountLimit = 0) => {
+const findCourses = async (studentnumbers, beforeDate, courses = []) => {
   const courseCodes = courses.length > 0 ? await getSubstitutions(courses) : ['DUMMY']
   const res = await sequelize.query(
     `
@@ -1111,7 +1109,6 @@ const findCourses = async (studentnumbers, beforeDate, courses = [], studentCoun
         FROM credit
         WHERE student_studentnumber IN (:studentnumbers) AND attainment_date < :beforeDate
         GROUP BY credit.course_code
-        HAVING COUNT(DISTINCT credit.student_studentnumber) >= :studentCountLimit
       ) credit ON credit.course_code = course.code
       INNER JOIN course_types ON course_types.coursetypecode = course.coursetypecode
       LEFT JOIN (
@@ -1133,7 +1130,6 @@ const findCourses = async (studentnumbers, beforeDate, courses = [], studentCoun
       replacements: {
         studentnumbers: studentnumbers.length > 0 ? studentnumbers : ['DUMMY'],
         beforeDate,
-        studentCountLimit,
         courseCodes,
         skipCourseCodeFilter: courses.length === 0,
       },
@@ -1172,17 +1168,17 @@ const bottlenecksOf = async (query, studentnumberlist, encryptdata = false) => {
       return { error: 'Student status should be either EXCHANGE or NONDEGREE or TRANSFERRED' }
     }
     if (query.selectedStudents) {
-      const allStudents = await studentnumbersWithAllStudyrightElements(
+      const allStudents = await studentnumbersWithAllStudyrightElements({
         studyRights,
         startDate,
         endDate,
         exchangeStudents,
         nondegreeStudents,
         transferredStudents,
-        query.tag,
-        !transferredStudents,
-        true
-      )
+        tag: query.tag,
+        transferredToStudents: true,
+        graduatedStudents: true,
+      })
       const disallowedRequest = checkThatSelectedStudentsAreUnderRequestedStudyright(
         query.selectedStudents,
         allStudents
@@ -1198,7 +1194,7 @@ const bottlenecksOf = async (query, studentnumberlist, encryptdata = false) => {
         params
       const studentnumbers =
         selectedStudents ||
-        (await studentnumbersWithAllStudyrightElements(
+        (await studentnumbersWithAllStudyrightElements({
           studyRights,
           startDate,
           endDate,
@@ -1206,48 +1202,36 @@ const bottlenecksOf = async (query, studentnumberlist, encryptdata = false) => {
           nondegreeStudents,
           transferredStudents,
           tag,
-          !transferredStudents,
-          true
-        ))
+          transferredToStudents: true,
+          graduatedStudents: true,
+        }))
 
       const allstudents = studentnumbers.reduce((numbers, num) => {
         numbers[num] = true
         return numbers
       }, {})
-      const courses = await findCourses(
-        studentnumbers,
-        dateMonthsFromNow(startDate, months),
-        courseCodes,
-        query.studentCountLimit
-      )
+      const courses = await findCourses(studentnumbers, dateMonthsFromNow(startDate, months), courseCodes)
       const foundCourseCodes = Object.keys(keyBy(courses, 'code'))
       const filteredCourseCodes = courseCodes?.filter(code => !foundCourseCodes.includes(code))
 
       const courseEnrollements = await findCourseEnrollments(
         studentnumbers,
         dateMonthsFromNow(startDate, months),
-        filteredCourseCodes,
-        query.studentCountLimit
+        filteredCourseCodes
       )
       return [allstudents, courses, courseEnrollements]
     } else {
       const { months, startDate } = params
       const beforeDate = months && startDate ? dateMonthsFromNow(startDate, months) : new Date()
-
       const allstudents = studentnumberlist.reduce((numbers, num) => {
         numbers[num] = true
         return numbers
       }, {})
-      const courses = await findCourses(studentnumberlist, beforeDate, courseCodes, query.studentCountLimit)
+      const courses = await findCourses(studentnumberlist, beforeDate, courseCodes)
       const foundCourseCodes = Object.keys(keyBy(courses, 'code'))
       const filteredCourseCodes = courseCodes?.filter(code => !foundCourseCodes.includes(code))
 
-      const courseEnrollements = await findCourseEnrollments(
-        studentnumberlist,
-        dateMonthsFromNow(startDate, months),
-        filteredCourseCodes,
-        query.studentCountLimit
-      )
+      const courseEnrollements = await findCourseEnrollments(studentnumberlist, beforeDate, filteredCourseCodes)
       return [allstudents, courses, courseEnrollements]
     }
   }
@@ -1289,7 +1273,7 @@ const bottlenecksOf = async (query, studentnumberlist, encryptdata = false) => {
     []
   )
   const codes = Object.keys(keyBy(courses, 'code')).map(code => code)
-  // Filter substitution courses for fetched courses -> this avoid the situation in which there is only
+  // Filter substitution courses for fetched courses -> by this we avoid the situation in which there is only
   // courses with old course codes. Frontend NEEDS in most cases the current course.
   const substitutionCourses = allCourses.filter(
     obj => substitutionCodes.includes(obj.code) && !codes.includes(obj.code)

@@ -121,7 +121,7 @@ router.post('/v2/populationstatistics/coursesbytag', async (req, res) => {
 router.post('/v2/populationstatistics/coursesbystudentnumberlist', async (req, res) => {
   const {
     user: { isAdmin, studentsUserCanAccess },
-    body: { studentnumberlist: studentnumbersInReq, studentCountLimit, ...query },
+    body: { studentnumberlist: studentnumbersInReq, ...query },
   } = req
 
   if (!studentnumbersInReq) {
@@ -136,7 +136,6 @@ router.post('/v2/populationstatistics/coursesbystudentnumberlist', async (req, r
       studyRights: query?.studyRights ?? [],
       semesters: query?.semesters ?? ['FALL', 'SPRING'],
       months: query?.months ?? 10000,
-      studentCountLimit,
     },
     studentnumberlist
   )
