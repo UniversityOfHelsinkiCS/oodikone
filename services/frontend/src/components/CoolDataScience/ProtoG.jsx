@@ -1,4 +1,4 @@
-/* eslint-disable */
+/* eslint-disable react/no-this-in-sfc */
 import React, { useState, useEffect, useCallback } from 'react'
 import { connect } from 'react-redux'
 import Highcharts from 'highcharts'
@@ -20,43 +20,43 @@ const defaultConfig = () => ({
     width: 500,
     height: 50,
     style: {
-      overflow: 'visible'
+      overflow: 'visible',
     },
     // small optimization, saves 1-2 ms each sparkline
-    skipClone: true
+    skipClone: true,
   },
   title: {
-    text: ''
+    text: '',
   },
   credits: {
-    enabled: false
+    enabled: false,
   },
   xAxis: {
     title: {
-      text: null
+      text: null,
     },
     startOnTick: false,
     endOnTick: false,
-    tickPositions: []
+    tickPositions: [],
   },
   yAxis: {
     endOnTick: false,
     startOnTick: false,
     labels: {
-      enabled: false
+      enabled: false,
     },
     title: {
-      text: null
+      text: null,
     },
-    tickPositions: [0]
+    tickPositions: [0],
   },
   legend: {
-    enabled: false
+    enabled: false,
   },
   tooltip: {
     hideDelay: 0,
     outside: true,
-    shared: true
+    shared: true,
   },
   plotOptions: {
     series: {
@@ -65,23 +65,23 @@ const defaultConfig = () => ({
       shadow: false,
       states: {
         hover: {
-          lineWidth: 1
-        }
+          lineWidth: 1,
+        },
       },
       marker: {
         radius: 1,
         states: {
           hover: {
-            radius: 2
-          }
-        }
-      }
+            radius: 2,
+          },
+        },
+      },
     },
     column: {
       negativeColor: '#910000',
-      borderColor: 'silver'
-    }
-  }
+      borderColor: 'silver',
+    },
+  },
 })
 
 const Chart = React.memo(({ tickDates, snapshots }) => (
@@ -91,51 +91,48 @@ const Chart = React.memo(({ tickDates, snapshots }) => (
       xAxis: {
         type: 'datetime',
         labels: {
-          formatter: function() {
+          formatter() {
             const d = new Date(this.value)
-            return `${d.getDate()}.${d.getMonth()}.${d
-              .getFullYear()
-              .toString()
-              .substring(-2)}`
-          }
+            return `${d.getDate()}.${d.getMonth()}.${d.getFullYear().toString().substring(-2)}`
+          },
         },
         tickPositions: tickDates.map(date => date.getTime()),
         minorTickInterval: 1.051e10,
-        minorTicks: true
+        minorTicks: true,
       },
       series: [
         {
           name: 'muut',
           data: snapshots.map(s => ({
             y: s.totalStudents - s.students3y - s.students4y,
-            x: new Date(s.date).getTime()
+            x: new Date(s.date).getTime(),
           })),
           color: '#ff7979',
-          fillOpacity: 0.7
+          fillOpacity: 0.7,
         },
         {
           name: '4v tahdissa',
           data: snapshots.map(s => ({
             y: s.students4y,
-            x: new Date(s.date).getTime()
+            x: new Date(s.date).getTime(),
           })),
           color: '#f9ca24',
-          fillOpacity: 0.7
+          fillOpacity: 0.7,
         },
         {
           name: '3v tahdissa',
           data: snapshots.map(s => ({
             y: s.students3y,
-            x: new Date(s.date).getTime()
+            x: new Date(s.date).getTime(),
           })),
           color: '#6ab04c',
-          fillOpacity: 0.7
-        }
+          fillOpacity: 0.7,
+        },
       ],
       tooltip: {
         pointFormat:
           '<span style="color:{series.color}">●</span>	<span>{series.name}</span>: <b>{point.percentage:.1f}%</b> ({point.y})<br/>',
-        xDateFormat: '%Y-%m-%d'
+        xDateFormat: '%Y-%m-%d',
       },
       plotOptions: {
         area: {
@@ -143,10 +140,10 @@ const Chart = React.memo(({ tickDates, snapshots }) => (
           lineColor: '#ffffff',
           lineWidth: 1,
           marker: {
-            lineWidth: 1
-          }
-        }
-      }
+            lineWidth: 1,
+          },
+        },
+      },
     })}
   />
 ))
@@ -198,9 +195,7 @@ const ProtoG = ({ uberdata, years, isLoading, loadingYears, getUberDispatch, get
   }
 
   const DrilldownMessage = () => (
-    <Message color='blue'
-      content="Klikkaamalla tiedekuntaa pystyt tarkastelemaan koulutusohjelma kohtaista dataa."
-    />
+    <Message color="blue" content="Klikkaamalla tiedekuntaa pystyt tarkastelemaan koulutusohjelma kohtaista dataa." />
   )
 
   const { CoolDataScience } = InfoToolTips
@@ -239,7 +234,7 @@ const ProtoG = ({ uberdata, years, isLoading, loadingYears, getUberDispatch, get
           <Table compact striped className="proto-g-table">
             <Table.Header>
               <Table.Row>
-                <Table.HeaderCell></Table.HeaderCell>
+                <Table.HeaderCell />
                 <Table.HeaderCell>Tiedekunta</Table.HeaderCell>
                 <Table.HeaderCell>Tahdissa olevien kehitys</Table.HeaderCell>
               </Table.Row>
@@ -284,7 +279,8 @@ const ProtoG = ({ uberdata, years, isLoading, loadingYears, getUberDispatch, get
           </Table>
         )}
         <Message>
-          {//eslint-disable-next-line react/no-children-prop
+          {
+            // eslint-disable-next-line react/no-children-prop
             <ReactMarkdown children={CoolDataScience.protoC} />
           }
         </Message>
@@ -297,10 +293,7 @@ const mapStateToProps = ({ coolDataScience }) => ({
   uberdata: coolDataScience.data.uber || [],
   isLoading: coolDataScience.pending.uber,
   years: coolDataScience.data.years,
-  loadingYears: coolDataScience.pending.years
+  loadingYears: coolDataScience.pending.years,
 })
 
-export default connect(
-  mapStateToProps,
-  { getUberDispatch: getUber, getYearsDispatch: getYears }
-)(ProtoG)
+export default connect(mapStateToProps, { getUberDispatch: getUber, getYearsDispatch: getYears })(ProtoG)
