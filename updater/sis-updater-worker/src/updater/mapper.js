@@ -145,7 +145,7 @@ const mapTeacher = person => ({
   name: person.first_names ? `${person.last_name} ${person.first_names}`.trim() : person.last_name,
 })
 
-const moduleTypes = new Set(['ModuleAttainment', 'DegreeProgrammeAttainment'])
+const moduleTypes = new Set(['ModuleAttainment', 'CustomModuleAttainment', 'DegreeProgrammeAttainment'])
 const isModule = courseType => moduleTypes.has(courseType)
 
 const creditMapper =
@@ -169,7 +169,6 @@ const creditMapper =
       type,
       course_unit_id,
       module_group_id,
-      nodes,
       study_right_id,
       attainment_language_urn,
     } = attainment
@@ -215,8 +214,8 @@ const creditMapper =
       }
     }
 
-    // These are leaf attainments that have no other attainments attached to them
-    const isStudyModule = nodes && nodes[0] !== undefined
+    // Check if attainment is a module type
+    const isStudyModule = isModule(type)
 
     return {
       id: id,
