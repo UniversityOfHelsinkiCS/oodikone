@@ -85,11 +85,11 @@ const startedStudyrights = async (faculty, since, studyRightWhere) =>
         },
       ],
       where: {
-        faculty_code: faculty,
-        studystartdate: {
+        facultyCode: faculty,
+        startdate: {
           [Op.gte]: since,
         },
-        student_studentnumber: { [Op.not]: null },
+        studentStudentnumber: { [Op.not]: null },
         ...studyRightWhere,
       },
     })
@@ -114,12 +114,12 @@ const graduatedStudyrights = async (faculty, since, studyrightWhere) =>
         },
       ],
       where: {
-        faculty_code: faculty,
+        facultyCode: faculty,
         enddate: {
           [Op.gte]: since,
         },
         graduated: 1,
-        student_studentnumber: { [Op.not]: null },
+        studentStudentnumber: { [Op.not]: null },
         ...studyrightWhere,
       },
     })
@@ -144,12 +144,12 @@ const studyrightsByRightStartYear = async (faculty, since, graduated = 1) =>
         },
       ],
       where: {
-        faculty_code: faculty,
+        facultyCode: faculty,
         startdate: {
           [Op.gte]: since,
         },
         graduated: graduated,
-        student_studentnumber: { [Op.not]: null },
+        studentStudentnumber: { [Op.not]: null },
       },
     })
   ).map(facultyFormatStudyright)
@@ -180,7 +180,7 @@ const getStudyRightsByExtent = async (faculty, elementStart, studyrightStart, co
         },
       ],
       where: {
-        faculty_code: faculty,
+        facultyCode: faculty,
         extentcode: {
           [Op.in]: extents,
         },
@@ -189,7 +189,7 @@ const getStudyRightsByExtent = async (faculty, elementStart, studyrightStart, co
         },
         studystartdate: { [Op.not]: null },
         ...studyrightStart,
-        student_studentnumber: { [Op.not]: null },
+        studentStudentnumber: { [Op.not]: null },
       },
     })
   ).map(facultyFormatStudyright)
