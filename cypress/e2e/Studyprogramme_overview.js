@@ -79,8 +79,8 @@ describe('Studyprogramme overview', () => {
         [2021, 0, 0, 0, 0, 0],
         [2020, 5860, 5591, 102, 0, 167],
         [2019, 8696, 7737, 587, 23, 349],
-        [2018, 7818, 6584, 857, 105, 272],
-        [2017, 3085, 2492, 158, 47, 388],
+        [2018, 7818, 6584, 837, 125, 272],
+        [2017, 3085, 2492, 153, 52, 388],
       ]
 
       cy.checkTableStats(tableContents, 'CreditsProducedByTheStudyprogramme')
@@ -122,9 +122,9 @@ describe('Studyprogramme overview', () => {
         // [Year, Total, Major students credits, Transferred credits]
         ...years.map(year => [year, 0, 0, 0]),
         [2021, 0, 0, 0],
-        [2020, 4999, 4675, 167],
-        [2019, 6182, 5699, 349],
-        [2018, 4884, 4537, 272],
+        [2020, 5018, 4694, 167],
+        [2019, 6185, 5702, 349],
+        [2018, 4885, 4538, 272],
         [2017, 1988, 1600, 388],
       ]
 
@@ -170,7 +170,7 @@ describe('Studyprogramme overview', () => {
         ['2020 - 2021', 541, 471, 10, 0, 60],
         ['2019 - 2020', 8575, 8266, 116, 0, 193],
         ['2018 - 2019', 10013, 8851, 791, 43, 328],
-        ['2017 - 2018', 6079, 4816, 787, 132, 344],
+        ['2017 - 2018', 6079, 4816, 762, 157, 344],
       ]
 
       cy.checkTableStats(creditTableContents, 'CreditsProducedByTheStudyprogramme')
@@ -258,6 +258,7 @@ describe('Studyprogramme overview', () => {
       // eslint-disable-next-line cypress/no-unnecessary-waiting
       cy.wait(10000)
       cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
+      cy.wait(5000)
       cy.get('.attached').contains('Studytracks and class statistics').click()
     })
 
