@@ -43,6 +43,7 @@ const selectCustomPopulationData = createSelector(
     allSemesters: semesters?.data?.semesters ?? [],
     custompop: populations?.students ?? [],
     studyProgramme: populations?.studyProgramme,
+    discardedStudentNumbers: populations?.discardedStudentNumbers,
   })
 )
 
@@ -50,7 +51,12 @@ const CustomPopulation = () => {
   const { language } = useLanguage()
   const dispatch = useDispatch()
 
-  const { allSemesters, custompop, studyProgramme: associatedProgramme } = useSelector(selectCustomPopulationData)
+  const {
+    allSemesters,
+    custompop,
+    studyProgramme: associatedProgramme,
+    discardedStudentNumbers,
+  } = useSelector(selectCustomPopulationData)
 
   const { data: courseStats } = useGetStudentListCourseStatisticsQuery({
     studentNumbers: custompop.map(s => s.studentNumber),
@@ -85,16 +91,20 @@ const CustomPopulation = () => {
 
   return (
     <FilterView name="CustomPopulation" filters={filters} students={custompop} displayTray={custompop.length > 0}>
-      {students => <CustomPopulationContent students={students} custompop={custompop} />}
+      {students => (
+        <CustomPopulationContent
+          discardedStudentNumbers={discardedStudentNumbers}
+          students={students}
+          custompop={custompop}
+        />
+      )}
     </FilterView>
   )
 }
 
-const CustomPopulationContent = ({ students, custompop }) => {
+const CustomPopulationContent = ({ students, custompop, discardedStudentNumbers }) => {
   const [activeIndex, setIndex] = useState([])
   const [newestIndex, setNewest] = useState(null)
-  const [studentsInput, setStudentsInput] = useState(null)
-  const [discardedStudentNumbers, setDiscarded] = useState([])
   const studyProgrammes = useFilteredAndFormattedElementDetails()
   const creditGainRef = useRef()
   const programmeRef = useRef()
@@ -113,15 +123,6 @@ const CustomPopulationContent = ({ students, custompop }) => {
   const { data: courseStats } = useGetStudentListCourseStatisticsQuery({
     studentNumbers: students.map(s => s.studentNumber),
   })
-
-  useEffect(() => {
-    setDiscarded(
-      _.difference(
-        studentsInput,
-        students.map(s => s.studentNumber)
-      )
-    )
-  }, [studentsInput, students])
 
   useEffect(() => {
     if (newestIndex) {
@@ -264,7 +265,10 @@ const CustomPopulationContent = ({ students, custompop }) => {
       {discardedStudentNumbers?.length > 0 && !populations.pending && (
         <RightsNotification discardedStudentNumbers={discardedStudentNumbers} />
       )}
-      <CustomPopulationSearch setStudentsInput={setStudentsInput} />
+      {discardedStudentNumbers?.length === 0 && students?.length === 0 && (
+        <Message>No students found. Please re-check the student number list</Message>
+      )}
+      <CustomPopulationSearch />
       {custompop.length > 0 && customPopulationFlag ? (
         <Segment className="contentSegment">{renderCustomPopulation()}</Segment>
       ) : (

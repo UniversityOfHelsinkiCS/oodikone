@@ -129,7 +129,6 @@ router.post('/v2/populationstatistics/coursesbystudentnumberlist', async (req, r
   }
 
   const studentnumberlist = isAdmin ? studentnumbersInReq : _.intersection(studentnumbersInReq, studentsUserCanAccess)
-
   const result = await Population.bottlenecksOf(
     {
       year: query?.year ?? 1900,
@@ -391,7 +390,9 @@ router.post('/v3/populationstatisticsbystudentnumbers', async (req, res) => {
 
   result.studyProgramme = tags?.studyProgramme
 
-  res.status(200).json(filterPersonalTags(result, id))
+  const discardedStudentNumbers = _.difference(studentnumberlist, filteredStudentNumbers)
+
+  res.status(200).json({ ...filterPersonalTags(result, id), discardedStudentNumbers })
 })
 
 router.get('/v3/populationstatistics/studyprogrammes', async (req, res) => {
