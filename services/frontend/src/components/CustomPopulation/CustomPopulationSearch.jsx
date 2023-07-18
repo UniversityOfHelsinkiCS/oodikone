@@ -27,7 +27,6 @@ const CustomPopulationSearch = ({
   loading,
   customPopulationSearches,
   customPopulationSearchSaving,
-  setStudentsInput,
 }) => {
   const [modal, setModal] = useState(false)
   const [input, setInput] = useState('')
@@ -99,7 +98,6 @@ const CustomPopulationSearch = ({
   const onClicker = e => {
     e.preventDefault()
     const studentnumbers = parseInput(input)
-    setStudentsInput(studentnumbers)
     getCustomPopulationDispatch({ studentnumberlist: studentnumbers, onProgress, associatedProgramme: programme })
     getCustomPopulationCoursesByStudentnumbers({ studentnumberlist: studentnumbers })
     selectCustomPopulationSearchDispatch(selectedSearchId || null)
