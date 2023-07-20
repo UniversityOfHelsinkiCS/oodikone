@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import PropTypes, { shape } from 'prop-types'
 import { Table, Progress, Radio, Icon } from 'semantic-ui-react'
+import { useGetAuthorizedUserQuery } from 'redux/auth'
 
 // https://stackoverflow.com/a/7091965
 const getAge = toDate => {
@@ -37,7 +38,8 @@ const groupedAgesReducer = (acc, age) => {
 const AgeStats = ({ filteredStudents, query }) => {
   const [isGrouped, setIsGrouped] = useState(true)
   const [expandedGroups, setExpandedGroups] = useState([])
-
+  const { isAdmin, rights } = useGetAuthorizedUserQuery()
+  const onlyIamRights = !isAdmin && rights.length === 0
   const studentsAges = filteredStudents.map(student => getAge(student.birthdate)).sort((a, b) => b - a)
 
   const ages = Object.entries(studentsAges.reduce(isGrouped ? groupedAgesReducer : separateAgesReducer, {}))
@@ -121,10 +123,15 @@ const AgeStats = ({ filteredStudents, query }) => {
         <Table.Body>
           {ages.map(([age, count], i) => (
             <React.Fragment key={age}>
-              <Table.Row onClick={() => handleGroupExpand(i)} style={{ cursor: isGrouped ? 'pointer' : undefined }}>
+              <Table.Row
+                onClick={!onlyIamRights ? () => handleGroupExpand(i) : null}
+                style={!onlyIamRights ? { cursor: isGrouped ? 'pointer' : undefined } : {}}
+              >
                 <Table.Cell>
                   {getAgeCellContent(age)}{' '}
-                  {isGrouped && <Icon name={expandedGroups.includes(i) ? 'caret down' : 'caret right'} color="grey" />}
+                  {isGrouped && !onlyIamRights && (
+                    <Icon name={expandedGroups.includes(i) ? 'caret down' : 'caret right'} color="grey" />
+                  )}
                 </Table.Cell>
                 <Table.Cell>{count}</Table.Cell>
                 <Table.Cell>
