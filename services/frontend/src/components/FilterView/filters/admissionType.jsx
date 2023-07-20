@@ -72,7 +72,7 @@ export default createFilter({
     selected: null,
   },
 
-  isActive: ({ selected }) => selected !== null,
+  isActive: ({ selected }) => !!selected,
 
   filter(student, { selected }, { args }) {
     return admissionTypeFilter(args.programme)(selected)(student)
