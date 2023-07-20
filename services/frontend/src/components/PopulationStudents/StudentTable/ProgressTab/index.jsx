@@ -104,11 +104,7 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
       },
       {
         code: `Enrollment`,
-        name: { fi: `Year ${idx + 1}: Fall`, en: `Year ${idx + 1}: Fall`, sv: `Year ${idx + 1}: Fall` },
-      },
-      {
-        code: `Enrollment`,
-        name: { fi: `Year ${idx + 1}: Spring`, en: `Year ${idx + 1}: Spring`, sv: `Year ${idx + 1}: Spring` },
+        name: { en: `Year ${idx + 1}` },
       },
     ]
     return acc
@@ -120,24 +116,10 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
     { title: months < 36 ? 'Academic Year 3 (in progress)' : 'Academic Year 3', year: 'year3', label: 'yearThree' },
   ]
 
-  const getEnrollmentValue = enrollmentObj => {
-    if (enrollmentObj?.enrollmenttype === 1) return 'No info'
-    if (enrollmentObj?.enrollmenttype === 1) return 'Present'
-    if (enrollmentObj?.enrollmenttype === 2) return 'Absent'
-    return 'Inactive'
-  }
-
   const nonCourse = ['Criteria', 'Credits']
   const style = { verticalAlign: 'middle', textAlign: 'center' }
 
-  const helpTexts = {
-    0: 'No information',
-    1: 'Active',
-    2: 'Student has enrolled as absent.',
-    3: 'Student has not enrolled to semester and is counted as inactive.',
-  }
-
-  const findProp = (info, s, enrollStatusIdx) => {
+  const findProp = (info, s) => {
     const propObj = {
       title: '',
       style,
@@ -148,16 +130,6 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
         (criteria?.allCourses[info.code] && criteria?.allCourses[info.code].includes(course.course_code))
     )
     if (nonCourse.includes(info.code)) return propObj
-    // Semester Enrollment - naming things is hard
-    if (info.code === 'Enrollment') {
-      if (info.name.en.includes('Fall') && s.semesterenrollments?.length > enrollStatusIdx) {
-        return { ...propObj, title: helpTexts[s.semesterenrollments[enrollStatusIdx]] }
-      }
-      if (s.semesterenrollments?.length < enrollStatusIdx + 1) {
-        return { ...propObj, title: helpTexts[s.semesterenrollments[enrollStatusIdx + 1]] }
-      }
-      return { ...propObj, title: helpTexts[0] }
-    }
     if (courses && courses.some(course => course.passed))
       return { ...propObj, title: `Passed-${moment(courses[0].date).format('YYYY-MM-DD')}` }
     if (courses && courses.some(course => course.passed === false))
@@ -171,17 +143,50 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
     }
     return propObj
   }
-
-  const enrolmentTypes = {
-    1: { className: 'label-present' },
-    2: { className: 'label-absent' },
-    3: { className: 'label-passive' },
+  const helpTexts = {
+    0: 'No information',
+    1: 'Active',
+    2: 'Absent',
+    3: 'Inactive',
   }
-
-  const renderSemester = enrollmentObj => {
-    if (!enrollmentObj) return ''
-    const { className } = enrolmentTypes[enrollmentObj.enrollmenttype]
-    return <div className={`enrollment-label-no-margin ${className}`}> </div>
+  const getSemesterEnrollmentVal = (student, enrollmentIndex) => {
+    const fall = student.semesterenrollments[enrollmentIndex]?.enrollmenttype ?? 0
+    const spring = student.semesterenrollments[enrollmentIndex + 1]?.enrollmenttype ?? 0
+    const fallText = `Fall: ${helpTexts[fall]}`
+    const springText = `Spring: ${helpTexts[spring]}`
+    return `${fallText} ${springText}`
+  }
+  const getEnrollmentSortingValue = (student, enrollmentIndex) => {
+    const fall = student.semesterenrollments[enrollmentIndex]?.enrollmenttype ?? 0
+    const spring = student.semesterenrollments[enrollmentIndex + 1]?.enrollmenttype ?? 0
+    const multiply = num => {
+      if (num === 1) return 1000
+      if (num === 2) return 1
+      return 0
+    }
+    return multiply(fall) + multiply(spring)
+  }
+  const getSemesterEnrollmentContent = (student, enrollmentIndex) => {
+    const enrollmentTypes = {
+      0: { className: 'label-none' },
+      1: { className: 'label-present' },
+      2: { className: 'label-absent' },
+      3: { className: 'label-passive' },
+    }
+    const renderSemester = (enrollment, leftMargin) => {
+      const { className } = enrollmentTypes[enrollment]
+      return <div className={`enrollment-label${!leftMargin ? '-no-margin' : ''} ${className}`} />
+    }
+    const fall = student.semesterenrollments[enrollmentIndex]?.enrollmenttype ?? 0
+    const spring = student.semesterenrollments[enrollmentIndex + 1]?.enrollmenttype ?? 0
+    const fallText = `Fall: ${helpTexts[fall]}`
+    const springText = `Spring: ${helpTexts[spring]}`
+    return (
+      <div title={`${fallText}\n${springText}`}>
+        {renderSemester(fall, false)}
+        {renderSemester(spring, true)}
+      </div>
+    )
   }
 
   const createContent = (labels, year, start, end, enrollStatusIdx) => {
@@ -203,31 +208,18 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
           ? `${m.code} ${enrollStatusIdx === 0 ? enrollStatusIdx + 1 : enrollStatusIdx}`
           : `${m.code}-${getTextIn(m.name)}`,
       headerProps: { title: `${m.code}, ${year}` },
-      cellProps: s => findProp(m, s, enrollStatusIdx),
+      cellProps: s => findProp(m, s),
       getRowVal: s => {
         if (m.code.includes('Criteria')) return s.criteriaProgress[year] ? s.criteriaProgress[year].totalSatisfied : 0
-        if (m.code.includes('Enrollment') && m.name.en.includes('Fall')) {
-          return s.semesterenrollments.length > enrollStatusIdx
-            ? getEnrollmentValue(s.semesterenrollments[enrollStatusIdx])
-            : 'No info'
-        }
-        if (m.code.includes('Enrollment') && m.name.en.includes('Spring')) {
-          return s.semesterenrollments.length > enrollStatusIdx + 1
-            ? getEnrollmentValue(s.semesterenrollments[enrollStatusIdx + 1])
-            : 'No info'
-        }
+        if (m.code.includes('Enrollment')) return getEnrollmentSortingValue(s, enrollStatusIdx)
         return findCsvText(s, m.code, year, criteria)
       },
+      // the following is hackish, but enrollment col needs to use the getRowVal for sorting
+      // and getRowExportVal can't be defined for all the other columns to not override their getRowVal
+      getRowExportVal: !m.code.includes('Enrollment') ? undefined : s => getSemesterEnrollmentVal(s, enrollStatusIdx),
       getRowContent: s => {
         if (m.code.includes('Criteria')) return s.criteriaProgress[year] ? s.criteriaProgress[year].totalSatisfied : 0
-        if (m.code.includes('Enrollment') && m.name.en.includes('Fall'))
-          return s.semesterenrollments.length > enrollStatusIdx
-            ? renderSemester(s.semesterenrollments[enrollStatusIdx])
-            : ''
-        if (m.code.includes('Enrollment') && m.name.en.includes('Spring'))
-          return s.semesterenrollments.length > enrollStatusIdx + 1
-            ? renderSemester(s.semesterenrollments[enrollStatusIdx + 1])
-            : ''
+        if (m.code.includes('Enrollment')) return getSemesterEnrollmentContent(s, enrollStatusIdx)
         return findRowContent(s, m.code, year, start, end, criteria)
       },
     }))
@@ -514,7 +506,9 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
           <span className="enrollment-label-no-margin label-present" />: Student has an active semester enrollment.{' '}
           <br />
           <span className="enrollment-label-no-margin label-absent" />: Student has enrolled as absent. <br />
-          <span className="enrollment-label-no-margin label-passive" />: Student has no semester enrollment.
+          <span className="enrollment-label-no-margin label-passive" />: Inactive: Student did not enroll at all. <br />
+          <span className="enrollment-label-no-margin label-none" />: Student has no enrollment, but also no study right
+          for the semester.
         </p>
       </Message>
       <Tab.Pane>
