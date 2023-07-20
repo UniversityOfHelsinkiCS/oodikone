@@ -5,6 +5,7 @@ import { Header, Segment } from 'semantic-ui-react'
 import { useGetSemestersQuery } from 'redux/semesters'
 import populationToData from 'selectors/populationDetails'
 import { getStudentTotalCredits, getUnifiedProgrammeName } from 'common'
+import { useGetAuthorizedUserQuery } from 'redux/auth'
 import PopulationDetails from '../PopulationDetails'
 import { useTitle } from '../../common/hooks'
 import useLanguage from '../LanguagePicker/useLanguage'
@@ -41,7 +42,8 @@ const PopulationStatistics = () => {
   const { query, queryIsSet, isLoading, selectedStudentsByYear, samples } = useSelector(
     populationToData.makePopulationsToData
   )
-
+  const { isAdmin, rights } = useGetAuthorizedUserQuery()
+  const onlyIamRights = !isAdmin && rights.length === 0
   useTitle('Class statistics')
 
   const { data: allSemesters } = useGetSemestersQuery()
@@ -55,7 +57,7 @@ const PopulationStatistics = () => {
     studentNumberFilter,
     hopsFilter({ programmeCode, combinedProgrammeCode }),
     genderFilter,
-    ageFilter,
+    !onlyIamRights ? ageFilter : null,
     courseFilter({ courses }),
     creditsEarnedFilter,
     graduatedFromProgrammeFilter({ code: programmeCode, combinedProgrammeCode }),
@@ -69,7 +71,7 @@ const PopulationStatistics = () => {
     }),
     studyTrackFilter({ code: programmeCode }),
     studyrightStatusFilter({ code: programmeCode, combinedProgrammeCode }),
-  ]
+  ].filter(Boolean)
 
   // For combined programme admission type is the same as they started in bachelor programme
   if (parseInt(query?.year, 10) >= 2020) {
