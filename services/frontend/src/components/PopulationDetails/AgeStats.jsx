@@ -91,9 +91,11 @@ const AgeStats = ({ filteredStudents, query }) => {
 
   return (
     <div>
-      <div style={{ marginTop: 15, marginBottom: 10 }}>
-        <Radio toggle label="Group ages" checked={isGrouped} onChange={() => setIsGrouped(!isGrouped)} />
-      </div>
+      {!onlyIamRights && (
+        <div style={{ marginTop: 15, marginBottom: 10 }}>
+          <Radio toggle label="Group ages" checked={isGrouped} onChange={() => setIsGrouped(!isGrouped)} />
+        </div>
+      )}
       <div>
         Average:{' '}
         {getAverage(
