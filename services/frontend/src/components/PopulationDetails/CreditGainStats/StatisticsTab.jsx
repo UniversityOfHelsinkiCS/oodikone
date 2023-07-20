@@ -5,7 +5,7 @@ import StatisticsTable from './StatisticsTable'
 
 const admissionTypes = [
   'Todistusvalinta',
-  'Koepisteet',
+  'Valintakoe',
   'Yhteispisteet',
   'Avoin väylä',
   'Kilpailumenestys',
@@ -24,7 +24,7 @@ const StatisticsTab = ({ allStudents, query }) => {
     )
 
   const getStatisticsTable = type => {
-    const filteredStudents = allStudents.filter(s => filterFunction(s, type))
+    const filteredStudents = allStudents.filter(s => filterFunction(s, type !== 'Valintakoe' ? type : 'Koepisteet'))
     return (
       <StatisticsTable
         key={`admissiontype-${type}`}

@@ -462,7 +462,8 @@ const GeneralTab = ({
       title: 'Admission type',
       getRowVal: s => {
         const studyright = s.studyrights.find(sr => sr.studyright_elements.some(e => e.code === programmeCode))
-        return studyright && studyright.admission_type ? studyright.admission_type : 'Ei valintatapaa'
+        const admissionType = studyright && studyright.admission_type ? studyright.admission_type : 'Ei valintatapaa'
+        return admissionType !== 'Koepisteet' ? admissionType : 'Valintakoe'
       },
     },
     passDate: {

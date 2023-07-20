@@ -98,7 +98,8 @@ export default ({ students, programmeCode }) => {
 
   const getAdmissionType = studyrights => {
     const studyright = findCorrectStudyright(studyrights)
-    return studyright && studyright.admission_type ? studyright.admission_type : 'Ei valintatapaa'
+    const admissionType = studyright && studyright.admission_type ? studyright.admission_type : 'Ei valintatapaa'
+    return admissionType === 'Koepisteet' ? 'Valintakoe' : admissionType
   }
 
   const studytrack = studyrights => {
