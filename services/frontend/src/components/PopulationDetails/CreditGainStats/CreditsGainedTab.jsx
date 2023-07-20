@@ -30,6 +30,7 @@ const CreditsGainedTab = ({ allStudents, query, creditDateFilterOptions }) => {
     const filteredStudents = allStudents.filter(s => filterFunction(s, type))
     return (
       <CreditsGainedTable
+        key={`creditsgainedtable-admissiontype-${type}`}
         type={type || 'Ei valintatapaa'}
         filteredStudents={filteredStudents}
         year={year}
@@ -56,7 +57,7 @@ const CreditsGainedTab = ({ allStudents, query, creditDateFilterOptions }) => {
         <Divider
           className="credits-gained-divider"
           horizontal
-          style={{ cursor: 'pointer' }}
+          style={{ cursor: 'pointer', marginBottom: !show && '50px' }}
           onClick={() => setShow(!show)}
         >
           By admission type <Icon name={`angle ${show ? 'down' : 'right'}`} />
