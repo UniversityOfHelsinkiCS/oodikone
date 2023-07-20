@@ -25,7 +25,13 @@ const StatisticsTab = ({ allStudents, query }) => {
 
   const getStatisticsTable = type => {
     const filteredStudents = allStudents.filter(s => filterFunction(s, type))
-    return <StatisticsTable type={type || 'Ei valintatapaa'} filteredStudents={filteredStudents} />
+    return (
+      <StatisticsTable
+        key={`admissiontype-${type}`}
+        type={type || 'Ei valintatapaa'}
+        filteredStudents={filteredStudents}
+      />
+    )
   }
 
   const admissionTypesAvailable = !allStudents.every(s => filterFunction(s, null))
