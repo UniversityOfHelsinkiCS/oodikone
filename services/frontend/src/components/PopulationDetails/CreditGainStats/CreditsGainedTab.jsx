@@ -5,7 +5,7 @@ import CreditsGainedTable from './CreditsGainedTable'
 
 const admissionTypes = [
   'Todistusvalinta',
-  'Koepisteet',
+  'Valintakoe',
   'Yhteispisteet',
   'Avoin väylä',
   'Kilpailumenestys',
@@ -19,10 +19,12 @@ const CreditsGainedTab = ({ allStudents, query, creditDateFilterOptions }) => {
 
   const { studyRights, year } = query
 
-  const filterFunction = (student, type) =>
-    student.studyrights.some(
-      sr => sr.studyright_elements.some(e => e.code === studyRights?.programme) && type === sr.admission_type
+  const filterFunction = (student, type) => {
+    const fixedType = type === 'Valintakoe' ? 'Koepisteet' : type
+    return student.studyrights.some(
+      sr => sr.studyright_elements.some(e => e.code === studyRights?.programme) && fixedType === sr.admission_type
     )
+  }
 
   const getCreditsGainedTable = type => {
     const filteredStudents = allStudents.filter(s => filterFunction(s, type))
