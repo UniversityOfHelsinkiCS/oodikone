@@ -36,7 +36,6 @@ class DbConnections extends EventEmitter {
       if (!this.knexConnection) {
         this.knex = knex({
           client: 'pg',
-          version: '9.6.3',
           connection: {
             host: SIS_IMPORTER_HOST,
             user: SIS_IMPORTER_USER,
