@@ -572,11 +572,9 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
     .where('parent_id', 'hy-university-root-id')
 
   const idsOfDegreeProgrammes = new Set(
-    await dbConnections.knex
-      .select('id')
-      .from('organisations')
-      .whereIn('parent_id', idsOfFaculties)
-      .map(org => org.id)
+    (await dbConnections.knex.select('id').from('organisations').whereIn('parent_id', idsOfFaculties)).map(
+      org => org.id
+    )
   )
 
   const sisDbCoursesForStudentAttainments = await Course.findAll({
