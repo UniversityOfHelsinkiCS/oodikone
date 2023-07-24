@@ -1,4 +1,4 @@
 .dockerignore
-Dockerfile
+*Dockerfile
 node_modules/
 *.log
