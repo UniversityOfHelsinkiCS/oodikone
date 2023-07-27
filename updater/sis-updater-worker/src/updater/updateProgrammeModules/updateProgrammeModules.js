@@ -5,7 +5,7 @@ const { ProgrammeModule, ProgrammeModuleChild } = require('../../db/models')
 const ModuleResolver = require('./resolver')
 
 const updateProgrammeModules = async programmeIds => {
-  const programmeChunks = chunk(programmeIds, 20)
+  const programmeChunks = chunk(programmeIds, 25)
   for (const chunk of programmeChunks) {
     await updateProgrammeModulesChunk(chunk)
   }
@@ -18,7 +18,7 @@ const updateProgrammeModulesChunk = async programmeIds => {
 
   for (const programme of programmes) {
     const resolvedProgramme = await resolveProgramme(programme)
-    recursiveWrite(resolvedProgramme, programme.id, moduleMap, joinMap)
+    recursiveWrite(resolvedProgramme, null, moduleMap, joinMap)
   }
 
   await bulkCreate(ProgrammeModule, Object.values(moduleMap))
@@ -32,6 +32,8 @@ const resolveProgramme = async programme => {
 
   const resolver = new ModuleResolver(dbConnections.knex)
 
+  const children = await resolver.resolve(programme.rule)
+
   return {
     id: programme.id,
     group_id: programme.group_id,
@@ -43,7 +45,7 @@ const resolveProgramme = async programme => {
     valid_from: programme?.validity_period?.startDate ?? null,
     valid_to: programme?.validity_period?.endDate ?? null,
     order: 0,
-    children: await resolver.resolve(programme.rule),
+    children,
   }
 }
 
@@ -68,7 +70,8 @@ const recursiveWrite = (modArg, parentId, programmeMap, joinMap) => {
   const { children, ...newModule } = mod
 
   programmeMap[mod.id] = newModule
-  joinMap[join.composite] = join
+
+  if (parentId) joinMap[join.composite] = join
 
   if (!children) return
   children.forEach(child => recursiveWrite(child, mod.id, programmeMap, joinMap))
