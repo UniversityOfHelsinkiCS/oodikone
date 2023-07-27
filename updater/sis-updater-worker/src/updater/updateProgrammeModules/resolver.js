@@ -75,7 +75,6 @@ class ModuleResolver {
     if (!courses) {
       return { error: 'could not find course' }
     }
-
     return courses.map(course => ({
       id: course.id,
       group_id: course.group_id,
