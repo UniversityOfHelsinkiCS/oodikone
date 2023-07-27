@@ -9,6 +9,9 @@ ProgrammeModule.init(
       primaryKey: true,
       type: STRING,
     },
+    group_id: {
+      type: STRING,
+    },
     code: {
       type: STRING,
     },
@@ -30,6 +33,12 @@ ProgrammeModule.init(
         model: 'organization',
         key: 'id',
       },
+    },
+    valid_from: {
+      type: DATE,
+    },
+    valid_to: {
+      type: DATE,
     },
     createdAt: {
       type: DATE,
