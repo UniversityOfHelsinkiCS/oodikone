@@ -102,7 +102,7 @@ export default {
   
   HUOM!
   - **All** Sisältää kaikki opiskelijat, joiden opinto-oikeudella on aloituspäivä kyseisenä vuonna, riippumatta siitä, onko opiskelija aloittanut opiskelemaan ko. vuonna. 
-  - **Started studying** Sisältää kaikki opiskelijat, jotka ovat aloittaneet opiskelemaan koulutusohjelmassa kyseisenä lukuvuonna.
+  - **Started studying** Sisältää kyseisenä vuonna aloittaneet opiskelijat (aloitetut opinto-oikeudet). Opiskelija on myös voinut myöhemmin keskeyttää opintonsa tai siirtyä pois ohjelmasta.
   - **Inactive** Sisältää kaikki opinto-oikeudet, jotka ovat alkaneet kyseisenä vuonna, mutta jotka ovat sittemmin vanhentuneet ilman, että opiskelija on valmistunut ohjelmasta. Sisältää myös opinto-oikeudet,
   joissa opiskelija on laiminlyönyt ilmoittautumisen tälle lukukaudelle.
 
