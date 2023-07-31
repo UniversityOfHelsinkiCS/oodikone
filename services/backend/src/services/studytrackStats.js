@@ -223,6 +223,7 @@ const getStudytrackDataForTheYear = async ({
         startDate,
         endDate,
         includeAllSpecials,
+        includeTransferredTo: includeAllSpecials,
         includeGraduated,
       })
 
@@ -230,7 +231,8 @@ const getStudytrackDataForTheYear = async ({
         codes,
         startDate,
         endDate,
-        includeAllSpecials: false,
+        includeAllSpecials,
+        includeTransferredTo: false,
         includeGraduated,
       })
       const students = await studytrackStudents(studentnumbers)

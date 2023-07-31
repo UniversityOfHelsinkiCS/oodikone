@@ -56,6 +56,7 @@ const getGraduatedStats = async ({ studyprogramme, since, years, isAcademicYear,
     startDate: alltimeStartDate,
     endDate: alltimeEndDate,
     includeAllSpecials,
+    includeTransferredTo: includeAllSpecials,
   })
 
   const studyrights = await graduatedStudyRights(studyprogramme, since, studentnumbers)
@@ -85,6 +86,7 @@ const getThesisStats = async ({ studyprogramme, since, years, isAcademicYear, in
     startDate: alltimeStartDate,
     endDate: alltimeEndDate,
     includeAllSpecials,
+    includeTransferredTo: includeAllSpecials,
   })
 
   const credits = await getThesisCredits(providercode, since, thesisType, studentnumbers)
@@ -112,6 +114,7 @@ const getGraduationTimeStats = async ({ studyprogramme, since, years, isAcademic
     startDate: alltimeStartDate,
     endDate: alltimeEndDate,
     includeAllSpecials,
+    includeTransferredTo: includeAllSpecials,
   })
 
   const studyrights = await graduatedStudyRights(studyprogramme, since, studentnumbers)

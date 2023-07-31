@@ -527,21 +527,24 @@ const studentnumbersWithAllStudyrightElements = async ({
   // eslint-disable-line
   // db startdate is formatted to utc so need to change it when querying
   const formattedStartDate = new Date(moment.tz(startDate, 'Europe/Helsinki').format()).toUTCString()
+  const formattedEndDate = new Date(moment.tz(endDate, 'Europe/Helsinki').format()).toUTCString()
 
   const filteredExtents = [16] // always filter out secondary subject students
+  if (!exchangeStudents) {
+    filteredExtents.push(7, 34)
+  }
+  if (!nondegreeStudents) {
+    filteredExtents.push(6, 9, 13, 14, 18, 22, 23, 99)
+  }
+
   let studyrightWhere = {
+    cancelled: false,
     extentcode: {
       [Op.notIn]: filteredExtents,
     },
     prioritycode: {
       [Op.not]: 6,
     },
-  }
-  if (!exchangeStudents) {
-    filteredExtents.push(7, 34)
-  }
-  if (!nondegreeStudents) {
-    filteredExtents.push(6, 9, 13, 14, 18, 22, 23, 99)
   }
 
   let studentWhere = {}
@@ -587,10 +590,10 @@ const studentnumbersWithAllStudyrightElements = async ({
           sequelize.fn(
             'GREATEST',
             sequelize.col('studyright_elements.startdate'),
-            sequelize.col('studyright.studystartdate')
+            sequelize.col('studyright.startdate')
           ),
           {
-            [Op.between]: [formattedStartDate, endDate],
+            [Op.between]: [formattedStartDate, formattedEndDate],
           }
         ),
       ],
@@ -602,12 +605,11 @@ const studentnumbersWithAllStudyrightElements = async ({
   })
 
   let studentnumbers = [...new Set(students.map(s => s.student_studentnumber))]
-
   // bit hacky solution, but this is used to filter out studentnumbers who have since changed studytracks
   const rights = await Studyright.findAll({
     attributes: ['studyrightid'],
     where: {
-      student_studentnumber: {
+      studentStudentnumber: {
         [Op.in]: studentnumbers,
       },
     },
@@ -997,7 +999,7 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
         endDate,
         exchangeStudents,
         nondegreeStudents,
-        transferredStudents,
+        transferredOutStudents: transferredStudents,
         tag: null,
         transferredToStudents: true,
         graduatedStudents: true,
@@ -1174,7 +1176,7 @@ const bottlenecksOf = async (query, studentnumberlist, encryptdata = false) => {
         endDate,
         exchangeStudents,
         nondegreeStudents,
-        transferredStudents,
+        transferredOutStudents: transferredStudents,
         tag: query.tag,
         transferredToStudents: true,
         graduatedStudents: true,
@@ -1200,7 +1202,7 @@ const bottlenecksOf = async (query, studentnumberlist, encryptdata = false) => {
           endDate,
           exchangeStudents,
           nondegreeStudents,
-          transferredStudents,
+          transferredOutStudents: transferredStudents,
           tag,
           transferredToStudents: true,
           graduatedStudents: true,

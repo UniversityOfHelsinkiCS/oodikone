@@ -22,6 +22,7 @@ const getStartedStats = async ({ studyprogramme, years, isAcademicYear }) => {
       startDate,
       endDate,
       includeAllSpecials: false,
+      includeTransferredTo: false,
       includeGraduated: true,
     })
     const studyrights = await startedStudyrights(studyprogramme, startDate, studentnumbersOfTheYear)
@@ -42,6 +43,7 @@ const getGraduatedStats = async ({ studyprogramme, since, years, isAcademicYear,
     startDate: alltimeStartDate,
     endDate: alltimeEndDate,
     includeAllSpecials,
+    includeTransferredTo: includeAllSpecials,
   })
 
   const studyrights = await graduatedStudyRights(studyprogramme, since, studentnumbersOfTheYear)
