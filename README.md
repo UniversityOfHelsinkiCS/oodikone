@@ -30,7 +30,6 @@ npm run cli
 
 _Please use a terminal at least 80 characters wide, the CLI is a bit rudimentary_ 😊
 
-
 What different CLI options do:
 
 1. Set up oodikone from scratch:
@@ -51,7 +50,44 @@ What different CLI options do:
 
 ### Architecture
 
-![Oodikone architecture](./documentation/Oodikone.png)
+```mermaid
+graph TB
+    subgraph Oodikone & Updater
+        subgraph Oodikone
+            client[React app] --> server[NodeJS server]
+            server --> ok_redis(Redis)
+            konedb[(kone-db)]
+        end
+        server -->|Read| sisdb[(sis-db)]
+        subgraph Updater
+            updaterscheduler[Scheduler] --> |Push jobs| nats
+            nats(NATS server)
+            updaterworker --> |Fetch jobs| nats
+            updaterworker[Worker] -->|Write| sisdb
+            updaterscheduler --> redis(Redis)
+            updaterworker --> redis
+        end
+    end
+
+    subgraph Common Toska services
+        jami[JAMI]
+        pate[Pate]
+        importer[Importer]
+    end
+
+    updaterworker -->|Read db| importer
+    updaterscheduler -->|Read db| importer
+    importer -->|Fetch data| sisu[Sisu export APIs]
+    server -->|Get IAM access| jami
+    server -->|Send mail| pate
+
+    subgraph Analytics
+        direction TB
+        sentry[Sentry]
+        graylog[Graylog]
+        grafana[Grafana]
+    end
+```
 
 ### Documentation
 
@@ -81,13 +117,13 @@ As said, the development environment runs entirely inside docker containers. To 
 
 `./run.sh` is simply a wrapper script to run oodikone, updater or both services in either anon or real mode. If you take a look at `package.json`, you can see that most of the predefined scripts above use `./run.sh` under the hood.
 
-It is recommended to spend some time to become familiar with `docker` and `docker-compose` cli commands. You can then use them directly or with `./run.sh` wrapper. Here is some examples for day-to-day development situations:
+It is recommended to spend some time to become familiar with `docker` and `docker compose` cli commands. You can then use them directly or with `./run.sh` wrapper. Here is some examples for day-to-day development situations:
 
 - `./run.sh oodikone anon pull`: Pull all images related to oodikone development
 - `./run.sh updater real up --build --force-recreate --detach`: Start updater detached (=in the background) in real data mode, but build new images before starting
-- `docker-compose ps`: view the containers in the running environment
-- `docker-compose logs frontend`: print logs for just frontend
-- `docker-compose logs --follow --tail 100 backend`: print last hundred rows of backend logs and begin to follow them in your terminal window
+- `docker compose ps`: view the containers in the running environment
+- `docker compose logs frontend`: print logs for just frontend
+- `docker compose logs --follow --tail 100 backend`: print last hundred rows of backend logs and begin to follow them in your terminal window
 - `docker exec -it backend sh`: open bash terminal inside backend container
 - `docker exec -it sis-db psql -U postgres sis-db-real`: open psql client to investigate sis real data database.
 
@@ -103,9 +139,7 @@ Cli script sets up pre-commit hooks that are used to lint and fix files before c
 
 For more information on how files are tested, take a look at "lint-staged" in `package.json`. Some files (e.g. github action files, dockerfiles, shell scripts) are checked with external tools and may require you to install those tools in case you're modifying files in question.
 
-There's no separate "lintfix" / "format" / "lint" command available, since pre-commit hooks will fix formatting and basic linting errors for you. In case pre-commit fails, you should fix the erroring code manually.
-
-However, if you want to run linting / formatting manually from command line, `package.json` defines `npm run eslint`, `npm run prettier` and `npm run stylelint` which you can use as an entrypoint.
+Pre-commit hooks will fix auto-fixable problems. To set up quick formatting: In VSCode you can go to command palette, select "ESLint: Fix all auto-fixable problems" and assign a hotkey for it, like `SHIFT + CTRL + '.'`.
 
 ## 🔨 Testing & CI
 
@@ -135,21 +169,19 @@ Continuous integration (CI) works with Github actions and is defined in workflow
 
 You should always install the dependencies **inside** the container to have the application **inside** the container access them. Module might be missing for example when someone else installs a new library and you only pull the changes in package.json. Use `docker exec <service> npm ci` to install modules inside the container.
 
-### I get the "You are not authorized to use Oodikone" -message when I try to work with anon-data
+### Studyguidance groups don't work on my machine
 
-Make sure you have your VPN on
-
-### I made a change to sis-db models aand created a migration, but tests are failing in CI!
-
-Migrations are handled by sis-importer-worker, since oodikone is using only replica. Since CI is testing only services included in oodikone, your new changes aren't migrated and thus are failing. Open anonyymioodi-folder in this repo to find more about how to to update the anon sis-db.
+Make sure you have your VPN on.
 
 ### Everything is broken, can't get oodikone running, data is not there etc.
 
 Just do clean install by launching cli with `npm cli` and running option 1: _Set up oodikone from scratch_.
 
+If you don't want to reset all data, you can delete the docker images `docker compose down --rmi` (or just one) and they will be rebuilt when you start them. This is sometimes necessary if some commit has updated images or you switch to an older commit which has changed the images.
+
 ## ✌🏼 Maintainers and contribution
 
-Toska of course.
+(Toska)[https://toska.dev] of course.
 
 University of Helsinki
 
