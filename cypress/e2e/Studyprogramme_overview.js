@@ -64,9 +64,9 @@ describe('Studyprogramme overview', () => {
         ...years.map(year => [year, 0, 0, 0, 0]),
         [2021, 0, 0, 1, 0],
         [2020, 10, 35, 3, 2],
-        [2019, 85, 17, 0, 1],
-        [2018, 159, 1, 0, 0],
-        [2017, 170, 0, 0, 0],
+        [2019, 86, 17, 0, 1],
+        [2018, 161, 1, 0, 0],
+        [2017, 171, 0, 0, 0],
       ]
 
       cy.checkTableStats(tableContents, 'StudentsOfTheStudyprogramme')
@@ -112,9 +112,9 @@ describe('Studyprogramme overview', () => {
         ...years.map(year => [year, 0, 0]),
         [2021, 0, 0],
         [2020, 10, 35],
-        [2019, 85, 17],
-        [2018, 159, 1],
-        [2017, 170, 0],
+        [2019, 86, 17],
+        [2018, 161, 1],
+        [2017, 171, 0],
       ]
 
       cy.checkTableStats(studentTableContents, 'StudentsOfTheStudyprogramme')
@@ -156,9 +156,9 @@ describe('Studyprogramme overview', () => {
         ...years.map(year => [year, 0, 0, 0, 0]),
         ['2021 - 2022', 0, 0, 0, 0],
         ['2020 - 2021', 10, 6, 3, 2],
-        ['2019 - 2020', 85, 38, 1, 0],
-        ['2018 - 2019', 159, 8, 0, 1],
-        ['2017 - 2018', 170, 1, 0, 0],
+        ['2019 - 2020', 86, 38, 1, 0],
+        ['2018 - 2019', 161, 8, 0, 1],
+        ['2017 - 2018', 171, 1, 0, 0],
       ]
       // eslint-disable-next-line cypress/no-unnecessary-waiting
       cy.wait(10000)
