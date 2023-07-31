@@ -17,11 +17,12 @@ const getStartedStats = async ({ studyprogramme, years, isAcademicYear }) => {
 
   for (const year of years) {
     const { startDate, endDate } = getYearStartAndEndDates(year, isAcademicYear)
+    // Include not transferred to, but the transferred out students are fine as said in info box
     const studentnumbersOfTheYear = await getCorrectStudentnumbers({
       codes: [studyprogramme],
       startDate,
       endDate,
-      includeAllSpecials: false,
+      includeAllSpecials: true,
       includeTransferredTo: false,
       includeGraduated: true,
     })
