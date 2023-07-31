@@ -26,6 +26,7 @@ const getFacultyThesisWriters = async ({ since, years, isAcademicYear, facultyPr
       startDate: alltimeStartDate,
       endDate: alltimeEndDate,
       includeAllSpecials,
+      includeTransferredTo: includeAllSpecials,
     })
 
     const thesisCourseCodes = await thesisWriters(provider, since, thesisTypes, students)
