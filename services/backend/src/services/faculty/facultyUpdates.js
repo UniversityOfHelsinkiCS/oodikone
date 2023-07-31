@@ -154,14 +154,9 @@ const updateFacultyProgressOverview = async faculty => {
   const options = [specialGraduated, specialNotGraduated, notSpecialGraduated, notSpecialNotGraduated]
 
   let newProgrammes = []
-  let allProgrammes = []
-  let allProgrammeCodes = []
   try {
-    const all = await findFacultyProgrammeCodes(faculty, 'ALL_PROGRAMMES')
     const onlyNew = await findFacultyProgrammeCodes(faculty, 'NEW_STUDY_PROGRAMMES')
-    allProgrammes = await setFacultyProgrammes(faculty, all, 'ALL_PROGRAMMES')
     newProgrammes = await setFacultyProgrammes(faculty, onlyNew, 'NEW_STUDY_PROGRAMMES')
-    allProgrammes?.data.forEach(prog => allProgrammeCodes.push(prog.code))
   } catch (e) {
     logger.error(`Faculty stats: all programme stats failed with error ${e}`)
   }
@@ -172,7 +167,6 @@ const updateFacultyProgressOverview = async faculty => {
       const updateFacultyStudentStats = await combineFacultyStudents(
         faculty,
         newProgrammes.data,
-        allProgrammeCodes,
         specialGroups,
         graduated
       )
@@ -180,7 +174,6 @@ const updateFacultyProgressOverview = async faculty => {
       const updateFacultyProgressStats = await combineFacultyStudentProgress(
         faculty,
         newProgrammes.data,
-        allProgrammeCodes,
         specialGroups,
         graduated
       )

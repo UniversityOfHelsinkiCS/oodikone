@@ -34,19 +34,16 @@ const FacultyProgrammeOverview = ({
   requiredRights,
 }) => {
   const toolTips = InfotoolTips.Faculty
-  const studyProgrammeFilter = 'NEW_STUDY_PROGRAMMES'
   const specials = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
   const graduated = graduatedGroup ? 'GRADUATED_EXCLUDED' : 'GRADUATED_INCLUDED'
   const { getTextIn } = useLanguage()
   const progressStats = useGetFacultyProgressStatsQuery({
     id: faculty?.code,
-    studyProgrammeFilter,
     specialGroups: specials,
     graduated,
   })
   const studentStats = useGetFacultyStudentStatsQuery({
     id: faculty.code,
-    studyProgrammeFilter,
     specialGroups: specials,
     graduated,
   })

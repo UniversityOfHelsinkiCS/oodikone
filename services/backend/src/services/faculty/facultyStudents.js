@@ -1,8 +1,6 @@
-const moment = require('moment')
-const { Op } = require('sequelize')
 const { getStartDate, getYearsArray, getPercentage, getYearsObject, tableTitles } = require('../studyprogrammeHelpers')
 const { getAcademicYearDates } = require('../../util/semester')
-const { getStudyRightsByExtent, getStudentsByStudentnumbers, getTransfers } = require('./faculty')
+const { getStudyRightsByExtent, getStudentsByStudentnumbers, getTransfersIn } = require('./faculty')
 const { checkTransfers } = require('./facultyHelpers')
 const { inactiveStudyrights, absentStudents, enrolledStudents } = require('../studyprogramme')
 const { graduatedStudyRights } = require('../studyprogramme')
@@ -77,7 +75,6 @@ const getStudentData = (students, facultyExtra, year, code) => {
 const getFacultyDataForYear = async ({
   faculty,
   programmes,
-  allProgrammeCodes,
   since,
   settings,
   year,
@@ -100,55 +97,30 @@ const getFacultyDataForYear = async ({
     graduated = [...graduated, 1]
   }
   const totals = emptyTotals()
-
   for (const { progId, code, name } of programmes) {
-    let elementStart = {}
-    let studyrightStart = {}
-    const start = moment(`${year.slice(0, 4)}-08-01`, 'YYYY-MM-DD')
-    const end = moment(`${year.slice(-4)}-07-31`, 'YYYY-MM-DD').endOf('day')
-    const allTransfers = await getTransfers(code, allProgrammeCodes, start, end)
     if (!Object.keys(facultyExtra[year]).includes(code)) facultyExtra[year][code] = {}
     if (!Object.keys(facultyExtra['Total']).includes(code)) facultyExtra['Total'][code] = {}
-    const startDateWhere = {
-      startdate: {
-        [Op.and]: {
-          [Op.gte]: startDate,
-          [Op.lte]: endDate,
-        },
-      },
-    }
-    if (code.includes('MH')) {
-      elementStart = startDateWhere
-    } else {
-      studyrightStart = startDateWhere
-    }
-    const allStudyrights = await getStudyRightsByExtent(
-      faculty,
-      elementStart,
-      studyrightStart,
-      code,
-      extents,
-      graduated
-    )
-    let studyrights = allStudyrights
-    let allStudents = []
 
-    studyrights = allStudyrights.filter(s => !checkTransfers(s, allTransfers, allTransfers))
+    const toTransfers = await getTransfersIn(code, startDate, endDate)
+    const allStudyrights = await getStudyRightsByExtent(faculty, startDate, endDate, code, extents, graduated)
+    let allStudents = []
     if (includeAllSpecials) {
-      allStudents = [...new Set([...allTransfers.map(sr => sr.studentnumber).filter(student => student !== null)])]
+      allStudents = [...new Set([...allStudyrights.map(sr => sr.studentnumber)])]
     }
+    let studyrights = allStudyrights.filter(s => !checkTransfers(s, toTransfers, toTransfers))
+
     // Get all the studyrights and students for the calculations
     const studentNbrs = studyrights.map(sr => sr.studentnumber)
-    allStudents = [...studentNbrs, ...allStudents]
+    allStudents = [...new Set([...studentNbrs, ...allStudents])]
     const students = await getStudentsByStudentnumbers(allStudents)
     const studentData = getStudentData(students, facultyExtra, year, code)
-    const started = await getStudentsByStudentnumbers(studentNbrs)
+    const started = [...new Set(studentNbrs)]
     const inactive = await inactiveStudyrights(code, allStudents)
-    const graduatedStudents = await graduatedStudyRights(code, start, allStudents)
+    const graduatedStudents = await graduatedStudyRights(code, startDate, allStudents)
     const absent = await absentStudents(code, allStudents)
     const enrolled = await enrolledStudents(code, allStudents)
     // Count stats for the programme
-    if (students.length === 0) continue
+    if (allStudents.length === 0) continue
     if (!(progId in programmeTableStats)) {
       programmeTableStats[progId] = years.reduce((resultObj, yearKey) => {
         return { ...resultObj, [yearKey]: [] }
@@ -215,7 +187,7 @@ const getFacultyDataForYear = async ({
 }
 
 // Combines all the data for faculty students table
-const combineFacultyStudents = async (code, programmes, allProgrammeCodes, specialGroups, graduated) => {
+const combineFacultyStudents = async (code, programmes, specialGroups, graduated) => {
   // Only academic years are considered
   const includeAllSpecials = specialGroups === 'SPECIAL_INCLUDED'
   const includeGraduated = graduated === 'GRADUATED_INCLUDED'
@@ -233,7 +205,6 @@ const combineFacultyStudents = async (code, programmes, allProgrammeCodes, speci
     const queryParams = {
       faculty: code,
       programmes,
-      allProgrammeCodes,
       since,
       settings,
       year,

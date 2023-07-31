@@ -22,7 +22,9 @@ const {
   mapCodesToIds,
   facultyProgrammeStudents,
 } = require('./facultyHelpers')
-
+const {
+  dbConnections: { sequelize },
+} = require('../../database/connection')
 const getTransferredToAndAway = async (programmeCodes, allProgrammeCodes, since) => {
   const awayTransfers = await transferredAway(programmeCodes, allProgrammeCodes, since)
   const toTransfers = await transferredTo(programmeCodes, allProgrammeCodes, since)
@@ -33,33 +35,26 @@ const getTransferredInside = async (programmeCodes, allProgrammeCodes, since) =>
   return await transferredInsideFaculty(programmeCodes, allProgrammeCodes, since)
 }
 
-const getTransfers = async (programmeCode, allProgrammeCodes, since, end) => {
-  return await transferredFaculty(programmeCode, allProgrammeCodes, since, end)
+const getTransfersOut = async (programmeCode, start, end) => {
+  return await transferredFaculty([], [programmeCode], start, end)
 }
 
-const transferredFaculty = async (programme, allProgrammeCodes, since, end) =>
+const getTransfersIn = async (programmeCode, start, end) => {
+  return await transferredFaculty([programmeCode], [], start, end)
+}
+const transferredFaculty = async (programmeCodeIn, programmeCodeOut, start, end) =>
   (
     await Transfer.findAll({
       where: {
         transferdate: {
-          [Op.between]: [since, end],
+          [Op.between]: [start, end],
         },
         [Op.or]: [
           {
-            sourcecode: allProgrammeCodes,
-            targetcode: programme,
+            sourcecode: programmeCodeOut,
           },
           {
-            sourcecode: programme,
-            targetcode: {
-              [Op.notIn]: allProgrammeCodes,
-            },
-          },
-          {
-            sourcecode: {
-              [Op.notIn]: allProgrammeCodes,
-            },
-            targetcode: programme,
+            targetcode: programmeCodeIn,
           },
         ],
       },
@@ -70,11 +65,6 @@ const startedStudyrights = async (faculty, since, studyRightWhere) =>
   (
     await Studyright.findAll({
       include: [
-        {
-          model: Student,
-          attributes: ['studentnumber'],
-          required: true,
-        },
         {
           model: StudyrightElement,
           required: true,
@@ -89,7 +79,6 @@ const startedStudyrights = async (faculty, since, studyRightWhere) =>
         startdate: {
           [Op.gte]: since,
         },
-        studentStudentnumber: { [Op.not]: null },
         ...studyRightWhere,
       },
     })
@@ -130,12 +119,8 @@ const studyrightsByRightStartYear = async (faculty, since, graduated = 1) =>
     await Studyright.findAll({
       include: [
         {
-          model: Student,
-          attributes: ['studentnumber'],
-          required: true,
-        },
-        {
           model: StudyrightElement,
+          attributes: ['code', 'startdate'],
           required: true,
           include: {
             model: ElementDetail,
@@ -149,47 +134,77 @@ const studyrightsByRightStartYear = async (faculty, since, graduated = 1) =>
           [Op.gte]: since,
         },
         graduated: graduated,
-        studentStudentnumber: { [Op.not]: null },
       },
     })
   ).map(facultyFormatStudyright)
 
-const getStudyRightsByExtent = async (faculty, elementStart, studyrightStart, code, extents, graduated) =>
+const getStudyRightsByExtent = async (faculty, startDate, endDate, code, extents, graduated) =>
   (
     await Studyright.findAll({
-      include: [
-        {
-          model: Student,
-          attributes: ['studentnumber'],
-          required: true,
+      include: {
+        model: StudyrightElement,
+        attributes: [],
+        required: true,
+        where: {
+          code: code,
         },
-        {
-          model: StudyrightElement,
-          required: true,
-          where: {
-            code: code,
-            ...elementStart,
-          },
-          include: {
-            model: ElementDetail,
-            required: true,
-            where: {
-              type: 20,
-            },
-          },
+        include: {
+          model: ElementDetail,
+          attributes: [],
         },
-      ],
+      },
+      group: [sequelize.col('studyright.studyrightid')],
       where: {
         facultyCode: faculty,
         extentcode: {
           [Op.in]: extents,
         },
+        prioritycode: {
+          [Op.not]: 6,
+        },
         graduated: {
           [Op.in]: graduated,
         },
-        studystartdate: { [Op.not]: null },
-        ...studyrightStart,
-        studentStudentnumber: { [Op.not]: null },
+        [Op.and]: [
+          sequelize.where(
+            sequelize.fn(
+              'GREATEST',
+              sequelize.col('studyright_elements.startdate'),
+              sequelize.col('studyright.startdate')
+            ),
+            {
+              [Op.between]: [startDate, endDate],
+            }
+          ),
+        ],
+      },
+    })
+  ).map(facultyFormatStudyright)
+
+const getStudyRightsByBachelorStart = async (faculty, startDate, endDate, code, extents, graduated) =>
+  (
+    await Studyright.findAll({
+      include: {
+        model: StudyrightElement,
+        required: true,
+        where: {
+          code: code,
+        },
+      },
+      where: {
+        facultyCode: faculty,
+        extentcode: {
+          [Op.in]: extents,
+        },
+        prioritycode: {
+          [Op.not]: 6,
+        },
+        graduated: {
+          [Op.in]: graduated,
+        },
+        startdate: {
+          [Op.between]: [startDate, endDate],
+        },
       },
     })
   ).map(facultyFormatStudyright)
@@ -396,6 +411,8 @@ module.exports = {
   getTransferredToAndAway,
   getTransferredInside,
   getStudyRightsByExtent,
+  getStudyRightsByBachelorStart,
   getStudentsByStudentnumbers,
-  getTransfers,
+  getTransfersOut,
+  getTransfersIn,
 }
