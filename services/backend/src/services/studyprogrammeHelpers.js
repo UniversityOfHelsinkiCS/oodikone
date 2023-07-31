@@ -2,12 +2,19 @@ const { studentnumbersWithAllStudyrightElements } = require('./populations')
 const { codes } = require('../../config/programmeCodes')
 
 // Helper functions
-const getCorrectStudentnumbers = async ({ codes, startDate, endDate, includeAllSpecials, includeGraduated = true }) => {
+const getCorrectStudentnumbers = async ({
+  codes,
+  startDate,
+  endDate,
+  includeAllSpecials,
+  includeTransferredTo,
+  includeGraduated = true,
+}) => {
   let studentnumbers = []
   const exchangeStudents = includeAllSpecials
   const nondegreeStudents = includeAllSpecials
   const transferredOutStudents = includeAllSpecials
-  const transferredToStudents = includeAllSpecials
+  const transferredToStudents = includeTransferredTo
   const graduatedStudents = includeGraduated
 
   studentnumbers = await studentnumbersWithAllStudyrightElements({

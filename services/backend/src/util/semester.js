@@ -10,10 +10,11 @@ const semesterStart = {
   SPRING: '01-01',
   FALL: '08-01',
 }
-
+// Sometimes startdate is in UTC sometimes not, add flexibility to this
+// End date must be then also in UTC, othervice students may land into two academic years.
 const semesterEnd = {
-  SPRING: '07-31T23:59:59.000Z',
-  FALL: '12-31T23:59:59.000Z',
+  SPRING: '07-31T20:59:59.000Z',
+  FALL: '12-31T20:59:59.000Z',
 }
 const getPassingSemester = (startYear, date) => {
   const mDate = moment(date).add(1, 'day')
@@ -40,8 +41,8 @@ const getAcademicYearDates = (year, since) => {
   const endYear =
     typeof year === 'number' ? moment(year, 'YYYY').add(1, 'years').format('YYYY') : Number(year.slice(7, 11))
   return {
-    startDate: `${startYear}-${semesterStart['FALL']}`,
-    endDate: `${endYear}-${semesterEnd['SPRING']}`,
+    startDate: new Date(moment.tz(`${startYear}-${semesterStart['FALL']}`, 'Europe/Helsinki').format()).toUTCString(),
+    endDate: new Date(`${endYear}-${semesterEnd['SPRING']}`).toUTCString(),
   }
 }
 
