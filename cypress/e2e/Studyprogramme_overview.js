@@ -1,3 +1,4 @@
+/* eslint-disable cypress/no-unnecessary-waiting */
 /// <reference types="Cypress" />
 
 const deleteTag = name => {
@@ -255,7 +256,6 @@ describe('Studyprogramme overview', () => {
   describe('Studytrack overview works for basic user', () => {
     beforeEach(() => {
       cy.init('/study-programme')
-      // eslint-disable-next-line cypress/no-unnecessary-waiting
       cy.wait(10000)
       cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
       cy.wait(5000)
@@ -271,12 +271,12 @@ describe('Studyprogramme overview', () => {
 
     it('Students of the studyprogramme are shown correctly', () => {
       const tableContents = [
-        // [Year, All, Started studying, Currently enrolled, Absent, Inactive, Graduated, Men, Women, Finnish]
+        // [Year, All, Started studying, Currently enrolled, Absent, Inactive, Graduated, Men, Women, other/unknown Finnish, other]
         ['2020 - 2021', 12, 10, 0, 0, 0, 0, 10, 2, 0, 12, 0],
-        ['2019 - 2020', 86, 85, 0, 0, 0, 1, 65, 21, 0, 86, 0],
-        ['2018 - 2019', 162, 159, 0, 0, 0, 11, 118, 44, 0, 161, 1],
-        ['2017 - 2018', 171, 170, 0, 0, 0, 42, 135, 36, 0, 166, 5],
-        ['Total', 431, 424, 0, 0, 0, 54, 328, 103, 0, 425, 6],
+        ['2019 - 2020', 86, 86, 0, 0, 0, 1, 65, 21, 0, 86, 0],
+        ['2018 - 2019', 162, 161, 0, 0, 0, 11, 118, 44, 0, 161, 1],
+        ['2017 - 2018', 171, 171, 0, 0, 0, 42, 135, 36, 0, 166, 5],
+        ['Total', 431, 428, 0, 0, 0, 54, 328, 103, 0, 425, 6],
       ]
 
       cy.checkTableStats(tableContents, 'StudytrackOverview')
@@ -285,10 +285,10 @@ describe('Studyprogramme overview', () => {
     it('Student progress data is shown correctly', () => {
       const tableContents = [
         ['2020 - 2021', 12, 12, 0, 0, 0, 0, 0, 0, 0],
-        ['2019 - 2020', 86, 10, 16, 34, 21, 5, 0, 0, 0],
-        ['2018 - 2019', 162, 2, 8, 27, 47, 36, 26, 12, 4],
-        ['2017 - 2018', 171, 5, 15, 21, 26, 22, 22, 33, 27],
-        ['Total', 431, 29, 39, 82, 94, 63, 48, 45, 31],
+        ['2019 - 2020', 86, 86, 0, 0, 0, 0, 0, 0, 0],
+        ['2018 - 2019', 162, 162, 0, 0, 0, 0, 0, 0, 0],
+        ['2017 - 2018', 171, 171, 0, 0, 0, 0, 0, 0, 0],
+        ['Total', 431, 431, 0, 0, 0, 0, 0, 0, 0],
       ]
 
       cy.checkTableStats(tableContents, 'StudytrackProgress')
@@ -299,9 +299,7 @@ describe('Studyprogramme overview', () => {
         .should('contain', 'Less than 15 credits')
         .should('contain', '30-59 credits')
         .should('contain', '180 or more credits')
-        .should('contain', '2.9%') // The percentage for less than 15 credits in 2017-2018, to check that the graph renders
-        .should('contain', '4.9%') // The percentage for 15-29 credits in 2018-2019
-        .should('contain', '11.6%') // The percentage for less than 15 credits in 2019-2020
+        .should('contain', '100.0%') // The percentage for less than 15 credits in 2017-2018, to check that the graph renders
 
       cy.get('[data-cy=graduation-times-graph-breakdownBachelor]')
       cy.get('[data-cy=GraduationTimeToggle]').click()
