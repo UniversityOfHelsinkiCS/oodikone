@@ -1,5 +1,4 @@
 const { indexOf } = require('lodash')
-const { Op } = require('sequelize')
 const moment = require('moment')
 const { getAcademicYearDates } = require('../../util/semester')
 const {
@@ -13,7 +12,7 @@ const {
   getVetenaryCreditGraphStats,
 } = require('../studyprogrammeHelpers')
 const { studytrackStudents } = require('../studyprogramme')
-const { getStudyRightsByExtent, getTransferredInside, getTransferredToAndAway } = require('./faculty')
+const { getStudyRightsByExtent, getStudyRightsByBachelorStart, getTransfersIn, getTransfersOut } = require('./faculty')
 const { checkTransfers } = require('./facultyHelpers')
 
 const getStudentData = (startDate, students, thresholdKeys, thresholdAmounts, limits = [], limitKeys = [], prog) => {
@@ -79,20 +78,20 @@ const createYearlyTitles = (start, limitList) => {
   ]
 }
 
-const filterOutTransfers = async (studyrights, programmes, allProgrammeCodes, since) => {
-  const transferredInAndOut = await getTransferredToAndAway(programmes, allProgrammeCodes, since)
-  const insideTransfers = await getTransferredInside(programmes, allProgrammeCodes, since)
-  const filteredStudyrights = studyrights.filter(sr => !checkTransfers(sr, insideTransfers, transferredInAndOut))
+const filterOutTransfers = async (studyrights, programmeCode, startDate, endDate) => {
+  const transferredIn = await getTransfersIn(programmeCode, startDate, endDate)
+  const transferredOut = await getTransfersOut(programmeCode, startDate, endDate)
+  const filteredStudyrights = studyrights.filter(sr => !checkTransfers(sr, transferredIn, transferredOut))
   return filteredStudyrights
 }
 
-const combineFacultyStudentProgress = async (faculty, programmes, allProgrammeCodes, specialGroups, graduated) => {
+const combineFacultyStudentProgress = async (faculty, programmes, specialGroups, graduated) => {
   const since = new Date('2017-08-01')
   const includeAllSpecials = specialGroups === 'SPECIAL_INCLUDED'
   const includeGraduated = graduated === 'GRADUATED_INCLUDED'
-  const graduationStatus = [0]
+  let graduationStatus = [0]
   if (includeGraduated) {
-    graduationStatus.push(1)
+    graduationStatus = [0, 1]
   }
   const yearsArray = getYearsArray(since.getFullYear(), true, true)
   const titlesVet = [
@@ -174,22 +173,17 @@ const combineFacultyStudentProgress = async (faculty, programmes, allProgrammeCo
     progressStats.yearlyBachelorTitles = [...progressStats.yearlyBachelorTitles, createYearlyTitles(0, bachelorlimits)]
     progressStats.yearlyMasterTitles = [...progressStats.yearlyMasterTitles, createYearlyTitles(0, masterlimits)]
     progressStats.yearlyBcMsTitles = [...progressStats.yearlyBcMsTitles, createYearlyTitles(0, bcmslimits)]
-    const programmeCodes = programmes.map(prog => prog.code)
 
     for (const { progId, code, name } of programmes) {
       let extentcodes = [1, 2, 3, 4]
       if (includeAllSpecials) {
-        extentcodes = [...extentcodes, ...[7, 9, 34, 22, 99, 14, 13]]
+        extentcodes = [...extentcodes, ...[6, 7, 9, 13, 14, 22, 23, 34, 99]]
       }
-      const startDateWhere = {
-        startdate: {
-          [Op.and]: {
-            [Op.gte]: startDate,
-            [Op.lte]: endDate,
-          },
-        },
-      }
-      let studyrights = await getStudyRightsByExtent(faculty, {}, startDateWhere, code, extentcodes, graduationStatus)
+      // For bachelor-master we want to have the start of the bachelor programme of the student.
+      let studyrights = code.includes('MH')
+        ? await getStudyRightsByBachelorStart(faculty, startDate, endDate, code, extentcodes, graduationStatus)
+        : await getStudyRightsByExtent(faculty, startDate, endDate, code, extentcodes, graduationStatus)
+
       // Get credit threshold values: 'combined study programme' is false and 'only master studyright' is true
       let { creditThresholdKeys, creditThresholdAmounts } = getCreditThresholds(code, false, true)
 
@@ -198,7 +192,7 @@ const combineFacultyStudentProgress = async (faculty, programmes, allProgrammeCo
         progressStats.programmeNames[progId] = { code: code, ...name }
       }
       if (!includeAllSpecials) {
-        studyrights = await filterOutTransfers(studyrights, programmeCodes, allProgrammeCodes, since)
+        studyrights = await filterOutTransfers(studyrights, code, startDate, endDate)
       }
       if (code.includes('KH')) {
         const allBachelors = studyrights.filter(sr => sr.extentcode === 1).map(sr => sr.studentnumber)
@@ -241,8 +235,8 @@ const combineFacultyStudentProgress = async (faculty, programmes, allProgrammeCo
         progressStats.mastersTableStats[indexOf(reversedYears, 'Total')][1] += msStudents.length || 0
         progressStats.bcMsTableStats[indexOf(reversedYears, year)][1] += bcMsStudents.length || 0
         progressStats.bcMsTableStats[indexOf(reversedYears, 'Total')][1] += bcMsStudents.length || 0
-        // Get credit threshold values both 'combined study programme' and 'only master studyright' are false
 
+        // Get credit threshold values both 'combined study programme' and 'only master studyright' are false
         const { creditThresholdKeys: creditThresholdKeysBcMs, creditThresholdAmounts: creditThresholdAmountsBcMs } =
           getCreditThresholds(code, false, false)
 
