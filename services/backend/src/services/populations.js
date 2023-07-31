@@ -538,7 +538,6 @@ const studentnumbersWithAllStudyrightElements = async ({
   }
 
   let studyrightWhere = {
-    cancelled: false,
     extentcode: {
       [Op.notIn]: filteredExtents,
     },
