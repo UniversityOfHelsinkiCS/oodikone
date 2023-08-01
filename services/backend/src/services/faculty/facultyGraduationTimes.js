@@ -4,6 +4,7 @@ const { findRightProgramme, isNewProgramme } = require('./facultyHelpers')
 const { getYearsArray, getYearsObject, getMedian, defineYear } = require('../studyprogrammeHelpers')
 const { codes } = require('../../../config/programmeCodes')
 const { bachelorStudyright, countTimeCategories, getStatutoryAbsences } = require('../graduationHelpers')
+const { getFacultyProgrammes } = require('./facultyService')
 
 const sortProgrammes = data => {
   const check = name => {
@@ -112,71 +113,82 @@ const addGraduation = async (
   ]
 }
 
-const getClassSizes = async (faculty, since, classSizes, programmeFilter, years) => {
-  const studyrights = await studyrightsByRightStartYear(faculty, since, [0, 1])
+const getClassSizes = async (faculty, programmeCodes, since, classSizes, programmeFilter, years) => {
+  for (const code of programmeCodes) {
+    const studyrights = await studyrightsByRightStartYear(faculty, code, since, [0, 1])
 
-  // get all received studyrights for each year
-  // a transferred student is counted into new programmes class size i.e.
-  // students who received studyright on year X and graduated/will be graduating from programme Y
-  // if we only counted those who started fresh in the new programme we could get a bigger number of graduates
-  // than the class size, as the graduatation time count only looks at a degree as whole studyright
-  for (const right of studyrights) {
-    const { startdate, studyrightid, extentcode, studyrightElements } = right
-    const { programme } = findRightProgramme(studyrightElements, 'graduated')
-    if (programmeFilter === 'NEW_STUDY_PROGRAMMES' && !isNewProgramme(programme)) continue
+    // get all received studyrights for each year
+    // a transferred student is counted into new programmes class size i.e.
+    // students who received studyright on year X and graduated/will be graduating from programme Y
+    // if we only counted those who started fresh in the new programme we could get a bigger number of graduates
+    // than the class size, as the graduatation time count only looks at a degree as whole studyright
+    for (const right of studyrights) {
+      const { startdate, studyrightid, extentcode, studyrightElements } = right
+      if (programmeFilter === 'NEW_STUDY_PROGRAMMES' && !isNewProgramme(code)) continue
 
-    let actualStartdate = startdate
-    let level = null
+      let actualStartdate = startdate
+      let level = null
 
-    if (programme === 'MH30_001' || programme === 'MH30_003') {
-      level = 'bcMsCombo'
-    } else if (extentcode === 1) {
-      level = 'bachelor'
-    } else if (extentcode === 2) {
-      if (studyrightid.slice(-2) === '-2') {
+      if (code === 'MH30_001' || code === 'MH30_003') {
         level = 'bcMsCombo'
-        actualStartdate = await findBachelorStartdate(studyrightid.replace(/-2$/, '-1'))
+      } else if (extentcode === 1) {
+        level = 'bachelor'
+      } else if (extentcode === 2) {
+        if (studyrightid.slice(-2) === '-2') {
+          level = 'bcMsCombo'
+          actualStartdate = await findBachelorStartdate(studyrightid.replace(/-2$/, '-1'))
+        } else {
+          level = 'master'
+        }
+      } else if (extentcode === 4) {
+        level = 'doctor'
+      } else if (extentcode === 3) {
+        level = 'licentiate'
       } else {
-        level = 'master'
+        continue
       }
-    } else if (extentcode === 4) {
-      level = 'doctor'
-    } else if (extentcode === 3) {
-      level = 'licentiate'
-    } else {
-      continue
-    }
+      const startYear = defineYear(actualStartdate, false)
 
-    const startYear = defineYear(actualStartdate, false)
-
-    // On faculty level, count started bachelor rights to BcMsCombo as well  --> useful class size even if master studies have yet not started
-    // On programme level BcMsCombo sizes are iffy as many students haven't started masters yet --> no Ms programme element to count
-    if (level !== 'bcMsCombo') {
-      classSizes[level][startYear] += 1
-      if (level === 'bachelor' && (await hasMS(programme, studyrightElements, studyrightid))) {
-        classSizes['bcMsCombo'][startYear] += 1
+      // On faculty level, count started bachelor rights to BcMsCombo as well  --> useful class size even if master studies have yet not started
+      // On programme level BcMsCombo sizes are iffy as many students haven't started masters yet --> no Ms programme element to count
+      if (level !== 'bcMsCombo') {
+        classSizes[level][startYear] += 1
+        if (level === 'bachelor' && (await hasMS(code, studyrightElements, studyrightid))) {
+          classSizes['bcMsCombo'][startYear] += 1
+        }
       }
-    }
 
-    if (!(programme in classSizes.programmes)) {
+      if (!(code in classSizes.programmes)) {
+        if (extentcode === 2) {
+          classSizes.programmes[code] = {}
+          classSizes.programmes[code]['bcMsCombo'] = getYearsObject({ years, emptyArrays: false })
+          classSizes.programmes[code]['master'] = getYearsObject({ years, emptyArrays: false })
+        } else {
+          classSizes.programmes[code] = getYearsObject({ years, emptyArrays: false })
+        }
+      }
+
       if (extentcode === 2) {
-        classSizes.programmes[programme] = {}
-        classSizes.programmes[programme]['bcMsCombo'] = getYearsObject({ years, emptyArrays: false })
-        classSizes.programmes[programme]['master'] = getYearsObject({ years, emptyArrays: false })
+        classSizes.programmes[code][level][startYear] += 1
       } else {
-        classSizes.programmes[programme] = getYearsObject({ years, emptyArrays: false })
+        classSizes.programmes[code][startYear] += 1
       }
-    }
-
-    if (extentcode === 2) {
-      classSizes.programmes[programme][level][startYear] += 1
-    } else {
-      classSizes.programmes[programme][startYear] += 1
     }
   }
 }
 
-const count = async (faculty, since, years, yearsList, levels, programmeFilter, programmeNames, goals, mode) => {
+const count = async (
+  faculty,
+  programmeCodes,
+  since,
+  years,
+  yearsList,
+  levels,
+  programmeFilter,
+  programmeNames,
+  goals,
+  mode
+) => {
   let graduationAmounts = {}
   let graduationTimes = {}
   let programmes = getProgrammeObjectBasis(yearsList, levels)
@@ -192,44 +204,43 @@ const count = async (faculty, since, years, yearsList, levels, programmeFilter, 
     graduationTimes[level] = getYearsObject({ years: yearsList, emptyArrays: true })
     data.medians[level] = []
   })
-
-  let studyrights = null
-  if (mode === 'gradYear') {
-    studyrights = await graduatedStudyrights(faculty, since)
-  } else {
-    studyrights = await studyrightsByRightStartYear(faculty, since)
-  }
-
-  for (const right of studyrights) {
-    const { enddate, startdate, studyrightid, extentcode, studyrightElements, studentnumber } = right
-    const { programme, programmeName } = findRightProgramme(studyrightElements, 'graduated')
-    if (programmeFilter === 'NEW_STUDY_PROGRAMMES' && !isNewProgramme(programme)) continue
-
-    if (!(programme in programmeNames)) {
-      programmeNames[programme] = programmeName
-    }
-
-    let year = null
+  for (const code of programmeCodes) {
+    let studyrights = null
     if (mode === 'gradYear') {
-      year = defineYear(enddate, false)
+      studyrights = await graduatedStudyrights(faculty, code, since)
     } else {
-      year = defineYear(startdate, false)
+      studyrights = await studyrightsByRightStartYear(faculty, code, since)
     }
+    for (const right of studyrights) {
+      const { enddate, startdate, studyrightid, extentcode, studyrightElements, studentnumber } = right
+      const { programme, programmeName } = findRightProgramme(studyrightElements, code)
+      if (programmeFilter === 'NEW_STUDY_PROGRAMMES' && !isNewProgramme(programme)) continue
 
-    await addGraduation(
-      extentcode,
-      startdate,
-      studyrightid,
-      enddate,
-      studentnumber,
-      graduationAmounts,
-      graduationTimes,
-      year,
-      programmes,
-      programme
-    )
+      if (!(programme in programmeNames)) {
+        programmeNames[programme] = programmeName
+      }
+
+      let year = null
+      if (mode === 'gradYear') {
+        year = defineYear(enddate, false)
+      } else {
+        year = defineYear(startdate, false)
+      }
+
+      await addGraduation(
+        extentcode,
+        startdate,
+        studyrightid,
+        enddate,
+        studentnumber,
+        graduationAmounts,
+        graduationTimes,
+        year,
+        programmes,
+        programme
+      )
+    }
   }
-
   years.forEach(year => {
     levels.forEach(level => {
       const median = getMedian(graduationTimes[level][year])
@@ -279,7 +290,8 @@ const count = async (faculty, since, years, yearsList, levels, programmeFilter, 
 }
 
 const countGraduationTimes = async (faculty, programmeFilter) => {
-  const isAcademicYear = false // = yearType === 'ACADEMIC_YEAR'
+  const programmes = (await getFacultyProgrammes(faculty, programmeFilter)).data
+  const isAcademicYear = false
   const since = isAcademicYear ? new Date('2017-08-01') : new Date('2017-01-01')
   const yearsList = getYearsArray(since.getFullYear(), isAcademicYear)
   const levels = ['bachelor', 'bcMsCombo', 'master', 'doctor', 'licentiate']
@@ -310,9 +322,10 @@ const countGraduationTimes = async (faculty, programmeFilter) => {
   // We count studyrights (vs. studyright_elements)
   // This way we get the whole time for a degree, even if the student was transferred to a new programme
   // E.g. started 8/2016 in old Bc, transferred to new 10/2020, graduated from new 1/2021 --> total 53 months (not 3)
-
+  const programmeCodes = programmes.map(prog => prog.code)
   const byGradYear = await count(
     faculty,
+    programmeCodes,
     since,
     years,
     yearsList,
@@ -322,8 +335,10 @@ const countGraduationTimes = async (faculty, programmeFilter) => {
     goals,
     'gradYear'
   )
+
   const byStartYear = await count(
     faculty,
+    programmeCodes,
     since,
     years,
     yearsList,
@@ -336,7 +351,7 @@ const countGraduationTimes = async (faculty, programmeFilter) => {
 
   const classSizes = getProgrammeObjectBasis(yearsList, levels, false)
   classSizes['programmes'] = {}
-  await getClassSizes(faculty, since, classSizes, programmeFilter, years)
+  await getClassSizes(faculty, programmeCodes, since, classSizes, programmeFilter, years)
 
   return { id: faculty, goals, byGradYear, byStartYear, programmeNames, classSizes }
 }

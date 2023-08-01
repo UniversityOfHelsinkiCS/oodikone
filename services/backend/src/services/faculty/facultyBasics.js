@@ -9,6 +9,7 @@ const {
   getTransferredToAndAway,
   getTransferredInside,
   studyrightsByRightStartYear,
+  getTransfersIn,
 } = require('./faculty')
 const { getStatsBasis, getYearsArray, defineYear } = require('../studyprogrammeHelpers')
 const { findRightProgramme, isNewProgramme, checkTransfers, getExtentFilter } = require('./facultyHelpers')
@@ -16,17 +17,12 @@ const { codes } = require('../../../config/programmeCodes')
 
 const filterDuplicateStudyrights = studyrights => {
   // bachelor+master students have two studyrights (separated by two last digits in studyrightid)
-  // choose only the earlier started one, so we don't count start of masters as starting in faculty
+  // choose only bachelor one, so we don't count start of masters as starting in faculty
   let rightsToCount = {}
 
   studyrights.forEach(right => {
     const id = right.studyrightid.slice(0, -2)
-    const start = new Date(right.studystartdate)
-    if (id in rightsToCount) {
-      if (new Date(rightsToCount[id].studystartdate) > start) {
-        rightsToCount[id] = right
-      }
-    } else {
+    if (right.studyrightid.slice(-2) === '-1') {
       rightsToCount[id] = right
     }
   })
@@ -60,6 +56,7 @@ const addProgramme = async (
 
 const getFacultyStarters = async (
   faculty,
+  programmes,
   transfersToOrAwayStudyrights,
   insideTransfersStudyrights,
   since,
@@ -75,42 +72,49 @@ const getFacultyStarters = async (
 ) => {
   const startedGraphStats = [...graphStats]
   const startedTableStats = { ...tableStats }
-  const studyrightWhere = getExtentFilter(includeAllSpecials)
-  const studyrights = await startedStudyrights(faculty, since, studyrightWhere)
-  let filteredStudyrights = filterDuplicateStudyrights(studyrights)
-  const keys = Object.keys(codes)
   const programmeTableStats = {}
-  if (!includeAllSpecials) {
-    filteredStudyrights = filteredStudyrights.filter(
-      s => !checkTransfers(s, insideTransfersStudyrights, transfersToOrAwayStudyrights)
-    )
+  const studyrightWhere = getExtentFilter(includeAllSpecials)
+  const start = new Date('2017-01-01').toUTCString()
+  const end = new Date()
+  for (const code of programmes) {
+    const studyrights = await startedStudyrights(faculty, code, since, studyrightWhere)
+    let filteredStudyrights = filterDuplicateStudyrights(studyrights)
+    const insideTransfers = await getTransfersIn(code, start, end)
+    filteredStudyrights = filteredStudyrights.filter(s => !checkTransfers(s, insideTransfers, insideTransfers))
+    const keys = Object.keys(codes)
+
+    if (!includeAllSpecials) {
+      // We do not include inside transferred studyrights into faculty starters, but function below expect two arguments
+      filteredStudyrights = filteredStudyrights.filter(
+        s => !checkTransfers(s, insideTransfersStudyrights, transfersToOrAwayStudyrights)
+      )
+    }
+
+    filteredStudyrights.forEach(({ startdate, studyrightElements }) => {
+      const { programme, programmeName } = findRightProgramme(studyrightElements, code)
+      let programmeId = programme
+
+      if (keys.includes(programme)) {
+        programmeId = codes[programme].toUpperCase()
+      }
+
+      if (programmeFilter === 'ALL_PROGRAMMES' || isNewProgramme(programme)) {
+        const startYear = defineYear(startdate, isAcademicYear)
+
+        startedGraphStats[indexOf(yearsArray, startYear)] += 1
+        startedTableStats[startYear] += 1
+
+        if (!(programmeId in programmeTableStats)) {
+          programmeTableStats[programmeId] = { ...tableStats }
+        }
+        programmeTableStats[programmeId][startYear] += 1
+
+        if (!(programmeId in allBasics.programmeNames)) {
+          allBasics.programmeNames[programmeId] = { ...programmeName, code: programme }
+        }
+      }
+    })
   }
-
-  filteredStudyrights.forEach(({ studystartdate, studyrightElements }) => {
-    const { programme, programmeName } = findRightProgramme(studyrightElements, 'started')
-    let programmeId = programme
-
-    if (keys.includes(programme)) {
-      programmeId = codes[programme].toUpperCase()
-    }
-
-    if (programmeFilter === 'ALL_PROGRAMMES' || isNewProgramme(programme)) {
-      const startYear = defineYear(studystartdate, isAcademicYear)
-
-      startedGraphStats[indexOf(yearsArray, startYear)] += 1
-      startedTableStats[startYear] += 1
-
-      if (!(programmeId in programmeTableStats)) {
-        programmeTableStats[programmeId] = { ...tableStats }
-      }
-      programmeTableStats[programmeId][startYear] += 1
-
-      if (!(programmeId in allBasics.programmeNames)) {
-        allBasics.programmeNames[programmeId] = { ...programmeName, code: programme }
-      }
-    }
-  })
-
   allBasics.studentInfo.graphStats.push({ name: 'Started studying (new in faculty)', data: startedGraphStats })
   programmeData['started'] = programmeTableStats
 
@@ -121,6 +125,7 @@ const getFacultyStarters = async (
 
 const getFacultyGraduates = async (
   faculty,
+  programmes,
   transfersToOrAwayStudyrights,
   insideTransfersStudyrights,
   since,
@@ -137,62 +142,62 @@ const getFacultyGraduates = async (
 ) => {
   const graduatedGraphStats = [[...graphStats], [...graphStats], [...graphStats], [...graphStats], [...graphStats]]
   const graduatedTableStats = {}
+  const programmeTableStats = {}
+  Object.keys(tableStats).forEach(year => (graduatedTableStats[year] = [0, 0, 0, 0, 0]))
   const keys = Object.keys(codes)
   let studyrightWhere = getExtentFilter(includeAllSpecials)
-  let graduatedRights = await graduatedStudyrights(faculty, since, studyrightWhere)
-  const programmeTableStats = {}
+  for (const code of programmes) {
+    let graduatedRights = await graduatedStudyrights(faculty, code, since, studyrightWhere)
+    if (!includeAllSpecials) {
+      graduatedRights = graduatedRights.filter(
+        s => !checkTransfers(s, insideTransfersStudyrights, transfersToOrAwayStudyrights)
+      )
+    }
+    graduatedRights.forEach(({ enddate, extentcode, studyrightElements }) => {
+      const { programme, programmeName } = findRightProgramme(studyrightElements, code)
+      let programmeId = programme
 
-  Object.keys(tableStats).forEach(year => (graduatedTableStats[year] = [0, 0, 0, 0, 0]))
-  if (!includeAllSpecials) {
-    graduatedRights = graduatedRights.filter(
-      s => !checkTransfers(s, insideTransfersStudyrights, transfersToOrAwayStudyrights)
-    )
+      if (keys.includes(programme)) {
+        programmeId = codes[programme].toUpperCase()
+      }
+
+      if (programmeFilter === 'ALL_PROGRAMMES' || isNewProgramme(programme)) {
+        const endYear = defineYear(enddate, isAcademicYear)
+        graduatedGraphStats[0][indexOf(yearsArray, endYear)] += 1
+        graduatedTableStats[endYear][0] += 1
+
+        if (!(programmeId in programmeTableStats)) {
+          programmeTableStats[programmeId] = {}
+          Object.keys(tableStats).forEach(year => (programmeTableStats[programmeId][year] = [0, 0, 0, 0, 0]))
+        }
+        programmeTableStats[programmeId][endYear][0] += 1
+
+        if (extentcode === 1) {
+          graduatedGraphStats[1][indexOf(yearsArray, endYear)] += 1
+          graduatedTableStats[endYear][1] += 1
+          programmeTableStats[programmeId][endYear][1] += 1
+        } else if (extentcode === 2) {
+          graduatedGraphStats[2][indexOf(yearsArray, endYear)] += 1
+          graduatedTableStats[endYear][2] += 1
+          programmeTableStats[programmeId][endYear][2] += 1
+        } else if (extentcode === 4) {
+          graduatedGraphStats[3][indexOf(yearsArray, endYear)] += 1
+          graduatedTableStats[endYear][3] += 1
+          programmeTableStats[programmeId][endYear][3] += 1
+        } else {
+          graduatedGraphStats[4][indexOf(yearsArray, endYear)] += 1
+          graduatedTableStats[endYear][4] += 1
+          programmeTableStats[programmeId][endYear][4] += 1
+        }
+
+        if (!(programmeId in allBasics.programmeNames)) {
+          allBasics.programmeNames[programmeId] = { code: programme, ...programmeName }
+        }
+      }
+    })
   }
-  graduatedRights.forEach(({ enddate, extentcode, studyrightElements }) => {
-    const { programme, programmeName } = findRightProgramme(studyrightElements, 'graduated')
-    let programmeId = programme
-
-    if (keys.includes(programme)) {
-      programmeId = codes[programme].toUpperCase()
-    }
-
-    if (programmeFilter === 'ALL_PROGRAMMES' || isNewProgramme(programme)) {
-      const endYear = defineYear(enddate, isAcademicYear)
-      graduatedGraphStats[0][indexOf(yearsArray, endYear)] += 1
-      graduatedTableStats[endYear][0] += 1
-
-      if (!(programmeId in programmeTableStats)) {
-        programmeTableStats[programmeId] = {}
-        Object.keys(tableStats).forEach(year => (programmeTableStats[programmeId][year] = [0, 0, 0, 0, 0]))
-      }
-      programmeTableStats[programmeId][endYear][0] += 1
-
-      if (extentcode === 1) {
-        graduatedGraphStats[1][indexOf(yearsArray, endYear)] += 1
-        graduatedTableStats[endYear][1] += 1
-        programmeTableStats[programmeId][endYear][1] += 1
-      } else if (extentcode === 2) {
-        graduatedGraphStats[2][indexOf(yearsArray, endYear)] += 1
-        graduatedTableStats[endYear][2] += 1
-        programmeTableStats[programmeId][endYear][2] += 1
-      } else if (extentcode === 4) {
-        graduatedGraphStats[3][indexOf(yearsArray, endYear)] += 1
-        graduatedTableStats[endYear][3] += 1
-        programmeTableStats[programmeId][endYear][3] += 1
-      } else {
-        graduatedGraphStats[4][indexOf(yearsArray, endYear)] += 1
-        graduatedTableStats[endYear][4] += 1
-        programmeTableStats[programmeId][endYear][4] += 1
-      }
-
-      if (!(programmeId in allBasics.programmeNames)) {
-        allBasics.programmeNames[programmeId] = { code: programme, ...programmeName }
-      }
-    }
-  })
 
   allBasics.studentInfo.graphStats.push({ name: 'Graduated', data: graduatedGraphStats[0] })
-
   allBasics.graduationInfo.graphStats.push({ name: 'Bachelors', data: graduatedGraphStats[1] })
   allBasics.graduationInfo.graphStats.push({ name: 'Masters', data: graduatedGraphStats[2] })
   allBasics.graduationInfo.graphStats.push({ name: 'Doctors', data: graduatedGraphStats[3] })
@@ -205,15 +210,15 @@ const getFacultyGraduates = async (
     countsGraduations[year] = graduatedTableStats[year]
   })
 }
-// If includeAllSpecial false, insidetransfers should contain only students started after 1.8.2017.
+// If includeAllSpecial false, inside transfers should contain only students started after 1.8.2017.
 const getInsideTransfers = async (programmeCodes, allProgrammeCodes, since, includeAllSpecials, faculty) => {
   if (includeAllSpecials) {
     return await transferredInsideFaculty(programmeCodes, allProgrammeCodes, since)
   }
   const insiders = await transferredInsideFaculty(programmeCodes, allProgrammeCodes, since)
-  const studyrights = (await studyrightsByRightStartYear(faculty, moment('2017-08-01', 'YYYY-MM-DD'))).map(
-    sr => sr.studyrightid
-  )
+  const studyrights = (
+    await studyrightsByRightStartYear(faculty, new Date(moment('2017-08-01', 'YYYY-MM-DD')).toUTCString())
+  ).map(sr => sr.studyrightid)
   const filteredTransfers = insiders.filter(tr => studyrights.includes(tr.studyrightid))
   return filteredTransfers
 }
@@ -254,7 +259,7 @@ const getFacultyTransfers = async (
   for (const { transferdate, targetcode } of insideTransfers) {
     const transferYear = defineYear(transferdate, isAcademicYear)
     transferGraphStats[0][indexOf(yearsArray, transferYear)] += 1
-    if (isAcademicYear && isArray(transferTableStats[transferYear])) {
+    if (isArray(transferTableStats[transferYear])) {
       transferTableStats[transferYear][0] += 1
       await addProgramme(
         programmeTableStats,
@@ -358,6 +363,7 @@ const combineFacultyBasics = async (faculty, programmes, yearType, allProgrammeC
   // Started studying in faculty
   await getFacultyStarters(
     faculty,
+    wantedProgrammeCodes,
     transfersToAwayStudyrights,
     transferInsideStudyrights,
     since,
@@ -375,6 +381,7 @@ const combineFacultyBasics = async (faculty, programmes, yearType, allProgrammeC
   // Graduated in faculty
   await getFacultyGraduates(
     faculty,
+    wantedProgrammeCodes,
     transfersToAwayStudyrights,
     transferInsideStudyrights,
     since,
