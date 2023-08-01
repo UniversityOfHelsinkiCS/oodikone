@@ -1,4 +1,7 @@
+const { chunk } = require('lodash')
+const { eachLimit } = require('async')
 const { dbConnections } = require('./connection')
+const { logger } = require('../utils/logger')
 const { getLatestSnapshot, isActive, getActiveSnapshot } = require('../utils')
 
 const selectFromByIds = async (table, ids, col = 'id') => dbConnections.knex(table).whereIn(col, ids)
@@ -51,10 +54,22 @@ const selectFromActiveSnapshotsByIds = async (table, ids, col = 'id') =>
 const getColumnsToUpdate = (model, keys) => Object.keys(model.rawAttributes).filter(a => !keys.includes(a))
 
 const bulkCreate = async (model, entities, transaction = null, properties = ['id']) => {
-  await model.bulkCreate(entities, {
-    updateOnDuplicate: getColumnsToUpdate(model, properties),
-    transaction,
-  })
+  try {
+    await model.bulkCreate(entities, {
+      updateOnDuplicate: getColumnsToUpdate(model, properties),
+      transaction,
+    })
+  } catch (e) {
+    if (entities.length === 1) {
+      logger.error({
+        message: e.message,
+        meta: { stack: e.stack, entity: entities[0] },
+      })
+      return
+    }
+    const chunks = chunk(entities, Math.floor(entities.length / 2))
+    await eachLimit(chunks, 1, async c => await bulkCreate(model, c, transaction, properties))
+  }
 }
 
 const getCourseUnitsByCodes = codes => dbConnections.knex('course_units').whereIn('code', codes).select('*')
