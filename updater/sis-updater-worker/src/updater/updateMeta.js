@@ -1,4 +1,4 @@
-const { sortBy, flatten, groupBy } = require('lodash')
+const { sortBy, uniqBy, flatten, groupBy } = require('lodash')
 const { Organization, Course, CourseType, CourseProvider, CreditType, StudyrightExtent } = require('../db/models')
 const { selectFromByIdsOrderBy, bulkCreate } = require('../db')
 const { dbConnections } = require('../db/connection')
@@ -111,8 +111,14 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
       .sort((a, b) => b[1] - a[1])
     course.mainCourseCode = sortedSubstitutions[0][0]
   }
+
   await bulkCreate(Course, courses)
-  await CourseProvider.bulkCreate(courseProviders, { ignoreDuplicates: true })
+  await bulkCreate(
+    CourseProvider,
+    uniqBy(courseProviders, cP => cP.composite),
+    null,
+    ['composite']
+  )
 }
 
 const updateCourseTypes = async studyLevels => {
@@ -125,8 +131,7 @@ const updateCreditTypes = async creditTypes => {
 
 const updateStudyrightExtents = async educationTypes => {
   const studyrightExtents = educationTypes.map(mapStudyrightExtent).filter(eT => eT.extentcode)
-  const uniques = _.uniqBy(studyrightExtents, sr => sr.extentcode)
-  await bulkCreate(StudyrightExtent, uniques, null, ['extentcode'])
+  await bulkCreate(StudyrightExtent, studyrightExtents, null, ['extentcode'])
 }
 
 const updateTrends = async () => {
