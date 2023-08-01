@@ -61,13 +61,16 @@ const transferredFaculty = async (programmeCodeIn, programmeCodeOut, start, end)
     })
   ).map(formatFacultyTransfer)
 
-const startedStudyrights = async (faculty, since, studyRightWhere) =>
+const startedStudyrights = async (faculty, code, since, studyRightWhere) =>
   (
     await Studyright.findAll({
       include: [
         {
           model: StudyrightElement,
           required: true,
+          where: {
+            code: code,
+          },
           include: {
             model: ElementDetail,
             required: true,
@@ -84,18 +87,16 @@ const startedStudyrights = async (faculty, since, studyRightWhere) =>
     })
   ).map(facultyFormatStudyright)
 
-const graduatedStudyrights = async (faculty, since, studyrightWhere) =>
+const graduatedStudyrights = async (faculty, code, since, studyrightWhere) =>
   (
     await Studyright.findAll({
       include: [
         {
-          model: Student,
-          attributes: ['studentnumber'],
-          required: true,
-        },
-        {
           model: StudyrightElement,
           required: true,
+          where: {
+            code: code,
+          },
           include: {
             model: ElementDetail,
             required: true,
@@ -108,19 +109,21 @@ const graduatedStudyrights = async (faculty, since, studyrightWhere) =>
           [Op.gte]: since,
         },
         graduated: 1,
-        studentStudentnumber: { [Op.not]: null },
         ...studyrightWhere,
       },
     })
   ).map(facultyFormatStudyright)
 
-const studyrightsByRightStartYear = async (faculty, since, graduated = 1) =>
+const studyrightsByRightStartYear = async (faculty, code, since, graduated = 1) =>
   (
     await Studyright.findAll({
       include: [
         {
           model: StudyrightElement,
           attributes: ['code', 'startdate'],
+          where: {
+            code: code,
+          },
           required: true,
           include: {
             model: ElementDetail,

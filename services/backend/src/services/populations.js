@@ -525,9 +525,6 @@ const studentnumbersWithAllStudyrightElements = async ({
   graduatedStudents,
 }) => {
   // eslint-disable-line
-  // db startdate is formatted to utc so need to change it when querying
-  const formattedStartDate = new Date(moment.tz(startDate, 'Europe/Helsinki').format()).toUTCString()
-  const formattedEndDate = new Date(moment.tz(endDate, 'Europe/Helsinki').format()).toUTCString()
 
   const filteredExtents = [16] // always filter out secondary subject students
   if (!exchangeStudents) {
@@ -592,7 +589,7 @@ const studentnumbersWithAllStudyrightElements = async ({
             sequelize.col('studyright.startdate')
           ),
           {
-            [Op.between]: [formattedStartDate, formattedEndDate],
+            [Op.between]: [startDate, endDate],
           }
         ),
       ],
