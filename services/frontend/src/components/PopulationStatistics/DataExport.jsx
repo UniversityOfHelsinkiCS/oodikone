@@ -1,7 +1,7 @@
 import { flatten, sortBy } from 'lodash'
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { Dropdown } from 'semantic-ui-react'
+import { Button, Icon, Popup } from 'semantic-ui-react'
 import xlsx from 'xlsx'
 import { reformatDate, getStudentTotalCredits, getStudentToStudyrightStartMap } from '../../common'
 import { PRIORITYCODE_TEXTS } from '../../constants'
@@ -213,21 +213,19 @@ export default ({ students, programmeCode }) => {
     return workbook
   }
 
-  const copyStudentNumbers = students => {
-    const studentNumbers = students.map(student => student.studentNumber).join('\n')
-    navigator.clipboard.writeText(studentNumbers)
-  }
-
   return (
-    <>
-      <Dropdown.Item
-        onClick={() => {
-          xlsx.writeFile(generateWorkbook(), 'students.xlsx')
-        }}
-        text="Excel Workbook"
-        icon="file excel"
-      />
-      <Dropdown.Item onClick={() => copyStudentNumbers(students)} text="Copy Student Numbers" icon="copy outline" />
-    </>
+    <Popup
+      trigger={
+        <Button
+          onClick={() => {
+            xlsx.writeFile(generateWorkbook(), 'students.xlsx')
+          }}
+        >
+          <Icon name="save" />
+          Combined Excel
+        </Button>
+      }
+      content="Click here to download a large Excel-workbook with both 'General' and 'Courses' tabs of the table below. To download them separately and select the columns, use the 'Export to Excel' button in the top-right corner of the table."
+    />
   )
 }

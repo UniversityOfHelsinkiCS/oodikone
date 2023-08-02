@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Tab, Grid, Dropdown } from 'semantic-ui-react'
+import { Tab, Grid } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import scrollToComponent from 'react-scroll-to-component'
 import { useGetAuthorizedUserQuery } from 'redux/auth'
@@ -134,13 +134,7 @@ const Panes = ({
         <Grid.Column>
           <StudentNameVisibilityToggle />
         </Grid.Column>
-        {dataExport && (
-          <Grid.Column textAlign="right">
-            <Dropdown text="Export Data" icon="save" button labeled className="icon" direction="left">
-              <Dropdown.Menu>{dataExport}</Dropdown.Menu>
-            </Dropdown>
-          </Grid.Column>
-        )}
+        {dataExport && <Grid.Column textAlign="right">{dataExport}</Grid.Column>}
       </Grid>
       <Tab onTabChange={handleTabChange} panes={panes} data-cy="student-table-tabs" />
     </>
