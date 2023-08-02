@@ -359,7 +359,6 @@ const Overview = ({
                     )}
                     titles={thesisWriters?.data?.titles}
                     sliceStart={2}
-                    extraHeight="EXTRA HEIGHT"
                     yearsVisible={Array(thesisWriters?.data.tableStats.length).fill(false)}
                   />
                 </div>
@@ -408,7 +407,6 @@ const Overview = ({
                       )
                     )}
                     titles={credits?.data?.titles}
-                    extraHeight="EXTRA HEIGHT"
                     sliceStart={2}
                     yearsVisible={Array(credits?.data?.tableStats.length).fill(false)}
                     shortNames={creditShortTitles}

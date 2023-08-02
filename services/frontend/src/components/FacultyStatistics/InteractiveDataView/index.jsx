@@ -12,7 +12,6 @@ const InteractiveDataTable = ({
   plotLinePlaces,
   titles,
   sliceStart,
-  extraHeight,
   yearsVisible,
   shortNames,
   studentsTable,
@@ -152,10 +151,20 @@ const InteractiveDataTable = ({
                   <CollapsedStackedBar
                     data={
                       sortbyColumn === 0
-                        ? sortedKeys?.map(programme => dataProgrammeStats[programme][yearIndex].slice(sliceStart))
-                        : keyOrder[yearIndex]?.map(programme =>
-                            dataProgrammeStats[programme][yearIndex].slice(sliceStart)
-                          )
+                        ? sortedKeys
+                            ?.map(programme =>
+                              dataProgrammeStats[programme]
+                                ? dataProgrammeStats[programme][yearIndex].slice(sliceStart)
+                                : null
+                            )
+                            .filter(prog => !!prog)
+                        : keyOrder[yearIndex]
+                            ?.map(programme =>
+                              dataProgrammeStats[programme]
+                                ? dataProgrammeStats[programme][yearIndex].slice(sliceStart)
+                                : null
+                            )
+                            .filter(prog => !!prog)
                     }
                     labels={sortbyColumn === 0 ? sortedKeys : keyOrder[yearIndex]}
                     plotLinePlaces={plotLinePlaces}
@@ -168,7 +177,6 @@ const InteractiveDataTable = ({
                     )}
                     longLabels={programmeNames}
                     names={titles?.slice(sliceStart)}
-                    extraHeight={extraHeight}
                     studentsTable={studentsTable}
                   />
                 </Table.Cell>
