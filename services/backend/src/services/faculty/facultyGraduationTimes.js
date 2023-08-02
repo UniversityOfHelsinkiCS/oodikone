@@ -4,7 +4,7 @@ const { findRightProgramme, isNewProgramme } = require('./facultyHelpers')
 const { getYearsArray, getYearsObject, getMedian, defineYear } = require('../studyprogrammeHelpers')
 const { codes } = require('../../../config/programmeCodes')
 const { bachelorStudyright, countTimeCategories, getStatutoryAbsences } = require('../graduationHelpers')
-const { getFacultyProgrammes } = require('./facultyService')
+const { getProgrammes } = require('./facultyService')
 
 const sortProgrammes = data => {
   const check = name => {
@@ -294,7 +294,7 @@ const count = async (
 }
 
 const countGraduationTimes = async (faculty, programmeFilter) => {
-  const programmes = (await getFacultyProgrammes(faculty, programmeFilter)).data
+  const programmes = (await getProgrammes(faculty, programmeFilter)).data
   const isAcademicYear = false
   const since = isAcademicYear ? new Date('2017-08-01') : new Date('2017-01-01')
   const yearsList = getYearsArray(since.getFullYear(), isAcademicYear)
