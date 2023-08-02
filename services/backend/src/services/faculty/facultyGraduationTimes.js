@@ -138,7 +138,11 @@ const getClassSizes = async (faculty, programmeCodes, since, classSizes, program
           level = 'bcMsCombo'
           actualStartdate = await findBachelorStartdate(studyrightid.replace(/-2$/, '-1'))
         } else {
-          level = 'master'
+          if (code.includes('KH')) {
+            level = 'bachelor' // Some rare faculties have one/two outliers with extent 2 for bachelor
+          } else {
+            level = 'master'
+          }
         }
       } else if (extentcode === 4) {
         level = 'doctor'
