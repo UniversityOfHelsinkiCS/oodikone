@@ -1,3 +1,4 @@
+/* eslint-disable cypress/no-unnecessary-waiting */
 /// <reference types="Cypress" />
 
 describe('Faculty overview', () => {
@@ -29,6 +30,7 @@ describe('Faculty overview', () => {
   describe('Faculty basic information: basic user', () => {
     beforeEach(() => {
       cy.init('/faculties')
+      cy.wait(3000)
       cy.contains('td', 'H80').click()
     })
     it('Basic information tab show all graphs and tables', () => {
@@ -98,7 +100,6 @@ describe('Faculty overview', () => {
 
       // I tried to fix this without cy.wait() method without effort. Sorting the programmes
       // or something else causes rerendering of the view and yield to failing tests.
-      // eslint-disable-next-line cypress/no-unnecessary-waiting
       cy.wait(10000)
       cy.get('[data-cy="Button-Show-CreditsProducedByTheFaculty-0"]').click()
       cy.get('[data-cy="Cell-CreditsProducedByTheFaculty-0"]').should('be.visible')
@@ -137,8 +138,11 @@ describe('Faculty overview', () => {
   describe('Average graduation times', () => {
     beforeEach(() => {
       cy.init('/faculties')
+      cy.wait(3000)
       cy.contains('td', 'H60').click()
+      cy.wait(3000)
       cy.contains('Graduation times').click()
+      cy.wait(3000)
     })
 
     it('User can view graduation graphs', () => {
@@ -228,7 +232,9 @@ describe('Faculty overview', () => {
     beforeEach(() => {
       cy.init('/faculties')
       cy.contains('td', 'H50').click()
+      cy.wait(1000)
       cy.contains('Programmes and student populations').click()
+      cy.wait(1000)
     })
 
     it('User can view studentdata table without %', () => {
@@ -280,11 +286,11 @@ describe('Faculty overview', () => {
       cy.get('[data-cy="Cell-FacultyBachelorsProgressTable-5"]').should('not.be.visible')
     })
 
-    it('Sudent statstable can be toggled', () => {
+    it('Studentstats table can be toggled', () => {
       cy.get('[data-cy="FacultyStudentStatsTable"]').should('not.contain', 'TKT')
-      cy.get('[data-cy="Button-FacultyStudentStatsTable-2"]').click()
+      cy.get('[data-cy="Button-FacultyStudentStatsTable-6"]').click()
       cy.get('[data-cy="FacultyStudentStatsTable"]').should('contain', 'TKT')
-      cy.get('[data-cy="Button-FacultyStudentStatsTable-2"]').click()
+      cy.get('[data-cy="Button-FacultyStudentStatsTable-6"]').click()
       cy.get('[data-cy="FacultyStudentStatsTable"]').should('not.contain', 'TKT')
     })
 

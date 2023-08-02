@@ -2,7 +2,6 @@ const router = require('express').Router()
 const { faculties } = require('../services/organisations')
 const { combineFacultyBasics } = require('../services/faculty/facultyBasics')
 const { combineFacultyCredits } = require('../services/faculty/facultyCredits')
-const { findFacultyProgrammeCodes } = require('../services/faculty/faculty')
 const { combineFacultyThesisWriters } = require('../services/faculty/facultyThesisWriters')
 const { countGraduationTimes } = require('../services/faculty/facultyGraduationTimes')
 const { updateFacultyOverview, updateFacultyProgressOverview } = require('../services/faculty/facultyUpdates')
@@ -10,8 +9,7 @@ const { combineFacultyStudentProgress } = require('../services/faculty/facultySt
 const { combineFacultyStudents } = require('../services/faculty/facultyStudents')
 
 const {
-  getFacultyProgrammes,
-  setFacultyProgrammes,
+  getProgrammes,
   getBasicStats,
   setBasicStats,
   getCreditStats,
@@ -29,15 +27,6 @@ const logger = require('../util/logger')
 
 // Faculty uses a lot of tools designed for Study programme.
 // Some of them have been copied here and slightly edited for faculty purpose.
-
-const getProgrammes = async (code, programmeFilter) => {
-  const programmes = await getFacultyProgrammes(code, programmeFilter)
-  if (programmes) return programmes
-  let updatedProgrammes = await findFacultyProgrammeCodes(code, programmeFilter)
-  if (updatedProgrammes) updatedProgrammes = await setFacultyProgrammes(code, updatedProgrammes, programmeFilter)
-
-  return updatedProgrammes
-}
 
 router.get('/', async (req, res) => {
   const ignore = ['Y', 'H99', 'Y01', 'H92', 'H930']

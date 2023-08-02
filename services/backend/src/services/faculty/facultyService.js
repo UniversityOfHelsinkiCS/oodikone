@@ -1,5 +1,6 @@
 const { redisClient } = require('../redis')
 const moment = require('moment')
+const { findFacultyProgrammeCodes } = require('./faculty')
 
 const createRedisKeyForFacultyProgrammes = (id, programmeFilter) => `FACULTY_PROGRAMMES_${id}_${programmeFilter}`
 const createRedisKeyForBasicStats = (id, yearType, programmeFilter, specialGroups) =>
@@ -27,7 +28,16 @@ const setFacultyProgrammes = async (id, data, programmeFilter) => {
   return dataToRedis
 }
 
-const getFacultyProgrammes = async (id, programmeFilter) => {
+const getProgrammes = async (code, programmeFilter) => {
+  const programmes = await getFacultyProgrammesFromRedis(code, programmeFilter)
+  if (programmes) return programmes
+  let updatedProgrammes = await findFacultyProgrammeCodes(code, programmeFilter)
+  if (updatedProgrammes) updatedProgrammes = await setFacultyProgrammes(code, updatedProgrammes, programmeFilter)
+
+  return updatedProgrammes
+}
+
+const getFacultyProgrammesFromRedis = async (id, programmeFilter) => {
   const redisKey = createRedisKeyForFacultyProgrammes(id, programmeFilter)
   const dataFromRedis = await redisClient.getAsync(redisKey)
   if (!dataFromRedis) return null
@@ -155,7 +165,7 @@ const setFacultyStudentStats = async (data, specialGroups, graduated) => {
 
 module.exports = {
   setFacultyProgrammes,
-  getFacultyProgrammes,
+  getProgrammes,
   setBasicStats,
   getBasicStats,
   setCreditStats,
