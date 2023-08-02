@@ -117,7 +117,7 @@ const CoursesTable = ({ students, studyGuidanceCourses }) => {
       acc[label] = acc[label] || []
       if (acc[label].some(l => l.code === e.code)) return acc
       acc[label].push(e)
-      if (e.label) mandatoryCourseLabels.push({ ...e.label, code: e.label_code })
+      if (e.label) mandatoryCourseLabels.push({ ...e.label, code: e.parent_code })
       else mandatoryCourseLabels.push({ id: 'null', label: '', code: '' })
       return acc
     }, {})
@@ -131,7 +131,7 @@ const CoursesTable = ({ students, studyGuidanceCourses }) => {
     const { visibleLabels, visibleCourseCodes } = coursesList.reduce(
       (acc, cur) => {
         if (cur.visible && cur.visible.visibility) {
-          acc.visibleLabels.add(cur.label_code)
+          acc.visibleLabels.add(cur.parent_code)
           acc.visibleCourseCodes.add(cur.code)
         }
 
@@ -199,7 +199,7 @@ const CoursesTable = ({ students, studyGuidanceCourses }) => {
                   : null
                 grade =
                   s.courses && !grade && hasPassedMandatory(s.studentNumber, m.code)
-                    ? s.courses.find(course => course.course_code === m.label_code)?.grade
+                    ? s.courses.find(course => course.course_code === m.parent_code)?.grade
                     : grade
                 const gradeText = grade ? `\nGrade: ${grade}` : ''
                 const studentCode = s.studentNumber ? `\nStudent number:  ${s.studentNumber}` : ``

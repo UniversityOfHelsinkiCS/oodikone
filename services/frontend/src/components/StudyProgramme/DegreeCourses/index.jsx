@@ -44,7 +44,7 @@ const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, re
     const defaultModules = {}
     const secondProgrammeModules = {}
     mandatoryCourses.defaultProgrammeCourses.forEach(course => {
-      const code = course.label_code
+      const code = course.parent_code
       if (!defaultModules[code]) {
         defaultModules[code] = []
       }
@@ -52,7 +52,7 @@ const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, re
     })
     if (combinedProgramme) {
       mandatoryCourses.secondProgrammeCourses.forEach(course => {
-        const code = course.label_code
+        const code = course.parent_code
         if (!secondProgrammeModules[code]) {
           secondProgrammeModules[code] = []
         }
@@ -89,7 +89,7 @@ const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, re
           addProgressCriteriaCredits={addProgressCriteriaCredits}
         />
       )}
-      {defaultModules && (
+      {defaultModules && defaultModules.length > 1 && (
         <DegreeCourseTableView
           modules={defaultModules}
           criteria={criteria}
