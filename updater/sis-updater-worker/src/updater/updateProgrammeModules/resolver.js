@@ -7,10 +7,19 @@ class ModuleResolver {
   constructor(knex) {
     this.knex = knex
     this.moduleCache = {}
+    this.orderTable = {}
     this.order = 1
   }
 
-  createModule = (mod, children) => {
+  getOrder(group_id) {
+    const oldOrder = this.orderTable[group_id]
+    if (oldOrder) return oldOrder
+    const newOrder = this.order++
+    this.orderTable[group_id] = newOrder
+    return newOrder
+  }
+
+  createModule(mod, children) {
     if (!mod.id) return children
     const newMod = {
       id: mod.id,
@@ -21,16 +30,29 @@ class ModuleResolver {
       study_level: mod.study_level,
       valid_from: mod?.validity_period?.startDate ?? null,
       valid_to: mod?.validity_period?.endDate ?? null,
-      order: this.order++,
+      order: this.getOrder(mod.group_id),
       children,
     }
     return newMod
   }
 
-  resolveSingleModule = async mod => {
+  createCourse(course) {
+    return {
+      id: course.id,
+      group_id: course.group_id,
+      code: course.code,
+      name: course.name,
+      study_level: course.study_level,
+      type: 'course',
+      valid_from: course.validity_period.startDate ?? null,
+      valid_to: course.validity_period.endDate ?? null,
+      order: this.getOrder(course.group_id),
+    }
+  }
+
+  async resolveSingleModule(mod) {
     if (mod.type === 'StudyModule') {
       const children = await this.resolve(mod.rule)
-      if (mod.code.startsWith('KK-')) return null
       return this.createModule(mod, children)
     }
 
@@ -42,13 +64,14 @@ class ModuleResolver {
     return unknownModule(mod)
   }
 
-  moduleResolver = async rule => {
+  async moduleResolver(rule) {
     const id = rule.moduleGroupId
 
     const modules = await this.knex('modules').where({ group_id: id })
     const children = []
 
     for (let mod of modules) {
+      if (mod.code?.startsWith('KK-')) continue
       let result = this.moduleCache[mod.id]
       if (!result) {
         result = await this.resolveSingleModule(mod)
@@ -59,7 +82,7 @@ class ModuleResolver {
     return children
   }
 
-  compositeResolver = async rule => {
+  async compositeResolver(rule) {
     const children = []
     for (const r of rule.rules) {
       const result = await this.resolve(r)
@@ -68,27 +91,17 @@ class ModuleResolver {
     return children.filter(Boolean)
   }
 
-  courseResolver = async rule => {
+  async courseResolver(rule) {
     const courseGroupId = rule.courseUnitGroupId
     const courses = await this.knex('course_units').where({ group_id: courseGroupId })
 
     if (!courses) {
       return { error: 'could not find course' }
     }
-    return courses.map(course => ({
-      id: course.id,
-      group_id: course.group_id,
-      code: course.code,
-      name: course.name,
-      study_level: course.study_level,
-      type: 'course',
-      valid_from: course.validity_period.startDate ?? null,
-      valid_to: course.validity_period.endDate ?? null,
-      order: this.order++,
-    }))
+    return courses.map(course => this.createCourse(course))
   }
 
-  resolve = async rule => {
+  async resolve(rule) {
     if (rule.type === 'CreditsRule') {
       return await this.resolve(rule.rule)
     }

@@ -15,7 +15,7 @@ const recursivelyGetModuleAndChildren = async (code, type, start = '1900-1-1', e
         UNION ALL
         SELECT pm.*, c.order AS module_order, c.name AS parent_name, c.code AS parent_code, c.id as parent_id
         FROM children c, programme_modules pm, programme_module_children pmc
-        WHERE c.id = pmc.parent_id AND pm.id = pmc.child_id
+        WHERE c.id = pmc.parent_id AND pm.group_id = pmc.child_id
         GROUP BY pm.id, c.name, c.code, c.order, c.id
       ) SELECT * FROM children WHERE type = ? AND (valid_to > ? OR valid_to IS NULL) AND (valid_from < ? OR valid_from IS NULL)`,
       { replacements: [code, type, start, end] }
