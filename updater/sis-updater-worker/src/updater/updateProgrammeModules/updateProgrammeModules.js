@@ -62,9 +62,9 @@ const recursiveWrite = (modArg, parentId, programmeMap, joinMap) => {
   }
 
   let join = {
-    composite: `${parentId}-${mod.id}`,
+    composite: `${parentId}-${mod.group_id}`,
     parentId: parentId,
-    childId: mod.id,
+    childId: mod.group_id,
   }
 
   const { children, ...newModule } = mod
