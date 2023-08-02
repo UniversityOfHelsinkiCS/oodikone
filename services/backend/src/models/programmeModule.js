@@ -1,4 +1,4 @@
-const { Model, STRING, DATE, JSONB } = require('sequelize')
+const { Model, STRING, DATE, INTEGER, JSONB } = require('sequelize')
 const { dbConnections } = require('../database/connection')
 
 class ProgrammeModule extends Model {}
@@ -7,6 +7,9 @@ ProgrammeModule.init(
   {
     id: {
       primaryKey: true,
+      type: STRING,
+    },
+    group_id: {
       type: STRING,
     },
     code: {
@@ -18,6 +21,9 @@ ProgrammeModule.init(
     type: {
       type: STRING,
     },
+    order: {
+      type: INTEGER,
+    },
     studyLevel: {
       type: STRING,
     },
@@ -27,6 +33,12 @@ ProgrammeModule.init(
         model: 'organization',
         key: 'id',
       },
+    },
+    valid_from: {
+      type: DATE,
+    },
+    valid_to: {
+      type: DATE,
     },
     createdAt: {
       type: DATE,
