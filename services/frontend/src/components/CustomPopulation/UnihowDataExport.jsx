@@ -1,7 +1,7 @@
 import React from 'react'
 import moment from 'moment'
 import xlsx from 'xlsx'
-import { Dropdown } from 'semantic-ui-react'
+import { Button, Popup } from 'semantic-ui-react'
 import { getStudentGradeMean, getStudentGradeMeanWeightedByCredits, getStudentTotalCredits } from '../../common'
 
 export default ({ students }) => {
@@ -23,14 +23,18 @@ export default ({ students }) => {
   const filename = `oodikone_export_${students.length}_students_${moment().format('YYYYMMDD-hhmmss')}.xlsx`
 
   return (
-    <>
-      <Dropdown.Item
-        onClick={() => {
-          xlsx.writeFile(getXlsx(), filename)
-        }}
-        text="Excel Workbook (UniHow)"
-        icon="file excel"
-      />
-    </>
+    <Popup
+      trigger={
+        <Button
+          onClick={() => {
+            xlsx.writeFile(getXlsx(), filename)
+          }}
+          icon="file excel"
+        >
+          Excel Workbook (UniHow)
+        </Button>
+      }
+      content="Click here to download a specialized Excel-workbook with Unihow-data."
+    />
   )
 }
