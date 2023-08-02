@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import _ from 'lodash'
 import { connect, useSelector, useDispatch } from 'react-redux'
 import { string, func, object } from 'prop-types'
 import { Container } from 'semantic-ui-react'
@@ -61,14 +62,24 @@ const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, re
     }
 
     setDefaultModules(
-      Object.entries(defaultModules)
-        .map(([module, courses]) => ({ module, courses, module_order: courses[0].module_order }))
-        .sort((a, b) => a.module_order - b.module_order)
+      _.orderBy(
+        Object.entries(defaultModules).map(([module, courses]) => ({
+          module,
+          courses,
+          module_order: courses[0].module_order,
+        })),
+        m => m.code
+      )
     )
     setSecondProgrammeModules(
-      Object.entries(secondProgrammeModules)
-        .map(([module, courses]) => ({ module, courses, module_order: courses[0].module_order }))
-        .sort((a, b) => a.module_order - b.module_order)
+      _.orderBy(
+        Object.entries(secondProgrammeModules).map(([module, courses]) => ({
+          module,
+          courses,
+          module_order: courses[0].module_order,
+        })),
+        m => m.code
+      )
     )
   }, [mandatoryCourses])
 

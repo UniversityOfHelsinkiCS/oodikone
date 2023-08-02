@@ -20,7 +20,7 @@ ProgrammeModuleChild.init(
       type: STRING,
       references: {
         model: 'programme_modules',
-        key: 'id',
+        key: 'group_id',
       },
     },
     createdAt: {
