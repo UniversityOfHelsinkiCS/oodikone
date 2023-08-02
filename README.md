@@ -8,7 +8,7 @@ To run Oodikone locally, you will need the following:
 
 1. Applications:
    - [Docker](https://docs.docker.com/install/) (version 20.10+),
-   - [Docker Compose](https://docs.docker.com/compose/install/)(version 1.29+) and
+   - [Docker Compose](https://docs.docker.com/compose/install/) (version 1.29+) and
    - [npm](https://docs.npmjs.com/cli/v7) (version 7+)
 2. Access to Toska Docker Hub,
 3. For real data setup, access to Toskas production servers.
@@ -89,6 +89,10 @@ graph TB
     end
 ```
 
+In development, backend and updater use the same redis, but in production they are separate.
+
+See also [older graph](documentation/Oodikone.png), which presents more information.
+
 ### Documentation
 
 Folder `documentation` currently contains some notes on sis-db schema and is meant as a place for storing useful information on Oodikone to make life easier for future developers. Feel free to add anything relevant!
@@ -143,25 +147,23 @@ Pre-commit hooks will fix auto-fixable problems. To set up quick formatting: In 
 
 ## 🔨 Testing & CI
 
-There are three types of tests in this project: static tests with eslint/prettier/other tools, jest integration tests for single service and cypress end-to-end tests. Linting is described above and other do work as follows:
+We use cypress for end-to-end testing. No unit tests are currently used.
 
-- Cypress
-  - can be launched in interactive mode with `npm run cypress open`. `package.json` defines entrypoint `npm run cypress` so you can basically run cypress with any arguments you want
-  - are defined in cypress -folder and cypress.config.json
-  - whole cypress test stack takes about 15 to 20 mins to run. Since tests are ran in our Github actions CI pipe, you're encouraged to take advantage of this instead of running all tests locally.
-  - There are some different user types and cypress commands defined for testing. Take a look at these when debugging tests.
-- Jest
-  - are ran with `docker-compose.test.yml`
-  - test command and environment themselves are in Dockerfile for service in question
-  - can be debugged by overriding default command in `docker-compose.test.yml` and running docker container in interactive mode
+Cypress
+
+- Can be launched in interactive mode with `npm run cypress open`. `package.json` defines entrypoint `npm run cypress` so you can basically run cypress with any arguments you want
+- Are defined in cypress -folder and cypress.config.json
+- The entire cypress test stack takes about 15 to 20 mins to run. Since tests are ran in our Github actions CI pipe, you're encouraged to take advantage of this instead of running all tests locally.
+- Running tests locally sometimes causes problems after running the whole tests suite due to some login-related issue. Also for this reason, it is usually best practice to only run single views locally, and let the CI run the entire test suite.
+- There are some different user types and cypress commands defined for testing. Take a look at these when debugging tests.
 
 Continuous integration (CI) works with Github actions and is defined in workflow files in `.github/workflows` folder:
 
-- oodikone setup for cypress and other tests in CI is defined in `docker-compose.ci.yml`. Take a look at this too if debugging github action workflows.
-- tests are run on every push.
-- after successful test run, oodikone is deployed to staging
-- after creating a release, oodikone is deployed to production
-- updater is deployed to production on every push, no tests included
+- Oodikone setup for cypress and other tests in CI is defined in `docker-compose.ci.yml`. Take a look at this too if debugging github action workflows.
+- Tests are run on every push
+- After a successful test run, oodikone is deployed to staging
+- After creating a release, oodikone is deployed to production
+- Updater is deployed to production when pushed if tests pass
 
 ## ❓FAQ
 
@@ -181,7 +183,7 @@ If you don't want to reset all data, you can delete the docker images `docker co
 
 ## ✌🏼 Maintainers and contribution
 
-(Toska)[https://toska.dev] of course.
+[Toska](https://toska.dev) of course.
 
 University of Helsinki
 
