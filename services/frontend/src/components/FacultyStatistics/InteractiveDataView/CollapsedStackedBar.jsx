@@ -5,13 +5,12 @@ import ReactHighcharts from 'react-highcharts'
 
 const colors = ['#7cb5ec', '#90ed7d', '#434348', '#f7a35c', '#FFF000', '#2b908f', '#f45b5b', '#91e8e1']
 
-const CollapsedStackedBar = ({ data, labels, longLabels, names, plotLinePlaces, differenceData, extraHeight }) => {
+const CollapsedStackedBar = ({ data, labels, longLabels, names, plotLinePlaces, differenceData }) => {
   const { getTextIn } = useLanguage()
   const transpose = matrix => {
     return matrix.reduce((prev, next) => next.map((_item, i) => (prev[i] || []).concat(next[i])), [])
   }
   if (names[0] === 'Started studying') names[0] += ' (new in faculty)'
-  const needsExtra = extraHeight === 'EXTRA HEIGHT'
   const dataTranspose = transpose(data)
     .map((obj, idx) => ({ name: names[idx], data: obj, color: colors[idx] }))
     .reverse()
@@ -56,15 +55,11 @@ const CollapsedStackedBar = ({ data, labels, longLabels, names, plotLinePlaces, 
     : []
 
   // Point width is 24 px different multipliers adjusts the height.
-  const getFlexHeight = (len, needsExtra) => {
-    if (len > 7 && needsExtra) return `${len * 24 * 1.5}px`
-    if (len > 5 && !needsExtra) return `${len * 24 * 1.5}px`
-    if (needsExtra && len <= 2) return `${len * 24 * 6}px`
-    if (needsExtra && len <= 4) return `${len * 24 * 3}px`
-    if (needsExtra) return `${len * 24 * 2}px`
-    if (len <= 2) return `${len * 24 * 5}px`
+  const getFlexHeight = len => {
+    if (len > 7) return `${len * 24 * 1.5}px`
+    if (len <= 2) return `${len * 24 * 6}px`
     if (len <= 4) return `${len * 24 * 3}px`
-    return `${len * 24}px`
+    return `${len * 24 * 2}px`
   }
 
   const getColor = change => {
@@ -78,7 +73,7 @@ const CollapsedStackedBar = ({ data, labels, longLabels, names, plotLinePlaces, 
     chart: {
       type: 'bar',
       marginTop: 60,
-      height: getFlexHeight(labels.length, needsExtra),
+      height: getFlexHeight(labels.length),
     },
     credits: {
       text: 'oodikone | TOSKA',
