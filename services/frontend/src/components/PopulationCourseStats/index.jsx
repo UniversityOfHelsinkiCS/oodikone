@@ -104,7 +104,6 @@ const PopulationCourseStats = props => {
   const [state, setState] = useState(initialState(props))
   const [expandedGroups, setExpandedGroups] = useState(new Set())
   const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
-
   const { handleTabChange } = useTabChangeAnalytics()
 
   const courseStatistics = useDelayedMemo(
@@ -146,7 +145,6 @@ const PopulationCourseStats = props => {
       const { name } = course
       return getTextIn(name, language).toLowerCase().includes(nameFilter.toLowerCase())
     }
-
     const visibleCoursesFilter = ({ course }) => {
       return (
         (mandatoryCourses.defaultProgrammeCourses &&
@@ -188,29 +186,29 @@ const PopulationCourseStats = props => {
     const modules = {}
 
     sortedStatistics.forEach(course => {
-      const code = course.label_code
-      if (!code) {
-        return
+      if (!modules[course.parent_code]) {
+        modules[course.parent_code] = {
+          module: { code: course.parent_code, name: course.parent_name },
+          courses: [],
+        }
       }
-      if (!modules[code]) {
-        modules[code] = []
-      }
-      modules[code].push(course)
+      modules[course.parent_code].courses.push(course)
     })
 
     Object.keys(modules).forEach(m => {
-      if (modules[m].length === 0) {
+      if (modules[m].courses.length === 0) {
         delete modules[m]
       }
     })
 
     setModules(
-      Object.entries(modules)
-        .map(([module, courses]) => ({
-          module: { code: module, name: courses[0].label_name, order: courses[0].module_order },
+      orderBy(
+        Object.entries(modules).map(([, { module, courses }]) => ({
+          module,
           courses,
-        }))
-        .sort((a, b) => a.module.order - b.module.order)
+        })),
+        item => item.module.order
+      )
     )
   }, [state.studentAmountLimit, props.courses.coursestatistics, state.codeFilter, state.nameFilter, mandatoryCourses])
 
@@ -347,6 +345,7 @@ const PopulationCourseStats = props => {
     },
     {
       menuItem: 'students',
+      hideIfOnlyIamRights: true,
       render: () => (
         <Tab.Pane className="menuTab">
           <Students
@@ -357,7 +356,7 @@ const PopulationCourseStats = props => {
         </Tab.Pane>
       ),
     },
-  ]
+  ].filter(p => !(p.hideIfOnlyIamRights && props.onlyIamRights))
 
   if (!courses) {
     return null
@@ -371,9 +370,6 @@ const PopulationCourseStats = props => {
     return null
   }
 
-  if (props.onlyIamRights) {
-    panes.pop()
-  }
   return (
     <div>
       <PopulationCourseContext.Provider value={contextValue}>
