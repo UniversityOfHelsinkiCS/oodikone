@@ -3,23 +3,22 @@ const { ExcludedCourse } = require('../models/models_kone')
 const { Op } = Sequelize
 const logger = require('../util/logger')
 const { combinedStudyprogrammes } = require('./studyprogrammeHelpers.js')
-
 const { dbConnections } = require('../database/connection')
 
-const recursivelyGetModuleAndChildren = async (code, type) => {
+const recursivelyGetModuleAndChildren = async (code, type, start = '1900-1-1', end = '2100-1-1') => {
   const connection = dbConnections.sequelize
   try {
     const [result] = await connection.query(
       `WITH RECURSIVE children as (
-        SELECT DISTINCT pm.*, 0 AS module_order, NULL::jsonb AS label_name, NULL AS label_code FROM programme_modules pm
+        SELECT DISTINCT pm.*, 0 AS module_order, NULL::jsonb AS parent_name, NULL AS parent_code, NULL as parent_id FROM programme_modules pm
         WHERE pm.code = ?
         UNION ALL
-        SELECT pm.*, c.order AS module_order, c.name AS label_name, c.code AS label_code
+        SELECT pm.*, c.order AS module_order, c.name AS parent_name, c.code AS parent_code, c.id as parent_id
         FROM children c, programme_modules pm, programme_module_children pmc
         WHERE c.id = pmc.parent_id AND pm.id = pmc.child_id
-        GROUP BY pm.id, c.name, c.code, c.order
-      ) SELECT * FROM children WHERE type = ?`,
-      { replacements: [code, type] }
+        GROUP BY pm.id, c.name, c.code, c.order, c.id
+      ) SELECT * FROM children WHERE type = ? AND (valid_to > ? OR valid_to IS NULL) AND (valid_from < ? OR valid_from IS NULL)`,
+      { replacements: [code, type, start, end] }
     )
     return result
   } catch (e) {
@@ -28,94 +27,67 @@ const recursivelyGetModuleAndChildren = async (code, type) => {
   }
 }
 
-const labelProgammes = (filteredProgrammes, excludedProgrammes) => {
-  return filteredProgrammes.map(module => {
-    const label = {
-      id: module.label_name.fi,
-      label: `${module.label_code}\n${module.label_name.fi}`,
-      orderNumber: module.module_order,
-    }
-    // check if course is excluded, and hide if it is
-    const foundCourse = excludedProgrammes.find(course => course.course_code === module.code)
-    const visible = { visibility: !foundCourse, id: foundCourse ? foundCourse.id : null }
+const modifyParent = (course, moduleMap) => {
+  let parent = moduleMap[course.parent_id]
+  const parents = []
+  while (parent) {
+    parents.push(parent)
+    parent = moduleMap[parent.parent_id]
+  }
 
-    return { ...module, label, visible }
-  })
+  let skip = 0
+  const parentsWithCode = parents.filter(p => p.code)
+  if (parentsWithCode.length > 0) {
+    parent = parentsWithCode[skip >= parentsWithCode.length ? parentsWithCode.length - 1 : skip]
+  } else {
+    parent = parents.find(m => m.code)
+  }
+  return { ...course, parent_id: parent.id, parent_code: parent.code, parent_name: parent.name }
 }
-const byProgrammeCode = async code => {
-  const result = await recursivelyGetModuleAndChildren(code, 'course')
-  if (!result.length) return []
-  const excluded = await ExcludedCourse.findAll({
+
+const getCoursesAndModulesForProgramme = async code => {
+  const courses = await recursivelyGetModuleAndChildren(code, 'course')
+  const modules = await recursivelyGetModuleAndChildren(code, 'module')
+  const excludedCourses = await ExcludedCourse.findAll({
     where: {
       programme_code: {
         [Op.eq]: code,
       },
     },
   })
+  const modulesMap = modules.reduce((obj, cur) => ({ ...obj, [cur.id]: cur }), {})
+  const modifiedCourses = courses
+    .map(c => modifyParent(c, modulesMap, code))
+    .filter(
+      (course1, index, array) =>
+        array.findIndex(course2 => course1.code === course2.code && course1.parent_code === course2.parent_code) ===
+        index
+    )
 
-  // filter out possible duplicates
-  const filtered = result.filter(
-    (course, index, array) =>
-      array.findIndex(c => c.id == course.id && c.code == course.code && c.label_code == course.label_code) == index
-  )
-
-  // this labels the modules to match the old system in frontend
-  const labeled = labelProgammes(filtered, excluded)
-
-  // Some studyprogrammes (e.g. eläinlääkis) are combined as bachelor-master
-  const isCombined = Object.keys(combinedStudyprogrammes).includes(code)
-  let secondProgrammelabeled = []
-  if (isCombined) {
-    const secondProgCode = combinedStudyprogrammes[code]
-    const secondProgrammeResult = await recursivelyGetModuleAndChildren(secondProgCode, 'course')
-    // Now do the same things for the second set of results as for the first
-    if (secondProgrammeResult.length) {
-      const excludedSecondProgrammes = await ExcludedCourse.findAll({
-        where: {
-          programme_code: {
-            [Op.eq]: secondProgCode,
-          },
-        },
-      })
-
-      // filter out possible duplicates
-      const secondFiltered = secondProgrammeResult.filter(
-        (course, index, array) =>
-          array.findIndex(c => c.id == course.id && c.code == course.code && c.label_code == course.label_code) == index
-      )
-
-      // this labels the modules to match the old system in frontend
-      secondProgrammelabeled = labelProgammes(secondFiltered, excludedSecondProgrammes)
-    }
-  }
-  // The second results are for combined programme views
-  return { defaultProgrammeCourses: labeled, secondProgrammeCourses: secondProgrammelabeled }
+  return { courses: labelProgammes(modifiedCourses, excludedCourses), modules }
 }
 
-const addExcludedCourses = async (programmecode, coursecodes) => {
-  return ExcludedCourse.bulkCreate(coursecodes.map(c => ({ programme_code: programmecode, course_code: c })))
-}
-
-const modulesByProgrammeCode = async code => {
-  const programmeResults = await recursivelyGetModuleAndChildren(code, 'module')
-
-  let secondProgrammeResults = []
+const getCoursesAndModules = async code => {
+  const defaultProgrammeCourses = await getCoursesAndModulesForProgramme(code)
   if (Object.keys(combinedStudyprogrammes).includes(code)) {
-    const masterProgCode = combinedStudyprogrammes[code]
-    secondProgrammeResults = await recursivelyGetModuleAndChildren(masterProgCode, 'module')
+    const secondProgramme = combinedStudyprogrammes[code]
+    const secondProgrammeCourses = await getCoursesAndModulesForProgramme(secondProgramme)
+    return { defaultProgrammeCourses, secondProgrammeCourses }
   }
-  // The second results are for combined programme views
-  return { defaultProgrammeResults: programmeResults, secondProgrammeResults: secondProgrammeResults }
+  return { defaultProgrammeCourses, secondProgrammeCourses: { courses: [], modules: [] } }
 }
 
-const removeExcludedCourses = async ids => {
-  return ExcludedCourse.destroy({
-    where: {
-      id: {
-        [Op.or]: ids,
-      },
-    },
+const labelProgammes = (modules, excludedCourses) => {
+  return modules.map(module => {
+    const label = {
+      id: module.parent_name.fi,
+      label: `${module.parent_code}\n${module.parent_name.fi}`,
+      orderNumber: module.module_order,
+    }
+    const foundCourse = excludedCourses.find(course => course.course_code === module.code)
+    const visible = { visibility: !foundCourse, id: foundCourse?.id ?? null }
+    return { ...module, label, visible }
   })
 }
 
-module.exports = { byProgrammeCode, addExcludedCourses, removeExcludedCourses, modulesByProgrammeCode }
+module.exports = getCoursesAndModules
