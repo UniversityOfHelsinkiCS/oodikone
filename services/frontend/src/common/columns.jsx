@@ -1,8 +1,54 @@
 import React from 'react'
 import { Popup, Icon } from 'semantic-ui-react'
-import { copyToClipboard } from 'common'
+import StudentInfoItem from 'components/common/StudentInfoItem'
 
-export const getCopyableEmailColumn = ({ popupStates, copyToClipboardAll, handlePopupOpen, handlePopupClose }) => {
+export const getCopyableStudentNumberColumn = ({
+  popupStates,
+  copyItemsToClipboard,
+  handlePopupOpen,
+  handlePopupClose,
+  fieldName,
+}) => {
+  return {
+    key: 'studentnumber',
+    forceToolsMode: 'dangling',
+    textTitle: 'Student number',
+    title: (
+      <>
+        Student number
+        <Popup
+          trigger={
+            <Icon
+              size="large"
+              link
+              name="copy"
+              onClick={event => copyItemsToClipboard(event, fieldName)}
+              style={{ float: 'right', marginLeft: '0.25em' }}
+              color="grey"
+              title="Click here to copy all student numbers onto your clipboard"
+            />
+          }
+          content="Copied student numbers!"
+          on="click"
+          open={popupStates.studentnumbers}
+          onClose={() => handlePopupClose('studentnumbers')}
+          onOpen={() => handlePopupOpen('studentnumbers')}
+          position="top right"
+        />
+      </>
+    ),
+    getRowVal: s => (!s.obfuscated ? s.studentNumber : 'hidden'),
+    getRowContent: s => <StudentInfoItem student={s} showSisuLink tab="General Tab" />,
+  }
+}
+
+export const getCopyableEmailColumn = ({
+  popupStates,
+  copyItemsToClipboard,
+  handlePopupOpen,
+  handlePopupClose,
+  fieldName,
+}) => {
   return {
     mergeHeader: true,
     merge: true,
@@ -22,16 +68,20 @@ export const getCopyableEmailColumn = ({ popupStates, copyToClipboardAll, handle
                   size="large"
                   link
                   name="copy"
-                  onClick={copyToClipboardAll}
-                  style={{ float: 'right', marginLeft: '0.25em' }}
+                  onClick={event => copyItemsToClipboard(event, fieldName)}
+                  style={{
+                    float: 'right',
+                    marginLeft: '0.25em',
+                  }}
                   color="grey"
+                  title="Click here to copy all emails onto your clipboard"
                 />
               }
               content="Copied email list!"
               on="click"
-              open={popupStates['0']}
-              onClose={() => handlePopupClose('0')}
-              onOpen={() => handlePopupOpen('0')}
+              open={popupStates.emails}
+              onClose={() => handlePopupClose('emails')}
+              onOpen={() => handlePopupOpen('emails')}
               position="top right"
             />
           </>
@@ -51,9 +101,7 @@ export const getCopyableEmailColumn = ({ popupStates, copyToClipboardAll, handle
                 <Icon
                   link
                   name="copy outline"
-                  onClick={() => {
-                    copyToClipboard(s.email)
-                  }}
+                  onClick={() => navigator.clipboard.writeText(s.email)}
                   style={{ float: 'right' }}
                 />
               }

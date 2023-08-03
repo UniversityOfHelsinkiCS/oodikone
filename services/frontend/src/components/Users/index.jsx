@@ -5,7 +5,6 @@ import { Radio, Icon, Header, Segment, Loader, Popup } from 'semantic-ui-react'
 import { getUsers } from '../../redux/users'
 import { getUnits } from '../../redux/units'
 import { getElementDetails } from '../../redux/elementdetails'
-import { copyToClipboard } from '../../common'
 import UserPageNew from './UserPage'
 import UserSearchList from './UserSearchList'
 import { useToggle, useTitle } from '../../common/hooks'
@@ -41,7 +40,7 @@ const Users = () => {
       .filter(u => u.is_enabled && u.email)
       .map(u => u.email)
       .join('; ')
-    copyToClipboard(clipboardString)
+    navigator.clipboard.writeText(clipboardString)
   }
 
   const renderUserPage = userid => {
