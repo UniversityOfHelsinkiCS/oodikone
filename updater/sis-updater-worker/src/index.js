@@ -31,15 +31,16 @@ const handleMessage = messageHandler => async msg => {
   }
 
   try {
+    if (data.type) logger.info({ message: `Starting to handle message of type ${data.type}` })
     await messageHandler(data)
 
     if (data.id) {
-      logger.info('Completion Ack ' + data.id + ' (Success)')
+      logger.info({ message: 'Completion Ack ' + data.id + ' (Success)' })
       stan.publish('SIS_COMPLETED_CHANNEL-' + data.id, JSON.stringify({ id: data.id, success: true }))
     }
   } catch (e) {
     if (data.id) {
-      logger.info('Completion Ack ' + data.id + ' (Failure)')
+      logger.info({ message: 'Completion Ack ' + data.id + ' (Failure)' })
       stan.publish(
         'SIS_COMPLETED_CHANNEL-' + data.id,
         JSON.stringify({ id: data.id, success: false, message: e.message })
