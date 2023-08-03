@@ -123,15 +123,6 @@ export const getStudentTotalCreditsFromMandatory = (student, mandatoryCourses) =
 export const getTotalCreditsFromCourses = courses =>
   courses.filter(c => c.passed && !c.isStudyModuleCredit).reduce((a, b) => a + b.credits, 0)
 
-export const copyToClipboard = text => {
-  const textField = document.createElement('textarea')
-  textField.innerText = text
-  document.body.appendChild(textField)
-  textField.select()
-  document.execCommand('copy')
-  textField.remove()
-}
-
 export const getCompiledPath = (template, parameters) => {
   const toPath = pathToRegexp.compile(template)
   return toPath(parameters)

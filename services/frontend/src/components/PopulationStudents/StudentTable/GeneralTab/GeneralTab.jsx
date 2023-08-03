@@ -4,10 +4,9 @@ import moment from 'moment'
 import SortableTable from 'components/SortableTable'
 import useFilters from 'components/FilterView/useFilters'
 import creditDateFilter from 'components/FilterView/filters/date'
-import { getStudentTotalCredits, reformatDate, copyToClipboard, getHighestGradeOfCourseBetweenRange } from 'common'
-import { hiddenNameAndEmailForExcel, getCopyableEmailColumn } from 'common/columns'
+import { getStudentTotalCredits, reformatDate, getHighestGradeOfCourseBetweenRange } from 'common'
+import { hiddenNameAndEmailForExcel, getCopyableEmailColumn, getCopyableStudentNumberColumn } from 'common/columns'
 import { useGetSemestersQuery } from 'redux/semesters'
-import StudentInfoItem from 'components/common/StudentInfoItem'
 import { PRIORITYCODE_TEXTS } from '../../../../constants'
 import useLanguage from '../../../LanguagePicker/useLanguage'
 import createMaps from './columnHelpers/createMaps'
@@ -197,28 +196,28 @@ const GeneralTab = ({
     return enrollments[0].enrollment_date_time
   }
 
-  const copyToClipboardAll = event => {
+  const copyItemsToClipboard = (event, fieldName) => {
     event.stopPropagation()
     const studentsInfo = selectedStudents.map(number => students[number])
-    const emails = studentsInfo.filter(s => s.email && !s.obfuscated).map(s => s.email)
-    const clipboardString = emails.join('; ')
-    copyToClipboard(clipboardString)
+    const list = studentsInfo.filter(s => s[fieldName] && !s.obfuscated).map(s => s[fieldName])
+    const clipboardString = list.join('; ')
+    navigator.clipboard.writeText(clipboardString)
   }
 
   const popupTimeoutLength = 1000
-  let timeout = null
+  const timeout = {}
 
   const handlePopupOpen = id => {
     setPopupStates({ [id]: true })
 
-    timeout = setTimeout(() => {
+    timeout[id] = setTimeout(() => {
       setPopupStates({ [id]: false })
     }, popupTimeoutLength)
   }
 
   const handlePopupClose = id => {
     setPopupStates({ [id]: false })
-    clearTimeout(timeout)
+    clearTimeout(timeout[id])
   }
 
   // Filters to check data for whether to show certain columns
@@ -367,12 +366,13 @@ const GeneralTab = ({
       displayColumn: false,
       getRowVal: s => s.phoneNumber,
     },
-    studentnumber: {
-      key: 'studentnumber',
-      title: 'Student number',
-      getRowVal: s => (!s.obfuscated ? s.studentNumber : 'hidden'),
-      getRowContent: s => <StudentInfoItem student={s} showSisuLink tab="General Tab" />,
-    },
+    studentnumber: getCopyableStudentNumberColumn({
+      popupStates,
+      copyItemsToClipboard,
+      handlePopupClose,
+      handlePopupOpen,
+      fieldName: 'studentNumber',
+    }),
     credits: creditsColumn,
     gradeForSingleCourse: {
       key: 'gradeForSingleCourse',
@@ -513,9 +513,10 @@ const GeneralTab = ({
     },
     email: getCopyableEmailColumn({
       popupStates,
-      copyToClipboardAll,
+      copyItemsToClipboard,
       handlePopupOpen,
       handlePopupClose,
+      fieldName: 'email',
     }),
     tags: {
       key: 'tags',
