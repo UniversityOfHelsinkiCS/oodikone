@@ -12,7 +12,7 @@ export const getKey = data => {
 }
 
 export const mergeColumnDefinitions = (original, overlay) => {
-  const result = _.cloneDeep(original)
+  const result = { ...original }
 
   if (!overlay) {
     return result
@@ -96,7 +96,7 @@ export const resolveDisplayColumn = column => {
 }
 
 export const computeColumnSpans = columns => {
-  const stack = _.cloneDeep(columns)
+  const stack = [...columns]
   const spans = {}
 
   let i = 0

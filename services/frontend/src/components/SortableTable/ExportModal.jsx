@@ -11,7 +11,7 @@ import ValueVisitor from './visitors/ValueVisitor'
 import ExportVisitor from './visitors/ExportVisitor'
 
 const getExportColumns = columns => {
-  const stack = _.cloneDeep(columns)
+  const stack = [...columns]
 
   const exportColumns = []
 

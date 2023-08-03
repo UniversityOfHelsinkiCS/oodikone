@@ -126,7 +126,7 @@ const SortableTable = ({
   )
 
   const [columns, columnsByKey] = useMemo(() => {
-    const columns = _.cloneDeep(pColumns)
+    const columns = [...pColumns]
 
     injectParentPointers(columns)
     insertGroupColumns(columns, groupDepth, toggleGroup, state.expandedGroups)
