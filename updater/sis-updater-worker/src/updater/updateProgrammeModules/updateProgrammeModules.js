@@ -5,6 +5,8 @@ const { ProgrammeModule, ProgrammeModuleChild } = require('../../db/models')
 const ModuleResolver = require('./resolver')
 
 const updateProgrammeModules = async programmeIds => {
+  await ProgrammeModuleChild.destroy({ where: {} })
+  await ProgrammeModule.destroy({ where: {} })
   const programmeChunks = chunk(programmeIds, 25)
   for (const chunk of programmeChunks) {
     await updateProgrammeModulesChunk(chunk)
