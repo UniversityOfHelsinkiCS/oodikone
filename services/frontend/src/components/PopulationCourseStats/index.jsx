@@ -207,7 +207,7 @@ const PopulationCourseStats = props => {
           module,
           courses,
         })),
-        item => item.module.order
+        item => item.module.code
       )
     )
   }, [state.studentAmountLimit, props.courses.coursestatistics, state.codeFilter, state.nameFilter, mandatoryCourses])
