@@ -303,7 +303,9 @@ const PopulationSearchForm = props => {
     if (!query.studyRights.programme) {
       return momentYear.year() >= 1900 && momentYear.isSameOrBefore(moment().subtract(6, 'months'))
     }
-    return props.studyProgrammes[query.studyRights.programme].enrollmentStartYears[momentYear.year()] != null
+
+    // 3.8.2023 Temporary fix to a bug that prevents users from seeing some valid programme-years
+    return true // props.studyProgrammes[query.studyRights.programme].enrollmentStartYears[momentYear.year()] != null
   }
 
   const renderableList = list =>
