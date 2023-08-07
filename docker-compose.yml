@@ -153,6 +153,7 @@ services:
       SIS_IMPORTER_HOST: sis-importer-db
       SIS_IMPORTER_PASSWORD: postgres
       SIS_IMPORTER_USER: postgres
+      SIS_PASSWORD: postgres
       SIS_NATS_TOKEN: dev
       SIS_NATS_URI: sis-updater-nats://sis-updater-nats:4222
     profiles:
