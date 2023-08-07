@@ -67,7 +67,7 @@ const updateStudyRights = async (
     // NOT_STARTED means that study right starts in the future.
     if (
       studyright.study_right_cancellation &&
-      ['RESCINDED', 'CANCELLED_BY_ADMINISTRATION', 'PASSIVE', 'NOT_STARTED', 'EXPIRED'].includes(
+      ['RESCINDED', 'CANCELLED_BY_ADMINISTRATION', 'PASSIVE', 'EXPIRED'].includes(
         studyright.study_right_cancellation.cancellationType
       )
     ) {
