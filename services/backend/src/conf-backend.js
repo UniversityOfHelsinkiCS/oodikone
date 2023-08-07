@@ -46,6 +46,10 @@ const SECRET_TOKEN = process.env.SECRET_TOKEN
 const DB_SCHEMA_KONE = process.env.DB_SCHEMA_KONE || 'public'
 const SIS_UPDATER_URL = process.env.SIS_UPDATER_URL
 
+const KONE_PASSWORD = process.env.KONE_PASSWORD || 'postgres'
+const USER_PASSWORD = process.env.USER_PASSWORD || 'postgres'
+const SIS_PASSWORD = process.env.SIS_PASSWORD || 'postgres'
+
 module.exports = {
   DB_URL_USER,
   DB_URL_KONE,
@@ -54,6 +58,9 @@ module.exports = {
   redis,
   SECRET_TOKEN,
   DB_SCHEMA_KONE,
+  KONE_PASSWORD,
+  USER_PASSWORD,
+  SIS_PASSWORD,
   requiredGroup,
   SIS_UPDATER_URL,
   runningInCI,

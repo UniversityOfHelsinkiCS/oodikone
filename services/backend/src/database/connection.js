@@ -20,6 +20,7 @@ class DbConnection extends EventEmitter {
         idle: 300000000,
       },
       logging: false,
+      password: conf.SIS_PASSWORD,
     })
   }
 
@@ -44,12 +45,14 @@ const sequelizeKone = new Sequelize(conf.DB_URL_KONE, {
   schema: conf.DB_SCHEMA_KONE,
   searchPath: conf.DB_SCHEMA_KONE,
   logging: false,
+  password: conf.KONE_PASSWORD,
 })
 
 sequelizeKone.query(`SET SESSION search_path to ${conf.DB_SCHEMA_KONE}`)
 
 const sequelizeUser = new Sequelize(conf.DB_URL_USER, {
   logging: false,
+  password: conf.USER_PASSWORD,
 })
 
 const initializeDatabaseConnection = async () => {

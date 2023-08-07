@@ -4,7 +4,8 @@ const EventEmitter = require('events')
 const Umzug = require('umzug')
 const { lock } = require('../utils/redis')
 const { MIGRATIONS_LOCK, isDev, runningInCI } = require('../config')
-const { DB_URL, SIS_IMPORTER_HOST, SIS_IMPORTER_USER, SIS_IMPORTER_PASSWORD, SIS_IMPORTER_DATABASE } = process.env
+const { DB_URL, SIS_IMPORTER_HOST, SIS_IMPORTER_USER, SIS_IMPORTER_PASSWORD, SIS_IMPORTER_DATABASE, SIS_PASSWORD } =
+  process.env
 const { logger } = require('../utils/logger')
 
 class DbConnections extends EventEmitter {
@@ -22,6 +23,7 @@ class DbConnections extends EventEmitter {
         acquire: 10000,
         idle: 300000000,
       },
+      password: SIS_PASSWORD,
       logging: false,
     })
   }
