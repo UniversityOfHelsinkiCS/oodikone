@@ -76,7 +76,7 @@ services:
     <<: *defaults
     command: 'redis-server --appendonly yes'
     container_name: redis
-    image: redis
+    image: redis:6.2.13
     ports:
       - '6379:6379'
     volumes:
