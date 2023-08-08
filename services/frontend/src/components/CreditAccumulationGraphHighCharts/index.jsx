@@ -2,7 +2,6 @@
 import React, { useState, useRef, useMemo } from 'react'
 import { renderToString } from 'react-dom/server'
 import moment from 'moment'
-import { useHistory } from 'react-router-dom'
 import Highcharts from 'highcharts/highstock'
 import { Button, Radio } from 'semantic-ui-react'
 import boostcanvas from 'highcharts/modules/boost-canvas'
@@ -452,7 +451,6 @@ const CreditAccumulationGraphHighCharts = ({
   studyPlanFilterIsActive,
   customStudyStartYear,
 }) => {
-  const history = useHistory()
   const chartRef = useRef()
   const { getTextIn } = useLanguage()
   const [graphHeight, setGraphHeight] = useState(700)
@@ -558,7 +556,7 @@ const CreditAccumulationGraphHighCharts = ({
     onPointClicked: point => {
       if (!singleStudent) {
         if (point.series.name.length > 10) return
-        history.push(`/students/${point.series.name}`)
+        window.open(`/students/${point.series.name}`, '_blank')
       }
     },
     graduations,
