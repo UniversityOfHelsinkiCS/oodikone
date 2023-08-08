@@ -5,7 +5,7 @@ import { Icon } from 'semantic-ui-react'
 import FigureContainer from 'components/FigureContainer'
 import _ from 'lodash'
 import ExportModal from './ExportModal'
-import { row, group, SortableTableContext } from './common'
+import { row, group, SortableTableContext, cloneColumns } from './common'
 import SortingFilteringVisitor from './visitors/SortingFilteringVisitor'
 import ValueVisitor from './visitors/ValueVisitor'
 import './style.css'
@@ -126,7 +126,7 @@ const SortableTable = ({
   )
 
   const [columns, columnsByKey] = useMemo(() => {
-    const columns = _.cloneDeep(pColumns)
+    const columns = cloneColumns(pColumns)
 
     injectParentPointers(columns)
     insertGroupColumns(columns, groupDepth, toggleGroup, state.expandedGroups)
