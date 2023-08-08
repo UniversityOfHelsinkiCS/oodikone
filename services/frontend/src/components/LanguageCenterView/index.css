@@ -12,12 +12,6 @@
   width: 100em;
 }
 
-.toggle-container {
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: column;
-  gap: 1em;
-}
 
 input[type="radio"] {
   margin-left: 2em;
@@ -47,6 +41,24 @@ input[type="radio"] {
 
 .datepicker-container {
   display: flex;
+}
+
+.datepicker-acual-container {
+  display: flex;
   flex-direction: column;
   gap: 0.4em;
+}
+
+.calendar-icon-container {
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  margin-right: 0.6em;
+}
+
+.completion-acual-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  margin-top: 1em;
 }

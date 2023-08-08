@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Divider, Loader, Radio } from 'semantic-ui-react'
+import { Divider, Icon, Loader, Radio } from 'semantic-ui-react'
 import SortableTable from 'components/SortableTable'
 import useLanguageCenterData from 'redux/languageCenterView'
 import './index.css'
@@ -118,40 +118,47 @@ const LanguageCenterView = () => {
       <Divider horizontal>Language center statistics</Divider>
       <div className="options-container">
         <div className="datepicker-container">
-          <p>
+          <div className="calendar-icon-container">
+            <Icon size="huge" name="calendar alternate outline" />
+          </div>
+          <div className="datepicker-acual-container">
             <b>From</b>
             <DateTimeSelector onChange={value => setDates({ ...dates, startDate: value })} value={dates.startDate} />
-          </p>
-          <p>
             <b>Until</b>
             <DateTimeSelector onChange={value => setDates({ ...dates, endDate: value })} value={dates.endDate} />
-          </p>
+          </div>
         </div>
-        <div className="toggle-container">
-          <b className="options-header" style={{ marginBottom: '0.6em' }}>
-            Course completion
-          </b>
-          <Radio
-            name="modeRadioGroup"
-            value="notCompleted"
-            label="Not completed"
-            onChange={() => setMode('notCompleted')}
-            checked={mode === 'notCompleted'}
-          />
-          <Radio
-            name="modeRadioGroup"
-            value="completed"
-            label="Completed"
-            onChange={() => setMode('completed')}
-            checked={mode === 'completed'}
-          />
-          <Radio
-            name="modeRadioGroup"
-            value="total"
-            label="Both"
-            onChange={() => setMode('total')}
-            checked={mode === 'total'}
-          />
+        <div className="completion-container">
+          <div className="completion-icon-container" />
+          <b className="options-header">Course completion</b>
+          <div className="completion-acual-container" />
+          <div>
+            <Radio
+              name="modeRadioGroup"
+              value="notCompleted"
+              label="Not completed"
+              onChange={() => setMode('notCompleted')}
+              checked={mode === 'notCompleted'}
+            />
+          </div>
+          <div>
+            <Radio
+              name="modeRadioGroup"
+              value="completed"
+              label="Completed"
+              onChange={() => setMode('completed')}
+              checked={mode === 'completed'}
+            />
+          </div>
+          <div>
+            <Radio
+              name="modeRadioGroup"
+              value="total"
+              label="Both"
+              onChange={() => setMode('total')}
+              checked={mode === 'total'}
+            />
+          </div>
         </div>
       </div>
       <div className="languagecenter-table">
