@@ -6,12 +6,12 @@ import { Modal, Table, Button, Checkbox } from 'semantic-ui-react'
 import _ from 'lodash'
 import xlsx from 'xlsx'
 import { v4 as uuidv4 } from 'uuid'
-import { getColumnTitle, getDataItemType, DataItemType } from './common'
+import { getColumnTitle, getDataItemType, DataItemType, cloneColumns } from './common'
 import ValueVisitor from './visitors/ValueVisitor'
 import ExportVisitor from './visitors/ExportVisitor'
 
 const getExportColumns = columns => {
-  const stack = _.cloneDeep(columns)
+  const stack = cloneColumns(columns)
 
   const exportColumns = []
 

@@ -3,7 +3,7 @@ import { useContext } from 'use-context-selector'
 import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
 import './style.css'
-import { SortableTableContext, getDataItemType, DataItemType, thickBorderStyles } from './common'
+import { SortableTableContext, getDataItemType, DataItemType, thickBorderStyles, cloneColumns } from './common'
 
 export const getKey = data => {
   if (data.studentnumber) return data.studentnumber
@@ -12,7 +12,7 @@ export const getKey = data => {
 }
 
 export const mergeColumnDefinitions = (original, overlay) => {
-  const result = _.cloneDeep(original)
+  const result = cloneColumns(original)
 
   if (!overlay) {
     return result
@@ -96,7 +96,7 @@ export const resolveDisplayColumn = column => {
 }
 
 export const computeColumnSpans = columns => {
-  const stack = _.cloneDeep(columns)
+  const stack = cloneColumns(columns)
   const spans = {}
 
   let i = 0

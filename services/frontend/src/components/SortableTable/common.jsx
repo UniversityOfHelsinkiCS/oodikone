@@ -64,3 +64,18 @@ export const getColumnTitle = column => {
     .filter(c => typeof c === 'string')
     .join(' - ')
 }
+
+export const cloneColumns = columns => {
+  if (!columns) return null
+  const copyColumn = column => {
+    const { children, ...rest } = column
+    if (children) {
+      const newChildren = cloneColumns(children)
+      return { children: newChildren, ...rest }
+    }
+    return { ...rest }
+  }
+  const copy = []
+  columns.forEach(col => copy.push(copyColumn(col)))
+  return copy
+}
