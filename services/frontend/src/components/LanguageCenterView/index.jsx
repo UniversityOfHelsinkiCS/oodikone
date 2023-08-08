@@ -4,7 +4,8 @@ import SortableTable from 'components/SortableTable'
 import useLanguageCenterData from 'redux/languageCenterView'
 import './index.css'
 import useLanguage from 'components/LanguagePicker/useLanguage'
-import Toggle from 'components/StudyProgramme/Toggle'
+import DateTimeSelector from 'components/DateTimeSelector'
+import moment from 'moment'
 
 const shorten = (text, maxLength) => (text.length > maxLength ? `${text.substring(0, maxLength)} ... ` : text)
 
@@ -78,11 +79,19 @@ const getCourseFaculties = attempts => {
   return map
 }
 
+const filterAttemptsByDates = (date, dates) => {
+  const start = dates.startDate?.toDate().getTime() ?? moment(new Date('1900-1-1'))
+  const end = dates.endDate?.toDate().getTime() ?? moment(new Date('2100-01-01'))
+  return moment(date).isBetween(start, end)
+}
+
 const LanguageCenterView = () => {
   const { data: rawData, isFetchingOrLoading, isError } = useLanguageCenterData()
   const { getTextIn } = useLanguage()
   const [filterOld, setFilterOld] = useState(true)
   const [mode, setMode] = useState('total')
+  const [dates, setDates] = useState({ startDate: null, endDate: null })
+
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
   if (isFetchingOrLoading || !rawData) return <Loader active style={{ marginTop: '15em' }} />
 
@@ -95,43 +104,55 @@ const LanguageCenterView = () => {
   }
 
   const data = filterFaculties(rawData)
+  data.attempts = data.attempts.filter(attempt => filterAttemptsByDates(attempt.date, dates))
   const courseFaculties = getCourseFaculties(data.attempts)
   const coursesWithFaculties = data.courses
     .map(c => ({ ...c, facultyStats: courseFaculties[c.code] }))
     .filter(course => course.facultyStats)
   const faculties = [...new Set(data.attempts.map(({ faculty }) => faculty))].sort()
-  console.log({ attempts: data.attempts, courseFaculties, coursesWithFaculties })
+
+  console.log({ attempts: data.attempts, courseFaculties, coursesWithFaculties, dates })
+
   return (
     <div className="languagecenterview">
-      <Divider horizontal>Language center overview</Divider>
-      <div className="toggle-container">
-        <Radio
-          name="modeRadioGroup"
-          value="total"
-          label="Total"
-          onChange={() => setMode('total')}
-          checked={mode === 'total'}
-        />
-        <Radio
-          name="modeRadioGroup"
-          value="notCompleted"
-          label="Not completed"
-          onChange={() => setMode('notCompleted')}
-          checked={mode === 'notCompleted'}
-        />
-        <Radio
-          name="modeRadioGroup"
-          value="completed"
-          label="Completed"
-          onChange={() => setMode('completed')}
-          checked={mode === 'completed'}
-        />
-        <Toggle
-          firstLabel="All faculties"
-          secondLabel="Filter out old faculties"
-          value={filterOld}
-          setValue={setFilterOld}
-        />
+      <Divider horizontal>Language center statistics</Divider>
+      <div className="options-container">
+        <div className="datepicker-container">
+          <p>
+            <b>From</b>
+            <DateTimeSelector onChange={value => setDates({ ...dates, startDate: value })} value={dates.startDate} />
+          </p>
+          <p>
+            <b>Until</b>
+            <DateTimeSelector onChange={value => setDates({ ...dates, endDate: value })} value={dates.endDate} />
+          </p>
+        </div>
+        <div className="toggle-container">
+          <b className="options-header" style={{ marginBottom: '0.6em' }}>
+            Course completion
+          </b>
+          <Radio
+            name="modeRadioGroup"
+            value="notCompleted"
+            label="Not completed"
+            onChange={() => setMode('notCompleted')}
+            checked={mode === 'notCompleted'}
+          />
+          <Radio
+            name="modeRadioGroup"
+            value="completed"
+            label="Completed"
+            onChange={() => setMode('completed')}
+            checked={mode === 'completed'}
+          />
+          <Radio
+            name="modeRadioGroup"
+            value="total"
+            label="Both"
+            onChange={() => setMode('total')}
+            checked={mode === 'total'}
+          />
+        </div>
       </div>
       <div className="languagecenter-table">
         <SortableTable columns={getColumns(getTextIn, faculties, mode)} data={coursesWithFaculties} stretch />
@@ -139,5 +160,10 @@ const LanguageCenterView = () => {
     </div>
   )
 }
-
+/*        <Toggle
+          firstLabel="All faculties"
+          secondLabel="Filter out old faculties"
+          value={filterOld}
+          setValue={setFilterOld}
+        /> */
 export default LanguageCenterView

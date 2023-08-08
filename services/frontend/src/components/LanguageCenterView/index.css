@@ -14,15 +14,13 @@
 
 .toggle-container {
   display: flex;
-  justify-content: center;
   flex-wrap: wrap;
-  margin-top: 1em;
+  flex-direction: column;
+  gap: 1em;
 }
 
-.radio-toggle {
-  display: flex;
-  justify-content: center;
-  margin: 20px 35px;
+input[type="radio"] {
+  margin-left: 2em;
 }
 
 .toggle-label {
@@ -38,4 +36,17 @@
   padding-right: 0.5em;
   font-weight: bold;
   opacity: 0.5;
+}
+
+.options-container {
+  display: flex;
+  gap: 20em;
+  margin-top: 1.4em;
+  font-size: large;
+}
+
+.datepicker-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
 }
