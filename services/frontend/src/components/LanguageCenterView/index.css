@@ -9,11 +9,9 @@
 
 .languagecenter-table {
   margin-top: 4em;
-  width: 115em;
 }
 
-
-input[type="radio"] {
+input[type='radio'] {
   margin-left: 2em;
 }
 
