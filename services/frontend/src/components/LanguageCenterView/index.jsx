@@ -18,7 +18,7 @@ const getColumns = (getTextIn, faculties, mode) => {
       getRowContent: row => (
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <b>{row.code ?? 'No faculty'}</b>
-          <i style={{ color: 'gray', fontWeight: 'normal' }}>{row.name && shorten(getTextIn(row.name), 90)}</i>
+          <i style={{ color: 'gray', fontWeight: 'normal' }}>{row.name && shorten(getTextIn(row.name), 60)}</i>
         </div>
       ),
     },
@@ -97,9 +97,9 @@ const calculateTotals = coursesWithFaculties => {
 }
 
 const filterAttemptsByDates = (date, dates) => {
-  const start = dates.startDate?.toDate().getTime() ?? moment(new Date('1900-1-1'))
-  const end = dates.endDate?.toDate().getTime() ?? moment(new Date('2100-01-01'))
-  return moment(date).isBetween(start, end)
+  const start = dates.startDate ?? moment(new Date('1900-1-1'))
+  const end = dates.endDate ?? moment(new Date('2100-01-01'))
+  return moment(new Date(date)).isBetween(start, end)
 }
 
 const LanguageCenterView = () => {
@@ -107,7 +107,6 @@ const LanguageCenterView = () => {
   const { getTextIn } = useLanguage()
   const [mode, setMode] = useState('total')
   const [dates, setDates] = useState({ startDate: null, endDate: null })
-
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
   if (isFetchingOrLoading || !rawData) return <Loader active style={{ marginTop: '15em' }} />
 
@@ -120,7 +119,7 @@ const LanguageCenterView = () => {
 
   const facultyFilteredData = filterFaculties(rawData)
   const filteredAttempts = facultyFilteredData.attempts.filter(attempt => filterAttemptsByDates(attempt.date, dates))
-  const data = { attempts: filteredAttempts, ...facultyFilteredData }
+  const data = { ...facultyFilteredData, attempts: filteredAttempts }
   const courseFaculties = getCourseFaculties(data.attempts)
   const coursesWithFaculties = data.courses
     .map(c => ({ ...c, facultyStats: courseFaculties[c.code] }))
