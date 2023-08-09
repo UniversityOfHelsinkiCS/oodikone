@@ -215,7 +215,7 @@ const PassFailEnrollments = ({ flat, onlyIamRights }) => {
     if (flat) {
       return courseStatistics.map(course => ({ ...course, code: course.course.code, name: course.course.name }))
     }
-    console.log(modules)
+
     return _.chain(modules)
       .map(({ module, courses }) =>
         group(
