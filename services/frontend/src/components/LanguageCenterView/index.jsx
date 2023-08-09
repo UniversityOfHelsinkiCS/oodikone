@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Divider, Icon, Loader, Radio } from 'semantic-ui-react'
-import SortableTable from 'components/SortableTable'
+import SortableTable, { row } from 'components/SortableTable'
 import useLanguageCenterData from 'redux/languageCenterView'
 import './index.css'
 import useLanguage from 'components/LanguagePicker/useLanguage'
@@ -79,6 +79,23 @@ const getCourseFaculties = attempts => {
   return map
 }
 
+const calculateTotals = coursesWithFaculties => {
+  const facultyStats = {}
+  coursesWithFaculties.forEach(course => {
+    Object.entries(course.facultyStats).forEach(([faculty, stats]) => {
+      if (!facultyStats[faculty]) {
+        facultyStats[faculty] = { notCompleted: 0, completed: 0 }
+      }
+      const oldStats = facultyStats[faculty]
+      if (!oldStats.notCompleted) oldStats.notCompleted = 0
+      if (!oldStats.completed) oldStats.completed = 0
+      oldStats.notCompleted += stats.notCompleted ?? 0
+      oldStats.completed += stats.completed ?? 0
+    })
+  })
+  return { code: 'All courses total', name: { en: '' }, facultyStats }
+}
+
 const filterAttemptsByDates = (date, dates) => {
   const start = dates.startDate?.toDate().getTime() ?? moment(new Date('1900-1-1'))
   const end = dates.endDate?.toDate().getTime() ?? moment(new Date('2100-01-01'))
@@ -102,9 +119,9 @@ const LanguageCenterView = () => {
       attempts: data.attempts.filter(attempt => attempt.faculty?.substring(0, 3).match(`^H\\d`)),
     }
   }
-
+  console.log({ rawData })
   const data = filterFaculties(rawData)
-  data.attempts = data.attempts.filter(attempt => filterAttemptsByDates(attempt.date, dates))
+  // data.attempts = data.attempts.filter(attempt => filterAttemptsByDates(attempt.date, dates))
   const courseFaculties = getCourseFaculties(data.attempts)
   const coursesWithFaculties = data.courses
     .map(c => ({ ...c, facultyStats: courseFaculties[c.code] }))
@@ -112,7 +129,9 @@ const LanguageCenterView = () => {
   const faculties = [...new Set(data.attempts.map(({ faculty }) => faculty))].sort()
 
   console.log({ attempts: data.attempts, courseFaculties, coursesWithFaculties, dates })
-
+  const totals = calculateTotals(coursesWithFaculties)
+  const totalRow = row(totals, { ignoreFilters: true, ignoreSorting: true })
+  console.log({ totals })
   return (
     <div className="languagecenterview">
       <Divider horizontal>Language center statistics</Divider>
@@ -162,7 +181,11 @@ const LanguageCenterView = () => {
         </div>
       </div>
       <div className="languagecenter-table">
-        <SortableTable columns={getColumns(getTextIn, faculties, mode)} data={coursesWithFaculties} stretch />
+        <SortableTable
+          columns={getColumns(getTextIn, faculties, mode)}
+          data={[totalRow, ...coursesWithFaculties]}
+          stretch
+        />
       </div>
     </div>
   )
