@@ -23,8 +23,8 @@ const getColumns = (getTextIn, faculties, mode) => {
       ),
     },
     ...faculties.map(facultyCode => ({
-      key: facultyCode,
-      title: facultyCode,
+      key: facultyCode ?? 'no-faculty',
+      title: facultyCode ?? 'No faculty',
       getRowVal: row => {
         const stats = row.facultyStats[facultyCode]
         if (!stats) return 0
@@ -38,7 +38,7 @@ const getColumns = (getTextIn, faculties, mode) => {
     })),
     {
       key: 'all',
-      title: 'All faculties',
+      title: 'Total',
       getRowVal: row => {
         const objVals = Object.values(row.facultyStats)
         const arr = objVals.map(stat => {
@@ -93,7 +93,7 @@ const calculateTotals = coursesWithFaculties => {
       oldStats.completed += stats.completed ?? 0
     })
   })
-  return { code: 'All courses total', name: { en: '' }, facultyStats }
+  return { code: 'TOTAL', name: { en: 'All courses total' }, facultyStats }
 }
 
 const filterAttemptsByDates = (date, dates) => {
@@ -105,7 +105,6 @@ const filterAttemptsByDates = (date, dates) => {
 const LanguageCenterView = () => {
   const { data: rawData, isFetchingOrLoading, isError } = useLanguageCenterData()
   const { getTextIn } = useLanguage()
-  const [filterOld, setFilterOld] = useState(true)
   const [mode, setMode] = useState('total')
   const [dates, setDates] = useState({ startDate: null, endDate: null })
 
@@ -113,25 +112,23 @@ const LanguageCenterView = () => {
   if (isFetchingOrLoading || !rawData) return <Loader active style={{ marginTop: '15em' }} />
 
   const filterFaculties = data => {
-    if (!filterOld) return data
     return {
       ...data,
-      attempts: data.attempts.filter(attempt => attempt.faculty?.substring(0, 3).match(`^H\\d`)),
+      attempts: data.attempts.filter(attempt => !attempt.faculty || attempt.faculty?.substring(0, 3).match(`^H\\d`)),
     }
   }
-  console.log({ rawData })
-  const data = filterFaculties(rawData)
-  // data.attempts = data.attempts.filter(attempt => filterAttemptsByDates(attempt.date, dates))
+
+  const facultyFilteredData = filterFaculties(rawData)
+  const filteredAttempts = facultyFilteredData.attempts.filter(attempt => filterAttemptsByDates(attempt.date, dates))
+  const data = { attempts: filteredAttempts, ...facultyFilteredData }
   const courseFaculties = getCourseFaculties(data.attempts)
   const coursesWithFaculties = data.courses
     .map(c => ({ ...c, facultyStats: courseFaculties[c.code] }))
     .filter(course => course.facultyStats)
   const faculties = [...new Set(data.attempts.map(({ faculty }) => faculty))].sort()
 
-  console.log({ attempts: data.attempts, courseFaculties, coursesWithFaculties, dates })
   const totals = calculateTotals(coursesWithFaculties)
   const totalRow = row(totals, { ignoreFilters: true, ignoreSorting: true })
-  console.log({ totals })
   return (
     <div className="languagecenterview">
       <Divider horizontal>Language center statistics</Divider>
@@ -190,10 +187,5 @@ const LanguageCenterView = () => {
     </div>
   )
 }
-/*        <Toggle
-          firstLabel="All faculties"
-          secondLabel="Filter out old faculties"
-          value={filterOld}
-          setValue={setFilterOld}
-        /> */
+
 export default LanguageCenterView
