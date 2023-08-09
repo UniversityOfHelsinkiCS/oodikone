@@ -6,7 +6,7 @@ const moment = require('moment')
 const { redisClient } = require('../services/redis')
 const _ = require('lodash')
 const { Op, col, where, fn } = require('sequelize')
-
+const logger = require('../util/logger')
 const REDIS_KEY = 'STUDYRIGHT_ASSOCIATIONS_V2'
 
 const byStudent = studentNumber => {
@@ -277,6 +277,7 @@ const calculateAssociationsFromDb = async (chunksize = 100000) => {
     })
     offset += chunksize
   }
+  logger.info('Associations debug log: ', associations.programmes.MH80_003)
   return associations
 }
 
