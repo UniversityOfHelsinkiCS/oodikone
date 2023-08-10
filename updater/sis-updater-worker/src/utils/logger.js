@@ -62,7 +62,7 @@ if (isDev) {
         protocol: 'udp',
         hostName: os.hostname(),
         additional: {
-          app: 'updater-scheduler',
+          app: 'updater-worker',
           environment: 'production',
         },
       })
