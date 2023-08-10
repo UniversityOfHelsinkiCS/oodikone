@@ -6,7 +6,6 @@ const moment = require('moment')
 const { redisClient } = require('../services/redis')
 const _ = require('lodash')
 const { Op, col, where, fn } = require('sequelize')
-const logger = require('../util/logger')
 const REDIS_KEY = 'STUDYRIGHT_ASSOCIATIONS_V2'
 
 const byStudent = studentNumber => {
@@ -166,9 +165,11 @@ const associatedStudyrightElements = async (offset, limit) => {
         attributes: ['type', 'name', 'code'],
       },
     },
+    order: [['studyrightid', 'DESC']],
+    // ^Use order when chunking with offset & limit,
+    // otherwise results are random and there will be misses
     limit,
     offset,
-    subQuery: false, // Do not include sub queries to count towards the limit
   })
   const groupings = studyrights.map(({ studyright_elements: sres }) =>
     sres.map(sre => ({
@@ -187,7 +188,6 @@ const StudyRightType = {
 }
 
 const calculateAssociationsFromDb = async (chunksize = 100000) => {
-  // bottlenecked by Studyright.findAll in associatedStudyrightElements()
   const transfers = await Transfer.findAll({
     attributes: ['studyrightid'],
   })
@@ -228,9 +228,10 @@ const calculateAssociationsFromDb = async (chunksize = 100000) => {
           const momentstartdate = moment(startdate)
           const enrollment = momentstartdate.isValid() ? getEnrollmentStartYear(momentstartdate) : null
           const enrollmentStartYears = associations.programmes[code].enrollmentStartYears
-          enrollmentStartYears[enrollment] = enrollmentStartYears[enrollment] || {
-            studyTracks: {},
-          }
+          if (!enrollmentStartYears[enrollment])
+            enrollmentStartYears[enrollment] = {
+              studyTracks: {},
+            }
           const enrollmentStartYear = enrollmentStartYears[enrollment]
 
           group
@@ -277,7 +278,7 @@ const calculateAssociationsFromDb = async (chunksize = 100000) => {
     })
     offset += chunksize
   }
-  logger.info('Associations debug log: ', associations.programmes.MH80_003)
+
   return associations
 }
 
