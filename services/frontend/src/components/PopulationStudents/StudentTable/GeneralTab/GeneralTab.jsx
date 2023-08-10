@@ -200,7 +200,7 @@ const GeneralTab = ({
     event.stopPropagation()
     const studentsInfo = selectedStudents.map(number => students[number])
     const list = studentsInfo.filter(s => s[fieldName] && !s.obfuscated).map(s => s[fieldName])
-    const clipboardString = list.join('; ')
+    const clipboardString = list.join(';')
     navigator.clipboard.writeText(clipboardString)
   }
 
