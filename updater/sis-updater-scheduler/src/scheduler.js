@@ -105,8 +105,9 @@ const scheduleFromDb = async ({
   if (limit) knexBuilder.limit(limit)
   if (whereIn) knexBuilder.whereIn(...whereIn)
   if (!clean) {
-    const lastHourlySchedule = await redisGet(REDIS_LAST_HOURLY_SCHEDULE)
-    if (lastHourlySchedule) knexBuilder.where('updated_at', '>=', new Date(lastHourlySchedule))
+    const lastHourlyScheduleFromRedis = await redisGet(REDIS_LAST_HOURLY_SCHEDULE)
+    const lastHourlySchedule = lastHourlyScheduleFromRedis ?? new Date(new Date().setHours(0, 0, 0, 0))
+    knexBuilder.where('updated_at', '>=', new Date(lastHourlySchedule))
   }
   const entities = await knexBuilder
   await eachLimit(chunk(entities, CHUNK_SIZE), 10, async e => await createJobs(e, scheduleId || table))
@@ -162,9 +163,10 @@ const scheduleStudents = async () => {
 }
 
 const getHourlyPersonsToUpdate = async () => {
+  logger.info('Getting hourly persons to update')
   const { knex } = knexConnection
-  const lastHourlySchedule = await redisGet(REDIS_LAST_HOURLY_SCHEDULE)
-
+  const lastHourlyScheduleFromRedis = await redisGet(REDIS_LAST_HOURLY_SCHEDULE)
+  const lastHourlySchedule = lastHourlyScheduleFromRedis ?? new Date(new Date().setHours(0, 0, 0, 0))
   const getUpdatedFrom = (table, pluck) => {
     const builder = knex(table).pluck(pluck)
     if (lastHourlySchedule) builder.where('updated_at', '>=', new Date(lastHourlySchedule))
