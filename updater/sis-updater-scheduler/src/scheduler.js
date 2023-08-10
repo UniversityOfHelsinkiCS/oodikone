@@ -115,6 +115,7 @@ const scheduleFromDb = async ({
 }
 
 const scheduleMeta = async (clean = true) => {
+  logger.info('Scheduled meta')
   await scheduleFromDb({
     table: IMPORTER_TABLES.organisations,
     clean,
@@ -153,6 +154,7 @@ const scheduleMeta = async (clean = true) => {
 }
 
 const scheduleStudents = async () => {
+  logger.info('Scheduled students')
   await scheduleFromDb({
     scheduleId: 'students',
     table: IMPORTER_TABLES.persons,
@@ -200,6 +202,7 @@ const getHourlyPersonsToUpdate = async () => {
 }
 
 const scheduleByStudentNumbers = async studentNumbers => {
+  logger.info('Scheduling by student numbers')
   const { knex } = knexConnection
   const personsToUpdate = await knex('persons').column('id', 'student_number').whereIn('student_number', studentNumbers)
 
@@ -211,6 +214,7 @@ const scheduleByStudentNumbers = async studentNumbers => {
 }
 
 const scheduleByCourseCodes = async courseCodes => {
+  logger.info('Scheduling course codes')
   const { knex } = knexConnection
   const coursesToUpdate = await knex(IMPORTER_TABLES.courseUnits)
     .whereIn('code', courseCodes)
@@ -245,6 +249,7 @@ const scheduleHourly = async () => {
 }
 
 const scheduleProgrammes = async () => {
+  logger.info('Scheduling programmes')
   const { knex } = knexConnection
 
   const modules = await knex('modules').where({ type: 'DegreeProgramme' })

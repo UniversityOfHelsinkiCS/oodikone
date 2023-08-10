@@ -58,6 +58,7 @@ const scheduleJob = async type => {
 
 const handleImmediates = async () => {
   try {
+    logger.info('Handling immediates')
     await Promise.all(SCHEDULE_IMMEDIATE.map(scheduleJob))
 
     if (EXIT_AFTER_IMMEDIATES) {
@@ -78,16 +79,15 @@ const handleImmediates = async () => {
 knexConnection.on('connect', async () => {
   logger.info('Knex database connection established successfully')
   startServer()
-
   await handleImmediates()
 
   // Monday-Friday at every minute 30
   scheduleCron('30 * * * 1-5', async () => {
     // If updater is currently running, then return
     if ((await isUpdaterActive()) || isDev) return
-    logger.info('Starting hourly')
 
     try {
+      logger.info('Starting hourly')
       await scheduleHourly()
     } catch (e) {
       logger.error({
@@ -100,10 +100,9 @@ knexConnection.on('connect', async () => {
   })
 
   // Every day at 3 AM
-
   scheduleCron('0 3 * * *', async () => {
     if (isDev) return
-
+    logger.info('Starting daily')
     try {
       await scheduleDaily()
     } catch (e) {
