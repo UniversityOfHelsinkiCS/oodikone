@@ -7,6 +7,8 @@ const sentry = require('winston-sentry-log')
 const { isDev, isStaging, isProduction, sentryRelease, sentryEnvironment, runningInCI } = require('../config')
 const { combine, timestamp, printf, splat } = winston.format
 
+const formatDate = timestamp => new Date(timestamp).toLocaleString('fi-FI')
+
 let transports = []
 
 if (isProduction && !isStaging && !runningInCI) {
@@ -24,7 +26,7 @@ if (isProduction && !isStaging && !runningInCI) {
 
 if (isDev) {
   const devFormat = printf(
-    ({ level, message, timestamp, ...rest }) => `${timestamp} ${level}: ${message} ${JSON.stringify(rest)}`
+    ({ level, message, timestamp, ...rest }) => `${formatDate(timestamp)} ${level}: ${message} ${JSON.stringify(rest)}`
   )
 
   transports.push(
@@ -44,14 +46,15 @@ if (isDev) {
     silly: 6,
   }
 
-  const prodFormat = winston.format.printf(({ level, ...rest }) =>
+  const prodFormat = printf(({ level, timestamp, ...rest }) =>
     JSON.stringify({
       level: levels[level],
+      timestamp: formatDate(timestamp),
       ...rest,
     })
   )
 
-  transports.push(new winston.transports.Console({ format: prodFormat }))
+  transports.push(new winston.transports.Console({ format: combine(splat(), timestamp(), prodFormat) }))
 
   if (isProduction && !isStaging) {
     transports.push(
