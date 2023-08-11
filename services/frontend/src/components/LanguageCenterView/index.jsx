@@ -6,10 +6,11 @@ import './index.css'
 import useLanguage from 'components/LanguagePicker/useLanguage'
 import moment from 'moment'
 import { useGetSemestersQuery } from 'redux/semesters'
+import { useGetFacultiesQuery } from 'redux/facultyStats'
 
 const shorten = (text, maxLength) => (text.length > maxLength ? `${text.substring(0, maxLength)} ... ` : text)
 
-const getColumns = (getTextIn, faculties, mode) => {
+const getColumns = (getTextIn, faculties, mode, facultyMap) => {
   const columns = [
     {
       key: 'course-name',
@@ -25,6 +26,7 @@ const getColumns = (getTextIn, faculties, mode) => {
     ...faculties.map(facultyCode => ({
       key: facultyCode ?? 'no-faculty',
       title: facultyCode ?? 'No faculty',
+      headerProps: { title: getTextIn(facultyMap[facultyCode]) },
       getRowVal: row => {
         const stats = row.facultyStats[facultyCode]
         if (!stats) return 0
@@ -103,6 +105,16 @@ const filterAttemptsByDates = (date, { startDate, endDate }) => {
 }
 
 const LanguageCenterView = () => {
+  const facultyQuery = useGetFacultiesQuery()
+  const facultyMap = useMemo(
+    () =>
+      facultyQuery.data?.reduce((obj, cur) => {
+        obj[cur.code] = cur.name
+        return obj
+      }, {}),
+    [facultyQuery?.data]
+  )
+
   const { data: rawData, isFetchingOrLoading, isError } = useLanguageCenterData()
   const { getTextIn } = useLanguage()
   const [mode, setMode] = useState('total')
@@ -230,7 +242,7 @@ const LanguageCenterView = () => {
         </div>
       </div>
       <div className="languagecenter-table">
-        <SortableTable columns={getColumns(getTextIn, faculties, filters.mode)} data={tableData} stretch />
+        <SortableTable columns={getColumns(getTextIn, faculties, filters.mode, facultyMap)} data={tableData} stretch />
       </div>
     </div>
   )
