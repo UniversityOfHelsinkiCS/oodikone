@@ -1,11 +1,11 @@
-import React, { useState } from 'react'
-import { Divider, Icon, Loader, Radio } from 'semantic-ui-react'
+import React, { useEffect, useMemo, useState } from 'react'
+import { Divider, Dropdown, Icon, Loader, Radio, Button } from 'semantic-ui-react'
 import SortableTable, { row } from 'components/SortableTable'
 import useLanguageCenterData from 'redux/languageCenterView'
 import './index.css'
 import useLanguage from 'components/LanguagePicker/useLanguage'
-import DateTimeSelector from 'components/DateTimeSelector'
 import moment from 'moment'
+import { useGetSemestersQuery } from 'redux/semesters'
 
 const shorten = (text, maxLength) => (text.length > maxLength ? `${text.substring(0, maxLength)} ... ` : text)
 
@@ -96,9 +96,9 @@ const calculateTotals = coursesWithFaculties => {
   return { code: 'TOTAL', name: { en: 'All courses total' }, facultyStats }
 }
 
-const filterAttemptsByDates = (date, dates) => {
-  const start = dates.startDate ?? moment(new Date('1900-1-1'))
-  const end = dates.endDate ?? moment(new Date('2100-01-01'))
+const filterAttemptsByDates = (date, { startDate, endDate }) => {
+  const start = startDate.startdate ?? moment(new Date('1900-1-1'))
+  const end = endDate.enddate ?? moment(new Date('2100-01-01'))
   return moment(new Date(date)).isBetween(start, end)
 }
 
@@ -106,9 +106,27 @@ const LanguageCenterView = () => {
   const { data: rawData, isFetchingOrLoading, isError } = useLanguageCenterData()
   const { getTextIn } = useLanguage()
   const [mode, setMode] = useState('total')
-  const [dates, setDates] = useState({ startDate: null, endDate: null })
-  if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
-  if (isFetchingOrLoading || !rawData) return <Loader active style={{ marginTop: '15em' }} />
+  const semesterQuery = useGetSemestersQuery()
+  const semesters =
+    semesterQuery.isSuccess &&
+    semesterQuery.data?.semesters &&
+    Object.values(semesterQuery.data.semesters).filter(
+      sem => sem.semestercode >= 133 && new Date(sem.startdate).getFullYear() <= new Date().getFullYear()
+    )
+  const [dates, setDates] = useState(null)
+  const [filters, setFilters] = useState({ mode, ...dates })
+  const [faculties, setFaculties] = useState([])
+
+  useEffect(() => {
+    if (!dates && semesters)
+      setDates({
+        startDate: semesters[0],
+        endDate: semesters[semesters.length - 1],
+      })
+    if (!filters.startDate || !filters.endDate) {
+      setFilters({ ...filters, startDate: semesters[0], endDate: semesters[semesters.length - 1] })
+    }
+  }, [semesters])
 
   const filterFaculties = data => {
     return {
@@ -117,30 +135,54 @@ const LanguageCenterView = () => {
     }
   }
 
-  const facultyFilteredData = filterFaculties(rawData)
-  const filteredAttempts = facultyFilteredData.attempts.filter(attempt => filterAttemptsByDates(attempt.date, dates))
-  const data = { ...facultyFilteredData, attempts: filteredAttempts }
-  const courseFaculties = getCourseFaculties(data.attempts)
-  const coursesWithFaculties = data.courses
-    .map(c => ({ ...c, facultyStats: courseFaculties[c.code] }))
-    .filter(course => course.facultyStats)
-  const faculties = [...new Set(data.attempts.map(({ faculty }) => faculty))].sort()
+  const tableData = useMemo(() => {
+    if (!rawData) return []
+    const facultyFilteredData = filterFaculties(rawData)
 
-  const totals = calculateTotals(coursesWithFaculties)
-  const totalRow = row(totals, { ignoreFilters: true, ignoreSorting: true })
+    const filteredAttempts =
+      !filters.startDate || !filters.endDate
+        ? facultyFilteredData.attempts
+        : facultyFilteredData.attempts.filter(attempt => filterAttemptsByDates(attempt.date, filters))
+
+    const data = { ...facultyFilteredData, attempts: filteredAttempts }
+    const newFaculties = [...new Set(data.attempts.map(({ faculty }) => faculty))].sort()
+    setFaculties(newFaculties)
+    const courseFaculties = getCourseFaculties(data.attempts)
+
+    const coursesWithFaculties = data.courses
+      .map(c => ({ ...c, facultyStats: courseFaculties[c.code] }))
+      .filter(course => course.facultyStats)
+    const totals = calculateTotals(coursesWithFaculties)
+    const totalRow = row(totals, { ignoreFilters: true, ignoreSorting: true })
+    return [totalRow, ...coursesWithFaculties]
+  }, [rawData, filters])
+
+  if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
+  if (isFetchingOrLoading || !rawData) return <Loader active style={{ marginTop: '15em' }} />
+
   return (
     <div className="languagecenterview">
       <Divider horizontal>Language center statistics</Divider>
       <div className="options-container">
         <div className="datepicker-container">
           <div className="calendar-icon-container">
-            <Icon size="huge" name="calendar alternate outline" />
+            <Icon size="big" name="calendar alternate outline" />
           </div>
           <div className="datepicker-acual-container">
             <b>From</b>
-            <DateTimeSelector onChange={value => setDates({ ...dates, startDate: value })} value={dates.startDate} />
+            <SemesterSelector
+              setSemester={semester => setDates({ ...dates, startDate: semester })}
+              semester={dates.startDate}
+              allSemesters={semesters}
+            />
             <b>Until</b>
-            <DateTimeSelector onChange={value => setDates({ ...dates, endDate: value })} value={dates.endDate} />
+            <SemesterSelector
+              allSemesters={semesters.filter(s => {
+                return dates.startDate.semestercode <= s.semestercode
+              })}
+              setSemester={semester => setDates({ ...dates, endDate: semester })}
+              semester={dates.endDate}
+            />
           </div>
         </div>
         <div className="completion-container">
@@ -151,7 +193,7 @@ const LanguageCenterView = () => {
             <Radio
               name="modeRadioGroup"
               value="notCompleted"
-              label="Not completed"
+              label="Enrolled but not passed"
               onChange={() => setMode('notCompleted')}
               checked={mode === 'notCompleted'}
             />
@@ -160,7 +202,7 @@ const LanguageCenterView = () => {
             <Radio
               name="modeRadioGroup"
               value="completed"
-              label="Completed"
+              label="Passed"
               onChange={() => setMode('completed')}
               checked={mode === 'completed'}
             />
@@ -175,14 +217,41 @@ const LanguageCenterView = () => {
             />
           </div>
         </div>
+        <div className="button-container">
+          <Button
+            disabled={
+              filters.startDate === dates.startDate && filters.endDate === dates.endDate && filters.mode === mode
+            }
+            onClick={() => setFilters({ mode, ...dates })}
+            color="green"
+          >
+            Apply filters
+          </Button>
+        </div>
       </div>
       <div className="languagecenter-table">
-        <SortableTable
-          columns={getColumns(getTextIn, faculties, mode)}
-          data={[totalRow, ...coursesWithFaculties]}
-          stretch
-        />
+        <SortableTable columns={getColumns(getTextIn, faculties, filters.mode)} data={tableData} stretch />
       </div>
+    </div>
+  )
+}
+
+const SemesterSelector = ({ allSemesters, semester, setSemester }) => {
+  const { getTextIn } = useLanguage()
+  const currentValue =
+    allSemesters.find(({ semestercode }) => semester.semestercode === semestercode) ?? allSemesters[0]
+  const options = useMemo(
+    () => allSemesters.map(s => ({ key: s.semestercode, text: getTextIn(s.name), value: s.semestercode })),
+    [allSemesters]
+  )
+
+  return (
+    <div>
+      <Dropdown
+        onChange={(_, { value }) => setSemester(allSemesters.find(({ semestercode }) => semestercode === value))}
+        value={currentValue.semestercode}
+        options={options}
+      />
     </div>
   )
 }
