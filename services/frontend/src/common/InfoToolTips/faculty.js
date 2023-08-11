@@ -13,7 +13,7 @@ export default {
   
   **Transferred inside**: Sisältää kyseisenä vuonna tiedekunnan sisällä siirtyneet opiskelijat (opinto-oikeudet). Ohjelmakohtaisissa tilastoissa siirto on laskettu kohdeohjelman tilastoihin.
 
-  **Transferred away**: Sisältää kyseisenä vuonna pois tiedekunnasta siirtyneet opiskelijat (opinto-oikeudet). Sama opiskelija voi esiintyä tilastoissa useana vuonna, mikäli hän on siirtynyt tiedekuntaan ja siitä pois useasti.
+  **Transferred away**: Sisältää opiskelijat, joiden opinto-oikeuden vastuutiedekunta on muuttunut kyseisen vuoden aikana. Sama opiskelija voi esiintyä tilastoissa useana vuonna, mikäli vastuutiedekunta on muuttunut useasti takaisin tiedekuntaan ja pois siitä.
   
   **Transferred to**: Sisältää kyseisenä vuonna tiedekuntaan siirtyneet opiskelijat (opinto-oikeudet).
 
