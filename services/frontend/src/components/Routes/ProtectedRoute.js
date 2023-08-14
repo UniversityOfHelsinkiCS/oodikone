@@ -17,7 +17,9 @@ const NoAccessToPageBanner = () => (
 )
 
 const ProtectedRoute = ({ requiredRoles = [], requireUserHasRights = false, ...rest }) => {
-  const { rights, iamRights, isAdmin, roles } = useGetAuthorizedUserQuery()
+  const user = useGetAuthorizedUserQuery()
+  const { rights, iamRights, iamGroups, isAdmin, roles } = user
+
   const hasAccessToRoute = () => {
     if (isAdmin) return true
     const hasRequiredRoles = requiredRoles.length > 0 ? checkUserAccess(requiredRoles, roles) : true
@@ -33,6 +35,9 @@ const ProtectedRoute = ({ requiredRoles = [], requireUserHasRights = false, ...r
     }
     if (rest.path.includes('completedcoursessearch')) {
       return hasRequiredRoles || hasRequiredRights
+    }
+    if (rest.path.includes('languagecenterview')) {
+      return iamGroups.includes('grp-kielikeskus-esihenkilot')
     }
     return hasRequiredRoles && hasRequiredRights
   }

@@ -44,7 +44,7 @@ const allNavigationItems = {
 }
 
 const NavigationBar = () => {
-  const { isLoading, rights, iamRights, mockedBy, userId, roles, isAdmin } = useGetAuthorizedUserQuery()
+  const { isLoading, rights, iamRights, iamGroups, mockedBy, userId, roles, isAdmin } = useGetAuthorizedUserQuery()
   const showAsUser = useShowAsUser()
   const [logout] = useLogoutMutation()
 
@@ -59,7 +59,12 @@ const NavigationBar = () => {
         if (!checkUserAccess(['admin', 'studyGuidanceGroups'], roles) && rights.length === 0) return
       }
       if (key === 'customPopulations') {
-        if (!checkUserAccess(['admin', 'studyGuidanceGroups', 'openUniSearch'], roles) && rights.length === 0) return
+        if (
+          !checkUserAccess(['admin', 'studyGuidanceGroups', 'openUniSearch'], roles) &&
+          rights.length === 0 &&
+          !iamGroups.includes('grp-kielikeskus-esihenkilot')
+        )
+          return
       } else if (key === 'courseStatistics') {
         if (!checkUserAccess(['courseStatistics', 'admin'], roles) && rights.length === 0) return
       } else if (key === 'faculty') {
@@ -94,7 +99,11 @@ const NavigationBar = () => {
       item.key === 'completedCoursesSearch'
     )
       return true
-    if (checkUserAccess(['admin'], roles) && item.key === 'languageCenterView') return true
+    if (
+      (checkUserAccess(['admin'], roles) || iamGroups.includes('grp-kielikeskus-esihenkilot')) &&
+      item.key === 'languageCenterView'
+    )
+      return true
     return false
   }
 
