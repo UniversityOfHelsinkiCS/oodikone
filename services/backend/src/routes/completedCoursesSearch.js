@@ -1,5 +1,7 @@
 const router = require('express').Router()
 const { getCompletedCourses } = require('../services/completedCoursesSearch')
+const { getImporterClient } = require('../util/importerClient')
+const importerClient = getImporterClient()
 const _ = require('lodash')
 const {
   getOpenUniSearches,
@@ -7,15 +9,32 @@ const {
   deleteSearch,
   updateSearch,
 } = require('../services/openUni/openUniManageSearches')
+const logger = require('../util/logger')
 
 router.get('/', async (req, res) => {
   const studentNumbers = JSON.parse(req.query?.studentlist) || []
   const courseCodes = JSON.parse(req.query?.courselist) || []
   const {
-    user: { isAdmin, studentsUserCanAccess },
+    user: { isAdmin, studentsUserCanAccess, sisPersonId: teacherId },
   } = req
   if (!Array.isArray(studentNumbers)) return res.status(400).json({ error: 'Student numbers must be of type array' })
   if (!Array.isArray(courseCodes)) return res.status(400).json({ error: 'Courses must be of type array' })
+
+  const answerTimeout = new Promise(resolve => setTimeout(resolve, 6000))
+
+  try {
+    // Teachers also can get rights to students via importer if the students
+    // have enrolled to their courses in last 8 months
+    // (acual logic a bit different, see importer)
+    const teacherRightsToStudents = await Promise.race([
+      importerClient.post(`/teacher-rights/`, { teacherId, studentNumbers }),
+      answerTimeout,
+    ])
+    if (teacherRightsToStudents && Array.isArray(teacherRightsToStudents.data))
+      studentsUserCanAccess.push(...teacherRightsToStudents.data)
+  } catch (e) {
+    logger.error(`Importer teacher-rights request failed with message: ${e?.message}`)
+  }
 
   const filteredStudentNumbers = isAdmin ? studentNumbers : _.intersection(studentNumbers, studentsUserCanAccess)
   const completedCourses = await getCompletedCourses(filteredStudentNumbers, courseCodes)
