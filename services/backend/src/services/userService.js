@@ -300,10 +300,11 @@ const getMockedUser = async ({ userToMock, mockedBy }) => {
     iamRights,
     specialGroup,
     mockedBy,
+    iamGroups: userFromDb.iamGroups,
   }
   userDataCache.set(userToMock, toReturn)
 
-  return { ...toReturn, iamGroups: userFromDb.iamGroups }
+  return toReturn
 }
 
 const getUser = async ({ username, name, email, iamGroups, iamRights, specialGroup, sisId }) => {
@@ -324,6 +325,7 @@ const getUser = async ({ username, name, email, iamGroups, iamRights, specialGro
   })
 
   const userFromDb = await byUsername(username)
+  userFromDb.iamGroups = await getUserIams(userFromDb.sisu_person_id)
   const formattedUser = await formatUser(userFromDb, specialGroup.kosu ? iamRights : [])
 
   const { newAccessGroups } = await updateAccessGroups(username, iamGroups, specialGroup, sisId)
@@ -333,6 +335,7 @@ const getUser = async ({ username, name, email, iamGroups, iamRights, specialGro
   const toReturn = {
     ...formattedUser,
     iamRights,
+    iamGroups: userFromDb.iamGroups,
     roles: newAccessGroups,
   }
   userDataCache.set(username, toReturn)
