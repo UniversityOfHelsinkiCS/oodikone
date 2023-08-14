@@ -170,7 +170,7 @@ const LanguageCenterView = () => {
   }, [rawData, filters])
 
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
-  if (isFetchingOrLoading || !rawData) return <Loader active style={{ marginTop: '15em' }} />
+  if (isFetchingOrLoading || !rawData || !dates || !semesters) return <Loader active style={{ marginTop: '15em' }} />
 
   return (
     <div className="languagecenterview">
@@ -184,16 +184,16 @@ const LanguageCenterView = () => {
             <b>From</b>
             <SemesterSelector
               setSemester={semester => setDates({ ...dates, startDate: semester })}
-              semester={dates.startDate}
+              semester={dates?.startDate}
               allSemesters={semesters}
             />
             <b>Until</b>
             <SemesterSelector
-              allSemesters={semesters.filter(s => {
+              allSemesters={semesters?.filter(s => {
                 return dates.startDate.semestercode <= s.semestercode
               })}
               setSemester={semester => setDates({ ...dates, endDate: semester })}
-              semester={dates.endDate}
+              semester={dates?.endDate}
             />
           </div>
         </div>
