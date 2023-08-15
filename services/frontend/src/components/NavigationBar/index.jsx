@@ -57,14 +57,6 @@ const NavigationBar = () => {
       }
       if (key === 'students') {
         if (!checkUserAccess(['admin', 'studyGuidanceGroups'], roles) && rights.length === 0) return
-      }
-      if (key === 'customPopulations') {
-        if (
-          !checkUserAccess(['admin', 'studyGuidanceGroups', 'openUniSearch'], roles) &&
-          rights.length === 0 &&
-          !iamGroups.includes('grp-kielikeskus-esihenkilot')
-        )
-          return
       } else if (key === 'courseStatistics') {
         if (!checkUserAccess(['courseStatistics', 'admin'], roles) && rights.length === 0) return
       } else if (key === 'faculty') {
@@ -94,11 +86,7 @@ const NavigationBar = () => {
     if (checkUserAccess(['openUniSearch', 'admin'], roles) && item.key === 'openUniSearch') return true
     if ((checkUserAccess(['studyGuidanceGroups', 'admin'], roles) || rights.length > 0) && item.key === 'customSearch')
       return true
-    if (
-      (checkUserAccess(['studyGuidanceGroups', 'admin'], roles) || rights.length > 0) &&
-      item.key === 'completedCoursesSearch'
-    )
-      return true
+    if (item.key === 'completedCoursesSearch') return true
     if (
       (checkUserAccess(['admin'], roles) || iamGroups.includes('grp-kielikeskus-esihenkilot')) &&
       item.key === 'languageCenterView'
