@@ -183,7 +183,12 @@ const LanguageCenterView = () => {
           <div className="datepicker-acual-container">
             <b>From</b>
             <SemesterSelector
-              setSemester={semester => setDates({ ...dates, startDate: semester })}
+              setSemester={semester => {
+                setDates({
+                  endDate: dates.endDate.semestercode < semester.semestercode ? semester : dates.endDate,
+                  startDate: semester,
+                })
+              }}
               semester={dates?.startDate}
               allSemesters={semesters}
             />
