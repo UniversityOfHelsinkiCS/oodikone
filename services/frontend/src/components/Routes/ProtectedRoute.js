@@ -33,9 +33,6 @@ const ProtectedRoute = ({ requiredRoles = [], requireUserHasRights = false, ...r
     if (rest.path.includes('custompopulation')) {
       return hasRequiredRoles || hasRequiredRights
     }
-    if (rest.path.includes('completedcoursessearch')) {
-      return hasRequiredRoles || hasRequiredRights
-    }
     if (rest.path.includes('languagecenterview')) {
       return iamGroups.includes('grp-kielikeskus-esihenkilot')
     }

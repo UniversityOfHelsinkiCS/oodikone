@@ -112,13 +112,7 @@ const Routes = () => (
         path={routes.customOpenUniPopulation}
         component={CustomOpenUniPopulations}
       />
-      <ProtectedRoute
-        requiredRoles={['admin', 'studyGuidanceGroups']}
-        requireUserHasRights
-        exact
-        path={routes.completedCoursesSearch}
-        component={CompletedCourses}
-      />
+      <ProtectedRoute exact path={routes.completedCoursesSearch} component={CompletedCourses} />
       <ProtectedRoute requiredRoles={['admin']} requireUserHasRights exact path={routes.updater} component={Updater} />
       <ProtectedRoute
         requiredRoles={['studyGuidanceGroups']}
