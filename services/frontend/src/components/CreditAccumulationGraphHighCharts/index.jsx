@@ -296,7 +296,7 @@ const filterGraduations = (student, selectedStudyRight, getTextIn) => {
         : []
       let elemName = ''
       if (studyrightElem.length > 0) {
-        elemName = getTextIn(studyrightElem[0].element_detail?.name)
+        elemName = getTextIn(_.orderBy(studyrightElem, 'enddate', 'desc')[0].element_detail?.name)
       }
       return {
         value: new Date(enddate).getTime(),
