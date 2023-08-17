@@ -155,6 +155,7 @@ const getFacultyGraduates = async (
     }
     graduatedRights.forEach(({ enddate, extentcode, studyrightElements }) => {
       const { programme, programmeName } = findRightProgramme(studyrightElements, code)
+      if (!studyrightElements.find(sre => new Date(sre.enddate).getTime() === new Date(enddate).getTime())) return
       let programmeId = programme
 
       if (keys.includes(programme)) {
