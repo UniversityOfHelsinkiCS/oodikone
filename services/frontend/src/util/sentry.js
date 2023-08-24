@@ -6,7 +6,7 @@ const initializeSentry = () => {
   if (!sentryRelease || !sentryEnvironment || runningInCypress) return
 
   Sentry.init({
-    dsn: 'https://020b79f0cbb14aad94cc9d69a1ea9d52@sentry.cs.helsinki.fi/2',
+    dsn: 'https://b6d3f10ac9a2c333461c74312bfb71d1@toska.cs.helsinki.fi/14',
     environment: sentryEnvironment,
     release: sentryRelease,
     integrations: [new Integrations.BrowserTracing()],
