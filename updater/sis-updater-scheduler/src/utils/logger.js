@@ -14,7 +14,7 @@ let transports = []
 if (isProduction && !isStaging && !runningInCI) {
   const options = {
     config: {
-      dsn: 'https://5fe012d12b7448d3b937f20ea941a8e5@sentry.cs.helsinki.fi/10',
+      dsn: 'https://b9947dc630a74f00b4db6afd50cfa906@toska.cs.helsinki.fi/17',
       environment: sentryEnvironment,
       release: sentryRelease,
     },
