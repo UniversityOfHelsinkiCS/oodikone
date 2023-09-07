@@ -33,7 +33,9 @@ export default {
 
   **Non-degree students**: Opiskelijat, joilla ei ole tutkinto-oikeutta Helsingin yliopistossa.
     
-  **Transferred credits**: Sisältää opintopisteet, jotka on suoritettu kyseisenä vuonna, ja hyväksiluettu tähän koulutusohjelmaan. Mukana ovat kaikenlaisilla opinto-oikeuksilla hyväksiluetut opintopisteet
+  **Transferred credits**: Sisältää opintopisteet, jotka on suoritettu kyseisenä vuonna, ja hyväksiluettu tähän koulutusohjelmaan. Mukana ovat kaikenlaisilla opinto-oikeuksilla hyväksiluetut opintopisteet. **Luku ei sisälly total-sarakkeeseen**.
+
+  **Type**: Kertoo onko kyseessä kurssi vai opintokokonaisuus.
   `,
   StudentsOfProgrammeCourses: `
   Sisältää kurssien opiskelijat.
@@ -45,7 +47,9 @@ export default {
   **Non-major students**: Sisältää kurssin opiskelijat, joilla EI ole ollut suoritushetkellä ensisijaista opinto-oikeutta kyseiseen koulutusohjelmaan. Sisältää
   esimerkiksi vaihto-opiskelijat ja erillis-opinto-oikeudella opiskelevat.
 
-  **Transferred students**: Sisältää opiskelijat, jotka ovat suorittaneet kyseisenä vuonna hyväksiluettuja opintopisteitä tähän koulutusohjelmaan. Mukana ovat kaikenlaisilla opinto-oikeuksilla hyväksiluetut opintopisteet
+  **Transferred students**: Sisältää opiskelijat, jotka ovat suorittaneet kyseisenä vuonna hyväksiluettuja opintopisteitä tähän koulutusohjelmaan. Mukana ovat kaikenlaisilla opinto-oikeuksilla hyväksiluetut opintopisteet. Lukua **ei lasketa mukaan Total-sarakkeeseen**.
+
+  **Type**: Kertoo onko kyseessä kurssi vai opintokokonaisuus.
   `,
   GraduatedAndThesisWritersOfTheProgramme: `
   **Wrote thesis**: Sisältää kyseisenä vuonna kandidaatintutkielman tai pro gradu-tutkielman hyväksytysti suorittaneet opiskelijat. Mukana ei ole mahdollisia arvosanan korotuksia.
