@@ -38,6 +38,7 @@ const studytrackStudents = async studentnumbers =>
         separate: true,
         attributes: ['credits', 'attainment_date'],
         where: {
+          isStudyModule: false,
           credittypecode: {
             [Op.in]: [4, 9],
           },
