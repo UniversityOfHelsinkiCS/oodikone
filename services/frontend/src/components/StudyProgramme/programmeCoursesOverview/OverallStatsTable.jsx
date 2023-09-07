@@ -227,8 +227,12 @@ const getColumns = (getTextIn, showStudents) => {
       },
     ]
   }
-
-  return columns
+  const typeColumn = {
+    key: 'type',
+    title: 'Type',
+    getRowVal: course => (course.isStudyModule ? 'Module' : 'Course'),
+  }
+  return [...columns, typeColumn]
 }
 
 const OverallStatsTable = ({ data, showStudents }) => {

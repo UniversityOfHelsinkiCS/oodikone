@@ -38,7 +38,6 @@ const studytrackStudents = async studentnumbers =>
         separate: true,
         attributes: ['credits', 'attainment_date'],
         where: {
-          isStudyModule: false,
           credittypecode: {
             [Op.in]: [4, 9],
           },
@@ -537,29 +536,30 @@ const getStudentsForProgrammeCourses = async (from, to, programmeCourses) => {
       `
       WITH Dist AS (
         SELECT DISTINCT cr.student_studentnumber AS student, cr.credits AS credits, 
-         co.code AS code, co.name AS course_name FROM credit cr
+         co.code AS code, co.name AS course_name, cr."isStudyModule" FROM credit cr
          INNER JOIN course co ON cr.course_code = co.code
          WHERE cr.attainment_date BETWEEN :from AND :to
          AND cr.course_code IN (:programmeCourses)
-         AND (cr."isStudyModule" = false OR cr."isStudyModule" IS NULL)
          AND cr.credittypecode = 4
          )
-         SELECT COUNT(student) AS total_students, SUM(credits) AS total_credits, code, course_name
+         SELECT COUNT(student) AS total_students, SUM(credits) AS total_credits, code, course_name, "isStudyModule"
          FROM Dist
-         GROUP BY dist.code, dist.course_name;
+         GROUP BY dist.code, dist.course_name, dist."isStudyModule";
       `,
       {
         type: sequelize.QueryTypes.SELECT,
         replacements: { from, to, programmeCourses },
       }
     )
-    return res.map(course => ({
+    const result = res.map(course => ({
       code: course.code,
       name: course.course_name,
       totalPassed: parseInt(course.total_students),
       totalAllcredits: parseInt(course.total_credits),
       type: 'passed',
+      isStudyModule: course.isStudyModule,
     }))
+    return result
   } catch (e) {
     logger.error(`getStudentsForProgrammeCourses() function failed ${e}`)
   }
@@ -597,7 +597,7 @@ const getNotCompletedForProgrammeCourses = async (from, to, programmeCourses) =>
     }
 
     const credits = await Credit.findAll({
-      attributes: ['course_code', 'student_studentnumber', 'credittypecode'],
+      attributes: ['course_code', 'student_studentnumber', 'credittypecode', 'isStudyModule'],
       include: {
         model: Course,
         attributes: ['code', 'name'],
@@ -607,9 +607,6 @@ const getNotCompletedForProgrammeCourses = async (from, to, programmeCourses) =>
         },
       },
       where: {
-        isStudyModule: {
-          [Op.not]: true,
-        },
         attainment_date: {
           [Op.between]: [from, to],
         },
@@ -622,6 +619,7 @@ const getNotCompletedForProgrammeCourses = async (from, to, programmeCourses) =>
         studentnumber: credit.student_studentnumber,
         credittype: credit.credittypecode,
         courseName: credit.course.name,
+        isStudyModule: credit.isStudyModule,
       }
     })
 
@@ -633,6 +631,7 @@ const getNotCompletedForProgrammeCourses = async (from, to, programmeCourses) =>
         courses[course.code] = {
           code: course.code,
           name: course.courseName,
+          isStudyModule: course.isStudyModule,
         }
 
         passedByCourseCodes[course.code] = []
@@ -663,6 +662,7 @@ const getNotCompletedForProgrammeCourses = async (from, to, programmeCourses) =>
         name: course.name,
         totalNotCompleted: [...new Set(notCompletedByCourseCodes[course.code])].length,
         type: 'notCompleted',
+        isStudyModule: course.isStudyModule,
       }))
   } catch (e) {
     logger.error(`getNotCompletedForProgrammeCourses failed ${e}`)
@@ -674,20 +674,19 @@ const getOwnStudentsForProgrammeCourses = async (from, to, programmeCourses, stu
     `
     WITH Dist AS (
       SELECT DISTINCT cr.student_studentnumber AS student, cr.credits AS credits,
-        co.code AS code, co.name AS course_name FROM credit cr
+        co.code AS code, co.name AS course_name, cr."isStudyModule" FROM credit cr
         INNER JOIN studyright_elements se ON se.studentnumber = cr.student_studentnumber
         INNER JOIN course co ON cr.course_code = co.code
         INNER JOIN course_providers cp ON cp.coursecode = co.id
         INNER JOIN organization o ON o.id = cp.organizationcode
         WHERE cr.attainment_date BETWEEN :from AND :to
         AND cr.course_code IN (:programmeCourses)
-        AND (cr."isStudyModule" = false OR cr."isStudyModule" IS NULL)
         AND cr.credittypecode = 4
         AND (se.code = :studyprogramme AND cr.attainment_date BETWEEN se.startdate AND se.enddate)
     )
-     SELECT COUNT(student) AS total_students, SUM(credits) AS total_credits, code, course_name
+     SELECT COUNT(student) AS total_students, SUM(credits) AS total_credits, code, course_name, "isStudyModule"
        FROM Dist
-       GROUP BY dist.code, course_name;
+       GROUP BY dist.code, course_name, "isStudyModule";
       `,
     {
       type: sequelize.QueryTypes.SELECT,
@@ -712,12 +711,11 @@ const getOtherStudentsForProgrammeCourses = async (from, to, programmeCourses, s
     `
     WITH Dist AS (
       SELECT DISTINCT cr.student_studentnumber AS student, cr.credits AS credits,
-      co.code AS code, co.name AS course_name FROM credit cr
+      co.code AS code, co.name AS course_name, cr."isStudyModule" FROM credit cr
       INNER JOIN studyright_elements se ON se.studentnumber = cr.student_studentnumber
       INNER JOIN course co ON cr.course_code = co.code
       WHERE cr.attainment_date BETWEEN :from AND :to
       AND cr.course_code IN (:programmeCourses)
-      AND (cr."isStudyModule" = false OR cr."isStudyModule" IS NULL)
       AND cr.credittypecode = 4
       AND cr.student_studentnumber IN
         (
@@ -731,9 +729,9 @@ const getOtherStudentsForProgrammeCourses = async (from, to, programmeCourses, s
           AND (studyright_elements.code = :studyprogramme AND cr.attainment_date BETWEEN studyright_elements.startdate AND studyright_elements.enddate)) 
           )
       )
-      SELECT COUNT(student) AS total_students, SUM(credits) AS total_credits, code, course_name
+      SELECT COUNT(student) AS total_students, SUM(credits) AS total_credits, code, course_name, "isStudyModule"
       FROM Dist
-      GROUP BY dist.code, course_name;
+      GROUP BY dist.code, course_name, "isStudyModule";
       `,
     {
       type: sequelize.QueryTypes.SELECT,
@@ -746,6 +744,7 @@ const getOtherStudentsForProgrammeCourses = async (from, to, programmeCourses, s
     totalOtherProgrammeStudents: parseInt(course.total_students),
     totalOtherProgrammeCredits: parseInt(course.total_credits),
     type: 'otherProgramme',
+    isStudyModule: course.isStudyModule,
   }))
 }
 
@@ -755,16 +754,15 @@ const getTransferStudentsForProgrammeCourses = async (from, to, programmeCourses
     `
     WITH Dist AS (
       SELECT DISTINCT cr.student_studentnumber AS student, cr.credits AS credits,
-      co.code AS code, co.name AS course_name FROM credit cr
+      co.code AS code, co.name AS course_name, cr."isStudyModule" FROM credit cr
       INNER JOIN course co ON cr.course_code = co.code
       WHERE cr.attainment_date BETWEEN :from AND :to
-      AND (cr."isStudyModule" = false OR cr."isStudyModule" IS NULL)
       AND cr.course_code IN (:programmeCourses)
       AND cr.credittypecode = 9
       )
-      SELECT COUNT(student) AS total_students, SUM(credits) AS total_credits, code, course_name
+      SELECT COUNT(student) AS total_students, SUM(credits) AS total_credits, code, course_name, "isStudyModule"
       FROM Dist
-      GROUP BY dist.code, course_name;
+      GROUP BY dist.code, course_name, "isStudyModule";
       `,
     {
       type: sequelize.QueryTypes.SELECT,
@@ -776,6 +774,7 @@ const getTransferStudentsForProgrammeCourses = async (from, to, programmeCourses
     name: course.course_name,
     totalTransferStudents: parseInt(course.total_students),
     totalTransferCredits: parseInt(course.total_credits),
+    isStudyModule: course.isStudyModule,
     type: 'transfer',
   }))
 }
@@ -786,10 +785,9 @@ const getStudentsWithoutStudyrightForProgrammeCourses = async (from, to, program
     `
     WITH Dist AS (
       SELECT DISTINCT cr.student_studentnumber AS student, cr.credits AS credits,
-      co.code AS code, co.name AS course_name FROM credit cr
+      co.code AS code, co.name AS course_name, cr."isStudyModule" FROM credit cr
       INNER JOIN course co ON cr.course_code = co.code
       WHERE cr.attainment_date BETWEEN :from AND :to
-      AND (cr."isStudyModule" = false OR cr."isStudyModule" IS NULL)
       AND cr.course_code IN (:programmeCourses)
       AND cr.credittypecode = 4
       AND cr.student_studentnumber NOT IN
@@ -798,9 +796,9 @@ const getStudentsWithoutStudyrightForProgrammeCourses = async (from, to, program
         WHERE studyright_elements.studentnumber = cr.student_studentnumber
         AND cr.attainment_date BETWEEN studyright_elements.startdate AND studyright_elements.enddate)
       )
-      SELECT COUNT(student) AS total_students, SUM(credits) AS total_credits, code, course_name
+      SELECT COUNT(student) AS total_students, SUM(credits) AS total_credits, code, course_name, "isStudyModule"
       FROM Dist
-      GROUP BY dist.code, course_name;
+      GROUP BY dist.code, course_name, "isStudyModule";
       `,
     {
       type: sequelize.QueryTypes.SELECT,

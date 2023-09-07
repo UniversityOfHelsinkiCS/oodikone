@@ -11,6 +11,7 @@ const ProgrammeCoursesOverview = ({ studyProgramme, combinedProgramme, academicY
     academicyear: academicYear ? 'ACADEMIC_YEAR' : 'NOT_ACADEMIC_YEAR',
     combinedProgramme,
   })
+
   const [fromYear, setFromYear] = useState(null)
   const [toYear, setToYear] = useState(null)
   const [years, setYears] = useState({})
@@ -90,6 +91,7 @@ const ProgrammeCoursesOverview = ({ studyProgramme, combinedProgramme, academicY
           ...values,
           code: course.code,
           name: course.name,
+          isStudyModule: course.isStudyModule,
         }
       })
 
