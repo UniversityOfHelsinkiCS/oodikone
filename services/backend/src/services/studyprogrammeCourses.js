@@ -145,6 +145,7 @@ const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme,
       acc[curr.code] = {
         code: curr.code,
         name: curr.name,
+        isStudyModule: curr.isStudyModule,
         years: {},
       }
     }
@@ -163,6 +164,7 @@ const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme,
         totalWithoutStudyrightCredits: 0,
         totalTransferStudents: 0,
         totalTransferCredits: 0,
+        isStudyModule: curr.isStudyModule,
       }
     }
     switch (curr.type) {
