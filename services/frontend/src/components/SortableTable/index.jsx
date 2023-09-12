@@ -79,7 +79,6 @@ getRowExport: Overrides getRowVal for excel
 formatValue: Same as getRowContent, but avoids recalculating value already calculated in getRowVal.
 
 
-
 --- Miscellaneous information ---
 
 * Single rows can ignore filters or sorting by row options. To do this, import row-function
