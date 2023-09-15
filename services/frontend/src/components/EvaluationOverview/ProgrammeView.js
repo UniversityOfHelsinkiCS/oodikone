@@ -94,8 +94,9 @@ const ProgrammeView = ({ studyprogramme }) => {
           <Segment className="contentSegment">
             <Message info>
               <Message.Header>This view is an abridged version of Oodikone's Studyprogramme Overview</Message.Header>
-              <p>
-                In these statistics, all special studyrights have been excluded, eg. exchange students and non-degree
+              <p style={{ marginTop: '12px' }}>
+                In these statistics, the following students are excluded: Students whose studyrights{' '}
+                <b>have been transferred away from or into the program</b> as well as exchange students and non-degree
                 students.
               </p>
               <p>
