@@ -8,19 +8,13 @@ import { useLocation } from 'react-router-dom'
 import { useGetSemestersQuery } from 'redux/semesters'
 import useLanguage from 'components/LanguagePicker/useLanguage'
 import { studentNumberFilter } from 'components/FilterView/filters'
-import { getTargetCreditsForProgramme } from 'common'
+import { getTargetCreditsForProgramme, TimeDivision, getCreditCategories } from 'common'
 import { getMonths } from '../../../common/query'
 import useFilters from '../../FilterView/useFilters'
 
 const StackOrdering = {
   ASCENDING: 'asc',
   DESCENDING: 'desc',
-}
-
-const TimeDivision = {
-  ACADEMIC_YEAR: 'academic-year',
-  CALENDAR_YEAR: 'calendar-year',
-  SEMESTER: 'semester',
 }
 
 export const getStudentCredits = (student, start, end, cumulative, includeTransferredCredits = true) => {
@@ -65,8 +59,6 @@ export const splitStudentCredits = (student, timeSlots, cumulative) => {
   return results
 }
 
-const LIMITS_NON_CUMULATIVE = [15, 30, 45, 60]
-
 const hasGraduatedAfter = (student, programme, slot) => {
   const sr = student.studyrights
     .filter(sr => sr.studyright_elements.findIndex(sre => sre.code === programme) > -1)
@@ -80,24 +72,9 @@ const hasGraduatedAfter = (student, programme, slot) => {
 const GRADUATED = Symbol('GRADUATED')
 
 const getChartData = (students, timeSlots, order, programme, timeDivision, cumulative, combinedProgramme) => {
-  const programmeCredits = combinedProgramme
-    ? getTargetCreditsForProgramme(programme) + 180
-    : getTargetCreditsForProgramme(programme)
+  const programmeCredits = getTargetCreditsForProgramme(programme) + (combinedProgramme ? 180 : 0)
 
-  // In calendar-year mode, minus 30 from target credits because programmers (usually) start in autumn,
-  // also if current date is before august, minus 30
-  const isCalendar = timeDivision === TimeDivision.CALENDAR_YEAR
-  const isPastAugust = new Date().getMonth() > 6
-  const calendarModifier = 30 + (isPastAugust ? 0 : 30)
-  const creditsByTimeslots =
-    timeSlots.length * (timeDivision === TimeDivision.SEMESTER ? 30 : 60) - (isCalendar ? calendarModifier : 0)
-  const maxCredits = creditsByTimeslots > programmeCredits ? programmeCredits : creditsByTimeslots
-
-  const limitBreaks = cumulative
-    ? [1, 2, 3, 4, 5, 6].map(num => Math.round((num * maxCredits) / 6))
-    : LIMITS_NON_CUMULATIVE.map(limit => limit * (timeDivision === TimeDivision.SEMESTER ? 0.5 : 1))
-
-  let limits = _.range(0, limitBreaks.length + 1).map(i => [limitBreaks[i - 1], limitBreaks[i]])
+  let limits = getCreditCategories(cumulative, timeDivision, programmeCredits, timeSlots, 6)
 
   let colors = chroma.scale(['#f8696b', '#f5e984', '#63be7a']).colors(limits.length)
 
