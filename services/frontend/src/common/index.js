@@ -1,6 +1,6 @@
 import moment from 'moment'
 import Datetime from 'react-datetime'
-import { filter, maxBy, sortBy, intersection } from 'lodash'
+import { range, filter, maxBy, sortBy, intersection } from 'lodash'
 import pathToRegexp from 'path-to-regexp'
 import { API_DATE_FORMAT, DISPLAY_DATE_FORMAT } from '../constants'
 import toskaLogo from '../assets/toska.png'
@@ -377,6 +377,32 @@ export const getStudyRightElementTargetDates = (studyRight, absences = []) => {
     new Date(moment(sreStartDate).add(absentMonthsBeforeStudy, 'months')),
     new Date(end.add(absentMonthsDuringStudy + absentMonthsBeforeStudy, 'months')),
   ]
+}
+
+export const TimeDivision = {
+  ACADEMIC_YEAR: 'academic-year',
+  CALENDAR_YEAR: 'calendar-year',
+  SEMESTER: 'semester',
+}
+
+/* Returns an array of credit categories depending on parameters, shows the high limit
+  of the category, for example [20, 40, 60, 80, 100, 120] where the first category is 0 - 20 */
+export const getCreditCategories = (cumulative, timeDivision, programmeCredits, timeSlots, creditCategoryAmount) => {
+  // In calendar-year mode, minus 30 from target credits because programmes (usually) start in autumn,
+  // also if current date is before august, minus 30
+  const isCalendar = timeDivision === TimeDivision.CALENDAR_YEAR
+  const isPastAugust = new Date().getMonth() > 6
+  const calendarModifier = 30 + (isPastAugust ? 0 : 30)
+  const creditsByTimeslots =
+    timeSlots.length * (timeDivision === TimeDivision.SEMESTER ? 30 : 60) - (isCalendar ? calendarModifier : 0)
+  const maxCredits = creditsByTimeslots > programmeCredits ? programmeCredits : creditsByTimeslots
+  const creditCategoryArray = []
+  for (let i = 1; i <= creditCategoryAmount; i++) creditCategoryArray.push(i)
+
+  const limitBreaks = cumulative
+    ? creditCategoryArray.map(num => Math.round((num * maxCredits) / creditCategoryAmount))
+    : [15, 30, 45, 60].map(limit => limit * (timeDivision === TimeDivision.SEMESTER ? 0.5 : 1))
+  return range(0, limitBreaks.length + 1).map(i => [limitBreaks[i - 1], limitBreaks[i]])
 }
 
 export const validateInputLength = (input, minLength) => input && input.trim().length >= minLength
