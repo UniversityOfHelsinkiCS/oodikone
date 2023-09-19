@@ -1,32 +1,27 @@
 import React, { useEffect, useState } from 'react'
 import _ from 'lodash'
-import { connect, useSelector, useDispatch } from 'react-redux'
+import { connect } from 'react-redux'
 import { string, func, object } from 'prop-types'
 import { Container } from 'semantic-ui-react'
 import {
   useAddProgressCriteriaCourseMutation,
   useAddProgressCriteriaCreditsMutation,
 } from 'redux/programmeProgressCriteria'
-import {
-  setCourseExclusion,
-  removeCourseExclusion,
-  getMandatoryCourses,
-} from '../../../redux/populationMandatoryCourses'
+import CurriculumPicker from 'components/PopulationDetails/CurriculumPicker'
+import { setCourseExclusion, removeCourseExclusion } from '../../../redux/populationMandatoryCourses'
 
 import CreditCriteriaForm from './CreditCriteriaForm'
 import DegreeCourseTableView from './DegreeCourseTableView'
 
 const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, removeExclusion, combinedProgramme }) => {
-  const dispatch = useDispatch()
-  const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
   const [defaultModules, setDefaultModules] = useState([])
+  const [curriculum, setCurriculum] = useState(null)
   // Second programme modules are for combined studyprogrammes
   const [secondProgrammeModules, setSecondProgrammeModules] = useState([])
   const [addProgressCriteriaCourse, { data: courseData }] = useAddProgressCriteriaCourseMutation()
   const [addProgressCriteriaCredits, { data: creditsData }] = useAddProgressCriteriaCreditsMutation()
-  useEffect(() => {
-    dispatch(getMandatoryCourses(studyProgramme))
-  }, [])
+
+  console.log({ curriculum })
 
   useEffect(() => {
     if (courseData) {
@@ -41,10 +36,10 @@ const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, re
   }, [creditsData])
 
   useEffect(() => {
-    if (!mandatoryCourses || !mandatoryCourses?.defaultProgrammeCourses?.length) return
+    if (!curriculum || !curriculum?.defaultProgrammeCourses?.length) return
     const defaultModules = {}
     const secondProgrammeModules = {}
-    mandatoryCourses.defaultProgrammeCourses.forEach(course => {
+    curriculum.defaultProgrammeCourses.forEach(course => {
       const code = course.parent_code
       if (!defaultModules[code]) {
         defaultModules[code] = []
@@ -52,7 +47,7 @@ const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, re
       defaultModules[code].push(course)
     })
     if (combinedProgramme) {
-      mandatoryCourses.secondProgrammeCourses.forEach(course => {
+      curriculum.secondProgrammeCourses.forEach(course => {
         const code = course.parent_code
         if (!secondProgrammeModules[code]) {
           secondProgrammeModules[code] = []
@@ -81,18 +76,16 @@ const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, re
         m => m.code
       )
     )
-  }, [mandatoryCourses])
-
-  // WARNING STUPIDNESS AHEAD
-  useEffect(() => {
-    if (!defaultModules[0]) return
-    if (defaultModules[0].module === 'undefined') {
-      dispatch(getMandatoryCourses(studyProgramme, true))
-    }
-  }, [defaultModules])
-
+  }, [curriculum])
+  
   return (
     <Container>
+      <div>
+        <h3 style={{ marginBottom: '15px' }}>
+          Select curriculum to edit:
+          <CurriculumPicker programmeCodes={[studyProgramme, combinedProgramme]} setCurriculum={setCurriculum} />
+        </h3>
+      </div>
       {(studyProgramme.includes('KH') || ['MH30_001', 'MH30_003'].includes(studyProgramme)) && (
         <CreditCriteriaForm
           criteria={criteria}
@@ -105,6 +98,7 @@ const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, re
           modules={defaultModules}
           criteria={criteria}
           studyProgramme={studyProgramme}
+          curriculum={curriculum}
           combinedProgramme=""
           setExclusion={setExclusion}
           removeExclusion={removeExclusion}
@@ -115,6 +109,7 @@ const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, re
         <DegreeCourseTableView
           modules={secondProgrammeModules}
           criteria={criteria}
+          curriculum={curriculum}
           studyProgramme={studyProgramme}
           combinedProgramme={combinedProgramme}
           setExclusion={setExclusion}

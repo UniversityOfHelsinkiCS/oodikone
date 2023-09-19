@@ -395,18 +395,6 @@ export const resolveStudyPlan = (studyPlans, studyRight) => {
   return studyPlans.find(p => p.programme_code === code && p.studyrightid === studyRight.studyrightid)
 }
 
-export const chooseCurriculumToFetch = (curriculums, selectedCurriculum, startYear) => {
-  if (!startYear) return null
-  if (selectedCurriculum?.curriculum_period_ids) {
-    return selectedCurriculum
-  }
-  if (curriculums.length > 0) {
-    const defaultCurriculum = curriculums.find(cur => cur.curriculum_period_ids.includes(parseInt(startYear, 10)))
-    return defaultCurriculum ?? curriculums[0]
-  }
-  return null
-}
-
 // These are the new Bachelor's programmes in Matlu, that have BH possibility
 export const bachelorHonoursProgrammes = [
   'KH50_001',

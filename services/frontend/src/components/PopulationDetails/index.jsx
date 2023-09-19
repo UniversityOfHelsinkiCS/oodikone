@@ -1,13 +1,10 @@
-import React, { useRef, useState, useEffect } from 'react'
+import React, { useRef, useState } from 'react'
 import { connect } from 'react-redux'
-import { Accordion, Dropdown, Radio } from 'semantic-ui-react'
-import _ from 'lodash'
+import { Accordion, Radio } from 'semantic-ui-react'
 import useFilters from 'components/FilterView/useFilters'
 import studyPlanFilter from 'components/FilterView/filters/hops'
 import { creditDateFilter } from 'components/FilterView/filters'
 import { useGetProgressCriteriaQuery } from 'redux/programmeProgressCriteria'
-import { curriculumsApi } from 'redux/populationCourses'
-import { chooseCurriculumToFetch } from 'common'
 import { useLocalStorage } from '../../common/hooks'
 import { useGetAuthorizedUserQuery } from '../../redux/auth'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
@@ -17,51 +14,7 @@ import InfoBox from '../Info/InfoBox'
 import CreditGainStats from './CreditGainStats'
 import AgeStats from './AgeStats'
 import infotooltips from '../../common/InfoToolTips'
-
-const { useGetCurriculumsQuery, useGetCurriculumOptionsQuery } = curriculumsApi
-
-const CurriculumPicker = ({ setCurriculum, programmeCodes, disabled, year }) => {
-  const curriculumOptionsQuery = useGetCurriculumOptionsQuery({ code: programmeCodes[0] }, { skip: !programmeCodes[0] })
-  const curriculums = curriculumOptionsQuery.data ?? []
-  const [selectedCurriculum, setSelectedCurriculum] = useState(curriculums.length ? curriculums[0] : null)
-  const chosenCurriculum = chooseCurriculumToFetch(curriculums, selectedCurriculum, year)
-  const curriculumsQuery = useGetCurriculumsQuery(
-    {
-      code: programmeCodes[0],
-      period_ids: chosenCurriculum?.curriculum_period_ids,
-    },
-    { skip: !chosenCurriculum?.curriculum_period_ids }
-  )
-  useEffect(() => {
-    setCurriculum(curriculumsQuery.data ?? null)
-  }, [curriculumsQuery.data])
-  const formatCurriculumOptions = cur => {
-    const years = _.sortBy(cur.curriculum_period_ids)
-    if (years.length === 0) return 'error'
-    if (years.length === 1) return years[0]
-    return `${years[0]} - ${years[years.length - 1]}`
-  }
-
-  return (
-    <Dropdown
-      disabled={disabled}
-      style={{
-        padding: '4px',
-        paddingLeft: '8px',
-        marginLeft: '10px',
-        background: '#e3e3e3',
-      }}
-      className="link item"
-      value={chosenCurriculum}
-      onChange={(_, { value }) => setSelectedCurriculum(value)}
-      options={curriculums.map(cur => ({
-        key: _.sortBy(cur.curriculum_period_ids).join(', '),
-        value: cur,
-        text: formatCurriculumOptions(cur),
-      }))}
-    />
-  )
-}
+import CurriculumPicker from './CurriculumPicker'
 
 const PopulationDetails = ({
   allStudents,

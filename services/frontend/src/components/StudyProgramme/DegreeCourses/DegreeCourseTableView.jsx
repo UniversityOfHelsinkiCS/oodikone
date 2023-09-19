@@ -1,11 +1,7 @@
 import React, { useState } from 'react'
 import { Button, Label, Table, Icon, Dropdown } from 'semantic-ui-react'
-import { curriculumsApi } from 'redux/populationCourses'
-import { chooseCurriculumToFetch } from 'common'
 
 import useLanguage from '../../LanguagePicker/useLanguage'
-
-const { useGetCurriculumOptionsQuery, useGetCurriculumsQuery } = curriculumsApi
 
 const getYear = criterionYear => {
   if (criterionYear === 1) return 'yearOne'
@@ -35,17 +31,10 @@ const DegreeCourseTableView = ({
   setExclusion,
   removeExclusion,
   addProgressCriteriaCourse,
+  curriculum,
 }) => {
   const [visible, setVisible] = useState({})
   const { getTextIn } = useLanguage()
-  const curriculumOptionsQuery = useGetCurriculumOptionsQuery(studyProgramme)
-  const [selectedCurriculum, setSelectedCurriculum] = useState(null)
-  const chosenCurriculum = chooseCurriculumToFetch()
-  const curriculumsQuery = useGetCurriculumsQuery(
-    { code: studyProgramme, period_ids: chosenCurriculum?.curriculum_period_ids },
-    { skip: !chosenCurriculum }
-  )
-  const curriculum = curriculumsQuery.data ?? null
   const excludeAll = code => {
     const module = modules.find(({ module }) => module === code)
     const excludeFromProgramme = combinedProgramme === '' ? studyProgramme : combinedProgramme
@@ -53,7 +42,7 @@ const DegreeCourseTableView = ({
       studyProgramme,
       excludeFromProgramme,
       module.courses.filter(c => c.visible.visibility).map(c => c.code),
-      curriculum
+      curriculum.version
     )
   }
 
@@ -61,7 +50,8 @@ const DegreeCourseTableView = ({
     const module = modules.find(({ module }) => module === code)
     removeExclusion(
       studyProgramme,
-      module.courses.map(c => c.visible.id)
+      module.courses.map(c => c.visible.id),
+      curriculum.version
     )
   }
 
@@ -112,7 +102,7 @@ const DegreeCourseTableView = ({
       <Button
         color="blue"
         onClick={() => {
-          setExclusion(studyProgramme, excludeFromProgramme, [course.code], curriculum)
+          setExclusion(studyProgramme, excludeFromProgramme, [course.code], curriculum.version)
         }}
       >
         Set hidden
@@ -123,7 +113,7 @@ const DegreeCourseTableView = ({
     <Button
       color="blue"
       onClick={() => {
-        removeExclusion(studyProgramme, [course.visible.id])
+        removeExclusion(studyProgramme, [course.visible.id], curriculum.version)
       }}
     >
       Set visible
@@ -136,7 +126,12 @@ const DegreeCourseTableView = ({
       onClick={() => {
         const year = getYear(criterionYear)
         const courses = criteria.courses ? [...criteria.courses[year], course.code] : [course.code]
-        addProgressCriteriaCourse({ programmeCode: studyProgramme, courses, year: criterionYear })
+        addProgressCriteriaCourse({
+          programmeCode: studyProgramme,
+          courses,
+          year: criterionYear,
+          version: curriculum.version,
+        })
       }}
     >
       {`Set criterion for year ${criterionYear}`}
