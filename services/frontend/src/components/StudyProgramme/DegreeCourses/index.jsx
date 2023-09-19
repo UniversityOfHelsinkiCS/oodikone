@@ -135,8 +135,8 @@ DegreeCourses.propTypes = {
 }
 
 const mapDispatchToProps = dispatch => ({
-  setExclusion: (programmecode, excludeFromProgramme, coursecode) =>
-    dispatch(setCourseExclusion(programmecode, excludeFromProgramme, coursecode)),
+  setExclusion: (programmecode, excludeFromProgramme, coursecode, curriculum) =>
+    dispatch(setCourseExclusion(programmecode, excludeFromProgramme, coursecode, curriculum)),
   removeExclusion: (programmecode, coursecode, id) => dispatch(removeCourseExclusion(programmecode, coursecode, id)),
 })
 

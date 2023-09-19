@@ -101,6 +101,7 @@ const getThesisStats = async ({ studyprogramme, since, years, isAcademicYear, in
 }
 
 const getGraduationTimeStats = async ({ studyprogramme, since, years, isAcademicYear, includeAllSpecials }) => {
+  console.log({ studyprogramme, since, years, isAcademicYear, includeAllSpecials })
   let graduationAmounts = getYearsObject({ years })
   let graduationTimes = getYearsObject({ years, emptyArrays: true })
   if (!studyprogramme) return { times: { medians: [], goal: 0 }, doCombo: false, comboTimes: { medians: [], goal: 0 } }
@@ -250,6 +251,7 @@ const getProgrammesBeforeOrAfter = async (studyprogramme, queryParameters) => {
 }
 
 const getGraduationStatsForStudytrack = async ({ studyprogramme, combinedProgramme, settings }) => {
+  console.log({ studyprogramme, combinedProgramme, settings })
   const { isAcademicYear, includeAllSpecials } = settings
   const since = getStartDate(studyprogramme, isAcademicYear)
   const years = getYearsArray(since.getFullYear(), isAcademicYear)
@@ -261,6 +263,7 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, combinedProgram
     isAcademicYear,
     includeAllSpecials,
   }
+
   const thesis = await getThesisStats(queryParameters)
   const thesisSecondProgramme = await getThesisStats(combinedQueryParameters)
 

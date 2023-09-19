@@ -89,6 +89,8 @@ services:
     volumes:
       - sis-db-data:/data
     shm_size: 2gb
+    ports:
+      - 12345:5432
 
   sis-importer-db:
     <<: *defaults
@@ -98,6 +100,8 @@ services:
       - updater
     volumes:
       - sis-importer-db-data:/data
+    ports:
+      - 12346:5432
 
   sis-updater-nats:
     <<: *defaults

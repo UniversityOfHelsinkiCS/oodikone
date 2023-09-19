@@ -4,7 +4,7 @@ import { handleRequest, RTKApi } from 'apiConnection'
 import actionHistory from './actionHistory'
 import users from './users'
 import populations from './populations'
-import populationCourses from './populationCourses'
+import populationCourses, { curriculumsApi } from './populationCourses'
 import populationSelectedStudentCourses from './populationSelectedStudentCourses'
 import populationProgrammes from './populationProgrammes'
 import populationProgrammesUnfiltered from './populationProgrammesUnfiltered'
@@ -68,12 +68,13 @@ const store = configureStore({
     customPopulationSearch,
     coolDataScience,
     [RTKApi.reducerPath]: RTKApi.reducer,
+    [curriculumsApi.reducerPath]: curriculumsApi.reducer,
     filters,
   },
   // oodikone is currently too heavy for other middlewares than thunk, but
   // feel free to take use them at some point if possible
   middleware: getDefaultMiddleware => [
-    ...getDefaultMiddleware({ immutableCheck: false, serializableCheck: false }),
+    ...getDefaultMiddleware({ immutableCheck: false, serializableCheck: false }).concat(curriculumsApi.middleware),
     handleRequest,
     RTKApi.middleware,
   ],

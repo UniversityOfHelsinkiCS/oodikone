@@ -196,7 +196,7 @@ const PopulationCourseStatsFlat = ({ courses, pending, filteredStudents, showFil
       </Table.HeaderCell>
     )
   }
-
+  console.log("Second: ", { courseStatistics })
   const { sortCriteria, reversed } = state
   const contextValue = {
     courseStatistics,

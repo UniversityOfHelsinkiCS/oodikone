@@ -1,6 +1,11 @@
 import React, { useState } from 'react'
 import { Button, Label, Table, Icon, Dropdown } from 'semantic-ui-react'
+import { curriculumsApi } from 'redux/populationCourses'
+import { chooseCurriculumToFetch } from 'common'
+
 import useLanguage from '../../LanguagePicker/useLanguage'
+
+const { useGetCurriculumOptionsQuery, useGetCurriculumsQuery } = curriculumsApi
 
 const getYear = criterionYear => {
   if (criterionYear === 1) return 'yearOne'
@@ -33,14 +38,22 @@ const DegreeCourseTableView = ({
 }) => {
   const [visible, setVisible] = useState({})
   const { getTextIn } = useLanguage()
-
+  const curriculumOptionsQuery = useGetCurriculumOptionsQuery(studyProgramme)
+  const [selectedCurriculum, setSelectedCurriculum] = useState(null)
+  const chosenCurriculum = chooseCurriculumToFetch()
+  const curriculumsQuery = useGetCurriculumsQuery(
+    { code: studyProgramme, period_ids: chosenCurriculum?.curriculum_period_ids },
+    { skip: !chosenCurriculum }
+  )
+  const curriculum = curriculumsQuery.data ?? null
   const excludeAll = code => {
     const module = modules.find(({ module }) => module === code)
     const excludeFromProgramme = combinedProgramme === '' ? studyProgramme : combinedProgramme
     setExclusion(
       studyProgramme,
       excludeFromProgramme,
-      module.courses.filter(c => c.visible.visibility).map(c => c.code)
+      module.courses.filter(c => c.visible.visibility).map(c => c.code),
+      curriculum
     )
   }
 
@@ -99,7 +112,7 @@ const DegreeCourseTableView = ({
       <Button
         color="blue"
         onClick={() => {
-          setExclusion(studyProgramme, excludeFromProgramme, [course.code])
+          setExclusion(studyProgramme, excludeFromProgramme, [course.code], curriculum)
         }}
       >
         Set hidden

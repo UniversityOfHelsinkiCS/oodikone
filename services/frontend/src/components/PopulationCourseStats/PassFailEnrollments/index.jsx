@@ -31,7 +31,7 @@ const PassFailEnrollments = ({ flat, onlyIamRights }) => {
   const { modules, courseStatistics, onGoToCourseStatisticsClick, toggleGroupExpansion, expandedGroups } =
     UsePopulationCourseContext()
   const { getTextIn } = useLanguage()
-
+  console.log({modules})
   const columns = useMemo(() => {
     const columns = [
       {
@@ -230,7 +230,7 @@ const PassFailEnrollments = ({ flat, onlyIamRights }) => {
       )
       .value()
   }, [modules, courseStatistics])
-
+  console.log({data})
   return (
     <>
       <SortableTable

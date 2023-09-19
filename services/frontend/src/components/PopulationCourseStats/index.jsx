@@ -103,7 +103,7 @@ const PopulationCourseStats = props => {
   const [modules, setModules] = useState([])
   const [state, setState] = useState(initialState(props))
   const [expandedGroups, setExpandedGroups] = useState(new Set())
-  const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
+  const { mandatoryCourses } = props
   const { handleTabChange } = useTabChangeAnalytics()
 
   const courseStatistics = useDelayedMemo(
@@ -133,6 +133,9 @@ const PopulationCourseStats = props => {
       courses: { coursestatistics },
       language,
     } = props
+
+    console.log({ coursestatistics })
+
     const courseCodeFilter = ({ course }) => {
       if (!codeFilter) return true
 
@@ -174,7 +177,7 @@ const PopulationCourseStats = props => {
             ...secondProgrammeCourses.map(course => ({ ...c, ...course })),
           ]
         })
-
+    console.log({ filteredCourses, coursestatistics, mandatoryCourses })
     const lodashSortOrder = reversed ? lodashSortOrderTypes.DESC : lodashSortOrderTypes.ASC
 
     const sortedStatistics = orderBy(
@@ -207,7 +210,7 @@ const PopulationCourseStats = props => {
           module,
           courses,
         })),
-        item => item.module.order
+        item => item.module.code
       )
     )
   }, [state.studentAmountLimit, props.courses.coursestatistics, state.codeFilter, state.nameFilter, mandatoryCourses])
@@ -303,7 +306,7 @@ const PopulationCourseStats = props => {
     toggleGroupExpansion,
     expandedGroups,
   }
-
+  console.log({ modulesInPopulationCourseStats: modules })
   const panes = [
     {
       menuItem: 'pass/fail',

@@ -37,10 +37,10 @@ const getMandatoryPassed = (mandatoryCourses, populationCourses, studyGuidanceCo
   return mandatoryPassed
 }
 
-const CoursesTable = ({ students, studyGuidanceCourses }) => {
+const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
   const { getTextIn } = useLanguage()
   const namesVisible = useSelector(state => state?.settings?.namesVisible)
-  const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses?.data)
+  const mandatoryCourses = curriculum
   const { data: populationCourses, pending } = useSelector(state => state?.populationSelectedStudentCourses)
   const mandatoryPassed = useMemo(
     () => getMandatoryPassed(mandatoryCourses, populationCourses, studyGuidanceCourses),
@@ -287,12 +287,13 @@ const StudyGuidanceGroupCoursesTabContainer = ({ students, group }) => {
   if (populationsCourses.pending) return null
   return <CoursesTable students={students} studyGuidanceCourses={populationsCourses} />
 }
-const CoursesTabContainer = ({ students, variant, studyGuidanceGroup }) => {
+
+const CoursesTabContainer = ({ students, variant, studyGuidanceGroup, curriculum }) => {
   if (variant === 'studyGuidanceGroupPopulation') {
     return <StudyGuidanceGroupCoursesTabContainer students={students} group={studyGuidanceGroup} />
   }
 
-  return <CoursesTable students={students} />
+  return <CoursesTable students={students} curriculum={curriculum} />
 }
 
 export default CoursesTabContainer
