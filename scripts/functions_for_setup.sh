@@ -233,7 +233,7 @@ linting and formatting"
 }
 
 docker_prune() {
-  infomsg "Running: docker system prune -a && docker volume prune"
+  infomsg "Running: docker system prune -a && docker volume prune -a"
   docker system prune -a && docker volume prune -a
 }
 

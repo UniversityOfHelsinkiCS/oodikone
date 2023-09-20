@@ -48,7 +48,7 @@ What different CLI options do:
 4. Restore data from dumps
    - Like option 2, but skips downloading, and simply restores databases from the dumps downloaded earlier.
 5. Docker system prune
-   - Runs `docker system prune -a && docker volume prune -a`. This will remove all your docker data, also related to any other applications than oodikone! Sometimes necessary after strange errors due to caching.
+   - Runs `docker system prune -a && docker volume prune -a`. This will remove all your docker data, also related to any other applications than oodikone! It is sometimes necessary after strange errors due to caching.
 
 ## ⌨️ Development
 
@@ -116,6 +116,7 @@ Some useful commands are defined in `package.json` and can be run with `npm run 
 - `npm run both`: starts oodikone and updater with anonymized data
 - `npm run both:real`: starts oodikone and updater with real data
 - `npm run docker:down`: stops the whole environment
+- `npm run flushredis`: Clears redis, which forces big calculations to be redone in e.g. studyprogramme overview and faculty views.
 
 Once you have ran setup for oodikone , you can just execute the first one (`npm run oodikone`). After starting and waiting for a while for containers to compile, oodikone can be accessed at [http://localhost:3000/](http://localhost:3000/) and Adminer (database investigation tool) at [http://localhost:5050/](http://localhost:5050/). Adminer requires you to login with username `postgres` and with any password you choose (for example `p`).
 
@@ -181,9 +182,9 @@ Make sure you have your VPN on.
 
 ### Everything is broken, can't get oodikone running, data is not there etc.
 
-Just do clean install by launching cli with `npm cli` and running option 1: _Set up oodikone from scratch_.
+First: Try `npm run cli` option 1: _Set up oodikone from scratch_ and then option 2 to download and restore databases (or option 4 to skip downloading, if you've done it recently).
 
-If you don't want to reset all data, you can delete the docker images `docker compose down --rmi` (or just one) and they will be rebuilt when you start them. This is sometimes necessary if some commit has updated images or you switch to an older commit which has changed the images.
+If that does not help, try option 5: _Docker system prune_. Notice that this clears up **all docker data**, including data related to other projects. If this is not ok, you'll need to identify the oodikone-specific docker volumes yourself and caches and clear those invididually.
 
 ## ✌🏼 Maintainers and contribution
 
