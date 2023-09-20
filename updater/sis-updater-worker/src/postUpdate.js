@@ -18,7 +18,7 @@ const {
 
 const logStatus = async (type, count, done, scheduled, startTime, humanType) => {
   logger.info({
-    message: `Update ${count} ${humanType}: ${done}/${scheduled}`,
+    message: `Updated ${count} ${humanType}: ${done}/${scheduled}`,
     type,
     count,
     done,

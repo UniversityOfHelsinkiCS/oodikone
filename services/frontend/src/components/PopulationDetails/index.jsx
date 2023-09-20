@@ -1,6 +1,6 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import { connect } from 'react-redux'
-import { Accordion } from 'semantic-ui-react'
+import { Accordion, Radio } from 'semantic-ui-react'
 import useFilters from 'components/FilterView/useFilters'
 import studyPlanFilter from 'components/FilterView/filters/hops'
 import { creditDateFilter } from 'components/FilterView/filters'
@@ -14,6 +14,7 @@ import InfoBox from '../Info/InfoBox'
 import CreditGainStats from './CreditGainStats'
 import AgeStats from './AgeStats'
 import infotooltips from '../../common/InfoToolTips'
+import CurriculumPicker from './CurriculumPicker'
 
 const PopulationDetails = ({
   allStudents,
@@ -32,9 +33,10 @@ const PopulationDetails = ({
   const courseTableRef = useRef()
   const studentTableRef = useRef()
   const { useFilterSelector } = useFilters()
+  const [curriculum, setCurriculum] = useState(null)
   const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions)
   const criteria = useGetProgressCriteriaQuery({ programmeCode: query?.studyRights?.programme })
-
+  const [courseTableMode, setCourseTableMode] = useState('curriculum')
   const handleClick = index => {
     const indexes = [...activeIndex].sort()
     if (indexes.includes(index)) {
@@ -46,12 +48,6 @@ const PopulationDetails = ({
       indexes.push(index)
     }
     setActiveIndex(indexes)
-
-    /**
-     * Here used to be a :tunkki: that scrolled to the component that was opened. However,
-     * it does not work with the way this view is now rendered. This is left here just as a
-     * reminder in case we want to reimplement auto-scrolling once this component is refactored.
-     */
   }
 
   const RenderCreditGainGraphs = () => {
@@ -154,12 +150,42 @@ const PopulationDetails = ({
       content: {
         content: (
           <div ref={courseTableRef}>
+            <div style={{ display: 'flex', flexDirection: 'row' }}>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <Radio
+                  style={{ marginBottom: '15px', marginTop: '5px', marginRight: '4px', fontWeight: 'bold' }}
+                  label="Choose curriculum"
+                  name="coursesRadioGroup"
+                  value="curriculum"
+                  onChange={(event, { value }) => setCourseTableMode(value)}
+                  checked={courseTableMode === 'curriculum'}
+                />
+                <Radio
+                  style={{ fontWeight: 'bold' }}
+                  label="Show all courses"
+                  name="coursesRadioGroup"
+                  value="all"
+                  onChange={(event, { value }) => setCourseTableMode(value)}
+                  checked={courseTableMode === 'all'}
+                />
+              </div>
+              <div>
+                <CurriculumPicker
+                  year={query?.year}
+                  programmeCodes={programmeCodes}
+                  setCurriculum={setCurriculum}
+                  disabled={courseTableMode !== 'curriculum'}
+                />
+              </div>
+            </div>
             <PopulationCourses
               query={query}
+              curriculum={curriculum}
               allStudents={allStudents}
               filteredStudents={filteredStudents}
               selectedStudentsByYear={selectedStudentsByYear}
               onlyIamRights={onlyIamRights}
+              courseTableMode={courseTableMode}
             />
           </div>
         ),
@@ -188,6 +214,7 @@ const PopulationDetails = ({
               criteria={criteria?.data}
               programmeCode={query?.studyRights?.programme}
               year={query?.year}
+              curriculum={curriculum}
             />
           </div>
         ),

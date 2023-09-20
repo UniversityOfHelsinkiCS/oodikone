@@ -55,6 +55,18 @@ const courseStatisticsApi = RTKApi.injectEndpoints({
 
 export const { useGetStudentListCourseStatisticsQuery } = courseStatisticsApi
 
+export const curriculumsApi = RTKApi.injectEndpoints({
+  endpoints: builder => ({
+    getCurriculumOptions: builder.query({
+      query: ({ code }) => `/v3/programme_modules/get_curriculum_options/${code}`,
+    }),
+    getCurriculums: builder.query({
+      // eslint-disable-next-line camelcase
+      query: ({ code, period_ids }) => `/v3/programme_modules/get_curriculum/${code}/${period_ids.join(',')}`,
+    }),
+  }),
+})
+
 export const getCustomPopulationCoursesByStudentnumbers = ({ studentnumberlist, usingStudyGuidanceGroups }) => {
   const route = '/v2/populationstatistics/coursesbystudentnumberlist'
   const prefix = 'GET_COURSES_OF_CUSTOM_POP_BY_SN_'

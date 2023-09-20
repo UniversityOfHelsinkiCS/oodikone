@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { connect, useSelector } from 'react-redux'
+import { connect } from 'react-redux'
 import { Table, Input, Tab, Icon } from 'semantic-ui-react'
 import { orderBy, debounce } from 'lodash'
 import { withRouter } from 'react-router-dom'
@@ -103,7 +103,7 @@ const PopulationCourseStats = props => {
   const [modules, setModules] = useState([])
   const [state, setState] = useState(initialState(props))
   const [expandedGroups, setExpandedGroups] = useState(new Set())
-  const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
+  const { mandatoryCourses } = props
   const { handleTabChange } = useTabChangeAnalytics()
 
   const courseStatistics = useDelayedMemo(
@@ -133,6 +133,7 @@ const PopulationCourseStats = props => {
       courses: { coursestatistics },
       language,
     } = props
+
     const courseCodeFilter = ({ course }) => {
       if (!codeFilter) return true
 
@@ -207,7 +208,7 @@ const PopulationCourseStats = props => {
           module,
           courses,
         })),
-        item => item.module.order
+        item => item.module.code
       )
     )
   }, [state.studentAmountLimit, props.courses.coursestatistics, state.codeFilter, state.nameFilter, mandatoryCourses])
