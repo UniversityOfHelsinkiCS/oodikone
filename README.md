@@ -45,6 +45,10 @@ What different CLI options do:
    - Creates real data databases and populates them with downloaded dumps.
 3. Reset single database
    - Like option 2, but only for single database. Leaves other databases untouched.
+4. Restore data from dumps
+   - Like option 2, but skips downloading, and simply restores databases from the dumps downloaded earlier.
+5. Docker system prune
+   - Runs `docker system prune -a && docker volume prune -a`. This will remove all your docker data, also related to any other applications than oodikone! Sometimes necessary after strange errors due to caching.
 
 ## ⌨️ Development
 
