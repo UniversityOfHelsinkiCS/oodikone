@@ -132,6 +132,11 @@ reset_all_real_data() {
   reset_databases "${DATABASES[@]}"
 }
 
+restore_data_from_dumps() {
+  infomsg "Restoring earlier-downloaded dumps to databases"
+  reset_databases "${DATABASES[@]}"
+}
+
 reset_single_database() {
   # Define custom shell prompt for the nested interactive select loop
   PS3="Please enter which database to reset: "
@@ -225,6 +230,11 @@ linting and formatting"
   "$PROJECT_ROOT"/run.sh both anon build
 
   successmsg "Setup ready, oodikone can be started! See README for more info."
+}
+
+docker_prune() {
+  infomsg "Running: docker system prune -a && docker volume prune"
+  docker system prune -a && docker volume prune -a
 }
 
 init_dirs() {

@@ -51,6 +51,8 @@ set_custom_select_prompt() {
     "Set up oodikone from scratch."
     "Reset all real data."
     "Reset single database."
+    "Restore data from dumps"
+    "Docker system prune"
     "Quit."
   )
 }
@@ -72,6 +74,10 @@ while true; do
         reset_single_database
         set_custom_select_prompt # Set prompt back to initial values
         ;;
+      "Restore data from dumps")
+      restore_data_from_dumps;;
+      "Docker system prune")
+        docker_prune;;
       "Quit.")
         break 2;;
       *) msg "${RED}Invalid option:${NOFORMAT} $REPLY
