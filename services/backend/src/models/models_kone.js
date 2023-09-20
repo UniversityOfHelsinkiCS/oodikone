@@ -18,6 +18,9 @@ const ExcludedCourse = sequelizeKone.define(
     programme_code: {
       type: Sequelize.STRING,
     },
+    curriculum_version: {
+      type: STRING,
+    },
     course_code: {
       type: Sequelize.STRING,
     },
@@ -121,6 +124,9 @@ const ProgressCriteria = sequelizeKone.define(
   {
     code: {
       primaryKey: true,
+      type: STRING,
+    },
+    curriculumVersion: {
       type: STRING,
     },
     coursesYearOne: {

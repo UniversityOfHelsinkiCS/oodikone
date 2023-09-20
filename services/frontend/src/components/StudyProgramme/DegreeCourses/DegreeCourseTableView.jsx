@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button, Label, Table, Icon, Dropdown } from 'semantic-ui-react'
+
 import useLanguage from '../../LanguagePicker/useLanguage'
 
 const getYear = criterionYear => {
@@ -23,16 +24,64 @@ const moduleVisibilityColor = visibility => {
 }
 
 const DegreeCourseTableView = ({
-  modules,
+  modules: initialModules,
   studyProgramme,
   combinedProgramme,
   criteria,
   setExclusion,
   removeExclusion,
   addProgressCriteriaCourse,
+  curriculum,
 }) => {
   const [visible, setVisible] = useState({})
   const { getTextIn } = useLanguage()
+  const [modules, setModules] = useState(initialModules)
+  const version = curriculum.version?.join(',')
+  useEffect(() => {
+    setModules(initialModules)
+  }, [initialModules])
+
+  const setModuleVisibility = (code, newVisibility) => {
+    // Same course can be in many modules, so change them all
+    const courseCodes = modules.find(({ module }) => module === code).courses.map(c => c.code)
+    setModules(
+      modules.map(mod => ({
+        ...mod,
+        courses: mod.courses.map(course => {
+          if (courseCodes.includes(course.code)) {
+            return {
+              ...course,
+              visible: { ...course.visible, visibility: newVisibility },
+            }
+          }
+          return course
+        }),
+      }))
+    )
+  }
+
+  const setCourseVisibility = (code, newVisibility) => {
+    setModules(
+      modules.map(mod => ({
+        ...mod,
+        courses: mod.courses.map(course => {
+          if (course.code !== code) return course
+          return {
+            ...course,
+            visible: { ...course.visible, visibility: newVisibility },
+          }
+        }),
+      }))
+    )
+  }
+
+  const isVisible = moduleCode => {
+    if (!visible[version]) {
+      setVisible[version] = {}
+      return false
+    }
+    return visible[version][moduleCode]
+  }
 
   const excludeAll = code => {
     const module = modules.find(({ module }) => module === code)
@@ -40,16 +89,20 @@ const DegreeCourseTableView = ({
     setExclusion(
       studyProgramme,
       excludeFromProgramme,
-      module.courses.filter(c => c.visible.visibility).map(c => c.code)
+      module.courses.filter(c => c.visible.visibility).map(c => c.code),
+      curriculum.version
     )
+    setModuleVisibility(code, false)
   }
 
   const deleteAll = code => {
     const module = modules.find(({ module }) => module === code)
-    removeExclusion(
-      studyProgramme,
-      module.courses.map(c => c.visible.id)
-    )
+    removeExclusion({
+      programmeCode: studyProgramme,
+      courseCodes: module.courses.map(c => c.code),
+      curriculumVersion: version,
+    })
+    setModuleVisibility(code, true)
   }
 
   const showAllButton = module => (
@@ -75,8 +128,8 @@ const DegreeCourseTableView = ({
   )
 
   const toggleVisible = code => {
-    const newState = !visible[code]
-    setVisible({ ...visible, [code]: newState })
+    const newState = !isVisible(code)
+    setVisible({ ...visible, [version]: { ...visible[version], [code]: newState } })
   }
 
   const calculateModuleVisibility = code => {
@@ -99,7 +152,8 @@ const DegreeCourseTableView = ({
       <Button
         color="blue"
         onClick={() => {
-          setExclusion(studyProgramme, excludeFromProgramme, [course.code])
+          setExclusion(studyProgramme, excludeFromProgramme, [course.code], curriculum.version)
+          setCourseVisibility(course.code, false)
         }}
       >
         Set hidden
@@ -110,7 +164,12 @@ const DegreeCourseTableView = ({
     <Button
       color="blue"
       onClick={() => {
-        removeExclusion(studyProgramme, [course.visible.id])
+        removeExclusion({
+          programmeCode: studyProgramme,
+          courseCodes: [course.visible.id],
+          curriculumVersion: version,
+        })
+        setCourseVisibility(course.code, true)
       }}
     >
       Set visible
@@ -123,7 +182,12 @@ const DegreeCourseTableView = ({
       onClick={() => {
         const year = getYear(criterionYear)
         const courses = criteria.courses ? [...criteria.courses[year], course.code] : [course.code]
-        addProgressCriteriaCourse({ programmeCode: studyProgramme, courses, year: criterionYear })
+        addProgressCriteriaCourse({
+          programmeCode: studyProgramme,
+          courses,
+          year: criterionYear,
+          version: curriculum.version,
+        })
       }}
     >
       {`Set criterion for year ${criterionYear}`}
@@ -219,7 +283,7 @@ const DegreeCourseTableView = ({
           <React.Fragment key={`fragment-${module}`}>
             <Table.Row key={module}>
               <Table.Cell style={{ cursor: 'pointer' }} onClick={() => toggleVisible(module)}>
-                <Icon name={visible[module] ? 'angle down' : 'angle right'} />
+                <Icon name={isVisible(module) ? 'angle down' : 'angle right'} />
                 <b>{courses[0] && courses[0].parent_name ? getTextIn(courses[0].parent_name) : module}</b>
               </Table.Cell>
               <Table.Cell>{module}</Table.Cell>
@@ -234,7 +298,7 @@ const DegreeCourseTableView = ({
                 {calculateModuleVisibility(module) === 'hidden' ? showAllButton(module) : hideAllButton(module)}
               </Table.Cell>
             </Table.Row>
-            {visible[module] &&
+            {isVisible(module) &&
               courses
                 .sort((a, b) => a.code.localeCompare(b.code))
                 .map(course => (

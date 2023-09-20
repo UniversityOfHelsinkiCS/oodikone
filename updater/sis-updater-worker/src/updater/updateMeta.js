@@ -131,7 +131,8 @@ const updateCreditTypes = async creditTypes => {
 
 const updateStudyrightExtents = async educationTypes => {
   const studyrightExtents = educationTypes.map(mapStudyrightExtent).filter(eT => eT.extentcode)
-  await bulkCreate(StudyrightExtent, studyrightExtents, null, ['extentcode'])
+  const uniqueExtents = _.uniqBy(studyrightExtents, 'extentcode')
+  await bulkCreate(StudyrightExtent, uniqueExtents, null, ['extentcode'])
 }
 
 const updateTrends = async () => {

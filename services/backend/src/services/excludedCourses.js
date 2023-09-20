@@ -2,16 +2,18 @@ const Sequelize = require('sequelize')
 const { ExcludedCourse } = require('../models/models_kone')
 const { Op } = Sequelize
 
-const addExcludedCourses = async (programmecode, coursecodes) => {
-  return ExcludedCourse.bulkCreate(coursecodes.map(c => ({ programme_code: programmecode, course_code: c })))
+const addExcludedCourses = async (programmecode, coursecodes, curriculum) => {
+  return ExcludedCourse.bulkCreate(
+    coursecodes.map(c => ({ programme_code: programmecode, curriculum_version: curriculum, course_code: c }))
+  )
 }
 
-const removeExcludedCourses = async ids => {
+const removeExcludedCourses = async ({ programmeCode, curriculumVersion, courseCodes }) => {
   return ExcludedCourse.destroy({
     where: {
-      id: {
-        [Op.or]: ids,
-      },
+      programme_code: programmeCode,
+      curriculum_version: curriculumVersion,
+      course_code: { [Op.in]: courseCodes },
     },
   })
 }
