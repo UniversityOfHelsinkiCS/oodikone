@@ -46,6 +46,7 @@ const resolveProgramme = async programme => {
     organization_id: responsibleOrg?.organisationId ?? null,
     valid_from: programme?.validity_period?.startDate ?? null,
     valid_to: programme?.validity_period?.endDate ?? null,
+    curriculum_period_ids: programme.curriculum_period_ids ?? [],
     order: 0,
     children,
   }
@@ -59,7 +60,7 @@ const recursiveWrite = (modArg, parentId, programmeMap, joinMap) => {
     return
   }
 
-  if (!mod.id) {
+  if (!mod.id || !mod.group_id) {
     return
   }
 

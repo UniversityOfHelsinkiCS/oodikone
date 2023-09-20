@@ -261,6 +261,7 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, combinedProgram
     isAcademicYear,
     includeAllSpecials,
   }
+
   const thesis = await getThesisStats(queryParameters)
   const thesisSecondProgramme = await getThesisStats(combinedQueryParameters)
 

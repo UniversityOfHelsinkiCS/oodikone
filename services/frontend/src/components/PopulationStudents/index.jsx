@@ -39,6 +39,7 @@ const Panes = ({
   criteria,
   months,
   year,
+  curriculum,
 }) => {
   const { handleTabChange } = useTabChangeAnalytics()
   const programmeForTagsLink = combinedProgramme ? `${mainProgramme}+${combinedProgramme}` : mainProgramme
@@ -65,7 +66,12 @@ const Panes = ({
     {
       menuItem: 'Courses',
       render: () => (
-        <CoursesTable students={filteredStudents} variant={variant} studyGuidanceGroup={studyGuidanceGroup} />
+        <CoursesTable
+          curriculum={curriculum}
+          students={filteredStudents}
+          variant={variant}
+          studyGuidanceGroup={studyGuidanceGroup}
+        />
       ),
     },
     {
@@ -154,6 +160,7 @@ const PopulationStudents = ({
   to,
   criteria,
   year,
+  curriculum,
 }) => {
   const [state, setState] = useState({})
   const studentRef = useRef()
@@ -222,6 +229,7 @@ const PopulationStudents = ({
         to={to}
         months={months}
         year={year}
+        curriculum={curriculum}
       />
     </>
   )

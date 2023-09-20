@@ -16,6 +16,9 @@ ExcludedCourse.init(
     course_code: {
       type: STRING,
     },
+    curriculum_version: {
+      type: STRING,
+    },
     created_at: {
       type: DATE,
     },

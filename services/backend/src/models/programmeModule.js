@@ -1,4 +1,4 @@
-const { Model, STRING, DATE, INTEGER, JSONB } = require('sequelize')
+const { Model, STRING, DATE, INTEGER, JSONB, ARRAY, TEXT } = require('sequelize')
 const { dbConnections } = require('../database/connection')
 
 class ProgrammeModule extends Model {}
@@ -39,6 +39,9 @@ ProgrammeModule.init(
     },
     valid_to: {
       type: DATE,
+    },
+    curriculum_period_ids: {
+      type: ARRAY(TEXT),
     },
     createdAt: {
       type: DATE,

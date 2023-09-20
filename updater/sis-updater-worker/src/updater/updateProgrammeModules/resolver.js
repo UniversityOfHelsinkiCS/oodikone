@@ -30,6 +30,7 @@ class ModuleResolver {
       study_level: mod.study_level,
       valid_from: mod?.validity_period?.startDate ?? null,
       valid_to: mod?.validity_period?.endDate ?? null,
+      curriculum_period_ids: mod.curriculum_period_ids ?? [],
       order: this.getOrder(mod.group_id),
       children,
     }
@@ -46,6 +47,7 @@ class ModuleResolver {
       type: 'course',
       valid_from: course.validity_period.startDate ?? null,
       valid_to: course.validity_period.endDate ?? null,
+      curriculum_period_ids: course.curriculum_period_ids ?? [],
       order: this.getOrder(course.group_id),
     }
   }
