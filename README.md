@@ -116,6 +116,7 @@ Some useful commands are defined in `package.json` and can be run with `npm run 
 - `npm run both`: starts oodikone and updater with anonymized data
 - `npm run both:real`: starts oodikone and updater with real data
 - `npm run docker:down`: stops the whole environment
+- `npm run testupdater`: runs tests for updater
 - `npm run flushredis`: Clears redis, which forces big calculations to be redone in e.g. studyprogramme overview and faculty views.
 
 Once you have ran setup for oodikone , you can just execute the first one (`npm run oodikone`). After starting and waiting for a while for containers to compile, oodikone can be accessed at [http://localhost:3000/](http://localhost:3000/) and Adminer (database investigation tool) at [http://localhost:5050/](http://localhost:5050/). Adminer requires you to login with username `postgres` and with any password you choose (for example `p`).
