@@ -16,6 +16,7 @@
     "both": "./run.sh both anon up --detach",
     "both:real": "./run.sh both real up --detach",
     "docker:down": "./run.sh both anon down --remove-orphans; ./run.sh both real down --remove-orphans",
+    "testupdater": "docker-compose --file docker-compose.ci.yml up --detach --no-recreate sis-updater-worker && SCHEDULE_IMMEDIATE=weekly EXIT_AFTER_IMMEDIATES=yes docker-compose --file docker-compose.ci.yml run sis-updater-scheduler npm start",
     "flushredis": "docker exec -it redis redis-cli flushall",
     "prepare": "husky install",
     "rapodiff": "docker exec backend node /opt/app-root/src/src/rapodiff.js"
