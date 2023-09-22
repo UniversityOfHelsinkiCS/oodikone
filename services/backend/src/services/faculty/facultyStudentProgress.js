@@ -1,16 +1,7 @@
 const { indexOf } = require('lodash')
 const moment = require('moment')
 const { getAcademicYearDates } = require('../../util/semester')
-const {
-  getCreditThresholds,
-  getBachelorCreditGraphStats,
-  getMasterCreditGraphStats,
-  getBachelorMasterCreditGraphStats,
-  getDoctoralCreditGraphStats,
-  getYearsArray,
-  tableTitles,
-  getVetenaryCreditGraphStats,
-} = require('../studyprogrammeHelpers')
+const { getCreditThresholds, getYearsArray } = require('../studyprogrammeHelpers')
 const { studytrackStudents } = require('../studyprogramme')
 const { getStudyRightsByExtent, getStudyRightsByBachelorStart, getTransfersIn, getTransfersOut } = require('./faculty')
 const { checkTransfers } = require('./facultyHelpers')
@@ -18,12 +9,14 @@ const { checkTransfers } = require('./facultyHelpers')
 const getStudentData = (startDate, students, thresholdKeys, thresholdAmounts, limits = [], limitKeys = [], prog) => {
   let data = {}
   let programmeData = {}
+  const creditCounts = []
   thresholdKeys.forEach(t => (data[t] = 0))
   limitKeys.forEach(t => (programmeData[t] = 0))
   students.forEach(({ credits }) => {
     const creditcount = credits
       .filter(credit => moment(credit.attainment_date).isSameOrAfter(startDate))
       .reduce((prev, curr) => prev + curr.credits, 0)
+    creditCounts.push(creditcount)
     data[thresholdKeys[0]] += creditcount < thresholdAmounts[0] ? 1 : 0
     data[thresholdKeys[1]] += creditcount >= thresholdAmounts[0] && creditcount < thresholdAmounts[1] ? 1 : 0
     data[thresholdKeys[2]] += creditcount >= thresholdAmounts[1] && creditcount < thresholdAmounts[2] ? 1 : 0
@@ -53,7 +46,7 @@ const getStudentData = (startDate, students, thresholdKeys, thresholdAmounts, li
     }
   })
 
-  return { data, progData: programmeData }
+  return { data, progData: programmeData, creditCounts }
 }
 
 const createLimits = (months, creditsToAdd) => {
@@ -94,59 +87,38 @@ const combineFacultyStudentProgress = async (faculty, programmes, specialGroups,
     graduationStatus = [0, 1]
   }
   const yearsArray = getYearsArray(since.getFullYear(), true, true)
-  const titlesVet = [
-    '',
-    'All',
-    '< 210 credits',
-    '210-239 credits',
-    '240-269 credits',
-    '270-299 credits',
-    '300-329 credits',
-    '330-359 credits',
-    ' 360 ≤ credits ',
-  ]
   const progressStats = {
     id: faculty,
     years: yearsArray,
-    bachelorsTableStats: new Array(yearsArray.length),
-    bcMsTableStats: new Array(yearsArray.length),
-    mastersTableStats: new Array(yearsArray.length),
-    doctoralTableStats: new Array(yearsArray.length),
-    bachelorsGraphStats: getBachelorCreditGraphStats(yearsArray),
-    bcMsGraphStats:
-      faculty === 'H90' ? getVetenaryCreditGraphStats(yearsArray) : getBachelorMasterCreditGraphStats(yearsArray),
-    mastersGraphStats:
-      faculty === 'H90' ? getBachelorCreditGraphStats(yearsArray) : getMasterCreditGraphStats(yearsArray),
-    doctoralGraphStats: getDoctoralCreditGraphStats(yearsArray),
-    bachelorTitles: tableTitles.creditProgress.bachelor,
-    bcMsTitles: faculty === 'H90' ? titlesVet : tableTitles.creditProgress.bachelorMaster,
-    mastersTitles: faculty === 'H90' ? tableTitles.creditProgress.bachelor : tableTitles.creditProgress.master,
-    doctoralTitles: tableTitles.creditProgress.doctoral,
     yearlyBachelorTitles: [],
     yearlyBcMsTitles: [],
     yearlyMasterTitles: [],
+    yearlyLicentiateTitles: [],
     programmeNames: {},
     bachelorsProgStats: {},
     bcMsProgStats: {},
     mastersProgStats: {},
     doctoralProgStats: {},
+    creditCounts: {
+      bachelor: {},
+      bachelorMaster: {},
+      master: {},
+      licentiate: {}, // only used for programmes MH30_001 and MH30_003
+      doctor: {},
+    },
   }
 
   const reversedYears = [...yearsArray].reverse()
-  reversedYears.forEach(year => {
-    progressStats.bachelorsTableStats[indexOf(reversedYears, year)] = [year, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    progressStats.bcMsTableStats[indexOf(reversedYears, year)] = [year, 0, 0, 0, 0, 0, 0, 0, 0]
-    progressStats.mastersTableStats[indexOf(reversedYears, year)] = [year, 0, 0, 0, 0, 0, 0, 0]
-    progressStats.doctoralTableStats[indexOf(reversedYears, year)] = [year, 0, 0, 0, 0, 0, 0]
-  })
 
   const limitKeys = ['zero', 't5', 't4', 't3', 't2', 't1']
   let bachelorlimits = []
   let masterlimits = []
   let bcmslimits = []
+  let licentiatelimits = []
   const bachelorProgress = {}
   const masterProgress = {}
   const bcmsProgress = {}
+  const licentiateProgress = {}
   const doctoralProgress = {}
   for (const year of reversedYears) {
     if (year === 'Total') continue
@@ -170,9 +142,26 @@ const combineFacultyStudentProgress = async (faculty, programmes, specialGroups,
     } else {
       bcmslimits = createLimits(months, 0)
     }
+    if (months >= 72 && faculty === 'H30') {
+      licentiatelimits = createLimits(72, 0)
+    } else if (months >= 60) {
+      licentiatelimits = createLimits(60, 0)
+    } else {
+      licentiatelimits = createLimits(months, 0)
+    }
     progressStats.yearlyBachelorTitles = [...progressStats.yearlyBachelorTitles, createYearlyTitles(0, bachelorlimits)]
     progressStats.yearlyMasterTitles = [...progressStats.yearlyMasterTitles, createYearlyTitles(0, masterlimits)]
+    progressStats.yearlyLicentiateTitles = [
+      ...progressStats.yearlyLicentiateTitles,
+      createYearlyTitles(0, licentiatelimits),
+    ]
     progressStats.yearlyBcMsTitles = [...progressStats.yearlyBcMsTitles, createYearlyTitles(0, bcmslimits)]
+
+    progressStats.creditCounts.bachelor[year] = []
+    progressStats.creditCounts.bachelorMaster[year] = []
+    progressStats.creditCounts.master[year] = []
+    progressStats.creditCounts.licentiate[year] = []
+    progressStats.creditCounts.doctor[year] = []
 
     for (const { progId, code, name } of programmes) {
       let extentcodes = [1, 2, 3, 4]
@@ -197,7 +186,7 @@ const combineFacultyStudentProgress = async (faculty, programmes, specialGroups,
       if (code.includes('KH')) {
         const allBachelors = studyrights.filter(sr => sr.extentcode === 1).map(sr => sr.studentnumber)
         const students = await studytrackStudents(allBachelors)
-        const { data: studentData, progData } = getStudentData(
+        const { progData, creditCounts } = getStudentData(
           startDate,
           students,
           creditThresholdKeys,
@@ -207,20 +196,12 @@ const combineFacultyStudentProgress = async (faculty, programmes, specialGroups,
           'KH'
         )
 
+        progressStats.creditCounts.bachelor[year] = [...progressStats.creditCounts.bachelor[year], ...creditCounts]
+
         if (!(progId in bachelorProgress)) {
           bachelorProgress[progId] = new Array(reversedYears.length - 1)
         }
-        progressStats.bachelorsTableStats[indexOf(reversedYears, year)][1] += students.length || 0
-        progressStats.bachelorsTableStats[indexOf(reversedYears, 'Total')][1] += students.length || 0
         bachelorProgress[progId][indexOf(reversedYears, year)] = limitKeys.map(key => progData[key])
-        for (const key of Object.keys(studentData)) {
-          progressStats.bachelorsTableStats[indexOf(reversedYears, year)][indexOf(creditThresholdKeys, key) + 2] +=
-            studentData[key] || 0
-          progressStats.bachelorsGraphStats[key].data[indexOf(yearsArray, year)] += studentData[key] || 0
-          progressStats.bachelorsTableStats[indexOf(reversedYears, 'Total')][indexOf(creditThresholdKeys, key) + 2] +=
-            studentData[key] || 0
-          progressStats.bachelorsGraphStats[key].data[indexOf(yearsArray, 'Total')] += studentData[key] || 0
-        }
       } else if (code.includes('MH')) {
         const allMsStudents = studyrights
           .filter(sr => sr.extentcode === 2 && sr.studyrightid.slice(-2) !== '-2')
@@ -231,16 +212,11 @@ const combineFacultyStudentProgress = async (faculty, programmes, specialGroups,
         const bcMsStudents = await studytrackStudents(allBcMsStudents)
         const msStudents = await studytrackStudents(allMsStudents)
 
-        progressStats.mastersTableStats[indexOf(reversedYears, year)][1] += msStudents.length || 0
-        progressStats.mastersTableStats[indexOf(reversedYears, 'Total')][1] += msStudents.length || 0
-        progressStats.bcMsTableStats[indexOf(reversedYears, year)][1] += bcMsStudents.length || 0
-        progressStats.bcMsTableStats[indexOf(reversedYears, 'Total')][1] += bcMsStudents.length || 0
-
         // Get credit threshold values both 'combined study programme' and 'only master studyright' are false
         const { creditThresholdKeys: creditThresholdKeysBcMs, creditThresholdAmounts: creditThresholdAmountsBcMs } =
           getCreditThresholds(code, false, false)
 
-        const { data: bcMsStudentdata, progData: bcMsProgdata } = getStudentData(
+        const { progData: bcMsProgdata, creditCounts: creditCountsBcMs } = getStudentData(
           startDate,
           bcMsStudents,
           creditThresholdKeysBcMs,
@@ -249,7 +225,7 @@ const combineFacultyStudentProgress = async (faculty, programmes, specialGroups,
           limitKeys,
           'MH'
         )
-        const { data: msStudentdata, progData: msProgdata } = getStudentData(
+        const { progData: msProgdata, creditCounts: creditCountsMaster } = getStudentData(
           startDate,
           msStudents,
           creditThresholdKeys,
@@ -258,48 +234,46 @@ const combineFacultyStudentProgress = async (faculty, programmes, specialGroups,
           limitKeys,
           'MH'
         )
-        if (!(progId in masterProgress)) {
-          masterProgress[progId] = new Array(reversedYears.length - 1)
-          bcmsProgress[progId] = new Array(reversedYears.length - 1)
-        }
-        masterProgress[progId][indexOf(reversedYears, year)] = limitKeys.map(key => msProgdata[key])
-        bcmsProgress[progId][indexOf(reversedYears, year)] = limitKeys.map(key => bcMsProgdata[key])
-        for (const key of Object.keys(msStudentdata)) {
-          progressStats.mastersTableStats[indexOf(reversedYears, year)][indexOf(creditThresholdKeys, key) + 2] +=
-            msStudentdata[key] || 0
-          progressStats.mastersTableStats[indexOf(reversedYears, 'Total')][indexOf(creditThresholdKeys, key) + 2] +=
-            msStudentdata[key] || 0
-          progressStats.mastersGraphStats[key].data[indexOf(yearsArray, year)] += msStudentdata[key] || 0
-          progressStats.mastersGraphStats[key].data[indexOf(yearsArray, 'Total')] += msStudentdata[key] || 0
-        }
-        for (const key of Object.keys(bcMsStudentdata)) {
-          progressStats.bcMsTableStats[indexOf(reversedYears, year)][indexOf(creditThresholdKeysBcMs, key) + 2] +=
-            bcMsStudentdata[key] || 0
-          progressStats.bcMsTableStats[indexOf(reversedYears, 'Total')][indexOf(creditThresholdKeysBcMs, key) + 2] +=
-            bcMsStudentdata[key] || 0
-          progressStats.bcMsGraphStats[key].data[indexOf(yearsArray, year)] += bcMsStudentdata[key] || 0
-          progressStats.bcMsGraphStats[key].data[indexOf(yearsArray, 'Total')] += bcMsStudentdata[key] || 0
+        if (['MH30_001', 'MH30_003'].includes(code)) {
+          progressStats.creditCounts.licentiate[year] = [
+            ...progressStats.creditCounts.licentiate[year],
+            ...creditCountsMaster,
+          ]
+          if (!(progId in licentiateProgress)) {
+            licentiateProgress[progId] = new Array(reversedYears.length - 1)
+          }
+          licentiateProgress[progId][indexOf(reversedYears, year)] = limitKeys.map(key => msProgdata[key])
+        } else {
+          progressStats.creditCounts.bachelorMaster[year] = [
+            ...progressStats.creditCounts.bachelorMaster[year],
+            ...creditCountsBcMs,
+          ]
+          progressStats.creditCounts.master[year] = [...progressStats.creditCounts.master[year], ...creditCountsMaster]
+          if (!(progId in masterProgress)) {
+            masterProgress[progId] = new Array(reversedYears.length - 1)
+            bcmsProgress[progId] = new Array(reversedYears.length - 1)
+          }
+          masterProgress[progId][indexOf(reversedYears, year)] = limitKeys.map(key => msProgdata[key])
+          bcmsProgress[progId][indexOf(reversedYears, year)] = limitKeys.map(key => bcMsProgdata[key])
         }
       } else {
         const all = studyrights.filter(sr => sr.extentcode === 4 || sr.extentcode === 3).map(sr => sr.studentnumber)
         const doctoralStudents = await studytrackStudents(all)
-        const { data } = getStudentData(startDate, doctoralStudents, creditThresholdKeys, creditThresholdAmounts, 'T')
 
-        progressStats.doctoralTableStats[indexOf(reversedYears, year)][1] += doctoralStudents.length || 0
-        progressStats.doctoralTableStats[indexOf(reversedYears, 'Total')][1] += doctoralStudents.length || 0
+        const { data, creditCounts } = getStudentData(
+          startDate,
+          doctoralStudents,
+          creditThresholdKeys,
+          creditThresholdAmounts,
+          'T'
+        )
+
+        progressStats.creditCounts.doctor[year] = [...progressStats.creditCounts.doctor[year], ...creditCounts]
+
         if (!(progId in doctoralProgress)) {
           doctoralProgress[progId] = new Array(reversedYears.length - 1)
         }
         doctoralProgress[progId][indexOf(reversedYears, year)] = creditThresholdKeys.map(key => data[key])
-
-        for (const key of Object.keys(data)) {
-          progressStats.doctoralTableStats[indexOf(reversedYears, year)][indexOf(creditThresholdKeys, key) + 2] +=
-            data[key] || 0
-          progressStats.doctoralTableStats[indexOf(reversedYears, 'Total')][indexOf(creditThresholdKeys, key) + 2] +=
-            data[key] || 0
-          progressStats.doctoralGraphStats[key].data[indexOf(yearsArray, year)] += data[key] || 0
-          progressStats.doctoralGraphStats[key].data[indexOf(yearsArray, 'Total')] += data[key] || 0
-        }
       }
     }
   }
@@ -313,6 +287,9 @@ const combineFacultyStudentProgress = async (faculty, programmes, specialGroups,
   progressStats.bcMsProgStats = Object.keys(bcmsProgress)
     .filter(prog => !bcmsProgress[prog].every(year => year.every(value => value === 0)))
     .reduce((result, prog) => ({ ...result, [prog]: bcmsProgress[prog] }), {})
+  progressStats.licentiateProgStats = Object.keys(licentiateProgress)
+    .filter(prog => !licentiateProgress[prog].every(year => year.every(value => value === 0)))
+    .reduce((result, prog) => ({ ...result, [prog]: licentiateProgress[prog] }), {})
   progressStats.doctoralProgStats = Object.keys(doctoralProgress)
     .filter(prog => !doctoralProgress[prog].every(year => year.every(value => value === 0)))
     .reduce((result, prog) => ({ ...result, [prog]: doctoralProgress[prog] }), {})
