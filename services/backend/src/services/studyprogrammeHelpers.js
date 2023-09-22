@@ -355,19 +355,19 @@ const getCombinedVetenaryCreditGraphStats = years => ({
     data: getEmptyArray(years.length),
   },
   lte120: {
-    name: '60-179 credits',
+    name: '60-119 credits',
     data: getEmptyArray(years.length),
   },
   lte180: {
-    name: '180-239 credits',
+    name: '120-179 credits',
     data: getEmptyArray(years.length),
   },
   lte240: {
-    name: '240-299 credits',
+    name: '180-239 credits',
     data: getEmptyArray(years.length),
   },
   lte300: {
-    name: '300-359 credits',
+    name: '240-299 credits',
     data: getEmptyArray(years.length),
   },
   lte360: {
@@ -376,6 +376,41 @@ const getCombinedVetenaryCreditGraphStats = years => ({
   },
   mte360: {
     name: '360 or more credits',
+    data: getEmptyArray(years.length),
+  },
+})
+
+const getDentistCreditGraphStats = years => ({
+  lte30: {
+    name: 'Less than 30 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte80: {
+    name: '30-79 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte130: {
+    name: '80-129 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte180: {
+    name: '130-179 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte230: {
+    name: '180-229 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte280: {
+    name: '230-279 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte330: {
+    name: '280-329 credits',
+    data: getEmptyArray(years.length),
+  },
+  mte330: {
+    name: '330 or more credits',
     data: getEmptyArray(years.length),
   },
 })
@@ -407,6 +442,37 @@ const getMasterCreditGraphStats = years => ({
   },
 })
 
+const getMasterOfPsychologyCreditGraphStats = years => ({
+  lte25: {
+    name: 'Less than 25 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte50: {
+    name: '25-49 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte75: {
+    name: '50-74 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte100: {
+    name: '75-99 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte125: {
+    name: '100-124 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte150: {
+    name: '125-149 credits',
+    data: getEmptyArray(years.length),
+  },
+  mte150: {
+    name: '150 or more credits',
+    data: getEmptyArray(years.length),
+  },
+})
+
 const getDoctoralCreditGraphStats = years => ({
   lte10: {
     name: 'Less than 10 credits',
@@ -431,7 +497,9 @@ const getDoctoralCreditGraphStats = years => ({
 })
 
 const getCreditGraphStats = (studyprogramme, years, combinedVetenary, masterStudyRightOnly = false) => {
-  if (combinedVetenary) return getCombinedVetenaryCreditGraphStats(years)
+  if (combinedVetenary || studyprogramme === 'MH30_001') return getCombinedVetenaryCreditGraphStats(years)
+  if (studyprogramme === 'MH30_003') return getDentistCreditGraphStats(years)
+  if (studyprogramme === 'MH30_004') return getMasterOfPsychologyCreditGraphStats(years)
   if (studyprogramme.includes('KH')) return getBachelorCreditGraphStats(years)
   if (studyprogramme === 'MH90_001')
     return masterStudyRightOnly ? getBachelorCreditGraphStats(years) : getVetenaryCreditGraphStats(years)
@@ -452,10 +520,21 @@ const vetenaryCreditThresholds = ['lte210', 'lte240', 'lte270', 'lte300', 'lte33
 const vetenaryCreditAmounts = [210, 240, 270, 300, 330, 360, 360]
 const combinedVetenaryThresholds = ['lte30', 'lte60', 'lte120', 'lte180', 'lte240', 'lte300', 'lte360', 'mte360']
 const combinedVetenaryAmounts = [30, 60, 120, 180, 240, 300, 360, 360]
+const dentistCreditThresholds = ['lte30', 'lte80', 'lte130', 'lte180', 'lte230', 'lte280', 'lte330', 'mte330']
+const dentistCreditAmounts = [30, 80, 130, 180, 230, 280, 330, 330]
+const masterOfPsychologyCreditThresholds = ['lte25', 'lte50', 'lte75', 'lte100', 'lte125', 'lte150', 'mte150']
+const masterOfPsychologyCreditAmounts = [25, 50, 75, 100, 125, 150, 150]
 
 const getCreditThresholds = (studyprogramme, combinedVetenary, masterStudyRightOnly = false) => {
-  if (combinedVetenary)
+  if (combinedVetenary || studyprogramme === 'MH30_001')
     return { creditThresholdKeys: combinedVetenaryThresholds, creditThresholdAmounts: combinedVetenaryAmounts }
+  if (studyprogramme === 'MH30_003')
+    return { creditThresholdKeys: dentistCreditThresholds, creditThresholdAmounts: dentistCreditAmounts }
+  if (studyprogramme === 'MH30_004')
+    return {
+      creditThresholdKeys: masterOfPsychologyCreditThresholds,
+      creditThresholdAmounts: masterOfPsychologyCreditAmounts,
+    }
   if (studyprogramme === 'MH90_001') {
     return masterStudyRightOnly
       ? { creditThresholdKeys: bachelorCreditThresholds, creditThresholdAmounts: bachelorCreditAmounts }
@@ -550,6 +629,29 @@ const tableTitles = {
       '300-359 credits',
       '360 ≤ credits',
     ],
+    masterOfPsychology: [
+      '',
+      'All',
+      '< 25 credits',
+      '25-49 credits',
+      '50-74 credits',
+      '75-99 credits',
+      '100-124 credits',
+      '125-149 credits',
+      '150 ≤ credits',
+    ],
+    dentist: [
+      '',
+      'All',
+      '< 30 credits',
+      '30-79 credits',
+      '80-129 credits',
+      '130-179 credits',
+      '180-229 credits',
+      '230-279 credits',
+      '280-329 credits',
+      '330 ≤ credits',
+    ],
     doctoral: ['', 'All', '< 10 credits', '10-19 credits', '20-29 credits', '30-39 credits', '40 ≤ credits'],
   },
   studytracksStart: ['', 'All', 'Started studying', 'Currently enrolled', 'Absent', 'Inactive'],
@@ -562,8 +664,10 @@ const tableTitles = {
 }
 
 const getCreditProgressTableTitles = (studyprogramme, combinedVetenaryProgramme, masterProgrammeOnly = false) => {
-  if (combinedVetenaryProgramme) return tableTitles.creditProgress.combinedVetenary
-  if (studyprogramme.includes('KH')) return tableTitles.creditProgress.bachelor
+  if (studyprogramme === 'MH30_001' || combinedVetenaryProgramme) return tableTitles.creditProgress.combinedVetenary
+  if (studyprogramme === 'MH30_003') return tableTitles.creditProgress.dentist
+  if (studyprogramme === 'MH30_004') return tableTitles.creditProgress.masterOfPsychology
+  if (studyprogramme === 'MH90_001' || studyprogramme.includes('KH')) return tableTitles.creditProgress.bachelor
   if (studyprogramme.includes('MH'))
     return masterProgrammeOnly ? tableTitles.creditProgress.master : tableTitles.creditProgress.bachelorMaster
   return tableTitles.creditProgress.doctoral

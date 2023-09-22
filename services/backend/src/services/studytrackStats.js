@@ -549,10 +549,7 @@ const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, combinedPro
     studytrackOptions,
     includeGraduated: settings.graduated,
     populationTitles: [...tableTitles.studytracksStart, ...graduatedTitles, ...tableTitles.studytracksEnd],
-    creditTableTitles:
-      studyprogramme === 'MH90_001'
-        ? tableTitles['creditProgress']['bachelor']
-        : getCreditProgressTableTitles(studyprogramme, combinedProgramme, true),
+    creditTableTitles: getCreditProgressTableTitles(studyprogramme, combinedProgramme, true),
   }
 }
 
