@@ -244,7 +244,18 @@ const FacultyProgrammeOverview = ({
                     icon="download"
                     floated="right"
                     onClick={() =>
-                      downloadProgressTableCsv(progressStats, progressStats?.data?.programmeNames, faculty, getTextIn)
+                      downloadProgressTableCsv(
+                        {
+                          ...progressStats,
+                          bachelorStats,
+                          bachelorMasterStats,
+                          masterStats,
+                          doctorStats,
+                        },
+                        progressStats?.data?.programmeNames,
+                        faculty,
+                        getTextIn
+                      )
                     }
                     style={{ backgroundColor: 'white', borderRadius: 0 }}
                   />

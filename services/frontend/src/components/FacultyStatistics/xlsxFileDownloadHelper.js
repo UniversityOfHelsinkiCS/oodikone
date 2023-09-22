@@ -109,17 +109,24 @@ export const downloadStudentTableCsv = (studentStats, programmeNames, faculty, s
 }
 
 export const downloadProgressTableCsv = (progressStats, programmeNames, faculty, getTextIn) => {
+  const bachelorStats = progressStats?.bachelorStats
+  const bachelorMasterStats = progressStats?.bachelorMasterStats
+  const masterStats = progressStats?.masterStats
+  const doctorStats = progressStats?.doctorStats
+
   const book = xlsx.utils.book_new()
-  const progressStatsBachelor = progressStats?.data?.bachelorsTableStats || []
-  const progressStatsBachelorMaster = progressStats?.data?.bcMsTableStats || []
-  const progressStatsMaster = progressStats?.data?.mastersTableStats || []
-  const progressStatsDoctor = progressStats?.data?.doctoralTableStats || []
+
+  const progressStatsBachelor = bachelorStats.tableStats || []
+  const progressStatsBachelorMaster = bachelorMasterStats.tableStats || []
+  const progressStatsMaster = masterStats.tableStats || []
+  const progressStatsDoctor = doctorStats.tableStats || []
+
   const tableData = [progressStatsBachelor, progressStatsMaster, progressStatsBachelorMaster, progressStatsDoctor]
   const tableHeadersData = [
-    progressStats?.data?.bachelorTitles,
-    progressStats?.data?.mastersTitles,
-    progressStats?.data?.bcMsTitles,
-    progressStats?.data?.doctoralTitles,
+    bachelorStats.tableTitles,
+    masterStats.tableTitles,
+    bachelorMasterStats.tableTitles,
+    doctorStats.tableTitles,
   ]
 
   const sheetNames = ['Bachelor', 'Master', 'Bachelor-Master', 'Doctor']
@@ -152,7 +159,7 @@ export const downloadProgressTableCsv = (progressStats, programmeNames, faculty,
     progressStats?.data?.yearlyBachelorTitles,
     progressStats?.data?.yearlyMasterTitles,
     progressStats?.data?.yearlyBcMsTitles,
-    progressStats?.data?.doctoralTitles,
+    doctorStats.tableTitles,
   ]
   counter = -1
   const years = progressStatsBachelor.map(row => row[0])
