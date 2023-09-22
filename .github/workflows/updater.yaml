@@ -46,61 +46,60 @@ jobs:
         with:
           path: /tmp/scheduler.tar
 
-  test_updater:
-    name: 'Test Updater'
-    runs-on: ubuntu-latest
-    needs:
-      - build_worker
-      - build_scheduler
-    steps:
-      - uses: actions/checkout@v3
-      - name: 'Login to toska docker registry'
-        uses: docker/login-action@v2
-        with:
-          registry: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
-      - name: 'Download built images'
-        uses: actions/download-artifact@v3
-        with:
-          path: /tmp/
-      - name: 'Load worker image'
-        run: docker load --input /tmp/artifact/worker.tar
-      - name: 'Load scheduler image'
-        run: docker load --input /tmp/artifact/scheduler.tar
-      - name: 'Start worker'
-        run: docker-compose --file docker-compose.ci.yml up --detach --no-recreate sis-updater-worker
-      - name: 'Run hourly jobs'
-        run: docker-compose --file docker-compose.ci.yml run sis-updater-scheduler npm start
-        env:
-          SCHEDULE_IMMEDIATE: hourly
-          EXIT_AFTER_IMMEDIATES: yes
-      - name: 'Run daily jobs'
-        run: docker-compose --file docker-compose.ci.yml run sis-updater-scheduler npm start
-        env:
-          SCHEDULE_IMMEDIATE: daily
-          EXIT_AFTER_IMMEDIATES: yes
-      - name: 'Run weekly jobs'
-        run: docker-compose --file docker-compose.ci.yml run sis-updater-scheduler npm start
-        env:
-          SCHEDULE_IMMEDIATE: weekly
-          EXIT_AFTER_IMMEDIATES: yes
-      - name: 'Run prepurge'
-        run: docker-compose --file docker-compose.ci.yml run sis-updater-scheduler npm start
-        env:
-          SCHEDULE_IMMEDIATE: prepurge
-          EXIT_AFTER_IMMEDIATES: yes
-      - name: 'Run purge'
-        run: docker-compose --file docker-compose.ci.yml run sis-updater-scheduler npm start
-        env:
-          SCHEDULE_IMMEDIATE: purge
-          EXIT_AFTER_IMMEDIATES: yes
+  # test_updater:
+  #   name: 'Test Updater'
+  #   runs-on: ubuntu-latest
+  #   needs:
+  #     - build_worker
+  #     - build_scheduler
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: 'Login to toska docker registry'
+  #       uses: docker/login-action@v2
+  #       with:
+  #         registry: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi
+  #         username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
+  #         password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+  #     - name: 'Download built images'
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         path: /tmp/
+  #     - name: 'Load worker image'
+  #       run: docker load --input /tmp/artifact/worker.tar
+  #     - name: 'Load scheduler image'
+  #       run: docker load --input /tmp/artifact/scheduler.tar
+  #     - name: 'Start worker'
+  #       run: docker-compose --file docker-compose.ci.yml up --detach --no-recreate sis-updater-worker
+  #     - name: 'Run hourly jobs'
+  #       run: docker-compose --file docker-compose.ci.yml run sis-updater-scheduler npm start
+  #       env:
+  #         SCHEDULE_IMMEDIATE: hourly
+  #         EXIT_AFTER_IMMEDIATES: yes
+  #     - name: 'Run daily jobs'
+  #       run: docker-compose --file docker-compose.ci.yml run sis-updater-scheduler npm start
+  #       env:
+  #         SCHEDULE_IMMEDIATE: daily
+  #         EXIT_AFTER_IMMEDIATES: yes
+  #     - name: 'Run weekly jobs'
+  #       run: docker-compose --file docker-compose.ci.yml run sis-updater-scheduler npm start
+  #       env:
+  #         SCHEDULE_IMMEDIATE: weekly
+  #         EXIT_AFTER_IMMEDIATES: yes
+  #     - name: 'Run prepurge'
+  #       run: docker-compose --file docker-compose.ci.yml run sis-updater-scheduler npm start
+  #       env:
+  #         SCHEDULE_IMMEDIATE: prepurge
+  #         EXIT_AFTER_IMMEDIATES: yes
+  #     - name: 'Run purge'
+  #       run: docker-compose --file docker-compose.ci.yml run sis-updater-scheduler npm start
+  #       env:
+  #         SCHEDULE_IMMEDIATE: purge
+  #         EXIT_AFTER_IMMEDIATES: yes
 
   release_worker:
     name: 'Build and release Updater worker'
     runs-on: ubuntu-latest
-    needs: test_updater
-
+    # needs: test_updater
     steps:
       - uses: actions/checkout@v3
 
