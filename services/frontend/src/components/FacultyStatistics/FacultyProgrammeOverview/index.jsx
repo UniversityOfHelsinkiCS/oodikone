@@ -158,6 +158,7 @@ const FacultyProgrammeOverview = ({
     7
   )
   const masterStats = calculateStats(progressStats?.data?.creditCounts?.master, 120)
+  const licentiateStats = calculateStats(progressStats?.data?.creditCounts?.licentiate, 360)
   const doctorStats = calculateStats(progressStats?.data?.creditCounts?.doctor, 40, 0, 5)
 
   return (
@@ -336,6 +337,38 @@ const FacultyProgrammeOverview = ({
                         cypress="FacultyMastersProgressTable"
                         progressTitles={progressStats?.data.yearlyMasterTitles}
                         needsExtra={faculty.code === 'H60' ? 'NO EXTRA' : 'EXTRA HEIGHT'}
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+              {faculty.code === 'H30' && (
+                <>
+                  {getDivider('Licentiate', 'LicentiateStudentsOfTheFacultyByStartingYear', 'no-infobox')}
+                  <div className="section-container">
+                    <div className="graph-container">
+                      <FacultyBarChart
+                        cypress="FacultyLicentiateProgress"
+                        data={{
+                          id: faculty.code,
+                          stats: licentiateStats.chartStats,
+                          years: progressStats?.data.years,
+                        }}
+                      />
+                    </div>
+                    <div className="table-container">
+                      <FacultyProgressTable
+                        data={licentiateStats.tableStats}
+                        programmeStats={progressStats?.data.licentiateProgStats}
+                        titles={licentiateStats.tableTitles}
+                        sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.licentiateProgStats).map(
+                          listObj => listObj[0]
+                        )}
+                        progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
+                        programmeNames={progressStats?.data.programmeNames}
+                        cypress="FacultyLicentiateProgressTable"
+                        progressTitles={progressStats?.data.yearlyLicentiateTitles}
+                        needsExtra="EXTRA HEIGHT"
                       />
                     </div>
                   </div>
