@@ -17,26 +17,28 @@ const getStudentData = (startDate, students, thresholdKeys, thresholdAmounts, li
       .filter(credit => moment(credit.attainment_date).isSameOrAfter(startDate))
       .reduce((prev, curr) => prev + curr.credits, 0)
     creditCounts.push(creditcount)
-    data[thresholdKeys[0]] += creditcount < thresholdAmounts[0] ? 1 : 0
-    data[thresholdKeys[1]] += creditcount >= thresholdAmounts[0] && creditcount < thresholdAmounts[1] ? 1 : 0
-    data[thresholdKeys[2]] += creditcount >= thresholdAmounts[1] && creditcount < thresholdAmounts[2] ? 1 : 0
-    data[thresholdKeys[3]] += creditcount >= thresholdAmounts[2] && creditcount < thresholdAmounts[3] ? 1 : 0
-    if (thresholdKeys.length === 8) {
-      data[thresholdKeys[4]] += creditcount >= thresholdAmounts[3] && creditcount < thresholdAmounts[4] ? 1 : 0
-      data[thresholdKeys[5]] += creditcount >= thresholdAmounts[4] && creditcount < thresholdAmounts[5] ? 1 : 0
-      data[thresholdKeys[6]] += creditcount >= thresholdAmounts[5] && creditcount < thresholdAmounts[6] ? 1 : 0
-      data[thresholdKeys[7]] += creditcount >= thresholdAmounts[6] ? 1 : 0
-    } else if (thresholdKeys.length === 7) {
-      data[thresholdKeys[4]] += creditcount >= thresholdAmounts[3] && creditcount < thresholdAmounts[4] ? 1 : 0
-      data[thresholdKeys[5]] += creditcount >= thresholdAmounts[4] && creditcount < thresholdAmounts[5] ? 1 : 0
-      data[thresholdKeys[6]] += creditcount >= thresholdAmounts[5] ? 1 : 0
-    } else if (thresholdKeys.length === 6) {
-      data[thresholdKeys[4]] += creditcount >= thresholdAmounts[3] && creditcount < thresholdAmounts[4] ? 1 : 0
-      data[thresholdKeys[5]] += creditcount >= thresholdAmounts[4] ? 1 : 0
+    // Data is only used for doctoral programmes, otherwise only programmeData is needed
+    if (prog === 'T') {
+      data[thresholdKeys[0]] += creditcount < thresholdAmounts[0] ? 1 : 0
+      data[thresholdKeys[1]] += creditcount >= thresholdAmounts[0] && creditcount < thresholdAmounts[1] ? 1 : 0
+      data[thresholdKeys[2]] += creditcount >= thresholdAmounts[1] && creditcount < thresholdAmounts[2] ? 1 : 0
+      data[thresholdKeys[3]] += creditcount >= thresholdAmounts[2] && creditcount < thresholdAmounts[3] ? 1 : 0
+      if (thresholdKeys.length === 8) {
+        data[thresholdKeys[4]] += creditcount >= thresholdAmounts[3] && creditcount < thresholdAmounts[4] ? 1 : 0
+        data[thresholdKeys[5]] += creditcount >= thresholdAmounts[4] && creditcount < thresholdAmounts[5] ? 1 : 0
+        data[thresholdKeys[6]] += creditcount >= thresholdAmounts[5] && creditcount < thresholdAmounts[6] ? 1 : 0
+        data[thresholdKeys[7]] += creditcount >= thresholdAmounts[6] ? 1 : 0
+      } else if (thresholdKeys.length === 7) {
+        data[thresholdKeys[4]] += creditcount >= thresholdAmounts[3] && creditcount < thresholdAmounts[4] ? 1 : 0
+        data[thresholdKeys[5]] += creditcount >= thresholdAmounts[4] && creditcount < thresholdAmounts[5] ? 1 : 0
+        data[thresholdKeys[6]] += creditcount >= thresholdAmounts[5] ? 1 : 0
+      } else if (thresholdKeys.length === 6) {
+        data[thresholdKeys[4]] += creditcount >= thresholdAmounts[3] && creditcount < thresholdAmounts[4] ? 1 : 0
+        data[thresholdKeys[5]] += creditcount >= thresholdAmounts[4] ? 1 : 0
+      } else {
+        data[thresholdKeys[4]] += creditcount >= thresholdAmounts[3] ? 1 : 0
+      }
     } else {
-      data[thresholdKeys[4]] += creditcount >= thresholdAmounts[3] ? 1 : 0
-    }
-    if (['KH', 'MH'].includes(prog)) {
       programmeData[limitKeys[0]] += creditcount <= limits[5][0] ? 1 : 0
       programmeData[limitKeys[1]] += limits[4][0] <= creditcount && limits[4][1] > creditcount ? 1 : 0
       programmeData[limitKeys[2]] += limits[3][0] <= creditcount && limits[3][1] > creditcount ? 1 : 0
@@ -265,6 +267,8 @@ const combineFacultyStudentProgress = async (faculty, programmes, specialGroups,
           doctoralStudents,
           creditThresholdKeys,
           creditThresholdAmounts,
+          undefined,
+          undefined,
           'T'
         )
 
