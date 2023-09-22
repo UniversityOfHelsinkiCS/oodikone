@@ -1,10 +1,21 @@
 import React from 'react'
 import { Message } from 'semantic-ui-react'
+import { calculateStats } from 'components/FacultyStatistics/FacultyProgrammeOverview'
 import FacultyProgressTable from '../FacultyStatistics/FacultyProgrammeOverview/FacultyProgressTable'
 import FacultyBarChart from '../FacultyStatistics/FacultyProgrammeOverview/FacultyBarChart'
 import sortProgrammeKeys from '../FacultyStatistics/facultyHelpers'
 
 const FacultyProgress = ({ faculty, progressStats, getDivider }) => {
+  const bachelorStats = calculateStats(progressStats?.data?.creditCounts?.bachelor, 180)
+  const bachelorMasterStats = calculateStats(
+    progressStats?.data?.creditCounts?.bachelorMaster,
+    faculty === 'H90' ? 360 : 300,
+    180,
+    7
+  )
+  const masterStats = calculateStats(progressStats?.data?.creditCounts?.master, 120)
+  const doctorStats = calculateStats(progressStats?.data?.creditCounts?.doctor, 40, 0, 5)
+
   return (
     <>
       {getDivider('Bachelor', 'BachelorStudentsOfTheFacultyByStartingYear', 'no-infobox')}
@@ -14,16 +25,16 @@ const FacultyProgress = ({ faculty, progressStats, getDivider }) => {
             cypress="FacultyBachelorsProgress"
             data={{
               id: faculty,
-              stats: progressStats?.data.bachelorsGraphStats,
+              stats: bachelorStats.chartStats,
               years: progressStats?.data.years,
             }}
           />
         </div>
         <div className="table-container">
           <FacultyProgressTable
-            data={progressStats?.data.bachelorsTableStats}
+            data={bachelorStats.tableStats}
             programmeStats={progressStats?.data.bachelorsProgStats}
-            titles={progressStats?.data.bachelorTitles}
+            titles={bachelorStats.tableTitles}
             sortedKeys={sortProgrammeKeys(
               Object.keys(progressStats?.data.bachelorsProgStats).map(obj => [
                 obj,
@@ -50,16 +61,16 @@ const FacultyProgress = ({ faculty, progressStats, getDivider }) => {
             cypress="FacultyBachelorMastersProgress"
             data={{
               id: faculty,
-              stats: progressStats?.data.bcMsGraphStats,
+              stats: bachelorMasterStats.chartStats,
               years: progressStats?.data.years,
             }}
           />
         </div>
         <div className="table-container">
           <FacultyProgressTable
-            data={progressStats?.data.bcMsTableStats}
+            data={bachelorMasterStats.tableStats}
             programmeStats={progressStats?.data.bcMsProgStats}
-            titles={progressStats?.data.bcMsTitles}
+            titles={bachelorMasterStats.tableTitles}
             sortedKeys={sortProgrammeKeys(
               Object.keys(progressStats?.data.bcMsProgStats).map(obj => [
                 obj,
@@ -84,16 +95,16 @@ const FacultyProgress = ({ faculty, progressStats, getDivider }) => {
                 cypress="FacultyMastersProgress"
                 data={{
                   id: faculty,
-                  stats: progressStats?.data.mastersGraphStats,
+                  stats: masterStats.chartStats,
                   years: progressStats?.data.years,
                 }}
               />
             </div>
             <div className="table-container">
               <FacultyProgressTable
-                data={progressStats?.data.mastersTableStats}
+                data={masterStats.tableStats}
                 programmeStats={progressStats?.data.mastersProgStats}
-                titles={progressStats?.data.mastersTitles}
+                titles={masterStats.tableTitles}
                 sortedKeys={sortProgrammeKeys(
                   Object.keys(progressStats?.data.mastersProgStats).map(obj => [
                     obj,
@@ -118,16 +129,16 @@ const FacultyProgress = ({ faculty, progressStats, getDivider }) => {
             cypress="FacultyDoctoralProgress"
             data={{
               id: faculty,
-              stats: progressStats?.data.doctoralGraphStats,
+              stats: doctorStats.chartStats,
               years: progressStats?.data.years,
             }}
           />
         </div>
         <div className="table-container">
           <FacultyProgressTable
-            data={progressStats?.data.doctoralTableStats}
+            data={doctorStats.tableStats}
             programmeStats={progressStats?.data.doctoralProgStats}
-            titles={progressStats?.data.doctoralTitles}
+            titles={doctorStats.tableTitles}
             sortedKeys={sortProgrammeKeys(
               Object.keys(progressStats?.data.doctoralProgStats).map(obj => [
                 obj,

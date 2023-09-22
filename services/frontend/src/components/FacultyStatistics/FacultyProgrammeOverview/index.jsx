@@ -2,6 +2,7 @@ import React from 'react'
 import { Button, Divider, Loader, Message, Popup } from 'semantic-ui-react'
 import { useGetFacultyProgressStatsQuery, useGetFacultyStudentStatsQuery } from 'redux/facultyStats'
 import useLanguage from 'components/LanguagePicker/useLanguage'
+import { getCreditCategories } from 'common'
 import FacultyProgressTable from './FacultyProgressTable'
 import FacultyBarChart from './FacultyBarChart'
 import Toggle from '../../StudyProgramme/Toggle'
@@ -22,9 +23,70 @@ const getDivider = (title, toolTipText, content, cypress) => (
     {content === 'no-infobox' ? null : <InfoBox content={content} cypress={cypress} />}
   </>
 )
+
 const getKey = (programmeKeys, idx) => {
   return programmeKeys[idx][1].startsWith('T') ? 'T' : programmeKeys[idx][1].slice(0, 2)
 }
+
+const isBetween = (number, lowerLimit, upperLimit) => {
+  return (lowerLimit === undefined || number >= lowerLimit) && (upperLimit === undefined || number < upperLimit)
+}
+
+export const calculateStats = (
+  creditCounts,
+  maximumAmountOfCredits,
+  minimumAmountOfCredits = 0,
+  numberOfCreditCategories = 7
+) => {
+  const tableStats = []
+  if (creditCounts === undefined) return tableStats
+
+  const limits = getCreditCategories(
+    true,
+    'academic-year',
+    maximumAmountOfCredits,
+    Object.keys(creditCounts),
+    numberOfCreditCategories - 1,
+    minimumAmountOfCredits
+  )
+  const tableTitles = ['', 'All']
+  for (let i = 0; i < limits.length; i++) {
+    if (limits[i][0] === undefined) tableTitles.push(`< ${limits[i][1]} credits`)
+    else if (limits[i][1] === undefined) tableTitles.push(`≥ ${limits[i][0]} credits`)
+    else tableTitles.push(`${limits[i][0]}–${limits[i][1]} credits`)
+  }
+
+  Object.keys(creditCounts).forEach(year => {
+    const yearCreditCount = creditCounts[year]
+    const yearCounts = [year, yearCreditCount.length]
+    tableStats.push(yearCounts)
+    for (let i = 0; i < limits.length; i++) {
+      yearCounts.push(yearCreditCount.filter(credits => isBetween(credits, limits[i][0], limits[i][1])).length)
+    }
+  })
+
+  const totalCounts = ['Total']
+  for (let i = 1; i < tableStats[0].length; i++) {
+    let columnSum = 0
+    for (let j = 0; j < tableStats.length; j++) {
+      columnSum += tableStats[j][i]
+    }
+    totalCounts.push(columnSum)
+  }
+  tableStats.push(totalCounts)
+
+  // Calculate statistics for the bar chart (i.e., transpose the tableStats as rows are now columns and vice versa)
+  const chartStats = []
+  for (let i = 2; i < tableStats[0].length; i++) {
+    const column = []
+    for (let j = tableStats.length - 1; j >= 0; j--) {
+      column.push(tableStats[j][i])
+    }
+    chartStats.push({ name: tableTitles[i].replace('<', 'Less than').replace('≥', 'At least'), data: column })
+  }
+  return { tableStats, chartStats, tableTitles }
+}
+
 const FacultyProgrammeOverview = ({
   faculty,
   graduatedGroup,
@@ -87,6 +149,16 @@ const FacultyProgrammeOverview = ({
       faculty.code
     )
   }
+
+  const bachelorStats = calculateStats(progressStats?.data?.creditCounts?.bachelor, 180)
+  const bachelorMasterStats = calculateStats(
+    progressStats?.data?.creditCounts?.bachelorMaster,
+    faculty.code === 'H90' ? 360 : 300,
+    180,
+    7
+  )
+  const masterStats = calculateStats(progressStats?.data?.creditCounts?.master, 120)
+  const doctorStats = calculateStats(progressStats?.data?.creditCounts?.doctor, 40, 0, 5)
 
   return (
     <div className="faculty-overview">
@@ -184,16 +256,16 @@ const FacultyProgrammeOverview = ({
                     cypress="FacultyBachelorsProgress"
                     data={{
                       id: faculty.code,
-                      stats: progressStats?.data.bachelorsGraphStats,
+                      stats: bachelorStats.chartStats,
                       years: progressStats?.data.years,
                     }}
                   />
                 </div>
                 <div className="table-container">
                   <FacultyProgressTable
-                    data={progressStats?.data.bachelorsTableStats}
+                    data={bachelorStats.tableStats}
                     programmeStats={progressStats?.data.bachelorsProgStats}
-                    titles={progressStats?.data.bachelorTitles}
+                    titles={bachelorStats.tableTitles}
                     sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.bachelorsProgStats).map(
                       listObj => listObj[0]
                     )}
@@ -216,16 +288,16 @@ const FacultyProgrammeOverview = ({
                     cypress="FacultyBachelorMastersProgress"
                     data={{
                       id: faculty.code,
-                      stats: progressStats?.data.bcMsGraphStats,
+                      stats: bachelorMasterStats.chartStats,
                       years: progressStats?.data.years,
                     }}
                   />
                 </div>
                 <div className="table-container">
                   <FacultyProgressTable
-                    data={progressStats?.data.bcMsTableStats}
+                    data={bachelorMasterStats.tableStats}
                     programmeStats={progressStats?.data.bcMsProgStats}
-                    titles={progressStats?.data.bcMsTitles}
+                    titles={bachelorMasterStats.tableTitles}
                     sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.bcMsProgStats).map(
                       listObj => listObj[0]
                     )}
@@ -246,16 +318,16 @@ const FacultyProgrammeOverview = ({
                         cypress="FacultyMastersProgress"
                         data={{
                           id: faculty.code,
-                          stats: progressStats?.data.mastersGraphStats,
+                          stats: masterStats.chartStats,
                           years: progressStats?.data.years,
                         }}
                       />
                     </div>
                     <div className="table-container">
                       <FacultyProgressTable
-                        data={progressStats?.data.mastersTableStats}
+                        data={masterStats.tableStats}
                         programmeStats={progressStats?.data.mastersProgStats}
-                        titles={progressStats?.data.mastersTitles}
+                        titles={masterStats.tableTitles}
                         sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.mastersProgStats).map(
                           listObj => listObj[0]
                         )}
@@ -276,16 +348,16 @@ const FacultyProgrammeOverview = ({
                     cypress="FacultyDoctoralProgress"
                     data={{
                       id: faculty.code,
-                      stats: progressStats?.data.doctoralGraphStats,
+                      stats: doctorStats.chartStats,
                       years: progressStats?.data.years,
                     }}
                   />
                 </div>
                 <div className="table-container">
                   <FacultyProgressTable
-                    data={progressStats?.data.doctoralTableStats}
+                    data={doctorStats.tableStats}
                     programmeStats={progressStats?.data.doctoralProgStats}
-                    titles={progressStats?.data.doctoralTitles}
+                    titles={doctorStats.tableTitles}
                     sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.doctoralProgStats).map(
                       listObj => listObj[0]
                     )}
