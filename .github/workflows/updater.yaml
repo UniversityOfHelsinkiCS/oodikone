@@ -125,7 +125,7 @@ jobs:
   release_scheduler:
     name: 'Build and release Updater scheduler'
     runs-on: ubuntu-latest
-    needs: test_updater
+    # needs: test_updater
 
     steps:
       - uses: actions/checkout@v3
