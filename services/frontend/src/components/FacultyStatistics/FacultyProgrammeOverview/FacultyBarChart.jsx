@@ -8,10 +8,10 @@ const getColors = len => {
 }
 
 const FacultyBarChart = ({ cypress, data }) => {
-  if (!data) return null
+  if (!data.stats) return null
 
   const colors = getColors(Object.keys(data.stats).length)
-  const dataWithColors = Object.values(data?.stats).map((series, index) => ({ ...series, color: colors[index] }))
+  const dataWithColors = Object.values(data.stats).map((series, index) => ({ ...series, color: colors[index] }))
   const getFileName = () => {
     return `oodikone_progress_of_students_in_${data?.id}_by_study_start_year`
   }
