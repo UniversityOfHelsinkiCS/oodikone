@@ -387,7 +387,14 @@ export const TimeDivision = {
 
 /* Returns an array of credit categories depending on parameters, shows the high limit
   of the category, for example [20, 40, 60, 80, 100, 120] where the first category is 0 - 20 */
-export const getCreditCategories = (cumulative, timeDivision, programmeCredits, timeSlots, creditCategoryAmount) => {
+export const getCreditCategories = (
+  cumulative,
+  timeDivision,
+  programmeCredits,
+  timeSlots,
+  creditCategoryAmount,
+  minCredits = 0
+) => {
   // In calendar-year mode, minus 30 from target credits because programmes (usually) start in autumn,
   // also if current date is before august, minus 30
   const isCalendar = timeDivision === TimeDivision.CALENDAR_YEAR
@@ -400,7 +407,7 @@ export const getCreditCategories = (cumulative, timeDivision, programmeCredits, 
   for (let i = 1; i <= creditCategoryAmount; i++) creditCategoryArray.push(i)
 
   const limitBreaks = cumulative
-    ? creditCategoryArray.map(num => Math.round((num * maxCredits) / creditCategoryAmount))
+    ? creditCategoryArray.map(num => Math.round(minCredits + (num * (maxCredits - minCredits)) / creditCategoryAmount))
     : [15, 30, 45, 60].map(limit => limit * (timeDivision === TimeDivision.SEMESTER ? 0.5 : 1))
   return range(0, limitBreaks.length + 1).map(i => [limitBreaks[i - 1], limitBreaks[i]])
 }
