@@ -9,6 +9,8 @@ const { combine, timestamp, printf, splat } = winston.format
 
 let transports = []
 
+const formatDate = timestamp => new Date(timestamp).toLocaleString('fi-FI')
+
 if (isProduction && !isStaging && !runningInCI) {
   const options = {
     config: {
@@ -24,7 +26,7 @@ if (isProduction && !isStaging && !runningInCI) {
 
 if (isDev) {
   const devFormat = printf(
-    ({ level, message, timestamp, ...rest }) => `${timestamp} ${level}: ${message} ${JSON.stringify(rest)}`
+    ({ level, message, timestamp, ...rest }) => `${formatDate(timestamp)} ${level}: ${message} ${JSON.stringify(rest)}`
   )
 
   transports.push(
@@ -44,8 +46,9 @@ if (isDev) {
     silly: 6,
   }
 
-  const prodFormat = winston.format.printf(({ level, ...rest }) =>
+  const prodFormat = printf(({ timestamp, level, ...rest }) =>
     JSON.stringify({
+      timestamp: formatDate(timestamp),
       level: levels[level],
       ...rest,
     })
