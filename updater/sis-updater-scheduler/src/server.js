@@ -9,7 +9,8 @@ const {
   scheduleByStudentNumbers,
   scheduleByCourseCodes,
 } = require('./scheduler')
-const { SECRET_TOKEN } = require('./config')
+const { SECRET_TOKEN, REDIS_LATEST_MESSAGE_RECEIVED } = require('./config')
+const { get: redisGet } = require('./utils/redis')
 
 const bakeMessage =
   res =>
@@ -38,6 +39,16 @@ const errorBoundary = (err, _, res, next) => {
 const app = express()
 app.use(express.json())
 app.use(message)
+
+app.get('/v1/healthcheck', async (_, res) => {
+  const latest_message = await redisGet(REDIS_LATEST_MESSAGE_RECEIVED)
+  const threshold = new Date(new Date().getTime() - 3600 * 1000) // 2 hours ago
+  if (!latest_message || new Date(latest_message).getTime() < threshold) {
+    return res.status(400).send()
+  }
+  res.status(200).send()
+})
+
 app.use(auth)
 
 app.get('/v1/meta', async (_, res) => {
