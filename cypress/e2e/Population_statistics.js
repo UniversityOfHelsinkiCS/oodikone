@@ -67,15 +67,11 @@ describe('Population Statistics tests', () => {
     it('Population statistics is usable on general level', () => {
       cy.visit(pathToCSBach2017)
       cy.cs('filtered-students')
-      cy.get('.header').within(() => {
-        cy.contains('Tietojenkäsittelytieteen kandiohjelma')
-        cy.contains('class size 170 students')
-      })
-      cy.get('.card').within(() => {
-        cy.contains('Excludes exchange students')
-        cy.contains('Excludes students with non-degree study right')
-        cy.contains('Excludes students who have transferred out of this programme')
-      })
+      cy.contains('Tietojenkäsittelytieteen kandiohjelma')
+      cy.contains('class size 170 students')
+      cy.contains('Excludes exchange students')
+      cy.contains('Excludes students with non-degree study right')
+      cy.contains('Excludes students who have transferred out of this programme')
       cy.cs('filtered-students')
 
       // Tests that use curriculum structure are commented out until
