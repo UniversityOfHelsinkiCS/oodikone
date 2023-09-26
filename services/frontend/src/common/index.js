@@ -316,7 +316,7 @@ const getEarliestStudyRightElement = studyright => {
 }
 
 export const getTargetCreditsForProgramme = code => {
-  if (code === 'MH30_001') return 360
+  if (code === 'MH30_001' || code === 'KH90_001-MH90_001') return 360
   if (code === 'MH30_003') return 330
   if (code === 'MH30_004') return 150
   if (code === 'MH90_001') return 180

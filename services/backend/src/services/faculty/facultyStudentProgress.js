@@ -6,7 +6,15 @@ const { studytrackStudents } = require('../studyprogramme')
 const { getStudyRightsByExtent, getStudyRightsByBachelorStart, getTransfersIn, getTransfersOut } = require('./faculty')
 const { checkTransfers } = require('./facultyHelpers')
 
-const getStudentData = (startDate, students, thresholdKeys, thresholdAmounts, limits = [], limitKeys = [], prog) => {
+const getStudentData = (
+  startDate,
+  students,
+  prog,
+  limits = [],
+  limitKeys = [],
+  thresholdKeys = [],
+  thresholdAmounts = []
+) => {
   let data = {}
   let programmeData = {}
   const creditCounts = []
@@ -176,9 +184,7 @@ const combineFacultyStudentProgress = async (faculty, programmes, specialGroups,
         : await getStudyRightsByExtent(faculty, startDate, endDate, code, extentcodes, graduationStatus)
 
       // Get credit threshold values: 'combined study programme' is false and 'only master studyright' is true
-      let { creditThresholdKeys, creditThresholdAmounts } = getCreditThresholds(code, false, true)
 
-      if (!creditThresholdKeys) continue
       if (!(progId in progressStats.programmeNames)) {
         progressStats.programmeNames[progId] = { code: code, ...name }
       }
@@ -188,15 +194,7 @@ const combineFacultyStudentProgress = async (faculty, programmes, specialGroups,
       if (code.includes('KH')) {
         const allBachelors = studyrights.filter(sr => sr.extentcode === 1).map(sr => sr.studentnumber)
         const students = await studytrackStudents(allBachelors)
-        const { progData, creditCounts } = getStudentData(
-          startDate,
-          students,
-          creditThresholdKeys,
-          creditThresholdAmounts,
-          bachelorlimits,
-          limitKeys,
-          'KH'
-        )
+        const { progData, creditCounts } = getStudentData(startDate, students, 'KH', bachelorlimits, limitKeys)
 
         progressStats.creditCounts.bachelor[year] = [...progressStats.creditCounts.bachelor[year], ...creditCounts]
 
@@ -214,27 +212,19 @@ const combineFacultyStudentProgress = async (faculty, programmes, specialGroups,
         const bcMsStudents = await studytrackStudents(allBcMsStudents)
         const msStudents = await studytrackStudents(allMsStudents)
 
-        // Get credit threshold values both 'combined study programme' and 'only master studyright' are false
-        const { creditThresholdKeys: creditThresholdKeysBcMs, creditThresholdAmounts: creditThresholdAmountsBcMs } =
-          getCreditThresholds(code, false, false)
-
         const { progData: bcMsProgdata, creditCounts: creditCountsBcMs } = getStudentData(
           startDate,
           bcMsStudents,
-          creditThresholdKeysBcMs,
-          creditThresholdAmountsBcMs,
+          'MH',
           bcmslimits,
-          limitKeys,
-          'MH'
+          limitKeys
         )
         const { progData: msProgdata, creditCounts: creditCountsMaster } = getStudentData(
           startDate,
           msStudents,
-          creditThresholdKeys,
-          creditThresholdAmounts,
+          'MH',
           masterlimits,
-          limitKeys,
-          'MH'
+          limitKeys
         )
         if (['MH30_001', 'MH30_003'].includes(code)) {
           progressStats.creditCounts.licentiate[year] = [
@@ -261,15 +251,16 @@ const combineFacultyStudentProgress = async (faculty, programmes, specialGroups,
       } else {
         const all = studyrights.filter(sr => sr.extentcode === 4 || sr.extentcode === 3).map(sr => sr.studentnumber)
         const doctoralStudents = await studytrackStudents(all)
+        let { creditThresholdKeys, creditThresholdAmounts } = getCreditThresholds(code)
 
         const { data, creditCounts } = getStudentData(
           startDate,
           doctoralStudents,
+          'T',
+          [],
+          [],
           creditThresholdKeys,
-          creditThresholdAmounts,
-          undefined,
-          undefined,
-          'T'
+          creditThresholdAmounts
         )
 
         progressStats.creditCounts.doctor[year] = [...progressStats.creditCounts.doctor[year], ...creditCounts]
