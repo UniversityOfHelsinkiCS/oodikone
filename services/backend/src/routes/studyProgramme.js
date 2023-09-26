@@ -227,19 +227,9 @@ router.get('/v2/studyprogrammes/:id/evaluationstats', async (req, res) => {
     status: gradData?.status,
     lastUpdated: gradData.lastUpdated,
     graduations: gradData,
-    progress: {
-      creditTableStats: {},
-      creditTableTitles: progressData?.creditTableTitles,
-      graphData: {
-        creditGraphStats: {},
-        id: progressData?.id,
-        years: progressData?.years,
-      },
-    },
+    creditCounts: progressData?.creditCounts,
+    years: progressData?.years,
   }
-
-  data.progress.creditTableStats[code] = progressData?.creditTableStats[code]
-  data.progress.graphData.creditGraphStats[code] = progressData?.creditGraphStats[code]
 
   return res.json(data)
 })
