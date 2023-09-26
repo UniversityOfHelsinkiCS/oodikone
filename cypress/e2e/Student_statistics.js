@@ -66,6 +66,7 @@ describe('Student Statistics tests', () => {
     cy.contains('td a', student.studentnumber).click()
     cy.contains('Introduction to Machine Learning (DATA11002)')
       .siblings()
+      .last()
       .within(() => {
         cy.get('.level').click()
       })
