@@ -284,11 +284,14 @@ describe('Studyprogramme overview', () => {
 
     it('Student progress data is shown correctly', () => {
       const tableContents = [
-        ['2020 - 2021', 12, 12, 0, 0, 0, 0, 0, 0, 0],
-        ['2019 - 2020', 86, 86, 0, 0, 0, 0, 0, 0, 0],
-        ['2018 - 2019', 162, 162, 0, 0, 0, 0, 0, 0, 0],
-        ['2017 - 2018', 171, 171, 0, 0, 0, 0, 0, 0, 0],
-        ['Total', 431, 431, 0, 0, 0, 0, 0, 0, 0],
+        ['2023 - 2024', 0, 0, 0, 0, 0, 0, 0, 0],
+        ['2022 - 2023', 0, 0, 0, 0, 0, 0, 0, 0],
+        ['2021 - 2022', 0, 0, 0, 0, 0, 0, 0, 0],
+        ['2020 - 2021', 12, 12, 0, 0, 0, 0, 0, 0],
+        ['2019 - 2020', 86, 86, 0, 0, 0, 0, 0, 0],
+        ['2018 - 2019', 162, 162, 0, 0, 0, 0, 0, 0],
+        ['2017 - 2018', 171, 171, 0, 0, 0, 0, 0, 0],
+        ['Total', 431, 431, 0, 0, 0, 0, 0, 0],
       ]
 
       cy.checkTableStats(tableContents, 'StudytrackProgress')
@@ -296,9 +299,9 @@ describe('Studyprogramme overview', () => {
 
     it('Studytrack overview graphs render', () => {
       cy.get('[data-cy=Graph-StudytrackProgress]')
-        .should('contain', 'Less than 15 credits')
-        .should('contain', '30-59 credits')
-        .should('contain', '180 or more credits')
+        .should('contain', 'Less than 30 credits')
+        .should('contain', '30–60 credits')
+        .should('contain', 'At least 180 credits')
         .should('contain', '100.0%') // The percentage for less than 15 credits in 2017-2018, to check that the graph renders
 
       cy.get('[data-cy=graduation-times-graph-breakdownBachelor]')
