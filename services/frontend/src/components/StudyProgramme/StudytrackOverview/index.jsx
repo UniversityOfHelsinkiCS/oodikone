@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Divider, Loader } from 'semantic-ui-react'
 
 import { useGetStudytrackStatsQuery } from 'redux/studyProgramme'
+import { calculateStats } from 'components/FacultyStatistics/FacultyProgrammeOverview'
 import InfoBox from '../../Info/InfoBox'
 import BarChart from './BarChart'
 import BasicDataTable from './BasicDataTable'
@@ -12,7 +13,7 @@ import MedianTimeBarChart from '../MedianTimeBarChart'
 import BreakdownBarChart from '../BreakdownBarChart'
 
 import InfotoolTips from '../../../common/InfoToolTips'
-import { getGraduationGraphTitle } from '../../../common'
+import { getGraduationGraphTitle, getTargetCreditsForProgramme } from '../../../common'
 import '../studyprogramme.css'
 
 const StudytrackOverview = ({
@@ -61,6 +62,19 @@ const StudytrackOverview = ({
     ? 'AverageGraduationTimesStudytracksMaster'
     : 'AverageGraduationTimesStudytracks'
   const infoTextStudentTable = combinedProgramme ? 'StudytrackOverviewCombinedProgramme' : 'StudytrackOverview'
+
+  const programmeCode = combinedProgramme ? `${studyprogramme}-${combinedProgramme}` : studyprogramme
+
+  const {
+    tableStats,
+    chartStats,
+    tableTitles: creditTableTitles,
+  } = calculateStats(stats?.data?.creditCounts, getTargetCreditsForProgramme(programmeCode))
+  const creditTableStats = {}
+  creditTableStats[studyprogramme] = tableStats
+  const creditChartData = { creditGraphStats: {}, years: stats?.data?.years }
+  creditChartData.creditGraphStats[studyprogramme] = chartStats
+
   return (
     <div className="studytrack-overview">
       {stats.isLoading || stats.isFetching ? (
@@ -113,13 +127,13 @@ const StudytrackOverview = ({
             }`,
             'StudytrackProgress'
           )}
-          <div className="section-container">
-            <BarChart cypress="StudytrackProgress" data={stats?.data} track={track || studyprogramme} />
+          <div className="section-container" style={{ marginBottom: '5em' }}>
+            <BarChart cypress="StudytrackProgress" data={creditChartData} track={track || studyprogramme} />
             <BasicDataTable
               cypress="StudytrackProgress"
-              data={stats?.data?.creditTableStats}
+              data={creditTableStats}
               track={track || studyprogramme}
-              titles={stats?.data?.creditTableTitles}
+              titles={creditTableTitles}
             />
           </div>
           {stats?.isSuccess && stats?.data?.includeGraduated && stats?.data?.graduationTimes[track] && (
