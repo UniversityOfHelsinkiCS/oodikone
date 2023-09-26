@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { Divider, Header, Loader, Message, Segment } from 'semantic-ui-react'
 import { useGetEvaluationStatsQuery } from 'redux/studyProgramme'
+import { calculateStats } from 'components/FacultyStatistics/FacultyProgrammeOverview'
+import { getTargetCreditsForProgramme } from 'common'
 import useLanguage from '../LanguagePicker/useLanguage'
 import Toggle from '../StudyProgramme/Toggle'
 import InfoBox from '../Info/InfoBox'
@@ -30,10 +32,19 @@ const ProgrammeView = ({ studyprogramme }) => {
     graduated: grad,
   })
 
+  const {
+    tableStats,
+    chartStats,
+    tableTitles: creditTableTitles,
+  } = calculateStats(statistics?.data?.creditCounts, getTargetCreditsForProgramme(studyprogramme))
+  const creditTableStats = {}
+  creditTableStats[studyprogramme] = tableStats
+  const creditChartData = { creditGraphStats: {}, years: statistics?.data?.years }
+  creditChartData.creditGraphStats[studyprogramme] = chartStats
+
   const programmeName = statistics?.data?.programmeName && getTextIn(statistics?.data?.programmeName)
 
   const graduationData = statistics?.data?.graduations
-  const progressData = statistics?.data?.progress
 
   const doCombo = graduationData?.doCombo
   const timesData = graduationData?.graduationTimes
@@ -129,12 +140,12 @@ const ProgrammeView = ({ studyprogramme }) => {
                 setValue={setGraduated}
               />
               <div className="section-container">
-                <BarChart cypress="StudytrackProgress" data={progressData?.graphData} track={studyprogramme} />
+                <BarChart cypress="StudytrackProgress" data={creditChartData} track={studyprogramme} />
                 <BasicDataTable
                   cypress="StudytrackProgress"
-                  data={progressData?.creditTableStats}
+                  data={creditTableStats}
                   track={studyprogramme}
-                  titles={progressData?.creditTableTitles}
+                  titles={creditTableTitles}
                 />
               </div>
               {graduationData?.programmesBeforeOrAfterGraphStats && (
