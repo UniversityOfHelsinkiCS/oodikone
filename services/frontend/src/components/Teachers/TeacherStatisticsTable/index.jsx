@@ -16,14 +16,14 @@ const TeacherStatisticsTable = ({ statistics, onClickFn, getCourseStats, unifyOp
   const columns = useMemo(
     () => [
       {
-        key: 'teacher',
+        key: 'code-and-link',
         mergeHeader: true,
         merge: true,
         children: [
           {
-            key: 'name',
-            title: 'Teacher',
-            getRowVal: row => row.name,
+            key: 'code',
+            title: 'Course code',
+            getRowVal: row => row.id,
             cellProps: row => ({
               style: { cursor: 'pointer' },
               onClick: () => onClickFn(row.id),
@@ -42,6 +42,11 @@ const TeacherStatisticsTable = ({ statistics, onClickFn, getCourseStats, unifyOp
             },
           },
         ],
+      },
+      {
+        key: 'name',
+        title: 'Course name',
+        getRowVal: row => row.name,
       },
       {
         key: 'credits',
