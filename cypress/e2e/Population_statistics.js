@@ -91,7 +91,11 @@ describe('Population Statistics tests', () => {
 
     it("Empty 'tags' tab has a link to the page where tags can be created", () => {
       cy.visit(pathToCSBach2017)
-      cy.contains('Students (170)').click()
+      cy.contains('Students (170)')
+        .parent()
+        .then($parentDiv => {
+          if (!$parentDiv.hasClass('active')) cy.contains('Students (170)').click()
+        })
       cy.get('[data-cy=student-table-tabs]').contains('Tags').click()
       cy.contains('No tags defined. You can define them here.').find('a').click()
       cy.contains('Tags').click()
@@ -123,7 +127,11 @@ describe('Population Statistics tests', () => {
 
     it('Credit Statistics, Credits Gained tab works', () => {
       cy.selectStudyProgramme('Tietojenkäsittelytieteen kandiohjelma')
-      cy.contains('Credit statistics').click()
+      cy.contains('Credit statistics')
+        .parent()
+        .then($parentDiv => {
+          if (!$parentDiv.hasClass('active')) cy.contains('Credit statistics').click()
+        })
       cy.contains('Credits Gained').click()
       cy.get("[data-cy='credits-gained-main-table']").should('contain', 'All students of the class')
       const today = moment().endOf('month')
@@ -159,7 +167,11 @@ describe('Population Statistics tests', () => {
       cy.visit(pathToCSMaster2019)
       cy.cs('filtered-students')
       cy.contains('Credit statistics')
-      cy.get("[data-cy='credit-statistics']").click()
+      cy.get("[data-cy='credit-statistics']")
+        .parent()
+        .then($parentDiv => {
+          if (!$parentDiv.hasClass('active')) cy.get("[data-cy='credit-statistics']").click()
+        })
       cy.contains('Credits Gained').click()
       cy.get('.credits-gained-divider').click()
       cy.get("[data-cy='credits-gained-table-Avoin väylä']").should('exist')
@@ -170,7 +182,11 @@ describe('Population Statistics tests', () => {
 
     it('Credit Statistics, Statistics pane works', () => {
       cy.selectStudyProgramme('Tietojenkäsittelytieteen kandiohjelma')
-      cy.contains('Credit statistics').click({ force: true })
+      cy.contains('Credit statistics')
+        .parent()
+        .then($parentDiv => {
+          if (!$parentDiv.hasClass('active')) cy.contains('Credit statistics').click()
+        })
       cy.get("[data-cy='credit-stats-tab'] > .menu > :nth-child(2)").click()
 
       cy.get("[data-cy='credit-stats-table-name-header']").should('contain', 'Statistic for n = 170 Students')
@@ -189,7 +205,11 @@ describe('Population Statistics tests', () => {
       const existing = '010113437'
       const nonExisting = '66666666'
       cy.visit(pathToCSBach2017)
-      cy.contains('Students (170)').click()
+      cy.contains('Students (170)')
+        .parent()
+        .then($parentDiv => {
+          if (!$parentDiv.hasClass('active')) cy.contains('Students (170)').click()
+        })
       cy.contains(existing)
       cy.contains(nonExisting).should('not.exist')
       cy.contains('button', 'Check studentnumbers').click()
