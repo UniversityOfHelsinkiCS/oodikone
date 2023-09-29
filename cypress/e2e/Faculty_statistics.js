@@ -213,7 +213,7 @@ describe('Faculty overview', () => {
         cy.get('div[class="faculty-graph"]')
         cy.contains('1 graduated (100 % of class)').should('have.length', 1)
         cy.contains('1 graduated').trigger('mouseover')
-        cy.contains('From class of 2018, 1/undefined students have graduated')
+        cy.contains('From class of 2018, 1/1 students have graduated')
       })
 
       cy.get('[data-cy="GraduationTimeToggle"]').click()

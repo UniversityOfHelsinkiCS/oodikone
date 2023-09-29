@@ -95,10 +95,10 @@ const BarChart = ({
       fontSize: '25px',
       // outside: true,
       // eslint-disable-next-line
-      formatter: function() {
+      formatter: function () {
         return getTooltipText(
           this.point.name,
-          this.point.code,
+          this.point.code ? this.point.code : this.point.name,
           this.point.amount,
           this.y,
           this.point.statistics,
