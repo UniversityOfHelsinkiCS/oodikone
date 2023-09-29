@@ -123,14 +123,10 @@ const updateFacultyOverview = async (faculty, statsType) => {
     }
   }
 
-  try {
-    const updatedTimesAll = await countGraduationTimes(faculty, 'ALL_PROGRAMMES')
-    await setGraduationStats(updatedTimesAll, 'ALL_PROGRAMMES')
-    const updatedTimesNew = await countGraduationTimes(faculty, 'NEW_STUDY_PROGRAMMES')
-    await setGraduationStats(updatedTimesNew, 'NEW_STUDY_PROGRAMMES')
-  } catch (e) {
-    logger.error(`Faculty updates: graduation stats failed with error: ${e}`)
-  }
+  const updatedTimesAll = await countGraduationTimes(faculty, 'ALL_PROGRAMMES')
+  await setGraduationStats(updatedTimesAll, 'ALL_PROGRAMMES')
+  const updatedTimesNew = await countGraduationTimes(faculty, 'NEW_STUDY_PROGRAMMES')
+  await setGraduationStats(updatedTimesNew, 'NEW_STUDY_PROGRAMMES')
   return 'OK'
 }
 

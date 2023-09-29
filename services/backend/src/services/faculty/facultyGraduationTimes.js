@@ -172,7 +172,7 @@ const getClassSizes = async (faculty, programmeCodes, since, classSizes, program
         }
       }
 
-      if (extentcode === 2) {
+      if (extentcode === 2 && ['master', 'bcMsCombo'].includes(level)) {
         classSizes.programmes[code][level][startYear] += 1
       } else {
         classSizes.programmes[code][startYear] += 1
