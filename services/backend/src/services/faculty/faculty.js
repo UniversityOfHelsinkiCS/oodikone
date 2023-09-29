@@ -289,6 +289,7 @@ const degreeProgrammesOfFaculty = async facultyCode =>
           },
         },
       },
+      group: ['programme_module.code', 'programme_module.name', 'organization.id'],
     })
   ).map(facultyFormatProgramme)
 
