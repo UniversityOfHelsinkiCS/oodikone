@@ -63,7 +63,7 @@ const NavigationBar = () => {
         if (!checkUserAccess(['facultyStatistics', 'admin'], roles)) return
       }
       const { reqRights } = allNavigationItems[key]
-      if (!reqRights || reqRights.every(r => roles.includes(r))) {
+      if (!reqRights || reqRights.every(r => roles.includes(r) || (key === 'teachers' && isAdmin))) {
         visibleNavigationItems[key] = allNavigationItems[key]
       }
     })
