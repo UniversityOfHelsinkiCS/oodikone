@@ -148,31 +148,31 @@ const ProgrammeView = ({ studyprogramme }) => {
                   titles={creditTableTitles}
                 />
               </div>
-              {graduationData?.programmesBeforeOrAfterGraphStats && (
+              {getDivider('Graduation times', 'AverageGraduationTimes')}
+              <div className="toggle-container">
+                <Toggle
+                  cypress="GraduationTimeToggle"
+                  firstLabel="Breakdown"
+                  secondLabel="Median time"
+                  value={showMedian}
+                  setValue={setShowMedian}
+                />
+                <div className="toggle-container">
+                  <Toggle
+                    cypress="YearToggle"
+                    toolTips={toolTips.YearToggle}
+                    firstLabel="Calendar year"
+                    secondLabel="Academic year"
+                    value={academicYear}
+                    setValue={setAcademicYear}
+                  />
+                </div>
+              </div>
+              <div className={`section-container${doCombo ? '' : '-centered'}`}>
+                {showMedian ? displayMedian() : displayBreakdown()}
+              </div>
+              {graduationData?.programmesBeforeOrAfterGraphStats?.length !== 0 && (
                 <>
-                  {getDivider('Graduation times', 'AverageGraduationTimes')}
-                  <div className="toggle-container">
-                    <Toggle
-                      cypress="GraduationTimeToggle"
-                      firstLabel="Breakdown"
-                      secondLabel="Median time"
-                      value={showMedian}
-                      setValue={setShowMedian}
-                    />
-                    <div className="toggle-container">
-                      <Toggle
-                        cypress="YearToggle"
-                        toolTips={toolTips.YearToggle}
-                        firstLabel="Calendar year"
-                        secondLabel="Academic year"
-                        value={academicYear}
-                        setValue={setAcademicYear}
-                      />
-                    </div>
-                  </div>
-                  <div className={`section-container${doCombo ? '' : '-centered'}`}>
-                    {showMedian ? displayMedian() : displayBreakdown()}
-                  </div>
                   {getDivider(
                     studyprogramme.includes('KH')
                       ? 'Primary master programme studies after this programme'
