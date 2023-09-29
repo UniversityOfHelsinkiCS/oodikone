@@ -167,12 +167,7 @@ router.get('/:id/update_basicview', async (req, res) => {
   const code = req.params.id
   const statsType = req.query?.stats_type
   if (code) {
-    let result = null
-    try {
-      result = await updateFacultyOverview(code, statsType)
-    } catch (e) {
-      logger.error(`Failed to update faculty ${code} basic tab stats for ${statsType}: ${e}`)
-    }
+    const result = await updateFacultyOverview(code, statsType)
     return res.json(result)
   }
   return res.status(422).end()
