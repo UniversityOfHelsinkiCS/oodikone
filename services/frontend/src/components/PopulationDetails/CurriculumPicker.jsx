@@ -64,11 +64,14 @@ const CurriculumPicker = ({ setCurriculum, programmeCodes, disabled, year }) => 
       className="link item"
       value={chosenCurriculum}
       onChange={(_, { value }) => setSelectedCurriculum(value)}
-      options={curriculums.map(cur => ({
-        key: sortBy(cur.curriculum_period_ids).join(', '),
-        value: cur,
-        text: formatCurriculumOptions(cur),
-      }))}
+      options={sortBy(
+        curriculums.map(cur => ({
+          key: sortBy(cur.curriculum_period_ids).join(', '),
+          value: cur,
+          text: formatCurriculumOptions(cur),
+        })),
+        'key'
+      )}
     />
   )
 }
