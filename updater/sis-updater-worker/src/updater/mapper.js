@@ -233,6 +233,7 @@ const creditMapper =
       org: attainmentUniOrg,
       language: language,
       is_open: is_open,
+      studyright_id: study_right_id,
     }
   }
 
