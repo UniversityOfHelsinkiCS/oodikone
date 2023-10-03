@@ -114,7 +114,11 @@ const CustomPopulationContent = ({ students, custompop, discardedStudentNumbers 
   const { customPopulationSearches, searchedCustomPopulationSearchId } = useSelector(
     state => state.customPopulationSearch
   )
-  const [studentAmountLimit, setStudentAmountLimit] = useState(Math.round(students.length ? students.length * 0.3 : 0))
+  const [studentAmountLimit, setStudentAmountLimit] = useState(0)
+
+  useEffect(() => {
+    setStudentAmountLimit(Math.round(students.length ? students.length * 0.3 : 0))
+  }, [students.length])
 
   const onStudentAmountLimitChange = value => {
     setStudentAmountLimit(Number.isNaN(Number(value)) ? studentAmountLimit : Number(value))
@@ -205,7 +209,7 @@ const CustomPopulationContent = ({ students, custompop, discardedStudentNumbers 
               <Form.Field inline>
                 <label>Limit to courses where student number is at least</label>
                 <Input
-                  defaultValue={studentAmountLimit}
+                  value={studentAmountLimit}
                   onChange={e => onStudentAmountLimitChange(e.target.value)}
                   style={{ width: '70px' }}
                 />
