@@ -17,6 +17,7 @@ const PopulationCourses = ({
   onlyIamRights,
   curriculum,
   courseTableMode,
+  studentAmountLimit,
 }) => {
   const populationCourses = useSelector(({ populationCourses }) => populationCourses)
   const mandatoryCourses = curriculum
@@ -103,7 +104,7 @@ const PopulationCourses = ({
         <CustomPopulationCourses
           courses={pending ? null : selectedPopulationCourses.data}
           filteredStudents={filteredStudents}
-          showFilter
+          studentAmountLimit={studentAmountLimit}
         />
       )}
     </Segment>

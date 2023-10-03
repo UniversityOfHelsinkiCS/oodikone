@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { useDispatch } from 'react-redux'
-import { Table, Form, Input, Tab, Icon } from 'semantic-ui-react'
+import { Table, Input, Tab, Icon } from 'semantic-ui-react'
 import { orderBy, debounce } from 'lodash'
 import { useGetSemestersQuery } from 'redux/semesters'
 import { clearCourseStats } from '../../redux/coursestats'
@@ -33,12 +33,12 @@ const lodashSortOrderTypes = {
   DESC: 'desc',
 }
 
-const updateCourseStatisticsCriteria = (courseStats, state, getTextIn) => {
+const updateCourseStatisticsCriteria = (courseStats, state, getTextIn, studentAmountLimit) => {
   if (!courseStats) {
     return []
   }
 
-  const { studentAmountLimit, sortCriteria, codeFilter, nameFilter, reversed } = state
+  const { sortCriteria, codeFilter, nameFilter, reversed } = state
 
   const studentAmountFilter = ({ stats }) => {
     const { students } = stats
@@ -74,14 +74,13 @@ const updateCourseStatisticsCriteria = (courseStats, state, getTextIn) => {
 const initialState = props => ({
   sortCriteria: tableColumnNames.STUDENTS,
   reversed: true,
-  studentAmountLimit: Math.round((props?.filteredStudents?.length ?? 0) * 0.3),
   codeFilter: '',
   nameFilter: '',
   activeView: null,
   selectedStudentsLength: props.selectedStudentsLength || 0,
 })
 
-const PopulationCourseStatsFlat = ({ courses, pending, filteredStudents, showFilter = true }) => {
+const PopulationCourseStatsFlat = ({ courses, pending, filteredStudents, showFilter = true, studentAmountLimit }) => {
   const dispatch = useDispatch()
   const semesterRequest = useGetSemestersQuery()
   const { getTextIn } = useLanguage()
@@ -99,25 +98,18 @@ const PopulationCourseStatsFlat = ({ courses, pending, filteredStudents, showFil
   }
 
   const [filterFields, setFilterFields] = useState({ codeFilter: '', nameFilter: '' })
-  const [timer, setTimer] = useState(null)
   const [state, setState] = useState(initialState(props))
 
   const courseStatistics = useMemo(
-    () => updateCourseStatisticsCriteria(courses?.coursestatistics, state, getTextIn),
-    [courses, state]
+    () => updateCourseStatisticsCriteria(courses?.coursestatistics, state, getTextIn, studentAmountLimit),
+    [courses, state, studentAmountLimit]
   )
 
   useEffect(() => {
     if (!pending && state && props.courses) {
-      const studentAmountLimit =
-        state.selectedStudentsLength !== props.selectedStudents.length
-          ? Math.round(props.selectedStudents.length * 0.3)
-          : state.studentAmountLimit
-
       setState({
         ...state,
         initialSortReady: true,
-        studentAmountLimit,
         selectedStudentsLength: props.selectedStudents.length,
       })
     }
@@ -141,21 +133,6 @@ const PopulationCourseStatsFlat = ({ courses, pending, filteredStudents, showFil
   useEffect(() => {
     if (!pending) setFilters(filterFields)
   }, [filterFields, pending])
-
-  const onStudentAmountLimitChange = e => {
-    const {
-      target: { value },
-    } = e
-    clearTimeout(timer)
-    setTimer(
-      setTimeout(() => {
-        setState({
-          ...state,
-          studentAmountLimit: typeof Number(value) === 'number' ? Number(value) : state.studentAmountLimit,
-        })
-      }, 1000)
-    )
-  }
 
   const onSortableColumnHeaderClick = criteria => {
     const { reversed, sortCriteria } = state
@@ -240,19 +217,9 @@ const PopulationCourseStatsFlat = ({ courses, pending, filteredStudents, showFil
   }
 
   return (
-    <div>
-      {showFilter && (
-        <Form>
-          <Form.Field inline>
-            <label>Limit to courses where student number at least</label>
-            <Input defaultValue={state.studentAmountLimit} onChange={onStudentAmountLimitChange} />
-          </Form.Field>
-        </Form>
-      )}
-      <PopulationCourseContext.Provider value={contextValue}>
-        <Tab panes={panes} />
-      </PopulationCourseContext.Provider>
-    </div>
+    <PopulationCourseContext.Provider value={contextValue}>
+      <Tab panes={panes} />
+    </PopulationCourseContext.Provider>
   )
 }
 
