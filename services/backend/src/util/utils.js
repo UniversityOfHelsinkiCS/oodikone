@@ -1,5 +1,5 @@
-const mapToProviders = elementDetails => {
-  return elementDetails.map(r => {
+const mapToProviders = programmeCodes => {
+  return programmeCodes.map(r => {
     const isNumber = str => !Number.isNaN(Number(str))
     if (r.includes('_')) {
       const [left, right] = r.split('_')
@@ -10,7 +10,16 @@ const mapToProviders = elementDetails => {
     }
     if (/^(T)[0-9]{6}$/.test(r)) {
       const numbers = r.substring(1)
-      return `7${numbers}`
+      const courseProvider = `7${numbers}`
+      const asNum = Number(courseProvider)
+      // God-awful hack to fix a bunch of doctoral degrees
+      // that got the wrong provider
+      if (asNum < 7920111 && asNum > 7920102) {
+        return `${asNum + 1}`
+      } else if (asNum === 7920111) {
+        return `7920103`
+      }
+      return `${asNum}`
     }
     return r
   })
