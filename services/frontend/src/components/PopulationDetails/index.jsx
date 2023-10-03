@@ -1,6 +1,6 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { connect } from 'react-redux'
-import { Accordion, Radio } from 'semantic-ui-react'
+import { Accordion, Form, Input, Radio } from 'semantic-ui-react'
 import useFilters from 'components/FilterView/useFilters'
 import studyPlanFilter from 'components/FilterView/filters/hops'
 import { creditDateFilter } from 'components/FilterView/filters'
@@ -34,6 +34,12 @@ const PopulationDetails = ({
   const studentTableRef = useRef()
   const { useFilterSelector } = useFilters()
   const [curriculum, setCurriculum] = useState(null)
+  const [studentAmountLimit, setStudentAmountLimit] = useState(0)
+
+  useEffect(() => {
+    setStudentAmountLimit(Math.round(filteredStudents.length ? filteredStudents.length * 0.3 : 0))
+  }, [filteredStudents.length])
+
   const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions)
   const criteria = useGetProgressCriteriaQuery({ programmeCode: query?.studyRights?.programme })
   const [courseTableMode, setCourseTableMode] = useState('curriculum')
@@ -69,6 +75,10 @@ const PopulationDetails = ({
         {filteredStudents.length > 0 && graphs}
       </>
     )
+  }
+
+  const onStudentAmountLimitChange = value => {
+    setStudentAmountLimit(Number.isNaN(Number(value)) ? studentAmountLimit : Number(value))
   }
 
   if (isLoading || !queryIsSet) {
@@ -151,9 +161,9 @@ const PopulationDetails = ({
         content: (
           <div ref={courseTableRef}>
             <div style={{ display: 'flex', flexDirection: 'row' }}>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '26px' }}>
                 <Radio
-                  style={{ marginBottom: '15px', marginTop: '5px', marginRight: '4px', fontWeight: 'bold' }}
+                  style={{ fontWeight: 'bold' }}
                   label="Choose curriculum"
                   name="coursesRadioGroup"
                   value="curriculum"
@@ -162,7 +172,7 @@ const PopulationDetails = ({
                 />
                 <Radio
                   style={{ fontWeight: 'bold' }}
-                  label="Show all courses"
+                  label="Show all courses with at least"
                   name="coursesRadioGroup"
                   value="all"
                   onChange={(event, { value }) => setCourseTableMode(value)}
@@ -176,6 +186,17 @@ const PopulationDetails = ({
                   setCurriculum={setCurriculum}
                   disabled={courseTableMode !== 'curriculum'}
                 />
+                <Form style={{ padding: '4px 4px 4px 8px' }}>
+                  <Form.Field inline>
+                    <Input
+                      value={studentAmountLimit}
+                      onChange={e => onStudentAmountLimitChange(e.target.value)}
+                      disabled={courseTableMode !== 'all'}
+                      style={{ width: '70px' }}
+                    />
+                    <label>students</label>
+                  </Form.Field>
+                </Form>
               </div>
             </div>
             <PopulationCourses
@@ -186,6 +207,7 @@ const PopulationDetails = ({
               selectedStudentsByYear={selectedStudentsByYear}
               onlyIamRights={onlyIamRights}
               courseTableMode={courseTableMode}
+              studentAmountLimit={studentAmountLimit}
             />
           </div>
         ),
