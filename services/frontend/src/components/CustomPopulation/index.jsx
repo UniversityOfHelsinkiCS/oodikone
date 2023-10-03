@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { createSelector } from '@reduxjs/toolkit'
 import { useSelector, useDispatch } from 'react-redux'
-import { Segment, Header, Accordion, Message, Label } from 'semantic-ui-react'
+import { Segment, Header, Accordion, Message, Label, Form, Input } from 'semantic-ui-react'
 import _ from 'lodash'
 import scrollToComponent from 'react-scroll-to-component'
 import semestersApi from 'redux/semesters'
@@ -114,6 +114,11 @@ const CustomPopulationContent = ({ students, custompop, discardedStudentNumbers 
   const { customPopulationSearches, searchedCustomPopulationSearchId } = useSelector(
     state => state.customPopulationSearch
   )
+  const [studentAmountLimit, setStudentAmountLimit] = useState(Math.round(students.length ? students.length * 0.3 : 0))
+
+  const onStudentAmountLimitChange = value => {
+    setStudentAmountLimit(Number.isNaN(Number(value)) ? studentAmountLimit : Number(value))
+  }
 
   const populations = useSelector(state => state.populations)
   const { customPopulationFlag } = populations
@@ -196,7 +201,21 @@ const CustomPopulationContent = ({ students, custompop, discardedStudentNumbers 
         content: (
           <div ref={coursesRef}>
             <InfoBox content={infotooltips.PopulationStatistics.CoursesOfPopulation} />
-            <CustomPopulationCourses filteredStudents={students} courses={courseStats} />
+            <Form style={{ padding: '4px 4px 4px 8px' }}>
+              <Form.Field inline>
+                <label>Limit to courses where student number is at least</label>
+                <Input
+                  defaultValue={studentAmountLimit}
+                  onChange={e => onStudentAmountLimitChange(e.target.value)}
+                  style={{ width: '70px' }}
+                />
+              </Form.Field>
+            </Form>
+            <CustomPopulationCourses
+              filteredStudents={students}
+              courses={courseStats}
+              studentAmountLimit={studentAmountLimit}
+            />
           </div>
         ),
       },
