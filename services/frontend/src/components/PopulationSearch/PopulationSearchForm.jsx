@@ -444,22 +444,22 @@ const PopulationSearchForm = props => {
   if (!shouldRenderSearchForm() && location.search !== '') {
     return null
   }
-  let errorText = 'Selected population already in analysis.'
+  let errorText = 'Selected population already in analysis'
   let isQueryInvalid = false
 
   if (!validYearCheck(momentYear)) {
     isQueryInvalid = true
-    errorText = 'Select a valid year.'
+    errorText = 'Select a valid year'
   }
 
   if (query.semesters.length === 0) {
     isQueryInvalid = true
-    errorText = 'Select at least one semester.'
+    errorText = 'Select at least one semester'
   }
 
   if (!query.studyRights.programme) {
     isQueryInvalid = true
-    errorText = 'Select study rights.'
+    errorText = 'Select studyprogramme'
   }
 
   return (
