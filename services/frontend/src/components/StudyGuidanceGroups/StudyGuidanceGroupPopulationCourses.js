@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Segment, Button } from 'semantic-ui-react'
+import { Segment, Button, Form, Input } from 'semantic-ui-react'
 import InfoBox from 'components/Info/InfoBox'
 import SegmentDimmer from 'components/SegmentDimmer'
 import PopulationCourseStatsFlat from 'components/PopulationCourseStats/PopulationCourseStatsFlat'
@@ -19,6 +19,15 @@ const StudyGuidanceGroupPopulationCourses = ({
   const { data: mandatoryCourses, pending } = useSelector(
     ({ populationMandatoryCourses }) => populationMandatoryCourses
   )
+  const [studentAmountLimit, setStudentAmountLimit] = useState(0)
+
+  useEffect(() => {
+    setStudentAmountLimit(Math.round(filteredStudents.length ? filteredStudents.length * 0.3 : 0))
+  }, [filteredStudents.length])
+
+  const onStudentAmountLimitChange = value => {
+    setStudentAmountLimit(Number.isNaN(Number(value)) ? studentAmountLimit : Number(value))
+  }
 
   useEffect(() => {
     // ensure mandatory courses are available for course stats structured
@@ -42,7 +51,24 @@ const StudyGuidanceGroupPopulationCourses = ({
       {showStructured ? (
         <PopulationCourseStats courses={courses} pending={false} filteredStudents={filteredStudents} />
       ) : (
-        <PopulationCourseStatsFlat courses={courses} pending={false} filteredStudents={filteredStudents} />
+        <>
+          <Form style={{ padding: '4px 4px 4px 8px' }}>
+            <Form.Field inline>
+              <label>Limit to courses where student number is at least</label>
+              <Input
+                value={studentAmountLimit}
+                onChange={e => onStudentAmountLimitChange(e.target.value)}
+                style={{ width: '70px' }}
+              />
+            </Form.Field>
+          </Form>
+          <PopulationCourseStatsFlat
+            courses={courses}
+            pending={false}
+            filteredStudents={filteredStudents}
+            studentAmountLimit={studentAmountLimit}
+          />
+        </>
       )}
       {pending && <SegmentDimmer isLoading={pending} />}
     </Segment>
