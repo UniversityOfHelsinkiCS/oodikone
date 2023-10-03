@@ -314,7 +314,7 @@ const countGraduationTimes = async (faculty, programmeFilter) => {
       MH30_001: 12,
       '320011-ma': 12,
       '320001-ma': 12,
-      MH30_003: 12,
+      MH30_003: 6,
       '320002-ma': 12,
     },
   }
