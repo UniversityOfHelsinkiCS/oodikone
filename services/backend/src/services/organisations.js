@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize')
-const { Organization, ProgrammeModule } = require('../models')
+const { Organization } = require('../models')
 const Op = Sequelize.Op
 const { dbConnections } = require('../database/connection')
 
@@ -222,19 +222,6 @@ const faculties = () => {
   })
 }
 
-const degreeProgrammeCodesOfFaculty = async facultyCode =>
-  (
-    await ProgrammeModule.findAll({
-      attributes: ['code'],
-      include: {
-        model: Organization,
-        where: {
-          code: facultyCode,
-        },
-      },
-    })
-  ).map(({ code }) => code)
-
 const providersOfFaculty = async facultyCode => {
   const [result] = await dbConnections.sequelize.query(
     `SELECT childOrg.code
@@ -251,7 +238,6 @@ const isFaculty = facultyCode => facultiesInOodi.includes(facultyCode)
 
 module.exports = {
   faculties,
-  degreeProgrammeCodesOfFaculty,
   isFaculty,
   providersOfFaculty,
   facultiesAndProgrammesForTrends,
