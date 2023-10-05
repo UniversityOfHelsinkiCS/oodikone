@@ -276,21 +276,24 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
     </Tab.Pane>
   )
 }
+
 // study guidance groups -feature uses different population + rtk query, so it needs to
 // be rendered differently also here: TODO: refactor things nicely
-const StudyGuidanceGroupCoursesTabContainer = ({ students, group }) => {
+const StudyGuidanceGroupCoursesTabContainer = ({ students, group, curriculum }) => {
   const groupStudentNumbers = group?.members?.map(({ personStudentNumber }) => personStudentNumber) || []
   const populationsCourses = useGetStudyGuidanceGroupPopulationCoursesQuery({
     studentnumberlist: groupStudentNumbers,
     year: group?.tags?.year,
   }).data
   if (populationsCourses.pending) return null
-  return <CoursesTable students={students} studyGuidanceCourses={populationsCourses} />
+  return <CoursesTable students={students} studyGuidanceCourses={populationsCourses} curriculum={curriculum} />
 }
 
 const CoursesTabContainer = ({ students, variant, studyGuidanceGroup, curriculum }) => {
   if (variant === 'studyGuidanceGroupPopulation') {
-    return <StudyGuidanceGroupCoursesTabContainer students={students} group={studyGuidanceGroup} />
+    return (
+      <StudyGuidanceGroupCoursesTabContainer students={students} group={studyGuidanceGroup} curriculum={curriculum} />
+    )
   }
 
   return <CoursesTable students={students} curriculum={curriculum} />
