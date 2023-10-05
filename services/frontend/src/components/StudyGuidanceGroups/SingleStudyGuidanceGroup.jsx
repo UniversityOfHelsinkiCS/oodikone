@@ -55,6 +55,7 @@ const SingleStudyGroupContent = ({ filteredStudents, population, group }) => {
   const refs = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef()]
   const [activeIndex, setActiveIndex] = useState([])
   const [newestIndex, setNewestIndex] = useState(null)
+  const [curriculum, setCurriculum] = useState(null)
   const isMounted = useIsMounted()
   const criteria = useGetProgressCriteriaQuery({
     programmeCode: group?.tags?.studyProgramme ? group?.tags?.studyProgramme : '',
@@ -213,6 +214,9 @@ const SingleStudyGroupContent = ({ filteredStudents, population, group }) => {
                   showStructured={coursesStructuredByProgramme}
                   toggleShowStructured={toggleCoursesStructuredByProgramme}
                   studyProgramme={group.tags?.studyProgramme ? programmeCodes[0] : null}
+                  year={year}
+                  curriculum={curriculum}
+                  setCurriculum={setCurriculum}
                 />
               )}
             </div>
@@ -236,6 +240,7 @@ const SingleStudyGroupContent = ({ filteredStudents, population, group }) => {
                 filteredStudents={students}
                 criteria={criteria}
                 studyGuidanceGroup={group}
+                curriculum={curriculum}
               />
             </div>
           ),

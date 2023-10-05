@@ -1,67 +1,60 @@
 import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { Segment, Button, Form, Input } from 'semantic-ui-react'
-import InfoBox from 'components/Info/InfoBox'
-import SegmentDimmer from 'components/SegmentDimmer'
+import { Segment, Form, Input, Radio } from 'semantic-ui-react'
 import PopulationCourseStatsFlat from 'components/PopulationCourseStats/PopulationCourseStatsFlat'
 import PopulationCourseStats from 'components/PopulationCourseStats'
-import { getMandatoryCourses } from 'redux/populationMandatoryCourses'
-import infotooltips from 'common/InfoToolTips'
+import CurriculumPicker from 'components/PopulationDetails/CurriculumPicker'
 
 const StudyGuidanceGroupPopulationCourses = ({
   courses,
   filteredStudents,
-  showStructured,
-  toggleShowStructured,
   studyProgramme,
+  year,
+  curriculum,
+  setCurriculum,
 }) => {
-  const dispatch = useDispatch()
-  const { data: mandatoryCourses, pending } = useSelector(
-    ({ populationMandatoryCourses }) => populationMandatoryCourses
-  )
   const [studentAmountLimit, setStudentAmountLimit] = useState(0)
-
-  useEffect(() => {
-    setStudentAmountLimit(Math.round(filteredStudents.length ? filteredStudents.length * 0.3 : 0))
-  }, [filteredStudents.length])
-
+  const curriculumsAvailable = studyProgramme && year
+  const [courseTableMode, setCourseTableMode] = useState(curriculumsAvailable ? 'curriculum' : 'all')
   const onStudentAmountLimitChange = value => {
     setStudentAmountLimit(Number.isNaN(Number(value)) ? studentAmountLimit : Number(value))
   }
 
-  useEffect(() => {
-    // ensure mandatory courses are available for course stats structured
-    if (showStructured && studyProgramme && !mandatoryCourses?.defaultProgrammeCourses) {
-      dispatch(getMandatoryCourses(studyProgramme))
-    }
-  }, [showStructured])
-
   return (
     <Segment basic>
-      {studyProgramme && showStructured ? (
-        <InfoBox content={infotooltips.PopulationStatistics.CoursesOfClass} />
-      ) : (
-        <InfoBox content={infotooltips.PopulationStatistics.CoursesOfPopulation} />
+      {curriculumsAvailable && (
+        <CourseTableModeSelector
+          courseTableMode={courseTableMode}
+          setCourseTableMode={setCourseTableMode}
+          year={year}
+          studyProgramme={studyProgramme}
+          setCurriculum={setCurriculum}
+          studentAmountLimit={studentAmountLimit}
+          setStudentAmountLimit={setStudentAmountLimit}
+          filteredStudents={filteredStudents}
+          onStudentAmountLimitChange={onStudentAmountLimitChange}
+        />
       )}
-      {studyProgramme && (
-        <Button primary onClick={() => toggleShowStructured()} style={{ marginLeft: '1em' }}>
-          {showStructured ? 'Show courses as flat list' : 'Show by programme structure'}
-        </Button>
-      )}
-      {showStructured ? (
-        <PopulationCourseStats courses={courses} pending={false} filteredStudents={filteredStudents} />
+      {courseTableMode === 'curriculum' ? (
+        <PopulationCourseStats
+          mandatoryCourses={curriculum}
+          courses={courses}
+          pending={false}
+          filteredStudents={filteredStudents}
+        />
       ) : (
         <>
-          <Form style={{ padding: '4px 4px 4px 8px' }}>
-            <Form.Field inline>
-              <label>Limit to courses where student number is at least</label>
-              <Input
-                value={studentAmountLimit}
-                onChange={e => onStudentAmountLimitChange(e.target.value)}
-                style={{ width: '70px' }}
-              />
-            </Form.Field>
-          </Form>
+          {!curriculumsAvailable && (
+            <Form style={{ padding: '4px 4px 4px 8px' }}>
+              <Form.Field inline>
+                <label>Limit to courses where student number is at least</label>
+                <Input
+                  value={studentAmountLimit}
+                  onChange={e => onStudentAmountLimitChange(e.target.value)}
+                  style={{ width: '70px' }}
+                />
+              </Form.Field>
+            </Form>
+          )}
           <PopulationCourseStatsFlat
             courses={courses}
             pending={false}
@@ -70,8 +63,66 @@ const StudyGuidanceGroupPopulationCourses = ({
           />
         </>
       )}
-      {pending && <SegmentDimmer isLoading={pending} />}
     </Segment>
   )
 }
+
+const CourseTableModeSelector = ({
+  courseTableMode,
+  setCourseTableMode,
+  year,
+  studyProgramme,
+  setCurriculum,
+  studentAmountLimit,
+  setStudentAmountLimit,
+  filteredStudents,
+  onStudentAmountLimitChange,
+}) => {
+  useEffect(() => {
+    setStudentAmountLimit(Math.round(filteredStudents.length ? filteredStudents.length * 0.3 : 0))
+  }, [filteredStudents.length])
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'row' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '26px' }}>
+        <Radio
+          style={{ fontWeight: 'bold' }}
+          label="Choose curriculum"
+          name="coursesRadioGroup"
+          value="curriculum"
+          onChange={(event, { value }) => setCourseTableMode(value)}
+          checked={courseTableMode === 'curriculum'}
+        />
+        <Radio
+          style={{ fontWeight: 'bold' }}
+          label="Show all courses with at least"
+          name="coursesRadioGroup"
+          value="all"
+          onChange={(event, { value }) => setCourseTableMode(value)}
+          checked={courseTableMode === 'all'}
+        />
+      </div>
+      <div>
+        <CurriculumPicker
+          year={year}
+          programmeCodes={[studyProgramme]}
+          setCurriculum={setCurriculum}
+          disabled={courseTableMode !== 'curriculum'}
+        />
+        <Form style={{ padding: '4px 4px 4px 8px' }}>
+          <Form.Field inline>
+            <Input
+              value={studentAmountLimit}
+              onChange={e => onStudentAmountLimitChange(e.target.value)}
+              disabled={courseTableMode !== 'all'}
+              style={{ width: '70px' }}
+            />
+            <label>students</label>
+          </Form.Field>
+        </Form>
+      </div>
+    </div>
+  )
+}
+
 export default StudyGuidanceGroupPopulationCourses
