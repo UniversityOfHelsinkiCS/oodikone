@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Segment, Button, Form, Input } from 'semantic-ui-react'
+// import { Segment, Button, Form, Input } from 'semantic-ui-react'
+import { Segment, Form, Input } from 'semantic-ui-react'
 import InfoBox from 'components/Info/InfoBox'
 import SegmentDimmer from 'components/SegmentDimmer'
 import PopulationCourseStatsFlat from 'components/PopulationCourseStats/PopulationCourseStatsFlat'
-import PopulationCourseStats from 'components/PopulationCourseStats'
+// import PopulationCourseStats from 'components/PopulationCourseStats'
 import { getMandatoryCourses } from 'redux/populationMandatoryCourses'
 import infotooltips from 'common/InfoToolTips'
 
@@ -12,7 +13,7 @@ const StudyGuidanceGroupPopulationCourses = ({
   courses,
   filteredStudents,
   showStructured,
-  toggleShowStructured,
+  // toggleShowStructured,
   studyProgramme,
 }) => {
   const dispatch = useDispatch()
@@ -36,6 +37,8 @@ const StudyGuidanceGroupPopulationCourses = ({
     }
   }, [showStructured])
 
+  // Button to toggle between flat list and programme structure view has been removed as an emergency fix
+
   return (
     <Segment basic>
       {studyProgramme && showStructured ? (
@@ -43,33 +46,33 @@ const StudyGuidanceGroupPopulationCourses = ({
       ) : (
         <InfoBox content={infotooltips.PopulationStatistics.CoursesOfPopulation} />
       )}
-      {studyProgramme && (
+      {/* {studyProgramme && (
         <Button primary onClick={() => toggleShowStructured()} style={{ marginLeft: '1em' }}>
           {showStructured ? 'Show courses as flat list' : 'Show by programme structure'}
         </Button>
-      )}
-      {showStructured ? (
+      )} */}
+      {/* {showStructured ? (
         <PopulationCourseStats courses={courses} pending={false} filteredStudents={filteredStudents} />
-      ) : (
-        <>
-          <Form style={{ padding: '4px 4px 4px 8px' }}>
-            <Form.Field inline>
-              <label>Limit to courses where student number is at least</label>
-              <Input
-                value={studentAmountLimit}
-                onChange={e => onStudentAmountLimitChange(e.target.value)}
-                style={{ width: '70px' }}
-              />
-            </Form.Field>
-          </Form>
-          <PopulationCourseStatsFlat
-            courses={courses}
-            pending={false}
-            filteredStudents={filteredStudents}
-            studentAmountLimit={studentAmountLimit}
-          />
-        </>
-      )}
+      ) : ( */}
+      <>
+        <Form style={{ padding: '4px 4px 4px 8px' }}>
+          <Form.Field inline>
+            <label>Limit to courses where student number is at least</label>
+            <Input
+              value={studentAmountLimit}
+              onChange={e => onStudentAmountLimitChange(e.target.value)}
+              style={{ width: '70px' }}
+            />
+          </Form.Field>
+        </Form>
+        <PopulationCourseStatsFlat
+          courses={courses}
+          pending={false}
+          filteredStudents={filteredStudents}
+          studentAmountLimit={studentAmountLimit}
+        />
+      </>
+      {/* )} */}
       {pending && <SegmentDimmer isLoading={pending} />}
     </Segment>
   )
