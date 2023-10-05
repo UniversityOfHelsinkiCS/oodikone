@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Segment } from 'semantic-ui-react'
 import { useGetProgressCriteriaQuery } from 'redux/programmeProgressCriteria'
+import PopulationCourseStatsFlat from 'components/PopulationCourseStats/PopulationCourseStatsFlat'
 import SegmentDimmer from '../SegmentDimmer'
 import PopulationCourseStats from '../PopulationCourseStats'
-import CustomPopulationCourses from '../CustomPopulation/CustomPopulationCourses'
 import InfoBox from '../Info/InfoBox'
 import FilterDegreeCoursesModal from './FilterDegreeCoursesModal'
 import { getPopulationSelectedStudentCourses } from '../../redux/populationSelectedStudentCourses'
@@ -101,7 +101,7 @@ const PopulationCourses = ({
           onlyIamRights={onlyIamRights}
         />
       ) : (
-        <CustomPopulationCourses
+        <PopulationCourseStatsFlat
           courses={pending ? null : selectedPopulationCourses.data}
           filteredStudents={filteredStudents}
           studentAmountLimit={studentAmountLimit}

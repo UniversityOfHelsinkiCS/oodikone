@@ -6,6 +6,7 @@ import _ from 'lodash'
 import { Segment, Header, Accordion, Form, Input } from 'semantic-ui-react'
 import scrollToComponent from 'react-scroll-to-component'
 import InfoBox from 'components/Info/InfoBox'
+import PopulationCourseStatsFlat from 'components/PopulationCourseStats/PopulationCourseStatsFlat'
 import { getCoursePopulation } from '../../redux/populations'
 import { getSingleCourseStats } from '../../redux/singleCourseStats'
 import { useGetStudentListCourseStatisticsQuery } from '../../redux/populationCourses'
@@ -17,7 +18,6 @@ import CoursePopulationGradeDist from './CoursePopulationGradeDist'
 import CoursePopulationLanguageDist from './CoursePopulationLanguageDist'
 import CoursePopulationCreditGainTable from './CoursePopulationCreditGainTable'
 import CustomPopulationProgrammeDist from '../CustomPopulation/CustomPopulationProgrammeDist'
-import CustomPopulationCourses from '../CustomPopulation/CustomPopulationCourses'
 import ProgressBar from '../ProgressBar'
 import { getStudentToTargetCourseDateMap, getUnifyTextIn } from '../../common'
 import { useProgress, useTitle } from '../../common/hooks'
@@ -241,7 +241,7 @@ const CoursePopulation = ({
       content: {
         content: (
           <div ref={programmeRef}>
-            <CustomPopulationCoursesWrapper filteredStudents={filtered} showFilter />
+            <CustomPopulationCoursesWrapper filteredStudents={filtered} />
           </div>
         ),
       },
@@ -362,16 +362,16 @@ const CoursePopulation = ({
   )
 }
 
-const CustomPopulationCoursesWrapper = props => {
+const CustomPopulationCoursesWrapper = ({ filteredStudents }) => {
   const { data: courseStatistics, isLoading } = useGetStudentListCourseStatisticsQuery({
-    studentNumbers: props.filteredStudents.map(student => student.studentNumber),
+    studentNumbers: filteredStudents.map(student => student.studentNumber),
   })
 
   const [studentAmountLimit, setStudentAmountLimit] = useState(0)
 
   useEffect(() => {
-    setStudentAmountLimit(Math.round(props.filteredStudents.length ? props.filteredStudents.length * 0.3 : 0))
-  }, [props.filteredStudents.length])
+    setStudentAmountLimit(Math.round(filteredStudents.length ? filteredStudents.length * 0.3 : 0))
+  }, [filteredStudents.length])
 
   const onStudentAmountLimitChange = value => {
     setStudentAmountLimit(Number.isNaN(Number(value)) ? studentAmountLimit : Number(value))
@@ -392,7 +392,11 @@ const CustomPopulationCoursesWrapper = props => {
           />
         </Form.Field>
       </Form>
-      <CustomPopulationCourses {...props} studentAmountLimit={studentAmountLimit} courses={courseStatistics} />
+      <PopulationCourseStatsFlat
+        filteredStudents={filteredStudents}
+        studentAmountLimit={studentAmountLimit}
+        courses={courseStatistics}
+      />
     </>
   )
 }

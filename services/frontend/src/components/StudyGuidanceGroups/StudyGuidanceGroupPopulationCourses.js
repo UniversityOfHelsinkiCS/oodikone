@@ -38,7 +38,6 @@ const StudyGuidanceGroupPopulationCourses = ({
         <PopulationCourseStats
           mandatoryCourses={curriculum}
           courses={courses}
-          pending={false}
           filteredStudents={filteredStudents}
         />
       ) : (

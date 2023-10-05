@@ -80,7 +80,7 @@ const initialState = props => ({
   selectedStudentsLength: props.selectedStudentsLength || 0,
 })
 
-const PopulationCourseStatsFlat = ({ courses, pending, filteredStudents, showFilter = true, studentAmountLimit }) => {
+const PopulationCourseStatsFlat = ({ courses, filteredStudents, studentAmountLimit }) => {
   const dispatch = useDispatch()
   const semesterRequest = useGetSemestersQuery()
   const { getTextIn } = useLanguage()
@@ -89,11 +89,9 @@ const PopulationCourseStatsFlat = ({ courses, pending, filteredStudents, showFil
 
   const props = {
     courses,
-    pending,
     populationCourses: courses,
     selectedStudents: filteredStudents,
     filteredStudents,
-    showFilter,
     years,
   }
 
@@ -106,14 +104,14 @@ const PopulationCourseStatsFlat = ({ courses, pending, filteredStudents, showFil
   )
 
   useEffect(() => {
-    if (!pending && state && props.courses) {
+    if (state && props.courses) {
       setState({
         ...state,
         initialSortReady: true,
         selectedStudentsLength: props.selectedStudents.length,
       })
     }
-  }, [props.courses, props.courseStatistics, props.selectedStudents, pending])
+  }, [props.courses, props.courseStatistics, props.selectedStudents])
 
   const onFilterChange = (e, field) => {
     const {
@@ -131,8 +129,8 @@ const PopulationCourseStatsFlat = ({ courses, pending, filteredStudents, showFil
   )
 
   useEffect(() => {
-    if (!pending) setFilters(filterFields)
-  }, [filterFields, pending])
+    setFilters(filterFields)
+  }, [filterFields])
 
   const onSortableColumnHeaderClick = criteria => {
     const { reversed, sortCriteria } = state
@@ -204,15 +202,7 @@ const PopulationCourseStatsFlat = ({ courses, pending, filteredStudents, showFil
     },
   ]
 
-  if (!props.courses) {
-    return null
-  }
-
-  if (!courseStatistics) {
-    return null
-  }
-
-  if (pending) {
+  if (!props.courses || !courseStatistics) {
     return null
   }
 

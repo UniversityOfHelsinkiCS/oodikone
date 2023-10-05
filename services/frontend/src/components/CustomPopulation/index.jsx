@@ -8,13 +8,13 @@ import semestersApi from 'redux/semesters'
 import { useFilteredAndFormattedElementDetails } from 'redux/elementdetails'
 
 import RightsNotification from 'components/RightsNotification'
+import PopulationCourseStatsFlat from 'components/PopulationCourseStats/PopulationCourseStatsFlat'
 import { useProgress, useTitle } from '../../common/hooks'
 import infotooltips from '../../common/InfoToolTips'
 import { getCustomPopulationSearches } from '../../redux/customPopulationSearch'
 import { useGetStudentListCourseStatisticsQuery } from '../../redux/populationCourses'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import PopulationStudents from '../PopulationStudents'
-import CustomPopulationCourses from './CustomPopulationCourses'
 import CustomPopulationProgrammeDist from './CustomPopulationProgrammeDist'
 import ProgressBar from '../ProgressBar'
 import InfoBox from '../Info/InfoBox'
@@ -215,7 +215,7 @@ const CustomPopulationContent = ({ students, custompop, discardedStudentNumbers 
                 />
               </Form.Field>
             </Form>
-            <CustomPopulationCourses
+            <PopulationCourseStatsFlat
               filteredStudents={students}
               courses={courseStats}
               studentAmountLimit={studentAmountLimit}
