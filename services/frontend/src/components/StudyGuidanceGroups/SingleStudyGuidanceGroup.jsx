@@ -151,7 +151,7 @@ const SingleStudyGroupContent = ({ filteredStudents, population, group }) => {
           ),
         },
       },
-      programmeCodes && year
+      ((programmeCodes?.length && programmeCodes[0]) || group?.tags?.studyProgramme) && year
         ? {
             key: 'credit-statistics-panel',
             title: {
