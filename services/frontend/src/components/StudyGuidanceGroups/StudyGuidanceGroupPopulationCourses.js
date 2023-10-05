@@ -117,7 +117,7 @@ const CourseTableModeSelector = ({
               disabled={courseTableMode !== 'all'}
               style={{ width: '70px' }}
             />
-            <label>students</label>
+            <label>total students</label>
           </Form.Field>
         </Form>
       </div>
