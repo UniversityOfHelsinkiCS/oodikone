@@ -194,7 +194,7 @@ const PopulationDetails = ({
                       disabled={courseTableMode !== 'all'}
                       style={{ width: '70px' }}
                     />
-                    <label>total students</label>
+                    <label>students</label>
                   </Form.Field>
                 </Form>
               </div>
