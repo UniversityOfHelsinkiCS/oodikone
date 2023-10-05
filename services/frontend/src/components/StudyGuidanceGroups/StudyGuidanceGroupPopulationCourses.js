@@ -35,11 +35,7 @@ const StudyGuidanceGroupPopulationCourses = ({
         />
       )}
       {courseTableMode === 'curriculum' ? (
-        <PopulationCourseStats
-          mandatoryCourses={curriculum}
-          courses={courses}
-          filteredStudents={filteredStudents}
-        />
+        <PopulationCourseStats mandatoryCourses={curriculum} courses={courses} filteredStudents={filteredStudents} />
       ) : (
         <>
           {!curriculumsAvailable && (
