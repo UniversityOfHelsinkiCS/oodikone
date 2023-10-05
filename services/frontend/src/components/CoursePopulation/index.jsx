@@ -3,7 +3,7 @@ import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import moment from 'moment'
 import _ from 'lodash'
-import { Segment, Header, Accordion } from 'semantic-ui-react'
+import { Segment, Header, Accordion, Form, Input } from 'semantic-ui-react'
 import scrollToComponent from 'react-scroll-to-component'
 import InfoBox from 'components/Info/InfoBox'
 import { getCoursePopulation } from '../../redux/populations'
@@ -367,12 +367,32 @@ const CustomPopulationCoursesWrapper = props => {
     studentNumbers: props.filteredStudents.map(student => student.studentNumber),
   })
 
+  const [studentAmountLimit, setStudentAmountLimit] = useState(0)
+
+  useEffect(() => {
+    setStudentAmountLimit(Math.round(props.filteredStudents.length ? props.filteredStudents.length * 0.3 : 0))
+  }, [props.filteredStudents.length])
+
+  const onStudentAmountLimitChange = value => {
+    setStudentAmountLimit(Number.isNaN(Number(value)) ? studentAmountLimit : Number(value))
+  }
+
   if (isLoading) return null
 
   return (
     <>
       <InfoBox content={infotooltips.PopulationStatistics.CoursesOfPopulation} />
-      <CustomPopulationCourses {...props} courses={courseStatistics} />
+      <Form style={{ padding: '4px 4px 4px 8px' }}>
+        <Form.Field inline>
+          <label>Limit to courses where student number is at least</label>
+          <Input
+            value={studentAmountLimit}
+            onChange={e => onStudentAmountLimitChange(e.target.value)}
+            style={{ width: '70px' }}
+          />
+        </Form.Field>
+      </Form>
+      <CustomPopulationCourses {...props} studentAmountLimit={studentAmountLimit} courses={courseStatistics} />
     </>
   )
 }
