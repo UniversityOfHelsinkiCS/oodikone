@@ -5,7 +5,7 @@ import studyPlanFilter from 'components/FilterView/filters/hops'
 import CollapsibleCreditRow from './CollapsibleCreditRow'
 import useFilters from '../../FilterView/useFilters'
 
-const CreditsGainedTable = ({ filteredStudents, type, year, creditDateFilterOptions }) => {
+const CreditsGainedTable = ({ filteredStudents, type, year, creditDateFilterOptions, programmeGoalTime }) => {
   const { useFilterSelector } = useFilters()
   const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive)
 
@@ -74,7 +74,7 @@ const CreditsGainedTable = ({ filteredStudents, type, year, creditDateFilterOpti
     creditList = filteredStudents.map(student => student.credits)
   }
 
-  const monthsForLimits = months > 60 ? 60 : months
+  const monthsForLimits = programmeGoalTime ? Math.min(months, programmeGoalTime) : months
 
   const limits = [
     [Math.ceil(monthsForLimits * (60 / 12))],

@@ -13,7 +13,7 @@ const admissionTypes = [
   null,
 ]
 
-const CreditsGainedTab = ({ allStudents, query, creditDateFilterOptions }) => {
+const CreditsGainedTab = ({ allStudents, query, creditDateFilterOptions, programmeGoalTime }) => {
   const [show, setShow] = useState(false)
   if (!allStudents || !allStudents.length || !query) return null
 
@@ -35,6 +35,7 @@ const CreditsGainedTab = ({ allStudents, query, creditDateFilterOptions }) => {
         filteredStudents={filteredStudents}
         year={year}
         creditDateFilterOptions={creditDateFilterOptions}
+        programmeGoalTime={programmeGoalTime}
       />
     )
   }
@@ -50,6 +51,7 @@ const CreditsGainedTab = ({ allStudents, query, creditDateFilterOptions }) => {
             filteredStudents={allStudents}
             year={year}
             creditDateFilterOptions={creditDateFilterOptions}
+            programmeGoalTime={programmeGoalTime}
           />
         </Grid.Column>
       </Grid.Row>
