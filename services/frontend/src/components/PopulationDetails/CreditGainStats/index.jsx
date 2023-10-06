@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react'
 import { Tab } from 'semantic-ui-react'
+import { getMonthsForDegree } from 'common'
 import { useTabChangeAnalytics } from '../../../common/hooks'
 import InfoBox from '../../Info/InfoBox'
 import StatisticsTab from './StatisticsTab'
@@ -10,6 +11,11 @@ import './creditGainStats.css'
 
 const CreditGainStats = ({ filteredStudents, query, creditDateFilterOptions, year }) => {
   const combinedProgramme = query?.studyRights?.combinedProgramme || ''
+
+  const programmeGoalTime = combinedProgramme
+    ? getMonthsForDegree(`${query?.studyRights?.programme}-${combinedProgramme}`)
+    : getMonthsForDegree(query?.studyRights?.programme)
+
   const renderCreditsGainTab = useCallback(() => {
     return (
       <Tab.Pane attached={false}>
@@ -17,6 +23,7 @@ const CreditGainStats = ({ filteredStudents, query, creditDateFilterOptions, yea
           allStudents={filteredStudents}
           query={query}
           creditDateFilterOptions={creditDateFilterOptions}
+          programmeGoalTime={programmeGoalTime}
         />
       </Tab.Pane>
     )

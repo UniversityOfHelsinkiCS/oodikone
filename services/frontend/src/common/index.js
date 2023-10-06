@@ -326,7 +326,7 @@ export const getTargetCreditsForProgramme = code => {
   // Those codes begin with 'LIS' is it 40 credits or something else?
 }
 
-const getMonthsForDegree = code => getTargetCreditsForProgramme(code) / (60 / 12)
+export const getMonthsForDegree = code => getTargetCreditsForProgramme(code) / (60 / 12)
 
 /**
  * Get start and end dates for study right element. For bachelor a 3 year target is used
