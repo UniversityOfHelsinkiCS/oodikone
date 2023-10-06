@@ -74,16 +74,18 @@ const CreditsGainedTable = ({ filteredStudents, type, year, creditDateFilterOpti
     creditList = filteredStudents.map(student => student.credits)
   }
 
+  const monthsForLimits = months > 60 ? 60 : months
+
   const limits = [
-    [Math.ceil(months * (60 / 12))],
-    [Math.ceil(months * (45 / 12)), Math.ceil(months * (60 / 12))],
-    [Math.ceil(months * (30 / 12)), Math.ceil(months * (45 / 12))],
-    [Math.ceil(months * (15 / 12)), Math.ceil(months * (30 / 12))],
-    [1, Math.ceil(months * (15 / 12))],
+    [Math.ceil(monthsForLimits * (60 / 12))],
+    [Math.ceil(monthsForLimits * (45 / 12)), Math.ceil(monthsForLimits * (60 / 12))],
+    [Math.ceil(monthsForLimits * (30 / 12)), Math.ceil(monthsForLimits * (45 / 12))],
+    [Math.ceil(monthsForLimits * (15 / 12)), Math.ceil(monthsForLimits * (30 / 12))],
+    [1, Math.ceil(monthsForLimits * (15 / 12))],
     [null, 0],
   ]
 
-  const monthString = months === 1 ? 'Month' : 'Months'
+  const monthString = months === 1 ? 'month' : 'months'
 
   const CreditsHeader = () => {
     if (studyPlanFilterIsActive) {
@@ -91,7 +93,7 @@ const CreditsGainedTable = ({ filteredStudents, type, year, creditDateFilterOpti
     }
     return (
       <p>
-        Gredits Gained Between <br /> {title} <br /> ({months} {monthString})
+        Credits gained between <br /> {title} <br /> ({months} {monthString})
       </p>
     )
   }
@@ -107,11 +109,11 @@ const CreditsGainedTable = ({ filteredStudents, type, year, creditDateFilterOpti
               <CreditsHeader />
             </Table.HeaderCell>
             <Table.HeaderCell key={`credits-number-of-students-${type}`}>
-              Number of Students
+              Number of students
               <br />
-              <span style={{ fontWeight: 100 }}>(n={filteredStudents.length})</span>
+              <span style={{ fontWeight: 100 }}>(n = {filteredStudents.length})</span>
             </Table.HeaderCell>
-            <Table.HeaderCell key={`credits-percentage-of-students-${type}`}>Percentage of Population</Table.HeaderCell>
+            <Table.HeaderCell key={`credits-percentage-of-students-${type}`}>Percentage of population</Table.HeaderCell>
           </Table.Row>
         </Table.Header>
 
@@ -123,7 +125,7 @@ const CreditsGainedTable = ({ filteredStudents, type, year, creditDateFilterOpti
               max={max}
               studentCount={studentCount}
               filteredLength={filteredStudents.length}
-              months={Number(months)}
+              months={monthsForLimits}
             />
           ))}
         </Table.Body>
