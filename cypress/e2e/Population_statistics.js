@@ -136,7 +136,8 @@ describe('Population Statistics tests', () => {
       cy.get("[data-cy='credits-gained-main-table']").should('contain', 'All students of the class')
       const today = moment().endOf('month')
       const months = Math.round(moment.duration(moment(today).diff(moment('2017-08-01'))).asMonths())
-      const monthsForLimits = months > 60 ? 60 : months
+      // Months are capped to goal time of the degree, 36 months is the goal time for bachelor's degree
+      const monthsForLimits = Math.min(36, months)
       const limits = [1, ..._.range(1, 5).map(p => Math.ceil(monthsForLimits * ((p * 15) / 12))), null]
       const ranges = _.range(1, limits.length).map(i => _.slice(limits, i - 1, i + 1))
 
