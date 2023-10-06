@@ -39,7 +39,9 @@ router.get('/v3/programme_modules/get_curriculum/:code/:period_ids', async (req,
   const result = await getCoursesAndModules(code, period_ids.replace(' ', '').split(','))
   res.json({
     defaultProgrammeCourses: result.defaultProgrammeCourses.courses,
+    defaultProgrammeModules: result.defaultProgrammeCourses.modules,
     secondProgrammeCourses: result.secondProgrammeCourses?.courses,
+    secondProgrammeModules: result.secondProgrammeCourses?.modules,
   })
 })
 

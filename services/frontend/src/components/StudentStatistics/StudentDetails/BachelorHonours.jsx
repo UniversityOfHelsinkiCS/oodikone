@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import moment from 'moment'
-import { useSelector } from 'react-redux'
 import { Divider, Table, Label, Header, Accordion, Icon } from 'semantic-ui-react'
-
+import CurriculumPicker from 'components/PopulationDetails/CurriculumPicker'
 import {
   bachelorHonoursProgrammes as bachelorCodes,
   bachelorHonoursBasicModules as basicHonoursModules,
@@ -11,7 +10,7 @@ import {
 } from '../../../common'
 
 const BachelorHonours = ({ student, absentYears, programmeCode }) => {
-  const mandatoryModules = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
+  const [curriculum, setCurriculum] = useState(null)
   const [studentsModules, setModules] = useState([])
   const [otherModules, setOther] = useState([])
   const [showHonoursModules, setShowHonoursModules] = useState(false)
@@ -20,6 +19,7 @@ const BachelorHonours = ({ student, absentYears, programmeCode }) => {
   const [graduated, setGraduated] = useState(false)
   const [inspection, setInspection] = useState(false)
   const [reason, setReason] = useState(null)
+  const mandatoryModules = { defaultProgrammeResults: curriculum?.defaultProgrammeModules }
 
   useEffect(() => {
     if (programmeCode) {
@@ -35,6 +35,7 @@ const BachelorHonours = ({ student, absentYears, programmeCode }) => {
   }, [programmeCode, student])
 
   useEffect(() => {
+    if (!mandatoryModules?.defaultProgrammeResults?.length) return
     const mandatoryModuleCodes = mandatoryModules.defaultProgrammeResults
       ? mandatoryModules.defaultProgrammeResults.map(mod => mod.code)
       : []
@@ -92,7 +93,7 @@ const BachelorHonours = ({ student, absentYears, programmeCode }) => {
     } else if (graduated && (allBasicUnderFour || allIntermediateUnderFour)) {
       setReason('Module grades too low')
     }
-  }, [mandatoryModules, student])
+  }, [curriculum?.defaultProgrammeModules, student])
 
   const dataRows = modules =>
     modules.map(mod => (
@@ -118,14 +119,7 @@ const BachelorHonours = ({ student, absentYears, programmeCode }) => {
     </Table>
   )
 
-  if (
-    !programmeCode ||
-    !student ||
-    !student.courses ||
-    !student.studyrights ||
-    !mandatoryModules?.defaultProgrammeResults?.length
-  )
-    return null
+  if (!programmeCode || !student || !student.courses || !student.studyrights) return null
 
   return (
     <>
@@ -140,6 +134,17 @@ const BachelorHonours = ({ student, absentYears, programmeCode }) => {
       />
       {!honors && reason && <Label tag content={reason} color="red" />}
       {inspection && <Label tag content="Might need further inspection" color="blue" />}
+      <div style={{ marginTop: '15px', marginBottom: '15px' }}>
+        <p>
+          Select curriculum version used for checking Bachelor's Honour's eligibility
+          <CurriculumPicker
+            year={new Date().getFullYear()}
+            programmeCodes={[programmeCode]}
+            curriculum={curriculum}
+            setCurriculum={setCurriculum}
+          />
+        </p>
+      </div>
       {honors ? (
         <Accordion>
           <Accordion.Title

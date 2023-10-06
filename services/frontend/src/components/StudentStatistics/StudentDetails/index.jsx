@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { func, shape, string, arrayOf, number, bool } from 'prop-types'
-import { connect, useDispatch } from 'react-redux'
+import { connect } from 'react-redux'
 import { Segment, Loader } from 'semantic-ui-react'
 import { isEmpty, sortBy } from 'lodash'
 import moment from 'moment'
@@ -18,7 +18,6 @@ import StudyrightsTable from './StudyrightsTable'
 import TagsTable from './TagsTable'
 import CourseParticipationTable from './CourseParticipationTable'
 import StudentGraphs from './StudentGraphs'
-import { getMandatoryCourseModules } from '../../../redux/populationMandatoryCourses'
 
 const StudentDetails = ({
   student,
@@ -34,11 +33,9 @@ const StudentDetails = ({
   fetching,
   clearCourseStats,
 }) => {
-  const dispatch = useDispatch()
   const [graphYearStart, setGraphYear] = useState(null)
   const [studyrightid, setStudyrightid] = useState('')
   const [honoursCode, setHonoursCode] = useState(null)
-
   const { data: semesters } = useGetSemestersQuery()
 
   useEffect(() => {
@@ -66,7 +63,6 @@ const StudentDetails = ({
       // currently only for matlu
       const shouldRender = bachelorCodes.includes(newestBachelorProgramme.code)
       if (!shouldRender && honoursCode !== null) setHonoursCode(null)
-      if (shouldRender) dispatch(getMandatoryCourseModules(newestBachelorProgramme.code))
       if (shouldRender) setHonoursCode(newestBachelorProgramme.code)
     }
   }, [Programmes, student])
