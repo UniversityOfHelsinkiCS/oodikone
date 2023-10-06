@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { connect } from 'react-redux'
+import { connect, useDispatch } from 'react-redux'
 import { Table, Input, Tab, Icon } from 'semantic-ui-react'
 import { orderBy, debounce } from 'lodash'
 import { withRouter } from 'react-router-dom'
@@ -80,13 +80,13 @@ const updateCourseStatisticsCriteria = (courseStats, state, mandatoryCourses, ge
   return courseStatistics
 }
 
-const initialState = props => ({
+const initialState = filteredStudents => ({
   sortCriteria: tableColumnNames.STUDENTS,
   reversed: true,
   codeFilter: '',
   nameFilter: '',
   activeView: null,
-  filteredStudentsLength: props.filteredStudentsLength || 0,
+  filteredStudentsLength: filteredStudents.length || 0,
 })
 
 const useDelayedMemo = (fn, watch) => {
@@ -97,42 +97,40 @@ const useDelayedMemo = (fn, watch) => {
   return cached
 }
 
-const PopulationCourseStats = props => {
+const PopulationCourseStats = ({ filteredStudents, mandatoryCourses, courses, pending, onlyIamRights }) => {
+  const dispatch = useDispatch()
+
   const { getTextIn } = useLanguage()
   const [filterFields, setFilterFields] = useState({ codeFilter: '', nameFilter: '' })
   const [modules, setModules] = useState([])
-  const [state, setState] = useState(initialState(props))
+  const [state, setState] = useState(initialState(filteredStudents))
   const [expandedGroups, setExpandedGroups] = useState(new Set())
-  const { mandatoryCourses } = props
   const { handleTabChange } = useTabChangeAnalytics()
 
   const courseStatistics = useDelayedMemo(
-    () => updateCourseStatisticsCriteria(props.courses?.coursestatistics, state, mandatoryCourses, getTextIn),
-    [props.courses, state]
+    () => updateCourseStatisticsCriteria(courses?.coursestatistics, state, mandatoryCourses, getTextIn),
+    [courses, state]
   )
 
   useEffect(() => {
-    if (state && props.courses) {
+    if (state && courses) {
       const studentAmountLimit =
-        state.filteredStudentsLength !== props.filteredStudents.length
-          ? Math.round(props.filteredStudents.length * 0.3)
+        state.filteredStudentsLength !== filteredStudents.length
+          ? Math.round(filteredStudents.length * 0.3)
           : state.studentAmountLimit
 
       setState({
         ...state,
         initialSortReady: true,
         studentAmountLimit,
-        filteredStudentsLength: props.filteredStudents.length,
+        filteredStudentsLength: filteredStudents.length,
       })
     }
-  }, [props.courses, props.filteredStudents])
+  }, [courses, filteredStudents])
 
   useEffect(() => {
     const { codeFilter, nameFilter, reversed, sortCriteria } = state
-    const {
-      courses: { coursestatistics },
-      language,
-    } = props
+    const { coursestatistics } = courses
 
     const courseCodeFilter = ({ course }) => {
       if (!codeFilter) return true
@@ -144,7 +142,7 @@ const PopulationCourseStats = props => {
       if (!nameFilter) return true
 
       const { name } = course
-      return getTextIn(name, language).toLowerCase().includes(nameFilter.toLowerCase())
+      return getTextIn(name).toLowerCase().includes(nameFilter.toLowerCase())
     }
     const visibleCoursesFilter = ({ course }) => {
       return (
@@ -211,7 +209,7 @@ const PopulationCourseStats = props => {
         item => item.module.code
       )
     )
-  }, [state.studentAmountLimit, props.courses.coursestatistics, state.codeFilter, state.nameFilter, mandatoryCourses])
+  }, [state.studentAmountLimit, courses.coursestatistics, state.codeFilter, state.nameFilter, mandatoryCourses])
 
   const onFilterChange = (e, field) => {
     const {
@@ -244,10 +242,9 @@ const PopulationCourseStats = props => {
     })
   }
 
-  const onGoToCourseStatisticsClick = useCallback(() => {
-    const { clearCourseStats: clearCourseStatsfn } = props
-    clearCourseStatsfn()
-  }, [props.clearCourseStats])
+  const onGoToCourseStatisticsClick = () => {
+    dispatch(clearCourseStats())
+  }
 
   const onFilterReset = field => {
     setFilterFields({ ...filterFields, [field]: '' })
@@ -289,7 +286,6 @@ const PopulationCourseStats = props => {
     )
   }
 
-  const { courses, pending } = props
   const { sortCriteria, reversed } = state
   const contextValue = {
     courseStatistics,
@@ -313,7 +309,7 @@ const PopulationCourseStats = props => {
           <PassFailEnrollments
             expandedGroups={expandedGroups}
             toggleGroupExpansion={toggleGroupExpansion}
-            onlyIamRights={props.onlyIamRights}
+            onlyIamRights={onlyIamRights}
           />
         </Tab.Pane>
       ),
@@ -325,7 +321,7 @@ const PopulationCourseStats = props => {
           <GradeDistribution
             expandedGroups={expandedGroups}
             toggleGroupExpansion={toggleGroupExpansion}
-            onlyIamRights={props.onlyIamRights}
+            onlyIamRights={onlyIamRights}
           />
         </Tab.Pane>
       ),
@@ -339,7 +335,7 @@ const PopulationCourseStats = props => {
             courseStatistics={courseStatistics}
             expandedGroups={expandedGroups}
             toggleGroupExpansion={toggleGroupExpansion}
-            onlyIamRights={props.onlyIamRights}
+            onlyIamRights={onlyIamRights}
           />
         </Tab.Pane>
       ),
@@ -350,24 +346,16 @@ const PopulationCourseStats = props => {
       render: () => (
         <Tab.Pane className="menuTab">
           <Students
-            filteredStudents={props.filteredStudents}
+            filteredStudents={filteredStudents}
             expandedGroups={expandedGroups}
             toggleGroupExpansion={toggleGroupExpansion}
           />
         </Tab.Pane>
       ),
     },
-  ].filter(p => !(p.hideIfOnlyIamRights && props.onlyIamRights))
+  ].filter(p => !(p.hideIfOnlyIamRights && onlyIamRights))
 
-  if (!courses) {
-    return null
-  }
-
-  if (!courseStatistics) {
-    return null
-  }
-
-  if (pending) {
+  if (!courses || !courseStatistics || pending) {
     return null
   }
 
