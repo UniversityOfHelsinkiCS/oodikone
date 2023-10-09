@@ -42,6 +42,7 @@ const PopulationStatistics = () => {
   const { query, queryIsSet, isLoading, selectedStudentsByYear, samples } = useSelector(
     populationToData.makePopulationsToData
   )
+
   const { isAdmin, rights } = useGetAuthorizedUserQuery()
   const onlyIamRights = !isAdmin && rights.length === 0
   useTitle('Class statistics')

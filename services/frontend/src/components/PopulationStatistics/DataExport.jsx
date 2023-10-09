@@ -3,20 +3,23 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { Button, Icon, Popup } from 'semantic-ui-react'
 import xlsx from 'xlsx'
+import { curriculumsApi } from 'redux/populationCourses'
 import { reformatDate, getStudentTotalCredits, getStudentToStudyrightStartMap } from '../../common'
 import { PRIORITYCODE_TEXTS } from '../../constants'
 import useLanguage from '../LanguagePicker/useLanguage'
 
+const { useGetCurriculumsQuery } = curriculumsApi
+
 export default ({ students, programmeCode }) => {
   const { getTextIn } = useLanguage()
-  const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
+  const queryYear = useSelector(({ populations }) => populations?.query?.year)
+  const curriculumQuery = useGetCurriculumsQuery({ code: programmeCode, period_ids: [queryYear] })
+  const mandatoryCourses = curriculumQuery?.currentData
   const populationStatistics = useSelector(({ populations }) => populations.data)
   const courses = useSelector(store => store.populationSelectedStudentCourses.data?.coursestatistics)
   const queryStudyrights = useSelector(({ populations }) =>
     populations.query ? Object.values(populations.query.studyRights) : []
   )
-
-  const queryYear = useSelector(({ populations }) => populations?.query?.year)
 
   const mandatoryPassed = () => {
     const mandatoryCodes = mandatoryCourses?.defaultProgrammeCourses
