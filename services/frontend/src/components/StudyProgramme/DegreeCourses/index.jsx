@@ -1,24 +1,37 @@
 import React, { useEffect, useState } from 'react'
 import _ from 'lodash'
 import { connect } from 'react-redux'
-import { string, func, object } from 'prop-types'
+import { string, func } from 'prop-types'
 import { Container } from 'semantic-ui-react'
 import {
   useAddProgressCriteriaCourseMutation,
   useAddProgressCriteriaCreditsMutation,
+  useGetProgressCriteriaQuery,
 } from 'redux/programmeProgressCriteria'
 import CurriculumPicker from 'components/PopulationDetails/CurriculumPicker'
 import { setCourseExclusion, removeCourseExclusion } from '../../../redux/courseExclusions'
-
 import CreditCriteriaForm from './CreditCriteriaForm'
 import DegreeCourseTableView from './DegreeCourseTableView'
 
-const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, removeExclusion, combinedProgramme }) => {
+const DegreeCourses = ({ studyProgramme, setExclusion, removeExclusion, combinedProgramme }) => {
   const [defaultModules, setDefaultModules] = useState([])
   const [curriculum, setCurriculum] = useState(null)
   const [secondProgrammeModules, setSecondProgrammeModules] = useState([])
   const [addProgressCriteriaCourse, { data: courseData }] = useAddProgressCriteriaCourseMutation()
   const [addProgressCriteriaCredits, { data: creditsData }] = useAddProgressCriteriaCreditsMutation()
+  const progressCriteria = useGetProgressCriteriaQuery({ programmeCode: studyProgramme })
+  const emptyCriteria = {
+    courses: { yearOne: [], yearTwo: [], yearThree: [], yearFour: [], yearFive: [], yearSix: [] },
+    credits: { yearOne: 0, yearTwo: 0, yearThree: 0, yearFour: 0, yearFive: 0, yearSix: 0 },
+  }
+
+  const [criteria, setCriteria] = useState(progressCriteria?.data ? progressCriteria.data : emptyCriteria)
+
+  useEffect(() => {
+    if (progressCriteria.data) {
+      setCriteria(progressCriteria.data)
+    }
+  }, [progressCriteria.data])
 
   useEffect(() => {
     if (courseData) {
@@ -122,8 +135,6 @@ DegreeCourses.propTypes = {
   studyProgramme: string.isRequired,
   removeExclusion: func.isRequired,
   setExclusion: func.isRequired,
-  criteria: object.isRequired,
-  setCriteria: func.isRequired,
 }
 
 const mapDispatchToProps = dispatch => ({

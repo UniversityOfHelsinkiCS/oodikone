@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Segment } from 'semantic-ui-react'
-import { useGetProgressCriteriaQuery } from 'redux/programmeProgressCriteria'
 import PopulationCourseStatsFlat from 'components/PopulationCourseStats/PopulationCourseStatsFlat'
 import SegmentDimmer from '../SegmentDimmer'
 import PopulationCourseStats from '../PopulationCourseStats'
@@ -19,13 +18,7 @@ const PopulationCourses = ({
   courseTableMode,
   studentAmountLimit,
 }) => {
-  const progressCriteria = useGetProgressCriteriaQuery({ programmeCode: query?.studyRights?.programme })
   const dispatch = useDispatch()
-  const emptyCriteria = {
-    courses: { yearOne: [], yearTwo: [], yearThree: [], yearFour: [], yearFive: [], yearSix: [] },
-    credits: { yearOne: 0, yearTwo: 0, yearThree: 0, yearFour: 0, yearFive: 0, yearSix: 0 },
-  }
-  const [criteria, setCriteria] = useState(progressCriteria?.data ? progressCriteria.data : emptyCriteria)
   const populationSelectedStudentCourses = useSelector(
     ({ populationSelectedStudentCourses }) => populationSelectedStudentCourses
   )
@@ -50,11 +43,7 @@ const PopulationCourses = ({
       })
     )
   }
-  useEffect(() => {
-    if (progressCriteria.data) {
-      setCriteria(progressCriteria.data)
-    }
-  }, [progressCriteria.data])
+
   useEffect(() => {
     if (mandatoryCourses && !queryHasBeenUpdated() && !populationSelectedStudentCourses.pending) {
       // Mandatory courses is an object due to possibility of combined programmes (e.g. eläinlääkis)
@@ -75,11 +64,7 @@ const PopulationCourses = ({
         <InfoBox content={infotooltips.PopulationStatistics.CoursesOfPopulation} />
       )}
       {query.studyRights.programme && !onlyIamRights && (
-        <FilterDegreeCoursesModal
-          studyProgramme={query.studyRights.programme}
-          criteria={criteria}
-          setCriteria={setCriteria}
-        />
+        <FilterDegreeCoursesModal studyProgramme={query.studyRights.programme} />
       )}
       <SegmentDimmer isLoading={pending} />
       {courseTableMode === 'curriculum' ? (
