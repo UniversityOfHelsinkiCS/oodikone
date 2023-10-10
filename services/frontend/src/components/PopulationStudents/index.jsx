@@ -125,6 +125,7 @@ const Panes = ({
           students={filteredStudents}
           criteria={criteria}
           months={months}
+          curriculum={curriculum}
           programme={mainProgramme || programme}
           studyGuidanceGroupProgramme={programme}
         />
