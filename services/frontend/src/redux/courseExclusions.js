@@ -1,17 +1,5 @@
 import { callController } from '../apiConnection/index'
 
-export const getMandatoryCourses = id => {
-  const prefix = 'GET_MANDATORY_COURSES_'
-  const route = `/v3/programme_modules/${id}`
-  return callController(route, prefix)
-}
-
-export const getMandatoryCourseModules = id => {
-  const prefix = 'GET_MANDATORY_MODULES_'
-  const route = `/v3/programme_modules/${id}/modules`
-  return callController(route, prefix)
-}
-
 export const setCourseExclusion = (programmecode, excludeFromProgramme, coursecodes, curriculum) => {
   const prefix = 'SET_COURSE_EXCLUSION_'
   const route = `/v3/programme_modules/${programmecode}`
@@ -30,24 +18,6 @@ export const removeCourseExclusion = ({ programmeCode, curriculumVersion, course
 
 const reducer = (state = { data: {} }, action) => {
   switch (action.type) {
-    case 'GET_MANDATORY_COURSES_ATTEMPT':
-      return {
-        ...state,
-        pending: true,
-      }
-    case 'GET_MANDATORY_COURSES_FAILURE':
-      return {
-        ...state,
-        pending: false,
-        error: true,
-        data: action.response,
-      }
-    case 'GET_MANDATORY_COURSES_SUCCESS':
-      return {
-        pending: false,
-        error: false,
-        data: action.response,
-      }
     case 'SET_COURSE_EXCLUSION_ATTEMPT':
       return {
         ...state,
@@ -79,24 +49,6 @@ const reducer = (state = { data: {} }, action) => {
         data: action.response,
       }
     case 'REMOVE_COURSE_EXCLUSION_SUCCESS':
-      return {
-        pending: false,
-        error: false,
-        data: action.response,
-      }
-    case 'GET_MANDATORY_MODULES_ATTEMPT':
-      return {
-        ...state,
-        pending: true,
-      }
-    case 'GET_MANDATORY_MODULES_FAILURE':
-      return {
-        ...state,
-        pending: false,
-        error: true,
-        data: action.response,
-      }
-    case 'GET_MANDATORY_MODULES_SUCCESS':
       return {
         pending: false,
         error: false,

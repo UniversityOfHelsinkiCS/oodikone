@@ -8,7 +8,7 @@ import {
   useAddProgressCriteriaCreditsMutation,
 } from 'redux/programmeProgressCriteria'
 import CurriculumPicker from 'components/PopulationDetails/CurriculumPicker'
-import { setCourseExclusion, removeCourseExclusion } from '../../../redux/populationMandatoryCourses'
+import { setCourseExclusion, removeCourseExclusion } from '../../../redux/courseExclusions'
 
 import CreditCriteriaForm from './CreditCriteriaForm'
 import DegreeCourseTableView from './DegreeCourseTableView'
@@ -16,7 +16,6 @@ import DegreeCourseTableView from './DegreeCourseTableView'
 const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, removeExclusion, combinedProgramme }) => {
   const [defaultModules, setDefaultModules] = useState([])
   const [curriculum, setCurriculum] = useState(null)
-  // Second programme modules are for combined studyprogrammes
   const [secondProgrammeModules, setSecondProgrammeModules] = useState([])
   const [addProgressCriteriaCourse, { data: courseData }] = useAddProgressCriteriaCourseMutation()
   const [addProgressCriteriaCredits, { data: creditsData }] = useAddProgressCriteriaCreditsMutation()
