@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import _ from 'lodash'
-import { connect } from 'react-redux'
-import { string, func } from 'prop-types'
 import { Container } from 'semantic-ui-react'
 import {
   useAddProgressCriteriaCourseMutation,
@@ -9,11 +7,10 @@ import {
   useGetProgressCriteriaQuery,
 } from 'redux/programmeProgressCriteria'
 import CurriculumPicker from 'components/PopulationDetails/CurriculumPicker'
-import { setCourseExclusion, removeCourseExclusion } from '../../../redux/courseExclusions'
 import CreditCriteriaForm from './CreditCriteriaForm'
 import DegreeCourseTableView from './DegreeCourseTableView'
 
-const DegreeCourses = ({ studyProgramme, setExclusion, removeExclusion, combinedProgramme }) => {
+const DegreeCourses = ({ studyProgramme, combinedProgramme, year }) => {
   const [defaultModules, setDefaultModules] = useState([])
   const [curriculum, setCurriculum] = useState(null)
   const [secondProgrammeModules, setSecondProgrammeModules] = useState([])
@@ -93,7 +90,11 @@ const DegreeCourses = ({ studyProgramme, setExclusion, removeExclusion, combined
       <div>
         <h3 style={{ marginTop: '15px', marginBottom: '15px' }}>
           Select curriculum to edit:
-          <CurriculumPicker programmeCodes={[studyProgramme, combinedProgramme]} setCurriculum={setCurriculum} />
+          <CurriculumPicker
+            year={year}
+            programmeCodes={[studyProgramme, combinedProgramme]}
+            setCurriculum={setCurriculum}
+          />
         </h3>
       </div>
       {(studyProgramme.includes('KH') || ['MH30_001', 'MH30_003'].includes(studyProgramme)) && (
@@ -110,8 +111,6 @@ const DegreeCourses = ({ studyProgramme, setExclusion, removeExclusion, combined
           studyProgramme={studyProgramme}
           curriculum={curriculum}
           combinedProgramme=""
-          setExclusion={setExclusion}
-          removeExclusion={removeExclusion}
           addProgressCriteriaCourse={addProgressCriteriaCourse}
         />
       )}
@@ -122,8 +121,6 @@ const DegreeCourses = ({ studyProgramme, setExclusion, removeExclusion, combined
           curriculum={curriculum}
           studyProgramme={studyProgramme}
           combinedProgramme={combinedProgramme}
-          setExclusion={setExclusion}
-          removeExclusion={removeExclusion}
           addProgressCriteriaCourse={addProgressCriteriaCourse}
         />
       )}
@@ -131,17 +128,4 @@ const DegreeCourses = ({ studyProgramme, setExclusion, removeExclusion, combined
   )
 }
 
-DegreeCourses.propTypes = {
-  studyProgramme: string.isRequired,
-  removeExclusion: func.isRequired,
-  setExclusion: func.isRequired,
-}
-
-const mapDispatchToProps = dispatch => ({
-  setExclusion: (programmecode, excludeFromProgramme, coursecode, curriculum) =>
-    dispatch(setCourseExclusion(programmecode, excludeFromProgramme, coursecode, curriculum)),
-  removeExclusion: ({ programmeCode, curriculumVersion, courseCodes }) =>
-    dispatch(removeCourseExclusion({ programmeCode, curriculumVersion, courseCodes })),
-})
-
-export default connect(null, mapDispatchToProps)(DegreeCourses)
+export default DegreeCourses

@@ -1,9 +1,8 @@
 import React, { useState } from 'react'
-import { string } from 'prop-types'
 import { Button, Icon, Modal, Container } from 'semantic-ui-react'
 import DegreeCoursesTable from '../StudyProgramme/DegreeCourses'
 
-const FilterDegreeCoursesModal = ({ studyProgramme }) => {
+const FilterDegreeCoursesModal = ({ studyProgramme, year }) => {
   const [open, setOpen] = useState(false)
 
   const setModalOpenState = state => {
@@ -27,7 +26,7 @@ const FilterDegreeCoursesModal = ({ studyProgramme }) => {
       <Modal.Header>Hide degree courses</Modal.Header>
       <Modal.Content image>
         <Container>
-          <DegreeCoursesTable studyProgramme={studyProgramme} />
+          <DegreeCoursesTable year={year} studyProgramme={studyProgramme} />
           <Button onClick={() => setModalOpenState(false)} icon labelPosition="left" style={{ marginTop: '10px' }}>
             <Icon name="save" />
             Save & Close
@@ -36,10 +35,6 @@ const FilterDegreeCoursesModal = ({ studyProgramme }) => {
       </Modal.Content>
     </Modal>
   )
-}
-
-FilterDegreeCoursesModal.propTypes = {
-  studyProgramme: string.isRequired,
 }
 
 export default FilterDegreeCoursesModal
