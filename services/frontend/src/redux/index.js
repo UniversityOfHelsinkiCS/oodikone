@@ -8,7 +8,7 @@ import populationCourses, { curriculumsApi } from './populationCourses'
 import populationSelectedStudentCourses from './populationSelectedStudentCourses'
 import populationProgrammes from './populationProgrammes'
 import populationProgrammesUnfiltered from './populationProgrammesUnfiltered'
-import populationMandatoryCourses from './populationMandatoryCourses'
+import courseExclusions from './courseExclusions'
 import faculties from './faculties'
 import units from './units'
 import elementdetails from './elementdetails'
@@ -43,7 +43,7 @@ const store = configureStore({
     populationSelectedStudentCourses,
     populationProgrammes,
     populationProgrammesUnfiltered,
-    populationMandatoryCourses,
+    courseExclusions,
     faculties,
     units,
     students,

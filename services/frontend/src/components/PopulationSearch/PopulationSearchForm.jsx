@@ -13,7 +13,6 @@ import useLanguage from 'components/LanguagePicker/useLanguage'
 import { getPopulationStatistics, clearPopulations } from '../../redux/populations'
 import { getPopulationCourses } from '../../redux/populationCourses'
 import { getPopulationSelectedStudentCourses, clearSelected } from '../../redux/populationSelectedStudentCourses'
-import { getMandatoryCourses } from '../../redux/populationMandatoryCourses'
 import { getProgrammes } from '../../redux/populationProgrammes'
 import { momentFromFormat, reformatDate, textAndDescriptionSearch, cancelablePromise } from '../../common'
 import { useSearchHistory } from '../../common/hooks'
@@ -118,11 +117,7 @@ const PopulationSearchForm = props => {
     props.setLoading()
     props.clearSelected()
     fetchPopulationPromises.current = cancelablePromise(
-      Promise.all([
-        props.getPopulationStatistics({ ...formattedQueryParams, uuid, onProgress }),
-        [],
-        props.getMandatoryCourses(formattedQueryParams.studyRights.programme),
-      ])
+      Promise.all([props.getPopulationStatistics({ ...formattedQueryParams, uuid, onProgress }), []])
     )
     const success = await fetchPopulationPromises.current.promise
     if (success) {
@@ -506,7 +501,6 @@ export default withRouter(
     getPopulationStatistics,
     getPopulationCourses,
     getPopulationSelectedStudentCourses,
-    getMandatoryCourses,
     getProgrammes,
     setLoading,
     clearSelected,
