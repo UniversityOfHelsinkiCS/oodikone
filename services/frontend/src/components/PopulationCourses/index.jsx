@@ -64,7 +64,7 @@ const PopulationCourses = ({
         <InfoBox content={infotooltips.PopulationStatistics.CoursesOfPopulation} />
       )}
       {query.studyRights.programme && !onlyIamRights && (
-        <FilterDegreeCoursesModal studyProgramme={query.studyRights.programme} />
+        <FilterDegreeCoursesModal studyProgramme={query.studyRights.programme} year={query.year} />
       )}
       <SegmentDimmer isLoading={pending} />
       {courseTableMode === 'curriculum' ? (

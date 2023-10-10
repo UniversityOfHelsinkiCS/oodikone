@@ -10,7 +10,7 @@ const chooseCurriculumToFetch = (curriculums, selectedCurriculum, startYear) => 
     return selectedCurriculum
   }
   if (curriculums.length > 0) {
-    if (!startYear && curriculums) {
+    if (!startYear) {
       return curriculums[0]
     }
     const defaultCurriculum = curriculums.find(cur => cur.curriculum_period_ids.includes(parseInt(startYear, 10)))
@@ -22,9 +22,8 @@ const chooseCurriculumToFetch = (curriculums, selectedCurriculum, startYear) => 
 const CurriculumPicker = ({ setCurriculum, programmeCodes, disabled, year }) => {
   const curriculumOptionsQuery = useGetCurriculumOptionsQuery({ code: programmeCodes[0] }, { skip: !programmeCodes[0] })
   const curriculums = curriculumOptionsQuery.data ?? []
-  const [selectedCurriculum, setSelectedCurriculum] = useState(curriculums.length ? curriculums[0] : null)
+  const [selectedCurriculum, setSelectedCurriculum] = useState(null)
   const chosenCurriculum = chooseCurriculumToFetch(curriculums, selectedCurriculum, year)
-
   const curriculumsQuery = useGetCurriculumsQuery(
     {
       code: programmeCodes[0],
