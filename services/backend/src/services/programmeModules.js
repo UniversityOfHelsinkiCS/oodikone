@@ -18,7 +18,7 @@ const getCurriculumVersions = async code => {
   } catch (e) {
     logger.error(`Error when searching curriculum versions for code: ${code}`)
     logger.error(e)
-    return []
+    return null
   }
 }
 
@@ -41,7 +41,7 @@ const recursivelyGetModuleAndChildren = async (code, curriculum_period_ids) => {
   } catch (e) {
     logger.error(`Error when searching modules and children with code: ${code}`)
     logger.error(e)
-    return []
+    return null
   }
 }
 
