@@ -65,14 +65,15 @@ const createEmptyHidden = nthHiddenColumn => {
   ]
 }
 
-const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGroupProgramme }) => {
-  const mandatoryCourses = useSelector(state => state?.populationMandatoryCourses?.data)
+const ProgressTable = ({ curriculum, criteria, students, months, programme, studyGuidanceGroupProgramme }) => {
   const namesVisible = useSelector(state => state?.settings?.namesVisible)
   const { getTextIn } = useLanguage()
   const isStudyGuidanceGroupProgramme = studyGuidanceGroupProgramme !== ''
-  const credtiMonths = [12, 24, 36, 48, 60, 72]
+  const creditMonths = [12, 24, 36, 48, 60, 72]
+  const mandatoryCourses = curriculum
   const defaultCourses = keyBy(mandatoryCourses.defaultProgrammeCourses, 'code')
   const coursesSecondProgramme = keyBy(mandatoryCourses.secondProgrammeCourses, 'code')
+
   const getCourseName = courseCode => {
     if (defaultCourses[courseCode]) return defaultCourses[courseCode].name
     if (coursesSecondProgramme[courseCode]) return coursesSecondProgramme[courseCode].name
@@ -83,9 +84,9 @@ const ProgressTable = ({ criteria, students, months, programme, studyGuidanceGro
       {
         code: `Credits`,
         name: {
-          fi: `${credtiMonths[idx]} mos.: ${criteria.credits[year]}`,
-          en: `${credtiMonths[idx]} mos.: ${criteria.credits[year]}`,
-          sv: `${credtiMonths[idx]} mos.: ${criteria.credits[year]}`,
+          fi: `${creditMonths[idx]} mos.: ${criteria.credits[year]}`,
+          en: `${creditMonths[idx]} mos.: ${criteria.credits[year]}`,
+          sv: `${creditMonths[idx]} mos.: ${criteria.credits[year]}`,
         },
       },
       ...[...criteria.courses[year]]
