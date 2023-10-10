@@ -15,14 +15,11 @@ const PopulationCourses = ({
   filteredStudents,
   selectedStudentsByYear,
   onlyIamRights,
-  curriculum,
+  curriculum: mandatoryCourses,
   courseTableMode,
   studentAmountLimit,
 }) => {
-  const populationCourses = useSelector(({ populationCourses }) => populationCourses)
-  const mandatoryCourses = curriculum
   const progressCriteria = useGetProgressCriteriaQuery({ programmeCode: query?.studyRights?.programme })
-
   const dispatch = useDispatch()
   const emptyCriteria = {
     courses: { yearOne: [], yearTwo: [], yearThree: [], yearFour: [], yearFive: [], yearSix: [] },
@@ -66,15 +63,9 @@ const PopulationCourses = ({
       const programmeCodesToFetch = [...mandatoryCourseCodes, ...mandatoryCourseCodesSecondProg]
       fetch(programmeCodesToFetch)
     }
-  }, [query, filteredStudents, curriculum, populationSelectedStudentCourses])
+  }, [query, filteredStudents, mandatoryCourses, populationSelectedStudentCourses])
 
-  if (!mandatoryCourses) return null
-
-  const selectedPopulationCourses = populationSelectedStudentCourses.data
-    ? populationSelectedStudentCourses
-    : populationCourses
-
-  const pending = populationSelectedStudentCourses.pending || populationCourses.pending
+  const pending = populationSelectedStudentCourses.pending || !mandatoryCourses
 
   return (
     <Segment basic>
@@ -93,16 +84,16 @@ const PopulationCourses = ({
       <SegmentDimmer isLoading={pending} />
       {courseTableMode === 'curriculum' ? (
         <PopulationCourseStats
-          key={selectedPopulationCourses.query.uuid}
+          key={populationSelectedStudentCourses.query.uuid}
           mandatoryCourses={mandatoryCourses}
-          courses={selectedPopulationCourses.data}
+          courses={populationSelectedStudentCourses.data ?? []}
           pending={pending}
           filteredStudents={filteredStudents}
           onlyIamRights={onlyIamRights}
         />
       ) : (
         <PopulationCourseStatsFlat
-          courses={pending ? null : selectedPopulationCourses.data}
+          courses={pending ? null : populationSelectedStudentCourses.data ?? []}
           filteredStudents={filteredStudents}
           studentAmountLimit={studentAmountLimit}
         />
