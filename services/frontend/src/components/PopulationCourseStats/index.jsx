@@ -35,6 +35,9 @@ const lodashSortOrderTypes = {
   ASC: 'asc',
   DESC: 'desc',
 }
+const visibleCoursesFilter = ({ course }, mandatoryCourses) =>
+  mandatoryCourses.defaultProgrammeCourses?.some(c => c.code === course.code && c.visible.visibility) ||
+  mandatoryCourses.secondProgrammeCourses?.some(c => c.code === course.code && c.visible.visibility)
 
 const updateCourseStatisticsCriteria = (courseStats, state, mandatoryCourses, getTextIn) => {
   if (!courseStats) {
@@ -52,20 +55,11 @@ const updateCourseStatisticsCriteria = (courseStats, state, mandatoryCourses, ge
     return getTextIn(name).toLowerCase().includes(nameFilter.toLowerCase())
   }
 
-  const mandatoryFilter = ({ course }) => {
-    return (
-      (mandatoryCourses.defaultProgrammeCourses &&
-        mandatoryCourses.defaultProgrammeCourses.some(c => c.code === course.code)) ||
-      (mandatoryCourses.secondProgrammeCourses &&
-        mandatoryCourses.secondProgrammeCourses.some(c => c.code === course.code))
-    )
-  }
-
   const filteredCourses =
     courseStats &&
     mandatoryCourses &&
     courseStats
-      .filter(mandatoryFilter)
+      .filter(c => visibleCoursesFilter(c, mandatoryCourses))
       .filter(c => !codeFilter || courseCodeFilter(c))
       .filter(c => !nameFilter || courseNameFilter(c))
 
@@ -99,7 +93,6 @@ const useDelayedMemo = (fn, watch) => {
 
 const PopulationCourseStats = ({ filteredStudents, mandatoryCourses, courses, pending, onlyIamRights }) => {
   const dispatch = useDispatch()
-
   const { getTextIn } = useLanguage()
   const [filterFields, setFilterFields] = useState({ codeFilter: '', nameFilter: '' })
   const [modules, setModules] = useState([])
@@ -144,20 +137,12 @@ const PopulationCourseStats = ({ filteredStudents, mandatoryCourses, courses, pe
       const { name } = course
       return getTextIn(name).toLowerCase().includes(nameFilter.toLowerCase())
     }
-    const visibleCoursesFilter = ({ course }) => {
-      return (
-        (mandatoryCourses.defaultProgrammeCourses &&
-          mandatoryCourses.defaultProgrammeCourses.some(c => c.code === course.code)) ||
-        (mandatoryCourses.secondProgrammeCourses &&
-          mandatoryCourses.secondProgrammeCourses.some(c => c.code === course.code))
-      )
-    }
 
     const filteredCourses =
       coursestatistics &&
       mandatoryCourses &&
       coursestatistics
-        .filter(visibleCoursesFilter)
+        .filter(c => visibleCoursesFilter(c, mandatoryCourses))
         .filter(courseCodeFilter)
         .filter(courseNameFilter)
         // it needs to be with flatMap and filter and not map and find
