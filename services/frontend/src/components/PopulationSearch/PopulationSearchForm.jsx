@@ -11,7 +11,6 @@ import { useGetAuthorizedUserQuery } from 'redux/auth'
 import infoTooltips from 'common/InfoToolTips'
 import useLanguage from 'components/LanguagePicker/useLanguage'
 import { getPopulationStatistics, clearPopulations } from '../../redux/populations'
-import { getPopulationCourses } from '../../redux/populationCourses'
 import { getPopulationSelectedStudentCourses, clearSelected } from '../../redux/populationSelectedStudentCourses'
 import { getProgrammes } from '../../redux/populationProgrammes'
 import { momentFromFormat, reformatDate, textAndDescriptionSearch, cancelablePromise } from '../../common'
@@ -499,7 +498,6 @@ const mapStateToProps = ({ settings, populations, populationProgrammes }) => {
 export default withRouter(
   connect(mapStateToProps, {
     getPopulationStatistics,
-    getPopulationCourses,
     getPopulationSelectedStudentCourses,
     getProgrammes,
     setLoading,
