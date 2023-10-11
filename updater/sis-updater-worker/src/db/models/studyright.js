@@ -1,4 +1,4 @@
-const { Model, STRING, DATE, INTEGER, BOOLEAN } = require('sequelize')
+const { Model, STRING, DATE, INTEGER } = require('sequelize')
 const { dbConnections } = require('../connection')
 
 class Studyright extends Model {}
@@ -28,7 +28,8 @@ Studyright.init(
       type: INTEGER,
     },
     cancelled: {
-      type: BOOLEAN,
+      type: STRING,
+      allowNull: true,
     },
     studentStudentnumber: {
       type: STRING,
