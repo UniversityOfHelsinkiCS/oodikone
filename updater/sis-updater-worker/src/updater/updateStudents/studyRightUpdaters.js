@@ -13,29 +13,17 @@ const {
 } = require('../shared')
 
 const isCancelled = (studyright, extentcode) => {
-  if (
-    extentcode === 1 &&
-    studyright.study_right_cancellation &&
-    ['RESCINDED', 'CANCELLED_BY_ADMINISTRATION', 'PASSIVE'].includes(
-      studyright.study_right_cancellation.cancellationType
-    ) &&
-    !studyright.study_right_graduation
-  ) {
-    return true
+  const cancellation = studyright.study_right_cancellation?.cancellationType
+  const graduation1 = studyright.study_right_graduation
+  const graduation2 = studyright.study_right_graduation?.phase2GraduationDate
+  if (!cancellation) return null
+  if (!['RESCINDED', 'CANCELLED_BY_ADMINISTRATION', 'PASSIVE'].includes(cancellation)) {
+    return null
   }
-  if (
-    extentcode === 2 &&
-    studyright.study_right_cancellation &&
-    ['RESCINDED', 'CANCELLED_BY_ADMINISTRATION', 'PASSIVE'].includes(
-      studyright.study_right_cancellation.cancellationType
-    ) &&
-    (!studyright.study_right_graduation ||
-      (studyright.study_right_graduation && !studyright.study_right_graduation.phase2GraduationDate))
-  ) {
-    return true
-  }
-  return false
+  if (extentcode === 1) return graduation1 ? null : cancellation
+  return !graduation2 ? cancellation : null
 }
+
 const updateStudyRights = async (
   groupedStudyRightSnapshots,
   personIdToStudentNumber,
@@ -44,7 +32,6 @@ const updateStudyRights = async (
 ) => {
   const currentSemester = getSemesterByDate(new Date())
   const studyrightMapper = (personIdToStudentNumber, admissionNamesById) => (studyright, overrideProps) => {
-    const cancelled = isCancelled(studyright, 1)
     const defaultProps = {
       studyrightid: `${studyright.id}-1`, // duplikaattifix
       facultyCode: getOrganisationCode(studyright.organisation_id),
@@ -54,7 +41,7 @@ const updateStudyRights = async (
       graduated: studyright.study_right_graduation ? 1 : 0,
       studystartdate: studyright.valid.startDate,
       admissionType: admissionNamesById[studyright.admission_type_urn],
-      cancelled,
+      cancelled: isCancelled(studyright, 1),
     }
     return {
       ...defaultProps,
