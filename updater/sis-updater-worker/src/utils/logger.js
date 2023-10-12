@@ -54,7 +54,7 @@ if (isDev) {
     })
   )
 
-  transports.push(new winston.transports.Console({ format: prodFormat }))
+  transports.push(new winston.transports.Console({ format: combine(splat(), timestamp(), prodFormat) }))
 
   if (isProduction && !isStaging) {
     transports.push(
