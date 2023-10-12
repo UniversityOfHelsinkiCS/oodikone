@@ -42,7 +42,7 @@ app.use(message)
 
 app.get('/v1/healthcheck', async (_, res) => {
   const latest_message = await redisGet(REDIS_LATEST_MESSAGE_RECEIVED)
-  const threshold = new Date(new Date().getTime() - 3600 * 1000) // 2 hours ago
+  const threshold = new Date().getTime() - 1000 * 60 * 60 * 6 // 6 hours ago
   if (!latest_message || new Date(latest_message).getTime() < threshold) {
     return res.status(400).send()
   }
