@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect } from 'react'
 import { connect, useDispatch } from 'react-redux'
-import { Table, Input, Tab, Icon } from 'semantic-ui-react'
-import { orderBy, debounce } from 'lodash'
+import { Tab } from 'semantic-ui-react'
+import { orderBy } from 'lodash'
 import { withRouter } from 'react-router-dom'
 import { clearCourseStats } from '../../redux/coursestats'
 import { useTabChangeAnalytics } from '../../common/hooks'
@@ -11,7 +11,6 @@ import { PopulationCourseContext } from './PopulationCourseContext'
 import GradeDistribution from './GradeDistribution'
 import PassFailEnrollments from './PassFailEnrollments'
 import Students from './Students'
-import useLanguage from '../LanguagePicker/useLanguage'
 
 export const tableColumnNames = {
   STUDENTS: 'students',
@@ -31,145 +30,43 @@ export const sortOrderTypes = {
   DESC: 'descending',
 }
 
-const lodashSortOrderTypes = {
-  ASC: 'asc',
-  DESC: 'desc',
-}
 const visibleCoursesFilter = ({ course }, mandatoryCourses) =>
   mandatoryCourses.defaultProgrammeCourses?.some(c => c.code === course.code && c.visible.visibility) ||
   mandatoryCourses.secondProgrammeCourses?.some(c => c.code === course.code && c.visible.visibility)
 
-const updateCourseStatisticsCriteria = (courseStats, state, mandatoryCourses, getTextIn) => {
-  if (!courseStats) {
-    return []
-  }
-
-  const { sortCriteria, codeFilter, nameFilter, reversed } = state
-
-  const courseCodeFilter = ({ course }) => {
-    const { code } = course
-    return code.toLowerCase().includes(codeFilter.toLowerCase())
-  }
-  const courseNameFilter = ({ course }) => {
-    const { name } = course
-    return getTextIn(name).toLowerCase().includes(nameFilter.toLowerCase())
-  }
-
-  const filteredCourses =
-    courseStats &&
-    mandatoryCourses &&
-    courseStats
-      .filter(c => visibleCoursesFilter(c, mandatoryCourses))
-      .filter(c => !codeFilter || courseCodeFilter(c))
-      .filter(c => !nameFilter || courseNameFilter(c))
-
-  const lodashSortOrder = reversed ? lodashSortOrderTypes.DESC : lodashSortOrderTypes.ASC
-
-  const courseStatistics = orderBy(
-    filteredCourses,
-    [course => course.stats[sortCriteria], course => course.course.code],
-    [lodashSortOrder, lodashSortOrderTypes.ASC]
-  )
-
-  return courseStatistics
-}
-
-const initialState = filteredStudents => ({
-  sortCriteria: tableColumnNames.STUDENTS,
-  reversed: true,
-  codeFilter: '',
-  nameFilter: '',
-  activeView: null,
-  filteredStudentsLength: filteredStudents.length || 0,
-})
-
-const useDelayedMemo = (fn, watch) => {
-  const [cached, setCached] = useState(fn())
-
-  useEffect(() => setCached(fn()), watch)
-
-  return cached
-}
-
 const PopulationCourseStats = ({ filteredStudents, mandatoryCourses, courses, pending, onlyIamRights }) => {
   const dispatch = useDispatch()
-  const { getTextIn } = useLanguage()
-  const [filterFields, setFilterFields] = useState({ codeFilter: '', nameFilter: '' })
   const [modules, setModules] = useState([])
-  const [state, setState] = useState(initialState(filteredStudents))
   const [expandedGroups, setExpandedGroups] = useState(new Set())
   const { handleTabChange } = useTabChangeAnalytics()
 
-  const courseStatistics = useDelayedMemo(
-    () => updateCourseStatisticsCriteria(courses?.coursestatistics, state, mandatoryCourses, getTextIn),
-    [courses, state]
-  )
-
   useEffect(() => {
-    if (state && courses) {
-      const studentAmountLimit =
-        state.filteredStudentsLength !== filteredStudents.length
-          ? Math.round(filteredStudents.length * 0.3)
-          : state.studentAmountLimit
-
-      setState({
-        ...state,
-        initialSortReady: true,
-        studentAmountLimit,
-        filteredStudentsLength: filteredStudents.length,
-      })
-    }
-  }, [courses, filteredStudents])
-
-  useEffect(() => {
-    const { codeFilter, nameFilter, reversed, sortCriteria } = state
-    const { coursestatistics } = courses
-
-    const courseCodeFilter = ({ course }) => {
-      if (!codeFilter) return true
-
-      const { code } = course
-      return code.toLowerCase().includes(codeFilter.toLowerCase())
-    }
-    const courseNameFilter = ({ course }) => {
-      if (!nameFilter) return true
-
-      const { name } = course
-      return getTextIn(name).toLowerCase().includes(nameFilter.toLowerCase())
-    }
+    const coursestatistics = courses.coursestatistics ?? []
 
     const filteredCourses =
-      coursestatistics &&
-      mandatoryCourses &&
-      coursestatistics
-        .filter(c => visibleCoursesFilter(c, mandatoryCourses))
-        .filter(courseCodeFilter)
-        .filter(courseNameFilter)
-        // it needs to be with flatMap and filter and not map and find
-        // because there can be many mandatoryCourses with the same course code
-        // as they can belong to many categories
-        .flatMap(c => {
-          const defaultProgrammeCourses = mandatoryCourses.defaultProgrammeCourses.filter(
-            mc => mc.code === c.course.code
-          )
-          const secondProgrammeCourses = mandatoryCourses.secondProgrammeCourses.filter(mc => mc.code === c.course.code)
-          return [
-            ...defaultProgrammeCourses.map(course => ({ ...c, ...course })),
-            ...secondProgrammeCourses.map(course => ({ ...c, ...course })),
-          ]
-        })
-
-    const lodashSortOrder = reversed ? lodashSortOrderTypes.DESC : lodashSortOrderTypes.ASC
-
-    const sortedStatistics = orderBy(
-      filteredCourses,
-      [course => course.stats[sortCriteria], course => course.course.code],
-      [lodashSortOrder, lodashSortOrderTypes.ASC]
-    )
+      coursestatistics && mandatoryCourses
+        ? coursestatistics
+            .filter(c => visibleCoursesFilter(c, mandatoryCourses))
+            // it needs to be with flatMap and filter and not map and find
+            // because there can be many mandatoryCourses with the same course code
+            // as they can belong to many categories
+            .flatMap(c => {
+              const defaultProgrammeCourses = mandatoryCourses.defaultProgrammeCourses.filter(
+                mc => mc.code === c.course.code
+              )
+              const secondProgrammeCourses = mandatoryCourses.secondProgrammeCourses.filter(
+                mc => mc.code === c.course.code
+              )
+              return [
+                ...defaultProgrammeCourses.map(course => ({ ...c, ...course })),
+                ...secondProgrammeCourses.map(course => ({ ...c, ...course })),
+              ]
+            })
+        : []
 
     const modules = {}
 
-    sortedStatistics.forEach(course => {
+    filteredCourses?.forEach(course => {
       if (!modules[course.parent_code]) {
         modules[course.parent_code] = {
           module: { code: course.parent_code, name: course.parent_name },
@@ -194,47 +91,11 @@ const PopulationCourseStats = ({ filteredStudents, mandatoryCourses, courses, pe
         item => item.module.code
       )
     )
-  }, [state.studentAmountLimit, courses.coursestatistics, state.codeFilter, state.nameFilter, mandatoryCourses])
-
-  const onFilterChange = (e, field) => {
-    const {
-      target: { value },
-    } = e
-
-    setFilterFields({ ...filterFields, [field]: value })
-  }
-
-  const setFilters = useCallback(
-    debounce(({ codeFilter, nameFilter }) => {
-      setState({ ...state, codeFilter, nameFilter })
-    }, 500),
-    [state]
-  )
-
-  useEffect(() => {
-    setFilters(filterFields)
-  }, [filterFields])
-
-  const onSortableColumnHeaderClick = criteria => {
-    const { reversed, sortCriteria } = state
-    const isActiveSortCriteria = sortCriteria === criteria
-    const isReversed = isActiveSortCriteria ? !reversed : reversed
-
-    setState({
-      ...state,
-      sortCriteria: criteria,
-      reversed: isReversed,
-    })
-  }
+  }, [courses.coursestatistics, mandatoryCourses])
 
   const onGoToCourseStatisticsClick = () => {
     dispatch(clearCourseStats())
   }
-
-  const onFilterReset = field => {
-    setFilterFields({ ...filterFields, [field]: '' })
-  }
-
   const toggleGroupExpansion = (code, close = false, all = null) => {
     if (all) {
       setExpandedGroups(new Set(all))
@@ -251,36 +112,11 @@ const PopulationCourseStats = ({ filteredStudents, mandatoryCourses, courses, pe
     }
   }
 
-  const getFilterValue = field => (field in filterFields ? filterFields[field] || '' : '')
-
-  const renderFilterInputHeaderCell = (field, name, colSpan = '') => {
-    return (
-      <Table.HeaderCell width="6" colSpan={colSpan}>
-        <div>{name}</div>
-        <div>
-          <Input
-            className="courseCodeInput"
-            transparent
-            placeholder="Filter..."
-            onChange={e => onFilterChange(e, field)}
-            value={getFilterValue(field)}
-            icon={getFilterValue(field) ? <Icon name="delete" link onClick={() => onFilterReset(field)} /> : undefined}
-          />
-        </div>
-      </Table.HeaderCell>
-    )
-  }
-
-  const { sortCriteria, reversed } = state
   const contextValue = {
-    courseStatistics,
     modules,
-    filterInput: renderFilterInputHeaderCell,
+    courseStatistics: courses.coursestatistics,
     onGoToCourseStatisticsClick,
-    onSortableColumnHeaderClick,
     tableColumnNames,
-    sortCriteria,
-    reversed,
     courses,
     toggleGroupExpansion,
     expandedGroups,
@@ -303,11 +139,7 @@ const PopulationCourseStats = ({ filteredStudents, mandatoryCourses, courses, pe
       menuItem: 'grades',
       render: () => (
         <Tab.Pane className="menuTab">
-          <GradeDistribution
-            expandedGroups={expandedGroups}
-            toggleGroupExpansion={toggleGroupExpansion}
-            onlyIamRights={onlyIamRights}
-          />
+          <GradeDistribution onlyIamRights={onlyIamRights} />
         </Tab.Pane>
       ),
     },
@@ -315,13 +147,7 @@ const PopulationCourseStats = ({ filteredStudents, mandatoryCourses, courses, pe
       menuItem: 'when passed',
       render: () => (
         <Tab.Pane className="menuTab">
-          <PassingSemesters
-            filterInput={renderFilterInputHeaderCell}
-            courseStatistics={courseStatistics}
-            expandedGroups={expandedGroups}
-            toggleGroupExpansion={toggleGroupExpansion}
-            onlyIamRights={onlyIamRights}
-          />
+          <PassingSemesters onlyIamRights={onlyIamRights} />
         </Tab.Pane>
       ),
     },
@@ -330,17 +156,13 @@ const PopulationCourseStats = ({ filteredStudents, mandatoryCourses, courses, pe
       hideIfOnlyIamRights: true,
       render: () => (
         <Tab.Pane className="menuTab">
-          <Students
-            filteredStudents={filteredStudents}
-            expandedGroups={expandedGroups}
-            toggleGroupExpansion={toggleGroupExpansion}
-          />
+          <Students filteredStudents={filteredStudents} />
         </Tab.Pane>
       ),
     },
   ].filter(p => !(p.hideIfOnlyIamRights && onlyIamRights))
 
-  if (!courses || !courseStatistics || pending) {
+  if (!courses || pending) {
     return null
   }
 
