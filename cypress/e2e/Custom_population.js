@@ -41,7 +41,7 @@ const deleteAllSearches = () => {
 }
 
 const fillForm = content => {
-  cy.contains('Insert studentnumbers you wish to use for population here')
+  cy.contains('Insert student numbers you wish to use for population here')
     .siblings()
     .get('textarea')
     .type(content.join('\n'))
