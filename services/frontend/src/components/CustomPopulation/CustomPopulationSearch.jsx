@@ -1,17 +1,15 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import { Button, Modal, Form, TextArea } from 'semantic-ui-react'
-import { shape, func, arrayOf, bool } from 'prop-types'
 import { textAndDescriptionSearch } from 'common'
 import { useFilteredAndFormattedElementDetails } from 'redux/elementdetails'
 import { useProgress, useTitle } from '../../common/hooks'
 import { getCustomPopulation } from '../../redux/populations'
 import {
-  getCustomPopulationSearches,
-  saveCustomPopulationSearch,
-  updateCustomPopulationSearch,
-  selectCustomPopulationSearch,
-  deleteCustomPopulationSearch,
+  useGetCustomPopulationSearchesQuery,
+  useCreateCustomPopulationSearchMutation,
+  useUpdateCustomPopulationSearchMutation,
+  useDeleteCustomPopulationSearchMutation,
 } from '../../redux/customPopulationSearch'
 import { getCustomPopulationCoursesByStudentnumbers } from '../../redux/populationCourses'
 import SearchHistory from '../SearchHistory'
@@ -19,28 +17,23 @@ import SearchHistory from '../SearchHistory'
 const CustomPopulationSearch = ({
   getCustomPopulationDispatch,
   getCustomPopulationCoursesByStudentnumbers,
-  getCustomPopulationSearchesDispatch,
-  saveCustomPopulationSearchDispatch,
-  updateCustomPopulationSearchDispatch,
-  selectCustomPopulationSearchDispatch,
-  deleteCustomPopulationSearchDispatch,
   loading,
-  customPopulationSearches,
-  customPopulationSearchSaving,
+  onPopulationChange,
 }) => {
   const [modal, setModal] = useState(false)
   const [input, setInput] = useState('')
   const [name, setName] = useState('')
   const [programme, setProgramme] = useState('')
-  const [selectedSearchId, setSelectedSearchId] = useState('')
+  const [selectedSearch, setSelectedSearch] = useState(null)
   const programmes = useFilteredAndFormattedElementDetails()
   const { onProgress } = useProgress(loading)
 
   useTitle('Custom population')
 
-  useEffect(() => {
-    getCustomPopulationSearchesDispatch()
-  }, [])
+  const { data: searches, isFetching } = useGetCustomPopulationSearchesQuery()
+  const [createSearch] = useCreateCustomPopulationSearchMutation()
+  const [updateSearch] = useUpdateCustomPopulationSearchMutation()
+  const [deleteSearch] = useDeleteCustomPopulationSearchMutation()
 
   const handleNameChange = e => {
     setName(e.target.value)
@@ -49,7 +42,7 @@ const CustomPopulationSearch = ({
   const clearForm = () => {
     setName('')
     setInput('')
-    setSelectedSearchId('')
+    setSelectedSearch(null)
   }
 
   const handleClose = () => {
@@ -65,33 +58,31 @@ const CustomPopulationSearch = ({
       .map(s => (s.length === 8 ? `0${s}` : s))
 
   const onSave = () => {
-    const studentnumberlist = parseInput(input)
-    if (selectedSearchId) {
-      updateCustomPopulationSearchDispatch({ id: selectedSearchId, studentnumberlist })
+    const students = parseInput(input)
+    if (selectedSearch) {
+      updateSearch({ id: selectedSearch.id, students })
     } else {
-      saveCustomPopulationSearchDispatch({ name, studentnumberlist })
+      createSearch({ name, students })
     }
   }
 
   const onDelete = () => {
-    if (selectedSearchId) {
-      deleteCustomPopulationSearchDispatch({ id: selectedSearchId })
+    if (selectedSearch) {
+      deleteSearch({ id: selectedSearch.id })
       clearForm()
     }
   }
 
-  const onSelectSearch = selected => {
-    if (!selected) {
+  const onSelectSearch = selectedId => {
+    if (!selectedId) {
       clearForm()
       return
     }
-
-    const { id: selectedSearchId } = selected
-    const selectedSearch = customPopulationSearches.find(({ id }) => id === selectedSearchId)
+    const selectedSearch = searches.find(({ id }) => id === selectedId)
     if (selectedSearch) {
       setInput(selectedSearch.students.join('\n'))
       setName(selectedSearch.name)
-      setSelectedSearchId(selectedSearch.id)
+      setSelectedSearch(selectedSearch)
     }
   }
 
@@ -100,9 +91,11 @@ const CustomPopulationSearch = ({
     const studentnumbers = parseInput(input)
     getCustomPopulationDispatch({ studentnumberlist: studentnumbers, onProgress, associatedProgramme: programme })
     getCustomPopulationCoursesByStudentnumbers({ studentnumberlist: studentnumbers })
-    selectCustomPopulationSearchDispatch(selectedSearchId || null)
+    onPopulationChange(selectedSearch)
     handleClose()
   }
+
+  if (!searches) return null
 
   return (
     <Modal
@@ -117,13 +110,13 @@ const CustomPopulationSearch = ({
     >
       <Modal.Content>
         <Form>
-          <h2> Custom population new</h2>
+          <h2>New custom population</h2>
           <Form.Field>
-            <em> Insert name for this custom population if you wish to save it </em>
-            <Form.Input disabled={!!selectedSearchId} value={name} placeholder="name" onChange={handleNameChange} />
+            <em>Insert name for this custom population if you wish to save it</em>
+            <Form.Input disabled={!!selectedSearch} value={name} placeholder="name" onChange={handleNameChange} />
           </Form.Field>
           <Form.Field>
-            <em> Insert studentnumbers you wish to use for population here </em>
+            <em>Insert student numbers you wish to use for population here</em>
             <TextArea
               value={input}
               placeholder="011111111"
@@ -144,26 +137,26 @@ const CustomPopulationSearch = ({
         </Form>
         <SearchHistory
           header="Saved populations"
-          items={customPopulationSearches.map(s => ({
+          items={searches.map(s => ({
             ...s,
             text: s.name,
             timestamp: new Date(s.updatedAt),
             params: { id: s.id },
           }))}
           updateItem={() => null}
-          handleSearch={onSelectSearch}
+          handleSearch={({ id }) => onSelectSearch(id)}
         />
       </Modal.Content>
       <Modal.Actions>
         <Button
-          disabled={!name || customPopulationSearchSaving}
-          loading={customPopulationSearchSaving}
+          disabled={!name || isFetching}
+          loading={isFetching}
           floated="left"
           icon="save"
           onClick={onSave}
           content="Save"
         />
-        <Button disabled={!selectedSearchId} negative floated="left" icon="trash" onClick={onDelete} content="Delete" />
+        <Button disabled={!selectedSearch} negative floated="left" icon="trash" onClick={onDelete} content="Delete" />
         <Button onClick={handleClose}>Cancel</Button>
         <Button positive onClick={e => onClicker(e)} data-cy="search-button">
           Search population
@@ -173,33 +166,11 @@ const CustomPopulationSearch = ({
   )
 }
 
-CustomPopulationSearch.propTypes = {
-  getCustomPopulationDispatch: func.isRequired,
-  getCustomPopulationCoursesByStudentnumbers: func.isRequired,
-  loading: bool.isRequired,
-  customPopulationSearches: arrayOf(shape({})).isRequired,
-  customPopulationSearchSaving: bool.isRequired,
-  saveCustomPopulationSearchDispatch: func.isRequired,
-  getCustomPopulationSearchesDispatch: func.isRequired,
-  updateCustomPopulationSearchDispatch: func.isRequired,
-  selectCustomPopulationSearchDispatch: func.isRequired,
-  deleteCustomPopulationSearchDispatch: func.isRequired,
-}
-
-const mapStateToProps = ({ populations, populationCourses, customPopulationSearch }) => ({
+const mapStateToProps = ({ populations }) => ({
   loading: populations.pending,
-  custompop: populations.data.students || [],
-  courses: populationCourses.data,
-  customPopulationSearches: customPopulationSearch.customPopulationSearches,
-  customPopulationSearchSaving: customPopulationSearch.saving,
 })
 
 export default connect(mapStateToProps, {
   getCustomPopulationDispatch: getCustomPopulation,
   getCustomPopulationCoursesByStudentnumbers,
-  saveCustomPopulationSearchDispatch: saveCustomPopulationSearch,
-  getCustomPopulationSearchesDispatch: getCustomPopulationSearches,
-  updateCustomPopulationSearchDispatch: updateCustomPopulationSearch,
-  selectCustomPopulationSearchDispatch: selectCustomPopulationSearch,
-  deleteCustomPopulationSearchDispatch: deleteCustomPopulationSearch,
 })(CustomPopulationSearch)

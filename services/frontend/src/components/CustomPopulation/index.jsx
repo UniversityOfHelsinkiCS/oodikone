@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { createSelector } from '@reduxjs/toolkit'
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { Segment, Header, Accordion, Message, Label, Form, Input } from 'semantic-ui-react'
 import _ from 'lodash'
 import scrollToComponent from 'react-scroll-to-component'
@@ -11,7 +11,6 @@ import RightsNotification from 'components/RightsNotification'
 import PopulationCourseStatsFlat from 'components/PopulationCourseStats/PopulationCourseStatsFlat'
 import { useProgress, useTitle } from '../../common/hooks'
 import infotooltips from '../../common/InfoToolTips'
-import { getCustomPopulationSearches } from '../../redux/customPopulationSearch'
 import { useGetStudentListCourseStatisticsQuery } from '../../redux/populationCourses'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import PopulationStudents from '../PopulationStudents'
@@ -49,7 +48,6 @@ const selectCustomPopulationData = createSelector(
 
 const CustomPopulation = () => {
   const { language } = useLanguage()
-  const dispatch = useDispatch()
 
   const {
     allSemesters,
@@ -62,10 +60,6 @@ const CustomPopulation = () => {
     studentNumbers: custompop.map(s => s.studentNumber),
   })
   useTitle('Custom population')
-
-  useEffect(() => {
-    dispatch(getCustomPopulationSearches())
-  }, [])
 
   const filters = useMemo(() => {
     const filtersList = [
@@ -105,16 +99,18 @@ const CustomPopulation = () => {
 const CustomPopulationContent = ({ students, custompop, discardedStudentNumbers }) => {
   const [activeIndex, setIndex] = useState([])
   const [newestIndex, setNewest] = useState(null)
+  const [selectedCustomPopulationSearch, setSelectedCustomPopulationSearch] = useState(null)
   const studyProgrammes = useFilteredAndFormattedElementDetails()
   const creditGainRef = useRef()
   const programmeRef = useRef()
   const coursesRef = useRef()
   const studentRef = useRef()
   const refs = [creditGainRef, programmeRef, coursesRef, studentRef]
-  const { customPopulationSearches, searchedCustomPopulationSearchId } = useSelector(
-    state => state.customPopulationSearch
-  )
   const [studentAmountLimit, setStudentAmountLimit] = useState(0)
+
+  const handleSelectedPopulationChange = selectedPopulation => {
+    setSelectedCustomPopulationSearch(selectedPopulation)
+  }
 
   useEffect(() => {
     setStudentAmountLimit(Math.round(students.length ? students.length * 0.3 : 0))
@@ -153,6 +149,7 @@ const CustomPopulationContent = ({ students, custompop, discardedStudentNumbers 
     else setNewest(null)
     setIndex(indexes)
   }
+
   const createPanels = () => [
     {
       key: 0,
@@ -255,9 +252,7 @@ const CustomPopulationContent = ({ students, custompop, discardedStudentNumbers 
         <div style={{ margin: 'auto' }}>
           <Header className="segmentTitle" size="large" textAlign="center">
             Custom population
-            {searchedCustomPopulationSearchId
-              ? ` "${customPopulationSearches.find(({ id }) => id === searchedCustomPopulationSearchId).name}"`
-              : ''}
+            {selectedCustomPopulationSearch && ` "${selectedCustomPopulationSearch.name}"`}
             {populations.data.studyProgramme && (
               <Label
                 style={{ marginLeft: '2em' }}
@@ -291,7 +286,7 @@ const CustomPopulationContent = ({ students, custompop, discardedStudentNumbers 
       {discardedStudentNumbers?.length === 0 && students?.length === 0 && (
         <Message>No students found. Please re-check the student number list</Message>
       )}
-      <CustomPopulationSearch />
+      <CustomPopulationSearch onPopulationChange={handleSelectedPopulationChange} />
       {custompop.length > 0 && customPopulationFlag ? (
         <Segment className="contentSegment">{renderCustomPopulation()}</Segment>
       ) : (
