@@ -1,5 +1,6 @@
 import { useLocalStorage } from 'common/hooks'
-import React, { useMemo, useRef } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
+import reactScrollToComponent from 'react-scroll-to-component'
 import { Accordion } from 'semantic-ui-react'
 
 const titleStyle = { paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }
@@ -12,26 +13,29 @@ const titleStyle = { paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fo
 */
 const PanelView = ({ panels: initialPanels, viewTitle }) => {
   const refs = useRef([])
-  const [activeIndex, setActiveIndex] = useLocalStorage(viewTitle, [])
+  const [activeIndex, setActiveIndex] = useLocalStorage(viewTitle, [0])
+  const [newestIndex, setNewestIndex] = useState(null)
 
-  const handleClick = index => {
-    const indexes = [...activeIndex].sort()
-    if (indexes.includes(index)) {
-      indexes.splice(
-        indexes.findIndex(ind => ind === index),
-        1
-      )
+  useEffect(() => {
+    if (newestIndex) reactScrollToComponent(refs.current[newestIndex], { align: 'bottom' })
+  }, [newestIndex])
+
+  const togglePanel = index => {
+    const currentActiveIndex = new Set(activeIndex)
+    if (currentActiveIndex.has(index)) {
+      currentActiveIndex.delete(index)
     } else {
-      indexes.push(index)
+      currentActiveIndex.add(index)
+      setNewestIndex(index)
     }
-    setActiveIndex([...indexes])
+    setActiveIndex([...currentActiveIndex])
   }
 
   const panels = useMemo(
     () =>
       initialPanels.map((p, i) => ({
         key: `${p.title}-${i}`,
-        onTitleClick: () => handleClick(i),
+        onTitleClick: () => togglePanel(i),
         title: {
           content: <span style={titleStyle}>{p.title}</span>,
         },
