@@ -10,6 +10,7 @@ const titleStyle = { paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fo
   e.g.
   [ { title: 'Credit accumulation', content: <>stuff</> }, 
   ... ]
+  falsy items are filtered out, so you can leave them in
 */
 const PanelView = ({ panels: initialPanels, viewTitle }) => {
   const refs = useRef([])
@@ -33,25 +34,27 @@ const PanelView = ({ panels: initialPanels, viewTitle }) => {
 
   const panels = useMemo(
     () =>
-      initialPanels.map((p, i) => ({
-        key: `${p.title}-${i}`,
-        onTitleClick: () => togglePanel(i),
-        title: {
-          content: <span style={titleStyle}>{p.title}</span>,
-        },
-        content: {
-          content: (
-            <div
-              key={p.key}
-              ref={e => {
-                refs.current[i] = e
-              }}
-            >
-              {p.content}
-            </div>
-          ),
-        },
-      })),
+      initialPanels
+        .filter(p => p)
+        .map((p, i) => ({
+          key: `${p.title}-${i}`,
+          onTitleClick: () => togglePanel(i),
+          title: {
+            content: <span style={titleStyle}>{p.title}</span>,
+          },
+          content: {
+            content: (
+              <div
+                key={p.key}
+                ref={e => {
+                  refs.current[i] = e
+                }}
+              >
+                {p.content}
+              </div>
+            ),
+          },
+        })),
     [initialPanels, activeIndex]
   )
 
