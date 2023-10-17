@@ -1,11 +1,10 @@
 import * as filters from 'components/FilterView/filters'
-import { Button, Header, Accordion, Divider, Label } from 'semantic-ui-react'
+import { Button, Header, Divider, Label } from 'semantic-ui-react'
 import moment from 'moment'
 import CreditAccumulationGraphHighCharts from 'components/CreditAccumulationGraphHighCharts'
 import _ from 'lodash'
 import PopulationStudents from 'components/PopulationStudents'
-import React, { useCallback, useEffect, useState, useRef } from 'react'
-import scrollToComponent from 'react-scroll-to-component'
+import React, { useState } from 'react'
 import SegmentDimmer from 'components/SegmentDimmer'
 import useFilters from 'components/FilterView/useFilters'
 import creditDateFilter from 'components/FilterView/filters/date'
@@ -16,11 +15,11 @@ import {
   useGetStudyGuidanceGroupPopulationCoursesQuery,
 } from 'redux/studyGuidanceGroups'
 import { useHistory } from 'react-router-dom'
-import { useToggle } from 'common/hooks'
 import { useGetProgressCriteriaQuery } from 'redux/programmeProgressCriteria'
 import useLanguage from 'components/LanguagePicker/useLanguage'
 import AgeStats from 'components/PopulationDetails/AgeStats'
 import CreditGainStats from 'components/PopulationDetails/CreditGainStats'
+import PanelView from 'components/common/PanelView'
 import StudyGuidanceGroupPopulationCourses from './StudyGuidanceGroupPopulationCourses'
 import { startYearToAcademicYear, Wrapper, StyledMessage } from './common'
 import { useGetSemestersQuery } from '../../redux/semesters'
@@ -28,35 +27,9 @@ import FilterView from '../FilterView'
 
 const createAcademicYearStartDate = year => new Date(year, 7, 1)
 
-const useIsMounted = () => {
-  const isMounted = useRef(false)
-
-  useEffect(() => {
-    isMounted.current = true
-
-    return () => {
-      isMounted.current = false
-    }
-  }, [])
-
-  return useCallback(() => isMounted.current, [])
-}
-
-const useToggleAndSetNewestIndex = ({ defaultValue, indexOfPanelToScroll, setNewestIndex, isMounted }) => {
-  const [state, toggle] = useToggle(defaultValue)
-  useEffect(() => {
-    if (isMounted()) setNewestIndex(indexOfPanelToScroll)
-  }, [state])
-  return [state, toggle]
-}
-
-const SingleStudyGroupContent = ({ filteredStudents, population, group }) => {
+const SingleStudyGroupContent = ({ filteredStudents, group }) => {
   const { useFilterSelector, filterDispatch } = useFilters()
-  const refs = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef()]
-  const [activeIndex, setActiveIndex] = useState([])
-  const [newestIndex, setNewestIndex] = useState(null)
   const [curriculum, setCurriculum] = useState(null)
-  const isMounted = useIsMounted()
   const criteria = useGetProgressCriteriaQuery({
     programmeCode: group?.tags?.studyProgramme ? group?.tags?.studyProgramme : '',
   }).data
@@ -81,24 +54,6 @@ const SingleStudyGroupContent = ({ filteredStudents, population, group }) => {
   const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions)
   const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive)
 
-  const [coursesStructuredByProgramme, toggleCoursesStructuredByProgramme] = useToggleAndSetNewestIndex({
-    defaultValue: !!group.tags?.studyProgramme,
-    indexOfPanelToScroll: 1,
-    setNewestIndex,
-    isMounted,
-  })
-
-  const togglePanel = index => {
-    const currentActiveIndex = new Set(activeIndex)
-    if (currentActiveIndex.has(index)) {
-      currentActiveIndex.delete(index)
-    } else {
-      currentActiveIndex.add(index)
-      setNewestIndex(index)
-    }
-    setActiveIndex([...currentActiveIndex])
-  }
-
   const toggleCreditDateFilter = () => {
     if (creditDateFilterActive) {
       filterDispatch(creditDateFilter.actions.reset())
@@ -112,154 +67,86 @@ const SingleStudyGroupContent = ({ filteredStudents, population, group }) => {
     }
   }
 
-  useEffect(() => {
-    if (newestIndex) scrollToComponent(refs[newestIndex].current, { align: 'bottom' })
-  }, [newestIndex])
-
-  useEffect(() => {
-    togglePanel(0)
-  }, [population])
-
   const customStudyStartYear = year ? new Date(`${year}-07-31`) : null
 
-  const createPanels = students =>
-    [
-      {
-        key: 'credit-accumulation-panel',
-        title: {
-          content: (
-            <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-              Credit accumulation (for {students.length} students)
-            </span>
-          ),
-        },
-        content: {
-          content: (
-            <div ref={refs[0]}>
-              {group.tags?.year && (
-                <Button primary onClick={() => toggleCreditDateFilter()}>
-                  {creditDateFilterActive ? 'Show all credits' : 'Show starting from associated year'}
-                </Button>
-              )}
-              <CreditAccumulationGraphHighCharts
-                students={students}
-                studyPlanFilterIsActive={studyPlanFilterIsActive}
-                programmeCodes={group?.tags?.studyProgramme ? programmeCodes : []}
-                customStudyStartYear={customStudyStartYear}
+  const panels = [
+    {
+      title: `Credit accumulation (for ${filteredStudents.length} students)`,
+      content: (
+        <>
+          {group.tags?.year && (
+            <Button primary onClick={() => toggleCreditDateFilter()}>
+              {creditDateFilterActive ? 'Show all credits' : 'Show starting from associated year'}
+            </Button>
+          )}
+          <CreditAccumulationGraphHighCharts
+            students={filteredStudents}
+            studyPlanFilterIsActive={studyPlanFilterIsActive}
+            programmeCodes={group?.tags?.studyProgramme ? programmeCodes : []}
+            customStudyStartYear={customStudyStartYear}
+          />
+        </>
+      ),
+    },
+    ((programmeCodes?.length && programmeCodes[0]) || group?.tags?.studyProgramme) && year
+      ? {
+          title: 'Credit statistics',
+          content: !query?.years ? (
+            <div>
+              <CreditGainStats
+                query={query}
+                filteredStudents={filteredStudents}
+                creditDateFilterOptions={creditDateFilterOptions}
+                year={group.tags.year}
               />
             </div>
+          ) : (
+            <div>This table is omitted when searching population of multiple years</div>
           ),
-        },
-      },
-      ((programmeCodes?.length && programmeCodes[0]) || group?.tags?.studyProgramme) && year
-        ? {
-            key: 'credit-statistics-panel',
-            title: {
-              content: (
-                <span
-                  style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}
-                  data-cy="credit-statistics"
-                >
-                  Credit statistics
-                </span>
-              ),
-            },
-            content: {
-              content: !query?.years ? (
-                <div ref={refs[1]}>
-                  <CreditGainStats
-                    query={query}
-                    filteredStudents={filteredStudents}
-                    creditDateFilterOptions={creditDateFilterOptions}
-                    year={group.tags.year}
-                  />
-                </div>
-              ) : (
-                <div>This table is omitted when searching population of multiple years</div>
-              ),
-            },
-          }
-        : null,
-      {
-        key: 'age-distribution-panel',
-        title: {
-          content: (
-            <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-              Age distribution
-            </span>
-          ),
-        },
-        content: {
-          content: <AgeStats filteredStudents={filteredStudents} query={query} />,
-        },
-      },
-      {
-        key: 'courses-panel',
-        title: {
-          content: (
-            <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-              Courses of population
-            </span>
-          ),
-        },
-        content: {
-          content: (
-            <div ref={refs[3]}>
-              {coursesAreLoading ? (
-                <SegmentDimmer isLoading={coursesAreLoading} />
-              ) : (
-                <StudyGuidanceGroupPopulationCourses
-                  courses={courses}
-                  filteredStudents={students}
-                  showStructured={coursesStructuredByProgramme}
-                  toggleShowStructured={toggleCoursesStructuredByProgramme}
-                  studyProgramme={group.tags?.studyProgramme ? programmeCodes[0] : null}
-                  year={year}
-                  curriculum={curriculum}
-                  setCurriculum={setCurriculum}
-                />
-              )}
-            </div>
-          ),
-        },
-      },
-      {
-        key: 'students-of-population-panel',
-        title: {
-          content: (
-            <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-              Students ({students.length})
-            </span>
-          ),
-        },
-        content: {
-          content: (
-            <div ref={refs[4]}>
-              <PopulationStudents
-                variant="studyGuidanceGroupPopulation"
-                filteredStudents={students}
-                criteria={criteria}
-                studyGuidanceGroup={group}
-                curriculum={curriculum}
-              />
-            </div>
-          ),
-        },
-      },
-    ]
-      .filter(item => item !== null)
-      .map((panel, index) => ({ ...panel, onTitleClick: () => togglePanel(index) }))
+        }
+      : null,
+    {
+      title: 'Age distribution',
+      content: <AgeStats filteredStudents={filteredStudents} query={query} />,
+    },
+    {
+      title: 'Courses of population',
+      content: (
+        <div>
+          {coursesAreLoading ? (
+            <SegmentDimmer isLoading={coursesAreLoading} />
+          ) : (
+            <StudyGuidanceGroupPopulationCourses
+              courses={courses}
+              filteredStudents={filteredStudents}
+              studyProgramme={group.tags?.studyProgramme ? programmeCodes[0] : null}
+              year={year}
+              curriculum={curriculum}
+              setCurriculum={setCurriculum}
+            />
+          )}
+        </div>
+      ),
+    },
+    {
+      title: `Students (${filteredStudents.length})`,
+      content: (
+        <div>
+          <PopulationStudents
+            variant="studyGuidanceGroupPopulation"
+            filteredStudents={filteredStudents}
+            criteria={criteria}
+            studyGuidanceGroup={group}
+            curriculum={curriculum}
+          />
+        </div>
+      ),
+    },
+  ]
 
   return (
     <div style={{ overflowX: 'auto', flexGrow: 1, padding: '1px' }}>
-      <Accordion
-        activeIndex={activeIndex}
-        exclusive={false}
-        styled
-        fluid
-        panels={createPanels(filteredStudents)}
-        style={{ overflowX: 'auto' }}
-      />
+      <PanelView panels={panels} viewTitle="Studyguidance group" />
     </div>
   )
 }

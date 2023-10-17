@@ -18,7 +18,6 @@ const StudyGuidanceGroupPopulationCourses = ({
   const onStudentAmountLimitChange = value => {
     setStudentAmountLimit(Number.isNaN(Number(value)) ? studentAmountLimit : Number(value))
   }
-
   return (
     <Segment basic>
       {curriculumsAvailable && (
