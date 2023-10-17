@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
-import { Form, Input, Radio } from 'semantic-ui-react'
 import useFilters from 'components/FilterView/useFilters'
 import studyPlanFilter from 'components/FilterView/filters/hops'
 import { creditDateFilter } from 'components/FilterView/filters'
@@ -14,7 +13,7 @@ import InfoBox from '../Info/InfoBox'
 import CreditGainStats from './CreditGainStats'
 import AgeStats from './AgeStats'
 import infotooltips from '../../common/InfoToolTips'
-import CurriculumPicker from './CurriculumPicker'
+import { CourseTableModeSelector } from './CurriculumPicker'
 
 const PopulationDetails = ({
   allStudents,
@@ -98,45 +97,17 @@ const PopulationDetails = ({
       title: 'Courses of class',
       content: (
         <div>
-          <div style={{ display: 'flex', flexDirection: 'row' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '26px' }}>
-              <Radio
-                style={{ fontWeight: 'bold' }}
-                label="Choose curriculum"
-                name="coursesRadioGroup"
-                value="curriculum"
-                onChange={(event, { value }) => setCourseTableMode(value)}
-                checked={courseTableMode === 'curriculum'}
-              />
-              <Radio
-                style={{ fontWeight: 'bold' }}
-                label="Show all courses with at least"
-                name="coursesRadioGroup"
-                value="all"
-                onChange={(event, { value }) => setCourseTableMode(value)}
-                checked={courseTableMode === 'all'}
-              />
-            </div>
-            <div>
-              <CurriculumPicker
-                year={query?.year}
-                programmeCodes={programmeCodes}
-                setCurriculum={setCurriculum}
-                disabled={courseTableMode !== 'curriculum'}
-              />
-              <Form style={{ padding: '4px 4px 4px 8px' }}>
-                <Form.Field inline>
-                  <Input
-                    value={studentAmountLimit}
-                    onChange={e => onStudentAmountLimitChange(e.target.value)}
-                    disabled={courseTableMode !== 'all'}
-                    style={{ width: '70px' }}
-                  />
-                  <label>total students</label>
-                </Form.Field>
-              </Form>
-            </div>
-          </div>
+          <CourseTableModeSelector
+            courseTableMode={courseTableMode}
+            setCourseTableMode={setCourseTableMode}
+            year={query?.year}
+            studyProgramme={query?.programme}
+            studentAmountLimit={studentAmountLimit}
+            setCurriculum={setCurriculum}
+            setStudentAmountLimit={setStudentAmountLimit}
+            filteredStudents={filteredStudents}
+            onStudentAmountLimitChange={onStudentAmountLimitChange}
+          />
           <PopulationCourses
             query={query}
             curriculum={curriculum}
