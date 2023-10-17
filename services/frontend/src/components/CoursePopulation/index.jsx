@@ -257,7 +257,7 @@ const CoursePopulation = ({
             <Header className="segmentTitle" size="medium" textAlign="center">
               {subHeader}
             </Header>
-            <PanelView panels={createPanels(filtered)} />
+            <PanelView panels={createPanels(filtered)} viewTitle="coursepopulation" />
           </Segment>
         </div>
       )}

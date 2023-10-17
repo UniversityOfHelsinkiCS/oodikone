@@ -146,7 +146,7 @@ const SingleStudyGroupContent = ({ filteredStudents, group }) => {
 
   return (
     <div style={{ overflowX: 'auto', flexGrow: 1, padding: '1px' }}>
-      <PanelView panels={panels} viewTitle="Studyguidance group" />
+      <PanelView panels={panels} viewTitle="studyguidancegroup" />
     </div>
   )
 }
