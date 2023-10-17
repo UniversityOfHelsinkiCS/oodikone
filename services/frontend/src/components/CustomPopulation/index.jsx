@@ -192,7 +192,7 @@ const CustomPopulationContent = ({ students, custompop, discardedStudentNumbers 
           </Header>
         </div>
       )}
-      <PanelView panels={panels} />
+      <PanelView panels={panels} viewTitle="custompopulation" />
     </div>
   )
 
