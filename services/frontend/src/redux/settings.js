@@ -3,8 +3,7 @@ import { DEFAULT_LANG } from '../constants'
 
 const initial = () => ({
   language: DEFAULT_LANG,
-  namesVisible: false,
-  studentlistVisible: false,
+  namesVisible: true,
   chartHeight: 600,
 })
 
@@ -43,11 +42,6 @@ const reducer = (state = initial(), action) => {
         ...state,
         namesVisible: !state.namesVisible,
       }
-    case 'TOGGLE_STUDENT_LIST_VISIBILITY':
-      return {
-        ...state,
-        studentlistVisible: !state.studentlistVisible,
-      }
     case 'SET_CHART_HEIGHT':
       return {
         ...state,
@@ -78,10 +72,6 @@ export const setChartHeight = size => ({
 
 export const toggleStudentNameVisibility = () => ({
   type: 'TOGGLE_STUDENT_NAME_VISIBILITY',
-})
-
-export const toggleStudentListVisibility = () => ({
-  type: 'TOGGLE_STUDENT_LIST_VISIBILITY',
 })
 
 export default reducer
