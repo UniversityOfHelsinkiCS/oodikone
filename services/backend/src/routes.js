@@ -6,6 +6,7 @@ const shibbolethCharsetMiddleware = require('./middleware/shibbolethCharsetMiddl
 const currentUserMiddleware = require('./middleware/currentUserMiddleware')
 const accessLogger = require('./middleware/accessLogger')
 const auth = require('./middleware/auth')
+const changelog = require('./routes/changelog')
 const courses = require('./routes/courses')
 const students = require('./routes/students')
 const population = require('./routes/population')
@@ -32,7 +33,6 @@ const studyProgrammeCriteria = require('./routes/studyProgrammeCriteria')
 const initializeSentry = require('./util/sentry')
 const completedCoursesSearch = require('./routes/completedCoursesSearch')
 const errorMiddleware = require('./middleware/errorMiddleware')
-
 module.exports = (app, url) => {
   initializeSentry(app)
   app.use(Sentry.Handlers.requestHandler())
@@ -58,6 +58,7 @@ module.exports = (app, url) => {
   app.use(url, studyProgramme)
   app.use(`${url}/programmecriteria`, studyProgrammeCriteria)
   app.use(`${url}/openunisearch`, auth.roles(['openUniSearch']), customOpenUniSearch)
+  app.use(`${url}/changelog`, changelog)
   app.use(`${url}/completedcoursessearch`, completedCoursesSearch)
   app.use(`${url}/languagecenterdata`, languageCenterData)
   app.use(`${url}/faculties`, auth.roles(['facultyStatistics']), faculties)

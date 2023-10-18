@@ -5,10 +5,11 @@ import { useGetAuthorizedUserQuery } from 'redux/auth'
 import { images, checkUserAccess } from '../../common'
 import { useTitle } from '../../common/hooks'
 import { builtAt } from '../../conf'
-import OodiToOodikone from './OoodiToOodikone'
+import Changelog from './Changelog'
 
 const FrontPage = () => {
   const { rights, roles } = useGetAuthorizedUserQuery()
+
   useTitle()
 
   const showItems = {
@@ -30,7 +31,6 @@ const FrontPage = () => {
         <Header as="h3" style={{ textAlign: 'center' }}>
           Exploratory Research on Study Data
         </Header>
-        <OodiToOodikone />
 
         {showItems.populations && (
           <>
@@ -73,6 +73,7 @@ const FrontPage = () => {
         </p>
 
         <Divider section />
+        <Changelog />
         {builtAt ? <p>Oodikone was last updated on: {moment(builtAt).toDate().toLocaleString()}</p> : null}
       </Container>
       <Image src={images.toskaLogo} size="medium" centered style={{ bottom: 0 }} />
