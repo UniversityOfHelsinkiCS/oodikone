@@ -15,13 +15,14 @@ const CustomPopulationProgrammeDist = ({
   studentToTargetCourseDateMap,
   populationStatistics,
   coursecode,
+  studentData,
 }) => {
   const { getTextIn } = useLanguage()
 
   const [tableRows, setRows] = useState([])
 
   useEffect(() => {
-    if (Object.keys(populationStatistics).length > 0) {
+    if (Object.keys(populationStatistics).length > 0 || Object.keys(studentData).length > 0) {
       const allProgrammes = {}
       const filteredSamples = samples.filter(student => selectedStudents.includes(student.studentNumber))
 
@@ -30,7 +31,7 @@ const CustomPopulationProgrammeDist = ({
           student.studyrights,
           student.studentNumber,
           studentToTargetCourseDateMap,
-          populationStatistics.elementdetails.data
+          populationStatistics.elementdetails?.data ?? studentData.elementdetails?.data
         )
         if (programme && programme.code === '00000' && coursecode) {
           const filteredEnrollments = (student.enrollments || [])
@@ -41,7 +42,7 @@ const CustomPopulationProgrammeDist = ({
             student.studyrights,
             student.studentNumber,
             { [student.studentNumber]: (filteredEnrollments[0] || {}).enrollment_date_time },
-            populationStatistics.elementdetails.data
+            populationStatistics.elementdetails?.data ?? studentData.elementdetails?.data
           )
         }
         if (programme) {

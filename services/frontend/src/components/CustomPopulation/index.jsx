@@ -1,17 +1,16 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react'
-import { createSelector } from '@reduxjs/toolkit'
-import { useSelector } from 'react-redux'
 import { Segment, Header, Accordion, Message, Label, Form, Input } from 'semantic-ui-react'
 import _ from 'lodash'
 import scrollToComponent from 'react-scroll-to-component'
-import semestersApi from 'redux/semesters'
+import { useGetSemestersQuery } from 'redux/semesters'
 import { useFilteredAndFormattedElementDetails } from 'redux/elementdetails'
 
 import RightsNotification from 'components/RightsNotification'
 import PopulationCourseStatsFlat from 'components/PopulationCourseStats/PopulationCourseStatsFlat'
+import { useGetCustomPopulationQuery } from 'redux/populations'
+import { useGetStudentListCourseStatisticsQuery } from 'redux/populationCourses'
 import { useProgress, useTitle } from '../../common/hooks'
 import infotooltips from '../../common/InfoToolTips'
-import { useGetStudentListCourseStatisticsQuery } from '../../redux/populationCourses'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import PopulationStudents from '../PopulationStudents'
 import CustomPopulationProgrammeDist from './CustomPopulationProgrammeDist'
@@ -35,31 +34,34 @@ import useLanguage from '../LanguagePicker/useLanguage'
 import CustomPopulationSearch from './CustomPopulationSearch'
 import UnihowDataExport from './UnihowDataExport'
 
-const selectCustomPopulationData = createSelector(
-  semestersApi.endpoints.getSemesters.select(),
-  state => state.populations.data,
-  (semesters, populations) => ({
-    allSemesters: semesters?.data?.semesters ?? [],
-    custompop: populations?.students ?? [],
-    studyProgramme: populations?.studyProgramme,
-    discardedStudentNumbers: populations?.discardedStudentNumbers,
-  })
-)
-
 const CustomPopulation = () => {
   const { language } = useLanguage()
-
-  const {
-    allSemesters,
-    custompop,
-    studyProgramme: associatedProgramme,
-    discardedStudentNumbers,
-  } = useSelector(selectCustomPopulationData)
-
-  const { data: courseStats } = useGetStudentListCourseStatisticsQuery({
-    studentNumbers: custompop.map(s => s.studentNumber),
+  const [customPopulationState, setCustomPopulationState] = useState({
+    selectedSearch: null,
+    studentNumbers: [],
+    associatedProgramme: '',
   })
+
+  const { data } = useGetSemestersQuery()
+  const allSemesters = data?.semesters ?? []
+
+  const { data: courseStats } = useGetStudentListCourseStatisticsQuery(
+    { studentNumbers: customPopulationState.studentNumbers },
+    { skip: !customPopulationState.studentNumbers.length }
+  )
+
+  const { data: studentData, isFetching } = useGetCustomPopulationQuery(
+    {
+      studentNumbers: customPopulationState.studentNumbers,
+      tags: { studyProgramme: customPopulationState.associatedProgramme },
+    },
+    { skip: !customPopulationState.studentNumbers.length }
+  )
+
   useTitle('Custom population')
+
+  const custompop = studentData?.students ?? []
+  const associatedProgramme = studentData?.studyProgramme
 
   const filters = useMemo(() => {
     const filtersList = [
@@ -73,7 +75,7 @@ const CustomPopulation = () => {
       programmeFilter,
       creditDateFilter,
       enrollmentStatusFilter({
-        allSemesters: allSemesters ?? [],
+        allSemesters,
         language,
       }),
     ]
@@ -85,21 +87,28 @@ const CustomPopulation = () => {
 
   return (
     <FilterView name="CustomPopulation" filters={filters} students={custompop} displayTray={custompop.length > 0}>
-      {students => (
+      {filteredStudents => (
         <CustomPopulationContent
-          discardedStudentNumbers={discardedStudentNumbers}
-          students={students}
-          custompop={custompop}
+          filteredStudents={filteredStudents}
+          studentData={studentData}
+          customPopulationState={customPopulationState}
+          setCustomPopulationState={setCustomPopulationState}
+          isFetchingPopulation={isFetching}
         />
       )}
     </FilterView>
   )
 }
 
-const CustomPopulationContent = ({ students, custompop, discardedStudentNumbers }) => {
+const CustomPopulationContent = ({
+  filteredStudents,
+  customPopulationState,
+  studentData,
+  setCustomPopulationState,
+  isFetchingPopulation,
+}) => {
   const [activeIndex, setIndex] = useState([])
   const [newestIndex, setNewest] = useState(null)
-  const [selectedCustomPopulationSearch, setSelectedCustomPopulationSearch] = useState(null)
   const studyProgrammes = useFilteredAndFormattedElementDetails()
   const creditGainRef = useRef()
   const programmeRef = useRef()
@@ -108,26 +117,24 @@ const CustomPopulationContent = ({ students, custompop, discardedStudentNumbers 
   const refs = [creditGainRef, programmeRef, coursesRef, studentRef]
   const [studentAmountLimit, setStudentAmountLimit] = useState(0)
 
-  const handleSelectedPopulationChange = selectedPopulation => {
-    setSelectedCustomPopulationSearch(selectedPopulation)
-  }
+  const discardedStudentNumbers = studentData?.discardedStudentNumber
+  const allStudents = studentData?.students ?? []
+  const associatedProgramme = studentData?.studyProgramme
 
   useEffect(() => {
-    setStudentAmountLimit(Math.round(students.length ? students.length * 0.3 : 0))
-  }, [students.length])
+    setStudentAmountLimit(Math.round(filteredStudents.length ? filteredStudents.length * 0.3 : 0))
+  }, [filteredStudents.length])
 
   const onStudentAmountLimitChange = value => {
     setStudentAmountLimit(Number.isNaN(Number(value)) ? studentAmountLimit : Number(value))
   }
 
-  const populations = useSelector(state => state.populations)
-  const { customPopulationFlag } = populations
+  const { data: courseStats } = useGetStudentListCourseStatisticsQuery(
+    { studentNumbers: filteredStudents.map(s => s.studentNumber) },
+    { skip: !filteredStudents.map(s => s.studentNumber).length }
+  )
 
-  const { progress } = useProgress(populations.pending)
-
-  const { data: courseStats } = useGetStudentListCourseStatisticsQuery({
-    studentNumbers: students.map(s => s.studentNumber),
-  })
+  const { progress } = useProgress(isFetchingPopulation)
 
   useEffect(() => {
     if (newestIndex) {
@@ -156,7 +163,7 @@ const CustomPopulationContent = ({ students, custompop, discardedStudentNumbers 
       title: {
         content: (
           <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-            Credit accumulation (for {students.length} students)
+            Credit accumulation (for {filteredStudents.length} students)
           </span>
         ),
       },
@@ -164,7 +171,7 @@ const CustomPopulationContent = ({ students, custompop, discardedStudentNumbers 
       content: {
         content: (
           <div ref={creditGainRef}>
-            <CreditAccumulationGraphHighCharts students={students} customPopulation />
+            <CreditAccumulationGraphHighCharts students={filteredStudents} customPopulation />
           </div>
         ),
       },
@@ -183,7 +190,11 @@ const CustomPopulationContent = ({ students, custompop, discardedStudentNumbers 
         content: (
           <div ref={programmeRef}>
             <InfoBox content={infotooltips.PopulationStatistics.ProgrammeDistributionCoursePopulation} />
-            <CustomPopulationProgrammeDist samples={students} selectedStudents={_.map(students, 'studentNumber')} />
+            <CustomPopulationProgrammeDist
+              samples={filteredStudents}
+              selectedStudents={_.map(filteredStudents, 'studentNumber')}
+              studentData={studentData}
+            />
           </div>
         ),
       },
@@ -213,7 +224,7 @@ const CustomPopulationContent = ({ students, custompop, discardedStudentNumbers 
               </Form.Field>
             </Form>
             <PopulationCourseStatsFlat
-              filteredStudents={students}
+              filteredStudents={filteredStudents}
               courses={courseStats}
               studentAmountLimit={studentAmountLimit}
             />
@@ -226,7 +237,7 @@ const CustomPopulationContent = ({ students, custompop, discardedStudentNumbers 
       title: {
         content: (
           <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-            Students ({students.length})
+            Students ({filteredStudents.length})
           </span>
         ),
       },
@@ -236,37 +247,15 @@ const CustomPopulationContent = ({ students, custompop, discardedStudentNumbers 
           <div ref={studentRef}>
             <PopulationStudents
               variant="customPopulation"
-              filteredStudents={students}
-              dataExport={<UnihowDataExport students={students} />}
-              customPopulationProgramme={populations.data.studyProgramme || ''}
+              filteredStudents={filteredStudents}
+              dataExport={<UnihowDataExport students={filteredStudents} />}
+              customPopulationProgramme={associatedProgramme || ''}
             />
           </div>
         ),
       },
     },
   ]
-
-  const renderCustomPopulation = () => (
-    <div>
-      {custompop && (
-        <div style={{ margin: 'auto' }}>
-          <Header className="segmentTitle" size="large" textAlign="center">
-            Custom population
-            {selectedCustomPopulationSearch && ` "${selectedCustomPopulationSearch.name}"`}
-            {populations.data.studyProgramme && (
-              <Label
-                style={{ marginLeft: '2em' }}
-                tag
-                color="blue"
-                content={studyProgrammes.find(p => p.key === populations.data.studyProgramme).text}
-              />
-            )}
-          </Header>
-        </div>
-      )}
-      <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={createPanels()} />
-    </div>
-  )
 
   return (
     <div className="segmentContainer">
@@ -280,15 +269,33 @@ const CustomPopulationContent = ({ students, custompop, discardedStudentNumbers 
           studentnumbers you have access rights to i.e. you have rights to the programme they are in.
         </p>
       </Message>
-      {discardedStudentNumbers?.length > 0 && !populations.pending && (
+      {discardedStudentNumbers?.length > 0 && !isFetchingPopulation && (
         <RightsNotification discardedStudentNumbers={discardedStudentNumbers} />
       )}
-      {discardedStudentNumbers?.length === 0 && students?.length === 0 && (
+      {discardedStudentNumbers?.length === 0 && filteredStudents?.length === 0 && (
         <Message>No students found. Please re-check the student number list</Message>
       )}
-      <CustomPopulationSearch onPopulationChange={handleSelectedPopulationChange} />
-      {custompop.length > 0 && customPopulationFlag ? (
-        <Segment className="contentSegment">{renderCustomPopulation()}</Segment>
+      <CustomPopulationSearch setCustomPopulationState={setCustomPopulationState} />
+      {!isFetchingPopulation && allStudents.length ? (
+        <Segment className="contentSegment">
+          <div>
+            <div style={{ margin: 'auto' }}>
+              <Header className="segmentTitle" size="large" textAlign="center">
+                Custom population
+                {customPopulationState.selectedSearch && ` "${customPopulationState.selectedSearch.name}"`}
+                {associatedProgramme && (
+                  <Label
+                    style={{ marginLeft: '2em' }}
+                    tag
+                    color="blue"
+                    content={studyProgrammes.find(p => p.key === associatedProgramme).text}
+                  />
+                )}
+              </Header>
+            </div>
+            <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={createPanels()} />
+          </div>
+        </Segment>
       ) : (
         <Segment className="contentSegment">
           <ProgressBar progress={progress} />
