@@ -1,4 +1,4 @@
-import { Dropdown } from 'semantic-ui-react'
+import { Dropdown, Form, Input, Radio } from 'semantic-ui-react'
 import React, { useState, useEffect } from 'react'
 import { curriculumsApi } from 'redux/populationCourses'
 import { sortBy } from 'lodash'
@@ -76,3 +76,61 @@ const CurriculumPicker = ({ setCurriculum, programmeCodes, disabled, year }) => 
 }
 
 export default CurriculumPicker
+
+export const CourseTableModeSelector = ({
+  courseTableMode,
+  setCourseTableMode,
+  year,
+  studyProgramme,
+  setCurriculum,
+  studentAmountLimit,
+  setStudentAmountLimit,
+  filteredStudents,
+  onStudentAmountLimitChange,
+}) => {
+  useEffect(() => {
+    setStudentAmountLimit(Math.round(filteredStudents.length ? filteredStudents.length * 0.3 : 0))
+  }, [filteredStudents.length])
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'row' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '26px' }}>
+        <Radio
+          style={{ fontWeight: 'bold' }}
+          label="Choose curriculum"
+          name="coursesRadioGroup"
+          value="curriculum"
+          onChange={(event, { value }) => setCourseTableMode(value)}
+          checked={courseTableMode === 'curriculum'}
+        />
+        <Radio
+          style={{ fontWeight: 'bold' }}
+          label="Show all courses with at least"
+          name="coursesRadioGroup"
+          value="all"
+          onChange={(event, { value }) => setCourseTableMode(value)}
+          checked={courseTableMode === 'all'}
+        />
+      </div>
+      <div>
+        <CurriculumPicker
+          year={year}
+          programmeCodes={[studyProgramme]}
+          setCurriculum={setCurriculum}
+          disabled={courseTableMode !== 'curriculum'}
+        />
+        <Form style={{ padding: '4px 4px 4px 8px' }}>
+          <Form.Field inline>
+            <Input
+              value={studentAmountLimit}
+              onChange={e => onStudentAmountLimitChange(e.target.value)}
+              disabled={courseTableMode !== 'all'}
+              style={{ width: '70px' }}
+            />
+            <label>total students</label>
+          </Form.Field>
+        </Form>
+      </div>
+    </div>
+  )
+}

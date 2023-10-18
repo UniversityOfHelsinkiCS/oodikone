@@ -2,10 +2,9 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Tab, Grid } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
-import scrollToComponent from 'react-scroll-to-component'
 import { useGetAuthorizedUserQuery } from 'redux/auth'
 import moment from 'moment'
-import { useTabChangeAnalytics, usePrevious } from '../../common/hooks'
+import { useTabChangeAnalytics } from '../../common/hooks'
 
 import { getTagsByStudytrackAction } from '../../redux/tags'
 import { getStudentTagsByStudytrackAction } from '../../redux/tagstudent'
@@ -166,7 +165,6 @@ const PopulationStudents = ({
   const [state, setState] = useState({})
   const studentRef = useRef()
   const dispatch = useDispatch()
-  const { studentlistVisible: showList } = useSelector(({ settings }) => settings)
   const { data: tags } = useSelector(({ tags }) => tags)
   const { query } = useSelector(({ populations }) => populations)
   let mainProgramme = query?.studyRights?.programme || ''
@@ -184,7 +182,7 @@ const PopulationStudents = ({
     mainProgramme = programmes[0]
     combinedProgramme = programmes.length > 1 ? programmes[1] : ''
   }
-  const prevShowList = usePrevious(showList)
+
   const { isAdmin } = useGetAuthorizedUserQuery()
   const admin = isAdmin
 
@@ -199,12 +197,6 @@ const PopulationStudents = ({
 
     setState({ ...state, admin })
   }, [])
-
-  useEffect(() => {
-    if (!prevShowList && showList) {
-      scrollToComponent(studentRef.current, { align: 'bottom' })
-    }
-  }, [prevShowList])
 
   if (filteredStudents.length === 0) return null
   return (

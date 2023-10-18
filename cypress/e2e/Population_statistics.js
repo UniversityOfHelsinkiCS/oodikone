@@ -169,10 +169,10 @@ describe('Population Statistics tests', () => {
       cy.visit(pathToCSMaster2019)
       cy.cs('filtered-students')
       cy.contains('Credit statistics')
-      cy.get("[data-cy='credit-statistics']")
+      cy.get("[data-cy='Credit statistics']")
         .parent()
         .then($parentDiv => {
-          if (!$parentDiv.hasClass('active')) cy.get("[data-cy='credit-statistics']").click()
+          if (!$parentDiv.hasClass('active')) cy.get("[data-cy='Credit statistics']").click()
         })
       cy.contains('Credits Gained').click()
       cy.get('.credits-gained-divider').click()
