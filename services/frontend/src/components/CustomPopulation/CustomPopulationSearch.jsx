@@ -1,32 +1,23 @@
 import React, { useState } from 'react'
-import { connect } from 'react-redux'
 import { Button, Modal, Form, TextArea } from 'semantic-ui-react'
 import { textAndDescriptionSearch } from 'common'
 import { useFilteredAndFormattedElementDetails } from 'redux/elementdetails'
-import { useProgress, useTitle } from '../../common/hooks'
-import { getCustomPopulation } from '../../redux/populations'
+import { useTitle } from '../../common/hooks'
 import {
   useGetCustomPopulationSearchesQuery,
   useCreateCustomPopulationSearchMutation,
   useUpdateCustomPopulationSearchMutation,
   useDeleteCustomPopulationSearchMutation,
 } from '../../redux/customPopulationSearch'
-import { getCustomPopulationCoursesByStudentnumbers } from '../../redux/populationCourses'
 import SearchHistory from '../SearchHistory'
 
-const CustomPopulationSearch = ({
-  getCustomPopulationDispatch,
-  getCustomPopulationCoursesByStudentnumbers,
-  loading,
-  onPopulationChange,
-}) => {
+const CustomPopulationSearch = ({ setCustomPopulationState }) => {
   const [modal, setModal] = useState(false)
   const [input, setInput] = useState('')
   const [name, setName] = useState('')
-  const [programme, setProgramme] = useState('')
+  const [associatedProgramme, setAssociatedProgramme] = useState('')
   const [selectedSearch, setSelectedSearch] = useState(null)
   const programmes = useFilteredAndFormattedElementDetails()
-  const { onProgress } = useProgress(loading)
 
   useTitle('Custom population')
 
@@ -88,10 +79,8 @@ const CustomPopulationSearch = ({
 
   const onClicker = e => {
     e.preventDefault()
-    const studentnumbers = parseInput(input)
-    getCustomPopulationDispatch({ studentnumberlist: studentnumbers, onProgress, associatedProgramme: programme })
-    getCustomPopulationCoursesByStudentnumbers({ studentnumberlist: studentnumbers })
-    onPopulationChange(selectedSearch)
+    const studentNumbers = parseInput(input)
+    setCustomPopulationState({ selectedSearch, studentNumbers, associatedProgramme })
     handleClose()
   }
 
@@ -128,8 +117,8 @@ const CustomPopulationSearch = ({
             name="Associated programme"
             search={textAndDescriptionSearch}
             options={programmes}
-            onChange={(_, value) => setProgramme(value?.value)}
-            value={programme}
+            onChange={(_, value) => setAssociatedProgramme(value?.value)}
+            value={associatedProgramme}
             closeOnChange
             clearable
             placeholder="Select associated study programme for the population"
@@ -166,11 +155,4 @@ const CustomPopulationSearch = ({
   )
 }
 
-const mapStateToProps = ({ populations }) => ({
-  loading: populations.pending,
-})
-
-export default connect(mapStateToProps, {
-  getCustomPopulationDispatch: getCustomPopulation,
-  getCustomPopulationCoursesByStudentnumbers,
-})(CustomPopulationSearch)
+export default CustomPopulationSearch

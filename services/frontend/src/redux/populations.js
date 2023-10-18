@@ -1,4 +1,4 @@
-import { callController } from '../apiConnection'
+import { RTKApi, callController } from '../apiConnection'
 
 const initialState = {
   pending: false,
@@ -53,20 +53,23 @@ export const getCoursePopulation = ({ coursecodes, from, to, onProgress, separat
   return callController(route, prefix, null, 'get', query, params, onProgress)
 }
 
-export const getCustomPopulation = ({
-  studentnumberlist,
-  onProgress,
-  usingStudyGuidanceGroups,
-  associatedProgramme,
-}) => {
-  const route = '/v3/populationstatisticsbystudentnumbers'
-  const prefix = 'GET_CUSTOM_POP_'
-  const tags = { studyProgramme: associatedProgramme, year: 1900 }
-  const params = { studentnumberlist, usingStudyGuidanceGroups }
-  const query = { studentnumberlist, studyRights: { programme: 'KH555' } }
-  const body = { studentnumberlist, usingStudyGuidanceGroups, tags }
-  return callController(route, prefix, body, 'post', query, params, onProgress)
-}
+const populationApi = RTKApi.injectEndpoints({
+  endpoints: builder => ({
+    getCustomPopulation: builder.query({
+      query: ({ studentNumbers, tags }) => ({
+        url: '/v3/populationstatisticsbystudentnumbers',
+        method: 'POST',
+        body: {
+          studentnumberlist: studentNumbers,
+          tags,
+        },
+      }),
+    }),
+  }),
+  overrideExisting: false,
+})
+
+export const { useGetCustomPopulationQuery } = populationApi
 
 export const clearPopulations = () => ({
   type: 'CLEAR_POPULATIONS',
@@ -136,34 +139,6 @@ const reducer = (state = initialState, action) => {
         data: action.response,
         updating: false,
         customPopulationFlag: false,
-      }
-    case 'GET_CUSTOM_POP_ATTEMPT':
-      return {
-        ...state,
-        pending: true,
-        error: false,
-        query: null,
-        data: {},
-        updating: false,
-        customPopulationFlag: true,
-      }
-    case 'GET_CUSTOM_POP_FAILURE':
-      return {
-        ...state,
-        pending: false,
-        error: true,
-        data: action.response,
-        updating: false,
-        customPopulationFlag: true,
-      }
-    case 'GET_CUSTOM_POP_SUCCESS':
-      return {
-        ...state,
-        pending: false,
-        error: false,
-        data: action.response,
-        updating: false,
-        customPopulationFlag: true,
       }
     case 'UPDATE_POPULATION_STUDENTS_ATTEMPT':
       return {

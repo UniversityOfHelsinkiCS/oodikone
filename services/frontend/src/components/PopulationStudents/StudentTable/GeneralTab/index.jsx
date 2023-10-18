@@ -3,6 +3,7 @@ import _ from 'lodash'
 import { useSelector } from 'react-redux'
 import { useGetStudyGuidanceGroupPopulationQuery } from 'redux/studyGuidanceGroups'
 import { useGetAuthorizedUserQuery } from 'redux/auth'
+import { useGetCustomPopulationQuery } from 'redux/populations'
 import GeneralTab from './GeneralTab'
 
 // study guidance groups -feature uses different population + rtk query, so it needs to
@@ -14,6 +15,15 @@ const StudyGuidanceGroupGeneralTabContainer = ({ group, ...props }) => {
   const { tags } = group
   const populations = useGetStudyGuidanceGroupPopulationQuery({ studentnumberlist: groupStudentNumbers, tags })
   return <GeneralTab populations={populations} group={group} {...props} />
+}
+
+const CustomPopulationGeneralTabContainer = props => {
+  const { filteredStudents, customPopulationProgramme } = props
+  const populations = useGetCustomPopulationQuery({
+    studentNumbers: filteredStudents.map(s => s.studentNumber),
+    tags: { studyProgramme: customPopulationProgramme },
+  })
+  return <GeneralTab populations={populations} {...props} />
 }
 
 const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
@@ -105,6 +115,16 @@ const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
   if (variant === 'studyGuidanceGroupPopulation') {
     return (
       <StudyGuidanceGroupGeneralTabContainer
+        group={studyGuidanceGroup}
+        columnKeysToInclude={columnKeysToInclude}
+        {...props}
+      />
+    )
+  }
+
+  if (variant === 'customPopulation') {
+    return (
+      <CustomPopulationGeneralTabContainer
         group={studyGuidanceGroup}
         columnKeysToInclude={columnKeysToInclude}
         {...props}
