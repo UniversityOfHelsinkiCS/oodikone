@@ -3,7 +3,7 @@ import { DEFAULT_LANG } from '../constants'
 
 const initial = () => ({
   language: DEFAULT_LANG,
-  namesVisible: true,
+  namesVisible: false,
   chartHeight: 600,
 })
 
