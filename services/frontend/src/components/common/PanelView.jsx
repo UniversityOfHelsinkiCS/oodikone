@@ -40,7 +40,11 @@ const PanelView = ({ panels: initialPanels, viewTitle }) => {
           key: `${p.title}-${i}`,
           onTitleClick: () => togglePanel(i),
           title: {
-            content: <span style={titleStyle}>{p.title}</span>,
+            content: (
+              <span style={titleStyle} data-cy={p.title}>
+                {p.title}
+              </span>
+            ),
           },
           content: {
             content: (
