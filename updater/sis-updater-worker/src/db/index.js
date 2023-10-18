@@ -1,5 +1,6 @@
 const { dbConnections } = require('./connection')
 const { getLatestSnapshot, isActive, getActiveSnapshot } = require('../utils')
+const { logger } = require('../utils/logger')
 
 const selectFromByIds = async (table, ids, col = 'id') => dbConnections.knex(table).whereIn(col, ids)
 
@@ -51,10 +52,22 @@ const selectFromActiveSnapshotsByIds = async (table, ids, col = 'id') =>
 const getColumnsToUpdate = (model, keys) => Object.keys(model.rawAttributes).filter(a => !keys.includes(a))
 
 const bulkCreate = async (model, entities, transaction = null, properties = ['id']) => {
-  await model.bulkCreate(entities, {
-    updateOnDuplicate: getColumnsToUpdate(model, properties),
-    transaction,
-  })
+  try {
+    await model.bulkCreate(entities, {
+      updateOnDuplicate: getColumnsToUpdate(model, properties),
+      transaction,
+    })
+  } catch (e) {
+    for (const entity of entities) {
+      try {
+        await model.upsert(entity, { fields: getColumnsToUpdate(model, properties) })
+      } catch (e) {
+        logger.error('Single-entity upsert failed.')
+        logger.error(JSON.stringify(entity, null, 2))
+        logger.error(e)
+      }
+    }
+  }
 }
 
 const getCourseUnitsByCodes = codes => dbConnections.knex('course_units').whereIn('code', codes).select('*')
