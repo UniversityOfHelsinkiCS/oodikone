@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 import React, { useState } from 'react'
 import { Segment, Form, Button, TextArea, Header, Message } from 'semantic-ui-react'
 import { callApi } from '../../apiConnection'
@@ -41,21 +42,21 @@ const Updater = () => {
           <b>Updater sis-db - Update students</b> Updates 1000 students at one click in development and all in
           production environment.
           <br />
-          <b>Updater sis-db - Update Programmes</b> Updates all study programmes and programme modules, see more details
-          'updater/sis-updater-worker/src/updater/updateProgrammeModules.js'.
+          <b>Updater sis-db - Update curriculums</b> Updates all study programmes and their curriculums. This takes a
+          few minutes, and breaks the curriculum features for that time, so do not run in production unnecessarily.
           <br />
           <b>Updater redis - Update redis</b> Updates updater redis. <br />
           <b>Oodikone redis - Refresh oodikone statistics</b> Refresh studyright associations and the last two years of
-          teacher leaderboard
+          teacher leaderboard.
           <br />
-          <b>Oodikone redis - Refresh all teacher leaderboards</b> Refresh all leaderboar statistics from 1963 until
+          <b>Oodikone redis - Refresh all teacher leaderboards</b> Refresh all leaderboard statistics from 1963 until
           today. Might take some time.
           <br />
           <b>Oodikone redis - Refresh trends</b> Refresh uber data from 2017-until now, status and graduated.
           <br />
           <b>Oodikone redis - Refresh faculties</b> Refresh data for all faculties for all tabs (time consuming).
           <br />
-          <b>Oodikone redis - Refresh study programmes</b> Refresh data for new studyp programmes for basic and
+          <b>Oodikone redis - Refresh study programmes</b> Refresh data for new study programmes for basic and
           studytrack tabs (time consuming).
         </p>
       </Message>
@@ -63,7 +64,15 @@ const Updater = () => {
         <Form.Group>
           <Form.Button content="Update meta" onClick={() => updateSISMeta()} />
           <Form.Button content="Update students" onClick={() => updateSISStudents()} />
-          <Form.Button content="Update programmes" onClick={() => updateSISProgrammes()} />
+          <Form.Button
+            content="Update curriculums"
+            onClick={() => {
+              // eslint-disable-next-line no-restricted-globals
+              if (confirm('This breaks all curriculum-related features for a few minutes. Continue?')) {
+                updateSISProgrammes()
+              }
+            }}
+          />
           <Form.Button content="Refresh updater redis cache" onClick={() => refreshSISRedisCache()} />
           <Form.Button content="Refresh oodikone statistics" onClick={() => refreshStatisticsV2()} />
           <Form.Button content="Refresh all teacher leaderboards" onClick={() => refreshAllTeacherLeaderboards()} />
