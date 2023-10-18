@@ -1,12 +1,12 @@
-import React, { useEffect, useState, useMemo, useRef } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import moment from 'moment'
 import _ from 'lodash'
-import { Segment, Header, Accordion, Form, Input } from 'semantic-ui-react'
-import scrollToComponent from 'react-scroll-to-component'
+import { Segment, Header, Form, Input } from 'semantic-ui-react'
 import InfoBox from 'components/Info/InfoBox'
 import PopulationCourseStatsFlat from 'components/PopulationCourseStats/PopulationCourseStatsFlat'
+import PanelView from 'components/common/PanelView'
 import { getCoursePopulation } from '../../redux/populations'
 import { getSingleCourseStats } from '../../redux/singleCourseStats'
 import { useGetStudentListCourseStatisticsQuery } from '../../redux/populationCourses'
@@ -59,14 +59,6 @@ const CoursePopulation = ({
   const [headerYears, setYears] = useState('')
   const [dateFrom, setDateFrom] = useState(null)
   const [dateTo, setDateTo] = useState(null)
-  const [activeIndex, setIndex] = useState([])
-  const [newestIndex, setNewest] = useState(null)
-  const gradeDistRef = useRef()
-  const languageDistRef = useRef()
-  const programmeRef = useRef()
-  const creditGainRef = useRef()
-  const studentRef = useRef()
-  const refs = [gradeDistRef, programmeRef, creditGainRef, studentRef]
   useTitle('Course population')
 
   const { onProgress, progress } = useProgress(pending && !studentData.students)
@@ -84,12 +76,6 @@ const CoursePopulation = ({
   useEffect(() => {
     getElementDetails()
   }, [])
-
-  useEffect(() => {
-    if (newestIndex && refs[newestIndex]) {
-      scrollToComponent(refs[newestIndex].current, { align: 'bottom' })
-    }
-  }, [activeIndex])
 
   const getFromToDates = (from, to, separate) => {
     const targetProp = separate ? 'semestercode' : 'yearcode'
@@ -144,157 +130,74 @@ const CoursePopulation = ({
     )
   }
 
-  const handleClick = index => {
-    const indexes = [...activeIndex].sort()
-    if (indexes.includes(index)) {
-      indexes.splice(
-        indexes.findIndex(ind => ind === index),
-        1
-      )
-    } else {
-      indexes.push(index)
-    }
-    if (activeIndex.length < indexes.length) setNewest(index)
-    else setNewest(null)
-    setIndex(indexes)
-  }
-
-  const panels = filtered => [
+  const createPanels = filtered => [
     {
-      key: 0,
-      title: {
-        content: (
-          <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-            Grade distribution
-          </span>
-        ),
-      },
-      onTitleClick: () => handleClick(0),
-      content: {
-        content: (
-          <div ref={gradeDistRef}>
-            <InfoBox content={infotooltips.PopulationStatistics.GradeDistributionCoursePopulation} />
-            <CoursePopulationGradeDist
-              selectedStudents={filtered.map(s => s.studentNumber)}
-              from={dateFrom}
-              to={dateTo}
-              samples={filtered}
-              codes={codes}
-            />
-          </div>
-        ),
-      },
+      title: 'Grade distribution',
+      content: (
+        <div>
+          <InfoBox content={infotooltips.PopulationStatistics.GradeDistributionCoursePopulation} />
+          <CoursePopulationGradeDist
+            selectedStudents={filtered.map(s => s.studentNumber)}
+            from={dateFrom}
+            to={dateTo}
+            samples={filtered}
+            codes={codes}
+          />
+        </div>
+      ),
     },
     {
-      key: 1,
-      title: {
-        content: (
-          <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-            Language distribution
-          </span>
-        ),
-      },
-      onTitleClick: () => handleClick(1),
-      content: {
-        content: (
-          <div ref={languageDistRef}>
-            <InfoBox content={infotooltips.PopulationStatistics.LanguageDistributionCoursePopulation} />
-            <CoursePopulationLanguageDist from={dateFrom} to={dateTo} samples={studentData.students} codes={codes} />
-          </div>
-        ),
-      },
+      title: 'Language distribution',
+      content: (
+        <div>
+          <InfoBox content={infotooltips.PopulationStatistics.LanguageDistributionCoursePopulation} />
+          <CoursePopulationLanguageDist from={dateFrom} to={dateTo} samples={filtered} codes={codes} />
+        </div>
+      ),
     },
     {
-      key: 2,
-      title: {
-        content: (
-          <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-            Programme distribution
-          </span>
-        ),
-      },
-      onTitleClick: () => handleClick(2),
-      content: {
-        content: (
-          <div ref={programmeRef}>
-            <InfoBox content={infotooltips.PopulationStatistics.ProgrammeDistributionCoursePopulation} />
-            <CustomPopulationProgrammeDist
-              studentToTargetCourseDateMap={studentToTargetCourseDateMap}
-              samples={filtered}
-              coursecode={codes}
-              selectedStudents={filtered.map(s => s.studentNumber)}
-            />
-          </div>
-        ),
-      },
+      title: 'Programme distribution',
+      content: (
+        <div>
+          <InfoBox content={infotooltips.PopulationStatistics.ProgrammeDistributionCoursePopulation} />
+          <CustomPopulationProgrammeDist
+            studentToTargetCourseDateMap={studentToTargetCourseDateMap}
+            samples={filtered}
+            coursecode={codes}
+            selectedStudents={filtered.map(s => s.studentNumber)}
+          />
+        </div>
+      ),
     },
     {
-      key: 3,
-      title: {
-        content: (
-          <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-            Courses of population
-          </span>
-        ),
-      },
-      onTitleClick: () => handleClick(3),
-      content: {
-        content: (
-          <div ref={programmeRef}>
-            <CustomPopulationCoursesWrapper filteredStudents={filtered} />
-          </div>
-        ),
-      },
+      title: 'Courses of population',
+      content: <CustomPopulationCoursesWrapper filteredStudents={filtered} />,
     },
     {
-      key: 4,
-      title: {
-        content: (
-          <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-            Credit gains
-          </span>
-        ),
-      },
-      onTitleClick: () => handleClick(4),
-      content: {
-        content: (
-          <div ref={creditGainRef}>
-            <CoursePopulationCreditGainTable
-              studentToTargetCourseDateMap={studentToTargetCourseDateMap}
-              selectedStudents={filtered.map(s => s.studentNumber)}
-              samples={filtered}
-              codes={codes}
-              from={dateFrom}
-              to={dateTo}
-            />
-          </div>
-        ),
-      },
+      title: 'Credit gains',
+      content: (
+        <CoursePopulationCreditGainTable
+          studentToTargetCourseDateMap={studentToTargetCourseDateMap}
+          selectedStudents={filtered.map(s => s.studentNumber)}
+          samples={filtered}
+          codes={codes}
+          from={dateFrom}
+          to={dateTo}
+        />
+      ),
     },
     {
-      key: 5,
-      title: {
-        content: (
-          <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-            Students ({filtered.length})
-          </span>
-        ),
-      },
-      onTitleClick: () => handleClick(5),
-      content: {
-        content: (
-          <div ref={studentRef}>
-            <PopulationStudents
-              variant="coursePopulation"
-              studentToTargetCourseDateMap={studentToTargetCourseDateMap}
-              filteredStudents={filtered}
-              coursecode={codes}
-              from={dateFrom}
-              to={dateTo}
-            />
-          </div>
-        ),
-      },
+      title: `Students (${filtered.length})`,
+      content: (
+        <PopulationStudents
+          variant="coursePopulation"
+          studentToTargetCourseDateMap={studentToTargetCourseDateMap}
+          filteredStudents={filtered}
+          coursecode={codes}
+          from={dateFrom}
+          to={dateTo}
+        />
+      ),
     },
   ]
 
@@ -354,7 +257,7 @@ const CoursePopulation = ({
             <Header className="segmentTitle" size="medium" textAlign="center">
               {subHeader}
             </Header>
-            <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={panels(filtered)} />
+            <PanelView panels={createPanels(filtered)} viewTitle="coursepopulation" />
           </Segment>
         </div>
       )}

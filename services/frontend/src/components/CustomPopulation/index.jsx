@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react'
-import { Segment, Header, Accordion, Message, Label, Form, Input } from 'semantic-ui-react'
+import React, { useState, useEffect, useMemo } from 'react'
+import { Segment, Header, Message, Label, Form, Input } from 'semantic-ui-react'
 import _ from 'lodash'
-import scrollToComponent from 'react-scroll-to-component'
 import { useGetSemestersQuery } from 'redux/semesters'
 import { useFilteredAndFormattedElementDetails } from 'redux/elementdetails'
 
@@ -9,6 +8,7 @@ import RightsNotification from 'components/RightsNotification'
 import PopulationCourseStatsFlat from 'components/PopulationCourseStats/PopulationCourseStatsFlat'
 import { useGetCustomPopulationQuery } from 'redux/populations'
 import { useGetStudentListCourseStatisticsQuery } from 'redux/populationCourses'
+import PanelView from 'components/common/PanelView'
 import { useProgress, useTitle } from '../../common/hooks'
 import infotooltips from '../../common/InfoToolTips'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
@@ -107,14 +107,7 @@ const CustomPopulationContent = ({
   setCustomPopulationState,
   isFetchingPopulation,
 }) => {
-  const [activeIndex, setIndex] = useState([])
-  const [newestIndex, setNewest] = useState(null)
   const studyProgrammes = useFilteredAndFormattedElementDetails()
-  const creditGainRef = useRef()
-  const programmeRef = useRef()
-  const coursesRef = useRef()
-  const studentRef = useRef()
-  const refs = [creditGainRef, programmeRef, coursesRef, studentRef]
   const [studentAmountLimit, setStudentAmountLimit] = useState(0)
 
   const discardedStudentNumbers = studentData?.discardedStudentNumber
@@ -136,124 +129,57 @@ const CustomPopulationContent = ({
 
   const { progress } = useProgress(isFetchingPopulation)
 
-  useEffect(() => {
-    if (newestIndex) {
-      scrollToComponent(refs[newestIndex].current, { align: 'bottom' })
-    }
-  }, [activeIndex])
-
-  const handleClick = index => {
-    const indexes = [...activeIndex].sort()
-    if (indexes.includes(index)) {
-      indexes.splice(
-        indexes.findIndex(ind => ind === index),
-        1
-      )
-    } else {
-      indexes.push(index)
-    }
-    if (activeIndex.length < indexes.length) setNewest(index)
-    else setNewest(null)
-    setIndex(indexes)
-  }
-
-  const createPanels = () => [
+  const panels = [
     {
-      key: 0,
-      title: {
-        content: (
-          <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-            Credit accumulation (for {filteredStudents.length} students)
-          </span>
-        ),
-      },
-      onTitleClick: () => handleClick(0),
-      content: {
-        content: (
-          <div ref={creditGainRef}>
-            <CreditAccumulationGraphHighCharts students={filteredStudents} customPopulation />
-          </div>
-        ),
-      },
+      title: `Credit accumulation (for ${filteredStudents.length} students)`,
+      content: <CreditAccumulationGraphHighCharts students={filteredStudents} customPopulation />,
     },
     {
-      key: 1,
-      title: {
-        content: (
-          <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-            Programme distribution
-          </span>
-        ),
-      },
-      onTitleClick: () => handleClick(1),
-      content: {
-        content: (
-          <div ref={programmeRef}>
-            <InfoBox content={infotooltips.PopulationStatistics.ProgrammeDistributionCoursePopulation} />
-            <CustomPopulationProgrammeDist
-              samples={filteredStudents}
-              selectedStudents={_.map(filteredStudents, 'studentNumber')}
-              studentData={studentData}
-            />
-          </div>
-        ),
-      },
+      title: 'Programme distribution',
+      content: (
+        <div>
+          <InfoBox content={infotooltips.PopulationStatistics.ProgrammeDistributionCoursePopulation} />
+          <CustomPopulationProgrammeDist
+            samples={filteredStudents}
+            selectedStudents={_.map(filteredStudents, 'studentNumber')}
+            studentData={studentData}
+          />
+        </div>
+      ),
     },
     {
-      key: 2,
-      title: {
-        content: (
-          <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-            Courses of population
-          </span>
-        ),
-      },
-      onTitleClick: () => handleClick(2),
-      content: {
-        content: (
-          <div ref={coursesRef}>
-            <InfoBox content={infotooltips.PopulationStatistics.CoursesOfPopulation} />
-            <Form style={{ padding: '4px 4px 4px 8px' }}>
-              <Form.Field inline>
-                <label>Limit to courses where student number is at least</label>
-                <Input
-                  value={studentAmountLimit}
-                  onChange={e => onStudentAmountLimitChange(e.target.value)}
-                  style={{ width: '70px' }}
-                />
-              </Form.Field>
-            </Form>
-            <PopulationCourseStatsFlat
-              filteredStudents={filteredStudents}
-              courses={courseStats}
-              studentAmountLimit={studentAmountLimit}
-            />
-          </div>
-        ),
-      },
+      title: 'Courses of population',
+      content: (
+        <>
+          <InfoBox content={infotooltips.PopulationStatistics.CoursesOfPopulation} />
+          <Form style={{ padding: '4px 4px 4px 8px' }}>
+            <Form.Field inline>
+              <label>Limit to courses where student number is at least</label>
+              <Input
+                value={studentAmountLimit}
+                onChange={e => onStudentAmountLimitChange(e.target.value)}
+                style={{ width: '70px' }}
+              />
+            </Form.Field>
+          </Form>
+          <PopulationCourseStatsFlat
+            filteredStudents={filteredStudents}
+            courses={courseStats}
+            studentAmountLimit={studentAmountLimit}
+          />
+        </>
+      ),
     },
     {
-      key: 3,
-      title: {
-        content: (
-          <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-            Students ({filteredStudents.length})
-          </span>
-        ),
-      },
-      onTitleClick: () => handleClick(3),
-      content: {
-        content: (
-          <div ref={studentRef}>
-            <PopulationStudents
-              variant="customPopulation"
-              filteredStudents={filteredStudents}
-              dataExport={<UnihowDataExport students={filteredStudents} />}
-              customPopulationProgramme={associatedProgramme || ''}
-            />
-          </div>
-        ),
-      },
+      title: `Students (${filteredStudents.length})`,
+      content: (
+        <PopulationStudents
+          variant="customPopulation"
+          filteredStudents={filteredStudents}
+          dataExport={<UnihowDataExport students={filteredStudents} />}
+          customPopulationProgramme={associatedProgramme || ''}
+        />
+      ),
     },
   ]
 
@@ -293,7 +219,7 @@ const CustomPopulationContent = ({
                 )}
               </Header>
             </div>
-            <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={createPanels()} />
+            <PanelView panels={panels} viewTitle="custompopulation" />
           </div>
         </Segment>
       ) : (
