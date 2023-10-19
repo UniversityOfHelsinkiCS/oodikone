@@ -9,6 +9,9 @@ Studyright.init(
       primaryKey: true,
       type: STRING,
     },
+    acual_studyrightid: {
+      type: STRING,
+    },
     startdate: {
       type: DATE,
     },

@@ -99,6 +99,9 @@ Transfer.belongsTo(ElementDetail, { as: 'source', foreignKey: 'sourcecode' })
 Transfer.belongsTo(ElementDetail, { as: 'target', foreignKey: 'targetcode' })
 
 Enrollment.belongsTo(Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
+Enrollment.belongsTo(Studyright, { foreignKey: 'studyright_id', targetKey: 'studyrightid', constraints: false })
+Studyright.hasMany(Enrollment, { foreignKey: 'studyright_id', constraints: false })
+
 Student.hasMany(Enrollment, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
 Enrollment.belongsTo(Course, { foreignKey: 'course_id' })
 Course.hasMany(Enrollment, { foreignKey: 'course_id' })

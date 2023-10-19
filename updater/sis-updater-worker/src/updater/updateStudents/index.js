@@ -19,7 +19,7 @@ const {
   getCourseUnitsByCodes,
   selectFromActiveSnapshotsByIds,
 } = require('../../db')
-const { getEducation, getUniOrgId, getEducationType, loadMapsIfNeeded } = require('../shared')
+const { getEducation, getUniOrgId, loadMapsIfNeeded } = require('../shared')
 const {
   studentMapper,
   mapTeacher,
@@ -34,23 +34,6 @@ const { dbConnections } = require('../../db/connection')
 const { isBaMa } = require('../../utils')
 const { updateStudyRights, updateStudyRightElements, updateElementDetails } = require('./studyRightUpdaters')
 const { getAttainmentsToBeExcluded } = require('./excludedPartialAttainments')
-
-// Check if studyright is degree leading or not
-const studyRightHasDegreeEducation = studyRight => {
-  const education = getEducation(studyRight.education_id)
-  if (!education) return false
-  const educationType = getEducationType(education.education_type)
-  if (!educationType) return false
-  if (
-    educationType.id === 'urn:code:education-type:non-degree-education:exchange-studies-postgraduate' ||
-    educationType.id === 'urn:code:education-type:non-degree-education:exchange-studies'
-  ) {
-    return true
-  }
-  // continuous education
-  if (educationType.id === 'urn:code:education-type:non-degree-education:updating-training') return true
-  return educationType.parent_id !== 'urn:code:education-type:non-degree-education'
-}
 
 // Accepted selection path is not available when degree programme doesn't have
 // studytrack or major subject. This is a known bug on SIS and has been reported
@@ -70,7 +53,6 @@ const addSelectionPathIfNeeded = snapshot =>
 const parseStudyrightSnapshots = studyrightSnapshots =>
   studyrightSnapshots.reduce((parsed, current) => {
     if (current.document_state !== 'ACTIVE') return parsed
-    if (!studyRightHasDegreeEducation(current)) return parsed
     parsed.push(addSelectionPathIfNeeded(current))
     return parsed
   }, [])

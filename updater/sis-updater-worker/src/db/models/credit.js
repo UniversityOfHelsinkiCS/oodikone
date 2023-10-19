@@ -84,10 +84,6 @@ Credit.init(
     studyright_id: {
       type: STRING,
       allowNull: true,
-      references: {
-        model: 'studyright',
-        key: 'id',
-      },
     },
   },
   {

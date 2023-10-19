@@ -97,6 +97,12 @@ Studyright.hasMany(Transfer, { foreignKey: 'studyrightid', sourceKey: 'studyrigh
 Transfer.belongsTo(ElementDetail, { as: 'source', foreignKey: 'sourcecode' })
 Transfer.belongsTo(ElementDetail, { as: 'target', foreignKey: 'targetcode' })
 
+Student.hasMany(Enrollment, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
+Enrollment.belongsTo(Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
+
+Enrollment.belongsTo(Studyright, { foreignKey: 'studyright_id', targetKey: 'studyrightid', constraints: false })
+Studyright.hasMany(Enrollment, { foreignKey: 'studyright_id', constraints: false })
+
 ProgrammeModule.belongsToMany(ProgrammeModule, {
   as: 'parents',
   through: ProgrammeModuleChild,
@@ -110,9 +116,6 @@ ProgrammeModule.belongsToMany(ProgrammeModule, {
 })
 
 Organization.hasMany(Organization, { foreignKey: 'parent_id', as: 'children' })
-
-Enrollment.belongsTo(Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
-Student.hasMany(Enrollment, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
 
 module.exports = {
   Organization,
