@@ -288,7 +288,6 @@ const insertParentColumn = (rootColumns, childColumn, props = {}) => {
   return newParent
 }
 
-// eslint-disable-next-line import/prefer-default-export
 export const insertGroupColumns = (columns, groupDepth, toggleGroup, expandedGroups) => {
   if (groupDepth > 0) {
     const firstColumn = findFirstLeafColumn(columns)

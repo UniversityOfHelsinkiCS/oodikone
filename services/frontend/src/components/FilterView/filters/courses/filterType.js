@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/prefer-default-export
 export const FilterType = {
   ALL: 'ALL',
   PASSED: 'PASSED',

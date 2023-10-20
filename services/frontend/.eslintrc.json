@@ -42,6 +42,7 @@
     "react/jsx-no-constructed-context-values": "off",
     "react/jsx-no-useless-fragment": "off",
     "import/no-unresolved": "off",
+    "import/prefer-default-export": "off",
     "react/jsx-no-bind": "error",
     "prefer-object-spread/prefer-object-spread": "error",
     "babel/no-invalid-this": "error",
