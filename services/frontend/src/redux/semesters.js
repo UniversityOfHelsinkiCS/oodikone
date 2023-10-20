@@ -1,5 +1,3 @@
-/* eslint-disable import/prefer-default-export */
-
 import { RTKApi } from 'apiConnection'
 
 const semestersApi = RTKApi.injectEndpoints({
