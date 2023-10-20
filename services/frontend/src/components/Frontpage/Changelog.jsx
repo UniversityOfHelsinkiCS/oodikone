@@ -32,7 +32,7 @@ const Changelog = () => {
     <div>
       <Header as="h1">Changelog</Header>
       {itemsToShow.map(release => (
-        <div>
+        <div key={release.time}>
           <Divider section />
           <ReactMarkdown children={getReleaseString(release)} />
         </div>
