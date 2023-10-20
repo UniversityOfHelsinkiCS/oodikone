@@ -22,12 +22,7 @@ const CustomPopulationProgrammeDist = ({
   const [tableRows, setRows] = useState([])
 
   useEffect(() => {
-    if (
-      !populationStatistics ||
-      !Object.keys(populationStatistics).length > 0 ||
-      !studentData ||
-      !Object.keys(studentData).length
-    ) {
+    if (!Object.keys(populationStatistics ?? {}).length && !Object.keys(studentData ?? {})) {
       return
     }
 
