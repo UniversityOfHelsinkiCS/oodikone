@@ -1,23 +1,19 @@
 import React, { useEffect, useState, useMemo } from 'react'
-import { withRouter } from 'react-router-dom'
-import { connect } from 'react-redux'
 import moment from 'moment'
 import _ from 'lodash'
 import { Segment, Header, Form, Input } from 'semantic-ui-react'
 import InfoBox from 'components/Info/InfoBox'
 import PopulationCourseStatsFlat from 'components/PopulationCourseStats/PopulationCourseStatsFlat'
 import PanelView from 'components/common/PanelView'
-import { getCoursePopulation } from '../../redux/populations'
-import { getSingleCourseStats } from '../../redux/singleCourseStats'
-import { useGetStudentListCourseStatisticsQuery } from '../../redux/populationCourses'
-import { getFaculties } from '../../redux/faculties'
-import { useGetSemestersQuery } from '../../redux/semesters'
-import { getElementDetails } from '../../redux/elementdetails'
+import { useGetPopulationStatisticsByCourseQuery } from 'redux/populations'
+import { useGetSingleCourseStatsQuery } from 'redux/singleCourseStats'
+import { useGetStudentListCourseStatisticsQuery } from 'redux/populationCourses'
+import { useGetSemestersQuery } from 'redux/semesters'
 import PopulationStudents from '../PopulationStudents'
-import CoursePopulationGradeDist from './CoursePopulationGradeDist'
-import CoursePopulationLanguageDist from './CoursePopulationLanguageDist'
-import CoursePopulationCreditGainTable from './CoursePopulationCreditGainTable'
-import CustomPopulationProgrammeDist from '../CustomPopulation/CustomPopulationProgrammeDist'
+import { CoursePopulationGradeDist } from './CoursePopulationGradeDist'
+import { CoursePopulationLanguageDist } from './CoursePopulationLanguageDist'
+import { CoursePopulationCreditGainTable } from './CoursePopulationCreditGainTable'
+import { CustomPopulationProgrammeDist } from '../CustomPopulation/CustomPopulationProgrammeDist'
 import ProgressBar from '../ProgressBar'
 import { getStudentToTargetCourseDateMap, getUnifyTextIn } from '../../common'
 import { useProgress, useTitle } from '../../common/hooks'
@@ -43,41 +39,45 @@ const NO_PROGRAMME = {
   startdate: '',
 }
 
-const CoursePopulation = ({
-  getCoursePopulationDispatch,
-  getSingleCourseStatsDispatch,
-  getElementDetails,
-  studentData,
-  pending,
-  history,
-  courseData,
-  getFacultiesDispatch,
-  unifyCourses,
-}) => {
+const CoursePopulation = ({ history }) => {
   const { getTextIn } = useLanguage()
   const [codes, setCodes] = useState([])
-  const [headerYears, setYears] = useState('')
-  const [dateFrom, setDateFrom] = useState(null)
-  const [dateTo, setDateTo] = useState(null)
   useTitle('Course population')
 
-  const { onProgress, progress } = useProgress(pending && !studentData.students)
+  const { coursecodes, from, to, separate, unifyCourses, years, years2 } = queryParamsFromUrl(history.location)
+  const { data: populationStatistics, isFetching } = useGetPopulationStatisticsByCourseQuery({
+    coursecodes,
+    from,
+    to,
+    separate,
+    unifyCourses,
+  })
+
+  useEffect(() => {
+    const parsedCourseCodes = JSON.parse(coursecodes)
+    setCodes(parsedCourseCodes)
+  }, [coursecodes])
+
+  const { progress } = useProgress(isFetching)
   const studentToTargetCourseDateMap = useMemo(
-    () => getStudentToTargetCourseDateMap(studentData.students ? studentData.students : [], codes),
-    [studentData.students, codes]
+    () => getStudentToTargetCourseDateMap(populationStatistics?.students ?? [], codes),
+    [populationStatistics?.students, codes]
   )
 
-  const { data: courseStatistics } = useGetStudentListCourseStatisticsQuery({
-    studentNumbers: studentData.students ? studentData.students.map(student => student.studentNumber) : [],
-  })
+  const { data: courseStatistics } = useGetStudentListCourseStatisticsQuery(
+    { studentNumbers: populationStatistics ? populationStatistics.students.map(student => student.studentNumber) : [] },
+    { skip: !populationStatistics }
+  )
 
   const { data: semesters = {} } = useGetSemestersQuery()
 
-  useEffect(() => {
-    getElementDetails()
-  }, [])
+  const { data: [courseData = undefined] = [] } = useGetSingleCourseStatsQuery(
+    { courseCodes: codes, separate },
+    { skip: codes.length === 0 }
+  )
 
   const getFromToDates = (from, to, separate) => {
+    if (!semesters.years || !semesters.semesters) return {}
     const targetProp = separate ? 'semestercode' : 'yearcode'
     const data = separate ? semesters.semesters : semesters.years
     const dataValues = Object.values(data)
@@ -89,40 +89,15 @@ const CoursePopulation = ({
     }
   }
 
-  useEffect(() => {
-    if (semesters.years && semesters.semesters) {
-      const { coursecodes, from, to, years, years2, separate, unifyCourses } = queryParamsFromUrl(history.location)
-      const parsedCourseCodes = JSON.parse(coursecodes)
-      getCoursePopulationDispatch({ coursecodes, from, to, onProgress, separate, unifyCourses })
-      getSingleCourseStatsDispatch({
-        fromYear: from,
-        toYear: to,
-        courseCodes: parsedCourseCodes,
-        separate,
-      })
-      setCodes(parsedCourseCodes)
-      if (years) {
-        setYears(years)
-      } else {
-        setYears(years2)
-      }
-      getFromToDates(from, to, separate)
-      getFacultiesDispatch()
+  const { dateFrom, dateTo } = getFromToDates(from, to, separate ? JSON.parse(separate) : false)
 
-      const { dateFrom, dateTo } = getFromToDates(from, to, separate ? JSON.parse(separate) : false)
-      setDateFrom(dateFrom)
-      setDateTo(dateTo)
-    }
-  }, [semesters])
-
-  const avoin = getUnifyTextIn(unifyCourses)
-  const header = courseData ? `${getTextIn(courseData.name)} ${headerYears} ${avoin}` : null
+  const header = courseData
+    ? `${getTextIn(courseData[unifyCourses].name)} ${years || years2} ${getUnifyTextIn(unifyCourses)}`
+    : null
 
   const subHeader = codes.join(', ')
 
-  if (!dateFrom || !dateTo) return null
-
-  if (!studentData.students) {
+  if (!populationStatistics || !semesters) {
     return (
       <Segment className="contentSegment">
         <ProgressBar progress={progress} />
@@ -137,11 +112,11 @@ const CoursePopulation = ({
         <div>
           <InfoBox content={infotooltips.PopulationStatistics.GradeDistributionCoursePopulation} />
           <CoursePopulationGradeDist
-            selectedStudents={filtered.map(s => s.studentNumber)}
+            singleCourseStats={courseData}
             from={dateFrom}
             to={dateTo}
-            samples={filtered}
-            codes={codes}
+            students={filtered}
+            courseCodes={codes}
           />
         </div>
       ),
@@ -162,27 +137,27 @@ const CoursePopulation = ({
           <InfoBox content={infotooltips.PopulationStatistics.ProgrammeDistributionCoursePopulation} />
           <CustomPopulationProgrammeDist
             studentToTargetCourseDateMap={studentToTargetCourseDateMap}
-            samples={filtered}
+            students={filtered}
             coursecode={codes}
-            selectedStudents={filtered.map(s => s.studentNumber)}
+            studentData={populationStatistics}
           />
         </div>
       ),
     },
     {
       title: 'Courses of population',
-      content: <CustomPopulationCoursesWrapper filteredStudents={filtered} />,
+      content: <CustomPopulationCoursesWrapper courseStatistics={courseStatistics} filteredStudents={filtered} />,
     },
     {
       title: 'Credit gains',
       content: (
         <CoursePopulationCreditGainTable
           studentToTargetCourseDateMap={studentToTargetCourseDateMap}
-          selectedStudents={filtered.map(s => s.studentNumber)}
-          samples={filtered}
+          students={filtered}
           codes={codes}
           from={dateFrom}
           to={dateTo}
+          populationStatistics={populationStatistics}
         />
       ),
     },
@@ -201,12 +176,10 @@ const CoursePopulation = ({
     },
   ]
 
-  const courses = JSON.parse(queryParamsFromUrl(history.location).coursecodes)
-
   const studyRightPredicate = (student, sre) => {
     const date = _.chain(student)
       .get('courses')
-      .filter(c => courses.includes(c.course_code))
+      .filter(c => codes.includes(c.course_code))
       .map('date')
       .max()
       .value()
@@ -235,7 +208,7 @@ const CoursePopulation = ({
           ],
         }),
         gradeFilter({
-          courseCodes: courses,
+          courseCodes: codes,
           from: dateFrom,
           to: dateTo,
         }),
@@ -246,7 +219,7 @@ const CoursePopulation = ({
       initialOptions={{
         [programmeFilter.key]: { mode: 'attainment', selectedProgrammes: [] },
       }}
-      students={studentData.students ?? []}
+      students={populationStatistics.students ?? []}
     >
       {filtered => (
         <div className="segmentContainer">
@@ -304,21 +277,4 @@ const CustomPopulationCoursesWrapper = ({ filteredStudents }) => {
   )
 }
 
-const mapStateToProps = ({ singleCourseStats, populations, courseSearch }) => {
-  return {
-    studentData: populations.data,
-    pending: populations.pending,
-    courseData: singleCourseStats.stats?.[courseSearch.openOrReqular],
-    unifyCourses: courseSearch.openOrReqular,
-    elementDetails: populations?.data?.elementdetails?.data,
-  }
-}
-
-export default withRouter(
-  connect(mapStateToProps, {
-    getCoursePopulationDispatch: getCoursePopulation,
-    getSingleCourseStatsDispatch: getSingleCourseStats,
-    getFacultiesDispatch: getFaculties,
-    getElementDetails,
-  })(CoursePopulation)
-)
+export default CoursePopulation

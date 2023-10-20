@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { Segment, Header, Message, Label, Form, Input } from 'semantic-ui-react'
-import _ from 'lodash'
 import { useGetSemestersQuery } from 'redux/semesters'
 import { useFilteredAndFormattedElementDetails } from 'redux/elementdetails'
 
@@ -13,7 +12,7 @@ import { useProgress, useTitle } from '../../common/hooks'
 import infotooltips from '../../common/InfoToolTips'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import PopulationStudents from '../PopulationStudents'
-import CustomPopulationProgrammeDist from './CustomPopulationProgrammeDist'
+import { CustomPopulationProgrammeDist } from './CustomPopulationProgrammeDist'
 import ProgressBar from '../ProgressBar'
 import InfoBox from '../Info/InfoBox'
 import FilterView from '../FilterView'
@@ -139,11 +138,7 @@ const CustomPopulationContent = ({
       content: (
         <div>
           <InfoBox content={infotooltips.PopulationStatistics.ProgrammeDistributionCoursePopulation} />
-          <CustomPopulationProgrammeDist
-            samples={filteredStudents}
-            selectedStudents={_.map(filteredStudents, 'studentNumber')}
-            studentData={studentData}
-          />
+          <CustomPopulationProgrammeDist students={filteredStudents} studentData={studentData} />
         </div>
       ),
     },

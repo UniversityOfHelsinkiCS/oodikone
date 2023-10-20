@@ -122,7 +122,7 @@ const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
     )
   }
 
-  if (variant === 'customPopulation') {
+  if (variant === 'customPopulation' || variant === 'coursePopulation') {
     return (
       <CustomPopulationGeneralTabContainer
         group={studyGuidanceGroup}
