@@ -1,0 +1,98 @@
+import moment from 'moment'
+import React from 'react'
+
+const shorten = (text, maxLength) => (text.length > maxLength ? `${text.substring(0, maxLength)} ... ` : text)
+
+export const getColumns = (getTextIn, faculties, mode, facultyMap) => {
+  const columns = [
+    {
+      key: 'course-name',
+      title: 'Course',
+      getRowVal: row => row.code ?? 'No faculty found because enrollment date missing.',
+      getRowContent: row => (
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <b>{row.code ?? 'No faculty'}</b>
+          <i style={{ color: 'gray', fontWeight: 'normal' }}>{row.name && shorten(getTextIn(row.name), 60)}</i>
+        </div>
+      ),
+    },
+    ...faculties.map(facultyCode => ({
+      key: facultyCode ?? 'no-faculty',
+      title: facultyCode ?? 'No faculty',
+      headerProps: { title: getTextIn(facultyMap[facultyCode]) },
+      getRowVal: row => {
+        const stats = row.facultyStats[facultyCode]
+        if (!stats) return 0
+        if (mode === 'total') {
+          const result = (stats.completed ?? 0) + (stats.notCompleted ?? 0)
+          return result
+        }
+        return stats[mode] ?? 0
+      },
+      filterable: false,
+    })),
+    {
+      key: 'all',
+      title: 'Total',
+      getRowVal: row => {
+        const objVals = Object.values(row.facultyStats)
+        const arr = objVals.map(stat => {
+          if (mode === 'total') {
+            const notCompleted = stat.notCompleted ?? 0
+            const completed = stat.completed ?? 0
+            return notCompleted + completed
+          }
+          return stat[mode]
+        })
+        return arr.reduce((sum, cur) => {
+          if (cur === undefined) return sum
+          return cur + sum
+        }, 0)
+      },
+    },
+  ]
+  return columns
+}
+
+export const getCourseFaculties = attempts => {
+  const map = attempts.reduce((obj, cur) => {
+    if (!obj[cur.courseCode]) {
+      obj[cur.courseCode] = {}
+    }
+    if (!obj[cur.courseCode][cur.faculty]) {
+      obj[cur.courseCode][cur.faculty] = {}
+    }
+    const stats = obj[cur.courseCode][cur.faculty]
+    const field = cur.completed ? 'completed' : 'notCompleted'
+    if (!stats[field]) {
+      stats[field] = 1
+    } else {
+      stats[field] += 1
+    }
+    return obj
+  }, {})
+  return map
+}
+
+export const calculateTotals = coursesWithFaculties => {
+  const facultyStats = {}
+  coursesWithFaculties.forEach(course => {
+    Object.entries(course.facultyStats).forEach(([faculty, stats]) => {
+      if (!facultyStats[faculty]) {
+        facultyStats[faculty] = { notCompleted: 0, completed: 0 }
+      }
+      const oldStats = facultyStats[faculty]
+      if (!oldStats.notCompleted) oldStats.notCompleted = 0
+      if (!oldStats.completed) oldStats.completed = 0
+      oldStats.notCompleted += stats.notCompleted ?? 0
+      oldStats.completed += stats.completed ?? 0
+    })
+  })
+  return { code: 'TOTAL', name: { en: 'All courses total' }, facultyStats }
+}
+
+export const filterAttemptsByDates = (date, { startDate, endDate }) => {
+  const start = startDate.startdate ?? moment(new Date('1900-1-1'))
+  const end = endDate.enddate ?? moment(new Date('2100-01-01'))
+  return moment(new Date(date)).isBetween(start, end)
+}
