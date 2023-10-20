@@ -22,56 +22,63 @@ const CustomPopulationProgrammeDist = ({
   const [tableRows, setRows] = useState([])
 
   useEffect(() => {
-    if (Object.keys(populationStatistics).length > 0 || Object.keys(studentData).length > 0) {
-      const allProgrammes = {}
-      const filteredSamples = samples.filter(student => selectedStudents.includes(student.studentNumber))
+    if (
+      !populationStatistics ||
+      !Object.keys(populationStatistics).length > 0 ||
+      !studentData ||
+      !Object.keys(studentData).length
+    ) {
+      return
+    }
 
-      filteredSamples.forEach(student => {
-        let programme = getNewestProgramme(
+    const allProgrammes = {}
+    const filteredSamples = samples.filter(student => selectedStudents.includes(student.studentNumber))
+
+    filteredSamples.forEach(student => {
+      let programme = getNewestProgramme(
+        student.studyrights,
+        student.studentNumber,
+        studentToTargetCourseDateMap,
+        populationStatistics.elementdetails?.data ?? studentData.elementdetails?.data
+      )
+      if (programme && programme.code === '00000' && coursecode) {
+        const filteredEnrollments = (student.enrollments || [])
+          // eslint-disable-next-line camelcase
+          .filter(({ course_code }) => coursecode.includes(course_code))
+          .sort((a, b) => new Date(b.enrollment_date_time) - new Date(a.enrollment_date_time))
+        programme = getNewestProgramme(
           student.studyrights,
           student.studentNumber,
-          studentToTargetCourseDateMap,
+          { [student.studentNumber]: (filteredEnrollments[0] || {}).enrollment_date_time },
           populationStatistics.elementdetails?.data ?? studentData.elementdetails?.data
         )
-        if (programme && programme.code === '00000' && coursecode) {
-          const filteredEnrollments = (student.enrollments || [])
-            // eslint-disable-next-line camelcase
-            .filter(({ course_code }) => coursecode.includes(course_code))
-            .sort((a, b) => new Date(b.enrollment_date_time) - new Date(a.enrollment_date_time))
-          programme = getNewestProgramme(
-            student.studyrights,
-            student.studentNumber,
-            { [student.studentNumber]: (filteredEnrollments[0] || {}).enrollment_date_time },
-            populationStatistics.elementdetails?.data ?? studentData.elementdetails?.data
-          )
-        }
-        if (programme) {
-          if (allProgrammes[programme.code]) {
-            allProgrammes[programme.code].students.push({ studentnumber: student.studentNumber })
-          } else {
-            allProgrammes[programme.code] = { programme, students: [] }
-            allProgrammes[programme.code].students.push({ studentnumber: student.studentNumber })
-          }
+      }
+      if (programme) {
+        if (allProgrammes[programme.code]) {
+          allProgrammes[programme.code].students.push({ studentnumber: student.studentNumber })
         } else {
-          if (!allProgrammes['00000']) {
-            allProgrammes['00000'] = { programme: { name: { en: 'No programme' } }, students: [] }
-          }
-          allProgrammes['00000'].students.push({ studentnumber: student.studentnumber })
+          allProgrammes[programme.code] = { programme, students: [] }
+          allProgrammes[programme.code].students.push({ studentnumber: student.studentNumber })
         }
-      })
-      const rows = Object.entries(allProgrammes).map(([code, { programme, students }]) => [
-        getTextIn(programme.name),
-        code,
-        students.length,
-        <Progress
-          style={{ margin: '0px' }}
-          percent={Math.round((students.length / selectedStudents.length) * 100)}
-          progress
-        />,
-      ])
-      const sortedRows = rows.sort((a, b) => b[2] - a[2])
-      setRows(sortedRows)
-    }
+      } else {
+        if (!allProgrammes['00000']) {
+          allProgrammes['00000'] = { programme: { name: { en: 'No programme' } }, students: [] }
+        }
+        allProgrammes['00000'].students.push({ studentnumber: student.studentnumber })
+      }
+    })
+    const rows = Object.entries(allProgrammes).map(([code, { programme, students }]) => [
+      getTextIn(programme.name),
+      code,
+      students.length,
+      <Progress
+        style={{ margin: '0px' }}
+        percent={Math.round((students.length / selectedStudents.length) * 100)}
+        progress
+      />,
+    ])
+    const sortedRows = rows.sort((a, b) => b[2] - a[2])
+    setRows(sortedRows)
   }, [selectedStudents])
 
   const headers = ['Programme', 'Code', `Students (all=${selectedStudents.length})`, 'Percentage of population']
