@@ -1,59 +1,46 @@
-import React, { useState, useEffect } from 'react'
-import { connect } from 'react-redux'
+import React from 'react'
 import { Progress, Table } from 'semantic-ui-react'
 import { intersection, orderBy } from 'lodash'
-import { shape, bool, arrayOf, string, number } from 'prop-types'
 import moment from 'moment'
 import { getHighestGradeOfCourseBetweenRange } from '../../../common'
 import ExternalGradeFilterToggle from './ExternalGradeFilterToggle'
 
-const CoursePopulationCreditDist = ({ singleCourseStats, pending, selectedStudents, samples, codes, from, to }) => {
-  const [courseGrades, setCourseGrades] = useState([])
+export const CoursePopulationGradeDist = ({ singleCourseStats, students, courseCodes, from, to }) => {
+  const courseGrades = []
 
-  useEffect(() => {
-    if (samples && singleCourseStats?.unifyStats?.alternatives) {
-      const filteredGradeArray = []
-      const grades = {}
+  if (students && singleCourseStats?.unifyStats?.alternatives) {
+    const grades = {}
 
-      samples.forEach(student => {
-        const courses = student.courses.filter(c => codes.includes(c.course_code))
-        const hasEnrollment =
-          student.enrollments?.some(
-            e => codes.includes(e.course_code) && moment(e.enrollment_date_time).isBetween(moment(from), moment(to))
-          ) ?? false
-        const highestGrade = getHighestGradeOfCourseBetweenRange(courses, from, to)
-        if (!highestGrade && hasEnrollment) {
-          if (!grades['No grade']) grades['No grade'] = []
-          grades['No grade'].push(student.studentNumber)
-        }
-
-        if (highestGrade) {
-          if (!grades[highestGrade.grade]) {
-            grades[highestGrade.grade] = []
-          }
-          grades[highestGrade.grade].push(student.studentNumber)
-        }
-      })
-
-      Object.keys(grades).forEach(grade => {
-        const filteredGrades = intersection(selectedStudents, grades[grade])
-        filteredGradeArray.push({ grade, amount: filteredGrades.length })
-      })
-
-      setCourseGrades(filteredGradeArray)
-    }
-  }, [pending, selectedStudents])
-
-  const sortedCourseGrades = orderBy(
-    courseGrades,
-    e => {
-      if (Number(e.grade)) {
-        return `_${e.grade}`
+    students.forEach(student => {
+      const courses = student.courses.filter(c => courseCodes.includes(c.course_code))
+      const hasEnrollment =
+        student.enrollments?.some(
+          e => courseCodes.includes(e.course_code) && moment(e.enrollment_date_time).isBetween(moment(from), moment(to))
+        ) ?? false
+      const highestGrade = getHighestGradeOfCourseBetweenRange(courses, from, to)
+      if (!highestGrade && hasEnrollment) {
+        if (!grades['No grade']) grades['No grade'] = []
+        grades['No grade'].push(student.studentNumber)
       }
-      return e.grade
-    },
-    ['desc']
-  )
+
+      if (highestGrade) {
+        if (!grades[highestGrade.grade]) {
+          grades[highestGrade.grade] = []
+        }
+        grades[highestGrade.grade].push(student.studentNumber)
+      }
+    })
+
+    Object.keys(grades).forEach(grade => {
+      const filteredGrades = intersection(
+        students.map(s => s.studentNumber),
+        grades[grade]
+      )
+      courseGrades.push({ grade, amount: filteredGrades.length })
+    })
+  }
+
+  const sortedCourseGrades = orderBy(courseGrades, e => (Number(e.grade) ? `_${e.grade}` : e.grade), ['desc'])
 
   return (
     <Table celled>
@@ -63,8 +50,7 @@ const CoursePopulationCreditDist = ({ singleCourseStats, pending, selectedStuden
           <Table.HeaderCell>Grades</Table.HeaderCell>
           <Table.HeaderCell>
             Number of Students
-            <br />
-            <span style={{ fontWeight: 100 }}>(n={selectedStudents.length})</span>
+            <div style={{ fontWeight: 100 }}>(n={students.length})</div>
           </Table.HeaderCell>
           <Table.HeaderCell>Percentage of Population</Table.HeaderCell>
         </Table.Row>
@@ -79,13 +65,13 @@ const CoursePopulationCreditDist = ({ singleCourseStats, pending, selectedStuden
             <Table.Cell>{grade.grade}</Table.Cell>
             <Table.Cell>{grade.amount}</Table.Cell>
             <Table.Cell>
-              {selectedStudents.length && (
-                <Progress
-                  percent={Math.round((grade.amount / selectedStudents.length) * 100)}
-                  progress
-                  style={{ margin: 0 }}
-                />
-              )}
+              <Progress
+                value={grade.amount}
+                total={students.length}
+                progress="percent"
+                precision={0}
+                style={{ margin: 0 }}
+              />
             </Table.Cell>
           </Table.Row>
         ))}
@@ -93,20 +79,3 @@ const CoursePopulationCreditDist = ({ singleCourseStats, pending, selectedStuden
     </Table>
   )
 }
-
-CoursePopulationCreditDist.propTypes = {
-  singleCourseStats: shape({}).isRequired,
-  pending: bool.isRequired,
-  selectedStudents: arrayOf(string).isRequired,
-  samples: arrayOf(shape({})).isRequired,
-  codes: arrayOf(string).isRequired,
-  from: number.isRequired,
-  to: number.isRequired,
-}
-
-const mapStateToProps = ({ singleCourseStats }) => ({
-  singleCourseStats: singleCourseStats.stats,
-  pending: singleCourseStats.pending,
-})
-
-export default connect(mapStateToProps)(CoursePopulationCreditDist)

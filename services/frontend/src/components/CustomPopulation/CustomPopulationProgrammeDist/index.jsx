@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { connect } from 'react-redux'
 import { Progress } from 'semantic-ui-react'
-import { arrayOf, string, shape } from 'prop-types'
 import SearchResultTable from '../../SearchResultTable'
 import { getNewestProgramme } from '../../../common'
 import useLanguage from '../../LanguagePicker/useLanguage'
@@ -9,32 +7,21 @@ import useFilters from '../../FilterView/useFilters'
 import { isProgrammeSelected, toggleProgrammeSelection } from '../../FilterView/filters/programmes'
 import FilterToggleIcon from '../../FilterToggleIcon'
 
-const CustomPopulationProgrammeDist = ({
-  samples,
-  selectedStudents,
-  studentToTargetCourseDateMap,
-  populationStatistics,
-  coursecode,
-  studentData,
-}) => {
+export const CustomPopulationProgrammeDist = ({ students, studentToTargetCourseDateMap, coursecode, studentData }) => {
   const { getTextIn } = useLanguage()
 
   const [tableRows, setRows] = useState([])
 
   useEffect(() => {
-    if (!Object.keys(populationStatistics ?? {}).length && !Object.keys(studentData ?? {})) {
-      return
-    }
-
+    if (Object.keys(studentData ?? {}).length === 0) return
     const allProgrammes = {}
-    const filteredSamples = samples.filter(student => selectedStudents.includes(student.studentNumber))
 
-    filteredSamples.forEach(student => {
+    students.forEach(student => {
       let programme = getNewestProgramme(
         student.studyrights,
         student.studentNumber,
         studentToTargetCourseDateMap,
-        populationStatistics.elementdetails?.data ?? studentData.elementdetails?.data
+        studentData.elementdetails?.data
       )
       if (programme && programme.code === '00000' && coursecode) {
         const filteredEnrollments = (student.enrollments || [])
@@ -45,7 +32,7 @@ const CustomPopulationProgrammeDist = ({
           student.studyrights,
           student.studentNumber,
           { [student.studentNumber]: (filteredEnrollments[0] || {}).enrollment_date_time },
-          populationStatistics.elementdetails?.data ?? studentData.elementdetails?.data
+          studentData.elementdetails?.data
         )
       }
       if (programme) {
@@ -62,21 +49,23 @@ const CustomPopulationProgrammeDist = ({
         allProgrammes['00000'].students.push({ studentnumber: student.studentnumber })
       }
     })
-    const rows = Object.entries(allProgrammes).map(([code, { programme, students }]) => [
+    const rows = Object.entries(allProgrammes).map(([code, { programme, students: programmeStudents }]) => [
       getTextIn(programme.name),
       code,
-      students.length,
+      programmeStudents.length,
       <Progress
-        style={{ margin: '0px' }}
-        percent={Math.round((students.length / selectedStudents.length) * 100)}
-        progress
+        value={programmeStudents.length}
+        total={students.length}
+        progress="percent"
+        precision={0}
+        style={{ margin: 0 }}
       />,
     ])
     const sortedRows = rows.sort((a, b) => b[2] - a[2])
     setRows(sortedRows)
-  }, [selectedStudents])
+  }, [students])
 
-  const headers = ['Programme', 'Code', `Students (all=${selectedStudents.length})`, 'Percentage of population']
+  const headers = ['Programme', 'Code', `Students (all=${students.length})`, 'Percentage of population']
 
   return (
     <SearchResultTable
@@ -100,22 +89,3 @@ const ProgrammeFilterToggleCell = ({ programme }) => {
     </span>
   )
 }
-
-CustomPopulationProgrammeDist.defaultProps = {
-  studentToTargetCourseDateMap: null,
-}
-
-CustomPopulationProgrammeDist.propTypes = {
-  samples: arrayOf(shape({})).isRequired,
-  selectedStudents: arrayOf(string).isRequired,
-  studentToTargetCourseDateMap: shape({}),
-  populationStatistics: shape({}).isRequired,
-}
-
-const mapStateToProps = ({ populations }) => {
-  return {
-    populationStatistics: populations.data,
-  }
-}
-
-export default connect(mapStateToProps)(CustomPopulationProgrammeDist)

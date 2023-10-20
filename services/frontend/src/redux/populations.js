@@ -44,15 +44,6 @@ export const getPopulationStatistics = ({
   return callController(route, prefix, null, 'get', query, params, onProgress)
 }
 
-export const getCoursePopulation = ({ coursecodes, from, to, onProgress, separate, unifyCourses }) => {
-  const route = '/v3/populationstatisticsbycourse'
-  const prefix = 'GET_STUDENTS_OF_COURSE_'
-  const params = { coursecodes, from, to, separate, unifyCourses }
-  const query = { coursecodes, from, to, studyRights: { programme: 'KH555' } } // why is programme defined to some garbo?
-
-  return callController(route, prefix, null, 'get', query, params, onProgress)
-}
-
 const populationApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
     getCustomPopulation: builder.query({
@@ -65,11 +56,17 @@ const populationApi = RTKApi.injectEndpoints({
         },
       }),
     }),
+    getPopulationStatisticsByCourse: builder.query({
+      query: ({ coursecodes, from, to, separate, unifyCourses }) => ({
+        url: '/v3/populationstatisticsbycourse',
+        params: { coursecodes, from, to, separate, unifyCourses },
+      }),
+    }),
   }),
   overrideExisting: false,
 })
 
-export const { useGetCustomPopulationQuery } = populationApi
+export const { useGetCustomPopulationQuery, useGetPopulationStatisticsByCourseQuery } = populationApi
 
 export const clearPopulations = () => ({
   type: 'CLEAR_POPULATIONS',
@@ -109,34 +106,6 @@ const reducer = (state = initialState, action) => {
         error: false,
         data: action.response,
         query: action.query,
-        updating: false,
-        customPopulationFlag: false,
-      }
-    case 'GET_STUDENTS_OF_COURSE_ATTEMPT':
-      return {
-        ...state,
-        pending: true,
-        error: false,
-        query: null,
-        data: {},
-        updating: false,
-        customPopulationFlag: false,
-      }
-    case 'GET_STUDENTS_OF_COURSE_FAILURE':
-      return {
-        ...state,
-        pending: false,
-        error: true,
-        data: action.response,
-        updating: false,
-        customPopulationFlag: false,
-      }
-    case 'GET_STUDENTS_OF_COURSE_SUCCESS':
-      return {
-        ...state,
-        pending: false,
-        error: false,
-        data: action.response,
         updating: false,
         customPopulationFlag: false,
       }

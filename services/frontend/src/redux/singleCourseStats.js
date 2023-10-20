@@ -1,16 +1,16 @@
-import { callController } from '../apiConnection/index'
+import { RTKApi, callController } from '../apiConnection/index'
 
-export const getSingleCourseStats = ({ fromYear, toYear, courseCodes, separate, unifyOpenUniCourses }) => {
-  const route = '/v3/courseyearlystats'
-  const params = {
-    codes: courseCodes,
-    startyearcode: fromYear,
-    endyearcode: toYear,
-    separate,
-    unifyOpenUniCourses,
-  }
-  return callController(route, 'GET_SINGLE_COURSE_STATS_', [], 'get', params, params)
-}
+const singleCourseStatsApi = RTKApi.injectEndpoints({
+  endpoints: builder => ({
+    getSingleCourseStats: builder.query({
+      query: ({ courseCodes, separate }) =>
+        `/v3/courseyearlystats?${courseCodes.map(code => `codes[]=${code}`).join('&')}&separate=${separate}`,
+    }),
+  }),
+  overrideExisting: false,
+})
+
+export const { useGetSingleCourseStatsQuery } = singleCourseStatsApi
 
 export const setSelectedCourse = code => ({
   type: 'SET_SELECTED_COURSE',
@@ -35,26 +35,6 @@ const reducer = (
   action
 ) => {
   switch (action.type) {
-    case 'GET_SINGLE_COURSE_STATS_ATTEMPT':
-      return {
-        ...state,
-        stats: {},
-        pending: true,
-        error: false,
-      }
-    case 'GET_SINGLE_COURSE_STATS_SUCCESS':
-      return {
-        ...state,
-        stats: action.response[0],
-        pending: false,
-        error: false,
-      }
-    case 'GET_SINGLE_COURSE_STATS_FAILURE':
-      return {
-        ...state,
-        pending: false,
-        error: true,
-      }
     case 'SET_SELECTED_COURSE':
       return {
         ...state,
