@@ -33,19 +33,18 @@ export const getColumns = (getTextIn, semesters, mode) => {
     },
     ...semesters.map(semester => ({
       key: `${semester.semestercode}`,
-      title: `${semester.name.fi}`,
+      title: `${semester.name.fi.replace(' ', '\n')}`,
       cellProps: row => {
         const stats = row.semesterStats[semester.semestercode]
+        // eslint-disable-next-line no-nested-ternary
         const value = !stats ? 0 : mode === 'total' ? (stats.completed ?? 0) + (stats.notCompleted ?? 0) : stats[mode]
-        const totalValue = getTotalOfSemesterStats(row.semesterStats) / semesters.length
-        const relativeValue = totalValue === 0 ? 0 : (value / totalValue) * 100
-        const green = (255 * relativeValue) / 100
-        const red = (255 * (100 - relativeValue)) / 100
-
-        // eslint-disable-next-line consistent-return
+        const totalValue = getTotalOfSemesterStats(row.semesterStats)
+        const relativeValue = totalValue === 0 ? 0 : value / (totalValue / semesters.length)
+        // const green = (255 * relativeValue) / 100
+        // const red = (255 * (100 - relativeValue)) / 100
         return {
           style: {
-            backgroundColor: `rgba(${red},${green},0,0.3)`,
+            backgroundColor: `rgba(0,200,0,${relativeValue / 2})`,
           },
         }
       },

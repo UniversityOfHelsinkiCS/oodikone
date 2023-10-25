@@ -4,6 +4,11 @@ import React from 'react'
 const shorten = (text, maxLength) => (text.length > maxLength ? `${text.substring(0, maxLength)} ... ` : text)
 
 export const getColumns = (getTextIn, faculties, mode, facultyMap) => {
+  const getFacultyTitle = code => {
+    if (!code) return 'No faculty' // Shouldn't happen probably
+    if (code === 'H930') return 'Open\nuni'
+    return code
+  }
   const columns = [
     {
       key: 'course-name',
@@ -18,7 +23,7 @@ export const getColumns = (getTextIn, faculties, mode, facultyMap) => {
     },
     ...faculties.map(facultyCode => ({
       key: facultyCode ?? 'no-faculty',
-      title: facultyCode ?? 'No faculty',
+      title: getFacultyTitle(facultyCode),
       headerProps: { title: getTextIn(facultyMap[facultyCode]) },
       getRowVal: row => {
         const stats = row.facultyStats[facultyCode]

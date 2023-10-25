@@ -160,7 +160,7 @@ const scheduleStudents = async () => {
     table: IMPORTER_TABLES.persons,
     whereNotNull: 'student_number',
     pluck: 'id',
-    limit: isDev ? DEV_SCHEDULE_COUNT : null,
+    limit: null,
   })
 }
 

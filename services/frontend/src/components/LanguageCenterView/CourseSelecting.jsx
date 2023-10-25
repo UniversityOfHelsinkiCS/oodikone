@@ -9,7 +9,7 @@ const CourseSelecting = () => {
   const [search, setSearch] = useState('')
   const courses = courseQuery.isSuccess && courseQuery.data
   if (!courses) return <Loader />
-  console.log(courses)
+
   return (
     <div className="languagecenterview">
       <h1>Course selector</h1>
