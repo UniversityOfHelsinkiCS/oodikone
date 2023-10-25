@@ -1,44 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Divider, Dropdown, Icon, Loader, Radio, Button } from 'semantic-ui-react'
-import SortableTable, { row } from 'components/SortableTable'
+import SortableTable from 'components/SortableTable'
 import { useGetLanguageCenterDataQuery } from 'redux/languageCenterView'
 import './index.css'
 import useLanguage from 'components/LanguagePicker/useLanguage'
 import { useGetSemestersQuery } from 'redux/semesters'
-import { useGetFacultiesQuery } from 'redux/facultyStats'
-import { calculateTotals, filterAttemptsByDates, getColumns, getCourseFaculties } from './dataprocessing'
-import CourseSelecting from './CourseSelecting'
-import LanguageCenterViewTime from './TimeDevelopment'
+import { filterAttemptsByDates, getColumns, getCourseMapWithSemesters } from './dataprocessingTime'
 
-const LanguageCenterView = () => {
-  const [page, setPage] = useState(null)
-
-  if (!page) {
-    return (
-      <div>
-        <Button onClick={() => setPage('main')}>Main</Button>
-        <Button onClick={() => setPage('time')}>Time development</Button>
-        <Button onClick={() => setPage('course')}>Course</Button>
-      </div>
-    )
-  }
-
-  if (page === 'main') return <LanguageCenterMainView />
-  if (page === 'time') return <LanguageCenterViewTime />
-  return <CourseSelecting />
-}
-
-const LanguageCenterMainView = () => {
-  const facultyQuery = useGetFacultiesQuery()
-  const facultyMap = useMemo(
-    () =>
-      facultyQuery.data?.reduce((obj, cur) => {
-        obj[cur.code] = cur.name
-        return obj
-      }, {}),
-    [facultyQuery?.data]
-  )
-
+const LanguageCenterViewTime = () => {
   const { data: rawData, isFetchingOrLoading, isError } = useGetLanguageCenterDataQuery()
   const { getTextIn } = useLanguage()
   const [mode, setMode] = useState('total')
@@ -52,7 +21,7 @@ const LanguageCenterMainView = () => {
 
   const [dates, setDates] = useState(null)
   const [filters, setFilters] = useState({ mode, ...dates })
-  const [faculties, setFaculties] = useState([])
+
   useEffect(() => {
     if (!dates && semesters)
       setDates({
@@ -81,23 +50,17 @@ const LanguageCenterMainView = () => {
         : facultyFilteredData.attempts.filter(attempt => filterAttemptsByDates(attempt.date, filters))
 
     const data = { ...facultyFilteredData, attempts: filteredAttempts }
-    const newFaculties = [...new Set(data.attempts.map(({ faculty }) => faculty))].sort()
-    setFaculties(newFaculties)
-    const courseFaculties = getCourseFaculties(data.attempts)
 
-    const coursesWithFaculties = data.courses
-      .map(c => ({ ...c, facultyStats: courseFaculties[c.code] }))
-      .filter(course => course.facultyStats)
-    const totals = calculateTotals(coursesWithFaculties)
-    const totalRow = row(totals, { ignoreFilters: true, ignoreSorting: true })
-    return [totalRow, ...coursesWithFaculties]
+    const courseMap = getCourseMapWithSemesters(data.attempts, semesters)
+    return data.courses.map(c => ({ ...c, semesterStats: courseMap[c.code] })).filter(course => course.semesterStats)
   }, [rawData, filters])
 
+  // eslint-disable-next-line no-console
   console.log({ semesters, rawData, tableData })
 
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
   if (isFetchingOrLoading || !rawData || !dates || !semesters) return <Loader active style={{ marginTop: '15em' }} />
-
+  if (!semesters) return null
   return (
     <div className="languagecenterview">
       <Divider horizontal>Language center statistics</Divider>
@@ -173,7 +136,7 @@ const LanguageCenterMainView = () => {
         </div>
       </div>
       <div className="languagecenter-table">
-        <SortableTable columns={getColumns(getTextIn, faculties, filters.mode, facultyMap)} data={tableData} stretch />
+        <SortableTable columns={getColumns(getTextIn, semesters, filters.mode)} data={tableData} stretch />
       </div>
     </div>
   )
@@ -199,4 +162,4 @@ const SemesterSelector = ({ allSemesters, semester, setSemester }) => {
   )
 }
 
-export default LanguageCenterView
+export default LanguageCenterViewTime

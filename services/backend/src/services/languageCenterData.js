@@ -3,6 +3,16 @@ const { Op } = require('sequelize')
 const { redisClient } = require('./redis')
 const REDIS_KEY = 'LANGUAGE_CENTER_DATA'
 
+const getLanguageCenterCourses = async () => {
+  const courses = await Course.findAll({
+    attributes: ['code', 'name'],
+    where: {
+      [Op.or]: [{ code: { [Op.like]: 'KK%' } }, { code: { [Op.like]: 'AYKK%' } }],
+    },
+  })
+  return courses
+}
+
 const getLanguageCenterData = async () => {
   const dataOnRedis = await redisClient.getAsync(REDIS_KEY)
   if (dataOnRedis) return JSON.parse(dataOnRedis)
@@ -12,12 +22,7 @@ const getLanguageCenterData = async () => {
 }
 
 const computeLanguageCenterData = async () => {
-  const courses = await Course.findAll({
-    attributes: ['code', 'name'],
-    where: {
-      [Op.or]: [{ code: { [Op.like]: 'KK%' } }, { code: { [Op.like]: 'AYKK%' } }],
-    },
-  })
+  const courses = await getLanguageCenterCourses()
 
   const credits = await Credit.findAll({
     attributes: ['course_code', 'credittypecode', 'student_studentnumber', 'semestercode', 'createdate'],
@@ -95,4 +100,4 @@ const computeLanguageCenterData = async () => {
   return { attempts: attemptsArray, courses }
 }
 
-module.exports = { getLanguageCenterData }
+module.exports = { getLanguageCenterData, getLanguageCenterCourses }
