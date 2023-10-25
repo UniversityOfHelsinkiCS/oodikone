@@ -24,7 +24,6 @@ import courseSearch from './coursesearch'
 import courseStats from './coursestats'
 import courseSummaryForm from './coursesSummaryForm'
 import accessGroups from './accessGroups'
-import feedback from './feedback'
 import tags from './tags'
 import tagstudent from './tagstudent'
 import singleCourseStats from './singleCourseStats'
@@ -57,7 +56,6 @@ const store = configureStore({
     courseSummaryForm,
     accessGroups,
     elementdetails,
-    feedback,
     tags,
     tagstudent,
     singleCourseStats,
