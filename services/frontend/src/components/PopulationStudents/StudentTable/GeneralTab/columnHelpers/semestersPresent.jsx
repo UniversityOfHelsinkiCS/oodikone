@@ -10,6 +10,7 @@ const getSemestersPresentFunctions = ({
   studentToStudyrightEndMap,
   studentToSecondStudyrightEndMap,
   getTextIn,
+  programmeCode,
 }) => {
   if (allSemesters?.length === 0 || !filteredStudents)
     return {
@@ -63,14 +64,16 @@ const getSemestersPresentFunctions = ({
     return 'Unknown enrollment type'
   }
 
-  const graduatedOnSemester = (student, sem) => {
+  const graduatedOnSemester = (student, sem, programmeCode) => {
     const firstGraduation = studentToStudyrightEndMap[student.studentNumber]
     const secondGraduation = studentToSecondStudyrightEndMap[student.studentNumber]
     if (
       firstGraduation &&
       moment(firstGraduation).isBetween(allSemestersMap[sem].startdate, allSemestersMap[sem].enddate)
-    )
-      return 1
+    ) {
+      if (programmeCode && programmeCode.startsWith('KH')) return 1
+      return 2
+    }
     if (
       secondGraduation &&
       moment(secondGraduation).isBetween(allSemestersMap[sem].startdate, allSemestersMap[sem].enddate)
@@ -123,7 +126,7 @@ const getSemestersPresentFunctions = ({
       semesterIcons.push(
         getSemesterJSX(
           student.semesterEnrollmentsMap[sem],
-          graduatedOnSemester(student, sem),
+          graduatedOnSemester(student, sem, programmeCode),
           sem % 2 === 0,
           `${student.studentNumber}-${sem}`
         )
@@ -138,7 +141,7 @@ const getSemestersPresentFunctions = ({
     if (!student.semesterenrollments?.length > 0) return {}
     const title = student.semesterenrollments.reduce((enrollmentsString, current) => {
       if (current.semestercode >= firstSemester && current.semestercode <= lastSemester) {
-        const graduation = graduatedOnSemester(student, current.semestercode)
+        const graduation = graduatedOnSemester(student, current.semestercode, programmeCode)
         const graduationText = `(graduated as ${graduation === 1 ? 'Bachelor' : 'Master'})`
         return `${enrollmentsString}${enrollmentTypeText(current.enrollmenttype)} in ${getTextIn(
           allSemestersMap[current.semestercode].name

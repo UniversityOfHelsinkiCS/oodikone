@@ -279,6 +279,7 @@ const GeneralTab = ({
     getSemesterEnrollmentsForExcel,
     getSemesterEnrollmentsVal,
   } = getSemestersPresentFunctions({
+    programmeCode,
     filteredStudents,
     allSemesters,
     allSemestersMap,
