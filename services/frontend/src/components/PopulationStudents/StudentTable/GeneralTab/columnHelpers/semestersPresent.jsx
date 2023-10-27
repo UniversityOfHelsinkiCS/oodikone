@@ -1,10 +1,10 @@
 import React from 'react'
 import moment from 'moment'
+import { Popup } from 'semantic-ui-react'
 
-const getSemestersPresentFunctions = ({
+export const getSemestersPresentFunctions = ({
   allSemesters,
   allSemestersMap,
-  group,
   year,
   filteredStudents,
   studentToStudyrightEndMap,
@@ -15,7 +15,6 @@ const getSemestersPresentFunctions = ({
   if (allSemesters?.length === 0 || !filteredStudents)
     return {
       getSemesterEnrollmentsContent: () => {},
-      getSemesterEnrollmentsProps: () => {},
       getSemesterEnrollmentsForExcel: () => {},
       getSemesterEnrollmentsVal: () => {},
     }
@@ -30,7 +29,7 @@ const getSemestersPresentFunctions = ({
   const isFall = semester => semester % 2 === 1
 
   const getFirstAndLastSemester = () => {
-    const associatedYear = group?.tags?.year || (year !== 'All' && year)
+    const associatedYear = year !== 'All' && year
     if (associatedYear) {
       return {
         first: allSemesters.find(
@@ -58,10 +57,10 @@ const getSemestersPresentFunctions = ({
   const { first: firstSemester, last: lastSemester } =
     allSemesters.length > 0 ? getFirstAndLastSemester() : { first: 9999, last: 0 }
   const enrollmentTypeText = type => {
-    if (type === 1) return 'Present'
-    if (type === 2) return 'Absent'
-    if (type === 3) return 'Inactive'
-    return 'Unknown enrollment type'
+    if (type === 1) return 'Enrolled as present'
+    if (type === 2) return 'Enrolled as absent'
+    if (type === 3) return 'Not enrolled'
+    return 'No study right'
   }
 
   const graduatedOnSemester = (student, sem, programmeCode) => {
@@ -87,11 +86,16 @@ const getSemestersPresentFunctions = ({
     if (!student.semesterenrollments) return ''
     const semesterIcons = []
 
-    const getSemesterJSX = (enrollmenttype, graduated, isSpring, key) => {
+    const getSemesterJSX = (sem, enrollmenttype, graduated, key) => {
       let type = 'none'
       if (enrollmenttype === 1) type = 'present'
       if (enrollmenttype === 2) type = 'absent'
       if (enrollmenttype === 3) type = 'passive'
+
+      const onHoverString = () => {
+        const graduationText = graduated !== 0 ? `(graduated as ${graduated === 1 ? 'Bachelor' : 'Master'})` : ''
+        return `${enrollmentTypeText(enrollmenttype)} in ${getTextIn(allSemestersMap[sem].name)} ${graduationText}`
+      }
 
       const graduationCrown = (
         <svg
@@ -116,40 +120,32 @@ const getSemestersPresentFunctions = ({
       )
 
       return (
-        <div key={key} className={`enrollment-label-no-margin label-${type} ${isSpring ? 'margin-right' : ''}`}>
-          {graduated > 0 && graduationCrown}
-        </div>
+        <Popup
+          on="hover"
+          content={onHoverString()}
+          size="tiny"
+          position="bottom center"
+          trigger={
+            <div key={key} className={`enrollment-label-no-margin label-${type} ${isFall(sem) ? '' : 'margin-right'}`}>
+              {graduated > 0 && graduationCrown}
+            </div>
+          }
+        />
       )
     }
 
     for (let sem = firstSemester; sem <= lastSemester; sem++) {
       semesterIcons.push(
         getSemesterJSX(
+          sem,
           student.semesterEnrollmentsMap[sem],
           graduatedOnSemester(student, sem, programmeCode),
-          sem % 2 === 0,
           `${student.studentNumber}-${sem}`
         )
       )
     }
 
     return <div style={{ display: 'flex', gap: '4px' }}>{semesterIcons}</div>
-  }
-
-  const getSemesterEnrollmentsProps = student => {
-    if (allSemesters?.length === 0) return {}
-    if (!student.semesterenrollments?.length > 0) return {}
-    const title = student.semesterenrollments.reduce((enrollmentsString, current) => {
-      if (current.semestercode >= firstSemester && current.semestercode <= lastSemester) {
-        const graduation = graduatedOnSemester(student, current.semestercode, programmeCode)
-        const graduationText = `(graduated as ${graduation === 1 ? 'Bachelor' : 'Master'})`
-        return `${enrollmentsString}${enrollmentTypeText(current.enrollmenttype)} in ${getTextIn(
-          allSemestersMap[current.semestercode].name
-        )} ${graduation > 0 ? graduationText : ''} \n`
-      }
-      return enrollmentsString
-    }, '')
-    return { title }
   }
 
   const getSemesterEnrollmentsForExcel = student => {
@@ -178,10 +174,7 @@ const getSemestersPresentFunctions = ({
     ) ?? 0
   return {
     getSemesterEnrollmentsContent,
-    getSemesterEnrollmentsProps,
     getSemesterEnrollmentsForExcel,
     getSemesterEnrollmentsVal,
   }
 }
-
-export default getSemestersPresentFunctions

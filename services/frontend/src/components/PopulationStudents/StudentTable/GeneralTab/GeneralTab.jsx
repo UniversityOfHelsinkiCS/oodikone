@@ -10,7 +10,7 @@ import { useGetSemestersQuery } from 'redux/semesters'
 import { PRIORITYCODE_TEXTS } from '../../../../constants'
 import useLanguage from '../../../LanguagePicker/useLanguage'
 import createMaps from './columnHelpers/createMaps'
-import getSemestersPresentFunctions from './columnHelpers/semestersPresent'
+import { getSemestersPresentFunctions } from './columnHelpers/semestersPresent'
 import getStudyProgrammeFunctions from './columnHelpers/studyProgramme'
 
 const GeneralTab = ({
@@ -273,21 +273,17 @@ const GeneralTab = ({
   let creditsColumn = null
   const creditColumnKeys = columnKeysToInclude.filter(k => k.indexOf('credits.') === 0)
 
-  const {
-    getSemesterEnrollmentsContent,
-    getSemesterEnrollmentsProps,
-    getSemesterEnrollmentsForExcel,
-    getSemesterEnrollmentsVal,
-  } = getSemestersPresentFunctions({
-    programmeCode,
-    filteredStudents,
-    allSemesters,
-    allSemestersMap,
-    year,
-    studentToStudyrightEndMap,
-    studentToSecondStudyrightEndMap,
-    getTextIn,
-  })
+  const { getSemesterEnrollmentsContent, getSemesterEnrollmentsForExcel, getSemesterEnrollmentsVal } =
+    getSemestersPresentFunctions({
+      programmeCode,
+      filteredStudents,
+      allSemesters,
+      allSemestersMap,
+      year,
+      studentToStudyrightEndMap,
+      studentToSecondStudyrightEndMap,
+      getTextIn,
+    })
 
   const { getStudyProgrammeContent, studentProgrammesMap, getStudyStartDate } = getStudyProgrammeFunctions({
     selectedStudents,
@@ -405,7 +401,6 @@ const GeneralTab = ({
       title: 'Semesters\npresent',
       filterType: 'range',
       getRowContent: s => getSemesterEnrollmentsContent(s),
-      cellProps: s => getSemesterEnrollmentsProps(s),
       getRowVal: s => getSemesterEnrollmentsVal(s),
       getRowExportVal: s => getSemesterEnrollmentsForExcel(s),
     },
