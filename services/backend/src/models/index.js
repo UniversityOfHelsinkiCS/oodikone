@@ -50,6 +50,8 @@ Credit.passed = ({ credittypecode }) =>
   credittypecode === CREDIT_TYPE_CODES.PASSED || credittypecode === CREDIT_TYPE_CODES.APPROVED
 Credit.failed = credit => credit.credittypecode === CREDIT_TYPE_CODES.FAILED
 Credit.improved = credit => credit.credittypecode === CREDIT_TYPE_CODES.IMPROVED
+Credit.belongsTo(Studyright, { foreignKey: 'studyright_id', targetKey: 'studyrightid', constraints: false })
+Studyright.hasMany(Credit, { foreignKey: 'studyright_id', constraints: false })
 
 Credit.belongsTo(Student, { foreignKey: 'student_studentnumber', targetKey: 'studentnumber' })
 Student.hasMany(Credit, { foreignKey: 'student_studentnumber', sourceKey: 'studentnumber' })
@@ -97,6 +99,9 @@ Transfer.belongsTo(ElementDetail, { as: 'source', foreignKey: 'sourcecode' })
 Transfer.belongsTo(ElementDetail, { as: 'target', foreignKey: 'targetcode' })
 
 Enrollment.belongsTo(Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
+Enrollment.belongsTo(Studyright, { foreignKey: 'studyright_id', targetKey: 'studyrightid', constraints: false })
+Studyright.hasMany(Enrollment, { foreignKey: 'studyright_id', constraints: false })
+
 Student.hasMany(Enrollment, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
 Enrollment.belongsTo(Course, { foreignKey: 'course_id' })
 Course.hasMany(Enrollment, { foreignKey: 'course_id' })

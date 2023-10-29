@@ -36,6 +36,7 @@ const isCancelled = (studyright, extentcode) => {
   }
   return false
 }
+
 const updateStudyRights = async (
   groupedStudyRightSnapshots,
   personIdToStudentNumber,
@@ -47,6 +48,7 @@ const updateStudyRights = async (
     const cancelled = isCancelled(studyright, 1)
     const defaultProps = {
       studyrightid: `${studyright.id}-1`, // duplikaattifix
+      actual_studyrightid: studyright.id,
       facultyCode: getOrganisationCode(studyright.organisation_id),
       startdate: studyright.valid.startDate,
       givendate: studyright.grant_date,
