@@ -1,7 +1,17 @@
-const { Course, Credit, Enrollment, StudyrightElement } = require('../models')
+const { Course, Credit, Enrollment, StudyrightElement, Studyright } = require('../models')
 const { Op } = require('sequelize')
 const { redisClient } = require('./redis')
 const REDIS_KEY = 'LANGUAGE_CENTER_DATA'
+
+const getLanguageCenterCourses = async () => {
+  const courses = await Course.findAll({
+    attributes: ['code', 'name'],
+    where: {
+      [Op.or]: [{ code: { [Op.like]: 'KK%' } }, { code: { [Op.like]: 'AYKK%' } }],
+    },
+  })
+  return courses
+}
 
 const getLanguageCenterData = async () => {
   const dataOnRedis = await redisClient.getAsync(REDIS_KEY)
@@ -12,25 +22,44 @@ const getLanguageCenterData = async () => {
 }
 
 const computeLanguageCenterData = async () => {
-  const courses = await Course.findAll({
-    attributes: ['code', 'name'],
-    where: {
-      [Op.or]: [{ code: { [Op.like]: 'KK%' } }, { code: { [Op.like]: 'AYKK%' } }],
-    },
-  })
+  const courses = await getLanguageCenterCourses()
 
   const credits = await Credit.findAll({
-    attributes: ['course_code', 'credittypecode', 'student_studentnumber', 'semestercode', 'createdate'],
+    attributes: [
+      'course_code',
+      'credittypecode',
+      'student_studentnumber',
+      'semestercode',
+      'createdate',
+      'studyright_id',
+    ],
     where: {
       [Op.or]: [{ course_code: { [Op.like]: 'KK%' } }, { course_code: { [Op.like]: 'AYKK%' } }],
     },
   })
 
   const enrollments = await Enrollment.findAll({
-    attributes: ['studentnumber', 'semestercode', 'course_code', 'enrollment_date_time'],
+    attributes: ['studentnumber', 'semestercode', 'course_code', 'enrollment_date_time', 'studyright_id'],
     where: {
       [Op.or]: [{ course_code: { [Op.like]: 'KK%' } }, { course_code: { [Op.like]: 'AYKK%' } }],
+      state: 'ENROLLED',
     },
+  })
+
+  const studyrights = await Studyright.findAll({})
+
+  const studyrightToFacultyMap = studyrights.reduce((obj, cur) => {
+    // Filter out: Kielikeskus (?), Aleksanteri-instituutti
+    if (['H906', 'H401'].includes(cur.facultyCode)) return obj
+    obj[cur.actual_studyrightid] = cur.facultyCode
+    return obj
+  }, {})
+
+  credits.forEach(c => {
+    c.faculty = studyrightToFacultyMap[c.studyright_id]
+  })
+  enrollments.forEach(c => {
+    c.faculty = studyrightToFacultyMap[c.studyright_id]
   })
 
   const studentList = new Set()
@@ -45,7 +74,13 @@ const computeLanguageCenterData = async () => {
     if (!attemptsByStudents[sn]) {
       attemptsByStudents[sn] = []
     }
-    attemptsByStudents[sn].push({ studentNumber: sn, courseCode: c.course_code, completed: true, date: c.createdate })
+    attemptsByStudents[sn].push({
+      studentNumber: sn,
+      courseCode: c.course_code,
+      completed: true,
+      date: c.createdate,
+      faculty: studyrightToFacultyMap[c.studyright_id],
+    })
   })
 
   enrollments.forEach(e => {
@@ -55,11 +90,13 @@ const computeLanguageCenterData = async () => {
     if (!attemptsByStudents[sn]) {
       attemptsByStudents[sn] = []
     }
+
     attemptsByStudents[sn].push({
       studentNumber: sn,
       courseCode: e.course_code,
       completed: false,
       date: e.enrollment_date_time,
+      faculty: studyrightToFacultyMap[e.studyright_id],
     })
   })
 
@@ -69,6 +106,7 @@ const computeLanguageCenterData = async () => {
       studentnumber: { [Op.in]: Array.from(studentList.values()) },
     },
   })
+
   const studyrightMap = studyrightElements.reduce((obj, cur) => {
     if (!obj[cur.studentnumber]) {
       obj[cur.studentnumber] = [{ startdate: cur.startdate, enddate: cur.enddate, code: cur.code }]
@@ -85,6 +123,7 @@ const computeLanguageCenterData = async () => {
   studentList.forEach(sn => attemptsArray.push(...attemptsByStudents[sn]))
 
   attemptsArray.forEach(item => {
+    if (item.faculty) return
     const faculty = getFaculty(item.studentNumber, item.date)
     if (faculty?.startsWith('MH') || faculty?.startsWith('KH')) {
       item.faculty = faculty.substring(1, 4)
@@ -92,7 +131,10 @@ const computeLanguageCenterData = async () => {
       item.faculty = faculty
     }
   })
-  return { attempts: attemptsArray, courses }
+
+  const filteredAttempts = attemptsArray.filter(attempt => attempt.faculty)
+
+  return { attempts: filteredAttempts, courses }
 }
 
-module.exports = { getLanguageCenterData }
+module.exports = { getLanguageCenterData, getLanguageCenterCourses }
