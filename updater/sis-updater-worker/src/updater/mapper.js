@@ -233,6 +233,7 @@ const creditMapper =
       org: attainmentUniOrg,
       language: language,
       is_open: is_open,
+      studyright_id: study_right_id,
     }
   }
 
@@ -385,6 +386,7 @@ const enrollmentMapper =
         studyRightIdToEducationType[enrollment.study_right_id] ===
         'urn:code:education-type:non-degree-education:open-university-studies',
       course_id,
+      studyright_id: enrollment.study_right_id,
     }
   }
 
