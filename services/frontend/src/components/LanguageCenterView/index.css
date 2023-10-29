@@ -32,39 +32,68 @@ input[type='radio'] {
 
 .options-container {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   margin-top: 1.4em;
   font-size: large;
+  flex: 1 1 0px;
 }
 
 .datepicker-container {
   display: flex;
+  flex-grow: 1;
 }
 
 .datepicker-acual-container {
   display: flex;
   gap: 0.4em;
   margin: auto;
+  flex-direction: column;
 }
 
 .calendar-icon-container {
   justify-content: center;
   align-items: center;
+  width: 100%;
   display: flex;
   margin-right: 0.6em;
 }
 
 .completion-container {
-  margin: 1.2em auto;
+  display: flex;
+  flex-grow: 1;
 }
 
 .completion-acual-container {
   display: flex;
+  gap: 0.4em;
+  margin: auto;
   flex-direction: column;
-  gap: 1em;
-  margin-top: 0.3em;
+}
+
+.completion-header {
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  display: flex;
+}
+
+.completion-radio-container {
+  align-items: left;
+  width: 100%;
+  margin-right: 0.6em;
+  flex-direction: column;
+  align-content: left;
+}
+
+.radio-buttons {
+  display: flex;
+  flex-direction: column;
 }
 
 .button-container {
-  margin: 0.4em auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-top: 1em;
 }
