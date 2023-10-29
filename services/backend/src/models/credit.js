@@ -81,6 +81,14 @@ Credit.init(
     is_open: {
       type: BOOLEAN,
     },
+    studyright_id: {
+      type: STRING,
+      allowNull: true,
+      references: {
+        model: 'studyright',
+        key: 'studyrightid',
+      },
+    },
   },
   {
     underscored: false,
