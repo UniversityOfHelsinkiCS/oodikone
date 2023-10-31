@@ -8,7 +8,13 @@ const {
   abort,
   updateCoursesByCourseCode,
 } = require('../services/sisUpdaterService')
-const { refreshStatistics, refreshTrends, refreshFaculties, refreshNewOverviews } = require('../events')
+const {
+  refreshStatistics,
+  refreshTrends,
+  refreshFaculties,
+  refreshNewOverviews,
+  refreshLanguageCenterData,
+} = require('../events')
 
 router.get('/update/v2/meta', async (req, res) => {
   const response = await updateSISMetadata(req)
@@ -70,6 +76,11 @@ router.post('/refresh_faculties_v2', async (req, res) => {
 router.post('/refresh_trends', async (req, res) => {
   await refreshTrends()
   res.status(200).json('Trends refreshed')
+})
+
+router.post('/refresh_language_center_data', async (req, res) => {
+  await refreshLanguageCenterData()
+  res.status(200).json('Language center data refreshed')
 })
 
 router.get('/abort', async (req, res) => {

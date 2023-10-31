@@ -31,6 +31,7 @@ const Updater = () => {
   const refreshTrends = () => apiCall('/updater/refresh_trends', 'post')
   const refreshFaculties = () => apiCall('/updater/refresh_faculties_v2', 'post')
   const refreshStudyProgrammes = () => apiCall('/updater/refresh_study_programmes_v2', 'post')
+  const refreshLanguageCenterData = () => apiCall('/updater/refresh_language_center_data', 'post')
 
   return (
     <Segment>
@@ -79,6 +80,7 @@ const Updater = () => {
           <Form.Button content="Refresh trends" onClick={() => refreshTrends()} />
           <Form.Button content="Refresh faculties" onClick={() => refreshFaculties()} />
           <Form.Button content="Refresh study programmes" onClick={() => refreshStudyProgrammes()} />
+          <Form.Button content="Refresh language center data" onClick={() => refreshLanguageCenterData()} />
         </Form.Group>
         <Form.Group>
           <Form.Button content="Stop Updating" negative onClick={abortSisUpdater} />
