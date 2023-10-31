@@ -1,4 +1,7 @@
+import { DEFAULT_LANG } from '../constants'
+
 const initialState = {
+  language: DEFAULT_LANG,
   namesVisible: false,
   chartHeight: 600,
 }
