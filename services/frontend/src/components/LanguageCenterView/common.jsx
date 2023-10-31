@@ -5,13 +5,6 @@ export const LanguageCenterContext = createContext(null)
 
 export const useLanguageCenterContext = () => useContext(LanguageCenterContext)
 
-export const filterFaculties = data => {
-  return {
-    ...data,
-    attempts: data.attempts.filter(attempt => !attempt.faculty || attempt.faculty?.substring(0, 3).match(`^H\\d`)),
-  }
-}
-
 export const shortenCourseName = (text, maxLength) =>
   text.length > maxLength ? `${text.substring(0, maxLength)} ... ` : text
 

@@ -1,7 +1,7 @@
 import React from 'react'
 import { shortenCourseName } from '../common'
 
-export const getColumns = (getTextIn, faculties, mode, facultyMap) => {
+export const getColumns = (getTextIn, faculties, mode, semesters, facultyMap) => {
   const getFacultyTitle = code => {
     if (!code) return 'No faculty' // Shouldn't happen probably
     if (code === 'H930') return 'Open\nuni'
@@ -26,33 +26,27 @@ export const getColumns = (getTextIn, faculties, mode, facultyMap) => {
       title: getFacultyTitle(facultyCode),
       headerProps: { title: getTextIn(facultyMap[facultyCode]) },
       getRowVal: row => {
-        const stats = row.facultyStats[facultyCode]
-        if (!stats) return 0
-        if (mode === 'total') {
-          const result = (stats.completed ?? 0) + (stats.notCompleted ?? 0)
-          return result
-        }
-        return stats[mode] ?? 0
+        let number = 0
+        semesters.forEach(sem => {
+          const semesterStats = row.bySemesters[sem]
+          if (!semesterStats || !semesterStats[facultyCode]) return
+          number += semesterStats[facultyCode][mode]
+        })
+        return number
       },
       filterable: false,
     })),
     {
-      key: 'all',
+      key: 'total-column',
       title: 'Total',
       getRowVal: row => {
-        const objVals = Object.values(row.facultyStats)
-        const arr = objVals.map(stat => {
-          if (mode === 'total') {
-            const notCompleted = stat.notCompleted ?? 0
-            const completed = stat.completed ?? 0
-            return notCompleted + completed
-          }
-          return stat[mode]
+        let number = 0
+        semesters.forEach(sem => {
+          const semesterStats = row.bySemesters[sem]
+          if (!semesterStats) return
+          number += semesterStats[mode]
         })
-        return arr.reduce((sum, cur) => {
-          if (cur === undefined) return sum
-          return cur + sum
-        }, 0)
+        return number
       },
     },
   ]
@@ -79,19 +73,29 @@ export const getCourseFaculties = attempts => {
   return map
 }
 
-export const calculateTotals = coursesWithFaculties => {
-  const facultyStats = {}
-  coursesWithFaculties.forEach(course => {
-    Object.entries(course.facultyStats).forEach(([faculty, stats]) => {
-      if (!facultyStats[faculty]) {
-        facultyStats[faculty] = { notCompleted: 0, completed: 0 }
-      }
-      const oldStats = facultyStats[faculty]
-      if (!oldStats.notCompleted) oldStats.notCompleted = 0
-      if (!oldStats.completed) oldStats.completed = 0
-      oldStats.notCompleted += stats.notCompleted ?? 0
-      oldStats.completed += stats.completed ?? 0
+export const calculateTotals = (courses, faculties, semesters) => {
+  const totalRow = {}
+  semesters.forEach(sem => {
+    totalRow[sem] = { completed: 0, notCompleted: 0, total: 0 }
+    courses.forEach(course => {
+      const stats = course.bySemesters[sem]
+      if (!stats) return
+      totalRow[sem].completed += stats.completed
+      totalRow[sem].notCompleted += stats.notCompleted
+      totalRow[sem].total += stats.total
+    })
+
+    faculties.forEach(fac => {
+      totalRow[sem][fac] = { completed: 0, notCompleted: 0, total: 0 }
+      courses.forEach(course => {
+        const stats = course.bySemesters[sem]?.[fac]
+        if (!stats) return
+        totalRow[sem][fac].completed += stats.completed
+        totalRow[sem][fac].notCompleted += stats.notCompleted
+        totalRow[sem][fac].total += stats.total
+      })
     })
   })
-  return { code: 'TOTAL', name: { en: 'All courses total' }, facultyStats }
+
+  return { code: 'TOTAL', name: { en: 'All courses total' }, bySemesters: totalRow }
 }
