@@ -22,10 +22,19 @@ const CreditGainTableRow = ({ statistics, code }) => {
   )
 }
 
-const CreditGainTable = ({ data, selectedStudents, totalCredits, headerText }) => {
+const CreditGainTable = ({ data, totalCredits, headerText }) => {
   const tableRows = Object.keys(data)
     .sort()
-    .map(code => <CreditGainTableRow key={code} statistics={data[code]} code={code} />)
+    .map(code => {
+      if (data[code].credits === 0) return null
+      return <CreditGainTableRow key={code} statistics={data[code]} code={code} />
+    })
+
+  const totalStudents = Object.values(data).reduce((acc, code) => {
+    if (code.credits === 0) return acc
+    return acc + code.students.length
+  }, 0)
+
   return (
     <Table>
       <Table.Header style={{ backgroundColor: 'whitesmoke' }}>
@@ -39,7 +48,7 @@ const CreditGainTable = ({ data, selectedStudents, totalCredits, headerText }) =
         {tableRows}
         <Table.Row style={{ backgroundColor: 'ghostwhite' }}>
           <Table.Cell style={{ fontWeight: '700' }}>Total</Table.Cell>
-          <Table.Cell style={{ fontWeight: '700' }}>{selectedStudents.length}</Table.Cell>
+          <Table.Cell style={{ fontWeight: '700' }}>{totalStudents}</Table.Cell>
           <Table.Cell style={{ fontWeight: '700' }}>{totalCredits}</Table.Cell>
         </Table.Row>
       </Table.Body>
@@ -59,7 +68,6 @@ export const CoursePopulationCreditGainTable = ({
   const [programmeCreditsStatistics, setStatistics] = useState({})
   const [facultyCreditsStatistics, setFacStatistics] = useState({})
   const [totalCredits, setTotalCredits] = useState(0)
-  const studentNumbers = students.map(student => student.studentNumber)
 
   useEffect(() => {
     if (!faculties || !students || Object.keys(populationStatistics ?? {}).length === 0) return
@@ -90,8 +98,6 @@ export const CoursePopulationCreditGainTable = ({
         facultyCredits[faculty.code] = { name: faculty.name, students: [], credits: 0 }
       }
 
-      programmeCredits[programme.code].students.push(student.studentNumber)
-      facultyCredits[faculty.code].students.push(student.studentNumber)
       const coursesBetween = []
       courses.forEach(course => {
         if (moment(course.date).isBetween(moment(from), moment(to)) && course.passed) {
@@ -103,6 +109,9 @@ export const CoursePopulationCreditGainTable = ({
         }
       })
       if (maxBy(coursesBetween, course => course.value)) {
+        programmeCredits[programme.code].students.push(student.studentNumber)
+        facultyCredits[faculty.code].students.push(student.studentNumber)
+
         const maxCredits = maxBy(coursesBetween, course => course.value).credits
         programmeCredits[programme.code].credits += maxCredits
         facultyCredits[faculty.code].credits += maxCredits
@@ -119,12 +128,7 @@ export const CoursePopulationCreditGainTable = ({
       menuItem: 'Faculty',
       render: () => (
         <Tab.Pane>
-          <CreditGainTable
-            data={facultyCreditsStatistics}
-            selectedStudents={studentNumbers}
-            totalCredits={totalCredits}
-            headerText="Faculty"
-          />
+          <CreditGainTable data={facultyCreditsStatistics} totalCredits={totalCredits} headerText="Faculty" />
         </Tab.Pane>
       ),
     },
@@ -132,12 +136,7 @@ export const CoursePopulationCreditGainTable = ({
       menuItem: 'Programme',
       render: () => (
         <Tab.Pane>
-          <CreditGainTable
-            data={programmeCreditsStatistics}
-            selectedStudents={studentNumbers}
-            totalCredits={totalCredits}
-            headerText="Programme"
-          />
+          <CreditGainTable data={programmeCreditsStatistics} totalCredits={totalCredits} headerText="Programme" />
         </Tab.Pane>
       ),
     },
