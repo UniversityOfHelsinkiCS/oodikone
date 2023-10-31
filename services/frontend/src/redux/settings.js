@@ -1,32 +1,10 @@
-import { callController } from '../apiConnection'
-import { DEFAULT_LANG } from '../constants'
-
-const initial = () => ({
-  language: DEFAULT_LANG,
+const initialState = {
   namesVisible: false,
   chartHeight: 600,
-})
-
-export const switchLanguage = (username, language) => {
-  const route = '/language'
-  const prefix = 'SWITCH_LANGUAGE_'
-  const data = { username, language }
-  const method = 'post'
-  return callController(route, prefix, data, method)
 }
 
-const reducer = (state = initial(), action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case 'INIT_LANGUAGE':
-      return {
-        ...state,
-        language: action.language,
-      }
-    case 'SWITCH_LANGUAGE_SUCCESS':
-      return {
-        ...state,
-        language: action.response.language,
-      }
     case 'HIDE_STUDENT_NAMES':
       return {
         ...state,
@@ -51,11 +29,6 @@ const reducer = (state = initial(), action) => {
       return state
   }
 }
-
-export const initLanguage = language => ({
-  type: 'INIT_LANGUAGE',
-  language,
-})
 
 export const hideStudentNames = () => ({
   type: 'HIDE_STUDENT_NAMES',
