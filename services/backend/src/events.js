@@ -12,6 +12,8 @@ const { isProduction } = require('./conf-backend')
 const { getCurrentSemester } = require('./services/semesters')
 const logger = require('./util/logger')
 const { getAssociations } = require('./services/studyrights')
+const { redisClient } = require('./services/redis')
+const { computeLanguageCenterData, LANGUAGE_CENTER_REDIS_KEY } = require('./services/languageCenterData')
 
 const schedule = (cronTime, func) => new CronJob({ cronTime, onTick: func, start: true, timeZone: 'Europe/Helsinki' })
 
@@ -137,12 +139,24 @@ const refreshTrends = async () => {
   logger.info('Trends refreshed!')
 }
 
+const refreshLanguageCenterData = async () => {
+  const freshData = await computeLanguageCenterData()
+  await redisClient.setAsync(LANGUAGE_CENTER_REDIS_KEY, JSON.stringify(freshData))
+  logger.info('Language center data refreshed!')
+}
+
 const startCron = () => {
   if (isProduction) {
     logger.info('Cronjob for refreshing stats started: runs at 3am every day.')
     // refresh 3am every day
     schedule('0 3 * * *', async () => {
-      for (const func of [refreshStatistics, refreshTrends, refreshNewOverviews, refreshFaculties]) {
+      for (const func of [
+        refreshStatistics,
+        refreshTrends,
+        refreshNewOverviews,
+        refreshFaculties,
+        refreshLanguageCenterData,
+      ]) {
         await func()
       }
     })
@@ -155,4 +169,5 @@ module.exports = {
   refreshTrends,
   refreshFaculties,
   refreshNewOverviews,
+  refreshLanguageCenterData,
 }
