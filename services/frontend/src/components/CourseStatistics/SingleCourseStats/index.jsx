@@ -41,6 +41,7 @@ const SingleCourseStats = ({
   maxYearsToCreatePopulationFrom,
   getMaxYearsToCreatePopulationFrom,
   userHasAccessToAllStats,
+  unifyCourses,
 }) => {
   const { getTextIn } = useLanguage()
   const [primary, setPrimary] = useState([ALL.value])
@@ -396,7 +397,7 @@ const SingleCourseStats = ({
       years.find(s => s.value === to).text.split('-')[1]
     }`
     const { alternatives } = stats
-    const queryObject = { from, to, coursecodes: JSON.stringify(alternatives), years2, separate: false }
+    const queryObject = { from, to, coursecodes: JSON.stringify(alternatives), years2, separate: false, unifyCourses }
     const searchString = qs.stringify(queryObject)
     history.push(`/coursepopulation?${searchString}`)
   }
@@ -534,6 +535,7 @@ const mapStateToProps = state => {
   return {
     programmes: selectors.getAllStudyProgrammes(state),
     maxYearsToCreatePopulationFrom: selectors.getMaxYearsToCreatePopulationFrom(state) || 0,
+    unifyCourses: state.courseSearch.openOrReqular,
   }
 }
 
