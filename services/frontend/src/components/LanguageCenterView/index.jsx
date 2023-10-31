@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Divider, Loader, Tab } from 'semantic-ui-react'
+import { Divider, Loader, Message, Tab } from 'semantic-ui-react'
 import './index.css'
 import { useGetSemestersQuery } from 'redux/semesters'
 import { useHistory } from 'react-router-dom'
@@ -60,6 +60,15 @@ const LanguageCenterView = () => {
     <LanguageCenterContext.Provider value={settingsContext}>
       <div className="languagecenterview">
         <Divider horizontal>Language center statistics</Divider>
+        <Message>
+          <p>This view displays amounts of enrollments and completions of courses organized by language center.</p>
+          <p>You can view the numbers by faculties or by semesters.</p>
+          <p>
+            <b style={{ color: 'red' }}>
+              This feature is still under development and the numbers are not yet completely accurate.
+            </b>
+          </p>
+        </Message>
         <div className="languagecenter-table">
           <Tab panes={getPanes()} activeIndex={tab} onTabChange={setTab} />
         </div>
