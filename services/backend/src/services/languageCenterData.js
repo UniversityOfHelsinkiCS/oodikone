@@ -1,7 +1,11 @@
 const { Course, Credit, Enrollment, StudyrightElement, Studyright } = require('../models')
 const { Op } = require('sequelize')
 const { redisClient } = require('./redis')
+const { getSemestersAndYears } = require('./semesters')
 const LANGUAGE_CENTER_REDIS_KEY = 'LANGUAGE_CENTER_DATA'
+
+const isBetween = (start, date, end) =>
+  new Date(start).getTime() <= new Date(date).getTime() && new Date(date).getTime() <= new Date(end).getTime()
 
 const getLanguageCenterCourses = async () => {
   const courses = await Course.findAll({
@@ -132,9 +136,50 @@ const computeLanguageCenterData = async () => {
     }
   })
 
-  const filteredAttempts = attemptsArray.filter(attempt => attempt.faculty)
+  const filteredAttempts = attemptsArray.filter(attempt => attempt.faculty?.substring(0, 3).match(`^H\\d`))
 
-  return { attempts: filteredAttempts, courses }
+  const formattedByFaculties = await formatByFaculties({ attempts: filteredAttempts, courses })
+
+  const faculties = [...new Set(filteredAttempts.map(({ faculty }) => faculty))]
+
+  return { attempts: filteredAttempts, courses, formattedByFaculties, faculties }
+}
+
+const formatByFaculties = async ({ attempts, courses }) => {
+  const semestersAndYears = await getSemestersAndYears()
+  const semesters = Object.values(semestersAndYears.semesters)
+  const semesterStatsMap = attempts.reduce((obj, cur) => {
+    const semester = semesters.find(s => isBetween(s.startdate, cur.date, s.enddate)).semestercode
+    if (!obj[cur.courseCode]) {
+      obj[cur.courseCode] = { completed: 0, notCompleted: 0, total: 0 }
+    }
+    if (!obj[cur.courseCode][semester]) {
+      obj[cur.courseCode][semester] = { completed: 0, notCompleted: 0, total: 0 }
+    }
+    if (!obj[cur.courseCode][semester][cur.faculty]) {
+      obj[cur.courseCode][semester][cur.faculty] = { completed: 0, notCompleted: 0, total: 0 }
+    }
+    const stats = obj[cur.courseCode][semester][cur.faculty]
+    const allFacultiesTotal = obj[cur.courseCode][semester]
+    const allSemestersTotal = obj[cur.courseCode]
+    if (cur.completed) {
+      stats.completed += 1
+      allFacultiesTotal.completed += 1
+      allSemestersTotal.completed += 1
+    } else {
+      stats.notCompleted += 1
+      allFacultiesTotal.notCompleted += 1
+      allSemestersTotal.notCompleted += 1
+    }
+    stats.total += 1
+    allFacultiesTotal.total += 1
+    allSemestersTotal.total += 1
+    return obj
+  }, {})
+
+  return courses
+    .map(c => ({ ...c.dataValues, bySemesters: semesterStatsMap[c.code] }))
+    .filter(course => course.bySemesters)
 }
 
 module.exports = {

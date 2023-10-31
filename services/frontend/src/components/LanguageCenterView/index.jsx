@@ -18,21 +18,17 @@ const LanguageCenterView = () => {
     )
 
   const [mode, setMode] = useState('total')
-  const [dates, setDates] = useState(null)
-  const [filters, setFilters] = useState({ mode, ...dates })
-
+  const [semesterFilter, setSemesterFilter] = useState(null)
   const history = useHistory()
-  const [tab, setTab] = useTabs('lc_tab', 0, history)
+  const [tab, setTab] = useTabs('languagecenter_tab', 0, history)
 
   useEffect(() => {
-    if (!dates && semesters)
-      setDates({
-        startDate: semesters[0],
-        endDate: semesters[semesters.length - 1],
+    if (!semesters?.length) return
+    if (!semesterFilter)
+      setSemesterFilter({
+        start: semesters[0].semestercode,
+        end: semesters[semesters.length - 1].semestercode,
       })
-    if (!filters.startDate || !filters.endDate) {
-      setFilters({ ...filters, startDate: semesters[0], endDate: semesters[semesters.length - 1] })
-    }
   }, [semesters])
 
   const getPanes = () => {
@@ -48,15 +44,13 @@ const LanguageCenterView = () => {
     ]
   }
 
-  if (!dates || !semesters) {
+  if (!semesterFilter || !semesters?.length) {
     return <Loader />
   }
 
   const settingsContext = {
-    filters,
-    setFilters,
-    dates,
-    setDates,
+    semesterFilter,
+    setSemesterFilter,
     mode,
     setMode,
     semesters,
