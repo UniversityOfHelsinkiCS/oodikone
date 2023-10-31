@@ -21,7 +21,7 @@ export const getColumns = (getTextIn, semesters, mode) => {
   const getValueFromStats = (stats, mode) => {
     if (!stats) return 0
     if (mode === 'total') return (stats.completed ?? 0) + (stats.notCompleted ?? 0)
-    return stats[mode]
+    return stats[mode] ?? 0
   }
 
   const columns = [
