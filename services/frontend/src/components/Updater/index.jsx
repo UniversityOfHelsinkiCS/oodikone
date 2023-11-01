@@ -62,6 +62,7 @@ const Updater = () => {
         </p>
       </Message>
       <Form>
+        <Header>Updater (data pulled from importer db and brought to oodikone db)</Header>
         <Form.Group>
           <Form.Button content="Update meta" onClick={() => updateSISMeta()} />
           <Form.Button content="Update students" onClick={() => updateSISStudents()} />
@@ -74,6 +75,9 @@ const Updater = () => {
               }
             }}
           />
+        </Form.Group>
+        <Header>Refresh data (calculations done by oodikone-backend and cached in redis)</Header>
+        <Form.Group style={{ maxWidth: '10em' }}>
           <Form.Button content="Refresh updater redis cache" onClick={() => refreshSISRedisCache()} />
           <Form.Button content="Refresh oodikone statistics" onClick={() => refreshStatisticsV2()} />
           <Form.Button content="Refresh all teacher leaderboards" onClick={() => refreshAllTeacherLeaderboards()} />
@@ -82,13 +86,11 @@ const Updater = () => {
           <Form.Button content="Refresh study programmes" onClick={() => refreshStudyProgrammes()} />
           <Form.Button content="Refresh language center data" onClick={() => refreshLanguageCenterData()} />
         </Form.Group>
-        <Form.Group>
-          <Form.Button content="Stop Updating" negative onClick={abortSisUpdater} />
-        </Form.Group>
       </Form>
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
         <Form.Group>
-          <TextArea onChange={(_, { value }) => setSISNums(value)} style={{ width: '98%' }} />
+          <Header>Update custom list of students</Header>
+          <TextArea onChange={(_, { value }) => setSISNums(value)} style={{ width: '25%' }} />
           <Form.Button
             onClick={updateSISPopulationStudents}
             content="Update students by student number"
@@ -96,11 +98,17 @@ const Updater = () => {
           />
         </Form.Group>
         <Form.Group>
-          <TextArea onChange={(_, { value }) => setSISCourses(value)} style={{ width: '98%' }} />
+          <Header style={{ marginTop: '1em' }}>Update custom list of courses</Header>
+          <TextArea onChange={(_, { value }) => setSISCourses(value)} style={{ width: '25%' }} />
           <Form.Button onClick={updateSISCourses} content="Update courses by course code" icon="refresh" />
         </Form.Group>
       </div>
+      <Header>Stop updating (aborts all updating processes in the worker, also those started by a cron-job) </Header>
+      <Form.Group>
+        <Form.Button content="Stop Updating" negative onClick={abortSisUpdater} />
+      </Form.Group>
       <Segment>
+        <Header>Status messages</Header>
         <Button content="Clear messages" onClick={() => setMessages([])} />
         {messages.map((message, i) => {
           return (
