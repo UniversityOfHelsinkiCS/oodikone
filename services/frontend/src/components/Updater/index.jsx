@@ -10,8 +10,9 @@ const Updater = () => {
   const [SISCourses, setSISCourses] = useState('')
   useTitle('Updater')
 
-  const apiCall = async (url, method, data) => {
+  const apiCall = async (name, url, method, data) => {
     try {
+      if (name) setMessages(messages.concat({ message: `Requested refresh of ${name}`, color: 'yellow' }))
       const response = await callApi(url, method, data)
       setMessages(messages.concat({ message: response.data, color: 'green' }))
     } catch {
@@ -19,19 +20,22 @@ const Updater = () => {
     }
   }
 
-  const updateSISMeta = () => apiCall('/updater/update/v2/meta', 'get')
-  const updateSISStudents = () => apiCall('/updater/update/v2/students', 'get')
-  const updateSISProgrammes = () => apiCall('/updater/update/v2/programmes')
-  const updateSISPopulationStudents = () => apiCall('/updater/update/v2/students', 'post', SISNums.trim().split('\n'))
-  const refreshStatisticsV2 = () => apiCall('/updater/refresh_statistic_v2', 'post')
-  const abortSisUpdater = () => apiCall('/updater/abort', 'get')
-  const refreshSISRedisCache = () => apiCall('/updater/refresh_redis_cache', 'get')
-  const updateSISCourses = () => apiCall('/updater/update/v2/courses', 'post', SISCourses.trim().split('\n'))
-  const refreshAllTeacherLeaderboards = () => apiCall('/teachers/top', 'post')
-  const refreshTrends = () => apiCall('/updater/refresh_trends', 'post')
-  const refreshFaculties = () => apiCall('/updater/refresh_faculties_v2', 'post')
-  const refreshStudyProgrammes = () => apiCall('/updater/refresh_study_programmes_v2', 'post')
-  const refreshLanguageCenterData = () => apiCall('/updater/refresh_language_center_data', 'post')
+  const updateSISMeta = () => apiCall('meta', '/updater/update/v2/meta', 'get')
+  const updateSISStudents = () => apiCall('students', '/updater/update/v2/students', 'get')
+  const updateSISProgrammes = () => apiCall('curriculums', '/updater/update/v2/programmes')
+  const updateSISPopulationStudents = () =>
+    apiCall('custom student list', '/updater/update/v2/students', 'post', SISNums.trim().split('\n'))
+  const refreshStatisticsV2 = () => apiCall('statistics', '/updater/refresh_statistic_v2', 'post')
+  const abortSisUpdater = () => apiCall(null, '/updater/abort', 'get')
+  const refreshSISRedisCache = () => apiCall('Updater redis', '/updater/refresh_redis_cache', 'get')
+  const updateSISCourses = () =>
+    apiCall('custom course list', '/updater/update/v2/courses', 'post', SISCourses.trim().split('\n'))
+  const refreshAllTeacherLeaderboards = () => apiCall('teacher leaderboards', '/teachers/top', 'post')
+  const refreshTrends = () => apiCall('trends', '/updater/refresh_trends', 'post')
+  const refreshFaculties = () => apiCall('faculties', '/updater/refresh_faculties_v2', 'post')
+  const refreshStudyProgrammes = () => apiCall('study programmes', '/updater/refresh_study_programmes_v2', 'post')
+  const refreshLanguageCenterData = () =>
+    apiCall('language center data', '/updater/refresh_language_center_data', 'post')
 
   return (
     <Segment>
@@ -59,6 +63,8 @@ const Updater = () => {
           <br />
           <b>Oodikone redis - Refresh study programmes</b> Refresh data for new study programmes for basic and
           studytrack tabs (time consuming).
+          <br />
+          <b>Oodikone redis - Refresh language center data</b> Refresh data for language center view.
         </p>
       </Message>
       <Form>
