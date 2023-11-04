@@ -14,7 +14,8 @@ const LanguageCenterView = () => {
     semestersQuery.isSuccess &&
     semestersQuery.data?.semesters &&
     Object.values(semestersQuery.data.semesters).filter(
-      sem => sem.semestercode >= 134 && new Date(sem.startdate).getFullYear() <= new Date().getFullYear()
+      // 135 = Fall 2017
+      sem => sem.semestercode >= 135 && new Date(sem.startdate).getFullYear() <= new Date().getFullYear()
     )
 
   const [mode, setMode] = useState('notCompleted')
