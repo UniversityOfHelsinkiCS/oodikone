@@ -31,7 +31,7 @@ export const SemestersTab = () => {
       <div className="options-container">
         <CompletionPicker />
       </div>
-      <SortableTable columns={getColumns(getTextIn, semesters, mode)} data={tableData} stretch />
+      <SortableTable columns={getColumns(getTextIn, semesters, mode)} data={tableData} striped={false} stretch />
     </div>
   )
 }
