@@ -2,6 +2,7 @@ const { Course, Credit, Enrollment, StudyrightElement, Studyright } = require('.
 const { Op } = require('sequelize')
 const { redisClient } = require('./redis')
 const { getSemestersAndYears } = require('./semesters')
+const { orderBy } = require('lodash')
 const LANGUAGE_CENTER_REDIS_KEY = 'LANGUAGE_CENTER_DATA'
 
 const isBetween = (start, date, end) =>
@@ -136,8 +137,8 @@ const computeLanguageCenterData = async () => {
 
   const filteredAttempts = attemptsArray.filter(attempt => attempt.faculty?.substring(0, 3).match(`^H\\d`))
 
-  const tableData = await createArrayOfCourses({ attempts: filteredAttempts, courses })
-
+  const unorderedTableData = await createArrayOfCourses({ attempts: filteredAttempts, courses })
+  const tableData = orderBy(unorderedTableData, 'code')
   const faculties = [...new Set(filteredAttempts.map(({ faculty }) => faculty))]
 
   return { tableData, faculties }
