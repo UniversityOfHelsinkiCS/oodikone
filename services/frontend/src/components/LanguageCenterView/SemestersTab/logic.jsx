@@ -1,27 +1,27 @@
 import React from 'react'
 import { shortenCourseName } from '../common'
 
-export const getColumns = (getTextIn, semesters, mode) => {
-  const getTotalOfSemesterStats = stats => {
-    const objVals = Object.values(stats)
-    const arr = objVals.map(stat => {
-      if (mode === 'total') {
-        const notCompleted = stat.notCompleted ?? 0
-        const completed = stat.completed ?? 0
-        return notCompleted + completed
-      }
-      return stat[mode]
-    })
-    return arr.reduce((sum, cur) => {
-      if (cur === undefined) return sum
-      return cur + sum
-    }, 0)
-  }
+export const getColumns = (getTextIn, semesters, numberMode, colorMode, allTotal) => {
+  const getColor = (row, semester) => {
+    if (colorMode === 'none' || allTotal === 0) return {}
+    if (!semester && colorMode === 'course') return {}
+    const stats = semester ? row.bySemesters[semester.semestercode] : row.bySemesters
+    if (!stats) return {}
+    const value = stats[numberMode]
+    const totalValue = colorMode === 'course' ? row.bySemesters[numberMode] : allTotal
+    if (value === 0) return {}
 
-  const getValueFromStats = (stats, mode) => {
-    if (!stats) return 0
-    if (mode === 'total') return (stats.completed ?? 0) + (stats.notCompleted ?? 0)
-    return stats[mode] ?? 0
+    const relativeValue = (() => {
+      if (totalValue === 0) return 0
+      if (colorMode === 'course') return value / ((totalValue / semesters.length) * 2)
+      return value / (totalValue / semesters.length / 8)
+    })()
+
+    return {
+      style: {
+        backgroundColor: `rgba(0,170,0,${relativeValue / 4})`,
+      },
+    }
   }
 
   const columns = [
@@ -41,52 +41,36 @@ export const getColumns = (getTextIn, semesters, mode) => {
     ...semesters.map(semester => ({
       key: `${semester.semestercode}`,
       title: `${semester.name.fi.replace(' ', '\n')}`,
-      cellProps: row => {
-        const stats = row.semesterStats[semester.semestercode]
-        const value = getValueFromStats(stats, mode)
-        const totalValue = getTotalOfSemesterStats(row.semesterStats)
-        const relativeValue = totalValue === 0 ? 0 : value / (totalValue / semesters.length)
-        return {
-          style: {
-            backgroundColor: `rgba(0,180,0,${relativeValue / 6})`,
-          },
-        }
-      },
-      getRowVal: row => getValueFromStats(row.semesterStats[semester.semestercode], mode),
+      cellProps: row => getColor(row, semester),
+      getRowVal: row => row.bySemesters[semester.semestercode]?.[numberMode] ?? 0,
       filterable: false,
     })),
     {
       key: 'all',
       title: 'Total',
-      getRowVal: row => getTotalOfSemesterStats(row.semesterStats),
+      getRowVal: row => row.bySemesters[numberMode],
+      cellProps: row => getColor(row),
     },
   ]
   return columns
 }
 
-export const getCourseMapWithSemesters = (attempts, semesters) => {
-  const map = attempts.reduce((obj, cur) => {
-    const semester = semesters.find(({ startdate, enddate }) => {
-      const start = new Date(startdate).getTime()
-      const end = new Date(enddate).getTime()
-      const attDate = new Date(cur.date).getTime()
-      const result = start < attDate && end > attDate
-      return result
-    })?.semestercode
-    if (!obj[cur.courseCode]) {
-      obj[cur.courseCode] = {}
-    }
-    if (!obj[cur.courseCode][semester]) {
-      obj[cur.courseCode][semester] = {}
-    }
-    const stats = obj[cur.courseCode][semester]
-    const field = cur.completed ? 'completed' : 'notCompleted'
-    if (!stats[field]) {
-      stats[field] = 1
-    } else {
-      stats[field] += 1
-    }
-    return obj
-  }, {})
-  return map
+export const calculateTotals = (courses, semesters) => {
+  const totalRow = { completed: 0, notCompleted: 0, total: 0 }
+
+  semesters.forEach(sem => {
+    totalRow[sem] = { completed: 0, notCompleted: 0, total: 0 }
+    courses.forEach(course => {
+      const stats = course.bySemesters[sem]
+      if (!stats) return
+      totalRow[sem].completed += stats.completed
+      totalRow[sem].notCompleted += stats.notCompleted
+      totalRow[sem].total += stats.total
+      totalRow.completed += stats.completed
+      totalRow.notCompleted += stats.notCompleted
+      totalRow.total += stats.total
+    })
+  })
+
+  return { code: 'TOTAL', name: { en: 'All courses total' }, bySemesters: totalRow }
 }

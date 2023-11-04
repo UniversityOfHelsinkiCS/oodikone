@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Divider, Loader, Message, Tab } from 'semantic-ui-react'
 import './index.css'
 import { useGetSemestersQuery } from 'redux/semesters'
@@ -18,10 +18,22 @@ const LanguageCenterView = () => {
       sem => sem.semestercode >= 135 && new Date(sem.startdate).getFullYear() <= new Date().getFullYear()
     )
 
-  const [mode, setMode] = useState('notCompleted')
+  const [numberMode, setNumberMode] = useState('notCompleted')
+  const [colorMode, setColorMode] = useState('course')
   const [semesterFilter, setSemesterFilter] = useState(null)
   const history = useHistory()
   const [tab, setTab] = useTabs('languagecenter_tab', 0, history)
+
+  const selectedSemesters = useMemo(() => {
+    const selectedSemestersArray = []
+    if (semesterFilter?.start && semesterFilter?.end) {
+      for (let i = parseInt(semesterFilter.start, 10); i <= parseInt(semesterFilter.end, 10); i++) {
+        selectedSemestersArray.push(i)
+      }
+    }
+
+    return [...new Set(selectedSemestersArray)]
+  }, [semesterFilter])
 
   useEffect(() => {
     if (!semesters?.length) return
@@ -52,9 +64,12 @@ const LanguageCenterView = () => {
   const settingsContext = {
     semesterFilter,
     setSemesterFilter,
-    mode,
-    setMode,
+    numberMode,
+    setNumberMode,
     semesters,
+    colorMode,
+    setColorMode,
+    selectedSemesters,
   }
 
   return (

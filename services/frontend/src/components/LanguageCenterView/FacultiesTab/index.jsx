@@ -12,8 +12,9 @@ import '../index.css'
 
 export const FacultiesTab = () => {
   const facultyQuery = useGetFacultiesQuery()
-  const { mode, semesterFilter, setSemesterFilter, semesters } = useLanguageCenterContext()
+  const { numberMode, semesterFilter, setSemesterFilter, semesters, selectedSemesters } = useLanguageCenterContext()
   const { data, isFetchingOrLoading, isError } = useGetLanguageCenterDataQuery()
+
   const facultyMap = useMemo(
     () =>
       facultyQuery.data?.reduce((obj, cur) => {
@@ -26,21 +27,14 @@ export const FacultiesTab = () => {
   const { getTextIn } = useLanguage()
 
   const totalRow = useMemo(() => {
-    if (!data?.formattedByFaculties) return []
+    if (!data?.tableData) return null
     const totals = calculateTotals(
-      data.formattedByFaculties,
+      data.tableData,
       data.faculties,
       semesters.map(s => s.semestercode)
     )
     return row(totals, { ignoreFilters: true, ignoreSorting: true })
   }, [data, facultyQuery.data])
-
-  const selectedSemesters = []
-  if (semesterFilter?.start && semesterFilter?.end) {
-    for (let i = parseInt(semesterFilter.start, 10); i <= parseInt(semesterFilter.end, 10); i++) {
-      selectedSemesters.push(i)
-    }
-  }
 
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
   if (isFetchingOrLoading || !data || !semesterFilter || !semesters?.length || !facultyMap)
@@ -53,8 +47,8 @@ export const FacultiesTab = () => {
         <CompletionPicker />
       </div>
       <SortableTable
-        columns={getColumns(getTextIn, [...data.faculties].sort(), mode, [...new Set(selectedSemesters)], facultyMap)}
-        data={[totalRow, ...data.formattedByFaculties]}
+        columns={getColumns(getTextIn, [...data.faculties].sort(), numberMode, selectedSemesters, facultyMap)}
+        data={[totalRow, ...data.tableData]}
         stretch
       />
     </div>
