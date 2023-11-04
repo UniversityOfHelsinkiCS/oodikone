@@ -12,11 +12,18 @@ const Updater = () => {
 
   const apiCall = async (name, url, method, data) => {
     try {
-      if (name) setMessages(messages.concat({ message: `Requested refresh of ${name}`, color: 'yellow' }))
+      if (name)
+        setMessages(oldMessages =>
+          oldMessages.concat({
+            time: new Date(),
+            message: `Requested refresh of ${name}`,
+            color: 'green',
+          })
+        )
       const response = await callApi(url, method, data)
-      setMessages(messages.concat({ message: response.data, color: 'green' }))
+      setMessages(oldMessages => oldMessages.concat({ time: new Date(), message: response.data, color: 'green' }))
     } catch {
-      setMessages(messages.concat({ message: 'Updater api error', color: 'red' }))
+      setMessages(oldMessages => oldMessages.concat({ time: new Date(), message: 'Updater api error', color: 'red' }))
     }
   }
 
@@ -116,11 +123,10 @@ const Updater = () => {
       <Segment>
         <Header>Status messages</Header>
         <Button content="Clear messages" onClick={() => setMessages([])} />
-        {messages.map((message, i) => {
+        {messages.map(message => {
           return (
-            // eslint-disable-next-line react/no-array-index-key
-            <Header key={i} style={{ color: message.color }}>
-              {message.message}
+            <Header key={`${message.time.getTime()}-${message.message}`} style={{ color: message.color }}>
+              {message.time.toLocaleTimeString()}: {message.message}
             </Header>
           )
         })}
