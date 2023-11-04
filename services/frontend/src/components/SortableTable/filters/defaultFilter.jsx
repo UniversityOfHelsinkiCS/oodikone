@@ -60,6 +60,7 @@ const DefaultColumnFilterComponent = ({ column, options, dispatch }) => {
 
         return (
           <Dropdown.Item
+            key={text}
             icon={<Icon name={icon} style={{ color }} />}
             text={
               text !== undefined && text !== null ? (
