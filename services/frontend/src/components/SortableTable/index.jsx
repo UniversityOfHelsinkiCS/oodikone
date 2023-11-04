@@ -103,6 +103,7 @@ const SortableTable = ({
   toggleGroupExpansion,
   expandedGroups,
   onlyExportColumns = [],
+  striped = true,
 }) => {
   const [exportModalOpen, setExportModalOpen] = useState(false)
   const [state, dispatch] = useReducer(
@@ -172,7 +173,11 @@ const SortableTable = ({
     })
   }
 
-  const classNames = ['ui', 'table', 'collapsing', 'striped', 'celled', 'ok-sortable-table']
+  const classNames = ['ui', 'table', 'collapsing', 'celled', 'ok-sortable-table']
+
+  if (striped) {
+    classNames.push('striped')
+  }
 
   if (singleLine) {
     classNames.push('single', 'line')
