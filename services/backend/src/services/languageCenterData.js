@@ -92,7 +92,6 @@ const computeLanguageCenterData = async () => {
     if (!attemptsByStudents[sn]) {
       attemptsByStudents[sn] = []
     }
-    if (attemptsByStudents[sn].find(att => att.courseCode === e.course_code)) return
     studentList.add(sn)
     attemptsByStudents[sn].push({
       studentNumber: sn,
