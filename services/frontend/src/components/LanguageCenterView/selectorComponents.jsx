@@ -1,7 +1,7 @@
 /* eslint-disable import/prefer-default-export */
 import useLanguage from 'components/LanguagePicker/useLanguage'
 import React, { useMemo } from 'react'
-import { Dropdown, Icon, Radio } from 'semantic-ui-react'
+import { Dropdown, Radio } from 'semantic-ui-react'
 import { useLanguageCenterContext } from './common'
 import './index.css'
 
@@ -91,9 +91,6 @@ export const SemesterRangeSelector = () => {
   return (
     <div className="datepicker-container">
       <div className="datepicker-acual-container">
-        <div className="calendar-icon-container">
-          <Icon size="big" name="calendar alternate outline" />
-        </div>
         <div>
           <b>From</b>
           <SemesterSelector
