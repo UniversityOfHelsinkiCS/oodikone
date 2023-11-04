@@ -1,7 +1,7 @@
 import React from 'react'
 import { shortenCourseName } from '../common'
 
-export const getColumns = (getTextIn, faculties, mode, semesters, facultyMap) => {
+export const getColumns = (getTextIn, faculties, numberMode, semesters, facultyMap) => {
   const getFacultyTitle = code => {
     if (!code) return 'No faculty' // Shouldn't happen probably
     if (code === 'H930') return 'Open\nuni'
@@ -30,7 +30,7 @@ export const getColumns = (getTextIn, faculties, mode, semesters, facultyMap) =>
         semesters.forEach(sem => {
           const semesterStats = row.bySemesters[sem]
           if (!semesterStats || !semesterStats[facultyCode]) return
-          number += semesterStats[facultyCode][mode]
+          number += semesterStats[facultyCode][numberMode]
         })
         return number
       },
@@ -44,7 +44,7 @@ export const getColumns = (getTextIn, faculties, mode, semesters, facultyMap) =>
         semesters.forEach(sem => {
           const semesterStats = row.bySemesters[sem]
           if (!semesterStats) return
-          number += semesterStats[mode]
+          number += semesterStats[numberMode]
         })
         return number
       },

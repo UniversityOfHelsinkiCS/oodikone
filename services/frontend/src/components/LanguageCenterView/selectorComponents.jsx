@@ -6,25 +6,58 @@ import { useLanguageCenterContext } from './common'
 import './index.css'
 
 export const CompletionPicker = () => {
-  const { mode, setMode } = useLanguageCenterContext()
+  const { numberMode, setNumberMode } = useLanguageCenterContext()
 
   return (
     <div className="completion-container">
       <div className="completion-acual-container">
-        <b className="completion-header">Show number of enrollments or completions</b>
+        <b className="completion-header">Show number of</b>
         <Radio
           name="modeRadioGroup"
           value="completed"
           label="Completions"
-          onChange={() => setMode('completed')}
-          checked={mode === 'completed'}
+          onChange={() => setNumberMode('completed')}
+          checked={numberMode === 'completed'}
         />
         <Radio
           name="modeRadioGroup"
           value="notCompleted"
           label="Enrollments"
-          onChange={() => setMode('notCompleted')}
-          checked={mode === 'notCompleted'}
+          onChange={() => setNumberMode('notCompleted')}
+          checked={numberMode === 'notCompleted'}
+        />
+      </div>
+    </div>
+  )
+}
+
+export const ColorModeSelector = () => {
+  const { colorMode, setColorMode } = useLanguageCenterContext()
+
+  return (
+    <div className="colormodeselector-container">
+      <div className="colormodeselector-acual-container">
+        <b className="colormodeselector-header">Coloring mode</b>
+        <Radio
+          name="colorModeGroup"
+          value="course"
+          label="Compare to average of course"
+          onChange={() => setColorMode('course')}
+          checked={colorMode === 'course'}
+        />
+        <Radio
+          name="colorModeGroup"
+          value="total"
+          label="Compare to other courses"
+          onChange={() => setColorMode('total')}
+          checked={colorMode === 'total'}
+        />
+        <Radio
+          name="colorModeGroup"
+          value="none"
+          label="No colors"
+          onChange={() => setColorMode('none')}
+          checked={colorMode === 'none'}
         />
       </div>
     </div>

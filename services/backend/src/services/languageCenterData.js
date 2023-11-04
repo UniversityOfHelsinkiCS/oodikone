@@ -137,14 +137,14 @@ const computeLanguageCenterData = async () => {
 
   const filteredAttempts = attemptsArray.filter(attempt => attempt.faculty?.substring(0, 3).match(`^H\\d`))
 
-  const formattedByFaculties = await formatByFaculties({ attempts: filteredAttempts, courses })
+  const tableData = await createArrayOfCourses({ attempts: filteredAttempts, courses })
 
   const faculties = [...new Set(filteredAttempts.map(({ faculty }) => faculty))]
 
-  return { attempts: filteredAttempts, courses, formattedByFaculties, faculties }
+  return { tableData, faculties }
 }
 
-const formatByFaculties = async ({ attempts, courses }) => {
+const createArrayOfCourses = async ({ attempts, courses }) => {
   const semestersAndYears = await getSemestersAndYears()
   const semesters = Object.values(semestersAndYears.semesters)
   const semesterStatsMap = attempts.reduce((obj, cur) => {
