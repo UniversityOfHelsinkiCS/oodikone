@@ -41,6 +41,7 @@ stretch: sets table's css width to 100%
 actions: JSX to add in the top right corner of the table, for example buttons
 hideHeaderBar: Hides the header bar that has a table icon, title, fullscreen button and menu/buttons
 style: css style object of the whole table
+striped: The style where every other row is grey. Boolean, default is true.
 defaultSort: [columnkey, order] of default sort column and order. For example ['name', 'desc']
 toggleGroupExpansion: Function which is called when group of rows is collapsed or expanded
 expandedGroups: Array (or set?) of keys of rows are supposed to be expanded. These two are used
