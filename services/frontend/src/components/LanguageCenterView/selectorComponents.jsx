@@ -11,27 +11,20 @@ export const CompletionPicker = () => {
   return (
     <div className="completion-container">
       <div className="completion-acual-container">
-        <b className="completion-header">Course completion</b>
-        <Radio
-          name="modeRadioGroup"
-          value="notCompleted"
-          label="Enrolled but not passed"
-          onChange={() => setMode('notCompleted')}
-          checked={mode === 'notCompleted'}
-        />
+        <b className="completion-header">Show number of enrollments or completions</b>
         <Radio
           name="modeRadioGroup"
           value="completed"
-          label="Passed"
+          label="Completions"
           onChange={() => setMode('completed')}
           checked={mode === 'completed'}
         />
         <Radio
           name="modeRadioGroup"
-          value="total"
-          label="Both"
-          onChange={() => setMode('total')}
-          checked={mode === 'total'}
+          value="notCompleted"
+          label="Enrollments"
+          onChange={() => setMode('notCompleted')}
+          checked={mode === 'notCompleted'}
         />
       </div>
     </div>
