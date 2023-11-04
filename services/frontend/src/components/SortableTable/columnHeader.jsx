@@ -548,7 +548,7 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
                   <div className="actions">
                     <div
                       className="item"
-                      active={sort === 'asc' ? true : undefined}
+                      active={sort === 'asc' ? 'true' : undefined}
                       onClick={() =>
                         dispatch({ type: 'TOGGLE_COLUMN_SORT', payload: { column: filterColumnKey, direction: 'asc' } })
                       }
@@ -557,7 +557,7 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
                     </div>
                     <div
                       className="item"
-                      active={sort === 'desc' ? true : undefined}
+                      active={sort === 'desc' ? 'true' : undefined}
                       onClick={() =>
                         dispatch({
                           type: 'TOGGLE_COLUMN_SORT',
