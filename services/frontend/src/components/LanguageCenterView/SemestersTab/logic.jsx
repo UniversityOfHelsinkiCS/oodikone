@@ -40,7 +40,7 @@ export const getColumns = (getTextIn, semesters, numberMode, colorMode, allTotal
     },
     ...semesters.map(semester => ({
       key: `${semester.semestercode}`,
-      title: `${semester.name.fi.replace(' ', '\n')}`,
+      title: `${getTextIn(semester.name).replace(' ', '\n')}`,
       cellProps: row => getColor(row, semester),
       getRowVal: row => row.bySemesters[semester.semestercode]?.[numberMode] ?? 0,
       filterable: false,
