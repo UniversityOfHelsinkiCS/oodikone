@@ -17,7 +17,7 @@ const LanguageCenterView = () => {
       sem => sem.semestercode >= 134 && new Date(sem.startdate).getFullYear() <= new Date().getFullYear()
     )
 
-  const [mode, setMode] = useState('total')
+  const [mode, setMode] = useState('notCompleted')
   const [semesterFilter, setSemesterFilter] = useState(null)
   const history = useHistory()
   const [tab, setTab] = useTabs('languagecenter_tab', 0, history)
