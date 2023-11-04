@@ -79,11 +79,12 @@ const LanguageCenterView = () => {
         <Message>
           <p>This view displays amounts of enrollments and completions of courses organized by language center.</p>
           <p>You can view the numbers by faculties or by semesters.</p>
-          <p>
-            <b style={{ color: 'red' }}>
-              This feature is still under development and the numbers are not yet completely accurate.
-            </b>
-          </p>
+          Explanations of settings:
+          <ul>
+            <li>Completion: Amount of passed completions of course</li>
+            <li>Enrollments: Total amount of enrollments on course</li>
+          </ul>
+          <p>This feature is under development and numbers may be inaccurate.</p>
         </Message>
         <div className="languagecenter-table">
           <Tab panes={getPanes()} activeIndex={tab} onTabChange={setTab} />
