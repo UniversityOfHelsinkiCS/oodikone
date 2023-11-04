@@ -7,11 +7,11 @@ import useLanguage from 'components/LanguagePicker/useLanguage'
 import { getColumns, getCourseMapWithSemesters } from './logic'
 import { useLanguageCenterContext } from '../common'
 import '../index.css'
-import { CompletionPicker } from '../selectorComponents'
+import { CompletionPicker, SemesterRangeSelector } from '../selectorComponents'
 
 export const SemestersTab = () => {
   const { getTextIn } = useLanguage()
-  const { semesterFilter, semesters, mode } = useLanguageCenterContext()
+  const { setSemesterFilter, semesterFilter, semesters, mode } = useLanguageCenterContext()
   const { data: rawData, isFetchingOrLoading, isError } = useGetLanguageCenterDataQuery()
 
   const tableData = useMemo(() => {
@@ -29,6 +29,7 @@ export const SemestersTab = () => {
   return (
     <div>
       <div className="options-container">
+        <SemesterRangeSelector setSemesterFilter={setSemesterFilter} semesterFilter={semesterFilter} />
         <CompletionPicker />
       </div>
       <SortableTable columns={getColumns(getTextIn, semesters, mode)} data={tableData} striped={false} stretch />
