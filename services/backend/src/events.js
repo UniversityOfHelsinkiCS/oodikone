@@ -164,4 +164,5 @@ module.exports = {
   refreshTrends,
   refreshFaculties,
   refreshNewOverviews,
+  refreshLanguageCenterData,
 }
