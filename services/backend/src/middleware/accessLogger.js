@@ -18,7 +18,6 @@ const accessLogger = morgan((tokens, req, res) => {
 
   const message = [
     user.name,
-    ':',
     tokens['method'](req, res),
     tokens['url'](req, res),
     tokens['status'](req, res),
