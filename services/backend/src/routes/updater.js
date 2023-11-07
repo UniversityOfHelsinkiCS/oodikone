@@ -15,6 +15,7 @@ const {
   refreshNewOverviews,
   refreshLanguageCenterData,
 } = require('../events')
+const logger = require('../util/logger')
 
 router.get('/update/v2/meta', async (req, res) => {
   const response = await updateSISMetadata(req)
@@ -52,6 +53,7 @@ router.get('/update/v2/programmes', async (req, res) => {
 })
 
 router.get('/refresh_redis_cache', async (req, res) => {
+  logger.info(`${req.user.userId} requested refresh of redis cache`)
   const response = await updateSISRedisCache()
   if (response) {
     res.status(200).json('Refreshing SIS redis cache scheduled')
@@ -59,26 +61,31 @@ router.get('/refresh_redis_cache', async (req, res) => {
 })
 
 router.post('/refresh_statistic_v2', async (req, res) => {
+  logger.info(`${req.user.userId} requested refresh of statistics`)
   await refreshStatistics()
   res.status(200).json('Teacher and study programme statistics refreshed')
 })
 
 router.post('/refresh_study_programmes_v2', async (req, res) => {
+  logger.info(`${req.user.userId} requested refresh of study programmes`)
   await refreshNewOverviews()
   res.status(200).json('New study programme overviews refreshed')
 })
 
 router.post('/refresh_faculties_v2', async (req, res) => {
+  logger.info(`${req.user.userId} requested refresh of faculties`)
   await refreshFaculties()
   res.status(200).json('Faculties refreshed')
 })
 
 router.post('/refresh_trends', async (req, res) => {
+  logger.info(`${req.user.userId} requested refresh of trends`)
   await refreshTrends()
   res.status(200).json('Trends refreshed')
 })
 
 router.post('/refresh_language_center_data', async (req, res) => {
+  logger.info(`${req.user.userId} requested refresh of language center data`)
   await refreshLanguageCenterData()
   res.status(200).json('Language center data refreshed')
 })
