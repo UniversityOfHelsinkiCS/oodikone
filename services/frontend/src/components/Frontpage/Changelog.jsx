@@ -30,6 +30,8 @@ export const Changelog = ({ showFullChangelog }) => {
     return releaseString
   }
 
+  const filterInternalReleases = release => !release.title.startsWith('Internal:')
+
   if (isLoading || itemsToShow.length === 0) return <Loader />
 
   return (
@@ -40,7 +42,7 @@ export const Changelog = ({ showFullChangelog }) => {
           <p>Last update on: {builtAt ? formatDate(builtAt) : formatDate(itemsToShow[0].time)}</p>
         </>
       )}
-      {itemsToShow.map(release => (
+      {itemsToShow.filter(filterInternalReleases).map(release => (
         <div key={release.time}>
           <Divider section />
           <ReactMarkdown children={getReleaseString(release)} />
