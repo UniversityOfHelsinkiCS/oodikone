@@ -139,6 +139,7 @@ const refreshTrends = async () => {
   logger.info('Trends refreshed!')
 }
 
+// eslint-disable-next-line no-unused-vars
 const refreshLanguageCenterData = async () => {
   const freshData = await computeLanguageCenterData()
   await redisClient.setAsync(LANGUAGE_CENTER_REDIS_KEY, JSON.stringify(freshData))
@@ -150,13 +151,7 @@ const startCron = () => {
     logger.info('Cronjob for refreshing stats started: runs at 3am every day.')
     // refresh 3am every day
     schedule('0 3 * * *', async () => {
-      for (const func of [
-        refreshStatistics,
-        refreshTrends,
-        refreshNewOverviews,
-        refreshFaculties,
-        refreshLanguageCenterData,
-      ]) {
+      for (const func of [refreshStatistics, refreshTrends, refreshNewOverviews, refreshFaculties]) {
         await func()
       }
     })
@@ -169,5 +164,4 @@ module.exports = {
   refreshTrends,
   refreshFaculties,
   refreshNewOverviews,
-  refreshLanguageCenterData,
 }
