@@ -148,9 +148,9 @@ const refreshLanguageCenterData = async () => {
 
 const startCron = () => {
   if (isProduction) {
-    logger.info('Cronjob for refreshing stats started: runs at 3am every day.')
-    // refresh 3am every day
-    schedule('0 3 * * *', async () => {
+    logger.info('Cronjob for refreshing stats started: runs at 4am saturday.')
+    // refresh on saturday only because was causing lag. Investigate & fix, then return to 3am daily
+    schedule('0 4 * * 6', async () => {
       for (const func of [refreshStatistics, refreshTrends, refreshNewOverviews, refreshFaculties]) {
         await func()
       }
