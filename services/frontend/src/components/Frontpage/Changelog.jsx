@@ -11,9 +11,15 @@ export const Changelog = ({ showFullChangelog }) => {
   const [itemsToShow, setItemsToShow] = useState([])
   const { data, isLoading } = useGetChangelogQuery()
 
+  const filterInternalReleases = release => !release.title.startsWith('Internal:')
+
   useEffect(() => {
     if (!data) return
-    setItemsToShow(showFullChangelog ? [...data.slice(0, 20)] : [...data.slice(0, 2)])
+    setItemsToShow(
+      showFullChangelog
+        ? [...data.filter(filterInternalReleases).slice(0, 20)]
+        : [...data.filter(filterInternalReleases).slice(0, 2)]
+    )
   }, [data, showFullChangelog])
 
   const formatDate = dateString => {
@@ -30,8 +36,6 @@ export const Changelog = ({ showFullChangelog }) => {
     return releaseString
   }
 
-  const filterInternalReleases = release => !release.title.startsWith('Internal:')
-
   if (isLoading || itemsToShow.length === 0) return <Loader />
 
   return (
@@ -42,7 +46,7 @@ export const Changelog = ({ showFullChangelog }) => {
           <p>Last update on: {builtAt ? formatDate(builtAt) : formatDate(itemsToShow[0].time)}</p>
         </>
       )}
-      {itemsToShow.filter(filterInternalReleases).map(release => (
+      {itemsToShow.map(release => (
         <div key={release.time}>
           <Divider section />
           <ReactMarkdown children={getReleaseString(release)} />
