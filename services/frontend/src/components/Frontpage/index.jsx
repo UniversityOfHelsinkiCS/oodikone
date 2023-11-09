@@ -51,7 +51,7 @@ const FrontPage = () => {
               <Grid.Row>
                 <Grid.Column>
                   <Header as="h3">Trends</Header>
-                  <p>View many kinds visualizations of study progress and study programme status.</p>
+                  <p>View many kinds of visualizations about study progress and study programme status.</p>
                   <Divider section />
                   {showItems.populations && (
                     <>
