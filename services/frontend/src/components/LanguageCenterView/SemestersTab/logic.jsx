@@ -48,7 +48,7 @@ export const getColumns = (getTextIn, semesters, numberMode, colorMode, allTotal
     {
       key: 'all',
       title: 'Total',
-      getRowVal: row => row.bySemesters[numberMode],
+      getRowVal: row => row.bySemesters[numberMode] ?? 0,
       cellProps: row => getColor(row),
     },
   ]

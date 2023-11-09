@@ -136,48 +136,53 @@ const computeLanguageCenterData = async () => {
   })
 
   const filteredAttempts = attemptsArray.filter(attempt => attempt.faculty?.substring(0, 3).match(`^H\\d`))
-
-  const unorderedTableData = await createArrayOfCourses({ attempts: filteredAttempts, courses })
-  const tableData = orderBy(unorderedTableData, 'code')
   const faculties = [...new Set(filteredAttempts.map(({ faculty }) => faculty))]
+
+  const unorderedTableData = await createArrayOfCourses(filteredAttempts, courses)
+
+  const tableData = orderBy(unorderedTableData, 'code')
 
   return { tableData, faculties }
 }
 
-const createArrayOfCourses = async ({ attempts, courses }) => {
+const createArrayOfCourses = async (attempts, courses) => {
+  const fields = { completed: 0, notCompleted: 0, ratio: 0 }
   const semestersAndYears = await getSemestersAndYears()
   const semesters = Object.values(semestersAndYears.semesters)
   const semesterStatsMap = attempts.reduce((obj, cur) => {
     const semester = semesters.find(s => isBetween(s.startdate, cur.date, s.enddate)).semestercode
     if (!obj[cur.courseCode]) {
-      obj[cur.courseCode] = { completed: 0, notCompleted: 0, total: 0 }
+      obj[cur.courseCode] = { ...fields }
     }
     if (!obj[cur.courseCode][semester]) {
-      obj[cur.courseCode][semester] = { completed: 0, notCompleted: 0, total: 0 }
+      obj[cur.courseCode][semester] = { ...fields }
     }
     if (!obj[cur.courseCode][semester][cur.faculty]) {
-      obj[cur.courseCode][semester][cur.faculty] = { completed: 0, notCompleted: 0, total: 0 }
+      obj[cur.courseCode][semester][cur.faculty] = { ...fields }
     }
-    const stats = obj[cur.courseCode][semester][cur.faculty]
+    if (!obj[cur.courseCode].byFaculties?.[cur.faculty]) {
+      if (!obj[cur.courseCode].byFaculties) obj[cur.courseCode].byFaculties = { ...fields }
+      obj[cur.courseCode].byFaculties[cur.faculty] = { ...fields }
+    }
+    const semesterFacultyStats = obj[cur.courseCode][semester][cur.faculty]
     const allFacultiesTotal = obj[cur.courseCode][semester]
     const allSemestersTotal = obj[cur.courseCode]
-    if (cur.completed) {
-      stats.completed += 1
-      allFacultiesTotal.completed += 1
-      allSemestersTotal.completed += 1
-    } else {
-      stats.notCompleted += 1
-      allFacultiesTotal.notCompleted += 1
-      allSemestersTotal.notCompleted += 1
+    const facultyTotalStats = obj[cur.courseCode].byFaculties[cur.faculty]
+    const allStats = [semesterFacultyStats, allFacultiesTotal, allSemestersTotal, facultyTotalStats]
+    for (const stats of allStats) {
+      if (cur.completed) {
+        stats.completed += 1
+      } else {
+        stats.notCompleted += 1
+      }
+      stats.ratio = stats.notCompleted === 0 ? 1 : stats.completed / stats.notCompleted
+      if (stats.ratio > 1) stats.ratio = 1
     }
-    stats.total += 1
-    allFacultiesTotal.total += 1
-    allSemestersTotal.total += 1
     return obj
   }, {})
 
   return courses
-    .map(c => ({ ...c.dataValues, bySemesters: semesterStatsMap[c.code] }))
+    .map(c => ({ ...c.dataValues, bySemesters: { ...semesterStatsMap[c.code], cellStats: {} } }))
     .filter(course => course.bySemesters)
 }
 

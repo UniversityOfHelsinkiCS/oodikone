@@ -1,12 +1,36 @@
 import React from 'react'
-import { shortenCourseName } from '../common'
+import { getRatio, shortenCourseName } from '../common'
 
-export const getColumns = (getTextIn, faculties, numberMode, semesters, facultyMap) => {
+export const getColumns = (getTextIn, faculties, numberMode, facultyMap) => {
   const getFacultyTitle = code => {
     if (!code) return 'No faculty' // Shouldn't happen probably
     if (code === 'H930') return 'Open\nuni'
     return code
   }
+
+  const totalEnrollmentsColumn = {
+    key: 'total-column',
+    title: 'Total\nenrollments',
+    getRowVal: row => row.bySemesters.facultiesTotal.notCompleted,
+    filterType: 'range',
+    forceToolsMode: 'floating',
+  }
+
+  const totalColumn = {
+    key: 'total-column',
+    title: 'Total',
+    getRowVal: row => row.bySemesters.facultiesTotal[numberMode],
+    forceToolsMode: 'floating',
+    filterType: 'range',
+  }
+
+  const getTotalColumn = () => {
+    if (numberMode === 'ratio') {
+      return totalEnrollmentsColumn
+    }
+    return totalColumn
+  }
+
   const columns = [
     {
       key: 'course-name',
@@ -25,30 +49,29 @@ export const getColumns = (getTextIn, faculties, numberMode, semesters, facultyM
       key: facultyCode ?? 'no-faculty',
       title: getFacultyTitle(facultyCode),
       headerProps: { title: getTextIn(facultyMap[facultyCode]) },
-      getRowVal: row => {
-        let number = 0
-        semesters.forEach(sem => {
-          const semesterStats = row.bySemesters[sem]
-          if (!semesterStats || !semesterStats[facultyCode]) return
-          number += semesterStats[facultyCode][numberMode]
-        })
-        return number
+      cellProps: row => {
+        const stats = row.bySemesters.cellStats[facultyCode]
+        if (stats.ratio === null) return null
+        const hoverTooltip = {
+          title: `Completions: ${stats.completed}\nEnrollments: ${stats.notCompleted}\nRatio: ${stats.ratio} %`,
+        }
+        if (numberMode !== 'ratio') return hoverTooltip
+        if (stats.notCompleted === 0) return hoverTooltip
+        return { ...hoverTooltip, style: { backgroundColor: `rgba(200,0,0,${1 - stats.ratio / 100})` } }
       },
-      filterable: false,
+      getRowVal: row => {
+        const stats = row.bySemesters.cellStats[facultyCode]
+        if (numberMode === 'ratio') {
+          if (stats.notCompleted === 0) return '-'
+          return stats.ratio
+        }
+        return stats[numberMode]
+      },
+      formatValue: numberMode === 'ratio' ? val => (val === '-' ? '-' : `${val} %`) : null,
+      filterType: 'range',
+      forceToolsMode: 'floating',
     })),
-    {
-      key: 'total-column',
-      title: 'Total',
-      getRowVal: row => {
-        let number = 0
-        semesters.forEach(sem => {
-          const semesterStats = row.bySemesters[sem]
-          if (!semesterStats) return
-          number += semesterStats[numberMode]
-        })
-        return number
-      },
-    },
+    getTotalColumn(),
   ]
   return columns
 }
@@ -74,28 +97,28 @@ export const getCourseFaculties = attempts => {
 }
 
 export const calculateTotals = (courses, faculties, semesters) => {
-  const totalRow = {}
+  const totalRow = { cellStats: { completed: 0, notCompleted: 0, ratio: null } }
   semesters.forEach(sem => {
-    totalRow[sem] = { completed: 0, notCompleted: 0, total: 0 }
+    totalRow[sem] = { completed: 0, notCompleted: 0, ratio: 1 }
     courses.forEach(course => {
       const stats = course.bySemesters[sem]
       if (!stats) return
       totalRow[sem].completed += stats.completed
       totalRow[sem].notCompleted += stats.notCompleted
-      totalRow[sem].total += stats.total
+      totalRow[sem].ratio = getRatio(totalRow[sem])
     })
 
     faculties.forEach(fac => {
-      totalRow[sem][fac] = { completed: 0, notCompleted: 0, total: 0 }
+      totalRow[sem][fac] = { completed: 0, notCompleted: 0, ratio: null }
       courses.forEach(course => {
         const stats = course.bySemesters[sem]?.[fac]
         if (!stats) return
         totalRow[sem][fac].completed += stats.completed
         totalRow[sem][fac].notCompleted += stats.notCompleted
-        totalRow[sem][fac].total += stats.total
+        totalRow[sem][fac].ratio = getRatio(totalRow[sem][fac])
       })
     })
   })
 
-  return { code: 'TOTAL', name: { en: 'All courses total' }, bySemesters: totalRow }
+  return { cellStats: {}, code: 'TOTAL', name: { en: 'All courses total' }, bySemesters: totalRow }
 }
