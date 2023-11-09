@@ -62,12 +62,12 @@ export const getColumns = (getTextIn, faculties, numberMode, facultyMap) => {
       getRowVal: row => {
         const stats = row.bySemesters.cellStats[facultyCode]
         if (numberMode === 'ratio') {
-          if (stats.notCompleted === 0) return '-'
+          if (stats.notCompleted === 0) return null
           return stats.ratio
         }
         return stats[numberMode]
       },
-      formatValue: numberMode === 'ratio' ? val => (val === '-' ? '-' : `${val} %`) : null,
+      formatValue: numberMode === 'ratio' ? val => (val === null ? '-' : `${val} %`) : null,
       filterType: 'range',
       forceToolsMode: 'floating',
     })),
