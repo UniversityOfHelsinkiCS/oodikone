@@ -5,7 +5,7 @@ import { Dropdown, Radio } from 'semantic-ui-react'
 import { useLanguageCenterContext } from './common'
 import './index.css'
 
-export const CompletionPicker = () => {
+export const CompletionPicker = ({ enableRatioOption }) => {
   const { numberMode, setNumberMode } = useLanguageCenterContext()
 
   return (
@@ -26,6 +26,15 @@ export const CompletionPicker = () => {
           onChange={() => setNumberMode('notCompleted')}
           checked={numberMode === 'notCompleted'}
         />
+        {enableRatioOption && (
+          <Radio
+            name="modeRadioGroup"
+            value="ratio"
+            label="Ratio of credits per enrollments"
+            onChange={() => setNumberMode('ratio')}
+            checked={numberMode === 'ratio'}
+          />
+        )}
       </div>
     </div>
   )

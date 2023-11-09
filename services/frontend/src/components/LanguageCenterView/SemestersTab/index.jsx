@@ -1,5 +1,5 @@
 /* eslint-disable import/prefer-default-export */
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { Loader } from 'semantic-ui-react'
 import SortableTable, { row } from 'components/SortableTable'
 import { useGetLanguageCenterDataQuery } from 'redux/languageCenterView'
@@ -11,9 +11,15 @@ import { ColorModeSelector, CompletionPicker, SemesterRangeSelector } from '../s
 
 export const SemestersTab = () => {
   const { getTextIn } = useLanguage()
-  const { setSemesterFilter, semesterFilter, semesters, numberMode, colorMode, selectedSemesters } =
+  const { setSemesterFilter, semesterFilter, semesters, numberMode, colorMode, selectedSemesters, setNumberMode } =
     useLanguageCenterContext()
   const { data, isFetchingOrLoading, isError } = useGetLanguageCenterDataQuery()
+
+  useEffect(() => {
+    if (numberMode === 'ratio') {
+      setNumberMode('completed')
+    }
+  }, [])
 
   const totalRow = useMemo(() => {
     if (!data) return null
@@ -25,12 +31,13 @@ export const SemestersTab = () => {
   if (!data || isFetchingOrLoading || !semesterFilter || !semesters)
     return <Loader active style={{ marginTop: '15em' }} />
 
+  if (numberMode === 'ratio') return null
   if (!semesters) return null
   return (
     <div>
       <div className="options-container">
         <SemesterRangeSelector setSemesterFilter={setSemesterFilter} semesterFilter={semesterFilter} />
-        <CompletionPicker />
+        <CompletionPicker enableRatioOption={false} />
         <ColorModeSelector />
       </div>
       <SortableTable
