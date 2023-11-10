@@ -4,6 +4,8 @@ import './index.css'
 import { useGetSemestersQuery } from 'redux/semesters'
 import { useHistory } from 'react-router-dom'
 import { useTabs } from 'common/hooks'
+import { useGetLanguageCenterDataQuery } from 'redux/languageCenterView'
+import { useGetFacultiesQuery } from 'redux/facultyStats'
 import { FacultiesTab } from './FacultiesTab/index'
 import { SemestersTab } from './SemestersTab/index'
 import { LanguageCenterContext } from './common'
@@ -17,6 +19,18 @@ const LanguageCenterView = () => {
       // 135 = Fall 2017
       sem => sem.semestercode >= 135 && new Date(sem.startdate).getFullYear() <= new Date().getFullYear()
     )
+  const facultyQuery = useGetFacultiesQuery()
+
+  const facultyMap = useMemo(
+    () =>
+      facultyQuery.data?.reduce((obj, cur) => {
+        obj[cur.code] = cur.name
+        return obj
+      }, {}),
+    [facultyQuery?.data]
+  )
+
+  const { data, isFetchingOrLoading, isError } = useGetLanguageCenterDataQuery()
 
   const [numberMode, setNumberMode] = useState('notCompleted')
   const [colorMode, setColorMode] = useState('course')
@@ -57,9 +71,9 @@ const LanguageCenterView = () => {
     ]
   }
 
-  if (!semesterFilter || !semesters?.length) {
-    return <Loader />
-  }
+  if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
+  if (!data || isFetchingOrLoading || !semesterFilter || !semesters?.length)
+    return <Loader active style={{ marginTop: '15em' }} />
 
   const settingsContext = {
     semesterFilter,
@@ -70,6 +84,8 @@ const LanguageCenterView = () => {
     colorMode,
     setColorMode,
     selectedSemesters,
+    data,
+    facultyMap,
   }
 
   return (
