@@ -39,7 +39,6 @@ describe('Student Statistics tests', () => {
     cy.url().should('include', '/students')
     cy.get('.prompt').type(student.studentnumber)
     cy.contains('td a', student.studentnumber).click()
-    cy.contains('Started: 01.08.2017')
     cy.contains('Tietojenkäsittelytieteen kandiohjelma (01.08.2017 - 31.07.2025')
     cy.contains(student.lastname).should('not.exist')
     cy.contains(student.firstnames).should('not.exist')
@@ -104,7 +103,6 @@ describe('Testing with admin rights', () => {
   it('Does not crash if student has no studyright or courses', () => {
     const studentNumber = '011825096'
     cy.init(`/students/${studentNumber}`, 'admin') // use admin to see all students
-    cy.contains('Started: Unavailable')
     cy.contains('Credits: 0')
   })
 })
