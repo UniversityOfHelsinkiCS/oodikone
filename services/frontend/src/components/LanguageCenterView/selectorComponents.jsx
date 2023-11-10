@@ -1,7 +1,7 @@
 /* eslint-disable import/prefer-default-export */
 import useLanguage from 'components/LanguagePicker/useLanguage'
 import React, { useMemo } from 'react'
-import { Dropdown, Radio } from 'semantic-ui-react'
+import { Checkbox, Dropdown, Radio } from 'semantic-ui-react'
 import { useLanguageCenterContext } from './common'
 import './index.css'
 
@@ -89,6 +89,20 @@ export const SemesterSelector = ({ allSemesters, semester, setSemester }) => {
         }
         value={currentValue.semestercode}
         options={options}
+      />
+    </div>
+  )
+}
+
+export const FilterEmptyCoursesSelector = () => {
+  const { filterEmptyCourses, setFilterEmptyCourses } = useLanguageCenterContext()
+
+  return (
+    <div className="emptycourses-selector">
+      <Checkbox
+        label="Hide empty courses"
+        onChange={() => setFilterEmptyCourses(!filterEmptyCourses)}
+        checked={filterEmptyCourses}
       />
     </div>
   )
