@@ -21,3 +21,10 @@ export const getRatio = stats => {
   const value = stats.completed / stats.notCompleted
   return Math.round(value * 100)
 }
+
+export const emptyCoursesFilter = (courses, numberMode) =>
+  courses.filter(({ bySemesters }) =>
+    numberMode === 'ratio'
+      ? bySemesters.facultiesTotal.completed || bySemesters.facultiesTotal.notCompleted
+      : bySemesters[numberMode]
+  )

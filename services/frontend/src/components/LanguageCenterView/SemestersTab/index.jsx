@@ -3,9 +3,14 @@ import React, { useEffect, useMemo } from 'react'
 import SortableTable, { row } from 'components/SortableTable'
 import useLanguage from 'components/LanguagePicker/useLanguage'
 import { calculateTotals, getColumns } from './logic'
-import { useLanguageCenterContext } from '../common'
+import { emptyCoursesFilter, useLanguageCenterContext } from '../common'
 import '../index.css'
-import { ColorModeSelector, CompletionPicker, SemesterRangeSelector } from '../selectorComponents'
+import {
+  ColorModeSelector,
+  CompletionPicker,
+  FilterEmptyCoursesSelector,
+  SemesterRangeSelector,
+} from '../selectorComponents'
 
 export const SemestersTab = () => {
   const { getTextIn } = useLanguage()
@@ -18,6 +23,7 @@ export const SemestersTab = () => {
     selectedSemesters,
     setNumberMode,
     data,
+    filterEmptyCourses,
   } = useLanguageCenterContext()
 
   useEffect(() => {
@@ -34,12 +40,14 @@ export const SemestersTab = () => {
 
   if (numberMode === 'ratio') return null
   if (!semesters) return null
+  const tableData = [totalRow, ...data.tableData]
   return (
     <div>
       <div className="options-container">
         <SemesterRangeSelector setSemesterFilter={setSemesterFilter} semesterFilter={semesterFilter} />
         <CompletionPicker enableRatioOption={false} />
         <ColorModeSelector />
+        <FilterEmptyCoursesSelector />
       </div>
       <SortableTable
         columns={getColumns(
@@ -49,7 +57,7 @@ export const SemestersTab = () => {
           colorMode,
           totalRow.bySemesters[numberMode]
         )}
-        data={[totalRow, ...data.tableData]}
+        data={filterEmptyCourses ? emptyCoursesFilter(tableData, numberMode) : tableData}
         striped={colorMode === 'none'}
         stretch
       />

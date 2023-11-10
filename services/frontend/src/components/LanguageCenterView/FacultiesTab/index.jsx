@@ -4,12 +4,12 @@ import SortableTable, { row } from 'components/SortableTable'
 import React, { useMemo } from 'react'
 import _ from 'lodash'
 import { calculateTotals, getColumns } from './logic'
-import { getRatio, useLanguageCenterContext } from '../common'
-import { CompletionPicker, SemesterRangeSelector } from '../selectorComponents'
+import { emptyCoursesFilter, getRatio, useLanguageCenterContext } from '../common'
+import { CompletionPicker, FilterEmptyCoursesSelector, SemesterRangeSelector } from '../selectorComponents'
 import '../index.css'
 
 export const FacultiesTab = () => {
-  const { numberMode, semesterFilter, setSemesterFilter, selectedSemesters, data, facultyMap } =
+  const { numberMode, semesterFilter, setSemesterFilter, selectedSemesters, data, facultyMap, filterEmptyCourses } =
     useLanguageCenterContext()
 
   const { getTextIn } = useLanguage()
@@ -21,7 +21,6 @@ export const FacultiesTab = () => {
 
   const tableData = useMemo(() => {
     const tableData = [totalRow, ..._.cloneDeep(data.tableData)]
-
     tableData.forEach(course => {
       const facultiesTotal = { completed: 0, notCompleted: 0, ratio: null }
       selectedSemesters.forEach(semestercode => {
@@ -48,10 +47,11 @@ export const FacultiesTab = () => {
       <div className="options-container">
         <SemesterRangeSelector setSemesterFilter={setSemesterFilter} semesterFilter={semesterFilter} />
         <CompletionPicker enableRatioOption />
+        <FilterEmptyCoursesSelector />
       </div>
       <SortableTable
         columns={getColumns(getTextIn, [...data.faculties].sort(), numberMode, facultyMap)}
-        data={tableData}
+        data={filterEmptyCourses ? emptyCoursesFilter(tableData, numberMode) : tableData}
         stretch
       />
     </div>

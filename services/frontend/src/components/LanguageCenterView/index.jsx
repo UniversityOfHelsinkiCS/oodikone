@@ -35,6 +35,7 @@ const LanguageCenterView = () => {
   const [numberMode, setNumberMode] = useState('notCompleted')
   const [colorMode, setColorMode] = useState('course')
   const [semesterFilter, setSemesterFilter] = useState(null)
+  const [filterEmptyCourses, setFilterEmptyCourses] = useState(true)
   const history = useHistory()
   const [tab, setTab] = useTabs('languagecenter_tab', 0, history)
 
@@ -86,6 +87,8 @@ const LanguageCenterView = () => {
     selectedSemesters,
     data,
     facultyMap,
+    filterEmptyCourses,
+    setFilterEmptyCourses,
   }
 
   return (
@@ -100,7 +103,6 @@ const LanguageCenterView = () => {
             <li>Completion: Amount of passed completions of course</li>
             <li>Enrollments: Total amount of enrollments on course</li>
           </ul>
-          <p>This feature is under development and numbers may be inaccurate.</p>
         </Message>
         <div className="languagecenter-table">
           <Tab panes={getPanes()} activeIndex={tab} onTabChange={setTab} />
