@@ -43,7 +43,6 @@ const StudentInfoCard = ({ student }) => {
           <Icon name="remove" className="controlIcon" onClick={onRemove} />
         </Card.Header>
         <Card.Meta>
-          <div className="startDate">{`Started: ${reformatDate(student.started, DISPLAY_DATE_FORMAT)}`}</div>
           <div className="startDate">{email}</div>
         </Card.Meta>
         <Card.Description>{`Credits: ${student.credits || 0}`}</Card.Description>
