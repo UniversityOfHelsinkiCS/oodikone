@@ -4,9 +4,16 @@ import SortableTable, { row } from 'components/SortableTable'
 import React, { useMemo } from 'react'
 import _ from 'lodash'
 import { calculateTotals, getColumns } from './logic'
-import { emptyCoursesFilter, getRatio, useLanguageCenterContext } from '../common'
+import { getRatio, useLanguageCenterContext } from '../common'
 import { CompletionPicker, FilterEmptyCoursesSelector, SemesterRangeSelector } from '../selectorComponents'
 import '../index.css'
+
+export const emptyCoursesFilter = (courses, numberMode) =>
+  courses.filter(({ bySemesters }) =>
+    numberMode === 'ratio'
+      ? bySemesters.facultiesTotal.completed || bySemesters.facultiesTotal.notCompleted
+      : bySemesters.facultiesTotal[numberMode]
+  )
 
 export const FacultiesTab = () => {
   const { numberMode, semesterFilter, setSemesterFilter, selectedSemesters, data, facultyMap, filterEmptyCourses } =
@@ -38,6 +45,7 @@ export const FacultiesTab = () => {
         facultiesTotal.ratio = getRatio(facultiesTotal)
       })
       course.bySemesters.facultiesTotal = facultiesTotal
+      course.bySemesters = { ...course.bySemesters, facultiesTotal }
     })
     return tableData
   }, [selectedSemesters, data])

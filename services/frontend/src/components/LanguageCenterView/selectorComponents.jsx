@@ -9,7 +9,7 @@ export const CompletionPicker = ({ enableRatioOption }) => {
   const { numberMode, setNumberMode } = useLanguageCenterContext()
 
   return (
-    <div className="completion-container">
+    <div className="selector-container">
       <div className="completion-acual-container">
         <b className="completion-header">Show number of</b>
         <Radio
@@ -44,7 +44,7 @@ export const ColorModeSelector = () => {
   const { colorMode, setColorMode } = useLanguageCenterContext()
 
   return (
-    <div className="colormodeselector-container">
+    <div className="selector-container">
       <div className="colormodeselector-acual-container">
         <b className="colormodeselector-header">Coloring mode</b>
         <Radio
@@ -82,7 +82,7 @@ export const SemesterSelector = ({ allSemesters, semester, setSemester }) => {
   )
 
   return (
-    <div>
+    <div className="selector-container">
       <Dropdown
         onChange={(_, { value }) =>
           setSemester(allSemesters.find(({ semestercode }) => semestercode === value).semestercode)
@@ -98,7 +98,7 @@ export const FilterEmptyCoursesSelector = () => {
   const { filterEmptyCourses, setFilterEmptyCourses } = useLanguageCenterContext()
 
   return (
-    <div className="emptycourses-selector">
+    <div className="selector-container">
       <Checkbox
         label="Hide empty courses"
         onChange={() => setFilterEmptyCourses(!filterEmptyCourses)}
@@ -112,7 +112,7 @@ export const SemesterRangeSelector = () => {
   const { semesters, semesterFilter, setSemesterFilter } = useLanguageCenterContext()
 
   return (
-    <div className="datepicker-container">
+    <div className="selector-container">
       <div className="datepicker-acual-container">
         <div>
           <b>From</b>

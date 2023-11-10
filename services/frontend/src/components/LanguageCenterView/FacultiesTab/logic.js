@@ -1,5 +1,4 @@
-import React from 'react'
-import { getRatio, shortenCourseName } from '../common'
+import { courseNameColumn, getRatio } from '../common'
 
 export const getColumns = (getTextIn, faculties, numberMode, facultyMap) => {
   const getFacultyTitle = code => {
@@ -32,19 +31,7 @@ export const getColumns = (getTextIn, faculties, numberMode, facultyMap) => {
   }
 
   const columns = [
-    {
-      key: 'course-name',
-      title: 'Course',
-      getRowVal: row => row.code ?? 'No faculty found because enrollment date missing.',
-      getRowContent: row => (
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <b>{row.code ?? 'No faculty'}</b>
-          <i style={{ color: 'gray', fontWeight: 'normal' }}>
-            {row.name && shortenCourseName(getTextIn(row.name), 60)}
-          </i>
-        </div>
-      ),
-    },
+    courseNameColumn(getTextIn),
     ...faculties.map(facultyCode => ({
       key: facultyCode ?? 'no-faculty',
       title: getFacultyTitle(facultyCode),
@@ -97,7 +84,8 @@ export const getCourseFaculties = attempts => {
 }
 
 export const calculateTotals = (courses, faculties, semesters) => {
-  const totalRow = { cellStats: { completed: 0, notCompleted: 0, ratio: null } }
+  const facultiesTotal = { completed: 0, notCompleted: 0, ratio: null }
+  const totalRow = { cellStats: {} }
   semesters.forEach(sem => {
     totalRow[sem] = { completed: 0, notCompleted: 0, ratio: 1 }
     courses.forEach(course => {
@@ -106,6 +94,9 @@ export const calculateTotals = (courses, faculties, semesters) => {
       totalRow[sem].completed += stats.completed
       totalRow[sem].notCompleted += stats.notCompleted
       totalRow[sem].ratio = getRatio(totalRow[sem])
+      facultiesTotal.completed += stats.completed
+      facultiesTotal.notCompleted += stats.notCompleted
+      facultiesTotal.ratio = getRatio(totalRow)
     })
 
     faculties.forEach(fac => {
@@ -120,5 +111,5 @@ export const calculateTotals = (courses, faculties, semesters) => {
     })
   })
 
-  return { cellStats: {}, code: 'TOTAL', name: { en: 'All courses total' }, bySemesters: totalRow }
+  return { cellStats: {}, code: 'TOTAL', name: { en: 'All courses total' }, bySemesters: totalRow, facultiesTotal }
 }

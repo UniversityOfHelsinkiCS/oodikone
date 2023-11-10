@@ -3,7 +3,7 @@ import React, { useEffect, useMemo } from 'react'
 import SortableTable, { row } from 'components/SortableTable'
 import useLanguage from 'components/LanguagePicker/useLanguage'
 import { calculateTotals, getColumns } from './logic'
-import { emptyCoursesFilter, useLanguageCenterContext } from '../common'
+import { useLanguageCenterContext } from '../common'
 import '../index.css'
 import {
   ColorModeSelector,
@@ -11,6 +11,13 @@ import {
   FilterEmptyCoursesSelector,
   SemesterRangeSelector,
 } from '../selectorComponents'
+
+export const emptyCoursesFilter = (courses, numberMode) =>
+  courses.filter(({ bySemesters }) =>
+    numberMode === 'ratio'
+      ? bySemesters.facultiesTotal.completed || bySemesters.facultiesTotal.notCompleted
+      : bySemesters[numberMode]
+  )
 
 export const SemestersTab = () => {
   const { getTextIn } = useLanguage()

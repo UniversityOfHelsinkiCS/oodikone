@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Divider, Icon, Loader, Message, Tab } from 'semantic-ui-react'
+import { Button, Divider, Icon, Loader, Message, Tab } from 'semantic-ui-react'
 import './index.css'
 import { useGetSemestersQuery } from 'redux/semesters'
 import { useHistory } from 'react-router-dom'
@@ -95,10 +95,23 @@ const LanguageCenterView = () => {
     <LanguageCenterContext.Provider value={settingsContext}>
       <div className="languagecenterview">
         <Divider horizontal>Language center statistics</Divider>
-        <Message style={{ maxWidth: '60em' }}>
-          <p>This view displays amounts of enrollments and completions of courses organized by language center.</p>
-          <p>You can view the numbers by faculties or by semesters.</p>
-          Explanations of settings:
+        <LanguageCenterInfoBox />
+        <div className="languagecenter-table">
+          <Tab panes={getPanes()} activeIndex={tab} onTabChange={setTab} />
+        </div>
+      </div>
+    </LanguageCenterContext.Provider>
+  )
+}
+
+const LanguageCenterInfoBox = () => {
+  const [open, setOpen] = useState(false)
+  return (
+    <Message style={{ maxWidth: '60em' }}>
+      <p>This view displays amounts of enrollments and completions of courses organized by language center.</p>
+      <p>You can view the numbers by faculties or by semesters.</p>
+      {open && (
+        <div>
           <ul>
             <li>
               <b>Show number of:</b>
@@ -113,6 +126,10 @@ const LanguageCenterView = () => {
                 are no credits or enrollments. Hover mouse over a cell to view the amount of enrollments and credits.
               </li>
             </ul>
+            <li>
+              <b>Coloring mode: </b>Only available in "by semesters" -tab. Change this to compare a course's popularity
+              to other courses, or to its own average in time.
+            </li>
             <li>
               <b>Hide empty courses</b>: Hides courses where the total of selected number is zero. In ratio-mode, the
               courses where both enrollments and completions are zero, are hidden.
@@ -140,12 +157,12 @@ const LanguageCenterView = () => {
             This is a new feature. Suggestions for improvement or questions are welcomed to grp-toska@helsinki.fi or via
             the <a href="https://oodikone.helsinki.fi/feedback">feedback form</a>.
           </p>
-        </Message>
-        <div className="languagecenter-table">
-          <Tab panes={getPanes()} activeIndex={tab} onTabChange={setTab} />
         </div>
-      </div>
-    </LanguageCenterContext.Provider>
+      )}
+      <Button style={{ marginTop: '20px' }} onClick={() => setOpen(!open)}>
+        {open ? 'Hide' : 'Show more info'}
+      </Button>
+    </Message>
   )
 }
 

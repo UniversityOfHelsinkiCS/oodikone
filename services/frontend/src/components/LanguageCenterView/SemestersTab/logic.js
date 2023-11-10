@@ -1,5 +1,4 @@
-import React from 'react'
-import { shortenCourseName } from '../common'
+import { courseNameColumn } from '../common'
 
 export const getColumns = (getTextIn, semesters, numberMode, colorMode, allTotal) => {
   const getColor = (row, semester) => {
@@ -25,19 +24,7 @@ export const getColumns = (getTextIn, semesters, numberMode, colorMode, allTotal
   }
 
   const columns = [
-    {
-      key: 'course-name',
-      title: 'Course',
-      getRowVal: row => row.code ?? 'No faculty found because enrollment date missing.',
-      getRowContent: row => (
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <b>{row.code ?? 'No faculty'}</b>
-          <i style={{ color: 'gray', fontWeight: 'normal' }}>
-            {row.name && shortenCourseName(getTextIn(row.name), 46)}
-          </i>
-        </div>
-      ),
-    },
+    courseNameColumn(getTextIn),
     ...semesters.map(semester => ({
       key: `${semester.semestercode}`,
       title: `${getTextIn(semester.name).replace(' ', '\n')}`,
