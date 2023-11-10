@@ -112,7 +112,7 @@ export default {
 
   Kenttien **Currently enrolled, Absent, Inactive** ja **Graduated** arvot tuottavat yhteenlaskettuna kentän **All** arvon.
   
-  Mukana ovat oletusarvoisesti myös vaihto-opiskelijat, ohjelmaan ja siitä pois siirtyneet opiskelijat sekä erillisopinto-oikeudella opiskelevat.
+  Mukana ovat oletusarvoisesti myös ohjelmaan ja siitä pois siirtyneet opiskelijat.
   Taulukko näyttää myös näistä opiskelijoista miesten, naisten ja suomalaisten osuudet sekä valmistuneiden määrän. 
 
   Yläosan valikosta on mahdollista valita tarkasteluun yhden opintosuunnan opiskelijat. Sekä opiskelijoiden yleistiedot että edistyminen opintopisteittäin
@@ -130,7 +130,7 @@ export default {
   - Kenttien **Currently enrolled, Absent, Inactive** ja **Graduated licentiate** (tai **Graduated master**) arvot tuottavat yhteenlaskettuna kentän **All** arvon.
   - Lisäksi kenttien **Currently enrolled, Absent, Inactive** arvot sisältävät opiskelijat, joilla on kyseinen status riippumatta siitä, onko opiskelija kandi- vai maisterivaiheen opiskelija.
   
-  Mukana ovat oletusarvoisesti myös vaihto-opiskelijat, ohjelmaan ja siitä pois siirtyneet opiskelijat sekä erillisopinto-oikeudella opiskelevat.
+  Mukana ovat oletusarvoisesti myös ohjelmaan ja siitä pois siirtyneet opiskelijat.
   Taulukko näyttää myös näistä opiskelijoista miesten, naisten ja suomalaisten osuudet sekä valmistuneiden määrän. 
 
   Yläosan valikosta on mahdollista valita tarkasteluun yhden opintosuunnan opiskelijat. Sekä opiskelijoiden yleistiedot että edistyminen opintopisteittäin
@@ -141,7 +141,7 @@ export default {
   
   HUOM! Mukana ovat myös muuhun kuin valittuun koulutusohjelmaan tai opintosuuntaan tehdyt opintopisteet.
 
-  Mukana ovat oletusarvoisesti myös vaihto-opiskelijat, erillisopinto-oikeudella opiskelevat ja ohjelmaan siirtyneet.   
+  Mukana ovat oletusarvoisesti myös ohjelmaan siirtyneet opiskelijat.
 
   Mikäli yläosan valikosta valittuna on jokin tietty opintosuunta, myös nämä graafit ja taulukot kuvaavat kyseisen opintosuunnan opiskelijoita.    
   `,
