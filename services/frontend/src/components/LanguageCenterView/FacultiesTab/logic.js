@@ -7,12 +7,19 @@ export const getColumns = (getTextIn, faculties, numberMode, facultyMap) => {
     return code
   }
 
-  const totalEnrollmentsColumn = {
-    key: 'total-column',
-    title: 'Total\nenrollments',
-    getRowVal: row => row.bySemesters.facultiesTotal.notCompleted,
-    filterType: 'range',
-    forceToolsMode: 'floating',
+  const formatAsPercent = val => (val === null ? '-' : `${val} %`)
+
+  const getRatioTooltip = stats =>
+    `Completions: ${stats.completed}\nEnrollments: ${stats.notCompleted}\nRatio: ${stats.ratio} %`
+
+  const getRatioCellProps = stats => {
+    if (stats.ratio === null) return null
+    const hoverTooltip = {
+      title: getRatioTooltip(stats),
+    }
+    if (numberMode !== 'ratio') return hoverTooltip
+    if (stats.notCompleted === 0) return hoverTooltip
+    return { ...hoverTooltip, style: { backgroundColor: `rgba(200,0,0,${1 - stats.ratio / 100})` } }
   }
 
   const totalColumn = {
@@ -23,11 +30,16 @@ export const getColumns = (getTextIn, faculties, numberMode, facultyMap) => {
     filterType: 'range',
   }
 
-  const getTotalColumn = () => {
-    if (numberMode === 'ratio') {
-      return totalEnrollmentsColumn
-    }
-    return totalColumn
+  const totalRatioColumn = {
+    key: 'total-ratio',
+    title: 'Total ratio',
+    getRowVal: row => {
+      const stats = row.bySemesters.facultiesTotal
+      if (stats.notCompleted === 0 || stats.ratio === null) return null
+      return stats.ratio
+    },
+    formatValue: val => formatAsPercent(val),
+    cellProps: row => getRatioCellProps(row.bySemesters.facultiesTotal),
   }
 
   const columns = [
@@ -36,16 +48,7 @@ export const getColumns = (getTextIn, faculties, numberMode, facultyMap) => {
       key: facultyCode ?? 'no-faculty',
       title: getFacultyTitle(facultyCode),
       headerProps: { title: getTextIn(facultyMap[facultyCode]) },
-      cellProps: row => {
-        const stats = row.bySemesters.cellStats[facultyCode]
-        if (stats.ratio === null) return null
-        const hoverTooltip = {
-          title: `Completions: ${stats.completed}\nEnrollments: ${stats.notCompleted}\nRatio: ${stats.ratio} %`,
-        }
-        if (numberMode !== 'ratio') return hoverTooltip
-        if (stats.notCompleted === 0) return hoverTooltip
-        return { ...hoverTooltip, style: { backgroundColor: `rgba(200,0,0,${1 - stats.ratio / 100})` } }
-      },
+      cellProps: row => getRatioCellProps(row.bySemesters.cellStats[facultyCode]),
       getRowVal: row => {
         const stats = row.bySemesters.cellStats[facultyCode]
         if (numberMode === 'ratio') {
@@ -54,12 +57,13 @@ export const getColumns = (getTextIn, faculties, numberMode, facultyMap) => {
         }
         return stats[numberMode]
       },
-      formatValue: numberMode === 'ratio' ? val => (val === null ? '-' : `${val} %`) : null,
+      formatValue: numberMode !== 'ratio' ? null : val => formatAsPercent(val),
       filterType: 'range',
       forceToolsMode: 'floating',
     })),
-    getTotalColumn(),
-  ]
+    numberMode !== 'ratio' ? null : totalRatioColumn,
+    numberMode === 'ratio' ? null : totalColumn,
+  ].filter(Boolean)
   return columns
 }
 
