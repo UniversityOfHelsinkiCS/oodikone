@@ -1,5 +1,5 @@
 import moment from 'moment'
-import { createContext, useContext } from 'react'
+import React, { createContext, useContext } from 'react'
 
 export const LanguageCenterContext = createContext(null)
 
@@ -7,6 +7,18 @@ export const useLanguageCenterContext = () => useContext(LanguageCenterContext)
 
 export const shortenCourseName = (text, maxLength) =>
   text.length > maxLength ? `${text.substring(0, maxLength)} ... ` : text
+
+export const courseNameColumn = getTextIn => ({
+  key: 'course-name',
+  title: 'Course',
+  getRowVal: row => row.code,
+  getRowContent: row => (
+    <div title={getTextIn(row.name)} style={{ display: 'flex', flexDirection: 'column' }}>
+      <b>{row.code}</b>
+      <i style={{ color: 'gray', fontWeight: 'normal' }}>{row.name && shortenCourseName(getTextIn(row.name), 46)}</i>
+    </div>
+  ),
+})
 
 export const filterAttemptsByDates = (date, { startDate, endDate }) => {
   const start = startDate.startdate ?? moment(new Date('1900-1-1'))
@@ -21,10 +33,3 @@ export const getRatio = stats => {
   const value = stats.completed / stats.notCompleted
   return Math.round(value * 100)
 }
-
-export const emptyCoursesFilter = (courses, numberMode) =>
-  courses.filter(({ bySemesters }) =>
-    numberMode === 'ratio'
-      ? bySemesters.facultiesTotal.completed || bySemesters.facultiesTotal.notCompleted
-      : bySemesters[numberMode]
-  )
