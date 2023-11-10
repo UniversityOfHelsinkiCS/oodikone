@@ -44,7 +44,10 @@ const CoursePopulation = ({ history }) => {
   const [codes, setCodes] = useState([])
   useTitle('Course population')
 
-  const { coursecodes, from, to, separate, unifyCourses, years, years2 } = queryParamsFromUrl(history.location)
+  const { coursecodes, from, to, separate, unifyCourses, years, years2, combineSubstitutions } = queryParamsFromUrl(
+    history.location
+  )
+
   const { data: populationStatistics, isFetching } = useGetPopulationStatisticsByCourseQuery({
     coursecodes,
     from,
@@ -72,7 +75,7 @@ const CoursePopulation = ({ history }) => {
   const { data: semesters = {} } = useGetSemestersQuery()
 
   const { data: [courseData = undefined] = [] } = useGetSingleCourseStatsQuery(
-    { courseCodes: codes, separate },
+    { courseCodes: codes, separate, combineSubstitutions },
     { skip: codes.length === 0 }
   )
 

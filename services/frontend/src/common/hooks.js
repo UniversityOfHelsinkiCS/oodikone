@@ -169,7 +169,8 @@ export const useProgress = loading => {
   }, [loading])
 
   const onProgress = p => {
-    if (p > 0) {
+    if (p === Infinity) finishProgress()
+    else if (p > 0) {
       setProgress(50 + Math.floor(p / 2))
     }
   }
