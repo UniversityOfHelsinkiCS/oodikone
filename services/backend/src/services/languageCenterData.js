@@ -56,6 +56,9 @@ const computeLanguageCenterData = async () => {
   const studyrightToFacultyMap = studyrights.reduce((obj, cur) => {
     // Filter out: Kielikeskus (?), Aleksanteri-instituutti
     if (['H906', 'H401'].includes(cur.facultyCode)) return obj
+    if (!cur.actual_studyrightid) return obj
+    // ^The studyright id should exist, but there was once a faulty row temporarily in studyright-table,
+    // which screwed up the faculties due to null getting a value to this map
     obj[cur.actual_studyrightid] = cur.facultyCode
     return obj
   }, {})
@@ -137,7 +140,6 @@ const computeLanguageCenterData = async () => {
 
   const filteredAttempts = attemptsArray.filter(attempt => attempt.faculty?.substring(0, 3).match(`^H\\d`))
   const faculties = [...new Set(filteredAttempts.map(({ faculty }) => faculty))]
-
   const unorderedTableData = await createArrayOfCourses(filteredAttempts, courses)
 
   const tableData = orderBy(unorderedTableData, 'code')
