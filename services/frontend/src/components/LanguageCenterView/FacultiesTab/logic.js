@@ -67,26 +67,6 @@ export const getColumns = (getTextIn, faculties, numberMode, facultyMap) => {
   return columns
 }
 
-export const getCourseFaculties = attempts => {
-  const map = attempts.reduce((obj, cur) => {
-    if (!obj[cur.courseCode]) {
-      obj[cur.courseCode] = {}
-    }
-    if (!obj[cur.courseCode][cur.faculty]) {
-      obj[cur.courseCode][cur.faculty] = {}
-    }
-    const stats = obj[cur.courseCode][cur.faculty]
-    const field = cur.completed ? 'completed' : 'notCompleted'
-    if (!stats[field]) {
-      stats[field] = 1
-    } else {
-      stats[field] += 1
-    }
-    return obj
-  }, {})
-  return map
-}
-
 export const calculateTotals = (courses, faculties, semesters) => {
   const facultiesTotal = { completed: 0, notCompleted: 0, ratio: null }
   const totalRow = { cellStats: {} }
