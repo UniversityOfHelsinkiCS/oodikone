@@ -43,20 +43,6 @@ const byId = async id => {
           },
         },
         {
-          model: Studyright,
-          include: {
-            model: StudyrightElement,
-            include: {
-              model: ElementDetail,
-              where: {
-                type: {
-                  [Op.in]: [10, 20, 30],
-                },
-              },
-            },
-          },
-        },
-        {
           model: SemesterEnrollment,
         },
         {
@@ -79,6 +65,24 @@ const byId = async id => {
       },
     }),
   ])
+  const studyrights = await Studyright.findAll({
+    where: {
+      student_studentnumber: id,
+      [Op.not]: { prioritycode: 6 },
+    },
+    include: {
+      model: StudyrightElement,
+      include: {
+        model: ElementDetail,
+        where: {
+          type: {
+            [Op.in]: [10, 20, 30],
+          },
+        },
+      },
+    },
+  })
+  student.studyrights = studyrights
   const tagprogrammes = await ElementDetail.findAll({
     where: {
       code: {
@@ -97,9 +101,6 @@ const byId = async id => {
     }
   })
   student.semester_enrollments = mappedEnrollments
-
-  const filteredStudyrights = student.studyrights.filter(sr => sr.prioritycode !== 6)
-  student.studyrights = filteredStudyrights
 
   student.tags = tags.map(t => ({
     ...t.get(),
