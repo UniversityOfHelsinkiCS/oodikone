@@ -20,7 +20,7 @@ export const FacultiesTab = () => {
   }, [data, facultyMap])
 
   const tableData = useMemo(() => {
-    const tableData = [totalRow, ..._.cloneDeep(data.tableData)]
+    const tableData = [_.cloneDeep(totalRow), ..._.cloneDeep(data.tableData)]
     tableData.forEach(course => {
       const facultiesTotal = { completions: 0, enrollments: 0, ratio: null }
       selectedSemesters.forEach(semestercode => {
