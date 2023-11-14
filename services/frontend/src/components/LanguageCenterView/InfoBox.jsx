@@ -27,10 +27,6 @@ export const InfoBox = () => {
               <b>Coloring mode: </b>Only available in "by semesters" -tab. Change this to compare a course's popularity
               to other courses, or to its own average in time.
             </li>
-            <li>
-              <b>Hide empty courses</b>: Hides courses where the total of selected number is zero. In ratio-mode, the
-              courses where both enrollments and completions are zero, are hidden.
-            </li>
           </ul>
           <p>Tips:</p>
           <ul>
