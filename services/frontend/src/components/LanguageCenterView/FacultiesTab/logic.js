@@ -10,7 +10,7 @@ export const getColumns = (getTextIn, faculties, numberMode, facultyMap) => {
   const formatAsPercent = val => (val === null ? '-' : `${val} %`)
 
   const getRatioTooltip = stats =>
-    `Completions: ${stats.completed}\nEnrollments: ${stats.notCompleted}\nRatio: ${stats.ratio} %`
+    `Completions: ${stats.completions}\nEnrollments: ${stats.enrollments}\nRatio: ${stats.ratio} %`
 
   const getRatioCellProps = stats => {
     if (stats.ratio === null) return null
@@ -18,7 +18,7 @@ export const getColumns = (getTextIn, faculties, numberMode, facultyMap) => {
       title: getRatioTooltip(stats),
     }
     if (numberMode !== 'ratio') return hoverTooltip
-    if (stats.notCompleted === 0) return hoverTooltip
+    if (stats.enrollments === 0) return hoverTooltip
     return { ...hoverTooltip, style: { backgroundColor: `rgba(200,0,0,${1 - stats.ratio / 100})` } }
   }
 
@@ -35,7 +35,7 @@ export const getColumns = (getTextIn, faculties, numberMode, facultyMap) => {
     title: 'Total ratio',
     getRowVal: row => {
       const stats = row.bySemesters.facultiesTotal
-      if (stats.notCompleted === 0 || stats.ratio === null) return null
+      if (stats.enrollments === 0 || stats.ratio === null) return null
       return stats.ratio
     },
     formatValue: val => formatAsPercent(val),
@@ -52,7 +52,7 @@ export const getColumns = (getTextIn, faculties, numberMode, facultyMap) => {
       getRowVal: row => {
         const stats = row.bySemesters.cellStats[facultyCode]
         if (numberMode === 'ratio') {
-          if (stats.notCompleted === 0) return null
+          if (stats.enrollments === 0) return null
           return stats.ratio
         }
         return stats[numberMode]
@@ -68,28 +68,28 @@ export const getColumns = (getTextIn, faculties, numberMode, facultyMap) => {
 }
 
 export const calculateTotals = (courses, faculties, semesters) => {
-  const facultiesTotal = { completed: 0, notCompleted: 0, ratio: null }
+  const facultiesTotal = { completions: 0, enrollments: 0, ratio: null }
   const totalRow = { cellStats: {} }
   semesters.forEach(sem => {
-    totalRow[sem] = { completed: 0, notCompleted: 0, ratio: 1 }
+    totalRow[sem] = { completions: 0, enrollments: 0, ratio: 1 }
     courses.forEach(course => {
       const stats = course.bySemesters[sem]
       if (!stats) return
-      totalRow[sem].completed += stats.completed
-      totalRow[sem].notCompleted += stats.notCompleted
+      totalRow[sem].completions += stats.completions
+      totalRow[sem].enrollments += stats.enrollments
       totalRow[sem].ratio = getRatio(totalRow[sem])
-      facultiesTotal.completed += stats.completed
-      facultiesTotal.notCompleted += stats.notCompleted
+      facultiesTotal.completions += stats.completions
+      facultiesTotal.enrollments += stats.enrollments
       facultiesTotal.ratio = getRatio(totalRow)
     })
 
     faculties.forEach(fac => {
-      totalRow[sem][fac] = { completed: 0, notCompleted: 0, ratio: null }
+      totalRow[sem][fac] = { completions: 0, enrollments: 0, ratio: null }
       courses.forEach(course => {
         const stats = course.bySemesters[sem]?.[fac]
         if (!stats) return
-        totalRow[sem][fac].completed += stats.completed
-        totalRow[sem][fac].notCompleted += stats.notCompleted
+        totalRow[sem][fac].completions += stats.completions
+        totalRow[sem][fac].enrollments += stats.enrollments
         totalRow[sem][fac].ratio = getRatio(totalRow[sem][fac])
       })
     })

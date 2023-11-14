@@ -152,7 +152,7 @@ const computeLanguageCenterData = async () => {
 }
 
 const createArrayOfCourses = async (attempts, courses) => {
-  const fields = { completed: 0, notCompleted: 0, ratio: 0 }
+  const fields = { completions: 0, enrollments: 0, ratio: 0 }
   const semesterStatsMap = attempts.reduce((obj, cur) => {
     const semester = cur.semestercode
     if (!obj[cur.courseCode]) {
@@ -175,11 +175,11 @@ const createArrayOfCourses = async (attempts, courses) => {
     const allStats = [semesterFacultyStats, allFacultiesTotal, allSemestersTotal, facultyTotalStats]
     for (const stats of allStats) {
       if (cur.completed) {
-        stats.completed += 1
+        stats.completions += 1
       } else {
-        stats.notCompleted += 1
+        stats.enrollments += 1
       }
-      stats.ratio = stats.notCompleted === 0 ? 1 : stats.completed / stats.notCompleted
+      stats.ratio = stats.enrollments === 0 ? 1 : stats.completions / stats.enrollments
       if (stats.ratio > 1) stats.ratio = 1
     }
     return obj

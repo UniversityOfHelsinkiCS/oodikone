@@ -11,7 +11,7 @@ import '../index.css'
 export const emptyCoursesFilter = (courses, numberMode) =>
   courses.filter(({ bySemesters }) =>
     numberMode === 'ratio'
-      ? bySemesters.facultiesTotal.completed || bySemesters.facultiesTotal.notCompleted
+      ? bySemesters.facultiesTotal.completions || bySemesters.facultiesTotal.enrollments
       : bySemesters.facultiesTotal[numberMode]
   )
 
@@ -29,18 +29,18 @@ export const FacultiesTab = () => {
   const tableData = useMemo(() => {
     const tableData = [totalRow, ..._.cloneDeep(data.tableData)]
     tableData.forEach(course => {
-      const facultiesTotal = { completed: 0, notCompleted: 0, ratio: null }
+      const facultiesTotal = { completions: 0, enrollments: 0, ratio: null }
       selectedSemesters.forEach(semestercode => {
         data.faculties.forEach(faculty => {
           if (!course.bySemesters.cellStats[faculty])
-            course.bySemesters.cellStats[faculty] = { completed: 0, notCompleted: 0, ratio: null }
+            course.bySemesters.cellStats[faculty] = { completions: 0, enrollments: 0, ratio: null }
           const stats = course.bySemesters[semestercode]?.[faculty]
           if (!stats) return
-          course.bySemesters.cellStats[faculty].completed += stats.completed
-          course.bySemesters.cellStats[faculty].notCompleted += stats.notCompleted
+          course.bySemesters.cellStats[faculty].completions += stats.completions
+          course.bySemesters.cellStats[faculty].enrollments += stats.enrollments
           course.bySemesters.cellStats[faculty].ratio = getRatio(course.bySemesters.cellStats[faculty])
-          facultiesTotal.completed += stats.completed
-          facultiesTotal.notCompleted += stats.notCompleted
+          facultiesTotal.completions += stats.completions
+          facultiesTotal.enrollments += stats.enrollments
         })
         facultiesTotal.ratio = getRatio(facultiesTotal)
       })

@@ -14,17 +14,17 @@ export const CompletionPicker = ({ enableRatioOption }) => {
         <b className="completion-header">Show number of</b>
         <Radio
           name="modeRadioGroup"
-          value="completed"
+          value="completions"
           label="Completions"
-          onChange={() => setNumberMode('completed')}
-          checked={numberMode === 'completed'}
+          onChange={() => setNumberMode('completions')}
+          checked={numberMode === 'completions'}
         />
         <Radio
           name="modeRadioGroup"
-          value="notCompleted"
+          value="enrollments"
           label="Enrollments"
-          onChange={() => setNumberMode('notCompleted')}
-          checked={numberMode === 'notCompleted'}
+          onChange={() => setNumberMode('enrollments')}
+          checked={numberMode === 'enrollments'}
         />
         {enableRatioOption && (
           <Radio

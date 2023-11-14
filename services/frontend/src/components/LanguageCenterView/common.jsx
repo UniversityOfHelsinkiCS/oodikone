@@ -27,9 +27,9 @@ export const filterAttemptsByDates = (date, { startDate, endDate }) => {
 }
 
 export const getRatio = stats => {
-  if (stats.notCompleted < stats.completed) return 100
-  if (stats.completed === 0) return 0
-  if (stats.notCompleted === 0) return null
-  const value = stats.completed / stats.notCompleted
+  if (stats.enrollments < stats.completions) return 100
+  if (stats.completions === 0) return 0
+  if (stats.enrollments === 0) return null
+  const value = stats.completions / stats.enrollments
   return Math.round(value * 100)
 }
