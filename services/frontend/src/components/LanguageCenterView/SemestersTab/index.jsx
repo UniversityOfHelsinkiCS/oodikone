@@ -15,7 +15,7 @@ import {
 export const emptyCoursesFilter = (courses, numberMode) =>
   courses.filter(({ bySemesters }) =>
     numberMode === 'ratio'
-      ? bySemesters.facultiesTotal.completed || bySemesters.facultiesTotal.notCompleted
+      ? bySemesters.facultiesTotal.completions || bySemesters.facultiesTotal.enrollments
       : bySemesters[numberMode]
   )
 
@@ -35,7 +35,7 @@ export const SemestersTab = () => {
 
   useEffect(() => {
     if (numberMode === 'ratio') {
-      setNumberMode('completed')
+      setNumberMode('completions')
     }
   }, [])
 

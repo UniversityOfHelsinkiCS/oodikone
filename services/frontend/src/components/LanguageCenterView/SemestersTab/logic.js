@@ -43,18 +43,18 @@ export const getColumns = (getTextIn, semesters, numberMode, colorMode, allTotal
 }
 
 export const calculateTotals = (courses, semesters) => {
-  const totalRow = { completed: 0, notCompleted: 0, total: 0 }
+  const totalRow = { completions: 0, enrollments: 0, total: 0 }
 
   semesters.forEach(sem => {
-    totalRow[sem] = { completed: 0, notCompleted: 0, total: 0 }
+    totalRow[sem] = { completions: 0, enrollments: 0, total: 0 }
     courses.forEach(course => {
       const stats = course.bySemesters[sem]
       if (!stats) return
-      totalRow[sem].completed += stats.completed
-      totalRow[sem].notCompleted += stats.notCompleted
+      totalRow[sem].completions += stats.completions
+      totalRow[sem].enrollments += stats.enrollments
       totalRow[sem].total += stats.total
-      totalRow.completed += stats.completed
-      totalRow.notCompleted += stats.notCompleted
+      totalRow.completions += stats.completions
+      totalRow.enrollments += stats.enrollments
       totalRow.total += stats.total
     })
   })
