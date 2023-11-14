@@ -5,18 +5,11 @@ import React, { useMemo } from 'react'
 import _ from 'lodash'
 import { calculateTotals, getColumns } from './logic'
 import { getRatio, useLanguageCenterContext } from '../common'
-import { CompletionPicker, FilterEmptyCoursesSelector, SemesterRangeSelector } from '../selectorComponents'
+import { CompletionPicker, SemesterRangeSelector } from '../selectorComponents'
 import '../index.css'
 
-export const emptyCoursesFilter = (courses, numberMode) =>
-  courses.filter(({ bySemesters }) =>
-    numberMode === 'ratio'
-      ? bySemesters.facultiesTotal.completions || bySemesters.facultiesTotal.enrollments
-      : bySemesters.facultiesTotal[numberMode]
-  )
-
 export const FacultiesTab = () => {
-  const { numberMode, semesterFilter, setSemesterFilter, selectedSemesters, data, facultyMap, filterEmptyCourses } =
+  const { numberMode, semesterFilter, setSemesterFilter, selectedSemesters, data, facultyMap } =
     useLanguageCenterContext()
 
   const { getTextIn } = useLanguage()
@@ -55,11 +48,10 @@ export const FacultiesTab = () => {
       <div className="options-container">
         <SemesterRangeSelector setSemesterFilter={setSemesterFilter} semesterFilter={semesterFilter} />
         <CompletionPicker enableRatioOption />
-        <FilterEmptyCoursesSelector />
       </div>
       <SortableTable
         columns={getColumns(getTextIn, [...data.faculties].sort(), numberMode, facultyMap)}
-        data={filterEmptyCourses ? emptyCoursesFilter(tableData, numberMode) : tableData}
+        data={tableData}
         stretch
       />
     </div>
