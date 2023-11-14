@@ -15,10 +15,10 @@ export const getColumns = (getTextIn, semesters, numberMode, colorMode, allTotal
       if (colorMode === 'course') return value / ((totalValue / semesters.length) * 2)
       return value / (totalValue / semesters.length / 8)
     })()
-
+    const divisor = colorMode === 'course' ? 6 : 2
     return {
       style: {
-        backgroundColor: `rgba(0,170,0,${relativeValue / 4})`,
+        backgroundColor: `rgba(0,170,0,${relativeValue / divisor})`,
       },
     }
   }
