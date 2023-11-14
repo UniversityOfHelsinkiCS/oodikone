@@ -3,7 +3,7 @@
   justify-content: center;
   margin: 50px 25px;
   flex-direction: column;
-  align-content: 'center';
+  align-content: center;
   align-items: center;
 }
 
@@ -15,107 +15,12 @@ input[type='radio'] {
   margin-left: 2em;
 }
 
-.toggle-label {
-  cursor: pointer;
-  padding-left: 0.5em;
-  padding-right: 0.5em;
-  font-weight: bold;
-}
-
-.toggle-label-checked {
-  cursor: pointer;
-  padding-left: 0.5em;
-  padding-right: 0.5em;
-  font-weight: bold;
-  opacity: 0.5;
-}
-
 .options-container {
   display: flex;
   flex-direction: row;
   margin-top: 1.4em;
   font-size: large;
   flex: 1 1 0px;
-}
-
-.datepicker-container {
-  display: flex;
-  flex-grow: 1;
-}
-
-.datepicker-acual-container {
-  display: flex;
-  gap: 0.4em;
-  margin: auto;
-  flex-direction: column;
-}
-
-.calendar-icon-container {
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  display: flex;
-  margin-right: 0.6em;
-}
-
-.completion-container {
-  display: flex;
-  flex-grow: 1;
-}
-
-.completion-acual-container {
-  display: flex;
-  gap: 0.4em;
-  margin: auto;
-  flex-direction: column;
-}
-
-.completion-header {
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  display: flex;
-}
-
-.completion-radio-container {
-  align-items: left;
-  width: 100%;
-  margin-right: 0.6em;
-  flex-direction: column;
-  align-content: left;
-}
-
-.radio-buttons {
-  display: flex;
-  flex-direction: column;
-}
-
-.button-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  margin-top: 1em;
-}
-
-.colormodeselector-container {
-  display: flex;
-  flex-grow: 1;
-}
-
-.colormodeselector-acual-container {
-  display: flex;
-  gap: 0.4em;
-  margin: auto;
-  flex-direction: column;
-}
-
-.emptycourses-selector {
-  display: flex;
-  gap: 0.4em;
-  margin: auto;
-  flex-direction: column;
-  max-width: 8em;
 }
 
 .selector-container {

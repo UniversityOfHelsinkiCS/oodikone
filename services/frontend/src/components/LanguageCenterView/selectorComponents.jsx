@@ -10,32 +10,30 @@ export const CompletionPicker = ({ enableRatioOption }) => {
 
   return (
     <div className="selector-container">
-      <div className="completion-acual-container">
-        <b className="completion-header">Show number of</b>
+      <b>Show number of</b>
+      <Radio
+        name="modeRadioGroup"
+        value="completions"
+        label="Completions"
+        onChange={() => setNumberMode('completions')}
+        checked={numberMode === 'completions'}
+      />
+      <Radio
+        name="modeRadioGroup"
+        value="enrollments"
+        label="Enrollments"
+        onChange={() => setNumberMode('enrollments')}
+        checked={numberMode === 'enrollments'}
+      />
+      {enableRatioOption && (
         <Radio
           name="modeRadioGroup"
-          value="completions"
-          label="Completions"
-          onChange={() => setNumberMode('completions')}
-          checked={numberMode === 'completions'}
+          value="ratio"
+          label="Ratio of credits per enrollments"
+          onChange={() => setNumberMode('ratio')}
+          checked={numberMode === 'ratio'}
         />
-        <Radio
-          name="modeRadioGroup"
-          value="enrollments"
-          label="Enrollments"
-          onChange={() => setNumberMode('enrollments')}
-          checked={numberMode === 'enrollments'}
-        />
-        {enableRatioOption && (
-          <Radio
-            name="modeRadioGroup"
-            value="ratio"
-            label="Ratio of credits per enrollments"
-            onChange={() => setNumberMode('ratio')}
-            checked={numberMode === 'ratio'}
-          />
-        )}
-      </div>
+      )}
     </div>
   )
 }
@@ -45,30 +43,28 @@ export const ColorModeSelector = () => {
 
   return (
     <div className="selector-container">
-      <div className="colormodeselector-acual-container">
-        <b className="colormodeselector-header">Coloring mode</b>
-        <Radio
-          name="colorModeGroup"
-          value="course"
-          label="Compare to average of course"
-          onChange={() => setColorMode('course')}
-          checked={colorMode === 'course'}
-        />
-        <Radio
-          name="colorModeGroup"
-          value="total"
-          label="Compare to other courses"
-          onChange={() => setColorMode('total')}
-          checked={colorMode === 'total'}
-        />
-        <Radio
-          name="colorModeGroup"
-          value="none"
-          label="No colors"
-          onChange={() => setColorMode('none')}
-          checked={colorMode === 'none'}
-        />
-      </div>
+      <b>Coloring mode</b>
+      <Radio
+        name="colorModeGroup"
+        value="course"
+        label="Compare to average of course"
+        onChange={() => setColorMode('course')}
+        checked={colorMode === 'course'}
+      />
+      <Radio
+        name="colorModeGroup"
+        value="total"
+        label="Compare to other courses"
+        onChange={() => setColorMode('total')}
+        checked={colorMode === 'total'}
+      />
+      <Radio
+        name="colorModeGroup"
+        value="none"
+        label="No colors"
+        onChange={() => setColorMode('none')}
+        checked={colorMode === 'none'}
+      />
     </div>
   )
 }
@@ -113,34 +109,32 @@ export const SemesterRangeSelector = () => {
 
   return (
     <div className="selector-container">
-      <div className="datepicker-acual-container">
-        <div>
-          <b>From</b>
+      <div>
+        <b>From</b>
+        <SemesterSelector
+          setSemester={semester => {
+            setSemesterFilter({
+              end: semesterFilter.end < semester ? semester : semesterFilter.end,
+              start: semester,
+            })
+          }}
+          semester={semesterFilter?.start}
+          allSemesters={semesters}
+        />
+      </div>
+      <div>
+        <b>Until</b>
+        {semesters && (
           <SemesterSelector
+            allSemesters={semesters?.filter(s => {
+              return semesterFilter.start <= s.semestercode
+            })}
             setSemester={semester => {
-              setSemesterFilter({
-                end: semesterFilter.end < semester ? semester : semesterFilter.end,
-                start: semester,
-              })
+              setSemesterFilter({ ...semesterFilter, end: semester })
             }}
-            semester={semesterFilter?.start}
-            allSemesters={semesters}
+            semester={semesterFilter?.end}
           />
-        </div>
-        <div>
-          <b>Until</b>
-          {semesters && (
-            <SemesterSelector
-              allSemesters={semesters?.filter(s => {
-                return semesterFilter.start <= s.semestercode
-              })}
-              setSemester={semester => {
-                setSemesterFilter({ ...semesterFilter, end: semester })
-              }}
-              semester={semesterFilter?.end}
-            />
-          )}
-        </div>
+        )}
       </div>
     </div>
   )
