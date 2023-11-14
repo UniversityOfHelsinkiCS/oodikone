@@ -94,6 +94,12 @@ const computeLanguageCenterData = async () => {
       attemptsByStudents[sn] = []
     }
     studentList.add(sn)
+    if (
+      attemptsByStudents[sn].find(
+        att => !att.completed && att.semestercode === e.semestercode && att.courseCode === e.course_code
+      )
+    )
+      return
     attemptsByStudents[sn].push({
       studentNumber: sn,
       courseCode: e.course_code,
