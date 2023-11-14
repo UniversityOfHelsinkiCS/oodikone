@@ -13,14 +13,14 @@ export const InfoBox = () => {
             <li>
               <b>Show number of:</b>
             </li>
-
             <ul>
-              <li>Completion: Amount of passed completions of course</li>
+              <li>Completions: Amount of passed completions of course</li>
               <li>Enrollments: Amount of accepted enrollments on course</li>
               <li>
-                Ratio: Percentage of credits per enrollments. 0 % means there are zero credits and at least one
-                enrollment. 100 % means there are at least as many credits as enrollments. A dash "-" indicates there
-                are no credits or enrollments. Hover mouse over a cell to view the amount of enrollments and credits.
+                Ratio: Percentage of completions per enrollments. 0 % means there are zero completions and at least one
+                enrollment. 100 % means there are at least as many completions as enrollments. A dash indicates there
+                are no completions or enrollments. Hover mouse over a cell to view the amount of enrollments and
+                completions.
               </li>
             </ul>
             <li>
