@@ -12,6 +12,7 @@ export const CompletionPicker = ({ enableRatioOption }) => {
     <div className="selector-container">
       <b>Show number of</b>
       <Radio
+        data-cy="completions-button"
         name="modeRadioGroup"
         value="completions"
         label="Completions"
@@ -19,6 +20,7 @@ export const CompletionPicker = ({ enableRatioOption }) => {
         checked={numberMode === 'completions'}
       />
       <Radio
+        data-cy="enrollments-button"
         name="modeRadioGroup"
         value="enrollments"
         label="Enrollments"
@@ -29,6 +31,7 @@ export const CompletionPicker = ({ enableRatioOption }) => {
         <Radio
           name="modeRadioGroup"
           value="ratio"
+          data-cy="ratio-button"
           label="Ratio of credits per enrollments"
           onChange={() => setNumberMode('ratio')}
           checked={numberMode === 'ratio'}
@@ -69,7 +72,7 @@ export const ColorModeSelector = () => {
   )
 }
 
-export const SemesterSelector = ({ allSemesters, semester, setSemester }) => {
+export const SemesterSelector = ({ allSemesters, semester, setSemester, dataCy }) => {
   const { getTextIn } = useLanguage()
   const currentValue = allSemesters.find(({ semestercode }) => semester === semestercode) ?? allSemesters[0]
   const options = useMemo(
@@ -80,6 +83,7 @@ export const SemesterSelector = ({ allSemesters, semester, setSemester }) => {
   return (
     <div className="selector-container">
       <Dropdown
+        data-cy={dataCy}
         onChange={(_, { value }) =>
           setSemester(allSemesters.find(({ semestercode }) => semestercode === value).semestercode)
         }
@@ -98,6 +102,7 @@ export const SemesterRangeSelector = () => {
       <div>
         <b>From</b>
         <SemesterSelector
+          dataCy="semester-from"
           setSemester={semester => {
             setSemesterFilter({
               end: semesterFilter.end < semester ? semester : semesterFilter.end,
@@ -112,6 +117,7 @@ export const SemesterRangeSelector = () => {
         <b>Until</b>
         {semesters && (
           <SemesterSelector
+            dataCy="semester-to"
             allSemesters={semesters?.filter(s => {
               return semesterFilter.start <= s.semestercode
             })}
