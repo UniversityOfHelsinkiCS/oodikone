@@ -51,7 +51,7 @@ export const FacultiesTab = () => {
       </div>
       <SortableTable
         columns={getColumns(getTextIn, [...data.faculties].sort(), numberMode, facultyMap)}
-        data={tableData}
+        data={numberMode === 'ratio' ? tableData.slice(1) : tableData}
         stretch
       />
     </div>
