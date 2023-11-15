@@ -53,4 +53,12 @@ describe('When language center is opened', () => {
     cy.contains('1339')
     cy.contains('Coloring mode')
   })
+
+  it('Not visible to a user without right to see it', () => {
+    cy.init('/languagecenterview')
+    cy.contains('Access denied')
+    cy.contains("You're currently not allowed to see this page.")
+    cy.contains('Custom populations').click()
+    cy.contains('Language center view').should('not.exist')
+  })
 })
