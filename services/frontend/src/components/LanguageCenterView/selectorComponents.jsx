@@ -32,7 +32,7 @@ export const CompletionPicker = ({ enableRatioOption }) => {
           name="modeRadioGroup"
           value="ratio"
           data-cy="ratio-button"
-          label="Ratio of credits per enrollments"
+          label="Ratio of completions per enrollments"
           onChange={() => setNumberMode('ratio')}
           checked={numberMode === 'ratio'}
         />
