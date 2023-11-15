@@ -3,7 +3,8 @@ import { courseNameColumn, getRatio } from '../common'
 export const getColumns = (getTextIn, faculties, numberMode, facultyMap) => {
   const getFacultyTitle = code => {
     if (!code) return 'No faculty' // Shouldn't happen probably
-    if (code === 'H930') return 'Open\nuni'
+    if (code === 'OPEN') return 'Open\nuni'
+    if (code === 'OTHER') return 'Other\nfaculty'
     return code
   }
 

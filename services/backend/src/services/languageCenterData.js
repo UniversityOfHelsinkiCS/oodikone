@@ -4,6 +4,11 @@ const { redisClient } = require('./redis')
 const { orderBy } = require('lodash')
 const LANGUAGE_CENTER_REDIS_KEY = 'LANGUAGE_CENTER_DATA'
 
+const isBetween = (start, date, end) =>
+  new Date(start).getTime() <= new Date(date).getTime() && new Date(date).getTime() <= new Date(end).getTime()
+
+const findStudyright = (studyrights, date) => studyrights?.find(sr => isBetween(sr.startdate, date, sr.enddate))
+
 const getLanguageCenterCourses = async () => {
   const courses = await Course.findAll({
     attributes: ['code', 'name'],
@@ -37,6 +42,7 @@ const computeLanguageCenterData = async () => {
     where: {
       [Op.or]: [{ course_code: { [Op.like]: 'KK%' } }, { course_code: { [Op.like]: 'AYKK%' } }],
     },
+    raw: true,
   })
 
   const enrollments = await Enrollment.findAll({
@@ -45,13 +51,12 @@ const computeLanguageCenterData = async () => {
       [Op.or]: [{ course_code: { [Op.like]: 'KK%' } }, { course_code: { [Op.like]: 'AYKK%' } }],
       state: 'ENROLLED',
     },
+    raw: true,
   })
 
-  const studyrights = await Studyright.findAll({})
+  const studyrights = await Studyright.findAll({ raw: true })
 
-  const studyrightToFacultyMap = studyrights.reduce((obj, cur) => {
-    // Filter out: Kielikeskus (?), Aleksanteri-instituutti
-    if (['H906', 'H401'].includes(cur.facultyCode)) return obj
+  const attemptStudyrightToFacultyMap = studyrights.reduce((obj, cur) => {
     if (!cur.actual_studyrightid) return obj
     // ^The studyright id should exist, but there was once a faulty row temporarily in studyright-table,
     // which screwed up the faculties due to null getting a value to this map
@@ -59,11 +64,22 @@ const computeLanguageCenterData = async () => {
     return obj
   }, {})
 
+  const studentnumberToStudyrightsMap = studyrights.reduce((obj, cur) => {
+    if (!obj[cur.studentStudentnumber]) obj[cur.studentStudentnumber] = []
+    obj[cur.studentStudentnumber].push(cur)
+    return obj
+  }, {})
+
+  const elementStudyrightIdToStudyrightMap = studyrights.reduce((obj, cur) => {
+    obj[cur.studyrightid] = cur
+    return obj
+  }, {})
+
   credits.forEach(c => {
-    c.faculty = studyrightToFacultyMap[c.studyright_id]
+    c.faculty = attemptStudyrightToFacultyMap[c.studyright_id]
   })
   enrollments.forEach(c => {
-    c.faculty = studyrightToFacultyMap[c.studyright_id]
+    c.faculty = attemptStudyrightToFacultyMap[c.studyright_id]
   })
 
   const studentList = new Set()
@@ -83,7 +99,7 @@ const computeLanguageCenterData = async () => {
       courseCode: c.course_code,
       completed: true,
       date: c.createdate,
-      faculty: studyrightToFacultyMap[c.studyright_id],
+      faculty: attemptStudyrightToFacultyMap[c.studyright_id],
       semestercode: c.semestercode,
     })
   })
@@ -105,46 +121,67 @@ const computeLanguageCenterData = async () => {
       courseCode: e.course_code,
       completed: false,
       date: e.enrollment_date_time,
-      faculty: studyrightToFacultyMap[e.studyright_id],
+      faculty: attemptStudyrightToFacultyMap[e.studyright_id],
       semestercode: e.semestercode,
     })
   })
 
   const studyrightElements = await StudyrightElement.findAll({
-    attributes: ['studentnumber', 'startdate', 'enddate', 'code'],
+    attributes: ['studentnumber', 'startdate', 'enddate', 'code', 'studyrightid'],
     where: {
       studentnumber: { [Op.in]: Array.from(studentList.values()) },
     },
+    raw: true,
   })
 
-  const studyrightMap = studyrightElements.reduce((obj, cur) => {
+  const studyrightElementsMap = studyrightElements.reduce((obj, cur) => {
     if (!obj[cur.studentnumber]) {
-      obj[cur.studentnumber] = [{ startdate: cur.startdate, enddate: cur.enddate, code: cur.code }]
-    } else {
-      obj[cur.studentnumber].push({ startdate: cur.startdate, enddate: cur.enddate, code: cur.code })
+      obj[cur.studentnumber] = []
     }
+    obj[cur.studentnumber].push({
+      startdate: cur.startdate,
+      enddate: cur.enddate,
+      code: elementStudyrightIdToStudyrightMap[cur.studyrightid]?.facultyCode,
+    })
     return obj
   }, {})
 
   const getFaculty = (studentNumber, date) =>
-    studyrightMap[studentNumber]?.find(sr => sr.startdate <= date && sr.enddate >= date)?.code
+    findStudyright(studyrightElementsMap[studentNumber], date)?.code ||
+    findStudyright(studentnumberToStudyrightsMap[studentNumber], date)?.facultyCode
 
   const attemptsArray = []
   studentList.forEach(sn => attemptsArray.push(...attemptsByStudents[sn]))
+  // 93033 Avoin yliopisto, yhteistyöoppilaitokset"
+  // 93034 Kesäyliopistot
+  const isOpenUni = code => ['9301', 'H930', '93033', '93034'].includes(code)
+  const isMisc = code => ['H906', 'H401'].includes(code) // Language center, Alexander institute (very few numbers)
 
   attemptsArray.forEach(item => {
-    if (item.faculty) return
+    if (item.faculty) {
+      if (isOpenUni(item.faculty)) {
+        item.faculty = 'OPEN'
+      } else if (isMisc(item.faculty) || !item.faculty.substring(0, 3).match(`^H\\d`)) {
+        item.faculty = 'OTHER'
+      }
+      return
+    }
+    // Credit or enrollment did not have studyright_id. Find based on date,
+    // and if studyrightElement is not found, check studyrights because open uni rights
+    // do not have studyrightelements
     const faculty = getFaculty(item.studentNumber, item.date)
-    if (faculty?.startsWith('MH') || faculty?.startsWith('KH')) {
-      item.faculty = faculty.substring(1, 4)
+    if (isOpenUni(faculty)) {
+      item.faculty = 'OPEN'
+    } else if (faculty?.substring(0, 3).match(`^H\\d`)) {
+      item.faculty = !isMisc(faculty) ? faculty : 'OTHER'
     } else {
-      item.faculty = faculty
+      item.faculty = 'OTHER'
     }
   })
 
-  const filteredAttempts = attemptsArray.filter(attempt => attempt.faculty?.substring(0, 3).match(`^H\\d`))
-  const faculties = [...new Set(filteredAttempts.map(({ faculty }) => faculty))]
-  const unorderedTableData = await createArrayOfCourses(filteredAttempts, courses)
+  const faculties = [...new Set(attemptsArray.map(({ faculty }) => faculty))]
+
+  const unorderedTableData = await createArrayOfCourses(attemptsArray, courses)
 
   const tableData = orderBy(unorderedTableData, 'code')
 
