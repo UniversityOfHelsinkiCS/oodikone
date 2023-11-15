@@ -33,7 +33,7 @@ const LanguageCenterView = () => {
 
   const { data, isFetchingOrLoading, isError } = useGetLanguageCenterDataQuery()
 
-  const [numberMode, setNumberMode] = useState('enrollments')
+  const [numberMode, setNumberMode] = useState('completions')
   const [colorMode, setColorMode] = useState('course')
   const [semesterFilter, setSemesterFilter] = useState(null)
   const [filterEmptyCourses, setFilterEmptyCourses] = useState(true)
