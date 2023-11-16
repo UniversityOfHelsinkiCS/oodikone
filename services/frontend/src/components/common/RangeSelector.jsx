@@ -3,7 +3,7 @@ import { Range, getTrackBackground } from 'react-range'
 import _ from 'lodash'
 import { Input } from 'semantic-ui-react'
 
-const RangeSelector = ({ min, max, value, onChange, disabled = false }) => {
+export const RangeSelector = ({ min, max, value, onChange, disabled = false }) => {
   const [dirtyMin, setDirtyMin] = useState(null)
   const [dirtyMax, setDirtyMax] = useState(null)
 
@@ -121,5 +121,3 @@ const RangeSelector = ({ min, max, value, onChange, disabled = false }) => {
     </div>
   )
 }
-
-export default RangeSelector

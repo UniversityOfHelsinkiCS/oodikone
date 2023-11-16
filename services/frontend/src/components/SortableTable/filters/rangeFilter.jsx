@@ -3,7 +3,7 @@ import { useContextSelector } from 'use-context-selector'
 import _ from 'lodash'
 import { Icon } from 'semantic-ui-react'
 import { useDebounce } from 'common/hooks'
-import RangeSelector from 'components/RangeSelector'
+import { RangeSelector } from 'components/common/RangeSelector'
 import { SortableTableContext, getColumnValue } from '../common'
 
 const RangeColumnFilterComponent = ({ column, options, dispatch }) => {
