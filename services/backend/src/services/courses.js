@@ -240,12 +240,15 @@ const allCodeAlternatives = async code => {
   return sortMainCode([...course.substitutions, code])
 }
 
-const yearlyStatsOfNew = async (coursecode, separate, unification, anonymizationSalt) => {
+const yearlyStatsOfNew = async (coursecode, separate, unification, anonymizationSalt, combineSubstitutions) => {
   const courseForSubs = await Course.findOne({
     where: { code: coursecode },
   })
 
-  let codes = courseForSubs.substitutions ? sortMainCode([...courseForSubs.substitutions, coursecode]) : [coursecode]
+  let codes =
+    combineSubstitutions && courseForSubs.substitutions
+      ? sortMainCode([...courseForSubs.substitutions, coursecode])
+      : [coursecode]
 
   if (unification === 'reqular') {
     codes = codes.filter(course => !isOpenUniCourseCode(course))
@@ -398,12 +401,12 @@ const maxYearsToCreatePopulationFrom = async (coursecodes, unifyCourses) => {
   return maxYearsToCreatePopulationFrom
 }
 
-const courseYearlyStats = async (coursecodes, separate, anonymizationSalt) => {
+const courseYearlyStats = async (coursecodes, separate, anonymizationSalt, combineSubstitutions) => {
   const statsReqular = await Promise.all(
     coursecodes.map(async code => {
-      const unifyStats = await yearlyStatsOfNew(code, separate, 'unify', anonymizationSalt)
-      const reqularStats = await yearlyStatsOfNew(code, separate, 'reqular', anonymizationSalt)
-      const openStats = await yearlyStatsOfNew(code, separate, 'open', anonymizationSalt)
+      const unifyStats = await yearlyStatsOfNew(code, separate, 'unify', anonymizationSalt, combineSubstitutions)
+      const reqularStats = await yearlyStatsOfNew(code, separate, 'reqular', anonymizationSalt, combineSubstitutions)
+      const openStats = await yearlyStatsOfNew(code, separate, 'open', anonymizationSalt, combineSubstitutions)
 
       return { unifyStats, reqularStats, openStats }
     })
