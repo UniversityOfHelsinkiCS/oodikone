@@ -229,7 +229,6 @@ const createArrayOfCourses = async (attempts, courses) => {
 
 module.exports = {
   getLanguageCenterData,
-  getLanguageCenterCourses,
   LANGUAGE_CENTER_REDIS_KEY,
   computeLanguageCenterData,
 }
