@@ -1,4 +1,4 @@
-import RangeSelector from 'components/RangeSelector'
+import { RangeSelector } from 'components/common/RangeSelector'
 import React, { useMemo } from 'react'
 import _ from 'lodash'
 import { useDebounce } from 'common/hooks'
