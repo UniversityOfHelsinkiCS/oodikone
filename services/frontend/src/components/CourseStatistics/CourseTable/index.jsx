@@ -27,7 +27,7 @@ const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, ma
         <div>{getTextIn(course.name)}</div>
         <div>{getActiveYears(course)}</div>
       </Table.Cell>
-      <Table.Cell content={!course.alternatives ? course.code : course.alternatives.map(a => a.code).join(', ')} />
+      <Table.Cell content={[course.code, ...course.substitutions].join(', ')} />
       {controlIcon ? <Table.Cell icon={controlIcon} /> : null}
     </Table.Row>
   )

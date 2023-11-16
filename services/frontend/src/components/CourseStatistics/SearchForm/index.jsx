@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Segment, Header, Form } from 'semantic-ui-react'
+import { Segment, Header, Form, Radio, Popup } from 'semantic-ui-react'
 import { useSelector, useDispatch } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import qs from 'query-string'
@@ -8,7 +8,7 @@ import { func, shape } from 'prop-types'
 import { clearCourses, findCoursesV2 } from '../../../redux/coursesearch'
 import { getCourseStats, clearCourseStats } from '../../../redux/coursestats'
 import { getCourseSearchResults } from '../../../selectors/courses'
-import { useSearchHistory } from '../../../common/hooks'
+import { useSearchHistory, useToggle } from '../../../common/hooks'
 import { validateInputLength } from '../../../common'
 import AutoSubmitSearchInput from '../../AutoSubmitSearchInput'
 import CourseTable from '../CourseTable'
@@ -29,29 +29,25 @@ const searchBoxStyle = {
   boxShadow: '0 2px 4px 0 rgb(34 36 38 / 12%), 0 2px 10px 0 rgb(34 36 38 / 15%)',
 }
 
-const SearchForm = props => {
+const SearchForm = ({ location, history, onProgress }) => {
   const { getTextIn } = useLanguage()
   const dispatch = useDispatch()
   const isLoading = useSelector(state => state.courseStats.pending)
-  const matchingCourses = useSelector(getCourseSearchResults)
-  const [state, setState] = useState({
-    ...INITIAL,
-  })
+  const [combineSubstitutions, toggleCombineSubstitutions] = useToggle(true)
+  const matchingCourses = useSelector(state => getCourseSearchResults(state, combineSubstitutions))
+  const [state, setState] = useState({ ...INITIAL })
   const [searchHistory, addItemToSearchHistory, updateItemInSearchHistory] = useSearchHistory('courseSearch', 6)
 
   const { courseName, courseCode, selectedCourses, separate } = state
 
-  // const { coursesLoading, isLoading, matchingCourses /* unifyOpenUniCourses */ } = props
-
   const parseQueryFromUrl = () => {
-    const { location } = props
     const { courseCodes, separate, unifyOpenUniCourses, ...rest } = qs.parse(location.search)
     const query = {
       ...INITIAL,
       ...rest,
       courseCodes: JSON.parse(courseCodes),
       separate: JSON.parse(separate),
-      // unifyOpenUniCourses: JSON.parse(unifyOpenUniCourses || false),
+      combineSubstitutions: JSON.parse(combineSubstitutions),
     }
     return query
   }
@@ -59,11 +55,10 @@ const SearchForm = props => {
   const fetchStatisticsFromUrlParams = () => {
     const query = parseQueryFromUrl()
     setState({ ...state, ...query })
-    dispatch(getCourseStats(query, props.onProgress))
+    dispatch(getCourseStats(query, onProgress))
   }
 
   useEffect(() => {
-    const { location } = props
     if (!location.search) {
       dispatch(clearCourses())
       dispatch(clearCourseStats())
@@ -71,11 +66,10 @@ const SearchForm = props => {
   }, [])
 
   useEffect(() => {
-    const { location } = props
     if (location.search) {
       fetchStatisticsFromUrlParams()
     }
-  }, [props.location.search])
+  }, [location.search])
 
   const onSelectCourse = course => {
     course.selected = !course.selected
@@ -99,9 +93,12 @@ const SearchForm = props => {
   }
 
   const pushQueryToUrl = query => {
-    const { history } = props
     const { courseCodes, ...rest } = query
-    const queryObject = { ...rest, courseCodes: JSON.stringify(courseCodes) }
+    const queryObject = {
+      ...rest,
+      courseCodes: JSON.stringify(courseCodes),
+      combineSubstitutions: JSON.stringify(combineSubstitutions),
+    }
     const searchString = qs.stringify(queryObject)
     history.push({ search: searchString })
   }
@@ -115,6 +112,7 @@ const SearchForm = props => {
     const params = {
       courseCodes: codes,
       separate,
+      combineSubstitutions,
     }
     const searchHistoryText = codes.map(code => `${getTextIn(selectedCourses[code].name)} ${code}`)
     addItemToSearchHistory({
@@ -129,13 +127,20 @@ const SearchForm = props => {
     const isValidCode = validateInputLength(courseCode, 2)
 
     if (isValidName || isValidCode) {
-      return dispatch(findCoursesV2({ name: courseName, code: courseCode }))
+      return dispatch(findCoursesV2({ name: courseName, code: courseCode, combineSubstitutions }))
     }
     if (courseName.length < 5 && courseCode.length < 2) {
       dispatch(clearCourses())
     }
     return Promise.resolve()
   }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await fetchCourses()
+    }
+    fetchData()
+  }, [combineSubstitutions])
 
   const courses = matchingCourses.filter(c => !selectedCourses[c.code])
 
@@ -176,7 +181,7 @@ const SearchForm = props => {
                   placeholder="Search by entering a course name"
                   value={courseName}
                   onChange={cn => setState({ ...state, courseName: cn })}
-                  loading={props.coursesLoading}
+                  loading={isLoading}
                   minSearchLength={0}
                 />
               </Form.Field>
@@ -187,9 +192,30 @@ const SearchForm = props => {
                   placeholder="Search by a course code"
                   value={courseCode}
                   onChange={cc => setState({ ...state, courseCode: cc })}
-                  loading={props.coursesLoading}
+                  loading={isLoading}
                   minSearchLength={0}
                   data-cy="course-code-input"
+                />
+              </Form.Field>
+              <Form.Field>
+                <Popup
+                  on="hover"
+                  content={getTextIn({
+                    fi: 'Jos "Combine substitutions" on valittuna (oletuksena), niin kurssi ja leikkaavat kurssit yhdistetään tilastoissa.',
+                    en: 'If "Combine substitutions" is on (default behavior), then course and its substitutions are combined in the statistics.',
+                  })}
+                  size="tiny"
+                  position="top center"
+                  trigger={
+                    <Radio
+                      toggle
+                      label="Combine substitutions"
+                      checked={combineSubstitutions}
+                      onChange={toggleCombineSubstitutions}
+                      style={{ margin: '32px 0 0 5px', height: '100%' }}
+                      data-cy="combine-substitutions-toggle"
+                    />
+                  }
                 />
               </Form.Field>
             </Form.Group>

@@ -168,7 +168,7 @@ describe('Course Statistics tests', () => {
     it('Population of course shows grades for each student', () => {
       cy.get("input[placeholder='Search by a course code']").type('TKT20001')
       cy.wait(2000)
-      cy.contains(/^TKT20001, AYTKT20001$/).click({ force: true })
+      cy.contains(/^TKT20001, 58131, AYTKT20001$/).click({ force: true })
       cy.wait(2000)
       cy.contains('Fetch statistics').should('be.enabled').click({ force: true })
       cy.wait(2000)
@@ -184,7 +184,7 @@ describe('Course Statistics tests', () => {
 
     it('Language distribution is correct', () => {
       cy.get("input[placeholder='Search by a course code']").type('TKT20003')
-      cy.contains(/^TKT20003$/).click()
+      cy.contains(/^TKT20003, 582219$/).click()
       cy.contains('Fetch statistics').should('be.enabled').click()
       cy.contains('TKT20003, 582219 Käyttöjärjestelmät')
       cy.get('[data-cy=unify_radio_reqular]').click()
@@ -196,12 +196,87 @@ describe('Course Statistics tests', () => {
       cy.contains('td', 'english').siblings().contains('5')
     })
 
+    it('Shows correct statistics when course is not combined with its substitutions', () => {
+      cy.get('[data-cy="combine-substitutions-toggle"]').should('have.class', 'checked').click()
+      cy.get('[data-cy="combine-substitutions-toggle"]').should('not.have.class', 'checked')
+
+      cy.get("input[placeholder='Search by a course code']").type('TKT10002')
+      cy.contains('td', /^TKT10002$/).click()
+      cy.contains('Fetch statistics').should('be.enabled').click()
+      cy.contains('Search for courses').should('not.exist')
+      cy.contains('TKT10002 Ohjelmoinnin perusteet')
+
+      // Statistics
+      const yearRange = { from: '2010-2011', to: '2020-2021' }
+      const attemptsTableContents = [
+        // [time, attempts, passed, failed]
+        ['Total', null, 290, 278, 12],
+      ]
+
+      const gradesTableContents = [
+        // [time, attempts, 0, 1, 2, 3, 4, 5, other passed]
+        ['Total', null, 290, 12, 8, 9, 12, 17, 223, 9],
+        ['2020-2021', null, 1, 0, 0, 0, 0, 0, 1, 0],
+        ['2019-2020', null, 37, 1, 2, 0, 3, 3, 28],
+        ['2018-2019', null, 109, 4, 2, 5, 4, 6, 88, 0],
+        ['2017-2018', null, 129, 7, 3, 3, 3, 4, 101, 8],
+        ['2016-2017', null, 9, 0, 0, 1, 2, 2, 4, 0],
+        ['2015-2016', null, 2, 0, 0, 0, 0, 1, 1, 0],
+        ['2014-2015', null, 1, 0, 0, 0, 0, 0, 0, 1],
+        ['2013-2014', null, 1, 0, 1, 0, 0, 0, 0, 0],
+        ['2010-2011', null, 1, 0, 0, 0, 0, 1, 0, 0],
+      ]
+      // Time range
+      cy.get("div[name='fromYear']").within(() => {
+        cy.get("div[role='option']").first().should('have.text', yearRange.to)
+        cy.contains("div[role='option']", yearRange.from).should('have.class', 'selected')
+        cy.get("div[role='option']").last().should('have.text', '2010-2011')
+        cy.get("div[role='option']").should('have.length', 11)
+      })
+      cy.get("div[name='toYear']").within(() => {
+        cy.get("div[role='option']").first().should('have.text', '2020-2021')
+        cy.contains("div[role='option']", yearRange.to).should('have.class', 'selected')
+        cy.get("div[role='option']").last().should('have.text', yearRange.from)
+        cy.get("div[role='option']").should('have.length', 11)
+      })
+
+      cy.contains('#CourseStatPanes a.item', 'Table').click()
+      cy.contains('#CourseStatPanes a.item', 'Attempts').click()
+      cy.get('#CourseStatPanes table>tbody').within(() => {
+        attemptsTableContents.forEach((values, trIndex) => {
+          cy.get('tr')
+            .eq(trIndex)
+            .within(() => {
+              values.forEach((value, tdIndex) => {
+                if (value === null) return
+                cy.get('td').eq(tdIndex).contains(value)
+              })
+            })
+        })
+        cy.get('tr').should('have.length', 10)
+      })
+      cy.get('[data-cy=gradeToggle]', { force: true }).click({ force: true })
+      cy.get('#CourseStatPanes table>tbody').within(() => {
+        gradesTableContents.forEach((values, trIndex) => {
+          cy.get('tr')
+            .eq(trIndex)
+            .within(() => {
+              values.forEach((value, tdIndex) => {
+                if (value === null) return
+                cy.get('td').eq(tdIndex).contains(value)
+              })
+            })
+        })
+        cy.get('tr').should('have.length', 10)
+      })
+    })
+
     describe('When searching unified course stats', () => {
       beforeEach(() => {
         cy.url().should('include', '/coursestatistics')
         cy.contains('Search for courses')
         cy.get("input[placeholder='Search by a course code']").type('TKT10002')
-        cy.contains('td', 'TKT10002, AYTKT10002').click()
+        cy.contains('td', /^TKT10002, 581325, A581325, AYTKT10002$/).click()
         cy.contains('Fetch statistics').should('be.enabled').click()
         cy.contains('Search for courses').should('not.exist')
         cy.contains('TKT10002, 581325, AYTKT10002, A581325 Ohjelmoinnin perusteet')
@@ -367,6 +442,7 @@ describe('Course Statistics tests', () => {
     })
   })
 
+  // ! This test does not pass locally but it does pass on GitHub Actions (see issue #4317)
   it('Some features of Course Statistics are hidden for courseStatistics-users without other rights', () => {
     cy.init('/coursestatistics', 'onlycoursestatistics')
     cy.get('[data-cy=navbar-courseStatistics]').click()

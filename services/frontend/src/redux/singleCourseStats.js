@@ -3,8 +3,10 @@ import { RTKApi, callController } from '../apiConnection/index'
 const singleCourseStatsApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
     getSingleCourseStats: builder.query({
-      query: ({ courseCodes, separate }) =>
-        `/v3/courseyearlystats?${courseCodes.map(code => `codes[]=${code}`).join('&')}&separate=${separate}`,
+      query: ({ courseCodes, separate, combineSubstitutions }) =>
+        `/v3/courseyearlystats?${courseCodes
+          .map(code => `codes[]=${code}`)
+          .join('&')}&separate=${separate}&combineSubstitutions=${combineSubstitutions}`,
     }),
   }),
   overrideExisting: false,

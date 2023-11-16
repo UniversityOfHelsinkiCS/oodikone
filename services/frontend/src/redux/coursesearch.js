@@ -4,9 +4,9 @@ const prefix = 'GET_COURSE_SEARCH_RESULT_'
 
 export const clearCourses = () => ({ type: 'CLEAR_SEARCH_RESULTS' })
 
-export const findCoursesV2 = ({ name, code }) => {
+export const findCoursesV2 = ({ name, code, combineSubstitutions }) => {
   const route = '/v2/coursesmulti'
-  const params = { name, code }
+  const params = { name, code, combineSubstitutions }
   return callController(route, prefix, [], 'get', params, params)
 }
 
