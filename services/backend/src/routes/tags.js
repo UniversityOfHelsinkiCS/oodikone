@@ -23,8 +23,10 @@ router.get('/tags/:studytrack', async (req, res) => {
     user: { rights, roles, id },
   } = req
   const programmeCodes = studytrack.includes('KH') && studytrack.includes('MH') ? studytrack.split('-') : [studytrack]
+
+  // Respond with null and 200 instead of 403 if the user isn't authorized to view the tags. This is to avoid unnecessary noise in Sentry
   if (!rights.includes(programmeCodes[0]) && !rights.includes(programmeCodes[1]) && !roles?.includes('admin'))
-    return res.status(403).end()
+    return res.json(null)
 
   const tags = await Tags.findTagsByStudytrack(studytrack)
   res.status(200).json(filterRelevantTags(tags, id))
@@ -81,8 +83,10 @@ router.get('/studenttags/:studytrack', async (req, res) => {
   } = req
 
   const programmeCodes = studytrack.includes('KH') && studytrack.includes('MH') ? studytrack.split('-') : [studytrack]
+
+  // Respond with null and 200 instead of 403 if the user isn't authorized to view the tags. This is to avoid unnecessary noise in Sentry
   if (!rights.includes(programmeCodes[0]) && !rights.includes(programmeCodes[1]) && !roles?.includes('admin'))
-    return res.status(403).end()
+    return res.json(null)
 
   const result = await TagStudent.getStudentTagsByStudytrack(studytrack)
   res.status(200).json(filterRelevantStudentTags(result, id))
