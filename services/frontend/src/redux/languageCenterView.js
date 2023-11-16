@@ -5,10 +5,7 @@ const languageCenterApi = RTKApi.injectEndpoints({
     getLanguageCenterData: builder.query({
       query: () => `languagecenterdata`,
     }),
-    getLanguageCenterCourses: builder.query({
-      query: () => `languagecenterdata/courses`,
-    }),
   }),
 })
 
-export const { useGetLanguageCenterDataQuery, useGetLanguageCenterCoursesQuery } = languageCenterApi
+export const { useGetLanguageCenterDataQuery } = languageCenterApi
