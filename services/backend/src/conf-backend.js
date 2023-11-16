@@ -74,4 +74,5 @@ module.exports = {
   backendPort,
   importerUrl,
   importerToken,
+  isDev,
 }
