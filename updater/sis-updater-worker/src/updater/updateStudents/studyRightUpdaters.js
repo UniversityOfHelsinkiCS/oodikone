@@ -301,11 +301,10 @@ const updateStudyRightElements = async (
 
       orderedSnapshots.sort(possibleBscFirst).forEach(snapshot => {
         const studentnumber = personIdToStudentNumber[mainStudyRight.person_id]
-        // according to Eija Airio this is the right way to get the date... at least when studyright has changed
-        // clarification: when education changes in the study right we need to get the start date from
-        // the _first_ snapshot as it is the date when the transfer is happened. However, this causes sometimes huge caps
-        let startDate = snapshot.first_snapshot_date_time || snapshot.valid.startDate
-        // fix was made for varhaiskasvatus at first place, see https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2741
+        // Previous implementation used the first snapshot date as the start date by default. This was meant to fix the bug for students that have transferred from one programme to another inside a faculty. However, this caused some problems for students that had previous studyrights (e.g. from open university) and then started their degree studies at the university. Now we use the first snapshot date as the start date only if there are multiple study right elements in one study right (i.e. the student has transferred from one programme to another) since the first snapshot date is the date when the transfer is happened. Otherwise we use the start date of the valid field of the snapshot. This might also fix the huge gaps that were caused by the previous implementation as the first snapshot date time doesn't always match with the actual start date of the studies.
+
+        let startDate = snapshots.length > 1 ? snapshot.first_snapshot_date_time : snapshot.valid.startDate
+        // The original fix was made for varhaiskasvatus at first place, see https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2741
         // However, there were gaps between other programmes too. Now ALL in all ba-ma studyrights master start date is bachelor graduation  date + 1
         if (
           snapshot.accepted_selection_path &&
