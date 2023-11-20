@@ -46,7 +46,11 @@ const UserSearchList = ({ enabledOnly, users, error, elementdetails }) => {
                   ))}
               </Label.Group>
             ),
-            getRowVal: user => user.accessgroup.map(ag => ag.group_code).sort(),
+            getRowVal: user =>
+              user.accessgroup
+                .map(ag => ag.group_code)
+                .sort()
+                .join(', '),
           },
           {
             key: 'PROGRAMMES',
@@ -93,7 +97,7 @@ const UserSearchList = ({ enabledOnly, users, error, elementdetails }) => {
                   ))}
               </Label.Group>
             ),
-            getRowVal: user => user.iam_groups.slice().sort(),
+            getRowVal: user => user.iam_groups.slice().sort().join(', '),
           },
           {
             key: 'OODIACCESS',
