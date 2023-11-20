@@ -32,8 +32,8 @@ const authorizationApi = RTKApi.injectEndpoints({
 const { useLoginQuery } = authorizationApi
 
 export const useGetAuthorizedUserQuery = () => {
-  const { data, isLoading, error, ...rest } = useLoginQuery()
-  if (isLoading || error) return { data, isLoading, error, ...rest }
+  const { data, isLoading, isFetching, error, ...rest } = useLoginQuery()
+  if (isLoading || isFetching || error) return { data, isLoading, isFetching, error, ...rest }
 
   const { user } = data
 
