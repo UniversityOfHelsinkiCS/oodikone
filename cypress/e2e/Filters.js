@@ -1,8 +1,6 @@
 /* eslint-disable cypress/no-unnecessary-waiting */
 /// <reference types="Cypress" />
 
-// const baseUrl = Cypress.config().baseUrl
-
 const MOCKED_DATE = new Date(2022, 6, 12).getTime()
 
 const checkFilteringResult = studentCount => {
@@ -93,7 +91,7 @@ describe('Population Statistics', () => {
   const defaultAmountOfStudents = 159
   const runTestStepWithPreAndPostParts = createRunTestStepWithPreAndPostPartsFunction(defaultAmountOfStudents)
 
-  before(() => {
+  beforeEach(() => {
     cy.init(pathToCSBach2018)
   })
 
@@ -117,7 +115,6 @@ describe('Population Statistics', () => {
       checkFilteringResult(defaultAmountOfStudents - graduated)
       getCard().cs('option-all').click()
     })
-    cy.cs('reset-all-filters').click()
   })
 
   it('Transfer filter works', () => {
@@ -129,7 +126,6 @@ describe('Population Statistics', () => {
       checkFilteringResult(defaultAmountOfStudents + transferred)
       cy.cs('TransferredToProgramme-filter-card').cs('option-havenot').click()
     })
-    cy.cs('reset-all-filters').click()
   })
 
   it('Enrollment filter works', () => {
@@ -145,7 +141,6 @@ describe('Population Statistics', () => {
     runTestStepWithPreAndPostParts('CreditsEarned', () => {
       testRangeFilter('CreditsEarned-filter-card', 50, 150, 118)
     })
-    cy.cs('reset-all-filters').click()
   })
 
   it('Age filter works', () => {
@@ -156,7 +151,6 @@ describe('Population Statistics', () => {
   })
 
   it('Gender filter works', () => {
-    cy.cs('reset-all-filters').click()
     runTestStepWithPreAndPostParts('Gender', () => {
       cy.cs('genderFilter-dropdown').selectFromDropdown(0)
       checkFilteringResult(42)
@@ -225,6 +219,17 @@ describe('Population Statistics', () => {
       })
     })
   })
+
+  it('"Reset All Filters" button works', () => {
+    cy.cs('Gender-header').click()
+    cy.cs('genderFilter-dropdown').selectFromDropdown(0)
+    checkFilteringResult(42)
+    cy.cs('StartYearAtUni-header').click()
+    cy.cs('startYearAtUni-dropdown').selectFromDropdown(3)
+    checkFilteringResult(39)
+    cy.cs('reset-all-filters').click()
+    checkFilteringResult(defaultAmountOfStudents)
+  })
 })
 
 describe('Course Statistics', () => {
@@ -233,7 +238,7 @@ describe('Course Statistics', () => {
   const defaultAmountOfStudents = 118
   const runTestStepWithPreAndPostParts = createRunTestStepWithPreAndPostPartsFunction(defaultAmountOfStudents)
 
-  before(() => {
+  beforeEach(() => {
     cy.init(pathToDSAndAlgoSpring2019)
   })
 
@@ -277,14 +282,12 @@ describe('Course Statistics', () => {
 
   it('Age filter works', () => {
     cy.clock(MOCKED_DATE, ['Date'])
-    cy.cs('reset-all-filters').click()
     runTestStepWithPreAndPostParts('Age', () => {
       testRangeFilter('Age-filter-card', 20, 40, 33)
     })
   })
 
   it('Gender filter works', () => {
-    cy.cs('reset-all-filters').click()
     runTestStepWithPreAndPostParts('Gender', () => {
       cy.cs('genderFilter-dropdown').selectFromDropdown(0)
       checkFilteringResult(27)
@@ -324,14 +327,13 @@ describe('Course Statistics', () => {
 describe('Custom Population Statistics', () => {
   let runTestStepWithPreAndPostParts
 
-  before(() => {
+  beforeEach(() => {
     cy.init('/custompopulation')
     cy.cs('custom-pop-search-button').click()
     cy.fixture('customPopulations').then(({ studentNumbersForCSStudentsSet1, studentNumbersForCSStudentsSet2 }) => {
       const students = [...studentNumbersForCSStudentsSet1, ...studentNumbersForCSStudentsSet2]
       runTestStepWithPreAndPostParts = createRunTestStepWithPreAndPostPartsFunction(students.length)
       cy.cs('student-no-input').click().type(students.join('\n'))
-      cy.wait(10000)
     })
     cy.cs('search-button').click()
   })
@@ -341,7 +343,6 @@ describe('Custom Population Statistics', () => {
     runTestStepWithPreAndPostParts('Age', () => {
       testRangeFilter('Age-filter-card', 20, 30, 1)
     })
-    cy.cs('reset-all-filters').click()
   })
 
   it('Programme defaults to "Active Study Right" mode', () => {
