@@ -1,11 +1,5 @@
 import { callController } from '../apiConnection'
 
-export const getStudentTagsAction = () => {
-  const route = '/studenttags'
-  const prefix = 'GET_STUDENT_TAGS_'
-  return callController(route, prefix)
-}
-
 export const createStudentTagAction = (tag, studytrack, combinedProgramme) => {
   const route = `/studenttags/${tag.studentnumber}`
   const prefix = 'CREATE_STUDENT_TAG_'
@@ -37,12 +31,6 @@ export const getStudentTagsByStudytrackAction = studytrack => {
   return callController(route, prefix, data)
 }
 
-export const getStudentTagsByStudentnumberAction = studentnumber => {
-  const route = `/studenttags/${studentnumber}`
-  const prefix = 'GET_STUDENT_TAG_BY_SN_'
-  return callController(route, prefix)
-}
-
 export const deleteStudentTagAction = (tagId, studentnumber, studytrack, combinedProgramme) => {
   const route = '/studenttags/delete_one'
   const prefix = 'DELETE_STUDENT_TAG_'
@@ -53,25 +41,6 @@ export const deleteStudentTagAction = (tagId, studentnumber, studytrack, combine
 
 const reducer = (state = { data: [], success: false, created: false, pending: false, error: null }, action) => {
   switch (action.type) {
-    case 'GET_STUDENT_TAGS_ATTEMPT':
-      return {
-        ...state,
-        pending: true,
-        error: null,
-      }
-    case 'GET_STUDENT_TAGS_SUCCESS':
-      return {
-        ...state,
-        pending: false,
-        data: action.response || {},
-        error: null,
-      }
-    case 'GET_STUDENT_TAGS_FAILURE':
-      return {
-        ...state,
-        pending: false,
-        error: null,
-      }
     case 'GET_STUDENT_TAGS_BY_ST_ATTEMPT':
       return {
         ...state,
@@ -92,25 +61,6 @@ const reducer = (state = { data: [], success: false, created: false, pending: fa
         pending: false,
         data: action.response || [],
         success: true,
-        error: null,
-      }
-    case 'GET_STUDENT_TAG_BY_SN_ATTEMPT':
-      return {
-        ...state,
-        pending: true,
-        error: null,
-      }
-    case 'GET_STUDENT_TAG_BY_SN_FAILURE':
-      return {
-        ...state,
-        pending: false,
-        error: null,
-      }
-    case 'GET_STUDENT_TAG_BY_SN_SUCCESS':
-      return {
-        ...state,
-        pending: false,
-        data: action.response || [],
         error: null,
       }
     case 'CREATE_STUDENT_TAG_ATTEMPT':

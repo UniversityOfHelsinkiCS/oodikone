@@ -149,3 +149,7 @@
   color: rgb(0 0 0 / 95%);
   z-index: 13;
 }
+
+body.figure-fullscreen {
+  overflow: hidden;
+}

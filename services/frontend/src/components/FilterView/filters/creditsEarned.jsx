@@ -5,8 +5,6 @@ import { useDebounce } from 'common/hooks'
 import { getStudentTotalCredits } from '../../../common'
 import createFilter from './createFilter'
 
-export const contextKey = 'creditFilter'
-
 const CreditsEarnedFilterCard = ({ options, onOptionsChange, bounds }) => {
   const { min, max } = bounds
 

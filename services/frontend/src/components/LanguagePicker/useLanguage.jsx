@@ -24,7 +24,7 @@ export const LanguageProvider = ({ children }) => {
   return <LanguageContext.Provider value={[state, setState]}>{children}</LanguageContext.Provider>
 }
 
-export const getTextInWithLanguage = (texts, language) => {
+const getTextInWithLanguage = (texts, language) => {
   if (texts) {
     return texts[language] || texts.fi || texts.en || texts.sv || Object.values(texts)[0]
   }

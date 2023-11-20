@@ -4,8 +4,6 @@ import fp from 'lodash/fp'
 import { getHighestGradeOrEnrollmentOfCourseBetweenRange } from '../../../common'
 import createFilter from './createFilter'
 
-export const contextKey = 'gradeFilter'
-
 /**
  * Grade filter.
  * Only applicable to a single course.

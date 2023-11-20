@@ -12,7 +12,7 @@ const getCourseYears = course => ({
   endYear: moment(course.max_attainment_date).year(),
 })
 
-const getActiveYears = course => {
+export const getActiveYears = course => {
   const { startYear, endYear } = getCourseYears(course)
   if (!startYear && !endYear) return 'No attainments yet'
   const startYearText = getYearText(startYear, isSpring(course.min_attainment_date))
@@ -32,6 +32,4 @@ const getActiveYears = course => {
   return `${startYearText} — ${endYearText}`
 }
 
-const userHasAccessToAllCourseStats = (roles, rights) => roles.includes('admin') || rights.length > 0
-
-export { getActiveYears, getYearText, userHasAccessToAllCourseStats }
+export const userHasAccessToAllCourseStats = (roles, rights) => roles.includes('admin') || rights.length > 0

@@ -9,6 +9,6 @@ export const fields = {
 
 const reducer = formreducer(prefix, { [fields.programmes]: [ALL.value] })
 
-export const { setValue, clear } = reducer
+export const { setValue } = reducer
 
 export default reducer.reducer

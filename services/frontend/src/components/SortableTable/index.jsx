@@ -2,8 +2,8 @@
 
 import React, { useState, useMemo, useReducer, useCallback } from 'react'
 import { Icon } from 'semantic-ui-react'
-import FigureContainer from 'components/FigureContainer'
 import _ from 'lodash'
+import FigureContainer from './FigureContainer'
 import ExportModal from './ExportModal'
 import { row, group, SortableTableContext, cloneColumns } from './common'
 import SortingFilteringVisitor from './visitors/SortingFilteringVisitor'

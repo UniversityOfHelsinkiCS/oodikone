@@ -11,7 +11,7 @@ export const getKey = data => {
   return uuidv4()
 }
 
-export const mergeColumnDefinitions = (original, overlay) => {
+const mergeColumnDefinitions = (original, overlay) => {
   const result = cloneColumns(original)
 
   if (!overlay) {
@@ -157,7 +157,7 @@ const ColumnContent = ({ column, data, isGroup, parents }) => {
   }
 }
 
-export const Row = ({ data, isGroup, parents }) => {
+const Row = ({ data, isGroup, parents }) => {
   const { columns, columnSpans } = useContext(SortableTableContext)
 
   const resolveProp = value => {

@@ -8,8 +8,6 @@ import './courseFilter.css'
 import createFilter from '../createFilter'
 import useLanguage from '../../../LanguagePicker/useLanguage'
 
-export const contextKey = 'coursesFilter'
-
 const CourseFilterCard = ({ courseStats, options, onOptionsChange }) => {
   const { courseFilters } = options
   const { getTextIn } = useLanguage()
@@ -36,7 +34,7 @@ const CourseFilterCard = ({ courseStats, options, onOptionsChange }) => {
       })
     )
 
-  const onChange = (_, { value }) => { // eslint-disable-line
+  const onChange = (_, { value }) => {
     setCourseFilter(value[0], FilterType.ALL)
   }
 

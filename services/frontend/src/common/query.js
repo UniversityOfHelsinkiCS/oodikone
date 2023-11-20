@@ -1,13 +1,13 @@
 /**
  * Global definitions for query params.
  */
-import qs from 'qs'
+import qs from 'query-string'
 
 /**
  * All query params from given `location`.
  * @param {object} location React-Router's `location` object.
  */
-export const queryParamsFromUrl = location => qs.parse(location.search, { ignoreQueryPrefix: true })
+export const queryParamsFromUrl = location => qs.parse(location.search)
 
 /**
  * Get `months` parameter from query.

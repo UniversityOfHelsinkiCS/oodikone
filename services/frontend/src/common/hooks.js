@@ -1,15 +1,7 @@
 import React, { useCallback, useState, useEffect, useRef } from 'react'
-import { chunk, isEqual } from 'lodash'
+import { isEqual } from 'lodash'
 import qs from 'query-string'
 import { SEARCH_HISTORY_VERSION } from '../constants'
-
-export const usePrevious = value => {
-  const ref = useRef()
-  useEffect(() => {
-    ref.current = value
-  })
-  return ref.current
-}
 
 export const useTabChangeAnalytics = () => {
   const previousTabIndex = React.useRef(0)
@@ -105,7 +97,7 @@ export const useSearchHistory = (id, capacity = 5) => {
   return [searchHistory, addItem, updateItem]
 }
 
-export const useInterval = (callback, delay) => {
+const useInterval = (callback, delay) => {
   const savedCallback = useRef()
   const savedId = useRef()
 
@@ -184,55 +176,6 @@ export const useTitle = title => {
   useEffect(() => {
     document.title = title ? `${title} - Oodikone` : 'Oodikone'
   }, [title])
-}
-
-export const useChunk = (data, chunkifyBy) => {
-  const [chunkedData, setChunkedData] = useState([])
-  const chunkTrigger = useRef([])
-  const sleepTimeout = useRef(null)
-
-  const sleep = ms =>
-    new Promise(res => {
-      sleepTimeout.current = setTimeout(res, ms)
-    })
-
-  const chunkify = async () => {
-    const chunks = chunk(data, 50)
-    let res = []
-    for (let i = 0; i < chunks.length; i++) {
-      const chunk = chunks[i]
-
-      // Gives time to the main event loop
-      await sleep(1) // eslint-disable-line
-      res = res.concat(...chunk)
-      setChunkedData(res)
-    }
-  }
-
-  useEffect(() => {
-    if (
-      chunkifyBy &&
-      !isEqual(
-        chunkTrigger.current,
-        data
-          .slice()
-          .sort()
-          .map(d => d[chunkifyBy])
-      )
-    ) {
-      chunkTrigger.current = data.map(d => d[chunkifyBy])
-    }
-  }, [data])
-
-  useEffect(() => {
-    if (chunkifyBy) {
-      chunkify()
-    }
-
-    return () => clearTimeout(sleepTimeout.current)
-  }, [chunkTrigger.current])
-
-  return chunkifyBy ? chunkedData : data
 }
 
 export const useLocalStorage = (key, initialValue) => {

@@ -14,14 +14,13 @@ const getHeaderRow = headers => (
   </Table.Header>
 )
 
-const getTableBody = (rows, rowClickFn, selectable, actionTrigger) => (
+const getTableBody = (rows, selectable, actionTrigger) => (
   <Table.Body>
     {rows.map((row, i) => (
       <Table.Row
         className={selectable ? 'selectableRow' : ''}
         // eslint-disable-next-line react/no-array-index-key
         key={`row-${i}`}
-        onClick={e => rowClickFn(e, row)}
       >
         {Object.values(row).map((value, index) => (
           // eslint-disable-next-line react/no-array-index-key
@@ -35,13 +34,13 @@ const getTableBody = (rows, rowClickFn, selectable, actionTrigger) => (
   </Table.Body>
 )
 
-const SearchResultTable = ({ actionTrigger, headers, rows, rowClickFn, noResultText, selectable, definition }) => {
+const SearchResultTable = ({ actionTrigger, headers, rows, noResultText, selectable }) => {
   if (rows.length > 0) {
     return (
       <Segment style={{ maxHeight: '80vh', overflowY: 'auto', padding: 0 }}>
-        <Table unstackable selectable={selectable} definition={definition} className="fixed-header">
+        <Table unstackable selectable={selectable} definition={false} className="fixed-header">
           {getHeaderRow(headers)}
-          {getTableBody(rows, rowClickFn, selectable, actionTrigger)}
+          {getTableBody(rows, selectable, actionTrigger)}
         </Table>
       </Segment>
     )
@@ -49,21 +48,12 @@ const SearchResultTable = ({ actionTrigger, headers, rows, rowClickFn, noResultT
   return <div>{noResultText}</div>
 }
 
-SearchResultTable.defaultProps = {
-  rowClickFn: () => null,
-  selectable: false,
-  definition: false,
-  actionTrigger: null,
-}
-
 SearchResultTable.propTypes = {
   headers: arrayOf(string).isRequired,
   rows: arrayOf(array).isRequired,
-  rowClickFn: func,
   noResultText: string.isRequired,
-  selectable: bool,
-  definition: bool,
-  actionTrigger: func,
+  selectable: bool.isRequired,
+  actionTrigger: func.isRequired,
 }
 
 export default SearchResultTable
