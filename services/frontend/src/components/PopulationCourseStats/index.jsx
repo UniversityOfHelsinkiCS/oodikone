@@ -12,7 +12,7 @@ import GradeDistribution from './GradeDistribution'
 import PassFailEnrollments from './PassFailEnrollments'
 import Students from './Students'
 
-export const tableColumnNames = {
+const tableColumnNames = {
   STUDENTS: 'students',
   PASSED: 'passed',
   RETRY_PASSED: 'retryPassed',
@@ -23,11 +23,6 @@ export const tableColumnNames = {
   PER_STUDENT: 'perStudent',
   PASSED_OF_POPULATION: 'passedOfPopulation',
   TRIED_OF_POPULATION: 'triedOfPopulation',
-}
-
-export const sortOrderTypes = {
-  ASC: 'ascending',
-  DESC: 'descending',
 }
 
 const visibleCoursesFilter = ({ course }, mandatoryCourses) =>

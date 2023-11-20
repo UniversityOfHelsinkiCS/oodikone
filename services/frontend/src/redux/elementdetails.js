@@ -50,7 +50,7 @@ const elementDetailsApi = RTKApi.injectEndpoints({
   overrideExisting: false,
 })
 
-export const { useGetAllElementDetailsQuery } = elementDetailsApi
+const { useGetAllElementDetailsQuery } = elementDetailsApi
 
 // Returns only newest studyprogrammes and formats them to be used in semantic ui dropdowns
 export const useFilteredAndFormattedElementDetails = () => {

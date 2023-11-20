@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useMemo } from '
 import { Icon, Card, Portal, Popup, Button } from 'semantic-ui-react'
 import { createHtmlPortalNode, InPortal, OutPortal } from 'react-reverse-portal'
 
-import './styles.css'
+import './style.css'
 
 const FigureContext = createContext(null)
 

@@ -15,7 +15,6 @@ import { getPopulationSelectedStudentCourses, clearSelected } from '../../redux/
 import { getProgrammes } from '../../redux/populationProgrammes'
 import { momentFromFormat, reformatDate, textAndDescriptionSearch, cancelablePromise } from '../../common'
 import { useSearchHistory } from '../../common/hooks'
-import { setLoading } from '../../redux/graphSpinner'
 import './populationSearch.css'
 import SearchHistory from '../SearchHistory'
 
@@ -113,7 +112,6 @@ const PopulationSearchForm = props => {
     const formattedQueryParams = formatQueryParamsToArrays(query, ['semesters', 'studentStatuses', 'years'])
     const uuid = uuidv4()
     setState({ isLoading: true })
-    props.setLoading()
     props.clearSelected()
     fetchPopulationPromises.current = cancelablePromise(
       Promise.all([props.getPopulationStatistics({ ...formattedQueryParams, uuid, onProgress }), []])
@@ -500,7 +498,6 @@ export default withRouter(
     getPopulationStatistics,
     getPopulationSelectedStudentCourses,
     getProgrammes,
-    setLoading,
     clearSelected,
     clearPopulations,
   })(PopulationSearchForm)

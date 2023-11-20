@@ -4,7 +4,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { showAsUserKey } from 'common'
 import { apiBasePath, isDev } from '../conf'
 
-export const getHeaders = () => {
+const getHeaders = () => {
   // Set up dev user for development environment, mimicking production admin user
   const devUserHeaders = {
     uid: 'mluukkai',
@@ -24,9 +24,9 @@ export const getHeaders = () => {
   return headers
 }
 
-export const api = axios.create({ baseURL: apiBasePath, headers: getHeaders(), timeout: 120_000 })
+const api = axios.create({ baseURL: apiBasePath, headers: getHeaders(), timeout: 120_000 })
 
-export const actionSuffixes = {
+const actionSuffixes = {
   attempt: `ATTEMPT`,
   failure: `FAILURE`,
   success: `SUCCESS`,

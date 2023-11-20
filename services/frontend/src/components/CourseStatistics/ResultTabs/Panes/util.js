@@ -1,4 +1,3 @@
-import { arrayOf, number, oneOfType, shape, string, oneOf } from 'prop-types'
 import { flatten } from 'lodash'
 
 const gradesMap = {
@@ -32,17 +31,9 @@ export const getMaxValueOfSeries = series =>
     return curMax >= acc ? curMax : acc
   }, 0)
 
-export const dataSeriesType = shape({
-  name: string,
-  code: oneOfType([string, number]),
-  stats: arrayOf(shape({})),
-})
+const THESIS_GRADE_KEYS = ['I', 'A', 'NSLA', 'LUB', 'CL', 'MCLA', 'ECLA', 'L']
 
-export const viewModeType = oneOf(Object.values(viewModeNames))
-
-export const THESIS_GRADE_KEYS = ['I', 'A', 'NSLA', 'LUB', 'CL', 'MCLA', 'ECLA', 'L']
-
-export const sortGrades = (a, b) => gradesMap[a] - gradesMap[b]
+const sortGrades = (a, b) => gradesMap[a] - gradesMap[b]
 
 export const isThesisGrades = grades => Object.keys(grades).some(k => THESIS_GRADE_KEYS.includes(k))
 

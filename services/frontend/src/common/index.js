@@ -1,8 +1,5 @@
 import moment from 'moment'
-import Datetime from 'react-datetime'
-import { range, filter, maxBy, sortBy, intersection } from 'lodash'
-import pathToRegexp from 'path-to-regexp'
-import { API_DATE_FORMAT, DISPLAY_DATE_FORMAT } from '../constants'
+import { range, filter, maxBy, intersection } from 'lodash'
 import toskaLogo from '../assets/toska.png'
 import irtomikko from '../assets/irtomikko.png'
 
@@ -38,12 +35,6 @@ export const getStudentToStudyrightStartMap = (students, programmeCode) => {
   }, {})
 }
 
-// Combined study programmes: key bachelor programme, item master/licentiate programme
-export const getCombinedProgrammeId = progId => {
-  const combinedProgrammes = { KH90_001: 'MH90_001' }
-  return Object.keys(combinedProgrammes).includes(progId) ? combinedProgrammes[progId] : ''
-}
-
 //  Graph titles for graduation graphs used in studyprogramme Basic info -tab and Programmes and student pop. -tab
 export const getGraduationGraphTitle = (studyProgramme, doCombo = false) => {
   if (!studyProgramme) return ''
@@ -71,22 +62,7 @@ export const momentFromFormat = (date, format) => moment(date, format)
 
 export const reformatDate = (date, outputFormat) => (!date ? 'Unavailable' : moment(date).local().format(outputFormat))
 
-export const isInDateFormat = (date, format) => moment(date, format, true).isValid()
-export const isValidYear = year =>
-  year.isSameOrBefore(Datetime.moment(), 'year') && year.isAfter(Datetime.moment('1900', 'YYYY'), 'year')
-export const dateFromApiToDisplay = date => moment(date, API_DATE_FORMAT).format(DISPLAY_DATE_FORMAT)
-
-export const sortDatesWithFormat = (d1, d2, dateFormat) => moment(d1, dateFormat) - moment(d2, dateFormat)
-
 export const byDateDesc = (a, b) => new Date(b.date) - new Date(a.date)
-
-export const byName = (a, b) => a.name.localeCompare(b.name)
-
-export const byCodeDesc = (a, b) => b.code.localeCompare(a.code)
-
-export const studyRightRegex = /.*master|bachelor|doctor|licentiate|specialist.*/
-
-export const studyrightElementTypes = { programme: 20, speciality: 30 }
 
 export const getStudentTotalCredits = (student, includeTransferredCredits = true) => {
   const passedCourses = includeTransferredCredits
@@ -113,19 +89,6 @@ export const getStudentGradeMeanWeightedByCredits = (student, includeTransferred
   const sumWeights = courses.reduce((a, b) => a + Number(b.credits), 0)
   const mean = gradeTotal / sumWeights || 0
   return mean
-}
-
-export const getStudentTotalCreditsFromMandatory = (student, mandatoryCourses) =>
-  student.courses
-    .filter(c => c.passed && !c.isStudyModuleCredit && mandatoryCourses.find(cr => cr.code === c.code))
-    .reduce((a, b) => a + b.credits, 0)
-
-export const getTotalCreditsFromCourses = courses =>
-  courses.filter(c => c.passed && !c.isStudyModuleCredit).reduce((a, b) => a + b.credits, 0)
-
-export const getCompiledPath = (template, parameters) => {
-  const toPath = pathToRegexp.compile(template)
-  return toPath(parameters)
 }
 
 export const getTextInWithOpen = (texts, language, isOpenCourse) => {
@@ -195,22 +158,6 @@ export const cancelablePromise = promise => {
       hasCanceled = true
     },
   }
-}
-
-export const flattenStudyrights = (studyrights, programme) => {
-  const studyrightcodes = []
-  studyrights.forEach(sr => {
-    if (sr.studyright_elements.map(srE => srE.code).includes(programme)) {
-      const programmeStartdate = sr.studyright_elements.find(srE => srE.code === programme).startdate
-      const currentStudytracks = sr.studyright_elements.reduce((acc, curr) => {
-        if (curr.element_detail.type === 30 && !(curr.startdate < programmeStartdate)) acc.push(curr)
-        return acc
-      }, [])
-
-      if (currentStudytracks.length > 0) studyrightcodes.push(sortBy(currentStudytracks, 'startdate').reverse()[0].code)
-    }
-  })
-  return studyrightcodes
 }
 
 // Gives students course completion date
@@ -415,8 +362,6 @@ export const getCreditCategories = (
 export const validateInputLength = (input, minLength) => input && input.trim().length >= minLength
 
 export const splitByEmptySpace = str => str.replace(/\s\s+/g, ' ').split(' ')
-
-export const isNewHYStudyProgramme = code => !!(code && code.match(/^[A-Z]*[0-9]*_[0-9]*$/))
 
 export const resolveStudyPlan = (studyPlans, studyRight) => {
   if (!studyRight) return null

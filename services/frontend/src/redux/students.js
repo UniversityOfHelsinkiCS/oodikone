@@ -25,10 +25,6 @@ export const resetStudent = () => ({
   type: 'RESET_STUDENT_SUCCESS',
 })
 
-export const clearStudentError = () => ({
-  type: 'CLEAR_STUDENT_ERROR',
-})
-
 const reducer = (state = { data: [], pending: false, error: false, fetching: false }, action) => {
   switch (action.type) {
     case 'FIND_STUDENTS_ATTEMPT':
@@ -86,11 +82,6 @@ const reducer = (state = { data: [], pending: false, error: false, fetching: fal
           ...state.data.filter(student => student.studentNumber !== action.response.studentNumber),
           { ...action.response, ...{ fetched: true } },
         ],
-      }
-    case 'CLEAR_STUDENT_ERROR':
-      return {
-        ...state,
-        error: false,
       }
     case 'SELECT_STUDENTS_SUCCESS':
       return { ...state, selected: action.response }

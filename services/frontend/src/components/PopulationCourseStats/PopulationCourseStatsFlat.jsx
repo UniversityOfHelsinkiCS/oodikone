@@ -10,7 +10,7 @@ import GradeDistribution from './GradeDistribution'
 import useLanguage from '../LanguagePicker/useLanguage'
 import PassFailEnrollments from './PassFailEnrollments'
 
-export const tableColumnNames = {
+const tableColumnNames = {
   STUDENTS: 'students',
   PASSED: 'passed',
   RETRY_PASSED: 'retryPassed',
@@ -21,11 +21,6 @@ export const tableColumnNames = {
   PER_STUDENT: 'perStudent',
   PASSED_OF_POPULATION: 'passedOfPopulation',
   TRIED_OF_POPULATION: 'triedOfPopulation',
-}
-
-export const sortOrderTypes = {
-  ASC: 'ascending',
-  DESC: 'descending',
 }
 
 const lodashSortOrderTypes = {

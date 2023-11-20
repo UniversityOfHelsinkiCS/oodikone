@@ -2,11 +2,6 @@ import colors from '../styles/variables'
 
 const { chartblue, red, green, chartdarkg, chartlgreen, chartdarkred, chartlred } = colors
 
-export const AVAILABLE_LANGUAGES = [
-  { name: 'fi', code: 'fi' },
-  { name: 'en', code: 'en' },
-  { name: 'sv', code: 'sv' },
-]
 export const DEFAULT_LANG = 'fi'
 export const DISPLAY_DATE_FORMAT = 'DD.MM.YYYY'
 export const DISPLAY_DATE_FORMAT_DEV = 'DD.MM.YYYY HH:mm:ss'

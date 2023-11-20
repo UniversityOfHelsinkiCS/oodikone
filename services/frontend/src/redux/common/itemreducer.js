@@ -47,11 +47,4 @@ const itemreducer = (prefix, initial) => {
   }
 }
 
-export const actions = prefix => {
-  const types = additionalTypes(prefix)
-  return {
-    clear: () => ({ type: types.clear }),
-  }
-}
-
 export default itemreducer

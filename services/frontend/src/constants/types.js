@@ -7,24 +7,7 @@ export const graphDataType = shape({
   data: arrayOf(number),
 })
 
-export const displayableDateType = shape({
-  text: string.isRequired,
-  value: string.isRequired,
-})
-
-export const studentDetailsType = shape({
-  studentNumber: string.isRequired,
-  started: string,
-  credits: number,
-})
-
-export const dropdownType = shape({
-  key: oneOfType([string, number]).isRequired,
-  value: oneOfType([string, number]).isRequired,
-  text: shape({}).isRequired,
-})
-
-export const courseDataType = shape({
+const courseDataType = shape({
   id: oneOfType([number, string]),
   category: oneOfType([number, string]),
   passed: oneOfType([number, string]),

@@ -4,8 +4,6 @@ import { useDebounce } from 'common/hooks'
 import _ from 'lodash'
 import createFilter from './createFilter'
 
-export const contextKey = 'ageFilter'
-
 const getAge = toDate => {
   const today = new Date()
   const birthDate = new Date(toDate)

@@ -1,11 +1,5 @@
 import { callController } from '../apiConnection'
 
-export const getTagsAction = () => {
-  const route = '/tags'
-  const prefix = 'GET_TAGS_'
-  return callController(route, prefix)
-}
-
 // Combined programme is included to studytrack in form KHxx_xxx-MHxx_xxx
 export const getTagsByStudytrackAction = studytrack => {
   const route = `/tags/${studytrack}`
@@ -32,17 +26,6 @@ export const deleteTagAction = tag => {
 
 const reducer = (state = { data: [] }, action) => {
   switch (action.type) {
-    case 'GET_TAGS_ATTEMPT':
-      return {
-        ...state,
-        pending: true,
-      }
-    case 'GET_TAGS_SUCCESS':
-      return {
-        ...state,
-        pending: false,
-        data: action.response || {},
-      }
     case 'GET_TAGS_BY_ST_ATTEMPT':
       return {
         ...state,
@@ -59,11 +42,6 @@ const reducer = (state = { data: [] }, action) => {
         ...state,
         pending: false,
         data: action.response || {},
-      }
-    case 'GET_TAGS_FAILURE':
-      return {
-        ...state,
-        pending: false,
       }
     case 'CREATE_TAG_ATTEMPT':
       return {

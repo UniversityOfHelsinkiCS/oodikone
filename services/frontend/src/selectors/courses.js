@@ -1,6 +1,5 @@
 import { createSelector } from '@reduxjs/toolkit'
 import { orderBy } from 'lodash'
-import { byDateDesc } from '../common'
 
 const sortSubstitutions = course => {
   const result = orderBy(
@@ -50,20 +49,7 @@ const filterCourseSearchResults = (courses, combineSubstitutions) => {
   return result
 }
 
-const getData = obj => obj
 const getCourseSearchSelector = state => state.courseSearch.data.courses
-
-export const sortCourses = courseList =>
-  Object.values(courseList.data)
-    .sort(byDateDesc)
-    .map(course => ({
-      ...course,
-      title: `${course.name} (${course.code})`,
-      key: `${course.name}-${course.code}`,
-      selected: courseList.selected.some(c => course.code === c.code),
-    }))
-
-export const makeSortCourses = () => createSelector(getData, sortCourses)
 
 export const getCourseSearchResults = createSelector(
   [getCourseSearchSelector, (state, combineSubstitutions) => combineSubstitutions],

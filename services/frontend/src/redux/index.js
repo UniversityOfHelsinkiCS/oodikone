@@ -4,7 +4,7 @@ import { handleRequest, RTKApi } from 'apiConnection'
 import actionHistory from './actionHistory'
 import users from './users'
 import populations from './populations'
-import populationCourses, { curriculumsApi } from './populationCourses'
+import { curriculumsApi } from './populationCourses'
 import populationSelectedStudentCourses from './populationSelectedStudentCourses'
 import populationProgrammes from './populationProgrammes'
 import populationProgrammesUnfiltered from './populationProgrammesUnfiltered'
@@ -12,8 +12,6 @@ import faculties from './faculties'
 import units from './units'
 import elementdetails from './elementdetails'
 import students from './students'
-import errors from './errors'
-import graphSpinner from './graphSpinner'
 import settings from './settings'
 import teachers from './teachers'
 import providers from './providers'
@@ -36,15 +34,12 @@ const store = configureStore({
     actionHistory,
     users,
     populations,
-    populationCourses,
     populationSelectedStudentCourses,
     populationProgrammes,
     populationProgrammesUnfiltered,
     faculties,
     units,
     students,
-    errors,
-    graphSpinner,
     settings,
     teachers,
     providers,

@@ -17,17 +17,7 @@ const StackOrdering = {
   DESCENDING: 'desc',
 }
 
-export const getStudentCredits = (student, start, end, cumulative, includeTransferredCredits = true) => {
-  const predicate = cumulative ? c => moment(c.date).isBefore(end) : c => moment(c.date).isBetween(start, end)
-
-  const passedCourses = includeTransferredCredits
-    ? student.courses.filter(c => c.passed && !c.isStudyModuleCredit && predicate(c))
-    : student.courses.filter(c => c.passed && !c.isStudyModuleCredit && predicate(c) && c.credittypecode !== 9)
-
-  return _.sum(_.map(passedCourses, 'credits'))
-}
-
-export const splitStudentCredits = (student, timeSlots, cumulative) => {
+const splitStudentCredits = (student, timeSlots, cumulative) => {
   if (!timeSlots.length) return {}
 
   let timeSlotN = 0
