@@ -33,3 +33,8 @@ export const getRatio = stats => {
   const value = stats.completions / stats.enrollments
   return Math.round(value * 100)
 }
+
+export const getDifference = stats => {
+  const value = stats.notCompleted - stats.completed
+  return value < 0 ? 0 : value
+}

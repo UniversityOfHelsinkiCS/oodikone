@@ -9,12 +9,18 @@ const isBetween = (start, date, end) =>
 
 const findStudyright = (studyrights, date) => studyrights?.find(sr => isBetween(sr.startdate, date, sr.enddate))
 
+const getDifference = stats => {
+  const value = stats.enrollments - stats.completions
+  return value < 0 ? 0 : value
+}
+
 const getLanguageCenterCourses = async () => {
   const courses = await Course.findAll({
     attributes: ['code', 'name'],
     where: {
       [Op.or]: [{ code: { [Op.like]: 'KK%' } }, { code: { [Op.like]: 'AYKK%' } }],
     },
+    raw: true,
   })
   return courses
 }
@@ -166,6 +172,7 @@ const computeLanguageCenterData = async () => {
       }
       return
     }
+
     // Credit or enrollment did not have studyright_id. Find based on date,
     // and if studyrightElement is not found, check studyrights because open uni rights
     // do not have studyrightelements
@@ -189,9 +196,13 @@ const computeLanguageCenterData = async () => {
 }
 
 const createArrayOfCourses = async (attempts, courses) => {
-  const fields = { completions: 0, enrollments: 0, ratio: 0 }
+  const fields = { completions: 0, enrollments: 0, ratio: 0, difference: 0 }
+  const semestersObject = {}
+  const facultyObject = {}
   const semesterStatsMap = attempts.reduce((obj, cur) => {
     const semester = cur.semestercode
+    facultyObject[cur.faculty] = true
+    semestersObject[semester] = true
     if (!obj[cur.courseCode]) {
       obj[cur.courseCode] = { ...fields }
     }
@@ -222,9 +233,24 @@ const createArrayOfCourses = async (attempts, courses) => {
     return obj
   }, {})
 
-  return courses
-    .map(c => ({ ...c.dataValues, bySemesters: { ...semesterStatsMap[c.code], cellStats: {} } }))
+  const courseList = courses
+    .map(c => ({ ...c, bySemesters: { ...semesterStatsMap[c.code], cellStats: {} } }))
     .filter(course => course.bySemesters)
+
+  courseList.forEach(course => {
+    Object.keys(semestersObject).forEach(sem => {
+      const stats = course.bySemesters[sem]
+      if (!stats) return
+      stats.difference = getDifference(stats)
+      Object.keys(facultyObject).forEach(fac => {
+        const stats = course.bySemesters[sem]?.[fac]
+        if (!stats) return
+        stats.difference = getDifference(stats)
+      })
+    })
+  })
+
+  return courseList
 }
 
 module.exports = {

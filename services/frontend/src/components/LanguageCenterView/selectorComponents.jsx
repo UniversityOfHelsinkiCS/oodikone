@@ -7,36 +7,30 @@ import './index.css'
 
 export const CompletionPicker = ({ enableRatioOption }) => {
   const { numberMode, setNumberMode } = useLanguageCenterContext()
+  const modes = [
+    { value: 'completions', label: 'Completions' },
+    { value: 'enrollments', label: 'Enrollments' },
+  ]
+  if (enableRatioOption)
+    modes.push(
+      { value: 'ratio', label: 'Ratio of completions per enrollments' },
+      { value: 'difference', label: 'Enrollments exceeding completions' }
+    )
 
   return (
     <div className="selector-container">
       <b>Show number of</b>
-      <Radio
-        data-cy="completions-button"
-        name="modeRadioGroup"
-        value="completions"
-        label="Completions"
-        onChange={() => setNumberMode('completions')}
-        checked={numberMode === 'completions'}
-      />
-      <Radio
-        data-cy="enrollments-button"
-        name="modeRadioGroup"
-        value="enrollments"
-        label="Enrollments"
-        onChange={() => setNumberMode('enrollments')}
-        checked={numberMode === 'enrollments'}
-      />
-      {enableRatioOption && (
+      {modes.map(mode => (
         <Radio
+          data-cy={`${mode.value}-button`}
           name="modeRadioGroup"
-          value="ratio"
-          data-cy="ratio-button"
-          label="Ratio of completions per enrollments"
-          onChange={() => setNumberMode('ratio')}
-          checked={numberMode === 'ratio'}
+          value={mode.value}
+          label={mode.label}
+          key={mode.value}
+          onChange={() => setNumberMode(mode.value)}
+          checked={numberMode === mode.value}
         />
-      )}
+      ))}
     </div>
   )
 }

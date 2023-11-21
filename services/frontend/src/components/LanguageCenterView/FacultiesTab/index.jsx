@@ -22,20 +22,22 @@ export const FacultiesTab = () => {
   const tableData = useMemo(() => {
     const tableData = [_.cloneDeep(totalRow), ..._.cloneDeep(data.tableData)]
     tableData.forEach(course => {
-      const facultiesTotal = { completions: 0, enrollments: 0, ratio: null }
+      const facultiesTotal = { completions: 0, enrollments: 0, ratio: null, difference: 0 }
       selectedSemesters.forEach(semestercode => {
         data.faculties.forEach(faculty => {
           if (!course.bySemesters.cellStats[faculty])
-            course.bySemesters.cellStats[faculty] = { completions: 0, enrollments: 0, ratio: null }
+            course.bySemesters.cellStats[faculty] = { completions: 0, enrollments: 0, ratio: null, difference: 0 }
           const stats = course.bySemesters[semestercode]?.[faculty]
           if (!stats) return
           course.bySemesters.cellStats[faculty].completions += stats.completions
           course.bySemesters.cellStats[faculty].enrollments += stats.enrollments
           course.bySemesters.cellStats[faculty].ratio = getRatio(course.bySemesters.cellStats[faculty])
+          course.bySemesters.cellStats[faculty].difference = stats.difference
           facultiesTotal.completions += stats.completions
           facultiesTotal.enrollments += stats.enrollments
         })
         facultiesTotal.ratio = getRatio(facultiesTotal)
+        facultiesTotal.difference += course.bySemesters[semestercode]?.difference ?? 0
       })
       course.bySemesters.facultiesTotal = facultiesTotal
       course.bySemesters = { ...course.bySemesters, facultiesTotal }
