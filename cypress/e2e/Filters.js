@@ -186,6 +186,8 @@ describe('Population Statistics', () => {
     })
   })
 
+  // This tests needs the curriculum structure and the test db doesn't yet have the same structure as the real db
+  // Although there was something wrong with the test before the change in the db (see issue #3111), must be investigated
   it.skip('Courses filter works', () => {
     // courses takes long time to load, wait for it to complete
     cy.wait(25000)
@@ -264,18 +266,6 @@ describe('Course Statistics', () => {
       const card = cy.cs('Programme-filter-card')
       const programmeDropdown = card.cs('Programme-filter-dropdown').selectFromDropdown(1)
       checkFilteringResult(116)
-      programmeDropdown.get('i.delete').click()
-    })
-  })
-
-  // The test does not work since it tries to filter by "Ravitsemustiede"-studytrack when checking
-  // CS Bachelor students. Now that the irrelevant studytracks have been removed, the test fails.
-  // So fix this
-  it.skip('Study track filter works', () => {
-    runTestStepWithPreAndPostParts('StudyTrack', () => {
-      const card = cy.cs('StudyTrack-filter-card')
-      const programmeDropdown = card.cs('StudyTrack-filter-dropdown').selectFromDropdown(0)
-      checkFilteringResult(1)
       programmeDropdown.get('i.delete').click()
     })
   })

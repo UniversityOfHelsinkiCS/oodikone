@@ -42,7 +42,6 @@ describe('Users tests', () => {
       cy.cs('user-edit-button-basic').click()
       cy.get('i.spy').click()
       cy.contains('mocking as basic')
-      cy.wait(1000)
       cy.contains('Study programme').click().siblings().contains('Search by class').click()
       cy.contains('label', 'Study programme')
       cy.contains('label', 'Study programme')

@@ -1,4 +1,3 @@
-/* eslint-disable cypress/no-unnecessary-waiting */
 /// <reference types="Cypress" />
 
 const deleteTag = name => {
@@ -24,28 +23,11 @@ const getEmptyYears = isAcademicYear => {
 }
 
 describe('Studyprogramme overview', () => {
-  before(() => {
-    cy.init('/study-programme', 'admin')
-    cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click({ force: true })
-    cy.get('.attached').contains('Update statistics').click()
-    // eslint-disable-next-line cypress/no-unnecessary-waiting
-    cy.wait(5000)
-    cy.get('button').eq(0).click({ force: true })
-    // eslint-disable-next-line cypress/no-unnecessary-waiting
-    cy.wait(10000)
-    cy.get('button').eq(1).click({ force: true })
-    // eslint-disable-next-line cypress/no-unnecessary-waiting
-    cy.wait(10000)
-  })
-
   /* Basic information overview -tests*/
   describe('Basic information -view works for basic user', () => {
     beforeEach(() => {
       cy.init('/study-programme')
-      // eslint-disable-next-line cypress/no-unnecessary-waiting
-      cy.wait(10000)
       cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click({ force: true })
-      // cy.viewport(1536, 960)
     })
 
     // If the backend breaks for one of the sections, the section header is not rendered and this will fail
@@ -104,8 +86,6 @@ describe('Studyprogramme overview', () => {
 
     it('Special studyrights can be excluded and basic data changes accordingly', () => {
       cy.get('[data-cy=StudentToggle]').click()
-      // eslint-disable-next-line cypress/no-unnecessary-waiting
-      cy.wait(15000)
       const years = getEmptyYears()
       const studentTableContents = [
         // [Year, Started, Graduated]
@@ -147,8 +127,6 @@ describe('Studyprogramme overview', () => {
 
     it('Year can be changed to academic year, and data changes accordingly', () => {
       cy.get('[data-cy=YearToggle]').click({ force: true })
-      // eslint-disable-next-line cypress/no-unnecessary-waiting
-      cy.wait(15000)
       const isAcademicYear = true
       const years = getEmptyYears(isAcademicYear)
       const studentTableContents = [
@@ -160,8 +138,6 @@ describe('Studyprogramme overview', () => {
         ['2018 - 2019', 161, 8, 0, 1],
         ['2017 - 2018', 171, 1, 0, 0],
       ]
-      // eslint-disable-next-line cypress/no-unnecessary-waiting
-      cy.wait(10000)
       cy.checkTableStats(studentTableContents, 'StudentsOfTheStudyprogramme')
 
       const creditTableContents = [
@@ -175,7 +151,6 @@ describe('Studyprogramme overview', () => {
       ]
 
       cy.checkTableStats(creditTableContents, 'CreditsProducedByTheStudyprogramme')
-      //cy.wait(10000)
       cy.get('[data-cy=YearToggle]').click()
     })
 
@@ -225,8 +200,6 @@ describe('Studyprogramme overview', () => {
   describe('Graduation times of master programmes', () => {
     it('are split into two graphs', () => {
       cy.init('/study-programme', 'admin')
-      // eslint-disable-next-line cypress/no-unnecessary-waiting
-      cy.wait(5000)
       cy.contains('a', 'Kasvatustieteiden maisteriohjelma').click({ force: true })
 
       cy.get('[data-cy=graduation-times-graph-breakdownMaster]')
@@ -256,9 +229,7 @@ describe('Studyprogramme overview', () => {
   describe('Studytrack overview works for basic user', () => {
     beforeEach(() => {
       cy.init('/study-programme')
-      cy.wait(10000)
       cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
-      cy.wait(5000)
       cy.get('.attached').contains('Studytracks and class statistics').click()
     })
 
@@ -321,8 +292,6 @@ describe('Studyprogramme overview', () => {
   describe('Programme courses works for basic user', () => {
     beforeEach(() => {
       cy.init('/study-programme')
-      // eslint-disable-next-line cypress/no-unnecessary-waiting
-      cy.wait(10000)
       cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
       cy.get('.attached').contains('Programme courses').click()
     })
@@ -343,21 +312,12 @@ describe('Studyprogramme overview', () => {
     })
 
     it('calendar year -> academic year toggle works', () => {
-      // eslint-disable-next-line cypress/no-unnecessary-waiting
-      cy.wait(10000)
       cy.get('[data-cy=fromYear]').click().contains('2018').click()
-
       cy.get('[data-cy=toYear').click().contains('2019').click()
-      // eslint-disable-next-line cypress/no-unnecessary-waiting
-      cy.wait(20000)
       cy.get('[data-cy=CoursesSortableTable]').within(() => {
         cy.get('tr').eq(1).contains('684')
       })
-      // eslint-disable-next-line cypress/no-unnecessary-waiting
-      cy.wait(20000)
       cy.get('[data-cy=calendarAcademicYearToggle]').first().click()
-      // eslint-disable-next-line cypress/no-unnecessary-waiting
-      cy.wait(20000)
       cy.get('[data-cy=CoursesSortableTable]').within(() => {
         cy.get('tr').eq(1).contains('772')
       })
@@ -399,8 +359,6 @@ describe('Studyprogramme overview', () => {
   describe('Basic information -view works for basic user', () => {
     beforeEach(() => {
       cy.init('/study-programme')
-      // eslint-disable-next-line cypress/no-unnecessary-waiting
-      cy.wait(10000)
       cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
       cy.get('.attached').contains('Tags').click()
     })
@@ -450,8 +408,6 @@ describe('Studyprogramme overview', () => {
 
       cy.go('back')
       cy.go('back')
-      // eslint-disable-next-line cypress/no-unnecessary-waiting
-      cy.wait(10000)
       deleteTag(name)
 
       cy.contains('Student statistics').click()
@@ -461,7 +417,6 @@ describe('Studyprogramme overview', () => {
     })
   })
 
-  /*
   describe('IAM user', () => {
     beforeEach(() => {
       cy.init('/study-programme', 'onlyiamrights')
@@ -497,5 +452,4 @@ describe('Studyprogramme overview', () => {
       cy.get('[data-cy=Section-AverageGraduationTimesStudytracks]')
     })
   })
-  */
 })
