@@ -497,6 +497,26 @@ const GeneralTab = ({
         }
       },
     },
+    latestAttainmentDate: {
+      key: 'latestAttainmentDate',
+      title: 'Latest attainment date',
+      getRowVal: s => {
+        const studyPlan = s.studyplans.find(sp => sp.programme_code === programmeCode)
+        if (!studyPlan) return ''
+        const { included_courses: coursesInStudyPlan } = studyPlan
+
+        const dates = s.courses
+          .filter(c => coursesInStudyPlan.includes(c.course_code) && c.passed === true)
+          .map(c => c.date)
+        if (!dates.length) return ''
+        const latestDate = dates.sort((a, b) => new Date(b) - new Date(a))[0]
+        return reformatDate(latestDate, 'YYYY-MM-DD')
+      },
+      helpText: getTextIn({
+        fi: 'Päivämäärä, jolloin opiskelija on viimeksi suorittanut hyväksytysti kurssin, joka sisältyy hänen HOPSiinsa.',
+        en: 'The date when the student last successfully completed a course included in their HOPS.',
+      }),
+    },
     priority: {
       key: 'priority',
       title: 'Priority',
