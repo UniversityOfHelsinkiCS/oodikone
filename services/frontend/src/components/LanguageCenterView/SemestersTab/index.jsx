@@ -21,7 +21,7 @@ export const SemestersTab = () => {
   } = useLanguageCenterContext()
 
   useEffect(() => {
-    if (numberMode === 'ratio') {
+    if (['ratio', 'difference'].includes(numberMode)) {
       setNumberMode('completions')
     }
   }, [])
