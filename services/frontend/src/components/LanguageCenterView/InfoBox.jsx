@@ -17,10 +17,8 @@ export const InfoBox = () => {
               <li>Completions: Amount of passed completions of course</li>
               <li>Enrollments: Amount of accepted enrollments on course</li>
               <li>
-                Ratio: Percentage of completions per enrollments. 0 % means there are zero completions and at least one
-                enrollment. 100 % means there are at least as many completions as enrollments. A dash indicates there
-                are no completions or enrollments. Hover mouse over a cell to view the amount of enrollments and
-                completions.
+                Enrollments exceeding completions: For every course per semester, the amount of enrollments that
+                exceeded the amount of completions.
               </li>
             </ul>
             <li>
@@ -30,9 +28,9 @@ export const InfoBox = () => {
           </ul>
           <p>Tips:</p>
           <ul>
-            <li>Hover your mouse over the faculty column header to see the name of the faculty</li>
             <li>
-              When in ratio mode, hover your mouse over the cells to see the numbers of completions and enrollments.
+              Hover your mouse over the faculty column header to see the name of the faculty. The same is possible with
+              long course names.
             </li>
             <li>
               Click the column headers to sort by the column, or click the filter icon{' '}

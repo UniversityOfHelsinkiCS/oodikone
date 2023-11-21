@@ -21,7 +21,7 @@ export const SemestersTab = () => {
   } = useLanguageCenterContext()
 
   useEffect(() => {
-    if (['ratio', 'difference'].includes(numberMode)) {
+    if (!['completions', 'enrollments'].includes(numberMode)) {
       setNumberMode('completions')
     }
   }, [])
@@ -32,14 +32,13 @@ export const SemestersTab = () => {
     return row(totals, { ignoreSorting: true, ignoreFilters: true })
   }, [data, selectedSemesters])
 
-  if (numberMode === 'ratio') return null
   if (!semesters) return null
   const tableData = [totalRow, ...data.tableData]
   return (
     <div>
       <div className="options-container">
         <SemesterRangeSelector setSemesterFilter={setSemesterFilter} semesterFilter={semesterFilter} />
-        <CompletionPicker enableRatioOption={false} />
+        <CompletionPicker />
         <ColorModeSelector />
       </div>
       <SortableTable

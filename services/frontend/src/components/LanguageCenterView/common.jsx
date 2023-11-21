@@ -26,14 +26,6 @@ export const filterAttemptsByDates = (date, { startDate, endDate }) => {
   return moment(new Date(date)).isBetween(start, end)
 }
 
-export const getRatio = stats => {
-  if (stats.enrollments < stats.completions) return 100
-  if (stats.completions === 0) return 0
-  if (stats.enrollments === 0) return null
-  const value = stats.completions / stats.enrollments
-  return Math.round(value * 100)
-}
-
 export const getDifference = stats => {
   const value = stats.notCompleted - stats.completed
   return value < 0 ? 0 : value

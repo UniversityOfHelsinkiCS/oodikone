@@ -4,7 +4,7 @@ import SortableTable, { row } from 'components/SortableTable'
 import React, { useMemo } from 'react'
 import _ from 'lodash'
 import { calculateTotals, getColumns } from './logic'
-import { getRatio, useLanguageCenterContext } from '../common'
+import { useLanguageCenterContext } from '../common'
 import { CompletionPicker, SemesterRangeSelector } from '../selectorComponents'
 import '../index.css'
 
@@ -22,21 +22,19 @@ export const FacultiesTab = () => {
   const tableData = useMemo(() => {
     const tableData = [_.cloneDeep(totalRow), ..._.cloneDeep(data.tableData)]
     tableData.forEach(course => {
-      const facultiesTotal = { completions: 0, enrollments: 0, ratio: null, difference: 0 }
+      const facultiesTotal = { completions: 0, enrollments: 0, difference: 0 }
       selectedSemesters.forEach(semestercode => {
         data.faculties.forEach(faculty => {
           if (!course.bySemesters.cellStats[faculty])
-            course.bySemesters.cellStats[faculty] = { completions: 0, enrollments: 0, ratio: null, difference: 0 }
+            course.bySemesters.cellStats[faculty] = { completions: 0, enrollments: 0, difference: 0 }
           const stats = course.bySemesters[semestercode]?.[faculty]
           if (!stats) return
           course.bySemesters.cellStats[faculty].completions += stats.completions
           course.bySemesters.cellStats[faculty].enrollments += stats.enrollments
-          course.bySemesters.cellStats[faculty].ratio = getRatio(course.bySemesters.cellStats[faculty])
           course.bySemesters.cellStats[faculty].difference = stats.difference
           facultiesTotal.completions += stats.completions
           facultiesTotal.enrollments += stats.enrollments
         })
-        facultiesTotal.ratio = getRatio(facultiesTotal)
         facultiesTotal.difference += course.bySemesters[semestercode]?.difference ?? 0
       })
       course.bySemesters.facultiesTotal = facultiesTotal
@@ -49,11 +47,11 @@ export const FacultiesTab = () => {
     <div>
       <div className="options-container">
         <SemesterRangeSelector setSemesterFilter={setSemesterFilter} semesterFilter={semesterFilter} />
-        <CompletionPicker enableRatioOption />
+        <CompletionPicker enableDifference />
       </div>
       <SortableTable
         columns={getColumns(getTextIn, [...data.faculties].sort(), numberMode, facultyMap)}
-        data={numberMode === 'ratio' ? tableData.slice(1) : tableData}
+        data={tableData}
         stretch
       />
     </div>
