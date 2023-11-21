@@ -34,6 +34,7 @@ const SearchForm = ({ location, history, onProgress }) => {
   const dispatch = useDispatch()
   const isLoading = useSelector(state => state.courseStats.pending)
   const [combineSubstitutions, toggleCombineSubstitutions] = useToggle(true)
+  const [selectMultipleCoursesEnabled, toggleSelectMultipleCoursesEnabled] = useToggle(false)
   const matchingCourses = useSelector(state => getCourseSearchResults(state, combineSubstitutions))
   const [state, setState] = useState({ ...INITIAL })
   const [searchHistory, addItemToSearchHistory, updateItemInSearchHistory] = useSearchHistory('courseSearch', 6)
@@ -135,12 +136,27 @@ const SearchForm = ({ location, history, onProgress }) => {
     return Promise.resolve()
   }
 
+  const clearSelectedCourses = () => {
+    setState({ ...state, selectedCourses: {} })
+  }
+
+  useEffect(() => {
+    if (Object.keys(selectedCourses).length === 0 || selectMultipleCoursesEnabled) return
+    onSubmitFormClick()
+  }, [selectedCourses])
+
   useEffect(() => {
     const fetchData = async () => {
       await fetchCourses()
     }
     fetchData()
+    clearSelectedCourses()
   }, [combineSubstitutions])
+
+  useEffect(() => {
+    if (selectMultipleCoursesEnabled) return
+    clearSelectedCourses()
+  }, [selectMultipleCoursesEnabled])
 
   const courses = matchingCourses.filter(c => !selectedCourses[c.code])
 
@@ -198,25 +214,53 @@ const SearchForm = ({ location, history, onProgress }) => {
                 />
               </Form.Field>
               <Form.Field>
-                <Popup
-                  on="hover"
-                  content={getTextIn({
-                    fi: 'Jos "Combine substitutions" on valittuna (oletuksena), niin kurssi ja leikkaavat kurssit yhdistetään tilastoissa.',
-                    en: 'If "Combine substitutions" is on (default behavior), then course and its substitutions are combined in the statistics.',
-                  })}
-                  size="tiny"
-                  position="top center"
-                  trigger={
-                    <Radio
-                      toggle
-                      label="Combine substitutions"
-                      checked={combineSubstitutions}
-                      onChange={toggleCombineSubstitutions}
-                      style={{ margin: '32px 0 0 5px', height: '100%' }}
-                      data-cy="combine-substitutions-toggle"
-                    />
-                  }
-                />
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: '20px',
+                    marginLeft: '10px',
+                  }}
+                >
+                  <Popup
+                    on="hover"
+                    content={getTextIn({
+                      fi: 'Jos "Combine substitutions" on valittuna (oletuksena), niin kurssi ja leikkaavat kurssit yhdistetään tilastoissa.',
+                      en: 'If "Combine substitutions" is on (default behavior), then course and its substitutions are combined in the statistics.',
+                    })}
+                    size="tiny"
+                    position="top center"
+                    trigger={
+                      <Radio
+                        toggle
+                        label="Combine substitutions"
+                        checked={combineSubstitutions}
+                        onChange={toggleCombineSubstitutions}
+                        data-cy="combine-substitutions-toggle"
+                      />
+                    }
+                  />
+                  <Popup
+                    on="hover"
+                    content={getTextIn({
+                      fi: 'Jos "Select multiple courses" on valittuna, voit valita tarkasteltavaksi useita kursseja.',
+                      en: 'If "Select multiple courses" is on, you can select multiple courses to view statistics for.',
+                    })}
+                    size="tiny"
+                    position="top center"
+                    trigger={
+                      <Radio
+                        toggle
+                        label="Select multiple courses"
+                        checked={selectMultipleCoursesEnabled}
+                        onChange={toggleSelectMultipleCoursesEnabled}
+                        data-cy="select-multiple-courses-toggle"
+                      />
+                    }
+                  />
+                </div>
               </Form.Field>
             </Form.Group>
             <div style={!noSelectedCourses ? searchBoxStyle : null}>
