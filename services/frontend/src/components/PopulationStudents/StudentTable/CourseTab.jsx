@@ -142,6 +142,29 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
 
     const getTotalRowVal = (t, m) => t[m.code]
 
+    const findBestGrade = (courses, code) => {
+      const course = populationCourses?.coursestatistics?.find(c => c.course.code === code)
+      if (!course) return null
+      const { substitutions } = course.course
+      const courseAttainments = courses.filter(
+        course =>
+          [code, `AY${code}`, `A${code}`].includes(course.course_code) ||
+          substitutions.some(sub =>
+            [sub, `AY${sub}`, sub.startsWith('A') && sub.substring(1)].includes(course.course_code)
+          )
+      )
+
+      const bestGrade =
+        courseAttainments.length > 0
+          ? sortBy(courseAttainments, element => {
+              const order = { 5: 0, 4: 1, 3: 2, 2: 3, 1: 4, HT: 5, TT: 6, 'Hyv.': 7, 'Hyl.': 8 }
+              return order[element.grade]
+            })[0].grade
+          : null
+
+      return bestGrade
+    }
+
     const columns = []
 
     columns.push(
@@ -193,15 +216,9 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
               vertical: true,
               forceToolsMode: 'dangling',
               cellProps: s => {
-                let grade = s.courses
-                  ? s.courses.find(course => course.course_code === m.code || course.course_code === `AY${m.code}`)
-                      ?.grade
-                  : null
-                grade =
-                  s.courses && !grade && hasPassedMandatory(s.studentNumber, m.code)
-                    ? s.courses.find(course => course.course_code === m.parent_code)?.grade
-                    : grade
-                const gradeText = grade ? `\nGrade: ${grade}` : ''
+                if (!s.courses) return null
+                const bestGrade = findBestGrade(s.courses, m.code)
+                const gradeText = bestGrade ? `\nGrade: ${bestGrade}` : ''
                 const studentCode = s.studentNumber ? `\nStudent number:  ${s.studentNumber}` : ``
                 return {
                   title: `${m.code}, ${getTextIn(m.name)}${studentCode} ${gradeText}`,
@@ -213,18 +230,30 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
               },
               headerProps: { title: `${m.code}, ${getTextIn(m.name)}` },
               getRowVal: s => {
-                if (s.total) {
-                  return getTotalRowVal(s, m)
-                }
+                if (s.total) return getTotalRowVal(s, m)
 
                 return hasPassedMandatory(s.studentNumber, m.code) ? 'Passed' : ''
               },
               getRowExportVal: s => {
-                if (s.total) {
-                  return getTotalRowVal(s, m)
+                if (s.total) return getTotalRowVal(s, m)
+
+                const bestGrade = findBestGrade(s.courses, m.code)
+
+                if (!bestGrade) {
+                  if (
+                    s.enrollments &&
+                    s.enrollments.some(
+                      enrollment => enrollment.course_code === m.code && enrollment.state === 'ENROLLED'
+                    )
+                  ) {
+                    return 0
+                  }
+                  return ''
                 }
 
-                return hasPassedMandatory(s.studentNumber, m.code) ? 'Passed' : ''
+                if (bestGrade === 'Hyl.') return 0
+                if (['1', '2', '3', '4', '5'].includes(bestGrade)) return parseInt(bestGrade, 10)
+                return bestGrade
               },
               getRowContent: s => {
                 if (s.total) return getTotalRowVal(s, m)

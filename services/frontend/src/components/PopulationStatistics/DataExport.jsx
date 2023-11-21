@@ -113,8 +113,8 @@ export default ({ students, programmeCode }) => {
         .filter(el => populationStatistics.elementdetails.data[el.code].type === 20)
         .forEach(el => {
           if (queryStudyrights.includes(el.code)) {
-          startdate = el.startdate // eslint-disable-line
-          enddate = el.enddate // eslint-disable-line
+            startdate = el.startdate // eslint-disable-line
+            enddate = el.enddate // eslint-disable-line
           }
         })
       elemArr
@@ -137,6 +137,7 @@ export default ({ students, programmeCode }) => {
   const hasPassedMandatory = (studentNumber, code, codes) => {
     return codes[code] && codes[code].includes(studentNumber)
   }
+
   const totalMandatoryPassed = (studentNumber, codes, programmeCode) => {
     if (!programmeCode) return 0
     return (
@@ -150,6 +151,21 @@ export default ({ students, programmeCode }) => {
       )
     )
   }
+
+  const findBestGrade = (courses, code) => {
+    const courseAttainments = courses.filter(course => [code, `AY${code}`, `A${code}`].includes(course.course_code))
+
+    const bestGrade =
+      courseAttainments.length > 0
+        ? sortBy(courseAttainments, element => {
+            const order = { 5: 0, 4: 1, 3: 2, 2: 3, 1: 4, HT: 5, TT: 6, 'Hyv.': 7, 'Hyl.': 8 }
+            return order[element.grade]
+          })[0].grade
+        : null
+
+    return bestGrade
+  }
+
   const generateWorkbook = () => {
     const codes = mandatoryPassed()
     const sortedMandatory = programmeCode
@@ -206,7 +222,27 @@ export default ({ students, programmeCode }) => {
         'updated at': reformatDate(s.updatedAt, 'YYYY-MM-DD  hh:mm:ss'),
         'mandatory total passed': totalMandatoryPassed(s.studentNumber, codes, programmeCode),
         ...sortedMandatory.reduce((acc, m) => {
-          acc[`${getTextIn(m.name)} ${m.code}`] = hasPassedMandatory(s.studentNumber, m.code, codes)
+          const bestGrade = findBestGrade(s.courses, m.code)
+          let bestGradeOnChart
+
+          if (!bestGrade) {
+            if (
+              s.enrollments &&
+              s.enrollments.some(enrollment => enrollment.course_code === m.code && enrollment.state === 'ENROLLED')
+            ) {
+              bestGradeOnChart = 0
+            } else {
+              bestGradeOnChart = ''
+            }
+          } else if (bestGrade === 'Hyl.') {
+            bestGradeOnChart = 0
+          } else if (['1', '2', '3', '4', '5'].includes(bestGrade)) {
+            bestGradeOnChart = parseInt(bestGrade, 10)
+          } else {
+            bestGradeOnChart = bestGrade
+          }
+
+          acc[`${getTextIn(m.name)} ${m.code}`] = bestGradeOnChart
           return acc
         }, {}),
       }))
