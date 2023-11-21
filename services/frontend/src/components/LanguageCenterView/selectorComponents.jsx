@@ -5,17 +5,13 @@ import { Dropdown, Radio } from 'semantic-ui-react'
 import { useLanguageCenterContext } from './common'
 import './index.css'
 
-export const CompletionPicker = ({ enableRatioOption }) => {
+export const CompletionPicker = ({ enableDifference }) => {
   const { numberMode, setNumberMode } = useLanguageCenterContext()
   const modes = [
     { value: 'completions', label: 'Completions' },
     { value: 'enrollments', label: 'Enrollments' },
   ]
-  if (enableRatioOption)
-    modes.push(
-      { value: 'ratio', label: 'Ratio of completions per enrollments' },
-      { value: 'difference', label: 'Enrollments exceeding completions' }
-    )
+  if (enableDifference) modes.push({ value: 'difference', label: 'Enrollments exceeding completions' })
 
   return (
     <div className="selector-container">

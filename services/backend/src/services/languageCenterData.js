@@ -196,7 +196,7 @@ const computeLanguageCenterData = async () => {
 }
 
 const createArrayOfCourses = async (attempts, courses) => {
-  const fields = { completions: 0, enrollments: 0, ratio: 0, difference: 0 }
+  const fields = { completions: 0, enrollments: 0, difference: 0 }
   const semestersObject = {}
   const facultyObject = {}
   const semesterStatsMap = attempts.reduce((obj, cur) => {
@@ -227,8 +227,6 @@ const createArrayOfCourses = async (attempts, courses) => {
       } else {
         stats.enrollments += 1
       }
-      stats.ratio = stats.enrollments === 0 ? 1 : stats.completions / stats.enrollments
-      if (stats.ratio > 1) stats.ratio = 1
     }
     return obj
   }, {})
