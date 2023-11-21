@@ -69,29 +69,33 @@ export const getColumns = (getTextIn, faculties, numberMode, facultyMap) => {
 }
 
 export const calculateTotals = (courses, faculties, semesters) => {
-  const facultiesTotal = { completions: 0, enrollments: 0, ratio: null }
+  const facultiesTotal = { completions: 0, enrollments: 0, ratio: null, difference: 0 }
   const totalRow = { cellStats: {} }
   semesters.forEach(sem => {
-    totalRow[sem] = { completions: 0, enrollments: 0, ratio: 1 }
+    totalRow[sem] = { completions: 0, enrollments: 0, ratio: null, difference: 0 }
     courses.forEach(course => {
       const stats = course.bySemesters[sem]
       if (!stats) return
+
       totalRow[sem].completions += stats.completions
       totalRow[sem].enrollments += stats.enrollments
       totalRow[sem].ratio = getRatio(totalRow[sem])
+      totalRow[sem].difference += stats.difference ?? 0
       facultiesTotal.completions += stats.completions
       facultiesTotal.enrollments += stats.enrollments
       facultiesTotal.ratio = getRatio(totalRow)
+      facultiesTotal.difference += stats.difference ?? 0
     })
 
     faculties.forEach(fac => {
-      totalRow[sem][fac] = { completions: 0, enrollments: 0, ratio: null }
+      totalRow[sem][fac] = { completions: 0, enrollments: 0, ratio: null, difference: 0 }
       courses.forEach(course => {
         const stats = course.bySemesters[sem]?.[fac]
         if (!stats) return
         totalRow[sem][fac].completions += stats.completions
         totalRow[sem][fac].enrollments += stats.enrollments
         totalRow[sem][fac].ratio = getRatio(totalRow[sem][fac])
+        totalRow[sem][fac].difference += stats.difference ?? 0
       })
     })
   })
