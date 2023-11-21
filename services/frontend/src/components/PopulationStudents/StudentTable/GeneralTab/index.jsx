@@ -90,6 +90,7 @@ const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
       'studyTrack',
       'programme',
       'admissionType',
+      'latestAttainmentDate',
     ],
     studyGuidanceGroupPopulation: getStudyGuidanceGroupColumns(),
   }
