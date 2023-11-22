@@ -37,16 +37,10 @@ const computeLanguageCenterData = async () => {
   const courses = await getLanguageCenterCourses()
 
   const credits = await Credit.findAll({
-    attributes: [
-      'course_code',
-      'credittypecode',
-      'student_studentnumber',
-      'semestercode',
-      'createdate',
-      'studyright_id',
-    ],
+    attributes: ['course_code', 'student_studentnumber', 'semestercode', 'credit_date_time', 'studyright_id'],
     where: {
       [Op.or]: [{ course_code: { [Op.like]: 'KK%' } }, { course_code: { [Op.like]: 'AYKK%' } }],
+      credittypecode: 4,
     },
     raw: true,
   })
@@ -93,9 +87,6 @@ const computeLanguageCenterData = async () => {
 
   credits.forEach(c => {
     const sn = c.student_studentnumber
-
-    // ignoring 7 (improved), 9 (transferred) and 10 (failed)
-    if (c.credittypecode !== 4) return
     studentList.add(sn)
     if (!attemptsByStudents[sn]) {
       attemptsByStudents[sn] = []
