@@ -5,6 +5,8 @@ export const LanguageCenterContext = createContext(null)
 
 export const useLanguageCenterContext = () => useContext(LanguageCenterContext)
 
+export const emptyFields = { completions: 0, enrollments: 0, difference: 0, rejected: 0 }
+
 export const shortenCourseName = (text, maxLength) =>
   text.length > maxLength ? `${text.substring(0, maxLength)} ... ` : text
 
