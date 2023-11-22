@@ -5,7 +5,7 @@ import React, { useMemo } from 'react'
 import _ from 'lodash'
 import { calculateTotals, getColumns } from './logic'
 import { useLanguageCenterContext, emptyFields } from '../common'
-import { CompletionPicker, SemesterRangeSelector } from '../selectorComponents'
+import { NumberModeSelector, SemesterRangeSelector } from '../selectorComponents'
 import '../index.css'
 
 export const FacultiesTab = () => {
@@ -48,7 +48,7 @@ export const FacultiesTab = () => {
     <div>
       <div className="options-container">
         <SemesterRangeSelector setSemesterFilter={setSemesterFilter} semesterFilter={semesterFilter} />
-        <CompletionPicker enableDifference />
+        <NumberModeSelector enableDifference />
       </div>
       <SortableTable
         columns={getColumns(getTextIn, [...data.faculties].sort(), numberMode, facultyMap)}

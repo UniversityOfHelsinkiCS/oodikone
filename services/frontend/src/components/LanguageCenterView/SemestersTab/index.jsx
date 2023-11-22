@@ -5,7 +5,7 @@ import useLanguage from 'components/LanguagePicker/useLanguage'
 import { calculateTotals, getColumns } from './logic'
 import { useLanguageCenterContext } from '../common'
 import '../index.css'
-import { ColorModeSelector, CompletionPicker, SemesterRangeSelector } from '../selectorComponents'
+import { ColorModeSelector, NumberModeSelector, SemesterRangeSelector } from '../selectorComponents'
 
 export const SemestersTab = () => {
   const { getTextIn } = useLanguage()
@@ -38,7 +38,7 @@ export const SemestersTab = () => {
     <div>
       <div className="options-container">
         <SemesterRangeSelector setSemesterFilter={setSemesterFilter} semesterFilter={semesterFilter} />
-        <CompletionPicker />
+        <NumberModeSelector />
         <ColorModeSelector />
       </div>
       <SortableTable

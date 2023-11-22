@@ -5,7 +5,7 @@ import { Dropdown, Radio } from 'semantic-ui-react'
 import { useLanguageCenterContext } from './common'
 import './index.css'
 
-export const CompletionPicker = ({ enableDifference }) => {
+export const NumberModeSelector = ({ enableDifference }) => {
   const { numberMode, setNumberMode } = useLanguageCenterContext()
   const modes = [
     { value: 'completions', label: 'Completions' },
