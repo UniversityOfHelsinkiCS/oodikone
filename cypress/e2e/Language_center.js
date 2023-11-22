@@ -6,7 +6,7 @@ const hasLanded = () => {
 }
 
 describe('When language center is opened', () => {
-  describe('with an admin user', () => {
+  describe('as an admin user', () => {
     beforeEach(() => {
       cy.init('/languagecenterview', 'admin')
       cy.get('[data-cy="completions-button"]').click()
@@ -29,10 +29,10 @@ describe('When language center is opened', () => {
       cy.contains('505')
     })
 
-    it('Faculties tab ratio button works', () => {
-      cy.get('[data-cy="ratio-button"]').click()
+    it('Faculties tab "exceeding" button works', () => {
+      cy.get('[data-cy="difference-button"]').click()
       cy.contains('0')
-      cy.contains('Total ratio')
+      cy.contains('Total')
     })
 
     it('Faculties tab semester selector changes numbers', () => {

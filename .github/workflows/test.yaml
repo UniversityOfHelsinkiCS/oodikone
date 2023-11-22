@@ -316,6 +316,22 @@ jobs:
           password: ${{ secrets.password }}
           spec: cypress/e2e/Openuni.js
 
+  test_language_center:
+    name: 'Test language center view'
+    needs:
+      - build_and_push_anon_sis_db
+      - build_and_push_anon_kone_db
+      - build_and_push_anon_user_db
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: 'Run tests'
+        uses: ./.github/actions/run-tests
+        with:
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
+          spec: cypress/e2e/Language_center.js
+
   # === Other tests ===
   test_service_exit_statuses:
     name: 'Check services run correctly'
