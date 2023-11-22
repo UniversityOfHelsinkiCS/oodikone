@@ -840,21 +840,21 @@ const updateTeachers = async attainments => {
 }
 
 // why we are using two terms for the same thing: term registration and semester enrollment
-const semesterEnrolmentsOfStudent = allSementerEnrollments => {
-  const semesters = uniq(allSementerEnrollments.map(s => s.semestercode))
+const semesterEnrolmentsOfStudent = allSemesterEnrollments => {
+  const semesters = uniq(allSemesterEnrollments.map(s => s.semestercode))
   const semesterEnrollments = semesters.map(semester => {
-    const enrolmentsForSemster = allSementerEnrollments.filter(se => se.semestercode === semester)
+    const enrollmentsForSemester = allSemesterEnrollments.filter(se => se.semestercode === semester)
 
-    const present = enrolmentsForSemster.find(se => se.enrollmenttype === 1)
+    const present = enrollmentsForSemester.find(se => se.enrollmenttype === 1)
     if (present) {
       return present
     }
-    const absent = enrolmentsForSemster.find(se => se.enrollmenttype === 2)
+    const absent = enrollmentsForSemester.find(se => se.enrollmenttype === 2)
     if (absent) {
       return absent
     }
 
-    return enrolmentsForSemster[0]
+    return enrollmentsForSemester[0]
   })
 
   return semesterEnrollments
