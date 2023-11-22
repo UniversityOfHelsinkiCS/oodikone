@@ -10,6 +10,7 @@ export const CompletionPicker = ({ enableDifference }) => {
   const modes = [
     { value: 'completions', label: 'Completions' },
     { value: 'enrollments', label: 'Enrollments' },
+    { value: 'rejected', label: 'Rejected enrollments' },
   ]
   if (enableDifference) modes.push({ value: 'difference', label: 'Enrollments exceeding completions' })
 

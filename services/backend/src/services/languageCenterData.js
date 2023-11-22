@@ -46,10 +46,10 @@ const computeLanguageCenterData = async () => {
   })
 
   const enrollments = await Enrollment.findAll({
-    attributes: ['studentnumber', 'semestercode', 'course_code', 'enrollment_date_time', 'studyright_id'],
+    attributes: ['studentnumber', 'semestercode', 'course_code', 'enrollment_date_time', 'studyright_id', 'state'],
     where: {
       [Op.or]: [{ course_code: { [Op.like]: 'KK%' } }, { course_code: { [Op.like]: 'AYKK%' } }],
-      state: 'ENROLLED',
+      state: { [Op.in]: ['ENROLLED', 'REJECTED'] },
     },
     raw: true,
   })
@@ -120,6 +120,7 @@ const computeLanguageCenterData = async () => {
       date: e.enrollment_date_time,
       faculty: attemptStudyrightToFacultyMap[e.studyright_id],
       semestercode: e.semestercode,
+      enrolled: e.state === 'ENROLLED',
     })
   })
 
@@ -187,7 +188,7 @@ const computeLanguageCenterData = async () => {
 }
 
 const createArrayOfCourses = async (attempts, courses) => {
-  const fields = { completions: 0, enrollments: 0, difference: 0 }
+  const fields = { completions: 0, enrollments: 0, difference: 0, rejected: 0 }
   const semestersObject = {}
   const facultyObject = {}
   const semesterStatsMap = attempts.reduce((obj, cur) => {
@@ -216,7 +217,11 @@ const createArrayOfCourses = async (attempts, courses) => {
       if (cur.completed) {
         stats.completions += 1
       } else {
-        stats.enrollments += 1
+        if (cur.enrolled) {
+          stats.enrollments += 1
+        } else {
+          stats.rejected += 1
+        }
       }
     }
     return obj

@@ -4,7 +4,7 @@ import SortableTable, { row } from 'components/SortableTable'
 import React, { useMemo } from 'react'
 import _ from 'lodash'
 import { calculateTotals, getColumns } from './logic'
-import { useLanguageCenterContext } from '../common'
+import { useLanguageCenterContext, emptyFields } from '../common'
 import { CompletionPicker, SemesterRangeSelector } from '../selectorComponents'
 import '../index.css'
 
@@ -22,18 +22,19 @@ export const FacultiesTab = () => {
   const tableData = useMemo(() => {
     const tableData = [_.cloneDeep(totalRow), ..._.cloneDeep(data.tableData)]
     tableData.forEach(course => {
-      const facultiesTotal = { completions: 0, enrollments: 0, difference: 0 }
+      const facultiesTotal = { ...emptyFields }
       selectedSemesters.forEach(semestercode => {
         data.faculties.forEach(faculty => {
-          if (!course.bySemesters.cellStats[faculty])
-            course.bySemesters.cellStats[faculty] = { completions: 0, enrollments: 0, difference: 0 }
+          if (!course.bySemesters.cellStats[faculty]) course.bySemesters.cellStats[faculty] = { ...emptyFields }
           const stats = course.bySemesters[semestercode]?.[faculty]
           if (!stats) return
           course.bySemesters.cellStats[faculty].completions += stats.completions
           course.bySemesters.cellStats[faculty].enrollments += stats.enrollments
+          course.bySemesters.cellStats[faculty].rejected += stats.rejected
           course.bySemesters.cellStats[faculty].difference = stats.difference
           facultiesTotal.completions += stats.completions
           facultiesTotal.enrollments += stats.enrollments
+          facultiesTotal.rejected += stats.rejected
         })
         facultiesTotal.difference += course.bySemesters[semestercode]?.difference ?? 0
       })
