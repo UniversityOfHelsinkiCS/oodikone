@@ -14,8 +14,20 @@ const teachersApi = RTKApi.injectEndpoints({
           .map(provider => `providers[]=${provider}`)
           .join('&')}&semesterStart=${semesterStart}&semesterEnd=${semesterEnd}`,
     }),
+    getTopTeachers: builder.query({
+      query: ({ yearcode, category }) => `/teachers/top?yearcode=${yearcode}&category=${category}`,
+    }),
+    getTopTeachersCategories: builder.query({
+      query: () => '/teachers/top/categories',
+    }),
   }),
   overrideExisting: false,
 })
 
-export const { useGetTeacherQuery, useFindTeachersQuery, useLazyGetTeacherStatisticsQuery } = teachersApi
+export const {
+  useGetTeacherQuery,
+  useFindTeachersQuery,
+  useLazyGetTeacherStatisticsQuery,
+  useLazyGetTopTeachersQuery,
+  useGetTopTeachersCategoriesQuery,
+} = teachersApi
