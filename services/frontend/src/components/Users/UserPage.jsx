@@ -13,7 +13,7 @@ import { getProgrammesUnfiltered } from 'redux/populationProgrammesUnfiltered'
 import { textAndDescriptionSearch } from '../../common'
 import AccessRights from './AccessRights'
 import AccessGroups from './AccessGroups'
-import EmailNotification from './EmailNotification'
+import { EmailNotification } from './EmailNotification'
 import useLanguage from '../LanguagePicker/useLanguage'
 
 const UserPage = ({
