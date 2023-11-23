@@ -5,16 +5,14 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { difference, min, max, flatten, pickBy, uniq } from 'lodash'
 import qs from 'query-string'
+
+import { useGetMaxYearsToCreatePopulationFromQuery } from 'redux/populations'
+import { setSelectedCourse, clearSelectedCourse } from 'redux/singleCourseStats'
+import { useGetSemestersQuery } from 'redux/semesters'
 import ResultTabs from '../ResultTabs'
-import {
-  setSelectedCourse,
-  clearSelectedCourse,
-  getMaxYearsToCreatePopulationFrom,
-} from '../../../redux/singleCourseStats'
 import ProgrammeDropdown from '../ProgrammeDropdown'
 import selectors, { ALL } from '../../../selectors/courseStats'
 import YearFilter from '../SearchForm/YearFilter'
-import { useGetSemestersQuery } from '../../../redux/semesters'
 import useLanguage from '../../LanguagePicker/useLanguage'
 import countTotalStats from './countTotalStats'
 
@@ -38,8 +36,6 @@ const SingleCourseStats = ({
   location,
   stats: { coursecode },
   programmes,
-  maxYearsToCreatePopulationFrom,
-  getMaxYearsToCreatePopulationFrom,
   userHasAccessToAllStats,
   unifyCourses,
 }) => {
@@ -78,14 +74,29 @@ const SingleCourseStats = ({
     }
   }
 
+  const { data: maxYears } = useGetMaxYearsToCreatePopulationFromQuery({
+    courseCodes: JSON.stringify(stats.alternatives),
+  })
+
+  let maxYearsToCreatePopulationFrom = 0
+  if (maxYears) {
+    switch (unifyCourses) {
+      case 'openStats':
+        maxYearsToCreatePopulationFrom = maxYears.openCourses
+        break
+      case 'reqularStats':
+        maxYearsToCreatePopulationFrom = maxYears.uniCourses
+        break
+      default:
+        maxYearsToCreatePopulationFrom = maxYears.unifyCourses
+    }
+  }
+
   useEffect(() => {
     if (location.search) {
       const { separate } = parseQueryFromUrl()
       setSeparate(separate)
     }
-    getMaxYearsToCreatePopulationFrom({
-      courseCodes: JSON.stringify(stats.alternatives),
-    })
     setSelectedCourse(coursecode)
 
     const yearcodes = stats.statistics.map(s => s.yearcode)
@@ -434,10 +445,10 @@ const SingleCourseStats = ({
         <Form>
           {maxYearsToCreatePopulationFrom < toYear - fromYear + 1 ? (
             <Popup
-              content={`Max years to create a population from for this course is ${Math.max(
+              content={`The maximum time range to generate a population for this course is ${Math.max(
                 0,
                 maxYearsToCreatePopulationFrom
-              )}`}
+              )} years`}
               trigger={<span>{renderShowPopulation(true)}</span>}
             />
           ) : (
@@ -526,15 +537,12 @@ SingleCourseStats.propTypes = {
   history: shape({
     push: func,
   }).isRequired,
-  getMaxYearsToCreatePopulationFrom: func.isRequired,
-  maxYearsToCreatePopulationFrom: number.isRequired,
   userHasAccessToAllStats: bool.isRequired,
 }
 
 const mapStateToProps = state => {
   return {
     programmes: selectors.getAllStudyProgrammes(state),
-    maxYearsToCreatePopulationFrom: selectors.getMaxYearsToCreatePopulationFrom(state) || 0,
     unifyCourses: state.courseSearch.openOrReqular,
   }
 }
@@ -542,7 +550,6 @@ const mapStateToProps = state => {
 const mapDispatchToProps = {
   setSelectedCourse,
   clearSelectedCourse,
-  getMaxYearsToCreatePopulationFrom,
 }
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(SingleCourseStats))

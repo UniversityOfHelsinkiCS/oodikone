@@ -62,11 +62,21 @@ const populationApi = RTKApi.injectEndpoints({
         params: { coursecodes, from, to, separate, unifyCourses },
       }),
     }),
+    getMaxYearsToCreatePopulationFrom: builder.query({
+      query: ({ courseCodes }) => ({
+        url: '/v3/populationstatistics/maxYearsToCreatePopulationFrom',
+        params: { courseCodes },
+      }),
+    }),
   }),
   overrideExisting: false,
 })
 
-export const { useGetCustomPopulationQuery, useGetPopulationStatisticsByCourseQuery } = populationApi
+export const {
+  useGetCustomPopulationQuery,
+  useGetPopulationStatisticsByCourseQuery,
+  useGetMaxYearsToCreatePopulationFromQuery,
+} = populationApi
 
 export const clearPopulations = () => ({
   type: 'CLEAR_POPULATIONS',
