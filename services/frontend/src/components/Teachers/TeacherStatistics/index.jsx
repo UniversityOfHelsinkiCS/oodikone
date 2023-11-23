@@ -3,21 +3,22 @@ import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { Form, Segment, Dropdown, Button, Message } from 'semantic-ui-react'
 import moment from 'moment'
+
 import { useGetAuthorizedUserQuery } from 'redux/auth'
-import { getProviders } from '../../../redux/providers'
-import { useGetSemestersQuery } from '../../../redux/semesters'
-import { getTeacherStatistics } from '../../../redux/teacherStatistics'
+import { getProviders } from 'redux/providers'
+import { useGetSemestersQuery } from 'redux/semesters'
+import { useLazyGetTeacherStatisticsQuery } from 'redux/teachers'
 import TeacherStatisticsTable from '../TeacherStatisticsTable'
 import useLanguage from '../../LanguagePicker/useLanguage'
 
-const TeacherStatistics = ({ getProviders, getTeacherStatistics, providers, statistics, pending, history }) => {
+const TeacherStatistics = ({ getProviders, providers, history }) => {
   const { getTextIn } = useLanguage()
   const [semesterStart, setSemesterStart] = useState(null)
   const [semesterEnd, setSemesterEnd] = useState(null)
-  const [display, setDisplay] = useState(false)
   // awful variable name but for some reason we need providers for props and state :kuolemakiitos:
   const [provs, setProviders] = useState([])
   const { rights, isAdmin } = useGetAuthorizedUserQuery()
+  const [getTeacherStatistics, { data: teacherData, isFetching, isLoading }] = useLazyGetTeacherStatisticsQuery()
 
   const { data: semesterData } = useGetSemestersQuery()
 
@@ -80,10 +81,16 @@ const TeacherStatistics = ({ getProviders, getTeacherStatistics, providers, stat
     setProviders(value)
   }
 
-  const handleSubmit = async () => {
-    await getTeacherStatistics(semesterStart, semesterEnd, provs)
-    setDisplay(true)
-  }
+  const teacherStats = teacherData
+    ? Object.values(teacherData).map(teacher => ({
+        id: teacher.id,
+        name: teacher.name,
+        credits: teacher.stats.credits,
+        passed: teacher.stats.passed,
+        failed: teacher.stats.failed,
+        transferred: teacher.stats.transferred,
+      }))
+    : []
 
   const userProviders = mapToProviders(rights)
   const invalidQueryParams = provs.length === 0 || !semesterStart
@@ -108,7 +115,7 @@ const TeacherStatistics = ({ getProviders, getTeacherStatistics, providers, stat
               and between the given semesters for one of the given course providers."
       />
       <Segment>
-        <Form loading={pending}>
+        <Form loading={isLoading || isFetching}>
           <Form.Group widths="equal">
             <Form.Dropdown
               name="semesterStart"
@@ -152,12 +159,17 @@ const TeacherStatistics = ({ getProviders, getTeacherStatistics, providers, stat
               data-cy="course-providers"
             />
           </Form.Field>
-          <Button fluid content="Search" onClick={handleSubmit} disabled={invalidQueryParams} />
+          <Button
+            fluid
+            content="Search"
+            onClick={() => getTeacherStatistics({ semesterStart, semesterEnd, providers: provs })}
+            disabled={invalidQueryParams}
+          />
         </Form>
       </Segment>
-      {display && !pending && (
+      {teacherStats.length > 0 && (
         <Segment>
-          <TeacherStatisticsTable statistics={statistics} onClickFn={id => history.push(`/teachers/${id}`)} />
+          <TeacherStatisticsTable statistics={teacherStats} onClickFn={id => history.push(`/teachers/${id}`)} />
         </Segment>
       )}
     </div>
@@ -165,25 +177,11 @@ const TeacherStatistics = ({ getProviders, getTeacherStatistics, providers, stat
 }
 
 const mapStateToProps = state => {
-  const { providers, teacherStatistics } = state
+  const { providers } = state
   const providerOptions = providers.data.map(prov => ({ key: prov.code, value: prov.code, name: prov.name }))
-  const statistics = Object.values(teacherStatistics.data).map(teacher => ({
-    id: teacher.id,
-    name: teacher.name,
-    credits: teacher.stats.credits,
-    passed: teacher.stats.passed,
-    failed: teacher.stats.failed,
-    transferred: teacher.stats.transferred,
-  }))
   return {
     providers: providerOptions,
-    statistics,
-    pending: teacherStatistics.pending,
-    error: teacherStatistics.error,
   }
 }
 
-export default connect(mapStateToProps, {
-  getProviders,
-  getTeacherStatistics,
-})(withRouter(TeacherStatistics))
+export default connect(mapStateToProps, { getProviders })(withRouter(TeacherStatistics))

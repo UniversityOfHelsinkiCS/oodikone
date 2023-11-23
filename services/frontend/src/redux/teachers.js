@@ -8,8 +8,14 @@ const teachersApi = RTKApi.injectEndpoints({
     findTeachers: builder.query({
       query: ({ searchString }) => `/teachers/?searchTerm=${searchString}`,
     }),
+    getTeacherStatistics: builder.query({
+      query: ({ semesterStart, semesterEnd, providers }) =>
+        `/teachers/stats?${providers
+          .map(provider => `providers[]=${provider}`)
+          .join('&')}&semesterStart=${semesterStart}&semesterEnd=${semesterEnd}`,
+    }),
   }),
   overrideExisting: false,
 })
 
-export const { useGetTeacherQuery, useFindTeachersQuery } = teachersApi
+export const { useGetTeacherQuery, useFindTeachersQuery, useLazyGetTeacherStatisticsQuery } = teachersApi
