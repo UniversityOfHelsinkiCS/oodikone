@@ -5,7 +5,7 @@ import { useGetAuthorizedUserQuery } from 'redux/auth'
 import TeacherSearchTab from './TeacherSearchTab'
 import { TeacherPage } from './TeacherPage'
 import TeacherStatistics from './TeacherStatistics'
-import TeacherLeaderBoard from './TeacherLeaderBoard'
+import { TeacherLeaderBoard } from './TeacherLeaderBoard'
 import { useTabs, useTitle } from '../../common/hooks'
 
 const pane = (title, Content, icon) => ({

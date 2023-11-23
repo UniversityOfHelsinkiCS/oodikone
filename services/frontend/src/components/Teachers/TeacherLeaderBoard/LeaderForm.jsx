@@ -1,8 +1,6 @@
 import React, { useEffect } from 'react'
 import { Segment, Form } from 'semantic-ui-react'
-import { connect } from 'react-redux'
 import { func, arrayOf, shape, string, any, number } from 'prop-types'
-import { getTopTeachers } from '../../../redux/teachersTop'
 
 const currentYear = () => {
   const now = new Date()
@@ -11,7 +9,7 @@ const currentYear = () => {
   return now.getMonth() > 7 ? year : year - 1
 }
 
-const LeaderForm = ({
+export const LeaderForm = ({
   selectedyear,
   selectedcategory,
   handleCategoryChange,
@@ -73,7 +71,5 @@ LeaderForm.propTypes = {
   handleCategoryChange: func.isRequired,
   handleYearChange: func.isRequired,
   selectedcategory: string, // eslint-disable-line
-  selectedyear: number // eslint-disable-line
+  selectedyear: number, // eslint-disable-line
 }
-
-export default connect(null, { getTopTeachers })(LeaderForm)
