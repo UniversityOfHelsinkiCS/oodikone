@@ -196,7 +196,6 @@ const UserPage = ({
 }
 
 const mapStateToProps = state => ({
-  units: state.units.data,
   faculties: state.faculties.data,
   associations: state.populationProgrammesUnfiltered.data,
   pending: !!state.populationProgrammesUnfiltered.pending,

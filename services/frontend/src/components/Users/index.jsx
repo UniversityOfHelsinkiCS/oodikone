@@ -4,7 +4,6 @@ import { useHistory, useParams } from 'react-router-dom'
 import { Radio, Icon, Header, Segment, Loader, Popup } from 'semantic-ui-react'
 
 import { getUsers } from 'redux/users'
-import { getUnits } from 'redux/units'
 import UserPageNew from './UserPage'
 import UserSearchList from './UserSearchList'
 import { useToggle, useTitle } from '../../common/hooks'
@@ -16,12 +15,10 @@ const Users = () => {
   const [enabledOnly, toggleEnabledOnly] = useToggle(true)
   const [popupTimeout, setPopupTimeout] = useState(null)
   const [popupOpen, setPopupOpen] = useState(false)
-  const { data: units } = useSelector(({ units }) => units)
   const { data: users, pending } = useSelector(({ users }) => users)
   const { userid } = useParams()
 
   useEffect(() => {
-    if (units.length === 0) dispatch(getUnits())
     if (users.length === 0) dispatch(getUsers())
 
     return () => {
@@ -43,7 +40,7 @@ const Users = () => {
 
   const renderUserPage = userid => {
     const user = users.find(u => u.id === userid)
-    return !user ? <Loader active /> : <UserPageNew userid={userid} user={user} goBack={openUsersPage} />
+    return !user ? <Loader active /> : <UserPageNew user={user} goBack={openUsersPage} />
   }
 
   const handlePopupOpen = () => {
