@@ -10,7 +10,6 @@ import populationProgrammes from './populationProgrammes'
 import populationProgrammesUnfiltered from './populationProgrammesUnfiltered'
 import faculties from './faculties'
 import units from './units'
-import elementdetails from './elementdetails'
 import students from './students'
 import settings from './settings'
 import teachers from './teachers'
@@ -50,7 +49,6 @@ const store = configureStore({
     courseStats,
     courseSummaryForm,
     accessGroups,
-    elementdetails,
     tags,
     tagstudent,
     singleCourseStats,

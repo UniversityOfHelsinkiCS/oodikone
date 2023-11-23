@@ -3,28 +3,27 @@ import { Button, Card, Divider, List, Icon, Popup, Dropdown, Header } from 'sema
 import { connect } from 'react-redux'
 import { sortBy } from 'lodash'
 import { withRouter } from 'react-router-dom'
+
 import { useGetAuthorizedUserQuery, useShowAsUser } from 'redux/auth'
+import { useGetAllElementDetailsQuery } from 'redux/elementdetails'
+import { removeUserUnits, setFaculties } from 'redux/users'
+import { getAccessGroups } from 'redux/accessGroups'
+import { getFaculties } from 'redux/faculties'
+import { getProgrammesUnfiltered } from 'redux/populationProgrammesUnfiltered'
 import { textAndDescriptionSearch } from '../../common'
-import { removeUserUnits, setFaculties } from '../../redux/users'
-import { getAccessGroups } from '../../redux/accessGroups'
-import { getFaculties } from '../../redux/faculties'
-import { getProgrammesUnfiltered } from '../../redux/populationProgrammesUnfiltered'
 import AccessRights from './AccessRights'
 import AccessGroups from './AccessGroups'
 import EmailNotification from './EmailNotification'
-import { getElementDetails } from '../../redux/elementdetails'
 import useLanguage from '../LanguagePicker/useLanguage'
 
 const UserPage = ({
   user,
-  elementdetails,
   accessGroups,
   faculties,
   setFaculties,
   goBack,
   associations,
   pending,
-  getElementDetails,
   removeUserUnits,
   getAccessGroups,
   getFaculties,
@@ -33,9 +32,9 @@ const UserPage = ({
   const { getTextIn } = useLanguage()
   const { userId: currentUserId, isAdmin } = useGetAuthorizedUserQuery()
   const showAsUser = useShowAsUser()
+  const { data: elementdetails = [] } = useGetAllElementDetailsQuery()
 
   useEffect(() => {
-    if (elementdetails.length === 0) getElementDetails()
     if (accessGroups.data.length === 0) getAccessGroups()
     if (faculties.length === 0) getFaculties()
     if (Object.keys(associations).length === 0 && !pending) {
@@ -201,7 +200,6 @@ const mapStateToProps = state => ({
   faculties: state.faculties.data,
   associations: state.populationProgrammesUnfiltered.data,
   pending: !!state.populationProgrammesUnfiltered.pending,
-  elementdetails: state.elementdetails.data,
   accessGroups: state.accessGroups,
 })
 
@@ -211,5 +209,4 @@ export default connect(mapStateToProps, {
   getProgrammesUnfiltered,
   getAccessGroups,
   getFaculties,
-  getElementDetails,
 })(withRouter(UserPage))
