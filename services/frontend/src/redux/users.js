@@ -1,4 +1,22 @@
-import { callController } from '../apiConnection'
+import { callController, RTKApi } from '../apiConnection'
+
+const usersApi = RTKApi.injectEndpoints({
+  endpoints: builder => ({
+    getUserAccessEmailPreview: builder.query({
+      query: () => '/users/email/preview',
+    }),
+    sendUserAccessEmail: builder.mutation({
+      query: ({ recipientAddress }) => ({
+        url: '/users/email',
+        method: 'POST',
+        body: { recipientAddress },
+      }),
+    }),
+  }),
+  overrideExisting: false,
+})
+
+export const { useGetUserAccessEmailPreviewQuery, useSendUserAccessEmailMutation } = usersApi
 
 export const getUsers = () => {
   const route = '/users'

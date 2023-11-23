@@ -1,7 +1,5 @@
-import React, { useEffect, Fragment } from 'react'
+import React from 'react'
 import { Label, Message, Segment } from 'semantic-ui-react'
-import { connect } from 'react-redux'
-import { getPreview } from '../../redux/userAccessEmail'
 
 const Light = ({ children }) => <span style={{ fontWeight: 'normal' }}>{children}</span>
 
@@ -32,50 +30,35 @@ const EmailHeader = ({ isLoading, subject, to }) => {
   )
 }
 
-const EmailPreview = ({ userEmail, isLoading, error, subject, html, onPreviewRequested }) => {
-  useEffect(() => {
-    onPreviewRequested()
-  }, [])
+export const EmailPreview = ({ userEmailAddress, email, isLoading, isError }) => {
+  if (isLoading) {
+    return (
+      <Segment.Group>
+        <EmailHeader isLoading />
+        <Segment placeholder loading height="200px" style={{ background: '#f7f7f7' }} />
+      </Segment.Group>
+    )
+  }
+
+  if (isError) {
+    return <Message error header="Could not get email preview" />
+  }
 
   return (
     <Segment.Group>
-      <EmailHeader isLoading={isLoading} subject={subject} to={userEmail} />
-      <Segment
-        placeholder={isLoading}
-        loading={isLoading}
-        height={isLoading ? '200px' : undefined}
-        style={{ background: '#f7f7f7' }}
-      >
-        {error && <Message error header="Could not get email preview" list={[error]} />}
-        {!isLoading && !error && (
-          <iframe
-            sandbox=""
-            referrerPolicy="no-referrer"
-            height="200px"
-            width="100%"
-            style={{ border: 'none' }}
-            title="User access email preview"
-            srcDoc={html}
-            src={`data:text/html;base64,${btoa(html)}`}
-          />
-        )}
+      <EmailHeader isLoading={false} subject={email.subject} to={userEmailAddress} />
+      <Segment style={{ background: '#f7f7f7' }}>
+        <iframe
+          sandbox=""
+          referrerPolicy="no-referrer"
+          height="200px"
+          width="100%"
+          style={{ border: 'none' }}
+          title="User access email preview"
+          srcDoc={email.html}
+          src={`data:text/html;base64,${btoa(email.html)}`}
+        />
       </Segment>
     </Segment.Group>
   )
 }
-
-const mapStateToProps = ({ userAccessEmail: { preview } }) => {
-  const { pending, error, data } = preview
-  return {
-    isLoading: pending,
-    error,
-    subject: data && data.subject,
-    html: data && data.html,
-  }
-}
-
-const mapDispatchToProps = {
-  onPreviewRequested: getPreview,
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(EmailPreview)

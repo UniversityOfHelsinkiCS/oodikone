@@ -24,7 +24,6 @@ import accessGroups from './accessGroups'
 import tags from './tags'
 import tagstudent from './tagstudent'
 import singleCourseStats from './singleCourseStats'
-import userAccessEmail from './userAccessEmail'
 import coolDataScience from './coolDataScience'
 import filters from './filters'
 
@@ -52,7 +51,6 @@ const store = configureStore({
     tags,
     tagstudent,
     singleCourseStats,
-    userAccessEmail,
     coolDataScience,
     [RTKApi.reducerPath]: RTKApi.reducer,
     [curriculumsApi.reducerPath]: curriculumsApi.reducer,
