@@ -73,11 +73,11 @@ export const calculateTotals = (courses, semesters, faculties) => {
   return { cellStats: {}, code: 'TOTAL', name: { en: 'All courses total' }, bySemesters: totalRow, facultiesTotal }
 }
 
-export const getColor = (row, stats, columnAmount, colorMode, numberMode, allTotal) => {
+export const getColor = (stats, columnAmount, colorMode, numberMode, courseTotal, allTotal) => {
   if (colorMode === 'none' || allTotal === 0) return {}
   if (!stats) return {}
   const value = stats[numberMode]
-  const totalValue = colorMode === 'course' ? stats[numberMode] : allTotal
+  const totalValue = colorMode === 'course' ? courseTotal : allTotal
   if (value === 0) return {}
 
   const relativeValue = (() => {
@@ -86,8 +86,9 @@ export const getColor = (row, stats, columnAmount, colorMode, numberMode, allTot
     return value / (totalValue / columnAmount / 8)
   })()
   const divisor = colorMode === 'course' ? 6 : 2
-
+  const color = ['completions', 'enrollments'].includes(numberMode) ? `0,170,0` : `220,60,60`
+  const modifier = ['completions', 'enrollments'].includes(numberMode) ? 0 : 0.3
   return {
-    backgroundColor: `rgba(0,170,0,${relativeValue / divisor})`,
+    backgroundColor: `rgba(${color},${relativeValue / divisor + modifier})`,
   }
 }

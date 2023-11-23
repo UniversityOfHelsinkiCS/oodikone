@@ -9,8 +9,8 @@ export const NumberModeSelector = () => {
   const { numberMode, setNumberMode } = useLanguageCenterContext()
   const modes = [
     { value: 'completions', label: 'Completions' },
-    { value: 'enrollments', label: 'Enrollments' },
-    { value: 'difference', label: 'Enrollments exceeding completions' },
+    { value: 'enrollments', label: 'Accepted enrollments' },
+    { value: 'difference', label: 'Accepted enrollments exceeding completions' },
     { value: 'rejected', label: 'Rejected enrollments' },
   ]
 

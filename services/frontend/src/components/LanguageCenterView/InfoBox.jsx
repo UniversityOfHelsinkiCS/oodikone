@@ -17,8 +17,8 @@ export const InfoBox = () => {
               <li>Completions: Amount of passed completions of a course</li>
               <li>Enrollments: Amount of accepted enrollments on a course</li>
               <li>
-                Enrollments exceeding completions: For every course per semester, the amount of enrollments that
-                exceeded the amount of completions.
+                Enrollments exceeding completions: For every course per semester, the amount of accepted enrollments
+                that exceeded the amount of completions.
               </li>
               <li>Rejected: Amount of rejected enrollments on a course</li>
             </ul>
