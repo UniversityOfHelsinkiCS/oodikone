@@ -12,7 +12,6 @@ import faculties from './faculties'
 import students from './students'
 import settings from './settings'
 import providers from './providers'
-import teacherStatistics from './teacherStatistics'
 import teachersTop from './teachersTop'
 import teachersTopCategories from './teachersTopCategories'
 import courseSearch from './coursesearch'
@@ -37,7 +36,6 @@ const store = configureStore({
     students,
     settings,
     providers,
-    teacherStatistics,
     teachersTop,
     teachersTopCategories,
     courseSearch,
