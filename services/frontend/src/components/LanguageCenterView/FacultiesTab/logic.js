@@ -1,6 +1,6 @@
-import { courseNameColumn, emptyFields } from '../common'
+import { courseNameColumn, getColor } from '../common'
 
-export const getColumns = (getTextIn, faculties, numberMode, facultyMap) => {
+export const getColumns = (getTextIn, faculties, numberMode, colorMode, facultyMap, allTotal) => {
   const getFacultyTitle = code => {
     if (!code) return 'No faculty' // Shouldn't happen
     if (code === 'OPEN') return 'Open\nuni'
@@ -15,7 +15,13 @@ export const getColumns = (getTextIn, faculties, numberMode, facultyMap) => {
   const totalColumn = {
     key: 'total-column',
     title: 'Total',
-    cellProps: row => getTooltip(row.bySemesters.facultiesTotal),
+    cellProps: row => ({
+      style:
+        colorMode === 'course'
+          ? {}
+          : getColor(row, row.bySemesters.facultiesTotal, faculties.length, colorMode, numberMode, allTotal),
+      ...getTooltip(row.bySemesters.facultiesTotal),
+    }),
     getRowVal: row => row.bySemesters.facultiesTotal[numberMode],
     forceToolsMode: 'floating',
     filterType: 'range',
@@ -27,7 +33,10 @@ export const getColumns = (getTextIn, faculties, numberMode, facultyMap) => {
       key: facultyCode ?? 'no-faculty',
       title: getFacultyTitle(facultyCode),
       headerProps: { title: getTextIn(facultyMap[facultyCode]) },
-      cellProps: row => getTooltip(row.bySemesters.cellStats[facultyCode]),
+      cellProps: row => ({
+        style: getColor(row, row.bySemesters.cellStats[facultyCode], faculties.length, colorMode, numberMode, allTotal),
+        ...getTooltip(row.bySemesters.cellStats[facultyCode]),
+      }),
       getRowVal: row => {
         const stats = row.bySemesters.cellStats[facultyCode]
         return stats[numberMode]
@@ -38,39 +47,4 @@ export const getColumns = (getTextIn, faculties, numberMode, facultyMap) => {
     totalColumn,
   ]
   return columns
-}
-
-export const calculateTotals = (courses, faculties, semesters) => {
-  const facultiesTotal = { ...emptyFields }
-  const totalRow = { cellStats: {} }
-  semesters.forEach(sem => {
-    totalRow[sem] = { ...emptyFields }
-    courses.forEach(course => {
-      const stats = course.bySemesters[sem]
-      if (!stats) return
-
-      totalRow[sem].completions += stats.completions
-      totalRow[sem].enrollments += stats.enrollments
-      totalRow[sem].rejected += stats.rejected
-      totalRow[sem].difference += stats.difference ?? 0
-      facultiesTotal.completions += stats.completions
-      facultiesTotal.enrollments += stats.enrollments
-      facultiesTotal.rejected += stats.rejected
-      facultiesTotal.difference += stats.difference ?? 0
-    })
-
-    faculties.forEach(fac => {
-      totalRow[sem][fac] = { ...emptyFields }
-      courses.forEach(course => {
-        const stats = course.bySemesters[sem]?.[fac]
-        if (!stats) return
-        totalRow[sem][fac].completions += stats.completions
-        totalRow[sem][fac].enrollments += stats.enrollments
-        totalRow[sem][fac].rejected += stats.rejected
-        totalRow[sem][fac].difference += stats.difference ?? 0
-      })
-    })
-  })
-
-  return { cellStats: {}, code: 'TOTAL', name: { en: 'All courses total' }, bySemesters: totalRow, facultiesTotal }
 }

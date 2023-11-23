@@ -1,30 +1,16 @@
 /* eslint-disable import/prefer-default-export */
-import React, { useEffect, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import SortableTable, { row } from 'components/SortableTable'
 import useLanguage from 'components/LanguagePicker/useLanguage'
-import { calculateTotals, getColumns } from './logic'
-import { useLanguageCenterContext } from '../common'
+import { getColumns } from './logic'
+import { useLanguageCenterContext, calculateTotals } from '../common'
 import '../index.css'
 import { ColorModeSelector, NumberModeSelector, SemesterRangeSelector } from '../selectorComponents'
 
 export const SemestersTab = () => {
   const { getTextIn } = useLanguage()
-  const {
-    setSemesterFilter,
-    semesterFilter,
-    semesters,
-    numberMode,
-    colorMode,
-    selectedSemesters,
-    setNumberMode,
-    data,
-  } = useLanguageCenterContext()
-
-  useEffect(() => {
-    if (!['completions', 'enrollments'].includes(numberMode)) {
-      setNumberMode('completions')
-    }
-  }, [])
+  const { setSemesterFilter, semesterFilter, semesters, numberMode, colorMode, selectedSemesters, data } =
+    useLanguageCenterContext()
 
   const totalRow = useMemo(() => {
     if (!data) return null
@@ -32,8 +18,8 @@ export const SemestersTab = () => {
     return row(totals, { ignoreSorting: true, ignoreFilters: true })
   }, [data, selectedSemesters])
 
-  if (!semesters) return null
   const tableData = [totalRow, ...data.tableData]
+
   return (
     <div>
       <div className="options-container">

@@ -3,19 +3,19 @@ import useLanguage from 'components/LanguagePicker/useLanguage'
 import SortableTable, { row } from 'components/SortableTable'
 import React, { useMemo } from 'react'
 import _ from 'lodash'
-import { calculateTotals, getColumns } from './logic'
-import { useLanguageCenterContext, emptyFields } from '../common'
-import { NumberModeSelector, SemesterRangeSelector } from '../selectorComponents'
+import { getColumns } from './logic'
+import { calculateTotals, useLanguageCenterContext, emptyFields } from '../common'
+import { ColorModeSelector, NumberModeSelector, SemesterRangeSelector } from '../selectorComponents'
 import '../index.css'
 
 export const FacultiesTab = () => {
-  const { numberMode, semesterFilter, setSemesterFilter, selectedSemesters, data, facultyMap } =
+  const { numberMode, colorMode, semesterFilter, setSemesterFilter, selectedSemesters, data, facultyMap } =
     useLanguageCenterContext()
 
   const { getTextIn } = useLanguage()
 
   const totalRow = useMemo(() => {
-    const totals = calculateTotals(data.tableData, data.faculties, selectedSemesters)
+    const totals = calculateTotals(data.tableData, selectedSemesters, data.faculties)
     return row(totals, { ignoreFilters: true, ignoreSorting: true })
   }, [data, facultyMap])
 
@@ -35,6 +35,7 @@ export const FacultiesTab = () => {
           facultiesTotal.completions += stats.completions
           facultiesTotal.enrollments += stats.enrollments
           facultiesTotal.rejected += stats.rejected
+          facultiesTotal.difference += stats.difference
         })
         facultiesTotal.difference += course.bySemesters[semestercode]?.difference ?? 0
       })
@@ -48,12 +49,21 @@ export const FacultiesTab = () => {
     <div>
       <div className="options-container">
         <SemesterRangeSelector setSemesterFilter={setSemesterFilter} semesterFilter={semesterFilter} />
-        <NumberModeSelector enableDifference />
+        <NumberModeSelector />
+        <ColorModeSelector />
       </div>
       <SortableTable
-        columns={getColumns(getTextIn, [...data.faculties].sort(), numberMode, facultyMap)}
+        columns={getColumns(
+          getTextIn,
+          [...data.faculties].sort(),
+          numberMode,
+          colorMode,
+          facultyMap,
+          totalRow.bySemesters[numberMode]
+        )}
         data={tableData}
         stretch
+        striped={colorMode === 'none'}
       />
     </div>
   )
