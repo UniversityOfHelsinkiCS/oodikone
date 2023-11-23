@@ -9,7 +9,7 @@ export const getColumns = (getTextIn, faculties, numberMode, colorMode, facultyM
   }
 
   const getTooltip = stats => ({
-    title: `Completions: ${stats.completions}\nEnrollments: ${stats.enrollments}\nDifference: ${stats.difference}`,
+    title: `Completions: ${stats.completions}\nAccepted enrollments: ${stats.enrollments}\nExceeding: ${stats.difference}\nRejected: ${stats.rejected}`,
   })
 
   const totalColumn = {
@@ -19,7 +19,7 @@ export const getColumns = (getTextIn, faculties, numberMode, colorMode, facultyM
       style:
         colorMode === 'course'
           ? {}
-          : getColor(row, row.bySemesters.facultiesTotal, faculties.length, colorMode, numberMode, allTotal),
+          : getColor(row.bySemesters.facultiesTotal, faculties.length, colorMode, numberMode, null, allTotal),
       ...getTooltip(row.bySemesters.facultiesTotal),
     }),
     getRowVal: row => row.bySemesters.facultiesTotal[numberMode],
@@ -34,7 +34,14 @@ export const getColumns = (getTextIn, faculties, numberMode, colorMode, facultyM
       title: getFacultyTitle(facultyCode),
       headerProps: { title: getTextIn(facultyMap[facultyCode]) },
       cellProps: row => ({
-        style: getColor(row, row.bySemesters.cellStats[facultyCode], faculties.length, colorMode, numberMode, allTotal),
+        style: getColor(
+          row.bySemesters.cellStats[facultyCode],
+          faculties.length,
+          colorMode,
+          numberMode,
+          row.bySemesters.facultiesTotal[numberMode],
+          allTotal
+        ),
         ...getTooltip(row.bySemesters.cellStats[facultyCode]),
       }),
       getRowVal: row => {
