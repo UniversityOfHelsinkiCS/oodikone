@@ -14,16 +14,17 @@ export const InfoBox = () => {
               <b>Show number of:</b>
             </li>
             <ul>
-              <li>Completions: Amount of passed completions of course</li>
-              <li>Enrollments: Amount of accepted enrollments on course</li>
+              <li>Completions: Amount of passed completions of a course</li>
+              <li>Enrollments: Amount of accepted enrollments on a course</li>
               <li>
                 Enrollments exceeding completions: For every course per semester, the amount of enrollments that
                 exceeded the amount of completions.
               </li>
+              <li>Rejected: Amount of rejected enrollments on a course</li>
             </ul>
             <li>
-              <b>Coloring mode: </b>Only available in "by semesters" -tab. Change this to compare a course's popularity
-              to other courses, or to its own average in time.
+              <b>Coloring mode: </b>Change this to compare a course's popularity to other courses, or to its own average
+              in time.
             </li>
           </ul>
           <p>Tips:</p>

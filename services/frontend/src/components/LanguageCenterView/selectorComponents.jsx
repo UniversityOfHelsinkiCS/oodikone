@@ -5,14 +5,14 @@ import { Dropdown, Radio } from 'semantic-ui-react'
 import { useLanguageCenterContext } from './common'
 import './index.css'
 
-export const NumberModeSelector = ({ enableDifference }) => {
+export const NumberModeSelector = () => {
   const { numberMode, setNumberMode } = useLanguageCenterContext()
   const modes = [
     { value: 'completions', label: 'Completions' },
     { value: 'enrollments', label: 'Enrollments' },
+    { value: 'difference', label: 'Enrollments exceeding completions' },
     { value: 'rejected', label: 'Rejected enrollments' },
   ]
-  if (enableDifference) modes.push({ value: 'difference', label: 'Enrollments exceeding completions' })
 
   return (
     <div className="selector-container">
