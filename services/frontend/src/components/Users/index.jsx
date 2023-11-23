@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useHistory, useParams } from 'react-router-dom'
 import { Radio, Icon, Header, Segment, Loader, Popup } from 'semantic-ui-react'
-import { getUsers } from '../../redux/users'
-import { getUnits } from '../../redux/units'
-import { getElementDetails } from '../../redux/elementdetails'
+
+import { getUsers } from 'redux/users'
+import { getUnits } from 'redux/units'
 import UserPageNew from './UserPage'
 import UserSearchList from './UserSearchList'
 import { useToggle, useTitle } from '../../common/hooks'
@@ -17,12 +17,10 @@ const Users = () => {
   const [popupTimeout, setPopupTimeout] = useState(null)
   const [popupOpen, setPopupOpen] = useState(false)
   const { data: units } = useSelector(({ units }) => units)
-  const { data: elementdetails } = useSelector(({ elementdetails }) => elementdetails)
   const { data: users, pending } = useSelector(({ users }) => users)
   const { userid } = useParams()
 
   useEffect(() => {
-    if (elementdetails.length === 0) dispatch(getElementDetails())
     if (units.length === 0) dispatch(getUnits())
     if (users.length === 0) dispatch(getUsers())
 
@@ -78,7 +76,7 @@ const Users = () => {
       />
       <Segment loading={isLoading} className="contentSegment">
         {!userid ? (
-          <UserSearchList enabledOnly={enabledOnly} users={sortedUsers} error={error} elementdetails={elementdetails} />
+          <UserSearchList enabledOnly={enabledOnly} users={sortedUsers} error={error} />
         ) : (
           renderUserPage(userid)
         )}

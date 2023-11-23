@@ -1,41 +1,7 @@
 import { RTKApi } from 'apiConnection'
 import { getUnifiedProgrammeName } from 'common'
 import useLanguage from 'components/LanguagePicker/useLanguage'
-import { callController } from '../apiConnection'
 
-// original elementdetail stuff
-export const getElementDetails = () => {
-  const route = '/elementdetails/all'
-  const prefix = 'GET_ELEMENTDETAILS_'
-  return callController(route, prefix)
-}
-
-const reducer = (state = { data: [] }, action) => {
-  switch (action.type) {
-    case 'GET_ELEMENTDETAILS_ATTEMPT':
-      return {
-        ...state,
-        pending: true,
-        error: false,
-      }
-    case 'GET_ELEMENTDETAILS_FAILURE':
-      return {
-        pending: false,
-        error: true,
-        data: [],
-      }
-    case 'GET_ELEMENTDETAILS_SUCCESS':
-      return {
-        pending: false,
-        error: false,
-        data: action.response,
-      }
-    default:
-      return state
-  }
-}
-
-// RTK query based stuff
 const elementDetailsApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
     getAllElementDetails: builder.query({
@@ -50,7 +16,7 @@ const elementDetailsApi = RTKApi.injectEndpoints({
   overrideExisting: false,
 })
 
-const { useGetAllElementDetailsQuery } = elementDetailsApi
+export const { useGetAllElementDetailsQuery } = elementDetailsApi
 
 // Returns only newest studyprogrammes and formats them to be used in semantic ui dropdowns
 export const useFilteredAndFormattedElementDetails = () => {
@@ -92,5 +58,3 @@ export const useFilteredAndFormattedElementDetails = () => {
 
   return [...filteredAndFormatted, ...combinedOptions]
 }
-
-export default reducer
