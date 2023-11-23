@@ -3,7 +3,7 @@ import { Header, Segment, Tab } from 'semantic-ui-react'
 import { useHistory, useParams } from 'react-router-dom'
 import { useGetAuthorizedUserQuery } from 'redux/auth'
 import TeacherSearchTab from './TeacherSearchTab'
-import TeacherPage from './TeacherPage'
+import { TeacherPage } from './TeacherPage'
 import TeacherStatistics from './TeacherStatistics'
 import TeacherLeaderBoard from './TeacherLeaderBoard'
 import { useTabs, useTitle } from '../../common/hooks'
@@ -46,7 +46,7 @@ const Teachers = () => {
     <div className="segmentContainer">
       <Header className="segmentTitle" size="large" content="Teacher statistics" />
       <Segment className="contentSegment">
-        {teacherid ? <TeacherPage teacherid={teacherid} /> : <TeachersTabs />}
+        {teacherid ? <TeacherPage teacherId={teacherid} /> : <TeachersTabs />}
       </Segment>
     </div>
   )

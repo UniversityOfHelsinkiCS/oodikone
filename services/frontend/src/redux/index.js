@@ -11,7 +11,6 @@ import populationProgrammesUnfiltered from './populationProgrammesUnfiltered'
 import faculties from './faculties'
 import students from './students'
 import settings from './settings'
-import teachers from './teachers'
 import providers from './providers'
 import teacherStatistics from './teacherStatistics'
 import teachersTop from './teachersTop'
@@ -37,7 +36,6 @@ const store = configureStore({
     faculties,
     students,
     settings,
-    teachers,
     providers,
     teacherStatistics,
     teachersTop,
