@@ -1,54 +1,27 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import { Search, Segment, Icon } from 'semantic-ui-react'
-import { func, arrayOf, object, string } from 'prop-types'
-import { withRouter } from 'react-router-dom'
-import { connect } from 'react-redux'
+
 import './teacherSearch.css'
-import { validateInputLength, splitByEmptySpace } from '../../../common/index'
-import Timeout from '../../Timeout'
-import { findTeachers } from '../../../redux/teachers'
+import { useFindTeachersQuery } from 'redux/teachers'
+import { validateInputLength, splitByEmptySpace } from 'common'
+import { useDebounce } from 'common/hooks'
 import SortableTable from '../../SortableTable'
 
-const TeacherSearch = ({ icon, teachers, onClick, setTimeout, clearTimeout, findTeachers }) => {
+export const TeacherSearch = ({ onClick }) => {
   const [searchterm, setSearchterm] = useState('')
-  const [displayResults, setDisplayResults] = useState(false)
+  const [teachers, setTeachers] = useState([])
+  const [debouncedSearchTerm, setDebouncedSearchTerm, , dirty] = useDebounce(searchterm, 500, () => null)
+  const { data, isLoading, isFetching } = useFindTeachersQuery(
+    { searchString: splitByEmptySpace(debouncedSearchTerm.trim()).find(t => validateInputLength(t, 4)) },
+    { skip: !splitByEmptySpace(debouncedSearchTerm.trim()).find(t => validateInputLength(t, 4)) || dirty }
+  )
 
-  const resetComponent = () => {
-    setSearchterm('')
-    setDisplayResults(false)
-  }
+  useEffect(() => setTeachers(data || []), [data])
 
-  const fetchTeachers = searchterm => {
-    const trimmedSearchterm = searchterm.trim()
-    if (
-      !splitByEmptySpace(trimmedSearchterm).find(t => validateInputLength(t, 4)) ||
-      (Number(trimmedSearchterm) && trimmedSearchterm.length < 6)
-    ) {
-      return
-    }
-    // eslint-disable-next-line no-implied-eval
-    setTimeout('fetch', () => {}, 250)
-    findTeachers(trimmedSearchterm).then(() => {
-      setDisplayResults(true)
-      clearTimeout('fetch')
-    })
-  }
-
-  const handleSearchChange = (e, { value }) => {
-    clearTimeout('search')
-    if (value.length > 0) {
-      setSearchterm(value)
-      // eslint-disable-next-line no-implied-eval
-      setTimeout(
-        'search',
-        () => {
-          fetchTeachers(value)
-        },
-        250
-      )
-    } else {
-      resetComponent()
-    }
+  const handleSearchChange = e => {
+    setSearchterm(e.target.value)
+    setDebouncedSearchTerm(e.target.value)
+    if (e.target.value.length === 0) setTeachers([])
   }
 
   const columns = useMemo(
@@ -68,7 +41,7 @@ const TeacherSearch = ({ icon, teachers, onClick, setTimeout, clearTimeout, find
           },
           {
             key: 'icon',
-            getRowContent: () => <Icon name={icon} />,
+            getRowContent: () => <Icon name="level up alternate" />,
             export: false,
             cellProps: row => ({
               onClick: () => onClick(row),
@@ -80,45 +53,25 @@ const TeacherSearch = ({ icon, teachers, onClick, setTimeout, clearTimeout, find
     [onClick]
   )
 
+  const getContent = () => {
+    if (dirty || isLoading || isFetching) return <Icon loading size="huge" name="spinner" />
+
+    if (teachers.length === 0) return <div>No teachers matched your search</div>
+
+    return <SortableTable defaultSort={['name', 'desc']} hideHeaderBar columns={columns} data={teachers} />
+  }
+
   return (
-    <div>
-      <div className="searchContainer">
-        <Search
-          className="searchInput"
-          input={{ fluid: true }}
-          placeholder="Search by entering a username, id or name"
-          value={searchterm}
-          onSearchChange={handleSearchChange}
-          showNoResults={false}
-        />
-        {displayResults && (
-          <Segment className="contentSegment">
-            {teachers.length <= 0 ? (
-              <div>No teachers matched your search</div>
-            ) : (
-              <SortableTable defaultSort={['name', 'desc']} hideHeaderBar columns={columns} data={teachers} />
-            )}
-          </Segment>
-        )}
-      </div>
+    <div className="searchContainer">
+      <Search
+        className="searchInput"
+        input={{ fluid: true }}
+        placeholder="Search by entering a name or an id"
+        value={searchterm}
+        onSearchChange={handleSearchChange}
+        showNoResults={false}
+      />
+      <Segment className="contentSegment">{getContent()}</Segment>
     </div>
   )
 }
-
-TeacherSearch.propTypes = {
-  setTimeout: func.isRequired,
-  clearTimeout: func.isRequired,
-  teachers: arrayOf(object).isRequired,
-  findTeachers: func.isRequired,
-  onClick: func.isRequired,
-  icon: string.isRequired,
-}
-
-const mapStateToProps = ({ teachers }) => {
-  const { list } = teachers
-  return {
-    teachers: list,
-  }
-}
-
-export default withRouter(connect(mapStateToProps, { findTeachers })(Timeout(TeacherSearch)))
