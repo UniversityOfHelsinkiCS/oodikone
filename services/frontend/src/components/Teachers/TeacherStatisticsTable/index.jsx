@@ -1,21 +1,63 @@
-import React, { useCallback, useMemo } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useMemo } from 'react'
+import { Link, useHistory } from 'react-router-dom'
 import { Segment, Icon, Item } from 'semantic-ui-react'
-import { connect } from 'react-redux'
+
 import SortableTable from 'components/SortableTable'
-import { getCourseStats } from '../../../redux/coursestats'
 
-const calculatePassrate = (pass, fail) => (100 * pass) / (pass + fail)
-
-const TeacherStatisticsTable = ({ statistics, onClickFn, getCourseStats, unifyOpenUniCourses, renderLink }) => {
-  const fetchCourseStats = useCallback(
-    id => getCourseStats({ courseCodes: [id], separate: false, unifyOpenUniCourses }, null),
-    [unifyOpenUniCourses]
+const calculatePassrate = (pass, fail) =>
+  new Intl.NumberFormat(undefined, { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
+    pass / (pass + fail)
   )
 
-  const columns = useMemo(
-    () => [
-      {
+const createColumnWithTitle = title => ({
+  key: title,
+  title: title[0].toUpperCase() + title.slice(1),
+  getRowVal: row => row.name,
+})
+
+export const TeacherStatisticsTable = ({ statistics, variant }) => {
+  const history = useHistory()
+
+  const columns = [
+    {
+      key: 'credits',
+      title: 'Credits',
+      getRowVal: row => row.credits,
+    },
+    {
+      key: 'credits-transferred',
+      title: 'Credits transferred',
+      getRowVal: row => row.transferred,
+    },
+    {
+      key: 'passrate',
+      title: 'Passed',
+      getRowVal: row => row.passrate,
+    },
+  ]
+
+  switch (variant) {
+    case 'leaderboard':
+      columns.unshift({
+        key: 'name-and-link',
+        mergeHeader: true,
+        merge: true,
+        children: [
+          createColumnWithTitle('name'),
+          {
+            key: 'link',
+            getRowContent: row => (
+              <Item as={Link} to={`/teachers/${row.id}`} onClick={() => history.push(`/teachers/${row.id}`)}>
+                <Icon name="level up alternate" />
+              </Item>
+            ),
+          },
+        ],
+      })
+      break
+    case 'course':
+      columns.unshift(createColumnWithTitle('course name'))
+      columns.unshift({
         key: 'code-and-link',
         mergeHeader: true,
         merge: true,
@@ -24,50 +66,30 @@ const TeacherStatisticsTable = ({ statistics, onClickFn, getCourseStats, unifyOp
             key: 'code',
             title: 'Course code',
             getRowVal: row => row.id,
-            cellProps: row => ({
-              style: { cursor: 'pointer' },
-              onClick: () => onClickFn(row.id),
-            }),
           },
           {
             key: 'link',
-            getRowContent: row => {
-              if (!renderLink) return null
-              const query = `courseCodes=["${row.id}"]&separate=false&unifyOpenUniCourses=${unifyOpenUniCourses}`
-              return (
-                <Item as={Link} to={`/coursestatistics?${query}`} onClick={() => fetchCourseStats(row.id)}>
-                  <Icon name="level up alternate" />
-                </Item>
-              )
-            },
+            getRowContent: row => (
+              <Item
+                as={Link}
+                to={`/coursestatistics?combineSubstitutions=true&courseCodes=["${row.id}"]&separate=false`}
+              >
+                <Icon name="level up alternate" />
+              </Item>
+            ),
           },
         ],
-      },
-      {
-        key: 'name',
-        title: 'Course name',
-        getRowVal: row => row.name,
-      },
-      {
-        key: 'credits',
-        title: 'Credits',
-        getRowVal: row => row.credits,
-        formatValue: value => value.toFixed(2),
-      },
-      {
-        key: 'credits-transferred',
-        title: 'Credits Transferred',
-        getRowVal: row => row.transferred,
-      },
-      {
-        key: 'passrate',
-        title: 'Passed',
-        getRowVal: row => parseFloat(row.passrate),
-        formatValue: value => value.toFixed(2),
-      },
-    ],
-    [renderLink, unifyOpenUniCourses, fetchCourseStats]
-  )
+      })
+      break
+    case 'semester':
+      columns.unshift(createColumnWithTitle('semester'))
+      break
+    case 'year':
+      columns.unshift(createColumnWithTitle('year'))
+      break
+    default:
+      break
+  }
 
   const data = useMemo(
     () =>
@@ -81,15 +103,6 @@ const TeacherStatisticsTable = ({ statistics, onClickFn, getCourseStats, unifyOp
   return statistics.length === 0 ? (
     <Segment basic content="No statistics found for the given query." />
   ) : (
-    <>
-      <SortableTable title="Teacher statistics" columns={columns} data={data} />
-    </>
+    <SortableTable title="Teacher statistics" columns={columns} data={data} />
   )
 }
-
-const mapStateToProps = state => {
-  const { unifyOpenUniCourses } = state.courseSearch
-  return { unifyOpenUniCourses }
-}
-
-export default connect(mapStateToProps, { getCourseStats })(TeacherStatisticsTable)

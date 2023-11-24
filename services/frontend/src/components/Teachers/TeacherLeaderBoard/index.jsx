@@ -1,17 +1,15 @@
 import React, { useState } from 'react'
 import { Segment, Message } from 'semantic-ui-react'
-import { useHistory } from 'react-router-dom'
 import moment from 'moment'
 
 import { useGetTopTeachersCategoriesQuery, useLazyGetTopTeachersQuery } from 'redux/teachers'
-import TeacherStatisticsTable from '../TeacherStatisticsTable'
 import { LeaderForm } from './LeaderForm'
+import { TeacherStatisticsTable } from '../TeacherStatisticsTable'
 
 export const TeacherLeaderBoard = () => {
-  const history = useHistory()
   const [selectedYear, setSelectedYear] = useState(null)
   const [selectedCategory, setSelectedCategory] = useState(null)
-  const [getTopTeachers, { data: topTeachers }] = useLazyGetTopTeachersQuery()
+  const [getTopTeachers, { data: topTeachers = [] }] = useLazyGetTopTeachersQuery()
   const { data: yearsAndCategories, isLoading, isFetching } = useGetTopTeachersCategoriesQuery()
 
   const updateAndSubmitForm = args => {
@@ -75,13 +73,8 @@ export const TeacherLeaderBoard = () => {
         selectedyear={selectedYear}
       />
       <Segment>
-        <Message>{`Last updated: ${lastUpdated}`}</Message>
-        <TeacherStatisticsTable
-          statistics={topTeachers?.stats || []}
-          onClickFn={id => history.push(`/teachers/${id}`)}
-          unifyOpenUniCourses={false}
-          renderLink={false}
-        />
+        {topTeachers.length > 0 && <Message>{`Last updated: ${lastUpdated}`}</Message>}
+        <TeacherStatisticsTable statistics={topTeachers?.stats || []} variant="leaderboard" />
       </Segment>
     </div>
   )

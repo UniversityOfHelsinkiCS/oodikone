@@ -1,17 +1,15 @@
 import React, { useState } from 'react'
 import { Form, Segment, Dropdown, Button, Message } from 'semantic-ui-react'
 import moment from 'moment'
-import { useHistory } from 'react-router-dom/'
 
 import { useGetAuthorizedUserQuery } from 'redux/auth'
 import { useGetProvidersQuery } from 'redux/providers'
 import { useGetSemestersQuery } from 'redux/semesters'
 import { useLazyGetTeacherStatisticsQuery } from 'redux/teachers'
-import TeacherStatisticsTable from '../TeacherStatisticsTable'
-import useLanguage from '../../LanguagePicker/useLanguage'
+import useLanguage from 'components/LanguagePicker/useLanguage'
+import { TeacherStatisticsTable } from '../TeacherStatisticsTable'
 
 export const TeacherStatistics = () => {
-  const history = useHistory()
   const { getTextIn } = useLanguage()
   const [semesterStart, setSemesterStart] = useState(null)
   const [semesterEnd, setSemesterEnd] = useState(null)
@@ -19,7 +17,7 @@ export const TeacherStatistics = () => {
   const [provs, setProviders] = useState([])
   const { rights, isAdmin } = useGetAuthorizedUserQuery()
   const [getTeacherStatistics, { data: teacherData, isFetching, isLoading }] = useLazyGetTeacherStatisticsQuery()
-  const { data: providers } = useGetProvidersQuery()
+  const { data: providers = [] } = useGetProvidersQuery()
 
   const { data: semesterData } = useGetSemestersQuery()
 
@@ -92,8 +90,9 @@ export const TeacherStatistics = () => {
   const userProviders = mapToProviders(rights)
   const invalidQueryParams = provs.length === 0 || !semesterStart
   const providerOptions = isAdmin ? providers : providers.filter(p => userProviders.includes(p.value))
-  const localizedProviderOptions = providerOptions.map(({ name, ...rest }) => ({
-    ...rest,
+  const localizedProviderOptions = providerOptions.map(({ name, code }) => ({
+    key: code,
+    value: code,
     text: getTextIn(name),
   }))
   const filteredOptions = semesters.filter(sem => {
@@ -166,7 +165,7 @@ export const TeacherStatistics = () => {
       </Segment>
       {teacherStats.length > 0 && (
         <Segment>
-          <TeacherStatisticsTable statistics={teacherStats} onClickFn={id => history.push(`/teachers/${id}`)} />
+          <TeacherStatisticsTable statistics={teacherStats} variant="leaderboard" />
         </Segment>
       )}
     </div>
