@@ -1,12 +1,13 @@
 import React from 'react'
 import { Header, Segment, Tab } from 'semantic-ui-react'
 import { useHistory, useParams } from 'react-router-dom'
+
 import { useGetAuthorizedUserQuery } from 'redux/auth'
+import { useTabs, useTitle } from 'common/hooks'
 import TeacherSearchTab from './TeacherSearchTab'
-import { TeacherPage } from './TeacherPage'
 import TeacherStatistics from './TeacherStatistics'
 import { TeacherLeaderBoard } from './TeacherLeaderBoard'
-import { useTabs, useTitle } from '../../common/hooks'
+import { TeacherDetails } from './TeacherDetails'
 
 const pane = (title, Content, icon) => ({
   menuItem: { key: title, content: title, icon },
@@ -46,7 +47,7 @@ const Teachers = () => {
     <div className="segmentContainer">
       <Header className="segmentTitle" size="large" content="Teacher statistics" />
       <Segment className="contentSegment">
-        {teacherid ? <TeacherPage teacherId={teacherid} /> : <TeachersTabs />}
+        {teacherid ? <TeacherDetails teacherId={teacherid} /> : <TeachersTabs />}
       </Segment>
     </div>
   )
