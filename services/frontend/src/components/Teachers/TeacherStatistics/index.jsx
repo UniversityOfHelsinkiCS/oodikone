@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react'
-import { withRouter } from 'react-router-dom'
-import { connect } from 'react-redux'
+import React, { useState } from 'react'
 import { Form, Segment, Dropdown, Button, Message } from 'semantic-ui-react'
 import moment from 'moment'
+import { useHistory } from 'react-router-dom/'
 
 import { useGetAuthorizedUserQuery } from 'redux/auth'
-import { getProviders } from 'redux/providers'
+import { useGetProvidersQuery } from 'redux/providers'
 import { useGetSemestersQuery } from 'redux/semesters'
 import { useLazyGetTeacherStatisticsQuery } from 'redux/teachers'
 import TeacherStatisticsTable from '../TeacherStatisticsTable'
 import useLanguage from '../../LanguagePicker/useLanguage'
 
-const TeacherStatistics = ({ getProviders, providers, history }) => {
+export const TeacherStatistics = () => {
+  const history = useHistory()
   const { getTextIn } = useLanguage()
   const [semesterStart, setSemesterStart] = useState(null)
   const [semesterEnd, setSemesterEnd] = useState(null)
@@ -19,6 +19,7 @@ const TeacherStatistics = ({ getProviders, providers, history }) => {
   const [provs, setProviders] = useState([])
   const { rights, isAdmin } = useGetAuthorizedUserQuery()
   const [getTeacherStatistics, { data: teacherData, isFetching, isLoading }] = useLazyGetTeacherStatisticsQuery()
+  const { data: providers } = useGetProvidersQuery()
 
   const { data: semesterData } = useGetSemestersQuery()
 
@@ -31,10 +32,6 @@ const TeacherStatistics = ({ getProviders, providers, history }) => {
           value: semestercode,
           text: name.en,
         }))
-
-  useEffect(() => {
-    getProviders()
-  }, [])
 
   const setStartSemester = (_, { value }) => {
     setSemesterStart(value)
@@ -175,13 +172,3 @@ const TeacherStatistics = ({ getProviders, providers, history }) => {
     </div>
   )
 }
-
-const mapStateToProps = state => {
-  const { providers } = state
-  const providerOptions = providers.data.map(prov => ({ key: prov.code, value: prov.code, name: prov.name }))
-  return {
-    providers: providerOptions,
-  }
-}
-
-export default connect(mapStateToProps, { getProviders })(withRouter(TeacherStatistics))

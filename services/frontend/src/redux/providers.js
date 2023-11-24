@@ -1,13 +1,12 @@
-import { callController } from '../apiConnection'
-import itemreducer from './common/itemreducer'
+import { RTKApi } from '../apiConnection'
 
-const prefix = 'GET_PROVIDERS_'
+const providersApi = RTKApi.injectEndpoints({
+  endpoints: builder => ({
+    getProviders: builder.query({
+      query: () => '/providers',
+    }),
+  }),
+  overrideExisting: false,
+})
 
-export const getProviders = () => {
-  const route = '/providers'
-  return callController(route, prefix)
-}
-
-const reducer = itemreducer(prefix)
-
-export default reducer
+export const { useGetProvidersQuery } = providersApi
