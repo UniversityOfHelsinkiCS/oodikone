@@ -1,8 +1,9 @@
 import React from 'react'
-import { shape } from 'prop-types'
 import { isString } from 'lodash'
-import { Card, Tab, Icon } from 'semantic-ui-react'
-import { withRouter } from 'react-router-dom'
+import { Card, Tab, Icon, Segment } from 'semantic-ui-react'
+import { useHistory, Redirect } from 'react-router-dom'
+
+import { useGetTeacherQuery } from 'redux/teachers'
 import TeacherStatisticsTable from '../TeacherStatisticsTable'
 import CoursesTab from './CoursesTab'
 import '../../PopulationQueryCard/populationQueryCard.css'
@@ -24,8 +25,15 @@ const formatStatisticsForTable = (statistics, getTextIn) => {
   }))
 }
 
-const TeacherDetails = ({ teacher, history }) => {
+export const TeacherDetails = ({ teacherId }) => {
+  const history = useHistory()
   const { getTextIn } = useLanguage()
+  const { data: teacher, isLoading, isError } = useGetTeacherQuery({ id: teacherId })
+
+  if (isLoading) return <Segment basic loading />
+
+  if (isError) return <Redirect to="/teachers" />
+
   const { courses, years, semesters } = teacher.statistics
 
   const panes = [
@@ -53,10 +61,3 @@ const TeacherDetails = ({ teacher, history }) => {
     </div>
   )
 }
-
-TeacherDetails.propTypes = {
-  teacher: shape({}).isRequired,
-  history: shape({}).isRequired,
-}
-
-export default withRouter(TeacherDetails)
