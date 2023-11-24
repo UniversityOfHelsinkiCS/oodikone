@@ -11,7 +11,6 @@ import populationProgrammesUnfiltered from './populationProgrammesUnfiltered'
 import faculties from './faculties'
 import students from './students'
 import settings from './settings'
-import providers from './providers'
 import courseSearch from './coursesearch'
 import courseStats from './coursestats'
 import courseSummaryForm from './coursesSummaryForm'
@@ -33,7 +32,6 @@ const store = configureStore({
     faculties,
     students,
     settings,
-    providers,
     courseSearch,
     courseStats,
     courseSummaryForm,

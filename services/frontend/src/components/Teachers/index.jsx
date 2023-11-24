@@ -5,7 +5,7 @@ import { useHistory, useParams } from 'react-router-dom'
 import { useGetAuthorizedUserQuery } from 'redux/auth'
 import { useTabs, useTitle } from 'common/hooks'
 import TeacherSearchTab from './TeacherSearchTab'
-import TeacherStatistics from './TeacherStatistics'
+import { TeacherStatistics } from './TeacherStatistics'
 import { TeacherLeaderBoard } from './TeacherLeaderBoard'
 import { TeacherDetails } from './TeacherDetails'
 
