@@ -1,38 +1,33 @@
 import React, { useState, useEffect } from 'react'
 import { Tab, Form } from 'semantic-ui-react'
-import { shape, string, arrayOf, func, number, oneOfType, bool } from 'prop-types'
-import TeacherStatisticsTable from '../TeacherStatisticsTable'
+import { shape, string, arrayOf, func, number, oneOfType } from 'prop-types'
+
+import { TeacherStatisticsTable } from '../TeacherStatisticsTable'
 import useLanguage from '../../LanguagePicker/useLanguage'
 
-const CourseStatsTab = ({ statistics, options, doSelect, selected, renderCourseLink }) => (
-  <div>
-    <Form>
-      <Form.Dropdown
-        options={options}
-        placeholder="Select..."
-        selection
-        search
-        value={selected}
-        onChange={(_, { value }) => doSelect(value)}
-        selectOnBlur={false}
-        selectOnNavigation={false}
-      />
-    </Form>
-    {selected && <TeacherStatisticsTable statistics={statistics} onClickFn={() => {}} renderLink={renderCourseLink} />}
-  </div>
+const CourseTabDropdown = ({ options, doSelect, selected }) => (
+  <Form>
+    <Form.Dropdown
+      options={options}
+      placeholder="Select..."
+      selection
+      search
+      value={selected}
+      onChange={(_, { value }) => doSelect(value)}
+      selectOnBlur={false}
+      selectOnNavigation={false}
+    />
+  </Form>
 )
 
-CourseStatsTab.propTypes = {
+CourseTabDropdown.propTypes = {
   options: arrayOf(shape({})).isRequired,
-  statistics: arrayOf(shape({})).isRequired,
   doSelect: func.isRequired,
   selected: oneOfType([string, number]),
-  renderCourseLink: bool,
 }
 
-CourseStatsTab.defaultProps = {
+CourseTabDropdown.defaultProps = {
   selected: null,
-  renderCourseLink: false,
 }
 
 const CoursesTab = ({ courses, semesters }) => {
@@ -110,24 +105,19 @@ const CoursesTab = ({ courses, semesters }) => {
         {
           menuItem: 'Semester',
           render: () => (
-            <CourseStatsTab
-              options={semesterOptions}
-              doSelect={setSemester}
-              selected={selectedSemester}
-              statistics={getSemesterStats(selectedSemester)}
-              renderCourseLink
-            />
+            <>
+              <CourseTabDropdown options={semesterOptions} doSelect={setSemester} selected={selectedSemester} />
+              <TeacherStatisticsTable variant="course" statistics={getSemesterStats(selectedSemester)} />
+            </>
           ),
         },
         {
           menuItem: 'Course',
           render: () => (
-            <CourseStatsTab
-              options={courseOptions}
-              statistics={getCourseStats(selectedCourse)}
-              doSelect={setCourse}
-              selected={selectedCourse}
-            />
+            <>
+              <CourseTabDropdown options={courseOptions} doSelect={setCourse} selected={selectedCourse} />
+              <TeacherStatisticsTable variant="semester" statistics={getCourseStats(selectedCourse)} />
+            </>
           ),
         },
       ]}

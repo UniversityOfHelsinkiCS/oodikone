@@ -1,18 +1,13 @@
 import React from 'react'
 import { isString } from 'lodash'
-import { Card, Tab, Icon, Segment } from 'semantic-ui-react'
-import { useHistory, Redirect } from 'react-router-dom'
+import { Card, Tab, Segment } from 'semantic-ui-react'
+import { Redirect } from 'react-router-dom'
 
 import { useGetTeacherQuery } from 'redux/teachers'
-import TeacherStatisticsTable from '../TeacherStatisticsTable'
+import { TeacherStatisticsTable } from '../TeacherStatisticsTable'
 import CoursesTab from './CoursesTab'
 import '../../PopulationQueryCard/populationQueryCard.css'
 import useLanguage from '../../LanguagePicker/useLanguage'
-
-const statisticsTableTab = (title, statistics) => ({
-  menuItem: title,
-  render: () => <TeacherStatisticsTable statistics={statistics} onClickFn={() => {}} />,
-})
 
 const formatStatisticsForTable = (statistics, getTextIn) => {
   if (!statistics) {
@@ -26,7 +21,6 @@ const formatStatisticsForTable = (statistics, getTextIn) => {
 }
 
 export const TeacherDetails = ({ teacherId }) => {
-  const history = useHistory()
   const { getTextIn } = useLanguage()
   const { data: teacher, isLoading, isError } = useGetTeacherQuery({ id: teacherId })
 
@@ -41,18 +35,23 @@ export const TeacherDetails = ({ teacherId }) => {
       menuItem: 'Courses',
       render: () => <CoursesTab courses={courses} semesters={semesters} />,
     },
-    statisticsTableTab('Semesters', formatStatisticsForTable(semesters, getTextIn)),
-    statisticsTableTab('Years', formatStatisticsForTable(years, getTextIn)),
+    {
+      menuItem: 'Semesters',
+      render: () => (
+        <TeacherStatisticsTable variant="semester" statistics={formatStatisticsForTable(semesters, getTextIn)} />
+      ),
+    },
+    {
+      menuItem: 'Years',
+      render: () => <TeacherStatisticsTable variant="year" statistics={formatStatisticsForTable(years, getTextIn)} />,
+    },
   ]
 
   return (
     <div>
       <Card fluid className="cardContainer">
         <Card.Content>
-          <Card.Header className="cardHeader">
-            {teacher.name}
-            <Icon name="remove" className="controlIcon" onClick={() => history.goBack()} />
-          </Card.Header>
+          <Card.Header className="cardHeader">{teacher.name}</Card.Header>
           <Card.Meta content={teacher.code} />
           <Card.Meta content={teacher.id} />
         </Card.Content>
