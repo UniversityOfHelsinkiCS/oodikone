@@ -23,7 +23,6 @@ services:
     build:
       <<: *build_defaults
       context: services/backend
-    container_name: backend
     depends_on:
       - kone-db
       - redis
