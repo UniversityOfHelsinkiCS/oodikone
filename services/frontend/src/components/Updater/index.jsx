@@ -1,5 +1,5 @@
 /* eslint-disable no-alert */
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Segment, Form, Button, TextArea, Header, Message } from 'semantic-ui-react'
 import { callApi } from '../../apiConnection'
 import { useTitle } from '../../common/hooks'
@@ -8,18 +8,12 @@ const Updater = () => {
   const [messages, setMessages] = useState([])
   const [SISNums, setSISNums] = useState('')
   const [SISCourses, setSISCourses] = useState('')
+  const [jobs, setJobs] = useState(null)
+
   useTitle('Updater')
 
   const apiCall = async (name, url, method, data) => {
     try {
-      if (name)
-        setMessages(oldMessages =>
-          oldMessages.concat({
-            time: new Date(),
-            message: `Requested refresh of ${name}`,
-            color: 'green',
-          })
-        )
       const response = await callApi(url, method, data)
       setMessages(oldMessages => oldMessages.concat({ time: new Date(), message: response.data, color: 'green' }))
     } catch {
@@ -43,6 +37,41 @@ const Updater = () => {
   const refreshStudyProgrammes = () => apiCall('study programmes', '/updater/refresh_study_programmes_v2', 'post')
   const refreshLanguageCenterData = () =>
     apiCall('language center data', '/updater/refresh_language_center_data', 'post')
+  const getJobs = () => callApi('/updater/jobs', 'get')
+
+  const updateJobs = async () => {
+    const jobs = await getJobs()
+    setJobs(jobs?.data)
+  }
+
+  useEffect(() => {
+    updateJobs()
+  }, [])
+
+  const displayJobStatus = () => {
+    if (!jobs) return <Message>Loading job statuses...</Message>
+    return (
+      <Message style={{ fontSize: '20px' }}>
+        <Button icon="refresh" size="big" onClick={updateJobs} />
+        <p>Jobs running: {jobs.active?.length}</p>
+        <p>
+          <ul>
+            {jobs.active.map(j => (
+              <li>{j.name}</li>
+            ))}{' '}
+          </ul>
+        </p>
+        <p>Jobs waiting: {jobs.waiting?.length}</p>
+        <p>
+          <ul>
+            {jobs.waiting.map(j => (
+              <li>{j.name}</li>
+            ))}{' '}
+          </ul>
+        </p>
+      </Message>
+    )
+  }
 
   return (
     <Segment>
@@ -90,11 +119,18 @@ const Updater = () => {
           />
         </Form.Group>
         <Header>Refresh data (calculations done by oodikone-backend and cached in redis)</Header>
+        {displayJobStatus()}
         <Form.Group style={{ maxWidth: '10em' }}>
           <Form.Button content="Refresh updater redis cache" onClick={() => refreshSISRedisCache()} />
-          <Form.Button content="Refresh oodikone statistics" onClick={() => refreshStatisticsV2()} />
-          <Form.Button content="Refresh all teacher leaderboards" onClick={() => refreshAllTeacherLeaderboards()} />
+          <Form.Button
+            content="Refresh all teacher leaderboards"
+            onClick={() => {
+              // eslint-disable-next-line no-restricted-globals
+              if (confirm('This is not ran in worker yet. Continue?')) refreshAllTeacherLeaderboards()
+            }}
+          />
           <Form.Button content="Refresh trends" onClick={() => refreshTrends()} />
+          <Form.Button content="Refresh oodikone statistics" onClick={() => refreshStatisticsV2()} />
           <Form.Button content="Refresh faculties" onClick={() => refreshFaculties()} />
           <Form.Button content="Refresh study programmes" onClick={() => refreshStudyProgrammes()} />
           <Form.Button content="Refresh language center data" onClick={() => refreshLanguageCenterData()} />
@@ -116,7 +152,7 @@ const Updater = () => {
           <Form.Button onClick={updateSISCourses} content="Update courses by course code" icon="refresh" />
         </Form.Group>
       </div>
-      <Header>Stop updating (aborts all updating processes in the worker, also those started by a cron-job) </Header>
+      <Header>Stop updater (aborts all updating processes in the worker, also those started by a cron-job)</Header>
       <Form.Group>
         <Form.Button content="Stop Updating" negative onClick={abortSisUpdater} />
       </Form.Group>

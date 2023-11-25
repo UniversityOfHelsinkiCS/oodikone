@@ -8,14 +8,9 @@ const {
   abort,
   updateCoursesByCourseCode,
 } = require('../services/sisUpdaterService')
-const {
-  refreshStatistics,
-  refreshTrends,
-  refreshFaculties,
-  refreshNewOverviews,
-  refreshLanguageCenterData,
-} = require('../events')
+
 const logger = require('../util/logger')
+const { jobMaker, getJobs } = require('../worker/queue')
 
 router.get('/update/v2/meta', async (req, res) => {
   const response = await updateSISMetadata(req)
@@ -62,37 +57,43 @@ router.get('/refresh_redis_cache', async (req, res) => {
 
 router.post('/refresh_statistic_v2', async (req, res) => {
   logger.info(`${req.user.userId} requested refresh of statistics`)
-  await refreshStatistics()
+  jobMaker.statistics()
   res.status(200).json('Teacher and study programme statistics refreshed')
 })
 
 router.post('/refresh_study_programmes_v2', async (req, res) => {
   logger.info(`${req.user.userId} requested refresh of study programmes`)
-  await refreshNewOverviews()
-  res.status(200).json('New study programme overviews refreshed')
+  jobMaker.overviews()
+  res.status(200).json('Added job for refreshing study programme overviews')
 })
 
 router.post('/refresh_faculties_v2', async (req, res) => {
   logger.info(`${req.user.userId} requested refresh of faculties`)
-  await refreshFaculties()
-  res.status(200).json('Faculties refreshed')
+  jobMaker.faculties()
+  res.status(200).json('Added job for refreshing faculties')
 })
 
 router.post('/refresh_trends', async (req, res) => {
   logger.info(`${req.user.userId} requested refresh of trends`)
-  await refreshTrends()
-  res.status(200).json('Trends refreshed')
+  jobMaker.trends()
+  res.status(200).json('Added job for refreshing trends')
 })
 
 router.post('/refresh_language_center_data', async (req, res) => {
   logger.info(`${req.user.userId} requested refresh of language center data`)
-  await refreshLanguageCenterData()
-  res.status(200).json('Language center data refreshed')
+  jobMaker.languagecenter()
+  res.status(200).json('Added job for refreshing language center data')
 })
 
 router.get('/abort', async (req, res) => {
   await abort()
   res.status(200).json()
+})
+
+router.get('/jobs', async (req, res) => {
+  const waiting = await getJobs('waiting')
+  const active = await getJobs('active')
+  res.status(200).json({ waiting, active })
 })
 
 module.exports = router

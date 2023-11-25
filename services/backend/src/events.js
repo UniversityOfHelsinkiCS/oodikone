@@ -14,6 +14,7 @@ const logger = require('./util/logger')
 const { getAssociations } = require('./services/studyrights')
 const { redisClient } = require('./services/redis')
 const { computeLanguageCenterData, LANGUAGE_CENTER_REDIS_KEY } = require('./services/languageCenterData')
+const { jobMaker } = require('./worker/queue')
 
 const schedule = (cronTime, func) => new CronJob({ cronTime, onTick: func, start: true, timeZone: 'Europe/Helsinki' })
 
@@ -141,6 +142,7 @@ const refreshTrends = async () => {
 
 // eslint-disable-next-line no-unused-vars
 const refreshLanguageCenterData = async () => {
+  logger.info('Refreshing language center data...')
   const freshData = await computeLanguageCenterData()
   await redisClient.setAsync(LANGUAGE_CENTER_REDIS_KEY, JSON.stringify(freshData))
   logger.info('Language center data refreshed!')
@@ -150,9 +152,11 @@ const startCron = () => {
   if (isProduction) {
     logger.info('Cronjob for refreshing stats started: runs at 1am saturday.')
     // refresh on saturday only because was causing lag. Investigate & fix, then return to 3am daily
-    schedule('0 1 * * 6', async () => {
-      for (const func of [refreshStatistics, refreshTrends, refreshNewOverviews, refreshFaculties]) {
-        await func()
+    schedule('0 1 * * *', async () => {
+      logger.info('Running daily jobs from cron')
+      const jobTypes = Object.keys(jobMaker)
+      for (const type of jobTypes) {
+        jobMaker[type]()
       }
     })
   }
