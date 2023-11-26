@@ -44,7 +44,6 @@
     "import/no-unresolved": "off",
     "import/prefer-default-export": "off",
     "react/jsx-no-bind": "error",
-    "prefer-object-spread/prefer-object-spread": "error",
     "babel/no-invalid-this": "error",
     "react-hooks/rules-of-hooks": "error",
     "prettier/prettier": "error",
@@ -56,5 +55,5 @@
       }
     ]
   },
-  "plugins": ["react", "import", "prefer-object-spread", "babel", "react-hooks"]
+  "plugins": ["react", "import", "babel", "react-hooks"]
 }
