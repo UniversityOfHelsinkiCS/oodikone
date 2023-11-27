@@ -12,11 +12,6 @@ export const getStudent = studentNumber => {
   return callController(route, prefix)
 }
 
-export const selectStudent = studentNumber => ({
-  type: 'SELECT_STUDENT_SUCCESS',
-  response: studentNumber,
-})
-
 export const removeStudentSelection = () => ({
   type: 'REMOVE_SELECTED_SUCCESS',
 })
@@ -25,7 +20,7 @@ export const resetStudent = () => ({
   type: 'RESET_STUDENT_SUCCESS',
 })
 
-const reducer = (state = { data: [], pending: false, error: false, fetching: false }, action) => {
+export const reducer = (state = { data: [], pending: false, error: false, fetching: false }, action) => {
   switch (action.type) {
     case 'FIND_STUDENTS_ATTEMPT':
       return {
@@ -93,5 +88,3 @@ const reducer = (state = { data: [], pending: false, error: false, fetching: fal
       return state
   }
 }
-
-export default reducer

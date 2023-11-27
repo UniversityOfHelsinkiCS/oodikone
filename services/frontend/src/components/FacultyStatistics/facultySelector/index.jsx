@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { debounce } from 'lodash'
 import { Message, Header, Form } from 'semantic-ui-react'
-import useLanguage from 'components/LanguagePicker/useLanguage'
-import SortableTable from '../../SortableTable'
 
-const FacultySelector = ({ faculties, selected }) => {
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
+import { SortableTable } from '../../SortableTable'
+
+export const FacultySelector = ({ faculties, selected }) => {
   const [filter, setFilter] = useState('')
   const [filteredFaculties, setFilteredFaculties] = useState([])
   const { getTextIn, language } = useLanguage()
@@ -105,5 +106,3 @@ const FacultySelector = ({ faculties, selected }) => {
     </div>
   )
 }
-
-export default FacultySelector

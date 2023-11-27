@@ -1,7 +1,7 @@
 import React from 'react'
 import { Form, Dropdown, Message } from 'semantic-ui-react'
 import fp from 'lodash/fp'
-import createFilter from './createFilter'
+import { createFilter } from './createFilter'
 
 const TagsFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
   const name = 'tagsFilter'
@@ -46,7 +46,7 @@ const TagsFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
   )
 }
 
-export default createFilter({
+export const tagsFilter = createFilter({
   key: 'Tags',
 
   defaultOptions: {

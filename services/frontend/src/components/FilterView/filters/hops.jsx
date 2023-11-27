@@ -1,9 +1,9 @@
 import React from 'react'
 import { Radio, Button, Form } from 'semantic-ui-react'
-import useFilters from 'components/FilterView/useFilters'
+import { useFilters } from 'components/FilterView/useFilters'
 import moment from 'moment'
-import createFilter from './createFilter'
-import creditDateFilter, { selectedStartDate } from './date'
+import { createFilter } from './createFilter'
+import { creditDateFilter } from './date'
 
 const getCutStudyStart = ({ options, filterDispatch }) => {
   return (
@@ -30,6 +30,7 @@ const getCutStudyStart = ({ options, filterDispatch }) => {
 }
 
 const HopsFilterCard = ({ options, onOptionsChange, combinedProgramme }) => {
+  const { selectedStartDate } = creditDateFilter.selectors
   const { filterDispatch, useFilterSelector } = useFilters()
   const selectedCreditStartDate = useFilterSelector(selectedStartDate(''))
 
@@ -144,7 +145,7 @@ const HopsFilterCard = ({ options, onOptionsChange, combinedProgramme }) => {
   )
 }
 
-export default createFilter({
+export const hopsFilter = createFilter({
   key: 'hops',
 
   title: 'Personal Study Plan',

@@ -1,10 +1,10 @@
 import React from 'react'
-import * as _ from 'lodash'
+import _ from 'lodash'
 import { Table } from 'semantic-ui-react'
 
-import { getStudentTotalCredits } from '../../../common'
+import { getStudentTotalCredits } from 'common'
 
-const StatisticsTable = ({ filteredStudents, type }) => {
+export const StatisticsTable = ({ filteredStudents, type }) => {
   if (!filteredStudents || !filteredStudents.length) return null
   const credits = filteredStudents.map(student => getStudentTotalCredits(student))
   const formatNumber = (x, decimals) => (Number.isNaN(x) || !x ? 0 : x).toFixed(decimals)
@@ -49,5 +49,3 @@ const StatisticsTable = ({ filteredStudents, type }) => {
     </div>
   )
 }
-
-export default StatisticsTable

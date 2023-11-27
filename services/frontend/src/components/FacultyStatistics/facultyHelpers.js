@@ -27,7 +27,7 @@ const testKey = value => {
   return 6
 }
 
-const sortProgrammeKeys = (programmeKeys, faculty) => {
+export const sortProgrammeKeys = (programmeKeys, faculty) => {
   try {
     return programmeKeys.sort((a, b) => {
       if (a[1].includes(faculty) && !b[1].includes(faculty)) return -1
@@ -45,5 +45,3 @@ const sortProgrammeKeys = (programmeKeys, faculty) => {
     return programmeKeys
   }
 }
-
-export default sortProgrammeKeys

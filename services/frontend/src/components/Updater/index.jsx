@@ -4,7 +4,7 @@ import { Segment, Form, Button, TextArea, Header, Message } from 'semantic-ui-re
 import { callApi } from '../../apiConnection'
 import { useTitle } from '../../common/hooks'
 
-const Updater = () => {
+export const Updater = () => {
   const [messages, setMessages] = useState([])
   const [SISNums, setSISNums] = useState('')
   const [SISCourses, setSISCourses] = useState('')
@@ -170,5 +170,3 @@ const Updater = () => {
     </Segment>
   )
 }
-
-export default Updater

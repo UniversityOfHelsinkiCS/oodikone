@@ -1,9 +1,9 @@
 import React from 'react'
 import { Dropdown } from 'semantic-ui-react'
 import { LANGUAGE_CODES } from '../../constants'
-import useLanguage from './useLanguage'
+import { useLanguage } from './useLanguage'
 
-export default () => {
+export const LanguagePicker = () => {
   const { language, setLanguage } = useLanguage()
 
   const onChange = (_, { value }) => setLanguage(value)

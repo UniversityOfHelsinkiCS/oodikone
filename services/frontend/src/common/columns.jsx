@@ -1,6 +1,7 @@
 import React from 'react'
 import { Popup, Icon } from 'semantic-ui-react'
-import StudentInfoItem from 'components/common/StudentInfoItem'
+
+import { StudentInfoItem } from 'components/common/StudentInfoItem'
 
 export const getCopyableStudentNumberColumn = ({
   popupStates,

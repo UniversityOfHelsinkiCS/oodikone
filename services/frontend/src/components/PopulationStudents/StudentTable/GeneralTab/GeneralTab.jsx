@@ -1,19 +1,20 @@
 import React, { useState } from 'react'
 import _ from 'lodash'
 import moment from 'moment'
-import SortableTable from 'components/SortableTable'
-import useFilters from 'components/FilterView/useFilters'
-import creditDateFilter from 'components/FilterView/filters/date'
+
+import { SortableTable } from 'components/SortableTable'
+import { useFilters } from 'components/FilterView/useFilters'
+import { creditDateFilter } from 'components/FilterView/filters'
 import { getStudentTotalCredits, reformatDate, getHighestGradeOfCourseBetweenRange } from 'common'
 import { hiddenNameAndEmailForExcel, getCopyableEmailColumn, getCopyableStudentNumberColumn } from 'common/columns'
 import { useGetSemestersQuery } from 'redux/semesters'
 import { PRIORITYCODE_TEXTS } from '../../../../constants'
-import useLanguage from '../../../LanguagePicker/useLanguage'
-import createMaps from './columnHelpers/createMaps'
+import { useLanguage } from '../../../LanguagePicker/useLanguage'
+import { createMaps } from './columnHelpers/createMaps'
 import { getSemestersPresentFunctions } from './columnHelpers/semestersPresent'
-import getStudyProgrammeFunctions from './columnHelpers/studyProgramme'
+import { getStudyProgrammeFunctions } from './columnHelpers/studyProgramme'
 
-const GeneralTab = ({
+export const GeneralTab = ({
   group,
   populations,
   customPopulationProgramme,
@@ -115,8 +116,8 @@ const GeneralTab = ({
         .filter(el => populationStatistics.elementdetails.data[el.code].type === 20)
         .forEach(el => {
           if (cleanedQueryStudyrights.includes(el.code)) {
-            startdate = el.startdate // eslint-disable-line
-            enddate = el.enddate // eslint-disable-line
+            startdate = el.startdate
+            enddate = el.enddate
           }
         })
       elemArr
@@ -572,5 +573,3 @@ const GeneralTab = ({
     />
   )
 }
-
-export default GeneralTab

@@ -1,9 +1,9 @@
-/* eslint-disable babel/no-invalid-this */
+/* eslint-disable @babel/no-invalid-this */
 import _ from 'lodash'
-import DataVisitor from './DataVisitor'
+import { DataVisitor } from './DataVisitor'
 import { getColumnValue, getRowOptions } from '../common'
 
-export default class SortingFilteringVisitor extends DataVisitor {
+export class SortingFilteringVisitor extends DataVisitor {
   constructor(columns, state, filterTypes) {
     super()
     this.columns = columns

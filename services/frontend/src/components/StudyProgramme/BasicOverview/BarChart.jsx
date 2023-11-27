@@ -1,10 +1,9 @@
 import React from 'react'
-
-const ReactHighcharts = require('react-highcharts')
+import ReactHighcharts from 'react-highcharts'
 
 const colors = ['#003E65', '#1392c2', '#036415']
 
-const BarChart = ({ cypress, data }) => {
+export const BarChart = ({ cypress, data }) => {
   const dataWithColors = data?.graphStats?.map((series, index) => ({ ...series, color: colors[index] }))
 
   const defaultConfig = {
@@ -49,12 +48,10 @@ const BarChart = ({ cypress, data }) => {
     },
   }
 
-  if (!data) return <></>
+  if (!data) return null
   return (
     <div className="graph-container" data-cy={`Graph-${cypress}`}>
       <ReactHighcharts config={defaultConfig} />
     </div>
   )
 }
-
-export default BarChart

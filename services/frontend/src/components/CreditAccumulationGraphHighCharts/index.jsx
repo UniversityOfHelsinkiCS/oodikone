@@ -9,9 +9,9 @@ import _ from 'lodash'
 import boost from 'highcharts/modules/boost'
 import ReactHighstock from 'react-highcharts/ReactHighstock'
 import './creditAccumulationGraphHC.css'
-import CreditGraphTooltip from '../CreditGraphTooltip'
+import { CreditGraphTooltip } from '../CreditGraphTooltip'
 import { reformatDate, getStudyRightElementTargetDates } from '../../common'
-import useLanguage from '../LanguagePicker/useLanguage'
+import { useLanguage } from '../LanguagePicker/useLanguage'
 import { DISPLAY_DATE_FORMAT, API_DATE_FORMAT } from '../../constants'
 
 // boost canvas needed because tests break with large population
@@ -439,7 +439,7 @@ const filterTransfers = (student, getTextIn) => {
   return removeOverlapping
 }
 
-const CreditAccumulationGraphHighCharts = ({
+export const CreditAccumulationGraphHighCharts = ({
   students,
   singleStudent,
   absences,
@@ -593,5 +593,3 @@ const CreditAccumulationGraphHighCharts = ({
     </div>
   )
 }
-
-export default CreditAccumulationGraphHighCharts

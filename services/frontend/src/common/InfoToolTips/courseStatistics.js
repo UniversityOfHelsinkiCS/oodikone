@@ -1,4 +1,4 @@
-export default {
+export const courseStatisticsToolTips = {
   Tables: {
     ATTEMPTS: `
       **Table - Attempts**

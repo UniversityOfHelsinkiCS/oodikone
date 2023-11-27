@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react'
 import { Icon, Header } from 'semantic-ui-react'
 import _ from 'lodash'
-import WithHelpTooltip from '../../../Info/InfoWithHelpTooltip'
+
+import { InfoWithHelpTooltip } from 'components/Info/InfoWithHelpTooltip'
 
 import './FilterCard.css'
 
@@ -20,7 +21,7 @@ const useChange = value => {
   return change
 }
 
-const FilterCard = ({ filter, options, children, onClear }) => {
+export const FilterCard = ({ filter, options, children, onClear }) => {
   const title = filter.title ?? filter.key
   const active = filter.isActive(options)
   const { info, key } = filter
@@ -80,9 +81,9 @@ const FilterCard = ({ filter, options, children, onClear }) => {
 
   if (info) {
     header = (
-      <WithHelpTooltip containerStyle={{ alignItems: 'center' }} tooltip={info} data-cy="tooltip-div">
+      <InfoWithHelpTooltip containerStyle={{ alignItems: 'center' }} tooltip={info} data-cy="tooltip-div">
         {header}
-      </WithHelpTooltip>
+      </InfoWithHelpTooltip>
     )
   }
 
@@ -93,5 +94,3 @@ const FilterCard = ({ filter, options, children, onClear }) => {
     </div>
   )
 }
-
-export default FilterCard

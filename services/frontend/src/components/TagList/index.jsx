@@ -3,10 +3,10 @@ import { connect } from 'react-redux'
 import { Table } from 'semantic-ui-react'
 import { func, string, arrayOf, shape, bool } from 'prop-types'
 
-import TagStudent from '../TagStudent'
-import selector from '../../selectors/populationDetails'
-import { getTagsByStudytrackAction } from '../../redux/tags'
-import { getStudentTagsByStudytrackAction } from '../../redux/tagstudent'
+import { getTagsByStudytrackAction } from 'redux/tags'
+import { getStudentTagsByStudytrackAction } from 'redux/tagstudent'
+import { ConnectedTagStudent as TagStudent } from '../TagStudent'
+import { makePopulationsToData } from '../../selectors/populationDetails'
 
 const Row = memo(
   ({ studentsTags, sn, studytrack, tagOptions, name, combinedProgramme }) => (
@@ -89,7 +89,7 @@ const TagList = ({
 const mapStateToProps = state => {
   const { tagstudent, tags } = state
   const { settings } = state
-  const { programme } = selector.makePopulationsToData(state)
+  const { programme } = makePopulationsToData(state)
   return {
     tagstudent: tagstudent.data,
     tags: tags.data,
@@ -109,7 +109,7 @@ TagList.propTypes = {
   combinedProgramme: string.isRequired,
 }
 
-export default connect(mapStateToProps, {
+export const ConnectedTagList = connect(mapStateToProps, {
   getTagsByStudytrack: getTagsByStudytrackAction,
   getStudentTagsStudyTrack: getStudentTagsByStudytrackAction,
 })(TagList)

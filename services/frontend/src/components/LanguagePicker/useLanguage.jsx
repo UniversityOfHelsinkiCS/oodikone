@@ -30,7 +30,7 @@ const getTextInWithLanguage = (texts, language) => {
   }
   return null
 }
-export default () => {
+export const useLanguage = () => {
   const [state, setState] = useContext(LanguageContext)
 
   const getTextIn = useCallback(text => getTextInWithLanguage(text, state), [state])

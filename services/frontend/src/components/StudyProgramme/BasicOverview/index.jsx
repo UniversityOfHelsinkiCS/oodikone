@@ -2,16 +2,16 @@ import React, { useState } from 'react'
 import { Divider, Loader, Message } from 'semantic-ui-react'
 
 import { useGetBasicStatsQuery, useGetCreditStatsQuery, useGetGraduationStatsQuery } from 'redux/studyProgramme'
-import LineGraph from './LineGraph'
-import StackedBarChart from './StackedBarChart'
-import BarChart from './BarChart'
-import MedianTimeBarChart from '../MedianTimeBarChart'
-import BreakdownBarChart from '../BreakdownBarChart'
-import DataTable from './DataTable'
-import Toggle from '../Toggle'
-import InfoBox from '../../Info/InfoBox'
+import { studyProgrammeToolTips } from 'common/InfoToolTips'
+import { LineGraph } from './LineGraph'
+import { StackedBarChart } from './StackedBarChart'
+import { BarChart } from './BarChart'
+import { MedianTimeBarChart } from '../MedianTimeBarChart'
+import { BreakdownBarChart } from '../BreakdownBarChart'
+import { DataTable } from './DataTable'
+import { Toggle } from '../Toggle'
+import { InfoBox } from '../../Info/InfoBox'
 
-import InfotoolTips from '../../../common/InfoToolTips'
 import { getGraduationGraphTitle } from '../../../common'
 import '../studyprogramme.css'
 
@@ -23,7 +23,7 @@ const getGraduatedText = code => {
   return 'Graduated and thesis writers of the programme'
 }
 
-const Overview = ({
+export const BasicOverview = ({
   studyprogramme,
   combinedProgramme,
   specialGroups,
@@ -32,7 +32,6 @@ const Overview = ({
   setAcademicYear,
 }) => {
   const [showMedian, setShowMedian] = useState(false)
-  const toolTips = InfotoolTips.Studyprogramme
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
   const special = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
   const basics = useGetBasicStatsQuery({ id: studyprogramme, combinedProgramme, yearType, specialGroups: special })
@@ -53,7 +52,7 @@ const Overview = ({
           {title}
         </Divider>
       </div>
-      <InfoBox content={toolTips[toolTipText]} />
+      <InfoBox content={studyProgrammeToolTips[toolTipText]} />
     </>
   )
 
@@ -130,7 +129,7 @@ const Overview = ({
       <div className="toggle-container">
         <Toggle
           cypress="YearToggle"
-          toolTips={toolTips.YearToggle}
+          toolTips={studyProgrammeToolTips.YearToggle}
           firstLabel="Calendar year"
           secondLabel="Academic year"
           value={academicYear}
@@ -138,7 +137,7 @@ const Overview = ({
         />
         <Toggle
           cypress="StudentToggle"
-          toolTips={toolTips.StudentToggle}
+          toolTips={studyProgrammeToolTips.StudentToggle}
           firstLabel="All studyrights"
           secondLabel="Special studyrights excluded"
           value={specialGroups}
@@ -260,5 +259,3 @@ const Overview = ({
     </div>
   )
 }
-
-export default Overview

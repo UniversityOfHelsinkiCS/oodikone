@@ -47,7 +47,7 @@ export const clearSelected = () => ({
 })
 
 const defaultState = { pending: false, error: false, data: null, query: {} }
-const reducer = (state = defaultState, action) => {
+export const reducer = (state = defaultState, action) => {
   switch (action.type) {
     case 'GET_POPULATION_SELECTEDSTUDENTS_COURSES_ATTEMPT':
       return {
@@ -78,5 +78,3 @@ const reducer = (state = defaultState, action) => {
       return state
   }
 }
-
-export default reducer

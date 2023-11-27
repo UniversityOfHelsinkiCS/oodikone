@@ -2,11 +2,12 @@ import React from 'react'
 import produce from 'immer'
 import _ from 'lodash'
 import { Dropdown } from 'semantic-ui-react'
-import CourseCard from './CourseCard'
+
+import { CourseCard } from './CourseCard'
 import { FilterType } from './filterType'
 import './courseFilter.css'
-import createFilter from '../createFilter'
-import useLanguage from '../../../LanguagePicker/useLanguage'
+import { createFilter } from '../createFilter'
+import { useLanguage } from '../../../LanguagePicker/useLanguage'
 
 const CourseFilterCard = ({ courseStats, options, onOptionsChange }) => {
   const { courseFilters } = options
@@ -80,7 +81,7 @@ const filterFunctions = {
   [FilterType.ENROLLED_NO_GRADE]: createFilterFunc('enrolledNoGrade'),
 }
 
-const filter = createFilter({
+export const courseFilter = createFilter({
   key: 'Courses',
 
   defaultOptions: {
@@ -116,8 +117,6 @@ const filter = createFilter({
   },
 })
 
-export default filter
+export const { isCourseSelected } = courseFilter.selectors
 
-export const { isCourseSelected } = filter.selectors
-
-export const { toggleCourseSelection } = filter.actions
+export const { toggleCourseSelection } = courseFilter.actions

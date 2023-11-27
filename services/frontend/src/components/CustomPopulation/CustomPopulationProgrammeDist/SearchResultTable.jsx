@@ -34,7 +34,7 @@ const getTableBody = (rows, selectable, actionTrigger) => (
   </Table.Body>
 )
 
-const SearchResultTable = ({ actionTrigger, headers, rows, noResultText, selectable }) => {
+export const SearchResultTable = ({ actionTrigger, headers, rows, noResultText, selectable }) => {
   if (rows.length > 0) {
     return (
       <Segment style={{ maxHeight: '80vh', overflowY: 'auto', padding: 0 }}>
@@ -55,5 +55,3 @@ SearchResultTable.propTypes = {
   selectable: bool.isRequired,
   actionTrigger: func.isRequired,
 }
-
-export default SearchResultTable

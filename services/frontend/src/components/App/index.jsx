@@ -1,13 +1,14 @@
 import React, { useEffect } from 'react'
 import { initShibbolethPinger } from 'unfuck-spa-shibboleth-session'
 import * as Sentry from '@sentry/browser'
-import Header from 'components/Header'
-import Routes from 'components/Routes'
-import SegmentDimmer from 'components/SegmentDimmer'
+
+import { Header } from 'components/Header'
+import { Routes } from 'components/Routes'
+import { SegmentDimmer } from 'components/SegmentDimmer'
 import './app.css'
 import { isProduction } from 'conf'
 import { useGetAuthorizedUserQuery } from 'redux/auth'
-import AccessDenied from 'components/AccessDenied'
+import { AccessDenied } from 'components/AccessDenied'
 
 const addUserDetailsToLoggers = ({ id, userId, mockedBy }) => {
   if (!isProduction || !id || !userId) return
@@ -27,7 +28,7 @@ const Layout = ({ children }) => (
   </div>
 )
 
-const App = () => {
+export const App = () => {
   const { isLoading, error, id, userId, mockedBy } = useGetAuthorizedUserQuery()
 
   useEffect(() => {
@@ -44,5 +45,3 @@ const App = () => {
 
   return <Layout>{isLoading ? <SegmentDimmer isLoading={isLoading} /> : <Routes />}</Layout>
 }
-
-export default App

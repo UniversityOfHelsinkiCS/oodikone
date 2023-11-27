@@ -2,7 +2,7 @@
 import React from 'react'
 import ReactHighcharts from 'react-highcharts'
 
-const BarChart = ({ data, title, byStartYear = false }) => {
+export const BreakdownBarChart = ({ data, title, byStartYear = false }) => {
   const statData = [
     { name: 'On time', color: '#90A959', data: [] },
     { name: 'Max. year overtime', color: '#FEE191', data: [] },
@@ -41,7 +41,7 @@ const BarChart = ({ data, title, byStartYear = false }) => {
       fontSize: '25px',
       // outside: true,
       // eslint-disable-next-line
-      formatter: function() {
+      formatter: function () {
         return getTooltipText(this.series.name, this.y)
       },
     },
@@ -79,7 +79,6 @@ const BarChart = ({ data, title, byStartYear = false }) => {
             textOutline: 'none',
           },
           formatter() {
-            // eslint-disable-next-line react/no-this-in-sfc
             return this.y !== 0 ? this.y : ''
           },
         },
@@ -97,5 +96,3 @@ const BarChart = ({ data, title, byStartYear = false }) => {
     </div>
   )
 }
-
-export default BarChart

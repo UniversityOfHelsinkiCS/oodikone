@@ -4,7 +4,7 @@ const parseGrade = grade => {
   return parsedGrade
 }
 
-const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
+export const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
   const totals = formattedStats.reduce(
     (acc, curr) => {
       if (curr.rowObfuscated) {
@@ -151,5 +151,3 @@ const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
 
   return totals
 }
-
-export default countTotalStats

@@ -2,15 +2,16 @@ import React, { Fragment } from 'react'
 import { func, shape } from 'prop-types'
 import { Divider, Icon, Header, Item } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
-import useLanguage from 'components/LanguagePicker/useLanguage'
-import { byDateDesc, reformatDate, getTextInWithOpen, resolveStudyPlan } from '../../../common'
-import StudentCourseTable from '../StudentCourseTable'
+
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
+import { byDateDesc, reformatDate, getTextInWithOpen, resolveStudyPlan } from 'common'
+import { StudentCourseTable } from '../StudentCourseTable'
 
 // Some courses are without AY in the beginning in the studyplan even though the credits are registered with AY.
 const isInStudyPlan = (plan, code) =>
   plan && (plan.included_courses.includes(code) || plan.included_courses.includes(code.replace('AY', '')))
 
-const CourseParticipationTable = ({ student, clearCourseStats, studyrightid }) => {
+export const CourseParticipationTable = ({ student, clearCourseStats, studyrightid }) => {
   const { language } = useLanguage()
 
   if (!student) return null
@@ -118,5 +119,3 @@ CourseParticipationTable.propTypes = {
   student: shape({}).isRequired,
   clearCourseStats: func.isRequired,
 }
-
-export default CourseParticipationTable

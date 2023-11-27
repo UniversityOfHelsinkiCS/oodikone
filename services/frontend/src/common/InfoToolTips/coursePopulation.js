@@ -1,4 +1,4 @@
-export default {
+export const coursePopulationToolTips = {
   Students: `
   Taulukko näyttää oletusarvoisesti vain opiskelijanumerot, mutta harmaata liukukytkintä klikkaamalla saa näkyviin opiskelijoiden nimet.
   

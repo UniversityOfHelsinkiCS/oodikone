@@ -5,10 +5,10 @@ import { Button, Icon, Label } from 'semantic-ui-react'
 import { useShowAsUser } from 'redux/auth'
 import { useGetAllElementDetailsQuery } from 'redux/elementdetails'
 import { reformatDate } from '../../common'
-import useLanguage from '../LanguagePicker/useLanguage'
-import SortableTable from '../SortableTable'
+import { useLanguage } from '../LanguagePicker/useLanguage'
+import { SortableTable } from '../SortableTable'
 
-const UserSearchList = ({ enabledOnly, users, error }) => {
+export const UserSearchList = ({ enabledOnly, users, error }) => {
   const { getTextIn } = useLanguage()
   const { data: elementdetails = [] } = useGetAllElementDetailsQuery()
   const usersToRender = enabledOnly ? users.filter(u => u.is_enabled) : users
@@ -160,5 +160,3 @@ const UserSearchList = ({ enabledOnly, users, error }) => {
     </div>
   )
 }
-
-export default UserSearchList

@@ -1,7 +1,7 @@
 import React from 'react'
-import NoDataMessage from '../NoDataMessage'
+import ReactHighcharts from 'react-highcharts'
 
-const ReactHighcharts = require('react-highcharts')
+import { NoDataMessage } from '../NoDataMessage'
 
 const getColors = track => {
   if (!track) return ['#e66067', '#f57368', '#fb8c6e', '#fba678', '#dbda7d', '#9ec27c', '#60a866', '#008c59']
@@ -10,7 +10,7 @@ const getColors = track => {
   return ['#f57368', '#fb8c6e', '#fba678', '#dbda7d', '#9ec27c', '#60a866', '#008c59']
 }
 
-const BarChart = ({ cypress, data, track }) => {
+export const BarChart = ({ cypress, data, track }) => {
   if (!data || !data.creditGraphStats || !data.creditGraphStats[track])
     return <NoDataMessage message="No progress data for the studytrack found. Try with another studytrack" />
   const correctData = data?.creditGraphStats[track]
@@ -74,5 +74,3 @@ const BarChart = ({ cypress, data, track }) => {
     </div>
   )
 }
-
-export default BarChart

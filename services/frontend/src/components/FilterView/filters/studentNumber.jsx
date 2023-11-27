@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import { Button, Icon } from 'semantic-ui-react'
 import _ from 'lodash'
-import createFilter from './createFilter'
-import filterInfo from '../../../common/InfoToolTips/filters'
+
+import { filterToolTips } from 'common/InfoToolTips'
+import { createFilter } from './createFilter'
 
 const IconButton = ({ onClick, ...props }) => (
   <button
@@ -176,7 +177,7 @@ const StudentNumberFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
   )
 }
 
-export default createFilter({
+export const studentNumberFilter = createFilter({
   key: 'studentNumber',
 
   title: 'Student Number',
@@ -186,7 +187,7 @@ export default createFilter({
     blocklist: [],
   },
 
-  info: filterInfo.studentNumber,
+  info: filterToolTips.studentNumber,
 
   isActive: ({ allowlist, blocklist }) => allowlist.length > 0 || blocklist.length > 0,
 

@@ -1,12 +1,13 @@
-import SortableTable from 'components/SortableTable'
 import React, { useEffect, useState } from 'react'
-import { useGetCompletedCoursesQuery } from 'redux/completedCoursesSearch'
 import { Icon, Loader } from 'semantic-ui-react'
 import moment from 'moment'
-import StudentNameVisibilityToggle, { useStudentNameVisibility } from 'components/StudentNameVisibilityToggle'
-import useLanguage from 'components/LanguagePicker/useLanguage'
-import RightsNotification from 'components/RightsNotification'
-import StudentInfoItem from 'components/common/StudentInfoItem'
+
+import { SortableTable } from 'components/SortableTable'
+import { useGetCompletedCoursesQuery } from 'redux/completedCoursesSearch'
+import { StudentNameVisibilityToggle, useStudentNameVisibility } from 'components/StudentNameVisibilityToggle'
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
+import { RightsNotification } from 'components/RightsNotification'
+import { StudentInfoItem } from 'components/common/StudentInfoItem'
 import { hiddenNameAndEmailForExcel } from 'common/columns'
 
 const getColumns = (courses, showStudentNames, getTextIn) => {
@@ -145,7 +146,7 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
   return [...nameColumns, ...studentNbrColumn, ...completionStatusColumns, statisticHeader, ...emailColumn]
 }
 
-const CompletedCoursesSearchResults = ({ searchValues }) => {
+export const CompletedCoursesSearchResults = ({ searchValues }) => {
   const { courseList, studentList } = searchValues
   const [data, setData] = useState(null)
   const showStudentNames = useStudentNameVisibility()
@@ -186,5 +187,3 @@ const CompletedCoursesSearchResults = ({ searchValues }) => {
     </div>
   )
 }
-
-export default CompletedCoursesSearchResults

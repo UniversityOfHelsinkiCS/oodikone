@@ -1,7 +1,7 @@
 import React from 'react'
 import { Table } from 'semantic-ui-react'
 
-const DataTable = ({ data, cypress, titles, wideTable }) => {
+export const DataTable = ({ data, cypress, titles, wideTable }) => {
   if (!data || !titles) return null
 
   return (
@@ -28,5 +28,3 @@ const DataTable = ({ data, cypress, titles, wideTable }) => {
     </div>
   )
 }
-
-export default DataTable

@@ -23,7 +23,7 @@ export const clearSelectedCourse = () => ({
   type: 'CLEAR_SELECTED_COURSE',
 })
 
-const reducer = (state = { stats: {}, pending: false, error: false, selectedCourse: null }, action) => {
+export const reducer = (state = { stats: {}, pending: false, error: false, selectedCourse: null }, action) => {
   switch (action.type) {
     case 'SET_SELECTED_COURSE':
       return {
@@ -39,5 +39,3 @@ const reducer = (state = { stats: {}, pending: false, error: false, selectedCour
       return state
   }
 }
-
-export default reducer

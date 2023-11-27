@@ -1,9 +1,10 @@
 import React from 'react'
 import fp from 'lodash/fp'
 import { Form, Dropdown } from 'semantic-ui-react'
-import useLanguage from 'components/LanguagePicker/useLanguage'
-import filterInfo from '../../../common/InfoToolTips/filters'
-import createFilter from './createFilter'
+
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
+import { filterToolTips } from 'common/InfoToolTips'
+import { createFilter } from './createFilter'
 
 const STATUS_OPTIONS = [
   { key: 'enrl-status-present', text: 'Present', value: 1 },
@@ -75,12 +76,12 @@ const EnrollmentStatusFilterCard = ({ options, onOptionsChange, allSemesters, se
   )
 }
 
-export default createFilter({
+export const enrollmentStatusFilter = createFilter({
   key: 'EnrollmentStatus',
 
   title: 'Enrollment Status',
 
-  info: filterInfo.enrollmentStatus,
+  info: filterToolTips.enrollmentStatus,
   defaultOptions: {
     status: null,
     semesters: [],

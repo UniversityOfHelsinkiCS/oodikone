@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import { Button, Icon, Modal, Container } from 'semantic-ui-react'
-import DegreeCoursesTable from '../StudyProgramme/DegreeCourses'
 
-const FilterDegreeCoursesModal = ({ studyProgramme, year }) => {
+import { DegreeCoursesTable } from '../StudyProgramme/DegreeCourses'
+
+export const FilterDegreeCoursesModal = ({ studyProgramme, year }) => {
   const [open, setOpen] = useState(false)
 
   const setModalOpenState = state => {
@@ -36,5 +37,3 @@ const FilterDegreeCoursesModal = ({ studyProgramme, year }) => {
     </Modal>
   )
 }
-
-export default FilterDegreeCoursesModal

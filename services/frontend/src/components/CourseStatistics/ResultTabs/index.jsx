@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import { Tab, Segment, Menu, Icon } from 'semantic-ui-react'
-import { withRouter } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 import qs from 'query-string'
 import { useDispatch, useSelector } from 'react-redux'
+
 import { getCourseStats } from 'redux/coursestats'
 import { PassRate, PassRateSettings } from './Panes/passRate'
 import { Distribution, DistributionSettings } from './Panes/distribution'
@@ -68,7 +69,9 @@ const PaneContent = ({
   )
 }
 
-const ResultTabs = ({ primary, comparison, history, separate, availableStats, location }) => {
+export const ResultTabs = ({ primary, comparison, separate, availableStats }) => {
+  const history = useHistory()
+  const location = useLocation()
   const [tab, setTab] = useTabs('cs_tab', 0, history)
   const { userHasAccessToAllStats } = primary
   const courseStats = useSelector(({ courseStats }) => courseStats)
@@ -139,5 +142,3 @@ const ResultTabs = ({ primary, comparison, history, separate, availableStats, lo
     </Segment>
   )
 }
-
-export default withRouter(ResultTabs)

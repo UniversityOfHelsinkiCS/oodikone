@@ -3,7 +3,7 @@ import { sortBy } from 'lodash'
 import { Table } from 'semantic-ui-react'
 import { func, arrayOf, shape, string, bool } from 'prop-types'
 import { getActiveYears } from '../courseStatisticsUtils'
-import useLanguage from '../../LanguagePicker/useLanguage'
+import { useLanguage } from '../../LanguagePicker/useLanguage'
 import './courseTable.css'
 
 const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, mandatory = false, controlIcon }) => {
@@ -71,4 +71,4 @@ function areEqual(prevProps, nextProps) {
   return prevProps.courses.every(c1 => nextProps.courses.some(c2 => c1.code === c2.code))
 }
 
-export default React.memo(CourseTable, areEqual)
+export const MemoizedCourseTable = React.memo(CourseTable, areEqual)

@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import { Table } from 'semantic-ui-react'
-import ProgrammeProgressChart from './ProgrammeProgressChart'
-import BasicRow from '../InteractiveDataView/BasicRow'
+import { ProgrammeProgressChart } from './ProgrammeProgressChart'
+import { BasicRow } from '../InteractiveDataView/BasicRow'
 
-const FacultyProgressTable = ({
+export const FacultyProgressTable = ({
   data,
   programmeStats,
   titles,
@@ -67,9 +67,7 @@ const FacultyProgressTable = ({
                     />
                   </Table.Cell>
                 </Table.Row>
-              ) : (
-                <></>
-              )}
+              ) : null}
             </React.Fragment>
           ))}
         </Table.Body>
@@ -77,5 +75,3 @@ const FacultyProgressTable = ({
     </div>
   )
 }
-
-export default FacultyProgressTable

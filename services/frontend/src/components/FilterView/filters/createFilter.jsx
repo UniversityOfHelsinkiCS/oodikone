@@ -3,7 +3,7 @@ import produce from 'immer'
 import _ from 'lodash'
 import { setFilterOptions } from '../../../redux/filters'
 
-const createFilter = options => {
+export const createFilter = options => {
   const Component = options.component
 
   const selectorFuncs = {
@@ -145,5 +145,3 @@ const createFilter = options => {
 
   return factory
 }
-
-export default createFilter

@@ -1,9 +1,9 @@
 import React from 'react'
-import FilterToggle from '../../FilterView/FilterToggle'
-import useFilters from '../../FilterView/useFilters'
-import gradeFilter from '../../FilterView/filters/grade'
+import { FilterToggle } from '../../FilterView/FilterToggle'
+import { useFilters } from '../../FilterView/useFilters'
+import { gradeFilter } from '../../FilterView/filters'
 
-const ExternalGradeFilterToggle = ({ grade }) => {
+export const ExternalGradeFilterToggle = ({ grade }) => {
   const { useFilterSelector, filterDispatch } = useFilters()
 
   const isActive = useFilterSelector(gradeFilter.selectors.isGradeSelected(grade))
@@ -19,5 +19,3 @@ const ExternalGradeFilterToggle = ({ grade }) => {
     />
   )
 }
-
-export default ExternalGradeFilterToggle

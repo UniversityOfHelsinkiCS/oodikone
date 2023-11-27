@@ -3,8 +3,9 @@ import React from 'react'
 import { Form, Dropdown } from 'semantic-ui-react'
 import moment from 'moment'
 import _ from 'lodash'
-import useLanguage from 'components/LanguagePicker/useLanguage'
-import createFilter from './createFilter'
+
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
+import { createFilter } from './createFilter'
 
 const StudyTrackFilterCard = ({ options, onOptionsChange, withoutSelf, activeAt, code }) => {
   const { selected } = options
@@ -65,7 +66,7 @@ const StudyTrackFilterCard = ({ options, onOptionsChange, withoutSelf, activeAt,
   )
 }
 
-export default createFilter({
+export const studyTrackFilter = createFilter({
   key: 'StudyTrack',
 
   title: 'Study Track',

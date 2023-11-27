@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react'
 import { Form, TextArea, Button, Modal, Message, Icon, Header } from 'semantic-ui-react'
 
 import { useSendFeedbackMutation } from 'redux/feedback'
-import { useTitle } from '../../common/hooks'
+import { useTitle } from 'common/hooks'
 
-const Feedback = () => {
+export const Feedback = () => {
   const [feedback, setFeedback] = useState('')
   const [showError, setShowError] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
@@ -90,5 +90,3 @@ const Feedback = () => {
     </div>
   )
 }
-
-export default Feedback

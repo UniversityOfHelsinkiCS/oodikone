@@ -2,10 +2,8 @@
 import React from 'react'
 import ReactHighcharts from 'react-highcharts'
 
-const TimeBarChart = ({ data, goal, title, byStartYear }) => {
-  if (!data) {
-    return <></>
-  }
+export const MedianTimeBarChart = ({ data, goal, title, byStartYear }) => {
+  if (!data) return null
 
   const maxValue = data.reduce((max, { y }) => {
     return y > max ? y : max
@@ -54,7 +52,7 @@ const TimeBarChart = ({ data, goal, title, byStartYear }) => {
       backgroundColor: 'white',
       fontSize: '25px',
       // eslint-disable-next-line
-      formatter: function() {
+      formatter: function () {
         return getTooltipText(this.point.amount, this.y, this.point.name, this.point.statistics, this.point?.classSize)
       },
     },
@@ -145,5 +143,3 @@ const TimeBarChart = ({ data, goal, title, byStartYear }) => {
     </div>
   )
 }
-
-export default TimeBarChart

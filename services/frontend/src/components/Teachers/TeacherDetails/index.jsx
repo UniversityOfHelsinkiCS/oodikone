@@ -5,9 +5,9 @@ import { Redirect } from 'react-router-dom'
 
 import { useGetTeacherQuery } from 'redux/teachers'
 import { TeacherStatisticsTable } from '../TeacherStatisticsTable'
-import CoursesTab from './CoursesTab'
+import { CoursesTab } from './CoursesTab'
 import '../../PopulationQueryCard/populationQueryCard.css'
-import useLanguage from '../../LanguagePicker/useLanguage'
+import { useLanguage } from '../../LanguagePicker/useLanguage'
 
 const formatStatisticsForTable = (statistics, getTextIn) => {
   if (!statistics) {

@@ -1,4 +1,4 @@
-const formreducer = (prefix, initvals = {}) => {
+export const formreducer = (prefix, initvals = {}) => {
   const initial = { ...initvals }
 
   const actions = {
@@ -28,5 +28,3 @@ const formreducer = (prefix, initvals = {}) => {
     clear,
   }
 }
-
-export default formreducer

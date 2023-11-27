@@ -1,7 +1,7 @@
 import React from 'react'
 import { Form, Dropdown } from 'semantic-ui-react'
 import fp from 'lodash/fp'
-import createFilter from './createFilter'
+import { createFilter } from './createFilter'
 
 const StartYearAtUniFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
   const name = 'startYearAtUni'
@@ -43,7 +43,7 @@ const StartYearAtUniFilterCard = ({ options, onOptionsChange, withoutSelf }) => 
   )
 }
 
-export default createFilter({
+export const startYearAtUniFilter = createFilter({
   key: 'StartYearAtUni',
 
   title: 'Starting Year',

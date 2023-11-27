@@ -1,9 +1,10 @@
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Menu, Radio, Form } from 'semantic-ui-react'
-import { toggleOpenAndReqularCourses } from '../../../redux/coursesearch'
 
-const UnifyRadioButtons = ({ availableStats }) => {
+import { toggleOpenAndReqularCourses } from 'redux/coursesearch'
+
+export const UnifyRadioButtons = ({ availableStats }) => {
   const dispatch = useDispatch()
 
   const openOrReqular = useSelector(state => state.courseSearch.openOrReqular)
@@ -56,5 +57,3 @@ const UnifyRadioButtons = ({ availableStats }) => {
     </Menu>
   )
 }
-
-export default UnifyRadioButtons

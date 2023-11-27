@@ -5,12 +5,12 @@ import { Loader } from 'semantic-ui-react'
 import _ from 'lodash'
 import moment from 'moment'
 
-import useLanguage from 'components/LanguagePicker/useLanguage'
-import StatusCard from './StatusCard'
-import Toolbar from './Toolbar'
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
+import { coolDataScienceToolTips } from 'common/InfoToolTips'
+import { StatusCard } from './StatusCard'
+import { Toolbar } from './Toolbar'
 import { useLocalStorage } from '../../common/hooks'
-import InfoToolTips from '../../common/InfoToolTips'
-import DrillStack from './DrillStack'
+import { DrillStack } from './DrillStack'
 import { getStatusGraduated } from '../../redux/coolDataScience'
 import './status.css'
 
@@ -31,7 +31,7 @@ const settingDefinitions = [
     defaultValue: () => moment(),
     persist: false,
   },
-].map(setting => ({ ...setting, ...InfoToolTips.CoolDataScience.statusGraduated.settings[setting.key] }))
+].map(setting => ({ ...setting, ...coolDataScienceToolTips.statusGraduated.settings[setting.key] }))
 
 const StatusContainer = ({
   title,
@@ -108,7 +108,7 @@ const getDefaultSettings = () =>
     .fromPairs()
     .value()
 
-const Status = ({ getStatusGraduatedDispatch, data, loading }) => {
+const StatusGraduated = ({ getStatusGraduatedDispatch, data, loading }) => {
   const [explicitSettings, setSettings] = useLocalStorage('trendsGraduationStatusSettings', {})
   const [nonpersistentExplicitSettings, setNonpersistentSettings] = useState({})
   const { getTextIn } = useLanguage()
@@ -126,7 +126,6 @@ const Status = ({ getStatusGraduatedDispatch, data, loading }) => {
 
   const { showYearlyValues, showByYear, showCountingFrom } = settings
 
-  const { CoolDataScience } = InfoToolTips
   const isValidDate = d => moment.isMoment(d) && moment().diff(d) > 0
 
   useEffect(() => {
@@ -158,7 +157,7 @@ const Status = ({ getStatusGraduatedDispatch, data, loading }) => {
         <Toolbar
           value={settings}
           settings={settingDefinitions}
-          generalHelp={CoolDataScience.statusGraduated.general}
+          generalHelp={coolDataScienceToolTips.statusGraduated.general}
           changeSetting={changeSetting}
         />
       </div>
@@ -190,7 +189,7 @@ const Status = ({ getStatusGraduatedDispatch, data, loading }) => {
   )
 }
 
-Status.propTypes = {
+StatusGraduated.propTypes = {
   data: shape({}).isRequired,
   loading: bool.isRequired,
   getStatusGraduatedDispatch: func.isRequired,
@@ -201,4 +200,6 @@ const mapStateToProps = ({ coolDataScience }) => ({
   loading: coolDataScience.pending.graduated,
 })
 
-export default connect(mapStateToProps, { getStatusGraduatedDispatch: getStatusGraduated })(Status)
+export const ConnectedStatusGraduated = connect(mapStateToProps, { getStatusGraduatedDispatch: getStatusGraduated })(
+  StatusGraduated
+)

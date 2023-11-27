@@ -1,15 +1,12 @@
 import React, { useState } from 'react'
-import { withRouter, useLocation, useHistory } from 'react-router-dom'
 import { Message, Icon } from 'semantic-ui-react'
 import { useTitle } from '../../common/hooks'
-import CompletedCoursesSearch from './CompletedCoursesSearch'
-import CompletedCoursesSearchResults from './CompletedCoursesSearchResults'
+import { CompletedCoursesSearch } from './CompletedCoursesSearch'
+import { CompletedCoursesSearchResults } from './CompletedCoursesSearchResults'
 
-const CompletedCourses = () => {
+export const CompletedCourses = () => {
   useTitle('Search completed courses')
   const [searchValues, setValues] = useState({})
-  const location = useLocation()
-  const history = useHistory()
 
   return (
     <div className="segmentContainer">
@@ -29,7 +26,7 @@ const CompletedCourses = () => {
           <b>Empty cell</b>: Student has no completion or enrollment for the course.
         </p>
       </Message>
-      <CompletedCoursesSearch setValues={setValues} history={history} location={location} />
+      <CompletedCoursesSearch setValues={setValues} />
 
       <div style={{ paddingTop: '25px' }}>
         {searchValues && searchValues.courseList?.length > 0 && searchValues.studentList?.length > 0 && (
@@ -39,5 +36,3 @@ const CompletedCourses = () => {
     </div>
   )
 }
-
-export default withRouter(CompletedCourses)

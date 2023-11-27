@@ -1,11 +1,10 @@
 /* eslint-disable react/no-children-prop */
 import React, { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-import changelogApi from 'redux/changelog'
 import { Divider, Header, Loader } from 'semantic-ui-react'
-import { builtAt } from '../../conf'
 
-const { useGetChangelogQuery } = changelogApi
+import { useGetChangelogQuery } from 'redux/changelog'
+import { builtAt } from '../../conf'
 
 export const Changelog = ({ showFullChangelog }) => {
   const [itemsToShow, setItemsToShow] = useState([])

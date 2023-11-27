@@ -1,9 +1,9 @@
 import React from 'react'
 import { Table } from 'semantic-ui-react'
 
-import NoDataMessage from '../NoDataMessage'
+import { NoDataMessage } from '../NoDataMessage'
 
-const DataTable = ({ data, titles, track }) => {
+export const BasicDataTable = ({ data, titles, track }) => {
   if (!data || !data[track]?.length || !titles)
     return <NoDataMessage message="No progress data found for the studytrack. Try with another studytrack" />
 
@@ -47,5 +47,3 @@ const DataTable = ({ data, titles, track }) => {
     </div>
   )
 }
-
-export default DataTable

@@ -5,7 +5,7 @@ import './teacherSearch.css'
 import { useFindTeachersQuery } from 'redux/teachers'
 import { validateInputLength, splitByEmptySpace } from 'common'
 import { useDebounce } from 'common/hooks'
-import SortableTable from '../../SortableTable'
+import { SortableTable } from '../../SortableTable'
 
 export const TeacherSearch = ({ onClick }) => {
   const [searchterm, setSearchterm] = useState('')

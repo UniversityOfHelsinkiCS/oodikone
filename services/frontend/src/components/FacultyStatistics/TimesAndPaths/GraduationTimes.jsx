@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Divider, Message } from 'semantic-ui-react'
-import MedianBarChart from './MedianBarChart'
-import BreakdownBarChart from './BreakdownBarChart'
+import { MedianBarChart } from './MedianBarChart'
+import { BreakdownBarChart } from './BreakdownBarChart'
 import '../faculty.css'
 
 const MedianDisplay = ({
@@ -92,7 +92,7 @@ const BreakdownDislay = ({ handleClick, data, label, levelProgrammeData, program
   )
 }
 
-const GraduationTimes = ({
+export const GraduationTimes = ({
   title,
   data,
   level,
@@ -152,5 +152,3 @@ const GraduationTimes = ({
     </div>
   )
 }
-
-export default GraduationTimes

@@ -2,19 +2,19 @@ import React, { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { Segment, Label, Header, Divider, Form } from 'semantic-ui-react'
 import { oneOfType, number, string, bool } from 'prop-types'
-import SingleCourseStats from '../SingleCourseStats'
-import useLanguage from '../../LanguagePicker/useLanguage'
-import selectors from '../../../selectors/courseStats'
+import { ConnectedSingleCourseStats as SingleCourseStats } from '../SingleCourseStats'
+import { useLanguage } from '../../LanguagePicker/useLanguage'
+import { getCourseStats, getAvailableStats, getCourses } from '../../../selectors/courseStats'
 
-const SingleCourseTab = ({ selected, userHasAccessToAllStats }) => {
+export const SingleCourseTab = ({ selected, userHasAccessToAllStats }) => {
   const [selection, setSelection] = useState(selected)
   const { getTextIn } = useLanguage()
-  const stats = useSelector(selectors.getCourseStats)
-  const availableStats = useSelector(selectors.getAvailableStats)
-  const courses = useSelector(selectors.getCourses).map(({ code, name }) => ({
+  const stats = useSelector(getCourseStats)
+  const availableStats = useSelector(getAvailableStats)
+  const courses = useSelector(getCourses).map(({ code, name }) => ({
     key: code,
     value: code,
-    text: <Header content={<>{name}</>} />,
+    text: <Header content={name} />,
     content: name,
   }))
 
@@ -64,5 +64,3 @@ SingleCourseTab.propTypes = {
   selected: oneOfType([number, string]).isRequired,
   userHasAccessToAllStats: bool.isRequired,
 }
-
-export default SingleCourseTab

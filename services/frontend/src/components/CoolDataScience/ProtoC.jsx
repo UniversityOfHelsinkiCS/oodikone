@@ -7,7 +7,7 @@ import HighchartsCustomEvents from 'highcharts-custom-events'
 
 import ReactMarkdown from 'react-markdown'
 import moment from 'moment'
-import InfoToolTips from '../../common/InfoToolTips'
+import { coolDataScienceToolTips } from 'common/InfoToolTips'
 import { useGetProtoCQuery, useGetProtoCProgrammeQuery } from '../../redux/coolDataScience'
 
 HighchartsCustomEvents(Highcharts)
@@ -178,7 +178,7 @@ const makeClickableChartConfig = (sortedData, onPointClicked, org, [startYear, e
       labels: {
         events: {
           click() {
-            // eslint-disable-next-line babel/no-invalid-this
+            // eslint-disable-next-line @babel/no-invalid-this
             const clickedLabel = sortedData.find(data => data.name === this.value)
             setImmediate(() => onPointClicked(clickedLabel))
           },
@@ -511,7 +511,7 @@ const StudytrackDrilldown = ({ programme, sorter, sortDir, yearRange }) => {
   return <StudytrackChart programme={programmeSortedStudytracks} yearRange={yearRange} />
 }
 
-const ProtoC = ({ programme }) => {
+export const ProtoC = ({ programme }) => {
   const [sorter, setSorter] = useState('3v tahti')
   const [sortDir, setSortDir] = useState(1)
   const [drilldownOrgCode, setDrilldownOrgCode] = useState(null)
@@ -586,8 +586,6 @@ const ProtoC = ({ programme }) => {
     if (sorterName === sorter) setSortDir(-1 * sortDir)
     setSorter(sorterName)
   }
-
-  const { CoolDataScience } = InfoToolTips
 
   // create list from sorters and deprecate this
   const sorterNames = Object.keys(sorters)
@@ -733,10 +731,8 @@ const ProtoC = ({ programme }) => {
       <RenderBelowGraph />
       <Message>
         {/* eslint-disable-next-line react/no-children-prop */}
-        <ReactMarkdown children={CoolDataScience.protoC} />
+        <ReactMarkdown children={coolDataScienceToolTips.protoC} />
       </Message>
     </Segment>
   )
 }
-
-export default ProtoC

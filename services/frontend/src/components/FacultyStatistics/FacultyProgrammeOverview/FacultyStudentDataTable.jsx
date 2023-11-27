@@ -1,9 +1,9 @@
-/* eslint-disable react/no-array-index-key */
-import PopulationLink from 'components/StudyProgramme/StudytrackOverview/PopulationLink'
 import React, { useState } from 'react'
 import { Table, Button, Icon, Label, Popup } from 'semantic-ui-react'
-import useLanguage from 'components/LanguagePicker/useLanguage'
-import Toggle from '../../StudyProgramme/Toggle'
+
+import { PopulationLink } from 'components/StudyProgramme/StudytrackOverview/PopulationLink'
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
+import { Toggle } from '../../StudyProgramme/Toggle'
 
 const getStyle = idx => {
   if ([4, 12].includes(idx)) return { backgroundColor: '#f9f9f9', borderLeftWidth: 'thick' }
@@ -109,7 +109,7 @@ const getRows = ({
   })
 }
 
-const FacultyStudentDataTable = ({
+export const FacultyStudentDataTable = ({
   tableStats,
   extraTableStats,
   programmeStats,
@@ -267,5 +267,3 @@ const FacultyStudentDataTable = ({
     </div>
   )
 }
-
-export default FacultyStudentDataTable

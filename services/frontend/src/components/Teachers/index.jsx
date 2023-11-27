@@ -4,7 +4,7 @@ import { useHistory, useParams } from 'react-router-dom'
 
 import { useGetAuthorizedUserQuery } from 'redux/auth'
 import { useTabs, useTitle } from 'common/hooks'
-import TeacherSearchTab from './TeacherSearchTab'
+import { TeacherSearchTab } from './TeacherSearchTab'
 import { TeacherStatistics } from './TeacherStatistics'
 import { TeacherLeaderBoard } from './TeacherLeaderBoard'
 import { TeacherDetails } from './TeacherDetails'
@@ -40,7 +40,7 @@ const TeachersTabs = () => {
   )
 }
 
-const Teachers = () => {
+export const Teachers = () => {
   useTitle('Teachers')
   const { teacherid } = useParams()
   return (
@@ -52,5 +52,3 @@ const Teachers = () => {
     </div>
   )
 }
-
-export default Teachers

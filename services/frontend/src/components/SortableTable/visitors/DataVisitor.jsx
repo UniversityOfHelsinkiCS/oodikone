@@ -31,7 +31,7 @@ class DataVisitorContext {
   }
 }
 
-export default class DataVisitor {
+export class DataVisitor {
   visitRow(ctx) {
     return ctx.item
   }

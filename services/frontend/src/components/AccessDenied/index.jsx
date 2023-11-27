@@ -5,7 +5,7 @@ import ReactHighchart from 'react-highcharts'
 import { random } from 'lodash'
 import { useLogoutMutation } from 'redux/auth'
 import { images } from '../../common'
-import MulticolorBarChart from './MulticolorBarChart'
+import { MulticolorBarChart } from './MulticolorBarChart'
 
 // add github handles of oodikone devs here
 const names = [
@@ -37,7 +37,7 @@ const dummyData = names.map(name => ({
   }, []),
 }))
 
-const AccessDenied = ({ notEnabled }) => {
+export const AccessDenied = ({ notEnabled }) => {
   const header = notEnabled ? 'Welcome to Oodikone!' : 'Something broke'
   const subheader = notEnabled
     ? `You're currently not allowed to enter
@@ -113,5 +113,3 @@ const AccessDenied = ({ notEnabled }) => {
     </div>
   )
 }
-
-export default AccessDenied

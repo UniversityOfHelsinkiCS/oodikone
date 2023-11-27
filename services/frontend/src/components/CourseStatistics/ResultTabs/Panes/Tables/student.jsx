@@ -2,11 +2,10 @@ import React, { useMemo } from 'react'
 import qs from 'query-string'
 import { Link } from 'react-router-dom'
 import { Header, Icon, Item } from 'semantic-ui-react'
-import { connect } from 'react-redux'
 import { uniq } from 'lodash'
 import { string, object, arrayOf, bool } from 'prop-types'
-import { row } from 'components/SortableTable'
-import SortableTable from '../../../../SortableTable'
+
+import { SortableTable, row } from 'components/SortableTable'
 import { defineCellColor, resolveGrades, getSortableColumn } from '../util'
 
 const formatPercentage = p => `${(p * 100).toFixed(2)} %`
@@ -57,15 +56,16 @@ const getColumns = (stats, showDetails, showGrades, userHasAccessToAllStats, alt
         {
           key: 'TIME-ICON',
           export: false,
-          getRowContent: s => (
-            <>
-              {s.name !== 'Total' && userHasAccessToAllStats && (
+          getRowContent: s => {
+            if (s.name !== 'Total' && userHasAccessToAllStats) {
+              return (
                 <Item as={Link} to={showPopulation(s.code, s.name, s)}>
                   <Icon name="level up alternate" />
                 </Item>
-              )}
-            </>
-          ),
+              )
+            }
+            return null
+          },
         },
       ],
     },
@@ -189,7 +189,7 @@ const getColumns = (stats, showDetails, showGrades, userHasAccessToAllStats, alt
   })
 }
 
-const StudentTable = ({
+export const StudentTable = ({
   data: { name, stats },
   settings: { showDetails, separate, showGrades },
   alternatives,
@@ -240,5 +240,3 @@ StudentTable.propTypes = {
 StudentTable.defaultProps = {
   separate: false,
 }
-
-export default connect(null)(StudentTable)

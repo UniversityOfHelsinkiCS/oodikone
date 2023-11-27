@@ -3,20 +3,19 @@ import { Divider, Loader } from 'semantic-ui-react'
 
 import { useGetStudytrackStatsQuery } from 'redux/studyProgramme'
 import { calculateStats } from 'components/FacultyStatistics/FacultyProgrammeOverview'
-import InfoBox from '../../Info/InfoBox'
-import BarChart from './BarChart'
-import BasicDataTable from './BasicDataTable'
-import StudytrackDataTable from './StudytrackDataTable'
-import StudytrackSelector from './StudytrackSelector'
-import Toggle from '../Toggle'
-import MedianTimeBarChart from '../MedianTimeBarChart'
-import BreakdownBarChart from '../BreakdownBarChart'
-
-import InfotoolTips from '../../../common/InfoToolTips'
-import { getGraduationGraphTitle, getTargetCreditsForProgramme } from '../../../common'
+import { studyProgrammeToolTips } from 'common/InfoToolTips'
+import { getGraduationGraphTitle, getTargetCreditsForProgramme } from 'common'
+import { InfoBox } from '../../Info/InfoBox'
+import { BarChart } from './BarChart'
+import { BasicDataTable } from './BasicDataTable'
+import { StudytrackDataTable } from './StudytrackDataTable'
+import { StudytrackSelector } from './StudytrackSelector'
+import { Toggle } from '../Toggle'
+import { MedianTimeBarChart } from '../MedianTimeBarChart'
+import { BreakdownBarChart } from '../BreakdownBarChart'
 import '../studyprogramme.css'
 
-const StudytrackOverview = ({
+export const StudytrackOverview = ({
   studyprogramme,
   specialGroups,
   setSpecialGroups,
@@ -24,7 +23,6 @@ const StudytrackOverview = ({
   setGraduated,
   combinedProgramme,
 }) => {
-  const toolTips = InfotoolTips.Studyprogramme
   const [showMedian, setShowMedian] = useState(false)
   const [track, setTrack] = useState(studyprogramme)
   const special = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
@@ -48,7 +46,7 @@ const StudytrackOverview = ({
           {title}
         </Divider>
       </div>
-      <InfoBox content={toolTips[toolTipText]} />
+      <InfoBox content={studyProgrammeToolTips[toolTipText]} />
     </>
   )
 
@@ -85,7 +83,7 @@ const StudytrackOverview = ({
           <div className="toggle-container">
             <Toggle
               cypress="StudentToggle"
-              toolTips={toolTips.StudentToggle}
+              toolTips={studyProgrammeToolTips.StudentToggle}
               firstLabel="All studyrights"
               secondLabel="Special studyrights excluded"
               value={specialGroups}
@@ -93,7 +91,7 @@ const StudytrackOverview = ({
             />
             <Toggle
               cypress="GraduatedToggle"
-              toolTips={toolTips.GraduatedToggle}
+              toolTips={studyProgrammeToolTips.GraduatedToggle}
               firstLabel="Graduated included"
               secondLabel="Graduated excluded"
               value={graduated}
@@ -203,5 +201,3 @@ const StudytrackOverview = ({
     </div>
   )
 }
-
-export default StudytrackOverview

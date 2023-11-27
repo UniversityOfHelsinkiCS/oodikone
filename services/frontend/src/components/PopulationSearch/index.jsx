@@ -1,17 +1,19 @@
 import React from 'react'
 import { Segment, Header, Divider, Form, Button, Icon } from 'semantic-ui-react'
 import { connect } from 'react-redux'
-import { Link } from 'react-router-dom'
-import useFilters from 'components/FilterView/useFilters'
+import { Link, useHistory, useLocation } from 'react-router-dom'
+import { useFilters } from 'components/FilterView/useFilters'
 import { hopsFilter } from 'components/FilterView/filters'
-import PopulationSearchForm from './PopulationSearchForm'
-import PopulationSearchHistory from './PopulationSearchHistory'
-import ProgressBar from '../ProgressBar'
-import InfoBox from '../Info/InfoBox'
+import { populationStatisticsToolTips } from 'common/InfoToolTips'
+import { ConnectedPopulationSearchForm as PopulationSearchForm } from './PopulationSearchForm'
+import { ConnectedPopulationSearchHistory as PopulationSearchHistory } from './PopulationSearchHistory'
+import { ProgressBar } from '../ProgressBar'
+import { InfoBox } from '../Info/InfoBox'
 import { useProgress } from '../../common/hooks'
-import infotoolTips from '../../common/InfoToolTips'
 
-const PopulationSearch = ({ populationFound, history, location, loading, combinedProgrammeCode }) => {
+const PopulationSearch = ({ populationFound, loading, combinedProgrammeCode }) => {
+  const history = useHistory()
+  const location = useLocation()
   const { onProgress, progress } = useProgress(loading)
   const { filterDispatch, useFilterSelector } = useFilters()
   const onlyHopsCredit = useFilterSelector(hopsFilter.selectors.isActive)
@@ -24,7 +26,7 @@ const PopulationSearch = ({ populationFound, history, location, loading, combine
       {title && <Header size="medium">{title}</Header>}
       {(!populationFound || !history.location.search) && (
         <>
-          <InfoBox content={infotoolTips.PopulationStatistics.Search} cypress="PopulationSearch" />
+          <InfoBox content={populationStatisticsToolTips.Search} cypress="PopulationSearch" />
           <Divider />
         </>
       )}
@@ -66,7 +68,7 @@ const PopulationSearch = ({ populationFound, history, location, loading, combine
               />
             </Form.Field>
           )}
-          <PopulationSearchHistory history={history} />
+          <PopulationSearchHistory />
         </Form>
       )}
       <ProgressBar progress={progress} />
@@ -79,4 +81,4 @@ const mapStateToProps = ({ populations }) => ({
   loading: !!populations.pending,
 })
 
-export default connect(mapStateToProps)(PopulationSearch)
+export const ConnectedPopulationSearch = connect(mapStateToProps)(PopulationSearch)

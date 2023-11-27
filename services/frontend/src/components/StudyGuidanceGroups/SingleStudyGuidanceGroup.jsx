@@ -1,29 +1,29 @@
-import * as filters from 'components/FilterView/filters'
+import React, { useState } from 'react'
 import { Button, Header, Divider, Label } from 'semantic-ui-react'
 import moment from 'moment'
-import CreditAccumulationGraphHighCharts from 'components/CreditAccumulationGraphHighCharts'
 import _ from 'lodash'
-import PopulationStudents from 'components/PopulationStudents'
-import React, { useState } from 'react'
-import SegmentDimmer from 'components/SegmentDimmer'
-import useFilters from 'components/FilterView/useFilters'
-import creditDateFilter from 'components/FilterView/filters/date'
-import studyPlanFilter from 'components/FilterView/filters/hops'
+import { useHistory } from 'react-router-dom'
+
+import * as filters from 'components/FilterView/filters'
+import { CreditAccumulationGraphHighCharts } from 'components/CreditAccumulationGraphHighCharts'
+import { PopulationStudentsContainer as PopulationStudents } from 'components/PopulationStudents'
+import { SegmentDimmer } from 'components/SegmentDimmer'
+import { useFilters } from 'components/FilterView/useFilters'
+import { creditDateFilter, hopsFilter as studyPlanFilter } from 'components/FilterView/filters'
 import { useFilteredAndFormattedElementDetails } from 'redux/elementdetails'
 import {
   useGetStudyGuidanceGroupPopulationQuery,
   useGetStudyGuidanceGroupPopulationCoursesQuery,
 } from 'redux/studyGuidanceGroups'
-import { useHistory } from 'react-router-dom'
 import { useGetProgressCriteriaQuery } from 'redux/programmeProgressCriteria'
-import useLanguage from 'components/LanguagePicker/useLanguage'
-import AgeStats from 'components/PopulationDetails/AgeStats'
-import CreditGainStats from 'components/PopulationDetails/CreditGainStats'
-import PanelView from 'components/common/PanelView'
-import StudyGuidanceGroupPopulationCourses from './StudyGuidanceGroupPopulationCourses'
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
+import { AgeStats } from 'components/PopulationDetails/AgeStats'
+import { CreditGainStats } from 'components/PopulationDetails/CreditGainStats'
+import { PanelView } from 'components/common/PanelView'
+import { StudyGuidanceGroupPopulationCourses } from './StudyGuidanceGroupPopulationCourses'
 import { startYearToAcademicYear, Wrapper, StyledMessage } from './common'
 import { useGetSemestersQuery } from '../../redux/semesters'
-import FilterView from '../FilterView'
+import { FilterView } from '../FilterView'
 
 const createAcademicYearStartDate = year => new Date(year, 7, 1)
 
@@ -151,7 +151,7 @@ const SingleStudyGroupContent = ({ filteredStudents, group }) => {
   )
 }
 
-const SingleStudyGroupFilterView = props => {
+const SingleStudyGroupFilterView = ({ courses, group, population, ...otherProps }) => {
   const semesterQuery = useGetSemestersQuery()
   const allSemesters = semesterQuery.data?.semesters
   const { language } = useLanguage()
@@ -166,16 +166,16 @@ const SingleStudyGroupFilterView = props => {
     filters.startYearAtUniFilter,
     filters.tagsFilter,
     filters.courseFilter({
-      courses: props.courses?.coursestatistics ?? [],
+      courses: courses?.coursestatistics ?? [],
     }),
     filters.creditDateFilter,
     filters.creditsEarnedFilter,
   ]
 
-  if (!props.group?.tags?.studyProgramme) {
+  if (!group?.tags?.studyProgramme) {
     viewFilters.push(
       filters.programmeFilter({
-        additionalModes: props.group?.tags?.year
+        additionalModes: group?.tags?.year
           ? [
               {
                 key: 'assoc-year',
@@ -183,7 +183,7 @@ const SingleStudyGroupFilterView = props => {
                 description:
                   'Student has had a study right since the start year associated with this study guidance group.',
                 predicate: (_student, sre) =>
-                  moment(createAcademicYearStartDate(props.group.tags?.year)).isBetween(
+                  moment(createAcademicYearStartDate(group.tags?.year)).isBetween(
                     sre.startdate,
                     sre.enddate,
                     'day',
@@ -196,18 +196,18 @@ const SingleStudyGroupFilterView = props => {
     )
   }
 
-  if (props.group?.tags?.studyProgramme && props.group?.tags?.year && parseInt(props.group.tags.year, 10) >= 2020) {
+  if (group?.tags?.studyProgramme && group?.tags?.year && parseInt(group.tags.year, 10) >= 2020) {
     viewFilters.push(
       filters.admissionTypeFilter({
-        programme: props.group.tags.studyProgramme,
+        programme: group.tags.studyProgramme,
       })
     )
   }
 
-  if (props.group?.tags?.studyProgramme) {
-    const programmes = props.group?.tags?.studyProgramme.includes('+')
-      ? props.group?.tags?.studyProgramme.split('+')
-      : [props.group?.tags?.studyProgramme]
+  if (group?.tags?.studyProgramme) {
+    const programmes = group?.tags?.studyProgramme.includes('+')
+      ? group?.tags?.studyProgramme.split('+')
+      : [group?.tags?.studyProgramme]
     viewFilters.push(
       filters.graduatedFromProgrammeFilter({
         code: programmes[0],
@@ -225,21 +225,29 @@ const SingleStudyGroupFilterView = props => {
 
   const initialOptions = {}
 
-  if (props.group?.tags?.year) {
+  if (group?.tags?.year) {
     initialOptions[filters.hopsFilter.key] = {
-      studyStart: props.group?.tags?.year ? `${props.group.tags.year}-07-31` : null,
+      studyStart: group?.tags?.year ? `${group.tags.year}-07-31` : null,
       clearCreditDate: true,
     }
   }
 
   return (
     <FilterView
-      name={`StudyGuidanceGroup(${props.group.id})`}
+      name={`StudyGuidanceGroup(${group.id})`}
       filters={viewFilters}
-      students={props.population?.students ?? []}
+      students={population?.students ?? []}
       initialOptions={initialOptions}
     >
-      {students => <SingleStudyGroupContent {...props} filteredStudents={students} />}
+      {students => (
+        <SingleStudyGroupContent
+          courses={courses}
+          group={group}
+          population={population}
+          {...otherProps}
+          filteredStudents={students}
+        />
+      )}
     </FilterView>
   )
 }
@@ -273,7 +281,7 @@ const SingleStudyGroupViewWrapper = ({ group, isLoading, studyProgrammes, childr
   )
 }
 
-const SingleStudyGuidanceGroupContainer = ({ group }) => {
+export const SingleStudyGuidanceGroupContainer = ({ group }) => {
   const groupStudentNumbers = group?.members?.map(({ personStudentNumber }) => personStudentNumber) || []
   const studyProgrammes = useFilteredAndFormattedElementDetails()
   const { tags } = group
@@ -308,5 +316,3 @@ const SingleStudyGuidanceGroupContainer = ({ group }) => {
     </SingleStudyGroupViewWrapper>
   )
 }
-
-export default SingleStudyGuidanceGroupContainer

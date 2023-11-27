@@ -7,7 +7,7 @@ import { Segment, Loader, Dimmer, Table, Form, Dropdown, Icon, Checkbox, Message
 import _ from 'lodash'
 import ReactMarkdown from 'react-markdown'
 
-import InfoToolTips from '../../common/InfoToolTips'
+import { coolDataScienceToolTips } from 'common/InfoToolTips'
 import { getUber, getYears } from '../../redux/coolDataScience'
 import './protoG.css'
 
@@ -198,7 +198,6 @@ const ProtoG = ({ uberdata, years, isLoading, loadingYears, getUberDispatch, get
     <Message color="blue" content="Klikkaamalla tiedekuntaa pystyt tarkastelemaan koulutusohjelma kohtaista dataa." />
   )
 
-  const { CoolDataScience } = InfoToolTips
   return (
     <Segment>
       <div style={{ display: 'flex' }}>
@@ -281,7 +280,7 @@ const ProtoG = ({ uberdata, years, isLoading, loadingYears, getUberDispatch, get
         <Message>
           {
             // eslint-disable-next-line react/no-children-prop
-            <ReactMarkdown children={CoolDataScience.protoC} />
+            <ReactMarkdown children={coolDataScienceToolTips.protoC} />
           }
         </Message>
       </Segment>
@@ -296,4 +295,6 @@ const mapStateToProps = ({ coolDataScience }) => ({
   loadingYears: coolDataScience.pending.years,
 })
 
-export default connect(mapStateToProps, { getUberDispatch: getUber, getYearsDispatch: getYears })(ProtoG)
+export const ConnectedProtoG = connect(mapStateToProps, { getUberDispatch: getUber, getYearsDispatch: getYears })(
+  ProtoG
+)

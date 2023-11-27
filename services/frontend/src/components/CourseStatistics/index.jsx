@@ -2,18 +2,19 @@ import React, { useState, useEffect } from 'react'
 import { Header, Segment, Tab, Message } from 'semantic-ui-react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
-import './courseStatistics.css'
 import { useGetAuthorizedUserQuery } from 'redux/auth'
 import qs from 'query-string'
-import SearchForm from './SearchForm'
-import SingleCourseTab from './SingleCourseTab'
-import FacultyLevelStatistics from './FacultyLevelStatistics'
-import SummaryTab from './SummaryTab'
-import ProgressBar from '../ProgressBar'
+
+import { clearCourseStats, getCourseStats } from 'redux/coursestats'
+import { SearchForm } from './SearchForm'
+import { SingleCourseTab } from './SingleCourseTab'
+import { FacultyLevelStatistics } from './FacultyLevelStatistics'
+import { ConnectedSummaryTab as SummaryTab } from './SummaryTab'
+import { ProgressBar } from '../ProgressBar'
 import { useProgress, useTitle } from '../../common/hooks'
-import { clearCourseStats, getCourseStats } from '../../redux/coursestats'
 import { checkUserAccess } from '../../common'
 import { userHasAccessToAllCourseStats } from './courseStatisticsUtils'
+import './courseStatistics.css'
 
 const MENU = {
   SUM: 'Summary',
@@ -22,7 +23,7 @@ const MENU = {
   FACULTY: 'Faculty statistics',
 }
 
-const CourseStatistics = () => {
+export const CourseStatistics = () => {
   const history = useHistory()
   const dispatch = useDispatch()
   const { rights, roles } = useGetAuthorizedUserQuery()
@@ -156,5 +157,3 @@ const CourseStatistics = () => {
     </div>
   )
 }
-
-export default CourseStatistics

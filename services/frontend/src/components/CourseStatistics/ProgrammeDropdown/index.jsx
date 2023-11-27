@@ -2,10 +2,10 @@ import React from 'react'
 import { Form } from 'semantic-ui-react'
 import { string, arrayOf, shape, func, oneOfType, number } from 'prop-types'
 import { orderBy } from 'lodash'
-import DropdownItem from './DropdownItem'
-import ClearableItem from './ClearableItem'
+import { DropdownItem } from './DropdownItem'
+import { ClearableItem } from './ClearableItem'
 
-const ProgrammeDropdown = ({ options, label, name, onChange, onClear, value, ...props }) => (
+export const ProgrammeDropdown = ({ options, label, name, onChange, onClear, value, ...props }) => (
   <Form.Dropdown
     options={orderBy(options, ['size'], ['desc']).map(({ key, size, value: v, text, description }) => ({
       key,
@@ -48,5 +48,3 @@ ProgrammeDropdown.defaultProps = {
   value: [],
   onClear: undefined,
 }
-
-export default ProgrammeDropdown

@@ -1,7 +1,6 @@
-/* eslint-disable quotes */
 import React from 'react'
 import { Menu, Radio } from 'semantic-ui-react'
-import HelpButton from '../HelpButton'
+import { HelpButton } from '../HelpButton'
 import { gradeGraphOptions } from '../../../../constants'
 import {
   getDataObject,
@@ -11,7 +10,7 @@ import {
   isThesisSeries,
   absoluteToRelative,
 } from './util'
-import StackedBarChart from '../../../StackedBarChart'
+import { StackedBarChart } from '../../../StackedBarChart'
 
 const getGradeSeries = series => {
   const isGradeSeries = !isThesisSeries(series)

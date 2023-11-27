@@ -5,19 +5,17 @@ import { Segment, Loader } from 'semantic-ui-react'
 import { isEmpty, sortBy } from 'lodash'
 import moment from 'moment'
 
-import { withRouter } from 'react-router-dom'
-
-import { getStudent, removeStudentSelection, resetStudent } from '../../../redux/students'
-import { useGetSemestersQuery } from '../../../redux/semesters'
-import StudentInfoCard from '../StudentInfoCard'
-import { bachelorHonoursProgrammes as bachelorCodes, getNewestProgramme } from '../../../common'
-import { clearCourseStats } from '../../../redux/coursestats'
-import { getProgrammes } from '../../../redux/populationProgrammes'
-import BachelorHonours from './BachelorHonours'
-import StudyrightsTable from './StudyrightsTable'
-import TagsTable from './TagsTable'
-import CourseParticipationTable from './CourseParticipationTable'
-import StudentGraphs from './StudentGraphs'
+import { getStudent, removeStudentSelection, resetStudent } from 'redux/students'
+import { useGetSemestersQuery } from 'redux/semesters'
+import { clearCourseStats } from 'redux/coursestats'
+import { getProgrammes } from 'redux/populationProgrammes'
+import { bachelorHonoursProgrammes as bachelorCodes, getNewestProgramme } from 'common'
+import { StudentInfoCard } from '../StudentInfoCard'
+import { BachelorHonours } from './BachelorHonours'
+import { StudyrightsTable } from './StudyrightsTable'
+import { TagsTable } from './TagsTable'
+import { CourseParticipationTable } from './CourseParticipationTable'
+import { StudentGraphs } from './StudentGraphs'
 
 const StudentDetails = ({
   student,
@@ -262,4 +260,4 @@ const mapDispatchToProps = {
   getProgrammes,
 }
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(StudentDetails))
+export const ConnectedStudentDetails = connect(mapStateToProps, mapDispatchToProps)(StudentDetails)

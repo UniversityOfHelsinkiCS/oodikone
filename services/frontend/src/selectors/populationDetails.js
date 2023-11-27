@@ -2,7 +2,7 @@ import { createSelector } from '@reduxjs/toolkit'
 
 const getPopulations = state => state.populations
 
-const makePopulationsToData = createSelector([getPopulations], populations => {
+export const makePopulationsToData = createSelector([getPopulations], populations => {
   const { pending, data, query } = populations
   const { programme } = query ? query.studyRights : ''
 
@@ -26,7 +26,3 @@ const makePopulationsToData = createSelector([getPopulations], populations => {
 
   return { samples, selectedStudents, complemented, programme, selectedStudentsByYear, queryIsSet, isLoading, query }
 })
-
-export default {
-  makePopulationsToData,
-}

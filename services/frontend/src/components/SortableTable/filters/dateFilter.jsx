@@ -1,5 +1,5 @@
 import React from 'react'
-import DateRangeSelector from 'components/common/DateRangeSelector'
+import { DateRangeSelector } from 'components/common/DateRangeSelector'
 import moment from 'moment'
 import { getColumnValue } from '../common'
 
@@ -20,7 +20,7 @@ const DateColumnFilterComponent = ({ options, dispatch }) => {
   )
 }
 
-export default {
+export const dateColumnFilter = {
   component: DateColumnFilterComponent,
 
   isActive: options => options?.range?.[0] || options?.range?.[1],

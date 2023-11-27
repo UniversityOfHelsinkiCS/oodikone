@@ -1,4 +1,4 @@
-export default {
+export const populationStatisticsToolTips = {
   Advanced: `**Semesters:**  Jos haluaa tarkastella vain syyslukukaudella tai kevätlukukaudella aloittaneita, haluttu ajanjakso valitaan tästä.
 
   **Include:** Koulutusohjelmapopulaatiosta on oletusarvoisesti suodatettu pois ohjelmasta poissiirtyneet opiskelijat. Heidät voi sisällyttää mukaan lisäämällä ruksin ja noutamalla tulokset uudestaan (Fetch class with new settings).`,

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { Button, Label, Table, Icon, Dropdown } from 'semantic-ui-react'
-import { useSetCourseExclusionMutation, useRemoveCourseExclusionMutation } from '../../../redux/courseExclusions'
 
-import useLanguage from '../../LanguagePicker/useLanguage'
+import { useSetCourseExclusionMutation, useRemoveCourseExclusionMutation } from '../../../redux/courseExclusions'
+import { useLanguage } from '../../LanguagePicker/useLanguage'
 
 const getYear = criterionYear => {
   if (criterionYear === 1) return 'yearOne'
@@ -24,7 +24,7 @@ const moduleVisibilityColor = visibility => {
   }
 }
 
-const DegreeCourseTableView = ({
+export const DegreeCourseTableView = ({
   modules: initialModules,
   studyProgramme,
   combinedProgramme,
@@ -340,4 +340,3 @@ const DegreeCourseTableView = ({
     </Table>
   )
 }
-export default DegreeCourseTableView

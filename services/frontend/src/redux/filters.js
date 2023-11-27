@@ -54,4 +54,4 @@ export const selectViewFilters = createSelector(
 )
 
 export const { setFilterOptions, resetFilter, resetViewFilters } = slice.actions
-export default slice.reducer
+export const { reducer } = slice

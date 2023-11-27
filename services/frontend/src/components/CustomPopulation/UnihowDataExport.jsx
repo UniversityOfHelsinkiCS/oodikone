@@ -2,9 +2,10 @@ import React from 'react'
 import moment from 'moment'
 import xlsx from 'xlsx'
 import { Button, Popup } from 'semantic-ui-react'
-import { getStudentGradeMean, getStudentGradeMeanWeightedByCredits, getStudentTotalCredits } from '../../common'
 
-export default ({ students }) => {
+import { getStudentGradeMean, getStudentGradeMeanWeightedByCredits, getStudentTotalCredits } from 'common'
+
+export const UnihowDataExport = ({ students }) => {
   const getXlsx = () => {
     const data = students.map(student => ({
       'Student Number': student.studentNumber,

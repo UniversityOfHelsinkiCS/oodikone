@@ -2,8 +2,9 @@ import React from 'react'
 import { Progress, Table } from 'semantic-ui-react'
 import { intersection, orderBy } from 'lodash'
 import moment from 'moment'
+
 import { getHighestGradeOfCourseBetweenRange } from '../../../common'
-import ExternalGradeFilterToggle from './ExternalGradeFilterToggle'
+import { ExternalGradeFilterToggle } from './ExternalGradeFilterToggle'
 
 export const CoursePopulationGradeDist = ({ singleCourseStats, students, courseCodes, from, to }) => {
   const courseGrades = []

@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from 'react'
 import { Modal, Form, Button, TextArea, Loader } from 'semantic-ui-react'
 import qs from 'query-string'
+import { useLocation, useHistory } from 'react-router-dom'
+
 import {
   useGetSavedCourseListsQuery,
   useCreateCourseListMutation,
   useUpdateCourseListMutation,
   useDeleteCourseListMutation,
 } from 'redux/completedCoursesSearch'
-import SearchHistory from 'components/SearchHistory'
+import { SearchHistory } from 'components/SearchHistory'
 
-const CompletedCoursesSearch = ({ setValues, history, location }) => {
+export const CompletedCoursesSearch = ({ setValues }) => {
+  const location = useLocation()
+  const history = useHistory()
   const [modal, setModal] = useState(false)
   const [courseInput, setCourseInput] = useState('')
   const [studentInput, setStudentInput] = useState('')
@@ -231,5 +235,3 @@ const CompletedCoursesSearch = ({ setValues, history, location }) => {
     </Modal>
   )
 }
-
-export default CompletedCoursesSearch

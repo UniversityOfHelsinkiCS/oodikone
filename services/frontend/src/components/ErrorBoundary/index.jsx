@@ -2,7 +2,8 @@ import React, { Component, Suspense } from 'react'
 import { connect } from 'react-redux'
 import { Loader } from 'semantic-ui-react'
 import * as Sentry from '@sentry/browser'
-import AccessDenied from 'components/AccessDenied'
+
+import { AccessDenied } from 'components/AccessDenied'
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -41,4 +42,4 @@ class ErrorBoundary extends Component {
 }
 const mapStateToProps = ({ actionHistory }) => ({ actionHistory })
 
-export default connect(mapStateToProps, null)(ErrorBoundary)
+export const ConnectedErrorBoundary = connect(mapStateToProps, null)(ErrorBoundary)

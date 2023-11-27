@@ -27,7 +27,7 @@ export const getYears = () => {
   return callController(route, prefix)
 }
 
-const reducer = (
+export const reducer = (
   state = {
     data: { protoC: {}, protoCProgramme: {}, status: {}, uber: [], years: [], graduated: {} },
     pending: { protoC: false, protoCProgramme: false, status: false, uber: false, years: false, graduated: false },
@@ -216,5 +216,3 @@ const coolDataScienceApi = RTKApi.injectEndpoints({
 })
 
 export const { useGetProtoCQuery, useGetProtoCProgrammeQuery } = coolDataScienceApi
-
-export default reducer

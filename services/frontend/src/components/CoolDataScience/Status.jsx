@@ -3,12 +3,13 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Loader } from 'semantic-ui-react'
 import _ from 'lodash'
 import moment from 'moment'
-import useLanguage from 'components/LanguagePicker/useLanguage'
-import DrillStack from './DrillStack'
-import StatusCard from './StatusCard'
-import Toolbar from './Toolbar'
+
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
+import { coolDataScienceToolTips } from 'common/InfoToolTips'
+import { DrillStack } from './DrillStack'
+import { StatusCard } from './StatusCard'
+import { Toolbar } from './Toolbar'
 import { useLocalStorage } from '../../common/hooks'
-import InfoToolTips from '../../common/InfoToolTips'
 import { getStatus } from '../../redux/coolDataScience'
 import './status.css'
 
@@ -43,7 +44,7 @@ const settingDefinitions = _.map(
   ],
   setting => ({
     ...setting,
-    ...InfoToolTips.CoolDataScience.status.settings[setting.key],
+    ...coolDataScienceToolTips.status.settings[setting.key],
   })
 )
 
@@ -172,7 +173,7 @@ const createDrillData = (storeData, showRelativeValues, getTextIn) => {
 
 const isValidDate = d => moment().diff(moment(d)) > 0
 
-const Status = () => {
+export const Status = () => {
   const [explicitSettings, setSettings] = useLocalStorage('trendsStatusSettings', {})
   const [nonpersistentExplicitSettings, setNonpersistentSettings] = useState({})
   const { getTextIn } = useLanguage()
@@ -189,8 +190,6 @@ const Status = () => {
     () => createDrillData(storeData, settings.showRelativeValues, getTextIn),
     [storeData, settings.showRelativeValues]
   )
-
-  const { CoolDataScience } = InfoToolTips
 
   useEffect(() => {
     const { showCountingFrom, showByYear } = settings
@@ -234,7 +233,7 @@ const Status = () => {
         <Toolbar
           value={settings}
           settings={settingDefinitions}
-          generalHelp={CoolDataScience.status.general}
+          generalHelp={coolDataScienceToolTips.status.general}
           changeSetting={changeSetting}
         />
       </div>
@@ -247,5 +246,3 @@ const Status = () => {
     </>
   )
 }
-
-export default Status

@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react'
 import { Popup, Icon } from 'semantic-ui-react'
 import _ from 'lodash'
 
-const InfoWithHelpTooltip = ({ children, tooltip, containerStyle = {}, ...rest }) => {
+export const InfoWithHelpTooltip = ({ children, tooltip, containerStyle = {}, ...rest }) => {
   const popupContext = useRef()
   const [popupOpen, setPopupOpen] = useState(false)
   const [detailsOpen, setDetailsOPen] = useState(false)
@@ -26,27 +26,23 @@ const InfoWithHelpTooltip = ({ children, tooltip, containerStyle = {}, ...rest }
   })
 
   return (
-    <>
-      <Popup
-        wide={detailsOpen}
-        hoverable
-        size="tiny"
-        open={popupOpen}
-        onOpen={() => setPopupOpen(true)}
-        onClose={() => {
-          setPopupOpen(false)
-          setDetailsOPen(false)
-        }}
-        trigger={trigger}
-        context={popupContext}
-        {...popupProps}
-        on="hover"
-        mouseEnterDelay={2000}
-      >
-        <div>{tooltip.short}</div>
-      </Popup>
-    </>
+    <Popup
+      wide={detailsOpen}
+      hoverable
+      size="tiny"
+      open={popupOpen}
+      onOpen={() => setPopupOpen(true)}
+      onClose={() => {
+        setPopupOpen(false)
+        setDetailsOPen(false)
+      }}
+      trigger={trigger}
+      context={popupContext}
+      {...popupProps}
+      on="hover"
+      mouseEnterDelay={2000}
+    >
+      <div>{tooltip.short}</div>
+    </Popup>
   )
 }
-
-export default InfoWithHelpTooltip

@@ -1,7 +1,7 @@
 import React from 'react'
 import { Popup, Button, Icon } from 'semantic-ui-react'
 
-const FilterToggle = ({ active, applyFilter, clearFilter, popupContent }) => {
+export const FilterToggle = ({ active, applyFilter, clearFilter, popupContent }) => {
   const toggleFilter = () => {
     if (active) {
       clearFilter()
@@ -32,5 +32,3 @@ const FilterToggle = ({ active, applyFilter, clearFilter, popupContent }) => {
     <Toggle />
   )
 }
-
-export default FilterToggle

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import moment from 'moment'
 import { Loader, Icon } from 'semantic-ui-react'
+
 import { useGetOpenUniCourseStudentsQuery } from 'redux/openUniPopulations'
-import SortableTable from 'components/SortableTable'
-import useLanguage from 'components/LanguagePicker/useLanguage'
+import { SortableTable } from 'components/SortableTable'
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
 
 const getTableData = studentsData => {
   return Object.keys(studentsData).reduce(
@@ -200,7 +201,7 @@ const getColumns = (labelsToCourses, getTextIn) => {
   return columns
 }
 
-const OpenUniPopulationResults = ({ fieldValues }) => {
+export const OpenUniPopulationResults = ({ fieldValues }) => {
   const { courseList, startdate, enddate } = fieldValues
   const [tableData, setData] = useState({ data: [], columns: [] })
   const { getTextIn, language } = useLanguage()
@@ -237,5 +238,3 @@ const OpenUniPopulationResults = ({ fieldValues }) => {
     </div>
   )
 }
-
-export default OpenUniPopulationResults

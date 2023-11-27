@@ -52,9 +52,8 @@ const getCardDescription = (credits, grade, passed, isStudyModuleCredit) => (
   </Card.Description>
 )
 
-const CreditGraphTooltip = props => {
-  if (props.payload && props.payload.length > 0) {
-    const { payload } = props
+export const CreditGraphTooltip = ({ payload }) => {
+  if (payload && payload.length > 0) {
     const { name } = payload[0]
     const { title, credits, date, grade, passed, isStudyModuleCredit } = payload[0].payload
     return (
@@ -77,5 +76,3 @@ CreditGraphTooltip.defaultProps = {
 CreditGraphTooltip.propTypes = {
   payload: arrayOf(object),
 }
-
-export default CreditGraphTooltip

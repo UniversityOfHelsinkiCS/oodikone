@@ -19,7 +19,5 @@ const defaultState = {
   resetFilters: () => {},
 }
 
-const FilterViewContext = createContext(defaultState)
+export const FilterViewContext = createContext(defaultState)
 FilterViewContext.displayName = 'FilterView'
-
-export default FilterViewContext

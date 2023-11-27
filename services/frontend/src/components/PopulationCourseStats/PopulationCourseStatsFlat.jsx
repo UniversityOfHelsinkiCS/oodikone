@@ -6,9 +6,9 @@ import { useGetSemestersQuery } from 'redux/semesters'
 import { clearCourseStats } from '../../redux/coursestats'
 import './populationCourseStats.css'
 import { PopulationCourseContext } from './PopulationCourseContext'
-import GradeDistribution from './GradeDistribution'
-import useLanguage from '../LanguagePicker/useLanguage'
-import PassFailEnrollments from './PassFailEnrollments'
+import { GradeDistribution } from './GradeDistribution'
+import { useLanguage } from '../LanguagePicker/useLanguage'
+import { PassFailEnrollments } from './PassFailEnrollments'
 
 const tableColumnNames = {
   STUDENTS: 'students',
@@ -75,7 +75,7 @@ const initialState = props => ({
   selectedStudentsLength: props.selectedStudentsLength || 0,
 })
 
-const PopulationCourseStatsFlat = ({ courses, filteredStudents, studentAmountLimit }) => {
+export const PopulationCourseStatsFlat = ({ courses, filteredStudents, studentAmountLimit }) => {
   const dispatch = useDispatch()
   const semesterRequest = useGetSemestersQuery()
   const { getTextIn } = useLanguage()
@@ -207,5 +207,3 @@ const PopulationCourseStatsFlat = ({ courses, filteredStudents, studentAmountLim
     </PopulationCourseContext.Provider>
   )
 }
-
-export default PopulationCourseStatsFlat

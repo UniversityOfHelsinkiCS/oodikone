@@ -9,7 +9,7 @@ const getStatusIcon = stats => {
   return ''
 }
 
-const UpdateView = ({ faculty }) => {
+export const UpdateView = ({ faculty }) => {
   const [skipBasic, setSkipBasic] = useState(true)
   const [skipCredits, setSkipCredits] = useState(true)
   const [skipThesis, setSkipThesis] = useState(true)
@@ -53,5 +53,3 @@ const UpdateView = ({ faculty }) => {
     </div>
   )
 }
-
-export default UpdateView

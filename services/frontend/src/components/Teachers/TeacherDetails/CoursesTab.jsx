@@ -3,7 +3,7 @@ import { Tab, Form } from 'semantic-ui-react'
 import { shape, string, arrayOf, func, number, oneOfType } from 'prop-types'
 
 import { TeacherStatisticsTable } from '../TeacherStatisticsTable'
-import useLanguage from '../../LanguagePicker/useLanguage'
+import { useLanguage } from '../../LanguagePicker/useLanguage'
 
 const CourseTabDropdown = ({ options, doSelect, selected }) => (
   <Form>
@@ -30,7 +30,7 @@ CourseTabDropdown.defaultProps = {
   selected: null,
 }
 
-const CoursesTab = ({ courses, semesters }) => {
+export const CoursesTab = ({ courses, semesters }) => {
   const { getTextIn } = useLanguage()
   const [selectedSemester, setSelectedSemester] = useState(null)
   const [selectedCourse, setSelectedCourse] = useState(null)
@@ -129,5 +129,3 @@ CoursesTab.propTypes = {
   courses: shape({}).isRequired,
   semesters: shape({}).isRequired,
 }
-
-export default CoursesTab

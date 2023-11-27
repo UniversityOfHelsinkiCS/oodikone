@@ -2,13 +2,14 @@ import React, { useState, useMemo, useCallback } from 'react'
 import { Icon, Button, Item, Pagination } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import _ from 'lodash'
-import SortableTable, { group } from 'components/SortableTable'
-import useLanguage from 'components/LanguagePicker/useLanguage'
+
+import { SortableTable, group } from 'components/SortableTable'
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
-import CourseFilterToggle from '../CourseFilterToggle'
+import { CourseFilterToggle } from '../CourseFilterToggle'
 import { useStudentNameVisibility } from '../../StudentNameVisibilityToggle'
 
-const Students = ({ filteredStudents }) => {
+export const Students = ({ filteredStudents }) => {
   const { courseStatistics, onGoToCourseStatisticsClick, modules, toggleGroupExpansion, expandedGroups } =
     UsePopulationCourseContext()
   const { visible: namesVisible, toggle: toggleStudentNames } = useStudentNameVisibility()
@@ -189,5 +190,3 @@ const Students = ({ filteredStudents }) => {
     </div>
   )
 }
-
-export default Students

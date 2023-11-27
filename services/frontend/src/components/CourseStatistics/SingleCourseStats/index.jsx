@@ -2,19 +2,19 @@ import React, { useState, useMemo, useEffect } from 'react'
 import { Segment, Header, Form, Grid, Button, Popup } from 'semantic-ui-react'
 import { shape, string, arrayOf, objectOf, oneOfType, number, func, bool } from 'prop-types'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 import { difference, min, max, flatten, pickBy, uniq } from 'lodash'
 import qs from 'query-string'
 
 import { useGetMaxYearsToCreatePopulationFromQuery } from 'redux/populations'
 import { setSelectedCourse, clearSelectedCourse } from 'redux/singleCourseStats'
 import { useGetSemestersQuery } from 'redux/semesters'
-import ResultTabs from '../ResultTabs'
-import ProgrammeDropdown from '../ProgrammeDropdown'
-import selectors, { ALL } from '../../../selectors/courseStats'
-import YearFilter from '../SearchForm/YearFilter'
-import useLanguage from '../../LanguagePicker/useLanguage'
-import countTotalStats from './countTotalStats'
+import { ResultTabs } from '../ResultTabs'
+import { ProgrammeDropdown } from '../ProgrammeDropdown'
+import { ALL, getAllStudyProgrammes } from '../../../selectors/courseStats'
+import { YearFilter } from '../SearchForm/YearFilter'
+import { useLanguage } from '../../LanguagePicker/useLanguage'
+import { countTotalStats } from './countTotalStats'
 
 const countFilteredStudents = (stat, filter) =>
   stat
@@ -32,19 +32,19 @@ const SingleCourseStats = ({
   availableStats,
   setSelectedCourse,
   clearSelectedCourse,
-  history,
-  location,
-  stats: { coursecode },
   programmes,
   userHasAccessToAllStats,
   unifyCourses,
 }) => {
+  const history = useHistory()
+  const location = useLocation()
   const { getTextIn } = useLanguage()
   const [primary, setPrimary] = useState([ALL.value])
   const [comparison, setComparison] = useState([])
   const [fromYear, setFromYear] = useState(0)
   const [toYear, setToYear] = useState(0)
   const [separate, setSeparate] = useState(null)
+  const { coursecode } = stats
 
   const { data: semesterData } = useGetSemestersQuery()
   const { semesters, years } = useMemo(() => {
@@ -531,18 +531,14 @@ SingleCourseStats.propTypes = {
     coursecode: string,
   }).isRequired,
   programmes: arrayOf(shape({})).isRequired,
-  location: shape({}).isRequired,
   setSelectedCourse: func.isRequired,
   clearSelectedCourse: func.isRequired,
-  history: shape({
-    push: func,
-  }).isRequired,
   userHasAccessToAllStats: bool.isRequired,
 }
 
 const mapStateToProps = state => {
   return {
-    programmes: selectors.getAllStudyProgrammes(state),
+    programmes: getAllStudyProgrammes(state),
     unifyCourses: state.courseSearch.openOrReqular,
   }
 }
@@ -552,4 +548,4 @@ const mapDispatchToProps = {
   clearSelectedCourse,
 }
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(SingleCourseStats))
+export const ConnectedSingleCourseStats = connect(mapStateToProps, mapDispatchToProps)(SingleCourseStats)

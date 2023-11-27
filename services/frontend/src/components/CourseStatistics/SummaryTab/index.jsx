@@ -2,12 +2,13 @@ import React from 'react'
 import { Form, Label, Segment, Header } from 'semantic-ui-react'
 import { connect, useSelector } from 'react-redux'
 import { flatten } from 'lodash'
+
 import { useGetAuthorizedUserQuery } from 'redux/auth'
-import selectors, { ALL } from '../../../selectors/courseStats'
-import { fields, setValue } from '../../../redux/coursesSummaryForm'
-import AttemptsTable from '../AttemptsTable'
-import ProgrammeDropdown from '../ProgrammeDropdown'
-import useLanguage from '../../LanguagePicker/useLanguage'
+import { fields, setValue } from 'redux/coursesSummaryForm'
+import { ALL, getAllStudyProgrammes, summaryStatistics, getQueryInfo } from '../../../selectors/courseStats'
+import { AttemptsTable } from '../AttemptsTable'
+import { ProgrammeDropdown } from '../ProgrammeDropdown'
+import { useLanguage } from '../../LanguagePicker/useLanguage'
 import { userHasAccessToAllCourseStats } from '../courseStatisticsUtils'
 
 // Certified JavaScript moment but basically this was crashing
@@ -29,13 +30,13 @@ const unObjectifyProperty = ({ obj, property }) => {
 const SummaryTab = ({ setValue, onClickCourse }) => {
   const { roles, rights } = useGetAuthorizedUserQuery()
   const userHasAccessToAllStats = userHasAccessToAllCourseStats(roles, rights)
-  const programmes = useSelector(state => selectors.getAllStudyProgrammes(state))
+  const programmes = useSelector(state => getAllStudyProgrammes(state))
   const programmeCodes = useSelector(({ courseSummaryForm }) => courseSummaryForm[fields.programmes])
   const form = useSelector(({ courseSummaryForm }) => courseSummaryForm)
   const statistics = useSelector(state =>
-    selectors.summaryStatistics(state, { programmes, programmeCodes }, userHasAccessToAllStats)
+    summaryStatistics(state, { programmes, programmeCodes }, userHasAccessToAllStats)
   )
-  const queryInfo = useSelector(state => selectors.getQueryInfo(state))
+  const queryInfo = useSelector(state => getQueryInfo(state))
 
   const { getTextIn } = useLanguage()
   const handleChange = (_, { name, value }) => {
@@ -108,4 +109,4 @@ const SummaryTab = ({ setValue, onClickCourse }) => {
   )
 }
 
-export default connect(null, { setValue })(SummaryTab)
+export const ConnectedSummaryTab = connect(null, { setValue })(SummaryTab)

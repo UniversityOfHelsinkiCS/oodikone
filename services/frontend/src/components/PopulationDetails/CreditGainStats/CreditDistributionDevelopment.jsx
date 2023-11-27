@@ -5,12 +5,13 @@ import moment from 'moment'
 import _ from 'lodash'
 import chroma from 'chroma-js'
 import { useLocation } from 'react-router-dom'
+
 import { useGetSemestersQuery } from 'redux/semesters'
-import useLanguage from 'components/LanguagePicker/useLanguage'
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
 import { studentNumberFilter } from 'components/FilterView/filters'
 import { getTargetCreditsForProgramme, TimeDivision, getCreditCategories } from 'common'
-import { getMonths } from '../../../common/query'
-import useFilters from '../../FilterView/useFilters'
+import { getMonths } from 'common/query'
+import { useFilters } from '../../FilterView/useFilters'
 
 const StackOrdering = {
   ASCENDING: 'asc',
@@ -129,11 +130,15 @@ const getChartData = (students, timeSlots, order, programme, timeDivision, cumul
 }
 
 function tooltipFormatter() {
-  // eslint-disable-next-line
-  return `<div style="text-align: center; width: 100%"><b>${this.x}</b>, ${this.series.name}<br/>${this.y}/${this.total} students (${Math.round(this.percentage)}%)</div>`;
+  // eslint-disable-next-line @babel/no-invalid-this
+  return `<div style="text-align: center; width: 100%"><b>${this.x}</b>, ${this.series.name}<br/>${this.y}/${
+    // eslint-disable-next-line @babel/no-invalid-this
+    this.total
+    // eslint-disable-next-line @babel/no-invalid-this
+  } students (${Math.round(this.percentage)}%)</div>`
 }
 
-const CreditDistributionDevelopment = ({ students, programme, combinedProgramme, year }) => {
+export const CreditDistributionDevelopment = ({ students, programme, combinedProgramme, year }) => {
   const [cumulative, setCumulative] = useState(true)
   const [timeDivision, setTimeDivision] = useState(TimeDivision.SEMESTER)
   const [stackOrdering, setStackOrdering] = useState(StackOrdering.ASCENDING)
@@ -278,5 +283,3 @@ const CreditDistributionDevelopment = ({ students, programme, combinedProgramme,
     </div>
   )
 }
-
-export default CreditDistributionDevelopment

@@ -4,7 +4,7 @@ const additionalTypes = prefix => ({
   clear: `${prefix}_CLEAR`,
 })
 
-const itemreducer = (prefix, initial) => {
+export const itemreducer = (prefix, initial) => {
   const types = {
     ...actionTypes(prefix),
     ...additionalTypes(prefix),
@@ -46,5 +46,3 @@ const itemreducer = (prefix, initial) => {
     }
   }
 }
-
-export default itemreducer

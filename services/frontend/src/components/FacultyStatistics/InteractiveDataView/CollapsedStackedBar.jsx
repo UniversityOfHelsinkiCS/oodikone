@@ -1,11 +1,12 @@
 /* eslint-disable react/no-this-in-sfc */
-import useLanguage from 'components/LanguagePicker/useLanguage'
 import React from 'react'
 import ReactHighcharts from 'react-highcharts'
 
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
+
 const colors = ['#7cb5ec', '#90ed7d', '#434348', '#f7a35c', '#FFF000', '#2b908f', '#f45b5b', '#91e8e1']
 
-const CollapsedStackedBar = ({ data, labels, longLabels, names, plotLinePlaces, differenceData }) => {
+export const CollapsedStackedBar = ({ data, labels, longLabels, names, plotLinePlaces, differenceData }) => {
   const { getTextIn } = useLanguage()
   const transpose = matrix => {
     return matrix.reduce((prev, next) => next.map((_item, i) => (prev[i] || []).concat(next[i])), [])
@@ -165,5 +166,3 @@ const CollapsedStackedBar = ({ data, labels, longLabels, names, plotLinePlaces, 
   }
   return <ReactHighcharts config={defaultConfig} />
 }
-
-export default CollapsedStackedBar

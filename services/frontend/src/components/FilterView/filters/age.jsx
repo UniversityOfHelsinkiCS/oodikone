@@ -2,7 +2,8 @@ import React, { useMemo, useCallback } from 'react'
 import { RangeSelector } from 'components/common/RangeSelector'
 import { useDebounce } from 'common/hooks'
 import _ from 'lodash'
-import createFilter from './createFilter'
+
+import { createFilter } from './createFilter'
 
 const getAge = toDate => {
   const today = new Date()
@@ -39,7 +40,7 @@ const AgeFilterCard = ({ options, onOptionsChange, bounds }) => {
   )
 }
 
-export default createFilter({
+export const ageFilter = createFilter({
   key: 'Age',
 
   defaultOptions: {

@@ -14,7 +14,7 @@ export const useStudentNameVisibility = () => {
   return { visible, toggle }
 }
 
-const StudentNameVisibilityToggle = ({ style = {} }) => {
+export const StudentNameVisibilityToggle = ({ style = {} }) => {
   const { visible, toggle } = useStudentNameVisibility()
 
   const handleChange = useCallback(() => {
@@ -27,5 +27,3 @@ const StudentNameVisibilityToggle = ({ style = {} }) => {
     </div>
   )
 }
-
-export default StudentNameVisibilityToggle

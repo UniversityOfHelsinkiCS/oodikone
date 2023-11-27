@@ -4,33 +4,36 @@ import { func, shape, object, bool, arrayOf } from 'prop-types'
 import { Form, Button } from 'semantic-ui-react'
 import moment from 'moment'
 import qs from 'query-string'
-import PopulationQueryCard from '../PopulationQueryCard'
-import { removePopulation } from '../../redux/populations'
+import { useHistory } from 'react-router-dom'
+
+import { populationStatisticsToolTips } from 'common/InfoToolTips'
+import { removePopulation } from 'redux/populations'
+import { PopulationQueryCard } from '../PopulationQueryCard'
 import './populationSearch.css'
-import infotooltips from '../../common/InfoToolTips'
-import InfoBox from '../Info/InfoBox'
-import FilterActiveNote from './FilterActiveNote'
+import { InfoBox } from '../Info/InfoBox'
+import { FilterActiveNote } from './FilterActiveNote'
 
 const getMonths = (year, term) => {
   const start = term === 'FALL' ? `${year}-08-01` : moment(`${year}-01-01`).add(1, 'years')
   return Math.ceil(moment.duration(moment().diff(moment(start))).asMonths())
 }
 
-const PopulationSearchHistory = props => {
+const PopulationSearchHistory = ({ populations, units, tags, removePopulation }) => {
+  const history = useHistory()
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false)
   const [semesters, setSemesters] = useState(
-    props.populations.query?.semesters ? props.populations.query?.semesters : ['FALL', 'SPRING']
+    populations.query?.semesters ? populations.query?.semesters : ['FALL', 'SPRING']
   )
   const [studentStatuses, setStudentStatus] = useState(
-    props.populations.query?.studentStatuses ? props.populations.query?.studentStatuses : []
+    populations.query?.studentStatuses ? populations.query?.studentStatuses : []
   )
-  const [months, setMonths] = useState(props.populations.query?.months ? props.populations.query?.months : 0)
+  const [months, setMonths] = useState(populations.query?.months ? populations.query?.months : 0)
 
   const handleSemesterSelection = (e, { value }) => {
     const newSemesters = semesters.includes(value) ? semesters.filter(s => s !== value) : [...semesters, value]
-    if (!props.populations.query.tag) {
+    if (!populations.query.tag) {
       setSemesters(newSemesters)
-      setMonths(getMonths(props.populations.query.year, semesters.includes('FALL') ? 'FALL' : 'SPRING'))
+      setMonths(getMonths(populations.query.year, semesters.includes('FALL') ? 'FALL' : 'SPRING'))
     }
   }
 
@@ -41,7 +44,7 @@ const PopulationSearchHistory = props => {
   }
 
   const pushQueryToUrl = () => {
-    const { studyRights, tag, year } = props.populations.query
+    const { studyRights, tag, year } = populations.query
 
     const queryObject = {
       tag,
@@ -52,16 +55,15 @@ const PopulationSearchHistory = props => {
       studyRights: JSON.stringify(studyRights),
     }
     const searchString = qs.stringify(queryObject)
-    props.history.push({ search: searchString })
+    history.push({ search: searchString })
   }
 
-  const removeThisPopulation = uuid => props.removePopulation(uuid)
+  const removeThisPopulation = uuid => removePopulation(uuid)
 
   const renderAdvancedSettingsSelector = () => {
     if (!showAdvancedSettings) {
       return null
     }
-    const { populations } = props
 
     return (
       <Form.Group style={{ flexDirection: 'column' }}>
@@ -131,9 +133,6 @@ const PopulationSearchHistory = props => {
   }
 
   const renderQueryCards = () => {
-    const { populations, units, tags } = props
-    const { Advanced, QueryCard } = infotooltips.PopulationStatistics
-
     if (!units.data.programmes || !populations.query || !populations.data.students) {
       return null
     }
@@ -154,7 +153,7 @@ const PopulationSearchHistory = props => {
             tags={tags}
           />
           <div style={{ marginLeft: '5px', marginTop: '15px' }}>
-            <InfoBox content={QueryCard} />
+            <InfoBox content={populationStatisticsToolTips.QueryCard} />
           </div>
         </div>
         <div style={{ marginLeft: '100px' }}>
@@ -172,7 +171,9 @@ const PopulationSearchHistory = props => {
             </Form.Group>
           )}
           <div>{renderAdvancedSettingsSelector()}</div>
-          <div>{showAdvancedSettings ? <InfoBox content={Advanced} /> : <FilterActiveNote />}</div>
+          <div>
+            {showAdvancedSettings ? <InfoBox content={populationStatisticsToolTips.Advanced} /> : <FilterActiveNote />}
+          </div>
         </div>
       </div>
     )
@@ -191,7 +192,6 @@ PopulationSearchHistory.propTypes = {
   }).isRequired,
   units: object, // eslint-disable-line
   tags: arrayOf(shape({})).isRequired,
-  history: shape({}).isRequired,
 }
 
 const mapStateToProps = ({ populations, populationProgrammes, tags }) => ({
@@ -206,4 +206,4 @@ const mapDispatchToProps = dispatch => ({
   },
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(PopulationSearchHistory)
+export const ConnectedPopulationSearchHistory = connect(mapStateToProps, mapDispatchToProps)(PopulationSearchHistory)

@@ -1,8 +1,8 @@
 import React from 'react'
 import 'moment/locale/fi'
-import DateRangeSelector from 'components/common/DateRangeSelector'
-import createFilter from '../createFilter'
-import filterInfo from '../../../../common/InfoToolTips/filters'
+import { DateRangeSelector } from 'components/common/DateRangeSelector'
+import { filterToolTips } from 'common/InfoToolTips'
+import { createFilter } from '../createFilter'
 
 /**
  * Filter courses according to the date when credits were earned.
@@ -13,29 +13,27 @@ const CreditDateFilterCard = ({ options, onOptionsChange }) => {
   const { startDate, endDate } = options
 
   return (
-    <>
-      <div className="card-content" style={{ marginTop: '0.5rem' }}>
-        <DateRangeSelector
-          showSemesters
-          value={[startDate, endDate]}
-          onChange={([startDate, endDate]) =>
-            onOptionsChange({
-              startDate,
-              endDate,
-            })
-          }
-        />
-      </div>
-    </>
+    <div className="card-content" style={{ marginTop: '0.5rem' }}>
+      <DateRangeSelector
+        showSemesters
+        value={[startDate, endDate]}
+        onChange={([startDate, endDate]) =>
+          onOptionsChange({
+            startDate,
+            endDate,
+          })
+        }
+      />
+    </div>
   )
 }
 
-const filter = createFilter({
+export const creditDateFilter = createFilter({
   key: 'CreditDate',
 
   title: 'Date of Course Credits',
 
-  info: filterInfo.courseCredits,
+  info: filterToolTips.courseCredits,
 
   priority: 100,
 
@@ -69,7 +67,3 @@ const filter = createFilter({
 
   component: CreditDateFilterCard,
 })
-
-export default filter
-
-export const { selectedStartDate } = filter.selectors

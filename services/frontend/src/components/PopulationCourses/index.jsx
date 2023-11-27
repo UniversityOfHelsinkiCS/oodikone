@@ -1,15 +1,16 @@
 import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Segment } from 'semantic-ui-react'
-import PopulationCourseStatsFlat from 'components/PopulationCourseStats/PopulationCourseStatsFlat'
-import SegmentDimmer from '../SegmentDimmer'
-import PopulationCourseStats from '../PopulationCourseStats'
-import InfoBox from '../Info/InfoBox'
-import FilterDegreeCoursesModal from './FilterDegreeCoursesModal'
-import { getPopulationSelectedStudentCourses } from '../../redux/populationSelectedStudentCourses'
-import infotooltips from '../../common/InfoToolTips'
 
-const PopulationCourses = ({
+import { PopulationCourseStatsFlat } from 'components/PopulationCourseStats/PopulationCourseStatsFlat'
+import { populationStatisticsToolTips } from 'common/InfoToolTips'
+import { SegmentDimmer } from '../SegmentDimmer'
+import { ConnectedPopulationCourseStats as PopulationCourseStats } from '../PopulationCourseStats'
+import { InfoBox } from '../Info/InfoBox'
+import { FilterDegreeCoursesModal } from './FilterDegreeCoursesModal'
+import { getPopulationSelectedStudentCourses } from '../../redux/populationSelectedStudentCourses'
+
+export const PopulationCourses = ({
   query = {},
   filteredStudents,
   selectedStudentsByYear,
@@ -59,9 +60,9 @@ const PopulationCourses = ({
   return (
     <Segment basic>
       {courseTableMode === 'curriculum' ? (
-        <InfoBox content={infotooltips.PopulationStatistics.CoursesOfClass} />
+        <InfoBox content={populationStatisticsToolTips.CoursesOfClass} />
       ) : (
-        <InfoBox content={infotooltips.PopulationStatistics.CoursesOfPopulation} />
+        <InfoBox content={populationStatisticsToolTips.CoursesOfPopulation} />
       )}
       {query.studyRights.programme && !onlyIamRights && (
         <FilterDegreeCoursesModal studyProgramme={query.studyRights.programme} year={query.year} />
@@ -86,5 +87,3 @@ const PopulationCourses = ({
     </Segment>
   )
 }
-
-export default PopulationCourses

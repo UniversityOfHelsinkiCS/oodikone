@@ -5,7 +5,7 @@ import moment from 'moment'
 import 'moment/locale/fi'
 import { useGetSemestersQuery } from 'redux/semesters'
 import './style.css'
-import useLanguage from 'components/LanguagePicker/useLanguage'
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
 
 const semesterListStyles = {
   maxHeight: '10em',
@@ -15,7 +15,7 @@ const semesterListStyles = {
   borderTop: '1px solid #f9f9f9',
 }
 
-const DateTime = ({ value, onChange, before, after, showSemesters }) => {
+export const DateTimeSelector = ({ value, onChange, before, after, showSemesters }) => {
   const datetimeRef = useRef()
   const semesterRequest = useGetSemestersQuery()
   const allSemesters = semesterRequest.data?.semesters ?? []
@@ -126,5 +126,3 @@ const DateTime = ({ value, onChange, before, after, showSemesters }) => {
     />
   )
 }
-
-export default DateTime

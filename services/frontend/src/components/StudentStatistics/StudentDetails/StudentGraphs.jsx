@@ -3,9 +3,10 @@ import { Menu, Tab, Input, Message } from 'semantic-ui-react'
 import { flattenDeep } from 'lodash'
 import Highcharts from 'highcharts/highstock'
 import ReactHighcharts from 'react-highcharts'
-import useLanguage from 'components/LanguagePicker/useLanguage'
-import CreditAccumulationGraphHighCharts from '../../CreditAccumulationGraphHighCharts'
-import { byDateDesc, reformatDate, getStudyRightElementTargetDates } from '../../../common'
+
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
+import { byDateDesc, reformatDate, getStudyRightElementTargetDates } from 'common'
+import { CreditAccumulationGraphHighCharts } from '../../CreditAccumulationGraphHighCharts'
 
 const getEarliestAttainmentDate = ({ courses }) => {
   if (!courses) return null
@@ -228,7 +229,7 @@ const GradeGraph = ({ student, semesters }) => {
   )
 }
 
-const StudentGraphs = ({ student, absences, graphYearStart, semesters, studyRightId }) => {
+export const StudentGraphs = ({ student, absences, graphYearStart, semesters, studyRightId }) => {
   const panes = [
     {
       menuItem: 'Credit graph',
@@ -254,5 +255,3 @@ const StudentGraphs = ({ student, absences, graphYearStart, semesters, studyRigh
   ]
   return <Tab panes={panes} />
 }
-
-export default StudentGraphs

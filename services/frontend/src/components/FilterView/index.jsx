@@ -3,9 +3,10 @@ import { useSelector, useDispatch } from 'react-redux'
 import produce from 'immer'
 import _ from 'lodash'
 import fp from 'lodash/fp'
-import { selectViewFilters, setFilterOptions, resetViewFilters, resetFilter } from '../../redux/filters'
-import FilterViewContext from './FilterViewContext'
-import FilterTray from './FilterTray'
+
+import { selectViewFilters, setFilterOptions, resetViewFilters, resetFilter } from 'redux/filters'
+import { FilterViewContext } from './FilterViewContext'
+import { FilterTray } from './FilterTray'
 
 const resolveFilterOptions = (store, filters, initialOptions) => {
   return fp.flow(
@@ -18,7 +19,14 @@ const resolveFilterOptions = (store, filters, initialOptions) => {
   )(filters)
 }
 
-const FilterView = ({ children, name, filters: pFilters, students, displayTray: displayTrayProp, initialOptions }) => {
+export const FilterView = ({
+  children,
+  name,
+  filters: pFilters,
+  students,
+  displayTray: displayTrayProp,
+  initialOptions,
+}) => {
   const storeFilterOptions = useSelector(state => selectViewFilters(state, name))
   const filters = pFilters.map(filter => (typeof filter === 'function' ? filter() : filter))
   const filtersByKey = _.keyBy(filters, 'key')
@@ -115,5 +123,3 @@ const FilterView = ({ children, name, filters: pFilters, students, displayTray: 
     </FilterViewContext.Provider>
   )
 }
-
-export default FilterView

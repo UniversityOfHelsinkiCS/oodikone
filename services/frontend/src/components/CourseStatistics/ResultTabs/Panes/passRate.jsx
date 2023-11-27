@@ -1,9 +1,9 @@
-/* eslint-disable quotes */
 import React from 'react'
 import { Menu, Radio } from 'semantic-ui-react'
-import StackedBarChart from '../../../StackedBarChart'
+
+import { StackedBarChart } from '../../../StackedBarChart'
 import { passRateAttemptGraphOptions, passRateStudGraphOptions } from '../../../../constants'
-import HelpButton from '../HelpButton'
+import { HelpButton } from '../HelpButton'
 import { viewModeNames, getDataObject, getMaxValueOfSeries, absoluteToRelative } from './util'
 
 const getPassRateAttemptSeriesFromStats = stats => {

@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react'
 import { min, max, range } from 'lodash'
 import { useGetProgrammeCoursesStatsQuery } from 'redux/studyProgramme'
 import { Loader, Segment, Header } from 'semantic-ui-react'
-import CourseTabs from './CourseTabs'
-import CoursesYearFilter from './CourseYearFilter'
+import { CourseTabs } from './CourseTabs'
+import { CourseYearFilter } from './CourseYearFilter'
 
-const ProgrammeCoursesOverview = ({ studyProgramme, combinedProgramme, academicYear, setAcademicYear }) => {
+export const ProgrammeCoursesOverview = ({ studyProgramme, combinedProgramme, academicYear, setAcademicYear }) => {
   const { data, error, isLoading } = useGetProgrammeCoursesStatsQuery({
     id: studyProgramme,
     academicyear: academicYear ? 'ACADEMIC_YEAR' : 'NOT_ACADEMIC_YEAR',
@@ -102,7 +102,7 @@ const ProgrammeCoursesOverview = ({ studyProgramme, combinedProgramme, academicY
     <div className="studyprogramme-courses">
       <Segment style={{ marginTop: '1rem' }}>
         <Header as="h4">Time range</Header>
-        <CoursesYearFilter
+        <CourseYearFilter
           years={academicYear ? years.academic : years.normal}
           fromYear={fromYear}
           toYear={toYear}
@@ -119,5 +119,3 @@ const ProgrammeCoursesOverview = ({ studyProgramme, combinedProgramme, academicY
     </div>
   )
 }
-
-export default ProgrammeCoursesOverview

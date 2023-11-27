@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import { Segment, Form, Input } from 'semantic-ui-react'
-import PopulationCourseStatsFlat from 'components/PopulationCourseStats/PopulationCourseStatsFlat'
-import PopulationCourseStats from 'components/PopulationCourseStats'
+import { PopulationCourseStatsFlat } from 'components/PopulationCourseStats/PopulationCourseStatsFlat'
+import { ConnectedPopulationCourseStats as PopulationCourseStats } from 'components/PopulationCourseStats'
 import { CourseTableModeSelector } from 'components/PopulationDetails/CurriculumPicker'
 
-const StudyGuidanceGroupPopulationCourses = ({
+export const StudyGuidanceGroupPopulationCourses = ({
   courses,
   filteredStudents,
   studyProgramme,
@@ -60,5 +60,3 @@ const StudyGuidanceGroupPopulationCourses = ({
     </Segment>
   )
 }
-
-export default StudyGuidanceGroupPopulationCourses

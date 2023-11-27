@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { Link, useHistory } from 'react-router-dom'
 import { Segment, Icon, Item } from 'semantic-ui-react'
 
-import SortableTable from 'components/SortableTable'
+import { SortableTable } from 'components/SortableTable'
 
 const calculatePassrate = (pass, fail) =>
   new Intl.NumberFormat(undefined, { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(

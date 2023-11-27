@@ -1,16 +1,17 @@
 import React from 'react'
 import { Button, Divider, Loader, Message, Popup } from 'semantic-ui-react'
+
 import { useGetFacultyProgressStatsQuery, useGetFacultyStudentStatsQuery } from 'redux/facultyStats'
-import useLanguage from 'components/LanguagePicker/useLanguage'
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
 import { getCreditCategories } from 'common'
-import FacultyProgressTable from './FacultyProgressTable'
-import FacultyBarChart from './FacultyBarChart'
-import Toggle from '../../StudyProgramme/Toggle'
-import InfoBox from '../../Info/InfoBox'
-import InfotoolTips from '../../../common/InfoToolTips'
+import { facultyToolTips } from 'common/InfoToolTips'
+import { FacultyProgressTable } from './FacultyProgressTable'
+import { FacultyBarChart } from './FacultyBarChart'
+import { Toggle } from '../../StudyProgramme/Toggle'
+import { InfoBox } from '../../Info/InfoBox'
 import '../faculty.css'
-import FacultyStudentDataTable from './FacultyStudentDataTable'
-import sortProgrammeKeys from '../facultyHelpers'
+import { FacultyStudentDataTable } from './FacultyStudentDataTable'
+import { sortProgrammeKeys } from '../facultyHelpers'
 import { downloadProgressTableCsv, downloadStudentTableCsv } from '../xlsxFileDownloadHelper'
 
 const getDivider = (title, toolTipText, content, cypress) => (
@@ -87,7 +88,7 @@ export const calculateStats = (
   return { tableStats, chartStats, tableTitles }
 }
 
-const FacultyProgrammeOverview = ({
+export const FacultyProgrammeOverview = ({
   faculty,
   graduatedGroup,
   setGraduatedGroup,
@@ -95,7 +96,6 @@ const FacultyProgrammeOverview = ({
   setSpecialGroups,
   requiredRights,
 }) => {
-  const toolTips = InfotoolTips.Faculty
   const specials = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
   const graduated = graduatedGroup ? 'GRADUATED_EXCLUDED' : 'GRADUATED_INCLUDED'
   const { getTextIn } = useLanguage()
@@ -166,7 +166,7 @@ const FacultyProgrammeOverview = ({
       <div className="toggle-container">
         <Toggle
           cypress="StudentToggle"
-          toolTips={toolTips.StudentToggle}
+          toolTips={facultyToolTips.StudentToggle}
           firstLabel="All studyrights"
           secondLabel="Special studyrights excluded"
           value={specialGroups}
@@ -174,7 +174,7 @@ const FacultyProgrammeOverview = ({
         />
         <Toggle
           cypress="GraduatedToggle"
-          toolTips={toolTips.GraduatedToggle}
+          toolTips={facultyToolTips.GraduatedToggle}
           firstLabel="Graduated included"
           secondLabel="Graduated excluded"
           value={graduatedGroup}
@@ -190,7 +190,7 @@ const FacultyProgrammeOverview = ({
               {getDivider(
                 'Students of the faculty By Starting year',
                 'StudentsOfTheFacultyByStartingYear',
-                toolTips.StudentsStatsOfTheFaculty,
+                facultyToolTips.StudentsStatsOfTheFaculty,
                 'InfoFacultyStudentTable'
               )}
               <Popup
@@ -234,7 +234,7 @@ const FacultyProgrammeOverview = ({
               {getDivider(
                 'Progress of students of the faculty ',
                 'BachelorStudentsOfTheFacultyByStartingYear',
-                toolTips.StudentProgress,
+                facultyToolTips.StudentProgress,
                 'InfoFacultyProgress'
               )}
               <Popup
@@ -418,5 +418,3 @@ const FacultyProgrammeOverview = ({
     </div>
   )
 }
-
-export default FacultyProgrammeOverview

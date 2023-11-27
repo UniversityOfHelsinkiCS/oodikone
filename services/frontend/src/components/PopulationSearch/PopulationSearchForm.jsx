@@ -1,22 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 import qs from 'query-string'
 import { Form, Button, Message, Icon, Grid, Radio } from 'semantic-ui-react'
 import { v4 as uuidv4 } from 'uuid'
 import Datetime from 'react-datetime'
 import { sortBy, isEqual } from 'lodash'
 import moment from 'moment'
+
 import { useGetAuthorizedUserQuery } from 'redux/auth'
-import infoTooltips from 'common/InfoToolTips'
-import useLanguage from 'components/LanguagePicker/useLanguage'
-import { getPopulationStatistics, clearPopulations } from '../../redux/populations'
-import { getPopulationSelectedStudentCourses, clearSelected } from '../../redux/populationSelectedStudentCourses'
-import { getProgrammes } from '../../redux/populationProgrammes'
-import { momentFromFormat, reformatDate, textAndDescriptionSearch, cancelablePromise } from '../../common'
-import { useSearchHistory } from '../../common/hooks'
+import { getPopulationStatistics, clearPopulations } from 'redux/populations'
+import { clearSelected } from 'redux/populationSelectedStudentCourses'
+import { getProgrammes } from 'redux/populationProgrammes'
+import { populationStatisticsToolTips } from 'common/InfoToolTips'
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
+import { momentFromFormat, reformatDate, textAndDescriptionSearch, cancelablePromise } from 'common'
+import { useSearchHistory } from 'common/hooks'
 import './populationSearch.css'
-import SearchHistory from '../SearchHistory'
+import { SearchHistory } from '../SearchHistory'
 
 const YEAR_DATE_FORMAT = 'YYYY'
 
@@ -34,7 +35,19 @@ const initialQuery = () => ({
   tag: null,
 })
 
-const PopulationSearchForm = props => {
+const PopulationSearchForm = ({
+  studyProgrammes,
+  queries,
+  language,
+  onProgress,
+  clearSelected,
+  getPopulationStatistics,
+  getProgrammes,
+  clearPopulations,
+  pending,
+}) => {
+  const history = useHistory()
+  const location = useLocation()
   const { isAdmin } = useGetAuthorizedUserQuery()
   const { getTextIn } = useLanguage()
   const [totalState, setTotalState] = useState({
@@ -51,7 +64,6 @@ const PopulationSearchForm = props => {
 
   const { query, isLoading, momentYear } = totalState
 
-  const { studyProgrammes, location, queries, history, language, onProgress } = props
   if (
     (studyProgrammes.KH90_001 || studyProgrammes.MH90_001) &&
     !Object.keys(studyProgrammes).includes('KH90_001+MH90_001')
@@ -112,9 +124,9 @@ const PopulationSearchForm = props => {
     const formattedQueryParams = formatQueryParamsToArrays(query, ['semesters', 'studentStatuses', 'years'])
     const uuid = uuidv4()
     setState({ isLoading: true })
-    props.clearSelected()
+    clearSelected()
     fetchPopulationPromises.current = cancelablePromise(
-      Promise.all([props.getPopulationStatistics({ ...formattedQueryParams, uuid, onProgress }), []])
+      Promise.all([getPopulationStatistics({ ...formattedQueryParams, uuid, onProgress }), []])
     )
     const success = await fetchPopulationPromises.current.promise
     if (success) {
@@ -137,7 +149,7 @@ const PopulationSearchForm = props => {
   useEffect(() => {
     if (!studyProgrammes || Object.values(studyProgrammes).length === 0) {
       setState({ query: initialQuery() })
-      props.getProgrammes()
+      getProgrammes()
     }
     if (location.search) {
       fetchPopulationFromUrlParams()
@@ -193,7 +205,7 @@ const PopulationSearchForm = props => {
   })
 
   const pushQueryToUrl = query => {
-    if (!checkPreviousQuery(query, props.queries)) props.clearPopulations()
+    if (!checkPreviousQuery(query, queries)) clearPopulations()
     // Just to be sure that the previous population's data has been cleared
     setImmediate(() => {
       const { studyRights, ...rest } = query
@@ -296,7 +308,7 @@ const PopulationSearchForm = props => {
       return momentYear.year() >= 1900 && momentYear.isSameOrBefore(moment().subtract(6, 'months'))
     }
 
-    return props.studyProgrammes[query.studyRights.programme].enrollmentStartYears[momentYear.year()] != null
+    return studyProgrammes[query.studyRights.programme].enrollmentStartYears[momentYear.year()] != null
   }
 
   const renderableList = list =>
@@ -386,7 +398,7 @@ const PopulationSearchForm = props => {
     if (studyRights.programme) {
       return (
         <Message size="tiny" style={{ maxWidth: '25em' }}>
-          {infoTooltips.PopulationStatistics.TagAndTrackMovedIntoFilters}
+          {populationStatisticsToolTips.TagAndTrackMovedIntoFilters}
         </Message>
       )
     }
@@ -396,10 +408,10 @@ const PopulationSearchForm = props => {
 
   const renderStudyGroupSelector = () => {
     const { studyRights } = query
-    if (props.pending || !didMount) {
+    if (pending || !didMount) {
       return <Icon name="spinner" loading size="big" color="black" style={{ marginLeft: '45%' }} />
     }
-    if (Object.values(studyProgrammes).length === 0 && !props.pending) {
+    if (Object.values(studyProgrammes).length === 0 && !pending) {
       return (
         <Message
           error
@@ -429,7 +441,7 @@ const PopulationSearchForm = props => {
   }
 
   const shouldRenderSearchForm = () => {
-    const queryIsEmpty = Object.getOwnPropertyNames(props.queries).length > 0
+    const queryIsEmpty = Object.getOwnPropertyNames(queries).length > 0
     return !queryIsEmpty
   }
 
@@ -493,12 +505,9 @@ const mapStateToProps = ({ settings, populations, populationProgrammes }) => {
   }
 }
 
-export default withRouter(
-  connect(mapStateToProps, {
-    getPopulationStatistics,
-    getPopulationSelectedStudentCourses,
-    getProgrammes,
-    clearSelected,
-    clearPopulations,
-  })(PopulationSearchForm)
-)
+export const ConnectedPopulationSearchForm = connect(mapStateToProps, {
+  getPopulationStatistics,
+  getProgrammes,
+  clearSelected,
+  clearPopulations,
+})(PopulationSearchForm)

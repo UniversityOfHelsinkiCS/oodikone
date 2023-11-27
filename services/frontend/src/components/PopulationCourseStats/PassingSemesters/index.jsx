@@ -2,10 +2,11 @@ import React, { useMemo, useState } from 'react'
 import _ from 'lodash'
 import { Link } from 'react-router-dom'
 import { Item, Icon, Button } from 'semantic-ui-react'
-import SortableTable, { group } from 'components/SortableTable'
-import useLanguage from 'components/LanguagePicker/useLanguage'
+
+import { SortableTable, group } from 'components/SortableTable'
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
-import CourseFilterToggle from '../CourseFilterToggle'
+import { CourseFilterToggle } from '../CourseFilterToggle'
 
 const semesterColumn = (year, semester, cumulative) => ({
   key: `semester-${year}-${semester}`,
@@ -34,7 +35,7 @@ const yearColumn = (year, cumulative) => ({
   children: [semesterColumn(year, 'Fall', cumulative), semesterColumn(year, 'Spring', cumulative)],
 })
 
-const PassingSemesters = ({ onlyIamRights }) => {
+export const PassingSemesters = ({ onlyIamRights }) => {
   const { modules, onGoToCourseStatisticsClick, toggleGroupExpansion, expandedGroups } = UsePopulationCourseContext()
   const [cumulativeStats, setCumulativeStats] = useState(false)
   const { getTextIn } = useLanguage()
@@ -161,5 +162,3 @@ const PassingSemesters = ({ onlyIamRights }) => {
     </div>
   )
 }
-
-export default PassingSemesters

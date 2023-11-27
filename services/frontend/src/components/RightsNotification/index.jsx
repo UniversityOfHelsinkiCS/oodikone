@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Message, Button } from 'semantic-ui-react'
 
-const RightsNotification = ({ discardedStudentNumbers }) => {
+export const RightsNotification = ({ discardedStudentNumbers }) => {
   const [visible, setVisible] = useState(true)
 
   if (!visible) {
@@ -24,5 +24,3 @@ const RightsNotification = ({ discardedStudentNumbers }) => {
     </Message>
   )
 }
-
-export default RightsNotification

@@ -43,7 +43,7 @@ const getTableBody = rows => (
   </Table.Body>
 )
 
-const StudentCourseTable = ({ headers, rows, noResultText }) => {
+export const StudentCourseTable = ({ headers, rows, noResultText }) => {
   if (rows.length > 0) {
     return (
       <Segment style={{ padding: 0 }}>
@@ -62,5 +62,3 @@ StudentCourseTable.propTypes = {
   rows: arrayOf(array).isRequired,
   noResultText: string.isRequired,
 }
-
-export default StudentCourseTable

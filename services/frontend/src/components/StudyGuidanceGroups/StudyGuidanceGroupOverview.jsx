@@ -3,12 +3,13 @@ import { Link, useHistory } from 'react-router-dom'
 import { Formik } from 'formik'
 import { Form, Button, Icon, Modal } from 'semantic-ui-react'
 import Datetime from 'react-datetime'
+
 import { textAndDescriptionSearch } from 'common'
 import { useChangeStudyGuidanceGroupTagsMutation } from 'redux/studyGuidanceGroups'
 import { useFilteredAndFormattedElementDetails } from 'redux/elementdetails'
 import { useToggle } from 'common/hooks'
-import useLanguage from 'components/LanguagePicker/useLanguage'
-import SortableTable from 'components/SortableTable'
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
+import { SortableTable } from 'components/SortableTable'
 import { startYearToAcademicYear, StyledMessage } from './common'
 import './StudyGuidanceGroupOverview.css'
 
@@ -183,7 +184,7 @@ const TagCell = ({ tagName, group, studyProgrammes }) => {
   )
 }
 
-const StudyGuidanceGroupOverview = ({ groups }) => {
+export const StudyGuidanceGroupOverview = ({ groups }) => {
   const { getTextIn } = useLanguage()
   const studyProgrammes = useFilteredAndFormattedElementDetails()
 
@@ -245,5 +246,3 @@ const StudyGuidanceGroupOverview = ({ groups }) => {
     </>
   )
 }
-
-export default StudyGuidanceGroupOverview

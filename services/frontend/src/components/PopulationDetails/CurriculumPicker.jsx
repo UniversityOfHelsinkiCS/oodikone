@@ -19,7 +19,7 @@ const chooseCurriculumToFetch = (curriculums, selectedCurriculum, startYear) => 
   return null
 }
 
-const CurriculumPicker = ({ setCurriculum, programmeCodes, disabled, year }) => {
+export const CurriculumPicker = ({ setCurriculum, programmeCodes, disabled, year }) => {
   const curriculumOptionsQuery = useGetCurriculumOptionsQuery({ code: programmeCodes[0] }, { skip: !programmeCodes[0] })
   const curriculums = curriculumOptionsQuery.data ?? []
   const [selectedCurriculum, setSelectedCurriculum] = useState(null)
@@ -74,8 +74,6 @@ const CurriculumPicker = ({ setCurriculum, programmeCodes, disabled, year }) => 
     />
   )
 }
-
-export default CurriculumPicker
 
 export const CourseTableModeSelector = ({
   courseTableMode,

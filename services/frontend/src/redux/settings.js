@@ -6,7 +6,7 @@ const initialState = {
   chartHeight: 600,
 }
 
-const reducer = (state = initialState, action) => {
+export const reducer = (state = initialState, action) => {
   switch (action.type) {
     case 'TOGGLE_STUDENT_NAME_VISIBILITY':
       return {
@@ -21,5 +21,3 @@ const reducer = (state = initialState, action) => {
 export const toggleStudentNameVisibility = () => ({
   type: 'TOGGLE_STUDENT_NAME_VISIBILITY',
 })
-
-export default reducer

@@ -1,4 +1,4 @@
-export default {
+export const filterToolTips = {
   enrollmentStatus: {
     label: 'Filter students present, absent or passive',
     short:

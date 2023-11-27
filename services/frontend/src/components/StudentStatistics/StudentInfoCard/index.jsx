@@ -2,16 +2,17 @@ import React from 'react'
 import { Card, Icon, Button } from 'semantic-ui-react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
+
 import { useGetAuthorizedUserQuery } from 'redux/auth'
-import SisuLinkItem from 'components/common/SisuLinkItem'
-import { reformatDate } from '../../../common'
+import { SisuLinkItem } from 'components/common/SisuLinkItem'
+import { reformatDate } from 'common'
 import { DISPLAY_DATE_FORMAT, DISPLAY_DATE_FORMAT_DEV } from '../../../constants'
 import './studentInfoCard.css'
 import { removeStudentSelection, resetStudent } from '../../../redux/students'
 import { callApi } from '../../../apiConnection'
-import EnrollmentAccordion from './EnrollmentAccordion'
+import { EnrollmentAccordion } from './EnrollmentAccordion'
 
-const StudentInfoCard = ({ student }) => {
+export const StudentInfoCard = ({ student }) => {
   const dispatch = useDispatch()
   const history = useHistory()
   const { namesVisible: showName } = useSelector(state => state.settings)
@@ -58,5 +59,3 @@ const StudentInfoCard = ({ student }) => {
     </Card>
   )
 }
-
-export default StudentInfoCard

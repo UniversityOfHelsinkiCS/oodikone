@@ -58,7 +58,7 @@ const Content = ({ children, ...rest }) => {
   )
 }
 
-const FigureContainer = ({ children, style }) => {
+export const FigureContainer = ({ children, style }) => {
   const [isFullscreen, setFullscreen] = useState(false)
 
   const portalNode = useMemo(
@@ -115,5 +115,3 @@ const FigureContainer = ({ children, style }) => {
 
 FigureContainer.Header = Header
 FigureContainer.Content = Content
-
-export default FigureContainer

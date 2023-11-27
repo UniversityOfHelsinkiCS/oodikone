@@ -11,7 +11,7 @@ const noProgramme = {
   fi: 'Ei ohjelmaa',
 }
 
-const getStudyProgrammeFunctions = ({
+export const getStudyProgrammeFunctions = ({
   selectedStudents,
   students,
   programmeCode,
@@ -144,5 +144,3 @@ const getStudyProgrammeFunctions = ({
   }
   return { getStudyProgrammeContent, studentProgrammesMap, getStudyStartDate }
 }
-
-export default getStudyProgrammeFunctions

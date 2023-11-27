@@ -2,14 +2,13 @@ import React, { useState } from 'react'
 import { Divider, Loader } from 'semantic-ui-react'
 
 import { useGetFacultyGraduationTimesQuery } from 'redux/facultyStats'
-import Toggle from '../../StudyProgramme/Toggle'
-import InfoBox from '../../Info/InfoBox'
-import GraduationTimes from './GraduationTimes'
-import InfotoolTips from '../../../common/InfoToolTips'
+import { facultyToolTips } from 'common/InfoToolTips'
+import { Toggle } from '../../StudyProgramme/Toggle'
+import { InfoBox } from '../../Info/InfoBox'
+import { GraduationTimes } from './GraduationTimes'
 import '../faculty.css'
 
-const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes }) => {
-  const toolTips = InfotoolTips.Faculty
+export const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes }) => {
   const [showMedian, setShowMedian] = useState(false)
   const [groupByStartYear, setGroupByStartYear] = useState(false)
   const studyProgrammeFilter = studyProgrammes ? 'ALL_PROGRAMMES' : 'NEW_STUDY_PROGRAMMES'
@@ -38,16 +37,89 @@ const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes }) => 
           {title}
         </Divider>
       </div>
-      <InfoBox content={toolTips[toolTipText]} />
+      <InfoBox content={facultyToolTips[toolTipText]} />
     </>
   )
+
+  const getContent = () => {
+    if (isFetchingOrLoading) {
+      return <Loader active style={{ marginTop: '15em' }} />
+    }
+    if (graduationStats.isSuccess && graduationStats.data) {
+      return (
+        <>
+          {getDivider('Average graduation times', 'AverageGraduationTimes')}
+          <div className="toggle-container">
+            <Toggle
+              cypress="GraduationTimeToggle"
+              firstLabel="Breakdown"
+              secondLabel="Median times"
+              value={showMedian}
+              setValue={setShowMedian}
+            />
+            <Toggle
+              cypress="GroupByToggle"
+              firstLabel="Group by: Graduation year"
+              secondLabel="Starting year"
+              value={groupByStartYear}
+              setValue={setGroupByStartYear}
+            />
+          </div>
+          <div>
+            <GraduationTimes
+              level="bachelor"
+              title="Bachelor"
+              data={data?.bachelor}
+              goal={goals?.bachelor}
+              levelProgrammeData={programmeData?.bachelor}
+              {...commonProps}
+            />
+            <GraduationTimes
+              level="bcMsCombo"
+              title="Bachelor + Master"
+              data={data?.bcMsCombo}
+              goal={goals?.bcMsCombo}
+              levelProgrammeData={programmeData?.bcMsCombo}
+              groupBy={groupBy}
+              {...commonProps}
+            />
+            <GraduationTimes
+              level="master"
+              title="Master"
+              data={data?.master}
+              goal={goals?.master}
+              levelProgrammeData={programmeData?.master}
+              {...commonProps}
+            />
+            <GraduationTimes
+              level="doctor"
+              title="Doctor"
+              data={data?.doctor}
+              goal={goals?.doctor}
+              levelProgrammeData={programmeData?.doctor}
+              {...commonProps}
+            />
+            <GraduationTimes
+              level="licentiate"
+              title="Licentiate"
+              data={data?.licentiate}
+              goal={goals?.licentiate}
+              levelProgrammeData={programmeData?.licentiate}
+              {...commonProps}
+            />
+          </div>
+        </>
+      )
+    }
+    return null
+  }
 
   return (
     <div className="programmes-overview">
       <div className="toggle-container">
         <Toggle
           cypress="ProgrammeToggle"
-          toolTips={toolTips.ProgrammeToggle}
+          toolTips={facultyToolTips.ProgrammeToggle}
           firstLabel="New study programmes"
           secondLabel="All study programmes"
           value={studyProgrammes}
@@ -55,78 +127,7 @@ const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes }) => 
         />
       </div>
 
-      {isFetchingOrLoading ? (
-        <Loader active style={{ marginTop: '15em' }} />
-      ) : (
-        <>
-          {graduationStats.isSuccess && graduationStats.data && (
-            <>
-              {getDivider('Average graduation times', 'AverageGraduationTimes')}
-              <div className="toggle-container">
-                <Toggle
-                  cypress="GraduationTimeToggle"
-                  firstLabel="Breakdown"
-                  secondLabel="Median times"
-                  value={showMedian}
-                  setValue={setShowMedian}
-                />
-                <Toggle
-                  cypress="GroupByToggle"
-                  firstLabel="Group by: Graduation year"
-                  secondLabel="Starting year"
-                  value={groupByStartYear}
-                  setValue={setGroupByStartYear}
-                />
-              </div>
-              <div>
-                <GraduationTimes
-                  level="bachelor"
-                  title="Bachelor"
-                  data={data?.bachelor}
-                  goal={goals?.bachelor}
-                  levelProgrammeData={programmeData?.bachelor}
-                  {...commonProps}
-                />
-                <GraduationTimes
-                  level="bcMsCombo"
-                  title="Bachelor + Master"
-                  data={data?.bcMsCombo}
-                  goal={goals?.bcMsCombo}
-                  levelProgrammeData={programmeData?.bcMsCombo}
-                  groupBy={groupBy}
-                  {...commonProps}
-                />
-                <GraduationTimes
-                  level="master"
-                  title="Master"
-                  data={data?.master}
-                  goal={goals?.master}
-                  levelProgrammeData={programmeData?.master}
-                  {...commonProps}
-                />
-                <GraduationTimes
-                  level="doctor"
-                  title="Doctor"
-                  data={data?.doctor}
-                  goal={goals?.doctor}
-                  levelProgrammeData={programmeData?.doctor}
-                  {...commonProps}
-                />
-                <GraduationTimes
-                  level="licentiate"
-                  title="Licentiate"
-                  data={data?.licentiate}
-                  goal={goals?.licentiate}
-                  levelProgrammeData={programmeData?.licentiate}
-                  {...commonProps}
-                />
-              </div>
-            </>
-          )}
-        </>
-      )}
+      {isFetchingOrLoading ? <Loader active style={{ marginTop: '15em' }} /> : <>{getContent()}</>}
     </div>
   )
 }
-
-export default TimesAndPathsView

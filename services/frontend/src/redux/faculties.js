@@ -9,7 +9,7 @@ export const getFaculties = () => {
   return callController(route, prefix)
 }
 
-const reducer = (
+export const reducer = (
   state = {
     data: [],
     yearlyStats: [],
@@ -45,5 +45,3 @@ const reducer = (
       return state
   }
 }
-
-export default reducer

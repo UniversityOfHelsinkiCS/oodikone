@@ -4,7 +4,7 @@ import { sortBy } from 'lodash'
 import { Segment, Form, Header, Icon } from 'semantic-ui-react'
 import { arrayOf, func, shape, string, bool, instanceOf, oneOfType } from 'prop-types'
 
-const SearchHistory = ({ items, handleSearch, updateItem, disabled, header }) => {
+export const SearchHistory = ({ items, handleSearch, updateItem, disabled, header }) => {
   const [selected, setSelected] = useState(null)
 
   const sortedItems = sortBy(items, i => -new Date(i.timestamp).getTime())
@@ -73,5 +73,3 @@ SearchHistory.propTypes = {
   disabled: bool,
   header: string,
 }
-
-export default SearchHistory

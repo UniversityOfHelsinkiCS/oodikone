@@ -1,4 +1,4 @@
-export default {
+export const studyProgrammeToolTips = {
   YearToggle: `
   Academic year: Näyttää tilastot akateemisille vuosille jaoteltuna, esimerkiksi 1.8.2019-31.7.2020
   Calendar year: Näyttää tilastot kalenterivuosille jaoteltuna, esimerkiksi 1.1.2019-31.12.2019 

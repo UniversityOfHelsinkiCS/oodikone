@@ -1,10 +1,9 @@
 import React from 'react'
 import { Form, Radio } from 'semantic-ui-react'
 import _ from 'lodash'
-import createFilter from './createFilter'
-import filterInfo from '../../../common/InfoToolTips/filters'
-
-const moment = require('moment')
+import moment from 'moment'
+import { filterToolTips } from 'common/InfoToolTips'
+import { createFilter } from './createFilter'
 
 const StudyrightStatusFilterCard = ({ options, onOptionsChange, combinedProgrammeCode }) => {
   const { activeProgramme, activeCombinedProgramme } = options
@@ -75,12 +74,12 @@ const StudyrightStatusFilterCard = ({ options, onOptionsChange, combinedProgramm
   )
 }
 
-export default createFilter({
+export const studyrightStatusFilter = createFilter({
   key: 'studyrightStatusFilter',
 
   title: 'Studyright Status',
 
-  info: filterInfo.studyrightStatus,
+  info: filterToolTips.studyrightStatus,
 
   defaultOptions: {
     activeProgramme: null,

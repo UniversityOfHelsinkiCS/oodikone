@@ -1,7 +1,7 @@
-/* eslint-disable import/prefer-default-export */
 import React, { useMemo } from 'react'
-import SortableTable, { row } from 'components/SortableTable'
-import useLanguage from 'components/LanguagePicker/useLanguage'
+
+import { SortableTable, row } from 'components/SortableTable'
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
 import { getColumns } from './logic'
 import { useLanguageCenterContext, calculateTotals } from '../common'
 import '../index.css'

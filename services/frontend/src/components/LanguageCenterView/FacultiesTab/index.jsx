@@ -1,8 +1,8 @@
-/* eslint-disable import/prefer-default-export */
-import useLanguage from 'components/LanguagePicker/useLanguage'
-import SortableTable, { row } from 'components/SortableTable'
 import React, { useMemo } from 'react'
 import _ from 'lodash'
+
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
+import { SortableTable, row } from 'components/SortableTable'
 import { getColumns } from './logic'
 import { calculateTotals, useLanguageCenterContext, emptyFields } from '../common'
 import { ColorModeSelector, NumberModeSelector, SemesterRangeSelector } from '../selectorComponents'

@@ -1,12 +1,13 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { Menu, Radio } from 'semantic-ui-react'
+
 import { viewModeNames } from './util'
-import HelpButton from '../HelpButton'
-import StudentTable from './Tables/student'
-import AttemptsTable from './Tables/attempts'
-import selectors from '../../../../selectors/courseStats'
-import UnifyRadioButtons from '../UnifyRadioButtons'
+import { HelpButton } from '../HelpButton'
+import { StudentTable } from './Tables/student'
+import { AttemptsTable } from './Tables/attempts'
+import { getCourseAlternatives } from '../../../../selectors/courseStats'
+import { UnifyRadioButtons } from '../UnifyRadioButtons'
 
 export const TablesSettings = ({ value, onChange, availableStats, onSeparateChange }) => {
   const { viewMode, showDetails, showGrades, separate } = value
@@ -65,11 +66,11 @@ export const TablesSettings = ({ value, onChange, availableStats, onSeparateChan
   )
 }
 
-export const Tables = props => {
-  const alternatives = useSelector(selectors.getCourseAlternatives)
+export const Tables = ({ settings, ...otherProps }) => {
+  const alternatives = useSelector(getCourseAlternatives)
   const viewModes = { ATTEMPTS: AttemptsTable, STUDENT: StudentTable }
-  const Content = viewModes[props.settings.viewMode]
+  const Content = viewModes[settings.viewMode]
   const openOrReqular = useSelector(state => state.courseSearch.openOrReqular)
 
-  return <Content {...props} alternatives={alternatives} unifyCourses={openOrReqular} />
+  return <Content settings={settings} {...otherProps} alternatives={alternatives} unifyCourses={openOrReqular} />
 }

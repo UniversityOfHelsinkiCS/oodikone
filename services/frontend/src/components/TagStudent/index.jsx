@@ -1,5 +1,4 @@
 import React from 'react'
-import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { Dropdown, Label, Icon, Table } from 'semantic-ui-react'
 import { arrayOf, string, shape, func, bool } from 'prop-types'
@@ -72,9 +71,7 @@ const mapStateToProps = ({ settings }) => ({
   namesVisible: settings.namesVisible,
 })
 
-export default withRouter(
-  connect(mapStateToProps, {
-    createStudentTag: createStudentTagAction,
-    deleteStudentTag: deleteStudentTagAction,
-  })(TagStudent)
-)
+export const ConnectedTagStudent = connect(mapStateToProps, {
+  createStudentTag: createStudentTagAction,
+  deleteStudentTag: deleteStudentTagAction,
+})(TagStudent)

@@ -3,9 +3,12 @@ import Highcharts from 'highcharts'
 import ReactHighcharts from 'react-highcharts'
 import { shape, arrayOf, object } from 'prop-types'
 
-class StackedBarChart extends Component {
-  state = {
-    graphOptions: {},
+export class StackedBarChart extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      graphOptions: {},
+    }
   }
 
   componentDidMount() {
@@ -14,16 +17,17 @@ class StackedBarChart extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.series !== prevProps.series) {
-      const { options, series } = this.props
-      this.setState({ graphOptions: { ...options, series } }) //eslint-disable-line
+    const { series: currentSeries, options: currentOptions } = this.props
+    if (currentSeries !== prevProps.series) {
+      this.setState({ graphOptions: { ...currentOptions, series: currentSeries } })
     }
   }
 
   render() {
+    const { graphOptions } = this.state
     return (
       <div>
-        <ReactHighcharts highcharts={Highcharts} config={this.state.graphOptions} />
+        <ReactHighcharts highcharts={Highcharts} config={graphOptions} />
       </div>
     )
   }
@@ -32,5 +36,3 @@ StackedBarChart.propTypes = {
   options: shape({}).isRequired,
   series: arrayOf(object).isRequired,
 }
-
-export default StackedBarChart

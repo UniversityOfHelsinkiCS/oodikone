@@ -16,7 +16,7 @@ const NoAccessToPageBanner = () => (
   </Container>
 )
 
-const ProtectedRoute = ({ requiredRoles = [], requireUserHasRights = false, ...rest }) => {
+export const ProtectedRoute = ({ requiredRoles = [], requireUserHasRights = false, ...rest }) => {
   const user = useGetAuthorizedUserQuery()
   const { rights, iamRights, iamGroups, isAdmin, roles } = user
 
@@ -41,5 +41,3 @@ const ProtectedRoute = ({ requiredRoles = [], requireUserHasRights = false, ...r
 
   return hasAccessToRoute() ? <Route {...rest} /> : <NoAccessToPageBanner />
 }
-
-export default ProtectedRoute

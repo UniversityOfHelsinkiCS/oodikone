@@ -2,11 +2,9 @@ import React from 'react'
 import qs from 'query-string'
 import _, { uniq } from 'lodash'
 import { Link } from 'react-router-dom'
-import { connect } from 'react-redux'
 import { Header, Icon, Item } from 'semantic-ui-react'
 
-import { row } from 'components/SortableTable'
-import SortableTable from '../../../../SortableTable'
+import { SortableTable, row } from 'components/SortableTable'
 import { getGradeSpread, getThesisGradeSpread, isThesisGrades, resolveGrades, getSortableColumn } from '../util'
 
 const getTableData = (stats, useThesisGrades, isRelative) =>
@@ -54,7 +52,7 @@ const getGradeColumns = grades =>
     })
   )
 
-const AttemptsTable = ({
+export const AttemptsTable = ({
   data: { stats, name },
   settings: { showGrades, separate },
   alternatives,
@@ -193,5 +191,3 @@ const AttemptsTable = ({
     </div>
   )
 }
-
-export default connect(null)(AttemptsTable)

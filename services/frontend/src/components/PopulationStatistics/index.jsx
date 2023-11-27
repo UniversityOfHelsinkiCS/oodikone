@@ -1,17 +1,17 @@
 import React, { useMemo } from 'react'
 import { useSelector } from 'react-redux'
-import { useLocation, useHistory } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import { Header, Segment } from 'semantic-ui-react'
 import { useGetSemestersQuery } from 'redux/semesters'
-import populationToData from 'selectors/populationDetails'
+import { makePopulationsToData } from 'selectors/populationDetails'
 import { getStudentTotalCredits, getUnifiedProgrammeName } from 'common'
 import { useGetAuthorizedUserQuery } from 'redux/auth'
-import PopulationDetails from '../PopulationDetails'
+import { PopulationDetails } from '../PopulationDetails'
 import { useTitle } from '../../common/hooks'
-import useLanguage from '../LanguagePicker/useLanguage'
-import FilterView from '../FilterView'
-import PopulationSearch from '../PopulationSearch'
-import DataExport from './DataExport'
+import { useLanguage } from '../LanguagePicker/useLanguage'
+import { FilterView } from '../FilterView'
+import { ConnectedPopulationSearch as PopulationSearch } from '../PopulationSearch'
+import { DataExport } from './DataExport'
 import {
   ageFilter,
   courseFilter,
@@ -34,14 +34,12 @@ const getYearText = year => {
   if (year === 'All') return ''
   return `${year} - ${Number(year) + 1}`
 }
-const PopulationStatistics = () => {
+
+export const PopulationStatistics = () => {
   const location = useLocation()
   const { language, getTextIn } = useLanguage()
-  const history = useHistory()
   const courses = useSelector(store => store.populationSelectedStudentCourses.data?.coursestatistics)
-  const { query, queryIsSet, isLoading, selectedStudentsByYear, samples } = useSelector(
-    populationToData.makePopulationsToData
-  )
+  const { query, queryIsSet, isLoading, selectedStudentsByYear, samples } = useSelector(makePopulationsToData)
 
   const { isAdmin, rights } = useGetAuthorizedUserQuery()
   const onlyIamRights = !isAdmin && rights.length === 0
@@ -145,7 +143,7 @@ const PopulationStatistics = () => {
           </Header>
 
           <Segment className="contentSegment">
-            <PopulationSearch history={history} location={location} combinedProgrammeCode={combinedProgrammeCode} />
+            <PopulationSearch combinedProgrammeCode={combinedProgrammeCode} />
             {location.search !== '' ? (
               <PopulationDetails
                 queryIsSet={queryIsSet}
@@ -170,5 +168,3 @@ const PopulationStatistics = () => {
     </FilterView>
   )
 }
-
-export default PopulationStatistics
