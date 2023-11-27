@@ -87,8 +87,8 @@ const AssociateTagForm = ({ group, tagName, selectFieldItems, formik }) => (
   <>
     <p>
       {tagName === 'studyProgramme'
-        ? `Edit associated study programme for this group:`
-        : `Edit associated starting year for this group:`}
+        ? 'Edit associated study programme for this group:'
+        : 'Edit associated starting year for this group:'}
     </p>
     <Form onSubmit={formik.handleSubmit} style={{ ...cellWrapper, alignItems: 'center' }}>
       <div style={cellContent}>

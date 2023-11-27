@@ -111,7 +111,7 @@ const createGraphOptions = ({
             width: 3,
             dashStyle: 'dash',
             label: {
-              text: `Population study start`,
+              text: 'Population study start',
               fontSize: 30,
             },
           }))
@@ -141,7 +141,6 @@ const sortCoursesByDate = courses =>
   [...courses].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 
 const filterCoursesByStudyPlan = (plan, courses) =>
-  // eslint-disable-next-line camelcase
   !plan ? courses : courses.filter(({ course_code }) => plan.included_courses.includes(course_code))
 
 const filterCoursesByDate = (courses, date) => courses.filter(c => moment(c.date).isSameOrAfter(moment(date)))
@@ -288,7 +287,6 @@ const resolveStudyRightElement = ({ studyright_elements }) => {
 
 const filterGraduations = (student, selectedStudyRight, getTextIn) => {
   const graduated = student.studyrights.filter(({ graduated }) => graduated)
-  // eslint-disable-next-line camelcase
   if (!selectedStudyRight)
     return graduated.map(({ enddate, studyright_elements }) => {
       const studyrightElem = studyright_elements
@@ -488,7 +486,6 @@ export const CreditAccumulationGraphHighCharts = ({
   if (singleStudent) {
     const startDate = selectedStudyRight
       ? selectedStudyRight.studyright_elements
-          // eslint-disable-next-line camelcase
           .filter(({ element_detail }) => element_detail.type === 20)
           .sort((a, b) => new Date(a.startdate) - new Date(b.startdate))[0].startdate
       : _.chain(students[0].studyrights || students[0].courses)

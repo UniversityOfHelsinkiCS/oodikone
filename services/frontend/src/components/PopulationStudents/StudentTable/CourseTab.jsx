@@ -220,7 +220,7 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
                 if (!s.courses) return null
                 const bestGrade = findBestGrade(s.courses, m.code)
                 const gradeText = bestGrade ? `\nGrade: ${bestGrade}` : ''
-                const studentCode = s.studentNumber ? `\nStudent number:  ${s.studentNumber}` : ``
+                const studentCode = s.studentNumber ? `\nStudent number:  ${s.studentNumber}` : ''
                 return {
                   title: `${m.code}, ${getTextIn(m.name)}${studentCode} ${gradeText}`,
                   style: {
@@ -295,7 +295,7 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
           {mandatoryCourses?.defaultProgrammeCourses.length > 0 && (
             <SortableTable
               tableId="course-of-population-students"
-              title={`Courses of population's students`}
+              title="Courses of population's students"
               columns={columns}
               onlyExportColumns={hiddenNameAndEmailForExcel}
               data={data}

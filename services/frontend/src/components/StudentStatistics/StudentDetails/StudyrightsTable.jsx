@@ -215,7 +215,7 @@ export const StudyrightsTable = ({
                       <Popup
                         content={
                           rowIsFilterable
-                            ? `Display credits included in the study plan of this study right`
+                            ? 'Display credits included in the study plan of this study right'
                             : 'This study right does not have a study plan'
                         }
                         size="mini"
