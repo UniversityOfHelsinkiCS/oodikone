@@ -73,7 +73,7 @@ export const getColor = (stats, columnAmount, colorMode, numberMode, courseTotal
     return value / (totalValue / columnAmount / 8)
   })()
   const divisor = colorMode === 'course' ? 6 : 2
-  const color = ['completions', 'enrollments'].includes(numberMode) ? `0,170,0` : `220,60,60`
+  const color = ['completions', 'enrollments'].includes(numberMode) ? '0,170,0' : '220,60,60'
   const modifier = ['completions', 'enrollments'].includes(numberMode) ? 0 : 0.3
   return {
     backgroundColor: `rgba(${color},${relativeValue / divisor + modifier})`,

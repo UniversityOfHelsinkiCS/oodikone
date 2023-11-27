@@ -27,9 +27,9 @@ const getHeaders = () => {
 const api = axios.create({ baseURL: apiBasePath, headers: getHeaders(), timeout: 120_000 })
 
 const actionSuffixes = {
-  attempt: `ATTEMPT`,
-  failure: `FAILURE`,
-  success: `SUCCESS`,
+  attempt: 'ATTEMPT',
+  failure: 'FAILURE',
+  success: 'SUCCESS',
 }
 
 export const actionTypes = prefix => ({

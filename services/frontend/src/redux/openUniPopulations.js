@@ -7,7 +7,7 @@ const openUniPopulationApi = RTKApi.injectEndpoints({
         `/openunisearch?courselist=${JSON.stringify(courseList)}&startdate=${startdate}&enddate=${enddate}`,
     }),
     getSavedSearches: builder.query({
-      query: () => `/openunisearch/searches`,
+      query: () => '/openunisearch/searches',
     }),
     createOpenUniCourseSearch: builder.mutation({
       query: ({ courseList, name }) => ({

@@ -7,7 +7,7 @@ const completedCoursesSearchApi = RTKApi.injectEndpoints({
         `completedcoursessearch?courselist=${JSON.stringify(courseList)}&studentlist=${JSON.stringify(studentList)}`,
     }),
     getSavedCourseLists: builder.query({
-      query: () => `/completedcoursessearch/searches`,
+      query: () => '/completedcoursessearch/searches',
     }),
     createCourseList: builder.mutation({
       query: ({ courseList, name }) => ({

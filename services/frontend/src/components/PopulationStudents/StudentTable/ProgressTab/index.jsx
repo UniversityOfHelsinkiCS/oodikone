@@ -83,7 +83,7 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
   const labelCriteria = Object.keys(criteria.courses).reduce((acc, year, idx) => {
     acc[year] = [
       {
-        code: `Credits`,
+        code: 'Credits',
         name: {
           fi: `${creditMonths[idx]} mos.: ${criteria.credits[year]}`,
           en: `${creditMonths[idx]} mos.: ${criteria.credits[year]}`,
@@ -97,7 +97,7 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
           name: getCourseName(courseCode),
         })),
       {
-        code: `Criteria`,
+        code: 'Criteria',
         name: {
           fi: `Year ${idx + 1}: Fullfilled`,
           en: `Year ${idx + 1}: Fullfilled`,
@@ -105,7 +105,7 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
         },
       },
       {
-        code: `Enrollment`,
+        code: 'Enrollment',
         name: { en: `Year ${idx + 1}` },
       },
     ]
@@ -459,7 +459,7 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
           key: 'hidden-phoneNumber',
           export: true,
           displayColumn: false,
-          textTitle: `Phone number`,
+          textTitle: 'Phone number',
           getRowVal: s => s.phoneNumber,
         },
         {
@@ -520,7 +520,7 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
               <SortableTable
                 style={{ height: '80vh' }}
                 tableId="progress-of-population-students"
-                title={`Progress of population's students after predefined criteria`}
+                title="Progress of population's students after predefined criteria"
                 columns={columns}
                 data={data}
               />
