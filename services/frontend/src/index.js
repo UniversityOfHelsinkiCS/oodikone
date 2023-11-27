@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-filename-extension */
 // eslint-disable-next-line import/no-unused-modules
 import React from 'react'
 import ReactDOM from 'react-dom'
