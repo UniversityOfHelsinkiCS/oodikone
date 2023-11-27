@@ -8,12 +8,8 @@
   "parserOptions": {
     "requireConfigFile": false
   },
-  "extends": ["airbnb", "plugin:prettier/recommended"],
+  "extends": ["airbnb", "plugin:prettier/recommended", "plugin:import/recommended"],
   "rules": {
-    "react/no-did-mount-set-state": "off",
-    "react/destructuring-assignment": "off",
-    "react/no-typos": "off",
-    "react/sort-comp": "off",
     "react/forbid-prop-types": "off",
     "jsx-a11y/no-static-element-interactions": "off",
     "jsx-a11y/click-events-have-key-events": "off",
@@ -22,29 +18,24 @@
     "no-plusplus": "off",
     "no-shadow": "off",
     "react/jsx-props-no-spreading": "off",
-    "react/jsx-filename-extension": "off",
+    "react/jsx-filename-extension": ["error", { "allow": "as-needed" }],
     "react/function-component-definition": [
-      2,
-      {
-        "namedComponents": "arrow-function",
-        "unnamedComponents": "arrow-function"
-      }
+      "error",
+      { "namedComponents": "arrow-function", "unnamedComponents": "arrow-function" }
     ],
     "default-param-last": "off",
     "no-implied-eval": "off",
-    "react/state-in-constructor": "off",
-    "react/static-property-placement": "off",
-    "react/no-deprecated": "off",
     "react/no-unescaped-entities": "off",
     "react/prop-types": "off",
     "react/prefer-stateless-function": "error",
     "react/no-unstable-nested-components": "off",
     "react/jsx-no-constructed-context-values": "off",
-    "react/jsx-no-useless-fragment": "off",
-    "import/no-unresolved": "off",
+    "import/no-default-export": "error",
     "import/prefer-default-export": "off",
-    "react/jsx-no-bind": "error",
-    "babel/no-invalid-this": "error",
+    "import/no-unused-modules": ["error", { "missingExports": true, "unusedExports": true }],
+    "import/no-commonjs": "error",
+    "quotes": ["error", "single", { "avoidEscape": true }],
+    "@babel/no-invalid-this": "error",
     "react-hooks/rules-of-hooks": "error",
     "prettier/prettier": "error",
     "no-console": "error",
@@ -55,5 +46,12 @@
       }
     ]
   },
-  "plugins": ["react", "import", "babel", "react-hooks"]
+  "plugins": ["react", "@babel", "react-hooks"],
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "moduleDirectory": ["node_modules", "src/"]
+      }
+    }
+  }
 }
