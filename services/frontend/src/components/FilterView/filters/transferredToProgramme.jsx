@@ -1,7 +1,7 @@
 import React from 'react'
 import { Form, Radio } from 'semantic-ui-react'
-import createFilter from './createFilter'
-import filterInfo from '../../../common/InfoToolTips/filters'
+import { filterToolTips } from 'common/InfoToolTips'
+import { createFilter } from './createFilter'
 
 const TransferredToProgrammeFilterCard = ({ options, onOptionsChange }) => {
   const { transferred } = options
@@ -43,12 +43,12 @@ const TransferredToProgrammeFilterCard = ({ options, onOptionsChange }) => {
   )
 }
 
-export default createFilter({
+export const transferredToProgrammeFilter = createFilter({
   key: 'TransferredToProgramme',
 
   title: 'Transferred to Programme',
 
-  info: filterInfo.transferred,
+  info: filterToolTips.transferred,
 
   defaultOptions: {
     transferred: null,

@@ -3,10 +3,10 @@ import { Segment } from 'semantic-ui-react'
 import { Switch, Route, Link, useRouteMatch, useHistory } from 'react-router-dom'
 import { useTitle } from '../../common/hooks'
 
-import ProtoC from '../CoolDataScience/ProtoC'
-import ProtoC2 from '../CoolDataScience/ProtoC2'
-import ProtoG from '../CoolDataScience/ProtoG'
-import StatusPanel from '../CoolDataScience/StatusPanel'
+import { ProtoC } from '../CoolDataScience/ProtoC'
+import { ProtoC2 } from '../CoolDataScience/ProtoC2'
+import { ConnectedProtoG as ProtoG } from '../CoolDataScience/ProtoG'
+import { StatusPanel } from '../CoolDataScience/StatusPanel'
 import relativeGraphImg from '../../assets/graph-relative.png'
 import absoluteGraphImg from '../../assets/graph-absolute.png'
 import timelineGraphImg from '../../assets/graph-timeline.png'
@@ -37,7 +37,7 @@ const NavTiles = ({ children }) => {
 
 const baseURI = '/trends'
 
-const Trends = () => {
+export const Trends = () => {
   useTitle('Trends')
   const history = useHistory()
   const match = useRouteMatch({ path: baseURI, exact: true })
@@ -66,5 +66,3 @@ const Trends = () => {
     </>
   )
 }
-
-export default Trends

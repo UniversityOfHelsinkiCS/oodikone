@@ -1,5 +1,5 @@
 import xlsx from 'xlsx'
-import sortProgrammeKeys from './facultyHelpers'
+import { sortProgrammeKeys } from './facultyHelpers'
 
 export const downloadStudentTableCsv = (studentStats, programmeNames, faculty, sortedkeys, getTextIn) => {
   const book = xlsx.utils.book_new()
@@ -24,7 +24,7 @@ export const downloadStudentTableCsv = (studentStats, programmeNames, faculty, s
     }, {})
   )
   const tableSheet = xlsx.utils.json_to_sheet(tableStatsAsCsv)
-  xlsx.utils.book_append_sheet(book, tableSheet, `TotalTableStats`)
+  xlsx.utils.book_append_sheet(book, tableSheet, 'TotalTableStats')
 
   const programmeStats = studentStats?.data?.programmeStats || {}
   counter = 0

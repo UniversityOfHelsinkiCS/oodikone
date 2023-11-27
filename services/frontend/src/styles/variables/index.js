@@ -1,4 +1,4 @@
-const colors = {
+export const colors = {
   white: '#fff',
   black: '#222',
   deepBlack: '#000',
@@ -29,5 +29,3 @@ const colors = {
   chartdarkred: '#a03530',
   chartlred: '#e2726d',
 }
-
-export default colors

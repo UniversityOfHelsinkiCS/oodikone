@@ -1,5 +1,4 @@
-/* eslint-disable import/prefer-default-export */
-import useLanguage from 'components/LanguagePicker/useLanguage'
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
 import React, { useMemo } from 'react'
 import { Dropdown, Radio } from 'semantic-ui-react'
 import { useLanguageCenterContext } from './common'
@@ -63,7 +62,7 @@ export const ColorModeSelector = () => {
   )
 }
 
-export const SemesterSelector = ({ allSemesters, semester, setSemester, dataCy }) => {
+const SemesterSelector = ({ allSemesters, semester, setSemester, dataCy }) => {
   const { getTextIn } = useLanguage()
   const currentValue = allSemesters.find(({ semestercode }) => semester === semestercode) ?? allSemesters[0]
   const options = useMemo(

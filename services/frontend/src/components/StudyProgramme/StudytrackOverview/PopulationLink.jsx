@@ -68,9 +68,7 @@ const TotalPopulationLink = ({ studytrack, studyprogramme, combinedProgramme, ye
   )
 }
 
-const PopulationLink = ({ year, ...rest }) => {
+export const PopulationLink = ({ year, ...rest }) => {
   if (year === 'Total') return <TotalPopulationLink {...rest} />
   return <PopulationStatisticsLink {...rest} year={year} />
 }
-
-export default PopulationLink

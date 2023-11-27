@@ -3,10 +3,17 @@ import { func, shape, string } from 'prop-types'
 import { Divider, Table, Icon, Header, Item, Segment, Button, Popup } from 'semantic-ui-react'
 import { sortBy } from 'lodash'
 import { Link } from 'react-router-dom'
-import useLanguage from 'components/LanguagePicker/useLanguage'
-import { reformatDate, getTargetCreditsForProgramme } from '../../../common'
 
-const StudyrightsTable = ({ Programmes, student, handleStartDateChange, showPopulationStatistics, studyrightid }) => {
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
+import { reformatDate, getTargetCreditsForProgramme } from 'common'
+
+export const StudyrightsTable = ({
+  Programmes,
+  student,
+  handleStartDateChange,
+  showPopulationStatistics,
+  studyrightid,
+}) => {
   const { getTextIn } = useLanguage()
   const { programmes } = Programmes
   const programmeCodes = programmes ? Object.keys(programmes) : []
@@ -254,5 +261,3 @@ StudyrightsTable.propTypes = {
   showPopulationStatistics: func.isRequired,
   studyrightid: string,
 }
-
-export default StudyrightsTable

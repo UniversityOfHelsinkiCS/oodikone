@@ -5,7 +5,7 @@ import ReactHighchart from 'react-highcharts'
 import { graphDataType } from '../../../constants/types'
 import './multicolorBarChart.css'
 
-const MulticolorBarChart = props => {
+export const MulticolorBarChart = props => {
   const { chartTitle, chartData } = props
   if (chartData.length > 0) {
     return (
@@ -40,5 +40,3 @@ MulticolorBarChart.propTypes = {
   chartTitle: string.isRequired,
   chartData: arrayOf(graphDataType).isRequired,
 }
-
-export default MulticolorBarChart

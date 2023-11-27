@@ -9,7 +9,7 @@ const getStatusIcon = stats => {
   return ''
 }
 
-const NewUpdateView = ({ studyprogramme, combinedProgramme }) => {
+export const UpdateView = ({ studyprogramme, combinedProgramme }) => {
   const [skipBasic, setSkipBasic] = useState(true)
   const [skipStudytrack, setSkipStudytrack] = useState(true)
   const basicstats = useUpdateBasicViewQuery({ id: studyprogramme, combinedProgramme }, { skip: skipBasic })
@@ -47,5 +47,3 @@ const NewUpdateView = ({ studyprogramme, combinedProgramme }) => {
     </div>
   )
 }
-
-export default NewUpdateView

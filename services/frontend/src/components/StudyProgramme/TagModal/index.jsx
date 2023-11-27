@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { arrayOf, string, bool, func, shape } from 'prop-types'
 import { Button, Modal, Form, TextArea, Dropdown, Message } from 'semantic-ui-react'
 
-import { createMultipleStudentTagAction } from '../../../redux/tagstudent'
+import { createMultipleStudentTagAction } from 'redux/tagstudent'
 
 const TagModal = ({ tags, studytrack, createMultipleStudentTag, pending, success, error, combinedProgramme }) => {
   const [modalOpen, setModalOpen] = useState(false)
@@ -110,8 +109,6 @@ const mapStateToProps = ({ tagstudent }) => ({
   error: tagstudent.error,
 })
 
-export default withRouter(
-  connect(mapStateToProps, {
-    createMultipleStudentTag: createMultipleStudentTagAction,
-  })(TagModal)
+export const ConnectedTagModal = connect(mapStateToProps, { createMultipleStudentTag: createMultipleStudentTagAction })(
+  TagModal
 )

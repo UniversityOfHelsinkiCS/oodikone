@@ -53,7 +53,7 @@ export const setFaculties = (uid, faculties) => {
   return callController(route, prefix, data, 'post')
 }
 
-const reducer = (state = { data: [], enabledOnly: true }, action) => {
+export const reducer = (state = { data: [], enabledOnly: true }, action) => {
   switch (action.type) {
     case 'GET_USERS_ATTEMPT':
       return {
@@ -133,5 +133,3 @@ const reducer = (state = { data: [], enabledOnly: true }, action) => {
       return state
   }
 }
-
-export default reducer

@@ -2,10 +2,9 @@ import React from 'react'
 import './navigationBar.css'
 import { Menu, Dropdown, Button, Label } from 'semantic-ui-react'
 import { NavLink, Link } from 'react-router-dom'
-import { useLogoutMutation, useShowAsUser } from 'redux/auth'
+import { useLogoutMutation, useShowAsUser, useGetAuthorizedUserQuery } from 'redux/auth'
 import { checkUserAccess } from '../../common'
-import { useGetAuthorizedUserQuery } from '../../redux/auth'
-import LanguagePicker from '../LanguagePicker'
+import { LanguagePicker } from '../LanguagePicker'
 import { isDev, adminerUrls } from '../../conf'
 
 const allNavigationItems = {
@@ -43,7 +42,7 @@ const allNavigationItems = {
   feedback: { path: '/feedback', key: 'feedback', label: 'Give feedback' },
 }
 
-const NavigationBar = () => {
+export const NavigationBar = () => {
   const { isLoading, rights, iamRights, iamGroups, mockedBy, userId, roles, isAdmin } = useGetAuthorizedUserQuery()
   const showAsUser = useShowAsUser()
   const [logout] = useLogoutMutation()
@@ -175,5 +174,3 @@ const NavigationBar = () => {
     </Menu>
   )
 }
-
-export default NavigationBar

@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import { Table, Progress, Icon } from 'semantic-ui-react'
 
-import ExternalCreditFilterToggle from './ExternalCreditFilterToggle'
+import { ExternalCreditFilterToggle } from './ExternalCreditFilterToggle'
 
-const CollapsibleCreditRow = ({ min, max, studentCount, filteredLength, months }) => {
+export const CollapsibleCreditRow = ({ min, max, studentCount, filteredLength, months }) => {
   const [limits, setLimits] = useState([])
 
   const collapse = () => {
@@ -75,5 +75,3 @@ const CollapsibleCreditRow = ({ min, max, studentCount, filteredLength, months }
     </>
   )
 }
-
-export default CollapsibleCreditRow

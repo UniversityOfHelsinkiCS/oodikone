@@ -1,9 +1,10 @@
 import React from 'react'
 import { Tab } from 'semantic-ui-react'
-import Status from './Status'
-import Graduated from './StatusGraduated'
 
-const StatusPanel = () => {
+import { Status } from './Status'
+import { ConnectedStatusGraduated as Graduated } from './StatusGraduated'
+
+export const StatusPanel = () => {
   const panes = [
     {
       menuItem: 'Attainments',
@@ -24,5 +25,3 @@ const StatusPanel = () => {
   ]
   return <Tab panes={panes} />
 }
-
-export default StatusPanel

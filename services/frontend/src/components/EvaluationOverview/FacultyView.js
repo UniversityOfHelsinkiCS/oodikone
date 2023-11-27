@@ -1,22 +1,22 @@
 import React, { useState } from 'react'
 import { Divider, Header, Loader, Message } from 'semantic-ui-react'
+
 import {
   useGetFacultiesQuery,
   useGetFacultyProgressStatsQuery,
   useGetFacultyGraduationTimesQuery,
 } from 'redux/facultyStats'
-import FacultyGraduations from './FacultyGraduations'
-import FacultyProgress from './FacultyProgress'
-import Toggle from '../StudyProgramme/Toggle'
-import InfoBox from '../Info/InfoBox'
-import InfotoolTips from '../../common/InfoToolTips'
-import useLanguage from '../LanguagePicker/useLanguage'
+import { facultyToolTips } from 'common/InfoToolTips'
+import { FacultyGraduations } from './FacultyGraduations'
+import { FacultyProgress } from './FacultyProgress'
+import { Toggle } from '../StudyProgramme/Toggle'
+import { InfoBox } from '../Info/InfoBox'
+import { useLanguage } from '../LanguagePicker/useLanguage'
 import '../FacultyStatistics/faculty.css'
 
-const FacultyView = ({ faculty }) => {
+export const FacultyView = ({ faculty }) => {
   const [graduatedGroup, setGraduatedGroup] = useState(false)
   const [showMedian, setShowMedian] = useState(false)
-  const toolTips = InfotoolTips.Faculty
   const studyProgrammeFilter = 'NEW_STUDY_PROGRAMMES'
   const specials = 'SPECIAL_EXCLUDED'
   const graduated = graduatedGroup ? 'GRADUATED_EXCLUDED' : 'GRADUATED_INCLUDED'
@@ -91,13 +91,13 @@ const FacultyView = ({ faculty }) => {
                 {getDivider(
                   'Progress of students of the faculty ',
                   'BachelorStudentsOfTheFacultyByStartingYear',
-                  toolTips.StudentProgress,
+                  facultyToolTips.StudentProgress,
                   'InfoFacultyProgress'
                 )}
                 <div className="toggle-container">
                   <Toggle
                     cypress="GraduatedToggle"
-                    toolTips={toolTips.GraduatedToggle}
+                    toolTips={facultyToolTips.GraduatedToggle}
                     firstLabel="Graduated included"
                     secondLabel="Graduated excluded"
                     value={graduatedGroup}
@@ -109,7 +109,11 @@ const FacultyView = ({ faculty }) => {
             )}
             {graduationStats.isSuccess && graduationStats.data && (
               <>
-                {getDivider('Average graduation times', 'AverageGraduationTimes', toolTips.AverageGraduationTimes)}
+                {getDivider(
+                  'Average graduation times',
+                  'AverageGraduationTimes',
+                  facultyToolTips.AverageGraduationTimes
+                )}
                 <div className="toggle-container">
                   <Toggle
                     cypress="GraduationTimeToggle"
@@ -133,5 +137,3 @@ const FacultyView = ({ faculty }) => {
     </>
   )
 }
-
-export default FacultyView

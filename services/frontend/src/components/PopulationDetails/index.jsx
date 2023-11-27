@@ -1,21 +1,20 @@
 import React, { useEffect, useState } from 'react'
-import { connect } from 'react-redux'
-import useFilters from 'components/FilterView/useFilters'
-import studyPlanFilter from 'components/FilterView/filters/hops'
-import { creditDateFilter } from 'components/FilterView/filters'
+
+import { useFilters } from 'components/FilterView/useFilters'
+import { creditDateFilter, hopsFilter as studyPlanFilter } from 'components/FilterView/filters'
 import { useGetProgressCriteriaQuery } from 'redux/programmeProgressCriteria'
-import PanelView from 'components/common/PanelView'
-import { useGetAuthorizedUserQuery } from '../../redux/auth'
-import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
-import PopulationStudents from '../PopulationStudents'
-import PopulationCourses from '../PopulationCourses'
-import InfoBox from '../Info/InfoBox'
-import CreditGainStats from './CreditGainStats'
-import AgeStats from './AgeStats'
-import infotooltips from '../../common/InfoToolTips'
+import { useGetAuthorizedUserQuery } from 'redux/auth'
+import { PanelView } from 'components/common/PanelView'
+import { populationStatisticsToolTips } from 'common/InfoToolTips'
+import { CreditAccumulationGraphHighCharts } from '../CreditAccumulationGraphHighCharts'
+import { PopulationStudentsContainer as PopulationStudents } from '../PopulationStudents'
+import { PopulationCourses } from '../PopulationCourses'
+import { InfoBox } from '../Info/InfoBox'
+import { CreditGainStats } from './CreditGainStats'
+import { AgeStats } from './AgeStats'
 import { CourseTableModeSelector } from './CurriculumPicker'
 
-const PopulationDetails = ({
+export const PopulationDetails = ({
   allStudents,
   filteredStudents,
   queryIsSet,
@@ -38,7 +37,6 @@ const PopulationDetails = ({
   const criteria = useGetProgressCriteriaQuery({ programmeCode: query?.studyRights?.programme })
   const [courseTableMode, setCourseTableMode] = useState('curriculum')
   const RenderCreditGainGraphs = () => {
-    const { CreditAccumulation } = infotooltips.PopulationStatistics
     const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive)
 
     const graphs = (
@@ -52,7 +50,7 @@ const PopulationDetails = ({
     )
     return (
       <>
-        <InfoBox content={CreditAccumulation} />
+        <InfoBox content={populationStatisticsToolTips.CreditAccumulation} />
         {filteredStudents.length > 0 && graphs}
       </>
     )
@@ -141,11 +139,5 @@ const PopulationDetails = ({
       ),
     })
   }
-  return (
-    <>
-      <PanelView panels={panels} viewTitle="classstatistics" />
-    </>
-  )
+  return <PanelView panels={panels} viewTitle="classstatistics" />
 }
-
-export default connect(null)(PopulationDetails)

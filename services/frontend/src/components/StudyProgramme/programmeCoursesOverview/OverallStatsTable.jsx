@@ -1,12 +1,11 @@
 import React from 'react'
 import { Item, Icon } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
-import InfoToolTips from 'common/InfoToolTips'
-import InfoBox from 'components/Info/InfoBox'
-import useLanguage from '../../LanguagePicker/useLanguage'
-import SortableTable from '../../SortableTable'
 
-const toolTips = InfoToolTips.Studyprogramme
+import { studyProgrammeToolTips } from 'common/InfoToolTips'
+import { InfoBox } from 'components/Info/InfoBox'
+import { useLanguage } from '../../LanguagePicker/useLanguage'
+import { SortableTable } from '../../SortableTable'
 
 const getColumns = (getTextIn, showStudents) => {
   let columns = null
@@ -135,7 +134,7 @@ const getColumns = (getTextIn, showStudents) => {
           {
             key: 'transfer',
             title: 'Transferred students',
-            helpText: toolTips.TransferredCourses,
+            helpText: studyProgrammeToolTips.TransferredCourses,
             cellStyle: { textAlign: 'right' },
             filterType: 'range',
             getRowVal: course => course.totalTransferStudents,
@@ -177,7 +176,7 @@ const getColumns = (getTextIn, showStudents) => {
       {
         key: 'name',
         title: 'Name',
-        helpText: toolTips.Name,
+        helpText: studyProgrammeToolTips.Name,
         getRowVal: course => getTextIn(course.name),
         getRowContent: course =>
           getTextIn(course.name).length > 46 ? `${getTextIn(course.name).slice(0, 44)}...` : getTextIn(course.name),
@@ -235,17 +234,21 @@ const getColumns = (getTextIn, showStudents) => {
   return [...columns, typeColumn]
 }
 
-const OverallStatsTable = ({ data, showStudents }) => {
+export const OverallStatsTable = ({ data, showStudents }) => {
   const { getTextIn } = useLanguage()
   return (
     <>
       <InfoBox
-        content={showStudents ? toolTips.StudentsOfProgrammeCourses : toolTips.CreditsProducedByTheStudyprogramme}
+        content={
+          showStudents
+            ? studyProgrammeToolTips.StudentsOfProgrammeCourses
+            : studyProgrammeToolTips.CreditsProducedByTheStudyprogramme
+        }
         cypress="programme-courses"
       />
       <div data-cy="CoursesSortableTable">
         <SortableTable
-          title={`Student statistics for study programme courses `}
+          title="Student statistics for study programme courses "
           defaultSort={['name', 'asc']}
           columns={getColumns(getTextIn, showStudents)}
           data={data}
@@ -254,5 +257,3 @@ const OverallStatsTable = ({ data, showStudents }) => {
     </>
   )
 }
-
-export default OverallStatsTable

@@ -2,7 +2,7 @@ import React from 'react'
 import { Form, Checkbox } from 'semantic-ui-react'
 import fp from 'lodash/fp'
 import { getHighestGradeOrEnrollmentOfCourseBetweenRange } from '../../../common'
-import createFilter from './createFilter'
+import { createFilter } from './createFilter'
 
 /**
  * Grade filter.
@@ -59,7 +59,7 @@ const GradeFilterCard = ({ options, onOptionsChange, grades, withoutSelf }) => {
   )
 }
 
-export default createFilter({
+export const gradeFilter = createFilter({
   key: 'Grade',
 
   defaultOptions: {

@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 
-const Timeout = Composition =>
+export const Timeout = Composition =>
   class _Timeout extends Component {
     componentDidMount() {
       this.timeouts = {}
@@ -22,6 +22,7 @@ const Timeout = Composition =>
 
     clearAllTimeouts = () => {
       Object.keys(this.timeouts)
+        // eslint-disable-next-line @babel/no-invalid-this
         .map(key => this.timeouts[key])
         .forEach(clearTimeout)
       this.timeouts = {}
@@ -41,5 +42,3 @@ const Timeout = Composition =>
       )
     }
   }
-
-export default Timeout

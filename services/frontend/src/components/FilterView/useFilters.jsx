@@ -1,8 +1,8 @@
 import { useContext } from 'react'
 import { useDispatch } from 'react-redux'
-import FilterViewContext from './FilterViewContext'
+import { FilterViewContext } from './FilterViewContext'
 
-export default () => {
+export const useFilters = () => {
   const dispatch = useDispatch()
   const { getContextByKey, viewName, filterOptions } = useContext(FilterViewContext)
 

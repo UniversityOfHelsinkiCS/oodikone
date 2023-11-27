@@ -44,7 +44,7 @@ const getEnrollmentStatus = (semester, season) => {
   return 'Absent'
 }
 
-const EnrollmentAccordion = ({ semesterEnrollments }) => {
+export const EnrollmentAccordion = ({ semesterEnrollments }) => {
   const [active, setActive] = useState(false)
 
   const handleAccordionClick = () => {
@@ -105,5 +105,3 @@ const EnrollmentAccordion = ({ semesterEnrollments }) => {
 EnrollmentAccordion.propTypes = {
   semesterEnrollments: array.isRequired,
 }
-
-export default EnrollmentAccordion

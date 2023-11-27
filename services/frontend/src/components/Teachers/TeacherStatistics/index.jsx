@@ -6,7 +6,7 @@ import { useGetAuthorizedUserQuery } from 'redux/auth'
 import { useGetProvidersQuery } from 'redux/providers'
 import { useGetSemestersQuery } from 'redux/semesters'
 import { useLazyGetTeacherStatisticsQuery } from 'redux/teachers'
-import useLanguage from 'components/LanguagePicker/useLanguage'
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
 import { TeacherStatisticsTable } from '../TeacherStatisticsTable'
 
 export const TeacherStatistics = () => {

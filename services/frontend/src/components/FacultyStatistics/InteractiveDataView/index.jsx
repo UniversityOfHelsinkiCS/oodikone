@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { Table, Menu, Popup, Icon } from 'semantic-ui-react'
-import CollapsedStackedBar from './CollapsedStackedBar'
-import BasicRow from './BasicRow'
+import { CollapsedStackedBar } from './CollapsedStackedBar'
+import { BasicRow } from './BasicRow'
 
-const InteractiveDataTable = ({
+export const InteractiveDataTable = ({
   cypress,
   dataStats,
   dataProgrammeStats,
@@ -188,5 +188,3 @@ const InteractiveDataTable = ({
     </div>
   )
 }
-
-export default InteractiveDataTable

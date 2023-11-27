@@ -1,4 +1,4 @@
-import listreducer, { actions } from './common/listreducer'
+import { listreducer, actions } from './common/listreducer'
 import { callController } from '../apiConnection/index'
 
 const prefix = 'COURSESTATS_'
@@ -25,6 +25,4 @@ const responseToObj = coursestats => {
   return data
 }
 
-const reducer = listreducer(prefix, responseToObj)
-
-export default reducer
+export const reducer = listreducer(prefix, responseToObj)

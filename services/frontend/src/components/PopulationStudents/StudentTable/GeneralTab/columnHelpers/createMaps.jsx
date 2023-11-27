@@ -1,6 +1,6 @@
 import _ from 'lodash'
 
-const createMaps = ({ selectedStudents, students, programmeCode, combinedProgrammeCode }) => {
+export const createMaps = ({ selectedStudents, students, programmeCode, combinedProgrammeCode }) => {
   const studentToStudyrightStartMap = selectedStudents.reduce((res, sn) => {
     const currentStudyright = students[sn].studyrights.find(studyright =>
       studyright.studyright_elements.some(e => e.code === programmeCode)
@@ -49,5 +49,3 @@ const createMaps = ({ selectedStudents, students, programmeCode, combinedProgram
     studentToProgrammeStartMap,
   }
 }
-
-export default createMaps

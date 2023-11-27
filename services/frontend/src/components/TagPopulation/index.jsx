@@ -116,7 +116,7 @@ const mapStateToProps = ({ tagstudent }) => ({
   created: tagstudent.created,
 })
 
-export default connect(mapStateToProps, {
+export const ConnectedTagPopulation = connect(mapStateToProps, {
   createMultipleStudentTag: createMultipleStudentTagAction,
   deleteMultipleStudentTag: deleteMultipleStudentTagAction,
 })(TagPopulation)

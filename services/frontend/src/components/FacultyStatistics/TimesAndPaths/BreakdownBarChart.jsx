@@ -1,9 +1,10 @@
 /* eslint-disable react/no-this-in-sfc */
-import useLanguage from 'components/LanguagePicker/useLanguage'
 import React from 'react'
 import ReactHighcharts from 'react-highcharts'
 
-const BarChart = ({ data, handleClick, facultyGraph = true, year = null, label, programmeNames }) => {
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
+
+export const BreakdownBarChart = ({ data, handleClick, facultyGraph = true, year = null, label, programmeNames }) => {
   const { language } = useLanguage()
 
   const statData = [
@@ -57,7 +58,7 @@ const BarChart = ({ data, handleClick, facultyGraph = true, year = null, label, 
       fontSize: '25px',
       // outside: true,
       // eslint-disable-next-line
-      formatter: function() {
+      formatter: function () {
         return getTooltipText(this.x, this.series.name, this.y)
       },
     },
@@ -95,7 +96,6 @@ const BarChart = ({ data, handleClick, facultyGraph = true, year = null, label, 
             textOutline: 'none',
           },
           formatter() {
-            // eslint-disable-next-line react/no-this-in-sfc
             return this.y !== 0 ? this.y : ''
           },
         },
@@ -121,5 +121,3 @@ const BarChart = ({ data, handleClick, facultyGraph = true, year = null, label, 
     </div>
   )
 }
-
-export default BarChart

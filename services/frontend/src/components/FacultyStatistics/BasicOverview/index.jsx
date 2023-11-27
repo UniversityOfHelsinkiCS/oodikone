@@ -6,17 +6,17 @@ import {
   useGetFacultyBasicStatsQuery,
   useGetFacultyThesisStatsQuery,
 } from 'redux/facultyStats'
-import LineGraph from 'components/StudyProgramme/BasicOverview/LineGraph'
-import StackedBarChart from 'components/StudyProgramme/BasicOverview/StackedBarChart'
-import useLanguage from 'components/LanguagePicker/useLanguage'
-import InteractiveDataTable from '../InteractiveDataView'
-import Toggle from '../../StudyProgramme/Toggle'
-import InfoBox from '../../Info/InfoBox'
-import InfotoolTips from '../../../common/InfoToolTips'
-import sortProgrammeKeys from '../facultyHelpers'
+import { LineGraph } from 'components/StudyProgramme/BasicOverview/LineGraph'
+import { StackedBarChart } from 'components/StudyProgramme/BasicOverview/StackedBarChart'
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
+import { facultyToolTips } from 'common/InfoToolTips'
+import { InteractiveDataTable } from '../InteractiveDataView'
+import { Toggle } from '../../StudyProgramme/Toggle'
+import { InfoBox } from '../../Info/InfoBox'
+import { sortProgrammeKeys } from '../facultyHelpers'
 import '../faculty.css'
 
-const Overview = ({
+export const BasicOverview = ({
   faculty,
   academicYear,
   setAcademicYear,
@@ -25,7 +25,6 @@ const Overview = ({
   specialGroups,
   setSpecialGroups,
 }) => {
-  const toolTips = InfotoolTips.Faculty
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
   const studyProgrammeFilter = studyProgrammes ? 'ALL_PROGRAMMES' : 'NEW_STUDY_PROGRAMMES'
   const special = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
@@ -84,7 +83,7 @@ const Overview = ({
           {title}
         </Divider>
       </div>
-      <InfoBox content={toolTips[toolTipText]} cypress={toolTipText} />
+      <InfoBox content={facultyToolTips[toolTipText]} cypress={toolTipText} />
       <Popup
         content="Download statistics as xlsx file"
         trigger={
@@ -183,7 +182,7 @@ const Overview = ({
       <div className="toggle-container">
         <Toggle
           cypress="YearToggle"
-          toolTips={toolTips.YearToggle}
+          toolTips={facultyToolTips.YearToggle}
           firstLabel="Calendar year"
           secondLabel="Academic year"
           value={academicYear}
@@ -191,7 +190,7 @@ const Overview = ({
         />
         <Toggle
           cypress="ProgrammeToggle"
-          toolTips={toolTips.ProgrammeToggle}
+          toolTips={facultyToolTips.ProgrammeToggle}
           firstLabel="New study programmes"
           secondLabel="All study programmes"
           value={studyProgrammes}
@@ -199,7 +198,7 @@ const Overview = ({
         />
         <Toggle
           cypress="StudentToggle"
-          toolTips={toolTips.StudentToggle}
+          toolTips={facultyToolTips.StudentToggle}
           firstLabel="All studyrights"
           secondLabel="Special studyrights excluded"
           value={specialGroups}
@@ -420,5 +419,3 @@ const Overview = ({
     </div>
   )
 }
-
-export default Overview

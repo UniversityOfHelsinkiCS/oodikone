@@ -1,11 +1,12 @@
-import React, { Fragment } from 'react'
+import React from 'react'
 import { shape } from 'prop-types'
 import { Label, Header } from 'semantic-ui-react'
 import { sortBy } from 'lodash'
-import useLanguage from 'components/LanguagePicker/useLanguage'
-import SortableTable from '../../SortableTable'
 
-const TagsTable = ({ student }) => {
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
+import { SortableTable } from '../../SortableTable'
+
+export const TagsTable = ({ student }) => {
   const { getTextIn } = useLanguage()
   if (!student) return null
 
@@ -51,5 +52,3 @@ const TagsTable = ({ student }) => {
 TagsTable.propTypes = {
   student: shape({}).isRequired,
 }
-
-export default TagsTable

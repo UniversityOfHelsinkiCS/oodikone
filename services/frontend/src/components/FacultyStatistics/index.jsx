@@ -1,25 +1,25 @@
 import React, { useCallback, useState } from 'react'
-import { withRouter, useHistory } from 'react-router-dom'
+import { useHistory, useParams } from 'react-router-dom'
 import { Segment, Header, Tab, Loader } from 'semantic-ui-react'
+
 import { useGetFacultiesQuery } from 'redux/facultyStats'
 import { useGetAuthorizedUserQuery } from 'redux/auth'
 import { useTabs, useTitle } from '../../common/hooks'
-import FacultySelector from './facultySelector'
-import BasicOverview from './BasicOverview'
-import ProgrammeOverview from './FacultyProgrammeOverview'
-import TimesAndPathsView from './TimesAndPaths'
-import UpdateView from './UpdateView'
-import useLanguage from '../LanguagePicker/useLanguage'
+import { FacultySelector } from './facultySelector'
+import { BasicOverview } from './BasicOverview'
+import { FacultyProgrammeOverview } from './FacultyProgrammeOverview'
+import { TimesAndPathsView } from './TimesAndPaths'
+import { UpdateView } from './UpdateView'
+import { useLanguage } from '../LanguagePicker/useLanguage'
 
-const FacultyStatistics = props => {
+export const FacultyStatistics = () => {
   useTitle('Faculties')
   const history = useHistory()
+  const { facultyCode } = useParams()
   const { getTextIn } = useLanguage()
   const allFaculties = useGetFacultiesQuery()
   const faculties = allFaculties?.data
 
-  const { match } = props
-  const { facultyCode } = match.params
   const faculty = faculties && facultyCode && faculties.find(f => f.code === facultyCode)
   const facultyName = faculty && getTextIn(faculty.name)
 
@@ -61,7 +61,7 @@ const FacultyStatistics = props => {
       {
         menuItem: 'Programmes and student populations',
         render: () => (
-          <ProgrammeOverview
+          <FacultyProgrammeOverview
             faculty={faculty}
             graduatedGroup={graduatedGroup}
             setGraduatedGroup={setGraduatedGroup}
@@ -119,5 +119,3 @@ const FacultyStatistics = props => {
     </div>
   )
 }
-
-export default withRouter(FacultyStatistics)

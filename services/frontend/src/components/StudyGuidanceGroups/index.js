@@ -3,11 +3,11 @@ import { useParams } from 'react-router-dom'
 import { Header } from 'semantic-ui-react'
 import { useGetAllStudyGuidanceGroupsQuery } from 'redux/studyGuidanceGroups'
 import { useTitle } from 'common/hooks'
-import StudyGuidanceGroupOverview from './StudyGuidanceGroupOverview'
-import SingleStudyGuidanceGroup from './SingleStudyGuidanceGroup'
+import { StudyGuidanceGroupOverview } from './StudyGuidanceGroupOverview'
+import { SingleStudyGuidanceGroupContainer as SingleStudyGuidanceGroup } from './SingleStudyGuidanceGroup'
 import { Wrapper } from './common'
 
-const StudyGuidanceGroups = () => {
+export const StudyGuidanceGroups = () => {
   useTitle('Study guidance groups')
   const { groupid } = useParams()
   const { data, isLoading } = useGetAllStudyGuidanceGroupsQuery()
@@ -28,5 +28,3 @@ const StudyGuidanceGroups = () => {
     </>
   )
 }
-
-export default StudyGuidanceGroups

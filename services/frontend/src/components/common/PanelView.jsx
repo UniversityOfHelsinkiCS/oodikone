@@ -12,7 +12,7 @@ const titleStyle = { paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fo
   ... ]
   falsy items are filtered out, so you can leave them in
 */
-const PanelView = ({ panels: initialPanels, viewTitle }) => {
+export const PanelView = ({ panels: initialPanels, viewTitle }) => {
   const refs = useRef([])
   const [activeIndex, setActiveIndex] = useLocalStorage(viewTitle, [0])
   const [newestIndex, setNewestIndex] = useState(null)
@@ -64,5 +64,3 @@ const PanelView = ({ panels: initialPanels, viewTitle }) => {
 
   return <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={panels} />
 }
-
-export default PanelView

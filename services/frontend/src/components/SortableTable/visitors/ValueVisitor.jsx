@@ -1,9 +1,9 @@
-/* eslint-disable babel/no-invalid-this */
+/* eslint-disable @babel/no-invalid-this */
 import _ from 'lodash'
-import DataVisitor from './DataVisitor'
+import { DataVisitor } from './DataVisitor'
 import { getColumnValue, getRowOptions } from '../common'
 
-export default class ValueVisitor extends DataVisitor {
+export class ValueVisitor extends DataVisitor {
   constructor(columns, options = {}) {
     super()
     this.columns = columns

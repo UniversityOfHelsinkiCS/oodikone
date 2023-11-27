@@ -135,7 +135,7 @@ const DefaultColumnFilterComponent = ({ column, options, dispatch }) => {
   )
 }
 
-export default {
+export const defaultColumnFilter = {
   component: DefaultColumnFilterComponent,
 
   isActive: options => options?.valueFilters?.length,

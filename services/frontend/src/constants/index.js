@@ -1,4 +1,4 @@
-import colors from '../styles/variables'
+import { colors } from '../styles/variables'
 
 const { chartblue, red, green, chartdarkg, chartlgreen, chartdarkred, chartlred } = colors
 

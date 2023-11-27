@@ -5,28 +5,31 @@ const courseStatsSelector = state => state.courseStats.data
 const openOrReqularSelector = state => state.courseSearch.openOrReqular
 const singleCourseStatsSelector = state => state.singleCourseStats
 
-const getCourseStats = createSelector([courseStatsSelector, openOrReqularSelector], (courseStats, openOrReqular) => {
-  const stats = {}
+export const getCourseStats = createSelector(
+  [courseStatsSelector, openOrReqularSelector],
+  (courseStats, openOrReqular) => {
+    const stats = {}
 
-  Object.entries(courseStats).forEach(entry => {
-    const [coursecode] = entry
-    const data = entry[1][openOrReqular]
-    const { statistics } = data
-    stats[coursecode] = {
-      ...data,
-      statistics,
-    }
-  })
-  return stats
-})
+    Object.entries(courseStats).forEach(entry => {
+      const [coursecode] = entry
+      const data = entry[1][openOrReqular]
+      const { statistics } = data
+      stats[coursecode] = {
+        ...data,
+        statistics,
+      }
+    })
+    return stats
+  }
+)
 
-const getCourseAlternatives = createSelector(
+export const getCourseAlternatives = createSelector(
   [courseStatsSelector, openOrReqularSelector, singleCourseStatsSelector],
   (courseStats, openOrReqular, singleCourseStats) => {
     return courseStats[singleCourseStats.selectedCourse][openOrReqular].alternatives
   }
 )
-const getAvailableStats = createSelector([courseStatsSelector], courseStats => {
+export const getAvailableStats = createSelector([courseStatsSelector], courseStats => {
   const availableStats = {}
 
   Object.entries(courseStats).forEach(entry => {
@@ -43,23 +46,7 @@ const getAvailableStats = createSelector([courseStatsSelector], courseStats => {
 
 const selectedCourseSelector = state => state.singleCourseStats.selectedCourse
 
-const getMaxYearsToCreatePopulationFrom = createSelector(
-  [singleCourseStatsSelector, openOrReqularSelector],
-  (singleCourseStats, openOrReqular) => {
-    switch (openOrReqular) {
-      case 'openStats':
-        return singleCourseStats.maxYearsToCreatePopulationFrom.openCourses
-      case 'reqularStats':
-        return singleCourseStats.maxYearsToCreatePopulationFrom.uniCourses
-      case 'unifyStats':
-        return singleCourseStats.maxYearsToCreatePopulationFrom.unifyCourses
-      default:
-        return singleCourseStats.maxYearsToCreatePopulationFrom.unifyCourses
-    }
-  }
-)
-
-const getQueryInfo = createSelector([getCourseStats], stats => {
+export const getQueryInfo = createSelector([getCourseStats], stats => {
   const courseStats = Object.values(stats)
   const semesters = {}
   const courses = []
@@ -96,7 +83,7 @@ const mergeStudents = (students1, students2) => {
   return students1
 }
 
-const getAllStudyProgrammes = createSelector(
+export const getAllStudyProgrammes = createSelector(
   [getCourseStats, selectedCourseSelector],
   (courseStats, selectedCourseCode) => {
     const studentsIncluded = new Set(
@@ -187,7 +174,7 @@ const getSummaryStats = (statistics, filterStudentFn, userHasAccessToAllStats) =
   return summary
 }
 
-const summaryStatistics = createSelector(
+export const summaryStatistics = createSelector(
   getCourseStats,
   getProgrammesFromProps,
   (courseStats, { programmeCodes, programmes }, userHasAccessToAllStats) => {
@@ -216,21 +203,9 @@ const summaryStatistics = createSelector(
   }
 )
 
-const getCourses = createSelector(getCourseStats, stats =>
+export const getCourses = createSelector(getCourseStats, stats =>
   Object.values(stats).map(({ name, coursecode: code }) => ({
     code,
     name,
   }))
 )
-
-export default {
-  getAvailableStats,
-  getCourseStats,
-  getCourses,
-  getCourseAlternatives,
-  getAllStudyProgrammes,
-  summaryStatistics,
-  ALL,
-  getQueryInfo,
-  getMaxYearsToCreatePopulationFrom,
-}

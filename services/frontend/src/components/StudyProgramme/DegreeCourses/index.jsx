@@ -6,11 +6,11 @@ import {
   useAddProgressCriteriaCreditsMutation,
   useGetProgressCriteriaQuery,
 } from 'redux/programmeProgressCriteria'
-import CurriculumPicker from 'components/PopulationDetails/CurriculumPicker'
-import CreditCriteriaForm from './CreditCriteriaForm'
-import DegreeCourseTableView from './DegreeCourseTableView'
+import { CurriculumPicker } from 'components/PopulationDetails/CurriculumPicker'
+import { CreditCriteriaForm } from './CreditCriteriaForm'
+import { DegreeCourseTableView } from './DegreeCourseTableView'
 
-const DegreeCourses = ({ studyProgramme, combinedProgramme, year }) => {
+export const DegreeCoursesTable = ({ studyProgramme, combinedProgramme, year }) => {
   const [defaultModules, setDefaultModules] = useState([])
   const [curriculum, setCurriculum] = useState(null)
   const [secondProgrammeModules, setSecondProgrammeModules] = useState([])
@@ -127,5 +127,3 @@ const DegreeCourses = ({ studyProgramme, combinedProgramme, year }) => {
     </Container>
   )
 }
-
-export default DegreeCourses

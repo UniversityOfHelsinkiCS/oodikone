@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Container, Message, Form } from 'semantic-ui-react'
 
-const CreditCriteriaForm = ({ criteria, studyProgramme, addProgressCriteriaCredits }) => {
+export const CreditCriteriaForm = ({ criteria, studyProgramme, addProgressCriteriaCredits }) => {
   const [creditsLimit1, setCreditsLimit1] = useState('')
   const [creditsLimit2, setCreditsLimit2] = useState('')
   const [creditsLimit3, setCreditsLimit3] = useState('')
@@ -81,4 +81,3 @@ const CreditCriteriaForm = ({ criteria, studyProgramme, addProgressCriteriaCredi
     </Container>
   )
 }
-export default CreditCriteriaForm

@@ -1,18 +1,17 @@
-import React, { useEffect, useState, Fragment } from 'react'
-import { withRouter, Link, useLocation } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { func, string, arrayOf, object, bool } from 'prop-types'
 import { connect } from 'react-redux'
-
 import { Search, Segment, Container } from 'semantic-ui-react'
 import moment from 'moment'
-import useLanguage from 'components/LanguagePicker/useLanguage'
-import { findStudents, getStudent } from '../../../redux/students'
-import SegmentDimmer from '../../SegmentDimmer'
-import SortableTable from '../../SortableTable'
-import Timeout from '../../Timeout'
-import { makeFormatStudentRows } from '../../../selectors/students'
 
-import { containsOnlyNumbers, validateInputLength, splitByEmptySpace } from '../../../common'
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
+import { containsOnlyNumbers, validateInputLength, splitByEmptySpace } from 'common'
+import { findStudents, getStudent } from 'redux/students'
+import { SegmentDimmer } from '../../SegmentDimmer'
+import { SortableTable } from '../../SortableTable'
+import { Timeout } from '../../Timeout'
+import { makeFormatStudentRows } from '../../../selectors/students'
 
 const StudentSearch = ({
   getStudent,
@@ -326,4 +325,4 @@ const mapDispatchToProps = dispatch => ({
   getStudent: studentNumber => dispatch(getStudent(studentNumber)),
 })
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Timeout(StudentSearch)))
+export const ConnectedStudentSearch = connect(mapStateToProps, mapDispatchToProps)(Timeout(StudentSearch))

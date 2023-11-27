@@ -3,8 +3,9 @@ import { Dropdown } from 'semantic-ui-react'
 import fp from 'lodash/fp'
 import _ from 'lodash'
 import moment from 'moment'
-import useLanguage from '../../LanguagePicker/useLanguage'
-import createFilter from './createFilter'
+
+import { useLanguage } from '../../LanguagePicker/useLanguage'
+import { createFilter } from './createFilter'
 
 const NO_PROGRAMME = {
   code: '00000',
@@ -194,7 +195,7 @@ const MODE_PREDICATES = {
   active: (_, sre) => sre.code === NO_PROGRAMME.code || moment().isBetween(sre.startdate, sre.enddate, 'day', '[]'),
 }
 
-const filter = createFilter({
+export const programmeFilter = createFilter({
   key: 'Programme',
 
   defaultOptions: {
@@ -262,8 +263,6 @@ const filter = createFilter({
   ),
 })
 
-export default filter
+export const { isProgrammeSelected } = programmeFilter.selectors
 
-export const { isProgrammeSelected } = filter.selectors
-
-export const { toggleProgrammeSelection } = filter.actions
+export const { toggleProgrammeSelection } = programmeFilter.actions

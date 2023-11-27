@@ -1,17 +1,14 @@
 import React, { useState } from 'react'
-import { withRouter, useLocation, useHistory } from 'react-router-dom'
 import { Message, Icon, Loader } from 'semantic-ui-react'
 import moment from 'moment'
 import { useGetSavedSearchesQuery } from 'redux/openUniPopulations'
-import OpenUniPopulationResults from './OpenUniPopulationResults'
+import { OpenUniPopulationResults } from './OpenUniPopulationResults'
 import { useTitle } from '../../common/hooks'
-import CustomOpenUniSearch from './CustomOpenUniSearch'
+import { CustomOpenUniSearch } from './CustomOpenUniSearch'
 
-const CustomOpenUniPopulation = () => {
+export const CustomOpenUniPopulation = () => {
   useTitle('Custom open uni population')
   const [fieldValues, setValues] = useState({})
-  const location = useLocation()
-  const history = useHistory()
   const savedSearches = useGetSavedSearchesQuery()
   const isFetchingOrLoading = savedSearches.isLoading || savedSearches.isFetching
   const isError = savedSearches.isError || (savedSearches.isSuccess && !savedSearches.data)
@@ -32,12 +29,7 @@ const CustomOpenUniPopulation = () => {
           <b>Empty cell</b>: Student has no enrollments for the course. <br />
         </p>
       </Message>
-      <CustomOpenUniSearch
-        setValues={setValues}
-        savedSearches={savedSearches.data}
-        location={location}
-        history={history}
-      />
+      <CustomOpenUniSearch setValues={setValues} savedSearches={savedSearches.data} />
       <div style={{ paddingTop: '25px', paddingBottom: '10px', fontSize: '20px' }}>
         {fieldValues && fieldValues.courseList?.length > 0 && (
           <p>
@@ -59,5 +51,3 @@ const CustomOpenUniPopulation = () => {
     </div>
   )
 }
-
-export default withRouter(CustomOpenUniPopulation)

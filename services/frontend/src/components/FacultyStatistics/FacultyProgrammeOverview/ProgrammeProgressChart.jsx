@@ -2,13 +2,15 @@
 import React from 'react'
 import Highcharts from 'highcharts'
 import ReactHighcharts from 'react-highcharts'
-import useLanguage from 'components/LanguagePicker/useLanguage'
+
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
 
 const getColors = len => {
   if (len < 6) return ['#fba678', '#dbda7d', '#9ec27c', '#60a866', '#008c59']
   if (len < 8) return ['#f57368', '#fb8c6e', '#fba678', '#dbda7d', '#9ec27c', '#60a866', '#008c59']
   return ['#e66067', '#f57368', '#fb8c6e', '#fba678', '#dbda7d', '#9ec27c', '#60a866', '#008c59']
 }
+
 // Point width is 24 px different multipliers adjusts the height.
 const getFlexHeight = (len, needsExtra) => {
   if (len > 7 && needsExtra) return `${len * 24 * 1.5}px`
@@ -21,14 +23,10 @@ const getFlexHeight = (len, needsExtra) => {
   if (len <= 4) return `${len * 24 * 3}px`
   return `${len * 24}px`
 }
-const ProgrammeProgressChart = ({ data, labels, longLabels, names, needsExtra }) => {
+
+export const ProgrammeProgressChart = ({ data, labels, longLabels, names, needsExtra }) => {
   const { getTextIn } = useLanguage()
-  if (!data || data.length === 0)
-    return (
-      <>
-        <b>No data available</b>
-      </>
-    )
+  if (!data || data.length === 0) return <b>No data available</b>
   const transpose = matrix => {
     return matrix.reduce((prev, next) => next.map((_item, i) => (prev[i] || []).concat(next[i])), [])
   }
@@ -117,5 +115,3 @@ const ProgrammeProgressChart = ({ data, labels, longLabels, names, needsExtra })
 
   return <ReactHighcharts config={defaultConfig} />
 }
-
-export default ProgrammeProgressChart

@@ -4,7 +4,7 @@ const additionalTypes = prefix => ({
   reset: `${prefix}_CLEAR`,
 })
 
-const listreducer = (prefix, resToObject, rewriteData = true) => {
+export const listreducer = (prefix, resToObject, rewriteData = true) => {
   const types = {
     ...actionTypes(prefix),
     ...additionalTypes(prefix),
@@ -59,5 +59,3 @@ export const actions = prefix => {
     reset: () => ({ type: types.reset }),
   }
 }
-
-export default listreducer

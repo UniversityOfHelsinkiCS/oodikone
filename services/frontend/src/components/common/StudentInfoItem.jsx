@@ -1,9 +1,9 @@
 import React from 'react'
 import { Icon, Item } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
-import SisuLinkItem from './SisuLinkItem'
+import { SisuLinkItem } from './SisuLinkItem'
 
-const StudentInfoItem = ({ student, showSisuLink }) => {
+export const StudentInfoItem = ({ student, showSisuLink }) => {
   if (student.obfuscated) {
     return (
       <span style={student.obfuscated ? { fontStyle: 'italic', color: 'graytext' } : {}}>
@@ -21,5 +21,3 @@ const StudentInfoItem = ({ student, showSisuLink }) => {
     </div>
   )
 }
-
-export default StudentInfoItem

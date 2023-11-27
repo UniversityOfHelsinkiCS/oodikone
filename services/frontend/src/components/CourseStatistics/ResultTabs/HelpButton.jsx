@@ -1,12 +1,11 @@
 import React from 'react'
 import ReactMarkdown from 'react-markdown'
-
 import { Popup, Button, Icon } from 'semantic-ui-react'
 
-import infotooltips from '../../../common/InfoToolTips'
+import { courseStatisticsToolTips } from 'common/InfoToolTips'
 
-export default ({ tab, viewMode }) => {
-  let content = infotooltips.CourseStatistics[tab]
+export const HelpButton = ({ tab, viewMode }) => {
+  let content = courseStatisticsToolTips[tab]
 
   if (viewMode) {
     content = content[viewMode]

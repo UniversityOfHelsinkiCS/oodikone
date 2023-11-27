@@ -1,15 +1,16 @@
 import React, { useCallback } from 'react'
 import { Tab } from 'semantic-ui-react'
+
 import { getMonthsForDegree } from 'common'
-import { useTabChangeAnalytics } from '../../../common/hooks'
-import InfoBox from '../../Info/InfoBox'
-import StatisticsTab from './StatisticsTab'
-import CreditsGainedTab from './CreditsGainedTab'
-import CreditDistributionDevelopment from './CreditDistributionDevelopment'
-import infotooltips from '../../../common/InfoToolTips'
+import { populationStatisticsToolTips } from 'common/InfoToolTips'
+import { useTabChangeAnalytics } from 'common/hooks'
+import { InfoBox } from '../../Info/InfoBox'
+import { StatisticsTab } from './StatisticsTab'
+import { CreditsGainedTab } from './CreditsGainedTab'
+import { CreditDistributionDevelopment } from './CreditDistributionDevelopment'
 import './creditGainStats.css'
 
-const CreditGainStats = ({ filteredStudents, query, creditDateFilterOptions, year }) => {
+export const CreditGainStats = ({ filteredStudents, query, creditDateFilterOptions, year }) => {
   const combinedProgramme = query?.studyRights?.combinedProgramme || ''
 
   const programmeGoalTime = combinedProgramme
@@ -62,7 +63,7 @@ const CreditGainStats = ({ filteredStudents, query, creditDateFilterOptions, yea
 
   return (
     <div id="credit-gain-stats">
-      <InfoBox content={infotooltips.PopulationStatistics.CreditStatistics} />
+      <InfoBox content={populationStatisticsToolTips.CreditStatistics} />
       {filteredStudents && (
         <Tab
           defaultActiveIndex={2}
@@ -88,5 +89,3 @@ const CreditGainStats = ({ filteredStudents, query, creditDateFilterOptions, yea
     </div>
   )
 }
-
-export default CreditGainStats

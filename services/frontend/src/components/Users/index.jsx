@@ -4,11 +4,11 @@ import { useHistory, useParams } from 'react-router-dom'
 import { Radio, Icon, Header, Segment, Loader, Popup } from 'semantic-ui-react'
 
 import { getUsers } from 'redux/users'
-import UserPageNew from './UserPage'
-import UserSearchList from './UserSearchList'
+import { ConnectedUserPage as UserPage } from './UserPage'
+import { UserSearchList } from './UserSearchList'
 import { useToggle, useTitle } from '../../common/hooks'
 
-const Users = () => {
+export const Users = () => {
   useTitle('Users')
   const dispatch = useDispatch()
   const history = useHistory()
@@ -40,7 +40,7 @@ const Users = () => {
 
   const renderUserPage = userid => {
     const user = users.find(u => u.id === userid)
-    return !user ? <Loader active /> : <UserPageNew user={user} goBack={openUsersPage} />
+    return !user ? <Loader active /> : <UserPage user={user} goBack={openUsersPage} />
   }
 
   const handlePopupOpen = () => {
@@ -89,5 +89,3 @@ const Users = () => {
     </div>
   )
 }
-
-export default Users

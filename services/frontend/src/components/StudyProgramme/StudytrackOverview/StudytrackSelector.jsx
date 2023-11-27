@@ -2,9 +2,9 @@ import React from 'react'
 import { Dropdown } from 'semantic-ui-react'
 
 import '../studyprogramme.css'
-import useLanguage from 'components/LanguagePicker/useLanguage'
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
 
-const StudytrackSelector = ({ track, setTrack, studytracks }) => {
+export const StudytrackSelector = ({ track, setTrack, studytracks }) => {
   const { getTextIn } = useLanguage()
   if (!studytracks) return null
 
@@ -36,5 +36,3 @@ const StudytrackSelector = ({ track, setTrack, studytracks }) => {
     </div>
   )
 }
-
-export default StudytrackSelector

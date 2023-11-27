@@ -4,7 +4,7 @@ import { bool, number } from 'prop-types'
 import { useDidMount } from '../../common/hooks'
 import './progressBar.css'
 
-const ProgressBar = ({ progress, fixed }) => {
+export const ProgressBar = ({ progress, fixed }) => {
   const timeoutId = useRef()
   const [hidden, setHidden] = useState(true)
   const [visible, setVisible] = useState(true)
@@ -50,5 +50,3 @@ ProgressBar.propTypes = {
   progress: number.isRequired,
   fixed: bool,
 }
-
-export default ProgressBar

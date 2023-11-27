@@ -1,6 +1,7 @@
 import React from 'react'
 import { Label, Dropdown, Button, Icon, Popup } from 'semantic-ui-react'
-import useLanguage from '../../../LanguagePicker/useLanguage'
+
+import { useLanguage } from '../../../LanguagePicker/useLanguage'
 import { FilterType } from './filterType'
 
 const filterTexts = {
@@ -17,7 +18,7 @@ const translate = {
   ENROLLED_NO_GRADE: 'enrolledNoGrade',
 }
 
-const CourseCard = ({ course, filterType, onChange }) => {
+export const CourseCard = ({ course, filterType, onChange }) => {
   const { getTextIn } = useLanguage()
   const name = 'courseFilter'
 
@@ -28,51 +29,47 @@ const CourseCard = ({ course, filterType, onChange }) => {
   }
 
   return (
-    <>
-      <Label style={{ marginTop: '0.5rem' }}>
-        {getTextIn(course?.course?.name)}
+    <Label style={{ marginTop: '0.5rem' }}>
+      {getTextIn(course?.course?.name)}
 
-        <Dropdown
-          text={filterTexts[filterType].label}
-          value={filterType}
-          fluid
-          className="mini"
-          button
-          data-cy={`${name}-${course?.course?.code}-dropdown`}
-          style={{ marginTop: '0.5rem' }}
-        >
-          <Dropdown.Menu>
-            {Object.entries(filterTexts).map(([type, { label, info }]) => {
-              if (info) {
-                return (
-                  <Popup
-                    key={label}
-                    basic
-                    trigger={<Dropdown.Item text={label} value={type} onClick={onClick} />}
-                    content={info}
-                  />
-                )
-              }
-              if (course?.students[translate[type]] && Object.keys(course?.students[translate[type]]).length === 0)
-                return <Dropdown.Item key={label} text={label} value={type} onClick={onClick} disabled />
-              return <Dropdown.Item key={label} text={label} value={type} onClick={onClick} />
-            })}
-          </Dropdown.Menu>
-        </Dropdown>
+      <Dropdown
+        text={filterTexts[filterType].label}
+        value={filterType}
+        fluid
+        className="mini"
+        button
+        data-cy={`${name}-${course?.course?.code}-dropdown`}
+        style={{ marginTop: '0.5rem' }}
+      >
+        <Dropdown.Menu>
+          {Object.entries(filterTexts).map(([type, { label, info }]) => {
+            if (info) {
+              return (
+                <Popup
+                  key={label}
+                  basic
+                  trigger={<Dropdown.Item text={label} value={type} onClick={onClick} />}
+                  content={info}
+                />
+              )
+            }
+            if (course?.students[translate[type]] && Object.keys(course?.students[translate[type]]).length === 0)
+              return <Dropdown.Item key={label} text={label} value={type} onClick={onClick} disabled />
+            return <Dropdown.Item key={label} text={label} value={type} onClick={onClick} />
+          })}
+        </Dropdown.Menu>
+      </Dropdown>
 
-        <Button
-          compact
-          size="tiny"
-          onClick={clear}
-          icon
-          data-cy={`${name}-${course?.course?.code}-clear`}
-          style={{ marginTop: '0.5rem' }}
-        >
-          <Icon name="close" />
-        </Button>
-      </Label>
-    </>
+      <Button
+        compact
+        size="tiny"
+        onClick={clear}
+        icon
+        data-cy={`${name}-${course?.course?.code}-clear`}
+        style={{ marginTop: '0.5rem' }}
+      >
+        <Icon name="close" />
+      </Button>
+    </Label>
   )
 }
-
-export default CourseCard

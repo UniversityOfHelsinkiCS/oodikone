@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import Datetime from 'react-datetime'
-import { withRouter, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { Button, List, Segment, Header, Confirm, Form, Icon, Popup, Message, Item } from 'semantic-ui-react'
 import { arrayOf, string, shape, func } from 'prop-types'
 import moment from 'moment'
 
 import { useGetAuthorizedUserQuery } from 'redux/auth'
-import TagModal from '../TagModal'
+import { ConnectedTagModal as TagModal } from '../TagModal'
 import { reformatDate } from '../../../common'
-import SortableTable from '../../SortableTable'
+import { SortableTable } from '../../SortableTable'
 import { getTagsByStudytrackAction, createTagAction, deleteTagAction } from '../../../redux/tags'
 
 const YEAR_DATE_FORMAT = 'YYYY'
@@ -199,10 +199,8 @@ Tags.propTypes = {
   combinedProgramme: string.isRequired,
 }
 
-export default withRouter(
-  connect(mapStateToProps, {
-    createTag: createTagAction,
-    deleteTag: deleteTagAction,
-    getTagsByStudytrack: getTagsByStudytrackAction,
-  })(Tags)
-)
+export const ConnectedTags = connect(mapStateToProps, {
+  createTag: createTagAction,
+  deleteTag: deleteTagAction,
+  getTagsByStudytrack: getTagsByStudytrackAction,
+})(Tags)

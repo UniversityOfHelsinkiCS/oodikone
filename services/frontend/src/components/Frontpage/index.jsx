@@ -5,7 +5,7 @@ import { images, checkUserAccess } from '../../common'
 import { useTitle } from '../../common/hooks'
 import { Changelog } from './Changelog'
 
-const FrontPage = () => {
+export const FrontPage = () => {
   const { rights, roles } = useGetAuthorizedUserQuery()
   const [showFullChangelog, setShowFullChangelog] = useState(false)
 
@@ -107,5 +107,3 @@ const FrontPage = () => {
     </div>
   )
 }
-
-export default FrontPage

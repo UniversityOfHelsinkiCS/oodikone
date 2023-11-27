@@ -1,35 +1,17 @@
-import gender from './gender'
-import age from './age'
-import courses from './courses'
-import creditsEarned from './creditsEarned'
-import programmes from './programmes'
-import grade from './grade'
-import graduatedFromProgramme from './graduatedFromProgramme'
-import transferredToProgramme from './transferredToProgramme'
-import startYearAtUni from './startYearAtUni'
-import admissionType from './admissionType'
-import tags from './tags'
-import date from './date'
-import enrollmentStatus from './enrollmentStatus'
-import studyTrack from './studyTrack'
-import studyrightStatus from './studyrightStatus'
-import studentNumber from './studentNumber'
-import hops from './hops'
-
-export const genderFilter = gender
-export const ageFilter = age
-export const courseFilter = courses
-export const creditsEarnedFilter = creditsEarned
-export const programmeFilter = programmes
-export const gradeFilter = grade
-export const graduatedFromProgrammeFilter = graduatedFromProgramme
-export const transferredToProgrammeFilter = transferredToProgramme
-export const startYearAtUniFilter = startYearAtUni
-export const admissionTypeFilter = admissionType
-export const tagsFilter = tags
-export const creditDateFilter = date
-export const enrollmentStatusFilter = enrollmentStatus
-export const studyTrackFilter = studyTrack
-export const studyrightStatusFilter = studyrightStatus
-export const studentNumberFilter = studentNumber
-export const hopsFilter = hops
+export { genderFilter } from './gender'
+export { ageFilter } from './age'
+export { courseFilter } from './courses'
+export { creditsEarnedFilter } from './creditsEarned'
+export { programmeFilter } from './programmes'
+export { gradeFilter } from './grade'
+export { graduatedFromProgrammeFilter } from './graduatedFromProgramme'
+export { transferredToProgrammeFilter } from './transferredToProgramme'
+export { startYearAtUniFilter } from './startYearAtUni'
+export { admissionTypeFilter } from './admissionType'
+export { tagsFilter } from './tags'
+export { creditDateFilter } from './date'
+export { enrollmentStatusFilter } from './enrollmentStatus'
+export { studyTrackFilter } from './studyTrack'
+export { studyrightStatusFilter } from './studyrightStatus'
+export { studentNumberFilter } from './studentNumber'
+export { hopsFilter } from './hops'

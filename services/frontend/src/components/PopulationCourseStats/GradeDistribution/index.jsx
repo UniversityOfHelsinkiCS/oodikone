@@ -1,10 +1,10 @@
 import React, { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Icon, Item } from 'semantic-ui-react'
-import SortableTable, { group } from 'components/SortableTable'
+import { SortableTable, group } from 'components/SortableTable'
 import _ from 'lodash'
-import useLanguage from 'components/LanguagePicker/useLanguage'
-import CourseFilterToggle from '../CourseFilterToggle'
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
+import { CourseFilterToggle } from '../CourseFilterToggle'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
 
 const mapCourseData = course => ({
@@ -29,7 +29,7 @@ const mapCourseData = course => ({
   },
 })
 
-const GradeDistribution = ({ flat, onlyIamRights }) => {
+export const GradeDistribution = ({ flat, onlyIamRights }) => {
   const { modules, courseStatistics, onGoToCourseStatisticsClick, toggleGroupExpansion, expandedGroups } =
     UsePopulationCourseContext()
   const { getTextIn } = useLanguage()
@@ -148,16 +148,12 @@ const GradeDistribution = ({ flat, onlyIamRights }) => {
   }, [modules])
 
   return (
-    <>
-      <SortableTable
-        title="Grade distribution of courses"
-        data={data}
-        columns={columns}
-        toggleGroupExpansion={toggleGroupExpansion}
-        expandedGroups={expandedGroups}
-      />
-    </>
+    <SortableTable
+      title="Grade distribution of courses"
+      data={data}
+      columns={columns}
+      toggleGroupExpansion={toggleGroupExpansion}
+      expandedGroups={expandedGroups}
+    />
   )
 }
-
-export default GradeDistribution

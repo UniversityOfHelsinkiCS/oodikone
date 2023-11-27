@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux'
 import { useGetStudyGuidanceGroupPopulationQuery } from 'redux/studyGuidanceGroups'
 import { useGetAuthorizedUserQuery } from 'redux/auth'
 import { useGetCustomPopulationQuery } from 'redux/populations'
-import GeneralTab from './GeneralTab'
+import { GeneralTab } from './GeneralTab'
 
 // study guidance groups -feature uses different population + rtk query, so it needs to
 // be rendered differently. TODO: should refactor this, maybe with using allStudents
@@ -26,7 +26,7 @@ const CustomPopulationGeneralTabContainer = props => {
   return <GeneralTab populations={populations} {...props} />
 }
 
-const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
+export const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
   const populations = useSelector(({ populations }) => populations)
   const { namesVisible } = useSelector(({ settings }) => settings)
   const { isAdmin } = useGetAuthorizedUserQuery()
@@ -135,5 +135,3 @@ const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
 
   return <GeneralTab populations={populations} columnKeysToInclude={columnKeysToInclude} {...props} />
 }
-
-export default GeneralTabContainer

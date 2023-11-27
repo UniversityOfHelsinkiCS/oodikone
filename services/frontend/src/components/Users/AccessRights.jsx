@@ -2,10 +2,11 @@ import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import { Form, Divider } from 'semantic-ui-react'
 import { isEqual } from 'lodash'
+
+import { addUserUnits } from 'redux/users'
 import { textAndDescriptionSearch } from '../../common'
-import selectors from '../../selectors/programmes'
-import { addUserUnits } from '../../redux/users'
-import useLanguage from '../LanguagePicker/useLanguage'
+import { filteredDropdownProgrammeSelector } from '../../selectors/programmes'
+import { useLanguage } from '../LanguagePicker/useLanguage'
 
 const initialState = {
   programme: undefined,
@@ -69,10 +70,10 @@ const AccessRights = ({ uid, programmes, pending, ...props }) => {
 }
 
 const mapStateToProps = (state, props) => ({
-  programmes: selectors.filteredDropdownProgrammeSelector(state, props),
+  programmes: filteredDropdownProgrammeSelector(state, props),
   pending: Boolean(state.users.userunitpending),
 })
 
-export default connect(mapStateToProps, { addUserUnits }, null, {
+export const ConnectedAccessRights = connect(mapStateToProps, { addUserUnits }, null, {
   areStatePropsEqual: isEqual,
 })(AccessRights)

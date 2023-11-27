@@ -2,24 +2,23 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Tab, Grid } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
-import { useGetAuthorizedUserQuery } from 'redux/auth'
 import moment from 'moment'
-import { useTabChangeAnalytics } from '../../common/hooks'
 
-import { getTagsByStudytrackAction } from '../../redux/tags'
-import { getStudentTagsByStudytrackAction } from '../../redux/tagstudent'
-
-import StudentNameVisibilityToggle from '../StudentNameVisibilityToggle'
+import { useGetAuthorizedUserQuery } from 'redux/auth'
+import { coursePopulationToolTips, populationStatisticsToolTips } from 'common/InfoToolTips'
+import { useTabChangeAnalytics } from 'common/hooks'
+import { getTagsByStudytrackAction } from 'redux/tags'
+import { getStudentTagsByStudytrackAction } from 'redux/tagstudent'
+import { StudentNameVisibilityToggle } from '../StudentNameVisibilityToggle'
 import '../PopulationCourseStats/populationCourseStats.css'
-import InfoBox from '../Info/InfoBox'
-import CheckStudentList from './CheckStudentList'
-import TagPopulation from '../TagPopulation'
-import TagList from '../TagList'
-import ProgressTable from './StudentTable/ProgressTab'
+import { InfoBox } from '../Info/InfoBox'
+import { CheckStudentList } from './CheckStudentList'
+import { ConnectedTagPopulation as TagPopulation } from '../TagPopulation'
+import { ConnectedTagList as TagList } from '../TagList'
+import { ProgressTable } from './StudentTable/ProgressTab'
 import './populationStudents.css'
-import GeneralTab from './StudentTable/GeneralTab'
-import infotoolTips from '../../common/InfoToolTips'
-import CoursesTable from './StudentTable/CourseTab'
+import { GeneralTabContainer as GeneralTab } from './StudentTable/GeneralTab'
+import { CoursesTabContainer as CoursesTab } from './StudentTable/CourseTab'
 
 const Panes = ({
   filteredStudents,
@@ -65,7 +64,7 @@ const Panes = ({
     {
       menuItem: 'Courses',
       render: () => (
-        <CoursesTable
+        <CoursesTab
           curriculum={curriculum}
           students={filteredStudents}
           variant={variant}
@@ -235,7 +234,7 @@ const getTabs = programmeCode => {
   return ['General']
 }
 
-const PopulationStudentsContainer = ({ ...props }) => {
+export const PopulationStudentsContainer = ({ ...props }) => {
   const { variant } = props
   if (!['population', 'customPopulation', 'coursePopulation', 'studyGuidanceGroupPopulation'].includes(variant)) {
     throw new Error(`${variant} is not a proper variant!`)
@@ -249,23 +248,21 @@ const PopulationStudentsContainer = ({ ...props }) => {
           !['MH30_001', 'MH30_003'].includes(props.programmeCode))
           ? ['General', 'Courses', 'Tags']
           : ['General', 'Courses', 'Tags', 'Progress'],
-      infotoolTipContent: infotoolTips.PopulationStatistics.StudentsClass,
+      infotoolTipContent: populationStatisticsToolTips.StudentsClass,
     },
     coursePopulation: {
       panesToInclude: ['General'],
-      infotoolTipContent: infotoolTips.CoursePopulation.Students,
+      infotoolTipContent: coursePopulationToolTips.Students,
     },
     customPopulation: {
       panesToInclude: ['General'],
-      infotoolTipContent: infotoolTips.PopulationStatistics.StudentsCustom,
+      infotoolTipContent: populationStatisticsToolTips.StudentsCustom,
     },
     studyGuidanceGroupPopulation: {
       panesToInclude: getTabs(props.studyGuidanceGroup?.tags?.studyProgramme),
-      infotoolTipContent: infotoolTips.PopulationStatistics.StudentsGuidanceGroups,
+      infotoolTipContent: populationStatisticsToolTips.StudentsGuidanceGroups,
     },
   }
 
   return <PopulationStudents contentToInclude={contentByVariant[variant]} {...props} />
 }
-
-export default PopulationStudentsContainer

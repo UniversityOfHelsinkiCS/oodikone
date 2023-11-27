@@ -2,15 +2,15 @@ import React, { useState, useEffect } from 'react'
 import { connect, useDispatch } from 'react-redux'
 import { Tab } from 'semantic-ui-react'
 import { orderBy } from 'lodash'
-import { withRouter } from 'react-router-dom'
-import { clearCourseStats } from '../../redux/coursestats'
+
+import { clearCourseStats } from 'redux/coursestats'
 import { useTabChangeAnalytics } from '../../common/hooks'
-import PassingSemesters from './PassingSemesters'
+import { PassingSemesters } from './PassingSemesters'
 import './populationCourseStats.css'
 import { PopulationCourseContext } from './PopulationCourseContext'
-import GradeDistribution from './GradeDistribution'
-import PassFailEnrollments from './PassFailEnrollments'
-import Students from './Students'
+import { GradeDistribution } from './GradeDistribution'
+import { PassFailEnrollments } from './PassFailEnrollments'
+import { Students } from './Students'
 
 const tableColumnNames = {
   STUDENTS: 'students',
@@ -170,6 +170,4 @@ const PopulationCourseStats = ({ filteredStudents, mandatoryCourses, courses, pe
   )
 }
 
-export default connect(null, {
-  clearCourseStats,
-})(withRouter(PopulationCourseStats))
+export const ConnectedPopulationCourseStats = connect(null, { clearCourseStats })(PopulationCourseStats)

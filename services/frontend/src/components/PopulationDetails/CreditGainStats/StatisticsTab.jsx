@@ -1,7 +1,7 @@
 import React from 'react'
 import { Divider, Grid } from 'semantic-ui-react'
 
-import StatisticsTable from './StatisticsTable'
+import { StatisticsTable } from './StatisticsTable'
 
 const admissionTypes = [
   'Todistusvalinta',
@@ -13,7 +13,7 @@ const admissionTypes = [
   null,
 ]
 
-const StatisticsTab = ({ allStudents, query }) => {
+export const StatisticsTab = ({ allStudents, query }) => {
   if (!allStudents || !allStudents.length || !query) return null
 
   const { studyRights } = query
@@ -50,5 +50,3 @@ const StatisticsTab = ({ allStudents, query }) => {
     </Grid>
   )
 }
-
-export default StatisticsTab

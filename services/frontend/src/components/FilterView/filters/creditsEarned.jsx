@@ -1,9 +1,10 @@
 import { RangeSelector } from 'components/common/RangeSelector'
 import React, { useMemo } from 'react'
 import _ from 'lodash'
+
 import { useDebounce } from 'common/hooks'
 import { getStudentTotalCredits } from '../../../common'
-import createFilter from './createFilter'
+import { createFilter } from './createFilter'
 
 const CreditsEarnedFilterCard = ({ options, onOptionsChange, bounds }) => {
   const { min, max } = bounds
@@ -26,7 +27,7 @@ const CreditsEarnedFilterCard = ({ options, onOptionsChange, bounds }) => {
   )
 }
 
-export default createFilter({
+export const creditsEarnedFilter = createFilter({
   key: 'CreditsEarned',
 
   title: 'Credits Earned',

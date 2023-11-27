@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from 'react'
 import { Segment, Header, Form, Radio, Popup } from 'semantic-ui-react'
 import { useSelector, useDispatch } from 'react-redux'
-import { withRouter } from 'react-router-dom'
+import { useLocation, useHistory } from 'react-router-dom'
 import qs from 'query-string'
 import { sortBy } from 'lodash'
-import { func, shape } from 'prop-types'
-import { clearCourses, findCoursesV2 } from '../../../redux/coursesearch'
-import { getCourseStats, clearCourseStats } from '../../../redux/coursestats'
+import { func } from 'prop-types'
+
+import { clearCourses, findCoursesV2 } from 'redux/coursesearch'
+import { getCourseStats, clearCourseStats } from 'redux/coursestats'
 import { getCourseSearchResults } from '../../../selectors/courses'
 import { useSearchHistory, useToggle } from '../../../common/hooks'
 import { validateInputLength } from '../../../common'
-import AutoSubmitSearchInput from '../../AutoSubmitSearchInput'
-import CourseTable from '../CourseTable'
-import SearchHistory from '../../SearchHistory'
-import useLanguage from '../../LanguagePicker/useLanguage'
+import { TimeoutAutoSubmitSearchInput as AutoSubmitSearchInput } from '../../AutoSubmitSearchInput'
+import { MemoizedCourseTable as CourseTable } from '../CourseTable'
+import { SearchHistory } from '../../SearchHistory'
+import { useLanguage } from '../../LanguagePicker/useLanguage'
 
 const INITIAL = {
   courseName: '',
@@ -29,9 +30,11 @@ const searchBoxStyle = {
   boxShadow: '0 2px 4px 0 rgb(34 36 38 / 12%), 0 2px 10px 0 rgb(34 36 38 / 15%)',
 }
 
-const SearchForm = ({ location, history, onProgress }) => {
+export const SearchForm = ({ onProgress }) => {
   const { getTextIn } = useLanguage()
   const dispatch = useDispatch()
+  const location = useLocation()
+  const history = useHistory()
   const isLoading = useSelector(state => state.courseStats.pending)
   const [combineSubstitutions, toggleCombineSubstitutions] = useToggle(true)
   const [selectMultipleCoursesEnabled, toggleSelectMultipleCoursesEnabled] = useToggle(false)
@@ -326,9 +329,5 @@ SearchForm.defaultProps = {
 }
 
 SearchForm.propTypes = {
-  history: shape({}).isRequired,
-  location: shape({}).isRequired,
   onProgress: func,
 }
-
-export default withRouter(SearchForm)

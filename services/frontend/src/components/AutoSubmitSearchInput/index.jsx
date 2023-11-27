@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Input } from 'semantic-ui-react'
 import { func, string, number, bool } from 'prop-types'
-import Timeout from '../Timeout'
+import { Timeout } from '../Timeout'
 
 const TIMEOUTS = {
   FETCH: 'fetch',
@@ -93,4 +93,4 @@ AutoSubmitSearchInput.defaultProps = {
   disabled: false,
 }
 
-export default Timeout(AutoSubmitSearchInput)
+export const TimeoutAutoSubmitSearchInput = Timeout(AutoSubmitSearchInput)

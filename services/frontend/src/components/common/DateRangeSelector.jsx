@@ -1,8 +1,8 @@
 import React from 'react'
 import { Form } from 'semantic-ui-react'
-import DateTimeSelector from '../DateTimeSelector'
+import { DateTimeSelector } from '../DateTimeSelector'
 
-const DateRangeSelector = ({ value, onChange, ...rest }) => {
+export const DateRangeSelector = ({ value, onChange, ...rest }) => {
   const start = value ? value[0] : null
   const end = value ? value[1] : null
   return (
@@ -18,5 +18,3 @@ const DateRangeSelector = ({ value, onChange, ...rest }) => {
     </Form>
   )
 }
-
-export default DateRangeSelector

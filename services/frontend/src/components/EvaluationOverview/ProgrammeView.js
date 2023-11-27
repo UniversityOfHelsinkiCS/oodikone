@@ -1,27 +1,27 @@
 import React, { useState } from 'react'
 import { Divider, Header, Loader, Message, Segment } from 'semantic-ui-react'
+
 import { useGetEvaluationStatsQuery } from 'redux/studyProgramme'
 import { calculateStats } from 'components/FacultyStatistics/FacultyProgrammeOverview'
 import { getTargetCreditsForProgramme } from 'common'
-import useLanguage from '../LanguagePicker/useLanguage'
-import Toggle from '../StudyProgramme/Toggle'
-import InfoBox from '../Info/InfoBox'
-import MedianTimeBarChart from '../StudyProgramme/MedianTimeBarChart'
-import BreakdownBarChart from '../StudyProgramme/BreakdownBarChart'
-import StackedBarChart from '../StudyProgramme/BasicOverview/StackedBarChart'
-import BarChart from '../StudyProgramme/StudytrackOverview/BarChart'
-import BasicDataTable from '../StudyProgramme/StudytrackOverview/BasicDataTable'
-import DataTable from '../StudyProgramme/BasicOverview/DataTable'
-import InfotoolTips from '../../common/InfoToolTips'
+import { studyProgrammeToolTips } from 'common/InfoToolTips'
+import { useLanguage } from '../LanguagePicker/useLanguage'
+import { Toggle } from '../StudyProgramme/Toggle'
+import { InfoBox } from '../Info/InfoBox'
+import { MedianTimeBarChart } from '../StudyProgramme/MedianTimeBarChart'
+import { BreakdownBarChart } from '../StudyProgramme/BreakdownBarChart'
+import { StackedBarChart } from '../StudyProgramme/BasicOverview/StackedBarChart'
+import { BarChart } from '../StudyProgramme/StudytrackOverview/BarChart'
+import { BasicDataTable } from '../StudyProgramme/StudytrackOverview/BasicDataTable'
+import { DataTable } from '../StudyProgramme/BasicOverview/DataTable'
 import '../StudyProgramme/studyprogramme.css'
 
-const ProgrammeView = ({ studyprogramme }) => {
+export const ProgrammeView = ({ studyprogramme }) => {
   const { getTextIn } = useLanguage()
   const [showMedian, setShowMedian] = useState(false)
   const [academicYear, setAcademicYear] = useState(false)
   const [graduated, setGraduated] = useState(false)
 
-  const toolTips = InfotoolTips.Studyprogramme
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
   const grad = graduated ? 'GRADUATED_EXCLUDED' : 'GRADUATED_INCLUDED'
 
@@ -56,7 +56,7 @@ const ProgrammeView = ({ studyprogramme }) => {
           {title}
         </Divider>
       </div>
-      <InfoBox content={toolTips[toolTipText]} />
+      <InfoBox content={studyProgrammeToolTips[toolTipText]} />
     </>
   )
 
@@ -130,10 +130,10 @@ const ProgrammeView = ({ studyprogramme }) => {
               </p>
             </Message>
             <div>
-              {getDivider(`Progress of students of the studyprogramme by starting year`, 'StudytrackProgress')}
+              {getDivider('Progress of students of the studyprogramme by starting year', 'StudytrackProgress')}
               <Toggle
                 cypress="GraduatedToggle"
-                toolTips={toolTips.GraduatedToggle}
+                toolTips={studyProgrammeToolTips.GraduatedToggle}
                 firstLabel="Graduated included"
                 secondLabel="Graduated excluded"
                 value={graduated}
@@ -160,7 +160,7 @@ const ProgrammeView = ({ studyprogramme }) => {
                 <div className="toggle-container">
                   <Toggle
                     cypress="YearToggle"
-                    toolTips={toolTips.YearToggle}
+                    toolTips={studyProgrammeToolTips.YearToggle}
                     firstLabel="Calendar year"
                     secondLabel="Academic year"
                     value={academicYear}
@@ -201,5 +201,3 @@ const ProgrammeView = ({ studyprogramme }) => {
     </>
   )
 }
-
-export default ProgrammeView

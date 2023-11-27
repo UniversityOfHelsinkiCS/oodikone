@@ -2,14 +2,15 @@ import React, { useMemo } from 'react'
 import { useLocation, useHistory } from 'react-router-dom'
 import { Breadcrumb, Icon } from 'semantic-ui-react'
 import _ from 'lodash'
-import useLanguage from 'components/LanguagePicker/useLanguage'
+
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
 
 const getP = (a, b) => {
   if (a === 0 || b === 0) return 1
   return a / b
 }
 
-const DrillStack = ({ data, renderCard, historyKey }) => {
+export const DrillStack = ({ data, renderCard, historyKey }) => {
   const { getTextIn } = useLanguage()
   const history = useHistory()
   const location = useLocation()
@@ -133,5 +134,3 @@ const DrillStack = ({ data, renderCard, historyKey }) => {
     </>
   )
 }
-
-export default DrillStack

@@ -1,23 +1,22 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { useHistory, withRouter } from 'react-router-dom'
-import { connect, useDispatch, useSelector } from 'react-redux'
+import { useHistory, useParams } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
 import { Header, Segment, Tab, Menu } from 'semantic-ui-react'
+
 import { useGetAuthorizedUserQuery } from 'redux/auth'
 import { useGetProgressCriteriaQuery } from 'redux/programmeProgressCriteria'
-import DegreeCoursesTable from './DegreeCourses'
-import StudyProgrammeSelector from './StudyProgrammeSelector'
-import BasicOverview from './BasicOverview'
-import StudytrackOverview from './StudytrackOverview'
-import ProgrammeCoursesOverview from './programmeCoursesOverview'
-import UpdateView from './UpdateView'
+import { getProgrammes } from 'redux/populationProgrammes'
+import { getUnifiedProgrammeName } from 'common'
+import { useTabs, useTitle } from 'common/hooks'
+import { useLanguage } from '../LanguagePicker/useLanguage'
+import { DegreeCoursesTable } from './DegreeCourses'
+import { ConnectedStudyProgrammeSelector as StudyProgrammeSelector } from './StudyProgrammeSelector'
+import { BasicOverview } from './BasicOverview'
+import { StudytrackOverview } from './StudytrackOverview'
+import { ProgrammeCoursesOverview } from './programmeCoursesOverview'
+import { UpdateView } from './UpdateView'
 import '../PopulationQueryCard/populationQueryCard.css'
-import { getUnifiedProgrammeName } from '../../common'
-import { useTabs, useTitle } from '../../common/hooks'
-import Tags from './Tags'
-
-import { getProgrammes } from '../../redux/populationProgrammes'
-
-import useLanguage from '../LanguagePicker/useLanguage'
+import { ConnectedTags as Tags } from './Tags'
 
 const createName = (studyProgrammeId, combibedProgrammeId, programmes, language, getTextIn) => {
   if (combibedProgrammeId && programmes?.[studyProgrammeId] && programmes?.[combibedProgrammeId])
@@ -29,11 +28,12 @@ const createName = (studyProgrammeId, combibedProgrammeId, programmes, language,
   return programmes?.[studyProgrammeId] && getTextIn(programmes?.[studyProgrammeId].name)
 }
 
-const StudyProgramme = props => {
+export const StudyProgramme = () => {
   const dispatch = useDispatch()
   const history = useHistory()
+  const { studyProgrammeId } = useParams()
   const programmes = useSelector(state => state.populationProgrammes?.data?.programmes)
-  const progressCriteria = useGetProgressCriteriaQuery({ programmeCode: props.match.params.studyProgrammeId })
+  const progressCriteria = useGetProgressCriteriaQuery({ programmeCode: studyProgrammeId })
   const { language, getTextIn } = useLanguage()
   const { isAdmin, rights } = useGetAuthorizedUserQuery()
   const [tab, setTab] = useTabs('p_tab', 0, history)
@@ -57,8 +57,6 @@ const StudyProgramme = props => {
     }
   }, [progressCriteria.data])
 
-  const { match } = props
-  const { studyProgrammeId } = match.params
   const programmeId =
     studyProgrammeId && studyProgrammeId.includes('+') ? studyProgrammeId.split('+')[0] : studyProgrammeId
   const secondProgrammeId = studyProgrammeId && studyProgrammeId.includes('+') ? studyProgrammeId.split('+')[1] : ''
@@ -174,5 +172,3 @@ const StudyProgramme = props => {
     </div>
   )
 }
-
-export default connect()(withRouter(StudyProgramme))

@@ -2,7 +2,6 @@ import React, { useEffect } from 'react'
 import { Button, Card, Divider, List, Icon, Popup, Dropdown, Header } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { sortBy } from 'lodash'
-import { withRouter } from 'react-router-dom'
 
 import { useGetAuthorizedUserQuery, useShowAsUser } from 'redux/auth'
 import { useGetAllElementDetailsQuery } from 'redux/elementdetails'
@@ -11,10 +10,10 @@ import { getAccessGroups } from 'redux/accessGroups'
 import { getFaculties } from 'redux/faculties'
 import { getProgrammesUnfiltered } from 'redux/populationProgrammesUnfiltered'
 import { textAndDescriptionSearch } from '../../common'
-import AccessRights from './AccessRights'
-import AccessGroups from './AccessGroups'
+import { ConnectedAccessRights as AccessRights } from './AccessRights'
+import { ConnectedAccessGroups as AccessGroups } from './AccessGroups'
 import { EmailNotification } from './EmailNotification'
-import useLanguage from '../LanguagePicker/useLanguage'
+import { useLanguage } from '../LanguagePicker/useLanguage'
 
 const UserPage = ({
   user,
@@ -202,10 +201,10 @@ const mapStateToProps = state => ({
   accessGroups: state.accessGroups,
 })
 
-export default connect(mapStateToProps, {
+export const ConnectedUserPage = connect(mapStateToProps, {
   removeUserUnits,
   setFaculties,
   getProgrammesUnfiltered,
   getAccessGroups,
   getFaculties,
-})(withRouter(UserPage))
+})(UserPage)

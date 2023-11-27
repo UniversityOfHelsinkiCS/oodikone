@@ -1,12 +1,12 @@
 import React from 'react'
-import { Redirect, withRouter } from 'react-router-dom'
+import { Redirect, useParams } from 'react-router-dom'
 import { Segment } from 'semantic-ui-react'
 
-import FacultyView from './FacultyView'
-import ProgrammeView from './ProgrammeView'
+import { FacultyView } from './FacultyView'
+import { ProgrammeView } from './ProgrammeView'
 
-const EvaluationOverview = props => {
-  const { id, level } = props.match.params
+export const EvaluationOverview = () => {
+  const { id, level } = useParams()
 
   if (!(level === 'programme' || level === 'faculty') || !id) {
     return <Redirect to="/" />
@@ -20,5 +20,3 @@ const EvaluationOverview = props => {
     </div>
   )
 }
-
-export default withRouter(EvaluationOverview)

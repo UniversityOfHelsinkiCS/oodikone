@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { Table, Tab } from 'semantic-ui-react'
 import { maxBy } from 'lodash'
-import { useGetFacultiesQuery } from 'redux/facultyStats'
 import moment from 'moment'
-import InfoBox from '../../Info/InfoBox'
-import infotooltips from '../../../common/InfoToolTips'
-import { getNewestProgramme } from '../../../common'
-import useLanguage from '../../LanguagePicker/useLanguage'
+
+import { useGetFacultiesQuery } from 'redux/facultyStats'
+import { populationStatisticsToolTips } from 'common/InfoToolTips'
+import { getNewestProgramme } from 'common'
+import { InfoBox } from '../../Info/InfoBox'
+import { useLanguage } from '../../LanguagePicker/useLanguage'
 
 const CreditGainTableRow = ({ statistics, code }) => {
   const { getTextIn } = useLanguage()
@@ -144,7 +145,7 @@ export const CoursePopulationCreditGainTable = ({
 
   return (
     <>
-      <InfoBox content={infotooltips.PopulationStatistics.CreditDistributionCoursePopulation} />
+      <InfoBox content={populationStatisticsToolTips.CreditDistributionCoursePopulation} />
       <Tab panes={panes} />
     </>
   )

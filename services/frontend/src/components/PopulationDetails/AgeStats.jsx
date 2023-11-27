@@ -35,7 +35,7 @@ const groupedAgesReducer = (acc, age) => {
   return acc
 }
 
-const AgeStats = ({ filteredStudents, query }) => {
+export const AgeStats = ({ filteredStudents, query }) => {
   const [isGrouped, setIsGrouped] = useState(true)
   const [expandedGroups, setExpandedGroups] = useState([])
   const { isAdmin, rights } = useGetAuthorizedUserQuery()
@@ -181,5 +181,3 @@ AgeStats.propTypes = {
   filteredStudents: PropTypes.arrayOf(PropTypes.object).isRequired,
   query: shape({}).isRequired,
 }
-
-export default AgeStats

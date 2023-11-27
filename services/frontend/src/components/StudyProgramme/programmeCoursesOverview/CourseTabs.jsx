@@ -1,9 +1,10 @@
 import React from 'react'
 import { Tab } from 'semantic-ui-react'
-import OverallStatsTable from './OverallStatsTable'
-import Toggle from '../Toggle'
 
-const CourseTabs = ({ data, showStudents, handleShowStudentsChange }) => {
+import { OverallStatsTable } from './OverallStatsTable'
+import { Toggle } from '../Toggle'
+
+export const CourseTabs = ({ data, showStudents, handleShowStudentsChange }) => {
   const paneTypes = [
     {
       label: 'Tables',
@@ -37,5 +38,3 @@ const CourseTabs = ({ data, showStudents, handleShowStudentsChange }) => {
     </div>
   )
 }
-
-export default CourseTabs

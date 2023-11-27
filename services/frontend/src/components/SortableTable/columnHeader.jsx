@@ -4,11 +4,12 @@ import { useContextSelector } from 'use-context-selector'
 import { produce } from 'immer'
 import { Icon, Popup } from 'semantic-ui-react'
 import _ from 'lodash'
+
 import './style.css'
 import { SortableTableContext, getDataItemType, DataItemType, thickBorderStyles } from './common'
-import DefaultColumnFilter from './filters/defaultFilter'
-import DateColumnFilter from './filters/dateFilter'
-import RangeColumnFilter from './filters/rangeFilter'
+import { defaultColumnFilter } from './filters/defaultFilter'
+import { dateColumnFilter } from './filters/dateFilter'
+import { rangeColumnFilter } from './filters/rangeFilter'
 import { resolveDisplayColumn } from './columnContent'
 
 const getDefaultColumnOptions = () => ({
@@ -16,9 +17,9 @@ const getDefaultColumnOptions = () => ({
 })
 
 export const ColumnFilters = {
-  default: DefaultColumnFilter,
-  date: DateColumnFilter,
-  range: RangeColumnFilter,
+  default: defaultColumnFilter,
+  date: dateColumnFilter,
+  range: rangeColumnFilter,
 }
 
 const SizeMeasurer = ({ as = 'div', onSizeChange, children, ...rest }) => {

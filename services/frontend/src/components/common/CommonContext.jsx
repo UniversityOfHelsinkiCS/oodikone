@@ -1,6 +1,4 @@
 import React from 'react'
 import { LanguageProvider } from '../LanguagePicker/useLanguage'
 
-const CommonContext = ({ children }) => <LanguageProvider>{children}</LanguageProvider>
-
-export default CommonContext
+export const CommonContext = ({ children }) => <LanguageProvider>{children}</LanguageProvider>

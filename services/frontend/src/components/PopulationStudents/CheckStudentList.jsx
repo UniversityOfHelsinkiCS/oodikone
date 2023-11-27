@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { arrayOf, string } from 'prop-types'
 import { Button, Modal, Form, TextArea, Accordion, Header, List } from 'semantic-ui-react'
 
-const CheckStudentList = ({ students }) => {
+export const CheckStudentList = ({ students }) => {
   const [modalOpen, setModalOpen] = useState(false)
   const [input, setInput] = useState('')
   const [foundStudents, setFoundStudents] = useState([])
@@ -96,5 +96,3 @@ const CheckStudentList = ({ students }) => {
 CheckStudentList.propTypes = {
   students: arrayOf(string).isRequired,
 }
-
-export default CheckStudentList

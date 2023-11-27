@@ -2,11 +2,12 @@ import React, { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Tab, Icon, Message } from 'semantic-ui-react'
-import SortableTable from 'components/SortableTable'
 import { keyBy } from 'lodash'
 import moment from 'moment'
-import StudentInfoItem from 'components/common/StudentInfoItem'
-import useLanguage from '../../../LanguagePicker/useLanguage'
+
+import { SortableTable } from 'components/SortableTable'
+import { StudentInfoItem } from 'components/common/StudentInfoItem'
+import { useLanguage } from '../../../LanguagePicker/useLanguage'
 import '../../../StudentStatistics/StudentInfoCard/studentInfoCard.css'
 
 const findRowContent = (student, courseCode, year, start, end, criteria) => {
@@ -65,7 +66,7 @@ const createEmptyHidden = nthHiddenColumn => {
   ]
 }
 
-const ProgressTable = ({ curriculum, criteria, students, months, programme, studyGuidanceGroupProgramme }) => {
+export const ProgressTable = ({ curriculum, criteria, students, months, programme, studyGuidanceGroupProgramme }) => {
   const namesVisible = useSelector(state => state?.settings?.namesVisible)
   const { getTextIn } = useLanguage()
   const isStudyGuidanceGroupProgramme = studyGuidanceGroupProgramme !== ''
@@ -534,5 +535,3 @@ const ProgressTable = ({ curriculum, criteria, students, months, programme, stud
     </>
   )
 }
-
-export default ProgressTable

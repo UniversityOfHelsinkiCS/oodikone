@@ -4,7 +4,7 @@ import { Message, Icon, Button } from 'semantic-ui-react'
 import ReactMarkdown from 'react-markdown'
 import './infoBox.css'
 
-const InfoBox = ({ content, cypress }) => {
+export const InfoBox = ({ content, cypress }) => {
   const [open, setOpen] = useState(false)
   const toggleOpen = () => setOpen(prev => !prev)
 
@@ -39,5 +39,3 @@ const InfoBox = ({ content, cypress }) => {
 InfoBox.propTypes = {
   content: PropTypes.node.isRequired,
 }
-
-export default InfoBox

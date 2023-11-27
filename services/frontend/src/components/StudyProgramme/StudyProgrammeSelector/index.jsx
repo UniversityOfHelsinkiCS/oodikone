@@ -4,9 +4,10 @@ import { Link } from 'react-router-dom'
 import { debounce } from 'lodash'
 import { arrayOf, string, bool, shape } from 'prop-types'
 import { Loader, Message, Header, Form } from 'semantic-ui-react'
+
 import { getUnifiedProgrammeName } from 'common'
-import SortableTable from '../../SortableTable'
-import useLanguage from '../../LanguagePicker/useLanguage'
+import { SortableTable } from '../../SortableTable'
+import { useLanguage } from '../../LanguagePicker/useLanguage'
 
 const StudyProgrammeSelector = ({ studyprogrammes, selected }) => {
   const { getTextIn, language } = useLanguage()
@@ -235,4 +236,4 @@ const mapStateToProps = ({ populationProgrammes, settings }) => {
   }
 }
 
-export default connect(mapStateToProps, null)(StudyProgrammeSelector)
+export const ConnectedStudyProgrammeSelector = connect(mapStateToProps, null)(StudyProgrammeSelector)

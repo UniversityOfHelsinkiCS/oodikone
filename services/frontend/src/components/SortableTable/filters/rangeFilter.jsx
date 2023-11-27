@@ -59,7 +59,7 @@ const RangeColumnFilterComponent = ({ column, options, dispatch }) => {
   )
 }
 
-export default {
+export const rangeColumnFilter = {
   component: RangeColumnFilterComponent,
 
   initialOptions: () => ({

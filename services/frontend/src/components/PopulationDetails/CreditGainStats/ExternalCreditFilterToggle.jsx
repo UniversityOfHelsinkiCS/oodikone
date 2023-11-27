@@ -2,11 +2,11 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
 import { getMonths } from '../../../common/query'
-import FilterToggle from '../../FilterView/FilterToggle'
-import creditFilter from '../../FilterView/filters/creditsEarned'
-import useFilters from '../../FilterView/useFilters'
+import { FilterToggle } from '../../FilterView/FilterToggle'
+import { creditsEarnedFilter as creditFilter } from '../../FilterView/filters'
+import { useFilters } from '../../FilterView/useFilters'
 
-const ExternalCreditFilterToggle = ({ min, max }) => {
+export const ExternalCreditFilterToggle = ({ min, max }) => {
   const { filterDispatch } = useFilters()
   const { min: currentMin, max: currentMax } = useSelector(creditFilter.selectors.selectOptions)
 
@@ -25,5 +25,3 @@ const ExternalCreditFilterToggle = ({ min, max }) => {
     />
   )
 }
-
-export default ExternalCreditFilterToggle

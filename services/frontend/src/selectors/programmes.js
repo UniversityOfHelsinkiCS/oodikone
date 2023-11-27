@@ -17,7 +17,7 @@ const dropdownProgrammeSelector = createSelector(associationsSelector, assocs =>
   return programmes
 })
 
-const filteredDropdownProgrammeSelector = createSelector(
+export const filteredDropdownProgrammeSelector = createSelector(
   dropdownProgrammeSelector,
   userRightsPropSelector,
   (programmes, rights) => {
@@ -26,7 +26,3 @@ const filteredDropdownProgrammeSelector = createSelector(
     return programmes.filter(notSelected)
   }
 )
-
-export default {
-  filteredDropdownProgrammeSelector,
-}

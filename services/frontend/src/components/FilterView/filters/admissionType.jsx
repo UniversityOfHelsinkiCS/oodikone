@@ -1,6 +1,6 @@
 import React from 'react'
 import { Form, Dropdown } from 'semantic-ui-react'
-import createFilter from './createFilter'
+import { createFilter } from './createFilter'
 
 // Naming follows convention from SIS API (e.g urn:code:admissiont-type:m for "Muu")
 // Except changed Koepisteet to Valintakoe
@@ -14,7 +14,7 @@ const ADMISSION_TYPES = {
   N: null,
 }
 
-const admissionTypeFilter = code => value => student =>
+const filter = code => value => student =>
   student.studyrights.some(sr => {
     const fixedValue = value !== 'Valintakoe' ? value : 'Koepisteet'
     return (
@@ -27,7 +27,7 @@ const AdmissionTypeFilterCard = ({ options, onOptionsChange, withoutSelf, code }
   const { selected } = options
   const name = 'admissionTypeFilter'
 
-  const count = admissionType => withoutSelf().filter(admissionTypeFilter(code)(admissionType)).length
+  const count = admissionType => withoutSelf().filter(filter(code)(admissionType)).length
 
   const dropdownOptions = Object.entries(ADMISSION_TYPES).map(([key, admissionType]) => {
     const value = admissionType || 'Ei valintatapaa'
@@ -63,7 +63,7 @@ const AdmissionTypeFilterCard = ({ options, onOptionsChange, withoutSelf, code }
   )
 }
 
-export default createFilter({
+export const admissionTypeFilter = createFilter({
   key: 'AdmissionType',
 
   title: 'Admission Type',
@@ -75,7 +75,7 @@ export default createFilter({
   isActive: ({ selected }) => !!selected,
 
   filter(student, { selected }, { args }) {
-    return admissionTypeFilter(args.programme)(selected)(student)
+    return filter(args.programme)(selected)(student)
   },
 
   render: (props, { args }) => <AdmissionTypeFilterCard {...props} code={args.programme} />,

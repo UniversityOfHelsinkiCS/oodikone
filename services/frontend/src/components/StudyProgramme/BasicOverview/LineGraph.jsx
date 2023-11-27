@@ -1,13 +1,11 @@
 import React from 'react'
+import ReactHighcharts from 'react-highcharts'
 
 import '../studyprogramme.css'
 
-const ReactHighcharts = require('react-highcharts')
-require('highcharts-exporting')(ReactHighcharts.Highcharts)
-
 const colors = ['#7cb5ec', '#90ed7d', '#434348', '#f7a35c', '#FFF000', '#2b908f', '#f45b5b', '#91e8e1']
 
-const LineGraph = ({ cypress, data }) => {
+export const LineGraph = ({ cypress, data }) => {
   const dataWithColors = data?.graphStats.map((series, index) => ({
     ...series,
     color: colors[index],
@@ -47,12 +45,10 @@ const LineGraph = ({ cypress, data }) => {
     },
   }
 
-  if (!data) return <></>
+  if (!data) return null
   return (
     <div className="graph-container" data-cy={`Graph-${cypress}`}>
       <ReactHighcharts config={defaultConfig} />
     </div>
   )
 }
-
-export default LineGraph

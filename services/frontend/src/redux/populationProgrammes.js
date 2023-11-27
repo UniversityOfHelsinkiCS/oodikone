@@ -13,7 +13,7 @@ export const getProgrammes = () => {
   return callController(route, prefix)
 }
 
-const reducer = (state = { data: {} }, action) => {
+export const reducer = (state = { data: {} }, action) => {
   switch (action.type) {
     case types.attempt:
       return {
@@ -36,5 +36,3 @@ const reducer = (state = { data: {} }, action) => {
       return state
   }
 }
-
-export default reducer

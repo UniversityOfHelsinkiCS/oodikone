@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Divider, Icon, Grid } from 'semantic-ui-react'
 
-import CreditsGainedTable from './CreditsGainedTable'
+import { CreditsGainedTable } from './CreditsGainedTable'
 
 const admissionTypes = [
   'Todistusvalinta',
@@ -13,7 +13,7 @@ const admissionTypes = [
   null,
 ]
 
-const CreditsGainedTab = ({ allStudents, query, creditDateFilterOptions, programmeGoalTime }) => {
+export const CreditsGainedTab = ({ allStudents, query, creditDateFilterOptions, programmeGoalTime }) => {
   const [show, setShow] = useState(false)
   if (!allStudents || !allStudents.length || !query) return null
 
@@ -69,5 +69,3 @@ const CreditsGainedTab = ({ allStudents, query, creditDateFilterOptions, program
     </Grid>
   )
 }
-
-export default CreditsGainedTab

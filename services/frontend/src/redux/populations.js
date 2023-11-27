@@ -87,7 +87,7 @@ export const removePopulation = uuid => ({
   uuid,
 })
 
-const reducer = (state = initialState, action) => {
+export const reducer = (state = initialState, action) => {
   switch (action.type) {
     case 'GET_POPULATION_STATISTICS_ATTEMPT':
       return {
@@ -142,5 +142,3 @@ const reducer = (state = initialState, action) => {
       return state
   }
 }
-
-export default reducer

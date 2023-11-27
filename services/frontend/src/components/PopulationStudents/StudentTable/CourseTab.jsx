@@ -2,12 +2,13 @@ import React, { useMemo, useCallback } from 'react'
 import _, { orderBy, uniqBy, sortBy, isNumber } from 'lodash'
 import { useSelector } from 'react-redux'
 import { Icon, Tab } from 'semantic-ui-react'
-import useLanguage from 'components/LanguagePicker/useLanguage'
+
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
 import '../../PopulationCourseStats/populationCourseStats.css'
 import { useGetStudyGuidanceGroupPopulationCoursesQuery } from 'redux/studyGuidanceGroups'
-import StudentInfoItem from 'components/common/StudentInfoItem'
+import { StudentInfoItem } from 'components/common/StudentInfoItem'
 import { hiddenNameAndEmailForExcel } from 'common/columns'
-import SortableTable, { row } from '../../SortableTable'
+import { SortableTable, row } from '../../SortableTable'
 import '../populationStudents.css'
 
 const getMandatoryPassed = (mandatoryCourses, populationCourses, studyGuidanceCourses) => {
@@ -318,7 +319,7 @@ const StudyGuidanceGroupCoursesTabContainer = ({ students, group, curriculum }) 
   return <CoursesTable students={students} studyGuidanceCourses={populationsCourses} curriculum={curriculum} />
 }
 
-const CoursesTabContainer = ({ students, variant, studyGuidanceGroup, curriculum }) => {
+export const CoursesTabContainer = ({ students, variant, studyGuidanceGroup, curriculum }) => {
   if (variant === 'studyGuidanceGroupPopulation') {
     return (
       <StudyGuidanceGroupCoursesTabContainer students={students} group={studyGuidanceGroup} curriculum={curriculum} />
@@ -327,5 +328,3 @@ const CoursesTabContainer = ({ students, variant, studyGuidanceGroup, curriculum
 
   return <CoursesTable students={students} curriculum={curriculum} />
 }
-
-export default CoursesTabContainer

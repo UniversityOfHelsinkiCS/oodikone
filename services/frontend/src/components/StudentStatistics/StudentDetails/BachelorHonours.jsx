@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import moment from 'moment'
 import { Divider, Table, Label, Header, Accordion, Icon } from 'semantic-ui-react'
-import CurriculumPicker from 'components/PopulationDetails/CurriculumPicker'
+import { CurriculumPicker } from 'components/PopulationDetails/CurriculumPicker'
 import {
   bachelorHonoursProgrammes as bachelorCodes,
   bachelorHonoursBasicModules as basicHonoursModules,
   bachelorHonoursIntermediateModules as intermediateHonoursModules,
   reformatDate,
-} from '../../../common'
+} from 'common'
 
-const BachelorHonours = ({ student, absentYears, programmeCode }) => {
+export const BachelorHonours = ({ student, absentYears, programmeCode }) => {
   const [curriculum, setCurriculum] = useState(null)
   const [studentsModules, setModules] = useState([])
   const [otherModules, setOther] = useState([])
@@ -168,5 +168,3 @@ const BachelorHonours = ({ student, absentYears, programmeCode }) => {
     </>
   )
 }
-
-export default BachelorHonours

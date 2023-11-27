@@ -1,13 +1,12 @@
 import React from 'react'
-
-const ReactHighcharts = require('react-highcharts')
+import ReactHighcharts from 'react-highcharts'
 
 const getColors = len => {
   if (len < 8) return ['#f57368', '#fb8c6e', '#fba678', '#dbda7d', '#9ec27c', '#60a866', '#008c59']
   return ['#e66067', '#f57368', '#fb8c6e', '#fba678', '#dbda7d', '#9ec27c', '#60a866', '#008c59']
 }
 
-const FacultyBarChart = ({ cypress, data }) => {
+export const FacultyBarChart = ({ cypress, data }) => {
   if (!data.stats) return null
 
   const colors = getColors(Object.keys(data.stats).length)
@@ -66,5 +65,3 @@ const FacultyBarChart = ({ cypress, data }) => {
     </div>
   )
 }
-
-export default FacultyBarChart

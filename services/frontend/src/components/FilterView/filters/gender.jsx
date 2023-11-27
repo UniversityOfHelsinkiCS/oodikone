@@ -1,6 +1,6 @@
 import React from 'react'
 import { Form, Dropdown } from 'semantic-ui-react'
-import createFilter from './createFilter'
+import { createFilter } from './createFilter'
 
 const GENDERS = {
   female: { label: 'Female', value: 2 },
@@ -41,7 +41,7 @@ const GenderFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
   )
 }
 
-export default createFilter({
+export const genderFilter = createFilter({
   key: 'Gender',
 
   defaultOptions: {

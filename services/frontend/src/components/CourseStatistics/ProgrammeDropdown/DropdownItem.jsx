@@ -16,7 +16,7 @@ const styles = {
   },
 }
 
-const DropdownItem = ({ name, code, size, description }) =>
+export const DropdownItem = ({ name, code, size, description }) =>
   ['ALL', 'OTHER', 'EXCLUDED'].includes(code) ? (
     <Popup
       size="small"
@@ -54,5 +54,3 @@ DropdownItem.propTypes = {
   size: oneOfType([number, string]).isRequired,
   description: string,
 }
-
-export default DropdownItem

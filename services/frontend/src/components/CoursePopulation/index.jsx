@@ -2,22 +2,24 @@ import React, { useEffect, useState, useMemo } from 'react'
 import moment from 'moment'
 import _ from 'lodash'
 import { Segment, Header, Form, Input } from 'semantic-ui-react'
-import InfoBox from 'components/Info/InfoBox'
-import PopulationCourseStatsFlat from 'components/PopulationCourseStats/PopulationCourseStatsFlat'
-import PanelView from 'components/common/PanelView'
+
+import { InfoBox } from 'components/Info/InfoBox'
+import { PopulationCourseStatsFlat } from 'components/PopulationCourseStats/PopulationCourseStatsFlat'
+import { PanelView } from 'components/common/PanelView'
 import { useGetPopulationStatisticsByCourseQuery } from 'redux/populations'
 import { useGetSingleCourseStatsQuery } from 'redux/singleCourseStats'
 import { useGetStudentListCourseStatisticsQuery } from 'redux/populationCourses'
 import { useGetSemestersQuery } from 'redux/semesters'
-import PopulationStudents from '../PopulationStudents'
+import { populationStatisticsToolTips } from 'common/InfoToolTips'
+import { getStudentToTargetCourseDateMap, getUnifyTextIn } from 'common'
+import { useProgress, useTitle } from 'common/hooks'
+import { queryParamsFromUrl } from 'common/query'
+import { PopulationStudentsContainer as PopulationStudents } from '../PopulationStudents'
 import { CoursePopulationGradeDist } from './CoursePopulationGradeDist'
 import { CoursePopulationLanguageDist } from './CoursePopulationLanguageDist'
 import { CoursePopulationCreditGainTable } from './CoursePopulationCreditGainTable'
 import { CustomPopulationProgrammeDist } from '../CustomPopulation/CustomPopulationProgrammeDist'
-import ProgressBar from '../ProgressBar'
-import { getStudentToTargetCourseDateMap, getUnifyTextIn } from '../../common'
-import { useProgress, useTitle } from '../../common/hooks'
-import infotooltips from '../../common/InfoToolTips'
+import { ProgressBar } from '../ProgressBar'
 import {
   ageFilter,
   gradeFilter,
@@ -29,9 +31,8 @@ import {
   studyTrackFilter,
   studentNumberFilter,
 } from '../FilterView/filters'
-import FilterView from '../FilterView'
-import useLanguage from '../LanguagePicker/useLanguage'
-import { queryParamsFromUrl } from '../../common/query'
+import { FilterView } from '../FilterView'
+import { useLanguage } from '../LanguagePicker/useLanguage'
 
 const NO_PROGRAMME = {
   code: '00000',
@@ -39,7 +40,7 @@ const NO_PROGRAMME = {
   startdate: '',
 }
 
-const CoursePopulation = ({ history }) => {
+export const CoursePopulation = ({ history }) => {
   const { getTextIn } = useLanguage()
   const [codes, setCodes] = useState([])
   useTitle('Course population')
@@ -113,7 +114,7 @@ const CoursePopulation = ({ history }) => {
       title: 'Grade distribution',
       content: (
         <div>
-          <InfoBox content={infotooltips.PopulationStatistics.GradeDistributionCoursePopulation} />
+          <InfoBox content={populationStatisticsToolTips.GradeDistributionCoursePopulation} />
           <CoursePopulationGradeDist
             singleCourseStats={courseData}
             from={dateFrom}
@@ -128,7 +129,7 @@ const CoursePopulation = ({ history }) => {
       title: 'Language distribution',
       content: (
         <div>
-          <InfoBox content={infotooltips.PopulationStatistics.LanguageDistributionCoursePopulation} />
+          <InfoBox content={populationStatisticsToolTips.LanguageDistributionCoursePopulation} />
           <CoursePopulationLanguageDist from={dateFrom} to={dateTo} samples={filtered} codes={codes} />
         </div>
       ),
@@ -137,7 +138,7 @@ const CoursePopulation = ({ history }) => {
       title: 'Programme distribution',
       content: (
         <div>
-          <InfoBox content={infotooltips.PopulationStatistics.ProgrammeDistributionCoursePopulation} />
+          <InfoBox content={populationStatisticsToolTips.ProgrammeDistributionCoursePopulation} />
           <CustomPopulationProgrammeDist
             studentToTargetCourseDateMap={studentToTargetCourseDateMap}
             students={filtered}
@@ -260,7 +261,7 @@ const CustomPopulationCoursesWrapper = ({ filteredStudents }) => {
 
   return (
     <>
-      <InfoBox content={infotooltips.PopulationStatistics.CoursesOfPopulation} />
+      <InfoBox content={populationStatisticsToolTips.CoursesOfPopulation} />
       <Form style={{ padding: '4px 4px 4px 8px' }}>
         <Form.Field inline>
           <label>Limit to courses where student number is at least</label>
@@ -279,5 +280,3 @@ const CustomPopulationCoursesWrapper = ({ filteredStudents }) => {
     </>
   )
 }
-
-export default CoursePopulation

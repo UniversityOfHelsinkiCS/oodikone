@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import { Table, Header, Dropdown } from 'semantic-ui-react'
 import { flatten, uniq } from 'lodash'
 import { shape, string, number } from 'prop-types'
-import useLanguage from '../../LanguagePicker/useLanguage'
+import { useLanguage } from '../../LanguagePicker/useLanguage'
 
 const CourseTableRow = ({ facultyCode, students, credits, facultyName }) => {
   return (
@@ -83,7 +83,7 @@ const CourseTable = ({ course, courseInstance, selectedYear }) => {
   )
 }
 
-const FacultyLevelStatistics = () => {
+export const FacultyLevelStatistics = () => {
   const { language: activeLanguage } = useLanguage()
   const openOrReqular = useSelector(state => state.courseSearch.openOrReqular)
   const { courseStats } = useSelector(({ courseStats }) => ({
@@ -152,5 +152,3 @@ CourseTable.propTypes = {
 CourseTable.defaultProps = {
   courseInstance: null,
 }
-
-export default FacultyLevelStatistics

@@ -1,13 +1,12 @@
-/* eslint-disable no-return-assign */
-
 import React, { useState, useMemo, useReducer, useCallback } from 'react'
 import { Icon } from 'semantic-ui-react'
 import _ from 'lodash'
-import FigureContainer from './FigureContainer'
-import ExportModal from './ExportModal'
+
+import { FigureContainer } from './FigureContainer'
+import { ExportModal } from './ExportModal'
 import { row, group, SortableTableContext, cloneColumns } from './common'
-import SortingFilteringVisitor from './visitors/SortingFilteringVisitor'
-import ValueVisitor from './visitors/ValueVisitor'
+import { SortingFilteringVisitor } from './visitors/SortingFilteringVisitor'
+import { ValueVisitor } from './visitors/ValueVisitor'
 import './style.css'
 import {
   insertGroupColumns,
@@ -90,7 +89,7 @@ formatValue: Same as getRowContent, but avoids recalculating value already calcu
 
 */
 
-const SortableTable = ({
+export const SortableTable = ({
   tableId,
   columns: pColumns,
   title,
@@ -239,5 +238,3 @@ const SortableTable = ({
 }
 
 export { group, row }
-
-export default SortableTable

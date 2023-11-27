@@ -1,4 +1,3 @@
-/* eslint-disable babel/no-invalid-this */
 import React, { useState, useCallback, useMemo } from 'react'
 import Highcharts from 'highcharts'
 import ReactHighcharts from 'react-highcharts'
@@ -8,7 +7,7 @@ import ReactMarkdown from 'react-markdown'
 import HighchartsCustomEvents from 'highcharts-custom-events'
 
 import moment from 'moment'
-import InfoToolTips from '../../common/InfoToolTips'
+import { coolDataScienceToolTips } from 'common/InfoToolTips'
 import { useGetProtoCQuery, useGetProtoCProgrammeQuery } from '../../redux/coolDataScience'
 
 HighchartsCustomEvents(Highcharts)
@@ -166,6 +165,7 @@ const makeConfig = (data, sorter, type = 'column', clickHandler) => {
           click() {
             const { chart } = this
             chart.myLabel.destroy()
+            // eslint-disable-next-line @babel/no-invalid-this
             const clickedLabel = data.find(entry => entry.name === this.value)
             if (clickedLabel) clickHandler(clickedLabel)
           },
@@ -291,7 +291,7 @@ ClickableChart.defaultProps = {
   isSideways: false,
 }
 
-const ProtoC = ({ programme = 'KH50_005' }) => {
+export const ProtoC2 = ({ programme = 'KH50_005' }) => {
   const [sorter, setSorter] = useState('3v tahti')
   const [sortDir, setSortDir] = useState(1)
   const [drilldownOrgCode, setDrilldownOrgCode] = useState(null)
@@ -374,8 +374,6 @@ const ProtoC = ({ programme = 'KH50_005' }) => {
     setDrilldownProgrammeCode(programme.code)
   })
 
-  const { CoolDataScience } = InfoToolTips
-
   const handleClick = sorterName => {
     if (sorterName === sorter) setSortDir(-1 * sortDir)
     setSorter(sorterName)
@@ -457,9 +455,7 @@ const ProtoC = ({ programme = 'KH50_005' }) => {
           <Dimmer inverted active />
           <Loader active />
           {!protoCProgrammeLoading && protoCProgrammeData && (
-            <>
-              <NonClickableChart data={drilldownProgramme} sorter={currentSorter} isSideways />
-            </>
+            <NonClickableChart data={drilldownProgramme} sorter={currentSorter} isSideways />
           )}
           <div align="center">
             <Checkbox
@@ -477,7 +473,7 @@ const ProtoC = ({ programme = 'KH50_005' }) => {
           <Message>
             {
               // eslint-disable-next-line react/no-children-prop
-              <ReactMarkdown children={CoolDataScience.protoC2} />
+              <ReactMarkdown children={coolDataScienceToolTips.protoC2} />
             }
           </Message>
         </Segment>
@@ -586,7 +582,7 @@ const ProtoC = ({ programme = 'KH50_005' }) => {
         <Message>
           {
             // eslint-disable-next-line react/no-children-prop
-            <ReactMarkdown children={CoolDataScience.protoC2} />
+            <ReactMarkdown children={coolDataScienceToolTips.protoC2} />
           }
         </Message>
       </Segment>
@@ -594,8 +590,6 @@ const ProtoC = ({ programme = 'KH50_005' }) => {
   )
 }
 
-ProtoC.defaultProps = {
+ProtoC2.defaultProps = {
   programme: '',
 }
-
-export default ProtoC

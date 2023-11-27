@@ -4,7 +4,7 @@ import moment from 'moment'
 import 'moment/locale/fi'
 import ReactMarkdown from 'react-markdown'
 import Datetime from 'react-datetime'
-import WithHelpTooltip from './WithHelpTooltip'
+import { WithHelpTooltip } from './WithHelpTooltip'
 
 const unindent = s => s.replace(/(^|\n)[ \t]+/g, '\n')
 
@@ -101,7 +101,7 @@ const StatusSettings = ({ onSettingChange, value, settings, onOpenDetails }) => 
   )
 }
 
-export default ({ value, changeSetting, settings, generalHelp }) => {
+export const Toolbar = ({ value, changeSetting, settings, generalHelp }) => {
   const [usageDetailsOpen, setUsageDetailsOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const moreDetailsRef = useRef(null)

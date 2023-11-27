@@ -3,14 +3,18 @@ import React, { useEffect, useState } from 'react'
 import Datetime from 'react-datetime'
 import { Modal, Form, Button, TextArea } from 'semantic-ui-react'
 import qs from 'query-string'
-import SearchHistory from 'components/SearchHistory'
+import { useLocation, useHistory } from 'react-router-dom'
+
+import { SearchHistory } from 'components/SearchHistory'
 import {
   useCreateOpenUniCourseSearchMutation,
   useDeleteOpenUniCourseSearchMutation,
   useUpdateOpenUniCourseSearchMutation,
 } from 'redux/openUniPopulations'
 
-const CustomOpenUniSearch = ({ setValues, savedSearches, location, history }) => {
+export const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
+  const location = useLocation()
+  const history = useHistory()
   const [modal, setModal] = useState(false)
   const [input, setInput] = useState('')
   const [searchList, setSearches] = useState(savedSearches)
@@ -226,5 +230,3 @@ const CustomOpenUniSearch = ({ setValues, savedSearches, location, history }) =>
     </Modal>
   )
 }
-
-export default CustomOpenUniSearch

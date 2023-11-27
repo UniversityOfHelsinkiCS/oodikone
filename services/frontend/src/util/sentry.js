@@ -2,7 +2,7 @@ import * as Sentry from '@sentry/browser'
 import { Integrations } from '@sentry/tracing'
 import { sentryRelease, sentryEnvironment, runningInCypress } from '../conf'
 
-const initializeSentry = () => {
+export const initializeSentry = () => {
   if (!sentryRelease || !sentryEnvironment || runningInCypress) return
 
   Sentry.init({
@@ -13,5 +13,3 @@ const initializeSentry = () => {
     tracesSampleRate: 1.0,
   })
 }
-
-export default initializeSentry

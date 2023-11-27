@@ -3,7 +3,7 @@ import { Table } from 'semantic-ui-react'
 import { string, arrayOf, func, bool } from 'prop-types'
 
 import { courseDataWithRealisationsType } from '../../../constants/types'
-import FoldableRow from './foldableRow'
+import { FoldableRow } from './foldableRow'
 
 const getHeader = categoryName => {
   const getHeaderCell = content => <Table.HeaderCell key={content}>{content}</Table.HeaderCell>
@@ -18,7 +18,7 @@ const getHeader = categoryName => {
   )
 }
 
-const AttemptsTable = ({ categoryName, data, onClickCourse, userHasAccessToAllStats }) => (
+export const AttemptsTable = ({ categoryName, data, onClickCourse, userHasAccessToAllStats }) => (
   <Table style={{ cursor: 'pointer' }} selectable className="fixed-header">
     {getHeader(categoryName)}
     <Table.Body>
@@ -40,5 +40,3 @@ AttemptsTable.propTypes = {
   onClickCourse: func.isRequired,
   userHasAccessToAllStats: bool.isRequired,
 }
-
-export default AttemptsTable

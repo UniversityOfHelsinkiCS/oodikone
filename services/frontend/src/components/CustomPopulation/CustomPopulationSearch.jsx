@@ -9,9 +9,9 @@ import {
   useUpdateCustomPopulationSearchMutation,
   useDeleteCustomPopulationSearchMutation,
 } from '../../redux/customPopulationSearch'
-import SearchHistory from '../SearchHistory'
+import { SearchHistory } from '../SearchHistory'
 
-const CustomPopulationSearch = ({ setCustomPopulationState }) => {
+export const CustomPopulationSearch = ({ setCustomPopulationState }) => {
   const [modal, setModal] = useState(false)
   const [input, setInput] = useState('')
   const [name, setName] = useState('')
@@ -154,5 +154,3 @@ const CustomPopulationSearch = ({ setCustomPopulationState }) => {
     </Modal>
   )
 }
-
-export default CustomPopulationSearch

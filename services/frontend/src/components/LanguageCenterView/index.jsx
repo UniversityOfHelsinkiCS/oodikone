@@ -1,17 +1,19 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Divider, Loader, Tab } from 'semantic-ui-react'
-import './index.css'
-import { useGetSemestersQuery } from 'redux/semesters'
+
 import { useHistory } from 'react-router-dom'
+
 import { useTabs, useTitle } from 'common/hooks'
 import { useGetLanguageCenterDataQuery } from 'redux/languageCenterView'
 import { useGetFacultiesQuery } from 'redux/facultyStats'
+import { useGetSemestersQuery } from 'redux/semesters'
 import { FacultiesTab } from './FacultiesTab/index'
 import { SemestersTab } from './SemestersTab/index'
 import { LanguageCenterContext } from './common'
 import { InfoBox } from './InfoBox'
+import './index.css'
 
-const LanguageCenterView = () => {
+export const LanguageCenterView = () => {
   useTitle('Language center view')
   const semestersQuery = useGetSemestersQuery()
   const semesters =
@@ -105,5 +107,3 @@ const LanguageCenterView = () => {
     </LanguageCenterContext.Provider>
   )
 }
-
-export default LanguageCenterView

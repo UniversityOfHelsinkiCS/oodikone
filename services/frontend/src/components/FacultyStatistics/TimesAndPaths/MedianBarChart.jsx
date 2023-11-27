@@ -2,7 +2,7 @@
 import React from 'react'
 import ReactHighcharts from 'react-highcharts'
 
-const BarChart = ({
+export const MedianBarChart = ({
   data,
   goal,
   handleClick,
@@ -202,5 +202,3 @@ const BarChart = ({
     </div>
   )
 }
-
-export default BarChart

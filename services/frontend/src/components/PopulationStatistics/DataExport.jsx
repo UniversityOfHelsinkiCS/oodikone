@@ -6,11 +6,11 @@ import xlsx from 'xlsx'
 import { curriculumsApi } from 'redux/populationCourses'
 import { reformatDate, getStudentTotalCredits, getStudentToStudyrightStartMap } from '../../common'
 import { PRIORITYCODE_TEXTS } from '../../constants'
-import useLanguage from '../LanguagePicker/useLanguage'
+import { useLanguage } from '../LanguagePicker/useLanguage'
 
 const { useGetCurriculumsQuery } = curriculumsApi
 
-export default ({ students, programmeCode }) => {
+export const DataExport = ({ students, programmeCode }) => {
   const { getTextIn } = useLanguage()
   const queryYear = useSelector(({ populations }) => populations?.query?.year)
   const curriculumQuery = useGetCurriculumsQuery({ code: programmeCode, period_ids: [queryYear] })
@@ -113,8 +113,8 @@ export default ({ students, programmeCode }) => {
         .filter(el => populationStatistics.elementdetails.data[el.code].type === 20)
         .forEach(el => {
           if (queryStudyrights.includes(el.code)) {
-            startdate = el.startdate // eslint-disable-line
-            enddate = el.enddate // eslint-disable-line
+            startdate = el.startdate
+            enddate = el.enddate
           }
         })
       elemArr

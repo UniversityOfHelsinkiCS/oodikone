@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import { Icon, Popup, Table } from 'semantic-ui-react'
 
-import useLanguage from 'components/LanguagePicker/useLanguage'
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
 import { useGetAuthorizedUserQuery } from 'redux/auth'
-import PopulationLink from './PopulationLink'
-import Toggle from '../Toggle'
+import { PopulationLink } from './PopulationLink'
+import { Toggle } from '../Toggle'
 
 const getKey = year => `${year}-${Math.random()}`
 
@@ -276,7 +276,7 @@ const sortMainDataByYear = data => {
   return sortedData
 }
 
-const StudytrackDataTable = ({
+export const StudytrackDataTable = ({
   studyprogramme,
   dataOfAllTracks,
   studytracks,
@@ -403,5 +403,3 @@ const StudytrackDataTable = ({
     </div>
   )
 }
-
-export default StudytrackDataTable
