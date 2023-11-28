@@ -199,37 +199,46 @@ const startedStudyrights = async (studytrack, since, studentnumbers) =>
     })
   ).map(formatStudyright)
 
-const graduatedStudyRightsByStartDate = async (studytrack, since, academicEnddate) =>
-  (
-    await Studyright.findAll({
-      include: [
-        {
-          model: StudyrightElement,
-          required: true,
-          include: {
-            model: ElementDetail,
-            where: {
-              code: studytrack,
-            },
+const graduatedStudyRightsByStartDate = async (studytrack, startDate, endDate, combined) => {
+  const query = {
+    include: [
+      {
+        model: StudyrightElement,
+        required: true,
+        include: {
+          model: ElementDetail,
+          where: {
+            code: studytrack,
           },
         },
-        {
-          model: Student,
-          attributes: ['studentnumber'],
-          required: true,
-        },
-      ],
-      where: {
-        graduated: 1,
-        startdate: {
-          [Op.between]: [since, academicEnddate],
-        },
-        student_studentnumber: {
-          [Op.not]: null,
-        },
       },
-    })
-  ).map(formatStudyright)
+      {
+        model: Student,
+        attributes: ['studentnumber'],
+        required: true,
+      },
+    ],
+    where: {
+      graduated: 1,
+      student_studentnumber: {
+        [Op.not]: null,
+      },
+    },
+  }
+  if (!combined) {
+    // This logic is based on function studentnumbersWithAllStudyrightElements from ./populations.js as the goal is to find the students
+    // who have started their studies in the programme between startDate and endDate (i.e. the same logic as in class statistics)
+    query.where[Op.and] = [
+      sequelize.where(
+        sequelize.fn('GREATEST', sequelize.col('studyright_elements.startdate'), sequelize.col('studyright.startdate')),
+        { [Op.between]: [startDate, endDate] }
+      ),
+    ]
+  } else {
+    query.where.startdate = { [Op.between]: [startDate, endDate] }
+  }
+  return (await Studyright.findAll(query)).map(formatStudyright)
+}
 
 const graduatedStudyRights = async (studytrack, since, studentnumbers) =>
   (

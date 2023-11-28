@@ -244,8 +244,7 @@ const getStudytrackDataForTheYear = async ({
           : []
         // Studentnumbers are fetched based on studystartdate, if it is greater than startdate
         // Thus, computing the bc+ms graduated by startdate based on these studentnumbers does not work.
-        const academicEnddate = `${year.slice(-4)}-07-31T23:59:59`
-        graduatedByStartdate = await graduatedStudyRightsByStartDate(track, startDate, academicEnddate)
+        graduatedByStartdate = await graduatedStudyRightsByStartDate(track, startDate, endDate, false)
         if (combinedProgramme) {
           enrolled = getUnique([...enrolled, ...enrolledSecondProgramme].map(student => student.studentnumber))
           absent = getUnique([...absent, ...absentSecondProgramme].map(student => student.studentnumber))
@@ -254,7 +253,8 @@ const getStudytrackDataForTheYear = async ({
           graduatedByStartSecondProg = await graduatedStudyRightsByStartDate(
             combinedProgramme,
             startDate,
-            academicEnddate
+            endDate,
+            true
           )
         }
         totals[track].all = [...totals[track].all, ...all]
