@@ -165,7 +165,7 @@ const updateUser = async (username, fields) => {
 const getAccessGroups = async () => await AccessGroup.findAll()
 
 const updateAccessGroups = async (username, iamGroups = [], specialGroup = {}, sisId) => {
-  const { jory, hyOne, superAdmin, openUni } = specialGroup
+  const { jory, hyOne, superAdmin, openUni, katselmusViewer } = specialGroup
 
   const userFromDb = await byUsername(username)
   const formattedUser = await formatUser(userFromDb, [], Boolean(sisId))
@@ -181,6 +181,7 @@ const updateAccessGroups = async (username, iamGroups = [], specialGroup = {}, s
   if (hyOne || currentAccessGroups.includes('teachers')) newAccessGroups.push('teachers')
   if (superAdmin || currentAccessGroups.includes('admin')) newAccessGroups.push('admin')
   if (openUni) newAccessGroups.push('openUniSearch')
+  if (katselmusViewer) newAccessGroups.push('katselmusViewer')
 
   const accessGroups = await AccessGroup.findAll({
     where: {
