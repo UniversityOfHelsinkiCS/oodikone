@@ -4,7 +4,7 @@ const roles = requiredRoles => async (req, res, next) => {
       user: { roles },
     } = req
 
-    if (requiredRoles.every(r => roles.indexOf(r) >= 0) || roles.includes('admin')) {
+    if (requiredRoles.some(r => roles.includes(r)) || roles.includes('admin')) {
       return next()
     }
   }
