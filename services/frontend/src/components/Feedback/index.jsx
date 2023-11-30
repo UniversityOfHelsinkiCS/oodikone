@@ -58,6 +58,11 @@ export const Feedback = () => {
       )}
       <Header as="h1" textAlign="center" style={{ margin: '40px 0' }}>
         Give feedback
+        <Header.Subheader style={{ marginTop: '20px' }}>
+          We are constantly improving Oodikone. Please share your thoughts using the form below, or contact us at{' '}
+          <a href="mailto:grp-toska@helsinki.fi">grp-toska@helsinki.fi</a>.
+          <div style={{ marginTop: '10px' }}>You can write in Finnish or English.</div>
+        </Header.Subheader>
       </Header>
       <Form>
         <TextArea
