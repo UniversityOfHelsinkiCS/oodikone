@@ -93,7 +93,11 @@ const StatusSettings = ({ onSettingChange, value, settings, onOpenDetails }) => 
       definition
     )
 
-    return <div style={itemStyles}>{content}</div>
+    return (
+      <div key={key} style={itemStyles}>
+        {content}
+      </div>
+    )
   })
 
   return (

@@ -37,6 +37,7 @@ const EditableList = ({ value, onChange, renderLabel }) => {
       >
         {value.map((sn, i) => (
           <li
+            key={sn}
             style={{ display: 'flex', borderTop: i > 0 && '0px solid #e6e6e7', height: '1.75em', alignItems: 'center' }}
           >
             <span style={{ marginLeft: '0.3em', fontSize: '0.9em' }}>{sn}</span>

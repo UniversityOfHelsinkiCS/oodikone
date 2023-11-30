@@ -114,7 +114,7 @@ export const StatusCard = ({
       {yearlyValues && (
         <div className={`years item-type-${type}`}>
           {yearlyValues.map(({ label, accumulated, total }) => (
-            <span className="year-row">
+            <span className="year-row" key={label}>
               <b className="year-label">{label}:</b>
               <span className="year-value">{getDisplayValue(accumulated)}</span>
               <span className="separator">{typeof total === 'number' ? '/' : ''}</span>
