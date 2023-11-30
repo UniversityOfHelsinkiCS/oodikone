@@ -313,11 +313,9 @@ export const FacultyProgrammeOverview = ({
                     sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.bcMsProgStats).map(
                       listObj => listObj[0]
                     )}
-                    progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
                     programmeNames={progressStats?.data.programmeNames}
                     cypress="FacultyBachelorMasterProgressTable"
                     progressTitles={progressStats?.data.yearlyBcMsTitles}
-                    needsExtra={faculty.code === 'H60' ? 'NO EXTRA' : 'EXTRA HEIGHT'}
                   />
                 </div>
               </div>
@@ -343,11 +341,9 @@ export const FacultyProgrammeOverview = ({
                         sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.mastersProgStats).map(
                           listObj => listObj[0]
                         )}
-                        progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
                         programmeNames={progressStats?.data.programmeNames}
                         cypress="FacultyMastersProgressTable"
                         progressTitles={progressStats?.data.yearlyMasterTitles}
-                        needsExtra={faculty.code === 'H60' ? 'NO EXTRA' : 'EXTRA HEIGHT'}
                       />
                     </div>
                   </div>
@@ -375,11 +371,9 @@ export const FacultyProgrammeOverview = ({
                         sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.licentiateProgStats).map(
                           listObj => listObj[0]
                         )}
-                        progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
                         programmeNames={progressStats?.data.programmeNames}
                         cypress="FacultyLicentiateProgressTable"
                         progressTitles={progressStats?.data.yearlyLicentiateTitles}
-                        needsExtra="EXTRA HEIGHT"
                       />
                     </div>
                   </div>
@@ -405,7 +399,6 @@ export const FacultyProgrammeOverview = ({
                     sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.doctoralProgStats).map(
                       listObj => listObj[0]
                     )}
-                    progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
                     programmeNames={progressStats?.data.programmeNames}
                     cypress="FacultyDoctoralProgressTable"
                   />

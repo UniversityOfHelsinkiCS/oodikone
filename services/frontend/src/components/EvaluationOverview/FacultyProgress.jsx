@@ -44,7 +44,6 @@ export const FacultyProgress = ({ faculty, progressStats, getDivider }) => {
               ]),
               faculty
             ).map(listObj => listObj[0])}
-            progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
             programmeNames={progressStats?.data.programmeNames}
             cypress="FacultyBachelorsProgressTable"
             progressTitles={progressStats?.data.yearlyBachelorTitles}
@@ -80,11 +79,9 @@ export const FacultyProgress = ({ faculty, progressStats, getDivider }) => {
               ]),
               faculty
             ).map(listObj => listObj[0])}
-            progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
             programmeNames={progressStats?.data.programmeNames}
             cypress="FacultyBachelorMasterProgressTable"
             progressTitles={progressStats?.data.yearlyBcMsTitles}
-            needsExtra={faculty === 'H60' ? 'NO EXTRA' : 'EXTRA HEIGHT'}
           />
         </div>
       </div>
@@ -114,11 +111,9 @@ export const FacultyProgress = ({ faculty, progressStats, getDivider }) => {
                   ]),
                   faculty
                 ).map(listObj => listObj[0])}
-                progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
                 programmeNames={progressStats?.data.programmeNames}
                 cypress="FacultyMastersProgressTable"
                 progressTitles={progressStats?.data.yearlyMasterTitles}
-                needsExtra={faculty === 'H60' ? 'NO EXTRA' : 'EXTRA HEIGHT'}
               />
             </div>
           </div>
@@ -150,11 +145,9 @@ export const FacultyProgress = ({ faculty, progressStats, getDivider }) => {
                   ]),
                   faculty
                 ).map(listObj => listObj[0])}
-                progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
                 programmeNames={progressStats?.data.programmeNames}
                 cypress="FacultyLicentiateProgressTable"
                 progressTitles={progressStats?.data.yearlyLicentiateTitles}
-                needsExtra="EXTRA HEIGHT"
               />
             </div>
           </div>
@@ -184,7 +177,6 @@ export const FacultyProgress = ({ faculty, progressStats, getDivider }) => {
               ]),
               faculty
             ).map(listObj => listObj[0])}
-            progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
             programmeNames={progressStats?.data.programmeNames}
             cypress="FacultyDoctoralProgressTable"
           />
