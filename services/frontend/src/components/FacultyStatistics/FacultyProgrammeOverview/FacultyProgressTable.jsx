@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Table } from 'semantic-ui-react'
 import { ProgrammeProgressChart } from './ProgrammeProgressChart'
-import { BasicRow } from '../InteractiveDataView/BasicRow'
+import { ExpandableRow } from '../InteractiveDataView/ExpandableRow'
 
 export const FacultyProgressTable = ({
   data,
@@ -38,7 +38,7 @@ export const FacultyProgressTable = ({
           {data?.map((yearArray, yearIndex) => (
             <React.Fragment key={`random-fragment-key-${Math.random()}`}>
               {yearIndex < lenOfYearArray ? (
-                <BasicRow
+                <ExpandableRow
                   icon={visible[yearIndex] ? 'angle down' : 'angle right'}
                   yearArray={yearArray}
                   cypress={visible[yearIndex] ? `Hide-${cypress}` : `Show-${cypress}`}
