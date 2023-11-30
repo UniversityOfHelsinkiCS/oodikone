@@ -109,8 +109,6 @@ describe('Population Statistics tests', () => {
       // only spring
       cy.cs('toggle-fall').click()
       cy.contains('Fetch class').click()
-      // eslint-disable-next-line cypress/no-unnecessary-waiting
-      cy.wait(10000)
       cy.contains('Students (0)')
       // only fall
       cy.get('[data-cy=advanced-toggle]').click()
