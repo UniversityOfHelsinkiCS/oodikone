@@ -68,6 +68,7 @@ export const PassRateSettings = ({ value, onChange }) => {
     <Menu secondary style={{ marginBottom: 0 }}>
       {Object.entries(viewModeNames).map(([key, name]) => (
         <Menu.Item
+          key={key}
           active={viewMode === key}
           name={name}
           onClick={() =>

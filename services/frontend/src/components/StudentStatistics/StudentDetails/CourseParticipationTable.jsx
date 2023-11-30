@@ -54,12 +54,13 @@ export const CourseParticipationTable = ({ student, clearCourseStats, studyright
             ? `${getTextInWithOpen(course.name, language, isOpenCourse)} [Study Module]`
             : getTextInWithOpen(course.name, language, isOpenCourse)
         } ${credittypecode === 7 ? ` (${course.code}) (korotettu)` : `(${course.code})`}`,
-        <div>
+        <div key={`${course.code}-${new Date(date).getTime()}-grade-${grade}`}>
           {icon}
           {grade}
         </div>,
         credits,
         <Item
+          key={`${course.code}-${new Date(date).getTime()}-link-${grade}`}
           as={Link}
           to={`/coursestatistics?courseCodes=["${course.code}"]&separate=false&unifyOpenUniCourses=false`}
         >
@@ -75,12 +76,13 @@ export const CourseParticipationTable = ({ student, clearCourseStats, studyright
             ? `${getTextInWithOpen(course.name, language, isOpenCourse)} [Study Module]`
             : getTextInWithOpen(course.name, language, isOpenCourse)
         } ${credittypecode === 7 ? `, ${course.code} (korotettu)` : `(${course.code})`}`,
-        <div>
+        <div key={`${course.code}-${new Date(date).getTime()}-grade-${grade}`}>
           {icon}
           {grade}
         </div>,
         credits,
         <Item
+          key={`${course.code}-${new Date(date).getTime()}-link-${grade}`}
           as={Link}
           to={`/coursestatistics?courseCodes=["${course.code}"]&separate=false&unifyOpenUniCourses=false`}
         >

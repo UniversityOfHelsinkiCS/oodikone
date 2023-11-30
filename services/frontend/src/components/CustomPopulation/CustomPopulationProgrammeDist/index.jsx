@@ -55,6 +55,7 @@ export const CustomPopulationProgrammeDist = ({ students, studentToTargetCourseD
       code,
       programmeStudents.length,
       <Progress
+        key={code}
         value={programmeStudents.length}
         total={students.length}
         progress="percent"

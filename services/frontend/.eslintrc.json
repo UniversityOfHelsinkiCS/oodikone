@@ -30,6 +30,7 @@
     "react/prefer-stateless-function": "error",
     "react/no-unstable-nested-components": "off",
     "react/jsx-no-constructed-context-values": "off",
+    "react/jsx-key": "error",
     "import/no-default-export": "error",
     "import/prefer-default-export": "off",
     "import/no-unused-modules": ["error", { "missingExports": true, "unusedExports": true }],
@@ -39,12 +40,7 @@
     "react-hooks/rules-of-hooks": "error",
     "prettier/prettier": "error",
     "no-console": "error",
-    "no-param-reassign": [
-      "error",
-      {
-        "props": false
-      }
-    ]
+    "no-param-reassign": ["error", { "props": false }]
   },
   "plugins": ["react", "@babel", "react-hooks"],
   "settings": {
