@@ -5,7 +5,7 @@ const roundValue = value => {
   return Number.isInteger(value) ? value : value.toFixed(1)
 }
 
-export const BasicRow = ({ icon, yearArray, cypress, yearIndex, toggleVisibility, styles }) => {
+export const ExpandableRow = ({ icon, yearArray, cypress, yearIndex, toggleVisibility, styles }) => {
   return (
     <Table.Row style={styles} key={`Basic-row-${cypress}-${yearIndex}`}>
       {yearArray?.map((value, idx) => (

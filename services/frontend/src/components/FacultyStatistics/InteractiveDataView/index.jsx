@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Table, Menu, Popup, Icon } from 'semantic-ui-react'
 import { CollapsedStackedBar } from './CollapsedStackedBar'
-import { BasicRow } from './BasicRow'
+import { ExpandableRow } from './ExpandableRow'
 
 export const InteractiveDataTable = ({
   cypress,
@@ -139,7 +139,7 @@ export const InteractiveDataTable = ({
         <Table.Body>
           {dataStats?.map((yearArray, yearIndex) => (
             <React.Fragment key={`random-fragment-key-${Math.random()}`}>
-              <BasicRow
+              <ExpandableRow
                 icon={visible[yearIndex] ? 'angle down' : 'angle right'}
                 yearArray={yearArray}
                 cypress={visible[yearIndex] ? `Hide-${cypress}` : `Show-${cypress}`}
