@@ -37,7 +37,7 @@ export const ProtectedRoute = ({ requiredRoles = [], requireUserHasRights = fals
       return iamGroups.includes('grp-kielikeskus-esihenkilot')
     }
     if (rest.path.includes('evaluationoverview')) {
-      return roles.includes('katselmusViewer')
+      return roles?.length > 0 || rights?.length > 0
     }
     return hasRequiredRoles && hasRequiredRights
   }
