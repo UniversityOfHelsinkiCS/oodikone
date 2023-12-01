@@ -8,9 +8,10 @@ import boostcanvas from 'highcharts/modules/boost-canvas'
 import _ from 'lodash'
 import boost from 'highcharts/modules/boost'
 import ReactHighstock from 'react-highcharts/ReactHighstock'
+
 import './creditAccumulationGraphHC.css'
-import { CreditGraphTooltip } from '../CreditGraphTooltip'
-import { reformatDate, getStudyRightElementTargetDates } from '../../common'
+import { reformatDate, getStudyRightElementTargetDates } from 'common'
+import { CreditGraphTooltip } from './CreditGraphTooltip'
 import { useLanguage } from '../LanguagePicker/useLanguage'
 import { DISPLAY_DATE_FORMAT, API_DATE_FORMAT } from '../../constants'
 

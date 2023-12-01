@@ -1,7 +1,8 @@
 :root {
-  --flex-default: {
-    display: flex;
-    align-items: center;
+  --flex-default: {;
+
+    display: flex;;
+    align-items: center;;
     justify-content: space-around;
   }
 }

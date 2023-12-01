@@ -1,5 +1,7 @@
 import React from 'react'
 import { Menu, Radio } from 'semantic-ui-react'
+import ReactHighcharts from 'react-highcharts'
+
 import { HelpButton } from '../HelpButton'
 import { gradeGraphOptions } from '../../../../constants'
 import {
@@ -10,7 +12,6 @@ import {
   isThesisSeries,
   absoluteToRelative,
 } from './util'
-import { StackedBarChart } from '../../../StackedBarChart'
 
 const getGradeSeries = series => {
   const isGradeSeries = !isThesisSeries(series)
@@ -103,9 +104,11 @@ export const Distribution = ({ data, settings: { isRelative }, userHasAccessToAl
 
   return (
     <div>
-      <StackedBarChart
-        options={primaryDistributionOptions}
-        series={isRelative ? gradeGraphSeries.relative : gradeGraphSeries.absolute}
+      <ReactHighcharts
+        config={{
+          ...primaryDistributionOptions,
+          series: isRelative ? gradeGraphSeries.relative : gradeGraphSeries.absolute,
+        }}
       />
       {!userHasAccessToAllStats && (
         <span className="totalsDisclaimer">* Years with 5 students or less are shown as 0 in the chart</span>

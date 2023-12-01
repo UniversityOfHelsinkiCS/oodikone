@@ -1,7 +1,7 @@
 import React from 'react'
 import { Menu, Radio } from 'semantic-ui-react'
+import ReactHighcharts from 'react-highcharts'
 
-import { StackedBarChart } from '../../../StackedBarChart'
 import { passRateAttemptGraphOptions, passRateStudGraphOptions } from '../../../../constants'
 import { HelpButton } from '../HelpButton'
 import { viewModeNames, getDataObject, getMaxValueOfSeries, absoluteToRelative } from './util'
@@ -111,9 +111,8 @@ export const PassRate = ({ data, settings: { viewMode, isRelative }, userHasAcce
 
   return (
     <div>
-      <StackedBarChart
-        options={primaryGraphOptions}
-        series={isRelative ? passGraphSerie.relative : passGraphSerie.absolute}
+      <ReactHighcharts
+        config={{ ...primaryGraphOptions, series: isRelative ? passGraphSerie.relative : passGraphSerie.absolute }}
       />
       {!userHasAccessToAllStats && (
         <span className="totalsDisclaimer">* Years with 5 students or less are shown as 0 in the chart</span>
