@@ -6,13 +6,13 @@ import { useGetAuthorizedUserQuery } from 'redux/auth'
 import qs from 'query-string'
 
 import { clearCourseStats, getCourseStats } from 'redux/coursestats'
+import { checkUserAccess } from 'common'
+import { useProgress, useTitle } from 'common/hooks'
 import { SearchForm } from './SearchForm'
 import { SingleCourseTab } from './SingleCourseTab'
 import { FacultyLevelStatistics } from './FacultyLevelStatistics'
 import { ConnectedSummaryTab as SummaryTab } from './SummaryTab'
 import { ProgressBar } from '../ProgressBar'
-import { useProgress, useTitle } from '../../common/hooks'
-import { checkUserAccess } from '../../common'
 import { userHasAccessToAllCourseStats } from './courseStatisticsUtils'
 import './courseStatistics.css'
 
@@ -77,7 +77,11 @@ export const CourseStatistics = () => {
       {
         menuItem: MENU.COURSE,
         render: () => (
-          <SingleCourseTab selected={selected || initCourseCode} userHasAccessToAllStats={userHasAccessToAllStats} />
+          <SingleCourseTab
+            selected={selected}
+            setSelected={setSelected}
+            userHasAccessToAllStats={userHasAccessToAllStats}
+          />
         ),
       },
     ]
