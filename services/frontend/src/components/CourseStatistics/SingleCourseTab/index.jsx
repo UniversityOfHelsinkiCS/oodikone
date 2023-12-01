@@ -1,61 +1,48 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { useSelector } from 'react-redux'
 import { Segment, Label, Header, Divider, Form } from 'semantic-ui-react'
 import { oneOfType, number, string, bool } from 'prop-types'
-import { ConnectedSingleCourseStats as SingleCourseStats } from '../SingleCourseStats'
-import { useLanguage } from '../../LanguagePicker/useLanguage'
-import { getCourseStats, getAvailableStats, getCourses } from '../../../selectors/courseStats'
 
-export const SingleCourseTab = ({ selected, userHasAccessToAllStats }) => {
-  const [selection, setSelection] = useState(selected)
+import { getCourseStats, getAvailableStats, getCourses } from 'selectors/courseStats'
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
+import { ConnectedSingleCourseStats as SingleCourseStats } from '../SingleCourseStats'
+
+const CourseSelector = ({ courses, selected, setSelected }) => (
+  <>
+    <Header as="h4">Select course</Header>
+    <Form>
+      <Form.Select fluid options={courses} onChange={(e, { value }) => setSelected(value)} value={selected} />
+    </Form>
+    <Divider />
+  </>
+)
+
+export const SingleCourseTab = ({ selected, setSelected, userHasAccessToAllStats }) => {
   const { getTextIn } = useLanguage()
   const stats = useSelector(getCourseStats)
   const availableStats = useSelector(getAvailableStats)
   const courses = useSelector(getCourses).map(({ code, name }) => ({
     key: code,
     value: code,
-    text: <Header content={name} />,
-    content: name,
+    text: `${getTextIn(name)} (${code})`,
   }))
 
-  useEffect(() => {
-    setSelection(selected)
-  }, [selected])
-
-  if (!stats[selection]) return null
+  if (!stats[selected]) return null
 
   return (
     <div>
       <Segment>
-        <Form>
-          {courses ? (
-            courses.text
-          ) : (
-            <Form.Dropdown
-              name="selected"
-              options={courses}
-              onChange={(e, { value }) => setSelection(value)}
-              value={selection || courses.value}
-              selectOnBlur={false}
-              selectOnNavigation={false}
-            />
-          )}
-          <Divider />
-          <Label.Group>
-            <Label
-              key={stats[selection].coursecode}
-              content={`${stats[selection].alternatives.map(code => ` ${code}`)} ${getTextIn(stats[selection].name)} `}
-            />
-          </Label.Group>
-        </Form>
-      </Segment>
-      {selection && (
-        <SingleCourseStats
-          stats={stats[selection]}
-          userHasAccessToAllStats={userHasAccessToAllStats}
-          availableStats={availableStats[selected]}
+        {courses.length > 1 && <CourseSelector courses={courses} selected={selected} setSelected={setSelected} />}
+        <Label
+          key={stats[selected].coursecode}
+          content={`${stats[selected].alternatives.map(code => ` ${code}`)} ${getTextIn(stats[selected].name)} `}
         />
-      )}
+      </Segment>
+      <SingleCourseStats
+        stats={stats[selected]}
+        userHasAccessToAllStats={userHasAccessToAllStats}
+        availableStats={availableStats[selected]}
+      />
     </div>
   )
 }
