@@ -114,7 +114,7 @@ export const FacultyLevelStatistics = () => {
     <CourseTable
       course={course[openOrReqular]}
       courseInstance={courseInstance}
-      key={course.coursecode}
+      key={course.unifyStats.coursecode}
       selectedYear={selectedYear}
     />
   ))
