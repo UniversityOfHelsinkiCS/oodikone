@@ -1,4 +1,4 @@
-const { indexOf } = require('lodash')
+const { indexOf, inRange } = require('lodash')
 const moment = require('moment')
 const { getAcademicYearDates } = require('../../util/semester')
 const { getCreditThresholds, getYearsArray } = require('../studyprogrammeHelpers')
@@ -17,44 +17,39 @@ const getStudentData = (
 ) => {
   let data = {}
   let programmeData = {}
-  const creditCounts = []
+  const creditCounts = students.map(({ credits }) =>
+    credits
+      .filter(credit => moment(credit.attainment_date).isSameOrAfter(startDate))
+      .reduce((total, credit) => total + credit.credits, 0)
+  )
   thresholdKeys.forEach(t => (data[t] = 0))
   limitKeys.forEach(t => (programmeData[t] = 0))
-  students.forEach(({ credits }) => {
-    const creditcount = credits
-      .filter(credit => moment(credit.attainment_date).isSameOrAfter(startDate))
-      .reduce((prev, curr) => prev + curr.credits, 0)
-    creditCounts.push(creditcount)
-    // Data is only used for doctoral programmes, otherwise only programmeData is needed
-    if (prog === 'T') {
-      data[thresholdKeys[0]] += creditcount < thresholdAmounts[0] ? 1 : 0
-      data[thresholdKeys[1]] += creditcount >= thresholdAmounts[0] && creditcount < thresholdAmounts[1] ? 1 : 0
-      data[thresholdKeys[2]] += creditcount >= thresholdAmounts[1] && creditcount < thresholdAmounts[2] ? 1 : 0
-      data[thresholdKeys[3]] += creditcount >= thresholdAmounts[2] && creditcount < thresholdAmounts[3] ? 1 : 0
-      if (thresholdKeys.length === 8) {
-        data[thresholdKeys[4]] += creditcount >= thresholdAmounts[3] && creditcount < thresholdAmounts[4] ? 1 : 0
-        data[thresholdKeys[5]] += creditcount >= thresholdAmounts[4] && creditcount < thresholdAmounts[5] ? 1 : 0
-        data[thresholdKeys[6]] += creditcount >= thresholdAmounts[5] && creditcount < thresholdAmounts[6] ? 1 : 0
-        data[thresholdKeys[7]] += creditcount >= thresholdAmounts[6] ? 1 : 0
-      } else if (thresholdKeys.length === 7) {
-        data[thresholdKeys[4]] += creditcount >= thresholdAmounts[3] && creditcount < thresholdAmounts[4] ? 1 : 0
-        data[thresholdKeys[5]] += creditcount >= thresholdAmounts[4] && creditcount < thresholdAmounts[5] ? 1 : 0
-        data[thresholdKeys[6]] += creditcount >= thresholdAmounts[5] ? 1 : 0
-      } else if (thresholdKeys.length === 6) {
-        data[thresholdKeys[4]] += creditcount >= thresholdAmounts[3] && creditcount < thresholdAmounts[4] ? 1 : 0
-        data[thresholdKeys[5]] += creditcount >= thresholdAmounts[4] ? 1 : 0
-      } else {
-        data[thresholdKeys[4]] += creditcount >= thresholdAmounts[3] ? 1 : 0
-      }
-    } else {
-      programmeData[limitKeys[0]] += creditcount <= limits[5][0] ? 1 : 0
-      programmeData[limitKeys[1]] += limits[4][0] <= creditcount && limits[4][1] > creditcount ? 1 : 0
-      programmeData[limitKeys[2]] += limits[3][0] <= creditcount && limits[3][1] > creditcount ? 1 : 0
-      programmeData[limitKeys[3]] += limits[2][0] <= creditcount && limits[2][1] > creditcount ? 1 : 0
-      programmeData[limitKeys[4]] += limits[1][0] <= creditcount && limits[1][1] > creditcount ? 1 : 0
-      programmeData[limitKeys[5]] += creditcount >= limits[0][0] ? 1 : 0
-    }
-  })
+
+  // Data is only used for doctoral programmes, otherwise only programmeData is needed
+  if (prog === 'T') {
+    creditCounts.forEach(creditCount => {
+      thresholdKeys.some((thresholdKey, index) => {
+        if (
+          (index === 0 && creditCount < thresholdAmounts[0]) ||
+          (index === thresholdKeys.length - 1 && creditCount >= thresholdAmounts[index - 1]) ||
+          (index > 0 && inRange(creditCount, thresholdAmounts[index - 1], thresholdAmounts[index]))
+        ) {
+          data[thresholdKey] += 1
+          return true
+        }
+        return false
+      })
+    })
+  } else {
+    creditCounts.forEach(creditCount => {
+      programmeData[limitKeys[0]] += creditCount <= limits[5][0] ? 1 : 0
+      programmeData[limitKeys[1]] += inRange(creditCount, limits[4][0], limits[4][1]) ? 1 : 0
+      programmeData[limitKeys[2]] += inRange(creditCount, limits[3][0], limits[3][1]) ? 1 : 0
+      programmeData[limitKeys[3]] += inRange(creditCount, limits[2][0], limits[2][1]) ? 1 : 0
+      programmeData[limitKeys[4]] += inRange(creditCount, limits[1][0], limits[1][1]) ? 1 : 0
+      programmeData[limitKeys[5]] += creditCount >= limits[0][0] ? 1 : 0
+    })
+  }
 
   return { data, progData: programmeData, creditCounts }
 }
