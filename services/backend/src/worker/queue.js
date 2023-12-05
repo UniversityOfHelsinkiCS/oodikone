@@ -19,11 +19,19 @@ queue.on('waiting', job => {
 const worker = new Worker('refresh-redis-data', `${__dirname}/processor.js`, {
   connection,
   useWorkerThreads: true,
-  concurrency: 3,
 })
 
-worker.on('completed', job => {
+queue.on('completed', job => {
   logger.info(`Completed job: ${job.id}`)
+  console.log(JSON.stringify(job, null, 2))
+})
+
+queue.on('stalled', job => {
+  logger.info(`Stalled job: ${job.id}`)
+})
+
+worker.on('active', job => {
+  logger.info(`Started job: ${job.id}`)
 })
 
 // If there is no error event listener, the worker stops taking jobs after any error.
@@ -32,13 +40,19 @@ worker.on('error', err => {
   logger.error(err)
 })
 
-const addJob = type => {
-  queue.add(type, null, {
-    jobId: type,
-    removeOnComplete: true,
-    removeOnFail: true,
-    keepJobs: 0,
-  })
+const addJob = (type, code) => {
+  // job name (first arg) makes the job unique, and we want unique based on faculty/programme code
+  const name = code ? `${type}-${code}` : type
+  queue.add(
+    name,
+    { code },
+    {
+      jobId: name,
+      removeOnComplete: true,
+      removeOnFail: true,
+      keepJobs: 0,
+    }
+  )
 }
 
 const getJobs = async type => {
@@ -48,9 +62,9 @@ const getJobs = async type => {
 
 const jobMaker = {
   statistics: () => addJob('statistics'),
-  faculties: () => addJob('faculties'),
+  faculties: code => addJob(`faculties`, code),
   trends: () => addJob('trends'),
-  overviews: () => addJob('overviews'),
+  overviews: code => addJob(`overviews`, code),
   languagecenter: () => addJob('languagecenter'),
 }
 

@@ -27,11 +27,10 @@ const refreshFaculties = async () => {
   logger.info('Refreshing faculty overview statistics for all faculties')
   const facultyList = (await faculties()).filter(f => !['Y', 'H99', 'Y01', 'H92', 'H930'].includes(f.code))
   let ready = 0
-
+  await updateFaculty('H80')
   for (const faculty of facultyList) {
     try {
-      await updateFacultyOverview(faculty.code, 'ALL')
-      await updateFacultyProgressOverview(faculty.code)
+      await updateFaculty(faculty.code)
       ready += 1
     } catch (e) {
       logger.error({ message: `Failed to update stats for faculty ${faculty?.code} with type ALL`, meta: `${e}` })
@@ -39,6 +38,19 @@ const refreshFaculties = async () => {
     logger.info(`${ready}/${facultyList.length} faculties done; faculty ${faculty?.code}`)
   }
   logger.info('Faculty stats refreshed!')
+}
+
+const updateFaculty = async code => {
+  logger.info('Started updating faculty')
+  const start = new Date().getTime()
+  try {
+    await updateFacultyOverview(code, 'ALL')
+    await updateFacultyProgressOverview(code)
+    const time = new Date().getTime() - start
+    logger.info(`Updated faculty ${code} (took ${(time / 1000 / 60).toFixed(2)} minutes)`)
+  } catch (e) {
+    logger.error({ message: `Failed to update stats for faculty ${code} with type ALL`, meta: `${e}` })
+  }
 }
 
 const refreshNewOverviews = async () => {
@@ -167,6 +179,7 @@ module.exports = {
   refreshStatistics,
   refreshTrends,
   refreshFaculties,
+  updateFaculty,
   refreshNewOverviews,
   refreshLanguageCenterData,
 }

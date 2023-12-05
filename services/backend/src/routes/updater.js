@@ -69,7 +69,7 @@ router.post('/refresh_study_programmes_v2', async (req, res) => {
 
 router.post('/refresh_faculties_v2', async (req, res) => {
   logger.info(`${req.user.userId} requested refresh of faculties`)
-  jobMaker.faculties()
+  jobMaker.faculties("H74")
   res.status(200).json('Added job for refreshing faculties')
 })
 
