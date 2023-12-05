@@ -54,6 +54,7 @@ const handleMessage = messageHandler => async msg => {
       await redisSet(REDIS_LATEST_MESSAGE_RECEIVED, new Date())
     } catch (e) {
       logger.error({ message: 'Failed acking message', meta: e.stack })
+      if (e.name === 'NatsError' && !process.env.CI) process.exit(1)
     }
   }
 }
