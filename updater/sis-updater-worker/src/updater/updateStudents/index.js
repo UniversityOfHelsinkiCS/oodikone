@@ -52,7 +52,8 @@ const studyplansRedo = async (personIds, personIdToStudentNumber, secondTime) =>
     const [personId, studentnumber] = cur
     obj[studentnumber] = personId
     return obj
-  })
+  }, {})
+
   const studentNumbers = students.map(s => s.studentnumber)
   if (!studentNumbers.length) {
     return
