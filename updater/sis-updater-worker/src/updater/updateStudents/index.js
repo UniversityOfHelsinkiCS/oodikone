@@ -43,7 +43,7 @@ const studyplansRedo = async (personIds, personIdToStudentNumber, iteration = 0)
   yesterday.setDate(yesterday.getDate() - 1)
   const students = await Studyplan.findAll({
     where: {
-      // updatedAt: { [Op.lt]: yesterday },
+      updatedAt: { [Op.lt]: yesterday },
       studentnumber: { [Op.in]: personIds.map(id => personIdToStudentNumber[id]) },
     },
     attributes: ['studentnumber'],
@@ -59,7 +59,7 @@ const studyplansRedo = async (personIds, personIdToStudentNumber, iteration = 0)
   if (!studentNumbers.length) {
     return
   }
-  // const studentIds = await dbConnections.knex.select('id').from('persons').whereIn('student_number', studentNumbers)
+
   logger.info(
     `Updating ${studentNumbers.length} students again due to studyplans not updating. Iteration: ${iteration}`
   )
