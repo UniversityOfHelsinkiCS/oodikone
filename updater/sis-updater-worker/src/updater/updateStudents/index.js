@@ -37,12 +37,13 @@ const { getAttainmentsToBeExcluded } = require('./excludedPartialAttainments')
 const { logger } = require('../../utils/logger')
 
 // When updating students, studyplans sometimes are not updated. Check which aren't updated and redo the students
-const studyplansRedo = async (personIds, personIdToStudentNumber, secondTime) => {
+const studyplansRedo = async (personIds, personIdToStudentNumber, iteration = 0) => {
+  if (iteration > 1) return
   const yesterday = new Date()
   yesterday.setDate(yesterday.getDate() - 1)
   const students = await Studyplan.findAll({
     where: {
-      updatedAt: { [Op.lt]: yesterday },
+      // updatedAt: { [Op.lt]: yesterday },
       studentnumber: { [Op.in]: personIds.map(id => personIdToStudentNumber[id]) },
     },
     attributes: ['studentnumber'],
@@ -60,11 +61,12 @@ const studyplansRedo = async (personIds, personIdToStudentNumber, secondTime) =>
   }
   // const studentIds = await dbConnections.knex.select('id').from('persons').whereIn('student_number', studentNumbers)
   logger.info(
-    `Updating ${studentNumbers.length} students again due to studyplans not updating.${
-      secondTime ? 'Second time!' : ''
-    }`
+    `Updating ${studentNumbers.length} students again due to studyplans not updating. Iteration: ${iteration}`
   )
-  await updateStudents(studentNumbers.map(num => studentNumberToPersonId[num]))
+  await updateStudents(
+    studentNumbers.map(num => studentNumberToPersonId[num]),
+    iteration + 1
+  )
 }
 
 // Accepted selection path is not available when degree programme doesn't have
@@ -194,7 +196,7 @@ const parseTransfers = async (groupedStudyRightSnapshots, moduleGroupIdToCode, p
   return transfers
 }
 
-const updateStudents = async personIds => {
+const updateStudents = async (personIds, iteration = 0) => {
   await loadMapsIfNeeded()
 
   const [
@@ -264,8 +266,7 @@ const updateStudents = async personIds => {
 
   // Studyplans do not always update. These launch updateStudents again for those
   // whose studyplans weren't updated. Twice to see if it sometimes misses
-  await studyplansRedo(personIds, personIdToStudentNumber)
-  await studyplansRedo(personIds, personIdToStudentNumber, true)
+  await studyplansRedo(personIds, personIdToStudentNumber, iteration)
 }
 
 const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumber, groupedStudyRightSnapshots) => {
