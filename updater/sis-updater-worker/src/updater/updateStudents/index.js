@@ -34,6 +34,37 @@ const { dbConnections } = require('../../db/connection')
 const { isBaMa } = require('../../utils')
 const { updateStudyRights, updateStudyRightElements, updateElementDetails } = require('./studyRightUpdaters')
 const { getAttainmentsToBeExcluded } = require('./excludedPartialAttainments')
+const { logger } = require('../../utils/logger')
+
+// When updating students, studyplans sometimes are not updated. Check which aren't updated and redo the students
+const studyplansRedo = async (personIds, personIdToStudentNumber, secondTime) => {
+  const yesterday = new Date()
+  yesterday.setDate(yesterday.getDate() - 1)
+  const students = await Studyplan.findAll({
+    where: {
+      updatedAt: { [Op.lt]: yesterday },
+      studentnumber: { [Op.in]: personIds.map(id => personIdToStudentNumber[id]) },
+    },
+    attributes: ['studentnumber'],
+    distinct: true,
+  })
+  const studentNumberToPersonId = Object.entries(personIdToStudentNumber).reduce((obj, cur) => {
+    const [personId, studentnumber] = cur
+    obj[studentnumber] = personId
+    return obj
+  })
+  const studentNumbers = students.map(s => s.studentnumber)
+  if (!studentNumbers.length) {
+    return
+  }
+  // const studentIds = await dbConnections.knex.select('id').from('persons').whereIn('student_number', studentNumbers)
+  logger.info(
+    `Updating ${studentNumbers.length} students again due to studyplans not updating.${
+      secondTime ? 'Second time!' : ''
+    }`
+  )
+  await updateStudents(studentNumbers.map(num => studentNumberToPersonId[num]))
+}
 
 // Accepted selection path is not available when degree programme doesn't have
 // studytrack or major subject. This is a known bug on SIS and has been reported
@@ -229,6 +260,11 @@ const updateStudents = async personIds => {
     updateStudyplans(studyplans, personIds, personIdToStudentNumber, groupedStudyRightSnapshots),
     bulkCreate(Transfer, mappedTransfers, null, ['studyrightid']),
   ])
+
+  // Studyplans do not always update. These launch updateStudents again for those
+  // whose studyplans weren't updated. Twice to see if it sometimes misses
+  await studyplansRedo(personIds, personIdToStudentNumber)
+  await studyplansRedo(personIds, personIdToStudentNumber, true)
 }
 
 const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumber, groupedStudyRightSnapshots) => {
