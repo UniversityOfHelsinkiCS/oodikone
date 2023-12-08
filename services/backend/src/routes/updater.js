@@ -1,4 +1,5 @@
 const router = require('express').Router()
+const { refreshFaculties, refreshProgrammes } = require('../events')
 const {
   updateSISMetadata,
   updateSISStudents,
@@ -63,13 +64,13 @@ router.post('/refresh_statistic_v2', async (req, res) => {
 
 router.post('/refresh_study_programmes_v2', async (req, res) => {
   logger.info(`${req.user.userId} requested refresh of study programmes`)
-  jobMaker.overviews()
+  refreshProgrammes()
   res.status(200).json('Added job for refreshing study programme overviews')
 })
 
 router.post('/refresh_faculties_v2', async (req, res) => {
   logger.info(`${req.user.userId} requested refresh of faculties`)
-  jobMaker.faculties()
+  refreshFaculties()
   res.status(200).json('Added job for refreshing faculties')
 })
 

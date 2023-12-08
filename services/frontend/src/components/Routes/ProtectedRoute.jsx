@@ -39,6 +39,7 @@ export const ProtectedRoute = ({ requiredRoles = [], requireUserHasRights = fals
     if (rest.path.includes('evaluationoverview')) {
       return roles?.length > 0 || rights?.length > 0
     }
+
     return hasRequiredRoles && hasRequiredRights
   }
 

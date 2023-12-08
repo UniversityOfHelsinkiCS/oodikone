@@ -5,6 +5,7 @@ const routes = require('./routes')
 const { startCron } = require('./events')
 const { initializeDatabaseConnection, dbConnections } = require('./database/connection')
 const logger = require('./util/logger')
+require('./worker/worker')
 
 initializeDatabaseConnection()
   .then(() => {
