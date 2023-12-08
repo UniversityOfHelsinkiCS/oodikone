@@ -24,24 +24,27 @@ const refreshStudyrightAssociations = async () => {
 }
 
 const refreshFaculties = async () => {
-  logger.info('Refreshing faculty overview statistics for all faculties')
+  logger.info('Adding jobs to refresh all faculties')
   const facultyList = (await faculties()).filter(f => !['Y', 'H99', 'Y01', 'H92', 'H930'].includes(f.code))
-  let ready = 0
-
   for (const faculty of facultyList) {
-    try {
-      await updateFacultyOverview(faculty.code, 'ALL')
-      await updateFacultyProgressOverview(faculty.code)
-      ready += 1
-    } catch (e) {
-      logger.error({ message: `Failed to update stats for faculty ${faculty?.code} with type ALL`, meta: `${e}` })
-    }
-    logger.info(`${ready}/${facultyList.length} faculties done; faculty ${faculty?.code}`)
+    jobMaker.faculty(faculty.code)
   }
-  logger.info('Faculty stats refreshed!')
 }
 
-const refreshNewOverviews = async () => {
+const refreshFaculty = async code => {
+  logger.info('Started updating faculty')
+  const start = new Date().getTime()
+  try {
+    await updateFacultyOverview(code, 'ALL')
+    await updateFacultyProgressOverview(code)
+    const time = new Date().getTime() - start
+    logger.info(`Updated faculty ${code} (took ${(time / 1000 / 60).toFixed(2)} minutes)`)
+  } catch (e) {
+    logger.error({ message: `Failed to update stats for faculty ${code} with type ALL`, meta: `${e}` })
+  }
+}
+
+const refreshProgrammes = async () => {
   logger.info('Refreshing studyprogramme and studytrack overview statistics for all programmes')
   // Filters out old programmes and special ones like Fitech studies. Filters also out the programmes starting with
   // 2_ or ending with _2. Those programmes are mapped to correct programme (studentProgrammeModuleFixer.js)
@@ -53,31 +56,23 @@ const refreshNewOverviews = async () => {
         (code.includes('MH') && !code.startsWith('2_MH') && !code.endsWith('_2')) ||
         /^(T)[0-9]{6}$/.test(code)
     )
-  const associations = await getAssociations()
-  let ready = 0
+
+  // Ensure that studyright associations are refreshed before launching jobs, otherwise each job will do it
+  await getAssociations()
   for (const code of codes) {
-    let combinedProgramme = ''
     // If combined programme is given, this updates only the bachelor programme
-    try {
-      await updateBasicView(code, combinedProgramme)
-      await updateStudytrackView(code, combinedProgramme, associations)
-      ready += 1
-    } catch (e) {
-      logger.error({ message: `Failed to update overview stats for programme ${code}`, meta: `${e}` })
-    }
-    combinedProgramme = combinedStudyprogrammes[code] || ''
-    // If bachelor programme is combined with master programme, then update the combination.
-    if (combinedProgramme) {
-      try {
-        await updateBasicView(code, combinedProgramme)
-        await updateStudytrackView(code, combinedProgramme, associations)
-      } catch (e) {
-        logger.error({ message: `Failed to update overview stats for combined programme ${code}`, meta: `${e}` })
-      }
-    }
-    logger.info(`${ready}/${codes.length} programmes done: code ${code}`)
+    jobMaker.programme(code)
   }
-  logger.info('Studyprogramme and studytrack overview stats refreshed!')
+}
+
+const refreshProgramme = async code => {
+  const associations = await getAssociations()
+  await updateBasicView(code, '')
+  await updateStudytrackView(code, '', associations)
+
+  let combinedProgramme = combinedStudyprogrammes[code] || ''
+  await updateBasicView(code, combinedProgramme)
+  await updateStudytrackView(code, combinedProgramme, associations)
 }
 
 const refreshTeacherLeaderboard = async () => {
@@ -167,6 +162,8 @@ module.exports = {
   refreshStatistics,
   refreshTrends,
   refreshFaculties,
-  refreshNewOverviews,
+  refreshFaculty,
+  refreshProgramme,
+  refreshProgrammes,
   refreshLanguageCenterData,
 }

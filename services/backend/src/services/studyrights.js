@@ -6,6 +6,7 @@ const moment = require('moment')
 const { redisClient } = require('../services/redis')
 const _ = require('lodash')
 const { Op, col, where, fn } = require('sequelize')
+const logger = require('../util/logger')
 const REDIS_KEY = 'STUDYRIGHT_ASSOCIATIONS_V2'
 
 const byStudent = studentNumber => {
@@ -188,6 +189,7 @@ const StudyRightType = {
 }
 
 const calculateAssociationsFromDb = async (chunksize = 100000) => {
+  logger.info('Refreshing studyright associations. This will take a while.')
   const transfers = await Transfer.findAll({
     attributes: ['studyrightid'],
   })
