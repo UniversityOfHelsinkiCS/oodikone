@@ -143,16 +143,20 @@ const refreshLanguageCenterData = async () => {
   logger.info('Language center data refreshed!')
 }
 
+const dailyJobs = () => {
+  refreshFaculties()
+  refreshProgrammes()
+  jobMaker.languagecenter()
+  jobMaker.trends()
+  jobMaker.statistics()
+}
+
 const startCron = () => {
   if (isProduction) {
     logger.info('Cronjob for refreshing stats started: runs at 1am saturday.')
-    // refresh on saturday only because was causing lag. Investigate & fix, then return to 3am daily
     schedule('0 1 * * *', async () => {
       logger.info('Running daily jobs from cron')
-      const jobTypes = Object.keys(jobMaker)
-      for (const type of jobTypes) {
-        jobMaker[type]()
-      }
+      dailyJobs()
     })
   }
 }
