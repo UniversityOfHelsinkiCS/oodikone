@@ -1,4 +1,4 @@
-const { sortBy, uniqBy, flatten, groupBy } = require('lodash')
+const { uniqBy, flatten, groupBy } = require('lodash')
 const { Organization, Course, CourseType, CourseProvider, CreditType, StudyrightExtent } = require('../db/models')
 const { selectFromByIdsOrderBy, bulkCreate } = require('../db')
 const { dbConnections } = require('../db/connection')
@@ -79,12 +79,30 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
       ),
     ]
 
-    // Take organisation for the newest course_unit of this groupid
-    const coursesSortedByStartDate = sortBy(courses, 'validity_period.startDate')
-    const { organisations } = coursesSortedByStartDate[coursesSortedByStartDate.length - 1]
+    const organisationsById = {}
+
+    for (const { organisations: courseUnitOrganisations, validity_period: courseUnitValidityPeriod } of courses) {
+      for (const { share, organisationId, roleUrn, validityPeriod = {} } of courseUnitOrganisations) {
+        const effectiveValidityPeriod = Object.keys(validityPeriod).length ? validityPeriod : courseUnitValidityPeriod
+        const shareObj = {
+          share,
+          ...(effectiveValidityPeriod.startDate && { startDate: effectiveValidityPeriod.startDate }),
+          ...(effectiveValidityPeriod.endDate && { endDate: effectiveValidityPeriod.endDate }),
+        }
+
+        if (!organisationsById[organisationId]) {
+          organisationsById[organisationId] = { organisationId, roleUrn, shares: [shareObj] }
+        } else {
+          organisationsById[organisationId].shares.push(shareObj)
+        }
+      }
+    }
+
+    const organisations = Object.values(organisationsById)
+
     const mapCourseProvider = courseProviderMapper(groupId)
     courseProviders.push(
-      ...(organisations || [])
+      ...organisations
         .filter(({ roleUrn }) => roleUrn === 'urn:code:organisation-role:responsible-organisation')
         .map(mapCourseProvider)
     )

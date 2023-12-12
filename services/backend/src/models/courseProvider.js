@@ -1,4 +1,4 @@
-const { Model, STRING, DATE } = require('sequelize')
+const { Model, STRING, DATE, JSONB } = require('sequelize')
 const { dbConnections } = require('../database/connection')
 
 class CourseProvider extends Model {}
@@ -17,6 +17,9 @@ CourseProvider.init(
       },
       onUpdate: 'cascade',
       onDelete: 'cascade',
+    },
+    shares: {
+      type: JSONB,
     },
     organizationcode: {
       type: STRING,
