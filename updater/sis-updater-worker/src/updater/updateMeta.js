@@ -82,6 +82,9 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
     const organisationsById = {}
 
     for (const { organisations: courseUnitOrganisations, validity_period: courseUnitValidityPeriod } of courses) {
+      if (!courseUnitOrganisations) {
+        continue
+      }
       for (const { share, organisationId, roleUrn, validityPeriod = {} } of courseUnitOrganisations) {
         const effectiveValidityPeriod = Object.keys(validityPeriod).length ? validityPeriod : courseUnitValidityPeriod
         const shareObj = {
