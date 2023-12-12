@@ -65,6 +65,13 @@ app.get('/v1/students', async (_, res) => {
   res.locals.msg('Scheduled students')
 })
 
+app.post('/v1/studyplans', async (req, res) => {
+  const studentnumbers = req.body.studentnumbers
+  logger.info(`Scheduled update of ${studentnumbers.length} students whose studyplan has not been updated recently`)
+  await scheduleByStudentNumbers(studentnumbers)
+  res.locals.msg('Shceduled studyplans update')
+})
+
 app.get('/v1/programmes', async (_, res) => {
   await scheduleProgrammes()
 

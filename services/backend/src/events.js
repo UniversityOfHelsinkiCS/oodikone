@@ -158,6 +158,10 @@ const startCron = () => {
       logger.info('Running daily jobs from cron')
       dailyJobs()
     })
+    schedule('0 19 * * 1', async () => {
+      logger.info('Updating students whose studyplans have not been updated recently')
+      jobMaker.studyplansUpdate(4)
+    })
   }
 }
 

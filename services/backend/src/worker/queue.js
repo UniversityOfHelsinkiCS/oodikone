@@ -8,17 +8,17 @@ const connection = {
 
 const queue = new Queue('refresh-redis-data', { connection })
 
-const addJob = (type, code) => {
+const addJob = (type, data, keep) => {
   // job name (first arg) makes the job unique, and we want unique based on faculty/programme code
-  const name = code ? `${type}-${code}` : type
+  const name = data.code ? `${type}-${data.code}` : type
   queue.add(
     name,
-    { code },
+    { data },
     {
       jobId: name,
       removeOnComplete: true,
       removeOnFail: true,
-      keepJobs: 0,
+      keepJobs: keep ?? 0,
     }
   )
 }
@@ -29,11 +29,12 @@ const getJobs = async type => {
 }
 
 const jobMaker = {
-  faculty: code => addJob('faculty', code),
-  programme: code => addJob('programme', code),
+  faculty: code => addJob('faculty', { code }),
+  programme: code => addJob('programme', { code }),
   statistics: () => addJob('statistics'),
   trends: () => addJob('trends'),
   languagecenter: () => addJob('languagecenter'),
+  studyplansUpdate: days => addJob('studyplansUpdate', { days }, 7200),
 }
 
 module.exports = { jobMaker, getJobs }
