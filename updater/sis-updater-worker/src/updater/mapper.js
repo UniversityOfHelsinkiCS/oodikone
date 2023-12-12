@@ -276,10 +276,11 @@ const semesterEnrollmentMapper =
 
 const courseProviderMapper =
   courseGroupId =>
-  ({ organisationId }) => ({
+  ({ organisationId, shares }) => ({
     composite: `${courseGroupId}-${organisationId}`,
     coursecode: courseGroupId,
     organizationcode: organisationId,
+    shares,
   })
 
 const timify = t => new Date(t).getTime()
