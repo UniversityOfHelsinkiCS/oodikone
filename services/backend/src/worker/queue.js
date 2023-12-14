@@ -13,7 +13,7 @@ const addJob = (type, data, keep) => {
   const name = data.code ? `${type}-${data.code}` : type
   queue.add(
     name,
-    { data },
+    { ...data },
     {
       jobId: name,
       removeOnComplete: true,
