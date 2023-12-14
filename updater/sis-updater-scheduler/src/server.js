@@ -11,6 +11,7 @@ const {
 } = require('./scheduler')
 const { SECRET_TOKEN, REDIS_LATEST_MESSAGE_RECEIVED } = require('./config')
 const { get: redisGet } = require('./utils/redis')
+const { sendToSlack } = require('./purge')
 
 const bakeMessage =
   res =>
@@ -67,7 +68,9 @@ app.get('/v1/students', async (_, res) => {
 
 app.post('/v1/studyplans', async (req, res) => {
   const studentnumbers = req.body.studentnumbers
-  logger.info(`Scheduled update of ${studentnumbers.length} students whose studyplan has not been updated recently`)
+  const msg = `Scheduling update of ${studentnumbers.length} students whose studyplan has not been updated recently`
+  logger.info(msg)
+  sendToSlack(msg)
   await scheduleByStudentNumbers(studentnumbers)
   res.locals.msg('Shceduled studyplans update')
 })
