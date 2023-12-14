@@ -157,4 +157,5 @@ const startPurge = async () => {
 module.exports = {
   startPrePurge,
   startPurge,
+  sendToSlack,
 }
