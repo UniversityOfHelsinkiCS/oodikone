@@ -448,28 +448,43 @@ const getStudyRights = async students =>
     })
   ).map(formatStudyright)
 
-const getCreditsForStudyProgramme = async (codes, since) =>
+const getCreditsForStudyProgramme = async (provider, codes, since) =>
   (
-    await Credit.findAll({
-      attributes: ['course_code', 'credits', 'attainment_date', 'student_studentnumber'],
-      include: {
-        model: Course,
-        attributes: ['code'],
-        required: true,
-        where: {
-          code: codes,
-        },
-      },
-      where: {
-        credittypecode: 4,
-        isStudyModule: {
-          [Op.not]: true,
-        },
-        attainment_date: {
-          [Op.gte]: since,
-        },
-      },
-    })
+    await sequelize.query(
+      `
+      SELECT 
+        cr.course_code, 
+        cr.attainment_date, 
+        cr.student_studentnumber, 
+        cr.credits * COALESCE(share_element.share::numeric, 1) AS credits
+      FROM 
+        credit cr
+      JOIN 
+        course_providers cp ON cr.course_id = cp.coursecode
+      JOIN 
+        organization o ON cp.organizationcode = o.id
+      LEFT JOIN LATERAL 
+        (
+          SELECT (jae ->> 'share')::numeric AS share
+          FROM jsonb_array_elements(cp.shares) AS jae
+          WHERE (cr.attainment_date >= (jae ->> 'startDate')::date OR jae ->> 'startDate' IS NULL)
+            AND (cr.attainment_date <= (jae ->> 'endDate')::date OR jae ->> 'endDate' IS NULL)
+          ORDER BY 
+            (jae ->> 'startDate')::date DESC NULLS LAST,
+            (jae ->> 'endDate')::date DESC NULLS LAST
+          LIMIT 1
+        ) AS share_element ON TRUE
+      WHERE 
+        (o.code = :provider OR (o.code = 'H930' AND cr.course_code IN (:codes)))
+        AND cr.attainment_date >= :since
+        AND cr.credittypecode = 4
+        AND cr."isStudyModule" IS NOT TRUE
+      `,
+      {
+        type: sequelize.QueryTypes.SELECT,
+        replacements: { provider, codes, since },
+      }
+    )
   ).map(formatCredit)
 
 const getCourseCodesForStudyProgramme = async provider => {

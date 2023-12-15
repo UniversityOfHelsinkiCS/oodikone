@@ -71,9 +71,16 @@ const createTableStats = (reversedYears, includeAllSpecials, majors, nonMajors, 
 // Division is done on the basis that whether the student had a primary studyright to the programme on the attainmentDate
 // If special groups are excluded, the transfer students are filtered away from the major-students as well
 const getRegularCreditStats = async ({ studyprogramme, since, years, isAcademicYear, includeAllSpecials }) => {
+  let majors = getStatsBasis(years)
+  let nonMajors = getStatsBasis(years)
+  let nonDegree = getStatsBasis(years)
+  if (!studyprogramme) {
+    return { majors, nonMajors, nonDegree }
+  }
+
   const providercode = mapToProviders([studyprogramme])[0]
   const courses = await getCourseCodesForStudyProgramme(providercode)
-  const credits = await getCreditsForStudyProgramme(courses, since)
+  const credits = await getCreditsForStudyProgramme(providercode, courses, since)
   const students = [...new Set(credits.map(({ studentNumber }) => studentNumber))]
 
   let studyrights = await getStudyRights(students, since)
@@ -82,9 +89,6 @@ const getRegularCreditStats = async ({ studyprogramme, since, years, isAcademicY
     studyrights = studyrights.filter(s => !transfers.includes(s.studyrightid))
   }
 
-  let majors = getStatsBasis(years)
-  let nonMajors = getStatsBasis(years)
-  let nonDegree = getStatsBasis(years)
   credits.forEach(({ studentNumber, attainmentDate, credits }) => {
     const studentStudyrights = studyrights.filter(studyright => studyright.studentNumber === studentNumber)
     const attainmentYear = defineYear(attainmentDate, isAcademicYear)

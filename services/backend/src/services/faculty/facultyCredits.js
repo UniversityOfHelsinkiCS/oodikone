@@ -57,18 +57,22 @@ const getFacultyRegularCreditStats = async ({
   facultyProgrammes,
   facultyCode,
 }) => {
-  const providercode = mapToProviders([studyprogramme])[0]
-  const providedByProgramme = await getCourseCodesForStudyProgramme(providercode)
-  const allCredits = await getCreditsForStudyProgramme(providedByProgramme, since)
-  const credits = uniqBy(allCredits, 'id')
-  const students = [...new Set(credits.map(({ studentNumber }) => studentNumber))]
-
-  let studyRights = await getStudyRights(students)
   let majors = getStatsBasis(years) // Has studyright to programme
   let facultyNonMajors = getStatsBasis(years) // Has studyright in the same faculty but not in the programme from which credits are
   let facultyOthers = getStatsBasis(years) // Exchange students, specialization education in Medicine, Dentistry and vetenary medicine, continuous education
   let otherNonMajors = getStatsBasis(years) // Has studyright in different faculty
   let nonDegree = getStatsBasis(years) // open uni, non-degree study rights, contract studies, (other) specialisation education, credits outside of the studyright
+  if (!studyprogramme) {
+    return { majors, facultyNonMajors, otherNonMajors, facultyOthers, nonDegree }
+  }
+
+  const providercode = mapToProviders([studyprogramme])[0]
+  const providedByProgramme = await getCourseCodesForStudyProgramme(providercode)
+  const allCredits = await getCreditsForStudyProgramme(providercode, providedByProgramme, since)
+  const credits = uniqBy(allCredits, 'id')
+  const students = [...new Set(credits.map(({ studentNumber }) => studentNumber))]
+
+  let studyRights = await getStudyRights(students)
 
   credits.forEach(({ studentNumber, attainmentDate, credits }) => {
     const studentStudyrights = studyRights.filter(studyright => studyright.studentNumber === studentNumber)
