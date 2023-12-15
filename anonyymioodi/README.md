@@ -1,12 +1,12 @@
-### Anonyymioodi - anonymous database setup for oodikone
+# Anonyymioodi - test database setup
 
 This folder contains a guide and scripts to modify or create anonymous database images for oodikone, mainly used for testing.
 
-This quick guide should be enough for most purposes: Updating schema, data or postgres version. If not, More elaborate guide stored in [old readme](old_readme.md) (though it may have outdated info).
+This quick guide should be enough for most purposes: Updating schema, data or postgres version. If not, a more elaborate guide is stored in [old readme](old_readme.md) (though it may have some outdated info).
 
 ### Quick guide to update a test database
 
-- Do your dev stuff normally with the anonymous database, for example with `npm run both`. Edit data however you like, run updater via frontend for example, then run tests to see if they pass.
+- Do your dev stuff normally with the test database, for example with `npm run both`. Edit data however you like, run updater via frontend for example, then run tests to see if they pass.
 - When you're happy with the database, create a dump:
 - `docker exec -i <dbname> pg_dump -Fc -U postgres <dbname> > anonyymioodi/<dbname>.sqz`
 - Now you can shut it down `npm run docker:down`
