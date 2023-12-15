@@ -170,6 +170,7 @@ Continuous integration (CI) works with Github actions and is defined in workflow
 - After a successful test run, oodikone is deployed to staging
 - After creating a release, oodikone is deployed to production
 - Updater is deployed to production when pushed if tests pass
+- Test databases can be updated, instructions in [anonyymioodi README](anonyymioodi/README.md)
 
 ## ❓FAQ
 
