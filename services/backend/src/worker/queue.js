@@ -10,7 +10,7 @@ const queue = new Queue('refresh-redis-data', { connection })
 
 const addJob = (type, data, keep) => {
   // job name (first arg) makes the job unique, and we want unique based on faculty/programme code
-  const name = data.code ? `${type}-${data.code}` : type
+  const name = data?.code ? `${type}-${data.code}` : type
   queue.add(
     name,
     { ...data },
