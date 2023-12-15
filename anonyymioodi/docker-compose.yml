@@ -9,7 +9,7 @@ services:
       PGDATA: /data
       POSTGRES_DB: kone-db
       POSTGRES_HOST_AUTH_METHOD: trust
-    image: postgres:13.4-alpine
+    image: postgres:15.3
     profiles:
       - oodikone
 
@@ -30,8 +30,7 @@ services:
       PGDATA: /data
       POSTGRES_DB: sis-importer-db
       POSTGRES_HOST_AUTH_METHOD: trust
-    # image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/sis-importer-db
-    image: postgres:13.1
+    image: postgres:15.3
     profiles:
       - updater
 
@@ -42,7 +41,6 @@ services:
       PGDATA: /data
       POSTGRES_DB: user-db
       POSTGRES_HOST_AUTH_METHOD: trust
-    image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/user-db
-    # image: postgres:13.4-alpine
+    image: postgres:15.3
     profiles:
       - oodikone
