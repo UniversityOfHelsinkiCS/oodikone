@@ -475,14 +475,14 @@ const getCreditsForStudyProgramme = async (provider, codes, since) =>
           LIMIT 1
         ) AS share_element ON TRUE
       WHERE 
-        (o.code = :provider OR (:numberOfCodes > 0 AND o.code = 'H930' AND cr.course_code IN (:codes)))
+        (o.code = :provider${codes.length > 0 ? " OR (o.code = 'H930' AND cr.course_code IN (:codes))" : ''})
         AND cr.attainment_date >= :since
         AND cr.credittypecode = 4
         AND cr."isStudyModule" IS NOT TRUE
       `,
       {
         type: sequelize.QueryTypes.SELECT,
-        replacements: { provider, codes, since, numberOfCodes: codes.length },
+        replacements: { provider, codes, since },
       }
     )
   ).map(formatCredit)
