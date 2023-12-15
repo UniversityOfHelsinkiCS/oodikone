@@ -376,11 +376,11 @@ describe('Custom Population Statistics', () => {
     runTestStepWithPreAndPostParts('Courses', () => {
       const courses = ['MAT11001', 'TKT20004']
       cy.cs('courseFilter-course-dropdown').click().contains(`${courses[0]} - Johdatus yliopistomatematiikkaan`).click()
-      checkFilteringResult(4)
+      checkFilteringResult(5)
       cy.cs(`courseFilter-${courses[0]}-dropdown`).selectFromDropdown(1)
-      checkFilteringResult(4)
+      checkFilteringResult(5)
       cy.cs('courseFilter-course-dropdown').click().contains(`${courses[1]} - Tietoliikenteen perusteet`).click()
-      checkFilteringResult(3)
+      checkFilteringResult(4)
       cy.cs(`courseFilter-${courses[1]}-dropdown`).selectFromDropdown(2)
       checkFilteringResult(1)
       courses.forEach(course => cy.cs(`courseFilter-${course}-clear`).click())
