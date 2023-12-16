@@ -10,6 +10,7 @@ import { AttemptsTable } from '../AttemptsTable'
 import { ProgrammeDropdown } from '../ProgrammeDropdown'
 import { useLanguage } from '../../LanguagePicker/useLanguage'
 import { userHasAccessToAllCourseStats } from '../courseStatisticsUtils'
+import { DataExport } from './DataExport'
 
 // Certified JavaScript moment but basically this was crashing
 // since sometimes object like {en: ..., fi: ...., sv: ....}
@@ -96,6 +97,9 @@ const SummaryTab = ({ setValue, onClickCourse }) => {
           </Form.Field>
         </Form>
       </Segment>
+      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <DataExport data={data} />
+      </div>
       <AttemptsTable
         categoryName="Course"
         onClickCourse={onClickCourse}
