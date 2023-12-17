@@ -310,7 +310,7 @@ export const SearchForm = ({ onProgress }) => {
               title="Searched courses"
               onSelectCourse={onSelectCourse}
             />
-            {courses.length ? (
+            {courses.length && selectMultipleCoursesEnabled ? (
               <div className="select-all-container">
                 <Form.Button
                   type="button"
