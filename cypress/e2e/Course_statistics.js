@@ -103,6 +103,29 @@ describe('Course Statistics tests', () => {
       cy.contains('No results')
     })
 
+    it('"Select all search results" button is not showing unless "Select multiple courses" toggle is on', () => {
+      cy.contains('Search for courses')
+      cy.get("input[placeholder='Search by a course code']").type('TKT')
+      cy.get('[data-cy="select-multiple-courses-toggle"]').should('not.have.class', 'checked')
+      cy.contains('TKT10004, 581328')
+      cy.contains('Select all search results').should('not.exist')
+      cy.get('[data-cy="select-multiple-courses-toggle"]').click()
+      cy.get('[data-cy="select-multiple-courses-toggle"]').should('have.class', 'checked')
+      cy.contains('Select all search results')
+    })
+
+    it('"Fetch statistics" button is disabled if over 40 courses are selected', () => {
+      cy.contains('Search for courses')
+      cy.get("input[placeholder='Search by a course code']").type('TKT')
+      cy.get('[data-cy="select-multiple-courses-toggle"]').should('not.have.class', 'checked').click()
+      cy.get('[data-cy="select-multiple-courses-toggle"]').should('have.class', 'checked')
+      cy.contains('Select all search results').click()
+      cy.contains('Fetch statistics').should('not.be.enabled').trigger('mouseover', { force: true })
+      cy.contains('Voit valita tarkasteltavaksi enintään 40 kurssia kerrallaan.')
+      cy.get("input[placeholder='Search by a course code']").type('21')
+      cy.contains('Fetch statistics').should('be.enabled')
+    })
+
     it('Provider organization toggle works', () => {
       cy.contains('Search for courses')
       cy.get("input[placeholder='Search by entering a course name']").type('tietokantojen perusteet')
@@ -407,7 +430,7 @@ describe('Course Statistics tests', () => {
       cy.get('[data-cy=unify_radio_unify]').find('input').should('not.be.disabled')
     })
 
-    it('Has right to see all the sudents, because course provider is TKT', () => {
+    it('Has right to see all the students, because course provider is TKT', () => {
       cy.visit('coursestatistics?courseCodes=%5B%22TKT10004%22%5D&cs_tab=0&separate=false')
       cy.get('tbody > :nth-child(3) > :nth-child(2) .level').click()
       cy.contains('Students (154)').click()
