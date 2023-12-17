@@ -8,9 +8,9 @@ import { func } from 'prop-types'
 
 import { clearCourses, findCoursesV2 } from 'redux/coursesearch'
 import { getCourseStats, clearCourseStats } from 'redux/coursestats'
-import { getCourseSearchResults } from '../../../selectors/courses'
-import { useSearchHistory, useToggle } from '../../../common/hooks'
-import { validateInputLength } from '../../../common'
+import { getCourseSearchResults } from 'selectors/courses'
+import { useSearchHistory, useToggle } from 'common/hooks'
+import { validateInputLength } from 'common'
 import { TimeoutAutoSubmitSearchInput as AutoSubmitSearchInput } from '../../AutoSubmitSearchInput'
 import { MemoizedCourseTable as CourseTable } from '../CourseTable'
 import { SearchHistory } from '../../SearchHistory'
@@ -106,6 +106,20 @@ export const SearchForm = ({ onProgress }) => {
     const searchString = qs.stringify(queryObject)
     history.push({ search: searchString })
   }
+
+  useEffect(() => {
+    const matchingCourseCodes = matchingCourses.map(course => course.code)
+    const newSelectedCourses = Object.keys(selectedCourses)
+      .filter(course => matchingCourseCodes.includes(course))
+      .reduce((obj, key) => {
+        obj[key] = selectedCourses[key]
+        return obj
+      }, {})
+    setState({
+      ...state,
+      selectedCourses: newSelectedCourses,
+    })
+  }, [matchingCourses])
 
   const onSearchHistorySelected = historyItem => {
     pushQueryToUrl(historyItem)
