@@ -1,10 +1,81 @@
 /// <reference types="Cypress" />
 
+const checkGradeTable = gradesTableContents => {
+  cy.get('[data-cy="Grade distribution"]')
+    .parent()
+    .siblings('.content.active')
+    .get('table > tbody')
+    .first()
+    .within(() => {
+      gradesTableContents.forEach((values, trIndex) => {
+        cy.get('tr')
+          .eq(trIndex)
+          .within(() => {
+            values.forEach((value, tdIndex) => {
+              if (value === null) return
+              cy.get('td').eq(tdIndex).contains(value)
+            })
+          })
+      })
+      cy.get('tr').should('have.length', gradesTableContents.length)
+    })
+}
+
 describe('Course Statistics tests', () => {
   describe('when using basic user', () => {
     beforeEach(() => {
       cy.init('/coursestatistics')
       cy.url().should('include', '/coursestatistics')
+    })
+
+    describe('It shows correct statistics for courses with other grades than 0-5', () => {
+      it('Shows correct statistics for courses with scale HT-TT', () => {
+        const gradesTableContents = [
+          [null, 'TT', 190],
+          [null, 'Hyl.', 4],
+          [null, 'HT', 177],
+        ]
+        cy.contains('Search for courses')
+        cy.get("input[placeholder='Search by a course code']").type('KK-RUKIRJ')
+        cy.contains('td', 'KK-RUKIRJ').click()
+        cy.contains('Search for courses').should('not.exist')
+        cy.contains('KK-RUKIRJ, 992912, AYKK-RUKIRJ Toisen kotimaisen kielen kirjallinen taito, ruotsi (CEFR B1)')
+        cy.contains('.tabular.menu a', 'Grade distribution chart').click()
+        cy.contains('svg', 'Grades')
+        cy.contains('Show population').should('be.enabled').click()
+        checkGradeTable(gradesTableContents)
+      })
+
+      it("Shows correct statistics for old master's thesis grade scales", () => {
+        const gradesTableContents = [
+          [null, 'L', 1],
+          [null, 'CL', 1],
+        ]
+        cy.contains('Search for courses')
+        cy.get("input[placeholder='Search by a course code']").type('704220')
+        cy.contains('td', '704220').click()
+        cy.contains('Search for courses').should('not.exist')
+        cy.contains('704220 Taloustiede. Pro gradu -tutkielma')
+        cy.contains('.tabular.menu a', 'Grade distribution chart').click()
+        cy.contains('svg', 'Grades')
+        cy.contains('Show population').should('be.enabled').click()
+        checkGradeTable(gradesTableContents)
+      })
+
+      it('Shows correct statistics for courses with scale passed-failed', () => {
+        const gradesTableContents = [[null, 'Hyv.', 258]]
+        cy.contains('Search for courses')
+        cy.get("input[placeholder='Search by a course code']").type('KK-ENMALU1')
+        cy.contains('td', 'KK-ENMALU1').click()
+        cy.contains('Search for courses').should('not.exist')
+        cy.contains(
+          'KK-ENFARM1, KK-ENOIK1, KK-ENLAAK1, KK-ENMALU1, 995010Mat-lu Academic and Professional Communication in English 1 (CEFR B2)'
+        )
+        cy.contains('.tabular.menu a', 'Grade distribution chart').click()
+        cy.contains('svg', 'Grades')
+        cy.contains('Show population').should('be.enabled').click()
+        checkGradeTable(gradesTableContents)
+      })
     })
 
     it('Searching single course having substitution mappings shows course statistics', () => {
