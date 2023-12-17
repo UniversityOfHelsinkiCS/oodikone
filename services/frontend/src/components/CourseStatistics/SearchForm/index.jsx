@@ -23,6 +23,8 @@ const INITIAL = {
   separate: false,
 }
 
+const MAX_SELECTED_COURSES = 40
+
 const searchBoxStyle = {
   border: '2px solid black',
   borderRadius: '0.3em',
@@ -177,9 +179,44 @@ export const SearchForm = ({ onProgress }) => {
 
   const courses = matchingCourses.filter(c => !selectedCourses[c.code])
 
-  const disabled = isLoading || Object.keys(selectedCourses).length === 0
   const selected = Object.values(selectedCourses).map(course => ({ ...course, selected: true }))
   const noSelectedCourses = selected.length === 0
+  const disabled = isLoading || noSelectedCourses || selected.length > MAX_SELECTED_COURSES
+
+  const renderFetchStatisticsButton = () => {
+    const FetchStatisticsButton = (
+      <Form.Button
+        type="button"
+        disabled={disabled}
+        fluid
+        size="huge"
+        primary
+        basic
+        positive
+        content="Fetch statistics"
+        onClick={onSubmitFormClick}
+        data-cy="fetch-stats-button"
+      />
+    )
+
+    if (noSelectedCourses) return null
+
+    if (disabled) {
+      return (
+        <Popup
+          on="hover"
+          position="top center"
+          content={getTextIn({
+            fi: `Olet valinnut ${selected.length} kurssia. Voit valita tarkasteltavaksi enintään ${MAX_SELECTED_COURSES} kurssia kerrallaan. Tarkenna hakua tai poista valittuja kursseja.`,
+            en: `You have selected ${selected.length} courses. You can select up to ${MAX_SELECTED_COURSES} courses at a time. Refine your search or remove selected courses.`,
+          })}
+          trigger={<span>{FetchStatisticsButton}</span>}
+        />
+      )
+    }
+
+    return FetchStatisticsButton
+  }
 
   const addAllCourses = () => {
     courses.forEach(course => {
@@ -289,20 +326,7 @@ export const SearchForm = ({ onProgress }) => {
                 controlIcon="trash alternate outline"
                 selectedTable
               />
-              {!noSelectedCourses && (
-                <Form.Button
-                  type="button"
-                  disabled={disabled}
-                  fluid
-                  size="huge"
-                  primary
-                  basic
-                  positive
-                  content="Fetch statistics"
-                  onClick={onSubmitFormClick}
-                  data-cy="fetch-stats-button"
-                />
-              )}
+              {renderFetchStatisticsButton()}
             </div>
             <CourseTable
               hidden={isLoading}
