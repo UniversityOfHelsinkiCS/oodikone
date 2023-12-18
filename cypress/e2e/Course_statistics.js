@@ -358,12 +358,12 @@ describe('Course Statistics tests', () => {
       ]
 
       const attemptsTableContentsOpen = [
-        // [time, passed, failed, passrate]
-        ['Total', null, 175, 175, 0],
+        // [time, total, passed, failed]
+        ['Total', null, 199, 188, 11],
       ]
 
       const attemptsTableContentsReqular = [
-        // [time, passed, failed, passrate]
+        // [time, total, passed, failed]
         ['Total', null, 312, 298, 14],
       ]
 
