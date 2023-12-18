@@ -13,7 +13,7 @@ process.execArgv = process.execArgv.filter(arg => !arg.includes('--max_old_space
 const worker = new Worker('refresh-redis-data', `${__dirname}/processor.js`, {
   connection,
   useWorkerThreads: true,
-  concurrency: 3,
+  concurrency: 2,
 })
 
 worker.on('completed', job => {
