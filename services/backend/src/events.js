@@ -153,8 +153,8 @@ const dailyJobs = () => {
 
 const startCron = () => {
   if (isProduction) {
-    logger.info('Cronjob for refreshing stats started: runs at 1am saturday.')
-    schedule('0 1 * * *', async () => {
+    logger.info('Cronjob for refreshing stats started: runs daily at 23:00.')
+    schedule('0 23 * * *', async () => {
       logger.info('Running daily jobs from cron')
       dailyJobs()
     })
