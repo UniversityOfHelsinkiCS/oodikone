@@ -73,20 +73,13 @@ describe('Population Statistics tests', () => {
       cy.contains('Excludes students with non-degree study right')
       cy.contains('Excludes students who have transferred out of this programme')
       cy.cs('filtered-students')
-
-      // Tests that use curriculum structure are commented out until
-      // the test database is fixed to the same structure as real database
-      // after the modules rework
-      // cy.contains('Courses of class').click()
-
-      // cy.intercept('/api/v3/courseyearlystats**').as('coursePage')
-      // // eslint-disable-next-line cypress/no-unnecessary-waiting
-      // cy.wait(25000) // a bit hacky way, wait until ui is ready
-      // cy.get('[data-cy=toggle-group-module-TKT1]').click()
-      // cy.contains('td', 'TKT10002').siblings().find('i.level.up').click()
-      // cy.wait('@coursePage')
-      // cy.url().should('include', '/coursestatistics')
-      // cy.contains('TKT10002, 581325, AYTKT10002, A581325 Ohjelmoinnin perusteet')
+      cy.contains('Courses of class').click()
+      cy.intercept('/api/v3/courseyearlystats**').as('coursePage')
+      cy.get('[data-cy=toggle-group-module-TKT1]').click()
+      cy.contains('td', 'TKT10002').siblings().find('i.level.up').click()
+      cy.wait('@coursePage')
+      cy.url().should('include', '/coursestatistics')
+      cy.contains('TKT10002, 581325, AYTKT10002, A581325 Ohjelmoinnin perusteet')
     })
 
     it("Empty 'tags' tab has a link to the page where tags can be created", () => {
