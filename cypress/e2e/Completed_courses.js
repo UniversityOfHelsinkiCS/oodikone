@@ -73,7 +73,7 @@ describe('When search modal is opened', () => {
   })
 
   describe('When a search with correct data is executed', () => {
-    before(() => {
+    beforeEach(() => {
       cy.init('/completedcoursessearch')
       hasLanded()
       openCompletedCoursesModal()
@@ -90,14 +90,8 @@ describe('When search modal is opened', () => {
         '/completedcoursessearch?courseList=TKT10001&courseList=TKT10002&courseList=TKT10003&courseList=TKT10004&studentList=010450938&studentList=010589388&studentList=010614509'
       )
     })
-    /*
-    TODO: FIX
-    This is skipped because it's flaky in github actions for unknown reasons.
-    Instead of the results, a text appears saying "Something went wrong, please try refreshing the page".
-    */
-    it.skip('Finds correct students and courses', () => {
-      // eslint-disable-next-line cypress/no-unnecessary-waiting
-      cy.wait(5000)
+
+    it('Finds correct students and courses', () => {
       cy.fixture('completedCoursesData').then(({ studentSet1, coursesSet1 }) => {
         cy.get('[data-cy="completed-courses-table-div"]').should('contain.text', studentSet1[0])
         cy.get('[data-cy="completed-courses-table-div"]').should('contain.text', studentSet1[1])
