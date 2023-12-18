@@ -42,12 +42,13 @@ const updateSISRedisCache = async () => {
 const studyplansUpdate = async days => {
   const limitDate = new Date()
   limitDate.setDate(limitDate.getDate() - days)
-  const studentnumbers = await Studyplan.findAll({
+  const result = await Studyplan.findAll({
     where: { updatedAt: { [Op.lte]: limitDate } },
     attributes: ['studentnumber'],
     raw: true,
     limit: 1000,
   })
+  const studentnumbers = result.map(r => r.studentnumber)
   const response = await client.post('v1/studyplans', { studentnumbers }, params)
   return response.data
 }
