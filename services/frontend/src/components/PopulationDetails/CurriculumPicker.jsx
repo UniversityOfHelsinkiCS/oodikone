@@ -60,6 +60,7 @@ export const CurriculumPicker = ({ setCurriculum, programmeCodes, disabled, year
         marginLeft: '10px',
         background: '#e3e3e3',
       }}
+      data-cy="curriculum-picker"
       className="link item"
       value={chosenCurriculum}
       onChange={(_, { value }) => setSelectedCurriculum(value)}

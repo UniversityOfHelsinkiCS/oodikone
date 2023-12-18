@@ -73,6 +73,10 @@ describe('Population Statistics tests', () => {
       cy.contains('Excludes students with non-degree study right')
       cy.contains('Excludes students who have transferred out of this programme')
       cy.cs('filtered-students')
+    })
+
+    it('Courses of class is displayed and link to individual course stats page works', () => {
+      cy.visit(pathToCSBach2017)
       cy.contains('Courses of class').click()
       cy.intercept('/api/v3/courseyearlystats**').as('coursePage')
       cy.get('[data-cy=toggle-group-module-TKT1]').click()
@@ -80,6 +84,15 @@ describe('Population Statistics tests', () => {
       cy.wait('@coursePage')
       cy.url().should('include', '/coursestatistics')
       cy.contains('TKT10002, 581325, AYTKT10002, A581325 Ohjelmoinnin perusteet')
+    })
+
+    it('Courses of class curriculum selection works', () => {
+      cy.visit(pathToCSBach2017)
+      cy.contains('Courses of class').click()
+      cy.get('Opiskelijan digitaidot - Kumpula').should('not.exist')
+      cy.get('[data-cy=curriculum-picker]').click()
+      cy.contains('2020 - 2022').click()
+      cy.contains('Opiskelijan digitaidot - Kumpula')
     })
 
     it("Empty 'tags' tab has a link to the page where tags can be created", () => {
