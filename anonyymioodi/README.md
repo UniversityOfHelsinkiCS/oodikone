@@ -6,6 +6,7 @@ This quick guide should be enough for most purposes: Updating schema, data or po
 
 ### Quick guide to update a test database
 
+- Make sure you have the latest test-db. Just pulling images doesn't seem to replace your already existing volume, so you may need to remove it by hand. This may work: `docker volume rm oodikone_sis-db-data`. The new image including data should be pulled next time you launch oodikone normally.
 - Do your dev stuff normally with the test database, for example with `npm run both`. Edit data however you like, run updater via frontend for example, then run tests to see if they pass.
 - When you're happy with the database, create a dump:
 - `docker exec -i <dbname> pg_dump -Fc -U postgres <dbname> > anonyymioodi/<dbname>.sqz`
