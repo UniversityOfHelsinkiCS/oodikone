@@ -162,6 +162,10 @@ const startCron = () => {
       logger.info('Updating students whose studyplans have not been updated recently')
       jobMaker.studyplansUpdate(4)
     })
+    schedule('0 10 * * 2', async () => {
+      logger.info('Updating students whose studyplans have not been updated recently')
+      jobMaker.studyplansUpdate(5)
+    })
   }
 }
 
