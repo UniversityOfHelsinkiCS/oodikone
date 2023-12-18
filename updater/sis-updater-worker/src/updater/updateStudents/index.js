@@ -38,7 +38,7 @@ const { logger } = require('../../utils/logger')
 
 // When updating students, studyplans sometimes are not updated. Check which aren't updated and redo the students
 const studyplansRedo = async (personIds, personIdToStudentNumber, iteration = 0) => {
-  if (iteration > 1) return
+  if (iteration > 0) return
   const yesterday = new Date()
   yesterday.setDate(yesterday.getDate() - 1)
   const students = await Studyplan.findAll({
@@ -60,9 +60,7 @@ const studyplansRedo = async (personIds, personIdToStudentNumber, iteration = 0)
     return
   }
 
-  logger.info(
-    `Updating ${studentNumbers.length} students again due to studyplans not updating. Iteration: ${iteration}`
-  )
+  logger.info(`Updating ${studentNumbers.length} students again due to studyplans not updating.`)
   await updateStudents(
     studentNumbers.map(num => studentNumberToPersonId[num]),
     iteration + 1
