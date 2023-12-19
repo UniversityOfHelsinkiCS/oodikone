@@ -222,19 +222,22 @@ export const GeneralTab = ({
   }
 
   // Filters to check data for whether to show certain columns
-  const containsStudyTracks = selectedStudents
-    .map(sn => students[sn])
-    .map(st => st.studyrights)
-    .map(
-      studyrights =>
-        studyrightCodes(studyrights, 'studyright_elements').reduce((acc, elemArr) => {
-          elemArr
-            .filter(el => populationStatistics.elementdetails.data[el.code].type === 30)
-            .forEach(el => acc.push(getTextIn(populationStatistics.elementdetails.data[el.code].name)))
-          return acc
-        }, []).length > 0
-    )
-    .some(el => el === true)
+  const containsStudyTracks =
+    Object.keys(populationStatistics.elementdetails.data) > 0
+      ? selectedStudents
+          .map(sn => students[sn])
+          .map(st => st.studyrights)
+          .map(
+            studyrights =>
+              studyrightCodes(studyrights, 'studyright_elements').reduce((acc, elemArr) => {
+                elemArr
+                  .filter(el => populationStatistics.elementdetails?.data[el.code].type === 30)
+                  .forEach(el => acc.push(getTextIn(populationStatistics.elementdetails.data[el.code].name)))
+                return acc
+              }, []).length > 0
+          )
+          .some(el => el === true)
+      : false
 
   const containsOption = cleanedQueryStudyrights.some(code => code.startsWith('MH') || code.startsWith('KH'))
 
