@@ -23,4 +23,9 @@ export const filterToolTips = {
     short:
       'Rajaa yksittäisiä opiskelijoita pois tilastoista (blocklist) tai näytä vain määritellyt opiskelijat (allowlist). Vain täsmälliset opiskelijanumerot toimivat.',
   },
+  startingYear: {
+    label: null,
+    short:
+      'Valitse opiskelijoita sen mukaan, minä vuonna heidän ensimmäinen opinto-oikeutensa yliopistolla alkoi (ei siis ainoastaan tarkasteltavan tutkinnon oikeus). Avoimia opinto-oikeuksia ei oteta huomioon.',
+  },
 }

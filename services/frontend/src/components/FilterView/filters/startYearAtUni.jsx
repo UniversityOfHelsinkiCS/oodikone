@@ -1,6 +1,7 @@
 import React from 'react'
 import { Form, Dropdown } from 'semantic-ui-react'
 import fp from 'lodash/fp'
+import { filterToolTips } from 'common/InfoToolTips'
 import { createFilter } from './createFilter'
 
 const StartYearAtUniFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
@@ -51,6 +52,8 @@ export const startYearAtUniFilter = createFilter({
   defaultOptions: {
     selected: [],
   },
+
+  info: filterToolTips.startingYear,
 
   isActive: ({ selected }) => selected.length > 0,
 
