@@ -45,8 +45,8 @@ describe('Studyprogramme overview', () => {
         // [Year, Started, Graduated, Transferred Away, Transferred to]
         ...years.map(year => [year, 0, 0, 0, 0]),
         [2021, 0, 0, 1, 0],
-        [2020, 10, 35, 3, 2],
-        [2019, 86, 17, 0, 1],
+        [2020, 10, 35, 2, 2],
+        [2019, 86, 17, 1, 1],
         [2018, 161, 1, 0, 0],
         [2017, 171, 0, 0, 0],
       ]
@@ -103,9 +103,9 @@ describe('Studyprogramme overview', () => {
         // [Year, Total, Major students credits, Transferred credits]
         ...years.map(year => [year, 0, 0, 0]),
         [2021, 0, 0, 0],
-        [2020, 5018, 4694, 167],
-        [2019, 6185, 5702, 349],
-        [2018, 4885, 4538, 272],
+        [2020, 4999, 4675, 167],
+        [2019, 6182, 5699, 349],
+        [2018, 4884, 4537, 272],
         [2017, 1988, 1600, 388],
       ]
 
@@ -191,9 +191,9 @@ describe('Studyprogramme overview', () => {
         .should('contain', 'Tietojenkäsittelytieteen maisteriohjelma')
         .should('contain', 'Datatieteen maisteriohjelma')
         .should('contain', 'Matematiikan ja tilastotieteen maisteriohjelma')
-        .should('contain', 1)
-        .should('contain', 4)
-        .should('contain', 13)
+        .should('contain', 11)
+        .should('contain', 12)
+        .should('contain', 24)
     })
   })
 
@@ -243,11 +243,11 @@ describe('Studyprogramme overview', () => {
     it('Students of the studyprogramme are shown correctly', () => {
       const tableContents = [
         // [Year, All, Started studying, Currently enrolled, Absent, Inactive, Graduated, Men, Women, other/unknown Finnish, other]
-        ['2020 - 2021', 12, 10, 0, 0, 0, 0, 10, 2, 0, 12, 0],
-        ['2019 - 2020', 86, 86, 0, 0, 0, 1, 65, 21, 0, 86, 0],
-        ['2018 - 2019', 162, 161, 0, 0, 0, 11, 118, 44, 0, 161, 1],
-        ['2017 - 2018', 171, 171, 0, 0, 0, 42, 135, 36, 0, 166, 5],
-        ['Total', 431, 428, 0, 0, 0, 54, 328, 103, 0, 425, 6],
+        ['2020 - 2021', 12, 10, 0, 0, 12, 0, 10, 2, 0, 12, 0],
+        ['2019 - 2020', 86, 86, 0, 0, 85, 1, 65, 21, 0, 86, 0],
+        ['2018 - 2019', 162, 161, 0, 0, 151, 11, 118, 44, 0, 161, 1],
+        ['2017 - 2018', 171, 171, 0, 0, 129, 42, 135, 36, 0, 166, 5],
+        ['Total', 431, 428, 0, 0, 377, 54, 328, 103, 0, 425, 6],
       ]
 
       cy.checkTableStats(tableContents, 'StudytrackOverview')
@@ -259,10 +259,10 @@ describe('Studyprogramme overview', () => {
         ['2022 - 2023', 0, 0, 0, 0, 0, 0, 0, 0],
         ['2021 - 2022', 0, 0, 0, 0, 0, 0, 0, 0],
         ['2020 - 2021', 12, 12, 0, 0, 0, 0, 0, 0],
-        ['2019 - 2020', 86, 86, 0, 0, 0, 0, 0, 0],
-        ['2018 - 2019', 162, 162, 0, 0, 0, 0, 0, 0],
-        ['2017 - 2018', 171, 171, 0, 0, 0, 0, 0, 0],
-        ['Total', 431, 431, 0, 0, 0, 0, 0, 0],
+        ['2019 - 2020', 86, 26, 34, 21, 5, 0, 0, 0],
+        ['2018 - 2019', 162, 10, 27, 47, 36, 26, 12, 4],
+        ['2017 - 2018', 171, 20, 21, 26, 22, 22, 33, 27],
+        ['Total', 431, 68, 82, 94, 63, 48, 45, 31],
       ]
 
       cy.checkTableStats(tableContents, 'StudytrackProgress')

@@ -174,19 +174,20 @@ describe('Faculty overview', () => {
 
       cy.get('[data-cy="Section-master"]').within(() => {
         cy.get('div[class="faculty-graph"]')
-        cy.contains('1 graduated').should('have.length', 1)
-        cy.contains('1 graduated').trigger('mouseover')
-        cy.contains('1 students graduated in year 2020')
-        cy.contains('median study time: 25 months')
+        cy.contains('24 graduated').should('have.length', 1)
+        cy.contains('24 graduated').trigger('mouseover')
+        cy.contains('24 students graduated in year 2020')
+        cy.contains('median study time: 22 months')
         cy.contains('0 graduated over year late')
-        cy.contains('1 graduated max year overtime')
+        cy.contains('20 graduated on time')
+        cy.contains('4 graduated max year overtime')
 
-        cy.contains('1 graduated').click()
+        cy.contains('24 graduated').click()
         cy.contains('Year 2020 by graduation year')
         cy.get('div[class="programmes-graph"]').should('be.visible')
         cy.get('div[class="programmes-graph"]').within(() => {
           cy.contains('EDUM')
-          cy.contains('1 graduated').trigger('mouseover')
+          cy.contains('24 graduated').trigger('mouseover')
           cy.contains('Kasvatustieteiden maisteriohjelma')
           cy.contains('MH60_001')
         })
@@ -201,18 +202,21 @@ describe('Faculty overview', () => {
 
       cy.get('[data-cy="Section-master"]').within(() => {
         cy.get('div[class="faculty-graph"]')
-        cy.contains('1 graduated (100 % of class)').should('have.length', 1)
-        cy.contains('1 graduated').trigger('mouseover')
-        cy.contains('From class of 2018, 1/1 students have graduated')
+        cy.contains('19 graduated (44.2 % of class)').should('have.length', 1)
+        cy.contains('19 graduated').trigger('mouseover')
+        cy.contains('From class of 2018, 19/43 students have graduated')
       })
 
       cy.get('[data-cy="GraduationTimeToggle"]').click()
       cy.get('[data-cy="Section-master"]').within(() => {
-        cy.contains('1').click()
+        cy.contains('16').click()
         cy.get('div[class="programmes-breakdown-graph"]').should('be.visible')
         cy.get('div[class="programmes-breakdown-graph"]').within(() => {
           cy.contains('Year 2018 by start year')
           cy.contains('EDUM')
+          cy.contains('16').trigger('mouseover')
+          cy.contains('Kasvatustieteiden maisteriohjelma')
+          cy.contains('MH60_001')
         })
       })
     })
