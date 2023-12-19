@@ -77,20 +77,27 @@ const getRegularCreditStats = async ({ studyprogramme, since, years, isAcademicY
   if (!studyprogramme) {
     return { majors, nonMajors, nonDegree }
   }
-
   const providercode = mapToProviders([studyprogramme])[0]
   const courses = await getCourseCodesForStudyProgramme(providercode)
+
   const credits = await getCreditsForStudyProgramme(providercode, courses, since)
+
   const students = [...new Set(credits.map(({ studentNumber }) => studentNumber))]
 
   let studyrights = await getStudyRights(students, since)
+
   const transfers = (await allTransfers(studyprogramme, since)).map(t => t.studyrightid)
+
   if (!includeAllSpecials) {
     studyrights = studyrights.filter(s => !transfers.includes(s.studyrightid))
   }
-
+  const studentNumberToStudyrightsMap = studyrights.reduce((obj, cur) => {
+    if (!obj[cur.studentNumber]) obj[cur.studentNumber] = []
+    obj[cur.studentNumber].push(cur)
+    return obj
+  }, {})
   credits.forEach(({ studentNumber, attainmentDate, credits }) => {
-    const studentStudyrights = studyrights.filter(studyright => studyright.studentNumber === studentNumber)
+    const studentStudyrights = studentNumberToStudyrightsMap[studentNumber] || []
     const attainmentYear = defineYear(attainmentDate, isAcademicYear)
 
     if (!includeAllSpecials && isSpecialGroupCredit(studentStudyrights, attainmentDate, transfers)) {
@@ -133,7 +140,6 @@ const getCreditStatsForStudytrack = async ({ studyprogramme, combinedProgramme, 
   const { isAcademicYear, includeAllSpecials } = settings
   const since = getStartDate(studyprogramme, isAcademicYear)
   const years = getYearsArray(since.getFullYear(), isAcademicYear)
-
   const queryParameters = { studyprogramme, since, years, isAcademicYear, includeAllSpecials }
   const queryParametersSecondProg = {
     studyprogramme: combinedProgramme,
