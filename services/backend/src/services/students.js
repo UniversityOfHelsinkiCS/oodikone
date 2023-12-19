@@ -117,7 +117,7 @@ const getUnifyStatus = unifyCourses => {
     case 'openStats':
       return [true]
 
-    case 'reqularStats':
+    case 'regularStats':
       return [false]
 
     default:

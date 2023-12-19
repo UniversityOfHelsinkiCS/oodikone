@@ -248,7 +248,7 @@ const getOrgStats = (stats, orgId) =>
     },
   }
 
-const getOrgsOfOpenUniReqularCounterparts = async codes => {
+const getOrgsOfOpenUniRegularCounterparts = async codes => {
   const rows = await sequelize.query(
     `
       SELECT co.id, co.code, cp.organizationcode, org.code AS organization
@@ -352,7 +352,7 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
     ...new Set(_.flatten(yearlyOpenUniTotalCredits).map(c => unifyOpenUniversity(c.code))),
   ]
 
-  const orgsOfOpenUniReqularCounterparts = await getOrgsOfOpenUniReqularCounterparts(fromAyToNormalCourses)
+  const orgsOfOpenUniRegularCounterparts = await getOrgsOfOpenUniRegularCounterparts(fromAyToNormalCourses)
 
   const facultyProgrammes = facultiesAndProgrammesForTrends
 
@@ -459,7 +459,7 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
 
   const refactoredOpenUniCredits = [..._.flatten(yearlyOpenUniAccCredits), ..._.flatten(yearlyOpenUniTotalCredits)].map(
     ele => {
-      const org = orgsOfOpenUniReqularCounterparts[unifyOpenUniversity(ele.code)]
+      const org = orgsOfOpenUniRegularCounterparts[unifyOpenUniversity(ele.code)]
       return {
         ...ele,
         organizationcode: org ? org : 'H930',

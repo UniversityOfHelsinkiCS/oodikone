@@ -70,7 +70,7 @@ export const Tables = ({ settings, ...otherProps }) => {
   const alternatives = useSelector(getCourseAlternatives)
   const viewModes = { ATTEMPTS: AttemptsTable, STUDENT: StudentTable }
   const Content = viewModes[settings.viewMode]
-  const openOrReqular = useSelector(state => state.courseSearch.openOrReqular)
+  const openOrRegular = useSelector(state => state.courseSearch.openOrRegular)
 
-  return <Content settings={settings} {...otherProps} alternatives={alternatives} unifyCourses={openOrReqular} />
+  return <Content settings={settings} {...otherProps} alternatives={alternatives} unifyCourses={openOrRegular} />
 }

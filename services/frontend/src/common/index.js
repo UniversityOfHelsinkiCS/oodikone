@@ -123,7 +123,7 @@ export const getTextInWithOpen = (texts, language, isOpenCourse) => {
 
 export const getUnifyTextIn = unifyCourses => {
   switch (unifyCourses) {
-    case 'reqularStats':
+    case 'regularStats':
       return '(normal)'
 
     case 'openStats':
