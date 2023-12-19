@@ -109,8 +109,14 @@ const studentMapper = (attainments, studyRights, attainmentsToBeExluced) => stud
   const home_country = student.citizenships ? getCountry(student.citizenships[0]) : null
 
   const studyRightsOfStudent = studyRights.filter(SR => SR.person_id === id)
+
+  const filterNondegreeStudyrights = sr =>
+    sr.phase1_education_classification_urn || sr.phase2_education_classification_urn
+
   const dateofuniversityenrollment =
-    studyRightsOfStudent.length > 0 ? sortBy(studyRightsOfStudent.map(sr => sr.valid.startDate))[0] : null
+    studyRightsOfStudent.length > 0
+      ? sortBy(studyRightsOfStudent.filter(filterNondegreeStudyrights).map(sr => sr.valid.startDate))[0]
+      : null
 
   // Current db doesn't have studentnumbers in attainment table so have to use person_id for now.
   const attainmentsOfStudent = attainments.filter(
