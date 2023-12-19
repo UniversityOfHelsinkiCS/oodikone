@@ -72,10 +72,16 @@ const getFacultyRegularCreditStats = async ({
   const credits = uniqBy(allCredits, 'id')
   const students = [...new Set(credits.map(({ studentNumber }) => studentNumber))]
 
-  let studyRights = await getStudyRights(students)
+  let studyrights = await getStudyRights(students)
+
+  const studentNumberToStudyrightsMap = studyrights.reduce((obj, cur) => {
+    if (!obj[cur.studentNumber]) obj[cur.studentNumber] = []
+    obj[cur.studentNumber].push(cur)
+    return obj
+  }, {})
 
   credits.forEach(({ studentNumber, attainmentDate, credits }) => {
-    const studentStudyrights = studyRights.filter(studyright => studyright.studentNumber === studentNumber)
+    const studentStudyrights = studentNumberToStudyrightsMap[studentNumber] || []
     const attainmentYear = defineYear(attainmentDate, isAcademicYear)
 
     if (isMajorStudentCredit(studentStudyrights, attainmentDate, studyprogramme)) {
