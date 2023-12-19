@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { Icon, Loader } from 'semantic-ui-react'
 import moment from 'moment'
 
@@ -148,24 +148,12 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
 
 export const CompletedCoursesSearchResults = ({ searchValues }) => {
   const { courseList, studentList } = searchValues
-  const [data, setData] = useState(null)
   const showStudentNames = useStudentNameVisibility()
-  const completedCoursesTable = useGetCompletedCoursesQuery({ courseList, studentList })
-  const isFetchingOrLoading = completedCoursesTable.isLoading || completedCoursesTable.isFetching
-  const isError = completedCoursesTable.isError || (completedCoursesTable.isSuccess && !completedCoursesTable.data)
+  const { data, isLoading, isFetching, isError } = useGetCompletedCoursesQuery({ courseList, studentList })
   const { getTextIn } = useLanguage()
 
-  useEffect(() => {
-    if (!isError && !isFetchingOrLoading) {
-      setImmediate(() => {
-        const data = completedCoursesTable?.data
-        setData(data)
-      })
-    }
-  }, [completedCoursesTable])
-
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
-  if (isFetchingOrLoading || data === null) return <Loader active style={{ marginTop: '15em' }} />
+  if (isFetching || isLoading || !data) return <Loader active style={{ marginTop: '15em' }} />
 
   return (
     <div>
