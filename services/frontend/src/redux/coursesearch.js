@@ -10,14 +10,14 @@ export const findCoursesV2 = ({ name, code, combineSubstitutions }) => {
   return callController(route, prefix, [], 'get', params, params)
 }
 
-export const toggleOpenAndReqularCourses = showType => {
+export const toggleOpenAndRegularCourses = showType => {
   return {
-    type: 'TOGGLE_OPEN_AND_REQULAR_COURSES',
+    type: 'TOGGLE_OPEN_AND_Regular_COURSES',
     showType,
   }
 }
 
-export const reducer = (state = { data: {}, pending: false, openOrReqular: 'unifyStats' }, action) => {
+export const reducer = (state = { data: {}, pending: false, openOrRegular: 'unifyStats' }, action) => {
   switch (action.type) {
     case 'GET_COURSE_SEARCH_RESULT_ATTEMPT':
       return {
@@ -42,10 +42,10 @@ export const reducer = (state = { data: {}, pending: false, openOrReqular: 'unif
             : state.data,
       }
 
-    case 'TOGGLE_OPEN_AND_REQULAR_COURSES':
+    case 'TOGGLE_OPEN_AND_Regular_COURSES':
       return {
         ...state,
-        openOrReqular: action.showType,
+        openOrRegular: action.showType,
       }
 
     case 'CLEAR_SEARCH_RESULTS':

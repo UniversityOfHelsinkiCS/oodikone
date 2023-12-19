@@ -427,7 +427,7 @@ router.get('/v3/populationstatistics/maxYearsToCreatePopulationFrom', async (req
   )
   const maxYearsToCreatePopulationFromUni = await CourseService.maxYearsToCreatePopulationFrom(
     JSON.parse(courseCodes),
-    'reqularStats'
+    'regularStats'
   )
   const maxYearsToCreatePopulationFromBoth = await CourseService.maxYearsToCreatePopulationFrom(
     JSON.parse(courseCodes),

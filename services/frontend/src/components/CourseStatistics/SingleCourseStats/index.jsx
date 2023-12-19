@@ -84,7 +84,7 @@ const SingleCourseStats = ({
       case 'openStats':
         maxYearsToCreatePopulationFrom = maxYears.openCourses
         break
-      case 'reqularStats':
+      case 'regularStats':
         maxYearsToCreatePopulationFrom = maxYears.uniCourses
         break
       default:
@@ -539,7 +539,7 @@ SingleCourseStats.propTypes = {
 const mapStateToProps = state => {
   return {
     programmes: getAllStudyProgrammes(state),
-    unifyCourses: state.courseSearch.openOrReqular,
+    unifyCourses: state.courseSearch.openOrRegular,
   }
 }
 

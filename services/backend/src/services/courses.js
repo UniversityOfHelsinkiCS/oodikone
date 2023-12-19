@@ -250,7 +250,7 @@ const yearlyStatsOfNew = async (coursecode, separate, unification, anonymization
       ? sortMainCode([...courseForSubs.substitutions, coursecode])
       : [coursecode]
 
-  if (unification === 'reqular') {
+  if (unification === 'regular') {
     codes = codes.filter(course => !isOpenUniCourseCode(course))
   }
 
@@ -402,17 +402,17 @@ const maxYearsToCreatePopulationFrom = async (coursecodes, unifyCourses) => {
 }
 
 const courseYearlyStats = async (coursecodes, separate, anonymizationSalt, combineSubstitutions) => {
-  const statsReqular = await Promise.all(
+  const statsRegular = await Promise.all(
     coursecodes.map(async code => {
       const unifyStats = await yearlyStatsOfNew(code, separate, 'unify', anonymizationSalt, combineSubstitutions)
-      const reqularStats = await yearlyStatsOfNew(code, separate, 'reqular', anonymizationSalt, combineSubstitutions)
+      const regularStats = await yearlyStatsOfNew(code, separate, 'regular', anonymizationSalt, combineSubstitutions)
       const openStats = await yearlyStatsOfNew(code, separate, 'open', anonymizationSalt, combineSubstitutions)
 
-      return { unifyStats, reqularStats, openStats }
+      return { unifyStats, regularStats, openStats }
     })
   )
 
-  return statsReqular
+  return statsRegular
 }
 
 const nameLikeTerm = name => {

@@ -2,14 +2,14 @@ import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Menu, Radio, Form } from 'semantic-ui-react'
 
-import { toggleOpenAndReqularCourses } from 'redux/coursesearch'
+import { toggleOpenAndRegularCourses } from 'redux/coursesearch'
 
 export const UnifyRadioButtons = ({ availableStats }) => {
   const dispatch = useDispatch()
 
-  const openOrReqular = useSelector(state => state.courseSearch.openOrReqular)
+  const openOrRegular = useSelector(state => state.courseSearch.openOrRegular)
   const toggleUnifyRadioValue = (event, { value }) => {
-    dispatch(toggleOpenAndReqularCourses(value))
+    dispatch(toggleOpenAndRegularCourses(value))
   }
 
   return (
@@ -23,11 +23,11 @@ export const UnifyRadioButtons = ({ availableStats }) => {
             <Radio
               label={availableStats.university ? 'university' : 'university (no data)'}
               name="radioGroup"
-              value="reqularStats"
-              checked={openOrReqular === 'reqularStats'}
+              value="regularStats"
+              checked={openOrRegular === 'regularStats'}
               disabled={!availableStats.university}
               onChange={toggleUnifyRadioValue}
-              data-cy="unify_radio_reqular"
+              data-cy="unify_radio_regular"
             />
           </Form.Field>
           <Form.Field>
@@ -35,7 +35,7 @@ export const UnifyRadioButtons = ({ availableStats }) => {
               label={availableStats.open ? 'open' : 'open (no data)'}
               name="radioGroup"
               value="openStats"
-              checked={openOrReqular === 'openStats'}
+              checked={openOrRegular === 'openStats'}
               onChange={toggleUnifyRadioValue}
               disabled={!availableStats.open}
               data-cy="unify_radio_open"
@@ -46,7 +46,7 @@ export const UnifyRadioButtons = ({ availableStats }) => {
               label={availableStats.unify ? 'both' : 'both (no data)'}
               name="radioGroup"
               value="unifyStats"
-              checked={openOrReqular === 'unifyStats'}
+              checked={openOrRegular === 'unifyStats'}
               onChange={toggleUnifyRadioValue}
               disabled={!availableStats.unify}
               data-cy="unify_radio_unify"

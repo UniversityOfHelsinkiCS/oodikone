@@ -205,7 +205,7 @@ describe('Course Statistics tests', () => {
       cy.contains('Search for courses').should('not.exist')
 
       cy.contains('TKT10004, 581328, AYTKT10004, A581328 Tietokantojen perusteet')
-      cy.get('[data-cy=unify_radio_reqular]').click()
+      cy.get('[data-cy=unify_radio_regular]').click()
       cy.contains('TKT10004, 581328 Tietokantojen perusteet')
     })
 
@@ -258,7 +258,7 @@ describe('Course Statistics tests', () => {
       cy.get("input[placeholder='Search by a course code']").type('TKT20003')
       cy.contains(/^TKT20003, 582219$/).click()
       cy.contains('TKT20003, 582219 Käyttöjärjestelmät')
-      cy.get('[data-cy=unify_radio_reqular]').click()
+      cy.get('[data-cy=unify_radio_regular]').click()
       cy.get('tbody > :nth-child(3) > :nth-child(2) .level').click()
       cy.contains('Population of course Käyttöjärjestelmät 2019-2020')
       cy.contains('Language distribution').click()
@@ -362,7 +362,7 @@ describe('Course Statistics tests', () => {
         ['Total', null, 199, 188, 11],
       ]
 
-      const attemptsTableContentsReqular = [
+      const attemptsTableContentsRegular = [
         // [time, total, passed, failed]
         ['Total', null, 312, 298, 14],
       ]
@@ -426,7 +426,7 @@ describe('Course Statistics tests', () => {
       })
 
       it('Toggling course provider changes stats correctly', () => {
-        cy.get('[data-cy=unify_radio_reqular]').click()
+        cy.get('[data-cy=unify_radio_regular]').click()
         cy.get("div[name='toYear']").within(() => {
           cy.get("div[role='option']").first().should('have.text', '2020-2021')
           cy.contains("div[role='option']", yearRange.to).should('have.class', 'selected')
@@ -436,7 +436,7 @@ describe('Course Statistics tests', () => {
         cy.contains('#CourseStatPanes a.item', 'Table').click()
         cy.contains('#CourseStatPanes a.item', 'Attempts').click()
         cy.get('#CourseStatPanes table>tbody').within(() => {
-          attemptsTableContentsReqular.forEach((values, trIndex) => {
+          attemptsTableContentsRegular.forEach((values, trIndex) => {
             cy.get('tr')
               .eq(trIndex)
               .within(() => {
@@ -497,7 +497,7 @@ describe('Course Statistics tests', () => {
       cy.get("input[placeholder='Search by a course code']").type('AYCSM14111')
       cy.contains('AYCSM14111').click()
       cy.contains('AYCSM14111 Avoin yo: Full Stack -websovelluskehitys: React Native')
-      cy.get('[data-cy=unify_radio_reqular]').find('input').should('be.disabled')
+      cy.get('[data-cy=unify_radio_regular]').find('input').should('be.disabled')
       cy.get('[data-cy=unify_radio_unify]').find('input').should('not.be.disabled')
     })
 

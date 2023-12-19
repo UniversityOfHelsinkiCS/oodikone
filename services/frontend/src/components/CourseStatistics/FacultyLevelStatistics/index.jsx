@@ -85,13 +85,13 @@ const CourseTable = ({ course, courseInstance, selectedYear }) => {
 
 export const FacultyLevelStatistics = () => {
   const { language: activeLanguage } = useLanguage()
-  const openOrReqular = useSelector(state => state.courseSearch.openOrReqular)
+  const openOrRegular = useSelector(state => state.courseSearch.openOrRegular)
   const { courseStats } = useSelector(({ courseStats }) => ({
     courseStats: courseStats.data,
     language: activeLanguage,
   }))
 
-  const yearcodes = uniq(flatten(Object.values(courseStats).map(c => Object.keys(c[openOrReqular].facultyStats))))
+  const yearcodes = uniq(flatten(Object.values(courseStats).map(c => Object.keys(c[openOrRegular].facultyStats))))
     .sort()
     .reverse()
 
@@ -106,13 +106,13 @@ export const FacultyLevelStatistics = () => {
   const yearsCourseStats = Object.values(courseStats)
     .map(course => ({
       course,
-      courseInstance: course[openOrReqular].facultyStats[selectedYear],
+      courseInstance: course[openOrRegular].facultyStats[selectedYear],
     }))
     .sort((a, b) => (a.courseInstance === undefined) - (b.courseInstance === undefined))
 
   const courseTables = yearsCourseStats.map(({ course, courseInstance }) => (
     <CourseTable
-      course={course[openOrReqular]}
+      course={course[openOrRegular]}
       courseInstance={courseInstance}
       key={course.unifyStats.coursecode}
       selectedYear={selectedYear}

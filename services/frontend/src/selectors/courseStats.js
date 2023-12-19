@@ -2,17 +2,17 @@ import { createSelector } from '@reduxjs/toolkit'
 import { sortBy, flatten } from 'lodash'
 
 const courseStatsSelector = state => state.courseStats.data
-const openOrReqularSelector = state => state.courseSearch.openOrReqular
+const openOrRegularSelector = state => state.courseSearch.openOrRegular
 const singleCourseStatsSelector = state => state.singleCourseStats
 
 export const getCourseStats = createSelector(
-  [courseStatsSelector, openOrReqularSelector],
-  (courseStats, openOrReqular) => {
+  [courseStatsSelector, openOrRegularSelector],
+  (courseStats, openOrRegular) => {
     const stats = {}
 
     Object.entries(courseStats).forEach(entry => {
       const [coursecode] = entry
-      const data = entry[1][openOrReqular]
+      const data = entry[1][openOrRegular]
       const { statistics } = data
       stats[coursecode] = {
         ...data,
@@ -24,9 +24,9 @@ export const getCourseStats = createSelector(
 )
 
 export const getCourseAlternatives = createSelector(
-  [courseStatsSelector, openOrReqularSelector, singleCourseStatsSelector],
-  (courseStats, openOrReqular, singleCourseStats) => {
-    return courseStats[singleCourseStats.selectedCourse][openOrReqular].alternatives
+  [courseStatsSelector, openOrRegularSelector, singleCourseStatsSelector],
+  (courseStats, openOrRegular, singleCourseStats) => {
+    return courseStats[singleCourseStats.selectedCourse][openOrRegular].alternatives
   }
 )
 export const getAvailableStats = createSelector([courseStatsSelector], courseStats => {
@@ -38,7 +38,7 @@ export const getAvailableStats = createSelector([courseStatsSelector], courseSta
     availableStats[coursecode] = {
       unify: entry[1].unifyStats.statistics.length > 0,
       open: entry[1].openStats.statistics.length > 0,
-      university: entry[1].reqularStats.statistics.length > 0,
+      university: entry[1].regularStats.statistics.length > 0,
     }
   })
   return availableStats
@@ -64,7 +64,6 @@ export const getQueryInfo = createSelector([getCourseStats], stats => {
   return { courses, timeframe }
 })
 
-// export const newLocal = <Popup content="Students from all programmes" trigger="All" />
 export const ALL = {
   key: 'ALL',
   value: 'ALL',
