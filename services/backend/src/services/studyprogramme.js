@@ -501,35 +501,13 @@ const getCourseCodesForStudyProgramme = async provider => {
       },
     },
   })
-  // here is work in progress
-  // const courseIds = coursesByProvider.map(course => course.id)
-  // const coursesWithManyProviders = await CourseProvider.findAll({
-  //   attributes: ['coursecode', [sequelize.fn('COUNT', sequelize.col('organizationcode')), 'n_courses']],
-  //   where: {
-  //     coursecode: {
-  //       [Op.in]: courseIds,
-  //     },
-  //   },
-  //   group: 'coursecode',
-  // })
 
-  // const coursesProvidedByManyProgrammes = coursesWithManyProviders
-  //   .filter(course => course.n_courses >= 2)
-  //   .map(course => course.coursecode)
-  // // We are basically not interested other substitutions than those with open uni ones.
-  // const coursesToHave = coursesByProvider.filter(course => !coursesProvidedByManyProgrammes.includes(course.id))
   const coursesWithOpenUniSubstitutions = coursesByProvider.map(({ code, substitutions }) => {
     if (!substitutions || !substitutions.length) return [code]
     const alternatives = [`AY-${code}`, `AY${code}`, `A-${code}`]
     return [code].concat(substitutions.filter(sub => alternatives.includes(sub)))
   })
-  // const providedByManyProgrammes = coursesByProvider
-  //   .filter(course => coursesProvidedByManyProgrammes.includes(course.id))
-  //   .map(({ code, substitutions }) => {
-  //     if (!substitutions || !substitutions.length) return [code]
-  //     const alternatives = [`AY-${code}`, `AY${code}`, `A-${code}`]
-  //     return [code].concat(substitutions.filter(sub => alternatives.includes(sub)))
-  //   })
+
   return coursesWithOpenUniSubstitutions.flat()
 }
 
