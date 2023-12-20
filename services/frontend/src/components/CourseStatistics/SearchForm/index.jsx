@@ -329,7 +329,7 @@ export const SearchForm = ({ onProgress }) => {
               {renderFetchStatisticsButton()}
             </div>
             <CourseTable
-              hidden={isLoading}
+              hidden={isLoading || (Object.keys(courses).length === 0 && Object.keys(selectedCourses).length > 0)}
               courses={courses}
               title="Searched courses"
               onSelectCourse={onSelectCourse}
