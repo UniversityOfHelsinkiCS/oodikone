@@ -121,6 +121,7 @@ export const getSemestersPresentFunctions = ({
 
       return (
         <Popup
+          key={key}
           on="hover"
           content={onHoverString()}
           size="tiny"
