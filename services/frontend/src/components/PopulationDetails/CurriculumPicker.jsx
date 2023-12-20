@@ -51,6 +51,8 @@ export const CurriculumPicker = ({ setCurriculum, programmeCodes, disabled, year
     return `${years[0]} - ${years[years.length - 1]}`
   }
 
+  if (curriculums.length === 0) return null
+
   return (
     <Dropdown
       disabled={disabled}
@@ -62,12 +64,12 @@ export const CurriculumPicker = ({ setCurriculum, programmeCodes, disabled, year
       }}
       data-cy="curriculum-picker"
       className="link item"
-      value={chosenCurriculum}
-      onChange={(_, { value }) => setSelectedCurriculum(value)}
+      value={chosenCurriculum.dataValues.id}
+      onChange={(_, { value }) => setSelectedCurriculum(curriculums.find(c => c.dataValues.id === value))}
       options={sortBy(
         curriculums.map(cur => ({
           key: sortBy(cur.curriculum_period_ids).join(', '),
-          value: cur,
+          value: cur.dataValues.id,
           text: formatCurriculumOptions(cur),
         })),
         'key'
