@@ -27,14 +27,20 @@ export const FacultyView = ({ faculty }) => {
   const facultyDetails = faculties && faculty && faculties.find(f => f.code === faculty)
   const facultyName = facultyDetails && getTextIn(facultyDetails.name)
 
-  const progressStats = useGetFacultyProgressStatsQuery({
-    id: faculty,
-    studyProgrammeFilter,
-    specialGroups: specials,
-    graduated,
-  })
+  const progressStats = useGetFacultyProgressStatsQuery(
+    {
+      id: faculty,
+      studyProgrammeFilter,
+      specialGroups: specials,
+      graduated,
+    },
+    { skip: !facultyDetails }
+  )
 
-  const graduationStats = useGetFacultyGraduationTimesQuery({ id: faculty, studyProgrammeFilter })
+  const graduationStats = useGetFacultyGraduationTimesQuery(
+    { id: faculty, studyProgrammeFilter },
+    { skip: !facultyDetails }
+  )
 
   const getDivider = (title, toolTipText, content, cypress = undefined) => (
     <>
@@ -51,6 +57,17 @@ export const FacultyView = ({ faculty }) => {
     return <Loader active style={{ marginTop: '10em' }} />
   }
 
+  if (!facultyDetails) {
+    return (
+      <h3>
+        {getTextIn({
+          en: `Faculty “${faculty}” was not found. Please check the address.`,
+          fi: `Tiedekuntaa ”${faculty}” ei löytynyt. Ole hyvä ja tarkista osoite.`,
+        })}
+      </h3>
+    )
+  }
+
   const isFetchingOrLoading =
     progressStats.isLoading || progressStats.isFetching || graduationStats.isLoading || graduationStats.isFetching
 
@@ -62,8 +79,8 @@ export const FacultyView = ({ faculty }) => {
 
   return (
     <>
-      <div align="center" style={{ padding: '30px' }}>
-        <Header textAlign="center">{facultyName}</Header>
+      <div style={{ padding: '30px', textAlign: 'center' }}>
+        <Header>{facultyName}</Header>
         <span>{faculty}</span>
       </div>
       <Message info>
