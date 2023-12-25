@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: 'Get current time'
         id: get_current_time
@@ -48,7 +48,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Extract release version
         id: extract_version
@@ -83,7 +83,7 @@ jobs:
       - release_frontend
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Extract release version
         id: extract_version
@@ -120,7 +120,7 @@ jobs:
     if: success()
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: 'Send notification to slack'
         uses: UniversityOfHelsinkiCS/slackbot-action@v1.4.2
         with:
@@ -140,7 +140,7 @@ jobs:
     if: failure()
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: 'Send notification to slack'
         uses: UniversityOfHelsinkiCS/slackbot-action@v1.4.2
         with:
