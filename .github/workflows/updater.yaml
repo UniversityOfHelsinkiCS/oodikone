@@ -55,7 +55,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: 'Login to toska docker registry'
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
