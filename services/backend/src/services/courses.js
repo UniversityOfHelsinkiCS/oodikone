@@ -12,10 +12,10 @@ const {
 } = require('../models')
 
 const { parseCredit } = require('./parseCredits')
+const { parseEnrollment } = require('./parseEnrollments')
 const Op = Sequelize.Op
 const { CourseYearlyStatsCounter } = require('./course_yearly_stats_counter')
 const { sortMainCode, getSortRank } = require('../util/utils')
-const { parseEnrollment } = require('./parseEnrollments')
 
 const byNameOrCode = (searchTerm, language) =>
   Course.findAll({
@@ -72,38 +72,11 @@ const creditsForCourses = async (codes, anonymizationSalt, unification) => {
     }
   }
 
-  const credits = await Credit.findAll({
+  return await Credit.findAll({
     include: [
       {
         model: Student,
         attributes: ['studentnumber'],
-        include: {
-          model: StudyrightElement,
-          attributes: ['code', 'startdate'],
-          include: [
-            {
-              model: ElementDetail,
-              attributes: ['name', 'type'],
-              where: {
-                type: {
-                  [Op.eq]: 20,
-                },
-              },
-            },
-            {
-              model: Studyright,
-              attributes: ['prioritycode', 'faculty_code'],
-              where: {
-                prioritycode: {
-                  [Op.eq]: 1,
-                },
-              },
-              include: {
-                model: Organization,
-              },
-            },
-          ],
-        },
       },
       {
         model: Semester,
@@ -126,9 +99,51 @@ const creditsForCourses = async (codes, anonymizationSalt, unification) => {
     },
     order: [['attainment_date', 'ASC']],
   })
+}
 
-  const parsedCredits = credits.map(credit => parseCredit(credit, anonymizationSalt))
-  return parsedCredits
+const getStudentNumberToSrElementsMap = async studentNumbers => {
+  const studyrights = await Studyright.findAll({
+    attributes: ['prioritycode', 'faculty_code', 'student_studentnumber', 'studyrightid'],
+    where: {
+      prioritycode: {
+        [Op.eq]: 1,
+      },
+      student_studentnumber: { [Op.in]: studentNumbers },
+    },
+    include: {
+      model: Organization,
+    },
+  })
+
+  const studyrightMap = studyrights.reduce((obj, cur) => {
+    obj[cur.studyrightid] = cur
+    return obj
+  }, {})
+
+  const studyrightIds = Object.keys(studyrightMap)
+
+  const studyrightElements = await StudyrightElement.findAll({
+    attributes: ['code', 'startdate', 'studentnumber', 'studyrightid'],
+    include: [
+      {
+        model: ElementDetail,
+        attributes: ['name', 'type'],
+        where: {
+          type: {
+            [Op.eq]: 20,
+          },
+        },
+      },
+    ],
+    where: { studyrightid: { [Op.in]: studyrightIds } },
+  })
+
+  return studyrightElements.reduce((obj, cur) => {
+    if (!obj[cur.studentnumber]) obj[cur.studentnumber] = []
+    cur.studyright = studyrightMap[cur.studyrightid]
+    obj[cur.studentnumber].push(cur)
+    return obj
+  }, {})
 }
 
 const enrollmentsForCourses = async (codes, anonymizationSalt, unification) => {
@@ -142,38 +157,11 @@ const enrollmentsForCourses = async (codes, anonymizationSalt, unification) => {
     }
   }
 
-  const enrollments = await Enrollment.findAll({
+  return await Enrollment.findAll({
     include: [
       {
         model: Student,
         attributes: ['studentnumber'],
-        include: {
-          model: StudyrightElement,
-          attributes: ['code', 'startdate'],
-          include: [
-            {
-              model: ElementDetail,
-              attributes: ['name', 'type'],
-              where: {
-                type: {
-                  [Op.eq]: 20,
-                },
-              },
-            },
-            {
-              model: Studyright,
-              attributes: ['prioritycode', 'faculty_code'],
-              where: {
-                prioritycode: {
-                  [Op.eq]: 1,
-                },
-              },
-              include: {
-                model: Organization,
-              },
-            },
-          ],
-        },
       },
       {
         model: Semester,
@@ -197,7 +185,6 @@ const enrollmentsForCourses = async (codes, anonymizationSalt, unification) => {
       [Op.or]: [{ is_open }, { is_open: null }],
     },
   })
-  return enrollments.map(enrollment => parseEnrollment(enrollment, anonymizationSalt))
 }
 
 const bySearchTerm = async (term, language) => {
@@ -240,7 +227,14 @@ const allCodeAlternatives = async code => {
   return sortMainCode([...course.substitutions, code])
 }
 
-const yearlyStatsOfNew = async (coursecode, separate, unification, anonymizationSalt, combineSubstitutions) => {
+const yearlyStatsOfNew = async (
+  coursecode,
+  separate,
+  unification,
+  anonymizationSalt,
+  combineSubstitutions,
+  studentNumberToSrElementsMap
+) => {
   const courseForSubs = await Course.findOne({
     where: { code: coursecode },
   })
@@ -279,7 +273,7 @@ const yearlyStatsOfNew = async (coursecode, separate, unification, anonymization
       programmes,
       coursecode,
       credits,
-    } = credit
+    } = parseCredit(credit, anonymizationSalt, studentNumberToSrElementsMap)
 
     const groupcode = separate ? semestercode : yearcode
     const groupname = separate ? semestername : yearname
@@ -314,7 +308,7 @@ const yearlyStatsOfNew = async (coursecode, separate, unification, anonymization
 
   enrollments.forEach(enrollment => {
     const { studentnumber, semestercode, semestername, yearcode, yearname, coursecode, state, enrollment_date_time } =
-      enrollment
+      parseEnrollment(enrollment, anonymizationSalt, studentNumberToSrElementsMap)
 
     const groupcode = separate ? semestercode : yearcode
     const groupname = separate ? semestername : yearname
@@ -402,11 +396,53 @@ const maxYearsToCreatePopulationFrom = async (coursecodes, unifyCourses) => {
 }
 
 const courseYearlyStats = async (coursecodes, separate, anonymizationSalt, combineSubstitutions) => {
+  const credits = await Credit.findAll({
+    attributes: ['student_studentnumber'],
+    where: { course_code: { [Op.in]: coursecodes } },
+  })
+
+  const enrollment = await Enrollment.findAll({
+    attributes: ['studentnumber'],
+    where: { course_code: { [Op.in]: coursecodes } },
+  })
+
+  const studentnumbersObject = {}
+
+  credits.forEach(cr => {
+    studentnumbersObject[cr.student_studentnumber] = true
+  })
+  enrollment.forEach(cr => {
+    studentnumbersObject[cr.studentnumber] = true
+  })
+
+  const studentNumberToSrElementsMap = await getStudentNumberToSrElementsMap(Object.keys(studentnumbersObject))
+
   const statsRegular = await Promise.all(
     coursecodes.map(async code => {
-      const unifyStats = await yearlyStatsOfNew(code, separate, 'unify', anonymizationSalt, combineSubstitutions)
-      const regularStats = await yearlyStatsOfNew(code, separate, 'regular', anonymizationSalt, combineSubstitutions)
-      const openStats = await yearlyStatsOfNew(code, separate, 'open', anonymizationSalt, combineSubstitutions)
+      const unifyStats = await yearlyStatsOfNew(
+        code,
+        separate,
+        'unify',
+        anonymizationSalt,
+        combineSubstitutions,
+        studentNumberToSrElementsMap
+      )
+      const regularStats = await yearlyStatsOfNew(
+        code,
+        separate,
+        'regular',
+        anonymizationSalt,
+        combineSubstitutions,
+        studentNumberToSrElementsMap
+      )
+      const openStats = await yearlyStatsOfNew(
+        code,
+        separate,
+        'open',
+        anonymizationSalt,
+        combineSubstitutions,
+        studentNumberToSrElementsMap
+      )
 
       return { unifyStats, regularStats, openStats }
     })

@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const crypto = require('crypto')
-const Course = require('../services/courses')
+const courseService = require('../services/courses')
 const { faculties } = require('../services/organisations')
 const { validateParamLength } = require('../util')
 
@@ -12,7 +12,7 @@ router.get('/v2/coursesmulti', async (req, res) => {
     return res.status(400).json({ error: 'name or code invalid' })
   }
 
-  results = await Course.byNameAndOrCodeLike(name, code)
+  results = await courseService.byNameAndOrCodeLike(name, code)
 
   if (combineSubstitutions === 'false') {
     const courseCodes = results.courses.map(course => course.code)
@@ -24,7 +24,7 @@ router.get('/v2/coursesmulti', async (req, res) => {
           .filter(value => value !== null && !courseCodes.includes(value))
       ),
     ]
-    const substitutionDetails = await Course.byCodes(substitutions)
+    const substitutionDetails = await courseService.byCodes(substitutions)
     for (const substitution of substitutionDetails) {
       results.courses.push(substitution.dataValues)
     }
@@ -56,7 +56,7 @@ router.get('/v3/courseyearlystats', async (req, res) => {
     // and users with rights to any specific study programmes
     const anonymize = allowedRoles !== 'admin' && rights.length < 1
     const anonymizationSalt = anonymize ? crypto.randomBytes(12).toString('hex') : null
-    const results = await Course.courseYearlyStats(codes, separate, anonymizationSalt, combineSubstitutions)
+    const results = await courseService.courseYearlyStats(codes, separate, anonymizationSalt, combineSubstitutions)
     res.json(results)
   }
 })

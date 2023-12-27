@@ -636,8 +636,14 @@ const studentnumbersWithAllStudyrightElements = async ({
     raw: true,
   })
 
+  const studentNumberToSrElementMap = allStudytracksForStudents.reduce((obj, cur) => {
+    if (!obj[cur.studentnumber]) obj[cur.studentnumber] = []
+    obj[cur.studentnumber].push(cur)
+    return obj
+  }, {})
+
   const formattedStudytracks = studentnumbers.reduce((acc, curr) => {
-    acc[curr] = allStudytracksForStudents.filter(srE => srE.studentnumber === curr)
+    acc[curr] = studentNumberToSrElementMap[curr]
     return acc
   }, {})
 
