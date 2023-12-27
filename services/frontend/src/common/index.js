@@ -174,35 +174,37 @@ export const getStudentToTargetCourseDateMap = (students, codes) => {
 
 export const getAllProgrammesOfStudent = (studyrights, studentNumber, studentToTargetCourseDateMap, elementDetails) => {
   const studyprogrammes = []
-  studyrights.forEach(sr => {
-    const facultyCode = sr.faculty_code
-    const studyrightElements = sr.studyright_elements.filter(
-      srE =>
-        elementDetails[srE.code] &&
-        elementDetails[srE.code].type === 20 &&
-        (studentToTargetCourseDateMap && studentNumber
-          ? moment(studentToTargetCourseDateMap[studentNumber]).isBetween(
-              srE.startdate,
-              srE.enddate || moment(),
-              'day',
-              '[]'
-            )
-          : true)
-    )
-    if (studyrightElements.length > 0) {
-      const newestStudyrightElement = studyrightElements.sort(
-        (a, b) => new Date(b.startdate) - new Date(a.startdate) + (new Date(b.enddate) - new Date(a.enddate))
-      )[0]
-      studyprogrammes.push({
-        name: elementDetails[newestStudyrightElement.code].name,
-        startdate: newestStudyrightElement.startdate,
-        code: newestStudyrightElement.code,
-        facultyCode,
-        graduated: sr.graduated,
-        active: sr.active,
-      })
-    }
-  })
+  studyrights
+    .filter(sr => sr.extentcode < 5)
+    .forEach(sr => {
+      const facultyCode = sr.faculty_code
+      const studyrightElements = sr.studyright_elements.filter(
+        srE =>
+          elementDetails[srE.code] &&
+          elementDetails[srE.code].type === 20 &&
+          (studentToTargetCourseDateMap && studentNumber
+            ? moment(studentToTargetCourseDateMap[studentNumber]).isBetween(
+                srE.startdate,
+                srE.enddate || moment(),
+                'day',
+                '[]'
+              )
+            : true)
+      )
+      if (studyrightElements.length > 0) {
+        const newestStudyrightElement = studyrightElements.sort(
+          (a, b) => new Date(b.startdate) - new Date(a.startdate) + (new Date(b.enddate) - new Date(a.enddate))
+        )[0]
+        studyprogrammes.push({
+          name: elementDetails[newestStudyrightElement.code].name,
+          startdate: newestStudyrightElement.startdate,
+          code: newestStudyrightElement.code,
+          facultyCode,
+          graduated: sr.graduated,
+          active: sr.active,
+        })
+      }
+    })
 
   studyprogrammes.sort((a, b) => new Date(b.startdate) - new Date(a.startdate))
 
