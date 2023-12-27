@@ -17,10 +17,11 @@ const formatStudyrightElement = ({ code, element_detail, startdate, studyright: 
   }
 }
 
-const parseCredit = (credit, anonymizationSalt) => {
-  const { student, semester, grade, course_code, credits, attainment_date } = credit
-  const { studentnumber, studyright_elements } = student
+const parseCredit = (credit, anonymizationSalt, studentNumberToSrElementsMap) => {
+  const { semester, grade, course_code, credits, attainment_date, student_studentnumber: studentnumber } = credit
   const { yearcode, yearname, semestercode, name: semestername } = semester
+
+  const studyrightElements = studentNumberToSrElementsMap[studentnumber] || []
 
   if (anonymizationSalt) {
     const anonymizedStudentNumber = crypto
@@ -28,13 +29,8 @@ const parseCredit = (credit, anonymizationSalt) => {
       .update(`${studentnumber}${anonymizationSalt}`)
       .digest('hex')
 
-    const anonymizedStudent = {
-      studentnumber: anonymizedStudentNumber,
-    }
-
     return {
       obfuscated: true,
-      student: anonymizedStudent,
       yearcode,
       yearname,
       semestercode,
@@ -44,13 +40,12 @@ const parseCredit = (credit, anonymizationSalt) => {
       grade,
       passed: !Credit.failed(credit) || Credit.passed(credit) || Credit.improved(credit),
       studentnumber: anonymizedStudentNumber,
-      programmes: studyright_elements.map(formatStudyrightElement),
+      programmes: studyrightElements.map(formatStudyrightElement),
       credits,
     }
   }
 
   return {
-    student,
     yearcode,
     yearname,
     semestercode,
@@ -60,7 +55,7 @@ const parseCredit = (credit, anonymizationSalt) => {
     grade,
     passed: !Credit.failed(credit) || Credit.passed(credit) || Credit.improved(credit),
     studentnumber,
-    programmes: studyright_elements.map(formatStudyrightElement),
+    programmes: studyrightElements.map(formatStudyrightElement),
     credits,
   }
 }
