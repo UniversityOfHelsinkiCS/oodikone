@@ -21,7 +21,7 @@ const {
   dbConnections: { sequelize },
 } = require('../database/connection')
 const { Tag, TagStudent } = require('../models/models_kone')
-const { CourseStatsCounter } = require('./course_stats_counter')
+const { CourseStatsCounter } = require('./courses/course_stats_counter')
 const { getPassingSemester, semesterEnd, semesterStart } = require('../util/semester')
 const { getAllProgrammes } = require('./studyrights')
 const { encrypt } = require('../services/encrypt')
