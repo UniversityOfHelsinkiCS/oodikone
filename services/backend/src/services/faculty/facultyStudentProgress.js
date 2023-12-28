@@ -1,8 +1,8 @@
 const { indexOf, inRange } = require('lodash')
 const moment = require('moment')
 const { getAcademicYearDates } = require('../../util/semester')
-const { getCreditThresholds, getYearsArray } = require('../studyprogrammeHelpers')
-const { studytrackStudents } = require('../studyprogramme')
+const { getCreditThresholds, getYearsArray } = require('../studyprogramme/studyprogrammeHelpers')
+const { studytrackStudents } = require('../studyprogramme/studentGetters')
 const { getStudyRightsByExtent, getStudyRightsByBachelorStart, getTransfersIn, getTransfersOut } = require('./faculty')
 const { checkTransfers } = require('./facultyHelpers')
 

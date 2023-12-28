@@ -9,8 +9,9 @@ const {
   alltimeStartDate,
   alltimeEndDate,
 } = require('./studyprogrammeHelpers')
-const { graduatedStudyRights, startedStudyrights, transfersAway, transfersTo } = require('./studyprogramme')
-const { getYearStartAndEndDates } = require('../util/semester')
+const { transfersAway, transfersTo } = require('.')
+const { getYearStartAndEndDates } = require('../../util/semester')
+const { startedStudyrights, graduatedStudyRights } = require('./studyrightFinders')
 
 const getStartedStats = async ({ studyprogramme, years, isAcademicYear }) => {
   const { graphStats, tableStats } = getStatsBasis(years)

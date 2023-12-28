@@ -7,8 +7,10 @@ const {
   isNonMajorCredit,
   getYearsArray,
   getStartDate,
-} = require('../studyprogrammeHelpers')
-const { getStudyRights, getCreditsForStudyProgramme, getCourseCodesForStudyProgramme } = require('../studyprogramme')
+} = require('../studyprogramme/studyprogrammeHelpers')
+const { getCourseCodesForStudyProgramme } = require('../studyprogramme')
+const { getCreditsForStudyProgramme } = require('../studyprogramme/creditGetters')
+const { getStudyRights } = require('../studyprogramme/studyrightFinders')
 
 const isFacultyNonMajorCredit = (studyrights, attainmentDate, facultyProgrammes, facultyCode) => {
   let right = ''

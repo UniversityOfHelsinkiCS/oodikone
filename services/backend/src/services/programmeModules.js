@@ -2,7 +2,7 @@ const Sequelize = require('sequelize')
 const { ExcludedCourse } = require('../models/models_kone')
 const { Op } = Sequelize
 const logger = require('../util/logger')
-const { combinedStudyprogrammes } = require('./studyprogrammeHelpers.js')
+const { combinedStudyprogrammes } = require('./studyprogramme/studyprogrammeHelpers.js')
 const { dbConnections } = require('../database/connection')
 const { ProgrammeModule } = require('../models')
 

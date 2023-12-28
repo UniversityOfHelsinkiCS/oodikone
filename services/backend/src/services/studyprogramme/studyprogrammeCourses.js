@@ -1,16 +1,14 @@
 const _ = require('lodash')
 
+const { getCurrentStudyYearStartDate, getNotCompletedForProgrammeCourses, getAllProgrammeCourses } = require('.')
+const { mapToProviders } = require('../../util/utils')
 const {
-  getStudentsForProgrammeCourses,
-  getCurrentStudyYearStartDate,
   getOwnStudentsForProgrammeCourses,
-  getNotCompletedForProgrammeCourses,
+  getStudentsForProgrammeCourses,
   getStudentsWithoutStudyrightForProgrammeCourses,
-  getTransferStudentsForProgrammeCourses,
   getOtherStudentsForProgrammeCourses,
-  getAllProgrammeCourses,
-} = require('./studyprogramme')
-const { mapToProviders } = require('../util/utils')
+  getTransferStudentsForProgrammeCourses,
+} = require('./studentGetters')
 
 const getCurrentYearStartDate = () => {
   return new Date(new Date().getFullYear(), 0, 1)

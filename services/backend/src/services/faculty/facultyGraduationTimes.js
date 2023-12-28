@@ -1,7 +1,7 @@
 const moment = require('moment')
 const { graduatedStudyrights, studyrightsByRightStartYear, hasMasterRight } = require('./faculty')
 const { findRightProgramme, isNewProgramme } = require('./facultyHelpers')
-const { getYearsArray, getYearsObject, getMedian, defineYear } = require('../studyprogrammeHelpers')
+const { getYearsArray, getYearsObject, getMedian, defineYear } = require('../studyprogramme/studyprogrammeHelpers')
 const { codes } = require('../../../config/programmeCodes')
 const { bachelorStudyright, countTimeCategories, getStatutoryAbsences } = require('../graduationHelpers')
 const { getProgrammes } = require('./facultyService')
