@@ -19,7 +19,7 @@ const emptyTotals = () => {
     allOtherCountries: 0,
   }
 }
-const toltalsCalculation = totals => {
+const totalsCalculation = totals => {
   return [
     totals.total,
     totals.allStarted,
@@ -45,10 +45,10 @@ const toltalsCalculation = totals => {
   ]
 }
 const addTotals = (facultyTableStats, year, totals) => {
-  facultyTableStats[year] = [year, ...toltalsCalculation(totals)]
+  facultyTableStats[year] = [year, ...totalsCalculation(totals)]
 }
 const addTotalsProgramme = (programmeTableStats, progId, year, totals) => {
-  programmeTableStats[progId][year] = toltalsCalculation(totals)
+  programmeTableStats[progId][year] = totalsCalculation(totals)
 }
 
 const getStudentData = (students, facultyExtra, year, code) => {
