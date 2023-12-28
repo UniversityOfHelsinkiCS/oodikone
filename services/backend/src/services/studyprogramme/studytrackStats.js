@@ -11,17 +11,15 @@ const {
   getGoal,
 } = require('./studyprogrammeHelpers')
 const {
-  studytrackStudents,
   allStudyrights,
   startedStudyrights,
   inactiveStudyrights,
-  enrolledStudents,
-  absentStudents,
   graduatedStudyRightsByStartDate,
   graduatedStudyRights,
-} = require('./studyprogramme')
-const { getAcademicYearDates } = require('../util/semester')
-const { countTimeCategories, getStatutoryAbsences } = require('./graduationHelpers')
+} = require('./studyrightFinders')
+const { getAcademicYearDates } = require('../../util/semester')
+const { countTimeCategories, getStatutoryAbsences } = require('../graduationHelpers')
+const { studytrackStudents, enrolledStudents, absentStudents } = require('./studentGetters')
 
 const getUnique = studentnumbers => [...new Set(studentnumbers)]
 const getStudentData = (startDate, students) => {

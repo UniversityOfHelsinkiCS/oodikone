@@ -2,7 +2,7 @@ const {
   getCriteria,
   saveYearlyCourseCriteria,
   saveYearlyCreditCriteria,
-} = require('../services/studyProgrammeCriteria')
+} = require('../services/studyprogramme/studyProgrammeCriteria')
 
 const router = require('express').Router()
 

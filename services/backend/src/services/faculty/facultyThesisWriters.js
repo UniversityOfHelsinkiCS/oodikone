@@ -8,7 +8,7 @@ const {
   getCorrectStudentnumbers,
   alltimeEndDate,
   alltimeStartDate,
-} = require('../studyprogrammeHelpers')
+} = require('../studyprogramme/studyprogrammeHelpers')
 
 const getFacultyThesisWriters = async ({ since, years, isAcademicYear, facultyProgrammes, includeAllSpecials }) => {
   const thesisTypes = ['urn:code:course-unit-type:bachelors-thesis', 'urn:code:course-unit-type:masters-thesis']

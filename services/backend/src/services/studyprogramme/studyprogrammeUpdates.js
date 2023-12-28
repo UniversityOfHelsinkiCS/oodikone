@@ -1,14 +1,9 @@
-const { getBasicStatsForStudytrack } = require('../services/studyprogrammeBasics')
-const { getCreditStatsForStudytrack } = require('../services/studyprogrammeCredits')
-const { getGraduationStatsForStudytrack } = require('../services/studyprogrammeGraduations')
-const { getStudytrackStatsForStudyprogramme } = require('../services/studytrackStats')
-const {
-  setBasicStats,
-  setCreditStats,
-  setGraduationStats,
-  setStudytrackStats,
-} = require('../services/analyticsService')
-const logger = require('../util/logger')
+const { getBasicStatsForStudytrack } = require('./studyprogrammeBasics')
+const { getCreditStatsForStudytrack } = require('./studyprogrammeCredits')
+const { getGraduationStatsForStudytrack } = require('./studyprogrammeGraduations')
+const { getStudytrackStatsForStudyprogramme } = require('./studytrackStats')
+const { setBasicStats, setCreditStats, setGraduationStats, setStudytrackStats } = require('../analyticsService')
+const logger = require('../../util/logger')
 
 const updateBasicView = async (code, combinedProgramme) => {
   const specialCalendar = {

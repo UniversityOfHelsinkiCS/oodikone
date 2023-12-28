@@ -1,5 +1,5 @@
-const { studentnumbersWithAllStudyrightElements } = require('./populations')
-const { codes } = require('../../config/programmeCodes')
+const { studentnumbersWithAllStudyrightElements } = require('../populations')
+const { codes } = require('../../../config/programmeCodes')
 
 // Helper functions
 const getCorrectStudentnumbers = async ({

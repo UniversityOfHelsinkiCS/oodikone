@@ -10,7 +10,7 @@ const CourseService = require('../services/courses')
 const StatMergeService = require('../services/statMerger')
 const { mapToProviders } = require('../util/utils')
 const { encrypt, decrypt } = require('../services/encrypt')
-const { mapCodesToIds } = require('../services/studyprogrammeHelpers')
+const { mapCodesToIds } = require('../services/studyprogramme/studyprogrammeHelpers')
 
 const { ApplicationError } = require('../util/customErrors')
 

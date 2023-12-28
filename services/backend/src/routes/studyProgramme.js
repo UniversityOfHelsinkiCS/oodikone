@@ -1,9 +1,9 @@
 const router = require('express').Router()
-const { getBasicStatsForStudytrack } = require('../services/studyprogrammeBasics')
-const { getCreditStatsForStudytrack } = require('../services/studyprogrammeCredits')
-const { getGraduationStatsForStudytrack } = require('../services/studyprogrammeGraduations')
-const { getStudytrackStatsForStudyprogramme } = require('../services/studytrackStats')
-const { getStudyprogrammeCoursesForStudytrack } = require('../services/studyprogrammeCourses')
+const { getBasicStatsForStudytrack } = require('../services/studyprogramme/studyprogrammeBasics')
+const { getCreditStatsForStudytrack } = require('../services/studyprogramme/studyprogrammeCredits')
+const { getGraduationStatsForStudytrack } = require('../services/studyprogramme/studyprogrammeGraduations')
+const { getStudyprogrammeCoursesForStudytrack } = require('../services/studyprogramme/studyprogrammeCourses')
+const { getStudytrackStatsForStudyprogramme } = require('../services/studyprogramme/studytrackStats')
 const {
   getBasicStats,
   setBasicStats,
@@ -14,7 +14,7 @@ const {
   getStudytrackStats,
   setStudytrackStats,
 } = require('../services/analyticsService')
-const { updateBasicView, updateStudytrackView } = require('../services/studyprogrammeUpdates')
+const { updateBasicView, updateStudytrackView } = require('../services/studyprogramme/studyprogrammeUpdates')
 const { getProgrammeName } = require('../services/studyprogramme')
 const logger = require('../util/logger')
 const { getAssociations } = require('../services/studyrights')

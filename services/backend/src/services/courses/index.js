@@ -1,8 +1,8 @@
 const Sequelize = require('sequelize')
 const { Credit, Course, Organization, Enrollment } = require('../../models')
 
-const { parseCredit } = require('../parseCredits')
-const { parseEnrollment } = require('../parseEnrollments')
+const { parseCredit } = require('./parseCredits')
+const { parseEnrollment } = require('./parseEnrollments')
 const Op = Sequelize.Op
 const { CourseYearlyStatsCounter } = require('./course_yearly_stats_counter')
 const { sortMainCode } = require('../../util/utils')

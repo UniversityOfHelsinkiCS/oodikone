@@ -1,6 +1,6 @@
 const { indexOf } = require('lodash')
 
-const { mapToProviders } = require('../util/utils')
+const { mapToProviders } = require('../../util/utils')
 const {
   getStatsBasis,
   defineYear,
@@ -11,13 +11,9 @@ const {
   isSpecialGroupCredit,
   tableTitles,
 } = require('./studyprogrammeHelpers')
-const {
-  getStudyRights,
-  getCreditsForStudyProgramme,
-  getTransferredCredits,
-  allTransfers,
-  getCourseCodesForStudyProgramme,
-} = require('./studyprogramme')
+const { allTransfers, getCourseCodesForStudyProgramme } = require('.')
+const { getTransferredCredits, getCreditsForStudyProgramme } = require('./creditGetters')
+const { getStudyRights } = require('./studyrightFinders')
 
 const createGraphStats = (majors, nonMajors, nonDegree, transferred) => {
   return [

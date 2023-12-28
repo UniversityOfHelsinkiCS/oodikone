@@ -1,6 +1,6 @@
-const { ProgressCriteria } = require('../models/models_kone')
-const { Course } = require('../models')
-const logger = require('../util/logger')
+const { ProgressCriteria } = require('../../models/models_kone')
+const { Course } = require('../../models')
+const logger = require('../../util/logger')
 
 const getCriteriaByStudyProgramme = async code => {
   if (code === '') return null
@@ -12,7 +12,7 @@ const getCriteriaByStudyProgramme = async code => {
 }
 
 const getSubstitutions = async codes => {
-  if (codes === []) return []
+  if (!codes.length) return []
   const courses = await Course.findAll({ where: { code: codes }, attributes: ['code', 'substitutions'], raw: true })
   return courses.reduce((acc, { code, substitutions }) => ({ ...acc, [code]: substitutions }), {})
 }

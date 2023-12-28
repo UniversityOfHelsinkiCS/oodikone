@@ -25,7 +25,7 @@ const { CourseStatsCounter } = require('./courses/course_stats_counter')
 const { getPassingSemester, semesterEnd, semesterStart } = require('../util/semester')
 const { getAllProgrammes } = require('./studyrights')
 const { encrypt } = require('../services/encrypt')
-const { getCriteria } = require('./studyProgrammeCriteria')
+const { getCriteria } = require('./studyprogramme/studyProgrammeCriteria')
 const { getCurrentSemester } = require('./semesters')
 
 const enrolmentDates = () => {

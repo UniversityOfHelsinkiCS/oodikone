@@ -11,7 +11,7 @@ const {
   studyrightsByRightStartYear,
   getTransfersIn,
 } = require('./faculty')
-const { getStatsBasis, getYearsArray, defineYear } = require('../studyprogrammeHelpers')
+const { getStatsBasis, getYearsArray, defineYear } = require('../studyprogramme/studyprogrammeHelpers')
 const { findRightProgramme, isNewProgramme, checkTransfers, getExtentFilter } = require('./facultyHelpers')
 const { codes } = require('../../../config/programmeCodes')
 
