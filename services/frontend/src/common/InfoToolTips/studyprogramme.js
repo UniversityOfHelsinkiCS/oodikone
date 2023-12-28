@@ -139,6 +139,8 @@ export const studyProgrammeToolTips = {
   StudytrackProgress: `
   Kuvaa koulutusohjelman kyseiseen ohjelmaan opinto-oikeudella varustettujen opiskelijoiden etenemistä opintopisteissä mitattuna. Esimerkiksi 2020-2021 aloittaneiden opintopistejakaumaa.
   
+  Pisterajat toimivat siten, että jos välit ovat esimerkiksi 20-40 ja 40-60, niin 40 opintopistettä saanut opiskelija sijoittuu ainoastaan 40-60 väliin. 39.9 saanut sijoittuu 20-40 väliin.
+
   HUOM! Mukana ovat myös muuhun kuin valittuun koulutusohjelmaan tai opintosuuntaan tehdyt opintopisteet.
 
   Mukana ovat oletusarvoisesti myös ohjelmaan siirtyneet opiskelijat.
