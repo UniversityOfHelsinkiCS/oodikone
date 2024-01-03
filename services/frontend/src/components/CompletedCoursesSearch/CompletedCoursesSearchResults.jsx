@@ -16,7 +16,7 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
 
   const getCompletion = (student, courseCode, { icon }) => {
     const completion = student.credits.find(c => c.courseCode === courseCode && isPassed(c.creditType))
-    const enrollment = student.enrollments.find(e => e.courseCode === courseCode)
+    const enrollment = student.enrollments[courseCode]
     if (completion === undefined) {
       if (!enrollment) {
         return icon ? null : ''
@@ -38,7 +38,7 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
 
   const getTotalPassed = s => s.credits.filter(c => isPassed(c.creditType)).length
 
-  const getTotalUnfinished = student => student.enrollments.length
+  const getTotalUnfinished = student => Object.values(student.enrollments).length
 
   const style = {
     verticalAlign: 'middle',
@@ -57,7 +57,7 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
 
   const getCellProps = (student, courseCode) => {
     const creditDate = student.credits.find(credit => credit.courseCode === courseCode)?.date
-    const enrollmentDate = student.enrollments.find(enrollment => enrollment.courseCode === courseCode)?.date
+    const enrollmentDate = student.enrollments[courseCode]?.date
     if (!creditDate && !enrollmentDate) {
       return { style }
     }

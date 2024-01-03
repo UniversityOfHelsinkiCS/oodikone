@@ -1,6 +1,5 @@
 const { Credit, Enrollment, Student, Course } = require('../models')
 const { Op } = require('sequelize')
-const _ = require('lodash')
 
 const getCompletedCourses = async (studentNumbers, courseCodes) => {
   let courses = await Course.findAll({
@@ -126,6 +125,7 @@ const getCompletedCourses = async (studentNumbers, courseCodes) => {
       date: enrollment.date,
       courseCode: enrollment.courseCode,
       state: enrollment.state,
+      substitution: enrollment.substitution,
     })
   })
 
@@ -136,7 +136,8 @@ const getCompletedCourses = async (studentNumbers, courseCodes) => {
         studentNumber: student,
         sis_person_id: studentCredits[student].sis_person_id,
         credits: studentCredits[student].credits,
-        enrollments: studentCredits[student].enrollments,
+        enrollments: {},
+        allEnrollments: studentCredits[student].enrollments,
         firstnames: studentCredits[student].firstnames,
         lastname: studentCredits[student].lastname,
         email: studentCredits[student].email,
@@ -147,18 +148,22 @@ const getCompletedCourses = async (studentNumbers, courseCodes) => {
 
   students.forEach(student => {
     courseCodes.forEach(courseCode => {
-      let [hits, rest] = _.partition(student.enrollments, e => e.courseCode === courseCode)
-      if (hits?.length === 0) return
-      let latest = hits[0]
-      for (let hit of hits) {
-        if (hit > latest) {
-          latest = hit
-        }
-      }
-      student.enrollments = [latest, ...rest]
+      student.enrollments[courseCode] = student.allEnrollments
+        .filter(e => e.courseCode === courseCode || e.substitution === courseCode)
+        .sort(e => new Date(e.date).getDate())[0]
     })
   })
-  return { students, courses }
+
+  // Omit allEnrollments, we're only supposed to show the recent, relevant enrollment,
+  // the user does not have rights to see all enrollments.
+  return {
+    students: students.map(student => {
+      // eslint-disable-next-line no-unused-vars
+      const { allEnrollments, ...rest } = student
+      return { ...rest }
+    }),
+    courses,
+  }
 }
 
 module.exports = { getCompletedCourses }
