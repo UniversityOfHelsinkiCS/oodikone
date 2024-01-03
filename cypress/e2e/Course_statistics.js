@@ -185,7 +185,8 @@ describe('Course Statistics tests', () => {
       cy.contains('Select all search results')
     })
 
-    it('"Fetch statistics" button is disabled if over 40 courses are selected', () => {
+    // Skipped for now, due to limit being removed. Subject to change after testing in production
+    it.skip('"Fetch statistics" button is disabled if over 40 courses are selected', () => {
       cy.contains('Search for courses')
       cy.get("input[placeholder='Search by a course code']").type('TKT')
       cy.get('[data-cy="select-multiple-courses-toggle"]').should('not.have.class', 'checked').click()
