@@ -56,14 +56,18 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
   ]
 
   const getCellProps = (student, courseCode) => {
-    const creditDate = student.credits.find(credit => credit.courseCode === courseCode)?.date
-    const enrollmentDate = student.enrollments[courseCode]?.date
-    if (!creditDate && !enrollmentDate) {
+    const credit = student.credits.find(credit => credit.courseCode === courseCode)
+    const enrollment = student.enrollments[courseCode]
+    if (!credit && !enrollment) {
       return { style }
     }
-    const title = creditDate
-      ? `Passed on ${moment(creditDate).format('YYYY-MM-DD')} `
-      : `Last enrollment on ${moment(enrollmentDate).format('YYYY-MM-DD')} `
+    const title = credit
+      ? `Passed on ${moment(credit.date).format('YYYY-MM-DD')}\nCourse code: ${
+          credit.substitution ? credit.substitution : credit.courseCode
+        }`
+      : `Last enrollment on ${moment(enrollment.date).format('YYYY-MM-DD')}\nCourse code ${
+          enrollment.substitution ? enrollment.substitution : enrollment.courseCode
+        }`
     return { style, title }
   }
 
