@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Segment, Header, Form, Radio, Popup } from 'semantic-ui-react'
+import { Segment, Header, Form, Radio, Popup, Message } from 'semantic-ui-react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useLocation, useHistory } from 'react-router-dom'
 import qs from 'query-string'
@@ -23,7 +23,9 @@ const INITIAL = {
   separate: false,
 }
 
-const MAX_SELECTED_COURSES = 40
+// For now, let's allow more courses because it's necessary and doesn't necessarily fail if the courses
+// have small populations (this used to be limited to 40)
+const MAX_SELECTED_COURSES = 99999
 
 const searchBoxStyle = {
   border: '2px solid black',
@@ -108,20 +110,6 @@ export const SearchForm = ({ onProgress }) => {
     const searchString = qs.stringify(queryObject)
     history.push({ search: searchString })
   }
-
-  useEffect(() => {
-    const matchingCourseCodes = matchingCourses.map(course => course.code)
-    const newSelectedCourses = Object.keys(selectedCourses)
-      .filter(course => matchingCourseCodes.includes(course))
-      .reduce((obj, key) => {
-        obj[key] = selectedCourses[key]
-        return obj
-      }, {})
-    setState({
-      ...state,
-      selectedCourses: newSelectedCourses,
-    })
-  }, [matchingCourses])
 
   const onSearchHistorySelected = historyItem => {
     pushQueryToUrl(historyItem)
@@ -317,6 +305,13 @@ export const SearchForm = ({ onProgress }) => {
                 </div>
               </Form.Field>
             </Form.Group>
+            {selectMultipleCoursesEnabled && (
+              <Message>
+                <b style={{ color: 'red', fontSize: '14pt' }}>Notice:</b> Selecting many courses may fail if there are
+                too many students in total. If the feature does not work, try again with fewer courses. <br /> <br />
+                <b>Currently selected: {Object.keys(state.selectedCourses).length || 0}</b>
+              </Message>
+            )}
             <div style={!noSelectedCourses ? searchBoxStyle : null}>
               <CourseTable
                 title="Selected courses"
