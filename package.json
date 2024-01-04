@@ -19,7 +19,7 @@
     "testupdater": "docker-compose --file docker-compose.ci.yml up --detach --no-recreate sis-updater-worker && SCHEDULE_IMMEDIATE=weekly EXIT_AFTER_IMMEDIATES=yes docker-compose --file docker-compose.ci.yml run sis-updater-scheduler npm start",
     "flushredis": "docker exec -it redis redis-cli flushall",
     "prepare": "husky install",
-    "rapodiff": "docker exec backend node /opt/app-root/src/src/rapodiff.js"
+    "rapodiff": "docker exec oodikone_backend_1 node /opt/app-root/src/src/rapodiff/rapodiff.js"
   },
   "repository": {
     "type": "git",

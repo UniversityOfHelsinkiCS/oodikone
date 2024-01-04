@@ -1,25 +1,15 @@
-/* eslint no-console: 0 */
-
-/*
-  depends on nodeproxy running in importer.cs.helsinki.fi, and env RAPO_NODEPROXY (see importer for a proper value)
-  needs also acces to importer db api, uses env IMPORTER_API
-
-  known differences in APIs
-    - rapo does not show students that have graduated (it however takes some days for rapo to notice a graduation)
-    - rapo does not handle the starting year of transfers properly (shows in old staring population)
-    - rapo show some students incorrectly passive, see https://github.com/UniversityOfHelsinkiCS/oodikone/issues/3521
-*/
+/* eslint-disable no-console */
 
 const axios = require('axios').default
 
 const _ = require('lodash')
 
-const { optimizedStatisticsOf } = require('./services/populations')
-const { Student, Transfer, StudyrightElement, Studyright } = require('./models')
-
-const token = process.env.RAPO_NODEPROXY
+const { optimizedStatisticsOf } = require('../services/populations')
+const { Student, Transfer, StudyrightElement, Studyright } = require('../models')
+const { rapoToken, tokenImporterApi, importerDbApiUrl, nodeproxyUrl } = require('./rapodiff.js')
 
 const getFromRapo = async (urlStart, urlEnd) => {
+  console.log({ urlStart, urlEnd })
   const { data: rapoStuffLasna } = await axios.get(urlStart)
   const { data: rapoStuffLasnaMinus } = await axios.get(urlEnd)
 
@@ -83,10 +73,12 @@ const getFromOodikone = async (programme, year) => {
 
 const isAcuallyActive = async student => {
   const currentSemester = 144
-  const tokenImporterApi = process.env.IMPORTER_API
 
-  const url = `https://importer.cs.helsinki.fi/api/importer/students/${student}/rapo_semester_enrollments?token=${tokenImporterApi}`
-  const { data } = await axios.get(url)
+  const url = `${importerDbApiUrl}/students/${student}/rapo_semester_enrollments?token=${tokenImporterApi}`
+  const result = await axios.get(url)
+  console.log('result:')
+  console.log(result)
+  const { data } = result
   const terms = data.reduce((all, s) => all.concat(s.terms), []).filter(t => t.semester_code === currentSemester)
   const active = terms.filter(t => t.type !== 'NEGLECTED')
   const negl = terms.filter(t => t.type === 'NEGLECTED')
@@ -144,11 +136,11 @@ const programme_diff_year = async (programme, facultyCode, year, brief = false) 
 
   const rapoUrlStart = presence =>
     encodeURI(
-      `https://importer.cs.helsinki.fi/test/rapo/${facultyCode}/${programme}/${studyrightStartDate}/${presence}?token=${token}`
+      `${nodeproxyUrl}/test/rapo/${facultyCode}/${programme}/${studyrightStartDate}/${presence}?token=${rapoToken}`
     )
   const rapoUrlEnd = presence =>
     encodeURI(
-      `https://importer.cs.helsinki.fi/test/rapo/${facultyCode}/${programme}/${studyrightEndDate}/${presence}?token=${token}`
+      `${nodeproxyUrl}/test/rapo/${facultyCode}/${programme}/${studyrightEndDate}/${presence}?token=${rapoToken}`
     )
 
   const rapoStudentsLasna = await getFromRapo(rapoUrlStart('Läsnä'), rapoUrlEnd('Läsnä'))
@@ -247,7 +239,7 @@ const programme_diff = async (programme, faculty, brief) => {
   await programme_diff_year(programme, faculty, 2021, brief)
 }
 
-const faculty_diff = async (faculty, programmes, brief) => {
+const facultyDiff = async (faculty, programmes, brief) => {
   console.log('\n')
   console.log(faculty)
   console.log('==')
@@ -265,11 +257,11 @@ const msc_programme_diff_year = async (programme, facultyCode, year, brief = fal
 
   const rapoUrlStart = presence =>
     encodeURI(
-      `https://importer.cs.helsinki.fi/test/rapo/${facultyCode}/${programme}/${studyrightStartDate}/${presence}?token=${token}`
+      `${nodeproxyUrl}/test/rapo/${facultyCode}/${programme}/${studyrightStartDate}/${presence}?token=${rapoToken}`
     )
   const rapoUrlEnd = presence =>
     encodeURI(
-      `https://importer.cs.helsinki.fi/test/rapo/${facultyCode}/${programme}/${studyrightEndDate}/${presence}?token=${token}`
+      `${nodeproxyUrl}/test/rapo/${facultyCode}/${programme}/${studyrightEndDate}/${presence}?token=${rapoToken}`
     )
 
   const rapoStudentsLasna = await getFromRapo(rapoUrlStart('Läsnä'), rapoUrlEnd('Läsnä'))
@@ -337,27 +329,4 @@ const msc_programme_diff_year = async (programme, facultyCode, year, brief = fal
   }
 }
 
-const bsc_priogrammes_of_faculties = {
-  H10: ['KH10_001'],
-  H20: ['KH20_001'],
-  H30: ['KH30_001', 'KH30_002'],
-  H40: ['KH40_001', 'KH40_002', 'KH40_003', 'KH40_004', 'KH40_005', 'KH40_006'],
-  H50: ['KH50_001', 'KH50_002', 'KH50_003', 'KH50_004', 'KH50_005', 'KH50_006', 'KH50_007', 'KH50_008'],
-  H55: ['KH55_001'],
-  H60: ['KH60_001'],
-  H70: ['KH70_001', 'KH70_002', 'KH70_003', 'KH70_004'],
-  H74: ['KH74_001'],
-  H80: ['KH80_001', 'KH80_002', 'KH80_003', 'KH80_004'],
-  H90: ['KH90_001'],
-}
-
-const main = async () => {
-  for (let faculty of Object.keys(bsc_priogrammes_of_faculties)) {
-    await faculty_diff(faculty, bsc_priogrammes_of_faculties[faculty], true)
-  }
-
-  //await programme_diff_year('KH55_001', 'H55', 2021, true)
-  //await programme_diff('KH60_001', 'H60', true)
-}
-
-main().then(() => process.exit(0))
+module.exports = { facultyDiff }
