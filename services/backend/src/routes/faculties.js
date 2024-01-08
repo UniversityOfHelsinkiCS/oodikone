@@ -28,10 +28,15 @@ const logger = require('../util/logger')
 // Faculty uses a lot of tools designed for Study programme.
 // Some of them have been copied here and slightly edited for faculty purpose.
 
-router.get('/', async (req, res) => {
+const getFacultyList = async () => {
   const ignore = ['Y', 'H99', 'Y01', 'H92', 'H930']
   const facultyList = (await faculties()).filter(f => !ignore.includes(f.code))
   facultyList.sort((a, b) => (a.name.fi > b.name.fi ? 1 : -1))
+  return facultyList
+}
+
+router.get('/', async (req, res) => {
+  const facultyList = await getFacultyList()
   res.json(facultyList)
 })
 
@@ -143,6 +148,42 @@ router.get('/:id/progressstats', async (req, res) => {
     updateStats = await setFacultyProgressStats(updateStats, specialGroups, graduated)
   }
   return res.json(updateStats)
+})
+
+router.get('/allprogressstats', async (req, res) => {
+  const specialGroups = 'SPECIAL_EXCLUDED'
+  const graduated = req.query?.graduated
+  const allFaculties = (await getFacultyList()).map(f => f.code)
+  const codeToData = {}
+  console.log('allFaculties')
+  console.log(JSON.stringify(allFaculties, null, 2))
+  for (const facultyCode of allFaculties) {
+    console.log(facultyCode)
+    const data = await getFacultyProgressStats(facultyCode, specialGroups, graduated)
+    if (!data) {
+      console.log('No data found for code ' + facultyCode)
+      return res.status(500).end()
+    }
+    codeToData[facultyCode] = data
+  }
+
+  const universityData = {
+    years: codeToData.H50.years,
+    yearlyBachelorTitles: codeToData.H50.yearlyBachelorTitles,
+    creditCounts: {
+      bachelor: {},
+    },
+  }
+  console.log(universityData.years)
+  for (const facultyCode of allFaculties) {
+    const facultyData = codeToData[facultyCode]
+    for (const year of universityData.years.slice(1)) {
+      console.log(year)
+      if (!universityData.creditCounts.bachelor[year]) universityData.creditCounts.bachelor[year] = []
+      universityData.creditCounts.bachelor[year].push(...facultyData.creditCounts.bachelor[year])
+    }
+  }
+  return res.status(200).json(universityData)
 })
 
 router.get('/:id/studentstats', async (req, res) => {
