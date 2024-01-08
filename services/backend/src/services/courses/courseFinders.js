@@ -106,11 +106,12 @@ const codeLikeTerm = code =>
       }
 
 const byNameAndOrCodeLike = async (name, code) => {
-  let rawCourses = await Course.findAll({
+  const rawCourses = await Course.findAll({
     where: {
       ...nameLikeTerm(name),
       ...codeLikeTerm(code),
     },
+    order: [['id', 'desc']],
   })
 
   const courses = rawCourses
