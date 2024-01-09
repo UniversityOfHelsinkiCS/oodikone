@@ -62,12 +62,10 @@ export const CompletedCoursesSearch = ({ setValues }) => {
   }, [deletedData])
 
   useEffect(() => {
-    setImmediate(() => {
-      if (location.search) {
-        const query = parseQueryFromUrl()
-        setValues(query)
-      }
-    })
+    if (location.search) {
+      const query = parseQueryFromUrl()
+      setValues(query)
+    }
   }, [location.search])
 
   const clearForm = () => {
@@ -77,10 +75,8 @@ export const CompletedCoursesSearch = ({ setValues }) => {
   }
 
   const pushQueryToUrl = query => {
-    setImmediate(() => {
-      const searchString = qs.stringify(query)
-      history.push({ search: searchString })
-    })
+    const searchString = qs.stringify(query)
+    history.push({ search: searchString })
   }
 
   const handleClose = () => {
@@ -163,7 +159,7 @@ export const CompletedCoursesSearch = ({ setValues }) => {
         <Form>
           <h2>Search completed courses of students</h2>
           <Form.Field>
-            <em>Insert one or more student numbers, separated by a space, a newline, or a comma.</em>
+            <em>Insert one or more student numbers, separated by a space, a newline, a comma, or a semicolon.</em>
             <TextArea
               value={studentInput}
               placeholder="012345678, 12345678"
