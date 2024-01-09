@@ -48,7 +48,7 @@ describe('When search modal is opened', () => {
     hasLanded()
     openCompletedCoursesModal()
     cy.contains('Search completed courses of students')
-    cy.contains('Insert one or more student numbers, separated by a space, a newline, or a comma.')
+    cy.contains('Insert one or more student numbers, separated by a space, a newline, a comma, or a semicolon.')
     cy.contains('Insert one or more courses, separated by a space, a newline, or a comma.')
     cy.contains('Insert name for this course list if you wish to save it')
   })
