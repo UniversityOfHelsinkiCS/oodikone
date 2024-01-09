@@ -70,6 +70,7 @@ services:
     <<: *defaults
     image: quay.io/toska/jami:production
     environment:
+      - npm_config_cache=/tmp
       - PORT=3003
       - NODE_ENV=production
       - DATABASE_URL=postgres://postgres:postgres@jami-db:5432/postgres
