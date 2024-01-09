@@ -1,9 +1,7 @@
 import React from 'react'
-import moment from 'moment'
-import xlsx from 'xlsx'
 import { Button, Popup } from 'semantic-ui-react'
-
-import { getStudentGradeMean, getStudentGradeMeanWeightedByCredits, getStudentTotalCredits } from 'common'
+import xlsx from 'xlsx'
+import { getStudentGradeMean, getStudentGradeMeanWeightedByCredits, getStudentTotalCredits, getTimestamp } from 'common'
 
 export const UnihowDataExport = ({ students }) => {
   const getXlsx = () => {
@@ -21,7 +19,7 @@ export const UnihowDataExport = ({ students }) => {
     return workbook
   }
 
-  const filename = `oodikone_export_${students.length}_students_${moment().format('YYYYMMDD-hhmmss')}.xlsx`
+  const filename = `oodikone_export_${students.length}_students_${getTimestamp()}.xlsx`
 
   return (
     <Popup

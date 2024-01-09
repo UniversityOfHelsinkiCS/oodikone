@@ -64,6 +64,8 @@ export const reformatDate = (date, outputFormat) => (!date ? 'Unavailable' : mom
 
 export const byDateDesc = (a, b) => new Date(b.date) - new Date(a.date)
 
+export const getTimestamp = () => moment().format('YYYYMMDD-hhmmss')
+
 export const getStudentTotalCredits = (student, includeTransferredCredits = true) => {
   const passedCourses = includeTransferredCredits
     ? student.courses.filter(c => c.passed && !c.isStudyModuleCredit)

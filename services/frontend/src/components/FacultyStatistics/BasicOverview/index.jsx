@@ -1,11 +1,12 @@
 import React from 'react'
-import { Divider, Loader, Popup, Button, Message } from 'semantic-ui-react'
-import xlsx from 'xlsx'
 import {
   useGetFacultyCreditStatsQuery,
   useGetFacultyBasicStatsQuery,
   useGetFacultyThesisStatsQuery,
 } from 'redux/facultyStats'
+import { Divider, Loader, Popup, Button, Message } from 'semantic-ui-react'
+import xlsx from 'xlsx'
+import { getTimestamp } from 'common'
 import { LineGraph } from 'components/StudyProgramme/BasicOverview/LineGraph'
 import { StackedBarChart } from 'components/StudyProgramme/BasicOverview/StackedBarChart'
 import { useLanguage } from 'components/LanguagePicker/useLanguage'
@@ -73,7 +74,7 @@ export const BasicOverview = ({
     xlsx.utils.book_append_sheet(book, tableSheet, 'TableStats')
     const sheet = xlsx.utils.json_to_sheet(csvData)
     xlsx.utils.book_append_sheet(book, sheet, 'ProgrammeStats')
-    xlsx.writeFile(book, `${faculty.code}-${toolTipText}.xlsx`)
+    xlsx.writeFile(book, `oodikone_${faculty.code}_${toolTipText}_${getTimestamp()}.xlsx`)
   }
 
   const getDivider = (title, toolTipText, titles, tableStats, programmeStats, programmeNames) => (
