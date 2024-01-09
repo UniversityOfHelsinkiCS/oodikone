@@ -1,6 +1,7 @@
-import xlsx from 'xlsx'
 import React from 'react'
 import { Button, Icon } from 'semantic-ui-react'
+import xlsx from 'xlsx'
+import { getTimestamp } from 'common'
 
 export const DataExport = ({ data }) => {
   const jsonItems = data.reduce((arr, cur) => {
@@ -30,7 +31,7 @@ export const DataExport = ({ data }) => {
   return (
     <Button
       onClick={() => {
-        xlsx.writeFile(workbook, 'coursestatistics.xlsx')
+        xlsx.writeFile(workbook, `oodikone_course_statistics_${getTimestamp()}.xlsx`)
       }}
     >
       <Icon name="save" />

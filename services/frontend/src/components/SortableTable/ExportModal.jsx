@@ -1,10 +1,11 @@
 /* eslint-disable no-continue */
 
+import _ from 'lodash'
 import React, { useState, useMemo, useEffect } from 'react'
 import { Modal, Table, Button, Checkbox } from 'semantic-ui-react'
-import _ from 'lodash'
-import xlsx from 'xlsx'
 import { v4 as uuidv4 } from 'uuid'
+import xlsx from 'xlsx'
+import { getTimestamp } from 'common'
 import { getColumnTitle, getDataItemType, DataItemType, cloneColumns } from './common'
 import { ValueVisitor } from './visitors/ValueVisitor'
 import { ExportVisitor } from './visitors/ExportVisitor'
@@ -71,7 +72,7 @@ export const ExportModal = ({ open, onOpen, onClose, data, columns }) => {
     const sheet = xlsx.utils.json_to_sheet(rows)
     const book = xlsx.utils.book_new()
     xlsx.utils.book_append_sheet(book, sheet)
-    xlsx.writeFile(book, 'Oodikone_Export.xlsx')
+    xlsx.writeFile(book, `oodikone_${getTimestamp()}.xlsx`)
   }
 
   const toggleSelection = key => {

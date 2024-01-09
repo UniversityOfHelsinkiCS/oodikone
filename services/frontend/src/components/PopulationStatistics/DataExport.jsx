@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux'
 import { Button, Icon, Popup } from 'semantic-ui-react'
 import xlsx from 'xlsx'
 import { curriculumsApi } from 'redux/populationCourses'
-import { reformatDate, getStudentTotalCredits, getStudentToStudyrightStartMap } from '../../common'
+import { reformatDate, getStudentTotalCredits, getStudentToStudyrightStartMap, getTimestamp } from '../../common'
 import { PRIORITYCODE_TEXTS } from '../../constants'
 import { useLanguage } from '../LanguagePicker/useLanguage'
 
@@ -257,7 +257,7 @@ export const DataExport = ({ students, programmeCode }) => {
       trigger={
         <Button
           onClick={() => {
-            xlsx.writeFile(generateWorkbook(), 'students.xlsx')
+            xlsx.writeFile(generateWorkbook(), `oodikone_students_${getTimestamp()}.xlsx`)
           }}
         >
           <Icon name="save" />

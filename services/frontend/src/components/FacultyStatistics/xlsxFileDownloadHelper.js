@@ -1,4 +1,5 @@
 import xlsx from 'xlsx'
+import { getTimestamp } from 'common'
 import { sortProgrammeKeys } from './facultyHelpers'
 
 export const downloadStudentTableCsv = (studentStats, programmeNames, faculty, sortedkeys, getTextIn) => {
@@ -105,7 +106,7 @@ export const downloadStudentTableCsv = (studentStats, programmeNames, faculty, s
     xlsx.utils.book_append_sheet(book, countriesSheet, `CountriesStats-${year}`)
   })
 
-  xlsx.writeFile(book, `${faculty.code}-ProgrammeStats.xlsx`)
+  xlsx.writeFile(book, `oodikone_${faculty.code}_programme_stats_${getTimestamp()}.xlsx`)
 }
 
 export const downloadProgressTableCsv = (progressStats, programmeNames, faculty, getTextIn) => {
@@ -176,7 +177,7 @@ export const downloadProgressTableCsv = (progressStats, programmeNames, faculty,
                 ? tableHeadersDataProg[counter][yearIndex]
                 : tableHeadersDataProg[counter].slice(1)
             return {
-              'Acdemic Year': years[yearIndex],
+              'Academic Year': years[yearIndex],
               Programme: programme,
               Name: getTextIn(programmeNames[programme]),
               ...yearRow.reduce(
@@ -195,5 +196,5 @@ export const downloadProgressTableCsv = (progressStats, programmeNames, faculty,
       xlsx.utils.book_append_sheet(book, sheet, sheetNames[counter])
     }
   })
-  xlsx.writeFile(book, `${faculty.code}-progressTab.xlsx`)
+  xlsx.writeFile(book, `oodikone_${faculty.code}_progress_tab_${getTimestamp()}.xlsx`)
 }
