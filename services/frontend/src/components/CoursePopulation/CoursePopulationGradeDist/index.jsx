@@ -1,9 +1,8 @@
 import React from 'react'
 import { Progress, Table } from 'semantic-ui-react'
 import { intersection, orderBy } from 'lodash'
-import moment from 'moment'
 
-import { getHighestGradeOfCourseBetweenRange } from '../../../common'
+import { getHighestGradeOfCourseBetweenRange } from 'common'
 import { ExternalGradeFilterToggle } from './ExternalGradeFilterToggle'
 
 export const CoursePopulationGradeDist = ({ singleCourseStats, students, courseCodes, from, to }) => {
@@ -14,17 +13,13 @@ export const CoursePopulationGradeDist = ({ singleCourseStats, students, courseC
 
     students.forEach(student => {
       const courses = student.courses.filter(c => courseCodes.includes(c.course_code))
-      const hasEnrollment =
-        student.enrollments?.some(
-          e => courseCodes.includes(e.course_code) && moment(e.enrollment_date_time).isBetween(moment(from), moment(to))
-        ) ?? false
       const highestGrade = getHighestGradeOfCourseBetweenRange(courses, from, to)
-      if (!highestGrade && hasEnrollment) {
-        if (!grades['No grade']) grades['No grade'] = []
+      if (!highestGrade) {
+        if (!grades['No grade']) {
+          grades['No grade'] = []
+        }
         grades['No grade'].push(student.studentNumber)
-      }
-
-      if (highestGrade) {
+      } else {
         if (!grades[highestGrade.grade]) {
           grades[highestGrade.grade] = []
         }

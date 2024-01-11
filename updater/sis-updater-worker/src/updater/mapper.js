@@ -379,6 +379,7 @@ const enrollmentMapper =
   ) =>
   enrollment => {
     const { startDate } = realisationIdToActivityPeriod[enrollment.course_unit_realisation_id] || {}
+    // This null check is possibly unnecessary as activity_period column in the course_unit_realisations table seems to be always defined (although there's no "not null" constraint in the db)
     const targetSemester = getSemesterByDate(new Date(startDate || enrollment.enrolment_date_time))
     const course_id = courseUnitIdToCourseGroupId[enrollment.course_unit_id]
     return {
