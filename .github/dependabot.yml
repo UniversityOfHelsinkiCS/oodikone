@@ -8,6 +8,8 @@ updates:
     labels:
       - 'dependencies'
       - 'infra'
+    allow:
+      - dependency-type: 'production'
     ignore:
       - dependency-name: '*'
         update-types: ['version-update:semver-major']
@@ -20,6 +22,8 @@ updates:
     labels:
       - 'dependencies'
       - 'updater'
+    allow:
+      - dependency-type: 'production'
     ignore:
       - dependency-name: '*'
         update-types: ['version-update:semver-major']
@@ -32,6 +36,8 @@ updates:
     labels:
       - 'dependencies'
       - 'updater'
+    allow:
+      - dependency-type: 'production'
     ignore:
       - dependency-name: '*'
         update-types: ['version-update:semver-major']
@@ -44,6 +50,8 @@ updates:
     labels:
       - 'dependencies'
       - 'back'
+    allow:
+      - dependency-type: 'production'
     ignore:
       - dependency-name: '*'
         update-types: ['version-update:semver-major']
@@ -56,6 +64,8 @@ updates:
     labels:
       - 'dependencies'
       - 'front'
+    allow:
+      - dependency-type: 'production'
     ignore:
       - dependency-name: '*'
         update-types: ['version-update:semver-major']
