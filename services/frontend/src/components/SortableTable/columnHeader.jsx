@@ -10,6 +10,7 @@ import { SortableTableContext, getDataItemType, DataItemType, thickBorderStyles 
 import { defaultColumnFilter } from './filters/defaultFilter'
 import { dateColumnFilter } from './filters/dateFilter'
 import { rangeColumnFilter } from './filters/rangeFilter'
+import { multiSelectColumnFilter } from './filters/multiSelectFilter'
 import { resolveDisplayColumn } from './columnContent'
 
 const getDefaultColumnOptions = () => ({
@@ -20,6 +21,7 @@ export const ColumnFilters = {
   default: defaultColumnFilter,
   date: dateColumnFilter,
   range: rangeColumnFilter,
+  multi: multiSelectColumnFilter,
 }
 
 const SizeMeasurer = ({ as = 'div', onSizeChange, children, ...rest }) => {
