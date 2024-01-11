@@ -14,17 +14,17 @@ jobs:
     name: 'Build Updater worker'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: docker/setup-buildx-action@v2
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
       - name: 'Build the image'
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v5
         with:
           context: updater/sis-updater-worker/
           push: false
           outputs: type=docker,dest=/tmp/worker.tar
           tags: toska/sis-updater-worker:latest
       - name: 'Store built image'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: /tmp/worker.tar
 
@@ -32,17 +32,17 @@ jobs:
     name: 'Build Updater scheduler'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: docker/setup-buildx-action@v2
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
       - name: 'Build the image'
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v5
         with:
           context: updater/sis-updater-scheduler/
           push: false
           outputs: type=docker,dest=/tmp/scheduler.tar
           tags: toska/sis-updater-scheduler:latest
       - name: 'Store built image'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: /tmp/scheduler.tar
 
@@ -53,15 +53,15 @@ jobs:
       - build_worker
       - build_scheduler
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: 'Login to toska docker registry'
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
       - name: 'Download built images'
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: /tmp/
       - name: 'Load worker image'
@@ -101,7 +101,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: test_updater
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Build worker image
         id: build-image
@@ -128,7 +128,7 @@ jobs:
     needs: test_updater
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Build scheduler image
         id: build-image
