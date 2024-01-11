@@ -181,6 +181,7 @@ export const AttemptsTable = ({
       )}
       <SortableTable
         title={`Yearly attempt statistics for group ${name}`}
+        featureName="yearly_attempts"
         defaultSort={['TIME', 'desc']}
         columns={columns}
         data={data}

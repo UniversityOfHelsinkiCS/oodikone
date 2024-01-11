@@ -521,6 +521,7 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
                 style={{ height: '80vh' }}
                 tableId="progress-of-population-students"
                 title="Progress of population's students after predefined criteria"
+                featureName="progress"
                 columns={columns}
                 data={data}
               />

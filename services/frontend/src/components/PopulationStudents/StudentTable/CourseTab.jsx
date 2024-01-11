@@ -296,6 +296,7 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
             <SortableTable
               tableId="course-of-population-students"
               title="Courses of population's students"
+              featureName="courses"
               columns={columns}
               onlyExportColumns={hiddenNameAndEmailForExcel}
               data={data}

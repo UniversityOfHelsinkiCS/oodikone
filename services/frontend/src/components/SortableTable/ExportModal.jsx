@@ -52,7 +52,7 @@ const flattenData = data => {
   return flat
 }
 
-export const ExportModal = ({ open, onOpen, onClose, data, columns }) => {
+export const ExportModal = ({ open, onOpen, onClose, data, columns, featureName }) => {
   const exportColumns = useMemo(() => getExportColumns(columns), [columns])
   const flatData = useMemo(() => flattenData(data), [data])
   const [selected, setSelected] = useState(_.uniq(_.map(exportColumns, 'key')))
@@ -72,7 +72,7 @@ export const ExportModal = ({ open, onOpen, onClose, data, columns }) => {
     const sheet = xlsx.utils.json_to_sheet(rows)
     const book = xlsx.utils.book_new()
     xlsx.utils.book_append_sheet(book, sheet)
-    xlsx.writeFile(book, `oodikone_${getTimestamp()}.xlsx`)
+    xlsx.writeFile(book, `oodikone_${featureName}_${getTimestamp()}.xlsx`)
   }
 
   const toggleSelection = key => {

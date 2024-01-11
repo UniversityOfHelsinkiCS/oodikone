@@ -219,6 +219,7 @@ export const StudentTable = ({
       )}
       <SortableTable
         title={`Student statistics for group ${name}`}
+        featureName="group_statistics"
         defaultSort={['TIME', 'desc']}
         columns={columns}
         data={data}

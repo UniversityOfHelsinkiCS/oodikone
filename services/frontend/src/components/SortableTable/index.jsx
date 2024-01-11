@@ -32,6 +32,7 @@ Future uusihenkilö's will thank you.
 
 tableId: id-property of the <table> tag
 title: Table title
+featureName: Describes the feature in the Excel filename: "oodikone_{featureName}_{timeStamp}.xlsx". Defaults to "export"
 *data: Array of data items
 *columns: Array of columns, see fields of columns below
 onlyExportColumns: Array of columns, never shown but always added to export as the first columns
@@ -93,6 +94,7 @@ export const SortableTable = ({
   tableId,
   columns: pColumns,
   title,
+  featureName = 'export',
   data,
   defaultSort,
   style,
@@ -219,6 +221,7 @@ export const SortableTable = ({
         onClose={() => setExportModalOpen(false)}
         data={data}
         columns={[...onlyExportColumns, ...columns]}
+        featureName={featureName}
       />
       <SortableTableContext.Provider value={context}>
         <FigureContainer style={figureStyles}>
