@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react'
 import moment from 'moment'
 import _ from 'lodash'
 import { Segment, Header, Form, Input } from 'semantic-ui-react'
+import { useLocation } from 'react-router-dom'
 
 import { InfoBox } from 'components/Info/InfoBox'
 import { PopulationCourseStatsFlat } from 'components/PopulationCourseStats/PopulationCourseStatsFlat'
@@ -40,14 +41,14 @@ const NO_PROGRAMME = {
   startdate: '',
 }
 
-export const CoursePopulation = ({ history }) => {
+export const CoursePopulation = () => {
+  const location = useLocation()
   const { getTextIn } = useLanguage()
   const [codes, setCodes] = useState([])
   useTitle('Course population')
 
-  const { coursecodes, from, to, separate, unifyCourses, years, years2, combineSubstitutions } = queryParamsFromUrl(
-    history.location
-  )
+  const { coursecodes, from, to, separate, unifyCourses, years, years2, combineSubstitutions } =
+    queryParamsFromUrl(location)
 
   const { data: populationStatistics, isFetching } = useGetPopulationStatisticsByCourseQuery({
     coursecodes,
