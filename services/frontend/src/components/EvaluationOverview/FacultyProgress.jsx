@@ -85,7 +85,7 @@ export const FacultyProgress = ({ faculty, progressStats, getDivider }) => {
           />
         </div>
       </div>
-      {!(faculty === 'H90') && (
+      {!(faculty === 'H90' || faculty === 'ALL') && (
         <>
           {getDivider('Master', 'MasterStudentsOfTheFacultyByStartingYear', 'no-infobox')}
           <div className="section-container">
@@ -119,7 +119,7 @@ export const FacultyProgress = ({ faculty, progressStats, getDivider }) => {
           </div>
         </>
       )}
-      {faculty === 'H30' && (
+      {(faculty === 'H30' || faculty === 'ALL') && (
         <>
           {getDivider('Licentiate', 'LicentiateStudentsOfTheFacultyByStartingYear', 'no-infobox')}
           <div className="section-container">
