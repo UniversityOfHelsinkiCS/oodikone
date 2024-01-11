@@ -10,3 +10,13 @@
   position: relative;
   padding-bottom: 2em;
 }
+
+.header {
+  position: relative;
+  background-color: var(--black);
+  margin-bottom: 15px;
+}
+
+#main-menu {
+  z-index: 9003;
+}

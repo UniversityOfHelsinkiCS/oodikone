@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { initShibbolethPinger } from 'unfuck-spa-shibboleth-session'
 import * as Sentry from '@sentry/browser'
 
-import { Header } from 'components/Header'
+import { NavigationBar } from 'components/NavigationBar'
 import { Routes } from 'components/Routes'
 import { SegmentDimmer } from 'components/SegmentDimmer'
 import './app.css'
@@ -22,7 +22,9 @@ const addUserDetailsToLoggers = ({ id, userId, mockedBy }) => {
 const Layout = ({ children }) => (
   <div className="appContainer">
     <main className="routeViewContainer">
-      <Header />
+      <header className="header" role="banner" id="main-menu">
+        <NavigationBar />
+      </header>
       {children}
     </main>
   </div>
