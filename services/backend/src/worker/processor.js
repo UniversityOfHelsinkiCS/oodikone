@@ -13,6 +13,8 @@ const logger = require('../util/logger')
 // Beware of creating a circular dependency, e.g. don't import worker file into the files that you import to this file.
 // This causes this process to disregard concurrency-setting leading to trouble
 
+// Also, don't delete even though some tools may recognize this as unused file. it is used runtime
+
 const refreshers = {
   languagecenter: refreshLanguageCenterData,
   faculty: refreshFaculty,
