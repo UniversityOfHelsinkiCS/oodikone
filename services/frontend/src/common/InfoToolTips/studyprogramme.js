@@ -143,6 +143,8 @@ export const studyProgrammeToolTips = {
 
   HUOM! Mukana ovat myös muuhun kuin valittuun koulutusohjelmaan tai opintosuuntaan tehdyt opintopisteet.
 
+  Vain 1.8. alkaen rekisteröidyt suoritukset ovat mukana. Esimerkiksi jos opiskelija on aloittanut ohjelmassa 10.8.2020 ja hänellä on ennen 1.8.2020 rekisteröityjä suorituksia, niitä ei huomioida lukuvuoden 2020-2021 opintopistekertymässä.
+
   Mukana ovat oletusarvoisesti myös ohjelmaan siirtyneet opiskelijat.
 
   Mikäli yläosan valikosta valittuna on jokin tietty opintosuunta, myös nämä graafit ja taulukot kuvaavat kyseisen opintosuunnan opiskelijoita.    
