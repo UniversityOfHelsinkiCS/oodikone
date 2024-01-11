@@ -57,6 +57,7 @@ const updateStudyRights = async (
       studystartdate: studyright.valid.startDate,
       admissionType: admissionNamesById[studyright.admission_type_urn],
       cancelled,
+      isBaMa: isBaMa(getEducation(studyright.education_id)),
     }
     return {
       ...defaultProps,
