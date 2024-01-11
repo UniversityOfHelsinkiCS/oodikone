@@ -435,15 +435,16 @@ export const GeneralTab = ({
     programme: {
       key: 'programme',
       title: programmeCode ? 'Other programmes' : 'Study programmes',
+      filterType: 'multi',
       getRowContent: s => getStudyProgrammeContent(s),
       getRowVal: s => {
-        return studentProgrammesMap[s.studentNumber]?.getProgrammesList('; ')
+        return studentProgrammesMap[s.studentNumber]?.programmes.map(p => getTextIn(p.name))
       },
       cellProps: s => {
         return { title: studentProgrammesMap[s.studentNumber]?.getProgrammesList('\n') }
       },
       helpText:
-        'If students has more than one programme, hover your mouse on the cell to see the rest. They are also displayed in the exported Excel-file.',
+        'If student has more than one programme, hover your mouse on the cell to see the rest. They are also displayed in the exported Excel file.',
     },
     semesterEnrollmentsAmount: {
       key: 'semesterEnrollmentsAmount',
