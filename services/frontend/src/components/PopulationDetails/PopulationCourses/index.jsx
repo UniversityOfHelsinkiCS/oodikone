@@ -4,11 +4,11 @@ import { Segment } from 'semantic-ui-react'
 
 import { PopulationCourseStatsFlat } from 'components/PopulationCourseStats/PopulationCourseStatsFlat'
 import { populationStatisticsToolTips } from 'common/InfoToolTips'
-import { SegmentDimmer } from '../SegmentDimmer'
-import { ConnectedPopulationCourseStats as PopulationCourseStats } from '../PopulationCourseStats'
-import { InfoBox } from '../Info/InfoBox'
+import { SegmentDimmer } from 'components/SegmentDimmer'
+import { ConnectedPopulationCourseStats as PopulationCourseStats } from 'components/PopulationCourseStats'
+import { InfoBox } from 'components/Info/InfoBox'
+import { getPopulationSelectedStudentCourses } from 'redux/populationSelectedStudentCourses'
 import { FilterDegreeCoursesModal } from './FilterDegreeCoursesModal'
-import { getPopulationSelectedStudentCourses } from '../../redux/populationSelectedStudentCourses'
 
 export const PopulationCourses = ({
   query = {},
