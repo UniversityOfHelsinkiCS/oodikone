@@ -61,7 +61,7 @@ jobs:
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
       - name: 'Download built images'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
           path: /tmp/
       - name: 'Load worker image'
