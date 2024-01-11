@@ -52,7 +52,7 @@ export const FacultyProgress = ({ faculty, progressStats, getDivider }) => {
       </div>
       {getDivider('Bachelor + Master', 'ProgressOfBachelorMaster', 'no-infobox')}
       <Message data-cy="FacultyProgrammesShownInfo">
-        The starting year is the studyright start in the bachelor programme. The credits are comouted by the start date
+        The starting year is the studyright start in the bachelor programme. The credits are computed by the start date
         of the bachelor programme and at the moment, they do not include any transferred credits. Thus, in these
         statistics some students have less credits than in reality.
       </Message>
