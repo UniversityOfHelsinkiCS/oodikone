@@ -13,7 +13,6 @@ export const FacultyProgressTable = ({
   progressTitles,
 }) => {
   const [visibleYears, setVisibleYears] = useState(new Array(data.length).fill(false))
-
   const toggleVisibility = yearIndex => {
     setVisibleYears(visibleYears.map((year, index) => (index === yearIndex ? !year : year)))
   }

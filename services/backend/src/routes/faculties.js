@@ -7,7 +7,6 @@ const { countGraduationTimes } = require('../services/faculty/facultyGraduationT
 const { updateFacultyOverview, updateFacultyProgressOverview } = require('../services/faculty/facultyUpdates')
 const { combineFacultyStudentProgress } = require('../services/faculty/facultyStudentProgress')
 const { combineFacultyStudents } = require('../services/faculty/facultyStudents')
-
 const {
   getProgrammes,
   getBasicStats,
@@ -28,10 +27,15 @@ const logger = require('../util/logger')
 // Faculty uses a lot of tools designed for Study programme.
 // Some of them have been copied here and slightly edited for faculty purpose.
 
-router.get('/', async (req, res) => {
+const getFacultyList = async () => {
   const ignore = ['Y', 'H99', 'Y01', 'H92', 'H930']
   const facultyList = (await faculties()).filter(f => !ignore.includes(f.code))
   facultyList.sort((a, b) => (a.name.fi > b.name.fi ? 1 : -1))
+  return facultyList
+}
+
+router.get('/', async (req, res) => {
+  const facultyList = await getFacultyList()
   res.json(facultyList)
 })
 
@@ -143,6 +147,77 @@ router.get('/:id/progressstats', async (req, res) => {
     updateStats = await setFacultyProgressStats(updateStats, specialGroups, graduated)
   }
   return res.json(updateStats)
+})
+
+router.get('/allprogressstats', async (req, res) => {
+  if (!req.user.roles.includes('admin')) {
+    return res.status(403).send({ error: 'Feature not yet available to non-admins' })
+  }
+  const specialGroups = 'SPECIAL_EXCLUDED'
+  const graduated = req.query?.graduated
+  const allFaculties = await getFacultyList()
+  const facultyCodes = allFaculties.map(f => f.code)
+  const codeToData = {}
+
+  for (const facultyCode of facultyCodes) {
+    const data = await getFacultyProgressStats(facultyCode, specialGroups, graduated)
+    if (!data) {
+      return res.status(500).end()
+    }
+    codeToData[facultyCode] = data
+  }
+
+  const universityData = {
+    years: codeToData.H50.years,
+    yearlyBachelorTitles: codeToData.H50.yearlyBachelorTitles,
+    programmeNames: allFaculties.reduce((obj, fac) => {
+      obj[fac.code] = fac
+      return obj
+    }, {}),
+    bachelorsProgStats: {},
+    creditCounts: {
+      bachelor: {},
+    },
+  }
+
+  const unifyProgressStats = progStats => {
+    return progStats.reduce(
+      (all, prog) => {
+        prog.forEach((yearStats, yearIndex) =>
+          yearStats.forEach((category, categoryIndex) => {
+            all[yearIndex][categoryIndex] += prog[yearIndex][categoryIndex]
+          })
+        )
+        return all
+      },
+      // eslint-disable-next-line no-unused-vars
+      progStats[0].map(year => year.map(_num => 0))
+    )
+  }
+  for (const facultyCode of facultyCodes) {
+    const facultyData = codeToData[facultyCode]
+    for (const year of universityData.years.slice(1).reverse()) {
+      for (const fieldName of ['bachelor', 'bachelorMaster', 'master', 'licentiate', 'doctor']) {
+        if (!facultyData.creditCounts[fieldName] || Object.keys(facultyData.creditCounts[fieldName]).length === 0)
+          continue
+        if (!universityData.creditCounts[fieldName]) universityData.creditCounts[fieldName] = {}
+        if (!universityData.creditCounts[fieldName][year]) universityData.creditCounts[fieldName][year] = []
+        universityData.creditCounts[fieldName][year].push(...facultyData.creditCounts[fieldName][year])
+      }
+      for (const fieldName of [
+        'bachelorsProgStats',
+        'bcMsProgStats',
+        'licentiateProgStats',
+        'mastersProgStats',
+        'doctoralProgStats',
+      ]) {
+        if (Object.keys(facultyData[fieldName]).length === 0) continue
+        if (!universityData[fieldName]) universityData[fieldName] = {}
+        universityData[fieldName][facultyCode] = unifyProgressStats(Object.values(facultyData[fieldName]))
+      }
+    }
+  }
+  return res.status(200).json(universityData)
 })
 
 router.get('/:id/studentstats', async (req, res) => {

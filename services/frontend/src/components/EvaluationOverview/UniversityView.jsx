@@ -1,46 +1,26 @@
 import React, { useState } from 'react'
 import { Divider, Header, Loader, Message } from 'semantic-ui-react'
 
-import {
-  useGetFacultiesQuery,
-  useGetFacultyProgressStatsQuery,
-  useGetFacultyGraduationTimesQuery,
-} from 'redux/facultyStats'
+import { useGetFacultiesQuery, useGetAllFacultiesProgressStatsQuery } from 'redux/facultyStats'
 import { facultyToolTips } from 'common/InfoToolTips'
-import { FacultyGraduations } from './FacultyGraduations'
 import { FacultyProgress } from './FacultyProgress'
 import { Toggle } from '../StudyProgramme/Toggle'
 import { InfoBox } from '../Info/InfoBox'
-import { useLanguage } from '../LanguagePicker/useLanguage'
 import '../FacultyStatistics/faculty.css'
 
-export const FacultyView = ({ faculty }) => {
+export const UniversityView = ({ faculty }) => {
   const [graduatedGroup, setGraduatedGroup] = useState(false)
-  const [showMedian, setShowMedian] = useState(false)
-  const studyProgrammeFilter = 'NEW_STUDY_PROGRAMMES'
-  const specials = 'SPECIAL_EXCLUDED'
   const graduated = graduatedGroup ? 'GRADUATED_EXCLUDED' : 'GRADUATED_INCLUDED'
-  const { getTextIn } = useLanguage()
-
   const allFaculties = useGetFacultiesQuery()
-  const faculties = allFaculties?.data
-  const facultyDetails = faculties && faculty && faculties.find(f => f.code === faculty)
-  const facultyName = facultyDetails && getTextIn(facultyDetails.name)
-  const progressStats = useGetFacultyProgressStatsQuery(
-    {
-      id: faculty,
-      studyProgrammeFilter,
-      specialGroups: specials,
-      graduated,
-    },
-    { skip: !facultyDetails }
-  )
-
-  const graduationStats = useGetFacultyGraduationTimesQuery(
-    { id: faculty, studyProgrammeFilter },
-    { skip: !facultyDetails }
-  )
-
+  const progressStats = useGetAllFacultiesProgressStatsQuery({
+    graduated,
+  })
+  /*
+    const graduationStats = useGetFacultyGraduationTimesQuery(
+      { id: faculty, studyProgrammeFilter },
+      { skip: !facultyDetails }
+    )
+  */
   const getDivider = (title, toolTipText, content, cypress = undefined) => (
     <>
       <div className="divider">
@@ -56,30 +36,15 @@ export const FacultyView = ({ faculty }) => {
     return <Loader active style={{ marginTop: '10em' }} />
   }
 
-  if (!facultyDetails) {
-    return (
-      <h3>
-        {getTextIn({
-          en: `Faculty “${faculty}” was not found. Please check the address.`,
-          fi: `Tiedekuntaa ”${faculty}” ei löytynyt. Ole hyvä ja tarkista osoite.`,
-        })}
-      </h3>
-    )
-  }
+  const isFetchingOrLoading = progressStats.isLoading || progressStats.isFetching
 
-  const isFetchingOrLoading =
-    progressStats.isLoading || progressStats.isFetching || graduationStats.isLoading || graduationStats.isFetching
-
-  const isError =
-    (progressStats.isError && graduationStats.isError) ||
-    (progressStats.isSuccess && !progressStats.data && graduationStats.isSuccess && !graduationStats.data)
-
+  const isError = progressStats.isError || (progressStats.isSuccess && !progressStats.data)
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
 
   return (
     <>
       <div style={{ padding: '30px', textAlign: 'center' }}>
-        <Header>{facultyName}</Header>
+        <Header>University-level view</Header>
         <span>{faculty}</span>
       </div>
       <Message info>
@@ -120,31 +85,7 @@ export const FacultyView = ({ faculty }) => {
                     setValue={setGraduatedGroup}
                   />
                 </div>
-                <FacultyProgress faculty={faculty} progressStats={progressStats} getDivider={getDivider} />
-              </>
-            )}
-            {graduationStats.isSuccess && graduationStats.data && (
-              <>
-                {getDivider(
-                  'Average graduation times',
-                  'AverageGraduationTimes',
-                  facultyToolTips.AverageGraduationTimes
-                )}
-                <div className="toggle-container">
-                  <Toggle
-                    cypress="GraduationTimeToggle"
-                    firstLabel="Breakdown"
-                    secondLabel="Median times"
-                    value={showMedian}
-                    setValue={setShowMedian}
-                  />
-                </div>
-                <FacultyGraduations
-                  faculty={faculty}
-                  graduationStats={graduationStats}
-                  groupByStartYear={false}
-                  showMedian={showMedian}
-                />
+                <FacultyProgress faculty="ALL" progressStats={progressStats} getDivider={getDivider} />
               </>
             )}
           </div>
