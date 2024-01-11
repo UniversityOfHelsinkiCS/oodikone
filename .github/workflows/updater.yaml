@@ -24,7 +24,7 @@ jobs:
           outputs: type=docker,dest=/tmp/worker.tar
           tags: toska/sis-updater-worker:latest
       - name: 'Store built image'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           path: /tmp/worker.tar
 
@@ -42,7 +42,7 @@ jobs:
           outputs: type=docker,dest=/tmp/scheduler.tar
           tags: toska/sis-updater-scheduler:latest
       - name: 'Store built image'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           path: /tmp/scheduler.tar
 
