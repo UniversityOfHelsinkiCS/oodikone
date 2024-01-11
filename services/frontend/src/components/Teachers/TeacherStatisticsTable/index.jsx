@@ -103,6 +103,6 @@ export const TeacherStatisticsTable = ({ statistics, variant }) => {
   return statistics.length === 0 ? (
     <Segment basic content="No statistics found for the given query." />
   ) : (
-    <SortableTable title="Teacher statistics" columns={columns} data={data} />
+    <SortableTable title="Teacher statistics" featureName="teacher_statistics" columns={columns} data={data} />
   )
 }

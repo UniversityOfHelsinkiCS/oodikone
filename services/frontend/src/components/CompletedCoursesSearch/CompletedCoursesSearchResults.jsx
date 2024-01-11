@@ -171,6 +171,7 @@ export const CompletedCoursesSearchResults = ({ searchValues }) => {
       >
         <SortableTable
           title="Completed courses search"
+          featureName="completed_courses"
           columns={getColumns(data.courses, showStudentNames.visible, getTextIn)}
           onlyExportColumns={hiddenNameAndEmailForExcel}
           data={data.students}

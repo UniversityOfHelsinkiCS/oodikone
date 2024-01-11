@@ -177,6 +177,7 @@ export const Students = ({ filteredStudents }) => {
             />
           </>
         }
+        featureName="courses_passed"
         actions={
           <Button size="tiny" onClick={() => toggleStudentNames()}>
             {namesVisible ? 'Hide student names' : 'Show student names'}

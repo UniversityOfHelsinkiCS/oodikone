@@ -230,6 +230,7 @@ export const OpenUniPopulationResults = ({ fieldValues }) => {
         {courseList.length > 0 && (
           <SortableTable
             title={`Open Uni Student Population (${Object.keys(openUniStudentStats?.data.students).length} students)`}
+            featureName="open_uni"
             columns={tableData.columns}
             data={tableData.data}
           />

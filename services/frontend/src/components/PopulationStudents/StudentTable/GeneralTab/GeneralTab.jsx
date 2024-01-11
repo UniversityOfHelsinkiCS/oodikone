@@ -570,6 +570,7 @@ export const GeneralTab = ({
     <SortableTable
       style={{ height: '80vh' }}
       title="General student information"
+      featureName="students"
       columns={columns}
       onlyExportColumns={hiddenNameAndEmailForExcel}
       data={selectedStudents.map(sn => students[sn])}

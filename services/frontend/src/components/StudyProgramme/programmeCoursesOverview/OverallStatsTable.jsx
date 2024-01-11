@@ -248,7 +248,8 @@ export const OverallStatsTable = ({ data, showStudents }) => {
       />
       <div data-cy="CoursesSortableTable">
         <SortableTable
-          title="Student statistics for study programme courses "
+          title="Student statistics for study programme courses"
+          featureName="programme_courses"
           defaultSort={['name', 'asc']}
           columns={getColumns(getTextIn, showStudents)}
           data={data}

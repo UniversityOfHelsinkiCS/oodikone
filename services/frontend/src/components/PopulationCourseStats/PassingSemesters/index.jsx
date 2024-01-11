@@ -149,6 +149,7 @@ export const PassingSemesters = ({ onlyIamRights }) => {
     <div>
       <SortableTable
         title="Students Passing a Course per Semester"
+        featureName="passing_semester"
         actions={
           <Button size="mini" style={{ padding: '.75em .75em' }} onClick={() => setCumulativeStats(!cumulativeStats)}>
             {cumulativeStats ? 'Show yearly stats' : 'Show cumulative stats'}
