@@ -66,6 +66,9 @@ Studyright.init(
     admissionType: {
       type: STRING,
     },
+    isBaMa: {
+      type: BOOLEAN,
+    },
   },
   {
     underscored: true,
