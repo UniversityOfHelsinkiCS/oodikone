@@ -85,7 +85,7 @@ export const FacultyProgress = ({ faculty, progressStats, getDivider }) => {
           />
         </div>
       </div>
-      {!(faculty === 'H90' || faculty === 'ALL') && (
+      {faculty !== 'H90' && (
         <>
           {getDivider('Master', 'MasterStudentsOfTheFacultyByStartingYear', 'no-infobox')}
           <div className="section-container">
