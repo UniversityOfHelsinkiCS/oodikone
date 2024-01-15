@@ -171,7 +171,8 @@ router.get('/allprogressstats', async (req, res) => {
     years: codeToData.H50.years,
     yearlyBachelorTitles: codeToData.H50.yearlyBachelorTitles,
     programmeNames: allFaculties.reduce((obj, fac) => {
-      obj[fac.code] = fac
+      const { name, ...rest } = fac.dataValues
+      obj[fac.code] = { ...rest, ...name }
       return obj
     }, {}),
     bachelorsProgStats: {},
