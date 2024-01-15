@@ -53,23 +53,23 @@ export const PopulationStatistics = () => {
   const combinedProgrammeName = programmes && combinedProgrammeCode ? programmes[combinedProgrammeCode]?.name : ''
 
   const filters = [
-    studentNumberFilter,
-    hopsFilter({ programmeCode, combinedProgrammeCode }),
-    genderFilter,
     !onlyIamRights ? ageFilter : null,
     courseFilter({ courses }),
-    creditsEarnedFilter,
-    graduatedFromProgrammeFilter({ code: programmeCode, combinedProgrammeCode }),
-    transferredToProgrammeFilter,
-    startYearAtUniFilter,
-    tagsFilter,
     creditDateFilter,
+    creditsEarnedFilter,
     enrollmentStatusFilter({
       allSemesters: allSemesters?.semesters ?? [],
       language,
     }),
+    genderFilter,
+    graduatedFromProgrammeFilter({ code: programmeCode, combinedProgrammeCode }),
+    hopsFilter({ programmeCode, combinedProgrammeCode }),
+    studentNumberFilter,
+    startYearAtUniFilter,
     studyTrackFilter({ code: programmeCode }),
     studyrightStatusFilter({ code: programmeCode, combinedProgrammeCode }),
+    tagsFilter,
+    transferredToProgrammeFilter,
   ].filter(Boolean)
 
   // For combined programme admission type is the same as they started in bachelor programme
