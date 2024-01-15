@@ -25,6 +25,7 @@ import {
   startYearAtUniFilter,
   studentNumberFilter,
   studyrightStatusFilter,
+  studyrightTypeFilter,
   studyTrackFilter,
   tagsFilter,
   transferredToProgrammeFilter,
@@ -71,6 +72,15 @@ export const PopulationStatistics = () => {
     tagsFilter,
     transferredToProgrammeFilter,
   ].filter(Boolean)
+
+  if (programmeCode && (programmeCode.startsWith('MH') || programmeCode.endsWith('-ma'))) {
+    filters.push(
+      studyrightTypeFilter({
+        programme: programmeCode,
+        year: query?.year,
+      })
+    )
+  }
 
   // For combined programme admission type is the same as they started in bachelor programme
   if (parseInt(query?.year, 10) >= 2020) {
