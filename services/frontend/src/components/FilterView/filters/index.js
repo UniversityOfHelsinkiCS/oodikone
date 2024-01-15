@@ -1,5 +1,6 @@
 export { admissionTypeFilter } from './admissionType'
 export { ageFilter } from './age'
+export { bamaFilter } from './bama'
 export { courseFilter } from './courses'
 export { creditDateFilter } from './date'
 export { creditsEarnedFilter } from './creditsEarned'
