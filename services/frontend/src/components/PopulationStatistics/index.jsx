@@ -13,21 +13,21 @@ import { FilterView } from '../FilterView'
 import { ConnectedPopulationSearch as PopulationSearch } from '../PopulationSearch'
 import { DataExport } from './DataExport'
 import {
+  admissionTypeFilter,
   ageFilter,
   courseFilter,
+  creditDateFilter,
   creditsEarnedFilter,
+  enrollmentStatusFilter,
   genderFilter,
   graduatedFromProgrammeFilter,
-  transferredToProgrammeFilter,
-  startYearAtUniFilter,
-  admissionTypeFilter,
-  tagsFilter,
-  creditDateFilter,
-  enrollmentStatusFilter,
-  studyTrackFilter,
-  studyrightStatusFilter,
-  studentNumberFilter,
   hopsFilter,
+  startYearAtUniFilter,
+  studentNumberFilter,
+  studyrightStatusFilter,
+  studyTrackFilter,
+  tagsFilter,
+  transferredToProgrammeFilter,
 } from '../FilterView/filters'
 
 const getYearText = year => {
