@@ -121,7 +121,11 @@ export const FacultyProgress = ({ faculty, progressStats, getDivider }) => {
       )}
       {(faculty === 'H30' || faculty === 'ALL') && (
         <>
-          {getDivider('Licentiate', 'LicentiateStudentsOfTheFacultyByStartingYear', 'no-infobox')}
+          {getDivider(
+            faculty === 'ALL' ? 'Licentiate (H30) and Bachelor + Master (H90)' : 'Licentiate',
+            'LicentiateStudentsOfTheFacultyByStartingYear',
+            'no-infobox'
+          )}
           <div className="section-container">
             <div className="graph-container">
               <FacultyBarChart
