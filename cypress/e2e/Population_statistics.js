@@ -109,7 +109,10 @@ describe('Population Statistics tests', () => {
       cy.contains('Create new tag')
     })
 
-    it('Advanced settings work', () => {
+    // This test sometimes fails on headless mode. It seems that the click on the
+    // 'Fetch class with new settings' button doesn't always trigger history.push()
+    // so the page doesn't reload. This is why waiting also doesn't help.
+    it('Advanced settings work', { retries: 2 }, () => {
       cy.visit(pathToCSBach2017)
       cy.get('[data-cy=advanced-toggle]').click()
       // only spring
