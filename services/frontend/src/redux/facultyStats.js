@@ -28,6 +28,9 @@ const facultystatsApi = RTKApi.injectEndpoints({
     getAllFacultiesProgressStats: builder.query({
       query: ({ graduated }) => `/faculties/allprogressstats?graduated=${graduated}`,
     }),
+    getAllFacultiesGraduationStats: builder.query({
+      query: () => '/faculties/allgraduationstats',
+    }),
     getFacultyStudentStats: builder.query({
       query: ({ id, specialGroups, graduated }) =>
         `/faculties/${id}/studentstats?special_groups=${specialGroups}&graduated=${graduated}`,
@@ -50,6 +53,7 @@ export const {
   useGetFacultyGraduationTimesQuery,
   useGetFacultyProgressStatsQuery,
   useGetAllFacultiesProgressStatsQuery,
+  useGetAllFacultiesGraduationStatsQuery,
   useGetFacultyStudentStatsQuery,
   useUpdateFacultyBasicViewQuery,
   useUpdateFacultyProgressViewQuery,
