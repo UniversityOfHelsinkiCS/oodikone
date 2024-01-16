@@ -1,6 +1,7 @@
 const morgan = require('morgan')
 const logger = require('../util/logger')
 const _ = require('lodash')
+const { isProduction } = require('../conf-backend')
 
 // So this appears to be a hack to get neatly formatted stats like response-time etc. from morgan
 // without actually using morgan what it's used for (LOGGING REQUESTS!).
@@ -16,15 +17,24 @@ const accessLogger = morgan((tokens, req, res) => {
     meta['req-route'] = req.route.path
   }
 
-  const message = [
-    user.name,
-    tokens['method'](req, res),
-    tokens['url'](req, res),
-    tokens['status'](req, res),
-    '-',
-    tokens['response-time'](req, res),
-    'ms',
-  ].join(' ')
+  const message = isProduction
+    ? [
+        user.name,
+        tokens['method'](req, res),
+        tokens['url'](req, res),
+        tokens['status'](req, res),
+        '-',
+        tokens['response-time'](req, res),
+        'ms',
+      ].join(' ')
+    : [
+        user.name,
+        tokens['response-time'](req, res).split('.')[0],
+        'ms\t',
+        tokens['status'](req, res),
+        tokens['method'](req, res),
+        tokens['url'](req, res),
+      ].join(' ')
 
   const usingIamRights = user.iamRights.some(programmeCode => tokens['url'](req, res).includes(programmeCode))
   const onlyIamRights = !user.isAdmin && user.rights.length === 0
