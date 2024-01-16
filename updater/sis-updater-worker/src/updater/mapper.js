@@ -545,6 +545,7 @@ module.exports = {
   studentMapper,
   mapTeacher,
   creditMapper,
+  termRegistrationTypeToEnrollmenttype,
   semesterEnrollmentMapper,
   courseProviderMapper,
   courseMapper,

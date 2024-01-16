@@ -11,6 +11,7 @@ const {
   getSemesterByDate,
   educationTypeToExtentcode,
 } = require('../shared')
+const { termRegistrationTypeToEnrollmenttype } = require('../mapper')
 
 const isCancelled = (studyright, extentcode) => {
   if (
@@ -37,6 +38,21 @@ const isCancelled = (studyright, extentcode) => {
   return false
 }
 
+const getStudyrightSemesterEnrollments = (studyright, termRegistrations) => {
+  if (!termRegistrations || !Array.isArray(termRegistrations) || termRegistrations.length === 0) return null
+  return termRegistrations.map(termRegistration => {
+    const {
+      studyTerm: { termIndex, studyYearStartYear },
+      termRegistrationType,
+    } = termRegistration
+
+    const enrollmenttype = termRegistrationTypeToEnrollmenttype(termRegistrationType)
+    const { semestercode } = getSemester(getUniOrgId(studyright.organisation_id), studyYearStartYear, termIndex)
+
+    return { enrollmenttype, semestercode }
+  })
+}
+
 const updateStudyRights = async (
   groupedStudyRightSnapshots,
   personIdToStudentNumber,
@@ -58,6 +74,11 @@ const updateStudyRights = async (
       admissionType: admissionNamesById[studyright.admission_type_urn],
       cancelled,
       isBaMa: isBaMa(getEducation(studyright.education_id)),
+      semesterEnrollments: getStudyrightSemesterEnrollments(
+        studyright,
+        allTermRegistrations.find(termRegistration => termRegistration.study_right_id === studyright.id)
+          .term_registrations
+      ),
     }
     return {
       ...defaultProps,
