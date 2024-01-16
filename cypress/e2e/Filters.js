@@ -71,7 +71,7 @@ describe('Population Statistics with CS master', () => {
     '/populations?months=36&semesters=FALL&semesters=SPRING&studyRights={%22programme%22%3A%22MH50_009%22}&tag&year=2019'
   const defaultAmountOfStudents = 27
   const runTestStepWithPreAndPostParts = createRunTestStepWithPreAndPostPartsFunction(defaultAmountOfStudents)
-  before(() => {
+  beforeEach(() => {
     cy.init(pathToCSMast2019)
   })
 
@@ -81,6 +81,32 @@ describe('Population Statistics with CS master', () => {
       const programmeDropdown = card.cs('StudyTrack-filter-dropdown').selectFromDropdown(0)
       checkFilteringResult(1)
       programmeDropdown.get('i.delete').click()
+    })
+  })
+
+  describe('Studyright Type filter', () => {
+    it('is visible', () => {
+      cy.contains('Studyright Type')
+    })
+
+    it('is set to all by default', () => {
+      runTestStepWithPreAndPostParts('studyright-type', () => {
+        const card = cy.cs('studyright-type-filter-card')
+        card.get('[data-cy="all"] input').should('be.checked')
+      })
+    })
+
+    it('works', () => {
+      runTestStepWithPreAndPostParts('studyright-type', () => {
+        const expectedBaMaStudents = 26
+        const expectedMasterOnlyStudents = 1
+        cy.cs('studyright-type-filter-card').cs('bama').click()
+        checkFilteringResult(expectedBaMaStudents)
+        cy.cs('studyright-type-filter-card').cs('master').click()
+        checkFilteringResult(expectedMasterOnlyStudents)
+        cy.cs('studyright-type-filter-card').cs('all').click()
+        checkFilteringResult(defaultAmountOfStudents)
+      })
     })
   })
 })
@@ -225,6 +251,10 @@ describe('Population Statistics', () => {
     checkFilteringResult(31)
     cy.cs('reset-all-filters').click()
     checkFilteringResult(defaultAmountOfStudents)
+  })
+
+  it('Studyright Type filter is not visible', () => {
+    cy.contains('Studyright Type').should('not.exist')
   })
 })
 
