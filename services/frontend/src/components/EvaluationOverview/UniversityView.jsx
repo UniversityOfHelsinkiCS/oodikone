@@ -1,12 +1,17 @@
 import React, { useState } from 'react'
 import { Divider, Header, Loader, Message } from 'semantic-ui-react'
 
-import { useGetFacultiesQuery, useGetAllFacultiesProgressStatsQuery } from 'redux/facultyStats'
+import {
+  useGetFacultiesQuery,
+  useGetAllFacultiesProgressStatsQuery,
+  useGetAllFacultiesGraduationStatsQuery,
+} from 'redux/facultyStats'
 import { facultyToolTips } from 'common/InfoToolTips'
 import { FacultyProgress } from './FacultyProgress'
 import { Toggle } from '../StudyProgramme/Toggle'
 import { InfoBox } from '../Info/InfoBox'
 import '../FacultyStatistics/faculty.css'
+import { FacultyGraduations } from './FacultyGraduations'
 
 export const UniversityView = ({ faculty }) => {
   const [graduatedGroup, setGraduatedGroup] = useState(false)
@@ -15,12 +20,9 @@ export const UniversityView = ({ faculty }) => {
   const progressStats = useGetAllFacultiesProgressStatsQuery({
     graduated,
   })
-  /*
-    const graduationStats = useGetFacultyGraduationTimesQuery(
-      { id: faculty, studyProgrammeFilter },
-      { skip: !facultyDetails }
-    )
-  */
+
+  const graduationStats = useGetAllFacultiesGraduationStatsQuery()
+
   const getDivider = (title, toolTipText, content, cypress = undefined) => (
     <>
       <div className="divider">
@@ -36,9 +38,14 @@ export const UniversityView = ({ faculty }) => {
     return <Loader active style={{ marginTop: '10em' }} />
   }
 
-  const isFetchingOrLoading = progressStats.isLoading || progressStats.isFetching
+  const isFetchingOrLoading =
+    progressStats.isLoading || progressStats.isFetching || graduationStats.isLoading || graduationStats.isFetching
 
-  const isError = progressStats.isError || (progressStats.isSuccess && !progressStats.data)
+  const isError =
+    progressStats.isError ||
+    (progressStats.isSuccess && !progressStats.data) ||
+    graduationStats.isError ||
+    !graduationStats.data
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
 
   return (
@@ -91,6 +98,24 @@ export const UniversityView = ({ faculty }) => {
           </div>
         )}
       </div>
+      <>
+        {getDivider('Average graduation times', 'AverageGraduationTimes', facultyToolTips.AverageGraduationTimes)}
+        <div className="toggle-container">
+          <Toggle
+            cypress="GraduationTimeToggle"
+            firstLabel="Breakdown"
+            secondLabel="Median times"
+            value={false}
+            setValue={() => {}}
+          />
+        </div>
+        <FacultyGraduations
+          faculty={faculty}
+          graduationStats={graduationStats}
+          groupByStartYear={false}
+          showMedian={false}
+        />
+      </>
     </>
   )
 }

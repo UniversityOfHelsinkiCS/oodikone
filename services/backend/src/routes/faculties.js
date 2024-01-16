@@ -27,6 +27,8 @@ const logger = require('../util/logger')
 // Faculty uses a lot of tools designed for Study programme.
 // Some of them have been copied here and slightly edited for faculty purpose.
 
+const degreeNames = ['bachelor', 'bachelorMaster', 'master', 'licentiate', 'doctor']
+
 const getFacultyList = async () => {
   const ignore = ['Y', 'H99', 'Y01', 'H92', 'H930']
   const facultyList = (await faculties()).filter(f => !ignore.includes(f.code))
@@ -206,7 +208,7 @@ router.get('/allprogressstats', async (req, res) => {
   for (const facultyCode of facultyCodes) {
     const facultyData = codeToData[facultyCode]
     for (const year of universityData.years.slice(1).reverse()) {
-      for (const fieldName of ['bachelor', 'bachelorMaster', 'master', 'licentiate', 'doctor']) {
+      for (const fieldName of degreeNames) {
         const newFieldName = getNewFieldName(fieldName, facultyCode)
         if (!facultyData.creditCounts[newFieldName] || Object.keys(facultyData.creditCounts[fieldName]).length === 0)
           continue
@@ -227,6 +229,100 @@ router.get('/allprogressstats', async (req, res) => {
         universityData[newFieldName][facultyCode] = unifyProgressStats(Object.values(facultyData[fieldName]))
       }
     }
+  }
+  return res.status(200).json(universityData)
+})
+
+router.get('/allgraduationstats', async (req, res) => {
+  const degreeNames = ['bachelor', 'bcMsCombo', 'master', 'licentiate', 'doctor']
+  const allFaculties = await getFacultyList()
+  const facultyCodes = allFaculties.map(f => f.code)
+  const facultyData = {}
+  for (const facultyCode of facultyCodes) {
+    const data = await getGraduationStats(facultyCode, 'NEW_STUDY_PROGRAMMES')
+    if (!data) res.status(500).json({ message: `Did not find data for ${facultyCode}` })
+    facultyData[facultyCode] = data
+  }
+
+  const unifyTotals = (facultyData, universityData) => {
+    for (const degree of degreeNames) {
+      if (!universityData[degree]) universityData[degree] = []
+      if (!facultyData[degree]) continue
+      for (const yearStats of facultyData[degree]) {
+        const universityStats = universityData[degree]
+        const universityYearStats = universityData[degree].find(stats => stats.name === yearStats.name)
+        if (!universityYearStats) {
+          universityStats.push(yearStats)
+        } else {
+          universityYearStats.y += yearStats.y
+          universityYearStats.amount += yearStats.amount
+          universityYearStats.statistics.onTime += yearStats.statistics.onTime
+          universityYearStats.statistics.yearOver += yearStats.statistics.yearOver
+          universityYearStats.statistics.wayOver += yearStats.statistics.wayOver
+        }
+      }
+    }
+  }
+
+  const unifyProgrammeStats = (universityData, facultyData, facultyCode) => {
+    for (const degree of degreeNames) {
+      if (!facultyData[degree]) continue
+      if (!universityData[degree]) universityData[degree] = {}
+      for (const yearData of facultyData[degree]) {
+        if (!universityData[degree][yearData.name]) universityData[degree][yearData.name] = { programmes: [], data: [] }
+        const uniYearStats = universityData[degree][yearData.name]
+        if (!uniYearStats.programmes.find(prog => prog === facultyCode)) {
+          uniYearStats.programmes.push(facultyCode)
+        }
+        const uniYearFacultyStats = uniYearStats.data.find(item => item.code === facultyCode)
+        if (!uniYearFacultyStats) {
+          uniYearStats.data.push({ ...yearData, name: facultyCode, code: facultyCode })
+        } else {
+          uniYearFacultyStats.y += yearData.y
+          uniYearFacultyStats.amount += yearData.amount
+          uniYearFacultyStats.statistics.onTime += yearData.statistics.onTime
+          uniYearFacultyStats.statistics.yearOver += yearData.statistics.yearOver
+          uniYearFacultyStats.statistics.wayOver += yearData.statistics.wayOver
+        }
+      }
+    }
+
+    return universityData
+  }
+
+  const universityData = {
+    goals: {
+      bachelor: 36,
+      bcMsCombo: 60,
+      master: 24,
+      doctor: 48,
+      licentiate: 78,
+    },
+    programmeNames: allFaculties.reduce((obj, fac) => {
+      const { name, ...rest } = fac.dataValues
+      obj[fac.code] = { ...rest, ...name }
+      return obj
+    }, {}),
+    byGradYear: { medians: {}, programmes: { medians: {} } },
+    classSizes: { programmes: {} },
+  }
+
+  for (const facultyCode of facultyCodes) {
+    const data = facultyData[facultyCode]
+    unifyTotals(data.byGradYear.medians, universityData.byGradYear.medians)
+    unifyProgrammeStats(universityData.byGradYear.programmes.medians, data.byGradYear.medians, facultyCode)
+    for (const degree of degreeNames) {
+      if (!universityData.classSizes[degree]) {
+        universityData.classSizes[degree] = data.classSizes[degree]
+      } else {
+        Object.entries(data.classSizes[degree]).forEach(([key, value]) => {
+          universityData.classSizes[degree][key] += value
+        })
+      }
+    }
+    // eslint-disable-next-line no-unused-vars
+    const { programmes, ...rest } = data.classSizes
+    universityData.classSizes.programmes[facultyCode] = rest
   }
   return res.status(200).json(universityData)
 })
