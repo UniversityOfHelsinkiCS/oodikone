@@ -77,7 +77,7 @@ const updateStudyRights = async (
       semesterEnrollments: getStudyrightSemesterEnrollments(
         studyright,
         allTermRegistrations.find(termRegistration => termRegistration.study_right_id === studyright.id)
-          .term_registrations
+          ?.term_registrations
       ),
     }
     return {
