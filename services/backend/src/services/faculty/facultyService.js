@@ -16,6 +16,21 @@ const createRediskeyForFacultyProgress = (id, special_groups, graduated) =>
 const createRediskeyForFacultyStudents = (id, special_groups, graduated) =>
   `FACULTY_STUDENTS_STATS_${id}_${special_groups}_${graduated}`
 
+/*
+  Faculty data objects have graduation times left in as arrays, so that
+  university-level evaluation overview can count median-times by itself.
+  Faculties, however, don't need this, and it isn't needed in frontend
+  for universityview either. This removes them from the object.
+*/
+const removeGraduationTimes = data => {
+  Object.values(data.byGradYear.medians).forEach(array =>
+    array.forEach(yearStat => {
+      yearStat.times = null
+    })
+  )
+  data.byGradYear.medians
+}
+
 const setFacultyProgrammes = async (id, data, programmeFilter) => {
   const redisKey = createRedisKeyForFacultyProgrammes(id, programmeFilter)
   const dataToRedis = {
@@ -116,11 +131,15 @@ const setGraduationStats = async (data, programmeFilter) => {
   return dataToRedis
 }
 
-const getGraduationStats = async (id, programmeFilter) => {
+const getGraduationStats = async (id, programmeFilter, keepGraduationTimes = false) => {
   const redisKey = createRedisKeyForGraduationTimeStats(id, programmeFilter)
   const dataFromRedis = await redisClient.getAsync(redisKey)
   if (!dataFromRedis) return null
-  return JSON.parse(dataFromRedis)
+  const data = JSON.parse(dataFromRedis)
+  if (!keepGraduationTimes) {
+    removeGraduationTimes(data)
+  }
+  return data
 }
 
 const getFacultyProgressStats = async (id, specialGroups, graduated) => {

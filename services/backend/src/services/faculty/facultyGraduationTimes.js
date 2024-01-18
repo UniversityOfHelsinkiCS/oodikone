@@ -285,7 +285,16 @@ const count = async (
       }
       data.medians[level] = [
         ...data.medians[level],
-        { y: median, amount: graduationAmounts[level][year], statistics, name: year },
+        {
+          y: median,
+          amount: graduationAmounts[level][year],
+          /* Include invidivual graduation times for the sake of university-level evaluation overview (UniversityView) 
+            which has to count medians by itself - but this is not needed for startYear as that is not enabled there  
+          */
+          times: mode === 'startYear' ? graduationTimes[level][year] : null,
+          statistics,
+          name: year,
+        },
       ]
     })
   })
