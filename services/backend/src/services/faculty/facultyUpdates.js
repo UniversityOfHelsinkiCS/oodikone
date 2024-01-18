@@ -84,6 +84,7 @@ const updateFacultyOverview = async (faculty, statsType) => {
     allProgrammes?.data.forEach(prog => allProgrammeCodes.push(prog.code))
   } catch (e) {
     logger.error(`Faculty updates: programme stats failed with error: ${e}`)
+    logger.error(`Stack: ${e.stack}`)
   }
 
   for (const option of options) {
@@ -120,6 +121,7 @@ const updateFacultyOverview = async (faculty, statsType) => {
       }
     } catch (e) {
       logger.error(`Faculty updates: basic/thesis-writers/credits stats failed with error ${e}`)
+      logger.error(`Stack: ${e.stack}`)
     }
   }
 
@@ -155,6 +157,7 @@ const updateFacultyProgressOverview = async faculty => {
     newProgrammes = await setFacultyProgrammes(faculty, onlyNew, 'NEW_STUDY_PROGRAMMES')
   } catch (e) {
     logger.error(`Faculty stats: all programme stats failed with error ${e}`)
+    logger.error(`Stack: ${e.stack}`)
   }
 
   for (const option of options) {
@@ -176,6 +179,7 @@ const updateFacultyProgressOverview = async faculty => {
       await setFacultyProgressStats(updateFacultyProgressStats, specialGroups, graduated)
     } catch (e) {
       logger.error(`Faculty stats: progress stats failed with error ${e}`)
+      logger.error(`Stack: ${e.stack}`)
     }
   }
   return 'OK'
