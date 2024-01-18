@@ -15,6 +15,7 @@ import { FacultyGraduations } from './FacultyGraduations'
 
 export const UniversityView = ({ faculty }) => {
   const [graduatedGroup, setGraduatedGroup] = useState(false)
+  const [medianMode, setMedianMode] = useState(false)
   const graduated = graduatedGroup ? 'GRADUATED_EXCLUDED' : 'GRADUATED_INCLUDED'
   const allFaculties = useGetFacultiesQuery()
   const progressStats = useGetAllFacultiesProgressStatsQuery({
@@ -55,19 +56,12 @@ export const UniversityView = ({ faculty }) => {
         <span>{faculty}</span>
       </div>
       <Message info>
-        <Message.Header>This view is an abridged version of Oodikone's Faculty Overview</Message.Header>
+        <Message.Header>This view is a combined version of Oodikone's Faculty Evaluation Overview</Message.Header>
         <p>
-          In these statistics, all special studyrights have been excluded, eg. exchange students and non-degree
+          In these statistics, <b>all special studyrights have been excluded</b>, eg. exchange students and non-degree
           students.
         </p>
-        <p>
-          <b>You can find more statistics on this and all other faculties of the university in main Faculty view. </b>
-          The full view includes details such as: how many have graduated or started in each faculty and in its
-          programmes; credits produced by the faculty; populations backgrounds and enrollment statuses. This view
-          provides statistics both on the whole faculty level and a breakdown of how they are spread among the faculty's
-          programmes.
-        </p>
-        <p>Access the full Faculty view by clicking 'Faculty' in the top navigation bar.</p>
+        <p>Access the full Faculty view of individual faculties by clicking 'Faculty' in the top navigation bar.</p>
       </Message>
       <div className="faculty-overview">
         {isFetchingOrLoading ? (
@@ -97,25 +91,23 @@ export const UniversityView = ({ faculty }) => {
             )}
           </div>
         )}
-      </div>
-      <>
         {getDivider('Average graduation times', 'AverageGraduationTimes', facultyToolTips.AverageGraduationTimes)}
         <div className="toggle-container">
           <Toggle
             cypress="GraduationTimeToggle"
             firstLabel="Breakdown"
             secondLabel="Median times"
-            value={false}
-            setValue={() => {}}
+            value={medianMode}
+            setValue={() => setMedianMode(!medianMode)}
           />
         </div>
         <FacultyGraduations
           faculty={faculty}
           graduationStats={graduationStats}
           groupByStartYear={false}
-          showMedian={false}
+          showMedian={medianMode}
         />
-      </>
+      </div>
     </>
   )
 }

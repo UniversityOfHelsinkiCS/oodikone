@@ -23,6 +23,7 @@ const {
   setFacultyProgressStats,
 } = require('../services/faculty/facultyService')
 const logger = require('../util/logger')
+const { getMedian } = require('../services/studyprogramme/studyprogrammeHelpers')
 
 // Faculty uses a lot of tools designed for Study programme.
 // Some of them have been copied here and slightly edited for faculty purpose.
@@ -238,13 +239,14 @@ router.get('/allgraduationstats', async (req, res) => {
   const allFaculties = await getFacultyList()
   const facultyCodes = allFaculties.map(f => f.code)
   const facultyData = {}
+  const timesArrays = [] // keep book of these to null them in the end, large lists not used in frontend
   for (const facultyCode of facultyCodes) {
-    const data = await getGraduationStats(facultyCode, 'NEW_STUDY_PROGRAMMES')
+    const data = await getGraduationStats(facultyCode, 'NEW_STUDY_PROGRAMMES', true)
     if (!data) res.status(500).json({ message: `Did not find data for ${facultyCode}` })
     facultyData[facultyCode] = data
   }
 
-  const unifyTotals = (facultyData, universityData) => {
+  const unifyTotals = (facultyData, universityData, isLast) => {
     for (const degree of degreeNames) {
       if (!universityData[degree]) universityData[degree] = []
       if (!facultyData[degree]) continue
@@ -254,11 +256,15 @@ router.get('/allgraduationstats', async (req, res) => {
         if (!universityYearStats) {
           universityStats.push(yearStats)
         } else {
-          universityYearStats.y += yearStats.y
+          universityYearStats.times.push(...yearStats.times)
+          timesArrays.push(universityYearStats.times)
           universityYearStats.amount += yearStats.amount
           universityYearStats.statistics.onTime += yearStats.statistics.onTime
           universityYearStats.statistics.yearOver += yearStats.statistics.yearOver
           universityYearStats.statistics.wayOver += yearStats.statistics.wayOver
+          if (isLast) {
+            universityYearStats.y = getMedian(universityYearStats.times)
+          }
         }
       }
     }
@@ -269,16 +275,19 @@ router.get('/allgraduationstats', async (req, res) => {
       if (!facultyData[degree]) continue
       if (!universityData[degree]) universityData[degree] = {}
       for (const yearData of facultyData[degree]) {
-        if (!universityData[degree][yearData.name]) universityData[degree][yearData.name] = { programmes: [], data: [] }
+        if (!universityData[degree][yearData.name]) {
+          universityData[degree][yearData.name] = { programmes: [], data: [] }
+        }
         const uniYearStats = universityData[degree][yearData.name]
         if (!uniYearStats.programmes.find(prog => prog === facultyCode)) {
           uniYearStats.programmes.push(facultyCode)
         }
         const uniYearFacultyStats = uniYearStats.data.find(item => item.code === facultyCode)
+        const yearDataClone = { ...yearData, times: null, statistics: { ...yearData.statistics } }
         if (!uniYearFacultyStats) {
-          uniYearStats.data.push({ ...yearData, name: facultyCode, code: facultyCode })
+          uniYearStats.data.push({ ...yearDataClone, name: facultyCode, code: facultyCode })
         } else {
-          uniYearFacultyStats.y += yearData.y
+          uniYearFacultyStats.y = yearData.y
           uniYearFacultyStats.amount += yearData.amount
           uniYearFacultyStats.statistics.onTime += yearData.statistics.onTime
           uniYearFacultyStats.statistics.yearOver += yearData.statistics.yearOver
@@ -307,9 +316,10 @@ router.get('/allgraduationstats', async (req, res) => {
     classSizes: { programmes: {} },
   }
 
-  for (const facultyCode of facultyCodes) {
+  for (let i = 0; i < facultyCodes.length; i++) {
+    const facultyCode = facultyCodes[i]
     const data = facultyData[facultyCode]
-    unifyTotals(data.byGradYear.medians, universityData.byGradYear.medians)
+    unifyTotals(data.byGradYear.medians, universityData.byGradYear.medians, i === facultyCodes.length - 1)
     unifyProgrammeStats(universityData.byGradYear.programmes.medians, data.byGradYear.medians, facultyCode)
     for (const degree of degreeNames) {
       if (!universityData.classSizes[degree]) {
@@ -324,6 +334,12 @@ router.get('/allgraduationstats', async (req, res) => {
     const { programmes, ...rest } = data.classSizes
     universityData.classSizes.programmes[facultyCode] = rest
   }
+
+  // Empty "times" arrays because that's not needed anymore.
+  timesArrays.forEach(arr => {
+    arr.length = 0
+  })
+
   return res.status(200).json(universityData)
 })
 
