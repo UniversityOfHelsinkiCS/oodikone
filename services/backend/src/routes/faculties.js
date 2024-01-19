@@ -153,9 +153,6 @@ router.get('/:id/progressstats', async (req, res) => {
 })
 
 router.get('/allprogressstats', async (req, res) => {
-  if (!req.user.roles.includes('admin')) {
-    return res.status(403).send({ error: 'Feature not yet available to non-admins' })
-  }
   const specialGroups = 'SPECIAL_EXCLUDED'
   const graduated = req.query?.graduated
   const allFaculties = await getFacultyList()
