@@ -37,9 +37,6 @@ export const ProtectedRoute = ({ requiredRoles = [], requireUserHasRights = fals
       return iamGroups.includes('grp-kielikeskus-esihenkilot')
     }
     if (rest.path.includes('evaluationoverview')) {
-      if (rest.location.pathname.includes('university')) {
-        return false
-      }
       return roles?.length > 0 || rights?.length > 0
     }
 
