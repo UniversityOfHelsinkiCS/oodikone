@@ -277,6 +277,8 @@ export const getTargetCreditsForProgramme = code => {
   // Those codes begin with 'LIS' is it 40 credits or something else?
 }
 
+export const isMastersProgramme = programmeCode => programmeCode.startsWith('MH') || programmeCode.endsWith('-ma')
+
 export const getMonthsForDegree = code => getTargetCreditsForProgramme(code) / (60 / 12)
 
 /**

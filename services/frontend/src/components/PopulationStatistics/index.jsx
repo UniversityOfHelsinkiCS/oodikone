@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom'
 import { Header, Segment } from 'semantic-ui-react'
 import { useGetSemestersQuery } from 'redux/semesters'
 import { makePopulationsToData } from 'selectors/populationDetails'
-import { getStudentTotalCredits, getUnifiedProgrammeName } from 'common'
+import { getStudentTotalCredits, getUnifiedProgrammeName, isMastersProgramme } from 'common'
 import { useGetAuthorizedUserQuery } from 'redux/auth'
 import { PopulationDetails } from '../PopulationDetails'
 import { useTitle } from '../../common/hooks'
@@ -73,7 +73,7 @@ export const PopulationStatistics = () => {
     transferredToProgrammeFilter,
   ].filter(Boolean)
 
-  if (programmeCode && (programmeCode.startsWith('MH') || programmeCode.endsWith('-ma'))) {
+  if (programmeCode && isMastersProgramme(programmeCode)) {
     filters.push(
       studyrightTypeFilter({
         programme: programmeCode,
