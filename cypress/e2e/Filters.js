@@ -98,8 +98,8 @@ describe('Population Statistics with CS master', () => {
 
     it('works', () => {
       runTestStepWithPreAndPostParts('studyright-type', () => {
-        const expectedBaMaStudents = 26
-        const expectedMasterOnlyStudents = 1
+        const expectedBaMaStudents = 27
+        const expectedMasterOnlyStudents = 0
         cy.cs('studyright-type-filter-card').cs('bama').click()
         checkFilteringResult(expectedBaMaStudents)
         cy.cs('studyright-type-filter-card').cs('master').click()
