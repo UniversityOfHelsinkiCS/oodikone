@@ -199,23 +199,15 @@ router.get('/allprogressstats', async (req, res) => {
     )
   }
 
-  // Put Eläinlääkis bachelor+master stats into same box as licentiate, as the target credit is same(360)
-  const getNewFieldName = (fieldName, facultyCode) => {
-    if (fieldName === 'bachelorMaster' && facultyCode === 'H90') return 'licentiate'
-    if (fieldName === 'bcMsProgStats' && facultyCode === 'H90') return 'licentiateProgStats'
-    return fieldName
-  }
-
   for (const facultyCode of facultyCodes) {
     const facultyData = codeToData[facultyCode]
     for (const year of universityData.years.slice(1).reverse()) {
       for (const fieldName of degreeNames) {
-        const newFieldName = getNewFieldName(fieldName, facultyCode)
-        if (!facultyData.creditCounts[newFieldName] || Object.keys(facultyData.creditCounts[fieldName]).length === 0)
+        if (!facultyData.creditCounts[fieldName] || Object.keys(facultyData.creditCounts[fieldName]).length === 0)
           continue
-        if (!universityData.creditCounts[newFieldName]) universityData.creditCounts[newFieldName] = {}
-        if (!universityData.creditCounts[newFieldName][year]) universityData.creditCounts[newFieldName][year] = []
-        universityData.creditCounts[newFieldName][year].push(...facultyData.creditCounts[fieldName][year])
+        if (!universityData.creditCounts[fieldName]) universityData.creditCounts[fieldName] = {}
+        if (!universityData.creditCounts[fieldName][year]) universityData.creditCounts[fieldName][year] = []
+        universityData.creditCounts[fieldName][year].push(...facultyData.creditCounts[fieldName][year])
       }
       for (const fieldName of [
         'bachelorsProgStats',
@@ -224,13 +216,17 @@ router.get('/allprogressstats', async (req, res) => {
         'mastersProgStats',
         'doctoralProgStats',
       ]) {
-        const newFieldName = getNewFieldName(fieldName, facultyCode)
         if (Object.keys(facultyData[fieldName]).length === 0) continue
-        if (!universityData[newFieldName]) universityData[newFieldName] = {}
-        universityData[newFieldName][facultyCode] = unifyProgressStats(Object.values(facultyData[fieldName]))
+        if (!universityData[fieldName]) universityData[fieldName] = {}
+        universityData[fieldName][facultyCode] = unifyProgressStats(Object.values(facultyData[fieldName]))
       }
     }
   }
+
+  // Remove ELL bachelor+master progresstats for now, because it is problematic due to different credit limits
+  // when expanding the table rows to show 'programme'(faculty) specific progress bars
+  delete universityData.bcMsProgStats['H90']
+
   return res.status(200).json(universityData)
 })
 

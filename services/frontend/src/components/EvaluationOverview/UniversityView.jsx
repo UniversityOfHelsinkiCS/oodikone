@@ -62,6 +62,11 @@ export const UniversityView = ({ faculty }) => {
           students.
         </p>
         <p>Access the full Faculty view of individual faculties by clicking 'Faculty' in the top navigation bar.</p>
+        <p>
+          <b>Veterinary medicine bachelor + licentiate (MH90_001) is disabled</b> and not visible in the progress stats.
+          It is visible in graduation times, but notice that it is found in "Bachelor + Master" category although it has
+          a target time of 6 years, whereas the other degrees in that category have a target of 5 years.{' '}
+        </p>
       </Message>
       <div className="faculty-overview">
         {isFetchingOrLoading ? (
