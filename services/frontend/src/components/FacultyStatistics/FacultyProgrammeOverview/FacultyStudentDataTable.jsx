@@ -66,14 +66,13 @@ const getTableCell = ({ year, programme, valIdx, rowIdx, tableLinePlaces, value 
 }
 
 const getOtherCountriesList = ({ year, code, extraTableStats }) => {
-  if (!extraTableStats || !extraTableStats[year] || !extraTableStats[year][code])
-    return <p key={`${Math.random()}-nodata`}>No data</p>
+  if (Object.keys(extraTableStats?.[year]?.[code]).length === 0) return <p key={`${Math.random()}-nodata`}>No data</p>
   const countriesData = extraTableStats[year][code]
   return Object.keys(countriesData)
     .sort()
     .map(key => (
       <p key={`${Math.random()}-${key}`} style={{ padding: 0, margin: 0 }}>
-        {key}: <b>{countriesData[key]}</b>
+        {key === 'null' ? 'Unknown' : key}: <b>{countriesData[key]}</b>
       </p>
     ))
 }
@@ -89,11 +88,12 @@ const getRows = ({
   programmeNames,
 }) => {
   return programmeStats[programme][year].map((value, valIdx) => {
+    const key = `${programme}-${year}-${`${value}${valIdx}`}`
     if (!showPercentages && typeof value === 'string' && (value.includes('%') || value.includes('NA'))) return null
     if (valIdx === 19) {
       return (
         <Popup
-          key={`${year}-${programme}-${Math.random()}`}
+          key={key}
           content={getOtherCountriesList({ year, code: programmeNames[programme].code, extraTableStats })}
           trigger={getTableCell({ year, programme, valIdx, rowIdx: idx, tableLinePlaces, value })}
         />
@@ -101,7 +101,7 @@ const getRows = ({
     }
     return (
       <Popup
-        key={`${programme}-${year}-${Math.random()}`}
+        key={key}
         content={getTitlePopup(valIdx)}
         trigger={getTableCell({ year, programme, valIdx, rowIdx: idx, tableLinePlaces, value })}
       />
