@@ -16,6 +16,7 @@ import {
   useGetStudyGuidanceGroupPopulationCoursesQuery,
 } from 'redux/studyGuidanceGroups'
 import { useGetProgressCriteriaQuery } from 'redux/programmeProgressCriteria'
+import { isMastersProgramme } from 'common'
 import { useLanguage } from 'components/LanguagePicker/useLanguage'
 import { AgeStats } from 'components/PopulationDetails/AgeStats'
 import { CreditGainStats } from 'components/PopulationDetails/CreditGainStats'
@@ -192,6 +193,15 @@ const SingleStudyGroupFilterView = ({ courses, group, population, ...otherProps 
               },
             ]
           : [],
+      })
+    )
+  }
+
+  if (group?.tags?.studyProgramme && isMastersProgramme(group.tags.studyProgramme)) {
+    viewFilters.push(
+      filters.studyrightTypeFilter({
+        programme: group.tags.studyProgramme,
+        year: group.tags.year,
       })
     )
   }
