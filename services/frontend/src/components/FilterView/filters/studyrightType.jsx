@@ -44,8 +44,7 @@ const findStudyrightElement = (element, startdate, programme, year) => {
   const date = moment(new Date(`${year}-08-01`))
   const startDate = moment(new Date(startdate))
   const endDate = moment(new Date(element.enddate))
-
-  return date.isBetween(startDate, endDate)
+  return date.isBetween(startDate, endDate, undefined, '[]')
 }
 
 export const studyrightTypeFilter = createFilter({
