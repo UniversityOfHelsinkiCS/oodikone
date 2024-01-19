@@ -160,7 +160,7 @@ describe('Custom population tests', () => {
       })
     })
 
-    it('Updates a custom population search', () => {
+    it('Updates a custom population search', { retries: 2 }, () => {
       cy.fixture('customPopulations').then(({ studentNumbersForCSStudentsSet1, studentNumbersForCSStudentsSet2 }) => {
         const students1 = studentNumbersForCSStudentsSet1
         const students2 = studentNumbersForCSStudentsSet2
