@@ -73,7 +73,8 @@ noHeader: Just removes header, I think (not sure of the point of this, since you
 
 cellProps: given to each cell like <td {...cellProps}>. Use for style, hover title, etc.
 cellStyle: Basically shorthand for cellProps: { style: ... }
-filterType: set to 'date' or 'range' to make the filter work differently
+filterType: options are 'date', 'range' and 'multi' (or default if left empty). Check the filters folder
+  for examples and documentation (at least multiSelectFilter.jsx has a good description how it works)
 getRowVal: Get single cell value. This will be used for sorting and filtering, and displayed unless overridden.
 getRowContent: Single cell JSX: Overrides getRowVal for value to display, but does not affect excel
 getRowExport: Overrides getRowVal for excel
