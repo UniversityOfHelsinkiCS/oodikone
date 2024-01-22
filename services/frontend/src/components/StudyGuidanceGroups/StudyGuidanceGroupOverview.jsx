@@ -27,6 +27,7 @@ const LinkToGroup = ({ group }) => {
         padding: '.78571429em .78571429em',
       }}
       to={dest}
+      data-cy={`study-guidance-group-link-${group.id}`}
     >
       {getTextIn(group.name)}
       <Icon color="blue" name="level up alternate" onClick={() => history.push(dest)} />
@@ -242,7 +243,9 @@ export const StudyGuidanceGroupOverview = ({ groups }) => {
           lisäominaisuuksia.{' '}
         </p>
       </StyledMessage>
-      <SortableTable hideHeaderBar columns={headers} data={groups} singleLine={false} />
+      <div data-cy="Table-study-guidance-group-overview">
+        <SortableTable hideHeaderBar columns={headers} data={groups} singleLine={false} />
+      </div>
     </>
   )
 }
