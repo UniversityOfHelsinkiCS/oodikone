@@ -161,6 +161,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
             'admission_type',
             'cancelled',
             'is_ba_ma',
+            'semester_enrollments',
           ],
           separate: true,
           include: [
