@@ -154,13 +154,42 @@ jobs:
           ./anonyymioodi/commit_and_push_to_toska_hub.sh user-db
 
   # === End-to-end tests ===
-  test_course_statistics:
-    name: 'Test course statistics'
+  test_end_to_end:
+    runs-on: ubuntu-latest
     needs:
       - build_and_push_anon_sis_db
       - build_and_push_anon_kone_db
       - build_and_push_anon_user_db
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - name: 'Test course statistics'
+            spec: cypress/e2e/Course_statistics.js
+          - name: 'Test custom population'
+            spec: cypress/e2e/Custom_population.js
+          - name: 'Test population statistics'
+            spec: cypress/e2e/Population_statistics.js
+          - name: 'Test filters'
+            spec: cypress/e2e/Filters.js
+          - name: 'Test student statistics'
+            spec: cypress/e2e/Student_statistics.js
+          - name: 'Test completed courses'
+            spec: cypress/e2e/Completed_courses.js
+          - name: 'Test studyprogramme overview'
+            spec: cypress/e2e/Studyprogramme_overview.js
+          - name: 'Test teachers and users'
+            spec: |
+              cypress/e2e/Teachers.js
+              cypress/e2e/Users.js
+          - name: 'Test faculty statistics'
+            spec: cypress/e2e/Faculty_statistics.js
+          - name: 'Test open uni search'
+            spec: cypress/e2e/Openuni.js
+          - name: 'Test language center view'
+            spec: cypress/e2e/Language_center.js
+          - name: 'Test study guidance groups'
+            spec: cypress/e2e/Study_guidance_groups.js
+    name: ${{ matrix.name }}
     steps:
       - uses: actions/checkout@v4
       - name: 'Run tests'
@@ -168,169 +197,7 @@ jobs:
         with:
           username: ${{ secrets.username }}
           password: ${{ secrets.password }}
-          spec: cypress/e2e/Course_statistics.js
-
-  test_custom_population:
-    name: 'Test custom population'
-    needs:
-      - build_and_push_anon_sis_db
-      - build_and_push_anon_kone_db
-      - build_and_push_anon_user_db
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: 'Run tests'
-        uses: ./.github/actions/run-tests
-        with:
-          username: ${{ secrets.username }}
-          password: ${{ secrets.password }}
-          spec: cypress/e2e/Custom_population.js
-
-  test_population_statistics:
-    name: 'Test population statistics'
-    runs-on: ubuntu-latest
-    needs:
-      - build_and_push_anon_sis_db
-      - build_and_push_anon_kone_db
-      - build_and_push_anon_user_db
-    steps:
-      - uses: actions/checkout@v4
-      - name: 'Run tests'
-        uses: ./.github/actions/run-tests
-        with:
-          username: ${{ secrets.username }}
-          password: ${{ secrets.password }}
-          spec: cypress/e2e/Population_statistics.js
-
-  test_filters:
-    name: 'Test filters'
-    runs-on: ubuntu-latest
-    needs:
-      - build_and_push_anon_sis_db
-      - build_and_push_anon_kone_db
-      - build_and_push_anon_user_db
-    steps:
-      - uses: actions/checkout@v4
-      - name: 'Run tests'
-        uses: ./.github/actions/run-tests
-        with:
-          username: ${{ secrets.username }}
-          password: ${{ secrets.password }}
-          spec: cypress/e2e/Filters.js
-
-  test_student_statistics:
-    name: 'Test student statistics'
-    needs:
-      - build_and_push_anon_sis_db
-      - build_and_push_anon_kone_db
-      - build_and_push_anon_user_db
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: 'Run tests'
-        uses: ./.github/actions/run-tests
-        with:
-          username: ${{ secrets.username }}
-          password: ${{ secrets.password }}
-          spec: cypress/e2e/Student_statistics.js
-
-  test_completed_courses:
-    name: 'Test completed courses'
-    needs:
-      - build_and_push_anon_sis_db
-      - build_and_push_anon_kone_db
-      - build_and_push_anon_user_db
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: 'Run tests'
-        uses: ./.github/actions/run-tests
-        with:
-          username: ${{ secrets.username }}
-          password: ${{ secrets.password }}
-          spec: cypress/e2e/Completed_courses.js
-
-  test_studyprogramme_overview:
-    name: 'Test studyprogramme overview'
-    needs:
-      - build_and_push_anon_sis_db
-      - build_and_push_anon_kone_db
-      - build_and_push_anon_user_db
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: 'Run tests'
-        uses: ./.github/actions/run-tests
-        with:
-          username: ${{ secrets.username }}
-          password: ${{ secrets.password }}
-          spec: cypress/e2e/Studyprogramme_overview.js
-
-  test_teachers_and_users:
-    name: 'Test teachers and users'
-    needs:
-      - build_and_push_anon_sis_db
-      - build_and_push_anon_kone_db
-      - build_and_push_anon_user_db
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: 'Run tests'
-        uses: ./.github/actions/run-tests
-        with:
-          username: ${{ secrets.username }}
-          password: ${{ secrets.password }}
-          spec: |
-            cypress/e2e/Teachers.js
-            cypress/e2e/Users.js
-
-  test_faculty_statistics:
-    name: 'Test faculty statistics'
-    needs:
-      - build_and_push_anon_sis_db
-      - build_and_push_anon_kone_db
-      - build_and_push_anon_user_db
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: 'Run tests'
-        uses: ./.github/actions/run-tests
-        with:
-          username: ${{ secrets.username }}
-          password: ${{ secrets.password }}
-          spec: cypress/e2e/Faculty_statistics.js
-
-  test_open_uni_search:
-    name: 'Test open uni search'
-    needs:
-      - build_and_push_anon_sis_db
-      - build_and_push_anon_kone_db
-      - build_and_push_anon_user_db
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: 'Run tests'
-        uses: ./.github/actions/run-tests
-        with:
-          username: ${{ secrets.username }}
-          password: ${{ secrets.password }}
-          spec: cypress/e2e/Openuni.js
-
-  test_language_center:
-    name: 'Test language center view'
-    needs:
-      - build_and_push_anon_sis_db
-      - build_and_push_anon_kone_db
-      - build_and_push_anon_user_db
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: 'Run tests'
-        uses: ./.github/actions/run-tests
-        with:
-          username: ${{ secrets.username }}
-          password: ${{ secrets.password }}
-          spec: cypress/e2e/Language_center.js
+          spec: ${{ matrix.spec }}
 
   # === Other tests ===
   test_service_exit_statuses:
