@@ -1,0 +1,28 @@
+[
+  {
+    "id": "sgg-cypress-1",
+    "name": {
+      "fi": "TKT kandit 2018"
+    },
+    "members": [
+      { "personStudentNumber": "010450938" },
+      { "personStudentNumber": "010589388" },
+      { "personStudentNumber": "010262566" }
+    ],
+    "tags": {
+      "studyProgramme": "KH50_005",
+      "year": "2018"
+    }
+  },
+  {
+    "id": "sgg-cypress-2",
+    "name": {
+      "fi": "Oma ohjausryhmä"
+    },
+    "members": [{ "personStudentNumber": "010614509" }, { "personStudentNumber": "010307146" }],
+    "tags": {
+      "studyProgramme": null,
+      "year": null
+    }
+  }
+]
