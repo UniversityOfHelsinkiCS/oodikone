@@ -52,12 +52,29 @@ export const GeneralTab = ({
 
   if (!populationStatistics || !populationStatistics.elementdetails) return null
 
-  const createSemesterEnrollmentsMap = student =>
-    student.semesterenrollments?.reduce((enrollments, enrollment) => {
-      const newEnrollmentsObject = { ...enrollments }
-      newEnrollmentsObject[enrollment.semestercode] = enrollment.enrollmenttype
-      return newEnrollmentsObject
+  const studyGuidanceGroupProgrammes =
+    group?.tags?.studyProgramme && group?.tags?.studyProgramme.includes('+')
+      ? group?.tags?.studyProgramme.split('+')
+      : [group?.tags?.studyProgramme]
+
+  const programmeCode = query?.studyRights?.programme || studyGuidanceGroupProgrammes[0] || customPopulationProgramme
+
+  const createSemesterEnrollmentsMap = student => {
+    let semesterEnrollments
+
+    if (programmeCode) {
+      semesterEnrollments = student.studyrights.find(sr =>
+        sr.studyright_elements.some(e => e.code === programmeCode)
+      )?.semester_enrollments
+    }
+
+    semesterEnrollments = semesterEnrollments ?? student.semesterenrollments
+
+    return semesterEnrollments.reduce((enrollments, enrollment) => {
+      enrollments[enrollment.semestercode] = enrollment.enrollmenttype
+      return enrollments
     }, {})
+  }
 
   const selectedStudents = filteredStudents.map(stu => stu.studentNumber)
   const students = Object.fromEntries(
@@ -71,21 +88,16 @@ export const GeneralTab = ({
       .map(stu => [stu.studentNumber, stu])
   )
 
-  const getCombinedProgrammeCode = (query, studyGuidangeGroupProgrammes) => {
+  const getCombinedProgrammeCode = (query, studyGuidanceGroupProgrammes) => {
     if (query && query?.studyRights?.combinedProgramme) return query.studyRights.combinedProgramme
-    if (studyGuidangeGroupProgrammes.length > 1) return studyGuidangeGroupProgrammes[1]
+    if (studyGuidanceGroupProgrammes.length > 1) return studyGuidanceGroupProgrammes[1]
     return ''
   }
 
   const queryStudyrights = query ? Object.values(query.studyRights) : []
   const cleanedQueryStudyrights = queryStudyrights.filter(sr => !!sr)
-  const studyGuidangeGroupProgrammes =
-    group?.tags?.studyProgramme && group?.tags?.studyProgramme.includes('+')
-      ? group?.tags?.studyProgramme.split('+')
-      : [group?.tags?.studyProgramme]
 
-  const programmeCode = query?.studyRights?.programme || studyGuidangeGroupProgrammes[0] || customPopulationProgramme
-  const combinedProgrammeCode = getCombinedProgrammeCode(query, studyGuidangeGroupProgrammes)
+  const combinedProgrammeCode = getCombinedProgrammeCode(query, studyGuidanceGroupProgrammes)
 
   const {
     studentToStudyrightStartMap,
