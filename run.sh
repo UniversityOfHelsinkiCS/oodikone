@@ -83,8 +83,6 @@ parse_profiles
 parse_env
 if [[ "$compose_command" == "" ]]; then
   final_command="docker-compose ${env}"
-elif [[ "$compose_command" == *"down"* ]]; then
-  final_command="docker-compose ${env} ${compose_command}"
 else
   final_command="docker-compose ${env} ${profiles} ${compose_command}"
 fi
