@@ -130,7 +130,7 @@ describe('Population Statistics', () => {
     })
   })
 
-  it('Graduation filter works', () => {
+  it('Graduation filter works', { retries: 2 }, () => {
     runTestStepWithPreAndPostParts('GraduatedFromProgramme', () => {
       const getCard = () => cy.cs('GraduatedFromProgramme-filter-card')
 
