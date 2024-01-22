@@ -64,6 +64,7 @@ export const getSemestersPresentFunctions = ({
   }
 
   const graduatedOnSemester = (student, sem, programmeCode) => {
+    if (!programmeCode) return 0
     const firstGraduation = studentToStudyrightEndMap[student.studentNumber]
     const secondGraduation = studentToSecondStudyrightEndMap[student.studentNumber]
     if (
@@ -81,7 +82,7 @@ export const getSemestersPresentFunctions = ({
     return 0
   }
 
-  const getSemesterEnrollmentsContent = student => {
+  const getSemesterEnrollmentsContent = (student, studyright) => {
     if (allSemesters.length === 0) return ''
     if (!student.semesterenrollments) return ''
     const semesterIcons = []
@@ -136,10 +137,13 @@ export const getSemestersPresentFunctions = ({
     }
 
     for (let sem = firstSemester; sem <= lastSemester; sem++) {
+      const enrollment = student.semesterEnrollmentsMap
+        ? student.semesterEnrollmentsMap[sem]
+        : studyright[0].semesterEnrollments.find(e => e.semestercode === sem)?.enrollmenttype
       semesterIcons.push(
         getSemesterJSX(
           sem,
-          student.semesterEnrollmentsMap[sem],
+          enrollment,
           graduatedOnSemester(student, sem, programmeCode),
           `${student.studentNumber}-${sem}`
         )

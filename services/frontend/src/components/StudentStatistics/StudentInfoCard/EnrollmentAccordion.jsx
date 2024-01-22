@@ -1,107 +1,119 @@
 import React, { useState } from 'react'
 import { Icon, Accordion, Table, Popup } from 'semantic-ui-react'
-import { array } from 'prop-types'
 import _ from 'lodash'
 
-import './studentInfoCard.css'
+import { useGetSemestersQuery } from 'redux/semesters'
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
+import { getSemestersPresentFunctions } from 'components/PopulationStudents/StudentTable/GeneralTab/columnHelpers/semestersPresent'
 
-const enrolmentTypes = {
-  1: { text: 'Present', className: 'label-present' },
-  2: { text: 'Absent', className: 'label-absent' },
-  3: { text: 'Inactive', className: 'label-passive' },
-  STATUTORY: { text: 'Absent, statutory', className: 'label-absent-statutory' },
+const calculateSemesterEnrollmentsByStudyright = (semestersAndYears, studyrights) => {
+  const { semesters, years } = semestersAndYears
+  const programmeNames = {}
+  let firstYear
+
+  const enrollmentsByStudyright = Object.values(studyrights).reduce((enrollments, studyright) => {
+    // Let's choose the first studyright as they are all linked to the same actual (Sisu) studyright
+    studyright[0].semesterEnrollments.forEach(enrollment => {
+      const year = years[semesters[enrollment.semestercode].yearcode]
+      const enrollmentYear = new Date(year.startdate).getFullYear()
+
+      if (!firstYear || enrollmentYear < firstYear) {
+        firstYear = enrollmentYear
+      }
+
+      const studyrightId = studyright[0].actual_studyrightid
+      if (!enrollments[studyrightId]) {
+        enrollments[studyrightId] = {}
+      }
+      enrollments[studyrightId][enrollment.semestercode] = enrollment.enrollmenttype
+    })
+
+    studyright.forEach(element => {
+      const studyrightId = element.actual_studyrightid
+      if (!programmeNames[studyrightId]) {
+        programmeNames[studyrightId] = []
+      }
+      element.studyright_elements
+        .filter(elem => elem.element_detail.type === 20)
+        .forEach(elem => {
+          programmeNames[studyrightId].push(elem.element_detail.name)
+        })
+    })
+    return enrollments
+  }, {})
+
+  return { enrollmentsByStudyright, programmeNames, firstYear }
 }
 
-const helpTexts = {
-  1: '',
-  2: 'The registration has been done and the student is not attending to the study term.',
-  3: 'The registration has not been done and the student is counted as inactive.',
-  STATUTORY: 'This absence is statutory e.g. parental leave or military service',
-}
-const curDate = new Date()
-
-const renderSemester = ({ enrollmenttype, statutoryAbsence }) => {
-  const { text, className } = statutoryAbsence ? enrolmentTypes.STATUTORY : enrolmentTypes[enrollmenttype]
-  const helpText = helpTexts[enrollmenttype] + (statutoryAbsence ? ` ${helpTexts.STATUTORY}` : '')
-  return (
-    <div className="enrollment-container">
-      {text}
-      <div className={`enrollment-label ${className}`}> </div>
-      {enrollmenttype > 1 ? (
-        <Popup content={helpText} trigger={<Icon className="help-icon" name="question circle outline" />} />
-      ) : null}
-    </div>
-  )
-}
-
-const getEnrollmentStatus = (semester, season) => {
-  if (semester.name.en.includes('Spring') && season === 'SPRING') {
-    return renderSemester(semester)
-  }
-  if (semester.name.en.includes('Autumn') && season === 'FALL') {
-    return renderSemester(semester)
-  }
-  return 'Absent'
-}
-
-export const EnrollmentAccordion = ({ semesterEnrollments }) => {
+export const EnrollmentAccordion = ({ student }) => {
+  const { data: semestersAndYears } = useGetSemestersQuery()
   const [active, setActive] = useState(false)
+  const { getTextIn } = useLanguage()
 
-  const handleAccordionClick = () => {
-    setActive(!active)
-  }
+  if (!semestersAndYears || !student) return null
 
-  const groupedEnrollments = _.groupBy(semesterEnrollments, 'yearname')
+  const { studyrights } = student
 
-  const sortedKeys = Object.keys(groupedEnrollments).sort((a, b) => {
-    return groupedEnrollments[b][0].semestercode - groupedEnrollments[a][0].semestercode
+  const studyrightsGroupedByStudyright = _.groupBy(
+    studyrights?.filter(sr => sr.studyright_elements.length > 0),
+    'actual_studyrightid'
+  )
+
+  const { enrollmentsByStudyright, programmeNames, firstYear } = calculateSemesterEnrollmentsByStudyright(
+    semestersAndYears,
+    studyrightsGroupedByStudyright
+  )
+
+  const { getSemesterEnrollmentsContent } = getSemestersPresentFunctions({
+    allSemesters: Object.values(semestersAndYears.semesters),
+    allSemestersMap: semestersAndYears.semesters,
+    year: `${Math.max(new Date().getFullYear() - 7, firstYear)}`,
+    filteredStudents: [student],
+    getTextIn,
   })
 
-  if (curDate < new Date(curDate.getFullYear(), 7, 1)) {
-    sortedKeys.shift()
-  }
+  const semesterEnrollments = Object.values(studyrightsGroupedByStudyright).reduce((acc, studyright) => {
+    acc[studyright[0].actual_studyrightid] = getSemesterEnrollmentsContent(student, studyright)
+    return acc
+  }, {})
 
   return (
-    <div className={active ? 'enrollmentAccordion' : ''}>
-      <Accordion>
-        <Accordion.Title active={active} onClick={handleAccordionClick}>
-          <Icon name="dropdown" />
-          Enrollments
-        </Accordion.Title>
-        <Accordion.Content active={active}>
-          <Table celled>
-            <Table.Header>
-              <Table.Row>
-                <Table.HeaderCell>Semester</Table.HeaderCell>
-                <Table.HeaderCell>Autumn</Table.HeaderCell>
-                <Table.HeaderCell>Spring</Table.HeaderCell>
+    <Accordion style={{ marginBottom: active ? '0.5em' : 0 }}>
+      <Accordion.Title active={active} onClick={() => setActive(!active)}>
+        <Icon name="dropdown" />
+        Enrollments
+      </Accordion.Title>
+      <Accordion.Content active={active}>
+        <Table celled>
+          <Table.Header>
+            <Table.Row>
+              <Table.HeaderCell>Programme(s)</Table.HeaderCell>
+              <Table.HeaderCell>
+                Semesters
+                <Popup
+                  position="top center"
+                  trigger={<Icon name="question circle outline" style={{ opacity: 0.5, marginLeft: '0.25em' }} />}
+                  content="Displays enrollment data for the current and up to six previous academic years."
+                />
+              </Table.HeaderCell>
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>
+            {Object.entries(enrollmentsByStudyright).map(([studyrightId]) => (
+              <Table.Row key={studyrightId}>
+                <Table.Cell>
+                  {_.flatten(programmeNames[studyrightId])
+                    .map(getTextIn)
+                    .map(elem => (
+                      <p key={elem}>{elem}</p>
+                    ))}
+                </Table.Cell>
+                <Table.Cell>{semesterEnrollments[studyrightId]}</Table.Cell>
               </Table.Row>
-            </Table.Header>
-            <Table.Body>
-              {sortedKeys.map(key => {
-                const semester = groupedEnrollments[key]
-                return semester[0].startYear <= curDate.getFullYear() ? (
-                  <Table.Row key={key}>
-                    <Table.Cell>{key}</Table.Cell>
-
-                    <Table.Cell>{getEnrollmentStatus(semester[0], 'FALL')}</Table.Cell>
-
-                    <Table.Cell>
-                      {semester.length > 1
-                        ? getEnrollmentStatus(semester[1], 'SPRING')
-                        : getEnrollmentStatus(semester[0], 'SPRING')}
-                    </Table.Cell>
-                  </Table.Row>
-                ) : null
-              })}
-            </Table.Body>
-          </Table>
-        </Accordion.Content>
-      </Accordion>
-    </div>
+            ))}
+          </Table.Body>
+        </Table>
+      </Accordion.Content>
+    </Accordion>
   )
-}
-
-EnrollmentAccordion.propTypes = {
-  semesterEnrollments: array.isRequired,
 }

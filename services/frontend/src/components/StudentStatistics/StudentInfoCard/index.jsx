@@ -3,14 +3,15 @@ import { Card, Icon, Button } from 'semantic-ui-react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 
-import { useGetAuthorizedUserQuery } from 'redux/auth'
 import { SisuLinkItem } from 'components/common/SisuLinkItem'
 import { reformatDate } from 'common'
+import { callApi } from 'apiConnection'
+import { useGetAuthorizedUserQuery } from 'redux/auth'
+import { removeStudentSelection, resetStudent } from 'redux/students'
 import { DISPLAY_DATE_FORMAT, DISPLAY_DATE_FORMAT_DEV } from '../../../constants'
-import './studentInfoCard.css'
-import { removeStudentSelection, resetStudent } from '../../../redux/students'
-import { callApi } from '../../../apiConnection'
 import { EnrollmentAccordion } from './EnrollmentAccordion'
+
+import './studentInfoCard.css'
 
 export const StudentInfoCard = ({ student }) => {
   const dispatch = useDispatch()
@@ -48,7 +49,7 @@ export const StudentInfoCard = ({ student }) => {
         </Card.Meta>
         <Card.Description>{`Credits: ${student.credits || 0}`}</Card.Description>
         <div style={{ paddingTop: '4px' }}>
-          <EnrollmentAccordion semesterEnrollments={student.semesterenrollments} />
+          <EnrollmentAccordion student={student} />
           <p style={{ fontSize: 14 }}>{`Updated at ${formattedTimestamp}`}</p>
           <Button disabled={updating} compact size="medium" labelPosition="left" onClick={updateStudent}>
             <Icon loading={updating} name="refresh" />
