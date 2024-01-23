@@ -19,7 +19,7 @@ const gradesMap = {
 }
 
 export const viewModeNames = {
-  STUDENT: 'Students',
+  STUDENTS: 'Students',
   ATTEMPTS: 'Attempts',
 }
 

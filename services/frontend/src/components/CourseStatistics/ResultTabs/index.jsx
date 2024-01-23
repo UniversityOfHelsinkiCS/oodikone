@@ -3,12 +3,12 @@ import { Tab, Segment, Menu, Icon } from 'semantic-ui-react'
 import { useHistory, useLocation } from 'react-router-dom'
 import qs from 'query-string'
 import { useDispatch, useSelector } from 'react-redux'
-
 import { getCourseStats } from 'redux/coursestats'
-import { PassRate, PassRateSettings } from './Panes/passRate'
-import { Distribution, DistributionSettings } from './Panes/distribution'
-import { Tables, TablesSettings } from './Panes/tables'
 import { useProgress, useTabs } from '../../../common/hooks'
+import { AttemptsTableContent, AttemptsTableSettings } from './Panes/attempts'
+import { Distribution, DistributionSettings } from './Panes/distribution'
+import { PassRate, PassRateSettings } from './Panes/passRate'
+import { StudentsTableContent, StudentsTableSettings } from './Panes/students'
 
 import './resultTabs.css'
 
@@ -97,23 +97,30 @@ export const ResultTabs = ({ primary, comparison, separate, availableStats }) =>
 
   const paneTypes = [
     {
-      label: 'Tables',
-      icon: 'table',
-      initialSettings: { showDetails: false, viewMode: 'STUDENT', separate },
-      settings: TablesSettings,
-      component: Tables,
+      label: 'Students',
+      icon: 'user',
+      initialSettings: { showDetails: false, separate },
+      settings: StudentsTableSettings,
+      component: StudentsTableContent,
+    },
+    {
+      label: 'Attempts',
+      icon: 'redo',
+      initialSettings: { separate },
+      settings: AttemptsTableSettings,
+      component: AttemptsTableContent,
     },
     {
       label: 'Pass rate chart',
       icon: 'balance',
-      initialSettings: { viewMode: 'STUDENT', separate },
+      initialSettings: { viewMode: 'STUDENTS', separate },
       settings: PassRateSettings,
       component: PassRate,
     },
     {
       label: 'Grade distribution chart',
       icon: 'chart bar',
-      initialSettings: { isRelative: false, viewMode: 'STUDENT' },
+      initialSettings: { isRelative: false, viewMode: 'STUDENTS' },
       settings: DistributionSettings,
       component: Distribution,
     },

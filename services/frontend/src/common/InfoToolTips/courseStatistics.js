@@ -13,7 +13,7 @@ export const courseStatisticsToolTips = {
       Arvosanajakaumaa katsoessasi voit muuttaa luvut prosenteiksi, klikkaamalla painiketta "Relative".
       Mahdollinen sarake "Other passed" sisältää sekä arvosanan "Hyv." saaneet että kurssin hyväksilukeneet.
     `,
-    STUDENT: `
+    STUDENTS: `
       **Table - Students**
 
       Taulukko näyttää yksittäiset opiskelijat, jotka ovat kurssia suorittaneet.
@@ -35,7 +35,7 @@ export const courseStatisticsToolTips = {
       Hylätyt suoritukset sisältävät arvosanat Hyl. ja 0, sekä suoritukset, joille opettaja on antanut merkinnän
       "Luop" (Luopunut suorituksesta) tai "Eisa" (Ei saapunut tenttiin).
     `,
-    STUDENT: `
+    STUDENTS: `
       **Pass rate chart - Students**
 
       Graafi näyttää yksittäiset opiskelijat, jotka ovat kurssia suorittaneet.
