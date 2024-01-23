@@ -189,7 +189,7 @@ const getColumns = (stats, showDetails, showGrades, userHasAccessToAllStats, alt
   })
 }
 
-export const StudentTable = ({
+export const StudentsTable = ({
   data: { name, stats },
   settings: { showDetails, separate, showGrades },
   alternatives,
@@ -231,13 +231,13 @@ export const StudentTable = ({
   )
 }
 
-StudentTable.propTypes = {
+StudentsTable.propTypes = {
   data: object.isRequired,
   alternatives: arrayOf(string).isRequired,
   separate: bool,
   userHasAccessToAllStats: bool.isRequired,
 }
 
-StudentTable.defaultProps = {
+StudentsTable.defaultProps = {
   separate: false,
 }
