@@ -75,18 +75,22 @@ export const UniversityView = ({ faculty }) => {
         </p>
       </Message>
       <div>
-        <p>
-          <b>Click here to open the corresponding view for an individual faculty</b>
-        </p>
-        <div className="facultyLinkBox">
-          {orderBy(allFaculties.data, 'code').map(faculty => (
-            <p key={faculty.code}>
-              <Link to={`/evaluationoverview/faculty/${faculty.code}`}>{`${faculty.code} ${getTextIn(
-                faculty.name
-              )}`}</Link>
+        {allFaculties?.data?.length > 0 && (
+          <div>
+            <p>
+              <b>Click here to open the corresponding view for an individual faculty</b>
             </p>
-          ))}
-        </div>
+            <div className="facultyLinkBox">
+              {orderBy(allFaculties.data, 'code').map(faculty => (
+                <span key={faculty.code}>
+                  <Link style={{ marginTop: '5px' }} to={`/evaluationoverview/faculty/${faculty.code}`}>{`${
+                    faculty.code
+                  } ${getTextIn(faculty.name)}`}</Link>
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
       <div className="faculty-overview">
         <div className="programmes-overview">
