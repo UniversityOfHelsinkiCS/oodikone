@@ -1,13 +1,9 @@
 import React, { useState } from 'react'
 import { Divider, Header, Loader, Message } from 'semantic-ui-react'
-
-import {
-  useGetFacultiesQuery,
-  useGetAllFacultiesProgressStatsQuery,
-  useGetAllFacultiesGraduationStatsQuery,
-} from 'redux/facultyStats'
+import { useGetAllFacultiesProgressStatsQuery, useGetAllFacultiesGraduationStatsQuery } from 'redux/facultyStats'
 import { facultyToolTips } from 'common/InfoToolTips'
 import { Link } from 'react-router-dom'
+import { useGetAuthorizedUserQuery } from 'redux/auth'
 import { useLanguage } from 'components/LanguagePicker/useLanguage'
 import { orderBy } from 'lodash'
 import { FacultyProgress } from './FacultyProgress'
@@ -19,8 +15,9 @@ import { FacultyGraduations } from './FacultyGraduations'
 export const UniversityView = ({ faculty }) => {
   const [graduatedGroup, setGraduatedGroup] = useState(false)
   const [medianMode, setMedianMode] = useState(false)
+  const { isAdmin, roles } = useGetAuthorizedUserQuery()
+  const userHasFacultyRights = isAdmin || roles.includes('facultyStatistics') || roles.includes('katselmusViewer')
   const graduated = graduatedGroup ? 'GRADUATED_EXCLUDED' : 'GRADUATED_INCLUDED'
-  const allFaculties = useGetFacultiesQuery()
   const progressStats = useGetAllFacultiesProgressStatsQuery({
     graduated,
   })
@@ -37,14 +34,7 @@ export const UniversityView = ({ faculty }) => {
     </>
   )
 
-  if (
-    allFaculties.isLoading ||
-    allFaculties.isFetching ||
-    graduationStats.isLoading ||
-    graduationStats.isFetching ||
-    progressStats.isFetching ||
-    progressStats.isLoading
-  ) {
+  if (graduationStats.isLoading || graduationStats.isFetching || progressStats.isFetching || progressStats.isLoading) {
     return <Loader active style={{ marginTop: '10em' }} />
   }
 
@@ -54,7 +44,7 @@ export const UniversityView = ({ faculty }) => {
     graduationStats.isError ||
     !graduationStats.data
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
-
+  const allFaculties = Object.values(progressStats.data.programmeNames)
   return (
     <>
       <div style={{ padding: '30px', textAlign: 'center' }}>
@@ -75,17 +65,17 @@ export const UniversityView = ({ faculty }) => {
         </p>
       </Message>
       <div>
-        {allFaculties?.data?.length > 0 && (
+        {userHasFacultyRights && (
           <div>
             <p>
               <b>Click here to open the corresponding view for an individual faculty</b>
             </p>
             <div className="facultyLinkBox">
-              {orderBy(allFaculties.data, 'code').map(faculty => (
+              {orderBy(allFaculties, 'code').map(faculty => (
                 <span key={faculty.code}>
                   <Link style={{ marginTop: '5px' }} to={`/evaluationoverview/faculty/${faculty.code}`}>{`${
                     faculty.code
-                  } ${getTextIn(faculty.name)}`}</Link>
+                  } ${getTextIn(faculty)}`}</Link>
                 </span>
               ))}
             </div>
