@@ -7,6 +7,9 @@ import {
   useGetAllFacultiesGraduationStatsQuery,
 } from 'redux/facultyStats'
 import { facultyToolTips } from 'common/InfoToolTips'
+import { Link } from 'react-router-dom'
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
+import { orderBy } from 'lodash'
 import { FacultyProgress } from './FacultyProgress'
 import { Toggle } from '../StudyProgramme/Toggle'
 import { InfoBox } from '../Info/InfoBox'
@@ -21,9 +24,8 @@ export const UniversityView = ({ faculty }) => {
   const progressStats = useGetAllFacultiesProgressStatsQuery({
     graduated,
   })
-
+  const { getTextIn } = useLanguage()
   const graduationStats = useGetAllFacultiesGraduationStatsQuery()
-
   const getDivider = (title, toolTipText, content, cypress = undefined) => (
     <>
       <div className="divider">
@@ -35,7 +37,14 @@ export const UniversityView = ({ faculty }) => {
     </>
   )
 
-  if (allFaculties.isLoading || allFaculties.isFetching || graduationStats.isLoading || graduationStats.isFetching) {
+  if (
+    allFaculties.isLoading ||
+    allFaculties.isFetching ||
+    graduationStats.isLoading ||
+    graduationStats.isFetching ||
+    progressStats.isFetching ||
+    progressStats.isLoading
+  ) {
     return <Loader active style={{ marginTop: '10em' }} />
   }
 
@@ -65,6 +74,20 @@ export const UniversityView = ({ faculty }) => {
           a target time of 6 years, whereas the other degrees in that category have a target of 5 years.{' '}
         </p>
       </Message>
+      <div>
+        <p>
+          <b>Click here to open the corresponding view for an individual faculty</b>
+        </p>
+        <div className="facultyLinkBox">
+          {orderBy(allFaculties.data, 'code').map(faculty => (
+            <p key={faculty.code}>
+              <Link to={`/evaluationoverview/faculty/${faculty.code}`}>{`${faculty.code} ${getTextIn(
+                faculty.name
+              )}`}</Link>
+            </p>
+          ))}
+        </div>
+      </div>
       <div className="faculty-overview">
         <div className="programmes-overview">
           {getDivider(
