@@ -1,6 +1,14 @@
 const Sequelize = require('sequelize')
 const { Op } = Sequelize
 const { codes } = require('../../../config/programmeCodes')
+const { faculties } = require('../organisations')
+
+const getFacultyList = async () => {
+  const ignore = ['Y', 'H99', 'Y01', 'H92', 'H930']
+  const facultyList = (await faculties()).filter(f => !ignore.includes(f.code))
+  facultyList.sort((a, b) => (a.name.fi > b.name.fi ? 1 : -1))
+  return facultyList
+}
 
 const findRightProgramme = (studyrightElements, code) => {
   let programme = ''
@@ -140,6 +148,7 @@ const mapCodesToIds = data => {
 }
 
 module.exports = {
+  getFacultyList,
   findRightProgramme,
   facultyFormatStudyright,
   facultyFormatProgramme,

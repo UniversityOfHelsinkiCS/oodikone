@@ -35,12 +35,9 @@ export const UniversityView = ({ faculty }) => {
     </>
   )
 
-  if (allFaculties.isLoading || allFaculties.isFetching) {
+  if (allFaculties.isLoading || allFaculties.isFetching || graduationStats.isLoading || graduationStats.isFetching) {
     return <Loader active style={{ marginTop: '10em' }} />
   }
-
-  const isFetchingOrLoading =
-    progressStats.isLoading || progressStats.isFetching || graduationStats.isLoading || graduationStats.isFetching
 
   const isError =
     progressStats.isError ||
@@ -69,33 +66,26 @@ export const UniversityView = ({ faculty }) => {
         </p>
       </Message>
       <div className="faculty-overview">
-        {isFetchingOrLoading ? (
-          <Loader active style={{ marginTop: '15em' }} />
-        ) : (
-          <div className="programmes-overview">
-            {progressStats.isSuccess && progressStats.data && (
-              <>
-                {getDivider(
-                  'Progress of students of the faculty ',
-                  'BachelorStudentsOfTheFacultyByStartingYear',
-                  facultyToolTips.StudentProgress,
-                  'InfoFacultyProgress'
-                )}
-                <div className="toggle-container">
-                  <Toggle
-                    cypress="GraduatedToggle"
-                    toolTips={facultyToolTips.GraduatedToggle}
-                    firstLabel="Graduated included"
-                    secondLabel="Graduated excluded"
-                    value={graduatedGroup}
-                    setValue={setGraduatedGroup}
-                  />
-                </div>
-                <FacultyProgress faculty="ALL" progressStats={progressStats} getDivider={getDivider} />
-              </>
-            )}
+        <div className="programmes-overview">
+          {getDivider(
+            'Progress of students of the faculty ',
+            'BachelorStudentsOfTheFacultyByStartingYear',
+            facultyToolTips.StudentProgress,
+            'InfoFacultyProgress'
+          )}
+          <div className="toggle-container">
+            <Toggle
+              cypress="GraduatedToggle"
+              toolTips={facultyToolTips.GraduatedToggle}
+              firstLabel="Graduated included"
+              secondLabel="Graduated excluded"
+              value={graduatedGroup}
+              setValue={setGraduatedGroup}
+            />
           </div>
-        )}
+          <FacultyProgress faculty="ALL" progressStats={progressStats} getDivider={getDivider} />
+        </div>
+
         {getDivider('Average graduation times', 'AverageGraduationTimes', facultyToolTips.AverageGraduationTimes)}
         <div className="toggle-container">
           <Toggle
