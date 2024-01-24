@@ -37,7 +37,7 @@ const programmeCreditsDiff = async fileName => {
 }
 
 // Change weird rapo programmecodes to oodikone format, example: 300-M003 => MH30_003
-const transformProgrammeCode = oldCode => `H${oldCode.slice(1, 3)}_${oldCode.slice(5, 8)}`
+const transformProgrammeCode = oldCode => `${oldCode[4]}H${oldCode.slice(0, 2)}_${oldCode.slice(5, 8)}`
 
 const formatData = data =>
   data.reduce((obj, cur) => {
