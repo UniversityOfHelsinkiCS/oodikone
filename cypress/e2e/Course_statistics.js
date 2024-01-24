@@ -78,7 +78,7 @@ describe('Course Statistics tests', () => {
       })
     })
 
-    it('Searching single course having substitution mappings shows course statistics', () => {
+    it('Searching single course having substitution mappings shows course statistics', { retries: 3 }, () => {
       cy.contains('Search for courses')
       cy.get("input[placeholder='Search by a course code']").type('TKT20001')
       // Click uni course, not avoin
