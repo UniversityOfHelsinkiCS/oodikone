@@ -8,7 +8,10 @@ const { combine, timestamp, printf, splat } = winston.format
 
 let transports = []
 
-const formatDate = timestamp => new Date(timestamp).toLocaleTimeString('fi-FI').replace(' klo', '')
+const formatDate = timestamp => {
+  if (!isProduction) return new Date(timestamp).toLocaleTimeString('fi-FI').replace(' klo', '')
+  return new Date(timestamp).toLocaleString('fi-FI').replace(' klo', '')
+}
 
 const consoleFormat = printf(
   ({ level, message, timestamp }) => `${formatDate(timestamp).split(' ')} ${level}: ${message}`
