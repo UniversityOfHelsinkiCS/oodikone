@@ -9,9 +9,8 @@ export const HelpButton = ({ tab, viewMode }) => {
 
   if (viewMode) {
     content = content[viewMode]
+    content = content.replace(/\n +/g, '\n')
   }
-
-  content = content.replace(/\n +/g, '\n')
 
   return (
     <Popup

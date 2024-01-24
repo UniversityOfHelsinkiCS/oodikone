@@ -89,10 +89,11 @@ describe('Course Statistics tests', () => {
       cy.contains('TKT20001')
       cy.contains('58131') // old mapped code
 
-      cy.contains('.tabular.menu a', 'Table').click()
+      cy.contains('.tabular.menu a', 'Students').click()
       cy.contains('All')
-      cy.cs('viewMode-Attempts').click()
-      cy.cs('viewMode-Students').click()
+
+      cy.contains('.tabular.menu a', 'Attempts').click()
+      cy.contains('All')
 
       cy.contains('.tabular.menu a', 'Pass rate chart').click()
       cy.contains('svg', 'Pass rate chart')
@@ -186,7 +187,7 @@ describe('Course Statistics tests', () => {
     })
 
     // Skipped for now, due to limit being removed. Subject to change after testing in production
-    it.skip('"Fetch statistics" button is disabled if over 40 courses are selected', () => {
+    it('"Fetch statistics" button is disabled if over 40 courses are selected', () => {
       cy.contains('Search for courses')
       cy.get("input[placeholder='Search by a course code']").type('TKT')
       cy.get('[data-cy="select-multiple-courses-toggle"]').should('not.have.class', 'checked').click()
@@ -310,7 +311,6 @@ describe('Course Statistics tests', () => {
         cy.get("div[role='option']").should('have.length', 11)
       })
 
-      cy.contains('#CourseStatPanes a.item', 'Table').click()
       cy.contains('#CourseStatPanes a.item', 'Attempts').click()
       cy.get('#CourseStatPanes table>tbody').within(() => {
         attemptsTableContents.forEach((values, trIndex) => {
@@ -358,16 +358,6 @@ describe('Course Statistics tests', () => {
         ['Total', null, 511, 486, 25],
       ]
 
-      const attemptsTableContentsOpen = [
-        // [time, total, passed, failed]
-        ['Total', null, 199, 188, 11],
-      ]
-
-      const attemptsTableContentsRegular = [
-        // [time, total, passed, failed]
-        ['Total', null, 312, 298, 14],
-      ]
-
       const gradesTableContents = [
         // [time, attempts, 0, 1, 2, 3, 4, 5, other passed]
         ['Total', null, 511, 25, 11, 17, 21, 59, 365, 13],
@@ -395,7 +385,6 @@ describe('Course Statistics tests', () => {
         })
         cy.contains('Show population').should('not.be.enabled')
 
-        cy.contains('#CourseStatPanes a.item', 'Table').click()
         cy.contains('#CourseStatPanes a.item', 'Attempts').click()
         cy.get('#CourseStatPanes table>tbody').within(() => {
           attemptsTableContents.forEach((values, trIndex) => {
@@ -424,44 +413,6 @@ describe('Course Statistics tests', () => {
           })
           cy.get('tr').should('have.length', 17)
         })
-      })
-
-      it('Toggling course provider changes stats correctly', () => {
-        cy.get('[data-cy=unify_radio_regular]').click()
-        cy.get("div[name='toYear']").within(() => {
-          cy.get("div[role='option']").first().should('have.text', '2020-2021')
-          cy.contains("div[role='option']", yearRange.to).should('have.class', 'selected')
-          cy.get("div[role='option']").last().should('have.text', yearRange.from)
-          cy.get("div[role='option']").should('have.length', 21)
-        })
-        cy.contains('#CourseStatPanes a.item', 'Table').click()
-        cy.contains('#CourseStatPanes a.item', 'Attempts').click()
-        cy.get('#CourseStatPanes table>tbody').within(() => {
-          attemptsTableContentsRegular.forEach((values, trIndex) => {
-            cy.get('tr')
-              .eq(trIndex)
-              .within(() => {
-                values.forEach((value, tdIndex) => {
-                  if (value === null) return
-                  cy.get('td').eq(tdIndex).contains(value)
-                })
-              })
-          })
-        })
-        cy.get('[data-cy=unify_radio_open]').click()
-        cy.get('#CourseStatPanes table>tbody').within(() => {
-          attemptsTableContentsOpen.forEach((values, trIndex) => {
-            cy.get('tr')
-              .eq(trIndex)
-              .within(() => {
-                values.forEach((value, tdIndex) => {
-                  if (value === null) return
-                  cy.get('td').eq(tdIndex).contains(value)
-                })
-              })
-          })
-        })
-        cy.get('[data-cy=unify_radio_unify]').click()
       })
 
       it('After changing time range shows same stats', () => {
