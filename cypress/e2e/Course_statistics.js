@@ -187,7 +187,7 @@ describe('Course Statistics tests', () => {
     })
 
     // Skipped for now, due to limit being removed. Subject to change after testing in production
-    it('"Fetch statistics" button is disabled if over 40 courses are selected', () => {
+    it.skip('"Fetch statistics" button is disabled if over 40 courses are selected', () => {
       cy.contains('Search for courses')
       cy.get("input[placeholder='Search by a course code']").type('TKT')
       cy.get('[data-cy="select-multiple-courses-toggle"]').should('not.have.class', 'checked').click()
@@ -470,8 +470,7 @@ describe('Course Statistics tests', () => {
     cy.contains('Filter statistics by study programmes').should('not.exist')
     cy.contains('Faculty statistics').should('not.exist')
     cy.contains('Show population').should('not.exist')
-
-    cy.cs('viewMode-Attempts').click()
+    cy.contains('.tabular.menu a', 'Attempts').click()
 
     const attemptsTableContents = [
       // [time, passed, failed, passrate, total enrollments, enrolled, rejected, aborted]
