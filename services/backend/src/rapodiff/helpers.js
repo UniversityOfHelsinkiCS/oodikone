@@ -3,19 +3,18 @@ const Papa = require('papaparse')
 const fs = require('fs/promises')
 
 const parseCsv = async (fileName, fun) => {
-  const data = await fs.readFile(`${__dirname}/${fileName}`, 'utf8')
+  const file = await fs.readFile(`${__dirname}/${fileName}`, 'utf8')
 
-  await Papa.parse(data, {
-    complete: async data => {
-      if (!data?.data) {
-        console.log('Parsing file failed')
-        console.log(data.errors)
-        return
-      }
-      await fun(data?.data)
-    },
-    encoding: 'utf8',
-  })
+  Papa.parsePromise = file => {
+    return new Promise((complete, error) => {
+      Papa.parse(file, { complete, error })
+    })
+  }
+
+  const data = await Papa.parsePromise(file)
+  console.log(data)
+  console.log('papa parse')
+  await fun(data?.data)
 }
 
 module.exports = { parseCsv }
