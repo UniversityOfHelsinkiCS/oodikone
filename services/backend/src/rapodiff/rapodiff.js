@@ -3,7 +3,7 @@
 
 const { bscProgrammesOfFaculties } = require('./conf')
 const { facultyDiff } = require('./studyrightDiff')
-const { parseCsv, programmeCreditsDiff } = require('./creditsDiff')
+const { programmeCreditsDiff } = require('./creditsDiff')
 
 const runFacultyStudyrightDiffs = async () => {
   console.log('Running faculty diffs.')
