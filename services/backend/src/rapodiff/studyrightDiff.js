@@ -6,7 +6,7 @@ const _ = require('lodash')
 
 const { optimizedStatisticsOf } = require('../services/populations')
 const { Student, Transfer, StudyrightElement, Studyright } = require('../models')
-const { rapoToken, tokenImporterApi, importerDbApiUrl, nodeproxyUrl } = require('./rapodiff.js')
+const { rapoToken, tokenImporterApi, importerDbApiUrl, nodeproxyUrl } = require('./conf.js')
 
 const getFromRapo = async (urlStart, urlEnd) => {
   console.log({ urlStart, urlEnd })

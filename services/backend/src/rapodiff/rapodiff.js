@@ -3,6 +3,7 @@
 
 const { bscProgrammesOfFaculties } = require('./conf')
 const { facultyDiff } = require('./studyrightDiff')
+const { parseCsv, programmeCreditsDiff } = require('./creditsDiff')
 
 const runFacultyStudyrightDiffs = async () => {
   console.log('Running faculty diffs.')
@@ -19,18 +20,17 @@ const runCreditDiffs = async () => {
 }
 
 // ** To add new mode, just type key and function here **
-const modes = {} // { studyrights: runFacultyStudyrightDiffs, credits: runCreditDiffs }
+const modes = { credits: () => programmeCreditsDiff('data.csv') } // { studyrights: runFacultyStudyrightDiffs, credits: runCreditDiffs }
 
 const main = async () => {
   console.log('**RAPODIFF**\n')
   const mode = process.argv[2]
   const modeFunction = modes[mode]
   if (!modeFunction) {
-    /*console.log(
+    console.log(
       'Unknown or missing mode. Supply the mode as an argument. Supported modes:\n',
       Object.keys(modes).join('\n ')
-    ) */
-    console.log('Rapodiff disabled: an importer route in api-gateway must be first opened & possibly other fixes.')
+    )
     return
   }
   await modeFunction()
