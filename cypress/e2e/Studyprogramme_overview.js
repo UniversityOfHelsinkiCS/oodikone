@@ -401,7 +401,7 @@ describe('Studyprogramme overview', () => {
       cy.get('textarea').type('010113437')
       cy.get('.positive').click()
 
-      cy.contains('Student statistics').click()
+      cy.contains('Students').click()
       cy.get('.prompt').type(student)
       cy.contains('a', student).click()
       cy.contains(name)
@@ -410,7 +410,7 @@ describe('Studyprogramme overview', () => {
       cy.go('back')
       deleteTag(name)
 
-      cy.contains('Student statistics').click()
+      cy.contains('Students').click()
       cy.get('.prompt').type(student)
       cy.contains('a', student).click()
       cy.contains(name).should('not.exist')
