@@ -6,10 +6,10 @@ const usersApi = RTKApi.injectEndpoints({
       query: () => '/users/email/preview',
     }),
     sendUserAccessEmail: builder.mutation({
-      query: ({ recipientAddress }) => ({
+      query: recipientAddress => ({
         url: '/users/email',
         method: 'POST',
-        body: { recipientAddress },
+        body: { email: recipientAddress },
       }),
     }),
   }),
