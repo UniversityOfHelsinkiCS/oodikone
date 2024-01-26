@@ -18,8 +18,8 @@ const allNavigationItems = {
       { path: '/study-programme', key: 'overview', label: 'Overview' },
     ],
   },
-  courseStatistics: { path: '/coursestatistics', key: 'courseStatistics', label: 'Course statistics' },
-  students: { path: '/students', key: 'students', label: 'Student statistics' },
+  courseStatistics: { path: '/coursestatistics', key: 'courseStatistics', label: 'Courses' },
+  students: { path: '/students', key: 'students', label: 'Students' },
   teachers: { path: '/teachers', key: 'teachers', label: 'Teachers', reqRights: ['teachers'] },
   users: { path: '/users', key: 'users', label: 'Users', reqRights: ['admin'] },
   studyGuidanceGroups: {
