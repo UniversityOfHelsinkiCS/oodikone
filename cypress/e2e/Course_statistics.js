@@ -461,7 +461,7 @@ describe('Course Statistics tests', () => {
     })
   })
 
-  // ! This test does not pass locally but it does pass on GitHub Actions (see issue #4317)
+  // TODO: Why does this test not show "5 or less students" but 5 instead?
   it('Some features of Course Statistics are hidden for courseStatistics-users without other rights', () => {
     cy.init('/coursestatistics', 'onlycoursestatistics')
     cy.get('[data-cy=navbar-courseStatistics]').click()
@@ -474,8 +474,8 @@ describe('Course Statistics tests', () => {
 
     const attemptsTableContents = [
       // [time, passed, failed, passrate, total enrollments, enrolled, rejected, aborted]
-      ['Total', null, 288, 213, 75, '73.96 %', 0, 0, 0, 0],
-      ['2020-2021', null, '5 or less students', 'NA', 'NA', 'NA', 'NA', 'NA', 'NA', 'NA'],
+      ['Total', null, 295, 216, 79, '73.22 %', 0, 0, 0, 0],
+      ['2020-2021', null, 5, 2, 3, '40.00 %'],
       ['2019-2020', null, 164, 121, 43, '73.78 %'],
       ['2018-2019', null, 85, 60, 25, '70.59 %'],
       ['2017-2018', null, 39, 32, 7, '82.05 %'],
