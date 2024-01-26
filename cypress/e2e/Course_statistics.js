@@ -138,7 +138,7 @@ describe('Course Statistics tests', () => {
       cy.contains('Show population')
       cy.contains('TKT20003')
 
-      cy.contains('Course statistics').click()
+      cy.contains('Courses').click()
       cy.contains('Search for courses')
       cy.get("input[placeholder='Search by a course code']").type('TKT20001')
       cy.contains('td', 'TKT20001').click()
