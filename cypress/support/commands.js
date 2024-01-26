@@ -53,6 +53,16 @@ const onlyIamRightsUserHeaders = {
   hypersonsisuid: 'hy-hlo-1111111',
 }
 
+// Also has element detail of "KH50_005" for the study guidance groups to work
+const onlyStudyGuidanceGroupsUser = {
+  uid: 'onlystudyguidancegroups',
+  displayname: 'Study Guidance Groups User',
+  'shib-session-id': 'mock-cypress-session',
+  hygroupcn: 'grp-oodikone-users',
+  mail: 'grp-toska+mockonlystudyguidancegroupsuser@helsinki.fi',
+  hypersonsisuid: 'hy-hlo-2222222',
+}
+
 // TODO add user into anon-DB (check the need for changing hypersonid)
 // REMEMBER TO ADD ROLE openUniSearch
 // const openUniUser = {
@@ -71,6 +81,7 @@ const userHeaders = [
   onlycoursestatisticsUserHeaders,
   norightsUserHeaders,
   onlyIamRightsUserHeaders,
+  onlyStudyGuidanceGroupsUser,
 ]
 
 /**
