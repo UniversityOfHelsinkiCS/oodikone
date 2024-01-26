@@ -8,8 +8,8 @@ describe('Users tests', () => {
       cy.get('[data-cy="navBar"]').contains('Give feedback').should('exist')
 
       cy.get('[data-cy="navBar"]').contains('Study programme').should('not.exist')
-      cy.get('[data-cy="navBar"]').contains('Student statistics').should('not.exist')
-      cy.get('[data-cy="navBar"]').contains('Course statistics').should('not.exist')
+      cy.get('[data-cy="navBar"]').contains('Students').should('not.exist')
+      cy.get('[data-cy="navBar"]').contains('Courses').should('not.exist')
       cy.get('[data-cy="navBar"]').contains('Teachers').should('not.exist')
       cy.get('[data-cy="navBar"]').contains('Users').should('not.exist')
       cy.get('[data-cy="navBar"]').contains('Faculty').should('not.exist')
@@ -30,8 +30,8 @@ describe('Users tests', () => {
 
     it('should see more stuff than others', () => {
       cy.get('[data-cy="navBar"]').contains('Study programme').should('exist')
-      cy.get('[data-cy="navBar"]').contains('Student statistics').should('exist')
-      cy.get('[data-cy="navBar"]').contains('Course statistics').should('exist')
+      cy.get('[data-cy="navBar"]').contains('Students').should('exist')
+      cy.get('[data-cy="navBar"]').contains('Courses').should('exist')
       // TODO: admin should probably see this as well, since can access this page: cy.get('[data-cy="navBar"]').contains('Teachers').should('exist')
       cy.get('[data-cy="navBar"]').contains('Users').should('exist')
       cy.get('[data-cy="navBar"]').contains('Trends').should('exist')
