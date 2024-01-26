@@ -22,7 +22,7 @@ describe('Study guidance group tests', () => {
 
     describe('with study guidance groups', () => {
       beforeEach(() => {
-        cy.visit('/studyguidancegroups')
+        cy.init('/studyguidancegroups', 'onlystudyguidancegroups')
         cy.intercept('/api/studyguidancegroups', { fixture: 'studyGuidanceGroups.json' })
       })
 
@@ -50,7 +50,7 @@ describe('Study guidance group tests', () => {
     })
 
     it('has a working back button', () => {
-      cy.visit('/studyguidancegroups/sgg-cypress-1')
+      cy.init('/studyguidancegroups/sgg-cypress-1', 'onlystudyguidancegroups')
 
       cy.get('button.ui.button').contains('Back').click()
       cy.url().should('eq', `${Cypress.config().baseUrl}/studyguidancegroups`)
@@ -58,7 +58,7 @@ describe('Study guidance group tests', () => {
 
     describe('without associated study programme and year', () => {
       beforeEach(() => {
-        cy.visit('/studyguidancegroups/sgg-cypress-2')
+        cy.init('/studyguidancegroups/sgg-cypress-2', 'onlystudyguidancegroups')
       })
 
       it('shows the correct panes', () => {
@@ -101,7 +101,7 @@ describe('Study guidance group tests', () => {
 
     describe('with associated study programme and year', () => {
       beforeEach(() => {
-        cy.visit('/studyguidancegroups/sgg-cypress-1')
+        cy.init('/studyguidancegroups/sgg-cypress-1', 'onlystudyguidancegroups')
       })
 
       it('shows the correct labels', () => {
