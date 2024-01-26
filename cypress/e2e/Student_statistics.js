@@ -1,9 +1,9 @@
 /// <reference types="Cypress" />
 
-describe('Student Statistics tests', () => {
+describe('Students tests', () => {
   beforeEach(() => {
     cy.init()
-    cy.contains('Student statistics').click()
+    cy.contains('Students').click()
     cy.contains('Show student names')
   })
 
@@ -14,7 +14,7 @@ describe('Student Statistics tests', () => {
     sis_person_id: 'hy-hlo-84830887',
   }
 
-  it('Student statistics search form is usable', () => {
+  it('Students search form is usable', () => {
     cy.contains('Show student names')
     cy.url().should('include', '/students')
     cy.get('.prompt').type(student.lastname)
