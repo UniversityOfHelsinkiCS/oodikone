@@ -7,101 +7,103 @@ export const DISPLAY_DATE_FORMAT = 'DD.MM.YYYY'
 export const DISPLAY_DATE_FORMAT_DEV = 'DD.MM.YYYY HH:mm:ss'
 export const API_DATE_FORMAT = 'YYYY.MM.DD'
 
-export const passRateAttemptGraphOptions = (categories, max, title, skipFirstColor) => ({
+export const passRateAttemptGraphOptions = (isRelative, categories, max, title, skipFirstColor) => ({
   chart: {
     type: 'column',
   },
   colors: skipFirstColor ? [green, red] : [chartblue, green, red],
-
   title: {
     text: title,
   },
-
   xAxis: {
     categories,
   },
-
   yAxis: {
     allowDecimals: false,
     title: {
-      text: 'Number of Students',
+      text: isRelative ? 'Share of Students' : 'Number of Students',
     },
     max,
     floor: -max,
   },
-
   plotOptions: {
     column: {
       stacking: 'normal',
       borderRadius: 3,
     },
+    series: {
+      tooltip: {
+        valueSuffix: isRelative ? '%' : '',
+      },
+    },
   },
 })
 
-export const passRateStudGraphOptions = (categories, max, title, skipFirstColor) => ({
+export const passRateStudGraphOptions = (isRelative, categories, max, title, skipFirstColor) => ({
   chart: {
     type: 'column',
   },
   colors: skipFirstColor
     ? [chartlgreen, chartdarkg, chartlred, chartdarkred]
     : [chartblue, chartlgreen, chartdarkg, chartlred, chartdarkred],
-
   title: {
     text: title,
   },
-
   xAxis: {
     categories,
   },
-
   yAxis: {
     allowDecimals: false,
     title: {
-      text: 'Number of Students',
+      text: isRelative ? 'Share of Students' : 'Number of Students',
     },
     max,
     floor: -max,
   },
-
   plotOptions: {
     column: {
       stacking: 'normal',
       borderRadius: 1,
     },
+    series: {
+      tooltip: {
+        valueSuffix: isRelative ? '%' : '',
+      },
+    },
   },
 })
 
-export const gradeGraphOptions = (categories, max, title) => ({
+export const gradeGraphOptions = (isRelative, categories, max, title) => ({
   chart: {
     type: 'column',
   },
   colors: [red, chartblue, chartblue, chartblue, chartblue, chartblue, green, green],
-
   title: {
     text: title,
   },
-
   legend: {
     enabled: false,
   },
-
   xAxis: {
     categories,
   },
-
   yAxis: {
     allowDecimals: false,
     title: {
-      text: 'Number of Students',
+      text: isRelative ? 'Share of Students' : 'Number of Students',
     },
     max,
     floor: -max,
   },
-
   plotOptions: {
     column: {
       stacking: 'normal',
       borderRadius: 2,
+    },
+    series: {
+      tooltip: {
+        valueSuffix: isRelative ? '%' : '',
+      },
     },
   },
 })
