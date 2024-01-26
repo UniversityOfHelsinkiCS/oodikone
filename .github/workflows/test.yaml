@@ -171,8 +171,8 @@ jobs:
             spec: cypress/e2e/Population_statistics.js
           - name: 'Test filters'
             spec: cypress/e2e/Filters.js
-          - name: 'Test student statistics'
-            spec: cypress/e2e/Student_statistics.js
+          - name: 'Test students'
+            spec: cypress/e2e/Students.js
           - name: 'Test completed courses'
             spec: cypress/e2e/Completed_courses.js
           - name: 'Test studyprogramme overview'
