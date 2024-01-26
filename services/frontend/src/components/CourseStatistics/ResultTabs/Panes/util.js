@@ -1,4 +1,5 @@
 import { flatten } from 'lodash'
+import { calculatePercentage } from 'common'
 
 const gradesMap = {
   0: 0,
@@ -39,7 +40,7 @@ export const isThesisGrades = grades => Object.keys(grades).some(k => THESIS_GRA
 
 export const isThesisSeries = series => series && series.some(s => isThesisGrades(s))
 
-export const absoluteToRelative = all => (p, i) => p / all[i] || 0
+export const absoluteToRelative = all => (p, i) => parseFloat(calculatePercentage(p, all[i]).slice(0, -1))
 
 export const resolveGrades = stats => {
   const failedGrades = ['eisa', 'hyl.', 'hyl', '0', 'luop']

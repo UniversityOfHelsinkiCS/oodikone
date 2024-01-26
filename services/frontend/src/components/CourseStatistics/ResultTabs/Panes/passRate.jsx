@@ -99,15 +99,13 @@ export const PassRate = ({ data, settings: { viewMode, isRelative }, userHasAcce
 
   const stats = data.stats.filter(stat => stat.name !== 'Total')
   const statYears = stats.map(year => year.name)
-  // const comparisonStats = comparison ? comparison.stats : []
   const passGraphSerieFn = isAttemptsMode ? getPassRateAttemptSeriesFromStats : getPassRateStudSeriesFromStats
 
   const passGraphSerie = passGraphSerieFn(stats)
-  // const comparisonGraphSerie = passGraphSerieFn(comparisonStats)
 
-  const maxPassRateVal = isRelative ? 1 : getMaxValueOfSeries(passGraphSerie.absolute)
+  const maxPassRateVal = isRelative ? 100 : getMaxValueOfSeries(passGraphSerie.absolute)
   const graphOptionsFn = isAttemptsMode ? passRateAttemptGraphOptions : passRateStudGraphOptions
-  const primaryGraphOptions = graphOptionsFn(statYears, maxPassRateVal, 'Pass rate chart', isRelative)
+  const primaryGraphOptions = graphOptionsFn(isRelative, statYears, maxPassRateVal, 'Pass rate chart', isRelative)
 
   return (
     <div>

@@ -1,16 +1,15 @@
 import React from 'react'
-import { Menu, Radio } from 'semantic-ui-react'
 import ReactHighcharts from 'react-highcharts'
-
-import { HelpButton } from '../HelpButton'
+import { Menu, Radio } from 'semantic-ui-react'
 import { gradeGraphOptions } from '../../../../constants'
+import { HelpButton } from '../HelpButton'
 import {
+  absoluteToRelative,
   getDataObject,
-  getMaxValueOfSeries,
   getGradeSpread,
+  getMaxValueOfSeries,
   getThesisGradeSpread,
   isThesisSeries,
-  absoluteToRelative,
 } from './util'
 
 const getGradeSeries = series => {
@@ -98,9 +97,9 @@ export const Distribution = ({ data, settings: { isRelative }, userHasAccessToAl
 
   const gradeGraphSeries = getGradeSeries(grades)
 
-  const maxGradeValue = isRelative ? 1 : getMaxValueOfSeries(gradeGraphSeries.absolute)
+  const maxGradeValue = isRelative ? 100 : getMaxValueOfSeries(gradeGraphSeries.absolute)
 
-  const primaryDistributionOptions = gradeGraphOptions(statYears, maxGradeValue, 'Grades')
+  const primaryDistributionOptions = gradeGraphOptions(isRelative, statYears, maxGradeValue, 'Grades')
 
   return (
     <div>
