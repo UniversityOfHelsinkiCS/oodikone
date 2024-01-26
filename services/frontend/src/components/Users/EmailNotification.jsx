@@ -11,11 +11,23 @@ const DisabledEmailButton = props => (
 )
 
 const SendFailBanner = ({ userEmail }) => <Message error header={`Email could not be sent to ${userEmail}`} />
+const SendSuccessBanner = ({ userEmail }) => <Message success header={`Email sent to ${userEmail}`} />
 
 export const EmailNotification = ({ userEmail }) => {
   const [confirmOpen, setConfirmOpen] = useState(false)
-  const [sendEmail, { isLoading: sendIsLoading, isError: sendIsError }] = useSendUserAccessEmailMutation()
+  const [sendEmail, { isLoading: sendIsLoading, isError: sendIsError, isSuccess: sendIsSuccess }] =
+    useSendUserAccessEmailMutation()
   const { data: email, isLoading: previewIsLoading, isError: previewIsError } = useGetUserAccessEmailPreviewQuery()
+
+  const getNotification = () => {
+    if (sendIsSuccess) {
+      return <SendSuccessBanner userEmail={userEmail} />
+    }
+    if (sendIsError) {
+      return <SendFailBanner userEmail={userEmail} />
+    }
+    return null
+  }
 
   return userEmail ? (
     <>
@@ -24,7 +36,7 @@ export const EmailNotification = ({ userEmail }) => {
         <Modal.Header>Send email about receiving access to Oodikone</Modal.Header>
         <Modal.Content scrolling>
           <Modal.Description>
-            {sendIsError && <SendFailBanner userEmail={userEmail} />}
+            {getNotification()}
             <EmailPreview
               userEmailAddress={userEmail}
               email={email}
@@ -41,8 +53,10 @@ export const EmailNotification = ({ userEmail }) => {
           />
           <Button
             primary
-            onClick={() => sendEmail(userEmail)}
-            disabled={previewIsLoading || previewIsError || sendIsLoading}
+            onClick={() => {
+              sendEmail(userEmail)
+            }}
+            disabled={previewIsLoading || previewIsError || sendIsLoading || sendIsSuccess}
             loading={sendIsLoading}
             icon="send"
             content="Send"
