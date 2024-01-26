@@ -1,13 +1,8 @@
 import React, { useMemo } from 'react'
 import { Link, useHistory } from 'react-router-dom'
 import { Segment, Icon, Item } from 'semantic-ui-react'
-
+import { calculatePercentage } from 'common'
 import { SortableTable } from 'components/SortableTable'
-
-const calculatePassrate = (pass, fail) =>
-  new Intl.NumberFormat(undefined, { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
-    pass / (pass + fail)
-  )
 
 const createColumnWithTitle = title => ({
   key: title,
@@ -95,7 +90,7 @@ export const TeacherStatisticsTable = ({ statistics, variant }) => {
     () =>
       statistics.map(stat => ({
         ...stat,
-        passrate: calculatePassrate(stat.passed, stat.failed),
+        passrate: calculatePercentage(stat.passed, stat.passed + stat.failed),
       })),
     [statistics]
   )

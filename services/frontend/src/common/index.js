@@ -281,6 +281,11 @@ export const isMastersProgramme = programmeCode => programmeCode.startsWith('MH'
 
 export const getMonthsForDegree = code => getTargetCreditsForProgramme(code) / (60 / 12)
 
+export const calculatePercentage = (numerator, denominator) =>
+  new Intl.NumberFormat(undefined, { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
+    numerator / denominator
+  )
+
 /**
  * Get start and end dates for study right element. For bachelor a 3 year target is used
  * and for masters a 2 year target. Any absences within the study right element extends the end date.
