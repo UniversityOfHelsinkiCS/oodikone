@@ -218,7 +218,7 @@ const findAll = async () => {
     allUsers.map(async user => {
       const { iamGroups, specialGroup } = userAccess.find(({ id }) => id === user.sisu_person_id) || {}
 
-      const { accessGroups } = await updateAccessGroups(user.username, iamGroups, specialGroup)
+      const { accessGroups } = await updateAccessGroups(user.username, iamGroups, specialGroup, user.sisu_person_id)
 
       return {
         ...user.get(),
