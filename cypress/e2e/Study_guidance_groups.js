@@ -86,7 +86,6 @@ describe('Study guidance group tests', () => {
           'Start year at uni',
           'Study programmes',
           'Tags',
-          'Last Updated At',
         ]
         const secondRowHeadings = ['All', 'Since 1.1.1970']
         cy.cs('Students (2)').click()
@@ -149,7 +148,6 @@ describe('Study guidance group tests', () => {
           'Other programmes',
           'Semesters present amount',
           'Tags',
-          'Last Updated At',
         ]
         const secondRowHeadings = ['All', 'HOPS', 'Since 1.8.2018']
         cy.cs('Students (3)').click()
