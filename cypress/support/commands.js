@@ -1,14 +1,13 @@
 /// <reference types="Cypress" />
 //
-// Note: here we need to set keys to be all lowercase, since
-// we're replacing headers after they've left browser / frontend.
+// ! IMPORTANT: here we need to set keys to be all lowercase, since
+// ! we're replacing headers after they've left browser / frontend.
 // All of these users are available in anon user-db
 const adminUserHeaders = {
   uid: 'admin',
   displayname: 'Admin User',
   'shib-session-id': 'mock-cypress-session',
   hygroupcn: 'grp-oodikone-users;grp-oodikone-basic-users;grp-toska',
-  edupersonaffiliation: 'member;employee;faculty',
   mail: 'grp-toska+mockadminuser@helsinki.fi',
   hypersonsisuid: 'hy-hlo-6666666',
 }
@@ -18,17 +17,15 @@ const basicUserHeaders = {
   displayname: 'Basic User',
   'shib-session-id': 'mock-cypress-session',
   hygroupcn: 'grp-oodikone-users;grp-oodikone-basic-users',
-  edupersonaffiliation: 'member',
   mail: 'grp-toska+mockbasicuser@helsinki.fi',
   hypersonsisuid: 'hy-hlo-1234567',
 }
 
 const onlycoursestatisticsUserHeaders = {
   uid: 'onlycoursestatistics',
-  displayName: 'Onlycoursestatistics User',
-  'shib-session-id': 'mock-session',
-  hyGroupCn: 'grp-oodikone-basic-users',
-  eduPersonAffiliation: 'member',
+  displayname: 'Onlycoursestatistics User',
+  'shib-session-id': 'mock-cypress-session',
+  hygroupcn: 'grp-oodikone-basic-users',
   mail: 'grp-toska+mockonlycoursestatisticsuser@helsinki.fi',
   hypersonsisuid: 'hy-hlo-7654321',
 }
@@ -38,7 +35,6 @@ const norightsUserHeaders = {
   displayname: 'Norights User',
   'shib-session-id': 'mock-cypress-session',
   hygroupcn: 'grp-oodikone-users',
-  edupersonaffiliation: 'member',
   mail: 'grp-toska+mocknorightuser@helsinki.fi',
   hypersonsisuid: 'hy-hlo-0000000',
 }
@@ -48,7 +44,6 @@ const onlyIamRightsUserHeaders = {
   displayname: 'Only IAM rights user',
   'shib-session-id': 'mock-cypress-session',
   hygroupcn: 'hy-employees;hy-mltdk-tkt-jory',
-  edupersonaffiliation: 'member',
   mail: 'grp-toska+mockonlyiamrightsuser@helsinki.fi',
   hypersonsisuid: 'hy-hlo-1111111',
 }
@@ -70,7 +65,6 @@ const onlyStudyGuidanceGroupsUser = {
 //   displayname: 'Open Uni User',
 //   'shib-session-id': 'mock-cypress-session',
 //   hygroupcn: 'grp-oodikone-basics-users;hy-ypa-opa-dojo',
-//   edupersonaffiliation: 'member',
 //   mail: 'grp-toska+mockopenuniuser@helsinki.fi',
 //   hypersonsisuid: 'hy-hlo-9999999',
 // }
