@@ -88,7 +88,7 @@ export const PassRateSettings = ({ value, onChange }) => {
         />
       </Menu.Item>
       <Menu.Item>
-        <HelpButton tab="PassRate" viewMode={viewMode} />
+        <HelpButton tab="PassRate" viewMode={viewMode || 'STUDENTS'} />
       </Menu.Item>
     </Menu>
   )
