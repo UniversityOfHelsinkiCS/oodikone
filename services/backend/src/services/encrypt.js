@@ -1,11 +1,12 @@
-const { randomBytes, createCipheriv, createDecipheriv } = require('crypto')
+const { createCipheriv, createDecipheriv, randomBytes } = require('crypto')
+const { CRYPT_KEY } = require('../conf-backend')
 
 const algorithm = 'aes-256-cbc'
-const key = randomBytes(32)
-const iv = randomBytes(16)
 
 const encrypt = text => {
-  const cipher = createCipheriv(algorithm, Buffer.from(key), iv)
+  if (!CRYPT_KEY) throw Error('Define crypt key in environment variables')
+  const iv = randomBytes(16)
+  const cipher = createCipheriv(algorithm, Buffer.from(CRYPT_KEY), iv)
   let encrypted = cipher.update(text)
   encrypted = Buffer.concat([encrypted, cipher.final()])
 
@@ -16,9 +17,10 @@ const encrypt = text => {
 }
 
 const decrypt = text => {
+  if (!CRYPT_KEY) throw Error('Define crypt key in environment variables')
   const iv = Buffer.from(text.iv, 'hex')
   const encryptedText = Buffer.from(text.encryptedData, 'hex')
-  const decipher = createDecipheriv(algorithm, Buffer.from(key), iv)
+  const decipher = createDecipheriv(algorithm, Buffer.from(CRYPT_KEY), iv)
   let decrypted = decipher.update(encryptedText)
   decrypted = Buffer.concat([decrypted, decipher.final()])
 

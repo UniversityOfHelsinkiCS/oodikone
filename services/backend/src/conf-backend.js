@@ -50,8 +50,11 @@ const KONE_PASSWORD = process.env.KONE_PASSWORD || 'postgres'
 const USER_PASSWORD = process.env.USER_PASSWORD || 'postgres'
 const SIS_PASSWORD = process.env.SIS_PASSWORD || 'postgres'
 
+const CRYPT_KEY = process.env.CRYPT_KEY
+
 module.exports = {
   DB_URL_USER,
+  CRYPT_KEY,
   DB_URL_KONE,
   DB_MAX_CONNECTIONS,
   DB_MAX_CRON_CONNECTIONS,
