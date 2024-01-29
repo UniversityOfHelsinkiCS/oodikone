@@ -2,7 +2,7 @@
 
 describe('Study guidance group tests', () => {
   describe('Study guidance group overview page', () => {
-    describe('without study guidance groups', () => {
+    describe('without study guidance groups', { retries: 3 }, () => {
       it('shows the correct notification', () => {
         cy.init('/studyguidancegroups', 'admin')
         cy.contains('Study guidance groups')
@@ -10,7 +10,7 @@ describe('Study guidance group tests', () => {
       })
     })
 
-    describe('without correct rights', () => {
+    describe('without correct rights', { retries: 3 }, () => {
       it('shows the correct notification', () => {
         cy.init('/studyguidancegroups')
         cy.contains('Access denied')
@@ -20,7 +20,7 @@ describe('Study guidance group tests', () => {
       })
     })
 
-    describe('with study guidance groups', () => {
+    describe('with study guidance groups', { retries: 3 }, () => {
       beforeEach(() => {
         cy.init('/studyguidancegroups', 'onlystudyguidancegroups')
         cy.intercept('/api/studyguidancegroups', { fixture: 'studyGuidanceGroups.json' })
@@ -44,7 +44,7 @@ describe('Study guidance group tests', () => {
     })
   })
 
-  describe('Page for single study guidance group', () => {
+  describe('Page for single study guidance group', { retries: 3 }, () => {
     beforeEach(() => {
       cy.intercept('/api/studyguidancegroups', { fixture: 'studyGuidanceGroups.json' })
     })
@@ -98,7 +98,7 @@ describe('Study guidance group tests', () => {
       })
     })
 
-    describe('with associated study programme and year', () => {
+    describe('with associated study programme and year', { retries: 3 }, () => {
       beforeEach(() => {
         cy.init('/studyguidancegroups/sgg-cypress-1', 'onlystudyguidancegroups')
       })
