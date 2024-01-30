@@ -19,7 +19,7 @@ const accessLogger = morgan((tokens, req, res) => {
 
   const message = isProduction
     ? [
-        user.name,
+        `${user.mockedBy ? '(mocking) ' : ' '}${user.name}`,
         tokens['method'](req, res),
         tokens['url'](req, res),
         tokens['status'](req, res),
