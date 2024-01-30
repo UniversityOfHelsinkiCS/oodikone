@@ -52,9 +52,9 @@ export const FrontPage = () => {
                 <Grid.Column>
                   <Header as="h3">University</Header>
                   <p>View tables and diagrams about study progress of different faculties.</p>
-                  <Divider section />
                   {showItems.populations && (
                     <>
+                      <Divider section />
                       <Header as="h3">Study programme</Header>
                       <List bulleted>
                         <List.Item>
@@ -71,8 +71,8 @@ export const FrontPage = () => {
                   {showItems.courseStatistics && (
                     <>
                       <Divider section />
-                      <Header as="h3">Course statistics</Header>
-                      <p>View statistics by course and year.</p>
+                      <Header as="h3">Courses</Header>
+                      <p>View statistics about course attempts, completions and grades.</p>
                     </>
                   )}
                   {showItems.students && (
