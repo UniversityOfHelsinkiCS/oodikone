@@ -34,8 +34,6 @@ export const studyProgrammeToolTips = {
   **Non-degree students**: Opiskelijat, joilla ei ole tutkinto-oikeutta Helsingin yliopistossa.
     
   **Transferred credits**: Sisältää opintopisteet, jotka on suoritettu kyseisenä vuonna, ja hyväksiluettu tähän koulutusohjelmaan. Mukana ovat kaikenlaisilla opinto-oikeuksilla hyväksiluetut opintopisteet. **Luku ei sisälly total-sarakkeeseen**.
-
-  **Type**: Kertoo onko kyseessä kurssi vai opintokokonaisuus.
   `,
   StudentsOfProgrammeCourses: `
   Sisältää kurssien opiskelijat.
