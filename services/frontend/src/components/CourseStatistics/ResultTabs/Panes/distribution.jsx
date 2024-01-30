@@ -47,7 +47,7 @@ const getGradeSeries = series => {
       }
     : {
         absolute: [
-          getDataObject(' I', newSeries.I, 'a'),
+          getDataObject('I', newSeries.I, 'a'),
           getDataObject('A', newSeries.A, 'b'),
           getDataObject('NSLA', newSeries.NSLA, 'c'),
           getDataObject('LUB', newSeries.LUB, 'd'),
@@ -57,7 +57,7 @@ const getGradeSeries = series => {
           getDataObject('L', newSeries.L, 'h'),
         ],
         relative: [
-          getDataObject(' I', newSeries.I.map(absoluteToRelative(sumAll)), 'a'),
+          getDataObject('I', newSeries.I.map(absoluteToRelative(sumAll)), 'a'),
           getDataObject('A', newSeries.A.map(absoluteToRelative(sumAll)), 'b'),
           getDataObject('NSLA', newSeries.NSLA.map(absoluteToRelative(sumAll)), 'c'),
           getDataObject('LUB', newSeries.LUB.map(absoluteToRelative(sumAll)), 'd'),

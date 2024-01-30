@@ -49,12 +49,12 @@ const getPassRateStudSeriesFromStats = stats => {
   return {
     absolute: [
       getDataObject('all', all, 'a'),
-      getDataObject(' passed on first try', passedFirst, 'b'),
+      getDataObject('passed on first try', passedFirst, 'b'),
       getDataObject('passed eventually', passedEventually, 'b'),
       getDataObject('never passed', neverPassed, 'c'),
     ],
     relative: [
-      getDataObject(' passed on first try', passedFirst.map(absoluteToRelative(all)), 'b'),
+      getDataObject('passed on first try', passedFirst.map(absoluteToRelative(all)), 'b'),
       getDataObject('passed eventually', passedEventually.map(absoluteToRelative(all)), 'b'),
       getDataObject('never passed', neverPassed.map(absoluteToRelative(all)), 'c'),
     ],
