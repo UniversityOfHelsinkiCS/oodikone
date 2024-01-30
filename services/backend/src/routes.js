@@ -25,7 +25,6 @@ const tags = require('./routes/tags')
 const updater = require('./routes/updater')
 const customPopulationSearch = require('./routes/customPopulationSearch')
 const languageCenterData = require('./routes/languageCenterData')
-const trends = require('./routes/trends')
 const programmeModules = require('./routes/programmeModules')
 const studyGuidanceGroups = require('./routes/studyGuidanceGroups')
 const studyProgramme = require('./routes/studyProgramme')
@@ -69,7 +68,6 @@ module.exports = (app, url) => {
   app.use(`${url}/users`, auth.roles(['admin']), users)
   app.use(`${url}/feedback`, feedback)
   app.use(`${url}/custom-population-search`, customPopulationSearch)
-  app.use(`${url}/cool-data-science`, trends)
   app.use(`${url}/studyguidancegroups`, auth.roles(['studyGuidanceGroups']), studyGuidanceGroups)
   app.get('*', async (_, res) => {
     const results = { error: 'unknown endpoint' }

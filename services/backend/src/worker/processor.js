@@ -1,10 +1,4 @@
-const {
-  refreshLanguageCenterData,
-  refreshProgramme,
-  refreshTrends,
-  refreshStatistics,
-  refreshFaculty,
-} = require('../events')
+const { refreshLanguageCenterData, refreshProgramme, refreshStatistics, refreshFaculty } = require('../events')
 const { studyplansUpdate } = require('../services/sisUpdaterService')
 
 const logger = require('../util/logger')
@@ -19,7 +13,6 @@ const refreshers = {
   languagecenter: refreshLanguageCenterData,
   faculty: refreshFaculty,
   programme: refreshProgramme,
-  trends: refreshTrends,
   statistics: refreshStatistics,
 }
 

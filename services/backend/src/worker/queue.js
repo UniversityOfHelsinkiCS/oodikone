@@ -32,7 +32,6 @@ const jobMaker = {
   faculty: code => addJob('faculty', { code }),
   programme: code => addJob('programme', { code }),
   statistics: () => addJob('statistics'),
-  trends: () => addJob('trends'),
   languagecenter: () => addJob('languagecenter'),
   studyplansUpdate: days => addJob('studyplansUpdate', { days }, 7200),
 }
