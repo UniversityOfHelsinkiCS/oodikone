@@ -1,7 +1,6 @@
 const { uniqBy, flatten, groupBy } = require('lodash')
 const { Organization, Course, CourseType, CourseProvider, CreditType, StudyrightExtent } = require('../db/models')
 const { selectFromByIdsOrderBy, bulkCreate } = require('../db')
-const { dbConnections } = require('../db/connection')
 const _ = require('lodash')
 const { courseProviderMapper, courseMapper, mapCourseType, mapStudyrightExtent } = require('./mapper')
 
@@ -156,10 +155,6 @@ const updateStudyrightExtents = async educationTypes => {
   await bulkCreate(StudyrightExtent, uniqueExtents, null, ['extentcode'])
 }
 
-const updateTrends = async () => {
-  await dbConnections.sequelize.query('REFRESH MATERIALIZED VIEW organization_yearly_credits')
-}
-
 module.exports = {
   updateOrganisations,
   updateStudyModules,
@@ -167,5 +162,4 @@ module.exports = {
   updateCourseTypes,
   updateCreditTypes,
   updateStudyrightExtents,
-  updateTrends,
 }

@@ -8,7 +8,7 @@ import { LanguagePicker } from '../LanguagePicker'
 import { isDev, adminerUrls } from '../../conf'
 
 const allNavigationItems = {
-  trends: { path: '/trends', key: 'trends', label: 'Trends' },
+  university: { path: '/evaluationoverview/university', key: 'university', label: 'University' },
   faculty: { path: '/faculties', key: 'faculties', label: 'Faculties' },
   populations: {
     key: 'studyProgramme',

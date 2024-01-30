@@ -32,7 +32,6 @@ export const Updater = () => {
   const updateSISCourses = () =>
     apiCall('custom course list', '/updater/update/v2/courses', 'post', SISCourses.trim().split('\n'))
   const refreshAllTeacherLeaderboards = () => apiCall('teacher leaderboards', '/teachers/top', 'post')
-  const refreshTrends = () => apiCall('trends', '/updater/refresh_trends', 'post')
   const refreshFaculties = () => apiCall('faculties', '/updater/refresh_faculties_v2', 'post')
   const refreshStudyProgrammes = () => apiCall('study programmes', '/updater/refresh_study_programmes_v2', 'post')
   const refreshLanguageCenterData = () =>
@@ -89,8 +88,6 @@ export const Updater = () => {
           <b>Oodikone redis - Refresh all teacher leaderboards</b> Refresh all leaderboard statistics from 1963 until
           today. Might take some time.
           <br />
-          <b>Oodikone redis - Refresh trends</b> Refresh uber data from 2017-until now, status and graduated.
-          <br />
           <b>Oodikone redis - Refresh faculties</b> Refresh data for all faculties for all tabs (time consuming).
           <br />
           <b>Oodikone redis - Refresh study programmes</b> Refresh data for new study programmes for basic and
@@ -125,7 +122,6 @@ export const Updater = () => {
               if (confirm('This is not ran in worker yet. Continue?')) refreshAllTeacherLeaderboards()
             }}
           />
-          <Form.Button content="Refresh trends" onClick={() => refreshTrends()} />
           <Form.Button content="Refresh oodikone statistics" onClick={() => refreshStatisticsV2()} />
           <Form.Button content="Refresh faculties" onClick={() => refreshFaculties()} />
           <Form.Button content="Refresh study programmes" onClick={() => refreshStudyProgrammes()} />

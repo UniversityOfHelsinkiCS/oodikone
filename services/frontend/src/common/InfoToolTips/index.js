@@ -1,5 +1,4 @@
 export { populationStatisticsToolTips } from './populationStatistics'
-export { coolDataScienceToolTips } from './coolDataScience'
 export { courseStatisticsToolTips } from './courseStatistics'
 export { coursePopulationToolTips } from './coursePopulation'
 export { studyProgrammeToolTips } from './studyprogramme'
