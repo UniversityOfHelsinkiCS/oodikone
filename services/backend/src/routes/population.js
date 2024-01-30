@@ -2,8 +2,8 @@ const crypto = require('crypto')
 const Sentry = require('@sentry/node')
 const router = require('express').Router()
 const _ = require('lodash')
-const Population = require('../services/populations')
-const Student = require('../services/students')
+const populationService = require('../services/populations')
+const studentService = require('../services/students')
 const StudyrightService = require('../services/studyrights')
 const TagService = require('../services/tags')
 const CourseService = require('../services/courses')
@@ -59,7 +59,7 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
         }
         const newMonths = (upperYearBound - Number(year)) * 12
         const query = { ...req.body, year, months: newMonths }
-        const coursestatistics = Population.bottlenecksOf(query, null, encrypted)
+        const coursestatistics = populationService.bottlenecksOf(query, null, encrypted)
         return coursestatistics
       })
     )
@@ -74,7 +74,7 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
   } else {
     if (encrypted) req.body.selectedStudents = req.body.selectedStudents.map(decrypt)
 
-    const result = await Population.bottlenecksOf(req.body, null, encrypted)
+    const result = await populationService.bottlenecksOf(req.body, null, encrypted)
 
     if (result.error) {
       Sentry.captureException(new Error(result.error))
@@ -95,10 +95,10 @@ router.post('/v2/populationstatistics/coursesbytag', async (req, res) => {
   const {
     user: { isAdmin, studentsUserCanAccess },
   } = req
-  const studentnumbers = await Student.findByTag(tag)
+  const studentnumbers = await studentService.findByTag(tag)
   const studentnumberlist = isAdmin ? studentnumbers : _.intersection(studentnumbers, studentsUserCanAccess)
 
-  const result = await Population.bottlenecksOf(
+  const result = await populationService.bottlenecksOf(
     {
       year: 1900,
       studyRights: [],
@@ -129,7 +129,7 @@ router.post('/v2/populationstatistics/coursesbystudentnumberlist', async (req, r
   }
 
   const studentnumberlist = isAdmin ? studentnumbersInReq : _.intersection(studentnumbersInReq, studentsUserCanAccess)
-  const result = await Population.bottlenecksOf(
+  const result = await populationService.bottlenecksOf(
     {
       year: query?.year ?? 1900,
       studyRights: query?.studyRights ?? [],
@@ -186,7 +186,7 @@ router.get('/v3/populationstatistics', async (req, res) => {
     const multipopulationstudentPromises = Promise.all(
       req.query.years.map(year => {
         const newMonths = (upperYearBound - Number(year)) * 12
-        const populationStudents = Population.optimizedStatisticsOf(
+        const populationStudents = populationService.optimizedStatisticsOf(
           {
             ...req.query,
             studyRights: { programme: studyRights.programme },
@@ -210,7 +210,7 @@ router.get('/v3/populationstatistics', async (req, res) => {
 
     res.json(filterPersonalTags(result, user.id))
   } else {
-    const result = await Population.optimizedStatisticsOf({
+    const result = await populationService.optimizedStatisticsOf({
       ...req.query,
       studyRights: { programme: studyRights.programme },
     })
@@ -259,15 +259,15 @@ router.get('/v3/populationstatisticsbytag', async (req, res) => {
 
   const semesters = ['FALL', 'SPRING']
 
-  const studentnumbers = await Student.findByTag(tag)
+  const studentnumbers = await studentService.findByTag(tag)
 
   const studentnumberlist = isAdmin ? studentnumbers : _.intersection(studentnumbers, studentsUserCanAccess)
 
   const studyRights = JSON.parse(studyRightsJSON)
-  const newStartYear = await Population.getEarliestYear(studentnumberlist, studyRights)
+  const newStartYear = await populationService.getEarliestYear(studentnumberlist, studyRights)
   const yearDifference = Number(year) - Number(newStartYear)
   const newMonths = Number(months) + 12 * yearDifference
-  const result = await Population.optimizedStatisticsOf(
+  const result = await populationService.optimizedStatisticsOf(
     {
       year: newStartYear,
       studyRights,
@@ -307,14 +307,14 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
   }
 
   const semesters = ['FALL', 'SPRING']
-  const studentnumbers = await Student.findByCourseAndSemesters(
+  const studentnumbers = await studentService.findByCourseAndSemesters(
     JSON.parse(coursecodes),
     from,
     to,
     separate,
     unifyCourses
   )
-  const result = await Population.optimizedStatisticsOf(
+  const result = await populationService.optimizedStatisticsOf(
     {
       // Useless, because studentnumbers are already filtered above by from & to.
       // We should probably refactor this to avoid more confusement.
@@ -374,7 +374,7 @@ router.post('/v3/populationstatisticsbystudentnumbers', async (req, res) => {
     tags?.studyProgramme && tags?.studyProgramme.includes('+')
       ? tags?.studyProgramme.split('+')[0]
       : tags?.studyProgramme
-  const result = await Population.optimizedStatisticsOf(
+  const result = await populationService.optimizedStatisticsOf(
     {
       year: tags?.year || 1900,
       studyRights: studyProgrammeCode ? [studyProgrammeCode] : [],

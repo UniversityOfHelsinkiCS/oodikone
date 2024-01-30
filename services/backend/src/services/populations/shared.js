@@ -9,19 +9,6 @@ const { semesterEnd, semesterStart } = require('../../util/semester')
 const { getAllProgrammes } = require('../studyrights')
 const { getCurrentSemester } = require('../semesters')
 
-const enrolmentDates = () => {
-  const query = 'SELECT DISTINCT s.dateOfUniversityEnrollment as date FROM Student s'
-  return sequelize.query(query, { type: sequelize.QueryTypes.SELECT })
-}
-
-const universityEnrolmentDates = async () => {
-  const [result] = await enrolmentDates()
-  return result
-    .map(r => r.date)
-    .filter(d => d)
-    .sort()
-}
-
 // Progress tab related helper functions.
 const createEmptyCriteriaYear = (criteria, year) => {
   return {
@@ -581,7 +568,6 @@ module.exports = {
   count,
   parseCreditInfo,
   checkThatSelectedStudentsAreUnderRequestedStudyright,
-  universityEnrolmentDates,
   findCourses,
   findCourseEnrollments,
   formatQueryParamArrays,

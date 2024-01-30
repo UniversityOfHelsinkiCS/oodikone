@@ -258,6 +258,5 @@ const getBasicStatsForStudytrack = async ({ studyprogramme, combinedProgramme, s
 }
 
 module.exports = {
-  getGraduatedStats,
   getBasicStatsForStudytrack,
 }

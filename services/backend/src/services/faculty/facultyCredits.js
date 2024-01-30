@@ -279,4 +279,4 @@ const combineFacultyCredits = async (faculty, programmes, allProgrammes, yearTyp
   return allCredits
 }
 
-module.exports = { combineFacultyCredits, getFacultyCreditStatsForStudytrack }
+module.exports = { combineFacultyCredits }

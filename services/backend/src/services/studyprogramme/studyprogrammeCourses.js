@@ -255,4 +255,4 @@ const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme,
   return Object.values(allCourses)
 }
 
-module.exports = { getStudyprogrammeCoursesForStudytrack, getAllStudyprogrammeCourses }
+module.exports = { getStudyprogrammeCoursesForStudytrack }

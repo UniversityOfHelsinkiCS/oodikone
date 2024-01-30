@@ -203,26 +203,7 @@ const getProtoCProgramme = async (query, doRefresh = false) => {
   return protoCProgramme
 }
 
-const refreshProtoC = async query => {
-  const { include_old_attainments, exclude_non_enrolled } = query
-  const KEY = `${REDIS_KEY_PROTOC}_OLD_${include_old_attainments.toUpperCase()}_ENR_${exclude_non_enrolled.toUpperCase()}`
-
-  const data = await calculateProtoC(query)
-  await saveToRedis(data, KEY)
-}
-
-const refreshProtoCProgramme = async query => {
-  const { include_old_attainments, exclude_non_enrolled, code } = query
-
-  const KEY = `${REDIS_KEY_PROTOC_PROGRAMME}_CODE_${code}_OLD_${include_old_attainments.toUpperCase()}_ENR_${exclude_non_enrolled.toUpperCase()}`
-
-  const data = await calculateProtoCProgramme(query)
-  await saveToRedis(data, KEY)
-}
-
 module.exports = {
   getProtoC,
-  refreshProtoC,
   getProtoCProgramme,
-  refreshProtoCProgramme,
 }

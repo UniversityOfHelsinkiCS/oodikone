@@ -2,11 +2,6 @@ const { STRING } = require('sequelize')
 const Sequelize = require('sequelize')
 const { sequelizeKone } = require('../database/connection')
 
-const ThesisTypeEnums = {
-  MASTER: 'MASTER',
-  BACHELOR: 'BACHELOR',
-}
-
 const ExcludedCourse = sequelizeKone.define(
   'excluded_courses',
   {
@@ -197,10 +192,8 @@ Tag.hasMany(TagStudent, { foreignKey: 'tag_id', sourceKey: 'tag_id' })
 module.exports = {
   TagStudent,
   Tag,
-  ThesisTypeEnums,
   CustomPopulationSearch,
   OpenUniPopulationSearch,
-  sequelizeKone,
   ExcludedCourse,
   StudyGuidanceGroupTag,
   ProgressCriteria,

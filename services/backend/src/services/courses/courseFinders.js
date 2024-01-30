@@ -2,67 +2,6 @@ const { Op } = require('sequelize')
 const { Course } = require('../../models')
 const { getSortRank } = require('../../util/utils')
 
-const byNameOrCode = (searchTerm, language) =>
-  Course.findAll({
-    where: {
-      [Op.or]: [
-        {
-          name: {
-            [language]: {
-              [Op.iLike]: searchTerm,
-            },
-          },
-        },
-        {
-          code: {
-            [Op.like]: searchTerm,
-          },
-        },
-      ],
-    },
-  })
-
-const byName = (name, language) =>
-  Course.findAll({
-    where: {
-      name: {
-        [language]: {
-          [Op.eq]: name,
-        },
-      },
-    },
-    order: [['latest_instance_date', 'DESC']],
-    limit: 1,
-  })
-
-const byCode = code => Course.findByPk(code)
-
-const findOneByCode = code => {
-  return Course.findOne({
-    attributes: ['id', 'code', 'name'],
-    where: {
-      code: code,
-    },
-  })
-}
-
-const bySearchTerm = async (term, language) => {
-  const formatCourse = course => ({
-    name: course.name[language],
-    code: course.code,
-    date: course.latest_instance_date,
-  })
-
-  try {
-    const result = await byNameOrCode(`%${term}%`, language)
-    return result.map(formatCourse)
-  } catch (e) {
-    return {
-      error: e,
-    }
-  }
-}
-
 const nameLikeTerm = name => {
   if (!name) {
     return undefined
@@ -149,10 +88,6 @@ const byNameAndOrCodeLike = async (name, code) => {
 }
 
 module.exports = {
-  byCode,
-  byName,
-  bySearchTerm,
   byNameAndOrCodeLike,
   byCodes,
-  findOneByCode,
 }
