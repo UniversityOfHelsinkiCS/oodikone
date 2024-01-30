@@ -4,13 +4,13 @@ import _ from 'lodash'
 import { useLanguage } from 'components/LanguagePicker/useLanguage'
 import { SortableTable, row } from 'components/SortableTable'
 import { getColumns } from './logic'
-import { calculateTotals, useLanguageCenterContext, emptyFields } from '../common'
+import { calculateTotals, useColorizedCoursesTableContext, emptyFields } from '../common'
 import { ColorModeSelector, NumberModeSelector, SemesterRangeSelector } from '../selectorComponents'
 import '../index.css'
 
 export const FacultiesTab = () => {
   const { numberMode, colorMode, semesterFilter, setSemesterFilter, selectedSemesters, data, facultyMap } =
-    useLanguageCenterContext()
+    useColorizedCoursesTableContext()
 
   const { getTextIn } = useLanguage()
 

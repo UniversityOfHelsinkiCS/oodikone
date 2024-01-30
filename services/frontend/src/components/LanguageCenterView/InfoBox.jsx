@@ -4,7 +4,7 @@ import { Button, Icon, Message } from 'semantic-ui-react'
 export const InfoBox = () => {
   const [open, setOpen] = useState(false)
   return (
-    <Message style={{ maxWidth: '60em' }}>
+    <Message style={{ maxWidth: '60em', marginBottom: '4em' }}>
       <p>This view displays amounts of enrollments and completions of courses organized by language center.</p>
       <p>You can view the numbers by faculties or by semesters.</p>
       {open && (

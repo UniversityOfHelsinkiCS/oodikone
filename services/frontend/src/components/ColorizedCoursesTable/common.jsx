@@ -1,8 +1,8 @@
 import React, { createContext, useContext } from 'react'
 
-export const LanguageCenterContext = createContext(null)
+export const ColorizedCoursesTableContext = createContext(null)
 
-export const useLanguageCenterContext = () => useContext(LanguageCenterContext)
+export const useColorizedCoursesTableContext = () => useContext(ColorizedCoursesTableContext)
 
 export const emptyFields = { completions: 0, enrollments: 0, difference: 0, rejected: 0 }
 
