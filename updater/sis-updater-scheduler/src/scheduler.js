@@ -293,19 +293,6 @@ const schedulePurge = async () => {
   }
 }
 
-const scheduleTrends = async () => {
-  await schedule({ type: 'trends' })
-}
-
-const scheduleDaily = async () => {
-  try {
-    await scheduleTrends()
-  } catch (e) {
-    logger.error({ message: 'Daily scheduling failed', meta: e.stack })
-    throw e
-  }
-}
-
 module.exports = {
   scheduleMeta,
   scheduleStudents,
@@ -314,7 +301,6 @@ module.exports = {
   scheduleWeekly,
   schedulePrePurge,
   schedulePurge,
-  scheduleDaily,
   scheduleByStudentNumbers,
   scheduleByCourseCodes,
   isUpdaterActive,

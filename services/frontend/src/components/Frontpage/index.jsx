@@ -17,7 +17,7 @@ export const FrontPage = () => {
     students: checkUserAccess(['studyGuidanceGroups', 'admin'], roles) || rights.length > 0,
     courseStatistics: checkUserAccess(['courseStatistics', 'admin'], roles) || rights.length > 0,
     teachers: checkUserAccess(['teachers', 'admin'], roles),
-    trends: true,
+    university: true,
     feedback: true,
   }
 
@@ -50,8 +50,8 @@ export const FrontPage = () => {
             <Grid columns="two" style={{ marginTop: '40px' }} divided>
               <Grid.Row>
                 <Grid.Column>
-                  <Header as="h3">Trends</Header>
-                  <p>View many kinds of visualizations about study progress and study programme status.</p>
+                  <Header as="h3">University</Header>
+                  <p>View tables and diagrams about study progress of different faculties.</p>
                   <Divider section />
                   {showItems.populations && (
                     <>

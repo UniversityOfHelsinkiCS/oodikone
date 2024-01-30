@@ -18,7 +18,6 @@ import { reducer as accessGroups } from './accessGroups'
 import { reducer as tags } from './tags'
 import { reducer as tagstudent } from './tagstudent'
 import { reducer as singleCourseStats } from './singleCourseStats'
-import { reducer as coolDataScience } from './coolDataScience'
 import { reducer as filters } from './filters'
 
 export const store = configureStore({
@@ -39,7 +38,6 @@ export const store = configureStore({
     tags,
     tagstudent,
     singleCourseStats,
-    coolDataScience,
     [RTKApi.reducerPath]: RTKApi.reducer,
     [curriculumsApi.reducerPath]: curriculumsApi.reducer,
     filters,

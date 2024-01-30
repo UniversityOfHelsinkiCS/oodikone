@@ -2,9 +2,9 @@
 
 describe('Users tests', () => {
   describe('Using user with just grp-oodikone-user, no other rights', () => {
-    it('shows only frontpage, trends feedback', () => {
+    it('shows only frontpage, university, feedback', () => {
       cy.init('', 'norights') // login with norights user
-      cy.get('[data-cy="navBar"]').contains('Trends').should('exist')
+      cy.get('[data-cy="navBar"]').contains('University').should('exist')
       cy.get('[data-cy="navBar"]').contains('Give feedback').should('exist')
 
       cy.get('[data-cy="navBar"]').contains('Study programme').should('not.exist')
@@ -34,7 +34,7 @@ describe('Users tests', () => {
       cy.get('[data-cy="navBar"]').contains('Courses').should('exist')
       // TODO: admin should probably see this as well, since can access this page: cy.get('[data-cy="navBar"]').contains('Teachers').should('exist')
       cy.get('[data-cy="navBar"]').contains('Users').should('exist')
-      cy.get('[data-cy="navBar"]').contains('Trends').should('exist')
+      cy.get('[data-cy="navBar"]').contains('University').should('exist')
     })
 
     it("mocking normal user shows only the mocked user's programmes", () => {

@@ -50,7 +50,6 @@ const CustomPopulation = React.lazy(() =>
   retry(() => import('../CustomPopulation').then(module => ({ default: module.CustomPopulation })))
 )
 const Updater = React.lazy(() => retry(() => import('../Updater').then(module => ({ default: module.Updater }))))
-const Trends = React.lazy(() => retry(() => import('../Trends').then(module => ({ default: module.Trends }))))
 const StudyGuidanceGroups = React.lazy(() =>
   retry(() => import('../StudyGuidanceGroups').then(module => ({ default: module.StudyGuidanceGroups })))
 )
@@ -79,7 +78,6 @@ const routes = {
   coursepopulation: '/coursepopulation',
   custompopulation: '/custompopulation',
   updater: '/updater',
-  trends: '/trends',
   studyGuidanceGroups: '/studyguidancegroups/:groupid?',
   faculties: '/faculties/:facultyCode?',
   customOpenUniPopulation: '/openunipopulation',
@@ -93,7 +91,6 @@ export const Routes = () => (
     <Switch>
       <Route exact path="/" component={FrontPage} />
       <Route exact path={routes.feedback} component={Feedback} />
-      <Route path={routes.trends} component={Trends} />
       <ProtectedRoute requireUserHasRights exact path="/populations" component={Populations} />
       <ProtectedRoute
         requiredRoles={['admin', 'facultyStatistics']}
@@ -153,7 +150,6 @@ export const Routes = () => (
         component={LanguageCenterView}
       />
       <ProtectedRoute requireUserHasRights exact path={routes.evaluationOverview} component={EvaluationOverview} />
-      <Redirect from="/cool-data-science" to="/trends" />
       <Redirect to="/" />
     </Switch>
   </Suspense>
