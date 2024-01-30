@@ -1,4 +1,4 @@
-const { sortBy, mapValues, flatten, uniqBy } = require('lodash')
+const { sortBy, flatten, uniqBy } = require('lodash')
 const { getMinMaxDate } = require('../utils')
 const {
   educationTypeToExtentcode,
@@ -341,29 +341,6 @@ const mapCourseType = studyLevel => ({
   name: studyLevel.name,
 })
 
-const mapSemester = ([org, orgStudyYears]) => {
-  let semestercode = 1
-  return sortBy(orgStudyYears, 'start_year').map(orgStudyYear => {
-    return orgStudyYear.study_terms.map((studyTerm, i) => {
-      const acualYear = new Date(studyTerm.valid.startDate).getFullYear()
-      return {
-        composite: `${org}-${semestercode}`,
-        name: mapValues(studyTerm.name, n => {
-          return `${n} ${acualYear}`
-        }),
-        startdate: studyTerm.valid.startDate,
-        enddate: studyTerm.valid.endDate,
-        yearcode: Number(orgStudyYear.start_year) - 1949, // lul! :D
-        yearname: orgStudyYear.name,
-        semestercode: semestercode++,
-        org,
-        termIndex: i,
-        startYear: orgStudyYear.start_year,
-      }
-    })
-  })
-}
-
 const mapStudyrightExtent = educationType => ({
   extentcode: educationTypeToExtentcode[educationType.id],
   name: educationType.name,
@@ -550,7 +527,6 @@ module.exports = {
   courseProviderMapper,
   courseMapper,
   mapCourseType,
-  mapSemester,
   mapStudyrightExtent,
   enrollmentMapper,
   studyplanMapper,
