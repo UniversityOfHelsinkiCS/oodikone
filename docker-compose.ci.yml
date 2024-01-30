@@ -73,7 +73,7 @@ services:
     environment:
       - npm_config_cache=/tmp
       - PORT=3003
-      - NODE_ENV=production
+      - NODE_ENV=dev
       - DATABASE_URL=postgres://postgres:postgres@jami-db:5432/postgres
     ports:
       - 3003:3003
