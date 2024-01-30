@@ -6,24 +6,27 @@ const _ = require('lodash')
 const diffs = []
 let noDiffCounter = 0
 
-const diff = (rapoData, okData, code, rapoField, okField) => {
+const excelMode = false
+
+const diff = (rapoData, okData, code, rapoFields, okFields) => {
   for (const year of Object.keys(okData)) {
+    if (year !== '2022' && year !== '2023') continue
     const rapo = rapoData[year]
     const ok = okData[year]
     if (!rapo) {
       if (!ok) console.log(`Year ${year} not in rapo for code ${code}, skipping`)
       continue
     }
-    if (ok[okField] === undefined || rapo[rapoField] === undefined) throw new Error('Invalid fields')
-    const okValue = Math.round(ok[okField])
-    const rapoValue = Math.round(rapo[rapoField])
+
+    const okValue = okFields.reduce((sum, cur) => Math.round(ok[cur]) + sum, 0)
+    const rapoValue = rapoFields.reduce((sum, cur) => Math.round(rapo[cur]) + sum, 0)
     const diff = Math.abs(okValue - rapoValue)
-    const bigger = Math.max(rapo[rapoField], ok[okField])
-    if ((diff > bigger * 0.1 && bigger > 500) || diff > 400) {
-      /*const diffStr = `${code} - ${year} - Ok.${okField}: ${okValue
-        .toString()
-        .padStart(8)} \tRapo.${rapoField}: ${rapoValue.toString().padStart(8)}\tDiff: ${diff}`*/
-      const diffStr = `${code}\t${year}\t${rapoValue}\t${okValue}\t${diff}`
+    if (diff > 400) {
+      const diffStr = !excelMode
+        ? `${code} - ${year} - Ok fields ${okFields}: ${okValue
+            .toString()
+            .padStart(8)} \tRapo fields ${rapoFields}: ${rapoValue.toString().padStart(8)}\tDiff: ${diff}`
+        : `${code}\t${year}\t${rapoValue}\t${okValue}\t${diff}`
       diffs.push({ code, year, diff, diffStr })
     } else {
       noDiffCounter += 1
@@ -41,9 +44,9 @@ const parseOkData = data => {
 
 // Acual logic in this function
 const process = async data => {
-  // Define here the fields to diff against each other
-  const rapoField = 'openUni'
-  const okField = 'nondegree'
+  // Define here the fields to diff against each other. Must be an array, multiple fields will be summed
+  const rapoField = ['openUni', 'exchange']
+  const okField = ['nondegree']
   const rapoProgrammeData = formatData(data.slice(1))
   const allProgrammeCodes = [...new Set(Object.keys(rapoProgrammeData))]
   for (const programmeCode of allProgrammeCodes) {
