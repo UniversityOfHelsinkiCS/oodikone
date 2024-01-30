@@ -28,7 +28,7 @@ const accessLogger = morgan((tokens, req, res) => {
         'ms',
       ].join(' ')
     : [
-        user.name,
+        `${user.mockedBy ? '(mocking) ' : ' '}${user.name}`,
         tokens['response-time'](req, res).split('.')[0],
         'ms\t',
         tokens['status'](req, res),
