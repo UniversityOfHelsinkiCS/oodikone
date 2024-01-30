@@ -1,10 +1,12 @@
 /* eslint-disable no-console */
 const { getCreditStats } = require('../services/analyticsService')
 const { parseCsv } = require('./helpers')
+const _ = require('lodash')
 
 const diffs = []
+let noDiffCounter = 0
 
-const diff = (rapoData, okData, code, field) => {
+const diff = (rapoData, okData, code, rapoField, okField) => {
   for (const year of Object.keys(okData)) {
     const rapo = rapoData[year]
     const ok = okData[year]
@@ -12,11 +14,19 @@ const diff = (rapoData, okData, code, field) => {
       if (!ok) console.log(`Year ${year} not in rapo for code ${code}, skipping`)
       continue
     }
-    const diff = Math.abs(rapo[field] - ok[field])
-    const bigger = Math.max(rapo[field], ok[field])
-    if ((diff > bigger * 0.1 && bigger > 400) || diff > 100) {
-      console.log(`${code} \t ${year}: ${field} diff: ${diff} \tOk: ${ok[field]} \tRapo: ${rapo[field]}`)
-      diffs.push({ code, year, diff })
+    if (ok[okField] === undefined || rapo[rapoField] === undefined) throw new Error('Invalid fields')
+    const okValue = Math.round(ok[okField])
+    const rapoValue = Math.round(rapo[rapoField])
+    const diff = Math.abs(okValue - rapoValue)
+    const bigger = Math.max(rapo[rapoField], ok[okField])
+    if ((diff > bigger * 0.1 && bigger > 500) || diff > 400) {
+      /*const diffStr = `${code} - ${year} - Ok.${okField}: ${okValue
+        .toString()
+        .padStart(8)} \tRapo.${rapoField}: ${rapoValue.toString().padStart(8)}\tDiff: ${diff}`*/
+      const diffStr = `${code}\t${year}\t${rapoValue}\t${okValue}\t${diff}`
+      diffs.push({ code, year, diff, diffStr })
+    } else {
+      noDiffCounter += 1
     }
   }
 }
@@ -30,14 +40,21 @@ const parseOkData = data => {
 }
 
 // Acual logic in this function
-const process = async (data, field = 'total') => {
+const process = async data => {
+  // Define here the fields to diff against each other
+  const rapoField = 'openUni'
+  const okField = 'nondegree'
   const rapoProgrammeData = formatData(data.slice(1))
   const allProgrammeCodes = [...new Set(Object.keys(rapoProgrammeData))]
   for (const programmeCode of allProgrammeCodes) {
     const okProgrammeData = await getCreditStats(programmeCode, '', 'CALENDAR_YEAR', 'SPECIAL_INCLUDED')
-    diff(rapoProgrammeData[programmeCode], parseOkData(okProgrammeData), programmeCode, field)
+    diff(rapoProgrammeData[programmeCode], parseOkData(okProgrammeData), programmeCode, rapoField, okField)
   }
-  console.log(`${diffs.length} diffs found.`)
+  const orderedDiffs = _.orderBy(diffs, 'diff', 'asc')
+  orderedDiffs.forEach(d => console.log(d.diffStr))
+  console.log(`${diffs.length} diffs found with current settings. Numbers with no diff: ${noDiffCounter}`)
+  const totalDiff = orderedDiffs.reduce((sum, cur) => cur.diff + sum, 0)
+  console.log('Total difference: ', totalDiff)
 }
 
 const programmeCreditsDiff = async fileName => {
