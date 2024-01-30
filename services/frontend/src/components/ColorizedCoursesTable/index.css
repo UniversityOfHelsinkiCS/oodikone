@@ -1,14 +1,9 @@
-.languagecenterview {
+.colorized-courses-table {
   display: flex;
   justify-content: center;
-  margin: 50px 25px;
   flex-direction: column;
   align-content: center;
   align-items: center;
-}
-
-.languagecenter-table {
-  margin-top: 4em;
 }
 
 input[type='radio'] {

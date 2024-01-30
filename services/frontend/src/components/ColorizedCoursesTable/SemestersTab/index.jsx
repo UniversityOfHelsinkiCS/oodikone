@@ -3,14 +3,14 @@ import React, { useMemo } from 'react'
 import { SortableTable, row } from 'components/SortableTable'
 import { useLanguage } from 'components/LanguagePicker/useLanguage'
 import { getColumns } from './logic'
-import { useLanguageCenterContext, calculateTotals } from '../common'
+import { useColorizedCoursesTableContext, calculateTotals } from '../common'
 import '../index.css'
 import { ColorModeSelector, NumberModeSelector, SemesterRangeSelector } from '../selectorComponents'
 
 export const SemestersTab = () => {
   const { getTextIn } = useLanguage()
   const { setSemesterFilter, semesterFilter, semesters, numberMode, colorMode, selectedSemesters, data } =
-    useLanguageCenterContext()
+    useColorizedCoursesTableContext()
 
   const totalRow = useMemo(() => {
     if (!data) return null

@@ -1,11 +1,11 @@
 import { useLanguage } from 'components/LanguagePicker/useLanguage'
 import React, { useMemo } from 'react'
 import { Dropdown, Radio } from 'semantic-ui-react'
-import { useLanguageCenterContext } from './common'
+import { useColorizedCoursesTableContext } from './common'
 import './index.css'
 
 export const NumberModeSelector = () => {
-  const { numberMode, setNumberMode } = useLanguageCenterContext()
+  const { numberMode, setNumberMode } = useColorizedCoursesTableContext()
   const modes = [
     { value: 'completions', label: 'Completions' },
     { value: 'enrollments', label: 'Accepted enrollments' },
@@ -32,7 +32,7 @@ export const NumberModeSelector = () => {
 }
 
 export const ColorModeSelector = () => {
-  const { colorMode, setColorMode } = useLanguageCenterContext()
+  const { colorMode, setColorMode } = useColorizedCoursesTableContext()
 
   return (
     <div className="selector-container">
@@ -85,7 +85,7 @@ const SemesterSelector = ({ allSemesters, semester, setSemester, dataCy }) => {
 }
 
 export const SemesterRangeSelector = () => {
-  const { semesters, semesterFilter, setSemesterFilter } = useLanguageCenterContext()
+  const { semesters, semesterFilter, setSemesterFilter } = useColorizedCoursesTableContext()
 
   return (
     <div className="selector-container">
