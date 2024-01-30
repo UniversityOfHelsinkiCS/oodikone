@@ -74,12 +74,6 @@ router.post('/refresh_faculties_v2', async (req, res) => {
   res.status(200).json('Added job for refreshing faculties')
 })
 
-router.post('/refresh_trends', async (req, res) => {
-  logger.info(`${req.user.userId} requested refresh of trends`)
-  jobMaker.trends()
-  res.status(200).json('Added job for refreshing trends')
-})
-
 router.post('/refresh_language_center_data', async (req, res) => {
   logger.info(`${req.user.userId} requested refresh of language center data`)
   jobMaker.languagecenter()

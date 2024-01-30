@@ -2,13 +2,13 @@ const Sequelize = require('sequelize')
 const { Op } = Sequelize
 const LRU = require('lru-cache')
 const { getStudentnumbersByElementdetails } = require('./students')
-const { facultiesAndProgrammesForTrends } = require('../services/organisations')
 const { sendNotificationAboutNewUser } = require('../services/mailservice')
 const { checkStudyGuidanceGroupsAccess, getAllStudentsUserHasInGroups } = require('../services/studyGuidanceGroups')
 const _ = require('lodash')
 const { User, UserElementDetails, AccessGroup, UserFaculties, sequelizeUser } = require('../models/models_user')
 const { getOrganizationAccess } = require('../util/organizationAccess')
 const { getUserIams, getAllUserAccess } = require('../util/jami')
+const { facultiesAndProgrammesForTrends } = require('./organisations')
 
 const courseStatisticsGroup = 'grp-oodikone-basic-users'
 const facultyStatisticsGroup = 'grp-oodikone-users'

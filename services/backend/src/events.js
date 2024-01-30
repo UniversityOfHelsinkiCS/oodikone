@@ -1,6 +1,4 @@
 const { CronJob } = require('cron')
-const moment = require('moment')
-const { refreshStatus, refreshStatusGraduated, refreshUber, getStartYears } = require('./services/trends')
 const { refreshAssociationsInRedis } = require('./services/studyrights')
 const { getAllProgrammes } = require('./services/studyrights')
 const { updateBasicView, updateStudytrackView } = require('./services/studyprogramme/studyprogrammeUpdates')
@@ -81,42 +79,6 @@ const refreshTeacherLeaderboard = async () => {
   await findAndSaveTeachers(currentSemestersYearCode - 1, currentSemestersYearCode)
 }
 
-const refreshStatusToRedis = async () => {
-  const unixMillis = moment().valueOf()
-  const date = new Date(Number(unixMillis))
-
-  date.setHours(23, 59, 59, 999)
-  const showByYearOff = 'false'
-  const showByYear = 'true'
-  logger.info('Refreshing CDS Status')
-  await refreshStatus(date.getTime(), showByYearOff)
-  await refreshStatus(date.getTime(), showByYear)
-  logger.info('Refreshing CDS Status doned')
-
-  logger.info('Refreshing CDS Graduated')
-  await refreshStatusGraduated(date.getTime(), showByYearOff)
-  await refreshStatusGraduated(date.getTime(), showByYear)
-  logger.info('Refreshing CDS graduated doned')
-}
-
-const refreshUberToRedis = async () => {
-  const years = (await getStartYears()).map(({ studystartdate }) => studystartdate)
-  for (const year of years) {
-    const formattedYear = new Date(year).getFullYear()
-    logger.info(`Refreshing CDS uber year ${formattedYear}`)
-    const defaultQuery = { include_old_attainments: 'false', start_date: year }
-    const oldAttainmentsQuery = { include_old_attainments: 'true', start_date: year }
-    try {
-      await refreshUber(defaultQuery)
-      await refreshUber(oldAttainmentsQuery)
-      logger.info(`Refreshing CDS uber year ${formattedYear} doned`)
-    } catch (e) {
-      logger.error({ message: `Error when refreshing CDS uber year ${formattedYear}`, meta: `${e}` })
-    }
-  }
-  logger.info(`Refreshing CDS Uber data doned`)
-}
-
 const refreshStatistics = async () => {
   const statfuncs = [refreshStudyrightAssociations, refreshTeacherLeaderboard]
   logger.info('Refreshing statistics')
@@ -126,16 +88,6 @@ const refreshStatistics = async () => {
   logger.info('Statistics refreshed!')
 }
 
-const refreshTrends = async () => {
-  const trendfuncs = [refreshStatusToRedis, refreshUberToRedis]
-  logger.info('Refreshing trends')
-  for (const func of trendfuncs) {
-    await func()
-  }
-  logger.info('Trends refreshed!')
-}
-
-// eslint-disable-next-line no-unused-vars
 const refreshLanguageCenterData = async () => {
   logger.info('Refreshing language center data...')
   const freshData = await computeLanguageCenterData()
@@ -147,7 +99,6 @@ const dailyJobs = () => {
   refreshFaculties()
   refreshProgrammes()
   jobMaker.languagecenter()
-  jobMaker.trends()
   jobMaker.statistics()
 }
 
@@ -172,7 +123,6 @@ const startCron = () => {
 module.exports = {
   startCron,
   refreshStatistics,
-  refreshTrends,
   refreshFaculties,
   refreshFaculty,
   refreshProgramme,
