@@ -11,7 +11,7 @@ on:
       - 'cypress/**'
       - 'cypress.config.json'
       - 'services/**'
-      - '!services/backend/src/rapodiff.js'
+      - '!services/backend/src/rapodiff/**'
       - 'docker-compose.ci.yml'
       - 'package*.json'
       - 'updater/sis-updater-worker/src/db/migrations/**'
