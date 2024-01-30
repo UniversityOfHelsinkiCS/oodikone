@@ -139,7 +139,7 @@ export const getSemestersPresentFunctions = ({
     for (let sem = firstSemester; sem <= lastSemester; sem++) {
       const enrollment = student.semesterEnrollmentsMap
         ? student.semesterEnrollmentsMap[sem]
-        : studyright[0].semesterEnrollments.find(e => e.semestercode === sem)?.enrollmenttype
+        : studyright[0].semesterEnrollments?.find(e => e.semestercode === sem)?.enrollmenttype
       semesterIcons.push(
         getSemesterJSX(
           sem,
