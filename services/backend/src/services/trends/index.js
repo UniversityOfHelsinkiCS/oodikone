@@ -6,7 +6,7 @@ const {
 const { getStatus, refreshStatus } = require('./statusAttainments')
 // TODO: change getGraduatedStatus -> getStatusGraduated
 const { getGraduatedStatus, refreshStatusGraduated } = require('./statusGraduated')
-const { getProtoC, refreshProtoC, getProtoCProgramme, refreshProtoCProgramme } = require('./protoC')
+const { getProtoC, getProtoCProgramme } = require('./protoC')
 const { getUber, refreshUber } = require('./uber')
 
 const STUDYRIGHT_START_DATE = '2017-07-31 21:00:00+00'
@@ -47,8 +47,6 @@ module.exports = {
   getProtoCProgramme,
   getStatus,
   getUber,
-  refreshProtoC,
-  refreshProtoCProgramme,
   refreshStatus,
   refreshStatusGraduated,
   refreshUber,

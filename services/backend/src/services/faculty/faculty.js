@@ -293,7 +293,7 @@ const degreeProgrammesOfFaculty = async facultyCode =>
     })
   ).map(facultyFormatProgramme)
 
-const facultyOgranizationId = async faculty => {
+const facultyOrganizationId = async faculty => {
   return await Organization.findOne({
     attributes: ['id'],
     where: {
@@ -359,7 +359,7 @@ const findFacultyProgrammeCodes = async (faculty, programmeFilter) => {
   allProgrammeCodes = allProgrammeCodes.concat(directAssociationProgrammes.map(prog => prog.code))
 
   // find faculty's organization id and its direct child organizations
-  const { id } = await facultyOgranizationId(faculty)
+  const { id } = await facultyOrganizationId(faculty)
   const facultyChildOrganizations = await getChildOrganizations(id)
 
   // get programme modules that have a faculty child as organization(_id)
@@ -408,10 +408,8 @@ module.exports = {
   transferredInsideFaculty,
   transferredAway,
   transferredTo,
-  degreeProgrammesOfFaculty,
   thesisWriters,
   findFacultyProgrammeCodes,
-  facultyOgranizationId,
   getTransferredToAndAway,
   getTransferredInside,
   getStudyRightsByExtent,
