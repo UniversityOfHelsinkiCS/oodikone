@@ -115,6 +115,7 @@ export const ProgrammeCoursesOverview = ({ studyProgramme, combinedProgramme, ac
         data={filterDataByYear(data, fromYear, toYear)}
         showStudents={showStudents}
         handleShowStudentsChange={setShowStudents}
+        studyProgramme={studyProgramme}
       />
     </div>
   )
