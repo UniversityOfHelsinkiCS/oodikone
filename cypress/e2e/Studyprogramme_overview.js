@@ -318,6 +318,8 @@ describe('Studyprogramme overview', () => {
         cy.get('tr').eq(1).contains('684')
       })
       cy.get('[data-cy=calendarAcademicYearToggle]').first().click()
+      cy.get('[data-cy=fromYear]').click().contains('2018-2019').click()
+      cy.get('[data-cy=toYear').click().contains('2019-2020').click()
       cy.get('[data-cy=CoursesSortableTable]').within(() => {
         cy.get('tr').eq(1).contains('772')
       })
