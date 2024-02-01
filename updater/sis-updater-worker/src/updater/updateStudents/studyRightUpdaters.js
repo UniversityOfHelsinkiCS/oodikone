@@ -44,12 +44,12 @@ const getStudyrightSemesterEnrollments = (studyright, termRegistrations) => {
     const {
       studyTerm: { termIndex, studyYearStartYear },
       termRegistrationType,
+      statutoryAbsence,
     } = termRegistration
 
     const enrollmenttype = termRegistrationTypeToEnrollmenttype(termRegistrationType)
     const { semestercode } = getSemester(getUniOrgId(studyright.organisation_id), studyYearStartYear, termIndex)
-
-    return { enrollmenttype, semestercode }
+    return { enrollmenttype, semestercode, statutoryAbsence }
   })
 }
 
