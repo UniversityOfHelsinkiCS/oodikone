@@ -35,6 +35,9 @@ const studyprogrammeApi = RTKApi.injectEndpoints({
       query: ({ id, yearType, specialGroups, graduated }) =>
         `/v2/studyprogrammes/${id}/evaluationstats?year_type=${yearType}&special_groups=${specialGroups}&graduated=${graduated}`,
     }),
+    getColorizedTableCourseStats: builder.query({
+      query: ({ id }) => `/v2/studyprogrammes/${id}/colorizedtablecoursestats`,
+    }),
   }),
   overrideExisting: false,
 })
@@ -48,4 +51,5 @@ export const {
   useUpdateStudytrackViewQuery,
   useGetProgrammeCoursesStatsQuery,
   useGetEvaluationStatsQuery,
+  useGetColorizedTableCourseStatsQuery,
 } = studyprogrammeApi
