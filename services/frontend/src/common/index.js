@@ -384,6 +384,13 @@ export const resolveStudyPlan = (studyPlans, studyRight) => {
   return studyPlans.find(p => p.programme_code === code && p.studyrightid === studyRight.studyrightid)
 }
 
+export const getCurrentSemester = allSemesters => {
+  if (!allSemesters) return null
+  return Object.values(allSemesters).find(
+    sem => new Date(sem.startdate) <= new Date() && new Date(sem.enddate) >= new Date()
+  )
+}
+
 // These are the new Bachelor's programmes in Matlu, that have BH possibility
 export const bachelorHonoursProgrammes = [
   'KH50_001',
