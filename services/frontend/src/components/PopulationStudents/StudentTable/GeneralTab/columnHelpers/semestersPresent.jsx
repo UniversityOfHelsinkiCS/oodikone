@@ -2,6 +2,8 @@ import React from 'react'
 import moment from 'moment'
 import { Popup } from 'semantic-ui-react'
 
+import { getCurrentSemester } from 'common'
+
 export const getSemestersPresentFunctions = ({
   allSemesters,
   allSemestersMap,
@@ -19,12 +21,7 @@ export const getSemestersPresentFunctions = ({
       getSemesterEnrollmentsVal: () => {},
     }
 
-  const currentSemesterCode = (() => {
-    const now = new Date()
-    const isSpring = now.getMonth() <= 7
-    return allSemesters.find(sem => sem.name.en === `${isSpring ? 'Spring' : 'Autumn'} ${new Date().getFullYear()}`)
-      ?.semestercode
-  })()
+  const { semestercode: currentSemesterCode } = getCurrentSemester(allSemestersMap) || {}
 
   const isFall = semester => semester % 2 === 1
 
