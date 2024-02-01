@@ -56,8 +56,10 @@ export const getSemestersPresentFunctions = ({
 
   const { first: firstSemester, last: lastSemester } =
     allSemesters.length > 0 ? getFirstAndLastSemester() : { first: 9999, last: 0 }
-  const enrollmentTypeText = type => {
+
+  const enrollmentTypeText = (type, statutoryAbsence) => {
     if (type === 1) return 'Enrolled as present'
+    if (type === 2 && statutoryAbsence) return 'Enrolled as absent (statutory)'
     if (type === 2) return 'Enrolled as absent'
     if (type === 3) return 'Not enrolled'
     return 'No study right'
@@ -87,15 +89,18 @@ export const getSemestersPresentFunctions = ({
     if (!student.semesterenrollments) return ''
     const semesterIcons = []
 
-    const getSemesterJSX = (sem, enrollmenttype, graduated, key) => {
+    const getSemesterJSX = (sem, enrollmenttype, statutoryAbsence, graduated, key) => {
       let type = 'none'
       if (enrollmenttype === 1) type = 'present'
       if (enrollmenttype === 2) type = 'absent'
+      if (enrollmenttype === 2 && statutoryAbsence) type = 'absent-statutory'
       if (enrollmenttype === 3) type = 'passive'
 
       const onHoverString = () => {
         const graduationText = graduated !== 0 ? `(graduated as ${graduated === 1 ? 'Bachelor' : 'Master'})` : ''
-        return `${enrollmentTypeText(enrollmenttype)} in ${getTextIn(allSemestersMap[sem].name)} ${graduationText}`
+        return `${enrollmentTypeText(enrollmenttype, statutoryAbsence)} in ${getTextIn(
+          allSemestersMap[sem].name
+        )} ${graduationText}`
       }
 
       const graduationCrown = (
@@ -137,13 +142,14 @@ export const getSemestersPresentFunctions = ({
     }
 
     for (let sem = firstSemester; sem <= lastSemester; sem++) {
-      const enrollment = student.semesterEnrollmentsMap
+      const { enrollmenttype, statutoryAbsence } = student.semesterEnrollmentsMap
         ? student.semesterEnrollmentsMap[sem]
-        : studyright[0].semesterEnrollments?.find(e => e.semestercode === sem)?.enrollmenttype
+        : studyright[0].semesterEnrollments?.find(e => e.semestercode === sem) || {}
       semesterIcons.push(
         getSemesterJSX(
           sem,
-          enrollment,
+          enrollmenttype,
+          statutoryAbsence,
           graduatedOnSemester(student, sem, programmeCode),
           `${student.studentNumber}-${sem}`
         )

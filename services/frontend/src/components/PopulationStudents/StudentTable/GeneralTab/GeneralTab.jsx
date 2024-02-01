@@ -70,8 +70,11 @@ export const GeneralTab = ({
 
     semesterEnrollments = semesterEnrollments ?? student.semesterenrollments
 
-    return semesterEnrollments.reduce((enrollments, enrollment) => {
-      enrollments[enrollment.semestercode] = enrollment.enrollmenttype
+    return semesterEnrollments.reduce((enrollments, { enrollmenttype, semestercode, statutoryAbsence }) => {
+      enrollments[semestercode] = {
+        enrollmenttype,
+        statutoryAbsence: statutoryAbsence ?? false,
+      }
       return enrollments
     }, {})
   }
