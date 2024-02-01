@@ -64,10 +64,12 @@ export const EnrollmentAccordion = ({ student }) => {
     studyrightsGroupedByStudyright
   )
 
+  const firstDisplayedYear = `${Math.max(new Date().getFullYear() - 10, firstYear)}`
+
   const { getSemesterEnrollmentsContent } = getSemestersPresentFunctions({
     allSemesters: Object.values(semestersAndYears.semesters),
     allSemestersMap: semestersAndYears.semesters,
-    year: `${Math.max(new Date().getFullYear() - 7, firstYear)}`,
+    year: firstDisplayedYear,
     filteredStudents: [student],
     getTextIn,
   })
@@ -89,11 +91,11 @@ export const EnrollmentAccordion = ({ student }) => {
             <Table.Row>
               <Table.HeaderCell>Programme(s)</Table.HeaderCell>
               <Table.HeaderCell>
-                Semesters
+                Semesters (starting from autumn {firstDisplayedYear})
                 <Popup
                   position="top center"
                   trigger={<Icon name="question circle outline" style={{ opacity: 0.5, marginLeft: '0.25em' }} />}
-                  content="Displays enrollment data for the current and up to six previous academic years."
+                  content="Displays enrollment data for the current and up to nine previous academic years."
                 />
               </Table.HeaderCell>
             </Table.Row>
