@@ -13,7 +13,7 @@ const calculateSemesterEnrollmentsByStudyright = (semestersAndYears, studyrights
 
   const enrollmentsByStudyright = Object.values(studyrights).reduce((enrollments, studyright) => {
     // Let's choose the first studyright as they are all linked to the same actual (Sisu) studyright
-    studyright[0].semesterEnrollments?.forEach(enrollment => {
+    studyright[0].semesterEnrollments.forEach(enrollment => {
       const year = years[semesters[enrollment.semestercode].yearcode]
       const enrollmentYear = new Date(year.startdate).getFullYear()
 
@@ -55,7 +55,7 @@ export const EnrollmentAccordion = ({ student }) => {
   const { studyrights } = student
 
   const studyrightsGroupedByStudyright = _.groupBy(
-    studyrights?.filter(sr => sr.studyright_elements.length > 0),
+    studyrights?.filter(sr => sr.semesterEnrollments !== null && sr.studyright_elements.length > 0),
     'actual_studyrightid'
   )
 
