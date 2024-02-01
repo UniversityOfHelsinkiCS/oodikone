@@ -1,28 +1,22 @@
 import React from 'react'
 import { Tab } from 'semantic-ui-react'
 
-import { ColorizedCoursesTable } from 'components/ColorizedCoursesTable'
 import { useGetColorizedTableCourseStatsQuery } from 'redux/studyProgramme'
+import { ColorizedCoursesTable } from 'components/ColorizedCoursesTable'
 import { OverallStatsTable } from './OverallStatsTable'
-import { Toggle } from '../Toggle'
 
-export const CourseTabs = ({ data, studyProgramme, showStudents, handleShowStudentsChange }) => {
+export const ProgrammeCourses = ({ studyProgramme, combinedProgramme, academicYear, setAcademicYear }) => {
   const paneTypes = [
     {
       label: 'By credit type',
       icon: 'list',
       component: () => (
-        <>
-          <Toggle
-            cypress="creditsStudentsToggle"
-            toolTips={null}
-            firstLabel="Show credits"
-            secondLabel="Show students"
-            value={showStudents}
-            setValue={handleShowStudentsChange}
-          />
-          <OverallStatsTable data={data} showStudents={showStudents} />
-        </>
+        <OverallStatsTable
+          studyProgramme={studyProgramme}
+          combinedProgramme={combinedProgramme}
+          academicYear={academicYear}
+          setAcademicYear={setAcademicYear}
+        />
       ),
     },
     {
@@ -47,5 +41,9 @@ export const CourseTabs = ({ data, studyProgramme, showStudents, handleShowStude
     ),
   }))
 
-  return <Tab id="CourseStatPanes" panes={panes} data-cy="CourseTabs" />
+  return (
+    <div className="studyprogramme-courses">
+      <Tab id="CourseStatPanes" panes={panes} data-cy="CourseTabs" />
+    </div>
+  )
 }

@@ -13,7 +13,7 @@ import { DegreeCoursesTable } from './DegreeCourses'
 import { ConnectedStudyProgrammeSelector as StudyProgrammeSelector } from './StudyProgrammeSelector'
 import { BasicOverview } from './BasicOverview'
 import { StudytrackOverview } from './StudytrackOverview'
-import { ProgrammeCoursesOverview } from './programmeCoursesOverview'
+import { ProgrammeCourses } from './ProgrammeCourses'
 import { UpdateView } from './UpdateView'
 import '../PopulationQueryCard/populationQueryCard.css'
 import { ConnectedTags as Tags } from './Tags'
@@ -96,7 +96,7 @@ export const StudyProgramme = () => {
       panes.push({
         menuItem: <Menu.Item key="Programme courses">Programme courses</Menu.Item>,
         render: () => (
-          <ProgrammeCoursesOverview
+          <ProgrammeCourses
             academicYear={academicYear}
             studyProgramme={programmeId}
             setAcademicYear={setAcademicYear}
