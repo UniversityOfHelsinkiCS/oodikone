@@ -251,4 +251,5 @@ module.exports = {
   getLanguageCenterData,
   LANGUAGE_CENTER_REDIS_KEY,
   computeLanguageCenterData,
+  createArrayOfCourses,
 }

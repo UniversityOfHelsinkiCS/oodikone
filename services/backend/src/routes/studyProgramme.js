@@ -2,7 +2,10 @@ const router = require('express').Router()
 const { getBasicStatsForStudytrack } = require('../services/studyprogramme/studyprogrammeBasics')
 const { getCreditStatsForStudytrack } = require('../services/studyprogramme/studyprogrammeCredits')
 const { getGraduationStatsForStudytrack } = require('../services/studyprogramme/studyprogrammeGraduations')
-const { getStudyprogrammeCoursesForStudytrack } = require('../services/studyprogramme/studyprogrammeCourses')
+const {
+  getStudyprogrammeCoursesForStudytrack,
+  getStudyprogrammeStatsForColorizedCoursesTable,
+} = require('../services/studyprogramme/studyprogrammeCourses')
 const { getStudytrackStatsForStudyprogramme } = require('../services/studyprogramme/studytrackStats')
 const {
   getBasicStats,
@@ -137,6 +140,17 @@ router.get('/v2/studyprogrammes/:id/studytrackstats', async (req, res) => {
   })
   if (updated) await setStudytrackStats(updated, graduated, specialGroups)
   return res.json(updated)
+})
+
+router.get('/v2/studyprogrammes/:id/colorizedtablecoursestats', async (req, res) => {
+  const code = req.params.id
+
+  try {
+    const data = await getStudyprogrammeStatsForColorizedCoursesTable(code)
+    return res.json(data)
+  } catch (e) {
+    logger.error({ message: `Failed to get code ${code} colorized table course stats`, meta: `${e}` })
+  }
 })
 
 router.get('/v2/studyprogrammes/:id/update_basicview', async (req, res) => {

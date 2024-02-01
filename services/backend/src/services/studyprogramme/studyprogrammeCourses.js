@@ -1,4 +1,5 @@
 const _ = require('lodash')
+const { Op } = require('sequelize')
 
 const { getCurrentStudyYearStartDate, getNotCompletedForProgrammeCourses, getAllProgrammeCourses } = require('.')
 const { mapToProviders } = require('../../util/utils')
@@ -9,6 +10,8 @@ const {
   getOtherStudentsForProgrammeCourses,
   getTransferStudentsForProgrammeCourses,
 } = require('./studentGetters')
+const { Credit, Enrollment } = require('../../models')
+const { createArrayOfCourses } = require('../languageCenterData')
 
 const getCurrentYearStartDate = () => {
   return new Date(new Date().getFullYear(), 0, 1)
@@ -68,6 +71,78 @@ const makeYearlyPromises = (years, academicYear, type, programmeCourses, studypr
         )
       })
   )
+}
+
+const getStudyprogrammeStatsForColorizedCoursesTable = async studyprogramme => {
+  const courses = await getAllProgrammeCourses(mapToProviders([studyprogramme])[0])
+  const courseCodes = courses.map(c => c.code)
+
+  const credits = await Credit.findAll({
+    attributes: ['course_code', 'student_studentnumber', 'semestercode', 'attainment_date'],
+    where: {
+      course_code: { [Op.in]: courseCodes },
+      credittypecode: 4,
+    },
+    raw: true,
+  })
+
+  const enrollments = await Enrollment.findAll({
+    attributes: ['studentnumber', 'semestercode', 'course_code', 'enrollment_date_time', 'state'],
+    where: {
+      course_code: { [Op.in]: courseCodes },
+      state: { [Op.in]: ['ENROLLED', 'REJECTED'] },
+    },
+    raw: true,
+  })
+
+  const studentList = new Set()
+  const attemptsByStudents = {}
+
+  credits.forEach(c => {
+    const sn = c.student_studentnumber
+    studentList.add(sn)
+    if (!attemptsByStudents[sn]) {
+      attemptsByStudents[sn] = []
+    }
+    attemptsByStudents[sn].push({
+      studentNumber: sn,
+      courseCode: c.course_code,
+      completed: true,
+      date: c.attainment_date,
+      semestercode: c.semestercode,
+    })
+  })
+
+  enrollments.forEach(e => {
+    const sn = e.studentnumber
+    if (!attemptsByStudents[sn]) {
+      attemptsByStudents[sn] = []
+    }
+    studentList.add(sn)
+    if (
+      attemptsByStudents[sn].find(
+        att => !att.completed && att.semestercode === e.semestercode && att.courseCode === e.course_code
+      )
+    )
+      return
+    attemptsByStudents[sn].push({
+      studentNumber: sn,
+      courseCode: e.course_code,
+      completed: false,
+      date: e.enrollment_date_time,
+      semestercode: e.semestercode,
+      enrolled: e.state === 'ENROLLED',
+    })
+  })
+
+  const attemptsArray = []
+  studentList.forEach(sn => attemptsArray.push(...attemptsByStudents[sn]))
+
+  const unorderedTableData = await createArrayOfCourses(attemptsArray, courses)
+
+  const tableData = _.orderBy(unorderedTableData, 'code')
+
+  return { tableData }
 }
 
 const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme, academicYear, combinedProgramme) => {
@@ -255,4 +330,4 @@ const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme,
   return Object.values(allCourses)
 }
 
-module.exports = { getStudyprogrammeCoursesForStudytrack }
+module.exports = { getStudyprogrammeCoursesForStudytrack, getStudyprogrammeStatsForColorizedCoursesTable }
