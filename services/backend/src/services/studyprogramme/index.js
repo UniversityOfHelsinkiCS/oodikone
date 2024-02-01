@@ -72,7 +72,7 @@ const getCourseCodesForStudyProgramme = async provider => {
 
 const getAllProgrammeCourses = async providerCode => {
   const res = await Course.findAll({
-    attributes: ['id', 'code', 'substitutions'],
+    attributes: ['id', 'code', 'name', 'substitutions'],
     include: [
       {
         model: Organization,
