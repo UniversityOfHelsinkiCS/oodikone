@@ -11,14 +11,7 @@ const {
   SCHEDULE_IMMEDIATE,
 } = require('./config')
 const { startServer } = require('./server')
-const {
-  scheduleHourly,
-  scheduleWeekly,
-  scheduleDaily,
-  schedulePrePurge,
-  schedulePurge,
-  isUpdaterActive,
-} = require('./scheduler')
+const { scheduleHourly, scheduleWeekly, schedulePrePurge, schedulePurge, isUpdaterActive } = require('./scheduler')
 
 stan.on('error', e => {
   logger.error({ message: 'NATS connection failed: ' + e, meta: e.stack })
@@ -38,7 +31,6 @@ knexConnection.on('error', e => {
 const JOB_TYPES = {
   hourly: scheduleHourly,
   weekly: scheduleWeekly,
-  daily: scheduleDaily,
   prepurge: schedulePrePurge,
   purge: schedulePurge,
 }
@@ -97,20 +89,6 @@ knexConnection.on('connect', async () => {
     }
 
     await redisSet(REDIS_LAST_HOURLY_SCHEDULE, new Date())
-  })
-
-  // Every day at 3 AM
-  scheduleCron('0 3 * * *', async () => {
-    if (isDev) return
-    logger.info('Starting daily')
-    try {
-      await scheduleDaily()
-    } catch (e) {
-      logger.error({
-        message: 'Daily run failed: ' + e.message,
-        mete: e.stack,
-      })
-    }
   })
 
   // Saturday at 4 AM
