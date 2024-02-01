@@ -25,3 +25,11 @@ input[type='radio'] {
   flex-direction: column;
   max-width: 12em;
 }
+
+table tr th,
+td > div > i {
+  max-width: 340px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

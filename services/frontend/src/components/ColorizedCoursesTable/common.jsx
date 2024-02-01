@@ -6,8 +6,6 @@ export const useColorizedCoursesTableContext = () => useContext(ColorizedCourses
 
 export const emptyFields = { completions: 0, enrollments: 0, difference: 0, rejected: 0 }
 
-const shortenCourseName = (text, maxLength) => (text.length > maxLength ? `${text.substring(0, maxLength)} ... ` : text)
-
 export const courseNameColumn = getTextIn => ({
   key: 'course-name',
   title: 'Course',
@@ -15,7 +13,7 @@ export const courseNameColumn = getTextIn => ({
   getRowContent: row => (
     <div title={getTextIn(row.name)} style={{ display: 'flex', flexDirection: 'column' }}>
       <b>{row.code}</b>
-      <i style={{ color: 'gray', fontWeight: 'normal' }}>{row.name && shortenCourseName(getTextIn(row.name), 46)}</i>
+      <i style={{ color: 'gray', fontWeight: 'normal' }}>{row.name && getTextIn(row.name)}</i>
     </div>
   ),
 })
