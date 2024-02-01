@@ -283,8 +283,16 @@ const formatUser = async (userFromDb, extraRights, getStudentAccess = true) => {
 }
 
 const getMockedUser = async ({ userToMock, mockedBy }) => {
-  if (userDataCache.has(userToMock)) {
-    return userDataCache.get(userToMock)
+  // Using different keys for users being mocked to prevent users from seeing
+  // themselves as mocked. Also, if the user is already logged in, we don't want
+  // the regular data from the cache because that doesn't have the mockedBy field
+  if (userDataCache.has(`mocking-as-${userToMock}`)) {
+    const userFromCache = userDataCache.get(`mocking-as-${userToMock}`)
+    if (userFromCache.mockedBy !== mockedBy) {
+      userFromCache.mockedBy = mockedBy
+      userDataCache.set(`mocking-as-${userToMock}`, userFromCache)
+    }
+    return userFromCache
   }
 
   const userFromDb = await byUsername(userToMock)
@@ -303,7 +311,7 @@ const getMockedUser = async ({ userToMock, mockedBy }) => {
     mockedBy,
     iamGroups: userFromDb.iamGroups,
   }
-  userDataCache.set(userToMock, toReturn)
+  userDataCache.set(`mocking-as-${userToMock}`, toReturn)
 
   return toReturn
 }
