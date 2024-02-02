@@ -58,7 +58,7 @@ describe('When language center is opened', { retries: 2 }, () => {
       cy.init('/languagecenterview', 'norights')
       cy.contains('Access denied')
       cy.contains("You're currently not allowed to see this page.")
-      cy.contains('Custom populations').click()
+      cy.contains('Special populations').click()
       cy.contains('Language center view').should('not.exist')
     })
   })
