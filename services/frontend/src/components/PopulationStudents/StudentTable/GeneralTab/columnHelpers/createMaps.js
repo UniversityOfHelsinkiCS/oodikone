@@ -16,9 +16,10 @@ export const createMaps = ({ selectedStudents, students, programmeCode, combined
   }, {})
 
   const studentToProgrammeStartMap = selectedStudents.reduce((res, sn) => {
-    const targetStudyright = findStudyrightElementForClass(students[sn].studyrights, programmeCode, year)
+    const programmeStart = findStudyrightElementForClass(students[sn].studyrights, programmeCode, year)?.startdate
     // clean up odd bachelor start dates, (givendate)
-    res[sn] = new Date(Math.max(new Date(targetStudyright.startdate), new Date(studentToStudyrightStartMap[sn])))
+    const studyrightStart = new Date(studentToStudyrightStartMap[sn])
+    res[sn] = programmeStart ? new Date(Math.max(programmeStart, studyrightStart)) : studyrightStart
     return res
   }, {})
 
