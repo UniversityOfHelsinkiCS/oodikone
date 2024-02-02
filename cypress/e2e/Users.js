@@ -29,7 +29,7 @@ describe('Users tests', () => {
     })
 
     it('should see more stuff than others', () => {
-      cy.get('[data-cy="navBar"]').contains('Study programme').should('exist')
+      cy.get('[data-cy="navBar"]').contains('Programmes').should('exist')
       cy.get('[data-cy="navBar"]').contains('Students').should('exist')
       cy.get('[data-cy="navBar"]').contains('Courses').should('exist')
       // TODO: admin should probably see this as well, since can access this page: cy.get('[data-cy="navBar"]').contains('Teachers').should('exist')
@@ -42,9 +42,9 @@ describe('Users tests', () => {
       cy.cs('user-edit-button-basic').click()
       cy.get('i.spy').click()
       cy.contains('mocking as basic')
-      cy.contains('Study programme').click().siblings().contains('Search by class').click()
-      cy.contains('label', 'Study programme')
-      cy.contains('label', 'Study programme')
+      cy.contains('Programmes').click().siblings().contains('Year class').click()
+      cy.contains('label', 'Programmes')
+      cy.contains('label', 'Programmes')
         .siblings()
         .within(() => {
           cy.get("div[role='option']").should('have.length', 2).contains('Tietojenkäsittelytieteen kandiohjelma')
