@@ -19,7 +19,7 @@ export const createMaps = ({ selectedStudents, students, programmeCode, combined
     const programmeStart = findStudyrightElementForClass(students[sn].studyrights, programmeCode, year)?.startdate
     // clean up odd bachelor start dates, (givendate)
     const studyrightStart = new Date(studentToStudyrightStartMap[sn])
-    res[sn] = programmeStart ? new Date(Math.max(programmeStart, studyrightStart)) : studyrightStart
+    res[sn] = programmeStart ? new Date(Math.max(new Date(programmeStart), studyrightStart)) : studyrightStart
     return res
   }, {})
 
