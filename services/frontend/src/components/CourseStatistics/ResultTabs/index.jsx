@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
-import { Tab, Segment, Menu, Icon } from 'semantic-ui-react'
-import { useHistory, useLocation } from 'react-router-dom'
 import qs from 'query-string'
+import React, { useState } from 'react'
+import { useHistory, useLocation } from 'react-router-dom'
+import { Icon, Menu, Segment, Tab } from 'semantic-ui-react'
 import { useDispatch, useSelector } from 'react-redux'
 import { getCourseStats } from 'redux/coursestats'
 import { useProgress, useTabs } from '../../../common/hooks'
@@ -9,7 +9,6 @@ import { AttemptsTableContent, AttemptsTableSettings } from './Panes/attempts'
 import { Distribution, DistributionSettings } from './Panes/distribution'
 import { PassRate, PassRateSettings } from './Panes/passRate'
 import { StudentsTableContent, StudentsTableSettings } from './Panes/students'
-
 import './resultTabs.css'
 
 const PaneContent = ({

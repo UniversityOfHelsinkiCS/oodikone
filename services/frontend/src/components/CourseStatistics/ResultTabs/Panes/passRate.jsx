@@ -1,10 +1,9 @@
 import React from 'react'
-import { Menu, Radio } from 'semantic-ui-react'
 import ReactHighcharts from 'react-highcharts'
-
+import { Menu, Radio } from 'semantic-ui-react'
 import { passRateAttemptGraphOptions, passRateStudGraphOptions } from '../../../../constants'
 import { HelpButton } from '../HelpButton'
-import { viewModeNames, getDataObject, getMaxValueOfSeries, absoluteToRelative } from './util'
+import { absoluteToRelative, getDataObject, getMaxValueOfSeries, viewModeNames } from './util'
 
 const getPassRateAttemptSeriesFromStats = stats => {
   const all = []
