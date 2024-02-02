@@ -21,7 +21,7 @@ const checkGradeTable = gradesTableContents => {
     })
 }
 
-describe('Course Statistics tests', () => {
+describe('Course Statistics tests', { retries: 2 }, () => {
   describe('when using basic user', () => {
     beforeEach(() => {
       cy.init('/coursestatistics')

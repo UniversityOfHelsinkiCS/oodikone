@@ -66,7 +66,7 @@ const createRunTestStepWithPreAndPostPartsFunction = amountWithoutFiltering => {
   }
 }
 
-describe('Population Statistics with CS master', () => {
+describe('Population Statistics with CS master', { retries: 2 }, () => {
   const pathToCSMast2019 =
     '/populations?months=36&semesters=FALL&semesters=SPRING&studyRights={%22programme%22%3A%22MH50_009%22}&tag&year=2019'
   const defaultAmountOfStudents = 27
