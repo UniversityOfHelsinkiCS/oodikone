@@ -107,7 +107,7 @@ export const GeneralTab = ({
     studentToStudyrightEndMap,
     studentToProgrammeStartMap,
     studentToSecondStudyrightEndMap,
-  } = createMaps({ students, selectedStudents, programmeCode, combinedProgrammeCode })
+  } = createMaps({ students, selectedStudents, programmeCode, combinedProgrammeCode, year })
 
   const transferFrom = s => getTextIn(populationStatistics.elementdetails.data[s.transferSource].name)
 
