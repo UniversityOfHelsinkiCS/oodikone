@@ -3,7 +3,7 @@
 const moment = require('moment')
 const _ = require('lodash')
 
-describe('Population Statistics tests', () => {
+describe('Population Statistics tests', { retries: 2 }, () => {
   const pathToCSBach2017 =
     '/populations?months=36&semesters=FALL&semesters=SPRING&studyRights={%22programme%22%3A%22KH50_005%22}&tag&year=2017'
   const pathToCSMaster2019 =

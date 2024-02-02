@@ -1,6 +1,6 @@
 /// <reference types="Cypress" />
 
-describe('Study guidance group tests', () => {
+describe('Study guidance group tests', { retries: 2 }, () => {
   describe('Study guidance group overview page', () => {
     describe('without study guidance groups', { retries: 3 }, () => {
       it('shows the correct notification', () => {

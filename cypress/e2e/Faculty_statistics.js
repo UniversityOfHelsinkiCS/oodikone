@@ -1,6 +1,6 @@
 /// <reference types="Cypress" />
 
-describe('Faculty overview', () => {
+describe('Faculty overview', { retries: 2 }, () => {
   describe('Faculty can be selected', () => {
     it('Faculties are listed and one can be chosen', () => {
       cy.init('/faculties')

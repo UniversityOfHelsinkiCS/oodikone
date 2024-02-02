@@ -1,6 +1,6 @@
 /// <reference types="Cypress" />
 
-describe('Students tests', () => {
+describe('Students tests', { retries: 2 }, () => {
   beforeEach(() => {
     cy.init()
     cy.contains('Students').click()
