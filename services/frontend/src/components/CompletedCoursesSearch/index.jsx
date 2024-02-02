@@ -11,7 +11,7 @@ export const CompletedCourses = () => {
   return (
     <div className="segmentContainer">
       <Message style={{ maxWidth: '800px', fontSize: '16px' }}>
-        <Message.Header>Search completed courses</Message.Header>
+        <Message.Header>Check completed courses</Message.Header>
         <p>
           Here you can search by a list of student and course numbers to see whether students have completed certain
           courses yet. The tool will also show if students have enrolled on the course, if they have not yet completed

@@ -12,9 +12,9 @@ const allNavigationItems = {
   faculty: { path: '/faculties', key: 'faculties', label: 'Faculties' },
   populations: {
     key: 'studyProgramme',
-    label: 'Study programme',
+    label: 'Programmes',
     items: [
-      { path: '/populations', key: 'class', label: 'Search by class' },
+      { path: '/populations', key: 'class', label: 'Year class' },
       { path: '/study-programme', key: 'overview', label: 'Overview' },
     ],
   },
@@ -30,11 +30,11 @@ const allNavigationItems = {
   },
   customPopulations: {
     key: 'customPopulation',
-    label: 'Custom populations',
+    label: 'Special populations',
     items: [
-      { path: '/custompopulation', key: 'customSearch', label: 'Search by Studentnumbers' },
+      { path: '/custompopulation', key: 'customSearch', label: 'Custom population' },
       { path: '/openunipopulation', key: 'openUniSearch', label: 'Fetch Open Uni Students by Courses' },
-      { path: '/completedcoursessearch', key: 'completedCoursesSearch', label: 'Search completed courses of students' },
+      { path: '/completedcoursessearch', key: 'completedCoursesSearch', label: 'Completed courses of students' },
       { path: '/languagecenterview', key: 'languageCenterView', label: 'Language center view' },
     ],
   },
