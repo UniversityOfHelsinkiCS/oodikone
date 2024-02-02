@@ -1,6 +1,6 @@
-import moment from 'moment'
 import React from 'react'
 import { Form, Radio } from 'semantic-ui-react'
+import { findStudyrightElementForClass } from 'common'
 import { createFilter } from './createFilter'
 
 const STUDYRIGHT_TYPES = {
@@ -38,15 +38,6 @@ const StudyrightTypeFilterCard = ({ options, onOptionsChange }) => {
   )
 }
 
-const findStudyrightElement = (element, startdate, programme, year) => {
-  if (element.code !== programme) return false
-
-  const date = moment(new Date(`${year}-08-01`))
-  const startDate = moment(new Date(startdate))
-  const endDate = moment(new Date(element.enddate))
-  return date.isBetween(startDate, endDate, undefined, '[]')
-}
-
 export const studyrightTypeFilter = createFilter({
   key: 'studyright-type',
 
@@ -63,15 +54,13 @@ export const studyrightTypeFilter = createFilter({
       return true
     }
 
-    const isFound = student.studyrights.some(
-      studyright =>
-        studyright.is_ba_ma &&
-        studyright.studyright_elements.some(element =>
-          findStudyrightElement(element, studyright.startdate, args.programme, args.year)
-        )
+    const isFound = findStudyrightElementForClass(
+      student.studyrights.filter(sr => sr.is_ba_ma),
+      args.programme,
+      args.year
     )
 
-    return isFound === (mode === 1)
+    return !!isFound === (mode === 1)
   },
 
   component: StudyrightTypeFilterCard,

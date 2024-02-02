@@ -256,6 +256,17 @@ export const getHighestGradeOrEnrollmentOfCourseBetweenRange = (courses, enrollm
   return grade
 }
 
+/* Takes students all studyrights. Returns the sr-element that is relevant for a yearly class of programme */
+export const findStudyrightElementForClass = (studyrights, programme, year) =>
+  studyrights
+    .flatMap(sr => sr.studyright_elements)
+    .find(element => {
+      if (element.code !== programme) return false
+      const date = moment(new Date(`${year}-08-01`))
+      const endDate = moment(new Date(element.enddate))
+      return date.isBefore(endDate, undefined, '[]')
+    })
+
 const getEarliestStudyRightElement = studyright => {
   if (!studyright) return null
   return (
