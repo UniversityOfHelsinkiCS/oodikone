@@ -6,7 +6,7 @@ const { findAndSaveTeachers } = require('./services/topteachers')
 const { faculties } = require('./services/organisations')
 const { combinedStudyprogrammes } = require('./services/studyprogramme/studyprogrammeHelpers')
 const { updateFacultyOverview, updateFacultyProgressOverview } = require('./services/faculty/facultyUpdates')
-const { isProduction } = require('./conf-backend')
+const { isProduction, runningInCI } = require('./conf-backend')
 const { getCurrentSemester } = require('./services/semesters')
 const logger = require('./util/logger')
 const { getAssociations } = require('./services/studyrights')
@@ -103,7 +103,7 @@ const dailyJobs = () => {
 }
 
 const startCron = () => {
-  if (isProduction) {
+  if (isProduction && !runningInCI) {
     logger.info('Cronjob for refreshing stats started: runs daily at 23:00.')
     schedule('0 23 * * *', async () => {
       logger.info('Running daily jobs from cron')
