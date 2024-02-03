@@ -131,6 +131,27 @@ describe('Course Statistics tests', { retries: 2 }, () => {
       cy.contains('Search for courses')
     })
 
+    it('On searches with multiple courses, has correct links on the Course tab', () => {
+      cy.cs('select-multiple-courses-toggle').click()
+      cy.get("input[placeholder='Search by a course code']").type('TKT')
+      cy.contains('td', /^TKT20001/).click()
+      cy.contains('td', /^TKT10002/).click()
+      cy.contains('Fetch statistics').click()
+      cy.contains('Search for courses').should('not.exist')
+
+      cy.get('.ui.contentSegment .ui.menu').contains('Course').click()
+      cy.cs('course-selector').get('.active.selected.item').contains('TKT10002')
+      cy.get('#CourseStatPanes table a.item:first').click()
+      cy.contains('Population of course Ohjelmoinnin perusteet')
+
+      cy.go('back')
+      cy.get('.ui.contentSegment .ui.menu').contains('Course').click()
+      cy.cs('course-selector').click()
+      cy.cs('course-selector').contains('TKT20001').click()
+      cy.get('#CourseStatPanes table a.item:first').click()
+      cy.contains('Population of course Tietorakenteet ja algoritmit')
+    })
+
     it('On consecutive searches should not crash and search should work', () => {
       cy.contains('Search for courses')
       cy.get("input[placeholder='Search by a course code']").type('TKT20003')
