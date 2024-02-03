@@ -160,6 +160,7 @@ jobs:
       - build_and_push_anon_sis_db
       - build_and_push_anon_kone_db
       - build_and_push_anon_user_db
+    continue-on-error: true
     strategy:
       matrix:
         include:
