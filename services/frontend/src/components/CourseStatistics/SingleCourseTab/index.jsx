@@ -1,21 +1,30 @@
 import React from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Segment, Label, Header, Divider, Form } from 'semantic-ui-react'
 import { oneOfType, number, string, bool } from 'prop-types'
 
 import { getCourseStats, getAvailableStats, getCourses } from 'selectors/courseStats'
 import { useLanguage } from 'components/LanguagePicker/useLanguage'
+import { setSelectedCourse } from 'redux/singleCourseStats'
 import { ConnectedSingleCourseStats as SingleCourseStats } from '../SingleCourseStats'
 
-const CourseSelector = ({ courses, selected, setSelected }) => (
-  <>
-    <Header as="h4">Select course</Header>
-    <Form>
-      <Form.Select fluid options={courses} onChange={(e, { value }) => setSelected(value)} value={selected} />
-    </Form>
-    <Divider />
-  </>
-)
+const CourseSelector = ({ courses, selected, setSelected }) => {
+  const dispatch = useDispatch()
+  const onCourseChange = (_, { value }) => {
+    setSelected(value)
+    dispatch(setSelectedCourse(value))
+  }
+
+  return (
+    <>
+      <Header as="h4">Select course</Header>
+      <Form>
+        <Form.Select data-cy="course-selector" fluid options={courses} onChange={onCourseChange} value={selected} />
+      </Form>
+      <Divider />
+    </>
+  )
+}
 
 export const SingleCourseTab = ({ selected, setSelected, userHasAccessToAllStats }) => {
   const { getTextIn } = useLanguage()
