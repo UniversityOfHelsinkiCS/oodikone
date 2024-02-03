@@ -12,7 +12,6 @@ import { useGetAuthorizedUserQuery } from 'redux/auth'
 import { getPopulationStatistics, clearPopulations } from 'redux/populations'
 import { clearSelected } from 'redux/populationSelectedStudentCourses'
 import { getProgrammes } from 'redux/populationProgrammes'
-import { populationStatisticsToolTips } from 'common/InfoToolTips'
 import { useLanguage } from 'components/LanguagePicker/useLanguage'
 import { momentFromFormat, reformatDate, textAndDescriptionSearch, cancelablePromise } from 'common'
 import { useSearchHistory } from 'common/hooks'
@@ -391,18 +390,6 @@ const PopulationSearchForm = ({
     </Form.Field>
   )
 
-  const renderAdditionalStudyTrackOrTagDropdown = studyRights => {
-    if (studyRights.programme) {
-      return (
-        <Message size="tiny" style={{ maxWidth: '25em' }}>
-          {populationStatisticsToolTips.TagAndTrackMovedIntoFilters}
-        </Message>
-      )
-    }
-
-    return null
-  }
-
   const renderStudyGroupSelector = () => {
     const { studyRights } = query
     if (pending || !didMount) {
@@ -429,12 +416,7 @@ const PopulationSearchForm = ({
       programmesToRender = renderableList(sortedStudyProgrammes)
     }
 
-    return (
-      <div>
-        {renderStudyProgrammeDropdown(studyRights, programmesToRender)}
-        {renderAdditionalStudyTrackOrTagDropdown(studyRights)}
-      </div>
-    )
+    return <div>{renderStudyProgrammeDropdown(studyRights, programmesToRender)}</div>
   }
 
   const shouldRenderSearchForm = () => {
