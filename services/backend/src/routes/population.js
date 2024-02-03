@@ -5,7 +5,6 @@ const _ = require('lodash')
 const populationService = require('../services/populations')
 const studentService = require('../services/students')
 const StudyrightService = require('../services/studyrights')
-const TagService = require('../services/tags')
 const CourseService = require('../services/courses')
 const StatMergeService = require('../services/statMerger')
 const { mapToProviders } = require('../util/utils')
@@ -245,46 +244,6 @@ router.get('/v3/populationstatistics', async (req, res) => {
 
     res.json(filterPersonalTags(result, user.id))
   }
-})
-
-router.get('/v3/populationstatisticsbytag', async (req, res) => {
-  const {
-    user: { id, isAdmin, studentsUserCanAccess },
-    query: { tag, studyRights: studyRightsJSON, months, year },
-  } = req
-
-  if (!tag) return res.status(400).json({ error: 'The query should have a tag defined' })
-  const foundTag = await TagService.findTagById(tag)
-  if (!foundTag) return res.status(404).json({ error: 'Tag not found' })
-
-  const semesters = ['FALL', 'SPRING']
-
-  const studentnumbers = await studentService.findByTag(tag)
-
-  const studentnumberlist = isAdmin ? studentnumbers : _.intersection(studentnumbers, studentsUserCanAccess)
-
-  const studyRights = JSON.parse(studyRightsJSON)
-  const newStartYear = await populationService.getEarliestYear(studentnumberlist, studyRights)
-  const yearDifference = Number(year) - Number(newStartYear)
-  const newMonths = Number(months) + 12 * yearDifference
-  const result = await populationService.optimizedStatisticsOf(
-    {
-      year: newStartYear,
-      studyRights,
-      semesters,
-      months: newMonths,
-      tag: foundTag,
-    },
-    studentnumberlist
-  )
-
-  if (result.error) {
-    Sentry.captureException(new Error(result.error))
-    res.status(400).end()
-    return
-  }
-
-  res.json(filterPersonalTags(result, id))
 })
 
 router.get('/v3/populationstatisticsbycourse', async (req, res) => {

@@ -32,7 +32,6 @@ const initialQuery = () => ({
   studentStatuses: [],
   studyRights: {},
   months: months('2017', 'FALL'),
-  tag: null,
 })
 
 const PopulationSearchForm = ({
@@ -102,13 +101,12 @@ const PopulationSearchForm = ({
     const sameStudentStatuses = previousQuery.studentStatuses
       ? isEqual(studentStatusesArray, previousQuery.studentStatuses)
       : !(query.studentStatuses.length > 0)
-    const sameTag = previousQuery.tag ? previousQuery.tag === query.tag : !query.tag
     const sameYears = previousQuery.years ? isEqual(previousQuery.years, query.years) : !query.years
     const sameStudyrights = previousQuery.studyRights
       ? isEqual(previousQuery.studyRights, query.studyRights)
       : !query.studyRights
 
-    return sameStudyrights && sameMonths && sameYear && sameSemesters && sameStudentStatuses && sameTag && sameYears
+    return sameStudyrights && sameMonths && sameYear && sameSemesters && sameStudentStatuses && sameYears
   }
 
   const formatQueryParamsToArrays = (query, params) => {
@@ -160,7 +158,6 @@ const PopulationSearchForm = ({
           ...query,
           studentStatuses: [],
           semesters: ['FALL', 'SPRING'],
-          tag: null,
         },
       })
     }

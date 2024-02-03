@@ -15,12 +15,11 @@ export const getPopulationStatistics = ({
   studyRights,
   months,
   uuid,
-  tag,
   year,
   years,
   onProgress,
 }) => {
-  const route = !tag ? '/v3/populationstatistics/' : '/v3/populationstatisticsbytag'
+  const route = '/v3/populationstatistics/'
   const prefix = 'GET_POPULATION_STATISTICS_'
   const query = {
     semesters,
@@ -28,7 +27,6 @@ export const getPopulationStatistics = ({
     studyRights,
     uuid,
     months,
-    tag,
     year,
     years,
   }
@@ -37,7 +35,6 @@ export const getPopulationStatistics = ({
     studentStatuses,
     months,
     studyRights,
-    tag,
     year,
     years,
   }
