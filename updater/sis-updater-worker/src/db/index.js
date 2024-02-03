@@ -9,12 +9,6 @@ const selectFromByIdsOrderBy = async (table, ids, col = 'id', by, order = 'asc')
 
 const selectAllFrom = async table => dbConnections.knex(table)
 
-const selectWithoutNull = notNullCol => {
-  return async query => query.whereNotNull(notNullCol)
-}
-
-const selectColumnsFrom = (table, cols) => dbConnections.knex(table).select(cols)
-
 const selectAllFromSnapshots = async table =>
   (
     await dbConnections.knex
@@ -79,8 +73,6 @@ module.exports = {
   bulkCreate,
   selectAllFrom,
   selectAllFromSnapshots,
-  selectColumnsFrom,
-  selectWithoutNull,
   getCourseUnitsByCodes,
   selectFromActiveSnapshotsByIds,
 }
