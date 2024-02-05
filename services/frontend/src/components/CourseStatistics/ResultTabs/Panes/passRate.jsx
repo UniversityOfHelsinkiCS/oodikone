@@ -3,7 +3,7 @@ import ReactHighcharts from 'react-highcharts'
 import { Menu, Radio } from 'semantic-ui-react'
 import { passRateAttemptGraphOptions, passRateStudGraphOptions } from '../../../../constants'
 import { HelpButton } from '../HelpButton'
-import { absoluteToRelative, getDataObject, getMaxValueOfSeries, viewModeNames } from './util'
+import { absoluteToRelative, getDataObject, getMaxValueOfSeries } from './util'
 
 const getPassRateAttemptSeriesFromStats = stats => {
   const all = []
@@ -65,19 +65,6 @@ export const PassRateSettings = ({ value, onChange }) => {
 
   return (
     <Menu secondary style={{ marginBottom: 0 }}>
-      {Object.entries(viewModeNames).map(([key, name]) => (
-        <Menu.Item
-          key={key}
-          active={viewMode === key}
-          name={name}
-          onClick={() =>
-            onChange({
-              ...value,
-              viewMode: key,
-            })
-          }
-        />
-      ))}
       <Menu.Item>
         <Radio
           toggle
@@ -93,7 +80,7 @@ export const PassRateSettings = ({ value, onChange }) => {
   )
 }
 
-export const PassRate = ({ data, settings: { viewMode, isRelative }, userHasAccessToAllStats }) => {
+export const PassRateContent = ({ data, settings: { viewMode, isRelative }, userHasAccessToAllStats }) => {
   const isAttemptsMode = viewMode === 'ATTEMPTS'
 
   const stats = data.stats.filter(stat => stat.name !== 'Total')
