@@ -18,7 +18,7 @@ const deleteAllSearches = () => {
     })
 }
 
-describe('Open uni population tests', { retries: 2 }, () => {
+describe('Open uni population tests', () => {
   describe('Open uni form can be used', () => {
     // When openUniUser is created, change it here
     beforeEach(() => {

@@ -3,7 +3,7 @@
 const moment = require('moment')
 const _ = require('lodash')
 
-describe('Population Statistics tests', { retries: 2 }, () => {
+describe('Population Statistics tests', () => {
   const pathToCSBach2017 =
     '/populations?months=36&semesters=FALL&semesters=SPRING&studyRights={%22programme%22%3A%22KH50_005%22}&tag&year=2017'
   const pathToCSMaster2019 =
@@ -112,7 +112,7 @@ describe('Population Statistics tests', { retries: 2 }, () => {
     // This test sometimes fails on headless mode. It seems that the click on the
     // 'Fetch class with new settings' button doesn't always trigger history.push()
     // so the page doesn't reload. This is why waiting also doesn't help.
-    it('Advanced settings work', { retries: 2 }, () => {
+    it('Advanced settings work', () => {
       cy.visit(pathToCSBach2017)
       cy.get('[data-cy=advanced-toggle]').click()
       // only spring

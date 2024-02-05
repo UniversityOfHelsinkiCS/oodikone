@@ -74,7 +74,7 @@ const containsSpecificStudents = (studentnumbers = []) => {
   studentnumbers.forEach(s => cy.contains(s))
 }
 
-describe('Custom population tests', { retries: 2 }, () => {
+describe('Custom population tests', () => {
   const nonExistentStudentNumbers = ['123', 'X', '-', ' ']
   beforeEach(() => {
     cy.init('/custompopulation')

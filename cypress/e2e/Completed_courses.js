@@ -33,7 +33,7 @@ const deleteAllSearches = () => {
     })
 }
 
-describe('When search modal is opened', { retries: 2 }, () => {
+describe('When search modal is opened', () => {
   after(() => {
     cy.init('/completedcoursessearch')
     hasLanded()

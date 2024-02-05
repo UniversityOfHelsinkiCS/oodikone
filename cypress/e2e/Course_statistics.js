@@ -21,7 +21,7 @@ const checkGradeTable = gradesTableContents => {
     })
 }
 
-describe('Course Statistics tests', { retries: 2 }, () => {
+describe('Course Statistics tests', () => {
   describe('when using basic user', () => {
     beforeEach(() => {
       cy.init('/coursestatistics')
@@ -78,7 +78,7 @@ describe('Course Statistics tests', { retries: 2 }, () => {
       })
     })
 
-    it('Searching single course having substitution mappings shows course statistics', { retries: 3 }, () => {
+    it('Searching single course having substitution mappings shows course statistics', () => {
       cy.contains('Search for courses')
       cy.get("input[placeholder='Search by a course code']").type('TKT20001')
       // Click uni course, not avoin
@@ -250,7 +250,7 @@ describe('Course Statistics tests', { retries: 2 }, () => {
       cy.contains('TKT20001, 58131, AYTKT20001 Tietorakenteet ja algoritmit')
     })
 
-    it('Can find course population', { retries: 3 }, () => {
+    it('Can find course population', () => {
       cy.contains('Search for courses')
       cy.get("input[placeholder='Search by a course code']").type('TKT20003')
       cy.contains('tr', 'TKT20003').click()
@@ -265,7 +265,7 @@ describe('Course Statistics tests', { retries: 2 }, () => {
       cy.contains('010431753')
     })
 
-    it('Population of course shows grades for each student', { retries: 3 }, () => {
+    it('Population of course shows grades for each student', () => {
       cy.get("input[placeholder='Search by a course code']").type('TKT20001')
       cy.contains(/^TKT20001, 58131, AYTKT20001$/).click({ force: true })
       cy.contains('TKT20001, 58131, AYTKT20001 Tietorakenteet ja algoritmit')
@@ -473,7 +473,7 @@ describe('Course Statistics tests', { retries: 2 }, () => {
       cy.get('[data-cy=unify_radio_unify]').find('input').should('not.be.disabled')
     })
 
-    it('Has right to see all the students, because course provider is TKT', { retries: 3 }, () => {
+    it('Has right to see all the students, because course provider is TKT', () => {
       cy.visit('coursestatistics?courseCodes=%5B%22TKT10004%22%5D&cs_tab=0&separate=false')
       cy.get('tbody > :nth-child(3) > :nth-child(2) .level').click()
       cy.contains('Students (154)').click()

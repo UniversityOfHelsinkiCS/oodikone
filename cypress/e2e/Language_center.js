@@ -11,7 +11,7 @@ const hasLanded = () => {
   in anon data, and the faculties do not get resolved.
 */
 
-describe('When language center is opened', { retries: 2 }, () => {
+describe('When language center is opened', () => {
   describe('as an admin user', () => {
     beforeEach(() => {
       cy.init('/languagecenterview', 'admin')
