@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Divider, Header, Loader, Message } from 'semantic-ui-react'
+import { Divider, Header, Loader, Message, Segment } from 'semantic-ui-react'
 import { useGetAllFacultiesProgressStatsQuery, useGetAllFacultiesGraduationStatsQuery } from 'redux/facultyStats'
 import { facultyToolTips } from 'common/InfoToolTips'
 import { Link } from 'react-router-dom'
@@ -12,7 +12,17 @@ import { InfoBox } from '../Info/InfoBox'
 import '../FacultyStatistics/faculty.css'
 import { FacultyGraduations } from './FacultyGraduations'
 
-export const UniversityView = ({ faculty }) => {
+export const UniversityViewPage = () => {
+  return (
+    <div className="segmentContainer">
+      <Segment className="contentSegment">
+        <UniversityView />
+      </Segment>
+    </div>
+  )
+}
+
+export const UniversityView = ({ isEvaluationOverview }) => {
   const [graduatedGroup, setGraduatedGroup] = useState(false)
   const [medianMode, setMedianMode] = useState(false)
   const { isAdmin, roles } = useGetAuthorizedUserQuery()
@@ -38,19 +48,19 @@ export const UniversityView = ({ faculty }) => {
     return <Loader active style={{ marginTop: '10em' }} />
   }
 
-  const isError =
-    progressStats.isError ||
-    (progressStats.isSuccess && !progressStats.data) ||
-    graduationStats.isError ||
-    !graduationStats.data
-  if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
-  const allFaculties = Object.values(progressStats.data.programmeNames)
-  return (
-    <>
-      <div style={{ padding: '30px', textAlign: 'center' }}>
-        <Header>University-level view</Header>
-        <span>{faculty}</span>
-      </div>
+  const getMessage = () => {
+    if (!isEvaluationOverview) {
+      return (
+        <Message info>
+          <p>
+            In these statistics, <b>all special studyrights have been excluded</b>, eg. exchange students and non-degree
+            students. A toggle will be added later to include special studyrights. Also, programme MH90_001 (Veterinary
+            medicine bachelor + licentiate) is currently excluded.
+          </p>
+        </Message>
+      )
+    }
+    return (
       <Message info>
         <Message.Header>This view is a combined version of Oodikone's Faculty Evaluation Overview</Message.Header>
         <p>
@@ -64,8 +74,24 @@ export const UniversityView = ({ faculty }) => {
           a target time of 6 years, whereas the other degrees in that category have a target of 5 years.{' '}
         </p>
       </Message>
+    )
+  }
+
+  const isError =
+    progressStats.isError ||
+    (progressStats.isSuccess && !progressStats.data) ||
+    graduationStats.isError ||
+    !graduationStats.data
+  if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
+  const allFaculties = Object.values(progressStats.data.programmeNames)
+  return (
+    <>
+      <div style={{ padding: '30px', textAlign: 'center' }}>
+        <Header>University-level view</Header>
+      </div>
+      {getMessage()}
       <div>
-        {userHasFacultyRights && (
+        {userHasFacultyRights && isEvaluationOverview && (
           <div>
             <p>
               <b>Click here to open the corresponding view for an individual faculty</b>
@@ -114,7 +140,6 @@ export const UniversityView = ({ faculty }) => {
           />
         </div>
         <FacultyGraduations
-          faculty={faculty}
           graduationStats={graduationStats}
           groupByStartYear={false}
           showMedian={medianMode}

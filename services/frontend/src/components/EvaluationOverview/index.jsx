@@ -16,7 +16,7 @@ export const EvaluationOverview = () => {
   const levelToComponent = {
     programme: <ProgrammeView studyprogramme={id} />,
     faculty: <FacultyView faculty={id} />,
-    university: <UniversityView />,
+    university: <UniversityView isEvaluationOverview />,
   }
 
   return (
