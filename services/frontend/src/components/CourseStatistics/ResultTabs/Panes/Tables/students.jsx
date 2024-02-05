@@ -222,6 +222,7 @@ export const StudentsTable = ({
         defaultSort={['TIME', 'desc']}
         columns={columns}
         data={data}
+        maxHeight="40vh"
       />
       {!userHasAccessToAllStats && (
         <span className="totalsDisclaimer">* Years with 5 students or less are NOT included in the total</span>
