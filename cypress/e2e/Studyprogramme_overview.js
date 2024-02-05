@@ -22,7 +22,7 @@ const getEmptyYears = isAcademicYear => {
   return years
 }
 
-describe('Studyprogramme overview', { retries: 2 }, () => {
+describe('Studyprogramme overview', () => {
   /* Basic information overview -tests*/
   describe('Basic information -view works for basic user', () => {
     beforeEach(() => {

@@ -1,6 +1,6 @@
 /// <reference types="Cypress" />
 
-describe('Teachers page tests', { retries: 3 }, () => {
+describe('Teachers page tests', () => {
   beforeEach(() => {
     // login as admin = has teacher rights
     cy.init('/teachers', 'admin')
