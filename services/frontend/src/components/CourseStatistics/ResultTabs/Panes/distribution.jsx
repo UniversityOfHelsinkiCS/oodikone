@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
 import ReactHighcharts from 'react-highcharts'
-import { Menu, Radio } from 'semantic-ui-react'
+import { Icon, Menu, Segment, Radio, Tab } from 'semantic-ui-react'
 import { gradeGraphOptions } from '../../../../constants'
 import { HelpButton } from '../HelpButton'
 import {
@@ -69,7 +69,7 @@ const getGradeSeries = series => {
       }
 }
 
-export const DistributionSettings = ({ value, onChange }) => {
+const DistributionSettings = ({ value, onChange }) => {
   const { isRelative } = value
 
   return (
@@ -89,7 +89,7 @@ export const DistributionSettings = ({ value, onChange }) => {
   )
 }
 
-export const Distribution = ({ data, settings: { isRelative }, userHasAccessToAllStats }) => {
+const DistributionContent = ({ data, settings: { isRelative }, userHasAccessToAllStats }) => {
   const stats = data.stats.filter(stat => stat.name !== 'Total' || isRelative)
 
   const statYears = stats.map(year => year.name)
@@ -113,5 +113,54 @@ export const Distribution = ({ data, settings: { isRelative }, userHasAccessToAl
         <span className="totalsDisclaimer">* Years with 5 students or less are shown as 0 in the chart</span>
       )}
     </div>
+  )
+}
+
+export const DistributionPane = ({ initialSettings, datasets, availableStats, updateQuery, ...rest }) => {
+  const [settings, setSettings] = useState(initialSettings)
+  const [splitDirection, setSplitDirection] = useState('row')
+
+  const toggleSeparate = separate => {
+    setSettings({ ...settings, separate })
+    updateQuery(separate)
+  }
+
+  return (
+    <Tab.Pane>
+      <Segment basic>
+        <div style={{ display: 'flex', marginBottom: '2em' }}>
+          <DistributionSettings
+            value={settings}
+            onChange={setSettings}
+            onSeparateChange={toggleSeparate}
+            availableStats={availableStats}
+          />
+          <div style={{ flexGrow: 1 }} />
+          {datasets.filter(i => i).length > 1 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1em' }}>
+              <label>Split direction: </label>
+              <Menu style={{ margin: 0 }}>
+                <Menu.Item active={splitDirection === 'row'} onClick={() => setSplitDirection('row')}>
+                  <Icon name="arrows alternate horizontal" />
+                </Menu.Item>
+                <Menu.Item active={splitDirection === 'column'} onClick={() => setSplitDirection('column')}>
+                  <Icon name="arrows alternate vertical" />
+                </Menu.Item>
+              </Menu>
+            </div>
+          )}
+        </div>
+        <div style={{ display: 'flex', flexDirection: splitDirection, gap: '2em' }}>
+          {datasets
+            .filter(i => i)
+            .map(data => (
+              <div key={data.name} style={{ flexGrow: 1, flexBasis: 1, width: '100%' }}>
+                <h3>{data.name}</h3>
+                <DistributionContent data={data} settings={settings} {...rest} />
+              </div>
+            ))}
+        </div>
+      </Segment>
+    </Tab.Pane>
   )
 }

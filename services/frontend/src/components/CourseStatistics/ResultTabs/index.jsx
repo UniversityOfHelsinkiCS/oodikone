@@ -1,72 +1,14 @@
 import qs from 'query-string'
-import React, { useState } from 'react'
+import React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
-import { Icon, Menu, Segment, Tab } from 'semantic-ui-react'
+import { Segment, Tab } from 'semantic-ui-react'
 import { useDispatch, useSelector } from 'react-redux'
 import { getCourseStats } from 'redux/coursestats'
 import { useProgress, useTabs } from '../../../common/hooks'
-import { AttemptsTableContent, AttemptsTableSettings } from './Panes/attempts'
-import { Distribution, DistributionSettings } from './Panes/distribution'
-import { PassRate, PassRateSettings } from './Panes/passRate'
-import { StudentsTableContent, StudentsTableSettings } from './Panes/students'
+import { AttemptsPane } from './Panes/attempts'
+import { DistributionPane } from './Panes/distribution'
+import { StudentsPane } from './Panes/students'
 import './resultTabs.css'
-
-const PaneContent = ({
-  component: Component,
-  settings: SettingsComponent,
-  initialSettings,
-  datasets,
-  availableStats,
-  updateQuery,
-  ...rest
-}) => {
-  const [settings, setSettings] = useState(initialSettings)
-  const [splitDirection, setSplitDirection] = useState('row')
-
-  const toggleSeparate = separate => {
-    setSettings({ ...settings, separate })
-    updateQuery(separate)
-  }
-
-  return (
-    <Tab.Pane>
-      <Segment basic>
-        <div style={{ display: 'flex', marginBottom: '2em' }}>
-          <SettingsComponent
-            value={settings}
-            onChange={setSettings}
-            onSeparateChange={toggleSeparate}
-            availableStats={availableStats}
-          />
-          <div style={{ flexGrow: 1 }} />
-          {datasets.filter(i => i).length > 1 && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1em' }}>
-              <label>Split direction: </label>
-              <Menu style={{ margin: 0 }}>
-                <Menu.Item active={splitDirection === 'row'} onClick={() => setSplitDirection('row')}>
-                  <Icon name="arrows alternate horizontal" />
-                </Menu.Item>
-                <Menu.Item active={splitDirection === 'column'} onClick={() => setSplitDirection('column')}>
-                  <Icon name="arrows alternate vertical" />
-                </Menu.Item>
-              </Menu>
-            </div>
-          )}
-        </div>
-        <div style={{ display: 'flex', flexDirection: splitDirection, gap: '2em' }}>
-          {datasets
-            .filter(i => i)
-            .map(data => (
-              <div key={data.name} style={{ flexGrow: 1, flexBasis: 1, width: '100%' }}>
-                <h3>{data.name}</h3>
-                <Component data={data} settings={settings} {...rest} />
-              </div>
-            ))}
-        </div>
-      </Segment>
-    </Tab.Pane>
-  )
-}
 
 export const ResultTabs = ({ primary, comparison, separate, availableStats }) => {
   const history = useHistory()
@@ -99,48 +41,34 @@ export const ResultTabs = ({ primary, comparison, separate, availableStats }) =>
       label: 'Students',
       icon: 'user',
       initialSettings: { showDetails: false, separate },
-      settings: StudentsTableSettings,
-      component: StudentsTableContent,
+      component: StudentsPane,
     },
     {
       label: 'Attempts',
       icon: 'redo',
       initialSettings: { separate },
-      settings: AttemptsTableSettings,
-      component: AttemptsTableContent,
-    },
-    {
-      label: 'Pass rate chart',
-      icon: 'balance',
-      initialSettings: { viewMode: 'STUDENTS', separate },
-      settings: PassRateSettings,
-      component: PassRate,
+      component: AttemptsPane,
     },
     {
       label: 'Grade distribution chart',
       icon: 'chart bar',
       initialSettings: { isRelative: false, viewMode: 'STUDENTS' },
-      settings: DistributionSettings,
-      component: Distribution,
+      component: DistributionPane,
     },
   ]
 
-  const panes = paneTypes.map(
-    ({ icon, label, initialSettings, component: Component, settings: SettingsComponent }) => ({
-      menuItem: { icon, content: label, key: label },
-      render: () => (
-        <PaneContent
-          component={Component}
-          settings={SettingsComponent}
-          updateQuery={updateSeparate}
-          userHasAccessToAllStats={userHasAccessToAllStats}
-          initialSettings={initialSettings}
-          datasets={[primary, comparison]}
-          availableStats={availableStats}
-        />
-      ),
-    })
-  )
+  const panes = paneTypes.map(({ icon, label, initialSettings, component: Component }) => ({
+    menuItem: { icon, content: label, key: label },
+    render: () => (
+      <Component
+        updateQuery={updateSeparate}
+        userHasAccessToAllStats={userHasAccessToAllStats}
+        initialSettings={initialSettings}
+        datasets={[primary, comparison]}
+        availableStats={availableStats}
+      />
+    ),
+  }))
 
   return (
     <Segment loading={loading} basic>
