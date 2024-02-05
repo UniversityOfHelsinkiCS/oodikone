@@ -135,15 +135,13 @@ export const BachelorHonours = ({ student, absentYears, programmeCode }) => {
       {!honors && reason && <Label tag content={reason} color="red" />}
       {inspection && <Label tag content="Might need further inspection" color="blue" />}
       <div style={{ marginTop: '15px', marginBottom: '15px' }}>
-        <p>
-          Select curriculum version used for checking Bachelor's Honour's eligibility
-          <CurriculumPicker
-            year={new Date().getFullYear()}
-            programmeCodes={[programmeCode]}
-            curriculum={curriculum}
-            setCurriculum={setCurriculum}
-          />
-        </p>
+        Select curriculum version used for checking Bachelor's Honour's eligibility
+        <CurriculumPicker
+          year={new Date().getFullYear()}
+          programmeCodes={[programmeCode]}
+          curriculum={curriculum}
+          setCurriculum={setCurriculum}
+        />
       </div>
       {honors ? (
         <Accordion>
