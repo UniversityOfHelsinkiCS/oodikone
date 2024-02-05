@@ -300,6 +300,7 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
               columns={columns}
               onlyExportColumns={hiddenNameAndEmailForExcel}
               data={data}
+              firstColumnSticky
             />
           )}
         </div>

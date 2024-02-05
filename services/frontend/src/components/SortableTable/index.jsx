@@ -42,6 +42,7 @@ actions: JSX to add in the top right corner of the table, for example buttons
 hideHeaderBar: Hides the header bar that has a table icon, title, fullscreen button and menu/buttons
 style: css style object of the whole table
 striped: The style where every other row is grey. Boolean, default is true.
+firstColumnSticky: Boolean, default is false. If true, the first column is sticky
 defaultSort: [columnkey, order] of default sort column and order. For example ['name', 'desc']
 toggleGroupExpansion: Function which is called when group of rows is collapsed or expanded
 expandedGroups: Array (or set?) of keys of rows are supposed to be expanded. These two are used
@@ -107,6 +108,7 @@ export const SortableTable = ({
   expandedGroups,
   onlyExportColumns = [],
   striped = true,
+  firstColumnSticky = false,
 }) => {
   const [exportModalOpen, setExportModalOpen] = useState(false)
   const [state, dispatch] = useReducer(
@@ -190,9 +192,14 @@ export const SortableTable = ({
     classNames.push('basic')
   }
 
+  if (firstColumnSticky) {
+    classNames.push('first-column-sticky')
+  }
+
   const content = (
     <table className={classNames.join(' ')} id={tableId} style={tableStyles}>
-      <thead style={{ position: 'sticky', top: 0, zIndex: 1 }}>{headers}</thead>
+      {/* <thead style={{ position: 'sticky', top: 0, zIndex: 1 }}>{headers}</thead> */}
+      <thead>{headers}</thead>
       <tbody>
         {sortedData.map(item => (
           <DataItem key={`dataItem-${getKey(item)}`} item={item} />
