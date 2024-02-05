@@ -88,7 +88,7 @@ router.get('/allgraduationstats', async (req, res) => {
   const timesArrays = [] // keep book of these to null them in the end, large lists not used in frontend
   for (const facultyCode of facultyCodes) {
     const data = await getGraduationStats(facultyCode, 'NEW_STUDY_PROGRAMMES', true)
-    if (!data) res.status(500).json({ message: `Did not find data for ${facultyCode}` })
+    if (!data) return res.status(500).json({ message: `Did not find data for ${facultyCode}` })
     facultyData[facultyCode] = data
   }
 
