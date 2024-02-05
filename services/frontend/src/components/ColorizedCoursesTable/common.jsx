@@ -58,6 +58,26 @@ export const calculateTotals = (courses, semesters, faculties) => {
   return { cellStats: {}, code: 'TOTAL', name: { en: 'All courses total' }, bySemesters: totalRow, facultiesTotal }
 }
 
+export const calculateNewTotalColumnValues = (data, selectedSemesters) =>
+  data.map(originalRow => {
+    const row = { ...originalRow }
+    const includedValues = { completions: 0, enrollments: 0, difference: 0, rejected: 0 }
+
+    Object.entries(originalRow.bySemesters).forEach(
+      ([semesterCode, { completions, enrollments, difference, rejected }]) => {
+        if (selectedSemesters.includes(semesterCode)) {
+          includedValues.completions += completions
+          includedValues.enrollments += enrollments
+          includedValues.difference += difference
+          includedValues.rejected += rejected
+        }
+      }
+    )
+
+    row.bySemesters = { ...row.bySemesters, ...includedValues }
+    return row
+  })
+
 export const getColor = (stats, columnAmount, colorMode, numberMode, courseTotal, allTotal) => {
   if (colorMode === 'none' || allTotal === 0) return {}
   if (!stats) return {}
