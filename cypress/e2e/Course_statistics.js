@@ -91,11 +91,10 @@ describe('Course Statistics tests', { retries: 2 }, () => {
 
       cy.contains('.tabular.menu a', 'Students').click()
       cy.contains('All')
+      cy.contains('svg', 'Pass rate chart')
 
       cy.contains('.tabular.menu a', 'Attempts').click()
       cy.contains('All')
-
-      cy.contains('.tabular.menu a', 'Pass rate chart').click()
       cy.contains('svg', 'Pass rate chart')
 
       cy.contains('.tabular.menu a', 'Grade distribution chart').click()
