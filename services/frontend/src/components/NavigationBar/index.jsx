@@ -14,7 +14,7 @@ const allNavigationItems = {
     key: 'studyProgramme',
     label: 'Programmes',
     items: [
-      { path: '/populations', key: 'class', label: 'Year class' },
+      { path: '/populations', key: 'class', label: 'Class statistics' },
       { path: '/study-programme', key: 'overview', label: 'Overview' },
     ],
   },
