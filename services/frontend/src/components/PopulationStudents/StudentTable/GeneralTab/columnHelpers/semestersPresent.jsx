@@ -2,7 +2,7 @@ import React from 'react'
 import moment from 'moment'
 import { Popup } from 'semantic-ui-react'
 
-import { getCurrentSemester } from 'common'
+import { getCurrentSemester, isMastersProgramme } from 'common'
 
 export const getSemestersPresentFunctions = ({
   allSemesters,
@@ -70,7 +70,7 @@ export const getSemestersPresentFunctions = ({
       firstGraduation &&
       moment(firstGraduation).isBetween(allSemestersMap[sem].startdate, allSemestersMap[sem].enddate)
     ) {
-      if (programmeCode && programmeCode.startsWith('KH')) return 1
+      if (!isMastersProgramme(programmeCode)) return 1
       return 2
     }
     if (
