@@ -19,11 +19,6 @@ const gradesMap = {
   L: 7,
 }
 
-export const viewModeNames = {
-  STUDENTS: 'Students',
-  ATTEMPTS: 'Attempts',
-}
-
 export const getDataObject = (name, data, stack) => ({ name, data, stack })
 
 export const getMaxValueOfSeries = series =>
