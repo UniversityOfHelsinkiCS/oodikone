@@ -1,14 +1,13 @@
-import React, { useMemo } from 'react'
+import { uniq } from 'lodash'
+import { arrayOf, bool, object, string } from 'prop-types'
 import qs from 'query-string'
+import React, { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Header, Icon, Item } from 'semantic-ui-react'
-import { uniq } from 'lodash'
-import { string, object, arrayOf, bool } from 'prop-types'
-
 import { SortableTable, row } from 'components/SortableTable'
 import { defineCellColor, resolveGrades, getSortableColumn } from '../util'
 
-const formatPercentage = p => `${(p * 100).toFixed(2)} %`
+const formatPercentage = passRate => (Number.isNaN(passRate) ? '–' : `${(passRate * 100).toFixed(2)} %`)
 
 const getGradeColumns = grades =>
   grades.map(({ key, title }) =>
