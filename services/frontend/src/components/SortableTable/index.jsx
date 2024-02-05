@@ -47,6 +47,7 @@ defaultSort: [columnkey, order] of default sort column and order. For example ['
 toggleGroupExpansion: Function which is called when group of rows is collapsed or expanded
 expandedGroups: Array (or set?) of keys of rows are supposed to be expanded. These two are used
     only in population of courses
+maxHeight: Overwrite the maximum height. Defaults to 80vh if not set.
 
 --- Column usage: (* = required field) ---
 
@@ -109,6 +110,7 @@ export const SortableTable = ({
   onlyExportColumns = [],
   striped = true,
   firstColumnSticky = false,
+  maxHeight = '80vh',
 }) => {
   const [exportModalOpen, setExportModalOpen] = useState(false)
   const [state, dispatch] = useReducer(
@@ -237,9 +239,7 @@ export const SortableTable = ({
             <Icon style={{ color: '#c2c2c2', position: 'relative', top: '1px', marginRight: '0.5em' }} name="table" />{' '}
             {title}
           </FigureContainer.Header>
-          <FigureContainer.Content
-            style={{ padding: 0, overflow: 'auto', backgroundColor: '#e8e8e91c', maxHeight: '80vh' }}
-          >
+          <FigureContainer.Content style={{ padding: 0, overflow: 'auto', backgroundColor: '#e8e8e91c', maxHeight }}>
             {content}
           </FigureContainer.Content>
         </FigureContainer>
