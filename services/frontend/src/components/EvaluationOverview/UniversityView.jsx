@@ -85,7 +85,7 @@ export const UniversityView = ({ faculty }) => {
       <div className="faculty-overview">
         <div className="programmes-overview">
           {getDivider(
-            'Progress of students of the faculty ',
+            'Progress of students of the university ',
             'BachelorStudentsOfTheFacultyByStartingYear',
             facultyToolTips.StudentProgress,
             'InfoFacultyProgress'
@@ -118,6 +118,7 @@ export const UniversityView = ({ faculty }) => {
           graduationStats={graduationStats}
           groupByStartYear={false}
           showMedian={medianMode}
+          universityMode
         />
       </div>
     </>

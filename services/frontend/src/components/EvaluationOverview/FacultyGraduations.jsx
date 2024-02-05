@@ -2,7 +2,7 @@ import React from 'react'
 
 import { GraduationTimes } from 'components/FacultyStatistics/TimesAndPaths/GraduationTimes'
 
-export const FacultyGraduations = ({ faculty, graduationStats, groupByStartYear, showMedian }) => {
+export const FacultyGraduations = ({ faculty, graduationStats, groupByStartYear, showMedian, universityMode }) => {
   const groupBy = groupByStartYear ? 'byStartYear' : 'byGradYear'
   const label = groupByStartYear ? 'Start year' : 'Graduation year'
   const data = graduationStats?.data?.[groupBy].medians
@@ -11,7 +11,7 @@ export const FacultyGraduations = ({ faculty, graduationStats, groupByStartYear,
   const programmeData = graduationStats?.data?.[groupBy].programmes.medians
   const programmeNames = graduationStats?.data?.programmeNames
   const classSizes = graduationStats?.data?.classSizes
-  const commonProps = { label, programmeNames, showMedian, classSizes, goalExceptions }
+  const commonProps = { label, programmeNames, showMedian, classSizes, goalExceptions, universityMode }
 
   return (
     <div>

@@ -14,6 +14,7 @@ export const MedianBarChart = ({
   classSizes,
   level,
   goalExceptions,
+  universityMode,
 }) => {
   let modData = null
   if (!facultyGraph && goalExceptions.needed && ['master', 'bcMsCombo'].includes(level)) {
@@ -80,6 +81,13 @@ export const MedianBarChart = ({
       }</b><br />${code}${timeText}${statisticsText}${goalText}`
     }
     return `${timeText}${statisticsText}`
+  }
+
+  const getLabel = () => {
+    if (universityMode) {
+      return facultyGraph ? 'Graduation year' : 'Faculty'
+    }
+    return facultyGraph ? label : 'Programme'
   }
 
   const config = {
@@ -158,7 +166,7 @@ export const MedianBarChart = ({
     xAxis: {
       type: 'category',
       title: {
-        text: facultyGraph ? label : 'Programme',
+        text: getLabel(),
         align: 'high',
         offset: 0,
         rotation: 0,
