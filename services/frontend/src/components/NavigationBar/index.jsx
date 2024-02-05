@@ -25,7 +25,7 @@ const allNavigationItems = {
   studyGuidanceGroups: {
     path: '/studyguidancegroups',
     key: 'studyGuidanceGroups',
-    label: 'Study guidance groups',
+    label: 'Guidance groups',
     reqRights: ['studyGuidanceGroups'],
   },
   customPopulations: {
