@@ -130,7 +130,7 @@ export const getThesisGradeSpread = (series, isRelative) => {
 export const getGradeSpread = (series, isRelative) => {
   const failedKeys = ['eisa', 'hyl.', 'hyl', '0', 'luop']
 
-  const baseAccumalator = {
+  const baseAccumulator = {
     0: [],
     1: [],
     2: [],
@@ -163,7 +163,7 @@ export const getGradeSpread = (series, isRelative) => {
 
       return acc
     },
-    { ...baseAccumalator }
+    { ...baseAccumulator }
   )
   const total = Object.keys(newSeries).reduce((acc, curr) => {
     const numOfGrades = newSeries[curr][0]
