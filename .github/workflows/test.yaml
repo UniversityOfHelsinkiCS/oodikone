@@ -161,6 +161,7 @@ jobs:
       - build_and_push_anon_kone_db
       - build_and_push_anon_user_db
     strategy:
+      fail-fast: false
       matrix:
         include:
           - name: 'Test course statistics'
