@@ -4,7 +4,15 @@ import ReactHighcharts from 'react-highcharts'
 
 import { useLanguage } from 'components/LanguagePicker/useLanguage'
 
-export const BreakdownBarChart = ({ data, handleClick, facultyGraph = true, year = null, label, programmeNames }) => {
+export const BreakdownBarChart = ({
+  data,
+  handleClick,
+  facultyGraph = true,
+  year = null,
+  label,
+  programmeNames,
+  universityMode,
+}) => {
   const { language } = useLanguage()
 
   const statData = [
@@ -45,6 +53,13 @@ export const BreakdownBarChart = ({ data, handleClick, facultyGraph = true, year
     return `<b>${seriesName}</b>: ${amount}`
   }
 
+  const getLabel = () => {
+    if (universityMode) {
+      return facultyGraph ? 'Graduation year' : 'Faculty'
+    }
+    return facultyGraph ? label : 'Programme'
+  }
+
   const config = {
     chart: {
       type: 'bar',
@@ -66,7 +81,7 @@ export const BreakdownBarChart = ({ data, handleClick, facultyGraph = true, year
       type: 'category',
       categories,
       title: {
-        text: facultyGraph ? label : 'Programme',
+        text: getLabel(),
         align: 'high',
         offset: 0,
         rotation: 0,
