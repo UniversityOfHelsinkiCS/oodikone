@@ -3,7 +3,7 @@ import React, { useMemo } from 'react'
 import { SortableTable, row } from 'components/SortableTable'
 import { useLanguage } from 'components/LanguagePicker/useLanguage'
 import { getColumns } from './logic'
-import { useColorizedCoursesTableContext, calculateTotals } from '../common'
+import { useColorizedCoursesTableContext, calculateTotals, calculateNewTotalColumnValues } from '../common'
 import '../index.css'
 import { ColorModeSelector, NumberModeSelector, SemesterRangeSelector } from '../selectorComponents'
 
@@ -18,7 +18,12 @@ export const SemestersTab = () => {
     return row(totals, { ignoreSorting: true, ignoreFilters: true })
   }, [data, selectedSemesters])
 
-  const tableData = [totalRow, ...data.tableData]
+  const updatedTableData = useMemo(() => {
+    if (!data) return null
+    return calculateNewTotalColumnValues(data.tableData, selectedSemesters.map(String))
+  }, [data, selectedSemesters])
+
+  const tableData = [totalRow, ...updatedTableData]
 
   return (
     <div>
