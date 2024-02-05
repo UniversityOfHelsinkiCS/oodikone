@@ -68,6 +68,9 @@ const CompletedCourses = React.lazy(() =>
 const LanguageCenterView = React.lazy(() =>
   retry(() => import('../LanguageCenterView').then(module => ({ default: module.LanguageCenterView })))
 )
+const UniversityViewPage = React.lazy(() =>
+  retry(() => import('../EvaluationOverview/UniversityView').then(module => ({ default: module.UniversityViewPage })))
+)
 
 const routes = {
   students: '/students/:studentNumber?',
@@ -82,6 +85,7 @@ const routes = {
   faculties: '/faculties/:facultyCode?',
   customOpenUniPopulation: '/openunipopulation',
   evaluationOverview: '/evaluationoverview/:level?/:id?',
+  university: '/university',
   completedCoursesSearch: '/completedcoursessearch',
   languageCenterView: '/languagecenterview',
 }
@@ -150,6 +154,7 @@ export const Routes = () => (
         component={LanguageCenterView}
       />
       <ProtectedRoute requireUserHasRights exact path={routes.evaluationOverview} component={EvaluationOverview} />
+      <ProtectedRoute requireUserHasRights exact path={routes.university} component={UniversityViewPage} />
       <Redirect to="/" />
     </Switch>
   </Suspense>
