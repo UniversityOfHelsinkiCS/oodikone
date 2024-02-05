@@ -226,9 +226,8 @@ const singleStudentTooltipFormatter = (point, student, getTextIn) => {
 const createGoalSeries = (starting, ending, absences) => {
   const lastMonth = Math.ceil(getXAxisMonth(moment(ending), moment(starting)))
 
-  const getColor = (i, type, statutoryAbsence) => {
+  const getColor = (i, type) => {
     if (i % 2 === 0) return '#96d7c3'
-    if (statutoryAbsence) return '#8e24aa'
     if (type === 2) return '#ffb300'
     if (type === -1) return '#e0e0e0'
     return '#e53935'
@@ -254,7 +253,14 @@ const createGoalSeries = (starting, ending, absences) => {
 
   const zoneStart = absencePoints.length ? [absencePoints[0][0]] : []
   const zones = absencePoints.reduce((acc, [start, , enrollmenttype, statutoryAbsence], i) => {
-    return [...acc, { value: start, color: getColor(i, enrollmenttype, statutoryAbsence) }]
+    return [
+      ...acc,
+      {
+        value: start,
+        color: getColor(i, enrollmenttype),
+        dashStyle: statutoryAbsence ? 'Dash' : 'Solid',
+      },
+    ]
   }, zoneStart)
 
   const lastCredits = (lastMonth - totalAbsenceMonths) * (60 / 12)

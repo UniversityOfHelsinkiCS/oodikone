@@ -23,12 +23,13 @@
   background-color: #03cc0d;
 }
 
-.label-absent {
+.label-absent,
+.label-absent-statutory {
   background-color: #ffb300;
 }
 
 .label-absent-statutory {
-  background-color: #8e24aa;
+  border: 2px solid #03cc0d;
 }
 
 .label-passive {
