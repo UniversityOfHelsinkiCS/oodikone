@@ -1,9 +1,11 @@
 .colorized-courses-table {
   display: flex;
-  justify-content: center;
   flex-direction: column;
-  align-content: center;
   align-items: center;
+}
+
+.colorized-courses-table > div {
+  max-width: 100%;
 }
 
 input[type='radio'] {

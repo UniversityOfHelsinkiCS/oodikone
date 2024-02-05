@@ -37,7 +37,7 @@ export const SemestersTab = () => {
         )}
         data={tableData}
         striped={colorMode === 'none'}
-        stretch
+        firstColumnSticky
       />
     </div>
   )
