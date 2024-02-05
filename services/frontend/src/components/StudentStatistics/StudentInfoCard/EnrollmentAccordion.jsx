@@ -45,6 +45,53 @@ const calculateSemesterEnrollmentsByStudyright = (semestersAndYears, studyrights
   return { enrollmentsByStudyright, programmeNames, firstYear }
 }
 
+const getProgrammeEndDateForStudyright = (studyright, extentCode) => {
+  const graduatedStudyright = studyright.find(el => el.extentcode === extentCode && el.graduated === 1)
+  if (!graduatedStudyright) return null
+
+  const { enddate, code } = graduatedStudyright.studyright_elements.find(
+    elem => elem.enddate === graduatedStudyright.enddate
+  )
+  return { enddate, programmeCode: code }
+}
+
+const processStudyrights = (studyrights, student, firstDisplayedYear, getTextIn, semestersAndYears) =>
+  studyrights.reduce((acc, studyright) => {
+    const studentToStudyrightEndMap = { [student.studentNumber]: null }
+    const studentToSecondStudyrightEndMap = { [student.studentNumber]: null }
+
+    const baseArguments = {
+      allSemesters: Object.values(semestersAndYears.semesters),
+      allSemestersMap: semestersAndYears.semesters,
+      year: firstDisplayedYear,
+      filteredStudents: [student],
+      getTextIn,
+    }
+
+    const masterInfo = getProgrammeEndDateForStudyright(studyright, 2)
+    if (masterInfo) {
+      const { enddate, programmeCode } = masterInfo
+      baseArguments.programmeCode = programmeCode
+      studentToSecondStudyrightEndMap[student.studentNumber] = enddate
+    }
+
+    const bachelorInfo = getProgrammeEndDateForStudyright(studyright, 1)
+    if (bachelorInfo) {
+      const { enddate, programmeCode } = bachelorInfo
+      baseArguments.programmeCode = programmeCode
+      studentToStudyrightEndMap[student.studentNumber] = enddate
+    }
+
+    const { getSemesterEnrollmentsContent } = getSemestersPresentFunctions({
+      ...baseArguments,
+      studentToStudyrightEndMap,
+      studentToSecondStudyrightEndMap,
+    })
+
+    acc[studyright[0].actual_studyrightid] = getSemesterEnrollmentsContent(student, studyright)
+    return acc
+  }, {})
+
 export const EnrollmentAccordion = ({ student }) => {
   const { data: semestersAndYears } = useGetSemestersQuery()
   const [active, setActive] = useState(false)
@@ -66,18 +113,13 @@ export const EnrollmentAccordion = ({ student }) => {
 
   const firstDisplayedYear = `${Math.max(new Date().getFullYear() - 10, firstYear)}`
 
-  const { getSemesterEnrollmentsContent } = getSemestersPresentFunctions({
-    allSemesters: Object.values(semestersAndYears.semesters),
-    allSemestersMap: semestersAndYears.semesters,
-    year: firstDisplayedYear,
-    filteredStudents: [student],
+  const semesterEnrollments = processStudyrights(
+    Object.values(studyrightsGroupedByStudyright),
+    student,
+    firstDisplayedYear,
     getTextIn,
-  })
-
-  const semesterEnrollments = Object.values(studyrightsGroupedByStudyright).reduce((acc, studyright) => {
-    acc[studyright[0].actual_studyrightid] = getSemesterEnrollmentsContent(student, studyright)
-    return acc
-  }, {})
+    semestersAndYears
+  )
 
   return (
     <Accordion style={{ marginBottom: active ? '0.5em' : 0 }}>
