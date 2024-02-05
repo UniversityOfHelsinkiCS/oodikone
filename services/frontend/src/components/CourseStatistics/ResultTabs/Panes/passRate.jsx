@@ -64,7 +64,7 @@ export const PassRateSettings = ({ value, onChange }) => {
   const { viewMode, isRelative } = value
 
   return (
-    <Menu secondary style={{ marginBottom: 0 }}>
+    <Menu secondary style={{ marginTop: 20, marginBottom: 0 }}>
       <Menu.Item>
         <Radio
           toggle
