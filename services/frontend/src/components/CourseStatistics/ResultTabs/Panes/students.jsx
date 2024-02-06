@@ -109,7 +109,7 @@ export const StudentsPane = ({ initialSettings, datasets, availableStats, update
         {datasets
           .filter(i => i)
           .map(data => (
-            <div key={data.name} style={{ flexGrow: 1, flexBasis: 1, width: '100%' }}>
+            <div key={data.name} style={{ flexGrow: 1, flexBasis: 1, width: '50%' }}>
               <h3>{data.name}</h3>
               <PassRateContent data={data} settings={settings} {...rest} />
             </div>
