@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { getCourseStats } from 'redux/coursestats'
 import { useProgress, useTabs } from '../../../common/hooks'
 import { AttemptsPane } from './Panes/attempts'
-import { DistributionPane } from './Panes/distribution'
+import { GradeDistributionPane } from './Panes/gradeDistribution'
 import { StudentsPane } from './Panes/students'
 import './resultTabs.css'
 
@@ -50,10 +50,10 @@ export const ResultTabs = ({ primary, comparison, separate, availableStats }) =>
       component: AttemptsPane,
     },
     {
-      label: 'Grade distribution chart',
+      label: 'Grade distribution',
       icon: 'chart bar',
       initialSettings: { isRelative: false, viewMode: 'STUDENTS' },
-      component: DistributionPane,
+      component: GradeDistributionPane,
     },
   ]
 
