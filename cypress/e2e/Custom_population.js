@@ -18,7 +18,7 @@ const save = () => {
 }
 
 const selectSavedPopulation = name => {
-  cy.get('[data-cy="history-search"]').children().eq(0).type(name).type('{enter}')
+  cy.get('[data-cy="history-search"]').children().eq(0).type(`${name}{enter}`)
 }
 
 const deleteAllSearches = () => {
@@ -33,7 +33,7 @@ const deleteAllSearches = () => {
       const searchItems = d.find('div[role=option] > span[class=text]')
       for (let i = 0; i < searchItems.length; i++) {
         if (searchItems[i].textContent.includes('TEST-')) {
-          cy.get('[data-cy="history-search"]').children().eq(0).type(searchItems[i].textContent).type('{enter}')
+          cy.get('[data-cy="history-search"]').children().eq(0).type(`${searchItems[i].textContent}{enter}`)
           cy.get('button').contains('Delete').click()
         }
       }
@@ -160,7 +160,7 @@ describe('Custom population tests', () => {
       })
     })
 
-    it('Updates a custom population search', { retries: 2 }, () => {
+    it('Updates a custom population search', () => {
       cy.fixture('customPopulations').then(({ studentNumbersForCSStudentsSet1, studentNumbersForCSStudentsSet2 }) => {
         const students1 = studentNumbersForCSStudentsSet1
         const students2 = studentNumbersForCSStudentsSet2
