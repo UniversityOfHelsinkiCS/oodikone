@@ -23,8 +23,17 @@ const currentUserMiddleware = async (req, _res, next) => {
     uid: username,
   } = req.headers
 
-  if (!sessionId || !username) {
-    throw new ApplicationError('Not enough data in request headers', 403, { logoutUrl })
+  const missingHeaders = []
+
+  if (!sessionId) missingHeaders.push('shib-session-id')
+  if (!username) missingHeaders.push('uid')
+
+  if (missingHeaders.length > 0) {
+    throw new ApplicationError(
+      `Not enough data in request headers, the following headers were missing: ${missingHeaders.join(', ')}`,
+      403,
+      { logoutUrl }
+    )
   }
 
   const iamGroups = parseIamGroups(hygroupcn)
