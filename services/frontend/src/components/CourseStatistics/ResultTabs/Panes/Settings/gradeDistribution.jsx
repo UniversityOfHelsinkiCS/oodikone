@@ -1,6 +1,6 @@
 import React from 'react'
 import { Menu, Radio } from 'semantic-ui-react'
-import { HelpButton } from '../../HelpButton'
+import { HelpButton } from './HelpButton'
 
 export const GradeDistributionSettings = ({ value, onChange }) => {
   const { isRelative } = value
