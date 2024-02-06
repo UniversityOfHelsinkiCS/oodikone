@@ -1,7 +1,7 @@
 import React from 'react'
 import { Menu, Radio } from 'semantic-ui-react'
-import { HelpButton } from '../../HelpButton'
-import { UnifyRadioButtons } from '../../UnifyRadioButtons'
+import { HelpButton } from './HelpButton'
+import { UnifyRadioButtons } from './UnifyRadioButtons'
 
 export const AttemptsTableSettings = ({ value, onChange, availableStats, onSeparateChange }) => {
   const { showGrades, separate } = value
