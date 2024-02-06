@@ -23,6 +23,8 @@ export const StudentsPane = ({ initialSettings, datasets, availableStats, update
     updateQuery(separate)
   }
 
+  const halfWidth = datasets.filter(dataset => dataset).length > 1 && splitDirection === 'row'
+
   return (
     <PaneContent>
       <div style={{ display: 'flex', marginBottom: '2em' }}>
@@ -51,7 +53,14 @@ export const StudentsPane = ({ initialSettings, datasets, availableStats, update
         {datasets
           .filter(i => i)
           .map(data => (
-            <div key={data.name} style={{ flexGrow: 1, flexBasis: 1, width: '100%' }}>
+            <div
+              key={data.name}
+              style={{
+                flexGrow: 1,
+                flexBasis: 1,
+                maxWidth: halfWidth ? '50%' : '100%',
+              }}
+            >
               <h3>{data.name}</h3>
               <StudentsTableContent data={data} settings={settings} {...rest} />
             </div>
@@ -67,7 +76,7 @@ export const StudentsPane = ({ initialSettings, datasets, availableStats, update
         {datasets
           .filter(i => i)
           .map(data => (
-            <div key={data.name} style={{ flexGrow: 1, flexBasis: 1, width: '50%' }}>
+            <div key={data.name} style={{ flexGrow: 1, flexBasis: 1, maxWidth: halfWidth ? '50%' : '100%' }}>
               <h3>{data.name}</h3>
               <PassRateContent data={data} settings={settings} {...rest} />
             </div>
