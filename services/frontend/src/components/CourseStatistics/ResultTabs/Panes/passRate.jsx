@@ -95,11 +95,9 @@ export const PassRateContent = ({ data, settings: { viewMode, isRelative }, user
 
   return (
     <div>
-      <div>
-        <ReactHighcharts
-          config={{ ...primaryGraphOptions, series: isRelative ? passGraphSerie.relative : passGraphSerie.absolute }}
-        />
-      </div>
+      <ReactHighcharts
+        config={{ ...primaryGraphOptions, series: isRelative ? passGraphSerie.relative : passGraphSerie.absolute }}
+      />
       {!userHasAccessToAllStats && (
         <span className="totalsDisclaimer">* Years with 5 students or less are shown as 0 in the chart</span>
       )}
