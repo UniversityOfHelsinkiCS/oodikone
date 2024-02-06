@@ -71,7 +71,7 @@ export const ResultTabs = ({ primary, comparison, separate, availableStats }) =>
   }))
 
   return (
-    <Segment loading={loading} basic>
+    <Segment loading={loading}>
       <Tab id="CourseStatPanes" panes={panes} onTabChange={handleTabChange} activeIndex={tab} />
     </Segment>
   )

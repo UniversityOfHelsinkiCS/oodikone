@@ -64,7 +64,7 @@ export const PassRateSettings = ({ value, onChange }) => {
   const { viewMode, isRelative } = value
 
   return (
-    <Menu secondary style={{ marginTop: 20, marginBottom: 0 }}>
+    <Menu secondary style={{ marginTop: 20, marginBottom: 20 }}>
       <Menu.Item>
         <Radio
           toggle
@@ -95,9 +95,11 @@ export const PassRateContent = ({ data, settings: { viewMode, isRelative }, user
 
   return (
     <div>
-      <ReactHighcharts
-        config={{ ...primaryGraphOptions, series: isRelative ? passGraphSerie.relative : passGraphSerie.absolute }}
-      />
+      <div>
+        <ReactHighcharts
+          config={{ ...primaryGraphOptions, series: isRelative ? passGraphSerie.relative : passGraphSerie.absolute }}
+        />
+      </div>
       {!userHasAccessToAllStats && (
         <span className="totalsDisclaimer">* Years with 5 students or less are shown as 0 in the chart</span>
       )}
