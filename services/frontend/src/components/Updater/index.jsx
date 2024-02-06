@@ -1,13 +1,13 @@
 /* eslint-disable no-alert */
 import React, { useEffect, useState } from 'react'
-import { Segment, Form, Button, TextArea, Header, Message } from 'semantic-ui-react'
+import { Segment, Form, Button, TextArea, Header, Message, Radio } from 'semantic-ui-react'
 import { callApi } from '../../apiConnection'
 import { useTitle } from '../../common/hooks'
 
 export const Updater = () => {
   const [messages, setMessages] = useState([])
-  const [SISNums, setSISNums] = useState('')
-  const [SISCourses, setSISCourses] = useState('')
+  const [customList, setCustomList] = useState('')
+  const [type, setType] = useState('students')
   const [jobs, setJobs] = useState(null)
 
   useTitle('Updater')
@@ -24,13 +24,11 @@ export const Updater = () => {
   const updateSISMeta = () => apiCall('meta', '/updater/update/v2/meta', 'get')
   const updateSISStudents = () => apiCall('students', '/updater/update/v2/students', 'get')
   const updateSISProgrammes = () => apiCall('curriculums', '/updater/update/v2/programmes')
-  const updateSISPopulationStudents = () =>
-    apiCall('custom student list', '/updater/update/v2/students', 'post', SISNums.trim().split('\n'))
+  const updateSISCustomList = () =>
+    apiCall('custom list', `/updater/update/v2/customlist/${type}`, 'post', customList.trim().split('\n'))
   const refreshStatisticsV2 = () => apiCall('statistics', '/updater/refresh_statistic_v2', 'post')
   const abortSisUpdater = () => apiCall(null, '/updater/abort', 'get')
   const refreshSISRedisCache = () => apiCall('Updater redis', '/updater/refresh_redis_cache', 'get')
-  const updateSISCourses = () =>
-    apiCall('custom course list', '/updater/update/v2/courses', 'post', SISCourses.trim().split('\n'))
   const refreshAllTeacherLeaderboards = () => apiCall('teacher leaderboards', '/teachers/top', 'post')
   const refreshFaculties = () => apiCall('faculties', '/updater/refresh_faculties_v2', 'post')
   const refreshStudyProgrammes = () => apiCall('study programmes', '/updater/refresh_study_programmes_v2', 'post')
@@ -130,18 +128,25 @@ export const Updater = () => {
       </Form>
       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
         <Form.Group>
-          <Header>Update custom list of students</Header>
-          <TextArea onChange={(_, { value }) => setSISNums(value)} style={{ width: '25%' }} />
-          <Form.Button
-            onClick={updateSISPopulationStudents}
-            content="Update students by student number"
-            icon="refresh"
-          />
-        </Form.Group>
-        <Form.Group>
-          <Header style={{ marginTop: '1em' }}>Update custom list of courses</Header>
-          <TextArea onChange={(_, { value }) => setSISCourses(value)} style={{ width: '25%' }} />
-          <Form.Button onClick={updateSISCourses} content="Update courses by course code" icon="refresh" />
+          <Header>
+            Update custom list of items (students & courses in updater, programmes & faculties computed on backend)
+          </Header>
+          <TextArea onChange={(_, { value }) => setCustomList(value)} style={{ width: '25%' }} />
+          <div style={{ display: 'flex', flexDirection: 'row', gap: '2em', marginTop: '2em' }}>
+            {['students', 'courses', 'faculties', 'programmes'].map(thisType => (
+              <Radio
+                data-cy={`${thisType}-button`}
+                name="modeRadioGroup"
+                value={thisType}
+                label={thisType}
+                key={thisType}
+                onChange={() => setType(thisType)}
+                checked={type === thisType}
+                style={{ fontSize: '24px', paddingTop: '10px' }}
+              />
+            ))}
+            <Form.Button onClick={updateSISCustomList} content="Update custom list of items" icon="refresh" />
+          </div>
         </Form.Group>
       </div>
       <Header>Stop updater (aborts all updating processes in the worker, also those started by a cron-job)</Header>

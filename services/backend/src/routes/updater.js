@@ -13,6 +13,16 @@ const {
 const logger = require('../util/logger')
 const { jobMaker, getJobs } = require('../worker/queue')
 
+const refreshFacultiesByList = list => {
+  list.forEach(code => jobMaker.faculty(code))
+  return 'Added jobs for refreshing faculties'
+}
+
+const refreshProgrammesByList = list => {
+  list.forEach(code => jobMaker.programme(code))
+  return 'Added jobs for refreshing programme'
+}
+
 router.get('/update/v2/meta', async (req, res) => {
   const response = await updateSISMetadata(req)
   if (response) {
@@ -27,10 +37,20 @@ router.get('/update/v2/students', async (req, res) => {
   }
 })
 
-router.post('/update/v2/students', async (req, res) => {
-  const response = await updateStudentsByStudentNumber(req.body)
+router.post('/update/v2/customlist/:type', async (req, res) => {
+  const type = req.params.type
+  const list = req.body
+  const typeToJob = {
+    students: updateStudentsByStudentNumber,
+    courses: updateCoursesByCourseCode,
+    faculties: refreshFacultiesByList,
+    programmes: refreshProgrammesByList,
+  }
+  if (typeof typeToJob[type] !== 'function') return res.status(400).json('Bad job type')
+  const response = await typeToJob[type](list)
+
   if (response) {
-    res.status(200).json('Update SIS students scheduled')
+    res.status(200).json('Scheduled custom list')
   }
 })
 
