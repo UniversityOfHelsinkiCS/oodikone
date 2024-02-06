@@ -40,7 +40,7 @@ describe('Course Statistics tests', () => {
         cy.contains('td', 'KK-RUKIRJ').click()
         cy.contains('Search for courses').should('not.exist')
         cy.contains('KK-RUKIRJ, 992912, AYKK-RUKIRJ Toisen kotimaisen kielen kirjallinen taito, ruotsi (CEFR B1)')
-        cy.contains('.tabular.menu a', 'Grade distribution chart').click()
+        cy.contains('.tabular.menu a', 'Grade distribution').click()
         cy.contains('svg', 'Grades')
         cy.contains('Show population').should('be.enabled').click()
         checkGradeTable(gradesTableContents)
@@ -56,7 +56,7 @@ describe('Course Statistics tests', () => {
         cy.contains('td', '704220').click()
         cy.contains('Search for courses').should('not.exist')
         cy.contains('704220 Taloustiede. Pro gradu -tutkielma')
-        cy.contains('.tabular.menu a', 'Grade distribution chart').click()
+        cy.contains('.tabular.menu a', 'Grade distribution').click()
         cy.contains('svg', 'Grades')
         cy.contains('Show population').should('be.enabled').click()
         checkGradeTable(gradesTableContents)
@@ -71,7 +71,7 @@ describe('Course Statistics tests', () => {
         cy.contains(
           'KK-ENFARM1, KK-ENOIK1, KK-ENLAAK1, KK-ENMALU1, 995010Mat-lu Academic and Professional Communication in English 1 (CEFR B2)'
         )
-        cy.contains('.tabular.menu a', 'Grade distribution chart').click()
+        cy.contains('.tabular.menu a', 'Grade distribution').click()
         cy.contains('svg', 'Grades')
         cy.contains('Show population').should('be.enabled').click()
         checkGradeTable(gradesTableContents)
@@ -97,7 +97,7 @@ describe('Course Statistics tests', () => {
       cy.contains('All')
       cy.contains('svg', 'Pass rate chart')
 
-      cy.contains('.tabular.menu a', 'Grade distribution chart').click()
+      cy.contains('.tabular.menu a', 'Grade distribution').click()
       cy.contains('svg', 'Grades')
 
       cy.contains('a', 'New query').click()
