@@ -3,8 +3,8 @@ import { Form } from 'semantic-ui-react'
 import { studyProgrammeToolTips } from 'common/InfoToolTips'
 import { Toggle } from '../Toggle'
 
-export const CourseYearFilter = ({ years, fromYear, toYear, handleChange, academicYear = false, setAcademicYear }) => {
-  return (
+export const CourseYearFilter = ({ years, fromYear, toYear, handleChange, academicYear = false, setAcademicYear }) =>
+  years ? (
     <div className="toggle-container" data-cy="CoursesYearFilter">
       <div style={{ marginTop: '0.5rem' }}>
         <Form>
@@ -47,5 +47,4 @@ export const CourseYearFilter = ({ years, fromYear, toYear, handleChange, academ
         setValue={setAcademicYear}
       />
     </div>
-  )
-}
+  ) : null
