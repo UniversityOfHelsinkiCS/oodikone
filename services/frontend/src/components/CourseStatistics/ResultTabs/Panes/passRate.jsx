@@ -1,8 +1,6 @@
 import React from 'react'
 import ReactHighcharts from 'react-highcharts'
-import { Menu, Radio } from 'semantic-ui-react'
 import { passRateAttemptGraphOptions, passRateStudGraphOptions } from '../../../../constants'
-import { HelpButton } from '../HelpButton'
 import { absoluteToRelative, getDataObject, getMaxValueOfSeries } from './util'
 
 const getPassRateAttemptSeriesFromStats = stats => {
@@ -58,26 +56,6 @@ const getPassRateStudSeriesFromStats = stats => {
       getDataObject('never passed', neverPassed.map(absoluteToRelative(all)), 'c'),
     ],
   }
-}
-
-export const PassRateSettings = ({ value, onChange }) => {
-  const { viewMode, isRelative } = value
-
-  return (
-    <Menu secondary style={{ marginTop: 20, marginBottom: 20 }}>
-      <Menu.Item>
-        <Radio
-          toggle
-          label="Show relative"
-          checked={isRelative}
-          onChange={() => onChange({ ...value, isRelative: !isRelative })}
-        />
-      </Menu.Item>
-      <Menu.Item>
-        <HelpButton tab="PassRate" viewMode={viewMode || 'STUDENTS'} />
-      </Menu.Item>
-    </Menu>
-  )
 }
 
 export const PassRateContent = ({ data, settings: { viewMode, isRelative }, userHasAccessToAllStats }) => {

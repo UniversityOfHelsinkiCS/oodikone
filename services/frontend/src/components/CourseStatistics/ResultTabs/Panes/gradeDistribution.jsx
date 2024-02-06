@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import ReactHighcharts from 'react-highcharts'
-import { Icon, Menu, Radio } from 'semantic-ui-react'
+import { Icon, Menu } from 'semantic-ui-react'
 import { gradeGraphOptions } from '../../../../constants'
-import { HelpButton } from '../HelpButton'
 import { PaneContent } from '../PaneContent'
+import { GradeDistributionSettings } from './Settings/gradeDistribution'
 import {
   absoluteToRelative,
   getDataObject,
@@ -70,27 +70,7 @@ const getGradeSeries = series => {
       }
 }
 
-const DistributionSettings = ({ value, onChange }) => {
-  const { isRelative } = value
-
-  return (
-    <Menu secondary style={{ marginBottom: 0 }}>
-      <Menu.Item>
-        <Radio
-          toggle
-          label="Show relative"
-          checked={isRelative}
-          onChange={() => onChange({ ...value, isRelative: !isRelative })}
-        />
-        <Menu.Item>
-          <HelpButton tab="GradeDistribution" />
-        </Menu.Item>
-      </Menu.Item>
-    </Menu>
-  )
-}
-
-const DistributionContent = ({ data, settings: { isRelative }, userHasAccessToAllStats }) => {
+const GradeDistributionContent = ({ data, settings: { isRelative }, userHasAccessToAllStats }) => {
   const stats = data.stats.filter(stat => stat.name !== 'Total' || isRelative)
 
   const statYears = stats.map(year => year.name)
@@ -117,7 +97,7 @@ const DistributionContent = ({ data, settings: { isRelative }, userHasAccessToAl
   )
 }
 
-export const DistributionPane = ({ initialSettings, datasets, availableStats, updateQuery, ...rest }) => {
+export const GradeDistributionPane = ({ initialSettings, datasets, availableStats, updateQuery, ...rest }) => {
   const [settings, setSettings] = useState(initialSettings)
   const [splitDirection, setSplitDirection] = useState('row')
 
@@ -129,7 +109,7 @@ export const DistributionPane = ({ initialSettings, datasets, availableStats, up
   return (
     <PaneContent>
       <div style={{ display: 'flex', marginBottom: '2em' }}>
-        <DistributionSettings
+        <GradeDistributionSettings
           value={settings}
           onChange={setSettings}
           onSeparateChange={toggleSeparate}
@@ -156,7 +136,7 @@ export const DistributionPane = ({ initialSettings, datasets, availableStats, up
           .map(data => (
             <div key={data.name} style={{ flexGrow: 1, flexBasis: 1, width: '100%' }}>
               <h3>{data.name}</h3>
-              <DistributionContent data={data} settings={settings} {...rest} />
+              <GradeDistributionContent data={data} settings={settings} {...rest} />
             </div>
           ))}
       </div>

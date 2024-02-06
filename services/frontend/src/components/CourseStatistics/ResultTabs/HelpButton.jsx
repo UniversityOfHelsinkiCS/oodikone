@@ -1,7 +1,6 @@
 import React from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Popup, Button, Icon } from 'semantic-ui-react'
-
 import { courseStatisticsToolTips } from 'common/InfoToolTips'
 
 export const HelpButton = ({ tab, viewMode }) => {

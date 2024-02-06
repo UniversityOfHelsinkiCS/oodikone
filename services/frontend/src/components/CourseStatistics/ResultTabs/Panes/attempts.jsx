@@ -1,45 +1,12 @@
 import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
-import { Icon, Menu, Radio } from 'semantic-ui-react'
+import { Icon, Menu } from 'semantic-ui-react'
 import { getCourseAlternatives } from '../../../../selectors/courseStats'
-import { HelpButton } from '../HelpButton'
 import { PaneContent } from '../PaneContent'
-import { UnifyRadioButtons } from '../UnifyRadioButtons'
 import { AttemptsTable } from './Tables/attempts'
-import { PassRateContent, PassRateSettings } from './passRate'
-
-const AttemptsTableSettings = ({ value, onChange, availableStats, onSeparateChange }) => {
-  const { showGrades, separate } = value
-
-  return (
-    <div>
-      <Menu style={{ flexWrap: 'wrap' }} secondary>
-        <Menu.Item>
-          <Radio
-            toggle
-            label="Show grades"
-            data-cy="gradeToggle"
-            checked={showGrades}
-            onChange={() => onChange({ ...value, showGrades: !showGrades })}
-          />
-        </Menu.Item>
-        <Menu.Item>
-          <Radio
-            toggle
-            label="Separate by semesters"
-            data-cy="separateToggle"
-            checked={separate}
-            onChange={() => onSeparateChange(!separate)}
-          />
-        </Menu.Item>
-        <Menu.Item>
-          <HelpButton tab="Tables" viewMode="ATTEMPTS" />
-        </Menu.Item>
-      </Menu>
-      <UnifyRadioButtons availableStats={availableStats} />
-    </div>
-  )
-}
+import { AttemptsTableSettings } from './Settings/attempts'
+import { PassRateSettings } from './Settings/passRate'
+import { PassRateContent } from './passRate'
 
 const AttemptsTableContent = ({ settings, ...otherProps }) => {
   const alternatives = useSelector(getCourseAlternatives)
