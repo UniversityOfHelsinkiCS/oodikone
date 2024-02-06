@@ -225,11 +225,26 @@ export const SearchForm = ({ onProgress }) => {
     })
   }
 
+  const newFeatureMessage = {
+    header: {
+      en: 'Are you looking for statistics of courses offered by a specific study programme?',
+      fi: 'Haluatko tarkastella tilastoja tietyn koulutusohjelman tarjoamista kursseista?',
+    },
+    content: {
+      en: 'You can now see the statistics of all courses offered by a study programme by selecting Programmes > Overview > Choose programme > Programme courses > By semester.',
+      fi: 'Voit nyt tarkastella tilastoja kaikista koulutusohjelman tarjoamista kursseista valitsemalla Programmes > Overview > Valitse ohjelma > Programme courses > By semester.',
+    },
+  }
+
   return (
     <>
       <Segment loading={isLoading}>
         <Form>
           <Header>Search for courses</Header>
+          <Message info>
+            <Message.Header>{getTextIn(newFeatureMessage.header)}</Message.Header>
+            <p>{getTextIn(newFeatureMessage.content)}</p>
+          </Message>
           <div style={{ marginBottom: '15px' }}>
             <Form.Group>
               <Form.Field width={8}>
