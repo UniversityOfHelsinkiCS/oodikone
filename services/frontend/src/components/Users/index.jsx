@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useHistory, useParams } from 'react-router-dom'
-import { Radio, Icon, Header, Segment, Loader, Popup } from 'semantic-ui-react'
+import { Icon, Header, Segment, Loader, Popup } from 'semantic-ui-react'
 
 import { getUsers } from 'redux/users'
+import { useTitle } from 'common/hooks'
 import { ConnectedUserPage as UserPage } from './UserPage'
 import { UserSearchList } from './UserSearchList'
-import { useToggle, useTitle } from '../../common/hooks'
 
 export const Users = () => {
   useTitle('Users')
   const dispatch = useDispatch()
   const history = useHistory()
-  const [enabledOnly, toggleEnabledOnly] = useToggle(true)
   const [popupTimeout, setPopupTimeout] = useState(null)
   const [popupOpen, setPopupOpen] = useState(false)
   const { data: users, pending } = useSelector(({ users }) => users)
@@ -32,7 +31,7 @@ export const Users = () => {
 
   const copyEmailsToClippoard = () => {
     const clipboardString = users
-      .filter(u => u.is_enabled && u.email)
+      .filter(u => u.email)
       .map(u => u.email)
       .join('; ')
     navigator.clipboard.writeText(clipboardString)
@@ -66,17 +65,8 @@ export const Users = () => {
       <Header className="segmentTitle" size="large">
         Oodikone users
       </Header>
-      <Radio
-        label={`Showing ${enabledOnly ? 'only enabled' : 'all'} users`}
-        toggle
-        onClick={() => toggleEnabledOnly()}
-      />
       <Segment loading={isLoading} className="contentSegment">
-        {!userid ? (
-          <UserSearchList enabledOnly={enabledOnly} users={sortedUsers} error={error} />
-        ) : (
-          renderUserPage(userid)
-        )}
+        {!userid ? <UserSearchList users={sortedUsers} error={error} /> : renderUserPage(userid)}
       </Segment>
       <Popup
         trigger={<Icon link name="envelope" onClick={copyEmailsToClippoard} style={{ float: 'right' }} />}

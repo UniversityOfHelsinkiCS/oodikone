@@ -70,7 +70,6 @@ const byId = async id =>
 const formatUserForAdminView = user => ({
   ...user.get(),
   elementdetails: user.programme.map(p => p.elementDetailCode),
-  is_enabled: true, // this is probably not needed: is here mainly because old userservice created users for every logged in user, even if they hadn't correct iamgroups
 })
 
 const addProgrammes = async (id, codes) => {
@@ -222,7 +221,6 @@ const findAll = async () => {
 
       return {
         ...user.get(),
-        is_enabled: true,
         iam_groups: iamGroups || [],
         elementdetails: _.uniqBy([
           ...user.programme.map(p => p.elementDetailCode),
@@ -274,7 +272,6 @@ const formatUser = async (userFromDb, extraRights, getStudentAccess = true) => {
     sisPersonId, //
     iamGroups,
     email,
-    is_enabled: true, // this is probably not needed: is here mainly because old userservice created users for every logged in user, even if they hadn't correct iamgroups
     rights,
     roles: accessGroups,
     studentsUserCanAccess, // studentnumbers used in various parts of backend. For admin this is usually empty, since no programmes / faculties are set.
