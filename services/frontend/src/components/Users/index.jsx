@@ -57,8 +57,8 @@ export const Users = () => {
   }
 
   const isLoading = pending === undefined || pending === true
-  const error = users.error || false
-  const sortedUsers = [...users].sort((a, b) => a.full_name.localeCompare(b.full_name))
+
+  if (users.error) return <h3>Something went wrong, please try refreshing the page.</h3>
 
   return (
     <div style={{ marginBottom: '10px' }} className="segmentContainer">
@@ -66,7 +66,7 @@ export const Users = () => {
         Oodikone users
       </Header>
       <Segment loading={isLoading} className="contentSegment">
-        {!userid ? <UserSearchList users={sortedUsers} error={error} /> : renderUserPage(userid)}
+        {!userid ? <UserSearchList users={users} /> : renderUserPage(userid)}
       </Segment>
       <Popup
         trigger={<Icon link name="envelope" onClick={copyEmailsToClippoard} style={{ float: 'right' }} />}
