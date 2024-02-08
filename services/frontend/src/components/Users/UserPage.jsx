@@ -84,7 +84,7 @@ const UserPage = ({
     <Card fluid>
       <Card.Content>
         <Card.Header>
-          {isAdmin && user.username !== currentUserId && user.is_enabled && (
+          {isAdmin && user.username !== currentUserId && (
             <Popup
               content="Show Oodikone as this user"
               trigger={
@@ -104,9 +104,6 @@ const UserPage = ({
         <Divider />
         <Card.Meta content={user.username} />
         <Card.Meta content={user.email} />
-        <Card.Description>
-          {`Access to oodikone: ${user.is_enabled ? 'En' : 'Dis'}abled`} <br />
-        </Card.Description>
       </Card.Content>
     </Card>
   )
