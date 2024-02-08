@@ -40,6 +40,8 @@ const computeLanguageCenterData = async () => {
     attributes: ['course_code', 'student_studentnumber', 'semestercode', 'attainment_date', 'studyright_id'],
     where: {
       [Op.or]: [{ course_code: { [Op.like]: 'KK%' } }, { course_code: { [Op.like]: 'AYKK%' } }],
+      // 135 = autumn 2017
+      semestercode: { [Op.gte]: 135 },
       credittypecode: 4,
     },
     raw: true,
@@ -49,6 +51,7 @@ const computeLanguageCenterData = async () => {
     attributes: ['studentnumber', 'semestercode', 'course_code', 'enrollment_date_time', 'studyright_id', 'state'],
     where: {
       [Op.or]: [{ course_code: { [Op.like]: 'KK%' } }, { course_code: { [Op.like]: 'AYKK%' } }],
+      semestercode: { [Op.gte]: 135 },
       state: { [Op.in]: ['ENROLLED', 'REJECTED'] },
     },
     raw: true,
@@ -196,23 +199,20 @@ const createArrayOfCourses = async (attempts, courses) => {
     facultyObject[cur.faculty] = true
     semestersObject[semester] = true
     if (!obj[cur.courseCode]) {
-      obj[cur.courseCode] = { ...fields }
+      obj[cur.courseCode] = {}
     }
     if (!obj[cur.courseCode][semester]) {
       obj[cur.courseCode][semester] = { ...fields }
     }
-    if (!obj[cur.courseCode][semester][cur.faculty]) {
+    if (cur.faculty && !obj[cur.courseCode][semester][cur.faculty]) {
       obj[cur.courseCode][semester][cur.faculty] = { ...fields }
     }
-    if (!obj[cur.courseCode].byFaculties?.[cur.faculty]) {
-      if (!obj[cur.courseCode].byFaculties) obj[cur.courseCode].byFaculties = { ...fields }
-      obj[cur.courseCode].byFaculties[cur.faculty] = { ...fields }
-    }
-    const semesterFacultyStats = obj[cur.courseCode][semester][cur.faculty]
     const allFacultiesTotal = obj[cur.courseCode][semester]
-    const allSemestersTotal = obj[cur.courseCode]
-    const facultyTotalStats = obj[cur.courseCode].byFaculties[cur.faculty]
-    const allStats = [semesterFacultyStats, allFacultiesTotal, allSemestersTotal, facultyTotalStats]
+    const allStats = [allFacultiesTotal]
+    if (cur.faculty) {
+      const semesterFacultyStats = obj[cur.courseCode][semester][cur.faculty]
+      allStats.push(semesterFacultyStats)
+    }
     for (const stats of allStats) {
       if (cur.completed) {
         stats.completions += 1

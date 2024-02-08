@@ -81,6 +81,8 @@ const getStudyprogrammeStatsForColorizedCoursesTable = async studyprogramme => {
     attributes: ['course_code', 'student_studentnumber', 'semestercode', 'attainment_date'],
     where: {
       course_code: { [Op.in]: courseCodes },
+      // 135 = autumn 2017
+      semestercode: { [Op.gte]: 135 },
       credittypecode: 4,
     },
     raw: true,
@@ -90,6 +92,7 @@ const getStudyprogrammeStatsForColorizedCoursesTable = async studyprogramme => {
     attributes: ['studentnumber', 'semestercode', 'course_code', 'enrollment_date_time', 'state'],
     where: {
       course_code: { [Op.in]: courseCodes },
+      semestercode: { [Op.gte]: 135 },
       state: { [Op.in]: ['ENROLLED', 'REJECTED'] },
     },
     raw: true,
