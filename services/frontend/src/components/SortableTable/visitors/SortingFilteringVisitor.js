@@ -19,38 +19,8 @@ export class SortingFilteringVisitor extends DataVisitor {
       return undefined
     }
 
-    const [columnKey, { sort }] = sortByColumn
+    const [columnKey, { sort: orderDirection }] = sortByColumn
     const column = this.columns[columnKey]
-
-    if (sort === 'desc') {
-      return (a, b) => {
-        let va = getColumnValue(pCtx.withItem(a), column)
-        let vb = getColumnValue(pCtx.withItem(b), column)
-
-        if (getRowOptions(a).ignoreSorting) return -1
-        if (getRowOptions(b).ignoreSorting) return 1
-
-        if (typeof va === 'string' && typeof vb === 'string') {
-          va = va.toLowerCase()
-          vb = vb.toLowerCase()
-        }
-        if (va === 'Not saved') {
-          return 0
-        }
-
-        if (va !== 'Not saved' && vb === 'Not saved') {
-          return -1
-        }
-
-        if (va === vb) {
-          return 0
-        }
-        if (va < vb) {
-          return 1
-        }
-        return -1
-      }
-    }
 
     return (a, b) => {
       let va = getColumnValue(pCtx.withItem(a), column)
@@ -59,18 +29,31 @@ export class SortingFilteringVisitor extends DataVisitor {
       if (getRowOptions(a).ignoreSorting) return -1
       if (getRowOptions(b).ignoreSorting) return 1
 
-      if (typeof va === 'string' && typeof vb === 'string') {
-        va = va.toLowerCase()
-        vb = vb.toLowerCase()
+      if (va == null) return 1
+      if (vb == null) return -1
+
+      if (typeof va !== typeof vb) {
+        va = va.toString()
+        vb = vb.toString()
       }
 
-      if (va === vb) {
-        return 0
+      let comparison = 0
+
+      switch (typeof va) {
+        case 'string':
+          comparison = va.localeCompare(vb, 'fi', { sensitivity: 'accent' })
+          break
+        case 'number':
+          comparison = va - vb
+          break
+        case 'object':
+          if (va instanceof Date) comparison = va.getTime() - vb.getTime()
+          break
+        default:
+          break
       }
-      if (va < vb) {
-        return -1
-      }
-      return 1
+
+      return orderDirection === 'asc' ? comparison : comparison * -1
     }
   }
 
