@@ -53,12 +53,11 @@ export const setFaculties = (uid, faculties) => {
   return callController(route, prefix, data, 'post')
 }
 
-export const reducer = (state = { data: [], enabledOnly: true }, action) => {
+export const reducer = (state = { data: [] }, action) => {
   switch (action.type) {
     case 'GET_USERS_ATTEMPT':
       return {
         ...state,
-        enabledOnly: false,
         pending: true,
       }
     case 'GET_USERS_FAILURE':

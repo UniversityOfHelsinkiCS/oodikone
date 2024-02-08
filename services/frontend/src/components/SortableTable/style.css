@@ -131,6 +131,10 @@
   max-width: 15em;
 }
 
+i.filter.icon {
+  cursor: pointer;
+}
+
 .filter-menu > div > .ui.input {
   margin: 1.14285714rem 0.78571429rem;
   width: calc(100% - 2 * 0.78571429rem);
