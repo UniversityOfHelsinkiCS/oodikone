@@ -508,79 +508,84 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
           )}
         </Orientable>
         <div style={{ flexGrow: 1 }} />
-        <SizeMeasurer onSizeChange={onToolsSizeChange} className={`column-tools ${toolsMode}`}>
-          <div>
-            {sortable && (!hasChildren || column.mergeHeader) && (
-              <Icon
-                name={sortIcon}
-                style={{ color: sort ? 'rgb(33, 133, 208)' : '#bbb', position: 'relative', top: '-1px' }}
-              />
-            )}
-            {filterable && (!hasChildren || column.mergeHeader) && (
-              <Popup
-                offset={[-3, 0]}
-                trigger={<Icon name="filter" style={{ color: isFilterActive ? 'rgb(33, 133, 208)' : '#bbb' }} />}
-                position="bottom center"
-                open={filterMenuOpen}
-                onOpen={e => {
-                  if (e?.stopPropagation) {
-                    e.stopPropagation()
-                  }
+        {(sortable || filterable) && (
+          <SizeMeasurer onSizeChange={onToolsSizeChange} className={`column-tools ${toolsMode}`}>
+            <div>
+              {sortable && (!hasChildren || column.mergeHeader) && (
+                <Icon
+                  name={sortIcon}
+                  style={{ color: sort ? 'rgb(33, 133, 208)' : '#bbb', position: 'relative', top: '-1px' }}
+                />
+              )}
+              {filterable && (!hasChildren || column.mergeHeader) && (
+                <Popup
+                  offset={[-3, 0]}
+                  trigger={<Icon name="filter" style={{ color: isFilterActive ? 'rgb(33, 133, 208)' : '#bbb' }} />}
+                  position="bottom center"
+                  open={filterMenuOpen}
+                  onOpen={e => {
+                    if (e?.stopPropagation) {
+                      e.stopPropagation()
+                    }
 
-                  setFilterMenuOpen(true)
-                }}
-                onClose={e => {
-                  if (e?.stopPropagation) {
-                    e.stopPropagation()
-                  }
+                    setFilterMenuOpen(true)
+                  }}
+                  onClose={e => {
+                    if (e?.stopPropagation) {
+                      e.stopPropagation()
+                    }
 
-                  setFilterMenuOpen(false)
-                }}
-                on="click"
-                className="filter-menu"
-                hideOnScroll={false}
-                style={{ padding: 0, zIndex: 9005 }}
-                hoverable
-              >
-                <div onClick={e => e.stopPropagation()}>
-                  <FilterComponent
-                    dispatch={filterComponentDispatch}
-                    column={column}
-                    options={state.filterOptions ?? ColumnFilters[column.filterType ?? 'default'].initialOptions()}
-                  />
-                  <div className="actions">
-                    <div
-                      className="item"
-                      onClick={() =>
-                        dispatch({ type: 'TOGGLE_COLUMN_SORT', payload: { column: filterColumnKey, direction: 'asc' } })
-                      }
-                    >
-                      Sort: Ascending
-                    </div>
-                    <div
-                      className="item"
-                      onClick={() =>
-                        dispatch({
-                          type: 'TOGGLE_COLUMN_SORT',
-                          payload: { column: filterColumnKey, direction: 'desc' },
-                        })
-                      }
-                    >
-                      Sort: Descending
-                    </div>
-                    <div
-                      className="item"
-                      onClick={() => dispatch({ type: 'RESET_COLUMN_FILTER', payload: { column: filterColumnKey } })}
-                    >
-                      Reset column filter
+                    setFilterMenuOpen(false)
+                  }}
+                  on="click"
+                  className="filter-menu"
+                  hideOnScroll={false}
+                  style={{ padding: 0, zIndex: 9005 }}
+                  hoverable
+                >
+                  <div onClick={e => e.stopPropagation()}>
+                    <FilterComponent
+                      dispatch={filterComponentDispatch}
+                      column={column}
+                      options={state.filterOptions ?? ColumnFilters[column.filterType ?? 'default'].initialOptions()}
+                    />
+                    <div className="actions">
+                      <div
+                        className="item"
+                        onClick={() =>
+                          dispatch({
+                            type: 'TOGGLE_COLUMN_SORT',
+                            payload: { column: filterColumnKey, direction: 'asc' },
+                          })
+                        }
+                      >
+                        Sort: Ascending
+                      </div>
+                      <div
+                        className="item"
+                        onClick={() =>
+                          dispatch({
+                            type: 'TOGGLE_COLUMN_SORT',
+                            payload: { column: filterColumnKey, direction: 'desc' },
+                          })
+                        }
+                      >
+                        Sort: Descending
+                      </div>
+                      <div
+                        className="item"
+                        onClick={() => dispatch({ type: 'RESET_COLUMN_FILTER', payload: { column: filterColumnKey } })}
+                      >
+                        Reset column filter
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Popup>
-            )}
-            {column.helpText && <Popup position="top center" trigger={helpIcon} content={column.helpText} />}
-          </div>
-        </SizeMeasurer>
+                </Popup>
+              )}
+              {column.helpText && <Popup position="top center" trigger={helpIcon} content={column.helpText} />}
+            </div>
+          </SizeMeasurer>
+        )}
       </SizeMeasurer>
     </th>
   )
