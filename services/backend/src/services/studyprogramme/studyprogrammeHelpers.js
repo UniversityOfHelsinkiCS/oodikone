@@ -56,6 +56,7 @@ const formatStudyright = studyright => {
     studyright_elements,
     cancelled,
     facultyCode,
+    actual_studyrightid,
   } = studyright
 
   return {
@@ -73,6 +74,7 @@ const formatStudyright = studyright => {
     studyrightElements: studyright_elements,
     cancelled,
     facultyCode,
+    actual_studyrightid,
     name:
       studyright_elements?.length && studyright_elements[0].element_detail && studyright_elements[0].element_detail.name
         ? studyright_elements[0].element_detail.name
@@ -92,14 +94,16 @@ const formatStudent = student => {
 }
 
 const formatCredit = credit => {
-  const { student_studentnumber, course_code, credits, attainment_date } = credit
+  const { student_studentnumber, course_code, credits, attainment_date, studyright_id, id } = credit
   const code = course_code.replace('AY', '')
   return {
     id: `${student_studentnumber}-${code}`, // For getting unique credits for each course code and student number
+    acualId: id,
     studentNumber: student_studentnumber,
     courseCode: code,
     credits,
     attainmentDate: attainment_date,
+    studyrightId: studyright_id,
   }
 }
 
@@ -355,4 +359,5 @@ module.exports = {
   mapCodesToIds,
   getId,
   getGoal,
+  getCorrectStartDate,
 }

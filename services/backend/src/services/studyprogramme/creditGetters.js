@@ -11,10 +11,12 @@ const getCreditsForStudyProgramme = async (provider, codes, since) =>
     await sequelize.query(
       `
       SELECT 
+        cr.id,
         cr.course_code, 
         cr.attainment_date, 
         cr.student_studentnumber, 
-        cr.credits * COALESCE(share_element.share::numeric, 1) AS credits
+        cr.credits * COALESCE(share_element.share::numeric, 1) AS credits,
+        cr.studyright_id
       FROM 
         credit cr
       JOIN 

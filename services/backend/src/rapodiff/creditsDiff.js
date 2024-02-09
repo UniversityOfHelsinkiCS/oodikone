@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 const { getCreditStats } = require('../services/analyticsService')
+const { getCreditStatsForRapodiff } = require('../services/studyprogramme/rapoCredits')
 const { parseCsv } = require('./helpers')
 const _ = require('lodash')
 
@@ -66,6 +67,41 @@ const programmeCreditsDiff = async fileName => {
   console.log('Diff completed.')
 }
 
+const processIds = async (rawData, code) => {
+  const data = rawData.slice(1)
+  console.log('amount of rapo credits: ', data.length)
+  const rapoData = data
+    .map(row => ({
+      id: row[4],
+      credits: row[5],
+      type: row[6],
+      incl: row[7],
+    }))
+    .filter(row => row.type === '2' && row.incl === '0')
+  const rapoIds = data.map(row => row.id)
+  const stats = await getCreditStatsForRapodiff(code)
+  const okIds = stats.ids
+  console.dir(Object.keys(okIds).length)
+  const notInOk = rapoIds.filter(id => id && !okIds[id.slice(11)]).map(str => str.slice(11))
+  const rapoIdMap = rapoIds.reduce((obj, cur) => {
+    obj[cur] = true
+    return obj
+  }, {})
+  const notInRapo = Object.keys(okIds).filter(id => !rapoIdMap[`ATTAINMENT-${id}`])
+  console.log('\n In rapo, but not in OK: ', notInOk.length)
+  // console.dir(notInOk, { maxArrayLength: null })
+  console.log('\n In OK, but not in Rapo: ', notInRapo.length)
+  // console.dir(notInRapo.slice(0, 20))
+  delete stats.ids
+  console.log(stats)
+  const rapoCredits = rapoData.reduce((sum, cur) => parseInt(sum, 10) + parseInt(cur.credits, 10), 0)
+  console.log('rapoCredits: ', rapoCredits)
+}
+
+const testNewCalc = async code => {
+  await parseCsv('credits.csv', async data => processIds(data, code))
+}
+
 // Change weird rapo programmecodes to oodikone format, example: 300-M003 => MH30_003
 const transformProgrammeCode = oldCode => `${oldCode[4]}H${oldCode.slice(0, 2)}_${oldCode.slice(5, 8)}`
 
@@ -91,4 +127,4 @@ const formatData = data =>
     return obj
   }, {})
 
-module.exports = { programmeCreditsDiff }
+module.exports = { programmeCreditsDiff, testNewCalc }
