@@ -106,6 +106,8 @@ export const EnrollmentAccordion = ({ student }) => {
     'actual_studyrightid'
   )
 
+  if (Object.keys(studyrightsGroupedByStudyright).length === 0) return null
+
   const { enrollmentsByStudyright, programmeNames, firstYear } = calculateSemesterEnrollmentsByStudyright(
     semestersAndYears,
     studyrightsGroupedByStudyright

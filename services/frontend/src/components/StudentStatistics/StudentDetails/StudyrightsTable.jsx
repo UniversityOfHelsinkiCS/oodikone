@@ -21,35 +21,39 @@ export const StudyrightsTable = ({
 
   if (!student) return null
 
-  const studyRightRows = student.studyrights.map(studyright => {
-    const programmes = sortBy(studyright.studyright_elements, 'enddate')
-      .filter(e => e.element_detail.type === 20)
-      .map(programme => ({
-        code: programme.code,
-        startdate: programme.startdate,
-        studystartdate: studyright.studystartdate,
-        enddate: programme.enddate,
-        name: getTextIn(programme.element_detail.name),
-        isFilterable:
-          !studyright.cancelled &&
-          student.studyplans.map(plan => plan.programme_code).includes(programme.element_detail.code),
-      }))
-    const studytracks = sortBy(studyright.studyright_elements, 'enddate')
-      .filter(e => e.element_detail.type === 30)
-      .map(studytrack => ({
-        startdate: studytrack.startdate,
-        enddate: studytrack.enddate,
-        name: getTextIn(studytrack.element_detail.name),
-      }))
-    return {
-      studyrightid: studyright.studyrightid,
-      graduated: studyright.graduated,
-      enddate: studyright.enddate,
-      active: studyright.active,
-      cancelled: studyright.cancelled,
-      elements: { programmes, studytracks },
-    }
-  })
+  const studyRightRows = student.studyrights
+    .filter(sr => sr.studyright_elements.length > 0)
+    .map(studyright => {
+      const programmes = sortBy(studyright.studyright_elements, 'enddate')
+        .filter(e => e.element_detail.type === 20)
+        .map(programme => ({
+          code: programme.code,
+          startdate: programme.startdate,
+          studystartdate: studyright.studystartdate,
+          enddate: programme.enddate,
+          name: getTextIn(programme.element_detail.name),
+          isFilterable:
+            !studyright.cancelled &&
+            student.studyplans.map(plan => plan.programme_code).includes(programme.element_detail.code),
+        }))
+      const studytracks = sortBy(studyright.studyright_elements, 'enddate')
+        .filter(e => e.element_detail.type === 30)
+        .map(studytrack => ({
+          startdate: studytrack.startdate,
+          enddate: studytrack.enddate,
+          name: getTextIn(studytrack.element_detail.name),
+        }))
+      return {
+        studyrightid: studyright.studyrightid,
+        graduated: studyright.graduated,
+        enddate: studyright.enddate,
+        active: studyright.active,
+        cancelled: studyright.cancelled,
+        elements: { programmes, studytracks },
+      }
+    })
+
+  if (studyRightRows.length === 0) return null
 
   const filterDuplicates = (elem1, index, array) => {
     for (let i = 0; i < array.length; i++) {
