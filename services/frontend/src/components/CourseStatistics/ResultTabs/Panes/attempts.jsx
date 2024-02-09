@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import { Icon, Menu } from 'semantic-ui-react'
 import { PaneContent } from '../PaneContent'
+import { PassRateChart } from './Charts/passRate'
 import { AttemptsTable } from './Tables/attempts'
 import { AttemptsTableSettings } from './Settings/attempts'
 import { PassRateSettings } from './Settings/passRate'
-import { PassRateContent } from './passRate'
 
 export const AttemptsPane = ({ availableStats, datasets, separate, userHasAccessToAllStats, updateQuery }) => {
   const [settings, setSettings] = useState({ viewMode: 'ATTEMPTS', separate })
@@ -65,7 +65,7 @@ export const AttemptsPane = ({ availableStats, datasets, separate, userHasAccess
           .map(data => (
             <div key={data.name} style={{ flexGrow: 1, flexBasis: 1, maxWidth: halfWidth ? '50%' : '100%' }}>
               <h3>{data.name}</h3>
-              <PassRateContent data={data} settings={settings} userHasAccessToAllStats={userHasAccessToAllStats} />
+              <PassRateChart data={data} settings={settings} userHasAccessToAllStats={userHasAccessToAllStats} />
             </div>
           ))}
       </div>
