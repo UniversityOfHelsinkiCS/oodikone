@@ -1,11 +1,12 @@
-import React from 'react'
-import qs from 'query-string'
 import _, { uniq } from 'lodash'
+import qs from 'query-string'
+import React from 'react'
+import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Header, Icon, Item } from 'semantic-ui-react'
-
 import { SortableTable, row } from 'components/SortableTable'
-import { getGradeSpread, getThesisGradeSpread, isThesisGrades, resolveGrades, getSortableColumn } from '../util'
+import { getCourseAlternatives } from 'selectors/courseStats'
+import { getGradeSpread, getSortableColumn, getThesisGradeSpread, isThesisGrades, resolveGrades } from '../util'
 
 const getTableData = (stats, useThesisGrades, isRelative) =>
   stats.map(stat => {
@@ -55,7 +56,6 @@ const getGradeColumns = grades =>
 export const AttemptsTable = ({
   data: { stats, name },
   settings: { showGrades, separate },
-  alternatives,
   isRelative,
   userHasAccessToAllStats,
   headerVisible = false,
@@ -64,6 +64,7 @@ export const AttemptsTable = ({
     attempts: { grades },
   } = stats[0]
   const useThesisGrades = isThesisGrades(grades)
+  const alternatives = useSelector(getCourseAlternatives)
 
   const showPopulation = (yearcode, years) => {
     const queryObject = {

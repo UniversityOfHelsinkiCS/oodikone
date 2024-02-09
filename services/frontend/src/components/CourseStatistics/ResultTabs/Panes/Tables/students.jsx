@@ -1,10 +1,12 @@
 import { uniq } from 'lodash'
-import { arrayOf, bool, object, string } from 'prop-types'
+import { bool, object } from 'prop-types'
 import qs from 'query-string'
 import React, { useMemo } from 'react'
+import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Header, Icon, Item } from 'semantic-ui-react'
 import { SortableTable, row } from 'components/SortableTable'
+import { getCourseAlternatives } from 'selectors/courseStats'
 import { defineCellColor, resolveGrades, getSortableColumn } from '../util'
 
 const formatPercentage = passRate => (Number.isNaN(passRate) ? '–' : `${(passRate * 100).toFixed(2)} %`)
@@ -191,11 +193,12 @@ const getColumns = (stats, showDetails, showGrades, userHasAccessToAllStats, alt
 export const StudentsTable = ({
   data: { name, stats },
   settings: { showDetails, separate, showGrades },
-  alternatives,
-  unifyCourses,
   userHasAccessToAllStats,
   headerVisible = false,
 }) => {
+  const alternatives = useSelector(getCourseAlternatives)
+  const unifyCourses = useSelector(state => state.courseSearch.openOrRegular)
+
   const columns = useMemo(
     () => getColumns(stats, showDetails, showGrades, userHasAccessToAllStats, alternatives, separate, unifyCourses),
     [stats, showDetails, showGrades, userHasAccessToAllStats, alternatives, separate, unifyCourses]
@@ -233,7 +236,6 @@ export const StudentsTable = ({
 
 StudentsTable.propTypes = {
   data: object.isRequired,
-  alternatives: arrayOf(string).isRequired,
   separate: bool,
   userHasAccessToAllStats: bool.isRequired,
 }

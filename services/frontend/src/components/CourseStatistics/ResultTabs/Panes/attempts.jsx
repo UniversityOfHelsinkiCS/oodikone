@@ -1,18 +1,10 @@
 import React, { useState } from 'react'
-import { useSelector } from 'react-redux'
 import { Icon, Menu } from 'semantic-ui-react'
-import { getCourseAlternatives } from '../../../../selectors/courseStats'
 import { PaneContent } from '../PaneContent'
 import { AttemptsTable } from './Tables/attempts'
 import { AttemptsTableSettings } from './Settings/attempts'
 import { PassRateSettings } from './Settings/passRate'
 import { PassRateContent } from './passRate'
-
-const AttemptsTableContent = ({ settings, ...otherProps }) => {
-  const alternatives = useSelector(getCourseAlternatives)
-  const openOrRegular = useSelector(state => state.courseSearch.openOrRegular)
-  return <AttemptsTable settings={settings} {...otherProps} alternatives={alternatives} unifyCourses={openOrRegular} />
-}
 
 export const AttemptsPane = ({ initialSettings, datasets, availableStats, updateQuery, ...rest }) => {
   const [settings, setSettings] = useState({ viewMode: 'ATTEMPTS', ...initialSettings })
@@ -62,7 +54,7 @@ export const AttemptsPane = ({ initialSettings, datasets, availableStats, update
               }}
             >
               <h3>{data.name}</h3>
-              <AttemptsTableContent data={data} settings={settings} {...rest} />
+              <AttemptsTable data={data} settings={settings} {...rest} />
             </div>
           ))}
       </div>
