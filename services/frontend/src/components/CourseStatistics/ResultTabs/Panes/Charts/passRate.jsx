@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactHighcharts from 'react-highcharts'
-import { passRateAttemptGraphOptions, passRateStudGraphOptions } from '../../../../constants'
-import { absoluteToRelative, getDataObject, getMaxValueOfSeries } from './util'
+import { passRateAttemptGraphOptions, passRateStudGraphOptions } from '../../../../../constants'
+import { absoluteToRelative, getDataObject, getMaxValueOfSeries } from '../util'
 
 const getPassRateAttemptSeriesFromStats = stats => {
   const all = []
@@ -58,7 +58,7 @@ const getPassRateStudSeriesFromStats = stats => {
   }
 }
 
-export const PassRateContent = ({ data, settings: { viewMode, isRelative }, userHasAccessToAllStats }) => {
+export const PassRateChart = ({ data, settings: { viewMode, isRelative }, userHasAccessToAllStats }) => {
   const isAttemptsMode = viewMode === 'ATTEMPTS'
 
   const stats = data.stats.filter(stat => stat.name !== 'Total')
