@@ -129,8 +129,6 @@ services:
       SIS_IMPORTER_USER: postgres
       SIS_NATS_TOKEN: dev
       SIS_NATS_URI: sis-updater-nats://sis-updater-nats:4222
-      SCHEDULE_IMMEDIATE: '${SCHEDULE_IMMEDIATE}'
-      EXIT_AFTER_IMMEDIATES: '${EXIT_AFTER_IMMEDIATES}'
     ports:
       - 8082:8082
     profiles:
