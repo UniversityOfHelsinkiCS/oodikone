@@ -16,6 +16,8 @@ export const StudentsPane = ({ availableStats, datasets, separate, userHasAccess
   }
 
   const halfWidth = datasets.filter(dataset => dataset).length > 1 && splitDirection === 'row'
+  const styleContainer = { display: 'flex', flexDirection: splitDirection, justifyContent: 'space-between' }
+  const styleData = { flexGrow: 1, flexBasis: 1, maxWidth: halfWidth ? '49%' : '100%' }
 
   return (
     <PaneContent>
@@ -29,28 +31,21 @@ export const StudentsPane = ({ availableStats, datasets, separate, userHasAccess
         <div style={{ flexGrow: 1 }} />
         <DirectionToggle datasets={datasets} setSplitDirection={setSplitDirection} splitDirection={splitDirection} />
       </div>
-      <div style={{ display: 'flex', flexDirection: splitDirection, gap: '2em' }}>
+      <div style={styleContainer}>
         {datasets
           .filter(i => i)
           .map(data => (
-            <div
-              key={data.name}
-              style={{
-                flexGrow: 1,
-                flexBasis: 1,
-                maxWidth: halfWidth ? '50%' : '100%',
-              }}
-            >
+            <div key={data.name} style={styleData}>
               <StudentsTable data={data} settings={settings} userHasAccessToAllStats={userHasAccessToAllStats} />
             </div>
           ))}
       </div>
       <PassRateSettings onChange={setSettings} value={settings} />
-      <div style={{ display: 'flex', flexDirection: splitDirection, gap: '2em' }}>
+      <div style={styleContainer}>
         {datasets
           .filter(i => i)
           .map(data => (
-            <div key={data.name} style={{ flexGrow: 1, flexBasis: 1, maxWidth: halfWidth ? '50%' : '100%' }}>
+            <div key={data.name} style={styleData}>
               <PassRateChart data={data} settings={settings} userHasAccessToAllStats={userHasAccessToAllStats} />
             </div>
           ))}
