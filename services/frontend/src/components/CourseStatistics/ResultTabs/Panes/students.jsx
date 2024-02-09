@@ -1,18 +1,10 @@
 import React, { useState } from 'react'
-import { useSelector } from 'react-redux'
 import { Icon, Menu } from 'semantic-ui-react'
-import { getCourseAlternatives } from '../../../../selectors/courseStats'
 import { PaneContent } from '../PaneContent'
 import { StudentsTable } from './Tables/students'
 import { StudentsTableSettings } from './Settings/students'
 import { PassRateSettings } from './Settings/passRate'
 import { PassRateContent } from './passRate'
-
-const StudentsTableContent = ({ settings, ...otherProps }) => {
-  const alternatives = useSelector(getCourseAlternatives)
-  const openOrRegular = useSelector(state => state.courseSearch.openOrRegular)
-  return <StudentsTable settings={settings} {...otherProps} alternatives={alternatives} unifyCourses={openOrRegular} />
-}
 
 export const StudentsPane = ({ initialSettings, datasets, availableStats, updateQuery, ...rest }) => {
   const [settings, setSettings] = useState({ viewMode: 'STUDENTS', ...initialSettings })
@@ -62,7 +54,7 @@ export const StudentsPane = ({ initialSettings, datasets, availableStats, update
               }}
             >
               <h3>{data.name}</h3>
-              <StudentsTableContent data={data} settings={settings} {...rest} />
+              <StudentsTable data={data} settings={settings} {...rest} />
             </div>
           ))}
       </div>
