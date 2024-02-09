@@ -261,6 +261,7 @@ const getStudyRights = async students =>
         'extentcode',
         'cancelled',
         'facultyCode',
+        'actual_studyrightid',
       ],
       where: {
         studentStudentnumber: students,

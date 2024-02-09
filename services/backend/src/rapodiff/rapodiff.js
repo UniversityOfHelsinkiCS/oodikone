@@ -3,7 +3,7 @@
 
 const { bscProgrammesOfFaculties } = require('./conf')
 const { facultyDiff } = require('./studyrightDiff')
-const { programmeCreditsDiff } = require('./creditsDiff')
+const { programmeCreditsDiff, testNewCalc } = require('./creditsDiff')
 
 const runFacultyStudyrightDiffs = async () => {
   console.log('Running faculty diffs.')
@@ -20,12 +20,13 @@ const runCreditDiffs = async () => {
 }
 
 // ** To add new mode, just type key and function here **
-const modes = { credits: () => programmeCreditsDiff('data.csv') } // { studyrights: runFacultyStudyrightDiffs, credits: runCreditDiffs }
+const modes = { credits: () => programmeCreditsDiff('data.csv'), test: code => testNewCalc(code) } // { studyrights: runFacultyStudyrightDiffs, credits: runCreditDiffs }
 
 const main = async () => {
   console.log('**RAPODIFF**\n')
   const mode = process.argv[2]
   const modeFunction = modes[mode]
+  const arg = process.argv[3]
   if (!modeFunction) {
     console.log(
       'Unknown or missing mode. Supply the mode as an argument. Supported modes:\n',
@@ -33,7 +34,7 @@ const main = async () => {
     )
     return
   }
-  await modeFunction()
+  await modeFunction(arg)
 }
 
 main().then(() => process.exit(0))
