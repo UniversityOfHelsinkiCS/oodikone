@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { Icon, Menu } from 'semantic-ui-react'
-import { PaneContent } from '../PaneContent'
 import { GradeDistributionChart } from './Charts/gradeDistribution'
 import { GradeDistributionSettings } from './Settings/gradeDistribution'
+import { PaneContent } from './PaneContent'
 
 export const GradeDistributionPane = ({ datasets, userHasAccessToAllStats }) => {
   const [isRelative, setIsRelative] = useState(false)

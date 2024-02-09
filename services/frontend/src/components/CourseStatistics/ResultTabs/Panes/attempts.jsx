@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import { Icon, Menu } from 'semantic-ui-react'
-import { PaneContent } from '../PaneContent'
 import { PassRateChart } from './Charts/passRate'
 import { AttemptsTable } from './Tables/attempts'
 import { AttemptsTableSettings } from './Settings/attempts'
 import { PassRateSettings } from './Settings/passRate'
+import { PaneContent } from './PaneContent'
 
 export const AttemptsPane = ({ availableStats, datasets, separate, userHasAccessToAllStats, updateQuery }) => {
   const [settings, setSettings] = useState({ viewMode: 'ATTEMPTS', separate })
