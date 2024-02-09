@@ -40,32 +40,29 @@ export const ResultTabs = ({ primary, comparison, separate, availableStats }) =>
     {
       label: 'Students',
       icon: 'user',
-      initialSettings: { showDetails: false, separate },
       component: StudentsPane,
     },
     {
       label: 'Attempts',
       icon: 'redo',
-      initialSettings: { separate },
       component: AttemptsPane,
     },
     {
       label: 'Grade distribution',
       icon: 'chart bar',
-      initialSettings: { isRelative: false, viewMode: 'STUDENTS' },
       component: GradeDistributionPane,
     },
   ]
 
-  const panes = paneTypes.map(({ icon, label, initialSettings, component: Component }) => ({
+  const panes = paneTypes.map(({ icon, label, component: Component }) => ({
     menuItem: { icon, content: label, key: label },
     render: () => (
       <Component
+        availableStats={availableStats}
+        datasets={[primary, comparison]}
         updateQuery={updateSeparate}
         userHasAccessToAllStats={userHasAccessToAllStats}
-        initialSettings={initialSettings}
-        datasets={[primary, comparison]}
-        availableStats={availableStats}
+        separate={separate}
       />
     ),
   }))
