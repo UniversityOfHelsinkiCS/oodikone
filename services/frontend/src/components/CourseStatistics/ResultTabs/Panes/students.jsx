@@ -6,8 +6,8 @@ import { StudentsTableSettings } from './Settings/students'
 import { PassRateSettings } from './Settings/passRate'
 import { PassRateContent } from './passRate'
 
-export const StudentsPane = ({ initialSettings, datasets, availableStats, updateQuery, ...rest }) => {
-  const [settings, setSettings] = useState({ viewMode: 'STUDENTS', ...initialSettings })
+export const StudentsPane = ({ availableStats, datasets, separate, userHasAccessToAllStats, updateQuery }) => {
+  const [settings, setSettings] = useState({ viewMode: 'STUDENTS', showDetails: false, separate })
   const [splitDirection, setSplitDirection] = useState('row')
 
   const toggleSeparate = separate => {
@@ -21,10 +21,10 @@ export const StudentsPane = ({ initialSettings, datasets, availableStats, update
     <PaneContent>
       <div style={{ display: 'flex', marginBottom: '2em' }}>
         <StudentsTableSettings
-          value={settings}
+          availableStats={availableStats}
           onChange={setSettings}
           onSeparateChange={toggleSeparate}
-          availableStats={availableStats}
+          value={settings}
         />
         <div style={{ flexGrow: 1 }} />
         {datasets.filter(i => i).length > 1 && (
@@ -54,23 +54,18 @@ export const StudentsPane = ({ initialSettings, datasets, availableStats, update
               }}
             >
               <h3>{data.name}</h3>
-              <StudentsTable data={data} settings={settings} {...rest} />
+              <StudentsTable data={data} settings={settings} userHasAccessToAllStats={userHasAccessToAllStats} />
             </div>
           ))}
       </div>
-      <PassRateSettings
-        value={settings}
-        onChange={setSettings}
-        onSeparateChange={toggleSeparate}
-        availableStats={availableStats}
-      />
+      <PassRateSettings onChange={setSettings} value={settings} />
       <div style={{ display: 'flex', flexDirection: splitDirection, gap: '2em' }}>
         {datasets
           .filter(i => i)
           .map(data => (
             <div key={data.name} style={{ flexGrow: 1, flexBasis: 1, maxWidth: halfWidth ? '50%' : '100%' }}>
               <h3>{data.name}</h3>
-              <PassRateContent data={data} settings={settings} {...rest} />
+              <PassRateContent data={data} settings={settings} userHasAccessToAllStats={userHasAccessToAllStats} />
             </div>
           ))}
       </div>

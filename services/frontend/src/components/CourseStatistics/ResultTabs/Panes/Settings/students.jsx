@@ -3,7 +3,7 @@ import { Menu, Radio } from 'semantic-ui-react'
 import { HelpButton } from './HelpButton'
 import { UnifyRadioButtons } from './UnifyRadioButtons'
 
-export const StudentsTableSettings = ({ value, onChange, availableStats, onSeparateChange }) => {
+export const StudentsTableSettings = ({ availableStats, onChange, onSeparateChange, value }) => {
   const { showDetails, showGrades, separate } = value
 
   return (

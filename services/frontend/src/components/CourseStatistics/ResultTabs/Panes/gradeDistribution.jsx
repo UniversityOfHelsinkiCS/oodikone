@@ -70,7 +70,7 @@ const getGradeSeries = series => {
       }
 }
 
-const GradeDistributionContent = ({ data, settings: { isRelative }, userHasAccessToAllStats }) => {
+const GradeDistributionContent = ({ data, isRelative, userHasAccessToAllStats }) => {
   const stats = data.stats.filter(stat => stat.name !== 'Total' || isRelative)
 
   const statYears = stats.map(year => year.name)
@@ -97,24 +97,14 @@ const GradeDistributionContent = ({ data, settings: { isRelative }, userHasAcces
   )
 }
 
-export const GradeDistributionPane = ({ initialSettings, datasets, availableStats, updateQuery, ...rest }) => {
-  const [settings, setSettings] = useState(initialSettings)
+export const GradeDistributionPane = ({ datasets, userHasAccessToAllStats }) => {
+  const [isRelative, setIsRelative] = useState(false)
   const [splitDirection, setSplitDirection] = useState('row')
-
-  const toggleSeparate = separate => {
-    setSettings({ ...settings, separate })
-    updateQuery(separate)
-  }
 
   return (
     <PaneContent>
       <div style={{ display: 'flex', marginBottom: '2em' }}>
-        <GradeDistributionSettings
-          value={settings}
-          onChange={setSettings}
-          onSeparateChange={toggleSeparate}
-          availableStats={availableStats}
-        />
+        <GradeDistributionSettings isRelative={isRelative} setIsRelative={setIsRelative} />
         <div style={{ flexGrow: 1 }} />
         {datasets.filter(i => i).length > 1 && (
           <div style={{ display: 'flex', alignItems: 'center', gap: '1em' }}>
@@ -136,7 +126,11 @@ export const GradeDistributionPane = ({ initialSettings, datasets, availableStat
           .map(data => (
             <div key={data.name} style={{ flexGrow: 1, flexBasis: 1, width: '100%' }}>
               <h3>{data.name}</h3>
-              <GradeDistributionContent data={data} settings={settings} {...rest} />
+              <GradeDistributionContent
+                data={data}
+                isRelative={isRelative}
+                userHasAccessToAllStats={userHasAccessToAllStats}
+              />
             </div>
           ))}
       </div>

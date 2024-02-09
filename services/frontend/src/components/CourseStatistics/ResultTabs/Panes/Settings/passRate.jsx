@@ -2,7 +2,7 @@ import React from 'react'
 import { Menu, Radio } from 'semantic-ui-react'
 import { HelpButton } from './HelpButton'
 
-export const PassRateSettings = ({ value, onChange }) => {
+export const PassRateSettings = ({ onChange, value }) => {
   const { viewMode, isRelative } = value
 
   return (
