@@ -41,7 +41,6 @@ export const AttemptsPane = ({ availableStats, datasets, separate, userHasAccess
                 maxWidth: halfWidth ? '50%' : '100%',
               }}
             >
-              <h3>{data.name}</h3>
               <AttemptsTable data={data} settings={settings} userHasAccessToAllStats={userHasAccessToAllStats} />
             </div>
           ))}
@@ -52,7 +51,6 @@ export const AttemptsPane = ({ availableStats, datasets, separate, userHasAccess
           .filter(i => i)
           .map(data => (
             <div key={data.name} style={{ flexGrow: 1, flexBasis: 1, maxWidth: halfWidth ? '50%' : '100%' }}>
-              <h3>{data.name}</h3>
               <PassRateChart data={data} settings={settings} userHasAccessToAllStats={userHasAccessToAllStats} />
             </div>
           ))}
