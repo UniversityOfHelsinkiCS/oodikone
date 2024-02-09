@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
-import { Icon, Menu } from 'semantic-ui-react'
 import { PassRateChart } from './Charts/passRate'
 import { AttemptsTable } from './Tables/attempts'
 import { AttemptsTableSettings } from './Settings/attempts'
 import { PassRateSettings } from './Settings/passRate'
+import { DirectionToggle } from './DirectionToggle'
 import { PaneContent } from './PaneContent'
 
 export const AttemptsPane = ({ availableStats, datasets, separate, userHasAccessToAllStats, updateQuery }) => {
@@ -27,19 +27,7 @@ export const AttemptsPane = ({ availableStats, datasets, separate, userHasAccess
           availableStats={availableStats}
         />
         <div style={{ flexGrow: 1 }} />
-        {datasets.filter(i => i).length > 1 && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1em' }}>
-            <label>Split direction: </label>
-            <Menu style={{ margin: 0 }}>
-              <Menu.Item active={splitDirection === 'row'} onClick={() => setSplitDirection('row')}>
-                <Icon name="arrows alternate horizontal" />
-              </Menu.Item>
-              <Menu.Item active={splitDirection === 'column'} onClick={() => setSplitDirection('column')}>
-                <Icon name="arrows alternate vertical" />
-              </Menu.Item>
-            </Menu>
-          </div>
-        )}
+        <DirectionToggle datasets={datasets} setSplitDirection={setSplitDirection} splitDirection={splitDirection} />
       </div>
       <div style={{ display: 'flex', flexDirection: splitDirection, gap: '2em' }}>
         {datasets

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import { Icon, Menu } from 'semantic-ui-react'
 import { GradeDistributionChart } from './Charts/gradeDistribution'
 import { GradeDistributionSettings } from './Settings/gradeDistribution'
+import { DirectionToggle } from './DirectionToggle'
 import { PaneContent } from './PaneContent'
 
 export const GradeDistributionPane = ({ datasets, userHasAccessToAllStats }) => {
@@ -15,19 +15,7 @@ export const GradeDistributionPane = ({ datasets, userHasAccessToAllStats }) => 
       <div style={{ display: 'flex', marginBottom: '2em' }}>
         <GradeDistributionSettings isRelative={isRelative} setIsRelative={setIsRelative} />
         <div style={{ flexGrow: 1 }} />
-        {datasets.filter(i => i).length > 1 && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1em' }}>
-            <label>Split direction: </label>
-            <Menu style={{ margin: 0 }}>
-              <Menu.Item active={splitDirection === 'row'} onClick={() => setSplitDirection('row')}>
-                <Icon name="arrows alternate horizontal" />
-              </Menu.Item>
-              <Menu.Item active={splitDirection === 'column'} onClick={() => setSplitDirection('column')}>
-                <Icon name="arrows alternate vertical" />
-              </Menu.Item>
-            </Menu>
-          </div>
-        )}
+        <DirectionToggle datasets={datasets} setSplitDirection={setSplitDirection} splitDirection={splitDirection} />
       </div>
       <div style={{ display: 'flex', flexDirection: splitDirection, gap: '2em' }}>
         {datasets
