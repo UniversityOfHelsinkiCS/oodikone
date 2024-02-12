@@ -16,7 +16,8 @@ const getCreditsForStudyProgramme = async (provider, codes, since) =>
         cr.attainment_date, 
         cr.student_studentnumber, 
         cr.credits * COALESCE(share_element.share::numeric, 1) AS credits,
-        cr.studyright_id
+        cr.studyright_id,
+        cr.semestercode
       FROM 
         credit cr
       JOIN 

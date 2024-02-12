@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-const { getCreditStats } = require('../services/analyticsService')
 const { getCreditStatsForRapodiff } = require('../services/studyprogramme/rapoCredits')
 const { parseCsv } = require('./helpers')
 const _ = require('lodash')
@@ -7,9 +6,7 @@ const _ = require('lodash')
 const diffs = []
 let noDiffCounter = 0
 
-const excelMode = false
-
-const diff = (rapoData, okData, code, rapoFields, okFields) => {
+const diff = (rapoData, okData, code) => {
   for (const year of Object.keys(okData)) {
     if (year !== '2022' && year !== '2023') continue
     const rapo = rapoData[year]
@@ -18,41 +15,31 @@ const diff = (rapoData, okData, code, rapoFields, okFields) => {
       if (!ok) console.log(`Year ${year} not in rapo for code ${code}, skipping`)
       continue
     }
-
-    const okValue = okFields.reduce((sum, cur) => Math.round(ok[cur]) + sum, 0)
-    const rapoValue = rapoFields.reduce((sum, cur) => Math.round(rapo[cur]) + sum, 0)
-    const diff = Math.abs(okValue - rapoValue)
-    if (diff > 400) {
-      const diffStr = !excelMode
-        ? `${code} - ${year} - Ok fields ${okFields}: ${okValue
-            .toString()
-            .padStart(8)} \tRapo fields ${rapoFields}: ${rapoValue.toString().padStart(8)}\tDiff: ${diff}`
-        : `${code}\t${year}\t${rapoValue}\t${okValue}\t${diff}`
-      diffs.push({ code, year, diff, diffStr })
-    } else {
-      noDiffCounter += 1
+    for (const field of ['basic', 'incoming-exchange', 'open-uni', 'agreement', 'separate', 'other']) {
+      const okValue = Math.round(ok[field] || 0)
+      const rapoValue = Math.round(rapo[field] || 0)
+      const diff = Math.abs(okValue - rapoValue)
+      const diffStr = `${field.padEnd(10, ' ')} ${year} ${code.padEnd(
+        10,
+        ' '
+      )} Difference: ${diff} Rapo: ${rapoValue} Oodikone: ${okValue}`
+      diffs.push({ field, diff, okValue, rapoValue, code, year, diffStr })
     }
   }
 }
-
-const parseOkData = data => {
-  return data.tableStats.reduce((obj, cur) => {
-    const [year, total, major, nonmajor, nondegree, transferred] = cur
-    obj[year] = { total, basic: major, nonmajor, nondegree, transferred }
-    return obj
-  }, {})
-}
-
+let counter = 0
 // Acual logic in this function
 const process = async data => {
   // Define here the fields to diff against each other. Must be an array, multiple fields will be summed
-  const rapoField = ['openUni', 'exchange']
-  const okField = ['nondegree']
   const rapoProgrammeData = formatData(data.slice(1))
   const allProgrammeCodes = [...new Set(Object.keys(rapoProgrammeData))]
   for (const programmeCode of allProgrammeCodes) {
-    const okProgrammeData = await getCreditStats(programmeCode, '', 'CALENDAR_YEAR', 'SPECIAL_INCLUDED')
-    diff(rapoProgrammeData[programmeCode], parseOkData(okProgrammeData), programmeCode, rapoField, okField)
+    const okProgrammeData = await getCreditStatsForRapodiff(programmeCode, '', 'CALENDAR_YEAR', 'SPECIAL_INCLUDED')
+    counter++
+    if (counter % 5 === 0) {
+      console.log(`Done ${Math.round((counter / allProgrammeCodes.length) * 100)} %`)
+    }
+    diff(rapoProgrammeData[programmeCode], okProgrammeData, programmeCode)
   }
   const orderedDiffs = _.orderBy(diffs, 'diff', 'asc')
   orderedDiffs.forEach(d => console.log(d.diffStr))
@@ -78,10 +65,14 @@ const processIds = async (rawData, code) => {
       incl: row[7],
     }))
     .filter(row => row.type === '2' && row.incl === '0')
-  const rapoIds = data.map(row => row.id)
+  const rapoIds = rapoData.map(row => row.id)
   const stats = await getCreditStatsForRapodiff(code)
+  if (!stats.ids) {
+    console.log(stats)
+    console.log('Edit getCreditStats code so that it saves a list of the relevant ids you want to compare.')
+    return
+  }
   const okIds = stats.ids
-  console.dir(Object.keys(okIds).length)
   const notInOk = rapoIds.filter(id => id && !okIds[id.slice(11)]).map(str => str.slice(11))
   const rapoIdMap = rapoIds.reduce((obj, cur) => {
     obj[cur] = true
@@ -89,11 +80,11 @@ const processIds = async (rawData, code) => {
   }, {})
   const notInRapo = Object.keys(okIds).filter(id => !rapoIdMap[`ATTAINMENT-${id}`])
   console.log('\n In rapo, but not in OK: ', notInOk.length)
-  // console.dir(notInOk, { maxArrayLength: null })
+  console.dir(notInOk)
   console.log('\n In OK, but not in Rapo: ', notInRapo.length)
-  // console.dir(notInRapo.slice(0, 20))
+  console.dir(notInRapo)
   delete stats.ids
-  console.log(stats)
+  console.log(stats['2022'])
   const rapoCredits = rapoData.reduce((sum, cur) => parseInt(sum, 10) + parseInt(cur.credits, 10), 0)
   console.log('rapoCredits: ', rapoCredits)
 }
@@ -116,10 +107,10 @@ const formatData = data =>
       facultyCode,
       programmeInfo,
       basic: parseNum(basic),
-      exchange: parseNum(exchange),
-      otherUni: parseNum(otherUni),
-      openUni: parseNum(openUni),
-      special: parseNum(special),
+      'incoming-exchange': parseNum(exchange),
+      agreement: parseNum(otherUni),
+      'open-uni': parseNum(openUni),
+      separate: parseNum(special),
       total: parseNum(total),
       abroad: parseNum(abroad),
       other: parseNum(other),

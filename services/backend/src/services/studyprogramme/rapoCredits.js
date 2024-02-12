@@ -1,38 +1,39 @@
 const { mapToProviders } = require('../../util/utils')
 const { defineYear, getCorrectStartDate } = require('./studyprogrammeHelpers')
-const { getCourseCodesForStudyProgramme } = require('.')
+const { getCourseCodesForStudyProgramme, allTransfers } = require('.')
 const { getCreditsForStudyProgramme, getTransferredCredits } = require('./creditGetters')
 const { getStudyRights } = require('./studyrightFinders')
+
 /**
  * Rapo-kategoriat 9.2.2024, joiden perusteella tämä koodi on tehty. Numerot täsmäävät vain 2022 alkaen, koska sisu/oodi ero.
- * 
- * 'basic'
- * Perustutkinto-opiskelijat: niiden opiskelijoiden opintopisteet, joilla on oikeus suorittaa alempi tai 
- * ylempi korkeakoulututkinto.
+  
+  'basic'
+  Perustutkinto-opiskelijat: niiden opiskelijoiden opintopisteet, joilla on oikeus suorittaa alempi tai 
+  ylempi korkeakoulututkinto.
 
-'incoming-exchange'
-Saapuvat vaihto-opiskelijat: opintosuoritukset, jotka ovat saapuvan kansainvälisen opiskelijan suorittamia. 
-Sisältää kaikki vaihto-opiskelijan opiskeluoikeuden aikana syntyneet opintopisteet.
+  'incoming-exchange'
+  Saapuvat vaihto-opiskelijat: opintosuoritukset, jotka ovat saapuvan kansainvälisen opiskelijan suorittamia. 
+  Sisältää kaikki vaihto-opiskelijan opiskeluoikeuden aikana syntyneet opintopisteet.
 
-'agreement'
-Korkeakoulujen väliset yhteistyöopinnot: opintosuoritukset, jotka on tehty korkeakoulujen väliseen
- yhteistyösopimukseen perustuvalla opiskeluoikeudella.
+  'agreement'
+  Korkeakoulujen väliset yhteistyöopinnot: opintosuoritukset, jotka on tehty korkeakoulujen väliseen
+  yhteistyösopimukseen perustuvalla opiskeluoikeudella.
 
-'open-uni'
-Avoimen opiskeluoikeus, ei tutkinto-opiskelija: opintosuoritukset, joiden suorituksen luokittelu on 
-"avoimena yliopisto-opintona suoritettu" ja opiskelija ei ole tutkinto-opiskelija tai kansainvälinen vaihto-opiskelija.
+  'open-uni'
+  Avoimen opiskeluoikeus, ei tutkinto-opiskelija: opintosuoritukset, joiden suorituksen luokittelu on 
+  "avoimena yliopisto-opintona suoritettu" ja opiskelija ei ole tutkinto-opiskelija tai kansainvälinen vaihto-opiskelija.
 
-'separate'
-Erillisoikeus: opintosuoritukset, joiden suorituksen luokittelu on "erillisellä opiskeluoikeudella" tai 
-"opettajankoulutuksen erillisellä opiskeluikeudella" suoritettu. Ei sisällä kansainvälisten vaihto-opiskelijoiden suorituksia.
-Ulkomailta hyväksiluetut opintopisteet: ulkomailta hyväksilutetut opintopisteet.
+  'separate'
+  Erillisoikeus: opintosuoritukset, joiden suorituksen luokittelu on "erillisellä opiskeluoikeudella" tai 
+  "opettajankoulutuksen erillisellä opiskeluikeudella" suoritettu. Ei sisällä kansainvälisten vaihto-opiskelijoiden suorituksia.
+  Ulkomailta hyväksiluetut opintopisteet: ulkomailta hyväksilutetut opintopisteet.
 
-'transferred'
-Muut hyväksiluetut opintopisteet: kotimaassa suoritetut, hyväksiluetut opintopisteet.
- */
+  'transferred'
+  Muut hyväksiluetut opintopisteet: kotimaassa suoritetut, hyväksiluetut opintopisteet.
+*/
 
 const getCategory = (extent, hadDegreeStudyright) => {
-  if ([1, 2, 3, 4].includes(extent) || hadDegreeStudyright) return 'basic-degree' // Rapo-kategoria: Perustutkinto-opiskelijat
+  if ([1, 2, 3, 4].includes(extent) || hadDegreeStudyright) return 'basic' // Rapo-kategoria: Perustutkinto-opiskelijat
   if (extent === 7 || extent === 34) return 'incoming-exchange' // Saapuvat vaihto-opiskelijat
   if (extent === 9 && !hadDegreeStudyright) return 'open-uni' // Avoimen opiskeluoikeus, ei tutkinto-opiskelija
   if (extent === 14) return 'agreement' // Korkeakoulujen väliset yhteistyöopinnot
@@ -45,41 +46,43 @@ const getCategory = (extent, hadDegreeStudyright) => {
   other way. First check for same faculty as credit, but if not found, take first
   without (both have to be active when course was completed)
 */
-const findRelevantStudyright = (attainmentDate, studyrights, facultyCode) => {
-  const withinFaculty = studyrights.find(studyright => {
-    if (studyright.facultyCode !== facultyCode) return false
-    const startDate = getCorrectStartDate(studyright)
-    if (!studyright.graduated) return new Date(attainmentDate) >= new Date(startDate)
-    return new Date(attainmentDate) >= new Date(startDate) && new Date(attainmentDate) <= new Date(studyright.enddate)
-  })
-  if (withinFaculty) return withinFaculty
+const findRelevantStudyright = (attainmentDate, studyrights) => {
   return studyrights.find(studyright => {
     const startDate = getCorrectStartDate(studyright)
     if (!studyright.graduated) return new Date(attainmentDate) >= new Date(startDate)
-    return new Date(attainmentDate) >= new Date(startDate) && new Date(attainmentDate) <= new Date(studyright.enddate)
+    return (
+      new Date(studyright.startdate).getTime() <= new Date(attainmentDate).getTime() &&
+      new Date(attainmentDate).getTime() <= new Date(studyright.enddate).getTime()
+    )
   })
 }
 
 // At the given date, student had SOME degree-studyright.
 const isDegreeStudent = (studyrights, date) =>
-  studyrights?.find(
-    sr =>
-      [1, 2, 3, 4].includes(sr.extentcode) &&
+  studyrights?.some(sr => {
+    const rightExtentCode = [1, 2, 3, 4].includes(sr.extentcode)
+    const rightDates =
       new Date(sr.startdate).getTime() <= new Date(date).getTime() &&
       new Date(date).getTime() <= new Date(sr.enddate).getTime()
-  )
+    // it is possible to also check if student had active semester enrollment to the studyright here.
+    // However, it is unsure if rapo requires this (seems like maybe not). shouldn't make a huge difference.
+    return rightExtentCode && rightDates
+  })
 
 /* includes all specials, is calendar year, since 2017-01-01 */
-const getCreditStatsForRapodiff = async programmeCode => {
+const getCreditStatsForRapodiff = async (programmeCode, isAcademicYear, specialIncluded = true) => {
   const since = new Date('2017-01-01')
   const providercode = mapToProviders([programmeCode])[0]
   const courses = await getCourseCodesForStudyProgramme(providercode)
-  const facultyCode = programmeCode.slice(1, 4)
   const credits = await getCreditsForStudyProgramme(providercode, courses, since)
-
   const students = [...new Set(credits.map(({ studentNumber }) => studentNumber))]
 
+  const transfers = (await allTransfers(programmeCode, since)).map(t => t.studyrightid)
+
   let studyrights = await getStudyRights(students)
+  if (!specialIncluded) {
+    studyrights = studyrights.filter(s => !transfers.includes(s.studyrightid))
+  }
 
   const studyrightIdToStudyrightMap = studyrights.reduce((obj, cur) => {
     obj[cur.actual_studyrightid] = cur
@@ -91,17 +94,19 @@ const getCreditStatsForRapodiff = async programmeCode => {
     obj[cur.studentNumber].push(cur)
     return obj
   }, {})
-  const stats = { ids: {}, total: 0 }
-  credits.forEach(({ acualId: id, attainmentDate, studentNumber, credits, studyrightId }) => {
+
+  const stats = {}
+
+  credits.forEach(({ attainmentDate, studentNumber, credits, studyrightId }) => {
     const relevantStudyright = studyrightId
       ? studyrightIdToStudyrightMap[studyrightId]
-      : findRelevantStudyright(attainmentDate, studentNumberToStudyrightsMap[studentNumber], facultyCode)
+      : findRelevantStudyright(attainmentDate, studentNumberToStudyrightsMap[studentNumber])
     if (!relevantStudyright) return
-    const attainmentYear = defineYear(attainmentDate, false)
+    const attainmentYear = defineYear(attainmentDate, isAcademicYear)
+
     const hadDegreeStudyright = isDegreeStudent(studentNumberToStudyrightsMap[studentNumber], attainmentDate)
     const category = getCategory(relevantStudyright.extentcode, hadDegreeStudyright)
-    if (category === 'open-uni' && credits > 0 && new Date(attainmentDate).getFullYear() === 2022) stats.ids[id] = true
-    if (!stats[attainmentYear]) stats[attainmentYear] = { total: 0, transferred: 0 }
+    if (!stats[attainmentYear]) stats[attainmentYear] = { transferred: 0 }
     stats[attainmentYear].total += credits
     if (!stats[attainmentYear][category]) {
       stats[attainmentYear][category] = 0
@@ -112,8 +117,8 @@ const getCreditStatsForRapodiff = async programmeCode => {
   const transferredCredits = await getTransferredCredits(providercode, since)
 
   transferredCredits.forEach(({ attainment_date, credits }) => {
-    const attainmentYear = defineYear(attainment_date, false)
-    if (!stats[attainmentYear]) stats[attainmentYear] = { total: 0, transferred: 0 }
+    const attainmentYear = defineYear(attainment_date, isAcademicYear)
+    if (!stats[attainmentYear]) stats[attainmentYear] = { transferred: 0 }
     stats[attainmentYear].transferred += credits || 0
     // Transferred not counted in total
   })
