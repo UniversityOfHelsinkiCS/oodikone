@@ -80,7 +80,7 @@ const getRegularCreditStats = async ({ studyprogramme, since, years, isAcademicY
 
   const students = [...new Set(credits.map(({ studentNumber }) => studentNumber))]
 
-  let studyrights = await getStudyRights(students, since)
+  let studyrights = await getStudyRights(students)
 
   const transfers = (await allTransfers(studyprogramme, since)).map(t => t.studyrightid)
 
