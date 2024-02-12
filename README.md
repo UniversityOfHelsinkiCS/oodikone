@@ -61,6 +61,7 @@ graph TB
             client[React app] --> server[NodeJS server]
             server --> ok_redis(Redis)
             konedb[(kone-db)]
+            userdb[(user-db)]
         end
         server -->|Read| sisdb[(sis-db)]
         subgraph Updater
