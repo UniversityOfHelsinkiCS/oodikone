@@ -79,7 +79,7 @@ const getCreditStatsForRapodiff = async programmeCode => {
 
   const students = [...new Set(credits.map(({ studentNumber }) => studentNumber))]
 
-  let studyrights = await getStudyRights(students, since)
+  let studyrights = await getStudyRights(students)
 
   const studyrightIdToStudyrightMap = studyrights.reduce((obj, cur) => {
     obj[cur.actual_studyrightid] = cur
