@@ -25,26 +25,50 @@ export const ColumnFilters = {
 }
 
 const SizeMeasurer = ({ as = 'div', onSizeChange, children, ...rest }) => {
-  const monitorRef = useRef(
-    new window.ResizeObserver(entries => {
-      if (Array.isArray(entries[0].borderBoxSize)) {
-        onSizeChange(entries[0].borderBoxSize[0])
-      } else {
-        onSizeChange(entries[0].borderBoxSize)
-      }
-    })
-  )
+  const monitorRef = useRef(null)
+  const targetRef = useRef(null)
 
-  const targetRef = useRef()
+  useEffect(() => {
+    let animationFrameId = null
+
+    const observer = new ResizeObserver(entries => {
+      cancelAnimationFrame(animationFrameId)
+
+      animationFrameId = requestAnimationFrame(() => {
+        if (Array.isArray(entries[0].borderBoxSize)) {
+          onSizeChange(entries[0].borderBoxSize[0])
+        } else {
+          onSizeChange(entries[0].borderBoxSize)
+        }
+      })
+    })
+
+    if (targetRef.current) {
+      observer.observe(targetRef.current)
+    }
+
+    return () => {
+      if (targetRef.current) {
+        observer.unobserve(targetRef.current)
+      }
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId)
+      }
+    }
+  }, [onSizeChange])
 
   const target = useCallback(node => {
-    if (node) {
-      monitorRef.current.observe(node)
-    } else {
+    // Unobserve the previous node
+    if (targetRef.current && monitorRef.current) {
       monitorRef.current.unobserve(targetRef.current)
     }
 
     targetRef.current = node
+
+    // Observe the new node, if it's not null
+    if (node && monitorRef.current) {
+      monitorRef.current.observe(node)
+    }
   }, [])
 
   const Container = as
