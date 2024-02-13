@@ -16,4 +16,4 @@ COPY . .
 
 EXPOSE 8082
 
-CMD ["npm", "start"]
+CMD ["node", "src/index.js"]

@@ -14,4 +14,4 @@ COPY ./package* ./
 RUN npm ci --omit-dev
 COPY . .
 
-CMD ["npm", "start"]
+CMD ["node", "src/index.js"]

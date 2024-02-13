@@ -8,4 +8,4 @@ COPY ./package* ./
 RUN npm ci
 COPY . .
 
-CMD ["npm", "run", "dev"]
+CMD ["node_modules/.bin/nodemon", "src/index.js"]

@@ -7,6 +7,7 @@ WORKDIR /opt/app-root/src
 EXPOSE 8080
 
 ENV NODE_ENV=production
+ENV NODE_OPTIONS=--max-old-space-size=4096
 
 ARG BASE_PATH
 ENV PUBLIC_URL=$BASE_PATH
@@ -24,4 +25,4 @@ COPY ./package* ./
 RUN npm ci --omit-dev
 COPY . .
 
-CMD ["npm", "start"]
+CMD ["node", "index.js"]
