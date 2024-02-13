@@ -17,7 +17,7 @@ module.exports.REDIS_LAST_WEEKLY_SCHEDULE = 'LAST_WEEKLY_SCHEDULE'
 module.exports.REDIS_LAST_PREPURGE_INFO = 'LAST_PREPURGE_INFO'
 
 module.exports.EXIT_AFTER_IMMEDIATES = process.env.EXIT_AFTER_IMMEDIATES === 'yes'
-module.exports.SCHEDULE_IMMEDIATE = (process.env.SCHEDULE_IMMEDIATE || 'none').split(',')
+module.exports.SCHEDULE_IMMEDIATE = process.env.SCHEDULE_IMMEDIATE?.split(',') || []
 module.exports.ENABLE_WORKER_REPORTING =
   module.exports.EXIT_AFTER_IMMEDIATES || process.env.ENABLE_WORKER_REPORTING === 'yes'
 
