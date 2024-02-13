@@ -24,7 +24,7 @@
     "papaparse": "^5.4.1",
     "pg": "^8.8.0",
     "redis": "^3.1.2",
-    "sequelize": "^6.24.0",
+    "sequelize": "^6.37.0",
     "umzug": "^2.3.0",
     "unfuck-utf8-headers-middleware": "^1.0.1",
     "winston": "^3.8.2",
