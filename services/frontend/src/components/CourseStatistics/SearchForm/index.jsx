@@ -8,6 +8,7 @@ import { func } from 'prop-types'
 
 import { clearCourses, findCoursesV2 } from 'redux/coursesearch'
 import { getCourseStats, clearCourseStats } from 'redux/coursestats'
+import { useGetAuthorizedUserQuery } from 'redux/auth'
 import { getCourseSearchResults } from 'selectors/courses'
 import { useSearchHistory, useToggle } from 'common/hooks'
 import { validateInputLength } from 'common'
@@ -45,6 +46,8 @@ export const SearchForm = ({ onProgress }) => {
   const matchingCourses = useSelector(state => getCourseSearchResults(state, combineSubstitutions))
   const [state, setState] = useState({ ...INITIAL })
   const [searchHistory, addItemToSearchHistory, updateItemInSearchHistory] = useSearchHistory('courseSearch', 6)
+  const { iamRights, isAdmin } = useGetAuthorizedUserQuery()
+  const hasStudyProgrammeRights = iamRights.length > 0 || isAdmin
 
   const { courseName, courseCode, selectedCourses, separate } = state
 
@@ -241,10 +244,12 @@ export const SearchForm = ({ onProgress }) => {
       <Segment loading={isLoading}>
         <Form>
           <Header>Search for courses</Header>
-          <Message info>
-            <Message.Header>{getTextIn(newFeatureMessage.header)}</Message.Header>
-            <p>{getTextIn(newFeatureMessage.content)}</p>
-          </Message>
+          {hasStudyProgrammeRights && (
+            <Message info>
+              <Message.Header>{getTextIn(newFeatureMessage.header)}</Message.Header>
+              <p>{getTextIn(newFeatureMessage.content)}</p>
+            </Message>
+          )}
           <div style={{ marginBottom: '15px' }}>
             <Form.Group>
               <Form.Field width={8}>
