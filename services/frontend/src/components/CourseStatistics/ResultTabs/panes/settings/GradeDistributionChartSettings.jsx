@@ -1,8 +1,8 @@
 import React from 'react'
 import { Menu, Radio } from 'semantic-ui-react'
-import { HelpButton } from './HelpButton'
+import { HelpButton } from './common/HelpButton'
 
-export const GradeDistributionSettings = ({ isRelative, setIsRelative }) => {
+export const GradeDistributionChartSettings = ({ isRelative, setIsRelative }) => {
   return (
     <Menu secondary style={{ marginBottom: 0 }}>
       <Menu.Item>

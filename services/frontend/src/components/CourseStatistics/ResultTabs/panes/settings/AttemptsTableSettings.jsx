@@ -1,23 +1,14 @@
 import React from 'react'
 import { Menu, Radio } from 'semantic-ui-react'
-import { HelpButton } from './HelpButton'
-import { UnifyRadioButtons } from './UnifyRadioButtons'
+import { HelpButton } from './common/HelpButton'
+import { UnifyRadioButtons } from './common/UnifyRadioButtons'
 
-export const StudentsTableSettings = ({ availableStats, onChange, onSeparateChange, value }) => {
-  const { showDetails, showGrades, separate } = value
+export const AttemptsTableSettings = ({ value, onChange, availableStats, onSeparateChange }) => {
+  const { showGrades, separate } = value
 
   return (
     <div>
       <Menu style={{ flexWrap: 'wrap' }} secondary>
-        <Menu.Item>
-          <Radio
-            toggle
-            label="Show details"
-            data-cy="detailToggle"
-            checked={showDetails}
-            onChange={() => onChange({ ...value, showDetails: !showDetails })}
-          />
-        </Menu.Item>
         <Menu.Item>
           <Radio
             toggle
@@ -37,7 +28,7 @@ export const StudentsTableSettings = ({ availableStats, onChange, onSeparateChan
           />
         </Menu.Item>
         <Menu.Item>
-          <HelpButton tab="Tables" viewMode="STUDENTS" />
+          <HelpButton tab="Tables" viewMode="ATTEMPTS" />
         </Menu.Item>
       </Menu>
       <UnifyRadioButtons availableStats={availableStats} />
