@@ -13,9 +13,9 @@ import {
 const getGradeSeries = series => {
   const isGradeSeries = !isThesisSeries(series)
   const newSeries = isGradeSeries ? getGradeSpread(series) : getThesisGradeSpread(series)
-  const sumAll = Object.values(newSeries)[0].map((_, idx) =>
+  const sumAll = Object.values(newSeries)[0].map((_, index) =>
     Object.values(newSeries)
-      .map(serie => serie[idx])
+      .map(series => series[index])
       .reduce((a, b) => a + b, 0)
   )
   return isGradeSeries

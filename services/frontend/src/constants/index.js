@@ -39,7 +39,7 @@ export const passRateAttemptGraphOptions = (isRelative, categories, max, title, 
   },
 })
 
-export const passRateStudGraphOptions = (isRelative, categories, max, title, skipFirstColor) => ({
+export const passRateStudentGraphOptions = (isRelative, categories, max, title, skipFirstColor) => ({
   chart: {
     type: 'column',
   },

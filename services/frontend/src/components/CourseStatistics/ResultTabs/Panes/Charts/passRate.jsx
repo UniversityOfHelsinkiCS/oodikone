@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactHighcharts from 'react-highcharts'
-import { passRateAttemptGraphOptions, passRateStudGraphOptions } from '../../../../../constants'
+import { passRateAttemptGraphOptions, passRateStudentGraphOptions } from '../../../../../constants'
 import { absoluteToRelative, getDataObject, getMaxValueOfSeries } from '../util'
 
 const getPassRateAttemptSeriesFromStats = stats => {
@@ -28,7 +28,7 @@ const getPassRateAttemptSeriesFromStats = stats => {
   }
 }
 
-const getPassRateStudSeriesFromStats = stats => {
+const getPassRateStudentSeriesFromStats = stats => {
   const all = []
   const passedFirst = []
   const passedEventually = []
@@ -63,12 +63,12 @@ export const PassRateChart = ({ data, settings: { viewMode, isRelative }, userHa
 
   const stats = data.stats.filter(stat => stat.name !== 'Total')
   const statYears = stats.map(year => year.name)
-  const passGraphSerieFn = isAttemptsMode ? getPassRateAttemptSeriesFromStats : getPassRateStudSeriesFromStats
+  const passGraphSeries = isAttemptsMode
+    ? getPassRateAttemptSeriesFromStats(stats)
+    : getPassRateStudentSeriesFromStats(stats)
 
-  const passGraphSerie = passGraphSerieFn(stats)
-
-  const maxPassRateVal = isRelative ? 100 : getMaxValueOfSeries(passGraphSerie.absolute)
-  const graphOptionsFn = isAttemptsMode ? passRateAttemptGraphOptions : passRateStudGraphOptions
+  const maxPassRateVal = isRelative ? 100 : getMaxValueOfSeries(passGraphSeries.absolute)
+  const graphOptionsFn = isAttemptsMode ? passRateAttemptGraphOptions : passRateStudentGraphOptions
   const primaryGraphOptions = graphOptionsFn(
     isRelative,
     statYears,
@@ -80,7 +80,7 @@ export const PassRateChart = ({ data, settings: { viewMode, isRelative }, userHa
   return (
     <div>
       <ReactHighcharts
-        config={{ ...primaryGraphOptions, series: isRelative ? passGraphSerie.relative : passGraphSerie.absolute }}
+        config={{ ...primaryGraphOptions, series: isRelative ? passGraphSeries.relative : passGraphSeries.absolute }}
       />
       {!userHasAccessToAllStats && (
         <span className="totalsDisclaimer">* Years with 5 students or less are shown as 0 in the chart</span>
