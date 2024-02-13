@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { PassRateChart } from './Charts/passRate'
-import { PassRateSettings } from './Settings/passRate'
+import { PassRateChart } from '../charts/PassRateChart'
+import { PassRateChartSettings } from '../settings/PassRateChartSettings'
 import { DirectionToggle } from './DirectionToggle'
 import { PaneContent } from './PaneContent'
 
@@ -53,7 +53,7 @@ export const Pane = ({
             </div>
           ))}
       </div>
-      <PassRateSettings onChange={setSettings} value={settings} />
+      <PassRateChartSettings onChange={setSettings} value={settings} />
       <div style={styleContainer}>
         {datasets
           .filter(i => i)

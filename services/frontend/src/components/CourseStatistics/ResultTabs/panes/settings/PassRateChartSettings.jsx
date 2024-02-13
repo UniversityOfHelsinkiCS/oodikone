@@ -1,8 +1,8 @@
 import React from 'react'
 import { Menu, Radio } from 'semantic-ui-react'
-import { HelpButton } from './HelpButton'
+import { HelpButton } from './common/HelpButton'
 
-export const PassRateSettings = ({ onChange, value }) => {
+export const PassRateChartSettings = ({ onChange, value }) => {
   const { viewMode, isRelative } = value
 
   return (

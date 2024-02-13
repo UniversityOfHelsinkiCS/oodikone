@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import { GradeDistributionChart } from './Charts/gradeDistribution'
-import { GradeDistributionSettings } from './Settings/gradeDistribution'
-import { DirectionToggle } from './DirectionToggle'
-import { PaneContent } from './PaneContent'
+import { GradeDistributionChart } from './charts/GradeDistributionChart'
+import { GradeDistributionChartSettings } from './settings/GradeDistributionChartSettings'
+import { DirectionToggle } from './common/DirectionToggle'
+import { PaneContent } from './common/PaneContent'
 
 export const GradeDistributionPane = ({ datasets, userHasAccessToAllStats }) => {
   const [isRelative, setIsRelative] = useState(false)
@@ -13,7 +13,7 @@ export const GradeDistributionPane = ({ datasets, userHasAccessToAllStats }) => 
   return (
     <PaneContent>
       <div style={{ display: 'flex', marginBottom: '2em' }}>
-        <GradeDistributionSettings isRelative={isRelative} setIsRelative={setIsRelative} />
+        <GradeDistributionChartSettings isRelative={isRelative} setIsRelative={setIsRelative} />
         <div style={{ flexGrow: 1 }} />
         <DirectionToggle datasets={datasets} setSplitDirection={setSplitDirection} splitDirection={splitDirection} />
       </div>
