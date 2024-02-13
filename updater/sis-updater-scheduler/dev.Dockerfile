@@ -10,4 +10,4 @@ COPY . .
 
 EXPOSE 8082
 
-CMD ["npm", "run", "dev"]
+CMD ["node_modules/.bin/nodemon", "src/index.js"]
