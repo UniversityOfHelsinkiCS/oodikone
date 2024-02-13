@@ -34,13 +34,15 @@ const byCodes = codes => {
   })
 }
 
+const escapeRegExp = string => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
 const codeLikeTerm = code =>
   !code
     ? undefined
     : {
         code: {
-          // Starts with code or has AY/A in front of the code
-          [Op.iRegexp]: `^(AY|ay|A|a)?${code}`,
+          // Starts with code or has AY/A in front of the code (case-insensitive)
+          [Op.iRegexp]: `^(AY|A)?${escapeRegExp(code)}`,
         },
       }
 
