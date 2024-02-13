@@ -1,6 +1,4 @@
-import { colors } from '../styles/variables'
-
-const { chartblue, red, green, chartdarkg, chartlgreen, chartdarkred, chartlred } = colors
+import { color, chartColor } from 'styles/colors'
 
 export const DEFAULT_LANG = 'fi'
 export const DISPLAY_DATE_FORMAT = 'DD.MM.YYYY'
@@ -11,7 +9,7 @@ export const passRateAttemptGraphOptions = (isRelative, categories, max, title, 
   chart: {
     type: 'column',
   },
-  colors: skipFirstColor ? [green, red] : [chartblue, green, red],
+  colors: skipFirstColor ? [color.green, color.red] : [chartColor.blue, color.green, color.red],
   title: {
     text: title,
   },
@@ -44,8 +42,8 @@ export const passRateStudentGraphOptions = (isRelative, categories, max, title, 
     type: 'column',
   },
   colors: skipFirstColor
-    ? [chartlgreen, chartdarkg, chartlred, chartdarkred]
-    : [chartblue, chartlgreen, chartdarkg, chartlred, chartdarkred],
+    ? [chartColor.greenLight, chartColor.greenDark, chartColor.redLight, chartColor.redDark]
+    : [chartColor.blue, chartColor.greenLight, chartColor.greenDark, chartColor.redLight, chartColor.redDark],
   title: {
     text: title,
   },
@@ -77,7 +75,16 @@ export const gradeGraphOptions = (isRelative, categories, max, title) => ({
   chart: {
     type: 'column',
   },
-  colors: [red, chartblue, chartblue, chartblue, chartblue, chartblue, green, green],
+  colors: [
+    color.red,
+    chartColor.blue,
+    chartColor.blue,
+    chartColor.blue,
+    chartColor.blue,
+    chartColor.blue,
+    color.green,
+    color.green,
+  ],
   title: {
     text: title,
   },
