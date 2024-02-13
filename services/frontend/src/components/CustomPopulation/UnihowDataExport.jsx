@@ -25,15 +25,14 @@ export const UnihowDataExport = ({ students }) => {
     <Popup
       trigger={
         <Button
-          onClick={() => {
-            xlsx.writeFile(getXlsx(), filename)
-          }}
           icon="file excel"
-        >
-          Excel Workbook (UniHow)
-        </Button>
+          content="Excel Workbook (UniHow)"
+          labelPosition="left"
+          onClick={() => xlsx.writeFile(getXlsx(), filename)}
+        />
       }
-      content="Click here to download a specialized Excel-workbook with Unihow-data."
+      content="Click here to download a specialized Excel workbook with UniHow data."
+      position="top center"
     />
   )
 }

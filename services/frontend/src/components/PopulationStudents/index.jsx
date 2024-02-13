@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Tab, Grid } from 'semantic-ui-react'
+import { Tab } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import moment from 'moment'
 
@@ -135,12 +135,10 @@ const Panes = ({
 
   return (
     <>
-      <Grid columns="two">
-        <Grid.Column>
-          <StudentNameVisibilityToggle />
-        </Grid.Column>
-        {dataExport && <Grid.Column textAlign="right">{dataExport}</Grid.Column>}
-      </Grid>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <StudentNameVisibilityToggle />
+        {dataExport}
+      </div>
       <Tab onTabChange={handleTabChange} panes={panes} data-cy="student-table-tabs" />
     </>
   )
