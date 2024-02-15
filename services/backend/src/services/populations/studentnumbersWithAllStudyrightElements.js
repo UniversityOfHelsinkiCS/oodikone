@@ -18,8 +18,6 @@ const studentnumbersWithAllStudyrightElements = async ({
   transferredToStudents,
   graduatedStudents,
 }) => {
-  // eslint-disable-line
-
   const filteredExtents = [16] // always filter out secondary subject students
   if (!exchangeStudents) {
     filteredExtents.push(7, 34)

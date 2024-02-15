@@ -1,4 +1,3 @@
-/* eslint-disable cypress/no-unnecessary-waiting */
 /// <reference types="Cypress" />
 
 const MOCKED_DATE = new Date(2022, 6, 12).getTime()
