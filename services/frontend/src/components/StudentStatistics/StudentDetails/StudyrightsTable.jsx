@@ -3,9 +3,12 @@ import { func, shape, string } from 'prop-types'
 import { Divider, Table, Icon, Header, Item, Segment, Button, Popup } from 'semantic-ui-react'
 import { sortBy } from 'lodash'
 import { Link } from 'react-router-dom'
+import ReactMarkdown from 'react-markdown'
 
 import { useLanguage } from 'components/LanguagePicker/useLanguage'
-import { reformatDate, getTargetCreditsForProgramme } from 'common'
+import { reformatDate, getTargetCreditsForProgramme, calculatePercentage } from 'common'
+import { HoverableHelpPopup } from 'components/common/HoverableHelpPopup'
+import { studentToolTips } from 'common/InfoToolTips'
 
 export const StudyrightsTable = ({
   Programmes,
@@ -157,10 +160,10 @@ export const StudyrightsTable = ({
 
     const { completed_credits: completedCredits } = studyplan
     const credits = completedCredits || 0
-    if (c.graduated) return `${credits}cr`
+    if (c.graduated) return `${credits} cr`
     const totalCredits = getTargetCreditsForProgramme(programmeCodes[0])
-    const completedPercentage = `${(Math.min(1, credits / Math.max(totalCredits, 1)) * 100).toFixed(0)}%`
-    return `${completedPercentage} (${credits}cr)`
+    const completedPercentage = calculatePercentage(credits, totalCredits, 0)
+    return `${completedPercentage} (${credits} cr)`
   }
 
   return (
@@ -176,32 +179,10 @@ export const StudyrightsTable = ({
               <Table.HeaderCell key={header}>
                 {header}
                 {header === 'Status' && (
-                  <Popup
-                    hoverable
-                    content={
-                      <>
-                        <p>
-                          Shows the status of the current semester enrollment of the student in the corresponding
-                          programme.
-                        </p>
-                        <p style={{ marginBottom: 0 }}>
-                          <strong>Active:</strong> Student has a semester enrollment to the corresponding programme as
-                          either present or absent.
-                        </p>
-                        <p style={{ marginBottom: 0, marginTop: 0 }}>
-                          <strong>Inactive:</strong> Student has not enrolled to the corresponding programme this
-                          semester.
-                        </p>
-                        <p style={{ marginBottom: 0, marginTop: 0 }}>
-                          <strong>Cancelled:</strong> Studyright for the corresponding programme is cancelled.
-                        </p>
-                        <p style={{ marginTop: 0 }}>
-                          <strong>Graduated:</strong> Student has graduated from the corresponding programme.
-                        </p>
-                      </>
-                    }
+                  <HoverableHelpPopup
+                    content={<ReactMarkdown>{studentToolTips.StudyrightStatus}</ReactMarkdown>}
                     size="mini"
-                    trigger={<Icon name="question circle outline" />}
+                    style={{ marginLeft: '0.25rem' }}
                   />
                 )}
               </Table.HeaderCell>
