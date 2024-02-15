@@ -80,16 +80,12 @@ export const GeneralTab = ({
   }
 
   const selectedStudents = filteredStudents.map(stu => stu.studentNumber)
-  const students = Object.fromEntries(
-    filteredStudents
-      .map(stu => {
-        return {
-          ...stu,
-          semesterEnrollmentsMap: createSemesterEnrollmentsMap(stu),
-        }
-      })
-      .map(stu => [stu.studentNumber, stu])
-  )
+  const students = filteredStudents.reduce((acc, stu) => {
+    acc[stu.studentNumber] = columnKeysToInclude.includes('semesterEnrollments')
+      ? { ...stu, semesterEnrollmentsMap: createSemesterEnrollmentsMap(stu) }
+      : stu
+    return acc
+  }, {})
 
   const getCombinedProgrammeCode = (query, studyGuidanceGroupProgrammes) => {
     if (query && query?.studyRights?.combinedProgramme) return query.studyRights.combinedProgramme
