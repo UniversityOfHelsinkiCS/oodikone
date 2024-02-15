@@ -12,7 +12,6 @@
   "plugins": ["prettier", "cypress"],
   "rules": {
     "no-console": "error",
-    "react/no-unescaped-entities": "off",
     "no-async-promise-executor": "off",
     "prettier/prettier": "error",
     "cypress/no-assigning-return-values": "off"
