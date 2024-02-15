@@ -1,84 +1,34 @@
 import React, { useEffect } from 'react'
-import { Button, Card, Divider, List, Icon, Popup, Dropdown, Header } from 'semantic-ui-react'
+import { Button, Card, Divider, Popup, Dropdown, Segment, Loader, Message } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { sortBy } from 'lodash'
+import { useHistory, useParams } from 'react-router-dom'
 
 import { useGetAuthorizedUserQuery, useShowAsUser } from 'redux/auth'
-import { useGetAllElementDetailsQuery } from 'redux/elementdetails'
-import { removeUserUnits, setFaculties } from 'redux/users'
-import { getAccessGroups } from 'redux/accessGroups'
+import { setFaculties, useGetUserQuery } from 'redux/users'
 import { getFaculties } from 'redux/faculties'
-import { getProgrammesUnfiltered } from 'redux/populationProgrammesUnfiltered'
 import { textAndDescriptionSearch } from '../../common'
-import { ConnectedAccessRights as AccessRights } from './AccessRights'
-import { ConnectedAccessGroups as AccessGroups } from './AccessGroups'
+import { AccessRights } from './AccessRights'
+import { AccessGroups } from './AccessGroups'
 import { EmailNotification } from './EmailNotification'
 import { useLanguage } from '../LanguagePicker/useLanguage'
 
-const UserPage = ({
-  user,
-  accessGroups,
-  faculties,
-  setFaculties,
-  goBack,
-  associations,
-  pending,
-  removeUserUnits,
-  getAccessGroups,
-  getFaculties,
-  getProgrammesUnfiltered,
-}) => {
+const UserPage = ({ faculties, setFaculties, getFaculties }) => {
+  const history = useHistory()
+
+  const { userid } = useParams()
   const { getTextIn } = useLanguage()
   const { userId: currentUserId, isAdmin } = useGetAuthorizedUserQuery()
   const showAsUser = useShowAsUser()
-  const { data: elementdetails = [] } = useGetAllElementDetailsQuery()
+  const { data: user, isLoading, isError, error } = useGetUserQuery(userid)
 
   useEffect(() => {
-    if (accessGroups.data.length === 0) getAccessGroups()
     if (faculties.length === 0) getFaculties()
-    if (Object.keys(associations).length === 0 && !pending) {
-      getProgrammesUnfiltered()
-    }
   }, [])
 
-  const removeAccess = (uid, unit) => () => removeUserUnits(uid, [unit])
+  if (isLoading) return <Loader active inline="centered" />
 
-  const renderUnitList = (usersElementdetailCodes, elementdetails, user) => {
-    if (!usersElementdetailCodes) return null
-    const nameInLanguage = element => getTextIn(element.name)
-    const elementDetailCodesAvailable = new Set(elementdetails.map(({ code }) => code))
-    const usersElementdetailCodesAvailable = usersElementdetailCodes.filter(obj =>
-      elementDetailCodesAvailable.has(obj.elementDetailCode)
-    )
-    usersElementdetailCodesAvailable.sort()
-    return (
-      <List divided>
-        {usersElementdetailCodesAvailable.length > 0 &&
-          usersElementdetailCodesAvailable.map(({ elementDetailCode: code }) => {
-            const element = elementdetails.find(e => e.code === code)
-            return (
-              <List.Item key={code}>
-                <List.Content floated="right">
-                  <Button
-                    data-cy="remove-access"
-                    basic
-                    negative
-                    floated="right"
-                    onClick={removeAccess(user.id, code)}
-                    content="Remove"
-                    size="tiny"
-                  />
-                </List.Content>
-                <List.Content>
-                  {element && element.type === 30 ? <Icon name="minus" /> : null}{' '}
-                  {`${nameInLanguage(element)} (${code})`}
-                </List.Content>
-              </List.Item>
-            )
-          })}
-      </List>
-    )
-  }
+  if (isError) return <Message negative size="big" icon="ban" header={error.data.error} />
 
   const renderUserInfoCard = () => (
     <Card fluid>
@@ -108,25 +58,11 @@ const UserPage = ({
     </Card>
   )
 
-  const renderAccessRights = () => (
+  const renderFacultyAccessRights = () => (
     <Card fluid>
       <Card.Content>
-        <Card.Header content="Access rights" />
+        <Card.Header content="Faculty access rights" />
         <Card.Description>
-          {user.accessgroup.map(ag => ag.group_code).includes('admin') ? (
-            <p
-              style={{
-                fontSize: '34px',
-                fontFamily: 'Comic Sans',
-                color: 'darkred',
-                border: '1px',
-              }}
-            >
-              Admin access!
-            </p>
-          ) : null}
-          {renderUnitList(user.programme, elementdetails, user)}
-          <Header content="Faculties" />
           <Dropdown
             placeholder="Select faculties"
             fluid
@@ -134,12 +70,7 @@ const UserPage = ({
             multiple
             value={user.faculty.map(f => f.faculty_code)}
             options={sortBy(
-              faculties.map(f => ({
-                key: f.code,
-                text: getTextIn(f.name),
-                description: f.code,
-                value: f.code,
-              })),
+              faculties.map(f => ({ key: f.code, text: getTextIn(f.name), description: f.code, value: f.code })),
               ['text']
             )}
             onChange={(__, { value: facultycodes }) => setFaculties(user.id, facultycodes)}
@@ -152,56 +83,44 @@ const UserPage = ({
     </Card>
   )
 
-  if (!accessGroups) {
-    return null
-  }
-
   return (
-    <div>
-      <Button icon="arrow circle left" content="Back" onClick={goBack} />
-      <Divider />
-      <Card.Group>
-        {renderUserInfoCard()}
-        <Card fluid>
-          <Card.Content>
-            <Card.Header content="Add study programme access rights" />
-            <Divider />
-            <AccessRights uid={user.id} rights={user.elementdetails} />
-          </Card.Content>
-        </Card>
-        <Card fluid>
-          <Card.Content>
-            <Card.Header content="Add access group rights" />
-            <Divider />
-            <AccessGroups user={user} />
-          </Card.Content>
-        </Card>
-        {renderAccessRights()}
-        <Card fluid>
-          <Card.Content>
-            <Card.Header content="Send email about receiving access to oodikone" />
-            <Card.Description>
+    <Segment loading={isLoading} className="contentSegment">
+      <div>
+        <Button icon="arrow circle left" content="Back" onClick={() => history.push('/users')} />
+        <Divider />
+        <Card.Group>
+          {renderUserInfoCard()}
+          <Card fluid>
+            <Card.Content>
+              <Card.Header content="Roles" />
+              <AccessGroups user={user} />
+            </Card.Content>
+          </Card>
+          <Card fluid>
+            <Card.Content>
+              <Card.Header content="Study programme access rights" />
               <Divider />
-              <EmailNotification userEmail={user.email} />
-            </Card.Description>
-          </Card.Content>
-        </Card>
-      </Card.Group>
-    </div>
+              <AccessRights user={user} />
+            </Card.Content>
+          </Card>
+          {renderFacultyAccessRights()}
+          <Card fluid>
+            <Card.Content>
+              <Card.Header content="Send email about receiving access to oodikone" />
+              <Card.Description>
+                <Divider />
+                <EmailNotification userEmail={user.email} />
+              </Card.Description>
+            </Card.Content>
+          </Card>
+        </Card.Group>
+      </div>
+    </Segment>
   )
 }
 
 const mapStateToProps = state => ({
   faculties: state.faculties.data,
-  associations: state.populationProgrammesUnfiltered.data,
-  pending: !!state.populationProgrammesUnfiltered.pending,
-  accessGroups: state.accessGroups,
 })
 
-export const ConnectedUserPage = connect(mapStateToProps, {
-  removeUserUnits,
-  setFaculties,
-  getProgrammesUnfiltered,
-  getAccessGroups,
-  getFaculties,
-})(UserPage)
+export const ConnectedUserPage = connect(mapStateToProps, { setFaculties, getFaculties })(UserPage)

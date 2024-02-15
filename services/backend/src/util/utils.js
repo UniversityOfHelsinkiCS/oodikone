@@ -51,8 +51,17 @@ const sortMainCode = codeArray => {
   })
 }
 
+/** Returns a sorting function that can be used to sort strings so that Finnish alphabetical order is respected.
+ * @param {string} field - The field to sort by (optional: if not given, the function will sort by the strings themselves)
+ */
+const createLocaleComparator = (field = null) => {
+  if (!field) return (val1, val2) => val1.localeCompare(val2, 'fi', { sensitivity: 'accent' })
+  return (val1, val2) => val1[field].localeCompare(val2[field], 'fi', { sensitivity: 'accent' })
+}
+
 module.exports = {
   mapToProviders,
   sortMainCode,
   getSortRank,
+  createLocaleComparator,
 }

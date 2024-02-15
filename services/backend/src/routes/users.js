@@ -13,6 +13,16 @@ router.get('/access_groups', async (req, res) => {
   res.json(result)
 })
 
+router.get('/:uid', async (req, res) => {
+  try {
+    const { uid } = req.params
+    const user = await userService.findOne(uid)
+    return res.json(user)
+  } catch (e) {
+    return res.status(400).json({ error: e.message })
+  }
+})
+
 router.post('/modifyaccess', async (req, res) => {
   try {
     const result = await userService.modifyAccess(req.body)
