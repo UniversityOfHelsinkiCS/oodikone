@@ -1,14 +1,14 @@
-const Sequelize = require('sequelize')
-const { Op } = Sequelize
+const { Op } = require('sequelize')
 const LRU = require('lru-cache')
+const _ = require('lodash')
+
 const { getStudentnumbersByElementdetails } = require('./students')
 const { facultiesAndProgrammesForTrends } = require('../services/organisations')
 const { sendNotificationAboutNewUser } = require('../services/mailservice')
 const { checkStudyGuidanceGroupsAccess, getAllStudentsUserHasInGroups } = require('../services/studyGuidanceGroups')
-const _ = require('lodash')
 const { User, UserElementDetails, AccessGroup, UserFaculties, sequelizeUser } = require('../models/models_user')
-const { getOrganizationAccess } = require('../util/organizationAccess')
-const { getUserIams, getAllUserAccess } = require('../util/jami')
+const { getUserIams, getAllUserAccess, getUserIamAccess } = require('../util/jami')
+const { createLocaleComparator } = require('../util/utils')
 
 const courseStatisticsGroup = 'grp-oodikone-basic-users'
 const facultyStatisticsGroup = 'grp-oodikone-users'
@@ -230,8 +230,32 @@ const findAll = async () => {
       }
     })
   )
+  return formattedUsers.sort(createLocaleComparator('full_name'))
+}
 
-  return formattedUsers
+const findOne = async id => {
+  const user = await byId(id)
+  if (!user) {
+    throw new Error(`User with id ${id} not found`)
+  }
+
+  const userIams = await getUserIams(user.sisu_person_id)
+
+  user.iamGroups = userIams
+
+  const { iamAccess, specialGroup } = await getUserIamAccess(user)
+
+  const { accessGroups } = await updateAccessGroups(user.username, userIams, specialGroup)
+
+  return {
+    ...user.get(),
+    iam_groups: iamAccess || [],
+    elementdetails: _.uniqBy([
+      ...user.programme.map(p => p.elementDetailCode),
+      ...enrichProgrammesFromFaculties(user.faculty.map(f => f.faculty_code)),
+    ]),
+    accessgroup: accessGroups,
+  }
 }
 
 const formatUser = async (userFromDb, extraRights, getStudentAccess = true) => {
@@ -277,6 +301,23 @@ const formatUser = async (userFromDb, extraRights, getStudentAccess = true) => {
     studentsUserCanAccess, // studentnumbers used in various parts of backend. For admin this is usually empty, since no programmes / faculties are set.
     isAdmin: accessGroups.includes('admin'),
   }
+}
+
+const getOrganizationAccess = async user => {
+  if (!user.iamGroups) user.iamGroups = user.iam_groups
+
+  if (user.iamGroups.length === 0) return {}
+
+  const { iamAccess, specialGroup } = await getUserIamAccess(user)
+
+  const access = {}
+  if (_.isObject(iamAccess)) {
+    Object.keys(iamAccess).forEach(code => {
+      access[code] = iamAccess[code]
+    })
+  }
+
+  return { access, specialGroup }
 }
 
 const getMockedUser = async ({ userToMock, mockedBy }) => {
@@ -353,9 +394,11 @@ module.exports = {
   enableElementDetails,
   removeElementDetails,
   findAll,
+  findOne,
   modifyAccess,
   getAccessGroups,
   setFaculties,
   getUser,
   getMockedUser,
+  getOrganizationAccess,
 }

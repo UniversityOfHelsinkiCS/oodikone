@@ -7,14 +7,12 @@ import { reducer as populations } from './populations'
 import { curriculumsApi } from './populationCourses'
 import { reducer as populationSelectedStudentCourses } from './populationSelectedStudentCourses'
 import { reducer as populationProgrammes } from './populationProgrammes'
-import { reducer as populationProgrammesUnfiltered } from './populationProgrammesUnfiltered'
 import { reducer as faculties } from './faculties'
 import { reducer as students } from './students'
 import { reducer as settings } from './settings'
 import { reducer as courseSearch } from './coursesearch'
 import { reducer as courseStats } from './coursestats'
 import { coursesSummaryFormReducer as courseSummaryForm } from './coursesSummaryForm'
-import { reducer as accessGroups } from './accessGroups'
 import { reducer as tags } from './tags'
 import { reducer as tagstudent } from './tagstudent'
 import { reducer as singleCourseStats } from './singleCourseStats'
@@ -27,14 +25,12 @@ export const store = configureStore({
     populations,
     populationSelectedStudentCourses,
     populationProgrammes,
-    populationProgrammesUnfiltered,
     faculties,
     students,
     settings,
     courseSearch,
     courseStats,
     courseSummaryForm,
-    accessGroups,
     tags,
     tagstudent,
     singleCourseStats,
