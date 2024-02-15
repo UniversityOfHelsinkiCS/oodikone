@@ -10,6 +10,9 @@ export const passRateAttemptGraphOptions = (isRelative, categories, max, title, 
     type: 'column',
   },
   colors: skipFirstColor ? [color.green, color.red] : [chartColor.blue, color.green, color.red],
+  credits: {
+    text: 'oodikone | TOSKA',
+  },
   title: {
     text: title,
   },
@@ -44,6 +47,9 @@ export const passRateStudentGraphOptions = (isRelative, categories, max, title, 
   colors: skipFirstColor
     ? [chartColor.greenLight, chartColor.greenDark, chartColor.redLight, chartColor.redDark]
     : [chartColor.blue, chartColor.greenLight, chartColor.greenDark, chartColor.redLight, chartColor.redDark],
+  credits: {
+    text: 'oodikone | TOSKA',
+  },
   title: {
     text: title,
   },
@@ -85,6 +91,9 @@ export const gradeGraphOptions = (isRelative, categories, max, title) => ({
     color.green,
     color.green,
   ],
+  credits: {
+    text: 'oodikone | TOSKA',
+  },
   title: {
     text: title,
   },
