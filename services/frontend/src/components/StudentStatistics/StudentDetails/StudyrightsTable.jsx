@@ -31,7 +31,7 @@ export const StudyrightsTable = ({
         .filter(e => e.element_detail.type === 20)
         .map(programme => ({
           code: programme.code,
-          startdate: programme.startdate,
+          startdate: programme.startdate ?? studyright.studystartdate,
           studystartdate: studyright.studystartdate,
           enddate: programme.enddate,
           name: getTextIn(programme.element_detail.name),
