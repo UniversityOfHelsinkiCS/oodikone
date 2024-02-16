@@ -1,46 +1,49 @@
 import React from 'react'
-import { Menu, Radio } from 'semantic-ui-react'
+import { Radio, Segment, SegmentGroup } from 'semantic-ui-react'
 import { HelpButton } from './common/HelpButton'
-import { UnifyRadioButtons } from './common/UnifyRadioButtons'
+import { ProviderOrganization } from './common/ProviderOrganization'
 
 export const StudentsTableSettings = ({ availableStats, onChange, onSeparateChange, value }) => {
   const { showDetails, showGrades, separate } = value
 
+  const elements = [
+    <Radio
+      checked={showDetails}
+      data-cy="detailToggle"
+      label="Show details"
+      key="detailToggle"
+      onChange={() => onChange({ ...value, showDetails: !showDetails })}
+      toggle
+    />,
+    <Radio
+      checked={showGrades}
+      data-cy="gradeToggle"
+      label="Show grades"
+      key="gradeToggle"
+      onChange={() => onChange({ ...value, showGrades: !showGrades })}
+      toggle
+    />,
+    <Radio
+      checked={separate}
+      data-cy="separateToggle"
+      label="Separate by semesters"
+      key="separateToggle"
+      onChange={() => onSeparateChange(!separate)}
+      toggle
+    />,
+    <ProviderOrganization availableStats={availableStats} key="providerOrganization" />,
+  ]
+
   return (
-    <div>
-      <Menu style={{ flexWrap: 'wrap' }} secondary>
-        <Menu.Item>
-          <Radio
-            toggle
-            label="Show details"
-            data-cy="detailToggle"
-            checked={showDetails}
-            onChange={() => onChange({ ...value, showDetails: !showDetails })}
-          />
-        </Menu.Item>
-        <Menu.Item>
-          <Radio
-            toggle
-            label="Show grades"
-            data-cy="gradeToggle"
-            checked={showGrades}
-            onChange={() => onChange({ ...value, showGrades: !showGrades })}
-          />
-        </Menu.Item>
-        <Menu.Item>
-          <Radio
-            toggle
-            label="Separate by semesters"
-            data-cy="separateToggle"
-            checked={separate}
-            onChange={() => onSeparateChange(!separate)}
-          />
-        </Menu.Item>
-        <Menu.Item>
-          <HelpButton tab="Tables" viewMode="STUDENTS" />
-        </Menu.Item>
-      </Menu>
-      <UnifyRadioButtons availableStats={availableStats} />
+    <div style={{ alignItems: 'center', display: 'flex' }}>
+      <SegmentGroup horizontal secondary>
+        {elements.map(element => (
+          <Segment key={element.key} style={{ alignItems: 'center', display: 'flex' }}>
+            {element}
+          </Segment>
+        ))}
+      </SegmentGroup>
+      <HelpButton tab="Tables" viewMode="STUDENTS" />
     </div>
   )
 }
