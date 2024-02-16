@@ -23,10 +23,11 @@ ENV REACT_APP_SENTRY_ENVIRONMENT=$SENTRY_ENVIRONMENT
 ARG SENTRY_RELEASE
 ENV REACT_APP_SENTRY_RELEASE=$SENTRY_RELEASE
 
-COPY ./package* ./
+# Add reading permissions to package.json and package-lock.json
+COPY --chmod=644 ./package* ./
 RUN npm ci --include=dev
 COPY . .
 
-RUN npm run build && npm prune --production && npm install -g serve@12.0.0
+RUN npm run build && npm prune --omit=dev && npm install -g serve@12.0.0
 
 CMD ["serve", "--single", "--listen", "5000", "build"]
