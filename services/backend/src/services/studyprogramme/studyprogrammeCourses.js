@@ -34,6 +34,7 @@ const getAllStudyprogrammeCourses = async studyprogramme => {
 const makeYearlyPromises = (years, academicYear, type, programmeCourses, studyprogramme) => {
   return years.map(
     year =>
+      // eslint-disable-next-line no-async-promise-executor
       new Promise(async res => {
         const from = academicYear === 'ACADEMIC_YEAR' ? new Date(year, 7, 1, 0, 0, 0) : new Date(year, 0, 1, 0, 0, 0)
         const to =
