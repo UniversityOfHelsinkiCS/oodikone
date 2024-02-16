@@ -1,37 +1,41 @@
 import React from 'react'
-import { Menu, Radio } from 'semantic-ui-react'
+import { Radio, Segment, SegmentGroup } from 'semantic-ui-react'
 import { HelpButton } from './common/HelpButton'
-import { UnifyRadioButtons } from './common/UnifyRadioButtons'
+import { ProviderOrganization } from './common/ProviderOrganization'
 
-export const AttemptsTableSettings = ({ value, onChange, availableStats, onSeparateChange }) => {
+export const AttemptsTableSettings = ({ availableStats, onChange, onSeparateChange, value }) => {
   const { showGrades, separate } = value
 
+  const elements = [
+    <Radio
+      checked={showGrades}
+      data-cy="gradeToggle"
+      label="Show grades"
+      key="gradeToggle"
+      onChange={() => onChange({ ...value, showGrades: !showGrades })}
+      toggle
+    />,
+    <Radio
+      checked={separate}
+      data-cy="separateToggle"
+      label="Separate by semesters"
+      key="separateToggle"
+      onChange={() => onSeparateChange(!separate)}
+      toggle
+    />,
+    <ProviderOrganization availableStats={availableStats} key="providerOrganization" />,
+  ]
+
   return (
-    <div>
-      <Menu style={{ flexWrap: 'wrap' }} secondary>
-        <Menu.Item>
-          <Radio
-            toggle
-            label="Show grades"
-            data-cy="gradeToggle"
-            checked={showGrades}
-            onChange={() => onChange({ ...value, showGrades: !showGrades })}
-          />
-        </Menu.Item>
-        <Menu.Item>
-          <Radio
-            toggle
-            label="Separate by semesters"
-            data-cy="separateToggle"
-            checked={separate}
-            onChange={() => onSeparateChange(!separate)}
-          />
-        </Menu.Item>
-        <Menu.Item>
-          <HelpButton tab="Tables" viewMode="ATTEMPTS" />
-        </Menu.Item>
-      </Menu>
-      <UnifyRadioButtons availableStats={availableStats} />
+    <div style={{ alignItems: 'center', display: 'flex' }}>
+      <SegmentGroup horizontal secondary>
+        {elements.map(element => (
+          <Segment key={element.key} style={{ alignItems: 'center', display: 'flex' }}>
+            {element}
+          </Segment>
+        ))}
+      </SegmentGroup>
+      <HelpButton tab="Tables" viewMode="ATTEMPTS" />
     </div>
   )
 }

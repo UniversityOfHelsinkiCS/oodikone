@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactMarkdown from 'react-markdown'
-import { Popup, Button, Icon } from 'semantic-ui-react'
+import { Button, Icon, Popup } from 'semantic-ui-react'
 import { courseStatisticsToolTips } from 'common/InfoToolTips'
 
 export const HelpButton = ({ tab, viewMode }) => {
@@ -17,7 +17,7 @@ export const HelpButton = ({ tab, viewMode }) => {
       on="click"
       wide="very"
       trigger={
-        <Button icon labelPosition="left">
+        <Button icon labelPosition="left" style={{ height: '50px', marginLeft: '30px' }}>
           <Icon name="question circle outline" />
           Help
         </Button>
