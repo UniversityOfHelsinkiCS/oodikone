@@ -101,13 +101,13 @@ const getThesisStats = async ({ studyprogramme, since, years, isAcademicYear, in
 }
 
 const getGraduationTimeStats = async ({ studyprogramme, since, years, isAcademicYear, includeAllSpecials }) => {
-  let graduationAmounts = getYearsObject({ years })
-  let graduationTimes = getYearsObject({ years, emptyArrays: true })
+  const graduationAmounts = getYearsObject({ years })
+  const graduationTimes = getYearsObject({ years, emptyArrays: true })
   if (!studyprogramme) return { times: { medians: [], goal: 0 }, doCombo: false, comboTimes: { medians: [], goal: 0 } }
   // for bc+ms combo
   const doCombo = studyprogramme.startsWith('MH') && !['MH30_001', 'MH30_003'].includes(studyprogramme)
-  let graduationAmountsCombo = getYearsObject({ years })
-  let graduationTimesCombo = getYearsObject({ years, emptyArrays: true })
+  const graduationAmountsCombo = getYearsObject({ years })
+  const graduationTimesCombo = getYearsObject({ years, emptyArrays: true })
 
   const studentnumbers = await getCorrectStudentnumbers({
     codes: [studyprogramme],
@@ -121,6 +121,10 @@ const getGraduationTimeStats = async ({ studyprogramme, since, years, isAcademic
 
   // for masters, separate bc+ms combo from just ms students (except some medical progs)
   for (const right of studyrights) {
+    const elements = right.studyrightElements.filter(
+      element => new Date(element.enddate).toDateString() === new Date(right.enddate).toDateString()
+    )
+    if (elements.length === 0) continue
     if (doCombo && right.studyrightid.slice(-2) === '-2') {
       await addGraduation(right, isAcademicYear, graduationAmountsCombo, graduationTimesCombo)
     } else {
@@ -161,11 +165,11 @@ const getTransferStudyrightMap = async (studyprogramme, since) => {
 const formatStats = (stats, years) => {
   const tableStats = Object.values(stats)
     .filter(p => years.map(year => p[year]).find(started => started !== 0)) // Filter out programmes with no-one started between the selected years
-    .map(p => [p.code, getId(p.code), p.name['fi'], ...years.map(year => p[year])])
+    .map(p => [p.code, getId(p.code), p.name.fi, ...years.map(year => p[year])])
 
   const graphStats = Object.values(stats)
     .filter(p => years.map(year => p[year]).find(started => started !== 0)) // Filter out programmes with no-one started between the selected years
-    .map(p => ({ name: p.name['fi'], code: p.code, data: years.map(year => p[year]) }))
+    .map(p => ({ name: p.name.fi, code: p.code, data: years.map(year => p[year]) }))
 
   return { tableStats, graphStats }
 }
@@ -176,10 +180,12 @@ const getProgrammesBeforeStarting = async ({ studyprogramme, since, years, isAca
 
   // Get studyrights for bachelor studyprogrammes. This excludes studytracks.
   const programmes = await getAllProgrammes()
-  let studyrightsBeforeMasters = await previousStudyrights(programmes, allStudents)
+  const studyrightsBeforeMasters = await previousStudyrights(programmes, allStudents)
   const studyprogrammeCodes = uniqBy(studyrightsBeforeMasters, 'code').map(s => ({ code: s.code, name: s.name }))
   const stats = {}
-  studyprogrammeCodes.forEach(c => (stats[c.code] = { ...c, ...getYearsObject({ years }) }))
+  studyprogrammeCodes.forEach(c => {
+    stats[c.code] = { ...c, ...getYearsObject({ years }) }
+  })
 
   // Map transfers to the Master's programme
   const transfers = await getTransferStudyrightMap(studyprogramme, since)
@@ -214,10 +220,12 @@ const getProgrammesAfterGraduation = async ({ studyprogramme, since, years, isAc
 
   // Get studyrights for masters studyprogramme. This excludes studytracks.
   const programmes = await getAllProgrammes()
-  let studyrightsAfterThisProgramme = await followingStudyrights(since, programmes, graduatedStudents)
+  const studyrightsAfterThisProgramme = await followingStudyrights(since, programmes, graduatedStudents)
   const studyprogrammeCodes = uniqBy(studyrightsAfterThisProgramme, 'code').map(s => ({ code: s.code, name: s.name }))
   const stats = {}
-  studyprogrammeCodes.forEach(c => (stats[c.code] = { ...c, ...getYearsObject({ years }) }))
+  studyprogrammeCodes.forEach(c => {
+    stats[c.code] = { ...c, ...getYearsObject({ years }) }
+  })
 
   const transfers = await getTransferStudyrightMap(studyprogramme, since)
 
