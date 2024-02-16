@@ -535,7 +535,10 @@ const updateEnrollments = async (enrollments, personIdToStudentNumber) => {
     studyRightIdToEducationType
   )
 
-  const mappedEnrollments = enrollments.filter(({ document_state }) => document_state === 'ACTIVE').map(mapEnrollment)
+  const mappedEnrollments = enrollments
+    .filter(({ document_state }) => document_state === 'ACTIVE')
+    .map(mapEnrollment)
+    .filter(({ studentnumber }) => studentnumber != null)
   await bulkCreate(Enrollment, mappedEnrollments)
 }
 
