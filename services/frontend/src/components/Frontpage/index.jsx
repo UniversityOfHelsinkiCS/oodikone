@@ -5,21 +5,63 @@ import { images, checkUserAccess } from '../../common'
 import { useTitle } from '../../common/hooks'
 import { Changelog } from './Changelog'
 
+const FrontPageItem = ({ title, content }) => {
+  return (
+    <>
+      <Header as="h3">{title}</Header>
+      {content}
+    </>
+  )
+}
+
 export const FrontPage = () => {
-  const { rights, roles } = useGetAuthorizedUserQuery()
+  const { rights, roles, iamRights } = useGetAuthorizedUserQuery()
   const [showFullChangelog, setShowFullChangelog] = useState(false)
 
   useTitle()
 
-  const showItems = {
-    populations: roles.includes('admin') || rights.length > 0,
-    studyProgramme: roles.includes('admin') || rights.length > 0,
-    students: checkUserAccess(['studyGuidanceGroups', 'admin'], roles) || rights.length > 0,
-    courseStatistics: checkUserAccess(['courseStatistics', 'admin'], roles) || rights.length > 0,
-    teachers: checkUserAccess(['teachers', 'admin'], roles),
-    university: true,
-    feedback: true,
-  }
+  const items = [
+    {
+      show: true,
+      title: 'University',
+      content: <p>View tables and diagrams about study progress of different faculties</p>,
+    },
+    {
+      show: roles.includes('admin') || rights.length > 0 || iamRights.length > 0,
+      title: 'Programmes',
+      content: (
+        <List bulleted>
+          <List.Item>
+            <i>Class statistics:</i> View details of a specific year of a study programme
+          </List.Item>
+          <List.Item>
+            <i>Overview:</i> View statistics of a programme across all years
+          </List.Item>
+        </List>
+      ),
+    },
+    {
+      show: checkUserAccess(['courseStatistics', 'admin'], roles) || rights.length > 0,
+      title: 'Courses',
+      content: <p>View statistics about course attempts, completions and grades</p>,
+    },
+    {
+      show: checkUserAccess(['studyGuidanceGroups', 'admin'], roles) || rights.length > 0,
+      title: 'Students',
+      content: <p>View detailed information for a given student</p>,
+    },
+    {
+      show: true,
+      title: 'Feedback',
+      content: (
+        <p>
+          For questions and suggestions, please use the{' '}
+          <a href="https://oodikone.helsinki.fi/feedback">feedback form</a> or shoot an email to{' '}
+          <a href="mailto:grp-toska@helsinki.fi">grp-toska@helsinki.fi</a>.
+        </p>
+      ),
+    },
+  ]
 
   return (
     <div>
@@ -50,45 +92,15 @@ export const FrontPage = () => {
             <Grid columns="two" style={{ marginTop: '40px' }} divided>
               <Grid.Row>
                 <Grid.Column>
-                  <Header as="h3">University</Header>
-                  <p>View tables and diagrams about study progress of different faculties.</p>
-                  {showItems.populations && (
-                    <>
-                      <Divider section />
-                      <Header as="h3">Study programme</Header>
-                      <List bulleted>
-                        <List.Item>
-                          <i>Search by Class:</i> Query a student population specified by a starting year and a study
-                          right. Oodikone will show you interactive statistics and visualizations for the population to
-                          be explored.
-                        </List.Item>
-                        <List.Item>
-                          <i>Overview:</i> View student progress and annual productivity for a given study programme.
-                        </List.Item>
-                      </List>
-                    </>
+                  {items.map(
+                    (item, index) =>
+                      item.show && (
+                        <React.Fragment key={item.title}>
+                          <FrontPageItem title={item.title} content={item.content} />
+                          {index !== items.length - 1 ? <Divider section /> : null}
+                        </React.Fragment>
+                      )
                   )}
-                  {showItems.courseStatistics && (
-                    <>
-                      <Divider section />
-                      <Header as="h3">Courses</Header>
-                      <p>View statistics about course attempts, completions and grades.</p>
-                    </>
-                  )}
-                  {showItems.students && (
-                    <>
-                      <Divider section />
-                      <Header as="h3">Student statistics</Header>
-                      <p>View detailed information for a given student.</p>
-                    </>
-                  )}
-                  <Divider section />
-                  <Header as="h3">Feedback</Header>
-                  <p>
-                    For questions and suggestions, please use the{' '}
-                    <a href="https://oodikone.helsinki.fi/feedback">feedback form</a> or shoot an email to{' '}
-                    <a href="mailto:grp-toska@helsinki.fi">grp-toska@helsinki.fi</a>.
-                  </p>
                 </Grid.Column>
                 <Grid.Column style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                   <Changelog showFullChangelog={false} />
