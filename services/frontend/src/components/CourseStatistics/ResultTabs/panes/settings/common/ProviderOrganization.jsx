@@ -26,7 +26,7 @@ export const ProviderOrganization = ({ availableStats }) => {
 
   return (
     <div style={{ alignItems: 'center', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ marginBottom: '10px' }}>Provider organization(s)</div>
+      <label style={{ marginBottom: '10px' }}>Provider organization(s)</label>
       <SegmentGroup horizontal style={{ margin: '0' }}>
         <Segment>
           <Checkbox

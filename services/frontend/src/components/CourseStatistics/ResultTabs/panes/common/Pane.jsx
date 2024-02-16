@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { PassRateChart } from '../charts/PassRateChart'
 import { PassRateChartSettings } from '../settings/PassRateChartSettings'
-import { DirectionToggle } from './DirectionToggle'
 import { PaneContent } from './PaneContent'
 
 /**
@@ -21,28 +20,31 @@ export const Pane = ({
   updateQuery,
 }) => {
   const [settings, setSettings] = useState(initialSettings)
-  const [splitDirection, setSplitDirection] = useState('row')
+
+  const setSplitDirection = splitDirection => {
+    setSettings({ ...settings, splitDirection })
+  }
 
   const toggleSeparate = separate => {
     setSettings({ ...settings, separate })
     updateQuery(separate)
   }
 
-  const halfWidth = datasets.filter(dataset => dataset).length > 1 && splitDirection === 'row'
-  const styleContainer = { display: 'flex', flexDirection: splitDirection, justifyContent: 'space-between' }
+  const halfWidth = datasets.filter(dataset => dataset).length > 1 && settings.splitDirection === 'row'
+  const styleContainer = { display: 'flex', flexDirection: settings.splitDirection, justifyContent: 'space-between' }
   const styleData = { flexGrow: 1, flexBasis: 1, maxWidth: halfWidth ? '49%' : '100%' }
 
   return (
     <PaneContent>
-      <div style={{ display: 'flex', marginBottom: '2em' }}>
+      <div style={{ marginBottom: '1em' }}>
         <Settings
           availableStats={availableStats}
+          datasets={datasets}
           onChange={setSettings}
           onSeparateChange={toggleSeparate}
+          setSplitDirection={setSplitDirection}
           value={settings}
         />
-        <div style={{ flexGrow: 1 }} />
-        <DirectionToggle datasets={datasets} setSplitDirection={setSplitDirection} splitDirection={splitDirection} />
       </div>
       <div style={styleContainer}>
         {datasets
