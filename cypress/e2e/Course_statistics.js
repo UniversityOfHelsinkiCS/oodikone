@@ -227,7 +227,8 @@ describe('Course Statistics tests', () => {
       cy.contains('Search for courses').should('not.exist')
 
       cy.contains('TKT10004, 581328, AYTKT10004, A581328 Tietokantojen perusteet')
-      cy.get('[data-cy=unify_radio_regular]').click()
+      cy.cs('providerCheckboxUniversity').should('have.class', 'checked').click()
+      cy.cs('providerCheckboxOpenUni').should('have.class', 'checked').click()
       cy.contains('TKT10004, 581328 Tietokantojen perusteet')
     })
 
@@ -280,7 +281,7 @@ describe('Course Statistics tests', () => {
       cy.get("input[placeholder='Search by a course code']").type('TKT20003')
       cy.contains(/^TKT20003, 582219$/).click()
       cy.contains('TKT20003, 582219 Käyttöjärjestelmät')
-      cy.get('[data-cy=unify_radio_regular]').click()
+      cy.cs('providerCheckboxOpenUni').click()
       cy.get('tbody > :nth-child(3) > :nth-child(2) .level').click()
       cy.contains('Population of course Käyttöjärjestelmät 2019-2020')
       cy.contains('Language distribution').click()
@@ -465,12 +466,12 @@ describe('Course Statistics tests', () => {
       })
     })
 
-    it('If no data available, unify toggle is disabled', () => {
+    it('If no data available, toggle is disabled', () => {
       cy.get("input[placeholder='Search by a course code']").type('AYCSM14111')
       cy.contains('AYCSM14111').click()
       cy.contains('AYCSM14111 Avoin yo: Full Stack -websovelluskehitys: React Native')
-      cy.get('[data-cy=unify_radio_regular]').find('input').should('be.disabled')
-      cy.get('[data-cy=unify_radio_unify]').find('input').should('not.be.disabled')
+      cy.cs('providerCheckboxUniversity').find('input').should('be.disabled')
+      cy.cs('providerCheckboxOpenUni').find('input').should('not.be.disabled')
     })
 
     it('Has right to see all the students, because course provider is TKT', () => {
