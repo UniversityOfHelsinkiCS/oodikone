@@ -1,12 +1,10 @@
 import React from 'react'
 import { Icon, Menu } from 'semantic-ui-react'
 
-export const DirectionToggle = ({ datasets, setSplitDirection, splitDirection }) => {
-  if (datasets.filter(dataset => dataset).length <= 1) return null
-
+export const DirectionToggle = ({ setSplitDirection, splitDirection }) => {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '1em' }}>
-      <label>Split direction: </label>
+    <div style={{ alignItems: 'center', display: 'flex', flexDirection: 'column', gap: '1em' }}>
+      <label>Split direction</label>
       <Menu style={{ margin: 0 }}>
         <Menu.Item active={splitDirection === 'row'} onClick={() => setSplitDirection('row')}>
           <Icon name="arrows alternate horizontal" />

@@ -1,10 +1,18 @@
 import React from 'react'
 import { Radio, Segment, SegmentGroup } from 'semantic-ui-react'
+import { DirectionToggle } from './common/DirectionToggle'
 import { HelpButton } from './common/HelpButton'
 import { ProviderOrganization } from './common/ProviderOrganization'
 
-export const AttemptsTableSettings = ({ availableStats, onChange, onSeparateChange, value }) => {
-  const { showGrades, separate } = value
+export const AttemptsTableSettings = ({
+  availableStats,
+  datasets,
+  onChange,
+  onSeparateChange,
+  setSplitDirection,
+  value,
+}) => {
+  const { showGrades, separate, splitDirection } = value
 
   const elements = [
     <Radio
@@ -26,9 +34,13 @@ export const AttemptsTableSettings = ({ availableStats, onChange, onSeparateChan
     <ProviderOrganization availableStats={availableStats} key="providerOrganization" />,
   ]
 
+  if (datasets.filter(dataset => dataset).length > 1) {
+    elements.push(<DirectionToggle setSplitDirection={setSplitDirection} splitDirection={splitDirection} />)
+  }
+
   return (
     <div style={{ alignItems: 'center', display: 'flex' }}>
-      <SegmentGroup horizontal secondary>
+      <SegmentGroup horizontal>
         {elements.map(element => (
           <Segment key={element.key} style={{ alignItems: 'center', display: 'flex' }}>
             {element}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { GradeDistributionChart } from './charts/GradeDistributionChart'
+import { DirectionToggle } from './settings/common/DirectionToggle'
 import { GradeDistributionChartSettings } from './settings/GradeDistributionChartSettings'
-import { DirectionToggle } from './common/DirectionToggle'
 import { PaneContent } from './common/PaneContent'
 
 export const GradeDistributionPane = ({ datasets, userHasAccessToAllStats }) => {

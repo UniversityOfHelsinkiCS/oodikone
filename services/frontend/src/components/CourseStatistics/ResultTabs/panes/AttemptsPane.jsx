@@ -8,7 +8,7 @@ export const AttemptsPane = ({ availableStats, datasets, separate, userHasAccess
     <Pane
       availableStats={availableStats}
       datasets={datasets}
-      initialSettings={{ viewMode: 'ATTEMPTS', separate }}
+      initialSettings={{ viewMode: 'ATTEMPTS', separate, splitDirection: 'row' }}
       settingsComponent={AttemptsTableSettings}
       tableComponent={AttemptsTable}
       userHasAccessToAllStats={userHasAccessToAllStats}
