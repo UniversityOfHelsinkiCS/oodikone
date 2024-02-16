@@ -10,4 +10,4 @@ COPY ./package* ./
 RUN npm ci
 COPY . .
 
-CMD ["npm", "start"]
+CMD ["node_modules/.bin/vite"]
