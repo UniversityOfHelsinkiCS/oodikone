@@ -9,42 +9,19 @@ export const ProviderOrganization = ({ availableStats }) => {
   const openOrRegular = useSelector(state => state.courseSearch.openOrRegular)
 
   const toggleValue = (_event, { value }) => {
-    let newValue
-    switch (value) {
-      case 'regularStats':
-        switch (openOrRegular) {
-          case 'regularStats':
-            newValue = 'openStats'
-            break
-          case 'openStats':
-            newValue = 'unifyStats'
-            break
-          case 'unifyStats':
-            newValue = 'openStats'
-            break
-          default:
-            break
-        }
-        break
-      case 'openStats':
-        switch (openOrRegular) {
-          case 'openStats':
-            newValue = 'regularStats'
-            break
-          case 'regularStats':
-            newValue = 'unifyStats'
-            break
-          case 'unifyStats':
-            newValue = 'regularStats'
-            break
-          default:
-            break
-        }
-        break
-      default:
-        break
+    const options = {
+      regularStats: {
+        regularStats: 'openStats',
+        openStats: 'unifyStats',
+        unifyStats: 'openStats',
+      },
+      openStats: {
+        openStats: 'regularStats',
+        regularStats: 'unifyStats',
+        unifyStats: 'regularStats',
+      },
     }
-    return dispatch(toggleOpenAndRegularCourses(newValue))
+    return dispatch(toggleOpenAndRegularCourses(options[value][openOrRegular]))
   }
 
   return (
