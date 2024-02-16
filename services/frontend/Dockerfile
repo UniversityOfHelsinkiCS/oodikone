@@ -27,6 +27,6 @@ COPY ./package* ./
 RUN npm ci --include=dev
 COPY . .
 
-RUN npm run build && npm prune --omit=dev && npm install -g serve@12.0.0
+RUN npm run build && npm install -g serve@12.0.0
 
 CMD ["serve", "--single", "--listen", "5000", "build"]
