@@ -211,14 +211,19 @@ export const OpenUniPopulationResults = ({ fieldValues }) => {
 
   useEffect(() => {
     if (!isError && !isFetchingOrLoading) {
-      const unOrderedlabels = openUniStudentStats?.data.courses
-      const labelsToCourses = [...unOrderedlabels].sort((a, b) => a.label.localeCompare(b.label))
-      setImmediate(() => {
+      const unOrderedLabels = openUniStudentStats?.data.courses
+      const labelsToCourses = [...unOrderedLabels].sort((a, b) => a.label.localeCompare(b.label))
+
+      const timer = setTimeout(() => {
         const data = getTableData(openUniStudentStats?.data.students)
         const columns = getColumns(labelsToCourses, getTextIn)
         setData({ data, columns })
-      })
+      }, 0)
+
+      // Cleanup function to clear the timeout
+      return () => clearTimeout(timer)
     }
+    return undefined
   }, [openUniStudentStats, language])
 
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>

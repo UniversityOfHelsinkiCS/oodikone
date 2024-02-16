@@ -4,10 +4,6 @@
     "node": true,
     "jest": true
   },
-  "parser": "@babel/eslint-parser",
-  "parserOptions": {
-    "requireConfigFile": false
-  },
   "extends": ["eslint:recommended", "plugin:prettier/recommended", "plugin:cypress/recommended"],
   "plugins": ["prettier", "cypress"],
   "rules": {

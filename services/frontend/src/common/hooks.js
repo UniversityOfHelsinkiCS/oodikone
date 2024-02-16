@@ -152,7 +152,7 @@ export const useProgress = loading => {
 
   const finishProgress = () => {
     setDelay(null)
-    setImmediate(() => setProgress(100))
+    setTimeout(() => setProgress(100), 0)
   }
 
   useEffect(() => {

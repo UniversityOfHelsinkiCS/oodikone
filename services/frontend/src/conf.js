@@ -3,8 +3,8 @@ export const isProduction = process.env.NODE_ENV === 'production'
 export const isDev = process.env.NODE_ENV === 'development'
 
 // Sentry
-export const sentryRelease = process.env.REACT_APP_SENTRY_RELEASE || ''
-export const sentryEnvironment = process.env.REACT_APP_SENTRY_ENVIRONMENT || ''
+export const sentryRelease = import.meta.env.REACT_APP_SENTRY_RELEASE || ''
+export const sentryEnvironment = import.meta.env.REACT_APP_SENTRY_ENVIRONMENT || ''
 export const runningInCypress = !!window.Cypress
 
 // Adminer is only used in dev mode, imo hardcoding this url here is ok.
@@ -16,8 +16,8 @@ export const adminerUrls = databaseNames.map(db => ({
 }))
 
 // Base paths
-export const basePath = process.env.PUBLIC_URL || ''
+export const basePath = import.meta.env.PUBLIC_URL || ''
 export const apiBasePath = `${basePath}/api`
 
 // Update time for frontpage
-export const builtAt = process.env.REACT_APP_BUILT_AT || ''
+export const builtAt = import.meta.env.REACT_APP_BUILT_AT || ''

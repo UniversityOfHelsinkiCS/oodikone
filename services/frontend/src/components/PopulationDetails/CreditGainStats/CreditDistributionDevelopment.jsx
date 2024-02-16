@@ -130,11 +130,8 @@ const getChartData = (students, timeSlots, order, programme, timeDivision, cumul
 }
 
 function tooltipFormatter() {
-  // eslint-disable-next-line @babel/no-invalid-this
   return `<div style="text-align: center; width: 100%"><b>${this.x}</b>, ${this.series.name}<br/>${this.y}/${
-    // eslint-disable-next-line @babel/no-invalid-this
     this.total
-    // eslint-disable-next-line @babel/no-invalid-this
   } students (${Math.round(this.percentage)}%)</div>`
 }
 
