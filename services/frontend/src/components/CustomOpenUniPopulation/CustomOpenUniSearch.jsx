@@ -51,11 +51,12 @@ export const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
   }, [deletedData])
 
   const pushQueryToUrl = query => {
-    setImmediate(() => {
+    setTimeout(() => {
       const searchString = qs.stringify(query)
       history.push({ search: searchString })
-    })
+    }, 0)
   }
+
   const parseQueryFromUrl = () => {
     const { courseCode, startdate, enddate } = qs.parse(location.search)
     let courseCodes = courseCode
@@ -69,15 +70,19 @@ export const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
   }
 
   useEffect(() => {
-    setImmediate(() => {
+    const timer = setTimeout(() => {
       if (!location.search) {
         setValues({})
       } else {
         const query = parseQueryFromUrl()
         setValues(query)
       }
-    })
+    }, 0)
+
+    // Cleanup function to clear the timeout
+    return () => clearTimeout(timer)
   }, [location.search])
+
   const clearForm = () => {
     setInput('')
     setName('')

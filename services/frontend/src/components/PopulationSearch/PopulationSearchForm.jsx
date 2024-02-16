@@ -203,7 +203,7 @@ const PopulationSearchForm = ({
   const pushQueryToUrl = query => {
     if (!checkPreviousQuery(query, queries)) clearPopulations()
     // Just to be sure that the previous population's data has been cleared
-    setImmediate(() => {
+    setTimeout(() => {
       const { studyRights, ...rest } = query
       studyRights.combinedProgramme =
         studyRights.programme && studyRights.programme.includes('+') ? studyRights.programme.split('+')[1] : ''
@@ -214,7 +214,7 @@ const PopulationSearchForm = ({
       const queryObject = { ...rest, studyRights: JSON.stringify(studyRights) }
       const searchString = qs.stringify(queryObject)
       history.push({ search: searchString })
-    })
+    }, 0)
   }
 
   const getSearchHistoryTextFromQuery = () => {

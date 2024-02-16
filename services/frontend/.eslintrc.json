@@ -2,11 +2,11 @@
   "root": true,
   "env": {
     "browser": true,
-    "node": true
+    "es2020": true
   },
-  "parser": "@babel/eslint-parser",
   "parserOptions": {
-    "requireConfigFile": false
+    "ecmaVersion": "latest",
+    "sourceType": "module"
   },
   "extends": ["airbnb", "plugin:prettier/recommended", "plugin:import/recommended"],
   "rules": {
@@ -31,22 +31,25 @@
     "react/no-unstable-nested-components": "off",
     "react/jsx-no-constructed-context-values": "off",
     "react/jsx-key": "error",
+    "react/no-unknown-property": "off",
     "import/no-default-export": "error",
     "import/prefer-default-export": "off",
     "import/no-unused-modules": ["error", { "missingExports": true, "unusedExports": true }],
     "import/no-commonjs": "error",
     "quotes": ["error", "single", { "avoidEscape": true }],
-    "@babel/no-invalid-this": "error",
     "react-hooks/rules-of-hooks": "error",
     "no-console": "error",
     "no-param-reassign": ["error", { "props": false }]
   },
-  "plugins": ["react", "@babel", "react-hooks"],
+  "plugins": ["react", "react-hooks"],
   "settings": {
     "import/resolver": {
       "node": {
         "moduleDirectory": ["node_modules", "src/"]
       }
+    },
+    "react": {
+      "version": "detect"
     }
   }
 }
