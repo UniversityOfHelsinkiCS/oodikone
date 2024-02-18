@@ -1,6 +1,5 @@
 import { useLocalStorage } from 'common/hooks'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import reactScrollToComponent from 'react-scroll-to-component'
 import { Accordion } from 'semantic-ui-react'
 
 const titleStyle = { paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }
@@ -18,7 +17,7 @@ export const PanelView = ({ panels: initialPanels, viewTitle }) => {
   const [newestIndex, setNewestIndex] = useState(null)
 
   useEffect(() => {
-    if (newestIndex) reactScrollToComponent(refs.current[newestIndex], { align: 'bottom' })
+    if (newestIndex) refs.current[newestIndex].scrollIntoView({ behavior: 'smooth', block: 'end' })
   }, [newestIndex])
 
   const togglePanel = index => {

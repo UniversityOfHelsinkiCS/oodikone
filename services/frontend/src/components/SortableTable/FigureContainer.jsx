@@ -1,6 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react'
+import React, { createContext, useContext, useState, useEffect } from 'react'
 import { Icon, Card, Portal, Popup, Button } from 'semantic-ui-react'
-import { createHtmlPortalNode, InPortal, OutPortal } from 'react-reverse-portal'
 
 import './style.css'
 
@@ -61,54 +60,31 @@ const Content = ({ children, ...rest }) => {
 export const FigureContainer = ({ children, style }) => {
   const [isFullscreen, setFullscreen] = useState(false)
 
-  const portalNode = useMemo(
-    () =>
-      createHtmlPortalNode({
-        attributes: {
-          class: 'ui card fluid',
-        },
-      }),
-    []
-  )
-
   useEffect(() => {
     if (isFullscreen) {
       document.body.classList.add('figure-fullscreen')
-      portalNode.element.style = `
-        position: sticky;
-        margin: 0;
-        inset: 0;
-        height: 100vh;
-        border: none;
-        border-radius: 0;
-      `
     } else {
       document.body.classList.remove('figure-fullscreen')
-      portalNode.element.style = `
-        overflow: hidden;
-        maxHeight: 100%;
-      `
-      Object.assign(portalNode.element.style, style)
     }
 
     return () => document.body.classList.remove('figure-fullscreen')
-  }, [isFullscreen, portalNode])
+  }, [isFullscreen])
 
   return (
     <FigureContext.Provider value={{ isFullscreen, setFullscreen }}>
-      <InPortal node={portalNode}>{children}</InPortal>
-      {!isFullscreen && <OutPortal node={portalNode} />}
-      <Portal
-        open={isFullscreen}
-        style={{
-          width: '100% !important',
-          height: '100% !important',
-        }}
-      >
-        <div style={{ inset: '70px 0px 0px 0px', position: 'absolute', zIndex: 900, height: '100000vh' }}>
-          {isFullscreen && <OutPortal node={portalNode} />}
-        </div>
-      </Portal>
+      {isFullscreen ? (
+        <Portal open={isFullscreen}>
+          <div style={{ inset: '70px 0px 0px 0px', position: 'absolute', zIndex: 3, height: '10000vh' }}>
+            <Card fluid style={{ position: 'sticky', margin: 0, inset: 0, height: '100vh', zIndex: 2 }}>
+              {children}
+            </Card>
+          </div>
+        </Portal>
+      ) : (
+        <Card fluid style={style}>
+          {children}
+        </Card>
+      )}
     </FigureContext.Provider>
   )
 }
