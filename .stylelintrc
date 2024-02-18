@@ -1,22 +1,6 @@
 {
-  "extends": ["stylelint-config-standard", "stylelint-prettier/recommended"],
+  "extends": ["stylelint-config-standard"],
   "rules": {
-    "selector-type-no-unknown": [
-      true,
-      {
-        "ignoreTypes": ["/^--/", "--"]
-      }
-    ],
-    "selector-pseudo-class-no-unknown": [
-      true,
-      {
-        "ignorePseudoClasses": ["global"]
-      }
-    ],
-    "prettier/prettier": true,
-    "selector-class-pattern": null,
-    "custom-property-pattern": null,
-    "value-no-vendor-prefix": null,
-    "property-no-vendor-prefix": null
+    "selector-class-pattern": "^[a-z][a-zA-Z-]*$"
   }
 }
