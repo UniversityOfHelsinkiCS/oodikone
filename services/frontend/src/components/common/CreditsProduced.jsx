@@ -43,7 +43,7 @@ const makeTableStats = (data, showAll, isAcademicYear) => {
   if (!data) return null
   const currentYear = new Date().getFullYear()
   const tableStats = []
-  for (let year = 2017; year <= currentYear; year++) {
+  for (let year = currentYear; year >= 2017; year--) {
     const yearData = data[getFormattedYear(year, isAcademicYear)]
     if (!yearData) continue
     const basic = yearData.basic || 0
