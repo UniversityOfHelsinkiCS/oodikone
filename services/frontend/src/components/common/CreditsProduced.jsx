@@ -28,7 +28,6 @@ const makeGraphData = (data, showAll, isAcademicYear) => {
   const years = []
   const graphStats = []
   for (let year = 2017; year <= currentYear; year++) {
-    // eslint-disable-next-line no-restricted-syntax
     allKeys.forEach(key => {
       if (!graphStats.find(k => k.name === names[key])) {
         graphStats.push({ name: names[key], data: [] })
