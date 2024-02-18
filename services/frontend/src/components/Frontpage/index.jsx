@@ -114,7 +114,7 @@ export const FrontPage = () => {
         )}
       </Container>
       <a href="https://toska.dev/">
-        <Image src={images.toskaLogo} size="medium" centered style={{ bottom: 0 }} />
+        <Image src={images.toskaLogo} alt="Logo of Toska" size="medium" centered style={{ bottom: 0 }} />
       </a>
     </div>
   )
