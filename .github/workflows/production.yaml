@@ -105,8 +105,8 @@ jobs:
         with:
           environment: production
           set_commits: 'skip'
-          sourcemaps: './build/static/js'
-          url_prefix: '~/static/js'
+          sourcemaps: './build/assets'
+          url_prefix: '~/assets'
           version: ${{ steps.extract_version.outputs.VERSION }}
 
   report_success:
