@@ -1,5 +1,3 @@
-/* eslint-disable no-continue */
-
 import _ from 'lodash'
 import React, { useState, useMemo, useEffect } from 'react'
 import { Modal, Table, Button, Checkbox } from 'semantic-ui-react'

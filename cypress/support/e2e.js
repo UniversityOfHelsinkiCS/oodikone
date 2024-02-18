@@ -13,7 +13,7 @@
 // https://on.cypress.io/configuration
 // ***********************************************************
 
-import './commands'
+require('./commands')
 
 // This error is benign and seems to be only present in Cypress
 const resizeObserverLoopErrRe = /^[^(ResizeObserver loop limit exceeded)]/

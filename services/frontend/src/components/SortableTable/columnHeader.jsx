@@ -140,7 +140,7 @@ export const createHeaders = (columns, columnDepth, dispatch) => {
     const [column] = stack.splice(0, 1)
 
     if (column.parent?.mergeHeader) {
-      continue // eslint-disable-line
+      continue
     }
 
     const currentDepth = column.depth ?? 0
@@ -257,7 +257,6 @@ export const tableStateReducer = (...args) =>
           state.expandedGroups.push(group)
         }
       },
-      // eslint-disable-next-line prettier/prettier
     })[type]()
   })
 
