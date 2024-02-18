@@ -45,7 +45,7 @@ export const BasicOverview = ({
 }) => {
   const [showMedian, setShowMedian] = useState(false)
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
-  const special = !specialGroups
+  const special = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
   const basics = useGetBasicStatsQuery({
     id: studyprogramme,
     combinedProgramme,
@@ -55,7 +55,7 @@ export const BasicOverview = ({
   const credits = useGetCreditStatsQuery({
     codes: [studyprogramme, combinedProgramme].filter(Boolean),
     isAcademicYear: academicYear,
-    specialGroups: special,
+    specialGroups: !specialGroups,
   })
   const graduations = useGetGraduationStatsQuery({
     id: studyprogramme,
