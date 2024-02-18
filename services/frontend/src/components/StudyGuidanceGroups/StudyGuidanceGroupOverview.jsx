@@ -1,7 +1,6 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link, useHistory } from 'react-router-dom'
-import { Formik } from 'formik'
-import { Form, Button, Icon, Modal } from 'semantic-ui-react'
+import { Form, Button, Icon, Modal, Message } from 'semantic-ui-react'
 import Datetime from 'react-datetime'
 
 import { textAndDescriptionSearch } from 'common'
@@ -46,53 +45,78 @@ const cellContent = { flexGrow: 1 }
 const EditTagModal = ({ group, tagName, toggleEdit, selectFieldItems, open }) => {
   const [changeStudyGuidanceGroupTags, { isLoading }] = useChangeStudyGuidanceGroupTagsMutation()
   const { getTextIn } = useLanguage()
+  const initialState = { [tagName]: '' }
+  const [formValues, setFormValues] = useState(initialState)
+  const [formErrors, setFormErrors] = useState({})
 
-  const onSubmit = values => {
-    changeStudyGuidanceGroupTags({ groupId: group.id, tags: values })
-    toggleEdit()
+  useEffect(() => {
+    setFormValues(initialState)
+    setFormErrors({})
+  }, [group, tagName, open])
+
+  const validate = values => {
+    const tags = { studyProgramme: 'Study programme', year: 'Starting year' }
+    const errors = {}
+    if (!values[tagName]) {
+      errors[tagName] = `${tags[tagName]} is required!`
+    }
+    return errors
+  }
+
+  const handleChange = (name, value) => {
+    setFormValues(prev => ({ ...prev, [name]: value }))
+  }
+
+  const handleSubmit = () => {
+    const errors = validate(formValues)
+    setFormErrors(errors)
+
+    if (Object.keys(errors).length === 0) {
+      changeStudyGuidanceGroupTags({ groupId: group.id, tags: formValues })
+      toggleEdit()
+    }
   }
 
   return (
     <Modal onClose={toggleEdit} open={open}>
-      <Formik
-        initialValues={{ [tagName]: '' }}
-        onSubmit={values => onSubmit(values)}
-        validate={values => (!values[tagName] ? { [tagName]: `${tagName} is required` } : {})}
-      >
-        {formik => (
-          <>
-            <Modal.Header>{getTextIn(group.name)}</Modal.Header>
-            <Modal.Content>
-              <AssociateTagForm group={group} tagName={tagName} selectFieldItems={selectFieldItems} formik={formik} />
-            </Modal.Content>
-            <Modal.Actions>
-              <Button content="Cancel" labelPosition="right" icon="trash" onClick={toggleEdit} negative />
-              <Button
-                content="Save"
-                type="submit"
-                labelPosition="right"
-                icon="checkmark"
-                onClick={formik.handleSubmit}
-                disabled={isLoading}
-                positive
-              />
-            </Modal.Actions>
-          </>
-        )}
-      </Formik>
+      <>
+        <Modal.Header>{getTextIn(group.name)}</Modal.Header>
+        <Modal.Content>
+          <AssociateTagForm
+            group={group}
+            tagName={tagName}
+            selectFieldItems={selectFieldItems}
+            formValues={formValues}
+            handleChange={handleChange}
+            formErrors={formErrors}
+          />
+        </Modal.Content>
+        <Modal.Actions>
+          <Button content="Cancel" labelPosition="right" icon="trash" onClick={toggleEdit} negative />
+          <Button
+            content="Save"
+            type="submit"
+            labelPosition="right"
+            icon="checkmark"
+            onClick={handleSubmit}
+            disabled={isLoading}
+            positive
+          />
+        </Modal.Actions>
+      </>
     </Modal>
   )
 }
 
-const AssociateTagForm = ({ group, tagName, selectFieldItems, formik }) => (
+const AssociateTagForm = ({ group, tagName, selectFieldItems, formValues, handleChange, formErrors }) => (
   <>
     <p>
       {tagName === 'studyProgramme'
         ? 'Edit associated study programme for this group:'
         : 'Edit associated starting year for this group:'}
     </p>
-    <Form onSubmit={formik.handleSubmit} style={{ ...cellWrapper, alignItems: 'center' }}>
-      <div style={cellContent}>
+    <Form style={{ alignItems: 'center' }}>
+      <div>
         {tagName === 'studyProgramme' ? (
           <Form.Select
             name={tagName}
@@ -103,16 +127,16 @@ const AssociateTagForm = ({ group, tagName, selectFieldItems, formik }) => (
             }
             options={selectFieldItems}
             closeOnChange
-            value={formik.values[tagName]}
-            onChange={(_, value) => formik.setFieldValue(tagName, value?.value)}
+            value={formValues[tagName]}
+            onChange={(_, { value }) => handleChange(tagName, value)}
           />
         ) : (
           <Datetime
-            className="studyguidancegroupoverview__yeartagselector"
+            className="guidance-group-overview-year-tag-selector"
             name={tagName}
             dateFormat="YYYY"
             timeFormat={false}
-            initialvalue={group.tags?.[tagName]}
+            initialValue={group.tags?.[tagName]}
             inputProps={{ readOnly: true }}
             renderYear={(props, year) => {
               const shiftBy = 2 // fix to start from 2017 instead of 2019
@@ -121,7 +145,7 @@ const AssociateTagForm = ({ group, tagName, selectFieldItems, formik }) => (
                 ...props,
                 key: props.key - shiftBy,
                 className:
-                  `${formik.values[tagName]}` === formattedAndShiftedYear.substring(0, 4)
+                  `${formValues[tagName]}` === formattedAndShiftedYear.substring(0, 4)
                     ? 'rdtYear rdtActive'
                     : 'rdtYear',
                 'data-value': props['data-value'] - shiftBy,
@@ -141,12 +165,13 @@ const AssociateTagForm = ({ group, tagName, selectFieldItems, formik }) => (
               )
             }}
             closeOnSelect
-            value={formik.values[tagName]}
-            onChange={value => formik.setFieldValue(tagName, value?.format('YYYY'))}
+            value={formValues[tagName]}
+            onChange={value => handleChange(tagName, value?.format('YYYY'))}
           />
         )}
       </div>
     </Form>
+    {formErrors[tagName] && <Message negative icon="exclamation circle" header={`${formErrors[tagName]}`} />}
   </>
 )
 
