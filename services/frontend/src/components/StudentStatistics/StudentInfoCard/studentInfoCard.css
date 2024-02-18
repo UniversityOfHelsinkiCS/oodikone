@@ -9,7 +9,9 @@
 
 .enrollment-label-no-margin {
   border-radius: 0.28rem;
-  box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+  box-shadow:
+    0 1px 3px 0 #d4d4d5,
+    0 0 0 1px #d4d4d5;
   display: inline-block;
   width: 15px;
   height: 15px;
