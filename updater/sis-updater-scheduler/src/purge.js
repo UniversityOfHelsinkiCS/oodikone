@@ -1,5 +1,4 @@
-const axios = require('axios').default
-const { NATS_GROUP, SIS_PURGE_CHANNEL, REDIS_LAST_PREPURGE_INFO } = require('./config')
+const { NATS_GROUP, SIS_PURGE_CHANNEL, REDIS_LAST_PREPURGE_INFO, SLACK_WEBHOOK } = require('./config')
 const { logger } = require('./utils/logger')
 const { stan, opts } = require('./utils/stan')
 const { set: redisSet, get: redisGet } = require('./utils/redis')
@@ -28,12 +27,20 @@ let collectedPrePurgeTableData = {} // Collect data from nats, since synchronous
 let stanChannel // Channel is initialized once for purge
 
 const sendToSlack = async text => {
-  const SLACK_WEBHOOK = process.env.SLACK_WEBHOOK
   logger.info('Sending to slack', { text })
   if (!SLACK_WEBHOOK) return logger.info('SLACK_WEBHOOK environment variable must be set')
 
   try {
-    axios.post(SLACK_WEBHOOK, { text })
+    const res = await fetch(SLACK_WEBHOOK, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ text }),
+    })
+    if (!res.ok) {
+      throw new Error('Failed to send to slack')
+    }
   } catch (err) {
     logger.info('Failed to send to slack', { err: err.meta })
   }

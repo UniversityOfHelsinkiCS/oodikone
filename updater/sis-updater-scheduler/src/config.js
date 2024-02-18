@@ -20,6 +20,7 @@ module.exports.EXIT_AFTER_IMMEDIATES = process.env.EXIT_AFTER_IMMEDIATES === 'ye
 module.exports.SCHEDULE_IMMEDIATE = process.env.SCHEDULE_IMMEDIATE?.split(',') || []
 module.exports.ENABLE_WORKER_REPORTING =
   module.exports.EXIT_AFTER_IMMEDIATES || process.env.ENABLE_WORKER_REPORTING === 'yes'
+module.exports.SLACK_WEBHOOK = process.env.SLACK_WEBHOOK
 
 // Sentry
 module.exports.sentryRelease = process.env.SENTRY_RELEASE || ''
