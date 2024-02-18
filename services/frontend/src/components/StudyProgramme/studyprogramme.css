@@ -1,4 +1,4 @@
-@media only screen and (min-width: 3240px) {
+@media only screen and (width >= 3240px) {
   .studytrack-overview,
   .studyprogramme-overview,
   .studyprogramme-courses {
@@ -6,7 +6,7 @@
   }
 }
 
-@media only screen and (min-width: 3240px) {
+@media only screen and (width >= 3240px) {
   .studytrack-overview .section-container,
   .studyprogramme-overview .section-container,
   .studyprogramme-courses .section-container {

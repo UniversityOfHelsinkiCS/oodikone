@@ -112,19 +112,15 @@
   position: absolute;
   outline: 0;
   top: 100%;
-  min-width: -webkit-max-content;
-  min-width: -moz-max-content;
   margin: 0;
   padding: 0;
   background: #fff;
   font-size: 1em;
   text-shadow: none;
   text-align: left;
-  -webkit-box-shadow: 0 2px 3px 0 rgb(34 36 38 / 15%);
   box-shadow: 0 2px 3px 0 rgb(34 36 38 / 15%);
   border: 1px solid rgb(34 36 38 / 15%);
   border-radius: 0.28571429rem;
-  -webkit-transition: opacity 0.1s ease;
   transition: opacity 0.1s ease;
   z-index: 11;
   will-change: transform, opacity;
@@ -144,7 +140,6 @@ i.filter.icon {
   position: static;
   overflow-y: auto;
   border: none;
-  -webkit-box-shadow: none !important;
   box-shadow: none !important;
   border-radius: 0 !important;
   margin: 0 !important;
@@ -172,9 +167,7 @@ i.filter.icon {
   font-size: 1rem;
   text-transform: none;
   font-weight: 400;
-  -webkit-box-shadow: none;
   box-shadow: none;
-  -webkit-touch-callout: none;
 }
 
 .filter-menu .item:hover {
