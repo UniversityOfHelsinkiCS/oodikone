@@ -5,7 +5,6 @@ import { Dropdown } from 'semantic-ui-react'
 
 import { CourseCard } from './CourseCard'
 import { FilterType } from './filterType'
-import './courseFilter.css'
 import { createFilter } from '../createFilter'
 import { useLanguage } from '../../../LanguagePicker/useLanguage'
 

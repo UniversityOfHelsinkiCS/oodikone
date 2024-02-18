@@ -5,9 +5,6 @@
 }
 
 .progressBarHidden {
-  -webkit-animation-name: hide;
-  -webkit-animation-duration: 2s;
-  -webkit-animation-fill-mode: forwards;
   animation-name: hide;
   animation-duration: 2s;
   animation-fill-mode: forwards;

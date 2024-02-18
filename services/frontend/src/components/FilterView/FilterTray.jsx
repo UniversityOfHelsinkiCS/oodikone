@@ -1,8 +1,7 @@
 import React, { useContext } from 'react'
 import { Segment, Header, Button } from 'semantic-ui-react'
-import './filterTray.css'
-import { FilterViewContext } from '../FilterViewContext'
-import { FilterCard } from '../filters/common/FilterCard'
+import { FilterViewContext } from './FilterViewContext'
+import { FilterCard } from './filters/common/FilterCard'
 
 export const FilterTray = () => {
   const {
