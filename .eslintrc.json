@@ -1,15 +1,19 @@
 {
   "env": {
-    "es6": true,
-    "node": true,
-    "jest": true
+    "commonjs": true,
+    "es2021": true,
+    "node": true
+  },
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "commonjs"
   },
   "extends": ["eslint:recommended", "plugin:prettier/recommended", "plugin:cypress/recommended"],
-  "plugins": ["prettier", "cypress"],
   "rules": {
     "no-console": "error",
     "no-async-promise-executor": "off",
     "prettier/prettier": "error",
-    "cypress/no-assigning-return-values": "off"
+    "cypress/no-assigning-return-values": "off",
+    "cypress/unsafe-to-chain-command": "off"
   }
 }
