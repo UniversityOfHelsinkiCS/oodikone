@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-const { getCreditStatsForRapodiff } = require('../services/studyprogramme/rapoCredits')
+const { getCreditStatsForRapodiff } = require('../services/studyprogramme/studyprogrammeCredits')
 const { parseCsv } = require('./helpers')
 const _ = require('lodash')
 

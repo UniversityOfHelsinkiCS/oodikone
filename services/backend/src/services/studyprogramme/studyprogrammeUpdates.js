@@ -1,9 +1,9 @@
 const { getBasicStatsForStudytrack } = require('./studyprogrammeBasics')
-const { getCreditStatsForStudytrack } = require('./studyprogrammeCredits')
 const { getGraduationStatsForStudytrack } = require('./studyprogrammeGraduations')
 const { getStudytrackStatsForStudyprogramme } = require('./studytrackStats')
 const { setBasicStats, setCreditStats, setGraduationStats, setStudytrackStats } = require('../analyticsService')
 const logger = require('../../util/logger')
+const { computeProgrammeCreditStats } = require('./studyprogrammeCredits')
 
 const updateBasicView = async (code, combinedProgramme) => {
   const specialCalendar = {
@@ -37,15 +37,16 @@ const updateBasicView = async (code, combinedProgramme) => {
       })
       await setBasicStats(basicStats, option.yearType, option.specialGroups)
 
-      const creditStats = await getCreditStatsForStudytrack({
-        studyprogramme: code,
-        combinedProgramme,
-        settings: {
-          isAcademicYear: option.yearType === 'ACADEMIC_YEAR',
-          includeAllSpecials: option.specialGroups === 'SPECIAL_INCLUDED',
-        },
-      })
-      await setCreditStats(creditStats, option.yearType, option.specialGroups)
+      const creditStats = await computeProgrammeCreditStats(
+        code,
+        option.yearType === 'ACADEMIC_YEAR',
+        option.specialGroups === 'SPECIAL_INCLUDED'
+      )
+      await setCreditStats(
+        creditStats,
+        option.yearType === 'ACADEMIC_YEAR',
+        option.specialGroups === 'SPECIAL_INCLUDED'
+      )
 
       const graduationStats = await getGraduationStatsForStudytrack({
         studyprogramme: code,

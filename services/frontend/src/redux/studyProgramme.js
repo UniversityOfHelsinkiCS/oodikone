@@ -7,8 +7,10 @@ const studyprogrammeApi = RTKApi.injectEndpoints({
         `/v2/studyprogrammes/${id}/basicstats?year_type=${yearType}&special_groups=${specialGroups}&combined_programme=${combinedProgramme}`,
     }),
     getCreditStats: builder.query({
-      query: ({ id, yearType, specialGroups, combinedProgramme }) =>
-        `/v2/studyprogrammes/${id}/creditstats?year_type=${yearType}&special_groups=${specialGroups}&combined_programme=${combinedProgramme}`,
+      query: ({ codes, isAcademicYear, specialGroups }) =>
+        `/v2/studyprogrammes/creditstats?codes=${JSON.stringify(
+          codes
+        )}&isAcademicYear=${isAcademicYear}&includeSpecials=${specialGroups}`,
     }),
     getGraduationStats: builder.query({
       query: ({ id, yearType, specialGroups, combinedProgramme }) =>

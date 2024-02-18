@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const { getBasicStatsForStudytrack } = require('../services/studyprogramme/studyprogrammeBasics')
-const { getCreditStatsForStudytrack } = require('../services/studyprogramme/studyprogrammeCredits')
+const { getProgrammeCreditStats } = require('../services/studyprogramme/studyprogrammeCredits')
 const { getGraduationStatsForStudytrack } = require('../services/studyprogramme/studyprogrammeGraduations')
 const {
   getStudyprogrammeCoursesForStudytrack,
@@ -10,8 +10,6 @@ const { getStudytrackStatsForStudyprogramme } = require('../services/studyprogra
 const {
   getBasicStats,
   setBasicStats,
-  getCreditStats,
-  setCreditStats,
   getGraduationStats,
   setGraduationStats,
   getStudytrackStats,
@@ -56,26 +54,14 @@ router.get('/v2/studyprogrammes/:id/basicstats', async (req, res) => {
   return res.json(updated)
 })
 
-router.get('/v2/studyprogrammes/:id/creditstats', async (req, res) => {
-  const code = req.params.id
-  const yearType = req.query?.year_type
-  const specialGroups = req.query?.special_groups
-  const combinedProgramme = req.query?.combined_programme
-
-  if (!code) return res.status(422).end()
-
-  const data = await getCreditStats(code, combinedProgramme, yearType, specialGroups)
-  if (data) return res.json(data)
-  const updatedStats = await getCreditStatsForStudytrack({
-    studyprogramme: req.params.id,
-    combinedProgramme,
-    settings: {
-      isAcademicYear: yearType === 'ACADEMIC_YEAR',
-      includeAllSpecials: specialGroups === 'SPECIAL_INCLUDED',
-    },
-  })
-  if (updatedStats) await setCreditStats(updatedStats, yearType, specialGroups)
-  return res.json(updatedStats)
+router.get('/v2/studyprogrammes/creditstats', async (req, res) => {
+  const { codes: codesListString, isAcademicYear, includeSpecials } = req.query
+  const codes = JSON.parse(codesListString)
+  const stats = {}
+  for (const code of codes) {
+    stats[code] = await getProgrammeCreditStats(code, isAcademicYear !== 'false', includeSpecials)
+  }
+  return res.json({ stats })
 })
 
 router.get('/v2/studyprogrammes/:id/graduationstats', async (req, res) => {

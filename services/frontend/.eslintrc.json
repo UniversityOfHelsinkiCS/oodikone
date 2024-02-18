@@ -39,7 +39,8 @@
     "quotes": ["error", "single", { "avoidEscape": true }],
     "react-hooks/rules-of-hooks": "error",
     "no-console": "error",
-    "no-param-reassign": ["error", { "props": false }]
+    "no-param-reassign": ["error", { "props": false }],
+    "no-continue": "off"
   },
   "plugins": ["react", "react-hooks"],
   "settings": {
