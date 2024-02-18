@@ -55,15 +55,11 @@ describe('Studyprogramme overview', () => {
     })
 
     it('Basic information contains correct credits', () => {
-      const years = getEmptyYears()
       const tableContents = [
-        // [Year, Total, Major credits, Non-major credits, Non-degree credits, Transferred credits]
-        ...years.map(year => [year, 0, 0, 0, 0, 0]),
-        [2021, 0, 0, 0, 0, 0],
-        [2020, 4928, 4736, 25, 0, 167],
-        [2019, 7737, 7266, 99, 23, 349],
-        [2018, 6730, 6289, 84, 85, 272],
-        [2017, 2900, 2452, 33, 27, 388],
+        [2020, 4511, 4511, 0, 0, 167],
+        [2019, 7117, 7097, 0, 0, 349],
+        [2018, 5747, 5742, 0, 0, 272],
+        [2017, 1910, 1910, 0, 0, 388],
       ]
 
       cy.checkTableStats(tableContents, 'CreditsProducedByTheStudyprogramme')
@@ -101,12 +97,10 @@ describe('Studyprogramme overview', () => {
 
       const creditTableContents = [
         // [Year, Total, Major students credits, Transferred credits]
-        ...years.map(year => [year, 0, 0, 0]),
-        [2021, 0, 0, 0],
-        [2020, 4224, 3954, 167],
-        [2019, 5812, 5357, 349],
-        [2018, 4639, 4302, 272],
-        [2017, 1968, 1580, 388],
+        [2020, 4511, 4511, 0, 0, 167],
+        [2019, 7117, 7097, 0, 0, 349],
+        [2018, 5747, 5742, 0, 0, 272],
+        [2017, 1910, 1910, 0, 0, 388],
       ]
 
       cy.checkTableStats(creditTableContents, 'CreditsProducedByTheStudyprogramme')
@@ -141,13 +135,11 @@ describe('Studyprogramme overview', () => {
       cy.checkTableStats(studentTableContents, 'StudentsOfTheStudyprogramme')
 
       const creditTableContents = [
-        // [Year, Total, Major students credits, Non-major students credits, Non-degree credits, Transferred credits]
-        ...years.map(year => [year, 0, 0, 0, 0, 0]),
-        ['2021 - 2022', 0, 0, 0, 0, 0],
-        ['2020 - 2021', 412, 342, 10, 0, 60],
-        ['2019 - 2020', 7546, 7319, 34, 0, 193],
-        ['2018 - 2019', 8866, 8380, 115, 43, 328],
-        ['2017 - 2018', 5220, 4702, 82, 92, 344],
+        // Credit table doesnt show (later) years without data
+        ['2020 - 2021', 352, 352, 0, 0, 60],
+        ['2019 - 2020', 6966, 6966, 0, 0, 193],
+        ['2018 - 2019', 7797, 7777, 0, 0, 328],
+        ['2017 - 2018', 4170, 4165, 0, 0, 344],
       ]
 
       cy.checkTableStats(creditTableContents, 'CreditsProducedByTheStudyprogramme')
@@ -161,11 +153,10 @@ describe('Studyprogramme overview', () => {
         .should('contain', 'Transferred away')
 
       cy.get('[data-cy=Graph-CreditsProducedByTheStudyprogramme')
-        .should('contain', 'Major students credits')
-        .should('contain', 'Non-major students credits')
-        .should('contain', 'Transferred credits')
-        .should('contain', 7266)
-        .should('contain', 6289)
+        .should('contain', 'Degree students')
+        .should('contain', 'Transferred')
+        .should('contain', 388)
+        .should('contain', 7097)
 
       cy.get('[data-cy=Graph-GraduatedAndThesisWritersOfTheProgramme')
         .should('contain', 'Graduated students')
@@ -209,10 +200,10 @@ describe('Studyprogramme overview', () => {
       cy.get('[data-cy=graduation-times-graphMaster]').within(() => {
         cy.contains('Graduation year')
         cy.contains('2020')
-        cy.contains('24 graduated').trigger('mouseover')
+        cy.contains('21 graduated').trigger('mouseover')
         cy.contains('study time: 22 months')
-        cy.contains('20 graduated on time')
-        cy.contains('4 graduated max year overtime')
+        cy.contains('18 graduated on time')
+        cy.contains('3 graduated max year overtime')
       })
 
       cy.get('[data-cy=graduation-times-graphBachelor]').within(() => {
