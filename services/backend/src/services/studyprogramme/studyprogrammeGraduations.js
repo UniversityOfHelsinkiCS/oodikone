@@ -39,7 +39,6 @@ const checkStartdate = async (id, startdate) => {
 const addGraduation = async (studyright, isAcademicYear, amounts, times) => {
   const startdate = await checkStartdate(studyright.studyrightid, studyright.startdate)
   const graduationYear = defineYear(studyright.enddate, isAcademicYear)
-
   const totalTimeToGraduation = moment(studyright.enddate).diff(moment(startdate), 'months')
   const statutoryAbsences = await getStatutoryAbsences(studyright.studentNumber, startdate, studyright.enddate)
   const timeToGraduation = totalTimeToGraduation - statutoryAbsences
@@ -116,9 +115,7 @@ const getGraduationTimeStats = async ({ studyprogramme, since, years, isAcademic
     includeAllSpecials,
     includeTransferredTo: includeAllSpecials,
   })
-
   const studyrights = await graduatedStudyRights(studyprogramme, since, studentnumbers)
-
   // for masters, separate bc+ms combo from just ms students (except some medical progs)
   for (const right of studyrights) {
     const elements = right.studyrightElements.filter(

@@ -3,6 +3,8 @@ import { Divider, Loader, Message } from 'semantic-ui-react'
 
 import { useGetBasicStatsQuery, useGetCreditStatsQuery, useGetGraduationStatsQuery } from 'redux/studyProgramme'
 import { studyProgrammeToolTips } from 'common/InfoToolTips'
+import { getGraduationGraphTitle } from 'common'
+import { CreditsProduced } from 'components/common/CreditsProduced'
 import { LineGraph } from './LineGraph'
 import { StackedBarChart } from './StackedBarChart'
 import { BarChart } from './BarChart'
@@ -11,11 +13,21 @@ import { BreakdownBarChart } from '../BreakdownBarChart'
 import { DataTable } from './DataTable'
 import { Toggle } from '../Toggle'
 import { InfoBox } from '../../Info/InfoBox'
-
-import { getGraduationGraphTitle } from '../../../common'
 import '../studyprogramme.css'
 
+const getDivider = (title, toolTipText) => (
+  <>
+    <div className="divider">
+      <Divider data-cy={`Section-${toolTipText}`} horizontal>
+        {title}
+      </Divider>
+    </div>
+    <InfoBox content={studyProgrammeToolTips[toolTipText]} />
+  </>
+)
+
 const isNewProgramme = code => code.includes('KH') || code.includes('MH') || /^(T)[0-9]{6}$/.test(code)
+
 const getGraduatedText = code => {
   if (code.slice(0, 1) === 'T' || code.slice(0, 3) === 'LIS') {
     return 'Graduated of the programme'
@@ -33,28 +45,28 @@ export const BasicOverview = ({
 }) => {
   const [showMedian, setShowMedian] = useState(false)
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
-  const special = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
-  const basics = useGetBasicStatsQuery({ id: studyprogramme, combinedProgramme, yearType, specialGroups: special })
-  const credits = useGetCreditStatsQuery({ id: studyprogramme, combinedProgramme, yearType, specialGroups: special })
+  const special = !specialGroups
+  const basics = useGetBasicStatsQuery({
+    id: studyprogramme,
+    combinedProgramme,
+    yearType,
+    specialGroups: 'SPECIAL_INCLUDED',
+  })
+  const credits = useGetCreditStatsQuery({
+    codes: [studyprogramme, combinedProgramme].filter(Boolean),
+    isAcademicYear: academicYear,
+    specialGroups: special,
+  })
   const graduations = useGetGraduationStatsQuery({
     id: studyprogramme,
     combinedProgramme,
     yearType,
     specialGroups: special,
   })
+
   const doCombo = graduations?.data?.doCombo
   const timesData = graduations?.data?.graduationTimes
   const timesDataSecondProgramme = graduations?.data?.graduationTimesSecondProgramme
-  const getDivider = (title, toolTipText) => (
-    <>
-      <div className="divider">
-        <Divider data-cy={`Section-${toolTipText}`} horizontal>
-          {title}
-        </Divider>
-      </div>
-      <InfoBox content={studyProgrammeToolTips[toolTipText]} />
-    </>
-  )
 
   const displayMedian = () => (
     <>
@@ -167,42 +179,15 @@ export const BasicOverview = ({
               </div>
             </>
           )}
-          {credits.isSuccess && credits.data && (
+          {credits?.data?.stats?.[studyprogramme]?.stats && (
             <>
+              {' '}
               {getDivider('Credits produced by the studyprogramme', 'CreditsProducedByTheStudyprogramme')}
-              <div className="section-container">
-                <StackedBarChart
-                  cypress="CreditsProducedByTheStudyprogramme"
-                  data={credits?.data?.graphStats}
-                  labels={credits?.data?.years}
-                />
-                <DataTable
-                  cypress="CreditsProducedByTheStudyprogramme"
-                  data={credits?.data?.tableStats}
-                  titles={credits?.data?.titles}
-                />
-              </div>
-              {combinedProgramme && credits?.data?.graphStatsSecondProg?.length > 0 && (
-                <>
-                  <h4>
-                    {combinedProgramme === 'MH90_001'
-                      ? 'Credits produced by the licentiate programme'
-                      : 'Credits produced by the master programme'}
-                  </h4>
-                  <div className="section-container">
-                    <StackedBarChart
-                      cypress="CreditsProducedByTheSecondProg"
-                      data={credits?.data?.graphStatsSecondProg}
-                      labels={credits?.data?.years}
-                    />
-                    <DataTable
-                      cypress="CreditsProducedByTheSecondProg"
-                      data={credits?.data?.tableStatsSecondProg}
-                      titles={credits?.data?.titles}
-                    />
-                  </div>
-                </>
-              )}
+              <CreditsProduced
+                data={credits?.data?.stats?.[studyprogramme]?.stats}
+                secondData={credits?.data?.stats?.[combinedProgramme]?.stats}
+                academicYear={academicYear}
+              />
             </>
           )}
           {graduations.isSuccess && graduations.data && (

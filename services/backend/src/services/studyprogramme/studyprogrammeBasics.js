@@ -47,7 +47,6 @@ const getGraduatedStats = async ({ studyprogramme, since, years, isAcademicYear,
     includeAllSpecials,
     includeTransferredTo: includeAllSpecials,
   })
-
   const studyrights = await graduatedStudyRights(studyprogramme, since, studentnumbersOfTheYear)
   studyrights.forEach(({ enddate, studyrightElements }) => {
     // Check that the study right element ending to graduation belong to study programme
