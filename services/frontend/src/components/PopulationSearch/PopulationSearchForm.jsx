@@ -5,7 +5,7 @@ import qs from 'query-string'
 import { Form, Button, Message, Icon, Grid, Radio } from 'semantic-ui-react'
 import { v4 as uuidv4 } from 'uuid'
 import Datetime from 'react-datetime'
-import { sortBy, isEqual } from 'lodash'
+import { sortBy, isEqual } from 'lodash-es'
 import moment from 'moment'
 
 import { useGetAuthorizedUserQuery } from 'redux/auth'

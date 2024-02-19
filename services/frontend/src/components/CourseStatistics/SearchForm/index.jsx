@@ -3,7 +3,7 @@ import { Segment, Header, Form, Radio, Popup, Message } from 'semantic-ui-react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useLocation, useHistory } from 'react-router-dom'
 import qs from 'query-string'
-import { sortBy } from 'lodash'
+import { sortBy } from 'lodash-es'
 import { func } from 'prop-types'
 
 import { clearCourses, findCoursesV2 } from 'redux/coursesearch'

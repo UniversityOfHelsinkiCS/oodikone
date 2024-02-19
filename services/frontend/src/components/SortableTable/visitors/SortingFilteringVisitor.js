@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import * as _ from 'lodash-es'
 import { DataVisitor } from './DataVisitor'
 import { getColumnValue, getRowOptions } from '../common'
 

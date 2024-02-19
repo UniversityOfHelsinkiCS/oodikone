@@ -1,4 +1,4 @@
-import { uniq } from 'lodash'
+import { uniq } from 'lodash-es'
 import { bool, object } from 'prop-types'
 import qs from 'query-string'
 import React, { useMemo } from 'react'

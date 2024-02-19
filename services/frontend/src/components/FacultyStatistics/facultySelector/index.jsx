@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { debounce } from 'lodash'
+import { debounce } from 'lodash-es'
 import { Message, Header, Form } from 'semantic-ui-react'
 
 import { useLanguage } from 'components/LanguagePicker/useLanguage'

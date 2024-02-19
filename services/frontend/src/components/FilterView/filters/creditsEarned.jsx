@@ -1,6 +1,6 @@
 import { RangeSelector } from 'components/common/RangeSelector'
 import React, { useMemo } from 'react'
-import _ from 'lodash'
+import * as _ from 'lodash-es'
 
 import { useDebounce } from 'common/hooks'
 import { getStudentTotalCredits } from '../../../common'

@@ -1,5 +1,5 @@
 import moment from 'moment'
-import { range, filter, maxBy, intersection } from 'lodash'
+import { range, filter, maxBy, intersection } from 'lodash-es'
 import toskaLogo from '../assets/toska.png'
 import irtomikko from '../assets/irtomikko.png'
 

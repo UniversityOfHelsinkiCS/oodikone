@@ -1,4 +1,4 @@
-import { flatten, sortBy } from 'lodash'
+import { flatten, sortBy } from 'lodash-es'
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { Button, Icon, Popup } from 'semantic-ui-react'

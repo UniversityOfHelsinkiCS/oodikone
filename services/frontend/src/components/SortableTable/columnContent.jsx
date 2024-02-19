@@ -1,6 +1,6 @@
 import React from 'react'
 import { useContext } from 'use-context-selector'
-import _ from 'lodash'
+import * as _ from 'lodash-es'
 import { v4 as uuidv4 } from 'uuid'
 import './style.css'
 import { SortableTableContext, getDataItemType, DataItemType, thickBorderStyles, cloneColumns } from './common'

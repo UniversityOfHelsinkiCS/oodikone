@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import { useContextSelector } from 'use-context-selector'
-import _ from 'lodash'
+import * as _ from 'lodash-es'
 import { Icon, Input, Dropdown } from 'semantic-ui-react'
 import { SortableTableContext, getColumnValue } from '../common'
 

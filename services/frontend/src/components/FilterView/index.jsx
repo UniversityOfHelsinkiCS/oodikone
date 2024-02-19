@@ -1,23 +1,21 @@
 import React, { useMemo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import produce from 'immer'
-import _ from 'lodash'
-import fp from 'lodash/fp'
+import * as _ from 'lodash-es'
 
 import { selectViewFilters, setFilterOptions, resetViewFilters, resetFilter } from 'redux/filters'
 import { FilterViewContext } from './FilterViewContext'
 import { FilterTray } from './FilterTray'
 
-const resolveFilterOptions = (store, filters, initialOptions) => {
-  return fp.flow(
-    fp.map(({ key, defaultOptions }) => [
-      key,
-      [store[key]?.options, !store[key] ? _.get(initialOptions, key) : null, defaultOptions],
-    ]),
-    fp.fromPairs,
-    fp.mapValues(values => _.find(values))
-  )(filters)
-}
+const resolveFilterOptions = (store, filters, initialOptions) =>
+  _.chain(filters)
+    .map(({ key, defaultOptions }) => {
+      const options = store[key]?.options ?? _.get(initialOptions, key, null)
+      const values = [options, defaultOptions].filter(value => value !== null)
+      return [key, _.find(values, value => value !== undefined)]
+    })
+    .fromPairs()
+    .value()
 
 export const FilterView = ({
   children,
@@ -38,10 +36,10 @@ export const FilterView = ({
 
   const displayTray = displayTrayProp !== undefined ? !!displayTrayProp : true
 
-  const precompute = fp.flow(
-    fp.filter(({ precompute }) => precompute),
-    fp.keyBy('key'),
-    fp.mapValues(({ precompute, key }) =>
+  const precompute = filters => {
+    const filtered = _.filter(filters, ({ precompute }) => precompute)
+    const keyed = _.keyBy(filtered, 'key')
+    return _.mapValues(keyed, ({ precompute, key }) =>
       precompute({
         students,
         options: filterOptions[key] ?? filtersByKey[key].defaultOptions,
@@ -49,7 +47,7 @@ export const FilterView = ({
         args: filtersByKey[key].args,
       })
     )
-  )
+  }
 
   const precomputed = useMemo(() => precompute(orderedFilters), [students, orderedFilters, filterOptions])
 
@@ -68,23 +66,36 @@ export const FilterView = ({
     }
   }
 
-  const applyFilters = fp.flow(
-    fp.map(filter => [filter, getFilterContext(filter.key)]),
-    fp.filter(([{ key, isActive }, ctx]) => isActive(filterOptions[key], ctx)),
-    fp.reduce((students, [{ filter }, ctx]) => {
-      return students
-        .map(student => {
-          const res = []
-          const newStudent = produce(student, s => {
-            res.push(filter(s, ctx.options, ctx))
+  const applyFilters = filters => {
+    // Map each filter to a tuple of [filter, context]
+    const mappedFilters = _.map(filters, filter => [filter, getFilterContext(filter.key)])
+
+    // Filter out inactive filters or those not applicable based on context
+    const activeFilters = _.filter(mappedFilters, ([{ key, isActive }, ctx]) => isActive(filterOptions[key], ctx))
+
+    // Reduce the active filters to apply them to the student array
+    const filteredStudents = _.reduce(
+      activeFilters,
+      (currentStudents, [{ filter }, ctx]) => {
+        return _.chain(currentStudents)
+          .map(student => {
+            const res = []
+            const newStudent = produce(student, draft => {
+              const result = filter(draft, ctx.options, ctx)
+              res.push(result)
+            })
+            res.push(newStudent)
+            return res
           })
-          res.push(newStudent)
-          return res
-        })
-        .filter(([keep]) => keep)
-        .map(([, student]) => student)
-    }, students)
-  )
+          .filter(([keep]) => keep)
+          .map(([, student]) => student)
+          .value()
+      },
+      students
+    )
+
+    return filteredStudents
+  }
 
   const filteredStudents = useMemo(
     () => applyFilters(orderedFilters),

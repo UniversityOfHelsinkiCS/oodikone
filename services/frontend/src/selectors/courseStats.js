@@ -1,5 +1,5 @@
 import { createSelector } from '@reduxjs/toolkit'
-import { sortBy, flatten } from 'lodash'
+import { sortBy, flatten } from 'lodash-es'
 
 const courseStatsSelector = state => state.courseStats.data
 const openOrRegularSelector = state => state.courseSearch.openOrRegular

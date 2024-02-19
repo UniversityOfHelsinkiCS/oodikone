@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Button, Header, Divider, Label } from 'semantic-ui-react'
 import moment from 'moment'
-import _ from 'lodash'
+import * as _ from 'lodash-es'
 import { useHistory } from 'react-router-dom'
 
 import * as filters from 'components/FilterView/filters'

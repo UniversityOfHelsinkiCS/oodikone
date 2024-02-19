@@ -1,7 +1,7 @@
 import React from 'react'
 import { func, arrayOf, object, shape, string, oneOfType, number } from 'prop-types'
 import { Card, Icon } from 'semantic-ui-react'
-import { minBy } from 'lodash'
+import { minBy } from 'lodash-es'
 
 import './populationQueryCard.css'
 import { reformatDate } from 'common'

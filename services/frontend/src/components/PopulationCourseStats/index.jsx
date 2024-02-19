@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { connect, useDispatch } from 'react-redux'
 import { Tab } from 'semantic-ui-react'
-import { orderBy } from 'lodash'
+import { orderBy } from 'lodash-es'
 
 import { clearCourseStats } from 'redux/coursestats'
 import { useTabChangeAnalytics } from '../../common/hooks'

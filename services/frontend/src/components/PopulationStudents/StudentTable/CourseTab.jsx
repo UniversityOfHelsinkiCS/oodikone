@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback } from 'react'
-import _, { orderBy, uniqBy, sortBy, isNumber } from 'lodash'
+import * as _ from 'lodash-es'
 import { useSelector } from 'react-redux'
 import { Icon, Tab } from 'semantic-ui-react'
 
@@ -103,7 +103,7 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
       getRowVal: s =>
         s.total
           ? Object.values(s)
-              .filter(isNumber)
+              .filter(_.isNumber)
               .reduce((acc, e) => acc + e, 0)
           : totalMandatoryPassed(s.studentNumber),
       cellProps: { title: 'Total passed' },
@@ -123,8 +123,8 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
       return acc
     }, {})
 
-    const sortedlabels = orderBy(
-      uniqBy(mandatoryCourseLabels, l => l.label),
+    const sortedlabels = _.orderBy(
+      _.uniqBy(mandatoryCourseLabels, l => l.label),
       [e => e.orderNumber],
       ['asc']
     )
@@ -157,7 +157,7 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
 
       const bestGrade =
         courseAttainments.length > 0
-          ? sortBy(courseAttainments, element => {
+          ? _.sortBy(courseAttainments, element => {
               const order = { 5: 0, 4: 1, 3: 2, 2: 3, 1: 4, HT: 5, TT: 6, 'Hyv.': 7, 'Hyl.': 8 }
               return order[element.grade]
             })[0].grade
@@ -189,7 +189,7 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
           ),
           textTitle: e.code,
           thickBorders: true,
-          children: sortBy(labelToMandatoryCourses[e.label], [
+          children: _.sortBy(labelToMandatoryCourses[e.label], [
             m => {
               const res = m.code.match(/\d+/)
               return res ? Number(res[0]) : Number.MAX_VALUE

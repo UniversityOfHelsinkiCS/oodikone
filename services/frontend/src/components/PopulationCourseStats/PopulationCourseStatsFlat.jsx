@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { useDispatch } from 'react-redux'
 import { Table, Input, Tab, Icon } from 'semantic-ui-react'
-import { orderBy, debounce } from 'lodash'
+import { orderBy, debounce } from 'lodash-es'
 import { useGetSemestersQuery } from 'redux/semesters'
 import { clearCourseStats } from '../../redux/coursestats'
 import './populationCourseStats.css'

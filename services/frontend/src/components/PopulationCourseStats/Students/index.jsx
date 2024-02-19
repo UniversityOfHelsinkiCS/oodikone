@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react'
 import { Icon, Button, Item, Pagination } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
-import _ from 'lodash'
+import * as _ from 'lodash-es'
 
 import { SortableTable, group } from 'components/SortableTable'
 import { useLanguage } from 'components/LanguagePicker/useLanguage'

@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react'
 import ReactHighcharts from 'react-highcharts'
 import { Radio, Dropdown, Segment } from 'semantic-ui-react'
 import moment from 'moment'
-import _ from 'lodash'
+import * as _ from 'lodash-es'
 import chroma from 'chroma-js'
 import { useLocation } from 'react-router-dom'
 

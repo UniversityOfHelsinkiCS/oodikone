@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import * as _ from 'lodash-es'
 import React, { useState, useMemo, useEffect } from 'react'
 import { Modal, Table, Button, Checkbox } from 'semantic-ui-react'
 import { v4 as uuidv4 } from 'uuid'

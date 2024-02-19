@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Menu, Tab, Input, Message } from 'semantic-ui-react'
-import { flattenDeep } from 'lodash'
+import { flattenDeep } from 'lodash-es'
 import Highcharts from 'highcharts/highstock'
 import ReactHighcharts from 'react-highcharts'
 

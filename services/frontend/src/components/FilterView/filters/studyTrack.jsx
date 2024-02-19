@@ -2,7 +2,7 @@
 import React from 'react'
 import { Form, Dropdown } from 'semantic-ui-react'
 import moment from 'moment'
-import _ from 'lodash'
+import * as _ from 'lodash-es'
 
 import { useLanguage } from 'components/LanguagePicker/useLanguage'
 import { createFilter } from './createFilter'

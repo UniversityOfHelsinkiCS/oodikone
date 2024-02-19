@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useReducer, useCallback } from 'react'
 import { Icon } from 'semantic-ui-react'
-import _ from 'lodash'
+import * as _ from 'lodash-es'
 
 import { FigureContainer } from './FigureContainer'
 import { ExportModal } from './ExportModal'

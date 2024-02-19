@@ -1,6 +1,6 @@
 import React from 'react'
 import produce from 'immer'
-import _ from 'lodash'
+import * as _ from 'lodash-es'
 import { Dropdown } from 'semantic-ui-react'
 
 import { CourseCard } from './CourseCard'

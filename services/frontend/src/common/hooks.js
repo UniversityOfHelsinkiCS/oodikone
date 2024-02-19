@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useEffect, useRef } from 'react'
-import { isEqual } from 'lodash'
+import { isEqual } from 'lodash-es'
 import qs from 'query-string'
 import { SEARCH_HISTORY_VERSION } from '../constants'
 

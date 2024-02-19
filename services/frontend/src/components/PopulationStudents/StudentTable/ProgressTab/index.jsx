@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Tab, Icon, Message } from 'semantic-ui-react'
-import { keyBy } from 'lodash'
+import { keyBy } from 'lodash-es'
 import moment from 'moment'
 
 import { SortableTable } from 'components/SortableTable'

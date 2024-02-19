@@ -1,7 +1,7 @@
 import { Dropdown, Form, Input, Radio } from 'semantic-ui-react'
 import React, { useState, useEffect } from 'react'
 import { curriculumsApi } from 'redux/populationCourses'
-import { sortBy } from 'lodash'
+import { sortBy } from 'lodash-es'
 
 const { useGetCurriculumsQuery, useGetCurriculumOptionsQuery } = curriculumsApi
 
