@@ -58,7 +58,7 @@ describe('Studyprogramme overview', () => {
       const tableContents = [
         [2020, 4511, 4511, 0, 0, 167],
         [2019, 7097, 7097, 0, 0, 349],
-        [2018, 5747, 5742, 0, 0, 272],
+        [2018, 5742, 5742, 0, 0, 272],
         [2017, 1910, 1910, 0, 0, 388],
       ]
 
@@ -96,7 +96,6 @@ describe('Studyprogramme overview', () => {
       cy.checkTableStats(studentTableContents, 'StudentsOfTheStudyprogramme')
 
       const creditTableContents = [
-        // [Year, Total, Major students credits, Transferred credits]
         [2020, 4511, 4511, 0, 0, 167],
         [2019, 7097, 7097, 0, 0, 349],
         [2018, 5742, 5742, 0, 0, 272],
