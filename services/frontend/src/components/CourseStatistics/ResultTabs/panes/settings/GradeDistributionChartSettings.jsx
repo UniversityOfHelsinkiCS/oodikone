@@ -1,16 +1,19 @@
 import React from 'react'
-import { Menu, Radio } from 'semantic-ui-react'
+import { Radio, Segment, SegmentGroup } from 'semantic-ui-react'
 import { HelpButton } from './common/HelpButton'
+import { Setting } from './common/Setting'
 
 export const GradeDistributionChartSettings = ({ isRelative, setIsRelative }) => {
   return (
-    <Menu secondary style={{ marginBottom: 0 }}>
-      <Menu.Item>
-        <Radio toggle label="Show relative" checked={isRelative} onChange={() => setIsRelative(!isRelative)} />
-        <Menu.Item>
-          <HelpButton tab="GradeDistribution" />
-        </Menu.Item>
-      </Menu.Item>
-    </Menu>
+    <div style={{ alignItems: 'center', display: 'flex', marginTop: '20px' }}>
+      <SegmentGroup horizontal>
+        <Segment>
+          <Setting labelText="Show relative">
+            <Radio toggle checked={isRelative} onChange={() => setIsRelative(!isRelative)} />
+          </Setting>
+        </Segment>
+      </SegmentGroup>
+      <HelpButton tab="GradeDistribution" />
+    </div>
   )
 }

@@ -77,7 +77,12 @@ export const GradeDistributionChart = ({ data, isRelative, userHasAccessToAllSta
 
   const maxGradeValue = isRelative ? 100 : getMaxValueOfSeries(gradeGraphSeries.absolute)
 
-  const primaryDistributionOptions = gradeGraphOptions(isRelative, statYears, maxGradeValue, 'Grades')
+  const primaryDistributionOptions = gradeGraphOptions(
+    isRelative,
+    statYears,
+    maxGradeValue,
+    `Grades for group ${data.name}`
+  )
 
   return (
     <div>

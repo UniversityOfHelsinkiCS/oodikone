@@ -58,7 +58,7 @@ const getPassRateStudentSeriesFromStats = stats => {
   }
 }
 
-export const PassRateChart = ({ data, settings: { viewMode, isRelative }, userHasAccessToAllStats }) => {
+export const PassRateChart = ({ data, isRelative, userHasAccessToAllStats, viewMode }) => {
   const isAttemptsMode = viewMode === 'ATTEMPTS'
 
   const stats = data.stats.filter(stat => stat.name !== 'Total')
