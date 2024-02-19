@@ -5,7 +5,7 @@ import {
   useGetFacultyThesisStatsQuery,
 } from 'redux/facultyStats'
 import { Divider, Loader, Popup, Button, Message } from 'semantic-ui-react'
-import xlsx from 'xlsx'
+import { utils, writeFile } from 'xlsx'
 import { getTimestamp } from 'common'
 import { LineGraph } from 'components/StudyProgramme/BasicOverview/LineGraph'
 import { StackedBarChart } from 'components/StudyProgramme/BasicOverview/StackedBarChart'
@@ -69,12 +69,12 @@ export const BasicOverview = ({
       yearArray.reduce((result, value, yearIndex) => ({ ...result, [headers[yearIndex].key]: value }), {})
     )
 
-    const book = xlsx.utils.book_new()
-    const tableSheet = xlsx.utils.json_to_sheet(tableStatsAsCsv)
-    xlsx.utils.book_append_sheet(book, tableSheet, 'TableStats')
-    const sheet = xlsx.utils.json_to_sheet(csvData)
-    xlsx.utils.book_append_sheet(book, sheet, 'ProgrammeStats')
-    xlsx.writeFile(book, `oodikone_${faculty.code}_${toolTipText}_${getTimestamp()}.xlsx`)
+    const book = utils.book_new()
+    const tableSheet = utils.json_to_sheet(tableStatsAsCsv)
+    utils.book_append_sheet(book, tableSheet, 'TableStats')
+    const sheet = utils.json_to_sheet(csvData)
+    utils.book_append_sheet(book, sheet, 'ProgrammeStats')
+    writeFile(book, `oodikone_${faculty.code}_${toolTipText}_${getTimestamp()}.xlsx`)
   }
 
   const getDivider = (title, toolTipText, titles, tableStats, programmeStats, programmeNames) => (

@@ -1,9 +1,9 @@
-import xlsx from 'xlsx'
+import { utils, writeFile } from 'xlsx'
 import { getTimestamp } from 'common'
 import { sortProgrammeKeys } from './facultyHelpers'
 
 export const downloadStudentTableCsv = (studentStats, programmeNames, faculty, sortedkeys, getTextIn) => {
-  const book = xlsx.utils.book_new()
+  const book = utils.book_new()
   const tableHeaders = studentStats.data.titles.slice(1)
   const countriesExtra = studentStats.data.facultyTableStatsExtra
   const years = Object.keys(studentStats.data.facultyTableStats)
@@ -24,8 +24,8 @@ export const downloadStudentTableCsv = (studentStats, programmeNames, faculty, s
       return { ...result, [header]: value }
     }, {})
   )
-  const tableSheet = xlsx.utils.json_to_sheet(tableStatsAsCsv)
-  xlsx.utils.book_append_sheet(book, tableSheet, 'TotalTableStats')
+  const tableSheet = utils.json_to_sheet(tableStatsAsCsv)
+  utils.book_append_sheet(book, tableSheet, 'TotalTableStats')
 
   const programmeStats = studentStats?.data?.programmeStats || {}
   counter = 0
@@ -53,8 +53,8 @@ export const downloadStudentTableCsv = (studentStats, programmeNames, faculty, s
     ],
     []
   )
-  const sheet = xlsx.utils.json_to_sheet(progressStatsToCsv)
-  xlsx.utils.book_append_sheet(book, sheet, 'FacultyProgrammeStats')
+  const sheet = utils.json_to_sheet(progressStatsToCsv)
+  utils.book_append_sheet(book, sheet, 'FacultyProgrammeStats')
 
   const countriesHeadersForEachYear = years.reduce(
     (result, year) => ({
@@ -102,11 +102,11 @@ export const downloadStudentTableCsv = (studentStats, programmeNames, faculty, s
       ],
       []
     )
-    const countriesSheet = xlsx.utils.json_to_sheet(countriesStats)
-    xlsx.utils.book_append_sheet(book, countriesSheet, `CountriesStats-${year}`)
+    const countriesSheet = utils.json_to_sheet(countriesStats)
+    utils.book_append_sheet(book, countriesSheet, `CountriesStats-${year}`)
   })
 
-  xlsx.writeFile(book, `oodikone_${faculty.code}_programme_stats_${getTimestamp()}.xlsx`)
+  writeFile(book, `oodikone_${faculty.code}_programme_stats_${getTimestamp()}.xlsx`)
 }
 
 export const downloadProgressTableCsv = (progressStats, programmeNames, faculty, getTextIn) => {
@@ -115,7 +115,7 @@ export const downloadProgressTableCsv = (progressStats, programmeNames, faculty,
   const masterStats = progressStats?.masterStats
   const doctorStats = progressStats?.doctorStats
 
-  const book = xlsx.utils.book_new()
+  const book = utils.book_new()
 
   const progressStatsBachelor = bachelorStats.tableStats || []
   const progressStatsBachelorMaster = bachelorMasterStats.tableStats || []
@@ -141,8 +141,8 @@ export const downloadProgressTableCsv = (progressStats, programmeNames, faculty,
           {}
         )
       )
-      const tableSheet = xlsx.utils.json_to_sheet(tableStatsAsCsv)
-      xlsx.utils.book_append_sheet(book, tableSheet, `TableStats-${sheetNames[counter]}`)
+      const tableSheet = utils.json_to_sheet(tableStatsAsCsv)
+      utils.book_append_sheet(book, tableSheet, `TableStats-${sheetNames[counter]}`)
     }
   })
 
@@ -192,9 +192,9 @@ export const downloadProgressTableCsv = (progressStats, programmeNames, faculty,
         ],
         []
       )
-      const sheet = xlsx.utils.json_to_sheet(progressStatsToCsv)
-      xlsx.utils.book_append_sheet(book, sheet, sheetNames[counter])
+      const sheet = utils.json_to_sheet(progressStatsToCsv)
+      utils.book_append_sheet(book, sheet, sheetNames[counter])
     }
   })
-  xlsx.writeFile(book, `oodikone_${faculty.code}_progress_tab_${getTimestamp()}.xlsx`)
+  writeFile(book, `oodikone_${faculty.code}_progress_tab_${getTimestamp()}.xlsx`)
 }

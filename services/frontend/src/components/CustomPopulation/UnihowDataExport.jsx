@@ -1,6 +1,6 @@
 import React from 'react'
 import { Button, Popup } from 'semantic-ui-react'
-import xlsx from 'xlsx'
+import { utils, writeFile } from 'xlsx'
 import { getStudentGradeMean, getStudentGradeMeanWeightedByCredits, getStudentTotalCredits, getTimestamp } from 'common'
 
 export const UnihowDataExport = ({ students }) => {
@@ -12,10 +12,10 @@ export const UnihowDataExport = ({ students }) => {
       'Grade Mean Weighted by ECTS (no transferred credits)': getStudentGradeMeanWeightedByCredits(student, false),
     }))
 
-    const sheet = xlsx.utils.json_to_sheet(data)
+    const sheet = utils.json_to_sheet(data)
 
-    const workbook = xlsx.utils.book_new()
-    xlsx.utils.book_append_sheet(workbook, sheet)
+    const workbook = utils.book_new()
+    utils.book_append_sheet(workbook, sheet)
     return workbook
   }
 
@@ -28,7 +28,7 @@ export const UnihowDataExport = ({ students }) => {
           icon="file excel"
           content="Excel Workbook (UniHow)"
           labelPosition="left"
-          onClick={() => xlsx.writeFile(getXlsx(), filename)}
+          onClick={() => writeFile(getXlsx(), filename)}
         />
       }
       content="Click here to download a specialized Excel workbook with UniHow data."

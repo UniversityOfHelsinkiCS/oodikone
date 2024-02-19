@@ -2,7 +2,8 @@ import { flatten, sortBy } from 'lodash'
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { Button, Icon, Popup } from 'semantic-ui-react'
-import xlsx from 'xlsx'
+import { utils, writeFile } from 'xlsx'
+
 import { curriculumsApi } from 'redux/populationCourses'
 import { reformatDate, getStudentTotalCredits, getStudentToStudyrightStartMap, getTimestamp } from '../../common'
 import { PRIORITYCODE_TEXTS } from '../../constants'
@@ -195,7 +196,7 @@ export const DataExport = ({ students, programmeCode }) => {
       return res
     }, {})
 
-    const worksheet = xlsx.utils.json_to_sheet(
+    const worksheet = utils.json_to_sheet(
       students.map(s => ({
         'last name': s.lastname,
         'given names': s.firstnames,
@@ -247,19 +248,15 @@ export const DataExport = ({ students, programmeCode }) => {
         }, {}),
       }))
     )
-    const workbook = xlsx.utils.book_new()
-    xlsx.utils.book_append_sheet(workbook, worksheet)
+    const workbook = utils.book_new()
+    utils.book_append_sheet(workbook, worksheet)
     return workbook
   }
 
   return (
     <Popup
       trigger={
-        <Button
-          onClick={() => {
-            xlsx.writeFile(generateWorkbook(), `oodikone_students_${getTimestamp()}.xlsx`)
-          }}
-        >
+        <Button onClick={() => writeFile(generateWorkbook(), `oodikone_students_${getTimestamp()}.xlsx`)}>
           <Icon name="save" />
           Combined Excel
         </Button>
