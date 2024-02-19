@@ -15,7 +15,7 @@
     "node-nats-streaming": "^0.2.6",
     "pg": "^8.11.1",
     "redis": "^3.1.2",
-    "uuid": "^9.0.0",
+    "uuid": "^9.0.1",
     "winston": "^3.8.2",
     "winston-gelf-transporter": "^1.0.2",
     "winston-sentry-log": "^1.0.26"
