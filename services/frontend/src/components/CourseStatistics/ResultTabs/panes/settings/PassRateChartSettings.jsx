@@ -1,23 +1,21 @@
 import React from 'react'
-import { Menu, Radio } from 'semantic-ui-react'
+import { Radio, Segment, SegmentGroup } from 'semantic-ui-react'
 import { HelpButton } from './common/HelpButton'
+import { Setting } from './common/Setting'
 
 export const PassRateChartSettings = ({ onChange, value }) => {
   const { viewMode, isRelative } = value
 
   return (
-    <Menu secondary style={{ marginTop: 20, marginBottom: 20 }}>
-      <Menu.Item>
-        <Radio
-          toggle
-          label="Show relative"
-          checked={isRelative}
-          onChange={() => onChange({ ...value, isRelative: !isRelative })}
-        />
-      </Menu.Item>
-      <Menu.Item>
-        <HelpButton tab="PassRate" viewMode={viewMode || 'STUDENTS'} />
-      </Menu.Item>
-    </Menu>
+    <div style={{ alignItems: 'center', display: 'flex', marginTop: '20px' }}>
+      <SegmentGroup horizontal>
+        <Segment>
+          <Setting labelText="Show relative">
+            <Radio toggle checked={isRelative} onChange={() => onChange({ ...value, isRelative: !isRelative })} />
+          </Setting>
+        </Segment>
+      </SegmentGroup>
+      <HelpButton tab="PassRate" viewMode={viewMode || 'STUDENTS'} />
+    </div>
   )
 }

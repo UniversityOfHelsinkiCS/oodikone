@@ -8,7 +8,7 @@ export const Setting = ({ children, labelText }) => {
         style={{
           display: 'flex',
           flexDirection: 'column',
-          height: '70px',
+          height: '60px',
           justifyContent: 'center',
         }}
       >
