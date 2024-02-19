@@ -23,4 +23,7 @@ export default defineConfig({
     outDir: 'build',
     sourcemap: 'hidden',
   },
+  define: {
+    'process.env': process.env,
+  },
 })
