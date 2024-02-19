@@ -27,6 +27,7 @@ runs:
       run: docker-compose --file docker-compose.ci.yml up --detach
 
     - name: 'Run cypress'
+      shell: bash
       run: npm run cypress run -- --browser chrome --baseUrl http://localhost:1337 --spec ${{ inputs.spec }}
       # uses: cypress-io/github-action@v6
       # with:
