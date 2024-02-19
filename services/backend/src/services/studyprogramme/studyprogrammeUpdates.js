@@ -58,7 +58,7 @@ const updateBasicView = async (code, combinedProgramme) => {
       })
       await setGraduationStats(graduationStats, option.yearType, option.specialGroups)
     } catch (e) {
-      logger.error(`Studytrack graduation stats failed: ${e}`)
+      logger.error(`Programme basic stats failed: ${e}`)
       logger.error(`Stack: ${e.stack}`)
     }
   }

@@ -48,7 +48,7 @@ const getCategory = (extent, hadDegreeStudyright) => {
   without (both have to be active when course was completed)
 */
 const findRelevantStudyright = (attainmentDate, studyrights) => {
-  return studyrights.find(studyright => {
+  return studyrights?.find(studyright => {
     const startDate = getCorrectStartDate(studyright)
     if (!studyright.graduated) return new Date(attainmentDate) >= new Date(startDate)
     return (
