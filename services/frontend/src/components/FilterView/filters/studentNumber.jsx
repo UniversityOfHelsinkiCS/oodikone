@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Button, Icon } from 'semantic-ui-react'
-import * as _ from 'lodash-es'
+import _ from 'lodash'
 
 import { filterToolTips } from 'common/InfoToolTips'
 import { createFilter } from './createFilter'

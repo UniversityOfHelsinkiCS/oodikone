@@ -1,6 +1,6 @@
 import React from 'react'
 import { Progress, Table } from 'semantic-ui-react'
-import { intersection, orderBy } from 'lodash-es'
+import { intersection, orderBy } from 'lodash'
 
 import { getHighestGradeOfCourseBetweenRange } from 'common'
 import { ExternalGradeFilterToggle } from './ExternalGradeFilterToggle'

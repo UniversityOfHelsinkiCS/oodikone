@@ -1,7 +1,7 @@
 import React from 'react'
 import { func, shape, string } from 'prop-types'
 import { Divider, Table, Icon, Header, Item, Segment, Button, Popup } from 'semantic-ui-react'
-import { sortBy } from 'lodash-es'
+import { sortBy } from 'lodash'
 import { Link } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 

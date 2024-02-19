@@ -1,7 +1,7 @@
 import React from 'react'
 import { Form, Label, Segment, Header } from 'semantic-ui-react'
 import { connect, useSelector } from 'react-redux'
-import { flatten } from 'lodash-es'
+import { flatten } from 'lodash'
 
 import { useGetAuthorizedUserQuery } from 'redux/auth'
 import { fields, setValue } from 'redux/coursesSummaryForm'

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Icon, Accordion, Table, Popup } from 'semantic-ui-react'
-import * as _ from 'lodash-es'
+import _ from 'lodash'
 
 import { useGetSemestersQuery } from 'redux/semesters'
 import { useLanguage } from 'components/LanguagePicker/useLanguage'

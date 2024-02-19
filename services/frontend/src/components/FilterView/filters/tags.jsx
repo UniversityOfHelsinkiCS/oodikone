@@ -1,12 +1,12 @@
 import React from 'react'
 import { Form, Dropdown, Message } from 'semantic-ui-react'
-import * as _ from 'lodash-es'
+import fp from 'lodash/fp'
 import { createFilter } from './createFilter'
 
 const TagsFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
   const name = 'tagsFilter'
 
-  const countsByTag = _.chain(withoutSelf()).map('tags').flatten().countBy('tag.tagname').value()
+  const countsByTag = fp.flow(fp.map('tags'), fp.flatten, fp.countBy('tag.tagname'))(withoutSelf())
 
   const dropdownOptions = Object.keys(countsByTag).map(tag => ({
     key: `tag-${tag}`,

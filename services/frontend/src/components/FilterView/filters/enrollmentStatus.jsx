@@ -1,4 +1,5 @@
 import React from 'react'
+import fp from 'lodash/fp'
 import { Form, Dropdown } from 'semantic-ui-react'
 
 import { useLanguage } from 'components/LanguagePicker/useLanguage'
@@ -88,10 +89,14 @@ export const enrollmentStatusFilter = createFilter({
 
   isActive: ({ status }) => status !== null,
 
-  precompute: ({ students }) => {
-    const semesterCodes = Array.from(new Set(students.flatMap(s => s.semesterenrollments).map(s => s.semestercode)))
-    return { semesterCodes }
-  },
+  precompute: fp.flow(
+    ({ students }) => students,
+    fp.map('semesterenrollments'),
+    fp.flatten,
+    fp.map('semestercode'),
+    fp.uniq,
+    semesterCodes => ({ semesterCodes })
+  ),
 
   filter(student, { status, semesters }) {
     return semesters.every(sem => {

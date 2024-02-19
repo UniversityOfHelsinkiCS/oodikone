@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react'
 import { Icon, Header } from 'semantic-ui-react'
-import * as _ from 'lodash-es'
+import _ from 'lodash'
 
 import { InfoWithHelpTooltip } from 'components/Info/InfoWithHelpTooltip'
 

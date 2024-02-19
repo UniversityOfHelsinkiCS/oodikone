@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import * as _ from 'lodash-es'
+import _ from 'lodash'
 import { Container } from 'semantic-ui-react'
 import {
   useAddProgressCriteriaCourseMutation,

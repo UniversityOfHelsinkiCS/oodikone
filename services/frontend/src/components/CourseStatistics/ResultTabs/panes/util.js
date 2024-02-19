@@ -1,4 +1,4 @@
-import { flatten } from 'lodash-es'
+import { flatten } from 'lodash'
 import { calculatePercentage } from 'common'
 
 const gradesMap = {

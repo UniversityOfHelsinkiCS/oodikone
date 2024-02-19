@@ -1,4 +1,4 @@
-import * as _ from 'lodash-es'
+import _, { uniq } from 'lodash'
 import qs from 'query-string'
 import React from 'react'
 import { useSelector } from 'react-redux'
@@ -70,7 +70,7 @@ export const AttemptsTable = ({
     const queryObject = {
       from: yearcode,
       to: yearcode,
-      coursecodes: JSON.stringify(_.uniq(alternatives)),
+      coursecodes: JSON.stringify(uniq(alternatives)),
       years,
       separate,
     }

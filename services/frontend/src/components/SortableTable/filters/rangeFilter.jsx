@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import { useContextSelector } from 'use-context-selector'
-import * as _ from 'lodash-es'
+import _ from 'lodash'
 import { Icon } from 'semantic-ui-react'
 import { useDebounce } from 'common/hooks'
 import { RangeSelector } from 'components/common/RangeSelector'

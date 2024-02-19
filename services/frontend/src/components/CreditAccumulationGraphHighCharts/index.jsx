@@ -5,7 +5,7 @@ import moment from 'moment'
 import Highcharts from 'highcharts/highstock'
 import { Button, Radio } from 'semantic-ui-react'
 import boostcanvas from 'highcharts/modules/boost-canvas'
-import * as _ from 'lodash-es'
+import _ from 'lodash'
 import boost from 'highcharts/modules/boost'
 import ReactHighstock from 'react-highcharts/ReactHighstock'
 

@@ -1,6 +1,6 @@
 import React from 'react'
 import { Form, Checkbox } from 'semantic-ui-react'
-import * as _ from 'lodash-es'
+import fp from 'lodash/fp'
 import { getHighestGradeOrEnrollmentOfCourseBetweenRange } from '../../../common'
 import { createFilter } from './createFilter'
 
@@ -9,6 +9,8 @@ import { createFilter } from './createFilter'
  * Only applicable to a single course.
  */
 const GradeFilterCard = ({ options, onOptionsChange, grades, withoutSelf }) => {
+  // const { addFilter, removeFilter, activeFilters } = useFilters()
+  // const { value, setValue, grades } = useGradeFilter()
   const { selected } = options
   const name = 'gradeFilter'
 
@@ -31,9 +33,9 @@ const GradeFilterCard = ({ options, onOptionsChange, grades, withoutSelf }) => {
   }
 
   const studentsWithoutSelf = withoutSelf()
-  const gradesWithoutSelf = _.mapValues(grades, studentNumbers =>
-    studentNumbers.filter(sn => studentsWithoutSelf.some(student => student.studentNumber === sn))
-  )
+  const gradesWithoutSelf = fp.mapValues(
+    fp.filter(sn => studentsWithoutSelf.find(s => s.studentNumber === sn) !== undefined)
+  )(grades)
 
   return (
     <div className="card-content">
@@ -66,24 +68,29 @@ export const gradeFilter = createFilter({
 
   isActive: ({ selected }) => selected.length > 0,
 
-  precompute: ({ students, args }) => {
-    const result = _.chain(students)
-      .map(student => [
+  precompute: ({ students, args }) =>
+    fp.flow(
+      fp.map(student => [
         student.studentNumber,
-        _.filter(student.courses, course => args.courseCodes.includes(course.course_code)),
-        _.filter(student.enrollments, enrollment => args.courseCodes.includes(enrollment.course_code)),
-      ])
-      .map(([studentNumber, courses, enrollments]) => [
-        studentNumber,
+        fp.filter(course => args.courseCodes.includes(course.course_code))(student.courses),
+        fp.filter(enrollment => args.courseCodes.includes(enrollment.course_code))(student.enrollments),
+      ]),
+      /* fp.filter(
+      fp.flow(
+        ([, courses]) => courses,
+        fp.map('course_code'),
+        courses => args.courseCodes.some(code => courses.includes(code))
+      )
+    ), */
+      fp.map(([sn, courses, enrollments]) => [
+        sn,
         getHighestGradeOrEnrollmentOfCourseBetweenRange(courses, enrollments, args.from, args.to),
-      ])
-      .filter(([, grade]) => grade !== undefined)
-      .groupBy(([, { grade }]) => grade)
-      .mapValues(studentsWithGrades => studentsWithGrades.map(([studentNumber]) => studentNumber))
-      .value()
-
-    return { grades: result }
-  },
+      ]),
+      fp.filter(([, grade]) => grade !== undefined),
+      fp.groupBy(([, { grade }]) => grade),
+      fp.mapValues(fp.map(([sn]) => sn)),
+      grades => ({ grades })
+    )(students),
 
   filter(student, { selected }, { precomputed }) {
     return selected.some(selectedGrade => precomputed.grades[selectedGrade].includes(student.studentNumber))

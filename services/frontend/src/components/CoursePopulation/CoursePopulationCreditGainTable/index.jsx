@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Table, Tab } from 'semantic-ui-react'
-import { maxBy } from 'lodash-es'
+import { maxBy } from 'lodash'
 import moment from 'moment'
 
 import { useGetFacultiesQuery } from 'redux/facultyStats'

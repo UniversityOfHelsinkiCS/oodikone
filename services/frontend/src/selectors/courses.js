@@ -1,5 +1,5 @@
 import { createSelector } from '@reduxjs/toolkit'
-import { orderBy } from 'lodash-es'
+import { orderBy } from 'lodash'
 
 const sortSubstitutions = course => {
   const result = orderBy(

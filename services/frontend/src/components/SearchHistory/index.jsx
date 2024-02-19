@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import moment from 'moment'
-import { sortBy } from 'lodash-es'
+import { sortBy } from 'lodash'
 import { Segment, Form, Header, Icon } from 'semantic-ui-react'
 import { arrayOf, func, shape, string, bool, instanceOf, oneOfType } from 'prop-types'
 

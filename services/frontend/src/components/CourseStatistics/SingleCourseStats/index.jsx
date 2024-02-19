@@ -3,7 +3,7 @@ import { Segment, Header, Form, Grid, Button, Popup } from 'semantic-ui-react'
 import { shape, string, arrayOf, objectOf, oneOfType, number, func, bool } from 'prop-types'
 import { connect } from 'react-redux'
 import { useHistory, useLocation } from 'react-router-dom'
-import { difference, min, max, flatten, pickBy, uniq } from 'lodash-es'
+import { difference, min, max, flatten, pickBy, uniq } from 'lodash'
 import qs from 'query-string'
 
 import { useGetMaxYearsToCreatePopulationFromQuery } from 'redux/populations'

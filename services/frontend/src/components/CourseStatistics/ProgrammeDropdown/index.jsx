@@ -1,7 +1,7 @@
 import React from 'react'
 import { Form } from 'semantic-ui-react'
 import { string, arrayOf, shape, func, oneOfType, number } from 'prop-types'
-import { orderBy } from 'lodash-es'
+import { orderBy } from 'lodash'
 import { DropdownItem } from './DropdownItem'
 import { ClearableItem } from './ClearableItem'
 

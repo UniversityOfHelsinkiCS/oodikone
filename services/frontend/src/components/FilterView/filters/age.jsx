@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback } from 'react'
 import { RangeSelector } from 'components/common/RangeSelector'
 import { useDebounce } from 'common/hooks'
-import * as _ from 'lodash-es'
+import _ from 'lodash'
 
 import { createFilter } from './createFilter'
 

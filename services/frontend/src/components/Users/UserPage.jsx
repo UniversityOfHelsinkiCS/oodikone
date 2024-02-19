@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { Button, Card, Divider, Popup, Dropdown, Segment, Loader, Message } from 'semantic-ui-react'
 import { connect } from 'react-redux'
-import { sortBy } from 'lodash-es'
+import { sortBy } from 'lodash'
 import { useHistory, useParams } from 'react-router-dom'
 
 import { useGetAuthorizedUserQuery, useShowAsUser } from 'redux/auth'

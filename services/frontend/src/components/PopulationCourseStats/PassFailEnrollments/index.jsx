@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import * as _ from 'lodash-es'
+import _ from 'lodash'
 import { SortableTable, group } from 'components/SortableTable'
 import { Item, Icon } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'

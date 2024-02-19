@@ -1,6 +1,6 @@
 import React from 'react'
 import { Form, Dropdown } from 'semantic-ui-react'
-import * as _ from 'lodash-es'
+import fp from 'lodash/fp'
 import { filterToolTips } from 'common/InfoToolTips'
 import { createFilter } from './createFilter'
 
@@ -9,8 +9,10 @@ const StartYearAtUniFilterCard = ({ options, onOptionsChange, withoutSelf }) => 
 
   const { selected } = options
 
-  const studentsGroupedByYear = _.groupBy(withoutSelf(), student => new Date(student.started).getFullYear())
-  const countsByYear = _.mapValues(studentsGroupedByYear, students => students.length)
+  const countsByYear = fp.flow(
+    fp.groupBy(student => new Date(student.started).getFullYear()),
+    fp.mapValues(students => students.length)
+  )(withoutSelf())
 
   const dropdownOptions = Object.keys(countsByYear).map(year => ({
     key: `year-${year}`,

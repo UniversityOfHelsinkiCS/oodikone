@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import moment from 'moment'
-import * as _ from 'lodash-es'
+import _ from 'lodash'
 import { Segment, Header, Form, Input } from 'semantic-ui-react'
 import { useLocation } from 'react-router-dom'
 

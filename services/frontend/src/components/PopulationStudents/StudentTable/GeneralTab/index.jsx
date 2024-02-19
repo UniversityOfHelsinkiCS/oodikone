@@ -1,5 +1,5 @@
 import React from 'react'
-import * as _ from 'lodash-es'
+import _ from 'lodash'
 import { useSelector } from 'react-redux'
 import { useGetStudyGuidanceGroupPopulationQuery } from 'redux/studyGuidanceGroups'
 import { useGetAuthorizedUserQuery } from 'redux/auth'

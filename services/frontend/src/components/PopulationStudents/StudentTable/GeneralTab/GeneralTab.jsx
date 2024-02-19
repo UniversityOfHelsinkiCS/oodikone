@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import * as _ from 'lodash-es'
+import _ from 'lodash'
 import moment from 'moment'
 
 import { SortableTable } from 'components/SortableTable'

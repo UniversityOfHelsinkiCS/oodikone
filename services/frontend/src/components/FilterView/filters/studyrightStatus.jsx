@@ -1,6 +1,6 @@
 import React from 'react'
 import { Form, Radio } from 'semantic-ui-react'
-import * as _ from 'lodash-es'
+import _ from 'lodash'
 import moment from 'moment'
 import { filterToolTips } from 'common/InfoToolTips'
 import { createFilter } from './createFilter'

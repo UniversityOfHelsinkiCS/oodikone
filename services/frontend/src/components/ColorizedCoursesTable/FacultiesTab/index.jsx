@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import * as _ from 'lodash-es'
+import _ from 'lodash'
 
 import { useLanguage } from 'components/LanguagePicker/useLanguage'
 import { SortableTable, row } from 'components/SortableTable'

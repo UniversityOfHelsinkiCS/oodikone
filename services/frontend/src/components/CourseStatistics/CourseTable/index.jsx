@@ -1,5 +1,5 @@
 import React from 'react'
-import { sortBy } from 'lodash-es'
+import { sortBy } from 'lodash'
 import { Table } from 'semantic-ui-react'
 import { func, arrayOf, shape, string, bool } from 'prop-types'
 import { getActiveYears } from '../courseStatisticsUtils'

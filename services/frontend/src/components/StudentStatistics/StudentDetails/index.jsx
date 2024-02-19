@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { func, shape, string, arrayOf, number, bool } from 'prop-types'
 import { connect } from 'react-redux'
 import { Segment, Loader } from 'semantic-ui-react'
-import { isEmpty, sortBy } from 'lodash-es'
+import { isEmpty, sortBy } from 'lodash'
 import moment from 'moment'
 
 import { getStudent, removeStudentSelection, resetStudent } from 'redux/students'

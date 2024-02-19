@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react'
 import { Dropdown } from 'semantic-ui-react'
-import * as _ from 'lodash-es'
+import fp from 'lodash/fp'
+import _ from 'lodash'
 import moment from 'moment'
 
 import { useLanguage } from '../../LanguagePicker/useLanguage'
@@ -25,33 +26,27 @@ const ProgrammeFilterCard = ({
   const { selectedProgrammes } = options
   const name = 'programmeFilterCard'
 
-  const visibleProgrammes = (() => {
-    const studentProgrammePairs = _.flatMap(withoutSelf(), student =>
+  const visibleProgrammes = fp.flow(
+    fp.flatMap(student =>
       _.get(studentToProgrammeMap, student.studentNumber, []).map(programme => ({ student, programme }))
-    )
-    const groupedByStudentNumber = _.groupBy(studentProgrammePairs, 'student.studentNumber')
-    const filteredByProgramme = _.pickBy(groupedByStudentNumber, pairs =>
-      _.some(pairs, ({ programme }) => options.selectedProgrammes.every(pcode => programme.code === pcode))
-    )
-    const filteredPairs = _.chain(filteredByProgramme)
-      .values()
-      .flatten()
-      .filter(({ student, programme }) => studyRightPredicate(student, programme))
-      .value()
-    const programmes = _.map(filteredPairs, 'programme')
-    const programmeCounts = _.reduce(
-      programmes,
-      (acc, details) => {
-        if (!acc[details.code]) {
-          acc[details.code] = { ...details, studentCount: 0 }
-        }
-        acc[details.code].studentCount += 1
-        return acc
-      },
-      {}
-    )
-    return _.values(programmeCounts)
-  })()
+    ),
+    fp.groupBy('student.studentNumber'),
+    fp.pickBy(fp.some(({ programme }) => options.selectedProgrammes.every(pcode => programme.code === pcode))),
+    fp.values,
+    fp.flatten,
+    fp.filter(({ student, programme }) => studyRightPredicate(student, programme)),
+    fp.map('programme'),
+    fp.reduce((acc, details) => {
+      if (!acc[details.code]) {
+        acc[details.code] = { ...details, studentCount: 0 }
+      }
+
+      acc[details.code].studentCount += 1
+
+      return acc
+    }, {}),
+    fp.values
+  )(withoutSelf())
 
   const dropdownOptions = useMemo(
     () =>
@@ -166,11 +161,11 @@ const ProgrammeFilterCard = ({
   )
 }
 
-const getStudentProgrammes = student => {
-  const studyrights = _.get(student, 'studyrights', [])
-  const studyrightElements = _.flatMap(studyrights, 'studyright_elements')
-  return studyrightElements.filter(element => _.get(element, 'element_detail.type') === 20)
-}
+const getStudentProgrammes = fp.flow(
+  fp.get('studyrights'),
+  fp.flatMap('studyright_elements'),
+  fp.filter(['element_detail.type', 20])
+)
 
 const createStudentToProgrammeMap = (students, studyRightPredicate) => {
   const studentProgrammePairs = []
@@ -184,19 +179,15 @@ const createStudentToProgrammeMap = (students, studyRightPredicate) => {
     })
   })
 
-  const programmes = _.uniqBy(_.map(studentProgrammePairs, 'programme.element_detail'), 'code')
+  const programmes = fp.flow(fp.map('programme.element_detail'), fp.uniqBy('code'))(studentProgrammePairs)
 
-  const studentToProgrammeMap = studentProgrammePairs => {
-    const filteredPairs = _.filter(studentProgrammePairs, ({ student, programme }) =>
-      studyRightPredicate(student, programme)
-    )
+  const studentToProgrammeMap = fp.flow(
+    fp.filter(({ student, programme }) => studyRightPredicate(student, programme)),
+    fp.groupBy('student.studentNumber'),
+    fp.mapValues(fp.map('programme.element_detail'))
+  )(studentProgrammePairs)
 
-    const groupedByStudent = _.groupBy(filteredPairs, 'student.studentNumber')
-
-    return _.mapValues(groupedByStudent, pairs => _.map(pairs, pair => pair.programme.element_detail))
-  }
-
-  return { programmes, studentToProgrammeMap: studentToProgrammeMap(studentProgrammePairs) }
+  return { programmes, studentToProgrammeMap }
 }
 
 const MODE_PREDICATES = {

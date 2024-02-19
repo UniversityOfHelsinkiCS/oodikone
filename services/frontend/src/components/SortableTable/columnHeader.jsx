@@ -3,7 +3,7 @@ import React, { useRef, useState, useEffect, useMemo, useCallback } from 'react'
 import { useContextSelector } from 'use-context-selector'
 import { produce } from 'immer'
 import { Icon, Popup } from 'semantic-ui-react'
-import * as _ from 'lodash-es'
+import _ from 'lodash'
 
 import './style.css'
 import { SortableTableContext, getDataItemType, DataItemType, thickBorderStyles } from './common'
