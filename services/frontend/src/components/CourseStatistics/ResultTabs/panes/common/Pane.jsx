@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
 import { GradeDistributionChart } from '../charts/GradeDistributionChart'
 import { PassRateChart } from '../charts/PassRateChart'
-import { GradeDistributionChartSettings } from '../settings/GradeDistributionChartSettings'
-import { PassRateChartSettings } from '../settings/PassRateChartSettings'
+import { ChartSettings } from '../settings/ChartSettings'
 import { TableSettings } from '../settings/TableSettings'
 import { PaneContent } from './PaneContent'
 
@@ -54,7 +53,7 @@ const PassRateChartSection = ({
 }) => {
   return (
     <>
-      <PassRateChartSettings isRelative={isRelative} setIsRelative={setIsRelative} />
+      <ChartSettings isRelative={isRelative} setIsRelative={setIsRelative} tab="PassRate" viewMode={viewMode} />
       <div style={styleContainer}>
         {datasets
           .filter(i => i)
@@ -83,7 +82,7 @@ const GradeDistributionChartSection = ({
 }) => {
   return (
     <>
-      <GradeDistributionChartSettings isRelative={isRelative} setIsRelative={setIsRelative} />
+      <ChartSettings isRelative={isRelative} setIsRelative={setIsRelative} tab="GradeDistribution" />
       <div style={styleContainer}>
         {datasets
           .filter(i => i)
