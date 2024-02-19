@@ -50,10 +50,9 @@ const makeTableStats = (data, showAll, isAcademicYear) => {
     const openUni = yearData['open-uni'] || 0
     const exchange = yearData['incoming-exchange'] || 0
     const special = yearData.special || 0
-    const other = yearData.other || 0
     const agreement = yearData.agreement || 0
     const transferred = yearData.transferred || 0
-    const total = basic + openUni + special + other + agreement
+    const total = basic + openUni + special + agreement
 
     /* TODO: Other-category missing for now, clarify what go in that, and fix those */
     const yearStats = [
