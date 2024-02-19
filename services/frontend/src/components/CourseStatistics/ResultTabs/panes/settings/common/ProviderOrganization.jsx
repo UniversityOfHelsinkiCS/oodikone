@@ -25,32 +25,29 @@ export const ProviderOrganization = ({ availableStats }) => {
   }
 
   return (
-    <div style={{ alignItems: 'center', display: 'flex', flexDirection: 'column' }}>
-      <label style={{ marginBottom: '10px' }}>Provider organization(s)</label>
-      <SegmentGroup horizontal style={{ margin: '0' }}>
-        <Segment>
-          <Checkbox
-            checked={openOrRegular === 'regularStats' || openOrRegular === 'unifyStats'}
-            data-cy="providerCheckboxUniversity"
-            disabled={!availableStats.university}
-            label={availableStats.university ? 'University' : 'University (no data)'}
-            name="radioGroup"
-            onChange={toggleValue}
-            value="regularStats"
-          />
-        </Segment>
-        <Segment>
-          <Checkbox
-            checked={openOrRegular === 'openStats' || openOrRegular === 'unifyStats'}
-            data-cy="providerCheckboxOpenUni"
-            disabled={!availableStats.open}
-            label={availableStats.open ? 'Open uni' : 'Open uni (no data)'}
-            name="radioGroup"
-            onChange={toggleValue}
-            value="openStats"
-          />
-        </Segment>
-      </SegmentGroup>
-    </div>
+    <SegmentGroup horizontal style={{ margin: 0, padding: 0 }}>
+      <Segment>
+        <Checkbox
+          checked={openOrRegular === 'regularStats' || openOrRegular === 'unifyStats'}
+          data-cy="providerCheckboxUniversity"
+          disabled={!availableStats.university}
+          label={availableStats.university ? 'University' : 'University (no data)'}
+          name="radioGroup"
+          onChange={toggleValue}
+          value="regularStats"
+        />
+      </Segment>
+      <Segment>
+        <Checkbox
+          checked={openOrRegular === 'openStats' || openOrRegular === 'unifyStats'}
+          data-cy="providerCheckboxOpenUni"
+          disabled={!availableStats.open}
+          label={availableStats.open ? 'Open uni' : 'Open uni (no data)'}
+          name="radioGroup"
+          onChange={toggleValue}
+          value="openStats"
+        />
+      </Segment>
+    </SegmentGroup>
   )
 }
