@@ -46,8 +46,6 @@ jobs:
             services/frontend/Dockerfile
           build-args: |
             BUILT_AT=${{ steps.get_current_time.outputs.NOW }}
-            BASE_PATH=/oodikone
-            GIT_SHA=${{ github.sha }}
             STAGING=true
 
       - name: Push to quay.io
