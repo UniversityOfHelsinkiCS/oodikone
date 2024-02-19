@@ -110,11 +110,9 @@ const computeProgrammeCreditStats = async (programmeCode, isAcademicYear, specia
     const relevantStudyright = studyrightId
       ? studyrightIdToStudyrightMap[studyrightId]
       : findRelevantStudyright(attainmentDate, studentNumberToStudyrightsMap[studentNumber])
-    if (!relevantStudyright) return
     const attainmentYear = defineYear(attainmentDate, isAcademicYear)
-
     const hadDegreeStudyright = isDegreeStudent(studentNumberToStudyrightsMap[studentNumber], attainmentDate)
-    const category = getCategory(relevantStudyright.extentcode, hadDegreeStudyright)
+    const category = relevantStudyright ? getCategory(relevantStudyright.extentcode, hadDegreeStudyright) : 'other'
     if (!stats[attainmentYear]) stats[attainmentYear] = { transferred: 0 }
     stats[attainmentYear].total += credits
     if (!stats[attainmentYear][category]) {
