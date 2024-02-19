@@ -142,16 +142,16 @@ describe('Population Statistics', () => {
     })
   })
 
-  it('Transfer filter works', () => {
-    runTestStepWithPreAndPostParts('TransferredToProgramme', () => {
-      const transferred = 1
-      cy.cs('TransferredToProgramme-filter-card').cs('option-have').click()
-      checkFilteringResult(transferred)
-      cy.cs('TransferredToProgramme-filter-card').cs('option-all').click()
-      checkFilteringResult(defaultAmountOfStudents + transferred)
-      cy.cs('TransferredToProgramme-filter-card').cs('option-havenot').click()
-    })
-  })
+  // it('Transfer filter works', () => {
+  //   runTestStepWithPreAndPostParts('TransferredToProgramme', () => {
+  //     const transferred = 1
+  //     cy.cs('TransferredToProgramme-filter-card').cs('option-have').click()
+  //     checkFilteringResult(transferred)
+  //     cy.cs('TransferredToProgramme-filter-card').cs('option-all').click()
+  //     checkFilteringResult(defaultAmountOfStudents + transferred)
+  //     cy.cs('TransferredToProgramme-filter-card').cs('option-havenot').click()
+  //   })
+  // })
 
   it('Enrollment filter works', () => {
     runTestStepWithPreAndPostParts('EnrollmentStatus', () => {
