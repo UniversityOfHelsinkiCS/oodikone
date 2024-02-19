@@ -5,15 +5,8 @@ import { HelpButton } from './common/HelpButton'
 import { ProviderOrganization } from './common/ProviderOrganization'
 import { Setting } from './common/Setting'
 
-export const AttemptsTableSettings = ({
-  availableStats,
-  datasets,
-  onChange,
-  onSeparateChange,
-  setSplitDirection,
-  value,
-}) => {
-  const { showGrades, separate, splitDirection } = value
+export const TableSettings = ({ availableStats, datasets, onChange, onSeparateChange, setSplitDirection, value }) => {
+  const { showDetails, showGrades, separate, splitDirection, viewMode } = value
 
   const settings = [
     <Setting key="gradeToggle" labelText="Show grades">
@@ -32,6 +25,20 @@ export const AttemptsTableSettings = ({
     </Setting>,
   ]
 
+  if (viewMode === 'STUDENTS') {
+    settings.unshift(
+      <Setting key="detailToggle" labelText="Show details">
+        <Radio
+          checked={showDetails}
+          data-cy="detailToggle"
+          key="detailToggle"
+          onChange={() => onChange({ ...value, showDetails: !showDetails })}
+          toggle
+        />
+      </Setting>
+    )
+  }
+
   if (datasets.filter(dataset => dataset).length > 1) {
     settings.push(
       <Setting key="splitDirection" labelText="Split direction">
@@ -47,7 +54,7 @@ export const AttemptsTableSettings = ({
           <Segment key={element.key}>{element}</Segment>
         ))}
       </SegmentGroup>
-      <HelpButton tab="Tables" viewMode="ATTEMPTS" />
+      <HelpButton tab="Tables" viewMode="STUDENTS" />
     </div>
   )
 }

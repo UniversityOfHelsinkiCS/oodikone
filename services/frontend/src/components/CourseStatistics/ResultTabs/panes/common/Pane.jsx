@@ -1,20 +1,19 @@
 import React, { useState } from 'react'
 import { PassRateChart } from '../charts/PassRateChart'
 import { PassRateChartSettings } from '../settings/PassRateChartSettings'
+import { TableSettings } from '../settings/TableSettings'
 import { PaneContent } from './PaneContent'
 
 /**
  * A generalized pane component that is used on the Students and the Attempts tabs.
  * Contains settings and table for the corresponding tab and the pass rate chart.
  *
- * @param settingsComponent Should be either StudentsTableSettings or AttemptsTableSettings
  * @param tableComponent Should be either StudentsTable or AttemptsTable
  */
 export const Pane = ({
   availableStats,
   datasets,
   initialSettings,
-  settingsComponent: Settings,
   tableComponent: Table,
   userHasAccessToAllStats,
   updateQuery,
@@ -37,7 +36,7 @@ export const Pane = ({
   return (
     <PaneContent>
       <div style={{ marginBottom: '1em' }}>
-        <Settings
+        <TableSettings
           availableStats={availableStats}
           datasets={datasets}
           onChange={setSettings}
