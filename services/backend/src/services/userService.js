@@ -163,10 +163,10 @@ const updateUser = async (username, fields) => {
 
 const getAccessGroups = async () => await AccessGroup.findAll()
 
-const updateAccessGroups = async (username, iamGroups = [], specialGroup = {}, sisId) => {
+const updateAccessGroups = async (username, iamGroups = [], specialGroup = {}, sisId, user) => {
   const { jory, hyOne, superAdmin, openUni, katselmusViewer } = specialGroup
 
-  const userFromDb = await byUsername(username)
+  const userFromDb = user || (await byUsername(username))
   const formattedUser = await formatUser(userFromDb, [], Boolean(sisId))
 
   const { roles: currentAccessGroups } = formattedUser
@@ -213,11 +213,16 @@ const findAll = async () => {
 
   const userAccess = await getAllUserAccess()
 
+  const userAccessMap = userAccess.reduce((obj, cur) => {
+    obj[cur.id] = cur
+    return obj
+  }, {})
+
   const formattedUsers = await Promise.all(
     allUsers.map(async user => {
-      const { iamGroups, specialGroup } = userAccess.find(({ id }) => id === user.sisu_person_id) || {}
+      const { iamGroups, specialGroup } = userAccessMap[user.sisu_person_id] || {}
 
-      const { accessGroups } = await updateAccessGroups(user.username, iamGroups, specialGroup)
+      const { accessGroups } = await updateAccessGroups(user.username, iamGroups, specialGroup, null, user)
 
       return {
         ...user.get(),
