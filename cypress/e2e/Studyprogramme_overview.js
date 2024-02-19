@@ -57,7 +57,7 @@ describe('Studyprogramme overview', () => {
     it('Basic information contains correct credits', () => {
       const tableContents = [
         [2020, 4511, 4511, 0, 0, 167],
-        [2019, 7117, 7097, 0, 0, 349],
+        [2019, 7097, 7097, 0, 0, 349],
         [2018, 5747, 5742, 0, 0, 272],
         [2017, 1910, 1910, 0, 0, 388],
       ]
@@ -98,8 +98,8 @@ describe('Studyprogramme overview', () => {
       const creditTableContents = [
         // [Year, Total, Major students credits, Transferred credits]
         [2020, 4511, 4511, 0, 0, 167],
-        [2019, 7117, 7097, 0, 0, 349],
-        [2018, 5747, 5742, 0, 0, 272],
+        [2019, 7097, 7097, 0, 0, 349],
+        [2018, 5742, 5742, 0, 0, 272],
         [2017, 1910, 1910, 0, 0, 388],
       ]
 
@@ -139,7 +139,7 @@ describe('Studyprogramme overview', () => {
         ['2020 - 2021', 352, 352, 0, 0, 60],
         ['2019 - 2020', 6966, 6966, 0, 0, 193],
         ['2018 - 2019', 7797, 7777, 0, 0, 328],
-        ['2017 - 2018', 4170, 4165, 0, 0, 344],
+        ['2017 - 2018', 4165, 4165, 0, 0, 344],
       ]
 
       cy.checkTableStats(creditTableContents, 'CreditsProducedByTheStudyprogramme')
