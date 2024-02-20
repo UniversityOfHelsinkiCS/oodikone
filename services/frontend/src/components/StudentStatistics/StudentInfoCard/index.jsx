@@ -1,7 +1,6 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Card, Icon, Button } from 'semantic-ui-react'
 import { useSelector, useDispatch } from 'react-redux'
-import { useHistory } from 'react-router-dom'
 
 import { SisuLinkItem } from 'components/common/SisuLinkItem'
 import { reformatDate } from 'common'
@@ -15,23 +14,23 @@ import './studentInfoCard.css'
 
 export const StudentInfoCard = ({ student }) => {
   const dispatch = useDispatch()
-  const history = useHistory()
   const { namesVisible: showName } = useSelector(state => state.settings)
-  const { updating } = useSelector(state => state.populations)
   const { isAdmin } = useGetAuthorizedUserQuery()
   const name = showName ? `${student.name}, ` : ''
   const email = showName && student.email ? `${student.email}` : ''
-  const onRemove = () => {
-    history.push('/students')
-    dispatch(resetStudent())
-    dispatch(removeStudentSelection())
-  }
 
   const formattedTimestamp = reformatDate(student.updatedAt, isAdmin ? DISPLAY_DATE_FORMAT_DEV : DISPLAY_DATE_FORMAT)
 
   const updateStudent = async () => {
-    await callApi('/updater/update/v2/students', 'post', [student.studentNumber])
+    await callApi('/updater/update/v2/customlist/students', 'post', [student.studentNumber])
   }
+
+  useEffect(() => {
+    return () => {
+      dispatch(resetStudent())
+      dispatch(removeStudentSelection())
+    }
+  }, [])
 
   return (
     <Card fluid>
@@ -42,7 +41,6 @@ export const StudentInfoCard = ({ student }) => {
             {student.studentNumber}
             <SisuLinkItem id={student.sis_person_id} />
           </div>
-          <Icon name="remove" className="controlIcon" onClick={onRemove} />
         </Card.Header>
         <Card.Meta>
           <div className="startDate">{email}</div>
@@ -50,11 +48,13 @@ export const StudentInfoCard = ({ student }) => {
         <Card.Description>{`Credits: ${student.credits || 0}`}</Card.Description>
         <div style={{ paddingTop: '4px' }}>
           <EnrollmentAccordion student={student} />
-          <p style={{ fontSize: 14 }}>{`Updated at ${formattedTimestamp}`}</p>
-          <Button disabled={updating} compact size="medium" labelPosition="left" onClick={updateStudent}>
-            <Icon loading={updating} name="refresh" />
-            update student
-          </Button>
+          <p>{`Updated at ${formattedTimestamp}`}</p>
+          {isAdmin && (
+            <Button compact size="medium" labelPosition="left" onClick={updateStudent}>
+              <Icon name="refresh" />
+              Update student
+            </Button>
+          )}
         </div>
       </Card.Content>
     </Card>
