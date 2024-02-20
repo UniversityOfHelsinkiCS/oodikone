@@ -35,7 +35,11 @@ const setBasicStats = async (data, yearType, specialGroups) => {
 
 const getCreditStats = async (id, isAcademicYear, specialGroups) => {
   if (!isUpdatedNewProgramme(id)) return null
-  const redisKey = createRedisKeyForCreditStats(id, isAcademicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR', specialGroups)
+  const redisKey = createRedisKeyForCreditStats(
+    id,
+    isAcademicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR',
+    specialGroups ? 'SPECIAL_INCLUDED' : 'SPECIAL_EXCLUDED'
+  )
   const dataFromRedis = await redisClient.getAsync(redisKey)
   if (!dataFromRedis) return null
   return JSON.parse(dataFromRedis)
