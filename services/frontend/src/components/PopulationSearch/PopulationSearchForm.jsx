@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import { useHistory, useLocation } from 'react-router-dom'
 import qs from 'query-string'
 import { Form, Button, Message, Icon, Grid, Radio } from 'semantic-ui-react'
-import { v4 as uuidv4 } from 'uuid'
 import Datetime from 'react-datetime'
 import { sortBy, isEqual } from 'lodash'
 import moment from 'moment'
@@ -119,7 +118,7 @@ const PopulationSearchForm = ({
 
   const fetchPopulation = async query => {
     const formattedQueryParams = formatQueryParamsToArrays(query, ['semesters', 'studentStatuses', 'years'])
-    const uuid = uuidv4()
+    const uuid = crypto.randomUUID()
     setState({ isLoading: true })
     clearSelected()
     fetchPopulationPromises.current = cancelablePromise(

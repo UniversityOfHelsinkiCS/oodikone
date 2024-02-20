@@ -1,14 +1,13 @@
 import React from 'react'
 import { useContext } from 'use-context-selector'
 import _ from 'lodash'
-import { v4 as uuidv4 } from 'uuid'
 import './style.css'
 import { SortableTableContext, getDataItemType, DataItemType, thickBorderStyles, cloneColumns } from './common'
 
 export const getKey = data => {
   if (data.studentnumber) return data.studentnumber
   if (data.id) return data.id
-  return uuidv4()
+  return crypto.randomUUID()
 }
 
 const mergeColumnDefinitions = (original, overlay) => {

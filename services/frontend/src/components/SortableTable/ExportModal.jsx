@@ -1,7 +1,6 @@
 import _ from 'lodash'
 import React, { useState, useMemo, useEffect } from 'react'
 import { Modal, Table, Button, Checkbox } from 'semantic-ui-react'
-import { v4 as uuidv4 } from 'uuid'
 import { utils, writeFile } from 'xlsx'
 import { getTimestamp } from 'common'
 import { getColumnTitle, getDataItemType, DataItemType, cloneColumns } from './common'
@@ -130,7 +129,7 @@ export const ExportModal = ({ open, onOpen, onClose, data, columns, featureName 
                   <div style={{ width: '0' }}>
                     {sampledValues[column.key].map(value => (
                       <span
-                        key={uuidv4()}
+                        key={value}
                         style={{
                           border: '1px solid #dedede',
                           borderRadius: '3px',

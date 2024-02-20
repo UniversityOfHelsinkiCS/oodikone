@@ -17,7 +17,9 @@ export class ValueVisitor extends DataVisitor {
     }
 
     this.columns.forEach(column => {
-      const value = getColumnValue(ctx, column, this.exportMode)
+      let value = getColumnValue(ctx, column, this.exportMode)
+      if (_.isArray(value)) value = value.join(', ')
+      if (value === '') return
       this.values[column.key].add(value)
     })
   }
