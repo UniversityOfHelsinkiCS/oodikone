@@ -55,7 +55,7 @@ describe('Students tests', () => {
   it('Can get back to search menu', () => {
     cy.get('.prompt').type(student.studentnumber)
     cy.contains('td a', student.studentnumber).click()
-    cy.get('.remove').click()
+    cy.go('back')
     cy.contains('Student number').should('not.exist')
     cy.contains('Credits').should('not.exist')
   })
