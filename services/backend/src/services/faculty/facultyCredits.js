@@ -8,9 +8,9 @@ const {
   getYearsArray,
   getStartDate,
 } = require('../studyprogramme/studyprogrammeHelpers')
-const { getCourseCodesForStudyProgramme } = require('../studyprogramme')
-const { getCreditsForStudyProgramme } = require('../studyprogramme/creditGetters')
+const { getCreditsForProvider } = require('../studyprogramme/creditGetters')
 const { getStudyRights } = require('../studyprogramme/studyrightFinders')
+const { getCourseCodesOfProvider } = require('../providers')
 
 const isFacultyNonMajorCredit = (studyrights, attainmentDate, facultyProgrammes, facultyCode) => {
   let right = ''
@@ -69,8 +69,8 @@ const getFacultyRegularCreditStats = async ({
   }
 
   const providercode = mapToProviders([studyprogramme])[0]
-  const providedByProgramme = await getCourseCodesForStudyProgramme(providercode)
-  const allCredits = await getCreditsForStudyProgramme(providercode, providedByProgramme, since)
+  const providedByProgramme = await getCourseCodesOfProvider(providercode)
+  const allCredits = await getCreditsForProvider(providercode, providedByProgramme, since)
   const credits = uniqBy(allCredits, 'id')
   const students = [...new Set(credits.map(({ studentNumber }) => studentNumber))]
 
@@ -136,8 +136,9 @@ const getFacultyCreditStatsForStudytrack = async ({
   const years = getYearsArray(since.getFullYear(), isAcademicYear)
 
   const queryParameters = { studyprogramme, since, years, isAcademicYear, facultyProgrammes, facultyCode }
-  const { majors, facultyNonMajors, otherNonMajors, facultyOthers, nonDegree } =
-    await getFacultyRegularCreditStats(queryParameters)
+  const { majors, facultyNonMajors, otherNonMajors, facultyOthers, nonDegree } = await getFacultyRegularCreditStats(
+    queryParameters
+  )
 
   const reversedYears = getYearsArray(since.getFullYear(), isAcademicYear).reverse()
   const dataFound = [majors, facultyNonMajors, otherNonMajors].some(d => d.graphStats.length) // , transferred

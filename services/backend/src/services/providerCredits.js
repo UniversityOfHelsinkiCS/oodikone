@@ -1,9 +1,10 @@
-const { mapToProviders } = require('../../util/utils')
-const { defineYear, getCorrectStartDate } = require('./studyprogrammeHelpers')
-const { getCourseCodesForStudyProgramme, allTransfers } = require('.')
-const { getCreditsForStudyProgramme, getTransferredCredits } = require('./creditGetters')
-const { getStudyRights } = require('./studyrightFinders')
-const { getCreditStats, setCreditStats } = require('../analyticsService')
+const { mapToProviders } = require('../util/utils')
+const { defineYear, getCorrectStartDate } = require('./studyprogramme/studyprogrammeHelpers')
+const { allTransfers } = require('./studyprogramme')
+const { getCreditsForProvider, getTransferredCredits } = require('./studyprogramme/creditGetters')
+const { getStudyRights } = require('./studyprogramme/studyrightFinders')
+const { getCreditStats, setCreditStats } = require('./analyticsService')
+const { getCourseCodesOfProvider } = require('./providers')
 
 /**
  * Rapo-kategoriat 9.2.2024, joiden perusteella tämä koodi on tehty. Numerot täsmäävät vain 2022 alkaen, koska sisu/oodi ero.
@@ -70,23 +71,23 @@ const isDegreeStudent = (studyrights, date) =>
     return rightExtentCode && rightDates
   })
 
-const getProgrammeCreditStats = async (programmeCode, isAcademicYear, specialIncluded = true) => {
-  let data = await getCreditStats(programmeCode, isAcademicYear, specialIncluded)
+const getCreditsProduced = async (provider, isAcademicYear, specialIncluded = true) => {
+  let data = await getCreditStats(provider, isAcademicYear, specialIncluded)
   if (data) return data
-  data = await computeProgrammeCreditStats(programmeCode, isAcademicYear, specialIncluded)
+  data = await computeCreditsProduced(provider, isAcademicYear, specialIncluded)
   await setCreditStats(data, isAcademicYear, specialIncluded)
   return data
 }
 
-/* includes all specials, is calendar year, since 2017-01-01 */
-const computeProgrammeCreditStats = async (programmeCode, isAcademicYear, specialIncluded = true) => {
+/* Calculates credits produced by provider (programme or faculty) */
+const computeCreditsProduced = async (providerCode, isAcademicYear, specialIncluded = true) => {
   const since = new Date('2017-01-01')
-  const providercode = mapToProviders([programmeCode])[0]
-  const courses = await getCourseCodesForStudyProgramme(providercode)
-  const credits = await getCreditsForStudyProgramme(providercode, courses, since)
+  const providercode = mapToProviders([providerCode])[0]
+  const courses = await getCourseCodesOfProvider(providercode)
+  const credits = await getCreditsForProvider(providercode, courses, since)
   const students = [...new Set(credits.map(({ studentNumber }) => studentNumber))]
 
-  const transfers = (await allTransfers(programmeCode, since)).map(t => t.studyrightid)
+  const transfers = (await allTransfers(providerCode, since)).map(t => t.studyrightid)
 
   let studyrights = await getStudyRights(students)
   if (!specialIncluded) {
@@ -130,10 +131,10 @@ const computeProgrammeCreditStats = async (programmeCode, isAcademicYear, specia
     // Transferred not counted in total
   })
 
-  return { stats, id: programmeCode }
+  return { stats, id: providerCode }
 }
 
 module.exports = {
-  getProgrammeCreditStats,
-  computeProgrammeCreditStats,
+  getCreditsProduced,
+  computeCreditsProduced,
 }

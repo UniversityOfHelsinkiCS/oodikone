@@ -6,7 +6,7 @@ const {
 } = require('../../database/connection')
 const { formatCredit } = require('./studyprogrammeHelpers')
 
-const getCreditsForStudyProgramme = async (provider, codes, since) =>
+const getCreditsForProvider = async (provider, codes, since) =>
   (
     await sequelize.query(
       `
@@ -111,7 +111,7 @@ const getThesisCredits = async (provider, since, thesisType, studentnumbers) =>
   })
 
 module.exports = {
-  getCreditsForStudyProgramme,
+  getCreditsForProvider,
   getTransferredCredits,
   getThesisCredits,
 }

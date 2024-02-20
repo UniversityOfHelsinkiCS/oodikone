@@ -46,30 +46,6 @@ const allTransfers = async (studytrack, since) => {
   return [...transferredTo, ...transferredAway]
 }
 
-const getCourseCodesForStudyProgramme = async provider => {
-  const coursesByProvider = await Course.findAll({
-    attributes: ['id', 'code', 'substitutions'],
-    include: {
-      model: Organization,
-      required: true,
-      where: {
-        code: provider,
-      },
-      through: {
-        attributes: [],
-      },
-    },
-  })
-
-  const coursesWithOpenUniSubstitutions = coursesByProvider.map(({ code, substitutions }) => {
-    if (!substitutions || !substitutions.length) return [code]
-    const alternatives = [`AY-${code}`, `AY${code}`, `A-${code}`]
-    return [code].concat(substitutions.filter(sub => alternatives.includes(sub)))
-  })
-
-  return coursesWithOpenUniSubstitutions.flat()
-}
-
 const getAllProgrammeCourses = async providerCode => {
   const res = await Course.findAll({
     attributes: ['id', 'code', 'name', 'substitutions'],
@@ -227,7 +203,6 @@ module.exports = {
   allTransfers,
   getCurrentStudyYearStartDate,
   getAllProgrammeCourses,
-  getCourseCodesForStudyProgramme,
   getProgrammeName,
   getNotCompletedForProgrammeCourses,
   whereStudents,

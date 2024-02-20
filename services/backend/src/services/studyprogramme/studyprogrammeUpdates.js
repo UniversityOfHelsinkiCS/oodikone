@@ -3,7 +3,7 @@ const { getGraduationStatsForStudytrack } = require('./studyprogrammeGraduations
 const { getStudytrackStatsForStudyprogramme } = require('./studytrackStats')
 const { setBasicStats, setCreditStats, setGraduationStats, setStudytrackStats } = require('../analyticsService')
 const logger = require('../../util/logger')
-const { computeProgrammeCreditStats } = require('./studyprogrammeCredits')
+const { computeCreditsProduced } = require('../providerCredits')
 
 const updateBasicView = async (code, combinedProgramme) => {
   const specialCalendar = {
@@ -37,7 +37,7 @@ const updateBasicView = async (code, combinedProgramme) => {
       })
       await setBasicStats(basicStats, option.yearType, option.specialGroups)
 
-      const creditStats = await computeProgrammeCreditStats(
+      const creditStats = await computeCreditsProduced(
         code,
         option.yearType === 'ACADEMIC_YEAR',
         option.specialGroups === 'SPECIAL_INCLUDED'

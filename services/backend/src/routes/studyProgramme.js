@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const { getBasicStatsForStudytrack } = require('../services/studyprogramme/studyprogrammeBasics')
-const { getProgrammeCreditStats } = require('../services/studyprogramme/studyprogrammeCredits')
+const { getCreditsProduced } = require('../services/providerCredits')
 const { getGraduationStatsForStudytrack } = require('../services/studyprogramme/studyprogrammeGraduations')
 const {
   getStudyprogrammeCoursesForStudytrack,
@@ -59,7 +59,7 @@ router.get('/v2/studyprogrammes/creditstats', async (req, res) => {
   const codes = JSON.parse(codesListString)
   const stats = {}
   for (const code of codes) {
-    stats[code] = await getProgrammeCreditStats(code, isAcademicYear !== 'false', includeSpecials)
+    stats[code] = await getCreditsProduced(code, isAcademicYear !== 'false', includeSpecials)
   }
   return res.json({ stats })
 })
