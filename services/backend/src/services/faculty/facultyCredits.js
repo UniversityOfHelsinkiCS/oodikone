@@ -136,9 +136,8 @@ const getFacultyCreditStatsForStudytrack = async ({
   const years = getYearsArray(since.getFullYear(), isAcademicYear)
 
   const queryParameters = { studyprogramme, since, years, isAcademicYear, facultyProgrammes, facultyCode }
-  const { majors, facultyNonMajors, otherNonMajors, facultyOthers, nonDegree } = await getFacultyRegularCreditStats(
-    queryParameters
-  )
+  const { majors, facultyNonMajors, otherNonMajors, facultyOthers, nonDegree } =
+    await getFacultyRegularCreditStats(queryParameters)
 
   const reversedYears = getYearsArray(since.getFullYear(), isAcademicYear).reverse()
   const dataFound = [majors, facultyNonMajors, otherNonMajors].some(d => d.graphStats.length) // , transferred
