@@ -1,6 +1,7 @@
 import React from 'react'
 import { Radio, Segment, SegmentGroup } from 'semantic-ui-react'
-import { HelpButton } from './common/HelpButton'
+import { courseStatisticsToolTips } from 'common/InfoToolTips'
+import { InfoBox } from 'components/Info/InfoBox'
 import { Setting } from './common/Setting'
 
 export const ChartSettings = ({ isRelative, setIsRelative, tab, viewMode }) => {
@@ -13,7 +14,13 @@ export const ChartSettings = ({ isRelative, setIsRelative, tab, viewMode }) => {
           </Setting>
         </Segment>
       </SegmentGroup>
-      <HelpButton tab={tab} viewMode={viewMode} />
+      <div style={{ marginLeft: '20px' }}>
+        {tab === 'GradeDistribution' ? (
+          <InfoBox content={courseStatisticsToolTips.GradeDistribution} popup />
+        ) : (
+          <InfoBox content={courseStatisticsToolTips.PassRate[viewMode]} popup />
+        )}
+      </div>
     </div>
   )
 }

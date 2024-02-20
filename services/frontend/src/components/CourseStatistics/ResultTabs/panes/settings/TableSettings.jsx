@@ -56,7 +56,7 @@ export const TableSettings = ({ availableStats, datasets, onChange, onSeparateCh
         ))}
       </SegmentGroup>
       <div style={{ marginLeft: '20px' }}>
-        <InfoBox content={courseStatisticsToolTips.Tables.STUDENTS} popup />
+        <InfoBox content={courseStatisticsToolTips.Tables[viewMode]} popup />
       </div>
     </div>
   )

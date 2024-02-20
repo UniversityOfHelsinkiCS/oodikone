@@ -28,7 +28,7 @@ export const courseStatisticsToolTips = {
   },
   PassRate: {
     ATTEMPTS: `
-      **Pass rate chart - Attempts**
+      **Pass rate - Attempts**
 
       Graafi näyttää suorituskerrat lukuvuositasolla jaoteltuina hyväksyttyihin ja hylättyihin suorituksiin.
       Hyväksytyt suoritukset sisältävät arvosanat 1-5 sekä arvosanan Hyv.
@@ -36,7 +36,7 @@ export const courseStatisticsToolTips = {
       "Luop" (Luopunut suorituksesta) tai "Eisa" (Ei saapunut tenttiin).
     `,
     STUDENTS: `
-      **Pass rate chart - Students**
+      **Pass rate - Students**
 
       Graafi näyttää yksittäiset opiskelijat, jotka ovat kurssia suorittaneet.
       Jokainen opiskelija on jaoteltu luokkiin: "läpäissyt ensiyrittämällä", "läpäissyt lopulta" tai "ei koskaan läpäissyt kurssia".
