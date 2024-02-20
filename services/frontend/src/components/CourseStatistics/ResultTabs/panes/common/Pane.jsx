@@ -104,7 +104,7 @@ const GradeDistributionChartSection = ({
  * A generalized pane component that is used on the Students and the Attempts tabs.
  * Contains settings and table for the corresponding tab and the pass rate chart.
  *
- * @param tableComponent Should be either StudentsTable or AttemptsTable
+ * @param tableComponent - Should be either StudentsTable or AttemptsTable
  */
 export const Pane = ({
   availableStats,

@@ -1,7 +1,8 @@
 import React from 'react'
 import { Radio, Segment, SegmentGroup } from 'semantic-ui-react'
+import { courseStatisticsToolTips } from 'common/InfoToolTips'
+import { InfoBox } from 'components/Info/InfoBox'
 import { DirectionToggle } from './common/DirectionToggle'
-import { HelpButton } from './common/HelpButton'
 import { ProviderOrganization } from './common/ProviderOrganization'
 import { Setting } from './common/Setting'
 
@@ -50,11 +51,13 @@ export const TableSettings = ({ availableStats, datasets, onChange, onSeparateCh
   return (
     <div style={{ alignItems: 'center', display: 'flex' }}>
       <SegmentGroup horizontal>
-        {settings.map(element => (
-          <Segment key={element.key}>{element}</Segment>
+        {settings.map(setting => (
+          <Segment key={setting.key}>{setting}</Segment>
         ))}
       </SegmentGroup>
-      <HelpButton tab="Tables" viewMode="STUDENTS" />
+      <div style={{ marginLeft: '20px' }}>
+        <InfoBox content={courseStatisticsToolTips.Tables.STUDENTS} popup />
+      </div>
     </div>
   )
 }
