@@ -3,13 +3,12 @@ import ReactHighcharts from 'react-highcharts'
 import { Radio, Dropdown, Segment } from 'semantic-ui-react'
 import moment from 'moment'
 import _ from 'lodash'
-import chroma from 'chroma-js'
 import { useLocation } from 'react-router-dom'
 
 import { useGetSemestersQuery } from 'redux/semesters'
 import { useLanguage } from 'components/LanguagePicker/useLanguage'
 import { studentNumberFilter } from 'components/FilterView/filters'
-import { getTargetCreditsForProgramme, TimeDivision, getCreditCategories } from 'common'
+import { getTargetCreditsForProgramme, TimeDivision, getCreditCategories, generateGradientColors } from 'common'
 import { getMonths } from 'common/query'
 import { useFilters } from '../../FilterView/useFilters'
 
@@ -66,11 +65,10 @@ const getChartData = (students, timeSlots, order, programme, timeDivision, cumul
   const programmeCredits = getTargetCreditsForProgramme(programme) + (combinedProgramme ? 180 : 0)
 
   let limits = getCreditCategories(cumulative, timeDivision, programmeCredits, timeSlots, 6)
-
-  let colors = chroma.scale(['#f8696b', '#f5e984', '#63be7a']).colors(limits.length)
+  let colors = generateGradientColors(limits.length)
 
   limits.push(GRADUATED)
-  colors.push('#dedede')
+  colors.push('#dedede') // grey
 
   if (order === StackOrdering.ASCENDING) {
     limits = _.reverse(limits)

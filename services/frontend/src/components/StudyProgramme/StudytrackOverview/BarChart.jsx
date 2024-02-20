@@ -1,20 +1,14 @@
 import React from 'react'
 import ReactHighcharts from 'react-highcharts'
 
+import { generateGradientColors } from '@/common'
 import { NoDataMessage } from '../NoDataMessage'
-
-const getColors = track => {
-  if (!track) return ['#e66067', '#f57368', '#fb8c6e', '#fba678', '#dbda7d', '#9ec27c', '#60a866', '#008c59']
-  if (track.includes('KH') || track === 'MH90_001')
-    return ['#e66067', '#f57368', '#fb8c6e', '#fba678', '#dbda7d', '#9ec27c', '#60a866', '#008c59']
-  return ['#f57368', '#fb8c6e', '#fba678', '#dbda7d', '#9ec27c', '#60a866', '#008c59']
-}
 
 export const BarChart = ({ cypress, data, track }) => {
   if (!data || !data.creditGraphStats || !data.creditGraphStats[track])
     return <NoDataMessage message="No progress data for the studytrack found. Try with another studytrack" />
-  const correctData = data?.creditGraphStats[track]
-  const colors = getColors(track)
+  const correctData = data.creditGraphStats[track]
+  const colors = generateGradientColors(correctData.length)
   const dataWithColors = Object.values(correctData).map((series, index) => ({ ...series, color: colors[index] }))
 
   const getFileName = () => {

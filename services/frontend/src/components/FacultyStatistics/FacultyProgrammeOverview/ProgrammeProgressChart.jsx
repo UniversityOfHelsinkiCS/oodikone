@@ -4,12 +4,7 @@ import Highcharts from 'highcharts'
 import ReactHighcharts from 'react-highcharts'
 
 import { useLanguage } from 'components/LanguagePicker/useLanguage'
-
-const getColors = len => {
-  if (len < 6) return ['#fba678', '#dbda7d', '#9ec27c', '#60a866', '#008c59']
-  if (len < 8) return ['#f57368', '#fb8c6e', '#fba678', '#dbda7d', '#9ec27c', '#60a866', '#008c59']
-  return ['#e66067', '#f57368', '#fb8c6e', '#fba678', '#dbda7d', '#9ec27c', '#60a866', '#008c59']
-}
+import { generateGradientColors } from '@/common'
 
 // Point width is 24 px different multipliers adjusts the height.
 const getFlexHeight = len => {
@@ -26,7 +21,7 @@ export const ProgrammeProgressChart = ({ data, labels, longLabels, names }) => {
     return matrix.reduce((prev, next) => next.map((_item, i) => (prev[i] || []).concat(next[i])), [])
   }
 
-  const colors = getColors(data[0]?.length || 6)
+  const colors = generateGradientColors(data[0]?.length || 6)
   const dataTranspose = transpose(data)
     .map((obj, idx) => ({ name: names[idx], data: obj, color: colors[idx] }))
     .reverse()

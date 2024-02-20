@@ -1,15 +1,12 @@
 import React from 'react'
 import ReactHighcharts from 'react-highcharts'
 
-const getColors = len => {
-  if (len < 8) return ['#f57368', '#fb8c6e', '#fba678', '#dbda7d', '#9ec27c', '#60a866', '#008c59']
-  return ['#e66067', '#f57368', '#fb8c6e', '#fba678', '#dbda7d', '#9ec27c', '#60a866', '#008c59']
-}
+import { generateGradientColors } from '@/common'
 
 export const FacultyBarChart = ({ cypress, data }) => {
   if (!data.stats) return null
 
-  const colors = getColors(Object.keys(data.stats).length)
+  const colors = generateGradientColors(Object.keys(data.stats).length)
   const dataWithColors = Object.values(data.stats).map((series, index) => ({ ...series, color: colors[index] }))
   const getFileName = () => {
     return `oodikone_progress_of_students_in_${data?.id}_by_study_start_year`
