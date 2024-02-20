@@ -47,6 +47,12 @@
     "import/resolver": {
       "node": {
         "moduleDirectory": ["node_modules", "src/"]
+      },
+      "eslint-import-resolver-custom-alias": {
+        "alias": {
+          "@": "./services/frontend/src"
+        },
+        "extensions": [".js", ".jsx"]
       }
     },
     "react": {
