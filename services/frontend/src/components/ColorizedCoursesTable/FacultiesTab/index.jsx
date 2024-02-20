@@ -3,16 +3,27 @@ import _ from 'lodash'
 
 import { useLanguage } from 'components/LanguagePicker/useLanguage'
 import { SortableTable, row } from 'components/SortableTable'
+import { useGetFacultiesQuery } from 'redux/facultyStats'
 import { getColumns } from './logic'
 import { calculateTotals, useColorizedCoursesTableContext, emptyFields } from '../common'
 import { ColorModeSelector, NumberModeSelector, SemesterRangeSelector } from '../selectorComponents'
 import '../index.css'
 
 export const FacultiesTab = () => {
-  const { numberMode, colorMode, semesterFilter, setSemesterFilter, selectedSemesters, data, facultyMap } =
+  const { numberMode, colorMode, semesterFilter, setSemesterFilter, selectedSemesters, data } =
     useColorizedCoursesTableContext()
 
   const { getTextIn } = useLanguage()
+  const facultyQuery = useGetFacultiesQuery()
+
+  const facultyMap = useMemo(
+    () =>
+      facultyQuery.data?.reduce((obj, cur) => {
+        obj[cur.code] = cur.name
+        return obj
+      }, {}),
+    [facultyQuery?.data]
+  )
 
   const totalRow = useMemo(() => {
     const totals = calculateTotals(data.tableData, selectedSemesters, data.faculties)
@@ -44,6 +55,8 @@ export const FacultiesTab = () => {
     })
     return tableData
   }, [selectedSemesters, data])
+
+  if (!facultyMap) return null
 
   return (
     <div>

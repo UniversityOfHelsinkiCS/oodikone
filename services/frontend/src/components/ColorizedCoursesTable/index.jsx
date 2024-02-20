@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { Divider, Loader, Tab } from 'semantic-ui-react'
 
 import { useTitle } from 'common/hooks'
-import { useGetFacultiesQuery } from 'redux/facultyStats'
 import { useGetSemestersQuery } from 'redux/semesters'
 import { getCurrentSemester } from 'common'
 import { ColorizedCoursesTableContext } from './common'
@@ -20,16 +19,6 @@ export const ColorizedCoursesTable = ({ fetchDataHook, studyProgramme, title, pa
       // 135 = Fall 2017
       sem => sem.semestercode >= 135 && sem.semestercode <= currentSemester.semestercode
     )
-  const facultyQuery = useGetFacultiesQuery()
-
-  const facultyMap = useMemo(
-    () =>
-      facultyQuery.data?.reduce((obj, cur) => {
-        obj[cur.code] = cur.name
-        return obj
-      }, {}),
-    [facultyQuery?.data]
-  )
 
   const { data, isFetching, isLoading, isError } = fetchDataHook({ id: studyProgramme })
 
@@ -75,7 +64,7 @@ export const ColorizedCoursesTable = ({ fetchDataHook, studyProgramme, title, pa
 
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
 
-  if (!data || isFetching || isLoading || !semesterFilter || !semesters?.length || !facultyMap) {
+  if (!data || isFetching || isLoading || !semesterFilter || !semesters?.length) {
     return <Loader active style={{ marginTop: '15em' }} />
   }
 
@@ -89,7 +78,6 @@ export const ColorizedCoursesTable = ({ fetchDataHook, studyProgramme, title, pa
     setColorMode,
     selectedSemesters,
     data,
-    facultyMap,
     filterEmptyCourses,
     setFilterEmptyCourses,
   }
