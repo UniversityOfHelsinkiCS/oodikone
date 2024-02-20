@@ -1,19 +1,18 @@
 import React, { useState } from 'react'
 import { Divider, Loader, Message } from 'semantic-ui-react'
-
-import { useGetBasicStatsQuery, useGetCreditStatsQuery, useGetGraduationStatsQuery } from 'redux/studyProgramme'
-import { studyProgrammeToolTips } from 'common/InfoToolTips'
-import { getGraduationGraphTitle } from 'common'
-import { CreditsProduced } from 'components/common/CreditsProduced'
+import { getGraduationGraphTitle } from '@/common'
+import { studyProgrammeToolTips } from '@/common/InfoToolTips'
+import { CreditsProduced } from '@/components/common/CreditsProduced'
+import { InfoBox } from '@/components/Info/InfoBox'
+import { useGetBasicStatsQuery, useGetCreditStatsQuery, useGetGraduationStatsQuery } from '@/redux/studyProgramme'
+import { BreakdownBarChart } from '../BreakdownBarChart'
+import { MedianTimeBarChart } from '../MedianTimeBarChart'
+import { Toggle } from '../Toggle'
+import '../studyprogramme.css'
+import { BarChart } from './BarChart'
+import { DataTable } from './DataTable'
 import { LineGraph } from './LineGraph'
 import { StackedBarChart } from './StackedBarChart'
-import { BarChart } from './BarChart'
-import { MedianTimeBarChart } from '../MedianTimeBarChart'
-import { BreakdownBarChart } from '../BreakdownBarChart'
-import { DataTable } from './DataTable'
-import { Toggle } from '../Toggle'
-import { InfoBox } from '../../Info/InfoBox'
-import '../studyprogramme.css'
 
 const getDivider = (title, toolTipText) => (
   <>
@@ -22,7 +21,9 @@ const getDivider = (title, toolTipText) => (
         {title}
       </Divider>
     </div>
-    <InfoBox content={studyProgrammeToolTips[toolTipText]} />
+    <div style={{ marginBottom: '1em' }}>
+      <InfoBox content={studyProgrammeToolTips[toolTipText]} />
+    </div>
   </>
 )
 

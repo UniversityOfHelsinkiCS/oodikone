@@ -1,19 +1,19 @@
 import React from 'react'
-import {
-  useGetFacultyCreditStatsQuery,
-  useGetFacultyBasicStatsQuery,
-  useGetFacultyThesisStatsQuery,
-} from 'redux/facultyStats'
-import { Divider, Loader, Popup, Button, Message } from 'semantic-ui-react'
+import { Button, Divider, Loader, Message, Popup } from 'semantic-ui-react'
 import { utils, writeFile } from 'xlsx'
-import { getTimestamp } from 'common'
-import { LineGraph } from 'components/StudyProgramme/BasicOverview/LineGraph'
-import { StackedBarChart } from 'components/StudyProgramme/BasicOverview/StackedBarChart'
-import { useLanguage } from 'components/LanguagePicker/useLanguage'
-import { facultyToolTips } from 'common/InfoToolTips'
+import {
+  useGetFacultyBasicStatsQuery,
+  useGetFacultyCreditStatsQuery,
+  useGetFacultyThesisStatsQuery,
+} from '@/redux/facultyStats'
+import { getTimestamp } from '@/common'
+import { InfoBox } from '@/components/Info/InfoBox'
+import { facultyToolTips } from '@/common/InfoToolTips'
+import { LineGraph } from '@/components/StudyProgramme/BasicOverview/LineGraph'
+import { StackedBarChart } from '@/components/StudyProgramme/BasicOverview/StackedBarChart'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { Toggle } from '@/components/StudyProgramme/Toggle'
 import { InteractiveDataTable } from '../InteractiveDataView'
-import { Toggle } from '../../StudyProgramme/Toggle'
-import { InfoBox } from '../../Info/InfoBox'
 import { sortProgrammeKeys } from '../facultyHelpers'
 import '../faculty.css'
 
@@ -84,7 +84,9 @@ export const BasicOverview = ({
           {title}
         </Divider>
       </div>
-      <InfoBox content={facultyToolTips[toolTipText]} cypress={toolTipText} />
+      <div style={{ marginBottom: '1em' }}>
+        <InfoBox content={facultyToolTips[toolTipText]} cypress={toolTipText} />
+      </div>
       <Popup
         content="Download statistics as xlsx file"
         trigger={

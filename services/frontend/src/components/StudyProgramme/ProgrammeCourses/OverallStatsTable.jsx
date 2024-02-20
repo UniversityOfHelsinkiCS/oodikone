@@ -353,14 +353,16 @@ export const OverallStatsTable = ({ studyProgramme, combinedProgramme, academicY
         value={showStudents}
         setValue={setShowStudents}
       />
-      <InfoBox
-        content={
-          showStudents
-            ? studyProgrammeToolTips.StudentsOfProgrammeCourses
-            : studyProgrammeToolTips.CreditsProducedByTheStudyprogramme
-        }
-        cypress="programme-courses"
-      />
+      <div style={{ marginBottom: '1em' }}>
+        <InfoBox
+          content={
+            showStudents
+              ? studyProgrammeToolTips.StudentsOfProgrammeCourses
+              : studyProgrammeToolTips.CreditsProducedByTheStudyprogramme
+          }
+          cypress="programme-courses"
+        />
+      </div>
       <div data-cy="CoursesSortableTable">
         <SortableTable
           title="Student statistics for study programme courses"
