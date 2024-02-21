@@ -1,7 +1,6 @@
 const logger = require('../../util/logger')
 const { findFacultyProgrammeCodes } = require('./faculty')
 const { combineFacultyBasics } = require('./facultyBasics')
-const { combineFacultyCredits } = require('./facultyCredits')
 const { combineFacultyThesisWriters } = require('./facultyThesisWriters')
 const { countGraduationTimes } = require('./facultyGraduationTimes')
 const {
@@ -15,6 +14,7 @@ const {
 } = require('./facultyService')
 const { combineFacultyStudentProgress } = require('./facultyStudentProgress')
 const { combineFacultyStudents } = require('./facultyStudents')
+const { getCreditsProduced } = require('../providerCredits')
 
 const updateFacultyOverview = async (faculty, statsType) => {
   const calendarNewSpecial = {
@@ -102,13 +102,12 @@ const updateFacultyOverview = async (faculty, statsType) => {
         await setBasicStats(updatedStudentInfo, option.yearType, option.programmeFilter, option.specialGroups)
       }
       if ((statsType === 'ALL' || statsType === 'CREDITS') && specialGroups !== 'SPECIAL_EXCLUDED') {
-        const updatedCredits = await combineFacultyCredits(
+        const updatedCredits = await getCreditsProduced(
           faculty,
-          programmeFilter === 'ALL_PROGRAMMES' ? allProgrammes.data : newProgrammes.data,
-          allProgrammes.data,
-          yearType
+          yearType === 'ACADEMIC_YEAR',
+          specialGroups === 'SPECIAL_INCLUDED'
         )
-        await setCreditStats(updatedCredits, yearType, programmeFilter, specialGroups)
+        await setCreditStats(updatedCredits, yearType, specialGroups)
       }
       if (statsType === 'ALL' || statsType === 'THESIS') {
         const updateThesisWriters = await combineFacultyThesisWriters(
