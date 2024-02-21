@@ -19,27 +19,32 @@ export const facultyToolTips = {
 
   HUOM! Siirtyneiden määrä on erityisen suuri vuonna 2020, jolloin vanhoista koulutusohjelmista luovuttiin ja opiskelijat siirtyivät uusiin ohjelmiin.
   `,
-  CreditsProducedByTheFaculty: `
-  Sisältää opintopisteet suoritusvuosittain. Suoritukset on jaoteltu Sisussa näkyvän kurssin suorituspäivän mukaan.
+  CreditsProducedByTheFaculty: `Sisältää opintopisteet suoritusvuosittain. Suoritukset on jaoteltu Sisussa näkyvän kurssin suorituspäivän mukaan. Kategoriat vastaavat Rapon kategorioita. Pistemäärät ovat osin epätarkkoja ennen vuotta 2022 sisu-oodi-erojen vuoksi.
 
-  **Major students credits**: Sisältää ne opintopisteet, joiden suorittajalla on suoritushetkellä ollut ensisijainen opinto-oikeus johonkin tiedekunnan koulutusohjelmaan. Sisältää myös tiedekunnan ohjelmaan siirtyneet ensisijaiset opiskelijat.
+  Kurssin järjestäjä voi olla joko tiedekunnan koulutusohjelma tai tiedekunta itse. Tiedekunnan pisteet on laskettu yhteen lukemiin, ja näkyy erillisenä koulutusohjelmien kanssa tarkasteltaessa taulukosta aukeavia vuosia.
 
-  **Non-major faculty students credits**: Sisältää tiedekunnan koulutusohjelmien tuottamat opintopisteet, joiden suorittajalla EI ole ollut suoritushetkellä ensisijaista opinto-oikeutta kyseiseen koulutusohjelmaan,
-  MUTTA hänellä on sellainen johonkin toiseen tiedekunnan ohjelmaan.
+  Total-kategoriaan ei lasketa mukaan hyväksiluettuja opintopisteitä.
+
+  **Degree students**: Niiden opiskelijoiden opintopisteet, joilla on oikeus suorittaa alempi tai ylempi korkeakoulututkinto.
+
+  **Open university**: Avoimen opiskeluoikeus, ei tutkinto-opiskelija: opintosuoritukset, joiden suorituksen luokittelu on "avoimena yliopisto-opintona suoritettu" ja opiskelija ei ole tutkinto-opiskelija tai kansainvälinen vaihto-opiskelija.
+
+  **Exchange students**: Saapuvat vaihto-opiskelijat: opintosuoritukset, jotka ovat saapuvan kansainvälisen opiskelijan suorittamia. 
+  Sisältää kaikki vaihto-opiskelijan opiskeluoikeuden aikana syntyneet opintopisteet.
   
-  **Non-major other faculty students credits**: Sisältää tiedekunnan koulutusohjelmien tuottamat opintopisteet, joiden suorittajalla EI ole ollut suoritushetkellä ensisijaista opinto-oikeutta kyseiseen koulutusohjelmaan tai mihinkään muuhun kyseisen tiedekunnan koulutusohjelmaan.
+  **Transferred**: Hyväksiluetut opintopisteet
 
-  **Non-degree student credits**: Sisältää tiedekuntaan suoritetut opintopisteet, joiden suorittajilla ei ole tutkinto-oikeutta Helsingin yliopistossa **ja jotka on suoritettu** 
-  - Avoimessa yliopistossa
-  - erikoistumiskoulutuksessa
-  - erillisoikeudella
-  - korkeakoulujen välisessä yhteistyöopinnoissa
+  Lisäksi painamalla "Show special categories" -valintaa, saat näkyviin myös harvinaisemmat kategoriat:
   
-  **Other non-degree credits**: Sisältää tiedekuntaan suoritetut opintopisteet, joiden suorittajilla ei ole tutkinto-oikeutta Helsingin yliopistossa **ja jotka on suoritettu**
-  - täydennyskoulutuksessa
-  - erikoislääkärikoulutuksessa
-  - vaihto-opiskelijat
+  **Special**: 
+  Opintosuoritukset, joiden suorituksen luokittelu on "erillisellä opiskeluoikeudella" tai "opettajankoulutuksen erillisellä opiskeluikeudella" suoritettu. Ei sisällä kansainvälisten vaihto-opiskelijoiden suorituksia.
+  Ulkomailta hyväksiluetut opintopisteet: ulkomailta hyväksilutetut opintopisteet.
+
+  **Other university**:
+  Korkeakoulujen väliset yhteistyöopinnot: opintosuoritukset, jotka on tehty korkeakoulujen väliseen yhteistyösopimukseen perustuvalla opiskeluoikeudella.
+
   `,
+
   GraduatedOfTheFaculty:
     'Sisältää kyseisenä vuonna tiedekunnasta valmistuneet opiskelijat riippumatta siitä, minä vuonna opiskeluoikeus ohjelmaan on myönnetty. Jaottelu on tehty opinto-oikeuden päättymispäivän (=valmistumispäivän) perusteella.',
   ThesisWritersOfTheFaculty:

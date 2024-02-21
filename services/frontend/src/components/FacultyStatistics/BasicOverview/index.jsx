@@ -1,21 +1,41 @@
-import React from 'react'
-import { Button, Divider, Loader, Message, Popup } from 'semantic-ui-react'
-import { utils, writeFile } from 'xlsx'
+/* eslint-disable no-restricted-syntax */
+import React, { useState } from 'react'
 import {
-  useGetFacultyBasicStatsQuery,
   useGetFacultyCreditStatsQuery,
+  useGetFacultyBasicStatsQuery,
   useGetFacultyThesisStatsQuery,
 } from '@/redux/facultyStats'
+import { Divider, Loader, Popup, Button, Message } from 'semantic-ui-react'
+import { utils, writeFile } from 'xlsx'
 import { getTimestamp } from '@/common'
-import { InfoBox } from '@/components/Info/InfoBox'
-import { facultyToolTips } from '@/common/InfoToolTips'
 import { LineGraph } from '@/components/StudyProgramme/BasicOverview/LineGraph'
 import { StackedBarChart } from '@/components/StudyProgramme/BasicOverview/StackedBarChart'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { Toggle } from '@/components/StudyProgramme/Toggle'
+import { facultyToolTips } from '@/common/InfoToolTips'
+import { makeTableStats, makeGraphData } from '@/components/common/CreditsProduced'
 import { InteractiveDataTable } from '../InteractiveDataView'
 import { sortProgrammeKeys } from '../facultyHelpers'
 import '../faculty.css'
+
+const calculateTotals = stats => {
+  const totals = {}
+  for (const id of stats.ids) {
+    const providerStats = stats[id].stats
+    for (const year of Object.keys(providerStats)) {
+      const yearStats = providerStats[year]
+      if (!totals[year]) totals[year] = {}
+      for (const field of Object.keys(yearStats)) {
+        if (field === 'total') continue
+        if (!totals[year][field]) totals[year][field] = 0
+        if (!totals[year].total) totals[year].total = 0
+        totals[year][field] += Math.round(yearStats[field])
+        totals[year].total += Math.round(yearStats[field])
+      }
+    }
+  }
+
+  return totals
+}
 
 export const BasicOverview = ({
   faculty,
@@ -29,6 +49,7 @@ export const BasicOverview = ({
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
   const studyProgrammeFilter = studyProgrammes ? 'ALL_PROGRAMMES' : 'NEW_STUDY_PROGRAMMES'
   const special = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
+  const [showAll, setShowAll] = useState(false)
   const credits = useGetFacultyCreditStatsQuery({
     id: faculty?.code,
     yearType,
@@ -48,6 +69,15 @@ export const BasicOverview = ({
     specialGroups: special,
   })
   const { getTextIn } = useLanguage()
+  const tableStats = credits.data ? makeTableStats(calculateTotals(credits.data), showAll, academicYear) : {}
+  const graphStats = credits.data ? makeGraphData(calculateTotals(credits.data), showAll, academicYear) : null
+
+  const programmeStats = credits.data?.ids.reduce((obj, id) => {
+    return {
+      ...obj,
+      [id]: makeTableStats(credits.data[id].stats, showAll, academicYear).data,
+    }
+  }, {})
 
   const downloadCsv = (titles, tableStats, programmeStats, programmeNames, toolTipText) => {
     const headers = titles.map(title => ({ label: title === '' ? 'Year' : title, key: title === '' ? 'Year' : title }))
@@ -119,7 +149,8 @@ export const BasicOverview = ({
 
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
 
-  const creditShortTitles = ['Code', 'Total', 'Major', 'Non-major', 'Non-major other', 'Non-degree', 'Other Non-degree']
+  const creditSortingTitles = ['Code', 'Total', 'Degree', 'Open uni', 'Exchange', 'Transferred']
+  if (showAll) creditSortingTitles.push('Special', 'Other university')
   let transferShortTitles = []
   if (special === 'SPECIAL_INCLUDED') {
     transferShortTitles = ['Code', 'Started', 'Graduated', 'Transferred in', 'Transferred away', 'Transferred to']
@@ -133,6 +164,7 @@ export const BasicOverview = ({
     T: 'Doctors and Licentiates',
     LIS: 'Doctors and Licentiates',
     OTHER: 'Other',
+    H: 'Provided by faculty',
   }
 
   const getChartPlotLinePlaces = programmeKeys => {
@@ -175,7 +207,7 @@ export const BasicOverview = ({
         } else {
           plotLinePlaces.push([i + 1, options[key]])
         }
-      }
+      } else if (programmeKeys[i + 1][1].startsWith('H')) plotLinePlaces.push([i + 1, 'Produced by faculty'])
     }
     return plotLinePlaces
   }
@@ -377,41 +409,54 @@ export const BasicOverview = ({
                 credits?.data?.programmeTableStats,
                 credits?.data?.programmeNames
               )}
+              <div>
+                <Toggle
+                  cypress="showAllCreditsToggle"
+                  firstLabel="Show special categories"
+                  value={showAll}
+                  setValue={setShowAll}
+                />
+              </div>
               <div className="section-container">
                 <div className="graph-container-narrow">
                   <StackedBarChart
                     cypress="CreditsProducedByTheFaculty"
-                    data={credits?.data?.graphStats}
-                    labels={credits?.data?.years}
+                    data={graphStats.data}
+                    labels={graphStats.years}
                     wideTable="narrow"
                   />
                 </div>
                 <div className="table-container-wide">
                   <InteractiveDataTable
                     cypress="CreditsProducedByTheFaculty"
-                    dataStats={credits?.data?.tableStats}
-                    dataProgrammeStats={credits?.data?.programmeTableStats}
-                    programmeNames={credits?.data?.programmeNames}
-                    sortedKeys={sortProgrammeKeys(
-                      Object.keys(credits?.data.programmeTableStats).map(obj => [
-                        obj,
-                        credits?.data?.programmeNames[obj].code,
-                      ]),
-                      faculty.code
-                    ).map(listObj => listObj[0])}
-                    plotLinePlaces={getChartPlotLinePlaces(
-                      sortProgrammeKeys(
-                        Object.keys(credits?.data?.programmeTableStats).map(obj => [
-                          obj,
-                          credits?.data?.programmeNames[obj].code,
-                        ]),
+                    dataStats={tableStats.data}
+                    dataProgrammeStats={programmeStats}
+                    programmeNames={{
+                      ...credits.data.programmeNames,
+                      [faculty.code]: { ...faculty.name, code: faculty.code },
+                    }}
+                    sortedKeys={[
+                      ...sortProgrammeKeys(
+                        Object.keys(programmeStats)
+                          .filter(code => code !== faculty.code)
+                          .map(obj => [obj, credits.data.programmeNames[obj]?.code]),
                         faculty.code
-                      )
-                    )}
-                    titles={credits?.data?.titles}
+                      ),
+                      [faculty.code, faculty.code],
+                    ].map(listObj => listObj[0])}
+                    plotLinePlaces={getChartPlotLinePlaces([
+                      ...sortProgrammeKeys(
+                        Object.keys(programmeStats)
+                          .filter(code => code !== faculty.code)
+                          .map(obj => [obj, credits.data.programmeNames[obj]?.code]),
+                        faculty.code
+                      ),
+                      [faculty.code, faculty.code],
+                    ])}
+                    titles={tableStats.titles}
                     sliceStart={2}
-                    yearsVisible={Array(credits?.data?.tableStats.length).fill(false)}
-                    shortNames={creditShortTitles}
+                    yearsVisible={Array(tableStats.data.length).fill(false)}
+                    shortNames={creditSortingTitles}
                   />
                 </div>
               </div>

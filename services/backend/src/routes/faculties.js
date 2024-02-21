@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const { combineFacultyBasics } = require('../services/faculty/facultyBasics')
-const { combineFacultyCredits } = require('../services/faculty/facultyCredits')
+const { getFacultyCredits } = require('../services/faculty/facultyCredits')
 const { combineFacultyThesisWriters } = require('../services/faculty/facultyThesisWriters')
 const { countGraduationTimes } = require('../services/faculty/facultyGraduationTimes')
 const { updateFacultyOverview, updateFacultyProgressOverview } = require('../services/faculty/facultyUpdates')
@@ -10,8 +10,6 @@ const {
   getProgrammes,
   getBasicStats,
   setBasicStats,
-  getCreditStats,
-  setCreditStats,
   getThesisWritersStats,
   setThesisWritersStats,
   getGraduationStats,
@@ -69,25 +67,9 @@ router.get('/:id/basicstats', async (req, res) => {
 
 router.get('/:id/creditstats', async (req, res) => {
   const code = req.params.id
-  const yearType = req.query?.year_type
-  const programmeFilter = req.query?.programme_filter
-
-  if (!code) return res.status(422).end()
-  const data = await getCreditStats(code, yearType, programmeFilter)
-  if (data) return res.json(data)
-
-  const programmes = await getProgrammes(code, programmeFilter)
-  if (!programmes) return res.status(422).end()
-
-  // list of all programmes is also needed in classification of credits
-  const allProgrammes = programmeFilter === 'ALL_PROGRAMMES' ? programmes : await getProgrammes(code, 'ALL_PROGRAMMES')
-
-  let updatedStats = await combineFacultyCredits(code, programmes.data, allProgrammes.data, yearType)
-  if (updatedStats) {
-    updatedStats = await setCreditStats(updatedStats, yearType, programmeFilter)
-  }
-
-  return res.json(updatedStats)
+  const { year_type: yearType, specialGroups } = req.query
+  const stats = await getFacultyCredits(code, yearType === 'ACADEMIC_YEAR', specialGroups === 'SPECIAL_INCLUDED')
+  return res.json(stats)
 })
 
 router.get('/:id/thesisstats', async (req, res) => {

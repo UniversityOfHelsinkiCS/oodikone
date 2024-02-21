@@ -5,7 +5,7 @@ import React, { useState } from 'react'
 
 const getFormattedYear = (year, academicYear) => (academicYear ? `${year} - ${year + 1}` : `${year}`)
 
-const makeGraphData = (data, showAll, isAcademicYear) => {
+export const makeGraphData = (data, showAll, isAcademicYear) => {
   if (!data) return null
   const allKeys = [
     ...new Set(
@@ -39,19 +39,18 @@ const makeGraphData = (data, showAll, isAcademicYear) => {
   return { data: graphStats, years }
 }
 
-const makeTableStats = (data, showAll, isAcademicYear) => {
+export const makeTableStats = (data, showAll, isAcademicYear) => {
   if (!data) return null
   const currentYear = new Date().getFullYear()
   const tableStats = []
   for (let year = currentYear; year >= 2017; year--) {
     const yearData = data[getFormattedYear(year, isAcademicYear)]
-    if (!yearData) continue
-    const basic = yearData.basic || 0
-    const openUni = yearData['open-uni'] || 0
-    const exchange = yearData['incoming-exchange'] || 0
-    const special = yearData.special || 0
-    const agreement = yearData.agreement || 0
-    const transferred = yearData.transferred || 0
+    const basic = yearData?.basic || 0
+    const openUni = yearData?.['open-uni'] || 0
+    const exchange = yearData?.['incoming-exchange'] || 0
+    const special = yearData?.special || 0
+    const agreement = yearData?.agreement || 0
+    const transferred = yearData?.transferred || 0
     const total = basic + openUni + special + agreement
 
     /* TODO: Other-category missing for now, clarify what go in that, and fix those */

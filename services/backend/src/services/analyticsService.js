@@ -3,6 +3,8 @@ const moment = require('moment')
 
 // Only new bachelor, masters and doctoral programmes get their data updated in redis every night, use redis for them
 const isUpdatedNewProgramme = code => code.includes('KH') || code.includes('MH') || /^(T)[0-9]{6}$/.test(code)
+const isFaculty = code =>
+  ['H10', 'H20', 'H30', 'H40', 'H50', 'H55', 'H57', 'H60', 'H70', 'H74', 'H80', 'H90'].includes(code)
 const createRedisKeyForBasicStats = (id, yearType, specialGroups) => `BASIC_STATS_${id}_${yearType}_${specialGroups}`
 const createRedisKeyForCreditStats = (id, yearType, specialGroups) => `CREDIT_STATS_${id}_${yearType}_${specialGroups}`
 const createRedisKeyForGraduationStats = (id, yearType, specialGroups) =>
@@ -34,7 +36,6 @@ const setBasicStats = async (data, yearType, specialGroups) => {
 }
 
 const getCreditStats = async (id, isAcademicYear, specialGroups) => {
-  if (!isUpdatedNewProgramme(id)) return null
   const redisKey = createRedisKeyForCreditStats(
     id,
     isAcademicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR',
@@ -57,7 +58,7 @@ const setCreditStats = async (data, isAcademicYear, specialGroups) => {
     status: 'DONE',
     lastUpdated: moment().format(),
   }
-  if (!isUpdatedNewProgramme(id)) return dataToRedis
+  if (!isUpdatedNewProgramme(data.id) && !isFaculty(data.id)) return dataToRedis
   const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(dataToRedis))
   if (setOperationStatus !== 'OK') return null
   return dataToRedis
