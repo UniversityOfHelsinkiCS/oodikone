@@ -55,7 +55,10 @@ describe('Studyprogramme overview', () => {
     })
 
     it('Basic information contains correct credits', () => {
+      const years = getEmptyYears()
       const tableContents = [
+        ...years.map(year => [year, 0, 0]),
+        [2021, 0, 0, 0, 0, 0],
         [2020, 4511, 4511, 0, 0, 167],
         [2019, 7097, 7097, 0, 0, 349],
         [2018, 5742, 5742, 0, 0, 272],
@@ -96,6 +99,8 @@ describe('Studyprogramme overview', () => {
       cy.checkTableStats(studentTableContents, 'StudentsOfTheStudyprogramme')
 
       const creditTableContents = [
+        ...years.map(year => [year, 0, 0]),
+        [2021, 0, 0, 0, 0, 0],
         [2020, 4511, 4511, 0, 0, 167],
         [2019, 7097, 7097, 0, 0, 349],
         [2018, 5742, 5742, 0, 0, 272],
@@ -134,7 +139,8 @@ describe('Studyprogramme overview', () => {
       cy.checkTableStats(studentTableContents, 'StudentsOfTheStudyprogramme')
 
       const creditTableContents = [
-        // Credit table doesnt show (later) years without data
+        ...years.map(year => [year, 0, 0]),
+        ['2021 - 2022', 0, 0, 0, 0, 0],
         ['2020 - 2021', 352, 352, 0, 0, 60],
         ['2019 - 2020', 6966, 6966, 0, 0, 193],
         ['2018 - 2019', 7777, 7777, 0, 0, 328],
