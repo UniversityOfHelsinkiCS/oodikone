@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-const { getCreditStatsForRapodiff } = require('../services/providerCredits')
+const { getCreditsProduced } = require('../services/providerCredits')
 const { parseCsv } = require('./helpers')
 const _ = require('lodash')
 
@@ -19,11 +19,13 @@ const diff = (rapoData, okData, code) => {
       const okValue = Math.round(ok[field] || 0)
       const rapoValue = Math.round(rapo[field] || 0)
       const diff = Math.abs(okValue - rapoValue)
+      const percentage =
+        rapoValue !== 0 || okValue !== 0 ? Number(((diff / Math.max(okValue, rapoValue)) * 100).toFixed(2)) : 0
       const diffStr = `${field.padEnd(10, ' ')} ${year} ${code.padEnd(
         10,
         ' '
-      )} Difference: ${diff} Rapo: ${rapoValue} Oodikone: ${okValue}`
-      diffs.push({ field, diff, okValue, rapoValue, code, year, diffStr })
+      )} Difference: ${diff} Rapo: ${rapoValue} Oodikone: ${okValue} Percentage: ${percentage} %`
+      diffs.push({ field, diff, okValue, rapoValue, code, year, diffStr, percentage })
     }
   }
 }
@@ -34,14 +36,15 @@ const process = async data => {
   const rapoProgrammeData = formatData(data.slice(1))
   const allProgrammeCodes = [...new Set(Object.keys(rapoProgrammeData))]
   for (const programmeCode of allProgrammeCodes) {
-    const okProgrammeData = await getCreditStatsForRapodiff(programmeCode, '', 'CALENDAR_YEAR', 'SPECIAL_INCLUDED')
+    const okProgrammeData = await getCreditsProduced(programmeCode, false, true)
     counter++
     if (counter % 5 === 0) {
       console.log(`Done ${Math.round((counter / allProgrammeCodes.length) * 100)} %`)
     }
-    diff(rapoProgrammeData[programmeCode], okProgrammeData, programmeCode)
+    diff(rapoProgrammeData[programmeCode], okProgrammeData.stats, programmeCode)
   }
-  const orderedDiffs = _.orderBy(diffs, 'diff', 'asc')
+  const fieldToSortBy = 'percentage'
+  const orderedDiffs = _.orderBy(diffs, fieldToSortBy, 'asc')
   orderedDiffs.forEach(d => console.log(d.diffStr))
   console.log(`${diffs.length} diffs found with current settings. Numbers with no diff: ${noDiffCounter}`)
   const totalDiff = orderedDiffs.reduce((sum, cur) => cur.diff + sum, 0)
@@ -66,7 +69,7 @@ const processIds = async (rawData, code) => {
     }))
     .filter(row => row.type === '2' && row.incl === '0')
   const rapoIds = rapoData.map(row => row.id)
-  const stats = await getCreditStatsForRapodiff(code)
+  const stats = await getCreditsProduced(code)
   if (!stats.ids) {
     console.log(stats)
     console.log('Edit getCreditStats code so that it saves a list of the relevant ids you want to compare.')
