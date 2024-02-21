@@ -14,7 +14,7 @@ const {
 } = require('./facultyService')
 const { combineFacultyStudentProgress } = require('./facultyStudentProgress')
 const { combineFacultyStudents } = require('./facultyStudents')
-const { getCreditsProduced } = require('../providerCredits')
+const { computeCreditsProduced } = require('../providerCredits')
 
 const updateFacultyOverview = async (faculty, statsType) => {
   const calendarNewSpecial = {
@@ -102,7 +102,7 @@ const updateFacultyOverview = async (faculty, statsType) => {
         await setBasicStats(updatedStudentInfo, option.yearType, option.programmeFilter, option.specialGroups)
       }
       if ((statsType === 'ALL' || statsType === 'CREDITS') && specialGroups !== 'SPECIAL_EXCLUDED') {
-        const updatedCredits = await getCreditsProduced(
+        const updatedCredits = await computeCreditsProduced(
           faculty,
           yearType === 'ACADEMIC_YEAR',
           specialGroups === 'SPECIAL_INCLUDED'
