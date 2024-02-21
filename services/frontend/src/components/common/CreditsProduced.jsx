@@ -24,10 +24,11 @@ export const makeGraphData = (data, showAll, isAcademicYear) => {
     transferred: 'Transferred',
     'incoming-exchange': 'Exchange students',
   }
-  const currentYear = new Date().getFullYear()
   const years = []
   const graphStats = []
-  for (let year = 2017; year <= currentYear; year++) {
+  const today = new Date()
+  const latestYear = isAcademicYear && today.getMonth() < 7 ? today.getFullYear() - 1 : today.getFullYear()
+  for (let year = 2017; year <= latestYear; year++) {
     allKeys.forEach(key => {
       if (!graphStats.find(k => k.name === names[key])) {
         graphStats.push({ name: names[key], data: [] })
@@ -43,7 +44,7 @@ export const makeTableStats = (data, showAll, isAcademicYear) => {
   if (!data) return null
   const currentYear = new Date().getFullYear()
   const tableStats = []
-  for (let year = currentYear; year >= 2017; year--) {
+  for (let year = currentYear - (isAcademicYear ? 1 : 0); year >= 2017; year--) {
     const yearData = data[getFormattedYear(year, isAcademicYear)]
     const basic = yearData?.basic || 0
     const openUni = yearData?.['open-uni'] || 0
