@@ -4,73 +4,24 @@ import { Route, Switch, Redirect } from 'react-router-dom'
 import { SegmentDimmer } from 'components/SegmentDimmer'
 import { ProtectedRoute } from './ProtectedRoute'
 
-// From https://dev.to/goenning/how-to-retry-when-react-lazy-fails-mb5
-const retry = async (fn, retriesLeft = 3, interval = 500) =>
-  new Promise((resolve, reject) => {
-    fn()
-      .then(resolve)
-      .catch(error => {
-        if (retriesLeft <= 1) {
-          if (error && error.message && error.message.match(/loading.+chunk.+failed/gi)) {
-            // We probably made a release which deletes old js and css
-            // lazy load thus fails and user must reload page
-            resolve(null)
-            window.location.reload()
-          } else {
-            reject(error)
-          }
-          return
-        }
-        setTimeout(() => {
-          retry(fn, retriesLeft - 1, interval).then(resolve, reject)
-        }, interval)
-      })
-  })
-
-const FrontPage = React.lazy(() => retry(() => import('../Frontpage').then(module => ({ default: module.FrontPage }))))
-const Populations = React.lazy(() =>
-  retry(() => import('../PopulationStatistics').then(module => ({ default: module.PopulationStatistics })))
-)
-const StudentStatistics = React.lazy(() =>
-  retry(() => import('../StudentStatistics').then(module => ({ default: module.StudentStatistics })))
-)
-const CourseStatistics = React.lazy(() =>
-  retry(() => import('../CourseStatistics').then(module => ({ default: module.CourseStatistics })))
-)
-const Users = React.lazy(() => retry(() => import('../Users').then(module => ({ default: module.Users }))))
-const StudyProgramme = React.lazy(() =>
-  retry(() => import('../StudyProgramme').then(module => ({ default: module.StudyProgramme })))
-)
-const Teachers = React.lazy(() => retry(() => import('../Teachers').then(module => ({ default: module.Teachers }))))
-const Feedback = React.lazy(() => retry(() => import('../Feedback').then(module => ({ default: module.Feedback }))))
-const CoursePopulation = React.lazy(() =>
-  retry(() => import('../CoursePopulation').then(module => ({ default: module.CoursePopulation })))
-)
-const CustomPopulation = React.lazy(() =>
-  retry(() => import('../CustomPopulation').then(module => ({ default: module.CustomPopulation })))
-)
-const Updater = React.lazy(() => retry(() => import('../Updater').then(module => ({ default: module.Updater }))))
-const StudyGuidanceGroups = React.lazy(() =>
-  retry(() => import('../StudyGuidanceGroups').then(module => ({ default: module.StudyGuidanceGroups })))
-)
-const FacultyStatistics = React.lazy(() =>
-  retry(() => import('../FacultyStatistics').then(module => ({ default: module.FacultyStatistics })))
-)
-const CustomOpenUniPopulations = React.lazy(() =>
-  retry(() => import('../CustomOpenUniPopulation').then(module => ({ default: module.CustomOpenUniPopulation })))
-)
-const EvaluationOverview = React.lazy(() =>
-  retry(() => import('../EvaluationOverview').then(module => ({ default: module.EvaluationOverview })))
-)
-const CompletedCourses = React.lazy(() =>
-  retry(() => import('../CompletedCoursesSearch').then(module => ({ default: module.CompletedCourses })))
-)
-const LanguageCenterView = React.lazy(() =>
-  retry(() => import('../LanguageCenterView').then(module => ({ default: module.LanguageCenterView })))
-)
-const UniversityViewPage = React.lazy(() =>
-  retry(() => import('../EvaluationOverview/UniversityView').then(module => ({ default: module.UniversityViewPage })))
-)
+import { FrontPage } from '../Frontpage'
+import { Feedback } from '../Feedback'
+import { PopulationStatistics } from '../PopulationStatistics'
+import { FacultyStatistics } from '../FacultyStatistics'
+import { StudyProgramme } from '../StudyProgramme'
+import { StudentStatistics } from '../StudentStatistics'
+import { CourseStatistics } from '../CourseStatistics'
+import { Users } from '../Users'
+import { Teachers } from '../Teachers'
+import { CoursePopulation } from '../CoursePopulation'
+import { CustomPopulation } from '../CustomPopulation'
+import { CustomOpenUniPopulation } from '../CustomOpenUniPopulation'
+import { CompletedCourses } from '../CompletedCoursesSearch'
+import { Updater } from '../Updater'
+import { StudyGuidanceGroups } from '../StudyGuidanceGroups'
+import { LanguageCenterView } from '../LanguageCenterView'
+import { EvaluationOverview } from '../EvaluationOverview'
+import { UniversityView } from '../EvaluationOverview/UniversityView'
 
 const routes = {
   students: '/students/:studentNumber?',
@@ -95,7 +46,7 @@ export const Routes = () => (
     <Switch>
       <Route exact path="/" component={FrontPage} />
       <Route exact path={routes.feedback} component={Feedback} />
-      <ProtectedRoute requireUserHasRights exact path="/populations" component={Populations} />
+      <ProtectedRoute requireUserHasRights exact path="/populations" component={PopulationStatistics} />
       <ProtectedRoute
         requiredRoles={['admin', 'facultyStatistics']}
         exact
@@ -136,7 +87,7 @@ export const Routes = () => (
         requiredRoles={['admin', 'openUniSearch']}
         exact
         path={routes.customOpenUniPopulation}
-        component={CustomOpenUniPopulations}
+        component={CustomOpenUniPopulation}
       />
       <ProtectedRoute exact path={routes.completedCoursesSearch} component={CompletedCourses} />
       <ProtectedRoute requiredRoles={['admin']} requireUserHasRights exact path={routes.updater} component={Updater} />
@@ -154,7 +105,7 @@ export const Routes = () => (
         component={LanguageCenterView}
       />
       <ProtectedRoute requireUserHasRights exact path={routes.evaluationOverview} component={EvaluationOverview} />
-      <ProtectedRoute requireUserHasRights exact path={routes.university} component={UniversityViewPage} />
+      <ProtectedRoute requireUserHasRights exact path={routes.university} component={UniversityView} />
       <Redirect to="/" />
     </Switch>
   </Suspense>
