@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactHighcharts from 'react-highcharts'
-import { passRateAttemptGraphOptions, passRateStudentGraphOptions } from '../../../../../constants'
+import { passRateAttemptGraphOptions, passRateStudentGraphOptions } from '@/constants'
 import { absoluteToRelative, getDataObject, getMaxValueOfSeries } from '../util'
 
 const getPassRateAttemptSeriesFromStats = stats => {
