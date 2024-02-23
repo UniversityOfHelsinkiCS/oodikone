@@ -1,5 +1,5 @@
 import { flatten } from 'lodash'
-import { calculatePercentage } from 'common'
+import { calculatePercentage } from '@/common'
 
 const gradesMap = {
   0: 0,

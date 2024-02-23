@@ -4,8 +4,8 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Header, Icon, Item } from 'semantic-ui-react'
-import { SortableTable, row } from 'components/SortableTable'
-import { getCourseAlternatives } from 'selectors/courseStats'
+import { SortableTable, row } from '@/components/SortableTable'
+import { getCourseAlternatives } from '@/selectors/courseStats'
 import { getGradeSpread, getSortableColumn, getThesisGradeSpread, isThesisGrades, resolveGrades } from '../util'
 
 const getTableData = (stats, useThesisGrades, isRelative) =>

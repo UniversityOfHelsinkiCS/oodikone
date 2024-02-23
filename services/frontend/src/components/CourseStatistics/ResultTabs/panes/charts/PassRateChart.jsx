@@ -33,14 +33,17 @@ const getPassRateStudentSeriesFromStats = stats => {
   const passedFirst = []
   const passedEventually = []
   const neverPassed = []
+  const enrolledNoGrade = []
 
   stats.forEach(year => {
     const { passedFirst: pf, passedEventually: pe, neverPassed: np } = year.students.categories
+    const enrolledWithNoGrade = year.students.enrolledStudentsWithNoGrade
 
-    all.push((pf || 0) + (pe || 0) + (np || 0))
+    all.push((pf || 0) + (pe || 0) + (np || 0) + (enrolledWithNoGrade || 0))
     passedFirst.push(pf || 0)
     passedEventually.push(pe || 0)
     neverPassed.push(np || 0)
+    enrolledNoGrade.push(enrolledWithNoGrade || 0)
   })
 
   return {
@@ -49,11 +52,13 @@ const getPassRateStudentSeriesFromStats = stats => {
       getDataObject('passed on first try', passedFirst, 'b'),
       getDataObject('passed eventually', passedEventually, 'b'),
       getDataObject('never passed', neverPassed, 'c'),
+      getDataObject('enrolled, no grade', enrolledNoGrade, 'c'),
     ],
     relative: [
       getDataObject('passed on first try', passedFirst.map(absoluteToRelative(all)), 'b'),
       getDataObject('passed eventually', passedEventually.map(absoluteToRelative(all)), 'b'),
       getDataObject('never passed', neverPassed.map(absoluteToRelative(all)), 'c'),
+      getDataObject('enrolled, no grade', enrolledNoGrade.map(absoluteToRelative(all)), 'c'),
     ],
   }
 }

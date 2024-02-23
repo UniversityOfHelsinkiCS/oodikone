@@ -5,9 +5,9 @@ import React, { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Header, Icon, Item } from 'semantic-ui-react'
-import { SortableTable, row } from 'components/SortableTable'
-import { getCourseAlternatives } from 'selectors/courseStats'
-import { defineCellColor, resolveGrades, getSortableColumn } from '../util'
+import { SortableTable, row } from '@/components/SortableTable'
+import { getCourseAlternatives } from '@/selectors/courseStats'
+import { defineCellColor, getSortableColumn, resolveGrades } from '../util'
 
 const formatPercentage = passRate => (Number.isNaN(passRate) ? '–' : `${(passRate * 100).toFixed(2)} %`)
 
