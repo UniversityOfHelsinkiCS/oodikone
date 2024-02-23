@@ -17,16 +17,20 @@ export class ValueVisitor extends DataVisitor {
     }
 
     this.columns.forEach(column => {
-      let value = getColumnValue(ctx, column, this.exportMode)
-      if (_.isArray(value)) value = value.join(', ')
-      if (value === '') return
+      const value = getColumnValue(ctx, column, this.exportMode)
       this.values[column.key].add(value)
     })
   }
 
   sample(n) {
-    return _.chain(this.values)
-      .mapValues(v => _.sampleSize([...v], n))
-      .value()
+    return _.mapValues(this.values, v => {
+      let array = [...v.values()]
+
+      if (array.some(child => _.isArray(child))) {
+        array = _.uniq(_.flatten(array))
+      }
+
+      return _.sampleSize(array, n)
+    })
   }
 }
