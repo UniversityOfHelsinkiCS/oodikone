@@ -9,6 +9,7 @@ export const Updater = () => {
   const [customList, setCustomList] = useState('')
   const [type, setType] = useState('students')
   const [jobs, setJobs] = useState(null)
+  const [error, setError] = useState(false)
 
   useTitle('Updater')
 
@@ -66,6 +67,8 @@ export const Updater = () => {
     )
   }
 
+  if (error) throw new Error('Admin intentionally caused frontend crash')
+
   return (
     <Segment>
       <Message style={{ fontSize: '16px' }}>
@@ -92,6 +95,15 @@ export const Updater = () => {
           studytrack tabs (time consuming).
           <br />
           <b>Oodikone redis - Refresh language center data</b> Refresh data for language center view.
+          <br />
+          <button
+            type="button"
+            onClick={() => {
+              setError(true)
+            }}
+          >
+            Cause frontend crash
+          </button>
         </p>
       </Message>
       <Form>
