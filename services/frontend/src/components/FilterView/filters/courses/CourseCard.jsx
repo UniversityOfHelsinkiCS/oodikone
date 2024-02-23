@@ -1,7 +1,6 @@
 import React from 'react'
-import { Label, Dropdown, Button, Icon, Popup } from 'semantic-ui-react'
-
-import { useLanguage } from '../../../LanguagePicker/useLanguage'
+import { Button, Dropdown, Icon, Label, Popup } from 'semantic-ui-react'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { FilterType } from './filterType'
 
 const filterTexts = {

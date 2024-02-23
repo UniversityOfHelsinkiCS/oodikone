@@ -1,12 +1,11 @@
-import React from 'react'
 import produce from 'immer'
 import _ from 'lodash'
+import React from 'react'
 import { Dropdown } from 'semantic-ui-react'
-
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { createFilter } from '../createFilter'
 import { CourseCard } from './CourseCard'
 import { FilterType } from './filterType'
-import { createFilter } from '../createFilter'
-import { useLanguage } from '../../../LanguagePicker/useLanguage'
 
 const CourseFilterCard = ({ courseStats, options, onOptionsChange }) => {
   const { courseFilters } = options
