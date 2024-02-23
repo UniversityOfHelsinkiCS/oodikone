@@ -21,7 +21,7 @@ import { Updater } from '../Updater'
 import { StudyGuidanceGroups } from '../StudyGuidanceGroups'
 import { LanguageCenterView } from '../LanguageCenterView'
 import { EvaluationOverview } from '../EvaluationOverview'
-import { UniversityView } from '../EvaluationOverview/UniversityView'
+import { UniversityViewPage } from '../EvaluationOverview/UniversityView'
 
 const routes = {
   students: '/students/:studentNumber?',
@@ -105,7 +105,7 @@ export const Routes = () => (
         component={LanguageCenterView}
       />
       <ProtectedRoute requireUserHasRights exact path={routes.evaluationOverview} component={EvaluationOverview} />
-      <ProtectedRoute requireUserHasRights exact path={routes.university} component={UniversityView} />
+      <ProtectedRoute requireUserHasRights exact path={routes.university} component={UniversityViewPage} />
       <Redirect to="/" />
     </Switch>
   </Suspense>
