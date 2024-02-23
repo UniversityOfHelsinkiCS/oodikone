@@ -1,6 +1,5 @@
 import React from 'react'
 import { string, arrayOf } from 'prop-types'
-import Highcharts from 'highcharts'
 import ReactHighchart from 'react-highcharts'
 import { graphDataType } from '../../../constants/types'
 import './multicolorBarChart.css'
@@ -10,8 +9,6 @@ export const MulticolorBarChart = props => {
   if (chartData.length > 0) {
     return (
       <ReactHighchart
-        highcharts={Highcharts}
-        constructorType="barChart"
         neverReflow
         config={{
           title: {

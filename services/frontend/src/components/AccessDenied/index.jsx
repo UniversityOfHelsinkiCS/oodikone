@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { Transition, Dimmer, Header, Image, Container, Button } from 'semantic-ui-react'
-import Highcharts from 'highcharts'
 import ReactHighchart from 'react-highcharts'
 import { random } from 'lodash'
 import { useLogoutMutation } from 'redux/auth'
@@ -58,19 +57,15 @@ export const AccessDenied = ({ notEnabled }) => {
     <div>
       <Container style={{ display: 'flex', alignItems: 'stretch', height: '100vh', justifyContent: 'space-evenly' }}>
         <ReactHighchart
-          highcharts={Highcharts}
-          constructorType="stockChart"
           config={{
             title: {
               text: 'Students of Computer Science 2018-2020',
             },
-
             yAxis: {
               title: {
                 text: 'Cumulative credits',
               },
             },
-
             plotOptions: {
               series: {
                 label: {
@@ -79,11 +74,9 @@ export const AccessDenied = ({ notEnabled }) => {
                 pointStart: 2010,
               },
             },
-
             series: dummyData,
           }}
         />
-
         <MulticolorBarChart
           chartTitle="Your students' future"
           chartData={dummyData.map(e => ({ name: e.name, data: [Math.max(...e.data)] }))}
@@ -96,8 +89,7 @@ export const AccessDenied = ({ notEnabled }) => {
           <Header.Subheader>{subheader}</Header.Subheader>
           <br />
           <Button onClick={() => logout()} color="pink">
-            {' '}
-            Log out{' '}
+            Log out
           </Button>
         </Header>
       </Dimmer>

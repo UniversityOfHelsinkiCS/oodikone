@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
 import { Menu, Tab, Input, Message } from 'semantic-ui-react'
 import { flattenDeep } from 'lodash'
-import Highcharts from 'highcharts/highstock'
-import ReactHighcharts from 'react-highcharts'
+import ReactHighcharts from 'react-highcharts/ReactHighstock'
 
 import { useLanguage } from 'components/LanguagePicker/useLanguage'
 import { byDateDesc, reformatDate, getStudyRightElementTargetDates } from 'common'
@@ -222,9 +221,9 @@ const GradeGraph = ({ student, semesters }) => {
           <Input label="Group size" defaultValue={chunksize} onChange={e => setChunkSize(Number(e.target.value))} />
         </div>
       )}
-      {!chunky && !semester && <ReactHighcharts highcharts={Highcharts} config={totalMeanOptions} />}
-      {chunky && !semester && <ReactHighcharts highcharts={Highcharts} config={chunkMeanOptions} />}
-      {!chunky && semester && <ReactHighcharts highcharts={Highcharts} config={semesterMeanOptions} />}
+      {!chunky && !semester && <ReactHighcharts config={totalMeanOptions} />}
+      {chunky && !semester && <ReactHighcharts config={chunkMeanOptions} />}
+      {!chunky && semester && <ReactHighcharts config={semesterMeanOptions} />}
     </div>
   )
 }

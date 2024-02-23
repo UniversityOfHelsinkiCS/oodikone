@@ -2,11 +2,8 @@
 import React, { useState, useRef, useMemo } from 'react'
 import { renderToString } from 'react-dom/server'
 import moment from 'moment'
-import Highcharts from 'highcharts/highstock'
 import { Button, Radio } from 'semantic-ui-react'
-import boostcanvas from 'highcharts/modules/boost-canvas'
 import _ from 'lodash'
-import boost from 'highcharts/modules/boost'
 import ReactHighstock from 'react-highcharts/ReactHighstock'
 
 import './creditAccumulationGraphHC.css'
@@ -14,11 +11,6 @@ import { reformatDate, getStudyRightElementTargetDates } from 'common'
 import { CreditGraphTooltip } from './CreditGraphTooltip'
 import { useLanguage } from '../LanguagePicker/useLanguage'
 import { DISPLAY_DATE_FORMAT, API_DATE_FORMAT } from '../../constants'
-
-// boost canvas needed because tests break with large population
-// https://www.highcharts.com/errors/26/
-boostcanvas(Highcharts)
-boost(Highcharts)
 
 const SINGLE_GRAPH_GOAL_SERIES_NAME = 'Goal'
 
@@ -60,25 +52,6 @@ const createGraphOptions = ({
           events: {
             click() {
               onPointClicked(this)
-            },
-            mouseOver() {
-              if (this.series.halo) {
-                this.series.halo
-                  .attr({
-                    class: 'highcharts-tracker',
-                  })
-                  .toFront()
-              }
-            },
-            hover: {
-              halo: {
-                size: 9,
-                attributes: {
-                  fill: Highcharts.getOptions().colors[2],
-                  'stroke-width': 2,
-                  stroke: Highcharts.getOptions().colors[1],
-                },
-              },
             },
           },
           cursor: 'pointer',
@@ -593,7 +566,7 @@ export const CreditAccumulationGraphHighCharts = ({
         </div>
       </div>
 
-      <ReactHighstock highcharts={Highcharts} ref={chartRef} constructorType="stockChart" config={options} />
+      <ReactHighstock ref={chartRef} config={options} />
     </div>
   )
 }
