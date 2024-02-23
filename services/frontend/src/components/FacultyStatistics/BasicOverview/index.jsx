@@ -56,7 +56,6 @@ export const BasicOverview = ({
     id: faculty?.code,
     yearType,
     studyProgrammeFilter,
-    specialGroups: special,
   })
   const basics = useGetFacultyBasicStatsQuery({
     id: faculty?.code,

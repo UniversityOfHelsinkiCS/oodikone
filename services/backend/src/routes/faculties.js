@@ -67,8 +67,8 @@ router.get('/:id/basicstats', async (req, res) => {
 
 router.get('/:id/creditstats', async (req, res) => {
   const code = req.params.id
-  const { year_type: yearType, specialGroups } = req.query
-  const stats = await getFacultyCredits(code, yearType === 'ACADEMIC_YEAR', specialGroups === 'SPECIAL_INCLUDED')
+  const { year_type: yearType } = req.query
+  const stats = await getFacultyCredits(code, yearType === 'ACADEMIC_YEAR')
   return res.json(stats)
 })
 

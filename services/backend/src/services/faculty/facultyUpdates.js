@@ -6,7 +6,6 @@ const { countGraduationTimes } = require('./facultyGraduationTimes')
 const {
   setFacultyProgrammes,
   setBasicStats,
-  setCreditStats,
   setThesisWritersStats,
   setGraduationStats,
   setFacultyProgressStats,
@@ -15,6 +14,7 @@ const {
 const { combineFacultyStudentProgress } = require('./facultyStudentProgress')
 const { combineFacultyStudents } = require('./facultyStudents')
 const { computeCreditsProduced } = require('../providerCredits')
+const { setCreditStats } = require('../analyticsService')
 
 const updateFacultyOverview = async (faculty, statsType) => {
   const calendarNewSpecial = {
@@ -107,7 +107,7 @@ const updateFacultyOverview = async (faculty, statsType) => {
           yearType === 'ACADEMIC_YEAR',
           specialGroups === 'SPECIAL_INCLUDED'
         )
-        await setCreditStats(updatedCredits, yearType, specialGroups)
+        await setCreditStats(updatedCredits, yearType === 'ACADEMIC_YEAR', specialGroups === 'SPECIAL_INCLUDED')
       }
       if (statsType === 'ALL' || statsType === 'THESIS') {
         const updateThesisWriters = await combineFacultyThesisWriters(

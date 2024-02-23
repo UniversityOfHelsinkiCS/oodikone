@@ -10,8 +10,8 @@ const facultystatsApi = RTKApi.injectEndpoints({
         `/faculties/${id}/basicstats?year_type=${yearType}&programme_filter=${studyProgrammeFilter}&special_groups=${specialGroups}`,
     }),
     getFacultyCreditStats: builder.query({
-      query: ({ id, yearType, studyProgrammeFilter, specialGroups }) =>
-        `/faculties/${id}/creditstats?year_type=${yearType}&programme_filter=${studyProgrammeFilter}&special_groups=${specialGroups}`,
+      query: ({ id, yearType, studyProgrammeFilter }) =>
+        `/faculties/${id}/creditstats?year_type=${yearType}&programme_filter=${studyProgrammeFilter}`,
     }),
     getFacultyThesisStats: builder.query({
       query: ({ id, yearType, studyProgrammeFilter, specialGroups }) =>

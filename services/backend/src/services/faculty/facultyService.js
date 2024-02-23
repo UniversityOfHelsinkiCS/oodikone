@@ -5,8 +5,6 @@ const { findFacultyProgrammeCodes } = require('./faculty')
 const createRedisKeyForFacultyProgrammes = (id, programmeFilter) => `FACULTY_PROGRAMMES_${id}_${programmeFilter}`
 const createRedisKeyForBasicStats = (id, yearType, programmeFilter, specialGroups) =>
   `FACULTY_BASIC_STATS_${id}_${yearType}_${programmeFilter}_${specialGroups}`
-const createRedisKeyForCreditStats = (id, yearType, programmeFilter) =>
-  `FACULTY_CREDIT_STATS_${id}_${yearType}_${programmeFilter}`
 const createRedisKeyForThesiswriters = (id, yearType, programmeFilter, specialGroups) =>
   `FACULTY_THESIS_WRITERS_STATS_${id}_${yearType}_${programmeFilter}_${specialGroups}`
 const createRedisKeyForGraduationTimeStats = (id, programmeFilter) =>
@@ -43,7 +41,7 @@ const setFacultyProgrammes = async (id, data, programmeFilter) => {
   return dataToRedis
 }
 
-const getProgrammes = async (code, programmeFilter) => {
+const getProgrammes = async (code, programmeFilter = 'NEW_STUDY_PROGRAMMES') => {
   const programmes = await getFacultyProgrammesFromRedis(code, programmeFilter)
   if (programmes) return programmes
   let updatedProgrammes = await findFacultyProgrammeCodes(code, programmeFilter)
@@ -74,26 +72,6 @@ const setBasicStats = async (data, yearType, programmeFilter, specialGroups) => 
 
 const getBasicStats = async (id, yearType, programmeFilter, specialGroups) => {
   const redisKey = createRedisKeyForBasicStats(id, yearType, programmeFilter, specialGroups)
-  const dataFromRedis = await redisClient.getAsync(redisKey)
-  if (!dataFromRedis) return null
-  return JSON.parse(dataFromRedis)
-}
-
-const setCreditStats = async (data, yearType, specialGroups) => {
-  const { id } = data
-  const redisKey = createRedisKeyForCreditStats(id, yearType, specialGroups)
-  const dataToRedis = {
-    ...data,
-    status: 'DONE',
-    lastUpdated: moment().format(),
-  }
-  const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(dataToRedis))
-  if (setOperationStatus !== 'OK') return null
-  return dataToRedis
-}
-
-const getCreditStats = async (id, yearType, programmeFilter) => {
-  const redisKey = createRedisKeyForCreditStats(id, yearType, programmeFilter)
   const dataFromRedis = await redisClient.getAsync(redisKey)
   if (!dataFromRedis) return null
   return JSON.parse(dataFromRedis)
@@ -187,8 +165,6 @@ module.exports = {
   getProgrammes,
   setBasicStats,
   getBasicStats,
-  setCreditStats,
-  getCreditStats,
   setThesisWritersStats,
   getThesisWritersStats,
   setGraduationStats,

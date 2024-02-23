@@ -42,6 +42,7 @@ const updateBasicView = async (code, combinedProgramme) => {
         option.yearType === 'ACADEMIC_YEAR',
         option.specialGroups === 'SPECIAL_INCLUDED'
       )
+
       await setCreditStats(
         creditStats,
         option.yearType === 'ACADEMIC_YEAR',
