@@ -62,11 +62,12 @@ export const UserSearchList = () => {
           {
             key: 'USERNAME',
             title: 'Username',
-            getRowVal: user => (
+            getRowContent: user => (
               <Link to={`users/${user.id}`} data-cy={`user-edit-button-${user.username}`}>
                 {user.username}
               </Link>
             ),
+            getRowVal: user => user.username,
           },
           {
             key: 'ROLE',
