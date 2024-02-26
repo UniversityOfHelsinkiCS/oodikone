@@ -5,7 +5,9 @@ import { useAddUserUnitsMutation, useRemoveUserUnitsMutation } from 'redux/users
 import { useGetUnfilteredProgrammesQuery } from 'redux/populations'
 import { useGetAllElementDetailsQuery } from 'redux/elementdetails'
 import { createLocaleComparator, textAndDescriptionSearch } from 'common'
+import { userToolTips } from '@/common/InfoToolTips'
 import { useLanguage } from '../LanguagePicker/useLanguage'
+import { InfoBox } from '../Info/InfoBox'
 
 export const AccessRights = ({ user }) => {
   const { id: uid, elementdetails: rightsIncludingFacultyRights, programme: regularRights, accessgroup } = user
@@ -128,6 +130,7 @@ export const AccessRights = ({ user }) => {
         size="small"
         content={`Current IAM group based study programme access rights (${Object.keys(user.iam_groups).length})`}
       />
+      <InfoBox content={userToolTips.IamGroupBasedAccess} />
       <List divided>
         {currentIamAccessRights.map(({ code, name, rights }) => (
           <List.Item key={code}>
