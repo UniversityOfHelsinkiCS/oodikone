@@ -74,13 +74,7 @@ export const PassRateChart = ({ data, isRelative, userHasAccessToAllStats, viewM
 
   const maxPassRateVal = isRelative ? 100 : getMaxValueOfSeries(passGraphSeries.absolute)
   const graphOptionsFn = isAttemptsMode ? passRateAttemptGraphOptions : passRateStudentGraphOptions
-  const primaryGraphOptions = graphOptionsFn(
-    isRelative,
-    statYears,
-    maxPassRateVal,
-    `Pass rate for group ${data.name}`,
-    isRelative
-  )
+  const primaryGraphOptions = graphOptionsFn(isRelative, statYears, maxPassRateVal, `Pass rate for group ${data.name}`)
 
   return (
     <div>

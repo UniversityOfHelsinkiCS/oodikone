@@ -5,11 +5,11 @@ export const DISPLAY_DATE_FORMAT = 'DD.MM.YYYY'
 export const DISPLAY_DATE_FORMAT_DEV = 'DD.MM.YYYY HH:mm:ss'
 export const API_DATE_FORMAT = 'YYYY.MM.DD'
 
-export const passRateAttemptGraphOptions = (isRelative, categories, max, title, skipFirstColor) => ({
+export const passRateAttemptGraphOptions = (isRelative, categories, max, title) => ({
   chart: {
     type: 'column',
   },
-  colors: skipFirstColor ? [color.green, color.red] : [chartColor.blue, color.green, color.red],
+  colors: isRelative ? [color.green, color.red] : [chartColor.blue, color.green, color.red],
   credits: {
     text: 'oodikone | TOSKA',
   },
@@ -40,11 +40,11 @@ export const passRateAttemptGraphOptions = (isRelative, categories, max, title, 
   },
 })
 
-export const passRateStudentGraphOptions = (isRelative, categories, max, title, skipFirstColor) => ({
+export const passRateStudentGraphOptions = (isRelative, categories, max, title) => ({
   chart: {
     type: 'column',
   },
-  colors: skipFirstColor
+  colors: isRelative
     ? [chartColor.greenLight, chartColor.greenDark, chartColor.redLight, chartColor.redDark]
     : [chartColor.blue, chartColor.greenLight, chartColor.greenDark, chartColor.redLight, chartColor.redDark],
   credits: {
