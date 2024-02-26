@@ -6,7 +6,6 @@ import { reducer as populations } from './populations'
 import { curriculumsApi } from './populationCourses'
 import { reducer as populationSelectedStudentCourses } from './populationSelectedStudentCourses'
 import { reducer as populationProgrammes } from './populationProgrammes'
-import { reducer as faculties } from './faculties'
 import { reducer as students } from './students'
 import { reducer as settings } from './settings'
 import { reducer as courseSearch } from './coursesearch'
@@ -23,7 +22,6 @@ export const store = configureStore({
     populations,
     populationSelectedStudentCourses,
     populationProgrammes,
-    faculties,
     students,
     settings,
     courseSearch,
