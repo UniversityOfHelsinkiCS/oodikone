@@ -89,7 +89,7 @@ export const TeacherStatistics = () => {
 
   const userProviders = mapToProviders(rights)
   const invalidQueryParams = provs.length === 0 || !semesterStart
-  const providerOptions = isAdmin ? providers : providers.filter(p => userProviders.includes(p.value))
+  const providerOptions = isAdmin ? providers : providers.filter(p => userProviders.includes(p.code))
   const localizedProviderOptions = providerOptions.map(({ name, code }) => ({
     key: code,
     value: code,
