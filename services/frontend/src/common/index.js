@@ -409,7 +409,7 @@ export const getCurrentSemester = allSemesters => {
  */
 export const createLocaleComparator = (field = null) => {
   if (!field) return (val1, val2) => val1.localeCompare(val2, 'fi', { sensitivity: 'accent' })
-  return (val1, val2) => val1[field].localeCompare(val2[field], 'fi', { sensitivity: 'accent' })
+  return (val1, val2) => val1[field]?.localeCompare(val2[field], 'fi', { sensitivity: 'accent' })
 }
 
 const interpolateColor = (color1, color2, factor) =>
