@@ -39,27 +39,6 @@ const AccessGroup = sequelizeUser.define('access_group', {
   },
 })
 
-const UserFaculties = sequelizeUser.define('user_faculties', {
-  userId: {
-    primaryKey: true,
-    type: Sequelize.BIGINT,
-    references: {
-      model: 'users',
-      key: 'id',
-    },
-  },
-  faculty_code: {
-    primaryKey: true,
-    type: Sequelize.STRING,
-  },
-  createdAt: {
-    type: Sequelize.DATE,
-  },
-  updatedAt: {
-    type: Sequelize.DATE,
-  },
-})
-
 const User = sequelizeUser.define(
   'users',
   {
@@ -98,12 +77,9 @@ User.belongsToMany(AccessGroup, {
 })
 AccessGroup.belongsToMany(User, { through: 'user_accessgroup' })
 
-User.hasMany(UserFaculties, { as: 'faculty', foreignKey: 'userId' })
-
 module.exports = {
   User,
   UserElementDetails,
   AccessGroup,
-  UserFaculties,
   sequelizeUser,
 }

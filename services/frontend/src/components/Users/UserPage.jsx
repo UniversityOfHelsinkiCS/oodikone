@@ -1,30 +1,20 @@
-import React, { useEffect } from 'react'
-import { Button, Card, Divider, Popup, Dropdown, Segment, Loader, Message } from 'semantic-ui-react'
-import { connect } from 'react-redux'
-import { sortBy } from 'lodash'
+import React from 'react'
+import { Button, Card, Divider, Popup, Segment, Loader, Message } from 'semantic-ui-react'
 import { useHistory, useParams } from 'react-router-dom'
 
 import { useGetAuthorizedUserQuery, useShowAsUser } from 'redux/auth'
-import { setFaculties, useGetUserQuery } from 'redux/users'
-import { getFaculties } from 'redux/faculties'
-import { textAndDescriptionSearch } from '../../common'
+import { useGetUserQuery } from 'redux/users'
 import { AccessRights } from './AccessRights'
 import { AccessGroups } from './AccessGroups'
 import { EmailNotification } from './EmailNotification'
-import { useLanguage } from '../LanguagePicker/useLanguage'
 
-const UserPage = ({ faculties, setFaculties, getFaculties }) => {
+export const UserPage = () => {
   const history = useHistory()
 
   const { userid } = useParams()
-  const { getTextIn } = useLanguage()
   const { userId: currentUserId, isAdmin } = useGetAuthorizedUserQuery()
   const showAsUser = useShowAsUser()
   const { data: user, isLoading, isError, error } = useGetUserQuery(userid)
-
-  useEffect(() => {
-    if (faculties.length === 0) getFaculties()
-  }, [])
 
   if (isLoading) return <Loader active inline="centered" />
 
@@ -58,31 +48,6 @@ const UserPage = ({ faculties, setFaculties, getFaculties }) => {
     </Card>
   )
 
-  const renderFacultyAccessRights = () => (
-    <Card fluid>
-      <Card.Content>
-        <Card.Header content="Faculty access rights" />
-        <Card.Description>
-          <Dropdown
-            placeholder="Select faculties"
-            fluid
-            selection
-            multiple
-            value={user.faculty.map(f => f.faculty_code)}
-            options={sortBy(
-              faculties.map(f => ({ key: f.code, text: getTextIn(f.name), description: f.code, value: f.code })),
-              ['text']
-            )}
-            onChange={(__, { value: facultycodes }) => setFaculties(user.id, facultycodes)}
-            search={textAndDescriptionSearch}
-            selectOnBlur={false}
-            selectOnNavigation={false}
-          />
-        </Card.Description>
-      </Card.Content>
-    </Card>
-  )
-
   return (
     <Segment loading={isLoading} className="contentSegment">
       <div>
@@ -103,7 +68,6 @@ const UserPage = ({ faculties, setFaculties, getFaculties }) => {
               <AccessRights user={user} />
             </Card.Content>
           </Card>
-          {renderFacultyAccessRights()}
           <Card fluid>
             <Card.Content>
               <Card.Header content="Send email about receiving access to oodikone" />
@@ -118,9 +82,3 @@ const UserPage = ({ faculties, setFaculties, getFaculties }) => {
     </Segment>
   )
 }
-
-const mapStateToProps = state => ({
-  faculties: state.faculties.data,
-})
-
-export const ConnectedUserPage = connect(mapStateToProps, { setFaculties, getFaculties })(UserPage)

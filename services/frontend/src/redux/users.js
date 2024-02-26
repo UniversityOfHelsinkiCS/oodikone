@@ -1,4 +1,4 @@
-import { callController, RTKApi } from '../apiConnection'
+import { RTKApi } from '../apiConnection'
 
 const usersApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
@@ -56,33 +56,3 @@ export const {
   useGetUserAccessEmailPreviewQuery,
   useSendUserAccessEmailMutation,
 } = usersApi
-
-export const setFaculties = (uid, faculties) => {
-  const route = `/users/${uid}/faculties`
-  const data = { faculties }
-  const prefix = 'SET_USER_FACULTIES_'
-  return callController(route, prefix, data, 'post')
-}
-
-export const reducer = (state = { data: [] }, action) => {
-  switch (action.type) {
-    case 'SET_USER_FACULTIES_ATTEMPT':
-      return {
-        ...state,
-        setfacultypending: true,
-      }
-    case 'SET_USER_FACULTIES_FAILURE':
-      return {
-        ...state,
-        setfacultypending: false,
-      }
-    case 'SET_USER_FACULTIES_SUCCESS':
-      return {
-        ...state,
-        setfacultypending: false,
-        data: state.data.filter(user => user.id !== action.response.id).concat(action.response),
-      }
-    default:
-      return state
-  }
-}

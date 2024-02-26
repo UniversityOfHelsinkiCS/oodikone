@@ -2,7 +2,6 @@ import { configureStore } from '@reduxjs/toolkit'
 import { setupListeners } from '@reduxjs/toolkit/query/react'
 import { handleRequest, RTKApi } from 'apiConnection'
 import { reducer as actionHistory } from './actionHistory'
-import { reducer as users } from './users'
 import { reducer as populations } from './populations'
 import { curriculumsApi } from './populationCourses'
 import { reducer as populationSelectedStudentCourses } from './populationSelectedStudentCourses'
@@ -21,7 +20,6 @@ import { reducer as filters } from './filters'
 export const store = configureStore({
   reducer: {
     actionHistory,
-    users,
     populations,
     populationSelectedStudentCourses,
     populationProgrammes,

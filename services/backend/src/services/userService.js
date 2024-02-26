@@ -3,10 +3,9 @@ const LRU = require('lru-cache')
 const _ = require('lodash')
 
 const { getStudentnumbersByElementdetails } = require('./students')
-const { facultiesAndProgrammesForTrends } = require('../services/organisations')
 const { sendNotificationAboutNewUser } = require('../services/mailservice')
 const { checkStudyGuidanceGroupsAccess, getAllStudentsUserHasInGroups } = require('../services/studyGuidanceGroups')
-const { User, UserElementDetails, AccessGroup, UserFaculties, sequelizeUser } = require('../models/models_user')
+const { User, UserElementDetails, AccessGroup } = require('../models/models_user')
 const { getUserIams, getAllUserAccess, getUserIamAccess } = require('../util/jami')
 const { createLocaleComparator } = require('../util/utils')
 
@@ -31,11 +30,6 @@ const userIncludes = [
     model: AccessGroup,
     as: 'accessgroup',
     attributes: ['id', 'group_code', 'group_info'],
-  },
-  {
-    separate: true,
-    model: UserFaculties,
-    as: 'faculty',
   },
 ]
 
@@ -129,18 +123,6 @@ const enableElementDetails = async (id, codes) => {
   return formatUserForAdminView(user)
 }
 
-const setFaculties = async (id, faculties) => {
-  await sequelizeUser.transaction(async transaction => {
-    await UserFaculties.destroy({ where: { userId: id }, transaction })
-    for (const faculty of faculties) {
-      await UserFaculties.create({ userId: id, faculty_code: faculty }, { transaction })
-    }
-  })
-  const user = await byId(id)
-  userDataCache.del(user.username)
-  return formatUserForAdminView(user)
-}
-
 const removeElementDetails = async (id, codes) => {
   await removeProgrammes(id, codes)
   const user = await byId(id)
@@ -202,10 +184,6 @@ const updateAccessGroups = async (username, iamGroups = [], specialGroup = {}, s
   return { newAccessGroups, accessGroups }
 }
 
-// newer logic
-const enrichProgrammesFromFaculties = faculties =>
-  facultiesAndProgrammesForTrends.filter(f => faculties.includes(f.faculty_code)).map(f => f.programme_code)
-
 const findAll = async () => {
   const allUsers = await User.findAll({
     include: userIncludes,
@@ -227,10 +205,7 @@ const findAll = async () => {
       return {
         ...user.get(),
         iam_groups: iamGroups || [],
-        elementdetails: _.uniqBy([
-          ...user.programme.map(p => p.elementDetailCode),
-          ...enrichProgrammesFromFaculties(user.faculty.map(f => f.faculty_code)),
-        ]),
+        elementdetails: _.uniqBy([...user.programme.map(p => p.elementDetailCode)]),
         accessgroup: accessGroups,
       }
     })
@@ -255,22 +230,18 @@ const findOne = async id => {
   return {
     ...user.get(),
     iam_groups: iamAccess || [],
-    elementdetails: _.uniqBy([
-      ...user.programme.map(p => p.elementDetailCode),
-      ...enrichProgrammesFromFaculties(user.faculty.map(f => f.faculty_code)),
-    ]),
+    elementdetails: _.uniqBy([...user.programme.map(p => p.elementDetailCode)]),
     accessgroup: accessGroups,
   }
 }
 
 const formatUser = async (userFromDb, extraRights, getStudentAccess = true) => {
-  const [accessGroups, programmes, faculties] = [
+  const [accessGroups, programmes] = [
     ['accessgroup', 'group_code'],
     ['programme', 'elementDetailCode'],
-    ['faculty', 'faculty_code'],
   ].map(([field, code]) => userFromDb[field].map(entry => entry[code]))
 
-  const rights = _.uniqBy([...programmes, ...enrichProgrammesFromFaculties(faculties)]).concat(extraRights)
+  const rights = _.uniqBy([...programmes]).concat(extraRights)
 
   const {
     dataValues: {
@@ -402,7 +373,6 @@ module.exports = {
   findOne,
   modifyAccess,
   getAccessGroups,
-  setFaculties,
   getUser,
   getMockedUser,
   getOrganizationAccess,

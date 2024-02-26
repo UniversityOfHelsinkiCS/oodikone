@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom'
 import { Header } from 'semantic-ui-react'
 
 import { useTitle } from 'common/hooks'
-import { ConnectedUserPage as UserPage } from './UserPage'
+import { UserPage } from './UserPage'
 import { UserSearchList } from './UserSearchList'
 
 export const Users = () => {
