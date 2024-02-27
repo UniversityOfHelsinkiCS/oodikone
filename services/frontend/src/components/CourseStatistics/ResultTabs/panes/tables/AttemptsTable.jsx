@@ -65,14 +65,16 @@ export const AttemptsTable = ({
   } = stats[0]
   const useThesisGrades = isThesisGrades(grades)
   const alternatives = useSelector(getCourseAlternatives)
+  const unifyCourses = useSelector(state => state.courseSearch.openOrRegular)
 
-  const showPopulation = (yearcode, years) => {
+  const showPopulation = (yearcode, years, unifyCourses) => {
     const queryObject = {
       from: yearcode,
       to: yearcode,
       coursecodes: JSON.stringify(uniq(alternatives)),
       years,
       separate,
+      unifyCourses,
     }
     const searchString = qs.stringify(queryObject)
     return `/coursepopulation?${searchString}`
@@ -103,7 +105,7 @@ export const AttemptsTable = ({
         getRowContent: s =>
           s.name !== 'Total' &&
           userHasAccessToAllStats && (
-            <Item as={Link} to={showPopulation(s.code, s.name, s)}>
+            <Item as={Link} to={showPopulation(s.code, s.name, unifyCourses)}>
               <Icon name="level up alternate" />
             </Item>
           ),
