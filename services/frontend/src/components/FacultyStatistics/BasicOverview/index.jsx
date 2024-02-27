@@ -1,22 +1,23 @@
 /* eslint-disable no-restricted-syntax */
 import React, { useState } from 'react'
+import { Divider, Loader, Popup, Button, Message } from 'semantic-ui-react'
+import { utils, writeFile } from 'xlsx'
+
+import { getTimestamp } from '@/common'
+import { facultyToolTips } from '@/common/InfoToolTips'
+import { makeTableStats, makeGraphData } from '@/components/common/CreditsProduced'
+import { InfoBox } from '@/components/Info/InfoBox'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { LineGraph } from '@/components/StudyProgramme/BasicOverview/LineGraph'
+import { StackedBarChart } from '@/components/StudyProgramme/BasicOverview/StackedBarChart'
+import { Toggle } from '@/components/StudyProgramme/Toggle'
 import {
   useGetFacultyCreditStatsQuery,
   useGetFacultyBasicStatsQuery,
   useGetFacultyThesisStatsQuery,
 } from '@/redux/facultyStats'
-import { Divider, Loader, Popup, Button, Message } from 'semantic-ui-react'
-import { utils, writeFile } from 'xlsx'
-import { getTimestamp } from '@/common'
-import { LineGraph } from '@/components/StudyProgramme/BasicOverview/LineGraph'
-import { StackedBarChart } from '@/components/StudyProgramme/BasicOverview/StackedBarChart'
-import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { facultyToolTips } from '@/common/InfoToolTips'
-import { Toggle } from '@/components/StudyProgramme/Toggle'
-import { InfoBox } from '@/components/Info/InfoBox'
-import { makeTableStats, makeGraphData } from '@/components/common/CreditsProduced'
-import { InteractiveDataTable } from '../InteractiveDataView'
 import { sortProgrammeKeys } from '../facultyHelpers'
+import { InteractiveDataTable } from '../InteractiveDataView'
 import '../faculty.css'
 
 const calculateTotals = stats => {

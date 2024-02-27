@@ -1,14 +1,15 @@
+import { orderBy, debounce } from 'lodash'
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { useDispatch } from 'react-redux'
 import { Table, Input, Tab, Icon } from 'semantic-ui-react'
-import { orderBy, debounce } from 'lodash'
-import { useGetSemestersQuery } from 'redux/semesters'
-import { clearCourseStats } from '../../redux/coursestats'
-import './populationCourseStats.css'
-import { PopulationCourseContext } from './PopulationCourseContext'
-import { GradeDistribution } from './GradeDistribution'
+
+import { clearCourseStats } from '@/redux/coursestats'
+import { useGetSemestersQuery } from '@/redux/semesters'
 import { useLanguage } from '../LanguagePicker/useLanguage'
+import { GradeDistribution } from './GradeDistribution'
 import { PassFailEnrollments } from './PassFailEnrollments'
+import { PopulationCourseContext } from './PopulationCourseContext'
+import './populationCourseStats.css'
 
 const tableColumnNames = {
   STUDENTS: 'students',

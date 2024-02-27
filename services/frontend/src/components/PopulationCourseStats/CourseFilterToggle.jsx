@@ -1,9 +1,10 @@
 import React from 'react'
 import { Popup } from 'semantic-ui-react'
-import { isCourseSelected, toggleCourseSelection } from 'components/FilterView/filters/courses'
-import { FilterToggleIcon } from 'components/common/FilterToggleIcon'
-import { useFilters } from 'components/FilterView/useFilters'
-import { useLanguage } from 'components/LanguagePicker/useLanguage'
+
+import { FilterToggleIcon } from '@/components/common/FilterToggleIcon'
+import { isCourseSelected, toggleCourseSelection } from '@/components/FilterView/filters/courses'
+import { useFilters } from '@/components/FilterView/useFilters'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 
 export const CourseFilterToggle = ({ course }) => {
   const { getTextIn } = useLanguage()

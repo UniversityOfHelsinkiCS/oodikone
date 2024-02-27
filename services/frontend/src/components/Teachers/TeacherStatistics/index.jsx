@@ -1,12 +1,12 @@
+import moment from 'moment'
 import React, { useState } from 'react'
 import { Form, Segment, Dropdown, Button, Message } from 'semantic-ui-react'
-import moment from 'moment'
 
-import { useGetAuthorizedUserQuery } from 'redux/auth'
-import { useGetProvidersQuery } from 'redux/providers'
-import { useGetSemestersQuery } from 'redux/semesters'
-import { useLazyGetTeacherStatisticsQuery } from 'redux/teachers'
-import { useLanguage } from 'components/LanguagePicker/useLanguage'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { useGetAuthorizedUserQuery } from '@/redux/auth'
+import { useGetProvidersQuery } from '@/redux/providers'
+import { useGetSemestersQuery } from '@/redux/semesters'
+import { useLazyGetTeacherStatisticsQuery } from '@/redux/teachers'
 import { TeacherStatisticsTable } from '../TeacherStatisticsTable'
 
 export const TeacherStatistics = () => {

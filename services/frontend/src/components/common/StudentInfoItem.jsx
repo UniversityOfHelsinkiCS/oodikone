@@ -1,6 +1,7 @@
 import React from 'react'
-import { Icon, Item } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
+import { Icon, Item } from 'semantic-ui-react'
+
 import { SisuLinkItem } from './SisuLinkItem'
 
 export const StudentInfoItem = ({ student, showSisuLink }) => {

@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import { Divider, Loader } from 'semantic-ui-react'
 
-import { useGetFacultyGraduationTimesQuery } from 'redux/facultyStats'
-import { facultyToolTips } from 'common/InfoToolTips'
-import { Toggle } from '../../StudyProgramme/Toggle'
+import { facultyToolTips } from '@/common/InfoToolTips'
+import { useGetFacultyGraduationTimesQuery } from '@/redux/facultyStats'
 import { InfoBox } from '../../Info/InfoBox'
+import { Toggle } from '../../StudyProgramme/Toggle'
 import { GraduationTimes } from './GraduationTimes'
 import '../faculty.css'
 

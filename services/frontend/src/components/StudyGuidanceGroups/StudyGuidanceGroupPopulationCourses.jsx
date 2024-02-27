@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import { Segment, Form, Input } from 'semantic-ui-react'
-import { PopulationCourseStatsFlat } from 'components/PopulationCourseStats/PopulationCourseStatsFlat'
-import { ConnectedPopulationCourseStats as PopulationCourseStats } from 'components/PopulationCourseStats'
-import { CourseTableModeSelector } from 'components/PopulationDetails/CurriculumPicker'
+
+import { ConnectedPopulationCourseStats as PopulationCourseStats } from '@/components/PopulationCourseStats'
+import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
+import { CourseTableModeSelector } from '@/components/PopulationDetails/CurriculumPicker'
 
 export const StudyGuidanceGroupPopulationCourses = ({
   courses,

@@ -1,5 +1,5 @@
+import { ALL } from '@/selectors/courseStats'
 import { formreducer } from './common/formreducer'
-import { ALL } from '../selectors/courseStats'
 
 const prefix = 'COURSE_SUMMARY_FORM'
 

@@ -1,11 +1,11 @@
 import React from 'react'
-import { Segment, Header } from 'semantic-ui-react'
 import { useParams } from 'react-router-dom'
+import { Segment, Header } from 'semantic-ui-react'
 
-import { useTitle } from 'common/hooks'
-import { ConnectedStudentSearch as StudentSearch } from './StudentSearch'
-import { ConnectedStudentDetails as StudentDetails } from './StudentDetails'
+import { useTitle } from '@/common/hooks'
 import { StudentNameVisibilityToggle } from '../StudentNameVisibilityToggle'
+import { ConnectedStudentDetails as StudentDetails } from './StudentDetails'
+import { ConnectedStudentSearch as StudentSearch } from './StudentSearch'
 
 export const StudentStatistics = () => {
   const { studentNumber } = useParams()

@@ -1,9 +1,9 @@
-import React from 'react'
 import fp from 'lodash/fp'
+import React from 'react'
 import { Form, Dropdown } from 'semantic-ui-react'
 
-import { useLanguage } from 'components/LanguagePicker/useLanguage'
-import { filterToolTips } from 'common/InfoToolTips'
+import { filterToolTips } from '@/common/InfoToolTips'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { createFilter } from './createFilter'
 
 const STATUS_OPTIONS = [

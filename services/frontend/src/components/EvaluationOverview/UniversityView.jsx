@@ -1,16 +1,17 @@
-import React, { useState } from 'react'
-import { Divider, Header, Loader, Message, Segment } from 'semantic-ui-react'
-import { useGetAllFacultiesProgressStatsQuery, useGetAllFacultiesGraduationStatsQuery } from 'redux/facultyStats'
-import { facultyToolTips } from 'common/InfoToolTips'
-import { Link } from 'react-router-dom'
-import { useGetAuthorizedUserQuery } from 'redux/auth'
-import { useLanguage } from 'components/LanguagePicker/useLanguage'
 import { orderBy } from 'lodash'
-import { FacultyProgress } from './FacultyProgress'
-import { Toggle } from '../StudyProgramme/Toggle'
+import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { Divider, Header, Loader, Message, Segment } from 'semantic-ui-react'
+
+import { facultyToolTips } from '@/common/InfoToolTips'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { useGetAuthorizedUserQuery } from '@/redux/auth'
+import { useGetAllFacultiesProgressStatsQuery, useGetAllFacultiesGraduationStatsQuery } from '@/redux/facultyStats'
 import { InfoBox } from '../Info/InfoBox'
-import '../FacultyStatistics/faculty.css'
+import { Toggle } from '../StudyProgramme/Toggle'
 import { FacultyGraduations } from './FacultyGraduations'
+import { FacultyProgress } from './FacultyProgress'
+import '../FacultyStatistics/faculty.css'
 
 export const UniversityViewPage = () => {
   return (

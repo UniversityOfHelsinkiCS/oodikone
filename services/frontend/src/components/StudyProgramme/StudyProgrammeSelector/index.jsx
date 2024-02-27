@@ -1,13 +1,13 @@
+import { debounce } from 'lodash'
+import { arrayOf, string, bool, shape } from 'prop-types'
 import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { debounce } from 'lodash'
-import { arrayOf, string, bool, shape } from 'prop-types'
 import { Loader, Message, Header, Form } from 'semantic-ui-react'
 
-import { getUnifiedProgrammeName } from 'common'
-import { SortableTable } from '../../SortableTable'
+import { getUnifiedProgrammeName } from '@/common'
 import { useLanguage } from '../../LanguagePicker/useLanguage'
+import { SortableTable } from '../../SortableTable'
 
 const StudyProgrammeSelector = ({ studyprogrammes, selected }) => {
   const { getTextIn, language } = useLanguage()

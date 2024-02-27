@@ -1,6 +1,6 @@
+import { string, oneOfType, number } from 'prop-types'
 import React from 'react'
 import { Label, Popup } from 'semantic-ui-react'
-import { string, oneOfType, number } from 'prop-types'
 
 const styles = {
   container: {

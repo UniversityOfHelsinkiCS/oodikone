@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import { Icon, Popup, Table } from 'semantic-ui-react'
 
-import { useLanguage } from 'components/LanguagePicker/useLanguage'
-import { useGetAuthorizedUserQuery } from 'redux/auth'
-import { PopulationLink } from './PopulationLink'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { Toggle } from '../Toggle'
+import { PopulationLink } from './PopulationLink'
 
 const getKey = year => `${year}-${Math.random()}`
 

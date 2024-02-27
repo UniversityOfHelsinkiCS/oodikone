@@ -1,7 +1,7 @@
-import React, { useMemo, useState } from 'react'
-import { useContextSelector } from 'use-context-selector'
 import _ from 'lodash'
+import React, { useMemo, useState } from 'react'
 import { Checkbox, Dropdown, Input } from 'semantic-ui-react'
+import { useContextSelector } from 'use-context-selector'
 
 import { SortableTableContext, getColumnValue } from '../common'
 

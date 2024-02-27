@@ -1,6 +1,6 @@
+import { func, arrayOf, shape, string, any, number } from 'prop-types'
 import React, { useEffect } from 'react'
 import { Segment, Form } from 'semantic-ui-react'
-import { func, arrayOf, shape, string, any, number } from 'prop-types'
 
 const currentYear = () => {
   const now = new Date()

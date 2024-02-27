@@ -1,11 +1,12 @@
 import React from 'react'
-import './navigationBar.css'
-import { Menu, Dropdown, Button, Label } from 'semantic-ui-react'
 import { NavLink, Link } from 'react-router-dom'
-import { useLogoutMutation, useShowAsUser, useGetAuthorizedUserQuery } from 'redux/auth'
-import { checkUserAccess } from '../../common'
+import { Menu, Dropdown, Button, Label } from 'semantic-ui-react'
+
+import { checkUserAccess } from '@/common'
+import { isDev, adminerUrls } from '@/conf'
+import { useLogoutMutation, useShowAsUser, useGetAuthorizedUserQuery } from '@/redux/auth'
 import { LanguagePicker } from '../LanguagePicker'
-import { isDev, adminerUrls } from '../../conf'
+import './navigationBar.css'
 
 const allNavigationItems = {
   university: { path: '/university', key: 'university', label: 'University' },

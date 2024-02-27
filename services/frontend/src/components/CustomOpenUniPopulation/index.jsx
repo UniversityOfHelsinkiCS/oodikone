@@ -1,10 +1,11 @@
+import moment from 'moment'
 import React, { useState } from 'react'
 import { Message, Icon, Loader } from 'semantic-ui-react'
-import moment from 'moment'
-import { useGetSavedSearchesQuery } from 'redux/openUniPopulations'
-import { OpenUniPopulationResults } from './OpenUniPopulationResults'
-import { useTitle } from '../../common/hooks'
+
+import { useTitle } from '@/common/hooks'
+import { useGetSavedSearchesQuery } from '@/redux/openUniPopulations'
 import { CustomOpenUniSearch } from './CustomOpenUniSearch'
+import { OpenUniPopulationResults } from './OpenUniPopulationResults'
 
 export const CustomOpenUniPopulation = () => {
   useTitle('Custom open uni population')

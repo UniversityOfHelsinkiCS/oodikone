@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Divider, Loader, Tab } from 'semantic-ui-react'
 
-import { useTitle } from 'common/hooks'
-import { useGetSemestersQuery } from 'redux/semesters'
-import { getCurrentSemester } from 'common'
+import { getCurrentSemester } from '@/common'
+import { useTitle } from '@/common/hooks'
+import { useGetSemestersQuery } from '@/redux/semesters'
 import { ColorizedCoursesTableContext } from './common'
 import { FacultiesTab } from './FacultiesTab'
 import { SemestersTab } from './SemestersTab'

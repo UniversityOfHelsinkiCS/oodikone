@@ -1,11 +1,11 @@
 import React from 'react'
-import { Button, Card, Divider, Popup, Segment, Loader, Message } from 'semantic-ui-react'
 import { useHistory, useParams } from 'react-router-dom'
+import { Button, Card, Divider, Popup, Segment, Loader, Message } from 'semantic-ui-react'
 
-import { useGetAuthorizedUserQuery, useShowAsUser } from 'redux/auth'
-import { useGetUserQuery } from 'redux/users'
-import { AccessRights } from './AccessRights'
+import { useGetAuthorizedUserQuery, useShowAsUser } from '@/redux/auth'
+import { useGetUserQuery } from '@/redux/users'
 import { AccessGroups } from './AccessGroups'
+import { AccessRights } from './AccessRights'
 import { EmailNotification } from './EmailNotification'
 
 export const UserPage = () => {

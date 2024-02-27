@@ -1,7 +1,8 @@
-import { DataTable } from 'components/StudyProgramme/BasicOverview/DataTable'
-import { StackedBarChart } from 'components/StudyProgramme/BasicOverview/StackedBarChart'
-import { Toggle } from 'components/StudyProgramme/Toggle'
 import React, { useState } from 'react'
+
+import { DataTable } from '@/components/StudyProgramme/BasicOverview/DataTable'
+import { StackedBarChart } from '@/components/StudyProgramme/BasicOverview/StackedBarChart'
+import { Toggle } from '@/components/StudyProgramme/Toggle'
 
 const getFormattedYear = (year, academicYear) => (academicYear ? `${year} - ${year + 1}` : `${year}`)
 

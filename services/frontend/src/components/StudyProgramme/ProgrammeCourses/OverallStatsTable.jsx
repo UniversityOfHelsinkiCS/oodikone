@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react'
-import { Item, Icon, Segment, Header, Loader } from 'semantic-ui-react'
-import { Link } from 'react-router-dom'
 import { max, min, range } from 'lodash'
+import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { Item, Icon, Segment, Header, Loader } from 'semantic-ui-react'
 
-import { studyProgrammeToolTips } from 'common/InfoToolTips'
-import { InfoBox } from 'components/Info/InfoBox'
-import { useGetProgrammeCoursesStatsQuery } from 'redux/studyProgramme'
+import { studyProgrammeToolTips } from '@/common/InfoToolTips'
+import { InfoBox } from '@/components/Info/InfoBox'
+import { useGetProgrammeCoursesStatsQuery } from '@/redux/studyProgramme'
 import { useLanguage } from '../../LanguagePicker/useLanguage'
 import { SortableTable } from '../../SortableTable'
-import { CourseYearFilter } from './CourseYearFilter'
 import { Toggle } from '../Toggle'
+import { CourseYearFilter } from './CourseYearFilter'
 
 const getColumns = (getTextIn, showStudents) => {
   let columns = null

@@ -1,14 +1,14 @@
+import * as Sentry from '@sentry/browser'
 import React, { useEffect } from 'react'
 import { initShibbolethPinger } from 'unfuck-spa-shibboleth-session'
-import * as Sentry from '@sentry/browser'
 
-import { NavigationBar } from 'components/NavigationBar'
-import { Routes } from 'components/Routes'
-import { SegmentDimmer } from 'components/SegmentDimmer'
+import { AccessDenied } from '@/components/AccessDenied'
+import { NavigationBar } from '@/components/NavigationBar'
+import { Routes } from '@/components/Routes'
+import { SegmentDimmer } from '@/components/SegmentDimmer'
+import { isProduction } from '@/conf'
+import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import './app.css'
-import { isProduction } from 'conf'
-import { useGetAuthorizedUserQuery } from 'redux/auth'
-import { AccessDenied } from 'components/AccessDenied'
 
 const addUserDetailsToLoggers = ({ id, userId, mockedBy }) => {
   if (!isProduction || !id || !userId) return

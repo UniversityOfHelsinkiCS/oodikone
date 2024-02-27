@@ -2,16 +2,13 @@ import React, { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
 import { Header, Segment } from 'semantic-ui-react'
-import { useGetSemestersQuery } from 'redux/semesters'
-import { makePopulationsToData } from 'selectors/populationDetails'
-import { getStudentTotalCredits, getUnifiedProgrammeName, isMastersProgramme } from 'common'
-import { useGetAuthorizedUserQuery } from 'redux/auth'
-import { PopulationDetails } from '../PopulationDetails'
-import { useTitle } from '../../common/hooks'
-import { useLanguage } from '../LanguagePicker/useLanguage'
+
+import { getStudentTotalCredits, getUnifiedProgrammeName, isMastersProgramme } from '@/common'
+import { useTitle } from '@/common/hooks'
+import { useGetAuthorizedUserQuery } from '@/redux/auth'
+import { useGetSemestersQuery } from '@/redux/semesters'
+import { makePopulationsToData } from '@/selectors/populationDetails'
 import { FilterView } from '../FilterView'
-import { ConnectedPopulationSearch as PopulationSearch } from '../PopulationSearch'
-import { DataExport } from './DataExport'
 import {
   admissionTypeFilter,
   ageFilter,
@@ -30,6 +27,10 @@ import {
   tagsFilter,
   transferredToProgrammeFilter,
 } from '../FilterView/filters'
+import { useLanguage } from '../LanguagePicker/useLanguage'
+import { PopulationDetails } from '../PopulationDetails'
+import { ConnectedPopulationSearch as PopulationSearch } from '../PopulationSearch'
+import { DataExport } from './DataExport'
 
 const getYearText = year => {
   if (year === 'All') return ''

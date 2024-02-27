@@ -1,6 +1,7 @@
-import { useLocalStorage } from 'common/hooks'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Accordion } from 'semantic-ui-react'
+
+import { useLocalStorage } from '@/common/hooks'
 
 const titleStyle = { paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }
 

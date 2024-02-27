@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
-import { func, string, arrayOf, object, bool } from 'prop-types'
-import { connect } from 'react-redux'
-import { Search, Segment, Container } from 'semantic-ui-react'
 import moment from 'moment'
+import { func, string, arrayOf, object, bool } from 'prop-types'
+import React, { useEffect, useState } from 'react'
+import { connect } from 'react-redux'
+import { Link, useLocation } from 'react-router-dom'
+import { Search, Segment, Container } from 'semantic-ui-react'
 
-import { useLanguage } from 'components/LanguagePicker/useLanguage'
-import { containsOnlyNumbers, validateInputLength, splitByEmptySpace } from 'common'
-import { findStudents, getStudent } from 'redux/students'
+import { containsOnlyNumbers, validateInputLength, splitByEmptySpace } from '@/common'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { findStudents, getStudent } from '@/redux/students'
+import { makeFormatStudentRows } from '@/selectors/students'
 import { SegmentDimmer } from '../../SegmentDimmer'
 import { SortableTable } from '../../SortableTable'
 import { Timeout } from '../../Timeout'
-import { makeFormatStudentRows } from '../../../selectors/students'
 
 const StudentSearch = ({
   getStudent,

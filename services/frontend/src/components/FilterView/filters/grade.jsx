@@ -1,7 +1,8 @@
+import fp from 'lodash/fp'
 import React from 'react'
 import { Form, Checkbox } from 'semantic-ui-react'
-import fp from 'lodash/fp'
-import { getHighestGradeOrEnrollmentOfCourseBetweenRange } from '../../../common'
+
+import { getHighestGradeOrEnrollmentOfCourseBetweenRange } from '@/common'
 import { createFilter } from './createFilter'
 
 /**

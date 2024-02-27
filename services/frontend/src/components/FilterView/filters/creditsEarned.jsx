@@ -1,9 +1,9 @@
-import { RangeSelector } from 'components/common/RangeSelector'
-import React, { useMemo } from 'react'
 import _ from 'lodash'
+import React, { useMemo } from 'react'
 
-import { useDebounce } from 'common/hooks'
-import { getStudentTotalCredits } from '../../../common'
+import { getStudentTotalCredits } from '@/common'
+import { useDebounce } from '@/common/hooks'
+import { RangeSelector } from '@/components/common/RangeSelector'
 import { createFilter } from './createFilter'
 
 const CreditsEarnedFilterCard = ({ options, onOptionsChange, bounds }) => {

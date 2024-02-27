@@ -1,7 +1,8 @@
 import React, { createContext, useState, useCallback, useContext, useEffect } from 'react'
-import { useGetAuthorizedUserQuery } from 'redux/auth'
-import { DEFAULT_LANG, LANGUAGE_CODES } from '../../constants'
-import { callApi } from '../../apiConnection'
+
+import { callApi } from '@/apiConnection'
+import { DEFAULT_LANG, LANGUAGE_CODES } from '@/constants'
+import { useGetAuthorizedUserQuery } from '@/redux/auth'
 
 const LanguageContext = createContext([[], () => {}])
 LanguageContext.displayName = 'Language'

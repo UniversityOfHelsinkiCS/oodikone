@@ -1,6 +1,6 @@
+import _ from 'lodash'
 import React, { useState, useRef } from 'react'
 import { Popup, Icon } from 'semantic-ui-react'
-import _ from 'lodash'
 
 export const InfoWithHelpTooltip = ({ children, tooltip, containerStyle = {}, ...rest }) => {
   const popupContext = useRef()

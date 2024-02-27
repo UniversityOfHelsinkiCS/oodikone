@@ -1,6 +1,7 @@
+import { func, string, number, bool } from 'prop-types'
 import React, { useState, useEffect } from 'react'
 import { Input } from 'semantic-ui-react'
-import { func, string, number, bool } from 'prop-types'
+
 import { Timeout } from '../Timeout'
 
 const TIMEOUTS = {

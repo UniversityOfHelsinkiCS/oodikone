@@ -1,7 +1,8 @@
-import React, { useCallback, useState, useEffect, useRef } from 'react'
 import { isEqual } from 'lodash'
 import qs from 'query-string'
-import { SEARCH_HISTORY_VERSION } from '../constants'
+import React, { useCallback, useState, useEffect, useRef } from 'react'
+
+import { SEARCH_HISTORY_VERSION } from '@/constants'
 
 export const useTabChangeAnalytics = () => {
   const previousTabIndex = React.useRef(0)

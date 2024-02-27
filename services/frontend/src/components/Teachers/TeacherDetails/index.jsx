@@ -1,13 +1,13 @@
-import React from 'react'
 import { isString } from 'lodash'
-import { Card, Tab, Segment } from 'semantic-ui-react'
+import React from 'react'
 import { Redirect } from 'react-router-dom'
+import { Card, Tab, Segment } from 'semantic-ui-react'
 
-import { useGetTeacherQuery } from 'redux/teachers'
+import { useGetTeacherQuery } from '@/redux/teachers'
+import { useLanguage } from '../../LanguagePicker/useLanguage'
 import { TeacherStatisticsTable } from '../TeacherStatisticsTable'
 import { CoursesTab } from './CoursesTab'
 import '../../PopulationQueryCard/populationQueryCard.css'
-import { useLanguage } from '../../LanguagePicker/useLanguage'
 
 const formatStatisticsForTable = (statistics, getTextIn) => {
   if (!statistics) {

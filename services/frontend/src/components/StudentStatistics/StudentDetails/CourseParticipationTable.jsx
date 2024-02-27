@@ -1,10 +1,10 @@
-import React, { Fragment } from 'react'
 import { func, shape } from 'prop-types'
-import { Divider, Icon, Header, Item } from 'semantic-ui-react'
+import React, { Fragment } from 'react'
 import { Link } from 'react-router-dom'
+import { Divider, Icon, Header, Item } from 'semantic-ui-react'
 
-import { useLanguage } from 'components/LanguagePicker/useLanguage'
-import { byDateDesc, reformatDate, getTextInWithOpen, resolveStudyPlan } from 'common'
+import { byDateDesc, reformatDate, getTextInWithOpen, resolveStudyPlan } from '@/common'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { StudentCourseTable } from '../StudentCourseTable'
 
 // Some courses are without AY in the beginning in the studyplan even though the credits are registered with AY.

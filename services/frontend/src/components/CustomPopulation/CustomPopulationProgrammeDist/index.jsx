@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { Progress } from 'semantic-ui-react'
 
-import { getNewestProgramme } from 'common'
-import { FilterToggleIcon } from 'components/common/FilterToggleIcon'
-import { SearchResultTable } from './SearchResultTable'
-import { useLanguage } from '../../LanguagePicker/useLanguage'
-import { useFilters } from '../../FilterView/useFilters'
+import { getNewestProgramme } from '@/common'
+import { FilterToggleIcon } from '@/components/common/FilterToggleIcon'
 import { isProgrammeSelected, toggleProgrammeSelection } from '../../FilterView/filters/programmes'
+import { useFilters } from '../../FilterView/useFilters'
+import { useLanguage } from '../../LanguagePicker/useLanguage'
+import { SearchResultTable } from './SearchResultTable'
 
 export const CustomPopulationProgrammeDist = ({ students, studentToTargetCourseDateMap, coursecode, studentData }) => {
   const { getTextIn } = useLanguage()

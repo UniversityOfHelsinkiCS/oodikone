@@ -1,7 +1,7 @@
 import React from 'react'
 
-import { useGetLanguageCenterDataQuery } from 'redux/languageCenterView'
-import { ColorizedCoursesTable } from 'components/ColorizedCoursesTable'
+import { ColorizedCoursesTable } from '@/components/ColorizedCoursesTable'
+import { useGetLanguageCenterDataQuery } from '@/redux/languageCenterView'
 import { InfoBox } from './InfoBox'
 
 export const LanguageCenterView = () => (

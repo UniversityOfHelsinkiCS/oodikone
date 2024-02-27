@@ -1,18 +1,18 @@
 import React from 'react'
 import { Button, Divider, Loader, Message, Popup } from 'semantic-ui-react'
 
-import { useGetFacultyProgressStatsQuery, useGetFacultyStudentStatsQuery } from 'redux/facultyStats'
-import { useLanguage } from 'components/LanguagePicker/useLanguage'
-import { getCreditCategories } from 'common'
-import { facultyToolTips } from 'common/InfoToolTips'
-import { FacultyProgressTable } from './FacultyProgressTable'
-import { FacultyBarChart } from './FacultyBarChart'
-import { Toggle } from '../../StudyProgramme/Toggle'
+import { getCreditCategories } from '@/common'
+import { facultyToolTips } from '@/common/InfoToolTips'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { useGetFacultyProgressStatsQuery, useGetFacultyStudentStatsQuery } from '@/redux/facultyStats'
 import { InfoBox } from '../../Info/InfoBox'
+import { Toggle } from '../../StudyProgramme/Toggle'
 import '../faculty.css'
-import { FacultyStudentDataTable } from './FacultyStudentDataTable'
 import { sortProgrammeKeys } from '../facultyHelpers'
 import { downloadProgressTableCsv, downloadStudentTableCsv } from '../xlsxFileDownloadHelper'
+import { FacultyBarChart } from './FacultyBarChart'
+import { FacultyProgressTable } from './FacultyProgressTable'
+import { FacultyStudentDataTable } from './FacultyStudentDataTable'
 
 const getDivider = (title, toolTipText, content, cypress) => (
   <>

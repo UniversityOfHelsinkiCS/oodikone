@@ -1,13 +1,13 @@
 import React, { useState } from 'react'
 import { Button, Form, Header, Icon, List, Message, Popup, Radio } from 'semantic-ui-react'
 
-import { useAddUserUnitsMutation, useRemoveUserUnitsMutation } from 'redux/users'
-import { useGetUnfilteredProgrammesQuery } from 'redux/populations'
-import { useGetAllElementDetailsQuery } from 'redux/elementdetails'
-import { createLocaleComparator, textAndDescriptionSearch } from 'common'
+import { createLocaleComparator, textAndDescriptionSearch } from '@/common'
 import { userToolTips } from '@/common/InfoToolTips'
-import { useLanguage } from '../LanguagePicker/useLanguage'
+import { useGetAllElementDetailsQuery } from '@/redux/elementdetails'
+import { useGetUnfilteredProgrammesQuery } from '@/redux/populations'
+import { useAddUserUnitsMutation, useRemoveUserUnitsMutation } from '@/redux/users'
 import { InfoBox } from '../Info/InfoBox'
+import { useLanguage } from '../LanguagePicker/useLanguage'
 
 export const AccessRights = ({ user }) => {
   const { id: uid, elementdetails: rightsIncludingFacultyRights, programme: regularRights, accessgroup } = user

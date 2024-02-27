@@ -2,10 +2,11 @@ import _ from 'lodash'
 import React, { useState, useMemo, useEffect } from 'react'
 import { Modal, Table, Button, Checkbox } from 'semantic-ui-react'
 import { utils, writeFile } from 'xlsx'
-import { getTimestamp } from 'common'
+
+import { getTimestamp } from '@/common'
 import { getColumnTitle, getDataItemType, DataItemType, cloneColumns } from './common'
-import { ValueVisitor } from './visitors/ValueVisitor'
 import { ExportVisitor } from './visitors/ExportVisitor'
+import { ValueVisitor } from './visitors/ValueVisitor'
 
 const getExportColumns = columns => {
   const stack = cloneColumns(columns)

@@ -1,8 +1,9 @@
 import React from 'react'
-import { Container, Header, Message } from 'semantic-ui-react'
 import { Route } from 'react-router-dom'
-import { useGetAuthorizedUserQuery } from 'redux/auth'
-import { checkUserAccess } from '../../common'
+import { Container, Header, Message } from 'semantic-ui-react'
+
+import { checkUserAccess } from '@/common'
+import { useGetAuthorizedUserQuery } from '@/redux/auth'
 
 const NoAccessToPageBanner = () => (
   <Container text style={{ paddingTop: 50 }} textAlign="justified">

@@ -1,8 +1,8 @@
+import _ from 'lodash'
+import fp from 'lodash/fp'
+import moment from 'moment'
 import React, { useMemo } from 'react'
 import { Dropdown } from 'semantic-ui-react'
-import fp from 'lodash/fp'
-import _ from 'lodash'
-import moment from 'moment'
 
 import { useLanguage } from '../../LanguagePicker/useLanguage'
 import { createFilter } from './createFilter'

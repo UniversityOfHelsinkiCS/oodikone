@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react'
 import moment from 'moment'
+import React, { useEffect, useState } from 'react'
 import { Loader, Icon } from 'semantic-ui-react'
 
-import { useGetOpenUniCourseStudentsQuery } from 'redux/openUniPopulations'
-import { SortableTable } from 'components/SortableTable'
-import { useLanguage } from 'components/LanguagePicker/useLanguage'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { SortableTable } from '@/components/SortableTable'
+import { useGetOpenUniCourseStudentsQuery } from '@/redux/openUniPopulations'
 
 const getTableData = studentsData => {
   return Object.keys(studentsData).reduce(

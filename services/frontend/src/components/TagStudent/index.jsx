@@ -1,9 +1,9 @@
+import { arrayOf, string, shape, func, bool } from 'prop-types'
 import React from 'react'
 import { connect } from 'react-redux'
 import { Dropdown, Label, Icon, Table } from 'semantic-ui-react'
-import { arrayOf, string, shape, func, bool } from 'prop-types'
 
-import { createStudentTagAction, deleteStudentTagAction } from '../../redux/tagstudent'
+import { createStudentTagAction, deleteStudentTagAction } from '@/redux/tagstudent'
 
 const TagStudent = ({
   createStudentTag,

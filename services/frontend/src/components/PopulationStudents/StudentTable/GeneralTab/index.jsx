@@ -1,9 +1,10 @@
-import React from 'react'
 import _ from 'lodash'
+import React from 'react'
 import { useSelector } from 'react-redux'
-import { useGetStudyGuidanceGroupPopulationQuery } from 'redux/studyGuidanceGroups'
-import { useGetAuthorizedUserQuery } from 'redux/auth'
-import { useGetCustomPopulationQuery } from 'redux/populations'
+
+import { useGetAuthorizedUserQuery } from '@/redux/auth'
+import { useGetCustomPopulationQuery } from '@/redux/populations'
+import { useGetStudyGuidanceGroupPopulationQuery } from '@/redux/studyGuidanceGroups'
 import { GeneralTab } from './GeneralTab'
 
 // study guidance groups -feature uses different population + rtk query, so it needs to

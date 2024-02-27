@@ -1,6 +1,6 @@
+import { arrayOf, object } from 'prop-types'
 import React from 'react'
 import { Card, Icon } from 'semantic-ui-react'
-import { arrayOf, object } from 'prop-types'
 
 import './creditGraphTooltip.css'
 

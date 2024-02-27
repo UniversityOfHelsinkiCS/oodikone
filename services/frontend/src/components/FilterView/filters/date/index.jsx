@@ -1,7 +1,8 @@
 import React from 'react'
 import 'moment/locale/fi'
-import { DateRangeSelector } from 'components/common/DateRangeSelector'
-import { filterToolTips } from 'common/InfoToolTips'
+
+import { filterToolTips } from '@/common/InfoToolTips'
+import { DateRangeSelector } from '@/components/common/DateRangeSelector'
 import { createFilter } from '../createFilter'
 
 /**

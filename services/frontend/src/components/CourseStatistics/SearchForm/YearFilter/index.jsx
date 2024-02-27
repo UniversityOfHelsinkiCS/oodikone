@@ -1,5 +1,5 @@
-import React from 'react'
 import { arrayOf, func, number, shape } from 'prop-types'
+import React from 'react'
 import { Form } from 'semantic-ui-react'
 
 export const YearFilter = ({ years, fromYear, toYear, handleChange }) => (

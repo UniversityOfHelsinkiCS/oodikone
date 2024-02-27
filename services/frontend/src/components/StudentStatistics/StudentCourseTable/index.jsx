@@ -1,6 +1,6 @@
+import { arrayOf, array, string } from 'prop-types'
 import React from 'react'
 import { Table, Segment } from 'semantic-ui-react'
-import { arrayOf, array, string } from 'prop-types'
 
 const getHeaderRow = headers => (
   <Table.Header>

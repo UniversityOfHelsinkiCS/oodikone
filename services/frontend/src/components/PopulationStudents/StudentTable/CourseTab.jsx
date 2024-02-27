@@ -1,14 +1,14 @@
-import React, { useMemo, useCallback } from 'react'
 import _, { orderBy, uniqBy, sortBy, isNumber } from 'lodash'
+import React, { useMemo, useCallback } from 'react'
 import { useSelector } from 'react-redux'
 import { Icon, Tab } from 'semantic-ui-react'
 
-import { useLanguage } from 'components/LanguagePicker/useLanguage'
-import '../../PopulationCourseStats/populationCourseStats.css'
-import { useGetStudyGuidanceGroupPopulationCoursesQuery } from 'redux/studyGuidanceGroups'
-import { StudentInfoItem } from 'components/common/StudentInfoItem'
-import { hiddenNameAndEmailForExcel } from 'common/columns'
+import { hiddenNameAndEmailForExcel } from '@/common/columns'
+import { StudentInfoItem } from '@/components/common/StudentInfoItem'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { useGetStudyGuidanceGroupPopulationCoursesQuery } from '@/redux/studyGuidanceGroups'
 import { SortableTable, row } from '../../SortableTable'
+import '../../PopulationCourseStats/populationCourseStats.css'
 import '../populationStudents.css'
 
 const getMandatoryPassed = (mandatoryCourses, populationCourses, studyGuidanceCourses) => {

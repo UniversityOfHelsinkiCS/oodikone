@@ -1,14 +1,14 @@
+import moment from 'moment'
 import React from 'react'
 import { Icon, Loader } from 'semantic-ui-react'
-import moment from 'moment'
 
-import { SortableTable } from 'components/SortableTable'
-import { useGetCompletedCoursesQuery } from 'redux/completedCoursesSearch'
-import { StudentNameVisibilityToggle, useStudentNameVisibility } from 'components/StudentNameVisibilityToggle'
-import { useLanguage } from 'components/LanguagePicker/useLanguage'
-import { RightsNotification } from 'components/RightsNotification'
-import { StudentInfoItem } from 'components/common/StudentInfoItem'
-import { hiddenNameAndEmailForExcel } from 'common/columns'
+import { hiddenNameAndEmailForExcel } from '@/common/columns'
+import { StudentInfoItem } from '@/components/common/StudentInfoItem'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { RightsNotification } from '@/components/RightsNotification'
+import { SortableTable } from '@/components/SortableTable'
+import { StudentNameVisibilityToggle, useStudentNameVisibility } from '@/components/StudentNameVisibilityToggle'
+import { useGetCompletedCoursesQuery } from '@/redux/completedCoursesSearch'
 
 const getColumns = (courses, showStudentNames, getTextIn) => {
   const isPassed = credit => [4, 7, 9].includes(credit)

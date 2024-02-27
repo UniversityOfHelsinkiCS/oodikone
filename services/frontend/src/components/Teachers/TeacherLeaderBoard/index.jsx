@@ -1,10 +1,10 @@
+import moment from 'moment'
 import React, { useState } from 'react'
 import { Segment, Message } from 'semantic-ui-react'
-import moment from 'moment'
 
-import { useGetTopTeachersCategoriesQuery, useLazyGetTopTeachersQuery } from 'redux/teachers'
-import { LeaderForm } from './LeaderForm'
+import { useGetTopTeachersCategoriesQuery, useLazyGetTopTeachersQuery } from '@/redux/teachers'
 import { TeacherStatisticsTable } from '../TeacherStatisticsTable'
+import { LeaderForm } from './LeaderForm'
 
 export const TeacherLeaderBoard = () => {
   const [selectedYear, setSelectedYear] = useState(null)

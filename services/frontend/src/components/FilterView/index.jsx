@@ -1,12 +1,12 @@
-import React, { useMemo } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
 import produce from 'immer'
 import _ from 'lodash'
 import fp from 'lodash/fp'
+import React, { useMemo } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 
-import { selectViewFilters, setFilterOptions, resetViewFilters, resetFilter } from 'redux/filters'
-import { FilterViewContext } from './FilterViewContext'
+import { selectViewFilters, setFilterOptions, resetViewFilters, resetFilter } from '@/redux/filters'
 import { FilterTray } from './FilterTray'
+import { FilterViewContext } from './FilterViewContext'
 
 const resolveFilterOptions = (store, filters, initialOptions) => {
   return fp.flow(

@@ -1,8 +1,8 @@
 import React from 'react'
 import { Tab } from 'semantic-ui-react'
 
-import { useGetColorizedTableCourseStatsQuery } from 'redux/studyProgramme'
-import { ColorizedCoursesTable } from 'components/ColorizedCoursesTable'
+import { ColorizedCoursesTable } from '@/components/ColorizedCoursesTable'
+import { useGetColorizedTableCourseStatsQuery } from '@/redux/studyProgramme'
 import { OverallStatsTable } from './OverallStatsTable'
 
 export const ProgrammeCourses = ({ studyProgramme, combinedProgramme, academicYear, setAcademicYear }) => {

@@ -1,8 +1,8 @@
+import { intersection, orderBy } from 'lodash'
 import React from 'react'
 import { Progress, Table } from 'semantic-ui-react'
-import { intersection, orderBy } from 'lodash'
 
-import { getHighestGradeOfCourseBetweenRange } from 'common'
+import { getHighestGradeOfCourseBetweenRange } from '@/common'
 import { ExternalGradeFilterToggle } from './ExternalGradeFilterToggle'
 
 export const CoursePopulationGradeDist = ({ singleCourseStats, students, courseCodes, from, to }) => {

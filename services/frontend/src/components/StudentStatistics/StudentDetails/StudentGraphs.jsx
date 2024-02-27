@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
-import { Menu, Tab, Input, Message } from 'semantic-ui-react'
 import { flattenDeep } from 'lodash'
+import React, { useState } from 'react'
 import ReactHighcharts from 'react-highcharts/ReactHighstock'
+import { Menu, Tab, Input, Message } from 'semantic-ui-react'
 
-import { useLanguage } from 'components/LanguagePicker/useLanguage'
-import { byDateDesc, reformatDate, getStudyRightElementTargetDates } from 'common'
+import { byDateDesc, reformatDate, getStudyRightElementTargetDates } from '@/common'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { CreditAccumulationGraphHighCharts } from '../../CreditAccumulationGraphHighCharts'
 
 const getEarliestAttainmentDate = ({ courses }) => {

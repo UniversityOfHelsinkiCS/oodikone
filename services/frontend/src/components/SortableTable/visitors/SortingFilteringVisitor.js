@@ -1,6 +1,7 @@
 import _ from 'lodash'
-import { DataVisitor } from './DataVisitor'
+
 import { getColumnValue, getRowOptions } from '../common'
+import { DataVisitor } from './DataVisitor'
 
 export class SortingFilteringVisitor extends DataVisitor {
   constructor(columns, state, filterTypes) {

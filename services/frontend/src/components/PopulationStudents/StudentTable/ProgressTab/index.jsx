@@ -1,12 +1,12 @@
+import { keyBy } from 'lodash'
+import moment from 'moment'
 import React, { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Tab, Icon, Message } from 'semantic-ui-react'
-import { keyBy } from 'lodash'
-import moment from 'moment'
 
-import { SortableTable } from 'components/SortableTable'
-import { StudentInfoItem } from 'components/common/StudentInfoItem'
+import { StudentInfoItem } from '@/components/common/StudentInfoItem'
+import { SortableTable } from '@/components/SortableTable'
 import { useLanguage } from '../../../LanguagePicker/useLanguage'
 import '../../../StudentStatistics/StudentInfoCard/studentInfoCard.css'
 

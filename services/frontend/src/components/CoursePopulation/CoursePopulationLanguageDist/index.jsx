@@ -1,7 +1,8 @@
+import moment from 'moment'
 import React from 'react'
 import { Table, Progress } from 'semantic-ui-react'
-import moment from 'moment'
-import { languageAbbreviations } from '../../../common'
+
+import { languageAbbreviations } from '@/common'
 
 export const CoursePopulationLanguageDist = ({ samples, codes, from, to }) => {
   let total = 0

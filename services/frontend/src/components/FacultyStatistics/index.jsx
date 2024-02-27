@@ -2,15 +2,15 @@ import React, { useCallback, useState } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
 import { Segment, Header, Tab, Loader } from 'semantic-ui-react'
 
-import { useGetFacultiesQuery } from 'redux/facultyStats'
-import { useGetAuthorizedUserQuery } from 'redux/auth'
-import { useTabs, useTitle } from '../../common/hooks'
-import { FacultySelector } from './facultySelector'
+import { useTabs, useTitle } from '@/common/hooks'
+import { useGetAuthorizedUserQuery } from '@/redux/auth'
+import { useGetFacultiesQuery } from '@/redux/facultyStats'
+import { useLanguage } from '../LanguagePicker/useLanguage'
 import { BasicOverview } from './BasicOverview'
 import { FacultyProgrammeOverview } from './FacultyProgrammeOverview'
+import { FacultySelector } from './facultySelector'
 import { TimesAndPathsView } from './TimesAndPaths'
 import { UpdateView } from './UpdateView'
-import { useLanguage } from '../LanguagePicker/useLanguage'
 
 export const FacultyStatistics = () => {
   useTitle('Faculties')

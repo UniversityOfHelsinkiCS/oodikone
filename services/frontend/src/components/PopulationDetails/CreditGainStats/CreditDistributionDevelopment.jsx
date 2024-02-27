@@ -1,15 +1,15 @@
+import _ from 'lodash'
+import moment from 'moment'
 import React, { useState, useMemo } from 'react'
 import ReactHighcharts from 'react-highcharts'
-import { Radio, Dropdown, Segment } from 'semantic-ui-react'
-import moment from 'moment'
-import _ from 'lodash'
 import { useLocation } from 'react-router-dom'
+import { Radio, Dropdown, Segment } from 'semantic-ui-react'
 
-import { useGetSemestersQuery } from 'redux/semesters'
-import { useLanguage } from 'components/LanguagePicker/useLanguage'
-import { studentNumberFilter } from 'components/FilterView/filters'
-import { getTargetCreditsForProgramme, TimeDivision, getCreditCategories, generateGradientColors } from 'common'
-import { getMonths } from 'common/query'
+import { getTargetCreditsForProgramme, TimeDivision, getCreditCategories, generateGradientColors } from '@/common'
+import { getMonths } from '@/common/query'
+import { studentNumberFilter } from '@/components/FilterView/filters'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { useGetSemestersQuery } from '@/redux/semesters'
 import { useFilters } from '../../FilterView/useFilters'
 
 const StackOrdering = {

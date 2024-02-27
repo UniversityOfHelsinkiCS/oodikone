@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
 import { arrayOf, string } from 'prop-types'
+import React, { useState } from 'react'
 import { Button, Modal, Form, TextArea, Accordion, Header, List } from 'semantic-ui-react'
 
 export const CheckStudentList = ({ students }) => {

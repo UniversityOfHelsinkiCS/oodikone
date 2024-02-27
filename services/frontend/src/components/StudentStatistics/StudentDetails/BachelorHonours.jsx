@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react'
 import moment from 'moment'
+import React, { useEffect, useState } from 'react'
 import { Divider, Table, Label, Header, Accordion, Icon } from 'semantic-ui-react'
-import { CurriculumPicker } from 'components/PopulationDetails/CurriculumPicker'
+
 import {
   bachelorHonoursProgrammes as bachelorCodes,
   bachelorHonoursBasicModules as basicHonoursModules,
   bachelorHonoursIntermediateModules as intermediateHonoursModules,
   reformatDate,
-} from 'common'
+} from '@/common'
+import { CurriculumPicker } from '@/components/PopulationDetails/CurriculumPicker'
 
 export const BachelorHonours = ({ student, absentYears, programmeCode }) => {
   const [curriculum, setCurriculum] = useState(null)

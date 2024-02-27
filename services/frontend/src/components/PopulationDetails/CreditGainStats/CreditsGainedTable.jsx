@@ -2,9 +2,9 @@ import moment from 'moment/moment'
 import React from 'react'
 import { Table } from 'semantic-ui-react'
 
-import { hopsFilter as studyPlanFilter } from 'components/FilterView/filters'
-import { CollapsibleCreditRow } from './CollapsibleCreditRow'
+import { hopsFilter as studyPlanFilter } from '@/components/FilterView/filters'
 import { useFilters } from '../../FilterView/useFilters'
+import { CollapsibleCreditRow } from './CollapsibleCreditRow'
 
 export const CreditsGainedTable = ({ filteredStudents, type, year, creditDateFilterOptions, programmeGoalTime }) => {
   const { useFilterSelector } = useFilters()

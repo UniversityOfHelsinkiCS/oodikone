@@ -1,7 +1,8 @@
+import moment from 'moment'
 import React from 'react'
 import { Radio, Button, Form } from 'semantic-ui-react'
-import { useFilters } from 'components/FilterView/useFilters'
-import moment from 'moment'
+
+import { useFilters } from '@/components/FilterView/useFilters'
 import { createFilter } from './createFilter'
 import { creditDateFilter } from './date'
 

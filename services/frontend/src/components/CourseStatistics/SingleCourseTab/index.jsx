@@ -1,11 +1,11 @@
+import { oneOfType, number, string, bool } from 'prop-types'
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Segment, Label, Header, Divider, Form } from 'semantic-ui-react'
-import { oneOfType, number, string, bool } from 'prop-types'
 
-import { getCourseStats, getAvailableStats, getCourses } from 'selectors/courseStats'
-import { useLanguage } from 'components/LanguagePicker/useLanguage'
-import { setSelectedCourse } from 'redux/singleCourseStats'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { setSelectedCourse } from '@/redux/singleCourseStats'
+import { getCourseStats, getAvailableStats, getCourses } from '@/selectors/courseStats'
 import { ConnectedSingleCourseStats as SingleCourseStats } from '../SingleCourseStats'
 
 const CourseSelector = ({ courses, selected, setSelected }) => {

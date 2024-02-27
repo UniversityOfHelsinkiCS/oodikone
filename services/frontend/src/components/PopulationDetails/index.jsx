@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react'
 
-import { useFilters } from 'components/FilterView/useFilters'
-import { creditDateFilter, hopsFilter as studyPlanFilter } from 'components/FilterView/filters'
-import { useGetProgressCriteriaQuery } from 'redux/programmeProgressCriteria'
-import { useGetAuthorizedUserQuery } from 'redux/auth'
-import { PanelView } from 'components/common/PanelView'
-import { populationStatisticsToolTips } from 'common/InfoToolTips'
+import { populationStatisticsToolTips } from '@/common/InfoToolTips'
+import { PanelView } from '@/components/common/PanelView'
+import { creditDateFilter, hopsFilter as studyPlanFilter } from '@/components/FilterView/filters'
+import { useFilters } from '@/components/FilterView/useFilters'
+import { useGetAuthorizedUserQuery } from '@/redux/auth'
+import { useGetProgressCriteriaQuery } from '@/redux/programmeProgressCriteria'
 import { CreditAccumulationGraphHighCharts } from '../CreditAccumulationGraphHighCharts'
-import { PopulationStudentsContainer as PopulationStudents } from '../PopulationStudents'
-import { PopulationCourses } from './PopulationCourses'
 import { InfoBox } from '../Info/InfoBox'
-import { CreditGainStats } from './CreditGainStats'
+import { PopulationStudentsContainer as PopulationStudents } from '../PopulationStudents'
 import { AgeStats } from './AgeStats'
+import { CreditGainStats } from './CreditGainStats'
 import { CourseTableModeSelector } from './CurriculumPicker'
+import { PopulationCourses } from './PopulationCourses'
 
 export const PopulationDetails = ({
   allStudents,

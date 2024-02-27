@@ -1,13 +1,13 @@
 import React from 'react'
-import { Header, Segment, Tab } from 'semantic-ui-react'
 import { useHistory, useParams } from 'react-router-dom'
+import { Header, Segment, Tab } from 'semantic-ui-react'
 
-import { useGetAuthorizedUserQuery } from 'redux/auth'
-import { useTabs, useTitle } from 'common/hooks'
+import { useTabs, useTitle } from '@/common/hooks'
+import { useGetAuthorizedUserQuery } from '@/redux/auth'
+import { TeacherDetails } from './TeacherDetails'
+import { TeacherLeaderBoard } from './TeacherLeaderBoard'
 import { TeacherSearchTab } from './TeacherSearchTab'
 import { TeacherStatistics } from './TeacherStatistics'
-import { TeacherLeaderBoard } from './TeacherLeaderBoard'
-import { TeacherDetails } from './TeacherDetails'
 
 const pane = (title, Content, icon) => ({
   menuItem: { key: title, content: title, icon },

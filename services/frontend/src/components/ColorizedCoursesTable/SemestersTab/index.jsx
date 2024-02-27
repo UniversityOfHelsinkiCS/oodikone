@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react'
 
-import { SortableTable, row } from 'components/SortableTable'
-import { useLanguage } from 'components/LanguagePicker/useLanguage'
-import { getColumns } from './logic'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { SortableTable, row } from '@/components/SortableTable'
 import { useColorizedCoursesTableContext, calculateTotals, calculateNewTotalColumnValues } from '../common'
 import '../index.css'
 import { ColorModeSelector, NumberModeSelector, SemesterRangeSelector } from '../selectorComponents'
+import { getColumns } from './logic'
 
 export const SemestersTab = () => {
   const { getTextIn } = useLanguage()

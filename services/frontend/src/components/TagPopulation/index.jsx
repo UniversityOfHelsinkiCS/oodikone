@@ -1,9 +1,9 @@
+import { arrayOf, string, shape, func } from 'prop-types'
 import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Button, Dropdown, List, Confirm } from 'semantic-ui-react'
-import { arrayOf, string, shape, func } from 'prop-types'
 
-import { createMultipleStudentTagAction, deleteMultipleStudentTagAction } from '../../redux/tagstudent'
+import { createMultipleStudentTagAction, deleteMultipleStudentTagAction } from '@/redux/tagstudent'
 
 const TagPopulation = ({
   createMultipleStudentTag,

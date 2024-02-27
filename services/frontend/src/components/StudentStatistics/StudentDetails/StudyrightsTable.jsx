@@ -1,14 +1,14 @@
-import React from 'react'
-import { func, shape, string } from 'prop-types'
-import { Divider, Table, Icon, Header, Item, Segment, Button, Popup } from 'semantic-ui-react'
 import { sortBy } from 'lodash'
-import { Link } from 'react-router-dom'
+import { func, shape, string } from 'prop-types'
+import React from 'react'
 import ReactMarkdown from 'react-markdown'
+import { Link } from 'react-router-dom'
+import { Divider, Table, Icon, Header, Item, Segment, Button, Popup } from 'semantic-ui-react'
 
-import { useLanguage } from 'components/LanguagePicker/useLanguage'
-import { reformatDate, getTargetCreditsForProgramme, calculatePercentage } from 'common'
-import { HoverableHelpPopup } from 'components/common/HoverableHelpPopup'
-import { studentToolTips } from 'common/InfoToolTips'
+import { reformatDate, getTargetCreditsForProgramme, calculatePercentage } from '@/common'
+import { studentToolTips } from '@/common/InfoToolTips'
+import { HoverableHelpPopup } from '@/components/common/HoverableHelpPopup'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 
 export const StudyrightsTable = ({
   Programmes,

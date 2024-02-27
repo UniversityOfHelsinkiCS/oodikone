@@ -1,8 +1,9 @@
+import { flatten, uniq } from 'lodash'
+import { shape, string, number } from 'prop-types'
 import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { Table, Header, Dropdown } from 'semantic-ui-react'
-import { flatten, uniq } from 'lodash'
-import { shape, string, number } from 'prop-types'
+
 import { useLanguage } from '../../LanguagePicker/useLanguage'
 
 const CourseTableRow = ({ facultyCode, students, credits, facultyName }) => {

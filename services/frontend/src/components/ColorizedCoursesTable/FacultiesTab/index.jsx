@@ -1,12 +1,12 @@
-import React, { useMemo } from 'react'
 import _ from 'lodash'
+import React, { useMemo } from 'react'
 
-import { useLanguage } from 'components/LanguagePicker/useLanguage'
-import { SortableTable, row } from 'components/SortableTable'
-import { useGetFacultiesQuery } from 'redux/facultyStats'
-import { getColumns } from './logic'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { SortableTable, row } from '@/components/SortableTable'
+import { useGetFacultiesQuery } from '@/redux/facultyStats'
 import { calculateTotals, useColorizedCoursesTableContext, emptyFields } from '../common'
 import { ColorModeSelector, NumberModeSelector, SemesterRangeSelector } from '../selectorComponents'
+import { getColumns } from './logic'
 import '../index.css'
 
 export const FacultiesTab = () => {

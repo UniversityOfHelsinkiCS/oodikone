@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { Form, TextArea, Button, Modal, Message, Icon, Header } from 'semantic-ui-react'
 
-import { useSendFeedbackMutation } from 'redux/feedback'
-import { useTitle } from 'common/hooks'
+import { useTitle } from '@/common/hooks'
+import { useSendFeedbackMutation } from '@/redux/feedback'
 
 export const Feedback = () => {
   const [feedback, setFeedback] = useState('')

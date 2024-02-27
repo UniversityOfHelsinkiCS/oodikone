@@ -1,17 +1,17 @@
+import moment from 'moment'
+import { func, shape, object, bool, arrayOf } from 'prop-types'
+import qs from 'query-string'
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
-import { func, shape, object, bool, arrayOf } from 'prop-types'
-import { Form, Button } from 'semantic-ui-react'
-import moment from 'moment'
-import qs from 'query-string'
 import { useHistory } from 'react-router-dom'
+import { Form, Button } from 'semantic-ui-react'
 
-import { populationStatisticsToolTips } from 'common/InfoToolTips'
-import { removePopulation } from 'redux/populations'
-import { PopulationQueryCard } from '../PopulationQueryCard'
-import './populationSearch.css'
+import { populationStatisticsToolTips } from '@/common/InfoToolTips'
+import { removePopulation } from '@/redux/populations'
 import { InfoBox } from '../Info/InfoBox'
+import { PopulationQueryCard } from '../PopulationQueryCard'
 import { FilterActiveNote } from './FilterActiveNote'
+import './populationSearch.css'
 
 const getMonths = (year, term) => {
   const start = term === 'FALL' ? `${year}-08-01` : moment(`${year}-01-01`).add(1, 'years')

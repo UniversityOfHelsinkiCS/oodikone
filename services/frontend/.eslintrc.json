@@ -36,6 +36,14 @@
     "import/prefer-default-export": "off",
     "import/no-unused-modules": ["error", { "missingExports": true, "unusedExports": true }],
     "import/no-commonjs": "error",
+    "import/order": [
+      "error",
+      {
+        "groups": ["builtin", "external", "internal", "parent", "sibling"],
+        "pathGroups": [{ "pattern": "@/**", "group": "internal", "position": "before" }],
+        "alphabetize": { "order": "asc", "caseInsensitive": true }
+      }
+    ],
     "quotes": ["error", "single", { "avoidEscape": true }],
     "react-hooks/rules-of-hooks": "error",
     "no-console": "error",

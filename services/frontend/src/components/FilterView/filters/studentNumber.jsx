@@ -1,8 +1,8 @@
+import _ from 'lodash'
 import React, { useState } from 'react'
 import { Button, Icon } from 'semantic-ui-react'
-import _ from 'lodash'
 
-import { filterToolTips } from 'common/InfoToolTips'
+import { filterToolTips } from '@/common/InfoToolTips'
 import { createFilter } from './createFilter'
 
 const IconButton = ({ onClick, ...props }) => (

@@ -1,9 +1,8 @@
+import _ from 'lodash'
 import React, { useState, useRef } from 'react'
 import { Icon, Header } from 'semantic-ui-react'
-import _ from 'lodash'
 
-import { InfoWithHelpTooltip } from 'components/Info/InfoWithHelpTooltip'
-
+import { InfoWithHelpTooltip } from '@/components/Info/InfoWithHelpTooltip'
 import './FilterCard.css'
 
 const useChange = value => {

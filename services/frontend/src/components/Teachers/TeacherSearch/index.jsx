@@ -1,11 +1,11 @@
 import React, { useState, useMemo, useEffect } from 'react'
 import { Search, Segment, Icon } from 'semantic-ui-react'
 
-import './teacherSearch.css'
-import { useFindTeachersQuery } from 'redux/teachers'
-import { validateInputLength, splitByEmptySpace } from 'common'
-import { useDebounce } from 'common/hooks'
+import { validateInputLength, splitByEmptySpace } from '@/common'
+import { useDebounce } from '@/common/hooks'
+import { useFindTeachersQuery } from '@/redux/teachers'
 import { SortableTable } from '../../SortableTable'
+import './teacherSearch.css'
 
 export const TeacherSearch = ({ onClick }) => {
   const [searchterm, setSearchterm] = useState('')

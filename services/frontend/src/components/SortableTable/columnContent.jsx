@@ -1,8 +1,9 @@
+import _ from 'lodash'
 import React from 'react'
 import { useContext } from 'use-context-selector'
-import _ from 'lodash'
-import './style.css'
+
 import { SortableTableContext, getDataItemType, DataItemType, thickBorderStyles, cloneColumns } from './common'
+import './style.css'
 
 export const getKey = data => {
   if (data.studentnumber) return data.studentnumber

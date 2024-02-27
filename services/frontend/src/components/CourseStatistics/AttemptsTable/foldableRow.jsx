@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
 import { bool, func } from 'prop-types'
+import React, { useState } from 'react'
 import { Table, Icon } from 'semantic-ui-react'
 
-import { courseDataWithRealisationsType } from '../../../constants/types'
+import { courseDataWithRealisationsType } from '@/constants/types'
 import './foldableRow.css'
 
 export const FoldableRow = ({ courseData, onClickFn, userHasAccessToAllStats }) => {

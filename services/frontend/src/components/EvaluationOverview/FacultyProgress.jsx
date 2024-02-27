@@ -2,9 +2,9 @@ import React from 'react'
 import { Message } from 'semantic-ui-react'
 
 import { calculateStats } from 'components/FacultyStatistics/FacultyProgrammeOverview'
-import { FacultyProgressTable } from '../FacultyStatistics/FacultyProgrammeOverview/FacultyProgressTable'
-import { FacultyBarChart } from '../FacultyStatistics/FacultyProgrammeOverview/FacultyBarChart'
 import { sortProgrammeKeys } from '../FacultyStatistics/facultyHelpers'
+import { FacultyBarChart } from '../FacultyStatistics/FacultyProgrammeOverview/FacultyBarChart'
+import { FacultyProgressTable } from '../FacultyStatistics/FacultyProgrammeOverview/FacultyProgressTable'
 
 export const FacultyProgress = ({ faculty, progressStats, getDivider }) => {
   const bachelorStats = calculateStats(progressStats?.data?.creditCounts?.bachelor, 180)

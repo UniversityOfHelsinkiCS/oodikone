@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from 'react'
 import _ from 'lodash'
+import React, { useEffect, useState } from 'react'
 import { Container } from 'semantic-ui-react'
+
+import { CurriculumPicker } from '@/components/PopulationDetails/CurriculumPicker'
 import {
   useAddProgressCriteriaCourseMutation,
   useAddProgressCriteriaCreditsMutation,
   useGetProgressCriteriaQuery,
-} from 'redux/programmeProgressCriteria'
-import { CurriculumPicker } from 'components/PopulationDetails/CurriculumPicker'
+} from '@/redux/programmeProgressCriteria'
 import { CreditCriteriaForm } from './CreditCriteriaForm'
 import { DegreeCourseTableView } from './DegreeCourseTableView'
 

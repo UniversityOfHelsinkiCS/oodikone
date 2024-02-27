@@ -1,20 +1,16 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { Segment, Header, Message, Label, Form, Input } from 'semantic-ui-react'
-import { useGetSemestersQuery } from 'redux/semesters'
-import { useFilteredAndFormattedElementDetails } from 'redux/elementdetails'
 
-import { RightsNotification } from 'components/RightsNotification'
-import { PopulationCourseStatsFlat } from 'components/PopulationCourseStats/PopulationCourseStatsFlat'
-import { useGetCustomPopulationQuery } from 'redux/populations'
-import { useGetStudentListCourseStatisticsQuery } from 'redux/populationCourses'
-import { PanelView } from 'components/common/PanelView'
-import { populationStatisticsToolTips } from 'common/InfoToolTips'
-import { useProgress, useTitle } from '../../common/hooks'
+import { useProgress, useTitle } from '@/common/hooks'
+import { populationStatisticsToolTips } from '@/common/InfoToolTips'
+import { PanelView } from '@/components/common/PanelView'
+import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
+import { RightsNotification } from '@/components/RightsNotification'
+import { useFilteredAndFormattedElementDetails } from '@/redux/elementdetails'
+import { useGetStudentListCourseStatisticsQuery } from '@/redux/populationCourses'
+import { useGetCustomPopulationQuery } from '@/redux/populations'
+import { useGetSemestersQuery } from '@/redux/semesters'
 import { CreditAccumulationGraphHighCharts } from '../CreditAccumulationGraphHighCharts'
-import { PopulationStudentsContainer as PopulationStudents } from '../PopulationStudents'
-import { CustomPopulationProgrammeDist } from './CustomPopulationProgrammeDist'
-import { ProgressBar } from '../ProgressBar'
-import { InfoBox } from '../Info/InfoBox'
 import { FilterView } from '../FilterView'
 import {
   ageFilter,
@@ -29,7 +25,11 @@ import {
   creditDateFilter,
   enrollmentStatusFilter,
 } from '../FilterView/filters'
+import { InfoBox } from '../Info/InfoBox'
 import { useLanguage } from '../LanguagePicker/useLanguage'
+import { PopulationStudentsContainer as PopulationStudents } from '../PopulationStudents'
+import { ProgressBar } from '../ProgressBar'
+import { CustomPopulationProgrammeDist } from './CustomPopulationProgrammeDist'
 import { CustomPopulationSearch } from './CustomPopulationSearch'
 import { UnihowDataExport } from './UnihowDataExport'
 

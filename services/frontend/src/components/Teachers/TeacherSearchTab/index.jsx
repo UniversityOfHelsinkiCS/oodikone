@@ -1,6 +1,6 @@
 import React from 'react'
-import { Message } from 'semantic-ui-react'
 import { useHistory } from 'react-router-dom'
+import { Message } from 'semantic-ui-react'
 
 import { TeacherSearch } from '../TeacherSearch'
 

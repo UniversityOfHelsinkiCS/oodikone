@@ -1,8 +1,9 @@
-import React from 'react'
-import { Form, Radio } from 'semantic-ui-react'
 import _ from 'lodash'
 import moment from 'moment'
-import { filterToolTips } from 'common/InfoToolTips'
+import React from 'react'
+import { Form, Radio } from 'semantic-ui-react'
+
+import { filterToolTips } from '@/common/InfoToolTips'
 import { createFilter } from './createFilter'
 
 const StudyrightStatusFilterCard = ({ options, onOptionsChange, combinedProgrammeCode }) => {

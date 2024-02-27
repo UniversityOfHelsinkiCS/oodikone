@@ -1,9 +1,9 @@
-import React from 'react'
-import { shape } from 'prop-types'
-import { Label, Header } from 'semantic-ui-react'
 import { sortBy } from 'lodash'
+import { shape } from 'prop-types'
+import React from 'react'
+import { Label, Header } from 'semantic-ui-react'
 
-import { useLanguage } from 'components/LanguagePicker/useLanguage'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SortableTable } from '../../SortableTable'
 
 export const TagsTable = ({ student }) => {

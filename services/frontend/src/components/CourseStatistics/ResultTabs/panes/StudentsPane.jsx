@@ -1,6 +1,7 @@
 import React from 'react'
-import { StudentsTable } from './tables/StudentsTable'
+
 import { Pane } from './Pane'
+import { StudentsTable } from './tables/StudentsTable'
 
 export const StudentsPane = ({ availableStats, datasets, separate, userHasAccessToAllStats, updateQuery }) => {
   return (

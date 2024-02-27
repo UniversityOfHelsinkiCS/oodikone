@@ -1,11 +1,12 @@
 import React from 'react'
 import { useParams } from 'react-router-dom'
 import { Header } from 'semantic-ui-react'
-import { useGetAllStudyGuidanceGroupsQuery } from 'redux/studyGuidanceGroups'
-import { useTitle } from 'common/hooks'
-import { StudyGuidanceGroupOverview } from './StudyGuidanceGroupOverview'
-import { SingleStudyGuidanceGroupContainer as SingleStudyGuidanceGroup } from './SingleStudyGuidanceGroup'
+
+import { useTitle } from '@/common/hooks'
+import { useGetAllStudyGuidanceGroupsQuery } from '@/redux/studyGuidanceGroups'
 import { Wrapper } from './common'
+import { SingleStudyGuidanceGroupContainer as SingleStudyGuidanceGroup } from './SingleStudyGuidanceGroup'
+import { StudyGuidanceGroupOverview } from './StudyGuidanceGroupOverview'
 
 export const StudyGuidanceGroups = () => {
   useTitle('Study guidance groups')

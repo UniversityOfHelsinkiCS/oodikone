@@ -1,12 +1,12 @@
-import React from 'react'
-import { func, arrayOf, object, shape, string, oneOfType, number } from 'prop-types'
-import { Card, Icon } from 'semantic-ui-react'
 import { minBy } from 'lodash'
+import { func, arrayOf, object, shape, string, oneOfType, number } from 'prop-types'
+import React from 'react'
+import { Card, Icon } from 'semantic-ui-react'
 
-import './populationQueryCard.css'
-import { reformatDate } from 'common'
-import { DISPLAY_DATE_FORMAT } from '../../constants'
+import { reformatDate } from '@/common'
+import { DISPLAY_DATE_FORMAT } from '@/constants'
 import { useLanguage } from '../LanguagePicker/useLanguage'
+import './populationQueryCard.css'
 
 export const PopulationQueryCard = ({ population, query, removeSampleFn, units, tags }) => {
   const { getTextIn } = useLanguage()

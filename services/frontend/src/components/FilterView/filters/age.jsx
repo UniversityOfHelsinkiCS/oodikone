@@ -1,8 +1,8 @@
-import React, { useMemo, useCallback } from 'react'
-import { RangeSelector } from 'components/common/RangeSelector'
-import { useDebounce } from 'common/hooks'
 import _ from 'lodash'
+import React, { useMemo, useCallback } from 'react'
 
+import { useDebounce } from '@/common/hooks'
+import { RangeSelector } from '@/components/common/RangeSelector'
 import { createFilter } from './createFilter'
 
 const getAge = toDate => {

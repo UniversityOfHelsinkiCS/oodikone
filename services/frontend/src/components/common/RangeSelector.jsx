@@ -1,6 +1,6 @@
+import _ from 'lodash'
 import React, { useState, useCallback } from 'react'
 import { Range, getTrackBackground } from 'react-range'
-import _ from 'lodash'
 import { Input } from 'semantic-ui-react'
 
 export const RangeSelector = ({ min, max, value, onChange, disabled = false }) => {

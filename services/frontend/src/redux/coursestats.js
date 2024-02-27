@@ -1,5 +1,5 @@
+import { callController } from '@/apiConnection/index'
 import { listreducer, actions } from './common/listreducer'
-import { callController } from '../apiConnection/index'
 
 const prefix = 'COURSESTATS_'
 

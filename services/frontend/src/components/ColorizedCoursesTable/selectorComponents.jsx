@@ -1,6 +1,7 @@
-import { useLanguage } from 'components/LanguagePicker/useLanguage'
 import React, { useMemo } from 'react'
 import { Dropdown, Radio } from 'semantic-ui-react'
+
+import { useLanguage } from 'components/LanguagePicker/useLanguage'
 import { useColorizedCoursesTableContext } from './common'
 import './index.css'
 

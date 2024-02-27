@@ -1,6 +1,7 @@
 import React from 'react'
-import { AttemptsTable } from './tables/AttemptsTable'
+
 import { Pane } from './Pane'
+import { AttemptsTable } from './tables/AttemptsTable'
 
 export const AttemptsPane = ({ availableStats, datasets, separate, userHasAccessToAllStats, updateQuery }) => {
   return (

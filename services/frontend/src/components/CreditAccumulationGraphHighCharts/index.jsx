@@ -1,16 +1,16 @@
 /* eslint-disable camelcase */
+import _ from 'lodash'
+import moment from 'moment'
 import React, { useState, useRef, useMemo } from 'react'
 import { renderToString } from 'react-dom/server'
-import moment from 'moment'
-import { Button, Radio } from 'semantic-ui-react'
-import _ from 'lodash'
 import ReactHighstock from 'react-highcharts/ReactHighstock'
+import { Button, Radio } from 'semantic-ui-react'
 
-import './creditAccumulationGraphHC.css'
-import { reformatDate, getStudyRightElementTargetDates } from 'common'
-import { CreditGraphTooltip } from './CreditGraphTooltip'
+import { reformatDate, getStudyRightElementTargetDates } from '@/common'
+import { DISPLAY_DATE_FORMAT, API_DATE_FORMAT } from '@/constants'
 import { useLanguage } from '../LanguagePicker/useLanguage'
-import { DISPLAY_DATE_FORMAT, API_DATE_FORMAT } from '../../constants'
+import { CreditGraphTooltip } from './CreditGraphTooltip'
+import './creditAccumulationGraphHC.css'
 
 const SINGLE_GRAPH_GOAL_SERIES_NAME = 'Goal'
 

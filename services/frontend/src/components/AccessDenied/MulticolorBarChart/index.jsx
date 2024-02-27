@@ -1,7 +1,8 @@
-import React from 'react'
 import { string, arrayOf } from 'prop-types'
+import React from 'react'
 import ReactHighchart from 'react-highcharts'
-import { graphDataType } from '../../../constants/types'
+
+import { graphDataType } from '@/constants/types'
 import './multicolorBarChart.css'
 
 export const MulticolorBarChart = props => {

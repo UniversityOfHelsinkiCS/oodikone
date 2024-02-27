@@ -1,15 +1,15 @@
+import { orderBy } from 'lodash'
 import React, { useState, useEffect } from 'react'
 import { connect, useDispatch } from 'react-redux'
 import { Tab } from 'semantic-ui-react'
-import { orderBy } from 'lodash'
 
-import { clearCourseStats } from 'redux/coursestats'
-import { useTabChangeAnalytics } from '../../common/hooks'
+import { useTabChangeAnalytics } from '@/common/hooks'
+import { clearCourseStats } from '@/redux/coursestats'
+import { GradeDistribution } from './GradeDistribution'
+import { PassFailEnrollments } from './PassFailEnrollments'
 import { PassingSemesters } from './PassingSemesters'
 import './populationCourseStats.css'
 import { PopulationCourseContext } from './PopulationCourseContext'
-import { GradeDistribution } from './GradeDistribution'
-import { PassFailEnrollments } from './PassFailEnrollments'
 import { Students } from './Students'
 
 const tableColumnNames = {

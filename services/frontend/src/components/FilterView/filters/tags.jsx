@@ -1,6 +1,7 @@
+import fp from 'lodash/fp'
 import React from 'react'
 import { Form, Dropdown, Message } from 'semantic-ui-react'
-import fp from 'lodash/fp'
+
 import { createFilter } from './createFilter'
 
 const TagsFilterCard = ({ options, onOptionsChange, withoutSelf }) => {

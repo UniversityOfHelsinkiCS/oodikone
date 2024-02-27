@@ -1,9 +1,10 @@
+import { orderBy } from 'lodash'
+import { string, arrayOf, shape, func, oneOfType, number } from 'prop-types'
 import React from 'react'
 import { Form } from 'semantic-ui-react'
-import { string, arrayOf, shape, func, oneOfType, number } from 'prop-types'
-import { orderBy } from 'lodash'
-import { DropdownItem } from './DropdownItem'
+
 import { ClearableItem } from './ClearableItem'
+import { DropdownItem } from './DropdownItem'
 
 export const ProgrammeDropdown = ({ options, label, name, onChange, onClear, value, ...props }) => (
   <Form.Dropdown

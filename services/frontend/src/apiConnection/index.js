@@ -1,7 +1,8 @@
-import axios from 'axios'
-import * as Sentry from '@sentry/browser'
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { showAsUserKey } from 'common'
+import * as Sentry from '@sentry/browser'
+import axios from 'axios'
+
+import { showAsUserKey } from '@/common'
 import { apiBasePath, isDev } from '../conf'
 
 const getHeaders = () => {

@@ -1,17 +1,17 @@
 import React, { useState } from 'react'
 import { Divider, Header, Loader, Message } from 'semantic-ui-react'
 
+import { facultyToolTips } from '@/common/InfoToolTips'
 import {
   useGetFacultiesQuery,
   useGetFacultyProgressStatsQuery,
   useGetFacultyGraduationTimesQuery,
-} from 'redux/facultyStats'
-import { facultyToolTips } from 'common/InfoToolTips'
-import { FacultyGraduations } from './FacultyGraduations'
-import { FacultyProgress } from './FacultyProgress'
-import { Toggle } from '../StudyProgramme/Toggle'
+} from '@/redux/facultyStats'
 import { InfoBox } from '../Info/InfoBox'
 import { useLanguage } from '../LanguagePicker/useLanguage'
+import { Toggle } from '../StudyProgramme/Toggle'
+import { FacultyGraduations } from './FacultyGraduations'
+import { FacultyProgress } from './FacultyProgress'
 import '../FacultyStatistics/faculty.css'
 
 export const FacultyView = ({ faculty }) => {

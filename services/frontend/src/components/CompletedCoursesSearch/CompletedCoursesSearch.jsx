@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react'
-import { Modal, Form, Button, TextArea, Loader } from 'semantic-ui-react'
 import qs from 'query-string'
+import React, { useState, useEffect } from 'react'
 import { useLocation, useHistory } from 'react-router-dom'
+import { Modal, Form, Button, TextArea, Loader } from 'semantic-ui-react'
 
+import { SearchHistory } from '@/components/SearchHistory'
 import {
   useGetSavedCourseListsQuery,
   useCreateCourseListMutation,
   useUpdateCourseListMutation,
   useDeleteCourseListMutation,
-} from 'redux/completedCoursesSearch'
-import { SearchHistory } from 'components/SearchHistory'
+} from '@/redux/completedCoursesSearch'
 
 export const CompletedCoursesSearch = ({ setValues }) => {
   const location = useLocation()

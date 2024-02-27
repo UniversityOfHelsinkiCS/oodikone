@@ -1,12 +1,12 @@
-import React, { useMemo, useState } from 'react'
 import _ from 'lodash'
+import React, { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Item, Icon, Button } from 'semantic-ui-react'
 
-import { SortableTable, group } from 'components/SortableTable'
-import { useLanguage } from 'components/LanguagePicker/useLanguage'
-import { UsePopulationCourseContext } from '../PopulationCourseContext'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { SortableTable, group } from '@/components/SortableTable'
 import { CourseFilterToggle } from '../CourseFilterToggle'
+import { UsePopulationCourseContext } from '../PopulationCourseContext'
 
 const semesterColumn = (year, semester, cumulative) => ({
   key: `semester-${year}-${semester}`,

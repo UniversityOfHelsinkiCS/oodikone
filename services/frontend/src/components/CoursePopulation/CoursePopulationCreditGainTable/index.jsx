@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react'
-import { Table, Tab } from 'semantic-ui-react'
 import { maxBy } from 'lodash'
 import moment from 'moment'
+import React, { useEffect, useState } from 'react'
+import { Table, Tab } from 'semantic-ui-react'
 
-import { useGetFacultiesQuery } from 'redux/facultyStats'
-import { populationStatisticsToolTips } from 'common/InfoToolTips'
-import { getNewestProgramme } from 'common'
+import { getNewestProgramme } from '@/common'
+import { populationStatisticsToolTips } from '@/common/InfoToolTips'
+import { useGetFacultiesQuery } from '@/redux/facultyStats'
 import { InfoBox } from '../../Info/InfoBox'
 import { useLanguage } from '../../LanguagePicker/useLanguage'
 

@@ -2,8 +2,8 @@
 import React from 'react'
 import ReactHighcharts from 'react-highcharts'
 
-import { useLanguage } from 'components/LanguagePicker/useLanguage'
 import { generateGradientColors } from '@/common'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 
 export const ProgrammeProgressChart = ({ data, labels, longLabels, names }) => {
   const { getTextIn } = useLanguage()

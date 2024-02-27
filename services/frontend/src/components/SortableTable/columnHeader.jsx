@@ -1,17 +1,17 @@
 /* eslint-disable no-return-assign */
-import React, { useRef, useState, useEffect, useMemo, useCallback } from 'react'
-import { useContextSelector } from 'use-context-selector'
 import { produce } from 'immer'
-import { Icon, Popup } from 'semantic-ui-react'
 import _ from 'lodash'
+import React, { useRef, useState, useEffect, useMemo, useCallback } from 'react'
+import { Icon, Popup } from 'semantic-ui-react'
+import { useContextSelector } from 'use-context-selector'
 
-import './style.css'
-import { SortableTableContext, getDataItemType, DataItemType, thickBorderStyles } from './common'
-import { defaultColumnFilter } from './filters/defaultFilter'
-import { dateColumnFilter } from './filters/dateFilter'
-import { rangeColumnFilter } from './filters/rangeFilter'
-import { multiSelectColumnFilter } from './filters/multiSelectFilter'
 import { resolveDisplayColumn } from './columnContent'
+import { SortableTableContext, getDataItemType, DataItemType, thickBorderStyles } from './common'
+import { dateColumnFilter } from './filters/dateFilter'
+import { defaultColumnFilter } from './filters/defaultFilter'
+import { multiSelectColumnFilter } from './filters/multiSelectFilter'
+import { rangeColumnFilter } from './filters/rangeFilter'
+import './style.css'
 
 const getDefaultColumnOptions = () => ({
   valueFilters: [],

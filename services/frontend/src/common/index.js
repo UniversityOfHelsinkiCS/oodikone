@@ -1,7 +1,8 @@
-import moment from 'moment'
 import { range, filter, maxBy, intersection } from 'lodash'
-import toskaLogo from '../assets/toska.png'
+import moment from 'moment'
+
 import irtomikko from '../assets/irtomikko.png'
+import toskaLogo from '../assets/toska.png'
 
 export const textAndDescriptionSearch = (dropDownOptions, param) =>
   filter(dropDownOptions, option =>

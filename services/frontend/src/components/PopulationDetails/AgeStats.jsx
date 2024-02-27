@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
 import PropTypes, { shape } from 'prop-types'
+import React, { useState } from 'react'
 import { Table, Progress, Radio, Icon } from 'semantic-ui-react'
-import { useGetAuthorizedUserQuery } from 'redux/auth'
+
+import { useGetAuthorizedUserQuery } from '@/redux/auth'
 
 // https://stackoverflow.com/a/7091965
 const getAge = toDate => {

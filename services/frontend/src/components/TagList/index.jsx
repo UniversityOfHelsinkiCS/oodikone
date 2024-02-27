@@ -1,12 +1,12 @@
+import { func, string, arrayOf, shape, bool } from 'prop-types'
 import React, { memo, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Table } from 'semantic-ui-react'
-import { func, string, arrayOf, shape, bool } from 'prop-types'
 
-import { getTagsByStudytrackAction } from 'redux/tags'
-import { getStudentTagsByStudytrackAction } from 'redux/tagstudent'
+import { getTagsByStudytrackAction } from '@/redux/tags'
+import { getStudentTagsByStudytrackAction } from '@/redux/tagstudent'
+import { makePopulationsToData } from '@/selectors/populationDetails'
 import { ConnectedTagStudent as TagStudent } from '../TagStudent'
-import { makePopulationsToData } from '../../selectors/populationDetails'
 
 const Row = memo(
   ({ studentsTags, sn, studytrack, tagOptions, name, combinedProgramme }) => (

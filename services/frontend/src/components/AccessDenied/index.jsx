@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react'
-import { Transition, Dimmer, Header, Image, Container, Button } from 'semantic-ui-react'
-import ReactHighchart from 'react-highcharts'
 import { random } from 'lodash'
-import { useLogoutMutation } from 'redux/auth'
-import { images } from '../../common'
+import React, { useState, useEffect } from 'react'
+import ReactHighchart from 'react-highcharts'
+import { Transition, Dimmer, Header, Image, Container, Button } from 'semantic-ui-react'
+
+import { images } from '@/common'
+import { useLogoutMutation } from '@/redux/auth'
 import { MulticolorBarChart } from './MulticolorBarChart'
 
 // add github handles of oodikone devs here

@@ -1,8 +1,8 @@
-import React from 'react'
 import _ from 'lodash'
+import React from 'react'
 import { Table } from 'semantic-ui-react'
 
-import { getStudentTotalCredits } from 'common'
+import { getStudentTotalCredits } from '@/common'
 
 export const StatisticsTable = ({ filteredStudents, type }) => {
   if (!filteredStudents || !filteredStudents.length) return null

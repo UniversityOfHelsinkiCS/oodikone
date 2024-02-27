@@ -2,12 +2,12 @@ import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Segment } from 'semantic-ui-react'
 
-import { PopulationCourseStatsFlat } from 'components/PopulationCourseStats/PopulationCourseStatsFlat'
-import { populationStatisticsToolTips } from 'common/InfoToolTips'
-import { SegmentDimmer } from 'components/SegmentDimmer'
-import { ConnectedPopulationCourseStats as PopulationCourseStats } from 'components/PopulationCourseStats'
-import { InfoBox } from 'components/Info/InfoBox'
-import { getPopulationSelectedStudentCourses } from 'redux/populationSelectedStudentCourses'
+import { populationStatisticsToolTips } from '@/common/InfoToolTips'
+import { InfoBox } from '@/components/Info/InfoBox'
+import { ConnectedPopulationCourseStats as PopulationCourseStats } from '@/components/PopulationCourseStats'
+import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
+import { SegmentDimmer } from '@/components/SegmentDimmer'
+import { getPopulationSelectedStudentCourses } from '@/redux/populationSelectedStudentCourses'
 import { FilterDegreeCoursesModal } from './FilterDegreeCoursesModal'
 
 export const PopulationCourses = ({

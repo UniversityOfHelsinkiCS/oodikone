@@ -1,7 +1,8 @@
-import React from 'react'
 import produce from 'immer'
 import _ from 'lodash'
-import { setFilterOptions } from '../../../redux/filters'
+import React from 'react'
+
+import { setFilterOptions } from '@/redux/filters'
 
 export const createFilter = options => {
   const Component = options.component

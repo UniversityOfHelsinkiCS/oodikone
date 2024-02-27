@@ -1,10 +1,10 @@
+import _ from 'lodash'
 import React, { useState } from 'react'
 import { Icon, Accordion, Table, Popup } from 'semantic-ui-react'
-import _ from 'lodash'
 
-import { useGetSemestersQuery } from 'redux/semesters'
-import { useLanguage } from 'components/LanguagePicker/useLanguage'
-import { getSemestersPresentFunctions } from 'components/PopulationStudents/StudentTable/GeneralTab/columnHelpers/semestersPresent'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { getSemestersPresentFunctions } from '@/components/PopulationStudents/StudentTable/GeneralTab/columnHelpers/semestersPresent'
+import { useGetSemestersQuery } from '@/redux/semesters'
 
 const calculateSemesterEnrollmentsByStudyright = (semestersAndYears, studyrights) => {
   const { semesters, years } = semestersAndYears

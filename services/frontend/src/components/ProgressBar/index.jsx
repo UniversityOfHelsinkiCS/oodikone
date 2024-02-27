@@ -1,7 +1,8 @@
+import { bool, number } from 'prop-types'
 import React, { useState, useEffect, useRef } from 'react'
 import { Progress } from 'semantic-ui-react'
-import { bool, number } from 'prop-types'
-import { useDidMount } from '../../common/hooks'
+
+import { useDidMount } from '@/common/hooks'
 import './progressBar.css'
 
 export const ProgressBar = ({ progress, fixed }) => {

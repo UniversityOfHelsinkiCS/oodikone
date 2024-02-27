@@ -1,9 +1,10 @@
+import _ from 'lodash'
 import React, { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Icon, Item } from 'semantic-ui-react'
-import { SortableTable, group } from 'components/SortableTable'
-import _ from 'lodash'
-import { useLanguage } from 'components/LanguagePicker/useLanguage'
+
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { SortableTable, group } from '@/components/SortableTable'
 import { CourseFilterToggle } from '../CourseFilterToggle'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
 

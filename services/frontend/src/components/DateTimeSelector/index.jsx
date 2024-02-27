@@ -1,11 +1,12 @@
+import moment from 'moment'
 import React, { useRef } from 'react'
 import Datetime from 'react-datetime'
 import { Icon, Button } from 'semantic-ui-react'
-import moment from 'moment'
 import 'moment/locale/fi'
-import { useGetSemestersQuery } from 'redux/semesters'
+
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { useGetSemestersQuery } from '@/redux/semesters'
 import './style.css'
-import { useLanguage } from 'components/LanguagePicker/useLanguage'
 
 const semesterListStyles = {
   maxHeight: '10em',

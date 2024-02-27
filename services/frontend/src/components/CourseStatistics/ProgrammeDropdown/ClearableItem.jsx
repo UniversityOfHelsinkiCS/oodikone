@@ -1,6 +1,6 @@
+import { string, func } from 'prop-types'
 import React from 'react'
 import { Icon } from 'semantic-ui-react'
-import { string, func } from 'prop-types'
 
 const styles = {
   container: {

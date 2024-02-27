@@ -1,7 +1,8 @@
-import { RTKApi } from 'apiConnection'
 import { useHistory } from 'react-router-dom'
-import { showAsUserKey } from 'common'
-import { isDev } from 'conf'
+
+import { RTKApi } from '@/apiConnection'
+import { showAsUserKey } from '@/common'
+import { isDev } from '@/conf'
 
 const authorizationApi = RTKApi.injectEndpoints({
   endpoints: builder => ({

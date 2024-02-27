@@ -1,13 +1,8 @@
+import _ from 'lodash'
 import React, { useState, useMemo, useReducer, useCallback } from 'react'
 import { Icon } from 'semantic-ui-react'
-import _ from 'lodash'
 
-import { FigureContainer } from './FigureContainer'
-import { ExportModal } from './ExportModal'
-import { row, group, SortableTableContext, cloneColumns } from './common'
-import { SortingFilteringVisitor } from './visitors/SortingFilteringVisitor'
-import { ValueVisitor } from './visitors/ValueVisitor'
-import './style.css'
+import { DataItem, getKey, computeColumnSpans } from './columnContent'
 import {
   insertGroupColumns,
   injectParentPointers,
@@ -18,7 +13,12 @@ import {
   getInitialState,
   ColumnFilters,
 } from './columnHeader'
-import { DataItem, getKey, computeColumnSpans } from './columnContent'
+import { row, group, SortableTableContext, cloneColumns } from './common'
+import { ExportModal } from './ExportModal'
+import { FigureContainer } from './FigureContainer'
+import { SortingFilteringVisitor } from './visitors/SortingFilteringVisitor'
+import { ValueVisitor } from './visitors/ValueVisitor'
+import './style.css'
 
 /*
 *** SortableTable documentation ***

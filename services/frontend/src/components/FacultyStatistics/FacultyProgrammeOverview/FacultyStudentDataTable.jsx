@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { Table, Button, Icon, Label, Popup } from 'semantic-ui-react'
 
-import { PopulationLink } from 'components/StudyProgramme/StudytrackOverview/PopulationLink'
-import { useLanguage } from 'components/LanguagePicker/useLanguage'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { PopulationLink } from '@/components/StudyProgramme/StudytrackOverview/PopulationLink'
 import { Toggle } from '../../StudyProgramme/Toggle'
 
 const getStyle = idx => {
