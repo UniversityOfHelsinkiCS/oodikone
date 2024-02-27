@@ -19,10 +19,16 @@ class ErrorBoundary extends Component {
 
   componentDidCatch(error, errorInfo) {
     const { actionHistory } = this.props
+    const cleanedActionHistory = actionHistory ? actionHistory.map(({ payload, ...rest }) => rest) : []
+    const encoder = new TextEncoder()
+    // Sentry's maximum for an individual extra data item is 16kB so let's make sure we don't exceed that
+    while (encoder.encode(JSON.stringify(cleanedActionHistory)).length > 16000) {
+      cleanedActionHistory.shift()
+    }
     Sentry.withScope(scope => {
       scope.setExtras({
         ...errorInfo,
-        actionHistory: actionHistory ? JSON.stringify(actionHistory) : undefined,
+        actionHistory: JSON.stringify(cleanedActionHistory),
       })
       Sentry.captureException(error)
     })
