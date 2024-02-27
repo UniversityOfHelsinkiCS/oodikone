@@ -13,6 +13,7 @@ const { getAssociations } = require('./services/studyrights')
 const { redisClient } = require('./services/redis')
 const { computeLanguageCenterData, LANGUAGE_CENTER_REDIS_KEY } = require('./services/languageCenterData')
 const { jobMaker } = require('./worker/queue')
+const { deleteOutdatedUsers } = require('./services/userService')
 
 const schedule = (cronTime, func) => new CronJob({ cronTime, onTick: func, start: true, timeZone: 'Europe/Helsinki' })
 
@@ -108,6 +109,11 @@ const startCron = () => {
     schedule('0 23 * * *', async () => {
       logger.info('Running daily jobs from cron')
       dailyJobs()
+    })
+    schedule('0 4 * * 3', async () => {
+      logger.info("Deleting users who haven't logged in for 18 months")
+      const numberOfDeletedUsers = await deleteOutdatedUsers()
+      logger.info(`Deleted ${numberOfDeletedUsers} users.`)
     })
     schedule('0 19 * * 1', async () => {
       logger.info('Updating students whose studyplans have not been updated recently')

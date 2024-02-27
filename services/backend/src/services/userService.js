@@ -8,6 +8,7 @@ const { checkStudyGuidanceGroupsAccess, getAllStudentsUserHasInGroups } = requir
 const { User, UserElementDetails, AccessGroup } = require('../models/models_user')
 const { getUserIams, getAllUserAccess, getUserIamAccess } = require('../util/jami')
 const { createLocaleComparator } = require('../util/utils')
+const { sequelizeUser } = require('../database/connection')
 
 const courseStatisticsGroup = 'grp-oodikone-basic-users'
 const facultyStatisticsGroup = 'grp-oodikone-users'
@@ -56,6 +57,34 @@ const byId = async id =>
       id,
     },
     include: userIncludes,
+  })
+
+const deleteOutdatedUsers = async () =>
+  await sequelizeUser.transaction(async t => {
+    const outdatedUsersCTE = `
+      WITH outdated_users AS (
+        SELECT id FROM users
+        WHERE last_login IS NULL OR last_login < CURRENT_DATE - INTERVAL '18 months'
+      )`
+
+    await sequelizeUser.query(
+      `${outdatedUsersCTE} DELETE FROM user_faculties WHERE "userId" IN (SELECT id FROM outdated_users)`,
+      { transaction: t }
+    )
+    await sequelizeUser.query(
+      `${outdatedUsersCTE} DELETE FROM user_accessgroup WHERE "userId" IN (SELECT id FROM outdated_users)`,
+      { transaction: t }
+    )
+    await sequelizeUser.query(
+      `${outdatedUsersCTE} DELETE FROM user_elementdetails WHERE "userId" IN (SELECT id FROM outdated_users)`,
+      { transaction: t }
+    )
+    const [results] = await sequelizeUser.query(
+      `${outdatedUsersCTE} DELETE FROM users WHERE id IN (SELECT id FROM outdated_users) RETURNING id`,
+      { transaction: t }
+    )
+
+    return results.length
   })
 
 // Crud things from old userservice
@@ -376,4 +405,5 @@ module.exports = {
   getUser,
   getMockedUser,
   getOrganizationAccess,
+  deleteOutdatedUsers,
 }
