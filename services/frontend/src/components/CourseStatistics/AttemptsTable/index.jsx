@@ -1,8 +1,7 @@
+import { arrayOf, bool, func, string } from 'prop-types'
 import React from 'react'
 import { Table } from 'semantic-ui-react'
-import { string, arrayOf, func, bool } from 'prop-types'
-
-import { courseDataWithRealisationsType } from '../../../constants/types'
+import { courseDataWithRealisationsType } from '@/constants/types'
 import { FoldableRow } from './foldableRow'
 
 const getHeader = categoryName => {

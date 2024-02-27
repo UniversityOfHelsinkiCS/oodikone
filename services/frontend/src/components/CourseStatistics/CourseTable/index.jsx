@@ -1,9 +1,9 @@
-import React from 'react'
 import { sortBy } from 'lodash'
+import React from 'react'
 import { Table } from 'semantic-ui-react'
-import { func, arrayOf, shape, string, bool } from 'prop-types'
+import { arrayOf, func, bool, shape, string } from 'prop-types'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { getActiveYears } from '../courseStatisticsUtils'
-import { useLanguage } from '../../LanguagePicker/useLanguage'
 import './courseTable.css'
 
 const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, mandatory = false, controlIcon }) => {
