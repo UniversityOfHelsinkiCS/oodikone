@@ -1,39 +1,38 @@
-import React, { useEffect, useState, useMemo } from 'react'
-import moment from 'moment'
 import _ from 'lodash'
-import { Segment, Header, Form, Input } from 'semantic-ui-react'
+import moment from 'moment'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-
-import { InfoBox } from 'components/Info/InfoBox'
-import { PopulationCourseStatsFlat } from 'components/PopulationCourseStats/PopulationCourseStatsFlat'
-import { PanelView } from 'components/common/PanelView'
-import { useGetPopulationStatisticsByCourseQuery } from 'redux/populations'
-import { useGetSingleCourseStatsQuery } from 'redux/singleCourseStats'
-import { useGetStudentListCourseStatisticsQuery } from 'redux/populationCourses'
-import { useGetSemestersQuery } from 'redux/semesters'
-import { populationStatisticsToolTips } from 'common/InfoToolTips'
-import { getStudentToTargetCourseDateMap, getUnifyTextIn } from 'common'
-import { useProgress, useTitle } from 'common/hooks'
-import { queryParamsFromUrl } from 'common/query'
-import { PopulationStudentsContainer as PopulationStudents } from '../PopulationStudents'
-import { CoursePopulationGradeDist } from './CoursePopulationGradeDist'
-import { CoursePopulationLanguageDist } from './CoursePopulationLanguageDist'
-import { CoursePopulationCreditGainTable } from './CoursePopulationCreditGainTable'
-import { CustomPopulationProgrammeDist } from '../CustomPopulation/CustomPopulationProgrammeDist'
-import { ProgressBar } from '../ProgressBar'
+import { Form, Header, Input, Segment } from 'semantic-ui-react'
+import { getStudentToTargetCourseDateMap, getUnifyTextIn } from '@/common'
+import { useProgress, useTitle } from '@/common/hooks'
+import { queryParamsFromUrl } from '@/common/query'
+import { populationStatisticsToolTips } from '@/common/InfoToolTips'
+import { PanelView } from '@/components/common/PanelView'
+import { CustomPopulationProgrammeDist } from '@/components/CustomPopulation/CustomPopulationProgrammeDist'
+import { FilterView } from '@/components/FilterView'
 import {
   ageFilter,
-  gradeFilter,
-  genderFilter,
   courseFilter,
   creditsEarnedFilter,
-  startYearAtUniFilter,
+  genderFilter,
+  gradeFilter,
   programmeFilter,
-  studyTrackFilter,
+  startYearAtUniFilter,
   studentNumberFilter,
-} from '../FilterView/filters'
-import { FilterView } from '../FilterView'
-import { useLanguage } from '../LanguagePicker/useLanguage'
+  studyTrackFilter,
+} from '@/components/FilterView/filters'
+import { InfoBox } from '@/components/Info/InfoBox'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
+import { PopulationStudentsContainer as PopulationStudents } from '@/components/PopulationStudents'
+import { ProgressBar } from '@/components/ProgressBar'
+import { useGetPopulationStatisticsByCourseQuery } from '@/redux/populations'
+import { useGetStudentListCourseStatisticsQuery } from '@/redux/populationCourses'
+import { useGetSemestersQuery } from '@/redux/semesters'
+import { useGetSingleCourseStatsQuery } from '@/redux/singleCourseStats'
+import { CoursePopulationCreditGainTable } from './CoursePopulationCreditGainTable'
+import { CoursePopulationLanguageDist } from './CoursePopulationLanguageDist'
+import { CoursePopulationGradeDist } from './CoursePopulationGradeDist'
 
 const NO_PROGRAMME = {
   code: '00000',
