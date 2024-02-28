@@ -2,6 +2,7 @@ import moment from 'moment'
 import React, { useState } from 'react'
 import { Form, Segment, Dropdown, Button, Message } from 'semantic-ui-react'
 
+import { createLocaleComparator } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProvidersQuery } from '@/redux/providers'
@@ -40,6 +41,7 @@ export const TeacherStatistics = () => {
 
   /*
     Maps new studyright codes to providercodes. Just a wild guess on how the codes are structured....
+    The same logic as in backend's mapToProviders function.
     --------
     KH50_005
     500-K005
@@ -64,6 +66,20 @@ export const TeacherStatistics = () => {
         const suffix = `${left[0]}${right}`
         const providercode = `${prefix}0-${suffix}`
         return providercode
+      }
+      if (/^(T)[0-9]{6}$/.test(r)) {
+        const numbers = r.substring(1)
+        const courseProvider = `7${numbers}`
+        const asNum = Number(courseProvider)
+        // God-awful hack to fix a bunch of doctoral degrees
+        // that got the wrong provider
+        if (asNum > 7920102 && asNum < 7920111) {
+          return `${asNum + 1}`
+        }
+        if (asNum === 7920111) {
+          return '7920103'
+        }
+        return `${asNum}`
       }
       return r
     })
@@ -90,11 +106,13 @@ export const TeacherStatistics = () => {
   const userProviders = mapToProviders(rights)
   const invalidQueryParams = provs.length === 0 || !semesterStart
   const providerOptions = isAdmin ? providers : providers.filter(p => userProviders.includes(p.code))
-  const localizedProviderOptions = providerOptions.map(({ name, code }) => ({
-    key: code,
-    value: code,
-    text: getTextIn(name),
-  }))
+  const localizedProviderOptions = providerOptions
+    .map(({ name, code }) => ({
+      key: code,
+      value: code,
+      text: getTextIn(name),
+    }))
+    .sort(createLocaleComparator('text'))
   const filteredOptions = semesters.filter(sem => {
     const options =
       moment(new Date()).diff(new Date(`${new Date().getFullYear()}-8-1`), 'days') > 0
