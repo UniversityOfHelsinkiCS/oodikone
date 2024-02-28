@@ -204,7 +204,6 @@ set_up_oodikone_from_scratch() {
   infomsg "Cleaning up docker setup and node_modules from possible previous installations"
   local compose_down_args="--remove-orphans --volumes --rmi all"
   "$PROJECT_ROOT"/run.sh both down "$compose_down_args" || infomsg "Cleaning errored, but will continue"
-  docker-compose --file "$PROJECT_ROOT"/docker-compose.test.yml "$compose_down_args" || infomsg "Cleaning errored, but will continue"
   docker-compose --file "$PROJECT_ROOT"/docker-compose.ci.yml "$compose_down_args" || infomsg "Cleaning errored, but will continue"
   for folder in "${folders_to_set_up[@]}"; do
     cd "$folder" || die "Couldn't change directory to folder $folder"

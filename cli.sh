@@ -22,7 +22,7 @@ trap cleanup SIGINT SIGTERM ERR EXIT
 cleanup() {
   trap - SIGINT SIGTERM ERR EXIT
   warningmsg "Trying to run docker-compose down and remove orphans"
-  docker-compose down --remove-orphans
+  docker-compose --profile oodikone --profile updater down --remove-orphans
 }
 
 # === CLI ===
