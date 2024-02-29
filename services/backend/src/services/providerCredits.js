@@ -28,19 +28,24 @@ const { getCourseCodesOfProvider } = require('./providers')
   'separate'
   Erillisoikeus: opintosuoritukset, joiden suorituksen luokittelu on "erillisellä opiskeluoikeudella" tai 
   "opettajankoulutuksen erillisellä opiskeluikeudella" suoritettu. Ei sisällä kansainvälisten vaihto-opiskelijoiden suorituksia.
-  Ulkomailta hyväksiluetut opintopisteet: ulkomailta hyväksilutetut opintopisteet.
 
   'transferred'
+  Ulkomailta hyväksiluetut opintopisteet: ulkomailta hyväksilutetut opintopisteet.
   Muut hyväksiluetut opintopisteet: kotimaassa suoritetut, hyväksiluetut opintopisteet.
+
+  Possible ambiguities / mistakes:
+  Rapo may use createddate instead of attainment_date to determine if student had active studyright.
+  This is probably very rare to cause differences, only one such was found in MH60_001
+
 */
 
-const getCategory = (extent, hadDegreeStudyright) => {
-  if ([1, 2, 3, 4].includes(extent) || hadDegreeStudyright) return 'basic' // Rapo-kategoria: Perustutkinto-opiskelijat
-  if (extent === 7 || extent === 34) return 'incoming-exchange' // Saapuvat vaihto-opiskelijat
-  if (extent === 9 && !hadDegreeStudyright) return 'open-uni' // Avoimen opiskeluoikeus, ei tutkinto-opiskelija
-  if (extent === 14) return 'agreement' // Korkeakoulujen väliset yhteistyöopinnot
-  if (extent === 99) return 'separate' // Erillisoikeus
-  return 'other'
+const getCategory = (extent, degreeStudyright) => {
+  if ([7, 34].includes(extent)) return 'incoming-exchange' // Saapuvat vaihto-opiskelijat
+  if ([9, 31].includes(extent) && !degreeStudyright) return 'open-uni' // Avoimen opiskeluoikeus, ei tutkinto-opiskelija
+  if ([14, 16].includes(extent)) return 'agreement' // Korkeakoulujen väliset yhteistyöopinnot
+  if ([13, 18, 22, 23, 99].includes(extent)) return 'separate' // Erillisoikeus
+  if ([1, 2].includes(extent) || (degreeStudyright && [1, 2].includes(degreeStudyright.extentcode))) return 'basic' // Rapo-kategoria: Perustutkinto-opiskelijat
+  return 'other' // TODO: These still happen, but not a lot. Should be investigated which go here and where they should go instead
 }
 
 /*
@@ -59,16 +64,14 @@ const findRelevantStudyright = (attainmentDate, studyrights) => {
   })
 }
 
-// At the given date, student had SOME degree-studyright.
-const isDegreeStudent = (studyrights, date) =>
-  studyrights?.some(sr => {
+const getDegreeStudyright = (studyrights, date, semestercode) =>
+  studyrights?.find(sr => {
     const rightExtentCode = [1, 2, 3, 4].includes(sr.extentcode)
     const rightDates =
       new Date(sr.startdate).getTime() <= new Date(date).getTime() &&
       new Date(date).getTime() <= new Date(sr.enddate).getTime()
-    // it is possible to also check if student had active semester enrollment to the studyright here.
-    // However, it is unsure if rapo requires this (seems like maybe not). shouldn't make a huge difference.
-    return rightExtentCode && rightDates
+    const enrolled = sr.semesterEnrollments?.some(e => e.semestercode === semestercode && e.enrollmenttype === 1)
+    return rightExtentCode && rightDates && enrolled
   })
 
 const getCreditsProduced = async (provider, isAcademicYear, specialIncluded = true) => {
@@ -82,9 +85,23 @@ const getCreditsProduced = async (provider, isAcademicYear, specialIncluded = tr
 /* Calculates credits produced by provider (programme or faculty) */
 const computeCreditsProduced = async (providerCode, isAcademicYear, specialIncluded = true) => {
   const since = new Date('2017-01-01')
-  const providercode = mapToProviders([providerCode])[0]
-  const courses = await getCourseCodesOfProvider(providercode)
-  const credits = await getCreditsForProvider(providercode, courses, since)
+  const rapoFormattedProviderCode = mapToProviders([providerCode])[0]
+  const courses = await getCourseCodesOfProvider(rapoFormattedProviderCode)
+  const credits = await getCreditsForProvider(rapoFormattedProviderCode, courses, since)
+
+  // This part also adds oikis vaasa which is provided by different organization.
+  // Uknown if there are other similar cases!
+  const vaasaCodes = {
+    '200-K001': '200-K0012',
+    '200-M001': '200-M0012',
+  }
+  const vaasaProvider = vaasaCodes[rapoFormattedProviderCode]
+  if (vaasaProvider) {
+    const courses = await getCourseCodesOfProvider(vaasaProvider)
+    const vaasaCredits = await getCreditsForProvider(vaasaProvider, courses, since)
+    credits.push(...vaasaCredits)
+  }
+
   const students = [...new Set(credits.map(({ studentNumber }) => studentNumber))]
 
   const transfers = (await allTransfers(providerCode, since)).map(t => t.studyrightid)
@@ -107,13 +124,17 @@ const computeCreditsProduced = async (providerCode, isAcademicYear, specialInclu
 
   const stats = {}
 
-  credits.forEach(({ attainmentDate, studentNumber, credits, studyrightId }) => {
+  credits.forEach(({ attainmentDate, studentNumber, credits, studyrightId, semestercode }) => {
     const relevantStudyright = studyrightId
       ? studyrightIdToStudyrightMap[studyrightId]
       : findRelevantStudyright(attainmentDate, studentNumberToStudyrightsMap[studentNumber])
     const attainmentYear = defineYear(attainmentDate, isAcademicYear)
-    const hadDegreeStudyright = isDegreeStudent(studentNumberToStudyrightsMap[studentNumber], attainmentDate)
-    const category = relevantStudyright ? getCategory(relevantStudyright.extentcode, hadDegreeStudyright) : 'other'
+    const degreeStudyright = getDegreeStudyright(
+      studentNumberToStudyrightsMap[studentNumber],
+      attainmentDate,
+      semestercode
+    )
+    const category = relevantStudyright ? getCategory(relevantStudyright.extentcode, degreeStudyright) : 'other'
     if (!stats[attainmentYear]) stats[attainmentYear] = { transferred: 0 }
     stats[attainmentYear].total += credits
     if (!stats[attainmentYear][category]) {
@@ -122,10 +143,13 @@ const computeCreditsProduced = async (providerCode, isAcademicYear, specialInclu
     stats[attainmentYear][category] += credits
   })
 
-  const transferredCredits = await getTransferredCredits(providercode, since)
-
-  transferredCredits.forEach(({ attainment_date, credits }) => {
-    const attainmentYear = defineYear(attainment_date, isAcademicYear)
+  const transferredCredits = await getTransferredCredits(rapoFormattedProviderCode, since)
+  if (vaasaProvider) {
+    const vaasaTransferredCredits = await getTransferredCredits(vaasaProvider, since)
+    transferredCredits.push(...vaasaTransferredCredits)
+  }
+  transferredCredits.forEach(({ createdate, credits }) => {
+    const attainmentYear = defineYear(createdate, isAcademicYear)
     if (!stats[attainmentYear]) stats[attainmentYear] = { transferred: 0 }
     stats[attainmentYear].transferred += credits || 0
     // Transferred not counted in total
