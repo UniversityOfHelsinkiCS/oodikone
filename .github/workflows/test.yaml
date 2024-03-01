@@ -9,11 +9,6 @@ on:
       password:
         required: true
         description: 'Toska registry password'
-  push:
-    branches:
-      - development
-  pull_request:
-    branches: [main, development]
 
 jobs:
   # === Static tests / linting ===
