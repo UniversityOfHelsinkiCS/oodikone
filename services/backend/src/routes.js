@@ -69,6 +69,9 @@ module.exports = (app, url) => {
   app.use(`${url}/feedback`, feedback)
   app.use(`${url}/custom-population-search`, customPopulationSearch)
   app.use(`${url}/studyguidancegroups`, auth.roles(['studyGuidanceGroups']), studyGuidanceGroups)
+  app.use(`${url}/explode`, auth.roles(['admin']), () => {
+    throw new Error('Explode route triggered in backend')
+  })
   app.get('*', async (_, res) => {
     const results = { error: 'unknown endpoint' }
     res.status(404).json(results)
