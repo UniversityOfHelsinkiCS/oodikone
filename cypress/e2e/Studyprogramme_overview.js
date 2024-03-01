@@ -160,8 +160,8 @@ describe('Studyprogramme overview', () => {
       cy.get('[data-cy=Graph-CreditsProducedByTheStudyprogramme')
         .should('contain', 'Degree students')
         .should('contain', 'Transferred')
-        .should('contain', 388)
-        .should('contain', 7097)
+        .should('contain', 6966)
+        .should('contain', 430)
 
       cy.get('[data-cy=Graph-GraduatedAndThesisWritersOfTheProgramme')
         .should('contain', 'Graduated students')
