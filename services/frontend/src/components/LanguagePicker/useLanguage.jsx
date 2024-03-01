@@ -48,7 +48,7 @@ export const useLanguage = () => {
     }
 
     setState(newLanguage)
-    callApi('/language', 'post', { language: newLanguage })
+    callApi('/users/language', 'post', { language: newLanguage })
   }
 
   return {
