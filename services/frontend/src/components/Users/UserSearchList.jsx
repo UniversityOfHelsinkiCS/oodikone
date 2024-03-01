@@ -91,25 +91,28 @@ export const UserSearchList = () => {
             sortable: false,
             filterType: 'multi',
             getRowVal: user => {
-              if (!user.elementdetails || user.elementdetails.length === 0) return []
-
-              return user.elementdetails.reduce((programmes, element) => {
-                const elem = elementdetails.find(e => e.code === element)
-                if (elem) programmes.push(getTextIn(elem.name))
-                return programmes
-              }, [])
+              const uniqueRights = new Set(user.programmeRights.map(r => r.code))
+              const programmeNames = []
+              uniqueRights.forEach(right => {
+                const elem = elementdetails.find(e => e.code === right)
+                if (elem) programmeNames.push(getTextIn(elem.name))
+              })
+              return programmeNames
             },
             getRowContent: user => {
-              if (!user.elementdetails || user.elementdetails.length === 0) return null
+              if (user.programmeRights.length === 0) return null
+
+              const uniqueRights = new Set(user.programmeRights.map(r => r.code))
 
               const nameInLanguage = code => {
                 const elem = elementdetails.find(e => e.code === code)
                 return elem ? getTextIn(elem.name) : null
               }
 
-              const name = nameInLanguage(user.elementdetails[0])
-              if (!name) return `${user.elementdetails.length} programmes`
-              return user.elementdetails.length > 1 ? `${name} + ${user.elementdetails.length - 1} others` : name
+              const [firstProgrammeRight] = uniqueRights
+              const name = nameInLanguage(firstProgrammeRight)
+              if (!name) return `${uniqueRights.size} programmes`
+              return uniqueRights.size > 1 ? `${name} + ${uniqueRights.size - 1} others` : name
             },
           },
           {

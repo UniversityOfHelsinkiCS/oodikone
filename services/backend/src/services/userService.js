@@ -87,14 +87,6 @@ const deleteOutdatedUsers = async () =>
     return results.length
   })
 
-// Crud things from old userservice
-
-// some fields that frontend needs
-const formatUserForAdminView = user => ({
-  ...user.get(),
-  elementdetails: user.programme.map(p => p.elementDetailCode),
-})
-
 const addProgrammes = async (id, codes) => {
   for (const code of codes) {
     await UserElementDetails.upsert({ userId: id, elementDetailCode: code })
@@ -142,21 +134,22 @@ const modifyAccess = async body => {
   const { username, accessgroups } = body
   await modifyRights(username, accessgroups)
   userDataCache.del(username)
-  return formatUserForAdminView(await byUsername(username))
+  const updatedUser = await byUsername(username)
+  return updatedUser
 }
 
 const enableElementDetails = async (id, codes) => {
   await addProgrammes(id, codes)
   const user = await byId(id)
   userDataCache.del(user.username)
-  return formatUserForAdminView(user)
+  return user
 }
 
 const removeElementDetails = async (id, codes) => {
   await removeProgrammes(id, codes)
   const user = await byId(id)
   userDataCache.del(user.userId)
-  return formatUserForAdminView(user)
+  return user
 }
 
 const updateUser = async (username, fields) => {
@@ -169,7 +162,8 @@ const updateUser = async (username, fields) => {
 
   userDataCache.del(username)
 
-  return formatUserForAdminView(await byUsername(username))
+  const updatedUser = await byUsername(username)
+  return updatedUser
 }
 
 const getAccessGroups = async () => await AccessGroup.findAll()
@@ -248,15 +242,15 @@ const findAll = async () => {
 
   const formattedUsers = await Promise.all(
     allUsers.map(async user => {
-      const { iamGroups, specialGroup } = userAccessMap[user.sisu_person_id] || {}
+      const { iamGroups, specialGroup, access } = userAccessMap[user.sisu_person_id] || {}
 
       const { accessGroups } = await updateAccessGroups(user.username, iamGroups, specialGroup, null, user)
 
       return {
         ...user.get(),
         iam_groups: iamGroups || [],
-        elementdetails: _.uniqBy([...user.programme.map(p => p.elementDetailCode)]),
         accessgroup: accessGroups,
+        programmeRights: getStudyProgrammeRights(access, specialGroup, user.programme),
       }
     })
   )
@@ -280,7 +274,6 @@ const findOne = async id => {
   return {
     ...user.get(),
     iam_groups: iamAccess || [],
-    elementdetails: _.uniqBy([...user.programme.map(p => p.elementDetailCode)]),
     accessgroup: accessGroups,
     programmeRights: getStudyProgrammeRights(iamAccess, specialGroup, user.programme),
   }

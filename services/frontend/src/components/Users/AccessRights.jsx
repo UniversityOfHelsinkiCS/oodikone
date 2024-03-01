@@ -17,8 +17,10 @@ const mapAndSortProgrammes = (programmes, elementdetails, getTextIn) =>
     })
     .sort(createLocaleComparator('name'))
 
+const getUserFullProgrammeRights = programmeRights => programmeRights.filter(r => !r.limited).map(r => r.code)
+
 export const AccessRights = ({ user }) => {
-  const { id: uid, elementdetails: rightsIncludingFacultyRights, accessgroup, programmeRights } = user
+  const { id: uid, accessgroup, programmeRights } = user
   const { getTextIn } = useLanguage()
   const [accessRightsToBeAdded, setAccessRightsToBeAdded] = useState([])
   const [accessRightsToBeRemoved, setAccessRightsToBeRemoved] = useState([])
@@ -26,7 +28,7 @@ export const AccessRights = ({ user }) => {
   const { data: elementdetails = [] } = useGetAllElementDetailsQuery()
   const { data: allProgrammes } = useGetUnfilteredProgrammesQuery()
   const programmes = Object.values(allProgrammes?.programmes || {})
-    .filter(programme => !rightsIncludingFacultyRights.includes(programme.code))
+    .filter(programme => !getUserFullProgrammeRights(programmeRights).includes(programme.code))
     .map(({ code, name }) => ({ code, name }))
   const [addUserUnitsMutation, addResult] = useAddUserUnitsMutation()
   const [removeUserUnitsMutation, removeResult] = useRemoveUserUnitsMutation()
