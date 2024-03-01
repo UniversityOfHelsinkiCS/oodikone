@@ -3,15 +3,16 @@ import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Divider, Header, Loader, Message, Segment } from 'semantic-ui-react'
 
+import { useTitle } from '@/common/hooks'
 import { facultyToolTips } from '@/common/InfoToolTips'
+import { InfoBox } from '@/components/Info/InfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { Toggle } from '@/components/StudyProgramme/Toggle'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
-import { useGetAllFacultiesProgressStatsQuery, useGetAllFacultiesGraduationStatsQuery } from '@/redux/facultyStats'
-import { InfoBox } from '../Info/InfoBox'
-import { Toggle } from '../StudyProgramme/Toggle'
+import { useGetAllFacultiesGraduationStatsQuery, useGetAllFacultiesProgressStatsQuery } from '@/redux/facultyStats'
+import '../FacultyStatistics/faculty.css'
 import { FacultyGraduations } from './FacultyGraduations'
 import { FacultyProgress } from './FacultyProgress'
-import '../FacultyStatistics/faculty.css'
 
 export const UniversityViewPage = () => {
   return (
@@ -24,6 +25,7 @@ export const UniversityViewPage = () => {
 }
 
 export const UniversityView = ({ isEvaluationOverview }) => {
+  useTitle('University')
   const [graduatedGroup, setGraduatedGroup] = useState(false)
   const [medianMode, setMedianMode] = useState(false)
   const { isAdmin, roles } = useGetAuthorizedUserQuery()
