@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import { Header, Segment, Tab, Message } from 'semantic-ui-react'
 
-import { checkUserAccess } from '@/common'
+import { checkUserAccess, getFullStudyProgrammeRights } from '@/common'
 import { useProgress, useTitle } from '@/common/hooks'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { clearCourseStats, getCourseStats } from '@/redux/coursestats'
@@ -26,7 +26,7 @@ const MENU = {
 export const CourseStatistics = () => {
   const history = useHistory()
   const dispatch = useDispatch()
-  const { rights, roles } = useGetAuthorizedUserQuery()
+  const { programmeRights, roles } = useGetAuthorizedUserQuery()
   const state = useSelector(state => state)
   const { courseStats } = state
   const { pending: loading } = courseStats
@@ -66,7 +66,9 @@ export const CourseStatistics = () => {
     setSelected(coursecode)
   }
 
-  const userHasAccessToAllStats = userHasAccessToAllCourseStats(roles, rights)
+  const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
+
+  const userHasAccessToAllStats = userHasAccessToAllCourseStats(roles, fullStudyProgrammeRights)
 
   const getPanes = () => {
     let panes = [
@@ -122,7 +124,7 @@ export const CourseStatistics = () => {
     }
   }
 
-  if (!checkUserAccess(['courseStatistics', 'admin'], roles) && rights.length < 1)
+  if (!checkUserAccess(['courseStatistics', 'admin'], roles) && fullStudyProgrammeRights.length < 1)
     return (
       <div className="segmentContainer">
         <Message

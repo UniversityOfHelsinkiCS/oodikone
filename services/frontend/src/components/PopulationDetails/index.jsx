@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
+import { getFullStudyProgrammeRights } from '@/common'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { PanelView } from '@/components/common/PanelView'
 import { creditDateFilter, hopsFilter as studyPlanFilter } from '@/components/FilterView/filters'
@@ -24,7 +25,8 @@ export const PopulationDetails = ({
   selectedStudentsByYear,
   programmeCodes,
 }) => {
-  const { isLoading: authLoading, rights, isAdmin } = useGetAuthorizedUserQuery()
+  const { isLoading: authLoading, programmeRights, isAdmin } = useGetAuthorizedUserQuery()
+  const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const { useFilterSelector } = useFilters()
   const [curriculum, setCurriculum] = useState(null)
   const [studentAmountLimit, setStudentAmountLimit] = useState(0)
@@ -67,8 +69,8 @@ export const PopulationDetails = ({
   const onlyIamRights =
     !authLoading &&
     !isAdmin &&
-    !rights.includes(query?.studyRights?.programme) &&
-    !rights.includes(query?.studyRights?.combinedProgramme)
+    !fullStudyProgrammeRights.includes(query?.studyRights?.programme) &&
+    !fullStudyProgrammeRights.includes(query?.studyRights?.combinedProgramme)
 
   const panels = [
     {

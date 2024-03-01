@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useHistory, useParams } from 'react-router-dom'
 import { Header, Segment, Tab, Menu } from 'semantic-ui-react'
 
-import { getUnifiedProgrammeName } from '@/common'
+import { getFullStudyProgrammeRights, getUnifiedProgrammeName } from '@/common'
 import { useTabs, useTitle } from '@/common/hooks'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { getProgrammes } from '@/redux/populationProgrammes'
@@ -35,7 +35,8 @@ export const StudyProgramme = () => {
   const programmes = useSelector(state => state.populationProgrammes?.data?.programmes)
   const progressCriteria = useGetProgressCriteriaQuery({ programmeCode: studyProgrammeId })
   const { language, getTextIn } = useLanguage()
-  const { isAdmin, rights } = useGetAuthorizedUserQuery()
+  const { isAdmin, programmeRights } = useGetAuthorizedUserQuery()
+  const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const [tab, setTab] = useTabs('p_tab', 0, history)
   const [academicYear, setAcademicYear] = useState(false)
   const [specialGroups, setSpecialGroups] = useState(false)
@@ -92,7 +93,11 @@ export const StudyProgramme = () => {
       ),
     })
 
-    if (isAdmin || rights.includes(programmeId) || rights.includes(secondProgrammeId)) {
+    if (
+      isAdmin ||
+      fullStudyProgrammeRights.includes(programmeId) ||
+      fullStudyProgrammeRights.includes(secondProgrammeId)
+    ) {
       panes.push({
         menuItem: <Menu.Item key="Programme courses">Programme courses</Menu.Item>,
         render: () => (

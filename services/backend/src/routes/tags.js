@@ -3,6 +3,7 @@ const Tags = require('../services/tags')
 const TagStudent = require('../services/tagstudent')
 const Students = require('../services/students')
 const { difference } = require('lodash')
+const { getFullStudyProgrammeRights } = require('../util/utils')
 
 const filterRelevantTags = (tags, userId) => {
   return tags.filter(tag => !tag.personal_user_id || tag.personal_user_id === userId)
@@ -12,6 +13,11 @@ const filterRelevantStudentTags = (studentTags, userId) => {
   return studentTags.filter(({ tag }) => !tag.personal_user_id || tag.personal_user_id === userId)
 }
 
+const userIsUnauthorized = (programmeRights, programmeCodes, roles) =>
+  !programmeRights.includes(programmeCodes[0]) &&
+  !programmeRights.includes(programmeCodes[1]) &&
+  !roles?.includes('admin')
+
 router.get('/tags', async (_req, res) => {
   const tags = await Tags.findTags()
   res.status(200).json(tags)
@@ -20,13 +26,14 @@ router.get('/tags', async (_req, res) => {
 router.get('/tags/:studytrack', async (req, res) => {
   const { studytrack } = req.params
   const {
-    user: { rights, roles, id },
+    user: { roles, id, programmeRights },
   } = req
+  const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
+
   const programmeCodes = studytrack.includes('KH') && studytrack.includes('MH') ? studytrack.split('-') : [studytrack]
 
   // Respond with null and 200 instead of 403 if the user isn't authorized to view the tags. This is to avoid unnecessary noise in Sentry
-  if (!rights.includes(programmeCodes[0]) && !rights.includes(programmeCodes[1]) && !roles?.includes('admin'))
-    return res.json(null)
+  if (userIsUnauthorized(fullStudyProgrammeRights, programmeCodes, roles)) return res.json(null)
 
   const tags = await Tags.findTagsByStudytrack(studytrack)
   res.status(200).json(filterRelevantTags(tags, id))
@@ -37,12 +44,12 @@ router.post('/tags', async (req, res) => {
     tag: { studytrack, tagname, year, personal_user_id },
   } = req.body
   const {
-    user: { rights, roles, id },
+    user: { roles, id, programmeRights },
   } = req
+  const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
 
   const programmeCodes = studytrack.includes('KH') && studytrack.includes('MH') ? studytrack.split('-') : [studytrack]
-  if (!rights.includes(programmeCodes[0]) && !rights.includes(programmeCodes[1]) && !roles?.includes('admin'))
-    return res.status(403).end()
+  if (userIsUnauthorized(fullStudyProgrammeRights, programmeCodes, roles)) return res.status(403).end()
 
   await Tags.createNewTag({ studytrack, tagname, year, personal_user_id })
   const tags = await Tags.findTagsByStudytrack(studytrack)
@@ -52,18 +59,15 @@ router.post('/tags', async (req, res) => {
 router.delete('/tags', async (req, res) => {
   const { tag } = req.body
   const {
-    user: { rights, roles, id },
+    user: { roles, id, programmeRights },
   } = req
+
+  const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
 
   const programmeCodes =
     tag.studytrack.includes('KH') && tag.studytrack.includes('MH') ? tag.studytrack.split('-') : [tag.studytrack]
 
-  if (
-    !rights.includes(programmeCodes[0]) &&
-    !rights.includes(programmeCodes[1]) &&
-    !roles?.includes('admin') &&
-    !(tag.personal_user_id === id)
-  )
+  if (userIsUnauthorized(fullStudyProgrammeRights, programmeCodes, roles) && !(tag.personal_user_id === id))
     return res.status(403).end()
 
   await Tags.deleteTag(tag)
@@ -79,13 +83,19 @@ router.get('/studenttags', async (req, res) => {
 router.get('/studenttags/:studytrack', async (req, res) => {
   const { studytrack } = req.params
   const {
-    user: { rights, roles, id },
+    user: { roles, id, programmeRights },
   } = req
+
+  const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
 
   const programmeCodes = studytrack.includes('KH') && studytrack.includes('MH') ? studytrack.split('-') : [studytrack]
 
   // Respond with null and 200 instead of 403 if the user isn't authorized to view the tags. This is to avoid unnecessary noise in Sentry
-  if (!rights.includes(programmeCodes[0]) && !rights.includes(programmeCodes[1]) && !roles?.includes('admin'))
+  if (
+    !fullStudyProgrammeRights.includes(programmeCodes[0]) &&
+    !fullStudyProgrammeRights.includes(programmeCodes[1]) &&
+    !roles?.includes('admin')
+  )
     return res.json(null)
 
   const result = await TagStudent.getStudentTagsByStudytrack(studytrack)
@@ -102,11 +112,12 @@ router.get('/studenttags/:studentnumber', async (req, res) => {
 router.post('/studenttags/:studentnumber', async (req, res) => {
   const { tag, studytrack, combinedProgramme } = req.body
   const {
-    user: { roles, rights, id },
+    user: { roles, id, programmeRights },
   } = req
 
-  if (!rights.includes(studytrack) && !rights.includes(combinedProgramme) && !roles?.includes('admin'))
-    return res.status(403).end()
+  const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
+
+  if (userIsUnauthorized(fullStudyProgrammeRights, [studytrack, combinedProgramme], roles)) return res.status(403).end()
 
   await TagStudent.createStudentTag(tag)
   const studytrackCode = combinedProgramme ? `${studytrack}-${combinedProgramme}` : studytrack
@@ -117,11 +128,12 @@ router.post('/studenttags/:studentnumber', async (req, res) => {
 router.post('/studenttags', async (req, res) => {
   const { tags, studytrack, combinedProgramme } = req.body
   const {
-    user: { rights, roles, id },
+    user: { roles, id, programmeRights },
   } = req
 
-  if (!rights.includes(studytrack) && !rights.includes(combinedProgramme) && !roles?.includes('admin'))
-    return res.status(403).end()
+  const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
+
+  if (userIsUnauthorized(fullStudyProgrammeRights, [studytrack, combinedProgramme], roles)) return res.status(403).end()
 
   const studytrackCode = combinedProgramme ? `${studytrack}-${combinedProgramme}` : studytrack
   const existingTags = await Tags.findTagsByStudytrack(studytrackCode)
@@ -146,11 +158,13 @@ router.post('/studenttags', async (req, res) => {
 router.delete('/studenttags/delete_one', async (req, res) => {
   const { tag_id, studentnumber, studytrack, combinedProgramme } = req.body
   const {
-    user: { rights, roles, id },
+    user: { roles, id, programmeRights },
   } = req
 
-  if (!rights.includes(studytrack) && !rights.includes(combinedProgramme) && !roles?.includes('admin'))
-    return res.status(403).end()
+  const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
+
+  if (userIsUnauthorized(fullStudyProgrammeRights, [studytrack, combinedProgramme], roles)) return res.status(403).end()
+
   const studytrackCode = combinedProgramme ? `${studytrack}-${combinedProgramme}` : studytrack
   const tags = await Tags.findTagsFromStudytrackById(studytrackCode, [tag_id])
   if (tags.length === 0) return res.status(403).json({ error: 'The tag does not exist' })
@@ -163,11 +177,13 @@ router.delete('/studenttags/delete_one', async (req, res) => {
 router.delete('/studenttags/delete_many', async (req, res) => {
   const { tagId, studentnumbers, studytrack, combinedProgramme } = req.body
   const {
-    user: { rights, roles, id },
+    user: { roles, id, programmeRights },
   } = req
 
-  if (!rights.includes(studytrack) && !rights.includes(combinedProgramme) && !roles?.includes('admin'))
-    return res.status(403).end()
+  const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
+
+  if (userIsUnauthorized(fullStudyProgrammeRights, [studytrack, combinedProgramme], roles)) return res.status(403).end()
+
   const studytrackCode = combinedProgramme ? `${studytrack}-${combinedProgramme}` : studytrack
   const tags = await Tags.findTagsFromStudytrackById(studytrackCode, [tagId])
   if (tags.length === 0) return res.status(403).json({ error: 'The tag does not exist' })

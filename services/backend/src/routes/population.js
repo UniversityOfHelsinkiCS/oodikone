@@ -7,7 +7,7 @@ const studentService = require('../services/students')
 const StudyrightService = require('../services/studyrights')
 const CourseService = require('../services/courses')
 const StatMergeService = require('../services/statMerger')
-const { mapToProviders } = require('../util/utils')
+const { mapToProviders, getFullStudyProgrammeRights } = require('../util/utils')
 const { encrypt, decrypt } = require('../services/encrypt')
 const { mapCodesToIds } = require('../services/studyprogramme/studyprogrammeHelpers')
 
@@ -148,7 +148,9 @@ router.post('/v2/populationstatistics/coursesbystudentnumberlist', async (req, r
 
 router.get('/v3/populationstatistics', async (req, res) => {
   const { year, semesters, studyRights: studyRightsJSON } = req.query
-  const { user } = req
+  const {
+    user: { isAdmin, programmeRights, id: userId },
+  } = req
 
   if (!year || !semesters || !studyRightsJSON) {
     res.status(400).json({ error: 'The query should have a year, semester and studyRights defined' })
@@ -156,17 +158,15 @@ router.get('/v3/populationstatistics', async (req, res) => {
   }
   let studyRights = null
   studyRights = JSON.parse(studyRightsJSON)
-  const {
-    user: { rights, iamRights, isAdmin },
-  } = req
+
+  const fullProgrammeRights = getFullStudyProgrammeRights(programmeRights)
+  const programmeRightsCodes = programmeRights.map(({ code }) => code)
 
   try {
     if (
       !isAdmin &&
-      !rights.includes(studyRights.programme) &&
-      !rights.includes(studyRights.combinedProgramme) &&
-      !iamRights.includes(studyRights.programme) &&
-      !iamRights.includes(studyRights.combinedProgramme)
+      !programmeRightsCodes.includes(studyRights.programme) &&
+      !programmeRightsCodes.includes(studyRights.combinedProgramme)
     ) {
       res.status(403).json([])
       return
@@ -207,7 +207,7 @@ router.get('/v3/populationstatistics', async (req, res) => {
       return
     }
 
-    res.json(filterPersonalTags(result, user.id))
+    res.json(filterPersonalTags(result, userId))
   } else {
     const result = await populationService.optimizedStatisticsOf({
       ...req.query,
@@ -220,8 +220,12 @@ router.get('/v3/populationstatistics', async (req, res) => {
       return
     }
 
-    // Obfuscate if user has only iam rights
-    if (!isAdmin && !rights.includes(studyRights.programme) && !rights.includes(studyRights.combinedProgramme)) {
+    // Obfuscate if user has only limited study programme rights
+    if (
+      !isAdmin &&
+      !fullProgrammeRights.includes(studyRights.programme) &&
+      !fullProgrammeRights.includes(studyRights.combinedProgramme)
+    ) {
       result.students = result.students.map(student => {
         const { iv, encryptedData } = encrypt(student.studentNumber)
         const obfuscatedBirthDate = new Date(new Date(student.birthdate).setMonth(0, 0)) // only birth year for age distribution
@@ -242,14 +246,14 @@ router.get('/v3/populationstatistics', async (req, res) => {
       })
     }
 
-    res.json(filterPersonalTags(result, user.id))
+    res.json(filterPersonalTags(result, userId))
   }
 })
 
 router.get('/v3/populationstatisticsbycourse', async (req, res) => {
   const { coursecodes, from, to, separate: sep, unifyCourses } = req.query
   const {
-    user: { id, isAdmin, studentsUserCanAccess: allStudentsUserCanAccess, rights },
+    user: { id, isAdmin, studentsUserCanAccess: allStudentsUserCanAccess, programmeRights },
   } = req
   const separate = sep ? JSON.parse(sep) : false
 
@@ -288,7 +292,8 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
   if (!isAdmin) {
     courseproviders = await CourseService.getCourseProvidersForCourses(JSON.parse(coursecodes))
   }
-  const rightsMappedToProviders = mapToProviders(rights)
+  const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
+  const rightsMappedToProviders = mapToProviders(fullStudyProgrammeRights)
   const found = courseproviders.some(r => rightsMappedToProviders.includes(r))
 
   const studentsUserCanAccess =
@@ -356,14 +361,14 @@ router.post('/v3/populationstatisticsbystudentnumbers', async (req, res) => {
 
 router.get('/v3/populationstatistics/studyprogrammes', async (req, res) => {
   const {
-    user: { rights, iamRights, roles },
+    user: { roles, programmeRights },
   } = req
   if (roles?.includes('admin')) {
     const studyrights = await StudyrightService.getAssociations()
     mapCodesToIds(studyrights.programmes)
     res.json(studyrights)
   } else {
-    const allRights = rights.concat(iamRights)
+    const allRights = _.uniq(programmeRights.map(p => p.code))
     // For combined programme
     // If more programmes are combined, then a function might be a better idea to add moar rights
     if (allRights.includes('KH90_001') || allRights.includes('MH90_001')) allRights.push('KH90_001', 'MH90_001')

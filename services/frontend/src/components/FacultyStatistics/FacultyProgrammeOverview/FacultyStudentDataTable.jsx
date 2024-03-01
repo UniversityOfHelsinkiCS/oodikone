@@ -236,15 +236,14 @@ export const FacultyStudentDataTable = ({
                             }
                             trigger={<b>{programme}</b>}
                           />
-                          {(requiredRights.rights?.includes(programmeNames[programme].code) ||
-                            requiredRights.isAdmin ||
-                            requiredRights.IAMrights?.includes(programmeNames[programme].code)) && (
-                            <PopulationLink
-                              studyprogramme={programmeNames[programme].code}
-                              year={year}
-                              years={calendarYears}
-                            />
-                          )}
+                          {requiredRights.programmeRights?.includes(programmeNames[programme].code) ||
+                            (requiredRights.isAdmin && (
+                              <PopulationLink
+                                studyprogramme={programmeNames[programme].code}
+                                year={year}
+                                years={calendarYears}
+                              />
+                            ))}
                         </Table.Cell>
                         {getRows({
                           idx,

@@ -3,6 +3,7 @@ import React from 'react'
 import { connect, useSelector } from 'react-redux'
 import { Form, Label, Segment, Header } from 'semantic-ui-react'
 
+import { getFullStudyProgrammeRights } from '@/common'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { fields, setValue } from '@/redux/coursesSummaryForm'
 import { ALL, getAllStudyProgrammes, summaryStatistics, getQueryInfo } from '@/selectors/courseStats'
@@ -29,8 +30,9 @@ const unObjectifyProperty = ({ obj, property }) => {
 }
 
 const SummaryTab = ({ setValue, onClickCourse }) => {
-  const { roles, rights } = useGetAuthorizedUserQuery()
-  const userHasAccessToAllStats = userHasAccessToAllCourseStats(roles, rights)
+  const { roles, programmeRights } = useGetAuthorizedUserQuery()
+  const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
+  const userHasAccessToAllStats = userHasAccessToAllCourseStats(roles, fullStudyProgrammeRights)
   const programmes = useSelector(state => getAllStudyProgrammes(state))
   const programmeCodes = useSelector(({ courseSummaryForm }) => courseSummaryForm[fields.programmes])
   const form = useSelector(({ courseSummaryForm }) => courseSummaryForm)

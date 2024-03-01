@@ -1,6 +1,7 @@
 const morgan = require('morgan')
 const logger = require('../util/logger')
 const _ = require('lodash')
+const { getFullStudyProgrammeRights } = require('../util/utils')
 
 // So this appears to be a hack to get neatly formatted stats like response-time etc. from morgan
 // without actually using morgan what it's used for (LOGGING REQUESTS!).
@@ -24,8 +25,10 @@ const accessLogger = morgan((tokens, req, res) => {
     tokens['url'](req, res),
   ].join(' ')
 
+  const fullStudyProgrammeRights = getFullStudyProgrammeRights(user.programmeRights)
+
   const usingIamRights = user.iamRights.some(programmeCode => tokens['url'](req, res).includes(programmeCode))
-  const onlyIamRights = !user.isAdmin && user.rights.length === 0
+  const onlyIamRights = !user.isAdmin && fullStudyProgrammeRights.length === 0
 
   logger.info(message, {
     // don't log student list which might be huge

@@ -2,6 +2,7 @@ import PropTypes, { shape } from 'prop-types'
 import React, { useState } from 'react'
 import { Table, Progress, Radio, Icon } from 'semantic-ui-react'
 
+import { getFullStudyProgrammeRights } from '@/common'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 
 // https://stackoverflow.com/a/7091965
@@ -39,8 +40,9 @@ const groupedAgesReducer = (acc, age) => {
 export const AgeStats = ({ filteredStudents, query }) => {
   const [isGrouped, setIsGrouped] = useState(true)
   const [expandedGroups, setExpandedGroups] = useState([])
-  const { isAdmin, rights } = useGetAuthorizedUserQuery()
-  const onlyIamRights = !isAdmin && rights.length === 0
+  const { isAdmin, programmeRights } = useGetAuthorizedUserQuery()
+  const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
+  const onlyIamRights = !isAdmin && fullStudyProgrammeRights.length === 0
   const studentsAges = filteredStudents.map(student => getAge(student.birthdate)).sort((a, b) => b - a)
 
   const ages = Object.entries(studentsAges.reduce(isGrouped ? groupedAgesReducer : separateAgesReducer, {}))

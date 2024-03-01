@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Container, Header, Image, Divider, List, Grid, Button, Icon } from 'semantic-ui-react'
 import { useGetAuthorizedUserQuery } from 'redux/auth'
-import { images, checkUserAccess } from '../../common'
+import { images, checkUserAccess, getFullStudyProgrammeRights } from '../../common'
 import { useTitle } from '../../common/hooks'
 import { Changelog } from './Changelog'
 
@@ -15,7 +15,9 @@ const FrontPageItem = ({ title, content }) => {
 }
 
 export const FrontPage = () => {
-  const { rights, roles, iamRights } = useGetAuthorizedUserQuery()
+  const { roles, programmeRights } = useGetAuthorizedUserQuery()
+  const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
+
   const [showFullChangelog, setShowFullChangelog] = useState(false)
 
   useTitle()
@@ -27,7 +29,7 @@ export const FrontPage = () => {
       content: <p>View tables and diagrams about study progress of different faculties</p>,
     },
     {
-      show: roles.includes('admin') || rights.length > 0 || iamRights.length > 0,
+      show: roles.includes('admin') || programmeRights.length > 0,
       title: 'Programmes',
       content: (
         <List bulleted>
@@ -41,12 +43,12 @@ export const FrontPage = () => {
       ),
     },
     {
-      show: checkUserAccess(['courseStatistics', 'admin'], roles) || rights.length > 0,
+      show: checkUserAccess(['courseStatistics', 'admin'], roles) || fullStudyProgrammeRights.length > 0,
       title: 'Courses',
       content: <p>View statistics about course attempts, completions and grades</p>,
     },
     {
-      show: checkUserAccess(['studyGuidanceGroups', 'admin'], roles) || rights.length > 0,
+      show: checkUserAccess(['studyGuidanceGroups', 'admin'], roles) || fullStudyProgrammeRights.length > 0,
       title: 'Students',
       content: <p>View detailed information for a given student</p>,
     },

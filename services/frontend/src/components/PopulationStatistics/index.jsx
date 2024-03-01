@@ -3,7 +3,12 @@ import { useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
 import { Header, Segment } from 'semantic-ui-react'
 
-import { getStudentTotalCredits, getUnifiedProgrammeName, isMastersProgramme } from '@/common'
+import {
+  getFullStudyProgrammeRights,
+  getStudentTotalCredits,
+  getUnifiedProgrammeName,
+  isMastersProgramme,
+} from '@/common'
 import { useTitle } from '@/common/hooks'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetSemestersQuery } from '@/redux/semesters'
@@ -43,8 +48,9 @@ export const PopulationStatistics = () => {
   const courses = useSelector(store => store.populationSelectedStudentCourses.data?.coursestatistics)
   const { query, queryIsSet, isLoading, selectedStudentsByYear, samples } = useSelector(makePopulationsToData)
 
-  const { isAdmin, rights } = useGetAuthorizedUserQuery()
-  const onlyIamRights = !isAdmin && rights.length === 0
+  const { isAdmin, programmeRights } = useGetAuthorizedUserQuery()
+  const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
+  const onlyIamRights = !isAdmin && fullStudyProgrammeRights.length === 0
   useTitle('Class statistics')
 
   const { data: allSemesters } = useGetSemestersQuery()

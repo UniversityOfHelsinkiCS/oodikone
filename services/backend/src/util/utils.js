@@ -59,9 +59,13 @@ const createLocaleComparator = (field = null) => {
   return (val1, val2) => val1[field].localeCompare(val2[field], 'fi', { sensitivity: 'accent' })
 }
 
+const getFullStudyProgrammeRights = programmeRights =>
+  programmeRights.filter(({ limited }) => !limited).map(({ code }) => code)
+
 module.exports = {
   mapToProviders,
   sortMainCode,
   getSortRank,
   createLocaleComparator,
+  getFullStudyProgrammeRights,
 }

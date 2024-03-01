@@ -290,8 +290,8 @@ export const StudytrackDataTable = ({
   const [show, setShow] = useState([])
   const [showPercentages, setShowPercentages] = useState(false)
   const { getTextIn } = useLanguage()
-  const { rights, iamRights, isAdmin } = useGetAuthorizedUserQuery()
-  const allRights = rights.concat(iamRights)
+  const { isAdmin, programmeRights } = useGetAuthorizedUserQuery()
+  const allRights = programmeRights.map(({ code }) => code)
   if (!dataOfAllTracks && !dataOfSingleTrack) return null
   const firstCellClicked = index => {
     const newShow = [...show]

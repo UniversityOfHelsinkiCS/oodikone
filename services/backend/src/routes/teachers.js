@@ -2,7 +2,7 @@ const teachers = require('../services/teachers')
 const topteachers = require('../services/topteachers')
 const { isFaculty, providersOfFaculty } = require('../services/organisations')
 const router = require('express').Router()
-const { mapToProviders } = require('../util/utils')
+const { mapToProviders, getFullStudyProgrammeRights } = require('../util/utils')
 
 router.get('/', async (req, res) => {
   const { searchTerm } = req.query
@@ -43,14 +43,16 @@ router.get('/top/categories', async (req, res) => {
 
 router.get('/stats', async (req, res) => {
   const {
-    user: { rights, roles },
+    user: { roles, programmeRights },
   } = req
+
+  const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
 
   const { providers, semesterStart, semesterEnd } = req.query
   if (!providers || !semesterStart) {
     return res.status(422).send('Missing required query parameters.')
   }
-  const providerRights = mapToProviders(rights)
+  const providerRights = mapToProviders(fullStudyProgrammeRights)
 
   if (!(providers.every(p => providerRights.includes(p)) || roles.includes('admin'))) {
     return res.status(403).send('You do not have rights to see this data')

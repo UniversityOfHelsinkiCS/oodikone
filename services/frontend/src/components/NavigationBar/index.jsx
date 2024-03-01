@@ -2,7 +2,7 @@ import React from 'react'
 import { NavLink, Link } from 'react-router-dom'
 import { Menu, Dropdown, Button, Label } from 'semantic-ui-react'
 
-import { checkUserAccess } from '@/common'
+import { checkUserAccess, getFullStudyProgrammeRights } from '@/common'
 import { isDev, adminerUrls } from '@/conf'
 import { useLogoutMutation, useShowAsUser, useGetAuthorizedUserQuery } from '@/redux/auth'
 import { LanguagePicker } from '../LanguagePicker'
@@ -44,7 +44,9 @@ const allNavigationItems = {
 }
 
 export const NavigationBar = () => {
-  const { isLoading, rights, iamRights, iamGroups, mockedBy, userId, roles, isAdmin } = useGetAuthorizedUserQuery()
+  const { isLoading, iamGroups, mockedBy, userId, roles, isAdmin, programmeRights } = useGetAuthorizedUserQuery()
+  const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
+
   const showAsUser = useShowAsUser()
   const [logout] = useLogoutMutation()
 
@@ -53,12 +55,12 @@ export const NavigationBar = () => {
     if (isLoading) return visibleNavigationItems
     Object.keys(allNavigationItems).forEach(key => {
       if (key === 'populations') {
-        if (!isAdmin && rights.length === 0 && iamRights.length === 0) return
+        if (!isAdmin && programmeRights.length === 0) return
       }
       if (key === 'students') {
-        if (!checkUserAccess(['admin', 'studyGuidanceGroups'], roles) && rights.length === 0) return
+        if (!checkUserAccess(['admin', 'studyGuidanceGroups'], roles) && fullStudyProgrammeRights.length === 0) return
       } else if (key === 'courseStatistics') {
-        if (!checkUserAccess(['courseStatistics', 'admin'], roles) && rights.length === 0) return
+        if (!checkUserAccess(['courseStatistics', 'admin'], roles) && fullStudyProgrammeRights.length === 0) return
       } else if (key === 'faculty') {
         if (!checkUserAccess(['facultyStatistics', 'admin'], roles)) return
       }
@@ -84,7 +86,10 @@ export const NavigationBar = () => {
   const showSearch = item => {
     if (item.key === 'class' || item.key === 'overview') return true
     if (checkUserAccess(['openUniSearch', 'admin'], roles) && item.key === 'openUniSearch') return true
-    if ((checkUserAccess(['studyGuidanceGroups', 'admin'], roles) || rights.length > 0) && item.key === 'customSearch')
+    if (
+      (checkUserAccess(['studyGuidanceGroups', 'admin'], roles) || fullStudyProgrammeRights.length > 0) &&
+      item.key === 'customSearch'
+    )
       return true
     if (item.key === 'completedCoursesSearch') return true
     if (

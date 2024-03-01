@@ -7,7 +7,7 @@ const { sendNotificationAboutNewUser } = require('../services/mailservice')
 const { checkStudyGuidanceGroupsAccess, getAllStudentsUserHasInGroups } = require('../services/studyGuidanceGroups')
 const { User, UserElementDetails, AccessGroup } = require('../models/models_user')
 const { getUserIams, getAllUserAccess, getUserIamAccess } = require('../util/jami')
-const { createLocaleComparator } = require('../util/utils')
+const { createLocaleComparator, getFullStudyProgrammeRights } = require('../util/utils')
 const { sequelizeUser } = require('../database/connection')
 
 const courseStatisticsGroup = 'grp-oodikone-basic-users'
@@ -193,7 +193,7 @@ const updateAccessGroups = async (username, iamGroups = [], specialGroup = {}, s
   const { jory, hyOne, superAdmin, openUni, katselmusViewer } = specialGroup
 
   const userFromDb = user || (await byUsername(username))
-  const formattedUser = await formatUser(userFromDb, [], Boolean(sisId))
+  const formattedUser = await formatUser(userFromDb, [], [], Boolean(sisId))
 
   const { roles: currentAccessGroups } = formattedUser
 
@@ -279,13 +279,10 @@ const findOne = async id => {
   }
 }
 
-const formatUser = async (userFromDb, extraRights, getStudentAccess = true) => {
-  const [accessGroups, programmes] = [
-    ['accessgroup', 'group_code'],
-    ['programme', 'elementDetailCode'],
-  ].map(([field, code]) => userFromDb[field].map(entry => entry[code]))
+const formatUser = async (userFromDb, extraRights, programmeRights, getStudentAccess = true) => {
+  const accessGroups = userFromDb.accessgroup.map(entry => entry.group_code)
 
-  const rights = _.uniqBy([...programmes]).concat(extraRights)
+  const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
 
   const {
     dataValues: {
@@ -302,7 +299,10 @@ const formatUser = async (userFromDb, extraRights, getStudentAccess = true) => {
   const studentsUserCanAccess = getStudentAccess
     ? _.uniqBy(
         (
-          await Promise.all([getStudentnumbersByElementdetails(rights), getAllStudentsUserHasInGroups(sisPersonId)])
+          await Promise.all([
+            getStudentnumbersByElementdetails(fullStudyProgrammeRights),
+            getAllStudentsUserHasInGroups(sisPersonId),
+          ])
         ).flat()
       )
     : []
@@ -316,10 +316,10 @@ const formatUser = async (userFromDb, extraRights, getStudentAccess = true) => {
     sisPersonId, //
     iamGroups,
     email,
-    rights,
     roles: accessGroups,
     studentsUserCanAccess, // studentnumbers used in various parts of backend. For admin this is usually empty, since no programmes / faculties are set.
     isAdmin: accessGroups.includes('admin'),
+    programmeRights,
   }
 }
 
@@ -360,7 +360,9 @@ const getMockedUser = async ({ userToMock, mockedBy }) => {
 
   const iamRights = Object.keys(access)
 
-  const formattedUser = await formatUser(userFromDb, specialGroup.kosu ? iamRights : [])
+  const programmeRights = getStudyProgrammeRights(access, specialGroup, userFromDb.programme)
+
+  const formattedUser = await formatUser(userFromDb, specialGroup.kosu ? iamRights : [], programmeRights)
 
   const toReturn = {
     ...formattedUser,
@@ -368,7 +370,6 @@ const getMockedUser = async ({ userToMock, mockedBy }) => {
     specialGroup,
     mockedBy,
     iamGroups: userFromDb.iamGroups,
-    programmeRights: getStudyProgrammeRights(access, specialGroup, userFromDb.programme),
   }
   userDataCache.set(`mocking-as-${userToMock}`, toReturn)
 
@@ -394,7 +395,8 @@ const getUser = async ({ username, name, email, iamGroups, iamRights, specialGro
 
   const userFromDb = await byUsername(username)
   userFromDb.iamGroups = await getUserIams(userFromDb.sisu_person_id)
-  const formattedUser = await formatUser(userFromDb, specialGroup.kosu ? iamRights : [])
+  const programmeRights = getStudyProgrammeRights(access, specialGroup, userFromDb.programme)
+  const formattedUser = await formatUser(userFromDb, specialGroup.kosu ? iamRights : [], programmeRights)
 
   const { newAccessGroups } = await updateAccessGroups(username, iamGroups, specialGroup, sisId)
 
@@ -405,7 +407,6 @@ const getUser = async ({ username, name, email, iamGroups, iamRights, specialGro
     iamRights,
     iamGroups: userFromDb.iamGroups,
     roles: newAccessGroups,
-    programmeRights: getStudyProgrammeRights(access, specialGroup, userFromDb.programme),
   }
   userDataCache.set(username, toReturn)
   return toReturn

@@ -2,7 +2,7 @@ import moment from 'moment'
 import React, { useState } from 'react'
 import { Form, Segment, Dropdown, Button, Message } from 'semantic-ui-react'
 
-import { createLocaleComparator } from '@/common'
+import { createLocaleComparator, getFullStudyProgrammeRights } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProvidersQuery } from '@/redux/providers'
@@ -16,7 +16,8 @@ export const TeacherStatistics = () => {
   const [semesterEnd, setSemesterEnd] = useState(null)
   // awful variable name but for some reason we need providers for props and state :kuolemakiitos:
   const [provs, setProviders] = useState([])
-  const { rights, isAdmin } = useGetAuthorizedUserQuery()
+  const { programmeRights, isAdmin } = useGetAuthorizedUserQuery()
+  const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const [getTeacherStatistics, { data: teacherData, isFetching, isLoading }] = useLazyGetTeacherStatisticsQuery()
   const { data: providers = [] } = useGetProvidersQuery()
 
@@ -103,7 +104,7 @@ export const TeacherStatistics = () => {
       }))
     : []
 
-  const userProviders = mapToProviders(rights)
+  const userProviders = mapToProviders(fullStudyProgrammeRights)
   const invalidQueryParams = provs.length === 0 || !semesterStart
   const providerOptions = isAdmin ? providers : providers.filter(p => userProviders.includes(p.code))
   const localizedProviderOptions = providerOptions
