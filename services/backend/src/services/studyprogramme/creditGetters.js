@@ -46,16 +46,14 @@ const getCreditsForProvider = async (provider, codes, since) => {
   const courseIdToShare = (courseId, attainmentDate) => {
     const providers = courseIdToShareMap[courseId]
     const relevantProvider = providers.find(p => organizationIdToCodeMap[p.organizationcode] === provider)
-    if (!relevantProvider) return 0
-    if (!relevantProvider.shares) return 0
+    if (!relevantProvider?.shares) return 0
     const relevantShare = relevantProvider.shares.find(share => {
       const startMatches = new Date(share.startDate) <= attainmentDate || !share.startDate
       const endMatches = new Date(share.endDate) >= attainmentDate || !share.endDate
       const bothArentNull = share.startDate || share.endDate
-      // TODO: This can mistake in cases where there are multiple entries with only startDate,
-      // those should be ordered and the most correct one taken
       return startMatches && endMatches && bothArentNull
     })
+
     // Odd logic, but if there are multiple providers for same course code, if no fitting dates are
     // not found for our relevant provider, we can assume the share of that date is of some other provider.
     // But if only 1 provider exists, we can assume it has share of 1.
