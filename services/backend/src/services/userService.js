@@ -174,6 +174,27 @@ const updateUser = async (username, fields) => {
 
 const getAccessGroups = async () => await AccessGroup.findAll()
 
+const getStudyProgrammeRights = (iamAccess, specialGroup, userProgrammes) => {
+  const iamBasedProgrammes = []
+
+  for (const [programmeCode, rights] of Object.entries(iamAccess || {})) {
+    if (specialGroup.kosu || rights.admin) {
+      iamBasedProgrammes.push({ code: programmeCode, limited: false, isIamBased: true })
+    } else {
+      iamBasedProgrammes.push({ code: programmeCode, limited: true, isIamBased: true })
+    }
+  }
+
+  return [
+    ...iamBasedProgrammes,
+    ...userProgrammes.map(({ elementDetailCode }) => ({
+      code: elementDetailCode,
+      limited: false,
+      isIamBased: false,
+    })),
+  ]
+}
+
 const updateAccessGroups = async (username, iamGroups = [], specialGroup = {}, sisId, user) => {
   const { jory, hyOne, superAdmin, openUni, katselmusViewer } = specialGroup
 
@@ -261,6 +282,7 @@ const findOne = async id => {
     iam_groups: iamAccess || [],
     elementdetails: _.uniqBy([...user.programme.map(p => p.elementDetailCode)]),
     accessgroup: accessGroups,
+    programmeRights: getStudyProgrammeRights(iamAccess, specialGroup, user.programme),
   }
 }
 
@@ -353,13 +375,14 @@ const getMockedUser = async ({ userToMock, mockedBy }) => {
     specialGroup,
     mockedBy,
     iamGroups: userFromDb.iamGroups,
+    programmeRights: getStudyProgrammeRights(access, specialGroup, userFromDb.programme),
   }
   userDataCache.set(`mocking-as-${userToMock}`, toReturn)
 
   return toReturn
 }
 
-const getUser = async ({ username, name, email, iamGroups, iamRights, specialGroup, sisId }) => {
+const getUser = async ({ username, name, email, iamGroups, iamRights, specialGroup, sisId, access }) => {
   if (userDataCache.has(username)) {
     return userDataCache.get(username)
   }
@@ -389,6 +412,7 @@ const getUser = async ({ username, name, email, iamGroups, iamRights, specialGro
     iamRights,
     iamGroups: userFromDb.iamGroups,
     roles: newAccessGroups,
+    programmeRights: getStudyProgrammeRights(access, specialGroup, userFromDb.programme),
   }
   userDataCache.set(username, toReturn)
   return toReturn

@@ -9,8 +9,16 @@ import { useAddUserUnitsMutation, useRemoveUserUnitsMutation } from '@/redux/use
 import { InfoBox } from '../Info/InfoBox'
 import { useLanguage } from '../LanguagePicker/useLanguage'
 
+const mapAndSortProgrammes = (programmes, elementdetails, getTextIn) =>
+  programmes
+    .map(({ code, limited }) => {
+      const elementInfo = elementdetails.find(e => e.code === code)
+      return { code, name: getTextIn(elementInfo?.name), limited }
+    })
+    .sort(createLocaleComparator('name'))
+
 export const AccessRights = ({ user }) => {
-  const { id: uid, elementdetails: rightsIncludingFacultyRights, programme: regularRights, accessgroup } = user
+  const { id: uid, elementdetails: rightsIncludingFacultyRights, accessgroup, programmeRights } = user
   const { getTextIn } = useLanguage()
   const [accessRightsToBeAdded, setAccessRightsToBeAdded] = useState([])
   const [accessRightsToBeRemoved, setAccessRightsToBeRemoved] = useState([])
@@ -47,21 +55,17 @@ export const AccessRights = ({ user }) => {
     options = options.filter(({ value }) => ['MH', 'KH'].includes(value.slice(0, 2)))
   }
 
-  const currentAccessRights = regularRights
-    .reduce((acc, { elementDetailCode }) => {
-      const elementInfo = elementdetails.find(e => e.code === elementDetailCode)
-      if (elementInfo) acc.push({ code: elementInfo.code, name: getTextIn(elementInfo.name) })
-      return acc
-    }, [])
-    .sort(createLocaleComparator('name'))
+  const currentRegularAccessRights = mapAndSortProgrammes(
+    programmeRights.filter(({ isIamBased }) => !isIamBased),
+    elementdetails,
+    getTextIn
+  )
 
-  const currentIamAccessRights = Object.entries(user.iam_groups)
-    .reduce((acc, [code, rights]) => {
-      const elementInfo = elementdetails.find(e => e.code === code)
-      acc.push({ code, name: getTextIn(elementInfo?.name), rights: { read: rights.read, admin: rights.admin } })
-      return acc
-    }, [])
-    .sort(createLocaleComparator('name'))
+  const currentIamAccessRights = mapAndSortProgrammes(
+    programmeRights.filter(({ isIamBased }) => isIamBased),
+    elementdetails,
+    getTextIn
+  )
 
   if (accessgroup.some(ag => ag.group_code === 'admin')) {
     return <Message positive icon="lock open" header="This user is an admin." />
@@ -101,9 +105,9 @@ export const AccessRights = ({ user }) => {
           onChange={() => setFilterOldProgrammes(!filterOldProgrammes)}
         />
       </div>
-      <Header size="small" content={`Current study programme access rights (${currentAccessRights.length})`} />
+      <Header size="small" content={`Current study programme access rights (${currentRegularAccessRights.length})`} />
       <List divided>
-        {currentAccessRights.map(({ code, name }) => (
+        {currentRegularAccessRights.map(({ code, name }) => (
           <List.Item key={code}>
             <List.Content floated="right">
               <Button
@@ -128,11 +132,11 @@ export const AccessRights = ({ user }) => {
       </List>
       <Header
         size="small"
-        content={`Current IAM group based study programme access rights (${Object.keys(user.iam_groups).length})`}
+        content={`Current IAM group based study programme access rights (${currentIamAccessRights.length})`}
       />
       <InfoBox content={userToolTips.IamGroupBasedAccess} />
       <List divided>
-        {currentIamAccessRights.map(({ code, name, rights }) => (
+        {currentIamAccessRights.map(({ code, name, limited }) => (
           <List.Item key={code}>
             <div style={{ display: 'flex' }}>
               <div style={{ flexGrow: 1 }}>
@@ -142,11 +146,7 @@ export const AccessRights = ({ user }) => {
                 content={
                   <Popup
                     trigger={
-                      <Icon
-                        name="exclamation triangle"
-                        color={!rights.read || rights.admin ? 'grey' : 'green'}
-                        disabled={!rights.read || rights.admin}
-                      />
+                      <Icon name="exclamation triangle" color={limited ? 'green' : 'grey'} disabled={!limited} />
                     }
                     content="Limited rights"
                     position="top center"
@@ -156,9 +156,7 @@ export const AccessRights = ({ user }) => {
               <List.Content
                 content={
                   <Popup
-                    trigger={
-                      <Icon name="check circle" color={!rights.admin ? 'grey' : 'green'} disabled={!rights.admin} />
-                    }
+                    trigger={<Icon name="check circle" color={!limited ? 'green' : 'grey'} disabled={limited} />}
                     content="Full rights"
                     position="top center"
                   />

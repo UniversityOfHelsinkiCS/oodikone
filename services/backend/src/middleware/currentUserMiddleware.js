@@ -52,6 +52,7 @@ const currentUserMiddleware = async (req, _res, next) => {
     iamRights,
     specialGroup,
     sisId,
+    access,
   })
 
   if (showAsUser && user.isAdmin) {
