@@ -59,10 +59,10 @@ describe('Studyprogramme overview', () => {
       const tableContents = [
         ...years.map(year => [year, 0, 0]),
         [2021, 0, 0, 0, 0, 0],
-        [2020, 4511, 4511, 0, 0, 167],
-        [2019, 7097, 7097, 0, 0, 349],
-        [2018, 5742, 5742, 0, 0, 272],
-        [2017, 1910, 1910, 0, 0, 388],
+        [2020, 4511, 4511, 0, 0, 406],
+        [2019, 7117, 7097, 0, 0, 434],
+        [2018, 5742, 5737, 0, 0, 150],
+        [2017, 1882, 1882, 0, 0, 186],
       ]
 
       cy.checkTableStats(tableContents, 'CreditsProducedByTheStudyprogramme')
@@ -101,10 +101,10 @@ describe('Studyprogramme overview', () => {
       const creditTableContents = [
         ...years.map(year => [year, 0, 0]),
         [2021, 0, 0, 0, 0, 0],
-        [2020, 4511, 4511, 0, 0, 167],
-        [2019, 7097, 7097, 0, 0, 349],
-        [2018, 5742, 5742, 0, 0, 272],
-        [2017, 1910, 1910, 0, 0, 388],
+        [2020, 4511, 4511, 0, 0, 406],
+        [2019, 7117, 7097, 0, 0, 434],
+        [2018, 5742, 5737, 0, 0, 150],
+        [2017, 1882, 1882, 0, 0, 186],
       ]
 
       cy.checkTableStats(creditTableContents, 'CreditsProducedByTheStudyprogramme')
@@ -141,10 +141,10 @@ describe('Studyprogramme overview', () => {
       const creditTableContents = [
         ...years.map(year => [year, 0, 0]),
         ['2021 - 2022', 0, 0, 0, 0, 0],
-        ['2020 - 2021', 352, 352, 0, 0, 60],
-        ['2019 - 2020', 6966, 6966, 0, 0, 193],
-        ['2018 - 2019', 7777, 7777, 0, 0, 328],
-        ['2017 - 2018', 4165, 4165, 0, 0, 344],
+        ['2020 - 2021', 352, 352, 0, 0, 296],
+        ['2019 - 2020', 6966, 6966, 0, 0, 430],
+        ['2018 - 2019', 7797, 7777, 0, 0, 259],
+        ['2017 - 2018', 4137, 4132, 0, 0, 191],
       ]
 
       cy.checkTableStats(creditTableContents, 'CreditsProducedByTheStudyprogramme')
