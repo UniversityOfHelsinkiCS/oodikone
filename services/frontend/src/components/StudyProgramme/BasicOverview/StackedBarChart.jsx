@@ -13,6 +13,7 @@ export const StackedBarChart = ({ cypress, data, labels, wideTable }) => {
     },
     series: dataWithColors,
     credits: {
+      href: 'https://toska.dev',
       text: 'oodikone | TOSKA',
     },
     xAxis: {

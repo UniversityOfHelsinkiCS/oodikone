@@ -198,6 +198,7 @@ export const MedianBarChart = ({
       ],
     },
     credits: {
+      href: 'https://toska.dev',
       text: 'oodikone | TOSKA',
     },
   }

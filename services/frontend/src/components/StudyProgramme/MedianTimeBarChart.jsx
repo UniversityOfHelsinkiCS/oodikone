@@ -133,6 +133,7 @@ export const MedianTimeBarChart = ({ data, goal, title, byStartYear }) => {
       ],
     },
     credits: {
+      href: 'https://toska.dev',
       text: 'oodikone | TOSKA',
     },
   }

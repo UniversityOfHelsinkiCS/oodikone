@@ -67,6 +67,7 @@ export const BreakdownBarChart = ({ data, title, byStartYear = false }) => {
       showFirstLabel: false,
     },
     credits: {
+      href: 'https://toska.dev',
       text: 'oodikone | TOSKA',
     },
     plotOptions: {

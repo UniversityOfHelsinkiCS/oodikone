@@ -12,6 +12,7 @@ export const BarChart = ({ cypress, data }) => {
     },
     series: dataWithColors,
     credits: {
+      href: 'https://toska.dev',
       text: 'oodikone | TOSKA',
     },
     xAxis: {

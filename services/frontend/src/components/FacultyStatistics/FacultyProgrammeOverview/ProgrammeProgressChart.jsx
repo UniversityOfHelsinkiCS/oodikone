@@ -25,6 +25,7 @@ export const ProgrammeProgressChart = ({ data, labels, longLabels, names }) => {
       height: 80 + 45 * labels.length,
     },
     credits: {
+      href: 'https://toska.dev',
       text: 'oodikone | TOSKA',
     },
     title: {

@@ -77,6 +77,7 @@ export const CollapsedStackedBar = ({ data, labels, longLabels, names, plotLineP
       height: getFlexHeight(labels.length),
     },
     credits: {
+      href: 'https://toska.dev',
       text: 'oodikone | TOSKA',
     },
     title: {

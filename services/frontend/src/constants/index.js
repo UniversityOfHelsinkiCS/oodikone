@@ -11,6 +11,7 @@ export const passRateAttemptGraphOptions = (isRelative, categories, max, title) 
   },
   colors: isRelative ? [color.green, color.red] : [chartColor.blue, color.green, color.red],
   credits: {
+    href: 'https://toska.dev',
     text: 'oodikone | TOSKA',
   },
   title: {
@@ -48,6 +49,7 @@ export const passRateStudentGraphOptions = (isRelative, categories, max, title) 
     ? [chartColor.greenLight, chartColor.greenDark, chartColor.redLight, chartColor.redDark]
     : [chartColor.blue, chartColor.greenLight, chartColor.greenDark, chartColor.redLight, chartColor.redDark],
   credits: {
+    href: 'https://toska.dev',
     text: 'oodikone | TOSKA',
   },
   title: {
@@ -92,6 +94,7 @@ export const gradeGraphOptions = (isRelative, categories, max, title) => ({
     color.green,
   ],
   credits: {
+    href: 'https://toska.dev',
     text: 'oodikone | TOSKA',
   },
   title: {

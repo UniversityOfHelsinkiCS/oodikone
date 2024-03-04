@@ -17,6 +17,7 @@ export const LineGraph = ({ cypress, data }) => {
     },
     series: dataWithColors,
     credits: {
+      href: 'https://toska.dev',
       text: 'oodikone | TOSKA',
     },
     exporting: {

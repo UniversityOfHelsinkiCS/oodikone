@@ -199,6 +199,7 @@ export const CreditDistributionDevelopment = ({ students, programme, combinedPro
     series,
     title: { text: title },
     credits: {
+      href: 'https://toska.dev',
       text: 'oodikone | TOSKA',
     },
     tooltip: {
