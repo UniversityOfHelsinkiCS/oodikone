@@ -1,8 +1,6 @@
 import React from 'react'
 import ReactHighcharts from 'react-highcharts'
 
-import { creditsHref, creditsText } from '@/constants'
-
 const colors = ['#003E65', '#1392c2', '#036415']
 
 export const BarChart = ({ cypress, data }) => {
@@ -14,8 +12,7 @@ export const BarChart = ({ cypress, data }) => {
     },
     series: dataWithColors,
     credits: {
-      href: creditsHref,
-      text: creditsText,
+      enabled: false,
     },
     xAxis: {
       categories: data?.years,

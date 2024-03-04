@@ -3,7 +3,6 @@ import React from 'react'
 import ReactHighcharts from 'react-highcharts'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { creditsHref, creditsText } from '@/constants'
 
 export const BreakdownBarChart = ({
   data,
@@ -100,8 +99,7 @@ export const BreakdownBarChart = ({
       showFirstLabel: false,
     },
     credits: {
-      href: creditsHref,
-      text: creditsText,
+      enabled: false,
     },
     plotOptions: {
       bar: {

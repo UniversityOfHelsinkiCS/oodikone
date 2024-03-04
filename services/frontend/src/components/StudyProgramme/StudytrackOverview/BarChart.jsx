@@ -3,7 +3,6 @@ import ReactHighcharts from 'react-highcharts'
 
 import { generateGradientColors } from '@/common'
 import { NoDataMessage } from '@/components/StudyProgramme/NoDataMessage'
-import { creditsHref, creditsText } from '@/constants'
 
 export const BarChart = ({ cypress, data, track }) => {
   if (!data || !data.creditGraphStats || !data.creditGraphStats[track])
@@ -25,8 +24,7 @@ export const BarChart = ({ cypress, data, track }) => {
     },
     series: dataWithColors,
     credits: {
-      href: creditsHref,
-      text: creditsText,
+      enabled: false,
     },
     xAxis: {
       categories: data?.years,

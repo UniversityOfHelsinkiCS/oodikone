@@ -4,7 +4,6 @@ import ReactHighcharts from 'react-highcharts'
 
 import { generateGradientColors } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { creditsHref, creditsText } from '@/constants'
 
 export const ProgrammeProgressChart = ({ data, labels, longLabels, names }) => {
   const { getTextIn } = useLanguage()
@@ -26,8 +25,7 @@ export const ProgrammeProgressChart = ({ data, labels, longLabels, names }) => {
       height: 80 + 45 * labels.length,
     },
     credits: {
-      href: creditsHref,
-      text: creditsText,
+      enabled: false,
     },
     title: {
       text: '',

@@ -1,6 +1,5 @@
 import React from 'react'
 import ReactHighcharts from 'react-highcharts'
-import { creditsHref, creditsText } from '@/constants'
 import { color, chartColor } from '@/styles/colors'
 import {
   absoluteToRelative,
@@ -26,8 +25,7 @@ const gradeGraphOptions = (isRelative, categories, max, title) => ({
     color.green,
   ],
   credits: {
-    href: creditsHref,
-    text: creditsText,
+    enabled: false,
   },
   title: {
     text: title,

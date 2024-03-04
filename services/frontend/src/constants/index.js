@@ -15,6 +15,3 @@ export const PRIORITYCODE_TEXTS = {
 export const SEARCH_HISTORY_VERSION = '1.0'
 
 export const LANGUAGE_CODES = ['fi', 'en', 'sv']
-
-export const creditsHref = 'https://toska.dev'
-export const creditsText = 'oodikone | TOSKA'

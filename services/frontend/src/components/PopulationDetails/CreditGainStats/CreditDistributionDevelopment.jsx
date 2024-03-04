@@ -10,7 +10,6 @@ import { getMonths } from '@/common/query'
 import { studentNumberFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { creditsHref, creditsText } from '@/constants'
 import { useGetSemestersQuery } from '@/redux/semesters'
 
 const StackOrdering = {
@@ -200,8 +199,7 @@ export const CreditDistributionDevelopment = ({ students, programme, combinedPro
     series,
     title: { text: title },
     credits: {
-      href: creditsHref,
-      text: creditsText,
+      enabled: false,
     },
     tooltip: {
       formatter: tooltipFormatter,
