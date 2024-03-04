@@ -1,6 +1,7 @@
 /* eslint-disable react/no-this-in-sfc */
 import React from 'react'
 import ReactHighcharts from 'react-highcharts'
+import { creditsHref, creditsText } from '@/constants'
 
 export const MedianBarChart = ({
   data,
@@ -198,8 +199,8 @@ export const MedianBarChart = ({
       ],
     },
     credits: {
-      href: 'https://toska.dev',
-      text: 'oodikone | TOSKA',
+      href: creditsHref,
+      text: creditsText,
     },
   }
 

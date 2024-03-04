@@ -2,6 +2,8 @@
 import React from 'react'
 import ReactHighcharts from 'react-highcharts'
 
+import { creditsHref, creditsText } from '@/constants'
+
 export const BreakdownBarChart = ({ data, title, byStartYear = false }) => {
   const statData = [
     { name: 'On time', color: '#90A959', data: [] },
@@ -67,8 +69,8 @@ export const BreakdownBarChart = ({ data, title, byStartYear = false }) => {
       showFirstLabel: false,
     },
     credits: {
-      href: 'https://toska.dev',
-      text: 'oodikone | TOSKA',
+      href: creditsHref,
+      text: creditsText,
     },
     plotOptions: {
       bar: {

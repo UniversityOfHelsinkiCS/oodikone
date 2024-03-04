@@ -2,6 +2,8 @@
 import React from 'react'
 import ReactHighcharts from 'react-highcharts'
 
+import { creditsHref, creditsText } from '@/constants'
+
 export const MedianTimeBarChart = ({ data, goal, title, byStartYear }) => {
   if (!data) return null
 
@@ -133,8 +135,8 @@ export const MedianTimeBarChart = ({ data, goal, title, byStartYear }) => {
       ],
     },
     credits: {
-      href: 'https://toska.dev',
-      text: 'oodikone | TOSKA',
+      href: creditsHref,
+      text: creditsText,
     },
   }
 

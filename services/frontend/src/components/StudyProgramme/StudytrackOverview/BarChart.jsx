@@ -2,7 +2,8 @@ import React from 'react'
 import ReactHighcharts from 'react-highcharts'
 
 import { generateGradientColors } from '@/common'
-import { NoDataMessage } from '../NoDataMessage'
+import { NoDataMessage } from '@/components/StudyProgramme/NoDataMessage'
+import { creditsHref, creditsText } from '@/constants'
 
 export const BarChart = ({ cypress, data, track }) => {
   if (!data || !data.creditGraphStats || !data.creditGraphStats[track])
@@ -24,8 +25,8 @@ export const BarChart = ({ cypress, data, track }) => {
     },
     series: dataWithColors,
     credits: {
-      href: 'https://toska.dev',
-      text: 'oodikone | TOSKA',
+      href: creditsHref,
+      text: creditsText,
     },
     xAxis: {
       categories: data?.years,

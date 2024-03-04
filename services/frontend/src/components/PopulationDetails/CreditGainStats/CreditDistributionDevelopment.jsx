@@ -1,16 +1,17 @@
 import _ from 'lodash'
 import moment from 'moment'
-import React, { useState, useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import ReactHighcharts from 'react-highcharts'
 import { useLocation } from 'react-router-dom'
-import { Radio, Dropdown, Segment } from 'semantic-ui-react'
+import { Dropdown, Radio, Segment } from 'semantic-ui-react'
 
-import { getTargetCreditsForProgramme, TimeDivision, getCreditCategories, generateGradientColors } from '@/common'
+import { generateGradientColors, getCreditCategories, getTargetCreditsForProgramme, TimeDivision } from '@/common'
 import { getMonths } from '@/common/query'
 import { studentNumberFilter } from '@/components/FilterView/filters'
+import { useFilters } from '@/components/FilterView/useFilters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { creditsHref, creditsText } from '@/constants'
 import { useGetSemestersQuery } from '@/redux/semesters'
-import { useFilters } from '../../FilterView/useFilters'
 
 const StackOrdering = {
   ASCENDING: 'asc',
@@ -199,8 +200,8 @@ export const CreditDistributionDevelopment = ({ students, programme, combinedPro
     series,
     title: { text: title },
     credits: {
-      href: 'https://toska.dev',
-      text: 'oodikone | TOSKA',
+      href: creditsHref,
+      text: creditsText,
     },
     tooltip: {
       formatter: tooltipFormatter,

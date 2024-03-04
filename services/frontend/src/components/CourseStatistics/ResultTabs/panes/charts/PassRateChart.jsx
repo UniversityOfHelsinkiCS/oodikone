@@ -1,5 +1,6 @@
 import React from 'react'
 import ReactHighcharts from 'react-highcharts'
+import { creditsHref, creditsText } from '@/constants'
 import { color, chartColor } from '@/styles/colors'
 import { absoluteToRelative, getDataObject, getMaxValueOfSeries } from '../util'
 
@@ -9,8 +10,8 @@ const passRateAttemptGraphOptions = (isRelative, categories, max, title) => ({
   },
   colors: isRelative ? [color.green, color.red] : [chartColor.blue, color.green, color.red],
   credits: {
-    href: 'https://toska.dev',
-    text: 'oodikone | TOSKA',
+    href: creditsHref,
+    text: creditsText,
   },
   title: {
     text: title,
@@ -47,8 +48,8 @@ const passRateStudentGraphOptions = (isRelative, categories, max, title) => ({
     ? [chartColor.greenLight, chartColor.greenDark, chartColor.redLight, chartColor.redDark]
     : [chartColor.blue, chartColor.greenLight, chartColor.greenDark, chartColor.redLight, chartColor.redDark],
   credits: {
-    href: 'https://toska.dev',
-    text: 'oodikone | TOSKA',
+    href: creditsHref,
+    text: creditsText,
   },
   title: {
     text: title,

@@ -2,7 +2,8 @@
 import React from 'react'
 import ReactHighcharts from 'react-highcharts'
 
-import { useLanguage } from 'components/LanguagePicker/useLanguage'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { creditsHref, creditsText } from '@/constants'
 
 export const BreakdownBarChart = ({
   data,
@@ -99,8 +100,8 @@ export const BreakdownBarChart = ({
       showFirstLabel: false,
     },
     credits: {
-      href: 'https://toska.dev',
-      text: 'oodikone | TOSKA',
+      href: creditsHref,
+      text: creditsText,
     },
     plotOptions: {
       bar: {

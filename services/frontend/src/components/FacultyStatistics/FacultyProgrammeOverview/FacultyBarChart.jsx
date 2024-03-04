@@ -2,6 +2,7 @@ import React from 'react'
 import ReactHighcharts from 'react-highcharts'
 
 import { generateGradientColors } from '@/common'
+import { creditsHref, creditsText } from '@/constants'
 
 export const FacultyBarChart = ({ cypress, data }) => {
   if (!data.stats) return null
@@ -18,8 +19,8 @@ export const FacultyBarChart = ({ cypress, data }) => {
     },
     series: dataWithColors,
     credits: {
-      href: 'https://toska.dev',
-      text: 'oodikone | TOSKA',
+      href: creditsHref,
+      text: creditsText,
     },
     xAxis: {
       categories: data?.years,
