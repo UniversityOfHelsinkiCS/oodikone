@@ -1,7 +1,81 @@
 import React from 'react'
 import ReactHighcharts from 'react-highcharts'
-import { passRateAttemptGraphOptions, passRateStudentGraphOptions } from '@/constants'
+import { color, chartColor } from '@/styles/colors'
 import { absoluteToRelative, getDataObject, getMaxValueOfSeries } from '../util'
+
+const passRateAttemptGraphOptions = (isRelative, categories, max, title) => ({
+  chart: {
+    type: 'column',
+  },
+  colors: isRelative ? [color.green, color.red] : [chartColor.blue, color.green, color.red],
+  credits: {
+    href: 'https://toska.dev',
+    text: 'oodikone | TOSKA',
+  },
+  title: {
+    text: title,
+  },
+  xAxis: {
+    categories,
+  },
+  yAxis: {
+    allowDecimals: false,
+    title: {
+      text: isRelative ? 'Share of Students' : 'Number of Students',
+    },
+    max,
+    floor: -max,
+  },
+  plotOptions: {
+    column: {
+      stacking: 'normal',
+      borderRadius: 3,
+    },
+    series: {
+      tooltip: {
+        valueSuffix: isRelative ? '%' : '',
+      },
+    },
+  },
+})
+
+const passRateStudentGraphOptions = (isRelative, categories, max, title) => ({
+  chart: {
+    type: 'column',
+  },
+  colors: isRelative
+    ? [chartColor.greenLight, chartColor.greenDark, chartColor.redLight, chartColor.redDark]
+    : [chartColor.blue, chartColor.greenLight, chartColor.greenDark, chartColor.redLight, chartColor.redDark],
+  credits: {
+    href: 'https://toska.dev',
+    text: 'oodikone | TOSKA',
+  },
+  title: {
+    text: title,
+  },
+  xAxis: {
+    categories,
+  },
+  yAxis: {
+    allowDecimals: false,
+    title: {
+      text: isRelative ? 'Share of Students' : 'Number of Students',
+    },
+    max,
+    floor: -max,
+  },
+  plotOptions: {
+    column: {
+      stacking: 'normal',
+      borderRadius: 1,
+    },
+    series: {
+      tooltip: {
+        valueSuffix: isRelative ? '%' : '',
+      },
+    },
+  },
+})
 
 const getPassRateAttemptSeriesFromStats = stats => {
   const all = []

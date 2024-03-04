@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactHighcharts from 'react-highcharts'
-import { gradeGraphOptions } from '../../../../../constants'
+import { color, chartColor } from '@/styles/colors'
 import {
   absoluteToRelative,
   getDataObject,
@@ -9,6 +9,54 @@ import {
   getThesisGradeSpread,
   isThesisSeries,
 } from '../util'
+
+const gradeGraphOptions = (isRelative, categories, max, title) => ({
+  chart: {
+    type: 'column',
+  },
+  colors: [
+    color.red,
+    chartColor.blue,
+    chartColor.blue,
+    chartColor.blue,
+    chartColor.blue,
+    chartColor.blue,
+    color.green,
+    color.green,
+  ],
+  credits: {
+    href: 'https://toska.dev',
+    text: 'oodikone | TOSKA',
+  },
+  title: {
+    text: title,
+  },
+  legend: {
+    enabled: false,
+  },
+  xAxis: {
+    categories,
+  },
+  yAxis: {
+    allowDecimals: false,
+    title: {
+      text: isRelative ? 'Share of Students' : 'Number of Students',
+    },
+    max,
+    floor: -max,
+  },
+  plotOptions: {
+    column: {
+      stacking: 'normal',
+      borderRadius: 2,
+    },
+    series: {
+      tooltip: {
+        valueSuffix: isRelative ? '%' : '',
+      },
+    },
+  },
+})
 
 const getGradeSeries = series => {
   const isGradeSeries = !isThesisSeries(series)
