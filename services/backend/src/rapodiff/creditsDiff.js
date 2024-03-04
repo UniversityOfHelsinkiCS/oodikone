@@ -8,7 +8,7 @@ let noDiffCounter = 0
 
 const diff = (rapoData, okData, code) => {
   for (const year of Object.keys(okData)) {
-    if (year !== '2022') continue
+    if (year !== '2022' && year !== '2023') continue
     const rapo = rapoData[year]
     const ok = okData[year]
     if (!rapo) {

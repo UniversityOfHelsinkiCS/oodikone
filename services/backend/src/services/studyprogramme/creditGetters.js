@@ -46,16 +46,30 @@ const getCreditsForProvider = async (provider, codes, since) => {
   const courseIdToShare = (courseId, attainmentDate) => {
     const providers = courseIdToShareMap[courseId]
     const relevantProvider = providers.find(p => organizationIdToCodeMap[p.organizationcode] === provider)
-    if (!relevantProvider) return 0
-    if (!relevantProvider.shares) return 0
-    const relevantShare = relevantProvider.shares.find(share => {
-      const startMatches = new Date(share.startDate) <= attainmentDate || !share.startDate
-      const endMatches = new Date(share.endDate) >= attainmentDate || !share.endDate
-      const bothArentNull = share.startDate || share.endDate
-      // TODO: This can mistake in cases where there are multiple entries with only startDate,
-      // those should be ordered and the most correct one taken
-      return startMatches && endMatches && bothArentNull
-    })
+    if (!relevantProvider?.shares) return 0
+    const relevantShare = relevantProvider.shares
+      .filter(share => {
+        const startMatches = new Date(share.startDate) <= attainmentDate || !share.startDate
+        const endMatches = new Date(share.endDate) >= attainmentDate || !share.endDate
+        const bothArentNull = share.startDate || share.endDate
+        return startMatches && endMatches && bothArentNull
+      })
+      // The next mess is for cases where there are multiple shares with only startdate or enddate.
+      // This isn't pretty and it may not be 100% correct but because the
+      // data is all over the place, this is best approximation for now.
+      .sort((a, b) => {
+        if (!b.startDate || !a.startDate) return 0
+        const bTime = b.startDate ? new Date(b.startDate).getTime() : 0
+        const aTime = a.startDate ? new Date(a.startDate).getTime() : 0
+        return bTime - aTime
+      })
+      .sort((a, b) => {
+        if (!b.endDate || !a.endDate) return 0
+        const bTime = b.endDate ? new Date(b.endDate).getTime() : 0
+        const aTime = a.endDate ? new Date(a.endDate).getTime() : 0
+        return bTime - aTime
+      })[0]
+
     // Odd logic, but if there are multiple providers for same course code, if no fitting dates are
     // not found for our relevant provider, we can assume the share of that date is of some other provider.
     // But if only 1 provider exists, we can assume it has share of 1.
