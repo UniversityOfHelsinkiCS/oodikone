@@ -5,12 +5,12 @@ import { Divider, Header, Loader, Message, Segment } from 'semantic-ui-react'
 
 import { useTitle } from '@/common/hooks'
 import { facultyToolTips } from '@/common/InfoToolTips'
+import '@/components/FacultyStatistics/faculty.css'
 import { InfoBox } from '@/components/Info/InfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Toggle } from '@/components/StudyProgramme/Toggle'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetAllFacultiesGraduationStatsQuery, useGetAllFacultiesProgressStatsQuery } from '@/redux/facultyStats'
-import '../FacultyStatistics/faculty.css'
 import { FacultyGraduations } from './FacultyGraduations'
 import { FacultyProgress } from './FacultyProgress'
 
@@ -87,6 +87,7 @@ export const UniversityView = ({ isEvaluationOverview }) => {
     !graduationStats.data
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
   const allFaculties = Object.values(progressStats.data.programmeNames)
+
   return (
     <>
       <div style={{ padding: '30px', textAlign: 'center' }}>
@@ -114,7 +115,7 @@ export const UniversityView = ({ isEvaluationOverview }) => {
       <div className="faculty-overview">
         <div className="programmes-overview">
           {getDivider(
-            'Progress of students of the university ',
+            'Progress of students of the university',
             'BachelorStudentsOfTheFacultyByStartingYear',
             facultyToolTips.StudentProgress,
             'InfoFacultyProgress'
@@ -131,7 +132,6 @@ export const UniversityView = ({ isEvaluationOverview }) => {
           </div>
           <FacultyProgress faculty="ALL" progressStats={progressStats} getDivider={getDivider} />
         </div>
-
         {getDivider('Average graduation times', 'AverageGraduationTimes', facultyToolTips.AverageGraduationTimes)}
         <div className="toggle-container">
           <Toggle

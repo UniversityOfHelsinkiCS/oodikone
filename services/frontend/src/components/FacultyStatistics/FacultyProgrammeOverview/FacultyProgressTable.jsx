@@ -29,7 +29,6 @@ export const FacultyProgressTable = ({
           ))}
         </Table.Row>
       </Table.Header>
-
       <Table.Body>
         {data.map((yearArray, yearIndex) => (
           <React.Fragment key={yearArray[0]}>
