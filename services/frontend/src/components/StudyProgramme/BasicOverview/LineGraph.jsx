@@ -12,7 +12,7 @@ export const LineGraph = ({ cypress, data }) => {
     color: colors[index],
   }))
 
-  const defaultConfig = {
+  const config = {
     title: {
       text: '',
     },
@@ -51,7 +51,7 @@ export const LineGraph = ({ cypress, data }) => {
 
   return (
     <div className="graph-container" data-cy={`Graph-${cypress}`}>
-      <ReactHighcharts config={defaultConfig} />
+      <ReactHighcharts config={config} />
     </div>
   )
 }

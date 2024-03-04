@@ -9,7 +9,7 @@ const colors = ['#7cb5ec', '#90ed7d', '#434348', '#f7a35c', '#FFF000', '#2b908f'
 export const StackedBarChart = ({ cypress, data, labels, wideTable }) => {
   const dataWithColors = data?.map((series, index) => ({ ...series, color: colors[index] }))
 
-  const defaultConfig = {
+  const config = {
     title: {
       text: '',
     },
@@ -64,7 +64,7 @@ export const StackedBarChart = ({ cypress, data, labels, wideTable }) => {
   if (!data) return null
   return (
     <div className={`graph-container${wideTable ? '-narrow' : ''}`} data-cy={`Graph-${cypress}`}>
-      <ReactHighcharts config={defaultConfig} />
+      <ReactHighcharts config={config} />
     </div>
   )
 }

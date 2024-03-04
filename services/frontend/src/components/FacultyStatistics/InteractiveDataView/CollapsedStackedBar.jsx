@@ -71,7 +71,7 @@ export const CollapsedStackedBar = ({ data, labels, longLabels, names, plotLineP
   }
 
   // Tooltip formatter function: this.<some value> needs to be used in order to obtain access to the values.
-  const defaultConfig = {
+  const config = {
     chart: {
       type: 'bar',
       marginTop: 60,
@@ -166,5 +166,5 @@ export const CollapsedStackedBar = ({ data, labels, longLabels, names, plotLineP
   if (!dataTranspose) {
     return <>No data provided</>
   }
-  return <ReactHighcharts config={defaultConfig} />
+  return <ReactHighcharts config={config} />
 }

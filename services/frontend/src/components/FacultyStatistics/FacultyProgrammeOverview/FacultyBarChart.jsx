@@ -13,7 +13,7 @@ export const FacultyBarChart = ({ cypress, data }) => {
     return `oodikone_progress_of_students_in_${data?.id}_by_study_start_year`
   }
 
-  const defaultConfig = {
+  const config = {
     title: {
       text: '',
     },
@@ -60,7 +60,7 @@ export const FacultyBarChart = ({ cypress, data }) => {
 
   return (
     <div className="graph-container" data-cy={`Graph-${cypress}`}>
-      <ReactHighcharts config={defaultConfig} />
+      <ReactHighcharts config={config} />
     </div>
   )
 }

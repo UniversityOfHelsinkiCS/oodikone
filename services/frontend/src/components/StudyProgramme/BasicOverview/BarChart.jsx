@@ -8,7 +8,7 @@ const colors = ['#003E65', '#1392c2', '#036415']
 export const BarChart = ({ cypress, data }) => {
   const dataWithColors = data?.graphStats?.map((series, index) => ({ ...series, color: colors[index] }))
 
-  const defaultConfig = {
+  const config = {
     title: {
       text: '',
     },
@@ -54,7 +54,7 @@ export const BarChart = ({ cypress, data }) => {
   if (!data) return null
   return (
     <div className="graph-container" data-cy={`Graph-${cypress}`}>
-      <ReactHighcharts config={defaultConfig} />
+      <ReactHighcharts config={config} />
     </div>
   )
 }

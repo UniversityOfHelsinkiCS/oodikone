@@ -19,7 +19,7 @@ export const ProgrammeProgressChart = ({ data, labels, longLabels, names }) => {
     .reverse()
 
   // Tooltip formatter function: this.<some value> needs to be used in order to obtain access to the values.
-  const defaultConfig = {
+  const config = {
     chart: {
       type: 'bar',
       marginTop: 60,
@@ -76,5 +76,5 @@ export const ProgrammeProgressChart = ({ data, labels, longLabels, names }) => {
     },
   }
 
-  return <ReactHighcharts config={defaultConfig} />
+  return <ReactHighcharts config={config} />
 }
