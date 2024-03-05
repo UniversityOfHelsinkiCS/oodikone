@@ -8,6 +8,7 @@ const {
   updateStudentsByStudentNumber,
   abort,
   updateCoursesByCourseCode,
+  updateStudentsIndividually,
 } = require('../services/sisUpdaterService')
 
 const logger = require('../util/logger')
@@ -35,6 +36,11 @@ router.get('/update/v2/students', async (req, res) => {
   if (response) {
     res.status(200).json('Update SIS students scheduled')
   }
+})
+
+router.get('/update/v2/students_individually', async (req, res) => {
+  await updateStudentsIndividually()
+  res.status(200).send()
 })
 
 router.post('/update/v2/customlist/:type', async (req, res) => {

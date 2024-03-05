@@ -24,6 +24,7 @@ export const Updater = () => {
 
   const updateSISMeta = () => apiCall('meta', '/updater/update/v2/meta', 'get')
   const updateSISStudents = () => apiCall('students', '/updater/update/v2/students', 'get')
+  const updateSISStudentsIndividually = () => apiCall('students', '/updater/update/v2/students_individually', 'get')
   const updateSISProgrammes = () => apiCall('curriculums', '/updater/update/v2/programmes')
   const updateSISCustomList = () =>
     apiCall('custom list', `/updater/update/v2/customlist/${type}`, 'post', customList.trim().split('\n'))
@@ -111,6 +112,10 @@ export const Updater = () => {
         <Form.Group>
           <Form.Button content="Update meta" onClick={() => updateSISMeta()} />
           <Form.Button content="Update students" onClick={() => updateSISStudents()} />
+          <Form.Button
+            content="Update students individually (don't click)"
+            onClick={() => updateSISStudentsIndividually()}
+          />
           <Form.Button
             content="Update curriculums"
             onClick={() => {
