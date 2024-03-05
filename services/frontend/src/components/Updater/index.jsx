@@ -104,15 +104,6 @@ export const Updater = () => {
           >
             Cause frontend crash
           </button>
-          <button
-            style={{ marginLeft: '5px' }}
-            type="button"
-            onClick={() => {
-              callApi('explode', 'get')
-            }}
-          >
-            Cause backend error
-          </button>
         </p>
       </Message>
       <Form>
