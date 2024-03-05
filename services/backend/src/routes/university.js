@@ -6,7 +6,7 @@ const { getMedian } = require('../services/studyprogramme/studyprogrammeHelpers'
 const degreeNames = ['bachelor', 'bachelorMaster', 'master', 'licentiate', 'doctor']
 
 router.get('/allprogressstats', async (req, res) => {
-  const specialGroups = 'SPECIAL_EXCLUDED'
+  const specialGroups = req.query?.specialsIncluded === 'true' ? 'SPECIAL_INCLUDED' : 'SPECIAL_EXCLUDED'
   const graduated = req.query?.graduated
   const allFaculties = await getFacultyList()
   const facultyCodes = allFaculties.map(f => f.code)
@@ -15,7 +15,7 @@ router.get('/allprogressstats', async (req, res) => {
   for (const facultyCode of facultyCodes) {
     const data = await getFacultyProgressStats(facultyCode, specialGroups, graduated)
     if (!data) {
-      return res.status(500).end()
+      return res.status(404).send('Data missing from server: Refreshing faculty data required')
     }
     codeToData[facultyCode] = data
   }
@@ -66,8 +66,8 @@ router.get('/allprogressstats', async (req, res) => {
         'mastersProgStats',
         'doctoralProgStats',
       ]) {
-        if (Object.keys(facultyData[fieldName]).length === 0) continue
         if (!universityData[fieldName]) universityData[fieldName] = {}
+        if (Object.keys(facultyData[fieldName]).length === 0) continue
         universityData[fieldName][facultyCode] = unifyProgressStats(Object.values(facultyData[fieldName]))
       }
     }

@@ -28,11 +28,13 @@ export const UniversityView = ({ isEvaluationOverview }) => {
   useTitle('University')
   const [graduatedGroup, setGraduatedGroup] = useState(false)
   const [medianMode, setMedianMode] = useState(false)
+  const [excludeSpecials, setIncludeSpecials] = useState(isEvaluationOverview)
   const { isAdmin, roles } = useGetAuthorizedUserQuery()
   const userHasFacultyRights = isAdmin || roles.includes('facultyStatistics') || roles.includes('katselmusViewer')
   const graduated = graduatedGroup ? 'GRADUATED_EXCLUDED' : 'GRADUATED_INCLUDED'
   const progressStats = useGetAllFacultiesProgressStatsQuery({
     graduated,
+    includeSpecials: !excludeSpecials,
   })
   const { getTextIn } = useLanguage()
   const graduationStats = useGetAllFacultiesGraduationStatsQuery()
@@ -55,11 +57,7 @@ export const UniversityView = ({ isEvaluationOverview }) => {
     if (!isEvaluationOverview) {
       return (
         <Message info>
-          <p>
-            In these statistics, <b>all special studyrights have been excluded</b>, eg. exchange students and non-degree
-            students. A toggle will be added later to include special studyrights. Also, programme MH90_001 (Veterinary
-            medicine bachelor + licentiate) is currently excluded.
-          </p>
+          <p>Programme MH90_001 (Veterinary medicine bachelor + licentiate) is currently excluded.</p>
         </Message>
       )
     }
@@ -129,6 +127,16 @@ export const UniversityView = ({ isEvaluationOverview }) => {
               value={graduatedGroup}
               setValue={setGraduatedGroup}
             />
+            {!isEvaluationOverview && (
+              <Toggle
+                cypress="StudentToggle"
+                toolTips={facultyToolTips.StudentToggle}
+                firstLabel="All studyrights"
+                secondLabel="Special studyrights excluded"
+                value={excludeSpecials}
+                setValue={() => setIncludeSpecials(!excludeSpecials)}
+              />
+            )}
           </div>
           <FacultyProgress faculty="ALL" progressStats={progressStats} getDivider={getDivider} />
         </div>
