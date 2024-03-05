@@ -148,9 +148,8 @@ const computeCreditsProduced = async (providerCode, isAcademicYear, specialInclu
     const vaasaTransferredCredits = await getTransferredCredits(vaasaProvider, since)
     transferredCredits.push(...vaasaTransferredCredits)
   }
-  transferredCredits.forEach(({ attainmentDate, credits }) => {
-    // Notice: Rapo uses "createdate"-column of credit to determine the year. This wasn't what we want for OK.
-    const attainmentYear = defineYear(attainmentDate, isAcademicYear)
+  transferredCredits.forEach(({ createdate, credits }) => {
+    const attainmentYear = defineYear(createdate, isAcademicYear)
     if (!stats[attainmentYear]) stats[attainmentYear] = { transferred: 0 }
     stats[attainmentYear].transferred += credits || 0
     // Transferred not counted in total
