@@ -41,7 +41,7 @@ const currentUserMiddleware = async (req, _res, next) => {
 
   if (!hasRequiredIamGroup(iamGroups, iamRights)) {
     logger.error({ message: 'User does not have required iam group', meta: { iamGroups, iamRights } })
-    throw new ApplicationError('User does not have required iam group', 403, { logoutUrl })
+    throw new ApplicationError(`User '${username}' does not have required iam group`, 403, { logoutUrl })
   }
 
   let user = await getUser({
