@@ -57,7 +57,7 @@ const updateStudentsIndividually = async () => {
       },
     })
     const uniqueStudents = [...new Set(studentNumbers.map(s => s.studentnumber))]
-    const chunkSize = 1000
+    const chunkSize = 4000
     for (let from = 0; from < uniqueStudents.length - chunkSize; from += chunkSize) {
       await client.post(
         'v1/students',
