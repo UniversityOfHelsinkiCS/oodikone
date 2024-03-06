@@ -109,7 +109,7 @@ const CustomPopulationContent = ({
   const studyProgrammes = useFilteredAndFormattedElementDetails()
   const [studentAmountLimit, setStudentAmountLimit] = useState(0)
 
-  const discardedStudentNumbers = studentData?.discardedStudentNumber
+  const discardedStudentNumbers = studentData?.discardedStudentNumbers
   const allStudents = studentData?.students ?? []
   const associatedProgramme = studentData?.studyProgramme
 
