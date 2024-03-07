@@ -41,7 +41,7 @@ export const FacultyProgressTable = ({
                 toggleVisibility={() => toggleVisibility(yearIndex)}
               />
             ) : (
-              <Table.Row>
+              <Table.Row style={{ textAlign: 'right' }}>
                 {yearArray.map((value, index) => (
                   /* eslint-disable-next-line react/no-array-index-key */
                   <Table.Cell className="total-row-cell" key={`${index}-${value}`}>

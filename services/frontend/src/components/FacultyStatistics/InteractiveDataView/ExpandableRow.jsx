@@ -8,9 +8,9 @@ const roundValue = value => {
 export const ExpandableRow = ({ icon, yearArray, cypress, yearIndex, toggleVisibility, styles }) => {
   return (
     <Table.Row style={styles} key={`Basic-row-${cypress}-${yearIndex}`}>
-      {yearArray?.map((value, idx) => (
-        <Table.Cell key={`random-button-cell-key-${Math.random()}`}>
-          {idx === 0 ? (
+      {yearArray?.map((value, index) => (
+        <Table.Cell key={`random-button-cell-key-${Math.random()}`} textAlign={index === 0 ? 'center' : 'right'}>
+          {index === 0 ? (
             <Button
               as="div"
               onClick={toggleVisibility}
