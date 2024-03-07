@@ -80,6 +80,9 @@ const getStudyRights = async students =>
         student_studentnumber: {
           [Op.in]: students.length > 0 ? students : { [Op.not]: null },
         },
+        extentcode: {
+          [Op.in]: [1, 2, 3, 4],
+        },
       },
     })
   ).map(mapStudyRights)

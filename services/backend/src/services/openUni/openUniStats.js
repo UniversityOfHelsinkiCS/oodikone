@@ -3,7 +3,7 @@ const { getCredits, getStudyRights, getEnrollments, getStudentInfo, getCourseNam
 
 const uniq = objects => [...new Set(objects)]
 
-const calulateTotalsForStudent = async (studentStats, studentnumber) => {
+const calculateTotalsForStudent = async (studentStats, studentnumber) => {
   Object.keys(studentStats[studentnumber].courseInfo).forEach(course => {
     if (studentStats[studentnumber].courseInfo[course].status.passed) {
       studentStats[studentnumber].totals.passed += 1
@@ -100,7 +100,7 @@ const getCustomOpenUniCourses = async (courseCodes, startdate, enddate) => {
           }
         }
       }
-      await calulateTotalsForStudent(studentStats, studentnumber)
+      await calculateTotalsForStudent(studentStats, studentnumber)
     }
   }
   const openUniStats = { students: studentStats, courses: courses }
