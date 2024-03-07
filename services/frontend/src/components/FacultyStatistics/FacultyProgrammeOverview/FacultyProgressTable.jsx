@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Table } from 'semantic-ui-react'
 
-import { ExpandableRow } from '../InteractiveDataView/ExpandableRow'
+import { ExpandableRow } from '@/components/FacultyStatistics/InteractiveDataView/ExpandableRow'
 import { ProgrammeProgressChart } from './ProgrammeProgressChart'
 
 export const FacultyProgressTable = ({
