@@ -1,7 +1,8 @@
 import React from 'react'
-import { gradeFilter } from '../../FilterView/filters'
-import { FilterToggle } from '../../FilterView/FilterToggle'
-import { useFilters } from '../../FilterView/useFilters'
+
+import { gradeFilter } from '@/components/FilterView/filters'
+import { FilterToggle } from '@/components/FilterView/FilterToggle'
+import { useFilters } from '@/components/FilterView/useFilters'
 
 export const ExternalGradeFilterToggle = ({ grade }) => {
   const { useFilterSelector, filterDispatch } = useFilters()

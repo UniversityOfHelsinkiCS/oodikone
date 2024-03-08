@@ -3,8 +3,8 @@ import React, { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Divider, Header, Loader } from 'semantic-ui-react'
 
-import { useGetChangelogQuery } from 'redux/changelog'
-import { builtAt } from '../../conf'
+import { builtAt } from '@/conf'
+import { useGetChangelogQuery } from '@/redux/changelog'
 
 export const Changelog = ({ showFullChangelog }) => {
   const [itemsToShow, setItemsToShow] = useState([])

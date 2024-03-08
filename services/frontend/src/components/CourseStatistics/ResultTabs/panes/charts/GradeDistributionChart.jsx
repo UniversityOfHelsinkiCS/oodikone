@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactHighcharts from 'react-highcharts'
-import { color, chartColor } from '@/styles/colors'
+
 import {
   absoluteToRelative,
   getDataObject,
@@ -8,7 +8,8 @@ import {
   getMaxValueOfSeries,
   getThesisGradeSpread,
   isThesisSeries,
-} from '../util'
+} from '@/components/CourseStatistics/ResultTabs/panes/util'
+import { chartColor, color } from '@/styles/colors'
 
 const gradeGraphOptions = (isRelative, categories, max, title) => ({
   chart: {

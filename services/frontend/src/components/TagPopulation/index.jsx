@@ -1,5 +1,5 @@
 import { arrayOf, string, shape, func } from 'prop-types'
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import { Button, Dropdown, List, Confirm } from 'semantic-ui-react'
 

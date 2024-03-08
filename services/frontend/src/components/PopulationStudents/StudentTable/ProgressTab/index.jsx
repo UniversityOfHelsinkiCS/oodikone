@@ -3,12 +3,12 @@ import moment from 'moment'
 import React, { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Tab, Icon, Message } from 'semantic-ui-react'
+import { Icon, Message, Tab } from 'semantic-ui-react'
 
 import { StudentInfoItem } from '@/components/common/StudentInfoItem'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import '@/components/StudentStatistics/StudentInfoCard/studentInfoCard.css'
 import { SortableTable } from '@/components/SortableTable'
-import { useLanguage } from '../../../LanguagePicker/useLanguage'
-import '../../../StudentStatistics/StudentInfoCard/studentInfoCard.css'
 
 const findRowContent = (student, courseCode, year, start, end, criteria) => {
   if (courseCode.includes('Credits'))

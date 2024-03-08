@@ -1,8 +1,9 @@
 /* eslint-disable no-alert */
 import React, { useEffect, useState } from 'react'
-import { Segment, Form, Button, TextArea, Header, Message, Radio } from 'semantic-ui-react'
-import { callApi } from '../../apiConnection'
-import { useTitle } from '../../common/hooks'
+import { Button, Form, Header, Message, Radio, Segment, TextArea } from 'semantic-ui-react'
+
+import { callApi } from '@/apiConnection'
+import { useTitle } from '@/common/hooks'
 
 export const Updater = () => {
   const [messages, setMessages] = useState([])

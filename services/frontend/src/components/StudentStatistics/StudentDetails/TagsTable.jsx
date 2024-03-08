@@ -1,10 +1,10 @@
 import { sortBy } from 'lodash'
 import { shape } from 'prop-types'
 import React from 'react'
-import { Label, Header } from 'semantic-ui-react'
+import { Header, Label } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { SortableTable } from '../../SortableTable'
+import { SortableTable } from '@/components/SortableTable'
 
 export const TagsTable = ({ student }) => {
   const { getTextIn } = useLanguage()

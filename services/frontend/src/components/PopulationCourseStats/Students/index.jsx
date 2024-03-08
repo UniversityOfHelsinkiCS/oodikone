@@ -1,13 +1,13 @@
 import _ from 'lodash'
-import React, { useState, useMemo, useCallback } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Icon, Button, Item, Pagination } from 'semantic-ui-react'
+import { Button, Icon, Item, Pagination } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { CourseFilterToggle } from '@/components/PopulationCourseStats/CourseFilterToggle'
+import { UsePopulationCourseContext } from '@/components/PopulationCourseStats/PopulationCourseContext'
 import { SortableTable, group } from '@/components/SortableTable'
-import { useStudentNameVisibility } from '../../StudentNameVisibilityToggle'
-import { CourseFilterToggle } from '../CourseFilterToggle'
-import { UsePopulationCourseContext } from '../PopulationCourseContext'
+import { useStudentNameVisibility } from '@/components/StudentNameVisibilityToggle'
 
 export const Students = ({ filteredStudents }) => {
   const { courseStatistics, onGoToCourseStatisticsClick, modules, toggleGroupExpansion, expandedGroups } =

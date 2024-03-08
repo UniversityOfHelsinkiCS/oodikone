@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Button, Icon, Loader } from 'semantic-ui-react'
-import { useUpdateFacultyBasicViewQuery, useUpdateFacultyProgressViewQuery } from '../../../redux/facultyStats'
+
+import { useUpdateFacultyBasicViewQuery, useUpdateFacultyProgressViewQuery } from '@/redux/facultyStats'
 
 const getStatusIcon = stats => {
   if (stats.isLoading) return <Loader active />

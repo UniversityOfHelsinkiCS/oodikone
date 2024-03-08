@@ -3,13 +3,16 @@ import { Button, Divider, Loader, Message, Popup } from 'semantic-ui-react'
 
 import { getCreditCategories } from '@/common'
 import { facultyToolTips } from '@/common/InfoToolTips'
+import { sortProgrammeKeys } from '@/components/FacultyStatistics/facultyHelpers'
+import {
+  downloadProgressTableCsv,
+  downloadStudentTableCsv,
+} from '@/components/FacultyStatistics/xlsxFileDownloadHelper'
+import '@/components/FacultyStatistics/faculty.css'
+import { InfoBox } from '@/components/Info/InfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { Toggle } from '@/components/StudyProgramme/Toggle'
 import { useGetFacultyProgressStatsQuery, useGetFacultyStudentStatsQuery } from '@/redux/facultyStats'
-import { InfoBox } from '../../Info/InfoBox'
-import { Toggle } from '../../StudyProgramme/Toggle'
-import '../faculty.css'
-import { sortProgrammeKeys } from '../facultyHelpers'
-import { downloadProgressTableCsv, downloadStudentTableCsv } from '../xlsxFileDownloadHelper'
 import { FacultyBarChart } from './FacultyBarChart'
 import { FacultyProgressTable } from './FacultyProgressTable'
 import { FacultyStudentDataTable } from './FacultyStudentDataTable'

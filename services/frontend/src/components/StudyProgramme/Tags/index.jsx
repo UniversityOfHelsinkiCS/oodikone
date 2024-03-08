@@ -1,16 +1,16 @@
 import moment from 'moment'
-import { arrayOf, string, shape, func } from 'prop-types'
-import React, { useState, useEffect } from 'react'
+import { arrayOf, func, shape, string } from 'prop-types'
+import React, { useEffect, useState } from 'react'
 import Datetime from 'react-datetime'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Button, List, Segment, Header, Confirm, Form, Icon, Popup, Message, Item } from 'semantic-ui-react'
+import { Button, Confirm, Form, Header, Icon, Item, List, Message, Popup, Segment } from 'semantic-ui-react'
 
 import { reformatDate } from '@/common'
+import { SortableTable } from '@/components/SortableTable'
+import { ConnectedTagModal as TagModal } from '@/components/StudyProgramme/TagModal'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
-import { getTagsByStudytrackAction, createTagAction, deleteTagAction } from '@/redux/tags'
-import { SortableTable } from '../../SortableTable'
-import { ConnectedTagModal as TagModal } from '../TagModal'
+import { createTagAction, deleteTagAction, getTagsByStudytrackAction } from '@/redux/tags'
 
 const YEAR_DATE_FORMAT = 'YYYY'
 

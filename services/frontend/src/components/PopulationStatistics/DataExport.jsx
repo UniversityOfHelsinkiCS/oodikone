@@ -4,10 +4,10 @@ import { useSelector } from 'react-redux'
 import { Button, Icon, Popup } from 'semantic-ui-react'
 import { utils, writeFile } from 'xlsx'
 
-import { curriculumsApi } from 'redux/populationCourses'
-import { reformatDate, getStudentTotalCredits, getStudentToStudyrightStartMap, getTimestamp } from '../../common'
-import { PRIORITYCODE_TEXTS } from '../../constants'
-import { useLanguage } from '../LanguagePicker/useLanguage'
+import { getStudentTotalCredits, getStudentToStudyrightStartMap, getTimestamp, reformatDate } from '@/common'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { PRIORITYCODE_TEXTS } from '@/constants'
+import { curriculumsApi } from '@/redux/populationCourses'
 
 const { useGetCurriculumsQuery } = curriculumsApi
 

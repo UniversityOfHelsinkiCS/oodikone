@@ -4,7 +4,7 @@ import moment from 'moment'
 import React, { useMemo } from 'react'
 import { Dropdown } from 'semantic-ui-react'
 
-import { useLanguage } from '../../LanguagePicker/useLanguage'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { createFilter } from './createFilter'
 
 const NO_PROGRAMME = {

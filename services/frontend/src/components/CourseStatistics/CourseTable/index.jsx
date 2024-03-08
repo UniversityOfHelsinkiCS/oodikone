@@ -1,10 +1,10 @@
 import { sortBy } from 'lodash'
-import { arrayOf, func, bool, shape, string } from 'prop-types'
+import { arrayOf, bool, func, shape, string } from 'prop-types'
 import React from 'react'
 import { Table } from 'semantic-ui-react'
 
+import { getActiveYears } from '@/components/CourseStatistics/courseStatisticsUtils'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { getActiveYears } from '../courseStatisticsUtils'
 import './courseTable.css'
 
 const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, mandatory = false, controlIcon }) => {

@@ -1,15 +1,16 @@
 import React, { useState } from 'react'
-import { Button, Modal, Form, TextArea } from 'semantic-ui-react'
-import { textAndDescriptionSearch } from 'common'
-import { useFilteredAndFormattedElementDetails } from 'redux/elementdetails'
-import { useTitle } from '../../common/hooks'
+import { Button, Form, Modal, TextArea } from 'semantic-ui-react'
+
+import { textAndDescriptionSearch } from '@/common'
+import { useTitle } from '@/common/hooks'
+import { SearchHistory } from '@/components/SearchHistory'
 import {
-  useGetCustomPopulationSearchesQuery,
   useCreateCustomPopulationSearchMutation,
-  useUpdateCustomPopulationSearchMutation,
   useDeleteCustomPopulationSearchMutation,
-} from '../../redux/customPopulationSearch'
-import { SearchHistory } from '../SearchHistory'
+  useGetCustomPopulationSearchesQuery,
+  useUpdateCustomPopulationSearchMutation,
+} from '@/redux/customPopulationSearch'
+import { useFilteredAndFormattedElementDetails } from '@/redux/elementdetails'
 
 export const CustomPopulationSearch = ({ setCustomPopulationState }) => {
   const [modal, setModal] = useState(false)

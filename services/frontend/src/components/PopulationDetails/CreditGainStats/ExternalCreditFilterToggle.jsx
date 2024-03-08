@@ -3,9 +3,9 @@ import { useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
 
 import { getMonths } from '@/common/query'
-import { creditsEarnedFilter as creditFilter } from '../../FilterView/filters'
-import { FilterToggle } from '../../FilterView/FilterToggle'
-import { useFilters } from '../../FilterView/useFilters'
+import { creditsEarnedFilter as creditFilter } from '@/components/FilterView/filters'
+import { FilterToggle } from '@/components/FilterView/FilterToggle'
+import { useFilters } from '@/components/FilterView/useFilters'
 
 export const ExternalCreditFilterToggle = ({ min, max }) => {
   const { filterDispatch } = useFilters()

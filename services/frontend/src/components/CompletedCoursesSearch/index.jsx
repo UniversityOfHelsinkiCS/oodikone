@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
-import { Message, Icon } from 'semantic-ui-react'
-import { useTitle } from '../../common/hooks'
+import { Icon, Message } from 'semantic-ui-react'
+
+import { useTitle } from '@/common/hooks'
 import { CompletedCoursesSearch } from './CompletedCoursesSearch'
 import { CompletedCoursesSearchResults } from './CompletedCoursesSearchResults'
 

@@ -1,17 +1,17 @@
 import moment from 'moment'
-import { func, string, arrayOf, object, bool } from 'prop-types'
+import { arrayOf, bool, func, object, string } from 'prop-types'
 import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import { Link, useLocation } from 'react-router-dom'
-import { Search, Segment, Container } from 'semantic-ui-react'
+import { Container, Search, Segment } from 'semantic-ui-react'
 
 import { containsOnlyNumbers, validateInputLength, splitByEmptySpace } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { SegmentDimmer } from '@/components/SegmentDimmer'
+import { SortableTable } from '@/components/SortableTable'
+import { Timeout } from '@/components/Timeout'
 import { findStudents, getStudent } from '@/redux/students'
 import { makeFormatStudentRows } from '@/selectors/students'
-import { SegmentDimmer } from '../../SegmentDimmer'
-import { SortableTable } from '../../SortableTable'
-import { Timeout } from '../../Timeout'
 
 const StudentSearch = ({
   getStudent,

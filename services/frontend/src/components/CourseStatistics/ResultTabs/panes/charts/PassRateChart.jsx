@@ -1,7 +1,12 @@
 import React from 'react'
 import ReactHighcharts from 'react-highcharts'
-import { color, chartColor } from '@/styles/colors'
-import { absoluteToRelative, getDataObject, getMaxValueOfSeries } from '../util'
+
+import {
+  absoluteToRelative,
+  getDataObject,
+  getMaxValueOfSeries,
+} from '@/components/CourseStatistics/ResultTabs/panes/util'
+import { chartColor, color } from '@/styles/colors'
 
 const passRateAttemptGraphOptions = (isRelative, categories, max, title) => ({
   chart: {

@@ -1,14 +1,14 @@
 import { max, min, range } from 'lodash'
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Item, Icon, Segment, Header, Loader } from 'semantic-ui-react'
+import { Header, Item, Icon, Loader, Segment } from 'semantic-ui-react'
 
 import { studyProgrammeToolTips } from '@/common/InfoToolTips'
 import { InfoBox } from '@/components/Info/InfoBox'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { SortableTable } from '@/components/SortableTable'
+import { Toggle } from '@/components/StudyProgramme/Toggle'
 import { useGetProgrammeCoursesStatsQuery } from '@/redux/studyProgramme'
-import { useLanguage } from '../../LanguagePicker/useLanguage'
-import { SortableTable } from '../../SortableTable'
-import { Toggle } from '../Toggle'
 import { CourseYearFilter } from './CourseYearFilter'
 
 const getColumns = (getTextIn, showStudents) => {

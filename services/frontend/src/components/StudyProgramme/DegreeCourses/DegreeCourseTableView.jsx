@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react'
-import { Button, Label, Table, Icon, Dropdown } from 'semantic-ui-react'
+import React, { useEffect, useState } from 'react'
+import { Button, Dropdown, Icon, Label, Table } from 'semantic-ui-react'
 
-import { useSetCourseExclusionMutation, useRemoveCourseExclusionMutation } from '../../../redux/courseExclusions'
-import { useLanguage } from '../../LanguagePicker/useLanguage'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { useRemoveCourseExclusionMutation, useSetCourseExclusionMutation } from '@/redux/courseExclusions'
 
 const getYear = criterionYear => {
   if (criterionYear === 1) return 'yearOne'

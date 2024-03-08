@@ -1,16 +1,16 @@
 import { flatten } from 'lodash'
 import React from 'react'
 import { connect, useSelector } from 'react-redux'
-import { Form, Label, Segment, Header } from 'semantic-ui-react'
+import { Form, Header, Label, Segment } from 'semantic-ui-react'
 
 import { getFullStudyProgrammeRights } from '@/common'
+import { AttemptsTable } from '@/components/CourseStatistics/AttemptsTable'
+import { userHasAccessToAllCourseStats } from '@/components/CourseStatistics/courseStatisticsUtils'
+import { ProgrammeDropdown } from '@/components/CourseStatistics/ProgrammeDropdown'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { fields, setValue } from '@/redux/coursesSummaryForm'
-import { ALL, getAllStudyProgrammes, summaryStatistics, getQueryInfo } from '@/selectors/courseStats'
-import { useLanguage } from '../../LanguagePicker/useLanguage'
-import { AttemptsTable } from '../AttemptsTable'
-import { userHasAccessToAllCourseStats } from '../courseStatisticsUtils'
-import { ProgrammeDropdown } from '../ProgrammeDropdown'
+import { ALL, getAllStudyProgrammes, getQueryInfo, summaryStatistics } from '@/selectors/courseStats'
 import { DataExport } from './DataExport'
 
 // Certified JavaScript moment but basically this was crashing

@@ -3,8 +3,8 @@ import { Search, Segment, Icon } from 'semantic-ui-react'
 
 import { validateInputLength, splitByEmptySpace } from '@/common'
 import { useDebounce } from '@/common/hooks'
+import { SortableTable } from '@/components/SortableTable'
 import { useFindTeachersQuery } from '@/redux/teachers'
-import { SortableTable } from '../../SortableTable'
 import './teacherSearch.css'
 
 export const TeacherSearch = ({ onClick }) => {

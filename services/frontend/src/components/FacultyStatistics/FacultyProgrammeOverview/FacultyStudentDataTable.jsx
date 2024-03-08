@@ -3,7 +3,7 @@ import { Table, Button, Icon, Label, Popup } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { PopulationLink } from '@/components/StudyProgramme/StudytrackOverview/PopulationLink'
-import { Toggle } from '../../StudyProgramme/Toggle'
+import { Toggle } from '@/components/StudyProgramme/Toggle'
 
 const getStyle = idx => {
   if ([4, 12].includes(idx)) return { backgroundColor: '#f9f9f9', borderLeftWidth: 'thick' }

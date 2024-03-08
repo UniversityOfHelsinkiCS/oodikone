@@ -1,5 +1,5 @@
 import qs from 'query-string'
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useLocation, useHistory } from 'react-router-dom'
 import { Modal, Form, Button, TextArea, Loader } from 'semantic-ui-react'
 

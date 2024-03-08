@@ -1,9 +1,9 @@
-import { shape, string, arrayOf, func, number, oneOfType } from 'prop-types'
-import React, { useState, useEffect } from 'react'
+import { arrayOf, func, number, oneOfType, shape, string } from 'prop-types'
+import React, { useEffect, useState } from 'react'
 import { Tab, Form } from 'semantic-ui-react'
 
-import { useLanguage } from '../../LanguagePicker/useLanguage'
-import { TeacherStatisticsTable } from '../TeacherStatisticsTable'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { TeacherStatisticsTable } from '@/components/Teachers/TeacherStatisticsTable'
 
 const CourseTabDropdown = ({ options, doSelect, selected }) => (
   <Form>

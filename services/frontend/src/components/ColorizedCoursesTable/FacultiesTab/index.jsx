@@ -1,13 +1,21 @@
 import _ from 'lodash'
 import React, { useMemo } from 'react'
 
+import {
+  calculateTotals,
+  emptyFields,
+  useColorizedCoursesTableContext,
+} from '@/components/ColorizedCoursesTable/common'
+import '@/components/ColorizedCoursesTable/index.css'
+import {
+  ColorModeSelector,
+  NumberModeSelector,
+  SemesterRangeSelector,
+} from '@/components/ColorizedCoursesTable/selectorComponents'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SortableTable, row } from '@/components/SortableTable'
 import { useGetFacultiesQuery } from '@/redux/facultyStats'
-import { calculateTotals, useColorizedCoursesTableContext, emptyFields } from '../common'
-import { ColorModeSelector, NumberModeSelector, SemesterRangeSelector } from '../selectorComponents'
 import { getColumns } from './logic'
-import '../index.css'
 
 export const FacultiesTab = () => {
   const { numberMode, colorMode, semesterFilter, setSemesterFilter, selectedSemesters, data } =

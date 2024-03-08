@@ -1,5 +1,5 @@
 import { orderBy } from 'lodash'
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect, useDispatch } from 'react-redux'
 import { Tab } from 'semantic-ui-react'
 

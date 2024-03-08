@@ -2,11 +2,11 @@ import React, { useState } from 'react'
 import { Divider, Loader } from 'semantic-ui-react'
 
 import { facultyToolTips } from '@/common/InfoToolTips'
+import '@/components/FacultyStatistics/faculty.css'
+import { InfoBox } from '@/components/Info/InfoBox'
+import { Toggle } from '@/components/StudyProgramme/Toggle'
 import { useGetFacultyGraduationTimesQuery } from '@/redux/facultyStats'
-import { InfoBox } from '../../Info/InfoBox'
-import { Toggle } from '../../StudyProgramme/Toggle'
 import { GraduationTimes } from './GraduationTimes'
-import '../faculty.css'
 
 export const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes }) => {
   const [showMedian, setShowMedian] = useState(false)

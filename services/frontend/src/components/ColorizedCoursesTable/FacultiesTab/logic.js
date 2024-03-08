@@ -1,4 +1,4 @@
-import { courseNameColumn, getColor } from '../common'
+import { courseNameColumn, getColor } from '@/components/ColorizedCoursesTable/common'
 
 export const getColumns = (getTextIn, faculties, numberMode, colorMode, facultyMap, allTotal) => {
   const getFacultyTitle = code => {

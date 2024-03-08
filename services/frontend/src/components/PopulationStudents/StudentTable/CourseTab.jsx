@@ -1,15 +1,15 @@
-import _, { orderBy, uniqBy, sortBy, isNumber } from 'lodash'
-import React, { useMemo, useCallback } from 'react'
+import _, { isNumber, orderBy, sortBy, uniqBy } from 'lodash'
+import React, { useCallback, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { Icon, Tab } from 'semantic-ui-react'
 
 import { hiddenNameAndEmailForExcel } from '@/common/columns'
 import { StudentInfoItem } from '@/components/common/StudentInfoItem'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { SortableTable, row } from '@/components/SortableTable'
+import '@/components/PopulationCourseStats/populationCourseStats.css'
+import '@/components/PopulationStudents/populationStudents.css'
 import { useGetStudyGuidanceGroupPopulationCoursesQuery } from '@/redux/studyGuidanceGroups'
-import { SortableTable, row } from '../../SortableTable'
-import '../../PopulationCourseStats/populationCourseStats.css'
-import '../populationStudents.css'
 
 const getMandatoryPassed = (mandatoryCourses, populationCourses, studyGuidanceCourses) => {
   if (!mandatoryCourses || !mandatoryCourses.defaultProgrammeCourses || (!populationCourses && !studyGuidanceCourses))

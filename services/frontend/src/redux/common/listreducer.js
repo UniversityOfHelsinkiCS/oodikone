@@ -1,4 +1,4 @@
-import { actionTypes } from '../../apiConnection'
+import { actionTypes } from '@/apiConnection'
 
 const additionalTypes = prefix => ({
   reset: `${prefix}_CLEAR`,

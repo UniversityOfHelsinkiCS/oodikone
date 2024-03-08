@@ -1,7 +1,8 @@
 import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Radio } from 'semantic-ui-react'
-import { toggleStudentNameVisibility } from '../../redux/settings'
+
+import { toggleStudentNameVisibility } from '@/redux/settings'
 
 export const useStudentNameVisibility = () => {
   const visible = useSelector(state => state.settings.namesVisible)

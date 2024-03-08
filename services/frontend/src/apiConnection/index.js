@@ -3,7 +3,7 @@ import * as Sentry from '@sentry/browser'
 import axios from 'axios'
 
 import { showAsUserKey } from '@/common'
-import { apiBasePath, isDev } from '../conf'
+import { apiBasePath, isDev } from '@/conf'
 
 const getHeaders = () => {
   // Set up dev user for development environment, mimicking production admin user

@@ -1,8 +1,8 @@
-import { func, string, number, bool } from 'prop-types'
-import React, { useState, useEffect } from 'react'
+import { bool, func, number, string } from 'prop-types'
+import React, { useEffect, useState } from 'react'
 import { Input } from 'semantic-ui-react'
 
-import { Timeout } from '../Timeout'
+import { Timeout } from '@/components/Timeout'
 
 const TIMEOUTS = {
   FETCH: 'fetch',

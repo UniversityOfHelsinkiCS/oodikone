@@ -1,21 +1,21 @@
 import { sortBy } from 'lodash'
 import { func } from 'prop-types'
 import qs from 'query-string'
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useLocation, useHistory } from 'react-router-dom'
-import { Segment, Header, Form, Radio, Popup, Message } from 'semantic-ui-react'
+import { Form, Header, Message, Popup, Radio, Segment } from 'semantic-ui-react'
 
 import { validateInputLength } from '@/common'
 import { useSearchHistory, useToggle } from '@/common/hooks'
+import { TimeoutAutoSubmitSearchInput as AutoSubmitSearchInput } from '@/components/AutoSubmitSearchInput'
+import { MemoizedCourseTable as CourseTable } from '@/components/CourseStatistics/CourseTable'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { SearchHistory } from '@/components/SearchHistory'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { clearCourses, findCoursesV2 } from '@/redux/coursesearch'
 import { getCourseStats, clearCourseStats } from '@/redux/coursestats'
 import { getCourseSearchResults } from '@/selectors/courses'
-import { TimeoutAutoSubmitSearchInput as AutoSubmitSearchInput } from '../../AutoSubmitSearchInput'
-import { useLanguage } from '../../LanguagePicker/useLanguage'
-import { SearchHistory } from '../../SearchHistory'
-import { MemoizedCourseTable as CourseTable } from '../CourseTable'
 
 const INITIAL = {
   courseName: '',

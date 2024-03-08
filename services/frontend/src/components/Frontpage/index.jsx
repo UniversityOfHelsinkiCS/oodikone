@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
-import { Container, Header, Image, Divider, List, Grid, Button, Icon } from 'semantic-ui-react'
-import { useGetAuthorizedUserQuery } from 'redux/auth'
-import { images, checkUserAccess, getFullStudyProgrammeRights } from '../../common'
-import { useTitle } from '../../common/hooks'
+import { Button, Container, Divider, Grid, Header, Image, Icon, List } from 'semantic-ui-react'
+
+import { checkUserAccess, getFullStudyProgrammeRights, images } from '@/common'
+import { useTitle } from '@/common/hooks'
+import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { Changelog } from './Changelog'
 
 const FrontPageItem = ({ title, content }) => {

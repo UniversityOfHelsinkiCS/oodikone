@@ -1,5 +1,5 @@
 import { random } from 'lodash'
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import ReactHighchart from 'react-highcharts'
 import { Transition, Dimmer, Header, Image, Container, Button } from 'semantic-ui-react'
 

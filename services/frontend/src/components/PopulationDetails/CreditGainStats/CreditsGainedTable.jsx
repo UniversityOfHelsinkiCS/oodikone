@@ -3,7 +3,7 @@ import React from 'react'
 import { Table } from 'semantic-ui-react'
 
 import { hopsFilter as studyPlanFilter } from '@/components/FilterView/filters'
-import { useFilters } from '../../FilterView/useFilters'
+import { useFilters } from '@/components/FilterView/useFilters'
 import { CollapsibleCreditRow } from './CollapsibleCreditRow'
 
 export const CreditsGainedTable = ({ filteredStudents, type, year, creditDateFilterOptions, programmeGoalTime }) => {
