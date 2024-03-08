@@ -7,7 +7,13 @@ import { connect } from 'react-redux'
 import { useHistory, useLocation } from 'react-router-dom'
 import { Form, Button, Message, Icon, Grid, Radio } from 'semantic-ui-react'
 
-import { momentFromFormat, reformatDate, textAndDescriptionSearch, cancelablePromise } from '@/common'
+import {
+  momentFromFormat,
+  reformatDate,
+  textAndDescriptionSearch,
+  cancelablePromise,
+  isNewStudyProgramme,
+} from '@/common'
 import { useSearchHistory } from '@/common/hooks'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
@@ -408,9 +414,7 @@ const PopulationSearchForm = ({
     if (Object.values(studyProgrammes).length !== 0) {
       let sortedStudyProgrammes = sortBy(studyProgrammes, s => getTextIn(s.name))
       if (filterProgrammes) {
-        sortedStudyProgrammes = sortedStudyProgrammes.filter(
-          programme => programme.code.slice(0, 2) === 'MH' || programme.code.slice(0, 2) === 'KH'
-        )
+        sortedStudyProgrammes = sortedStudyProgrammes.filter(programme => isNewStudyProgramme(programme.code))
       }
       programmesToRender = renderableList(sortedStudyProgrammes)
     }

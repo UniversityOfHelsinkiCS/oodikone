@@ -442,6 +442,8 @@ export const generateGradientColors = steps => {
 export const getFullStudyProgrammeRights = programmeRights =>
   programmeRights ? programmeRights.filter(({ limited }) => !limited).map(({ code }) => code) : []
 
+export const isNewStudyProgramme = programmeCode => ['MH', 'KH', 'T9'].includes(programmeCode.slice(0, 2))
+
 // These are the new Bachelor's programmes in Matlu, that have BH possibility
 export const bachelorHonoursProgrammes = [
   'KH50_001',

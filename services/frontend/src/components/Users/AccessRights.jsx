@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Button, Form, Header, Icon, List, Message, Popup, Radio } from 'semantic-ui-react'
 
-import { createLocaleComparator, textAndDescriptionSearch } from '@/common'
+import { createLocaleComparator, isNewStudyProgramme, textAndDescriptionSearch } from '@/common'
 import { userToolTips } from '@/common/InfoToolTips'
 import { useGetAllElementDetailsQuery } from '@/redux/elementdetails'
 import { useGetUnfilteredProgrammesQuery } from '@/redux/populations'
@@ -54,7 +54,7 @@ export const AccessRights = ({ user }) => {
     .sort(createLocaleComparator('text'))
 
   if (filterOldProgrammes) {
-    options = options.filter(({ value }) => ['MH', 'KH'].includes(value.slice(0, 2)))
+    options = options.filter(({ value }) => isNewStudyProgramme(value))
   }
 
   const currentRegularAccessRights = mapAndSortProgrammes(
