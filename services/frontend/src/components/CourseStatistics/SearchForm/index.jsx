@@ -52,13 +52,19 @@ export const SearchForm = ({ onProgress }) => {
   const { courseName, courseCode, selectedCourses, separate } = state
 
   const parseQueryFromUrl = () => {
-    const { courseCodes, separate, unifyOpenUniCourses, ...rest } = qs.parse(location.search)
+    const {
+      courseCodes,
+      separate,
+      unifyOpenUniCourses,
+      combineSubstitutions: combineSubstitutionsFromUrl,
+      ...rest
+    } = qs.parse(location.search)
     const query = {
       ...INITIAL,
       ...rest,
       courseCodes: JSON.parse(courseCodes),
       separate: JSON.parse(separate),
-      combineSubstitutions: JSON.parse(combineSubstitutions),
+      combineSubstitutions: combineSubstitutionsFromUrl ?? JSON.parse(combineSubstitutions),
     }
     return query
   }
