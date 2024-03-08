@@ -54,6 +54,16 @@ export const UserPage = () => {
         <Button icon="arrow circle left" content="Back" onClick={() => history.push('/users')} />
         <Divider />
         <Card.Group>
+          {!user.sisu_person_id && (
+            <Message
+              header="This user does not have a person id"
+              content="All their roles and access rights might not be displayed."
+              info
+              negative
+              icon="exclamation circle"
+              style={{ margin: '1rem 0' }}
+            />
+          )}
           {renderUserInfoCard()}
           <Card fluid>
             <Card.Content>
