@@ -56,5 +56,9 @@ export const FacultyBarChart = ({ cypress, data }) => {
     },
   }
 
-  return <ReactHighcharts config={config} data-cy={`Graph-${cypress}`} />
+  return (
+    <div data-cy={`Graph-${cypress}`}>
+      <ReactHighcharts config={config} />
+    </div>
+  )
 }
