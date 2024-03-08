@@ -4,6 +4,7 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+  margin-top: 15px;
 }
 
 .faculty-overview .radio-toggle,

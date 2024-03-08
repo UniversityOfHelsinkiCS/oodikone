@@ -1,10 +1,10 @@
 import { debounce } from 'lodash'
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Message, Header, Form } from 'semantic-ui-react'
+import { Form, Message, Header } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { SortableTable } from '../../SortableTable'
+import { SortableTable } from '@/components/SortableTable'
 
 export const FacultySelector = ({ faculties, selected }) => {
   const [filter, setFilter] = useState('')

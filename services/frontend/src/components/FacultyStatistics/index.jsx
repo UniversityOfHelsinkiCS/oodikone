@@ -8,7 +8,7 @@ import { useGetFacultiesQuery } from '@/redux/facultyStats'
 import { useLanguage } from '../LanguagePicker/useLanguage'
 import { BasicOverview } from './BasicOverview'
 import { FacultyProgrammeOverview } from './FacultyProgrammeOverview'
-import { FacultySelector } from './facultySelector'
+import { FacultySelector } from './FacultySelector'
 import { TimesAndPathsView } from './TimesAndPaths'
 import { UpdateView } from './UpdateView'
 

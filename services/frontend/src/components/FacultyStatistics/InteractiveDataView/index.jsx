@@ -103,34 +103,34 @@ export const InteractiveDataTable = ({
   const differenceToPrevYears = calculatDiffToPrevYear(dataProgrammeStats)
 
   return (
-    <div>
-      <Menu compact attached="top">
-        <Menu.Item style={{ cursor: 'default', borderRadius: '1px', padding: '5px' }} active color="black">
+    <div style={{ marginTop: '20px' }}>
+      <Menu compact>
+        <Menu.Item style={{ cursor: 'default', borderRadius: '1px', padding: '0 10px' }} color="black">
           <Popup
+            content="Sort bars in the yearly charts by programme code or other column values. Sort is done inside the degree group."
             trigger={
               <div>
-                Sort by: <Icon name="question circle" />
+                <Icon name="question circle" /> Sort by
               </div>
             }
-            content="Sort bars in the yearly charts by programme code or other column values. Sort is done inside the degree group."
           />
         </Menu.Item>
         {sorterNames.map((sorterName, nameIndex) => (
           <Menu.Item
-            data-cy={`Menu-${cypress}-${sorterName}`}
-            color={sorter === sorterName ? 'blue' : 'black'}
-            key={sorterName}
             active={sorter === sorterName}
-            onClick={() => handleClick(sorterName, nameIndex)}
-            style={{ borderRadius: '1px', fontSize: '14px', padding: '5px' }}
-            icon={sortDir === 1 ? 'triangle down' : 'triangle up'}
+            color={sorter === sorterName ? 'blue' : 'black'}
             content={sorterName}
+            data-cy={`Menu-${cypress}-${sorterName}`}
+            key={sorterName}
+            onClick={() => handleClick(sorterName, nameIndex)}
+            style={{ borderRadius: '1px', fontSize: '14px', padding: '0 10px' }}
+            icon={sortDir === 1 ? 'triangle down' : 'triangle up'}
           />
         ))}
       </Menu>
       <Table data-cy={`Table-${cypress}`} celled>
         <Table.Header>
-          <Table.Row key={`randow-header-row-${Math.random()}`} textAlign="center">
+          <Table.Row key={`random-header-row-${Math.random()}`} textAlign="center">
             {titles?.map(title => (
               <Table.HeaderCell key={title}>{title}</Table.HeaderCell>
             ))}
@@ -140,11 +140,11 @@ export const InteractiveDataTable = ({
           {dataStats?.map((yearArray, yearIndex) => (
             <React.Fragment key={`random-fragment-key-${Math.random()}`}>
               <ExpandableRow
-                icon={visible[yearIndex] ? 'angle down' : 'angle right'}
-                yearArray={yearArray}
                 cypress={visible[yearIndex] ? `Hide-${cypress}` : `Show-${cypress}`}
-                yearIndex={yearIndex}
+                icon={visible[yearIndex] ? 'angle down' : 'angle right'}
                 toggleVisibility={() => toggleVisibility(yearIndex)}
+                yearArray={yearArray}
+                yearIndex={yearIndex}
               />
               <Table.Row key={`stack-row-key-${Math.random()}`} style={{ display: visible[yearIndex] ? '' : 'none' }}>
                 <Table.Cell data-cy={`Cell-${cypress}-${yearIndex}`} key={`stack-cell${Math.random()}`} colSpan={100}>
