@@ -23,6 +23,9 @@ router.get('/allprogressstats', async (req, res) => {
   const universityData = {
     years: codeToData.H50.years,
     yearlyBachelorTitles: codeToData.H50.yearlyBachelorTitles,
+    yearlyBcMsTitles: codeToData.H50.yearlyBcMsTitles,
+    yearlyMasterTitles: codeToData.H50.yearlyMasterTitles,
+    yearlyLicentiateTitles: codeToData.H50.yearlyLicentiateTitles,
     programmeNames: allFaculties.reduce((obj, fac) => {
       const { name, ...rest } = fac.dataValues
       obj[fac.code] = { ...rest, ...name }
