@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Table, Button, Icon, Label, Popup } from 'semantic-ui-react'
+import { Button, Icon, Label, Popup, Table } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { PopulationLink } from '@/components/StudyProgramme/StudytrackOverview/PopulationLink'
@@ -59,6 +59,7 @@ const getTableCell = ({ year, programme, valIdx, rowIdx, tableLinePlaces, value 
             }
           : { ...getStyle(valIdx + 1), ...getRowStyle(rowIdx, tableLinePlaces) }
       }
+      textAlign="right"
     >
       {value}
     </Table.Cell>
@@ -93,16 +94,16 @@ const getRows = ({
     if (valIdx === 19) {
       return (
         <Popup
-          key={key}
           content={getOtherCountriesList({ year, code: programmeNames[programme].code, extraTableStats })}
+          key={key}
           trigger={getTableCell({ year, programme, valIdx, rowIdx: idx, tableLinePlaces, value })}
         />
       )
     }
     return (
       <Popup
-        key={key}
         content={getTitlePopup(valIdx)}
+        key={key}
         trigger={getTableCell({ year, programme, valIdx, rowIdx: idx, tableLinePlaces, value })}
       />
     )
@@ -110,16 +111,16 @@ const getRows = ({
 }
 
 export const FacultyStudentDataTable = ({
-  tableStats,
+  cypress,
   extraTableStats,
-  programmeStats,
   programmeNames,
+  programmeStats,
+  requiredRights,
+  sortedKeys,
   tableLinePlaces,
+  tableStats,
   titles,
   years,
-  sortedKeys,
-  cypress,
-  requiredRights,
 }) => {
   const [yearsVisible, setVisible] = useState(new Array(years.length).fill(false))
   const [showPercentages, setShowPercentages] = useState(false)
@@ -141,8 +142,8 @@ export const FacultyStudentDataTable = ({
         cypress="HidePercentagesToggle"
         firstLabel="Hide percentages"
         secondLabel="Show percentages"
-        value={showPercentages}
         setValue={setShowPercentages}
+        value={showPercentages}
       />
       <Table data-cy={cypress} celled structured>
         <Table.Header>
@@ -173,7 +174,7 @@ export const FacultyStudentDataTable = ({
                 style={
                   [3, 7, 10].includes(index) ? { fontWeight: 'bold', borderLeftWidth: 'thick' } : { fontWeight: 'bold' }
                 }
-                textAlign="left"
+                textAlign="center"
               >
                 {title}
               </Table.HeaderCell>
@@ -191,17 +192,17 @@ export const FacultyStudentDataTable = ({
                       return (
                         <Table.Cell key={`${year}-faculty-cell}`}>
                           <Button
-                            key={`${year}-studentsTableButton}`}
                             as="div"
-                            onClick={() => toggleVisibility(yearIndex)}
-                            labelPosition="right"
-                            style={{ backgroundColor: 'white', borderRadius: 0, padding: 0, margin: 0 }}
                             data-cy={`Button-${cypress}-${yearIndex}`}
+                            key={`${year}-studentsTableButton}`}
+                            labelPosition="right"
+                            onClick={() => toggleVisibility(yearIndex)}
+                            style={{ backgroundColor: 'white', borderRadius: 0, margin: 0, padding: 0 }}
                           >
-                            <Button icon style={{ backgroundColor: 'white', borderRadius: 0, padding: 0, margin: 0 }}>
+                            <Button icon style={{ backgroundColor: 'white', borderRadius: 0, margin: 0, padding: 0 }}>
                               <Icon name={yearsVisible[yearIndex] ? 'angle down' : 'angle right'} />
                             </Button>
-                            <Label as="a" style={{ backgroundColor: 'white', borderRadius: 0, padding: 0, margin: 0 }}>
+                            <Label as="a" style={{ backgroundColor: 'white', borderRadius: 0, margin: 0, padding: 0 }}>
                               <b>{value}</b>
                             </Label>
                           </Button>
@@ -211,8 +212,9 @@ export const FacultyStudentDataTable = ({
                       return null
                     return (
                       <Table.Cell
-                        style={getStyle(valueIdx)}
                         key={`${year}$-cell-colorless-${valueIdx + Math.random()}`}
+                        style={getStyle(valueIdx)}
+                        textAlign="right"
                       >
                         {value}
                       </Table.Cell>
@@ -224,9 +226,9 @@ export const FacultyStudentDataTable = ({
                     return programmeStats[programme][year].length === 0 ? null : (
                       <Table.Row className="regular-row" key={`${year}-regular-row-${programme}`}>
                         <Table.Cell
-                          textAlign="left"
                           key={`${year}-${programme}`}
                           style={{ paddingLeft: '50px', ...getRowStyle(idx, tableLinePlaces) }}
+                          textAlign="left"
                         >
                           <Popup
                             content={

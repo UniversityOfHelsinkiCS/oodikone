@@ -191,7 +191,7 @@ export const FacultyProgrammeOverview = ({
           {studentStats && studentStats.data && (
             <>
               {getDivider(
-                'Students of the faculty By Starting year',
+                'Students of the faculty by starting year',
                 'StudentsOfTheFacultyByStartingYear',
                 facultyToolTips.StudentsStatsOfTheFaculty,
                 'InfoFacultyStudentTable'
