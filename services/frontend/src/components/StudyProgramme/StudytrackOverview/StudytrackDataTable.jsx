@@ -282,15 +282,15 @@ const sortMainDataByYear = data => {
 }
 
 export const StudytrackDataTable = ({
-  studyprogramme,
+  combinedProgramme,
   dataOfAllTracks,
-  studytracks,
-  singleTrack,
   dataOfSingleTrack,
+  otherCountriesStats,
+  singleTrack,
+  studyprogramme,
+  studytracks,
   titles,
   years,
-  combinedProgramme,
-  otherCountriesStats,
 }) => {
   const [show, setShow] = useState([])
   const [showPercentages, setShowPercentages] = useState(false)

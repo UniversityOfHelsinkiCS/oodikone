@@ -46,7 +46,9 @@ export const StudytrackOverview = ({
           {title}
         </Divider>
       </div>
-      <InfoBox content={studyProgrammeToolTips[toolTipText]} />
+      <div style={{ marginBottom: '20px' }}>
+        <InfoBox content={studyProgrammeToolTips[toolTipText]} />
+      </div>
     </>
   )
 
@@ -125,7 +127,7 @@ export const StudytrackOverview = ({
             }`,
             'StudytrackProgress'
           )}
-          <div className="section-container" style={{ marginBottom: '5em' }}>
+          <div style={{ marginBottom: '5em' }}>
             <BarChart cypress="StudytrackProgress" data={creditChartData} track={track || studyprogramme} />
             <BasicDataTable
               cypress="StudytrackProgress"
