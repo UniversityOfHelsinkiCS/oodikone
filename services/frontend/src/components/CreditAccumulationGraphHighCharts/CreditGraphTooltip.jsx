@@ -41,11 +41,11 @@ const getCardDescription = (credits, grade, passed, isStudyModuleCredit) => (
       <div className="tooltipBodyTitle">{isStudyModuleCredit ? 'module' : 'Passed'}</div>
       <div className="tooltipBodyValue">
         {isStudyModuleCredit ? ( // eslint-disable-line
-          <Icon name="certificate" color="purple" />
+          <Icon color="purple" name="certificate" />
         ) : passed ? (
-          <Icon name="check circle outline" color="green" />
+          <Icon color="green" name="check circle outline" />
         ) : (
-          <Icon name="circle outline" color="red" />
+          <Icon color="red" name="circle outline" />
         )}
       </div>
     </div>

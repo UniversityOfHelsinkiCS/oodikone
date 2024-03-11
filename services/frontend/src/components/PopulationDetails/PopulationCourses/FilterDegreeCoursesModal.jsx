@@ -12,9 +12,9 @@ export const FilterDegreeCoursesModal = ({ studyProgramme, year }) => {
 
   return (
     <Modal
-      size="large"
       onOpen={() => setModalOpenState(true)}
       open={open}
+      size="large"
       trigger={
         <span style={{ margin: '0 0.5rem' }}>
           <Button basic icon labelPosition="left">
@@ -27,8 +27,8 @@ export const FilterDegreeCoursesModal = ({ studyProgramme, year }) => {
       <Modal.Header>Hide degree courses</Modal.Header>
       <Modal.Content image>
         <Container>
-          <DegreeCoursesTable year={year} studyProgramme={studyProgramme} />
-          <Button onClick={() => setModalOpenState(false)} icon labelPosition="left" style={{ marginTop: '10px' }}>
+          <DegreeCoursesTable studyProgramme={studyProgramme} year={year} />
+          <Button icon labelPosition="left" onClick={() => setModalOpenState(false)} style={{ marginTop: '10px' }}>
             <Icon name="save" />
             Save & Close
           </Button>

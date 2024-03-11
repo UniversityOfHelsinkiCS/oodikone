@@ -11,7 +11,7 @@ export const Users = () => {
   const { userid } = useParams()
 
   return (
-    <div style={{ marginBottom: '10px' }} className="segmentContainer">
+    <div className="segmentContainer" style={{ marginBottom: '10px' }}>
       <Header className="segmentTitle" size="large">
         Oodikone users
       </Header>

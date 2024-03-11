@@ -148,17 +148,17 @@ export const PassingSemesters = ({ onlyIamRights }) => {
   return (
     <div>
       <SortableTable
-        title="Students Passing a Course per Semester"
-        featureName="passing_semester"
         actions={
-          <Button size="mini" style={{ padding: '.75em .75em' }} onClick={() => setCumulativeStats(!cumulativeStats)}>
+          <Button onClick={() => setCumulativeStats(!cumulativeStats)} size="mini" style={{ padding: '.75em .75em' }}>
             {cumulativeStats ? 'Show yearly stats' : 'Show cumulative stats'}
           </Button>
         }
         columns={columns}
         data={data}
-        toggleGroupExpansion={toggleGroupExpansion}
         expandedGroups={expandedGroups}
+        featureName="passing_semester"
+        title="Students Passing a Course per Semester"
+        toggleGroupExpansion={toggleGroupExpansion}
       />
     </div>
   )

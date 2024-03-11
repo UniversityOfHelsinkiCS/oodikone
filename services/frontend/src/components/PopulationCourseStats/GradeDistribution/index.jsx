@@ -150,12 +150,12 @@ export const GradeDistribution = ({ flat, onlyIamRights }) => {
 
   return (
     <SortableTable
-      title="Grade distribution of courses"
-      featureName="grade_distribution"
-      data={data}
       columns={columns}
-      toggleGroupExpansion={toggleGroupExpansion}
+      data={data}
       expandedGroups={expandedGroups}
+      featureName="grade_distribution"
+      title="Grade distribution of courses"
+      toggleGroupExpansion={toggleGroupExpansion}
     />
   )
 }

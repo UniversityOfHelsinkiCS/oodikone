@@ -157,11 +157,11 @@ export const PopulationCourseStatsFlat = ({ courses, filteredStudents, studentAm
         <div>
           <Input
             className="courseCodeInput"
-            transparent
-            placeholder="Filter..."
+            icon={getFilterValue(field) ? <Icon link name="delete" onClick={() => onFilterReset(field)} /> : undefined}
             onChange={e => onFilterChange(e, field)}
+            placeholder="Filter..."
+            transparent
             value={getFilterValue(field)}
-            icon={getFilterValue(field) ? <Icon name="delete" link onClick={() => onFilterReset(field)} /> : undefined}
           />
         </div>
       </Table.HeaderCell>

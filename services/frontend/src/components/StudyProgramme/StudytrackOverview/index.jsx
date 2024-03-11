@@ -79,23 +79,23 @@ export const StudytrackOverview = ({
         <Loader active style={{ marginTop: '10em' }} />
       ) : (
         <>
-          <StudytrackSelector track={track} setTrack={setTrack} studytracks={stats?.data?.studytrackOptions} />
+          <StudytrackSelector setTrack={setTrack} studytracks={stats?.data?.studytrackOptions} track={track} />
           <div className="toggle-container">
             <Toggle
               cypress="StudentToggle"
-              toolTips={studyProgrammeToolTips.StudentToggle}
               firstLabel="All studyrights"
               secondLabel="Special studyrights excluded"
-              value={specialGroups}
               setValue={setSpecialGroups}
+              toolTips={studyProgrammeToolTips.StudentToggle}
+              value={specialGroups}
             />
             <Toggle
               cypress="GraduatedToggle"
-              toolTips={studyProgrammeToolTips.GraduatedToggle}
               firstLabel="Graduated included"
               secondLabel="Graduated excluded"
-              value={graduated}
               setValue={setGraduated}
+              toolTips={studyProgrammeToolTips.GraduatedToggle}
+              value={graduated}
             />
           </div>
           {getDivider(
@@ -107,15 +107,15 @@ export const StudytrackOverview = ({
             infoTextStudentTable
           )}
           <StudytrackDataTable
-            studyprogramme={studyprogramme}
-            singleTrack={track !== studyprogramme && track}
-            studytracks={stats?.data?.studytrackOptions}
-            titles={stats?.data?.populationTitles}
+            combinedProgramme={combinedProgramme}
             dataOfAllTracks={stats?.data?.mainStatsByYear}
             dataOfSingleTrack={track && track !== studyprogramme ? stats?.data?.mainStatsByTrack[track] : null}
             otherCountriesStats={stats?.data?.otherCountriesCount}
+            singleTrack={track !== studyprogramme && track}
+            studyprogramme={studyprogramme}
+            studytracks={stats?.data?.studytrackOptions}
+            titles={stats?.data?.populationTitles}
             years={stats?.data?.years}
-            combinedProgramme={combinedProgramme}
           />
           {getDivider(
             `Progress of students of ${
@@ -130,8 +130,8 @@ export const StudytrackOverview = ({
             <BasicDataTable
               cypress="StudytrackProgress"
               data={creditTableStats}
-              track={track || studyprogramme}
               titles={creditTableTitles}
+              track={track || studyprogramme}
             />
           </div>
           {stats?.isSuccess && stats?.data?.includeGraduated && stats?.data?.graduationTimes[track] && (
@@ -141,32 +141,32 @@ export const StudytrackOverview = ({
                 cypress="GraduationTimeToggle"
                 firstLabel="Breakdown"
                 secondLabel="Median times"
-                value={showMedian}
                 setValue={setShowMedian}
+                value={showMedian}
               />
               <div className="section-container-centered">
                 {showMedian ? (
                   <div className="section-container">
                     {stats?.data.doCombo && (
                       <MedianTimeBarChart
+                        byStartYear
                         data={stats?.data?.graduationTimes[track].medians.combo}
                         goal={stats?.data?.graduationTimes.goals.combo}
                         title={getGraduationGraphTitle(track, stats?.data.doCombo)}
-                        byStartYear
                       />
                     )}
                     <MedianTimeBarChart
+                      byStartYear
                       data={stats?.data?.graduationTimes[track].medians.basic}
                       goal={stats?.data?.graduationTimes.goals.basic}
                       title={getGraduationGraphTitle(track, false)}
-                      byStartYear
                     />
                     {combinedProgramme && (
                       <MedianTimeBarChart
+                        byStartYear
                         data={stats?.data?.graduationTimesSecondProg[combinedProgramme]?.medians?.combo}
                         goal={stats?.data?.graduationTimesSecondProg.goals.combo}
                         title={getGraduationGraphTitle(combinedProgramme, true)}
-                        byStartYear
                       />
                     )}
                   </div>
@@ -174,21 +174,21 @@ export const StudytrackOverview = ({
                   <div className="section-container">
                     {stats?.data.doCombo && (
                       <BreakdownBarChart
+                        byStartYear
                         data={stats?.data?.graduationTimes[track]?.medians?.combo}
                         title={getGraduationGraphTitle(studyprogramme, stats?.data.doCombo)}
-                        byStartYear
                       />
                     )}
                     <BreakdownBarChart
+                      byStartYear
                       data={stats?.data?.graduationTimes[track]?.medians?.basic}
                       title={getGraduationGraphTitle(studyprogramme, false)}
-                      byStartYear
                     />
                     {combinedProgramme && (
                       <BreakdownBarChart
+                        byStartYear
                         data={stats?.data?.graduationTimesSecondProg[combinedProgramme]?.medians?.combo}
                         title={getGraduationGraphTitle(combinedProgramme, true)}
-                        byStartYear
                       />
                     )}
                   </div>

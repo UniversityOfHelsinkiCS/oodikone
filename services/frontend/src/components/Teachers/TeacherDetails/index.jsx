@@ -38,18 +38,18 @@ export const TeacherDetails = ({ teacherId }) => {
     {
       menuItem: 'Semesters',
       render: () => (
-        <TeacherStatisticsTable variant="semester" statistics={formatStatisticsForTable(semesters, getTextIn)} />
+        <TeacherStatisticsTable statistics={formatStatisticsForTable(semesters, getTextIn)} variant="semester" />
       ),
     },
     {
       menuItem: 'Years',
-      render: () => <TeacherStatisticsTable variant="year" statistics={formatStatisticsForTable(years, getTextIn)} />,
+      render: () => <TeacherStatisticsTable statistics={formatStatisticsForTable(years, getTextIn)} variant="year" />,
     },
   ]
 
   return (
     <div>
-      <Card fluid className="cardContainer">
+      <Card className="cardContainer" fluid>
         <Card.Content>
           <Card.Header className="cardHeader">{teacher.name}</Card.Header>
           <Card.Meta content={teacher.code} />

@@ -88,8 +88,8 @@ export const CreditsProduced = ({ data, secondData, academicYear }) => {
         <Toggle
           cypress="showAllCreditsToggle"
           firstLabel="Show special categories"
-          value={showAll}
           setValue={setShowAll}
+          value={showAll}
         />
       </div>
       <div className="section-container">

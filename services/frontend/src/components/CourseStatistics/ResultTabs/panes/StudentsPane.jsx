@@ -10,8 +10,8 @@ export const StudentsPane = ({ availableStats, datasets, separate, userHasAccess
       datasets={datasets}
       initialSettings={{ viewMode: 'STUDENTS', separate, splitDirection: 'row' }}
       tableComponent={StudentsTable}
-      userHasAccessToAllStats={userHasAccessToAllStats}
       updateQuery={updateQuery}
+      userHasAccessToAllStats={userHasAccessToAllStats}
     />
   )
 }

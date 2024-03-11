@@ -183,16 +183,16 @@ export const SearchForm = ({ onProgress }) => {
   const renderFetchStatisticsButton = () => {
     const FetchStatisticsButton = (
       <Form.Button
-        type="button"
+        basic
+        content="Fetch statistics"
+        data-cy="fetch-stats-button"
         disabled={disabled}
         fluid
-        size="huge"
-        primary
-        basic
-        positive
-        content="Fetch statistics"
         onClick={onSubmitFormClick}
-        data-cy="fetch-stats-button"
+        positive
+        primary
+        size="huge"
+        type="button"
       />
     )
 
@@ -201,12 +201,12 @@ export const SearchForm = ({ onProgress }) => {
     if (disabled) {
       return (
         <Popup
-          on="hover"
-          position="top center"
           content={getTextIn({
             fi: `Olet valinnut ${selected.length} kurssia. Voit valita tarkasteltavaksi enintään ${MAX_SELECTED_COURSES} kurssia kerrallaan. Tarkenna hakua tai poista valittuja kursseja.`,
             en: `You have selected ${selected.length} courses. You can select up to ${MAX_SELECTED_COURSES} courses at a time. Refine your search or remove selected courses.`,
           })}
+          on="hover"
+          position="top center"
           trigger={<span>{FetchStatisticsButton}</span>}
         />
       )
@@ -262,23 +262,23 @@ export const SearchForm = ({ onProgress }) => {
                 <label>Name:</label>
                 <AutoSubmitSearchInput
                   doSearch={fetchCourses}
-                  placeholder="Search by entering a course name"
-                  value={courseName}
-                  onChange={cn => setState({ ...state, courseName: cn })}
                   loading={isLoading}
                   minSearchLength={0}
+                  onChange={cn => setState({ ...state, courseName: cn })}
+                  placeholder="Search by entering a course name"
+                  value={courseName}
                 />
               </Form.Field>
               <Form.Field width={3}>
                 <label>Code:</label>
                 <AutoSubmitSearchInput
+                  data-cy="course-code-input"
                   doSearch={fetchCourses}
-                  placeholder="Search by a course code"
-                  value={courseCode}
-                  onChange={cc => setState({ ...state, courseCode: cc })}
                   loading={isLoading}
                   minSearchLength={0}
-                  data-cy="course-code-input"
+                  onChange={cc => setState({ ...state, courseCode: cc })}
+                  placeholder="Search by a course code"
+                  value={courseCode}
                 />
               </Form.Field>
               <Form.Field>
@@ -293,38 +293,38 @@ export const SearchForm = ({ onProgress }) => {
                   }}
                 >
                   <Popup
-                    on="hover"
                     content={getTextIn({
                       fi: 'Jos "Combine substitutions" on valittuna (oletuksena), niin kurssi ja leikkaavat kurssit yhdistetään tilastoissa.',
                       en: 'If "Combine substitutions" is on (default behavior), then course and its substitutions are combined in the statistics.',
                     })}
-                    size="tiny"
+                    on="hover"
                     position="top center"
+                    size="tiny"
                     trigger={
                       <Radio
-                        toggle
-                        label="Combine substitutions"
                         checked={combineSubstitutions}
-                        onChange={toggleCombineSubstitutions}
                         data-cy="combine-substitutions-toggle"
+                        label="Combine substitutions"
+                        onChange={toggleCombineSubstitutions}
+                        toggle
                       />
                     }
                   />
                   <Popup
-                    on="hover"
                     content={getTextIn({
                       fi: 'Jos "Select multiple courses" on valittuna, voit valita tarkasteltavaksi useita kursseja.',
                       en: 'If "Select multiple courses" is on, you can select multiple courses to view statistics for.',
                     })}
-                    size="tiny"
+                    on="hover"
                     position="top center"
+                    size="tiny"
                     trigger={
                       <Radio
-                        toggle
-                        label="Select multiple courses"
                         checked={selectMultipleCoursesEnabled}
-                        onChange={toggleSelectMultipleCoursesEnabled}
                         data-cy="select-multiple-courses-toggle"
+                        label="Select multiple courses"
+                        onChange={toggleSelectMultipleCoursesEnabled}
+                        toggle
                       />
                     }
                   />
@@ -340,30 +340,30 @@ export const SearchForm = ({ onProgress }) => {
             )}
             <div style={!noSelectedCourses ? searchBoxStyle : null}>
               <CourseTable
-                title="Selected courses"
-                hidden={noSelectedCourses}
-                courses={selected}
-                onSelectCourse={onSelectCourse}
                 controlIcon="trash alternate outline"
+                courses={selected}
+                hidden={noSelectedCourses}
+                onSelectCourse={onSelectCourse}
                 selectedTable
+                title="Selected courses"
               />
               {renderFetchStatisticsButton()}
             </div>
             <CourseTable
-              hidden={isLoading || (Object.keys(courses).length === 0 && Object.keys(selectedCourses).length > 0)}
               courses={courses}
-              title="Searched courses"
+              hidden={isLoading || (Object.keys(courses).length === 0 && Object.keys(selectedCourses).length > 0)}
               onSelectCourse={onSelectCourse}
+              title="Searched courses"
             />
             {courses.length && selectMultipleCoursesEnabled ? (
               <div className="select-all-container">
                 <Form.Button
-                  type="button"
-                  size="large"
-                  content="Select all search results"
                   basic
                   color="green"
+                  content="Select all search results"
                   onClick={addAllCourses}
+                  size="large"
+                  type="button"
                 />
               </div>
             ) : null}

@@ -129,19 +129,19 @@ export const BachelorHonours = ({ student, absentYears, programmeCode }) => {
       </Divider>
       <Header as="h5">Qualified</Header>
       <Label
-        tag
-        content={honors ? 'Qualified for Honours' : 'Not qualified for Honours'}
         color={honors ? 'green' : 'red'}
+        content={honors ? 'Qualified for Honours' : 'Not qualified for Honours'}
+        tag
       />
-      {!honors && reason && <Label tag content={reason} color="red" />}
-      {inspection && <Label tag content="Might need further inspection" color="blue" />}
+      {!honors && reason && <Label color="red" content={reason} tag />}
+      {inspection && <Label color="blue" content="Might need further inspection" tag />}
       <div style={{ marginTop: '15px', marginBottom: '15px' }}>
         Select curriculum version used for checking Bachelor's Honour's eligibility
         <CurriculumPicker
-          year={new Date().getFullYear()}
-          programmeCodes={[programmeCode]}
           curriculum={curriculum}
+          programmeCodes={[programmeCode]}
           setCurriculum={setCurriculum}
+          year={new Date().getFullYear()}
         />
       </div>
       {honors ? (

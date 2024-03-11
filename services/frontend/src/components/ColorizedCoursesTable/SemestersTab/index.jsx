@@ -36,7 +36,7 @@ export const SemestersTab = () => {
   return (
     <div>
       <div className="options-container">
-        <SemesterRangeSelector setSemesterFilter={setSemesterFilter} semesterFilter={semesterFilter} />
+        <SemesterRangeSelector semesterFilter={semesterFilter} setSemesterFilter={setSemesterFilter} />
         <NumberModeSelector />
         <ColorModeSelector />
       </div>
@@ -49,8 +49,8 @@ export const SemestersTab = () => {
           totalRow.bySemesters[numberMode]
         )}
         data={tableData}
-        striped={colorMode === 'none'}
         firstColumnSticky
+        striped={colorMode === 'none'}
       />
     </div>
   )

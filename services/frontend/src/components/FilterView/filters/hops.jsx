@@ -9,7 +9,9 @@ import { creditDateFilter } from './date'
 const getCutStudyStart = ({ options, filterDispatch }) => {
   return (
     <Button
+      className="credit-date-filter-input"
       content="Cut credits to study start"
+      disabled={!options.activeProgramme && !options.activeCombinedProgramme}
       onClick={() =>
         filterDispatch(
           creditDateFilter.actions.setOptions({
@@ -18,10 +20,8 @@ const getCutStudyStart = ({ options, filterDispatch }) => {
           })
         )
       }
-      disabled={!options.activeProgramme && !options.activeCombinedProgramme}
-      className="credit-date-filter-input"
-      size="mini"
       primary
+      size="mini"
       style={{
         margin: '0.5rem',
         whiteSpace: 'nowrap',
@@ -43,12 +43,13 @@ const HopsFilterCard = ({ options, onOptionsChange, combinedProgramme }) => {
         <div className="card-content">
           <Form.Field style={{ display: 'flex', flexDirection: 'column' }}>
             <Radio
-              label="None"
-              name="radioGroup"
               checked={
                 !options.activeProgramme ||
                 (options.activeProgramme === false && options.activeCombinedProgramme === false)
               }
+              data-cy="option-hops-bachelor"
+              label="None"
+              name="radioGroup"
               onChange={() =>
                 onOptionsChange({
                   ...options,
@@ -57,13 +58,13 @@ const HopsFilterCard = ({ options, onOptionsChange, combinedProgramme }) => {
                   combinedIsSelected: 'default',
                 })
               }
-              data-cy="option-hops-bachelor"
               style={{ margin: '0.5rem 0' }}
             />
             <Radio
+              checked={options.activeProgramme === true && options.activeCombinedProgramme === false}
+              data-cy="option-hops-bachelor"
               label="Bachelor studyright"
               name="radioGroup"
-              checked={options.activeProgramme === true && options.activeCombinedProgramme === false}
               onChange={() =>
                 onOptionsChange({
                   ...options,
@@ -72,13 +73,13 @@ const HopsFilterCard = ({ options, onOptionsChange, combinedProgramme }) => {
                   combinedIsSelected: 'default',
                 })
               }
-              data-cy="option-hops-bachelor"
               style={{ margin: '0.5rem 0' }}
             />
             <Radio
+              checked={options.activeProgramme === false && options.activeCombinedProgramme === true}
+              data-cy="option-hops-combined"
               label={`${typeOfCombined} studyright`}
               name="radioGroup"
-              checked={options.activeProgramme === false && options.activeCombinedProgramme === true}
               onChange={() =>
                 onOptionsChange({
                   ...options,
@@ -87,13 +88,13 @@ const HopsFilterCard = ({ options, onOptionsChange, combinedProgramme }) => {
                   combinedIsSelected: combinedProgramme,
                 })
               }
-              data-cy="option-hops-combined"
               style={{ margin: '0.5rem 0' }}
             />
             <Radio
+              checked={options.activeProgramme === true && options.activeCombinedProgramme === true}
+              data-cy="option-hops-both"
               label="Both studyrights"
               name="radioGroup"
-              checked={options.activeProgramme === true && options.activeCombinedProgramme === true}
               onChange={() =>
                 onOptionsChange({
                   ...options,
@@ -102,7 +103,6 @@ const HopsFilterCard = ({ options, onOptionsChange, combinedProgramme }) => {
                   combinedIsSelected: combinedProgramme,
                 })
               }
-              data-cy="option-hops-both"
               style={{ margin: '0.5rem 0' }}
             />
             {options.studyStart ? getCutStudyStart({ options, filterDispatch }) : null}
@@ -116,7 +116,6 @@ const HopsFilterCard = ({ options, onOptionsChange, combinedProgramme }) => {
   return (
     <div>
       <div
-        style={{ display: 'flex', alignItems: 'center', gap: '1em', cursor: 'pointer' }}
         onClick={() => {
           if (
             selectedCreditStartDate &&
@@ -137,8 +136,9 @@ const HopsFilterCard = ({ options, onOptionsChange, combinedProgramme }) => {
             combinedIsSelected: 'default',
           })
         }}
+        style={{ display: 'flex', alignItems: 'center', gap: '1em', cursor: 'pointer' }}
       >
-        <Radio style={{ width: '3.5rem', flexShrink: 0 }} toggle checked={options.activeProgramme} />
+        <Radio checked={options.activeProgramme} style={{ width: '3.5rem', flexShrink: 0 }} toggle />
         <div>Show only credits included in study plan</div>
       </div>
       {options.studyStart ? getCutStudyStart({ options, filterDispatch }) : null}

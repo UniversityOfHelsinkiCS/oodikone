@@ -204,7 +204,7 @@ export const SortableTable = ({
       <thead>{headers}</thead>
       <tbody>
         {sortedData.map(item => (
-          <DataItem key={`dataItem-${getKey(item)}`} item={item} />
+          <DataItem item={item} key={`dataItem-${getKey(item)}`} />
         ))}
       </tbody>
     </table>
@@ -227,16 +227,16 @@ export const SortableTable = ({
   return (
     <>
       <ExportModal
-        open={exportModalOpen}
-        onClose={() => setExportModalOpen(false)}
-        data={data}
         columns={[...onlyExportColumns, ...columns]}
+        data={data}
         featureName={featureName}
+        onClose={() => setExportModalOpen(false)}
+        open={exportModalOpen}
       />
       <SortableTableContext.Provider value={context}>
         <FigureContainer style={figureStyles}>
           <FigureContainer.Header actions={actions} onClickExport={() => setExportModalOpen(true)}>
-            <Icon style={{ color: '#c2c2c2', position: 'relative', top: '1px', marginRight: '0.5em' }} name="table" />{' '}
+            <Icon name="table" style={{ color: '#c2c2c2', position: 'relative', top: '1px', marginRight: '0.5em' }} />{' '}
             {title}
           </FigureContainer.Header>
           <FigureContainer.Content style={{ padding: 0, overflow: 'auto', backgroundColor: '#e8e8e91c', maxHeight }}>

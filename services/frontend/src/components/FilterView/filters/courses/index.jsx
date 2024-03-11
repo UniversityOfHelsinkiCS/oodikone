@@ -40,26 +40,26 @@ const CourseFilterCard = ({ courseStats, options, onOptionsChange }) => {
   return (
     <>
       <Dropdown
+        button
+        className="mini course-filter-selection"
+        closeOnChange
+        data-cy="courseFilter-course-dropdown"
+        fluid
+        multiple
+        name={name}
+        onChange={onChange}
         options={dropdownOptions}
         placeholder="Select Course"
-        selection
-        className="mini course-filter-selection"
-        fluid
-        button
-        value={[]}
-        onChange={onChange}
-        multiple
-        closeOnChange
         search
-        name={name}
-        data-cy="courseFilter-course-dropdown"
+        selection
+        value={[]}
       />
       {Object.entries(courseFilters).map(([code]) => (
         <CourseCard
           course={courseStats[code]}
           filterType={courseFilters[code] ?? FilterType.ALL}
-          onChange={type => setCourseFilter(code, type)}
           key={`course-filter-selected-course-${code}`}
+          onChange={type => setCourseFilter(code, type)}
         />
       ))}
     </>

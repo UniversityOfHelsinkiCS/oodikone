@@ -48,14 +48,14 @@ const Panes = ({
       render: () => (
         <Tab.Pane>
           <GeneralTab
-            variant={variant}
-            filteredStudents={filteredStudents}
-            studentToTargetCourseDateMap={studentToTargetCourseDateMap}
             coursecode={coursecode}
             customPopulationProgramme={customPopulationProgramme}
-            studyGuidanceGroup={studyGuidanceGroup}
+            filteredStudents={filteredStudents}
             from={from}
+            studentToTargetCourseDateMap={studentToTargetCourseDateMap}
+            studyGuidanceGroup={studyGuidanceGroup}
             to={to}
+            variant={variant}
             year={year}
           />
         </Tab.Pane>
@@ -67,8 +67,8 @@ const Panes = ({
         <CoursesTab
           curriculum={curriculum}
           students={filteredStudents}
-          variant={variant}
           studyGuidanceGroup={studyGuidanceGroup}
+          variant={variant}
         />
       ),
     },
@@ -90,7 +90,7 @@ const Panes = ({
               >
                 <h3>
                   No tags defined. You can define them{' '}
-                  <Link to={`/study-programme/${programmeForTagsLink}?p_m_tab=0&p_tab=4`} onClick={() => {}}>
+                  <Link onClick={() => {}} to={`/study-programme/${programmeForTagsLink}?p_m_tab=0&p_tab=4`}>
                     here
                   </Link>
                   .
@@ -100,15 +100,15 @@ const Panes = ({
             {tags.length > 0 && (
               <>
                 <TagPopulation
-                  tags={tags}
-                  selectedStudents={filteredStudents.map(stu => stu.studentNumber)}
-                  mainProgramme={mainProgramme}
                   combinedProgramme={combinedProgramme}
+                  mainProgramme={mainProgramme}
+                  selectedStudents={filteredStudents.map(stu => stu.studentNumber)}
+                  tags={tags}
                 />
                 <TagList
+                  combinedProgramme={combinedProgramme}
                   mainProgramme={mainProgramme}
                   selectedStudents={filteredStudents}
-                  combinedProgramme={combinedProgramme}
                 />
               </>
             )}
@@ -120,11 +120,11 @@ const Panes = ({
       menuItem: 'Progress',
       render: () => (
         <ProgressTable
-          students={filteredStudents}
           criteria={criteria}
-          months={months}
           curriculum={curriculum}
+          months={months}
           programme={mainProgramme || programme}
+          students={filteredStudents}
           studyGuidanceGroupProgramme={programme}
         />
       ),
@@ -139,7 +139,7 @@ const Panes = ({
         <StudentNameVisibilityToggle />
         {dataExport}
       </div>
-      <Tab onTabChange={handleTabChange} panes={panes} data-cy="student-table-tabs" />
+      <Tab data-cy="student-table-tabs" onTabChange={handleTabChange} panes={panes} />
     </>
   )
 }
@@ -198,28 +198,28 @@ const PopulationStudents = ({
   if (filteredStudents.length === 0) return null
   return (
     <>
-      <span style={{ marginRight: '0.5rem' }} ref={studentRef}>
+      <span ref={studentRef} style={{ marginRight: '0.5rem' }}>
         <InfoBox content={contentToInclude.infotoolTipContent} />
       </span>
       {admin ? <CheckStudentList students={filteredStudents.map(stu => stu.studentNumber)} /> : null}
       <Panes
-        filteredStudents={filteredStudents}
-        mainProgramme={mainProgramme}
         combinedProgramme={combinedProgramme}
-        visiblePanes={contentToInclude.panesToInclude}
-        dataExport={dataExport}
-        variant={variant}
-        studentToTargetCourseDateMap={studentToTargetCourseDateMap}
-        tags={tags}
-        criteria={criteria}
-        studyGuidanceGroup={studyGuidanceGroup}
-        customPopulationProgramme={customPopulationProgramme}
         coursecode={coursecode}
-        from={from}
-        to={to}
-        months={months}
-        year={year}
+        criteria={criteria}
         curriculum={curriculum}
+        customPopulationProgramme={customPopulationProgramme}
+        dataExport={dataExport}
+        filteredStudents={filteredStudents}
+        from={from}
+        mainProgramme={mainProgramme}
+        months={months}
+        studentToTargetCourseDateMap={studentToTargetCourseDateMap}
+        studyGuidanceGroup={studyGuidanceGroup}
+        tags={tags}
+        to={to}
+        variant={variant}
+        visiblePanes={contentToInclude.panesToInclude}
+        year={year}
       />
     </>
   )

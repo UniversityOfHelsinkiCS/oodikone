@@ -197,9 +197,9 @@ export const StudyrightsTable = ({
                 const rowIsFilterable = c.elements.programmes.some(p => p.isFilterable)
                 return (
                   <Table.Row
-                    style={{ cursor: rowIsFilterable ? 'pointer' : 'not-allowed' }}
                     key={c.studyrightid}
                     onClick={() => (rowIsFilterable ? handleStartDateChange(c.elements, c.studyrightid) : null)}
+                    style={{ cursor: rowIsFilterable ? 'pointer' : 'not-allowed' }}
                   >
                     <Table.Cell>
                       <Popup
@@ -212,12 +212,12 @@ export const StudyrightsTable = ({
                         trigger={
                           <div>
                             <Button
-                              onClick={() => handleStartDateChange(c.elements, c.studyrightid)}
-                              size="mini"
                               basic={c.studyrightid !== studyrightid}
-                              primary={c.studyrightid === studyrightid}
                               disabled={!rowIsFilterable}
                               icon
+                              onClick={() => handleStartDateChange(c.elements, c.studyrightid)}
+                              primary={c.studyrightid === studyrightid}
+                              size="mini"
                             >
                               <Icon name="filter" />
                             </Button>

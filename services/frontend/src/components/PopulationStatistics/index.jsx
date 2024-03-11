@@ -132,10 +132,8 @@ export const PopulationStatistics = () => {
 
   return (
     <FilterView
-      name="PopulationStatistics"
-      filters={filters}
-      students={students}
       displayTray={location.search !== ''}
+      filters={filters}
       initialOptions={{
         [transferredToProgrammeFilter.key]: {
           transferred: false,
@@ -144,10 +142,12 @@ export const PopulationStatistics = () => {
           studyStart: (students[0] || {}).studyrightStart,
         },
       }}
+      name="PopulationStatistics"
+      students={students}
     >
       {filteredStudents => (
         <div className="segmentContainer" style={{ flexGrow: 1 }}>
-          <Header className="segmentTitle" size="large" align="center">
+          <Header align="center" className="segmentTitle" size="large">
             {title}
             {location.search !== '' && query?.studyRights?.studyTrack && query?.studyRights?.studyTrack !== '' && (
               <Header.Subheader> studytrack {query?.studyRights?.studyTrack}</Header.Subheader>
@@ -163,20 +163,20 @@ export const PopulationStatistics = () => {
             <PopulationSearch combinedProgrammeCode={combinedProgrammeCode} />
             {location.search !== '' ? (
               <PopulationDetails
-                queryIsSet={queryIsSet}
-                query={query}
-                isLoading={isLoading}
-                programmeCodes={programmeCodes}
+                allStudents={samples}
                 dataExport={
                   <DataExport
-                    students={filteredStudents}
-                    programmeCode={query?.studyRights?.programme}
                     combinedProgrammeCode={combinedProgrammeCode}
+                    programmeCode={query?.studyRights?.programme}
+                    students={filteredStudents}
                   />
                 }
-                allStudents={samples}
-                selectedStudentsByYear={selectedStudentsByYear}
                 filteredStudents={filteredStudents}
+                isLoading={isLoading}
+                programmeCodes={programmeCodes}
+                query={query}
+                queryIsSet={queryIsSet}
+                selectedStudentsByYear={selectedStudentsByYear}
               />
             ) : null}
           </Segment>

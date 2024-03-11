@@ -16,14 +16,14 @@ const CreditDateFilterCard = ({ options, onOptionsChange }) => {
   return (
     <div className="card-content" style={{ marginTop: '0.5rem' }}>
       <DateRangeSelector
-        showSemesters
-        value={[startDate, endDate]}
         onChange={([startDate, endDate]) =>
           onOptionsChange({
             startDate,
             endDate,
           })
         }
+        showSemesters
+        value={[startDate, endDate]}
       />
     </div>
   )

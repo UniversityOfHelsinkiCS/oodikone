@@ -10,41 +10,41 @@ export const CourseYearFilter = ({ years, fromYear, toYear, handleChange, academ
         <Form>
           <Form.Group inline>
             <Form.Dropdown
-              label="From:"
               data-cy="fromYear"
-              name="fromYear"
-              options={toYear ? years.filter(({ value }) => value <= toYear) : years}
-              selection
               inline
-              placeholder="Select what ever year"
+              label="From:"
+              name="fromYear"
               onChange={handleChange}
-              value={fromYear}
+              options={toYear ? years.filter(({ value }) => value <= toYear) : years}
+              placeholder="Select what ever year"
               selectOnBlur={false}
               selectOnNavigation={false}
+              selection
+              value={fromYear}
             />
             <Form.Dropdown
-              label="To:"
               data-cy="toYear"
-              name="toYear"
-              options={fromYear ? years.filter(({ value }) => value >= fromYear) : years}
-              selection
               inline
-              placeholder="Select ending year"
+              label="To:"
+              name="toYear"
               onChange={handleChange}
-              value={toYear}
+              options={fromYear ? years.filter(({ value }) => value >= fromYear) : years}
+              placeholder="Select ending year"
               selectOnBlur={false}
               selectOnNavigation={false}
+              selection
+              value={toYear}
             />
           </Form.Group>
         </Form>
       </div>
       <Toggle
         cypress="calendarAcademicYearToggle"
-        toolTips={studyProgrammeToolTips.YearToggle}
         firstLabel="Calendar year"
         secondLabel="Academic year"
-        value={academicYear}
         setValue={setAcademicYear}
+        toolTips={studyProgrammeToolTips.YearToggle}
+        value={academicYear}
       />
     </div>
   ) : null

@@ -10,7 +10,7 @@ export const ChartSettings = ({ isRelative, setIsRelative, tab, viewMode }) => {
       <SegmentGroup horizontal>
         <Segment>
           <Setting labelText="Show relative">
-            <Radio toggle checked={isRelative} onChange={() => setIsRelative(!isRelative)} />
+            <Radio checked={isRelative} onChange={() => setIsRelative(!isRelative)} toggle />
           </Setting>
         </Segment>
       </SegmentGroup>

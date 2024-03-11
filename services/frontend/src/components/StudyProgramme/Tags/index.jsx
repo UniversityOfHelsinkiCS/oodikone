@@ -90,7 +90,7 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme,
           </Item>
           <Popup
             content="Only you can see this tag."
-            trigger={<Icon style={{ marginLeft: '1em' }} name="eye" color="purple" />}
+            trigger={<Icon color="purple" name="eye" style={{ marginLeft: '1em' }} />}
           />
         </>
       )
@@ -123,12 +123,12 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme,
         <Form.Field>
           {deleteButton(tag.tag_id)}
           <Confirm
-            open={confirm === tag.tag_id}
-            onCancel={() => setConfirm(null)}
-            onConfirm={event => handleDeleteTag(event, tag)}
-            content={`Are you sure you want to delete tag "${tag.tagname}"? If you press confirm you will delete it from all students that have it. You and other users won't be able to use this tag again.`}
             cancelButton="Cancel"
             confirmButton="Confirm"
+            content={`Are you sure you want to delete tag "${tag.tagname}"? If you press confirm you will delete it from all students that have it. You and other users won't be able to use this tag again.`}
+            onCancel={() => setConfirm(null)}
+            onConfirm={event => handleDeleteTag(event, tag)}
+            open={confirm === tag.tag_id}
           />
         </Form.Field>
       ),
@@ -139,11 +139,11 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme,
     <List>
       <Form>
         <Message
-          header="Create tags for study programme"
           content="Here you can create tags for study programme. You can either create public tags or personal tags. 
           Tags can be used to combine students from other starting years. 'Associated start year' means what year you want to use as a start year for the students in that tag.
           For example with this you can move student from earlier starting year to next year if the student was absent during first year. However this is optional and you can 
           create a new tag without selecting year."
+          header="Create tags for study programme"
         />
         <Segment>
           <Form.Group>
@@ -155,18 +155,18 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme,
               <label>Associated start year</label>
               <Datetime
                 className="yearSelectInput"
+                closeOnSelect
                 control={Datetime}
                 dateFormat={YEAR_DATE_FORMAT}
-                timeFormat={false}
-                renderYear={(props, selectableYear) => <td {...props}>{selectableYear}</td>}
-                closeOnSelect
-                value={year}
                 onChange={handleTagYearSelect}
+                renderYear={(props, selectableYear) => <td {...props}>{selectableYear}</td>}
+                timeFormat={false}
+                value={year}
               />
             </Form.Field>
             <Form.Field>
               <label>Personal tag</label>
-              <Form.Checkbox toggle checked={personal} onClick={() => setPersonal(!personal)} />
+              <Form.Checkbox checked={personal} onClick={() => setPersonal(!personal)} toggle />
             </Form.Field>
             <Button
               color="green"
@@ -176,7 +176,7 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme,
               {' '}
               Create new tag{' '}
             </Button>
-            <TagModal tags={tags} studytrack={studyprogramme} combinedProgramme={combinedProgramme} />
+            <TagModal combinedProgramme={combinedProgramme} studytrack={studyprogramme} tags={tags} />
           </Form.Group>
         </Segment>
       </Form>

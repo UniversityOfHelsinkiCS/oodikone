@@ -18,28 +18,28 @@ export const getCopyableStudentNumberColumn = ({
       <>
         Student number
         <Popup
+          content="Copied student numbers!"
+          on="click"
+          onClose={() => handlePopupClose('studentnumbers')}
+          onOpen={() => handlePopupOpen('studentnumbers')}
+          open={popupStates.studentnumbers}
+          position="top right"
           trigger={
             <Icon
-              size="large"
+              color="grey"
               link
               name="copy"
               onClick={event => copyItemsToClipboard(event, fieldName)}
+              size="large"
               style={{ float: 'right', marginLeft: '0.25em' }}
-              color="grey"
               title="Click here to copy all student numbers onto your clipboard"
             />
           }
-          content="Copied student numbers!"
-          on="click"
-          open={popupStates.studentnumbers}
-          onClose={() => handlePopupClose('studentnumbers')}
-          onOpen={() => handlePopupOpen('studentnumbers')}
-          position="top right"
         />
       </>
     ),
     getRowVal: s => (!s.obfuscated ? s.studentNumber : 'hidden'),
-    getRowContent: s => <StudentInfoItem student={s} showSisuLink tab="General Tab" />,
+    getRowContent: s => <StudentInfoItem showSisuLink student={s} tab="General Tab" />,
   }
 }
 
@@ -64,26 +64,26 @@ export const getCopyableEmailColumn = ({
           <>
             Email
             <Popup
+              content="Copied email list!"
+              on="click"
+              onClose={() => handlePopupClose('emails')}
+              onOpen={() => handlePopupOpen('emails')}
+              open={popupStates.emails}
+              position="top right"
               trigger={
                 <Icon
-                  size="large"
+                  color="grey"
                   link
                   name="copy"
                   onClick={event => copyItemsToClipboard(event, fieldName)}
+                  size="large"
                   style={{
                     float: 'right',
                     marginLeft: '0.25em',
                   }}
-                  color="grey"
                   title="Click here to copy all emails onto your clipboard"
                 />
               }
-              content="Copied email list!"
-              on="click"
-              open={popupStates.emails}
-              onClose={() => handlePopupClose('emails')}
-              onOpen={() => handlePopupOpen('emails')}
-              position="top right"
             />
           </>
         ),
@@ -98,6 +98,12 @@ export const getCopyableEmailColumn = ({
         getRowContent: s =>
           s.email && !s.obfuscated ? (
             <Popup
+              content="Email copied!"
+              on="click"
+              onClose={() => handlePopupClose(s.studentNumber)}
+              onOpen={() => handlePopupOpen(s.studentNumber)}
+              open={popupStates[s.studentNumber]}
+              position="top right"
               trigger={
                 <Icon
                   link
@@ -106,12 +112,6 @@ export const getCopyableEmailColumn = ({
                   style={{ float: 'right' }}
                 />
               }
-              content="Email copied!"
-              on="click"
-              open={popupStates[s.studentNumber]}
-              onClose={() => handlePopupClose(s.studentNumber)}
-              onOpen={() => handlePopupOpen(s.studentNumber)}
-              position="top right"
             />
           ) : null,
         cellProps: { className: 'iconCellNoPointer' },

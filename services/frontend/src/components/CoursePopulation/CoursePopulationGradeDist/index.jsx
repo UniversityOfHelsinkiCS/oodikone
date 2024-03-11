@@ -62,11 +62,11 @@ export const CoursePopulationGradeDist = ({ singleCourseStats, students, courseC
             <Table.Cell>{grade.amount}</Table.Cell>
             <Table.Cell>
               <Progress
-                value={grade.amount}
-                total={students.length}
-                progress="percent"
                 precision={0}
+                progress="percent"
                 style={{ margin: 0 }}
+                total={students.length}
+                value={grade.amount}
               />
             </Table.Cell>
           </Table.Row>

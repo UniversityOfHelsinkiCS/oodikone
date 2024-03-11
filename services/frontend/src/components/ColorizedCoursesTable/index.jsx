@@ -86,7 +86,7 @@ export const ColorizedCoursesTable = ({ fetchDataHook, studyProgramme, title, pa
     <ColorizedCoursesTableContext.Provider value={settingsContext}>
       <div className="colorized-courses-table">
         {dividerText && (
-          <Divider style={{ marginTop: '3em' }} horizontal>
+          <Divider horizontal style={{ marginTop: '3em' }}>
             {dividerText}
           </Divider>
         )}

@@ -24,23 +24,23 @@ export const AccessGroups = ({ user }) => {
   }
 
   return (
-    <Form loading={result.isLoading} error={result.isError} success={result.isSuccess}>
-      <Message error content="Modifying access rights failed." />
-      <Message success content="Modifying access rights succeeded." />
+    <Form error={result.isError} loading={result.isLoading} success={result.isSuccess}>
+      <Message content="Modifying access rights failed." error />
+      <Message content="Modifying access rights succeeded." success />
       <Form.Dropdown
-        name="groups"
         data-cy="access-groups-form"
-        placeholder="Select access groups"
         fluid
         multiple
-        selection
-        options={groups}
-        value={selected}
+        name="groups"
         onChange={(_, { value }) => setSelected(value)}
+        options={groups}
+        placeholder="Select access groups"
         selectOnBlur={false}
         selectOnNavigation={false}
+        selection
+        value={selected}
       />
-      <Button basic fluid positive content="Save" data-cy="access-groups-save" onClick={submit} />
+      <Button basic content="Save" data-cy="access-groups-save" fluid onClick={submit} positive />
     </Form>
   )
 }

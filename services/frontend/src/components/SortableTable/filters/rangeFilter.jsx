@@ -44,10 +44,10 @@ const RangeColumnFilterComponent = ({ column, options, dispatch }) => {
 
   return (
     <div
-      style={{ padding: '0.4em 0.75em', marginBottom: '0.5em' }}
       onClick={evt => evt.stopPropagation()}
       onMouseDown={evt => evt.stopPropagation()}
       onMouseUp={evt => evt.stopPropagation()}
+      style={{ padding: '0.4em 0.75em', marginBottom: '0.5em' }}
     >
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <div style={{ color: 'black', fontWeight: 'normal', margin: '0.3em 0 0.5em 0', flex: 1 }}>
@@ -55,7 +55,7 @@ const RangeColumnFilterComponent = ({ column, options, dispatch }) => {
         </div>
         {dirty && <Icon loading name="spinner" />}
       </div>
-      <RangeSelector min={min} max={max} onChange={handleChange} value={range} />
+      <RangeSelector max={max} min={min} onChange={handleChange} value={range} />
     </div>
   )
 }

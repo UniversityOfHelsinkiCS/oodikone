@@ -221,12 +221,12 @@ export const StudentsTable = ({
         </Header>
       )}
       <SortableTable
-        title={`Student statistics for group ${name}`}
-        featureName="group_statistics"
-        defaultSort={['TIME', 'desc']}
         columns={columns}
         data={data}
+        defaultSort={['TIME', 'desc']}
+        featureName="group_statistics"
         maxHeight="40vh"
+        title={`Student statistics for group ${name}`}
       />
       {!userHasAccessToAllStats && (
         <span className="totalsDisclaimer">* Years with 5 students or less are NOT included in the total</span>

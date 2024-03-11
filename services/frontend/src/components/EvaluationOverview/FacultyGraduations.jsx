@@ -16,44 +16,44 @@ export const FacultyGraduations = ({ faculty, graduationStats, groupByStartYear,
   return (
     <div>
       <GraduationTimes
-        level="bachelor"
-        title="Bachelor"
         data={data?.bachelor}
         goal={goals?.bachelor}
+        level="bachelor"
         levelProgrammeData={programmeData?.bachelor}
+        title="Bachelor"
         {...commonProps}
       />
       <GraduationTimes
-        level="bcMsCombo"
-        title="Bachelor + Master"
         data={data?.bcMsCombo}
         goal={goals?.bcMsCombo}
-        levelProgrammeData={programmeData?.bcMsCombo}
         groupBy={groupBy}
+        level="bcMsCombo"
+        levelProgrammeData={programmeData?.bcMsCombo}
+        title="Bachelor + Master"
         {...commonProps}
       />
       <GraduationTimes
-        level="master"
-        title="Master"
         data={data?.master}
         goal={goals?.master}
+        level="master"
         levelProgrammeData={programmeData?.master}
+        title="Master"
         {...commonProps}
       />
       <GraduationTimes
-        level="doctor"
-        title="Doctor"
         data={data?.doctor}
         goal={goals?.doctor}
+        level="doctor"
         levelProgrammeData={programmeData?.doctor}
+        title="Doctor"
         {...commonProps}
       />
       <GraduationTimes
-        level="licentiate"
-        title="Licentiate"
         data={data?.licentiate}
         goal={goals?.licentiate}
+        level="licentiate"
         levelProgrammeData={programmeData?.licentiate}
+        title="Licentiate"
         {...commonProps}
       />
     </div>

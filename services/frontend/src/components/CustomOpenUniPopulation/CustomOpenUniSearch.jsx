@@ -147,14 +147,14 @@ export const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
   }
   return (
     <Modal
+      onClose={handleClose}
+      open={modal}
+      size="small"
       trigger={
-        <Button size="small" color="blue" onClick={() => setModal(true)} data-cy="open-uni-search-button">
+        <Button color="blue" data-cy="open-uni-search-button" onClick={() => setModal(true)} size="small">
           Fetch Open Uni Students
         </Button>
       }
-      open={modal}
-      onClose={handleClose}
-      size="small"
     >
       <Modal.Content>
         <Form>
@@ -164,15 +164,16 @@ export const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
               <em> Insert name for this population if you wish to save it </em>
               <Form.Input
                 disabled={selectedSearchId !== ''}
-                value={name}
-                placeholder="name"
                 onChange={e => setName(e.target.value)}
+                placeholder="name"
+                value={name}
               />
             </Form.Field>
             <em>Insert course code(s)</em>
-            <TextArea value={input} placeholder="TKT12345, PSYK-123" onChange={e => setInput(e.target.value)} />
+            <TextArea onChange={e => setInput(e.target.value)} placeholder="TKT12345, PSYK-123" value={input} />
           </Form.Field>
           <SearchHistory
+            handleSearch={onSelectSearch}
             header="Saved populations"
             items={searchList?.map(s => ({
               ...s,
@@ -181,17 +182,16 @@ export const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
               params: { id: s.id },
             }))}
             updateItem={() => null}
-            handleSearch={onSelectSearch}
           />
           <Form.Field data-cy="begin-of-search">
             <em>Select beginning</em>
             <Datetime
-              value={startdate}
+              closeOnSelect
+              isValidDate={date => date.isBefore(enddate)}
+              locale="fi"
               onChange={value => setStartdate(value)}
               timeFormat={false}
-              locale="fi"
-              isValidDate={date => date.isBefore(enddate)}
-              closeOnSelect
+              value={startdate}
             />
           </Form.Field>
           <Form.Field data-cy="end-of-search">
@@ -199,36 +199,36 @@ export const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
             <br />
             <em>Attainments are fetched until today.</em>
             <Datetime
-              value={enddate}
+              closeOnSelect
+              isValidDate={date => date.isAfter(startdate)}
+              locale="fi"
               onChange={value => setEnddate(value)}
               timeFormat={false}
-              locale="fi"
-              isValidDate={date => date.isAfter(startdate)}
-              closeOnSelect
+              value={enddate}
             />
           </Form.Field>
         </Form>
       </Modal.Content>
       <Modal.Actions>
         <Button
+          content="Save"
           data-cy="save-search"
           disabled={!name || updateIsLoading || createIsLoading}
-          loading={updateIsLoading || createIsLoading}
           floated="left"
           icon="save"
+          loading={updateIsLoading || createIsLoading}
           onClick={onSave}
-          content="Save"
         />
         <Button
+          content="Delete"
           disabled={!selectedSearchId || deleteIsLoading}
-          negative
           floated="left"
           icon="trash"
+          negative
           onClick={onDelete}
-          content="Delete"
         />
         <Button onClick={handleClose}>Cancel</Button>
-        <Button positive onClick={e => onClicker(e)} data-cy="search-button">
+        <Button data-cy="search-button" onClick={e => onClicker(e)} positive>
           Search population
         </Button>
       </Modal.Actions>

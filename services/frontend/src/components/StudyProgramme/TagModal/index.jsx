@@ -42,34 +42,34 @@ const TagModal = ({ tags, studytrack, createMultipleStudentTag, pending, success
 
   return (
     <Modal
+      closeOnEscape={false}
+      onClose={() => setModalOpen(false)}
+      open={modalOpen}
+      size="small"
       trigger={
-        <Button size="small" disabled={!tags.length} color="blue" onClick={() => setModalOpen(true)}>
+        <Button color="blue" disabled={!tags.length} onClick={() => setModalOpen(true)} size="small">
           Add tags to students
         </Button>
       }
-      open={modalOpen}
-      onClose={() => setModalOpen(false)}
-      size="small"
-      closeOnEscape={false}
     >
       <Modal.Content>
         <Form>
           <h2> Add tags to students </h2>
-          <Message hidden={!error} content={error} negative />
+          <Message content={error} hidden={!error} negative />
           <Form.Field>
             <em> Select a tag </em>
             <Dropdown
+              onChange={handleChange}
+              options={createdOptions}
               placeholder="Tag"
               search
-              selection
               selectOnBlur={false}
               selectOnNavigation={false}
-              options={createdOptions}
-              onChange={handleChange}
+              selection
               value={selectedValue}
             />
             <em> Insert studentnumbers you wish to add tags to </em>
-            <TextArea placeholder="011111111" onChange={e => setInput(e.target.value)} value={input} />
+            <TextArea onChange={e => setInput(e.target.value)} placeholder="011111111" value={input} />
           </Form.Field>
         </Form>
       </Modal.Content>
@@ -78,9 +78,9 @@ const TagModal = ({ tags, studytrack, createMultipleStudentTag, pending, success
           Cancel
         </Button>
         <Button
-          positive
-          onClick={event => handleClick(event)}
           disabled={pending || selectedValue.length === 0 || !input.match(/[^\s,]+/g)}
+          onClick={event => handleClick(event)}
+          positive
         >
           Add tags
         </Button>

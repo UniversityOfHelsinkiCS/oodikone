@@ -415,7 +415,7 @@ const SingleCourseStats = ({
 
   const renderShowPopulation = (disabled = false) => {
     if (userHasAccessToAllStats) {
-      return <Button disabled={disabled} onClick={showPopulation} content="Show population" />
+      return <Button content="Show population" disabled={disabled} onClick={showPopulation} />
     }
     return null
   }
@@ -441,7 +441,7 @@ const SingleCourseStats = ({
     <div>
       <Segment>
         <Header as="h4">Statistics by time range</Header>
-        <YearFilter years={filteredYears} fromYear={fromYear} toYear={toYear} handleChange={handleYearChange} />
+        <YearFilter fromYear={fromYear} handleChange={handleYearChange} toYear={toYear} years={filteredYears} />
         <Form>
           {maxYearsToCreatePopulationFrom < toYear - fromYear + 1 ? (
             <Popup
@@ -463,22 +463,22 @@ const SingleCourseStats = ({
             <Grid>
               <Grid.Column width={8}>
                 <ProgrammeDropdown
-                  name="primary"
-                  options={options}
                   label="Primary group"
+                  name="primary"
+                  onChange={handleSelect}
+                  options={options}
                   placeholder="Select study programmes"
                   value={primary}
-                  onChange={handleSelect}
                 />
               </Grid.Column>
               <Grid.Column width={8}>
                 <ProgrammeDropdown
-                  name="comparison"
-                  options={comparisonProgrammes(options)}
                   label="Comparison group"
+                  name="comparison"
+                  onChange={handleSelect}
+                  options={comparisonProgrammes(options)}
                   placeholder="Optional"
                   value={comparison}
-                  onChange={handleSelect}
                 />
               </Grid.Column>
               <Grid.Column width={8} />
@@ -486,8 +486,8 @@ const SingleCourseStats = ({
                 <Form.Group>
                   <Form.Button
                     content="Select excluded study programmes"
-                    onClick={setExcludedToComparison}
                     disabled={primary.length === 1 && primary[0] === ALL.value}
+                    onClick={setExcludedToComparison}
                   />
                   <Form.Button content="Clear" onClick={clearComparison} />
                 </Form.Group>
@@ -497,10 +497,10 @@ const SingleCourseStats = ({
         </Segment>
       )}
       <ResultTabs
-        separate={separate}
-        primary={statistics.primary}
-        comparison={statistics.comparison}
         availableStats={availableStats}
+        comparison={statistics.comparison}
+        primary={statistics.primary}
+        separate={separate}
       />
     </div>
   )

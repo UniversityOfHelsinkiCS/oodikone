@@ -44,13 +44,13 @@ const GradeFilterCard = ({ options, onOptionsChange, grades, withoutSelf }) => {
         {choices.map(grade => (
           <Form.Field key={`${name}-${grade}`}>
             <Checkbox
+              checked={checked(grade)}
               label={
                 <label data-cy={`${name}-${grade}`}>
                   {grade}
                   <span className="filter-option-count">{` (${gradesWithoutSelf[grade].length} students)`}</span>
                 </label>
               }
-              checked={checked(grade)}
               onChange={onChange(grade)}
             />
           </Form.Field>

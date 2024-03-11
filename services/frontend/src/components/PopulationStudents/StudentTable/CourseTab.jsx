@@ -73,7 +73,7 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
       cellProps: { title: 'Student number' },
       getRowVal: s => (s.total ? '*' : s.studentNumber),
       getRowContent: s =>
-        s.total ? 'Summary:' : <StudentInfoItem student={s} tab="Mandatory courses table" showSisuLink />,
+        s.total ? 'Summary:' : <StudentInfoItem showSisuLink student={s} tab="Mandatory courses table" />,
     })
 
     if (namesVisible) {
@@ -258,7 +258,7 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
               },
               getRowContent: s => {
                 if (s.total) return getTotalRowVal(s, m)
-                return hasPassedMandatory(s.studentNumber, m.code) ? <Icon fitted name="check" color="green" /> : null
+                return hasPassedMandatory(s.studentNumber, m.code) ? <Icon color="green" fitted name="check" /> : null
               },
               code: m.code,
             })),
@@ -294,13 +294,13 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
         <div style={{ maxHeight: '80vh', width: '100%' }}>
           {mandatoryCourses?.defaultProgrammeCourses.length > 0 && (
             <SortableTable
+              columns={columns}
+              data={data}
+              featureName="courses"
+              firstColumnSticky
+              onlyExportColumns={hiddenNameAndEmailForExcel}
               tableId="course-of-population-students"
               title="Courses of population's students"
-              featureName="courses"
-              columns={columns}
-              onlyExportColumns={hiddenNameAndEmailForExcel}
-              data={data}
-              firstColumnSticky
             />
           )}
         </div>
@@ -318,15 +318,15 @@ const StudyGuidanceGroupCoursesTabContainer = ({ students, group, curriculum }) 
     year: group?.tags?.year,
   }).data
   if (populationsCourses.pending) return null
-  return <CoursesTable students={students} studyGuidanceCourses={populationsCourses} curriculum={curriculum} />
+  return <CoursesTable curriculum={curriculum} students={students} studyGuidanceCourses={populationsCourses} />
 }
 
 export const CoursesTabContainer = ({ students, variant, studyGuidanceGroup, curriculum }) => {
   if (variant === 'studyGuidanceGroupPopulation') {
     return (
-      <StudyGuidanceGroupCoursesTabContainer students={students} group={studyGuidanceGroup} curriculum={curriculum} />
+      <StudyGuidanceGroupCoursesTabContainer curriculum={curriculum} group={studyGuidanceGroup} students={students} />
     )
   }
 
-  return <CoursesTable students={students} curriculum={curriculum} />
+  return <CoursesTable curriculum={curriculum} students={students} />
 }

@@ -22,9 +22,9 @@ export const CreditGainStats = ({ filteredStudents, query, creditDateFilterOptio
       <Tab.Pane attached={false}>
         <CreditsGainedTab
           allStudents={filteredStudents}
-          query={query}
           creditDateFilterOptions={creditDateFilterOptions}
           programmeGoalTime={programmeGoalTime}
+          query={query}
         />
       </Tab.Pane>
     )
@@ -42,16 +42,16 @@ export const CreditGainStats = ({ filteredStudents, query, creditDateFilterOptio
     return (
       <Tab.Pane attached={false}>
         <CreditDistributionDevelopment
-          students={filteredStudents}
-          programme={query?.studyRights?.programme}
           combinedProgramme=""
+          programme={query?.studyRights?.programme}
+          students={filteredStudents}
           year={year}
         />
         {combinedProgramme && (
           <CreditDistributionDevelopment
-            students={filteredStudents}
-            programme={combinedProgramme}
             combinedProgramme={combinedProgramme}
+            programme={combinedProgramme}
+            students={filteredStudents}
             year={year}
           />
         )}
@@ -66,9 +66,10 @@ export const CreditGainStats = ({ filteredStudents, query, creditDateFilterOptio
       <InfoBox content={populationStatisticsToolTips.CreditStatistics} />
       {filteredStudents && (
         <Tab
+          data-cy="credit-stats-tab"
           defaultActiveIndex={2}
-          onTabChange={handleTabChange}
           menu={{ pointing: true }}
+          onTabChange={handleTabChange}
           panes={[
             {
               menuItem: 'Credits Gained',
@@ -83,7 +84,6 @@ export const CreditGainStats = ({ filteredStudents, query, creditDateFilterOptio
               render: renderDistributionDevelopment,
             },
           ]}
-          data-cy="credit-stats-tab"
         />
       )}
     </div>

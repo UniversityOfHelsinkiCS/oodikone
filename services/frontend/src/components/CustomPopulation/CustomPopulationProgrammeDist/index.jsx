@@ -56,11 +56,11 @@ export const CustomPopulationProgrammeDist = ({ students, studentToTargetCourseD
       programmeStudents.length,
       <Progress
         key={code}
-        value={programmeStudents.length}
-        total={students.length}
-        progress="percent"
         precision={0}
+        progress="percent"
         style={{ margin: 0 }}
+        total={students.length}
+        value={programmeStudents.length}
       />,
     ])
     const sortedRows = rows.sort((a, b) => b[2] - a[2])
@@ -71,11 +71,11 @@ export const CustomPopulationProgrammeDist = ({ students, studentToTargetCourseD
 
   return (
     <SearchResultTable
+      actionTrigger={row => <ProgrammeFilterToggleCell programme={row[1]} />}
       headers={headers}
+      noResultText="placeholder"
       rows={tableRows}
       selectable
-      noResultText="placeholder"
-      actionTrigger={row => <ProgrammeFilterToggleCell programme={row[1]} />}
     />
   )
 }
@@ -87,7 +87,7 @@ const ProgrammeFilterToggleCell = ({ programme }) => {
 
   return (
     <span style={{ display: 'inline-block', marginRight: '0.3em' }}>
-      <FilterToggleIcon onClick={() => filterDispatch(toggleProgrammeSelection(programme))} isActive={isActive} />
+      <FilterToggleIcon isActive={isActive} onClick={() => filterDispatch(toggleProgrammeSelection(programme))} />
     </span>
   )
 }

@@ -23,16 +23,16 @@ export const UnihowDataExport = ({ students }) => {
 
   return (
     <Popup
+      content="Click here to download a specialized Excel workbook with UniHow data."
+      position="top center"
       trigger={
         <Button
-          icon="file excel"
           content="Excel Workbook (UniHow)"
+          icon="file excel"
           labelPosition="left"
           onClick={() => writeFile(getXlsx(), filename)}
         />
       }
-      content="Click here to download a specialized Excel workbook with UniHow data."
-      position="top center"
     />
   )
 }

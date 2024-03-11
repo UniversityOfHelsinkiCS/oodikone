@@ -18,13 +18,13 @@ const getHeader = categoryName => {
 }
 
 export const AttemptsTable = ({ categoryName, data, onClickCourse, userHasAccessToAllStats }) => (
-  <Table style={{ cursor: 'pointer' }} selectable className="fixed-header">
+  <Table className="fixed-header" selectable style={{ cursor: 'pointer' }}>
     {getHeader(categoryName)}
     <Table.Body>
       {data.map(course => (
         <FoldableRow
-          key={course.id}
           courseData={course}
+          key={course.id}
           onClickFn={onClickCourse}
           userHasAccessToAllStats={userHasAccessToAllStats}
         />

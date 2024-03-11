@@ -24,17 +24,17 @@ const GenderFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
     <div className="card-content">
       <Form>
         <Dropdown
-          options={dropdownOptions}
-          value={selected}
-          onChange={(_, { value: inputValue }) => onOptionsChange({ selected: inputValue })}
-          placeholder="Choose Gender"
-          className="mini"
-          selection
-          selectOnBlur={false}
-          fluid
           button
+          className="mini"
           clearable
           data-cy="genderFilter-dropdown"
+          fluid
+          onChange={(_, { value: inputValue }) => onOptionsChange({ selected: inputValue })}
+          options={dropdownOptions}
+          placeholder="Choose Gender"
+          selectOnBlur={false}
+          selection
+          value={selected}
         />
       </Form>
     </div>

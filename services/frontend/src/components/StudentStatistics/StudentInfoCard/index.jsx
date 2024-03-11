@@ -50,7 +50,7 @@ export const StudentInfoCard = ({ student }) => {
           <EnrollmentAccordion student={student} />
           <p>{`Updated at ${formattedTimestamp}`}</p>
           {isAdmin && (
-            <Button compact size="medium" labelPosition="left" onClick={updateStudent}>
+            <Button compact labelPosition="left" onClick={updateStudent} size="medium">
               <Icon name="refresh" />
               Update student
             </Button>

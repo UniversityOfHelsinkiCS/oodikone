@@ -19,7 +19,7 @@ export const FilterActiveNote = () => {
     <Message color="blue" style={{ marginTop: '2.25rem' }}>
       By default only students who have not transferred to this study programme are shown.
       <div style={{ marginTop: '1rem' }}>
-        <Button primary disabled={clicked} onClick={handleClick}>
+        <Button disabled={clicked} onClick={handleClick} primary>
           Show all
         </Button>
       </div>

@@ -63,11 +63,11 @@ const CreditsGraph = ({ graphYearStart, student, absences, studyRightId }) => {
   const endDate = resolveGraphEndDate(dates, selectedStudyRight, student, studyRightTargetEnd)
   return (
     <CreditAccumulationGraphHighCharts
-      singleStudent
-      students={[student]}
-      startDate={selectedStart}
-      endDate={endDate}
       absences={absences}
+      endDate={endDate}
+      singleStudent
+      startDate={selectedStart}
+      students={[student]}
       studyRightId={studyRightId}
     />
   )
@@ -190,7 +190,7 @@ const GradeGraph = ({ student, semesters }) => {
           valitun koon mukaan ja ottaa niiden keskiarvot. Semester mean laskee jokaisen lukukauden keskiarvon.
         </p>
       </Message>
-      <Menu compact align="center">
+      <Menu align="center" compact>
         <Menu.Item
           active={!chunky && !semester}
           name="Show total mean"
@@ -218,7 +218,7 @@ const GradeGraph = ({ student, semesters }) => {
       </Menu>
       {chunky && (
         <div>
-          <Input label="Group size" defaultValue={chunksize} onChange={e => setChunkSize(Number(e.target.value))} />
+          <Input defaultValue={chunksize} label="Group size" onChange={e => setChunkSize(Number(e.target.value))} />
         </div>
       )}
       {!chunky && !semester && <ReactHighcharts config={totalMeanOptions} />}
@@ -236,8 +236,8 @@ export const StudentGraphs = ({ student, absences, graphYearStart, semesters, st
         <Tab.Pane>
           <CreditsGraph
             absences={absences}
-            student={student}
             graphYearStart={graphYearStart}
+            student={student}
             studyRightId={studyRightId}
           />
         </Tab.Pane>
@@ -247,7 +247,7 @@ export const StudentGraphs = ({ student, absences, graphYearStart, semesters, st
       menuItem: 'Grade graph',
       render: () => (
         <Tab.Pane>
-          <GradeGraph student={student} semesters={semesters} />
+          <GradeGraph semesters={semesters} student={student} />
         </Tab.Pane>
       ),
     },

@@ -12,10 +12,10 @@ export const ProgrammeCourses = ({ studyProgramme, combinedProgramme, academicYe
       icon: 'list',
       component: () => (
         <OverallStatsTable
-          studyProgramme={studyProgramme}
-          combinedProgramme={combinedProgramme}
           academicYear={academicYear}
+          combinedProgramme={combinedProgramme}
           setAcademicYear={setAcademicYear}
+          studyProgramme={studyProgramme}
         />
       ),
     },
@@ -25,8 +25,8 @@ export const ProgrammeCourses = ({ studyProgramme, combinedProgramme, academicYe
       component: () => (
         <ColorizedCoursesTable
           fetchDataHook={useGetColorizedTableCourseStatsQuery}
-          studyProgramme={studyProgramme}
           panes={['Semesters']}
+          studyProgramme={studyProgramme}
         />
       ),
     },
@@ -43,7 +43,7 @@ export const ProgrammeCourses = ({ studyProgramme, combinedProgramme, academicYe
 
   return (
     <div className="studyprogramme-courses">
-      <Tab id="CourseStatPanes" panes={panes} data-cy="CourseTabs" />
+      <Tab data-cy="CourseTabs" id="CourseStatPanes" panes={panes} />
     </div>
   )
 }

@@ -26,8 +26,8 @@ const StudyrightTypeFilterCard = ({ options, onOptionsChange }) => {
             <Radio
               checked={mode === option.value}
               data-cy={option.key}
-              label={option.text}
               key={option.key}
+              label={option.text}
               onChange={() => onOptionsChange({ mode: option.value })}
               style={{ marginBottom: '0.5rem' }}
             />

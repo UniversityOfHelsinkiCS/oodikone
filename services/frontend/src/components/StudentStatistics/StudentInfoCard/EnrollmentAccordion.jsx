@@ -137,9 +137,9 @@ export const EnrollmentAccordion = ({ student }) => {
               <Table.HeaderCell>
                 Semesters (starting from autumn {firstDisplayedYear})
                 <Popup
+                  content="Displays enrollment data for the current and up to nine previous academic years."
                   position="top center"
                   trigger={<Icon name="question circle outline" style={{ opacity: 0.5, marginLeft: '0.25em' }} />}
-                  content="Displays enrollment data for the current and up to nine previous academic years."
                 />
               </Table.HeaderCell>
             </Table.Row>

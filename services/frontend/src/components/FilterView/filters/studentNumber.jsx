@@ -7,9 +7,9 @@ import { createFilter } from './createFilter'
 
 const IconButton = ({ onClick, ...props }) => (
   <button
-    type="button"
     onClick={onClick}
     style={{ background: 'none', border: 'none', alignSelf: 'stretch', padding: '0 0.15em', cursor: 'pointer' }}
+    type="button"
   >
     <Icon {...props} style={_.merge(props.style ?? {}, { marginRight: 0, color: '#5a5a5a' })} />
   </button>
@@ -76,9 +76,7 @@ const EditableList = ({ value, onChange, renderLabel }) => {
         }}
       >
         <input
-          type="text"
           onChange={evt => setInput(evt.target.value)}
-          value={inputValue}
           placeholder="Student number(s)"
           style={{
             flexGrow: 1,
@@ -91,27 +89,29 @@ const EditableList = ({ value, onChange, renderLabel }) => {
             zIndex: 10,
             position: 'relative',
           }}
+          type="text"
+          value={inputValue}
         />
         <div style={{ width: '1px', alignSelf: 'stretch', backgroundColor: '#e6e6e7' }} />
         <IconButton
           name="plus"
-          title="Add to list"
           onClick={() => {
             const parts = inputValue.split(/[^0-9]+/)
             onChange(_.union(value, parts))
             setInput('')
           }}
+          title="Add to list"
         />
         <IconButton
           name="minus"
-          title="Remove from list"
           onClick={() => {
             const parts = inputValue.split(/[^0-9]+/)
             onChange(_.difference(value, parts))
             setInput('')
           }}
+          title="Remove from list"
         />
-        <IconButton title="Clear list" name="trash alternate outline" onClick={() => onChange([])} />
+        <IconButton name="trash alternate outline" onClick={() => onChange([])} title="Clear list" />
       </div>
     </div>
   )
@@ -160,19 +160,19 @@ const StudentNumberFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
     <div>
       <h3 style={{ fontSize: '0.8em', marginBottom: '0.5em' }}>Allowlist</h3>
       <EditableList
-        value={options.allowlist}
         onChange={allowlist => onOptionsChange({ ...options, allowlist })}
         renderLabel={labelRenderer}
+        value={options.allowlist}
       />
-      <Button icon labelPosition="right" size="mini" style={{ marginTop: '0.5em' }} onClick={swapLists}>
+      <Button icon labelPosition="right" onClick={swapLists} size="mini" style={{ marginTop: '0.5em' }}>
         <Icon name="exchange" rotated="clockwise" />
         Swap lists
       </Button>
       <h3 style={{ fontSize: '0.8em', marginTop: '0.5em', marginBottom: '0.5em' }}>Blocklist</h3>
       <EditableList
-        value={options.blocklist}
         onChange={blocklist => onOptionsChange({ ...options, blocklist })}
         renderLabel={labelRenderer}
+        value={options.blocklist}
       />
     </div>
   )

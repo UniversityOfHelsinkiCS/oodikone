@@ -70,12 +70,12 @@ export const PopulationCourses = ({
       <SegmentDimmer isLoading={pending} />
       {courseTableMode === 'curriculum' ? (
         <PopulationCourseStats
+          courses={populationSelectedStudentCourses.data ?? []}
+          filteredStudents={filteredStudents}
           key={populationSelectedStudentCourses.query.uuid}
           mandatoryCourses={mandatoryCourses}
-          courses={populationSelectedStudentCourses.data ?? []}
-          pending={pending}
-          filteredStudents={filteredStudents}
           onlyIamRights={onlyIamRights}
+          pending={pending}
         />
       ) : (
         <PopulationCourseStatsFlat

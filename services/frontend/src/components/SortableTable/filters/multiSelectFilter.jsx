@@ -22,8 +22,8 @@ const MultiSelectFilterComponent = ({ column, options, dispatch }) => {
       .map(value => (
         <Dropdown.Item key={value}>
           <Checkbox
-            label={value}
             checked={selectedFilters.some(filter => filter === value)}
+            label={value}
             onClick={() => dispatch({ type: 'SET_SELECTED_VALUES', payload: { value } })}
           />
         </Dropdown.Item>
@@ -34,7 +34,7 @@ const MultiSelectFilterComponent = ({ column, options, dispatch }) => {
 
   return (
     <>
-      <Input icon="search" iconPosition="left" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
+      <Input icon="search" iconPosition="left" onChange={e => setSearchTerm(e.target.value)} value={searchTerm} />
       <Dropdown.Menu scrolling>{dropdownItems}</Dropdown.Menu>
     </>
   )

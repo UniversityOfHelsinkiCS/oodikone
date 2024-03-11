@@ -25,7 +25,7 @@ const handler = onClick => e => {
 export const ClearableItem = ({ name, onClear, icon, ...props }) => (
   <div style={styles.container} {...props}>
     <div style={styles.clear}>
-      <Icon name={icon} disabled={!onClear} onClick={handler(onClear)} />
+      <Icon disabled={!onClear} name={icon} onClick={handler(onClear)} />
     </div>
     <div style={styles.text}>
       <span style={{ paddingLeft: '0.5rem' }}>{name}</span>

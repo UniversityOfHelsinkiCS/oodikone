@@ -64,17 +64,17 @@ export const ProgrammeView = ({ studyprogramme }) => {
     <>
       {doCombo && (
         <MedianTimeBarChart
+          byStartYear={false}
           data={graduationData?.comboTimes?.medians}
           goal={graduationData?.comboTimes?.goal}
           title="Bachelor + Master studyright"
-          byStartYear={false}
         />
       )}
       <MedianTimeBarChart
+        byStartYear={false}
         data={graduationData?.graduationTimes?.medians}
         goal={graduationData?.graduationTimes?.goal}
         title={doCombo ? 'Master studyright' : ' '}
-        byStartYear={false}
       />
     </>
   )
@@ -133,19 +133,19 @@ export const ProgrammeView = ({ studyprogramme }) => {
               {getDivider('Progress of students of the studyprogramme by starting year', 'StudytrackProgress')}
               <Toggle
                 cypress="GraduatedToggle"
-                toolTips={studyProgrammeToolTips.GraduatedToggle}
                 firstLabel="Graduated included"
                 secondLabel="Graduated excluded"
-                value={graduated}
                 setValue={setGraduated}
+                toolTips={studyProgrammeToolTips.GraduatedToggle}
+                value={graduated}
               />
               <div className="section-container">
                 <BarChart cypress="StudytrackProgress" data={creditChartData} track={studyprogramme} />
                 <BasicDataTable
                   cypress="StudytrackProgress"
                   data={creditTableStats}
-                  track={studyprogramme}
                   titles={creditTableTitles}
+                  track={studyprogramme}
                 />
               </div>
               {getDivider('Graduation times', 'AverageGraduationTimes')}
@@ -154,17 +154,17 @@ export const ProgrammeView = ({ studyprogramme }) => {
                   cypress="GraduationTimeToggle"
                   firstLabel="Breakdown"
                   secondLabel="Median time"
-                  value={showMedian}
                   setValue={setShowMedian}
+                  value={showMedian}
                 />
                 <div className="toggle-container">
                   <Toggle
                     cypress="YearToggle"
-                    toolTips={studyProgrammeToolTips.YearToggle}
                     firstLabel="Calendar year"
                     secondLabel="Academic year"
-                    value={academicYear}
                     setValue={setAcademicYear}
+                    toolTips={studyProgrammeToolTips.YearToggle}
+                    value={academicYear}
                   />
                 </div>
               </div>
@@ -182,14 +182,14 @@ export const ProgrammeView = ({ studyprogramme }) => {
                   <div className="section-container">
                     <StackedBarChart
                       cypress="ProgrammesBeforeOrAfter"
-                      wideTable
                       data={graduationData?.programmesBeforeOrAfterGraphStats}
                       labels={graduationData?.years}
+                      wideTable
                     />
                     <DataTable
-                      wideTable
                       data={graduationData?.programmesBeforeOrAfterTableStats}
                       titles={graduationData?.programmesBeforeOrAfterTitles}
+                      wideTable
                     />
                   </div>
                 </>

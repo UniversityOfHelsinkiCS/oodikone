@@ -46,10 +46,10 @@ const createCountriesContent = ({ year, studyprogramme, otherCountriesStats }) =
 const getBasicTableCell = ({ row, value, combinedProgramme, index }) => {
   return (
     <Table.Cell
-      textAlign="left"
       className={getCellClass(row[0])}
       key={getKey(value)}
       style={combinedProgramme ? getStyleForCombined(index) : getStyleForBasic(index)}
+      textAlign="left"
     >
       {value}
     </Table.Cell>
@@ -59,8 +59,8 @@ const getBasicTableCell = ({ row, value, combinedProgramme, index }) => {
 const getCountriesPopup = ({ index, combinedProgramme, value, row, year, studyprogramme, otherCountriesStats }) => {
   return (
     <Popup
-      key={`${row[0]}-${getKey(value)}`}
       content={createCountriesContent({ year, studyprogramme, otherCountriesStats })}
+      key={`${row[0]}-${getKey(value)}`}
       trigger={getBasicTableCell({ row, value, combinedProgramme, index })}
     />
   )
@@ -78,15 +78,15 @@ const getFirstCell = ({
   isAdmin,
 }) => {
   return (
-    <Table.Cell key={getKey(year)} className={getCellClass(year)} onClick={setShow}>
+    <Table.Cell className={getCellClass(year)} key={getKey(year)} onClick={setShow}>
       {yearlyData.length > 1 && <Icon name={`${show ? 'angle down' : 'angle right'}`} />}
       {year}
       {(isAdmin || allRights.includes(studyprogramme) || allRights.includes(combinedProgramme)) && (
         <PopulationLink
+          combinedProgramme={combinedProgramme}
           studyprogramme={studyprogramme}
           year={year}
           years={calendarYears}
-          combinedProgramme={combinedProgramme}
         />
       )}
     </Table.Cell>
@@ -105,7 +105,7 @@ const getSingleTrackRow = ({
   isAdmin,
 }) => {
   return (
-    <Table.Row key={getKey(row[0])} className="regular-row">
+    <Table.Row className="regular-row" key={getKey(row[0])}>
       {row.map((value, index) => {
         if (shouldBeHidden(showPercentages, value)) return null
         if (index === row.length - 2 && otherCountriesStats)
@@ -120,20 +120,20 @@ const getSingleTrackRow = ({
           })
         return (
           <Table.Cell
-            textAlign="left"
             className={getCellClass(row[0])}
-            style={combinedProgramme ? getStyleForCombined(index) : getStyleForBasic(index)}
             key={getKey(row[0])}
+            style={combinedProgramme ? getStyleForCombined(index) : getStyleForBasic(index)}
+            textAlign="left"
           >
             {value}
             {index === 0 &&
               (isAdmin || allRights.includes(studyprogramme) || allRights.includes(combinedProgramme)) && (
                 <PopulationLink
-                  studyprogramme={studyprogramme}
-                  year={row[0]}
-                  studytrack={code}
-                  years={calendarYears}
                   combinedProgramme={combinedProgramme}
+                  studyprogramme={studyprogramme}
+                  studytrack={code}
+                  year={row[0]}
+                  years={calendarYears}
                 />
               )}
           </Table.Cell>
@@ -163,7 +163,7 @@ const getRow = ({
   // Get row for the studyprogramme
   if (years.includes(row[0])) {
     return (
-      <Table.Row key={getKey(row[0])} className="header-row">
+      <Table.Row className="header-row" key={getKey(row[0])}>
         {row.map((value, index) => {
           if (shouldBeHidden(showPercentages, value)) return null
           if (index === 0)
@@ -199,20 +199,20 @@ const getRow = ({
     const correctStudytrack = row[0].split(', ')[1]
     const title = `${getTextIn(studytracks[correctStudytrack])}, ${correctStudytrack}`
     return (
-      <Table.Row key={getKey(row[0])} className="regular-row">
+      <Table.Row className="regular-row" key={getKey(row[0])}>
         {row.map((value, index) => {
           if (shouldBeHidden(showPercentages, value)) return null
           if (index === 0) {
             return (
-              <Table.Cell textAlign="left" style={{ paddingLeft: '50px' }} key={getKey(row[0])}>
+              <Table.Cell key={getKey(row[0])} style={{ paddingLeft: '50px' }} textAlign="left">
                 {title}
                 {(isAdmin || allRights.includes(studyprogramme) || allRights.includes(combinedProgramme)) && (
                   <PopulationLink
+                    combinedProgramme={combinedProgramme}
                     studyprogramme={studyprogramme}
+                    studytrack={correctStudytrack}
                     year={year}
                     years={calendarYears}
-                    studytrack={correctStudytrack}
-                    combinedProgramme={combinedProgramme}
                   />
                 )}
               </Table.Cell>
@@ -311,10 +311,10 @@ export const StudytrackDataTable = ({
       <Toggle
         firstLabel="Hide percentages"
         secondLabel="Show percentages"
-        value={showPercentages}
         setValue={setShowPercentages}
+        value={showPercentages}
       />
-      <Table data-cy="Table-StudytrackOverview" celled>
+      <Table celled data-cy="Table-StudytrackOverview">
         <Table.Header>
           <Table.Row key="FirstHeader">
             <Table.HeaderCell colSpan={!showPercentages ? 3 : 4} />
@@ -333,26 +333,26 @@ export const StudytrackDataTable = ({
             </Table.HeaderCell>
             <Table.HeaderCell colSpan={!showPercentages ? 2 : 4} style={{ borderLeftWidth: 'thick' }}>
               <Popup
+                content="Hover over 'Other' cell to see from which countries students are coming."
                 trigger={
                   <div>
                     Countries <Icon name="question circle" />
                   </div>
                 }
-                content="Hover over 'Other' cell to see from which countries students are coming."
               />
             </Table.HeaderCell>
           </Table.Row>
           <Table.Row key="Table-Studytrack-Titles">
             {titles.map((title, index) => (
               <Table.HeaderCell
-                key={title}
                 colSpan={index === 0 || index === 1 || !showPercentages ? 1 : 2}
-                textAlign="left"
+                key={title}
                 style={
                   borderStyleArray.includes(index)
                     ? { fontWeight: 'bold', borderLeftWidth: 'thick' }
                     : { fontWeight: 'bold' }
                 }
+                textAlign="left"
               >
                 {title}
               </Table.HeaderCell>

@@ -27,13 +27,13 @@ const getTableBody = rows => (
 
       return (
         <Table.Row
-          style={style}
           // eslint-disable-next-line react/no-array-index-key
           key={`row-${i}`}
+          style={style}
         >
           {rest.map((value, index) => (
             // eslint-disable-next-line react/no-array-index-key
-            <Table.Cell width={getWidth(index)} key={`cell-${index}`}>
+            <Table.Cell key={`cell-${index}`} width={getWidth(index)}>
               {value}
             </Table.Cell>
           ))}

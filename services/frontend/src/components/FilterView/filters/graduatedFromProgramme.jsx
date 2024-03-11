@@ -22,21 +22,21 @@ const GraduatedFromProgrammeFilterCard = ({ options, onOptionsChange, isCombined
       <div className="card-content">
         <Form.Field style={{ display: 'flex', flexDirection: 'column' }}>
           <Radio
-            label="All"
             checked={mode === null}
+            data-cy="option-all"
+            label="All"
             onChange={() => onOptionsChange({ mode: null })}
             style={{ marginBottom: '0.5rem' }}
-            data-cy="option-all"
           />
           {modeOptions.map(option => (
             <Radio
+              checked={mode === option.value}
+              data-cy={`option-${option.key}`}
               key={option.key}
               label={option.text}
               name="radioGroup"
-              style={{ marginBottom: '0.5rem' }}
-              checked={mode === option.value}
               onChange={() => onOptionsChange({ mode: option.value })}
-              data-cy={`option-${option.key}`}
+              style={{ marginBottom: '0.5rem' }}
             />
           ))}
         </Form.Field>

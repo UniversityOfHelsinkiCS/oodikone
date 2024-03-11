@@ -92,37 +92,37 @@ export const DegreeCoursesTable = ({ studyProgramme, combinedProgramme, year }) 
         <h3 style={{ marginTop: '15px', marginBottom: '15px' }}>
           Select curriculum to edit:
           <CurriculumPicker
-            year={year}
             programmeCodes={[studyProgramme, combinedProgramme]}
             setCurriculum={setCurriculum}
+            year={year}
           />
         </h3>
       </div>
       {(studyProgramme.includes('KH') || ['MH30_001', 'MH30_003'].includes(studyProgramme)) && (
         <CreditCriteriaForm
+          addProgressCriteriaCredits={addProgressCriteriaCredits}
           criteria={criteria}
           studyProgramme={studyProgramme}
-          addProgressCriteriaCredits={addProgressCriteriaCredits}
         />
       )}
       {defaultModules && defaultModules.length > 1 && (
         <DegreeCourseTableView
-          modules={defaultModules}
-          criteria={criteria}
-          studyProgramme={studyProgramme}
-          curriculum={curriculum}
-          combinedProgramme=""
           addProgressCriteriaCourse={addProgressCriteriaCourse}
+          combinedProgramme=""
+          criteria={criteria}
+          curriculum={curriculum}
+          modules={defaultModules}
+          studyProgramme={studyProgramme}
         />
       )}
       {secondProgrammeModules.length > 0 && (
         <DegreeCourseTableView
-          modules={secondProgrammeModules}
+          addProgressCriteriaCourse={addProgressCriteriaCourse}
+          combinedProgramme={combinedProgramme}
           criteria={criteria}
           curriculum={curriculum}
+          modules={secondProgrammeModules}
           studyProgramme={studyProgramme}
-          combinedProgramme={combinedProgramme}
-          addProgressCriteriaCourse={addProgressCriteriaCourse}
         />
       )}
     </Container>

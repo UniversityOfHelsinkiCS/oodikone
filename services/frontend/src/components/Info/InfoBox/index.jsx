@@ -42,14 +42,14 @@ export const InfoBox = ({ content, cypress, popup = false }) => {
 
   if (open) {
     return (
-      <Message icon className="ok-infobox" color="green">
+      <Message className="ok-infobox" color="green" icon>
         <div className="content-container" data-cy={`${cypress}-info-content`}>
           <Icon name="info circle" size="huge" />
           <Message.Content className="ok-infobox content">
             <ReactMarkdown>{content}</ReactMarkdown>
           </Message.Content>
         </div>
-        <Button onClick={toggleOpen} className="ok-infobox-close" data-cy={`${cypress}-close-info`}>
+        <Button className="ok-infobox-close" data-cy={`${cypress}-close-info`} onClick={toggleOpen}>
           Close Info
         </Button>
       </Message>

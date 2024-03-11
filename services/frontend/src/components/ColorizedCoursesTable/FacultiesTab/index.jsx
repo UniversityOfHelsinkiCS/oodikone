@@ -69,7 +69,7 @@ export const FacultiesTab = () => {
   return (
     <div>
       <div className="options-container">
-        <SemesterRangeSelector setSemesterFilter={setSemesterFilter} semesterFilter={semesterFilter} />
+        <SemesterRangeSelector semesterFilter={semesterFilter} setSemesterFilter={setSemesterFilter} />
         <NumberModeSelector />
         <ColorModeSelector />
       </div>

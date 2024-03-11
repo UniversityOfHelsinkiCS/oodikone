@@ -32,10 +32,10 @@ export const Timeout = Composition =>
 
       return (
         <Composition
-          timeouts={timeouts}
-          setTimeout={setTimeout}
-          clearTimeout={clearTimeout}
           clearAllTimeouts={clearAllTimeouts}
+          clearTimeout={clearTimeout}
+          setTimeout={setTimeout}
+          timeouts={timeouts}
           {...this.props}
         />
       )

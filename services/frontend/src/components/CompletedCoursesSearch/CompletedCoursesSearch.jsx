@@ -146,14 +146,14 @@ export const CompletedCoursesSearch = ({ setValues }) => {
 
   return (
     <Modal
+      onClose={handleClose}
+      open={modal}
+      size="small"
       trigger={
-        <Button size="small" color="blue" onClick={() => setModal(true)} data-cy="open-completed-courses-modal-button">
+        <Button color="blue" data-cy="open-completed-courses-modal-button" onClick={() => setModal(true)} size="small">
           Search completed courses of students
         </Button>
       }
-      open={modal}
-      onClose={handleClose}
-      size="small"
     >
       <Modal.Content>
         <Form>
@@ -161,19 +161,19 @@ export const CompletedCoursesSearch = ({ setValues }) => {
           <Form.Field>
             <em>Insert one or more student numbers, separated by a space, a newline, a comma, or a semicolon.</em>
             <TextArea
-              value={studentInput}
-              placeholder="012345678, 12345678"
-              onChange={e => setStudentInput(e.target.value)}
               data-cy="student-no-input"
+              onChange={e => setStudentInput(e.target.value)}
+              placeholder="012345678, 12345678"
+              value={studentInput}
             />
           </Form.Field>
           <Form.Field>
             <em>Insert one or more courses, separated by a space, a newline, or a comma.</em>
             <TextArea
-              value={courseInput}
-              placeholder="TKT12345, PSYK-123"
-              onChange={e => setCourseInput(e.target.value)}
               data-cy="course-list-input"
+              onChange={e => setCourseInput(e.target.value)}
+              placeholder="TKT12345, PSYK-123"
+              value={courseInput}
             />
           </Form.Field>
           <Form.Field>
@@ -181,13 +181,14 @@ export const CompletedCoursesSearch = ({ setValues }) => {
               <em> Insert name for this course list if you wish to save it </em>
               <Form.Input
                 disabled={selectedSearchId !== ''}
-                value={name}
-                placeholder="name"
                 onChange={e => setName(e.target.value)}
+                placeholder="name"
+                value={name}
               />
             </Form.Field>
           </Form.Field>
           <SearchHistory
+            handleSearch={onSelectSearch}
             header="Saved courselists"
             items={
               searchList
@@ -200,29 +201,28 @@ export const CompletedCoursesSearch = ({ setValues }) => {
                 : []
             }
             updateItem={() => null}
-            handleSearch={onSelectSearch}
           />
           <Modal.Actions>
             <Button
+              content="Save"
               data-cy="save-courselist"
               disabled={!name || updateIsLoading || createIsLoading}
-              loading={updateIsLoading || createIsLoading}
               floated="left"
               icon="save"
+              loading={updateIsLoading || createIsLoading}
               onClick={onSave}
-              content="Save"
             />
             <Button
+              content="Delete"
               disabled={!selectedSearchId || deleteIsLoading}
-              negative
               floated="left"
               icon="trash"
+              negative
               onClick={onDelete}
-              content="Delete"
             />
 
             <Button onClick={handleClose}>Cancel</Button>
-            <Button positive onClick={e => onClicker(e)} data-cy="completed-courses-search-button">
+            <Button data-cy="completed-courses-search-button" onClick={e => onClicker(e)} positive>
               Search
             </Button>
           </Modal.Actions>

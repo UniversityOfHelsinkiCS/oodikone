@@ -234,13 +234,13 @@ export const PassFailEnrollments = ({ flat, onlyIamRights }) => {
 
   return (
     <SortableTable
+      columns={columns}
+      data={data}
+      expandedGroups={expandedGroups}
+      featureName="pass_and_fail"
       tableId="pass-and-fail-statistics-of-courses"
       title="Pass and fail statistics of courses with course enrollment details"
-      featureName="pass_and_fail"
-      data={data}
-      columns={columns}
       toggleGroupExpansion={toggleGroupExpansion}
-      expandedGroups={expandedGroups}
     />
   )
 }

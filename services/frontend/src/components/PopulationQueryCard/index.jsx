@@ -42,7 +42,7 @@ export const PopulationQueryCard = ({ population, query, removeSampleFn, units, 
     <Card className="cardContainer">
       <Card.Header className="cardHeader">
         <div>{header}</div>
-        <Icon name="remove" className="controlIcon" onClick={() => removeSampleFn(uuid)} />
+        <Icon className="controlIcon" name="remove" onClick={() => removeSampleFn(uuid)} />
       </Card.Header>
       <Card.Meta>
         <div className="dateItem">

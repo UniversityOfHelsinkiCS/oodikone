@@ -27,20 +27,20 @@ const TagsFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
     <div className="card-content">
       <Form>
         <Dropdown
-          multiple
-          selection
-          fluid
-          options={dropdownOptions}
           button
           className="mini"
-          placeholder="Choose Tags to include"
+          data-cy={`${name}-dropdown`}
+          fluid
+          multiple
           onChange={(_, { value }) =>
             onOptionsChange({
               selected: value,
             })
           }
+          options={dropdownOptions}
+          placeholder="Choose Tags to include"
+          selection
           value={options.selected}
-          data-cy={`${name}-dropdown`}
         />
       </Form>
     </div>

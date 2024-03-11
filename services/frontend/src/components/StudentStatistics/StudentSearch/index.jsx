@@ -271,7 +271,7 @@ const StudentSearch = ({
 
       columns.splice(0, 0, ...nameColumns)
     }
-    return <SortableTable hideHeaderBar columns={columns} data={studentsSorted.slice(0, 200)} />
+    return <SortableTable columns={columns} data={studentsSorted.slice(0, 200)} hideHeaderBar />
   }
 
   if (studentNumber) {
@@ -285,9 +285,9 @@ const StudentSearch = ({
           input={{ fluid: true }}
           loading={loading}
           onSearchChange={handleSearchChange}
+          placeholder="Search with a student number or name (surname firstname)"
           showNoResults={false}
           value={searchStr}
-          placeholder="Search with a student number or name (surname firstname)"
         />
       </Container>
       <Segment basic>

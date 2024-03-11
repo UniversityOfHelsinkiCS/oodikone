@@ -19,7 +19,7 @@ const CourseSelector = ({ courses, selected, setSelected }) => {
     <>
       <Header as="h4">Select course</Header>
       <Form>
-        <Form.Select data-cy="course-selector" fluid options={courses} onChange={onCourseChange} value={selected} />
+        <Form.Select data-cy="course-selector" fluid onChange={onCourseChange} options={courses} value={selected} />
       </Form>
       <Divider />
     </>
@@ -43,14 +43,14 @@ export const SingleCourseTab = ({ selected, setSelected, userHasAccessToAllStats
       <Segment>
         {courses.length > 1 && <CourseSelector courses={courses} selected={selected} setSelected={setSelected} />}
         <Label
-          key={stats[selected].coursecode}
           content={`${stats[selected].alternatives.map(code => ` ${code}`)} ${getTextIn(stats[selected].name)} `}
+          key={stats[selected].coursecode}
         />
       </Segment>
       <SingleCourseStats
+        availableStats={availableStats[selected]}
         stats={stats[selected]}
         userHasAccessToAllStats={userHasAccessToAllStats}
-        availableStats={availableStats[selected]}
       />
     </div>
   )

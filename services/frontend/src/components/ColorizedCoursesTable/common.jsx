@@ -11,7 +11,7 @@ export const courseNameColumn = getTextIn => ({
   title: 'Course',
   getRowVal: row => row.code,
   getRowContent: row => (
-    <div title={getTextIn(row.name)} style={{ display: 'flex', flexDirection: 'column' }}>
+    <div style={{ display: 'flex', flexDirection: 'column' }} title={getTextIn(row.name)}>
       <b>{row.code}</b>
       <i style={{ color: 'gray', fontWeight: 'normal' }}>{row.name && getTextIn(row.name)}</i>
     </div>

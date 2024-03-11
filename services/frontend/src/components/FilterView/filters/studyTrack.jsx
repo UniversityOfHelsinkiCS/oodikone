@@ -49,18 +49,18 @@ const StudyTrackFilterCard = ({ options, onOptionsChange, withoutSelf, activeAt,
   return (
     <Form>
       <Dropdown
-        options={dropdownOptions}
-        value={selected}
-        onChange={handleChange}
-        placeholder="Choose study track"
-        className="mini"
-        selection
-        clearable
         button
-        search
-        multiple
-        fluid
+        className="mini"
+        clearable
         data-cy="StudyTrack-filter-dropdown"
+        fluid
+        multiple
+        onChange={handleChange}
+        options={dropdownOptions}
+        placeholder="Choose study track"
+        search
+        selection
+        value={selected}
       />
     </Form>
   )
@@ -100,6 +100,6 @@ export const studyTrackFilter = createFilter({
   },
 
   render: (props, { args }) => (
-    <StudyTrackFilterCard {...props} code={_.get(args, 'code')} activeAt={_.get(args, 'activeAt')} />
+    <StudyTrackFilterCard {...props} activeAt={_.get(args, 'activeAt')} code={_.get(args, 'code')} />
   ),
 })

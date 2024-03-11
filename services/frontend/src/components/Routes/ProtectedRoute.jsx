@@ -6,7 +6,7 @@ import { checkUserAccess } from '@/common'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 
 const NoAccessToPageBanner = () => (
-  <Container text style={{ paddingTop: 50 }} textAlign="justified">
+  <Container style={{ paddingTop: 50 }} text textAlign="justified">
     <Header as="h1" textAlign="center">
       Access denied
     </Header>

@@ -542,7 +542,7 @@ export const CreditAccumulationGraphHighCharts = ({
   })
 
   const makeGraphSizeButton = (height, label) => (
-    <Button active={graphHeight === height} onClick={() => setGraphHeight(height)} content={label} />
+    <Button active={graphHeight === height} content={label} onClick={() => setGraphHeight(height)} />
   )
 
   return (
@@ -552,8 +552,8 @@ export const CreditAccumulationGraphHighCharts = ({
           {!singleStudent && studyPlanFilterIsActive ? (
             <Radio
               checked={cutStudyPlanCredits}
-              onChange={() => setCutStudyPlanCredits(!cutStudyPlanCredits)}
               label="Display credits from study right start"
+              onChange={() => setCutStudyPlanCredits(!cutStudyPlanCredits)}
               toggle
             />
           ) : null}
@@ -566,7 +566,7 @@ export const CreditAccumulationGraphHighCharts = ({
         </div>
       </div>
 
-      <ReactHighstock ref={chartRef} config={options} />
+      <ReactHighstock config={options} ref={chartRef} />
     </div>
   )
 }

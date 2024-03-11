@@ -28,45 +28,45 @@ const StudyrightStatusFilterCard = ({ options, onOptionsChange, combinedProgramm
       <div className="card-content">
         <Form.Field style={{ display: 'flex', flexDirection: 'column' }}>
           <Radio
+            checked={activeProgramme === null && activeCombinedProgramme === null}
+            data-cy="option-activity-status-all"
             label="All"
             name="radioGroup"
-            checked={activeProgramme === null && activeCombinedProgramme === null}
             onChange={toggle(null, 'default')}
-            data-cy="option-activity-status-all"
           />
           <Radio
+            checked={activeProgramme === true}
+            data-cy="option-active"
             label={`Active ${restOfTitle}`}
             name="radioGroup"
-            checked={activeProgramme === true}
             onChange={toggle(true, 'default')}
-            data-cy="option-active"
             style={{ margin: '0.5rem 0' }}
           />
           {combinedProgrammeCode && (
             <Radio
+              checked={activeCombinedProgramme === true}
+              data-cy="option-active-combined"
               label={`Active ${typeOfCombined} studyright`}
               name="radioGroup"
-              checked={activeCombinedProgramme === true}
               onChange={toggle(true, 'combinedProgramme')}
-              data-cy="option-active-combined"
               style={{ margin: '0.5rem 0' }}
             />
           )}
           <Radio
+            checked={activeProgramme === false}
+            data-cy="option-inactive"
             label={`Inactive ${restOfTitle}`}
             name="radioGroup"
-            checked={activeProgramme === false}
             onChange={toggle(false, 'default')}
-            data-cy="option-inactive"
             style={{ margin: '0.5rem 0' }}
           />
           {combinedProgrammeCode && (
             <Radio
+              checked={activeCombinedProgramme === false}
+              data-cy="option-inactive-combined"
               label={`Inactive ${typeOfCombined} studyright`}
               name="radioGroup"
-              checked={activeCombinedProgramme === false}
               onChange={toggle(false, 'combinedProgramme')}
-              data-cy="option-inactive-combined"
             />
           )}
         </Form.Field>

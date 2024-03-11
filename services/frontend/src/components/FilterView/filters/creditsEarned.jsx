@@ -21,7 +21,7 @@ const CreditsEarnedFilterCard = ({ options, onOptionsChange, bounds }) => {
     <div>
       <p>Valitse opintopistehaitari, jolle asettuvat opiskelijat näytetään:</p>
       <div className="card-content">
-        {min < max && <RangeSelector min={min} max={max} onChange={setRange} value={range} />}
+        {min < max && <RangeSelector max={max} min={min} onChange={setRange} value={range} />}
       </div>
     </div>
   )

@@ -61,15 +61,8 @@ const DefaultColumnFilterComponent = ({ column, options, dispatch }) => {
 
         return (
           <Dropdown.Item
-            key={text}
             icon={<Icon name={icon} style={{ color }} />}
-            text={
-              text !== undefined && text !== null ? (
-                `${text}`
-              ) : (
-                <span style={{ color: 'gray', fontStyle: 'italic' }}>Empty</span>
-              )
-            }
+            key={text}
             onClick={evt => {
               dispatch({
                 type: 'CYCLE_VALUE_FILTER',
@@ -82,6 +75,13 @@ const DefaultColumnFilterComponent = ({ column, options, dispatch }) => {
               evt.preventDefault()
               evt.stopPropagation()
             }}
+            text={
+              text !== undefined && text !== null ? (
+                `${text}`
+              ) : (
+                <span style={{ color: 'gray', fontStyle: 'italic' }}>Empty</span>
+              )
+            }
           />
         )
       })
@@ -94,6 +94,8 @@ const DefaultColumnFilterComponent = ({ column, options, dispatch }) => {
       <Input
         icon="search"
         iconPosition="left"
+        onChange={evt => setSearch(evt.target.value)}
+        onClick={e => e.stopPropagation()}
         onKeyDown={evt => {
           if (evt.keyCode === 13) {
             const visibleValues = _.uniq(values).filter(value => search === '' || `${value}`.indexOf(search) > -1)
@@ -127,9 +129,7 @@ const DefaultColumnFilterComponent = ({ column, options, dispatch }) => {
             evt.stopPropagation()
           }
         }}
-        onClick={e => e.stopPropagation()}
         value={search}
-        onChange={evt => setSearch(evt.target.value)}
       />
       <Dropdown.Menu scrolling>{valueItems}</Dropdown.Menu>
     </>

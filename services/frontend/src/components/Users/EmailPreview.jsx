@@ -35,7 +35,7 @@ export const EmailPreview = ({ userEmailAddress, email, isLoading, isError }) =>
     return (
       <Segment.Group>
         <EmailHeader isLoading />
-        <Segment placeholder loading height="200px" style={{ background: '#f7f7f7' }} />
+        <Segment height="200px" loading placeholder style={{ background: '#f7f7f7' }} />
       </Segment.Group>
     )
   }
@@ -49,14 +49,14 @@ export const EmailPreview = ({ userEmailAddress, email, isLoading, isError }) =>
       <EmailHeader isLoading={false} subject={email.subject} to={userEmailAddress} />
       <Segment style={{ background: '#f7f7f7' }}>
         <iframe
-          sandbox=""
-          referrerPolicy="no-referrer"
           height="200px"
-          width="100%"
+          referrerPolicy="no-referrer"
+          sandbox=""
+          src={`data:text/html;base64,${btoa(email.html)}`}
+          srcDoc={email.html}
           style={{ border: 'none' }}
           title="User access email preview"
-          srcDoc={email.html}
-          src={`data:text/html;base64,${btoa(email.html)}`}
+          width="100%"
         />
       </Segment>
     </Segment.Group>

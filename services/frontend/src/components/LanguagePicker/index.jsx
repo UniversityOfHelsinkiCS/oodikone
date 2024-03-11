@@ -17,16 +17,16 @@ export const LanguagePicker = () => {
 
   return (
     <Dropdown
-      size="small"
+      button
       className="icon"
       floating
       icon="world"
       onChange={onChange}
-      text={language}
       options={options}
-      button
       selectOnBlur={false}
       selectOnNavigation={false}
+      size="small"
+      text={language}
     />
   )
 }

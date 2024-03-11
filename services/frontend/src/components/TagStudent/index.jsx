@@ -30,8 +30,8 @@ const TagStudent = ({
   }
 
   const studentsTags = studentstags.map(t => (
-    <Label key={`${studentnumber}-${t.tag.tag_id}`} color={t.tag.personal_user_id ? 'purple' : null}>
-      {t.tag.tagname} <Icon name="delete" link onClick={event => deleteTag(event, t.tag)} />
+    <Label color={t.tag.personal_user_id ? 'purple' : null} key={`${studentnumber}-${t.tag.tag_id}`}>
+      {t.tag.tagname} <Icon link name="delete" onClick={event => deleteTag(event, t.tag)} />
     </Label>
   ))
 
@@ -42,13 +42,13 @@ const TagStudent = ({
       <Table.Cell>{studentsTags}</Table.Cell>
       <Table.Cell>
         <Dropdown
+          onChange={handleChange}
+          options={tagOptions}
           placeholder="Tag"
           search
-          selection
-          options={tagOptions}
-          onChange={handleChange}
           selectOnBlur={false}
           selectOnNavigation={false}
+          selection
         />
       </Table.Cell>
     </Table.Row>

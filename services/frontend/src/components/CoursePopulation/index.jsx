@@ -116,11 +116,11 @@ export const CoursePopulation = () => {
         <div>
           <InfoBox content={populationStatisticsToolTips.GradeDistributionCoursePopulation} />
           <CoursePopulationGradeDist
-            singleCourseStats={courseData}
-            from={dateFrom}
-            to={dateTo}
-            students={filtered}
             courseCodes={codes}
+            from={dateFrom}
+            singleCourseStats={courseData}
+            students={filtered}
+            to={dateTo}
           />
         </div>
       ),
@@ -130,7 +130,7 @@ export const CoursePopulation = () => {
       content: (
         <div>
           <InfoBox content={populationStatisticsToolTips.LanguageDistributionCoursePopulation} />
-          <CoursePopulationLanguageDist from={dateFrom} to={dateTo} samples={filtered} codes={codes} />
+          <CoursePopulationLanguageDist codes={codes} from={dateFrom} samples={filtered} to={dateTo} />
         </div>
       ),
     },
@@ -140,10 +140,10 @@ export const CoursePopulation = () => {
         <div>
           <InfoBox content={populationStatisticsToolTips.ProgrammeDistributionCoursePopulation} />
           <CustomPopulationProgrammeDist
-            studentToTargetCourseDateMap={studentToTargetCourseDateMap}
-            students={filtered}
             coursecode={codes}
             studentData={populationStatistics}
+            studentToTargetCourseDateMap={studentToTargetCourseDateMap}
+            students={filtered}
           />
         </div>
       ),
@@ -156,12 +156,12 @@ export const CoursePopulation = () => {
       title: 'Credit gains',
       content: (
         <CoursePopulationCreditGainTable
-          studentToTargetCourseDateMap={studentToTargetCourseDateMap}
-          students={filtered}
           codes={codes}
           from={dateFrom}
-          to={dateTo}
           populationStatistics={populationStatistics}
+          studentToTargetCourseDateMap={studentToTargetCourseDateMap}
+          students={filtered}
+          to={dateTo}
         />
       ),
     },
@@ -169,12 +169,12 @@ export const CoursePopulation = () => {
       title: `Students (${filtered.length})`,
       content: (
         <PopulationStudents
-          variant="coursePopulation"
-          studentToTargetCourseDateMap={studentToTargetCourseDateMap}
-          filteredStudents={filtered}
           coursecode={codes}
+          filteredStudents={filtered}
           from={dateFrom}
+          studentToTargetCourseDateMap={studentToTargetCourseDateMap}
           to={dateTo}
+          variant="coursePopulation"
         />
       ),
     },
@@ -193,7 +193,6 @@ export const CoursePopulation = () => {
 
   return (
     <FilterView
-      name="CoursePopulation"
       filters={[
         genderFilter,
         studentNumberFilter,
@@ -223,6 +222,7 @@ export const CoursePopulation = () => {
       initialOptions={{
         [programmeFilter.key]: { mode: 'attainment', selectedProgrammes: [] },
       }}
+      name="CoursePopulation"
       students={populationStatistics.students ?? []}
     >
       {filtered => (
@@ -266,16 +266,16 @@ const CustomPopulationCoursesWrapper = ({ filteredStudents }) => {
         <Form.Field inline>
           <label>Limit to courses where student number is at least</label>
           <Input
-            value={studentAmountLimit}
             onChange={e => onStudentAmountLimitChange(e.target.value)}
             style={{ width: '70px' }}
+            value={studentAmountLimit}
           />
         </Form.Field>
       </Form>
       <PopulationCourseStatsFlat
+        courses={courseStatistics}
         filteredStudents={filteredStudents}
         studentAmountLimit={studentAmountLimit}
-        courses={courseStatistics}
       />
     </>
   )

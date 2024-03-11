@@ -19,13 +19,13 @@ export const NumberModeSelector = () => {
       <b>Show number of</b>
       {modes.map(mode => (
         <Radio
-          data-cy={`${mode.value}-button`}
-          name="modeRadioGroup"
-          value={mode.value}
-          label={mode.label}
-          key={mode.value}
-          onChange={() => setNumberMode(mode.value)}
           checked={numberMode === mode.value}
+          data-cy={`${mode.value}-button`}
+          key={mode.value}
+          label={mode.label}
+          name="modeRadioGroup"
+          onChange={() => setNumberMode(mode.value)}
+          value={mode.value}
         />
       ))}
     </div>
@@ -39,25 +39,25 @@ export const ColorModeSelector = () => {
     <div className="selector-container">
       <b>Coloring mode</b>
       <Radio
-        name="colorModeGroup"
-        value="course"
-        label="Compare to average of course"
-        onChange={() => setColorMode('course')}
         checked={colorMode === 'course'}
+        label="Compare to average of course"
+        name="colorModeGroup"
+        onChange={() => setColorMode('course')}
+        value="course"
       />
       <Radio
-        name="colorModeGroup"
-        value="total"
-        label="Compare to other courses"
-        onChange={() => setColorMode('total')}
         checked={colorMode === 'total'}
+        label="Compare to other courses"
+        name="colorModeGroup"
+        onChange={() => setColorMode('total')}
+        value="total"
       />
       <Radio
-        name="colorModeGroup"
-        value="none"
-        label="No colors"
-        onChange={() => setColorMode('none')}
         checked={colorMode === 'none'}
+        label="No colors"
+        name="colorModeGroup"
+        onChange={() => setColorMode('none')}
+        value="none"
       />
     </div>
   )
@@ -78,8 +78,8 @@ const SemesterSelector = ({ allSemesters, semester, setSemester, dataCy }) => {
         onChange={(_, { value }) =>
           setSemester(allSemesters.find(({ semestercode }) => semestercode === value).semestercode)
         }
-        value={currentValue.semestercode}
         options={options}
+        value={currentValue.semestercode}
       />
     </div>
   )
@@ -93,29 +93,29 @@ export const SemesterRangeSelector = () => {
       <div>
         <b>From</b>
         <SemesterSelector
+          allSemesters={semesters}
           dataCy="semester-from"
+          semester={semesterFilter?.start}
           setSemester={semester => {
             setSemesterFilter({
               end: semesterFilter.end < semester ? semester : semesterFilter.end,
               start: semester,
             })
           }}
-          semester={semesterFilter?.start}
-          allSemesters={semesters}
         />
       </div>
       <div>
         <b>Until</b>
         {semesters && (
           <SemesterSelector
-            dataCy="semester-to"
             allSemesters={semesters?.filter(s => {
               return semesterFilter.start <= s.semestercode
             })}
+            dataCy="semester-to"
+            semester={semesterFilter?.end}
             setSemester={semester => {
               setSemesterFilter({ ...semesterFilter, end: semester })
             }}
-            semester={semesterFilter?.end}
           />
         )}
       </div>

@@ -213,7 +213,7 @@ export const DegreeCourseTableView = ({
   const labelDropdown = course => {
     if (['MH30_001', 'MH30_003', 'KH90_001'].includes(studyProgramme)) {
       return (
-        <Dropdown text="Modify labels" className="link item">
+        <Dropdown className="link item" text="Modify labels">
           <Dropdown.Menu>
             {course.visible.visibility ? setExclusionButton(course) : deleteButton(course)}
             <Dropdown.Divider />
@@ -245,7 +245,7 @@ export const DegreeCourseTableView = ({
       )
     }
     return (
-      <Dropdown text="Modify labels" className="link item">
+      <Dropdown className="link item" text="Modify labels">
         <Dropdown.Menu>
           {course.visible.visibility ? setExclusionButton(course) : deleteButton(course)}
           <Dropdown.Divider />
@@ -286,15 +286,15 @@ export const DegreeCourseTableView = ({
         {modules.map(({ module, courses }) => (
           <React.Fragment key={`fragment-${module}`}>
             <Table.Row key={module}>
-              <Table.Cell style={{ cursor: 'pointer' }} onClick={() => toggleVisible(module)}>
+              <Table.Cell onClick={() => toggleVisible(module)} style={{ cursor: 'pointer' }}>
                 <Icon name={isVisible(module) ? 'angle down' : 'angle right'} />
                 <b>{courses[0] && courses[0].parent_name ? getTextIn(courses[0].parent_name) : module}</b>
               </Table.Cell>
               <Table.Cell>{module}</Table.Cell>
               <Table.Cell>
                 <Label
-                  content={calculateModuleVisibility(module)}
                   color={moduleVisibilityColor(calculateModuleVisibility(module))}
+                  content={calculateModuleVisibility(module)}
                 />
               </Table.Cell>
               {(studyProgramme.includes('KH') || ['MH30_001', 'MH30_003'].includes(studyProgramme)) && <Table.Cell />}
@@ -311,18 +311,18 @@ export const DegreeCourseTableView = ({
                     <Table.Cell>{course.code}</Table.Cell>
                     <Table.Cell>
                       <Label
-                        content={course.visible.visibility ? 'visible' : 'hidden'}
                         color={course.visible.visibility ? 'green' : 'red'}
+                        content={course.visible.visibility ? 'visible' : 'hidden'}
                       />
                     </Table.Cell>
                     {(studyProgramme.includes('KH') || ['MH30_001', 'MH30_003'].includes(studyProgramme)) && (
                       <Table.Cell>
-                        {criteria?.courses?.yearOne?.includes(course.code) && <Label content="year 1" color="blue" />}
-                        {criteria?.courses?.yearTwo?.includes(course.code) && <Label content="year 2" color="blue" />}
-                        {criteria?.courses?.yearThree?.includes(course.code) && <Label content="year 3" color="blue" />}
-                        {criteria?.courses?.yearFour?.includes(course.code) && <Label content="year 4" color="blue" />}
-                        {criteria?.courses?.yearFive?.includes(course.code) && <Label content="year 5" color="blue" />}
-                        {criteria?.courses?.yearSix?.includes(course.code) && <Label content="year 6" color="blue" />}
+                        {criteria?.courses?.yearOne?.includes(course.code) && <Label color="blue" content="year 1" />}
+                        {criteria?.courses?.yearTwo?.includes(course.code) && <Label color="blue" content="year 2" />}
+                        {criteria?.courses?.yearThree?.includes(course.code) && <Label color="blue" content="year 3" />}
+                        {criteria?.courses?.yearFour?.includes(course.code) && <Label color="blue" content="year 4" />}
+                        {criteria?.courses?.yearFive?.includes(course.code) && <Label color="blue" content="year 5" />}
+                        {criteria?.courses?.yearSix?.includes(course.code) && <Label color="blue" content="year 6" />}
                       </Table.Cell>
                     )}
                     {studyProgramme.includes('KH') || ['MH30_001', 'MH30_003'].includes(studyProgramme) ? (

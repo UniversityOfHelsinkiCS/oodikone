@@ -73,26 +73,26 @@ export const BasicOverview = ({
     <>
       {doCombo && (
         <MedianTimeBarChart
+          byStartYear={false}
           data={graduations?.data?.comboTimes?.medians}
           goal={graduations?.data?.comboTimes?.goal}
           title={getGraduationGraphTitle(studyprogramme, doCombo)}
-          byStartYear={false}
         />
       )}
       {studyprogramme !== 'MH90_001' && (
         <MedianTimeBarChart
+          byStartYear={false}
           data={timesData?.medians}
           goal={graduations?.data.graduationTimes?.goal}
           title={getGraduationGraphTitle(studyprogramme)}
-          byStartYear={false}
         />
       )}
       {combinedProgramme && (
         <MedianTimeBarChart
+          byStartYear={false}
           data={timesDataSecondProgramme?.medians}
           goal={graduations?.data.graduationTimesSecondProgramme?.goal}
           title={getGraduationGraphTitle(combinedProgramme, true)}
-          byStartYear={false}
         />
       )}
     </>
@@ -142,19 +142,19 @@ export const BasicOverview = ({
       <div className="toggle-container">
         <Toggle
           cypress="YearToggle"
-          toolTips={studyProgrammeToolTips.YearToggle}
           firstLabel="Calendar year"
           secondLabel="Academic year"
-          value={academicYear}
           setValue={setAcademicYear}
+          toolTips={studyProgrammeToolTips.YearToggle}
+          value={academicYear}
         />
         <Toggle
           cypress="StudentToggle"
-          toolTips={studyProgrammeToolTips.StudentToggle}
           firstLabel="All studyrights"
           secondLabel="Special studyrights excluded"
-          value={specialGroups}
           setValue={setSpecialGroups}
+          toolTips={studyProgrammeToolTips.StudentToggle}
+          value={specialGroups}
         />
       </div>
 
@@ -185,9 +185,9 @@ export const BasicOverview = ({
               {' '}
               {getDivider('Credits produced by the studyprogramme', 'CreditsProducedByTheStudyprogramme')}
               <CreditsProduced
+                academicYear={academicYear}
                 data={credits?.data?.stats?.[studyprogramme]?.stats}
                 secondData={credits?.data?.stats?.[combinedProgramme]?.stats}
-                academicYear={academicYear}
               />
             </>
           )}
@@ -208,8 +208,8 @@ export const BasicOverview = ({
                   cypress="GraduationTimeToggle"
                   firstLabel="Breakdown"
                   secondLabel="Median time"
-                  value={showMedian}
                   setValue={setShowMedian}
+                  value={showMedian}
                 />
               </div>
               <div className={`section-container${doCombo ? '' : '-centered'}`}>
@@ -226,14 +226,14 @@ export const BasicOverview = ({
                   <div className="section-container">
                     <StackedBarChart
                       cypress="ProgrammesBeforeOrAfter"
-                      wideTable
                       data={graduations?.data?.programmesBeforeOrAfterGraphStats}
                       labels={graduations?.data?.years}
+                      wideTable
                     />
                     <DataTable
-                      wideTable
                       data={graduations?.data?.programmesBeforeOrAfterTableStats}
                       titles={graduations?.data?.programmesBeforeOrAfterTitles}
+                      wideTable
                     />
                   </div>
                 </>

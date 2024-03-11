@@ -13,7 +13,7 @@ import { SortableTable } from '@/components/SortableTable'
 const findRowContent = (student, courseCode, year, start, end, criteria) => {
   if (courseCode.includes('Credits'))
     return student.criteriaProgress[year] && student.criteriaProgress[year].credits ? (
-      <Icon fitted name="check" title="Checked" color="green" />
+      <Icon color="green" fitted name="check" title="Checked" />
     ) : null
   const courses = student.courses.filter(
     course =>
@@ -22,17 +22,17 @@ const findRowContent = (student, courseCode, year, start, end, criteria) => {
   )
 
   if (courses && courses.some(course => course.credittypecode === 9))
-    return <Icon name="clipboard check" color="green" />
+    return <Icon color="green" name="clipboard check" />
   if (
     courses &&
     courses.some(course => course.passed) &&
     courses.some(course => moment(course.date).isBetween(moment(start), moment(end)))
   )
-    return <Icon fitted name="check" color="green" />
-  if (courses && courses.some(course => course.passed)) return <Icon fitted name="check" color="grey" />
-  if (courses && courses.some(course => course.passed === false)) return <Icon fitted name="times" color="red" />
+    return <Icon color="green" fitted name="check" />
+  if (courses && courses.some(course => course.passed)) return <Icon color="grey" fitted name="check" />
+  if (courses && courses.some(course => course.passed === false)) return <Icon color="red" fitted name="times" />
   if (student.enrollments && student.enrollments.map(course => course.course_code).includes(courseCode))
-    return <Icon fitted name="minus" color="grey" />
+    return <Icon color="grey" fitted name="minus" />
   return null
 }
 
@@ -246,7 +246,7 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
             cellProps: { title: 'student number', className: 'studentNumber' },
             getRowVal: s => s.studentNumber,
             getRowContent: s => (
-              <StudentInfoItem student={s} view="Student progress table" tab="Progress tab" showSisuLink />
+              <StudentInfoItem showSisuLink student={s} tab="Progress tab" view="Student progress table" />
             ),
           },
         ],
@@ -497,12 +497,12 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
       )}
       <Message style={{ fontSize: '16px', maxWidth: '700px' }}>
         <p>
-          <Icon fitted name="check" color="green" />: Student has passed the course in the academic year. <br />
-          <Icon fitted name="check" color="grey" />: Student has passed the course outside of the corresponding academic
-          year. <br /> <Icon fitted name="clipboard check" color="green" />: Student has credit transfer for the course.
+          <Icon color="green" fitted name="check" />: Student has passed the course in the academic year. <br />
+          <Icon color="grey" fitted name="check" />: Student has passed the course outside of the corresponding academic
+          year. <br /> <Icon color="green" fitted name="clipboard check" />: Student has credit transfer for the course.
           <br />
-          <Icon fitted name="times" color="red" />: Student has failed the course. <br />
-          <Icon fitted name="minus" color="grey" />: Student has enrolled, but has not received any grade from the
+          <Icon color="red" fitted name="times" />: Student has failed the course. <br />
+          <Icon color="grey" fitted name="minus" />: Student has enrolled, but has not received any grade from the
           course.
           <br />
           <span className="enrollment-label-no-margin label-present" />: Student has an active semester enrollment.{' '}
@@ -518,12 +518,12 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
           <div style={{ maxHeight: '80vh', width: '100%' }}>
             {isCriteriaSet ? (
               <SortableTable
+                columns={columns}
+                data={data}
+                featureName="progress"
                 style={{ height: '80vh' }}
                 tableId="progress-of-population-students"
                 title="Progress of population's students after predefined criteria"
-                featureName="progress"
-                columns={columns}
-                data={data}
               />
             ) : (
               <div>

@@ -42,7 +42,7 @@ export const TeacherStatisticsTable = ({ statistics, variant }) => {
           {
             key: 'link',
             getRowContent: row => (
-              <Item as={Link} to={`/teachers/${row.id}`} onClick={() => history.push(`/teachers/${row.id}`)}>
+              <Item as={Link} onClick={() => history.push(`/teachers/${row.id}`)} to={`/teachers/${row.id}`}>
                 <Icon name="level up alternate" />
               </Item>
             ),
@@ -98,6 +98,6 @@ export const TeacherStatisticsTable = ({ statistics, variant }) => {
   return statistics.length === 0 ? (
     <Segment basic content="No statistics found for the given query." />
   ) : (
-    <SortableTable title="Teacher statistics" featureName="teacher_statistics" columns={columns} data={data} />
+    <SortableTable columns={columns} data={data} featureName="teacher_statistics" title="Teacher statistics" />
   )
 }

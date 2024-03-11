@@ -29,13 +29,13 @@ export const CourseParticipationTable = ({ student, clearCourseStats, studyright
     let icon = null
 
     if (isStudyModuleCredit) {
-      icon = <Icon name="certificate" color="purple" />
+      icon = <Icon color="purple" name="certificate" />
     } else if (c.credittypecode === 9) {
-      icon = <Icon name="clipboard check" title="Credit transfer" color="green" />
+      icon = <Icon color="green" name="clipboard check" title="Credit transfer" />
     } else if (passed) {
-      icon = <Icon name="check" color="green" />
+      icon = <Icon color="green" name="check" />
     } else {
-      icon = <Icon name="times" color="red" />
+      icon = <Icon color="red" name="times" />
     }
 
     if (!courseRowsByAcademicYear[`${new Date(date).getFullYear()}-${new Date(date).getFullYear() + 1}`]) {
@@ -60,8 +60,8 @@ export const CourseParticipationTable = ({ student, clearCourseStats, studyright
         </div>,
         credits,
         <Item
-          key={`${course.code}-${new Date(date).getTime()}-link-${grade}`}
           as={Link}
+          key={`${course.code}-${new Date(date).getTime()}-link-${grade}`}
           to={`/coursestatistics?courseCodes=["${course.code}"]&separate=false&unifyOpenUniCourses=false`}
         >
           <Icon name="level up alternate" onClick={() => clearCourseStats()} />
@@ -82,8 +82,8 @@ export const CourseParticipationTable = ({ student, clearCourseStats, studyright
         </div>,
         credits,
         <Item
-          key={`${course.code}-${new Date(date).getTime()}-link-${grade}`}
           as={Link}
+          key={`${course.code}-${new Date(date).getTime()}-link-${grade}`}
           to={`/coursestatistics?courseCodes=["${course.code}"]&separate=false&unifyOpenUniCourses=false`}
         >
           <Icon name="level up alternate" onClick={() => clearCourseStats()} />
@@ -100,8 +100,8 @@ export const CourseParticipationTable = ({ student, clearCourseStats, studyright
         <Header content={academicYear} />
         <StudentCourseTable
           headers={courseHeaders}
-          rows={courseRowsByAcademicYear[academicYear]}
           noResultText="Student has courses marked"
+          rows={courseRowsByAcademicYear[academicYear]}
         />
       </Fragment>
     )

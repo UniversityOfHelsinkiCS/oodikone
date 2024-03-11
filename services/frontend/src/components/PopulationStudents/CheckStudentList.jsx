@@ -53,10 +53,10 @@ export const CheckStudentList = ({ students }) => {
     >
       <Modal.Content id="checkstudentsresults">
         <Header content="Results" />
-        <Accordion styled exclusive={false} panels={panels} fluid />
+        <Accordion exclusive={false} fluid panels={panels} styled />
       </Modal.Content>
       <Modal.Actions>
-        <Button color="green" onClick={() => setModalOpen(false)} inverted>
+        <Button color="green" inverted onClick={() => setModalOpen(false)}>
           Close
         </Button>
       </Modal.Actions>
@@ -65,21 +65,21 @@ export const CheckStudentList = ({ students }) => {
 
   return (
     <Modal
+      onClose={() => setModalOpen(false)}
+      open={modalOpen}
+      size="small"
       trigger={
-        <Button size="small" onClick={() => setModalOpen(true)}>
+        <Button onClick={() => setModalOpen(true)} size="small">
           Check studentnumbers
         </Button>
       }
-      open={modalOpen}
-      onClose={() => setModalOpen(false)}
-      size="small"
     >
       <Modal.Content>
         <Form>
           <h2> Check for studentnumbers </h2>
           <Form.Field>
             <em> Insert studentnumbers you wish to check here </em>
-            <TextArea placeholder="011111111" onChange={e => setInput(e.target.value)} />
+            <TextArea onChange={e => setInput(e.target.value)} placeholder="011111111" />
           </Form.Field>
         </Form>
       </Modal.Content>

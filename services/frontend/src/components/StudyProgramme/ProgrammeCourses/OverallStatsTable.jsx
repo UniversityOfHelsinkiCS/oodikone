@@ -337,21 +337,21 @@ export const OverallStatsTable = ({ studyProgramme, combinedProgramme, academicY
       <Segment style={{ marginTop: '1rem' }}>
         <Header as="h4">Time range</Header>
         <CourseYearFilter
-          years={academicYear ? years.academic : years.normal}
-          fromYear={fromYear}
-          toYear={toYear}
-          handleChange={handleYearChange}
           academicYear={academicYear}
+          fromYear={fromYear}
+          handleChange={handleYearChange}
           setAcademicYear={setAcademicYear}
+          toYear={toYear}
+          years={academicYear ? years.academic : years.normal}
         />
       </Segment>
       <Toggle
         cypress="creditsStudentsToggle"
-        toolTips={null}
         firstLabel="Show credits"
         secondLabel="Show students"
-        value={showStudents}
         setValue={setShowStudents}
+        toolTips={null}
+        value={showStudents}
       />
       <div style={{ marginBottom: '1em' }}>
         <InfoBox
@@ -365,11 +365,11 @@ export const OverallStatsTable = ({ studyProgramme, combinedProgramme, academicY
       </div>
       <div data-cy="CoursesSortableTable">
         <SortableTable
-          title="Student statistics for study programme courses"
-          featureName="programme_courses"
-          defaultSort={['name', 'asc']}
           columns={getColumns(getTextIn, showStudents)}
           data={filterDataByYear(data, fromYear, toYear)}
+          defaultSort={['name', 'asc']}
+          featureName="programme_courses"
+          title="Student statistics for study programme courses"
         />
       </div>
     </>

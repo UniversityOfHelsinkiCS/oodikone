@@ -18,7 +18,7 @@ export const UserPage = () => {
 
   if (isLoading) return <Loader active inline="centered" />
 
-  if (isError) return <Message negative size="big" icon="ban" header={error.data.error} />
+  if (isError) return <Message header={error.data.error} icon="ban" negative size="big" />
 
   const renderUserInfoCard = () => (
     <Card fluid>
@@ -29,12 +29,12 @@ export const UserPage = () => {
               content="Show Oodikone as this user"
               trigger={
                 <Button
-                  floated="right"
-                  circular
-                  size="tiny"
                   basic
+                  circular
+                  floated="right"
                   icon="spy"
                   onClick={() => showAsUser(user.username)}
+                  size="tiny"
                 />
               }
             />
@@ -49,18 +49,18 @@ export const UserPage = () => {
   )
 
   return (
-    <Segment loading={isLoading} className="contentSegment">
+    <Segment className="contentSegment" loading={isLoading}>
       <div>
-        <Button icon="arrow circle left" content="Back" onClick={() => history.push('/users')} />
+        <Button content="Back" icon="arrow circle left" onClick={() => history.push('/users')} />
         <Divider />
         <Card.Group>
           {!user.sisu_person_id && (
             <Message
-              header="This user does not have a person id"
               content="All their roles and access rights might not be displayed."
+              header="This user does not have a person id"
+              icon="exclamation circle"
               info
               negative
-              icon="exclamation circle"
               style={{ margin: '1rem 0' }}
             />
           )}

@@ -76,15 +76,15 @@ const SingleStudyGroupContent = ({ filteredStudents, group }) => {
       content: (
         <>
           {group.tags?.year && (
-            <Button primary onClick={() => toggleCreditDateFilter()}>
+            <Button onClick={() => toggleCreditDateFilter()} primary>
               {creditDateFilterActive ? 'Show all credits' : 'Show starting from associated year'}
             </Button>
           )}
           <CreditAccumulationGraphHighCharts
+            customStudyStartYear={customStudyStartYear}
+            programmeCodes={group?.tags?.studyProgramme ? programmeCodes : []}
             students={filteredStudents}
             studyPlanFilterIsActive={studyPlanFilterIsActive}
-            programmeCodes={group?.tags?.studyProgramme ? programmeCodes : []}
-            customStudyStartYear={customStudyStartYear}
           />
         </>
       ),
@@ -95,9 +95,9 @@ const SingleStudyGroupContent = ({ filteredStudents, group }) => {
           content: !query?.years ? (
             <div>
               <CreditGainStats
-                query={query}
-                filteredStudents={filteredStudents}
                 creditDateFilterOptions={creditDateFilterOptions}
+                filteredStudents={filteredStudents}
+                query={query}
                 year={group.tags.year}
               />
             </div>
@@ -119,11 +119,11 @@ const SingleStudyGroupContent = ({ filteredStudents, group }) => {
           ) : (
             <StudyGuidanceGroupPopulationCourses
               courses={courses}
+              curriculum={curriculum}
               filteredStudents={filteredStudents}
+              setCurriculum={setCurriculum}
               studyProgramme={group.tags?.studyProgramme ? programmeCodes[0] : null}
               year={year}
-              curriculum={curriculum}
-              setCurriculum={setCurriculum}
             />
           )}
         </div>
@@ -134,11 +134,11 @@ const SingleStudyGroupContent = ({ filteredStudents, group }) => {
       content: (
         <div>
           <PopulationStudents
-            variant="studyGuidanceGroupPopulation"
-            filteredStudents={filteredStudents}
             criteria={criteria}
-            studyGuidanceGroup={group}
             curriculum={curriculum}
+            filteredStudents={filteredStudents}
+            studyGuidanceGroup={group}
+            variant="studyGuidanceGroupPopulation"
           />
         </div>
       ),
@@ -244,10 +244,10 @@ const SingleStudyGroupFilterView = ({ courses, group, population, ...otherProps 
 
   return (
     <FilterView
-      name={`StudyGuidanceGroup(${group.id})`}
       filters={viewFilters}
-      students={population?.students ?? []}
       initialOptions={initialOptions}
+      name={`StudyGuidanceGroup(${group.id})`}
+      students={population?.students ?? []}
     >
       {students => (
         <SingleStudyGroupContent
@@ -274,16 +274,16 @@ const SingleStudyGroupViewWrapper = ({ group, isLoading, studyProgrammes, childr
   return (
     <>
       <Wrapper isLoading={isLoading}>
-        <Button icon="arrow circle left" content="Back" onClick={handleBack} />
+        <Button content="Back" icon="arrow circle left" onClick={handleBack} />
         <Divider />
         <div style={{ display: 'flex', gap: '8px', alignItems: 'baseline' }}>
           <Header size="medium" style={{ marginRight: 'auto' }}>
             {group && group.name && getTextIn(group.name)}
           </Header>
           {group.tags?.studyProgramme && (
-            <Label tag content={studyProgrammes.find(p => p.value === group.tags.studyProgramme)?.text} color="blue" />
+            <Label color="blue" content={studyProgrammes.find(p => p.value === group.tags.studyProgramme)?.text} tag />
           )}
-          {group.tags?.year && <Label tag content={startYearToAcademicYear(group.tags.year)} color="blue" />}
+          {group.tags?.year && <Label color="blue" content={startYearToAcademicYear(group.tags.year)} tag />}
         </div>
       </Wrapper>
       {children}
@@ -320,7 +320,7 @@ export const SingleStudyGuidanceGroupContainer = ({ group }) => {
         <SegmentDimmer isLoading />
       ) : (
         <div style={{ marginTop: '1rem' }}>
-          <SingleStudyGroupFilterView population={data} group={group} courses={courses} />
+          <SingleStudyGroupFilterView courses={courses} group={group} population={data} />
         </div>
       )}
     </SingleStudyGroupViewWrapper>

@@ -125,60 +125,60 @@ export const TeacherStatistics = () => {
   return (
     <div>
       <Message
-        header="Teacher statistics by course providers"
         content="Statistics for teachers that admitted credits during
               and between the given semesters for one of the given course providers."
+        header="Teacher statistics by course providers"
       />
       <Segment>
         <Form loading={isLoading || isFetching}>
           <Form.Group widths="equal">
             <Form.Dropdown
-              name="semesterStart"
-              placeholder="Semester"
               label="Start semester"
-              selection
-              search
-              options={filteredOptions}
-              value={semesterStart}
+              name="semesterStart"
               onChange={setStartSemester}
+              options={filteredOptions}
+              placeholder="Semester"
+              search
               selectOnBlur={false}
               selectOnNavigation={false}
+              selection
+              value={semesterStart}
             />
             <Form.Dropdown
-              name="semesterEnd"
-              placeholder="Semester"
-              label="End semester"
-              selection
-              search
-              options={filteredOptions.filter(semester => semester.value >= semesterStart)}
               disabled={!semesterStart}
-              value={semesterEnd}
+              label="End semester"
+              name="semesterEnd"
               onChange={setEndSemester}
+              options={filteredOptions.filter(semester => semester.value >= semesterStart)}
+              placeholder="Semester"
+              search
               selectOnBlur={false}
               selectOnNavigation={false}
+              selection
+              value={semesterEnd}
             />
           </Form.Group>
           <Form.Field>
             <label>Course providers</label>
             <Dropdown
-              name="providers"
-              placeholder="Providers"
+              data-cy="course-providers"
               multiple
-              selection
-              search
-              options={localizedProviderOptions}
-              value={provs}
+              name="providers"
               onChange={changeProviders}
+              options={localizedProviderOptions}
+              placeholder="Providers"
+              search
               selectOnBlur={false}
               selectOnNavigation={false}
-              data-cy="course-providers"
+              selection
+              value={provs}
             />
           </Form.Field>
           <Button
-            fluid
             content="Search"
-            onClick={() => getTeacherStatistics({ semesterStart, semesterEnd, providers: provs })}
             disabled={invalidQueryParams}
+            fluid
+            onClick={() => getTeacherStatistics({ semesterStart, semesterEnd, providers: provs })}
           />
         </Form>
       </Segment>

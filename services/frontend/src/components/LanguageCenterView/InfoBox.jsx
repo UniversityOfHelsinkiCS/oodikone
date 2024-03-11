@@ -51,7 +51,7 @@ export const InfoBox = () => {
           </p>
         </div>
       )}
-      <Button style={{ marginTop: '20px' }} onClick={() => setOpen(!open)}>
+      <Button onClick={() => setOpen(!open)} style={{ marginTop: '20px' }}>
         {open ? 'Hide' : 'Show more info'}
       </Button>
     </Message>

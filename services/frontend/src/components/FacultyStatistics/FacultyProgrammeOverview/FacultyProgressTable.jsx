@@ -21,7 +21,7 @@ export const FacultyProgressTable = ({
   const isTotalRow = yearArray => yearArray[0].toLowerCase() === 'total'
 
   return (
-    <Table data-cy={cypress} compact celled>
+    <Table celled compact data-cy={cypress}>
       <Table.Header>
         <Table.Row textAlign="center">
           {titles.map(title => (
@@ -34,11 +34,11 @@ export const FacultyProgressTable = ({
           <React.Fragment key={yearArray[0]}>
             {!isTotalRow(yearArray) ? (
               <ExpandableRow
-                icon={visibleYears[yearIndex] ? 'angle down' : 'angle right'}
-                yearArray={yearArray}
                 cypress={visibleYears[yearIndex] ? `Hide-${cypress}` : `Show-${cypress}`}
-                yearIndex={yearIndex}
+                icon={visibleYears[yearIndex] ? 'angle down' : 'angle right'}
                 toggleVisibility={() => toggleVisibility(yearIndex)}
+                yearArray={yearArray}
+                yearIndex={yearIndex}
               />
             ) : (
               <Table.Row style={{ textAlign: 'right' }}>
@@ -52,11 +52,11 @@ export const FacultyProgressTable = ({
             )}
             {!isTotalRow(yearArray) && (
               <Table.Row style={{ display: visibleYears[yearIndex] ? '' : 'none' }}>
-                <Table.Cell data-cy={`Cell-${cypress}-${yearIndex}`} colSpan={100}>
+                <Table.Cell colSpan={100} data-cy={`Cell-${cypress}-${yearIndex}`}>
                   <ProgrammeProgressChart
                     data={sortedKeys?.map(programme => programmeStats[programme][yearIndex])}
-                    longLabels={programmeNames}
                     labels={sortedKeys}
+                    longLabels={programmeNames}
                     names={progressTitles ? progressTitles[yearIndex] : titles.slice(2)}
                   />
                 </Table.Cell>

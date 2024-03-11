@@ -18,6 +18,7 @@ const LinkToGroup = ({ group }) => {
   const dest = `/studyguidancegroups/${group.id}`
   return (
     <Link
+      data-cy={`study-guidance-group-link-${group.id}`}
       style={{
         color: 'black',
         display: 'inline-block',
@@ -26,7 +27,6 @@ const LinkToGroup = ({ group }) => {
         padding: '.78571429em .78571429em',
       }}
       to={dest}
-      data-cy={`study-guidance-group-link-${group.id}`}
     >
       {getTextIn(group.name)}
       <Icon color="blue" name="level up alternate" onClick={() => history.push(dest)} />
@@ -83,24 +83,24 @@ const EditTagModal = ({ group, tagName, toggleEdit, selectFieldItems, open }) =>
         <Modal.Header>{getTextIn(group.name)}</Modal.Header>
         <Modal.Content>
           <AssociateTagForm
-            group={group}
-            tagName={tagName}
-            selectFieldItems={selectFieldItems}
-            formValues={formValues}
-            handleChange={handleChange}
             formErrors={formErrors}
+            formValues={formValues}
+            group={group}
+            handleChange={handleChange}
+            selectFieldItems={selectFieldItems}
+            tagName={tagName}
           />
         </Modal.Content>
         <Modal.Actions>
-          <Button content="Cancel" labelPosition="right" icon="trash" onClick={toggleEdit} negative />
+          <Button content="Cancel" icon="trash" labelPosition="right" negative onClick={toggleEdit} />
           <Button
             content="Save"
-            type="submit"
-            labelPosition="right"
-            icon="checkmark"
-            onClick={handleSubmit}
             disabled={isLoading}
+            icon="checkmark"
+            labelPosition="right"
+            onClick={handleSubmit}
             positive
+            type="submit"
           />
         </Modal.Actions>
       </>
@@ -119,25 +119,38 @@ const AssociateTagForm = ({ group, tagName, selectFieldItems, formValues, handle
       <div>
         {tagName === 'studyProgramme' ? (
           <Form.Select
-            name={tagName}
-            search={textAndDescriptionSearch}
+            closeOnChange
             fluid
+            name={tagName}
+            onChange={(_, { value }) => handleChange(tagName, value)}
+            options={selectFieldItems}
             placeholder={
               selectFieldItems.find(p => p.value === group.tags?.[tagName])?.text || 'Select study programme'
             }
-            options={selectFieldItems}
-            closeOnChange
+            search={textAndDescriptionSearch}
             value={formValues[tagName]}
-            onChange={(_, { value }) => handleChange(tagName, value)}
           />
         ) : (
           <Datetime
             className="guidance-group-overview-year-tag-selector"
-            name={tagName}
+            closeOnSelect
             dateFormat="YYYY"
-            timeFormat={false}
             initialValue={group.tags?.[tagName]}
             inputProps={{ readOnly: true }}
+            name={tagName}
+            onChange={value => handleChange(tagName, value?.format('YYYY'))}
+            renderInput={({ value, ...rest }) => {
+              return (
+                <div>
+                  <input
+                    placeholder="Select year"
+                    style={{ maxWidth: 400 }}
+                    value={startYearToAcademicYear(value)}
+                    {...rest}
+                  />
+                </div>
+              )
+            }}
             renderYear={(props, year) => {
               const shiftBy = 2 // fix to start from 2017 instead of 2019
               const formattedAndShiftedYear = startYearToAcademicYear(year - shiftBy)
@@ -152,26 +165,13 @@ const AssociateTagForm = ({ group, tagName, selectFieldItems, formValues, handle
               }
               return <td {...shiftedProps}> {formattedAndShiftedYear}</td>
             }}
-            renderInput={({ value, ...rest }) => {
-              return (
-                <div>
-                  <input
-                    value={startYearToAcademicYear(value)}
-                    placeholder="Select year"
-                    style={{ maxWidth: 400 }}
-                    {...rest}
-                  />
-                </div>
-              )
-            }}
-            closeOnSelect
+            timeFormat={false}
             value={formValues[tagName]}
-            onChange={value => handleChange(tagName, value?.format('YYYY'))}
           />
         )}
       </div>
     </Form>
-    {formErrors[tagName] && <Message negative icon="exclamation circle" header={`${formErrors[tagName]}`} />}
+    {formErrors[tagName] && <Message header={`${formErrors[tagName]}`} icon="exclamation circle" negative />}
   </>
 )
 
@@ -191,10 +191,10 @@ const TagCell = ({ tagName, group, studyProgrammes }) => {
     <>
       <EditTagModal
         group={group}
+        open={showEdit}
+        selectFieldItems={studyProgrammes}
         tagName={tagName}
         toggleEdit={toggleEdit}
-        selectFieldItems={studyProgrammes}
-        open={showEdit}
       />
       {group.tags?.[tagName] ? (
         <div style={{ ...cellWrapper, alignItems: 'baseline' }}>
@@ -245,14 +245,14 @@ export const StudyGuidanceGroupOverview = ({ groups }) => {
       title: 'Study Programme',
       getRowVal: group => group.tags?.studyProgramme,
       formatValue: value => studyProgrammes.find(p => p.value === value)?.text,
-      getRowContent: group => <TagCell tagName="studyProgramme" studyProgrammes={studyProgrammes} group={group} />,
+      getRowContent: group => <TagCell group={group} studyProgrammes={studyProgrammes} tagName="studyProgramme" />,
     },
     {
       key: 'associatedyear',
       title: 'Associated Starting Academic Year',
       getRowVal: group => group.tags?.year,
       formatValue: startYearToAcademicYear,
-      getRowContent: group => <TagCell tagName="year" group={group} />,
+      getRowContent: group => <TagCell group={group} tagName="year" />,
     },
   ]
 
@@ -269,7 +269,7 @@ export const StudyGuidanceGroupOverview = ({ groups }) => {
         </p>
       </StyledMessage>
       <div data-cy="Table-study-guidance-group-overview">
-        <SortableTable hideHeaderBar columns={headers} data={groups} singleLine={false} />
+        <SortableTable columns={headers} data={groups} hideHeaderBar singleLine={false} />
       </div>
     </>
   )

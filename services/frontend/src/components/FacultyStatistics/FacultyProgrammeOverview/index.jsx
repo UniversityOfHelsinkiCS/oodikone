@@ -169,19 +169,19 @@ export const FacultyProgrammeOverview = ({
       <div className="toggle-container">
         <Toggle
           cypress="StudentToggle"
-          toolTips={facultyToolTips.StudentToggle}
           firstLabel="All studyrights"
           secondLabel="Special studyrights excluded"
-          value={specialGroups}
           setValue={setSpecialGroups}
+          toolTips={facultyToolTips.StudentToggle}
+          value={specialGroups}
         />
         <Toggle
           cypress="GraduatedToggle"
-          toolTips={facultyToolTips.GraduatedToggle}
           firstLabel="Graduated included"
           secondLabel="Graduated excluded"
-          value={graduatedGroup}
           setValue={setGraduatedGroup}
+          toolTips={facultyToolTips.GraduatedToggle}
+          value={graduatedGroup}
         />
       </div>
       {isFetchingOrLoading ? (
@@ -200,8 +200,8 @@ export const FacultyProgrammeOverview = ({
                 content="Download student table statistics as xlsx."
                 trigger={
                   <Button
-                    icon="download"
                     floated="right"
+                    icon="download"
                     onClick={() =>
                       downloadStudentTableCsv(
                         studentStats,
@@ -217,16 +217,16 @@ export const FacultyProgrammeOverview = ({
               />
               <div>
                 <FacultyStudentDataTable
-                  tableStats={studentStats?.data.facultyTableStats}
+                  cypress="FacultyStudentStatsTable"
                   extraTableStats={studentStats?.data.facultyTableStatsExtra}
-                  programmeStats={studentStats?.data.programmeStats}
                   programmeNames={studentStats?.data.programmeNames}
-                  titles={studentStats?.data.titles}
-                  years={studentStats?.data.years}
+                  programmeStats={studentStats?.data.programmeStats}
+                  requiredRights={requiredRights}
                   sortedKeys={sortedProgrammeKeysStudents.map(listObj => listObj[0])}
                   tableLinePlaces={getTableLinePlaces(sortedProgrammeKeysStudents)}
-                  cypress="FacultyStudentStatsTable"
-                  requiredRights={requiredRights}
+                  tableStats={studentStats?.data.facultyTableStats}
+                  titles={studentStats?.data.titles}
+                  years={studentStats?.data.years}
                 />
               </div>
             </>
@@ -244,8 +244,8 @@ export const FacultyProgrammeOverview = ({
                 content="Download progress statistics as xlsx."
                 trigger={
                   <Button
-                    icon="download"
                     floated="right"
+                    icon="download"
                     onClick={() =>
                       downloadProgressTableCsv(
                         {
@@ -278,16 +278,16 @@ export const FacultyProgrammeOverview = ({
                 </div>
                 <div className="table-container">
                   <FacultyProgressTable
+                    cypress="FacultyBachelorsProgressTable"
                     data={bachelorStats.tableStats}
+                    programmeNames={progressStats?.data.programmeNames}
                     programmeStats={progressStats?.data.bachelorsProgStats}
-                    titles={bachelorStats.tableTitles}
+                    progressTitles={progressStats?.data.yearlyBachelorTitles}
+                    progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
                     sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.bachelorsProgStats).map(
                       listObj => listObj[0]
                     )}
-                    progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
-                    programmeNames={progressStats?.data.programmeNames}
-                    cypress="FacultyBachelorsProgressTable"
-                    progressTitles={progressStats?.data.yearlyBachelorTitles}
+                    titles={bachelorStats.tableTitles}
                   />
                 </div>
               </div>
@@ -314,15 +314,15 @@ export const FacultyProgrammeOverview = ({
                 </div>
                 <div className="table-container">
                   <FacultyProgressTable
+                    cypress="FacultyBachelorMasterProgressTable"
                     data={bachelorMasterStats.tableStats}
+                    programmeNames={progressStats?.data.programmeNames}
                     programmeStats={progressStats?.data.bcMsProgStats}
-                    titles={bachelorMasterStats.tableTitles}
+                    progressTitles={progressStats?.data.yearlyBcMsTitles}
                     sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.bcMsProgStats).map(
                       listObj => listObj[0]
                     )}
-                    programmeNames={progressStats?.data.programmeNames}
-                    cypress="FacultyBachelorMasterProgressTable"
-                    progressTitles={progressStats?.data.yearlyBcMsTitles}
+                    titles={bachelorMasterStats.tableTitles}
                   />
                 </div>
               </div>
@@ -342,15 +342,15 @@ export const FacultyProgrammeOverview = ({
                     </div>
                     <div className="table-container">
                       <FacultyProgressTable
+                        cypress="FacultyMastersProgressTable"
                         data={masterStats.tableStats}
+                        programmeNames={progressStats?.data.programmeNames}
                         programmeStats={progressStats?.data.mastersProgStats}
-                        titles={masterStats.tableTitles}
+                        progressTitles={progressStats?.data.yearlyMasterTitles}
                         sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.mastersProgStats).map(
                           listObj => listObj[0]
                         )}
-                        programmeNames={progressStats?.data.programmeNames}
-                        cypress="FacultyMastersProgressTable"
-                        progressTitles={progressStats?.data.yearlyMasterTitles}
+                        titles={masterStats.tableTitles}
                       />
                     </div>
                   </div>
@@ -372,15 +372,15 @@ export const FacultyProgrammeOverview = ({
                     </div>
                     <div className="table-container">
                       <FacultyProgressTable
+                        cypress="FacultyLicentiateProgressTable"
                         data={licentiateStats.tableStats}
+                        programmeNames={progressStats?.data.programmeNames}
                         programmeStats={progressStats?.data.licentiateProgStats}
-                        titles={licentiateStats.tableTitles}
+                        progressTitles={progressStats?.data.yearlyLicentiateTitles}
                         sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.licentiateProgStats).map(
                           listObj => listObj[0]
                         )}
-                        programmeNames={progressStats?.data.programmeNames}
-                        cypress="FacultyLicentiateProgressTable"
-                        progressTitles={progressStats?.data.yearlyLicentiateTitles}
+                        titles={licentiateStats.tableTitles}
                       />
                     </div>
                   </div>
@@ -400,14 +400,14 @@ export const FacultyProgrammeOverview = ({
                 </div>
                 <div className="table-container">
                   <FacultyProgressTable
+                    cypress="FacultyDoctoralProgressTable"
                     data={doctorStats.tableStats}
+                    programmeNames={progressStats?.data.programmeNames}
                     programmeStats={progressStats?.data.doctoralProgStats}
-                    titles={doctorStats.tableTitles}
                     sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.doctoralProgStats).map(
                       listObj => listObj[0]
                     )}
-                    programmeNames={progressStats?.data.programmeNames}
-                    cypress="FacultyDoctoralProgressTable"
+                    titles={doctorStats.tableTitles}
                   />
                 </div>
               </div>

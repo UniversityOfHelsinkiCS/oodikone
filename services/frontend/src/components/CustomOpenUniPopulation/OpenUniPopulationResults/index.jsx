@@ -90,9 +90,9 @@ const getColumns = (labelsToCourses, getTextIn) => {
   ]
   const findRowContent = (s, courseCode) => {
     if (s.courseInfo[courseCode] === undefined) return null
-    if (s.courseInfo[courseCode].status.passed) return <Icon fitted name="check" color="green" />
-    if (s.courseInfo[courseCode].status.failed) return <Icon fitted name="times" color="red" />
-    if (s.courseInfo[courseCode].status.unfinished) return <Icon fitted name="minus" color="grey" />
+    if (s.courseInfo[courseCode].status.passed) return <Icon color="green" fitted name="check" />
+    if (s.courseInfo[courseCode].status.failed) return <Icon color="red" fitted name="times" />
+    if (s.courseInfo[courseCode].status.unfinished) return <Icon color="grey" fitted name="minus" />
     return null
   }
 
@@ -231,13 +231,13 @@ export const OpenUniPopulationResults = ({ fieldValues }) => {
 
   return (
     <div style={{ paddingBottom: '50px' }}>
-      <div style={{ maxHeight: '80vh', width: '100%' }} data-cy="open-uni-table-div">
+      <div data-cy="open-uni-table-div" style={{ maxHeight: '80vh', width: '100%' }}>
         {courseList.length > 0 && (
           <SortableTable
-            title={`Open Uni Student Population (${Object.keys(openUniStudentStats?.data.students).length} students)`}
-            featureName="open_uni"
             columns={tableData.columns}
             data={tableData.data}
+            featureName="open_uni"
+            title={`Open Uni Student Population (${Object.keys(openUniStudentStats?.data.students).length} students)`}
           />
         )}
       </div>

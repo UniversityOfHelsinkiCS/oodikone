@@ -38,7 +38,7 @@ export const SearchResultTable = ({ actionTrigger, headers, rows, noResultText, 
   if (rows.length > 0) {
     return (
       <Segment style={{ maxHeight: '80vh', overflowY: 'auto', padding: 0 }}>
-        <Table unstackable selectable={selectable} definition={false} className="fixed-header">
+        <Table className="fixed-header" definition={false} selectable={selectable} unstackable>
           {getHeaderRow(headers)}
           {getTableBody(rows, selectable, actionTrigger)}
         </Table>

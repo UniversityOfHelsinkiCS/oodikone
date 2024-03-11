@@ -6,7 +6,7 @@ export const DataTable = ({ data, cypress, titles, wideTable }) => {
 
   return (
     <div className={`table-container${wideTable ? '-wide' : ''}`}>
-      <Table data-cy={`Table-${cypress}`} celled>
+      <Table celled data-cy={`Table-${cypress}`}>
         <Table.Header>
           <Table.Row>
             {titles?.map(title => (

@@ -35,28 +35,28 @@ export const LeaderForm = ({
       <Form>
         <Form.Group widths="equal">
           <Form.Dropdown
-            name="selectedyear"
             label="Academic year"
-            placeholder="Academic year"
-            options={yearoptions}
-            selection
-            search
-            value={selectedyear}
+            name="selectedyear"
             onChange={handleYearChange}
+            options={yearoptions}
+            placeholder="Academic year"
+            search
             selectOnBlur={false}
             selectOnNavigation={false}
+            selection
+            value={selectedyear}
           />
           <Form.Dropdown
-            name="selectedcategory"
             label="Category"
-            placeholder="Category"
-            options={categoryoptions}
-            selection
-            search
-            value={selectedcategory}
+            name="selectedcategory"
             onChange={handleCategoryChange}
+            options={categoryoptions}
+            placeholder="Category"
+            search
             selectOnBlur={false}
             selectOnNavigation={false}
+            selection
+            value={selectedcategory}
           />
         </Form.Group>
       </Form>

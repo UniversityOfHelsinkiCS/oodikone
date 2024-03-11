@@ -150,7 +150,7 @@ export const Students = ({ filteredStudents }) => {
           getRowContent: (row, isGroup) =>
             isGroup
               ? countCompleted(row.courses, student.studentnumber)
-              : hasCompleted(row.code, student.studentnumber) && <Icon fitted name="check" color="green" />,
+              : hasCompleted(row.code, student.studentnumber) && <Icon color="green" fitted name="check" />,
           formatValue: value => (value ? 'Passed' : 'Not passed'),
         })),
       },
@@ -161,32 +161,32 @@ export const Students = ({ filteredStudents }) => {
   return (
     <div>
       <SortableTable
-        title={
-          <>
-            Courses passed by students
-            <Pagination
-              style={{ marginLeft: '1em' }}
-              size="mini"
-              secondary
-              activePage={page + 1}
-              totalPages={maxPages + 1}
-              onPageChange={(e, { activePage }) => setPage(activePage - 1)}
-              ellipsisItem={null}
-              firstItem={null}
-              lastItem={null}
-            />
-          </>
-        }
-        featureName="courses_passed"
         actions={
-          <Button size="tiny" onClick={() => toggleStudentNames()}>
+          <Button onClick={() => toggleStudentNames()} size="tiny">
             {namesVisible ? 'Hide student names' : 'Show student names'}
           </Button>
         }
         columns={columns}
         data={data}
-        toggleGroupExpansion={toggleGroupExpansion}
         expandedGroups={expandedGroups}
+        featureName="courses_passed"
+        title={
+          <>
+            Courses passed by students
+            <Pagination
+              activePage={page + 1}
+              ellipsisItem={null}
+              firstItem={null}
+              lastItem={null}
+              onPageChange={(e, { activePage }) => setPage(activePage - 1)}
+              secondary
+              size="mini"
+              style={{ marginLeft: '1em' }}
+              totalPages={maxPages + 1}
+            />
+          </>
+        }
+        toggleGroupExpansion={toggleGroupExpansion}
       />
     </div>
   )

@@ -242,34 +242,34 @@ export const CreditDistributionDevelopment = ({ students, programme, combinedPro
   return (
     <div>
       <div style={{ textAlign: 'right' }}>
-        <Segment.Group horizontal compact style={{ display: 'inline-flex', margin: '0 0 2em 0' }}>
+        <Segment.Group compact horizontal style={{ display: 'inline-flex', margin: '0 0 2em 0' }}>
           <Segment>
-            <Radio toggle label="Cumulative" checked={cumulative} onChange={() => setCumulative(!cumulative)} />
+            <Radio checked={cumulative} label="Cumulative" onChange={() => setCumulative(!cumulative)} toggle />
           </Segment>
           <Segment>
             <label style={{ marginRight: '0.5em' }}>Divide by:</label>
             <Dropdown
               inline
-              value={timeDivision}
-              onChange={(_evt, { value }) => setTimeDivision(value)}
               label="Divide by"
+              onChange={(_evt, { value }) => setTimeDivision(value)}
               options={[
                 { value: TimeDivision.CALENDAR_YEAR, text: 'Calendar year' },
                 { value: TimeDivision.ACADEMIC_YEAR, text: 'Academic year' },
                 { value: TimeDivision.SEMESTER, text: 'Semester' },
               ]}
+              value={timeDivision}
             />
           </Segment>
           <Segment>
             <label style={{ marginRight: '0.5em' }}>Stack ordering:</label>
             <Dropdown
               inline
-              value={stackOrdering}
               onChange={(_evt, { value }) => setStackOrdering(value)}
               options={[
                 { value: StackOrdering.ASCENDING, text: 'Ascending' },
                 { value: StackOrdering.DESCENDING, text: 'Descending' },
               ]}
+              value={stackOrdering}
             />
           </Segment>
         </Segment.Group>

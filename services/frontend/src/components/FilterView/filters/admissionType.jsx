@@ -42,21 +42,21 @@ const AdmissionTypeFilterCard = ({ options, onOptionsChange, withoutSelf, code }
     <div className="card-content">
       <Form>
         <Dropdown
-          options={dropdownOptions}
-          value={selected}
+          button
+          className="mini"
+          clearable
+          data-cy={`${name}-dropdown`}
+          fluid
           onChange={(_, { value }) =>
             onOptionsChange({
               selected: value,
             })
           }
+          options={dropdownOptions}
           placeholder="Choose admission type"
-          className="mini"
-          selection
           selectOnBlur={false}
-          fluid
-          button
-          clearable
-          data-cy={`${name}-dropdown`}
+          selection
+          value={selected}
         />
       </Form>
     </div>

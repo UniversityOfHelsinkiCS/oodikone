@@ -102,17 +102,17 @@ export const getSemestersPresentFunctions = ({
 
       const graduationCrown = (
         <svg
-          style={{ overflow: 'visible' }}
-          width="23"
-          height="23"
-          viewBox="17 54 70 70"
           fill="none"
+          height="23"
+          style={{ overflow: 'visible' }}
+          viewBox="17 54 70 70"
+          width="23"
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
             d="M69.8203 29.1952L61.0704 56.1246H18.7499L10 29.1952L27.2632 38.9284L39.9102 15L52.5571 38.9284L69.8203 29.1952Z"
-            stroke="#696969"
             fill="#fff238"
+            stroke="#696969"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
@@ -124,13 +124,13 @@ export const getSemestersPresentFunctions = ({
 
       return (
         <Popup
+          content={onHoverString()}
           key={key}
           on="hover"
-          content={onHoverString()}
-          size="tiny"
           position="bottom center"
+          size="tiny"
           trigger={
-            <div key={key} className={`enrollment-label-no-margin label-${type} ${isFall(sem) ? '' : 'margin-right'}`}>
+            <div className={`enrollment-label-no-margin label-${type} ${isFall(sem) ? '' : 'margin-right'}`} key={key}>
               {graduated > 0 && graduationCrown}
             </div>
           }

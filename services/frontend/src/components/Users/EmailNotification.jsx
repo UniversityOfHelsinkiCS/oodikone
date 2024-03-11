@@ -4,14 +4,14 @@ import { Button, Modal, Message } from 'semantic-ui-react'
 import { useGetUserAccessEmailPreviewQuery, useSendUserAccessEmailMutation } from 'redux/users'
 import { EmailPreview } from './EmailPreview'
 
-const SendEmailButton = props => <Button basic fluid positive content="Preview email ..." {...props} />
+const SendEmailButton = props => <Button basic content="Preview email ..." fluid positive {...props} />
 
 const DisabledEmailButton = props => (
-  <Button basic fluid disabled content="Cannot send email - user has no email address" {...props} />
+  <Button basic content="Cannot send email - user has no email address" disabled fluid {...props} />
 )
 
 const SendFailBanner = ({ userEmail }) => <Message error header={`Email could not be sent to ${userEmail}`} />
-const SendSuccessBanner = ({ userEmail }) => <Message success header={`Email sent to ${userEmail}`} />
+const SendSuccessBanner = ({ userEmail }) => <Message header={`Email sent to ${userEmail}`} success />
 
 export const EmailNotification = ({ userEmail }) => {
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -32,34 +32,34 @@ export const EmailNotification = ({ userEmail }) => {
   return userEmail ? (
     <>
       <SendEmailButton onClick={() => setConfirmOpen(true)} />
-      <Modal open={confirmOpen} onClose={() => setConfirmOpen(false)}>
+      <Modal onClose={() => setConfirmOpen(false)} open={confirmOpen}>
         <Modal.Header>Send email about receiving access to Oodikone</Modal.Header>
         <Modal.Content scrolling>
           <Modal.Description>
             {getNotification()}
             <EmailPreview
-              userEmailAddress={userEmail}
               email={email}
-              isLoading={previewIsLoading}
               isError={previewIsError}
+              isLoading={previewIsLoading}
+              userEmailAddress={userEmail}
             />
           </Modal.Description>
         </Modal.Content>
         <Modal.Actions>
           <Button
+            content="Cancel"
             disabled={previewIsLoading || previewIsError || sendIsLoading}
             onClick={() => setConfirmOpen(false)}
-            content="Cancel"
           />
           <Button
-            primary
+            content="Send"
+            disabled={previewIsLoading || previewIsError || sendIsLoading || sendIsSuccess}
+            icon="send"
+            loading={sendIsLoading}
             onClick={() => {
               sendEmail(userEmail)
             }}
-            disabled={previewIsLoading || previewIsError || sendIsLoading || sendIsSuccess}
-            loading={sendIsLoading}
-            icon="send"
-            content="Send"
+            primary
           />
         </Modal.Actions>
       </Modal>

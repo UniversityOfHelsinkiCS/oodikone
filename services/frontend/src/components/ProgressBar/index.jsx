@@ -39,7 +39,7 @@ export const ProgressBar = ({ progress, fixed }) => {
   if (fixed) classNames.push('fixed')
 
   return hidden ? null : (
-    <Progress percent={progress} disabled={progress === 100} color="blue" className={classNames.join(' ')} />
+    <Progress className={classNames.join(' ')} color="blue" disabled={progress === 100} percent={progress} />
   )
 }
 

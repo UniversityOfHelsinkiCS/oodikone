@@ -11,7 +11,7 @@ export const StyledMessage = ({ children }) => (
 
 export const Wrapper = ({ isLoading, children }) => (
   <div className="segmentContainer">
-    <Segment loading={isLoading} className="contentSegment">
+    <Segment className="contentSegment" loading={isLoading}>
       {children}
     </Segment>
   </div>

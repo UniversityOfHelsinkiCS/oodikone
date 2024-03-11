@@ -31,25 +31,25 @@ export const SearchHistory = ({ items, handleSearch, updateItem, disabled, heade
         </>
       </Header>
       <Form.Dropdown
+        clearable
+        closeOnChange
+        data-cy="history-search"
         disabled={disabled}
-        placeholder="Select a previous search"
+        fluid
         noResultsMessage="No previous searches"
-        search
-        selection
-        value={selected}
+        onChange={handleChange}
         options={sortedItems.map(({ id, text, timestamp }) => ({
           key: id,
           value: id,
           text,
           description: moment(timestamp).format('DD.MM.YYYY LT'),
         }))}
-        onChange={handleChange}
-        closeOnChange
-        clearable
-        fluid
+        placeholder="Select a previous search"
+        search
         selectOnBlur={false}
         selectOnNavigation={false}
-        data-cy="history-search"
+        selection
+        value={selected}
       />
     </Segment>
   )

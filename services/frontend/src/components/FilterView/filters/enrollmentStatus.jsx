@@ -35,40 +35,40 @@ const EnrollmentStatusFilterCard = ({ options, onOptionsChange, allSemesters, se
       <Form>
         <Form.Field>
           <Dropdown
-            options={STATUS_OPTIONS}
-            value={status}
+            button
+            className="mini"
+            clearable
+            data-cy={`${name}-status`}
+            fluid
             onChange={(_, { value }) =>
               onOptionsChange({
                 ...options,
                 status: value !== '' ? value : null,
               })
             }
+            options={STATUS_OPTIONS}
             placeholder="Choose Enrollment Status"
-            className="mini"
             selection
-            fluid
-            button
-            clearable
-            data-cy={`${name}-status`}
+            value={status}
           />
         </Form.Field>
         <Form.Field>
           <Dropdown
-            multiple
-            selection
-            fluid
-            options={semesterOptions}
             button
             className="mini"
-            placeholder="Choose Semesters"
+            data-cy={`${name}-semesters`}
+            fluid
+            multiple
             onChange={(_, { value }) =>
               onOptionsChange({
                 ...options,
                 semesters: value,
               })
             }
+            options={semesterOptions}
+            placeholder="Choose Semesters"
+            selection
             value={semesters}
-            data-cy={`${name}-semesters`}
           />
         </Form.Field>
       </Form>
@@ -107,6 +107,6 @@ export const enrollmentStatusFilter = createFilter({
   },
 
   render: (props, { precomputed, args }) => (
-    <EnrollmentStatusFilterCard {...props} semesterCodes={precomputed.semesterCodes} allSemesters={args.allSemesters} />
+    <EnrollmentStatusFilterCard {...props} allSemesters={args.allSemesters} semesterCodes={precomputed.semesterCodes} />
   ),
 })

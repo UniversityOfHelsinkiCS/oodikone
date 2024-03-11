@@ -54,11 +54,11 @@ export const TeacherSearch = ({ onClick }) => {
   )
 
   const getContent = () => {
-    if (dirty || isLoading || isFetching) return <Icon loading size="huge" name="spinner" />
+    if (dirty || isLoading || isFetching) return <Icon loading name="spinner" size="huge" />
 
     if (teachers.length === 0) return <div>No teachers matched your search</div>
 
-    return <SortableTable defaultSort={['name', 'desc']} hideHeaderBar columns={columns} data={teachers} />
+    return <SortableTable columns={columns} data={teachers} defaultSort={['name', 'desc']} hideHeaderBar />
   }
 
   return (
@@ -66,10 +66,10 @@ export const TeacherSearch = ({ onClick }) => {
       <Search
         className="searchInput"
         input={{ fluid: true }}
-        placeholder="Search by entering a name or an id"
-        value={searchterm}
         onSearchChange={handleSearchChange}
+        placeholder="Search by entering a name or an id"
         showNoResults={false}
+        value={searchterm}
       />
       <Segment className="contentSegment">{getContent()}</Segment>
     </div>

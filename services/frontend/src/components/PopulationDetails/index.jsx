@@ -43,11 +43,11 @@ export const PopulationDetails = ({
 
     const graphs = (
       <CreditAccumulationGraphHighCharts
+        programmeCodes={programmeCodes}
         students={filteredStudents}
+        studyPlanFilterIsActive={studyPlanFilterIsActive}
         title="Id"
         trayOpen={() => {}}
-        studyPlanFilterIsActive={studyPlanFilterIsActive}
-        programmeCodes={programmeCodes}
       />
     )
     return (
@@ -81,9 +81,9 @@ export const PopulationDetails = ({
       title: 'Credit statistics',
       content: !query?.years ? (
         <CreditGainStats
-          query={query}
-          filteredStudents={filteredStudents}
           creditDateFilterOptions={creditDateFilterOptions}
+          filteredStudents={filteredStudents}
+          query={query}
         />
       ) : (
         <div>This table is omitted when searching population of multiple years</div>
@@ -99,23 +99,23 @@ export const PopulationDetails = ({
         <div>
           <CourseTableModeSelector
             courseTableMode={courseTableMode}
-            setCourseTableMode={setCourseTableMode}
-            year={query?.year}
-            studyProgramme={query?.studyRights?.programme}
-            studentAmountLimit={studentAmountLimit}
-            setCurriculum={setCurriculum}
-            setStudentAmountLimit={setStudentAmountLimit}
             filteredStudents={filteredStudents}
             onStudentAmountLimitChange={onStudentAmountLimitChange}
+            setCourseTableMode={setCourseTableMode}
+            setCurriculum={setCurriculum}
+            setStudentAmountLimit={setStudentAmountLimit}
+            studentAmountLimit={studentAmountLimit}
+            studyProgramme={query?.studyRights?.programme}
+            year={query?.year}
           />
           <PopulationCourses
-            query={query}
-            curriculum={curriculum}
             allStudents={allStudents}
-            filteredStudents={filteredStudents}
-            selectedStudentsByYear={selectedStudentsByYear}
-            onlyIamRights={onlyIamRights}
             courseTableMode={courseTableMode}
+            curriculum={curriculum}
+            filteredStudents={filteredStudents}
+            onlyIamRights={onlyIamRights}
+            query={query}
+            selectedStudentsByYear={selectedStudentsByYear}
             studentAmountLimit={studentAmountLimit}
           />
         </div>
@@ -129,13 +129,13 @@ export const PopulationDetails = ({
       content: (
         <div>
           <PopulationStudents
-            variant="population"
-            filteredStudents={filteredStudents}
-            dataExport={dataExport}
             criteria={criteria?.data}
-            programmeCode={query?.studyRights?.programme}
-            year={query?.year}
             curriculum={curriculum}
+            dataExport={dataExport}
+            filteredStudents={filteredStudents}
+            programmeCode={query?.studyRights?.programme}
+            variant="population"
+            year={query?.year}
           />
         </div>
       ),

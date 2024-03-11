@@ -79,28 +79,28 @@ export const AccessDenied = ({ notEnabled }) => {
           }}
         />
         <MulticolorBarChart
-          chartTitle="Your students' future"
           chartData={dummyData.map(e => ({ name: e.name, data: [Math.max(...e.data)] }))}
+          chartTitle="Your students' future"
         />
       </Container>
       <Dimmer active page>
-        <Image src={images.toskaLogo} size="medium" centered style={{ paddingTop: '2%' }} />
+        <Image centered size="medium" src={images.toskaLogo} style={{ paddingTop: '2%' }} />
         <Header as="h2" inverted>
           <p>{header}</p>
           <Header.Subheader>{subheader}</Header.Subheader>
           <br />
-          <Button onClick={() => logout()} color="pink">
+          <Button color="pink" onClick={() => logout()}>
             Log out
           </Button>
         </Header>
       </Dimmer>
-      <Transition visible={easterEgg} animation="fly up" duration={10000}>
+      <Transition animation="fly up" duration={10000} visible={easterEgg}>
         <Image
-          src={images.irtomikko}
-          size="huge"
-          verticalAlign="top"
           inline
+          size="huge"
+          src={images.irtomikko}
           style={{ position: 'absolute', top: '350px', right: '10px' }}
+          verticalAlign="top"
         />
       </Transition>
     </div>

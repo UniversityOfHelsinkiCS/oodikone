@@ -56,16 +56,9 @@ export const CurriculumPicker = ({ setCurriculum, programmeCodes, disabled, year
 
   return (
     <Dropdown
-      disabled={disabled}
-      style={{
-        padding: '4px',
-        paddingLeft: '8px',
-        marginLeft: '10px',
-        background: '#e3e3e3',
-      }}
-      data-cy="curriculum-picker"
       className="link item"
-      value={chosenCurriculum.dataValues.id}
+      data-cy="curriculum-picker"
+      disabled={disabled}
       onChange={(_, { value }) => setSelectedCurriculum(curriculums.find(c => c.dataValues.id === value))}
       options={sortBy(
         curriculums.map(cur => ({
@@ -75,6 +68,13 @@ export const CurriculumPicker = ({ setCurriculum, programmeCodes, disabled, year
         })),
         'key'
       )}
+      style={{
+        padding: '4px',
+        paddingLeft: '8px',
+        marginLeft: '10px',
+        background: '#e3e3e3',
+      }}
+      value={chosenCurriculum.dataValues.id}
     />
   )
 }
@@ -98,36 +98,36 @@ export const CourseTableModeSelector = ({
     <div style={{ display: 'flex', flexDirection: 'row' }}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '26px' }}>
         <Radio
-          style={{ fontWeight: 'bold' }}
+          checked={courseTableMode === 'curriculum'}
           label="Choose curriculum"
           name="coursesRadioGroup"
-          value="curriculum"
           onChange={(event, { value }) => setCourseTableMode(value)}
-          checked={courseTableMode === 'curriculum'}
+          style={{ fontWeight: 'bold' }}
+          value="curriculum"
         />
         <Radio
-          style={{ fontWeight: 'bold' }}
+          checked={courseTableMode === 'all'}
           label="Show all courses with at least"
           name="coursesRadioGroup"
-          value="all"
           onChange={(event, { value }) => setCourseTableMode(value)}
-          checked={courseTableMode === 'all'}
+          style={{ fontWeight: 'bold' }}
+          value="all"
         />
       </div>
       <div>
         <CurriculumPicker
-          year={year}
+          disabled={courseTableMode !== 'curriculum'}
           programmeCodes={[studyProgramme]}
           setCurriculum={setCurriculum}
-          disabled={courseTableMode !== 'curriculum'}
+          year={year}
         />
         <Form style={{ padding: '4px 4px 4px 8px' }}>
           <Form.Field inline>
             <Input
-              value={studentAmountLimit}
-              onChange={e => onStudentAmountLimitChange(e.target.value)}
               disabled={courseTableMode !== 'all'}
+              onChange={e => onStudentAmountLimitChange(e.target.value)}
               style={{ width: '70px' }}
+              value={studentAmountLimit}
             />
             <label>total students</label>
           </Form.Field>

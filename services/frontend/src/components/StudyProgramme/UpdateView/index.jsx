@@ -5,8 +5,8 @@ import { useUpdateBasicViewQuery, useUpdateStudytrackViewQuery } from '@/redux/s
 
 const getStatusIcon = stats => {
   if (stats.isLoading) return <Loader active />
-  if (stats.isSuccess) return <Icon name="check" color="green" />
-  if (stats.isError) return <Icon name="close" color="red" />
+  if (stats.isSuccess) return <Icon color="green" name="check" />
+  if (stats.isError) return <Icon color="red" name="close" />
   return ''
 }
 
@@ -24,9 +24,9 @@ export const UpdateView = ({ studyprogramme, combinedProgramme }) => {
       <div className="button-container">
         <h4>Update data on Basic Information -view</h4>
         <Button
-          disabled={basicstats.isLoading}
           color="blue"
           data-cy="updatebasicinfo"
+          disabled={basicstats.isLoading}
           onClick={() => setSkipBasic(false)}
         >
           Update Basic Information
@@ -36,9 +36,9 @@ export const UpdateView = ({ studyprogramme, combinedProgramme }) => {
       <div className="button-container">
         <h4>Update data on Populations and Studytracks -view</h4>
         <Button
-          disabled={studytrackstats.isLoading}
           color="blue"
           data-cy="updatepopulations"
+          disabled={studytrackstats.isLoading}
           onClick={() => setSkipStudytrack()}
         >
           Update Populations and Studytracks

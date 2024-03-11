@@ -11,12 +11,12 @@ import { ConnectedTagStudent as TagStudent } from '../TagStudent'
 const Row = memo(
   ({ studentsTags, sn, studytrack, tagOptions, name, combinedProgramme }) => (
     <TagStudent
-      studentnumber={sn}
+      combinedProgramme={combinedProgramme}
       studentname={name}
+      studentnumber={sn}
       studentstags={studentsTags}
       studytrack={studytrack}
       tagOptions={tagOptions}
-      combinedProgramme={combinedProgramme}
     />
   ),
   (prevProps, newProps) => prevProps.studentsTags.length === newProps.studentsTags.length
@@ -59,14 +59,14 @@ const TagList = ({
       }))
     return (
       <Row
+        combinedProgramme={combinedProgramme}
         key={sn}
-        tags={tags}
-        studentsTags={studentsTags}
-        sn={sn}
         name={name}
+        sn={sn}
+        studentsTags={studentsTags}
         studytrack={mainProgramme}
         tagOptions={studentTagOptions}
-        combinedProgramme={combinedProgramme}
+        tags={tags}
       />
     )
   })

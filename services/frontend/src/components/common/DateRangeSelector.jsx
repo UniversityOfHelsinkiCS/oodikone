@@ -10,11 +10,11 @@ export const DateRangeSelector = ({ value, onChange, ...rest }) => {
     <Form style={{}}>
       <Form.Field>
         <label>Beginning:</label>
-        <DateTimeSelector value={start} before={end} onChange={date => onChange([date, end])} {...rest} />
+        <DateTimeSelector before={end} onChange={date => onChange([date, end])} value={start} {...rest} />
       </Form.Field>
       <Form.Field>
         <label>Ending:</label>
-        <DateTimeSelector value={end} after={start} onChange={date => onChange([start, date])} {...rest} />
+        <DateTimeSelector after={start} onChange={date => onChange([start, date])} value={end} {...rest} />
       </Form.Field>
     </Form>
   )

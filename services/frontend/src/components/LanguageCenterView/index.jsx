@@ -6,10 +6,10 @@ import { InfoBox } from './InfoBox'
 
 export const LanguageCenterView = () => (
   <ColorizedCoursesTable
-    fetchDataHook={useGetLanguageCenterDataQuery}
-    title="Language center view"
-    panes={['Faculties', 'Semesters']}
-    infoBox={<InfoBox />}
     dividerText="Language center statistics"
+    fetchDataHook={useGetLanguageCenterDataQuery}
+    infoBox={<InfoBox />}
+    panes={['Faculties', 'Semesters']}
+    title="Language center view"
   />
 )

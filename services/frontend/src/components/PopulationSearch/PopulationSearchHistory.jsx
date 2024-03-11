@@ -71,24 +71,24 @@ const PopulationSearchHistory = ({ populations, units, tags, removePopulation })
           <Form.Field style={{ marginTop: '15px' }}>
             <b>Starting semesters</b>
             <Form.Checkbox
+              checked={semesters.includes('FALL')}
               className="populationStatisticsRadio"
+              data-cy="toggle-fall"
               key="FALL"
               label="Fall"
-              value="FALL"
               name="semesterGroup"
-              checked={semesters.includes('FALL')}
               onChange={handleSemesterSelection}
-              data-cy="toggle-fall"
+              value="FALL"
             />
             <Form.Checkbox
+              checked={semesters.includes('SPRING')}
               className="populationStatisticsRadio"
+              data-cy="toggle-spring"
               key="SPRING"
               label="Spring"
-              value="SPRING"
               name="semesterGroup"
-              checked={semesters.includes('SPRING')}
               onChange={handleSemesterSelection}
-              data-cy="toggle-spring"
+              value="SPRING"
             />
           </Form.Field>
         ) : null}
@@ -114,17 +114,17 @@ const PopulationSearchHistory = ({ populations, units, tags, removePopulation })
             onChange={handleStudentStatusSelection}
           /> */}
           <Form.Checkbox
+            checked={studentStatuses.includes('TRANSFERRED')}
             className="populationStatisticsRadio"
             key="TRANSFERRED"
             label="Students who have transferred out of the programme"
-            value="TRANSFERRED"
             name="studentStatusGroup"
-            checked={studentStatuses.includes('TRANSFERRED')}
             onChange={handleStudentStatusSelection}
+            value="TRANSFERRED"
           />
         </Form.Field>
         <Form.Field style={{ marginTop: '15px' }}>
-          <Button type="button" onClick={pushQueryToUrl}>
+          <Button onClick={pushQueryToUrl} type="button">
             Fetch class with new settings
           </Button>
         </Form.Field>
@@ -147,10 +147,10 @@ const PopulationSearchHistory = ({ populations, units, tags, removePopulation })
             population={populations.data}
             query={populations.query}
             queryId={0}
-            units={[units.data.programmes[programmeCode], units.data.studyTracks[studyTrackCode]].filter(Boolean)}
             removeSampleFn={removeThisPopulation}
-            updating={populations.updating}
             tags={tags}
+            units={[units.data.programmes[programmeCode], units.data.studyTracks[studyTrackCode]].filter(Boolean)}
+            updating={populations.updating}
           />
           <div style={{ marginLeft: '5px', marginTop: '15px' }}>
             <InfoBox content={populationStatisticsToolTips.QueryCard} />
@@ -161,11 +161,11 @@ const PopulationSearchHistory = ({ populations, units, tags, removePopulation })
             <Form.Group>
               <Form.Field>
                 <Form.Radio
-                  data-cy="advanced-toggle"
-                  toggle
                   checked={showAdvancedSettings}
-                  onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}
+                  data-cy="advanced-toggle"
                   label="Advanced settings"
+                  onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}
+                  toggle
                 />
               </Form.Field>
             </Form.Group>

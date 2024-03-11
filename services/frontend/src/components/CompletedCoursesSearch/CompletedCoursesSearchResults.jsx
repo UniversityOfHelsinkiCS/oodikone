@@ -23,9 +23,9 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
       }
       if (icon) {
         if (moment(enrollment.date) > moment().subtract(6, 'months')) {
-          return <Icon fitted name="minus" color="yellow" />
+          return <Icon color="yellow" fitted name="minus" />
         }
-        return <Icon fitted name="minus" color="grey" />
+        return <Icon color="grey" fitted name="minus" />
       }
 
       return `Latest enrollment: ${moment(enrollment.date).format('YYYY-MM-DD')}`
@@ -33,7 +33,7 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
 
     const substitutionString = completion.substitution ? ` as ${completion.substitution}` : ''
 
-    return icon ? <Icon fitted name="check" color="green" /> : `Passed${substitutionString}`
+    return icon ? <Icon color="green" fitted name="check" /> : `Passed${substitutionString}`
   }
 
   const getTotalPassed = s => s.credits.filter(c => isPassed(c.creditType)).length
@@ -51,7 +51,7 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
       title: 'Student Number',
       cellProps: { style },
       getRowVal: s => s.studentNumber,
-      getRowContent: s => <StudentInfoItem student={s} view="Completed courses search tool" showSisuLink />,
+      getRowContent: s => <StudentInfoItem showSisuLink student={s} view="Completed courses search tool" />,
     },
   ]
 
@@ -166,15 +166,15 @@ export const CompletedCoursesSearchResults = ({ searchValues }) => {
         <RightsNotification discardedStudentNumbers={data.discardedStudentNumbers} />
       )}
       <div
-        style={{ maxWidth: '100vh', overflowX: 'auto', paddingBottom: '50px', padding: '0.5em' }}
         data-cy="completed-courses-table-div"
+        style={{ maxWidth: '100vh', overflowX: 'auto', paddingBottom: '50px', padding: '0.5em' }}
       >
         <SortableTable
-          title="Completed courses search"
-          featureName="completed_courses"
           columns={getColumns(data.courses, showStudentNames.visible, getTextIn)}
-          onlyExportColumns={hiddenNameAndEmailForExcel}
           data={data.students}
+          featureName="completed_courses"
+          onlyExportColumns={hiddenNameAndEmailForExcel}
+          title="Completed courses search"
         />
       </div>
     </div>

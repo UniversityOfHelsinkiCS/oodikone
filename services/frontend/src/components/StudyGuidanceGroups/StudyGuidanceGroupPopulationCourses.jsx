@@ -24,18 +24,18 @@ export const StudyGuidanceGroupPopulationCourses = ({
       {curriculumsAvailable && (
         <CourseTableModeSelector
           courseTableMode={courseTableMode}
-          setCourseTableMode={setCourseTableMode}
-          year={year}
-          studyProgramme={studyProgramme}
-          setCurriculum={setCurriculum}
-          studentAmountLimit={studentAmountLimit}
-          setStudentAmountLimit={setStudentAmountLimit}
           filteredStudents={filteredStudents}
           onStudentAmountLimitChange={onStudentAmountLimitChange}
+          setCourseTableMode={setCourseTableMode}
+          setCurriculum={setCurriculum}
+          setStudentAmountLimit={setStudentAmountLimit}
+          studentAmountLimit={studentAmountLimit}
+          studyProgramme={studyProgramme}
+          year={year}
         />
       )}
       {courseTableMode === 'curriculum' ? (
-        <PopulationCourseStats mandatoryCourses={curriculum} courses={courses} filteredStudents={filteredStudents} />
+        <PopulationCourseStats courses={courses} filteredStudents={filteredStudents} mandatoryCourses={curriculum} />
       ) : (
         <>
           {!curriculumsAvailable && (
@@ -43,17 +43,17 @@ export const StudyGuidanceGroupPopulationCourses = ({
               <Form.Field inline>
                 <label>Limit to courses where student number is at least</label>
                 <Input
-                  value={studentAmountLimit}
                   onChange={e => onStudentAmountLimitChange(e.target.value)}
                   style={{ width: '70px' }}
+                  value={studentAmountLimit}
                 />
               </Form.Field>
             </Form>
           )}
           <PopulationCourseStatsFlat
             courses={courses}
-            pending={false}
             filteredStudents={filteredStudents}
+            pending={false}
             studentAmountLimit={studentAmountLimit}
           />
         </>

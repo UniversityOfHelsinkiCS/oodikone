@@ -145,7 +145,7 @@ export const FacultyStudentDataTable = ({
         setValue={setShowPercentages}
         value={showPercentages}
       />
-      <Table data-cy={cypress} celled structured>
+      <Table celled data-cy={cypress} structured>
         <Table.Header>
           <Table.Row key="FirstHeader">
             <Table.HeaderCell colSpan={!showPercentages ? 3 : 4} />
@@ -157,20 +157,20 @@ export const FacultyStudentDataTable = ({
             </Table.HeaderCell>
             <Table.HeaderCell colSpan={!showPercentages ? 2 : 4} style={{ borderLeftWidth: 'thick' }}>
               <Popup
+                content="Hover over 'Other' cell to see from which countries students are coming. Shown only for study programmes."
                 trigger={
                   <div>
                     Countries <Icon name="question circle" />
                   </div>
                 }
-                content="Hover over 'Other' cell to see from which countries students are coming. Shown only for study programmes."
               />
             </Table.HeaderCell>
           </Table.Row>
           <Table.Row key="secondHeader">
             {titles.map((title, index) => (
               <Table.HeaderCell
-                key={title}
                 colSpan={index === 0 || index === 1 || !showPercentages ? 1 : 2}
+                key={title}
                 style={
                   [3, 7, 10].includes(index) ? { fontWeight: 'bold', borderLeftWidth: 'thick' } : { fontWeight: 'bold' }
                 }
@@ -186,7 +186,7 @@ export const FacultyStudentDataTable = ({
           {years.map((year, yearIndex) => {
             return (
               <React.Fragment key={`${year}-fragment`}>
-                <Table.Row key={`${year}-faculty-row}`} className={year === 'Total' ? 'total-row-cell' : ''}>
+                <Table.Row className={year === 'Total' ? 'total-row-cell' : ''} key={`${year}-faculty-row}`}>
                   {tableStats[year].map((value, valueIdx) => {
                     if (valueIdx === 0)
                       return (

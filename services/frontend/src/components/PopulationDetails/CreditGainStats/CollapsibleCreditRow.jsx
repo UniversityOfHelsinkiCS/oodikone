@@ -27,31 +27,31 @@ export const CollapsibleCreditRow = ({ min, max, studentCount, filteredLength, m
 
   return (
     <>
-      <Table.Row style={{ cursor: isCollapsible && 'pointer' }} onClick={isCollapsible ? () => collapse() : undefined}>
+      <Table.Row onClick={isCollapsible ? () => collapse() : undefined} style={{ cursor: isCollapsible && 'pointer' }}>
         <Table.Cell collapsing>
-          <ExternalCreditFilterToggle min={min} max={max} />
+          <ExternalCreditFilterToggle max={max} min={min} />
         </Table.Cell>
         <Table.Cell key={`${min} ≤ credits`}>
           {max === 0 ? 0 : `${min} ≤ credits`}
           {max > 0 && ` < ${max}`}
-          {isCollapsible && <Icon name={isCollapsed ? 'caret down' : 'caret right'} color="grey" />}
+          {isCollapsible && <Icon color="grey" name={isCollapsed ? 'caret down' : 'caret right'} />}
         </Table.Cell>
         <Table.Cell>{!isCollapsed && studentCount(min, max)}</Table.Cell>
         <Table.Cell>
           {filteredLength && !isCollapsed && (
             <Progress
+              className="credit-stats-progress-bar"
               percent={Math.round((studentCount(min, max) / filteredLength) * 100)}
               progress
-              className="credit-stats-progress-bar"
             />
           )}
         </Table.Cell>
       </Table.Row>
       {limits.map(([imin, imax]) => (
-        <Table.Row style={{ backgroundColor: 'lightgray' }} key={`table-row-${imin}-${imax}`}>
+        <Table.Row key={`table-row-${imin}-${imax}`} style={{ backgroundColor: 'lightgray' }}>
           <Table.Cell collapsing>
             <div style={{ display: 'flex' }}>
-              <ExternalCreditFilterToggle min={imin} max={imax} />
+              <ExternalCreditFilterToggle max={imax} min={imin} />
             </div>
           </Table.Cell>
           <Table.Cell>
@@ -64,9 +64,9 @@ export const CollapsibleCreditRow = ({ min, max, studentCount, filteredLength, m
           <Table.Cell>
             {filteredLength && (
               <Progress
+                className="credit-stats-progress-bar"
                 percent={Math.round((studentCount(imin, imax) / filteredLength) * 100)}
                 progress
-                className="credit-stats-progress-bar"
               />
             )}
           </Table.Cell>

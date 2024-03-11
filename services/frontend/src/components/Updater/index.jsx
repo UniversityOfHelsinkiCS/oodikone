@@ -52,7 +52,7 @@ export const Updater = () => {
     if (!jobs) return <Message>Loading job statuses...</Message>
     return (
       <Message style={{ fontSize: '20px' }}>
-        <Button icon="refresh" size="big" onClick={updateJobs} />
+        <Button icon="refresh" onClick={updateJobs} size="big" />
         <p>Jobs running: {jobs.active?.length}</p>
         <ul>
           {jobs.active.map(j => (
@@ -99,10 +99,10 @@ export const Updater = () => {
           <b>Oodikone redis - Refresh language center data</b> Refresh data for language center view.
           <br />
           <button
-            type="button"
             onClick={() => {
               setError(true)
             }}
+            type="button"
           >
             Cause frontend crash
           </button>
@@ -153,17 +153,17 @@ export const Updater = () => {
           <div style={{ display: 'flex', flexDirection: 'row', gap: '2em', marginTop: '2em' }}>
             {['students', 'courses', 'faculties', 'programmes'].map(thisType => (
               <Radio
-                data-cy={`${thisType}-button`}
-                name="modeRadioGroup"
-                value={thisType}
-                label={thisType}
-                key={thisType}
-                onChange={() => setType(thisType)}
                 checked={type === thisType}
+                data-cy={`${thisType}-button`}
+                key={thisType}
+                label={thisType}
+                name="modeRadioGroup"
+                onChange={() => setType(thisType)}
                 style={{ fontSize: '24px', paddingTop: '10px' }}
+                value={thisType}
               />
             ))}
-            <Form.Button onClick={updateSISCustomList} content="Update custom list of items" icon="refresh" />
+            <Form.Button content="Update custom list of items" icon="refresh" onClick={updateSISCustomList} />
           </div>
         </Form.Group>
       </div>

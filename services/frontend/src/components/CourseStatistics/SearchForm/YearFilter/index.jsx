@@ -6,28 +6,28 @@ export const YearFilter = ({ years, fromYear, toYear, handleChange }) => (
   <Form>
     <Form.Group inline>
       <Form.Dropdown
+        inline
         label="From:"
         name="fromYear"
-        options={toYear ? years.filter(({ value }) => value <= toYear) : years}
-        selection
-        inline
-        placeholder="Select academic year"
         onChange={handleChange}
-        value={fromYear}
+        options={toYear ? years.filter(({ value }) => value <= toYear) : years}
+        placeholder="Select academic year"
         selectOnBlur={false}
         selectOnNavigation={false}
+        selection
+        value={fromYear}
       />
       <Form.Dropdown
+        inline
         label="To:"
         name="toYear"
-        options={fromYear ? years.filter(({ value }) => value >= fromYear) : years}
-        inline
-        selection
-        placeholder="Select academic year"
         onChange={handleChange}
-        value={toYear}
+        options={fromYear ? years.filter(({ value }) => value >= fromYear) : years}
+        placeholder="Select academic year"
         selectOnBlur={false}
         selectOnNavigation={false}
+        selection
+        value={toYear}
       />
     </Form.Group>
   </Form>

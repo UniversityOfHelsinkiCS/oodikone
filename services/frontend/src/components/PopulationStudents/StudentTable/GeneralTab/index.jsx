@@ -15,7 +15,7 @@ const StudyGuidanceGroupGeneralTabContainer = ({ group, ...props }) => {
   const groupStudentNumbers = group?.members?.map(({ personStudentNumber }) => personStudentNumber) || []
   const { tags } = group
   const populations = useGetStudyGuidanceGroupPopulationQuery({ studentnumberlist: groupStudentNumbers, tags })
-  return <GeneralTab populations={populations} group={group} {...props} />
+  return <GeneralTab group={group} populations={populations} {...props} />
 }
 
 const CustomPopulationGeneralTabContainer = props => {
@@ -117,8 +117,8 @@ export const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) =
   if (variant === 'studyGuidanceGroupPopulation') {
     return (
       <StudyGuidanceGroupGeneralTabContainer
-        group={studyGuidanceGroup}
         columnKeysToInclude={columnKeysToInclude}
+        group={studyGuidanceGroup}
         {...props}
       />
     )
@@ -127,12 +127,12 @@ export const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) =
   if (variant === 'customPopulation' || variant === 'coursePopulation') {
     return (
       <CustomPopulationGeneralTabContainer
-        group={studyGuidanceGroup}
         columnKeysToInclude={columnKeysToInclude}
+        group={studyGuidanceGroup}
         {...props}
       />
     )
   }
 
-  return <GeneralTab populations={populations} columnKeysToInclude={columnKeysToInclude} {...props} />
+  return <GeneralTab columnKeysToInclude={columnKeysToInclude} populations={populations} {...props} />
 }

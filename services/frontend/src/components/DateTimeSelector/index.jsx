@@ -26,19 +26,41 @@ export const DateTimeSelector = ({ value, onChange, before, after, showSemesters
   const startdate = before || today
   return (
     <Datetime
-      ref={datetimeRef}
-      value={value}
-      onChange={onChange}
-      timeFormat={false}
-      locale="fi"
       closeOnSelect
       isValidDate={date => {
         return date.isBefore(moment(startdate)) && (!after || date.isAfter(moment(after)))
       }}
+      locale="fi"
+      onChange={onChange}
+      ref={datetimeRef}
+      renderInput={(_, open) => (
+        <Button
+          className="credit-date-filter-input"
+          icon={value !== null}
+          onClick={open}
+          size="mini"
+          style={{
+            whiteSpace: 'nowrap',
+            paddingRight: value ? '3.5em !important' : undefined,
+            paddingLeft: value ? '1em !important' : undefined,
+          }}
+        >
+          {value === null ? 'Select Date' : moment(value).format('DD.MM.YYYY')}
+          {value !== null && (
+            <Icon
+              name="x"
+              onClick={evt => {
+                evt.stopPropagation()
+                onChange(null)
+              }}
+            />
+          )}
+        </Button>
+      )}
       renderView={(mode, renderDefault) => {
         const createDateButton = (date, label) => (
           <button
-            type="button"
+            className="date-picker-semester-button"
             key={label}
             onClick={() => {
               datetimeRef.current.setViewDate(moment(date))
@@ -49,7 +71,7 @@ export const DateTimeSelector = ({ value, onChange, before, after, showSemesters
               background: value && value.isSame(date, 'day') ? '#428bca' : 'white',
               color: value && value.isSame(date, 'day') ? 'white' : 'inherit',
             }}
-            className="date-picker-semester-button"
+            type="button"
           >
             {label}
           </button>
@@ -100,30 +122,8 @@ export const DateTimeSelector = ({ value, onChange, before, after, showSemesters
           </>
         )
       }}
-      renderInput={(_, open) => (
-        <Button
-          icon={value !== null}
-          onClick={open}
-          className="credit-date-filter-input"
-          size="mini"
-          style={{
-            whiteSpace: 'nowrap',
-            paddingRight: value ? '3.5em !important' : undefined,
-            paddingLeft: value ? '1em !important' : undefined,
-          }}
-        >
-          {value === null ? 'Select Date' : moment(value).format('DD.MM.YYYY')}
-          {value !== null && (
-            <Icon
-              name="x"
-              onClick={evt => {
-                evt.stopPropagation()
-                onChange(null)
-              }}
-            />
-          )}
-        </Button>
-      )}
+      timeFormat={false}
+      value={value}
     />
   )
 }

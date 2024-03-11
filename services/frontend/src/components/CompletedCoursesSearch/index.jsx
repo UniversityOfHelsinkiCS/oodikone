@@ -19,10 +19,10 @@ export const CompletedCourses = () => {
           it. Course substitutions are taken into account.
         </p>
         <p>
-          <Icon fitted name="check" color="green" />: Student has completed the course with a passing grade. <br />
-          <Icon fitted name="minus" color="yellow" />: Student has not completed the course, but has an active
+          <Icon color="green" fitted name="check" />: Student has completed the course with a passing grade. <br />
+          <Icon color="yellow" fitted name="minus" />: Student has not completed the course, but has an active
           enrollment from less than 6 months ago. <br />
-          <Icon fitted name="minus" color="grey" />: Student has not completed the course, but has an enrollment from
+          <Icon color="grey" fitted name="minus" />: Student has not completed the course, but has an enrollment from
           more than 6 months ago. <br />
           <b>Empty cell</b>: Student has no completion or enrollment for the course.
         </p>

@@ -20,9 +20,9 @@ const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, ma
 
   const toCourseRow = course => (
     <Table.Row
-      style={{ cursor: 'pointer' }}
       key={course.code}
       onClick={() => (course.min_attainment_date || mandatory ? onSelectCourse(course) : null)}
+      style={{ cursor: 'pointer' }}
     >
       <Table.Cell width={10}>
         <div>{getTextIn(course.name)}</div>
@@ -35,7 +35,7 @@ const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, ma
 
   return (
     !hidden && (
-      <Table selectable className="fixed-header">
+      <Table className="fixed-header" selectable>
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell>{title}</Table.HeaderCell>

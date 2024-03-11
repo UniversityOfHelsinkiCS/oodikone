@@ -37,15 +37,15 @@ export const FilterCard = ({ filter, options, children, onClear }) => {
 
   let header = (
     <div
+      className="filter-card-header"
+      data-cy={`${key}-header`}
+      onClick={() => setManuallyOpened(!open)}
       style={{
         display: 'flex',
         alignItems: 'center',
         cursor: 'pointer',
         flexGrow: 1,
       }}
-      className="filter-card-header"
-      onClick={() => setManuallyOpened(!open)}
-      data-cy={`${key}-header`}
     >
       <Icon name={open ? 'caret down' : 'caret right'} style={{ color: 'black', flexShrink: 0 }} />
       <Header size="tiny" style={{ margin: '0' }}>
@@ -67,12 +67,12 @@ export const FilterCard = ({ filter, options, children, onClear }) => {
       <div style={{ flexGrow: 1, minWidth: '1rem' }} />
       {active && (
         <Icon
+          className="filter-clear-icon"
           name="trash alternate outline"
           onClick={evt => {
             evt.stopPropagation()
             onClear()
           }}
-          className="filter-clear-icon"
         />
       )}
     </div>
@@ -80,14 +80,14 @@ export const FilterCard = ({ filter, options, children, onClear }) => {
 
   if (info) {
     header = (
-      <InfoWithHelpTooltip containerStyle={{ alignItems: 'center' }} tooltip={info} data-cy="tooltip-div">
+      <InfoWithHelpTooltip containerStyle={{ alignItems: 'center' }} data-cy="tooltip-div" tooltip={info}>
         {header}
       </InfoWithHelpTooltip>
     )
   }
 
   return (
-    <div style={{ margin: '1rem 0' }} data-cy={`${key}-filter-card`} data-open={open}>
+    <div data-cy={`${key}-filter-card`} data-open={open} style={{ margin: '1rem 0' }}>
       <div style={{ marginBottom: '1rem' }}>{header}</div>
       {open && <div onClick={() => setManuallyOpened(true)}>{children}</div>}
     </div>

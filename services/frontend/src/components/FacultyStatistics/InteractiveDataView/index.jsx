@@ -105,7 +105,7 @@ export const InteractiveDataTable = ({
   return (
     <div style={{ marginTop: '20px' }}>
       <Menu compact>
-        <Menu.Item style={{ cursor: 'default', borderRadius: '1px', padding: '0 10px' }} color="black">
+        <Menu.Item color="black" style={{ cursor: 'default', borderRadius: '1px', padding: '0 10px' }}>
           <Popup
             content="Sort bars in the yearly charts by programme code or other column values. Sort is done inside the degree group."
             trigger={
@@ -121,14 +121,14 @@ export const InteractiveDataTable = ({
             color={sorter === sorterName ? 'blue' : 'black'}
             content={sorterName}
             data-cy={`Menu-${cypress}-${sorterName}`}
+            icon={sortDir === 1 ? 'triangle down' : 'triangle up'}
             key={sorterName}
             onClick={() => handleClick(sorterName, nameIndex)}
             style={{ borderRadius: '1px', fontSize: '14px', padding: '0 10px' }}
-            icon={sortDir === 1 ? 'triangle down' : 'triangle up'}
           />
         ))}
       </Menu>
-      <Table data-cy={`Table-${cypress}`} celled>
+      <Table celled data-cy={`Table-${cypress}`}>
         <Table.Header>
           <Table.Row key={`random-header-row-${Math.random()}`} textAlign="center">
             {titles?.map(title => (
@@ -147,7 +147,7 @@ export const InteractiveDataTable = ({
                 yearIndex={yearIndex}
               />
               <Table.Row key={`stack-row-key-${Math.random()}`} style={{ display: visible[yearIndex] ? '' : 'none' }}>
-                <Table.Cell data-cy={`Cell-${cypress}-${yearIndex}`} key={`stack-cell${Math.random()}`} colSpan={100}>
+                <Table.Cell colSpan={100} data-cy={`Cell-${cypress}-${yearIndex}`} key={`stack-cell${Math.random()}`}>
                   <CollapsedStackedBar
                     data={
                       sortbyColumn === 0
@@ -166,8 +166,6 @@ export const InteractiveDataTable = ({
                             )
                             .filter(prog => !!prog)
                     }
-                    labels={sortbyColumn === 0 ? sortedKeys : keyOrder[yearIndex]}
-                    plotLinePlaces={plotLinePlaces}
                     differenceData={Object.keys(differenceToPrevYears)?.reduce(
                       (yearlyObject, programme) => ({
                         ...yearlyObject,
@@ -175,8 +173,10 @@ export const InteractiveDataTable = ({
                       }),
                       {}
                     )}
+                    labels={sortbyColumn === 0 ? sortedKeys : keyOrder[yearIndex]}
                     longLabels={programmeNames}
                     names={titles?.slice(sliceStart)}
+                    plotLinePlaces={plotLinePlaces}
                     studentsTable={studentsTable}
                   />
                 </Table.Cell>

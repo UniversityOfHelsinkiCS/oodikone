@@ -56,7 +56,7 @@ export const Feedback = () => {
           </Message.Content>
         </Message>
       )}
-      <Header as="h1" textAlign="center" style={{ margin: '40px 0' }}>
+      <Header as="h1" style={{ margin: '40px 0' }} textAlign="center">
         Give feedback
         <Header.Subheader style={{ marginTop: '20px' }}>
           We are constantly improving Oodikone. Please share your thoughts using the form below, or contact us at{' '}
@@ -66,19 +66,13 @@ export const Feedback = () => {
       </Header>
       <Form>
         <TextArea
+          onChange={handleTyping}
           placeholder="Tell us more"
           style={{ minHeight: 400, maxWidth: 1000 }}
-          onChange={handleTyping}
           value={feedback}
         />
         <div>
           <Modal
-            trigger={
-              <Button primary style={{ marginTop: '30px' }} disabled={!feedback.trim().length || isLoading}>
-                Submit
-              </Button>
-            }
-            header="Sending mail to Toska"
             actions={[
               'Cancel',
               {
@@ -89,6 +83,12 @@ export const Feedback = () => {
                 onClick: event => handleSubmit(event),
               },
             ]}
+            header="Sending mail to Toska"
+            trigger={
+              <Button disabled={!feedback.trim().length || isLoading} primary style={{ marginTop: '30px' }}>
+                Submit
+              </Button>
+            }
           />
         </div>
       </Form>

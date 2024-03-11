@@ -13,14 +13,14 @@ export const FoldableRow = ({ courseData, onClickFn, userHasAccessToAllStats }) 
   const showCourseRealisations = hasRealisations && isUnfolded
 
   const getCell = (content, obfuscated) => (
-    <Table.Cell style={{ color: obfuscated && 'gray' }} content={obfuscated ? '5 or less students' : content} />
+    <Table.Cell content={obfuscated ? '5 or less students' : content} style={{ color: obfuscated && 'gray' }} />
   )
 
   const getRow = (rowId, rowData, isMainRow = true) => {
     const { passed, failed, passrate, realisation, obfuscated } = rowData
     const showFoldIcon = isMainRow && hasRealisations
     return (
-      <Table.Row key={rowId} className={!isMainRow ? 'subRow' : ''}>
+      <Table.Row className={!isMainRow ? 'subRow' : ''} key={rowId}>
         <Table.Cell
           className={showFoldIcon ? 'foldControlCell' : ''}
           onClick={() => isMainRow && setIsUnfolded(isUnfolded => !isUnfolded)}
@@ -28,6 +28,7 @@ export const FoldableRow = ({ courseData, onClickFn, userHasAccessToAllStats }) 
           {showFoldIcon ? <Icon name={`angle ${isUnfolded ? 'down' : 'right'}`} /> : null}
         </Table.Cell>
         <Table.Cell
+          className={isMainRow ? 'courseNameCell' : 'courseRealisationCell'}
           content={
             isMainRow ? (
               <>
@@ -38,9 +39,8 @@ export const FoldableRow = ({ courseData, onClickFn, userHasAccessToAllStats }) 
               realisation
             )
           }
-          style={{ color: obfuscated && 'gray' }}
-          className={isMainRow ? 'courseNameCell' : 'courseRealisationCell'}
           onClick={() => onClickFn(id)}
+          style={{ color: obfuscated && 'gray' }}
         />
         {getCell(passed, obfuscated)}
         {getCell(failed, obfuscated)}

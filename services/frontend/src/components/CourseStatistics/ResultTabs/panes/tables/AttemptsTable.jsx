@@ -190,12 +190,12 @@ export const AttemptsTable = ({
         </Header>
       )}
       <SortableTable
-        title={`Yearly attempt statistics for group ${name}`}
-        featureName="yearly_attempts"
-        defaultSort={['TIME', 'desc']}
         columns={columns}
         data={data}
+        defaultSort={['TIME', 'desc']}
+        featureName="yearly_attempts"
         maxHeight="40vh"
+        title={`Yearly attempt statistics for group ${name}`}
       />
       {!userHasAccessToAllStats && (
         <span className="totalsDisclaimer">* Years with 5 students or less are NOT included in the total</span>

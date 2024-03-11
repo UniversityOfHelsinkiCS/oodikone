@@ -29,11 +29,11 @@ const CourseTable = ({ course, courseInstance, selectedYear }) => {
       .sort(([facultyCodeA], [facultyCodeB]) => facultyCodeA.localeCompare(facultyCodeB))
       .map(([facultyCode, instanceFaculty]) => (
         <CourseTableRow
-          key={`${coursecode}-${facultyCode}`}
+          credits={instanceFaculty.credits}
           facultyCode={facultyCode}
           facultyName={getTextIn(instanceFaculty.name)}
+          key={`${coursecode}-${facultyCode}`}
           students={instanceFaculty.students.length}
-          credits={instanceFaculty.credits}
         />
       ))
   ) : (
@@ -67,13 +67,13 @@ const CourseTable = ({ course, courseInstance, selectedYear }) => {
         {courseInstance ? (
           <Table.Footer>
             <Table.Row>
-              <Table.HeaderCell width={13} style={{ fontWeight: '700' }}>
+              <Table.HeaderCell style={{ fontWeight: '700' }} width={13}>
                 Total
               </Table.HeaderCell>
-              <Table.HeaderCell width={2} style={{ fontWeight: '700' }}>
+              <Table.HeaderCell style={{ fontWeight: '700' }} width={2}>
                 {courseInstance ? courseInstance.allStudents.length : 0}
               </Table.HeaderCell>
-              <Table.HeaderCell width={1} style={{ fontWeight: '700' }}>
+              <Table.HeaderCell style={{ fontWeight: '700' }} width={1}>
                 {courseInstance ? courseInstance.allCredits : 0}
               </Table.HeaderCell>
             </Table.Row>
@@ -124,13 +124,13 @@ export const FacultyLevelStatistics = () => {
     <div>
       Select year
       <Dropdown
-        fluid
-        selection
         defaultValue={selectedYear}
-        options={dropdownOptions}
+        fluid
         onChange={(e, data) => {
           setSelectedYear(data.value)
         }}
+        options={dropdownOptions}
+        selection
       />
       {courseTables}
     </div>

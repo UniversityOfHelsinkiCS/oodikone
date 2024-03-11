@@ -135,13 +135,13 @@ export const Pane = ({
         <TableSection
           availableStats={availableStats}
           datasets={datasets}
-          settings={settings}
           setSettings={setSettings}
           setSplitDirection={setSplitDirection}
-          tableComponent={tableComponent}
-          toggleSeparate={toggleSeparate}
+          settings={settings}
           styleContainer={styleContainer}
           styleData={styleData}
+          tableComponent={tableComponent}
+          toggleSeparate={toggleSeparate}
           userHasAccessToAllStats={userHasAccessToAllStats}
         />
         {settings.showGrades ? (

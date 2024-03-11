@@ -96,7 +96,7 @@ export const AgeStats = ({ filteredStudents, query }) => {
     <div>
       {!onlyIamRights && (
         <div style={{ marginTop: 15, marginBottom: 10 }}>
-          <Radio toggle label="Group ages" checked={isGrouped} onChange={() => setIsGrouped(!isGrouped)} />
+          <Radio checked={isGrouped} label="Group ages" onChange={() => setIsGrouped(!isGrouped)} toggle />
         </div>
       )}
       <div>
@@ -135,7 +135,7 @@ export const AgeStats = ({ filteredStudents, query }) => {
                 <Table.Cell>
                   {getAgeCellContent(age)}{' '}
                   {isGrouped && !onlyIamRights && (
-                    <Icon name={expandedGroups.includes(i) ? 'caret down' : 'caret right'} color="grey" />
+                    <Icon color="grey" name={expandedGroups.includes(i) ? 'caret down' : 'caret right'} />
                   )}
                 </Table.Cell>
                 <Table.Cell>{count}</Table.Cell>

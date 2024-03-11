@@ -10,8 +10,8 @@ export const AttemptsPane = ({ availableStats, datasets, separate, userHasAccess
       datasets={datasets}
       initialSettings={{ viewMode: 'ATTEMPTS', separate, splitDirection: 'row' }}
       tableComponent={AttemptsTable}
-      userHasAccessToAllStats={userHasAccessToAllStats}
       updateQuery={updateQuery}
+      userHasAccessToAllStats={userHasAccessToAllStats}
     />
   )
 }

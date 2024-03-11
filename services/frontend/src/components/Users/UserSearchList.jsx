@@ -46,9 +46,6 @@ export const UserSearchList = () => {
   return (
     <Segment className="contentSegment">
       <SortableTable
-        stretch
-        singleLine={false}
-        hideHeaderBar
         columns={[
           {
             key: 'NAME',
@@ -63,7 +60,7 @@ export const UserSearchList = () => {
             key: 'USERNAME',
             title: 'Username',
             getRowContent: user => (
-              <Link to={`users/${user.id}`} data-cy={`user-edit-button-${user.username}`}>
+              <Link data-cy={`user-edit-button-${user.username}`} to={`users/${user.id}`}>
                 {user.username}
               </Link>
             ),
@@ -79,7 +76,7 @@ export const UserSearchList = () => {
                 {user.accessgroup
                   .toSorted((a, b) => a.group_code.localeCompare(b.group_code))
                   .map(({ group_code: code }) => (
-                    <Label key={code} content={code} />
+                    <Label content={code} key={code} />
                   ))}
               </Label.Group>
             ),
@@ -123,7 +120,7 @@ export const UserSearchList = () => {
             getRowContent: user => (
               <Label.Group>
                 {user.iam_groups.toSorted().map(iam => (
-                  <Label key={iam} content={iam} />
+                  <Label content={iam} key={iam} />
                 ))}
               </Label.Group>
             ),
@@ -147,19 +144,22 @@ export const UserSearchList = () => {
             filterable: false,
             sortable: false,
             getRowVal: user => (
-              <Button circular size="tiny" basic icon="spy" onClick={() => showAsUser(user.username)} />
+              <Button basic circular icon="spy" onClick={() => showAsUser(user.username)} size="tiny" />
             ),
           },
         ]}
         data={users}
+        hideHeaderBar
+        singleLine={false}
+        stretch
       />
       <Popup
-        trigger={<Icon link name="envelope" onClick={copyEmailsToClipboard} style={{ float: 'right' }} />}
         content="Copied email(s)!"
         on="click"
-        onOpen={handlePopupOpen}
         onClose={handlePopupClose}
+        onOpen={handlePopupOpen}
         open={popupOpen}
+        trigger={<Icon link name="envelope" onClick={copyEmailsToClipboard} style={{ float: 'right' }} />}
       />
     </Segment>
   )

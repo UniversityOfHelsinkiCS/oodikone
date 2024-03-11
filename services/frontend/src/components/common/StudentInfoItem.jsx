@@ -15,7 +15,7 @@ export const StudentInfoItem = ({ student, showSisuLink }) => {
   return (
     <div style={{ display: 'inline-flex' }}>
       <div>{student.studentNumber}</div>
-      <Item as={Link} to={`/students/${student.studentNumber}`} style={{ marginLeft: '10px', marginRight: '10px' }}>
+      <Item as={Link} style={{ marginLeft: '10px', marginRight: '10px' }} to={`/students/${student.studentNumber}`}>
         <Icon name="user outline" />
       </Item>
       {showSisuLink && <SisuLinkItem id={student.sis_person_id} />}

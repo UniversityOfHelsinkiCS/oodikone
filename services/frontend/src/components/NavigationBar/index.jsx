@@ -76,7 +76,7 @@ export const NavigationBar = () => {
 
   // Min-content sets logo always to the left
   const renderHome = () => (
-    <Menu.Item as={Link} to="/" tabIndex="-1">
+    <Menu.Item as={Link} tabIndex="-1" to="/">
       <span className="logo">
         <h2 className="logoText">oodikone</h2>
       </span>
@@ -103,17 +103,17 @@ export const NavigationBar = () => {
   const renderNavigationRoutes = () =>
     Object.values(visibleNavigationItems).map(({ items, path, key, label, tag }) =>
       items ? (
-        <Menu.Item as={Dropdown} key={`menu-item-drop-${key}`} tabIndex="-1" text={label} data-cy={`navbar-${key}`}>
+        <Menu.Item as={Dropdown} data-cy={`navbar-${key}`} key={`menu-item-drop-${key}`} tabIndex="-1" text={label}>
           <Dropdown.Menu>
             {items.map(
               i =>
                 showSearch(i) && (
                   <Dropdown.Item
                     as={NavLink}
-                    key={`menu-item-${i.path}`}
-                    to={i.path}
-                    tabIndex="-1"
                     data-cy={`navbar-${i.key}`}
+                    key={`menu-item-${i.path}`}
+                    tabIndex="-1"
+                    to={i.path}
                   >
                     {i.label}
                   </Dropdown.Item>
@@ -122,11 +122,11 @@ export const NavigationBar = () => {
           </Dropdown.Menu>
         </Menu.Item>
       ) : (
-        <Menu.Item as={NavLink} key={`menu-item-${path}`} to={path} tabIndex="-1" data-cy={`navbar-${key}`}>
+        <Menu.Item as={NavLink} data-cy={`navbar-${key}`} key={`menu-item-${path}`} tabIndex="-1" to={path}>
           {label}
           {tag && (
             <div style={{ position: 'absolute', top: 0, right: 17 }}>
-              <Label style={{ fontSize: '8px' }} color="red" ribbon="right">
+              <Label color="red" ribbon="right" style={{ fontSize: '8px' }}>
                 {tag}
               </Label>
             </div>
@@ -136,24 +136,24 @@ export const NavigationBar = () => {
     )
   const renderUserMenu = () =>
     isDev ? (
-      <Menu.Item as={Dropdown} style={{ backgroundColor: 'purple', color: 'white' }} text="Dev controls" tabIndex="-1">
+      <Menu.Item as={Dropdown} style={{ backgroundColor: 'purple', color: 'white' }} tabIndex="-1" text="Dev controls">
         <Dropdown.Menu>
           {adminerUrls.map(({ url, text }) => (
             <Dropdown.Item
+              icon="database"
               key={`${url}-${text}`}
               onClick={() => {
                 const win = window.open(url, '_blank')
                 win.focus()
               }}
               text={text}
-              icon="database"
             />
           ))}
-          <Dropdown.Item icon="log out" text="Logout" onClick={() => logout()} />
+          <Dropdown.Item icon="log out" onClick={() => logout()} text="Logout" />
         </Dropdown.Menu>
       </Menu.Item>
     ) : (
-      <Menu.Item link onClick={() => logout()} icon="log out" tabIndex="-1">
+      <Menu.Item icon="log out" link onClick={() => logout()} tabIndex="-1">
         Logout
       </Menu.Item>
     )
@@ -171,7 +171,7 @@ export const NavigationBar = () => {
   )
 
   return (
-    <Menu data-cy="navBar" stackable fluid className="navBar">
+    <Menu className="navBar" data-cy="navBar" fluid stackable>
       {renderHome()}
       {!isLoading && renderNavigationRoutes()}
       {!isLoading && renderUserMenu()}

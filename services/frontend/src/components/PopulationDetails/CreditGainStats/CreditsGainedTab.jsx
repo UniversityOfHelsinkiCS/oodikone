@@ -30,12 +30,12 @@ export const CreditsGainedTab = ({ allStudents, query, creditDateFilterOptions, 
     const filteredStudents = allStudents.filter(s => filterFunction(s, type))
     return (
       <CreditsGainedTable
-        key={`creditsgainedtable-admissiontype-${type}`}
-        type={type || 'Ei valintatapaa'}
-        filteredStudents={filteredStudents}
-        year={year}
         creditDateFilterOptions={creditDateFilterOptions}
+        filteredStudents={filteredStudents}
+        key={`creditsgainedtable-admissiontype-${type}`}
         programmeGoalTime={programmeGoalTime}
+        type={type || 'Ei valintatapaa'}
+        year={year}
       />
     )
   }
@@ -45,13 +45,13 @@ export const CreditsGainedTab = ({ allStudents, query, creditDateFilterOptions, 
   return (
     <Grid>
       <Grid.Row>
-        <Grid.Column width={16} data-cy="credits-gained-main-table">
+        <Grid.Column data-cy="credits-gained-main-table" width={16}>
           <CreditsGainedTable
-            type="All students of the class"
-            filteredStudents={allStudents}
-            year={year}
             creditDateFilterOptions={creditDateFilterOptions}
+            filteredStudents={allStudents}
             programmeGoalTime={programmeGoalTime}
+            type="All students of the class"
+            year={year}
           />
         </Grid.Column>
       </Grid.Row>
@@ -59,8 +59,8 @@ export const CreditsGainedTab = ({ allStudents, query, creditDateFilterOptions, 
         <Divider
           className="credits-gained-divider"
           horizontal
-          style={{ cursor: 'pointer', marginBottom: !show && '50px' }}
           onClick={() => setShow(!show)}
+          style={{ cursor: 'pointer', marginBottom: !show && '50px' }}
         >
           By admission type <Icon name={`angle ${show ? 'down' : 'right'}`} />
         </Divider>

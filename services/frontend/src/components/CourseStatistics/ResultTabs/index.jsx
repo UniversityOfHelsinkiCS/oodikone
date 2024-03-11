@@ -55,16 +55,16 @@ export const ResultTabs = ({ primary, comparison, separate, availableStats }) =>
       <Component
         availableStats={availableStats}
         datasets={[primary, comparison]}
+        separate={separate}
         updateQuery={updateSeparate}
         userHasAccessToAllStats={userHasAccessToAllStats}
-        separate={separate}
       />
     ),
   }))
 
   return (
     <Segment loading={loading}>
-      <Tab id="CourseStatPanes" panes={panes} onTabChange={handleTabChange} activeIndex={tab} />
+      <Tab activeIndex={tab} id="CourseStatPanes" onTabChange={handleTabChange} panes={panes} />
     </Segment>
   )
 }

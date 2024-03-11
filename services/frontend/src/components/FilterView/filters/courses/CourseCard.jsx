@@ -32,39 +32,39 @@ export const CourseCard = ({ course, filterType, onChange }) => {
       {getTextIn(course?.course?.name)}
 
       <Dropdown
+        button
+        className="mini"
+        data-cy={`${name}-${course?.course?.code}-dropdown`}
+        fluid
+        style={{ marginTop: '0.5rem' }}
         text={filterTexts[filterType].label}
         value={filterType}
-        fluid
-        className="mini"
-        button
-        data-cy={`${name}-${course?.course?.code}-dropdown`}
-        style={{ marginTop: '0.5rem' }}
       >
         <Dropdown.Menu>
           {Object.entries(filterTexts).map(([type, { label, info }]) => {
             if (info) {
               return (
                 <Popup
-                  key={label}
                   basic
-                  trigger={<Dropdown.Item text={label} value={type} onClick={onClick} />}
                   content={info}
+                  key={label}
+                  trigger={<Dropdown.Item onClick={onClick} text={label} value={type} />}
                 />
               )
             }
             if (course?.students[translate[type]] && Object.keys(course?.students[translate[type]]).length === 0)
-              return <Dropdown.Item key={label} text={label} value={type} onClick={onClick} disabled />
-            return <Dropdown.Item key={label} text={label} value={type} onClick={onClick} />
+              return <Dropdown.Item disabled key={label} onClick={onClick} text={label} value={type} />
+            return <Dropdown.Item key={label} onClick={onClick} text={label} value={type} />
           })}
         </Dropdown.Menu>
       </Dropdown>
 
       <Button
         compact
-        size="tiny"
-        onClick={clear}
-        icon
         data-cy={`${name}-${course?.course?.code}-clear`}
+        icon
+        onClick={clear}
+        size="tiny"
         style={{ marginTop: '0.5rem' }}
       >
         <Icon name="close" />

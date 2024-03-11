@@ -30,9 +30,11 @@ export const FacultyProgress = ({ faculty, progressStats, getDivider }) => {
         }}
       />
       <FacultyProgressTable
+        cypress="FacultyBachelorsProgressTable"
         data={bachelorStats.tableStats}
+        programmeNames={progressStats?.data.programmeNames}
         programmeStats={progressStats?.data.bachelorsProgStats}
-        titles={bachelorStats.tableTitles}
+        progressTitles={progressStats?.data.yearlyBachelorTitles}
         sortedKeys={sortProgrammeKeys(
           Object.keys(progressStats?.data.bachelorsProgStats).map(obj => [
             obj,
@@ -40,9 +42,7 @@ export const FacultyProgress = ({ faculty, progressStats, getDivider }) => {
           ]),
           faculty
         ).map(listObj => listObj[0])}
-        programmeNames={progressStats?.data.programmeNames}
-        cypress="FacultyBachelorsProgressTable"
-        progressTitles={progressStats?.data.yearlyBachelorTitles}
+        titles={bachelorStats.tableTitles}
       />
       {getDivider('Bachelor + Master', 'ProgressOfBachelorMaster', 'no-infobox')}
       <Message data-cy="FacultyProgrammesShownInfo">
@@ -59,9 +59,11 @@ export const FacultyProgress = ({ faculty, progressStats, getDivider }) => {
         }}
       />
       <FacultyProgressTable
+        cypress="FacultyBachelorMasterProgressTable"
         data={bachelorMasterStats.tableStats}
+        programmeNames={progressStats?.data.programmeNames}
         programmeStats={progressStats?.data.bcMsProgStats}
-        titles={bachelorMasterStats.tableTitles}
+        progressTitles={progressStats?.data.yearlyBcMsTitles}
         sortedKeys={sortProgrammeKeys(
           Object.keys(progressStats?.data.bcMsProgStats).map(obj => [
             obj,
@@ -69,9 +71,7 @@ export const FacultyProgress = ({ faculty, progressStats, getDivider }) => {
           ]),
           faculty
         ).map(listObj => listObj[0])}
-        programmeNames={progressStats?.data.programmeNames}
-        cypress="FacultyBachelorMasterProgressTable"
-        progressTitles={progressStats?.data.yearlyBcMsTitles}
+        titles={bachelorMasterStats.tableTitles}
       />
       {faculty !== 'H90' && (
         <>
@@ -85,9 +85,11 @@ export const FacultyProgress = ({ faculty, progressStats, getDivider }) => {
             }}
           />
           <FacultyProgressTable
+            cypress="FacultyMastersProgressTable"
             data={masterStats.tableStats}
+            programmeNames={progressStats?.data.programmeNames}
             programmeStats={progressStats?.data.mastersProgStats}
-            titles={masterStats.tableTitles}
+            progressTitles={progressStats?.data.yearlyMasterTitles}
             sortedKeys={sortProgrammeKeys(
               Object.keys(progressStats?.data.mastersProgStats).map(obj => [
                 obj,
@@ -95,9 +97,7 @@ export const FacultyProgress = ({ faculty, progressStats, getDivider }) => {
               ]),
               faculty
             ).map(listObj => listObj[0])}
-            programmeNames={progressStats?.data.programmeNames}
-            cypress="FacultyMastersProgressTable"
-            progressTitles={progressStats?.data.yearlyMasterTitles}
+            titles={masterStats.tableTitles}
           />
         </>
       )}
@@ -113,9 +113,11 @@ export const FacultyProgress = ({ faculty, progressStats, getDivider }) => {
             }}
           />
           <FacultyProgressTable
+            cypress="FacultyLicentiateProgressTable"
             data={licentiateStats.tableStats}
+            programmeNames={progressStats?.data.programmeNames}
             programmeStats={progressStats?.data.licentiateProgStats}
-            titles={licentiateStats.tableTitles}
+            progressTitles={progressStats?.data.yearlyLicentiateTitles}
             sortedKeys={sortProgrammeKeys(
               Object.keys(progressStats?.data.licentiateProgStats).map(obj => [
                 obj,
@@ -123,9 +125,7 @@ export const FacultyProgress = ({ faculty, progressStats, getDivider }) => {
               ]),
               faculty
             ).map(listObj => listObj[0])}
-            programmeNames={progressStats?.data.programmeNames}
-            cypress="FacultyLicentiateProgressTable"
-            progressTitles={progressStats?.data.yearlyLicentiateTitles}
+            titles={licentiateStats.tableTitles}
           />
         </>
       )}
@@ -139,9 +139,10 @@ export const FacultyProgress = ({ faculty, progressStats, getDivider }) => {
         }}
       />
       <FacultyProgressTable
+        cypress="FacultyDoctoralProgressTable"
         data={doctorStats.tableStats}
+        programmeNames={progressStats?.data.programmeNames}
         programmeStats={progressStats?.data.doctoralProgStats}
-        titles={doctorStats.tableTitles}
         sortedKeys={sortProgrammeKeys(
           Object.keys(progressStats?.data.doctoralProgStats).map(obj => [
             obj,
@@ -149,8 +150,7 @@ export const FacultyProgress = ({ faculty, progressStats, getDivider }) => {
           ]),
           faculty
         ).map(listObj => listObj[0])}
-        programmeNames={progressStats?.data.programmeNames}
-        cypress="FacultyDoctoralProgressTable"
+        titles={doctorStats.tableTitles}
       />
     </>
   )

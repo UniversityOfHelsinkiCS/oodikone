@@ -255,13 +255,13 @@ export const DataExport = ({ students, programmeCode }) => {
 
   return (
     <Popup
+      content="Click here to download a large Excel-workbook with both 'General' and 'Courses' tabs of the table below. To download them separately and select the columns, use the 'Export to Excel' button in the top-right corner of the table."
       trigger={
         <Button onClick={() => writeFile(generateWorkbook(), `oodikone_students_${getTimestamp()}.xlsx`)}>
           <Icon name="save" />
           Combined Excel
         </Button>
       }
-      content="Click here to download a large Excel-workbook with both 'General' and 'Courses' tabs of the table below. To download them separately and select the columns, use the 'Export to Excel' button in the top-right corner of the table."
     />
   )
 }

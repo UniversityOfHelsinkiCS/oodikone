@@ -23,14 +23,14 @@ export const CustomOpenUniPopulation = () => {
         <p>
           Here you can create custom population using a list of courses. Clicking the blue button will open a modal
           where you can enter a list of courses. <br />
-          <Icon fitted name="check" color="green" />: Student has passed the course. <br />
-          <Icon fitted name="times" color="red" />: Student has failed the course. <br />
-          <Icon fitted name="minus" color="grey" />: Student has enrolled, but has not received any grade from the
+          <Icon color="green" fitted name="check" />: Student has passed the course. <br />
+          <Icon color="red" fitted name="times" />: Student has failed the course. <br />
+          <Icon color="grey" fitted name="minus" />: Student has enrolled, but has not received any grade from the
           course. <br />
           <b>Empty cell</b>: Student has no enrollments for the course. <br />
         </p>
       </Message>
-      <CustomOpenUniSearch setValues={setValues} savedSearches={savedSearches.data} />
+      <CustomOpenUniSearch savedSearches={savedSearches.data} setValues={setValues} />
       <div style={{ paddingTop: '25px', paddingBottom: '10px', fontSize: '20px' }}>
         {fieldValues && fieldValues.courseList?.length > 0 && (
           <p>

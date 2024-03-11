@@ -70,58 +70,58 @@ export const AccessRights = ({ user }) => {
   )
 
   if (accessgroup.some(ag => ag.group_code === 'admin')) {
-    return <Message positive icon="lock open" header="This user is an admin." />
+    return <Message header="This user is an admin." icon="lock open" positive />
   }
 
   return (
     <Form
-      loading={addResult.isLoading || removeResult.isLoading}
       error={addResult.isError || removeResult.isError}
+      loading={addResult.isLoading || removeResult.isLoading}
       success={addResult.isSuccess || removeResult.isSuccess}
     >
-      <Header size="small" content="Select new study programme access rights" style={{ marginBottom: '8px' }} />
-      <Message error content="Modifying access rights failed." />
-      <Message success content="The access rights were updated successfully." />
+      <Header content="Select new study programme access rights" size="small" style={{ marginBottom: '8px' }} />
+      <Message content="Modifying access rights failed." error />
+      <Message content="The access rights were updated successfully." success />
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
         <div style={{ flexGrow: 1 }}>
           <Form.Dropdown
-            name="programme"
-            placeholder="Select study programmes to add"
-            data-cy="access-rights-form"
-            options={options}
-            multiple
-            value={accessRightsToBeAdded}
-            onChange={(_, { value }) => setAccessRightsToBeAdded(value)}
-            fluid
-            search={textAndDescriptionSearch}
-            selection
             clearable
+            data-cy="access-rights-form"
+            fluid
+            multiple
+            name="programme"
+            onChange={(_, { value }) => setAccessRightsToBeAdded(value)}
+            options={options}
+            placeholder="Select study programmes to add"
+            search={textAndDescriptionSearch}
             selectOnBlur={false}
             selectOnNavigation={false}
+            selection
+            value={accessRightsToBeAdded}
           />
         </div>
         <Radio
-          toggle
-          label="Filter out old and specialized programmes"
           checked={filterOldProgrammes}
+          label="Filter out old and specialized programmes"
           onChange={() => setFilterOldProgrammes(!filterOldProgrammes)}
+          toggle
         />
       </div>
-      <Header size="small" content={`Current study programme access rights (${currentRegularAccessRights.length})`} />
+      <Header content={`Current study programme access rights (${currentRegularAccessRights.length})`} size="small" />
       <List divided>
         {currentRegularAccessRights.map(({ code, name }) => (
           <List.Item key={code}>
             <List.Content floated="right">
               <Button
                 basic
-                negative={!accessRightsToBeRemoved.includes(code)}
+                content={accessRightsToBeRemoved.includes(code) ? 'Cancel removal' : 'Mark for removal'}
                 floated="right"
+                negative={!accessRightsToBeRemoved.includes(code)}
                 onClick={
                   accessRightsToBeRemoved.includes(code)
                     ? () => setAccessRightsToBeRemoved(accessRightsToBeRemoved.filter(right => right !== code))
                     : () => setAccessRightsToBeRemoved([...accessRightsToBeRemoved, code])
                 }
-                content={accessRightsToBeRemoved.includes(code) ? 'Cancel removal' : 'Mark for removal'}
                 size="mini"
               />
             </List.Content>
@@ -133,8 +133,8 @@ export const AccessRights = ({ user }) => {
         ))}
       </List>
       <Header
-        size="small"
         content={`Current IAM group based study programme access rights (${currentIamAccessRights.length})`}
+        size="small"
       />
       <InfoBox content={userToolTips.IamGroupBasedAccess} />
       <List divided>
@@ -147,20 +147,20 @@ export const AccessRights = ({ user }) => {
               <List.Content
                 content={
                   <Popup
-                    trigger={
-                      <Icon name="exclamation triangle" color={limited ? 'green' : 'grey'} disabled={!limited} />
-                    }
                     content="Limited rights"
                     position="top center"
+                    trigger={
+                      <Icon color={limited ? 'green' : 'grey'} disabled={!limited} name="exclamation triangle" />
+                    }
                   />
                 }
               />
               <List.Content
                 content={
                   <Popup
-                    trigger={<Icon name="check circle" color={!limited ? 'green' : 'grey'} disabled={limited} />}
                     content="Full rights"
                     position="top center"
+                    trigger={<Icon color={!limited ? 'green' : 'grey'} disabled={limited} name="check circle" />}
                   />
                 }
               />
@@ -169,13 +169,13 @@ export const AccessRights = ({ user }) => {
         ))}
       </List>
       <Form.Button
-        disabled={accessRightsToBeAdded.length === 0 && accessRightsToBeRemoved.length === 0}
         basic
-        fluid
-        positive
         content="Save"
-        onClick={handleSave}
         data-cy="access-rights-save"
+        disabled={accessRightsToBeAdded.length === 0 && accessRightsToBeRemoved.length === 0}
+        fluid
+        onClick={handleSave}
+        positive
       />
     </Form>
   )

@@ -22,7 +22,7 @@ const addUserDetailsToLoggers = ({ id, userId, mockedBy }) => {
 const Layout = ({ children }) => (
   <div className="appContainer">
     <main className="routeViewContainer">
-      <header className="header" role="banner" id="main-menu">
+      <header className="header" id="main-menu" role="banner">
         <NavigationBar />
       </header>
       {children}

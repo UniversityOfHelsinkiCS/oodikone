@@ -22,16 +22,16 @@ export const StudytrackSelector = ({ track, setTrack, studytracks }) => {
       <h4>Choose studytrack</h4>
       <Dropdown
         fluid
-        selection
         name="studytrack"
-        placeholder="All students of the studyprogramme"
-        value={track}
         onChange={handleStudytrackChange}
         options={Object.entries(studytracks).map(([code, track]) => ({
           key: code,
           value: code,
           text: code === 'studyprogramme' ? getOptionName(track) : `${getOptionName(track)}, ${code}`,
         }))}
+        placeholder="All students of the studyprogramme"
+        selection
+        value={track}
       />
     </div>
   )

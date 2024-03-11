@@ -7,16 +7,16 @@ const roundValue = value => {
 
 export const ExpandableRow = ({ icon, yearArray, cypress, yearIndex, toggleVisibility, styles }) => {
   return (
-    <Table.Row style={styles} key={`Basic-row-${cypress}-${yearIndex}`}>
+    <Table.Row key={`Basic-row-${cypress}-${yearIndex}`} style={styles}>
       {yearArray?.map((value, index) => (
         <Table.Cell key={`random-button-cell-key-${Math.random()}`} textAlign={index === 0 ? 'center' : 'right'}>
           {index === 0 ? (
             <Button
               as="div"
-              onClick={toggleVisibility}
-              labelPosition="right"
-              style={{ backgroundColor: 'white', borderRadius: 0, padding: 0, margin: 0 }}
               data-cy={`Button-${cypress}-${yearIndex}`}
+              labelPosition="right"
+              onClick={toggleVisibility}
+              style={{ backgroundColor: 'white', borderRadius: 0, padding: 0, margin: 0 }}
             >
               <Button icon style={{ backgroundColor: 'white', borderRadius: 0, padding: 0, margin: 0 }}>
                 <Icon name={icon} />

@@ -100,7 +100,7 @@ export const FacultySelector = ({ faculties, selected }) => {
       {filteredFaculties.length > 0 ? (
         <>
           <Header>Faculties</Header>
-          <SortableTable hideHeaderBar columns={headers} data={filteredFaculties} />
+          <SortableTable columns={headers} data={filteredFaculties} hideHeaderBar />
         </>
       ) : null}
     </div>

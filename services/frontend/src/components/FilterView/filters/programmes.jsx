@@ -106,9 +106,10 @@ const ProgrammeFilterCard = ({
   return (
     <>
       <Dropdown
-        multiple
         closeOnChange
+        data-cy="Programme-filter-dropdown"
         fluid
+        multiple
         name={name}
         onChange={handleChange}
         options={dropdownOptions}
@@ -116,16 +117,13 @@ const ProgrammeFilterCard = ({
         search
         selection
         value={selectedProgrammes}
-        data-cy="Programme-filter-dropdown"
       />
       <div style={{ marginTop: '0.5em' }}>
         Mode:{' '}
         <Dropdown
-          data-cy="Programme-filter-mode-selector"
           compact
+          data-cy="Programme-filter-mode-selector"
           inline
-          placeholder="Type"
-          value={options.mode ?? 'active'}
           onChange={(_, { value }) => setMode(value)}
           options={[...builtInModes, ...additionalModes].map(mode => ({
             key: mode.key,
@@ -155,6 +153,8 @@ const ProgrammeFilterCard = ({
               </>
             ),
           }))}
+          placeholder="Type"
+          value={options.mode ?? 'active'}
         />
       </div>
     </>
@@ -255,9 +255,9 @@ export const programmeFilter = createFilter({
   render: (props, { precomputed, args }) => (
     <ProgrammeFilterCard
       {...props}
+      additionalModes={args?.additionalModes ?? []}
       programmes={precomputed.programmes}
       studentToProgrammeMap={precomputed.studentToProgrammeMap}
-      additionalModes={args?.additionalModes ?? []}
       studyRightPredicate={args?.studyRightPredicate ?? (() => true)}
     />
   ),

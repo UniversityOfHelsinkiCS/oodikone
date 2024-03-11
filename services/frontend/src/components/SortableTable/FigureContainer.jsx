@@ -22,6 +22,8 @@ const Header = ({ children, actions, onClickExport }) => {
         Export to Excel
       </Button>
       <Popup
+        on="hover"
+        position="bottom left"
         trigger={
           <Icon
             name={isFullscreen ? 'compress' : 'expand'}
@@ -29,8 +31,6 @@ const Header = ({ children, actions, onClickExport }) => {
             style={{ cursor: 'pointer', fontSize: '1.1rem', marginRight: '0.5em', position: 'relative', top: '-1px' }}
           />
         }
-        on="hover"
-        position="bottom left"
       >
         Toggle Fullscreen
       </Popup>

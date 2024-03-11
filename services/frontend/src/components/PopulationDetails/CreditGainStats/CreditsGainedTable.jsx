@@ -121,12 +121,12 @@ export const CreditsGainedTable = ({ filteredStudents, type, year, creditDateFil
         <Table.Body data-cy="credits-gained-table-body">
           {limits.map(([min, max]) => (
             <CollapsibleCreditRow
-              key={`credits-table-row-${min}-${max}-${type}`}
-              min={min}
-              max={max}
-              studentCount={studentCount}
               filteredLength={filteredStudents.length}
+              key={`credits-table-row-${min}-${max}-${type}`}
+              max={max}
+              min={min}
               months={monthsForLimits}
+              studentCount={studentCount}
             />
           ))}
         </Table.Body>

@@ -186,31 +186,31 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected }) => {
       {combinedProgrammes.length > 0 ? (
         <>
           <Header>Combined programmes</Header>
-          <SortableTable hideHeaderBar columns={headers} data={combinedProgrammes} />
+          <SortableTable columns={headers} data={combinedProgrammes} hideHeaderBar />
         </>
       ) : null}
       {bachelorProgrammes.length > 0 ? (
         <>
           <Header>Bachelor programmes</Header>
-          <SortableTable hideHeaderBar columns={headers} data={bachelorProgrammes} />
+          <SortableTable columns={headers} data={bachelorProgrammes} hideHeaderBar />
         </>
       ) : null}
       {masterProgrammes.length > 0 ? (
         <>
           <Header>Master programmes</Header>
-          <SortableTable hideHeaderBar columns={headers} data={masterProgrammes} />
+          <SortableTable columns={headers} data={masterProgrammes} hideHeaderBar />
         </>
       ) : null}
       {doctoralProgrammes.length > 0 ? (
         <>
           <Header>Doctoral programmes</Header>
-          <SortableTable hideHeaderBar columns={headers} data={doctoralProgrammes} />
+          <SortableTable columns={headers} data={doctoralProgrammes} hideHeaderBar />
         </>
       ) : null}
       {otherProgrammes.length > 0 ? (
         <>
           <Header>Specialization programmes and old programmes</Header>
-          <SortableTable hideHeaderBar columns={headers} data={otherProgrammes} />
+          <SortableTable columns={headers} data={otherProgrammes} hideHeaderBar />
         </>
       ) : null}
     </>

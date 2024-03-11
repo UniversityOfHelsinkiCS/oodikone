@@ -165,13 +165,13 @@ export const createHeaders = (columns, columnDepth, dispatch) => {
 
       rows[currentDepth].push(
         <ColumnHeader
-          key={column.key}
+          column={displayColumn}
           columnKey={column.key}
+          dispatch={dispatch}
           displayColumnKey={displayColumn.key}
+          key={column.key}
           rowSpan={rowspan}
           style={style}
-          column={displayColumn}
-          dispatch={dispatch}
         />
       )
     }
@@ -371,7 +371,7 @@ const ColumnHeader = ({ columnKey, displayColumnKey, ...props }) => {
 
   const state = useMemo(() => storedState ?? getDefaultColumnOptions(), [storedState])
 
-  return <ColumnHeaderContent state={state} colSpan={colSpan} {...props} />
+  return <ColumnHeaderContent colSpan={colSpan} state={state} {...props} />
 }
 
 const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowSpan, style }) => {
@@ -472,10 +472,18 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
 
   return (
     <th
-      id={column.key}
-      colSpan={colSpan}
-      rowSpan={rowSpan}
       className={filterMenuOpen ? 'filter-menu-open' : 'filter-menu-closed'}
+      colSpan={colSpan}
+      id={column.key}
+      onClick={() => {
+        if (sortable) {
+          dispatch({
+            type: 'TOGGLE_COLUMN_SORT',
+            payload: { column: filterColumnKey },
+          })
+        }
+      }}
+      rowSpan={rowSpan}
       style={{
         ...style,
         cursor: sortable ? 'pointer' : 'initial',
@@ -484,14 +492,6 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
         overflow: toolsMode === 'floating' ? 'hidden' : '',
         display: column.displayColumn === false ? 'none' : '',
         ...borderStyles,
-      }}
-      onClick={() => {
-        if (sortable) {
-          dispatch({
-            type: 'TOGGLE_COLUMN_SORT',
-            payload: { column: filterColumnKey },
-          })
-        }
       }}
       {...column.headerProps}
     >
@@ -532,7 +532,7 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
         </Orientable>
         <div style={{ flexGrow: 1 }} />
         {(sortable || filterable) && (
-          <SizeMeasurer onSizeChange={onToolsSizeChange} className={`column-tools ${toolsMode}`}>
+          <SizeMeasurer className={`column-tools ${toolsMode}`} onSizeChange={onToolsSizeChange}>
             <div>
               {sortable && (!hasChildren || column.mergeHeader) && (
                 <Icon
@@ -542,17 +542,11 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
               )}
               {filterable && (!hasChildren || column.mergeHeader) && (
                 <Popup
+                  className="filter-menu"
+                  hideOnScroll={false}
+                  hoverable
                   offset={[-3, 0]}
-                  trigger={<Icon name="filter" style={{ color: isFilterActive ? 'rgb(33, 133, 208)' : '#bbb' }} />}
-                  position="bottom center"
-                  open={filterMenuOpen}
-                  onOpen={e => {
-                    if (e?.stopPropagation) {
-                      e.stopPropagation()
-                    }
-
-                    setFilterMenuOpen(true)
-                  }}
+                  on="click"
                   onClose={e => {
                     if (e?.stopPropagation) {
                       e.stopPropagation()
@@ -560,16 +554,22 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
 
                     setFilterMenuOpen(false)
                   }}
-                  on="click"
-                  className="filter-menu"
-                  hideOnScroll={false}
+                  onOpen={e => {
+                    if (e?.stopPropagation) {
+                      e.stopPropagation()
+                    }
+
+                    setFilterMenuOpen(true)
+                  }}
+                  open={filterMenuOpen}
+                  position="bottom center"
                   style={{ padding: 0, zIndex: 9005 }}
-                  hoverable
+                  trigger={<Icon name="filter" style={{ color: isFilterActive ? 'rgb(33, 133, 208)' : '#bbb' }} />}
                 >
                   <div onClick={e => e.stopPropagation()}>
                     <FilterComponent
-                      dispatch={filterComponentDispatch}
                       column={column}
+                      dispatch={filterComponentDispatch}
                       options={state.filterOptions ?? ColumnFilters[column.filterType ?? 'default'].initialOptions()}
                     />
                     <div className="actions">
@@ -605,7 +605,7 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
                   </div>
                 </Popup>
               )}
-              {column.helpText && <Popup position="top center" trigger={helpIcon} content={column.helpText} />}
+              {column.helpText && <Popup content={column.helpText} position="top center" trigger={helpIcon} />}
             </div>
           </SizeMeasurer>
         )}

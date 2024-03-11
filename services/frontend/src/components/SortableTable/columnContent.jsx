@@ -67,7 +67,7 @@ export const DataItem = ({ item, parents = [] }) => {
   )
 
   const childRows = _.includes(context.state.expandedGroups, item.definition.key)
-    ? item.children.map(child => <DataItem key={getKey(item)} item={child} parents={[item.definition, ...parents]} />)
+    ? item.children.map(child => <DataItem item={child} key={getKey(item)} parents={[item.definition, ...parents]} />)
     : undefined
 
   return (

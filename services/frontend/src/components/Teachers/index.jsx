@@ -32,10 +32,10 @@ const TeachersTabs = () => {
 
   return (
     <Tab
-      menu={{ attached: false, borderless: true, tabular: true }}
-      panes={panes}
       activeIndex={tab}
+      menu={{ attached: false, borderless: true, tabular: true }}
       onTabChange={setTab}
+      panes={panes}
     />
   )
 }
@@ -45,7 +45,7 @@ export const Teachers = () => {
   const { teacherid } = useParams()
   return (
     <div className="segmentContainer">
-      <Header className="segmentTitle" size="large" content="Teacher statistics" />
+      <Header className="segmentTitle" content="Teacher statistics" size="large" />
       <Segment className="contentSegment">
         {teacherid ? <TeacherDetails teacherId={teacherid} /> : <TeachersTabs />}
       </Segment>

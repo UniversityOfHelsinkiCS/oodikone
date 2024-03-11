@@ -19,8 +19,8 @@ const styles = {
 export const DropdownItem = ({ name, code, size, description }) =>
   ['ALL', 'OTHER', 'EXCLUDED'].includes(code) ? (
     <Popup
-      size="small"
       content={description}
+      size="small"
       trigger={
         <div style={styles.container}>
           <div style={styles.text}>

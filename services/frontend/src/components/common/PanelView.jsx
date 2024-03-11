@@ -41,7 +41,7 @@ export const PanelView = ({ panels: initialPanels, viewTitle }) => {
           onTitleClick: () => togglePanel(i),
           title: {
             content: (
-              <span style={titleStyle} data-cy={p.title}>
+              <span data-cy={p.title} style={titleStyle}>
                 {p.title}
               </span>
             ),
@@ -62,5 +62,5 @@ export const PanelView = ({ panels: initialPanels, viewTitle }) => {
     [initialPanels, activeIndex]
   )
 
-  return <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={panels} />
+  return <Accordion activeIndex={activeIndex} exclusive={false} fluid panels={panels} styled />
 }

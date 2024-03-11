@@ -89,43 +89,44 @@ export const CustomPopulationSearch = ({ setCustomPopulationState }) => {
 
   return (
     <Modal
+      onClose={handleClose}
+      open={modal}
+      size="small"
       trigger={
-        <Button size="small" color="blue" onClick={() => setModal(true)} data-cy="custom-pop-search-button">
+        <Button color="blue" data-cy="custom-pop-search-button" onClick={() => setModal(true)} size="small">
           Custom population
         </Button>
       }
-      open={modal}
-      onClose={handleClose}
-      size="small"
     >
       <Modal.Content>
         <Form>
           <h2>New custom population</h2>
           <Form.Field>
             <em>Insert name for this custom population if you wish to save it</em>
-            <Form.Input disabled={!!selectedSearch} value={name} placeholder="name" onChange={handleNameChange} />
+            <Form.Input disabled={!!selectedSearch} onChange={handleNameChange} placeholder="name" value={name} />
           </Form.Field>
           <Form.Field>
             <em>Insert student numbers you wish to use for population here</em>
             <TextArea
-              value={input}
-              placeholder="011111111"
-              onChange={e => setInput(e.target.value)}
               data-cy="student-no-input"
+              onChange={e => setInput(e.target.value)}
+              placeholder="011111111"
+              value={input}
             />
           </Form.Field>
           <Form.Select
-            name="Associated programme"
-            search={textAndDescriptionSearch}
-            options={programmes}
-            onChange={(_, value) => setAssociatedProgramme(value?.value)}
-            value={associatedProgramme}
-            closeOnChange
             clearable
+            closeOnChange
+            name="Associated programme"
+            onChange={(_, value) => setAssociatedProgramme(value?.value)}
+            options={programmes}
             placeholder="Select associated study programme for the population"
+            search={textAndDescriptionSearch}
+            value={associatedProgramme}
           />
         </Form>
         <SearchHistory
+          handleSearch={({ id }) => onSelectSearch(id)}
           header="Saved populations"
           items={searches.map(s => ({
             ...s,
@@ -134,21 +135,20 @@ export const CustomPopulationSearch = ({ setCustomPopulationState }) => {
             params: { id: s.id },
           }))}
           updateItem={() => null}
-          handleSearch={({ id }) => onSelectSearch(id)}
         />
       </Modal.Content>
       <Modal.Actions>
         <Button
+          content="Save"
           disabled={!name || isFetching}
-          loading={isFetching}
           floated="left"
           icon="save"
+          loading={isFetching}
           onClick={onSave}
-          content="Save"
         />
-        <Button disabled={!selectedSearch} negative floated="left" icon="trash" onClick={onDelete} content="Delete" />
+        <Button content="Delete" disabled={!selectedSearch} floated="left" icon="trash" negative onClick={onDelete} />
         <Button onClick={handleClose}>Cancel</Button>
-        <Button positive onClick={e => onClicker(e)} data-cy="search-button">
+        <Button data-cy="search-button" onClick={e => onClicker(e)} positive>
           Search population
         </Button>
       </Modal.Actions>

@@ -28,7 +28,7 @@ const CreditGainTable = ({ data, totalCredits, headerText }) => {
     .sort()
     .map(code => {
       if (data[code].credits === 0) return null
-      return <CreditGainTableRow key={code} statistics={data[code]} code={code} />
+      return <CreditGainTableRow code={code} key={code} statistics={data[code]} />
     })
 
   const totalStudents = Object.values(data).reduce((acc, code) => {
@@ -129,7 +129,7 @@ export const CoursePopulationCreditGainTable = ({
       menuItem: 'Faculty',
       render: () => (
         <Tab.Pane>
-          <CreditGainTable data={facultyCreditsStatistics} totalCredits={totalCredits} headerText="Faculty" />
+          <CreditGainTable data={facultyCreditsStatistics} headerText="Faculty" totalCredits={totalCredits} />
         </Tab.Pane>
       ),
     },
@@ -137,7 +137,7 @@ export const CoursePopulationCreditGainTable = ({
       menuItem: 'Programme',
       render: () => (
         <Tab.Pane>
-          <CreditGainTable data={programmeCreditsStatistics} totalCredits={totalCredits} headerText="Programme" />
+          <CreditGainTable data={programmeCreditsStatistics} headerText="Programme" totalCredits={totalCredits} />
         </Tab.Pane>
       ),
     },

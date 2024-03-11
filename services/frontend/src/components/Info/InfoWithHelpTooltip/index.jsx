@@ -8,14 +8,14 @@ export const InfoWithHelpTooltip = ({ children, tooltip, containerStyle = {}, ..
   const [detailsOpen, setDetailsOPen] = useState(false)
 
   const trigger = (
-    <div style={{ display: 'flex', ...containerStyle }} data-cy="tooltip-trigger">
+    <div data-cy="tooltip-trigger" style={{ display: 'flex', ...containerStyle }}>
       {children}
-      <div ref={popupContext} style={{ display: 'inline-block', cursor: 'help' }} data-cy="popup-context">
+      <div data-cy="popup-context" ref={popupContext} style={{ display: 'inline-block', cursor: 'help' }}>
         <Icon
+          name="question circle outline"
           onClick={() => setPopupOpen(!popupOpen)}
           ref={popupContext}
           style={{ marginLeft: '0.5em', color: '#888' }}
-          name="question circle outline"
         />
       </div>
     </div>
@@ -27,20 +27,20 @@ export const InfoWithHelpTooltip = ({ children, tooltip, containerStyle = {}, ..
 
   return (
     <Popup
-      wide={detailsOpen}
+      context={popupContext}
       hoverable
-      size="tiny"
-      open={popupOpen}
-      onOpen={() => setPopupOpen(true)}
       onClose={() => {
         setPopupOpen(false)
         setDetailsOPen(false)
       }}
+      onOpen={() => setPopupOpen(true)}
+      open={popupOpen}
+      size="tiny"
       trigger={trigger}
-      context={popupContext}
+      wide={detailsOpen}
       {...popupProps}
-      on="hover"
       mouseEnterDelay={2000}
+      on="hover"
     >
       <div>{tooltip.short}</div>
     </Popup>

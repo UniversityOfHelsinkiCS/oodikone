@@ -37,12 +37,12 @@ export const FilterTray = () => {
       return (
         <div key={key}>
           <FilterCard
-            title={title ?? key}
             active={isActive(filterOptions[key])}
-            onClear={() => resetFilter(key)}
-            info={info}
             filter={filter}
+            info={info}
+            onClear={() => resetFilter(key)}
             options={ctx.options}
+            title={title ?? key}
           >
             {render(props, ctx)}
           </FilterCard>
@@ -62,7 +62,7 @@ export const FilterTray = () => {
           overflowY: 'auto',
         }}
       >
-        <Header size="small" style={{ textAlign: 'center' }} data-cy="filtered-students">
+        <Header data-cy="filtered-students" size="small" style={{ textAlign: 'center' }}>
           Filter students
         </Header>
         <div style={{ textAlign: 'center' }}>
@@ -73,7 +73,7 @@ export const FilterTray = () => {
         </div>
         {haveOptionsBeenChanged && (
           <div style={{ marginTop: '0.5rem', textAlign: 'center' }}>
-            <Button compact size="mini" onClick={resetFilters} data-cy="reset-all-filters">
+            <Button compact data-cy="reset-all-filters" onClick={resetFilters} size="mini">
               Reset All Filters
             </Button>
           </div>

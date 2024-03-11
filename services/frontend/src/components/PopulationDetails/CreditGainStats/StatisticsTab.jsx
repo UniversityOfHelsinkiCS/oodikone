@@ -27,9 +27,9 @@ export const StatisticsTab = ({ allStudents, query }) => {
     const filteredStudents = allStudents.filter(s => filterFunction(s, type !== 'Valintakoe' ? type : 'Koepisteet'))
     return (
       <StatisticsTable
+        filteredStudents={filteredStudents}
         key={`admissiontype-${type}`}
         type={type || 'Ei valintatapaa'}
-        filteredStudents={filteredStudents}
       />
     )
   }
@@ -37,9 +37,9 @@ export const StatisticsTab = ({ allStudents, query }) => {
   const admissionTypesAvailable = !allStudents.every(s => filterFunction(s, null))
 
   return (
-    <Grid padded centered>
+    <Grid centered padded>
       <Grid.Row>
-        <StatisticsTable type="All students of the population" filteredStudents={allStudents} />
+        <StatisticsTable filteredStudents={allStudents} type="All students of the population" />
       </Grid.Row>
       {admissionTypesAvailable && (
         <>

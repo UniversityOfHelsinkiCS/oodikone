@@ -128,8 +128,8 @@ export const CourseStatistics = () => {
     return (
       <div className="segmentContainer">
         <Message
-          error
           color="red"
+          error
           header="You have no rights to access any data. If you should have access please contact grp-toska@helsinki.fi"
         />
       </div>
@@ -144,10 +144,10 @@ export const CourseStatistics = () => {
 
     return (
       <Tab
-        menu={{ attached: false, borderless: false }}
-        panes={panes}
         activeIndex={activeIndex}
+        menu={{ attached: false, borderless: false }}
         onTabChange={handleTabChange}
+        panes={panes}
       />
     )
   }

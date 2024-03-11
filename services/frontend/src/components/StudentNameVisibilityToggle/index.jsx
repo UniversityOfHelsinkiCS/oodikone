@@ -24,7 +24,7 @@ export const StudentNameVisibilityToggle = ({ style = {} }) => {
 
   return (
     <div style={{ marginTop: 15, marginBottom: 10, ...style }}>
-      <Radio data-cy="toggleStudentNames" toggle label="Show student names" checked={visible} onChange={handleChange} />
+      <Radio checked={visible} data-cy="toggleStudentNames" label="Show student names" onChange={handleChange} toggle />
     </div>
   )
 }

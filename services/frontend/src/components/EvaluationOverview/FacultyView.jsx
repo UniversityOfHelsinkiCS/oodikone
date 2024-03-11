@@ -113,14 +113,14 @@ export const FacultyView = ({ faculty }) => {
                 <div className="toggle-container">
                   <Toggle
                     cypress="GraduatedToggle"
-                    toolTips={facultyToolTips.GraduatedToggle}
                     firstLabel="Graduated included"
                     secondLabel="Graduated excluded"
-                    value={graduatedGroup}
                     setValue={setGraduatedGroup}
+                    toolTips={facultyToolTips.GraduatedToggle}
+                    value={graduatedGroup}
                   />
                 </div>
-                <FacultyProgress faculty={faculty} progressStats={progressStats} getDivider={getDivider} />
+                <FacultyProgress faculty={faculty} getDivider={getDivider} progressStats={progressStats} />
               </>
             )}
             {graduationStats.isSuccess && graduationStats.data && (
@@ -135,8 +135,8 @@ export const FacultyView = ({ faculty }) => {
                     cypress="GraduationTimeToggle"
                     firstLabel="Breakdown"
                     secondLabel="Median times"
-                    value={showMedian}
                     setValue={setShowMedian}
+                    value={showMedian}
                   />
                 </div>
                 <FacultyGraduations

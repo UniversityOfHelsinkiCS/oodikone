@@ -79,10 +79,10 @@ const SummaryTab = ({ setValue, onClickCourse }) => {
             <>
               <Header as="h4">Filter statistics by study programmes</Header>
               <ProgrammeDropdown
-                options={options}
                 label="Study programmes:"
                 name={fields.programmes}
                 onChange={handleChange}
+                options={options}
                 value={form[fields.programmes]}
               />
             </>
@@ -93,7 +93,7 @@ const SummaryTab = ({ setValue, onClickCourse }) => {
               {queryInfo.timeframe.map(objBeforeUbObjectifying => {
                 const obj = unObjectifyProperty({ obj: objBeforeUbObjectifying, property: 'name' })
                 const { code, name } = obj
-                return <Label key={code} content={name} />
+                return <Label content={name} key={code} />
               })}
             </Label.Group>
           </Form.Field>
@@ -104,8 +104,8 @@ const SummaryTab = ({ setValue, onClickCourse }) => {
       </div>
       <AttemptsTable
         categoryName="Course"
-        onClickCourse={onClickCourse}
         data={data}
+        onClickCourse={onClickCourse}
         userHasAccessToAllStats={userHasAccessToAllStats}
       />
       {!userHasAccessToAllStats && (

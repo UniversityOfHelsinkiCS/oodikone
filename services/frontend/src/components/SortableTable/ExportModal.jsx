@@ -87,11 +87,11 @@ export const ExportModal = ({ open, onOpen, onClose, data, columns, featureName 
   }
 
   return (
-    <Modal onOpen={onOpen} onClose={onClose} open={open}>
+    <Modal onClose={onClose} onOpen={onOpen} open={open}>
       <Modal.Header>Export to Excel</Modal.Header>
       <Modal.Actions>
         <Button content="Cancel" onClick={() => onClose()} />
-        <Button primary content="Export" onClick={() => handleExport()} />
+        <Button content="Export" onClick={() => handleExport()} primary />
       </Modal.Actions>
       <Modal.Content>
         <p>
@@ -101,12 +101,12 @@ export const ExportModal = ({ open, onOpen, onClose, data, columns, featureName 
 
         <div>
           <Button
-            onClick={() => setSelected(exportColumns.map(c => c.key))}
             disabled={selected.length === exportColumns.length}
+            onClick={() => setSelected(exportColumns.map(c => c.key))}
           >
             Include all
           </Button>
-          <Button onClick={() => setSelected([])} disabled={selected.length === 0}>
+          <Button disabled={selected.length === 0} onClick={() => setSelected([])}>
             Exclude all
           </Button>
         </div>

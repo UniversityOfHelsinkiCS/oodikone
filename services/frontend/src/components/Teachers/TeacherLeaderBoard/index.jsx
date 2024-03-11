@@ -64,13 +64,13 @@ export const TeacherLeaderBoard = () => {
         Teachers who have produced the most credits from all departments.
       </Message>
       <LeaderForm
-        yearoptions={yearOptions}
         categoryoptions={categoryOptions}
-        handleYearChange={handleYearChange}
         handleCategoryChange={handleCategoryChange}
+        handleYearChange={handleYearChange}
         initLeaderboard={initLeaderboard}
         selectedcategory={selectedCategory}
         selectedyear={selectedYear}
+        yearoptions={yearOptions}
       />
       <Segment>
         {topTeachers.length > 0 && <Message>{`Last updated: ${lastUpdated}`}</Message>}

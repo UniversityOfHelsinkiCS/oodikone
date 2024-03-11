@@ -11,7 +11,7 @@ export const FilterToggle = ({ active, applyFilter, clearFilter, popupContent })
   }
 
   const Toggle = () => (
-    <Button onClick={toggleFilter} size="mini" icon basic={!active} primary={active}>
+    <Button basic={!active} icon onClick={toggleFilter} primary={active} size="mini">
       <Icon name="filter" />
     </Button>
   )

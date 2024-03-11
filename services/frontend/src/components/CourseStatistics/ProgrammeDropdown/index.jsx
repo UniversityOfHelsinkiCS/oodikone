@@ -8,19 +8,19 @@ import { DropdownItem } from './DropdownItem'
 
 export const ProgrammeDropdown = ({ options, label, name, onChange, onClear, value, ...props }) => (
   <Form.Dropdown
+    fluid
+    label={label}
+    multiple
+    name={name}
+    onChange={onChange}
     options={orderBy(options, ['size'], ['desc']).map(({ key, size, value: v, text, description }) => ({
       key,
-      content: <DropdownItem name={text} code={key} size={size} description={description} />,
+      content: <DropdownItem code={key} description={description} name={text} size={size} />,
       text: !onClear ? text : <ClearableItem name={text} onClear={onClear} />,
       value: v,
     }))}
-    selection
-    multiple
-    fluid
-    label={label}
-    name={name}
-    onChange={onChange}
     search
+    selection
     value={value}
     {...props}
     selectOnBlur={false}

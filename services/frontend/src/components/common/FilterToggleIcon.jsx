@@ -6,8 +6,8 @@ import './filterToggleIcon.css'
 
 export const FilterToggleIcon = ({ onClick, isActive }) => (
   <span className={`flexIcon ${isActive ? 'active' : ''}`} style={{ cursor: 'pointer' }}>
-    <Icon onClick={onClick} name="filter" />
-    <Icon onClick={onClick} name={isActive ? 'remove' : 'add'} size="tiny" />
+    <Icon name="filter" onClick={onClick} />
+    <Icon name={isActive ? 'remove' : 'add'} onClick={onClick} size="tiny" />
   </span>
 )
 

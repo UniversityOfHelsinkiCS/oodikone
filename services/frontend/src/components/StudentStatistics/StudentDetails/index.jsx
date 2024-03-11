@@ -181,22 +181,22 @@ const StudentDetails = ({
     <Segment className="contentSegment">
       <StudentInfoCard student={student} />
       <StudentGraphs
-        student={student}
         absences={getAbsentYears()}
         graphYearStart={graphYearStart}
         semesters={semesters}
+        student={student}
         studyRightId={studyrightid}
       />
       <TagsTable student={student} />
       <StudyrightsTable
         Programmes={Programmes}
-        student={student}
         handleStartDateChange={handleStartDateChange}
         showPopulationStatistics={showPopulationStatistics}
+        student={student}
         studyrightid={studyrightid}
       />
-      {honoursCode && <BachelorHonours student={student} absentYears={getAbsentYears()} programmeCode={honoursCode} />}
-      <CourseParticipationTable student={student} clearCourseStats={clearCourseStats} studyrightid={studyrightid} />
+      {honoursCode && <BachelorHonours absentYears={getAbsentYears()} programmeCode={honoursCode} student={student} />}
+      <CourseParticipationTable clearCourseStats={clearCourseStats} student={student} studyrightid={studyrightid} />
     </Segment>
   )
 }

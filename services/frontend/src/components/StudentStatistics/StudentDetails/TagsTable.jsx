@@ -22,7 +22,6 @@ export const TagsTable = ({ student }) => {
     <>
       <Header content="Tags" />
       <SortableTable
-        data={data}
         columns={[
           {
             key: 'PROGRAMME',
@@ -40,10 +39,11 @@ export const TagsTable = ({ student }) => {
             getRowVal: t => sortBy(t.tags.map(tt => tt.tag.tagname)).join(':'),
             getRowContent: t =>
               sortBy(t.tags, t => t.tag.tagname).map(t => (
-                <Label key={t.tag.tag_id} content={t.tag.tagname} color={t.tag.personal_user_id ? 'purple' : null} />
+                <Label color={t.tag.personal_user_id ? 'purple' : null} content={t.tag.tagname} key={t.tag.tag_id} />
               )),
           },
         ]}
+        data={data}
       />
     </>
   )

@@ -48,13 +48,13 @@ export const FacultyStatistics = () => {
         menuItem: 'Basic information',
         render: () => (
           <BasicOverview
-            faculty={faculty}
             academicYear={academicYear}
+            faculty={faculty}
             setAcademicYear={setAcademicYear}
-            studyProgrammes={studyProgrammes}
+            setSpecialGroups={setSpecialGroups}
             setStudyProgrammes={setStudyProgrammes}
             specialGroups={specialGroups}
-            setSpecialGroups={setSpecialGroups}
+            studyProgrammes={studyProgrammes}
           />
         ),
       },
@@ -64,10 +64,10 @@ export const FacultyStatistics = () => {
           <FacultyProgrammeOverview
             faculty={faculty}
             graduatedGroup={graduatedGroup}
-            setGraduatedGroup={setGraduatedGroup}
-            specialGroups={specialGroups}
-            setSpecialGroups={setSpecialGroups}
             requiredRights={requiredRights}
+            setGraduatedGroup={setGraduatedGroup}
+            setSpecialGroups={setSpecialGroups}
+            specialGroups={specialGroups}
           />
         ),
       },
@@ -76,8 +76,8 @@ export const FacultyStatistics = () => {
         render: () => (
           <TimesAndPathsView
             faculty={faculty}
-            studyProgrammes={studyProgrammes}
             setStudyProgrammes={setStudyProgrammes}
+            studyProgrammes={studyProgrammes}
           />
         ),
       },
@@ -102,7 +102,7 @@ export const FacultyStatistics = () => {
           Faculty statistics
         </Header>
         <Segment className="contentSegment">
-          <FacultySelector faculties={faculties} selected={facultyCode !== undefined} handleSelect={handleSelect} />
+          <FacultySelector faculties={faculties} handleSelect={handleSelect} selected={facultyCode !== undefined} />
         </Segment>
       </div>
     )
@@ -114,7 +114,7 @@ export const FacultyStatistics = () => {
           <Header textAlign="center">{facultyName}</Header>
           <span>{facultyCode}</span>
         </div>
-        <Tab panes={panes} activeIndex={tab} onTabChange={setTab} />
+        <Tab activeIndex={tab} onTabChange={setTab} panes={panes} />
       </Segment>
     </div>
   )

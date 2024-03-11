@@ -8,14 +8,14 @@ const DateColumnFilterComponent = ({ options, dispatch }) => {
   return (
     <div className="sortable-table-date-picker" style={{ padding: '0.5em 0.75em' }}>
       <DateRangeSelector
-        showSemesters
-        value={options?.range}
         onChange={range =>
           dispatch({
             type: 'SET_RANGE',
             payload: { range },
           })
         }
+        showSemesters
+        value={options?.range}
       />
     </div>
   )

@@ -17,12 +17,12 @@ export const ExternalCreditFilterToggle = ({ min, max }) => {
 
   return (
     <FilterToggle
-      filter={creditFilter}
       active={active}
       applyFilter={() => filterDispatch(creditFilter.actions.setOptions({ min, max: limitedMax }))}
       clearFilter={() => filterDispatch(creditFilter.actions.clear())}
-      popupContent={`Rajaa opiskelijat ensimmäisen ${months} kuukauden aikana saatujen opintopisteiden perusteella`}
+      filter={creditFilter}
       filterName="Credit Filter"
+      popupContent={`Rajaa opiskelijat ensimmäisen ${months} kuukauden aikana saatujen opintopisteiden perusteella`}
     />
   )
 }

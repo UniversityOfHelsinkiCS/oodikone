@@ -37,7 +37,7 @@ const PopulationSearch = ({ populationFound, loading, combinedProgrammeCode }) =
         <Form>
           <Form.Field>
             <Link to="/populations">
-              <Button icon labelPosition="left" color="blue">
+              <Button color="blue" icon labelPosition="left">
                 <Icon name="left arrow" />
                 Search new class
               </Button>
@@ -45,27 +45,27 @@ const PopulationSearch = ({ populationFound, loading, combinedProgrammeCode }) =
           </Form.Field>
           <Form.Field>
             <Form.Radio
-              toggle
               checked={onlyHopsCredit && (bothHopsSelected || !combinedHopsSelected)}
-              onClick={() => {
-                filterDispatch(hopsFilter.actions.toggle())
-              }}
               label={
                 combinedProgrammeCode
                   ? 'Show only credits included in bachelor study plan'
                   : 'Show only credits included in study plan'
               }
+              onClick={() => {
+                filterDispatch(hopsFilter.actions.toggle())
+              }}
+              toggle
             />
           </Form.Field>
           {combinedProgrammeCode && (
             <Form.Field>
               <Form.Radio
-                toggle
                 checked={combinedHopsSelected}
+                label="Show only credits included in licentiate study plan"
                 onClick={() => {
                   filterDispatch(hopsFilter.actions.toggleCombinedProgramme(combinedProgrammeCode))
                 }}
-                label="Show only credits included in licentiate study plan"
+                toggle
               />
             </Form.Field>
           )}

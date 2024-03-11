@@ -85,14 +85,14 @@ export const CustomPopulation = () => {
   }, [courseStats, allSemesters, associatedProgramme, language])
 
   return (
-    <FilterView name="CustomPopulation" filters={filters} students={custompop} displayTray={custompop.length > 0}>
+    <FilterView displayTray={custompop.length > 0} filters={filters} name="CustomPopulation" students={custompop}>
       {filteredStudents => (
         <CustomPopulationContent
-          filteredStudents={filteredStudents}
-          studentData={studentData}
           customPopulationState={customPopulationState}
-          setCustomPopulationState={setCustomPopulationState}
+          filteredStudents={filteredStudents}
           isFetchingPopulation={isFetching}
+          setCustomPopulationState={setCustomPopulationState}
+          studentData={studentData}
         />
       )}
     </FilterView>
@@ -131,14 +131,14 @@ const CustomPopulationContent = ({
   const panels = [
     {
       title: `Credit accumulation (for ${filteredStudents.length} students)`,
-      content: <CreditAccumulationGraphHighCharts students={filteredStudents} customPopulation />,
+      content: <CreditAccumulationGraphHighCharts customPopulation students={filteredStudents} />,
     },
     {
       title: 'Programme distribution',
       content: (
         <div>
           <InfoBox content={populationStatisticsToolTips.ProgrammeDistributionCoursePopulation} />
-          <CustomPopulationProgrammeDist students={filteredStudents} studentData={studentData} />
+          <CustomPopulationProgrammeDist studentData={studentData} students={filteredStudents} />
         </div>
       ),
     },
@@ -151,15 +151,15 @@ const CustomPopulationContent = ({
             <Form.Field inline>
               <label>Limit to courses where student number is at least</label>
               <Input
-                value={studentAmountLimit}
                 onChange={e => onStudentAmountLimitChange(e.target.value)}
                 style={{ width: '70px' }}
+                value={studentAmountLimit}
               />
             </Form.Field>
           </Form>
           <PopulationCourseStatsFlat
-            filteredStudents={filteredStudents}
             courses={courseStats}
+            filteredStudents={filteredStudents}
             studentAmountLimit={studentAmountLimit}
           />
         </>
@@ -169,10 +169,10 @@ const CustomPopulationContent = ({
       title: `Students (${filteredStudents.length})`,
       content: (
         <PopulationStudents
-          variant="customPopulation"
-          filteredStudents={filteredStudents}
-          dataExport={<UnihowDataExport students={filteredStudents} />}
           customPopulationProgramme={associatedProgramme || ''}
+          dataExport={<UnihowDataExport students={filteredStudents} />}
+          filteredStudents={filteredStudents}
+          variant="customPopulation"
         />
       ),
     },
@@ -206,10 +206,10 @@ const CustomPopulationContent = ({
                 {customPopulationState.selectedSearch && ` "${customPopulationState.selectedSearch.name}"`}
                 {associatedProgramme && (
                   <Label
-                    style={{ marginLeft: '2em' }}
-                    tag
                     color="blue"
                     content={studyProgrammes.find(p => p.key === associatedProgramme).text}
+                    style={{ marginLeft: '2em' }}
+                    tag
                   />
                 )}
               </Header>

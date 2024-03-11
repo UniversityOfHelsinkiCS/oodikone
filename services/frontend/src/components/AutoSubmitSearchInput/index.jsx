@@ -58,13 +58,13 @@ const AutoSubmitSearchInput = ({
   }
   return (
     <Input
+      disabled={disabled}
       fluid
       icon={icon}
-      value={value}
+      loading={loading}
       onChange={handleSearchChange}
       placeholder={placeholder}
-      loading={loading}
-      disabled={disabled}
+      value={value}
       {...rest}
     />
   )

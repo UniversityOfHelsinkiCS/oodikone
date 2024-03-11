@@ -124,8 +124,8 @@ const PopulationCourseStats = ({ filteredStudents, mandatoryCourses, courses, pe
         <Tab.Pane className="menuTab">
           <PassFailEnrollments
             expandedGroups={expandedGroups}
-            toggleGroupExpansion={toggleGroupExpansion}
             onlyIamRights={onlyIamRights}
+            toggleGroupExpansion={toggleGroupExpansion}
           />
         </Tab.Pane>
       ),
@@ -164,7 +164,7 @@ const PopulationCourseStats = ({ filteredStudents, mandatoryCourses, courses, pe
   return (
     <div>
       <PopulationCourseContext.Provider value={contextValue}>
-        <Tab panes={panes} onTabChange={handleTabChange} />
+        <Tab onTabChange={handleTabChange} panes={panes} />
       </PopulationCourseContext.Provider>
     </div>
   )

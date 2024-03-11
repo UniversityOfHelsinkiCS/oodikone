@@ -10,7 +10,6 @@ export const MulticolorBarChart = props => {
   if (chartData.length > 0) {
     return (
       <ReactHighchart
-        neverReflow
         config={{
           title: {
             text: chartTitle,
@@ -28,6 +27,7 @@ export const MulticolorBarChart = props => {
           },
           series: chartData,
         }}
+        neverReflow
       />
     )
   }

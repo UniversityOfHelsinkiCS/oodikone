@@ -43,68 +43,68 @@ const routes = {
 export const Routes = () => (
   <Suspense fallback={<SegmentDimmer isLoading />}>
     <Switch>
-      <Route exact path="/" component={FrontPage} />
-      <Route exact path={routes.feedback} component={Feedback} />
-      <ProtectedRoute requireUserHasRights exact path="/populations" component={PopulationStatistics} />
+      <Route component={FrontPage} exact path="/" />
+      <Route component={Feedback} exact path={routes.feedback} />
+      <ProtectedRoute component={PopulationStatistics} exact path="/populations" requireUserHasRights />
       <ProtectedRoute
-        requiredRoles={['admin', 'facultyStatistics']}
+        component={FacultyStatistics}
         exact
         path={routes.faculties}
-        component={FacultyStatistics}
+        requiredRoles={['admin', 'facultyStatistics']}
       />
       <ProtectedRoute
-        requireUserHasRights
+        component={StudyProgramme}
         exact
         path="/study-programme/:studyProgrammeId?"
-        component={StudyProgramme}
+        requireUserHasRights
       />
       <ProtectedRoute
-        requiredRoles={['admin', 'studyGuidanceGroups']}
-        requireUserHasRights
+        component={StudentStatistics}
         exact
         path={routes.students}
-        component={StudentStatistics}
+        requireUserHasRights
+        requiredRoles={['admin', 'studyGuidanceGroups']}
       />
       <ProtectedRoute
-        requiredRoles={['courseStatistics']}
-        requireUserHasRights
+        component={CourseStatistics}
         exact
         path={routes.courseStatistics}
-        component={CourseStatistics}
-      />
-      <ProtectedRoute requiredRoles={['admin']} exact path={routes.users} component={Users} />
-      <ProtectedRoute requiredRoles={['teachers']} exact path={routes.teachers} component={Teachers} />
-      <ProtectedRoute requireUserHasRights exact path={routes.coursepopulation} component={CoursePopulation} />
-      <ProtectedRoute
-        requiredRoles={['admin', 'studyGuidanceGroups']}
         requireUserHasRights
+        requiredRoles={['courseStatistics']}
+      />
+      <ProtectedRoute component={Users} exact path={routes.users} requiredRoles={['admin']} />
+      <ProtectedRoute component={Teachers} exact path={routes.teachers} requiredRoles={['teachers']} />
+      <ProtectedRoute component={CoursePopulation} exact path={routes.coursepopulation} requireUserHasRights />
+      <ProtectedRoute
+        component={CustomPopulation}
         exact
         path={routes.custompopulation}
-        component={CustomPopulation}
+        requireUserHasRights
+        requiredRoles={['admin', 'studyGuidanceGroups']}
       />
       <ProtectedRoute
-        requiredRoles={['admin', 'openUniSearch']}
+        component={CustomOpenUniPopulation}
         exact
         path={routes.customOpenUniPopulation}
-        component={CustomOpenUniPopulation}
+        requiredRoles={['admin', 'openUniSearch']}
       />
-      <ProtectedRoute exact path={routes.completedCoursesSearch} component={CompletedCourses} />
-      <ProtectedRoute requiredRoles={['admin']} requireUserHasRights exact path={routes.updater} component={Updater} />
+      <ProtectedRoute component={CompletedCourses} exact path={routes.completedCoursesSearch} />
+      <ProtectedRoute component={Updater} exact path={routes.updater} requireUserHasRights requiredRoles={['admin']} />
       <ProtectedRoute
-        requiredRoles={['studyGuidanceGroups']}
+        component={StudyGuidanceGroups}
         exact
         path={routes.studyGuidanceGroups}
-        component={StudyGuidanceGroups}
+        requiredRoles={['studyGuidanceGroups']}
       />
       <ProtectedRoute
-        requiredRoles={['admin']}
-        requireUserHasRights
+        component={LanguageCenterView}
         exact
         path={routes.languageCenterView}
-        component={LanguageCenterView}
+        requireUserHasRights
+        requiredRoles={['admin']}
       />
-      <ProtectedRoute requireUserHasRights exact path={routes.evaluationOverview} component={EvaluationOverview} />
-      <ProtectedRoute requireUserHasRights exact path={routes.university} component={UniversityViewPage} />
+      <ProtectedRoute component={EvaluationOverview} exact path={routes.evaluationOverview} requireUserHasRights />
+      <ProtectedRoute component={UniversityViewPage} exact path={routes.university} requireUserHasRights />
       <Redirect to="/" />
     </Switch>
   </Suspense>

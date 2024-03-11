@@ -8,14 +8,14 @@ import { TeacherStatisticsTable } from '@/components/Teachers/TeacherStatisticsT
 const CourseTabDropdown = ({ options, doSelect, selected }) => (
   <Form>
     <Form.Dropdown
+      onChange={(_, { value }) => doSelect(value)}
       options={options}
       placeholder="Select..."
-      selection
       search
-      value={selected}
-      onChange={(_, { value }) => doSelect(value)}
       selectOnBlur={false}
       selectOnNavigation={false}
+      selection
+      value={selected}
     />
   </Form>
 )
@@ -106,8 +106,8 @@ export const CoursesTab = ({ courses, semesters }) => {
           menuItem: 'Semester',
           render: () => (
             <>
-              <CourseTabDropdown options={semesterOptions} doSelect={setSemester} selected={selectedSemester} />
-              <TeacherStatisticsTable variant="course" statistics={getSemesterStats(selectedSemester)} />
+              <CourseTabDropdown doSelect={setSemester} options={semesterOptions} selected={selectedSemester} />
+              <TeacherStatisticsTable statistics={getSemesterStats(selectedSemester)} variant="course" />
             </>
           ),
         },
@@ -115,8 +115,8 @@ export const CoursesTab = ({ courses, semesters }) => {
           menuItem: 'Course',
           render: () => (
             <>
-              <CourseTabDropdown options={courseOptions} doSelect={setCourse} selected={selectedCourse} />
-              <TeacherStatisticsTable variant="semester" statistics={getCourseStats(selectedCourse)} />
+              <CourseTabDropdown doSelect={setCourse} options={courseOptions} selected={selectedCourse} />
+              <TeacherStatisticsTable statistics={getCourseStats(selectedCourse)} variant="semester" />
             </>
           ),
         },

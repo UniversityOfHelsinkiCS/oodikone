@@ -68,13 +68,13 @@ export const StudyProgramme = () => {
       menuItem: 'Basic information',
       render: () => (
         <BasicOverview
-          studyprogramme={programmeId}
-          history={history}
-          specialGroups={specialGroups}
-          setSpecialGroups={setSpecialGroups}
           academicYear={academicYear}
-          setAcademicYear={setAcademicYear}
           combinedProgramme={secondProgrammeId}
+          history={history}
+          setAcademicYear={setAcademicYear}
+          setSpecialGroups={setSpecialGroups}
+          specialGroups={specialGroups}
+          studyprogramme={programmeId}
         />
       ),
     })
@@ -82,13 +82,13 @@ export const StudyProgramme = () => {
       menuItem: 'Studytracks and class statistics',
       render: () => (
         <StudytrackOverview
-          studyprogramme={programmeId}
-          history={history}
-          specialGroups={specialGroups}
-          setSpecialGroups={setSpecialGroups}
-          graduated={graduated}
-          setGraduated={setGraduated}
           combinedProgramme={secondProgrammeId}
+          graduated={graduated}
+          history={history}
+          setGraduated={setGraduated}
+          setSpecialGroups={setSpecialGroups}
+          specialGroups={specialGroups}
+          studyprogramme={programmeId}
         />
       ),
     })
@@ -103,9 +103,9 @@ export const StudyProgramme = () => {
         render: () => (
           <ProgrammeCourses
             academicYear={academicYear}
-            studyProgramme={programmeId}
-            setAcademicYear={setAcademicYear}
             combinedProgramme={secondProgrammeId}
+            setAcademicYear={setAcademicYear}
+            studyProgramme={programmeId}
           />
         ),
       })
@@ -113,22 +113,22 @@ export const StudyProgramme = () => {
         menuItem: 'Degree courses',
         render: () => (
           <DegreeCoursesTable
-            studyProgramme={programmeId}
             combinedProgramme={secondProgrammeId}
             criteria={criteria}
             setCriteria={setCriteria}
+            studyProgramme={programmeId}
           />
         ),
       })
       panes.push({
         menuItem: 'Tags',
-        render: () => <Tags studyprogramme={programmeId} combinedProgramme={secondProgrammeId} />,
+        render: () => <Tags combinedProgramme={secondProgrammeId} studyprogramme={programmeId} />,
       })
     }
     if (isAdmin) {
       panes.push({
         menuItem: 'Update statistics',
-        render: () => <UpdateView studyprogramme={programmeId} combinedProgramme={secondProgrammeId} />,
+        render: () => <UpdateView combinedProgramme={secondProgrammeId} studyprogramme={programmeId} />,
       })
     }
     return panes
@@ -172,7 +172,7 @@ export const StudyProgramme = () => {
             </span>
           )}
         </div>
-        <Tab panes={panes} activeIndex={tab} onTabChange={setTab} />
+        <Tab activeIndex={tab} onTabChange={setTab} panes={panes} />
       </Segment>
     </div>
   )

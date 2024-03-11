@@ -326,14 +326,19 @@ const PopulationSearchForm = ({
     const { year } = query
     const currentYear = moment().year()
     return (
-      <Form.Group key="year" className="enrollmentSelectorGroup">
-        <Form.Field error={!validYearCheck(momentYear)} className="yearSelect">
+      <Form.Group className="enrollmentSelectorGroup" key="year">
+        <Form.Field className="yearSelect" error={!validYearCheck(momentYear)}>
           <label>Class of</label>
           <Datetime
             className="yearSelectInput"
+            closeOnSelect
             control={Datetime}
             dateFormat={YEAR_DATE_FORMAT}
-            timeFormat={false}
+            isValidDate={validYearCheck}
+            onChange={handleYearSelection}
+            renderInput={dateInputProps => (
+              <input {...dateInputProps} value={`${year}-${moment().year(year).add(1, 'years').format('YYYY')}`} />
+            )}
             renderYear={(p, selectableYear) =>
               selectableYear <= currentYear && selectableYear >= 1900 ? (
                 <td {...p}>
@@ -342,30 +347,25 @@ const PopulationSearchForm = ({
                 </td>
               ) : null
             }
-            closeOnSelect
-            renderInput={dateInputProps => (
-              <input {...dateInputProps} value={`${year}-${moment().year(year).add(1, 'years').format('YYYY')}`} />
-            )}
-            isValidDate={validYearCheck}
-            onChange={handleYearSelection}
+            timeFormat={false}
           />
         </Form.Field>
 
         <Form.Field className="yearControl">
-          <Button.Group basic vertical className="yearControlButtonGroup">
-            <Button type="button" icon="plus" className="yearControlButton" onClick={addYear} tabIndex="-1" />
-            <Button type="button" icon="minus" className="yearControlButton" onClick={subtractYear} tabIndex="-1" />
+          <Button.Group basic className="yearControlButtonGroup" vertical>
+            <Button className="yearControlButton" icon="plus" onClick={addYear} tabIndex="-1" type="button" />
+            <Button className="yearControlButton" icon="minus" onClick={subtractYear} tabIndex="-1" type="button" />
           </Button.Group>
         </Form.Field>
         <Form.Field>
           <div>
             {isAdmin && (
               <Radio
-                data-cy="toggleFilterProgrammes"
-                toggle
-                label="Filter out old and specialized programmes"
                 checked={filterProgrammes}
+                data-cy="toggleFilterProgrammes"
+                label="Filter out old and specialized programmes"
                 onChange={() => setFilterProgrammes(!filterProgrammes)}
+                toggle
               />
             )}
           </div>
@@ -378,19 +378,19 @@ const PopulationSearchForm = ({
     <Form.Field>
       <label>Study programme</label>
       <Form.Dropdown
+        clearable
+        closeOnChange
+        data-cy="select-study-programme"
+        fluid
+        noResultsMessage="No selectable study programmes"
+        onChange={handleProgrammeChange}
+        options={programmesToRender}
         placeholder="Select study programme"
         search={textAndDescriptionSearch}
-        selection
-        noResultsMessage="No selectable study programmes"
-        value={studyRights.programme}
-        options={programmesToRender}
-        onChange={handleProgrammeChange}
-        closeOnChange
-        clearable
-        fluid
         selectOnBlur={false}
         selectOnNavigation={false}
-        data-cy="select-study-programme"
+        selection
+        value={studyRights.programme}
       />
     </Form.Field>
   )
@@ -398,13 +398,13 @@ const PopulationSearchForm = ({
   const renderStudyGroupSelector = () => {
     const { studyRights } = query
     if (pending || !didMount) {
-      return <Icon name="spinner" loading size="big" color="black" style={{ marginLeft: '45%' }} />
+      return <Icon color="black" loading name="spinner" size="big" style={{ marginLeft: '45%' }} />
     }
     if (Object.values(studyProgrammes).length === 0 && !pending) {
       return (
         <Message
-          error
           color="red"
+          error
           header="You have no rights to access any data. If you should have access please contact grp-toska@helsinki.fi"
         />
       )
@@ -459,17 +459,17 @@ const PopulationSearchForm = ({
             </Grid.Column>
           </Grid.Row>
         </Grid>
-        <Message error color="blue" header={errorText} />
-        <Form.Button color="blue" onClick={handleSubmit} disabled={isQueryInvalid || query.months < 0}>
+        <Message color="blue" error header={errorText} />
+        <Form.Button color="blue" disabled={isQueryInvalid || query.months < 0} onClick={handleSubmit}>
           See class
         </Form.Button>
         <SearchHistory
+          handleSearch={pushQueryToUrl}
           items={searchHistory.map(item => {
             item.date = new Date(item.date)
             return item
           })}
           updateItem={updateItemInSearchHistory}
-          handleSearch={pushQueryToUrl}
         />
       </Form>
     </div>

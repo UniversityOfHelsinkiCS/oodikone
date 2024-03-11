@@ -53,27 +53,27 @@ const TagPopulation = ({
 
   const addConfirm = (
     <Confirm
-      open={confirmAdd && !!selectedTag}
-      onCancel={() => setConfirmAdd(false)}
-      onConfirm={() => handleAdd()}
+      cancelButton="Cancel"
+      confirmButton="Confirm"
       content={`Are you sure you want to add tag "${selectedTag ? selectedTag.tagname : null}" to ${
         selectedStudents.length
       } students?`}
-      cancelButton="Cancel"
-      confirmButton="Confirm"
+      onCancel={() => setConfirmAdd(false)}
+      onConfirm={() => handleAdd()}
+      open={confirmAdd && !!selectedTag}
     />
   )
 
   const deleteConfirm = (
     <Confirm
-      open={confirmDelete && !!selectedTag}
-      onCancel={() => setConfirmDelete(false)}
-      onConfirm={() => handleDelete()}
+      cancelButton="Cancel"
+      confirmButton="Confirm"
       content={`Are you sure you want to delete tag "${selectedTag ? selectedTag.tagname : null}" from ${
         selectedStudents.length
       } students?`}
-      cancelButton="Cancel"
-      confirmButton="Confirm"
+      onCancel={() => setConfirmDelete(false)}
+      onConfirm={() => handleDelete()}
+      open={confirmDelete && !!selectedTag}
     />
   )
 
@@ -81,20 +81,20 @@ const TagPopulation = ({
     <List horizontal>
       <List.Item>
         <Dropdown
+          onChange={handleChange}
+          options={options}
           placeholder="Tag"
           search
-          selection
-          options={options}
-          onChange={handleChange}
-          value={selectedValue}
           selectOnBlur={false}
           selectOnNavigation={false}
+          selection
+          value={selectedValue}
         />
       </List.Item>
-      <Button onClick={() => setConfirmAdd(true)} disabled={selectedValue === ''}>
+      <Button disabled={selectedValue === ''} onClick={() => setConfirmAdd(true)}>
         add tag to {selectedStudents.length} students
       </Button>
-      <Button onClick={() => setConfirmDelete(true)} disabled={selectedValue === ''}>
+      <Button disabled={selectedValue === ''} onClick={() => setConfirmDelete(true)}>
         delete tag from {selectedStudents.length} students
       </Button>
       {deleteConfirm}

@@ -40,12 +40,12 @@ const MedianDisplay = ({
       )}
       <div className="graduations-chart-container">
         <MedianBarChart
+          classSizes={classSizes?.[level]}
           data={data}
           goal={goal}
           handleClick={handleClick}
           label={label}
           programmeNames={programmeNames}
-          classSizes={classSizes?.[level]}
           universityMode={universityMode}
         />
         {!programmeData ? (
@@ -56,17 +56,17 @@ const MedianDisplay = ({
           </div>
         ) : (
           <MedianBarChart
-            data={levelProgrammeData[year]?.data}
-            goal={goal}
-            facultyGraph={false}
-            handleClick={handleClick}
-            year={year}
-            label={label}
-            programmeNames={programmeNames}
             classSizes={classSizes?.programmes}
-            level={level}
+            data={levelProgrammeData[year]?.data}
+            facultyGraph={false}
+            goal={goal}
             goalExceptions={goalExceptions}
+            handleClick={handleClick}
+            label={label}
+            level={level}
+            programmeNames={programmeNames}
             universityMode={universityMode}
+            year={year}
           />
         )}
       </div>
@@ -97,12 +97,12 @@ const BreakdownDisplay = ({
         ) : (
           <BreakdownBarChart
             data={levelProgrammeData[year]?.data}
-            handleClick={handleClick}
             facultyGraph={false}
-            year={year}
+            handleClick={handleClick}
             label={label}
             programmeNames={programmeNames}
             universityMode={universityMode}
+            year={year}
           />
         )}
       </div>
@@ -143,31 +143,31 @@ export const GraduationTimes = ({
       <Divider horizontal>{title}</Divider>
       {!showMedian ? (
         <BreakdownDisplay
-          handleClick={handleClick}
           data={data}
-          level={level}
+          handleClick={handleClick}
           label={label}
+          level={level}
           levelProgrammeData={levelProgrammeData}
-          programmeNames={programmeNames}
-          year={year}
           programmeData={programmeData}
+          programmeNames={programmeNames}
           universityMode={universityMode}
+          year={year}
         />
       ) : (
         <MedianDisplay
-          handleClick={handleClick}
-          data={data}
-          level={level}
-          goal={goal}
-          label={label}
-          levelProgrammeData={levelProgrammeData}
-          programmeNames={programmeNames}
           classSizes={classSizes}
-          groupBy={groupBy}
+          data={data}
+          goal={goal}
           goalExceptions={goalExceptions}
-          year={year}
+          groupBy={groupBy}
+          handleClick={handleClick}
+          label={label}
+          level={level}
+          levelProgrammeData={levelProgrammeData}
           programmeData={programmeData}
+          programmeNames={programmeNames}
           universityMode={universityMode}
+          year={year}
         />
       )}
     </div>

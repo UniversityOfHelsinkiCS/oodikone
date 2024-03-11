@@ -121,24 +121,24 @@ export const UniversityView = ({ isEvaluationOverview }) => {
           <div className="toggle-container">
             <Toggle
               cypress="GraduatedToggle"
-              toolTips={facultyToolTips.GraduatedToggle}
               firstLabel="Graduated included"
               secondLabel="Graduated excluded"
-              value={graduatedGroup}
               setValue={setGraduatedGroup}
+              toolTips={facultyToolTips.GraduatedToggle}
+              value={graduatedGroup}
             />
             {!isEvaluationOverview && (
               <Toggle
                 cypress="StudentToggle"
-                toolTips={facultyToolTips.StudentToggle}
                 firstLabel="All studyrights"
                 secondLabel="Special studyrights excluded"
-                value={excludeSpecials}
                 setValue={() => setIncludeSpecials(!excludeSpecials)}
+                toolTips={facultyToolTips.StudentToggle}
+                value={excludeSpecials}
               />
             )}
           </div>
-          <FacultyProgress faculty="ALL" progressStats={progressStats} getDivider={getDivider} />
+          <FacultyProgress faculty="ALL" getDivider={getDivider} progressStats={progressStats} />
         </div>
         {getDivider('Average graduation times', 'AverageGraduationTimes', facultyToolTips.AverageGraduationTimes)}
         <div className="toggle-container">
@@ -146,8 +146,8 @@ export const UniversityView = ({ isEvaluationOverview }) => {
             cypress="GraduationTimeToggle"
             firstLabel="Breakdown"
             secondLabel="Median times"
-            value={medianMode}
             setValue={() => setMedianMode(!medianMode)}
+            value={medianMode}
           />
         </div>
         <FacultyGraduations

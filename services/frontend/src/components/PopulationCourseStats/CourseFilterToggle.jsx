@@ -14,13 +14,6 @@ export const CourseFilterToggle = ({ course }) => {
 
   return (
     <Popup
-      trigger={
-        <FilterToggleIcon
-          style={{ cursor: 'pointer' }}
-          isActive={isActive}
-          onClick={() => filterDispatch(toggleCourseSelection(course.code))}
-        />
-      }
       content={
         isActive ? (
           <span>
@@ -33,6 +26,13 @@ export const CourseFilterToggle = ({ course }) => {
         )
       }
       position="top right"
+      trigger={
+        <FilterToggleIcon
+          isActive={isActive}
+          onClick={() => filterDispatch(toggleCourseSelection(course.code))}
+          style={{ cursor: 'pointer' }}
+        />
+      }
     />
   )
 }

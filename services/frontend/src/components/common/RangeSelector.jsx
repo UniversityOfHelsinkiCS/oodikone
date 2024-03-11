@@ -48,11 +48,23 @@ export const RangeSelector = ({ min, max, value, onChange, disabled = false }) =
   return (
     <div>
       <Range
-        step={1}
-        min={isDisabled ? 0 : min}
         max={isDisabled ? 1 : max}
-        values={isDisabled ? [0, 1] : rangeValues}
+        min={isDisabled ? 0 : min}
         onChange={isDisabled ? _.noop : onChange}
+        renderThumb={({ props }) => (
+          <div
+            {...props}
+            style={{
+              ...props.style,
+              height: '13px',
+              width: '13px',
+              backgroundColor: '#f2f2f2',
+              border: isDisabled ? '#f2f2f2' : '3px solid rgb(33, 133, 208)',
+              borderRadius: '10px',
+            }}
+            tabIndex=""
+          />
+        )}
         renderTrack={({ props, children }) => (
           <div
             {...props}
@@ -61,7 +73,6 @@ export const RangeSelector = ({ min, max, value, onChange, disabled = false }) =
               props.onMouseDown(evt)
               return false
             }}
-            tabIndex=""
             style={{
               ...props.style,
               height: '3px',
@@ -75,47 +86,36 @@ export const RangeSelector = ({ min, max, value, onChange, disabled = false }) =
                 colors: isDisabled ? ['#f2f2f2', '#f2f2f2', '#f2f2f2'] : ['#f2f2f2', 'rgb(33, 133, 208)', '#f2f2f2'],
               }),
             }}
+            tabIndex=""
           >
             {children}
           </div>
         )}
-        renderThumb={({ props }) => (
-          <div
-            {...props}
-            tabIndex=""
-            style={{
-              ...props.style,
-              height: '13px',
-              width: '13px',
-              backgroundColor: '#f2f2f2',
-              border: isDisabled ? '#f2f2f2' : '3px solid rgb(33, 133, 208)',
-              borderRadius: '10px',
-            }}
-          />
-        )}
+        step={1}
+        values={isDisabled ? [0, 1] : rangeValues}
       />
 
       <div style={{ display: 'flex', alignItems: 'center', marginTop: '0.5em' }}>
         <Input
-          error={dirtyMin !== null}
-          value={dirtyMin ?? value[0]}
+          data-cy="range-selector-min"
           disabled={isDisabled}
-          style={{ flexShrink: 1, width: '5em' }}
+          error={dirtyMin !== null}
+          onBlur={() => setDirtyMin(null)}
           onChange={minOnChange}
           onFocus={e => e.stopPropagation()}
-          onBlur={() => setDirtyMin(null)}
-          data-cy="range-selector-min"
+          style={{ flexShrink: 1, width: '5em' }}
+          value={dirtyMin ?? value[0]}
         />
         <span style={{ margin: '0 0.5em' }}>&mdash;</span>
         <Input
-          error={dirtyMax !== null}
-          value={dirtyMax ?? value[1]}
-          style={{ flexShrink: 1, width: '5em' }}
+          data-cy="range-selector-max"
           disabled={isDisabled}
+          error={dirtyMax !== null}
+          onBlur={() => setDirtyMax(null)}
           onChange={maxOnChange}
           onFocus={e => e.stopPropagation()}
-          onBlur={() => setDirtyMax(null)}
-          data-cy="range-selector-max"
+          style={{ flexShrink: 1, width: '5em' }}
+          value={dirtyMax ?? value[1]}
         />
       </div>
     </div>

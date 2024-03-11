@@ -74,12 +74,12 @@ export const FrontPage = () => {
             <Header as="h1" style={{ textAlign: 'center' }}>
               Latest updates
             </Header>
-            <Button fluid style={{ margin: '30px 0' }} onClick={() => setShowFullChangelog(false)}>
+            <Button fluid onClick={() => setShowFullChangelog(false)} style={{ margin: '30px 0' }}>
               <Icon name="arrow left" />
               Back to front page
             </Button>
             <Changelog showFullChangelog />
-            <Button fluid style={{ margin: '30px 0' }} onClick={() => setShowFullChangelog(false)}>
+            <Button fluid onClick={() => setShowFullChangelog(false)} style={{ margin: '30px 0' }}>
               <Icon name="arrow left" />
               Back to front page
             </Button>
@@ -92,14 +92,14 @@ export const FrontPage = () => {
             <Header as="h3" style={{ textAlign: 'center' }}>
               Exploratory Research on Study Data
             </Header>
-            <Grid columns="two" style={{ marginTop: '40px' }} divided>
+            <Grid columns="two" divided style={{ marginTop: '40px' }}>
               <Grid.Row>
                 <Grid.Column>
                   {items.map(
                     (item, index) =>
                       item.show && (
                         <React.Fragment key={item.title}>
-                          <FrontPageItem title={item.title} content={item.content} />
+                          <FrontPageItem content={item.content} title={item.title} />
                           {index !== items.length - 1 ? <Divider section /> : null}
                         </React.Fragment>
                       )
@@ -107,7 +107,7 @@ export const FrontPage = () => {
                 </Grid.Column>
                 <Grid.Column style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                   <Changelog showFullChangelog={false} />
-                  <Button style={{ marginTop: '40px' }} onClick={() => setShowFullChangelog(true)}>
+                  <Button onClick={() => setShowFullChangelog(true)} style={{ marginTop: '40px' }}>
                     Show more
                   </Button>
                 </Grid.Column>
@@ -117,7 +117,7 @@ export const FrontPage = () => {
         )}
       </Container>
       <a href="https://toska.dev/">
-        <Image src={images.toskaLogo} alt="Logo of Toska" size="medium" centered style={{ bottom: 0 }} />
+        <Image alt="Logo of Toska" centered size="medium" src={images.toskaLogo} style={{ bottom: 0 }} />
       </a>
     </div>
   )

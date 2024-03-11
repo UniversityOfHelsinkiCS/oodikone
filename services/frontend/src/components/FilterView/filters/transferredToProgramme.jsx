@@ -16,26 +16,26 @@ const TransferredToProgrammeFilterCard = ({ options, onOptionsChange }) => {
       <div className="card-content">
         <Form.Field style={{ display: 'flex', flexDirection: 'column' }}>
           <Radio
+            checked={transferred === null}
+            data-cy="option-all"
             label="All"
             name="radioGroup"
-            checked={transferred === null}
             onChange={toggle(null)}
-            data-cy="option-all"
           />
           <Radio
+            checked={transferred === true}
+            data-cy="option-have"
             label="Transferred"
             name="radioGroup"
-            checked={transferred === true}
             onChange={toggle(true)}
-            data-cy="option-have"
             style={{ margin: '0.5rem 0' }}
           />
           <Radio
+            checked={transferred === false}
+            data-cy="option-havenot"
             label="Not Transferred"
             name="radioGroup"
-            checked={transferred === false}
             onChange={toggle(false)}
-            data-cy="option-havenot"
           />
         </Form.Field>
       </div>

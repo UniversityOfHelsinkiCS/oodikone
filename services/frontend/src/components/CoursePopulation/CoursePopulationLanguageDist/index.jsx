@@ -47,7 +47,7 @@ export const CoursePopulationLanguageDist = ({ samples, codes, from, to }) => {
             <Table.Cell>{getLanguage(language[0])}</Table.Cell>
             <Table.Cell>{language[1]}</Table.Cell>
             <Table.Cell>
-              <Progress value={language[1]} total={total} progress="percent" precision={0} style={{ margin: 0 }} />
+              <Progress precision={0} progress="percent" style={{ margin: 0 }} total={total} value={language[1]} />
             </Table.Cell>
           </Table.Row>
         ))}
