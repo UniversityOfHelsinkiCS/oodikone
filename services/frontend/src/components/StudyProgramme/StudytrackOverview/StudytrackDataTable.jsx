@@ -31,7 +31,12 @@ const getStyleForCombined = idx => {
 }
 
 const createCountriesContent = ({ year, studyprogramme, otherCountriesStats }) => {
-  if (!otherCountriesStats || !otherCountriesStats[studyprogramme] || !otherCountriesStats[studyprogramme][year])
+  if (
+    !otherCountriesStats ||
+    !otherCountriesStats[studyprogramme] ||
+    !otherCountriesStats[studyprogramme][year] ||
+    Object.keys(otherCountriesStats[studyprogramme][year]).length === 0
+  )
     return <p key={Math.random()}>No data</p>
   const countriesData = otherCountriesStats[studyprogramme][year]
   return Object.keys(countriesData)
