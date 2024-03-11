@@ -116,17 +116,16 @@ export const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes
 
   return (
     <div className="programmes-overview">
-      <div className="toggle-container">
+      <div className="toggle-container" style={{ marginTop: '30px' }}>
         <Toggle
           cypress="ProgrammeToggle"
-          toolTips={facultyToolTips.ProgrammeToggle}
           firstLabel="New study programmes"
           secondLabel="All study programmes"
-          value={studyProgrammes}
           setValue={setStudyProgrammes}
+          toolTips={facultyToolTips.ProgrammeToggle}
+          value={studyProgrammes}
         />
       </div>
-
       {isFetchingOrLoading ? <Loader active style={{ marginTop: '15em' }} /> : <>{getContent()}</>}
     </div>
   )
