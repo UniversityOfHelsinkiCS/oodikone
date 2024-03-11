@@ -13,9 +13,7 @@ export const ProgrammeProgressChart = ({ data, labels, longLabels, names }) => {
   }
 
   const colors = generateGradientColors(data[0]?.length || 6)
-  const dataTranspose = transpose(data)
-    .map((obj, idx) => ({ name: names[idx], data: obj, color: colors[idx] }))
-    .reverse()
+  const dataTranspose = transpose(data).map((obj, idx) => ({ name: names[idx], data: obj, color: colors[idx] }))
 
   // Tooltip formatter function: this.<some value> needs to be used in order to obtain access to the values.
   const config = {
