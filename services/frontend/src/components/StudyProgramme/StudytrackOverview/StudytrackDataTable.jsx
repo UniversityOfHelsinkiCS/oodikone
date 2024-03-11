@@ -2,8 +2,8 @@ import React, { useState } from 'react'
 import { Icon, Popup, Table } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { Toggle } from '@/components/StudyProgramme/Toggle'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
-import { Toggle } from '../Toggle'
 import { PopulationLink } from './PopulationLink'
 
 const getKey = year => `${year}-${Math.random()}`
@@ -49,7 +49,7 @@ const getBasicTableCell = ({ row, value, combinedProgramme, index }) => {
       className={getCellClass(row[0])}
       key={getKey(value)}
       style={combinedProgramme ? getStyleForCombined(index) : getStyleForBasic(index)}
-      textAlign="left"
+      textAlign="right"
     >
       {value}
     </Table.Cell>
@@ -352,7 +352,7 @@ export const StudytrackDataTable = ({
                     ? { fontWeight: 'bold', borderLeftWidth: 'thick' }
                     : { fontWeight: 'bold' }
                 }
-                textAlign="left"
+                textAlign="center"
               >
                 {title}
               </Table.HeaderCell>

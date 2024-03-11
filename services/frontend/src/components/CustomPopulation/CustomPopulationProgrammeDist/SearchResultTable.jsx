@@ -1,6 +1,6 @@
-import { arrayOf, array, string, func, bool } from 'prop-types'
+import { array, arrayOf, bool, func, string } from 'prop-types'
 import React from 'react'
-import { Table, Segment } from 'semantic-ui-react'
+import { Segment, Table } from 'semantic-ui-react'
 
 import './searchResultsTable.css'
 

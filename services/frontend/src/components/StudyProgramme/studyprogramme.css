@@ -120,15 +120,10 @@ body {
 .studytrack-overview .table-container .total-row-cell,
 .studyprogramme-overview .table-container .total-row-cell {
   border-top: 3px solid rgb(189 180 180);
-  font-weight: bold;
 }
 
 .studytrack-overview .studytrack-selector {
   margin: 60px 60px 30px;
-}
-
-.studytrack-overview .header-row {
-  font-weight: bold;
 }
 
 .studytrack-overview .datatable {

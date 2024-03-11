@@ -1,7 +1,7 @@
 import React from 'react'
 import { Table } from 'semantic-ui-react'
 
-import { NoDataMessage } from '../NoDataMessage'
+import { NoDataMessage } from '@/components/StudyProgramme/NoDataMessage'
 
 export const BasicDataTable = ({ data, titles, track }) => {
   if (!data || !data[track]?.length || !titles)
@@ -28,7 +28,6 @@ export const BasicDataTable = ({ data, titles, track }) => {
             ))}
           </Table.Row>
         </Table.Header>
-
         <Table.Body>
           {sortedData.map(array => (
             <Table.Row key={`random-year-key-${Math.random()}`}>
