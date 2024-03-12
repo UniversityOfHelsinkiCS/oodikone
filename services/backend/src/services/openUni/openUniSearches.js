@@ -17,7 +17,6 @@ const getCredits = async (courseCodes, startdate) =>
         course_code: {
           [Op.in]: courseCodes,
         },
-        is_open: true,
         attainment_date: {
           [Op.gte]: startdate,
         },
