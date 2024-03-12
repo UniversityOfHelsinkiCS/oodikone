@@ -5,9 +5,11 @@ import { Tab, Table } from 'semantic-ui-react'
 
 import { getNewestProgramme } from '@/common'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
+import { findCorrectProgramme } from '@/components/CustomPopulation/CustomPopulationProgrammeDist'
 import { InfoBox } from '@/components/Info/InfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useGetFacultiesQuery } from '@/redux/facultyStats'
+import { useGetSemestersQuery } from '@/redux/semesters'
 
 const CreditGainTableRow = ({ statistics, code }) => {
   const { getTextIn } = useLanguage()
@@ -66,6 +68,7 @@ export const CoursePopulationCreditGainTable = ({
   populationStatistics,
 }) => {
   const { data: faculties } = useGetFacultiesQuery()
+  const { data: semesters } = useGetSemestersQuery()
   const [programmeCreditsStatistics, setStatistics] = useState({})
   const [facultyCreditsStatistics, setFacStatistics] = useState({})
   const [totalCredits, setTotalCredits] = useState(0)
@@ -78,12 +81,14 @@ export const CoursePopulationCreditGainTable = ({
     let tempTotal = 0
     students.forEach(student => {
       const courses = student.courses.filter(c => codes.includes(c.course_code))
-      const programme = getNewestProgramme(
-        student.studyrights,
-        student.studentNumber,
-        studentToTargetCourseDateMap,
-        populationStatistics.elementdetails.data
-      )
+      const programme =
+        findCorrectProgramme(student, codes, semesters, from, to) ??
+        getNewestProgramme(
+          student.studyrights,
+          student.studentNumber,
+          studentToTargetCourseDateMap,
+          populationStatistics.elementdetails.data
+        )
 
       if (!programmeCredits[programme.code]) {
         programmeCredits[programme.code] = { name: programme.name, students: [], credits: 0 }
