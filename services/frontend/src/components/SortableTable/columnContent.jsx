@@ -2,7 +2,7 @@ import _ from 'lodash'
 import React from 'react'
 import { useContext } from 'use-context-selector'
 
-import { SortableTableContext, getDataItemType, DataItemType, thickBorderStyles, cloneColumns } from './common'
+import { cloneColumns, DataItemType, getDataItemType, SortableTableContext, thickBorderStyles } from './common'
 import './style.css'
 
 export const getKey = data => {

@@ -7,14 +7,17 @@ export const getColumns = (getTextIn, semesters, numberMode, colorMode, allTotal
       key: `${semester.semestercode}`,
       title: `${getTextIn(semester.name).replace(' ', '\n')}`,
       cellProps: row => ({
-        style: getColor(
-          row.bySemesters[semester.semestercode],
-          semesters.length,
-          colorMode,
-          numberMode,
-          row.bySemesters[numberMode],
-          allTotal
-        ),
+        style: {
+          ...getColor(
+            row.bySemesters[semester.semestercode],
+            semesters.length,
+            colorMode,
+            numberMode,
+            row.bySemesters[numberMode],
+            allTotal
+          ),
+          textAlign: 'right',
+        },
       }),
       getRowVal: row => row.bySemesters[semester.semestercode]?.[numberMode] ?? 0,
       filterType: 'range',
@@ -24,10 +27,12 @@ export const getColumns = (getTextIn, semesters, numberMode, colorMode, allTotal
       title: 'Total',
       getRowVal: row => row.bySemesters[numberMode] ?? 0,
       cellProps: row => ({
-        style:
-          colorMode === 'course'
+        style: {
+          ...(colorMode === 'course'
             ? {}
-            : getColor(row.bySemesters, semesters.length, colorMode, numberMode, null, allTotal),
+            : getColor(row.bySemesters, semesters.length, colorMode, numberMode, null, allTotal)),
+          textAlign: 'right',
+        },
       }),
     },
   ]

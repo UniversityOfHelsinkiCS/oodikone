@@ -1,19 +1,19 @@
 import _ from 'lodash'
-import React, { useState, useMemo, useReducer, useCallback } from 'react'
+import React, { useCallback, useMemo, useReducer, useState } from 'react'
 import { Icon } from 'semantic-ui-react'
 
-import { DataItem, getKey, computeColumnSpans } from './columnContent'
+import { computeColumnSpans, DataItem, getKey } from './columnContent'
 import {
-  insertGroupColumns,
-  injectParentPointers,
-  extractColumnKeys,
   calculateGroupDepth,
-  createHeaders,
-  tableStateReducer,
-  getInitialState,
   ColumnFilters,
+  createHeaders,
+  extractColumnKeys,
+  getInitialState,
+  injectParentPointers,
+  insertGroupColumns,
+  tableStateReducer,
 } from './columnHeader'
-import { row, group, SortableTableContext, cloneColumns } from './common'
+import { cloneColumns, group, row, SortableTableContext } from './common'
 import { ExportModal } from './ExportModal'
 import { FigureContainer } from './FigureContainer'
 import { SortingFilteringVisitor } from './visitors/SortingFilteringVisitor'
@@ -25,8 +25,6 @@ import './style.css'
 Please update this when making changes inside SortableTable,
 if they affect how the table and its columns are used.
 Future uusihenkilö's will thank you.
-
-
 
 --- SortableTable usage ---
 
@@ -54,8 +52,7 @@ maxHeight: Overwrite the maximum height. Defaults to 80vh if not set.
 - Fields that concern whole column or header
 
 *key: Column key, unique
-*title: Column header title (<th>). Can be either string or JSX. For string title, newlines are replaced
-        by space for export.
+*title: Column header title (<th>). Can be either string or JSX. For string title, newlines are replaced by space for export.
 textTitle: Required for excel, if title is JSX. Set to null to exclude a parent header from export
 headerProps: These are given to header as: <th {...headerProps}>
 sortable: set to false if you want to disable column sorting. If multiple columns merged, set it to all
@@ -82,35 +79,32 @@ getRowContent: Single cell JSX: Overrides getRowVal for value to display, but do
 getRowExport: Overrides getRowVal for excel
 formatValue: Same as getRowContent, but avoids recalculating value already calculated in getRowVal.
 
-
 --- Miscellaneous information ---
 
 * Single rows can ignore filters or sorting by row options. To do this, import row-function
   from SortableTable-folder, and create data row with it (instead of just value as normally).
   For example, data can be set like this to have a totals-row on the top:
     [row(totals, { ignoreFilters: true, ignoreSorting: true }), ...students]
-
-
 */
 
 export const SortableTable = ({
-  tableId,
+  actions,
   columns: pColumns,
-  title,
-  featureName = 'export',
   data,
   defaultSort,
-  style,
-  actions,
-  stretch,
-  singleLine = true,
-  hideHeaderBar,
-  toggleGroupExpansion,
   expandedGroups,
-  onlyExportColumns = [],
-  striped = true,
+  featureName = 'export',
   firstColumnSticky = false,
+  hideHeaderBar,
   maxHeight = '80vh',
+  onlyExportColumns = [],
+  singleLine = true,
+  stretch,
+  striped = true,
+  style,
+  tableId,
+  title,
+  toggleGroupExpansion,
 }) => {
   const [exportModalOpen, setExportModalOpen] = useState(false)
   const [state, dispatch] = useReducer(
@@ -200,7 +194,6 @@ export const SortableTable = ({
 
   const content = (
     <table className={classNames.join(' ')} id={tableId} style={tableStyles}>
-      {/* <thead style={{ position: 'sticky', top: 0, zIndex: 1 }}>{headers}</thead> */}
       <thead>{headers}</thead>
       <tbody>
         {sortedData.map(item => (
@@ -236,10 +229,10 @@ export const SortableTable = ({
       <SortableTableContext.Provider value={context}>
         <FigureContainer style={figureStyles}>
           <FigureContainer.Header actions={actions} onClickExport={() => setExportModalOpen(true)}>
-            <Icon name="table" style={{ color: '#c2c2c2', position: 'relative', top: '1px', marginRight: '0.5em' }} />{' '}
+            <Icon name="table" style={{ color: '#c2c2c2', marginRight: '0.5em', position: 'relative', top: '1px' }} />{' '}
             {title}
           </FigureContainer.Header>
-          <FigureContainer.Content style={{ padding: 0, overflow: 'auto', backgroundColor: '#e8e8e91c', maxHeight }}>
+          <FigureContainer.Content style={{ backgroundColor: '#e8e8e91c', maxHeight, overflow: 'auto', padding: 0 }}>
             {content}
           </FigureContainer.Content>
         </FigureContainer>
