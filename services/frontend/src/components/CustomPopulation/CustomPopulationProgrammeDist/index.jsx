@@ -20,12 +20,59 @@ const formatStudyright = (studyright, date) => {
     return {
       name: { en: 'No programme at the time of attainment', fi: 'Ei ohjelmaa suorituksen hetkellä' },
       code: '00000',
+      facultyCode: '00000',
     }
   }
   const { element_detail: elementDetail, code } = studyrightElementsDuringCourse.sort(
     (a, b) => new Date(b.startdate) - new Date(a.startdate)
   )[0]
-  return { name: elementDetail.name, code }
+  return { name: elementDetail.name, code, facultyCode: studyright.faculty_code }
+}
+
+export const findCorrectProgramme = (student, coursecodes, semesters, startDate, endDate) => {
+  const yearcode = Object.values(semesters.years || {}).find(
+    year => moment(year.startdate).isSame(startDate, 'day') && moment(year.enddate).isSame(endDate, 'day')
+  )?.yearcode
+  const correctSemesters = Object.values(semesters.semesters || {})
+    .filter(sem => sem.yearcode === yearcode)
+    .map(sem => sem.semestercode)
+  let programme
+  const courseAttainment = student.courses.filter(
+    a =>
+      coursecodes.includes(a.course_code) &&
+      moment(a.date).isBetween(startDate, endDate, undefined, '[]') &&
+      a.credittypecode !== 7
+  )[0]
+  const courseEnrollments = student.enrollments?.filter(e => coursecodes.includes(e.course_code)) || []
+  let studyrightIdOfCourse
+  const findStudyrightAssociatedWithCourse = (studyright, date) =>
+    studyright.studyright_elements.some(
+      e => e.element_detail.type === 20 && moment(date).isBetween(e.startdate, e.enddate, undefined, '[]')
+    )
+
+  // First check if there's a studyright associated with the course attainment
+  if (courseAttainment && courseAttainment.studyright_id) {
+    studyrightIdOfCourse = courseAttainment.studyright_id
+    const correctStudyrights = student.studyrights.filter(sr => sr.actual_studyrightid === studyrightIdOfCourse)
+    const studyrightAssociatedWithCourse = correctStudyrights.find(sr =>
+      findStudyrightAssociatedWithCourse(sr, courseAttainment.date)
+    )
+    programme = formatStudyright(studyrightAssociatedWithCourse, courseAttainment.date)
+  }
+
+  // If no studyright associated with the course attainment, check if there's a studyright associated with the course enrollment
+  if (!programme) {
+    const courseEnrollment = courseEnrollments.find(e => correctSemesters.includes(e.semestercode))
+    studyrightIdOfCourse = courseEnrollment?.studyright_id
+    if (studyrightIdOfCourse) {
+      const correctStudyrights = student.studyrights.filter(sr => sr.actual_studyrightid === studyrightIdOfCourse)
+      const studyrightAssociatedWithCourse = correctStudyrights.find(sr =>
+        findStudyrightAssociatedWithCourse(sr, courseEnrollment.enrollment_date_time)
+      )
+      programme = formatStudyright(studyrightAssociatedWithCourse, courseEnrollment.enrollment_date_time)
+    }
+  }
+  return programme
 }
 
 export const CustomPopulationProgrammeDist = ({
@@ -38,55 +85,17 @@ export const CustomPopulationProgrammeDist = ({
 }) => {
   const { getTextIn } = useLanguage()
   const { data: semesters } = useGetSemestersQuery()
-  const yearcode = Object.values(semesters.years || {}).find(
-    year => moment(year.startdate).isSame(from, 'day') && moment(year.enddate).isSame(to, 'day')
-  )?.yearcode
-  const correctSemesters = Object.values(semesters.semesters || {})
-    .filter(sem => sem.yearcode === yearcode)
-    .map(sem => sem.semestercode)
+  if (!semesters) return null
   const allProgrammes = {}
 
   students.forEach(student => {
     let programme
     if (coursecode) {
-      const courseAttainment = student.courses.filter(
-        a =>
-          coursecode.includes(a.course_code) &&
-          moment(a.date).isBetween(from, to, undefined, '[]') &&
-          a.credittypecode !== 7
-      )[0]
-      const courseEnrollments = student.enrollments?.filter(e => coursecode.includes(e.course_code)) || []
-      let studyrightIdOfCourse
-      const findStudyrightAssociatedWithCourse = (studyright, date) =>
-        studyright.studyright_elements.some(
-          e => e.element_detail.type === 20 && moment(date).isBetween(e.startdate, e.enddate, undefined, '[]')
-        )
-
-      // First check if there's a studyright associated with the course attainment
-      if (courseAttainment && courseAttainment.studyright_id) {
-        studyrightIdOfCourse = courseAttainment.studyright_id
-        const correctStudyrights = student.studyrights.filter(sr => sr.actual_studyrightid === studyrightIdOfCourse)
-        const studyrightAssociatedWithCourse = correctStudyrights.find(sr =>
-          findStudyrightAssociatedWithCourse(sr, courseAttainment.date)
-        )
-        programme = formatStudyright(studyrightAssociatedWithCourse, courseAttainment.date)
-      }
-
-      // If no studyright associated with the course attainment, check if there's a studyright associated with the course enrollment
-      if (!programme) {
-        const courseEnrollment = courseEnrollments.find(e => correctSemesters.includes(e.semestercode))
-        studyrightIdOfCourse = courseEnrollment?.studyright_id
-        if (studyrightIdOfCourse) {
-          const correctStudyrights = student.studyrights.filter(sr => sr.actual_studyrightid === studyrightIdOfCourse)
-          const studyrightAssociatedWithCourse = correctStudyrights.find(sr =>
-            findStudyrightAssociatedWithCourse(sr, courseEnrollment.enrollment_date_time)
-          )
-          programme = formatStudyright(studyrightAssociatedWithCourse, courseEnrollment.enrollment_date_time)
-        }
-      }
+      programme = findCorrectProgramme(student, coursecode, semesters, from, to)
     }
 
-    // If no studyright associated with the course attainment or enrollment, just get the newest studyright at the time of the course attainment or enrollment
+    // If no studyright associated with the course attainment or enrollment or there are no courseCodes,
+    // (custom population) just get the newest studyright at the time of the course attainment or enrollment
     if (!programme) {
       programme = getNewestProgramme(
         student.studyrights,
