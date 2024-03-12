@@ -140,7 +140,9 @@ export const CoursePopulationCreditGainTable = ({
 
   return (
     <>
-      <InfoBox content={populationStatisticsToolTips.CreditDistributionCoursePopulation} />
+      <div style={{ marginBottom: '20px' }}>
+        <InfoBox content={populationStatisticsToolTips.CreditDistributionCoursePopulation} />
+      </div>
       <Tab panes={panes} />
     </>
   )
