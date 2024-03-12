@@ -1,8 +1,13 @@
 import React from 'react'
 import { Table } from 'semantic-ui-react'
 
-export const DataTable = ({ data, cypress, titles, wideTable }) => {
+export const DataTable = ({ cypress, data, titles, wideTable }) => {
   if (!data || !titles) return null
+
+  const textAlign = (value, index) => {
+    if (index === 0) return 'center'
+    return Number.isInteger(value) ? 'right' : 'left'
+  }
 
   return (
     <div className={`table-container${wideTable ? '-wide' : ''}`}>
@@ -14,12 +19,13 @@ export const DataTable = ({ data, cypress, titles, wideTable }) => {
             ))}
           </Table.Row>
         </Table.Header>
-
         <Table.Body>
           {data?.map(yearArray => (
             <Table.Row key={`random-year-key-${Math.random()}`}>
-              {yearArray?.map(value => (
-                <Table.Cell key={`random-key-${Math.random()}`}>{value}</Table.Cell>
+              {yearArray?.map((value, index) => (
+                <Table.Cell key={`random-key-${Math.random()}`} textAlign={textAlign(value, index)}>
+                  {value}
+                </Table.Cell>
               ))}
             </Table.Row>
           ))}
