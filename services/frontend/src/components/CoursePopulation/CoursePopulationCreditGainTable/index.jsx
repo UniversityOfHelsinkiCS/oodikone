@@ -1,6 +1,6 @@
 import { maxBy } from 'lodash'
 import moment from 'moment'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { Tab, Table } from 'semantic-ui-react'
 
 import { getNewestProgramme } from '@/common'
@@ -69,72 +69,62 @@ export const CoursePopulationCreditGainTable = ({
 }) => {
   const { data: faculties } = useGetFacultiesQuery()
   const { data: semesters } = useGetSemestersQuery()
-  const [programmeCreditsStatistics, setStatistics] = useState({})
-  const [facultyCreditsStatistics, setFacStatistics] = useState({})
-  const [totalCredits, setTotalCredits] = useState(0)
+  const programmeCredits = {}
+  const facultyCredits = {}
 
-  useEffect(() => {
-    if (!faculties || !students || Object.keys(populationStatistics ?? {}).length === 0) return
-    const programmeCredits = {}
-    const facultyCredits = {}
+  let totalCredits = 0
+  students.forEach(student => {
+    const courses = student.courses.filter(c => codes.includes(c.course_code))
+    const programme =
+      findCorrectProgramme(student, codes, semesters, from, to) ??
+      getNewestProgramme(
+        student.studyrights,
+        student.studentNumber,
+        studentToTargetCourseDateMap,
+        populationStatistics.elementdetails.data
+      )
 
-    let tempTotal = 0
-    students.forEach(student => {
-      const courses = student.courses.filter(c => codes.includes(c.course_code))
-      const programme =
-        findCorrectProgramme(student, codes, semesters, from, to) ??
-        getNewestProgramme(
-          student.studyrights,
-          student.studentNumber,
-          studentToTargetCourseDateMap,
-          populationStatistics.elementdetails.data
-        )
+    if (!programmeCredits[programme.code]) {
+      programmeCredits[programme.code] = { name: programme.name, students: [], credits: 0 }
+    }
 
-      if (!programmeCredits[programme.code]) {
-        programmeCredits[programme.code] = { name: programme.name, students: [], credits: 0 }
-      }
+    const faculty = faculties?.find(fac => fac.code === programme.facultyCode) || {
+      // in case there isn't a faculty associated with studyright
+      code: '0000',
+      name: { en: 'No associated faculty', fi: 'Ei tiedekuntaa suorituksen hetkellä' },
+    }
 
-      const faculty = faculties?.find(fac => fac.code === programme.facultyCode) || {
-        // in case there isn't a faculty associated with studyright
-        code: '0000',
-        name: { fi: 'No associated faculty' },
-      }
+    if (!facultyCredits[faculty.code]) {
+      facultyCredits[faculty.code] = { name: faculty.name, students: [], credits: 0 }
+    }
 
-      if (!facultyCredits[faculty.code]) {
-        facultyCredits[faculty.code] = { name: faculty.name, students: [], credits: 0 }
-      }
-
-      const coursesBetween = []
-      courses.forEach(course => {
-        if (moment(course.date).isBetween(moment(from), moment(to)) && course.passed) {
-          if (course.grade === 'Hyv.') {
-            coursesBetween.push({ grade: course.grade, value: 1, credits: course.credits })
-          } else {
-            coursesBetween.push({ grade: course.grade, value: Number(course.grade), credits: course.credits })
-          }
+    const coursesBetween = []
+    courses.forEach(course => {
+      if (moment(course.date).isBetween(moment(from), moment(to)) && course.passed) {
+        if (course.grade === 'Hyv.') {
+          coursesBetween.push({ grade: course.grade, value: 1, credits: course.credits })
+        } else {
+          coursesBetween.push({ grade: course.grade, value: Number(course.grade), credits: course.credits })
         }
-      })
-      if (maxBy(coursesBetween, course => course.value)) {
-        programmeCredits[programme.code].students.push(student.studentNumber)
-        facultyCredits[faculty.code].students.push(student.studentNumber)
-
-        const maxCredits = maxBy(coursesBetween, course => course.value).credits
-        programmeCredits[programme.code].credits += maxCredits
-        facultyCredits[faculty.code].credits += maxCredits
-        tempTotal += maxBy(coursesBetween, course => course.value).credits
       }
     })
-    setTotalCredits(tempTotal)
-    setStatistics(programmeCredits)
-    setFacStatistics(facultyCredits)
-  }, [students, faculties])
+    if (maxBy(coursesBetween, course => course.value)) {
+      programmeCredits[programme.code].students.push(student.studentNumber)
+      facultyCredits[faculty.code].students.push(student.studentNumber)
+
+      const maxCredits = maxBy(coursesBetween, course => course.value).credits
+      programmeCredits[programme.code].credits += maxCredits
+      facultyCredits[faculty.code].credits += maxCredits
+      totalCredits += maxBy(coursesBetween, course => course.value).credits
+    }
+  })
 
   const panes = [
     {
       menuItem: 'Faculty',
       render: () => (
         <Tab.Pane>
-          <CreditGainTable data={facultyCreditsStatistics} headerText="Faculty" totalCredits={totalCredits} />
+          <CreditGainTable data={facultyCredits} headerText="Faculty" totalCredits={totalCredits} />
         </Tab.Pane>
       ),
     },
@@ -142,7 +132,7 @@ export const CoursePopulationCreditGainTable = ({
       menuItem: 'Programme',
       render: () => (
         <Tab.Pane>
-          <CreditGainTable data={programmeCreditsStatistics} headerText="Programme" totalCredits={totalCredits} />
+          <CreditGainTable data={programmeCredits} headerText="Programme" totalCredits={totalCredits} />
         </Tab.Pane>
       ),
     },
