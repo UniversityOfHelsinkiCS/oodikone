@@ -1,11 +1,11 @@
 import React from 'react'
-import { NavLink, Link } from 'react-router-dom'
-import { Menu, Dropdown, Button, Label } from 'semantic-ui-react'
+import { Link, NavLink, useLocation } from 'react-router-dom'
+import { Button, Dropdown, Label, Menu } from 'semantic-ui-react'
 
 import { checkUserAccess, getFullStudyProgrammeRights } from '@/common'
-import { isDev, adminerUrls } from '@/conf'
-import { useLogoutMutation, useShowAsUser, useGetAuthorizedUserQuery } from '@/redux/auth'
-import { LanguagePicker } from '../LanguagePicker'
+import { LanguagePicker } from '@/components/LanguagePicker'
+import { adminerUrls, isDev } from '@/conf'
+import { useGetAuthorizedUserQuery, useLogoutMutation, useShowAsUser } from '@/redux/auth'
 import './navigationBar.css'
 
 const allNavigationItems = {
@@ -46,6 +46,7 @@ const allNavigationItems = {
 export const NavigationBar = () => {
   const { isLoading, iamGroups, mockedBy, userId, roles, isAdmin, programmeRights } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
+  const location = useLocation()
 
   const showAsUser = useShowAsUser()
   const [logout] = useLogoutMutation()
@@ -72,9 +73,6 @@ export const NavigationBar = () => {
     return { ...visibleNavigationItems }
   }
 
-  const visibleNavigationItems = refreshNavigationRoutes()
-
-  // Min-content sets logo always to the left
   const renderHome = () => (
     <Menu.Item as={Link} tabIndex="-1" to="/">
       <span className="logo">
@@ -100,22 +98,31 @@ export const NavigationBar = () => {
     return false
   }
 
+  const visibleNavigationItems = refreshNavigationRoutes()
+
   const renderNavigationRoutes = () =>
     Object.values(visibleNavigationItems).map(({ items, path, key, label, tag }) =>
       items ? (
-        <Menu.Item as={Dropdown} data-cy={`navbar-${key}`} key={`menu-item-drop-${key}`} tabIndex="-1" text={label}>
+        <Menu.Item
+          active={items.some(item => location.pathname.includes(item.path))}
+          as={Dropdown}
+          data-cy={`navbar-${key}`}
+          key={`menu-item-drop-${key}`}
+          tabIndex="-1"
+          text={label}
+        >
           <Dropdown.Menu>
             {items.map(
-              i =>
-                showSearch(i) && (
+              item =>
+                showSearch(item) && (
                   <Dropdown.Item
                     as={NavLink}
-                    data-cy={`navbar-${i.key}`}
-                    key={`menu-item-${i.path}`}
+                    data-cy={`navbar-${item.key}`}
+                    key={`menu-item-${item.path}`}
                     tabIndex="-1"
-                    to={i.path}
+                    to={item.path}
                   >
-                    {i.label}
+                    {item.label}
                   </Dropdown.Item>
                 )
             )}
@@ -134,6 +141,7 @@ export const NavigationBar = () => {
         </Menu.Item>
       )
     )
+
   const renderUserMenu = () =>
     isDev ? (
       <Menu.Item as={Dropdown} style={{ backgroundColor: 'purple', color: 'white' }} tabIndex="-1" text="Dev controls">
