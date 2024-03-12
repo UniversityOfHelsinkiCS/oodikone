@@ -111,7 +111,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
       raw: true,
     }),
     Enrollment.findAll({
-      attributes: ['course_code', 'state', 'enrollment_date_time', 'studentnumber', 'semestercode'],
+      attributes: ['course_code', 'state', 'enrollment_date_time', 'studentnumber', 'semestercode', 'studyright_id'],
       where: {
         enrollment_date_time: {
           [Op.between]: [attainmentDateFrom, endDate],
@@ -162,6 +162,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
             'cancelled',
             'is_ba_ma',
             'semester_enrollments',
+            'actual_studyrightid',
           ],
           separate: true,
           include: [
@@ -207,6 +208,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
         'student_studentnumber',
         'course_code',
         'language',
+        'studyright_id',
       ],
       where: creditsOfStudent,
       raw: true,

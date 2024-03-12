@@ -141,9 +141,11 @@ export const CoursePopulation = () => {
           <InfoBox content={populationStatisticsToolTips.ProgrammeDistributionCoursePopulation} />
           <CustomPopulationProgrammeDist
             coursecode={codes}
+            from={dateFrom}
             studentData={populationStatistics}
             studentToTargetCourseDateMap={studentToTargetCourseDateMap}
             students={filtered}
+            to={dateTo}
           />
         </div>
       ),

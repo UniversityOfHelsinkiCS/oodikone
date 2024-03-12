@@ -97,7 +97,16 @@ const formatStudentForPopulationStatistics = (
   code,
   currentSemester
 ) => {
-  const toCourse = ({ grade, attainment_date, credits, course_code, credittypecode, isStudyModule, language }) => {
+  const toCourse = ({
+    grade,
+    attainment_date,
+    credits,
+    course_code,
+    credittypecode,
+    isStudyModule,
+    language,
+    studyright_id,
+  }) => {
     const attainment_date_normailized =
       attainment_date < startDate ? startDateMoment.clone().add(1, 'day').toISOString() : attainment_date
     const passed = Credit.passed({ credittypecode })
@@ -111,6 +120,7 @@ const formatStudentForPopulationStatistics = (
       isStudyModuleCredit: isStudyModule,
       credittypecode,
       language,
+      studyright_id,
     }
   }
   const criteriaCoursesBySubstitutions = criteria?.allCourses
