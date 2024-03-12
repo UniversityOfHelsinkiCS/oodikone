@@ -22,6 +22,7 @@ const {
   mapCodesToIds,
   facultyProgrammeStudents,
 } = require('./facultyHelpers')
+const { uniqBy } = require('lodash')
 const {
   dbConnections: { sequelize },
 } = require('../../database/connection')
@@ -278,20 +279,25 @@ const transferredTo = async (programmes, allProgrammeCodes, since) =>
   ).map(formatFacultyTransfer)
 
 const degreeProgrammesOfFaculty = async facultyCode =>
-  (
-    await ProgrammeModule.findAll({
-      attributes: ['code', 'name'],
-      include: {
-        model: Organization,
-        where: {
-          code: {
-            [Op.startsWith]: facultyCode,
+  // Some programmenames are different, causing this to return multiples of same codes.
+  // Hence the uniqBy
+  uniqBy(
+    (
+      await ProgrammeModule.findAll({
+        attributes: ['code', 'name'],
+        include: {
+          model: Organization,
+          where: {
+            code: {
+              [Op.startsWith]: facultyCode,
+            },
           },
         },
-      },
-      group: ['programme_module.code', 'programme_module.name', 'organization.id'],
-    })
-  ).map(facultyFormatProgramme)
+        group: ['programme_module.code', 'programme_module.name', 'organization.id'],
+      })
+    ).map(facultyFormatProgramme),
+    'code'
+  )
 
 const facultyOrganizationId = async faculty => {
   return await Organization.findOne({
