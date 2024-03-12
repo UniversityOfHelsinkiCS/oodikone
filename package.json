@@ -5,6 +5,7 @@
     "cypress": "cypress",
     "concurrently": "concurrently",
     "eslint": "eslint",
+    "lint:all": "eslint --ext .js,.jsx services/ updater/ --report-unused-disable-directives",
     "stylelint": "stylelint",
     "actionlint": "node-actionlint",
     "prettier": "prettier",

@@ -8,12 +8,32 @@
     "ecmaVersion": "latest",
     "sourceType": "commonjs"
   },
-  "extends": ["eslint:recommended", "plugin:prettier/recommended", "plugin:cypress/recommended"],
+  "extends": [
+    "eslint:recommended",
+    "airbnb",
+    "plugin:cypress/recommended",
+    "plugin:import/recommended",
+    "plugin:prettier/recommended"
+  ],
   "rules": {
     "no-console": "error",
     "no-async-promise-executor": "off",
     "prettier/prettier": "error",
     "cypress/no-assigning-return-values": "off",
-    "cypress/unsafe-to-chain-command": "off"
-  }
+    "cypress/unsafe-to-chain-command": "off",
+    "camelcase": "off",
+    "no-plusplus": "off",
+    "no-shadow": "off",
+    "quotes": ["error", "single", { "avoidEscape": true }],
+    "no-promise-executor-return": "off",
+    "no-restricted-syntax": "off",
+    "no-continue": "off",
+    "no-await-in-loop": "off",
+    "no-param-reassign": "off",
+    "no-return-await": "off",
+    "consistent-return": "off",
+    "default-param-last": "off",
+    "import/order": "off"
+  },
+  "ignorePatterns": ["node_modules/", "build/", "**/*migrations*/**"]
 }
