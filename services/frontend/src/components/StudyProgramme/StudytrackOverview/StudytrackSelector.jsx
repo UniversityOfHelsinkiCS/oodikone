@@ -2,7 +2,7 @@ import React from 'react'
 import { Dropdown } from 'semantic-ui-react'
 
 import '../studyprogramme.css'
-import { useLanguage } from 'components/LanguagePicker/useLanguage'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 
 export const StudytrackSelector = ({ track, setTrack, studytracks }) => {
   const { getTextIn } = useLanguage()

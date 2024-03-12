@@ -1,7 +1,8 @@
 import React from 'react'
 import { Radio, Segment, SegmentGroup } from 'semantic-ui-react'
-import { courseStatisticsToolTips } from 'common/InfoToolTips'
-import { InfoBox } from 'components/Info/InfoBox'
+
+import { courseStatisticsToolTips } from '@/common/InfoToolTips'
+import { InfoBox } from '@/components/Info/InfoBox'
 import { DirectionToggle } from './common/DirectionToggle'
 import { ProviderOrganization } from './common/ProviderOrganization'
 import { Setting } from './common/Setting'

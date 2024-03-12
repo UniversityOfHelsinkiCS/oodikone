@@ -1,8 +1,9 @@
 import React, { useMemo } from 'react'
 import { Link, useHistory } from 'react-router-dom'
 import { Segment, Icon, Item } from 'semantic-ui-react'
-import { calculatePercentage } from 'common'
-import { SortableTable } from 'components/SortableTable'
+
+import { calculatePercentage } from '@/common'
+import { SortableTable } from '@/components/SortableTable'
 
 const createColumnWithTitle = title => ({
   key: title,

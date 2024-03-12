@@ -1,7 +1,8 @@
 import React from 'react'
 import { Radio, Segment, SegmentGroup } from 'semantic-ui-react'
-import { courseStatisticsToolTips } from 'common/InfoToolTips'
-import { InfoBox } from 'components/Info/InfoBox'
+
+import { courseStatisticsToolTips } from '@/common/InfoToolTips'
+import { InfoBox } from '@/components/Info/InfoBox'
 import { Setting } from './common/Setting'
 
 export const ChartSettings = ({ isRelative, setIsRelative, tab, viewMode }) => {

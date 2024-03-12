@@ -1,6 +1,7 @@
 import React from 'react'
 import { Form, Radio } from 'semantic-ui-react'
-import { findStudyrightElementForClass } from 'common'
+
+import { findStudyrightElementForClass } from '@/common'
 import { createFilter } from './createFilter'
 
 const STUDYRIGHT_TYPES = {

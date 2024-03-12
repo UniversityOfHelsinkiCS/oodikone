@@ -2,14 +2,13 @@
 import path from 'path'
 import react from '@vitejs/plugin-react-swc'
 import { defineConfig } from 'vite'
-import tsconfigPaths from 'vite-tsconfig-paths'
 
 import { inStaging } from './src/conf'
 
 // https://vitejs.dev/config/
 // eslint-disable-next-line import/no-unused-modules, import/no-default-export
 export default defineConfig({
-  plugins: [react(), tsconfigPaths({ root: __dirname, projects: ['./jsconfig.json'] })],
+  plugins: [react()],
   base: inStaging ? '/oodikone' : '/',
   server: {
     proxy: {

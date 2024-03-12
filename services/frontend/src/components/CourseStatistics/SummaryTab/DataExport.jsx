@@ -1,7 +1,8 @@
 import React from 'react'
 import { Button, Icon } from 'semantic-ui-react'
 import { utils, writeFile } from 'xlsx'
-import { getTimestamp } from 'common'
+
+import { getTimestamp } from '@/common'
 
 export const DataExport = ({ data }) => {
   const jsonItems = data.reduce((arr, cur) => {

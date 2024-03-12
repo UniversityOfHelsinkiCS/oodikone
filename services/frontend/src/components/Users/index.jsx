@@ -2,7 +2,7 @@ import React from 'react'
 import { useParams } from 'react-router-dom'
 import { Header } from 'semantic-ui-react'
 
-import { useTitle } from 'common/hooks'
+import { useTitle } from '@/common/hooks'
 import { UserPage } from './UserPage'
 import { UserSearchList } from './UserSearchList'
 

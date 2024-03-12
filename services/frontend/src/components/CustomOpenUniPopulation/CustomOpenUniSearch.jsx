@@ -5,12 +5,12 @@ import Datetime from 'react-datetime'
 import { useLocation, useHistory } from 'react-router-dom'
 import { Modal, Form, Button, TextArea } from 'semantic-ui-react'
 
-import { SearchHistory } from 'components/SearchHistory'
+import { SearchHistory } from '@/components/SearchHistory'
 import {
   useCreateOpenUniCourseSearchMutation,
   useDeleteOpenUniCourseSearchMutation,
   useUpdateOpenUniCourseSearchMutation,
-} from 'redux/openUniPopulations'
+} from '@/redux/openUniPopulations'
 
 export const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
   const location = useLocation()

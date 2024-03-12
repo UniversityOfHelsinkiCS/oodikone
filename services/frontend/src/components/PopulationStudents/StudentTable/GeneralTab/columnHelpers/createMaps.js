@@ -1,4 +1,4 @@
-import { findStudyrightElementForClass } from 'common'
+import { findStudyrightElementForClass } from '@/common'
 
 export const createMaps = ({ selectedStudents, students, programmeCode, combinedProgrammeCode, year }) => {
   const studentToStudyrightStartMap = selectedStudents.reduce((res, sn) => {

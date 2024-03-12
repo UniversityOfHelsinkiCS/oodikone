@@ -1,6 +1,7 @@
 import React from 'react'
 import { Form } from 'semantic-ui-react'
-import { studyProgrammeToolTips } from 'common/InfoToolTips'
+
+import { studyProgrammeToolTips } from '@/common/InfoToolTips'
 import { Toggle } from '../Toggle'
 
 export const CourseYearFilter = ({ years, fromYear, toYear, handleChange, academicYear = false, setAcademicYear }) =>

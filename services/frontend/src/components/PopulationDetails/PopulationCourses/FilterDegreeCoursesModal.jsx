@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Button, Icon, Modal, Container } from 'semantic-ui-react'
 
-import { DegreeCoursesTable } from 'components/StudyProgramme/DegreeCourses'
+import { DegreeCoursesTable } from '@/components/StudyProgramme/DegreeCourses'
 
 export const FilterDegreeCoursesModal = ({ studyProgramme, year }) => {
   const [open, setOpen] = useState(false)

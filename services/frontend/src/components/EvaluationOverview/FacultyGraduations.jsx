@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { GraduationTimes } from 'components/FacultyStatistics/TimesAndPaths/GraduationTimes'
+import { GraduationTimes } from '@/components/FacultyStatistics/TimesAndPaths/GraduationTimes'
 
 export const FacultyGraduations = ({ faculty, graduationStats, groupByStartYear, showMedian, universityMode }) => {
   const groupBy = groupByStartYear ? 'byStartYear' : 'byGradYear'

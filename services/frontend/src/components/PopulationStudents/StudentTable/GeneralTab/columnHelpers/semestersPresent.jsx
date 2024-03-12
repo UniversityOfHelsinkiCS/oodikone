@@ -2,7 +2,7 @@ import moment from 'moment'
 import React from 'react'
 import { Popup } from 'semantic-ui-react'
 
-import { getCurrentSemester, isMastersProgramme } from 'common'
+import { getCurrentSemester, isMastersProgramme } from '@/common'
 
 export const getSemestersPresentFunctions = ({
   allSemesters,

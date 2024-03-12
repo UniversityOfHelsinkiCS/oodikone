@@ -3,7 +3,7 @@ import React, { Component, Suspense } from 'react'
 import { connect } from 'react-redux'
 import { Loader } from 'semantic-ui-react'
 
-import { AccessDenied } from 'components/AccessDenied'
+import { AccessDenied } from '@/components/AccessDenied'
 
 let sent = null
 

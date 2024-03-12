@@ -1,5 +1,5 @@
 import React from 'react'
-import { reformatDate, getAllProgrammesOfStudent } from 'common'
+import { reformatDate, getAllProgrammesOfStudent } from '@/common'
 
 const noProgrammeDuringCourse = {
   en: 'No programme at time of course',

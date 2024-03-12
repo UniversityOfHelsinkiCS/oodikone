@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Button, Modal, Message } from 'semantic-ui-react'
 
-import { useGetUserAccessEmailPreviewQuery, useSendUserAccessEmailMutation } from 'redux/users'
+import { useGetUserAccessEmailPreviewQuery, useSendUserAccessEmailMutation } from '@/redux/users'
 import { EmailPreview } from './EmailPreview'
 
 const SendEmailButton = props => <Button basic content="Preview email ..." fluid positive {...props} />

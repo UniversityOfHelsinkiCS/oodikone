@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Form, Button, Message } from 'semantic-ui-react'
 
-import { useGetAccessGroupsQuery, useModifyAccessGroupsMutation } from 'redux/users'
+import { useGetAccessGroupsQuery, useModifyAccessGroupsMutation } from '@/redux/users'
 
 export const AccessGroups = ({ user }) => {
   const [selected, setSelected] = useState(user.accessgroup.map(({ group_code: code }) => code))

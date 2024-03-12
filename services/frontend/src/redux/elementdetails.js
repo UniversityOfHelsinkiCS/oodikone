@@ -1,6 +1,6 @@
-import { RTKApi } from 'apiConnection'
-import { getUnifiedProgrammeName } from 'common'
-import { useLanguage } from 'components/LanguagePicker/useLanguage'
+import { RTKApi } from '@/apiConnection'
+import { getUnifiedProgrammeName } from '@/common'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 
 const elementDetailsApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
