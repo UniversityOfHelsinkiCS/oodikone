@@ -160,7 +160,7 @@ const creditMapper =
     courseUnitIdToCourseGroupId,
     moduleGroupIdToModuleCode,
     courseGroupIdToCourseCode,
-    studyrightIdToOrganisationsName
+    studyRightIdToEducationType
   ) =>
   attainment => {
     const {
@@ -195,26 +195,23 @@ const creditMapper =
     let is_open = false
 
     // check if ay code or ay studyright or ay responsible organisation
-    if (course_code) {
-      if (!isModule(type)) {
-        if (course_code.match(/^AY?(.+?)(?:en|fi|sv)?$/)) {
-          is_open = true
+    if (course_code && !isModule(type)) {
+      if (course_code.match(/^AY?(.+?)(?:en|fi|sv)?$/)) {
+        is_open = true
+      } else {
+        if (study_right_id !== null) {
+          if (
+            studyRightIdToEducationType[study_right_id] ===
+            'urn:code:education-type:non-degree-education:open-university-studies'
+          )
+            is_open = true
         } else {
-          if (study_right_id !== null) {
-            const organisationName = studyrightIdToOrganisationsName[study_right_id]
-            if (organisationName) {
-              if (organisationName['fi'].startsWith('Avoin yliopisto')) {
-                is_open = true
-              }
-            }
-          } else {
-            if (
-              organisations
-                .filter(({ roleUrn }) => roleUrn === 'urn:code:organisation-role:responsible-organisation')
-                .some(org => org.organisationid === 'hy-org-48645785')
-            ) {
-              is_open = true
-            }
+          if (
+            organisations
+              .filter(({ roleUrn }) => roleUrn === 'urn:code:organisation-role:responsible-organisation')
+              .some(org => org.organisationid === 'hy-org-48645785')
+          ) {
+            is_open = true
           }
         }
       }

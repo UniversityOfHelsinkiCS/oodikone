@@ -215,6 +215,17 @@ const updateStudents = async (personIds, iteration = 0) => {
     selectFromByIds('plans', personIds, 'user_id'),
   ])
 
+  const enrollmentStudyrights = await selectFromActiveSnapshotsByIds(
+    'studyrights',
+    enrollments.map(({ study_right_id }) => study_right_id).filter(id => !!id)
+  )
+  const attainmentStudyrights = await selectFromActiveSnapshotsByIds(
+    'studyrights',
+    attainments.map(a => a.study_right_id).filter(id => !!id)
+  )
+
+  const bothStudyrights = [...enrollmentStudyrights, ...attainmentStudyrights]
+
   const parsedStudyrightSnapshots = parseStudyrightSnapshots(studyrightSnapshots)
   const groupedStudyRightSnapshots = groupStudyrightSnapshots(parsedStudyrightSnapshots)
   const personIdToStudentNumber = students.reduce((res, curr) => {
@@ -247,6 +258,17 @@ const updateStudents = async (personIds, iteration = 0) => {
 
   const mappedTransfers = await parseTransfers(groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber)
 
+  const educations = await selectFromByIds(
+    'educations',
+    bothStudyrights.map(({ education_id }) => education_id).filter(id => !!id)
+  )
+
+  const studyRightIdToEducationType = bothStudyrights.reduce((res, curr) => {
+    const education = educations.find(e => e.id === curr.education_id)
+    res[curr.id] = education ? education.education_type : null
+    return res
+  }, {})
+
   await Promise.all([
     updateStudyRightElements(
       groupedStudyRightSnapshots,
@@ -255,9 +277,9 @@ const updateStudents = async (personIds, iteration = 0) => {
       formattedStudyRights,
       mappedTransfers
     ),
-    updateAttainments(attainments, personIdToStudentNumber, attainmentsToBeExluced),
+    updateAttainments(attainments, personIdToStudentNumber, attainmentsToBeExluced, studyRightIdToEducationType),
     updateTermRegistrations(termRegistrations, personIdToStudentNumber),
-    updateEnrollments(enrollments, personIdToStudentNumber),
+    updateEnrollments(enrollments, personIdToStudentNumber, studyRightIdToEducationType),
     updateStudyplans(studyplans, personIds, personIdToStudentNumber, groupedStudyRightSnapshots),
     bulkCreate(Transfer, mappedTransfers, null, ['studyrightid']),
   ])
@@ -478,8 +500,8 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
   await bulkCreate(Studyplan, mappedPlans)
 }
 
-const updateEnrollments = async (enrollments, personIdToStudentNumber) => {
-  const [courseUnitRealisations, courseUnits, studyRights] = await Promise.all([
+const updateEnrollments = async (enrollments, personIdToStudentNumber, studyRightIdToEducationType) => {
+  const [courseUnitRealisations, courseUnits] = await Promise.all([
     selectFromByIds(
       'course_unit_realisations',
       enrollments.map(({ course_unit_realisation_id }) => course_unit_realisation_id).filter(id => !!id)
@@ -487,10 +509,6 @@ const updateEnrollments = async (enrollments, personIdToStudentNumber) => {
     selectFromByIds(
       'course_units',
       enrollments.map(({ course_unit_id }) => course_unit_id).filter(id => !!id)
-    ),
-    selectFromActiveSnapshotsByIds(
-      'studyrights',
-      enrollments.map(({ study_right_id }) => study_right_id).filter(id => !!id)
     ),
   ])
 
@@ -516,17 +534,6 @@ const updateEnrollments = async (enrollments, personIdToStudentNumber) => {
     return res
   }, {})
 
-  const educations = await selectFromByIds(
-    'educations',
-    studyRights.map(({ education_id }) => education_id).filter(id => !!id)
-  )
-
-  const studyRightIdToEducationType = studyRights.reduce((res, curr) => {
-    const education = educations.find(e => e.id === curr.education_id)
-    res[curr.id] = education ? education.education_type : null
-    return res
-  }, {})
-
   const mapEnrollment = enrollmentMapper(
     personIdToStudentNumber,
     courseUnitIdToCourseGroupId,
@@ -542,9 +549,14 @@ const updateEnrollments = async (enrollments, personIdToStudentNumber) => {
   await bulkCreate(Enrollment, mappedEnrollments)
 }
 
-const updateAttainments = async (attainments, personIdToStudentNumber, attainmentsToBeExluced) => {
+const updateAttainments = async (
+  attainments,
+  personIdToStudentNumber,
+  attainmentsToBeExluced,
+  studyRightIdToEducationType
+) => {
   await updateTeachers(attainments)
-  const [courseUnits, modules, studyrights] = await Promise.all([
+  const [courseUnits, modules] = await Promise.all([
     selectFromByIds(
       'course_units',
       attainments.map(a => a.course_unit_id).filter(id => !!id)
@@ -553,17 +565,6 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
       'modules',
       attainments.map(a => a.module_group_id).filter(id => !!id),
       'group_id'
-    ),
-    selectFromByIds(
-      'studyrights',
-      attainments.map(a => a.study_right_id).filter(id => !!id)
-    ),
-  ])
-
-  const [studyrightOrganisations] = await Promise.all([
-    selectFromByIds(
-      'organisations',
-      studyrights.map(studyright => studyright.organisation_id).filter(id => !!id)
     ),
   ])
 
@@ -574,16 +575,6 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
 
   const moduleGroupIdToModuleCode = modules.reduce((res, curr) => {
     res[curr.group_id] = curr.code
-    return res
-  }, {})
-
-  const organisationIdToName = studyrightOrganisations.reduce((res, curr) => {
-    res[curr.id] = curr.name
-    return res
-  }, {})
-
-  const studyrightIdToOrganisationsName = studyrights.reduce((res, curr) => {
-    res[curr.id] = organisationIdToName[curr.organisation_id]
     return res
   }, {})
 
@@ -619,8 +610,6 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
     'CustomModuleAttainment',
   ])
   const creditTeachers = []
-
-  const courseCodeToAyCodelessId = new Map()
 
   const coursesToBeCreated = new Map()
   const courseProvidersToBeCreated = []
@@ -821,8 +810,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
     courseUnitIdToCourseGroupId,
     moduleGroupIdToModuleCode,
     courseGroupIdToCourseCode,
-    studyrightIdToOrganisationsName,
-    courseCodeToAyCodelessId
+    studyRightIdToEducationType
   )
 
   const credits = fixedAttainments
