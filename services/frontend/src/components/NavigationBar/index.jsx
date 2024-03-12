@@ -9,38 +9,38 @@ import { useGetAuthorizedUserQuery, useLogoutMutation, useShowAsUser } from '@/r
 import './navigationBar.css'
 
 const allNavigationItems = {
-  university: { path: '/university', key: 'university', label: 'University' },
-  faculty: { path: '/faculties', key: 'faculties', label: 'Faculties' },
+  university: { key: 'university', label: 'University', path: '/university' },
+  faculty: { key: 'faculties', label: 'Faculties', path: '/faculties' },
   populations: {
+    items: [
+      { key: 'class', label: 'Class statistics', path: '/populations' },
+      { key: 'overview', label: 'Overview', path: '/study-programme' },
+    ],
     key: 'studyProgramme',
     label: 'Programmes',
-    items: [
-      { path: '/populations', key: 'class', label: 'Class statistics' },
-      { path: '/study-programme', key: 'overview', label: 'Overview' },
-    ],
   },
-  courseStatistics: { path: '/coursestatistics', key: 'courseStatistics', label: 'Courses' },
-  students: { path: '/students', key: 'students', label: 'Students' },
-  teachers: { path: '/teachers', key: 'teachers', label: 'Teachers', reqRights: ['teachers'] },
-  users: { path: '/users', key: 'users', label: 'Users', reqRights: ['admin'] },
+  courseStatistics: { key: 'courseStatistics', label: 'Courses', path: '/coursestatistics' },
+  students: { key: 'students', label: 'Students', path: '/students' },
+  teachers: { key: 'teachers', label: 'Teachers', path: '/teachers', reqRights: ['teachers'] },
+  users: { key: 'users', label: 'Users', path: '/users', reqRights: ['admin'] },
   studyGuidanceGroups: {
-    path: '/studyguidancegroups',
     key: 'studyGuidanceGroups',
     label: 'Guidance groups',
+    path: '/studyguidancegroups',
     reqRights: ['studyGuidanceGroups'],
   },
   customPopulations: {
+    items: [
+      { key: 'customSearch', label: 'Custom population', path: '/custompopulation' },
+      { key: 'openUniSearch', label: 'Fetch Open Uni Students by Courses', path: '/openunipopulation' },
+      { key: 'completedCoursesSearch', label: 'Completed courses of students', path: '/completedcoursessearch' },
+      { key: 'languageCenterView', label: 'Language center view', path: '/languagecenterview' },
+    ],
     key: 'customPopulation',
     label: 'Special populations',
-    items: [
-      { path: '/custompopulation', key: 'customSearch', label: 'Custom population' },
-      { path: '/openunipopulation', key: 'openUniSearch', label: 'Fetch Open Uni Students by Courses' },
-      { path: '/completedcoursessearch', key: 'completedCoursesSearch', label: 'Completed courses of students' },
-      { path: '/languagecenterview', key: 'languageCenterView', label: 'Language center view' },
-    ],
   },
-  updater: { path: '/updater', key: 'updater', label: 'Updater', reqRights: ['admin'] },
-  feedback: { path: '/feedback', key: 'feedback', label: 'Give feedback' },
+  updater: { key: 'updater', label: 'Updater', path: '/updater', reqRights: ['admin'] },
+  feedback: { key: 'feedback', label: 'Give feedback', path: '/feedback' },
 }
 
 export const NavigationBar = () => {
@@ -101,7 +101,7 @@ export const NavigationBar = () => {
   const visibleNavigationItems = refreshNavigationRoutes()
 
   const renderNavigationRoutes = () =>
-    Object.values(visibleNavigationItems).map(({ items, path, key, label, tag }) =>
+    Object.values(visibleNavigationItems).map(({ items, key, label, path, tag }) =>
       items ? (
         <Menu.Item
           active={items.some(item => location.pathname.includes(item.path))}
