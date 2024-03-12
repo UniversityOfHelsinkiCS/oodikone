@@ -51,13 +51,23 @@ export const findCorrectProgramme = (student, coursecodes, semesters, startDate,
     )
 
   // First check if there's a studyright associated with the course attainment
-  if (courseAttainment && courseAttainment.studyright_id) {
-    studyrightIdOfCourse = courseAttainment.studyright_id
-    const correctStudyrights = student.studyrights.filter(sr => sr.actual_studyrightid === studyrightIdOfCourse)
-    const studyrightAssociatedWithCourse = correctStudyrights.find(sr =>
-      findStudyrightAssociatedWithCourse(sr, courseAttainment.date)
-    )
-    programme = formatStudyright(studyrightAssociatedWithCourse, courseAttainment.date)
+  if (courseAttainment) {
+    studyrightIdOfCourse = courseAttainment?.studyright_id
+    if (!studyrightIdOfCourse) {
+      const studyplanStudyrightId = student.studyplans.find(sp =>
+        sp.included_courses.some(c => coursecodes.includes(c))
+      )?.studyrightid
+      studyrightIdOfCourse = student.studyrights.find(
+        sr => sr.studyrightid === studyplanStudyrightId
+      ).actual_studyrightid
+    }
+    if (studyrightIdOfCourse) {
+      const correctStudyrights = student.studyrights.filter(sr => sr.actual_studyrightid === studyrightIdOfCourse)
+      const studyrightAssociatedWithCourse = correctStudyrights.find(sr =>
+        findStudyrightAssociatedWithCourse(sr, courseAttainment.date)
+      )
+      programme = formatStudyright(studyrightAssociatedWithCourse, courseAttainment.date)
+    }
   }
 
   // If no studyright associated with the course attainment, check if there's a studyright associated with the course enrollment
