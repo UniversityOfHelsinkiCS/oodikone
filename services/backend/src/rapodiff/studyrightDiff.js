@@ -6,7 +6,7 @@ const _ = require('lodash')
 
 const { optimizedStatisticsOf } = require('../services/populations')
 const { Student, Transfer, StudyrightElement, Studyright } = require('../models')
-const { rapoToken, tokenImporterApi, importerDbApiUrl, nodeproxyUrl } = require('./conf.js')
+const { rapoToken, tokenImporterApi, importerDbApiUrl, nodeproxyUrl } = require('./conf')
 
 const getFromRapo = async (urlStart, urlEnd) => {
   console.log({ urlStart, urlEnd })
@@ -164,7 +164,7 @@ const programme_diff_year = async (programme, facultyCode, year, brief = false) 
   const onlyInRapo = _.difference(rapoStudents, oodikoneStudents)
 
   const wrongMissingInRapo = []
-  for (let student of onlyInOodikone) {
+  for (const student of onlyInOodikone) {
     const status = await isAcuallyActive(student)
     if (status) {
       wrongMissingInRapo.push(student)
@@ -173,7 +173,7 @@ const programme_diff_year = async (programme, facultyCode, year, brief = false) 
 
   // these are in wrong RAPO-population
   const transferred = []
-  for (let student of onlyInRapo) {
+  for (const student of onlyInRapo) {
     const isTransfer = await hasTransferred(student, programme)
     if (isTransfer) {
       transferred.push(student)
@@ -243,7 +243,7 @@ const facultyDiff = async (faculty, programmes, brief) => {
   console.log('\n')
   console.log(faculty)
   console.log('==')
-  for (let programme of programmes) {
+  for (const programme of programmes) {
     await programme_diff(programme, faculty, brief)
   }
 }
@@ -277,16 +277,16 @@ const msc_programme_diff_year = async (programme, facultyCode, year, brief = fal
   const onlyInRapo = _.difference(rapoStudents, oodikoneStudents)
 
   const wrongInRapo = []
-  for (let student of onlyInOodikone) {
+  for (const student of onlyInOodikone) {
     const status = await isAcuallyActive(student)
     if (status) {
-      //wrongInRapo.push(student)
+      // wrongInRapo.push(student)
     }
   }
 
   // in wrong RAPO population
   const transferred = []
-  for (let student of onlyInRapo) {
+  for (const student of onlyInRapo) {
     const status = await hasTransferred(student, programme)
     if (status) {
       transferred.push(student)

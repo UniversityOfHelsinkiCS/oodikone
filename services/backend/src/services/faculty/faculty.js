@@ -1,5 +1,4 @@
-const Sequelize = require('sequelize')
-const { Op } = Sequelize
+const { Op } = require('sequelize')
 const {
   ElementDetail,
   Organization,
@@ -26,23 +25,7 @@ const { uniqBy } = require('lodash')
 const {
   dbConnections: { sequelize },
 } = require('../../database/connection')
-const getTransferredToAndAway = async (programmeCodes, allProgrammeCodes, since) => {
-  const awayTransfers = await transferredAway(programmeCodes, allProgrammeCodes, since)
-  const toTransfers = await transferredTo(programmeCodes, allProgrammeCodes, since)
-  return [...toTransfers, ...awayTransfers]
-}
 
-const getTransferredInside = async (programmeCodes, allProgrammeCodes, since) => {
-  return await transferredInsideFaculty(programmeCodes, allProgrammeCodes, since)
-}
-
-const getTransfersOut = async (programmeCode, start, end) => {
-  return await transferredFaculty([], [programmeCode], start, end)
-}
-
-const getTransfersIn = async (programmeCode, start, end) => {
-  return await transferredFaculty([programmeCode], [], start, end)
-}
 const transferredFaculty = async (programmeCodeIn, programmeCodeOut, start, end) =>
   (
     await Transfer.findAll({
@@ -70,7 +53,7 @@ const startedStudyrights = async (faculty, code, since, studyRightWhere) =>
           model: StudyrightElement,
           required: true,
           where: {
-            code: code,
+            code,
           },
           include: {
             model: ElementDetail,
@@ -96,7 +79,7 @@ const graduatedStudyrights = async (faculty, code, since, studyrightWhere) =>
           model: StudyrightElement,
           required: true,
           where: {
-            code: code,
+            code,
           },
           include: {
             model: ElementDetail,
@@ -123,7 +106,7 @@ const studyrightsByRightStartYear = async (faculty, code, since, graduated = 1) 
           model: StudyrightElement,
           attributes: ['code', 'startdate'],
           where: {
-            code: code,
+            code,
           },
           required: true,
           include: {
@@ -137,7 +120,7 @@ const studyrightsByRightStartYear = async (faculty, code, since, graduated = 1) 
         startdate: {
           [Op.gte]: since,
         },
-        graduated: graduated,
+        graduated,
       },
     })
   ).map(facultyFormatStudyright)
@@ -150,7 +133,7 @@ const getStudyRightsByExtent = async (faculty, startDate, endDate, code, extents
         attributes: [],
         required: true,
         where: {
-          code: code,
+          code,
         },
         include: {
           model: ElementDetail,
@@ -192,7 +175,7 @@ const getStudyRightsByBachelorStart = async (faculty, startDate, endDate, code, 
         model: StudyrightElement,
         required: true,
         where: {
-          code: code,
+          code,
         },
       },
       where: {
@@ -372,6 +355,7 @@ const findFacultyProgrammeCodes = async (faculty, programmeFilter) => {
   for (const org of facultyChildOrganizations) {
     const childAssociationProgrammes = await degreeProgrammesOfFaculty(org.code)
     if (childAssociationProgrammes.length > 0) {
+      // eslint-disable-next-line no-loop-func
       childAssociationProgrammes.forEach(prog => {
         if (!(prog.code in allProgrammeCodes)) {
           allProgrammes = allProgrammes.concat([prog])
@@ -385,6 +369,7 @@ const findFacultyProgrammeCodes = async (faculty, programmeFilter) => {
         for (const gcOrg of grandChildren) {
           const associatedProgrammes = await degreeProgrammesOfFaculty(gcOrg.code)
           if (associatedProgrammes.length > 0) {
+            // eslint-disable-next-line no-loop-func
             associatedProgrammes.forEach(prog => {
               if (!(prog.code in allProgrammeCodes)) {
                 allProgrammes = allProgrammes.concat([prog])
@@ -404,6 +389,24 @@ const findFacultyProgrammeCodes = async (faculty, programmeFilter) => {
   mapCodesToIds(allProgrammes)
 
   return allProgrammes
+}
+
+const getTransferredToAndAway = async (programmeCodes, allProgrammeCodes, since) => {
+  const awayTransfers = await transferredAway(programmeCodes, allProgrammeCodes, since)
+  const toTransfers = await transferredTo(programmeCodes, allProgrammeCodes, since)
+  return [...toTransfers, ...awayTransfers]
+}
+
+const getTransferredInside = async (programmeCodes, allProgrammeCodes, since) => {
+  return await transferredInsideFaculty(programmeCodes, allProgrammeCodes, since)
+}
+
+const getTransfersOut = async (programmeCode, start, end) => {
+  return await transferredFaculty([], [programmeCode], start, end)
+}
+
+const getTransfersIn = async (programmeCode, start, end) => {
+  return await transferredFaculty([programmeCode], [], start, end)
 }
 
 module.exports = {

@@ -11,8 +11,10 @@ const accessLogger = morgan((tokens, req, res) => {
   const fields = ['method', 'url', 'status', 'response-time', 'remote-addr', 'remote-user', 'user-agent', 'referrer']
   const { user } = req
   const meta = { ...user }
-  fields.forEach(field => (meta[field] = tokens[field](req, res)))
-  meta['time'] = tokens['date'](req, res, 'iso')
+  fields.forEach(field => {
+    meta[field] = tokens[field](req, res)
+  })
+  meta.time = tokens.date(req, res, 'iso')
   if (req.route) {
     meta['req-route'] = req.route.path
   }
@@ -20,14 +22,14 @@ const accessLogger = morgan((tokens, req, res) => {
   const message = [
     `${user.mockedBy ? '(mocking) ' : ''}${user.name}`,
     `${(tokens['response-time'](req, res) || '0').split('.')[0]} ms`.padEnd(8, ' '),
-    tokens['status'](req, res),
-    tokens['method'](req, res),
-    tokens['url'](req, res),
+    tokens.status(req, res),
+    tokens.method(req, res),
+    tokens.url(req, res),
   ].join(' ')
 
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(user.programmeRights)
 
-  const usingIamRights = user.iamRights.some(programmeCode => tokens['url'](req, res).includes(programmeCode))
+  const usingIamRights = user.iamRights.some(programmeCode => tokens.url(req, res).includes(programmeCode))
   const onlyIamRights = !user.isAdmin && fullStudyProgrammeRights.length === 0
 
   logger.info(message, {

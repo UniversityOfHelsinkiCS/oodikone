@@ -2,6 +2,7 @@ const { Course, Credit, Enrollment, StudyrightElement, Studyright } = require('.
 const { Op } = require('sequelize')
 const { redisClient } = require('./redis')
 const { orderBy } = require('lodash')
+
 const LANGUAGE_CENTER_REDIS_KEY = 'LANGUAGE_CENTER_DATA'
 
 const isBetween = (start, date, end) =>
@@ -25,12 +26,59 @@ const getLanguageCenterCourses = async () => {
   return courses
 }
 
-const getLanguageCenterData = async () => {
-  const dataOnRedis = await redisClient.getAsync(LANGUAGE_CENTER_REDIS_KEY)
-  if (dataOnRedis) return JSON.parse(dataOnRedis)
-  const freshData = await computeLanguageCenterData()
-  redisClient.setAsync(LANGUAGE_CENTER_REDIS_KEY, JSON.stringify(freshData))
-  return freshData
+const createArrayOfCourses = async (attempts, courses) => {
+  const fields = { completions: 0, enrollments: 0, difference: 0, rejected: 0 }
+  const semestersObject = {}
+  const facultyObject = {}
+  const semesterStatsMap = attempts.reduce((obj, cur) => {
+    const semester = cur.semestercode
+    facultyObject[cur.faculty] = true
+    semestersObject[semester] = true
+    if (!obj[cur.courseCode]) {
+      obj[cur.courseCode] = {}
+    }
+    if (!obj[cur.courseCode][semester]) {
+      obj[cur.courseCode][semester] = { ...fields }
+    }
+    if (cur.faculty && !obj[cur.courseCode][semester][cur.faculty]) {
+      obj[cur.courseCode][semester][cur.faculty] = { ...fields }
+    }
+    const allFacultiesTotal = obj[cur.courseCode][semester]
+    const allStats = [allFacultiesTotal]
+    if (cur.faculty) {
+      const semesterFacultyStats = obj[cur.courseCode][semester][cur.faculty]
+      allStats.push(semesterFacultyStats)
+    }
+    for (const stats of allStats) {
+      if (cur.completed) {
+        stats.completions += 1
+      } else if (cur.enrolled) {
+        stats.enrollments += 1
+      } else {
+        stats.rejected += 1
+      }
+    }
+    return obj
+  }, {})
+
+  const courseList = courses
+    .map(c => ({ ...c, bySemesters: { ...semesterStatsMap[c.code], cellStats: {} } }))
+    .filter(course => course.bySemesters)
+
+  courseList.forEach(course => {
+    Object.keys(semestersObject).forEach(sem => {
+      const stats = course.bySemesters[sem]
+      if (!stats) return
+      stats.difference = getDifference(stats)
+      Object.keys(facultyObject).forEach(fac => {
+        const stats = course.bySemesters[sem]?.[fac]
+        if (!stats) return
+        stats.difference = getDifference(stats)
+      })
+    })
+  })
+
+  return courseList
 }
 
 const computeLanguageCenterData = async () => {
@@ -162,7 +210,7 @@ const computeLanguageCenterData = async () => {
     if (item.faculty) {
       if (isOpenUni(item.faculty)) {
         item.faculty = 'OPEN'
-      } else if (isMisc(item.faculty) || !item.faculty.substring(0, 3).match(`^H\\d`)) {
+      } else if (isMisc(item.faculty) || !item.faculty.substring(0, 3).match('^H\\d')) {
         item.faculty = 'OTHER'
       }
       return
@@ -174,7 +222,7 @@ const computeLanguageCenterData = async () => {
     const faculty = getFaculty(item.studentNumber, item.date)
     if (isOpenUni(faculty)) {
       item.faculty = 'OPEN'
-    } else if (faculty?.substring(0, 3).match(`^H\\d`)) {
+    } else if (faculty?.substring(0, 3).match('^H\\d')) {
       item.faculty = !isMisc(faculty) ? faculty : 'OTHER'
     } else {
       item.faculty = 'OTHER'
@@ -190,61 +238,12 @@ const computeLanguageCenterData = async () => {
   return { tableData, faculties }
 }
 
-const createArrayOfCourses = async (attempts, courses) => {
-  const fields = { completions: 0, enrollments: 0, difference: 0, rejected: 0 }
-  const semestersObject = {}
-  const facultyObject = {}
-  const semesterStatsMap = attempts.reduce((obj, cur) => {
-    const semester = cur.semestercode
-    facultyObject[cur.faculty] = true
-    semestersObject[semester] = true
-    if (!obj[cur.courseCode]) {
-      obj[cur.courseCode] = {}
-    }
-    if (!obj[cur.courseCode][semester]) {
-      obj[cur.courseCode][semester] = { ...fields }
-    }
-    if (cur.faculty && !obj[cur.courseCode][semester][cur.faculty]) {
-      obj[cur.courseCode][semester][cur.faculty] = { ...fields }
-    }
-    const allFacultiesTotal = obj[cur.courseCode][semester]
-    const allStats = [allFacultiesTotal]
-    if (cur.faculty) {
-      const semesterFacultyStats = obj[cur.courseCode][semester][cur.faculty]
-      allStats.push(semesterFacultyStats)
-    }
-    for (const stats of allStats) {
-      if (cur.completed) {
-        stats.completions += 1
-      } else {
-        if (cur.enrolled) {
-          stats.enrollments += 1
-        } else {
-          stats.rejected += 1
-        }
-      }
-    }
-    return obj
-  }, {})
-
-  const courseList = courses
-    .map(c => ({ ...c, bySemesters: { ...semesterStatsMap[c.code], cellStats: {} } }))
-    .filter(course => course.bySemesters)
-
-  courseList.forEach(course => {
-    Object.keys(semestersObject).forEach(sem => {
-      const stats = course.bySemesters[sem]
-      if (!stats) return
-      stats.difference = getDifference(stats)
-      Object.keys(facultyObject).forEach(fac => {
-        const stats = course.bySemesters[sem]?.[fac]
-        if (!stats) return
-        stats.difference = getDifference(stats)
-      })
-    })
-  })
-
-  return courseList
+const getLanguageCenterData = async () => {
+  const dataOnRedis = await redisClient.getAsync(LANGUAGE_CENTER_REDIS_KEY)
+  if (dataOnRedis) return JSON.parse(dataOnRedis)
+  const freshData = await computeLanguageCenterData()
+  redisClient.setAsync(LANGUAGE_CENTER_REDIS_KEY, JSON.stringify(freshData))
+  return freshData
 }
 
 module.exports = {

@@ -1,12 +1,12 @@
 const os = require('os')
-
 const winston = require('winston')
 const { WinstonGelfTransporter } = require('winston-gelf-transporter')
 
 const { isProduction } = require('../conf-backend')
+
 const { combine, timestamp, printf, splat } = winston.format
 
-let transports = []
+const transports = []
 
 const formatDate = timestamp => {
   if (!isProduction) return new Date(timestamp).toLocaleTimeString('fi-FI').replace(' klo', '')

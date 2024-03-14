@@ -1,7 +1,6 @@
 const moment = require('moment')
-const sequelize = require('sequelize')
+const { Op } = require('sequelize')
 const { Semester } = require('../models')
-const Op = sequelize.Op
 
 const getCurrentSemester = async () => {
   const today = new Date()

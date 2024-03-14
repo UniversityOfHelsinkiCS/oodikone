@@ -333,7 +333,7 @@ const getGoal = programme => {
   if (programme.startsWith('LI')) {
     return 78
   }
-  return 48 //unknown, likely old doctor or licentiate
+  return 48 // unknown, likely old doctor or licentiate
 }
 
 module.exports = {

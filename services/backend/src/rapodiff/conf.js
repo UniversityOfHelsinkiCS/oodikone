@@ -2,8 +2,8 @@
 const rapoToken = process.env.RAPO_NODEPROXY
 const importerDbApiToken = process.env.IMPORTER_DB_API_TOKEN
 
-const nodeproxyUrl = `https://toska.cs.helsinki.fi`
-const importerDbApiUrl = `https://api-toska.apps.ocp-prod-0.k8s.it.helsinki.fi/importer`
+const nodeproxyUrl = 'https://toska.cs.helsinki.fi'
+const importerDbApiUrl = 'https://api-toska.apps.ocp-prod-0.k8s.it.helsinki.fi/importer'
 
 const bscProgrammesOfFaculties = {
   H10: ['KH10_001'],

@@ -18,7 +18,7 @@ const { codes } = require('../../../config/programmeCodes')
 const filterDuplicateStudyrights = studyrights => {
   // bachelor+master students have two studyrights (separated by two last digits in studyrightid)
   // choose only bachelor one, so we don't count start of masters as starting in faculty
-  let rightsToCount = {}
+  const rightsToCount = {}
 
   studyrights.forEach(right => {
     const id = right.studyrightid.slice(0, -2)
@@ -39,18 +39,22 @@ const addProgramme = async (
   facultyProgrammes,
   includeAllSpecials
 ) => {
-  let { progId, name, code } = facultyProgrammes.filter(prog => prog.code === programme)[0]
+  const { progId, name, code } = facultyProgrammes.filter(prog => prog.code === programme)[0]
   if (!(progId in stats)) {
     stats[progId] = {}
     if (includeAllSpecials) {
-      Object.keys(tableStats).forEach(year => (stats[progId][year] = [0, 0, 0]))
+      Object.keys(tableStats).forEach(year => {
+        stats[progId][year] = [0, 0, 0]
+      })
     } else {
-      Object.keys(tableStats).forEach(year => (stats[progId][year] = [0]))
+      Object.keys(tableStats).forEach(year => {
+        stats[progId][year] = [0]
+      })
     }
   }
   stats[progId][transferYear][index] += 1
   if (!(progId in allBasics.programmeNames)) {
-    allBasics.programmeNames[progId] = { ...name, code: code }
+    allBasics.programmeNames[progId] = { ...name, code }
   }
 }
 
@@ -116,7 +120,7 @@ const getFacultyStarters = async (
     })
   }
   allBasics.studentInfo.graphStats.push({ name: 'Started studying (new in faculty)', data: startedGraphStats })
-  programmeData['started'] = programmeTableStats
+  programmeData.started = programmeTableStats
 
   Object.keys(startedTableStats).forEach(year => {
     counts[year] = [startedTableStats[year]]
@@ -143,9 +147,11 @@ const getFacultyGraduates = async (
   const graduatedGraphStats = [[...graphStats], [...graphStats], [...graphStats], [...graphStats], [...graphStats]]
   const graduatedTableStats = {}
   const programmeTableStats = {}
-  Object.keys(tableStats).forEach(year => (graduatedTableStats[year] = [0, 0, 0, 0, 0]))
+  Object.keys(tableStats).forEach(year => {
+    graduatedTableStats[year] = [0, 0, 0, 0, 0]
+  })
   const keys = Object.keys(codes)
-  let studyrightWhere = getExtentFilter(includeAllSpecials)
+  const studyrightWhere = getExtentFilter(includeAllSpecials)
   for (const code of programmes) {
     let graduatedRights = await graduatedStudyrights(faculty, code, since, studyrightWhere)
     if (!includeAllSpecials) {
@@ -169,7 +175,9 @@ const getFacultyGraduates = async (
 
         if (!(programmeId in programmeTableStats)) {
           programmeTableStats[programmeId] = {}
-          Object.keys(tableStats).forEach(year => (programmeTableStats[programmeId][year] = [0, 0, 0, 0, 0]))
+          Object.keys(tableStats).forEach(year => {
+            programmeTableStats[programmeId][year] = [0, 0, 0, 0, 0]
+          })
         }
         programmeTableStats[programmeId][endYear][0] += 1
 
@@ -204,7 +212,7 @@ const getFacultyGraduates = async (
   allBasics.graduationInfo.graphStats.push({ name: 'Doctors', data: graduatedGraphStats[3] })
   allBasics.graduationInfo.graphStats.push({ name: 'Others', data: graduatedGraphStats[4] })
 
-  programmeData['graduated'] = programmeTableStats
+  programmeData.graduated = programmeTableStats
 
   Object.keys(graduatedTableStats).forEach(year => {
     counts[year] = counts[year].concat(graduatedTableStats[year][0])
@@ -246,13 +254,17 @@ const getFacultyTransfers = async (
     faculty
   )
   let transferGraphStats = []
-  let transferTableStats = {}
+  const transferTableStats = {}
   if (includeAllSpecials) {
     transferGraphStats = [[...graphStats], [...graphStats], [...graphStats]]
-    Object.keys(tableStats).forEach(year => (transferTableStats[year] = [0, 0, 0]))
+    Object.keys(tableStats).forEach(year => {
+      transferTableStats[year] = [0, 0, 0]
+    })
   } else {
     transferGraphStats = [[...graphStats]]
-    Object.keys(tableStats).forEach(year => (transferTableStats[year] = [0]))
+    Object.keys(tableStats).forEach(year => {
+      transferTableStats[year] = [0]
+    })
   }
 
   const programmeTableStats = {}
@@ -320,7 +332,7 @@ const getFacultyTransfers = async (
     allBasics.studentInfo.graphStats.push({ name: 'Transferred away', data: transferGraphStats[1] })
     allBasics.studentInfo.graphStats.push({ name: 'Transferred to', data: transferGraphStats[2] })
   }
-  programmeData['transferred'] = programmeTableStats
+  programmeData.transferred = programmeTableStats
 
   Object.keys(transferTableStats).forEach(year => {
     counts[year] = counts[year].concat(transferTableStats[year])
@@ -328,10 +340,10 @@ const getFacultyTransfers = async (
 }
 
 const combineFacultyBasics = async (faculty, programmes, yearType, allProgrammeCodes, programmeFilter, special) => {
-  let counts = {}
-  let countsGraduations = {}
-  let years = []
-  let programmeData = {}
+  const counts = {}
+  const countsGraduations = {}
+  const years = []
+  const programmeData = {}
   const isAcademicYear = yearType === 'ACADEMIC_YEAR'
   const includeAllSpecials = special === 'SPECIAL_INCLUDED'
   const since = isAcademicYear ? new Date('2017-08-01') : new Date('2017-01-01')
@@ -340,7 +352,7 @@ const combineFacultyBasics = async (faculty, programmes, yearType, allProgrammeC
   Object.keys(tableStats).forEach(year => years.push(year))
   const wantedProgrammeCodes = programmes.map(prog => prog.code)
 
-  let allBasics = {
+  const allBasics = {
     id: faculty,
     years: [],
     programmeNames: {},
@@ -424,7 +436,7 @@ const combineFacultyBasics = async (faculty, programmes, yearType, allProgrammeC
   allBasics.studentInfo.tableStats.reverse()
   allBasics.graduationInfo.tableStats.reverse()
 
-  //combine programme level tablestats
+  // combine programme level tablestats
   // all programmes are not present in all data types, check all found programmes and patch missing details with 0
 
   let allCodes = Object.keys(programmeData.started).concat(
@@ -433,8 +445,8 @@ const combineFacultyBasics = async (faculty, programmes, yearType, allProgrammeC
   )
   allCodes = [...new Set(allCodes)]
 
-  let studentInfo = {}
-  let graduationInfo = {}
+  const studentInfo = {}
+  const graduationInfo = {}
 
   allCodes.forEach(code => {
     if (!(code in studentInfo)) studentInfo[code] = {}
@@ -457,12 +469,10 @@ const combineFacultyBasics = async (faculty, programmes, yearType, allProgrammeC
       // trasferred
       if (code in programmeData.transferred) {
         studentInfo[code][year] = studentInfo[code][year].concat(programmeData.transferred[code][year])
+      } else if (includeAllSpecials) {
+        studentInfo[code][year] = studentInfo[code][year].concat([0, 0, 0])
       } else {
-        if (includeAllSpecials) {
-          studentInfo[code][year] = studentInfo[code][year].concat([0, 0, 0])
-        } else {
-          studentInfo[code][year] = studentInfo[code][year].concat([0])
-        }
+        studentInfo[code][year] = studentInfo[code][year].concat([0])
       }
     }
   })

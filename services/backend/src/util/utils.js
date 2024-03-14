@@ -16,8 +16,9 @@ const mapToProviders = programmeCodes => {
       // that got the wrong provider
       if (asNum < 7920111 && asNum > 7920102) {
         return `${asNum + 1}`
-      } else if (asNum === 7920111) {
-        return `7920103`
+      }
+      if (asNum === 7920111) {
+        return '7920103'
       }
       return `${asNum}`
     }
@@ -46,9 +47,7 @@ const getSortRank = code => {
 
 const sortMainCode = codeArray => {
   if (!codeArray) return []
-  return codeArray.sort(function (x, y) {
-    return getSortRank(y) - getSortRank(x)
-  })
+  return codeArray.sort((x, y) => getSortRank(y) - getSortRank(x))
 }
 
 /** Returns a sorting function that can be used to sort strings so that Finnish alphabetical order is respected.

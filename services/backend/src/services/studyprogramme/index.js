@@ -1,15 +1,14 @@
 const _ = require('lodash')
-const Sequelize = require('sequelize')
+const { Op } = require('sequelize')
 const {
   dbConnections: { sequelize },
 } = require('../../database/connection')
-const { Op } = Sequelize
 const { Credit, Course, Organization, ProgrammeModule, Transfer, Enrollment } = require('../../models')
 const { formatTransfer } = require('./studyprogrammeHelpers')
 const logger = require('../../util/logger')
 
 const whereStudents = studentnumbers => {
-  return studentnumbers ? studentnumbers : { [Op.not]: null }
+  return studentnumbers || { [Op.not]: null }
 }
 
 const sinceDate = since => {

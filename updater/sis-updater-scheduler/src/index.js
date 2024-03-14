@@ -14,7 +14,7 @@ const { startServer } = require('./server')
 const { scheduleHourly, scheduleWeekly, schedulePrePurge, schedulePurge, isUpdaterActive } = require('./scheduler')
 
 stan.on('error', e => {
-  logger.error({ message: 'NATS connection failed: ' + e, meta: e.stack })
+  logger.error({ message: `NATS connection failed: ${e}`, meta: e.stack })
   if (!process.env.CI) process.exit(1)
 })
 
@@ -83,7 +83,7 @@ knexConnection.on('connect', async () => {
       await scheduleHourly()
     } catch (e) {
       logger.error({
-        message: 'Hourly run failed: ' + e.message,
+        message: `Hourly run failed: ${e.message}`,
         meta: e.stack,
       })
     }
@@ -100,7 +100,7 @@ knexConnection.on('connect', async () => {
       await scheduleWeekly()
     } catch (e) {
       logger.error({
-        message: 'Weekly run failed: ' + e.message,
+        message: `Weekly run failed: ${e.message}`,
         meta: e.stack,
       })
     }
@@ -117,7 +117,7 @@ knexConnection.on('connect', async () => {
       await schedulePrePurge()
     } catch (e) {
       logger.error({
-        message: 'Prepurge failed: ' + e.message,
+        message: `Prepurge failed: ${e.message}`,
         meta: e.stack,
       })
     }
@@ -133,7 +133,7 @@ knexConnection.on('connect', async () => {
       await schedulePurge()
     } catch (e) {
       logger.error({
-        message: 'Purge failed: ' + e.message,
+        message: `Purge failed: ${e.message}`,
         meta: e.stack,
       })
     }

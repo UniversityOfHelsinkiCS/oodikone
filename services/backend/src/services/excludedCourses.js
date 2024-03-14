@@ -1,6 +1,5 @@
-const Sequelize = require('sequelize')
+const { Op } = require('sequelize')
 const { ExcludedCourse } = require('../models/models_kone')
-const { Op } = Sequelize
 
 const addExcludedCourses = async (programmecode, coursecodes, curriculum) => {
   return ExcludedCourse.bulkCreate(

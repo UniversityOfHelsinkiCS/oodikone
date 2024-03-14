@@ -74,7 +74,7 @@ const updateFacultyOverview = async (faculty, statsType) => {
   ]
   let allProgrammes = []
   let newProgrammes = []
-  let allProgrammeCodes = []
+  const allProgrammeCodes = []
 
   try {
     const all = await findFacultyProgrammeCodes(faculty, 'ALL_PROGRAMMES')

@@ -11,7 +11,7 @@ const getCompletedCourses = async (studentNumbers, courseCodes) => {
     },
   })
 
-  let fullCourseCodes = [
+  const fullCourseCodes = [
     ...courseCodes,
     ...new Set([...courses.reduce((acc, course) => [...acc, course.code, ...course.substitutions], [])]),
   ]
@@ -63,7 +63,7 @@ const getCompletedCourses = async (studentNumbers, courseCodes) => {
       ? null
       : courses.find(course => course.substitutions.includes(course_code))?.code
     return {
-      courseCode: originalCode ? originalCode : course_code,
+      courseCode: originalCode || course_code,
       substitution: originalCode ? course_code : null,
       studentNumber: student_studentnumber,
       creditType: credittypecode,
@@ -74,7 +74,7 @@ const getCompletedCourses = async (studentNumbers, courseCodes) => {
   enrollments = enrollments.map(enrollment => {
     const originalCode = courses.find(course => course.substitutions.includes(enrollment.course_code))?.code
     return {
-      courseCode: originalCode ? originalCode : enrollment.course_code,
+      courseCode: originalCode || enrollment.course_code,
       substitution: originalCode ? enrollment.course_code : null,
       studentNumber: enrollment.studentnumber,
       date: enrollment.enrollment_date_time,
@@ -100,7 +100,8 @@ const getCompletedCourses = async (studentNumbers, courseCodes) => {
     const previous = studentCredits[credit.studentNumber].credits?.find(c => credit.courseCode === c.courseCode)
     if (previous && previous.date > credit.date) {
       return
-    } else if (previous) {
+    }
+    if (previous) {
       studentCredits[credit.studentNumber].credits = studentCredits[credit.studentNumber].credits.filter(
         c => credit.courseCode !== c.courseCode
       )
@@ -148,6 +149,8 @@ const getCompletedCourses = async (studentNumbers, courseCodes) => {
 
   students.forEach(student => {
     courseCodes.forEach(courseCode => {
+      // TODO: Fix this, sort function always takes two parameters
+      // eslint-disable-next-line prefer-destructuring
       student.enrollments[courseCode] = student.allEnrollments
         .filter(e => e.courseCode === courseCode || e.substitution === courseCode)
         .sort(e => new Date(e.date).getDate())[0]
@@ -158,7 +161,6 @@ const getCompletedCourses = async (studentNumbers, courseCodes) => {
   // the user does not have rights to see all enrollments.
   return {
     students: students.map(student => {
-      // eslint-disable-next-line no-unused-vars
       const { allEnrollments, ...rest } = student
       return { ...rest }
     }),

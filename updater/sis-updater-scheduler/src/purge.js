@@ -139,7 +139,7 @@ const startPrePurge = async () => {
 const startPurge = async () => {
   const allowedToPurge = purgeAfterDate => {
     if (!purgeAfterDate) {
-      logger.info(`Purge was scheduled, but there was no date to purge after. Purge was not executed.`)
+      logger.info('Purge was scheduled, but there was no date to purge after. Purge was not executed.')
 
       return false
     }

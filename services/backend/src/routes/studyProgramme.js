@@ -23,7 +23,7 @@ const { ElementDetail } = require('../models')
 
 // For grafana statistics (idea stolen from Norppa)
 const logInfoForGrafana = async (code, combinedProgramme) => {
-  const programme = await ElementDetail.findOne({ where: { code: code } })
+  const programme = await ElementDetail.findOne({ where: { code } })
   const programmeCode = combinedProgramme ? `${programme.code}-${combinedProgramme}` : programme.code
   logger.info('Study Programme', {
     studyprogrammeName: combinedProgramme ? `${programme.name.fi} + maisteri` : programme.name.fi,
@@ -150,9 +150,8 @@ router.get('/v2/studyprogrammes/:id/update_basicview', async (req, res) => {
       logger.error({ message: `Failed to update code ${code} ${combinedProgramme} basic stats`, meta: `${e}` })
     }
     return res.json(result)
-  } else {
-    res.status(422).end()
   }
+  res.status(422).end()
 })
 
 router.get('/v2/studyprogrammes/:id/update_studytrackview', async (req, res) => {
@@ -167,9 +166,8 @@ router.get('/v2/studyprogrammes/:id/update_studytrackview', async (req, res) => 
       logger.error({ message: `Failed to update code ${code} ${combinedProgramme} studytrack stats`, meta: `${e}` })
     }
     return res.json(result)
-  } else {
-    res.status(422).end()
   }
+  res.status(422).end()
 })
 
 router.get('/v2/studyprogrammes/:id/evaluationstats', async (req, res) => {

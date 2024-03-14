@@ -26,7 +26,7 @@ const studentnumbersWithAllStudyrightElements = async ({
     filteredExtents.push(6, 9, 13, 14, 18, 22, 23, 99)
   }
 
-  let studyrightWhere = {
+  const studyrightWhere = {
     extentcode: {
       [Op.notIn]: filteredExtents,
     },
@@ -35,7 +35,7 @@ const studentnumbersWithAllStudyrightElements = async ({
     },
   }
 
-  let studentWhere = {}
+  const studentWhere = {}
   if (tag) {
     const taggedStudentnumbers = await TagStudent.findAll({
       attributes: ['studentnumber'],
@@ -70,7 +70,7 @@ const studentnumbersWithAllStudyrightElements = async ({
     where: {
       [Op.or]: [
         {
-          ['$studyright_elements->element_detail.type$']: {
+          '$studyright_elements->element_detail.type$': {
             [Op.ne]: 20,
           },
         },
@@ -92,7 +92,7 @@ const studentnumbersWithAllStudyrightElements = async ({
     raw: true,
   })
 
-  let studentnumbers = [...new Set(students.map(s => s.student_studentnumber))]
+  const studentnumbers = [...new Set(students.map(s => s.student_studentnumber))]
   // bit hacky solution, but this is used to filter out studentnumbers who have since changed studytracks
   const rights = await Studyright.findAll({
     attributes: ['studyrightid'],

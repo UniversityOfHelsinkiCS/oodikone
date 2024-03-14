@@ -15,7 +15,7 @@ const calculateTotalsForStudent = async (studentStats, studentnumber) => {
   })
 }
 const getCustomOpenUniCourses = async (courseCodes, startdate, enddate) => {
-  const ayCourseCodes = courseCodes.map(courseCode => 'AY' + courseCode)
+  const ayCourseCodes = courseCodes.map(courseCode => `AY${courseCode}`)
   const allCourseCodes = courseCodes.concat(ayCourseCodes)
   const allCredits = await getCredits(allCourseCodes, startdate)
   const allEnrollments = await getEnrollments(allCourseCodes, startdate, enddate)
@@ -60,7 +60,7 @@ const getCustomOpenUniCourses = async (courseCodes, startdate, enddate) => {
             (acc, code) => ({ ...acc, [code.replace('AY', '')]: getEmptyCourseInfo() }),
             {}
           ),
-          email: email,
+          email,
           secondaryEmail: secondary_email,
           totals: { passed: 0, failed: 0, unfinished: 0 },
         }
@@ -103,7 +103,7 @@ const getCustomOpenUniCourses = async (courseCodes, startdate, enddate) => {
       await calculateTotalsForStudent(studentStats, studentnumber)
     }
   }
-  const openUniStats = { students: studentStats, courses: courses }
+  const openUniStats = { students: studentStats, courses }
   return openUniStats
 }
 

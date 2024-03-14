@@ -142,8 +142,8 @@ const getStudentsForProgrammeCourses = async (from, to, programmeCourses) => {
     const result = res.map(course => ({
       code: course.code,
       name: course.course_name,
-      totalPassed: parseInt(course.total_students),
-      totalAllcredits: parseInt(course.total_credits),
+      totalPassed: parseInt(course.total_students, 10),
+      totalAllcredits: parseInt(course.total_credits, 10),
       type: 'passed',
       isStudyModule: course.isStudyModule,
     }))
@@ -182,8 +182,8 @@ const getOwnStudentsForProgrammeCourses = async (from, to, programmeCourses, stu
     const res = {
       code: course.code,
       name: course.course_name,
-      totalProgrammeStudents: parseInt(course.total_students),
-      totalProgrammeCredits: parseInt(course.total_credits),
+      totalProgrammeStudents: parseInt(course.total_students, 10),
+      totalProgrammeCredits: parseInt(course.total_credits, 10),
       type: 'ownProgramme',
     }
     return res
@@ -226,8 +226,8 @@ const getOtherStudentsForProgrammeCourses = async (from, to, programmeCourses, s
   return res.map(course => ({
     code: course.code,
     name: course.course_name,
-    totalOtherProgrammeStudents: parseInt(course.total_students),
-    totalOtherProgrammeCredits: parseInt(course.total_credits),
+    totalOtherProgrammeStudents: parseInt(course.total_students, 10),
+    totalOtherProgrammeCredits: parseInt(course.total_credits, 10),
     type: 'otherProgramme',
     isStudyModule: course.isStudyModule,
   }))
@@ -257,8 +257,8 @@ const getTransferStudentsForProgrammeCourses = async (from, to, programmeCourses
   return res.map(course => ({
     code: course.code,
     name: course.course_name,
-    totalTransferStudents: parseInt(course.total_students),
-    totalTransferCredits: parseInt(course.total_credits),
+    totalTransferStudents: parseInt(course.total_students, 10),
+    totalTransferCredits: parseInt(course.total_credits, 10),
     isStudyModule: course.isStudyModule,
     type: 'transfer',
   }))
@@ -293,8 +293,8 @@ const getStudentsWithoutStudyrightForProgrammeCourses = async (from, to, program
   return res.map(course => ({
     code: course.code,
     name: course.course_name,
-    totalWithoutStudyrightStudents: parseInt(course.total_students),
-    totalWithoutStudyrightCredits: parseInt(course.total_credits),
+    totalWithoutStudyrightStudents: parseInt(course.total_students, 10),
+    totalWithoutStudyrightCredits: parseInt(course.total_credits, 10),
     type: 'noStudyright',
   }))
 }

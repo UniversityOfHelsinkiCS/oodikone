@@ -42,6 +42,8 @@ const update = async ({ entityIds, type }) => {
       return await updateHandler(await selectFromByIds(type, entityIds))
     case 'programme_modules':
       return await updateHandler(entityIds)
+    default:
+      break
   }
 }
 

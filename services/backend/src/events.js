@@ -69,7 +69,7 @@ const refreshProgramme = async code => {
   await updateBasicView(code, '')
   await updateStudytrackView(code, '', associations)
 
-  let combinedProgramme = combinedStudyprogrammes[code] || ''
+  const combinedProgramme = combinedStudyprogrammes[code] || ''
   await updateBasicView(code, combinedProgramme)
   await updateStudytrackView(code, combinedProgramme, associations)
 }

@@ -4,7 +4,31 @@ const { parseCsv } = require('./helpers')
 const _ = require('lodash')
 
 const diffs = []
-let noDiffCounter = 0
+const noDiffCounter = 0
+
+// Change weird rapo programmecodes to oodikone format, example: 300-M003 => MH30_003
+const transformProgrammeCode = oldCode => `${oldCode[4]}H${oldCode.slice(0, 2)}_${oldCode.slice(5, 8)}`
+
+const formatData = data =>
+  data.reduce((obj, cur) => {
+    const parseNum = str => (str === '' ? 0 : parseInt(str, 10))
+    const [year, facultyCode, programmeInfo, basic, exchange, otherUni, openUni, special, total, abroad, other] = cur
+    const programmeCode = transformProgrammeCode(programmeInfo.split(' ')[0])
+    if (!obj[programmeCode]) obj[programmeCode] = {}
+    obj[programmeCode][year] = {
+      year,
+      facultyCode,
+      programmeInfo,
+      basic: parseNum(basic),
+      'incoming-exchange': parseNum(exchange),
+      agreement: parseNum(otherUni),
+      'open-uni': parseNum(openUni),
+      separate: parseNum(special),
+      total: parseNum(total),
+      transferred: parseNum(abroad) + parseNum(other),
+    }
+    return obj
+  }, {})
 
 const diff = (rapoData, okData, code) => {
   for (const year of Object.keys(okData)) {
@@ -149,29 +173,5 @@ const processIds = async (rawData, code, field) => {
 const testNewCalc = async (fileName, code, field) => {
   await parseCsv(fileName, async data => processIds(data, code, field))
 }
-
-// Change weird rapo programmecodes to oodikone format, example: 300-M003 => MH30_003
-const transformProgrammeCode = oldCode => `${oldCode[4]}H${oldCode.slice(0, 2)}_${oldCode.slice(5, 8)}`
-
-const formatData = data =>
-  data.reduce((obj, cur) => {
-    const parseNum = str => (str === '' ? 0 : parseInt(str, 10))
-    const [year, facultyCode, programmeInfo, basic, exchange, otherUni, openUni, special, total, abroad, other] = cur
-    const programmeCode = transformProgrammeCode(programmeInfo.split(' ')[0])
-    if (!obj[programmeCode]) obj[programmeCode] = {}
-    obj[programmeCode][year] = {
-      year,
-      facultyCode,
-      programmeInfo,
-      basic: parseNum(basic),
-      'incoming-exchange': parseNum(exchange),
-      agreement: parseNum(otherUni),
-      'open-uni': parseNum(openUni),
-      separate: parseNum(special),
-      total: parseNum(total),
-      transferred: parseNum(abroad) + parseNum(other),
-    }
-    return obj
-  }, {})
 
 module.exports = { programmeCreditsDiff, testNewCalc }

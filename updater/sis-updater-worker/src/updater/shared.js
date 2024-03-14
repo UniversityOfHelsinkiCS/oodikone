@@ -38,45 +38,6 @@ const localMaps = {
   countries: null,
 }
 
-const loadMapsIfNeeded = async () => {
-  const now = new Date().getTime()
-  if (!loadedAt || now - loadedAt > TIME_LIMIT_BETWEEN_RELOADS) {
-    const unlock = await redisLock(SHARED_LOCK, 1000 * 60 * 3)
-    const isInitialized = await redisGet(REDIS_INITIALIZED)
-    if (!isInitialized) {
-      await calculateMapsToRedis()
-      await redisSet(REDIS_INITIALIZED, true)
-      await redisExpire(REDIS_INITIALIZED, 1800)
-    }
-    unlock()
-    await loadMapsFromRedis()
-    loadedAt = now
-  }
-}
-
-const loadMapsOnDemand = async () => {
-  // TODO: hotfix for frontend, refactor this to more logical place
-  const unlock = await redisLock(SHARED_LOCK, 1000 * 60 * 3)
-  await calculateMapsToRedis()
-  await redisSet(REDIS_INITIALIZED, true)
-  await redisExpire(REDIS_INITIALIZED, 1800)
-  unlock()
-  await loadMapsFromRedis()
-  loadedAt = new Date().getTime()
-}
-
-const calculateMapsToRedis = async () =>
-  Promise.all([
-    initDaysToSemesters(),
-    initEducationTypes(),
-    initOrganisationIdToCode(),
-    initEducationIdToEducation(),
-    initGradeScaleIdToGradeIdsToGrades(),
-    initOrgToUniOrgId(),
-    initOrgToStartYearToSemesters(),
-    initCountries(),
-  ])
-
 const loadMapsFromRedis = async () =>
   each(Object.entries(localMapToRedisKey), async ([localMap, redisKey]) => {
     localMaps[localMap] = await redisGet(redisKey)
@@ -203,6 +164,45 @@ const initCountries = async () =>
       return res
     })
   )
+
+const calculateMapsToRedis = async () =>
+  Promise.all([
+    initDaysToSemesters(),
+    initEducationTypes(),
+    initOrganisationIdToCode(),
+    initEducationIdToEducation(),
+    initGradeScaleIdToGradeIdsToGrades(),
+    initOrgToUniOrgId(),
+    initOrgToStartYearToSemesters(),
+    initCountries(),
+  ])
+
+const loadMapsIfNeeded = async () => {
+  const now = new Date().getTime()
+  if (!loadedAt || now - loadedAt > TIME_LIMIT_BETWEEN_RELOADS) {
+    const unlock = await redisLock(SHARED_LOCK, 1000 * 60 * 3)
+    const isInitialized = await redisGet(REDIS_INITIALIZED)
+    if (!isInitialized) {
+      await calculateMapsToRedis()
+      await redisSet(REDIS_INITIALIZED, true)
+      await redisExpire(REDIS_INITIALIZED, 1800)
+    }
+    unlock()
+    await loadMapsFromRedis()
+    loadedAt = now
+  }
+}
+
+const loadMapsOnDemand = async () => {
+  // TODO: hotfix for frontend, refactor this to more logical place
+  const unlock = await redisLock(SHARED_LOCK, 1000 * 60 * 3)
+  await calculateMapsToRedis()
+  await redisSet(REDIS_INITIALIZED, true)
+  await redisExpire(REDIS_INITIALIZED, 1800)
+  unlock()
+  await loadMapsFromRedis()
+  loadedAt = new Date().getTime()
+}
 
 const getCountry = countryId => localMaps.countries[countryId]
 

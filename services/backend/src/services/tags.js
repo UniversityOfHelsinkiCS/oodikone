@@ -1,7 +1,5 @@
-const Sequelize = require('sequelize')
+const { Op } = require('sequelize')
 const { Tag } = require('../models/models_kone')
-
-const Op = Sequelize.Op
 
 const findTagById = tag_id =>
   Tag.findOne({
@@ -34,7 +32,7 @@ const findTagsFromStudytrackById = async (studytrack, tag_ids) => {
 }
 
 const createNewTag = async tag => {
-  if (isNaN(tag.year)) {
+  if (Number.isNaN(tag.year)) {
     const newTag = {
       ...tag,
       year: null,

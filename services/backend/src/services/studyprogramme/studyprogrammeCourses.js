@@ -24,8 +24,8 @@ const getAllStudyprogrammeCourses = async studyprogramme => {
   const normalCourses = await getAllProgrammeCourses(providerCode)
   return normalCourses.reduce((acc, curr) => {
     acc.push(curr.code)
-    if (curr.substitutions && curr.substitutions.includes('AY' + curr.code)) {
-      acc.push('AY' + curr.code)
+    if (curr.substitutions && curr.substitutions.includes(`AY${curr.code}`)) {
+      acc.push(`AY${curr.code}`)
     }
     return acc
   }, [])
@@ -34,7 +34,6 @@ const getAllStudyprogrammeCourses = async studyprogramme => {
 const makeYearlyPromises = (years, academicYear, type, programmeCourses, studyprogramme) => {
   return years.map(
     year =>
-      // eslint-disable-next-line no-async-promise-executor
       new Promise(async res => {
         const from = academicYear === 'ACADEMIC_YEAR' ? new Date(year, 7, 1, 0, 0, 0) : new Date(year, 0, 1, 0, 0, 0)
         const to =
@@ -66,7 +65,7 @@ const makeYearlyPromises = (years, academicYear, type, programmeCourses, studypr
 
         res(
           result.map(c => {
-            c['year'] = year
+            c.year = year
             return c
           })
         )
@@ -227,8 +226,8 @@ const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme,
       }
     }
 
-    if (!acc[curr.code]['years'][curr.year]) {
-      acc[curr.code]['years'][curr.year] = {
+    if (!acc[curr.code].years[curr.year]) {
+      acc[curr.code].years[curr.year] = {
         totalAllStudents: 0,
         totalPassed: 0,
         totalNotCompleted: 0,
@@ -246,30 +245,32 @@ const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme,
     }
     switch (curr.type) {
       case 'passed':
-        acc[curr.code]['years'][curr.year]['totalPassed'] += curr.totalPassed
-        acc[curr.code]['years'][curr.year]['totalAllStudents'] += acc[curr.code]['years'][curr.year]['totalPassed']
-        acc[curr.code]['years'][curr.year]['totalAllCredits'] += curr.totalAllcredits
+        acc[curr.code].years[curr.year].totalPassed += curr.totalPassed
+        acc[curr.code].years[curr.year].totalAllStudents += acc[curr.code].years[curr.year].totalPassed
+        acc[curr.code].years[curr.year].totalAllCredits += curr.totalAllcredits
         break
       case 'notCompleted':
-        acc[curr.code]['years'][curr.year]['totalNotCompleted'] += curr.totalNotCompleted
-        acc[curr.code]['years'][curr.year]['totalAllStudents'] +=
-          acc[curr.code]['years'][curr.year]['totalNotCompleted']
+        acc[curr.code].years[curr.year].totalNotCompleted += curr.totalNotCompleted
+        acc[curr.code].years[curr.year].totalAllStudents += acc[curr.code].years[curr.year].totalNotCompleted
         break
       case 'ownProgramme':
-        acc[curr.code]['years'][curr.year]['totalProgrammeStudents'] += curr.totalProgrammeStudents
-        acc[curr.code]['years'][curr.year]['totalProgrammeCredits'] += curr.totalProgrammeCredits
+        acc[curr.code].years[curr.year].totalProgrammeStudents += curr.totalProgrammeStudents
+        acc[curr.code].years[curr.year].totalProgrammeCredits += curr.totalProgrammeCredits
         break
       case 'otherProgramme':
-        acc[curr.code]['years'][curr.year]['totalOtherProgrammeStudents'] += curr.totalOtherProgrammeStudents
-        acc[curr.code]['years'][curr.year]['totalOtherProgrammeCredits'] += curr.totalOtherProgrammeCredits
+        acc[curr.code].years[curr.year].totalOtherProgrammeStudents += curr.totalOtherProgrammeStudents
+        acc[curr.code].years[curr.year].totalOtherProgrammeCredits += curr.totalOtherProgrammeCredits
         break
       case 'noStudyright':
-        acc[curr.code]['years'][curr.year]['totalWithoutStudyrightStudents'] += curr.totalWithoutStudyrightStudents
-        acc[curr.code]['years'][curr.year]['totalWithoutStudyrightCredits'] += curr.totalWithoutStudyrightCredits
+        acc[curr.code].years[curr.year].totalWithoutStudyrightStudents += curr.totalWithoutStudyrightStudents
+        acc[curr.code].years[curr.year].totalWithoutStudyrightCredits += curr.totalWithoutStudyrightCredits
         break
       case 'transfer':
-        acc[curr.code]['years'][curr.year]['totalTransferStudents'] += curr.totalTransferStudents
-        acc[curr.code]['years'][curr.year]['totalTransferCredits'] += curr.totalTransferCredits
+        acc[curr.code].years[curr.year].totalTransferStudents += curr.totalTransferStudents
+        acc[curr.code].years[curr.year].totalTransferCredits += curr.totalTransferCredits
+        break
+      default:
+        break
     }
 
     return acc
@@ -294,15 +295,15 @@ const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme,
 
     if (allCourses[normCode]) {
       const mergedCourse = {}
-      mergedCourse['code'] = allCourses[normCode].code
-      mergedCourse['name'] = allCourses[normCode].name
-      mergedCourse['years'] = {}
+      mergedCourse.code = allCourses[normCode].code
+      mergedCourse.name = allCourses[normCode].name
+      mergedCourse.years = {}
 
       yearRange
         .filter(year => year <= maxYear)
         .forEach(year => {
-          if (!allCourses[normCode]['years'][year]) {
-            mergedCourse['years'][year] = {
+          if (!allCourses[normCode].years[year]) {
+            mergedCourse.years[year] = {
               totalAllStudents: 0,
               totalPassed: 0,
               totalNotCompleted: 0,
@@ -317,13 +318,12 @@ const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme,
               totalTransferStudents: 0,
             }
           } else {
-            mergedCourse['years'][year] = { ...allCourses[normCode]['years'][year] }
+            mergedCourse.years[year] = { ...allCourses[normCode].years[year] }
           }
 
-          if (allCourses[ayCourse]['years'][year]) {
+          if (allCourses[ayCourse].years[year]) {
             properties.forEach(prop => {
-              mergedCourse['years'][year][prop] =
-                mergedCourse['years'][year][prop] + allCourses[ayCourse]['years'][year][prop]
+              mergedCourse.years[year][prop] += allCourses[ayCourse].years[year][prop]
             })
           }
         })

@@ -2,8 +2,9 @@ const Sequelize = require('sequelize')
 const EventEmitter = require('events')
 const Umzug = require('umzug')
 const conf = require('../conf-backend')
-const { SIS_DB_URL } = process.env
 const logger = require('../util/logger')
+
+const { SIS_DB_URL } = process.env
 
 class DbConnection extends EventEmitter {
   constructor() {

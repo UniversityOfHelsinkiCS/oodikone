@@ -6,7 +6,7 @@ const getCriteriaByStudyProgramme = async code => {
   if (code === '') return null
   return await ProgressCriteria.findOne({
     where: {
-      code: code,
+      code,
     },
   })
 }
@@ -71,22 +71,22 @@ const saveYearlyCreditCriteria = async (studyProgramme, credits) => {
   if (!studyProgrammeToUpdate) {
     const courseObj = { year1: [], year2: [], year3: [], year4: [], year5: [], year6: [] }
     const creditsObj = {
-      year1: parseInt(credits.year1),
-      year2: parseInt(credits.year2),
-      year3: parseInt(credits.year3),
-      year4: parseInt(credits.year4),
-      year5: parseInt(credits.year5),
-      year6: parseInt(credits.year6),
+      year1: parseInt(credits.year1, 10),
+      year2: parseInt(credits.year2, 10),
+      year3: parseInt(credits.year3, 10),
+      year4: parseInt(credits.year4, 10),
+      year5: parseInt(credits.year5, 10),
+      year6: parseInt(credits.year6, 10),
     }
     return await createCriteria(studyProgramme, courseObj, creditsObj)
   }
   const yearlyCredits = {
-    creditsYearOne: parseInt(credits.year1),
-    creditsYearTwo: parseInt(credits.year2),
-    creditsYearThree: parseInt(credits.year3),
-    creditsYearFour: parseInt(credits.year4),
-    creditsYearFive: parseInt(credits.year5),
-    creditsYearSix: parseInt(credits.year6),
+    creditsYearOne: parseInt(credits.year1, 10),
+    creditsYearTwo: parseInt(credits.year2, 10),
+    creditsYearThree: parseInt(credits.year3, 10),
+    creditsYearFour: parseInt(credits.year4, 10),
+    creditsYearFive: parseInt(credits.year5, 10),
+    creditsYearSix: parseInt(credits.year6, 10),
   }
   try {
     const updatedData = await studyProgrammeToUpdate.update({ ...yearlyCredits })

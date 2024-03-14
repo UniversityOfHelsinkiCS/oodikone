@@ -235,7 +235,7 @@ const updateStudyRights = async (
       const extentcode =
         educationTypeToExtentcode[educationType.id] || educationTypeToExtentcode[educationType.parent_id]
       const mappedStudyright = mapStudyright(studyright, {
-        extentcode: extentcode,
+        extentcode,
         prioritycode: parsePriorityCode(studyright),
         active: parseActivity(studyright, termRegistrations, extentcode),
         enddate: parseEndDate(studyright),
@@ -275,7 +275,7 @@ const updateStudyRightElements = async (
 
     // be default, well use the enddate in studyright and given startdate
     // (might be horrible logic, check later)
-    let enddate = formattedStudyRightsById[studyrightid].enddate
+    let { enddate } = formattedStudyRightsById[studyrightid]
     let realStartDate = startdate
 
     // except when studyright has been transferred, then override
@@ -381,7 +381,7 @@ const updateStudyRightElements = async (
           }
         } else {
           const [programme, studytrack] = mapStudyrightElements(
-            `${mainStudyRight.id}-1`, //mainStudyRight.id, duplikaattifix
+            `${mainStudyRight.id}-1`, // mainStudyRight.id, duplikaattifix
             startDate,
             studentnumber,
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase1GroupId],

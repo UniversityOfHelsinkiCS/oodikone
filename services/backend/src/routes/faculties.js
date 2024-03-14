@@ -42,8 +42,8 @@ router.get('/:id/basicstats', async (req, res) => {
   const wantedProgrammes = await getProgrammes(code, programmeFilter)
   if (!wantedProgrammes) return res.status(422).end()
 
-  //all programmes are required for correct sorting of transfers
-  let allProgrammeCodes = []
+  // all programmes are required for correct sorting of transfers
+  const allProgrammeCodes = []
   if (programmeFilter === 'NEW_STUDY_PROGRAMMES') {
     const allProgs = await getProgrammes(code, 'ALL_PROGRAMMES')
     allProgs?.data.forEach(prog => allProgrammeCodes.push(prog.code))

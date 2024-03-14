@@ -70,7 +70,6 @@ const postUpdate = async (updateMsg, currentChunkStartTime) => {
   if (updateReady) {
     await handleUpdateEnding(doneKey, totalKey)
     logger.info('Updating ended')
-    return
   }
 }
 

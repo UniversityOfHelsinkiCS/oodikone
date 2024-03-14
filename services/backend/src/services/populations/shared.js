@@ -1,5 +1,4 @@
-const Sequelize = require('sequelize')
-const { Op } = Sequelize
+const { Op } = require('sequelize')
 const moment = require('moment')
 const { Credit, Course, Studyright, ElementDetail, StudyrightElement } = require('../../models')
 const {
@@ -126,6 +125,8 @@ const formatStudentForPopulationStatistics = (
   const criteriaCoursesBySubstitutions = criteria?.allCourses
     ? Object.keys(criteria.allCourses).reduce((acc, code) => {
         acc[code] = code
+        // TODO: Check this line, arrow functions shouldn't return assignments
+        // eslint-disable-next-line no-return-assign
         criteria.allCourses[code].map(subst => (acc[subst] = code))
         return acc
       }, {})
@@ -274,7 +275,7 @@ const getOptionsForStudents = async (students, code, level) => {
     currentExtent = 2
     optionExtent = 1
   } else {
-    throw new Error('Invalid study level ' + level)
+    throw new Error(`Invalid study level ${level}`)
   }
 
   const programmes = await getAllProgrammes()
@@ -287,7 +288,7 @@ const getOptionsForStudents = async (students, code, level) => {
           studentnumber: {
             [Op.in]: students,
           },
-          code: code,
+          code,
         },
       },
     ],
@@ -450,7 +451,7 @@ const formatStudentsForApi = async (
 }
 
 const formatQueryParamArrays = (query, params) => {
-  let res = { ...query }
+  const res = { ...query }
   params.forEach(p => {
     if (!res[p]) return
     res[p] = Array.isArray(res[p]) ? res[p] : [res[p]]

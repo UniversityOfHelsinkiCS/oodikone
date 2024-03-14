@@ -8,35 +8,6 @@ const updateOrganisations = async organisations => {
   await bulkCreate(Organization, organisations)
 }
 
-const updateStudyModules = async studyModules => {
-  const hyStudyModules = studyModules.filter(s => !s.university_org_ids.includes('aalto-university-root-id'))
-  const attainments = await selectFromByIdsOrderBy(
-    'attainments',
-    hyStudyModules.map(s => s.id),
-    'module_id',
-    'attainment_date'
-  )
-
-  const courseIdToAttainments = groupBy(attainments, 'module_id')
-  const groupIdToCourse = groupBy(hyStudyModules, 'group_id')
-
-  await updateCourses(courseIdToAttainments, groupIdToCourse)
-}
-
-const updateCourseUnits = async courseUnits => {
-  const attainments = await selectFromByIdsOrderBy(
-    'attainments',
-    courseUnits.map(c => c.id),
-    'course_unit_id',
-    'attainment_date'
-  )
-
-  const courseIdToAttainments = groupBy(attainments, 'course_unit_id')
-  const groupIdToCourse = groupBy(courseUnits, 'group_id')
-
-  await updateCourses(courseIdToAttainments, groupIdToCourse)
-}
-
 // sort substitutions so that main code is first
 const newLetterBasedCode = /^[A-Za-z]/ // new letter based codes come first
 const oldNumericCode = /^\d/ // old numeric codes come second
@@ -129,6 +100,7 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
     const sortedSubstitutions = [course.code, ...course.substitutions]
       .map(code => [code, getSubstitutionPriority(code)])
       .sort((a, b) => b[1] - a[1])
+    // eslint-disable-next-line prefer-destructuring
     course.mainCourseCode = sortedSubstitutions[0][0]
   }
 
@@ -139,6 +111,35 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
     null,
     ['composite']
   )
+}
+
+const updateStudyModules = async studyModules => {
+  const hyStudyModules = studyModules.filter(s => !s.university_org_ids.includes('aalto-university-root-id'))
+  const attainments = await selectFromByIdsOrderBy(
+    'attainments',
+    hyStudyModules.map(s => s.id),
+    'module_id',
+    'attainment_date'
+  )
+
+  const courseIdToAttainments = groupBy(attainments, 'module_id')
+  const groupIdToCourse = groupBy(hyStudyModules, 'group_id')
+
+  await updateCourses(courseIdToAttainments, groupIdToCourse)
+}
+
+const updateCourseUnits = async courseUnits => {
+  const attainments = await selectFromByIdsOrderBy(
+    'attainments',
+    courseUnits.map(c => c.id),
+    'course_unit_id',
+    'attainment_date'
+  )
+
+  const courseIdToAttainments = groupBy(attainments, 'course_unit_id')
+  const groupIdToCourse = groupBy(courseUnits, 'group_id')
+
+  await updateCourses(courseIdToAttainments, groupIdToCourse)
 }
 
 const updateCourseTypes = async studyLevels => {

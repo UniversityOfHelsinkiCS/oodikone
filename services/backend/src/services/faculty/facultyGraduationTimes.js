@@ -8,7 +8,7 @@ const { getProgrammes } = require('./facultyService')
 
 const sortProgrammes = data => {
   const check = name => {
-    if (isNaN(name[0])) return -1
+    if (Number.isNaN(name[0])) return -1
     return 1
   }
   data.sort((a, b) => {
@@ -22,8 +22,8 @@ const getSortedProgIds = progs => {
 
   for (const prog of progs) {
     if (Object.keys(codes).includes(prog)) {
-      const name = prog === 'T923103' ? codes[prog].toUpperCase() + '-DP' : codes[prog].toUpperCase()
-      programmes = [...programmes, { name: name, code: prog }]
+      const name = prog === 'T923103' ? `${codes[prog].toUpperCase()}-DP` : codes[prog].toUpperCase()
+      programmes = [...programmes, { name, code: prog }]
     } else {
       programmes = [...programmes, { name: prog, code: prog }]
     }
@@ -137,12 +137,10 @@ const getClassSizes = async (faculty, programmeCodes, since, classSizes, program
         if (studyrightid.slice(-2) === '-2') {
           level = 'bcMsCombo'
           actualStartdate = await findBachelorStartdate(studyrightid.replace(/-2$/, '-1'))
+        } else if (code.includes('KH')) {
+          level = 'bachelor' // Some rare faculties have one/two outliers with extent 2 for bachelor
         } else {
-          if (code.includes('KH')) {
-            level = 'bachelor' // Some rare faculties have one/two outliers with extent 2 for bachelor
-          } else {
-            level = 'master'
-          }
+          level = 'master'
         }
       } else if (extentcode === 4) {
         level = 'doctor'
@@ -158,15 +156,15 @@ const getClassSizes = async (faculty, programmeCodes, since, classSizes, program
       if (level !== 'bcMsCombo') {
         classSizes[level][startYear] += 1
         if (level === 'bachelor' && (await hasMS(code, studyrightElements, studyrightid))) {
-          classSizes['bcMsCombo'][startYear] += 1
+          classSizes.bcMsCombo[startYear] += 1
         }
       }
 
       if (!(code in classSizes.programmes)) {
         if (extentcode === 2) {
           classSizes.programmes[code] = {}
-          classSizes.programmes[code]['bcMsCombo'] = getYearsObject({ years, emptyArrays: false })
-          classSizes.programmes[code]['master'] = getYearsObject({ years, emptyArrays: false })
+          classSizes.programmes[code].bcMsCombo = getYearsObject({ years, emptyArrays: false })
+          classSizes.programmes[code].master = getYearsObject({ years, emptyArrays: false })
         } else {
           classSizes.programmes[code] = getYearsObject({ years, emptyArrays: false })
         }
@@ -193,10 +191,10 @@ const count = async (
   goals,
   mode
 ) => {
-  let graduationAmounts = {}
-  let graduationTimes = {}
-  let programmes = getProgrammeObjectBasis(yearsList, levels)
-  let data = {
+  const graduationAmounts = {}
+  const graduationTimes = {}
+  const programmes = getProgrammeObjectBasis(yearsList, levels)
+  const data = {
     medians: {},
     programmes: {
       medians: getProgrammeObjectBasis(yearsList, levels),
@@ -265,7 +263,9 @@ const count = async (
           }
 
           const progStatistics = countTimeCategories(programmes[level][year][prog.code].graduationTimes, goal)
-          Object.keys(progStatistics).forEach(key => (statistics[key] += progStatistics[key]))
+          Object.keys(progStatistics).forEach(key => {
+            statistics[key] += progStatistics[key]
+          })
 
           data.programmes.medians[level][year].programmes = [
             ...data.programmes.medians[level][year].programmes,
@@ -318,7 +318,7 @@ const countGraduationTimes = async (faculty, programmeFilter) => {
     doctor: 48,
     licentiate: 78,
     exceptions: {
-      MH30_004: 6, //months more
+      MH30_004: 6, // months more
       '420420-ma': 6,
       MH30_001: 12,
       '320011-ma': 12,
@@ -363,7 +363,7 @@ const countGraduationTimes = async (faculty, programmeFilter) => {
   )
 
   const classSizes = getProgrammeObjectBasis(yearsList, levels, false)
-  classSizes['programmes'] = {}
+  classSizes.programmes = {}
   await getClassSizes(faculty, programmeCodes, since, classSizes, programmeFilter, years)
 
   return { id: faculty, goals, byGradYear, byStartYear, programmeNames, classSizes }

@@ -51,7 +51,7 @@ router.put('/searches/:id', async (req, res) => {
   if (!id || !userId) return res.status(422).end()
   const updatedSearch = await updateSearch(userId, id, courseCodes)
 
-  if (!updatedSearch) return res.status(404).json({ error: `Open uni search could not be found` })
+  if (!updatedSearch) return res.status(404).json({ error: 'Open uni search could not be found' })
   return res.json({
     id: updatedSearch.id,
     userId: updatedSearch.userId,
@@ -67,7 +67,7 @@ router.delete('/searches/:id', async (req, res) => {
   if (!id || !userId) return res.status(422).end()
 
   const deletedSearch = await deleteSearch(userId, id)
-  if (!deletedSearch) return res.status(404).json({ error: `Open uni search could not be found` })
+  if (!deletedSearch) return res.status(404).json({ error: 'Open uni search could not be found' })
   return res.json(id)
 })
 

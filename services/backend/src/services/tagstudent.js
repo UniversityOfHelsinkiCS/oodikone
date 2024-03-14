@@ -1,7 +1,5 @@
-const Sequelize = require('sequelize')
+const { Op } = require('sequelize')
 const { TagStudent, Tag } = require('../models/models_kone')
-
-const Op = Sequelize.Op
 
 const getStudentTags = () => TagStudent.findAll({})
 

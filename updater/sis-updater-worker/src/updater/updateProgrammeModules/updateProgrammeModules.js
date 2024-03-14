@@ -4,29 +4,6 @@ const { selectFromByIds, bulkCreate } = require('../../db')
 const { ProgrammeModule, ProgrammeModuleChild } = require('../../db/models')
 const ModuleResolver = require('./resolver')
 
-const updateProgrammeModules = async programmeIds => {
-  await ProgrammeModuleChild.destroy({ where: {} })
-  await ProgrammeModule.destroy({ where: {} })
-  const programmeChunks = chunk(programmeIds, 25)
-  for (const chunk of programmeChunks) {
-    await updateProgrammeModulesChunk(chunk)
-  }
-}
-
-const updateProgrammeModulesChunk = async programmeIds => {
-  const moduleMap = {}
-  const joinMap = {}
-  const programmes = await selectFromByIds('modules', programmeIds)
-
-  for (const programme of programmes) {
-    const resolvedProgramme = await resolveProgramme(programme)
-    recursiveWrite(resolvedProgramme, null, moduleMap, joinMap)
-  }
-
-  await bulkCreate(ProgrammeModule, Object.values(moduleMap))
-  await ProgrammeModuleChild.bulkCreate(Object.values(joinMap), { ignoreDuplicates: true })
-}
-
 const resolveProgramme = async programme => {
   const responsibleOrg = programme.organisations
     ? programme.organisations.find(o => o.roleUrn === 'urn:code:organisation-role:responsible-organisation')
@@ -64,9 +41,9 @@ const recursiveWrite = (modArg, parentId, programmeMap, joinMap) => {
     return
   }
 
-  let join = {
+  const join = {
     composite: `${parentId}-${mod.group_id}`,
-    parentId: parentId,
+    parentId,
     childId: mod.group_id,
   }
 
@@ -78,6 +55,29 @@ const recursiveWrite = (modArg, parentId, programmeMap, joinMap) => {
 
   if (!children) return
   children.forEach(child => recursiveWrite(child, mod.id, programmeMap, joinMap))
+}
+
+const updateProgrammeModulesChunk = async programmeIds => {
+  const moduleMap = {}
+  const joinMap = {}
+  const programmes = await selectFromByIds('modules', programmeIds)
+
+  for (const programme of programmes) {
+    const resolvedProgramme = await resolveProgramme(programme)
+    recursiveWrite(resolvedProgramme, null, moduleMap, joinMap)
+  }
+
+  await bulkCreate(ProgrammeModule, Object.values(moduleMap))
+  await ProgrammeModuleChild.bulkCreate(Object.values(joinMap), { ignoreDuplicates: true })
+}
+
+const updateProgrammeModules = async programmeIds => {
+  await ProgrammeModuleChild.destroy({ where: {} })
+  await ProgrammeModule.destroy({ where: {} })
+  const programmeChunks = chunk(programmeIds, 25)
+  for (const chunk of programmeChunks) {
+    await updateProgrammeModulesChunk(chunk)
+  }
 }
 
 module.exports = { updateProgrammeModules }

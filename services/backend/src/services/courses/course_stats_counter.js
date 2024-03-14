@@ -49,6 +49,7 @@ class CourseStatsCounter {
     this.grades = {}
   }
 
+  // eslint-disable-next-line class-methods-use-this
   initializePassingSemesters(initialValue = 0) {
     const passingSemesters = {
       BEFORE: initialValue,
@@ -63,7 +64,7 @@ class CourseStatsCounter {
   }
 
   markAttempt() {
-    this.stats.attempts = this.stats.attempts + 1
+    this.stats.attempts += 1
   }
 
   markToAll(studentnumber) {
@@ -164,12 +165,12 @@ class CourseStatsCounter {
   }
 
   getPassingSemestersCumulative() {
-    const passingSemesters = this.stats.passingSemesters
+    const { passingSemesters } = this.stats
     const attemptStats = {
-      BEFORE: passingSemesters['BEFORE'],
+      BEFORE: passingSemesters.BEFORE,
     }
 
-    attemptStats['0-FALL'] = passingSemesters['BEFORE'] + passingSemesters['0-FALL']
+    attemptStats['0-FALL'] = passingSemesters.BEFORE + passingSemesters['0-FALL']
     attemptStats['0-SPRING'] = attemptStats['0-FALL'] + passingSemesters['0-SPRING']
 
     for (let i = 1; i < 7; i++) {
@@ -177,22 +178,21 @@ class CourseStatsCounter {
       attemptStats[spring[i]] = attemptStats[fall[i]] + passingSemesters[spring[i]]
     }
 
-    attemptStats['LATER'] = attemptStats['6-SPRING'] + passingSemesters['LATER']
+    attemptStats.LATER = attemptStats['6-SPRING'] + passingSemesters.LATER
 
     return attemptStats
   }
 
   getFinalStats() {
-    const stats = this.stats
-    const students = this.students
+    const { stats, students } = this
     const studs = this.enrollments
       ? Object.keys(this.enrollments)
           .filter(key => key !== 'ENROLLED' && key !== 'semesters')
           .reduce((acc, key) => [...acc, ...[...this.enrollments[key]].map(studentnumber => studentnumber)], [])
       : []
     const allStudents = Object.keys(students.all).map(student => student)
-    const fileredEnrolledNoGrade = this.enrollments['ENROLLED']
-      ? [...this.enrollments['ENROLLED']]
+    const fileredEnrolledNoGrade = this.enrollments.ENROLLED
+      ? [...this.enrollments.ENROLLED]
           .filter(student => !studs.includes(student) && !allStudents.includes(student))
           .reduce((acc, student) => ({ ...acc, [student]: true }), {})
       : {}

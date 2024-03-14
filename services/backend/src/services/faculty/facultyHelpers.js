@@ -1,5 +1,4 @@
-const Sequelize = require('sequelize')
-const { Op } = Sequelize
+const { Op } = require('sequelize')
 const { codes } = require('../../../config/programmeCodes')
 const { faculties } = require('../organisations')
 
@@ -124,7 +123,7 @@ const getExtentFilter = includeAllSpecials => {
   if (!includeAllSpecials) {
     filteredExtents.push(6, 7, 9, 13, 14, 18, 22, 23, 34, 99)
   }
-  let studyrightWhere = {
+  const studyrightWhere = {
     extentcode: {
       [Op.notIn]: filteredExtents,
     },
@@ -139,7 +138,7 @@ const mapCodesToIds = data => {
     if (keys.includes(prog.code)) {
       prog.progId = codes[prog.code].toUpperCase()
       if (prog.code === 'T923103' && !prog.progId.includes('-DP')) {
-        prog.progId = prog.progId + '-DP'
+        prog.progId += '-DP'
       }
     } else {
       prog.progId = prog.code

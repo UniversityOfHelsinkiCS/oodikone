@@ -1,6 +1,7 @@
 const router = require('express').Router()
 const { getCompletedCourses } = require('../services/completedCoursesSearch')
 const { getImporterClient } = require('../util/importerClient')
+
 const importerClient = getImporterClient()
 const _ = require('lodash')
 const {
@@ -27,7 +28,7 @@ router.get('/', async (req, res) => {
     // have enrolled to their courses in last 8 months
     // (acual logic a bit different, see importer)
     const teacherRightsToStudents = await Promise.race([
-      importerClient.post(`/teacher-rights/`, { teacherId, studentNumbers }),
+      importerClient.post('/teacher-rights/', { teacherId, studentNumbers }),
       answerTimeout,
     ])
     if (teacherRightsToStudents && Array.isArray(teacherRightsToStudents.data))

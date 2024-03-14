@@ -72,7 +72,7 @@ class ModuleResolver {
     const modules = await this.knex('modules').where({ group_id: id })
     const children = []
 
-    for (let mod of modules) {
+    for (const mod of modules) {
       if (mod.code?.startsWith('KK-')) continue
       let result = this.moduleCache[mod.id]
       if (!result) {

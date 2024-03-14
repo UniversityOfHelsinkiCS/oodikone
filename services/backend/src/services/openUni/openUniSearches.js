@@ -105,8 +105,8 @@ const createOpenUniPopulationSearch = async (userId, name, courseCodes) => {
 const updateOpenUniPopulationSearch = async (userId, id, courseCodes) => {
   const searchToUpdate = await OpenUniPopulationSearch.findOne({
     where: {
-      userId: userId,
-      id: id,
+      userId,
+      id,
     },
   })
 
@@ -117,8 +117,8 @@ const updateOpenUniPopulationSearch = async (userId, id, courseCodes) => {
 const deleteOpenUniSearch = async (userId, id) => {
   return await OpenUniPopulationSearch.destroy({
     where: {
-      userId: userId,
-      id: id,
+      userId,
+      id,
     },
   })
 }

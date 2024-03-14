@@ -1,9 +1,8 @@
-const Sequelize = require('sequelize')
+const { Op } = require('sequelize')
 const { Credit, Course, Organization, Enrollment } = require('../../models')
 
 const { parseCredit } = require('./parseCredits')
 const { parseEnrollment } = require('./parseEnrollments')
-const Op = Sequelize.Op
 const { CourseYearlyStatsCounter } = require('./course_yearly_stats_counter')
 const { sortMainCode } = require('../../util/utils')
 const {
@@ -23,7 +22,7 @@ const unifyOpenUniversity = code => {
 
 const allCodeAlternatives = async code => {
   const course = await Course.findOne({
-    where: { code: code },
+    where: { code },
   })
 
   return sortMainCode([...course.substitutions, code])
@@ -62,7 +61,7 @@ const yearlyStatsOfNew = async (
 
   const counter = new CourseYearlyStatsCounter()
 
-  for (let credit of credits) {
+  for (const credit of credits) {
     const {
       studentnumber,
       grade,

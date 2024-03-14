@@ -29,11 +29,10 @@ const frontUrl = process.env.FRONT_URL
 const backendPort = 8080
 
 // Other stuff
-const DB_URL_KONE = process.env.DB_URL_KONE
-const DB_URL_USER = process.env.DB_URL_USER
+const { DB_URL_KONE, DB_URL_USER, SECRET_TOKEN, SIS_UPDATER_URL, CRYPT_KEY } = process.env
 
 let DB_MAX_CONNECTIONS = parseInt(process.env.DB_MAX_CONNECTIONS, 10)
-if (isNaN(DB_MAX_CONNECTIONS)) {
+if (Number.isNaN(DB_MAX_CONNECTIONS)) {
   DB_MAX_CONNECTIONS = 5 // sequelize's default
 }
 let DB_MAX_CRON_CONNECTIONS = DB_MAX_CONNECTIONS - 5
@@ -42,15 +41,11 @@ if (DB_MAX_CRON_CONNECTIONS < 1) {
 }
 
 const redis = process.env.REDIS
-const SECRET_TOKEN = process.env.SECRET_TOKEN
 const DB_SCHEMA_KONE = process.env.DB_SCHEMA_KONE || 'public'
-const SIS_UPDATER_URL = process.env.SIS_UPDATER_URL
 
 const KONE_PASSWORD = process.env.KONE_PASSWORD || 'postgres'
 const USER_PASSWORD = process.env.USER_PASSWORD || 'postgres'
 const SIS_PASSWORD = process.env.SIS_PASSWORD || 'postgres'
-
-const CRYPT_KEY = process.env.CRYPT_KEY
 
 module.exports = {
   DB_URL_USER,

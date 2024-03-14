@@ -3,8 +3,8 @@ const LRU = require('lru-cache')
 const _ = require('lodash')
 
 const { getStudentnumbersByElementdetails } = require('./students')
-const { sendNotificationAboutNewUser } = require('../services/mailservice')
-const { checkStudyGuidanceGroupsAccess, getAllStudentsUserHasInGroups } = require('../services/studyGuidanceGroups')
+const { sendNotificationAboutNewUser } = require('./mailservice')
+const { checkStudyGuidanceGroupsAccess, getAllStudentsUserHasInGroups } = require('./studyGuidanceGroups')
 const { User, UserElementDetails, AccessGroup } = require('../models/models_user')
 const { getUserIams, getAllUserAccess, getUserIamAccess } = require('../util/jami')
 const { createLocaleComparator, getFullStudyProgrammeRights } = require('../util/utils')
@@ -111,6 +111,7 @@ const modifyRights = async (username, rights) => {
       if (val === true) {
         return code
       }
+      return undefined
     })
     .filter(code => code)
   const rightsToRemove = Object.entries(rights)
@@ -118,6 +119,7 @@ const modifyRights = async (username, rights) => {
       if (val === false) {
         return code
       }
+      return undefined
     })
     .filter(code => code)
 
@@ -189,6 +191,50 @@ const getStudyProgrammeRights = (iamAccess, specialGroup, userProgrammes) => {
   ]
 }
 
+const formatUser = async (userFromDb, extraRights, programmeRights, getStudentAccess = true) => {
+  const accessGroups = userFromDb.accessgroup.map(entry => entry.group_code)
+
+  const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
+
+  const {
+    dataValues: {
+      id,
+      username: userId,
+      full_name: name,
+      email,
+      language,
+      sisu_person_id: sisPersonId,
+      iam_groups: iamGroups,
+    },
+  } = userFromDb
+
+  const studentsUserCanAccess = getStudentAccess
+    ? _.uniqBy(
+        (
+          await Promise.all([
+            getStudentnumbersByElementdetails(fullStudyProgrammeRights),
+            getAllStudentsUserHasInGroups(sisPersonId),
+          ])
+        ).flat()
+      )
+    : []
+
+  // attribute naming is a bit confusing, but it's used so widely in oodikone, that it's not probably worth changing
+  return {
+    id, // our internal id, not the one from sis, (e.g. 101)
+    userId, // acually username (e.g. mluukkai)
+    name,
+    language,
+    sisPersonId, //
+    iamGroups,
+    email,
+    roles: accessGroups,
+    studentsUserCanAccess, // studentnumbers used in various parts of backend. For admin this is usually empty, since no programmes / faculties are set.
+    isAdmin: accessGroups.includes('admin'),
+    programmeRights,
+  }
+}
+
 const updateAccessGroups = async (username, iamGroups = [], specialGroup = {}, sisId, user) => {
   const { jory, hyOne, superAdmin, openUni, katselmusViewer } = specialGroup
 
@@ -198,7 +244,7 @@ const updateAccessGroups = async (username, iamGroups = [], specialGroup = {}, s
   const { roles: currentAccessGroups } = formattedUser
 
   // Modify accessgroups based on current groups and iamGroups
-  let newAccessGroups = []
+  const newAccessGroups = []
   if (currentAccessGroups.includes('studyGuidanceGroups') || (sisId && (await checkStudyGuidanceGroupsAccess(sisId))))
     newAccessGroups.push('studyGuidanceGroups')
   if (iamGroups.includes(courseStatisticsGroup)) newAccessGroups.push('courseStatistics')
@@ -276,50 +322,6 @@ const findOne = async id => {
     iam_groups: iamAccess || [],
     accessgroup: accessGroups,
     programmeRights: getStudyProgrammeRights(iamAccess, specialGroup, user.programme),
-  }
-}
-
-const formatUser = async (userFromDb, extraRights, programmeRights, getStudentAccess = true) => {
-  const accessGroups = userFromDb.accessgroup.map(entry => entry.group_code)
-
-  const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
-
-  const {
-    dataValues: {
-      id,
-      username: userId,
-      full_name: name,
-      email,
-      language,
-      sisu_person_id: sisPersonId,
-      iam_groups: iamGroups,
-    },
-  } = userFromDb
-
-  const studentsUserCanAccess = getStudentAccess
-    ? _.uniqBy(
-        (
-          await Promise.all([
-            getStudentnumbersByElementdetails(fullStudyProgrammeRights),
-            getAllStudentsUserHasInGroups(sisPersonId),
-          ])
-        ).flat()
-      )
-    : []
-
-  // attribute naming is a bit confusing, but it's used so widely in oodikone, that it's not probably worth changing
-  return {
-    id, // our internal id, not the one from sis, (e.g. 101)
-    userId, // acually username (e.g. mluukkai)
-    name,
-    language,
-    sisPersonId, //
-    iamGroups,
-    email,
-    roles: accessGroups,
-    studentsUserCanAccess, // studentnumbers used in various parts of backend. For admin this is usually empty, since no programmes / faculties are set.
-    isAdmin: accessGroups.includes('admin'),
-    programmeRights,
   }
 }
 

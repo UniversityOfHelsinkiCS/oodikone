@@ -23,11 +23,12 @@ const { studytrackStudents, enrolledStudents, absentStudents } = require('./stud
 
 const getUnique = studentnumbers => [...new Set(studentnumbers)]
 const getStudentData = (startDate, students) => {
-  let data = { female: 0, male: 0, otherUnkown: 0, finnish: 0, otherCountries: 0, otherCountriesCounts: {} }
+  const data = { female: 0, male: 0, otherUnkown: 0, finnish: 0, otherCountries: 0, otherCountriesCounts: {} }
   const creditCounts = []
   students.forEach(({ genderCode, homeCountryEn, credits }) => {
     const creditcount = credits
       .filter(credit => moment(credit.attainment_date).isAfter(startDate))
+      // eslint-disable-next-line no-return-assign
       .reduce((prev, curr) => (prev += curr.credits), 0)
     creditCounts.push(creditcount)
 
@@ -103,7 +104,7 @@ const getGraduationTimeStats = async ({
     ...graduationTimes[track].medians.combo,
     {
       y: medianCombo,
-      amount: graduationAmounts[track]['combo'][year],
+      amount: graduationAmounts[track].combo[year],
       name: year,
       statistics: statisticsCombo,
       classSize,
@@ -112,7 +113,7 @@ const getGraduationTimeStats = async ({
 
   graduationTimes[track].medians.basic = [
     ...graduationTimes[track].medians.basic,
-    { y: median, amount: graduationAmounts[track]['basic'][year], name: year, statistics, classSize },
+    { y: median, amount: graduationAmounts[track].basic[year], name: year, statistics, classSize },
   ]
 }
 
@@ -288,11 +289,12 @@ const getStudytrackDataForTheYear = async ({
           return acc
         }, {})
 
-        otherCountriesCount[track]['Total'] = countryStatsFromYears
+        otherCountriesCount[track].Total = countryStatsFromYears
       }
 
       // If the track has no stats for that year, it should be removed from the table and dropdown options
       if (all.length === 0) {
+        // eslint-disable-next-line no-unused-expressions
         emptyTracks.has(track) ? emptyTracks.set(track, emptyTracks.get(track) + 1) : emptyTracks.set(track, 1)
         return
       }
@@ -319,7 +321,7 @@ const getStudytrackDataForTheYear = async ({
       // Count stats for the main studytrack table grouped by year
       mainStatsByYear[year] = [
         [
-          studytrackNames[track]?.name['fi'] ? `${studytrackNames[track]?.name['fi']}, ${track}` : year,
+          studytrackNames[track]?.name.fi ? `${studytrackNames[track]?.name.fi}, ${track}` : year,
           ...getStats(
             all,
             started,
@@ -484,7 +486,7 @@ const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, combinedPro
   const graduatedTitles = combinedProgramme ? getCorrectCombinedTitles() : tableTitles.studytracksBasic
   return {
     id: combinedProgramme ? `${studyprogramme}-${combinedProgramme}` : studyprogramme,
-    years: years,
+    years,
     ...data,
     doCombo,
     studytrackOptions,

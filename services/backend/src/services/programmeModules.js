@@ -1,8 +1,7 @@
-const Sequelize = require('sequelize')
+const { Op } = require('sequelize')
 const { ExcludedCourse } = require('../models/models_kone')
-const { Op } = Sequelize
 const logger = require('../util/logger')
-const { combinedStudyprogrammes } = require('./studyprogramme/studyprogrammeHelpers.js')
+const { combinedStudyprogrammes } = require('./studyprogramme/studyprogrammeHelpers')
 const { dbConnections } = require('../database/connection')
 const { ProgrammeModule } = require('../models')
 
@@ -12,7 +11,7 @@ const getCurriculumVersions = async code => {
     if (!result) return
     const modified = result.map(r => ({
       ...r,
-      curriculum_period_ids: r.curriculum_period_ids.map(id => parseInt(id.substring(6)) + 1949),
+      curriculum_period_ids: r.curriculum_period_ids.map(id => parseInt(id.substring(6), 10) + 1949),
     }))
     return modified
   } catch (e) {
@@ -66,6 +65,19 @@ const modifyParent = (course, moduleMap) => {
   return { ...course, parent_id: parent.id, parent_code: parent.code, parent_name: parent.name }
 }
 
+const labelProgammes = (modules, excludedCourses) => {
+  return modules.map(module => {
+    const label = {
+      id: module.parent_name.fi,
+      label: `${module.parent_code}\n${module.parent_name.fi}`,
+      orderNumber: module.module_order,
+    }
+    const foundCourse = excludedCourses.find(course => course.course_code === module.code)
+    const visible = { visibility: !foundCourse, id: foundCourse?.id ?? null }
+    return { ...module, label, visible }
+  })
+}
+
 const getCoursesAndModulesForProgramme = async (code, period_ids) => {
   if (!period_ids) return {}
   const result = await recursivelyGetModuleAndChildren(
@@ -105,19 +117,6 @@ const getCoursesAndModules = async (code, period_ids) => {
     return { defaultProgrammeCourses, secondProgrammeCourses }
   }
   return { defaultProgrammeCourses, secondProgrammeCourses: { courses: [], modules: [] } }
-}
-
-const labelProgammes = (modules, excludedCourses) => {
-  return modules.map(module => {
-    const label = {
-      id: module.parent_name.fi,
-      label: `${module.parent_code}\n${module.parent_name.fi}`,
-      orderNumber: module.module_order,
-    }
-    const foundCourse = excludedCourses.find(course => course.course_code === module.code)
-    const visible = { visibility: !foundCourse, id: foundCourse?.id ?? null }
-    return { ...module, label, visible }
-  })
 }
 
 module.exports = { getCoursesAndModules, getCurriculumVersions }

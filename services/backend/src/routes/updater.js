@@ -44,7 +44,7 @@ router.get('/update/v2/students_individually', async (req, res) => {
 })
 
 router.post('/update/v2/customlist/:type', async (req, res) => {
-  const type = req.params.type
+  const { type } = req.params
   const list = req.body
   const typeToJob = {
     students: updateStudentsByStudentNumber,

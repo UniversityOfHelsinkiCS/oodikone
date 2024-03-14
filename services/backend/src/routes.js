@@ -33,6 +33,7 @@ const studyProgrammeCriteria = require('./routes/studyProgrammeCriteria')
 const initializeSentry = require('./util/sentry')
 const completedCoursesSearch = require('./routes/completedCoursesSearch')
 const errorMiddleware = require('./middleware/errorMiddleware')
+
 module.exports = (app, url) => {
   initializeSentry(app)
   app.use(Sentry.Handlers.requestHandler())

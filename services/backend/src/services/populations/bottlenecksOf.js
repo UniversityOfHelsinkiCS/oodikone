@@ -50,7 +50,9 @@ const bottlenecksOf = async (query, studentnumberlist, encryptdata = false) => {
 
   const getStudentsAndCourses = async (selectedStudents, studentnumberlist, courseCodes) => {
     if (!studentnumberlist) {
+      // TODO: Check where this params object is coming from as ESLint is complaining about it
       const { months, studyRights, startDate, endDate, exchangeStudents, nondegreeStudents, transferredStudents, tag } =
+        // eslint-disable-next-line no-use-before-define
         params
       const studentnumbers =
         selectedStudents ||
@@ -80,25 +82,28 @@ const bottlenecksOf = async (query, studentnumberlist, encryptdata = false) => {
         filteredCourseCodes
       )
       return [allstudents, courses, courseEnrollements]
-    } else {
-      const { months, startDate } = params
-      const beforeDate = months && startDate ? dateMonthsFromNow(startDate, months) : new Date()
-      const allstudents = studentnumberlist.reduce((numbers, num) => {
-        numbers[num] = true
-        return numbers
-      }, {})
-      const courses = await findCourses(studentnumberlist, beforeDate, courseCodes)
-      const foundCourseCodes = Object.keys(keyBy(courses, 'code'))
-      const filteredCourseCodes = courseCodes?.filter(code => !foundCourseCodes.includes(code))
-
-      const courseEnrollements = await findCourseEnrollments(studentnumberlist, beforeDate, filteredCourseCodes)
-      return [allstudents, courses, courseEnrollements]
     }
+    // TODO: Check where this params object is coming from as ESLint is complaining about it
+    // eslint-disable-next-line no-use-before-define
+    const { months, startDate } = params
+    const beforeDate = months && startDate ? dateMonthsFromNow(startDate, months) : new Date()
+    const allstudents = studentnumberlist.reduce((numbers, num) => {
+      numbers[num] = true
+      return numbers
+    }, {})
+    const courses = await findCourses(studentnumberlist, beforeDate, courseCodes)
+    const foundCourseCodes = Object.keys(keyBy(courses, 'code'))
+    const filteredCourseCodes = courseCodes?.filter(code => !foundCourseCodes.includes(code))
+
+    const courseEnrollements = await findCourseEnrollments(studentnumberlist, beforeDate, filteredCourseCodes)
+    return [allstudents, courses, courseEnrollements]
   }
 
   const encryptStudentnumbers = bottlenecks => {
+    // eslint-disable-next-line guard-for-in
     for (const course in bottlenecks.coursestatistics) {
       const encryptedStudentStats = {}
+      // eslint-disable-next-line guard-for-in
       for (const data in bottlenecks.coursestatistics[course].students) {
         encryptedStudentStats[data] = {}
         const studentnumbers = Object.keys(bottlenecks.coursestatistics[course].students[data])
@@ -158,11 +163,11 @@ const bottlenecksOf = async (query, studentnumberlist, encryptdata = false) => {
 
   const coursesByCode = keyBy(coursesToLoop, 'code')
   for (const course of coursesToLoop) {
-    let { course_type } = course
+    const { course_type } = course
     let maincourse = course
 
     if (course.main_course_code && course.main_course_code !== course.code) {
-      let newmain = coursesByCode[course.main_course_code]
+      const newmain = coursesByCode[course.main_course_code]
 
       if (newmain) {
         maincourse = newmain

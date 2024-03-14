@@ -15,15 +15,19 @@ const getStudentData = (
   thresholdKeys = [],
   thresholdAmounts = []
 ) => {
-  let data = {}
-  let programmeData = {}
+  const data = {}
+  const programmeData = {}
   const creditCounts = students.map(({ credits }) =>
     credits
       .filter(credit => moment(credit.attainment_date).isSameOrAfter(startDate))
       .reduce((total, credit) => total + credit.credits, 0)
   )
-  thresholdKeys.forEach(t => (data[t] = 0))
-  limitKeys.forEach(t => (programmeData[t] = 0))
+  thresholdKeys.forEach(t => {
+    data[t] = 0
+  })
+  limitKeys.forEach(t => {
+    programmeData[t] = 0
+  })
 
   // Data is only used for doctoral programmes, otherwise only programmeData is needed
   if (prog === 'T') {
@@ -129,7 +133,7 @@ const combineFacultyStudentProgress = async (faculty, programmes, specialGroups,
     if (year === 'Total') continue
     const { startDate, endDate } = getAcademicYearDates(year, since)
     const lastDayOfMonth = moment().endOf('month')
-    let months = Math.round(moment.duration(moment(lastDayOfMonth).diff(moment(startDate))).asMonths())
+    const months = Math.round(moment.duration(moment(lastDayOfMonth).diff(moment(startDate))).asMonths())
     if (months >= 36) {
       bachelorlimits = createLimits(36, 0)
     } else {
@@ -181,7 +185,7 @@ const combineFacultyStudentProgress = async (faculty, programmes, specialGroups,
       // Get credit threshold values: 'combined study programme' is false and 'only master studyright' is true
 
       if (!(progId in progressStats.programmeNames)) {
-        progressStats.programmeNames[progId] = { code: code, ...name }
+        progressStats.programmeNames[progId] = { code, ...name }
       }
       if (!includeAllSpecials) {
         studyrights = await filterOutTransfers(studyrights, code, startDate, endDate)
@@ -246,7 +250,7 @@ const combineFacultyStudentProgress = async (faculty, programmes, specialGroups,
       } else {
         const all = studyrights.filter(sr => sr.extentcode === 4 || sr.extentcode === 3).map(sr => sr.studentnumber)
         const doctoralStudents = await studytrackStudents(all)
-        let { creditThresholdKeys, creditThresholdAmounts } = getCreditThresholds(code)
+        const { creditThresholdKeys, creditThresholdAmounts } = getCreditThresholds(code)
 
         const { data, creditCounts } = getStudentData(
           startDate,

@@ -1,4 +1,4 @@
-const { redisClient } = require('../services/redis')
+const { redisClient } = require('./redis')
 const moment = require('moment')
 
 // Only new bachelor, masters and doctoral programmes get their data updated in redis every night, use redis for them
@@ -14,7 +14,7 @@ const createRedisKeyForStudytrackStats = (id, graduated, specialGroups) =>
 
 const getBasicStats = async (id, combinedProgramme, yearType, specialGroups) => {
   if (!isUpdatedNewProgramme(id)) return null
-  let searchkey = combinedProgramme ? `${id}-${combinedProgramme}` : id
+  const searchkey = combinedProgramme ? `${id}-${combinedProgramme}` : id
   const redisKey = createRedisKeyForBasicStats(searchkey, yearType, specialGroups)
   const dataFromRedis = await redisClient.getAsync(redisKey)
   if (!dataFromRedis) return null
@@ -66,7 +66,7 @@ const setCreditStats = async (data, isAcademicYear, specialGroups) => {
 
 const getGraduationStats = async (id, combinedProgramme, yearType, specialGroups) => {
   if (!isUpdatedNewProgramme(id)) return null
-  let searchkey = combinedProgramme ? `${id}-${combinedProgramme}` : id
+  const searchkey = combinedProgramme ? `${id}-${combinedProgramme}` : id
   const redisKey = createRedisKeyForGraduationStats(searchkey, yearType, specialGroups)
   const dataFromRedis = await redisClient.getAsync(redisKey)
   if (!dataFromRedis) return null
@@ -89,7 +89,7 @@ const setGraduationStats = async (data, yearType, specialGroups) => {
 
 const getStudytrackStats = async (id, combinedProgramme, graduated, specialGroups) => {
   if (!isUpdatedNewProgramme(id)) return null
-  let searchkey = combinedProgramme ? `${id}-${combinedProgramme}` : id
+  const searchkey = combinedProgramme ? `${id}-${combinedProgramme}` : id
   const redisKey = createRedisKeyForStudytrackStats(searchkey, graduated, specialGroups)
   const dataFromRedis = await redisClient.getAsync(redisKey)
   if (!dataFromRedis) return null

@@ -31,19 +31,19 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
   // db startdate is formatted to utc so need to change it when querying
   const formattedStartDate = new Date(moment.tz(startDate, 'Europe/Helsinki').format()).toUTCString()
 
-  const studentnumbers = studentnumberlist
-    ? studentnumberlist
-    : await studentnumbersWithAllStudyrightElements({
-        studyRights,
-        startDate: formattedStartDate,
-        endDate,
-        exchangeStudents,
-        nondegreeStudents,
-        transferredOutStudents: transferredStudents,
-        tag: null,
-        transferredToStudents: true,
-        graduatedStudents: true,
-      })
+  const studentnumbers =
+    studentnumberlist ||
+    (await studentnumbersWithAllStudyrightElements({
+      studyRights,
+      startDate: formattedStartDate,
+      endDate,
+      exchangeStudents,
+      nondegreeStudents,
+      transferredOutStudents: transferredStudents,
+      tag: null,
+      transferredToStudents: true,
+      graduatedStudents: true,
+    }))
 
   const code = studyRights[0] || ''
   let optionData = {}

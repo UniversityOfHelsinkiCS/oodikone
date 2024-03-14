@@ -10,6 +10,7 @@ const { getStudyRightsByExtent, getStudentsByStudentnumbers, getTransfersIn } = 
 const { checkTransfers } = require('./facultyHelpers')
 const { inactiveStudyrights, graduatedStudyRights } = require('../studyprogramme/studyrightFinders')
 const { enrolledStudents, absentStudents } = require('../studyprogramme/studentGetters')
+
 const emptyTotals = () => {
   return {
     total: 0,
@@ -58,7 +59,7 @@ const addTotalsProgramme = (programmeTableStats, progId, year, totals) => {
 }
 
 const getStudentData = (students, facultyExtra, year, code) => {
-  let data = { female: 0, male: 0, finnish: 0, otherCountries: 0, otherUnknown: 0 }
+  const data = { female: 0, male: 0, finnish: 0, otherCountries: 0, otherUnknown: 0 }
   students.forEach(({ genderCode, homeCountryEn }) => {
     data.male += genderCode === '1' ? 1 : 0
     data.female += genderCode === '2' ? 1 : 0
@@ -67,11 +68,11 @@ const getStudentData = (students, facultyExtra, year, code) => {
     data.otherCountries += homeCountryEn !== 'Finland' ? 1 : 0
     if (!Object.keys(facultyExtra[year][code]).includes(homeCountryEn) && homeCountryEn !== 'Finland')
       facultyExtra[year][code][homeCountryEn] = 0
-    if (!Object.keys(facultyExtra['Total'][code]).includes(homeCountryEn) && homeCountryEn !== 'Finland')
-      facultyExtra['Total'][code][homeCountryEn] = 0
+    if (!Object.keys(facultyExtra.Total[code]).includes(homeCountryEn) && homeCountryEn !== 'Finland')
+      facultyExtra.Total[code][homeCountryEn] = 0
     if (homeCountryEn !== 'Finland') {
       facultyExtra[year][code][homeCountryEn] += 1
-      facultyExtra['Total'][code][homeCountryEn] += 1
+      facultyExtra.Total[code][homeCountryEn] += 1
     }
   })
   return data
@@ -105,7 +106,7 @@ const getFacultyDataForYear = async ({
   const totals = emptyTotals()
   for (const { progId, code, name } of programmes) {
     if (!Object.keys(facultyExtra[year]).includes(code)) facultyExtra[year][code] = {}
-    if (!Object.keys(facultyExtra['Total']).includes(code)) facultyExtra['Total'][code] = {}
+    if (!Object.keys(facultyExtra.Total).includes(code)) facultyExtra.Total[code] = {}
 
     const toTransfers = await getTransfersIn(code, startDate, endDate)
     const allStudyrights = await getStudyRightsByExtent(faculty, startDate, endDate, code, extents, graduated)
@@ -113,7 +114,7 @@ const getFacultyDataForYear = async ({
     if (includeAllSpecials) {
       allStudents = [...new Set([...allStudyrights.map(sr => sr.studentnumber)])]
     }
-    let studyrights = allStudyrights.filter(s => !checkTransfers(s, toTransfers, toTransfers))
+    const studyrights = allStudyrights.filter(s => !checkTransfers(s, toTransfers, toTransfers))
 
     // Get all the studyrights and students for the calculations
     const studentNbrs = studyrights.map(sr => sr.studentnumber)
@@ -134,7 +135,7 @@ const getFacultyDataForYear = async ({
       progTotals[progId] = emptyTotals()
     }
     if (!(progId in programmeNames)) {
-      programmeNames[progId] = { code: code, ...name }
+      programmeNames[progId] = { code, ...name }
       progTotals[progId] = emptyTotals()
     }
 
@@ -232,12 +233,12 @@ const combineFacultyStudents = async (code, programmes, specialGroups, graduated
 
   const studentsData = {
     id: code,
-    years: years,
-    facultyTableStats: facultyTableStats,
+    years,
+    facultyTableStats,
     facultyTableStatsExtra: facultyExtra,
     programmeStats: programmeTableStats,
     titles: [...tableTitles.studytracksStart, ...tableTitles.studytracksBasic, ...tableTitles.studytracksEnd],
-    programmeNames: programmeNames,
+    programmeNames,
   }
   return studentsData
 }

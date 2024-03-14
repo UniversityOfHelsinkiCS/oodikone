@@ -1,15 +1,14 @@
 const os = require('os')
-
 const winston = require('winston')
 const { WinstonGelfTransporter } = require('winston-gelf-transporter')
-const sentry = require('winston-sentry-log')
-
+const Sentry = require('winston-sentry-log')
 const { isDev, isStaging, isProduction, sentryRelease, sentryEnvironment, runningInCI } = require('../config')
+
 const { combine, timestamp, printf, splat } = winston.format
 
 const formatDate = timestamp => new Date(timestamp).toLocaleString('fi-FI')
 
-let transports = []
+const transports = []
 
 if (isProduction && !isStaging && !runningInCI) {
   const options = {
@@ -21,7 +20,7 @@ if (isProduction && !isStaging && !runningInCI) {
     level: 'error',
   }
 
-  transports.push(new sentry(options))
+  transports.push(new Sentry(options))
 }
 
 if (isDev) {

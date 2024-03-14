@@ -129,8 +129,8 @@ const studentMapper = (attainments, studyRights, attainmentsToBeExluced) => stud
     abbreviatedname: `${last_name} ${first_names}`.trim(),
     studentnumber: student_number,
     email: primary_email,
-    secondary_email: secondary_email,
-    phone_number: phone_number,
+    secondary_email,
+    phone_number,
     gender_code,
     national_student_number: oppija_id,
     birthdate: date_of_birth,
@@ -186,11 +186,11 @@ const creditMapper =
 
     if (!targetSemester) return null
 
-    let course_code = !isModule(type)
+    const course_code = !isModule(type)
       ? courseGroupIdToCourseCode[courseUnitIdToCourseGroupId[course_unit_id]]
       : moduleGroupIdToModuleCode[module_group_id]
 
-    let course_id = !isModule(type) ? courseUnitIdToCourseGroupId[course_unit_id] : module_group_id
+    const course_id = !isModule(type) ? courseUnitIdToCourseGroupId[course_unit_id] : module_group_id
 
     let is_open = false
 
@@ -198,22 +198,18 @@ const creditMapper =
     if (course_code && !isModule(type)) {
       if (course_code.match(/^AY?(.+?)(?:en|fi|sv)?$/)) {
         is_open = true
-      } else {
-        if (study_right_id !== null) {
-          if (
-            studyRightIdToEducationType[study_right_id] ===
-            'urn:code:education-type:non-degree-education:open-university-studies'
-          )
-            is_open = true
-        } else {
-          if (
-            organisations
-              .filter(({ roleUrn }) => roleUrn === 'urn:code:organisation-role:responsible-organisation')
-              .some(org => org.organisationid === 'hy-org-48645785')
-          ) {
-            is_open = true
-          }
-        }
+      } else if (study_right_id !== null) {
+        if (
+          studyRightIdToEducationType[study_right_id] ===
+          'urn:code:education-type:non-degree-education:open-university-studies'
+        )
+          is_open = true
+      } else if (
+        organisations
+          .filter(({ roleUrn }) => roleUrn === 'urn:code:organisation-role:responsible-organisation')
+          .some(org => org.organisationid === 'hy-org-48645785')
+      ) {
+        is_open = true
       }
     }
 
@@ -221,21 +217,21 @@ const creditMapper =
     const isStudyModule = isModule(type)
 
     return {
-      id: id,
+      id,
       grade: getGrade(grade_scale_id, grade_id).value,
       student_studentnumber: personIdToStudentNumber[person_id],
-      credits: credits,
+      credits,
       createdate: registration_date,
       credittypecode: getCreditTypeCodeFromAttainment(attainment, getGrade(grade_scale_id, grade_id).passed),
-      attainment_date: attainment_date,
-      course_id: course_id,
+      attainment_date,
+      course_id,
       course_code,
       semestercode: targetSemester.semestercode,
       semester_composite: targetSemester.composite,
       isStudyModule,
       org: attainmentUniOrg,
-      language: language,
-      is_open: is_open,
+      language,
+      is_open,
       studyright_id: study_right_id,
     }
   }
@@ -302,8 +298,7 @@ const courseMapper = courseIdToAttainments => (groupedCourse, substitutions) => 
     (res, curr) => {
       const courseAttainments = courseIdToAttainments[curr.id]
       if (!courseAttainments || courseAttainments.length === 0) return res
-      let min_attainment_date = res.min_attainment_date
-      let max_attainment_date = res.max_attainment_date
+      let { min_attainment_date, max_attainment_date } = res
       if (!min_attainment_date || timify(min_attainment_date) > timify(courseAttainments[0].attainment_date))
         min_attainment_date = courseAttainments[0].attainment_date
       if (

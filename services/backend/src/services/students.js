@@ -1,4 +1,4 @@
-const Sequelize = require('sequelize')
+const { Op } = require('sequelize')
 const {
   dbConnections: { sequelize },
 } = require('../database/connection')
@@ -16,7 +16,6 @@ const {
   Transfer,
 } = require('../models')
 const { TagStudent, Tag } = require('../models/models_kone')
-const Op = Sequelize.Op
 const logger = require('../util/logger')
 
 const createStudent = student => Student.create(student)
@@ -288,7 +287,7 @@ const formatStudent = async ({
     updatedAt: updatedAt || createdAt,
     studyplans,
     tags,
-    sis_person_id: sis_person_id,
+    sis_person_id,
   }
 }
 
@@ -321,13 +320,12 @@ const nameLike = terms => {
   const [first, second] = terms
   if (!second) {
     return columnLike('abbreviatedname', first)
-  } else {
-    return {
-      [Op.or]: [
-        columnLike('abbreviatedname', `%${first}%${second}%`),
-        columnLike('abbreviatedname', `%${second}%${first}%`),
-      ],
-    }
+  }
+  return {
+    [Op.or]: [
+      columnLike('abbreviatedname', `%${first}%${second}%`),
+      columnLike('abbreviatedname', `%${second}%${first}%`),
+    ],
   }
 }
 

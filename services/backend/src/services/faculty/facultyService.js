@@ -26,19 +26,28 @@ const removeGraduationTimes = data => {
       yearStat.times = null
     })
   )
+  // TODO: Does this do something? Seems like an unnecessary line.
+  // eslint-disable-next-line no-unused-expressions
   data.byGradYear.medians
 }
 
 const setFacultyProgrammes = async (id, data, programmeFilter) => {
   const redisKey = createRedisKeyForFacultyProgrammes(id, programmeFilter)
   const dataToRedis = {
-    data: data,
+    data,
     status: 'DONE',
     lastUpdated: moment().format(),
   }
   const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(dataToRedis))
   if (setOperationStatus !== 'OK') return null
   return dataToRedis
+}
+
+const getFacultyProgrammesFromRedis = async (id, programmeFilter) => {
+  const redisKey = createRedisKeyForFacultyProgrammes(id, programmeFilter)
+  const dataFromRedis = await redisClient.getAsync(redisKey)
+  if (!dataFromRedis) return null
+  return JSON.parse(dataFromRedis)
 }
 
 const getProgrammes = async (code, programmeFilter = 'NEW_STUDY_PROGRAMMES') => {
@@ -48,13 +57,6 @@ const getProgrammes = async (code, programmeFilter = 'NEW_STUDY_PROGRAMMES') => 
   if (updatedProgrammes) updatedProgrammes = await setFacultyProgrammes(code, updatedProgrammes, programmeFilter)
 
   return updatedProgrammes
-}
-
-const getFacultyProgrammesFromRedis = async (id, programmeFilter) => {
-  const redisKey = createRedisKeyForFacultyProgrammes(id, programmeFilter)
-  const dataFromRedis = await redisClient.getAsync(redisKey)
-  if (!dataFromRedis) return null
-  return JSON.parse(dataFromRedis)
 }
 
 const setBasicStats = async (data, yearType, programmeFilter, specialGroups) => {

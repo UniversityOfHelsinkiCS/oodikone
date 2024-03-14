@@ -43,7 +43,7 @@ const schedule = async (args, channel = SIS_UPDATER_SCHEDULE_CHANNEL) => {
 
   const id = uuid.v4()
 
-  const completionChannel = stan.subscribe('SIS_COMPLETED_CHANNEL-' + id, NATS_GROUP, opts)
+  const completionChannel = stan.subscribe(`SIS_COMPLETED_CHANNEL-${id}`, NATS_GROUP, opts)
 
   return new Promise((resolve, reject) => {
     const messageHandler = msg => {
@@ -64,7 +64,7 @@ const schedule = async (args, channel = SIS_UPDATER_SCHEDULE_CHANNEL) => {
         if (data.success) {
           resolve()
         } else {
-          logger.error('Job failed: ' + data.message)
+          logger.error(`Job failed: ${data.message}`)
           reject(data.message)
         }
 

@@ -1,5 +1,4 @@
-const Sequelize = require('sequelize')
-const { Op } = Sequelize
+const { Op } = require('sequelize')
 const moment = require('moment')
 const { Semester, SemesterEnrollment, Studyright } = require('../models')
 
@@ -39,7 +38,7 @@ const statutoryAbsences = async (studentnumber, startdate, enddate) =>
         },
       },
       where: {
-        studentnumber: studentnumber,
+        studentnumber,
         statutory_absence: true,
       },
     })

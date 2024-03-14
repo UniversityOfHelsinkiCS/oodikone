@@ -61,6 +61,7 @@ const studyplansRedo = async (personIds, personIdToStudentNumber, iteration = 0)
   }
 
   logger.info(`Updating ${studentNumbers.length} students again due to studyplans not updating.`)
+  // eslint-disable-next-line no-use-before-define
   await updateStudents(
     studentNumbers.map(num => studentNumberToPersonId[num]),
     iteration + 1
@@ -146,11 +147,17 @@ const parseTransfers = async (groupedStudyRightSnapshots, moduleGroupIdToCode, p
 
       if (usePhase2 && !get(orderedSnapshots[i - 1], 'accepted_selection_path.educationPhase2GroupId')) return curr
 
-      const mappedId = isBaMa(studyRightEducation)
-        ? usePhase2 && !!get(snapshot, 'accepted_selection_path.educationPhase2GroupId')
-          ? `${studyrightid}-2`
-          : `${studyrightid}-1`
-        : `${studyrightid}-1` // studyrightid duplicatefix
+      let mappedId
+
+      if (isBaMa(studyRightEducation)) {
+        if (usePhase2 && !!get(snapshot, 'accepted_selection_path.educationPhase2GroupId')) {
+          mappedId = `${studyrightid}-2`
+        } else {
+          mappedId = `${studyrightid}-1`
+        }
+      } else {
+        mappedId = `${studyrightid}-1` // studyrightid duplicatefix
+      }
 
       const sourcecode =
         moduleGroupIdToCode[
@@ -192,101 +199,6 @@ const parseTransfers = async (groupedStudyRightSnapshots, moduleGroupIdToCode, p
     transfers.push(...getTransfersFrom(orderedSnapshots, snapshots[0].id, snapshots[0].education_id))
   })
   return transfers
-}
-
-const updateStudents = async (personIds, iteration = 0) => {
-  await loadMapsIfNeeded()
-
-  const [
-    students,
-    studyrightSnapshots,
-    attainments,
-    termRegistrations,
-    studyRightPrimalities,
-    enrollments,
-    studyplans,
-  ] = await Promise.all([
-    selectFromByIds('persons', personIds),
-    selectFromByIds('studyrights', personIds, 'person_id'),
-    selectFromByIds('attainments', personIds, 'person_id'),
-    selectFromByIds('term_registrations', personIds, 'student_id'),
-    selectFromByIds('study_right_primalities', personIds, 'student_id'),
-    selectFromByIds('enrolments', personIds, 'person_id'),
-    selectFromByIds('plans', personIds, 'user_id'),
-  ])
-
-  const enrollmentStudyrights = await selectFromActiveSnapshotsByIds(
-    'studyrights',
-    enrollments.map(({ study_right_id }) => study_right_id).filter(id => !!id)
-  )
-  const attainmentStudyrights = await selectFromActiveSnapshotsByIds(
-    'studyrights',
-    attainments.map(a => a.study_right_id).filter(id => !!id)
-  )
-
-  const bothStudyrights = [...enrollmentStudyrights, ...attainmentStudyrights]
-
-  const parsedStudyrightSnapshots = parseStudyrightSnapshots(studyrightSnapshots)
-  const groupedStudyRightSnapshots = groupStudyrightSnapshots(parsedStudyrightSnapshots)
-  const personIdToStudentNumber = students.reduce((res, curr) => {
-    res[curr.id] = curr.student_number
-    return res
-  }, {})
-
-  const personIdToStudyRightIdToPrimality = studyRightPrimalities.reduce((res, curr) => {
-    if (!res[curr.student_id]) res[curr.student_id] = {}
-    res[curr.student_id][curr.study_right_id] = curr
-    return res
-  }, {})
-
-  const attainmentsToBeExluced = getAttainmentsToBeExcluded()
-  const mappedStudents = students
-    .filter(s => s.student_number)
-    .map(studentMapper(attainments, parsedStudyrightSnapshots, attainmentsToBeExluced))
-
-  await bulkCreate(Student, mappedStudents)
-
-  const [moduleGroupIdToCode, formattedStudyRights] = await Promise.all([
-    updateElementDetails(flatten(Object.values(groupedStudyRightSnapshots))),
-    updateStudyRights(
-      groupedStudyRightSnapshots,
-      personIdToStudentNumber,
-      personIdToStudyRightIdToPrimality,
-      termRegistrations
-    ),
-  ])
-
-  const mappedTransfers = await parseTransfers(groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber)
-
-  const educations = await selectFromByIds(
-    'educations',
-    bothStudyrights.map(({ education_id }) => education_id).filter(id => !!id)
-  )
-
-  const studyRightIdToEducationType = bothStudyrights.reduce((res, curr) => {
-    const education = educations.find(e => e.id === curr.education_id)
-    res[curr.id] = education ? education.education_type : null
-    return res
-  }, {})
-
-  await Promise.all([
-    updateStudyRightElements(
-      groupedStudyRightSnapshots,
-      moduleGroupIdToCode,
-      personIdToStudentNumber,
-      formattedStudyRights,
-      mappedTransfers
-    ),
-    updateAttainments(attainments, personIdToStudentNumber, attainmentsToBeExluced, studyRightIdToEducationType),
-    updateTermRegistrations(termRegistrations, personIdToStudentNumber),
-    updateEnrollments(enrollments, personIdToStudentNumber, studyRightIdToEducationType),
-    updateStudyplans(studyplans, personIds, personIdToStudentNumber, groupedStudyRightSnapshots),
-    bulkCreate(Transfer, mappedTransfers, null, ['studyrightid']),
-  ])
-
-  // Studyplans do not always update. These launch updateStudents again for those
-  // whose studyplans weren't updated. Twice to see if it sometimes misses
-  await studyplansRedo(personIds, personIdToStudentNumber, iteration)
 }
 
 const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumber, groupedStudyRightSnapshots) => {
@@ -549,6 +461,21 @@ const updateEnrollments = async (enrollments, personIdToStudentNumber, studyRigh
   await bulkCreate(Enrollment, mappedEnrollments)
 }
 
+const updateTeachers = async attainments => {
+  const acceptorPersonIds = flatten(
+    attainments.map(attainment =>
+      attainment.acceptor_persons
+        .filter(p => p.roleUrn === 'urn:code:attainment-acceptor-type:approved-by')
+        .map(p => p.personId)
+    )
+  ).filter(p => !!p)
+
+  const teachers = (await selectFromByIds('persons', acceptorPersonIds)).map(p => mapTeacher(p))
+
+  // Sort to avoid deadlocks
+  await bulkCreate(Teacher, sortBy(teachers, ['id']))
+}
+
 const updateAttainments = async (
   attainments,
   personIdToStudentNumber,
@@ -732,14 +659,14 @@ const updateAttainments = async (
           const correctProvider = att.organisations.find(
             o =>
               idsOfDegreeProgrammes.has(o.organisationId) &&
-              o.roleUrn == 'urn:code:organisation-role:responsible-organisation'
+              o.roleUrn === 'urn:code:organisation-role:responsible-organisation'
           )
           if (correctProvider) {
             courseProvidersToBeCreated.push(mapCourseProvider(correctProvider))
           }
         }
 
-        courseUnit = course ? course : { id: parsedCourseCode, code: parsedCourseCode }
+        courseUnit = course || { id: parsedCourseCode, code: parsedCourseCode }
         courseUnit.group_id = courseUnit.id
       }
 
@@ -761,13 +688,13 @@ const updateAttainments = async (
       if (!codeParts.length) return attainmentIdCodeMap
 
       let parsedCourseCode = ''
+      // eslint-disable-next-line prefer-destructuring
       if (codeParts.length === 1) parsedCourseCode = codeParts[0]
-      else {
-        if (codeParts[1].length < 7) {
-          parsedCourseCode = `${codeParts[0]}-${codeParts[1]}`
-        } else {
-          parsedCourseCode = codeParts[0]
-        }
+      else if (codeParts[1].length < 7) {
+        parsedCourseCode = `${codeParts[0]}-${codeParts[1]}`
+      } else {
+        // eslint-disable-next-line prefer-destructuring
+        parsedCourseCode = codeParts[0]
       }
       return { ...attainmentIdCodeMap, [att.id]: parsedCourseCode }
     }
@@ -851,21 +778,6 @@ const updateAttainments = async (
   )
 }
 
-const updateTeachers = async attainments => {
-  const acceptorPersonIds = flatten(
-    attainments.map(attainment =>
-      attainment.acceptor_persons
-        .filter(p => p.roleUrn === 'urn:code:attainment-acceptor-type:approved-by')
-        .map(p => p.personId)
-    )
-  ).filter(p => !!p)
-
-  const teachers = (await selectFromByIds('persons', acceptorPersonIds)).map(p => mapTeacher(p))
-
-  // Sort to avoid deadlocks
-  await bulkCreate(Teacher, sortBy(teachers, ['id']))
-}
-
 // why we are using two terms for the same thing: term registration and semester enrollment
 const semesterEnrolmentsOfStudent = allSemesterEnrollments => {
   const semesters = uniq(allSemesterEnrollments.map(s => s.semestercode))
@@ -910,6 +822,101 @@ const updateTermRegistrations = async (termRegistrations, personIdToStudentNumbe
   const semesterEnrollments = flatten(Object.values(enrolmentsByStudents).map(semesterEnrolmentsOfStudent))
 
   await bulkCreate(SemesterEnrollment, semesterEnrollments)
+}
+
+const updateStudents = async (personIds, iteration = 0) => {
+  await loadMapsIfNeeded()
+
+  const [
+    students,
+    studyrightSnapshots,
+    attainments,
+    termRegistrations,
+    studyRightPrimalities,
+    enrollments,
+    studyplans,
+  ] = await Promise.all([
+    selectFromByIds('persons', personIds),
+    selectFromByIds('studyrights', personIds, 'person_id'),
+    selectFromByIds('attainments', personIds, 'person_id'),
+    selectFromByIds('term_registrations', personIds, 'student_id'),
+    selectFromByIds('study_right_primalities', personIds, 'student_id'),
+    selectFromByIds('enrolments', personIds, 'person_id'),
+    selectFromByIds('plans', personIds, 'user_id'),
+  ])
+
+  const enrollmentStudyrights = await selectFromActiveSnapshotsByIds(
+    'studyrights',
+    enrollments.map(({ study_right_id }) => study_right_id).filter(id => !!id)
+  )
+  const attainmentStudyrights = await selectFromActiveSnapshotsByIds(
+    'studyrights',
+    attainments.map(a => a.study_right_id).filter(id => !!id)
+  )
+
+  const bothStudyrights = [...enrollmentStudyrights, ...attainmentStudyrights]
+
+  const parsedStudyrightSnapshots = parseStudyrightSnapshots(studyrightSnapshots)
+  const groupedStudyRightSnapshots = groupStudyrightSnapshots(parsedStudyrightSnapshots)
+  const personIdToStudentNumber = students.reduce((res, curr) => {
+    res[curr.id] = curr.student_number
+    return res
+  }, {})
+
+  const personIdToStudyRightIdToPrimality = studyRightPrimalities.reduce((res, curr) => {
+    if (!res[curr.student_id]) res[curr.student_id] = {}
+    res[curr.student_id][curr.study_right_id] = curr
+    return res
+  }, {})
+
+  const attainmentsToBeExluced = getAttainmentsToBeExcluded()
+  const mappedStudents = students
+    .filter(s => s.student_number)
+    .map(studentMapper(attainments, parsedStudyrightSnapshots, attainmentsToBeExluced))
+
+  await bulkCreate(Student, mappedStudents)
+
+  const [moduleGroupIdToCode, formattedStudyRights] = await Promise.all([
+    updateElementDetails(flatten(Object.values(groupedStudyRightSnapshots))),
+    updateStudyRights(
+      groupedStudyRightSnapshots,
+      personIdToStudentNumber,
+      personIdToStudyRightIdToPrimality,
+      termRegistrations
+    ),
+  ])
+
+  const mappedTransfers = await parseTransfers(groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber)
+
+  const educations = await selectFromByIds(
+    'educations',
+    bothStudyrights.map(({ education_id }) => education_id).filter(id => !!id)
+  )
+
+  const studyRightIdToEducationType = bothStudyrights.reduce((res, curr) => {
+    const education = educations.find(e => e.id === curr.education_id)
+    res[curr.id] = education ? education.education_type : null
+    return res
+  }, {})
+
+  await Promise.all([
+    updateStudyRightElements(
+      groupedStudyRightSnapshots,
+      moduleGroupIdToCode,
+      personIdToStudentNumber,
+      formattedStudyRights,
+      mappedTransfers
+    ),
+    updateAttainments(attainments, personIdToStudentNumber, attainmentsToBeExluced, studyRightIdToEducationType),
+    updateTermRegistrations(termRegistrations, personIdToStudentNumber),
+    updateEnrollments(enrollments, personIdToStudentNumber, studyRightIdToEducationType),
+    updateStudyplans(studyplans, personIds, personIdToStudentNumber, groupedStudyRightSnapshots),
+    bulkCreate(Transfer, mappedTransfers, null, ['studyrightid']),
+  ])
+
+  // Studyplans do not always update. These launch updateStudents again for those
+  // whose studyplans weren't updated. Twice to see if it sometimes misses
+  await studyplansRedo(personIds, personIdToStudentNumber, iteration)
 }
 
 module.exports = {

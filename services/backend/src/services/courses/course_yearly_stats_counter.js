@@ -199,20 +199,16 @@ class CourseYearlyStatsCounter {
             category: 'passedFirst',
             code: groupcode,
           })
-        } else {
-          if (student.category == 'passedFirst') {
-            this.students.set(studentnumber, {
-              earliestAttainment: attainment_date,
-              category: 'passedEventually',
-              code: groupcode,
-            })
-          }
+        } else if (student.category === 'passedFirst') {
+          this.students.set(studentnumber, {
+            earliestAttainment: attainment_date,
+            category: 'passedEventually',
+            code: groupcode,
+          })
         }
-      } else {
-        if (student.category === 'neverPassed') {
-          if (passed) {
-            this.students.set(studentnumber, { ...student, category: 'passedEventually' })
-          }
+      } else if (student.category === 'neverPassed') {
+        if (passed) {
+          this.students.set(studentnumber, { ...student, category: 'passedEventually' })
         }
       }
     }
@@ -258,7 +254,8 @@ class CourseYearlyStatsCounter {
         // totals cannot be calculated
         this.obfuscated = true
 
-        let gradeSpread = {}
+        const gradeSpread = {}
+        // eslint-disable-next-line guard-for-in
         for (const grade in normalStats.attempts.grades) {
           gradeSpread[grade] = []
         }

@@ -3,10 +3,11 @@ const {
 } = require('../database/connection')
 const { Studyright, StudyrightElement, ElementDetail, Transfer } = require('../models')
 const moment = require('moment')
-const { redisClient } = require('../services/redis')
+const { redisClient } = require('./redis')
 const _ = require('lodash')
 const { Op, col, where, fn } = require('sequelize')
 const logger = require('../util/logger')
+
 const REDIS_KEY = 'STUDYRIGHT_ASSOCIATIONS_V2'
 
 const byStudent = studentNumber => {
@@ -107,9 +108,8 @@ const allUniqueStudyrightCodeArrays = () =>
 const uniqueStudyrightAssocations = elementcodes => {
   if (elementcodes === undefined) {
     return allUniqueStudyrightCodeArrays()
-  } else {
-    return uniqueStudyrightCodeArrays(elementcodes)
   }
+  return uniqueStudyrightCodeArrays(elementcodes)
 }
 
 const getAssociatedStudyrights = async elementcodes => {
@@ -199,7 +199,7 @@ const calculateAssociationsFromDb = async (chunksize = 100000) => {
     return 'FALL'
   }
   const getEnrollmentStartYear = momentstartdate => {
-    if (getSemester(momentstartdate) == 'SPRING') return momentstartdate.utc(2).year() - 1
+    if (getSemester(momentstartdate) === 'SPRING') return momentstartdate.utc(2).year() - 1
     return momentstartdate.year()
   }
   const total = await Studyright.count()
@@ -221,15 +221,15 @@ const calculateAssociationsFromDb = async (chunksize = 100000) => {
           }
         } else if (type === StudyRightType.PROGRAMME) {
           associations.programmes[code] = associations.programmes[code] || {
-            type: type,
-            name: name,
-            code: code,
+            type,
+            name,
+            code,
             enrollmentStartYears: {},
             studytracks: [],
           }
           const momentstartdate = moment(startdate)
           const enrollment = momentstartdate.isValid() ? getEnrollmentStartYear(momentstartdate) : null
-          const enrollmentStartYears = associations.programmes[code].enrollmentStartYears
+          const { enrollmentStartYears } = associations.programmes[code]
           if (!enrollmentStartYears[enrollment])
             enrollmentStartYears[enrollment] = {
               studyTracks: {},
@@ -269,9 +269,9 @@ const calculateAssociationsFromDb = async (chunksize = 100000) => {
                   programmes: {},
                 }
                 associations.studyTracks[e.code].programmes[code] = {
-                  type: type,
-                  name: name,
-                  code: code,
+                  type,
+                  name,
+                  code,
                 }
               }
             })
@@ -304,9 +304,8 @@ const getAssociations = async (doRefresh = false) => {
     const associations = await calculateAssociationsFromDb()
     await saveAssociationsToRedis(associations)
     return associations
-  } else {
-    return studyrights
   }
+  return studyrights
 }
 
 const getFilteredAssociations = async codes => {

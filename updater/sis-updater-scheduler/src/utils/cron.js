@@ -1,4 +1,4 @@
-const CronJob = require('cron').CronJob
+const { CronJob } = require('cron')
 
 const schedule = (cronTime, job) => new CronJob(cronTime, job, null, true, 'Europe/Helsinki')
 

@@ -223,7 +223,7 @@ const getBasicStatsForStudytrack = async ({ studyprogramme, combinedProgramme, s
 
   const reversedYears = getYearsArray(since.getFullYear(), isAcademicYear).reverse()
   const key = includeAllSpecials ? 'SPECIAL_INCLUDED' : 'SPECIAL_EXCLUDED'
-  const titles = tableTitles['basics'][combinedProgramme ? `${key}_COMBINED_PROGRAMME` : key]
+  const titles = tableTitles.basics[combinedProgramme ? `${key}_COMBINED_PROGRAMME` : key]
   const tableStats = reversedYears.map(year =>
     initializeTableStats(
       year,

@@ -76,7 +76,8 @@ const markCredit = (stats, passed, failed, credits, transferred) => {
       passed: stats.passed + 1,
       transferred: transferred ? stats.transferred + credits : stats.transferred,
     }
-  } else if (failed) {
+  }
+  if (failed) {
     return {
       ...stats,
       failed: stats.failed + 1,
@@ -133,6 +134,8 @@ const markCreditForCourse = (courses, credit) => {
     },
   }
 }
+
+const isRegularCourse = credit => !credit.isStudyModule
 
 const teacherStats = async teacherid => {
   const teacher = await findTeacherCredits(teacherid)
@@ -229,8 +232,6 @@ const getCredits = (teacherIds, semestercodeStart, semestercodeEnd) =>
       },
     },
   })
-
-const isRegularCourse = credit => !credit.isStudyModule
 
 const calculateCreditStatistics = credits =>
   credits.reduce(

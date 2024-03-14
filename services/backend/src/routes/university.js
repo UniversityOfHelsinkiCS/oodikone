@@ -3,6 +3,7 @@ const { getFacultyList } = require('../services/faculty/facultyHelpers')
 const { getGraduationStats, getFacultyProgressStats } = require('../services/faculty/facultyService')
 
 const { getMedian } = require('../services/studyprogramme/studyprogrammeHelpers')
+
 const degreeNames = ['bachelor', 'bachelorMaster', 'master', 'licentiate', 'doctor']
 
 router.get('/allprogressstats', async (req, res) => {
@@ -78,7 +79,7 @@ router.get('/allprogressstats', async (req, res) => {
 
   // Remove ELL bachelor+master progresstats for now, because it is problematic due to different credit limits
   // when expanding the table rows to show 'programme'(faculty) specific progress bars
-  delete universityData.bcMsProgStats['H90']
+  delete universityData.bcMsProgStats.H90
 
   return res.status(200).json(universityData)
 })
@@ -179,7 +180,7 @@ router.get('/allgraduationstats', async (req, res) => {
         })
       }
     }
-    // eslint-disable-next-line no-unused-vars
+
     const { programmes, ...rest } = data.classSizes
     universityData.classSizes.programmes[facultyCode] = rest
   }

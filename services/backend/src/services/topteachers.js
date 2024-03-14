@@ -1,4 +1,4 @@
-const { redisClient } = require('../services/redis')
+const { redisClient } = require('./redis')
 const { getSemestersAndYears, getCurrentSemester } = require('./semesters')
 const { Teacher, Semester, Credit, Course } = require('../models')
 const { Op } = require('sequelize')
@@ -78,14 +78,14 @@ const updatedStats = (statistics, teacher, passed, failed, credits, transferred)
       credits: transferred ? stats.credits : stats.credits + credits,
       transferred: transferred ? stats.transferred + credits : stats.transferred,
     }
-  } else if (failed) {
+  }
+  if (failed) {
     return {
       ...stats,
       failed: stats.failed + 1,
     }
-  } else {
-    return stats
   }
+  return stats
 }
 
 const isRegularCourse = credit => !credit.isStudyModule
@@ -130,19 +130,19 @@ const findTopTeachers = async yearcode => {
   }
 }
 
+const findAndSaveTopTeachers = async yearcode => {
+  const { all, openuni } = await findTopTeachers(yearcode)
+  await setTeacherStats(ID.OPENUNI, yearcode, openuni)
+  await setTeacherStats(ID.ALL, yearcode, all)
+}
+
 const findAndSaveTeachers = async (startcode = 1, to) => {
   const endcode = to || (await getCurrentSemester()).getDataValue('yearcode')
   for (let code = startcode; code <= endcode; code++) {
     await findAndSaveTopTeachers(code)
     logger.info(`Teacher leaderboard for yearcode ${code} calculated`)
   }
-  logger.info(`Teacher leaderboard calculations done`)
-}
-
-const findAndSaveTopTeachers = async yearcode => {
-  const { all, openuni } = await findTopTeachers(yearcode)
-  await setTeacherStats(ID.OPENUNI, yearcode, openuni)
-  await setTeacherStats(ID.ALL, yearcode, all)
+  logger.info('Teacher leaderboard calculations done')
 }
 
 module.exports = {

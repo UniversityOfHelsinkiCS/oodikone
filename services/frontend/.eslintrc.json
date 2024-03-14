@@ -63,7 +63,7 @@
       }
     },
     "react": {
-      "version": "detect"
+      "version": "16.14.0"
     }
   }
 }

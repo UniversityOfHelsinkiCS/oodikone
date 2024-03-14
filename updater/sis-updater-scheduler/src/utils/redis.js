@@ -8,6 +8,11 @@ const redisRetry = ({ attempt, error }) => {
   return Math.min(attempt * 100, 5000)
 }
 
+const client = redis.createClient({
+  url: process.env.REDIS_URI,
+  retry_strategy: redisRetry,
+})
+
 const redisPromisify = async (func, ...params) =>
   new Promise((res, rej) => {
     func.call(client, ...params, (err, data) => {
@@ -15,11 +20,6 @@ const redisPromisify = async (func, ...params) =>
       else res(data)
     })
   })
-
-const client = redis.createClient({
-  url: process.env.REDIS_URI,
-  retry_strategy: redisRetry,
-})
 
 const set = async (key, val) => await redisPromisify(client.set, key, val)
 

@@ -13,10 +13,10 @@ const {
 const getFacultyThesisWriters = async ({ since, years, isAcademicYear, facultyProgrammes, includeAllSpecials }) => {
   const thesisTypes = ['urn:code:course-unit-type:bachelors-thesis', 'urn:code:course-unit-type:masters-thesis']
 
-  let bachelors = getStatsBasis(years)
-  let masters = getStatsBasis(years)
-  let programmeCounts = {}
-  let programmeNames = {}
+  const bachelors = getStatsBasis(years)
+  const masters = getStatsBasis(years)
+  const programmeCounts = {}
+  const programmeNames = {}
 
   for (const { progId, code, name } of facultyProgrammes) {
     if (code === 'MH70_008_2' || code.startsWith('LIS') || code.startsWith('T')) continue
@@ -36,8 +36,10 @@ const getFacultyThesisWriters = async ({ since, years, isAcademicYear, facultyPr
       if (!(progId in programmeCounts)) {
         programmeCounts[progId] = {}
 
-        Object.keys(bachelors.tableStats).forEach(year => (programmeCounts[progId][year] = [0, 0, 0]))
-        programmeNames[progId] = { ...name, code: code }
+        Object.keys(bachelors.tableStats).forEach(year => {
+          programmeCounts[progId][year] = [0, 0, 0]
+        })
+        programmeNames[progId] = { ...name, code }
       }
       programmeCounts[progId][thesisYear][0] += 1
 
@@ -94,7 +96,7 @@ const getFacultyThesisWritersForProgrammes = async (
 }
 
 const combineFacultyThesisWriters = async (faculty, facultyProgrammes, yearType, specialGroups) => {
-  let allThesisWriters = {
+  const allThesisWriters = {
     id: faculty,
     years: [],
     tableStats: [],

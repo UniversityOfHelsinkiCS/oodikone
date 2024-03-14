@@ -67,7 +67,7 @@ app.get('/v1/students', async (_, res) => {
 })
 
 app.post('/v1/studyplans', async (req, res) => {
-  const studentnumbers = req.body.studentnumbers
+  const { studentnumbers } = req.body
   const msg = `Scheduling update of ${studentnumbers.length} students whose studyplan has not been updated recently`
   logger.info(msg)
   sendToSlack(msg)
@@ -83,7 +83,7 @@ app.get('/v1/programmes', async (_, res) => {
 })
 
 app.post('/v1/students', async (req, res) => {
-  const individualMode = req.body.individualMode
+  const { individualMode } = req.body
   const studentnumbers = req.body.studentnumbers.map(n => (n[0] === '0' ? n : `0${n}`))
 
   logger.info(`Scheduling ${studentnumbers.length} custom studentnumbers ${individualMode ? 'individually' : ''}`)

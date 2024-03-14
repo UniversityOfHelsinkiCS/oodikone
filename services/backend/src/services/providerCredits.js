@@ -74,14 +74,6 @@ const getDegreeStudyright = (studyrights, date, semestercode) =>
     return rightExtentCode && rightDates && enrolled
   })
 
-const getCreditsProduced = async (provider, isAcademicYear, specialIncluded = true) => {
-  let data = await getCreditStats(provider, isAcademicYear, specialIncluded)
-  if (data) return data
-  data = await computeCreditsProduced(provider, isAcademicYear, specialIncluded)
-  await setCreditStats(data, isAcademicYear, specialIncluded)
-  return data
-}
-
 /* Calculates credits produced by provider (programme or faculty) */
 const computeCreditsProduced = async (providerCode, isAcademicYear, specialIncluded = true) => {
   const since = new Date('2017-01-01')
@@ -156,6 +148,14 @@ const computeCreditsProduced = async (providerCode, isAcademicYear, specialInclu
   })
 
   return { stats, id: providerCode }
+}
+
+const getCreditsProduced = async (provider, isAcademicYear, specialIncluded = true) => {
+  let data = await getCreditStats(provider, isAcademicYear, specialIncluded)
+  if (data) return data
+  data = await computeCreditsProduced(provider, isAcademicYear, specialIncluded)
+  await setCreditStats(data, isAcademicYear, specialIncluded)
+  return data
 }
 
 module.exports = {
