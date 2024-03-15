@@ -9,7 +9,7 @@ const getMonths = year => {
   const start = `${year}-08-01`
   return Math.round(moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths())
 }
-const getTotalPopulationLink = (studytrack, studyprogramme, combinedProgramme, months, yearsString) => {
+const getTotalPopulationLink = (combinedProgramme, months, studyprogramme, studytrack, yearsString) => {
   if (studytrack) {
     return (
       `/populations?months=${months}&semesters=FALL&semesters=` +
@@ -28,7 +28,7 @@ const getTotalPopulationLink = (studytrack, studyprogramme, combinedProgramme, m
   )
 }
 
-const getPopulationLink = (studytrack, studyprogramme, combinedProgramme, startYear, months) => {
+const getPopulationLink = (combinedProgramme, months, startYear, studytrack, studyprogramme) => {
   if (studytrack) {
     return (
       `/populations?months=${months}&semesters=FALL&semesters=` +
@@ -46,7 +46,7 @@ const getPopulationLink = (studytrack, studyprogramme, combinedProgramme, startY
     `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&year=${startYear}`
   )
 }
-const PopulationStatisticsLink = ({ studytrack, studyprogramme, combinedProgramme, year }) => {
+const PopulationStatisticsLink = ({ combinedProgramme, studyprogramme, studytrack, year }) => {
   const startYear = Number(year.slice(0, 4))
   const months = Math.ceil(moment.duration(moment().diff(`${startYear}-08-01`)).asMonths())
   const href = getPopulationLink(studytrack, studyprogramme, combinedProgramme, startYear, months)
@@ -57,7 +57,7 @@ const PopulationStatisticsLink = ({ studytrack, studyprogramme, combinedProgramm
   )
 }
 
-const TotalPopulationLink = ({ studytrack, studyprogramme, combinedProgramme, years }) => {
+const TotalPopulationLink = ({ combinedProgramme, studyprogramme, studytrack, years }) => {
   const yearsString = years.join('&years=')
   const months = getMonths(Math.min(...years.map(year => Number(year))))
   const href = getTotalPopulationLink(studytrack, studyprogramme, combinedProgramme, months, yearsString)
@@ -69,6 +69,8 @@ const TotalPopulationLink = ({ studytrack, studyprogramme, combinedProgramme, ye
 }
 
 export const PopulationLink = ({ year, ...rest }) => {
-  if (year === 'Total') return <TotalPopulationLink {...rest} />
+  if (year === 'Total') {
+    return <TotalPopulationLink {...rest} />
+  }
   return <PopulationStatisticsLink {...rest} year={year} />
 }

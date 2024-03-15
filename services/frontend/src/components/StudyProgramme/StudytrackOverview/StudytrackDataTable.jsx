@@ -12,25 +12,27 @@ const shouldBeHidden = (showPercentages, value) => !showPercentages && typeof va
 
 const getCellClass = value => (value === 'Total' ? 'total-row-cell' : '')
 
-const getSpanValue = (idx, showPercentages, combinedProgramme) => {
-  if (combinedProgramme && showPercentages) return idx + 2
-  if (combinedProgramme) return idx + 1
-  return idx
+const getSpanValue = (combinedProgramme, index, showPercentages) => {
+  if (combinedProgramme && showPercentages) return index + 2
+  if (combinedProgramme) return index + 1
+  return index
 }
-const getStyleForBasic = idx => {
-  if ([4, 12].includes(idx)) return { backgroundColor: '#f9f9f9', borderLeftWidth: 'thick' }
-  if ([1, 5, 8, 9, 12, 13, 16, 17, 20, 21].includes(idx)) return { backgroundColor: '#f9f9f9' }
-  if (idx === 18) return { borderLeftWidth: 'thick' }
-  return {}
-}
-const getStyleForCombined = idx => {
-  if ([4, 20].includes(idx)) return { backgroundColor: '#f9f9f9', borderLeftWidth: 'thick' }
-  if ([1, 5, 8, 9, 12, 13, 16, 17, 21].includes(idx)) return { backgroundColor: '#f9f9f9' }
-  if ([14].includes(idx)) return { borderLeftWidth: 'thick' }
+
+const getStyleForBasic = index => {
+  if ([4, 12].includes(index)) return { backgroundColor: '#f9f9f9', borderLeftWidth: 'thick' }
+  if ([1, 5, 8, 9, 12, 13, 16, 17, 20, 21].includes(index)) return { backgroundColor: '#f9f9f9' }
+  if (index === 18) return { borderLeftWidth: 'thick' }
   return {}
 }
 
-const createCountriesContent = ({ year, studyprogramme, otherCountriesStats }) => {
+const getStyleForCombined = index => {
+  if ([4, 20].includes(index)) return { backgroundColor: '#f9f9f9', borderLeftWidth: 'thick' }
+  if ([1, 5, 8, 9, 12, 13, 16, 17, 21].includes(index)) return { backgroundColor: '#f9f9f9' }
+  if ([14].includes(index)) return { borderLeftWidth: 'thick' }
+  return {}
+}
+
+const createCountriesContent = ({ otherCountriesStats, studyprogramme, year }) => {
   if (
     !otherCountriesStats ||
     !otherCountriesStats[studyprogramme] ||
@@ -48,7 +50,7 @@ const createCountriesContent = ({ year, studyprogramme, otherCountriesStats }) =
     ))
 }
 
-const getBasicTableCell = ({ row, value, combinedProgramme, index }) => {
+const getBasicTableCell = ({ combinedProgramme, index, row, value }) => {
   return (
     <Table.Cell
       className={getCellClass(row[0])}
@@ -61,26 +63,26 @@ const getBasicTableCell = ({ row, value, combinedProgramme, index }) => {
   )
 }
 
-const getCountriesPopup = ({ index, combinedProgramme, value, row, year, studyprogramme, otherCountriesStats }) => {
+const getCountriesPopup = ({ combinedProgramme, index, otherCountriesStats, row, studyprogramme, value, year }) => {
   return (
     <Popup
-      content={createCountriesContent({ year, studyprogramme, otherCountriesStats })}
+      content={createCountriesContent({ otherCountriesStats, studyprogramme, year })}
       key={`${row[0]}-${getKey(value)}`}
-      trigger={getBasicTableCell({ row, value, combinedProgramme, index })}
+      trigger={getBasicTableCell({ combinedProgramme, index, row, value })}
     />
   )
 }
 
 const getFirstCell = ({
-  yearlyData,
-  year,
-  show,
-  studyprogramme,
+  allRights,
   calendarYears,
   combinedProgramme,
-  setShow,
-  allRights,
   isAdmin,
+  setShow,
+  show,
+  studyprogramme,
+  year,
+  yearlyData,
 }) => {
   return (
     <Table.Cell className={getCellClass(year)} key={getKey(year)} onClick={setShow}>
@@ -99,15 +101,15 @@ const getFirstCell = ({
 }
 
 const getSingleTrackRow = ({
-  row,
-  studyprogramme,
-  code,
-  showPercentages,
-  calendarYears,
-  combinedProgramme,
-  otherCountriesStats,
   allRights,
+  calendarYears,
+  code,
+  combinedProgramme,
   isAdmin,
+  otherCountriesStats,
+  row,
+  showPercentages,
+  studyprogramme,
 }) => {
   return (
     <Table.Row className="regular-row" key={getKey(row[0])}>
@@ -115,13 +117,13 @@ const getSingleTrackRow = ({
         if (shouldBeHidden(showPercentages, value)) return null
         if (index === row.length - 2 && otherCountriesStats)
           return getCountriesPopup({
-            index,
             combinedProgramme,
-            value,
-            row,
-            year: row[0],
-            studyprogramme: code,
+            index,
             otherCountriesStats,
+            row,
+            studyprogramme: code,
+            value,
+            year: row[0],
           })
         return (
           <Table.Cell
@@ -149,23 +151,22 @@ const getSingleTrackRow = ({
 }
 
 const getRow = ({
-  yearlyData,
-  row,
-  show,
-  setShow,
-  studyprogramme,
-  studytracks,
-  showPercentages,
-  years,
+  allRights,
   calendarYears,
   combinedProgramme,
-  otherCountriesStats,
   getTextIn,
-  allRights,
   isAdmin,
+  otherCountriesStats,
+  row,
+  setShow,
+  show,
+  showPercentages,
+  studyprogramme,
+  studytracks,
+  years,
+  yearlyData,
 }) => {
   const year = yearlyData && yearlyData[0] && yearlyData[0][0]
-  // Get row for the studyprogramme
   if (years.includes(row[0])) {
     return (
       <Table.Row className="header-row" key={getKey(row[0])}>
@@ -173,27 +174,27 @@ const getRow = ({
           if (shouldBeHidden(showPercentages, value)) return null
           if (index === 0)
             return getFirstCell({
-              yearlyData,
-              year: row[0],
-              show,
-              studyprogramme,
+              allRights,
               calendarYears,
               combinedProgramme,
-              setShow,
-              allRights,
               isAdmin,
+              setShow,
+              show,
+              studyprogramme,
+              year: row[0],
+              yearlyData,
             })
           if (index === row.length - 2 && otherCountriesStats)
             return getCountriesPopup({
-              index,
               combinedProgramme,
-              value,
-              row,
-              year: row[0],
-              studyprogramme,
+              index,
               otherCountriesStats,
+              row,
+              studyprogramme,
+              value,
+              year: row[0],
             })
-          return getBasicTableCell({ row, value, combinedProgramme, index })
+          return getBasicTableCell({ combinedProgramme, index, row, value })
         })}
       </Table.Row>
     )
@@ -225,16 +226,16 @@ const getRow = ({
           }
           if (index === row.length - 2 && otherCountriesStats) {
             return getCountriesPopup({
-              index,
               combinedProgramme,
-              value,
-              row,
-              year,
-              studyprogramme: correctStudytrack,
+              index,
               otherCountriesStats,
+              row,
+              studyprogramme: correctStudytrack,
+              value,
+              year,
             })
           }
-          return getBasicTableCell({ row, value, combinedProgramme, index })
+          return getBasicTableCell({ combinedProgramme, index, row, value })
         })}
       </Table.Row>
     )
@@ -303,7 +304,6 @@ export const StudytrackDataTable = ({
     show[index] = newShow[index] === undefined ? true : !show[index]
     setShow([...show])
   }
-
   const sortedMainStats = sortMainDataByYear(Object.values(dataOfAllTracks))
   const sortedTrackStats = sortTrackDataByYear(dataOfSingleTrack)
   const calendarYears = years.reduce((all, year) => {
@@ -326,8 +326,8 @@ export const StudytrackDataTable = ({
             <Table.HeaderCell
               colSpan={
                 !showPercentages
-                  ? getSpanValue(4, showPercentages, combinedProgramme)
-                  : getSpanValue(8, showPercentages, combinedProgramme)
+                  ? getSpanValue(combinedProgramme, 4, showPercentages)
+                  : getSpanValue(combinedProgramme, 8, showPercentages)
               }
               style={{ borderLeftWidth: 'thick' }}
             >
@@ -369,36 +369,35 @@ export const StudytrackDataTable = ({
             {singleTrack
               ? sortedTrackStats.map(row =>
                   getSingleTrackRow({
-                    row,
-                    studyprogramme,
-                    code: singleTrack,
-                    showPercentages,
-                    years,
-                    calendarYears,
-                    combinedProgramme,
-                    otherCountriesStats,
                     allRights,
+                    calendarYears,
+                    code: singleTrack,
+                    combinedProgramme,
                     isAdmin,
+                    otherCountriesStats,
+                    row,
+                    showPercentages,
+                    studyprogramme,
                   })
                 )
               : sortedMainStats?.map((yearlyData, index) =>
                   yearlyData.map(row =>
                     getRow({
-                      yearlyData,
-                      row,
-                      studyprogramme,
-                      show: show[index],
-                      setShow: () => firstCellClicked(index),
-                      studytracks,
-                      showPercentages,
-                      years,
+                      allRights,
                       calendarYears,
                       combinedProgramme,
-                      otherCountriesStats,
                       getTextIn,
                       index,
-                      allRights,
                       isAdmin,
+                      otherCountriesStats,
+                      row,
+                      setShow: () => firstCellClicked(index),
+                      show: show[index],
+                      showPercentages,
+                      studyprogramme,
+                      studytracks,
+                      years,
+                      yearlyData,
                     })
                   )
                 )}
