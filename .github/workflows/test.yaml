@@ -12,8 +12,8 @@ on:
 
 jobs:
   # === Static tests / linting ===
-  lint_backend:
-    name: 'Lint backend'
+  lint_backend_and_frontend:
+    name: 'Lint backend and frontend'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,24 +21,11 @@ jobs:
         with:
           node-version: 18
       - name: 'Install dependencies'
-        run: npm ci && cd services/backend && npm ci
-      - name: 'Run backend linter'
-        run: npm run eslint services/backend
-
-  lint_frontend:
-    name: 'Lint frontend'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 18
-      - name: 'Install dependencies'
-        run: npm ci && cd services/frontend && npm ci
-      - name: 'Run frontend linter'
-        run: npm run concurrently \
-          'eslint --ext .jsx,.js services/frontend --report-unused-disable-directives' \
-          'stylelint services/frontend/src/**/*.css'
+        run: npm ci && cd services/frontend && npm ci && cd ../backend && npm ci
+      - name: 'Run Stylelint for CSS files'
+        run: npm run stylelint "services/frontend/src/**/*.css"
+      - name: 'Run ESLint for JS files'
+        run: npm run eslint -- --ext .jsx,.js services --report-unused-disable-directives
 
   # === Build database images ===
   build_backend:

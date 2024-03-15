@@ -3,7 +3,6 @@
   "description": "An application for analyzing university data.",
   "scripts": {
     "cypress": "cypress",
-    "concurrently": "concurrently",
     "eslint": "eslint",
     "lint:all": "eslint --ext .js,.jsx services/ updater/ --report-unused-disable-directives",
     "stylelint": "stylelint",
@@ -32,7 +31,6 @@
   },
   "homepage": "https://github.com/UniversityOfHelsinkiCS/oodikone#readme",
   "devDependencies": {
-    "concurrently": "^7.4.0",
     "cypress": "^13.2.0",
     "eslint": "^8.56.0",
     "eslint-config-airbnb": "^19.0.4",
