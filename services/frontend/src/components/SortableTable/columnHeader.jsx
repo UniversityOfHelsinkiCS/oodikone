@@ -1,5 +1,5 @@
 /* eslint-disable no-return-assign */
-import { produce } from 'immer'
+import produce from 'immer'
 import _ from 'lodash'
 import React, { useRef, useState, useEffect, useMemo, useCallback } from 'react'
 import { Icon, Popup } from 'semantic-ui-react'

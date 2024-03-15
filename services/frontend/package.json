@@ -11,7 +11,7 @@
     "@sentry/browser": "^6.18.2",
     "@sentry/tracing": "^6.18.2",
     "axios": "^0.21.4",
-    "immer": "^9.0.12",
+    "immer": "^9.0.21",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
     "prop-types": "^15.8.1",
