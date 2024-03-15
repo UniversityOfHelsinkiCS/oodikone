@@ -9,6 +9,7 @@ const getMonths = year => {
   const start = `${year}-08-01`
   return Math.round(moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths())
 }
+
 const getTotalPopulationLink = (combinedProgramme, months, studyprogramme, studytrack, yearsString) => {
   if (studytrack) {
     return (
@@ -28,7 +29,7 @@ const getTotalPopulationLink = (combinedProgramme, months, studyprogramme, study
   )
 }
 
-const getPopulationLink = (combinedProgramme, months, startYear, studytrack, studyprogramme) => {
+const getPopulationLink = (combinedProgramme, months, startYear, studyprogramme, studytrack) => {
   if (studytrack) {
     return (
       `/populations?months=${months}&semesters=FALL&semesters=` +
@@ -46,10 +47,11 @@ const getPopulationLink = (combinedProgramme, months, startYear, studytrack, stu
     `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&year=${startYear}`
   )
 }
+
 const PopulationStatisticsLink = ({ combinedProgramme, studyprogramme, studytrack, year }) => {
   const startYear = Number(year.slice(0, 4))
   const months = Math.ceil(moment.duration(moment().diff(`${startYear}-08-01`)).asMonths())
-  const href = getPopulationLink(studytrack, studyprogramme, combinedProgramme, startYear, months)
+  const href = getPopulationLink(combinedProgramme, months, startYear, studyprogramme, studytrack)
   return (
     <Link title={`Population statistics of class ${year}`} to={href}>
       <Icon name="level up alternate" />
@@ -60,7 +62,7 @@ const PopulationStatisticsLink = ({ combinedProgramme, studyprogramme, studytrac
 const TotalPopulationLink = ({ combinedProgramme, studyprogramme, studytrack, years }) => {
   const yearsString = years.join('&years=')
   const months = getMonths(Math.min(...years.map(year => Number(year))))
-  const href = getTotalPopulationLink(studytrack, studyprogramme, combinedProgramme, months, yearsString)
+  const href = getTotalPopulationLink(combinedProgramme, months, studyprogramme, studytrack, yearsString)
   return (
     <Link title="Population statistics of all years" to={href}>
       <Icon name="level up alternate" />
