@@ -98,6 +98,10 @@ In development, backend and updater use the same redis, but in production they a
 
 See also [older graph](documentation/Oodikone.png), which presents more information.
 
+To read a bit more details about what updater-scheduler and updater-worker do, see their own READMEs:
+- [updater-scheduler's README](./updater/sis-updater-scheduler/README.md)
+- [updater-worker's README](./updater/sis-updater-worker/README.md)
+
 ### Documentation
 
 Folder `documentation` currently contains some notes on sis-db schema and is meant as a place for storing useful information on Oodikone to make life easier for future developers. Feel free to add anything relevant!
