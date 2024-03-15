@@ -189,7 +189,7 @@ export const CompletedCoursesSearch = ({ setValues }) => {
           </Form.Field>
           <SearchHistory
             handleSearch={onSelectSearch}
-            header="Saved courselists"
+            header="Saved courselist" // This should cause the tests to fail
             items={
               searchList
                 ? searchList.map(list => ({
