@@ -167,6 +167,7 @@ const getRow = ({
   yearlyData,
 }) => {
   const year = yearlyData && yearlyData[0] && yearlyData[0][0]
+
   if (years.includes(row[0])) {
     return (
       <Table.Row className="header-row" key={getKey(row[0])}>
@@ -200,48 +201,51 @@ const getRow = ({
     )
   }
 
-  // Get row for any possible studytrack under the header studyprogramme row, if they are folded open
-  if (show) {
-    const correctStudytrack = row[0].split(', ')[1]
-    const title = `${getTextIn(studytracks[correctStudytrack])}, ${correctStudytrack}`
-    return (
-      <Table.Row className="regular-row" key={getKey(row[0])}>
-        {row.map((value, index) => {
-          if (shouldBeHidden(showPercentages, value)) return null
-          if (index === 0) {
-            return (
-              <Table.Cell key={getKey(row[0])} style={{ paddingLeft: '50px' }} textAlign="left">
-                {title}
-                {(isAdmin || allRights.includes(studyprogramme) || allRights.includes(combinedProgramme)) && (
-                  <PopulationLink
-                    combinedProgramme={combinedProgramme}
-                    studyprogramme={studyprogramme}
-                    studytrack={correctStudytrack}
-                    year={year}
-                    years={calendarYears}
-                  />
-                )}
-              </Table.Cell>
-            )
-          }
-          if (index === row.length - 2 && otherCountriesStats) {
-            return getCountriesPopup({
-              combinedProgramme,
-              index,
-              otherCountriesStats,
-              row,
-              studyprogramme: correctStudytrack,
-              value,
-              year,
-            })
-          }
-          return getBasicTableCell({ combinedProgramme, index, row, value })
-        })}
-      </Table.Row>
-    )
+  if (!show) {
+    return null
   }
 
-  return null
+  const correctStudytrack = row[0].split(', ')[1]
+  const title =
+    studytracks[correctStudytrack] === undefined
+      ? correctStudytrack
+      : `${getTextIn(studytracks[correctStudytrack])}, ${correctStudytrack}`
+
+  return (
+    <Table.Row className="regular-row" key={getKey(row[0])}>
+      {row.map((value, index) => {
+        if (shouldBeHidden(showPercentages, value)) return null
+        if (index === 0) {
+          return (
+            <Table.Cell key={getKey(row[0])} style={{ paddingLeft: '50px' }} textAlign="left">
+              {title}
+              {(isAdmin || allRights.includes(studyprogramme) || allRights.includes(combinedProgramme)) && (
+                <PopulationLink
+                  combinedProgramme={combinedProgramme}
+                  studyprogramme={studyprogramme}
+                  studytrack={correctStudytrack}
+                  year={year}
+                  years={calendarYears}
+                />
+              )}
+            </Table.Cell>
+          )
+        }
+        if (index === row.length - 2 && otherCountriesStats) {
+          return getCountriesPopup({
+            combinedProgramme,
+            index,
+            otherCountriesStats,
+            row,
+            studyprogramme: correctStudytrack,
+            value,
+            year,
+          })
+        }
+        return getBasicTableCell({ combinedProgramme, index, row, value })
+      })}
+    </Table.Row>
+  )
 }
 
 const sortTrackDataByYear = data => {
