@@ -9,7 +9,8 @@ const { isBaMa } = require('../../utils')
 const { updateStudyRights, updateStudyRightElements, updateElementDetails } = require('./studyRightUpdaters')
 const { getAttainmentsToBeExcluded } = require('./excludedPartialAttainments')
 const { updateAttainments } = require('./attainments')
-const { updateStudyplans, studyplansRedo } = require('./studyPlans')
+const { updateStudyplans, findStudentsToReupdate } = require('./studyPlans')
+const { logger } = require('../../utils/logger')
 
 // Accepted selection path is not available when degree programme doesn't have
 // studytrack or major subject. This is a known bug on SIS and has been reported
@@ -331,7 +332,12 @@ const updateStudents = async (personIds, iteration = 0) => {
 
   // Studyplans do not always update. These launch updateStudents again for those
   // whose studyplans weren't updated. Twice to see if it sometimes misses
-  await studyplansRedo(personIds, personIdToStudentNumber, iteration)
+  const studentsToReupdate = await findStudentsToReupdate(personIds, personIdToStudentNumber, iteration)
+  if (!studentsToReupdate) return
+  if (studentsToReupdate.length) {
+    logger.info(`Updating ${studentsToReupdate.length} students again due to studyplans not updating.`)
+    await updateStudents(studentsToReupdate, iteration + 1)
+  }
 }
 
 module.exports = {

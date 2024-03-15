@@ -6,8 +6,6 @@ const { selectFromByIds, bulkCreate } = require('../../db')
 const { getEducation } = require('../shared')
 const { studyplanMapper, sanitizeCourseCode } = require('../mapper')
 const { isBaMa } = require('../../utils')
-const { logger } = require('../../utils/logger')
-const { updateStudents } = require('.')
 
 const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumber, groupedStudyRightSnapshots) => {
   const studyplans = studyplansAll.filter(plan => plan.primary)
@@ -220,8 +218,8 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
   await bulkCreate(Studyplan, mappedPlans)
 }
 
-// When updating students, studyplans sometimes are not updated. Check which aren't updated and redo the students
-const studyplansRedo = async (personIds, personIdToStudentNumber, iteration = 0) => {
+// When updating students, studyplans sometimes are not updated. Check which aren't updated
+const findStudentsToReupdate = async (personIds, personIdToStudentNumber, iteration = 0) => {
   if (iteration > 0) return
   const yesterday = new Date()
   yesterday.setDate(yesterday.getDate() - 1)
@@ -239,20 +237,10 @@ const studyplansRedo = async (personIds, personIdToStudentNumber, iteration = 0)
     return obj
   }, {})
 
-  const studentNumbers = students.map(s => s.studentnumber)
-  if (!studentNumbers.length) {
-    return
-  }
-
-  logger.info(`Updating ${studentNumbers.length} students again due to studyplans not updating.`)
-
-  await updateStudents(
-    studentNumbers.map(num => studentNumberToPersonId[num]),
-    iteration + 1
-  )
+  return students.map(s => studentNumberToPersonId[s.studentnumber])
 }
 
 module.exports = {
   updateStudyplans,
-  studyplansRedo,
+  findStudentsToReupdate,
 }
