@@ -76,7 +76,7 @@ const EditableList = ({ value, onChange, renderLabel }) => {
         }}
       >
         <input
-          onChange={evt => setInput(evt.target.value)}
+          onChange={event => setInput(event.target.value)}
           placeholder="Student number(s)"
           style={{
             flexGrow: 1,

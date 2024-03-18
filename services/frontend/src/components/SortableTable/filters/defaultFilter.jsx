@@ -63,7 +63,7 @@ const DefaultColumnFilterComponent = ({ column, options, dispatch }) => {
           <Dropdown.Item
             icon={<Icon name={icon} style={{ color }} />}
             key={text}
-            onClick={evt => {
+            onClick={event => {
               dispatch({
                 type: 'CYCLE_VALUE_FILTER',
                 payload: {
@@ -72,8 +72,8 @@ const DefaultColumnFilterComponent = ({ column, options, dispatch }) => {
                 },
               })
 
-              evt.preventDefault()
-              evt.stopPropagation()
+              event.preventDefault()
+              event.stopPropagation()
             }}
             text={
               text !== undefined && text !== null ? (

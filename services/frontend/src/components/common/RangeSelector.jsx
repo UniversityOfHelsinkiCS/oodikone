@@ -68,9 +68,9 @@ export const RangeSelector = ({ min, max, value, onChange, disabled = false }) =
         renderTrack={({ props, children }) => (
           <div
             {...props}
-            onMouseDown={evt => {
-              evt.stopPropagation()
-              props.onMouseDown(evt)
+            onMouseDown={event => {
+              event.stopPropagation()
+              props.onMouseDown(event)
               return false
             }}
             style={{

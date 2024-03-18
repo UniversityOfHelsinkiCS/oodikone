@@ -49,8 +49,8 @@ export const DateTimeSelector = ({ value, onChange, before, after, showSemesters
           {value !== null && (
             <Icon
               name="x"
-              onClick={evt => {
-                evt.stopPropagation()
+              onClick={event => {
+                event.stopPropagation()
                 onChange(null)
               }}
             />

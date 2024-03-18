@@ -69,8 +69,8 @@ export const FilterCard = ({ filter, options, children, onClear }) => {
         <Icon
           className="filter-clear-icon"
           name="trash alternate outline"
-          onClick={evt => {
-            evt.stopPropagation()
+          onClick={event => {
+            event.stopPropagation()
             onClear()
           }}
         />

@@ -254,7 +254,7 @@ export const CreditDistributionDevelopment = ({ students, programme, combinedPro
             <Dropdown
               inline
               label="Divide by"
-              onChange={(_evt, { value }) => setTimeDivision(value)}
+              onChange={(_event, { value }) => setTimeDivision(value)}
               options={[
                 { value: TimeDivision.CALENDAR_YEAR, text: 'Calendar year' },
                 { value: TimeDivision.ACADEMIC_YEAR, text: 'Academic year' },
@@ -267,7 +267,7 @@ export const CreditDistributionDevelopment = ({ students, programme, combinedPro
             <label style={{ marginRight: '0.5em' }}>Stack ordering:</label>
             <Dropdown
               inline
-              onChange={(_evt, { value }) => setStackOrdering(value)}
+              onChange={(_event, { value }) => setStackOrdering(value)}
               options={[
                 { value: StackOrdering.ASCENDING, text: 'Ascending' },
                 { value: StackOrdering.DESCENDING, text: 'Descending' },

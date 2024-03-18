@@ -411,13 +411,13 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
 
   const { component: FilterComponent, isActive } = ColumnFilters[column.filterType ?? 'default']
 
-  const filterComponentDispatch = evt => {
+  const filterComponentDispatch = event => {
     dispatch({
       type: 'COLUMN_FILTER_EVENT',
       payload: {
         column: column.key,
         filterType: column.filterType ?? 'default',
-        event: evt,
+        event,
       },
     })
   }
