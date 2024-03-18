@@ -23,7 +23,7 @@ export const checkUserAccess = (requiredRoles, roles) => {
 export const getStudentToStudyrightStartMap = (students, programmeCode) => {
   return students.reduce((res, student) => {
     const currentStudyright = student.studyrights?.find(studyright =>
-      studyright.studyright_elements.some(e => e.code === programmeCode)
+      studyright.studyright_elements.some(element => element.code === programmeCode)
     )
     if (currentStudyright?.studyrightid && currentStudyright.studyrightid.slice(-2) === '-2') {
       const bachelorId = currentStudyright.studyrightid.replace(/-2$/, '-1')
@@ -36,7 +36,6 @@ export const getStudentToStudyrightStartMap = (students, programmeCode) => {
   }, {})
 }
 
-//  Graph titles for graduation graphs used in studyprogramme Basic info -tab and Programmes and student pop. -tab
 export const getGraduationGraphTitle = (studyProgramme, doCombo = false) => {
   if (!studyProgramme) return ''
   if (['MH30_001', 'MH30_003'].includes(studyProgramme)) return 'Licenciate studyright'
@@ -149,9 +148,8 @@ export const cancelablePromise = promise => {
       await promise
       if (hasCanceled) res(false)
       res(true)
-    } catch (e) {
-      console.log('e', e) // eslint-disable-line no-console
-      rej(e)
+    } catch (error) {
+      rej(error)
     }
   })
 
@@ -392,7 +390,7 @@ export const resolveStudyPlan = (studyPlans, studyRight) => {
   if (!studyRight) return null
   const { code } =
     studyRight.studyright_elements
-      .filter(e => e.element_detail.type === 20)
+      .filter(element => element.element_detail.type === 20)
       .sort((a, b) => new Date(a.startdate) - new Date(b.startdate))[0] || {}
   if (!code) return null
   return studyPlans.find(p => p.programme_code === code && p.studyrightid === studyRight.studyrightid)

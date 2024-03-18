@@ -24,12 +24,12 @@ export const TeacherLeaderBoard = () => {
     updateAndSubmitForm({ selectedYear: year, selectedCategory: category })
   }
 
-  const handleYearChange = (e, { value }) => {
+  const handleYearChange = (_event, { value }) => {
     setSelectedYear(value)
     updateAndSubmitForm({ selectedYear: value })
   }
 
-  const handleCategoryChange = (e, { value }) => {
+  const handleCategoryChange = (_event, { value }) => {
     setSelectedCategory(value)
     updateAndSubmitForm({ selectedCategory: value })
   }

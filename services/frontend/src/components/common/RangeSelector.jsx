@@ -102,7 +102,7 @@ export const RangeSelector = ({ min, max, value, onChange, disabled = false }) =
           error={dirtyMin !== null}
           onBlur={() => setDirtyMin(null)}
           onChange={minOnChange}
-          onFocus={e => e.stopPropagation()}
+          onFocus={event => event.stopPropagation()}
           style={{ flexShrink: 1, width: '5em' }}
           value={dirtyMin ?? value[0]}
         />
@@ -113,7 +113,7 @@ export const RangeSelector = ({ min, max, value, onChange, disabled = false }) =
           error={dirtyMax !== null}
           onBlur={() => setDirtyMax(null)}
           onChange={maxOnChange}
-          onFocus={e => e.stopPropagation()}
+          onFocus={event => event.stopPropagation()}
           style={{ flexShrink: 1, width: '5em' }}
           value={dirtyMax ?? value[1]}
         />

@@ -63,8 +63,8 @@ export const GeneralTab = ({
     let semesterEnrollments
 
     if (programmeCode) {
-      semesterEnrollments = student.studyrights.find(sr =>
-        sr.studyright_elements.some(e => e.code === programmeCode)
+      semesterEnrollments = student.studyrights.find(studyright =>
+        studyright.studyright_elements.some(element => element.code === programmeCode)
       )?.semester_enrollments
     }
 
@@ -202,8 +202,8 @@ export const GeneralTab = ({
   const getEnrollmentDate = s => {
     const enrollments =
       s.enrollments
-        ?.filter(e => coursecode.includes(e.course_code))
-        ?.filter(e => e.semestercode >= fromSemester && e.semestercode <= toSemester) ?? null
+        ?.filter(enrollment => coursecode.includes(enrollment.course_code))
+        ?.filter(enrollment => enrollment.semestercode >= fromSemester && enrollment.semestercode <= toSemester) ?? null
     if (!enrollments || !enrollments.length) return ''
     return enrollments[0].enrollment_date_time
   }

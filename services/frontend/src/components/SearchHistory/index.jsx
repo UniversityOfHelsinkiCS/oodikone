@@ -9,7 +9,7 @@ export const SearchHistory = ({ items, handleSearch, updateItem, disabled, heade
 
   const sortedItems = sortBy(items, i => -new Date(i.timestamp).getTime())
 
-  const handleChange = (e, { value }) => {
+  const handleChange = (_event, { value }) => {
     if (!value) {
       handleSearch(null)
       setSelected(null)

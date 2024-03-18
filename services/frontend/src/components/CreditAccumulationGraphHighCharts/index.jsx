@@ -260,7 +260,7 @@ const resolveStudyRightElement = ({ studyright_elements }) => {
   if (!studyright_elements || !studyright_elements.length) return {}
   return (
     studyright_elements
-      .filter(e => e.element_detail.type === 20)
+      .filter(element => element.element_detail.type === 20)
       .sort((a, b) => new Date(b.startdate) - new Date(a.startdate))[0] || {}
   )
 }

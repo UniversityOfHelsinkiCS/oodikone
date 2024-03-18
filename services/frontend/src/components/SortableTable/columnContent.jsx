@@ -152,7 +152,7 @@ const getCellContent = (column, data, isGroup, parents) => {
 const ColumnContent = ({ column, data, isGroup, parents }) => {
   try {
     return getCellContent(column, data, isGroup, parents)
-  } catch (e) {
+  } catch (error) {
     return 'Error'
   }
 }

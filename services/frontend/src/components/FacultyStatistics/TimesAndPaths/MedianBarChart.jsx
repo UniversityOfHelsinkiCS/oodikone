@@ -156,8 +156,8 @@ export const MedianBarChart = ({
         ],
         point: {
           events: {
-            click(e) {
-              handleClick(e, facultyGraph)
+            click(event) {
+              handleClick(event, facultyGraph)
             },
           },
         },

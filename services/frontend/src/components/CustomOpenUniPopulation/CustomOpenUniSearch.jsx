@@ -96,8 +96,8 @@ export const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
     clearForm()
   }
 
-  const onClicker = e => {
-    e.preventDefault()
+  const onClicker = event => {
+    event.preventDefault()
     const courseList = input.split(/[\s,]+/).map(code => code.trim().toUpperCase())
     const query = {
       courseCode: courseList,
@@ -164,13 +164,13 @@ export const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
               <em> Insert name for this population if you wish to save it </em>
               <Form.Input
                 disabled={selectedSearchId !== ''}
-                onChange={e => setName(e.target.value)}
+                onChange={event => setName(event.target.value)}
                 placeholder="name"
                 value={name}
               />
             </Form.Field>
             <em>Insert course code(s)</em>
-            <TextArea onChange={e => setInput(e.target.value)} placeholder="TKT12345, PSYK-123" value={input} />
+            <TextArea onChange={event => setInput(event.target.value)} placeholder="TKT12345, PSYK-123" value={input} />
           </Form.Field>
           <SearchHistory
             handleSearch={onSelectSearch}
@@ -228,7 +228,7 @@ export const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
           onClick={onDelete}
         />
         <Button onClick={handleClose}>Cancel</Button>
-        <Button data-cy="search-button" onClick={e => onClicker(e)} positive>
+        <Button data-cy="search-button" onClick={event => onClicker(event)} positive>
           Search population
         </Button>
       </Modal.Actions>

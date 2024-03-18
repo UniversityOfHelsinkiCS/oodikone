@@ -18,10 +18,10 @@ export const TeacherSearch = ({ onClick }) => {
 
   useEffect(() => setTeachers(data || []), [data])
 
-  const handleSearchChange = e => {
-    setSearchterm(e.target.value)
-    setDebouncedSearchTerm(e.target.value)
-    if (e.target.value.length === 0) setTeachers([])
+  const handleSearchChange = event => {
+    setSearchterm(event.target.value)
+    setDebouncedSearchTerm(event.target.value)
+    if (event.target.value.length === 0) setTeachers([])
   }
 
   const columns = useMemo(

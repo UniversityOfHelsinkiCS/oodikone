@@ -41,7 +41,7 @@ const AutoSubmitSearchInput = ({
     onChange('')
   }
 
-  const handleSearchChange = (e, { value: val }) => {
+  const handleSearchChange = (_event, { value: val }) => {
     clearTimeout(TIMEOUTS.SEARCH)
     if (val.length >= 0) {
       onChange(val)

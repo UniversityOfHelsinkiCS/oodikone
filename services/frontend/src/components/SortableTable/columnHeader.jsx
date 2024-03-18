@@ -547,16 +547,16 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
                   hoverable
                   offset={[-3, 0]}
                   on="click"
-                  onClose={e => {
-                    if (e?.stopPropagation) {
-                      e.stopPropagation()
+                  onClose={event => {
+                    if (event?.stopPropagation) {
+                      event.stopPropagation()
                     }
 
                     setFilterMenuOpen(false)
                   }}
-                  onOpen={e => {
-                    if (e?.stopPropagation) {
-                      e.stopPropagation()
+                  onOpen={event => {
+                    if (event?.stopPropagation) {
+                      event.stopPropagation()
                     }
 
                     setFilterMenuOpen(true)
@@ -566,7 +566,7 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
                   style={{ padding: 0, zIndex: 9005 }}
                   trigger={<Icon name="filter" style={{ color: isFilterActive ? 'rgb(33, 133, 208)' : '#bbb' }} />}
                 >
-                  <div onClick={e => e.stopPropagation()}>
+                  <div onClick={event => event.stopPropagation()}>
                     <FilterComponent
                       column={column}
                       dispatch={filterComponentDispatch}

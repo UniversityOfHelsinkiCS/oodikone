@@ -22,7 +22,9 @@ export const CreditsGainedTab = ({ allStudents, query, creditDateFilterOptions, 
   const filterFunction = (student, type) => {
     const fixedType = type === 'Valintakoe' ? 'Koepisteet' : type
     return student.studyrights.some(
-      sr => sr.studyright_elements.some(e => e.code === studyRights?.programme) && fixedType === sr.admission_type
+      studyright =>
+        studyright.studyright_elements.some(element => element.code === studyRights?.programme) &&
+        fixedType === studyright.admission_type
     )
   }
 

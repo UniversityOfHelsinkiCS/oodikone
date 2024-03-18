@@ -95,7 +95,7 @@ export const FacultySelector = ({ faculties, selected }) => {
     <div data-cy="select-faculty">
       <Form>
         Filter faculties:
-        <Form.Input onChange={e => handleFilterChange(e.target.value)} width="4" />
+        <Form.Input onChange={event => handleFilterChange(event.target.value)} width="4" />
       </Form>
       {filteredFaculties.length > 0 ? (
         <>

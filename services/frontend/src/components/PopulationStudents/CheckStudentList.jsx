@@ -79,7 +79,7 @@ export const CheckStudentList = ({ students }) => {
           <h2> Check for studentnumbers </h2>
           <Form.Field>
             <em> Insert studentnumbers you wish to check here </em>
-            <TextArea onChange={e => setInput(e.target.value)} placeholder="011111111" />
+            <TextArea onChange={element => setInput(element.target.value)} placeholder="011111111" />
           </Form.Field>
         </Form>
       </Modal.Content>

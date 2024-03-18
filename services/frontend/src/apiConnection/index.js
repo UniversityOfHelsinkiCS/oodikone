@@ -96,9 +96,9 @@ export const handleRequest = store => next => async action => {
     try {
       const res = await callApi(route, method, data, params, 0, onProgress)
       store.dispatch({ type: success, response: res.data, query })
-    } catch (e) {
-      store.dispatch({ type: failure, response: e, query })
-      handleError(e, store.getState().actionHistory)
+    } catch (error) {
+      store.dispatch({ type: failure, response: error, query })
+      handleError(error, store.getState().actionHistory)
     }
   }
 }

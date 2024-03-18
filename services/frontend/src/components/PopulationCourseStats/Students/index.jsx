@@ -178,7 +178,7 @@ export const Students = ({ filteredStudents }) => {
               ellipsisItem={null}
               firstItem={null}
               lastItem={null}
-              onPageChange={(e, { activePage }) => setPage(activePage - 1)}
+              onPageChange={(_event, { activePage }) => setPage(activePage - 1)}
               secondary
               size="mini"
               style={{ marginLeft: '1em' }}

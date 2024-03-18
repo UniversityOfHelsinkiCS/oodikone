@@ -27,8 +27,8 @@ export const CustomPopulationSearch = ({ setCustomPopulationState }) => {
   const [updateSearch] = useUpdateCustomPopulationSearchMutation()
   const [deleteSearch] = useDeleteCustomPopulationSearchMutation()
 
-  const handleNameChange = e => {
-    setName(e.target.value)
+  const handleNameChange = event => {
+    setName(event.target.value)
   }
 
   const clearForm = () => {
@@ -78,8 +78,8 @@ export const CustomPopulationSearch = ({ setCustomPopulationState }) => {
     }
   }
 
-  const onClicker = e => {
-    e.preventDefault()
+  const onClicker = event => {
+    event.preventDefault()
     const studentNumbers = parseInput(input)
     setCustomPopulationState({ selectedSearch, studentNumbers, associatedProgramme })
     handleClose()
@@ -109,7 +109,7 @@ export const CustomPopulationSearch = ({ setCustomPopulationState }) => {
             <em>Insert student numbers you wish to use for population here</em>
             <TextArea
               data-cy="student-no-input"
-              onChange={e => setInput(e.target.value)}
+              onChange={event => setInput(event.target.value)}
               placeholder="011111111"
               value={input}
             />
@@ -148,7 +148,7 @@ export const CustomPopulationSearch = ({ setCustomPopulationState }) => {
         />
         <Button content="Delete" disabled={!selectedSearch} floated="left" icon="trash" negative onClick={onDelete} />
         <Button onClick={handleClose}>Cancel</Button>
-        <Button data-cy="search-button" onClick={e => onClicker(e)} positive>
+        <Button data-cy="search-button" onClick={event => onClicker(event)} positive>
           Search population
         </Button>
       </Modal.Actions>

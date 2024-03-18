@@ -66,8 +66,8 @@ const SummaryTab = ({ setValue, onClickCourse }) => {
   })
 
   const options = programmes
-    .map(e => ({ ...e, size: new Set(flatten(Object.values(e.students))).size }))
-    .filter(e => e.size > 0)
+    .map(programme => ({ ...programme, size: new Set(flatten(Object.values(programme.students))).size }))
+    .filter(programme => programme.size > 0)
     .map(({ text, ...rest }) => ({ text: typeof text === 'string' ? text : getTextIn(text), ...rest }))
     .map(prog => ({ ...prog, name: prog.text }))
 

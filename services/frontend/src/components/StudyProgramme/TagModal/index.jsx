@@ -69,7 +69,7 @@ const TagModal = ({ tags, studytrack, createMultipleStudentTag, pending, success
               value={selectedValue}
             />
             <em> Insert studentnumbers you wish to add tags to </em>
-            <TextArea onChange={e => setInput(e.target.value)} placeholder="011111111" value={input} />
+            <TextArea onChange={event => setInput(event.target.value)} placeholder="011111111" value={input} />
           </Form.Field>
         </Form>
       </Modal.Content>

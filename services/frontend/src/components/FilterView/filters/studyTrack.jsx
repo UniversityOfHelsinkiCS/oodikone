@@ -2,7 +2,7 @@
 import _ from 'lodash'
 import moment from 'moment'
 import React from 'react'
-import { Form, Dropdown } from 'semantic-ui-react'
+import { Dropdown, Form } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { createFilter } from './createFilter'
@@ -17,7 +17,7 @@ const StudyTrackFilterCard = ({ options, onOptionsChange, withoutSelf, activeAt,
     .filter(student => !student.transferredStudyright)
     .flatMap(student => student.studyrights)
     .map(sr => sr.studyright_elements)
-    .filter(sre => sre.some(e => e.code === code))
+    .filter(sre => sre.some(element => element.code === code))
     .flatMap()
     .filter(
       sre =>

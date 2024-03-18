@@ -180,7 +180,7 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected }) => {
       {studyprogrammes.length > 10 ? (
         <Form>
           Filter programmes:
-          <Form.Input onChange={e => handleFilterChange(e.target.value)} width="4" />
+          <Form.Input onChange={event => handleFilterChange(event.target.value)} width="4" />
         </Form>
       ) : null}
       {combinedProgrammes.length > 0 ? (

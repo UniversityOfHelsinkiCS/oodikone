@@ -230,8 +230,8 @@ export const CreditDistributionDevelopment = ({ students, programme, combinedPro
         cursor: 'pointer',
         point: {
           events: {
-            click(e) {
-              filterDispatch(studentNumberFilter.actions.addToAllowlist(e.point.custom.students))
+            click(event) {
+              filterDispatch(studentNumberFilter.actions.addToAllowlist(event.point.custom.students))
             },
           },
         },

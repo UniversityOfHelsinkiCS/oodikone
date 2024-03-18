@@ -69,7 +69,7 @@ const StudentSearch = ({
     })
   }
 
-  const handleSearchChange = (e, { value }) => {
+  const handleSearchChange = (_event, { value }) => {
     customClearTimeout('search')
     setSearchStr(value)
     if (value.length > 0) {

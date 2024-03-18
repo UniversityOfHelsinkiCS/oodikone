@@ -28,7 +28,7 @@ export const StudyrightsTable = ({
     .filter(sr => sr.studyright_elements.length > 0)
     .map(studyright => {
       const programmes = sortBy(studyright.studyright_elements, 'enddate')
-        .filter(e => e.element_detail.type === 20)
+        .filter(element => element.element_detail.type === 20)
         .map(programme => ({
           code: programme.code,
           startdate: programme.startdate ?? studyright.studystartdate,
@@ -40,7 +40,7 @@ export const StudyrightsTable = ({
             student.studyplans.map(plan => plan.programme_code).includes(programme.element_detail.code),
         }))
       const studytracks = sortBy(studyright.studyright_elements, 'enddate')
-        .filter(e => e.element_detail.type === 30)
+        .filter(element => element.element_detail.type === 30)
         .map(studytrack => ({
           startdate: studytrack.startdate,
           enddate: studytrack.enddate,

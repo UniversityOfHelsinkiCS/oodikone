@@ -274,7 +274,7 @@ export const OverallStatsTable = ({ studyProgramme, combinedProgramme, academicY
 
   if (error) return <h3>Something went wrong, please try refreshing the page.</h3>
 
-  const handleYearChange = (e, { name, value }) => {
+  const handleYearChange = (_event, { name, value }) => {
     if (name === 'fromYear' && value <= toYear) setFromYear(value)
     else if (name === 'toYear' && value >= fromYear) setToYear(value)
   }

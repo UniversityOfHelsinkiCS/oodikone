@@ -22,7 +22,7 @@ const resolveGraphStartDate = (student, graphYearStart, selectedStudyRight, stud
     return Math.min(new Date(earliestAttainmentDate).getTime(), new Date(graphYearStart || new Date()).getTime())
 
   const studyRightElement = selectedStudyRight.studyright_elements
-    .filter(e => e.element_detail.type === 20)
+    .filter(element => element.element_detail.type === 20)
     .sort((a, b) => new Date(b.startdate) - new Date(a.startdate))[0]
   const studyPlan = student.studyplans.find(p => p.programme_code === studyRightElement.code)
   const filteredCourses = studyPlan
@@ -218,7 +218,11 @@ const GradeGraph = ({ student, semesters }) => {
       </Menu>
       {chunky && (
         <div>
-          <Input defaultValue={chunksize} label="Group size" onChange={e => setChunkSize(Number(e.target.value))} />
+          <Input
+            defaultValue={chunksize}
+            label="Group size"
+            onChange={event => setChunkSize(Number(event.target.value))}
+          />
         </div>
       )}
       {!chunky && !semester && <ReactHighcharts config={totalMeanOptions} />}

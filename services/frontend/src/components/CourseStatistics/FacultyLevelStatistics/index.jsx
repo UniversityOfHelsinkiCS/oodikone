@@ -126,7 +126,7 @@ export const FacultyLevelStatistics = () => {
       <Dropdown
         defaultValue={selectedYear}
         fluid
-        onChange={(e, data) => {
+        onChange={(_event, data) => {
           setSelectedYear(data.value)
         }}
         options={dropdownOptions}

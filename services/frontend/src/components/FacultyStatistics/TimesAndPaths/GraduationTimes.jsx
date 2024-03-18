@@ -128,9 +128,9 @@ export const GraduationTimes = ({
   const [year, setYear] = useState(null)
   if (!data.some(a => a.amount > 0)) return null
 
-  const handleClick = (e, isFacultyGraph, seriesCategory = null) => {
+  const handleClick = (event, isFacultyGraph, seriesCategory = null) => {
     if (isFacultyGraph) {
-      setYear(seriesCategory || e.point.name)
+      setYear(seriesCategory || event.point.name)
       setProgrammeData(true)
     } else {
       setProgrammeData(false)

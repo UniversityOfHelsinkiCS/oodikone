@@ -38,19 +38,19 @@ export const CreditCriteriaForm = ({ criteria, studyProgramme, addProgressCriter
           <Form.Input
             fluid
             label={`First year (12 months) last set: ${criteria?.credits?.yearOne}`}
-            onChange={e => setCreditsLimit1(e.target.value)}
+            onChange={event => setCreditsLimit1(event.target.value)}
             type="number"
           />
           <Form.Input
             fluid
             label={`Second year (24 months) last set: ${criteria?.credits?.yearTwo}`}
-            onChange={e => setCreditsLimit2(e.target.value)}
+            onChange={event => setCreditsLimit2(event.target.value)}
             type="number"
           />
           <Form.Input
             fluid
             label={`Third year (36 months) last set: ${criteria?.credits?.yearThree}`}
-            onChange={e => setCreditsLimit3(e.target.value)}
+            onChange={event => setCreditsLimit3(event.target.value)}
             type="number"
           />
         </Form.Group>
@@ -59,19 +59,19 @@ export const CreditCriteriaForm = ({ criteria, studyProgramme, addProgressCriter
             <Form.Input
               fluid
               label={`Fourth year (48 months) last set: ${criteria?.credits?.yearFour}`}
-              onChange={e => setCreditsLimit4(e.target.value)}
+              onChange={event => setCreditsLimit4(event.target.value)}
               type="number"
             />
             <Form.Input
               fluid
               label={`Fifth year (60 months) last set: ${criteria?.credits?.yearFive}`}
-              onChange={e => setCreditsLimit5(e.target.value)}
+              onChange={event => setCreditsLimit5(event.target.value)}
               type="number"
             />
             <Form.Input
               fluid
               label={`Sixth year (72 months) last set: ${criteria?.credits?.yearSix}`}
-              onChange={e => setCreditsLimit6(e.target.value)}
+              onChange={event => setCreditsLimit6(event.target.value)}
               type="number"
             />
           </Form.Group>

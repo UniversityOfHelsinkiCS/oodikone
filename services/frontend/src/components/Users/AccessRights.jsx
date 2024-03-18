@@ -12,7 +12,7 @@ import { useLanguage } from '../LanguagePicker/useLanguage'
 const mapAndSortProgrammes = (programmes, elementdetails, getTextIn) =>
   programmes
     .map(({ code, limited }) => {
-      const elementInfo = elementdetails.find(e => e.code === code)
+      const elementInfo = elementdetails.find(element => element.code === code)
       return { code, name: getTextIn(elementInfo?.name), limited }
     })
     .sort(createLocaleComparator('name'))

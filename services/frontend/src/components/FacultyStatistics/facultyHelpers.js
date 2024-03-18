@@ -41,7 +41,7 @@ export const sortProgrammeKeys = (programmeKeys, faculty) => {
       }
       return testKey(a[1]) - testKey(b[1])
     })
-  } catch (e) {
+  } catch (error) {
     return programmeKeys
   }
 }

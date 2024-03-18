@@ -120,8 +120,8 @@ export const BreakdownBarChart = ({
         groupPadding: 0.15,
         point: {
           events: {
-            click(e) {
-              handleClick(e, facultyGraph, categories[this.x])
+            click(event) {
+              handleClick(event, facultyGraph, categories[this.x])
             },
           },
         },

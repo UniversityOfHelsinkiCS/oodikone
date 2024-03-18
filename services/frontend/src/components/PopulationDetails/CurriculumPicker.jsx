@@ -125,7 +125,7 @@ export const CourseTableModeSelector = ({
           <Form.Field inline>
             <Input
               disabled={courseTableMode !== 'all'}
-              onChange={e => onStudentAmountLimitChange(e.target.value)}
+              onChange={event => onStudentAmountLimitChange(event.target.value)}
               style={{ width: '70px' }}
               value={studentAmountLimit}
             />

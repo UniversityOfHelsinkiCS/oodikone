@@ -328,7 +328,7 @@ const SingleCourseStats = ({
     }
   }
 
-  const handleSelect = (e, { name, value }) => {
+  const handleSelect = (_event, { name, value }) => {
     let selected = [...value].filter(v => v !== ALL.value)
     if (name === 'primary') {
       setComparison(comparison.filter(p => p !== 'EXCLUDED'))
@@ -346,7 +346,7 @@ const SingleCourseStats = ({
     }
   }
 
-  const handleYearChange = (e, { name, value }) => {
+  const handleYearChange = (_event, { name, value }) => {
     if (name === 'fromYear' && value <= toYear) setFromYear(value)
     else if (name === 'toYear' && value >= fromYear) setToYear(value)
   }
@@ -425,11 +425,11 @@ const SingleCourseStats = ({
 
   const timeFilter = (_, value) => value >= fromYear && value <= toYear
   const filteredProgrammes = programmes
-    .map(e => {
-      const students = new Set(flatten(Object.values(pickBy(e.students, timeFilter))))
-      return { ...e, students: [...students], size: students.size }
+    .map(programme => {
+      const students = new Set(flatten(Object.values(pickBy(programme.students, timeFilter))))
+      return { ...programme, students: [...students], size: students.size }
     })
-    .filter(e => e.size > 0)
+    .filter(programme => programme.size > 0)
 
   if (stats.statistics.length < 1) return <Segment>No data for selected course</Segment>
 

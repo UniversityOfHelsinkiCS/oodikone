@@ -114,8 +114,8 @@ export const CompletedCoursesSearch = ({ setValues }) => {
     }
   }
 
-  const onClicker = e => {
-    e.preventDefault()
+  const onClicker = event => {
+    event.preventDefault()
 
     const courseList = courseInput
       .split(/[\s,]+/)
@@ -162,7 +162,7 @@ export const CompletedCoursesSearch = ({ setValues }) => {
             <em>Insert one or more student numbers, separated by a space, a newline, a comma, or a semicolon.</em>
             <TextArea
               data-cy="student-no-input"
-              onChange={e => setStudentInput(e.target.value)}
+              onChange={event => setStudentInput(event.target.value)}
               placeholder="012345678, 12345678"
               value={studentInput}
             />
@@ -171,7 +171,7 @@ export const CompletedCoursesSearch = ({ setValues }) => {
             <em>Insert one or more courses, separated by a space, a newline, or a comma.</em>
             <TextArea
               data-cy="course-list-input"
-              onChange={e => setCourseInput(e.target.value)}
+              onChange={event => setCourseInput(event.target.value)}
               placeholder="TKT12345, PSYK-123"
               value={courseInput}
             />
@@ -181,7 +181,7 @@ export const CompletedCoursesSearch = ({ setValues }) => {
               <em> Insert name for this course list if you wish to save it </em>
               <Form.Input
                 disabled={selectedSearchId !== ''}
-                onChange={e => setName(e.target.value)}
+                onChange={event => setName(event.target.value)}
                 placeholder="name"
                 value={name}
               />
@@ -222,7 +222,7 @@ export const CompletedCoursesSearch = ({ setValues }) => {
             />
 
             <Button onClick={handleClose}>Cancel</Button>
-            <Button data-cy="completed-courses-search-button" onClick={e => onClicker(e)} positive>
+            <Button data-cy="completed-courses-search-button" onClick={event => onClicker(event)} positive>
               Search
             </Button>
           </Modal.Actions>

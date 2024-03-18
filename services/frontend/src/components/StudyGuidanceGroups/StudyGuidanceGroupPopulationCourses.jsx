@@ -43,7 +43,7 @@ export const StudyGuidanceGroupPopulationCourses = ({
               <Form.Field inline>
                 <label>Limit to courses where student number is at least</label>
                 <Input
-                  onChange={e => onStudentAmountLimitChange(e.target.value)}
+                  onChange={event => onStudentAmountLimitChange(event.target.value)}
                   style={{ width: '70px' }}
                   value={studentAmountLimit}
                 />

@@ -20,7 +20,9 @@ export const StatisticsTab = ({ allStudents, query }) => {
 
   const filterFunction = (student, type) =>
     student.studyrights.some(
-      sr => sr.studyright_elements.some(e => e.code === studyRights?.programme) && type === sr.admission_type
+      studyright =>
+        studyright.studyright_elements.some(element => element.code === studyRights?.programme) &&
+        type === studyright.admission_type
     )
 
   const getStatisticsTable = type => {

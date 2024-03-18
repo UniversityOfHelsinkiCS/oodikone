@@ -94,10 +94,10 @@ const DefaultColumnFilterComponent = ({ column, options, dispatch }) => {
       <Input
         icon="search"
         iconPosition="left"
-        onChange={evt => setSearch(evt.target.value)}
-        onClick={e => e.stopPropagation()}
-        onKeyDown={evt => {
-          if (evt.keyCode === 13) {
+        onChange={event => setSearch(event.target.value)}
+        onClick={event => event.stopPropagation()}
+        onKeyDown={event => {
+          if (event.keyCode === 13) {
             const visibleValues = _.uniq(values).filter(value => search === '' || `${value}`.indexOf(search) > -1)
 
             const visibleTypes = _.chain(valueFilters)
@@ -125,8 +125,8 @@ const DefaultColumnFilterComponent = ({ column, options, dispatch }) => {
               payload: { column: column.key, values: visibleValues, type: newType },
             })
 
-            evt.preventDefault()
-            evt.stopPropagation()
+            event.preventDefault()
+            event.stopPropagation()
           }
         }}
         value={search}

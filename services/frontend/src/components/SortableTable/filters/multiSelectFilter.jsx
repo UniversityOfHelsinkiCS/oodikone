@@ -34,7 +34,12 @@ const MultiSelectFilterComponent = ({ column, options, dispatch }) => {
 
   return (
     <>
-      <Input icon="search" iconPosition="left" onChange={e => setSearchTerm(e.target.value)} value={searchTerm} />
+      <Input
+        icon="search"
+        iconPosition="left"
+        onChange={event => setSearchTerm(event.target.value)}
+        value={searchTerm}
+      />
       <Dropdown.Menu scrolling>{dropdownItems}</Dropdown.Menu>
     </>
   )

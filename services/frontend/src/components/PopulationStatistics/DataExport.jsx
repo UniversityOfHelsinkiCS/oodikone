@@ -80,7 +80,7 @@ export const DataExport = ({ students, programmeCode }) => {
   const findCorrectStudyright = studyrights => {
     const code = queryStudyrights[0]
     if (!code || !studyrights) return ''
-    return studyrights.find(sr => sr.studyright_elements.some(e => e.code === code))
+    return studyrights.find(studyright => studyright.studyright_elements.some(element => element.code === code))
   }
 
   const getStartOfStudyright = studyrights => {
@@ -96,7 +96,7 @@ export const DataExport = ({ students, programmeCode }) => {
         acc.push(curr.studyright_elements)
         return acc
       }, [])
-    ).filter(e => e.code === code)
+    ).filter(element => element.code === code)
     return new Date(Math.max(new Date(element[0]?.startdate), new Date(getStartOfStudyright(studyrights))))
   }
 
@@ -188,7 +188,7 @@ export const DataExport = ({ students, programmeCode }) => {
           acc.push(curr.studyright_elements)
           return acc
         }, [])
-      ).filter(e => e.code === programmeCode)
+      ).filter(element => element.code === programmeCode)
       // clean up odd bachelor start dates, (givendate)
       res[sn.studentNumber] = new Date(
         Math.max(new Date(targetStudyright[0]?.startdate), new Date(studentToStudyrightStarts[sn.studentNumber]))

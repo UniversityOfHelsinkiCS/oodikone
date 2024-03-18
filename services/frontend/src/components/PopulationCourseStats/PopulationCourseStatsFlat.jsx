@@ -109,10 +109,10 @@ export const PopulationCourseStatsFlat = ({ courses, filteredStudents, studentAm
     }
   }, [props.courses, props.courseStatistics, props.selectedStudents])
 
-  const onFilterChange = (e, field) => {
+  const onFilterChange = (event, field) => {
     const {
       target: { value },
-    } = e
+    } = event
 
     setFilterFields({ ...filterFields, [field]: value })
   }
@@ -158,7 +158,7 @@ export const PopulationCourseStatsFlat = ({ courses, filteredStudents, studentAm
           <Input
             className="courseCodeInput"
             icon={getFilterValue(field) ? <Icon link name="delete" onClick={() => onFilterReset(field)} /> : undefined}
-            onChange={e => onFilterChange(e, field)}
+            onChange={event => onFilterChange(event, field)}
             placeholder="Filter..."
             transparent
             value={getFilterValue(field)}

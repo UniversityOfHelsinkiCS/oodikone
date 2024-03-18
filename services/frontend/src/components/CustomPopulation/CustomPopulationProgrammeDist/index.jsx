@@ -43,11 +43,14 @@ export const findCorrectProgramme = (student, coursecodes, semesters, startDate,
       moment(a.date).isBetween(startDate, endDate, undefined, '[]') &&
       a.credittypecode !== 7
   )[0]
-  const courseEnrollments = student.enrollments?.filter(e => coursecodes.includes(e.course_code)) || []
+  const courseEnrollments =
+    student.enrollments?.filter(enrollment => coursecodes.includes(enrollment.course_code)) || []
   let studyrightIdOfCourse
   const findStudyrightAssociatedWithCourse = (studyright, date) =>
     studyright.studyright_elements.some(
-      e => e.element_detail.type === 20 && moment(date).isBetween(e.startdate, e.enddate, undefined, '[]')
+      element =>
+        element.element_detail.type === 20 &&
+        moment(date).isBetween(element.startdate, element.enddate, undefined, '[]')
     )
 
   // First check if there's a studyright associated with the course attainment
@@ -74,7 +77,7 @@ export const findCorrectProgramme = (student, coursecodes, semesters, startDate,
 
   // If no studyright associated with the course attainment, check if there's a studyright associated with the course enrollment
   if (!programme) {
-    const courseEnrollment = courseEnrollments.find(e => correctSemesters.includes(e.semestercode))
+    const courseEnrollment = courseEnrollments.find(enrollment => correctSemesters.includes(enrollment.semestercode))
     studyrightIdOfCourse = courseEnrollment?.studyright_id
     if (studyrightIdOfCourse) {
       const correctStudyrights = student.studyrights.filter(sr => sr.actual_studyrightid === studyrightIdOfCourse)
