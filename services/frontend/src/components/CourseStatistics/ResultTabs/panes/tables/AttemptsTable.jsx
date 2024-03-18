@@ -124,7 +124,7 @@ export const AttemptsTable = ({
     timeColumn,
     getSortableColumn({
       key: 'ATTEMPTS',
-      title: 'Total attempts',
+      title: 'Total\nattempts',
       getRowVal: s => (s.rowObfuscated ? '5 or less students' : s.attempts),
     }),
     getSortableColumn({
@@ -145,7 +145,7 @@ export const AttemptsTable = ({
     }),
     getSortableColumn({
       key: 'TOTAL_ENROLLMENTS',
-      title: 'Total enrollments',
+      title: 'Total\nenrollments',
       helpText: 'All enrollments, including all rejected and aborted states.',
       getRowVal: s => (s.rowObfuscated ? 'NA' : s.totalEnrollments),
     }),
@@ -183,7 +183,7 @@ export const AttemptsTable = ({
   const data = getTableData(stats, useThesisGrades, isRelative)
 
   return (
-    <div>
+    <>
       {headerVisible && (
         <Header as="h3" textAlign="center">
           {name}
@@ -200,6 +200,6 @@ export const AttemptsTable = ({
       {!userHasAccessToAllStats && (
         <span className="totalsDisclaimer">* Years with 5 students or less are NOT included in the total</span>
       )}
-    </div>
+    </>
   )
 }

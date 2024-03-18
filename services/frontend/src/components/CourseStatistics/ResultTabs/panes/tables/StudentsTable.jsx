@@ -73,7 +73,7 @@ const getColumns = (stats, showDetails, showGrades, userHasAccessToAllStats, alt
     },
     {
       key: 'TOTAL',
-      title: 'Total\nStudents',
+      title: 'Total\nstudents',
       helpText: 'Total count of students, including enrolled students with no grade.',
       cellProps: s => ({
         style: {
