@@ -10,19 +10,31 @@
   },
   "extends": "../../.eslintrc.json",
   "rules": {
+    "camelcase": "error",
+    "consistent-return": "error",
+    "import/no-commonjs": "error",
+    "import/no-default-export": "error",
+    "import/no-unused-modules": ["error", { "missingExports": true, "unusedExports": true }],
+    "import/order": [
+      "error",
+      {
+        "alphabetize": { "order": "asc", "caseInsensitive": true },
+        "groups": ["builtin", "external", "internal", "parent", "sibling"],
+        "pathGroups": [{ "pattern": "@/**", "group": "internal", "position": "before" }]
+      }
+    ],
+    "import/prefer-default-export": "off",
     "jsx-a11y/click-events-have-key-events": "off",
     "jsx-a11y/label-has-associated-control": "off",
     "jsx-a11y/label-has-for": "off",
     "jsx-a11y/no-static-element-interactions": "off",
-    "camelcase": "error",
     "no-async-promise-executor": "error",
-    "no-promise-executor-return": "error",
-    "no-restricted-syntax": "error",
     "no-await-in-loop": "error",
-    "no-return-await": "error",
-    "consistent-return": "error",
     "no-implied-eval": "off",
     "no-param-reassign": ["error", { "props": false }],
+    "no-promise-executor-return": "error",
+    "no-restricted-syntax": "error",
+    "no-return-await": "error",
     "react/forbid-prop-types": "off",
     "react/function-component-definition": [
       "error",
@@ -38,19 +50,7 @@
     "react/no-unstable-nested-components": "off",
     "react/prefer-stateless-function": "error",
     "react/prop-types": "off",
-    "react-hooks/rules-of-hooks": "error",
-    "import/no-default-export": "error",
-    "import/no-unused-modules": ["error", { "missingExports": true, "unusedExports": true }],
-    "import/no-commonjs": "error",
-    "import/order": [
-      "error",
-      {
-        "alphabetize": { "order": "asc", "caseInsensitive": true },
-        "groups": ["builtin", "external", "internal", "parent", "sibling"],
-        "pathGroups": [{ "pattern": "@/**", "group": "internal", "position": "before" }]
-      }
-    ],
-    "import/prefer-default-export": "off"
+    "react-hooks/rules-of-hooks": "error"
   },
   "plugins": ["react", "react-hooks"],
   "settings": {

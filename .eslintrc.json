@@ -16,24 +16,24 @@
     "plugin:prettier/recommended"
   ],
   "rules": {
-    "no-console": "error",
-    "no-async-promise-executor": "off",
-    "prettier/prettier": "error",
+    "camelcase": "off",
+    "consistent-return": "off",
     "cypress/no-assigning-return-values": "off",
     "cypress/unsafe-to-chain-command": "off",
-    "camelcase": "off",
+    "default-param-last": "off",
+    "import/order": "off",
+    "no-async-promise-executor": "off",
+    "no-await-in-loop": "off",
+    "no-console": "error",
+    "no-continue": "off",
+    "no-param-reassign": "off",
     "no-plusplus": "off",
-    "no-shadow": "off",
-    "quotes": ["error", "single", { "avoidEscape": true }],
     "no-promise-executor-return": "off",
     "no-restricted-syntax": "off",
-    "no-continue": "off",
-    "no-await-in-loop": "off",
-    "no-param-reassign": "off",
     "no-return-await": "off",
-    "consistent-return": "off",
-    "default-param-last": "off",
-    "import/order": "off"
+    "no-shadow": "off",
+    "prettier/prettier": "error",
+    "quotes": ["error", "single", { "avoidEscape": true }]
   },
   "ignorePatterns": ["node_modules/", "build/", "**/*migrations*/**"]
 }
