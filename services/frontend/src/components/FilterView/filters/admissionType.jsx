@@ -15,11 +15,13 @@ const ADMISSION_TYPES = {
 }
 
 const filter = code => value => student =>
-  student.studyrights.some(sr => {
+  student.studyrights.some(studyright => {
     const fixedValue = value !== 'Valintakoe' ? value : 'Koepisteet'
     return (
-      sr.studyright_elements.some(sre => sre.code === code) &&
-      (value === null || value === 'Ei valintatapaa' ? !sr.admission_type : sr.admission_type === fixedValue)
+      studyright.studyright_elements.some(sre => sre.code === code) &&
+      (value === null || value === 'Ei valintatapaa'
+        ? !studyright.admission_type
+        : studyright.admission_type === fixedValue)
     )
   })
 

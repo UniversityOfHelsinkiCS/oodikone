@@ -56,7 +56,7 @@ export const studyrightTypeFilter = createFilter({
     }
 
     const isFound = findStudyrightElementForClass(
-      student.studyrights.filter(sr => sr.is_ba_ma),
+      student.studyrights.filter(studyright => studyright.is_ba_ma),
       args.programme,
       args.year
     )

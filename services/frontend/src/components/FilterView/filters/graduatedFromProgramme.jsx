@@ -65,7 +65,7 @@ export const graduatedFromProgrammeFilter = createFilter({
     let examinedStudyRights = student.studyrights
 
     if (precomputed.isCombinedExtent && mode > 0) {
-      examinedStudyRights = student.studyrights.filter(sr => sr.extentcode === mode)
+      examinedStudyRights = student.studyrights.filter(studyright => studyright.extentcode === mode)
     }
 
     const keepGraduated = mode > 0
@@ -73,10 +73,10 @@ export const graduatedFromProgrammeFilter = createFilter({
       (mode === 2 || mode === -1) && args.combinedProgrammeCode ? args.combinedProgrammeCode : args.code
     return (
       keepGraduated ===
-      examinedStudyRights.some(sr =>
-        sr.studyright_elements.some(sre => {
-          const dateMatch = new Date(sre.enddate) >= new Date(sr.enddate)
-          return sre.code === chosenProgrammeCode && dateMatch && sr.graduated
+      examinedStudyRights.some(studyright =>
+        studyright.studyright_elements.some(sre => {
+          const dateMatch = new Date(sre.enddate) >= new Date(studyright.enddate)
+          return sre.code === chosenProgrammeCode && dateMatch && studyright.graduated
         })
       )
     )

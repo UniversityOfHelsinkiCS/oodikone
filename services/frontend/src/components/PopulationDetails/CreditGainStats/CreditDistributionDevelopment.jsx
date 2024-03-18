@@ -50,13 +50,16 @@ const splitStudentCredits = (student, timeSlots, cumulative) => {
 }
 
 const hasGraduatedAfter = (student, programme, slot) => {
-  const sr = student.studyrights
-    .filter(sr => sr.studyright_elements.findIndex(sre => sre.code === programme) > -1)
+  const studyright = student.studyrights
+    .filter(studyright => studyright.studyright_elements.findIndex(sre => sre.code === programme) > -1)
     .pop()
-  if (sr === undefined) {
+  if (studyright === undefined) {
     return false
   }
-  return sr.graduated && (moment(slot.end).isAfter(sr.enddate) || moment(sr.enddate).isBetween(slot.start, slot.end))
+  return (
+    studyright.graduated &&
+    (moment(slot.end).isAfter(studyright.enddate) || moment(studyright.enddate).isBetween(slot.start, slot.end))
+  )
 }
 
 const GRADUATED = Symbol('GRADUATED')

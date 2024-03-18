@@ -94,7 +94,7 @@ export const GeneralTab = ({
   }
 
   const queryStudyrights = query ? Object.values(query.studyRights) : []
-  const cleanedQueryStudyrights = queryStudyrights.filter(sr => !!sr)
+  const cleanedQueryStudyrights = queryStudyrights.filter(studyright => !!studyright)
 
   const combinedProgrammeCode = getCombinedProgrammeCode(query, studyGuidanceGroupProgrammes)
 
@@ -109,8 +109,8 @@ export const GeneralTab = ({
 
   const studyrightCodes = (studyrights, value) => {
     return studyrights
-      .filter(sr => {
-        const { studyright_elements: studyrightElements } = sr
+      .filter(studyright => {
+        const { studyright_elements: studyrightElements } = studyright
         return (
           studyrightElements.filter(sre => cleanedQueryStudyrights.includes(sre.code)).length >=
           cleanedQueryStudyrights.length
@@ -473,7 +473,9 @@ export const GeneralTab = ({
       key: 'admissionType',
       title: 'Admission type',
       getRowVal: s => {
-        const studyright = s.studyrights.find(sr => sr.studyright_elements.some(e => e.code === programmeCode))
+        const studyright = s.studyrights.find(studyright =>
+          studyright.studyright_elements.some(e => e.code === programmeCode)
+        )
         const admissionType = studyright && studyright.admission_type ? studyright.admission_type : 'Ei valintatapaa'
         return admissionType !== 'Koepisteet' ? admissionType : 'Valintakoe'
       },

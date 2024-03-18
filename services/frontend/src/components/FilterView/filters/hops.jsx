@@ -168,7 +168,9 @@ export const hopsFilter = createFilter({
   filter: (student, { activeProgramme, activeCombinedProgramme }, { args }) => {
     const { studyrightStart, studyplans } = student
     const studyrightStartDate = new Date(studyrightStart)
-    const studyrights = student.studyrights.filter(sr => !sr.cancelled)?.map(sr => sr.studyrightid)
+    const studyrights = student.studyrights
+      .filter(studyright => !studyright.cancelled)
+      ?.map(studyright => studyright.studyrightid)
 
     const hops = studyplans.find(
       plan => plan.programme_code === args.programmeCode && studyrights.includes(plan.studyrightid)

@@ -51,7 +51,7 @@ const StudentDetails = ({
 
   useEffect(() => {
     if (Programmes.programmes && student && student.studyrights) {
-      const bachelorStudyrights = student.studyrights.filter(sr => sr.extentcode === 1)
+      const bachelorStudyrights = student.studyrights.filter(studyright => studyright.extentcode === 1)
       const newestBachelorProgramme = getNewestProgramme(
         bachelorStudyrights,
         student.studentNumber,

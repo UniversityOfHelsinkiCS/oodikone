@@ -25,7 +25,7 @@ export const StudyrightsTable = ({
   if (!student) return null
 
   const studyRightRows = student.studyrights
-    .filter(sr => sr.studyright_elements.length > 0)
+    .filter(studyright => studyright.studyright_elements.length > 0)
     .map(studyright => {
       const programmes = sortBy(studyright.studyright_elements, 'enddate')
         .filter(element => element.element_detail.type === 20)

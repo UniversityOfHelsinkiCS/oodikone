@@ -176,10 +176,10 @@ export const getStudentToTargetCourseDateMap = (students, codes) => {
 export const getAllProgrammesOfStudent = (studyrights, studentNumber, studentToTargetCourseDateMap, elementDetails) => {
   const studyprogrammes = []
   studyrights
-    .filter(sr => sr.extentcode < 5)
-    .forEach(sr => {
-      const facultyCode = sr.faculty_code
-      const studyrightElements = sr.studyright_elements.filter(
+    .filter(studyright => studyright.extentcode < 5)
+    .forEach(studyright => {
+      const facultyCode = studyright.faculty_code
+      const studyrightElements = studyright.studyright_elements.filter(
         srE =>
           elementDetails[srE.code] &&
           elementDetails[srE.code].type === 20 &&
@@ -201,8 +201,8 @@ export const getAllProgrammesOfStudent = (studyrights, studentNumber, studentToT
           startdate: newestStudyrightElement.startdate,
           code: newestStudyrightElement.code,
           facultyCode,
-          graduated: sr.graduated,
-          active: sr.active,
+          graduated: studyright.graduated,
+          active: studyright.active,
         })
       }
     })
@@ -255,10 +255,9 @@ export const getHighestGradeOrEnrollmentOfCourseBetweenRange = (courses, enrollm
   return grade
 }
 
-/* Takes students all studyrights. Returns the sr-element that is relevant for a yearly class of programme */
 export const findStudyrightElementForClass = (studyrights, programme, year) =>
   studyrights
-    .flatMap(sr => sr.studyright_elements)
+    .flatMap(studyright => studyright.studyright_elements)
     .find(element => {
       if (element.code !== programme) return false
       const date = moment(new Date(`${year}-08-01`))

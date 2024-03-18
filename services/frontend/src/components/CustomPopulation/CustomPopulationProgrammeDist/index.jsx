@@ -63,14 +63,16 @@ export const findCorrectProgramme = (student, coursecodes, semesters, startDate,
       )?.studyrightid
       if (studyplanStudyrightId) {
         studyrightIdOfCourse = student.studyrights.find(
-          sr => sr.studyrightid === studyplanStudyrightId
+          studyright => studyright.studyrightid === studyplanStudyrightId
         ).actual_studyrightid
       }
     }
     if (studyrightIdOfCourse) {
-      const correctStudyrights = student.studyrights.filter(sr => sr.actual_studyrightid === studyrightIdOfCourse)
-      const studyrightAssociatedWithCourse = correctStudyrights.find(sr =>
-        findStudyrightAssociatedWithCourse(sr, courseAttainment.date)
+      const correctStudyrights = student.studyrights.filter(
+        studyright => studyright.actual_studyrightid === studyrightIdOfCourse
+      )
+      const studyrightAssociatedWithCourse = correctStudyrights.find(studyright =>
+        findStudyrightAssociatedWithCourse(studyright, courseAttainment.date)
       )
       programme = formatStudyright(studyrightAssociatedWithCourse, courseAttainment.date)
     }
@@ -81,9 +83,11 @@ export const findCorrectProgramme = (student, coursecodes, semesters, startDate,
     const courseEnrollment = courseEnrollments.find(enrollment => correctSemesters.includes(enrollment.semestercode))
     studyrightIdOfCourse = courseEnrollment?.studyright_id
     if (studyrightIdOfCourse) {
-      const correctStudyrights = student.studyrights.filter(sr => sr.actual_studyrightid === studyrightIdOfCourse)
-      const studyrightAssociatedWithCourse = correctStudyrights.find(sr =>
-        findStudyrightAssociatedWithCourse(sr, courseEnrollment.enrollment_date_time)
+      const correctStudyrights = student.studyrights.filter(
+        studyright => studyright.actual_studyrightid === studyrightIdOfCourse
+      )
+      const studyrightAssociatedWithCourse = correctStudyrights.find(studyright =>
+        findStudyrightAssociatedWithCourse(studyright, courseEnrollment.enrollment_date_time)
       )
       programme = formatStudyright(studyrightAssociatedWithCourse, courseEnrollment.enrollment_date_time)
     }

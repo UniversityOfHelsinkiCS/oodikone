@@ -102,7 +102,9 @@ export const EnrollmentAccordion = ({ student }) => {
   const { studyrights } = student
 
   const studyrightsGroupedByStudyright = _.groupBy(
-    studyrights?.filter(sr => sr.semesterEnrollments !== null && sr.studyright_elements.length > 0),
+    studyrights?.filter(
+      studyright => studyright.semesterEnrollments !== null && studyright.studyright_elements.length > 0
+    ),
     'actual_studyrightid'
   )
 
