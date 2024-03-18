@@ -13,16 +13,16 @@ export const CollapsedStackedBar = ({ data, labels, longLabels, names, plotLineP
   }
   if (names[0] === 'Started studying') names[0] += ' (new in faculty)'
   const dataTranspose = transpose(data)
-    .map((obj, idx) => ({ name: names[idx], data: obj, color: colors[idx] }))
+    .map((obj, index) => ({ name: names[index], data: obj, color: colors[index] }))
     .reverse()
 
   const differenceArray = Object.keys(differenceData).reduce(
     (programmes, programme) => ({
       ...programmes,
       [programme]: differenceData[programme].reduce(
-        (results, val, currentIdx) => ({
+        (results, val, currentIndex) => ({
           ...results,
-          [names[currentIdx]]: val,
+          [names[currentIndex]]: val,
         }),
         {}
       ),

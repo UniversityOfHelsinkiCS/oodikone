@@ -27,8 +27,8 @@ export const TeacherStatistics = () => {
     ? []
     : Object.values(semesterData?.semesters)
         .reverse()
-        .map(({ semestercode, name }, idx) => ({
-          key: idx,
+        .map(({ semestercode, name }, index) => ({
+          key: index,
           value: semestercode,
           text: name.en,
         }))

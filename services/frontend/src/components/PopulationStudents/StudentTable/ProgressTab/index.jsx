@@ -80,14 +80,14 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
     if (coursesSecondProgramme[courseCode]) return coursesSecondProgramme[courseCode].name
     return ''
   }
-  const labelCriteria = Object.keys(criteria.courses).reduce((acc, year, idx) => {
+  const labelCriteria = Object.keys(criteria.courses).reduce((acc, year, index) => {
     acc[year] = [
       {
         code: 'Credits',
         name: {
-          fi: `${creditMonths[idx]} mos.: ${criteria.credits[year]}`,
-          en: `${creditMonths[idx]} mos.: ${criteria.credits[year]}`,
-          sv: `${creditMonths[idx]} mos.: ${criteria.credits[year]}`,
+          fi: `${creditMonths[index]} mos.: ${criteria.credits[year]}`,
+          en: `${creditMonths[index]} mos.: ${criteria.credits[year]}`,
+          sv: `${creditMonths[index]} mos.: ${criteria.credits[year]}`,
         },
       },
       ...[...criteria.courses[year]]
@@ -99,14 +99,14 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
       {
         code: 'Criteria',
         name: {
-          fi: `Year ${idx + 1}: Fullfilled`,
-          en: `Year ${idx + 1}: Fullfilled`,
-          sv: `Year ${idx + 1}: Fullfilled`,
+          fi: `Year ${index + 1}: Fullfilled`,
+          en: `Year ${index + 1}: Fullfilled`,
+          sv: `Year ${index + 1}: Fullfilled`,
         },
       },
       {
         code: 'Enrollment',
-        name: { en: `Year ${idx + 1}` },
+        name: { en: `Year ${index + 1}` },
       },
     ]
     return acc
@@ -191,7 +191,7 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
     )
   }
 
-  const createContent = (labels, year, start, end, enrollStatusIdx) => {
+  const createContent = (labels, year, start, end, enrollStatusIndex) => {
     return labels.map(m => ({
       key: `${year}-${m.code}-${m.name.fi}`,
       title: (
@@ -207,21 +207,21 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
       ),
       textTitle:
         m.name === ''
-          ? `${m.code} ${enrollStatusIdx === 0 ? enrollStatusIdx + 1 : enrollStatusIdx}`
+          ? `${m.code} ${enrollStatusIndex === 0 ? enrollStatusIndex + 1 : enrollStatusIndex}`
           : `${m.code}-${getTextIn(m.name)}`,
       headerProps: { title: `${m.code}, ${year}` },
       cellProps: s => findProp(m, s),
       getRowVal: s => {
         if (m.code.includes('Criteria')) return s.criteriaProgress[year] ? s.criteriaProgress[year].totalSatisfied : 0
-        if (m.code.includes('Enrollment')) return getEnrollmentSortingValue(s, enrollStatusIdx)
+        if (m.code.includes('Enrollment')) return getEnrollmentSortingValue(s, enrollStatusIndex)
         return findCsvText(s, m.code, year, criteria)
       },
       // the following is hackish, but enrollment col needs to use the getRowVal for sorting
       // and getRowExportVal can't be defined for all the other columns to not override their getRowVal
-      getRowExportVal: !m.code.includes('Enrollment') ? undefined : s => getSemesterEnrollmentVal(s, enrollStatusIdx),
+      getRowExportVal: !m.code.includes('Enrollment') ? undefined : s => getSemesterEnrollmentVal(s, enrollStatusIndex),
       getRowContent: s => {
         if (m.code.includes('Criteria')) return s.criteriaProgress[year] ? s.criteriaProgress[year].totalSatisfied : 0
-        if (m.code.includes('Enrollment')) return getSemesterEnrollmentContent(s, enrollStatusIdx)
+        if (m.code.includes('Enrollment')) return getSemesterEnrollmentContent(s, enrollStatusIndex)
         return findRowContent(s, m.code, year, start, end, criteria)
       },
     }))

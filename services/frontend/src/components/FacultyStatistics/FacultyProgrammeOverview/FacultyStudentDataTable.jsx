@@ -5,40 +5,40 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { PopulationLink } from '@/components/StudyProgramme/StudytrackOverview/PopulationLink'
 import { Toggle } from '@/components/StudyProgramme/Toggle'
 
-const getStyle = idx => {
-  if ([4, 12].includes(idx)) return { backgroundColor: '#f9f9f9', borderLeftWidth: 'thick' }
-  if ([1, 4, 5, 8, 9, 12, 13, 16, 17, 20, 21].includes(idx)) return { backgroundColor: '#f9f9f9' }
-  if (idx === 18) return { borderLeftWidth: 'thick' }
+const getStyle = index => {
+  if ([4, 12].includes(index)) return { backgroundColor: '#f9f9f9', borderLeftWidth: 'thick' }
+  if ([1, 4, 5, 8, 9, 12, 13, 16, 17, 20, 21].includes(index)) return { backgroundColor: '#f9f9f9' }
+  if (index === 18) return { borderLeftWidth: 'thick' }
   return {}
 }
 
 const backgroundColors = { KH: '#ffffff', MH: '#f2f6f7', T: '#e7edee' }
 const backgroundColorsDarks = { KH: '#f9f9f9', MH: '#eeeeee', T: '#dddddd' }
 
-const getTitlePopup = idx => {
-  if (idx === 0) return 'All'
-  if ([1, 2].includes(idx)) return 'Started studying'
-  if ([3, 4].includes(idx)) return 'Currently enrolled'
-  if ([5, 6].includes(idx)) return 'Absent'
-  if ([7, 8].includes(idx)) return 'Inactive'
-  if ([9, 10].includes(idx)) return 'Graduated'
-  if ([11, 12].includes(idx)) return 'Men'
-  if ([13, 14].includes(idx)) return 'Women'
-  if ([15, 16].includes(idx)) return 'Other/Unknown'
-  if ([17, 18].includes(idx)) return 'Finland'
+const getTitlePopup = index => {
+  if (index === 0) return 'All'
+  if ([1, 2].includes(index)) return 'Started studying'
+  if ([3, 4].includes(index)) return 'Currently enrolled'
+  if ([5, 6].includes(index)) return 'Absent'
+  if ([7, 8].includes(index)) return 'Inactive'
+  if ([9, 10].includes(index)) return 'Graduated'
+  if ([11, 12].includes(index)) return 'Men'
+  if ([13, 14].includes(index)) return 'Women'
+  if ([15, 16].includes(index)) return 'Other/Unknown'
+  if ([17, 18].includes(index)) return 'Finland'
   return 'Other'
 }
 
-const getRowStyle = (idx, tableLinePlaces, dark = false) => {
-  if (tableLinePlaces.length >= 3 && tableLinePlaces[2][0] <= idx)
+const getRowStyle = (index, tableLinePlaces, dark = false) => {
+  if (tableLinePlaces.length >= 3 && tableLinePlaces[2][0] <= index)
     return dark
       ? { backgroundColor: backgroundColorsDarks[tableLinePlaces[2][1]] }
       : { backgroundColor: backgroundColors[tableLinePlaces[2][1]] }
-  if (tableLinePlaces.length >= 3 && tableLinePlaces[2][0] > idx && tableLinePlaces[1][0] <= idx)
+  if (tableLinePlaces.length >= 3 && tableLinePlaces[2][0] > index && tableLinePlaces[1][0] <= index)
     return dark
       ? { backgroundColor: backgroundColorsDarks[tableLinePlaces[1][1]] }
       : { backgroundColor: backgroundColors[tableLinePlaces[1][1]] }
-  if (tableLinePlaces.length >= 2 && tableLinePlaces[1][0] > idx && tableLinePlaces[0][0] <= idx)
+  if (tableLinePlaces.length >= 2 && tableLinePlaces[1][0] > index && tableLinePlaces[0][0] <= index)
     return dark
       ? { backgroundColor: backgroundColorsDarks[tableLinePlaces[0][1]] }
       : { backgroundColor: backgroundColors[tableLinePlaces[0][1]] }
@@ -47,17 +47,17 @@ const getRowStyle = (idx, tableLinePlaces, dark = false) => {
     : { backgroundColor: backgroundColors[tableLinePlaces[0][1]] }
 }
 
-const getTableCell = ({ year, programme, valIdx, rowIdx, tableLinePlaces, value }) => {
+const getTableCell = ({ year, programme, valIndex, rowIndex, tableLinePlaces, value }) => {
   return (
     <Table.Cell
       key={`${year}-${programme}-color-${Math.random()}`}
       style={
-        getStyle(valIdx + 1)?.backgroundColor
+        getStyle(valIndex + 1)?.backgroundColor
           ? {
-              borderLeftWidth: getStyle(valIdx + 1).borderLeftWidth,
-              ...getRowStyle(rowIdx, tableLinePlaces, true),
+              borderLeftWidth: getStyle(valIndex + 1).borderLeftWidth,
+              ...getRowStyle(rowIndex, tableLinePlaces, true),
             }
-          : { ...getStyle(valIdx + 1), ...getRowStyle(rowIdx, tableLinePlaces) }
+          : { ...getStyle(valIndex + 1), ...getRowStyle(rowIndex, tableLinePlaces) }
       }
       textAlign="right"
     >
@@ -79,7 +79,7 @@ const getOtherCountriesList = ({ year, code, extraTableStats }) => {
 }
 
 const getRows = ({
-  idx,
+  index,
   programme,
   year,
   showPercentages,
@@ -88,23 +88,23 @@ const getRows = ({
   tableLinePlaces,
   programmeNames,
 }) => {
-  return programmeStats[programme][year].map((value, valIdx) => {
-    const key = `${programme}-${year}-${`${value}${valIdx}`}`
+  return programmeStats[programme][year].map((value, valIndex) => {
+    const key = `${programme}-${year}-${`${value}${valIndex}`}`
     if (!showPercentages && typeof value === 'string' && (value.includes('%') || value.includes('NA'))) return null
-    if (valIdx === 19) {
+    if (valIndex === 19) {
       return (
         <Popup
           content={getOtherCountriesList({ year, code: programmeNames[programme].code, extraTableStats })}
           key={key}
-          trigger={getTableCell({ year, programme, valIdx, rowIdx: idx, tableLinePlaces, value })}
+          trigger={getTableCell({ year, programme, valIndex, rowIndex: index, tableLinePlaces, value })}
         />
       )
     }
     return (
       <Popup
-        content={getTitlePopup(valIdx)}
+        content={getTitlePopup(valIndex)}
         key={key}
-        trigger={getTableCell({ year, programme, valIdx, rowIdx: idx, tableLinePlaces, value })}
+        trigger={getTableCell({ year, programme, valIndex, rowIndex: index, tableLinePlaces, value })}
       />
     )
   })
@@ -187,8 +187,8 @@ export const FacultyStudentDataTable = ({
             return (
               <React.Fragment key={`${year}-fragment`}>
                 <Table.Row className={year === 'Total' ? 'total-row-cell' : ''} key={`${year}-faculty-row}`}>
-                  {tableStats[year].map((value, valueIdx) => {
-                    if (valueIdx === 0)
+                  {tableStats[year].map((value, valueIndex) => {
+                    if (valueIndex === 0)
                       return (
                         <Table.Cell key={`${year}-faculty-cell}`}>
                           <Button
@@ -212,8 +212,8 @@ export const FacultyStudentDataTable = ({
                       return null
                     return (
                       <Table.Cell
-                        key={`${year}$-cell-colorless-${valueIdx + Math.random()}`}
-                        style={getStyle(valueIdx)}
+                        key={`${year}$-cell-colorless-${valueIndex + Math.random()}`}
+                        style={getStyle(valueIndex)}
                         textAlign="right"
                       >
                         {value}
@@ -222,12 +222,12 @@ export const FacultyStudentDataTable = ({
                   })}
                 </Table.Row>
                 {yearsVisible[yearIndex] &&
-                  sortedKeys.map((programme, idx) => {
+                  sortedKeys.map((programme, index) => {
                     return programmeStats[programme][year].length === 0 ? null : (
                       <Table.Row className="regular-row" key={`${year}-regular-row-${programme}`}>
                         <Table.Cell
                           key={`${year}-${programme}`}
-                          style={{ paddingLeft: '50px', ...getRowStyle(idx, tableLinePlaces) }}
+                          style={{ paddingLeft: '50px', ...getRowStyle(index, tableLinePlaces) }}
                           textAlign="left"
                         >
                           <Popup
@@ -248,7 +248,7 @@ export const FacultyStudentDataTable = ({
                             ))}
                         </Table.Cell>
                         {getRows({
-                          idx,
+                          index,
                           programme,
                           year,
                           showPercentages,

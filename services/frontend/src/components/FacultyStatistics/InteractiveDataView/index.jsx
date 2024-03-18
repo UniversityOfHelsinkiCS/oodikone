@@ -30,7 +30,7 @@ export const InteractiveDataTable = ({
       const numbersOfYears = dataStats.length
       const data = sortedKeys?.map(programme => [programme, dataProgrammeStats[programme]])
       const groupIndices = plotLinePlaces.length > 0 ? plotLinePlaces.map(val => val[0]) : []
-      for (let yearIdx = 0; yearIdx < numbersOfYears; yearIdx++) {
+      for (let yearIndex = 0; yearIndex < numbersOfYears; yearIndex++) {
         let yearlySortedKeys = []
         if (groupIndices.length > 0) {
           for (let i = 0; i < groupIndices.length; i++) {
@@ -40,8 +40,8 @@ export const InteractiveDataTable = ({
               ...data
                 .slice(groupIndices[i], ending)
                 .sort((a, b) => {
-                  if (sortDir === -1) return a[1][yearIdx][columnIndex] - b[1][yearIdx][columnIndex]
-                  return b[1][yearIdx][columnIndex] - a[1][yearIdx][columnIndex]
+                  if (sortDir === -1) return a[1][yearIndex][columnIndex] - b[1][yearIndex][columnIndex]
+                  return b[1][yearIndex][columnIndex] - a[1][yearIndex][columnIndex]
                 })
                 .map(yearlyProgrammes => yearlyProgrammes[0]),
             ]
@@ -49,12 +49,12 @@ export const InteractiveDataTable = ({
         } else {
           yearlySortedKeys = data
             .sort((a, b) => {
-              if (sortDir === -1) return a[1][yearIdx][columnIndex] - b[1][yearIdx][columnIndex]
-              return b[1][yearIdx][columnIndex] - a[1][yearIdx][columnIndex]
+              if (sortDir === -1) return a[1][yearIndex][columnIndex] - b[1][yearIndex][columnIndex]
+              return b[1][yearIndex][columnIndex] - a[1][yearIndex][columnIndex]
             })
             .map(yearlyProgrammes => yearlyProgrammes[0])
         }
-        keys[yearIdx] = yearlySortedKeys
+        keys[yearIndex] = yearlySortedKeys
       }
     }
     setkeyOrder(keys)
@@ -77,7 +77,7 @@ export const InteractiveDataTable = ({
           yearIndex < programmeData[programme].length - 1
             ? programmeData[programme][yearIndex]
                 .slice(sliceStart)
-                .map((val, idx) => val - programmeData[programme][yearIndex + 1][idx + sliceStart])
+                .map((val, index) => val - programmeData[programme][yearIndex + 1][index + sliceStart])
             : new Array(programmeData[programme][yearIndex].length - sliceStart).fill(0)
         ),
       }),

@@ -183,7 +183,7 @@ export const createHeaders = (columns, columnDepth, dispatch) => {
     }
   }
   // eslint-disable-next-line react/no-array-index-key
-  return rows.map((cells, idx) => <tr key={idx}>{cells}</tr>)
+  return rows.map((cells, index) => <tr key={index}>{cells}</tr>)
 }
 
 export const getInitialState = (defaultSort, expandedGroups) => () => ({

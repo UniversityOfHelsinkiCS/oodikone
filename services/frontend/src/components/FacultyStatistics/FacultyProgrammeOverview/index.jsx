@@ -28,8 +28,8 @@ const getDivider = (title, toolTipText, content, cypress) => (
   </>
 )
 
-const getKey = (programmeKeys, idx) => {
-  return programmeKeys[idx][1].startsWith('T') ? 'T' : programmeKeys[idx][1].slice(0, 2)
+const getKey = (programmeKeys, index) => {
+  return programmeKeys[index][1].startsWith('T') ? 'T' : programmeKeys[index][1].slice(0, 2)
 }
 
 const isBetween = (number, lowerLimit, upperLimit) => {
