@@ -103,28 +103,28 @@ export const computeColumnSpans = columns => {
   let maxDepth = 0
 
   while (stack.length > 0) {
-    const elem = stack[stack.length - 1]
+    const element = stack[stack.length - 1]
 
-    const currentDepth = elem.depth ?? 1
+    const currentDepth = element.depth ?? 1
 
     maxDepth = Math.max(currentDepth, maxDepth)
 
-    if (elem.start !== undefined) {
-      spans[elem.key] = i - elem.start
+    if (element.start !== undefined) {
+      spans[element.key] = i - element.start
       stack.pop()
-    } else if (!elem.children || elem.children.length === 0) {
+    } else if (!element.children || element.children.length === 0) {
       i += 1
-      spans[elem.key] = 1
+      spans[element.key] = 1
       stack.pop()
     } else {
-      elem.start = i
+      element.start = i
       let depth = currentDepth + 1
 
-      if (elem.mergeHeader) {
+      if (element.mergeHeader) {
         depth = currentDepth
       }
 
-      elem.children.forEach(e => stack.push({ ...e, depth }))
+      element.children.forEach(element => stack.push({ ...element, depth }))
     }
   }
 

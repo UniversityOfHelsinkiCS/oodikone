@@ -34,9 +34,9 @@ const calculateSemesterEnrollmentsByStudyright = (semestersAndYears, studyrights
         programmeNames[studyrightId] = []
       }
       element.studyright_elements
-        .filter(elem => elem.element_detail.type === 20)
-        .forEach(elem => {
-          programmeNames[studyrightId].push(elem.element_detail.name)
+        .filter(element => element.element_detail.type === 20)
+        .forEach(element => {
+          programmeNames[studyrightId].push(element.element_detail.name)
         })
     })
     return enrollments
@@ -46,11 +46,11 @@ const calculateSemesterEnrollmentsByStudyright = (semestersAndYears, studyrights
 }
 
 const getProgrammeEndDateForStudyright = (studyright, extentCode) => {
-  const graduatedStudyright = studyright.find(el => el.extentcode === extentCode && el.graduated === 1)
+  const graduatedStudyright = studyright.find(element => element.extentcode === extentCode && element.graduated === 1)
   if (!graduatedStudyright) return null
 
   const { enddate, code } = graduatedStudyright.studyright_elements.find(
-    elem => elem.enddate === graduatedStudyright.enddate
+    element => element.enddate === graduatedStudyright.enddate
   )
   return { enddate, programmeCode: code }
 }
@@ -150,8 +150,8 @@ export const EnrollmentAccordion = ({ student }) => {
                 <Table.Cell>
                   {_.flatten(programmeNames[studyrightId])
                     .map(getTextIn)
-                    .map(elem => (
-                      <p key={elem}>{elem}</p>
+                    .map(element => (
+                      <p key={element}>{element}</p>
                     ))}
                 </Table.Cell>
                 <Table.Cell>{semesterEnrollments[studyrightId]}</Table.Cell>

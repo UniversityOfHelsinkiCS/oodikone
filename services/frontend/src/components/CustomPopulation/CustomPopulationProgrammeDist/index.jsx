@@ -14,7 +14,8 @@ const formatStudyright = (studyright, date) => {
   if (!studyright) return undefined
   const studyrightElementsDuringCourse =
     studyright?.studyright_elements.filter(
-      elem => elem.element_detail.type === 20 && moment(date).isBetween(elem.startdate, elem.enddate, 'day', '[]')
+      element =>
+        element.element_detail.type === 20 && moment(date).isBetween(element.startdate, element.enddate, 'day', '[]')
     ) || []
   if (studyrightElementsDuringCourse.length === 0) {
     return {

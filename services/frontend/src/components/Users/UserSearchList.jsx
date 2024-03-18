@@ -91,8 +91,8 @@ export const UserSearchList = () => {
               const uniqueRights = new Set(user.programmeRights.map(r => r.code))
               const programmeNames = []
               uniqueRights.forEach(right => {
-                const elem = elementdetails.find(element => element.code === right)
-                if (elem) programmeNames.push(getTextIn(elem.name))
+                const element = elementdetails.find(element => element.code === right)
+                if (element) programmeNames.push(getTextIn(element.name))
               })
               return programmeNames
             },
@@ -102,8 +102,8 @@ export const UserSearchList = () => {
               const uniqueRights = new Set(user.programmeRights.map(r => r.code))
 
               const nameInLanguage = code => {
-                const elem = elementdetails.find(element => element.code === code)
-                return elem ? getTextIn(elem.name) : null
+                const element = elementdetails.find(element => element.code === code)
+                return element ? getTextIn(element.name) : null
               }
 
               const [firstProgrammeRight] = uniqueRights

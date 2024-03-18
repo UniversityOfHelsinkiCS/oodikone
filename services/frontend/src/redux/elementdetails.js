@@ -25,20 +25,20 @@ export const useFilteredAndFormattedElementDetails = () => {
   const filteredAndFormatted = isLoading
     ? []
     : data
-        .filter(elem => elem.code.startsWith('KH') || elem.code.startsWith('MH'))
-        .map(elem => ({
-          key: elem.code,
-          value: elem.code,
-          description: elem.code,
-          text: getTextIn(elem.name),
+        .filter(element => element.code.startsWith('KH') || element.code.startsWith('MH'))
+        .map(element => ({
+          key: element.code,
+          value: element.code,
+          description: element.code,
+          text: getTextIn(element.name),
         }))
   // create options for combined programmes
   const combinedProgrammeCodes = ['KH90_001', 'MH90_001']
   const dataForCombined = isLoading
     ? {}
     : data
-        .filter(elem => combinedProgrammeCodes.includes(elem.code))
-        .reduce((acc, elem) => ({ ...acc, [elem.code]: elem.name }), {})
+        .filter(element => combinedProgrammeCodes.includes(element.code))
+        .reduce((acc, element) => ({ ...acc, [element.code]: element.name }), {})
 
   const combinedOptions =
     isLoading && !dataForCombined

@@ -122,23 +122,23 @@ export const GeneralTab = ({
   const studytrack = studyrights => {
     let startdate = '1900-01-01'
     let enddate = '2020-04-20'
-    const res = studyrightCodes(studyrights, 'studyright_elements').reduce((acc, elemArr) => {
-      elemArr
-        .filter(el => populationStatistics.elementdetails.data[el.code].type === 20)
-        .forEach(el => {
-          if (cleanedQueryStudyrights.includes(el.code)) {
-            startdate = el.startdate
-            enddate = el.enddate
+    const res = studyrightCodes(studyrights, 'studyright_elements').reduce((acc, elements) => {
+      elements
+        .filter(element => populationStatistics.elementdetails.data[element.code].type === 20)
+        .forEach(element => {
+          if (cleanedQueryStudyrights.includes(element.code)) {
+            startdate = element.startdate
+            enddate = element.enddate
           }
         })
-      elemArr
-        .filter(el => populationStatistics.elementdetails.data[el.code].type === 30)
-        .forEach(el => {
-          if (el.enddate > startdate && el.startdate <= enddate) {
+      elements
+        .filter(element => populationStatistics.elementdetails.data[element.code].type === 30)
+        .forEach(element => {
+          if (element.enddate > startdate && element.startdate <= enddate) {
             acc.push({
-              name: populationStatistics.elementdetails.data[el.code].name.fi,
-              startdate: el.startdate,
-              enddate: el.enddate,
+              name: populationStatistics.elementdetails.data[element.code].name.fi,
+              startdate: element.startdate,
+              enddate: element.enddate,
             })
           }
         })
@@ -240,14 +240,14 @@ export const GeneralTab = ({
           .map(st => st.studyrights)
           .map(
             studyrights =>
-              studyrightCodes(studyrights, 'studyright_elements').reduce((acc, elemArr) => {
-                elemArr
-                  .filter(el => populationStatistics.elementdetails?.data[el.code].type === 30)
-                  .forEach(el => acc.push(getTextIn(populationStatistics.elementdetails.data[el.code].name)))
+              studyrightCodes(studyrights, 'studyright_elements').reduce((acc, elements) => {
+                elements
+                  .filter(element => populationStatistics.elementdetails?.data[element.code].type === 30)
+                  .forEach(element => acc.push(getTextIn(populationStatistics.elementdetails.data[element.code].name)))
                 return acc
               }, []).length > 0
           )
-          .some(el => el === true)
+          .some(element => element === true)
       : false
 
   const containsOption = cleanedQueryStudyrights.some(code => code.startsWith('MH') || code.startsWith('KH'))

@@ -88,8 +88,14 @@ const StudentSearch = ({
   const getStudyrights = s => {
     if (s.studyrights) {
       const elements = s.studyrights
-        .filter(sr => sr.active && !sr.graduated)
-        .reduce((res, sr) => [...res, ...sr.studyright_elements.map(elem => getTextIn(elem.element_detail.name))], [])
+        .filter(studyright => studyright.active && !studyright.graduated)
+        .reduce(
+          (res, studyright) => [
+            ...res,
+            ...studyright.studyright_elements.map(element => getTextIn(element.element_detail.name)),
+          ],
+          []
+        )
       const sorted = elements.sort()
       return sorted.reduce((res, name) => `${res}; ${name}`, '').slice(1)
     }

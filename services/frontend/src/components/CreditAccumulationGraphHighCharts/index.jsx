@@ -405,8 +405,9 @@ const createStudentCreditLines = (
   })
 
 const findTransferName = (student, transfer) =>
-  student.studyrights.flatMap(right => right.studyright_elements).find(elem => elem.code === transfer.targetcode)
-    .element_detail.name
+  student.studyrights
+    .flatMap(studyright => studyright.studyright_elements)
+    .find(element => element.code === transfer.targetcode).element_detail.name
 
 const filterTransfers = (student, getTextIn) => {
   const transferTimes = student.transfers.map(transfer => ({
@@ -469,7 +470,7 @@ export const CreditAccumulationGraphHighCharts = ({
           .filter(({ element_detail }) => element_detail.type === 20)
           .sort((a, b) => new Date(a.startdate) - new Date(b.startdate))[0].startdate
       : _.chain(students[0].studyrights || students[0].courses)
-          .map(elem => new Date(elem.startdate || elem.date))
+          .map(element => new Date(element.startdate || element.date))
           .sortBy()
           .head()
           .defaultTo(new Date())
