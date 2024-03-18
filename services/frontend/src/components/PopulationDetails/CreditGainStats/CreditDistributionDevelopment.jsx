@@ -51,7 +51,7 @@ const splitStudentCredits = (student, timeSlots, cumulative) => {
 
 const hasGraduatedAfter = (student, programme, slot) => {
   const studyright = student.studyrights
-    .filter(studyright => studyright.studyright_elements.findIndex(sre => sre.code === programme) > -1)
+    .filter(studyright => studyright.studyright_elements.findIndex(element => element.code === programme) > -1)
     .pop()
   if (studyright === undefined) {
     return false

@@ -74,9 +74,9 @@ export const graduatedFromProgrammeFilter = createFilter({
     return (
       keepGraduated ===
       examinedStudyRights.some(studyright =>
-        studyright.studyright_elements.some(sre => {
-          const dateMatch = new Date(sre.enddate) >= new Date(studyright.enddate)
-          return sre.code === chosenProgrammeCode && dateMatch && studyright.graduated
+        studyright.studyright_elements.some(element => {
+          const dateMatch = new Date(element.enddate) >= new Date(studyright.enddate)
+          return element.code === chosenProgrammeCode && dateMatch && studyright.graduated
         })
       )
     )

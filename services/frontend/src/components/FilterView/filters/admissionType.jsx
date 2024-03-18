@@ -18,7 +18,7 @@ const filter = code => value => student =>
   student.studyrights.some(studyright => {
     const fixedValue = value !== 'Valintakoe' ? value : 'Koepisteet'
     return (
-      studyright.studyright_elements.some(sre => sre.code === code) &&
+      studyright.studyright_elements.some(element => element.code === code) &&
       (value === null || value === 'Ei valintatapaa'
         ? !studyright.admission_type
         : studyright.admission_type === fixedValue)

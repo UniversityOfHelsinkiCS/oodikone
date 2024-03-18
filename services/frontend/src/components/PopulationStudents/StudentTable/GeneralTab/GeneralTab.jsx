@@ -112,7 +112,7 @@ export const GeneralTab = ({
       .filter(studyright => {
         const { studyright_elements: studyrightElements } = studyright
         return (
-          studyrightElements.filter(sre => cleanedQueryStudyrights.includes(sre.code)).length >=
+          studyrightElements.filter(element => cleanedQueryStudyrights.includes(element.code)).length >=
           cleanedQueryStudyrights.length
         )
       })

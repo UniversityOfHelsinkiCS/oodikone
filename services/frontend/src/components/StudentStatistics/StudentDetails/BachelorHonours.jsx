@@ -26,7 +26,7 @@ export const BachelorHonours = ({ student, absentYears, programmeCode }) => {
     if (programmeCode) {
       const bachelorStudyrights = student.studyrights.filter(studyright => studyright.extentcode === 1)
       const studyrightWithNewestProgramme = bachelorStudyrights.find(studyright =>
-        studyright.studyright_elements.map(srE => srE.code).includes(programmeCode)
+        studyright.studyright_elements.map(element => element.code).includes(programmeCode)
       )
       if (studyrightWithNewestProgramme) {
         setStartDate(moment(studyrightWithNewestProgramme.startdate))

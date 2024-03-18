@@ -57,7 +57,10 @@ export const DataExport = ({ students, programmeCode }) => {
     return studyrights
       .filter(studyright => {
         const { studyright_elements: studyrightElements } = studyright
-        return studyrightElements.filter(sre => queryStudyrights.includes(sre.code)).length >= queryStudyrights.length
+        return (
+          studyrightElements.filter(element => queryStudyrights.includes(element.code)).length >=
+          queryStudyrights.length
+        )
       })
       .map(a => a[value])
   }

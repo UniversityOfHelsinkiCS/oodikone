@@ -180,13 +180,13 @@ export const getAllProgrammesOfStudent = (studyrights, studentNumber, studentToT
     .forEach(studyright => {
       const facultyCode = studyright.faculty_code
       const studyrightElements = studyright.studyright_elements.filter(
-        srE =>
-          elementDetails[srE.code] &&
-          elementDetails[srE.code].type === 20 &&
+        element =>
+          elementDetails[element.code] &&
+          elementDetails[element.code].type === 20 &&
           (studentToTargetCourseDateMap && studentNumber
             ? moment(studentToTargetCourseDateMap[studentNumber]).isBetween(
-                srE.startdate,
-                srE.enddate || moment(),
+                element.startdate,
+                element.enddate || moment(),
                 'day',
                 '[]'
               )

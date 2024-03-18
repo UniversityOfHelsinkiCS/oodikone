@@ -192,7 +192,9 @@ const createStudentToProgrammeMap = (students, studyRightPredicate) => {
 
 const MODE_PREDICATES = {
   any: () => true,
-  active: (_, sre) => sre.code === NO_PROGRAMME.code || moment().isBetween(sre.startdate, sre.enddate, 'day', '[]'),
+  active: (_, studyrightElement) =>
+    studyrightElement.code === NO_PROGRAMME.code ||
+    moment().isBetween(studyrightElement.startdate, studyrightElement.enddate, 'day', '[]'),
 }
 
 export const programmeFilter = createFilter({
@@ -221,7 +223,8 @@ export const programmeFilter = createFilter({
 
       if (modePredicate) {
         const prevPredicate = predicate
-        predicate = (student, sre) => prevPredicate(student, sre) && modePredicate(student, sre)
+        predicate = (student, studyrightElement) =>
+          prevPredicate(student, studyrightElement) && modePredicate(student, studyrightElement)
       }
     }
 

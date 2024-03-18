@@ -182,7 +182,7 @@ export const CoursePopulation = () => {
     },
   ]
 
-  const studyRightPredicate = (student, sre) => {
+  const studyRightPredicate = (student, studyrightElement) => {
     const date = _.chain(student)
       .get('courses')
       .filter(c => codes.includes(c.course_code))
@@ -190,7 +190,10 @@ export const CoursePopulation = () => {
       .max()
       .value()
 
-    return sre.code === NO_PROGRAMME.code || moment(date).isBetween(sre.startdate, sre.enddate, 'day', '[]')
+    return (
+      studyrightElement.code === NO_PROGRAMME.code ||
+      moment(date).isBetween(studyrightElement.startdate, studyrightElement.enddate, 'day', '[]')
+    )
   }
 
   return (

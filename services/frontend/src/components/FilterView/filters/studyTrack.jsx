@@ -17,14 +17,14 @@ const StudyTrackFilterCard = ({ options, onOptionsChange, withoutSelf, activeAt,
     .filter(student => !student.transferredStudyright)
     .flatMap(student => student.studyrights)
     .map(studyright => studyright.studyright_elements)
-    .filter(sre => sre.some(element => element.code === code))
+    .filter(element => element.some(element => element.code === code))
     .flatMap()
     .filter(
-      sre =>
-        sre.element_detail?.type === 30 &&
-        (activeAtMoment ? activeAtMoment.isBetween(sre.startdate, sre.enddate, 'day', '[]') : true)
+      element =>
+        element.element_detail?.type === 30 &&
+        (activeAtMoment ? activeAtMoment.isBetween(element.startdate, element.enddate, 'day', '[]') : true)
     )
-    .map(sre => sre.element_detail)
+    .map(element => element.element_detail)
     .keyBy('code')
     .values()
     .map(({ code, name }) => ({
@@ -83,19 +83,19 @@ export const studyTrackFilter = createFilter({
     return student.studyrights
       .filter(({ studyright_elements, graduated }) =>
         studyright_elements.some(
-          sre =>
-            sre.element_detail.type === 30 &&
+          element =>
+            element.element_detail.type === 30 &&
             (!activeAt ||
               moment(activeAt).isBetween(
-                moment(sre.startdate),
-                graduated ? moment() : moment(sre.enddate),
+                moment(element.startdate),
+                graduated ? moment() : moment(element.enddate),
                 'day',
                 '[]'
               ))
         )
       )
       .flatMap(({ studyright_elements }) => studyright_elements)
-      .map(sre => sre.element_detail.code)
+      .map(element => element.element_detail.code)
       .some(code => selected.includes(code))
   },
 
