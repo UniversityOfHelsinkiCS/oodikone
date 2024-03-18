@@ -1,10 +1,10 @@
 import _ from 'lodash'
-import React, { useState, useMemo, useEffect } from 'react'
-import { Modal, Table, Button, Checkbox } from 'semantic-ui-react'
+import React, { useEffect, useMemo, useState } from 'react'
+import { Button, Checkbox, Modal, Table } from 'semantic-ui-react'
 import { utils, writeFile } from 'xlsx'
 
 import { getTimestamp } from '@/common'
-import { getColumnTitle, getDataItemType, DataItemType, cloneColumns } from './common'
+import { cloneColumns, DataItemType, getColumnTitle, getDataItemType } from './common'
 import { ExportVisitor } from './visitors/ExportVisitor'
 import { ValueVisitor } from './visitors/ValueVisitor'
 
@@ -110,7 +110,6 @@ export const ExportModal = ({ open, onOpen, onClose, data, columns, featureName 
             Exclude all
           </Button>
         </div>
-
         <Table celled striped>
           <Table.Header>
             <Table.Row key="TitleRow">
@@ -130,14 +129,14 @@ export const ExportModal = ({ open, onOpen, onClose, data, columns, featureName 
                   <div style={{ width: '0' }}>
                     {sampledValues[column.key].map(value => (
                       <span
-                        key={value}
+                        key={crypto.randomUUID()}
                         style={{
+                          backgroundColor: '#f9fafb',
                           border: '1px solid #dedede',
                           borderRadius: '3px',
-                          padding: '0px 3px',
-                          backgroundColor: '#f9fafb',
-                          marginRight: '0.25em',
                           color: '#555',
+                          marginRight: '0.25em',
+                          padding: '0px 3px',
                         }}
                       >
                         {value}
