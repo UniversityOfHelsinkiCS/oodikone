@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Datetime from 'react-datetime'
 import { Link, useHistory } from 'react-router-dom'
-import { Form, Button, Icon, Modal, Message } from 'semantic-ui-react'
+import { Button, Form, Icon, Message, Modal } from 'semantic-ui-react'
 
 import { textAndDescriptionSearch } from '@/common'
 import { useToggle } from '@/common/hooks'
@@ -15,7 +15,7 @@ import './StudyGuidanceGroupOverview.css'
 const LinkToGroup = ({ group }) => {
   const { getTextIn } = useLanguage()
   const history = useHistory()
-  const dest = `/studyguidancegroups/${group.id}`
+  const destination = `/studyguidancegroups/${group.id}`
   return (
     <Link
       data-cy={`study-guidance-group-link-${group.id}`}
@@ -26,17 +26,17 @@ const LinkToGroup = ({ group }) => {
         height: '100%',
         padding: '.78571429em .78571429em',
       }}
-      to={dest}
+      to={destination}
     >
       {getTextIn(group.name)}
-      <Icon color="blue" name="level up alternate" onClick={() => history.push(dest)} />
+      <Icon color="blue" name="level up alternate" onClick={() => history.push(destination)} />
     </Link>
   )
 }
 
-const prettifyCamelCase = str => {
-  const splitted = str.match(/[A-Za-z][a-z]*/g) || []
-  return splitted.map(w => w.charAt(0).toLowerCase() + w.substring(1)).join(' ')
+const prettifyCamelCase = string => {
+  const splitted = string.match(/[A-Za-z][a-z]*/g) || []
+  return splitted.map(word => word.charAt(0).toLowerCase() + word.substring(1)).join(' ')
 }
 
 const cellWrapper = { display: 'flex', gap: '8px', width: '100%' }
@@ -175,7 +175,7 @@ const AssociateTagForm = ({ group, tagName, selectFieldItems, formValues, handle
   </>
 )
 
-const TagCell = ({ tagName, group, studyProgrammes }) => {
+const TagCell = ({ group, studyProgrammes, tagName }) => {
   const [showEdit, toggleEdit] = useToggle()
   const getText = () => {
     switch (tagName) {
@@ -248,7 +248,7 @@ export const StudyGuidanceGroupOverview = ({ groups }) => {
       getRowContent: group => <TagCell group={group} studyProgrammes={studyProgrammes} tagName="studyProgramme" />,
     },
     {
-      key: 'associatedyear',
+      key: 'associatedYear',
       title: 'Associated Starting Academic Year',
       getRowVal: group => group.tags?.year,
       formatValue: startYearToAcademicYear,
@@ -259,18 +259,21 @@ export const StudyGuidanceGroupOverview = ({ groups }) => {
   if (groups.length === 0) {
     return <StyledMessage>You do not have access to any study guidance groups.</StyledMessage>
   }
+
   return (
-    <>
-      <StyledMessage>
-        <p>
-          Tällä sivulla pääset tarkastemaan ohjattavien opiskelijoidesi etenemistä ohjausryhmittäin. Voit halutessasi
-          lisätä ohjausryhmään aloitusvuoden ja koulutusohjelman, jolloin yksittäisen ohjausryhmän näkymään avautuu
-          lisäominaisuuksia.{' '}
-        </p>
-      </StyledMessage>
-      <div data-cy="Table-study-guidance-group-overview">
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
+      <div style={{ marginBottom: '30px' }}>
+        <StyledMessage>
+          <p>
+            Tällä sivulla pääset tarkastemaan ohjattavien opiskelijoidesi etenemistä ohjausryhmittäin. Voit halutessasi
+            lisätä ohjausryhmään aloitusvuoden ja koulutusohjelman, jolloin yksittäisen ohjausryhmän näkymään avautuu
+            lisäominaisuuksia.
+          </p>
+        </StyledMessage>
+      </div>
+      <div data-cy="Table-study-guidance-group-overview" style={{ margin: 'auto' }}>
         <SortableTable columns={headers} data={groups} hideHeaderBar singleLine={false} />
       </div>
-    </>
+    </div>
   )
 }

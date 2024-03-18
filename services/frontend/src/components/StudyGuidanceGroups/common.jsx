@@ -6,7 +6,7 @@ export const startYearToAcademicYear = year => {
 }
 
 export const StyledMessage = ({ children }) => (
-  <Message style={{ maxWidth: '800px', margin: 'auto' }}>{children}</Message>
+  <Message style={{ margin: 'auto', maxWidth: '800px' }}>{children}</Message>
 )
 
 export const Wrapper = ({ isLoading, children }) => (

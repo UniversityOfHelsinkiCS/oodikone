@@ -59,7 +59,7 @@ export const populationStatisticsToolTips = {
   Opiskelijat on mahdollista suodattaa kurssin perusteella käyttämällä kurssirivin vasemmassa laidassa olevaa suodatinpainiketta.
   Kurssisuodatin aukeaa ikkunan vasempaan laitaan ja tarjoaa lisää vaihtoehtoja suodatukseen. Voit myös valita monta kurssia kerralla suodattimeen.
   
-  Klikkaamalla kurssin nimen vieressä olevaa sinistä nuolta, siirryt ko. kurssin **Course Statistics** -näkymään.
+  Klikkaamalla kurssin nimen vieressä olevaa sinistä nuolta, siirryt ko. kurssin **Course statistics** -näkymään.
 
   Lisäksi kurssin nimi **name** ja koodisarakkeissa **code** suodatinkuvaketta  klikkaamalla tulee esiin hakukentät suodattamista varten.
   Suodattimet saa tyhjennettyä painamalla kentän vieressä olevaa ruksia tai valitsemall valikon alaosasta **Reset column filter**.
@@ -81,7 +81,7 @@ export const populationStatisticsToolTips = {
   Opiskelijat on mahdollista suodattaa kurssin perusteella käyttämällä kurssirivin vasemmassa laidassa olevaa suodatinpainiketta.
   Kurssisuodatin aukeaa ikkunan vasempaan laitaan ja tarjoaa lisää vaihtoehtoja suodatukseen. Voit myös valita monta kurssia kerralla suodattimeen.
   
-  Klikkaamalla kurssin nimen vieressä olevaa sinistä nuolta, siirryt ko. kurssin **Course Statistics** -näkymään.
+  Klikkaamalla kurssin nimen vieressä olevaa sinistä nuolta, siirryt ko. kurssin **Course statistics** -näkymään.
   
   Taulukon tietoja voi suodattaa antamalla opiskelijoiden vähimmäismäärän kurssilla kenttään *Limit to courses where student number at least*.
   Lisäksi kurssin nimi **name** ja koodisarakkeissa **code** suodatinkuvaketta  klikkaamalla tulee esiin hakukentät suodattamista varten.
