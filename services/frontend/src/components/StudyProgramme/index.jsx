@@ -150,7 +150,7 @@ export const StudyProgramme = () => {
     return (
       <div className="segmentContainer">
         <Header className="segmentTitle" size="large">
-          Study Programme
+          Study programme
         </Header>
         <Segment className="contentSegment">
           <StudyProgrammeSelector handleSelect={handleSelect} selected={studyProgrammeId !== undefined} />

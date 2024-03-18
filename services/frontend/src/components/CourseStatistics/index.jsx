@@ -154,7 +154,7 @@ export const CourseStatistics = () => {
   return (
     <div className="segmentContainer">
       <Header className="segmentTitle" size="large">
-        Course Statistics
+        Course statistics
       </Header>
       <Segment className="contentSegment">
         {getContent()}
