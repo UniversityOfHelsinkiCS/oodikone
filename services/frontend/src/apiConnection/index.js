@@ -74,15 +74,15 @@ export const callController = (route, prefix, data, method = 'get', query, param
   return { type: attempt, requestSettings }
 }
 
-const handleError = (err, actionHistory = []) => {
-  const { response } = err
+const handleError = (error, actionHistory = []) => {
+  const { response } = error
   if (response && response.status) {
-    Sentry.withScope(s => {
-      s.setExtra('config', err.config)
-      s.setExtra('request', err.request)
-      s.setExtra('response', err.response)
-      s.setExtra('actionHistory', JSON.stringify(actionHistory))
-      Sentry.captureException(err)
+    Sentry.withScope(scope => {
+      scope.setExtra('config', error.config)
+      scope.setExtra('request', error.request)
+      scope.setExtra('response', error.response)
+      scope.setExtra('actionHistory', JSON.stringify(actionHistory))
+      Sentry.captureException(error)
     })
   }
 }
