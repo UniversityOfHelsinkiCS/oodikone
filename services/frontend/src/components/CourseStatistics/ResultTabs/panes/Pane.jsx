@@ -126,8 +126,17 @@ export const Pane = ({
   }
 
   const halfWidth = datasets.filter(dataset => dataset).length > 1 && settings.splitDirection === 'row'
-  const styleContainer = { display: 'flex', flexDirection: settings.splitDirection, justifyContent: 'space-between' }
-  const styleData = { flexGrow: 1, flexBasis: 1, maxWidth: halfWidth ? '49%' : '100%' }
+  const styleContainer = {
+    display: 'flex',
+    flexDirection: settings.splitDirection,
+    justifyContent: 'space-between',
+  }
+  const styleData = {
+    flexGrow: 1,
+    flexBasis: 1,
+    marginBottom: halfWidth ? '0px' : '20px',
+    maxWidth: halfWidth ? '49%' : '100%',
+  }
 
   return (
     <Tab.Pane>
