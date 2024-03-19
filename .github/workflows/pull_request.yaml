@@ -13,8 +13,61 @@ on:
       - 'package*.json'
 
 jobs:
-  test:
-    uses: ./.github/workflows/test.yaml
-    secrets:
-      username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-      password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+  lint_backend_and_frontend:
+    name: 'Lint backend and frontend'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: 'Install dependencies'
+        run: npm ci && cd services/frontend && npm ci && cd ../backend && npm ci
+      - name: 'Run Stylelint for CSS files'
+        run: npm run stylelint "services/frontend/src/**/*.css"
+      - name: 'Run ESLint for JS files'
+        run: npm run eslint -- --ext .jsx,.js services --report-unused-disable-directives
+
+  test_end_to_end:
+    runs-on: ubuntu-latest
+    needs:
+      - lint_backend_and_frontend
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: 'Test course statistics'
+            spec: cypress/e2e/Course_statistics.js
+          - name: 'Test custom population'
+            spec: cypress/e2e/Custom_population.js
+          - name: 'Test population statistics'
+            spec: cypress/e2e/Population_statistics.js
+          - name: 'Test filters'
+            spec: cypress/e2e/Filters.js
+          - name: 'Test students'
+            spec: cypress/e2e/Students.js
+          - name: 'Test completed courses'
+            spec: cypress/e2e/Completed_courses.js
+          - name: 'Test studyprogramme overview'
+            spec: cypress/e2e/Studyprogramme_overview.js
+          - name: 'Test teachers and users'
+            spec: |
+              cypress/e2e/Teachers.js
+              cypress/e2e/Users.js
+          - name: 'Test faculty statistics'
+            spec: cypress/e2e/Faculty_statistics.js
+          - name: 'Test open uni search'
+            spec: cypress/e2e/Openuni.js
+          - name: 'Test language center view'
+            spec: cypress/e2e/Language_center.js
+          - name: 'Test study guidance groups'
+            spec: cypress/e2e/Study_guidance_groups.js
+    name: ${{ matrix.name }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: 'Run tests'
+        uses: ./.github/actions/run-tests
+        with:
+          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
+          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+          spec: ${{ matrix.spec }}
