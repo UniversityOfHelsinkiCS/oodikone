@@ -3,7 +3,7 @@ import qs from 'query-string'
 import React, { useEffect, useState } from 'react'
 import Datetime from 'react-datetime'
 import { useLocation, useHistory } from 'react-router-dom'
-import { Modal, Form, Button, TextArea } from 'semantic-ui-react'
+import { Button, Form, Modal, TextArea } from 'semantic-ui-react'
 
 import { SearchHistory } from '@/components/SearchHistory'
 import {
@@ -45,8 +45,8 @@ export const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
 
   useEffect(() => {
     if (deletedData) {
-      const filteredsearches = searchList.filter(s => s.id !== deletedData)
-      setSearches(filteredsearches)
+      const filteredSearches = searchList.filter(s => s.id !== deletedData)
+      setSearches(filteredSearches)
     }
   }, [deletedData])
 

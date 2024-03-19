@@ -51,7 +51,7 @@ export const ageFilter = createFilter({
   isActive: ({ min, max }) => min !== null || max !== null,
 
   precompute: ({ students }) => {
-    const ages = students.map(s => getAge(s.birthdate)).filter(age => !Number.isNaN(age))
+    const ages = students.map(student => getAge(student.birthdate)).filter(age => !Number.isNaN(age))
 
     return {
       min: _.min(ages),

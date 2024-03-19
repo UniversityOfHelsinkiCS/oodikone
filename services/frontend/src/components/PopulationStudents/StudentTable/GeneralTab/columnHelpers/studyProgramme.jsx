@@ -117,26 +117,26 @@ export const getStudyProgrammeFunctions = ({
     return res
   }, {})
 
-  const getStudyProgrammeContent = s => {
-    const programme = studentProgrammesMap[s.studentNumber]?.programmeToShow
+  const getStudyProgrammeContent = student => {
+    const programme = studentProgrammesMap[student.studentNumber]?.programmeToShow
 
     if (!programme) return getTextIn(noProgramme)
     const formattedProgramme = programme.length > 45 ? `${programme.substring(0, 43)}...` : programme
-    if (studentProgrammesMap[s.studentNumber]?.programmes.length > 1) {
+    if (studentProgrammesMap[student.studentNumber]?.programmes.length > 1) {
       return (
         <div>
-          {formattedProgramme} + {studentProgrammesMap[s.studentNumber].programmes.length - 1}
+          {formattedProgramme} + {studentProgrammesMap[student.studentNumber].programmes.length - 1}
         </div>
       )
     }
     return formattedProgramme
   }
-  const getStudyStartDate = s => {
+  const getStudyStartDate = student => {
     if (programmeCode !== undefined) {
-      return reformatDate(studentToProgrammeStartMap[s.studentNumber], 'YYYY-MM-DD')
+      return reformatDate(studentToProgrammeStartMap[student.studentNumber], 'YYYY-MM-DD')
     }
 
-    const programme = studentProgrammesMap[s.studentNumber]?.programmes[0]
+    const programme = studentProgrammesMap[student.studentNumber]?.programmes[0]
     if (programme?.startdate) {
       return reformatDate(programme.startdate, 'YYYY-MM-DD')
     }

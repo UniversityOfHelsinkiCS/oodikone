@@ -26,7 +26,9 @@ export const StatisticsTab = ({ allStudents, query }) => {
     )
 
   const getStatisticsTable = type => {
-    const filteredStudents = allStudents.filter(s => filterFunction(s, type !== 'Valintakoe' ? type : 'Koepisteet'))
+    const filteredStudents = allStudents.filter(student =>
+      filterFunction(student, type !== 'Valintakoe' ? type : 'Koepisteet')
+    )
     return (
       <StatisticsTable
         filteredStudents={filteredStudents}
@@ -36,7 +38,7 @@ export const StatisticsTab = ({ allStudents, query }) => {
     )
   }
 
-  const admissionTypesAvailable = !allStudents.every(s => filterFunction(s, null))
+  const admissionTypesAvailable = !allStudents.every(student => filterFunction(student, null))
 
   return (
     <Grid centered padded>

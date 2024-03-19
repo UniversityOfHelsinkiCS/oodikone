@@ -19,7 +19,7 @@ export const CourseParticipationTable = ({ student, clearCourseStats, studyright
 
   const courseRowsByAcademicYear = {}
 
-  const studyRight = student.studyrights.find(s => s.studyrightid === studyrightid)
+  const studyRight = student.studyrights.find(studyright => studyright.studyrightid === studyrightid)
   const plan = resolveStudyPlan(student.studyplans, studyRight)
 
   student.courses.sort(byDateDesc).forEach(studentCourse => {

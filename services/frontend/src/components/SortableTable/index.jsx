@@ -68,7 +68,7 @@ vertical: If true, header is vertical
 noHeader: Just removes header, I think (not sure of the point of this, since you can just omit title)
 
 - Fields that set cell content or properties. Can receive either a value, or a function that takes data
-  item as an argument, and returns value for specific row (for example s => s.studentNumber)
+  item as an argument, and returns value for specific row (for example student => student.studentNumber)
 
 cellProps: given to each cell like <td {...cellProps}>. Use for style, hover title, etc.
 cellStyle: Basically shorthand for cellProps: { style: ... }

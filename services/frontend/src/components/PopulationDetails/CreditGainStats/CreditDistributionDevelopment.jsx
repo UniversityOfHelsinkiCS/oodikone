@@ -81,7 +81,7 @@ const getChartData = (students, timeSlots, order, programme, timeDivision, cumul
     .fill()
     .map(() => new Array(timeSlots.length).fill().map(() => ({ y: 0, custom: { students: [] } })))
 
-  const studentCredits = students.map(s => splitStudentCredits(s, timeSlots, cumulative))
+  const studentCredits = students.map(student => splitStudentCredits(student, timeSlots, cumulative))
 
   timeSlots.forEach((slot, timeSlotIndex) => {
     students
@@ -176,11 +176,11 @@ export const CreditDistributionDevelopment = ({ students, programme, combinedPro
 
     if (timeDivision === TimeDivision.SEMESTER) {
       return Object.values(semesters)
-        .filter(s => startDate.isBefore(s.enddate) && moment().isAfter(s.startdate))
-        .map(s => ({
-          start: s.startdate,
-          end: s.enddate,
-          label: getTextIn(s.name),
+        .filter(semester => startDate.isBefore(semester.enddate) && moment().isAfter(semester.startdate))
+        .map(semester => ({
+          start: semester.startdate,
+          end: semester.enddate,
+          label: getTextIn(semester.name),
         }))
     }
 

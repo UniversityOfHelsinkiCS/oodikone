@@ -73,9 +73,9 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
       key: 'studentnumber',
       title: 'Student Number',
       cellProps: { title: 'Student number' },
-      getRowVal: s => (s.total ? '*' : s.studentNumber),
-      getRowContent: s =>
-        s.total ? 'Summary:' : <StudentInfoItem showSisuLink student={s} tab="Mandatory courses table" />,
+      getRowVal: student => (student.total ? '*' : student.studentNumber),
+      getRowContent: student =>
+        student.total ? 'Summary:' : <StudentInfoItem showSisuLink student={student} tab="Mandatory courses table" />,
     })
 
     if (namesVisible) {
@@ -83,14 +83,14 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
         {
           key: 'lastname',
           title: 'Last name',
-          getRowVal: s => (s.total ? null : s.lastname),
+          getRowVal: student => (student.total ? null : student.lastname),
           cellProps: { title: 'last name' },
           export: false,
         },
         {
           key: 'firstname',
           title: 'Given names',
-          getRowVal: s => (s.total ? null : s.firstnames),
+          getRowVal: student => (student.total ? null : student.firstnames),
           cellProps: { title: 'first names' },
           export: false,
         }
@@ -102,12 +102,12 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
       title: 'Total Passed',
       filterType: 'range',
       vertical: true,
-      getRowVal: s =>
-        s.total
-          ? Object.values(s)
+      getRowVal: student =>
+        student.total
+          ? Object.values(student)
               .filter(isNumber)
               .reduce((acc, e) => acc + e, 0)
-          : totalMandatoryPassed(s.studentNumber),
+          : totalMandatoryPassed(student.studentNumber),
       cellProps: { title: 'Total passed' },
     })
 
@@ -218,11 +218,11 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
               textTitle: m.code,
               vertical: true,
               forceToolsMode: 'dangling',
-              cellProps: s => {
-                if (!s.courses) return null
-                const bestGrade = findBestGrade(s.courses, m.code)
+              cellProps: student => {
+                if (!student.courses) return null
+                const bestGrade = findBestGrade(student.courses, m.code)
                 const gradeText = bestGrade ? `\nGrade: ${bestGrade}` : ''
-                const studentCode = s.studentNumber ? `\nStudent number:  ${s.studentNumber}` : ''
+                const studentCode = student.studentNumber ? `\nStudent number:  ${student.studentNumber}` : ''
                 return {
                   title: `${m.code}, ${getTextIn(m.name)}${studentCode} ${gradeText}`,
                   style: {
@@ -232,20 +232,20 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
                 }
               },
               headerProps: { title: `${m.code}, ${getTextIn(m.name)}` },
-              getRowVal: s => {
-                if (s.total) return getTotalRowVal(s, m)
+              getRowVal: student => {
+                if (student.total) return getTotalRowVal(student, m)
 
-                return hasPassedMandatory(s.studentNumber, m.code) ? 'Passed' : ''
+                return hasPassedMandatory(student.studentNumber, m.code) ? 'Passed' : ''
               },
-              getRowExportVal: s => {
-                if (s.total) return getTotalRowVal(s, m)
+              getRowExportVal: student => {
+                if (student.total) return getTotalRowVal(student, m)
 
-                const bestGrade = findBestGrade(s.courses, m.code)
+                const bestGrade = findBestGrade(student.courses, m.code)
 
                 if (!bestGrade) {
                   if (
-                    s.enrollments &&
-                    s.enrollments.some(
+                    student.enrollments &&
+                    student.enrollments.some(
                       enrollment => enrollment.course_code === m.code && enrollment.state === 'ENROLLED'
                     )
                   ) {
@@ -258,9 +258,11 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
                 if (['1', '2', '3', '4', '5'].includes(bestGrade)) return parseInt(bestGrade, 10)
                 return bestGrade
               },
-              getRowContent: s => {
-                if (s.total) return getTotalRowVal(s, m)
-                return hasPassedMandatory(s.studentNumber, m.code) ? <Icon color="green" fitted name="check" /> : null
+              getRowContent: student => {
+                if (student.total) return getTotalRowVal(student, m)
+                return hasPassedMandatory(student.studentNumber, m.code) ? (
+                  <Icon color="green" fitted name="check" />
+                ) : null
               },
               code: m.code,
             })),
@@ -272,13 +274,13 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
 
   const data = useMemo(() => {
     const totals = students.reduce(
-      (acc, s) => {
+      (acc, student) => {
         const passedCourses = new Set()
         if (mandatoryCourses.defaultProgrammeCourses) {
           mandatoryCourses.defaultProgrammeCourses.forEach(m => {
             if (passedCourses.has(m.code)) return
             passedCourses.add(m.code)
-            if (hasPassedMandatory(s.studentNumber, m.code)) ++acc[m.code]
+            if (hasPassedMandatory(student.studentNumber, m.code)) ++acc[m.code]
           })
         }
         return acc
@@ -302,7 +304,7 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
               firstColumnSticky
               onlyExportColumns={hiddenNameAndEmailForExcel}
               tableId="course-of-population-students"
-              title="Courses of population's students"
+              title="Courses of population'student students"
             />
           )}
         </div>

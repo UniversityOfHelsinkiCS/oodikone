@@ -128,7 +128,7 @@ const StudentNumberFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
   }
 
   const labelRenderer = sn =>
-    students.find(s => s.studentNumber === sn) ? (
+    students.find(student => student.studentNumber === sn) ? (
       <Icon
         name="check"
         style={{

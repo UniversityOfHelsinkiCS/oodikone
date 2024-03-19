@@ -183,7 +183,7 @@ const PopulationSearchForm = ({
     })
   }
 
-  const handleProgrammeChange = (_e, { value }) => {
+  const handleProgrammeChange = (_event, { value }) => {
     const programme = value
     if (programme === '') {
       handleClear('programme')
@@ -225,11 +225,13 @@ const PopulationSearchForm = ({
   const getSearchHistoryTextFromQuery = () => {
     const { studyRights, semesters, months, year, studentStatuses } = query
     const studyRightsText = `${getTextIn(studyProgrammes[studyRights.programme].name)} ${Object.values(studyRights)
-      .filter(s => s)
+      .filter(studyright => studyright)
       .join(', ')}`
     const timeText = `${semesters.join(', ')}/${year}-${parseInt(year, 10) + 1}, ${months} months`
     const studentStatusesText =
-      studentStatuses.length > 0 ? `includes ${studentStatuses.map(s => s.toLowerCase()).join(', ')} students` : null
+      studentStatuses.length > 0
+        ? `includes ${studentStatuses.map(status => status.toLowerCase()).join(', ')} students`
+        : null
 
     return [studyRightsText, timeText, studentStatusesText].filter(t => t).join(' - ')
   }
@@ -412,7 +414,7 @@ const PopulationSearchForm = ({
 
     let programmesToRender
     if (Object.values(studyProgrammes).length !== 0) {
-      let sortedStudyProgrammes = sortBy(studyProgrammes, s => getTextIn(s.name))
+      let sortedStudyProgrammes = sortBy(studyProgrammes, programme => getTextIn(programme.name))
       if (filterProgrammes) {
         sortedStudyProgrammes = sortedStudyProgrammes.filter(programme => isNewStudyProgramme(programme.code))
       }

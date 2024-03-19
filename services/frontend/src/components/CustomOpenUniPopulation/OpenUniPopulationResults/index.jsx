@@ -27,11 +27,11 @@ const getColumns = (labelsToCourses, getTextIn) => {
     verticalAlign: 'middle',
     textAlign: 'center',
   }
+
   const studentNbrColumn = [
     {
       key: 'studentnumber-parent',
       mergeHeader: true,
-      // merge: true,
       title: 'Student Number',
       children: [
         {
@@ -220,7 +220,6 @@ export const OpenUniPopulationResults = ({ fieldValues }) => {
         setData({ data, columns })
       }, 0)
 
-      // Cleanup function to clear the timeout
       return () => clearTimeout(timer)
     }
     return undefined

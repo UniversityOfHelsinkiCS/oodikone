@@ -31,9 +31,9 @@ const THESIS_GRADE_KEYS = ['I', 'A', 'NSLA', 'LUB', 'CL', 'MCLA', 'ECLA', 'L']
 
 const sortGrades = (a, b) => gradesMap[a] - gradesMap[b]
 
-export const isThesisGrades = grades => Object.keys(grades).some(k => THESIS_GRADE_KEYS.includes(k))
+export const isThesisGrades = grades => Object.keys(grades).some(key => THESIS_GRADE_KEYS.includes(key))
 
-export const isThesisSeries = series => series && series.some(s => isThesisGrades(s))
+export const isThesisSeries = series => series && series.some(series => isThesisGrades(series))
 
 export const absoluteToRelative = all => (p, i) => parseFloat(calculatePercentage(p, all[i]).slice(0, -1))
 

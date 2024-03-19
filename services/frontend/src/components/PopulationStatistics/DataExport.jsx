@@ -55,7 +55,7 @@ export const DataExport = ({ students, programmeCode }) => {
     return mandatoryPassedCourses
   }
 
-  const transferFrom = s => getTextIn(populationStatistics.elementdetails.data[s.transferSource].name)
+  const transferFrom = student => getTextIn(populationStatistics.elementdetails.data[student.transferSource].name)
 
   const studyrightCodes = (studyrights, value) => {
     return studyrights
@@ -204,39 +204,42 @@ export const DataExport = ({ students, programmeCode }) => {
     }, {})
 
     const worksheet = utils.json_to_sheet(
-      students.map(s => ({
-        'last name': s.lastname,
-        'given names': s.firstnames,
-        'student number': s.studentNumber,
-        'all credits': s.allCredits ? s.allCredits : s.credits,
-        'hops credits': s.hopsCredits,
+      students.map(student => ({
+        'last name': student.lastname,
+        'given names': student.firstnames,
+        'student number': student.studentNumber,
+        'all credits': student.allCredits ? student.allCredits : student.credits,
+        'hops credits': student.hopsCredits,
         'credits since start': getStudentTotalCredits({
-          ...s,
-          courses: s.courses.filter(course => new Date(course.date) >= studentToProgrammeStartMap[s.studentNumber]),
+          ...student,
+          courses: student.courses.filter(
+            course => new Date(course.date) >= studentToProgrammeStartMap[student.studentNumber]
+          ),
         }),
-        'phone number': s.phoneNumber,
-        email: s.email,
-        secondaryEmail: s.secondaryEmail,
-        'transferred from': s.transferredStudyright ? transferFrom(s) : '',
-        priority: priorityText(s.studyrights),
-        extent: extentCodes(s.studyrights),
-        studytrack: studytrack(s.studyrights).map(st => st.name)[0],
-        tags: tags(s.tags),
-        'start year at university': reformatDate(s.started, 'YYYY'),
-        'start of studyright': reformatDate(getStartOfStudyright(s.studyrights), 'YYYY-MM-DD'),
-        'started in programme': reformatDate(getStartedInProgramme(s.studyrights), 'YYYY-MM-DD'),
-        'admission type': parseInt(queryYear, 10 >= 2020) ? getAdmissionType(s.studyrights) : undefined,
-        bachelor: s.option ? getTextIn(s.option.name) : '',
-        'updated at': reformatDate(s.updatedAt, 'YYYY-MM-DD  hh:mm:ss'),
-        'mandatory total passed': totalMandatoryPassed(s.studentNumber, codes, programmeCode),
+        'phone number': student.phoneNumber,
+        email: student.email,
+        secondaryEmail: student.secondaryEmail,
+        'transferred from': student.transferredStudyright ? transferFrom(student) : '',
+        priority: priorityText(student.studyrights),
+        extent: extentCodes(student.studyrights),
+        studytrack: studytrack(student.studyrights).map(studyright => studyright.name)[0],
+        tags: tags(student.tags),
+        'start year at university': reformatDate(student.started, 'YYYY'),
+        'start of studyright': reformatDate(getStartOfStudyright(student.studyrights), 'YYYY-MM-DD'),
+        'started in programme': reformatDate(getStartedInProgramme(student.studyrights), 'YYYY-MM-DD'),
+        'admission type': parseInt(queryYear, 10 >= 2020) ? getAdmissionType(student.studyrights) : undefined,
+        bachelor: student.option ? getTextIn(student.option.name) : '',
+        'updated at': reformatDate(student.updatedAt, 'YYYY-MM-DD  hh:mm:ss'),
+        'mandatory total passed': totalMandatoryPassed(student.studentNumber, codes, programmeCode),
         ...sortedMandatory.reduce((acc, m) => {
-          const bestGrade = findBestGrade(s.courses, m.code)
+          const bestGrade = findBestGrade(student.courses, m.code)
           let bestGradeOnChart
-
           if (!bestGrade) {
             if (
-              s.enrollments &&
-              s.enrollments.some(enrollment => enrollment.course_code === m.code && enrollment.state === 'ENROLLED')
+              student.enrollments &&
+              student.enrollments.some(
+                enrollment => enrollment.course_code === m.code && enrollment.state === 'ENROLLED'
+              )
             ) {
               bestGradeOnChart = 0
             } else {
@@ -249,7 +252,6 @@ export const DataExport = ({ students, programmeCode }) => {
           } else {
             bestGradeOnChart = bestGrade
           }
-
           acc[`${getTextIn(m.name)} ${m.code}`] = bestGradeOnChart
           return acc
         }, {}),

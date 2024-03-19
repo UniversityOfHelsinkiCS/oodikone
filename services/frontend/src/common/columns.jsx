@@ -1,5 +1,5 @@
 import React from 'react'
-import { Popup, Icon } from 'semantic-ui-react'
+import { Icon, Popup } from 'semantic-ui-react'
 
 import { StudentInfoItem } from '@/components/common/StudentInfoItem'
 
@@ -38,8 +38,8 @@ export const getCopyableStudentNumberColumn = ({
         />
       </>
     ),
-    getRowVal: s => (!s.obfuscated ? s.studentNumber : 'hidden'),
-    getRowContent: s => <StudentInfoItem showSisuLink student={s} tab="General Tab" />,
+    getRowVal: student => (!student.obfuscated ? student.studentNumber : 'hidden'),
+    getRowContent: student => <StudentInfoItem showSisuLink student={student} tab="General Tab" />,
   }
 }
 
@@ -88,27 +88,27 @@ export const getCopyableEmailColumn = ({
           </>
         ),
         textTitle: 'Email',
-        getRowVal: s => s.email,
+        getRowVal: student => student.email,
       },
       {
         key: 'copyEmail',
         textTitle: 'Secondary email',
         sortable: false,
-        getRowVal: s => s.secondaryEmail,
-        getRowContent: s =>
-          s.email && !s.obfuscated ? (
+        getRowVal: student => student.secondaryEmail,
+        getRowContent: student =>
+          student.email && !student.obfuscated ? (
             <Popup
               content="Email copied!"
               on="click"
-              onClose={() => handlePopupClose(s.studentNumber)}
-              onOpen={() => handlePopupOpen(s.studentNumber)}
-              open={popupStates[s.studentNumber]}
+              onClose={() => handlePopupClose(student.studentNumber)}
+              onOpen={() => handlePopupOpen(student.studentNumber)}
+              open={popupStates[student.studentNumber]}
               position="top right"
               trigger={
                 <Icon
                   link
                   name="copy outline"
-                  onClick={() => navigator.clipboard.writeText(s.email)}
+                  onClick={() => navigator.clipboard.writeText(student.email)}
                   style={{ float: 'right' }}
                 />
               }
@@ -124,25 +124,25 @@ export const hiddenNameAndEmailForExcel = [
   {
     key: 'hidden-lastname',
     title: 'Last name',
-    getRowVal: s => s.lastname,
+    getRowVal: student => student.lastname,
     export: true,
   },
   {
     key: 'hidden-firstnames',
     title: 'First names',
-    getRowVal: s => s.firstnames,
+    getRowVal: student => student.firstnames,
     export: true,
   },
   {
     key: 'hidden-email',
     title: 'E-mail',
-    getRowVal: s => s.email ?? '',
+    getRowVal: student => student.email ?? '',
     export: true,
   },
   {
     key: 'hidden-secondary-email',
     title: 'Secondary E-mail',
-    getRowVal: s => s.secondaryEmail ?? '',
+    getRowVal: student => student.secondaryEmail ?? '',
     export: true,
   },
 ]

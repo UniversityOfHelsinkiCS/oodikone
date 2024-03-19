@@ -67,7 +67,12 @@ const SemesterSelector = ({ allSemesters, semester, setSemester, dataCy }) => {
   const { getTextIn } = useLanguage()
   const currentValue = allSemesters.find(({ semestercode }) => semester === semestercode) ?? allSemesters[0]
   const options = useMemo(
-    () => allSemesters.map(s => ({ key: s.semestercode, text: getTextIn(s.name), value: s.semestercode })),
+    () =>
+      allSemesters.map(semester => ({
+        key: semester.semestercode,
+        text: getTextIn(semester.name),
+        value: semester.semestercode,
+      })),
     [allSemesters]
   )
 
@@ -108,8 +113,8 @@ export const SemesterRangeSelector = () => {
         <b>Until</b>
         {semesters && (
           <SemesterSelector
-            allSemesters={semesters?.filter(s => {
-              return semesterFilter.start <= s.semestercode
+            allSemesters={semesters?.filter(semester => {
+              return semesterFilter.start <= semester.semestercode
             })}
             dataCy="semester-to"
             semester={semesterFilter?.end}

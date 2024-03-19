@@ -21,7 +21,7 @@ const StudyGuidanceGroupGeneralTabContainer = ({ group, ...props }) => {
 const CustomPopulationGeneralTabContainer = props => {
   const { filteredStudents, customPopulationProgramme } = props
   const populations = useGetCustomPopulationQuery({
-    studentNumbers: filteredStudents.map(s => s.studentNumber),
+    studentNumbers: filteredStudents.map(student => student.studentNumber),
     tags: { studyProgramme: customPopulationProgramme },
   })
   return <GeneralTab populations={populations} {...props} />

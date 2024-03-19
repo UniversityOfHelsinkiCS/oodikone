@@ -105,7 +105,7 @@ export const GeneralTab = ({
     studentToSecondStudyrightEndMap,
   } = createMaps({ students, selectedStudents, programmeCode, combinedProgrammeCode, year })
 
-  const transferFrom = s => getTextIn(populationStatistics.elementdetails.data[s.transferSource].name)
+  const transferFrom = student => getTextIn(populationStatistics.elementdetails.data[student.transferSource].name)
 
   const studyrightCodes = (studyrights, value) => {
     return studyrights
@@ -168,8 +168,8 @@ export const GeneralTab = ({
     return moment(started).get('year')
   }
 
-  const getGradeAndDate = s => {
-    const courses = s.courses.filter(course => coursecode.includes(course.course_code))
+  const getGradeAndDate = student => {
+    const courses = student.courses.filter(course => coursecode.includes(course.course_code))
     const highestGrade = getHighestGradeOfCourseBetweenRange(courses, from, to)
     if (!highestGrade) return { grade: '-', date: '', language: '' }
     const { date, language } = courses
@@ -182,26 +182,28 @@ export const GeneralTab = ({
     }
   }
 
-  const getCreditsBetween = s => {
+  const getCreditsBetween = student => {
     if (group?.tags?.year) {
       return getStudentTotalCredits({
-        ...s,
-        courses: s.courses.filter(course => new Date(course.date) > new Date(group?.tags?.year, 7, 1)),
+        ...student,
+        courses: student.courses.filter(course => new Date(course.date) > new Date(group?.tags?.year, 7, 1)),
       })
     }
     const sinceDate = creditDateFilterOptions?.startDate || new Date(1970, 0, 1)
     const untilDate = creditDateFilterOptions?.endDate || new Date()
 
     const credits = getStudentTotalCredits({
-      ...s,
-      courses: s.courses.filter(course => new Date(course.date) >= sinceDate && new Date(course.date) <= untilDate),
+      ...student,
+      courses: student.courses.filter(
+        course => new Date(course.date) >= sinceDate && new Date(course.date) <= untilDate
+      ),
     })
     return credits
   }
 
-  const getEnrollmentDate = s => {
+  const getEnrollmentDate = student => {
     const enrollments =
-      s.enrollments
+      student.enrollments
         ?.filter(enrollment => coursecode.includes(enrollment.course_code))
         ?.filter(enrollment => enrollment.semestercode >= fromSemester && enrollment.semestercode <= toSemester) ?? null
     if (!enrollments || !enrollments.length) return ''
@@ -211,7 +213,9 @@ export const GeneralTab = ({
   const copyItemsToClipboard = (event, fieldName) => {
     event.stopPropagation()
     const studentsInfo = selectedStudents.map(number => students[number])
-    const list = studentsInfo.filter(s => s[fieldName] && !s.obfuscated).map(s => s[fieldName])
+    const list = studentsInfo
+      .filter(student => student[fieldName] && !student.obfuscated)
+      .map(student => student[fieldName])
     const clipboardString = list.join(';')
     navigator.clipboard.writeText(clipboardString)
   }
@@ -315,31 +319,34 @@ export const GeneralTab = ({
       key: 'credits-all',
       title: sole ? 'All Credits' : 'All',
       filterType: 'range',
-      getRowVal: s => s.allCredits || s.credits,
+      getRowVal: student => student.allCredits || student.credits,
     }),
     hops: sole => ({
       key: 'credits-hops',
       title: sole ? 'Credits in HOPS' : 'HOPS',
       filterType: 'range',
-      getRowVal: s =>
-        s.hopsCredits !== undefined
-          ? s.hopsCredits
-          : s.studyplans?.find(plan => plan.programme_code === programmeCode)?.completed_credits ?? 0,
+      getRowVal: student =>
+        student.hopsCredits !== undefined
+          ? student.hopsCredits
+          : student.studyplans?.find(plan => plan.programme_code === programmeCode)?.completed_credits ?? 0,
     }),
     hopsCombinedProg: () => ({
       key: 'credits-hopsCombinedProg',
       title: combinedProgrammeCode === 'MH90_001' ? 'Licentiate\nHOPS' : 'Master\nHOPS',
       filterType: 'range',
-      getRowVal: s => s.studyplans?.find(plan => plan.programme_code === combinedProgrammeCode)?.completed_credits ?? 0,
+      getRowVal: student =>
+        student.studyplans?.find(plan => plan.programme_code === combinedProgrammeCode)?.completed_credits ?? 0,
     }),
     studyright: sole => ({
       key: 'credits-studyright',
       title: sole ? `Credits ${creditColumnTitle}` : creditColumnTitle,
       filterType: 'range',
-      getRowVal: s => {
+      getRowVal: student => {
         const credits = getStudentTotalCredits({
-          ...s,
-          courses: s.courses.filter(course => new Date(course.date) >= studentToProgrammeStartMap[s.studentNumber]),
+          ...student,
+          courses: student.courses.filter(
+            course => new Date(course.date) >= studentToProgrammeStartMap[student.studentNumber]
+          ),
         })
         return credits
       },
@@ -349,7 +356,7 @@ export const GeneralTab = ({
       key: 'credits-since',
       title: getTitleForCreditsSince(sole),
       filterType: 'range',
-      getRowVal: s => getCreditsBetween(s),
+      getRowVal: student => getCreditsBetween(student),
     }),
   }
 
@@ -368,14 +375,14 @@ export const GeneralTab = ({
 
   // All columns components user is able to use
   const columnsAvailable = {
-    lastname: { key: 'lastname', title: 'Last name', getRowVal: s => s.lastname, export: false },
-    firstname: { key: 'firstname', title: 'Given names', getRowVal: s => s.firstnames, export: false },
+    lastname: { key: 'lastname', title: 'Last name', getRowVal: student => student.lastname, export: false },
+    firstname: { key: 'firstname', title: 'Given names', getRowVal: student => student.firstnames, export: false },
     phoneNumber: {
       key: 'phoneNumber',
       title: 'Phone number',
       export: true,
       displayColumn: false,
-      getRowVal: s => s.phoneNumber,
+      getRowVal: student => student.phoneNumber,
     },
     studentnumber: getCopyableStudentNumberColumn({
       popupStates,
@@ -388,70 +395,70 @@ export const GeneralTab = ({
     gradeForSingleCourse: {
       key: 'gradeForSingleCourse',
       title: 'Grade',
-      getRowVal: s => {
-        const { grade } = getGradeAndDate(s)
+      getRowVal: student => {
+        const { grade } = getGradeAndDate(student)
         return grade
       },
     },
     studyTrack: containsStudyTracks && {
       key: 'studyTrack',
       title: 'Study track',
-      getRowVal: s => studytrack(s.studyrights).map(st => st.name)[0],
+      getRowVal: student => studytrack(student.studyrights).map(st => st.name)[0],
     },
     studyrightStart: {
       key: 'studyrightStart',
       title: 'Start of\nstudyright',
       filterType: 'date',
-      getRowVal: s => reformatDate(studentToStudyrightStartMap[s.studentNumber], 'YYYY-MM-DD'),
+      getRowVal: student => reformatDate(studentToStudyrightStartMap[student.studentNumber], 'YYYY-MM-DD'),
     },
     studyStartDate: {
       key: 'studyStartDate',
       title: 'Started in\nprogramme',
       filterType: 'date',
-      getRowVal: s => getStudyStartDate(s),
+      getRowVal: student => getStudyStartDate(student),
     },
     semesterEnrollments: {
       key: 'semesterEnrollments',
       title: 'Semesters\npresent',
       filterType: 'range',
-      getRowContent: s => getSemesterEnrollmentsContent(s),
-      getRowVal: s => getSemesterEnrollmentsVal(s),
-      getRowExportVal: s => getSemesterEnrollmentsForExcel(s),
+      getRowContent: student => getSemesterEnrollmentsContent(student),
+      getRowVal: student => getSemesterEnrollmentsVal(student),
+      getRowExportVal: student => getSemesterEnrollmentsForExcel(student),
     },
     endDate: {
       key: 'endDate',
       title: combinedProgrammeCode ? 'Bachelor\ngraduation\ndate' : 'Graduation\ndate',
       filterType: 'date',
-      getRowVal: s =>
-        studentToStudyrightEndMap[s.studentNumber]
-          ? reformatDate(studentToStudyrightEndMap[s.studentNumber], 'YYYY-MM-DD')
+      getRowVal: student =>
+        studentToStudyrightEndMap[student.studentNumber]
+          ? reformatDate(studentToStudyrightEndMap[student.studentNumber], 'YYYY-MM-DD')
           : '',
     },
     endDateCombinedProg: {
       key: 'endDateCombinedProg',
       title: combinedProgrammeCode === 'MH90_001' ? 'Licentiate\ngraduation\ndate' : 'Master\ngraduation\ndate',
       filterType: 'date',
-      getRowVal: s =>
-        studentToSecondStudyrightEndMap[s.studentNumber]
-          ? reformatDate(studentToSecondStudyrightEndMap[s.studentNumber], 'YYYY-MM-DD')
+      getRowVal: student =>
+        studentToSecondStudyrightEndMap[student.studentNumber]
+          ? reformatDate(studentToSecondStudyrightEndMap[student.studentNumber], 'YYYY-MM-DD')
           : '',
     },
     startYear: {
       key: 'startYear',
       title: 'Start year\nat uni',
       filterType: 'range',
-      getRowVal: s => getStarted(s),
+      getRowVal: student => getStarted(student),
     },
     programme: {
       key: 'programme',
       title: programmeCode ? 'Other programmes' : 'Study programmes',
       filterType: 'multi',
-      getRowContent: s => getStudyProgrammeContent(s),
-      getRowVal: s => {
-        return studentProgrammesMap[s.studentNumber]?.programmes.map(p => getTextIn(p.name))
+      getRowContent: student => getStudyProgrammeContent(student),
+      getRowVal: student => {
+        return studentProgrammesMap[student.studentNumber]?.programmes.map(p => getTextIn(p.name))
       },
-      cellProps: s => {
-        return { title: studentProgrammesMap[s.studentNumber]?.getProgrammesList('\n') }
+      cellProps: student => {
+        return { title: studentProgrammesMap[student.studentNumber]?.getProgrammesList('\n') }
       },
       helpText:
         'If student has more than one programme, hover your mouse on the cell to see the rest. They are also displayed in the exported Excel file.',
@@ -461,18 +468,19 @@ export const GeneralTab = ({
       title: 'Semesters present amount',
       export: true,
       displayColumn: false,
-      getRowVal: s => (s.semesterenrollments ? s.semesterenrollments.filter(e => e.enrollmenttype === 1).length : 0),
+      getRowVal: student =>
+        student.semesterenrollments ? student.semesterenrollments.filter(e => e.enrollmenttype === 1).length : 0,
     },
     transferredFrom: {
       key: 'transferredFrom',
       title: 'Transferred\nfrom',
-      getRowVal: s => (s.transferredStudyright ? transferFrom(s) : ''),
+      getRowVal: student => (student.transferredStudyright ? transferFrom(student) : ''),
     },
     admissionType: shouldShowAdmissionType && {
       key: 'admissionType',
       title: 'Admission type',
-      getRowVal: s => {
-        const studyright = s.studyrights.find(studyright =>
+      getRowVal: student => {
+        const studyright = student.studyrights.find(studyright =>
           studyright.studyright_elements.some(e => e.code === programmeCode)
         )
         const admissionType = studyright && studyright.admission_type ? studyright.admission_type : 'Ei valintatapaa'
@@ -482,47 +490,47 @@ export const GeneralTab = ({
     passDate: {
       key: 'passDate',
       title: 'Attainment date',
-      getRowVal: s => {
-        const { date } = getGradeAndDate(s)
+      getRowVal: student => {
+        const { date } = getGradeAndDate(student)
         return date ? reformatDate(date, 'YYYY-MM-DD') : 'No attainment'
       },
     },
     enrollmentDate: {
       key: 'enrollmentDate',
       title: 'Enrollment date',
-      getRowVal: s => {
-        const date = getEnrollmentDate(s)
+      getRowVal: student => {
+        const date = getEnrollmentDate(student)
         return date ? reformatDate(date, 'YYYY-MM-DD') : 'No enrollment'
       },
     },
     language: {
       key: 'language',
       title: 'Language',
-      getRowVal: s => {
-        const { language } = getGradeAndDate(s)
+      getRowVal: student => {
+        const { language } = getGradeAndDate(student)
         return language
       },
     },
     option: containsOption && {
       key: 'option',
       title: cleanedQueryStudyrights.some(code => code.startsWith('MH')) ? 'Bachelor' : 'Master',
-      getRowVal: s => (s.option ? getTextIn(s.option.name) : ''),
+      getRowVal: student => (student.option ? getTextIn(student.option.name) : ''),
       formatValue: val => (val.length > 45 ? `${val.substring(0, 43)}...` : val),
-      cellProps: s => {
+      cellProps: student => {
         return {
-          title: s.option ? getTextIn(s.option.name) : '',
+          title: student.option ? getTextIn(student.option.name) : '',
         }
       },
     },
     latestAttainmentDate: {
       key: 'latestAttainmentDate',
       title: 'Latest attainment date',
-      getRowVal: s => {
-        const studyPlan = s.studyplans.find(sp => sp.programme_code === programmeCode)
+      getRowVal: student => {
+        const studyPlan = student.studyplans.find(sp => sp.programme_code === programmeCode)
         if (!studyPlan) return ''
         const { included_courses: coursesInStudyPlan } = studyPlan
 
-        const dates = s.courses
+        const dates = student.courses
           .filter(course => coursesInStudyPlan.includes(course.course_code) && course.passed === true)
           .map(course => course.date)
         if (!dates.length) return ''
@@ -537,12 +545,12 @@ export const GeneralTab = ({
     priority: {
       key: 'priority',
       title: 'Priority',
-      getRowVal: s => priorityText(s.studyrights),
+      getRowVal: student => priorityText(student.studyrights),
     },
     extent: {
       key: 'extent',
       title: 'Extent',
-      getRowVal: s => extentCodes(s.studyrights),
+      getRowVal: student => extentCodes(student.studyrights),
     },
     email: getCopyableEmailColumn({
       popupStates,
@@ -554,13 +562,13 @@ export const GeneralTab = ({
     tags: {
       key: 'tags',
       title: 'Tags',
-      getRowVal: s => (!s.obfuscated ? tags(s.tags) : ''),
+      getRowVal: student => (!student.obfuscated ? tags(student.tags) : ''),
     },
     updatedAt: {
       key: 'updatedAt',
       title: 'Last Updated At',
       filterType: 'date',
-      getRowVal: s => reformatDate(s.updatedAt, 'YYYY-MM-DD  HH:mm:ss'),
+      getRowVal: student => reformatDate(student.updatedAt, 'YYYY-MM-DD  HH:mm:ss'),
     },
   }
   // Columns are shown in order they're declared above. JS guarantees this order of keys

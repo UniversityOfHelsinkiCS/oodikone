@@ -107,7 +107,7 @@ export const getAllStudyProgrammes = createSelector(
         const [code, info] = entry
         const { name, students } = info
         const filteredStudents = Object.keys(students).reduce(
-          (acc, k) => ({ ...acc, [k]: students[k].filter(s => studentsIncluded.has(s)) }),
+          (acc, k) => ({ ...acc, [k]: students[k].filter(student => studentsIncluded.has(student)) }),
           {}
         )
         if (!all[code]) {

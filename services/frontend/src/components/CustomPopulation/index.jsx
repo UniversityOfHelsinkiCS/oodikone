@@ -122,8 +122,8 @@ const CustomPopulationContent = ({
   }
 
   const { data: courseStats } = useGetStudentListCourseStatisticsQuery(
-    { studentNumbers: filteredStudents.map(s => s.studentNumber) },
-    { skip: !filteredStudents.map(s => s.studentNumber).length }
+    { studentNumbers: filteredStudents.map(student => student.studentNumber) },
+    { skip: !filteredStudents.map(student => student.studentNumber).length }
   )
 
   const { progress } = useProgress(isFetchingPopulation)

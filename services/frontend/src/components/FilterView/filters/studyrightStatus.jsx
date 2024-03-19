@@ -94,20 +94,28 @@ export const studyrightStatusFilter = createFilter({
     const { code, combinedProgrammeCode } = args
     const now = moment(new Date())
 
-    const status = s => {
+    const status = studyright => {
       // Studyright is active if the student has enrolled (absent or present) for this semester and the studyright has not yet ended
       if (activeProgramme === true || activeCombinedProgramme === true)
-        return s.active === 1 && ((s.enddate && moment(s.enddate).isAfter(now)) || !s.enddate)
+        return (
+          studyright.active === 1 &&
+          ((studyright.enddate && moment(studyright.enddate).isAfter(now)) || !studyright.enddate)
+        )
       // Studyright is inactive if the student has not enrolled for this semester or the studyright has expired
       if (activeProgramme === false || activeCombinedProgramme === false)
-        return !s.graduated && (s.active === 0 || (s.enddate && moment(s.enddate).isBefore(now)))
+        return (
+          !studyright.graduated &&
+          (studyright.active === 0 || (studyright.enddate && moment(studyright.enddate).isBefore(now)))
+        )
       return true
     }
 
     const chosenCode = activeCombinedProgramme && combinedProgrammeCode ? combinedProgrammeCode : code
-    return student.studyrights.some(s => {
-      const correctStatus = status(s)
-      return correctStatus && s.studyright_elements.some(s => s.code === chosenCode)
+    return student.studyrights.some(studyright => {
+      const correctStatus = status(studyright)
+      return (
+        correctStatus && studyright.studyright_elements.some(studyrightElement => studyrightElement.code === chosenCode)
+      )
     })
   },
 

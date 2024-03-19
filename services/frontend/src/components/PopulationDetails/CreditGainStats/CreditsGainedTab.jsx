@@ -29,7 +29,7 @@ export const CreditsGainedTab = ({ allStudents, query, creditDateFilterOptions, 
   }
 
   const getCreditsGainedTable = type => {
-    const filteredStudents = allStudents.filter(s => filterFunction(s, type))
+    const filteredStudents = allStudents.filter(student => filterFunction(student, type))
     return (
       <CreditsGainedTable
         creditDateFilterOptions={creditDateFilterOptions}
@@ -42,7 +42,7 @@ export const CreditsGainedTab = ({ allStudents, query, creditDateFilterOptions, 
     )
   }
 
-  const admissionTypesAvailable = !allStudents.every(s => filterFunction(s, null))
+  const admissionTypesAvailable = !allStudents.every(student => filterFunction(student, null))
 
   return (
     <Grid>

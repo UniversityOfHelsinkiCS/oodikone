@@ -1,7 +1,7 @@
-import React, { useState, useMemo, useEffect } from 'react'
-import { Search, Segment, Icon } from 'semantic-ui-react'
+import React, { useEffect, useMemo, useState } from 'react'
+import { Icon, Search, Segment } from 'semantic-ui-react'
 
-import { validateInputLength, splitByEmptySpace } from '@/common'
+import { splitByEmptySpace, validateInputLength } from '@/common'
 import { useDebounce } from '@/common/hooks'
 import { SortableTable } from '@/components/SortableTable'
 import { useFindTeachersQuery } from '@/redux/teachers'

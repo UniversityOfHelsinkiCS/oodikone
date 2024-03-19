@@ -29,7 +29,7 @@ export const CoursePopulationGradeDist = ({ singleCourseStats, students, courseC
 
     Object.keys(grades).forEach(grade => {
       const filteredGrades = intersection(
-        students.map(s => s.studentNumber),
+        students.map(student => student.studentNumber),
         grades[grade]
       )
       courseGrades.push({ grade, amount: filteredGrades.length })

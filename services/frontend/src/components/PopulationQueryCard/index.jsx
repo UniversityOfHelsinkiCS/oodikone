@@ -1,11 +1,11 @@
 import { minBy } from 'lodash'
-import { func, arrayOf, object, shape, string, oneOfType, number } from 'prop-types'
+import { arrayOf, func, number, object, oneOfType, shape, string } from 'prop-types'
 import React from 'react'
 import { Card, Icon } from 'semantic-ui-react'
 
 import { reformatDate } from '@/common'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { DISPLAY_DATE_FORMAT } from '@/constants'
-import { useLanguage } from '../LanguagePicker/useLanguage'
 import './populationQueryCard.css'
 
 export const PopulationQueryCard = ({ population, query, removeSampleFn, units, tags }) => {
@@ -13,8 +13,10 @@ export const PopulationQueryCard = ({ population, query, removeSampleFn, units, 
   const { uuid, year, semesters, months, studentStatuses, tag } = query
   const tagname = tag && tags.length > 0 ? tags.find(t => t.tag_id === tag)?.tagname : ''
   const { students } = population
-  const header = units.map(u => getTextIn(u.name)).join(', ')
-  const semesterList = semesters.map(s => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase()).join(', ')
+  const header = units.map(unit => getTextIn(unit.name)).join(', ')
+  const semesterList = semesters
+    .map(semester => semester.charAt(0).toUpperCase() + semester.slice(1).toLowerCase())
+    .join(', ')
 
   if (students.length > 0) {
     return (

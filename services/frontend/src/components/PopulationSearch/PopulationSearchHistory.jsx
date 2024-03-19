@@ -30,7 +30,9 @@ const PopulationSearchHistory = ({ populations, units, tags, removePopulation })
   const [months, setMonths] = useState(populations.query?.months ? populations.query?.months : 0)
 
   const handleSemesterSelection = (_event, { value }) => {
-    const newSemesters = semesters.includes(value) ? semesters.filter(s => s !== value) : [...semesters, value]
+    const newSemesters = semesters.includes(value)
+      ? semesters.filter(semester => semester !== value)
+      : [...semesters, value]
     if (!populations.query.tag) {
       setSemesters(newSemesters)
       setMonths(getMonths(populations.query.year, semesters.includes('FALL') ? 'FALL' : 'SPRING'))
@@ -39,7 +41,7 @@ const PopulationSearchHistory = ({ populations, units, tags, removePopulation })
 
   const handleStudentStatusSelection = (_event, { value }) => {
     setStudentStatus(
-      studentStatuses.includes(value) ? studentStatuses.filter(s => s !== value) : [...studentStatuses, value]
+      studentStatuses.includes(value) ? studentStatuses.filter(status => status !== value) : [...studentStatuses, value]
     )
   }
 

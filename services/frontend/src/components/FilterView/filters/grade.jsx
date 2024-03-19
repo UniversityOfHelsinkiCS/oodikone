@@ -35,7 +35,7 @@ const GradeFilterCard = ({ options, onOptionsChange, grades, withoutSelf }) => {
 
   const studentsWithoutSelf = withoutSelf()
   const gradesWithoutSelf = fp.mapValues(
-    fp.filter(sn => studentsWithoutSelf.find(s => s.studentNumber === sn) !== undefined)
+    fp.filter(sn => studentsWithoutSelf.find(student => student.studentNumber === sn) !== undefined)
   )(grades)
 
   return (

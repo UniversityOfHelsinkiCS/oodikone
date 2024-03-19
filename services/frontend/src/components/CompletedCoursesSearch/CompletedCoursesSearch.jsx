@@ -1,14 +1,14 @@
 import qs from 'query-string'
 import React, { useEffect, useState } from 'react'
 import { useLocation, useHistory } from 'react-router-dom'
-import { Modal, Form, Button, TextArea, Loader } from 'semantic-ui-react'
+import { Button, Form, Loader, Modal, TextArea } from 'semantic-ui-react'
 
 import { SearchHistory } from '@/components/SearchHistory'
 import {
-  useGetSavedCourseListsQuery,
   useCreateCourseListMutation,
-  useUpdateCourseListMutation,
   useDeleteCourseListMutation,
+  useGetSavedCourseListsQuery,
+  useUpdateCourseListMutation,
 } from '@/redux/completedCoursesSearch'
 
 export const CompletedCoursesSearch = ({ setValues }) => {
@@ -56,8 +56,8 @@ export const CompletedCoursesSearch = ({ setValues }) => {
 
   useEffect(() => {
     if (deletedData) {
-      const filteredsearches = searchList.filter(s => s.id !== deletedData)
-      setSearches(filteredsearches)
+      const filteredSearches = searchList.filter(s => s.id !== deletedData)
+      setSearches(filteredSearches)
     }
   }, [deletedData])
 

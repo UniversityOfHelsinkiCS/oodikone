@@ -121,12 +121,12 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
   const nonCourse = ['Criteria', 'Credits']
   const style = { verticalAlign: 'middle', textAlign: 'center' }
 
-  const findProp = (info, s) => {
+  const findProp = (info, student) => {
     const propObj = {
       title: '',
       style,
     }
-    const courses = s.courses.filter(
+    const courses = student.courses.filter(
       course =>
         course.course_code === info.code ||
         (criteria?.allCourses[info.code] && criteria?.allCourses[info.code].includes(course.course_code))
@@ -136,8 +136,8 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
       return { ...propObj, title: `Passed-${moment(courses[0].date).format('YYYY-MM-DD')}` }
     if (courses && courses.some(course => course.passed === false))
       return { ...propObj, title: `Failed-${moment(courses[0].date).format('YYYY-MM-DD')}` }
-    if (s.enrollments && s.enrollments.map(course => course.course_code).includes(info.code)) {
-      const enrollment = s.enrollments.filter(enrollment => enrollment.course_code === info.code)
+    if (student.enrollments && student.enrollments.map(course => course.course_code).includes(info.code)) {
+      const enrollment = student.enrollments.filter(enrollment => enrollment.course_code === info.code)
       return {
         ...propObj,
         title: `Enrollment-${moment(enrollment[0].enrollment_date_time).format('YYYY-MM-DD')}`,
@@ -210,19 +210,23 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
           ? `${m.code} ${enrollStatusIndex === 0 ? enrollStatusIndex + 1 : enrollStatusIndex}`
           : `${m.code}-${getTextIn(m.name)}`,
       headerProps: { title: `${m.code}, ${year}` },
-      cellProps: s => findProp(m, s),
-      getRowVal: s => {
-        if (m.code.includes('Criteria')) return s.criteriaProgress[year] ? s.criteriaProgress[year].totalSatisfied : 0
-        if (m.code.includes('Enrollment')) return getEnrollmentSortingValue(s, enrollStatusIndex)
-        return findCsvText(s, m.code, year, criteria)
+      cellProps: student => findProp(m, student),
+      getRowVal: student => {
+        if (m.code.includes('Criteria'))
+          return student.criteriaProgress[year] ? student.criteriaProgress[year].totalSatisfied : 0
+        if (m.code.includes('Enrollment')) return getEnrollmentSortingValue(student, enrollStatusIndex)
+        return findCsvText(student, m.code, year, criteria)
       },
       // the following is hackish, but enrollment col needs to use the getRowVal for sorting
       // and getRowExportVal can't be defined for all the other columns to not override their getRowVal
-      getRowExportVal: !m.code.includes('Enrollment') ? undefined : s => getSemesterEnrollmentVal(s, enrollStatusIndex),
-      getRowContent: s => {
-        if (m.code.includes('Criteria')) return s.criteriaProgress[year] ? s.criteriaProgress[year].totalSatisfied : 0
-        if (m.code.includes('Enrollment')) return getSemesterEnrollmentContent(s, enrollStatusIndex)
-        return findRowContent(s, m.code, year, start, end, criteria)
+      getRowExportVal: !m.code.includes('Enrollment')
+        ? undefined
+        : student => getSemesterEnrollmentVal(student, enrollStatusIndex),
+      getRowContent: student => {
+        if (m.code.includes('Criteria'))
+          return student.criteriaProgress[year] ? student.criteriaProgress[year].totalSatisfied : 0
+        if (m.code.includes('Enrollment')) return getSemesterEnrollmentContent(student, enrollStatusIndex)
+        return findRowContent(student, m.code, year, start, end, criteria)
       },
     }))
   }
@@ -244,9 +248,9 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
             key: 'studentnumber-parent',
             title: 'Student Number',
             cellProps: { title: 'student number', className: 'studentNumber' },
-            getRowVal: s => s.studentNumber,
-            getRowContent: s => (
-              <StudentInfoItem showSisuLink student={s} tab="Progress tab" view="Student progress table" />
+            getRowVal: student => student.studentNumber,
+            getRowContent: student => (
+              <StudentInfoItem showSisuLink student={student} tab="Progress tab" view="Student progress table" />
             ),
           },
         ],
@@ -262,7 +266,7 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
             title: 'Last Name',
             export: true,
             forceToolsMode: namesVisible ? '' : 'none',
-            getRowVal: s => s.lastname,
+            getRowVal: student => student.lastname,
             displayColumn: namesVisible,
           },
           {
@@ -270,7 +274,7 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
             title: 'First Names',
             export: true,
             forceToolsMode: namesVisible ? '' : 'none',
-            getRowVal: s => s.firstnames,
+            getRowVal: student => student.firstnames,
             displayColumn: namesVisible,
           },
         ],
@@ -460,21 +464,21 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
           export: true,
           displayColumn: false,
           textTitle: 'Phone number',
-          getRowVal: s => s.phoneNumber,
+          getRowVal: student => student.phoneNumber,
         },
         {
           key: 'hidden-email',
           export: true,
           displayColumn: false,
           textTitle: 'Email',
-          getRowVal: s => s.email,
+          getRowVal: student => student.email,
         },
         {
           key: 'hidden-secondary-email',
           export: true,
           displayColumn: false,
           textTitle: 'Secondary Email',
-          getRowVal: s => s.secondaryEmail,
+          getRowVal: student => student.secondaryEmail,
         },
       ],
     })
@@ -523,7 +527,7 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
                 featureName="progress"
                 style={{ height: '80vh' }}
                 tableId="progress-of-population-students"
-                title="Progress of population's students after predefined criteria"
+                title="Progress of population'student students after predefined criteria"
               />
             ) : (
               <div>

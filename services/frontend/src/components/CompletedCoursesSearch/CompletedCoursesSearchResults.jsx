@@ -36,7 +36,7 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
     return icon ? <Icon color="green" fitted name="check" /> : `Passed${substitutionString}`
   }
 
-  const getTotalPassed = s => s.credits.filter(credit => isPassed(credit.creditType)).length
+  const getTotalPassed = student => student.credits.filter(credit => isPassed(credit.creditType)).length
 
   const getTotalUnfinished = student => Object.values(student.enrollments).length
 
@@ -50,8 +50,8 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
       key: 'studentnumber',
       title: 'Student Number',
       cellProps: { style },
-      getRowVal: s => s.studentNumber,
-      getRowContent: s => <StudentInfoItem showSisuLink student={s} view="Completed courses search tool" />,
+      getRowVal: student => student.studentNumber,
+      getRowContent: student => <StudentInfoItem showSisuLink student={student} view="Completed courses search tool" />,
     },
   ]
 
@@ -83,10 +83,10 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
         </div>
       ),
       textTitle: course.code,
-      cellProps: s => getCellProps(s, course.code),
+      cellProps: student => getCellProps(student, course.code),
       headerProps: { title: course.code },
-      getRowVal: s => getCompletion(s, course.code, { icon: false }),
-      getRowContent: s => getCompletion(s, course.code, { icon: true }),
+      getRowVal: student => getCompletion(student, course.code, { icon: false }),
+      getRowContent: student => getCompletion(student, course.code, { icon: true }),
     }
   })
 
@@ -96,13 +96,13 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
       title: 'Passed',
       cellProps: { style },
       headerProps: { title: 'Passed' },
-      getRowVal: s => getTotalPassed(s),
+      getRowVal: student => getTotalPassed(student),
     },
     {
       key: 'unfinished',
       title: 'Unfinished',
       headerProps: { title: 'Unfinished' },
-      getRowVal: s => getTotalUnfinished(s),
+      getRowVal: student => getTotalUnfinished(student),
       cellProps: { style },
     },
   ]
@@ -122,7 +122,7 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
           title: 'Email',
           cellProps: { style },
           headerProps: { title: 'Email' },
-          getRowVal: s => (s.email ? s.email : ''),
+          getRowVal: student => (student.email ? student.email : ''),
           export: false,
         },
       ]
@@ -134,14 +134,14 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
           key: 'lastname',
           title: 'Last name',
           cellProps: { style },
-          getRowVal: s => s.lastname,
+          getRowVal: student => student.lastname,
           export: false,
         },
         {
           key: 'firstnames',
           title: 'First names',
           cellProps: { style },
-          getRowVal: s => s.firstnames,
+          getRowVal: student => student.firstnames,
           export: false,
         },
       ]
