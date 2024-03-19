@@ -404,7 +404,9 @@ export const getCurrentSemester = allSemesters => {
   )
 }
 
-/** Returns a sorting function that can be used to sort strings so that Finnish alphabetical order is respected.
+/**
+ * Returns a sorting function that can be used to sort strings so that Finnish alphabetical order is respected.
+ *
  * @param {string} field - The field to sort by (optional: if not given, the function will sort by the strings themselves)
  */
 export const createLocaleComparator = (field = null) => {
@@ -455,8 +457,8 @@ export const bachelorHonoursProgrammes = [
   'KH50_008',
 ]
 
-// Basic modules from Sisu programme structures. All modules that can be found for the past years' structures
-// taken into account
+// Basic modules from Sisu programme structures. All modules that
+// can be found for the past years' structures taken into account
 export const bachelorHonoursBasicModules = {
   KH50_001: ['MAT110', 'MAT120', 'MAT130', 'MAT120', 'TKT1'],
   KH50_002: ['FYS1100', 'FYS1200'],
@@ -468,8 +470,8 @@ export const bachelorHonoursBasicModules = {
   KH50_008: ['BSCH1000', 'BSCS1000', 'BSMA1000', 'BSMS1000', 'BSPH1000'],
 }
 
-// Similarly intermediate modules from Sisu programme structures. All modules that can be found for the past years' structures
-// taken into account
+// Similarly intermediate modules from Sisu programme structures. All modules
+// that can be found for the past years' structures taken into account
 export const bachelorHonoursIntermediateModules = {
   KH50_001: ['mat217', 'MAT210', 'MAT220', 'MAT240', 'MAT213', 'MAT230', 'MAT218', 'MAT011'],
   KH50_002: ['FYS2100', 'FYS2200', 'FYS2300', 'FYS2400', 'FYS2500', 'FYS2600'],
@@ -488,3 +490,14 @@ export const languageAbbreviations = {
 }
 
 export const showAsUserKey = 'showAsUser'
+
+export const getAge = date => {
+  const today = new Date()
+  const birthDate = new Date(date)
+  let age = today.getFullYear() - birthDate.getFullYear()
+  const monthDifference = today.getMonth() - birthDate.getMonth()
+  if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+    age--
+  }
+  return age
+}

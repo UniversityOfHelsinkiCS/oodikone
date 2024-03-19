@@ -75,9 +75,9 @@ const PopulationCourseStats = ({ filteredStudents, mandatoryCourses, courses, pe
       modules[course.parent_code].courses.push(course)
     })
 
-    Object.keys(modules).forEach(m => {
-      if (modules[m].courses.length === 0) {
-        delete modules[m]
+    Object.keys(modules).forEach(module => {
+      if (modules[module].courses.length === 0) {
+        delete modules[module]
       }
     })
 

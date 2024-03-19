@@ -1,25 +1,12 @@
 import PropTypes, { shape } from 'prop-types'
 import React, { useState } from 'react'
-import { Table, Progress, Radio, Icon } from 'semantic-ui-react'
+import { Icon, Progress, Radio, Table } from 'semantic-ui-react'
 
-import { getFullStudyProgrammeRights } from '@/common'
+import { getAge, getFullStudyProgrammeRights } from '@/common'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 
-// https://stackoverflow.com/a/7091965
-const getAge = toDate => {
-  const today = new Date()
-  const birthDate = new Date(toDate)
-  let age = today.getFullYear() - birthDate.getFullYear()
-  const m = today.getMonth() - birthDate.getMonth()
-  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-    age--
-  }
-  return age
-}
-
-function getAverage(values) {
+const getAverage = values => {
   if (values.length === 0) return 0
-
   return (values.reduce((acc, cur) => acc + cur, 0) / values.length).toFixed(1)
 }
 
@@ -108,7 +95,6 @@ export const AgeStats = ({ filteredStudents, query }) => {
             for (let i = 0; i < count; i++) {
               acc.push(Number(age))
             }
-
             return acc
           }, [])
         )}
@@ -126,7 +112,6 @@ export const AgeStats = ({ filteredStudents, query }) => {
             <Table.HeaderCell>Percentage of Population</Table.HeaderCell>
           </Table.Row>
         </Table.Header>
-
         <Table.Body>
           {ages.map(([age, count], i) => (
             <React.Fragment key={age}>
@@ -149,7 +134,6 @@ export const AgeStats = ({ filteredStudents, query }) => {
                   />
                 </Table.Cell>
               </Table.Row>
-
               {isGrouped &&
                 expandedGroups.includes(i) &&
                 Object.entries(

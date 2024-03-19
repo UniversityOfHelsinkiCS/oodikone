@@ -1,20 +1,10 @@
 import _ from 'lodash'
-import React, { useMemo, useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 
+import { getAge } from '@/common'
 import { useDebounce } from '@/common/hooks'
 import { RangeSelector } from '@/components/common/RangeSelector'
 import { createFilter } from './createFilter'
-
-const getAge = toDate => {
-  const today = new Date()
-  const birthDate = new Date(toDate)
-  let age = today.getFullYear() - birthDate.getFullYear()
-  const m = today.getMonth() - birthDate.getMonth()
-  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-    age--
-  }
-  return age
-}
 
 const AgeFilterCard = ({ options, onOptionsChange, bounds }) => {
   const { min, max } = bounds
