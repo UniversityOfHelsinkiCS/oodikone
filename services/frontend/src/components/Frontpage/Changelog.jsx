@@ -26,7 +26,14 @@ export const Changelog = ({ showFullChangelog }) => {
     return dateFormatter.format(date)
   }
 
-  function getDescription(string) {
+  /**
+   * Strips the internal part of the changelog description. It doesn't matter how
+   * the keyword is spelled in the changelog, but using **Internal** is recommended.
+   *
+   * @param {string} string - The description to parse.
+   * @returns string - The description without the internal part.
+   */
+  const getDescription = string => {
     const lines = string.split('\n')
     const internalIndex = lines.findIndex(line => line.toLowerCase().includes('internal'))
     if (internalIndex === -1 || internalIndex === 0) {
