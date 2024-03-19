@@ -17,10 +17,12 @@ export const StudentStatistics = () => {
         Student statistics
       </Header>
       <StudentNameVisibilityToggle />
-      <Segment className="contentSegment">
-        <StudentSearch studentNumber={studentNumber} />
-        <StudentDetails studentNumber={studentNumber} />
-      </Segment>
+      <div style={{ alignContent: 'center', margin: 'auto' }}>
+        <Segment className="contentSegment">
+          <StudentSearch studentNumber={studentNumber} />
+          <StudentDetails studentNumber={studentNumber} />
+        </Segment>
+      </div>
     </div>
   )
 }

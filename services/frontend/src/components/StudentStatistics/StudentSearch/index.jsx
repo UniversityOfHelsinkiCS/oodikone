@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import { Link, useLocation } from 'react-router-dom'
 import { Container, Search, Segment } from 'semantic-ui-react'
 
-import { containsOnlyNumbers, validateInputLength, splitByEmptySpace } from '@/common'
+import { containsOnlyNumbers, splitByEmptySpace, validateInputLength } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SegmentDimmer } from '@/components/SegmentDimmer'
 import { SortableTable } from '@/components/SortableTable'
@@ -14,24 +14,24 @@ import { findStudents, getStudent } from '@/redux/students'
 import { makeFormatStudentRows } from '@/selectors/students'
 
 const StudentSearch = ({
-  getStudent,
   clearTimeout: customClearTimeout,
-  setTimeout: customSetTimeout,
-  students,
-  studentNumber,
   findStudents,
-  showNames,
+  getStudent,
   pending,
+  setTimeout: customSetTimeout,
+  showNames,
+  studentNumber,
+  students,
 }) => {
   const { getTextIn } = useLanguage()
   const [loading, setLoading] = useState(false)
   const [showResults, setShowResults] = useState(false)
-  const [searchStr, setSearchStr] = useState('')
+  const [searchString, setSearchString] = useState('')
   const location = useLocation()
   const resetComponent = () => {
     setLoading(false)
     setShowResults(false)
-    setSearchStr('')
+    setSearchString('')
   }
 
   useEffect(() => {
@@ -45,16 +45,15 @@ const StudentSearch = ({
     }
   }, [])
 
-  const fetchStudentList = searchStr => {
+  const fetchStudentList = searchString => {
     if (
-      !splitByEmptySpace(searchStr.trim())
+      !splitByEmptySpace(searchString.trim())
         .slice(0, 2)
         .find(t => validateInputLength(t, 4)) ||
-      (Number(searchStr) && searchStr.trim().length < 6)
+      (Number(searchString) && searchString.trim().length < 6)
     ) {
       return
     }
-
     customSetTimeout(
       'fetch',
       () => {
@@ -62,7 +61,7 @@ const StudentSearch = ({
       },
       250
     )
-    findStudents(searchStr.trim()).then(() => {
+    findStudents(searchString.trim()).then(() => {
       customClearTimeout('fetch')
       setLoading(false)
       setShowResults(true)
@@ -71,7 +70,7 @@ const StudentSearch = ({
 
   const handleSearchChange = (_event, { value }) => {
     customClearTimeout('search')
-    setSearchStr(value)
+    setSearchString(value)
     if (value.length > 0) {
       customSetTimeout(
         'search',
@@ -85,9 +84,9 @@ const StudentSearch = ({
     }
   }
 
-  const getStudyrights = s => {
-    if (s.studyrights) {
-      const elements = s.studyrights
+  const getStudyrights = student => {
+    if (student.studyrights) {
+      const elements = student.studyrights
         .filter(studyright => studyright.active && !studyright.graduated)
         .reduce(
           (res, studyright) => [
@@ -104,10 +103,9 @@ const StudentSearch = ({
 
   const renderSearchResults = () => {
     if (!showResults || pending) {
-      // so that the loading spinner doesn't go on top of the search box
       return <div style={{ margin: 100 }} />
     }
-    // let studentsSorted = students
+
     if (students.length <= 0) {
       return <div>No search results or search term is not accurate enough</div>
     }
@@ -133,7 +131,6 @@ const StudentSearch = ({
       if (aDate && !bDate) {
         return -1
       }
-
       return 0
     })
 
@@ -141,19 +138,19 @@ const StudentSearch = ({
       {
         key: 'studentnumber',
         title: 'Student number',
-        getRowVal: s => s.studentNumber,
-        getRowContent: s => (
+        getRowVal: student => student.studentNumber,
+        getRowContent: student => (
           <Link
             style={{
               color: 'black',
               display: 'inline-block',
-              width: '100%',
               height: '100%',
               padding: '.78571429em .78571429em',
+              width: '100%',
             }}
-            to={`/students/${s.studentNumber}`}
+            to={`/students/${student.studentNumber}`}
           >
-            {s.studentNumber}
+            {student.studentNumber}
           </Link>
         ),
         cellProps: {
@@ -165,19 +162,20 @@ const StudentSearch = ({
       {
         key: 'started',
         title: 'Started',
-        getRowVal: s => (s.started === 'Unavailable' ? -Infinity : moment(s.started, 'DD.MM.YYYY').unix()),
-        getRowContent: s => (
+        getRowVal: student =>
+          student.started === 'Unavailable' ? -Infinity : moment(student.started, 'DD.MM.YYYY').unix(),
+        getRowContent: student => (
           <Link
             style={{
               color: 'black',
               display: 'inline-block',
-              width: '100%',
               height: '100%',
               padding: '.78571429em .78571429em',
+              width: '100%',
             }}
-            to={`/students/${s.studentNumber}`}
+            to={`/students/${student.studentNumber}`}
           >
-            {s.started}
+            {student.started}
           </Link>
         ),
         cellProps: {
@@ -189,19 +187,19 @@ const StudentSearch = ({
       {
         key: 'credits',
         title: 'Credits',
-        getRowVal: s => s.credits,
-        getRowContent: s => (
+        getRowVal: student => student.credits,
+        getRowContent: student => (
           <Link
             style={{
               color: 'black',
               display: 'inline-block',
-              width: '100%',
               height: '100%',
               padding: '.78571429em .78571429em',
+              width: '100%',
             }}
-            to={`/students/${s.studentNumber}`}
+            to={`/students/${student.studentNumber}`}
           >
-            {s.credits}
+            {student.credits}
           </Link>
         ),
         cellProps: {
@@ -212,9 +210,9 @@ const StudentSearch = ({
       },
       {
         key: 'studyrights',
-        title: 'Active Studyrights',
-        getRowVal: s => getStudyrights(s),
-        getRowContent: s => getStudyrights(s),
+        title: 'Active studyrights',
+        getRowVal: student => getStudyrights(student),
+        getRowContent: student => getStudyrights(student),
         cellProps: {
           style: {
             padding: '2',
@@ -228,19 +226,19 @@ const StudentSearch = ({
         {
           key: 'lastname',
           title: 'Last names',
-          getRowVal: s => s.lastname,
-          getRowContent: s => (
+          getRowVal: student => student.lastname,
+          getRowContent: student => (
             <Link
               style={{
                 color: 'black',
                 display: 'inline-block',
-                width: '100%',
                 height: '100%',
                 padding: '.78571429em .78571429em',
+                width: '100%',
               }}
-              to={`/students/${s.studentNumber}`}
+              to={`/students/${student.studentNumber}`}
             >
-              {s.lastname}
+              {student.lastname}
             </Link>
           ),
           cellProps: {
@@ -252,19 +250,19 @@ const StudentSearch = ({
         {
           key: 'firstnames',
           title: 'Given names',
-          getRowVal: s => s.firstnames,
-          getRowContent: s => (
+          getRowVal: student => student.firstnames,
+          getRowContent: student => (
             <Link
               style={{
                 color: 'black',
                 display: 'inline-block',
-                width: '100%',
                 height: '100%',
                 padding: '.78571429em .78571429em',
+                width: '100%',
               }}
-              to={`/students/${s.studentNumber}`}
+              to={`/students/${student.studentNumber}`}
             >
-              {s.firstnames}
+              {student.firstnames}
             </Link>
           ),
           cellProps: {
@@ -274,9 +272,9 @@ const StudentSearch = ({
           },
         },
       ]
-
       columns.splice(0, 0, ...nameColumns)
     }
+
     return <SortableTable columns={columns} data={studentsSorted.slice(0, 200)} hideHeaderBar />
   }
 
@@ -293,7 +291,7 @@ const StudentSearch = ({
           onSearchChange={handleSearchChange}
           placeholder="Search with a student number or name (surname firstname)"
           showNoResults={false}
-          value={searchStr}
+          value={searchString}
         />
       </Container>
       <Segment basic>
@@ -303,16 +301,18 @@ const StudentSearch = ({
     </>
   )
 }
+
 StudentSearch.propTypes = {
+  clearTimeout: func.isRequired,
   findStudents: func.isRequired,
   getStudent: func.isRequired,
+  pending: bool.isRequired,
+  setTimeout: func.isRequired,
+  showNames: bool.isRequired,
   studentNumber: string,
   students: arrayOf(object).isRequired,
-  setTimeout: func.isRequired,
-  clearTimeout: func.isRequired,
-  showNames: bool.isRequired,
-  pending: bool.isRequired,
 }
+
 StudentSearch.defaultProps = {
   studentNumber: undefined,
 }
@@ -320,14 +320,14 @@ StudentSearch.defaultProps = {
 const formatStudentRows = makeFormatStudentRows()
 
 const mapStateToProps = ({ students, settings }) => ({
-  students: formatStudentRows(students),
-  showNames: settings.namesVisible,
   selected: students.selected,
+  showNames: settings.namesVisible,
+  students: formatStudentRows(students),
   pending: students.pending,
 })
 
 const mapDispatchToProps = dispatch => ({
-  findStudents: searchStr => dispatch(findStudents(searchStr)),
+  findStudents: searchString => dispatch(findStudents(searchString)),
   getStudent: studentNumber => dispatch(getStudent(studentNumber)),
 })
 
