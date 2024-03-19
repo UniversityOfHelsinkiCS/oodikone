@@ -26,8 +26,12 @@ const tableColumnNames = {
 }
 
 const visibleCoursesFilter = ({ course }, mandatoryCourses) =>
-  mandatoryCourses.defaultProgrammeCourses?.some(c => c.code === course.code && c.visible.visibility) ||
-  mandatoryCourses.secondProgrammeCourses?.some(c => c.code === course.code && c.visible.visibility)
+  mandatoryCourses.defaultProgrammeCourses?.some(
+    programmeCourse => programmeCourse.code === course.code && programmeCourse.visible.visibility
+  ) ||
+  mandatoryCourses.secondProgrammeCourses?.some(
+    programmeCourse => programmeCourse.code === course.code && programmeCourse.visible.visibility
+  )
 
 const PopulationCourseStats = ({ filteredStudents, mandatoryCourses, courses, pending, onlyIamRights }) => {
   const dispatch = useDispatch()
@@ -41,20 +45,20 @@ const PopulationCourseStats = ({ filteredStudents, mandatoryCourses, courses, pe
     const filteredCourses =
       coursestatistics && mandatoryCourses
         ? coursestatistics
-            .filter(c => visibleCoursesFilter(c, mandatoryCourses))
+            .filter(course => visibleCoursesFilter(course, mandatoryCourses))
             // it needs to be with flatMap and filter and not map and find
             // because there can be many mandatoryCourses with the same course code
             // as they can belong to many categories
-            .flatMap(c => {
+            .flatMap(course => {
               const defaultProgrammeCourses = mandatoryCourses.defaultProgrammeCourses.filter(
-                mc => mc.code === c.course.code
+                mandatoryCourse => mandatoryCourse.code === course.course.code
               )
               const secondProgrammeCourses = mandatoryCourses.secondProgrammeCourses.filter(
-                mc => mc.code === c.course.code
+                mandatoryCourse => mandatoryCourse.code === course.course.code
               )
               return [
-                ...defaultProgrammeCourses.map(course => ({ ...c, ...course })),
-                ...secondProgrammeCourses.map(course => ({ ...c, ...course })),
+                ...defaultProgrammeCourses.map(programmeCourse => ({ ...course, ...programmeCourse })),
+                ...secondProgrammeCourses.map(programmeCourse => ({ ...course, ...programmeCourse })),
               ]
             })
         : []

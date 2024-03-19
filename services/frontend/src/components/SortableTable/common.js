@@ -56,9 +56,9 @@ export const getColumnValue = (ctx, column, exportMode = false) => {
 
 export const getColumnTitle = column => {
   return [...(column.parents ?? []), column]
-    .filter(c => c.textTitle !== null || (c.textTitle ?? c.title))
-    .map(c => c.textTitle ?? c.title)
-    .filter(c => typeof c === 'string')
+    .filter(col => col.textTitle !== null || (col.textTitle ?? col.title))
+    .map(col => col.textTitle ?? col.title)
+    .filter(col => typeof col === 'string')
     .join(' - ')
 }
 

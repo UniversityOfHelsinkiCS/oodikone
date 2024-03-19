@@ -120,7 +120,7 @@ export const CompletedCoursesSearch = ({ setValues }) => {
     const courseList = courseInput
       .split(/[\s,]+/)
       .map(code => code.trim().toUpperCase())
-      .filter(c => c !== '')
+      .filter(code => code !== '')
     const studentList = studentInput
       .split(/[;\s,]+/)
       .map(code => code.trim())

@@ -26,24 +26,28 @@ export const DataExport = ({ students, programmeCode }) => {
     const mandatoryCodes = mandatoryCourses?.defaultProgrammeCourses
       ? mandatoryCourses?.defaultProgrammeCourses
           .filter(course => course.visible && course.visible.visibility)
-          .map(c => c.code)
+          .map(course => course.code)
       : []
     const mandatoryCodesSecondProgramme = mandatoryCourses?.secondProgrammeCourses
       ? mandatoryCourses.secondProgrammeCourses
           .filter(course => course.visible && course.visible.visibility)
-          .map(c => c.code)
+          .map(course => course.code)
       : []
     let mandatoryPassedCourses = {}
     if (courses) {
       mandatoryPassedCourses = {
         ...mandatoryCodes.reduce((obj, code) => {
-          const foundCourse = courses.find(c => c.course.code === code)
-          obj[code] = foundCourse ? Object.keys(courses.find(c => c.course.code === code).students.passed) : null
+          const foundCourse = courses.find(course => course.course.code === code)
+          obj[code] = foundCourse
+            ? Object.keys(courses.find(course => course.course.code === code).students.passed)
+            : null
           return obj
         }, {}),
         ...mandatoryCodesSecondProgramme.reduce((obj, code) => {
-          const foundCourse = courses.find(c => c.course.code === code)
-          obj[code] = foundCourse ? Object.keys(courses.find(c => c.course.code === code).students.passed) : null
+          const foundCourse = courses.find(course => course.course.code === code)
+          obj[code] = foundCourse
+            ? Object.keys(courses.find(course => course.course.code === code).students.passed)
+            : null
           return obj
         }, {}),
       }
@@ -208,7 +212,7 @@ export const DataExport = ({ students, programmeCode }) => {
         'hops credits': s.hopsCredits,
         'credits since start': getStudentTotalCredits({
           ...s,
-          courses: s.courses.filter(c => new Date(c.date) >= studentToProgrammeStartMap[s.studentNumber]),
+          courses: s.courses.filter(course => new Date(course.date) >= studentToProgrammeStartMap[s.studentNumber]),
         }),
         'phone number': s.phoneNumber,
         email: s.email,

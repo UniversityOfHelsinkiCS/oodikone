@@ -169,11 +169,11 @@ export const GeneralTab = ({
   }
 
   const getGradeAndDate = s => {
-    const courses = s.courses.filter(c => coursecode.includes(c.course_code))
+    const courses = s.courses.filter(course => coursecode.includes(course.course_code))
     const highestGrade = getHighestGradeOfCourseBetweenRange(courses, from, to)
     if (!highestGrade) return { grade: '-', date: '', language: '' }
     const { date, language } = courses
-      .filter(c => c.grade === highestGrade.grade)
+      .filter(course => course.grade === highestGrade.grade)
       .sort((a, b) => new Date(b.date) - new Date(a.date))[0]
     return {
       grade: highestGrade.grade,
@@ -186,7 +186,7 @@ export const GeneralTab = ({
     if (group?.tags?.year) {
       return getStudentTotalCredits({
         ...s,
-        courses: s.courses.filter(c => new Date(c.date) > new Date(group?.tags?.year, 7, 1)),
+        courses: s.courses.filter(course => new Date(course.date) > new Date(group?.tags?.year, 7, 1)),
       })
     }
     const sinceDate = creditDateFilterOptions?.startDate || new Date(1970, 0, 1)
@@ -194,7 +194,7 @@ export const GeneralTab = ({
 
     const credits = getStudentTotalCredits({
       ...s,
-      courses: s.courses.filter(c => new Date(c.date) >= sinceDate && new Date(c.date) <= untilDate),
+      courses: s.courses.filter(course => new Date(course.date) >= sinceDate && new Date(course.date) <= untilDate),
     })
     return credits
   }
@@ -339,12 +339,11 @@ export const GeneralTab = ({
       getRowVal: s => {
         const credits = getStudentTotalCredits({
           ...s,
-          courses: s.courses.filter(c => new Date(c.date) >= studentToProgrammeStartMap[s.studentNumber]),
+          courses: s.courses.filter(course => new Date(course.date) >= studentToProgrammeStartMap[s.studentNumber]),
         })
         return credits
       },
     }),
-
     since: sole => ({
       // If a year is associated and no filters exist, this will act differently
       key: 'credits-since',
@@ -524,8 +523,8 @@ export const GeneralTab = ({
         const { included_courses: coursesInStudyPlan } = studyPlan
 
         const dates = s.courses
-          .filter(c => coursesInStudyPlan.includes(c.course_code) && c.passed === true)
-          .map(c => c.date)
+          .filter(course => coursesInStudyPlan.includes(course.course_code) && course.passed === true)
+          .map(course => course.date)
         if (!dates.length) return ''
         const latestDate = dates.sort((a, b) => new Date(b) - new Date(a))[0]
         return reformatDate(latestDate, 'YYYY-MM-DD')

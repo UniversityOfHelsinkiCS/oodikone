@@ -53,8 +53,8 @@ const updateCourseStatisticsCriteria = (courseStats, state, getTextIn, studentAm
     courseStats &&
     courseStats
       .filter(studentAmountFilter)
-      .filter(c => !codeFilter || courseCodeFilter(c))
-      .filter(c => !nameFilter || courseNameFilter(c))
+      .filter(course => !codeFilter || courseCodeFilter(course))
+      .filter(course => !nameFilter || courseNameFilter(course))
 
   const lodashSortOrder = reversed ? lodashSortOrderTypes.DESC : lodashSortOrderTypes.ASC
 

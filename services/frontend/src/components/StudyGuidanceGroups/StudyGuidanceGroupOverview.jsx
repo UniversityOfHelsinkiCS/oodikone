@@ -79,31 +79,29 @@ const EditTagModal = ({ group, tagName, toggleEdit, selectFieldItems, open }) =>
 
   return (
     <Modal onClose={toggleEdit} open={open}>
-      <>
-        <Modal.Header>{getTextIn(group.name)}</Modal.Header>
-        <Modal.Content>
-          <AssociateTagForm
-            formErrors={formErrors}
-            formValues={formValues}
-            group={group}
-            handleChange={handleChange}
-            selectFieldItems={selectFieldItems}
-            tagName={tagName}
-          />
-        </Modal.Content>
-        <Modal.Actions>
-          <Button content="Cancel" icon="trash" labelPosition="right" negative onClick={toggleEdit} />
-          <Button
-            content="Save"
-            disabled={isLoading}
-            icon="checkmark"
-            labelPosition="right"
-            onClick={handleSubmit}
-            positive
-            type="submit"
-          />
-        </Modal.Actions>
-      </>
+      <Modal.Header>{getTextIn(group.name)}</Modal.Header>
+      <Modal.Content>
+        <AssociateTagForm
+          formErrors={formErrors}
+          formValues={formValues}
+          group={group}
+          handleChange={handleChange}
+          selectFieldItems={selectFieldItems}
+          tagName={tagName}
+        />
+      </Modal.Content>
+      <Modal.Actions>
+        <Button content="Cancel" icon="trash" labelPosition="right" negative onClick={toggleEdit} />
+        <Button
+          content="Save"
+          disabled={isLoading}
+          icon="checkmark"
+          labelPosition="right"
+          onClick={handleSubmit}
+          positive
+          type="submit"
+        />
+      </Modal.Actions>
     </Modal>
   )
 }

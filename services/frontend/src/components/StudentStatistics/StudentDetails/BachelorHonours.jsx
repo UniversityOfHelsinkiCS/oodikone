@@ -55,7 +55,7 @@ export const BachelorHonours = ({ student, absentYears, programmeCode }) => {
     setModules(honoursModules)
     setOther(
       student.courses.filter(
-        c => !honoursModulesCodes.includes(c.course_code) && mandatoryModuleCodes.includes(c.course_code)
+        course => !honoursModulesCodes.includes(course.course_code) && mandatoryModuleCodes.includes(course.course_code)
       )
     )
 

@@ -185,7 +185,7 @@ export const CoursePopulation = () => {
   const studyRightPredicate = (student, studyrightElement) => {
     const date = _.chain(student)
       .get('courses')
-      .filter(c => codes.includes(c.course_code))
+      .filter(course => codes.includes(course.course_code))
       .map('date')
       .max()
       .value()

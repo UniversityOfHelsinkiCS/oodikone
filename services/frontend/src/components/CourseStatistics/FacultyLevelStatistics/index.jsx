@@ -92,7 +92,9 @@ export const FacultyLevelStatistics = () => {
     language: activeLanguage,
   }))
 
-  const yearcodes = uniq(flatten(Object.values(courseStats).map(c => Object.keys(c[openOrRegular].facultyStats))))
+  const yearcodes = uniq(
+    flatten(Object.values(courseStats).map(course => Object.keys(course[openOrRegular].facultyStats)))
+  )
     .sort()
     .reverse()
 

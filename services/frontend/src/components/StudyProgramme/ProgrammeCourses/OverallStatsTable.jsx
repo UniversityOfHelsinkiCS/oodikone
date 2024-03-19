@@ -281,9 +281,9 @@ export const OverallStatsTable = ({ studyProgramme, combinedProgramme, academicY
 
   const filterDataByYear = (data, fromYear, toYear) => {
     const yearRange = range(fromYear, Number(toYear) + 1)
-    const filteredAndmergedCourses = data
-      .filter(c => {
-        const arr = Object.keys(c.years).some(key => yearRange.includes(Number(key)))
+    const filteredAndMergedCourses = data
+      .filter(course => {
+        const arr = Object.keys(course.years).some(key => yearRange.includes(Number(key)))
         return arr
       })
       .map(course => {
@@ -329,7 +329,7 @@ export const OverallStatsTable = ({ studyProgramme, combinedProgramme, academicY
         }
       })
 
-    return filteredAndmergedCourses
+    return filteredAndMergedCourses
   }
 
   return (

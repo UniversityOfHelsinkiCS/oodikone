@@ -50,13 +50,13 @@ export const getQueryInfo = createSelector([getCourseStats], stats => {
   const courseStats = Object.values(stats)
   const semesters = {}
   const courses = []
-  courseStats.forEach(c => {
+  courseStats.forEach(course => {
     courses.push({
-      code: c.coursecode,
-      name: c.name,
-      alternatives: c.alternatives,
+      code: course.coursecode,
+      name: course.name,
+      alternatives: course.alternatives,
     })
-    c.statistics.forEach(({ name, code }) => {
+    course.statistics.forEach(({ name, code }) => {
       semesters[code] = { name, code }
     })
   })

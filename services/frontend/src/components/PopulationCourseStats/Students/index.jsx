@@ -18,9 +18,8 @@ export const Students = ({ filteredStudents }) => {
 
   const hasCompleted = useCallback(
     (courseCode, student) => {
-      const course = courseStatistics.find(c => c.course.code === courseCode)
+      const course = courseStatistics.find(course => course.course.code === courseCode)
       if (!course) return false
-
       return Boolean(course.students.passed[student])
     },
     [courseStatistics]
@@ -34,7 +33,6 @@ export const Students = ({ filteredStudents }) => {
           completed++
         }
       })
-
       return completed
     },
     [hasCompleted]

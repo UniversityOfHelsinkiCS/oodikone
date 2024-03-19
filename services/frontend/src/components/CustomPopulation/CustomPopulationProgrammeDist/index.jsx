@@ -58,8 +58,8 @@ export const findCorrectProgramme = (student, coursecodes, semesters, startDate,
   if (courseAttainment) {
     studyrightIdOfCourse = courseAttainment?.studyright_id
     if (!studyrightIdOfCourse) {
-      const studyplanStudyrightId = student.studyplans.find(sp =>
-        sp.included_courses.some(c => coursecodes.includes(c))
+      const studyplanStudyrightId = student.studyplans.find(studyplan =>
+        studyplan.included_courses.some(course => coursecodes.includes(course))
       )?.studyrightid
       if (studyplanStudyrightId) {
         studyrightIdOfCourse = student.studyrights.find(

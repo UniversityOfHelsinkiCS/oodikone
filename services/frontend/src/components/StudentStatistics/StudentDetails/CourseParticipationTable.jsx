@@ -22,15 +22,15 @@ export const CourseParticipationTable = ({ student, clearCourseStats, studyright
   const studyRight = student.studyrights.find(s => s.studyrightid === studyrightid)
   const plan = resolveStudyPlan(student.studyplans, studyRight)
 
-  student.courses.sort(byDateDesc).forEach(c => {
-    const { date, grade, credits, isOpenCourse, course, isStudyModuleCredit, passed, credittypecode } = c
+  student.courses.sort(byDateDesc).forEach(studentCourse => {
+    const { course, credits, credittypecode, date, grade, isOpenCourse, isStudyModuleCredit, passed } = studentCourse
     const isIncluded = isInStudyPlan(plan, course.code)
 
     let icon = null
 
     if (isStudyModuleCredit) {
       icon = <Icon color="purple" name="certificate" />
-    } else if (c.credittypecode === 9) {
+    } else if (credittypecode === 9) {
       icon = <Icon color="green" name="clipboard check" title="Credit transfer" />
     } else if (passed) {
       icon = <Icon color="green" name="check" />

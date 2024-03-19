@@ -15,7 +15,7 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
   // 4=completed, 7=improved, 9=transferred, 10=failed
 
   const getCompletion = (student, courseCode, { icon }) => {
-    const completion = student.credits.find(c => c.courseCode === courseCode && isPassed(c.creditType))
+    const completion = student.credits.find(credit => credit.courseCode === courseCode && isPassed(credit.creditType))
     const enrollment = student.enrollments[courseCode]
     if (completion === undefined) {
       if (!enrollment) {
@@ -36,7 +36,7 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
     return icon ? <Icon color="green" fitted name="check" /> : `Passed${substitutionString}`
   }
 
-  const getTotalPassed = s => s.credits.filter(c => isPassed(c.creditType)).length
+  const getTotalPassed = s => s.credits.filter(credit => isPassed(credit.creditType)).length
 
   const getTotalUnfinished = student => Object.values(student.enrollments).length
 

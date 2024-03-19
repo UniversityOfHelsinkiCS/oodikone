@@ -59,12 +59,14 @@ export const CurriculumPicker = ({ setCurriculum, programmeCodes, disabled, year
       className="link item"
       data-cy="curriculum-picker"
       disabled={disabled}
-      onChange={(_, { value }) => setSelectedCurriculum(curriculums.find(c => c.dataValues.id === value))}
+      onChange={(_, { value }) =>
+        setSelectedCurriculum(curriculums.find(curriculum => curriculum.dataValues.id === value))
+      }
       options={sortBy(
-        curriculums.map(cur => ({
-          key: sortBy(cur.curriculum_period_ids).join(', '),
-          value: cur.dataValues.id,
-          text: formatCurriculumOptions(cur),
+        curriculums.map(curriculum => ({
+          key: sortBy(curriculum.curriculum_period_ids).join(', '),
+          value: curriculum.dataValues.id,
+          text: formatCurriculumOptions(curriculum),
         })),
         'key'
       )}

@@ -24,14 +24,14 @@ const resolveGraphStartDate = (student, graphYearStart, selectedStudyRight, stud
   const studyRightElement = selectedStudyRight.studyright_elements
     .filter(element => element.element_detail.type === 20)
     .sort((a, b) => new Date(b.startdate) - new Date(a.startdate))[0]
-  const studyPlan = student.studyplans.find(p => p.programme_code === studyRightElement.code)
+  const studyPlan = student.studyplans.find(plan => plan.programme_code === studyRightElement.code)
   const filteredCourses = studyPlan
     ? // eslint-disable-next-line camelcase
       student.courses.filter(({ course_code }) => studyPlan.included_courses.includes(course_code))
     : []
 
   return Math.min(
-    ...flattenDeep(filteredCourses.map(c => c.date)).map(d => new Date(d).getTime()),
+    ...flattenDeep(filteredCourses.map(course => course.date)).map(date => new Date(date).getTime()),
     new Date(studyRightTargetStart).getTime()
   )
 }
@@ -55,7 +55,7 @@ const resolveGraphEndDate = (dates, selectedStudyRight, student, studyRightTarge
 
 const CreditsGraph = ({ graphYearStart, student, absences, studyRightId }) => {
   const selectedStudyRight = student.studyrights.find(({ studyrightid }) => studyrightid === studyRightId)
-  const dates = flattenDeep(student.courses.map(c => c.date)).map(d => new Date(d).getTime())
+  const dates = flattenDeep(student.courses.map(course => course.date)).map(date => new Date(date).getTime())
   const [studyRightTargetStart, studyRightTargetEnd] = getStudyRightElementTargetDates(selectedStudyRight, absences)
   const selectedStart = new Date(
     resolveGraphStartDate(student, graphYearStart, selectedStudyRight, studyRightTargetStart)
@@ -86,7 +86,9 @@ const semesterChunkify = (courses, semesterenrollments, semesters, getTextIn) =>
   const semesterChunks = semesterenrollments.reduce((acc, curr) => {
     const currSemester = semesters.semesters[curr.semestercode]
     const filteredcourses = courses.filter(
-      c => new Date(currSemester.startdate) < new Date(c.date) && new Date(c.date) < new Date(currSemester.enddate)
+      course =>
+        new Date(currSemester.startdate) < new Date(course.date) &&
+        new Date(course.date) < new Date(currSemester.enddate)
     )
     const grades = { data: filteredcourses, semester: currSemester, numOfCourses: filteredcourses.length }
     acc.push(grades)
@@ -109,7 +111,9 @@ const semesterChunkify = (courses, semesterenrollments, semesters, getTextIn) =>
 // probably needs some fixing to be done
 const gradeMeanSeries = (student, chunksize, semesters, getTextIn) => {
   const sortedCourses = student.courses.sort(byDateDesc).reverse()
-  const filterCourses = sortedCourses.filter(c => Number(c.grade) && !c.isStudyModuleCredit && c.passed)
+  const filterCourses = sortedCourses.filter(
+    course => Number(course.grade) && !course.isStudyModuleCredit && course.passed
+  )
   const data = filterCourses.reduce(
     (acc, curr) => {
       acc.grades.push({ grade: Number(curr.grade), date: curr.date, code: curr.course_code })

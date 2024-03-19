@@ -84,7 +84,7 @@ export const resolveDisplayColumn = column => {
     if (column.mergeHeader === true) {
       ;[displayColumn] = column.children
     } else if (typeof column.mergeHeader === 'string') {
-      displayColumn = column.children.find(c => c.key === column.mergeHeader)
+      displayColumn = column.children.find(child => child.key === column.mergeHeader)
     }
   }
 
@@ -205,7 +205,7 @@ const Row = ({ data, isGroup, parents }) => {
         </td>
       )
     } else if (column.children && column.children.length > 0) {
-      stack.splice(0, 0, ...column.children.map((c, i) => ({ ...c, childIndex: i })))
+      stack.splice(0, 0, ...column.children.map((child, index) => ({ ...child, childIndex: index })))
     } else {
       cells.push(<td key={`${column.key}-else-${cellProps.title}`} {...cellProps} />)
     }

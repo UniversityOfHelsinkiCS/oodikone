@@ -9,7 +9,7 @@ export const StatisticsTable = ({ filteredStudents, type }) => {
   const credits = filteredStudents.map(student => getStudentTotalCredits(student))
   const formatNumber = (x, decimals) => (Number.isNaN(x) || !x ? 0 : x).toFixed(decimals)
   const mean = _.mean(credits)
-  const stdev = Math.sqrt(_.sum(_.map(credits, c => (c - mean) * (c - mean))) / credits.length)
+  const stdev = Math.sqrt(_.sum(_.map(credits, credit => (credit - mean) * (credit - mean))) / credits.length)
 
   return (
     <div className="statistics-table">

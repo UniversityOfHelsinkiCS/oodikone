@@ -44,11 +44,11 @@ export const DegreeCourseTableView = ({
 
   const setModuleVisibility = (code, newVisibility) => {
     // Same course can be in many modules, so change them all
-    const courseCodes = modules.find(({ module }) => module === code).courses.map(c => c.code)
+    const courseCodes = modules.find(({ module }) => module === code).courses.map(course => course.code)
     setModules(
-      modules.map(mod => ({
-        ...mod,
-        courses: mod.courses.map(course => {
+      modules.map(module => ({
+        ...module,
+        courses: module.courses.map(course => {
           if (courseCodes.includes(course.code)) {
             return {
               ...course,
@@ -89,7 +89,7 @@ export const DegreeCourseTableView = ({
     const excludeFromProgramme = combinedProgramme === '' ? studyProgramme : combinedProgramme
     setExclusion({
       programmeCode: excludeFromProgramme,
-      courseCodes: module.courses.filter(c => c.visible.visibility).map(c => c.code),
+      courseCodes: module.courses.filter(course => course.visible.visibility).map(course => course.code),
       curriculumVersion: curriculum.version,
     })
     setModuleVisibility(code, false)
@@ -99,7 +99,7 @@ export const DegreeCourseTableView = ({
     const module = modules.find(({ module }) => module === code)
     removeExclusion({
       programmeCode: studyProgramme,
-      courseCodes: module.courses.map(c => c.code),
+      courseCodes: module.courses.map(course => course.code),
       curriculumVersion: version,
     })
     setModuleVisibility(code, true)

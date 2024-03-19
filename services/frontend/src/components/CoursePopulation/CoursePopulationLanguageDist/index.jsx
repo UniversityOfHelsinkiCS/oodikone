@@ -10,7 +10,7 @@ export const CoursePopulationLanguageDist = ({ samples, codes, from, to }) => {
 
   if (samples) {
     samples.forEach(student => {
-      const courses = student.courses.filter(c => codes.includes(c.course_code))
+      const courses = student.courses.filter(course => codes.includes(course.course_code))
       const filteredCourses = courses
         .filter(course => moment(course.date).isBetween(moment(from), moment(to)))
         .sort((a, b) => (new Date(a.date) <= new Date(b.date) ? -1 : 1))

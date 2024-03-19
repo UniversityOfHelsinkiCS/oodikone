@@ -117,7 +117,7 @@ const sortCoursesByDate = courses =>
 const filterCoursesByStudyPlan = (plan, courses) =>
   !plan ? courses : courses.filter(({ course_code }) => plan.included_courses.includes(course_code))
 
-const filterCoursesByDate = (courses, date) => courses.filter(c => moment(c.date).isSameOrAfter(moment(date)))
+const filterCoursesByDate = (courses, date) => courses.filter(course => moment(course.date).isSameOrAfter(moment(date)))
 
 const filterCourses = (
   student,

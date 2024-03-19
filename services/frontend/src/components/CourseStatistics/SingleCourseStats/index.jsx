@@ -116,7 +116,7 @@ const SingleCourseStats = ({
   }, [location.search])
 
   useEffect(() => {
-    if (primary.every(c => !programmes.map(p => p.key).includes(c))) {
+    if (primary.every(course => !programmes.map(programme => programme.key).includes(course))) {
       setPrimary([ALL.value])
     }
   }, [programmes])

@@ -17,10 +17,10 @@ const getMandatoryPassed = (mandatoryCourses, populationCourses, studyGuidanceCo
   const mandatoryCodes = [
     ...mandatoryCourses.defaultProgrammeCourses
       .filter(course => course.visible && course.visible.visibility)
-      .map(c => c.code),
+      .map(course => course.code),
     ...mandatoryCourses.secondProgrammeCourses
       .filter(course => course.visible && course.visible.visibility)
-      .map(c => c.code),
+      .map(course => course.code),
   ]
 
   let mandatoryPassed = {}
@@ -28,9 +28,11 @@ const getMandatoryPassed = (mandatoryCourses, populationCourses, studyGuidanceCo
   if (popCourses?.coursestatistics) {
     const courseStats = popCourses.coursestatistics
     mandatoryPassed = mandatoryCodes.reduce((obj, code) => {
-      const foundCourse = !!courseStats.find(c => c.course.code === code)
+      const foundCourse = !!courseStats.find(course => course.course.code === code)
 
-      const passedArray = foundCourse ? Object.keys(courseStats.find(c => c.course.code === code).students.passed) : []
+      const passedArray = foundCourse
+        ? Object.keys(courseStats.find(course => course.course.code === code).students.passed)
+        : []
       obj[code] = passedArray
       return obj
     }, {})
@@ -144,7 +146,7 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
     const getTotalRowVal = (t, m) => t[m.code]
 
     const findBestGrade = (courses, code) => {
-      const course = populationCourses?.coursestatistics?.find(c => c.course.code === code)
+      const course = populationCourses?.coursestatistics?.find(course => course.course.code === code)
       if (!course) return null
       const { substitutions } = course.course
       const courseAttainments = courses.filter(

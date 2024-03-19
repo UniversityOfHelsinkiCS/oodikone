@@ -3,9 +3,9 @@ import { func, shape, string } from 'prop-types'
 import React from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Link } from 'react-router-dom'
-import { Divider, Table, Icon, Header, Item, Segment, Button, Popup } from 'semantic-ui-react'
+import { Button, Divider, Header, Icon, Item, Popup, Segment, Table } from 'semantic-ui-react'
 
-import { reformatDate, getTargetCreditsForProgramme, calculatePercentage } from '@/common'
+import { calculatePercentage, getTargetCreditsForProgramme, reformatDate } from '@/common'
 import { studentToolTips } from '@/common/InfoToolTips'
 import { HoverableHelpPopup } from '@/components/common/HoverableHelpPopup'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -58,7 +58,7 @@ export const StudyrightsTable = ({
 
   if (studyRightRows.length === 0) return null
 
-  const filterDuplicates = (elem1, index, array) => {
+  const filterDuplicates = (elem1, _index, array) => {
     for (let i = 0; i < array.length; i++) {
       const elem2 = array[i]
       if (
@@ -72,21 +72,21 @@ export const StudyrightsTable = ({
     return true
   }
 
-  const renderStatus = c => {
-    if (c.cancelled)
+  const renderStatus = studyright => {
+    if (studyright.cancelled)
       return (
         <div style={{ display: 'flex' }}>
           <p style={{ color: 'black', fontWeight: 'bolder' }}>CANCELLED</p>
         </div>
       )
-    if (c.graduated)
+    if (studyright.graduated)
       return (
         <div>
           <p style={{ color: 'green', fontWeight: 'bolder', marginBottom: 0 }}>GRADUATED</p>
-          <p style={{ color: 'grey', marginTop: 0 }}>{reformatDate(c.enddate, 'DD.MM.YYYY')}</p>
+          <p style={{ color: 'grey', marginTop: 0 }}>{reformatDate(studyright.enddate, 'DD.MM.YYYY')}</p>
         </div>
       )
-    if (c.active)
+    if (studyright.active)
       return (
         <div style={{ display: 'flex' }}>
           <p style={{ color: 'blue', fontWeight: 'bolder' }}>ACTIVE</p>
@@ -99,8 +99,10 @@ export const StudyrightsTable = ({
     )
   }
 
-  const getActualStartDate = c =>
-    new Date(c.startdate).getTime() > new Date(c.studystartdate).getTime() ? c.startdate : c.studystartdate
+  const getActualStartDate = studyright =>
+    new Date(studyright.startdate).getTime() > new Date(studyright.studystartdate).getTime()
+      ? studyright.startdate
+      : studyright.studystartdate
 
   // End dates of study rights are semi-open intervals, subtract 1 day to get acual end date
   const getAcualEndDate = (endDate, graduated) => {
@@ -109,13 +111,13 @@ export const StudyrightsTable = ({
     return new Date(new Date(endDate).setDate(new Date(endDate).getDate() - 1))
   }
 
-  const renderProgrammes = c =>
-    sortBy(c.elements.programmes.filter(filterDuplicates), 'startdate')
+  const renderProgrammes = studyright =>
+    sortBy(studyright.elements.programmes.filter(filterDuplicates), 'startdate')
       .reverse()
       .map(programme => (
         <p key={`${programme.name}-${programme.startdate}`}>
           {`${programme.name} (${reformatDate(getActualStartDate(programme), 'DD.MM.YYYY')} - ${reformatDate(
-            getAcualEndDate(programme.enddate, c.graduated),
+            getAcualEndDate(programme.enddate, studyright.graduated),
             'DD.MM.YYYY'
           )})`}
           {programmeCodes.includes(programme.code) && (
@@ -127,10 +129,10 @@ export const StudyrightsTable = ({
         </p>
       ))
 
-  const renderStudytracks = c => {
-    const studytracks = c.elements.studytracks.filter(filterDuplicates)
+  const renderStudytracks = studyright => {
+    const studytracks = studyright.elements.studytracks.filter(filterDuplicates)
 
-    return sortBy(c.elements.programmes.filter(filterDuplicates), 'startdate')
+    return sortBy(studyright.elements.programmes.filter(filterDuplicates), 'startdate')
       .reverse()
       .map(programme => {
         const studytrack = studytracks.find(studytrack => studytrack.startdate === programme.startdate)
@@ -138,7 +140,7 @@ export const StudyrightsTable = ({
         return studytrack ? (
           <p key={`${studytrack.name}-${studytrack.startdate}`}>
             {`${studytrack.name} (${reformatDate(studytrack.startdate, 'DD.MM.YYYY')} - ${reformatDate(
-              getAcualEndDate(studytrack.enddate, c.graduated),
+              getAcualEndDate(studytrack.enddate, studyright.graduated),
               'DD.MM.YYYY'
             )})`}
             <br />
@@ -151,16 +153,17 @@ export const StudyrightsTable = ({
       })
   }
 
-  const renderCompletionPercent = (c, student) => {
-    const programmeCodes = c.elements.programmes.filter(filterDuplicates).map(programme => programme.code)
+  const renderCompletionPercent = (studyright, student) => {
+    const programmeCodes = studyright.elements.programmes.filter(filterDuplicates).map(programme => programme.code)
     const studyplan = student.studyplans.find(
-      sp => programmeCodes.includes(sp.programme_code) && sp.studyrightid === c.studyrightid
+      studyplan =>
+        programmeCodes.includes(studyplan.programme_code) && studyplan.studyrightid === studyright.studyrightid
     )
     if (!studyplan) return <>-</>
 
     const { completed_credits: completedCredits } = studyplan
     const credits = completedCredits || 0
-    if (c.graduated) return `${credits} cr`
+    if (studyright.graduated) return `${credits} cr`
     const totalCredits = getTargetCreditsForProgramme(programmeCodes[0])
     const completedPercentage = calculatePercentage(credits, totalCredits, 0)
     return `${completedPercentage} (${credits} cr)`
@@ -190,50 +193,50 @@ export const StudyrightsTable = ({
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {sortBy(studyRightRows, c => Number(c.studyrightid))
-            .reverse()
-            .map(c => {
-              if (c.elements.programmes.length > 0) {
-                const rowIsFilterable = c.elements.programmes.some(p => p.isFilterable)
-                return (
-                  <Table.Row
-                    key={c.studyrightid}
-                    onClick={() => (rowIsFilterable ? handleStartDateChange(c.elements, c.studyrightid) : null)}
-                    style={{ cursor: rowIsFilterable ? 'pointer' : 'not-allowed' }}
-                  >
-                    <Table.Cell>
-                      <Popup
-                        content={
-                          rowIsFilterable
-                            ? 'Display credits included in the study plan of this study right'
-                            : 'This study right does not have a study plan'
-                        }
-                        size="mini"
-                        trigger={
-                          <div>
-                            <Button
-                              basic={c.studyrightid !== studyrightid}
-                              disabled={!rowIsFilterable}
-                              icon
-                              onClick={() => handleStartDateChange(c.elements, c.studyrightid)}
-                              primary={c.studyrightid === studyrightid}
-                              size="mini"
-                            >
-                              <Icon name="filter" />
-                            </Button>
-                          </div>
-                        }
-                      />
-                    </Table.Cell>
-                    <Table.Cell>{c.elements.programmes.length > 0 && renderProgrammes(c)}</Table.Cell>
-                    <Table.Cell>{renderStudytracks(c)}</Table.Cell>
-                    <Table.Cell>{renderStatus(c)}</Table.Cell>
-                    <Table.Cell>{renderCompletionPercent(c, student)}</Table.Cell>
-                  </Table.Row>
-                )
-              }
-              return null
-            })}
+          {studyRightRows.map(studyright => {
+            if (studyright.elements.programmes.length > 0) {
+              const rowIsFilterable = studyright.elements.programmes.some(p => p.isFilterable)
+              return (
+                <Table.Row
+                  key={studyright.studyrightid}
+                  onClick={() =>
+                    rowIsFilterable ? handleStartDateChange(studyright.elements, studyright.studyrightid) : null
+                  }
+                  style={{ cursor: rowIsFilterable ? 'pointer' : 'not-allowed' }}
+                >
+                  <Table.Cell>
+                    <Popup
+                      content={
+                        rowIsFilterable
+                          ? 'Display credits included in the study plan of this study right'
+                          : 'This study right does not have a study plan'
+                      }
+                      size="mini"
+                      trigger={
+                        <div>
+                          <Button
+                            basic={studyright.studyrightid !== studyrightid}
+                            disabled={!rowIsFilterable}
+                            icon
+                            onClick={() => handleStartDateChange(studyright.elements, studyright.studyrightid)}
+                            primary={studyright.studyrightid === studyrightid}
+                            size="mini"
+                          >
+                            <Icon name="filter" />
+                          </Button>
+                        </div>
+                      }
+                    />
+                  </Table.Cell>
+                  <Table.Cell>{studyright.elements.programmes.length > 0 && renderProgrammes(studyright)}</Table.Cell>
+                  <Table.Cell>{renderStudytracks(studyright)}</Table.Cell>
+                  <Table.Cell>{renderStatus(studyright)}</Table.Cell>
+                  <Table.Cell>{renderCompletionPercent(studyright, student)}</Table.Cell>
+                </Table.Row>
+              )
+            }
+            return null
+          })}
         </Table.Body>
       </Table>
     </Segment>

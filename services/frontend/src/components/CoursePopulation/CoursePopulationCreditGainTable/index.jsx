@@ -74,7 +74,7 @@ export const CoursePopulationCreditGainTable = ({
 
   let totalCredits = 0
   students.forEach(student => {
-    const courses = student.courses.filter(c => codes.includes(c.course_code))
+    const courses = student.courses.filter(course => codes.includes(course.course_code))
     const programme =
       findCorrectProgramme(student, codes, semesters, from, to) ??
       getNewestProgramme(

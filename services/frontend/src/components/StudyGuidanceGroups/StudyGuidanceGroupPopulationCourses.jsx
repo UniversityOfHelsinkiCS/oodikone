@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Segment, Form, Input } from 'semantic-ui-react'
+import { Form, Input, Segment } from 'semantic-ui-react'
 
 import { ConnectedPopulationCourseStats as PopulationCourseStats } from '@/components/PopulationCourseStats'
 import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'

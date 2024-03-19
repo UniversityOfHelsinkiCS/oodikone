@@ -12,7 +12,7 @@ export const CoursePopulationGradeDist = ({ singleCourseStats, students, courseC
     const grades = {}
 
     students.forEach(student => {
-      const courses = student.courses.filter(c => courseCodes.includes(c.course_code))
+      const courses = student.courses.filter(course => courseCodes.includes(course.course_code))
       const highestGrade = getHighestGradeOfCourseBetweenRange(courses, from, to)
       if (!highestGrade) {
         if (!grades['No grade']) {

@@ -25,8 +25,8 @@ const splitStudentCredits = (student, timeSlots, cumulative) => {
   const results = new Array(timeSlots.length).fill(0)
 
   _.chain(student.courses)
-    .filter(c => c.passed && !c.isStudyModuleCredit && moment(c.date).isAfter(timeSlots[0].start))
-    .orderBy(c => moment(c.date), ['asc'])
+    .filter(course => course.passed && !course.isStudyModuleCredit && moment(course.date).isAfter(timeSlots[0].start))
+    .orderBy(course => moment(course.date), ['asc'])
     .forEach(course => {
       while (timeSlotN < timeSlots.length && moment(course.date).isAfter(timeSlots[timeSlotN].end)) {
         timeSlotN++

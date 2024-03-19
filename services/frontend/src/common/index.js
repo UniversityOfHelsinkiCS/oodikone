@@ -68,15 +68,17 @@ export const getTimestamp = () => moment().format('YYYY-MM-DD')
 
 export const getStudentTotalCredits = (student, includeTransferredCredits = true) => {
   const passedCourses = includeTransferredCredits
-    ? student.courses.filter(c => c.passed && !c.isStudyModuleCredit)
-    : student.courses.filter(c => c.passed && !c.isStudyModuleCredit && c.credittypecode !== 9)
+    ? student.courses.filter(course => course.passed && !course.isStudyModuleCredit)
+    : student.courses.filter(course => course.passed && !course.isStudyModuleCredit && course.credittypecode !== 9)
   return Math.round(100 * passedCourses.reduce((a, b) => a + b.credits, 0)) / 100
 }
 
 const getGradedCourses = (student, includeTransferredCredits = true) =>
   includeTransferredCredits
-    ? student.courses.filter(c => Number(c.grade) && !c.isStudyModuleCredit)
-    : student.courses.filter(c => Number(c.grade) && !c.isStudyModuleCredit && c.credittypecode !== 9)
+    ? student.courses.filter(course => Number(course.grade) && !course.isStudyModuleCredit)
+    : student.courses.filter(
+        course => Number(course.grade) && !course.isStudyModuleCredit && course.credittypecode !== 9
+      )
 
 export const getStudentGradeMean = (student, includeTransferredCredits = true) => {
   const courses = getGradedCourses(student, includeTransferredCredits)
@@ -166,7 +168,7 @@ export const getStudentToTargetCourseDateMap = (students, codes) => {
   const codeSet = new Set(codes)
   return students.reduce((acc, student) => {
     const targetCourse = student.courses
-      .filter(c => codeSet.has(c.course_code))
+      .filter(course => codeSet.has(course.course_code))
       .sort((a, b) => new Date(b.date) - new Date(a.date))[0]
     acc[student.studentNumber] = targetCourse ? targetCourse.date : null
     return acc

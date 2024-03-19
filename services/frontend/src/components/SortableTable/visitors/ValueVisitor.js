@@ -9,7 +9,7 @@ export class ValueVisitor extends DataVisitor {
     this.columns = columns
     this.exportMode = options?.exportMode
     this.honourIgnoreFilters = options?.honourIgnoreFilters
-    this.values = _.fromPairs(_.map(columns, c => [c.key, new Set()]))
+    this.values = _.fromPairs(_.map(columns, column => [column.key, new Set()]))
   }
 
   visitRow(ctx) {

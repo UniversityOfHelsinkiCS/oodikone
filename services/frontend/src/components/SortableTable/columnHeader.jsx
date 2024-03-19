@@ -178,7 +178,7 @@ export const createHeaders = (columns, columnDepth, dispatch) => {
 
     if (column.children && !column.mergeHeader) {
       const childDepth = column.noHeader ? currentDepth : currentDepth + 1
-      const children = column.children.map(c => ({ ...c, depth: childDepth }))
+      const children = column.children.map(child => ({ ...child, depth: childDepth }))
       stack = [...children, ...stack]
     }
   }

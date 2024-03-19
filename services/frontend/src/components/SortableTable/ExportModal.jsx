@@ -23,7 +23,7 @@ const getExportColumns = columns => {
     }
 
     if (column.children && column.children.length > 0) {
-      stack.splice(0, 0, ...column.children.map(c => ({ ...c, parents: [...parents, column] })))
+      stack.splice(0, 0, ...column.children.map(child => ({ ...child, parents: [...parents, column] })))
       continue
     }
 
@@ -102,7 +102,7 @@ export const ExportModal = ({ open, onOpen, onClose, data, columns, featureName 
         <div>
           <Button
             disabled={selected.length === exportColumns.length}
-            onClick={() => setSelected(exportColumns.map(c => c.key))}
+            onClick={() => setSelected(exportColumns.map(column => column.key))}
           >
             Include all
           </Button>

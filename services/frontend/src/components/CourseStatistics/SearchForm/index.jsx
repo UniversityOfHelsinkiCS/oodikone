@@ -174,7 +174,7 @@ export const SearchForm = ({ onProgress }) => {
     clearSelectedCourses()
   }, [selectMultipleCoursesEnabled])
 
-  const courses = matchingCourses.filter(c => !selectedCourses[c.code])
+  const courses = matchingCourses.filter(course => !selectedCourses[course.code])
 
   const selected = Object.values(selectedCourses).map(course => ({ ...course, selected: true }))
   const noSelectedCourses = selected.length === 0
