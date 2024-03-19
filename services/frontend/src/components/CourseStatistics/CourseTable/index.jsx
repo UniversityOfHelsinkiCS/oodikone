@@ -65,7 +65,7 @@ CourseTable.defaultProps = {
   mandatory: false,
 }
 
-function areEqual(prevProps, nextProps) {
+const areEqual = (prevProps, nextProps) => {
   if (prevProps.courses.length !== nextProps.courses.length) {
     return false
   }
