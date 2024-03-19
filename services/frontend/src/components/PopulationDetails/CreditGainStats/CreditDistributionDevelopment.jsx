@@ -130,7 +130,7 @@ const getChartData = (students, timeSlots, order, programme, timeDivision, cumul
   return series
 }
 
-const tooltipFormatter = () => {
+function tooltipFormatter() {
   return `<div style="text-align: center; width: 100%"><b>${this.x}</b>, ${this.series.name}<br/>${this.y}/${
     this.total
   } students (${Math.round(this.percentage)}%)</div>`
