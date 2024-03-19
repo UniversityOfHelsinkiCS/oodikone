@@ -1,4 +1,3 @@
-/* eslint-disable react/no-children-prop */
 import React, { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Divider, Header, Loader } from 'semantic-ui-react'
@@ -27,11 +26,21 @@ export const Changelog = ({ showFullChangelog }) => {
     return dateFormatter.format(date)
   }
 
+  function getDescription(string) {
+    const lines = string.split('\n')
+    const internalIndex = lines.findIndex(line => line.toLowerCase().includes('internal'))
+    if (internalIndex === -1 || internalIndex === 0) {
+      return string
+    }
+    return lines.slice(0, internalIndex).join('\n')
+  }
+
   const getReleaseString = release => {
     const date = formatDate(release.time)
-    const { title } = release
-    const description = release.description.split('### Internal')[0]
-    const releaseString = showFullChangelog ? `## ${title}\n${date}\n\n${description}` : `#### ${title}\n${description}`
+    const description = getDescription(release.description)
+    const releaseString = showFullChangelog
+      ? `## ${release.title}\n${date}\n\n${description}`
+      : `#### ${release.title}\n${description}`
     return releaseString
   }
 
@@ -48,7 +57,7 @@ export const Changelog = ({ showFullChangelog }) => {
       {itemsToShow.map(release => (
         <div key={release.time}>
           <Divider section />
-          <ReactMarkdown children={getReleaseString(release)} />
+          <ReactMarkdown>{getReleaseString(release)}</ReactMarkdown>
         </div>
       ))}
     </div>
