@@ -1,14 +1,14 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Link, useHistory, useLocation } from 'react-router-dom'
-import { Segment, Header, Divider, Form, Button, Icon } from 'semantic-ui-react'
+import { Button, Divider, Form, Header, Icon, Segment } from 'semantic-ui-react'
 
 import { useProgress } from '@/common/hooks'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { hopsFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
-import { InfoBox } from '../Info/InfoBox'
-import { ProgressBar } from '../ProgressBar'
+import { InfoBox } from '@/components/Info/InfoBox'
+import { ProgressBar } from '@/components/ProgressBar'
 import { ConnectedPopulationSearchForm as PopulationSearchForm } from './PopulationSearchForm'
 import { ConnectedPopulationSearchHistory as PopulationSearchHistory } from './PopulationSearchHistory'
 

@@ -1,27 +1,27 @@
 import { sortBy, isEqual } from 'lodash'
 import moment from 'moment'
 import qs from 'query-string'
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Datetime from 'react-datetime'
 import { connect } from 'react-redux'
 import { useHistory, useLocation } from 'react-router-dom'
-import { Form, Button, Message, Icon, Grid, Radio } from 'semantic-ui-react'
+import { Button, Form, Grid, Icon, Message, Radio } from 'semantic-ui-react'
 
 import {
+  cancelablePromise,
+  isNewStudyProgramme,
   momentFromFormat,
   reformatDate,
   textAndDescriptionSearch,
-  cancelablePromise,
-  isNewStudyProgramme,
 } from '@/common'
 import { useSearchHistory } from '@/common/hooks'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { SearchHistory } from '@/components/SearchHistory'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { getProgrammes } from '@/redux/populationProgrammes'
 import { getPopulationStatistics, clearPopulations } from '@/redux/populations'
 import { clearSelected } from '@/redux/populationSelectedStudentCourses'
 import './populationSearch.css'
-import { SearchHistory } from '../SearchHistory'
 
 const YEAR_DATE_FORMAT = 'YYYY'
 

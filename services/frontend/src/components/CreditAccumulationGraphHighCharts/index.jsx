@@ -1,14 +1,14 @@
 /* eslint-disable camelcase */
 import _ from 'lodash'
 import moment from 'moment'
-import React, { useState, useRef, useMemo } from 'react'
+import React, { useMemo, useRef, useState } from 'react'
 import { renderToString } from 'react-dom/server'
 import ReactHighstock from 'react-highcharts/ReactHighstock'
 import { Button, Radio } from 'semantic-ui-react'
 
 import { reformatDate, getStudyRightElementTargetDates } from '@/common'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { DISPLAY_DATE_FORMAT, API_DATE_FORMAT } from '@/constants'
-import { useLanguage } from '../LanguagePicker/useLanguage'
 import { CreditGraphTooltip } from './CreditGraphTooltip'
 import './creditAccumulationGraphHC.css'
 

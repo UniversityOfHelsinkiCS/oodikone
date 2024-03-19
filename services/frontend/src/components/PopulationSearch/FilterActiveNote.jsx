@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { Button, Message } from 'semantic-ui-react'
 
-import { transferredToProgrammeFilter } from '../FilterView/filters'
-import { useFilters } from '../FilterView/useFilters'
+import { transferredToProgrammeFilter } from '@/components/FilterView/filters'
+import { useFilters } from '@/components/FilterView/useFilters'
 
 export const FilterActiveNote = () => {
   const { filterDispatch } = useFilters()

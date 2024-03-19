@@ -1,11 +1,11 @@
 import React, { useCallback, useState } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
-import { Segment, Header, Tab, Loader } from 'semantic-ui-react'
+import { Header, Loader, Segment, Tab } from 'semantic-ui-react'
 
 import { useTabs, useTitle } from '@/common/hooks'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetFacultiesQuery } from '@/redux/facultyStats'
-import { useLanguage } from '../LanguagePicker/useLanguage'
 import { BasicOverview } from './BasicOverview'
 import { FacultyProgrammeOverview } from './FacultyProgrammeOverview'
 import { FacultySelector } from './FacultySelector'

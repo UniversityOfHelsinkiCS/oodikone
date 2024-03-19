@@ -1,12 +1,12 @@
-import { oneOfType, number, string, bool } from 'prop-types'
+import { bool, number, oneOfType, string } from 'prop-types'
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Segment, Label, Header, Divider, Form } from 'semantic-ui-react'
+import { Divider, Form, Header, Label, Segment } from 'semantic-ui-react'
 
+import { ConnectedSingleCourseStats as SingleCourseStats } from '@/components/CourseStatistics/SingleCourseStats'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { setSelectedCourse } from '@/redux/singleCourseStats'
-import { getCourseStats, getAvailableStats, getCourses } from '@/selectors/courseStats'
-import { ConnectedSingleCourseStats as SingleCourseStats } from '../SingleCourseStats'
+import { getAvailableStats, getCourses, getCourseStats } from '@/selectors/courseStats'
 
 const CourseSelector = ({ courses, selected, setSelected }) => {
   const dispatch = useDispatch()

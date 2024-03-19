@@ -2,17 +2,17 @@ import React, { useState } from 'react'
 import { Divider, Header, Loader, Message } from 'semantic-ui-react'
 
 import { facultyToolTips } from '@/common/InfoToolTips'
+import { InfoBox } from '@/components/Info/InfoBox'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { Toggle } from '@/components/StudyProgramme/Toggle'
 import {
   useGetFacultiesQuery,
-  useGetFacultyProgressStatsQuery,
   useGetFacultyGraduationTimesQuery,
+  useGetFacultyProgressStatsQuery,
 } from '@/redux/facultyStats'
-import { InfoBox } from '../Info/InfoBox'
-import { useLanguage } from '../LanguagePicker/useLanguage'
-import { Toggle } from '../StudyProgramme/Toggle'
 import { FacultyGraduations } from './FacultyGraduations'
 import { FacultyProgress } from './FacultyProgress'
-import '../FacultyStatistics/faculty.css'
+import '@/components/FacultyStatistics/faculty.css'
 
 export const FacultyView = ({ faculty }) => {
   const [graduatedGroup, setGraduatedGroup] = useState(false)

@@ -1,24 +1,24 @@
 /* eslint-disable no-restricted-syntax */
 import React, { useState } from 'react'
-import { Divider, Loader, Popup, Button, Message } from 'semantic-ui-react'
+import { Button, Divider, Loader, Message, Popup } from 'semantic-ui-react'
 import { utils, writeFile } from 'xlsx'
 
 import { getTimestamp } from '@/common'
 import { facultyToolTips } from '@/common/InfoToolTips'
 import { makeTableStats, makeGraphData } from '@/components/common/CreditsProduced'
+import { sortProgrammeKeys } from '@/components/FacultyStatistics/facultyHelpers'
+import { InteractiveDataTable } from '@/components/FacultyStatistics/InteractiveDataView'
 import { InfoBox } from '@/components/Info/InfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { LineGraph } from '@/components/StudyProgramme/BasicOverview/LineGraph'
 import { StackedBarChart } from '@/components/StudyProgramme/BasicOverview/StackedBarChart'
 import { Toggle } from '@/components/StudyProgramme/Toggle'
+import '@/components/FacultyStatistics/faculty.css'
 import {
   useGetFacultyCreditStatsQuery,
   useGetFacultyBasicStatsQuery,
   useGetFacultyThesisStatsQuery,
 } from '@/redux/facultyStats'
-import { sortProgrammeKeys } from '../facultyHelpers'
-import { InteractiveDataTable } from '../InteractiveDataView'
-import '../faculty.css'
 
 const calculateTotals = stats => {
   const totals = {}

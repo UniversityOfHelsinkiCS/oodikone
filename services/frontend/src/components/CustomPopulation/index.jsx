@@ -1,34 +1,34 @@
-import React, { useState, useEffect, useMemo } from 'react'
-import { Segment, Header, Message, Label, Form, Input } from 'semantic-ui-react'
+import React, { useEffect, useMemo, useState } from 'react'
+import { Form, Header, Input, Label, Message, Segment } from 'semantic-ui-react'
 
 import { useProgress, useTitle } from '@/common/hooks'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { PanelView } from '@/components/common/PanelView'
+import { CreditAccumulationGraphHighCharts } from '@/components/CreditAccumulationGraphHighCharts'
+import { FilterView } from '@/components/FilterView'
+import {
+  ageFilter,
+  courseFilter,
+  creditDateFilter,
+  creditsEarnedFilter,
+  enrollmentStatusFilter,
+  genderFilter,
+  hopsFilter,
+  programmeFilter,
+  startYearAtUniFilter,
+  tagsFilter,
+  transferredToProgrammeFilter,
+} from '@/components/FilterView/filters'
+import { InfoBox } from '@/components/Info/InfoBox'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
+import { PopulationStudentsContainer as PopulationStudents } from '@/components/PopulationStudents'
+import { ProgressBar } from '@/components/ProgressBar'
 import { RightsNotification } from '@/components/RightsNotification'
 import { useFilteredAndFormattedElementDetails } from '@/redux/elementdetails'
 import { useGetStudentListCourseStatisticsQuery } from '@/redux/populationCourses'
 import { useGetCustomPopulationQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
-import { CreditAccumulationGraphHighCharts } from '../CreditAccumulationGraphHighCharts'
-import { FilterView } from '../FilterView'
-import {
-  ageFilter,
-  courseFilter,
-  programmeFilter,
-  creditsEarnedFilter,
-  genderFilter,
-  transferredToProgrammeFilter,
-  startYearAtUniFilter,
-  hopsFilter,
-  tagsFilter,
-  creditDateFilter,
-  enrollmentStatusFilter,
-} from '../FilterView/filters'
-import { InfoBox } from '../Info/InfoBox'
-import { useLanguage } from '../LanguagePicker/useLanguage'
-import { PopulationStudentsContainer as PopulationStudents } from '../PopulationStudents'
-import { ProgressBar } from '../ProgressBar'
 import { CustomPopulationProgrammeDist } from './CustomPopulationProgrammeDist'
 import { CustomPopulationSearch } from './CustomPopulationSearch'
 import { UnihowDataExport } from './UnihowDataExport'
