@@ -1,24 +1,24 @@
 import moment from 'moment'
-import React, { useState, useEffect, useRef } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import React, { useEffect, useRef, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Tab } from 'semantic-ui-react'
 
 import { useTabChangeAnalytics } from '@/common/hooks'
 import { coursePopulationToolTips, populationStatisticsToolTips } from '@/common/InfoToolTips'
+import { InfoBox } from '@/components/Info/InfoBox'
+import { StudentNameVisibilityToggle } from '@/components/StudentNameVisibilityToggle'
+import { ConnectedTagList as TagList } from '@/components/TagList'
+import { ConnectedTagPopulation as TagPopulation } from '@/components/TagPopulation'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { getTagsByStudytrackAction } from '@/redux/tags'
 import { getStudentTagsByStudytrackAction } from '@/redux/tagstudent'
-import { InfoBox } from '../Info/InfoBox'
-import { StudentNameVisibilityToggle } from '../StudentNameVisibilityToggle'
-import { ConnectedTagList as TagList } from '../TagList'
-import { ConnectedTagPopulation as TagPopulation } from '../TagPopulation'
 import { CheckStudentList } from './CheckStudentList'
 import { CoursesTabContainer as CoursesTab } from './StudentTable/CourseTab'
 import { GeneralTabContainer as GeneralTab } from './StudentTable/GeneralTab'
 import { ProgressTable } from './StudentTable/ProgressTab'
+import '@/components/PopulationCourseStats/populationCourseStats.css'
 import './populationStudents.css'
-import '../PopulationCourseStats/populationCourseStats.css'
 
 const Panes = ({
   filteredStudents,
@@ -102,7 +102,7 @@ const Panes = ({
                 <TagPopulation
                   combinedProgramme={combinedProgramme}
                   mainProgramme={mainProgramme}
-                  selectedStudents={filteredStudents.map(stu => stu.studentNumber)}
+                  selectedStudents={filteredStudents.map(student => student.studentNumber)}
                   tags={tags}
                 />
                 <TagList
@@ -201,7 +201,7 @@ const PopulationStudents = ({
       <span ref={studentRef} style={{ marginRight: '0.5rem' }}>
         <InfoBox content={contentToInclude.infotoolTipContent} />
       </span>
-      {admin ? <CheckStudentList students={filteredStudents.map(stu => stu.studentNumber)} /> : null}
+      {admin ? <CheckStudentList students={filteredStudents.map(student => student.studentNumber)} /> : null}
       <Panes
         combinedProgramme={combinedProgramme}
         coursecode={coursecode}

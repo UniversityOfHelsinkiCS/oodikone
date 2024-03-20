@@ -60,7 +60,13 @@ export const containsOnlyNumbers = str => str.match('^\\d+$')
 
 export const momentFromFormat = (date, format) => moment(date, format)
 
-export const reformatDate = (date, outputFormat) => (!date ? 'Unavailable' : moment(date).local().format(outputFormat))
+export const reformatDate = (date, outputFormat) => {
+  if (!date) {
+    return 'Unavailable'
+  }
+  const parsedDate = moment(date, 'YYYY-MM-DD').local().format(outputFormat)
+  return parsedDate
+}
 
 export const byDateDesc = (a, b) => new Date(b.date) - new Date(a.date)
 
@@ -257,8 +263,8 @@ export const getHighestGradeOrEnrollmentOfCourseBetweenRange = (courses, enrollm
   return grade
 }
 
-export const findStudyrightElementForClass = (studyrights, programme, year) =>
-  studyrights
+export const findStudyrightElementForClass = (studyrights, programme, year) => {
+  return studyrights
     .flatMap(studyright => studyright.studyright_elements)
     .find(element => {
       if (element.code !== programme) return false
@@ -266,6 +272,7 @@ export const findStudyrightElementForClass = (studyrights, programme, year) =>
       const endDate = moment(new Date(element.enddate))
       return date.isBefore(endDate, undefined, '[]')
     })
+}
 
 const getEarliestStudyRightElement = studyright => {
   if (!studyright) return null

@@ -79,11 +79,11 @@ export const GeneralTab = ({
     }, {})
   }
 
-  const selectedStudents = filteredStudents.map(stu => stu.studentNumber)
-  const students = filteredStudents.reduce((acc, stu) => {
-    acc[stu.studentNumber] = columnKeysToInclude.includes('semesterEnrollments')
-      ? { ...stu, semesterEnrollmentsMap: createSemesterEnrollmentsMap(stu) }
-      : stu
+  const selectedStudents = filteredStudents.map(student => student.studentNumber)
+  const students = filteredStudents.reduce((acc, student) => {
+    acc[student.studentNumber] = columnKeysToInclude.includes('semesterEnrollments')
+      ? { ...student, semesterEnrollmentsMap: createSemesterEnrollmentsMap(student) }
+      : student
     return acc
   }, {})
 
@@ -240,8 +240,8 @@ export const GeneralTab = ({
   const containsStudyTracks =
     Object.keys(populationStatistics.elementdetails.data) > 0
       ? selectedStudents
-          .map(sn => students[sn])
-          .map(st => st.studyrights)
+          .map(student => students[student])
+          .map(student => student.studyrights)
           .map(
             studyrights =>
               studyrightCodes(studyrights, 'studyright_elements').reduce((acc, elements) => {
@@ -290,7 +290,7 @@ export const GeneralTab = ({
   }
 
   let creditsColumn = null
-  const creditColumnKeys = columnKeysToInclude.filter(k => k.indexOf('credits.') === 0)
+  const creditColumnKeys = columnKeysToInclude.filter(key => key.indexOf('credits.') === 0)
 
   const { getSemesterEnrollmentsContent, getSemesterEnrollmentsForExcel, getSemesterEnrollmentsVal } =
     getSemestersPresentFunctions({
@@ -373,7 +373,6 @@ export const GeneralTab = ({
     }
   }
 
-  // All columns components user is able to use
   const columnsAvailable = {
     lastname: { key: 'lastname', title: 'Last name', getRowVal: student => student.lastname, export: false },
     firstname: { key: 'firstname', title: 'Given names', getRowVal: student => student.firstnames, export: false },
@@ -469,7 +468,9 @@ export const GeneralTab = ({
       export: true,
       displayColumn: false,
       getRowVal: student =>
-        student.semesterenrollments ? student.semesterenrollments.filter(e => e.enrollmenttype === 1).length : 0,
+        student.semesterenrollments
+          ? student.semesterenrollments.filter(enrollment => enrollment.enrollmenttype === 1).length
+          : 0,
     },
     transferredFrom: {
       key: 'transferredFrom',
@@ -481,7 +482,7 @@ export const GeneralTab = ({
       title: 'Admission type',
       getRowVal: student => {
         const studyright = student.studyrights.find(studyright =>
-          studyright.studyright_elements.some(e => e.code === programmeCode)
+          studyright.studyright_elements.some(element => element.code === programmeCode)
         )
         const admissionType = studyright && studyright.admission_type ? studyright.admission_type : 'Ei valintatapaa'
         return admissionType !== 'Koepisteet' ? admissionType : 'Valintakoe'
@@ -526,7 +527,7 @@ export const GeneralTab = ({
       key: 'latestAttainmentDate',
       title: 'Latest attainment date',
       getRowVal: student => {
-        const studyPlan = student.studyplans.find(sp => sp.programme_code === programmeCode)
+        const studyPlan = student.studyplans.find(plan => plan.programme_code === programmeCode)
         if (!studyPlan) return ''
         const { included_courses: coursesInStudyPlan } = studyPlan
 
@@ -571,12 +572,13 @@ export const GeneralTab = ({
       getRowVal: student => reformatDate(student.updatedAt, 'YYYY-MM-DD  HH:mm:ss'),
     },
   }
-  // Columns are shown in order they're declared above. JS guarantees this order of keys
-  // to stay for non-integer keys
+
+  // Columns are shown in order they're declared above. JS
+  // guarantees this order of keys to stay for non-integer keys
   const orderOfColumns = Object.values(columnsAvailable).reduce(
-    (acc, curr, ind) => ({
+    (acc, curr, index) => ({
       ...acc,
-      [curr.key]: ind,
+      [curr.key]: index,
     }),
     {}
   )
@@ -590,7 +592,7 @@ export const GeneralTab = ({
   return (
     <SortableTable
       columns={columns}
-      data={selectedStudents.map(sn => students[sn])}
+      data={selectedStudents.map(student => students[student])}
       featureName="students"
       onlyExportColumns={hiddenNameAndEmailForExcel}
       style={{ height: '80vh' }}
