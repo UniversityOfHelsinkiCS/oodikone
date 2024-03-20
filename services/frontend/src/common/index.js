@@ -264,11 +264,13 @@ export const getHighestGradeOrEnrollmentOfCourseBetweenRange = (courses, enrollm
 }
 
 export const findStudyrightElementForClass = (studyrights, programme, year) => {
+  let startYear = year
   return studyrights
     .flatMap(studyright => studyright.studyright_elements)
     .find(element => {
       if (element.code !== programme) return false
-      const date = moment(new Date(`${year}-08-01`))
+      if (year === 'All') startYear = element.startdate.substring(0, 4)
+      const date = moment(new Date(`${startYear}-08-01`))
       const endDate = moment(new Date(element.enddate))
       return date.isBefore(endDate, undefined, '[]')
     })
