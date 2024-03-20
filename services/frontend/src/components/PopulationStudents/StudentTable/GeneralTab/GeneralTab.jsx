@@ -240,7 +240,7 @@ export const GeneralTab = ({
   const containsStudyTracks =
     Object.keys(populationStatistics.elementdetails.data) > 0
       ? selectedStudents
-          .map(student => students[student])
+          .map(studentNumber => students[studentNumber])
           .map(student => student.studyrights)
           .map(
             studyrights =>
@@ -592,7 +592,7 @@ export const GeneralTab = ({
   return (
     <SortableTable
       columns={columns}
-      data={selectedStudents.map(student => students[student])}
+      data={selectedStudents.map(studentNumber => students[studentNumber])}
       featureName="students"
       onlyExportColumns={hiddenNameAndEmailForExcel}
       style={{ height: '80vh' }}
