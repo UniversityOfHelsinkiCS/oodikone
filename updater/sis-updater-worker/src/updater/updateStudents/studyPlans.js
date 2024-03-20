@@ -102,11 +102,6 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
     return res
   }, {})
 
-  const programmeModuleGroupIdToCode = programmeModules.reduce((res, cur) => {
-    res[cur.id] = cur.code
-    return res
-  }, {})
-
   const courseUnitIdToCode = courseUnits.reduce((res, cur) => {
     res[cur.id] = cur.code
     return res
@@ -146,7 +141,7 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
     if (attainment.code) return [attainment.code]
 
     const { course_unit_id, module_id } = attainment
-    const code = courseUnitIdToCode[course_unit_id] || programmeModuleGroupIdToCode[module_id]
+    const code = courseUnitIdToCode[course_unit_id] || programmeModuleIdToCode[module_id]
     if (!code) return []
     return [code]
   }
@@ -169,7 +164,10 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
 
   const moduleIdToParentDegreeProgramme = {}
   const mapParentDegreeProgrammes = (moduleId, degreeProgrammeId) => {
-    moduleIdToParentDegreeProgramme[moduleId] = degreeProgrammeId
+    if (!moduleIdToParentDegreeProgramme[moduleId]) {
+      moduleIdToParentDegreeProgramme[moduleId] = []
+    }
+    moduleIdToParentDegreeProgramme[moduleId].push(degreeProgrammeId)
     if (!childModules[moduleId]) return
 
     childModules[moduleId].forEach(child => {
@@ -189,11 +187,17 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
     return res
   }, {})
 
-  const moduleIdToParentModuleCode = Object.keys(moduleIdToParentDegreeProgramme).reduce((acc, cur) => {
-    const parent = moduleIdToParentDegreeProgramme[cur]
-    acc[cur] = programmeModuleGroupIdToCode[parent]
-    return acc
-  }, {})
+  const moduleIdToParentModuleCode = Object.entries(moduleIdToParentDegreeProgramme).reduce(
+    (acc, [moduleId, degreeProgrammeIds]) => {
+      const codes = new Set()
+      for (const programmeId of degreeProgrammeIds) {
+        codes.add(programmeModuleIdToCode[programmeId])
+      }
+      acc[moduleId] = codes
+      return acc
+    },
+    {}
+  )
 
   const mapStudyplan = studyplanMapper(
     personIdToStudentNumber,

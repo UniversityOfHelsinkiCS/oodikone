@@ -405,14 +405,14 @@ const studyplanMapper =
       const graduated = moduleAttainments[programmeId] && moduleAttainments[programmeId][studyplan.user_id]
       const id = `${studentnumber}-${code}-${studyrightId}`
       const courseUnitSelections = studyplan.course_unit_selections
-        .filter(courseUnit => moduleIdToParentModuleCode[courseUnit.parentModuleId] === code)
+        .filter(courseUnit => moduleIdToParentModuleCode[courseUnit.parentModuleId]?.has(code))
         .filter(({ substituteFor }) => !substituteFor.length) // Filter out CUs used to substitute another CU
         .map(({ substitutedBy, courseUnitId }) => {
           if (substitutedBy.length) return courseUnitIdToCode[substitutedBy[0]]
           return courseUnitIdToCode[courseUnitId]
         })
       const customCourseUnitSelections = studyplan.custom_course_unit_attainment_selections
-        .filter(({ parentModuleId }) => moduleIdToParentModuleCode[parentModuleId] === code)
+        .filter(({ parentModuleId }) => moduleIdToParentModuleCode[parentModuleId]?.has(code))
         .map(({ customCourseUnitAttainmentId }) => (attainmentIdToAttainment[customCourseUnitAttainmentId] || {}).code)
         .map(sanitizeCourseCode)
         .filter(c => !!c)
@@ -421,7 +421,7 @@ const studyplanMapper =
         studyplan.module_selections
           .filter(
             ({ moduleId }) =>
-              moduleIdToParentModuleCode[moduleId] === code &&
+              moduleIdToParentModuleCode[moduleId]?.has(code) &&
               moduleAttainments[moduleId] &&
               moduleAttainments[moduleId][studyplan.user_id]
           )
@@ -432,12 +432,12 @@ const studyplanMapper =
         graduated
           ? getAttainmentsFromAttainment(moduleAttainments[programmeId][studyplan.user_id])
           : studyplan.custom_course_unit_attainment_selections
-              .filter(({ parentModuleId }) => moduleIdToParentModuleCode[parentModuleId] === code)
+              .filter(({ parentModuleId }) => moduleIdToParentModuleCode[parentModuleId]?.has(code))
               .map(({ customCourseUnitAttainmentId }) => attainmentIdToAttainment[customCourseUnitAttainmentId])
               .concat(
                 flatten(
                   studyplan.course_unit_selections
-                    .filter(courseUnit => moduleIdToParentModuleCode[courseUnit.parentModuleId] === code)
+                    .filter(courseUnit => moduleIdToParentModuleCode[courseUnit.parentModuleId]?.has(code))
                     .filter(({ substituteFor }) => !substituteFor.length) // Filter out CUs used to substitute another CU
                     .map(({ substitutedBy, courseUnitId }) => {
                       if (substitutedBy.length) {
@@ -479,7 +479,7 @@ const studyplanMapper =
                   studyplan.module_selections
                     .filter(
                       ({ moduleId }) =>
-                        moduleIdToParentModuleCode[moduleId] === code &&
+                        moduleIdToParentModuleCode[moduleId]?.has(code) &&
                         moduleAttainments[moduleId] &&
                         moduleAttainments[moduleId][studyplan.user_id]
                     )
