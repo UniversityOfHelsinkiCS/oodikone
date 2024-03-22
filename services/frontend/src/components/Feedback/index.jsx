@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Form, TextArea, Button, Modal, Message, Icon, Header } from 'semantic-ui-react'
+import { Button, Form, Header, Icon, Message, Modal, TextArea } from 'semantic-ui-react'
 
 import { useTitle } from '@/common/hooks'
 import { useSendFeedbackMutation } from '@/redux/feedback'

@@ -38,6 +38,7 @@ export const makeGraphData = (data, showAll, isAcademicYear) => {
     })
     years.push(getFormattedYear(year, isAcademicYear))
   }
+  graphStats.sort((a, b) => a.name.localeCompare(b.name))
   return { data: graphStats, years }
 }
 

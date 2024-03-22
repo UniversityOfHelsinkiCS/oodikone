@@ -124,7 +124,6 @@ export const ProgrammeView = ({ studyprogramme }) => {
                 with interactive statistics and visualizations.
               </p>
               <p>
-                {' '}
                 Note that both views have access restrictions. If you can't access either view and feel you should have
                 access, please contact oodikone@helsinki.fi.
               </p>

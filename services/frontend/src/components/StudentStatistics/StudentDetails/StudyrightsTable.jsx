@@ -124,8 +124,7 @@ export const StudyrightsTable = ({
             <Item as={Link} to={showPopulationStatistics(programme.code, programme.startdate)}>
               <Icon name="level up alternate" />
             </Item>
-          )}{' '}
-          <br />
+          )}
         </p>
       ))
 

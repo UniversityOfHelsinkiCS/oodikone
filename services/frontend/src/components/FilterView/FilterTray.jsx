@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import { Segment, Header, Button } from 'semantic-ui-react'
+import { Button, Header, Segment } from 'semantic-ui-react'
 
 import { FilterCard } from './filters/common/FilterCard'
 import { FilterViewContext } from './FilterViewContext'

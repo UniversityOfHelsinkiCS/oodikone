@@ -509,7 +509,7 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
           <Icon color="grey" fitted name="minus" />: Student has enrolled, but has not received any grade from the
           course.
           <br />
-          <span className="enrollment-label-no-margin label-present" />: Student has an active semester enrollment.{' '}
+          <span className="enrollment-label-no-margin label-present" />: Student has an active semester enrollment.
           <br />
           <span className="enrollment-label-no-margin label-absent" />: Student has enrolled as absent. <br />
           <span className="enrollment-label-no-margin label-passive" />: Inactive: Student did not enroll at all. <br />

@@ -55,15 +55,15 @@ export const Updater = () => {
         <Button icon="refresh" onClick={updateJobs} size="big" />
         <p>Jobs running: {jobs.active?.length}</p>
         <ul>
-          {jobs.active.map(j => (
-            <li key={j.name}>{j.name}</li>
-          ))}{' '}
+          {jobs.active.map(job => (
+            <li key={job.name}>{job.name}</li>
+          ))}
         </ul>
         <p>Jobs waiting: {jobs.waiting?.length}</p>
         <ul>
-          {jobs.waiting.map(j => (
-            <li key={j.name}>{j.name}</li>
-          ))}{' '}
+          {jobs.waiting.map(job => (
+            <li key={job.name}>{job.name}</li>
+          ))}
         </ul>
       </Message>
     )
