@@ -57,7 +57,7 @@ export const BasicOverview = ({
   const credits = useGetCreditStatsQuery({
     codes: [studyprogramme, combinedProgramme].filter(Boolean),
     isAcademicYear: academicYear,
-    specialGroups: !specialGroups,
+    specialGroups,
   })
   const graduations = useGetGraduationStatsQuery({
     id: studyprogramme,
