@@ -94,10 +94,10 @@ export const calculateStats = (
 export const FacultyProgrammeOverview = ({
   faculty,
   graduatedGroup,
-  setGraduatedGroup,
-  specialGroups,
-  setSpecialGroups,
   requiredRights,
+  setGraduatedGroup,
+  setSpecialGroups,
+  specialGroups,
 }) => {
   const specials = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
   const graduated = graduatedGroup ? 'GRADUATED_EXCLUDED' : 'GRADUATED_INCLUDED'

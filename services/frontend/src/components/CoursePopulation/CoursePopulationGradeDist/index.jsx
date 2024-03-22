@@ -36,7 +36,11 @@ export const CoursePopulationGradeDist = ({ singleCourseStats, students, courseC
     })
   }
 
-  const sortedCourseGrades = orderBy(courseGrades, e => (Number(e.grade) ? `_${e.grade}` : e.grade), ['desc'])
+  const sortedCourseGrades = orderBy(
+    courseGrades,
+    courseGrade => (Number(courseGrade.grade) ? `_${courseGrade.grade}` : courseGrade.grade),
+    ['desc']
+  )
 
   return (
     <Table celled>

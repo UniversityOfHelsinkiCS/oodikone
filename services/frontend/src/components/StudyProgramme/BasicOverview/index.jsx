@@ -1,14 +1,15 @@
 import React, { useState } from 'react'
 import { Divider, Loader, Message } from 'semantic-ui-react'
+
 import { getGraduationGraphTitle } from '@/common'
 import { studyProgrammeToolTips } from '@/common/InfoToolTips'
 import { CreditsProduced } from '@/components/common/CreditsProduced'
 import { InfoBox } from '@/components/Info/InfoBox'
+import { BreakdownBarChart } from '@/components/StudyProgramme/BreakdownBarChart'
+import { MedianTimeBarChart } from '@/components/StudyProgramme/MedianTimeBarChart'
+import { Toggle } from '@/components/StudyProgramme/Toggle'
+import '@/components/StudyProgramme/studyprogramme.css'
 import { useGetBasicStatsQuery, useGetCreditStatsQuery, useGetGraduationStatsQuery } from '@/redux/studyProgramme'
-import { BreakdownBarChart } from '../BreakdownBarChart'
-import { MedianTimeBarChart } from '../MedianTimeBarChart'
-import { Toggle } from '../Toggle'
-import '../studyprogramme.css'
 import { BarChart } from './BarChart'
 import { DataTable } from './DataTable'
 import { LineGraph } from './LineGraph'
@@ -37,12 +38,12 @@ const getGraduatedText = code => {
 }
 
 export const BasicOverview = ({
-  studyprogramme,
-  combinedProgramme,
-  specialGroups,
-  setSpecialGroups,
   academicYear,
+  combinedProgramme,
   setAcademicYear,
+  setSpecialGroups,
+  specialGroups,
+  studyprogramme,
 }) => {
   const [showMedian, setShowMedian] = useState(false)
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'

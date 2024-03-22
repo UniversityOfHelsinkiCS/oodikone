@@ -41,13 +41,13 @@ const calculateTotals = stats => {
 }
 
 export const BasicOverview = ({
-  faculty,
   academicYear,
+  faculty,
   setAcademicYear,
-  studyProgrammes,
+  setSpecialGroups,
   setStudyProgrammes,
   specialGroups,
-  setSpecialGroups,
+  studyProgrammes,
 }) => {
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
   const studyProgrammeFilter = studyProgrammes ? 'ALL_PROGRAMMES' : 'NEW_STUDY_PROGRAMMES'

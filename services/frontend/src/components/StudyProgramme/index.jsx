@@ -1,14 +1,15 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory, useParams } from 'react-router-dom'
-import { Header, Segment, Tab, Menu } from 'semantic-ui-react'
+import { Header, Menu, Segment, Tab } from 'semantic-ui-react'
 
 import { getFullStudyProgrammeRights, getUnifiedProgrammeName } from '@/common'
 import { useTabs, useTitle } from '@/common/hooks'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import '@/components/PopulationQueryCard/populationQueryCard.css'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { getProgrammes } from '@/redux/populationProgrammes'
 import { useGetProgressCriteriaQuery } from '@/redux/programmeProgressCriteria'
-import { useLanguage } from '../LanguagePicker/useLanguage'
 import { BasicOverview } from './BasicOverview'
 import { DegreeCoursesTable } from './DegreeCourses'
 import { ProgrammeCourses } from './ProgrammeCourses'
@@ -16,7 +17,6 @@ import { ConnectedStudyProgrammeSelector as StudyProgrammeSelector } from './Stu
 import { StudytrackOverview } from './StudytrackOverview'
 import { ConnectedTags as Tags } from './Tags'
 import { UpdateView } from './UpdateView'
-import '../PopulationQueryCard/populationQueryCard.css'
 
 const createName = (studyProgrammeId, combibedProgrammeId, programmes, language, getTextIn) => {
   if (combibedProgrammeId && programmes?.[studyProgrammeId] && programmes?.[combibedProgrammeId])
@@ -70,7 +70,6 @@ export const StudyProgramme = () => {
         <BasicOverview
           academicYear={academicYear}
           combinedProgramme={secondProgrammeId}
-          history={history}
           setAcademicYear={setAcademicYear}
           setSpecialGroups={setSpecialGroups}
           specialGroups={specialGroups}
@@ -84,7 +83,6 @@ export const StudyProgramme = () => {
         <StudytrackOverview
           combinedProgramme={secondProgrammeId}
           graduated={graduated}
-          history={history}
           setGraduated={setGraduated}
           setSpecialGroups={setSpecialGroups}
           specialGroups={specialGroups}
