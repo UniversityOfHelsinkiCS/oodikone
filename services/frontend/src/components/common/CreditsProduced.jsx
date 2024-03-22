@@ -72,7 +72,7 @@ export const makeTableStats = (data, showAll, isAcademicYear) => {
   return { data: tableStats, titles }
 }
 
-export const CreditsProduced = ({ data, secondData, academicYear }) => {
+export const CreditsProduced = ({ academicYear, data, secondData }) => {
   const [showAll, setShowAll] = useState(false)
   if (!data) return null
 
@@ -102,7 +102,6 @@ export const CreditsProduced = ({ data, secondData, academicYear }) => {
       </div>
       {secondData && (
         <div>
-          {' '}
           <h4>Credits produced by the licentiate programme</h4>
           <div className="section-container">
             <StackedBarChart

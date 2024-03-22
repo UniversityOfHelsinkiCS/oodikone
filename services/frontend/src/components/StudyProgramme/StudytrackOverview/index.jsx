@@ -16,12 +16,12 @@ import { StudytrackDataTable } from './StudytrackDataTable'
 import { StudytrackSelector } from './StudytrackSelector'
 
 export const StudytrackOverview = ({
-  studyprogramme,
-  specialGroups,
-  setSpecialGroups,
+  combinedProgramme,
   graduated,
   setGraduated,
-  combinedProgramme,
+  setSpecialGroups,
+  specialGroups,
+  studyprogramme,
 }) => {
   const [showMedian, setShowMedian] = useState(false)
   const [track, setTrack] = useState(studyprogramme)

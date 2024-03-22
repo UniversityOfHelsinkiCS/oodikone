@@ -52,7 +52,7 @@ export const BasicOverview = ({
     id: studyprogramme,
     combinedProgramme,
     yearType,
-    specialGroups: 'SPECIAL_INCLUDED',
+    specialGroups: special,
   })
   const credits = useGetCreditStatsQuery({
     codes: [studyprogramme, combinedProgramme].filter(Boolean),
@@ -158,7 +158,6 @@ export const BasicOverview = ({
           value={specialGroups}
         />
       </div>
-
       {isFetchingOrLoading ? (
         <Loader active style={{ marginTop: '10em' }} />
       ) : (
@@ -183,7 +182,6 @@ export const BasicOverview = ({
           )}
           {credits?.data?.stats?.[studyprogramme]?.stats && (
             <>
-              {' '}
               {getDivider('Credits produced by the studyprogramme', 'CreditsProducedByTheStudyprogramme')}
               <CreditsProduced
                 academicYear={academicYear}
