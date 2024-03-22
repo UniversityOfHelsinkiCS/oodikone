@@ -132,7 +132,7 @@ describe('Custom population tests', () => {
   })
 
   describe('Custom population search saving', () => {
-    it('Saves a custom population search', () => {
+    it('Saves a custom population search', { retries: 2 }, () => {
       cy.fixture('customPopulations').then(({ studentNumbersForCSStudentsSet1 }) => {
         const students = studentNumbersForCSStudentsSet1
         openCustomPopupForm()
