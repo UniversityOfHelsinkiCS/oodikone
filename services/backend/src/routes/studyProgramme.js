@@ -59,7 +59,7 @@ router.get('/v2/studyprogrammes/creditstats', async (req, res) => {
   const codes = JSON.parse(codesListString)
   const stats = {}
   for (const code of codes) {
-    stats[code] = await getCreditsProduced(code, isAcademicYear !== 'false', includeSpecials)
+    stats[code] = await getCreditsProduced(code, isAcademicYear !== 'false', includeSpecials !== 'false')
   }
   return res.json({ stats })
 })
