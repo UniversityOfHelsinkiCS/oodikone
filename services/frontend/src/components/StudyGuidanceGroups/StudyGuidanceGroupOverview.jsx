@@ -240,14 +240,14 @@ export const StudyGuidanceGroupOverview = ({ groups }) => {
     },
     {
       key: 'studyProgramme',
-      title: 'Study Programme',
+      title: 'Study programme',
       getRowVal: group => group.tags?.studyProgramme,
       formatValue: value => studyProgrammes.find(programme => programme.value === value)?.text,
       getRowContent: group => <TagCell group={group} studyProgrammes={studyProgrammes} tagName="studyProgramme" />,
     },
     {
       key: 'associatedYear',
-      title: 'Associated Starting Academic Year',
+      title: 'Associated starting academic year',
       getRowVal: group => group.tags?.year,
       formatValue: startYearToAcademicYear,
       getRowContent: group => <TagCell group={group} tagName="year" />,

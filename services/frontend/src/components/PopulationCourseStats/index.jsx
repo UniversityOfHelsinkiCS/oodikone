@@ -123,7 +123,7 @@ const PopulationCourseStats = ({ filteredStudents, mandatoryCourses, courses, pe
 
   const panes = [
     {
-      menuItem: 'pass/fail',
+      menuItem: 'Pass/fail',
       render: () => (
         <Tab.Pane className="menuTab">
           <PassFailEnrollments
@@ -135,7 +135,7 @@ const PopulationCourseStats = ({ filteredStudents, mandatoryCourses, courses, pe
       ),
     },
     {
-      menuItem: 'grades',
+      menuItem: 'Grades',
       render: () => (
         <Tab.Pane className="menuTab">
           <GradeDistribution onlyIamRights={onlyIamRights} />
@@ -143,7 +143,7 @@ const PopulationCourseStats = ({ filteredStudents, mandatoryCourses, courses, pe
       ),
     },
     {
-      menuItem: 'when passed',
+      menuItem: 'When passed',
       render: () => (
         <Tab.Pane className="menuTab">
           <PassingSemesters onlyIamRights={onlyIamRights} />
@@ -151,7 +151,7 @@ const PopulationCourseStats = ({ filteredStudents, mandatoryCourses, courses, pe
       ),
     },
     {
-      menuItem: 'students',
+      menuItem: 'Students',
       hideIfOnlyIamRights: true,
       render: () => (
         <Tab.Pane className="menuTab">
@@ -159,7 +159,7 @@ const PopulationCourseStats = ({ filteredStudents, mandatoryCourses, courses, pe
         </Tab.Pane>
       ),
     },
-  ].filter(p => !(p.hideIfOnlyIamRights && onlyIamRights))
+  ].filter(pane => !(pane.hideIfOnlyIamRights && onlyIamRights))
 
   if (!courses || pending) {
     return null

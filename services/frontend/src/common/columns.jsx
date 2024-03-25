@@ -44,11 +44,11 @@ export const getCopyableStudentNumberColumn = ({
 }
 
 export const getCopyableEmailColumn = ({
-  popupStates,
   copyItemsToClipboard,
-  handlePopupOpen,
-  handlePopupClose,
   fieldName,
+  handlePopupClose,
+  handlePopupOpen,
+  popupStates,
 }) => {
   return {
     mergeHeader: true,
@@ -141,7 +141,7 @@ export const hiddenNameAndEmailForExcel = [
   },
   {
     key: 'hidden-secondary-email',
-    title: 'Secondary E-mail',
+    title: 'Secondary e-mail',
     getRowVal: student => student.secondaryEmail ?? '',
     export: true,
   },

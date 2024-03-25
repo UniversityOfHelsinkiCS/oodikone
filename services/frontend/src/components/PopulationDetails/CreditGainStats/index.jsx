@@ -63,7 +63,9 @@ export const CreditGainStats = ({ filteredStudents, query, creditDateFilterOptio
 
   return (
     <div id="credit-gain-stats">
-      <InfoBox content={populationStatisticsToolTips.CreditStatistics} />
+      <div style={{ marginBottom: '20px' }}>
+        <InfoBox content={populationStatisticsToolTips.CreditStatistics} />
+      </div>
       {filteredStudents && (
         <Tab
           data-cy="credit-stats-tab"
@@ -72,7 +74,7 @@ export const CreditGainStats = ({ filteredStudents, query, creditDateFilterOptio
           onTabChange={handleTabChange}
           panes={[
             {
-              menuItem: 'Credits Gained',
+              menuItem: 'Credits gained',
               render: renderCreditsGainTab,
             },
             {
@@ -80,7 +82,7 @@ export const CreditGainStats = ({ filteredStudents, query, creditDateFilterOptio
               render: renderQuartersTab,
             },
             {
-              menuItem: 'Distribution Development',
+              menuItem: 'Distribution development',
               render: renderDistributionDevelopment,
             },
           ]}

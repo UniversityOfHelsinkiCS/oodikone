@@ -11,16 +11,16 @@ import { HoverableHelpPopup } from '@/components/common/HoverableHelpPopup'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 
 export const StudyrightsTable = ({
-  Programmes,
-  student,
   handleStartDateChange,
+  Programmes,
   showPopulationStatistics,
+  student,
   studyrightid,
 }) => {
   const { getTextIn } = useLanguage()
   const { programmes } = Programmes
   const programmeCodes = programmes ? Object.keys(programmes) : []
-  const studyRightHeaders = ['Programme', 'Study Track', 'Status', 'Completed']
+  const studyRightHeaders = ['Programme', 'Study track', 'Status', 'Completed']
 
   if (!student) return null
 

@@ -78,7 +78,7 @@ const getColumns = (getTextIn, showStudents) => {
       },
       {
         key: 'breakdown',
-        title: 'Breakdown of Total',
+        title: 'Breakdown of total',
         parent: true,
         children: [
           {
@@ -91,7 +91,7 @@ const getColumns = (getTextIn, showStudents) => {
           },
           {
             key: 'not-completed',
-            title: 'Not Completed',
+            title: 'Not completed',
             cellStyle: { textAlign: 'right' },
             filterType: 'range',
             getRowVal: course => course.totalAllNotCompleted,
@@ -101,7 +101,7 @@ const getColumns = (getTextIn, showStudents) => {
       },
       {
         key: 'breakdown-passed',
-        title: 'Breakdown Statistics of Passed Students',
+        title: 'Breakdown statistics of passed students',
         parent: true,
         children: [
           {
@@ -132,7 +132,7 @@ const getColumns = (getTextIn, showStudents) => {
       },
       {
         key: 'exluded',
-        title: 'Not Included to Passed',
+        title: 'Not included to passed',
         parent: true,
         children: [
           {

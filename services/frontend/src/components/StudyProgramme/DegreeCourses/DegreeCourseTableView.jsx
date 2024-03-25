@@ -25,12 +25,12 @@ const moduleVisibilityColor = visibility => {
 }
 
 export const DegreeCourseTableView = ({
-  modules: initialModules,
-  studyProgramme,
+  addProgressCriteriaCourse,
   combinedProgramme,
   criteria,
-  addProgressCriteriaCourse,
   curriculum,
+  modules: initialModules,
+  studyProgramme,
 }) => {
   const [visible, setVisible] = useState({})
   const { getTextIn } = useLanguage()
@@ -271,14 +271,14 @@ export const DegreeCourseTableView = ({
         <Table.Row key="HeaderRow">
           <Table.HeaderCell>Name</Table.HeaderCell>
           <Table.HeaderCell>Code</Table.HeaderCell>
-          <Table.HeaderCell>Visibility Label</Table.HeaderCell>
+          <Table.HeaderCell>Visibility label</Table.HeaderCell>
           {(studyProgramme.includes('KH') || ['MH30_001', 'MH30_003'].includes(studyProgramme)) && (
-            <Table.HeaderCell>Criterion Labels</Table.HeaderCell>
+            <Table.HeaderCell>Criterion labels</Table.HeaderCell>
           )}
           <Table.HeaderCell>
             {studyProgramme.includes('KH') || ['MH30_001', 'MH30_003'].includes(studyProgramme)
-              ? 'Set Labels'
-              : 'Set Visibility'}
+              ? 'Set labels'
+              : 'Set visibility'}
           </Table.HeaderCell>
         </Table.Row>
       </Table.Header>

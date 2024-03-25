@@ -22,7 +22,7 @@ export const UpdateView = ({ studyprogramme, combinedProgramme }) => {
   return (
     <div className="update-view">
       <div className="button-container">
-        <h4>Update data on Basic Information -view</h4>
+        <h4>Update data on Basic Information view</h4>
         <Button
           color="blue"
           data-cy="updatebasicinfo"
@@ -34,7 +34,7 @@ export const UpdateView = ({ studyprogramme, combinedProgramme }) => {
         {getStatusIcon(basicstats)}
       </div>
       <div className="button-container">
-        <h4>Update data on Populations and Studytracks -view</h4>
+        <h4>Update data on Populations and Studytracks view</h4>
         <Button
           color="blue"
           data-cy="updatepopulations"

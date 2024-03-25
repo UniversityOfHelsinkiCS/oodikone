@@ -181,7 +181,7 @@ const StudentNumberFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
 export const studentNumberFilter = createFilter({
   key: 'studentNumber',
 
-  title: 'Student Number',
+  title: 'Student number',
 
   defaultOptions: {
     allowlist: [],

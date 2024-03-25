@@ -30,7 +30,7 @@ const CreditsEarnedFilterCard = ({ options, onOptionsChange, bounds }) => {
 export const creditsEarnedFilter = createFilter({
   key: 'CreditsEarned',
 
-  title: 'Credits Earned',
+  title: 'Credits earned',
 
   defaultOptions: {
     min: null,

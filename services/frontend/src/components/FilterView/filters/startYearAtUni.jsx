@@ -48,7 +48,7 @@ const StartYearAtUniFilterCard = ({ options, onOptionsChange, withoutSelf }) => 
 export const startYearAtUniFilter = createFilter({
   key: 'StartYearAtUni',
 
-  title: 'Starting Year',
+  title: 'Starting year',
 
   defaultOptions: {
     selected: [],

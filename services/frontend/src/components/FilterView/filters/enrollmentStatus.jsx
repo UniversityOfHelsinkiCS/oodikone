@@ -79,7 +79,7 @@ const EnrollmentStatusFilterCard = ({ options, onOptionsChange, allSemesters, se
 export const enrollmentStatusFilter = createFilter({
   key: 'EnrollmentStatus',
 
-  title: 'Enrollment Status',
+  title: 'Enrollment status',
 
   info: filterToolTips.enrollmentStatus,
   defaultOptions: {

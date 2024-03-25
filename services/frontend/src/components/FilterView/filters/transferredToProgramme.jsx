@@ -47,7 +47,7 @@ const TransferredToProgrammeFilterCard = ({ options, onOptionsChange }) => {
 export const transferredToProgrammeFilter = createFilter({
   key: 'TransferredToProgramme',
 
-  title: 'Transferred to Programme',
+  title: 'Transferred to programme',
 
   info: filterToolTips.transferred,
 

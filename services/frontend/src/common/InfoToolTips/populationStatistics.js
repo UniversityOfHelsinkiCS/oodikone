@@ -67,7 +67,7 @@ export const populationStatisticsToolTips = {
   **Huom! Nämä suodattimet vaikuttavat vain tähän taulukkoon, eivät koko populatioon.**
   
   **Taulukot**
-  - **pass/fail** - näkymä sisältää kurssisuoritukset, hylätyt, yritykset sekä ilmoittautumistiedot. Huom.! ilmoittautumistiedot ovat saatavilla vain Sisun käyttöönoton jälkeiseltä ajalta.
+  - **Pass/fail** - näkymä sisältää kurssisuoritukset, hylätyt, yritykset sekä ilmoittautumistiedot. Huom.! ilmoittautumistiedot ovat saatavilla vain Sisun käyttöönoton jälkeiseltä ajalta.
     - **Total students** - sarake näyttää kaikkien opiskelijoiden määrän, mukaanlukien ilmoittautuneet ilman arvosanaa.
     - **Enrolled, no grade** - sarake näyttää niiden opiskelijoiden määrän, joilla on ilmoittautuminen muttei arvosanaa eikä hylättyä suoritusta.
   - **grades** - arvosanajakauma.
@@ -90,7 +90,7 @@ export const populationStatisticsToolTips = {
   **Huom! Nämä suodattimet vaikuttavat vain tähän taulukkoon, eivät koko populatioon.**
   
   **Taulukot**
-  - **pass/fail** - näkymä sisältää kurssisuoritukset, hylätyt, yritykset sekä ilmoittautumistiedot. Huom.! ilmoittautumistiedot ovat saatavilla vain Sisun käyttöönoton jälkeiseltä ajalta.
+  - **Pass/fail** - näkymä sisältää kurssisuoritukset, hylätyt, yritykset sekä ilmoittautumistiedot. Huom.! ilmoittautumistiedot ovat saatavilla vain Sisun käyttöönoton jälkeiseltä ajalta.
   - **grades** - arvosanajakauma.
   `,
   Search: `Tässä osiossa voi tarkastella koulutusohjelmakohtaisia populaatioita sisäänotto-lukuvuoden mukaisesti,

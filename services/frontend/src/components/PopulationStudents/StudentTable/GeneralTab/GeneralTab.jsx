@@ -567,7 +567,7 @@ export const GeneralTab = ({
     },
     updatedAt: {
       key: 'updatedAt',
-      title: 'Last Updated At',
+      title: 'Last updated at',
       filterType: 'date',
       getRowVal: student => reformatDate(student.updatedAt, 'YYYY-MM-DD  HH:mm:ss'),
     },

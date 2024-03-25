@@ -48,7 +48,7 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
   const studentNbrColumn = [
     {
       key: 'studentnumber',
-      title: 'Student Number',
+      title: 'Student number',
       cellProps: { style },
       getRowVal: student => student.studentNumber,
       getRowContent: student => <StudentInfoItem showSisuLink student={student} view="Completed courses search tool" />,

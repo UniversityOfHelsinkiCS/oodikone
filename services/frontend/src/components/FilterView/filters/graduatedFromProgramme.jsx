@@ -48,7 +48,7 @@ const GraduatedFromProgrammeFilterCard = ({ options, onOptionsChange, isCombined
 export const graduatedFromProgrammeFilter = createFilter({
   key: 'GraduatedFromProgramme',
 
-  title: 'Graduated From Programme',
+  title: 'Graduated from programme',
 
   defaultOptions: {
     mode: null,

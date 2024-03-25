@@ -32,7 +32,7 @@ const CreditDateFilterCard = ({ options, onOptionsChange }) => {
 export const creditDateFilter = createFilter({
   key: 'CreditDate',
 
-  title: 'Date of Course Credits',
+  title: 'Date of course credits',
 
   info: filterToolTips.courseCredits,
 

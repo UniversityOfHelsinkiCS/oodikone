@@ -78,7 +78,7 @@ const StudyrightStatusFilterCard = ({ options, onOptionsChange, combinedProgramm
 export const studyrightStatusFilter = createFilter({
   key: 'studyrightStatusFilter',
 
-  title: 'Studyright Status',
+  title: 'Studyright status',
 
   info: filterToolTips.studyrightStatus,
 

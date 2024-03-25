@@ -42,7 +42,7 @@ const StudyrightTypeFilterCard = ({ options, onOptionsChange }) => {
 export const studyrightTypeFilter = createFilter({
   key: 'studyright-type',
 
-  title: 'Studyright Type',
+  title: 'Studyright type',
 
   defaultOptions: {
     mode: 0,
