@@ -194,7 +194,7 @@ export const StudyrightsTable = ({
         <Table.Body>
           {studyRightRows.map(studyright => {
             if (studyright.elements.programmes.length > 0) {
-              const rowIsFilterable = studyright.elements.programmes.some(p => p.isFilterable)
+              const rowIsFilterable = studyright.elements.programmes.some(programme => programme.isFilterable)
               return (
                 <Table.Row
                   key={studyright.studyrightid}

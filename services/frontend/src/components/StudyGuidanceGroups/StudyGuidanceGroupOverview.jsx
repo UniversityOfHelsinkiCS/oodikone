@@ -178,7 +178,7 @@ const TagCell = ({ group, studyProgrammes, tagName }) => {
   const getText = () => {
     switch (tagName) {
       case 'studyProgramme':
-        return studyProgrammes.find(p => p.value === group.tags?.[tagName])?.text
+        return studyProgrammes.find(programme => programme.value === group.tags?.[tagName])?.text
       case 'year':
         return startYearToAcademicYear(group.tags?.[tagName])
       default:
@@ -242,7 +242,7 @@ export const StudyGuidanceGroupOverview = ({ groups }) => {
       key: 'studyProgramme',
       title: 'Study Programme',
       getRowVal: group => group.tags?.studyProgramme,
-      formatValue: value => studyProgrammes.find(p => p.value === value)?.text,
+      formatValue: value => studyProgrammes.find(programme => programme.value === value)?.text,
       getRowContent: group => <TagCell group={group} studyProgrammes={studyProgrammes} tagName="studyProgramme" />,
     },
     {

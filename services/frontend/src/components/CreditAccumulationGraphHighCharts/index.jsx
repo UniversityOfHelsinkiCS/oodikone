@@ -131,14 +131,16 @@ const filterCourses = (
   if (byStudyPlanOfCode && cutStudyPlanCredits)
     return filterCoursesByDate(
       filterCoursesByStudyPlan(
-        student.studyplans.find(p => p.programme_code === byStudyPlanOfCode && p.studyrightid === studyrightid),
+        student.studyplans.find(
+          plan => plan.programme_code === byStudyPlanOfCode && plan.studyrightid === studyrightid
+        ),
         student.courses
       ),
       customStudyStartYear || student.studyrightStart
     )
   if (byStudyPlanOfCode)
     return filterCoursesByStudyPlan(
-      student.studyplans.find(p => p.programme_code === byStudyPlanOfCode && p.studyrightid === studyrightid),
+      student.studyplans.find(plan => plan.programme_code === byStudyPlanOfCode && plan.studyrightid === studyrightid),
       student.courses
     )
   if (singleStudent) return student.courses

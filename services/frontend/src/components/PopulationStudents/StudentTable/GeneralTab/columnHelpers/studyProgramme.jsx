@@ -13,13 +13,13 @@ const noProgramme = {
 }
 
 export const getStudyProgrammeFunctions = ({
-  selectedStudents,
-  students,
-  programmeCode,
   coursecode,
-  studentToProgrammeStartMap,
   elementDetails,
   getTextIn,
+  programmeCode,
+  selectedStudents,
+  students,
+  studentToProgrammeStartMap,
 }) => {
   if (!students || !selectedStudents || !elementDetails) return {}
 
@@ -68,7 +68,6 @@ export const getStudyProgrammeFunctions = ({
   const getStudentsProgrammes = student => {
     if (coursecode?.length > 0) {
       const programmesAtEnrollment = getProgrammesAtEnrollment(student)
-
       if (
         programmesAtEnrollment !== null &&
         programmesAtEnrollment?.length > 0 &&
@@ -88,31 +87,31 @@ export const getStudyProgrammeFunctions = ({
       if (programmes.length > 0) return programmes[0].name
     }
     if (programmeCode) {
-      const otherProgrammes = programmes.filter(prog => prog.code !== programmeCode)
+      const otherProgrammes = programmes.filter(programme => programme.code !== programmeCode)
       return otherProgrammes.length > 0 ? otherProgrammes[0].name : programmes[0].name
     }
     if (programmes.length > 0) return programmes[0].name
     return noProgramme
   }
 
-  const studentProgrammesMap = selectedStudents.reduce((res, sn) => {
-    res[sn] = {
-      programmes: getStudentsProgrammes(students[sn]),
+  const studentProgrammesMap = selectedStudents.reduce((res, studentNumber) => {
+    res[studentNumber] = {
+      programmes: getStudentsProgrammes(students[studentNumber]),
     }
 
-    const programmeToShow = getProgrammeToShow(res[sn].programmes)
+    const programmeToShow = getProgrammeToShow(res[studentNumber].programmes)
 
-    if (programmeToShow) res[sn].programmeToShow = getTextIn(programmeToShow)
-    res[sn].getProgrammesList = delimiter =>
-      res[sn].programmes
-        .map(p => {
-          if (p.graduated) {
-            return `${getTextIn(p.name)} (graduated)`
+    if (programmeToShow) res[studentNumber].programmeToShow = getTextIn(programmeToShow)
+    res[studentNumber].getProgrammesList = delimiter =>
+      res[studentNumber].programmes
+        .map(programme => {
+          if (programme.graduated) {
+            return `${getTextIn(programme.name)} (graduated)`
           }
-          if (!p.active && !p.code?.startsWith('0000')) {
-            return `${getTextIn(p.name)} (inactive)`
+          if (!programme.active && !programme.code?.startsWith('0000')) {
+            return `${getTextIn(programme.name)} (inactive)`
           }
-          return getTextIn(p.name)
+          return getTextIn(programme.name)
         })
         .join(delimiter)
     return res

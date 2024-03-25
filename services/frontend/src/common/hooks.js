@@ -161,9 +161,9 @@ export const useProgress = loading => {
     else if (didMount) finishProgress()
   }, [loading])
 
-  const onProgress = p => {
-    if (p > 0) {
-      setProgress(50 + Math.floor(p / 2))
+  const onProgress = progress => {
+    if (progress > 0) {
+      setProgress(50 + Math.floor(progress / 2))
     }
   }
 
@@ -185,7 +185,6 @@ export const useLocalStorage = (key, initialValue) => {
       const item = window.localStorage.getItem(key)
       return item ? JSON.parse(item) : initialValue
     } catch (error) {
-      console.log(error) // eslint-disable-line no-console
       return initialValue
     }
   })
@@ -255,11 +254,10 @@ export const useDebounce = (value, timeout, onChange) => {
   return [innerValue, setValue, flush, dirty]
 }
 
-// From: https://www.joshwcomeau.com/snippets/react-hooks/use-toggle/
 export const useToggle = (initialValue = false) => {
   const [value, setValue] = useState(initialValue)
   const toggle = useCallback(() => {
-    setValue(v => !v)
+    setValue(value => !value)
   }, [])
   return [value, toggle]
 }

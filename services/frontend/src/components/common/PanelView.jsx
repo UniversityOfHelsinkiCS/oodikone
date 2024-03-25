@@ -35,26 +35,26 @@ export const PanelView = ({ panels: initialPanels, viewTitle }) => {
   const panels = useMemo(
     () =>
       initialPanels
-        .filter(p => p)
-        .map((p, i) => ({
-          key: `${p.title}-${i}`,
-          onTitleClick: () => togglePanel(i),
+        .filter(panel => panel)
+        .map((panel, index) => ({
+          key: `${panel.title}-${index}`,
+          onTitleClick: () => togglePanel(index),
           title: {
             content: (
-              <span data-cy={p.title} style={titleStyle}>
-                {p.title}
+              <span data-cy={panel.title} style={titleStyle}>
+                {panel.title}
               </span>
             ),
           },
           content: {
             content: (
               <div
-                key={p.key}
-                ref={e => {
-                  refs.current[i] = e
+                key={panel.key}
+                ref={element => {
+                  refs.current[index] = element
                 }}
               >
-                {p.content}
+                {panel.content}
               </div>
             ),
           },

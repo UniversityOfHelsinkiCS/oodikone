@@ -13,11 +13,11 @@ export const ProgrammeDropdown = ({ options, label, name, onChange, onClear, val
     multiple
     name={name}
     onChange={onChange}
-    options={orderBy(options, ['size'], ['desc']).map(({ key, size, value: v, text, description }) => ({
+    options={orderBy(options, ['size'], ['desc']).map(({ key, size, value, text, description }) => ({
       key,
       content: <DropdownItem code={key} description={description} name={text} size={size} />,
       text: !onClear ? text : <ClearableItem name={text} onClear={onClear} />,
-      value: v,
+      value,
     }))}
     search
     selection

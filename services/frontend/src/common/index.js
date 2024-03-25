@@ -402,7 +402,9 @@ export const resolveStudyPlan = (studyPlans, studyRight) => {
       .filter(element => element.element_detail.type === 20)
       .sort((a, b) => new Date(a.startdate) - new Date(b.startdate))[0] || {}
   if (!code) return null
-  return studyPlans.find(p => p.programme_code === code && p.studyrightid === studyRight.studyrightid)
+  return studyPlans.find(
+    studyPlan => studyPlan.programme_code === code && studyPlan.studyrightid === studyRight.studyrightid
+  )
 }
 
 export const getCurrentSemester = allSemesters => {
