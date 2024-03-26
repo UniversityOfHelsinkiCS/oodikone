@@ -161,6 +161,9 @@ const GradeGraph = ({ semesters, student }) => {
     title: {
       text: 'Grade plot',
     },
+    tooltip: {
+      pointFormat: '{point.y:.2f}',
+    },
     xAxis: {
       type: 'datetime',
       min: new Date(series.minDate).getTime(),
