@@ -108,7 +108,6 @@ const semesterChunkify = (courses, semesterenrollments, semesters, getTextIn) =>
   return [{ name: 'Semester mean', data: semesterMeans, seriesThreshold: 150 }]
 }
 
-// probably needs some fixing to be done
 const gradeMeanSeries = (student, chunksize, semesters, getTextIn) => {
   const sortedCourses = student.courses.sort(byDateDesc).reverse()
   const filterCourses = sortedCourses.filter(
@@ -147,7 +146,7 @@ const gradeMeanSeries = (student, chunksize, semesters, getTextIn) => {
   return data
 }
 
-const GradeGraph = ({ student, semesters }) => {
+const GradeGraph = ({ semesters, student }) => {
   const [chunky, setChunky] = useState(false)
   const { getTextIn } = useLanguage()
   const [chunksize, setChunkSize] = useState(5)
@@ -194,31 +193,34 @@ const GradeGraph = ({ student, semesters }) => {
           valitun koon mukaan ja ottaa niiden keskiarvot. Semester mean laskee jokaisen lukukauden keskiarvon.
         </p>
       </Message>
-      <Menu align="center" compact>
+      <Menu align="center" compact style={{ marginBottom: '15px' }}>
         <Menu.Item
           active={!chunky && !semester}
-          name="Show total mean"
           onClick={() => {
             setChunky(false)
             setSemester(false)
           }}
-        />
+        >
+          Show total mean
+        </Menu.Item>
         <Menu.Item
           active={chunky && !semester}
-          name="Show group mean"
           onClick={() => {
             setChunky(true)
             setSemester(false)
           }}
-        />
+        >
+          Show group mean
+        </Menu.Item>
         <Menu.Item
           active={!chunky && semester}
-          name="Show semester mean"
           onClick={() => {
             setChunky(false)
             setSemester(true)
           }}
-        />
+        >
+          Show semester mean
+        </Menu.Item>
       </Menu>
       {chunky && (
         <div>
@@ -236,7 +238,7 @@ const GradeGraph = ({ student, semesters }) => {
   )
 }
 
-export const StudentGraphs = ({ student, absences, graphYearStart, semesters, studyRightId }) => {
+export const StudentGraphs = ({ absences, graphYearStart, semesters, student, studyRightId }) => {
   const panes = [
     {
       menuItem: 'Credit graph',
