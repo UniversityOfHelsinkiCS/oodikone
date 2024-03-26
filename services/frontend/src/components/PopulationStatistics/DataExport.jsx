@@ -189,16 +189,15 @@ export const DataExport = ({ students, programmeCode }) => {
       : []
 
     const studentToStudyrightStarts = getStudentToStudyrightStartMap(students, programmeCode)
-    const studentToProgrammeStartMap = students.reduce((res, sn) => {
+    const studentToProgrammeStartMap = students.reduce((res, student) => {
       const targetStudyright = flatten(
-        sn.studyrights.reduce((acc, curr) => {
+        student.studyrights.reduce((acc, curr) => {
           acc.push(curr.studyright_elements)
           return acc
         }, [])
       ).filter(element => element.code === programmeCode)
-      // clean up odd bachelor start dates, (givendate)
-      res[sn.studentNumber] = new Date(
-        Math.max(new Date(targetStudyright[0]?.startdate), new Date(studentToStudyrightStarts[sn.studentNumber]))
+      res[student.studentNumber] = new Date(
+        Math.max(new Date(targetStudyright[0]?.startdate), new Date(studentToStudyrightStarts[student.studentNumber]))
       )
       return res
     }, {})

@@ -1,6 +1,6 @@
 import fp from 'lodash/fp'
 import React from 'react'
-import { Form, Checkbox } from 'semantic-ui-react'
+import { Checkbox, Form } from 'semantic-ui-react'
 
 import { getHighestGradeOrEnrollmentOfCourseBetweenRange } from '@/common'
 import { createFilter } from './createFilter'
@@ -10,8 +10,6 @@ import { createFilter } from './createFilter'
  * Only applicable to a single course.
  */
 const GradeFilterCard = ({ options, onOptionsChange, grades, withoutSelf }) => {
-  // const { addFilter, removeFilter, activeFilters } = useFilters()
-  // const { value, setValue, grades } = useGradeFilter()
   const { selected } = options
   const name = 'gradeFilter'
 
@@ -35,7 +33,9 @@ const GradeFilterCard = ({ options, onOptionsChange, grades, withoutSelf }) => {
 
   const studentsWithoutSelf = withoutSelf()
   const gradesWithoutSelf = fp.mapValues(
-    fp.filter(sn => studentsWithoutSelf.find(student => student.studentNumber === sn) !== undefined)
+    fp.filter(
+      studentNumber => studentsWithoutSelf.find(student => student.studentNumber === studentNumber) !== undefined
+    )
   )(grades)
 
   return (
@@ -83,13 +83,13 @@ export const gradeFilter = createFilter({
         courses => args.courseCodes.some(code => courses.includes(code))
       )
     ), */
-      fp.map(([sn, courses, enrollments]) => [
-        sn,
+      fp.map(([studentNumber, courses, enrollments]) => [
+        studentNumber,
         getHighestGradeOrEnrollmentOfCourseBetweenRange(courses, enrollments, args.from, args.to),
       ]),
       fp.filter(([, grade]) => grade !== undefined),
       fp.groupBy(([, { grade }]) => grade),
-      fp.mapValues(fp.map(([sn]) => sn)),
+      fp.mapValues(fp.map(([studentNumber]) => studentNumber)),
       grades => ({ grades })
     )(students),
 
