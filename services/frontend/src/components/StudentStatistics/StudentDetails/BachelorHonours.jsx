@@ -1,6 +1,6 @@
 import moment from 'moment'
 import React, { useEffect, useState } from 'react'
-import { Divider, Table, Label, Header, Accordion, Icon } from 'semantic-ui-react'
+import { Accordion, Divider, Header, Icon, Label, Table } from 'semantic-ui-react'
 
 import {
   bachelorHonoursProgrammes as bachelorCodes,
@@ -10,7 +10,7 @@ import {
 } from '@/common'
 import { CurriculumPicker } from '@/components/PopulationDetails/CurriculumPicker'
 
-export const BachelorHonours = ({ student, absentYears, programmeCode }) => {
+export const BachelorHonours = ({ absentYears, programmeCode, student }) => {
   const [curriculum, setCurriculum] = useState(null)
   const [studentsModules, setModules] = useState([])
   const [otherModules, setOther] = useState([])
@@ -136,7 +136,7 @@ export const BachelorHonours = ({ student, absentYears, programmeCode }) => {
       {!honors && reason && <Label color="red" content={reason} tag />}
       {inspection && <Label color="blue" content="Might need further inspection" tag />}
       <div style={{ marginTop: '15px', marginBottom: '15px' }}>
-        Select curriculum version used for checking Bachelor's Honour's eligibility
+        Select curriculum version used for checking Bachelor Honours eligibility
         <CurriculumPicker
           curriculum={curriculum}
           programmeCodes={[programmeCode]}

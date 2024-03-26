@@ -4,7 +4,7 @@ import { Segment, Table } from 'semantic-ui-react'
 
 const getWidth = index => {
   if (index === 1) {
-    return '4'
+    return '6'
   }
   return '1'
 }
@@ -17,7 +17,7 @@ const getHeaderRow = headers => (
       {headers.map((header, index) => (
         <Table.HeaderCell
           key={`header-${header}`}
-          style={{ textAlign: index === creditsColumnIndex ? 'right' : 'left' }}
+          style={{ textAlign: index === creditsColumnIndex ? 'right' : 'left', paddingRight: '30px' }}
         >
           {header}
         </Table.HeaderCell>
@@ -41,7 +41,7 @@ const getTableBody = rows => (
             <Table.Cell
               // eslint-disable-next-line react/no-array-index-key
               key={`cell-${index}`}
-              style={{ textAlign: index === creditsColumnIndex ? 'right' : 'left', paddingRight: '20px' }}
+              style={{ textAlign: index === creditsColumnIndex ? 'right' : 'left', paddingRight: '30px' }}
               width={getWidth(index)}
             >
               {value}
