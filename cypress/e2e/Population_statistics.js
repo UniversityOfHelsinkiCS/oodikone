@@ -132,14 +132,14 @@ describe('Population Statistics tests', () => {
       cy.contains('Credit accumulation (for 170 students)')
     })
 
-    it('Credit Statistics, Credits Gained tab works', () => {
+    it('Credit Statistics, Credits gained tab works', () => {
       cy.selectStudyProgramme('Tietojenkäsittelytieteen kandiohjelma')
       cy.contains('Credit statistics')
         .parent()
         .then($parentDiv => {
           if (!$parentDiv.hasClass('active')) cy.contains('Credit statistics').click()
         })
-      cy.contains('Credits Gained').click()
+      cy.contains('Credits gained').click()
       cy.get("[data-cy='credits-gained-main-table']").should('contain', 'All students of the class')
       const today = moment().endOf('month')
       const months = Math.round(moment.duration(moment(today).diff(moment('2017-08-01'))).asMonths())
@@ -172,7 +172,7 @@ describe('Population Statistics tests', () => {
       cy.get("[data-cy='credits-gained-table-Ei valintatapaa']").should('not.exist')
     })
 
-    it('Credit Statistics, Credits Gained tab shows stats by admissions', () => {
+    it('Credit Statistics, Credits gained tab shows stats by admissions', () => {
       cy.visit(pathToCSMaster2019)
       cy.cs('filtered-students')
       cy.contains('Credit statistics')
@@ -181,7 +181,7 @@ describe('Population Statistics tests', () => {
         .then($parentDiv => {
           if (!$parentDiv.hasClass('active')) cy.get("[data-cy='Credit statistics']").click()
         })
-      cy.contains('Credits Gained').click()
+      cy.contains('Credits gained').click()
       cy.get('.credits-gained-divider').click()
       cy.get("[data-cy='credits-gained-table-Avoin väylä']").should('exist')
       cy.get("[data-cy='credits-gained-table-Yhteispisteet']").should('exist')

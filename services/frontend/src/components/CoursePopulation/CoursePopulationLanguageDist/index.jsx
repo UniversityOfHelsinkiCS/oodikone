@@ -35,10 +35,10 @@ export const CoursePopulationLanguageDist = ({ samples, codes, from, to }) => {
         <Table.Row>
           <Table.HeaderCell>Languages</Table.HeaderCell>
           <Table.HeaderCell>
-            Language Distribution
+            Language distribution
             <div style={{ fontWeight: 100 }}>(n={total})</div>
           </Table.HeaderCell>
-          <Table.HeaderCell>Percentage of Population</Table.HeaderCell>
+          <Table.HeaderCell>Percentage of population</Table.HeaderCell>
         </Table.Row>
       </Table.Header>
       <Table.Body>

@@ -1,4 +1,4 @@
-import { difference, min, max, flatten, pickBy, uniq } from 'lodash'
+import { difference, flatten, max, min, pickBy, uniq } from 'lodash'
 import { arrayOf, bool, func, number, objectOf, oneOfType, shape, string } from 'prop-types'
 import qs from 'query-string'
 import React, { useEffect, useMemo, useState } from 'react'
@@ -121,14 +121,14 @@ const SingleCourseStats = ({
     }
   }, [programmes])
 
-  const getProgrammeName = progcode => {
-    if (progcode === ALL.value) {
+  const getProgrammeName = programmeCode => {
+    if (programmeCode === ALL.value) {
       return 'All'
     }
-    if (progcode === 'EXCLUDED') {
+    if (programmeCode === 'EXCLUDED') {
       return 'Excluded'
     }
-    const { name } = stats.programmes[progcode]
+    const { name } = stats.programmes[programmeCode]
     return getTextIn(name)
   }
 
@@ -138,7 +138,7 @@ const SingleCourseStats = ({
     primary.includes(ALL.value)
       ? []
       : difference(
-          programmes.map(p => p.value).filter(v => v !== ALL.value),
+          programmes.map(programme => programme.value).filter(value => value !== ALL.value),
           primary
         )
 
@@ -157,7 +157,7 @@ const SingleCourseStats = ({
     return studentnumber => numberset.has(studentnumber)
   }
 
-  const validProgCode = code => {
+  const validProgrammeCode = code => {
     const { programmes } = stats
     return programmes[code] || code === ALL.value || code === 'EXCLUDED'
   }
@@ -277,9 +277,9 @@ const SingleCourseStats = ({
     }
   }
 
-  const statsForProgrammes = (progCodes, name) => {
+  const statsForProgrammes = (programmeCodes, name) => {
     const { statistics } = stats
-    const filter = belongsToAtLeastOneProgramme(progCodes)
+    const filter = belongsToAtLeastOneProgramme(programmeCodes)
     const formattedStats = statistics
       .filter(isStatInYearRange)
       .map(
@@ -320,7 +320,7 @@ const SingleCourseStats = ({
     const totals = countTotalStats(formattedStats, userHasAccessToAllStats)
 
     return {
-      codes: progCodes.concat,
+      codes: programmeCodes.concat,
       name,
       stats: formattedStats.concat(totals),
       userHasAccessToAllStats,
@@ -329,9 +329,9 @@ const SingleCourseStats = ({
   }
 
   const handleSelect = (_event, { name, value }) => {
-    let selected = [...value].filter(v => v !== ALL.value)
+    let selected = [...value].filter(value => value !== ALL.value)
     if (name === 'primary') {
-      setComparison(comparison.filter(p => p !== 'EXCLUDED'))
+      setComparison(comparison.filter(programmeCode => programmeCode !== 'EXCLUDED'))
     }
 
     if ((!primary.includes(ALL.value) && value.includes(ALL.value)) || (name === 'primary' && value.length === 0)) {
@@ -352,11 +352,9 @@ const SingleCourseStats = ({
   }
 
   const filteredProgrammeStatistics = () => {
-    const filter = p => validProgCode(p)
     const excludedProgrammes = getExcluded()
-
     const primaryProgrammes = primary
-    const comparisonProgrammes = comparison.filter(filter)
+    const comparisonProgrammes = comparison.filter(code => validProgrammeCode(code))
     if (comparison.includes('EXCLUDED')) comparisonProgrammes.push(...excludedProgrammes)
 
     const pstats = primaryProgrammes.length

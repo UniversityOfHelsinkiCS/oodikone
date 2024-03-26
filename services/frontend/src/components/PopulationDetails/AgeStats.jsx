@@ -105,11 +105,9 @@ export const AgeStats = ({ filteredStudents, query }) => {
           <Table.Row>
             <Table.HeaderCell>Age</Table.HeaderCell>
             <Table.HeaderCell>
-              Number of Students
-              <br />
-              <span style={{ fontWeight: 100 }}>(n={filteredStudents.length})</span>
+              Number of students <span style={{ fontWeight: 100 }}>(n={filteredStudents.length})</span>
             </Table.HeaderCell>
-            <Table.HeaderCell>Percentage of Population</Table.HeaderCell>
+            <Table.HeaderCell>Percentage of population</Table.HeaderCell>
           </Table.Row>
         </Table.Header>
         <Table.Body>

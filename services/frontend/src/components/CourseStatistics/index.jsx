@@ -115,7 +115,7 @@ export const CourseStatistics = () => {
       },
     ]
 
-    return !singleCourseStats ? panes : panes.filter(p => p.menuItem !== MENU.SUM)
+    return !singleCourseStats ? panes : panes.filter(pane => pane.menuItem !== MENU.SUM)
   }
 
   const handleTabChange = (_, { activeIndex, panes }) => {

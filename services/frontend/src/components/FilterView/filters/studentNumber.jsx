@@ -8,10 +8,16 @@ import { createFilter } from './createFilter'
 const IconButton = ({ onClick, ...props }) => (
   <button
     onClick={onClick}
-    style={{ background: 'none', border: 'none', alignSelf: 'stretch', padding: '0 0.15em', cursor: 'pointer' }}
+    style={{
+      alignSelf: 'stretch',
+      background: 'none',
+      border: 'none',
+      cursor: 'pointer',
+      padding: '0 0.15em',
+    }}
     type="button"
   >
-    <Icon {...props} style={_.merge(props.style ?? {}, { marginRight: 0, color: '#5a5a5a' })} />
+    <Icon {...props} style={_.merge(props.style ?? {}, { color: '#5a5a5a', marginRight: 0 })} />
   </button>
 )
 
@@ -27,26 +33,31 @@ const EditableList = ({ value, onChange, renderLabel }) => {
     >
       <ul
         style={{
-          margin: 0,
-          padding: 0,
           listStyle: 'none',
+          margin: 0,
           maxHeight: '10em',
           overflowY: 'auto',
+          padding: 0,
           scrollbarWidth: 'thin',
         }}
       >
-        {value.map((sn, i) => (
+        {value.map((studentNumber, index) => (
           <li
-            key={sn}
-            style={{ display: 'flex', borderTop: i > 0 && '0px solid #e6e6e7', height: '1.75em', alignItems: 'center' }}
+            key={studentNumber}
+            style={{
+              alignItems: 'center',
+              borderTop: index > 0 && '0px solid #e6e6e7',
+              display: 'flex',
+              height: '1.75em',
+            }}
           >
-            <span style={{ marginLeft: '0.3em', fontSize: '0.9em' }}>{sn}</span>
-            {renderLabel?.(sn)}
+            <span style={{ fontSize: '0.9em', marginLeft: '0.3em' }}>{studentNumber}</span>
+            {renderLabel?.(studentNumber)}
             <span style={{ flexGrow: 1 }} />
             <IconButton
               name="x"
               onClick={() => {
-                onChange(_.difference(value, [sn]))
+                onChange(_.difference(value, [studentNumber]))
               }}
             />
           </li>
@@ -54,12 +65,12 @@ const EditableList = ({ value, onChange, renderLabel }) => {
         {value.length === 0 && (
           <li
             style={{
-              paddingLeft: '0.3em',
               color: 'gray',
-              height: '1.75em',
               fontSize: '0.9em',
-              lineHeight: '1.75em',
               fontStyle: 'italic',
+              height: '1.75em',
+              lineHeight: '1.75em',
+              paddingLeft: '0.3em',
             }}
           >
             Empty
@@ -68,31 +79,31 @@ const EditableList = ({ value, onChange, renderLabel }) => {
       </ul>
       <div
         style={{
-          display: 'flex',
-          width: '100%',
-          height: '1.75em',
-          borderTop: '1px solid #e6e6e7',
           alignItems: 'center',
+          borderTop: '1px solid #e6e6e7',
+          display: 'flex',
+          height: '1.75em',
+          width: '100%',
         }}
       >
         <input
           onChange={event => setInput(event.target.value)}
           placeholder="Student number(s)"
           style={{
-            flexGrow: 1,
-            border: 'none',
-            minWidth: 0,
             alignSelf: 'stretch',
-            fontSize: '0.9em',
-            paddingLeft: '0.3em',
+            border: 'none',
             borderBottomLeftRadius: '3pt',
-            zIndex: 10,
+            flexGrow: 1,
+            fontSize: '0.9em',
+            minWidth: 0,
+            paddingLeft: '0.3em',
             position: 'relative',
+            zIndex: 10,
           }}
           type="text"
           value={inputValue}
         />
-        <div style={{ width: '1px', alignSelf: 'stretch', backgroundColor: '#e6e6e7' }} />
+        <div style={{ alignSelf: 'stretch', backgroundColor: '#e6e6e7', width: '1px' }} />
         <IconButton
           name="plus"
           onClick={() => {
@@ -127,17 +138,17 @@ const StudentNumberFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
     })
   }
 
-  const labelRenderer = sn =>
-    students.find(student => student.studentNumber === sn) ? (
+  const labelRenderer = studentNumber =>
+    students.find(student => student.studentNumber === studentNumber) ? (
       <Icon
         name="check"
         style={{
           color: '#31ac31',
           cursor: 'help',
-          position: 'relative',
-          top: '-3px',
           fontSize: '0.8em',
           marginLeft: '0.3em',
+          position: 'relative',
+          top: '-3px',
         }}
         title="Filter was applied to this student"
       />
@@ -147,10 +158,10 @@ const StudentNumberFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
         style={{
           color: 'rgb(223, 71, 71)',
           cursor: 'help',
-          position: 'relative',
-          top: '-3px',
           fontSize: '0.8em',
           marginLeft: '0.3em',
+          position: 'relative',
+          top: '-3px',
         }}
         title="This student was not present in the population"
       />
@@ -181,7 +192,7 @@ const StudentNumberFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
 export const studentNumberFilter = createFilter({
   key: 'studentNumber',
 
-  title: 'Student Number',
+  title: 'Student number',
 
   defaultOptions: {
     allowlist: [],
@@ -193,10 +204,9 @@ export const studentNumberFilter = createFilter({
   isActive: ({ allowlist, blocklist }) => allowlist.length > 0 || blocklist.length > 0,
 
   filter(student, { allowlist, blocklist }) {
-    const sn = student.studentNumber
-
     return (
-      (allowlist.length === 0 || _.includes(allowlist, sn)) && (blocklist.length === 0 || !_.includes(blocklist, sn))
+      (allowlist.length === 0 || _.includes(allowlist, student.studentNumber)) &&
+      (blocklist.length === 0 || !_.includes(blocklist, student.studentNumber))
     )
   },
 

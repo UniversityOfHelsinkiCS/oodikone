@@ -39,7 +39,7 @@ export const FacultySelector = ({ faculties, selected }) => {
   const headers = [
     {
       key: 'facultycode',
-      title: 'code',
+      title: 'Code',
       getRowVal: faculty => faculty.code,
       getRowContent: faculty => (
         <Link
@@ -63,7 +63,7 @@ export const FacultySelector = ({ faculties, selected }) => {
     },
     {
       key: 'facultyname',
-      title: 'name',
+      title: 'Name',
       getRowVal: faculty => getTextIn(faculty.name),
       getRowContent: faculty => (
         <Link

@@ -149,7 +149,7 @@ export const PassFailEnrollments = ({ flat, onlyIamRights }) => {
               },
               {
                 key: 'attempts-per-student',
-                title: 'per Student',
+                title: 'Per student',
                 cellStyle: { textAlign: 'right' },
                 filterType: 'range',
                 getRowVal: row => row.stats?.perStudent,
@@ -174,7 +174,7 @@ export const PassFailEnrollments = ({ flat, onlyIamRights }) => {
           },
           {
             key: 'of-population',
-            title: 'Percentage of Population',
+            title: 'Percentage of population',
             children: [
               {
                 key: 'passed-of-population',

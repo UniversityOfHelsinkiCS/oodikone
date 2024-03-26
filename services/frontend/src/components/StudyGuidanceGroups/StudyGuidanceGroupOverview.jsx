@@ -22,9 +22,9 @@ const LinkToGroup = ({ group }) => {
       style={{
         color: 'black',
         display: 'inline-block',
-        width: '100%',
         height: '100%',
         padding: '.78571429em .78571429em',
+        width: '100%',
       }}
       to={destination}
     >
@@ -42,7 +42,7 @@ const prettifyCamelCase = string => {
 const cellWrapper = { display: 'flex', gap: '8px', width: '100%' }
 const cellContent = { flexGrow: 1 }
 
-const EditTagModal = ({ group, tagName, toggleEdit, selectFieldItems, open }) => {
+const EditTagModal = ({ group, open, selectFieldItems, tagName, toggleEdit }) => {
   const [changeStudyGuidanceGroupTags, { isLoading }] = useChangeStudyGuidanceGroupTagsMutation()
   const { getTextIn } = useLanguage()
   const initialState = { [tagName]: '' }
@@ -67,7 +67,7 @@ const EditTagModal = ({ group, tagName, toggleEdit, selectFieldItems, open }) =>
     setFormValues(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = () => {
+  const handleSave = () => {
     const errors = validate(formValues)
     setFormErrors(errors)
 
@@ -75,6 +75,11 @@ const EditTagModal = ({ group, tagName, toggleEdit, selectFieldItems, open }) =>
       changeStudyGuidanceGroupTags({ groupId: group.id, tags: formValues })
       toggleEdit()
     }
+  }
+
+  const handleRemove = () => {
+    changeStudyGuidanceGroupTags({ groupId: group.id, tags: { [tagName]: null } })
+    toggleEdit()
   }
 
   return (
@@ -91,13 +96,22 @@ const EditTagModal = ({ group, tagName, toggleEdit, selectFieldItems, open }) =>
         />
       </Modal.Content>
       <Modal.Actions>
-        <Button content="Cancel" icon="trash" labelPosition="right" negative onClick={toggleEdit} />
+        <Button content="Cancel" icon="cancel" labelPosition="right" onClick={toggleEdit} />
+        <Button
+          content="Remove"
+          disabled={isLoading || !group.tags?.[tagName]}
+          icon="trash"
+          labelPosition="right"
+          negative
+          onClick={handleRemove}
+          type="submit"
+        />
         <Button
           content="Save"
           disabled={isLoading}
           icon="checkmark"
           labelPosition="right"
-          onClick={handleSubmit}
+          onClick={handleSave}
           positive
           type="submit"
         />
@@ -106,7 +120,7 @@ const EditTagModal = ({ group, tagName, toggleEdit, selectFieldItems, open }) =>
   )
 }
 
-const AssociateTagForm = ({ group, tagName, selectFieldItems, formValues, handleChange, formErrors }) => (
+const AssociateTagForm = ({ formErrors, formValues, group, handleChange, selectFieldItems, tagName }) => (
   <>
     <p>
       {tagName === 'studyProgramme'
@@ -123,7 +137,7 @@ const AssociateTagForm = ({ group, tagName, selectFieldItems, formValues, handle
             onChange={(_, { value }) => handleChange(tagName, value)}
             options={selectFieldItems}
             placeholder={
-              selectFieldItems.find(p => p.value === group.tags?.[tagName])?.text || 'Select study programme'
+              selectFieldItems.find(item => item.value === group.tags?.[tagName])?.text || 'Select study programme'
             }
             search={textAndDescriptionSearch}
             value={formValues[tagName]}
@@ -178,7 +192,7 @@ const TagCell = ({ group, studyProgrammes, tagName }) => {
   const getText = () => {
     switch (tagName) {
       case 'studyProgramme':
-        return studyProgrammes.find(p => p.value === group.tags?.[tagName])?.text
+        return studyProgrammes.find(programme => programme.value === group.tags?.[tagName])?.text
       case 'year':
         return startYearToAcademicYear(group.tags?.[tagName])
       default:
@@ -196,7 +210,7 @@ const TagCell = ({ group, studyProgrammes, tagName }) => {
       />
       {group.tags?.[tagName] ? (
         <div style={{ ...cellWrapper, alignItems: 'baseline' }}>
-          <p style={{ ...cellContent, textAlign: 'center' }}>{getText()}</p>
+          <p style={{ ...cellContent, textAlign: 'left' }}>{getText()}</p>
           <div style={{ ...cellContent, flexGrow: 0 }}>
             <Button icon="pencil" onClick={() => toggleEdit()} size="tiny" />
           </div>
@@ -233,21 +247,20 @@ export const StudyGuidanceGroupOverview = ({ groups }) => {
       getRowContent: group => group.members?.length || 0,
       cellProps: {
         style: {
-          padding: '0',
-          textAlign: 'center',
+          textAlign: 'right',
         },
       },
     },
     {
       key: 'studyProgramme',
-      title: 'Study Programme',
+      title: 'Study programme',
       getRowVal: group => group.tags?.studyProgramme,
-      formatValue: value => studyProgrammes.find(p => p.value === value)?.text,
+      formatValue: value => studyProgrammes.find(programme => programme.value === value)?.text,
       getRowContent: group => <TagCell group={group} studyProgrammes={studyProgrammes} tagName="studyProgramme" />,
     },
     {
       key: 'associatedYear',
-      title: 'Associated Starting Academic Year',
+      title: 'Associated starting academic year',
       getRowVal: group => group.tags?.year,
       formatValue: startYearToAcademicYear,
       getRowContent: group => <TagCell group={group} tagName="year" />,

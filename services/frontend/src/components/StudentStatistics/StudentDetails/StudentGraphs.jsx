@@ -41,7 +41,7 @@ const resolveGraphEndDate = (dates, selectedStudyRight, student, studyRightTarge
   const studyRightElement = selectedStudyRight.studyright_elements.sort(
     (a, b) => new Date(b.startdate) - new Date(a.startdate)
   )[0]
-  const studyPlan = student.studyplans.find(p => p.programme_code === studyRightElement.code)
+  const studyPlan = student.studyplans.find(plan => plan.programme_code === studyRightElement.code)
   const filteredCourses = studyPlan
     ? // eslint-disable-next-line camelcase
       student.courses.filter(({ course_code }) => studyPlan.included_courses.includes(course_code))

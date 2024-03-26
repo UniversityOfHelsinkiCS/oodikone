@@ -68,15 +68,11 @@ const StudyTrackFilterCard = ({ options, onOptionsChange, withoutSelf, activeAt,
 
 export const studyTrackFilter = createFilter({
   key: 'StudyTrack',
-
-  title: 'Study Track',
-
+  title: 'Study track',
   defaultOptions: {
     selected: [],
   },
-
   isActive: ({ selected }) => selected.length > 0,
-
   filter: (student, { selected, args }) => {
     const activeAt = _.get(args, 'activeAt', moment())
 
@@ -98,7 +94,6 @@ export const studyTrackFilter = createFilter({
       .map(element => element.element_detail.code)
       .some(code => selected.includes(code))
   },
-
   render: (props, { args }) => (
     <StudyTrackFilterCard {...props} activeAt={_.get(args, 'activeAt')} code={_.get(args, 'code')} />
   ),

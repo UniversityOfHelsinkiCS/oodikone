@@ -14,13 +14,13 @@ const NO_PROGRAMME = {
 }
 
 const ProgrammeFilterCard = ({
-  options,
-  onOptionsChange,
-  programmes,
-  withoutSelf,
-  studyRightPredicate,
-  studentToProgrammeMap,
   additionalModes,
+  onOptionsChange,
+  options,
+  programmes,
+  studentToProgrammeMap,
+  studyRightPredicate,
+  withoutSelf,
 }) => {
   const { getTextIn } = useLanguage()
   const { selectedProgrammes } = options
@@ -40,9 +40,7 @@ const ProgrammeFilterCard = ({
       if (!acc[details.code]) {
         acc[details.code] = { ...details, studentCount: 0 }
       }
-
       acc[details.code].studentCount += 1
-
       return acc
     }, {}),
     fp.values
@@ -51,11 +49,11 @@ const ProgrammeFilterCard = ({
   const dropdownOptions = useMemo(
     () =>
       _.chain(visibleProgrammes)
-        .concat(selectedProgrammes.map(code => programmes.find(p => p && p.code === code)))
-        .map(program => {
-          const code = program?.code ?? NO_PROGRAMME.code
-          const name = program?.name ?? NO_PROGRAMME.name
-          const studentCount = program?.studentCount ?? -1
+        .concat(selectedProgrammes.map(code => programmes.find(programme => programme && programme.code === code)))
+        .map(programme => {
+          const code = programme?.code ?? NO_PROGRAMME.code
+          const name = programme?.name ?? NO_PROGRAMME.name
+          const studentCount = programme?.studentCount ?? -1
           return {
             key: `programme-filter-value-${code}`,
             text: getTextIn(name),

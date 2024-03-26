@@ -14,7 +14,9 @@ const chooseCurriculumToFetch = (curriculums, selectedCurriculum, startYear) => 
     if (!startYear) {
       return curriculums[0]
     }
-    const defaultCurriculum = curriculums.find(cur => cur.curriculum_period_ids.includes(parseInt(startYear, 10)))
+    const defaultCurriculum = curriculums.find(curriculum =>
+      curriculum.curriculum_period_ids.includes(parseInt(startYear, 10))
+    )
     return defaultCurriculum ?? curriculums[0]
   }
   return null
@@ -45,8 +47,8 @@ export const CurriculumPicker = ({ setCurriculum, programmeCodes, disabled, year
     setCurriculum({ ...curriculumsQuery.data, version: chosenCurriculum?.curriculum_period_ids })
   }, [curriculumsQuery.data])
 
-  const formatCurriculumOptions = cur => {
-    const years = sortBy(cur.curriculum_period_ids)
+  const formatCurriculumOptions = curriculum => {
+    const years = sortBy(curriculum.curriculum_period_ids)
     if (years.length === 0) return 'error'
     if (years.length === 1) return years[0]
     return `${years[0]} - ${years[years.length - 1]}`
@@ -83,14 +85,14 @@ export const CurriculumPicker = ({ setCurriculum, programmeCodes, disabled, year
 
 export const CourseTableModeSelector = ({
   courseTableMode,
-  setCourseTableMode,
-  year,
-  studyProgramme,
-  setCurriculum,
-  studentAmountLimit,
-  setStudentAmountLimit,
   filteredStudents,
   onStudentAmountLimitChange,
+  setCourseTableMode,
+  setCurriculum,
+  setStudentAmountLimit,
+  studentAmountLimit,
+  studyProgramme,
+  year,
 }) => {
   useEffect(() => {
     setStudentAmountLimit(Math.round(filteredStudents.length ? filteredStudents.length * 0.3 : 0))
@@ -103,7 +105,7 @@ export const CourseTableModeSelector = ({
           checked={courseTableMode === 'curriculum'}
           label="Choose curriculum"
           name="coursesRadioGroup"
-          onChange={(event, { value }) => setCourseTableMode(value)}
+          onChange={(_event, { value }) => setCourseTableMode(value)}
           style={{ fontWeight: 'bold' }}
           value="curriculum"
         />
@@ -111,7 +113,7 @@ export const CourseTableModeSelector = ({
           checked={courseTableMode === 'all'}
           label="Show all courses with at least"
           name="coursesRadioGroup"
-          onChange={(event, { value }) => setCourseTableMode(value)}
+          onChange={(_event, { value }) => setCourseTableMode(value)}
           style={{ fontWeight: 'bold' }}
           value="all"
         />

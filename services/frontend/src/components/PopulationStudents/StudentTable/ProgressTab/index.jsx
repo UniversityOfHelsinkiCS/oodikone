@@ -246,7 +246,7 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
         children: [
           {
             key: 'studentnumber-parent',
-            title: 'Student Number',
+            title: 'Student number',
             cellProps: { title: 'student number', className: 'studentNumber' },
             getRowVal: student => student.studentNumber,
             getRowContent: student => (
@@ -263,7 +263,7 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
         children: [
           {
             key: 'lastname-hidden',
-            title: 'Last Name',
+            title: 'Last name',
             export: true,
             forceToolsMode: namesVisible ? '' : 'none',
             getRowVal: student => student.lastname,
@@ -271,7 +271,7 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
           },
           {
             key: 'firstname-hidden',
-            title: 'First Names',
+            title: 'First names',
             export: true,
             forceToolsMode: namesVisible ? '' : 'none',
             getRowVal: student => student.firstnames,
@@ -477,7 +477,7 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
           key: 'hidden-secondary-email',
           export: true,
           displayColumn: false,
-          textTitle: 'Secondary Email',
+          textTitle: 'Secondary email',
           getRowVal: student => student.secondaryEmail,
         },
       ],

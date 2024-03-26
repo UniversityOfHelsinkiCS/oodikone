@@ -281,7 +281,11 @@ const SingleStudyGroupViewWrapper = ({ group, isLoading, studyProgrammes, childr
             {group && group.name && getTextIn(group.name)}
           </Header>
           {group.tags?.studyProgramme && (
-            <Label color="blue" content={studyProgrammes.find(p => p.value === group.tags.studyProgramme)?.text} tag />
+            <Label
+              color="blue"
+              content={studyProgrammes.find(programme => programme.value === group.tags.studyProgramme)?.text}
+              tag
+            />
           )}
           {group.tags?.year && <Label color="blue" content={startYearToAcademicYear(group.tags.year)} tag />}
         </div>

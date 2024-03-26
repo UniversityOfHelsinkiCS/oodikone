@@ -11,16 +11,16 @@ import { HoverableHelpPopup } from '@/components/common/HoverableHelpPopup'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 
 export const StudyrightsTable = ({
-  Programmes,
-  student,
   handleStartDateChange,
+  Programmes,
   showPopulationStatistics,
+  student,
   studyrightid,
 }) => {
   const { getTextIn } = useLanguage()
   const { programmes } = Programmes
   const programmeCodes = programmes ? Object.keys(programmes) : []
-  const studyRightHeaders = ['Programme', 'Study Track', 'Status', 'Completed']
+  const studyRightHeaders = ['Programme', 'Study track', 'Status', 'Completed']
 
   if (!student) return null
 
@@ -194,7 +194,7 @@ export const StudyrightsTable = ({
         <Table.Body>
           {studyRightRows.map(studyright => {
             if (studyright.elements.programmes.length > 0) {
-              const rowIsFilterable = studyright.elements.programmes.some(p => p.isFilterable)
+              const rowIsFilterable = studyright.elements.programmes.some(programme => programme.isFilterable)
               return (
                 <Table.Row
                   key={studyright.studyrightid}

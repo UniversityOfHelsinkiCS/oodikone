@@ -1,19 +1,19 @@
-import { func, string, arrayOf, shape, bool } from 'prop-types'
+import { arrayOf, bool, func, shape, string } from 'prop-types'
 import React, { memo, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Table } from 'semantic-ui-react'
 
+import { ConnectedTagStudent as TagStudent } from '@/components/TagStudent'
 import { getTagsByStudytrackAction } from '@/redux/tags'
 import { getStudentTagsByStudytrackAction } from '@/redux/tagstudent'
 import { makePopulationsToData } from '@/selectors/populationDetails'
-import { ConnectedTagStudent as TagStudent } from '../TagStudent'
 
 const Row = memo(
-  ({ studentsTags, sn, studytrack, tagOptions, name, combinedProgramme }) => (
+  ({ studentsTags, studentNumber, studytrack, tagOptions, name, combinedProgramme }) => (
     <TagStudent
       combinedProgramme={combinedProgramme}
       studentname={name}
-      studentnumber={sn}
+      studentnumber={studentNumber}
       studentstags={studentsTags}
       studytrack={studytrack}
       tagOptions={tagOptions}
@@ -24,7 +24,7 @@ const Row = memo(
 
 Row.propTypes = {
   studentsTags: arrayOf(shape({})).isRequired,
-  sn: string.isRequired,
+  studentNumber: string.isRequired,
   studytrack: string.isRequired,
   tagOptions: arrayOf(shape({})).isRequired,
   name: string.isRequired,
@@ -32,14 +32,14 @@ Row.propTypes = {
 }
 
 const TagList = ({
-  selectedStudents,
-  tagstudent,
-  tags,
-  mainProgramme,
   combinedProgramme,
   getStudentTagsStudyTrack,
   getTagsByStudytrack,
+  mainProgramme,
   namesVisible,
+  selectedStudents,
+  tags,
+  tagstudent,
 }) => {
   useEffect(() => {
     const studytrackCode = combinedProgramme ? `${mainProgramme}-${combinedProgramme}` : mainProgramme
@@ -47,9 +47,9 @@ const TagList = ({
     getStudentTagsStudyTrack(studytrackCode)
   }, [])
 
-  const tagRows = selectedStudents.map(({ studentNumber: sn, name }) => {
-    const studentsTags = tagstudent.filter(tag => tag.studentnumber === sn)
-    const tagIds = studentsTags.map(t => t.tag.tag_id)
+  const tagRows = selectedStudents.map(({ studentNumber, name }) => {
+    const studentsTags = tagstudent.filter(tag => tag.studentnumber === studentNumber)
+    const tagIds = studentsTags.map(tag => tag.tag.tag_id)
     const studentTagOptions = tags
       .filter(tag => !tagIds.includes(tag.tag_id))
       .map(tag => ({
@@ -60,9 +60,9 @@ const TagList = ({
     return (
       <Row
         combinedProgramme={combinedProgramme}
-        key={sn}
+        key={studentNumber}
         name={name}
-        sn={sn}
+        studentNumber={studentNumber}
         studentsTags={studentsTags}
         studytrack={mainProgramme}
         tagOptions={studentTagOptions}
@@ -75,10 +75,10 @@ const TagList = ({
     <Table celled>
       <Table.Header>
         <Table.Row>
-          {namesVisible && <Table.HeaderCell>student name</Table.HeaderCell>}
-          <Table.HeaderCell>studentnumber</Table.HeaderCell>
-          <Table.HeaderCell>tags</Table.HeaderCell>
-          <Table.HeaderCell>add tags</Table.HeaderCell>
+          {namesVisible && <Table.HeaderCell>Student name</Table.HeaderCell>}
+          <Table.HeaderCell>Student number</Table.HeaderCell>
+          <Table.HeaderCell>Tags</Table.HeaderCell>
+          <Table.HeaderCell>Add tags</Table.HeaderCell>
         </Table.Row>
       </Table.Header>
       <Table.Body>{tagRows}</Table.Body>

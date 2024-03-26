@@ -21,23 +21,23 @@ import '@/components/PopulationCourseStats/populationCourseStats.css'
 import './populationStudents.css'
 
 const Panes = ({
-  filteredStudents,
-  tags,
-  visiblePanes,
-  dataExport,
-  variant,
-  studentToTargetCourseDateMap,
-  coursecode,
-  studyGuidanceGroup,
-  customPopulationProgramme,
-  mainProgramme,
   combinedProgramme,
-  from,
-  to,
-  criteria,
-  months,
-  year,
+  coursecode,
   curriculum,
+  customPopulationProgramme,
+  criteria,
+  dataExport,
+  filteredStudents,
+  from,
+  mainProgramme,
+  months,
+  studentToTargetCourseDateMap,
+  studyGuidanceGroup,
+  tags,
+  to,
+  variant,
+  visiblePanes,
+  year,
 }) => {
   const { handleTabChange } = useTabChangeAnalytics()
   const programmeForTagsLink = combinedProgramme ? `${mainProgramme}+${combinedProgramme}` : mainProgramme
@@ -80,12 +80,12 @@ const Panes = ({
             {tags.length === 0 && (
               <div
                 style={{
-                  paddingLeft: '10px',
-                  minHeight: '300px',
-                  width: '100%',
+                  alignItems: 'center',
                   display: 'flex',
                   justifyContent: 'center',
-                  alignItems: 'center',
+                  minHeight: '300px',
+                  paddingLeft: '10px',
+                  width: '100%',
                 }}
               >
                 <h3>
@@ -145,19 +145,19 @@ const Panes = ({
 }
 
 const PopulationStudents = ({
-  filteredStudents,
-  studentToTargetCourseDateMap,
-  dataExport,
   contentToInclude,
   coursecode = [],
-  variant,
-  studyGuidanceGroup,
+  curriculum,
   customPopulationProgramme,
+  criteria,
+  dataExport,
+  filteredStudents,
   from,
   to,
-  criteria,
+  studentToTargetCourseDateMap,
+  studyGuidanceGroup,
+  variant,
   year,
-  curriculum,
 }) => {
   const [state, setState] = useState({})
   const studentRef = useRef()
@@ -185,13 +185,11 @@ const PopulationStudents = ({
 
   useEffect(() => {
     if (tags && tags.length > 0) return
-    // Create studytrack for fetching tags for class statistics
     const correctCode = combinedProgramme ? `${mainProgramme}+${combinedProgramme}` : mainProgramme
     if (correctCode) {
       dispatch(getTagsByStudytrackAction(correctCode))
       dispatch(getStudentTagsByStudytrackAction(correctCode))
     }
-
     setState({ ...state, admin })
   }, [])
 

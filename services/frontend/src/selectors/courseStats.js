@@ -1,5 +1,5 @@
 import { createSelector } from '@reduxjs/toolkit'
-import { sortBy, flatten } from 'lodash'
+import { flatten, sortBy } from 'lodash'
 
 const courseStatsSelector = state => state.courseStats.data
 const openOrRegularSelector = state => state.courseSearch.openOrRegular
@@ -128,12 +128,12 @@ export const getAllStudyProgrammes = createSelector(
     Object.values(all).forEach(curr => {
       allStudents = mergeStudents(allStudents, curr.students)
     })
-    const programmes = Object.values(all).map(p => ({ ...p, size: p.students.length }))
+    const programmes = Object.values(all).map(programme => ({ ...programme, size: programme.students.length }))
     return [{ ...ALL, students: allStudents }, ...programmes]
   }
 )
 
-const getProgrammesFromProps = (state, { programmeCodes, programmes }) => ({ programmeCodes, programmes })
+const getProgrammesFromProps = (_state, { programmeCodes, programmes }) => ({ programmeCodes, programmes })
 
 const calculatePassRate = (passed, failed) => {
   const passRate = (100 * passed) / (passed + failed)
@@ -177,8 +177,10 @@ export const summaryStatistics = createSelector(
   getCourseStats,
   getProgrammesFromProps,
   (courseStats, { programmeCodes, programmes }, userHasAccessToAllStats) => {
-    const filteredProgrammes = programmes.filter(p => programmeCodes.includes(p.key))
-    const students = new Set(filteredProgrammes.reduce((acc, p) => [...acc, ...flatten(Object.values(p.students))], []))
+    const filteredProgrammes = programmes.filter(programme => programmeCodes.includes(programme.key))
+    const students = new Set(
+      filteredProgrammes.reduce((acc, programme) => [...acc, ...flatten(Object.values(programme.students))], [])
+    )
 
     const filterStudentFn = studentNumber => students.has(studentNumber)
     return Object.entries(courseStats).map(entry => {

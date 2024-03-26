@@ -1,17 +1,17 @@
-import { arrayOf, string, shape, func } from 'prop-types'
+import { arrayOf, func, shape, string } from 'prop-types'
 import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
-import { Button, Dropdown, List, Confirm } from 'semantic-ui-react'
+import { Button, Confirm, Dropdown, List } from 'semantic-ui-react'
 
 import { createMultipleStudentTagAction, deleteMultipleStudentTagAction } from '@/redux/tagstudent'
 
 const TagPopulation = ({
+  combinedProgramme,
   createMultipleStudentTag,
-  tags,
+  deleteMultipleStudentTag,
   mainProgramme,
   selectedStudents,
-  deleteMultipleStudentTag,
-  combinedProgramme,
+  tags,
 }) => {
   const [options, setOptions] = useState([])
   const [selectedValue, setSelected] = useState('')
@@ -39,10 +39,10 @@ const TagPopulation = ({
 
   const handleAdd = () => {
     const tagList = []
-    selectedStudents.forEach(sn => {
+    selectedStudents.forEach(studentNumber => {
       const tag = {
         tag_id: selectedValue,
-        studentnumber: sn,
+        studentnumber: studentNumber,
       }
       tagList.push(tag)
     })
@@ -91,11 +91,11 @@ const TagPopulation = ({
           value={selectedValue}
         />
       </List.Item>
-      <Button disabled={selectedValue === ''} onClick={() => setConfirmAdd(true)}>
-        add tag to {selectedStudents.length} students
+      <Button disabled={selectedValue === ''} onClick={() => setConfirmAdd(true)} style={{ marginLeft: '10px' }}>
+        Add tag to {selectedStudents.length} students
       </Button>
-      <Button disabled={selectedValue === ''} onClick={() => setConfirmDelete(true)}>
-        delete tag from {selectedStudents.length} students
+      <Button disabled={selectedValue === ''} onClick={() => setConfirmDelete(true)} style={{ marginLeft: '10px' }}>
+        Delete tag from {selectedStudents.length} students
       </Button>
       {deleteConfirm}
       {addConfirm}

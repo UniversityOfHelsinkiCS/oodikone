@@ -149,7 +149,7 @@ const HopsFilterCard = ({ options, onOptionsChange, combinedProgramme }) => {
 export const hopsFilter = createFilter({
   key: 'hops',
 
-  title: 'Personal Study Plan',
+  title: 'Personal study plan',
 
   priority: -200,
 

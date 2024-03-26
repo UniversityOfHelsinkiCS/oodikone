@@ -16,12 +16,10 @@ export const FilterDegreeCoursesModal = ({ studyProgramme, year }) => {
       open={open}
       size="large"
       trigger={
-        <span style={{ margin: '0 0.5rem' }}>
-          <Button basic icon labelPosition="left">
-            <Icon name="eye" />
-            Manage Courses Shown
-          </Button>
-        </span>
+        <Button basic icon labelPosition="left">
+          <Icon name="eye" />
+          Manage Courses Shown
+        </Button>
       }
     >
       <Modal.Header>Hide degree courses</Modal.Header>

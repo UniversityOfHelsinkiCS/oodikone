@@ -1,11 +1,11 @@
-import { arrayOf, string, bool, func, shape } from 'prop-types'
+import { arrayOf, bool, func, shape, string } from 'prop-types'
 import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
-import { Button, Modal, Form, TextArea, Dropdown, Message } from 'semantic-ui-react'
+import { Button, Dropdown, Form, Message, Modal, TextArea } from 'semantic-ui-react'
 
 import { createMultipleStudentTagAction } from '@/redux/tagstudent'
 
-const TagModal = ({ tags, studytrack, createMultipleStudentTag, pending, success, error, combinedProgramme }) => {
+const TagModal = ({ combinedProgramme, createMultipleStudentTag, error, pending, studytrack, success, tags }) => {
   const [modalOpen, setModalOpen] = useState(false)
   const [input, setInput] = useState('')
   const [selectedValue, setSelected] = useState('')
@@ -24,9 +24,9 @@ const TagModal = ({ tags, studytrack, createMultipleStudentTag, pending, success
     event.preventDefault()
     const studentnumbers = input.match(/[^\s,]+/g)
     createMultipleStudentTag(
-      studentnumbers.map(sn => ({
+      studentnumbers.map(studentNumber => ({
         tag_id: selectedValue,
-        studentnumber: sn,
+        studentnumber: studentNumber,
       })),
       studytrack,
       combinedProgramme

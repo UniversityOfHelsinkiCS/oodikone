@@ -32,7 +32,7 @@ const allNavigationItems = {
   customPopulations: {
     items: [
       { key: 'customSearch', label: 'Custom population', path: '/custompopulation' },
-      { key: 'openUniSearch', label: 'Fetch Open Uni Students by Courses', path: '/openunipopulation' },
+      { key: 'openUniSearch', label: 'Fetch open uni students by courses', path: '/openunipopulation' },
       { key: 'completedCoursesSearch', label: 'Completed courses of students', path: '/completedcoursessearch' },
       { key: 'languageCenterView', label: 'Language center view', path: '/languagecenterview' },
     ],

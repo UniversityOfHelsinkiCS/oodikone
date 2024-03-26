@@ -454,7 +454,7 @@ export const GeneralTab = ({
       filterType: 'multi',
       getRowContent: student => getStudyProgrammeContent(student),
       getRowVal: student => {
-        return studentProgrammesMap[student.studentNumber]?.programmes.map(p => getTextIn(p.name))
+        return studentProgrammesMap[student.studentNumber]?.programmes.map(programme => getTextIn(programme.name))
       },
       cellProps: student => {
         return { title: studentProgrammesMap[student.studentNumber]?.getProgrammesList('\n') }
@@ -567,7 +567,7 @@ export const GeneralTab = ({
     },
     updatedAt: {
       key: 'updatedAt',
-      title: 'Last Updated At',
+      title: 'Last updated at',
       filterType: 'date',
       getRowVal: student => reformatDate(student.updatedAt, 'YYYY-MM-DD  HH:mm:ss'),
     },

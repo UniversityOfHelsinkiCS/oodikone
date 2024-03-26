@@ -39,9 +39,16 @@ const getAllStudentsUserHasInGroups = async sisPersonId =>
       .map(member => member.personStudentNumber)
   )
 
+const getTagToUpdate = (studyProgramme, year) => {
+  if (studyProgramme || studyProgramme === null) {
+    return { studyProgramme }
+  }
+  return { year }
+}
+
 const changeGroupTags = async ({ groupId, tags }) => {
   const { studyProgramme, year } = tags
-  const tagToUpdate = studyProgramme ? { studyProgramme } : { year }
+  const tagToUpdate = getTagToUpdate(studyProgramme, year)
 
   const [result] = await StudyGuidanceGroupTag.upsert(
     {

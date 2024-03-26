@@ -68,7 +68,7 @@ const AdmissionTypeFilterCard = ({ options, onOptionsChange, withoutSelf, code }
 export const admissionTypeFilter = createFilter({
   key: 'AdmissionType',
 
-  title: 'Admission Type',
+  title: 'Admission type',
 
   defaultOptions: {
     selected: null,

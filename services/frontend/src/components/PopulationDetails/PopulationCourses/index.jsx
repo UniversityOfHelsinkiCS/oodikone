@@ -59,14 +59,22 @@ export const PopulationCourses = ({
 
   return (
     <Segment basic>
-      {courseTableMode === 'curriculum' ? (
-        <InfoBox content={populationStatisticsToolTips.CoursesOfClass} />
-      ) : (
-        <InfoBox content={populationStatisticsToolTips.CoursesOfPopulation} />
-      )}
-      {query.studyRights.programme && !onlyIamRights && (
-        <FilterDegreeCoursesModal studyProgramme={query.studyRights.programme} year={query.year} />
-      )}
+      <div style={{ display: 'flex' }}>
+        {courseTableMode === 'curriculum' ? (
+          <div style={{ marginBottom: '20px', marginRight: '10px' }}>
+            <InfoBox content={populationStatisticsToolTips.CoursesOfClass} />
+          </div>
+        ) : (
+          <div style={{ marginBottom: '20px', marginRight: '10px' }}>
+            <InfoBox content={populationStatisticsToolTips.CoursesOfPopulation} />
+          </div>
+        )}
+        {query.studyRights.programme && !onlyIamRights && (
+          <div style={{ marginBottom: '20px' }}>
+            <FilterDegreeCoursesModal studyProgramme={query.studyRights.programme} year={query.year} />
+          </div>
+        )}
+      </div>
       <SegmentDimmer isLoading={pending} />
       {courseTableMode === 'curriculum' ? (
         <PopulationCourseStats
