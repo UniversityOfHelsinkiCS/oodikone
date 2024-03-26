@@ -1,11 +1,11 @@
 import { func, shape } from 'prop-types'
 import React, { Fragment } from 'react'
 import { Link } from 'react-router-dom'
-import { Divider, Icon, Header, Item } from 'semantic-ui-react'
+import { Divider, Header, Icon, Item } from 'semantic-ui-react'
 
-import { byDateDesc, reformatDate, getTextInWithOpen, resolveStudyPlan } from '@/common'
+import { byDateDesc, getTextInWithOpen, reformatDate, resolveStudyPlan } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { StudentCourseTable } from '../StudentCourseTable'
+import { StudentCourseTable } from '@/components/StudentStatistics/StudentCourseTable'
 
 // Some courses are without AY in the beginning in the studyplan even though the credits are registered with AY.
 const isInStudyPlan = (plan, code) =>
@@ -20,11 +20,11 @@ export const CourseParticipationTable = ({ student, clearCourseStats, studyright
   const courseRowsByAcademicYear = {}
 
   const studyRight = student.studyrights.find(studyright => studyright.studyrightid === studyrightid)
-  const plan = resolveStudyPlan(student.studyplans, studyRight)
+  const studyPlan = resolveStudyPlan(student.studyplans, studyRight)
 
   student.courses.sort(byDateDesc).forEach(studentCourse => {
     const { course, credits, credittypecode, date, grade, isOpenCourse, isStudyModuleCredit, passed } = studentCourse
-    const isIncluded = isInStudyPlan(plan, course.code)
+    const isIncluded = isInStudyPlan(studyPlan, course.code)
 
     let icon = null
 
@@ -98,11 +98,7 @@ export const CourseParticipationTable = ({ student, clearCourseStats, studyright
     return (
       <Fragment key={academicYear}>
         <Header content={academicYear} />
-        <StudentCourseTable
-          headers={courseHeaders}
-          noResultText="Student has courses marked"
-          rows={courseRowsByAcademicYear[academicYear]}
-        />
+        <StudentCourseTable headers={courseHeaders} rows={courseRowsByAcademicYear[academicYear]} />
       </Fragment>
     )
   })

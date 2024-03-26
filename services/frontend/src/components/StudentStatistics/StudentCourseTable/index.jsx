@@ -1,16 +1,6 @@
-import { arrayOf, array, string } from 'prop-types'
+import { array, arrayOf, string } from 'prop-types'
 import React from 'react'
-import { Table, Segment } from 'semantic-ui-react'
-
-const getHeaderRow = headers => (
-  <Table.Header>
-    <Table.Row>
-      {headers.map(header => (
-        <Table.HeaderCell key={`header-${header}`}>{header}</Table.HeaderCell>
-      ))}
-    </Table.Row>
-  </Table.Header>
-)
+import { Segment, Table } from 'semantic-ui-react'
 
 const getWidth = index => {
   if (index === 1) {
@@ -19,21 +9,41 @@ const getWidth = index => {
   return '1'
 }
 
+const creditsColumnIndex = 3
+
+const getHeaderRow = headers => (
+  <Table.Header>
+    <Table.Row>
+      {headers.map((header, index) => (
+        <Table.HeaderCell
+          key={`header-${header}`}
+          style={{ textAlign: index === creditsColumnIndex ? 'right' : 'left' }}
+        >
+          {header}
+        </Table.HeaderCell>
+      ))}
+    </Table.Row>
+  </Table.Header>
+)
+
 const getTableBody = rows => (
   <Table.Body>
-    {rows.map((row, i) => {
+    {rows.map((row, index) => {
       const [highlight, ...rest] = Object.values(row)
       const style = highlight ? { backgroundColor: '#e8f4ff' } : null
-
       return (
         <Table.Row
           // eslint-disable-next-line react/no-array-index-key
-          key={`row-${i}`}
+          key={`row-${index}`}
           style={style}
         >
           {rest.map((value, index) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <Table.Cell key={`cell-${index}`} width={getWidth(index)}>
+            <Table.Cell
+              // eslint-disable-next-line react/no-array-index-key
+              key={`cell-${index}`}
+              style={{ textAlign: index === creditsColumnIndex ? 'right' : 'left', paddingRight: '20px' }}
+              width={getWidth(index)}
+            >
               {value}
             </Table.Cell>
           ))}
@@ -43,7 +53,7 @@ const getTableBody = rows => (
   </Table.Body>
 )
 
-export const StudentCourseTable = ({ headers, rows, noResultText }) => {
+export const StudentCourseTable = ({ headers, rows }) => {
   if (rows.length > 0) {
     return (
       <Segment style={{ padding: 0 }}>
@@ -54,11 +64,10 @@ export const StudentCourseTable = ({ headers, rows, noResultText }) => {
       </Segment>
     )
   }
-  return <div>{noResultText}</div>
+  return <div>Student has courses marked</div>
 }
 
 StudentCourseTable.propTypes = {
   headers: arrayOf(string).isRequired,
   rows: arrayOf(array).isRequired,
-  noResultText: string.isRequired,
 }
