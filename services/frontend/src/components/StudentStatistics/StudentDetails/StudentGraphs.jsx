@@ -158,6 +158,9 @@ const GradeGraph = ({ semesters, student }) => {
     chart: {
       type: 'spline',
     },
+    credits: {
+      enabled: false,
+    },
     title: {
       text: 'Grade plot',
     },
