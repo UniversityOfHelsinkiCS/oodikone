@@ -1,11 +1,13 @@
 const Sentry = require('@sentry/node')
 const express = require('express')
 const cors = require('cors')
+
 const { frontUrl } = require('./conf-backend')
 const shibbolethCharsetMiddleware = require('./middleware/shibbolethCharsetMiddleware')
 const currentUserMiddleware = require('./middleware/currentUserMiddleware')
 const accessLogger = require('./middleware/accessLogger')
 const auth = require('./middleware/auth')
+const errorMiddleware = require('./middleware/errorMiddleware')
 const changelog = require('./routes/changelog')
 const courses = require('./routes/courses')
 const students = require('./routes/students')
@@ -30,9 +32,9 @@ const studyGuidanceGroups = require('./routes/studyGuidanceGroups')
 const studyProgramme = require('./routes/studyProgramme')
 const customOpenUniSearch = require('./routes/customOpenUniSearch')
 const studyProgrammeCriteria = require('./routes/studyProgrammeCriteria')
-const initializeSentry = require('./util/sentry')
 const completedCoursesSearch = require('./routes/completedCoursesSearch')
-const errorMiddleware = require('./middleware/errorMiddleware')
+const closeToGraduation = require('./routes/closeToGraduation')
+const initializeSentry = require('./util/sentry')
 
 module.exports = (app, url) => {
   initializeSentry(app)
@@ -70,6 +72,7 @@ module.exports = (app, url) => {
   app.use(`${url}/feedback`, feedback)
   app.use(`${url}/custom-population-search`, customPopulationSearch)
   app.use(`${url}/studyguidancegroups`, auth.roles(['studyGuidanceGroups']), studyGuidanceGroups)
+  app.use(`${url}/close-to-graduation`, auth.roles(['admin']), closeToGraduation)
   app.get('*', async (_, res) => {
     const results = { error: 'unknown endpoint' }
     res.status(404).json(results)

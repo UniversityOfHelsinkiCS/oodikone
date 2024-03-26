@@ -35,6 +35,7 @@ const allNavigationItems = {
       { key: 'openUniSearch', label: 'Fetch open uni students by courses', path: '/openunipopulation' },
       { key: 'completedCoursesSearch', label: 'Completed courses of students', path: '/completedcoursessearch' },
       { key: 'languageCenterView', label: 'Language center view', path: '/languagecenterview' },
+      { key: 'closeToGraduation', label: 'Students who are close to graduation', path: '/close-to-graduation' },
     ],
     key: 'customPopulation',
     label: 'Special populations',
@@ -95,6 +96,7 @@ export const NavigationBar = () => {
       item.key === 'languageCenterView'
     )
       return true
+    if (item.key === 'closeToGraduation' && checkUserAccess(['admin'], roles)) return true
     return false
   }
 

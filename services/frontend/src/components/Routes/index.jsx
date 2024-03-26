@@ -20,6 +20,7 @@ import { StudyProgramme } from '@/components/StudyProgramme'
 import { Teachers } from '@/components/Teachers'
 import { Updater } from '@/components/Updater'
 import { Users } from '@/components/Users'
+import { CloseToGraduation } from '../CloseToGraduation'
 import { ProtectedRoute } from './ProtectedRoute'
 
 const routes = {
@@ -38,6 +39,7 @@ const routes = {
   university: '/university',
   completedCoursesSearch: '/completedcoursessearch',
   languageCenterView: '/languagecenterview',
+  closeToGraduation: '/close-to-graduation',
 }
 
 export const Routes = () => (
@@ -105,6 +107,13 @@ export const Routes = () => (
       />
       <ProtectedRoute component={EvaluationOverview} exact path={routes.evaluationOverview} requireUserHasRights />
       <ProtectedRoute component={UniversityViewPage} exact path={routes.university} requireUserHasRights />
+      <ProtectedRoute
+        component={CloseToGraduation}
+        exact
+        path={routes.closeToGraduation}
+        requireUserHasRights
+        requiredRoles={['admin']}
+      />
       <Redirect to="/" />
     </Switch>
   </Suspense>
