@@ -1,10 +1,25 @@
 const { Op } = require('sequelize')
-const { ElementDetail, Student, Studyplan, Studyright, StudyrightElement } = require('../../models')
+
+const {
+  ElementDetail,
+  Student,
+  Studyplan,
+  Studyright,
+  StudyrightElement,
+  Credit,
+  Course,
+  Organization,
+} = require('../../models')
+const { mapToProviders } = require('../../util/utils')
 
 const formatStudent = student => {
   const { studyright_elements: studyrightElements, startdate: startOfStudyright } = student.studyplans[0].studyright
   const programmeCode = student.studyplans[0].programme_code
   const programme = studyrightElements?.find(programme => programme.code === programmeCode)?.element_detail
+  const programmeCodeToProviderCode = mapToProviders([programmeCode])[0]
+  const thesisData = student.credits.find(credit =>
+    credit.course.organizations.some(org => org.code === programmeCodeToProviderCode)
+  )
 
   return {
     student: {
@@ -13,6 +28,13 @@ const formatStudent = student => {
       sis_person_id: student.sis_person_id,
     },
     startOfStudyright,
+    thesisInfo: thesisData
+      ? {
+          grade: thesisData.grade,
+          attainmentDate: thesisData.attainment_date,
+          courseCode: thesisData.course.code,
+        }
+      : null,
     programme: {
       code: programme?.code,
       name: programme?.name,
@@ -55,6 +77,9 @@ const getStudentsCloseToGraduation = async () =>
                   include: [
                     {
                       model: ElementDetail,
+                      where: {
+                        type: 20,
+                      },
                       attributes: ['code', 'name'],
                     },
                   ],
@@ -62,6 +87,28 @@ const getStudentsCloseToGraduation = async () =>
               ],
             },
           ],
+        },
+        {
+          model: Credit,
+          attributes: ['attainment_date', 'grade'],
+          required: false,
+          where: {
+            credittypecode: 4,
+          },
+          include: {
+            model: Course,
+            attributes: ['code'],
+            where: {
+              course_unit_type: 'urn:code:course-unit-type:bachelors-thesis',
+            },
+            include: {
+              model: Organization,
+              attributes: ['code'],
+              through: {
+                attributes: [],
+              },
+            },
+          },
         },
       ],
     })

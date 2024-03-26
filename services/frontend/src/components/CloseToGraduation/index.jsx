@@ -1,5 +1,5 @@
 import React from 'react'
-import { Divider, Loader, Message } from 'semantic-ui-react'
+import { Divider, Icon, Loader, Message } from 'semantic-ui-react'
 
 import { reformatDate } from '@/common'
 import { useTitle } from '@/common/hooks'
@@ -55,6 +55,23 @@ const getColumns = (getTextIn, namesVisible) => [
         forceToolsMode: 'floating',
       },
     ],
+  },
+  {
+    key: 'thesisStatus',
+    title: 'Thesis status',
+    getRowVal: row => (row.thesisInfo ? 'Thesis written' : 'Thesis not written'),
+    getRowContent: row => (row.thesisInfo ? <Icon color="green" name="check" /> : null),
+    cellProps: row =>
+      row.thesisInfo
+        ? {
+            style: { textAlign: 'center' },
+            title: [
+              `Attainment date: ${reformatDate(row.thesisInfo.attainmentDate, 'YYYY-MM-DD')}`,
+              `Course code: ${row.thesisInfo.courseCode}`,
+              `Grade: ${row.thesisInfo.grade}`,
+            ].join('\n'),
+          }
+        : {},
   },
 ]
 
