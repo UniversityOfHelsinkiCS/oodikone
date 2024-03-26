@@ -22,9 +22,9 @@ const LinkToGroup = ({ group }) => {
       style={{
         color: 'black',
         display: 'inline-block',
-        width: '100%',
         height: '100%',
         padding: '.78571429em .78571429em',
+        width: '100%',
       }}
       to={destination}
     >
@@ -91,7 +91,7 @@ const EditTagModal = ({ group, tagName, toggleEdit, selectFieldItems, open }) =>
         />
       </Modal.Content>
       <Modal.Actions>
-        <Button content="Cancel" icon="trash" labelPosition="right" negative onClick={toggleEdit} />
+        <Button content="Cancel" icon="cancel" labelPosition="right" negative onClick={toggleEdit} />
         <Button
           content="Save"
           disabled={isLoading}
