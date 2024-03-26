@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { Card, Icon, Button } from 'semantic-ui-react'
+import { useDispatch, useSelector } from 'react-redux'
+import { Button, Card, Icon } from 'semantic-ui-react'
 
 import { callApi } from '@/apiConnection'
 import { reformatDate } from '@/common'
@@ -9,7 +9,6 @@ import { DISPLAY_DATE_FORMAT, DISPLAY_DATE_FORMAT_DEV } from '@/constants'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { removeStudentSelection, resetStudent } from '@/redux/students'
 import { EnrollmentAccordion } from './EnrollmentAccordion'
-
 import './studentInfoCard.css'
 
 export const StudentInfoCard = ({ student }) => {

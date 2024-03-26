@@ -105,7 +105,7 @@ export const CourseParticipationTable = ({ student, clearCourseStats, studyright
 
   return (
     <>
-      <Divider horizontal style={{ padding: '20px' }}>
+      <Divider horizontal>
         <Header as="h4">Courses</Header>
       </Divider>
       {courseTables}

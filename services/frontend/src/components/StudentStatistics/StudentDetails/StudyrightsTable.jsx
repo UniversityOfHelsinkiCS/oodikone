@@ -170,7 +170,7 @@ export const StudyrightsTable = ({
 
   return (
     <Segment basic>
-      <Divider horizontal style={{ padding: '20px' }}>
+      <Divider horizontal>
         <Header as="h4">Filter credits by study right</Header>
       </Divider>
       <Table className="fixed-header">

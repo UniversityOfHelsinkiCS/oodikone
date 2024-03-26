@@ -124,7 +124,7 @@ export const BachelorHonours = ({ absentYears, programmeCode, student }) => {
 
   return (
     <>
-      <Divider horizontal style={{ padding: '20px' }}>
+      <Divider horizontal>
         <Header as="h4">Bachelor Honours</Header>
       </Divider>
       <Header as="h5">Qualified</Header>
