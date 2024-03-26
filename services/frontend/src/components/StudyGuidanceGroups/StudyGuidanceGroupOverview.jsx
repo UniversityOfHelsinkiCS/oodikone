@@ -196,7 +196,7 @@ const TagCell = ({ group, studyProgrammes, tagName }) => {
       />
       {group.tags?.[tagName] ? (
         <div style={{ ...cellWrapper, alignItems: 'baseline' }}>
-          <p style={{ ...cellContent, textAlign: 'center' }}>{getText()}</p>
+          <p style={{ ...cellContent, textAlign: 'left' }}>{getText()}</p>
           <div style={{ ...cellContent, flexGrow: 0 }}>
             <Button icon="pencil" onClick={() => toggleEdit()} size="tiny" />
           </div>
@@ -233,8 +233,7 @@ export const StudyGuidanceGroupOverview = ({ groups }) => {
       getRowContent: group => group.members?.length || 0,
       cellProps: {
         style: {
-          padding: '0',
-          textAlign: 'center',
+          textAlign: 'right',
         },
       },
     },
