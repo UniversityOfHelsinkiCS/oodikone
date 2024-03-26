@@ -1,5 +1,5 @@
-import React from 'react'
-import { Divider, Icon, Loader, Message } from 'semantic-ui-react'
+import React, { useState } from 'react'
+import { Divider, Dropdown, Form, Icon, Loader, Message } from 'semantic-ui-react'
 
 import { reformatDate } from '@/common'
 import { useTitle } from '@/common/hooks'
@@ -8,6 +8,7 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SortableTable } from '@/components/SortableTable'
 import { StudentNameVisibilityToggle, useStudentNameVisibility } from '@/components/StudentNameVisibilityToggle'
 import { useGetStudentsCloseToGraduationQuery } from '@/redux/closeToGraduation'
+import { useGetFacultiesQuery } from '@/redux/facultyStats'
 
 const getColumns = (getTextIn, namesVisible) => [
   {
@@ -79,8 +80,10 @@ export const CloseToGraduation = () => {
   useTitle('Close to graduation')
 
   const { data: students, isError, isLoading } = useGetStudentsCloseToGraduationQuery()
+  const { data: faculties = [] } = useGetFacultiesQuery()
   const { getTextIn } = useLanguage()
   const { visible: namesVisible } = useStudentNameVisibility()
+  const [chosenFaculties, setChosenFaculties] = useState([])
 
   const renderContent = () => {
     if (isError) {
@@ -93,10 +96,25 @@ export const CloseToGraduation = () => {
 
     return (
       <>
-        <StudentNameVisibilityToggle />
+        <StudentNameVisibilityToggle style={{ marginBottom: '2em' }} />
+        <Form style={{ width: '100%', marginBottom: '1em' }}>
+          <Form.Field>
+            <label>Choose faculties to filter by:</label>
+            <Dropdown
+              multiple
+              onChange={(_, { value }) => setChosenFaculties([...value])}
+              options={faculties.map(f => ({ key: f.code, text: getTextIn(f.name), value: f.code }))}
+              placeholder="Faculty"
+              selection
+              value={chosenFaculties}
+            />
+          </Form.Field>
+        </Form>
         <SortableTable
           columns={getColumns(getTextIn, namesVisible)}
-          data={students}
+          data={students.filter(
+            s => chosenFaculties.length === 0 || chosenFaculties.includes(s.programme.code.slice(1, 4))
+          )}
           featureName="students_close_to_graduation"
         />
       </>
