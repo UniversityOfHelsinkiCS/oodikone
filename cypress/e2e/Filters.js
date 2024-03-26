@@ -83,9 +83,9 @@ describe('Population Statistics with CS master', () => {
     })
   })
 
-  describe('Studyright Type filter', () => {
+  describe('Studyright type filter', () => {
     it('is visible', () => {
-      cy.contains('Studyright Type')
+      cy.contains('Studyright type')
     })
 
     it('is set to all by default', () => {
@@ -252,8 +252,8 @@ describe('Population Statistics', () => {
     checkFilteringResult(defaultAmountOfStudents)
   })
 
-  it('Studyright Type filter is not visible', () => {
-    cy.contains('Studyright Type').should('not.exist')
+  it('Studyright type filter is not visible', () => {
+    cy.contains('Studyright type').should('not.exist')
   })
 })
 

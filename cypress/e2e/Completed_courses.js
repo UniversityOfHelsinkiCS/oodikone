@@ -67,7 +67,7 @@ describe('When search modal is opened', () => {
       )
       cy.get('[data-cy="rights-notification"]').should('contain.text', '1')
       cy.get('[data-cy="completed-courses-table-div"]').should('contain.text', 'Completed courses search')
-      cy.get('[data-cy="completed-courses-table-div"]').should('contain.text', 'Student Number')
+      cy.get('[data-cy="completed-courses-table-div"]').should('contain.text', 'Student number')
       cy.get('[data-cy="completed-courses-table-div"]').should('not.contain', '1')
     })
   })
