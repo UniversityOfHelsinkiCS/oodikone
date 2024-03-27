@@ -11,6 +11,9 @@ const {
   Organization,
 } = require('../../models')
 const { mapToProviders } = require('../../util/utils')
+const { redisClient } = require('../redis')
+
+const CLOSE_TO_GRADUATION_REDIS_KEY = 'CLOSE_TO_GRADUATION_DATA'
 
 const formatStudent = student => {
   const { studyright_elements: studyrightElements, startdate: startOfStudyright } = student.studyplans[0].studyright
@@ -46,7 +49,7 @@ const formatStudent = student => {
   }
 }
 
-const getStudentsCloseToGraduation = async () =>
+const findStudentsCloseToGraduation = async () =>
   (
     await Student.findAll({
       attributes: ['abbreviatedname', 'creditcount', 'sis_person_id', 'studentnumber'],
@@ -114,6 +117,16 @@ const getStudentsCloseToGraduation = async () =>
     })
   ).map(student => formatStudent(student.toJSON()))
 
+const getCloseToGraduationData = async () => {
+  const dataOnRedis = await redisClient.getAsync(CLOSE_TO_GRADUATION_REDIS_KEY)
+  if (dataOnRedis) return JSON.parse(dataOnRedis)
+  const freshData = await findStudentsCloseToGraduation()
+  redisClient.setAsync(CLOSE_TO_GRADUATION_REDIS_KEY, JSON.stringify(freshData))
+  return freshData
+}
+
 module.exports = {
-  getStudentsCloseToGraduation,
+  findStudentsCloseToGraduation,
+  getCloseToGraduationData,
+  CLOSE_TO_GRADUATION_REDIS_KEY,
 }

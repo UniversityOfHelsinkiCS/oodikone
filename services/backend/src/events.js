@@ -14,6 +14,10 @@ const { redisClient } = require('./services/redis')
 const { computeLanguageCenterData, LANGUAGE_CENTER_REDIS_KEY } = require('./services/languageCenterData')
 const { jobMaker } = require('./worker/queue')
 const { deleteOutdatedUsers } = require('./services/userService')
+const {
+  findStudentsCloseToGraduation,
+  CLOSE_TO_GRADUATION_REDIS_KEY,
+} = require('./services/populations/closeToGraduation')
 
 const schedule = (cronTime, func) => new CronJob({ cronTime, onTick: func, start: true, timeZone: 'Europe/Helsinki' })
 
@@ -96,11 +100,19 @@ const refreshLanguageCenterData = async () => {
   logger.info('Language center data refreshed!')
 }
 
+const refreshCloseToGraduating = async () => {
+  logger.info('Updating students close to graduating...')
+  const updatedData = await findStudentsCloseToGraduation()
+  await redisClient.setAsync(CLOSE_TO_GRADUATION_REDIS_KEY, JSON.stringify(updatedData))
+  logger.info('Students close to graduating updated!')
+}
+
 const dailyJobs = () => {
   refreshFaculties()
   refreshProgrammes()
   jobMaker.languagecenter()
   jobMaker.statistics()
+  refreshCloseToGraduating()
 }
 
 const startCron = () => {
