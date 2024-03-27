@@ -3,6 +3,7 @@ import React, { useMemo, useState } from 'react'
 import { Icon, Input, Dropdown } from 'semantic-ui-react'
 import { useContextSelector } from 'use-context-selector'
 
+import { createLocaleComparator } from '@/common'
 import { SortableTableContext, getColumnValue } from '../common'
 
 const ValueFilterType = {
@@ -24,6 +25,7 @@ const DefaultColumnFilterComponent = ({ column, options, dispatch }) => {
     if (!values) {
       return []
     }
+    const stringComparator = createLocaleComparator()
     const t = _.uniq(values)
       .filter(
         value =>
@@ -33,6 +35,9 @@ const DefaultColumnFilterComponent = ({ column, options, dispatch }) => {
             `${value.toLowerCase()}`.indexOf(search.toLowerCase()) > -1)
       )
       .sort((a, b) => {
+        if (typeof a === 'string' && typeof b === 'string') {
+          return stringComparator(a, b)
+        }
         if (typeof a === 'number' && typeof b === 'number') {
           return a - b
         }
