@@ -77,7 +77,7 @@ const getColumns = (getTextIn, namesVisible) => [
 ]
 
 export const CloseToGraduation = () => {
-  useTitle('Close to graduation')
+  useTitle('Students close to graduation')
 
   const { data: students, isError, isLoading } = useGetStudentsCloseToGraduationQuery()
   const { data: faculties = [] } = useGetFacultiesQuery()
@@ -124,7 +124,7 @@ export const CloseToGraduation = () => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <Divider horizontal style={{ margin: '3em' }}>
-        Students who are close to graduation
+        Students close to graduation
       </Divider>
       <div style={{ maxWidth: '80%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         {renderContent()}
