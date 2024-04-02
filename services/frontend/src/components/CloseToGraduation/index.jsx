@@ -26,6 +26,24 @@ const getColumns = (getTextIn, namesVisible) => [
     displayColumn: namesVisible,
   },
   {
+    key: 'phoneNumber',
+    title: 'Phone number',
+    getRowVal: row => row.student.phoneNumber,
+    displayColumn: false,
+  },
+  {
+    key: 'email',
+    title: 'Email',
+    getRowVal: row => row.student.email,
+    displayColumn: false,
+  },
+  {
+    key: 'secondaryEmail',
+    title: 'Secondary email',
+    getRowVal: row => row.student.secondaryEmail,
+    displayColumn: false,
+  },
+  {
     key: 'programme',
     title: 'Programme',
     getRowVal: row => getTextIn(row.programme.name),

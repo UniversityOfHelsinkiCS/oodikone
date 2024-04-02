@@ -16,6 +16,14 @@ const { redisClient } = require('../redis')
 const CLOSE_TO_GRADUATION_REDIS_KEY = 'CLOSE_TO_GRADUATION_DATA'
 
 const formatStudent = student => {
+  const {
+    studentnumber: studentNumber,
+    abbreviatedname: name,
+    sis_person_id,
+    email,
+    phone_number: phoneNumber,
+    secondary_email: secondaryEmail,
+  } = student
   const { studyright_elements: studyrightElements, startdate: startOfStudyright } = student.studyplans[0].studyright
   const programmeCode = student.studyplans[0].programme_code
   const programme = studyrightElements?.find(programme => programme.code === programmeCode)?.element_detail
@@ -25,11 +33,7 @@ const formatStudent = student => {
   )
 
   return {
-    student: {
-      studentNumber: student.studentnumber,
-      name: student.abbreviatedname,
-      sis_person_id: student.sis_person_id,
-    },
+    student: { studentNumber, name, sis_person_id, email, phoneNumber, secondaryEmail },
     startOfStudyright,
     thesisInfo: thesisData
       ? {
@@ -52,7 +56,15 @@ const formatStudent = student => {
 const findStudentsCloseToGraduation = async () =>
   (
     await Student.findAll({
-      attributes: ['abbreviatedname', 'creditcount', 'sis_person_id', 'studentnumber'],
+      attributes: [
+        'abbreviatedname',
+        'creditcount',
+        'email',
+        'phone_number',
+        'secondary_email',
+        'sis_person_id',
+        'studentnumber',
+      ],
       include: [
         {
           model: Studyplan,
