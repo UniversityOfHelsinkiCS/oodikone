@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import React, { useCallback, useMemo, useReducer, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useReducer, useState } from 'react'
 import { Icon } from 'semantic-ui-react'
 
 import { computeColumnSpans, DataItem, getKey } from './columnContent'
@@ -46,6 +46,8 @@ toggleGroupExpansion: Function which is called when group of rows is collapsed o
 expandedGroups: Array (or set?) of keys of rows are supposed to be expanded. These two are used
     only in population of courses
 maxHeight: Overwrite the maximum height. Defaults to 80vh if not set.
+useFilteredDataOnExport: If true, uses filtered data on exports. Defaults to false.
+handleRowCountChange: A function that is called with the row count when it changes. Can be used to update the state in the parent component.
 
 --- Column usage: (* = required field) ---
 
@@ -95,6 +97,7 @@ export const SortableTable = ({
   expandedGroups,
   featureName = 'export',
   firstColumnSticky = false,
+  handleRowCountChange,
   hideHeaderBar,
   maxHeight = '80vh',
   onlyExportColumns = [],
@@ -105,6 +108,7 @@ export const SortableTable = ({
   tableId,
   title,
   toggleGroupExpansion,
+  useFilteredDataOnExport = false,
 }) => {
   const [exportModalOpen, setExportModalOpen] = useState(false)
   const [state, dispatch] = useReducer(
@@ -154,6 +158,10 @@ export const SortableTable = ({
     () => SortingFilteringVisitor.mutate(data, columnsByKey, state, ColumnFilters),
     [data, columnsByKey, state]
   )
+
+  useEffect(() => {
+    if (handleRowCountChange) handleRowCountChange(sortedData.length)
+  }, [sortedData.length])
 
   const tableStyles = {
     position: 'relative',
@@ -221,7 +229,7 @@ export const SortableTable = ({
     <>
       <ExportModal
         columns={[...onlyExportColumns, ...columns]}
-        data={data}
+        data={useFilteredDataOnExport ? sortedData : data}
         featureName={featureName}
         onClose={() => setExportModalOpen(false)}
         open={exportModalOpen}
