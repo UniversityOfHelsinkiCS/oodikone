@@ -1,4 +1,4 @@
-import PropTypes, { shape } from 'prop-types'
+import { arrayOf, object, shape } from 'prop-types'
 import React, { useState } from 'react'
 import { Icon, Progress, Radio, Table } from 'semantic-ui-react'
 
@@ -17,6 +17,7 @@ const separateAgesReducer = (acc, age) => {
   acc[age] = newCount
   return acc
 }
+
 const groupedAgesReducer = (acc, age) => {
   const ageGroup = getAgeGroup(age)
   const newCount = acc[ageGroup] ? ++acc[ageGroup] : 1
@@ -32,20 +33,20 @@ export const AgeStats = ({ filteredStudents, query }) => {
   const onlyIamRights = !isAdmin && fullStudyProgrammeRights.length === 0
   const studentsAges = filteredStudents.map(student => getAge(student.birthdate)).sort((a, b) => b - a)
 
-  const ages = Object.entries(studentsAges.reduce(isGrouped ? groupedAgesReducer : separateAgesReducer, {}))
-    .sort((a, b) => Number(b[0]) - Number(a[0]))
-    .map(([key, value]) => [key, value])
+  const getAges = grouped =>
+    Object.entries(studentsAges.reduce(grouped ? groupedAgesReducer : separateAgesReducer, {}))
+      .sort((a, b) => Number(b[0]) - Number(a[0]))
+      .map(([key, value]) => [key, value])
 
   const getAgeCellContent = age => {
     if (!isGrouped) return age
     if (age === '15') return '<20'
-
     return `${age} - ${Number(age) + 4}`
   }
 
   const handleGroupExpand = index => {
     if (expandedGroups.includes(index)) {
-      setExpandedGroups(expandedGroups.filter(val => val !== index))
+      setExpandedGroups(expandedGroups.filter(value => value !== index))
     } else {
       setExpandedGroups(expandedGroups.concat(index))
     }
@@ -57,13 +58,10 @@ export const AgeStats = ({ filteredStudents, query }) => {
       if (!studyright.studyright_elements.some(element => element.code === query.studyRights.programme)) {
         return startdate
       }
-
-      // matching behavior with backend, studystartdate is used if it exists and is bigger of the two
       return new Date(studyright.startdate).getTime() > new Date(studyright.studystartdate).getTime()
         ? studyright.startdate
         : studyright.studystartdate
     }, null)
-
     return new Date(actualStudyStartDate)
   }
 
@@ -71,11 +69,8 @@ export const AgeStats = ({ filteredStudents, query }) => {
     return getAverage(
       filteredStudents.reduce((acc, student) => {
         const timeSinceStudiesStart = new Date().getTime() - getActualStartDate(student).getTime()
-        // let's adjust student birthdate by adding time they have been studying
-        // so we can get their age when they started their studies
         const ageAtStudiestStart = getAge(new Date(student.birthdate).getTime() + timeSinceStudiesStart)
         acc.push(Number(ageAtStudiestStart))
-
         return acc
       }, [])
     )
@@ -90,14 +85,7 @@ export const AgeStats = ({ filteredStudents, query }) => {
       )}
       <div>
         Average:{' '}
-        {getAverage(
-          ages.reduce((acc, [age, count]) => {
-            for (let i = 0; i < count; i++) {
-              acc.push(Number(age))
-            }
-            return acc
-          }, [])
-        )}
+        {getAverage(getAges(false).flatMap(([age, count]) => Array.from({ length: count }, () => Number(age))))}
       </div>
       <div>Average at studies start: {getAverageAtStudiesStart()}</div>
       <Table celled compact="very">
@@ -111,16 +99,16 @@ export const AgeStats = ({ filteredStudents, query }) => {
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {ages.map(([age, count], i) => (
+          {getAges(isGrouped).map(([age, count], index) => (
             <React.Fragment key={age}>
               <Table.Row
-                onClick={!onlyIamRights ? () => handleGroupExpand(i) : null}
+                onClick={!onlyIamRights ? () => handleGroupExpand(index) : null}
                 style={!onlyIamRights ? { cursor: isGrouped ? 'pointer' : undefined } : {}}
               >
                 <Table.Cell>
                   {getAgeCellContent(age)}{' '}
                   {isGrouped && !onlyIamRights && (
-                    <Icon color="grey" name={expandedGroups.includes(i) ? 'caret down' : 'caret right'} />
+                    <Icon color="grey" name={expandedGroups.includes(index) ? 'caret down' : 'caret right'} />
                   )}
                 </Table.Cell>
                 <Table.Cell>{count}</Table.Cell>
@@ -133,7 +121,7 @@ export const AgeStats = ({ filteredStudents, query }) => {
                 </Table.Cell>
               </Table.Row>
               {isGrouped &&
-                expandedGroups.includes(i) &&
+                expandedGroups.includes(index) &&
                 Object.entries(
                   studentsAges
                     .filter(studentAge => studentAge + 1 > age && studentAge - 1 < Number(age) + 4)
@@ -165,6 +153,6 @@ export const AgeStats = ({ filteredStudents, query }) => {
 }
 
 AgeStats.propTypes = {
-  filteredStudents: PropTypes.arrayOf(PropTypes.object).isRequired,
+  filteredStudents: arrayOf(object).isRequired,
   query: shape({}).isRequired,
 }
