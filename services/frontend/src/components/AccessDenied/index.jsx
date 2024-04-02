@@ -5,9 +5,7 @@ import { Button, Container, Dimmer, Header, Image, Transition } from 'semantic-u
 
 import { images } from '@/common'
 import { useLogoutMutation } from '@/redux/auth'
-import { MulticolorBarChart } from './MulticolorBarChart'
 
-// add github handles of oodikone devs here
 const names = [
   'mluukkai',
   'jakousa',
@@ -40,10 +38,8 @@ const dummyData = names.map(name => ({
 export const AccessDenied = ({ notEnabled }) => {
   const header = notEnabled ? 'Welcome to Oodikone!' : 'Something broke'
   const subheader = notEnabled
-    ? `You're currently not allowed to enter
-  but you will get an email when you're authorized`
-    : `If this was not intended try refreshing your browser window,
-    pressing log out or contacting grp-toska@helsinki.fi`
+    ? "You're currently not allowed to enter but you will get an email when you're authorized"
+    : 'If this was not intended try refreshing your browser window, pressing log out or contacting grp-toska@helsinki.fi'
 
   const [easterEgg, setEasterEgg] = useState(false)
   const [logout] = useLogoutMutation()
@@ -56,31 +52,25 @@ export const AccessDenied = ({ notEnabled }) => {
 
   return (
     <div>
-      <Container style={{ display: 'flex', alignItems: 'stretch', height: '100vh', justifyContent: 'space-evenly' }}>
+      <Container style={{ alignItems: 'stretch', display: 'flex', height: '100vh', justifyContent: 'space-evenly' }}>
         <ReactHighchart
           config={{
-            title: {
-              text: 'Students of Computer Science 2018-2020',
-            },
-            yAxis: {
-              title: {
-                text: 'Cumulative credits',
-              },
-            },
-            plotOptions: {
-              series: {
-                label: {
-                  connectorAllowed: false,
-                },
-                pointStart: 2010,
-              },
-            },
+            credits: { enabled: false },
+            plotOptions: { series: { label: { connectorAllowed: false }, pointStart: 2010 } },
             series: dummyData,
+            title: { text: 'Students of Computer Science 2018-2020' },
+            yAxis: { title: { text: 'Cumulative credits' } },
           }}
         />
-        <MulticolorBarChart
-          chartData={dummyData.map(e => ({ name: e.name, data: [Math.max(...e.data)] }))}
-          chartTitle="Your students' future"
+        <ReactHighchart
+          config={{
+            chart: { type: 'column' },
+            credits: { enabled: false },
+            series: dummyData.map(element => ({ name: element.name, data: [Math.max(...element.data)] })),
+            title: { text: "Your students' future" },
+            xAxis: { categories: ['2018'] },
+            yAxis: { title: { text: 'Cumulative credits' } },
+          }}
         />
       </Container>
       <Dimmer active page>
@@ -99,7 +89,7 @@ export const AccessDenied = ({ notEnabled }) => {
           inline
           size="huge"
           src={images.irtomikko}
-          style={{ position: 'absolute', top: '350px', right: '10px' }}
+          style={{ position: 'absolute', right: '10px', top: '350px' }}
           verticalAlign="top"
         />
       </Transition>
