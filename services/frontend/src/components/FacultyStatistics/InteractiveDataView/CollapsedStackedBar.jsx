@@ -20,9 +20,9 @@ export const CollapsedStackedBar = ({ data, labels, longLabels, names, plotLineP
     (programmes, programme) => ({
       ...programmes,
       [programme]: differenceData[programme].reduce(
-        (results, val, currentIndex) => ({
+        (results, value, currentIndex) => ({
           ...results,
-          [names[currentIndex]]: val,
+          [names[currentIndex]]: value,
         }),
         {}
       ),
@@ -35,13 +35,13 @@ export const CollapsedStackedBar = ({ data, labels, longLabels, names, plotLineP
   }
 
   const chartPlotLinePlaces = plotLinePlaces
-    ? plotLinePlaces.map(val => ({
+    ? plotLinePlaces.map(value => ({
         color: '#90A959',
         width: 1,
-        value: val[0] - 0.5,
+        value: value[0] - 0.5,
         dashStyle: 'solid',
         label: {
-          text: val[1],
+          text: value[1],
           style: {
             color: 'black',
             fontWeight: 'bold',

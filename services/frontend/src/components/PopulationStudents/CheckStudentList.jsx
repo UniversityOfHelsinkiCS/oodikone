@@ -1,6 +1,6 @@
 import { arrayOf, string } from 'prop-types'
 import React, { useState } from 'react'
-import { Button, Modal, Form, TextArea, Accordion, Header, List } from 'semantic-ui-react'
+import { Accordion, Button, Form, Header, List, Modal, TextArea } from 'semantic-ui-react'
 
 export const CheckStudentList = ({ students }) => {
   const [modalOpen, setModalOpen] = useState(false)

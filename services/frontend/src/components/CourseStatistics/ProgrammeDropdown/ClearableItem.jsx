@@ -1,4 +1,4 @@
-import { string, func } from 'prop-types'
+import { func, string } from 'prop-types'
 import React from 'react'
 import { Icon } from 'semantic-ui-react'
 

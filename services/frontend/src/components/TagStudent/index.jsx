@@ -1,7 +1,7 @@
 import { arrayOf, string, shape, func, bool } from 'prop-types'
 import React from 'react'
 import { connect } from 'react-redux'
-import { Dropdown, Label, Icon, Table } from 'semantic-ui-react'
+import { Dropdown, Icon, Label, Table } from 'semantic-ui-react'
 
 import { createStudentTagAction, deleteStudentTagAction } from '@/redux/tagstudent'
 

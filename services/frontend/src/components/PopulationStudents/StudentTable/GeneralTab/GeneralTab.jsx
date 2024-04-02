@@ -516,7 +516,7 @@ export const GeneralTab = ({
       key: 'option',
       title: cleanedQueryStudyrights.some(code => code.startsWith('MH')) ? 'Bachelor' : 'Master',
       getRowVal: student => (student.option ? getTextIn(student.option.name) : ''),
-      formatValue: val => (val.length > 45 ? `${val.substring(0, 43)}...` : val),
+      formatValue: value => (value.length > 45 ? `${value.substring(0, 43)}...` : value),
       cellProps: student => {
         return {
           title: student.option ? getTextIn(student.option.name) : '',

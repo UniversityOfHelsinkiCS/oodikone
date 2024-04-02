@@ -1,6 +1,6 @@
 import { arrayOf, func, number, oneOfType, shape, string } from 'prop-types'
 import React, { useEffect, useState } from 'react'
-import { Tab, Form } from 'semantic-ui-react'
+import { Form, Tab } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { TeacherStatisticsTable } from '@/components/Teachers/TeacherStatisticsTable'

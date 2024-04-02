@@ -1,20 +1,21 @@
 import React, { useEffect, useState } from 'react'
-import { Table, Menu, Popup, Icon } from 'semantic-ui-react'
+import { Icon, Menu, Popup, Table } from 'semantic-ui-react'
+
 import { CollapsedStackedBar } from './CollapsedStackedBar'
 import { ExpandableRow } from './ExpandableRow'
 
 export const InteractiveDataTable = ({
   cypress,
-  dataStats,
   dataProgrammeStats,
-  programmeNames,
-  sortedKeys,
+  dataStats,
   plotLinePlaces,
-  titles,
-  sliceStart,
-  yearsVisible,
+  programmeNames,
   shortNames,
+  sliceStart,
+  sortedKeys,
   studentsTable,
+  titles,
+  yearsVisible,
 }) => {
   const [keyOrder, setkeyOrder] = useState({})
   const [sorter, setSorter] = useState('Code')
@@ -29,7 +30,7 @@ export const InteractiveDataTable = ({
     if (!(columnIndex === 0)) {
       const numbersOfYears = dataStats.length
       const data = sortedKeys?.map(programme => [programme, dataProgrammeStats[programme]])
-      const groupIndices = plotLinePlaces.length > 0 ? plotLinePlaces.map(val => val[0]) : []
+      const groupIndices = plotLinePlaces.length > 0 ? plotLinePlaces.map(value => value[0]) : []
       for (let yearIndex = 0; yearIndex < numbersOfYears; yearIndex++) {
         let yearlySortedKeys = []
         if (groupIndices.length > 0) {
@@ -63,6 +64,7 @@ export const InteractiveDataTable = ({
   useEffect(sortBySelectedColumn, [columnIndex, dataStats, sortDir])
 
   if (!dataStats || !titles || !dataProgrammeStats) return null
+
   /* Calculation works as follows
    1. Calculate difference between current and previous year: current year - previous year
    2. Calculations are done for the values starting from the index 2 (index 0: year, index 1: total)
@@ -77,7 +79,7 @@ export const InteractiveDataTable = ({
           yearIndex < programmeData[programme].length - 1
             ? programmeData[programme][yearIndex]
                 .slice(sliceStart)
-                .map((val, index) => val - programmeData[programme][yearIndex + 1][index + sliceStart])
+                .map((value, index) => value - programmeData[programme][yearIndex + 1][index + sliceStart])
             : new Array(programmeData[programme][yearIndex].length - sliceStart).fill(0)
         ),
       }),

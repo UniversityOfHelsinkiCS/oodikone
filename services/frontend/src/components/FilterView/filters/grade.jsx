@@ -21,7 +21,7 @@ const GradeFilterCard = ({ options, onOptionsChange, grades, withoutSelf }) => {
     if (checked(grade)) {
       onOptionsChange({
         ...options,
-        selected: selected.filter(val => val !== grade),
+        selected: selected.filter(value => value !== grade),
       })
     } else {
       onOptionsChange({

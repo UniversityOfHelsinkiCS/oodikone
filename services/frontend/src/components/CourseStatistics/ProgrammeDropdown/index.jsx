@@ -1,5 +1,5 @@
 import { orderBy } from 'lodash'
-import { string, arrayOf, shape, func, oneOfType, number } from 'prop-types'
+import { arrayOf, func, number, oneOfType, shape, string } from 'prop-types'
 import React from 'react'
 import { Form } from 'semantic-ui-react'
 

@@ -1,5 +1,5 @@
 import { bool, number } from 'prop-types'
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Progress } from 'semantic-ui-react'
 
 import { useDidMount } from '@/common/hooks'

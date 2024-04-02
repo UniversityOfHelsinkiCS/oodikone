@@ -1,4 +1,4 @@
-import { string, arrayOf } from 'prop-types'
+import { arrayOf, string } from 'prop-types'
 import React from 'react'
 import ReactHighchart from 'react-highcharts'
 

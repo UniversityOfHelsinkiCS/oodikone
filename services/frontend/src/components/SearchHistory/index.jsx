@@ -1,8 +1,8 @@
 import { sortBy } from 'lodash'
 import moment from 'moment'
-import { arrayOf, func, shape, string, bool, instanceOf, oneOfType } from 'prop-types'
+import { arrayOf, bool, func, instanceOf, oneOfType, shape, string } from 'prop-types'
 import React, { useState } from 'react'
-import { Segment, Form, Header, Icon } from 'semantic-ui-react'
+import { Form, Icon, Header, Segment } from 'semantic-ui-react'
 
 export const SearchHistory = ({ items, handleSearch, updateItem, disabled, header }) => {
   const [selected, setSelected] = useState(null)
