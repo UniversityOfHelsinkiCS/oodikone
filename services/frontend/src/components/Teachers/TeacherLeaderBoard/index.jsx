@@ -1,6 +1,6 @@
 import moment from 'moment'
 import React, { useState } from 'react'
-import { Segment, Message } from 'semantic-ui-react'
+import { Message, Segment } from 'semantic-ui-react'
 
 import { useGetTopTeachersCategoriesQuery, useLazyGetTopTeachersQuery } from '@/redux/teachers'
 import { TeacherStatisticsTable } from '../TeacherStatisticsTable'

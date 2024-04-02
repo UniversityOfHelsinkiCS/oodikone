@@ -1,6 +1,7 @@
 import React, { Suspense } from 'react'
 import { Redirect, Route, Switch } from 'react-router-dom'
 
+import { CloseToGraduation } from '@/components/CloseToGraduation'
 import { CompletedCourses } from '@/components/CompletedCoursesSearch'
 import { CoursePopulation } from '@/components/CoursePopulation'
 import { CourseStatistics } from '@/components/CourseStatistics'
@@ -20,7 +21,6 @@ import { StudyProgramme } from '@/components/StudyProgramme'
 import { Teachers } from '@/components/Teachers'
 import { Updater } from '@/components/Updater'
 import { Users } from '@/components/Users'
-import { CloseToGraduation } from '../CloseToGraduation'
 import { ProtectedRoute } from './ProtectedRoute'
 
 const routes = {

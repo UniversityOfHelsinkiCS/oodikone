@@ -1,4 +1,4 @@
-import { callController } from '../apiConnection'
+import { callController } from '@/apiConnection'
 
 const prefix = 'GET_POPULATIONS_PROGRAMMES_'
 

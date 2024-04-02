@@ -1,10 +1,10 @@
 import _ from 'lodash'
 import React, { useMemo, useState } from 'react'
-import { Icon, Input, Dropdown } from 'semantic-ui-react'
+import { Dropdown, Icon, Input } from 'semantic-ui-react'
 import { useContextSelector } from 'use-context-selector'
 
 import { createLocaleComparator } from '@/common'
-import { SortableTableContext, getColumnValue } from '../common'
+import { SortableTableContext, getColumnValue } from '@/components/SortableTable/common'
 
 const ValueFilterType = {
   Include: 'include',

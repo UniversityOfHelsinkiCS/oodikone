@@ -1,4 +1,4 @@
-import { callController } from '../apiConnection'
+import { callController } from '@/apiConnection'
 
 export const findStudents = searchStr => {
   const route = `/students/?searchTerm=${searchStr}`

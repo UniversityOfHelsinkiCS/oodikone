@@ -3,11 +3,11 @@ import { Link } from 'react-router-dom'
 import { Button, Icon, Label, Loader, Popup, Segment } from 'semantic-ui-react'
 
 import { reformatDate } from '@/common'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { SortableTable } from '@/components/SortableTable'
 import { useShowAsUser } from '@/redux/auth'
 import { useGetAllElementDetailsQuery } from '@/redux/elementdetails'
 import { useGetAllUsersQuery } from '@/redux/users'
-import { useLanguage } from '../LanguagePicker/useLanguage'
-import { SortableTable } from '../SortableTable'
 
 export const UserSearchList = () => {
   const { getTextIn } = useLanguage()

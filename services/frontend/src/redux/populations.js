@@ -1,4 +1,4 @@
-import { RTKApi, callController } from '../apiConnection'
+import { RTKApi, callController } from '@/apiConnection'
 
 const initialState = {
   pending: false,

@@ -1,4 +1,4 @@
-import { callController } from '../apiConnection'
+import { callController } from '@/apiConnection'
 
 // Combined programme is included to studytrack in form KHxx_xxx-MHxx_xxx
 export const getTagsByStudytrackAction = studytrack => {

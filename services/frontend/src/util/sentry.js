@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/browser'
 import { Integrations } from '@sentry/tracing'
-import { sentryRelease, sentryEnvironment, runningInCypress } from '../conf'
+
+import { runningInCypress, sentryEnvironment, sentryRelease } from '@/conf'
 
 export const initializeSentry = () => {
   if (!sentryRelease || !sentryEnvironment || runningInCypress) return

@@ -1,4 +1,4 @@
-import { RTKApi } from '../apiConnection/index'
+import { RTKApi } from '@/apiConnection'
 
 const singleCourseStatsApi = RTKApi.injectEndpoints({
   endpoints: builder => ({

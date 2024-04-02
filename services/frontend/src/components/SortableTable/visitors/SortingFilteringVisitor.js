@@ -1,6 +1,6 @@
 import _ from 'lodash'
 
-import { getColumnValue, getRowOptions } from '../common'
+import { getColumnValue, getRowOptions } from '@/components/SortableTable/common'
 import { DataVisitor } from './DataVisitor'
 
 export class SortingFilteringVisitor extends DataVisitor {

@@ -1,5 +1,6 @@
 import { createSelector } from '@reduxjs/toolkit'
-import { reformatDate } from '../common'
+
+import { reformatDate } from '@/common'
 
 const getStudents = students => students.data
 

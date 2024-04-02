@@ -1,4 +1,4 @@
-import { RTKApi } from '../apiConnection'
+import { RTKApi } from '@/apiConnection'
 
 const usersApi = RTKApi.injectEndpoints({
   endpoints: builder => ({

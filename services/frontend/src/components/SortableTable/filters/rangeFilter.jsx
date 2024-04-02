@@ -5,7 +5,7 @@ import { useContextSelector } from 'use-context-selector'
 
 import { useDebounce } from '@/common/hooks'
 import { RangeSelector } from '@/components/common/RangeSelector'
-import { SortableTableContext, getColumnValue } from '../common'
+import { SortableTableContext, getColumnValue } from '@/components/SortableTable/common'
 
 const RangeColumnFilterComponent = ({ column, options, dispatch }) => {
   const values = useContextSelector(SortableTableContext, ctx => ctx.values[column.key]) ?? []

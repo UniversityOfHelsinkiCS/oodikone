@@ -3,7 +3,7 @@ import React, { useMemo, useState } from 'react'
 import { Checkbox, Dropdown, Input } from 'semantic-ui-react'
 import { useContextSelector } from 'use-context-selector'
 
-import { SortableTableContext, getColumnValue } from '../common'
+import { SortableTableContext, getColumnValue } from '@/components/SortableTable/common'
 
 const MultiSelectFilterComponent = ({ column, options, dispatch }) => {
   const columnValues = useContextSelector(SortableTableContext, context => context.values[column.key]) ?? []

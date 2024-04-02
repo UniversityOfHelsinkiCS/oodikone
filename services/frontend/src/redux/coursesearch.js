@@ -1,4 +1,4 @@
-import { callController } from '../apiConnection/index'
+import { callController } from '@/apiConnection/index'
 
 const prefix = 'GET_COURSE_SEARCH_RESULT_'
 

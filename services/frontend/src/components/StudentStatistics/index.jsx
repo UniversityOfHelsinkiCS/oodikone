@@ -1,9 +1,9 @@
 import React from 'react'
 import { useParams } from 'react-router-dom'
-import { Segment, Header } from 'semantic-ui-react'
+import { Header, Segment } from 'semantic-ui-react'
 
 import { useTitle } from '@/common/hooks'
-import { StudentNameVisibilityToggle } from '../StudentNameVisibilityToggle'
+import { StudentNameVisibilityToggle } from '@/components/StudentNameVisibilityToggle'
 import { ConnectedStudentDetails as StudentDetails } from './StudentDetails'
 import { ConnectedStudentSearch as StudentSearch } from './StudentSearch'
 

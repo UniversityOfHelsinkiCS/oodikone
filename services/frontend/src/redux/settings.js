@@ -1,4 +1,4 @@
-import { DEFAULT_LANG } from '../constants'
+import { DEFAULT_LANG } from '@/constants'
 
 const initialState = {
   language: DEFAULT_LANG,

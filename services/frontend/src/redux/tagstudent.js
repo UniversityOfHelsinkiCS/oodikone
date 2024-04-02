@@ -1,4 +1,4 @@
-import { callController } from '../apiConnection'
+import { callController } from '@/apiConnection'
 
 export const createStudentTagAction = (tag, studytrack, combinedProgramme) => {
   const route = `/studenttags/${tag.studentnumber}`
@@ -23,6 +23,7 @@ export const deleteMultipleStudentTagAction = (tagId, studentnumbers, studytrack
   const data = { tagId, studentnumbers, studytrack, combinedProgramme }
   return callController(route, prefix, data, method)
 }
+
 // Combined programme is included to studytrack in form KHxx_xxx-MHxx_xxx
 export const getStudentTagsByStudytrackAction = studytrack => {
   const route = `/studenttags/${studytrack}`

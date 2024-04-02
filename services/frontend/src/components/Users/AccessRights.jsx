@@ -3,11 +3,11 @@ import { Button, Form, Header, Icon, List, Message, Popup, Radio } from 'semanti
 
 import { createLocaleComparator, isNewStudyProgramme, textAndDescriptionSearch } from '@/common'
 import { userToolTips } from '@/common/InfoToolTips'
+import { InfoBox } from '@/components/Info/InfoBox'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useGetAllElementDetailsQuery } from '@/redux/elementdetails'
 import { useGetUnfilteredProgrammesQuery } from '@/redux/populations'
 import { useAddUserUnitsMutation, useRemoveUserUnitsMutation } from '@/redux/users'
-import { InfoBox } from '../Info/InfoBox'
-import { useLanguage } from '../LanguagePicker/useLanguage'
 
 const mapAndSortProgrammes = (programmes, elementdetails, getTextIn) =>
   programmes

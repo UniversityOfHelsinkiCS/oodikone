@@ -10,10 +10,7 @@ import {
   isMastersProgramme,
 } from '@/common'
 import { useTitle } from '@/common/hooks'
-import { useGetAuthorizedUserQuery } from '@/redux/auth'
-import { useGetSemestersQuery } from '@/redux/semesters'
-import { makePopulationsToData } from '@/selectors/populationDetails'
-import { FilterView } from '../FilterView'
+import { FilterView } from '@/components/FilterView'
 import {
   admissionTypeFilter,
   ageFilter,
@@ -31,10 +28,13 @@ import {
   studyTrackFilter,
   tagsFilter,
   transferredToProgrammeFilter,
-} from '../FilterView/filters'
-import { useLanguage } from '../LanguagePicker/useLanguage'
-import { PopulationDetails } from '../PopulationDetails'
-import { ConnectedPopulationSearch as PopulationSearch } from '../PopulationSearch'
+} from '@/components/FilterView/filters'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { PopulationDetails } from '@/components/PopulationDetails'
+import { ConnectedPopulationSearch as PopulationSearch } from '@/components/PopulationSearch'
+import { useGetAuthorizedUserQuery } from '@/redux/auth'
+import { useGetSemestersQuery } from '@/redux/semesters'
+import { makePopulationsToData } from '@/selectors/populationDetails'
 import { DataExport } from './DataExport'
 
 const getYearText = year => {
