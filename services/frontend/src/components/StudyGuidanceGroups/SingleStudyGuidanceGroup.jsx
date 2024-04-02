@@ -298,8 +298,10 @@ const SingleStudyGroupViewWrapper = ({ group, isLoading, studyProgrammes, childr
 export const SingleStudyGuidanceGroupContainer = ({ group }) => {
   const groupStudentNumbers = group?.members?.map(({ personStudentNumber }) => personStudentNumber) || []
   const studyProgrammes = useFilteredAndFormattedElementDetails()
-  const { tags } = group
-  const { data, isLoading } = useGetStudyGuidanceGroupPopulationQuery({ studentnumberlist: groupStudentNumbers, tags })
+  const { data, isLoading } = useGetStudyGuidanceGroupPopulationQuery({
+    studentnumberlist: groupStudentNumbers,
+    tags: group?.tags,
+  })
   const { data: courses, isLoading: coursesAreLoading } = useGetStudyGuidanceGroupPopulationCoursesQuery({
     studentnumberlist: groupStudentNumbers,
     year: group?.tags?.year,
