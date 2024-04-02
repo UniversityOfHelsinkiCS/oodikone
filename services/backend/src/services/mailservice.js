@@ -66,17 +66,16 @@ const sendNotificationAboutNewUser = ({ userId, userFullName }) =>
 
 const accessMessageSubject =
   'Käyttöoikeutesi Oodikoneeseen on päivitetty – Your privileges in Oodikone have been updated'
-const accessMessageText = `<p>Sinulle on annettu oikeudet käyttää <a href="https://oodikone.helsinki.fi">Oodikonetta</a> tai käyttöoikeutesi Oodikoneeseen on päivitetty.</p>
-<p>Jotta muutokset astuvat voimaan, saatat joutua kirjautumaan ulos ja takaisin sisään.</p>
-<p>HUOM! Jos automaattinen uloskirjautuminen kaikista palveluista ei onnistunut kirjautuessasi ulos Oodikoneesta, voit kirjautua ulos jokaisesta palvelusta yksitellen tai sulkea kaikki selainikkunasi.</p>
-<p>Jos olet määritellyt selaimen palauttamaan edellisen istuntosi käynnistyksen yhteydessä, saatat joutua selainikkunoiden sulkemisen lisäksi poistamaan myös listattujen palvelujen evästeet.</p>
-<p>Katso ohjeet selaimen välimuistin tyhjentämiseksi: <a href="https://helpdesk.it.helsinki.fi/help/1002">https://helpdesk.it.helsinki.fi/help/1002</a></p>
-<br/>
-<p>You've been authorized to use <a href="https://oodikone.helsinki.fi">Oodikone</a> or your privileges in Oodikone have changed.</p>
-<p>You may need to log out and back in before your changes take place.</p>
-<p>NOTE! If the automatic logging out from all services was not successful when logging out of oodikone, you can log out one by one or close all of your browser windows.</p>
-<p>If you have defined your browser to restore your previous session in connection with starting the browser, logging out may also require deleting the cookies of the listed services in addition to closing the browser windows.</p>
-<p>See the instructions for clearing the browser cache: <a href="https://helpdesk.it.helsinki.fi/en/help/1002">https://helpdesk.it.helsinki.fi/en/help/1002</a></p>`
+const accessMessageText = `Sinulle on annettu oikeudet käyttää <a href="https://oodikone.helsinki.fi">Oodikonetta</a> tai käyttöoikeutesi Oodikoneeseen on päivitetty.<br/>\n
+Jotta muutokset astuvat voimaan, saatat joutua kirjautumaan ulos ja takaisin sisään.<br/>\n
+HUOM! Jos automaattinen uloskirjautuminen kaikista palveluista ei onnistunut kirjautuessasi ulos Oodikoneesta, voit kirjautua ulos jokaisesta palvelusta yksitellen tai sulkea kaikki selainikkunasi.<br/>\n
+Jos olet määritellyt selaimen palauttamaan edellisen istuntosi käynnistyksen yhteydessä, saatat joutua selainikkunoiden sulkemisen lisäksi poistamaan myös listattujen palvelujen evästeet.<br/>\n
+Katso ohjeet selaimen välimuistin tyhjentämiseksi: <a href="https://helpdesk.it.helsinki.fi/help/1002">https://helpdesk.it.helsinki.fi/help/1002</a><br/><br/>\n
+You've been authorized to use <a href="https://oodikone.helsinki.fi">Oodikone</a> or your privileges in Oodikone have changed.<br/>\n
+You may need to log out and back in before your changes take place.<br/>\n
+NOTE! If the automatic logging out from all services was not successful when logging out of oodikone, you can log out one by one or close all of your browser windows.<br/>\n
+If you have defined your browser to restore your previous session in connection with starting the browser, logging out may also require deleting the cookies of the listed services in addition to closing the browser windows.<br/>\n
+See the instructions for clearing the browser cache: <a href="https://helpdesk.it.helsinki.fi/en/help/1002">https://helpdesk.it.helsinki.fi/en/help/1002</a><br/>\n`
 
 const previewNotificationAboutAccessToUser = () => ({ accessMessageSubject, accessMessageText })
 
