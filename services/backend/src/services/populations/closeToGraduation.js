@@ -26,11 +26,14 @@ const formatStudent = student => {
   } = student
   const { studyright_elements: studyrightElements, startdate: startOfStudyright } = student.studyplans[0].studyright
   const programmeCode = student.studyplans[0].programme_code
-  const programme = studyrightElements?.find(programme => programme.code === programmeCode)?.element_detail
+  const programme = studyrightElements?.find(
+    element => element?.element_detail.type === 20 && element.code === programmeCode
+  )?.element_detail
   const programmeCodeToProviderCode = mapToProviders([programmeCode])[0]
   const thesisData = student.credits.find(credit =>
     credit.course.organizations.some(org => org.code === programmeCodeToProviderCode)
   )
+  const studyTrack = studyrightElements?.find(element => element?.element_detail.type === 30)?.element_detail
 
   return {
     student: { studentNumber, name, sis_person_id, email, phoneNumber, secondaryEmail },
@@ -45,6 +48,7 @@ const formatStudent = student => {
     programme: {
       code: programme?.code,
       name: programme?.name,
+      studyTrack,
     },
     credits: {
       hops: student.studyplans[0].completed_credits,
@@ -92,10 +96,7 @@ const findStudentsCloseToGraduation = async () =>
                   include: [
                     {
                       model: ElementDetail,
-                      where: {
-                        type: 20,
-                      },
-                      attributes: ['code', 'name'],
+                      attributes: ['code', 'name', 'type'],
                     },
                   ],
                 },

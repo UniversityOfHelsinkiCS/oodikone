@@ -10,7 +10,7 @@ import { StudentNameVisibilityToggle, useStudentNameVisibility } from '@/compone
 import { useGetStudentsCloseToGraduationQuery } from '@/redux/closeToGraduation'
 import { useGetFacultiesQuery } from '@/redux/facultyStats'
 
-const getColumns = (getTextIn, namesVisible) => [
+const getColumns = (getTextIn, namesVisible, studyTrackVisible) => [
   {
     key: 'studentNumber',
     title: 'Student number',
@@ -47,6 +47,13 @@ const getColumns = (getTextIn, namesVisible) => [
     key: 'programme',
     title: 'Programme',
     getRowVal: row => getTextIn(row.programme.name),
+    filterable: false,
+  },
+  {
+    key: 'studytrack',
+    title: 'Study track',
+    getRowVal: row => getTextIn(row.programme.studyTrack?.name),
+    displayColumn: studyTrackVisible,
   },
   {
     key: 'startOfStudyright',
