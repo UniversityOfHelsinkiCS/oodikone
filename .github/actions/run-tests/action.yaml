@@ -24,7 +24,7 @@ runs:
 
     - name: 'Run services, pull rest of the needed images'
       shell: bash
-      run: docker-compose --file docker-compose.ci.yml up --detach
+      run: docker compose --file docker-compose.ci.yml up --detach
 
     - name: 'Run cypress'
       uses: cypress-io/github-action@v6
@@ -44,4 +44,4 @@ runs:
     - name: 'Print logs on failure'
       shell: bash
       if: failure()
-      run: docker-compose --file docker-compose.ci.yml logs
+      run: docker compose --file docker-compose.ci.yml logs

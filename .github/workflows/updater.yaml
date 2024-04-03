@@ -89,24 +89,24 @@ jobs:
       - name: 'Load scheduler image'
         run: docker load --input /tmp/artifact/scheduler.tar
       - name: 'Start worker'
-        run: docker-compose --file docker-compose.ci.yml up --detach --no-recreate sis-updater-worker
+        run: docker compose --file docker-compose.ci.yml up --detach --no-recreate sis-updater-worker
       - name: 'Run hourly jobs'
-        run: docker-compose --file docker-compose.ci.yml run sis-updater-scheduler npm start
+        run: docker compose --file docker-compose.ci.yml run sis-updater-scheduler npm start
         env:
           SCHEDULE_IMMEDIATE: hourly
           EXIT_AFTER_IMMEDIATES: yes
       - name: 'Run weekly jobs'
-        run: docker-compose --file docker-compose.ci.yml run sis-updater-scheduler npm start
+        run: docker compose --file docker-compose.ci.yml run sis-updater-scheduler npm start
         env:
           SCHEDULE_IMMEDIATE: weekly
           EXIT_AFTER_IMMEDIATES: yes
       - name: 'Run prepurge'
-        run: docker-compose --file docker-compose.ci.yml run sis-updater-scheduler npm start
+        run: docker compose --file docker-compose.ci.yml run sis-updater-scheduler npm start
         env:
           SCHEDULE_IMMEDIATE: prepurge
           EXIT_AFTER_IMMEDIATES: yes
       - name: 'Run purge'
-        run: docker-compose --file docker-compose.ci.yml run sis-updater-scheduler npm start
+        run: docker compose --file docker-compose.ci.yml run sis-updater-scheduler npm start
         env:
           SCHEDULE_IMMEDIATE: purge
           EXIT_AFTER_IMMEDIATES: yes

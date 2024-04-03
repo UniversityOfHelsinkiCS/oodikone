@@ -70,7 +70,7 @@ jobs:
       - name: 'Let sis-updater-worker run migrations, then push new version of image to toska hub'
         if: steps.check_migrations.outputs.migrations == 'true'
         run: |
-          docker-compose --file docker-compose.ci.yml up --detach sis-updater-worker
+          docker compose --file docker-compose.ci.yml up --detach sis-updater-worker
           sleep 30 # wait for sis-updater-worker to start and run migrations
           ./anonyymioodi/commit_and_push_to_toska_hub.sh sis-db
 
@@ -103,7 +103,7 @@ jobs:
       - name: 'Let backend run migrations, then push new version of image to toska hub'
         if: steps.check_migrations.outputs.migrations == 'true'
         run: |
-          docker-compose --file docker-compose.ci.yml up --detach backend
+          docker compose --file docker-compose.ci.yml up --detach backend
           sleep 30 # wait for sis-updater-worker to start and run migrations
           ./anonyymioodi/commit_and_push_to_toska_hub.sh kone-db
 
@@ -136,7 +136,7 @@ jobs:
       - name: 'Let backend run migrations, then push new version of image to toska hub'
         if: steps.check_migrations.outputs.migrations == 'true'
         run: |
-          docker-compose --file docker-compose.ci.yml up --detach backend
+          docker compose --file docker-compose.ci.yml up --detach backend
           sleep 30 # wait for sis-updater-worker to start and run migrations
           ./anonyymioodi/commit_and_push_to_toska_hub.sh user-db
 
@@ -205,7 +205,7 @@ jobs:
           password: ${{ secrets.password }}
 
       - name: 'Run services, pull rest of the needed images'
-        run: docker-compose --file docker-compose.ci.yml up --detach
+        run: docker compose --file docker-compose.ci.yml up --detach
 
       - name: 'Check that exit statuses are not errors'
         run: |
@@ -217,4 +217,4 @@ jobs:
 
       - name: 'Print logs on failure'
         if: failure()
-        run: docker-compose --file docker-compose.ci.yml logs
+        run: docker compose --file docker-compose.ci.yml logs
