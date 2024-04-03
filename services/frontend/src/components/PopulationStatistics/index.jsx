@@ -14,6 +14,7 @@ import { FilterView } from '@/components/FilterView'
 import {
   admissionTypeFilter,
   ageFilter,
+  citizenshipFilter,
   courseFilter,
   creditDateFilter,
   creditsEarnedFilter,
@@ -62,6 +63,7 @@ export const PopulationStatistics = () => {
 
   const filters = [
     !onlyIamRights ? ageFilter : null,
+    citizenshipFilter,
     courseFilter({ courses }),
     creditDateFilter,
     creditsEarnedFilter,
