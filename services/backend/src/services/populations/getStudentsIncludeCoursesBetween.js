@@ -129,6 +129,8 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
         'lastname',
         'studentnumber',
         'home_country_en',
+        'home_country_fi',
+        'home_country_sv',
         'dateofuniversityenrollment',
         'creditcount',
         'abbreviatedname',

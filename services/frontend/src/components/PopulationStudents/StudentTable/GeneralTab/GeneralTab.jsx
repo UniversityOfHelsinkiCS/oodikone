@@ -512,6 +512,12 @@ export const GeneralTab = ({
         return language
       },
     },
+    citizenship: {
+      key: 'citizenship',
+      title: 'Citizenship',
+      getRowVal: student =>
+        getTextIn({ fi: student.home_country_fi, en: student.home_country_en, sv: student.home_country_sv }),
+    },
     option: containsOption && {
       key: 'option',
       title: cleanedQueryStudyrights.some(code => code.startsWith('MH')) ? 'Bachelor' : 'Master',

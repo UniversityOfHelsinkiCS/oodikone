@@ -92,6 +92,7 @@ export const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) =
       'programme',
       'admissionType',
       'latestAttainmentDate',
+      'citizenship',
     ],
     studyGuidanceGroupPopulation: getStudyGuidanceGroupColumns(),
   }

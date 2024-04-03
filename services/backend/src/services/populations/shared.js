@@ -86,6 +86,9 @@ const formatStudentForPopulationStatistics = (
     option,
     birthdate,
     sis_person_id,
+    home_country_fi,
+    home_country_sv,
+    home_country_en,
   },
   enrollments,
   credits,
@@ -204,6 +207,9 @@ const formatStudentForPopulationStatistics = (
     birthdate,
     studyplans,
     sis_person_id,
+    home_country_en,
+    home_country_fi,
+    home_country_sv,
     criteriaProgress: toProgressCriteria(),
   }
 }
