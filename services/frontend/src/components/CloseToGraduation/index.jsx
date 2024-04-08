@@ -181,7 +181,6 @@ export const CloseToGraduation = () => {
           featureName="students_close_to_graduation"
           handleRowCountChange={handleRowCountChange}
           title={`Students close to graduation (${rowCount} out of ${students.length} students shown)`}
-          useFilteredDataOnExport
         />
       </>
     )

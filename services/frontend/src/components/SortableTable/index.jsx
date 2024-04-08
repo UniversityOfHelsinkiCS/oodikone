@@ -46,7 +46,7 @@ toggleGroupExpansion: Function which is called when group of rows is collapsed o
 expandedGroups: Array (or set?) of keys of rows are supposed to be expanded. These two are used
     only in population of courses
 maxHeight: Overwrite the maximum height. Defaults to 80vh if not set.
-useFilteredDataOnExport: If true, uses filtered data on exports. Defaults to false.
+useFilteredDataOnExport: If true, uses filtered data (the data that's shown after applying all the selected filters) on exports. Defaults to true.
 handleRowCountChange: A function that is called with the row count when it changes. Can be used to update the state in the parent component.
 
 --- Column usage: (* = required field) ---
@@ -108,7 +108,7 @@ export const SortableTable = ({
   tableId,
   title,
   toggleGroupExpansion,
-  useFilteredDataOnExport = false,
+  useFilteredDataOnExport = true,
 }) => {
   const [exportModalOpen, setExportModalOpen] = useState(false)
   const [state, dispatch] = useReducer(
