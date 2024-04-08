@@ -6,7 +6,7 @@ import { hopsFilter as studyPlanFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { CollapsibleCreditRow } from './CollapsibleCreditRow'
 
-export const CreditsGainedTable = ({ filteredStudents, type, year, creditDateFilterOptions, programmeGoalTime }) => {
+export const CreditsGainedTable = ({ creditDateFilterOptions, filteredStudents, programmeGoalTime, type, year }) => {
   const { useFilterSelector } = useFilters()
   const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive)
 
@@ -117,7 +117,6 @@ export const CreditsGainedTable = ({ filteredStudents, type, year, creditDateFil
             <Table.HeaderCell key={`credits-percentage-of-students-${type}`}>Percentage of population</Table.HeaderCell>
           </Table.Row>
         </Table.Header>
-
         <Table.Body data-cy="credits-gained-table-body">
           {limits.map(([min, max]) => (
             <CollapsibleCreditRow

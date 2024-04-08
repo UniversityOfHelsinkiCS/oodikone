@@ -10,7 +10,7 @@ import { CreditsGainedTab } from './CreditsGainedTab'
 import { StatisticsTab } from './StatisticsTab'
 import './creditGainStats.css'
 
-export const CreditGainStats = ({ filteredStudents, query, creditDateFilterOptions, year }) => {
+export const CreditGainStats = ({ creditDateFilterOptions, filteredStudents, query, year }) => {
   const combinedProgramme = query?.studyRights?.combinedProgramme || ''
 
   const programmeGoalTime = combinedProgramme
@@ -25,6 +25,7 @@ export const CreditGainStats = ({ filteredStudents, query, creditDateFilterOptio
           creditDateFilterOptions={creditDateFilterOptions}
           programmeGoalTime={programmeGoalTime}
           query={query}
+          year={year}
         />
       </Tab.Pane>
     )

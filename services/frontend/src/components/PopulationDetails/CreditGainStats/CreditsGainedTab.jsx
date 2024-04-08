@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Divider, Icon, Grid } from 'semantic-ui-react'
+import { Divider, Grid, Icon } from 'semantic-ui-react'
 
 import { CreditsGainedTable } from './CreditsGainedTable'
 
@@ -13,11 +13,12 @@ const admissionTypes = [
   null,
 ]
 
-export const CreditsGainedTab = ({ allStudents, query, creditDateFilterOptions, programmeGoalTime }) => {
+export const CreditsGainedTab = ({ allStudents, creditDateFilterOptions, programmeGoalTime, query, year }) => {
   const [show, setShow] = useState(false)
+
   if (!allStudents || !allStudents.length || !query) return null
 
-  const { studyRights, year } = query
+  const { studyRights } = query
 
   const filterFunction = (student, type) => {
     const fixedType = type === 'Valintakoe' ? 'Koepisteet' : type
