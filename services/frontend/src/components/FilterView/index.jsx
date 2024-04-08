@@ -2,9 +2,9 @@ import produce from 'immer'
 import _ from 'lodash'
 import fp from 'lodash/fp'
 import React, { useMemo } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
-import { selectViewFilters, setFilterOptions, resetViewFilters, resetFilter } from '@/redux/filters'
+import { selectViewFilters, setFilterOptions, resetFilter, resetViewFilters } from '@/redux/filters'
 import { FilterTray } from './FilterTray'
 import { FilterViewContext } from './FilterViewContext'
 

@@ -160,7 +160,6 @@ export const PopulationStatistics = () => {
               </Header.Subheader>
             )}
           </Header>
-
           <Segment className="contentSegment">
             <PopulationSearch combinedProgrammeCode={combinedProgrammeCode} />
             {location.search !== '' ? (

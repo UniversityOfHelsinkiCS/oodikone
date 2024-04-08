@@ -31,6 +31,7 @@ const createAcademicYearStartDate = year => new Date(year, 7, 1)
 const SingleStudyGroupContent = ({ filteredStudents, group }) => {
   const { useFilterSelector, filterDispatch } = useFilters()
   const [curriculum, setCurriculum] = useState(null)
+
   const criteria = useGetProgressCriteriaQuery({
     programmeCode: group?.tags?.studyProgramme ? group?.tags?.studyProgramme : '',
   }).data
@@ -139,6 +140,7 @@ const SingleStudyGroupContent = ({ filteredStudents, group }) => {
             filteredStudents={filteredStudents}
             studyGuidanceGroup={group}
             variant="studyGuidanceGroupPopulation"
+            year={year}
           />
         </div>
       ),
