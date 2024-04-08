@@ -5,24 +5,24 @@ import { Icon, Progress, Radio, Table } from 'semantic-ui-react'
 import { getAge, getFullStudyProgrammeRights } from '@/common'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 
-const getAverage = values => {
-  if (values.length === 0) return 0
-  return (values.reduce((acc, cur) => acc + cur, 0) / values.length).toFixed(1)
+const getAverageAge = ages => {
+  if (ages.length === 0) return 0
+  return (ages.reduce((total, age) => total + age, 0) / ages.length).toFixed(1)
 }
 
 const getAgeGroup = age => Math.floor(age / 5) * 5
 
-const separateAgesReducer = (acc, age) => {
-  const newCount = acc[age] ? ++acc[age] : 1
-  acc[age] = newCount
-  return acc
+const separateAgesReducer = (counts, age) => {
+  const newCount = counts[age] ? ++counts[age] : 1
+  counts[age] = newCount
+  return counts
 }
 
-const groupedAgesReducer = (acc, age) => {
+const groupedAgesReducer = (counts, age) => {
   const ageGroup = getAgeGroup(age)
-  const newCount = acc[ageGroup] ? ++acc[ageGroup] : 1
-  acc[ageGroup] = newCount
-  return acc
+  const newCount = counts[ageGroup] ? ++counts[ageGroup] : 1
+  counts[ageGroup] = newCount
+  return counts
 }
 
 export const AgeStats = ({ filteredStudents, query }) => {
@@ -66,12 +66,12 @@ export const AgeStats = ({ filteredStudents, query }) => {
   }
 
   const getAverageAtStudiesStart = () => {
-    return getAverage(
-      filteredStudents.reduce((acc, student) => {
+    return getAverageAge(
+      filteredStudents.reduce((ages, student) => {
         const timeSinceStudiesStart = new Date().getTime() - getActualStartDate(student).getTime()
         const ageAtStudiestStart = getAge(new Date(student.birthdate).getTime() + timeSinceStudiesStart)
-        acc.push(Number(ageAtStudiestStart))
-        return acc
+        ages.push(Number(ageAtStudiestStart))
+        return ages
       }, [])
     )
   }
@@ -85,9 +85,9 @@ export const AgeStats = ({ filteredStudents, query }) => {
       )}
       <div>
         Average:{' '}
-        {getAverage(getAges(false).flatMap(([age, count]) => Array.from({ length: count }, () => Number(age))))}
+        {getAverageAge(getAges(false).flatMap(([age, count]) => Array.from({ length: count }, () => Number(age))))}
       </div>
-      <div>Average at studies start: {getAverageAtStudiesStart()}</div>
+      {query.studyRights?.programme && <div>Average at studies start: {getAverageAtStudiesStart()}</div>}
       <Table celled compact="very">
         <Table.Header>
           <Table.Row>

@@ -143,7 +143,7 @@ const getColumns = (stats, showDetails, showGrades, userHasAccessToAllStats, alt
     },
     {
       key: 'PASS_FIRST',
-      title: 'On First Attempt',
+      title: 'On first attempt',
       filterType: 'range',
       getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.categories.passedFirst || 0),
       cellProps: s => ({
