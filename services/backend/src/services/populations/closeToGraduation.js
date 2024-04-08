@@ -15,6 +15,31 @@ const { redisClient } = require('../redis')
 
 const CLOSE_TO_GRADUATION_REDIS_KEY = 'CLOSE_TO_GRADUATION_DATA'
 
+const findThesisAndLatestAttainments = (student, providerCode) => {
+  let thesisData
+  const latestAttainmentDates = {}
+
+  for (const attainment of student.credits) {
+    if (
+      attainment.course?.course_unit_type === 'urn:code:course-unit-type:bachelors-thesis' &&
+      attainment.course.organizations.some(org => org.code === providerCode)
+    ) {
+      thesisData = attainment
+    }
+    if (!latestAttainmentDates.total) {
+      latestAttainmentDates.total = attainment.attainment_date
+    }
+    if (!latestAttainmentDates.hops && student.studyplans[0].included_courses.includes(attainment.course?.code)) {
+      latestAttainmentDates.hops = attainment.attainment_date
+    }
+    if (thesisData && latestAttainmentDates.total && latestAttainmentDates.hops) {
+      break
+    }
+  }
+
+  return { latestAttainmentDates, thesisData }
+}
+
 const formatStudent = student => {
   const {
     studentnumber: studentNumber,
@@ -30,9 +55,7 @@ const formatStudent = student => {
     element => element?.element_detail.type === 20 && element.code === programmeCode
   )?.element_detail
   const programmeCodeToProviderCode = mapToProviders([programmeCode])[0]
-  const thesisData = student.credits.find(credit =>
-    credit.course.organizations.some(org => org.code === programmeCodeToProviderCode)
-  )
+  const { latestAttainmentDates, thesisData } = findThesisAndLatestAttainments(student, programmeCodeToProviderCode)
   const studyTrack = studyrightElements?.find(element => element?.element_detail.type === 30)?.element_detail
 
   return {
@@ -50,6 +73,7 @@ const formatStudent = student => {
       name: programme?.name,
       studyTrack,
     },
+    latestAttainmentDates,
     credits: {
       hops: student.studyplans[0].completed_credits,
       all: student.creditcount,
@@ -72,7 +96,7 @@ const findStudentsCloseToGraduation = async () =>
       include: [
         {
           model: Studyplan,
-          attributes: ['completed_credits', 'programme_code'],
+          attributes: ['completed_credits', 'included_courses', 'programme_code'],
           where: {
             completed_credits: {
               [Op.gte]: 160,
@@ -107,16 +131,12 @@ const findStudentsCloseToGraduation = async () =>
         {
           model: Credit,
           attributes: ['attainment_date', 'grade'],
-          required: false,
           where: {
             credittypecode: 4,
           },
           include: {
             model: Course,
-            attributes: ['code'],
-            where: {
-              course_unit_type: 'urn:code:course-unit-type:bachelors-thesis',
-            },
+            attributes: ['code', 'course_unit_type'],
             include: {
               model: Organization,
               attributes: ['code'],
@@ -127,6 +147,7 @@ const findStudentsCloseToGraduation = async () =>
           },
         },
       ],
+      order: [[{ model: Credit }, 'attainment_date', 'DESC']],
     })
   ).map(student => formatStudent(student.toJSON()))
 

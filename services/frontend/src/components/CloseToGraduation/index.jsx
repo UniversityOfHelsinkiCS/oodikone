@@ -68,18 +68,36 @@ const getColumns = (getTextIn, namesVisible, studyTrackVisible) => [
     title: 'Completed credits',
     children: [
       {
-        key: 'hops',
+        key: 'creditsHops',
         title: 'HOPS',
         getRowVal: row => row.credits.hops,
         filterType: 'range',
         forceToolsMode: 'floating',
       },
       {
-        key: 'all',
-        title: 'All',
+        key: 'creditsTotal',
+        title: 'Total',
         getRowVal: row => row.credits.all,
         filterType: 'range',
         forceToolsMode: 'floating',
+      },
+    ],
+  },
+  {
+    key: 'latestAttainmentDates',
+    title: 'Latest attainment date',
+    children: [
+      {
+        key: 'latestAttainmentHops',
+        title: 'HOPS',
+        getRowVal: row => reformatDate(row.latestAttainmentDates.hops, 'YYYY-MM-DD'),
+        filterType: 'date',
+      },
+      {
+        key: 'latestAttainmentTotal',
+        title: 'Total',
+        getRowVal: row => reformatDate(row.latestAttainmentDates.total, 'YYYY-MM-DD'),
+        filterType: 'date',
       },
     ],
   },
