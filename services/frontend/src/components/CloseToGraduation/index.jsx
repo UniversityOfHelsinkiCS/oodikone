@@ -159,6 +159,7 @@ export const CloseToGraduation = () => {
               }}
               options={facultyOptions}
               placeholder="Choose faculties..."
+              search
               selection
               value={chosenFaculties}
             />
@@ -170,6 +171,7 @@ export const CloseToGraduation = () => {
               onChange={(_, { value }) => setChosenProgrammes([...value])}
               options={programmeOptions}
               placeholder="Choose degree programmes..."
+              search
               selection
               value={chosenProgrammes}
             />
