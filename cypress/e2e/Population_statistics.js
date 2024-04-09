@@ -228,7 +228,7 @@ describe('Population Statistics tests', () => {
       cy.contains('#checkstudentsresults', 'Results').within(() => {
         cy.contains('Student numbers in list and in Sisu').click()
         cy.contains('#found', existing)
-        cy.contains('Student numbers in list but not in Sodi').click()
+        cy.contains('Student numbers in list but not in Sisu').click()
         cy.contains('#notfound', nonExisting)
         cy.contains('Student numbers in Sisu but not in list').click()
         cy.contains('#notsearched', '010614509')
