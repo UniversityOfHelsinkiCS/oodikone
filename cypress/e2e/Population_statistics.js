@@ -222,7 +222,7 @@ describe('Population Statistics tests', () => {
       cy.contains(existing)
       cy.contains(nonExisting).should('not.exist')
       cy.contains('button', 'Check student numbers').click()
-      cy.contains('Check for studentnumbers')
+      cy.contains('Check for student numbers')
       cy.get('textarea').type(existing).type('{enter}').type(nonExisting)
       cy.contains('button', 'check students').click()
       cy.contains('#checkstudentsresults', 'Results').within(() => {
