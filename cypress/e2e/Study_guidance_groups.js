@@ -147,6 +147,9 @@ describe('Study guidance group tests', () => {
           'Start year at uni',
           'Other programmes',
           'Semesters present amount',
+          'Transferred from',
+          'Citizenship',
+          'Latest attainment date',
           'Tags',
         ]
         const secondRowHeadings = ['All', 'HOPS', 'Since 1.8.2018']
