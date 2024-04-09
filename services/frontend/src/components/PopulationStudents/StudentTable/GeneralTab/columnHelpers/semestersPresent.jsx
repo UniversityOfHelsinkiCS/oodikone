@@ -2,7 +2,7 @@ import moment from 'moment'
 import React from 'react'
 import { Popup } from 'semantic-ui-react'
 
-import { getCurrentSemester, isMastersProgramme } from '@/common'
+import { getCurrentSemester, isFall, isMastersProgramme } from '@/common'
 
 export const getSemestersPresentFunctions = ({
   allSemesters,
@@ -22,8 +22,6 @@ export const getSemestersPresentFunctions = ({
     }
 
   const { semestercode: currentSemesterCode } = getCurrentSemester(allSemestersMap) || {}
-
-  const isFall = semester => semester % 2 === 1
 
   const getFirstAndLastSemester = () => {
     const associatedYear = year !== 'All' && year
@@ -83,7 +81,7 @@ export const getSemestersPresentFunctions = ({
 
   const getSemesterEnrollmentsContent = (student, studyright) => {
     if (allSemesters.length === 0) return ''
-    if (!student.semesterenrollments) return ''
+    if (!student.semesterenrollments && !studyright) return ''
     const semesterIcons = []
 
     const getSemesterJSX = (sem, enrollmenttype, statutoryAbsence, graduated, key) => {
@@ -173,13 +171,17 @@ export const getSemestersPresentFunctions = ({
     return enrollmentsString
   }
 
-  const getSemesterEnrollmentsVal = s =>
-    s.semesterenrollments?.reduce(
+  const getSemesterEnrollmentsVal = (student, studyright) => {
+    if (!student && !studyright) return 0
+    const enrollmentsToCount = studyright ? studyright.semesterEnrollments : student.semesterenrollments
+    return enrollmentsToCount.reduce(
       (prev, cur) =>
         prev +
         (cur.semestercode >= firstSemester && cur.semestercode <= lastSemester && cur.enrollmenttype === 1 ? 1 : 0),
       0
-    ) ?? 0
+    )
+  }
+
   return {
     getSemesterEnrollmentsContent,
     getSemesterEnrollmentsForExcel,

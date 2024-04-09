@@ -202,7 +202,12 @@ const Row = ({ data, isGroup, parents }) => {
     if (content !== undefined && content !== null) {
       cells.push(
         <td colSpan={columnSpans[column.key]} key={column.key + cellProps.title} {...cellProps}>
-          <div style={{ textAlign: Number.isInteger(content) || Number.isFinite(content) ? 'right' : 'left' }}>
+          <div
+            style={{
+              textAlign: !Number.isNaN(Number(content)) ? 'right' : 'left',
+              ...cellProps.style,
+            }}
+          >
             <ColumnContent column={column} data={data} isGroup={isGroup} parents={parents} />
           </div>
         </td>

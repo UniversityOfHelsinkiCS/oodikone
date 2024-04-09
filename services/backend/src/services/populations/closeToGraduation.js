@@ -49,6 +49,13 @@ const formatStudent = student => {
     phone_number: phoneNumber,
     secondary_email: secondaryEmail,
   } = student
+  const semesterEnrollments = {}
+  for (const enrollment of student.studyplans[0].studyright.semester_enrollments) {
+    semesterEnrollments[enrollment.semestercode] = {
+      type: enrollment.enrollmenttype,
+      statutoryAbsence: enrollment.statutoryAbsence,
+    }
+  }
   const { studyright_elements: studyrightElements, startdate: startOfStudyright } = student.studyplans[0].studyright
   const programmeCode = student.studyplans[0].programme_code
   const programme = studyrightElements?.find(
@@ -60,7 +67,10 @@ const formatStudent = student => {
 
   return {
     student: { studentNumber, name, sis_person_id, email, phoneNumber, secondaryEmail },
-    startOfStudyright,
+    studyright: {
+      startDate: startOfStudyright,
+      semesterEnrollments: student.studyplans[0].studyright.semester_enrollments,
+    },
     thesisInfo: thesisData
       ? {
           grade: thesisData.grade,
@@ -108,7 +118,7 @@ const findStudentsCloseToGraduation = async () =>
           include: [
             {
               model: Studyright,
-              attributes: ['startdate', 'studyrightid'],
+              attributes: ['semester_enrollments', 'startdate', 'studyrightid'],
               where: {
                 graduated: 0,
                 cancelled: false,

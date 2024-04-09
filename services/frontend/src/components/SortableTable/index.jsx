@@ -48,6 +48,8 @@ expandedGroups: Array (or set?) of keys of rows are supposed to be expanded. The
 maxHeight: Overwrite the maximum height. Defaults to 80vh if not set.
 useFilteredDataOnExport: If true, uses filtered data (the data that's shown after applying all the selected filters) on exports. Defaults to true.
 handleRowCountChange: A function that is called with the row count when it changes. Can be used to update the state in the parent component.
+pageNumber: The current page number, used for pagination (should be used through the component PaginatedSortableTable).
+rowsPerPage: The number of rows per page, used for pagination (should be used through the component PaginatedSortableTable).
 
 --- Column usage: (* = required field) ---
 
@@ -101,6 +103,8 @@ export const SortableTable = ({
   hideHeaderBar,
   maxHeight = '80vh',
   onlyExportColumns = [],
+  pageNumber,
+  rowsPerPage,
   singleLine = true,
   stretch,
   striped = true,
@@ -200,16 +204,21 @@ export const SortableTable = ({
     classNames.push('first-column-sticky')
   }
 
-  const content = (
-    <table className={classNames.join(' ')} id={tableId} style={tableStyles}>
-      <thead>{headers}</thead>
-      <tbody>
-        {sortedData.map(item => (
-          <DataItem item={item} key={`dataItem-${getKey(item)}`} />
-        ))}
-      </tbody>
-    </table>
-  )
+  const content = () => {
+    const indexOfFirstColumn = (pageNumber - 1) * rowsPerPage
+    const dataBeingDisplayed =
+      rowsPerPage && pageNumber ? sortedData.slice(indexOfFirstColumn, indexOfFirstColumn + rowsPerPage) : sortedData
+    return (
+      <table className={classNames.join(' ')} id={tableId} style={tableStyles}>
+        <thead>{headers}</thead>
+        <tbody>
+          {dataBeingDisplayed.map(item => (
+            <DataItem item={item} key={`dataItem-${getKey(item)}`} />
+          ))}
+        </tbody>
+      </table>
+    )
+  }
 
   const context = {
     state,
@@ -241,7 +250,7 @@ export const SortableTable = ({
             {title}
           </FigureContainer.Header>
           <FigureContainer.Content style={{ backgroundColor: '#e8e8e91c', maxHeight, overflow: 'auto', padding: 0 }}>
-            {content}
+            {content()}
           </FigureContainer.Content>
         </FigureContainer>
       </SortableTableContext.Provider>

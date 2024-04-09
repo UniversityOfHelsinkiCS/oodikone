@@ -60,6 +60,8 @@ export const containsOnlyNumbers = str => str.match('^\\d+$')
 
 export const momentFromFormat = (date, format) => moment(date, format)
 
+export const isFall = semester => semester % 2 === 1
+
 export const reformatDate = (date, outputFormat) => {
   if (!date) {
     return 'Unavailable'
