@@ -31,7 +31,7 @@ const TableSection = ({
       </div>
       <div style={styleContainer}>
         {datasets
-          .filter(i => i)
+          .filter(data => data)
           .map(data => (
             <div key={data.name} style={styleData}>
               <Table data={data} settings={settings} userHasAccessToAllStats={userHasAccessToAllStats} />
@@ -56,7 +56,7 @@ const PassRateChartSection = ({
       <ChartSettings isRelative={isRelative} setIsRelative={setIsRelative} tab="PassRate" viewMode={viewMode} />
       <div style={styleContainer}>
         {datasets
-          .filter(i => i)
+          .filter(data => data)
           .map(data => (
             <div key={data.name} style={styleData}>
               <PassRateChart
@@ -85,7 +85,7 @@ const GradeDistributionChartSection = ({
       <ChartSettings isRelative={isRelative} setIsRelative={setIsRelative} tab="GradeDistribution" />
       <div style={styleContainer}>
         {datasets
-          .filter(i => i)
+          .filter(data => data)
           .map(data => (
             <div key={data.name} style={styleData}>
               <GradeDistributionChart

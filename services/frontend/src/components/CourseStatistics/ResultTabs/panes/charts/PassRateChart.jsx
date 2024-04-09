@@ -25,7 +25,7 @@ const passRateAttemptGraphOptions = (isRelative, categories, max, title) => ({
   yAxis: {
     allowDecimals: false,
     title: {
-      text: isRelative ? 'Share of Students' : 'Number of Students',
+      text: isRelative ? 'Share of students' : 'Number of students',
     },
     max,
     floor: -max,
@@ -62,7 +62,7 @@ const passRateStudentGraphOptions = (isRelative, categories, max, title) => ({
   yAxis: {
     allowDecimals: false,
     title: {
-      text: isRelative ? 'Share of Students' : 'Number of Students',
+      text: isRelative ? 'Share of students' : 'Number of students',
     },
     max,
     floor: -max,
@@ -150,8 +150,8 @@ export const PassRateChart = ({ data, isRelative, userHasAccessToAllStats, viewM
     : getPassRateStudentSeriesFromStats(stats)
 
   const maxPassRateVal = isRelative ? 100 : getMaxValueOfSeries(passGraphSeries.absolute)
-  const graphOptionsFn = isAttemptsMode ? passRateAttemptGraphOptions : passRateStudentGraphOptions
-  const primaryGraphOptions = graphOptionsFn(isRelative, statYears, maxPassRateVal, `Pass rate for group ${data.name}`)
+  const graphOptions = isAttemptsMode ? passRateAttemptGraphOptions : passRateStudentGraphOptions
+  const primaryGraphOptions = graphOptions(isRelative, statYears, maxPassRateVal, `Pass rate for group ${data.name}`)
 
   return (
     <div>

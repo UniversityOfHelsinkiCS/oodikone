@@ -49,6 +49,7 @@ export const courseStatisticsToolTips = {
   GradeDistribution: `
     **Grade distribution**
 
-    Graafi näyttää suorituskertojen arvosanajakauman eri lukuvuosille.
+    Graafi näyttää suorituskertojen arvosanajakauman eri lukuvuosille. Arvosanaksi 0 lasketaan sekä hylätyt (Failed) arvosanat,
+    että ilmoittautuneet opiskelijat, joilla ei ole arvosanaa kurssista (Enrolled, no grade).
   `,
 }

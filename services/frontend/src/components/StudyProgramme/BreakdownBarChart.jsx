@@ -39,7 +39,6 @@ export const BreakdownBarChart = ({ data, title, byStartYear = false }) => {
     tooltip: {
       backgroundColor: 'white',
       fontSize: '25px',
-      // outside: true,
       // eslint-disable-next-line
       formatter: function () {
         return getTooltipText(this.series.name, this.y)
@@ -58,7 +57,6 @@ export const BreakdownBarChart = ({ data, title, byStartYear = false }) => {
     },
     yAxis: {
       min: 0,
-      // max: maxValue,
       title: { text: 'Number of students' },
       labels: {
         overflow: 'justify',

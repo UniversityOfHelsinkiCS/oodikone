@@ -40,7 +40,7 @@ const gradeGraphOptions = (isRelative, categories, max, title) => ({
   yAxis: {
     allowDecimals: false,
     title: {
-      text: isRelative ? 'Share of Students' : 'Number of Students',
+      text: isRelative ? 'Share of students' : 'Number of students',
     },
     max,
     floor: -max,
@@ -115,11 +115,18 @@ const getGradeSeries = series => {
       }
 }
 
+const getGrades = students => {
+  const grades = { ...students.grades }
+  const enrolledWithNoGrade = students.enrolledStudentsWithNoGrade || 0
+  grades[0] = (grades[0] || 0) + enrolledWithNoGrade
+  return grades
+}
+
 export const GradeDistributionChart = ({ data, isRelative, userHasAccessToAllStats }) => {
   const stats = data.stats.filter(stat => stat.name !== 'Total' || isRelative)
 
   const statYears = stats.map(year => year.name)
-  const grades = stats.flatMap(s => s.attempts.grades)
+  const grades = stats.map(year => getGrades(year.students))
 
   const gradeGraphSeries = getGradeSeries(grades)
 
