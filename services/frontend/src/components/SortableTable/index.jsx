@@ -231,7 +231,7 @@ export const SortableTable = ({
   }
 
   if (hideHeaderBar) {
-    return <SortableTableContext.Provider value={context}>{content}</SortableTableContext.Provider>
+    return <SortableTableContext.Provider value={context}>{content()}</SortableTableContext.Provider>
   }
 
   return (
