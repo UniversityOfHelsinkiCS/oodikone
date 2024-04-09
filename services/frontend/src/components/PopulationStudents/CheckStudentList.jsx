@@ -6,39 +6,39 @@ export const CheckStudentList = ({ students }) => {
   const [modalOpen, setModalOpen] = useState(false)
   const [input, setInput] = useState('')
   const [foundStudents, setFoundStudents] = useState([])
-  const [notInOodiRows, setNotInOodiRows] = useState([])
+  const [notInSisuRows, setNotInSisuRows] = useState([])
   const [notInListRows, setNotInListRows] = useState([])
 
   const checkStudents = input => {
     const studentnumbers = input.match(/[^\s,]+/g) || []
-    const foundStudents = studentnumbers.filter(a => students.includes(a))
-    const notInOodi = studentnumbers.filter(a => !students.includes(a))
-    const notInList = students.filter(a => !studentnumbers.includes(a))
+    const foundStudents = studentnumbers.filter(studentnumber => students.includes(studentnumber))
+    const notInSisu = studentnumbers.filter(studentnumber => !students.includes(studentnumber))
+    const notInList = students.filter(student => !studentnumbers.includes(student))
     setFoundStudents(foundStudents)
-    setNotInOodiRows(notInOodi)
+    setNotInSisuRows(notInSisu)
     setNotInListRows(notInList)
   }
 
   const panels = [
     {
       key: 'found',
-      title: 'Student numbers in list and in oodi',
+      title: 'Student numbers in list and in Sisu',
       content: {
-        content: foundStudents.length === 0 ? 'no numbers in list and oodi' : <List id="found" items={foundStudents} />,
+        content: foundStudents.length === 0 ? 'No numbers in list and Sisu' : <List id="found" items={foundStudents} />,
       },
     },
     {
       key: 'not found',
-      title: 'Student numbers in list but not in oodi',
+      title: 'Student numbers in list but not in Sisu',
       content: {
-        content: notInOodiRows.length === 0 ? 'all numbers in oodi' : <List id="notfound" items={notInOodiRows} />,
+        content: notInSisuRows.length === 0 ? 'All numbers in Sisu' : <List id="notfound" items={notInSisuRows} />,
       },
     },
     {
       key: 'not searched',
-      title: 'Student numbers in oodi but not in list',
+      title: 'Student numbers in Sisu but not in list',
       content: {
-        content: notInListRows.length === 0 ? 'all numbers in list' : <List id="notsearched" items={notInListRows} />,
+        content: notInListRows.length === 0 ? 'All numbers in list' : <List id="notsearched" items={notInListRows} />,
       },
     },
   ]
@@ -47,7 +47,7 @@ export const CheckStudentList = ({ students }) => {
     <Modal
       trigger={
         <Button color="green" disabled={input.length === 0} onClick={() => checkStudents(input)}>
-          check students
+          Check students
         </Button>
       }
     >
@@ -70,15 +70,15 @@ export const CheckStudentList = ({ students }) => {
       size="small"
       trigger={
         <Button onClick={() => setModalOpen(true)} size="small">
-          Check studentnumbers
+          Check student numbers
         </Button>
       }
     >
       <Modal.Content>
         <Form>
-          <h2> Check for studentnumbers </h2>
+          <h2>Check for student numbers</h2>
           <Form.Field>
-            <em> Insert studentnumbers you wish to check here </em>
+            <em>Insert student numbers you wish to check here</em>
             <TextArea onChange={element => setInput(element.target.value)} placeholder="011111111" />
           </Form.Field>
         </Form>
