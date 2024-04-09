@@ -159,7 +159,7 @@ export const GeneralTab = ({
   }
 
   const tags = tags => {
-    const studentTags = tags.map(t => t.tag.tagname)
+    const studentTags = tags.map(tag => tag.tag.tagname)
     return studentTags.join(', ')
   }
 
@@ -536,7 +536,6 @@ export const GeneralTab = ({
         const studyPlan = student.studyplans.find(plan => plan.programme_code === programmeCode)
         if (!studyPlan) return ''
         const { included_courses: coursesInStudyPlan } = studyPlan
-
         const dates = student.courses
           .filter(course => coursesInStudyPlan.includes(course.course_code) && course.passed === true)
           .map(course => course.date)

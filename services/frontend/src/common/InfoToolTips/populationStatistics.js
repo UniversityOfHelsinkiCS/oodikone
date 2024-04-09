@@ -114,7 +114,7 @@ export const populationStatisticsToolTips = {
   Valikoituja selvennyksiä: 
   - **Credits**
     - **All**  listaa opiskelijan suoritetut opintopisteet valitun tarkastelujakson  ajalta.
-    - **Since ... ** listaa opiskelijan suoritetut opintopisteet määritellystä ajankohdasta alkaen
+    - **Since** listaa opiskelijan suoritetut opintopisteet määritellystä ajankohdasta alkaen
   - **Start of studyright**: Opiskelijan valittuun ohjelmaan liittyvän opinto-oikeuden alkupäivä
   - **Study programme**: Näyttää opiskelijan uusimman opinto-oikeuden. Opiskelijan kaikki opinto-oikeudet näkyvät uusimmasta vanhimpaan Excel-tiedostossa, sekä laittamalla hiiri solun päälle.
   - **Other programme**: Näkyy, jos ryhmälle on asetettu opinto-oikeus. Tämä korvaa Study programme -sarakkeen, ja toimii muuten samoin mutta näyttää opiskelijan muista opinto-oikeuksista uusimman.

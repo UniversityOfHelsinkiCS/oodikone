@@ -7,7 +7,7 @@ import { useGetCustomPopulationQuery } from '@/redux/populations'
 import { useGetStudyGuidanceGroupPopulationQuery } from '@/redux/studyGuidanceGroups'
 import { GeneralTab } from './GeneralTab'
 
-// study guidance groups -feature uses different population + rtk query, so it needs to
+// The study guidance groups feature uses different population + rtk query, so it needs to
 // be rendered differently. TODO: should refactor this, maybe with using allStudents
 // from useFilters and making sure that it contains same students than the population
 // backend returns with population query below (so caching works)
@@ -33,75 +33,77 @@ export const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) =
   const { isAdmin } = useGetAuthorizedUserQuery()
 
   const getStudyGuidanceGroupColumns = () => {
-    const cols = ['credits.since', 'programme', 'startYear']
+    const columns = ['credits.since', 'programme', 'startYear']
     if (studyGuidanceGroup?.tags?.studyProgramme)
-      cols.push(
+      columns.push(
+        'citizenship',
         'credits.hops',
-        'studyrightStart',
-        'studyStartDate',
-        'studyStartDateActual',
         'endDate',
+        'extent',
+        'latestAttainmentDate',
+        'priority',
         'semesterEnrollments',
         'semesterEnrollmentsAmount'
       )
     if (studyGuidanceGroup?.tags?.studyProgramme && studyGuidanceGroup?.tags?.year) {
-      cols.push('admissionType')
+      columns.push('admissionType', 'studyrightStart', 'studyStartDate', 'studyStartDateActual', 'transferredFrom')
     }
-    return cols
+    return columns
   }
   const getCustomPopulationColumns = () => {
-    const cols = ['credits.since', 'programme', 'startYear']
+    const columns = ['credits.since', 'programme', 'startYear']
     if (props.customPopulationProgramme) {
-      cols.push(
+      columns.push(
         'credits.hops',
-        'studyrightStart',
-        'studyStartDate',
-        'studyStartDateActual',
         'endDate',
         'semesterEnrollments',
-        'semesterEnrollmentsAmount'
+        'semesterEnrollmentsAmount',
+        'studyrightStart',
+        'studyStartDate',
+        'studyStartDateActual'
       )
     }
-    return cols
+    return columns
   }
 
   const columnsByVariant = {
     customPopulation: getCustomPopulationColumns(),
     coursePopulation: [
-      'gradeForSingleCourse',
-      'programme',
-      'passDate',
-      'studyStartDate',
       'enrollmentDate',
+      'gradeForSingleCourse',
       'language',
+      'passDate',
+      'programme',
       'startYear',
+      'studyStartDate',
     ],
     population: [
-      'transferredFrom',
+      'admissionType',
+      'citizenship',
       'credits.hops',
       'credits.studyright',
-      'priority',
+      'endDate',
       'extent',
+      'latestAttainmentDate',
+      'priority',
+      'programme',
       'semesterEnrollments',
       'semesterEnrollmentsAmount',
+      'startYear',
       'studyrightStart',
       'studyStartDate',
       'studyStartDateActual',
-      'endDate',
       'studyTrack',
-      'programme',
-      'admissionType',
-      'latestAttainmentDate',
-      'citizenship',
+      'transferredFrom',
     ],
     studyGuidanceGroupPopulation: getStudyGuidanceGroupColumns(),
   }
-  const studyGuidanceGroupCombinedProg =
+  const studyGuidanceGroupCombinedProgramme =
     studyGuidanceGroup?.tags?.studyProgramme && studyGuidanceGroup?.tags?.studyProgramme.includes('+')
 
   if (
     (populations?.query?.studyRights?.combinedProgramme && variant === 'population') ||
-    (studyGuidanceGroupCombinedProg && variant === 'studyGuidanceGroupPopulation')
+    (studyGuidanceGroupCombinedProgramme && variant === 'studyGuidanceGroupPopulation')
   )
     columnsByVariant[variant].push('credits.hopsCombinedProg', 'endDateCombinedProg')
   const baseColumns = ['credits', 'credits.all', 'studentnumber', 'tags', 'updatedAt', 'phoneNumber']
