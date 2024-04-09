@@ -402,7 +402,7 @@ export const GeneralTab = ({
     studyTrack: containsStudyTracks && {
       key: 'studyTrack',
       title: 'Study track',
-      getRowVal: student => studytrack(student.studyrights).map(st => st.name)[0],
+      getRowVal: student => studytrack(student.studyrights).map(studytrack => studytrack.name)[0],
     },
     studyrightStart: {
       key: 'studyrightStart',

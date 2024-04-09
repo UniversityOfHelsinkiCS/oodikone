@@ -77,6 +77,7 @@ export const DataItem = ({ item, parents = [] }) => {
     </>
   )
 }
+
 export const resolveDisplayColumn = column => {
   let displayColumn = null
 
@@ -201,7 +202,9 @@ const Row = ({ data, isGroup, parents }) => {
     if (content !== undefined && content !== null) {
       cells.push(
         <td colSpan={columnSpans[column.key]} key={column.key + cellProps.title} {...cellProps}>
-          <ColumnContent column={column} data={data} isGroup={isGroup} parents={parents} />
+          <div style={{ textAlign: Number.isInteger(content) || Number.isFinite(content) ? 'right' : 'left' }}>
+            <ColumnContent column={column} data={data} isGroup={isGroup} parents={parents} />
+          </div>
         </td>
       )
     } else if (column.children && column.children.length > 0) {
