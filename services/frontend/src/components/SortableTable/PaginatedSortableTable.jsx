@@ -10,13 +10,17 @@ export const PaginatedSortableTable = ({ rowCount, ...props }) => {
     setActivePage(1)
   }, [rowCount])
 
+  const showPagination = rowCount > rowsPerPage
+
   return (
     <>
-      <Pagination
-        activePage={activePage}
-        onPageChange={(_, { activePage }) => setActivePage(activePage)}
-        totalPages={Math.ceil(rowCount / rowsPerPage)}
-      />
+      {showPagination && (
+        <Pagination
+          activePage={activePage}
+          onPageChange={(_, { activePage }) => setActivePage(activePage)}
+          totalPages={Math.ceil(rowCount / rowsPerPage)}
+        />
+      )}
       <SortableTable {...props} pageNumber={activePage} />
     </>
   )
