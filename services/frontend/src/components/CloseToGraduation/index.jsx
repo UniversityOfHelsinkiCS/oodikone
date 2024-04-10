@@ -128,6 +128,23 @@ const getColumns = (getTextIn, namesVisible, studyTrackVisible, allSemestersMap,
       })),
     },
     {
+      key: 'thesisCompleted',
+      title: 'Thesis\ncompleted',
+      getRowVal: row => (row.thesisInfo ? 'Thesis completed' : 'Thesis not completed'),
+      getRowContent: row => (row.thesisInfo ? <Icon color="green" name="check" /> : null),
+      cellProps: row =>
+        row.thesisInfo
+          ? {
+              style: { textAlign: 'center' },
+              title: [
+                `Attainment date: ${reformatDate(row.thesisInfo.attainmentDate, 'YYYY-MM-DD')}`,
+                `Course code: ${row.thesisInfo.courseCode}`,
+                `Grade: ${row.thesisInfo.grade}`,
+              ].join('\n'),
+            }
+          : {},
+    },
+    {
       key: 'latestAttainmentDates',
       title: 'Latest attainment date',
       children: [
@@ -144,23 +161,6 @@ const getColumns = (getTextIn, namesVisible, studyTrackVisible, allSemestersMap,
           filterType: 'date',
         },
       ],
-    },
-    {
-      key: 'thesisCompleted',
-      title: 'Thesis\ncompleted',
-      getRowVal: row => (row.thesisInfo ? 'Thesis completed' : 'Thesis not completed'),
-      getRowContent: row => (row.thesisInfo ? <Icon color="green" name="check" /> : null),
-      cellProps: row =>
-        row.thesisInfo
-          ? {
-              style: { textAlign: 'center' },
-              title: [
-                `Attainment date: ${reformatDate(row.thesisInfo.attainmentDate, 'YYYY-MM-DD')}`,
-                `Course code: ${row.thesisInfo.courseCode}`,
-                `Grade: ${row.thesisInfo.grade}`,
-              ].join('\n'),
-            }
-          : {},
     },
   ]
 }
