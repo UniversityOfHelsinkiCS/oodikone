@@ -397,18 +397,6 @@ export const validateInputLength = (input, minLength) => input && input.trim().l
 
 export const splitByEmptySpace = str => str.replace(/\s\s+/g, ' ').split(' ')
 
-export const resolveStudyPlan = (studyPlans, studyRight) => {
-  if (!studyRight) return null
-  const { code } =
-    studyRight.studyright_elements
-      .filter(element => element.element_detail.type === 20)
-      .sort((a, b) => new Date(a.startdate) - new Date(b.startdate))[0] || {}
-  if (!code) return null
-  return studyPlans.find(
-    studyPlan => studyPlan.programme_code === code && studyPlan.studyrightid === studyRight.studyrightid
-  )
-}
-
 export const getCurrentSemester = allSemesters => {
   if (!allSemesters) return null
   return Object.values(allSemesters).find(

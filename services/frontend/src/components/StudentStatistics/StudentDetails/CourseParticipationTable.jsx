@@ -3,7 +3,7 @@ import React, { Fragment } from 'react'
 import { Link } from 'react-router-dom'
 import { Divider, Header, Icon, Item } from 'semantic-ui-react'
 
-import { byDateDesc, getTextInWithOpen, reformatDate, resolveStudyPlan } from '@/common'
+import { byDateDesc, getTextInWithOpen, reformatDate } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { StudentCourseTable } from '@/components/StudentStatistics/StudentCourseTable'
 
@@ -19,8 +19,7 @@ export const CourseParticipationTable = ({ student, clearCourseStats, studyright
 
   const courseRowsByAcademicYear = {}
 
-  const studyRight = student.studyrights.find(studyright => studyright.studyrightid === studyrightid)
-  const studyPlan = resolveStudyPlan(student.studyplans, studyRight)
+  const studyPlan = student?.studyplans.find(plan => plan.studyrightid === studyrightid)
 
   student.courses.sort(byDateDesc).forEach(studentCourse => {
     const { course, credits, credittypecode, date, grade, isOpenCourse, isStudyModuleCredit, passed } = studentCourse
