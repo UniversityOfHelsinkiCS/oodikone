@@ -24,7 +24,7 @@ runs:
 
     - name: 'Run services, pull rest of the needed images'
       shell: bash
-      run: docker compose --file docker-compose.ci.yml up --detach
+      run: docker compose --file docker-compose.ci.yml up --detach --quiet-pull
 
     - name: 'Run cypress'
       uses: cypress-io/github-action@v6
