@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import React, { useState } from 'react'
-import { Divider, Dropdown, Form, Icon, Loader, Message } from 'semantic-ui-react'
+import { Divider, Dropdown, Form, Icon, Loader, Message, Radio } from 'semantic-ui-react'
 
 import { createLocaleComparator, getCurrentSemester, isFall, reformatDate } from '@/common'
 import { useTitle } from '@/common/hooks'
@@ -24,7 +24,14 @@ const getEnrollmentTypeTextForExcel = (type, statutoryAbsence) => {
   return 'No study right'
 }
 
-const getColumns = (getTextIn, namesVisible, studyTrackVisible, allSemestersMap, semesterEnrollmentFunctions) => {
+const getColumns = (
+  getTextIn,
+  namesVisible,
+  semesterEnrollmentsVisible,
+  studyTrackVisible,
+  allSemestersMap,
+  semesterEnrollmentFunctions
+) => {
   const { getSemesterEnrollmentsContent, getSemesterEnrollmentsVal } = semesterEnrollmentFunctions
   const currentSemesterCode = getCurrentSemester(allSemestersMap)?.semestercode
   const semestersToInclude = _.range(
@@ -109,6 +116,7 @@ const getColumns = (getTextIn, namesVisible, studyTrackVisible, allSemestersMap,
       key: 'semesterEnrollments',
       title: 'Semesters\npresent',
       filterType: 'range',
+      displayColumn: semesterEnrollmentsVisible,
       export: false,
       getRowContent: row => getSemesterEnrollmentsContent(row.student, [row.studyright]),
       getRowVal: row => getSemesterEnrollmentsVal(row.student, row.studyright),
@@ -177,6 +185,7 @@ export const CloseToGraduation = () => {
   const [chosenFaculties, setChosenFaculties] = useState([])
   const [chosenProgrammes, setChosenProgrammes] = useState([])
   const [rowCount, setRowCount] = useState(0)
+  const [semesterEnrollmentsVisible, setSemesterEnrollmentsVisible] = useState(false)
   const allSemesters = Object.entries(semesterData?.semesters || {}).map(item => item[1])
   const allSemestersMap = allSemesters.reduce((obj, cur, index) => {
     obj[index + 1] = cur
@@ -192,10 +201,17 @@ export const CloseToGraduation = () => {
 
   const handleRowCountChange = count => setRowCount(count)
 
-  const columns = getColumns(getTextIn, namesVisible, chosenProgrammes.length === 1, allSemestersMap, {
-    getSemesterEnrollmentsContent,
-    getSemesterEnrollmentsVal,
-  })
+  const columns = getColumns(
+    getTextIn,
+    namesVisible,
+    semesterEnrollmentsVisible,
+    chosenProgrammes.length === 1,
+    allSemestersMap,
+    {
+      getSemesterEnrollmentsContent,
+      getSemesterEnrollmentsVal,
+    }
+  )
 
   const renderContent = () => {
     if (isError) {
@@ -223,12 +239,29 @@ export const CloseToGraduation = () => {
 
     return (
       <>
-        <StudentNameVisibilityToggle style={{ marginBottom: '2em' }} />
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginBottom: '2em',
+            padding: '2em',
+            gap: '2em',
+          }}
+        >
+          <StudentNameVisibilityToggle style={{ marginTop: '0', marginBottom: '0' }} />
+          <Radio
+            checked={semesterEnrollmentsVisible}
+            label="Show semester enrollments"
+            onChange={() => setSemesterEnrollmentsVisible(!semesterEnrollmentsVisible)}
+            toggle
+          />
+        </div>
         <Form style={{ width: '100%', marginBottom: '1em' }}>
           <Message info>
             You can filter students by choosing a degree programme and/or a faculty. You can also select multiple
-            programmes or faculties. Please note that if you select a faculty, only the degree programmes belonging to
-            that faculty will be shown.
+            programmes or faculties. Please note that if you select a faculty, only the degree programmes of that
+            faculty will be shown.
           </Message>
           <Form.Field>
             <label>Faculties</label>
