@@ -38,7 +38,7 @@ const TagsFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
             })
           }
           options={dropdownOptions}
-          placeholder="Choose Tags to include"
+          placeholder="Choose tags to include"
           selection
           value={options.selected}
         />

@@ -49,7 +49,7 @@ const CourseFilterCard = ({ courseStats, options, onOptionsChange }) => {
         name={name}
         onChange={onChange}
         options={dropdownOptions}
-        placeholder="Select Course"
+        placeholder="Select course"
         search
         selection
         value={[]}

@@ -31,7 +31,7 @@ const GenderFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
           fluid
           onChange={(_, { value: inputValue }) => onOptionsChange({ selected: inputValue })}
           options={dropdownOptions}
-          placeholder="Choose Gender"
+          placeholder="Choose gender"
           selectOnBlur={false}
           selection
           value={selected}

@@ -1,6 +1,6 @@
 import fp from 'lodash/fp'
 import React from 'react'
-import { Form, Dropdown } from 'semantic-ui-react'
+import { Dropdown, Form } from 'semantic-ui-react'
 
 import { filterToolTips } from '@/common/InfoToolTips'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -47,7 +47,7 @@ const EnrollmentStatusFilterCard = ({ options, onOptionsChange, allSemesters, se
               })
             }
             options={STATUS_OPTIONS}
-            placeholder="Choose Enrollment Status"
+            placeholder="Choose enrollment status"
             selection
             value={status}
           />
@@ -66,7 +66,7 @@ const EnrollmentStatusFilterCard = ({ options, onOptionsChange, allSemesters, se
               })
             }
             options={semesterOptions}
-            placeholder="Choose Semesters"
+            placeholder="Choose semesters"
             selection
             value={semesters}
           />

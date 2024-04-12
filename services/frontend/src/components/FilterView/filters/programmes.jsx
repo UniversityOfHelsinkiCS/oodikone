@@ -111,7 +111,7 @@ const ProgrammeFilterCard = ({
         name={name}
         onChange={handleChange}
         options={dropdownOptions}
-        placeholder="Select Programme"
+        placeholder="Select programme"
         search
         selection
         value={selectedProgrammes}

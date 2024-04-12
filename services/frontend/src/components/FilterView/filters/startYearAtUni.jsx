@@ -36,7 +36,7 @@ const StartYearAtUniFilterCard = ({ options, onOptionsChange, withoutSelf }) => 
             })
           }
           options={dropdownOptions}
-          placeholder="Choose Years to Include"
+          placeholder="Choose years to include"
           selection
           value={selected}
         />

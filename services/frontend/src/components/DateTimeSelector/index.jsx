@@ -45,7 +45,7 @@ export const DateTimeSelector = ({ value, onChange, before, after, showSemesters
             paddingLeft: value ? '1em !important' : undefined,
           }}
         >
-          {value === null ? 'Select Date' : moment(value).format('DD.MM.YYYY')}
+          {value === null ? 'Select date' : moment(value).format('DD.MM.YYYY')}
           {value !== null && (
             <Icon
               name="x"

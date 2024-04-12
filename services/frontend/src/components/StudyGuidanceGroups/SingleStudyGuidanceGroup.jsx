@@ -23,7 +23,7 @@ import {
   useGetStudyGuidanceGroupPopulationCoursesQuery,
   useGetStudyGuidanceGroupPopulationQuery,
 } from '@/redux/studyGuidanceGroups'
-import { startYearToAcademicYear, Wrapper, StyledMessage } from './common'
+import { startYearToAcademicYear, StyledMessage, Wrapper } from './common'
 import { StudyGuidanceGroupPopulationCourses } from './StudyGuidanceGroupPopulationCourses'
 
 const createAcademicYearStartDate = year => new Date(year, 7, 1)
@@ -182,7 +182,7 @@ const SingleStudyGroupFilterView = ({ courses, group, population, ...otherProps 
           ? [
               {
                 key: 'assoc-year',
-                label: 'Since Assoc. Year',
+                label: 'Since assoc. year',
                 description:
                   'Student has had a study right since the start year associated with this study guidance group.',
                 predicate: (_student, studyrightElement) =>
