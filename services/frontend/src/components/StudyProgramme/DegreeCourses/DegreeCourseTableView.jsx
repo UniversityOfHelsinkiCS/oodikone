@@ -106,23 +106,13 @@ export const DegreeCourseTableView = ({
   }
 
   const showAllButton = module => (
-    <Button
-      color="blue"
-      onClick={() => {
-        deleteAll(module)
-      }}
-    >
+    <Button color="blue" onClick={() => deleteAll(module)}>
       Set visible
     </Button>
   )
 
   const hideAllButton = module => (
-    <Button
-      color="blue"
-      onClick={() => {
-        excludeAll(module)
-      }}
-    >
+    <Button color="blue" onClick={() => excludeAll(module)}>
       Set hidden
     </Button>
   )

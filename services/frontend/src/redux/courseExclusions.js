@@ -6,10 +6,7 @@ const courseExclusionsApi = RTKApi.injectEndpoints({
       query: ({ programmeCode, courseCodes, curriculumVersion }) => ({
         url: `/v3/course_exclusions/${programmeCode}`,
         method: 'POST',
-        body: {
-          courseCodes,
-          curriculumVersion,
-        },
+        body: { courseCodes, curriculumVersion },
       }),
     }),
     removeCourseExclusion: builder.mutation({
