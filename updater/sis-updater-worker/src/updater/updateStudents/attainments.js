@@ -293,13 +293,15 @@ const updateAttainments = async (
         properAttainmentTypes.has(a.type) && !attainmentsToBeExluced.has(a.id) && !doubleAttachment(a, fixedAttainments)
     )
     .map(a => {
-      a.acceptor_persons
-        .filter(p => p.roleUrn === 'urn:code:attainment-acceptor-type:approved-by' && !!p.personId)
-        .forEach(p => {
-          creditTeachers.push({ composite: `${a.id}-${p.personId}`, credit_id: a.id, teacher_id: p.personId })
-        })
-
-      return mapCredit(a)
+      const mappedCredit = mapCredit(a)
+      if (mappedCredit) {
+        a.acceptor_persons
+          .filter(p => p.roleUrn === 'urn:code:attainment-acceptor-type:approved-by' && !!p.personId)
+          .forEach(p => {
+            creditTeachers.push({ composite: `${a.id}-${p.personId}`, credit_id: a.id, teacher_id: p.personId })
+          })
+      }
+      return mappedCredit
     })
     .filter(c => !!c)
 
