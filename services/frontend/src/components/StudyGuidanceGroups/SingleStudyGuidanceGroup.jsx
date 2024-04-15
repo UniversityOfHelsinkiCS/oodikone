@@ -69,8 +69,6 @@ const SingleStudyGroupContent = ({ filteredStudents, group }) => {
     }
   }
 
-  const customStudyStartYear = year ? new Date(`${year}-07-31`) : null
-
   const panels = [
     {
       title: `Credit accumulation (for ${filteredStudents.length} students)`,
@@ -82,7 +80,6 @@ const SingleStudyGroupContent = ({ filteredStudents, group }) => {
             </Button>
           )}
           <CreditAccumulationGraphHighCharts
-            customStudyStartYear={customStudyStartYear}
             programmeCodes={group?.tags?.studyProgramme ? programmeCodes : []}
             students={filteredStudents}
             studyPlanFilterIsActive={studyPlanFilterIsActive}
