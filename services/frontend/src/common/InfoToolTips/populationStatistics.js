@@ -12,7 +12,7 @@ export const populationStatisticsToolTips = {
   **Showing XX months**: Dataa näytetään ohjelman vuosikurssin alkamispäivästä lähtien haluttuun kuukauteen asti (oletusarvoisesti "tähän päivään").
   
   **Updated** kertoo milloin data on päivitetty.`,
-  CreditAccumulation: `**Credit Accumulation**
+  CreditAccumulation: `**Credit accumulation**
   
   Opiskelijoiden kumulatiiviset opintopistekertymät opiskelijakohtaisina kuvaajina.
   Kun hiiren vie kuvaajien päälle, saa näkyviin jokaista kuvaajaa vastaavan opiskelijanumeron.

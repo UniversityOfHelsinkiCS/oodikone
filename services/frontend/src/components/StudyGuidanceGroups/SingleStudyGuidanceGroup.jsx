@@ -5,12 +5,14 @@ import { useHistory } from 'react-router-dom'
 import { Button, Divider, Header, Label } from 'semantic-ui-react'
 
 import { isMastersProgramme } from '@/common'
+import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { PanelView } from '@/components/common/PanelView'
 import { CreditAccumulationGraphHighCharts } from '@/components/CreditAccumulationGraphHighCharts'
 import { FilterView } from '@/components/FilterView'
 import * as filters from '@/components/FilterView/filters'
 import { creditDateFilter, hopsFilter as studyPlanFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
+import { InfoBox } from '@/components/Info/InfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { AgeStats } from '@/components/PopulationDetails/AgeStats'
 import { CreditGainStats } from '@/components/PopulationDetails/CreditGainStats'
@@ -74,6 +76,7 @@ const SingleStudyGroupContent = ({ filteredStudents, group }) => {
       title: `Credit accumulation (for ${filteredStudents.length} students)`,
       content: (
         <>
+          <InfoBox content={populationStatisticsToolTips.CreditAccumulation} />
           {group.tags?.year && (
             <Button onClick={() => toggleCreditDateFilter()} primary>
               {creditDateFilterActive ? 'Show all credits' : 'Show starting from associated year'}
