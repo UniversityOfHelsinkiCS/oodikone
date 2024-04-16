@@ -190,7 +190,13 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
         },
         {
           model: Studyplan,
-          attributes: ['included_courses', 'programme_code', 'completed_credits', 'studyrightid'],
+          attributes: [
+            'included_courses',
+            'programme_code',
+            'completed_credits',
+            'studyrightid',
+            'curriculum_period_id',
+          ],
           separate: true,
         },
       ],
