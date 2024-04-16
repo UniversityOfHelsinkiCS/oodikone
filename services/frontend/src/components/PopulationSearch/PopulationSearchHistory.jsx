@@ -96,25 +96,24 @@ const PopulationSearchHistory = ({ populations, units, tags, removePopulation })
         ) : null}
         <Form.Field style={{ marginTop: '15px' }}>
           <b>Include</b>
-          {/* Investigate why not working 
-            <Form.Checkbox
+          <Form.Checkbox
+            checked={studentStatuses.includes('EXCHANGE')}
             className="populationStatisticsRadio"
             key="EXCHANGE"
             label="Exchange students"
-            value="EXCHANGE"
             name="studentStatusGroup"
-            checked={studentStatuses.includes('EXCHANGE')}
             onChange={handleStudentStatusSelection}
+            value="EXCHANGE"
           />
           <Form.Checkbox
+            checked={studentStatuses.includes('NONDEGREE')}
             className="populationStatisticsRadio"
             key="NONDEGREE"
             label="Students with non-degree study right"
-            value="NONDEGREE"
             name="studentStatusGroup"
-            checked={studentStatuses.includes('NONDEGREE')}
             onChange={handleStudentStatusSelection}
-          /> */}
+            value="NONDEGREE"
+          />
           <Form.Checkbox
             checked={studentStatuses.includes('TRANSFERRED')}
             className="populationStatisticsRadio"
