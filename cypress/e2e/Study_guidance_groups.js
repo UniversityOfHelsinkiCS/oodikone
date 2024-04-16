@@ -140,6 +140,7 @@ describe('Study guidance group tests', () => {
           'Phone number',
           'Student number',
           'Credits',
+          'Curriculum version',
           'Start of studyright',
           'Started in programme',
           'Semesters present',
@@ -151,7 +152,6 @@ describe('Study guidance group tests', () => {
           'Citizenship',
           'Latest attainment date',
           'Tags',
-          'Curriculum version',
         ]
         const secondRowHeadings = ['All', 'HOPS', 'Since 1.8.2018']
         cy.cs('Students (3)').click()
