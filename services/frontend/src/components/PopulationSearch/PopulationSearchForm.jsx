@@ -352,7 +352,6 @@ const PopulationSearchForm = ({
             timeFormat={false}
           />
         </Form.Field>
-
         <Form.Field className="yearControl">
           <Button.Group basic className="yearControlButtonGroup" vertical>
             <Button className="yearControlButton" icon="plus" onClick={addYear} tabIndex="-1" type="button" />
@@ -360,7 +359,7 @@ const PopulationSearchForm = ({
           </Button.Group>
         </Form.Field>
         <Form.Field>
-          <div>
+          <div style={{ marginTop: '22px' }}>
             {isAdmin && (
               <Radio
                 checked={filterProgrammes}
