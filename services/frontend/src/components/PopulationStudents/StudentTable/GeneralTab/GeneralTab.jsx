@@ -391,6 +391,11 @@ export const GeneralTab = ({
       fieldName: 'studentNumber',
     }),
     credits: creditsColumn,
+    curriculumVersion: {
+      key: 'curriculumVersion',
+      title: 'Curriculum\nversion',
+      getRowVal: student => student.curriculumVersion,
+    },
     gradeForSingleCourse: {
       key: 'gradeForSingleCourse',
       title: 'Grade',

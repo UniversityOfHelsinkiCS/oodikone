@@ -38,6 +38,7 @@ export const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) =
       columns.push(
         'citizenship',
         'credits.hops',
+        'curriculumVersion',
         'endDate',
         'extent',
         'latestAttainmentDate',
@@ -82,6 +83,7 @@ export const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) =
       'citizenship',
       'credits.hops',
       'credits.studyright',
+      'curriculumVersion',
       'endDate',
       'extent',
       'latestAttainmentDate',
