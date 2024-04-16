@@ -64,6 +64,16 @@ const updateCreditcriteriaInfo = (criteria, criteriaYear, criteriaChecked, yearT
   }
 }
 
+const getCurriculumVersion = curriculumPeriodId => {
+  if (!curriculumPeriodId) return null
+  const versionNumber = parseInt(curriculumPeriodId.slice(-2), 10)
+  const year = versionNumber + 1949
+  const startYear = Math.floor((year - 1) / 3) * 3 + 1
+  const endYear = startYear + 3
+  const curriculumVersion = `${startYear}-${endYear}`
+  return curriculumVersion
+}
+
 const formatStudentForPopulationStatistics = (
   {
     firstnames,
@@ -135,6 +145,8 @@ const formatStudentForPopulationStatistics = (
       }, {})
     : {}
 
+  const correctStudyplan = studyplans ? studyplans.filter(plan => plan.programme_code === code) : []
+
   const toProgressCriteria = () => {
     const criteriaChecked = {
       year1: createEmptyCriteriaYear(criteria, 'yearOne'),
@@ -144,7 +156,7 @@ const formatStudentForPopulationStatistics = (
       year5: createEmptyCriteriaYear(criteria, 'yearFive'),
       year6: createEmptyCriteriaYear(criteria, 'yearSix'),
     }
-    const correctStudyplan = studyplans ? studyplans.filter(plan => plan.programme_code === code) : []
+
     const academicYears = { first: 0, second: 0, third: 0, fourth: 0, fifth: 0, sixth: 0 }
     if (criteria.courses || criteria.credits) {
       const courses = credits[studentnumber] ? credits[studentnumber].map(toCourse) : []
@@ -211,6 +223,7 @@ const formatStudentForPopulationStatistics = (
     home_country_fi,
     home_country_sv,
     criteriaProgress: toProgressCriteria(),
+    curriculumVersion: getCurriculumVersion(correctStudyplan[0]?.curriculum_period_id),
   }
 }
 
@@ -397,8 +410,12 @@ const formatStudentsForApi = async (
         stats.transfers.targets[transfer.targetcode] = target
         stats.transfers.sources[transfer.sourcecode] = source
       })
-      if (student.studentnumber in optionData) student.option = optionData[student.studentnumber]
-      else student.option = null
+
+      if (student.studentnumber in optionData) {
+        student.option = optionData[student.studentnumber]
+      } else {
+        student.option = null
+      }
 
       stats.students.push(
         formatStudentForPopulationStatistics(
@@ -469,6 +486,7 @@ const getSubstitutions = async codes => {
   const courses = await Course.findAll({ where: { code: codes }, attributes: ['code', 'substitutions'], raw: true })
   return [...new Set(courses.map(({ code, substitutions }) => [code, ...substitutions]).flat())]
 }
+
 // This duplicate code is added here to ensure that we get the enrollments in cases no credits found for the selected students.
 const findCourseEnrollments = async (studentnumbers, beforeDate, courses = []) => {
   const courseCodes = courses.length > 0 ? await getSubstitutions(courses) : ['DUMMY']
@@ -511,6 +529,7 @@ const findCourseEnrollments = async (studentnumbers, beforeDate, courses = []) =
   )
   return res
 }
+
 const findCourses = async (studentnumbers, beforeDate, courses = []) => {
   const courseCodes = courses.length > 0 ? await getSubstitutions(courses) : ['DUMMY']
   const res = await sequelize.query(

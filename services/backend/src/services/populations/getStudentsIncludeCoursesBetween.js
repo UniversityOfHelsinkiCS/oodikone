@@ -1,18 +1,18 @@
 const { Op } = require('sequelize')
 const { Tag, TagStudent } = require('../../models/models_kone')
 const {
-  Studyplan,
   Course,
   Credit,
+  ElementDetail,
   Enrollment,
   Student,
-  Transfer,
+  Studyplan,
   Studyright,
   StudyrightElement,
-  ElementDetail,
-  SemesterEnrollment,
-  Semester,
   StudyrightExtent,
+  Semester,
+  SemesterEnrollment,
+  Transfer,
 } = require('../../models')
 const moment = require('moment')
 const {
