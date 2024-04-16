@@ -186,7 +186,8 @@ export const getStudentToTargetCourseDateMap = (students, codes) => {
 export const getAllProgrammesOfStudent = (studyrights, studentNumber, studentToTargetCourseDateMap, elementDetails) => {
   const studyprogrammes = []
   studyrights
-    .filter(studyright => studyright.extentcode < 5)
+    // Bachelor's, master's, licentiate and doctoral programmes, also medicine, dentistry and veterinary specialization training
+    .filter(studyright => studyright.extentcode < 5 || studyright.extentcode === 23)
     .forEach(studyright => {
       const facultyCode = studyright.faculty_code
       const studyrightElements = studyright.studyright_elements.filter(
