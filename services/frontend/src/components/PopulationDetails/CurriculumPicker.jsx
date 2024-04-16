@@ -51,7 +51,7 @@ export const CurriculumPicker = ({ setCurriculum, programmeCodes, disabled, year
     const years = sortBy(curriculum.curriculum_period_ids)
     if (years.length === 0) return 'error'
     if (years.length === 1) return years[0]
-    return `${years[0]} - ${years[years.length - 1]}`
+    return `${years[0]} - ${years[0] + 3}`
   }
 
   if (curriculums.length === 0) return null

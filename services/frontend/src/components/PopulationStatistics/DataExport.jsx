@@ -228,7 +228,7 @@ export const DataExport = ({ students, programmeCode }) => {
         'started in programme': reformatDate(getStartedInProgramme(student.studyrights), 'YYYY-MM-DD'),
         'admission type': parseInt(queryYear, 10 >= 2020) ? getAdmissionType(student.studyrights) : undefined,
         bachelor: student.option ? getTextIn(student.option.name) : '',
-        'updated at': reformatDate(student.updatedAt, 'YYYY-MM-DD  hh:mm:ss'),
+        'updated at': reformatDate(student.updatedAt, 'YYYY-MM-DD hh:mm:ss'),
         'mandatory total passed': totalMandatoryPassed(student.studentNumber, codes, programmeCode),
         ...sortedMandatory.reduce((acc, m) => {
           const bestGrade = findBestGrade(student.courses, m.code)
