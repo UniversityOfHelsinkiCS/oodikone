@@ -9,6 +9,7 @@ import { useFilters } from '@/components/FilterView/useFilters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SortableTable } from '@/components/SortableTable'
 import { PRIORITYCODE_TEXTS } from '@/constants'
+import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { createMaps } from './columnHelpers/createMaps'
 import { getSemestersPresentFunctions } from './columnHelpers/semestersPresent'
@@ -34,6 +35,7 @@ export const GeneralTab = ({
     obj[index + 1] = cur
     return obj
   }, {})
+  const { isAdmin } = useGetAuthorizedUserQuery()
 
   const fromSemester = from
     ? Object.values(semesterData.semesters)
@@ -579,7 +581,7 @@ export const GeneralTab = ({
       key: 'updatedAt',
       title: 'Last updated at',
       filterType: 'date',
-      getRowVal: student => reformatDate(student.updatedAt, 'YYYY-MM-DD'),
+      getRowVal: student => reformatDate(student.updatedAt, isAdmin ? 'YYYY-MM-DD HH:mm:ss' : 'YYYY-MM-DD'),
     },
   }
 

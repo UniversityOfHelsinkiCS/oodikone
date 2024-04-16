@@ -66,7 +66,7 @@ export const reformatDate = (date, outputFormat) => {
   if (!date) {
     return 'Unavailable'
   }
-  const parsedDate = moment(date, 'YYYY-MM-DD').local().format(outputFormat)
+  const parsedDate = moment(date).local().format(outputFormat)
   return parsedDate
 }
 
