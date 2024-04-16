@@ -172,7 +172,7 @@ export const PopulationStatistics = () => {
               </Header.Subheader>
             )}
           </Header>
-          {students?.length === 0 && location.search !== '' && noStudentsMessage()}
+          {students?.length === 0 && location.search !== '' && !isLoading && noStudentsMessage()}
           <Segment className="contentSegment">
             <PopulationSearch combinedProgrammeCode={combinedProgrammeCode} />
             {location.search !== '' ? (
