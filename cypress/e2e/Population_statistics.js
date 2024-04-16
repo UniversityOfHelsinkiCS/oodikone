@@ -91,7 +91,7 @@ describe('Population Statistics tests', () => {
       cy.contains('Courses of class').click()
       cy.get('Opiskelijan digitaidot - Kumpula').should('not.exist')
       cy.get('[data-cy=curriculum-picker]').click()
-      cy.contains('2020 - 2022').click()
+      cy.contains('2020 - 2023').click()
       cy.contains('Opiskelijan digitaidot - Kumpula')
     })
 
