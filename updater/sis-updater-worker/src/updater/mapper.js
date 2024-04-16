@@ -506,6 +506,7 @@ const studyplanMapper =
         programme_code: code,
         included_courses: includedCourses,
         sisu_id: studyplan.id,
+        curriculum_period_id: studyplan.curriculum_period_id,
       }
     })
   }

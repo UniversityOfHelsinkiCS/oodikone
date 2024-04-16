@@ -43,6 +43,9 @@ Studyplan.init(
     completed_credits: {
       type: INTEGER,
     },
+    curriculum_period_id: {
+      type: STRING,
+    },
     createdAt: {
       type: DATE,
     },

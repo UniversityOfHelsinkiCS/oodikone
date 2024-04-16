@@ -37,10 +37,13 @@ Studyplan.init(
     included_courses: {
       type: ARRAY(STRING),
     },
+    sisu_id: {
+      type: STRING,
+    },
     completed_credits: {
       type: INTEGER,
     },
-    sisu_id: {
+    curriculum_period_id: {
       type: STRING,
     },
     createdAt: {
