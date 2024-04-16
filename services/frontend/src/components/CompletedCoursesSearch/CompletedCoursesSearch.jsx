@@ -92,7 +92,7 @@ export const CompletedCoursesSearch = ({ setValues }) => {
   const onSave = () => {
     const courseList = courseInput
       .split(/[\s,]+/)
-      .map(code => code.trim().toUpperCase())
+      .map(code => code.trim())
       .filter(code => code !== '')
     if (selectedSearchId !== '') {
       updateCourseList({ id: selectedSearchId, courseList })
@@ -119,7 +119,7 @@ export const CompletedCoursesSearch = ({ setValues }) => {
 
     const courseList = courseInput
       .split(/[\s,]+/)
-      .map(code => code.trim().toUpperCase())
+      .map(code => code.trim())
       .filter(code => code !== '')
     const studentList = studentInput
       .split(/[;\s,]+/)

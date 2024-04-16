@@ -1,14 +1,12 @@
 const { Credit, Enrollment, Student, Course } = require('../models')
-const { Op } = require('sequelize')
+const { Op, where, fn, col } = require('sequelize')
 
 const getCompletedCourses = async (studentNumbers, courseCodes) => {
   let courses = await Course.findAll({
     attributes: ['code', 'name', 'substitutions'],
-    where: {
-      code: {
-        [Op.in]: courseCodes,
-      },
-    },
+    where: where(fn('LOWER', col('code')), {
+      [Op.in]: courseCodes.map(code => code.toLowerCase()),
+    }),
   })
 
   const fullCourseCodes = [
