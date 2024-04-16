@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
-import { Header, Segment } from 'semantic-ui-react'
+import { Header, Message, Segment } from 'semantic-ui-react'
 
 import {
   getFullStudyProgrammeRights,
@@ -132,6 +132,18 @@ export const PopulationStatistics = () => {
       : getTextIn(programmeName)
   const title = location.search === '' ? 'Class statistics' : `${programmeText} ${getYearText(query?.year)}`
 
+  const noStudentsMessage = () => (
+    <div style={{ maxWidth: '80%' }}>
+      <Message
+        content="Choose “Advanced settings” below and make sure you have the correct student groups included in the class. For example, if you are looking for students of a specialist training in medicine or dentistry, you must choose “Students with non-degree study right”."
+        header="Not seeing any students?"
+        icon="question"
+        info
+        size="large"
+      />
+    </div>
+  )
+
   return (
     <FilterView
       displayTray={location.search !== ''}
@@ -160,6 +172,7 @@ export const PopulationStatistics = () => {
               </Header.Subheader>
             )}
           </Header>
+          {students?.length === 0 && noStudentsMessage()}
           <Segment className="contentSegment">
             <PopulationSearch combinedProgrammeCode={combinedProgrammeCode} />
             {location.search !== '' ? (
