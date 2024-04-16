@@ -98,18 +98,6 @@ const updateStudyRights = async (
       return 0
     }
 
-    // For some rare educations, term registrations are not necessary. Then just check validity from dates.
-    if (extentCode === 23) {
-      if (
-        studyright.valid?.startDate &&
-        new Date(studyright.valid.startDate) < new Date() &&
-        (!studyright.valid?.endDate || new Date(studyright.valid.endDate)) > new Date()
-      ) {
-        return 1
-      }
-      return 0
-    }
-
     // If the student has registered to be absent or attending for this semester, the studyright is active
     if (termRegistrations) {
       const studyrightToUniOrgId = getUniOrgId(studyright.organisation_id)
@@ -127,6 +115,18 @@ const updateStudyRights = async (
       if (activeSemesters.includes(currentSemester.semestercode)) {
         return 1
       }
+    }
+
+    // For some rare educations, term registrations are not necessary. Then just check validity from dates.
+    if (extentCode === 23) {
+      if (
+        studyright.valid?.startDate &&
+        new Date(studyright.valid.startDate) < new Date() &&
+        (!studyright.valid?.endDate || new Date(studyright.valid.endDate) > new Date())
+      ) {
+        return 1
+      }
+      return 0
     }
 
     // Default not active
