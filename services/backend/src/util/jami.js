@@ -20,6 +20,7 @@ const getUserIamAccess = async (user, attempt = 1) => {
     const { data: iamAccess } = await jamiClient.post('/', {
       userId: id,
       iamGroups,
+      getSisuAccess: true,
     })
 
     const { specialGroup } = iamAccess

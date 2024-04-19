@@ -175,6 +175,8 @@ services:
   jami:
     <<: *defaults
     image: quay.io/toska/jami:production
+    env_file:
+      - .env
     environment:
       - npm_config_cache=/tmp
       - PORT=3003
