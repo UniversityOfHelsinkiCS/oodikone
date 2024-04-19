@@ -36,7 +36,7 @@ const CitizenshipFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
           button
           className="mini"
           clearable
-          data-cy="genderFilter-dropdown"
+          data-cy="citizenshipFilter-dropdown"
           fluid
           onChange={(_, { value: inputValue }) => onOptionsChange({ selected: inputValue })}
           options={sortedDropdownOptions}
