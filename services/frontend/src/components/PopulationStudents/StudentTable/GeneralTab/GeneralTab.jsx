@@ -291,6 +291,16 @@ export const GeneralTab = ({
     return title
   }
 
+  const getGender = genderCode => {
+    const genders = {
+      0: 'Unknown',
+      1: 'Male',
+      2: 'Female',
+      3: 'Other',
+    }
+    return genders[genderCode]
+  }
+
   let creditsColumn = null
   const creditColumnKeys = columnKeysToInclude.filter(key => key.indexOf('credits.') === 0)
 
@@ -513,6 +523,11 @@ export const GeneralTab = ({
         const { language } = getGradeAndDate(student)
         return language
       },
+    },
+    gender: {
+      key: 'gender',
+      title: 'Gender',
+      getRowVal: student => getGender(student.gender_code),
     },
     citizenship: {
       key: 'citizenship',

@@ -41,6 +41,7 @@ export const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) =
         'curriculumVersion',
         'endDate',
         'extent',
+        'gender',
         'latestAttainmentDate',
         'priority',
         'semesterEnrollments',
@@ -51,6 +52,7 @@ export const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) =
     }
     return columns
   }
+
   const getCustomPopulationColumns = () => {
     const columns = ['credits.since', 'programme', 'startYear']
     if (props.customPopulationProgramme) {
@@ -86,6 +88,7 @@ export const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) =
       'curriculumVersion',
       'endDate',
       'extent',
+      'gender',
       'latestAttainmentDate',
       'priority',
       'programme',

@@ -148,6 +148,7 @@ describe('Study guidance group tests', () => {
           'Other programmes',
           'Semesters present amount',
           'Transferred from',
+          'Gender',
           'Citizenship',
           'Curriculum version',
           'Latest attainment date',
