@@ -18,7 +18,7 @@ import {
   courseFilter,
   creditDateFilter,
   creditsEarnedFilter,
-  curriculumVersionFilter,
+  curriculumPeriodFilter,
   enrollmentStatusFilter,
   genderFilter,
   graduatedFromProgrammeFilter,
@@ -68,7 +68,7 @@ export const PopulationStatistics = () => {
     courseFilter({ courses }),
     creditDateFilter,
     creditsEarnedFilter,
-    curriculumVersionFilter,
+    curriculumPeriodFilter,
     enrollmentStatusFilter({
       allSemesters: allSemesters?.semesters ?? [],
       language,

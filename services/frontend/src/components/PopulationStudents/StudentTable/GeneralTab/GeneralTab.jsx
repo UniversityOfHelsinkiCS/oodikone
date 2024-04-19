@@ -546,9 +546,9 @@ export const GeneralTab = ({
         }
       },
     },
-    curriculumVersion: {
-      key: 'curriculumVersion',
-      title: 'Curriculum\nversion',
+    curriculumPeriod: {
+      key: 'curriculumPeriod',
+      title: 'Curriculum\nperiod',
       getRowVal: student => student.curriculumVersion,
     },
     latestAttainmentDate: {

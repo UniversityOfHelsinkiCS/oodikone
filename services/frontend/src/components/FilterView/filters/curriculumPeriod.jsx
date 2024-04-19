@@ -4,24 +4,24 @@ import { Form, Dropdown } from 'semantic-ui-react'
 
 import { createFilter } from './createFilter'
 
-const CurriculumVersionFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
+const CurriculumPeriodFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
   const { selected } = options
 
-  const dropdownOptions = withoutSelf().reduce((curriculumVersions, student) => {
-    const { curriculumVersion } = student
+  const dropdownOptions = withoutSelf().reduce((curriculumPeriods, student) => {
+    const curriculumPeriod = student.curriculumVersion
 
-    if (curriculumVersions.every(option => option.value !== curriculumVersion)) {
-      const count = withoutSelf().filter(student => student.curriculumVersion === curriculumVersion).length
+    if (curriculumPeriods.every(option => option.value !== curriculumPeriod)) {
+      const count = withoutSelf().filter(student => student.curriculumVersion === curriculumPeriod).length
 
-      curriculumVersions.push({
-        key: curriculumVersion,
-        value: curriculumVersion,
-        text: `${curriculumVersion || 'No curriculum selected'} (${count})`,
+      curriculumPeriods.push({
+        key: curriculumPeriod,
+        value: curriculumPeriod,
+        text: `${curriculumPeriod || 'No period selected'} (${count})`,
         count,
       })
     }
 
-    return curriculumVersions
+    return curriculumPeriods
   }, [])
 
   const sortedDropdownOptions = _.orderBy(dropdownOptions, ['text', 'count'], ['asc', 'desc'])
@@ -33,11 +33,11 @@ const CurriculumVersionFilterCard = ({ options, onOptionsChange, withoutSelf }) 
           button
           className="mini"
           clearable
-          data-cy="curriculumVersionFilter-dropdown"
+          data-cy="curriculumPeriodFilter-dropdown"
           fluid
           onChange={(_, { value: inputValue }) => onOptionsChange({ selected: inputValue })}
           options={sortedDropdownOptions}
-          placeholder="Choose curriculum version"
+          placeholder="Choose curriculum period"
           selectOnBlur={false}
           selection
           value={selected}
@@ -47,8 +47,8 @@ const CurriculumVersionFilterCard = ({ options, onOptionsChange, withoutSelf }) 
   )
 }
 
-export const curriculumVersionFilter = createFilter({
-  key: 'Curriculum version',
+export const curriculumPeriodFilter = createFilter({
+  key: 'Curriculum period',
 
   defaultOptions: {
     selected: '',
@@ -60,5 +60,5 @@ export const curriculumVersionFilter = createFilter({
     return selected === student.curriculumVersion
   },
 
-  component: CurriculumVersionFilterCard,
+  component: CurriculumPeriodFilterCard,
 })
