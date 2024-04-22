@@ -84,6 +84,7 @@ export const PopulationDetails = ({
           creditDateFilterOptions={creditDateFilterOptions}
           filteredStudents={filteredStudents}
           query={query}
+          year={query?.year}
         />
       ) : (
         <div>This table is omitted when searching population of multiple years</div>
