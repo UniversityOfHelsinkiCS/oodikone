@@ -121,7 +121,7 @@ export const GeneralTab = ({
       .map(a => a[value])
   }
 
-  const studytrack = studyrights => {
+  const getStudyTrack = studyrights => {
     let startdate = '1900-01-01'
     let enddate = '2020-04-20'
     const res = studyrightCodes(studyrights, 'studyright_elements').reduce((acc, elements) => {
@@ -238,23 +238,25 @@ export const GeneralTab = ({
     clearTimeout(timeout[id])
   }
 
-  // Filters to check data for whether to show certain columns
-  const containsStudyTracks =
-    Object.keys(populationStatistics.elementdetails.data) > 0
-      ? selectedStudents
-          .map(studentNumber => students[studentNumber])
-          .map(student => student.studyrights)
-          .map(
-            studyrights =>
-              studyrightCodes(studyrights, 'studyright_elements').reduce((acc, elements) => {
-                elements
-                  .filter(element => populationStatistics.elementdetails?.data[element.code].type === 30)
-                  .forEach(element => acc.push(getTextIn(populationStatistics.elementdetails.data[element.code].name)))
-                return acc
-              }, []).length > 0
-          )
-          .some(element => element === true)
-      : false
+  const containsStudyTracks = () => {
+    if (Object.keys(populationStatistics.elementdetails.data) === 0) {
+      return false
+    }
+    const contains = selectedStudents
+      .map(studentNumber => students[studentNumber])
+      .map(student => student.studyrights)
+      .map(
+        studyrights =>
+          studyrightCodes(studyrights, 'studyright_elements').reduce((acc, elements) => {
+            elements
+              .filter(element => populationStatistics.elementdetails?.data[element.code].type === 30)
+              .forEach(element => acc.push(getTextIn(populationStatistics.elementdetails.data[element.code].name)))
+            return acc
+          }, []).length > 0
+      )
+      .some(element => element === true)
+    return contains
+  }
 
   const containsOption = cleanedQueryStudyrights.some(code => code.startsWith('MH') || code.startsWith('KH'))
 
@@ -411,10 +413,10 @@ export const GeneralTab = ({
         return grade
       },
     },
-    studyTrack: containsStudyTracks && {
+    studyTrack: containsStudyTracks() && {
       key: 'studyTrack',
       title: 'Study track',
-      getRowVal: student => studytrack(student.studyrights).map(studytrack => studytrack.name)[0],
+      getRowVal: student => getStudyTrack(student.studyrights).map(studytrack => studytrack.name)[0],
     },
     studyrightStart: {
       key: 'studyrightStart',

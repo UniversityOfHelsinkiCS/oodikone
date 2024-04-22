@@ -48,7 +48,14 @@ export const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) =
         'semesterEnrollmentsAmount'
       )
     if (studyGuidanceGroup?.tags?.studyProgramme && studyGuidanceGroup?.tags?.year) {
-      columns.push('admissionType', 'studyrightStart', 'studyStartDate', 'studyStartDateActual', 'transferredFrom')
+      columns.push(
+        'admissionType',
+        'studyrightStart',
+        'studyStartDate',
+        'studyStartDateActual',
+        'studyTrack',
+        'transferredFrom'
+      )
     }
     return columns
   }
