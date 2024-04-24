@@ -7,7 +7,6 @@ import { reducer as courseSearch } from './coursesearch'
 import { coursesSummaryFormReducer as courseSummaryForm } from './coursesSummaryForm'
 import { reducer as courseStats } from './coursestats'
 import { reducer as filters } from './filters'
-import { curriculumsApi } from './populationCourses'
 import { reducer as populationProgrammes } from './populationProgrammes'
 import { reducer as populations } from './populations'
 import { reducer as populationSelectedStudentCourses } from './populationSelectedStudentCourses'
@@ -32,13 +31,12 @@ export const store = configureStore({
     tagstudent,
     singleCourseStats,
     [RTKApi.reducerPath]: RTKApi.reducer,
-    [curriculumsApi.reducerPath]: curriculumsApi.reducer,
     filters,
   },
   // oodikone is currently too heavy for other middlewares than thunk, but
   // feel free to take use them at some point if possible
   middleware: getDefaultMiddleware => [
-    ...getDefaultMiddleware({ immutableCheck: false, serializableCheck: false }).concat(curriculumsApi.middleware),
+    ...getDefaultMiddleware({ immutableCheck: false, serializableCheck: false }),
     handleRequest,
     RTKApi.middleware,
   ],

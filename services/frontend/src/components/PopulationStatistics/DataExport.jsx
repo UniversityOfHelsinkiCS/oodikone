@@ -7,15 +7,12 @@ import { utils, writeFile } from 'xlsx'
 import { getStudentTotalCredits, getStudentToStudyrightStartMap, getTimestamp, reformatDate } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { PRIORITYCODE_TEXTS } from '@/constants'
-import { curriculumsApi } from '@/redux/populationCourses'
+import { useGetCurriculumsQuery } from '@/redux/populationCourses'
 
-const { useGetCurriculumsQuery } = curriculumsApi
-
-export const DataExport = ({ students, programmeCode }) => {
+export const DataExport = ({ students, programmeCode, curriculumYears }) => {
   const { getTextIn } = useLanguage()
   const queryYear = useSelector(({ populations }) => populations?.query?.year)
-  const curriculumQuery = useGetCurriculumsQuery({ code: programmeCode, period_ids: [queryYear] })
-  const mandatoryCourses = curriculumQuery?.currentData
+  const { data: mandatoryCourses } = useGetCurriculumsQuery({ code: programmeCode, periodIds: curriculumYears })
   const populationStatistics = useSelector(({ populations }) => populations.data)
   const courses = useSelector(store => store.populationSelectedStudentCourses.data?.coursestatistics)
   const queryStudyrights = useSelector(({ populations }) =>

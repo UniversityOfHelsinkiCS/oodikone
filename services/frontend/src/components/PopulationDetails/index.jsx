@@ -17,6 +17,8 @@ import { PopulationCourses } from './PopulationCourses'
 
 export const PopulationDetails = ({
   allStudents,
+  curriculum,
+  setCurriculum,
   filteredStudents,
   queryIsSet,
   isLoading,
@@ -28,7 +30,6 @@ export const PopulationDetails = ({
   const { isLoading: authLoading, programmeRights, isAdmin } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const { useFilterSelector } = useFilters()
-  const [curriculum, setCurriculum] = useState(null)
   const [studentAmountLimit, setStudentAmountLimit] = useState(0)
 
   useEffect(() => {
@@ -36,7 +37,10 @@ export const PopulationDetails = ({
   }, [filteredStudents.length])
 
   const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions)
-  const criteria = useGetProgressCriteriaQuery({ programmeCode: query?.studyRights?.programme })
+  const criteria = useGetProgressCriteriaQuery(
+    { programmeCode: query?.studyRights?.programme },
+    { skip: !query?.studyRights?.programme }
+  )
   const [courseTableMode, setCourseTableMode] = useState('curriculum')
   const RenderCreditGainGraphs = () => {
     const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive)

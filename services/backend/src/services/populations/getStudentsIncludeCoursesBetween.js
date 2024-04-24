@@ -56,7 +56,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
   })
   const studyPlanCourses = Array.from(new Set([...studyPlans.map(plan => plan.included_courses)].flat()))
 
-  const creditsOfStudentOther = {
+  const creditsOfStudent = {
     [Op.or]: [
       {
         attainment_date: {
@@ -64,43 +64,23 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
         },
       },
       {
-        course_code: studyPlanCourses,
+        // takes into account possible progress tests taken earlier than the start date
+        course_code: ['320001', 'MH30_001'].includes(studyright[0])
+          ? ['375063', '339101', ...studyPlanCourses]
+          : studyPlanCourses,
       },
     ],
     student_studentnumber: {
       [Op.in]: studentnumbers,
     },
   }
-
-  // takes into accout possible progress tests taken earlier than the start date
-  const creditsOfStudentLaakis = {
-    student_studentnumber: {
-      [Op.in]: studentnumbers,
-    },
-    [Op.or]: [
-      {
-        attainment_date: {
-          [Op.between]: [attainmentDateFrom, endDate],
-        },
-      },
-      {
-        course_code: {
-          [Op.in]: ['375063', '339101'].concat(studyPlanCourses),
-        },
-      },
-    ],
-  }
-
-  const creditsOfStudent = ['320001', 'MH30_001'].includes(studyright[0])
-    ? creditsOfStudentLaakis
-    : creditsOfStudentOther
 
   if (studentnumbers.length === 0)
     return { students: [], enrollments: [], credits: [], extents: [], semesters: [], elementdetails: [], courses: [] }
 
   const [courses, enrollments, students, credits, extents, semesters, elementdetails] = await Promise.all([
     Course.findAll({
-      attributes: [sequelize.literal('DISTINCT ON("code") code'), 'name', 'coursetypecode'],
+      attributes: [sequelize.literal('DISTINCT ON("code") code'), 'name'],
       include: [
         {
           model: Credit,
@@ -268,10 +248,9 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
       raw: true,
     }),
     sequelize.query(
-      `
-SELECT DISTINCT ON (code) code, name, type FROM element_details WHERE
-EXISTS (SELECT 1 FROM transfers WHERE studentnumber IN (:studentnumbers) AND (code = sourcecode OR code = targetcode)) OR
-EXISTS (SELECT 1 FROM studyright_elements WHERE studentnumber IN (:studentnumbers))`,
+      `SELECT DISTINCT ON (code) code, name, type FROM element_details WHERE
+      EXISTS (SELECT 1 FROM transfers WHERE studentnumber IN (:studentnumbers) AND (code = sourcecode OR code = targetcode)) OR
+      EXISTS (SELECT 1 FROM studyright_elements WHERE studentnumber IN (:studentnumbers) AND element_details.code = studyright_elements.code)`,
       {
         replacements: { studentnumbers },
         type: sequelize.QueryTypes.SELECT,

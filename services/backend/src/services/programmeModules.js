@@ -10,7 +10,7 @@ const getCurriculumVersions = async code => {
     const result = await ProgrammeModule.findAll({ where: { code } })
     if (!result) return
     const modified = result.map(r => ({
-      ...r,
+      ...r.toJSON(),
       curriculum_period_ids: r.curriculum_period_ids.map(id => parseInt(id.substring(6), 10) + 1949),
     }))
     return modified

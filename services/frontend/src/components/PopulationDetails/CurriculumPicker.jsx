@@ -2,9 +2,7 @@ import { sortBy } from 'lodash'
 import React, { useEffect, useState } from 'react'
 import { Dropdown, Form, Input, Radio } from 'semantic-ui-react'
 
-import { curriculumsApi } from '@/redux/populationCourses'
-
-const { useGetCurriculumsQuery, useGetCurriculumOptionsQuery } = curriculumsApi
+import { useGetCurriculumsQuery, useGetCurriculumOptionsQuery } from '@/redux/populationCourses'
 
 const chooseCurriculumToFetch = (curriculums, selectedCurriculum, startYear) => {
   if (selectedCurriculum?.curriculum_period_ids) {
@@ -23,29 +21,27 @@ const chooseCurriculumToFetch = (curriculums, selectedCurriculum, startYear) => 
 }
 
 export const CurriculumPicker = ({ setCurriculum, programmeCodes, disabled, year }) => {
-  const curriculumOptionsQuery = useGetCurriculumOptionsQuery({ code: programmeCodes[0] }, { skip: !programmeCodes[0] })
-  const curriculums = curriculumOptionsQuery.data ?? []
+  const { data: curriculums = [] } = useGetCurriculumOptionsQuery(
+    { code: programmeCodes[0] },
+    { skip: !programmeCodes[0] }
+  )
   const [selectedCurriculum, setSelectedCurriculum] = useState(null)
   const chosenCurriculum = chooseCurriculumToFetch(curriculums, selectedCurriculum, year)
-  const curriculumsQuery = useGetCurriculumsQuery(
+  const { data: chosenCurriculumData } = useGetCurriculumsQuery(
     {
       code: programmeCodes[0],
-      period_ids: chosenCurriculum?.curriculum_period_ids,
+      periodIds: chosenCurriculum?.curriculum_period_ids,
     },
     { skip: !chosenCurriculum?.curriculum_period_ids }
   )
 
   useEffect(() => {
-    curriculumsQuery.refetch()
-  }, [selectedCurriculum])
-
-  useEffect(() => {
-    if (!curriculumsQuery.data) {
+    if (!chosenCurriculumData) {
       setCurriculum(null)
       return
     }
-    setCurriculum({ ...curriculumsQuery.data, version: chosenCurriculum?.curriculum_period_ids })
-  }, [curriculumsQuery.data])
+    setCurriculum({ ...chosenCurriculumData, version: chosenCurriculum?.curriculum_period_ids })
+  }, [chosenCurriculumData])
 
   const formatCurriculumOptions = curriculum => {
     const years = sortBy(curriculum.curriculum_period_ids)
@@ -61,13 +57,11 @@ export const CurriculumPicker = ({ setCurriculum, programmeCodes, disabled, year
       className="link item"
       data-cy="curriculum-picker"
       disabled={disabled}
-      onChange={(_, { value }) =>
-        setSelectedCurriculum(curriculums.find(curriculum => curriculum.dataValues.id === value))
-      }
+      onChange={(_, { value }) => setSelectedCurriculum(curriculums.find(curriculum => curriculum.id === value))}
       options={sortBy(
         curriculums.map(curriculum => ({
           key: sortBy(curriculum.curriculum_period_ids).join(', '),
-          value: curriculum.dataValues.id,
+          value: curriculum.id,
           text: formatCurriculumOptions(curriculum),
         })),
         'key'
@@ -78,7 +72,7 @@ export const CurriculumPicker = ({ setCurriculum, programmeCodes, disabled, year
         marginLeft: '10px',
         background: '#e3e3e3',
       }}
-      value={chosenCurriculum.dataValues.id}
+      value={chosenCurriculum.id}
     />
   )
 }
