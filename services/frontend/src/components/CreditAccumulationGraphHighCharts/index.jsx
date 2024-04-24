@@ -412,13 +412,16 @@ const createStudentCreditLines = (
 const findTransferName = (student, transfer) =>
   student.studyrights
     .flatMap(studyright => studyright.studyright_elements)
-    .find(element => element.code === transfer.targetcode).element_detail.name
+    .find(element => element.code === transfer.targetcode)?.element_detail.name
 
 const filterTransfers = (student, getTextIn) => {
-  const transferTimes = student.transfers.map(transfer => ({
-    value: new Date(transfer.transferdate).getTime(),
-    studyright: `to ${getTextIn(findTransferName(student, transfer))}`,
-  }))
+  const transferTimes = student.transfers.map(transfer => {
+    const transferToName = getTextIn(findTransferName(student, transfer))
+    return {
+      value: new Date(transfer.transferdate).getTime(),
+      studyright: transferToName ? `to ${transferToName}` : '',
+    }
+  })
   const removeOverlapping = transferTimes.filter((transfer, i, a) => a.indexOf(transfer) === i)
   return removeOverlapping
 }
