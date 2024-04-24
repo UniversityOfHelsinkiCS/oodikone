@@ -239,23 +239,15 @@ export const GeneralTab = ({
   }
 
   const containsStudyTracks = () => {
-    if (Object.keys(populationStatistics.elementdetails.data) === 0) {
-      return false
+    const studentsInfo = selectedStudents.map(studentNumber => students[studentNumber])
+
+    for (const { studyrights } of studentsInfo) {
+      const studyRightElements = studyrightCodes(studyrights, 'studyright_elements').flat()
+      if (studyRightElements.some(element => element.element_detail.type === 30)) {
+        return true
+      }
     }
-    const contains = selectedStudents
-      .map(studentNumber => students[studentNumber])
-      .map(student => student.studyrights)
-      .map(
-        studyrights =>
-          studyrightCodes(studyrights, 'studyright_elements').reduce((acc, elements) => {
-            elements
-              .filter(element => populationStatistics.elementdetails?.data[element.code].type === 30)
-              .forEach(element => acc.push(getTextIn(populationStatistics.elementdetails.data[element.code].name)))
-            return acc
-          }, []).length > 0
-      )
-      .some(element => element === true)
-    return contains
+    return false
   }
 
   const containsOption = cleanedQueryStudyrights.some(code => code.startsWith('MH') || code.startsWith('KH'))
