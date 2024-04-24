@@ -33,7 +33,6 @@
     "no-implied-eval": "off",
     "no-param-reassign": ["error", { "props": false }],
     "no-promise-executor-return": "error",
-    "no-restricted-syntax": "error",
     "no-return-await": "error",
     "react/forbid-prop-types": "off",
     "react/function-component-definition": [

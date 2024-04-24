@@ -255,8 +255,7 @@ class CourseYearlyStatsCounter {
         this.obfuscated = true
 
         const gradeSpread = {}
-        // eslint-disable-next-line guard-for-in
-        for (const grade in normalStats.attempts.grades) {
+        for (const grade of Object.keys(normalStats.attempts.grades)) {
           gradeSpread[grade] = []
         }
 

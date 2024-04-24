@@ -100,11 +100,9 @@ const bottlenecksOf = async (query, studentnumberlist, encryptdata = false) => {
   }
 
   const encryptStudentnumbers = bottlenecks => {
-    // eslint-disable-next-line guard-for-in
-    for (const course in bottlenecks.coursestatistics) {
+    for (const course of Object.keys(bottlenecks.coursestatistics)) {
       const encryptedStudentStats = {}
-      // eslint-disable-next-line guard-for-in
-      for (const data in bottlenecks.coursestatistics[course].students) {
+      for (const data of Object.keys(bottlenecks.coursestatistics[course].students)) {
         encryptedStudentStats[data] = {}
         const studentnumbers = Object.keys(bottlenecks.coursestatistics[course].students[data])
         studentnumbers.forEach(studentnumber => {

@@ -11,7 +11,6 @@ export const BreakdownBarChart = ({ data, title, byStartYear = false }) => {
 
   let categories = []
 
-  // eslint-disable-next-line no-restricted-syntax
   for (const item of data) {
     statData[0].data = [...statData[0].data, item.statistics.onTime]
     statData[1].data = [...statData[1].data, item.statistics.yearOver]

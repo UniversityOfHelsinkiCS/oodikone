@@ -1,4 +1,3 @@
-/* eslint-disable no-restricted-syntax */
 import React, { useState } from 'react'
 import { Button, Divider, Loader, Message, Popup } from 'semantic-ui-react'
 import { utils, writeFile } from 'xlsx'
