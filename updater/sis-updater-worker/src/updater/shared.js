@@ -1,5 +1,5 @@
 const { each } = require('async')
-const { Semester, Organization } = require('../db/models')
+const { Semester, Organization, CREDIT_TYPE_CODES } = require('../db/models')
 const { selectAllFrom, selectAllFromSnapshots } = require('../db')
 const { getObject: redisGet, setObject: redisSet, lock: redisLock, expire: redisExpire } = require('../utils/redis')
 
@@ -7,12 +7,6 @@ const TIME_LIMIT_BETWEEN_RELOADS = 1000 * 60 * 30
 const REDIS_INITIALIZED = 'INITIALIZED'
 const SHARED_LOCK = 'SHARED_LOCK'
 const FIRST_SEMESTER_START_YEAR = 1950
-const CREDIT_TYPE_CODES = {
-  PASSED: 4,
-  FAILED: 10,
-  IMPROVED: 7,
-  APPROVED: 9,
-}
 
 let loadedAt = null
 

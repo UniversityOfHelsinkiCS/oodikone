@@ -236,16 +236,8 @@ const creditMapper =
     }
   }
 
-const termRegistrationTypeToEnrollmenttype = termRegistrationType => {
-  switch (termRegistrationType) {
-    case 'ATTENDING':
-      return 1
-    case 'NONATTENDING':
-      return 2
-    default:
-      return 3
-  }
-}
+const termRegistrationTypeToEnrollmenttype = termRegistrationType =>
+  ({ ATTENDING: 1, NONATTENDING: 2 })[termRegistrationType] ?? 3
 
 const semesterEnrollmentMapper =
   (personIdToStudentNumber, studyrightToUniOrgId) => (studentId, studyRightId) => termRegistration => {

@@ -19,6 +19,13 @@ const ProgrammeModule = require('./programmeModule')
 const ProgrammeModuleChild = require('./programmeModuleChild')
 const Enrollment = require('./enrollment')
 
+const CREDIT_TYPE_CODES = {
+  PASSED: 4,
+  FAILED: 10,
+  IMPROVED: 7,
+  APPROVED: 9,
+}
+
 CourseType.hasMany(Course, { foreignKey: 'coursetypecode', sourceKey: 'coursetypecode' })
 Course.belongsTo(CourseType, { foreignKey: 'coursetypecode', targetKey: 'coursetypecode' })
 
@@ -34,17 +41,7 @@ Semester.hasMany(SemesterEnrollment, { foreignKey: 'semestercomposite', sourceKe
 ProgrammeModule.belongsTo(Organization, { foreignKey: 'organization_id' })
 Organization.hasMany(ProgrammeModule, { foreignKey: 'organization_id' })
 
-Credit.notUnnecessary = credit => {
-  return credit.credits > 0 && credit.credits <= 12
-}
-
-const CREDIT_TYPE_CODES = {
-  PASSED: 4,
-  FAILED: 10,
-  IMPROVED: 7,
-  APPROVED: 9,
-}
-
+Credit.notUnnecessary = credit => credit.credits > 0 && credit.credits <= 12
 Credit.passed = ({ credittypecode }) =>
   credittypecode === CREDIT_TYPE_CODES.PASSED || credittypecode === CREDIT_TYPE_CODES.APPROVED
 Credit.failed = credit => credit.credittypecode === CREDIT_TYPE_CODES.FAILED
@@ -138,4 +135,5 @@ module.exports = {
   ProgrammeModule,
   ProgrammeModuleChild,
   Enrollment,
+  CREDIT_TYPE_CODES,
 }
