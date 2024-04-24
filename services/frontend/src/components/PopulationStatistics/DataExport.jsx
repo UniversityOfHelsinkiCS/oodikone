@@ -12,7 +12,10 @@ import { useGetCurriculumsQuery } from '@/redux/populationCourses'
 export const DataExport = ({ students, programmeCode, curriculumYears }) => {
   const { getTextIn } = useLanguage()
   const queryYear = useSelector(({ populations }) => populations?.query?.year)
-  const { data: mandatoryCourses } = useGetCurriculumsQuery({ code: programmeCode, periodIds: curriculumYears })
+  const { data: mandatoryCourses } = useGetCurriculumsQuery(
+    { code: programmeCode, periodIds: curriculumYears },
+    { skip: !curriculumYears }
+  )
   const populationStatistics = useSelector(({ populations }) => populations.data)
   const courses = useSelector(store => store.populationSelectedStudentCourses.data?.coursestatistics)
   const queryStudyrights = useSelector(({ populations }) =>
