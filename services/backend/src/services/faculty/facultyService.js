@@ -26,9 +26,6 @@ const removeGraduationTimes = data => {
       yearStat.times = null
     })
   )
-  // TODO: Does this do something? Seems like an unnecessary line.
-  // eslint-disable-next-line no-unused-expressions
-  data.byGradYear.medians
 }
 
 const setFacultyProgrammes = async (id, data, programmeFilter) => {
