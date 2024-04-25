@@ -16,12 +16,12 @@
     "pg": "^8.11.5",
     "redis": "^3.1.2",
     "uuid": "^9.0.1",
-    "winston": "^3.8.2",
+    "winston": "^3.13.0",
     "winston-gelf-transporter": "^1.0.2",
     "winston-sentry-log": "^1.0.26"
   },
   "devDependencies": {
-    "nodemon": "^3.0.3"
+    "nodemon": "^3.1.0"
   },
   "overrides": {
     "winston-gelf-transporter": {

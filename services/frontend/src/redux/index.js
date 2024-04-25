@@ -37,8 +37,8 @@ export const store = configureStore({
   // feel free to take use them at some point if possible
   middleware: getDefaultMiddleware => [
     ...getDefaultMiddleware({ immutableCheck: false, serializableCheck: false }),
-    handleRequest,
     RTKApi.middleware,
+    handleRequest,
   ],
 })
 setupListeners(store.dispatch)
