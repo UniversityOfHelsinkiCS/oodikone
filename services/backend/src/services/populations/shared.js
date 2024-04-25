@@ -136,11 +136,11 @@ const formatStudentForPopulationStatistics = (
     }
   }
   const criteriaCoursesBySubstitutions = criteria?.allCourses
-    ? Object.keys(criteria.allCourses).reduce((acc, code) => {
-        acc[code] = code
-        // TODO: Check this line, arrow functions shouldn't return assignments
-        // eslint-disable-next-line no-return-assign
-        criteria.allCourses[code].map(subst => (acc[subst] = code))
+    ? Object.keys(criteria.allCourses).reduce((acc, courseCode) => {
+        acc[courseCode] = courseCode
+        criteria.allCourses[courseCode].forEach(substitutionCode => {
+          acc[substitutionCode] = courseCode
+        })
         return acc
       }, {})
     : {}

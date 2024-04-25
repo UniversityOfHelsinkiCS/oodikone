@@ -12,93 +12,84 @@ const { encrypt } = require('../encrypt')
 const { CourseStatsCounter } = require('../courses/course_stats_counter')
 const { getPassingSemester } = require('../../util/semester')
 
-const bottlenecksOf = async (query, studentnumberlist, encryptdata = false) => {
-  const isValidRequest = async (query, params) => {
-    const { studyRights, startDate, endDate, exchangeStudents, nondegreeStudents, transferredStudents } = params
+const isValidRequest = async (query, params) => {
+  const { studyRights, startDate, endDate, exchangeStudents, nondegreeStudents, transferredStudents } = params
 
-    if (!query.semesters.every(semester => semester === 'FALL' || semester === 'SPRING')) {
-      return { error: 'Semester should be either SPRING OR FALL' }
-    }
-    if (
-      query.studentStatuses &&
-      !query.studentStatuses.every(
-        status => status === 'EXCHANGE' || status === 'NONDEGREE' || status === 'TRANSFERRED'
-      )
-    ) {
-      return { error: 'Student status should be either EXCHANGE or NONDEGREE or TRANSFERRED' }
-    }
-    if (query.selectedStudents) {
-      const allStudents = await studentnumbersWithAllStudyrightElements({
+  if (!query.semesters.every(semester => semester === 'FALL' || semester === 'SPRING')) {
+    return { error: 'Semester should be either SPRING OR FALL' }
+  }
+  if (
+    query.studentStatuses &&
+    !query.studentStatuses.every(status => status === 'EXCHANGE' || status === 'NONDEGREE' || status === 'TRANSFERRED')
+  ) {
+    return { error: 'Student status should be either EXCHANGE or NONDEGREE or TRANSFERRED' }
+  }
+  if (query.selectedStudents) {
+    const allStudents = await studentnumbersWithAllStudyrightElements({
+      studyRights,
+      startDate,
+      endDate,
+      exchangeStudents,
+      nondegreeStudents,
+      transferredOutStudents: transferredStudents,
+      tag: query.tag,
+      transferredToStudents: true,
+      graduatedStudents: true,
+    })
+    const disallowedRequest = checkThatSelectedStudentsAreUnderRequestedStudyright(query.selectedStudents, allStudents)
+    if (disallowedRequest) return { error: 'Trying to request unauthorized students data' }
+  }
+  return null
+}
+
+const getStudentsAndCourses = async (params, selectedStudents, studentnumberlist, courseCodes) => {
+  if (!studentnumberlist) {
+    const { months, studyRights, startDate, endDate, exchangeStudents, nondegreeStudents, transferredStudents, tag } =
+      params
+    const studentnumbers =
+      selectedStudents ||
+      (await studentnumbersWithAllStudyrightElements({
         studyRights,
         startDate,
         endDate,
         exchangeStudents,
         nondegreeStudents,
         transferredOutStudents: transferredStudents,
-        tag: query.tag,
+        tag,
         transferredToStudents: true,
         graduatedStudents: true,
-      })
-      const disallowedRequest = checkThatSelectedStudentsAreUnderRequestedStudyright(
-        query.selectedStudents,
-        allStudents
-      )
-      if (disallowedRequest) return { error: 'Trying to request unauthorized students data' }
-    }
-    return null
-  }
+      }))
 
-  const getStudentsAndCourses = async (selectedStudents, studentnumberlist, courseCodes) => {
-    if (!studentnumberlist) {
-      // TODO: Check where this params object is coming from as ESLint is complaining about it
-      const { months, studyRights, startDate, endDate, exchangeStudents, nondegreeStudents, transferredStudents, tag } =
-        // eslint-disable-next-line no-use-before-define
-        params
-      const studentnumbers =
-        selectedStudents ||
-        (await studentnumbersWithAllStudyrightElements({
-          studyRights,
-          startDate,
-          endDate,
-          exchangeStudents,
-          nondegreeStudents,
-          transferredOutStudents: transferredStudents,
-          tag,
-          transferredToStudents: true,
-          graduatedStudents: true,
-        }))
-
-      const allstudents = studentnumbers.reduce((numbers, num) => {
-        numbers[num] = true
-        return numbers
-      }, {})
-      const courses = await findCourses(studentnumbers, dateMonthsFromNow(startDate, months), courseCodes)
-      const foundCourseCodes = Object.keys(keyBy(courses, 'code'))
-      const filteredCourseCodes = courseCodes?.filter(code => !foundCourseCodes.includes(code))
-
-      const courseEnrollements = await findCourseEnrollments(
-        studentnumbers,
-        dateMonthsFromNow(startDate, months),
-        filteredCourseCodes
-      )
-      return [allstudents, courses, courseEnrollements]
-    }
-    // TODO: Check where this params object is coming from as ESLint is complaining about it
-    // eslint-disable-next-line no-use-before-define
-    const { months, startDate } = params
-    const beforeDate = months && startDate ? dateMonthsFromNow(startDate, months) : new Date()
-    const allstudents = studentnumberlist.reduce((numbers, num) => {
+    const allstudents = studentnumbers.reduce((numbers, num) => {
       numbers[num] = true
       return numbers
     }, {})
-    const courses = await findCourses(studentnumberlist, beforeDate, courseCodes)
+    const courses = await findCourses(studentnumbers, dateMonthsFromNow(startDate, months), courseCodes)
     const foundCourseCodes = Object.keys(keyBy(courses, 'code'))
     const filteredCourseCodes = courseCodes?.filter(code => !foundCourseCodes.includes(code))
 
-    const courseEnrollements = await findCourseEnrollments(studentnumberlist, beforeDate, filteredCourseCodes)
+    const courseEnrollements = await findCourseEnrollments(
+      studentnumbers,
+      dateMonthsFromNow(startDate, months),
+      filteredCourseCodes
+    )
     return [allstudents, courses, courseEnrollements]
   }
+  const { months, startDate } = params
+  const beforeDate = months && startDate ? dateMonthsFromNow(startDate, months) : new Date()
+  const allstudents = studentnumberlist.reduce((numbers, num) => {
+    numbers[num] = true
+    return numbers
+  }, {})
+  const courses = await findCourses(studentnumberlist, beforeDate, courseCodes)
+  const foundCourseCodes = Object.keys(keyBy(courses, 'code'))
+  const filteredCourseCodes = courseCodes?.filter(code => !foundCourseCodes.includes(code))
 
+  const courseEnrollements = await findCourseEnrollments(studentnumberlist, beforeDate, filteredCourseCodes)
+  return [allstudents, courses, courseEnrollements]
+}
+
+const bottlenecksOf = async (query, studentnumberlist, encryptdata = false) => {
   const encryptStudentnumbers = bottlenecks => {
     for (const course of Object.keys(bottlenecks.coursestatistics)) {
       const encryptedStudentStats = {}
@@ -124,8 +115,8 @@ const bottlenecksOf = async (query, studentnumberlist, encryptdata = false) => {
   // To fix failed and enrolled, no grade filter options some not so clean and nice solutions were added
   // Get the data with actual 1. courses and filtered students. 2. all students by year, if provided.
   const [[allstudents, courses, courseEnrollements], [, allCourses], error] = await Promise.all([
-    getStudentsAndCourses(query.selectedStudents, studentnumberlist, query.courses),
-    getStudentsAndCourses(allStudentsByYears, null, query.courses),
+    getStudentsAndCourses(params, query.selectedStudents, studentnumberlist, query.courses),
+    getStudentsAndCourses(params, allStudentsByYears, null, query.courses),
     isValidRequest(query, params),
   ])
 
