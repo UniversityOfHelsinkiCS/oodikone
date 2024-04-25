@@ -147,21 +147,17 @@ const getCompletedCourses = async (studentNumbers, courseCodes) => {
 
   students.forEach(student => {
     courseCodes.forEach(courseCode => {
-      // TODO: Fix this, sort function always takes two parameters
-      // eslint-disable-next-line prefer-destructuring
-      student.enrollments[courseCode] = student.allEnrollments
+      const [latestEnrollment] = student.allEnrollments
         .filter(e => e.courseCode === courseCode || e.substitution === courseCode)
-        .sort(e => new Date(e.date).getDate())[0]
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+      student.enrollments[courseCode] = latestEnrollment
     })
   })
 
   // Omit allEnrollments, we're only supposed to show the recent, relevant enrollment,
   // the user does not have rights to see all enrollments.
   return {
-    students: students.map(student => {
-      const { allEnrollments, ...rest } = student
-      return { ...rest }
-    }),
+    students: students.map(({ allEnrollments, ...rest }) => rest),
     courses,
   }
 }
