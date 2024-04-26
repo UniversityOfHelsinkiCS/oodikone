@@ -353,7 +353,7 @@ describe('Studyprogramme overview', () => {
     })
   })
 
-  /* Tag-tests*/
+  /* Tag-tests */
   describe('Basic information -view works for basic user', () => {
     beforeEach(() => {
       cy.init('/study-programme')
@@ -365,7 +365,7 @@ describe('Studyprogramme overview', () => {
       const name = `tag-${new Date().getTime()}`
       cy.get('.tagNameSelectInput > .ui > input').type(name)
       cy.get('.yearSelectInput').type('2018')
-      cy.contains('Create new tag').click()
+      cy.contains('Create a new tag').click()
       cy.contains(name)
       cy.contains('2018')
       deleteTag(name)
@@ -377,7 +377,7 @@ describe('Studyprogramme overview', () => {
       cy.get('.yearSelectInput').type('2018')
 
       cy.get('.ui > label').click()
-      cy.contains('Create new tag').click()
+      cy.contains('Create a new tag').click()
       cy.contains(name)
       deleteTag(name)
     })
@@ -388,7 +388,7 @@ describe('Studyprogramme overview', () => {
       const student = '010113437'
       cy.get('.tagNameSelectInput > .ui > input').type(name)
       cy.get('.yearSelectInput').type('2018')
-      cy.contains('Create new tag').click()
+      cy.contains('Create a new tag').click()
       cy.contains(name)
 
       cy.contains('Add tags to students').click()

@@ -106,7 +106,7 @@ describe('Population Statistics tests', () => {
       cy.contains('No tags defined. You can define them here.').find('a').click()
       cy.contains('Tags').click()
       cy.contains('Tietojenkäsittelytieteen kandiohjelma')
-      cy.contains('Create new tag')
+      cy.contains('Create a new tag')
     })
 
     // This test sometimes fails on headless mode. It seems that the click on the
