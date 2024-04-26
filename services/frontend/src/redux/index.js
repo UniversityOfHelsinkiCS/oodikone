@@ -13,8 +13,6 @@ import { reducer as populationSelectedStudentCourses } from './populationSelecte
 import { reducer as settings } from './settings'
 import { reducer as singleCourseStats } from './singleCourseStats'
 import { reducer as students } from './students'
-import { reducer as tags } from './tags'
-import { reducer as tagstudent } from './tagstudent'
 
 export const store = configureStore({
   reducer: {
@@ -27,8 +25,6 @@ export const store = configureStore({
     courseSearch,
     courseStats,
     courseSummaryForm,
-    tags,
-    tagstudent,
     singleCourseStats,
     [RTKApi.reducerPath]: RTKApi.reducer,
     filters,

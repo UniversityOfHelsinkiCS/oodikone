@@ -1,11 +1,9 @@
-import { arrayOf, bool, shape, string } from 'prop-types'
 import React, { memo } from 'react'
-import { connect } from 'react-redux'
 import { Table } from 'semantic-ui-react'
 
-import { ConnectedTagStudent as TagStudent } from '@/components/TagStudent'
+import { TagStudent } from '@/components/TagStudent'
 import { useGetStudentTagsByStudyTrackQuery, useGetTagsByStudyTrackQuery } from '@/redux/tags'
-import { makePopulationsToData } from '@/selectors/populationDetails'
+import { useStudentNameVisibility } from '../StudentNameVisibilityToggle'
 
 const Row = memo(
   ({ studentsTags, studentNumber, studytrack, tagOptions, name, combinedProgramme }) => (
@@ -21,19 +19,11 @@ const Row = memo(
   (prevProps, newProps) => prevProps.studentsTags.length === newProps.studentsTags.length
 )
 
-Row.propTypes = {
-  studentsTags: arrayOf(shape({})).isRequired,
-  studentNumber: string.isRequired,
-  studytrack: string.isRequired,
-  tagOptions: arrayOf(shape({})).isRequired,
-  name: string.isRequired,
-  combinedProgramme: string.isRequired,
-}
-
-const TagList = ({ combinedProgramme, mainProgramme, namesVisible, selectedStudents }) => {
+export const TagList = ({ combinedProgramme, mainProgramme, selectedStudents }) => {
   const correctCode = combinedProgramme ? `${mainProgramme}+${combinedProgramme}` : mainProgramme
   const { data: tags } = useGetTagsByStudyTrackQuery(correctCode, { skip: !correctCode })
   const { data: tagstudent } = useGetStudentTagsByStudyTrackQuery(correctCode, { skip: !correctCode })
+  const { visible: namesVisible } = useStudentNameVisibility()
 
   const tagRows =
     tagstudent && tags
@@ -75,21 +65,3 @@ const TagList = ({ combinedProgramme, mainProgramme, namesVisible, selectedStude
     </Table>
   )
 }
-
-const mapStateToProps = state => {
-  const { settings } = state
-  const { programme } = makePopulationsToData(state)
-  return {
-    studytrack: programme,
-    namesVisible: settings.namesVisible,
-  }
-}
-
-TagList.propTypes = {
-  selectedStudents: arrayOf(shape({})).isRequired,
-  mainProgramme: string.isRequired,
-  namesVisible: bool.isRequired,
-  combinedProgramme: string.isRequired,
-}
-
-export const ConnectedTagList = connect(mapStateToProps)(TagList)

@@ -15,7 +15,7 @@ import { DegreeCoursesTable } from './DegreeCourses'
 import { ProgrammeCourses } from './ProgrammeCourses'
 import { ConnectedStudyProgrammeSelector as StudyProgrammeSelector } from './StudyProgrammeSelector'
 import { StudytrackOverview } from './StudytrackOverview'
-import { ConnectedTags as Tags } from './Tags'
+import { Tags } from './Tags'
 import { UpdateView } from './UpdateView'
 
 const createName = (studyProgrammeId, combibedProgrammeId, programmes, language, getTextIn) => {

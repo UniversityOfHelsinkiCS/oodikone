@@ -1,8 +1,7 @@
 import moment from 'moment'
-import { arrayOf, func, shape, string } from 'prop-types'
-import React, { useEffect, useState } from 'react'
+import { string } from 'prop-types'
+import React, { useState } from 'react'
 import Datetime from 'react-datetime'
-import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Button, Confirm, Form, Header, Icon, Item, List, Message, Popup, Segment } from 'semantic-ui-react'
 
@@ -10,21 +9,22 @@ import { reformatDate } from '@/common'
 import { SortableTable } from '@/components/SortableTable'
 import { ConnectedTagModal as TagModal } from '@/components/StudyProgramme/TagModal'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
-import { createTagAction, deleteTagAction, getTagsByStudytrackAction } from '@/redux/tags'
+import { useCreateTagMutation, useGetTagsByStudyTrackQuery, useDeleteTagMutation } from '@/redux/tags'
 
 const YEAR_DATE_FORMAT = 'YYYY'
 
-const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme, combinedProgramme }) => {
+export const Tags = ({ studyprogramme, combinedProgramme }) => {
   const [tagname, setTagname] = useState('')
   const [confirm, setConfirm] = useState(null)
   const [year, setYear] = useState(null)
   const [personal, setPersonal] = useState(false)
   const { id: userId } = useGetAuthorizedUserQuery()
+  const studytrack = combinedProgramme ? `${studyprogramme}-${combinedProgramme}` : studyprogramme
+  const { data: tags } = useGetTagsByStudyTrackQuery(studytrack)
+  const [createTag] = useCreateTagMutation()
+  const [deleteTag] = useDeleteTagMutation()
 
-  useEffect(() => {
-    const studytrack = combinedProgramme ? `${studyprogramme}-${combinedProgramme}` : studyprogramme
-    getTagsByStudytrack(studytrack)
-  }, [])
+  if (!tags) return null
 
   const handleDeleteTag = (event, tag) => {
     event.preventDefault()
@@ -54,11 +54,7 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme,
     setTagname(target.value)
   }
 
-  const deleteButton = tag => (
-    <Button negative onClick={() => setConfirm(tag)}>
-      Delete
-    </Button>
-  )
+  const deleteButton = tag => <Button content="Delete" negative onClick={() => setConfirm(tag)} />
 
   const populationUrl = tag => {
     if (!tag.year) {
@@ -170,12 +166,10 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme,
             </Form.Field>
             <Button
               color="green"
+              content="Create a new tag"
               disabled={!tagname.trim() || tags.some(t => t.tagname === tagname.trim())}
               onClick={handleSubmit}
-            >
-              {' '}
-              Create new tag{' '}
-            </Button>
+            />
             <TagModal combinedProgramme={combinedProgramme} studytrack={studyprogramme} tags={tags} />
           </Form.Group>
         </Segment>
@@ -186,21 +180,7 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme,
   )
 }
 
-const mapStateToProps = state => ({
-  tags: state.tags.data,
-})
-
 Tags.propTypes = {
-  getTagsByStudytrack: func.isRequired,
-  createTag: func.isRequired,
-  deleteTag: func.isRequired,
-  tags: arrayOf(shape({ tag_id: string, tagname: string, studytrack: string })).isRequired,
   studyprogramme: string.isRequired,
   combinedProgramme: string.isRequired,
 }
-
-export const ConnectedTags = connect(mapStateToProps, {
-  createTag: createTagAction,
-  deleteTag: deleteTagAction,
-  getTagsByStudytrack: getTagsByStudytrackAction,
-})(Tags)

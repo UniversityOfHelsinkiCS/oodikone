@@ -1,5 +1,5 @@
 import moment from 'moment'
-import { arrayOf, bool, func, object, shape } from 'prop-types'
+import { bool, func, object, shape } from 'prop-types'
 import qs from 'query-string'
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
@@ -10,6 +10,7 @@ import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { InfoBox } from '@/components/Info/InfoBox'
 import { PopulationQueryCard } from '@/components/PopulationQueryCard'
 import { removePopulation, useGetProgrammesQuery } from '@/redux/populations'
+import { useGetTagsByStudyTrackQuery } from '@/redux/tags'
 import { FilterActiveNote } from './FilterActiveNote'
 import './populationSearch.css'
 
@@ -18,8 +19,11 @@ const getMonths = (year, term) => {
   return Math.ceil(moment.duration(moment().diff(moment(start))).asMonths())
 }
 
-const PopulationSearchHistory = ({ populations, tags, removePopulation }) => {
+const PopulationSearchHistory = ({ populations, removePopulation }) => {
   const { data: units } = useGetProgrammesQuery()
+  const { data: tags } = useGetTagsByStudyTrackQuery(populations?.query?.studyRights?.programme, {
+    skip: !populations?.query?.studyRights?.programme,
+  })
   const history = useHistory()
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false)
   const [semesters, setSemesters] = useState(
@@ -192,12 +196,10 @@ PopulationSearchHistory.propTypes = {
     data: shape({}),
     query: object,
   }).isRequired,
-  tags: arrayOf(shape({})).isRequired,
 }
 
-const mapStateToProps = ({ populations, tags }) => ({
+const mapStateToProps = ({ populations }) => ({
   populations,
-  tags: tags.data,
 })
 
 const mapDispatchToProps = dispatch => ({

@@ -1,32 +1,25 @@
-import { arrayOf, string, shape, func, bool } from 'prop-types'
+import { arrayOf, string, shape } from 'prop-types'
 import React from 'react'
-import { connect } from 'react-redux'
 import { Dropdown, Icon, Label, Table } from 'semantic-ui-react'
 
-import { createStudentTagAction, deleteStudentTagAction } from '@/redux/tagstudent'
+import { useDeleteMultipleStudentTagsMutation, useCreateStudentTagMutation } from '@/redux/tags'
+import { useStudentNameVisibility } from '../StudentNameVisibilityToggle'
 
-const TagStudent = ({
-  createStudentTag,
-  deleteStudentTag,
-  studentnumber,
-  studentstags,
-  studytrack,
-  tagOptions,
-  studentname,
-  namesVisible,
-  combinedProgramme,
-}) => {
+export const TagStudent = ({ studentnumber, studentstags, studytrack, tagOptions, studentname, combinedProgramme }) => {
+  const [deleteMultipleStudentTags] = useDeleteMultipleStudentTagsMutation()
+  const [createStudentTag] = useCreateStudentTagMutation()
+  const { visible: namesVisible } = useStudentNameVisibility()
   const handleChange = (event, { value }) => {
     event.preventDefault()
     const tag = {
       tag_id: value,
       studentnumber,
     }
-    createStudentTag(tag, studytrack, combinedProgramme)
+    createStudentTag({ tag, studytrack, combinedProgramme })
   }
 
   const deleteTag = (event, tag) => {
-    deleteStudentTag(tag.tag_id, studentnumber, studytrack, combinedProgramme)
+    deleteMultipleStudentTags({ tagId: tag.tag_id, studentnumbers: [studentnumber], studytrack, combinedProgramme })
   }
 
   const studentsTags = studentstags.map(t => (
@@ -56,22 +49,10 @@ const TagStudent = ({
 }
 
 TagStudent.propTypes = {
-  createStudentTag: func.isRequired,
-  deleteStudentTag: func.isRequired,
   studentnumber: string.isRequired,
   studentname: string.isRequired,
   studentstags: arrayOf(shape({ tag: shape({ tagname: string, tag_id: string }), id: string })).isRequired,
   studytrack: string.isRequired,
   tagOptions: arrayOf(shape({})).isRequired,
-  namesVisible: bool.isRequired,
   combinedProgramme: string.isRequired,
 }
-
-const mapStateToProps = ({ settings }) => ({
-  namesVisible: settings.namesVisible,
-})
-
-export const ConnectedTagStudent = connect(mapStateToProps, {
-  createStudentTag: createStudentTagAction,
-  deleteStudentTag: deleteStudentTagAction,
-})(TagStudent)

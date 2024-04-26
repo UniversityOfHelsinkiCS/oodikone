@@ -18,11 +18,6 @@ const userIsUnauthorized = (programmeRights, programmeCodes, roles) =>
   !programmeRights.includes(programmeCodes[1]) &&
   !roles?.includes('admin')
 
-router.get('/tags', async (_req, res) => {
-  const tags = await Tags.findTags()
-  res.status(200).json(tags)
-})
-
 router.get('/tags/:studytrack', async (req, res) => {
   const { studytrack } = req.params
   const {
@@ -75,11 +70,6 @@ router.delete('/tags', async (req, res) => {
   res.status(200).json(filterRelevantTags(t, id))
 })
 
-router.get('/studenttags', async (req, res) => {
-  const result = await TagStudent.getStudentTags()
-  res.status(200).json(result)
-})
-
 router.get('/studenttags/:studytrack', async (req, res) => {
   const { studytrack } = req.params
   const {
@@ -99,29 +89,6 @@ router.get('/studenttags/:studytrack', async (req, res) => {
     return res.json(null)
 
   const result = await TagStudent.getStudentTagsByStudytrack(studytrack)
-  res.status(200).json(filterRelevantStudentTags(result, id))
-})
-
-router.get('/studenttags/:studentnumber', async (req, res) => {
-  const { studentnumber } = req.params
-  const { user } = req
-  const result = await TagStudent.getStudentTagsByStudentnumber(studentnumber)
-  res.status(200).json(filterRelevantStudentTags(result, user.id))
-})
-
-router.post('/studenttags/:studentnumber', async (req, res) => {
-  const { tag, studytrack, combinedProgramme } = req.body
-  const {
-    user: { roles, id, programmeRights },
-  } = req
-
-  const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
-
-  if (userIsUnauthorized(fullStudyProgrammeRights, [studytrack, combinedProgramme], roles)) return res.status(403).end()
-
-  await TagStudent.createStudentTag(tag)
-  const studytrackCode = combinedProgramme ? `${studytrack}-${combinedProgramme}` : studytrack
-  const result = await TagStudent.getStudentTagsByStudytrack(studytrackCode)
   res.status(200).json(filterRelevantStudentTags(result, id))
 })
 
@@ -155,8 +122,8 @@ router.post('/studenttags', async (req, res) => {
   res.status(200).json(filterRelevantStudentTags(result, id))
 })
 
-router.delete('/studenttags/delete_one', async (req, res) => {
-  const { tag_id, studentnumber, studytrack, combinedProgramme } = req.body
+router.post('/studenttags/:studentnumber', async (req, res) => {
+  const { tag, studytrack, combinedProgramme } = req.body
   const {
     user: { roles, id, programmeRights },
   } = req
@@ -165,16 +132,13 @@ router.delete('/studenttags/delete_one', async (req, res) => {
 
   if (userIsUnauthorized(fullStudyProgrammeRights, [studytrack, combinedProgramme], roles)) return res.status(403).end()
 
+  await TagStudent.createStudentTag(tag)
   const studytrackCode = combinedProgramme ? `${studytrack}-${combinedProgramme}` : studytrack
-  const tags = await Tags.findTagsFromStudytrackById(studytrackCode, [tag_id])
-  if (tags.length === 0) return res.status(403).json({ error: 'The tag does not exist' })
-
-  await TagStudent.deleteStudentTag(studentnumber, tag_id)
   const result = await TagStudent.getStudentTagsByStudytrack(studytrackCode)
   res.status(200).json(filterRelevantStudentTags(result, id))
 })
 
-router.delete('/studenttags/delete_many', async (req, res) => {
+router.delete('/studenttags', async (req, res) => {
   const { tagId, studentnumbers, studytrack, combinedProgramme } = req.body
   const {
     user: { roles, id, programmeRights },
