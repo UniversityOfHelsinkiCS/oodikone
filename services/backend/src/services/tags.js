@@ -1,5 +1,5 @@
 const { Op } = require('sequelize')
-const { Tag } = require('../models/models_kone')
+const { Tag, TagStudent } = require('../models/models_kone')
 
 const findTagsByStudytrack = async studytrack => {
   return Tag.findAll({
@@ -43,9 +43,43 @@ const deleteTag = async tag => {
   })
 }
 
+const getStudentTagsByStudytrack = studytrack => {
+  return TagStudent.findAll({
+    include: {
+      model: Tag,
+      attributes: ['tag_id', 'tagname', 'personal_user_id'],
+      where: {
+        studytrack: {
+          [Op.eq]: studytrack,
+        },
+      },
+    },
+  })
+}
+
+const createMultipleStudentTags = async tags => {
+  return TagStudent.bulkCreate(tags, { ignoreDuplicates: true })
+}
+
+const deleteMultipleStudentTags = async (tagId, studentnumbers) => {
+  return TagStudent.destroy({
+    where: {
+      tag_id: {
+        [Op.eq]: tagId,
+      },
+      studentnumber: {
+        [Op.in]: studentnumbers,
+      },
+    },
+  })
+}
+
 module.exports = {
   createNewTag,
   findTagsByStudytrack,
   findTagsFromStudytrackById,
   deleteTag,
+  getStudentTagsByStudytrack,
+  createMultipleStudentTags,
+  deleteMultipleStudentTags,
 }

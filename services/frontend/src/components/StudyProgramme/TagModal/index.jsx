@@ -3,13 +3,13 @@ import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import { Button, Dropdown, Form, Message, Modal, TextArea } from 'semantic-ui-react'
 
-import { useCreateMultipleStudentTagsMutation } from '@/redux/tags'
+import { useCreateStudentTagsMutation } from '@/redux/tags'
 
 const TagModal = ({ combinedProgramme, error, pending, studytrack, success, tags }) => {
   const [modalOpen, setModalOpen] = useState(false)
   const [input, setInput] = useState('')
   const [selectedValue, setSelected] = useState('')
-  const [createMultipleStudentTags] = useCreateMultipleStudentTagsMutation()
+  const [createStudentTags] = useCreateStudentTagsMutation()
 
   useEffect(() => {
     if (!pending) {
@@ -24,7 +24,7 @@ const TagModal = ({ combinedProgramme, error, pending, studytrack, success, tags
   const handleClick = event => {
     event.preventDefault()
     const studentnumbers = input.match(/[^\s,]+/g)
-    createMultipleStudentTags({
+    createStudentTags({
       tags: studentnumbers.map(studentNumber => ({
         tag_id: selectedValue,
         studentnumber: studentNumber,

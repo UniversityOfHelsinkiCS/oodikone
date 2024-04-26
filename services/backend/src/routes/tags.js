@@ -1,8 +1,8 @@
 const router = require('express').Router()
-const Tags = require('../services/tags')
-const TagStudent = require('../services/tagstudent')
-const Students = require('../services/students')
 const { difference } = require('lodash')
+
+const Tags = require('../services/tags')
+const Students = require('../services/students')
 const { getFullStudyProgrammeRights } = require('../util/utils')
 
 const filterRelevantTags = (tags, userId) => {
@@ -88,7 +88,7 @@ router.get('/studenttags/:studytrack', async (req, res) => {
   )
     return res.json(null)
 
-  const result = await TagStudent.getStudentTagsByStudytrack(studytrack)
+  const result = await Tags.getStudentTagsByStudytrack(studytrack)
   res.status(200).json(filterRelevantStudentTags(result, id))
 })
 
@@ -117,24 +117,8 @@ router.post('/studenttags', async (req, res) => {
       .status(400)
       .json({ error: `Could not find the following students from the programme: ${missingStudents.join(', ')}` })
 
-  await TagStudent.createMultipleStudentTags(tags)
-  const result = await TagStudent.getStudentTagsByStudytrack(studytrackCode)
-  res.status(200).json(filterRelevantStudentTags(result, id))
-})
-
-router.post('/studenttags/:studentnumber', async (req, res) => {
-  const { tag, studytrack, combinedProgramme } = req.body
-  const {
-    user: { roles, id, programmeRights },
-  } = req
-
-  const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
-
-  if (userIsUnauthorized(fullStudyProgrammeRights, [studytrack, combinedProgramme], roles)) return res.status(403).end()
-
-  await TagStudent.createStudentTag(tag)
-  const studytrackCode = combinedProgramme ? `${studytrack}-${combinedProgramme}` : studytrack
-  const result = await TagStudent.getStudentTagsByStudytrack(studytrackCode)
+  await Tags.createMultipleStudentTags(tags)
+  const result = await Tags.getStudentTagsByStudytrack(studytrackCode)
   res.status(200).json(filterRelevantStudentTags(result, id))
 })
 
@@ -152,8 +136,8 @@ router.delete('/studenttags', async (req, res) => {
   const tags = await Tags.findTagsFromStudytrackById(studytrackCode, [tagId])
   if (tags.length === 0) return res.status(403).json({ error: 'The tag does not exist' })
 
-  await TagStudent.deleteMultipleStudentTags(tagId, studentnumbers)
-  const result = await TagStudent.getStudentTagsByStudytrack(studytrackCode)
+  await Tags.deleteMultipleStudentTags(tagId, studentnumbers)
+  const result = await Tags.getStudentTagsByStudytrack(studytrackCode)
   res.status(200).json(filterRelevantStudentTags(result, id))
 })
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Button, Confirm, Dropdown, List } from 'semantic-ui-react'
 
-import { useCreateMultipleStudentTagsMutation, useDeleteMultipleStudentTagsMutation } from '@/redux/tags'
+import { useCreateStudentTagsMutation, useDeleteStudentTagsMutation } from '@/redux/tags'
 
 export const TagPopulation = ({ combinedProgramme, mainProgramme, selectedStudents, tags }) => {
   const [options, setOptions] = useState([])
@@ -9,8 +9,8 @@ export const TagPopulation = ({ combinedProgramme, mainProgramme, selectedStuden
   const [selectedTag, setSelectedTag] = useState(null)
   const [confirmAdd, setConfirmAdd] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
-  const [createMultipleStudentTags] = useCreateMultipleStudentTagsMutation()
-  const [deleteMultipleStudentTags] = useDeleteMultipleStudentTagsMutation()
+  const [createStudentTags] = useCreateStudentTagsMutation()
+  const [deleteStudentTags] = useDeleteStudentTagsMutation()
 
   useEffect(() => {
     const createdOptions = tags.map(tag => ({ key: tag.tag_id, text: tag.tagname, value: tag.tag_id }))
@@ -25,7 +25,7 @@ export const TagPopulation = ({ combinedProgramme, mainProgramme, selectedStuden
   }
 
   const handleDelete = () => {
-    deleteMultipleStudentTags({
+    deleteStudentTags({
       tagId: selectedValue,
       studentnumbers: selectedStudents,
       studytrack: mainProgramme,
@@ -38,14 +38,13 @@ export const TagPopulation = ({ combinedProgramme, mainProgramme, selectedStuden
   const handleAdd = () => {
     const tagList = []
     selectedStudents.forEach(studentNumber => {
-      const tag = {
+      tagList.push({
         tag_id: selectedValue,
         studentnumber: studentNumber,
-      }
-      tagList.push(tag)
+      })
     })
     setSelected('')
-    createMultipleStudentTags({ tags: tagList, studytrack: mainProgramme, combinedProgramme })
+    createStudentTags({ tags: tagList, studytrack: mainProgramme, combinedProgramme })
     setConfirmAdd(false)
   }
 

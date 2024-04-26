@@ -2,24 +2,25 @@ import { arrayOf, string, shape } from 'prop-types'
 import React from 'react'
 import { Dropdown, Icon, Label, Table } from 'semantic-ui-react'
 
-import { useDeleteMultipleStudentTagsMutation, useCreateStudentTagMutation } from '@/redux/tags'
+import { useDeleteStudentTagsMutation, useCreateStudentTagsMutation } from '@/redux/tags'
 import { useStudentNameVisibility } from '../StudentNameVisibilityToggle'
 
 export const TagStudent = ({ studentnumber, studentstags, studytrack, tagOptions, studentname, combinedProgramme }) => {
-  const [deleteMultipleStudentTags] = useDeleteMultipleStudentTagsMutation()
-  const [createStudentTag] = useCreateStudentTagMutation()
+  const [deleteStudentTags] = useDeleteStudentTagsMutation()
+  const [createStudentTags] = useCreateStudentTagsMutation()
+
   const { visible: namesVisible } = useStudentNameVisibility()
   const handleChange = (event, { value }) => {
     event.preventDefault()
-    const tag = {
-      tag_id: value,
-      studentnumber,
-    }
-    createStudentTag({ tag, studytrack, combinedProgramme })
+    createStudentTags({
+      tags: [{ tag_id: value, studentnumber }],
+      studytrack,
+      combinedProgramme,
+    })
   }
 
   const deleteTag = (event, tag) => {
-    deleteMultipleStudentTags({ tagId: tag.tag_id, studentnumbers: [studentnumber], studytrack, combinedProgramme })
+    deleteStudentTags({ tagId: tag.tag_id, studentnumbers: [studentnumber], studytrack, combinedProgramme })
   }
 
   const studentsTags = studentstags.map(t => (
