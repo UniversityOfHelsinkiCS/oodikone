@@ -1,4 +1,19 @@
-import { callController } from '@/apiConnection'
+import { callController, RTKApi } from '@/apiConnection'
+
+const tagsApi = RTKApi.injectEndpoints({
+  endpoints: builder => ({
+    getTagsByStudyTrack: builder.query({
+      query: studyTrack => `/tags/${studyTrack}`,
+    }),
+    // Combined programme is included to studytrack in form KHxx_xxx-MHxx_xxx
+    getStudentTagsByStudyTrack: builder.query({
+      query: studytrack => `/studenttags/${studytrack}`,
+    }),
+  }),
+  overrideExisting: false,
+})
+
+export const { useGetTagsByStudyTrackQuery, useGetStudentTagsByStudyTrackQuery } = tagsApi
 
 // Combined programme is included to studytrack in form KHxx_xxx-MHxx_xxx
 export const getTagsByStudytrackAction = studytrack => {

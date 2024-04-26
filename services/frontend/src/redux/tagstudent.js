@@ -24,14 +24,6 @@ export const deleteMultipleStudentTagAction = (tagId, studentnumbers, studytrack
   return callController(route, prefix, data, method)
 }
 
-// Combined programme is included to studytrack in form KHxx_xxx-MHxx_xxx
-export const getStudentTagsByStudytrackAction = studytrack => {
-  const route = `/studenttags/${studytrack}`
-  const prefix = 'GET_STUDENT_TAGS_BY_ST_'
-  const data = { studytrack }
-  return callController(route, prefix, data)
-}
-
 export const deleteStudentTagAction = (tagId, studentnumber, studytrack, combinedProgramme) => {
   const route = '/studenttags/delete_one'
   const prefix = 'DELETE_STUDENT_TAG_'
@@ -42,28 +34,6 @@ export const deleteStudentTagAction = (tagId, studentnumber, studytrack, combine
 
 export const reducer = (state = { data: [], success: false, created: false, pending: false, error: null }, action) => {
   switch (action.type) {
-    case 'GET_STUDENT_TAGS_BY_ST_ATTEMPT':
-      return {
-        ...state,
-        pending: true,
-        success: false,
-        error: null,
-      }
-    case 'GET_STUDENT_TAGS_BY_ST_FAILURE':
-      return {
-        ...state,
-        pending: false,
-        success: false,
-        error: null,
-      }
-    case 'GET_STUDENT_TAGS_BY_ST_SUCCESS':
-      return {
-        ...state,
-        pending: false,
-        data: action.response || [],
-        success: true,
-        error: null,
-      }
     case 'CREATE_STUDENT_TAG_ATTEMPT':
       return {
         ...state,

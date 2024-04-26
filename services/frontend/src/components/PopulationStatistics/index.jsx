@@ -35,6 +35,7 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { PopulationDetails } from '@/components/PopulationDetails'
 import { ConnectedPopulationSearch as PopulationSearch } from '@/components/PopulationSearch'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
+import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { makePopulationsToData } from '@/selectors/populationDetails'
 import { DataExport } from './DataExport'
@@ -59,7 +60,19 @@ export const PopulationStatistics = () => {
   const { data: allSemesters } = useGetSemestersQuery()
   const programmeCode = query?.studyRights?.programme
   const combinedProgrammeCode = query?.studyRights?.combinedProgramme ? query?.studyRights?.combinedProgramme : ''
-  const programmes = useSelector(store => store.populationProgrammes?.data?.programmes)
+  const { data: programmesAndStudyTracks } = useGetProgrammesQuery()
+  const { programmes: studyProgrammes } = programmesAndStudyTracks || {}
+  const programmes = {
+    ...studyProgrammes,
+    'KH90_001+MH90_001': {
+      code: 'KH90_001+MH90_001',
+      name: {
+        fi: 'Eläinlääketieteen kandiohjelma ja lisensiaatin koulutusohjelma',
+        en: "Bachelor's and Degree Programme in Vetenary Medicine",
+        sv: 'Kandidats- och Utbildningsprogrammet i veterinärmedicin',
+      },
+    },
+  }
   const programmeName = programmes && programmeCode ? programmes[programmeCode]?.name : ''
   const combinedProgrammeName = programmes && combinedProgrammeCode ? programmes[combinedProgrammeCode]?.name : ''
 

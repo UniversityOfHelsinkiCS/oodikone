@@ -1,11 +1,10 @@
-import { arrayOf, bool, func, shape, string } from 'prop-types'
-import React, { memo, useEffect } from 'react'
+import { arrayOf, bool, shape, string } from 'prop-types'
+import React, { memo } from 'react'
 import { connect } from 'react-redux'
 import { Table } from 'semantic-ui-react'
 
 import { ConnectedTagStudent as TagStudent } from '@/components/TagStudent'
-import { getTagsByStudytrackAction } from '@/redux/tags'
-import { getStudentTagsByStudytrackAction } from '@/redux/tagstudent'
+import { useGetStudentTagsByStudyTrackQuery, useGetTagsByStudyTrackQuery } from '@/redux/tags'
 import { makePopulationsToData } from '@/selectors/populationDetails'
 
 const Row = memo(
@@ -31,45 +30,36 @@ Row.propTypes = {
   combinedProgramme: string.isRequired,
 }
 
-const TagList = ({
-  combinedProgramme,
-  getStudentTagsStudyTrack,
-  getTagsByStudytrack,
-  mainProgramme,
-  namesVisible,
-  selectedStudents,
-  tags,
-  tagstudent,
-}) => {
-  useEffect(() => {
-    const studytrackCode = combinedProgramme ? `${mainProgramme}-${combinedProgramme}` : mainProgramme
-    getTagsByStudytrack(studytrackCode)
-    getStudentTagsStudyTrack(studytrackCode)
-  }, [])
+const TagList = ({ combinedProgramme, mainProgramme, namesVisible, selectedStudents }) => {
+  const correctCode = combinedProgramme ? `${mainProgramme}+${combinedProgramme}` : mainProgramme
+  const { data: tags } = useGetTagsByStudyTrackQuery(correctCode, { skip: !correctCode })
+  const { data: tagstudent } = useGetStudentTagsByStudyTrackQuery(correctCode, { skip: !correctCode })
 
-  const tagRows = selectedStudents.map(({ studentNumber, name }) => {
-    const studentsTags = tagstudent.filter(tag => tag.studentnumber === studentNumber)
-    const tagIds = studentsTags.map(tag => tag.tag.tag_id)
-    const studentTagOptions = tags
-      .filter(tag => !tagIds.includes(tag.tag_id))
-      .map(tag => ({
-        key: tag.tag_id,
-        text: tag.tagname,
-        value: tag.tag_id,
-      }))
-    return (
-      <Row
-        combinedProgramme={combinedProgramme}
-        key={studentNumber}
-        name={name}
-        studentNumber={studentNumber}
-        studentsTags={studentsTags}
-        studytrack={mainProgramme}
-        tagOptions={studentTagOptions}
-        tags={tags}
-      />
-    )
-  })
+  const tagRows =
+    tagstudent && tags
+      ? selectedStudents.map(({ studentNumber, name }) => {
+          const studentsTags = tagstudent.filter(tag => tag.studentnumber === studentNumber)
+          const tagIds = studentsTags.map(tag => tag.tag.tag_id)
+          const studentTagOptions = tags
+            .filter(tag => !tagIds?.includes(tag.tag_id))
+            .map(tag => ({
+              key: tag.tag_id,
+              text: tag.tagname,
+              value: tag.tag_id,
+            }))
+          return (
+            <Row
+              combinedProgramme={combinedProgramme}
+              key={studentNumber}
+              name={name}
+              studentNumber={studentNumber}
+              studentsTags={studentsTags}
+              studytrack={mainProgramme}
+              tagOptions={studentTagOptions}
+            />
+          )
+        })
+      : null
 
   return (
     <Table celled>
@@ -87,29 +77,19 @@ const TagList = ({
 }
 
 const mapStateToProps = state => {
-  const { tagstudent, tags } = state
   const { settings } = state
   const { programme } = makePopulationsToData(state)
   return {
-    tagstudent: tagstudent.data,
-    tags: tags.data,
     studytrack: programme,
     namesVisible: settings.namesVisible,
   }
 }
 
 TagList.propTypes = {
-  getTagsByStudytrack: func.isRequired,
-  getStudentTagsStudyTrack: func.isRequired,
   selectedStudents: arrayOf(shape({})).isRequired,
-  tags: arrayOf(shape({})).isRequired,
   mainProgramme: string.isRequired,
-  tagstudent: arrayOf(shape({})).isRequired,
   namesVisible: bool.isRequired,
   combinedProgramme: string.isRequired,
 }
 
-export const ConnectedTagList = connect(mapStateToProps, {
-  getTagsByStudytrack: getTagsByStudytrackAction,
-  getStudentTagsStudyTrack: getStudentTagsByStudytrackAction,
-})(TagList)
+export const ConnectedTagList = connect(mapStateToProps)(TagList)

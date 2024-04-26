@@ -18,8 +18,7 @@ import { useSearchHistory } from '@/common/hooks'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SearchHistory } from '@/components/SearchHistory'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
-import { getProgrammes } from '@/redux/populationProgrammes'
-import { getPopulationStatistics, clearPopulations } from '@/redux/populations'
+import { getPopulationStatistics, clearPopulations, useGetProgrammesQuery } from '@/redux/populations'
 import { clearSelected } from '@/redux/populationSelectedStudentCourses'
 import './populationSearch.css'
 
@@ -39,13 +38,10 @@ const initialQuery = () => ({
 })
 
 const PopulationSearchForm = ({
-  studyProgrammes,
   queries,
-  language,
   onProgress,
   clearSelected,
   getPopulationStatistics,
-  getProgrammes,
   clearPopulations,
   pending,
 }) => {
@@ -62,24 +58,27 @@ const PopulationSearchForm = ({
   const [searchHistory, addItemToSearchHistory, updateItemInSearchHistory] = useSearchHistory('populationSearch', 8)
   const [filterProgrammes, setFilterProgrammes] = useState(fullAccessToStudentData)
   const fetchPopulationPromises = useRef()
+  const { data: programmesAndStudyTracks } = useGetProgrammesQuery()
+  const { programmes = {} } = programmesAndStudyTracks || {}
+  const studyProgrammes =
+    (programmes.KH90_001 || programmes.MH90_001) && !Object.keys(programmes).includes('KH90_001+MH90_001')
+      ? {
+          ...programmes,
+          'KH90_001+MH90_001': {
+            ...programmes.KH90_001,
+            code: 'KH90_001+MH90_001',
+            name: {
+              fi: 'Eläinlääketieteen kandiohjelma ja lisensiaatin koulutusohjelma',
+              en: "Bachelor's and Degree Programme in Vetenary Medicine",
+              sv: 'Kandidats- och Utbildningsprogrammet i veterinärmedicin',
+            },
+          },
+        }
+      : programmes
 
   const setState = newState => setTotalState({ ...totalState, ...newState })
 
   const { query, isLoading, momentYear } = totalState
-
-  if (
-    (studyProgrammes.KH90_001 || studyProgrammes.MH90_001) &&
-    !Object.keys(studyProgrammes).includes('KH90_001+MH90_001')
-  ) {
-    const vetenaryCombined = { ...studyProgrammes.KH90_001 }
-    vetenaryCombined.name = {
-      fi: 'Eläinlääketieteen kandiohjelma ja lisensiaatin koulutusohjelma',
-      en: "Bachelor's and Degree Programme in Vetenary Medicine",
-      sv: 'Kandidats- och Utbildningsprogrammet i veterinärmedicin',
-    }
-    vetenaryCombined.code = 'KH90_001+MH90_001'
-    studyProgrammes['KH90_001+MH90_001'] = vetenaryCombined
-  }
 
   const parseQueryFromUrl = () => {
     const initial = initialQuery()
@@ -151,7 +150,6 @@ const PopulationSearchForm = ({
   useEffect(() => {
     if (!studyProgrammes || Object.values(studyProgrammes).length === 0) {
       setState({ query: initialQuery() })
-      getProgrammes()
     }
     if (location.search) {
       fetchPopulationFromUrlParams()
@@ -318,7 +316,7 @@ const PopulationSearchForm = ({
     list.map(sp => {
       const { type, name, code } = sp
       const shh = { type, name, code }
-      shh.text = sp.name[language] || `${sp.name.fi || sp.name.en || sp.name.sv} (translation not found)`
+      shh.text = getTextIn(sp.name)
       shh.description = sp.code
       shh.value = sp.code
       return shh
@@ -477,20 +475,16 @@ const PopulationSearchForm = ({
   )
 }
 
-const mapStateToProps = ({ settings, populations, populationProgrammes }) => {
-  const { language } = settings
+const mapStateToProps = ({ populations, populationProgrammes }) => {
   const { pending } = populationProgrammes
   return {
-    language,
     queries: populations.query || {},
-    studyProgrammes: populationProgrammes.data.programmes || {},
     pending,
   }
 }
 
 export const ConnectedPopulationSearchForm = connect(mapStateToProps, {
   getPopulationStatistics,
-  getProgrammes,
   clearSelected,
   clearPopulations,
 })(PopulationSearchForm)

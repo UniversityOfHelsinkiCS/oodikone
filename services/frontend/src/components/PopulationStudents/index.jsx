@@ -1,6 +1,6 @@
 import moment from 'moment'
 import React, { useEffect, useRef, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Tab } from 'semantic-ui-react'
 
@@ -11,8 +11,7 @@ import { StudentNameVisibilityToggle } from '@/components/StudentNameVisibilityT
 import { ConnectedTagList as TagList } from '@/components/TagList'
 import { ConnectedTagPopulation as TagPopulation } from '@/components/TagPopulation'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
-import { getTagsByStudytrackAction } from '@/redux/tags'
-import { getStudentTagsByStudytrackAction } from '@/redux/tagstudent'
+import { useGetTagsByStudyTrackQuery } from '@/redux/tags'
 import { CheckStudentList } from './CheckStudentList'
 import { CoursesTabContainer as CoursesTab } from './StudentTable/CourseTab'
 import { GeneralTabContainer as GeneralTab } from './StudentTable/GeneralTab'
@@ -33,7 +32,6 @@ const Panes = ({
   months,
   studentToTargetCourseDateMap,
   studyGuidanceGroup,
-  tags,
   to,
   variant,
   visiblePanes,
@@ -42,6 +40,9 @@ const Panes = ({
   const { handleTabChange } = useTabChangeAnalytics()
   const programmeForTagsLink = combinedProgramme ? `${mainProgramme}+${combinedProgramme}` : mainProgramme
   const programme = studyGuidanceGroup?.tags?.studyProgramme || ''
+  const correctCode = combinedProgramme ? `${mainProgramme}+${combinedProgramme}` : mainProgramme
+  const { data: tags } = useGetTagsByStudyTrackQuery(correctCode, { skip: !correctCode })
+
   const panesAvailable = [
     {
       menuItem: 'General',
@@ -161,8 +162,6 @@ const PopulationStudents = ({
 }) => {
   const [state, setState] = useState({})
   const studentRef = useRef()
-  const dispatch = useDispatch()
-  const { data: tags } = useSelector(({ tags }) => tags)
   const { query } = useSelector(({ populations }) => populations)
   let mainProgramme = query?.studyRights?.programme || ''
   let combinedProgramme = query?.studyRights?.combinedProgramme || ''
@@ -183,12 +182,6 @@ const PopulationStudents = ({
   const { isAdmin } = useGetAuthorizedUserQuery()
 
   useEffect(() => {
-    if (tags && tags.length > 0) return
-    const correctCode = combinedProgramme ? `${mainProgramme}+${combinedProgramme}` : mainProgramme
-    if (correctCode) {
-      dispatch(getTagsByStudytrackAction(correctCode))
-      dispatch(getStudentTagsByStudytrackAction(correctCode))
-    }
     setState({ ...state, admin: isAdmin })
   }, [])
 
@@ -212,7 +205,6 @@ const PopulationStudents = ({
         months={months}
         studentToTargetCourseDateMap={studentToTargetCourseDateMap}
         studyGuidanceGroup={studyGuidanceGroup}
-        tags={tags}
         to={to}
         variant={variant}
         visiblePanes={contentToInclude.panesToInclude}

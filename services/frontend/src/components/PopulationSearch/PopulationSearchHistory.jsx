@@ -9,7 +9,7 @@ import { Button, Form } from 'semantic-ui-react'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { InfoBox } from '@/components/Info/InfoBox'
 import { PopulationQueryCard } from '@/components/PopulationQueryCard'
-import { removePopulation } from '@/redux/populations'
+import { removePopulation, useGetProgrammesQuery } from '@/redux/populations'
 import { FilterActiveNote } from './FilterActiveNote'
 import './populationSearch.css'
 
@@ -18,7 +18,8 @@ const getMonths = (year, term) => {
   return Math.ceil(moment.duration(moment().diff(moment(start))).asMonths())
 }
 
-const PopulationSearchHistory = ({ populations, units, tags, removePopulation }) => {
+const PopulationSearchHistory = ({ populations, tags, removePopulation }) => {
+  const { data: units } = useGetProgrammesQuery()
   const history = useHistory()
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false)
   const [semesters, setSemesters] = useState(
@@ -134,7 +135,7 @@ const PopulationSearchHistory = ({ populations, units, tags, removePopulation })
   }
 
   const renderQueryCards = () => {
-    if (!units.data.programmes || !populations.query || !populations.data.students) {
+    if (!units?.programmes || !populations.query || !populations.data.students) {
       return null
     }
     const { programme: programmeCode, studyTrack: studyTrackCode } = populations.query.studyRights
@@ -150,7 +151,7 @@ const PopulationSearchHistory = ({ populations, units, tags, removePopulation })
             queryId={0}
             removeSampleFn={removeThisPopulation}
             tags={tags}
-            units={[units.data.programmes[programmeCode], units.data.studyTracks[studyTrackCode]].filter(Boolean)}
+            units={[units.programmes[programmeCode], units.studyTracks[studyTrackCode]].filter(Boolean)}
             updating={populations.updating}
           />
           <div style={{ marginLeft: '5px', marginTop: '15px' }}>
@@ -191,13 +192,11 @@ PopulationSearchHistory.propTypes = {
     data: shape({}),
     query: object,
   }).isRequired,
-  units: object, // eslint-disable-line
   tags: arrayOf(shape({})).isRequired,
 }
 
-const mapStateToProps = ({ populations, populationProgrammes, tags }) => ({
+const mapStateToProps = ({ populations, tags }) => ({
   populations,
-  units: populationProgrammes,
   tags: tags.data,
 })
 
