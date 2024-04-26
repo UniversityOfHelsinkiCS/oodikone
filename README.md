@@ -99,6 +99,7 @@ In development, backend and updater use the same redis, but in production they a
 See also [older graph](documentation/Oodikone.png), which presents more information.
 
 To read a bit more details about what updater-scheduler and updater-worker do, see their own READMEs:
+
 - [updater-scheduler's README](./updater/sis-updater-scheduler/README.md)
 - [updater-worker's README](./updater/sis-updater-worker/README.md)
 
@@ -122,8 +123,11 @@ Some useful commands are defined in `package.json` and can be run with `npm run 
 - `npm run both:real`: starts oodikone and updater with real data
 - `npm run docker:down`: stops the whole environment
 - `npm run testupdater`: runs tests for updater
-- `npm run flushredis`: Clears redis, which forces big calculations to be redone in e.g. studyprogramme overview and faculty views.
+- `npm run flushredis`: clears redis, which forces big calculations to be redone in e.g. studyprogramme overview and faculty views.
 - `npm run rapodiff`: runs [Rapodiff](./services/backend/src/rapodiff/)
+- `npm run install:local`: installs `node_modules` for each package (backend, frontend, sis-updater-scheduler and sis-updater-worker) locally
+- `npm run install:docker`: installs `node_modules` for each package inside containers
+- `npm run install:both`: runs both `npm run install:local` and `npm run install:docker`
 
 Once you have ran setup for oodikone , you can just execute the first one (`npm run oodikone`). After starting and waiting for a while for containers to compile, oodikone can be accessed at [http://localhost:3000/](http://localhost:3000/) and Adminer (database investigation tool) at [http://localhost:5050/](http://localhost:5050/). Adminer requires you to login with username `postgres` and with any password you choose (for example `p`).
 
@@ -184,7 +188,7 @@ Continuous integration (CI) works with Github actions and is defined in workflow
 
 ### Modules are missing after updating package.json
 
-You should always install the dependencies **inside** the container to have the application **inside** the container access them. Module might be missing for example when someone else installs a new library and you only pull the changes in package.json. Use `docker exec <service> npm ci` to install modules inside the container.
+You should always install the dependencies **inside** the container to have the application **inside** the container access them. Module might be missing for example when someone else installs a new library and you only pull the changes in package.json. Use `docker exec <service> npm ci` to install modules inside the container or `npm run install:docker` to install modules inside all packages (backend, frontend, sis-updater-scheduler and sis-updater-worker).
 
 ### Studyguidance groups don't work on my machine
 
