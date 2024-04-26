@@ -27,7 +27,7 @@ export const PopulationDetails = ({
   selectedStudentsByYear,
   programmeCodes,
 }) => {
-  const { isLoading: authLoading, programmeRights, isAdmin } = useGetAuthorizedUserQuery()
+  const { isLoading: authLoading, programmeRights, fullAccessToStudentData } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const { useFilterSelector } = useFilters()
   const [studentAmountLimit, setStudentAmountLimit] = useState(0)
@@ -72,7 +72,7 @@ export const PopulationDetails = ({
 
   const onlyIamRights =
     !authLoading &&
-    !isAdmin &&
+    !fullAccessToStudentData &&
     !fullStudyProgrammeRights.includes(query?.studyRights?.programme) &&
     !fullStudyProgrammeRights.includes(query?.studyRights?.combinedProgramme)
 

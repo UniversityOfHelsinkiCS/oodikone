@@ -28,9 +28,9 @@ const groupedAgesReducer = (counts, age) => {
 export const AgeStats = ({ filteredStudents, query }) => {
   const [isGrouped, setIsGrouped] = useState(true)
   const [expandedGroups, setExpandedGroups] = useState([])
-  const { isAdmin, programmeRights } = useGetAuthorizedUserQuery()
+  const { fullAccessToStudentData, programmeRights } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
-  const onlyIamRights = !isAdmin && fullStudyProgrammeRights.length === 0
+  const onlyIamRights = !fullAccessToStudentData && fullStudyProgrammeRights.length === 0
   const studentsAges = filteredStudents.map(student => getAge(student.birthdate)).sort((a, b) => b - a)
 
   const getAges = grouped =>

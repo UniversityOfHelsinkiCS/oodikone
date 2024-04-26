@@ -40,6 +40,7 @@ export const useGetAuthorizedUserQuery = () => {
 
   return {
     ...user,
+    fullAccessToStudentData: user.roles.some(role => ['admin', 'fullSisuAccess'].includes(role)),
     isLoading,
     error,
     ...rest,

@@ -35,7 +35,7 @@ export const StudyProgramme = () => {
   const programmes = useSelector(state => state.populationProgrammes?.data?.programmes)
   const progressCriteria = useGetProgressCriteriaQuery({ programmeCode: studyProgrammeId })
   const { language, getTextIn } = useLanguage()
-  const { isAdmin, programmeRights } = useGetAuthorizedUserQuery()
+  const { isAdmin, fullAccessToStudentData, programmeRights } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const [tab, setTab] = useTabs('p_tab', 0, history)
   const [academicYear, setAcademicYear] = useState(false)
@@ -92,7 +92,7 @@ export const StudyProgramme = () => {
     })
 
     if (
-      isAdmin ||
+      fullAccessToStudentData ||
       fullStudyProgrammeRights.includes(programmeId) ||
       fullStudyProgrammeRights.includes(secondProgrammeId)
     ) {

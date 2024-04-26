@@ -23,13 +23,13 @@ export const FacultyStatistics = () => {
   const faculty = faculties && facultyCode && faculties.find(f => f.code === facultyCode)
   const facultyName = faculty && getTextIn(faculty.name)
 
-  const { isAdmin, programmeRights } = useGetAuthorizedUserQuery()
+  const { isAdmin, fullAccessToStudentData, programmeRights } = useGetAuthorizedUserQuery()
   const [tab, setTab] = useTabs('p_tab', 0, history)
   const [academicYear, setAcademicYear] = useState(false)
   const [studyProgrammes, setStudyProgrammes] = useState(false)
   const [specialGroups, setSpecialGroups] = useState(false)
   const [graduatedGroup, setGraduatedGroup] = useState(false)
-  const requiredRights = { isAdmin, programmeRights }
+  const requiredRights = { fullAccessToStudentData, programmeRights }
 
   const handleSelect = useCallback(
     faculty => {

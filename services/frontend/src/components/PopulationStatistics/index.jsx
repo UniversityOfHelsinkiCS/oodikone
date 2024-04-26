@@ -51,9 +51,9 @@ export const PopulationStatistics = () => {
   const { query, queryIsSet, isLoading, selectedStudentsByYear, samples } = useSelector(makePopulationsToData)
   const [curriculum, setCurriculum] = useState(null)
 
-  const { isAdmin, programmeRights } = useGetAuthorizedUserQuery()
+  const { fullAccessToStudentData, programmeRights } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
-  const onlyIamRights = !isAdmin && fullStudyProgrammeRights.length === 0
+  const onlyIamRights = !fullAccessToStudentData && fullStudyProgrammeRights.length === 0
   useTitle('Class statistics')
 
   const { data: allSemesters } = useGetSemestersQuery()

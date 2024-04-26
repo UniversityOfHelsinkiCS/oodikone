@@ -181,7 +181,6 @@ const PopulationStudents = ({
   }
 
   const { isAdmin } = useGetAuthorizedUserQuery()
-  const admin = isAdmin
 
   useEffect(() => {
     if (tags && tags.length > 0) return
@@ -190,7 +189,7 @@ const PopulationStudents = ({
       dispatch(getTagsByStudytrackAction(correctCode))
       dispatch(getStudentTagsByStudytrackAction(correctCode))
     }
-    setState({ ...state, admin })
+    setState({ ...state, admin: isAdmin })
   }, [])
 
   if (filteredStudents.length === 0) return null
@@ -199,7 +198,7 @@ const PopulationStudents = ({
       <span ref={studentRef} style={{ marginRight: '0.5rem' }}>
         <InfoBox content={contentToInclude.infotoolTipContent} />
       </span>
-      {admin ? <CheckStudentList students={filteredStudents.map(student => student.studentNumber)} /> : null}
+      {isAdmin ? <CheckStudentList students={filteredStudents.map(student => student.studentNumber)} /> : null}
       <Panes
         combinedProgramme={combinedProgramme}
         coursecode={coursecode}

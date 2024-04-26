@@ -239,7 +239,7 @@ export const FacultyStudentDataTable = ({
                             trigger={<b>{programme}</b>}
                           />
                           {requiredRights.programmeRights?.includes(programmeNames[programme].code) ||
-                            (requiredRights.isAdmin && (
+                            (requiredRights.fullAccessToStudentData && (
                               <PopulationLink
                                 studyprogramme={programmeNames[programme].code}
                                 year={year}

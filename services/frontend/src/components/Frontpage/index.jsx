@@ -30,7 +30,7 @@ export const FrontPage = () => {
       content: <p>View tables and diagrams about study progress of different faculties</p>,
     },
     {
-      show: roles.includes('admin') || programmeRights.length > 0,
+      show: checkUserAccess(['admin', 'fullSisuAccess'], roles) || programmeRights.length > 0,
       title: 'Programmes',
       content: (
         <List bulleted>

@@ -7,7 +7,7 @@ const studentService = require('../services/students')
 const StudyrightService = require('../services/studyrights')
 const CourseService = require('../services/courses')
 const StatMergeService = require('../services/statMerger')
-const { mapToProviders, getFullStudyProgrammeRights } = require('../util/utils')
+const { mapToProviders, getFullStudyProgrammeRights, hasFullAccessToStudentData } = require('../util/utils')
 const { encrypt, decrypt } = require('../services/encrypt')
 const { mapCodesToIds } = require('../services/studyprogramme/studyprogrammeHelpers')
 
@@ -92,10 +92,12 @@ router.post('/v2/populationstatistics/coursesbytag', async (req, res) => {
     return
   }
   const {
-    user: { isAdmin, studentsUserCanAccess },
+    user: { roles, studentsUserCanAccess },
   } = req
   const studentnumbers = await studentService.findByTag(tag)
-  const studentnumberlist = isAdmin ? studentnumbers : _.intersection(studentnumbers, studentsUserCanAccess)
+  const studentnumberlist = hasFullAccessToStudentData(roles)
+    ? studentnumbers
+    : _.intersection(studentnumbers, studentsUserCanAccess)
 
   const result = await populationService.bottlenecksOf(
     {
@@ -119,7 +121,7 @@ router.post('/v2/populationstatistics/coursesbytag', async (req, res) => {
 
 router.post('/v2/populationstatistics/coursesbystudentnumberlist', async (req, res) => {
   const {
-    user: { isAdmin, studentsUserCanAccess },
+    user: { roles, studentsUserCanAccess },
     body: { studentnumberlist: studentnumbersInReq, ...query },
   } = req
 
@@ -127,7 +129,9 @@ router.post('/v2/populationstatistics/coursesbystudentnumberlist', async (req, r
     throw new ApplicationError('The body should have a studentnumberlist defined', 400)
   }
 
-  const studentnumberlist = isAdmin ? studentnumbersInReq : _.intersection(studentnumbersInReq, studentsUserCanAccess)
+  const studentnumberlist = hasFullAccessToStudentData(roles)
+    ? studentnumbersInReq
+    : _.intersection(studentnumbersInReq, studentsUserCanAccess)
   const result = await populationService.bottlenecksOf(
     {
       year: query?.year ?? 1900,
@@ -149,7 +153,7 @@ router.post('/v2/populationstatistics/coursesbystudentnumberlist', async (req, r
 router.get('/v3/populationstatistics', async (req, res) => {
   const { year, semesters, studyRights: studyRightsJSON } = req.query
   const {
-    user: { isAdmin, programmeRights, id: userId },
+    user: { roles, programmeRights, id: userId },
   } = req
 
   if (!year || !semesters || !studyRightsJSON) {
@@ -164,7 +168,7 @@ router.get('/v3/populationstatistics', async (req, res) => {
 
   try {
     if (
-      !isAdmin &&
+      !hasFullAccessToStudentData(roles) &&
       !programmeRightsCodes.includes(studyRights.programme) &&
       !programmeRightsCodes.includes(studyRights.combinedProgramme)
     ) {
@@ -222,7 +226,7 @@ router.get('/v3/populationstatistics', async (req, res) => {
 
     // Obfuscate if user has only limited study programme rights
     if (
-      !isAdmin &&
+      !hasFullAccessToStudentData(roles) &&
       !fullProgrammeRights.includes(studyRights.programme) &&
       !fullProgrammeRights.includes(studyRights.combinedProgramme)
     ) {
@@ -253,7 +257,7 @@ router.get('/v3/populationstatistics', async (req, res) => {
 router.get('/v3/populationstatisticsbycourse', async (req, res) => {
   const { coursecodes, from, to, separate: sep, unifyCourses } = req.query
   const {
-    user: { id, isAdmin, studentsUserCanAccess: allStudentsUserCanAccess, programmeRights },
+    user: { id, roles, studentsUserCanAccess: allStudentsUserCanAccess, programmeRights },
   } = req
   const separate = sep ? JSON.parse(sep) : false
 
@@ -289,7 +293,7 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
     studentnumbers
   )
   let courseproviders = []
-  if (!isAdmin) {
+  if (!hasFullAccessToStudentData(roles)) {
     courseproviders = await CourseService.getCourseProvidersForCourses(JSON.parse(coursecodes))
   }
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
@@ -297,7 +301,9 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
   const found = courseproviders.some(r => rightsMappedToProviders.includes(r))
 
   const studentsUserCanAccess =
-    isAdmin || found ? new Set(studentnumbers) : new Set(_.intersection(studentnumbers, allStudentsUserCanAccess))
+    hasFullAccessToStudentData(roles) || found
+      ? new Set(studentnumbers)
+      : new Set(_.intersection(studentnumbers, allStudentsUserCanAccess))
 
   const randomHash = crypto.randomBytes(12).toString('hex')
   const obfuscateStudent = ({ studyrights, studentNumber, courses, gender_code }) => ({
@@ -330,9 +336,11 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
 router.post('/v3/populationstatisticsbystudentnumbers', async (req, res) => {
   const { studentnumberlist, tags } = req.body
   const {
-    user: { isAdmin, id, studentsUserCanAccess },
+    user: { roles, id, studentsUserCanAccess },
   } = req
-  const filteredStudentNumbers = isAdmin ? studentnumberlist : _.intersection(studentnumberlist, studentsUserCanAccess)
+  const filteredStudentNumbers = hasFullAccessToStudentData(roles)
+    ? studentnumberlist
+    : _.intersection(studentnumberlist, studentsUserCanAccess)
 
   const studyProgrammeCode =
     tags?.studyProgramme && tags?.studyProgramme.includes('+')
@@ -363,7 +371,7 @@ router.get('/v3/populationstatistics/studyprogrammes', async (req, res) => {
   const {
     user: { roles, programmeRights },
   } = req
-  if (roles?.includes('admin')) {
+  if (hasFullAccessToStudentData(roles)) {
     const studyrights = await StudyrightService.getAssociations()
     mapCodesToIds(studyrights.programmes)
     res.json(studyrights)

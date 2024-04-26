@@ -29,8 +29,9 @@ export const UniversityView = ({ isEvaluationOverview }) => {
   const [graduatedGroup, setGraduatedGroup] = useState(false)
   const [medianMode, setMedianMode] = useState(false)
   const [excludeSpecials, setIncludeSpecials] = useState(isEvaluationOverview)
-  const { isAdmin, roles } = useGetAuthorizedUserQuery()
-  const userHasFacultyRights = isAdmin || roles.includes('facultyStatistics') || roles.includes('katselmusViewer')
+  const { fullAccessToStudentData, roles } = useGetAuthorizedUserQuery()
+  const userHasFacultyRights =
+    fullAccessToStudentData || roles.includes('facultyStatistics') || roles.includes('katselmusViewer')
   const graduated = graduatedGroup ? 'GRADUATED_EXCLUDED' : 'GRADUATED_INCLUDED'
   const progressStats = useGetAllFacultiesProgressStatsQuery({
     graduated,

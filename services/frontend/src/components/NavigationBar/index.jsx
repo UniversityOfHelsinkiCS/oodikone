@@ -45,7 +45,8 @@ const allNavigationItems = {
 }
 
 export const NavigationBar = () => {
-  const { isLoading, iamGroups, mockedBy, userId, roles, isAdmin, programmeRights } = useGetAuthorizedUserQuery()
+  const { isLoading, iamGroups, mockedBy, userId, roles, isAdmin, programmeRights, fullAccessToStudentData } =
+    useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const location = useLocation()
 
@@ -57,14 +58,22 @@ export const NavigationBar = () => {
     if (isLoading) return visibleNavigationItems
     Object.keys(allNavigationItems).forEach(key => {
       if (key === 'populations') {
-        if (!isAdmin && programmeRights.length === 0) return
+        if (!fullAccessToStudentData && programmeRights.length === 0) return
       }
       if (key === 'students') {
-        if (!checkUserAccess(['admin', 'studyGuidanceGroups'], roles) && fullStudyProgrammeRights.length === 0) return
+        if (
+          !checkUserAccess(['admin', 'fullSisuAccess', 'studyGuidanceGroups'], roles) &&
+          fullStudyProgrammeRights.length === 0
+        )
+          return
       } else if (key === 'courseStatistics') {
-        if (!checkUserAccess(['courseStatistics', 'admin'], roles) && fullStudyProgrammeRights.length === 0) return
+        if (
+          !checkUserAccess(['admin', 'fullSisuAccess', 'courseStatistics'], roles) &&
+          fullStudyProgrammeRights.length === 0
+        )
+          return
       } else if (key === 'faculty') {
-        if (!checkUserAccess(['facultyStatistics', 'admin'], roles)) return
+        if (!checkUserAccess(['admin', 'fullSisuAccess', 'facultyStatistics'], roles)) return
       }
       const { reqRights } = allNavigationItems[key]
       if (!reqRights || reqRights.every(r => roles.includes(r) || (key === 'teachers' && isAdmin))) {
@@ -84,9 +93,10 @@ export const NavigationBar = () => {
 
   const showSearch = item => {
     if (item.key === 'class' || item.key === 'overview') return true
-    if (checkUserAccess(['openUniSearch', 'admin'], roles) && item.key === 'openUniSearch') return true
+    if (checkUserAccess(['admin', 'openUniSearch'], roles) && item.key === 'openUniSearch') return true
     if (
-      (checkUserAccess(['studyGuidanceGroups', 'admin'], roles) || fullStudyProgrammeRights.length > 0) &&
+      (checkUserAccess(['admin', 'fullSisuAccess', 'studyGuidanceGroups'], roles) ||
+        fullStudyProgrammeRights.length > 0) &&
       item.key === 'customSearch'
     )
       return true

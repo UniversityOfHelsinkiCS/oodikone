@@ -18,8 +18,7 @@ const NoAccessToPageBanner = () => (
 )
 
 export const ProtectedRoute = ({ requiredRoles = [], requireUserHasRights = false, ...rest }) => {
-  const user = useGetAuthorizedUserQuery()
-  const { programmeRights, iamGroups, isAdmin, roles } = user
+  const { programmeRights, iamGroups, isAdmin, roles } = useGetAuthorizedUserQuery()
 
   const hasAccessToRoute = () => {
     if (isAdmin) return true
@@ -28,23 +27,14 @@ export const ProtectedRoute = ({ requiredRoles = [], requireUserHasRights = fals
     if (requiredRoles.includes('courseStatistics')) {
       return hasRequiredRoles || hasRequiredRights
     }
-    if (rest.path.includes('students')) {
-      return hasRequiredRoles || hasRequiredRights
-    }
-    if (rest.path.includes('custompopulation')) {
+    if (['populations', 'students', 'custompopulation', 'study-programme'].some(route => rest.path.includes(route))) {
       return hasRequiredRoles || hasRequiredRights
     }
     if (rest.path.includes('languagecenterview')) {
       return iamGroups.includes('grp-kielikeskus-esihenkilot')
     }
     if (rest.path.includes('evaluationoverview')) {
-      if (rest.location.pathname.includes('university')) {
-        return true
-      }
-      return roles?.length > 0 || programmeRights?.length > 0
-    }
-    if (rest.path.includes('university')) {
-      return true
+      return rest.location.pathname.includes('university') ? true : hasRequiredRoles
     }
 
     return hasRequiredRoles && hasRequiredRights

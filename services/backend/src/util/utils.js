@@ -61,10 +61,13 @@ const createLocaleComparator = (field = null) => {
 const getFullStudyProgrammeRights = programmeRights =>
   programmeRights.filter(({ limited }) => !limited).map(({ code }) => code)
 
+const hasFullAccessToStudentData = roles => roles?.some(role => ['admin', 'fullSisuAccess'].includes(role))
+
 module.exports = {
   mapToProviders,
   sortMainCode,
   getSortRank,
   createLocaleComparator,
   getFullStudyProgrammeRights,
+  hasFullAccessToStudentData,
 }

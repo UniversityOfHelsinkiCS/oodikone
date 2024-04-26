@@ -40,6 +40,8 @@ const routes = {
   completedCoursesSearch: '/completedcoursessearch',
   languageCenterView: '/languagecenterview',
   closeToGraduation: '/close-to-graduation',
+  populations: '/populations',
+  studyProgramme: '/study-programme/:studyProgrammeId?',
 }
 
 export const Routes = () => (
@@ -47,32 +49,39 @@ export const Routes = () => (
     <Switch>
       <Route component={FrontPage} exact path="/" />
       <Route component={Feedback} exact path={routes.feedback} />
-      <ProtectedRoute component={PopulationStatistics} exact path="/populations" requireUserHasRights />
+      <ProtectedRoute
+        component={PopulationStatistics}
+        exact
+        path={routes.populations}
+        requireUserHasRights
+        requiredRoles={['fullSisuAccess']}
+      />
       <ProtectedRoute
         component={FacultyStatistics}
         exact
         path={routes.faculties}
-        requiredRoles={['admin', 'facultyStatistics']}
+        requiredRoles={['admin', 'fullSisuAccess', 'facultyStatistics']}
       />
       <ProtectedRoute
         component={StudyProgramme}
         exact
-        path="/study-programme/:studyProgrammeId?"
+        path={routes.studyProgramme}
         requireUserHasRights
+        requiredRoles={['fullSisuAccess']}
       />
       <ProtectedRoute
         component={StudentStatistics}
         exact
         path={routes.students}
         requireUserHasRights
-        requiredRoles={['admin', 'studyGuidanceGroups']}
+        requiredRoles={['admin', 'fullSisuAccess', 'studyGuidanceGroups']}
       />
       <ProtectedRoute
         component={CourseStatistics}
         exact
         path={routes.courseStatistics}
         requireUserHasRights
-        requiredRoles={['courseStatistics']}
+        requiredRoles={['fullSisuAccess', 'courseStatistics']}
       />
       <ProtectedRoute component={Users} exact path={routes.users} requiredRoles={['admin']} />
       <ProtectedRoute component={Teachers} exact path={routes.teachers} requiredRoles={['teachers']} />
@@ -82,7 +91,7 @@ export const Routes = () => (
         exact
         path={routes.custompopulation}
         requireUserHasRights
-        requiredRoles={['admin', 'studyGuidanceGroups']}
+        requiredRoles={['admin', 'fullSisuAccess', 'studyGuidanceGroups']}
       />
       <ProtectedRoute
         component={CustomOpenUniPopulation}
@@ -105,8 +114,13 @@ export const Routes = () => (
         requireUserHasRights
         requiredRoles={['admin']}
       />
-      <ProtectedRoute component={EvaluationOverview} exact path={routes.evaluationOverview} requireUserHasRights />
-      <ProtectedRoute component={UniversityViewPage} exact path={routes.university} requireUserHasRights />
+      <ProtectedRoute
+        component={EvaluationOverview}
+        exact
+        path={routes.evaluationOverview}
+        requiredRoles={['admin', 'fullSisuAccess', 'katselmusViewer']}
+      />
+      <ProtectedRoute component={UniversityViewPage} exact path={routes.university} />
       <ProtectedRoute
         component={CloseToGraduation}
         exact

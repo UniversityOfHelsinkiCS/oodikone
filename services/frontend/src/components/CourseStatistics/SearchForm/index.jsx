@@ -46,8 +46,8 @@ export const SearchForm = ({ onProgress }) => {
   const matchingCourses = useSelector(state => getCourseSearchResults(state, combineSubstitutions))
   const [state, setState] = useState({ ...INITIAL })
   const [searchHistory, addItemToSearchHistory, updateItemInSearchHistory] = useSearchHistory('courseSearch', 6)
-  const { iamRights, isAdmin } = useGetAuthorizedUserQuery()
-  const hasStudyProgrammeRights = iamRights.length > 0 || isAdmin
+  const { iamRights, fullAccessToStudentData } = useGetAuthorizedUserQuery()
+  const hasStudyProgrammeRights = iamRights.length > 0 || fullAccessToStudentData
 
   const { courseName, courseCode, selectedCourses, separate } = state
 

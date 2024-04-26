@@ -77,7 +77,7 @@ const getFirstCell = ({
   allRights,
   calendarYears,
   combinedProgramme,
-  isAdmin,
+  fullAccessToStudentData,
   setShow,
   show,
   studyprogramme,
@@ -88,7 +88,7 @@ const getFirstCell = ({
     <Table.Cell className={getCellClass(year)} key={getKey(year)} onClick={setShow}>
       {yearlyData.length > 1 && <Icon name={`${show ? 'angle down' : 'angle right'}`} />}
       {year}
-      {(isAdmin || allRights.includes(studyprogramme) || allRights.includes(combinedProgramme)) && (
+      {(fullAccessToStudentData || allRights.includes(studyprogramme) || allRights.includes(combinedProgramme)) && (
         <PopulationLink
           combinedProgramme={combinedProgramme}
           studyprogramme={studyprogramme}
@@ -105,7 +105,7 @@ const getSingleTrackRow = ({
   calendarYears,
   code,
   combinedProgramme,
-  isAdmin,
+  fullAccessToStudentData,
   otherCountriesStats,
   row,
   showPercentages,
@@ -134,7 +134,9 @@ const getSingleTrackRow = ({
           >
             {value}
             {index === 0 &&
-              (isAdmin || allRights.includes(studyprogramme) || allRights.includes(combinedProgramme)) && (
+              (fullAccessToStudentData ||
+                allRights.includes(studyprogramme) ||
+                allRights.includes(combinedProgramme)) && (
                 <PopulationLink
                   combinedProgramme={combinedProgramme}
                   studyprogramme={studyprogramme}
@@ -155,7 +157,7 @@ const getRow = ({
   calendarYears,
   combinedProgramme,
   getTextIn,
-  isAdmin,
+  fullAccessToStudentData,
   otherCountriesStats,
   row,
   setShow,
@@ -178,7 +180,7 @@ const getRow = ({
               allRights,
               calendarYears,
               combinedProgramme,
-              isAdmin,
+              fullAccessToStudentData,
               setShow,
               show,
               studyprogramme,
@@ -219,7 +221,9 @@ const getRow = ({
           return (
             <Table.Cell key={getKey(row[0])} style={{ paddingLeft: '50px' }} textAlign="left">
               {title}
-              {(isAdmin || allRights.includes(studyprogramme) || allRights.includes(combinedProgramme)) && (
+              {(fullAccessToStudentData ||
+                allRights.includes(studyprogramme) ||
+                allRights.includes(combinedProgramme)) && (
                 <PopulationLink
                   combinedProgramme={combinedProgramme}
                   studyprogramme={studyprogramme}
@@ -300,7 +304,7 @@ export const StudytrackDataTable = ({
   const [show, setShow] = useState([])
   const [showPercentages, setShowPercentages] = useState(false)
   const { getTextIn } = useLanguage()
-  const { isAdmin, programmeRights } = useGetAuthorizedUserQuery()
+  const { fullAccessToStudentData, programmeRights } = useGetAuthorizedUserQuery()
   const allRights = programmeRights.map(({ code }) => code)
   if (!dataOfAllTracks && !dataOfSingleTrack) return null
   const firstCellClicked = index => {
@@ -377,7 +381,7 @@ export const StudytrackDataTable = ({
                     calendarYears,
                     code: singleTrack,
                     combinedProgramme,
-                    isAdmin,
+                    fullAccessToStudentData,
                     otherCountriesStats,
                     row,
                     showPercentages,
@@ -392,7 +396,7 @@ export const StudytrackDataTable = ({
                       combinedProgramme,
                       getTextIn,
                       index,
-                      isAdmin,
+                      fullAccessToStudentData,
                       otherCountriesStats,
                       row,
                       setShow: () => firstCellClicked(index),

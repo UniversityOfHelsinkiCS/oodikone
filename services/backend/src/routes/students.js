@@ -1,6 +1,8 @@
 const router = require('express').Router()
+
 const Student = require('../services/students')
 const { ApplicationError } = require('../util/customErrors')
+const { hasFullAccessToStudentData } = require('../util/utils')
 
 const filterStudentTags = (student, userId) => {
   return {
@@ -11,7 +13,7 @@ const filterStudentTags = (student, userId) => {
 
 router.get('/students', async (req, res) => {
   const {
-    user: { isAdmin, studentsUserCanAccess },
+    user: { roles, studentsUserCanAccess },
     query: { searchTerm },
   } = req
 
@@ -28,7 +30,7 @@ router.get('/students', async (req, res) => {
 
   let results = []
   if (trimmedSearchTerm) {
-    results = isAdmin
+    results = hasFullAccessToStudentData(roles)
       ? await Student.bySearchTerm(trimmedSearchTerm)
       : await Student.bySearchTermAndStudentNumbers(trimmedSearchTerm, studentsUserCanAccess)
   }
@@ -38,10 +40,10 @@ router.get('/students', async (req, res) => {
 router.get('/students/:id', async (req, res) => {
   const { id: studentId } = req.params
   const {
-    user: { id, isAdmin, studentsUserCanAccess },
+    user: { id, roles, studentsUserCanAccess },
   } = req
 
-  if (!isAdmin && !studentsUserCanAccess.includes(studentId)) {
+  if (!hasFullAccessToStudentData(roles) && !studentsUserCanAccess.includes(studentId)) {
     throw new ApplicationError('Error finding student', 400)
   }
   const student = await Student.withId(studentId)

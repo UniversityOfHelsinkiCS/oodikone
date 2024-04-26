@@ -124,7 +124,7 @@ export const CourseStatistics = () => {
     }
   }
 
-  if (!checkUserAccess(['courseStatistics', 'admin'], roles) && fullStudyProgrammeRights.length < 1)
+  if (!checkUserAccess(['courseStatistics', 'admin', 'fullSisuAccess'], roles) && fullStudyProgrammeRights.length < 1)
     return (
       <div className="segmentContainer">
         <Message

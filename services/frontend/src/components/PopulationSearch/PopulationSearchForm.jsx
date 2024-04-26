@@ -51,7 +51,7 @@ const PopulationSearchForm = ({
 }) => {
   const history = useHistory()
   const location = useLocation()
-  const { isAdmin } = useGetAuthorizedUserQuery()
+  const { fullAccessToStudentData } = useGetAuthorizedUserQuery()
   const { getTextIn } = useLanguage()
   const [totalState, setTotalState] = useState({
     query: initialQuery(),
@@ -60,7 +60,7 @@ const PopulationSearchForm = ({
   })
   const [didMount, setDidMount] = useState(false)
   const [searchHistory, addItemToSearchHistory, updateItemInSearchHistory] = useSearchHistory('populationSearch', 8)
-  const [filterProgrammes, setFilterProgrammes] = useState(isAdmin)
+  const [filterProgrammes, setFilterProgrammes] = useState(fullAccessToStudentData)
   const fetchPopulationPromises = useRef()
 
   const setState = newState => setTotalState({ ...totalState, ...newState })
@@ -360,7 +360,7 @@ const PopulationSearchForm = ({
         </Form.Field>
         <Form.Field>
           <div style={{ marginTop: '22px' }}>
-            {isAdmin && (
+            {fullAccessToStudentData && (
               <Radio
                 checked={filterProgrammes}
                 data-cy="toggleFilterProgrammes"
