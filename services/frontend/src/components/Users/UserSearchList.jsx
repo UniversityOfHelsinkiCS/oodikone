@@ -75,9 +75,13 @@ export const UserSearchList = () => {
               <Label.Group>
                 {user.accessgroup
                   .toSorted((a, b) => a.group_code.localeCompare(b.group_code))
-                  .map(({ group_code: code }) => (
-                    <Label content={code} key={code} />
-                  ))}
+                  .map(({ group_code: code }) =>
+                    code === 'fullSisuAccess' ? (
+                      <Label color="orange" content={code} key={code} />
+                    ) : (
+                      <Label content={code} key={code} />
+                    )
+                  )}
               </Label.Group>
             ),
             getRowVal: user => user.accessgroup.map(ag => ag.group_code),
