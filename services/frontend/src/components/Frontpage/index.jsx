@@ -67,8 +67,8 @@ export const FrontPage = () => {
   ]
 
   return (
-    <div>
-      <Container style={{ paddingTop: 50, marginBottom: '20px' }} textAlign="justified">
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <Container style={{ paddingTop: 50, marginBottom: '30px' }} textAlign="justified">
         {showFullChangelog ? (
           <>
             <Header as="h1" style={{ textAlign: 'center' }}>
@@ -116,8 +116,8 @@ export const FrontPage = () => {
           </>
         )}
       </Container>
-      <a href="https://toska.dev/">
-        <Image alt="Logo of Toska" centered size="medium" src={images.toskaLogo} style={{ bottom: 0 }} />
+      <a href="https://toska.dev/" style={{ display: 'inline-block' }}>
+        <Image alt="Logo of Toska" centered size="medium" src={images.toskaLogo} />
       </a>
     </div>
   )
