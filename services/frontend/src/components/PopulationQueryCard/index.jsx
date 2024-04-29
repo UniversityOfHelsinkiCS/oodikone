@@ -6,7 +6,6 @@ import { Card, Icon } from 'semantic-ui-react'
 import { reformatDate } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { DISPLAY_DATE_FORMAT } from '@/constants'
-import './populationQueryCard.css'
 
 export const PopulationQueryCard = ({ population, query, removeSampleFn, units, tags }) => {
   const { getTextIn } = useLanguage()
@@ -20,8 +19,8 @@ export const PopulationQueryCard = ({ population, query, removeSampleFn, units, 
 
   if (students.length > 0) {
     return (
-      <Card className="cardContainer">
-        <Card.Header className="cardHeader">
+      <Card style={{ minWidth: '500px', padding: '0.5em', margin: '0.5em 0' }}>
+        <Card.Header>
           <div>Result details</div>
         </Card.Header>
         <Card.Meta>
@@ -29,20 +28,19 @@ export const PopulationQueryCard = ({ population, query, removeSampleFn, units, 
           <div>{`Updated at ${reformatDate(minBy(students, 'updatedAt').updatedAt, DISPLAY_DATE_FORMAT)} `}</div>
           <div>{studentStatuses.includes('EXCHANGE') ? 'Includes' : 'Excludes'} exchange students</div>
           <div>
-            {studentStatuses.includes('NONDEGREE') ? 'Includes ' : 'Excludes '}
-            students with non-degree study right
+            {studentStatuses.includes('NONDEGREE') ? 'Includes' : 'Excludes'} students with non-degree study right
           </div>
           <div>
-            {studentStatuses.includes('TRANSFERRED') ? 'Includes ' : 'Excludes '}
-            students who have transferred out of this programme
+            {studentStatuses.includes('TRANSFERRED') ? 'Includes' : 'Excludes'} students who have transferred out of
+            this programme
           </div>
         </Card.Meta>
       </Card>
     )
   }
   return (
-    <Card className="cardContainer">
-      <Card.Header className="cardHeader">
+    <Card style={{ minWidth: '500px', padding: '0.5em', margin: '0.5em 0' }}>
+      <Card.Header>
         <div>{header}</div>
         <Icon className="controlIcon" name="remove" onClick={() => removeSampleFn(uuid)} />
       </Card.Header>
@@ -68,5 +66,4 @@ PopulationQueryCard.propTypes = {
   }).isRequired,
   removeSampleFn: func.isRequired,
   units: arrayOf(object).isRequired,
-  tags: arrayOf(shape({})).isRequired,
 }

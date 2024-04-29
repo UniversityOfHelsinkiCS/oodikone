@@ -4,7 +4,6 @@ import { Redirect } from 'react-router-dom'
 import { Card, Segment, Tab } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import '@/components/PopulationQueryCard/populationQueryCard.css'
 import { TeacherStatisticsTable } from '@/components/Teachers/TeacherStatisticsTable'
 import { useGetTeacherQuery } from '@/redux/teachers'
 import { CoursesTab } from './CoursesTab'
@@ -49,9 +48,9 @@ export const TeacherDetails = ({ teacherId }) => {
 
   return (
     <div>
-      <Card className="cardContainer" fluid>
+      <Card fluid>
         <Card.Content>
-          <Card.Header className="cardHeader">{teacher.name}</Card.Header>
+          <Card.Header>{teacher.name}</Card.Header>
           <Card.Meta content={teacher.code} />
           <Card.Meta content={teacher.id} />
         </Card.Content>
