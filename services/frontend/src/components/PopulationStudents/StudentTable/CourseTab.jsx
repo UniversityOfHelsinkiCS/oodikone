@@ -304,7 +304,7 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
               firstColumnSticky
               onlyExportColumns={hiddenNameAndEmailForExcel}
               tableId="course-of-population-students"
-              title="Courses of population'student students"
+              title="Courses of population's students"
             />
           )}
         </div>
