@@ -313,14 +313,7 @@ const PopulationSearchForm = ({
   }
 
   const renderableList = list =>
-    list.map(sp => {
-      const { type, name, code } = sp
-      const shh = { type, name, code }
-      shh.text = getTextIn(sp.name)
-      shh.description = sp.code
-      shh.value = sp.code
-      return shh
-    })
+    list.map(({ type, name, code }) => ({ type, name, code, text: getTextIn(name), description: code, value: code }))
 
   const renderEnrollmentDateSelector = () => {
     const { year } = query
