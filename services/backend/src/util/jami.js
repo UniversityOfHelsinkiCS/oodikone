@@ -11,14 +11,12 @@ const jamiClient = axios.create({
   },
 })
 
-const getUserIamAccess = async (user, attempt = 1) => {
-  if (user.iamGroups.length === 0) return {}
-
-  const { id, iamGroups } = user
+const getUserIamAccess = async (sisPersonId, iamGroups, attempt = 1) => {
+  if (iamGroups.length === 0) return {}
 
   try {
     const { data: iamAccess } = await jamiClient.post('/', {
-      userId: id,
+      userId: sisPersonId,
       iamGroups,
       getSisuAccess: true,
     })
@@ -35,7 +33,7 @@ const getUserIamAccess = async (user, attempt = 1) => {
       return {}
     }
 
-    return getUserIamAccess(user, attempt + 1)
+    return getUserIamAccess(sisPersonId, iamGroups, attempt + 1)
   }
 }
 

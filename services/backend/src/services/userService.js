@@ -314,7 +314,7 @@ const findOne = async id => {
 
   user.iamGroups = userIams
 
-  const { iamAccess, specialGroup } = await getUserIamAccess(user)
+  const { iamAccess, specialGroup } = await getUserIamAccess(user.sisu_person_id, user.iamGroups)
 
   const { accessGroups } = await updateAccessGroups(user.username, userIams, specialGroup)
 
@@ -331,7 +331,7 @@ const getOrganizationAccess = async user => {
 
   if (user.iamGroups.length === 0) return {}
 
-  const { iamAccess, specialGroup } = await getUserIamAccess(user)
+  const { iamAccess, specialGroup } = await getUserIamAccess(user.sisu_person_id ?? user.id, user.iamGroups)
 
   const access = {}
   if (_.isObject(iamAccess)) {
