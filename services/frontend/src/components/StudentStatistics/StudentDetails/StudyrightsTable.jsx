@@ -9,16 +9,13 @@ import { calculatePercentage, getTargetCreditsForProgramme, reformatDate } from 
 import { studentToolTips } from '@/common/InfoToolTips'
 import { HoverableHelpPopup } from '@/components/common/HoverableHelpPopup'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { useGetProgrammesQuery } from '@/redux/populations'
 
-export const StudyrightsTable = ({
-  handleStartDateChange,
-  Programmes,
-  showPopulationStatistics,
-  student,
-  studyrightid,
-}) => {
+export const StudyrightsTable = ({ handleStartDateChange, showPopulationStatistics, student, studyrightid }) => {
   const { getTextIn } = useLanguage()
-  const { programmes } = Programmes
+  const { data: programmesAndStudyTracks } = useGetProgrammesQuery()
+  const programmes = programmesAndStudyTracks?.programmes
+
   const programmeCodes = programmes ? Object.keys(programmes) : []
   const studyRightHeaders = ['Programme', 'Study track', 'Status', 'Completed']
 
@@ -247,7 +244,6 @@ StudyrightsTable.defaultProps = {
 }
 
 StudyrightsTable.propTypes = {
-  Programmes: shape({}).isRequired,
   student: shape({}).isRequired,
   handleStartDateChange: func.isRequired,
   showPopulationStatistics: func.isRequired,

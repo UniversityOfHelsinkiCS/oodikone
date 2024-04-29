@@ -8,7 +8,7 @@ import { Loader, Segment } from 'semantic-ui-react'
 import { bachelorHonoursProgrammes as bachelorCodes, getNewestProgramme } from '@/common'
 import { StudentInfoCard } from '@/components/StudentStatistics/StudentInfoCard'
 import { clearCourseStats } from '@/redux/coursestats'
-import { getProgrammes } from '@/redux/populationProgrammes'
+import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { getStudent, removeStudentSelection, resetStudent } from '@/redux/students'
 import { BachelorHonours } from './BachelorHonours'
@@ -19,13 +19,11 @@ import { TagsTable } from './TagsTable'
 
 const StudentDetails = ({
   student,
-  Programmes,
   studentNumber,
   getStudent,
   student: { semesterenrollments },
   resetStudent,
   removeStudentSelection,
-  getProgrammes,
   pending,
   error,
   fetching,
@@ -33,12 +31,10 @@ const StudentDetails = ({
 }) => {
   const [graphYearStart, setGraphYear] = useState(null)
   const [studyrightid, setStudyrightid] = useState('')
-  const [honoursCode, setHonoursCode] = useState(null)
+  let honoursCode
   const { data: semesters } = useGetSemestersQuery()
-
-  useEffect(() => {
-    getProgrammes()
-  }, [])
+  const { data: programmesAndStudyTracks } = useGetProgrammesQuery()
+  const programmes = programmesAndStudyTracks?.programmes
 
   useEffect(() => {
     setGraphYear(null)
@@ -49,21 +45,14 @@ const StudentDetails = ({
     }
   }, [studentNumber])
 
-  useEffect(() => {
-    if (Programmes.programmes && student && student.studyrights) {
-      const bachelorStudyrights = student.studyrights.filter(studyright => studyright.extentcode === 1)
-      const newestBachelorProgramme = getNewestProgramme(
-        bachelorStudyrights,
-        student.studentNumber,
-        null,
-        Programmes.programmes
-      )
-      // currently only for matlu
-      const shouldRender = bachelorCodes.includes(newestBachelorProgramme.code)
-      if (!shouldRender && honoursCode !== null) setHonoursCode(null)
-      if (shouldRender) setHonoursCode(newestBachelorProgramme.code)
-    }
-  }, [Programmes, student])
+  if (programmes && student && student.studyrights) {
+    const bachelorStudyrights = student.studyrights.filter(studyright => studyright.extentcode === 1)
+    const newestBachelorProgramme = getNewestProgramme(bachelorStudyrights, student.studentNumber, null, programmes)
+    // currently only for matlu
+    const shouldRender = bachelorCodes.includes(newestBachelorProgramme.code)
+    if (!shouldRender && honoursCode !== null) honoursCode = null
+    if (shouldRender) honoursCode = newestBachelorProgramme.code
+  }
 
   const getAbsentYears = () => {
     semesterenrollments.sort((a, b) => a.semestercode - b.semestercode)
@@ -189,7 +178,6 @@ const StudentDetails = ({
       />
       <TagsTable student={student} />
       <StudyrightsTable
-        Programmes={Programmes}
         handleStartDateChange={handleStartDateChange}
         showPopulationStatistics={showPopulationStatistics}
         student={student}
@@ -205,7 +193,6 @@ StudentDetails.propTypes = {
   getStudent: func.isRequired,
   resetStudent: func.isRequired,
   clearCourseStats: func.isRequired,
-  Programmes: shape({}).isRequired,
   removeStudentSelection: func.isRequired,
   studentNumber: string,
   student: shape({
@@ -236,7 +223,6 @@ StudentDetails.propTypes = {
   pending: bool.isRequired,
   error: bool.isRequired,
   fetching: bool.isRequired,
-  getProgrammes: func.isRequired,
 }
 
 StudentDetails.defaultProps = {
@@ -244,12 +230,11 @@ StudentDetails.defaultProps = {
   studentNumber: '',
 }
 
-const mapStateToProps = ({ students, populationProgrammes }) => ({
+const mapStateToProps = ({ students }) => ({
   student: students.data.find(student => student.studentNumber === students.selected),
   pending: students.pending,
   error: students.error,
   fetching: students.fetching,
-  Programmes: populationProgrammes.data || {},
 })
 
 const mapDispatchToProps = {
@@ -257,7 +242,6 @@ const mapDispatchToProps = {
   clearCourseStats,
   resetStudent,
   getStudent,
-  getProgrammes,
 }
 
 export const ConnectedStudentDetails = connect(mapStateToProps, mapDispatchToProps)(StudentDetails)

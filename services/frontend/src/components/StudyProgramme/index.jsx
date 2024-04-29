@@ -1,5 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import React, { useEffect, useState } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
 import { Header, Menu, Segment, Tab } from 'semantic-ui-react'
 
@@ -7,12 +6,12 @@ import { getFullStudyProgrammeRights, getUnifiedProgrammeName } from '@/common'
 import { useTabs, useTitle } from '@/common/hooks'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
-import { getProgrammes } from '@/redux/populationProgrammes'
+import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetProgressCriteriaQuery } from '@/redux/programmeProgressCriteria'
 import { BasicOverview } from './BasicOverview'
 import { DegreeCoursesTable } from './DegreeCourses'
 import { ProgrammeCourses } from './ProgrammeCourses'
-import { ConnectedStudyProgrammeSelector as StudyProgrammeSelector } from './StudyProgrammeSelector'
+import { StudyProgrammeSelector } from './StudyProgrammeSelector'
 import { StudytrackOverview } from './StudytrackOverview'
 import { Tags } from './Tags'
 import { UpdateView } from './UpdateView'
@@ -28,10 +27,10 @@ const createName = (studyProgrammeId, combibedProgrammeId, programmes, language,
 }
 
 export const StudyProgramme = () => {
-  const dispatch = useDispatch()
   const history = useHistory()
   const { studyProgrammeId } = useParams()
-  const programmes = useSelector(state => state.populationProgrammes?.data?.programmes)
+  const { data: programmesAndStudyTracks } = useGetProgrammesQuery()
+  const programmes = programmesAndStudyTracks?.programmes
   const progressCriteria = useGetProgressCriteriaQuery({ programmeCode: studyProgrammeId })
   const { language, getTextIn } = useLanguage()
   const { isAdmin, fullAccessToStudentData, programmeRights } = useGetAuthorizedUserQuery()
@@ -46,10 +45,6 @@ export const StudyProgramme = () => {
   }
   const [criteria, setCriteria] = useState(progressCriteria?.data ? progressCriteria.data : emptyCriteria)
   useTitle('Study programmes')
-
-  useEffect(() => {
-    dispatch(getProgrammes())
-  }, [])
 
   useEffect(() => {
     if (progressCriteria.data) {
@@ -131,13 +126,6 @@ export const StudyProgramme = () => {
     return panes
   }
 
-  const handleSelect = useCallback(
-    programme => {
-      history.push(`/study-programme/${programme}`, { selected: programme })
-    },
-    [history]
-  )
-
   const programmeName = createName(programmeId, secondProgrammeId, programmes, language, getTextIn)
   const programmeLetterId = programmes?.[programmeId]?.progId
   const secondProgrammeLetterId = programmes?.[secondProgrammeId]?.progId
@@ -150,7 +138,7 @@ export const StudyProgramme = () => {
           Study programme
         </Header>
         <Segment className="contentSegment">
-          <StudyProgrammeSelector handleSelect={handleSelect} selected={studyProgrammeId !== undefined} />
+          <StudyProgrammeSelector selected={studyProgrammeId !== undefined} />
         </Segment>
       </div>
     )

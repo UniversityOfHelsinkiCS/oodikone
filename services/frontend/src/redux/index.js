@@ -7,7 +7,6 @@ import { reducer as courseSearch } from './coursesearch'
 import { coursesSummaryFormReducer as courseSummaryForm } from './coursesSummaryForm'
 import { reducer as courseStats } from './coursestats'
 import { reducer as filters } from './filters'
-import { reducer as populationProgrammes } from './populationProgrammes'
 import { reducer as populations } from './populations'
 import { reducer as populationSelectedStudentCourses } from './populationSelectedStudentCourses'
 import { reducer as settings } from './settings'
@@ -19,7 +18,6 @@ export const store = configureStore({
     actionHistory,
     populations,
     populationSelectedStudentCourses,
-    populationProgrammes,
     students,
     settings,
     courseSearch,
