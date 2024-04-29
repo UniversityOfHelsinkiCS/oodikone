@@ -179,8 +179,8 @@ export const PopulationStatistics = () => {
         <div className="segmentContainer" style={{ flexGrow: 1 }}>
           <Header align="center" className="segmentTitle" size="large">
             {title}
-            {location.search !== '' && query?.studyRights?.studyTrack && query?.studyRights?.studyTrack !== '' && (
-              <Header.Subheader> studytrack {query?.studyRights?.studyTrack}</Header.Subheader>
+            {location.search !== '' && query?.studyRights?.studyTrack && (
+              <Header.Subheader>studytrack {query.studyRights.studyTrack}</Header.Subheader>
             )}
             {location.search !== '' && (
               <Header.Subheader>
@@ -193,7 +193,6 @@ export const PopulationStatistics = () => {
             <PopulationSearch combinedProgrammeCode={combinedProgrammeCode} />
             {location.search !== '' ? (
               <PopulationDetails
-                allStudents={samples}
                 curriculum={curriculum}
                 dataExport={
                   <DataExport

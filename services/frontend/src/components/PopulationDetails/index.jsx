@@ -16,7 +16,6 @@ import { CourseTableModeSelector } from './CurriculumPicker'
 import { PopulationCourses } from './PopulationCourses'
 
 export const PopulationDetails = ({
-  allStudents,
   curriculum,
   setCurriculum,
   filteredStudents,
@@ -114,7 +113,6 @@ export const PopulationDetails = ({
             year={query?.year}
           />
           <PopulationCourses
-            allStudents={allStudents}
             courseTableMode={courseTableMode}
             curriculum={curriculum}
             filteredStudents={filteredStudents}
