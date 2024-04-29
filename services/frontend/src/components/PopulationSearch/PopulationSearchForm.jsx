@@ -37,14 +37,7 @@ const initialQuery = () => ({
   months: months('2017', 'FALL'),
 })
 
-const PopulationSearchForm = ({
-  queries,
-  onProgress,
-  clearSelected,
-  getPopulationStatistics,
-  clearPopulations,
-  pending,
-}) => {
+const PopulationSearchForm = ({ queries, onProgress, clearSelected, getPopulationStatistics, clearPopulations }) => {
   const history = useHistory()
   const location = useLocation()
   const { fullAccessToStudentData } = useGetAuthorizedUserQuery()
@@ -58,7 +51,7 @@ const PopulationSearchForm = ({
   const [searchHistory, addItemToSearchHistory, updateItemInSearchHistory] = useSearchHistory('populationSearch', 8)
   const [filterProgrammes, setFilterProgrammes] = useState(fullAccessToStudentData)
   const fetchPopulationPromises = useRef()
-  const { data: programmesAndStudyTracks } = useGetProgrammesQuery()
+  const { data: programmesAndStudyTracks, isLoading: programmesAreLoading } = useGetProgrammesQuery()
   const { programmes = {} } = programmesAndStudyTracks || {}
   const studyProgrammes =
     (programmes.KH90_001 || programmes.MH90_001) && !Object.keys(programmes).includes('KH90_001+MH90_001')
@@ -389,10 +382,10 @@ const PopulationSearchForm = ({
 
   const renderStudyGroupSelector = () => {
     const { studyRights } = query
-    if (pending || !didMount) {
+    if (programmesAreLoading || !didMount) {
       return <Icon color="black" loading name="spinner" size="big" style={{ marginLeft: '45%' }} />
     }
-    if (Object.values(studyProgrammes).length === 0 && !pending) {
+    if (Object.values(studyProgrammes).length === 0 && !programmesAreLoading) {
       return (
         <Message
           color="red"
@@ -468,11 +461,9 @@ const PopulationSearchForm = ({
   )
 }
 
-const mapStateToProps = ({ populations, populationProgrammes }) => {
-  const { pending } = populationProgrammes
+const mapStateToProps = ({ populations }) => {
   return {
     queries: populations.query || {},
-    pending,
   }
 }
 
