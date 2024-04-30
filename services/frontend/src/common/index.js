@@ -401,7 +401,7 @@ export const splitByEmptySpace = str => str.replace(/\s\s+/g, ' ').split(' ')
 export const getCurrentSemester = allSemesters => {
   if (!allSemesters) return null
   return Object.values(allSemesters).find(
-    sem => new Date(sem.startdate) <= new Date() && new Date(sem.enddate) >= new Date()
+    semester => new Date(semester.startdate) <= new Date() && new Date(semester.enddate) >= new Date()
   )
 }
 

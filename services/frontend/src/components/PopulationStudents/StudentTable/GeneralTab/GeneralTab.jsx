@@ -22,8 +22,6 @@ import { createMaps } from './columnHelpers/createMaps'
 import { getSemestersPresentFunctions } from './columnHelpers/semestersPresent'
 import { getStudyProgrammeFunctions } from './columnHelpers/studyProgramme'
 
-const NUMBER_OF_DISPLAYED_SEMESTERS = 6
-
 export const GeneralTab = ({
   group,
   populations,
@@ -394,11 +392,12 @@ export const GeneralTab = ({
     }
   }
 
+  const semestersToDisplay = (moment().year() - parseInt(year, 10)) * 2
   const currentSemesterCode = getCurrentSemester(allSemestersMap)?.semestercode
   const semestersToInclude = _.range(
     isFall(currentSemesterCode)
-      ? currentSemesterCode - NUMBER_OF_DISPLAYED_SEMESTERS + 2
-      : currentSemesterCode - NUMBER_OF_DISPLAYED_SEMESTERS + 1,
+      ? currentSemesterCode - semestersToDisplay + 2
+      : currentSemesterCode - semestersToDisplay + 1,
     isFall(currentSemesterCode) ? currentSemesterCode + 2 : currentSemesterCode + 1
   )
 
