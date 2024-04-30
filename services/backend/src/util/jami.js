@@ -52,8 +52,8 @@ const getUserIams = async userId => {
   }
 }
 
-const getAllUserAccess = async () => {
-  const { data } = await jamiClient.get('/all-access')
+const getAllUserAccess = async userIds => {
+  const { data } = await jamiClient.post('access-and-special-groups', { userIds })
 
   return data
 }

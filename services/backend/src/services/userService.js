@@ -280,7 +280,9 @@ const findAll = async () => {
     include: userIncludes,
   })
 
-  const userAccess = await getAllUserAccess()
+  const userIds = allUsers.map(user => user.dataValues.sisu_person_id)
+
+  const userAccess = await getAllUserAccess(userIds)
 
   const userAccessMap = userAccess.reduce((obj, cur) => {
     obj[cur.id] = cur
