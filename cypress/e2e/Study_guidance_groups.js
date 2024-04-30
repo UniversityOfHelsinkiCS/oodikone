@@ -155,7 +155,17 @@ describe('Study guidance group tests', () => {
           'Latest attainment date',
           'Tags',
         ]
-        const secondRowHeadings = ['All', 'HOPS', 'Since 1.8.2018']
+        const secondRowHeadings = [
+          'All',
+          'HOPS',
+          'Since 1.8.2018',
+          'Syksy 2021',
+          'Kevät 2022',
+          'Syksy 2022',
+          'Kevät 2023',
+          'Syksy 2023',
+          'Kevät 2024',
+        ]
         cy.cs('Students (3)').click()
         cy.get('[data-cy="student-table-tabs"] table thead tr').then($tr => {
           const firstRowTexts = Array.from($tr[0].children).map(elem => elem.innerText.replace('\n', ' '))
