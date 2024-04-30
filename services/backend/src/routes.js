@@ -72,7 +72,7 @@ module.exports = (app, url) => {
   app.use(`${url}/feedback`, feedback)
   app.use(`${url}/custom-population-search`, customPopulationSearch)
   app.use(`${url}/studyguidancegroups`, auth.roles(['studyGuidanceGroups']), studyGuidanceGroups)
-  app.use(`${url}/close-to-graduation`, auth.roles(['admin']), closeToGraduation)
+  app.use(`${url}/close-to-graduation`, auth.roles(['fullSisuAccess']), closeToGraduation)
   app.get('*', async (_, res) => {
     const results = { error: 'unknown endpoint' }
     res.status(404).json(results)

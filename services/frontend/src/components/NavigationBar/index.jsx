@@ -106,7 +106,7 @@ export const NavigationBar = () => {
       item.key === 'languageCenterView'
     )
       return true
-    if (item.key === 'closeToGraduation' && checkUserAccess(['admin'], roles)) return true
+    if (item.key === 'closeToGraduation' && checkUserAccess(['admin', 'fullSisuAccess'], roles)) return true
     return false
   }
 
