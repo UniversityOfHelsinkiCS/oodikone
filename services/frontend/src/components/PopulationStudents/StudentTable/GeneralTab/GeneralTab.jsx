@@ -3,11 +3,9 @@ import moment from 'moment'
 import React, { useState } from 'react'
 
 import {
-  getCurrentSemester,
   getEnrollmentTypeTextForExcel,
   getHighestGradeOfCourseBetweenRange,
   getStudentTotalCredits,
-  isFall,
   reformatDate,
 } from '@/common'
 import { getCopyableEmailColumn, getCopyableStudentNumberColumn, hiddenNameAndEmailForExcel } from '@/common/columns'
@@ -312,16 +310,17 @@ export const GeneralTab = ({
   let creditsColumn = null
   const creditColumnKeys = columnKeysToInclude.filter(key => key.indexOf('credits.') === 0)
 
-  const { getSemesterEnrollmentsContent, getSemesterEnrollmentsVal } = getSemestersPresentFunctions({
-    allSemesters,
-    allSemestersMap,
-    filteredStudents,
-    getTextIn,
-    programmeCode,
-    studentToSecondStudyrightEndMap,
-    studentToStudyrightEndMap,
-    year,
-  })
+  const { getFirstSemester, getLastSemester, getSemesterEnrollmentsContent, getSemesterEnrollmentsVal } =
+    getSemestersPresentFunctions({
+      allSemesters,
+      allSemestersMap,
+      filteredStudents,
+      getTextIn,
+      programmeCode,
+      studentToSecondStudyrightEndMap,
+      studentToStudyrightEndMap,
+      year,
+    })
 
   const { getStudyProgrammeContent, studentProgrammesMap, getStudyStartDate } = getStudyProgrammeFunctions({
     coursecode,
@@ -392,14 +391,7 @@ export const GeneralTab = ({
     }
   }
 
-  const semestersToDisplay = (moment().year() - parseInt(year, 10)) * 2
-  const currentSemesterCode = getCurrentSemester(allSemestersMap)?.semestercode
-  const semestersToInclude = _.range(
-    isFall(currentSemesterCode)
-      ? currentSemesterCode - semestersToDisplay + 2
-      : currentSemesterCode - semestersToDisplay + 1,
-    isFall(currentSemesterCode) ? currentSemesterCode + 2 : currentSemesterCode + 1
-  )
+  const semestersToInclude = _.range(getFirstSemester(), getLastSemester())
 
   const columnsAvailable = {
     lastname: { key: 'lastname', title: 'Last name', getRowVal: student => student.lastname, export: false },

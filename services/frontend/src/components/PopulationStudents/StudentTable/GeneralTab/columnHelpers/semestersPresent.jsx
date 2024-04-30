@@ -164,7 +164,13 @@ export const getSemestersPresentFunctions = ({
     )
   }
 
+  const getFirstSemester = () => firstSemester
+
+  const getLastSemester = () => lastSemester
+
   return {
+    getFirstSemester,
+    getLastSemester,
     getSemesterEnrollmentsContent,
     getSemesterEnrollmentsVal,
   }
