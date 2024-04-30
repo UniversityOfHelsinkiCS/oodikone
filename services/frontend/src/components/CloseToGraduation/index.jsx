@@ -2,27 +2,25 @@ import _ from 'lodash'
 import React, { useState } from 'react'
 import { Divider, Dropdown, Form, Icon, Loader, Message, Radio } from 'semantic-ui-react'
 
-import { createLocaleComparator, getCurrentSemester, isFall, reformatDate } from '@/common'
+import {
+  createLocaleComparator,
+  getCurrentSemester,
+  getEnrollmentTypeTextForExcel,
+  isFall,
+  reformatDate,
+} from '@/common'
 import { useTitle } from '@/common/hooks'
 import { StudentInfoItem } from '@/components/common/StudentInfoItem'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { getSemestersPresentFunctions } from '@/components/PopulationStudents/StudentTable/GeneralTab/columnHelpers/semestersPresent'
 import { PaginatedSortableTable } from '@/components/SortableTable/PaginatedSortableTable'
 import { StudentNameVisibilityToggle, useStudentNameVisibility } from '@/components/StudentNameVisibilityToggle'
 import { useGetStudentsCloseToGraduationQuery } from '@/redux/closeToGraduation'
 import { useFilteredAndFormattedElementDetails } from '@/redux/elementdetails'
 import { useGetFacultiesQuery } from '@/redux/facultyStats'
 import { useGetSemestersQuery } from '@/redux/semesters'
-import { getSemestersPresentFunctions } from '../PopulationStudents/StudentTable/GeneralTab/columnHelpers/semestersPresent'
 
 const NUMBER_OF_DISPLAYED_SEMESTERS = 6
-
-const getEnrollmentTypeTextForExcel = (type, statutoryAbsence) => {
-  if (type === 1) return 'Present'
-  if (type === 2 && statutoryAbsence) return 'Absent (statutory)'
-  if (type === 2) return 'Absent'
-  if (type === 3) return 'Not enrolled'
-  return 'No study right'
-}
 
 const getColumns = (
   getTextIn,
@@ -125,12 +123,14 @@ const getColumns = (
       key: 'semesterEnrollmentsForExcel',
       title: 'Enrollment status',
       displayColumn: false,
-      children: semestersToInclude.map(sem => ({
-        key: `${sem}`,
-        title: getTextIn(allSemestersMap[`${sem}`]?.name),
+      children: semestersToInclude.map(semester => ({
+        key: `${semester}`,
+        title: getTextIn(allSemestersMap[`${semester}`]?.name),
         displayColumn: false,
         getRowVal: student => {
-          const enrollment = student.studyright.semesterEnrollments.find(e => e.semestercode === sem)
+          const enrollment = student.studyright.semesterEnrollments.find(
+            enrollment => enrollment.semestercode === semester
+          )
           return getEnrollmentTypeTextForExcel(enrollment?.enrollmenttype, enrollment?.statutoryAbsence)
         },
       })),

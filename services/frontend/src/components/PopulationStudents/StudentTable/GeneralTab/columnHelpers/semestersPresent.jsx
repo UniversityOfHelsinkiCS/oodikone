@@ -7,17 +7,16 @@ import { getCurrentSemester, isFall, isMastersProgramme } from '@/common'
 export const getSemestersPresentFunctions = ({
   allSemesters,
   allSemestersMap,
-  year,
   filteredStudents,
-  studentToStudyrightEndMap,
-  studentToSecondStudyrightEndMap,
   getTextIn,
   programmeCode,
+  studentToSecondStudyrightEndMap,
+  studentToStudyrightEndMap,
+  year,
 }) => {
   if (allSemesters?.length === 0 || !filteredStudents)
     return {
       getSemesterEnrollmentsContent: () => {},
-      getSemesterEnrollmentsForExcel: () => {},
       getSemesterEnrollmentsVal: () => {},
     }
 
@@ -154,23 +153,6 @@ export const getSemestersPresentFunctions = ({
     return <div style={{ display: 'flex', gap: '4px' }}>{semesterIcons}</div>
   }
 
-  const getSemesterEnrollmentsForExcel = student => {
-    if (allSemesters?.length === 0) return ''
-    if (!student.semesterenrollments?.length > 0) return ''
-    let enrollmentsString = `Starting from ${getTextIn(
-      allSemestersMap[student.semesterenrollments[0].semestercode].name
-    )}: `
-    for (let sem = firstSemester; sem <= lastSemester; sem++) {
-      const type = student.semesterEnrollmentsMap[sem]
-      let sign = '_'
-      if (type === 1) sign = '+'
-      if (type === 2) sign = 'o'
-      enrollmentsString += sign
-    }
-
-    return enrollmentsString
-  }
-
   const getSemesterEnrollmentsVal = (student, studyright) => {
     if (!student && !studyright) return 0
     const enrollmentsToCount = studyright ? studyright.semesterEnrollments : student.semesterenrollments
@@ -184,7 +166,6 @@ export const getSemestersPresentFunctions = ({
 
   return {
     getSemesterEnrollmentsContent,
-    getSemesterEnrollmentsForExcel,
     getSemesterEnrollmentsVal,
   }
 }

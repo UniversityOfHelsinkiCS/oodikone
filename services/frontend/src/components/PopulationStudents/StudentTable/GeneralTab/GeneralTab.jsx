@@ -2,7 +2,14 @@ import _ from 'lodash'
 import moment from 'moment'
 import React, { useState } from 'react'
 
-import { getHighestGradeOfCourseBetweenRange, getStudentTotalCredits, reformatDate } from '@/common'
+import {
+  getCurrentSemester,
+  getEnrollmentTypeTextForExcel,
+  getHighestGradeOfCourseBetweenRange,
+  getStudentTotalCredits,
+  isFall,
+  reformatDate,
+} from '@/common'
 import { getCopyableEmailColumn, getCopyableStudentNumberColumn, hiddenNameAndEmailForExcel } from '@/common/columns'
 import { creditDateFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
@@ -14,6 +21,8 @@ import { useGetSemestersQuery } from '@/redux/semesters'
 import { createMaps } from './columnHelpers/createMaps'
 import { getSemestersPresentFunctions } from './columnHelpers/semestersPresent'
 import { getStudyProgrammeFunctions } from './columnHelpers/studyProgramme'
+
+const NUMBER_OF_DISPLAYED_SEMESTERS = 6
 
 export const GeneralTab = ({
   group,
@@ -295,29 +304,35 @@ export const GeneralTab = ({
     return genders[genderCode]
   }
 
+  const getStudyright = student => {
+    const studyright = student.studyrights.find(studyright =>
+      studyright.studyright_elements.some(element => element.code === programmeCode)
+    )
+    return studyright
+  }
+
   let creditsColumn = null
   const creditColumnKeys = columnKeysToInclude.filter(key => key.indexOf('credits.') === 0)
 
-  const { getSemesterEnrollmentsContent, getSemesterEnrollmentsForExcel, getSemesterEnrollmentsVal } =
-    getSemestersPresentFunctions({
-      programmeCode,
-      filteredStudents,
-      allSemesters,
-      allSemestersMap,
-      year,
-      studentToStudyrightEndMap,
-      studentToSecondStudyrightEndMap,
-      getTextIn,
-    })
+  const { getSemesterEnrollmentsContent, getSemesterEnrollmentsVal } = getSemestersPresentFunctions({
+    allSemesters,
+    allSemestersMap,
+    filteredStudents,
+    getTextIn,
+    programmeCode,
+    studentToSecondStudyrightEndMap,
+    studentToStudyrightEndMap,
+    year,
+  })
 
   const { getStudyProgrammeContent, studentProgrammesMap, getStudyStartDate } = getStudyProgrammeFunctions({
-    selectedStudents,
-    students,
-    programmeCode,
     coursecode,
-    studentToProgrammeStartMap,
     elementDetails: populationStatistics.elementdetails.data,
     getTextIn,
+    programmeCode,
+    selectedStudents,
+    students,
+    studentToProgrammeStartMap,
   })
 
   const availableCreditsColumns = {
@@ -379,6 +394,14 @@ export const GeneralTab = ({
     }
   }
 
+  const currentSemesterCode = getCurrentSemester(allSemestersMap)?.semestercode
+  const semestersToInclude = _.range(
+    isFall(currentSemesterCode)
+      ? currentSemesterCode - NUMBER_OF_DISPLAYED_SEMESTERS + 2
+      : currentSemesterCode - NUMBER_OF_DISPLAYED_SEMESTERS + 1,
+    isFall(currentSemesterCode) ? currentSemesterCode + 2 : currentSemesterCode + 1
+  )
+
   const columnsAvailable = {
     lastname: { key: 'lastname', title: 'Last name', getRowVal: student => student.lastname, export: false },
     firstname: { key: 'firstname', title: 'Given names', getRowVal: student => student.firstnames, export: false },
@@ -425,10 +448,25 @@ export const GeneralTab = ({
     semesterEnrollments: {
       key: 'semesterEnrollments',
       title: 'Semesters\npresent',
+      export: false,
       filterType: 'range',
       getRowContent: student => getSemesterEnrollmentsContent(student),
       getRowVal: student => getSemesterEnrollmentsVal(student),
-      getRowExportVal: student => getSemesterEnrollmentsForExcel(student),
+    },
+    semesterEnrollmentsForExcel: {
+      key: 'semesterEnrollmentsForExcel',
+      title: 'Enrollment status',
+      displayColumn: false,
+      children: semestersToInclude.map(semester => ({
+        key: `${semester}`,
+        title: getTextIn(allSemestersMap[`${semester}`]?.name),
+        displayColumn: false,
+        getRowVal: student => {
+          const studyright = getStudyright(student)
+          const enrollment = studyright.semester_enrollments.find(enrollment => enrollment.semestercode === semester)
+          return getEnrollmentTypeTextForExcel(enrollment?.enrollmenttype, enrollment?.statutoryAbsence)
+        },
+      })),
     },
     endDate: {
       key: 'endDate',
@@ -487,9 +525,7 @@ export const GeneralTab = ({
       key: 'admissionType',
       title: 'Admission type',
       getRowVal: student => {
-        const studyright = student.studyrights.find(studyright =>
-          studyright.studyright_elements.some(element => element.code === programmeCode)
-        )
+        const studyright = getStudyright(student)
         const admissionType = studyright && studyright.admission_type ? studyright.admission_type : 'Ei valintatapaa'
         return admissionType !== 'Koepisteet' ? admissionType : 'Valintakoe'
       },

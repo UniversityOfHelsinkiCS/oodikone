@@ -502,3 +502,11 @@ export const getAge = date => {
   }
   return age
 }
+
+export const getEnrollmentTypeTextForExcel = (type, statutoryAbsence) => {
+  if (type === 1) return 'Present'
+  if (type === 2 && statutoryAbsence) return 'Absent (statutory)'
+  if (type === 2) return 'Absent'
+  if (type === 3) return 'Not enrolled'
+  return 'No study right'
+}

@@ -45,7 +45,8 @@ export const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) =
         'latestAttainmentDate',
         'priority',
         'semesterEnrollments',
-        'semesterEnrollmentsAmount'
+        'semesterEnrollmentsAmount',
+        'semesterEnrollmentsForExcel'
       )
     if (studyGuidanceGroup?.tags?.studyProgramme && studyGuidanceGroup?.tags?.year) {
       columns.push(
@@ -68,6 +69,7 @@ export const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) =
         'endDate',
         'semesterEnrollments',
         'semesterEnrollmentsAmount',
+        'semesterEnrollmentsForExcel',
         'studyrightStart',
         'studyStartDate',
         'studyStartDateActual'
@@ -101,6 +103,7 @@ export const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) =
       'programme',
       'semesterEnrollments',
       'semesterEnrollmentsAmount',
+      'semesterEnrollmentsForExcel',
       'startYear',
       'studyrightStart',
       'studyStartDate',
