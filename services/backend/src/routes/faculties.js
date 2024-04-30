@@ -21,6 +21,7 @@ const {
 } = require('../services/faculty/facultyService')
 const logger = require('../util/logger')
 const { getFacultyList } = require('../services/faculty/facultyHelpers')
+const auth = require('../middleware/auth')
 
 // Faculty uses a lot of tools designed for Study programme.
 // Some of them have been copied here and slightly edited for faculty purpose.
@@ -30,7 +31,7 @@ router.get('/', async (req, res) => {
   res.json(facultyList)
 })
 
-router.get('/:id/basicstats', async (req, res) => {
+router.get('/:id/basicstats', auth.roles(['facultyStatistics', 'katselmusViewer']), async (req, res) => {
   const code = req.params.id
   const yearType = req.query?.year_type
   const programmeFilter = req.query?.programme_filter
@@ -65,14 +66,14 @@ router.get('/:id/basicstats', async (req, res) => {
   return res.json(updatedStats)
 })
 
-router.get('/:id/creditstats', async (req, res) => {
+router.get('/:id/creditstats', auth.roles(['facultyStatistics', 'katselmusViewer']), async (req, res) => {
   const code = req.params.id
   const { year_type: yearType } = req.query
   const stats = await getFacultyCredits(code, yearType === 'ACADEMIC_YEAR')
   return res.json(stats)
 })
 
-router.get('/:id/thesisstats', async (req, res) => {
+router.get('/:id/thesisstats', auth.roles(['facultyStatistics', 'katselmusViewer']), async (req, res) => {
   const code = req.params.id
   const yearType = req.query?.year_type
   const specialGroups = req.query?.special_groups
@@ -90,7 +91,7 @@ router.get('/:id/thesisstats', async (req, res) => {
   return res.json(updateStats)
 })
 
-router.get('/:id/graduationtimes', async (req, res) => {
+router.get('/:id/graduationtimes', auth.roles(['facultyStatistics', 'katselmusViewer']), async (req, res) => {
   const code = req.params.id
   const programmeFilter = req.query?.programme_filter
 
@@ -106,7 +107,7 @@ router.get('/:id/graduationtimes', async (req, res) => {
   return res.json(updatedStats)
 })
 
-router.get('/:id/progressstats', async (req, res) => {
+router.get('/:id/progressstats', auth.roles(['facultyStatistics', 'katselmusViewer']), async (req, res) => {
   const code = req.params.id
   const specialGroups = req.query?.special_groups
   const graduated = req.query?.graduated
@@ -124,7 +125,7 @@ router.get('/:id/progressstats', async (req, res) => {
   return res.json(updateStats)
 })
 
-router.get('/:id/studentstats', async (req, res) => {
+router.get('/:id/studentstats', auth.roles(['facultyStatistics', 'katselmusViewer']), async (req, res) => {
   const code = req.params.id
   const specialGroups = req.query?.special_groups
   const graduated = req.query?.graduated
@@ -142,7 +143,7 @@ router.get('/:id/studentstats', async (req, res) => {
   return res.json(updateStats)
 })
 
-router.get('/:id/update_basicview', async (req, res) => {
+router.get('/:id/update_basicview', auth.roles(['facultyStatistics', 'katselmusViewer']), async (req, res) => {
   const code = req.params.id
   const statsType = req.query?.stats_type
   if (code) {
@@ -152,7 +153,7 @@ router.get('/:id/update_basicview', async (req, res) => {
   return res.status(422).end()
 })
 
-router.get('/:id/update_progressview', async (req, res) => {
+router.get('/:id/update_progressview', auth.roles(['facultyStatistics', 'katselmusViewer']), async (req, res) => {
   const code = req.params.id
   if (code) {
     let result = null

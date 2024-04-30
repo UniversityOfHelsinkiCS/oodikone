@@ -64,7 +64,7 @@ module.exports = (app, url) => {
   app.use(`${url}/changelog`, changelog)
   app.use(`${url}/completedcoursessearch`, completedCoursesSearch)
   app.use(`${url}/languagecenterdata`, languageCenterData)
-  app.use(`${url}/faculties`, auth.roles(['facultyStatistics', 'katselmusViewer']), faculties)
+  app.use(`${url}/faculties`, faculties)
   app.use(`${url}/university`, university)
   app.use(`${url}/updater`, auth.roles(['admin']), updater)
   app.use(`${url}/teachers`, auth.roles(['teachers']), teachers)
