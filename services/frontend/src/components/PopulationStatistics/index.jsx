@@ -151,7 +151,10 @@ export const PopulationStatistics = () => {
   const noStudentsMessage = () => (
     <div style={{ maxWidth: '80%' }}>
       <Message
-        content="Choose “Advanced settings” below and make sure you have the correct student groups included in the class. For example, if you are looking for students of a specialist training in medicine or dentistry, you must choose “Students with non-degree study right”."
+        content={`
+          Choose “Advanced settings” below and make sure you have the correct student groups included
+          in the class. For example, if you are looking for students of a specialist training in
+          medicine or dentistry, you must choose “Students with non-degree study right”.`}
         header="Not seeing any students?"
         icon="question"
         info
@@ -159,6 +162,8 @@ export const PopulationStatistics = () => {
       />
     </div>
   )
+
+  const selected = query?.studyRights?.studyTrack ? [query?.studyRights?.studyTrack] : undefined
 
   return (
     <FilterView
@@ -170,6 +175,9 @@ export const PopulationStatistics = () => {
         },
         [hopsFilter.key]: {
           studyStart: (students[0] || {}).studyrightStart,
+        },
+        [studyTrackFilter.key]: {
+          selected,
         },
       }}
       name="PopulationStatistics"

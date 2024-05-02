@@ -7,7 +7,7 @@ import { Dropdown, Form } from 'semantic-ui-react'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { createFilter } from './createFilter'
 
-const StudyTrackFilterCard = ({ options, onOptionsChange, withoutSelf, activeAt, code }) => {
+const StudyTrackFilterCard = ({ activeAt, code, onOptionsChange, options, withoutSelf }) => {
   const { selected } = options
   const { getTextIn } = useLanguage()
 
@@ -72,7 +72,7 @@ export const studyTrackFilter = createFilter({
   defaultOptions: {
     selected: [],
   },
-  isActive: ({ selected }) => selected.length > 0,
+  isActive: ({ selected }) => (selected !== undefined ? selected.length > 0 : false),
   filter: (student, { selected, args }) => {
     const activeAt = _.get(args, 'activeAt', moment())
 
