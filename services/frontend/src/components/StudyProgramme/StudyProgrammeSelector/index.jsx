@@ -1,7 +1,7 @@
 import { debounce } from 'lodash'
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Form, Header, Loader, Message } from 'semantic-ui-react'
+import { Form, FormField, FormInput, Header, Loader, Message } from 'semantic-ui-react'
 
 import { createLocaleComparator, getUnifiedProgrammeName } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -13,8 +13,13 @@ const StudyProgrammeFilter = ({ handleFilterChange, studyProgrammes }) => {
 
   return (
     <Form>
-      Filter programmes:
-      <Form.Input onChange={event => handleFilterChange(event.target.value)} width="4" />
+      <FormField>
+        <label style={{ marginBottom: '10px' }}>Filter programmes</label>
+        <FormInput
+          onChange={event => handleFilterChange(event.target.value)}
+          placeholder="Type here to filter study programmes"
+        />
+      </FormField>
     </Form>
   )
 }
@@ -125,6 +130,7 @@ export const StudyProgrammeSelector = ({ selected }) => {
   return (
     <>
       <StudyProgrammeFilter handleFilterChange={handleFilterChange} studyProgrammes={studyProgrammes} />
+      {filteredStudyprogrammes.length === 0 && <Message>No programmes found</Message>}
       <StudyProgrammeTable header="Combined programmes" headers={headers} programmes={combinedProgrammes} />
       <StudyProgrammeTable header="Bachelor programmes" headers={headers} programmes={bachelorProgrammes} />
       <StudyProgrammeTable header="Master programmes" headers={headers} programmes={masterProgrammes} />
