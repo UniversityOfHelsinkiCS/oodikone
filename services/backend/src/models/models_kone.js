@@ -186,6 +186,20 @@ const StudyGuidanceGroupTag = sequelizeKone.define(
   { underscored: true, timestamps: true }
 )
 
+const StudyProgrammePin = sequelizeKone.define(
+  'study_programme_pins',
+  {
+    userId: {
+      primaryKey: true,
+      type: Sequelize.INTEGER,
+    },
+    studyProgrammes: {
+      type: Sequelize.ARRAY(Sequelize.STRING),
+    },
+  },
+  { underscored: true, timestamps: false }
+)
+
 TagStudent.belongsTo(Tag, { foreignKey: 'tag_id', sourceKey: 'tag_id' })
 Tag.hasMany(TagStudent, { foreignKey: 'tag_id', sourceKey: 'tag_id' })
 
@@ -197,4 +211,5 @@ module.exports = {
   ExcludedCourse,
   StudyGuidanceGroupTag,
   ProgressCriteria,
+  StudyProgrammePin,
 }
