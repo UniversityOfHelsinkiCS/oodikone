@@ -80,7 +80,7 @@ filterType: options are 'date', 'range' and 'multi' (or default if left empty). 
   for examples and documentation (at least multiSelectFilter.jsx has a good description how it works)
 getRowVal: Get single cell value. This will be used for sorting and filtering, and displayed unless overridden.
 getRowContent: Single cell JSX: Overrides getRowVal for value to display, but does not affect excel
-getRowExport: Overrides getRowVal for excel
+getRowExportVal: Overrides getRowVal for excel
 formatValue: Same as getRowContent, but avoids recalculating value already calculated in getRowVal.
 
 --- Miscellaneous information ---
