@@ -487,7 +487,16 @@ export const GeneralTab = ({
       filterType: 'multi',
       getRowContent: student => getStudyProgrammeContent(student),
       getRowVal: student => {
-        return studentProgrammesMap[student.studentNumber]?.programmes.map(programme => getTextIn(programme.name))
+        const programmesToUse = programmeCode
+          ? studentProgrammesMap[student.studentNumber]?.programmes.filter(prog => prog.code !== programmeCode)
+          : studentProgrammesMap[student.studentNumber]?.programmes
+        return programmesToUse.map(programme => getTextIn(programme.name))
+      },
+      getRowExportVal: student => {
+        const programmesToUse = programmeCode
+          ? studentProgrammesMap[student.studentNumber]?.programmes.filter(prog => prog.code !== programmeCode)
+          : studentProgrammesMap[student.studentNumber]?.programmes
+        return programmesToUse.map(programme => getTextIn(programme.name)).join('; ')
       },
       cellProps: student => {
         return { title: studentProgrammesMap[student.studentNumber]?.getProgrammesList('\n') }

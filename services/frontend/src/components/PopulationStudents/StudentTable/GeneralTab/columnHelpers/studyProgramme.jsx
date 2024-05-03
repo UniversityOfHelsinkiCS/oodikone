@@ -88,7 +88,7 @@ export const getStudyProgrammeFunctions = ({
     }
     if (programmeCode) {
       const otherProgrammes = programmes.filter(programme => programme.code !== programmeCode)
-      return otherProgrammes.length > 0 ? otherProgrammes[0].name : programmes[0].name
+      return otherProgrammes.length > 0 ? otherProgrammes[0].name : ''
     }
     if (programmes.length > 0) return programmes[0].name
     return noProgramme
@@ -99,18 +99,23 @@ export const getStudyProgrammeFunctions = ({
       programmes: getStudentsProgrammes(students[studentNumber]),
     }
 
+    const programmesToUse = programmeCode
+      ? res[studentNumber].programmes.filter(p => p.code !== programmeCode)
+      : res[studentNumber].programmes
+
     const programmeToShow = getProgrammeToShow(res[studentNumber].programmes)
 
-    if (programmeToShow) res[studentNumber].programmeToShow = getTextIn(programmeToShow)
+    if (programmeToShow) {
+      res[studentNumber].programmeToShow = getTextIn(programmeToShow)
+    } else {
+      res[studentNumber].programmeToShow = ''
+    }
+
     res[studentNumber].getProgrammesList = delimiter =>
-      res[studentNumber].programmes
+      programmesToUse
         .map(programme => {
-          if (programme.graduated) {
-            return `${getTextIn(programme.name)} (graduated)`
-          }
-          if (!programme.active && !programme.code?.startsWith('0000')) {
-            return `${getTextIn(programme.name)} (inactive)`
-          }
+          if (programme.graduated) return `${getTextIn(programme.name)} (graduated)`
+          if (!programme.active && !programme.code?.startsWith('0000')) return `${getTextIn(programme.name)} (inactive)`
           return getTextIn(programme.name)
         })
         .join(delimiter)
@@ -120,17 +125,26 @@ export const getStudyProgrammeFunctions = ({
   const getStudyProgrammeContent = student => {
     const programme = studentProgrammesMap[student.studentNumber]?.programmeToShow
 
-    if (!programme) return getTextIn(noProgramme)
+    if (!programme) {
+      if (programmeCode) return ''
+      return getTextIn(noProgramme)
+    }
+
+    const programmesToUse = programmeCode
+      ? studentProgrammesMap[student.studentNumber].programmes.filter(p => p.code !== programmeCode)
+      : studentProgrammesMap[student.studentNumber].programmes
+
     const formattedProgramme = programme.length > 45 ? `${programme.substring(0, 43)}...` : programme
-    if (studentProgrammesMap[student.studentNumber]?.programmes.length > 1) {
+    if (programmesToUse.length > 1) {
       return (
         <div>
-          {formattedProgramme} + {studentProgrammesMap[student.studentNumber].programmes.length - 1}
+          {formattedProgramme} + {programmesToUse.length - 1}
         </div>
       )
     }
     return formattedProgramme
   }
+
   const getStudyStartDate = student => {
     if (programmeCode !== undefined) {
       return reformatDate(studentToProgrammeStartMap[student.studentNumber], 'YYYY-MM-DD')
