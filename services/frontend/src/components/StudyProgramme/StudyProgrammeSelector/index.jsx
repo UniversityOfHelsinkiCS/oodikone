@@ -8,16 +8,38 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SortableTable } from '@/components/SortableTable'
 import { useGetProgrammesQuery } from '@/redux/populations'
 
-const StudyProgrammeLink = ({ programmeCode, linkText }) => (
+const StudyProgrammeFilter = ({ handleFilterChange, studyProgrammes }) => {
+  if (studyProgrammes.length <= 10) return null
+
+  return (
+    <Form>
+      Filter programmes:
+      <Form.Input onChange={event => handleFilterChange(event.target.value)} width="4" />
+    </Form>
+  )
+}
+
+const StudyProgrammeLink = ({ linkText, programmeCode }) => (
   <Link style={{ color: 'black' }} to={`/study-programme/${programmeCode}`}>
     {linkText}
   </Link>
 )
 
+const StudyProgrammeTable = ({ header, headers, programmes }) => {
+  if (programmes == null || programmes.length === 0) return null
+
+  return (
+    <>
+      <Header>{header}</Header>
+      <SortableTable columns={headers} data={programmes} hideHeaderBar />
+    </>
+  )
+}
+
 export const StudyProgrammeSelector = ({ selected }) => {
   const { getTextIn } = useLanguage()
   const { data: programmesAndStudyTracks } = useGetProgrammesQuery()
-  const studyprogrammes = Object.values(programmesAndStudyTracks?.programmes || {})
+  const studyProgrammes = Object.values(programmesAndStudyTracks?.programmes || {})
   const [filter, setFilter] = useState('')
   const handleFilterChange = debounce(value => {
     setFilter(value)
@@ -30,31 +52,37 @@ export const StudyProgrammeSelector = ({ selected }) => {
   const localeComparator = createLocaleComparator('code')
 
   if (selected) return null
-  if (!studyprogrammes) return <Loader active>Loading</Loader>
+  if (!studyProgrammes) return <Loader active>Loading</Loader>
 
   const headers = [
     {
-      key: 'programmecode',
-      title: 'code',
-      getRowVal: prog => prog.combinedCode ?? prog.code,
-      getRowContent: prog => <StudyProgrammeLink linkText={prog.combinedCode ?? prog.code} programmeCode={prog.code} />,
+      key: 'programmeCode',
+      title: 'Code',
+      getRowVal: programme => programme.combinedCode ?? programme.code,
+      getRowContent: programme => (
+        <StudyProgrammeLink linkText={programme.combinedCode ?? programme.code} programmeCode={programme.code} />
+      ),
     },
     {
       key: 'programmeId',
-      title: 'id',
-      getRowVal: prog => prog.progId ?? `${prog.code}-id`,
-      getRowContent: prog => <StudyProgrammeLink linkText={prog.progId ?? ''} programmeCode={prog.code} />,
+      title: 'Id',
+      getRowVal: programme => programme.progId ?? `${programme.code}-id`,
+      getRowContent: programme => (
+        <StudyProgrammeLink linkText={programme.progId ?? ''} programmeCode={programme.code} />
+      ),
     },
     {
-      key: 'programmename',
-      title: 'name',
-      getRowVal: prog => getTextIn(prog.name),
-      getRowContent: prog => <StudyProgrammeLink linkText={getTextIn(prog.name)} programmeCode={prog.code} />,
+      key: 'programmeName',
+      title: 'Name',
+      getRowVal: programme => getTextIn(programme.name),
+      getRowContent: programme => (
+        <StudyProgrammeLink linkText={getTextIn(programme.name)} programmeCode={programme.code} />
+      ),
     },
   ]
 
   const combinations = { KH90_001: 'MH90_001' }
-  const filteredStudyprogrammes = studyprogrammes
+  const filteredStudyprogrammes = studyProgrammes
     .sort(localeComparator)
     .filter(
       programme =>
@@ -66,7 +94,7 @@ export const StudyProgrammeSelector = ({ selected }) => {
   for (const programme of filteredStudyprogrammes) {
     if (programme.code === 'KH90_001') {
       const secondProgrammeCode = combinations[programme.code]
-      const secondProgramme = studyprogrammes.filter(programme => programme.code === secondProgrammeCode)
+      const secondProgramme = studyProgrammes.filter(programme => programme.code === secondProgrammeCode)
 
       const combinedName = {
         fi: getUnifiedProgrammeName(getTextIn(programme.name, 'fi'), getTextIn(secondProgramme[0]?.name, 'fi'), 'fi'),
@@ -92,46 +120,16 @@ export const StudyProgrammeSelector = ({ selected }) => {
     }
   }
 
-  if (studyprogrammes == null) return <Message>You do not have access to any programmes</Message>
+  if (studyProgrammes == null) return <Message>You do not have access to any programmes</Message>
 
   return (
     <>
-      {studyprogrammes.length > 10 && (
-        <Form>
-          Filter programmes:
-          <Form.Input onChange={event => handleFilterChange(event.target.value)} width="4" />
-        </Form>
-      )}
-      {combinedProgrammes.length > 0 && (
-        <>
-          <Header>Combined programmes</Header>
-          <SortableTable columns={headers} data={combinedProgrammes} hideHeaderBar />
-        </>
-      )}
-      {bachelorProgrammes.length > 0 && (
-        <>
-          <Header>Bachelor programmes</Header>
-          <SortableTable columns={headers} data={bachelorProgrammes} hideHeaderBar />
-        </>
-      )}
-      {masterProgrammes.length > 0 && (
-        <>
-          <Header>Master programmes</Header>
-          <SortableTable columns={headers} data={masterProgrammes} hideHeaderBar />
-        </>
-      )}
-      {doctoralProgrammes.length > 0 && (
-        <>
-          <Header>Doctoral programmes</Header>
-          <SortableTable columns={headers} data={doctoralProgrammes} hideHeaderBar />
-        </>
-      )}
-      {otherProgrammes.length > 0 && (
-        <>
-          <Header>Specialization programmes and old programmes</Header>
-          <SortableTable columns={headers} data={otherProgrammes} hideHeaderBar />
-        </>
-      )}
+      <StudyProgrammeFilter handleFilterChange={handleFilterChange} studyProgrammes={studyProgrammes} />
+      <StudyProgrammeTable header="Combined programmes" headers={headers} programmes={combinedProgrammes} />
+      <StudyProgrammeTable header="Bachelor programmes" headers={headers} programmes={bachelorProgrammes} />
+      <StudyProgrammeTable header="Master programmes" headers={headers} programmes={masterProgrammes} />
+      <StudyProgrammeTable header="Doctoral programmes" headers={headers} programmes={doctoralProgrammes} />
+      <StudyProgrammeTable header="Other programmes" headers={headers} programmes={otherProgrammes} />
     </>
   )
 }
