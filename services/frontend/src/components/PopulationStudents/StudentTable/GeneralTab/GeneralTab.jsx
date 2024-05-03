@@ -446,19 +446,16 @@ export const GeneralTab = ({
       key: 'semesterEnrollmentsForExcel',
       title: 'Enrollment status',
       displayColumn: false,
-      children:
-        getFirstSemester &&
-        getLastSemester &&
-        _.range(getFirstSemester(), getLastSemester()).map(semester => ({
-          key: `${semester}`,
-          title: getTextIn(allSemestersMap[`${semester}`]?.name),
-          displayColumn: false,
-          getRowVal: student => {
-            const studyright = getStudyright(student)
-            const enrollment = studyright.semester_enrollments.find(enrollment => enrollment.semestercode === semester)
-            return getEnrollmentTypeTextForExcel(enrollment?.enrollmenttype, enrollment?.statutoryAbsence)
-          },
-        })),
+      children: _.range(getFirstSemester(), getLastSemester() + 1).map(semester => ({
+        key: `${semester}`,
+        title: getTextIn(allSemestersMap[`${semester}`]?.name),
+        displayColumn: false,
+        getRowVal: student => {
+          const studyright = getStudyright(student)
+          const enrollment = studyright.semester_enrollments.find(enrollment => enrollment.semestercode === semester)
+          return getEnrollmentTypeTextForExcel(enrollment?.enrollmenttype, enrollment?.statutoryAbsence)
+        },
+      })),
     },
     endDate: {
       key: 'endDate',

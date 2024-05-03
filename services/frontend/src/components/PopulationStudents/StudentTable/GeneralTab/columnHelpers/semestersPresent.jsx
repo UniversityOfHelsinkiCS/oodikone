@@ -18,6 +18,8 @@ export const getSemestersPresentFunctions = ({
     return {
       getSemesterEnrollmentsContent: () => {},
       getSemesterEnrollmentsVal: () => {},
+      getFirstSemester: () => {},
+      getLastSemester: () => {},
     }
 
   const { semestercode: currentSemesterCode } = getCurrentSemester(allSemestersMap) || {}
