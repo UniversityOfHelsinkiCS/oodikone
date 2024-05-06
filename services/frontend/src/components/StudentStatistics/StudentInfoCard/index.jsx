@@ -1,19 +1,17 @@
-import React, { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import React from 'react'
 import { Button, Card, Icon } from 'semantic-ui-react'
 
 import { callApi } from '@/apiConnection'
 import { reformatDate } from '@/common'
 import { SisuLinkItem } from '@/components/common/SisuLinkItem'
+import { useStudentNameVisibility } from '@/components/StudentNameVisibilityToggle'
 import { DISPLAY_DATE_FORMAT, DISPLAY_DATE_FORMAT_DEV } from '@/constants'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
-import { removeStudentSelection, resetStudent } from '@/redux/students'
 import { EnrollmentAccordion } from './EnrollmentAccordion'
 import './studentInfoCard.css'
 
 export const StudentInfoCard = ({ student }) => {
-  const dispatch = useDispatch()
-  const { namesVisible: showName } = useSelector(state => state.settings)
+  const { visible: showName } = useStudentNameVisibility()
   const { isAdmin } = useGetAuthorizedUserQuery()
   const name = showName ? `${student.name}, ` : ''
   const email = showName && student.email ? `${student.email}` : ''
@@ -23,13 +21,6 @@ export const StudentInfoCard = ({ student }) => {
   const updateStudent = async () => {
     await callApi('/updater/update/v2/customlist/students', 'post', [student.studentNumber])
   }
-
-  useEffect(() => {
-    return () => {
-      dispatch(resetStudent())
-      dispatch(removeStudentSelection())
-    }
-  }, [])
 
   return (
     <Card fluid>

@@ -4,8 +4,8 @@ import { Header, Segment } from 'semantic-ui-react'
 
 import { useTitle } from '@/common/hooks'
 import { StudentNameVisibilityToggle } from '@/components/StudentNameVisibilityToggle'
-import { ConnectedStudentDetails as StudentDetails } from './StudentDetails'
-import { ConnectedStudentSearch as StudentSearch } from './StudentSearch'
+import { StudentDetails } from './StudentDetails'
+import { StudentSearch } from './StudentSearch'
 
 export const StudentStatistics = () => {
   const { studentNumber } = useParams()
@@ -19,8 +19,7 @@ export const StudentStatistics = () => {
       <StudentNameVisibilityToggle />
       <div style={{ alignContent: 'center', margin: 'auto' }}>
         <Segment className="contentSegment">
-          <StudentSearch studentNumber={studentNumber} />
-          <StudentDetails studentNumber={studentNumber} />
+          {studentNumber ? <StudentDetails studentNumber={studentNumber} /> : <StudentSearch />}
         </Segment>
       </div>
     </div>

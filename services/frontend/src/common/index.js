@@ -56,8 +56,6 @@ export const getUnifiedProgrammeName = (bachelor, masterLisentiate, language) =>
   return bachelor
 }
 
-export const containsOnlyNumbers = str => str.match('^\\d+$')
-
 export const momentFromFormat = (date, format) => moment(date, format)
 
 export const isFall = semester => semester % 2 === 1
@@ -71,6 +69,8 @@ export const reformatDate = (date, outputFormat) => {
 }
 
 export const byDateDesc = (a, b) => new Date(b.date) - new Date(a.date)
+
+export const byDateAsc = (a, b) => new Date(a.date) - new Date(b.date)
 
 export const getTimestamp = () => moment().format('YYYY-MM-DD')
 

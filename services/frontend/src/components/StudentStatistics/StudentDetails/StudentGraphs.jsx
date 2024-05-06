@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import ReactHighcharts from 'react-highcharts/ReactHighstock'
 import { Input, Menu, Message, Tab } from 'semantic-ui-react'
 
-import { byDateDesc, getStudyRightElementTargetDates, reformatDate } from '@/common'
+import { byDateAsc, getStudyRightElementTargetDates, reformatDate } from '@/common'
 import { CreditAccumulationGraphHighCharts } from '@/components/CreditAccumulationGraphHighCharts'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 
@@ -109,7 +109,7 @@ const semesterChunkify = (courses, semesterenrollments, semesters, getTextIn) =>
 }
 
 const gradeMeanSeries = (student, chunksize, semesters, getTextIn) => {
-  const sortedCourses = student.courses.sort(byDateDesc).reverse()
+  const sortedCourses = student.courses.toSorted(byDateAsc)
   const filterCourses = sortedCourses.filter(
     course => Number(course.grade) && !course.isStudyModuleCredit && course.passed
   )

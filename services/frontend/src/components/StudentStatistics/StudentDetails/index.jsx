@@ -1,49 +1,27 @@
 import { isEmpty, sortBy } from 'lodash'
 import moment from 'moment'
-import { arrayOf, bool, func, number, shape, string } from 'prop-types'
-import React, { useEffect, useState } from 'react'
-import { connect } from 'react-redux'
-import { Loader, Segment } from 'semantic-ui-react'
+import React, { useState } from 'react'
+import { Loader, Message, Segment } from 'semantic-ui-react'
 
 import { bachelorHonoursProgrammes as bachelorCodes, getNewestProgramme } from '@/common'
 import { StudentInfoCard } from '@/components/StudentStatistics/StudentInfoCard'
-import { clearCourseStats } from '@/redux/coursestats'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
-import { getStudent, removeStudentSelection, resetStudent } from '@/redux/students'
+import { useGetStudentQuery } from '@/redux/students'
 import { BachelorHonours } from './BachelorHonours'
 import { CourseParticipationTable } from './CourseParticipationTable'
 import { StudentGraphs } from './StudentGraphs'
 import { StudyrightsTable } from './StudyrightsTable'
 import { TagsTable } from './TagsTable'
 
-const StudentDetails = ({
-  student,
-  studentNumber,
-  getStudent,
-  student: { semesterenrollments },
-  resetStudent,
-  removeStudentSelection,
-  pending,
-  error,
-  fetching,
-  clearCourseStats,
-}) => {
+export const StudentDetails = ({ studentNumber }) => {
   const [graphYearStart, setGraphYear] = useState(null)
   const [studyrightid, setStudyrightid] = useState('')
   let honoursCode
   const { data: semesters } = useGetSemestersQuery()
   const { data: programmesAndStudyTracks } = useGetProgrammesQuery()
   const programmes = programmesAndStudyTracks?.programmes
-
-  useEffect(() => {
-    setGraphYear(null)
-    if (studentNumber.length > 0) getStudent(studentNumber)
-    else {
-      resetStudent()
-      removeStudentSelection()
-    }
-  }, [studentNumber])
+  const { data: student, isLoading, isError } = useGetStudentQuery(studentNumber)
 
   if (programmes && student && student.studyrights) {
     const bachelorStudyrights = student.studyrights.filter(studyright => studyright.extentcode === 1)
@@ -55,7 +33,7 @@ const StudentDetails = ({
   }
 
   const getAbsentYears = () => {
-    semesterenrollments.sort((a, b) => a.semestercode - b.semestercode)
+    const semesterEnrollments = student.semesterenrollments.toSorted((a, b) => a.semestercode - b.semestercode)
     const acualSemesters = semesters?.semesters ?? {}
 
     if (!acualSemesters) return []
@@ -74,13 +52,13 @@ const StudentDetails = ({
       )[0],
       10
     )
-    const mappedSemesterenrollments = semesterenrollments.reduce(
+    const mappedSemesterenrollments = semesterEnrollments.reduce(
       (res, curr) => ({ ...res, [curr.semestercode]: curr }),
       {}
     )
     const patchedSemesterenrollments = []
-    if (semesterenrollments.length) {
-      let runningSemestercode = semesterenrollments[0].semestercode
+    if (semesterEnrollments.length) {
+      let runningSemestercode = semesterEnrollments[0].semestercode
       while (runningSemestercode <= latestSemester) {
         if (!mappedSemesterenrollments[runningSemestercode])
           patchedSemesterenrollments.push({ semestercode: runningSemestercode, enrollmenttype: -1 })
@@ -157,15 +135,13 @@ const StudentDetails = ({
     setStudyrightid(id)
   }
 
-  if (fetching) return <Loader active={fetching} />
-  if ((pending || !studentNumber || isEmpty(student) || !semesters) && !error) return null
-  if (error) {
-    return (
-      <Segment textAlign="center">
-        <p>Student not found or no sufficient permissions</p>
-      </Segment>
-    )
-  }
+  if (isLoading) return <Loader active />
+
+  if ((!studentNumber || isEmpty(student) || !semesters) && !isError) return null
+
+  if (isError)
+    return <Message header="Student not found or no sufficient permissions" icon="warning sign" negative size="big" />
+
   return (
     <Segment className="contentSegment">
       <StudentInfoCard student={student} />
@@ -184,64 +160,7 @@ const StudentDetails = ({
         studyrightid={studyrightid}
       />
       {honoursCode && <BachelorHonours absentYears={getAbsentYears()} programmeCode={honoursCode} student={student} />}
-      <CourseParticipationTable clearCourseStats={clearCourseStats} student={student} studyrightid={studyrightid} />
+      <CourseParticipationTable clearCourseStats={() => {}} student={student} studyrightid={studyrightid} />
     </Segment>
   )
 }
-
-StudentDetails.propTypes = {
-  getStudent: func.isRequired,
-  resetStudent: func.isRequired,
-  clearCourseStats: func.isRequired,
-  removeStudentSelection: func.isRequired,
-  studentNumber: string,
-  student: shape({
-    courses: arrayOf(
-      shape({
-        course: shape({
-          code: string,
-          name: Object,
-        }),
-        credits: number,
-        date: string,
-        grade: string,
-        passed: bool,
-      })
-    ),
-    credits: number,
-    fetched: bool,
-    started: string,
-    studentNumber: string,
-    tags: arrayOf(
-      shape({
-        programme: shape({ code: string, name: shape({}) }),
-        studentnumber: string,
-        tag: shape({ studytrack: string, tagname: string }),
-      })
-    ),
-  }),
-  pending: bool.isRequired,
-  error: bool.isRequired,
-  fetching: bool.isRequired,
-}
-
-StudentDetails.defaultProps = {
-  student: {},
-  studentNumber: '',
-}
-
-const mapStateToProps = ({ students }) => ({
-  student: students.data.find(student => student.studentNumber === students.selected),
-  pending: students.pending,
-  error: students.error,
-  fetching: students.fetching,
-})
-
-const mapDispatchToProps = {
-  removeStudentSelection,
-  clearCourseStats,
-  resetStudent,
-  getStudent,
-}
-
-export const ConnectedStudentDetails = connect(mapStateToProps, mapDispatchToProps)(StudentDetails)

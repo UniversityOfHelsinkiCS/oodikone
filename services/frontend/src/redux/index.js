@@ -11,14 +11,12 @@ import { reducer as populations } from './populations'
 import { reducer as populationSelectedStudentCourses } from './populationSelectedStudentCourses'
 import { reducer as settings } from './settings'
 import { reducer as singleCourseStats } from './singleCourseStats'
-import { reducer as students } from './students'
 
 export const store = configureStore({
   reducer: {
     actionHistory,
     populations,
     populationSelectedStudentCourses,
-    students,
     settings,
     courseSearch,
     courseStats,

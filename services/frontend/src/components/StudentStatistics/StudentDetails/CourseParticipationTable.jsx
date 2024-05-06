@@ -1,4 +1,3 @@
-import { func, shape } from 'prop-types'
 import React, { Fragment } from 'react'
 import { Link } from 'react-router-dom'
 import { Divider, Header, Icon, Item } from 'semantic-ui-react'
@@ -21,7 +20,7 @@ export const CourseParticipationTable = ({ student, clearCourseStats, studyright
 
   const studyPlan = student?.studyplans.find(plan => plan.studyrightid === studyrightid)
 
-  student.courses.sort(byDateDesc).forEach(studentCourse => {
+  student.courses.toSorted(byDateDesc).forEach(studentCourse => {
     const { course, credits, credittypecode, date, grade, isOpenCourse, isStudyModuleCredit, passed } = studentCourse
     const isIncluded = isInStudyPlan(studyPlan, course.code)
 
@@ -110,9 +109,4 @@ export const CourseParticipationTable = ({ student, clearCourseStats, studyright
       {courseTables}
     </>
   )
-}
-
-CourseParticipationTable.propTypes = {
-  student: shape({}).isRequired,
-  clearCourseStats: func.isRequired,
 }
