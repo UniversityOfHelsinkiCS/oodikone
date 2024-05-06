@@ -166,7 +166,11 @@ export const StudyProgrammeSelector = ({ selected }) => {
   return (
     <>
       <StudyProgrammeFilter handleFilterChange={handleFilterChange} studyProgrammes={studyProgrammes} />
-      {filteredStudyProgrammes.length === 0 && <Message>No programmes found</Message>}
+      {filteredStudyProgrammes.length === 0 && (
+        <div style={{ marginTop: '20px', width: '600px' }}>
+          <Message>No programmes found</Message>
+        </div>
+      )}
       <StudyProgrammeTable header="Combined programmes" headers={headers} programmes={combinedProgrammes} />
       <StudyProgrammeTable header="Bachelor programmes" headers={headers} programmes={bachelorProgrammes} />
       <StudyProgrammeTable header="Master programmes" headers={headers} programmes={masterProgrammes} />

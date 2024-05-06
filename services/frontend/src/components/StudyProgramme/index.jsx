@@ -131,17 +131,19 @@ export const StudyProgramme = () => {
   const secondProgrammeLetterId = programmes?.[secondProgrammeId]?.progId
   const panes = getPanes()
 
-  if (!studyProgrammeId)
+  if (!studyProgrammeId) {
     return (
       <div className="segmentContainer">
         <Header className="segmentTitle" size="large">
-          Study programme
+          Study programmes
         </Header>
         <Segment className="contentSegment">
           <StudyProgrammeSelector selected={studyProgrammeId !== undefined} />
         </Segment>
       </div>
     )
+  }
+
   return (
     <div className="segmentContainer">
       <Segment className="contentSegment">
