@@ -7,6 +7,7 @@ import { hiddenNameAndEmailForExcel } from '@/common/columns'
 import { StudentInfoItem } from '@/components/common/StudentInfoItem'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SortableTable, row } from '@/components/SortableTable'
+import { useStudentNameVisibility } from '@/components/StudentNameVisibilityToggle'
 import '@/components/PopulationCourseStats/populationCourseStats.css'
 import '@/components/PopulationStudents/populationStudents.css'
 import { useGetStudyGuidanceGroupPopulationCoursesQuery } from '@/redux/studyGuidanceGroups'
@@ -42,7 +43,7 @@ const getMandatoryPassed = (mandatoryCourses, populationCourses, studyGuidanceCo
 
 const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
   const { getTextIn } = useLanguage()
-  const namesVisible = useSelector(state => state?.settings?.namesVisible)
+  const { visible: namesVisible } = useStudentNameVisibility()
   const mandatoryCourses = curriculum
   const { data: populationCourses, pending } = useSelector(state => state?.populationSelectedStudentCourses)
   const mandatoryPassed = useMemo(

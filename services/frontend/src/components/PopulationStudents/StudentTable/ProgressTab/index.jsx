@@ -1,7 +1,6 @@
 import { keyBy } from 'lodash'
 import moment from 'moment'
 import React, { useMemo } from 'react'
-import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Icon, Message, Tab } from 'semantic-ui-react'
 
@@ -9,6 +8,7 @@ import { StudentInfoItem } from '@/components/common/StudentInfoItem'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import '@/components/StudentStatistics/StudentInfoCard/studentInfoCard.css'
 import { SortableTable } from '@/components/SortableTable'
+import { useStudentNameVisibility } from '@/components/StudentNameVisibilityToggle'
 
 const findRowContent = (student, courseCode, year, start, end, criteria) => {
   if (courseCode.includes('Credits'))
@@ -67,7 +67,7 @@ const createEmptyHidden = nthHiddenColumn => {
 }
 
 export const ProgressTable = ({ curriculum, criteria, students, months, programme, studyGuidanceGroupProgramme }) => {
-  const namesVisible = useSelector(state => state?.settings?.namesVisible)
+  const { visible: namesVisible } = useStudentNameVisibility()
   const { getTextIn } = useLanguage()
   const isStudyGuidanceGroupProgramme = studyGuidanceGroupProgramme !== ''
   const creditMonths = [12, 24, 36, 48, 60, 72]
