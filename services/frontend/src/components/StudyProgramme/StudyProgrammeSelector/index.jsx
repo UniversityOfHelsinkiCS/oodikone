@@ -1,18 +1,23 @@
 import { debounce } from 'lodash'
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Form, FormField, FormInput, Header, Loader, Message } from 'semantic-ui-react'
+import { Button, Form, FormField, FormInput, Header, Icon, Loader, Message } from 'semantic-ui-react'
 
 import { createLocaleComparator, getUnifiedProgrammeName } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SortableTable } from '@/components/SortableTable'
 import { useGetProgrammesQuery } from '@/redux/populations'
+import {
+  useAddStudyProgrammePinMutation,
+  useGetStudyProgrammePinsQuery,
+  useRemoveStudyProgrammePinMutation,
+} from '@/redux/studyProgrammePins'
 
 const StudyProgrammeFilter = ({ handleFilterChange, studyProgrammes }) => {
   if (studyProgrammes.length <= 10) return null
 
   return (
-    <Form>
+    <Form style={{ width: '600px' }}>
       <FormField>
         <label style={{ marginBottom: '10px' }}>Filter programmes</label>
         <FormInput
@@ -29,6 +34,20 @@ const StudyProgrammeLink = ({ linkText, programmeCode }) => (
     {linkText}
   </Link>
 )
+
+const PinButton = ({ onClick, pinned, programmeCode }) => {
+  return (
+    <Button
+      icon
+      onClick={() => {
+        onClick({ programmeCode })
+      }}
+      style={{ background: 'none', padding: '5px' }}
+    >
+      <Icon name={pinned ? 'bookmark' : 'bookmark outline'} />
+    </Button>
+  )
+}
 
 const StudyProgrammeTable = ({ header, headers, programmes }) => {
   if (programmes == null || programmes.length === 0) return null
@@ -55,9 +74,14 @@ export const StudyProgrammeSelector = ({ selected }) => {
   const otherProgrammes = []
   const combinedProgrammes = []
   const localeComparator = createLocaleComparator('code')
+  const [addStudyProgrammePins] = useAddStudyProgrammePinMutation()
+  const [removeStudyProgrammePins] = useRemoveStudyProgrammePinMutation()
+  const studyProgrammePins = useGetStudyProgrammePinsQuery().data
 
   if (selected) return null
   if (!studyProgrammes) return <Loader active>Loading</Loader>
+
+  const isPinned = programmeCode => studyProgrammePins?.studyProgrammes?.includes(programmeCode)
 
   const headers = [
     {
@@ -84,10 +108,22 @@ export const StudyProgrammeSelector = ({ selected }) => {
         <StudyProgrammeLink linkText={getTextIn(programme.name)} programmeCode={programme.code} />
       ),
     },
+    {
+      key: 'pin',
+      title: 'Pin',
+      getRowVal: programme => programme.code,
+      getRowContent: programme => (
+        <PinButton
+          onClick={isPinned(programme.code) ? removeStudyProgrammePins : addStudyProgrammePins}
+          pinned={isPinned(programme.code)}
+          programmeCode={programme.code}
+        />
+      ),
+    },
   ]
 
   const combinations = { KH90_001: 'MH90_001' }
-  const filteredStudyprogrammes = studyProgrammes
+  const filteredStudyProgrammes = studyProgrammes
     .sort(localeComparator)
     .filter(
       programme =>
@@ -96,7 +132,7 @@ export const StudyProgrammeSelector = ({ selected }) => {
         (programme.progId && programme.progId.toLowerCase().includes(filter.toLocaleLowerCase()))
     )
 
-  for (const programme of filteredStudyprogrammes) {
+  for (const programme of filteredStudyProgrammes) {
     if (programme.code === 'KH90_001') {
       const secondProgrammeCode = combinations[programme.code]
       const secondProgramme = studyProgrammes.filter(programme => programme.code === secondProgrammeCode)
@@ -130,7 +166,7 @@ export const StudyProgrammeSelector = ({ selected }) => {
   return (
     <>
       <StudyProgrammeFilter handleFilterChange={handleFilterChange} studyProgrammes={studyProgrammes} />
-      {filteredStudyprogrammes.length === 0 && <Message>No programmes found</Message>}
+      {filteredStudyProgrammes.length === 0 && <Message>No programmes found</Message>}
       <StudyProgrammeTable header="Combined programmes" headers={headers} programmes={combinedProgrammes} />
       <StudyProgrammeTable header="Bachelor programmes" headers={headers} programmes={bachelorProgrammes} />
       <StudyProgrammeTable header="Master programmes" headers={headers} programmes={masterProgrammes} />

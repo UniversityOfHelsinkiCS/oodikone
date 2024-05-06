@@ -108,7 +108,7 @@ export const handleRequest = store => next => async action => {
 // All tags used for invalidating cache must be defined here
 export const RTKApi = createApi({
   reducerPath: 'api',
-  tagTypes: ['StudyGuidanceGroups', 'Semester', 'CustomPopulationSearches', 'Tags', 'Students'],
+  tagTypes: ['CustomPopulationSearches', 'Semester', 'Students', 'StudyGuidanceGroups', 'StudyProgrammePins', 'Tags'],
   baseQuery: fetchBaseQuery({
     baseUrl: apiBasePath,
     prepareHeaders: headers => {

@@ -34,6 +34,7 @@ const customOpenUniSearch = require('./routes/customOpenUniSearch')
 const studyProgrammeCriteria = require('./routes/studyProgrammeCriteria')
 const completedCoursesSearch = require('./routes/completedCoursesSearch')
 const closeToGraduation = require('./routes/closeToGraduation')
+const studyProgrammePins = require('./routes/studyProgrammePins')
 const initializeSentry = require('./util/sentry')
 
 module.exports = (app, url) => {
@@ -73,6 +74,7 @@ module.exports = (app, url) => {
   app.use(`${url}/custom-population-search`, customPopulationSearch)
   app.use(`${url}/studyguidancegroups`, auth.roles(['studyGuidanceGroups']), studyGuidanceGroups)
   app.use(`${url}/close-to-graduation`, auth.roles(['fullSisuAccess']), closeToGraduation)
+  app.use(`${url}/study-programme-pins`, studyProgrammePins)
   app.get('*', async (_, res) => {
     const results = { error: 'unknown endpoint' }
     res.status(404).json(results)
