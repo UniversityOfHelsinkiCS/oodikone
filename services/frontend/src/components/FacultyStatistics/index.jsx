@@ -95,7 +95,7 @@ export const FacultyStatistics = () => {
 
   const panes = getPanes()
 
-  if (!facultyCode)
+  if (!facultyCode) {
     return (
       <div className="segmentContainer">
         <Header className="segmentTitle" size="large">
@@ -106,6 +106,7 @@ export const FacultyStatistics = () => {
         </Segment>
       </div>
     )
+  }
 
   return (
     <div className="segmentContainer" data-cy="FacultySegmentContainer">

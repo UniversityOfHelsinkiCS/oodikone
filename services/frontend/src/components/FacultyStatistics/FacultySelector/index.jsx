@@ -1,7 +1,7 @@
 import { debounce } from 'lodash'
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Form, Message, Header } from 'semantic-ui-react'
+import { Form, FormField, FormInput, Message, Header } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SortableTable } from '@/components/SortableTable'
@@ -93,16 +93,22 @@ export const FacultySelector = ({ faculties, selected }) => {
 
   return (
     <div data-cy="select-faculty">
-      <Form>
-        Filter faculties:
-        <Form.Input onChange={event => handleFilterChange(event.target.value)} width="4" />
+      <Form style={{ width: '402px' }}>
+        <FormField>
+          <label style={{ marginBottom: '10px' }}>Filter faculties</label>
+          <FormInput
+            onChange={event => handleFilterChange(event.target.value)}
+            placeholder="Type here to filter faculties"
+          />
+        </FormField>
+        {filteredFaculties.length === 0 && <Message>No faculties found</Message>}
       </Form>
-      {filteredFaculties.length > 0 ? (
+      {filteredFaculties.length > 0 && (
         <>
           <Header>Faculties</Header>
           <SortableTable columns={headers} data={filteredFaculties} hideHeaderBar />
         </>
-      ) : null}
+      )}
     </div>
   )
 }
