@@ -199,7 +199,7 @@ export const CloseToGraduation = () => {
     year: `${new Date().getFullYear() - Math.floor(NUMBER_OF_DISPLAYED_SEMESTERS / 2)}`,
   })
 
-  const handleRowCountChange = count => setRowCount(count)
+  const handleDisplayedDataChange = students => setRowCount(students.length)
 
   const columns = getColumns(
     getTextIn,
@@ -295,7 +295,7 @@ export const CloseToGraduation = () => {
           columns={columns}
           data={filteredStudents}
           featureName="students_close_to_graduation"
-          handleRowCountChange={handleRowCountChange}
+          handleDisplayedDataChange={handleDisplayedDataChange}
           rowCount={rowCount}
           rowsPerPage={200}
           title={`Students close to graduation (${rowCount} out of ${students.length} students selected)`}

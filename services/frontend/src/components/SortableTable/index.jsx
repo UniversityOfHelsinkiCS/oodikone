@@ -47,7 +47,7 @@ expandedGroups: Array (or set?) of keys of rows are supposed to be expanded. The
     only in population of courses
 maxHeight: Overwrite the maximum height. Defaults to 80vh if not set.
 useFilteredDataOnExport: If true, uses filtered data (the data that's shown after applying all the selected filters) on exports. Defaults to true.
-handleRowCountChange: A function that is called with the row count when it changes. Can be used to update the state in the parent component.
+handleDisplayedDataChange: A function that is called with the displayed data when it changes. Can be used to update the state in the parent component.
 pageNumber: The current page number, used for pagination (should be used through the component PaginatedSortableTable).
 rowsPerPage: The number of rows per page, used for pagination (should be used through the component PaginatedSortableTable).
 
@@ -99,7 +99,7 @@ export const SortableTable = ({
   expandedGroups,
   featureName = 'export',
   firstColumnSticky = false,
-  handleRowCountChange,
+  handleDisplayedDataChange,
   hideHeaderBar,
   maxHeight = '80vh',
   onlyExportColumns = [],
@@ -164,8 +164,8 @@ export const SortableTable = ({
   )
 
   useEffect(() => {
-    if (handleRowCountChange) handleRowCountChange(sortedData.length)
-  }, [sortedData.length])
+    if (handleDisplayedDataChange) handleDisplayedDataChange(sortedData)
+  }, [sortedData])
 
   const tableStyles = {
     position: 'relative',
