@@ -34,8 +34,8 @@ const userIncludes = [
   },
 ]
 
-const accessGroupsByCodes = codes =>
-  AccessGroup.findAll({
+const accessGroupsByCodes = async codes =>
+  await AccessGroup.findAll({
     where: {
       group_code: {
         [Op.in]: codes,
@@ -255,13 +255,7 @@ const updateAccessGroups = async (username, iamGroups = [], specialGroup = {}, s
   if (katselmusViewer) newAccessGroups.push('katselmusViewer')
   if (fullSisuAccess) newAccessGroups.push('fullSisuAccess')
 
-  const accessGroups = await AccessGroup.findAll({
-    where: {
-      group_code: {
-        [Op.in]: newAccessGroups,
-      },
-    },
-  })
+  const accessGroups = await accessGroupsByCodes(newAccessGroups)
 
   // In the difference method "the order and references of result values are determined by the first array." https://lodash.com/docs/4.17.15#difference
   // Both directions needs to be checked in order to update roles when the access should no longer exists.

@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import _ from 'lodash'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Button, Icon, Label, Loader, Popup, Segment } from 'semantic-ui-react'
+import { Button, Label, Loader, Popup, Segment } from 'semantic-ui-react'
 
 import { reformatDate } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -13,17 +14,22 @@ export const UserSearchList = () => {
   const { getTextIn } = useLanguage()
   const [popupTimeout, setPopupTimeout] = useState(null)
   const [popupOpen, setPopupOpen] = useState(false)
+  const [userEmails, setUserEmails] = useState([])
   const { data: users = [], isLoading, isError } = useGetAllUsersQuery()
   const { data: elementdetails = [] } = useGetAllElementDetailsQuery()
   const showAsUser = useShowAsUser()
 
   const copyEmailsToClipboard = () => {
-    const clipboardString = users
-      .filter(u => u.email)
-      .map(u => u.email)
-      .join('; ')
-    navigator.clipboard.writeText(clipboardString)
+    navigator.clipboard.writeText(userEmails.join('; '))
   }
+
+  const handleDisplayedDataChange = useCallback(
+    users => {
+      const newEmails = users.filter(u => u.email).map(u => u.email)
+      if (!_.isEqual(newEmails, userEmails)) setUserEmails(newEmails)
+    },
+    [userEmails]
+  )
 
   useEffect(() => {
     return () => clearTimeout(popupTimeout)
@@ -92,6 +98,7 @@ export const UserSearchList = () => {
             sortable: false,
             filterType: 'multi',
             getRowVal: user => {
+              if (user.accessgroup.some(ag => ag.group_code === 'fullSisuAccess')) return []
               const uniqueRights = new Set(user.programmeRights.map(r => r.code))
               const programmeNames = []
               uniqueRights.forEach(right => {
@@ -100,21 +107,8 @@ export const UserSearchList = () => {
               })
               return programmeNames
             },
-            getRowContent: user => {
-              if (user.programmeRights.length === 0) return null
-
-              const uniqueRights = new Set(user.programmeRights.map(r => r.code))
-
-              const nameInLanguage = code => {
-                const element = elementdetails.find(element => element.code === code)
-                return element ? getTextIn(element.name) : null
-              }
-
-              const [firstProgrammeRight] = uniqueRights
-              const name = nameInLanguage(firstProgrammeRight)
-              if (!name) return `${uniqueRights.size} programmes`
-              return uniqueRights.size > 1 ? `${name} + ${uniqueRights.size - 1} others` : name
-            },
+            formatValue: programmes =>
+              programmes.length > 1 ? `${programmes[0]} + ${programmes.length - 1} others` : programmes[0],
           },
           {
             key: 'IAMGROUPS',
@@ -135,12 +129,7 @@ export const UserSearchList = () => {
             title: 'Last login',
             filterType: 'date',
             getRowVal: user => (user.last_login ? new Date(user.last_login) : null),
-            getRowContent: user =>
-              user.last_login ? (
-                <p>{reformatDate(user.last_login, 'DD.MM.YYYY')}</p>
-              ) : (
-                <p style={{ color: 'gray' }}>Not saved</p>
-              ),
+            getRowContent: user => user.last_login && <p>{reformatDate(user.last_login, 'DD.MM.YYYY')}</p>,
           },
           {
             key: 'SHOWAS',
@@ -153,18 +142,25 @@ export const UserSearchList = () => {
           },
         ]}
         data={users}
+        handleDisplayedDataChange={handleDisplayedDataChange}
         hideHeaderBar
         singleLine={false}
         stretch
       />
-      <Popup
-        content="Copied email(s)!"
-        on="click"
-        onClose={handlePopupClose}
-        onOpen={handlePopupOpen}
-        open={popupOpen}
-        trigger={<Icon link name="envelope" onClick={copyEmailsToClipboard} style={{ float: 'right' }} />}
-      />
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <Popup
+          content="Copied email(s)!"
+          on="click"
+          onClose={handlePopupClose}
+          onOpen={handlePopupOpen}
+          open={popupOpen}
+          position="top center"
+          size="large"
+          trigger={
+            <Button content="Copy email addresses" icon="envelope" onClick={copyEmailsToClipboard} primary size="big" />
+          }
+        />
+      </div>
     </Segment>
   )
 }
