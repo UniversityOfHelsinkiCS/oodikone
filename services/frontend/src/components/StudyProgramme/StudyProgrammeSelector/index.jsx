@@ -77,11 +77,12 @@ export const StudyProgrammeSelector = ({ selected }) => {
   const [addStudyProgrammePins] = useAddStudyProgrammePinMutation()
   const [removeStudyProgrammePins] = useRemoveStudyProgrammePinMutation()
   const studyProgrammePins = useGetStudyProgrammePinsQuery().data
+  const pinnedProgrammes = studyProgrammePins?.studyProgrammes || []
 
   if (selected) return null
   if (!studyProgrammes) return <Loader active>Loading</Loader>
 
-  const isPinned = programmeCode => studyProgrammePins?.studyProgrammes?.includes(programmeCode)
+  const isPinned = programmeCode => pinnedProgrammes.includes(programmeCode)
 
   const headers = [
     {
@@ -161,6 +162,18 @@ export const StudyProgrammeSelector = ({ selected }) => {
     }
   }
 
+  const sortWithPinnedFirst = (programmeA, programmeB) => {
+    const pinnedA = pinnedProgrammes.includes(programmeA.code)
+    const pinnedB = pinnedProgrammes.includes(programmeB.code)
+    if (pinnedA && !pinnedB) {
+      return -1
+    }
+    if (!pinnedA && pinnedB) {
+      return 1
+    }
+    return localeComparator(programmeA, programmeB)
+  }
+
   if (studyProgrammes == null) return <Message>You do not have access to any programmes</Message>
 
   return (
@@ -171,11 +184,31 @@ export const StudyProgrammeSelector = ({ selected }) => {
           <Message>No programmes found</Message>
         </div>
       )}
-      <StudyProgrammeTable header="Combined programmes" headers={headers} programmes={combinedProgrammes} />
-      <StudyProgrammeTable header="Bachelor programmes" headers={headers} programmes={bachelorProgrammes} />
-      <StudyProgrammeTable header="Master programmes" headers={headers} programmes={masterProgrammes} />
-      <StudyProgrammeTable header="Doctoral programmes" headers={headers} programmes={doctoralProgrammes} />
-      <StudyProgrammeTable header="Other programmes" headers={headers} programmes={otherProgrammes} />
+      <StudyProgrammeTable
+        header="Combined programmes"
+        headers={headers}
+        programmes={combinedProgrammes.sort(sortWithPinnedFirst)}
+      />
+      <StudyProgrammeTable
+        header="Bachelor programmes"
+        headers={headers}
+        programmes={bachelorProgrammes.sort(sortWithPinnedFirst)}
+      />
+      <StudyProgrammeTable
+        header="Master programmes"
+        headers={headers}
+        programmes={masterProgrammes.sort(sortWithPinnedFirst)}
+      />
+      <StudyProgrammeTable
+        header="Doctoral programmes"
+        headers={headers}
+        programmes={doctoralProgrammes.sort(sortWithPinnedFirst)}
+      />
+      <StudyProgrammeTable
+        header="Other programmes"
+        headers={headers}
+        programmes={otherProgrammes.sort(sortWithPinnedFirst)}
+      />
     </>
   )
 }
