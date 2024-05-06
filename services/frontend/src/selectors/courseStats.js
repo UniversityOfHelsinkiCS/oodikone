@@ -4,6 +4,7 @@ import { flatten, sortBy } from 'lodash'
 const courseStatsSelector = state => state.courseStats.data
 const openOrRegularSelector = state => state.courseSearch.openOrRegular
 const singleCourseStatsSelector = state => state.singleCourseStats
+const courseSummaryFormProgrammesSelector = state => state.courseSummaryForm.programmes
 
 export const getCourseStats = createSelector(
   [courseStatsSelector, openOrRegularSelector],
@@ -133,7 +134,7 @@ export const getAllStudyProgrammes = createSelector(
   }
 )
 
-const getProgrammesFromProps = (_state, { programmeCodes, programmes }) => ({ programmeCodes, programmes })
+const getUserHasAccessToAllStatsFromProps = (_, userHasAccessToAllStats) => userHasAccessToAllStats
 
 const calculatePassRate = (passed, failed) => {
   const passRate = (100 * passed) / (passed + failed)
@@ -175,8 +176,10 @@ const getSummaryStats = (statistics, filterStudentFn, userHasAccessToAllStats) =
 
 export const summaryStatistics = createSelector(
   getCourseStats,
-  getProgrammesFromProps,
-  (courseStats, { programmeCodes, programmes }, userHasAccessToAllStats) => {
+  getAllStudyProgrammes,
+  courseSummaryFormProgrammesSelector,
+  getUserHasAccessToAllStatsFromProps,
+  (courseStats, programmes, programmeCodes, userHasAccessToAllStats) => {
     const filteredProgrammes = programmes.filter(programme => programmeCodes.includes(programme.key))
     const students = new Set(
       filteredProgrammes.reduce((acc, programme) => [...acc, ...flatten(Object.values(programme.students))], [])

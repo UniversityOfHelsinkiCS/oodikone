@@ -9,7 +9,7 @@ import { userHasAccessToAllCourseStats } from '@/components/CourseStatistics/cou
 import { ProgrammeDropdown } from '@/components/CourseStatistics/ProgrammeDropdown'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
-import { fields, setValue } from '@/redux/coursesSummaryForm'
+import { setValue } from '@/redux/coursesSummaryForm'
 import { ALL, getAllStudyProgrammes, getQueryInfo, summaryStatistics } from '@/selectors/courseStats'
 import { DataExport } from './DataExport'
 
@@ -34,17 +34,14 @@ const SummaryTab = ({ setValue, onClickCourse }) => {
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const userHasAccessToAllStats = userHasAccessToAllCourseStats(roles, fullStudyProgrammeRights)
   const programmes = useSelector(state => getAllStudyProgrammes(state))
-  const programmeCodes = useSelector(({ courseSummaryForm }) => courseSummaryForm[fields.programmes])
   const form = useSelector(({ courseSummaryForm }) => courseSummaryForm)
-  const statistics = useSelector(state =>
-    summaryStatistics(state, { programmes, programmeCodes }, userHasAccessToAllStats)
-  )
+  const statistics = useSelector(state => summaryStatistics(state, userHasAccessToAllStats))
   const queryInfo = useSelector(state => getQueryInfo(state))
 
   const { getTextIn } = useLanguage()
   const handleChange = (_, { name, value }) => {
     let selected = [...value].filter(v => v !== ALL.value)
-    if ((!form[fields.programmes].includes(ALL.value) && value.includes(ALL.value)) || value.length === 0) {
+    if ((!form.programmes.includes(ALL.value) && value.includes(ALL.value)) || value.length === 0) {
       selected = [ALL.value]
     }
     setValue(name, selected)
@@ -80,10 +77,10 @@ const SummaryTab = ({ setValue, onClickCourse }) => {
               <Header as="h4">Filter statistics by study programmes</Header>
               <ProgrammeDropdown
                 label="Study programmes:"
-                name={fields.programmes}
+                name="programmes"
                 onChange={handleChange}
                 options={options}
-                value={form[fields.programmes]}
+                value={form.programmes}
               />
             </>
           )}

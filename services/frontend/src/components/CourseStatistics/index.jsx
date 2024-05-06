@@ -27,10 +27,8 @@ export const CourseStatistics = () => {
   const history = useHistory()
   const dispatch = useDispatch()
   const { programmeRights, roles } = useGetAuthorizedUserQuery()
-  const state = useSelector(state => state)
-  const { courseStats } = state
-  const { pending: loading } = courseStats
-  const courses = Object.keys(courseStats.data)
+  const { pending: loading, data: courseStatsData } = useSelector(({ courseStats }) => courseStats)
+  const courses = Object.keys(courseStatsData)
   const statsIsEmpty = courses.length === 0
   const singleCourseStats = courses.length === 1
   const initCourseCode = courses[0] || ''
