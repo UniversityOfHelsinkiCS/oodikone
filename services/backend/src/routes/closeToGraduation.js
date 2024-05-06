@@ -2,7 +2,7 @@ const { getCloseToGraduationData } = require('../services/populations/closeToGra
 
 const router = require('express').Router()
 
-router.get('/', async (req, res) => {
+router.get('/', async (_req, res) => {
   const result = await getCloseToGraduationData()
   res.json(result)
 })

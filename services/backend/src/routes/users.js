@@ -3,12 +3,12 @@ const userService = require('../services/userService')
 const { sendNotificationAboutAccessToUser, previewNotificationAboutAccessToUser } = require('../services/mailservice')
 const logger = require('../util/logger')
 
-router.get('/', async (req, res) => {
+router.get('/', async (_req, res) => {
   const results = await userService.findAll()
   res.json(results)
 })
 
-router.get('/access_groups', async (req, res) => {
+router.get('/access_groups', async (_req, res) => {
   const result = await userService.getAccessGroups()
   res.json(result)
 })
@@ -32,7 +32,7 @@ router.post('/modifyaccess', async (req, res) => {
   }
 })
 
-router.get('/email/preview', (req, res) => {
+router.get('/email/preview', (_req, res) => {
   const { accessMessageSubject, accessMessageText } = previewNotificationAboutAccessToUser()
   res.json({ subject: accessMessageSubject, html: accessMessageText })
 })

@@ -36,7 +36,7 @@ router.post('/top', async (req, res) => {
   await topteachers.findAndSaveTeachers(startyearcode, endyearcode)
 })
 
-router.get('/top/categories', async (req, res) => {
+router.get('/top/categories', async (_req, res) => {
   const result = await topteachers.getCategoriesAndYears()
   res.json(result)
 })

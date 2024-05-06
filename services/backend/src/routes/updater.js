@@ -31,14 +31,14 @@ router.get('/update/v2/meta', async (req, res) => {
   }
 })
 
-router.get('/update/v2/students', async (req, res) => {
+router.get('/update/v2/students', async (_req, res) => {
   const response = await updateSISStudents()
   if (response) {
     res.status(200).json('Update SIS students scheduled')
   }
 })
 
-router.get('/update/v2/students_individually', async (req, res) => {
+router.get('/update/v2/students_individually', async (_req, res) => {
   await updateStudentsIndividually()
   res.status(200).send()
 })
@@ -67,7 +67,7 @@ router.post('/update/v2/courses', async (req, res) => {
   }
 })
 
-router.get('/update/v2/programmes', async (req, res) => {
+router.get('/update/v2/programmes', async (_req, res) => {
   const response = await updateSISProgrammes()
   if (response) {
     res.status(200).json('Update SIS programmes scheduled')
@@ -106,12 +106,12 @@ router.post('/refresh_language_center_data', async (req, res) => {
   res.status(200).json('Added job for refreshing language center data')
 })
 
-router.get('/abort', async (req, res) => {
+router.get('/abort', async (_req, res) => {
   await abort()
   res.status(200).json()
 })
 
-router.get('/jobs', async (req, res) => {
+router.get('/jobs', async (_req, res) => {
   const waiting = await getJobs('waiting')
   const active = await getJobs('active')
   res.status(200).json({ waiting, active })

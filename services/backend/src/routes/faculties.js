@@ -26,7 +26,7 @@ const auth = require('../middleware/auth')
 // Faculty uses a lot of tools designed for Study programme.
 // Some of them have been copied here and slightly edited for faculty purpose.
 
-router.get('/', async (req, res) => {
+router.get('/', async (_req, res) => {
   const facultyList = await getFacultyList()
   res.json(facultyList)
 })

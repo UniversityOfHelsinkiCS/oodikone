@@ -2,7 +2,7 @@ const Sentry = require('@sentry/node')
 const { ApplicationError } = require('../util/customErrors')
 const logger = require('../util/logger')
 
-const errorHandler = (error, req, res, next) => {
+const errorHandler = (error, _req, res, next) => {
   logger.error(`${error.message} ${error.name} ${error.stack}`)
 
   Sentry.captureException(error)
