@@ -7,6 +7,7 @@ const studentsApi = RTKApi.injectEndpoints({
     }),
     getStudent: builder.query({
       query: studentNumber => `/students/${studentNumber}`,
+      providesTags: result => [{ type: 'Students', id: result.studentNumber }],
     }),
   }),
   overrideExisting: false,

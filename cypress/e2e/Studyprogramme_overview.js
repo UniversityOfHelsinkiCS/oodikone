@@ -391,7 +391,7 @@ describe('Studyprogramme overview', () => {
       cy.contains('Create a new tag').click()
       cy.contains(name)
 
-      cy.contains('Add tags to students').click()
+      cy.contains('Add a tag to students').click()
       cy.get('.form > .field > .dropdown').click().get('.ui > input.search').type(name).click()
 
       cy.get('.form > .field > .dropdown > .visible').contains(name).click()

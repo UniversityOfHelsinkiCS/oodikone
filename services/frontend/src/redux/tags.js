@@ -14,7 +14,7 @@ const tagsApi = RTKApi.injectEndpoints({
     }),
     deleteTag: builder.mutation({
       query: tag => ({ url: '/tags', method: 'DELETE', body: { tag } }),
-      invalidatesTags: ['Tags'],
+      invalidatesTags: ['Tags', 'Students'],
     }),
     getStudentTagsByStudyTrack: builder.query({
       query: studytrack => `/studenttags/${studytrack}`,
@@ -25,6 +25,7 @@ const tagsApi = RTKApi.injectEndpoints({
         method: 'POST',
         body: { tags, studytrack, combinedProgramme },
       }),
+      invalidatesTags: ['Students'],
     }),
     deleteStudentTags: builder.mutation({
       query: ({ tagId, studentnumbers, studytrack, combinedProgramme }) => ({
@@ -32,6 +33,7 @@ const tagsApi = RTKApi.injectEndpoints({
         method: 'DELETE',
         body: { tagId, studentnumbers, studytrack, combinedProgramme },
       }),
+      invalidatesTags: ['Students'],
     }),
   }),
   overrideExisting: false,
