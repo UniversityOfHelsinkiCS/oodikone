@@ -16,13 +16,14 @@ const {
 // 2 = Female 'urn:code:gender:female'
 // 3 = Other "urn:code:gender:other"
 // Oodi also had 9 = Määrittelemätön, but Sis doesn't have this data
-const parseGender = gender_urn => {
-  if (gender_urn === 'urn:code:gender:not-known') return '0'
-  if (gender_urn === 'urn:code:gender:male') return '1'
-  if (gender_urn === 'urn:code:gender:female') return '2'
-  if (gender_urn === 'urn:code:gender:other') return '3'
-  return '0'
+const genderCodes = {
+  'urn:code:gender:male': '1',
+  'urn:code:gender:female': '2',
+  'urn:code:gender:other': '3',
+  'urn:code:gender:not-known': '0',
 }
+
+const parseGender = genderUrn => genderCodes[genderUrn] ?? '0'
 
 // "Included and substituted study modules" are not real study modules and the credits must be counted in student's total credits, etc
 //  This rules out failed units and modules as well as improved ones
@@ -51,37 +52,19 @@ const sanitizeCourseCode = code => {
 }
 
 const calculateTotalCreditsFromAttainments = attainments => {
-  const totalCredits = attainments.reduce((sum, att) => {
-    // Misregistrations are not counted to the total
-    if (att.misregistration) {
-      return sum
-    }
-    if (!att.primary) {
-      return sum
-    }
-    // Expired attainments are not counted in the total
-    if (att.expiryDate < now) {
-      return sum
-    }
-
+  const isValidAttainment = attainment => {
+    if (attainment.misregistration) return false
+    if (!attainment.primary) return false
+    if (attainment.expiryDate < now) return false
     // Does not have any attainments attached to it, so is not a study module whose attainments have already been counted
-    if (att.nodes && att.nodes[0] !== undefined) {
-      return sum
-    }
-
-    if (!validTypes.includes(att.type)) {
-      return sum
-    }
-
+    if (attainment.nodes && attainment.nodes[0] !== undefined) return false
+    if (!validTypes.includes(attainment.type)) return false
     // If the state is FAILED or IMPROVED it should not be counted to total
-    if (!validStates.includes(att.state)) {
-      return sum
-    }
+    if (!validStates.includes(attainment.state)) return false
+    return true
+  }
 
-    return sum + Number(att.credits)
-  }, 0)
-
-  return totalCredits
+  return attainments.reduce((sum, att) => (isValidAttainment(att) ? sum + Number(att.credits) : sum), 0)
 }
 
 const studentMapper = (attainments, studyRights, attainmentsToBeExluced) => student => {
