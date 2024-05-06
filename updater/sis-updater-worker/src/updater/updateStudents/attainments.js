@@ -290,7 +290,10 @@ const updateAttainments = async (
     .filter(a => a.id !== null)
     .filter(
       a =>
-        properAttainmentTypes.has(a.type) && !attainmentsToBeExluced.has(a.id) && !doubleAttachment(a, fixedAttainments)
+        properAttainmentTypes.has(a.type) &&
+        !a.misregistration &&
+        !attainmentsToBeExluced.has(a.id) &&
+        !doubleAttachment(a, fixedAttainments)
     )
     .map(a => {
       const mappedCredit = mapCredit(a)
