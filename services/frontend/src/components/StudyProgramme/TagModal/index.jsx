@@ -1,30 +1,28 @@
-import { arrayOf, bool, shape, string } from 'prop-types'
 import React, { useEffect, useState } from 'react'
-import { connect } from 'react-redux'
 import { Button, Dropdown, Form, Message, Modal, TextArea } from 'semantic-ui-react'
 
 import { useCreateStudentTagsMutation } from '@/redux/tags'
 
-const TagModal = ({ combinedProgramme, error, pending, studytrack, success, tags }) => {
+export const TagModal = ({ combinedProgramme, studytrack, tags }) => {
   const [modalOpen, setModalOpen] = useState(false)
   const [input, setInput] = useState('')
   const [selectedValue, setSelected] = useState('')
-  const [createStudentTags] = useCreateStudentTagsMutation()
+  const [createStudentTags, { isError, isLoading, isSuccess }] = useCreateStudentTagsMutation()
 
   useEffect(() => {
-    if (!pending) {
-      if (success) {
+    if (!isLoading) {
+      if (isSuccess) {
         setModalOpen(false)
         setSelected('')
         setInput('')
       }
     }
-  }, [pending])
+  }, [isLoading])
 
-  const handleClick = event => {
+  const handleClick = async event => {
     event.preventDefault()
     const studentnumbers = input.match(/[^\s,]+/g)
-    createStudentTags({
+    await createStudentTags({
       tags: studentnumbers.map(studentNumber => ({
         tag_id: selectedValue,
         studentnumber: studentNumber,
@@ -50,7 +48,7 @@ const TagModal = ({ combinedProgramme, error, pending, studytrack, success, tags
       trigger={
         <Button
           color="blue"
-          content="Add tags to students"
+          content="Add a tag to students"
           disabled={!tags.length}
           onClick={() => setModalOpen(true)}
           size="small"
@@ -59,21 +57,22 @@ const TagModal = ({ combinedProgramme, error, pending, studytrack, success, tags
     >
       <Modal.Content>
         <Form>
-          <h2>Add tags to students</h2>
-          <Message content={error} hidden={!error} negative />
+          <h2>Add a tag to students</h2>
+          <Message content="Adding tags to students failed." hidden={!isError} negative />
           <Form.Field>
-            <em>Select a tag</em>
+            <label>Select a tag to add</label>
             <Dropdown
               onChange={handleChange}
               options={createdOptions}
-              placeholder="Tag"
               search
               selectOnBlur={false}
               selectOnNavigation={false}
               selection
               value={selectedValue}
             />
-            <em>Insert studentnumbers you wish to add tags to</em>
+          </Form.Field>
+          <Form.Field>
+            <label>Insert student numbers you wish to add the tag to (use commas to separate)</label>
             <TextArea onChange={event => setInput(event.target.value)} placeholder="011111111" value={input} />
           </Form.Field>
         </Form>
@@ -82,7 +81,7 @@ const TagModal = ({ combinedProgramme, error, pending, studytrack, success, tags
         <Button content="Cancel" negative onClick={() => setModalOpen(false)} />
         <Button
           content="Add tags"
-          disabled={pending || selectedValue.length === 0 || !input.match(/[^\s,]+/g)}
+          disabled={isLoading || selectedValue.length === 0 || !input.match(/[^\s,]+/g)}
           onClick={event => handleClick(event)}
           positive
         />
@@ -90,24 +89,3 @@ const TagModal = ({ combinedProgramme, error, pending, studytrack, success, tags
     </Modal>
   )
 }
-
-TagModal.defaultProps = {
-  error: null,
-}
-
-TagModal.propTypes = {
-  tags: arrayOf(shape({ tag_id: string, tagname: string, studytrack: string })).isRequired,
-  studytrack: string.isRequired,
-  combinedProgramme: string.isRequired,
-  pending: bool.isRequired,
-  success: bool.isRequired,
-  error: string,
-}
-
-const mapStateToProps = () => ({
-  pending: false,
-  success: true,
-  error: null,
-})
-
-export const ConnectedTagModal = connect(mapStateToProps)(TagModal)

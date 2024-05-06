@@ -7,7 +7,7 @@ import { Button, Confirm, Form, Header, Icon, Item, List, Message, Popup, Segmen
 
 import { reformatDate } from '@/common'
 import { SortableTable } from '@/components/SortableTable'
-import { ConnectedTagModal as TagModal } from '@/components/StudyProgramme/TagModal'
+import { TagModal } from '@/components/StudyProgramme/TagModal'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useCreateTagMutation, useGetTagsByStudyTrackQuery, useDeleteTagMutation } from '@/redux/tags'
 
@@ -115,6 +115,7 @@ export const Tags = ({ studyprogramme, combinedProgramme }) => {
     {
       key: 'delete',
       title: 'Delete',
+      export: false,
       getRowContent: tag => (
         <Form.Field>
           {deleteButton(tag.tag_id)}
