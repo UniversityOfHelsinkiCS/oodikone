@@ -36,6 +36,9 @@ const StudyProgrammeLink = ({ linkText, programmeCode }) => (
 )
 
 const PinButton = ({ onClick, pinned, programmeCode }) => {
+  const black = '#303030'
+  const grey = '#c4c4c4'
+
   return (
     <Button
       icon
@@ -44,7 +47,7 @@ const PinButton = ({ onClick, pinned, programmeCode }) => {
       }}
       style={{ background: 'none', padding: '5px' }}
     >
-      <Icon name={pinned ? 'bookmark' : 'bookmark outline'} />
+      <Icon name="pin" style={{ color: pinned ? black : grey }} />
     </Button>
   )
 }
