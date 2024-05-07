@@ -9,6 +9,7 @@ import { Button, Form, Grid, Icon, Message, Radio } from 'semantic-ui-react'
 
 import {
   cancelablePromise,
+  createPinnedFirstComparator,
   isNewStudyProgramme,
   momentFromFormat,
   reformatDate,
@@ -20,6 +21,7 @@ import { SearchHistory } from '@/components/SearchHistory'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { getPopulationStatistics, clearPopulations, useGetProgrammesQuery } from '@/redux/populations'
 import { clearSelected } from '@/redux/populationSelectedStudentCourses'
+import { useGetStudyProgrammePinsQuery } from '@/redux/studyProgrammePins'
 import './populationSearch.css'
 
 const YEAR_DATE_FORMAT = 'YYYY'
@@ -68,6 +70,8 @@ const PopulationSearchForm = ({ queries, onProgress, clearSelected, getPopulatio
           },
         }
       : programmes
+  const studyProgrammePins = useGetStudyProgrammePinsQuery().data
+  const pinnedProgrammes = studyProgrammePins?.studyProgrammes || []
 
   const setState = newState => setTotalState({ ...totalState, ...newState })
 
@@ -403,8 +407,9 @@ const PopulationSearchForm = ({ queries, onProgress, clearSelected, getPopulatio
       }
       programmesToRender = renderableList(sortedStudyProgrammes)
     }
+    const pinnedFirstComparator = createPinnedFirstComparator(pinnedProgrammes)
 
-    return <div>{renderStudyProgrammeDropdown(studyRights, programmesToRender)}</div>
+    return <div>{renderStudyProgrammeDropdown(studyRights, programmesToRender.sort(pinnedFirstComparator))}</div>
   }
 
   const shouldRenderSearchForm = () => {
