@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button, Form, FormField, FormInput, Header, Icon, Loader, Message } from 'semantic-ui-react'
 
-import { createLocaleComparator, getUnifiedProgrammeName } from '@/common'
+import { createLocaleComparator, createPinnedFirstComparator, getUnifiedProgrammeName } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SortableTable } from '@/components/SortableTable'
 import { useGetProgrammesQuery } from '@/redux/populations'
@@ -78,6 +78,7 @@ export const StudyProgrammeSelector = ({ selected }) => {
   const [removeStudyProgrammePins] = useRemoveStudyProgrammePinMutation()
   const studyProgrammePins = useGetStudyProgrammePinsQuery().data
   const pinnedProgrammes = studyProgrammePins?.studyProgrammes || []
+  const pinnedFirstComparator = createPinnedFirstComparator(pinnedProgrammes)
 
   if (selected) return null
   if (!studyProgrammes) return <Loader active>Loading</Loader>
@@ -162,18 +163,6 @@ export const StudyProgrammeSelector = ({ selected }) => {
     }
   }
 
-  const sortWithPinnedFirst = (programmeA, programmeB) => {
-    const pinnedA = pinnedProgrammes.includes(programmeA.code)
-    const pinnedB = pinnedProgrammes.includes(programmeB.code)
-    if (pinnedA && !pinnedB) {
-      return -1
-    }
-    if (!pinnedA && pinnedB) {
-      return 1
-    }
-    return localeComparator(programmeA, programmeB)
-  }
-
   if (studyProgrammes == null) return <Message>You do not have access to any programmes</Message>
 
   return (
@@ -187,27 +176,27 @@ export const StudyProgrammeSelector = ({ selected }) => {
       <StudyProgrammeTable
         header="Combined programmes"
         headers={headers}
-        programmes={combinedProgrammes.sort(sortWithPinnedFirst)}
+        programmes={combinedProgrammes.sort(pinnedFirstComparator)}
       />
       <StudyProgrammeTable
         header="Bachelor programmes"
         headers={headers}
-        programmes={bachelorProgrammes.sort(sortWithPinnedFirst)}
+        programmes={bachelorProgrammes.sort(pinnedFirstComparator)}
       />
       <StudyProgrammeTable
         header="Master programmes"
         headers={headers}
-        programmes={masterProgrammes.sort(sortWithPinnedFirst)}
+        programmes={masterProgrammes.sort(pinnedFirstComparator)}
       />
       <StudyProgrammeTable
         header="Doctoral programmes"
         headers={headers}
-        programmes={doctoralProgrammes.sort(sortWithPinnedFirst)}
+        programmes={doctoralProgrammes.sort(pinnedFirstComparator)}
       />
       <StudyProgrammeTable
         header="Other programmes"
         headers={headers}
-        programmes={otherProgrammes.sort(sortWithPinnedFirst)}
+        programmes={otherProgrammes.sort(pinnedFirstComparator)}
       />
     </>
   )

@@ -343,8 +343,8 @@ const PopulationSearchForm = ({ queries, onProgress, clearSelected, getPopulatio
           </Button.Group>
         </Form.Field>
         <Form.Field>
-          <div style={{ marginTop: '22px' }}>
-            {fullAccessToStudentData && (
+          {fullAccessToStudentData && (
+            <div style={{ marginTop: '22px' }}>
               <Radio
                 checked={filterProgrammes}
                 data-cy="toggleFilterProgrammes"
@@ -352,8 +352,8 @@ const PopulationSearchForm = ({ queries, onProgress, clearSelected, getPopulatio
                 onChange={() => setFilterProgrammes(!filterProgrammes)}
                 toggle
               />
-            )}
-          </div>
+            </div>
+          )}
         </Form.Field>
       </Form.Group>
     )
@@ -415,6 +415,7 @@ const PopulationSearchForm = ({ queries, onProgress, clearSelected, getPopulatio
   if (!shouldRenderSearchForm() && location.search !== '') {
     return null
   }
+
   let errorText = 'Selected population already in analysis'
   let isQueryInvalid = false
 
@@ -434,30 +435,28 @@ const PopulationSearchForm = ({ queries, onProgress, clearSelected, getPopulatio
   }
 
   return (
-    <div>
-      <Form error={isQueryInvalid} loading={isLoading}>
-        <Grid divided padded="vertically">
-          <Grid.Row>
-            <Grid.Column width={10}>
-              {renderEnrollmentDateSelector()}
-              {renderStudyGroupSelector()}
-            </Grid.Column>
-          </Grid.Row>
-        </Grid>
-        <Message color="blue" error header={errorText} />
-        <Form.Button color="blue" disabled={isQueryInvalid || query.months < 0} onClick={handleSubmit}>
-          See class
-        </Form.Button>
-        <SearchHistory
-          handleSearch={pushQueryToUrl}
-          items={searchHistory.map(item => {
-            item.date = new Date(item.date)
-            return item
-          })}
-          updateItem={updateItemInSearchHistory}
-        />
-      </Form>
-    </div>
+    <Form error={isQueryInvalid} loading={isLoading}>
+      <Grid divided padded="vertically">
+        <Grid.Row>
+          <Grid.Column width={10}>
+            {renderEnrollmentDateSelector()}
+            {renderStudyGroupSelector()}
+          </Grid.Column>
+        </Grid.Row>
+      </Grid>
+      <Message color="blue" error header={errorText} />
+      <Form.Button color="blue" disabled={isQueryInvalid || query.months < 0} onClick={handleSubmit}>
+        See class
+      </Form.Button>
+      <SearchHistory
+        handleSearch={pushQueryToUrl}
+        items={searchHistory.map(item => {
+          item.date = new Date(item.date)
+          return item
+        })}
+        updateItem={updateItemInSearchHistory}
+      />
+    </Form>
   )
 }
 
