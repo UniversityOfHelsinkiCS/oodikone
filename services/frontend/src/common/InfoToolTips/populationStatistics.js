@@ -94,14 +94,12 @@ export const populationStatisticsToolTips = {
   - **Pass/fail** - näkymä sisältää kurssisuoritukset, hylätyt, yritykset sekä ilmoittautumistiedot. Huom.! ilmoittautumistiedot ovat saatavilla vain Sisun käyttöönoton jälkeiseltä ajalta.
   - **grades** - arvosanajakauma.
   `,
-  Search: `Tässä osiossa voi tarkastella koulutusohjelmakohtaisia populaatioita sisäänotto-lukuvuoden mukaisesti,
-  vuosikurssi kerrallaan. Uudet koulutusohjelmat ovat pääsääntöisesti alkaneet 1.8.2017,
-  joten oletusvalinnat näyttävät tiedot tästä päivämäärästä lähtien.
+  Search: `Tässä osiossa voi tarkastella koulutusohjelmakohtaisia populaatioita sisäänottolukuvuoden mukaisesti, vuosikurssi kerrallaan.
+  Uudet koulutusohjelmat ovat pääsääntöisesti alkaneet 1.8.2017, joten oletusvalinnat näyttävät tiedot tästä päivämäärästä lähtien.
 
   - **Class of:** lukuvuosi, jolloin opiskelija on ilmoittautunut ensimmäisen kerran (läsnä- tai poissaolevaksi) ohjelmaan. Ilmoittautumisen opinto-oikeus voi olla ensi- tai toissijainen.
-  - **Study programme:** haluttu koulutusohjelma.
-  - **Select tag (Optional):** itsetehty tai valmis tägi.
-  - **Study track (Optional):** opintosuunta.`,
+  - **Study programme:** haluttu koulutusohjelma. Kiinnitetyt (suosikeiksi valitut) ohjelmat näkyvät ensimmäisinä valikossa. Kiinnitys on mahdollista koulutusohjelmalistauksessa.
+  `,
   StudentsGuidanceGroups: `**Students**
 
   Taulukko näyttää oletusarvoisesti vain opiskelijanumerot, mutta harmaata liukukytkintä klikkaamalla saa näkyviin opiskelijoiden nimet.
