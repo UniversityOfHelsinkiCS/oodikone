@@ -310,7 +310,14 @@ const PopulationSearchForm = ({ queries, onProgress, clearSelected, getPopulatio
   }
 
   const renderableList = list =>
-    list.map(({ type, name, code }) => ({ type, name, code, text: getTextIn(name), description: code, value: code }))
+    list.map(({ code, name }) => ({
+      code,
+      description: code,
+      icon: pinnedProgrammes.includes(code) ? 'pin' : '',
+      name,
+      text: getTextIn(name),
+      value: code,
+    }))
 
   const renderEnrollmentDateSelector = () => {
     const { year } = query
