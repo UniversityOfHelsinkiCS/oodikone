@@ -1,12 +1,12 @@
 import _ from 'lodash'
 import moment from 'moment'
+import qs from 'query-string'
 import React, { useMemo, useState } from 'react'
 import ReactHighcharts from 'react-highcharts'
 import { useLocation } from 'react-router-dom'
 import { Dropdown, Radio, Segment } from 'semantic-ui-react'
 
 import { generateGradientColors, getCreditCategories, getTargetCreditsForProgramme, TimeDivision } from '@/common'
-import { getMonths } from '@/common/query'
 import { studentNumberFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -140,7 +140,8 @@ export const CreditDistributionDevelopment = ({ students, programme, combinedPro
   const [cumulative, setCumulative] = useState(true)
   const [timeDivision, setTimeDivision] = useState(TimeDivision.SEMESTER)
   const [stackOrdering, setStackOrdering] = useState(StackOrdering.ASCENDING)
-  const months = getMonths(useLocation())
+  const location = useLocation()
+  const { months } = qs.parse(location.search)
   const semestersQuery = useGetSemestersQuery()
   const { getTextIn } = useLanguage()
   const { filterDispatch } = useFilters()

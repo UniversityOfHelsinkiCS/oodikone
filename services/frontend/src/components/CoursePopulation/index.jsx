@@ -1,12 +1,12 @@
 import _ from 'lodash'
 import moment from 'moment'
+import qs from 'query-string'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { Form, Header, Input, Segment } from 'semantic-ui-react'
 import { getStudentToTargetCourseDateMap, getUnifyTextIn } from '@/common'
 import { useProgress, useTitle } from '@/common/hooks'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
-import { queryParamsFromUrl } from '@/common/query'
 import { PanelView } from '@/components/common/PanelView'
 import { CustomPopulationProgrammeDist } from '@/components/CustomPopulation/CustomPopulationProgrammeDist'
 import { FilterView } from '@/components/FilterView'
@@ -46,8 +46,9 @@ export const CoursePopulation = () => {
   const [codes, setCodes] = useState([])
   useTitle('Course population')
 
-  const { coursecodes, from, to, separate, unifyCourses, years, years2, combineSubstitutions } =
-    queryParamsFromUrl(location)
+  const { coursecodes, from, to, separate, unifyCourses, years, years2, combineSubstitutions } = qs.parse(
+    location.search
+  )
 
   const { data: populationStatistics, isFetching } = useGetPopulationStatisticsByCourseQuery({
     coursecodes,
