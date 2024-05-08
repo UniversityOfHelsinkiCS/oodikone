@@ -4,18 +4,19 @@ describe('Faculty overview', () => {
   describe('Faculty can be selected', () => {
     it('Faculties are listed and one can be chosen', () => {
       cy.init('/faculties')
-      cy.get('[data-cy=select-faculty]').contains('td', 'H10')
-      cy.contains('td', 'H99').should('not.exist')
-      cy.contains('td', 'H90').click()
-      cy.contains('.header', 'Eläinlääketieteellinen tiedekunta')
+      cy.get('[data-cy=select-faculty]').contains('a', 'Teologinen tiedekunta')
+      cy.contains('a', 'H99').should('not.exist')
+      cy.contains('a', 'Teologinen tiedekunta').click()
+      cy.contains('.header', 'Teologinen tiedekunta')
     })
   })
 
   describe('Faculty basic information: admin user', () => {
     beforeEach(() => {
       cy.init('/faculties', 'admin')
-      cy.contains('td', 'H90').click()
+      cy.contains('a', 'Eläinlääketieteellinen tiedekunta').click()
     })
+
     it('Credits produced by faculty are shown', () => {
       cy.get('[data-cy="Section-CreditsProducedByTheFaculty"]').should('be.visible')
       cy.get('[data-cy="Graph-CreditsProducedByTheFaculty"]').should('be.visible')
@@ -29,8 +30,9 @@ describe('Faculty overview', () => {
   describe('Faculty basic information: basic user', () => {
     beforeEach(() => {
       cy.init('/faculties')
-      cy.contains('td', 'H80').click()
+      cy.contains('a', 'Maatalous-metsätieteellinen tiedekunta').click()
     })
+
     it('Basic information tab show all graphs and tables', () => {
       cy.get('[data-cy="Table-CreditsProducedByTheFaculty"]').should('be.visible')
       cy.get('[data-cy="Graph-CreditsProducedByTheFaculty"]').should('be.visible')
@@ -79,7 +81,7 @@ describe('Faculty overview', () => {
   describe('Study programme information: users with access', () => {
     beforeEach(() => {
       cy.init('/faculties')
-      cy.contains('td', 'H80').click()
+      cy.contains('a', 'Maatalous-metsätieteellinen tiedekunta').click()
     })
 
     it('Study programme credit information is not visible in the beginning', () => {
@@ -131,7 +133,7 @@ describe('Faculty overview', () => {
   describe('Average graduation times', () => {
     beforeEach(() => {
       cy.init('/faculties')
-      cy.contains('td', 'H60').click()
+      cy.contains('a', 'Kasvatustieteellinen tiedekunta').click()
       cy.contains('Graduation times').click()
     })
 
@@ -222,10 +224,10 @@ describe('Faculty overview', () => {
     })
   })
 
-  describe('Faculty Progress and student population -tab', () => {
+  describe('Faculty Progress and student population tab', () => {
     beforeEach(() => {
       cy.init('/faculties')
-      cy.contains('td', 'H50').click()
+      cy.contains('a', 'Matemaattis-luonnontieteellinen tiedekunta').click()
       cy.contains('Programmes and student populations').click()
     })
 
@@ -233,6 +235,7 @@ describe('Faculty overview', () => {
       cy.get('[data-cy="FacultyStudentStatsTable"]').should('be.visible')
       cy.get('[data-cy="FacultyStudentStatsTable"]').should('not.contain', '0 %')
     })
+
     it('User can view studentdata table with %', () => {
       cy.get('[data-cy="FacultyStudentStatsTable"]').should('be.visible')
       cy.get('[data-cy="HidePercentagesToggle"]').click()
@@ -245,8 +248,7 @@ describe('Faculty overview', () => {
       cy.get('[data-cy="Graph-FacultyMastersProgress"]').should('be.visible')
       cy.get('[data-cy="Graph-FacultyBachelorsProgress"]').should('be.visible')
     })
-    // Following two tests just test that nothing goes broken after toggling
-    // No data for testing that data actual change as supposed
+
     it('Graduations can be excluded', () => {
       cy.get('[data-cy="FacultyStudentStatsTable"]').should('be.visible')
       cy.get('[data-cy="StudentToggle"]').click()
