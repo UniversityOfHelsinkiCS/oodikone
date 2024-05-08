@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
-import { Header, Menu, Segment, Tab } from 'semantic-ui-react'
+import { Container, Header, Menu, Segment, Tab } from 'semantic-ui-react'
 
 import { getFullStudyProgrammeRights, getUnifiedProgrammeName } from '@/common'
 import { useTabs, useTitle } from '@/common/hooks'
@@ -133,14 +133,12 @@ export const StudyProgramme = () => {
 
   if (!studyProgrammeId) {
     return (
-      <div className="segmentContainer">
+      <Container>
         <Header className="segmentTitle" size="large">
           Study programmes
         </Header>
-        <Segment className="contentSegment">
-          <StudyProgrammeSelector selected={studyProgrammeId !== undefined} />
-        </Segment>
-      </div>
+        <StudyProgrammeSelector selected={studyProgrammeId !== undefined} />
+      </Container>
     )
   }
 

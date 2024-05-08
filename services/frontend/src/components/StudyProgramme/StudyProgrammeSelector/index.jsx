@@ -1,7 +1,7 @@
 import { debounce } from 'lodash'
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Button, Form, FormField, FormInput, Header, Icon, Loader, Message } from 'semantic-ui-react'
+import { Button, Form, FormField, FormInput, Header, Icon, Loader, Message, Segment } from 'semantic-ui-react'
 
 import { createLocaleComparator, createPinnedFirstComparator, getUnifiedProgrammeName } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -17,7 +17,7 @@ const StudyProgrammeFilter = ({ handleFilterChange, studyProgrammes }) => {
   if (studyProgrammes.length <= 10) return null
 
   return (
-    <Form style={{ width: '600px' }}>
+    <Form>
       <FormField>
         <label style={{ marginBottom: '10px' }}>Filter programmes</label>
         <FormInput
@@ -58,7 +58,7 @@ const StudyProgrammeTable = ({ header, headers, programmes }) => {
   return (
     <>
       <Header>{header}</Header>
-      <SortableTable columns={headers} data={programmes} hideHeaderBar />
+      <SortableTable columns={headers} data={programmes} hideHeaderBar stretch />
     </>
   )
 }
@@ -79,7 +79,7 @@ export const StudyProgrammeSelector = ({ selected }) => {
   const localeComparator = createLocaleComparator('code')
   const [addStudyProgrammePins] = useAddStudyProgrammePinMutation()
   const [removeStudyProgrammePins] = useRemoveStudyProgrammePinMutation()
-  const studyProgrammePins = useGetStudyProgrammePinsQuery().data
+  const { data: studyProgrammePins } = useGetStudyProgrammePinsQuery()
   const pinnedProgrammes = studyProgrammePins?.studyProgrammes || []
   const pinnedFirstComparator = createPinnedFirstComparator(pinnedProgrammes)
 
@@ -169,13 +169,9 @@ export const StudyProgrammeSelector = ({ selected }) => {
   if (studyProgrammes == null) return <Message>You do not have access to any programmes</Message>
 
   return (
-    <>
+    <Segment className="contentSegment">
       <StudyProgrammeFilter handleFilterChange={handleFilterChange} studyProgrammes={studyProgrammes} />
-      {filteredStudyProgrammes.length === 0 && (
-        <div style={{ marginTop: '20px', width: '600px' }}>
-          <Message>No programmes found</Message>
-        </div>
-      )}
+      {studyProgrammes.length > 0 && filteredStudyProgrammes.length === 0 && <Message>No programmes found</Message>}
       <StudyProgrammeTable
         header="Combined programmes"
         headers={headers}
@@ -201,6 +197,6 @@ export const StudyProgrammeSelector = ({ selected }) => {
         headers={headers}
         programmes={otherProgrammes.sort(pinnedFirstComparator)}
       />
-    </>
+    </Segment>
   )
 }
