@@ -20,7 +20,7 @@ export const FacultyStatistics = () => {
   const allFaculties = useGetFacultiesQuery()
   const faculties = allFaculties?.data
 
-  const faculty = faculties && facultyCode && faculties.find(f => f.code === facultyCode)
+  const faculty = faculties && facultyCode && faculties.find(faculty => faculty.code === facultyCode)
   const facultyName = faculty && getTextIn(faculty.name)
 
   const { isAdmin, fullAccessToStudentData, programmeRights } = useGetAuthorizedUserQuery()
@@ -95,14 +95,20 @@ export const FacultyStatistics = () => {
 
   const panes = getPanes()
 
+  const sortedFaculties = Array.from(faculties).sort((a, b) => a.code.localeCompare(b.code))
+
   if (!facultyCode) {
     return (
       <div className="segmentContainer">
         <Header className="segmentTitle" size="large">
-          Faculty statistics
+          Faculties
         </Header>
         <Segment className="contentSegment">
-          <FacultySelector faculties={faculties} handleSelect={handleSelect} selected={facultyCode !== undefined} />
+          <FacultySelector
+            faculties={sortedFaculties}
+            handleSelect={handleSelect}
+            selected={facultyCode !== undefined}
+          />
         </Segment>
       </div>
     )
