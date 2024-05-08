@@ -40,15 +40,17 @@ const PinButton = ({ onClick, pinned, programmeCode }) => {
   const grey = '#c4c4c4'
 
   return (
-    <Button
-      icon
-      onClick={() => {
-        onClick({ programmeCode })
-      }}
-      style={{ background: 'none', padding: '5px' }}
-    >
-      <Icon name="pin" style={{ color: pinned ? black : grey }} />
-    </Button>
+    <div style={{ width: '50px' }}>
+      <Button
+        icon
+        onClick={() => {
+          onClick({ programmeCode })
+        }}
+        style={{ background: 'none', padding: '5px' }}
+      >
+        <Icon name="pin" style={{ color: pinned ? black : grey }} />
+      </Button>
+    </div>
   )
 }
 
@@ -116,6 +118,10 @@ export const StudyProgrammeSelector = ({ selected }) => {
     {
       key: 'pin',
       title: 'Pin',
+      helpText: `
+        Click the pin icon to pin/unpin a programme. Pinned programmes are shown first
+        here and in the study programme search in Class statistics.
+      `,
       getRowVal: programme => programme.code,
       getRowContent: programme => (
         <PinButton
