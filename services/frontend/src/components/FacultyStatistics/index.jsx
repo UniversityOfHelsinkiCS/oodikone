@@ -99,7 +99,7 @@ export const FacultyStatistics = () => {
     return (
       <div className="segmentContainer">
         <Header className="segmentTitle" size="large">
-          Faculty statistics
+          Faculties
         </Header>
         <Segment className="contentSegment">
           <FacultySelector faculties={faculties} handleSelect={handleSelect} selected={facultyCode !== undefined} />
