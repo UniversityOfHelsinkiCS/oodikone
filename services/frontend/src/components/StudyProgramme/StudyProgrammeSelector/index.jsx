@@ -1,7 +1,7 @@
 import { debounce } from 'lodash'
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Button, Form, FormField, FormInput, Header, Icon, Loader, Message, Segment } from 'semantic-ui-react'
+import { Button, Form, FormField, FormInput, Header, Icon, Loader, Message, Radio, Segment } from 'semantic-ui-react'
 
 import { createLocaleComparator, createPinnedFirstComparator, getUnifiedProgrammeName } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -40,7 +40,7 @@ const PinButton = ({ onClick, pinned, programmeCode }) => {
   const grey = '#c4c4c4'
 
   return (
-    <div style={{ width: '50px' }}>
+    <div style={{ textAlign: 'center', width: '100%' }}>
       <Button
         icon
         onClick={() => {
@@ -54,8 +54,8 @@ const PinButton = ({ onClick, pinned, programmeCode }) => {
   )
 }
 
-const StudyProgrammeTable = ({ header, headers, programmes }) => {
-  if (programmes == null || programmes.length === 0) return null
+const StudyProgrammeTable = ({ header, headers, programmes, visible = true }) => {
+  if (!visible || programmes == null || programmes.length === 0) return null
 
   return (
     <>
@@ -70,6 +70,7 @@ export const StudyProgrammeSelector = ({ selected }) => {
   const { data: programmesAndStudyTracks } = useGetProgrammesQuery()
   const studyProgrammes = Object.values(programmesAndStudyTracks?.programmes || {})
   const [filter, setFilter] = useState('')
+  const [otherProgrammesVisible, setOtherProgrammesVisible] = useState(false)
   const handleFilterChange = debounce(value => {
     setFilter(value)
   }, 500)
@@ -118,6 +119,8 @@ export const StudyProgrammeSelector = ({ selected }) => {
     {
       key: 'pin',
       title: 'Pin',
+      sortable: false,
+      filterable: false,
       helpText: `
         Click the pin icon to pin/unpin a programme. Pinned programmes are shown first
         here and in the study programme search in Class statistics.
@@ -177,6 +180,13 @@ export const StudyProgrammeSelector = ({ selected }) => {
   return (
     <Segment className="contentSegment">
       <StudyProgrammeFilter handleFilterChange={handleFilterChange} studyProgrammes={studyProgrammes} />
+      <Radio
+        checked={!otherProgrammesVisible}
+        label="Filter out old and specialized programmes"
+        onChange={() => setOtherProgrammesVisible(!otherProgrammesVisible)}
+        style={{ marginTop: '20px' }}
+        toggle
+      />
       {studyProgrammes.length > 0 && filteredStudyProgrammes.length === 0 && <Message>No programmes found</Message>}
       <StudyProgrammeTable
         header="Combined programmes"
@@ -202,6 +212,7 @@ export const StudyProgrammeSelector = ({ selected }) => {
         header="Other programmes"
         headers={headers}
         programmes={otherProgrammes.sort(pinnedFirstComparator)}
+        visible={otherProgrammesVisible}
       />
     </Segment>
   )

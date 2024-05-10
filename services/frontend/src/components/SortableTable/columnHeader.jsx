@@ -605,9 +605,13 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
                   </div>
                 </Popup>
               )}
-              {column.helpText && <Popup content={column.helpText} position="top center" trigger={helpIcon} />}
             </div>
           </SizeMeasurer>
+        )}
+        {column.helpText && (
+          <div>
+            <Popup content={column.helpText} position="top center" trigger={helpIcon} />
+          </div>
         )}
       </SizeMeasurer>
     </th>
