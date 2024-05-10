@@ -1,13 +1,15 @@
 import _ from 'lodash'
-import React from 'react'
-import { useContext } from 'use-context-selector'
+import React, { memo } from 'react'
+import { useContext, useContextSelector } from 'use-context-selector'
 
 import { cloneColumns, DataItemType, getDataItemType, SortableTableContext, thickBorderStyles } from './common'
 import './style.css'
 
 export const getKey = data => {
-  if (data.studentnumber) return data.studentnumber
-  if (data.id) return data.id
+  const columnsToCheck = ['studentNumber', 'studentnumber', 'id']
+  for (const column of columnsToCheck) {
+    if (data[column]) return data[column]
+  }
   return crypto.randomUUID()
 }
 
@@ -158,8 +160,9 @@ const ColumnContent = ({ column, data, isGroup, parents }) => {
   }
 }
 
-const Row = ({ data, isGroup, parents }) => {
-  const { columns, columnSpans } = useContext(SortableTableContext)
+const RowComponent = ({ data, isGroup, parents }) => {
+  const columns = useContextSelector(SortableTableContext, ({ columns }) => columns)
+  const columnSpans = useContextSelector(SortableTableContext, ({ columnSpans }) => columnSpans)
 
   const resolveProp = value => {
     if (typeof value === 'function') {
@@ -225,3 +228,11 @@ const Row = ({ data, isGroup, parents }) => {
     </tr>
   )
 }
+
+const Row = memo(
+  RowComponent,
+  (prevProps, nextProps) =>
+    _.isEqual(prevProps.data, nextProps.data) &&
+    _.isEqual(prevProps.isGroup, nextProps.isGroup) &&
+    _.isEqual(prevProps.parents, nextProps.parents)
+)
