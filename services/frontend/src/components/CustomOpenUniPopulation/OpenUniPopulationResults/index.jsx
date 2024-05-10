@@ -28,18 +28,18 @@ const getColumns = (labelsToCourses, getTextIn) => {
     textAlign: 'center',
   }
 
-  const studentNbrColumn = [
+  const studentNumberColumn = [
     {
       key: 'studentnumber-parent',
       mergeHeader: true,
-      title: 'Student Number',
+      title: 'Student number',
       children: [
         {
           key: 'studentnumber-child',
-          title: 'Student Number',
+          title: 'Student number',
           cellProps: { style },
-          getRowVal: s => s.studentnumber,
-          getRowContent: s => s.studentnumber,
+          getRowVal: student => student.studentnumber,
+          getRowContent: student => student.studentnumber,
         },
       ],
     },
@@ -51,23 +51,20 @@ const getColumns = (labelsToCourses, getTextIn) => {
       title: 'Passed',
       cellProps: { style },
       headerProps: { title: 'Passed' },
-      getRowVal: s => s.totals.passed,
-      getRowContent: s => s.totals.passed,
+      getRowVal: student => student.totals.passed,
     },
     {
       key: 'failed',
       title: 'Failed',
       headerProps: { title: 'Failed' },
-      getRowVal: s => s.totals.failed,
-      getRowContent: s => s.totals.failed,
+      getRowVal: student => student.totals.failed,
       cellProps: { style },
     },
     {
       key: 'unfinished',
       title: 'Unfinished',
       headerProps: { title: 'Unfinished' },
-      getRowVal: s => s.totals.unfinished,
-      getRowContent: s => s.totals.unfinished,
+      getRowVal: student => student.totals.unfinished,
       cellProps: { style },
     },
   ]
@@ -76,53 +73,61 @@ const getColumns = (labelsToCourses, getTextIn) => {
     {
       key: 'email-child',
       title: 'Email',
-      getRowVal: s => (s.email ? s.email : ''),
-      getRowContent: s => (s.email ? s.email : ''),
+      getRowVal: student => (student.email ? student.email : ''),
       headerProps: { title: 'Email' },
     },
     {
       key: 'secondary_email-child',
-      title: 'Secondary Email',
-      getRowVal: s => (s.secondaryEmail ? s.secondaryEmail : ''),
-      getRowContent: s => (s.secondaryEmail ? s.secondaryEmail : ''),
+      title: 'Secondary email',
+      getRowVal: student => (student.secondaryEmail ? student.secondaryEmail : ''),
       headerProps: { title: 'Secondary Email' },
     },
   ]
-  const findRowContent = (s, courseCode) => {
-    if (s.courseInfo[courseCode] === undefined) return null
-    if (s.courseInfo[courseCode].status.passed) return <Icon color="green" fitted name="check" />
-    if (s.courseInfo[courseCode].status.failed) return <Icon color="red" fitted name="times" />
-    if (s.courseInfo[courseCode].status.unfinished) return <Icon color="grey" fitted name="minus" />
+
+  const findRowContent = (student, courseCode) => {
+    if (student.courseInfo[courseCode] === undefined) return null
+    if (student.courseInfo[courseCode].status.passed) return <Icon color="green" fitted name="check" />
+    if (student.courseInfo[courseCode].status.failed) return <Icon color="red" fitted name="times" />
+    if (student.courseInfo[courseCode].status.unfinished) return <Icon color="grey" fitted name="minus" />
     return null
   }
 
-  const findRowValue = (s, courseCode, hidden = false) => {
-    if (s.courseInfo[courseCode] === undefined) return ''
-    if (s.courseInfo[courseCode].status.passed && hidden)
-      return `Passed: ${moment(s.courseInfo[courseCode].status.passed).format('YYYY-MM-DD')}`
-    if (s.courseInfo[courseCode].status.failed && hidden)
-      return `Failed: ${moment(s.courseInfo[courseCode].status.failed).format('YYYY-MM-DD')}`
-    if (s.courseInfo[courseCode].status.unfinished && hidden)
-      return `Enrollment: ${moment(s.courseInfo[courseCode].status.unfinished).format('YYYY-MM-DD')}`
-    if (s.courseInfo[courseCode].status.passed) return 'Passed'
-    if (s.courseInfo[courseCode].status.failed) return 'Failed'
-    if (s.courseInfo[courseCode].status.unfinished) return 'Unfinished'
+  const findRowValue = (student, courseCode, hidden = false) => {
+    if (student.courseInfo[courseCode] === undefined) return ''
+    if (student.courseInfo[courseCode].status.passed && hidden) {
+      return `Passed: ${moment(student.courseInfo[courseCode].status.passed).format('YYYY-MM-DD')}`
+    }
+    if (student.courseInfo[courseCode].status.failed && hidden) {
+      return `Failed: ${moment(student.courseInfo[courseCode].status.failed).format('YYYY-MM-DD')}`
+    }
+    if (student.courseInfo[courseCode].status.unfinished && hidden) {
+      return `Enrollment: ${moment(student.courseInfo[courseCode].status.unfinished).format('YYYY-MM-DD')}`
+    }
+    if (student.courseInfo[courseCode].status.passed) return 'Passed'
+    if (student.courseInfo[courseCode].status.failed) return 'Failed'
+    if (student.courseInfo[courseCode].status.unfinished) return 'Unfinished'
     return ''
   }
-  const findProp = (s, courseCode) => {
+  const findProp = (student, courseCode) => {
     const propObj = {
       title: '',
       style,
     }
-    if (s.courseInfo[courseCode] === undefined) return propObj
-    if (s.courseInfo[courseCode].status.passed)
-      return { ...propObj, title: `Passed: ${moment(s.courseInfo[courseCode].status.passed).format('YYYY-MM-DD')}` }
-    if (s.courseInfo[courseCode].status.failed)
-      return { ...propObj, title: `Failed: ${moment(s.courseInfo[courseCode].status.failed).format('YYYY-MM-DD')}` }
-    if (s.courseInfo[courseCode].status.unfinished)
+    if (student.courseInfo[courseCode] === undefined) return propObj
+    if (student.courseInfo[courseCode].status.passed)
       return {
         ...propObj,
-        title: `Enrollment: ${moment(s.courseInfo[courseCode].status.unfinished).format('YYYY-MM-DD')}`,
+        title: `Passed: ${moment(student.courseInfo[courseCode].status.passed).format('YYYY-MM-DD')}`,
+      }
+    if (student.courseInfo[courseCode].status.failed)
+      return {
+        ...propObj,
+        title: `Failed: ${moment(student.courseInfo[courseCode].status.failed).format('YYYY-MM-DD')}`,
+      }
+    if (student.courseInfo[courseCode].status.unfinished)
+      return {
+        ...propObj,
+        title: `Enrollment: ${moment(student.courseInfo[courseCode].status.unfinished).format('YYYY-MM-DD')}`,
       }
     return propObj
   }
@@ -137,13 +142,13 @@ const getColumns = (labelsToCourses, getTextIn) => {
     textTitle: `${course.label}-${getTextIn(course.name)}`,
     vertical: false,
     forceToolsMode: 'dangling',
-    cellProps: s => findProp(s, course.label),
+    cellProps: student => findProp(student, course.label),
     headerProps: { title: `${course.label}-${getTextIn(course.name)}` },
-    getRowVal: s => {
-      return findRowValue(s, course.label)
+    getRowVal: student => {
+      return findRowValue(student, course.label)
     },
-    getRowContent: s => {
-      return findRowContent(s, course.label)
+    getRowContent: student => {
+      return findRowContent(student, course.label)
     },
     code: course.label,
   }))
@@ -156,8 +161,8 @@ const getColumns = (labelsToCourses, getTextIn) => {
     headerProps: {
       title: `Dates-${course.label}-${getTextIn(course.name)}`,
     },
-    getRowVal: s => {
-      return findRowValue(s, course.label, true)
+    getRowVal: student => {
+      return findRowValue(student, course.label, true)
     },
     code: `hidden ${course.label}`,
   }))
@@ -166,25 +171,25 @@ const getColumns = (labelsToCourses, getTextIn) => {
   columns.push(
     {
       key: 'general',
-      title: <b>Labels:</b>,
+      title: <b>Labels</b>,
       textTitle: null,
-      children: studentNbrColumn,
+      children: studentNumberColumn,
     },
     {
-      key: 'Courses',
-      title: <b>Courses:</b>,
+      key: 'courses',
+      title: <b>Courses</b>,
       textTitle: null,
       children: columnsToShow,
     },
     {
       key: 'statistics',
-      title: <b>Total of:</b>,
+      title: <b>Total of</b>,
       textTitle: null,
       children: statisticColumns,
     },
     {
       key: 'information',
-      title: <b>Information:</b>,
+      title: <b>Information</b>,
       textTitle: null,
       children: informationColumns,
     }
@@ -236,7 +241,7 @@ export const OpenUniPopulationResults = ({ fieldValues }) => {
             columns={tableData.columns}
             data={tableData.data}
             featureName="open_uni"
-            title={`Open Uni Student Population (${Object.keys(openUniStudentStats?.data.students).length} students)`}
+            title={`Open uni student population (${Object.keys(openUniStudentStats?.data.students).length} students)`}
           />
         )}
       </div>
