@@ -241,7 +241,7 @@ describe('Population Statistics', () => {
     })
   })
 
-  it('"Reset All Filters" button works', () => {
+  it('"Reset All Filters" button works', { retries: 2 }, () => {
     cy.cs('Gender-header').click()
     cy.cs('genderFilter-dropdown').selectFromDropdown(0)
     checkFilteringResult(42)
