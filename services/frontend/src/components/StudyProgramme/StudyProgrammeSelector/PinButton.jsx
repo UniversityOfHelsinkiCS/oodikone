@@ -6,7 +6,7 @@ export const PinButton = ({ onClick, pinned, programmeCode }) => {
   const grey = '#c4c4c4'
 
   return (
-    <div style={{ textAlign: 'center', width: '100%' }}>
+    <div style={{ textAlign: 'center' }}>
       <Button
         icon
         onClick={() => {

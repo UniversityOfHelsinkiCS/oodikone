@@ -1,7 +1,7 @@
 /* eslint-disable no-return-assign */
 import { produce } from 'immer'
 import _ from 'lodash'
-import React, { useRef, useState, useEffect, useMemo, useCallback } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Icon, Popup } from 'semantic-ui-react'
 import { useContextSelector } from 'use-context-selector'
 
@@ -520,20 +520,11 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
           <SizeMeasurer onSizeChange={onTitleSizeChange} style={{ display: 'inline-flex', alignItems: 'center' }}>
             {typeof column.title === 'string' ? <p style={{ whiteSpace: 'pre' }}>{column.title}</p> : column.title}
           </SizeMeasurer>
-          {column.helpText && forcedTitleWidth && (
-            <>
-              <div style={{ flexGrow: 1 }} />
-              <Icon
-                name="question circle outline"
-                style={{ opacity: 0.5, display: 'inline-block', marginRight: 0, marginLeft: '0.5em', flexShrink: 0 }}
-              />
-            </>
-          )}
         </Orientable>
         <div style={{ flexGrow: 1 }} />
         {(sortable || filterable) && (
           <SizeMeasurer className={`column-tools ${toolsMode}`} onSizeChange={onToolsSizeChange}>
-            <div>
+            <div style={{ marginRight: column.helpText ? '20px' : 0 }}>
               {sortable && (!hasChildren || column.mergeHeader) && (
                 <Icon
                   name={sortIcon}
