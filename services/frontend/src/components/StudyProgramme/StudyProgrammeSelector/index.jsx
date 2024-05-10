@@ -1,69 +1,19 @@
 import { debounce } from 'lodash'
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Button, Form, FormField, FormInput, Header, Icon, Loader, Message, Radio, Segment } from 'semantic-ui-react'
+import { Loader, Message, Radio, Segment } from 'semantic-ui-react'
 
 import { createLocaleComparator, createPinnedFirstComparator, getUnifiedProgrammeName } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { SortableTable } from '@/components/SortableTable'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import {
   useAddStudyProgrammePinMutation,
   useGetStudyProgrammePinsQuery,
   useRemoveStudyProgrammePinMutation,
 } from '@/redux/studyProgrammePins'
-
-const StudyProgrammeFilter = ({ handleFilterChange, studyProgrammes }) => {
-  if (studyProgrammes.length <= 10) return null
-
-  return (
-    <Form>
-      <FormField>
-        <label style={{ marginBottom: '10px' }}>Filter programmes</label>
-        <FormInput
-          onChange={event => handleFilterChange(event.target.value)}
-          placeholder="Type here to filter study programmes"
-        />
-      </FormField>
-    </Form>
-  )
-}
-
-const StudyProgrammeLink = ({ linkText, programmeCode }) => (
-  <Link style={{ color: 'black' }} to={`/study-programme/${programmeCode}`}>
-    {linkText}
-  </Link>
-)
-
-const PinButton = ({ onClick, pinned, programmeCode }) => {
-  const black = '#303030'
-  const grey = '#c4c4c4'
-
-  return (
-    <div style={{ textAlign: 'center', width: '100%' }}>
-      <Button
-        icon
-        onClick={() => {
-          onClick({ programmeCode })
-        }}
-        style={{ background: 'none', padding: '5px' }}
-      >
-        <Icon name="pin" style={{ color: pinned ? black : grey }} />
-      </Button>
-    </div>
-  )
-}
-
-const StudyProgrammeTable = ({ header, headers, programmes, visible = true }) => {
-  if (!visible || programmes == null || programmes.length === 0) return null
-
-  return (
-    <>
-      <Header>{header}</Header>
-      <SortableTable columns={headers} data={programmes} hideHeaderBar stretch />
-    </>
-  )
-}
+import { PinButton } from './PinButton'
+import { StudyProgrammeFilter } from './StudyProgrammeFilter'
+import { StudyProgrammeLink } from './StudyProgrammeLink'
+import { StudyProgrammeTable } from './StudyProgrammeTable'
 
 export const StudyProgrammeSelector = ({ selected }) => {
   const { getTextIn } = useLanguage()
