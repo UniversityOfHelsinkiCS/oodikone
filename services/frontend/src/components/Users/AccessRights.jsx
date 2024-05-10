@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
-import { Button, Form, Header, Icon, List, Message, Popup, Radio } from 'semantic-ui-react'
+import { Button, Form, Header, Icon, List, Message, Popup } from 'semantic-ui-react'
 
 import { createLocaleComparator, isNewStudyProgramme, textAndDescriptionSearch } from '@/common'
 import { userToolTips } from '@/common/InfoToolTips'
+import { FilterOldProgrammesToggle } from '@/components/common/FilterOldProgrammesToggle'
 import { InfoBox } from '@/components/Info/InfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useGetAllElementDetailsQuery } from '@/redux/elementdetails'
@@ -100,11 +101,10 @@ export const AccessRights = ({ user }) => {
             value={accessRightsToBeAdded}
           />
         </div>
-        <Radio
+        <FilterOldProgrammesToggle
           checked={filterOldProgrammes}
-          label="Filter out old and specialized programmes"
+          marginTop="0"
           onChange={() => setFilterOldProgrammes(!filterOldProgrammes)}
-          toggle
         />
       </div>
       <Header content={`Current study programme access rights (${currentRegularAccessRights.length})`} size="small" />

@@ -1,8 +1,9 @@
 import { debounce } from 'lodash'
 import React, { useState } from 'react'
-import { Loader, Message, Radio, Segment } from 'semantic-ui-react'
+import { Loader, Message, Segment } from 'semantic-ui-react'
 
 import { createLocaleComparator, createPinnedFirstComparator, getUnifiedProgrammeName } from '@/common'
+import { FilterOldProgrammesToggle } from '@/components/common/FilterOldProgrammesToggle'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import {
@@ -130,12 +131,9 @@ export const StudyProgrammeSelector = ({ selected }) => {
   return (
     <Segment className="contentSegment">
       <StudyProgrammeFilter handleFilterChange={handleFilterChange} studyProgrammes={studyProgrammes} />
-      <Radio
+      <FilterOldProgrammesToggle
         checked={!otherProgrammesVisible}
-        label="Filter out old and specialized programmes"
         onChange={() => setOtherProgrammesVisible(!otherProgrammesVisible)}
-        style={{ marginTop: '20px' }}
-        toggle
       />
       {studyProgrammes.length > 0 && filteredStudyProgrammes.length === 0 && <Message>No programmes found</Message>}
       <StudyProgrammeTable

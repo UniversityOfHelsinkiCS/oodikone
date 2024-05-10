@@ -5,7 +5,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import Datetime from 'react-datetime'
 import { connect } from 'react-redux'
 import { useHistory, useLocation } from 'react-router-dom'
-import { Button, Form, Grid, Icon, Message, Radio } from 'semantic-ui-react'
+import { Button, Form, Grid, Icon, Message } from 'semantic-ui-react'
 
 import {
   cancelablePromise,
@@ -16,6 +16,7 @@ import {
   textAndDescriptionSearch,
 } from '@/common'
 import { useSearchHistory } from '@/common/hooks'
+import { FilterOldProgrammesToggle } from '@/components/common/FilterOldProgrammesToggle'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SearchHistory } from '@/components/SearchHistory'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
@@ -355,15 +356,10 @@ const PopulationSearchForm = ({ queries, onProgress, clearSelected, getPopulatio
         </Form.Field>
         <Form.Field>
           {fullAccessToStudentData && (
-            <div style={{ marginTop: '22px' }}>
-              <Radio
-                checked={filterProgrammes}
-                data-cy="toggleFilterProgrammes"
-                label="Filter out old and specialized programmes"
-                onChange={() => setFilterProgrammes(!filterProgrammes)}
-                toggle
-              />
-            </div>
+            <FilterOldProgrammesToggle
+              checked={filterProgrammes}
+              onChange={() => setFilterProgrammes(!filterProgrammes)}
+            />
           )}
         </Form.Field>
       </Form.Group>
