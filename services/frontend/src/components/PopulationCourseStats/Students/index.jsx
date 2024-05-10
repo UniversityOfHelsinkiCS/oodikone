@@ -92,40 +92,24 @@ export const Students = ({ filteredStudents }) => {
         title: 'Course',
         children: [
           {
-            key: 'title-parent',
-            mergeHeader: 'title',
-            merge: true,
-            children: [
-              {
-                key: 'title',
-                title: 'Name',
-                getRowVal: row => getTextIn(row.name),
-              },
-              {
-                key: 'filter-toggle',
-                export: false,
-                getRowContent: (row, isGroup) => {
-                  if (isGroup) return null
-
-                  return <CourseFilterToggle course={row} />
-                },
-              },
-              {
-                key: 'go-to-course',
-                export: false,
-                getRowContent: (row, isGroup) =>
-                  !isGroup && (
-                    <Item
-                      as={Link}
-                      to={`/coursestatistics?courseCodes=["${encodeURIComponent(
-                        row.code
-                      )}"]&separate=false&unifyOpenUniCourses=false`}
-                    >
-                      <Icon name="level up alternate" onClick={() => onGoToCourseStatisticsClick(row.code)} />
-                    </Item>
-                  ),
-              },
-            ],
+            key: 'name',
+            title: 'Name',
+            getRowVal: row => getTextIn(row.name),
+            getRowContent: (row, isGroup) =>
+              isGroup ? (
+                getTextIn(row.name)
+              ) : (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.3em' }}>
+                  <div style={{ flexGrow: '1' }}>{getTextIn(row.name)}</div>
+                  <CourseFilterToggle course={row} />
+                  <Item
+                    as={Link}
+                    to={`/coursestatistics?courseCodes=["${encodeURIComponent(row.code)}"]&separate=false`}
+                  >
+                    <Icon name="level up alternate" onClick={() => onGoToCourseStatisticsClick(row.code)} />
+                  </Item>
+                </div>
+              ),
           },
           {
             key: 'code',
@@ -141,15 +125,13 @@ export const Students = ({ filteredStudents }) => {
           key: `student-${student.studentnumber}`,
           title: `${namesVisible ? student.name : student.studentnumber}`,
           vertical: true,
+          sortable: false,
+          filterable: false,
           getRowVal: (row, isGroup) =>
             isGroup
               ? countCompleted(row.courses, student.studentnumber)
-              : hasCompleted(row.code, student.studentnumber),
-          getRowContent: (row, isGroup) =>
-            isGroup
-              ? countCompleted(row.courses, student.studentnumber)
               : hasCompleted(row.code, student.studentnumber) && <Icon color="green" fitted name="check" />,
-          formatValue: value => (value ? 'Passed' : 'Not passed'),
+          getRowExportVal: row => (hasCompleted(row.code, student.studentnumber) ? '1' : ''),
         })),
       },
     ],
@@ -160,7 +142,7 @@ export const Students = ({ filteredStudents }) => {
     <div>
       <SortableTable
         actions={
-          <Button onClick={() => toggleStudentNames()} size="tiny">
+          <Button onClick={toggleStudentNames} size="tiny">
             {namesVisible ? 'Hide student names' : 'Show student names'}
           </Button>
         }

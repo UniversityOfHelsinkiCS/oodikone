@@ -261,3 +261,16 @@ export const useToggle = (initialValue = false) => {
   }, [])
   return [value, toggle]
 }
+
+/**
+ * This hook is similar to useMemo, but it does a deep comparison of the dependencies (using `isEqual` from Lodash).
+ */
+export const useDeepMemo = (factory, dependencies) => {
+  const ref = useRef()
+
+  if (!ref.current || !isEqual(dependencies, ref.current.deps)) {
+    ref.current = { deps: dependencies, result: factory() }
+  }
+
+  return ref.current.result
+}

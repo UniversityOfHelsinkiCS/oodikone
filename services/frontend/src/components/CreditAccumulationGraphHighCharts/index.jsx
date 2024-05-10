@@ -1,12 +1,13 @@
 /* eslint-disable camelcase */
 import _ from 'lodash'
 import moment from 'moment'
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { renderToString } from 'react-dom/server'
 import ReactHighstock from 'react-highcharts/ReactHighstock'
 import { Button, Radio } from 'semantic-ui-react'
 
 import { reformatDate, getStudyRightElementTargetDates } from '@/common'
+import { useDeepMemo } from '@/common/hooks'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { DISPLAY_DATE_FORMAT, API_DATE_FORMAT } from '@/constants'
 import { CreditGraphTooltip } from './CreditGraphTooltip'
@@ -447,7 +448,7 @@ export const CreditAccumulationGraphHighCharts = ({
       ? students[0].studyrights.find(({ studyrightid }) => studyrightid === studyRightId)
       : null
 
-  const seriesData = useMemo(
+  const seriesData = useDeepMemo(
     () =>
       createStudentCreditLines(
         students,
@@ -465,10 +466,9 @@ export const CreditAccumulationGraphHighCharts = ({
       startDate,
       studyRightId,
       studyPlanFilterIsActive,
-      programmeCodes,
       cutStudyPlanCredits,
+      programmeCodes,
       customStudyStartYear,
-      getTextIn,
     ]
   )
 

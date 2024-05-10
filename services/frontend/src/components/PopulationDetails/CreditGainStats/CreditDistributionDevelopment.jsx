@@ -1,12 +1,13 @@
 import _ from 'lodash'
 import moment from 'moment'
 import qs from 'query-string'
-import React, { useMemo, useState } from 'react'
+import React, { useState } from 'react'
 import ReactHighcharts from 'react-highcharts'
 import { useLocation } from 'react-router-dom'
 import { Dropdown, Radio, Segment } from 'semantic-ui-react'
 
 import { generateGradientColors, getCreditCategories, getTargetCreditsForProgramme, TimeDivision } from '@/common'
+import { useDeepMemo } from '@/common/hooks'
 import { studentNumberFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -64,22 +65,16 @@ const hasGraduatedAfter = (student, programme, slot) => {
 
 const GRADUATED = Symbol('GRADUATED')
 
-const getChartData = (students, timeSlots, order, programme, timeDivision, cumulative, combinedProgramme) => {
+const getChartData = (students, timeSlots, programme, timeDivision, cumulative, combinedProgramme) => {
   const programmeCredits = getTargetCreditsForProgramme(programme) + (combinedProgramme ? 180 : 0)
 
-  let limits = getCreditCategories(cumulative, timeDivision, programmeCredits, timeSlots, 6)
-  let colors = generateGradientColors(limits.length)
+  const limits = getCreditCategories(cumulative, timeDivision, programmeCredits, timeSlots, 6)
+  const colors = generateGradientColors(limits.length)
 
   limits.push(GRADUATED)
   colors.push('#dedede') // grey
 
-  if (order === StackOrdering.ASCENDING) {
-    limits = _.reverse(limits)
-    colors = _.reverse(colors)
-  }
-  const data = new Array(limits.length)
-    .fill()
-    .map(() => new Array(timeSlots.length).fill().map(() => ({ y: 0, custom: { students: [] } })))
+  const data = new Array(limits.length).fill().map(() => new Array(timeSlots.length).fill().map(() => ({ y: 0 })))
 
   const studentCredits = students.map(student => splitStudentCredits(student, timeSlots, cumulative))
 
@@ -103,7 +98,6 @@ const getChartData = (students, timeSlots, order, programme, timeDivision, cumul
             })
 
         data[rangeIndex][timeSlotIndex].y += 1
-        data[rangeIndex][timeSlotIndex].custom.students.push(student.studentNumber)
       })
   })
 
@@ -130,24 +124,18 @@ const getChartData = (students, timeSlots, order, programme, timeDivision, cumul
   return series
 }
 
-function tooltipFormatter() {
-  return `<div style="text-align: center; width: 100%"><b>${this.x}</b>, ${this.series.name}<br/>${this.y}/${
-    this.total
-  } students (${Math.round(this.percentage)}%)</div>`
-}
-
 export const CreditDistributionDevelopment = ({ students, programme, combinedProgramme, year }) => {
   const [cumulative, setCumulative] = useState(true)
   const [timeDivision, setTimeDivision] = useState(TimeDivision.SEMESTER)
   const [stackOrdering, setStackOrdering] = useState(StackOrdering.ASCENDING)
   const location = useLocation()
   const { months } = qs.parse(location.search)
-  const semestersQuery = useGetSemestersQuery()
+  const { data: semestersAndYears = {} } = useGetSemestersQuery()
+  const { semesters = {} } = semestersAndYears
   const { getTextIn } = useLanguage()
   const { filterDispatch } = useFilters()
-  const timeSlots = useMemo(() => {
+  const timeSlots = (() => {
     const startDate = year ? moment([year]).endOf('year') : moment().subtract({ months }).endOf('year')
-    const semesters = semestersQuery.data?.semesters ?? []
 
     if (timeDivision === TimeDivision.CALENDAR_YEAR) {
       const startYear = months === undefined ? year : moment().year() - Math.ceil(months / 12)
@@ -186,27 +174,27 @@ export const CreditDistributionDevelopment = ({ students, programme, combinedPro
     }
 
     return []
-  }, [timeDivision, months, year, semestersQuery, getTextIn])
+  })()
 
-  const seriesList = useMemo(() => {
-    return [
-      getChartData(students, timeSlots, stackOrdering, programme, timeDivision, false, combinedProgramme),
-      getChartData(students, timeSlots, stackOrdering, programme, timeDivision, true, combinedProgramme),
-    ]
-  }, [students, timeSlots, stackOrdering, programme, timeDivision, cumulative])
+  const series = useDeepMemo(
+    () => getChartData(students, timeSlots, programme, timeDivision, cumulative, combinedProgramme),
+    [students, timeSlots, programme, timeDivision, cumulative, combinedProgramme]
+  )
 
   const labels = timeSlots.map(ts => ts.label)
-  const series = seriesList[0 + cumulative]
   const bcMsTitle = combinedProgramme === 'MH90_001' ? 'Bachelor + Licentiate' : 'Bachelor + Master'
   const title = combinedProgramme ? bcMsTitle : ''
   const config = {
-    series,
+    series: stackOrdering === StackOrdering.ASCENDING ? series.toReversed() : series,
     title: { text: title },
     credits: {
       enabled: false,
     },
     tooltip: {
-      formatter: tooltipFormatter,
+      formatter() {
+        // eslint-disable-next-line react/no-this-in-sfc
+        return `<div style="text-align: center; width: 100%"><b>${this.x}</b>, ${this.series.name}<br/>${this.y}/${this.total} students (${Math.round(this.percentage)}%)</div>`
+      },
     },
     xAxis: {
       categories: labels,
