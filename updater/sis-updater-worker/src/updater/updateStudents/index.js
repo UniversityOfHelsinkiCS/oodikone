@@ -315,6 +315,10 @@ const updateStudents = async (personIds, iteration = 0) => {
     return res
   }, {})
 
+  const logError = (e, updatedItem) => {
+    logger.error({ message: `Failed to update ${updatedItem}`, meta: e })
+  }
+
   await Promise.all([
     updateStudyRightElements(
       groupedStudyRightSnapshots,
@@ -322,12 +326,26 @@ const updateStudents = async (personIds, iteration = 0) => {
       personIdToStudentNumber,
       formattedStudyRights,
       mappedTransfers
+    ).catch(e => {
+      logError(e, 'studyright elements')
+    }),
+    updateAttainments(attainments, personIdToStudentNumber, attainmentsToBeExluced, studyRightIdToEducationType).catch(
+      e => {
+        logError(e, 'attainments')
+      }
     ),
-    updateAttainments(attainments, personIdToStudentNumber, attainmentsToBeExluced, studyRightIdToEducationType),
-    updateTermRegistrations(termRegistrations, personIdToStudentNumber),
-    updateEnrollments(enrollments, personIdToStudentNumber, studyRightIdToEducationType),
-    updateStudyplans(studyplans, personIds, personIdToStudentNumber, groupedStudyRightSnapshots),
-    bulkCreate(Transfer, mappedTransfers, null, ['studyrightid']),
+    updateTermRegistrations(termRegistrations, personIdToStudentNumber).catch(e => {
+      logError(e, 'term registrations')
+    }),
+    updateEnrollments(enrollments, personIdToStudentNumber, studyRightIdToEducationType).catch(e => {
+      logError(e, 'enrollments')
+    }),
+    updateStudyplans(studyplans, personIds, personIdToStudentNumber, groupedStudyRightSnapshots).catch(e => {
+      logError(e, 'studyplans')
+    }),
+    bulkCreate(Transfer, mappedTransfers, null, ['studyrightid']).catch(e => {
+      logError(e, 'transfers')
+    }),
   ])
 
   // Studyplans do not always update. These launch updateStudents again for those
