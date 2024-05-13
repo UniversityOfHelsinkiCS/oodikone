@@ -4,6 +4,7 @@ const facultystatsApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
     getFaculties: builder.query({
       query: () => '/faculties',
+      keepUnusedDataFor: 24 * 60 * 60, // 24 hours
     }),
     getFacultyBasicStats: builder.query({
       query: ({ id, yearType, studyProgrammeFilter, specialGroups }) =>

@@ -17,10 +17,9 @@ export const FacultyStatistics = () => {
   const history = useHistory()
   const { facultyCode } = useParams()
   const { getTextIn } = useLanguage()
-  const allFaculties = useGetFacultiesQuery()
-  const faculties = allFaculties?.data
+  const { data: faculties = [], isLoading } = useGetFacultiesQuery()
 
-  const faculty = faculties && facultyCode && faculties.find(faculty => faculty.code === facultyCode)
+  const faculty = faculties.length > 0 && facultyCode && faculties.find(faculty => faculty.code === facultyCode)
   const facultyName = faculty && getTextIn(faculty.name)
 
   const { isAdmin, fullAccessToStudentData, programmeRights } = useGetAuthorizedUserQuery()
@@ -38,7 +37,7 @@ export const FacultyStatistics = () => {
     [history]
   )
 
-  if (allFaculties.isLoading || allFaculties.isFetching) {
+  if (isLoading) {
     return <Loader active style={{ marginTop: '10em' }} />
   }
 
@@ -95,7 +94,7 @@ export const FacultyStatistics = () => {
 
   const panes = getPanes()
 
-  const sortedFaculties = Array.from(faculties).sort((a, b) => a.code.localeCompare(b.code))
+  const sortedFaculties = faculties.toSorted((a, b) => a.code.localeCompare(b.code))
 
   if (!facultyCode) {
     return (
