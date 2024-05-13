@@ -64,6 +64,10 @@ export const AccessRights = ({ user }) => {
     getTextIn
   )
 
+  const removeAllAccessRights = async () => {
+    await removeUserUnitsMutation({ uid, codes: currentRegularAccessRights.map(r => r.code) })
+  }
+
   const currentIamAccessRights = mapAndSortProgrammes(
     programmeRights.filter(({ isIamBased }) => isIamBased),
     elementdetails,
@@ -72,6 +76,30 @@ export const AccessRights = ({ user }) => {
 
   if (accessgroup.some(ag => ag.group_code === 'admin')) {
     return <Message header="This user is an admin." icon="lock open" positive />
+  }
+
+  if (accessgroup.some(ag => ag.group_code === 'fullSisuAccess')) {
+    return (
+      <Message icon positive>
+        <Icon name="lock open" />
+        <Message.Content>
+          <Message.Header>This user has full access to Sisu student data.</Message.Header>
+          {currentRegularAccessRights.length > 0 && (
+            <>
+              The user also has {currentRegularAccessRights.length} manually given study programme access rights. Click{' '}
+              <Button
+                basic
+                onClick={removeAllAccessRights}
+                style={{ padding: '0.25em', boxShadow: 'none', marginRight: 0 }}
+              >
+                <span style={{ color: '#4183C4' }}>here</span>
+              </Button>
+              to remove all manually given study programme access rights.
+            </>
+          )}
+        </Message.Content>
+      </Message>
+    )
   }
 
   return (

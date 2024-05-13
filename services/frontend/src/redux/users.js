@@ -10,6 +10,7 @@ const usersApi = RTKApi.injectEndpoints({
     }),
     getUser: builder.query({
       query: uid => `/users/${uid}`,
+      providesTags: result => (result ? [{ type: 'Users', id: result.id }] : []),
     }),
     modifyAccessGroups: builder.mutation({
       query: ({ username, accessgroups }) => ({
@@ -17,6 +18,7 @@ const usersApi = RTKApi.injectEndpoints({
         method: 'POST',
         body: { username, accessgroups },
       }),
+      invalidatesTags: ['Users'],
     }),
     addUserUnits: builder.mutation({
       query: ({ uid, codes }) => ({
@@ -24,6 +26,7 @@ const usersApi = RTKApi.injectEndpoints({
         method: 'POST',
         body: { codes },
       }),
+      invalidatesTags: ['Users'],
     }),
     removeUserUnits: builder.mutation({
       query: ({ uid, codes }) => ({
@@ -31,6 +34,7 @@ const usersApi = RTKApi.injectEndpoints({
         method: 'DELETE',
         body: { codes },
       }),
+      invalidatesTags: ['Users'],
     }),
     getUserAccessEmailPreview: builder.query({
       query: () => '/users/email/preview',
