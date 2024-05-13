@@ -83,17 +83,19 @@ const chunkifyArray = (array, size = 1) => {
 }
 
 const semesterChunkify = (courses, semesterenrollments, semesters, getTextIn) => {
-  const semesterChunks = semesterenrollments.reduce((acc, curr) => {
-    const currSemester = semesters.semesters[curr.semestercode]
-    const filteredcourses = courses.filter(
-      course =>
-        new Date(currSemester.startdate) < new Date(course.date) &&
-        new Date(course.date) < new Date(currSemester.enddate)
-    )
-    const grades = { data: filteredcourses, semester: currSemester, numOfCourses: filteredcourses.length }
-    acc.push(grades)
-    return acc
-  }, [])
+  const semesterChunks = semesterenrollments
+    .toSorted((a, b) => a.semestercode - b.semestercode)
+    .reduce((acc, curr) => {
+      const currSemester = semesters.semesters[curr.semestercode]
+      const filteredcourses = courses.filter(
+        course =>
+          new Date(currSemester.startdate) < new Date(course.date) &&
+          new Date(course.date) < new Date(currSemester.enddate)
+      )
+      const grades = { data: filteredcourses, semester: currSemester, numOfCourses: filteredcourses.length }
+      acc.push(grades)
+      return acc
+    }, [])
   const semesterMeans = semesterChunks.reduce((acc, curr) => {
     const sum = curr.data.reduce((a, b) => a + b.grade, 0)
     if (curr.numOfCourses > 0)
@@ -174,7 +176,8 @@ const GradeGraph = ({ semesters, student }) => {
     },
     yAxis: {
       min: 1,
-      max: 5,
+      max: 5.1,
+      endOnTick: false,
     },
   }
 
