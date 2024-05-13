@@ -111,6 +111,11 @@ const getColumns = (
       ],
     },
     {
+      key: 'curriculumPeriod',
+      title: 'Curriculum period',
+      getRowVal: row => row.curriculumPeriod,
+    },
+    {
       key: 'semesterEnrollments',
       title: 'Semesters\npresent',
       filterType: 'range',

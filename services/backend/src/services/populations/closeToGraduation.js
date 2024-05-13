@@ -12,6 +12,7 @@ const {
 } = require('../../models')
 const { mapToProviders } = require('../../util/utils')
 const { redisClient } = require('../redis')
+const { getCurriculumVersion } = require('./shared')
 
 const CLOSE_TO_GRADUATION_REDIS_KEY = 'CLOSE_TO_GRADUATION_DATA'
 
@@ -84,6 +85,7 @@ const formatStudent = student => {
       studyTrack,
     },
     latestAttainmentDates,
+    curriculumPeriod: getCurriculumVersion(student.studyplans[0].curriculum_period_id),
     credits: {
       hops: student.studyplans[0].completed_credits,
       all: student.creditcount,
@@ -106,7 +108,7 @@ const findStudentsCloseToGraduation = async () =>
       include: [
         {
           model: Studyplan,
-          attributes: ['completed_credits', 'included_courses', 'programme_code'],
+          attributes: ['completed_credits', 'included_courses', 'programme_code', 'curriculum_period_id'],
           where: {
             completed_credits: {
               [Op.gte]: 160,

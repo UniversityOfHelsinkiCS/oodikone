@@ -612,4 +612,5 @@ module.exports = {
   getOptionsForStudents,
   dateMonthsFromNow,
   getEarliestYear,
+  getCurriculumVersion,
 }
