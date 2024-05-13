@@ -87,7 +87,7 @@ const getColumns = (
       key: 'startOfStudyright',
       title: 'Start of studyright',
       getRowVal: row => row.studyright.startDate,
-      getRowContent: row => reformatDate(row.studyright.startDate, 'YYYY-MM-DD'),
+      formatValue: date => reformatDate(date, 'YYYY-MM-DD'),
       filterType: 'date',
     },
     {
@@ -100,6 +100,7 @@ const getColumns = (
           getRowVal: row => row.credits.hops,
           filterType: 'range',
           forceToolsMode: 'floating',
+          helpText: "The credits earned from courses in the student's primary study plan",
         },
         {
           key: 'creditsTotal',
@@ -107,13 +108,15 @@ const getColumns = (
           getRowVal: row => row.credits.all,
           filterType: 'range',
           forceToolsMode: 'floating',
+          helpText: 'The total number of credits the student has earned at the university',
         },
       ],
     },
     {
       key: 'curriculumPeriod',
-      title: 'Curriculum period',
+      title: 'Curriculum\nperiod',
       getRowVal: row => row.curriculumPeriod,
+      helpText: 'The curriculum period the student has chosen for their primary study plan',
     },
     {
       key: 'semesterEnrollments',
@@ -166,12 +169,16 @@ const getColumns = (
           title: 'HOPS',
           getRowVal: row => reformatDate(row.latestAttainmentDates.hops, 'YYYY-MM-DD'),
           filterType: 'date',
+          helpText: 'The date when the student last completed a course in their primary study plan',
+          forceToolsMode: 'floating',
         },
         {
           key: 'latestAttainmentTotal',
           title: 'Total',
           getRowVal: row => reformatDate(row.latestAttainmentDates.total, 'YYYY-MM-DD'),
           filterType: 'date',
+          helpText: 'The date when the student last completed any course at the university',
+          forceToolsMode: 'floating',
         },
       ],
     },
@@ -299,6 +306,7 @@ export const CloseToGraduation = () => {
         <PaginatedSortableTable
           columns={columns}
           data={filteredStudents}
+          defaultSort={['programme', 'asc']}
           featureName="students_close_to_graduation"
           handleDisplayedDataChange={handleDisplayedDataChange}
           rowCount={rowCount}

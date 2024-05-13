@@ -466,7 +466,7 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
   const helpIcon = (
     <Icon
       name="question circle outline"
-      style={{ opacity: 0.5, display: 'inline-block', marginRight: 0, flexShrink: 0 }}
+      style={{ opacity: 0.5, display: 'inline-block', marginLeft: '0.35em', marginRight: 0 }}
     />
   )
 

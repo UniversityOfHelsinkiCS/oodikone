@@ -202,7 +202,7 @@ const RowComponent = ({ data, isGroup, parents }) => {
 
     const content = getCellContent(column, data, isGroup, parents)
 
-    if (content !== undefined && content !== null) {
+    if (content != null) {
       cells.push(
         <td colSpan={columnSpans[column.key]} key={column.key + cellProps.title} {...cellProps}>
           <div

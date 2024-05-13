@@ -80,13 +80,7 @@ const DefaultColumnFilterComponent = ({ column, options, dispatch }) => {
               event.preventDefault()
               event.stopPropagation()
             }}
-            text={
-              text !== undefined && text !== null ? (
-                `${text}`
-              ) : (
-                <span style={{ color: 'gray', fontStyle: 'italic' }}>Empty</span>
-              )
-            }
+            text={text != null ? `${text}` : <span style={{ color: 'gray', fontStyle: 'italic' }}>Empty</span>}
           />
         )
       })
