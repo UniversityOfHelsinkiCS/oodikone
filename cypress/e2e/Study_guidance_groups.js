@@ -79,14 +79,7 @@ describe('Study guidance group tests', () => {
       })
 
       it('general tab of the students table has the correct columns', () => {
-        const firstRowHeadings = [
-          'Phone number',
-          'Student number',
-          'Credits',
-          'Start year at uni',
-          'Study programmes',
-          'Tags',
-        ]
+        const firstRowHeadings = ['Student number', 'Credits', 'Start year at uni', 'Study programmes', 'Tags']
         const secondRowHeadings = ['All', 'Since 1.1.1970']
         cy.cs('Students (2)').click()
         cy.get('[data-cy="student-table-tabs"] table thead tr').then($tr => {
@@ -137,17 +130,14 @@ describe('Study guidance group tests', () => {
 
       it('general tab of the students table has the correct columns', () => {
         const firstRowHeadings = [
-          'Phone number',
           'Student number',
           'Credits',
           'Start of studyright',
           'Started in programme',
           'Semesters present',
-          'Enrollment status',
           'Graduation date',
           'Start year at uni',
           'Other programmes',
-          'Semesters present amount',
           'Transferred from',
           'Gender',
           'Citizenship',
