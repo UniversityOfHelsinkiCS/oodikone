@@ -1,14 +1,8 @@
 import { array, arrayOf, string } from 'prop-types'
 import React from 'react'
-import { Segment, Table } from 'semantic-ui-react'
+import { Table } from 'semantic-ui-react'
 
-const getWidth = index => {
-  if (index === 1) {
-    return '6'
-  }
-  return '1'
-}
-
+const courseNameColumnIndex = 1
 const creditsColumnIndex = 3
 
 const getHeaderRow = headers => (
@@ -17,7 +11,7 @@ const getHeaderRow = headers => (
       {headers.map((header, index) => (
         <Table.HeaderCell
           key={`header-${header}`}
-          style={{ textAlign: index === creditsColumnIndex ? 'right' : 'left', paddingRight: '30px' }}
+          style={{ textAlign: index === creditsColumnIndex ? 'right' : 'left' }}
         >
           {header}
         </Table.HeaderCell>
@@ -41,8 +35,8 @@ const getTableBody = rows => (
             <Table.Cell
               // eslint-disable-next-line react/no-array-index-key
               key={`cell-${index}`}
-              style={{ textAlign: index === creditsColumnIndex ? 'right' : 'left', paddingRight: '30px' }}
-              width={getWidth(index)}
+              style={{ textAlign: index === creditsColumnIndex ? 'right' : 'left' }}
+              width={index === courseNameColumnIndex ? 8 : 1}
             >
               {value}
             </Table.Cell>
@@ -56,12 +50,10 @@ const getTableBody = rows => (
 export const StudentCourseTable = ({ headers, rows }) => {
   if (rows.length > 0) {
     return (
-      <Segment style={{ padding: 0 }}>
-        <Table unstackable>
-          {getHeaderRow(headers)}
-          {getTableBody(rows)}
-        </Table>
-      </Segment>
+      <Table>
+        {getHeaderRow(headers)}
+        {getTableBody(rows)}
+      </Table>
     )
   }
   return <div>Student has courses marked</div>

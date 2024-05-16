@@ -1,7 +1,7 @@
 import { isEmpty, sortBy } from 'lodash'
 import moment from 'moment'
 import React, { useState } from 'react'
-import { Loader, Message, Segment } from 'semantic-ui-react'
+import { Loader, Message } from 'semantic-ui-react'
 
 import { bachelorHonoursProgrammes as bachelorCodes, getNewestProgramme } from '@/common'
 import { StudentInfoCard } from '@/components/StudentStatistics/StudentInfoCard'
@@ -143,7 +143,7 @@ export const StudentDetails = ({ studentNumber }) => {
     return <Message header="Student not found or no sufficient permissions" icon="warning sign" negative size="big" />
 
   return (
-    <Segment className="contentSegment">
+    <>
       <StudentInfoCard student={student} />
       <StudentGraphs
         absences={getAbsentYears()}
@@ -160,7 +160,7 @@ export const StudentDetails = ({ studentNumber }) => {
         studyrightid={studyrightid}
       />
       {honoursCode && <BachelorHonours absentYears={getAbsentYears()} programmeCode={honoursCode} student={student} />}
-      <CourseParticipationTable clearCourseStats={() => {}} student={student} studyrightid={studyrightid} />
-    </Segment>
+      <CourseParticipationTable student={student} studyrightid={studyrightid} />
+    </>
   )
 }

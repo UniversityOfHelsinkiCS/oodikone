@@ -17,7 +17,7 @@ export const StudentStatistics = () => {
         Student statistics
       </Header>
       <StudentNameVisibilityToggle />
-      <div style={{ alignContent: 'center', margin: 'auto' }}>
+      <div style={{ width: '75%', minWidth: '800px', maxWidth: '1200px' }}>
         <Segment className="contentSegment">
           {studentNumber ? <StudentDetails studentNumber={studentNumber} /> : <StudentSearch />}
         </Segment>

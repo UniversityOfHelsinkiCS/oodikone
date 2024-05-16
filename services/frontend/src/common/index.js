@@ -68,10 +68,6 @@ export const reformatDate = (date, outputFormat) => {
   return parsedDate
 }
 
-export const byDateDesc = (a, b) => new Date(b.date) - new Date(a.date)
-
-export const byDateAsc = (a, b) => new Date(a.date) - new Date(b.date)
-
 export const getTimestamp = () => moment().format('YYYY-MM-DD')
 
 export const getStudentTotalCredits = (student, includeTransferredCredits = true) => {
@@ -103,34 +99,21 @@ export const getStudentGradeMeanWeightedByCredits = (student, includeTransferred
   return mean
 }
 
-export const getTextInWithOpen = (texts, language, isOpenCourse) => {
-  const prefixes = ['Avoin', 'Öppna', 'Open']
-  if (texts) {
-    const lanText = texts[language] || texts.fi || texts.en || texts.sv || Object.values(texts)[0]
-    const splitText = lanText.split(':')
-    if (prefixes.some(word => splitText[0].startsWith(word))) {
-      splitText.shift()
-    }
-    const newText = [...splitText].join()
-
-    if (isOpenCourse) {
-      switch (language) {
-        case 'fi':
-          return `${prefixes[0]} yo: ${newText}`
-
-        case 'sv':
-          return `${prefixes[1]} uni: ${newText}`
-
-        case 'en':
-          return `${prefixes[2]} uni: ${newText}`
-
-        default:
-          return `${prefixes[0]} yo: ${newText}`
-      }
-    }
-    return newText
+export const getTextInWithOpen = (course, getTextIn, isOpenCourse, isStudyModuleCredit) => {
+  if (!course) return ''
+  const openUniTexts = { fi: 'Avoin yo', en: 'Open uni', sv: 'Öppna uni' }
+  let courseName = getTextIn(course.name)
+  if (
+    isOpenCourse &&
+    !Object.values(openUniTexts).some(text => courseName.toLowerCase().startsWith(text.toLowerCase()))
+  ) {
+    courseName = `${getTextIn(openUniTexts)}: ${courseName}`
   }
-  return null
+  if (isStudyModuleCredit) {
+    courseName += ` [${getTextIn({ en: 'Study module', fi: 'Opintokokonaisuus', sv: 'Studiehelhet' })}]`
+  }
+  courseName += ` (${course.code})`
+  return courseName
 }
 
 export const getUnifyTextIn = unifyCourses => {
@@ -322,7 +305,7 @@ export const getStudyRightElementTargetDates = (studyRight, absences = []) => {
   const months = getMonthsForDegree(code)
   const end =
     code.includes('KH') || code.includes('ba') || ['MH30_001', 'MH30_003'].includes(code)
-      ? moment(sreStartDate).add(months, 'months').set('month', 7).endOf('month')
+      ? moment(sreStartDate).add(months, 'months').set('month', 6).endOf('month')
       : moment(sreStartDate).add(months, 'months')
 
   if (!absences) return [new Date(sreStartDate), new Date(end)]

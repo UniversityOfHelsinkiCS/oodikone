@@ -1,8 +1,8 @@
 const { Op } = require('sequelize')
+
 const {
   dbConnections: { sequelize },
 } = require('../database/connection')
-const moment = require('moment')
 const {
   Student,
   Credit,
@@ -258,16 +258,12 @@ const formatStudent = async ({
     })
   )
 
-  const courseByDate = (a, b) => {
-    return moment(a.attainment_date).isSameOrBefore(b.attainment_date) ? -1 : 1
-  }
-
   if (credits === undefined) {
     credits = []
   }
 
   const formattedCredits = credits
-    .sort(courseByDate)
+    .sort((a, b) => new Date(a.attainment_date) - new Date(b.attainment_date))
     .map(toCourse)
     .filter(c => c.course.name !== 'missing')
 
