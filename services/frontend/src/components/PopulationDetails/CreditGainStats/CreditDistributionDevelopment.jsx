@@ -74,7 +74,9 @@ const getChartData = (students, timeSlots, programme, timeDivision, cumulative, 
   limits.push(GRADUATED)
   colors.push('#dedede') // grey
 
-  const data = new Array(limits.length).fill().map(() => new Array(timeSlots.length).fill().map(() => ({ y: 0 })))
+  const data = new Array(limits.length)
+    .fill()
+    .map(() => new Array(timeSlots.length).fill().map(() => ({ y: 0, custom: { students: [] } })))
 
   const studentCredits = students.map(student => splitStudentCredits(student, timeSlots, cumulative))
 
@@ -98,6 +100,7 @@ const getChartData = (students, timeSlots, programme, timeDivision, cumulative, 
             })
 
         data[rangeIndex][timeSlotIndex].y += 1
+        data[rangeIndex][timeSlotIndex].custom.students.push(student.studentNumber)
       })
   })
 
