@@ -452,7 +452,7 @@ export const GeneralTab = ({
         displayColumn: false,
         getRowVal: student => {
           const studyright = getStudyright(student)
-          const enrollment = studyright.semester_enrollments.find(enrollment => enrollment.semestercode === semester)
+          const enrollment = studyright.semester_enrollments?.find(enrollment => enrollment.semestercode === semester)
           return getEnrollmentTypeTextForExcel(enrollment?.enrollmenttype, enrollment?.statutoryAbsence)
         },
       })),
