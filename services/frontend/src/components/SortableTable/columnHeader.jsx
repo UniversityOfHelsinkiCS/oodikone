@@ -365,13 +365,14 @@ export const extractColumnKeys = columns => {
     .value()
 }
 
-const ColumnHeader = ({ columnKey, displayColumnKey, ...props }) => {
+const ColumnHeader = ({ columnKey, displayColumnKey, column, ...props }) => {
   const storedState = useContextSelector(SortableTableContext, ctx => ctx.state.columnOptions[displayColumnKey])
   const colSpan = useContextSelector(SortableTableContext, ctx => ctx.columnSpans[columnKey])
 
   const state = useMemo(() => storedState ?? getDefaultColumnOptions(), [storedState])
+  if (column.displayColumn === false) return null
 
-  return <ColumnHeaderContent colSpan={colSpan} state={state} {...props} />
+  return <ColumnHeaderContent colSpan={colSpan} column={column} state={state} {...props} />
 }
 
 const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowSpan, style }) => {
@@ -391,13 +392,13 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
     toolsMode = column.forceToolsMode
   }
 
-  const noDangling = column.noDangling || column.helpText
+  const noDangling = column.helpText != null
 
   useEffect(() => {
     if (!noDangling && forcedTitleWidth) {
       setForcedTitleWidth(undefined)
     }
-  }, [column.noDangling, column.helpText])
+  }, [column.helpText])
 
   const { sort } = state
 
@@ -439,7 +440,7 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
       if (!noDangling) {
         setToolsMode('dangling')
       } else {
-        setForcedTitleWidth(toolsWidth - (cellWidth - titleWidth))
+        setForcedTitleWidth(toolsWidth)
       }
     } else if (titleWidth + toolsWidth > cellWidth) {
       setToolsMode('floating')
@@ -490,7 +491,6 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
         verticalAlign: column.vertical ? 'top' : 'center',
         position: 'relative',
         overflow: toolsMode === 'floating' ? 'hidden' : '',
-        display: column.displayColumn === false ? 'none' : '',
         ...borderStyles,
       }}
       {...column.headerProps}

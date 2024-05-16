@@ -99,7 +99,6 @@ const getColumns = (
           title: 'HOPS',
           getRowVal: row => row.credits.hops,
           filterType: 'range',
-          forceToolsMode: 'floating',
           helpText: "The credits earned from courses in the student's primary study plan",
         },
         {
@@ -107,7 +106,6 @@ const getColumns = (
           title: 'Total',
           getRowVal: row => row.credits.all,
           filterType: 'range',
-          forceToolsMode: 'floating',
           helpText: 'The total number of credits the student has earned at the university',
         },
       ],
@@ -170,7 +168,6 @@ const getColumns = (
           getRowVal: row => reformatDate(row.latestAttainmentDates.hops, 'YYYY-MM-DD'),
           filterType: 'date',
           helpText: 'The date when the student last completed a course in their primary study plan',
-          forceToolsMode: 'floating',
         },
         {
           key: 'latestAttainmentTotal',
@@ -178,7 +175,6 @@ const getColumns = (
           getRowVal: row => reformatDate(row.latestAttainmentDates.total, 'YYYY-MM-DD'),
           filterType: 'date',
           helpText: 'The date when the student last completed any course at the university',
-          forceToolsMode: 'floating',
         },
       ],
     },
