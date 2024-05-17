@@ -64,6 +64,7 @@ describe('Students tests', () => {
     cy.get('.prompt').type(student.studentnumber)
     cy.contains('td a', student.studentnumber).click()
     cy.contains('Introduction to Machine Learning (DATA11002)')
+      .parent()
       .siblings()
       .last()
       .within(() => {
