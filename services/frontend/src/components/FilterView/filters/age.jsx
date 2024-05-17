@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import React, { useCallback, useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 
 import { getAge } from '@/common'
 import { useDebounce } from '@/common/hooks'

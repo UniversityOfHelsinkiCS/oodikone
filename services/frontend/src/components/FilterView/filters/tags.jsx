@@ -1,5 +1,4 @@
 import fp from 'lodash/fp'
-import React from 'react'
 import { Form, Dropdown, Message } from 'semantic-ui-react'
 
 import { createFilter } from './createFilter'

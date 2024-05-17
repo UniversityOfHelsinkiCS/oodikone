@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Segment, Tab } from 'semantic-ui-react'
 import { GradeDistributionChart } from './charts/GradeDistributionChart'
 import { PassRateChart } from './charts/PassRateChart'

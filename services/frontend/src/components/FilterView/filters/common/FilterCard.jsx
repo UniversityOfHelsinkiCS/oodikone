@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import React, { useState, useRef } from 'react'
+import { useState, useRef } from 'react'
 import { Icon, Header } from 'semantic-ui-react'
 
 import { InfoWithHelpTooltip } from '@/components/Info/InfoWithHelpTooltip'

@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import React, { memo } from 'react'
+import { memo } from 'react'
 import { useContext, useContextSelector } from 'use-context-selector'
 
 import { cloneColumns, DataItemType, getDataItemType, SortableTableContext, thickBorderStyles } from './common'

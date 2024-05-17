@@ -1,5 +1,4 @@
 import moment from 'moment/moment'
-import React from 'react'
 import { Table } from 'semantic-ui-react'
 
 import { hopsFilter as studyPlanFilter } from '@/components/FilterView/filters'

@@ -1,4 +1,3 @@
-import React from 'react'
 import { Popup } from 'semantic-ui-react'
 
 import { FilterToggleIcon } from '@/components/common/FilterToggleIcon'

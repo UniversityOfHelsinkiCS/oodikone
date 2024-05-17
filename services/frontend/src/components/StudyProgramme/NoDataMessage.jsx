@@ -1,5 +1,3 @@
-import React from 'react'
-
 export const NoDataMessage = ({ message }) => {
   return (
     <div className="no-data-message">

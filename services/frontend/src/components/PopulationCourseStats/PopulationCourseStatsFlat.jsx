@@ -1,5 +1,5 @@
 import { debounce, orderBy } from 'lodash'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { Icon, Input, Tab, Table } from 'semantic-ui-react'
 

@@ -1,4 +1,3 @@
-import React from 'react'
 import { Popup, Button, Icon } from 'semantic-ui-react'
 
 export const FilterToggle = ({ active, applyFilter, clearFilter, popupContent }) => {

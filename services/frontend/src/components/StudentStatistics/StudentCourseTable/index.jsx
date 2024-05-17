@@ -1,5 +1,4 @@
 import { array, arrayOf, string } from 'prop-types'
-import React from 'react'
 import { Table } from 'semantic-ui-react'
 
 const courseNameColumnIndex = 1

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Divider, Loader } from 'semantic-ui-react'
 
 import { getGraduationGraphTitle, getTargetCreditsForProgramme } from '@/common'

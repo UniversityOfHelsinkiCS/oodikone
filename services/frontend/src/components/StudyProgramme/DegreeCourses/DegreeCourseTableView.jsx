@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { Button, Dropdown, Icon, Label, Table } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -274,7 +274,7 @@ export const DegreeCourseTableView = ({
       </Table.Header>
       <Table.Body>
         {modules.map(({ module, courses }) => (
-          <React.Fragment key={`fragment-${module}`}>
+          <Fragment key={`fragment-${module}`}>
             <Table.Row key={module}>
               <Table.Cell onClick={() => toggleVisible(module)} style={{ cursor: 'pointer' }}>
                 <Icon name={isVisible(module) ? 'angle down' : 'angle right'} />
@@ -324,7 +324,7 @@ export const DegreeCourseTableView = ({
                     )}
                   </Table.Row>
                 ))}
-          </React.Fragment>
+          </Fragment>
         ))}
       </Table.Body>
     </Table>

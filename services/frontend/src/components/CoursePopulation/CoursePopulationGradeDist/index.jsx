@@ -1,5 +1,4 @@
 import { intersection, orderBy } from 'lodash'
-import React from 'react'
 import { Progress, Table } from 'semantic-ui-react'
 
 import { getHighestGradeOfCourseBetweenRange } from '@/common'

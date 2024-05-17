@@ -1,4 +1,3 @@
-import React from 'react'
 import { useHistory, useParams } from 'react-router-dom'
 import { Button, Card, Divider, Popup, Segment, Loader, Message } from 'semantic-ui-react'
 

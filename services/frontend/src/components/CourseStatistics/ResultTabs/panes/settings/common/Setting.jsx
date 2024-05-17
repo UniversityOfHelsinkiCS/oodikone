@@ -1,5 +1,3 @@
-import React from 'react'
-
 export const Setting = ({ children, labelText }) => {
   return (
     <div style={{ alignItems: 'center', display: 'flex', flexDirection: 'column' }}>

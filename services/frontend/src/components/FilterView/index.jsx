@@ -1,7 +1,7 @@
 import { produce } from 'immer'
 import _ from 'lodash'
 import fp from 'lodash/fp'
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { selectViewFilters, setFilterOptions, resetFilter, resetViewFilters } from '@/redux/filters'

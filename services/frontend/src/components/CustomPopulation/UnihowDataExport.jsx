@@ -1,4 +1,3 @@
-import React from 'react'
 import { Button, Popup } from 'semantic-ui-react'
 import { utils, writeFile } from 'xlsx'
 

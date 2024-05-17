@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { Table } from 'semantic-ui-react'
 
 import { ExpandableRow } from '@/components/FacultyStatistics/InteractiveDataView/ExpandableRow'
@@ -31,7 +31,7 @@ export const FacultyProgressTable = ({
       </Table.Header>
       <Table.Body>
         {data.map((yearArray, yearIndex) => (
-          <React.Fragment key={yearArray[0]}>
+          <Fragment key={yearArray[0]}>
             {!isTotalRow(yearArray) ? (
               <ExpandableRow
                 cypress={visibleYears[yearIndex] ? `Hide-${cypress}` : `Show-${cypress}`}
@@ -62,7 +62,7 @@ export const FacultyProgressTable = ({
                 </Table.Cell>
               </Table.Row>
             )}
-          </React.Fragment>
+          </Fragment>
         ))}
       </Table.Body>
     </Table>

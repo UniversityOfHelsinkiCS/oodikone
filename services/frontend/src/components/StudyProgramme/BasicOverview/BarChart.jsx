@@ -1,4 +1,3 @@
-import React from 'react'
 import ReactHighcharts from 'react-highcharts'
 
 const colors = ['#003E65', '#1392c2', '#036415']

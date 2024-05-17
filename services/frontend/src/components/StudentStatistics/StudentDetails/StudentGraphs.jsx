@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import React, { useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import ReactHighcharts from 'react-highcharts/ReactHighstock'
 import { Input, Menu, Message, Tab } from 'semantic-ui-react'
 

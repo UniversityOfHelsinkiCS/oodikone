@@ -1,5 +1,5 @@
 /* eslint-disable no-alert */
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button, Form, Header, Message, Radio, Segment, TextArea } from 'semantic-ui-react'
 
 import { callApi } from '@/apiConnection'

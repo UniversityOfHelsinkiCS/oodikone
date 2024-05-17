@@ -1,7 +1,7 @@
 import { sortBy } from 'lodash'
 import { func } from 'prop-types'
 import qs from 'query-string'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory, useLocation } from 'react-router-dom'
 import { Form, Header, Message, Popup, Radio, Segment } from 'semantic-ui-react'

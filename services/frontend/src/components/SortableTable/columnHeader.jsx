@@ -1,7 +1,7 @@
 /* eslint-disable no-return-assign */
 import { produce } from 'immer'
 import _ from 'lodash'
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Icon, Popup } from 'semantic-ui-react'
 import { useContextSelector } from 'use-context-selector'
 
@@ -375,7 +375,7 @@ const ColumnHeader = ({ columnKey, displayColumnKey, column, ...props }) => {
   return <ColumnHeaderContent colSpan={colSpan} column={column} state={state} {...props} />
 }
 
-const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowSpan, style }) => {
+const ColumnHeaderContent = memo(({ column, colSpan, state, dispatch, rowSpan, style }) => {
   const cellSize = useRef()
   const titleSize = useRef()
   const toolsSize = useRef()

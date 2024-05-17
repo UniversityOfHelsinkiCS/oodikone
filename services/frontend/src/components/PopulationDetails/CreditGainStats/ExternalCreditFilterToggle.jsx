@@ -1,5 +1,4 @@
 import qs from 'query-string'
-import React from 'react'
 import { useLocation } from 'react-router-dom'
 
 import { creditsEarnedFilter as creditFilter } from '@/components/FilterView/filters'

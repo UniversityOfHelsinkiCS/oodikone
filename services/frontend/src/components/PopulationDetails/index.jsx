@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { getFullStudyProgrammeRights } from '@/common'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'

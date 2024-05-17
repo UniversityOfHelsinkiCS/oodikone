@@ -1,7 +1,7 @@
 import moment from 'moment'
 import { bool, func, object, shape } from 'prop-types'
 import qs from 'query-string'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { connect } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import { Button, Form } from 'semantic-ui-react'

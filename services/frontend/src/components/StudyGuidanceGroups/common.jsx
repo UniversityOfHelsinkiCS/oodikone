@@ -1,4 +1,3 @@
-import React from 'react'
 import { Message, Segment } from 'semantic-ui-react'
 
 export const startYearToAcademicYear = year => {

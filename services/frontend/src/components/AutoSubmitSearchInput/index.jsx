@@ -1,5 +1,5 @@
 import { bool, func, number, string } from 'prop-types'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Input } from 'semantic-ui-react'
 
 import { Timeout } from '@/components/Timeout'

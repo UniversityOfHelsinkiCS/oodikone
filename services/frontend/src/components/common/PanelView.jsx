@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Accordion } from 'semantic-ui-react'
 
 import { useLocalStorage } from '@/common/hooks'

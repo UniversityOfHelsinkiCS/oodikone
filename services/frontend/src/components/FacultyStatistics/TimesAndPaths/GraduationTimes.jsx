@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Divider, Message } from 'semantic-ui-react'
 
 import { BreakdownBarChart } from './BreakdownBarChart'

@@ -1,6 +1,6 @@
 import moment from 'moment'
 import qs from 'query-string'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Datetime from 'react-datetime'
 import { useLocation, useHistory } from 'react-router-dom'
 import { Button, Form, Modal, TextArea } from 'semantic-ui-react'

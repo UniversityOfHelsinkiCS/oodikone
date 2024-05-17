@@ -1,5 +1,4 @@
 import { isString } from 'lodash'
-import React from 'react'
 import { Redirect } from 'react-router-dom'
 import { Card, Segment, Tab } from 'semantic-ui-react'
 

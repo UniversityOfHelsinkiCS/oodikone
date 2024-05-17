@@ -1,5 +1,5 @@
 import moment from 'moment'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Message, Icon, Loader } from 'semantic-ui-react'
 
 import { useTitle } from '@/common/hooks'

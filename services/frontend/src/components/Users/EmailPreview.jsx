@@ -1,4 +1,3 @@
-import React from 'react'
 import { Label, Message, Segment } from 'semantic-ui-react'
 
 const Light = ({ children }) => <span style={{ fontWeight: 'normal' }}>{children}</span>

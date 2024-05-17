@@ -1,5 +1,4 @@
 import _ from 'lodash'
-import React from 'react'
 import { useSelector } from 'react-redux'
 
 import { useGetAuthorizedUserQuery } from '@/redux/auth'

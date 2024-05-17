@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Container } from 'semantic-ui-react'
 
 import { CurriculumPicker } from '@/components/PopulationDetails/CurriculumPicker'

@@ -1,5 +1,5 @@
 import { bool, func } from 'prop-types'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Table, Icon } from 'semantic-ui-react'
 
 import { courseDataWithRealisationsType } from '@/constants/types'

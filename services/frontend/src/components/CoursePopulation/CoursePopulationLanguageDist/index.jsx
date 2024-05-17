@@ -1,5 +1,4 @@
 import moment from 'moment'
-import React from 'react'
 import { Table, Progress } from 'semantic-ui-react'
 
 import { languageAbbreviations } from '@/common'

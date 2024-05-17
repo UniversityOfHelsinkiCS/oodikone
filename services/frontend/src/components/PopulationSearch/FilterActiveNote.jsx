@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Button, Message } from 'semantic-ui-react'
 
 import { transferredToProgrammeFilter } from '@/components/FilterView/filters'

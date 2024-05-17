@@ -1,5 +1,5 @@
 import { arrayOf, func, number, oneOfType, shape, string } from 'prop-types'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Form, Tab } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'

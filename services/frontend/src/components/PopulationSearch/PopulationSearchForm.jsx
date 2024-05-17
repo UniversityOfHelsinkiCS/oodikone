@@ -1,7 +1,7 @@
 import { sortBy, isEqual } from 'lodash'
 import moment from 'moment'
 import qs from 'query-string'
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Datetime from 'react-datetime'
 import { connect } from 'react-redux'
 import { useHistory, useLocation } from 'react-router-dom'

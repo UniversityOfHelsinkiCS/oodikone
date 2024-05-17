@@ -1,4 +1,3 @@
-import React from 'react'
 import 'moment/locale/fi'
 
 import { filterToolTips } from '@/common/InfoToolTips'

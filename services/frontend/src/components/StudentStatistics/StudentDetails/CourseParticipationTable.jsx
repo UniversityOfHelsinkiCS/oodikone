@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react'
+import { Fragment } from 'react'
 import { Link } from 'react-router-dom'
 import { Divider, Header, Icon, Item, Label } from 'semantic-ui-react'
 

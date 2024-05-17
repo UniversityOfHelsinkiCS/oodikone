@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Container, Message, Form } from 'semantic-ui-react'
 
 export const CreditCriteriaForm = ({ criteria, studyProgramme, addProgressCriteriaCredits }) => {

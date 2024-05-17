@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import React, { useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Item, Icon, Button } from 'semantic-ui-react'
 

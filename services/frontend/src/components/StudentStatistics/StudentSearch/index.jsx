@@ -1,5 +1,5 @@
 import { debounce } from 'lodash'
-import React, { useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Container, Search, Segment } from 'semantic-ui-react'
 

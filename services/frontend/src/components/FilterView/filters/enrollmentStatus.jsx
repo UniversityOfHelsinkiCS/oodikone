@@ -1,5 +1,4 @@
 import fp from 'lodash/fp'
-import React from 'react'
 import { Dropdown, Form } from 'semantic-ui-react'
 
 import { filterToolTips } from '@/common/InfoToolTips'

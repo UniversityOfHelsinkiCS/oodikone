@@ -1,5 +1,5 @@
 import { debounce } from 'lodash'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Loader, Message, Segment } from 'semantic-ui-react'
 
 import { createLocaleComparator, createPinnedFirstComparator, getUnifiedProgrammeName } from '@/common'

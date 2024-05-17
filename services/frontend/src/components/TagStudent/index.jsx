@@ -1,5 +1,4 @@
 import { arrayOf, string, shape } from 'prop-types'
-import React from 'react'
 import { Dropdown, Icon, Label, Table } from 'semantic-ui-react'
 
 import { useDeleteStudentTagsMutation, useCreateStudentTagsMutation } from '@/redux/tags'

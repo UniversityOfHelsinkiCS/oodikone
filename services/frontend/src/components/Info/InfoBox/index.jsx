@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Button, Icon, Message, Popup } from 'semantic-ui-react'
 import { InfoBoxButton } from './InfoBoxButton'

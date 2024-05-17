@@ -1,4 +1,3 @@
-import React from 'react'
 import { Button, Dropdown, Icon, Label, Popup } from 'semantic-ui-react'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { FilterType } from './filterType'

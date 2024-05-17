@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { Button, Container, Divider, Grid, Header, Image, Icon, List } from 'semantic-ui-react'
 
 import { checkUserAccess, getFullStudyProgrammeRights, images } from '@/common'
@@ -98,10 +98,10 @@ export const FrontPage = () => {
                   {items.map(
                     (item, index) =>
                       item.show && (
-                        <React.Fragment key={item.title}>
+                        <Fragment key={item.title}>
                           <FrontPageItem content={item.content} title={item.title} />
                           {index !== items.length - 1 ? <Divider section /> : null}
-                        </React.Fragment>
+                        </Fragment>
                       )
                   )}
                 </Grid.Column>

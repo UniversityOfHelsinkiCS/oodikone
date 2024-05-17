@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import React, { useCallback, useEffect, useMemo, useReducer, useState } from 'react'
+import { useCallback, useEffect, useMemo, useReducer, useState } from 'react'
 import { Icon } from 'semantic-ui-react'
 
 import { computeColumnSpans, DataItem, getKey } from './columnContent'

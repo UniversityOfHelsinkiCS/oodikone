@@ -1,7 +1,7 @@
 import { difference, flatten, max, min, pickBy, uniq } from 'lodash'
 import { arrayOf, bool, func, number, objectOf, oneOfType, shape, string } from 'prop-types'
 import qs from 'query-string'
-import React, { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { connect } from 'react-redux'
 import { useHistory, useLocation } from 'react-router-dom'
 import { Button, Form, Grid, Header, Popup, Segment } from 'semantic-ui-react'

@@ -1,5 +1,5 @@
 import moment from 'moment'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Accordion, Divider, Header, Icon, Label, Table } from 'semantic-ui-react'
 
 import {

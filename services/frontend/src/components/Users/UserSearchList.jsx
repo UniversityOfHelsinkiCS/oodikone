@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import React, { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button, Label, Loader, Popup, Segment } from 'semantic-ui-react'
 

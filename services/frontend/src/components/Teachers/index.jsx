@@ -1,4 +1,3 @@
-import React from 'react'
 import { useHistory, useParams } from 'react-router-dom'
 import { Header, Segment, Tab } from 'semantic-ui-react'
 

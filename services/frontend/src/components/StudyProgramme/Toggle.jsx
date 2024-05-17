@@ -1,4 +1,3 @@
-import React from 'react'
 import { Radio } from 'semantic-ui-react'
 
 import { InfoWithHelpTooltip } from '@/components/Info/InfoWithHelpTooltip'

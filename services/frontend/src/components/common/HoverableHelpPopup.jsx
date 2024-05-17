@@ -1,4 +1,3 @@
-import React from 'react'
 import { Popup, Icon } from 'semantic-ui-react'
 
 export const HoverableHelpPopup = ({ content, style, size = 'small' }) => (

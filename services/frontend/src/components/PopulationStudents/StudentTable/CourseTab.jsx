@@ -1,5 +1,5 @@
 import _, { isNumber, orderBy, sortBy, uniqBy } from 'lodash'
-import React, { useCallback, useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { Icon, Tab } from 'semantic-ui-react'
 

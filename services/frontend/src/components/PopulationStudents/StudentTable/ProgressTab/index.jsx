@@ -1,6 +1,6 @@
 import { keyBy } from 'lodash'
 import moment from 'moment'
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Icon, Message, Tab } from 'semantic-ui-react'
 

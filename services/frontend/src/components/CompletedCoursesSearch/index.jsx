@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Icon, Message } from 'semantic-ui-react'
 
 import { useTitle } from '@/common/hooks'

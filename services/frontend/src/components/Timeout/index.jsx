@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import { Component } from 'react'
 
 export const Timeout = Composition =>
   class _Timeout extends Component {

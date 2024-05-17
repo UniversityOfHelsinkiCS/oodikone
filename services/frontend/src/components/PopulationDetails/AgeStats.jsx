@@ -1,5 +1,5 @@
 import { arrayOf, object, shape } from 'prop-types'
-import React, { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { Icon, Progress, Radio, Table } from 'semantic-ui-react'
 
 import { getAge, getFullStudyProgrammeRights } from '@/common'
@@ -100,7 +100,7 @@ export const AgeStats = ({ filteredStudents, query }) => {
         </Table.Header>
         <Table.Body>
           {getAges(isGrouped).map(([age, count], index) => (
-            <React.Fragment key={age}>
+            <Fragment key={age}>
               <Table.Row
                 onClick={!onlyIamRights ? () => handleGroupExpand(index) : null}
                 style={!onlyIamRights ? { cursor: isGrouped ? 'pointer' : undefined } : {}}
@@ -144,7 +144,7 @@ export const AgeStats = ({ filteredStudents, query }) => {
                       </Table.Row>
                     )
                   })}
-            </React.Fragment>
+            </Fragment>
           ))}
         </Table.Body>
       </Table>

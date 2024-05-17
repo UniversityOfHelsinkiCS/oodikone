@@ -1,5 +1,4 @@
 import moment from 'moment'
-import React from 'react'
 import { Popup } from 'semantic-ui-react'
 
 import { getCurrentSemester, isFall, isMastersProgramme } from '@/common'

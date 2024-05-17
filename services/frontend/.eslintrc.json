@@ -8,7 +8,7 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "extends": "../../.eslintrc.json",
+  "extends": ["../../.eslintrc.json", "plugin:react/jsx-runtime"],
   "rules": {
     "camelcase": "error",
     "consistent-return": "error",
@@ -62,7 +62,7 @@
       }
     },
     "react": {
-      "version": "16.14.0"
+      "version": "18.2.0"
     }
   }
 }

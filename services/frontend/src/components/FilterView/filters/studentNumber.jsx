@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Button, Icon } from 'semantic-ui-react'
 
 import { filterToolTips } from '@/common/InfoToolTips'

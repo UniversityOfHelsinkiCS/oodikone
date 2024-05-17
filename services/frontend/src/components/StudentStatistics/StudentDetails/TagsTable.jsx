@@ -1,6 +1,5 @@
 import { sortBy } from 'lodash'
 import { shape } from 'prop-types'
-import React from 'react'
 import { Header, Label } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'

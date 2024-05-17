@@ -1,5 +1,4 @@
 import { bool, number, oneOfType, string } from 'prop-types'
-import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Divider, Form, Header, Label, Segment } from 'semantic-ui-react'
 

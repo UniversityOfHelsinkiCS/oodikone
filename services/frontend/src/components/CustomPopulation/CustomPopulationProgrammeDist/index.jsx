@@ -1,5 +1,4 @@
 import moment from 'moment'
-import React from 'react'
 import { Progress } from 'semantic-ui-react'
 
 import { getNewestProgramme } from '@/common'

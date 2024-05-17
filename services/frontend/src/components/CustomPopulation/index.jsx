@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Form, Header, Input, Label, Message, Segment } from 'semantic-ui-react'
 
 import { useProgress, useTitle } from '@/common/hooks'

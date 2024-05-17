@@ -1,6 +1,5 @@
 import { maxBy } from 'lodash'
 import moment from 'moment'
-import React from 'react'
 import { Tab, Table } from 'semantic-ui-react'
 
 import { getNewestProgramme } from '@/common'

@@ -1,5 +1,4 @@
 import moment from 'moment'
-import React from 'react'
 import { Icon, Loader } from 'semantic-ui-react'
 
 import { hiddenNameAndEmailForExcel } from '@/common/columns'

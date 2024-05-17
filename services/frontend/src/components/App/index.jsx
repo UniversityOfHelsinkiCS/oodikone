@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/browser'
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { initShibbolethPinger } from 'unfuck-spa-shibboleth-session'
 
 import { AccessDenied } from '@/components/AccessDenied'

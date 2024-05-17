@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import React, { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Button, Checkbox, Modal, Table } from 'semantic-ui-react'
 import { utils, writeFile } from 'xlsx'
 

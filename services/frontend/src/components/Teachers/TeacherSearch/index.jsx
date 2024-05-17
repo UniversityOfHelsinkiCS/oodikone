@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Icon, Search, Segment } from 'semantic-ui-react'
 
 import { splitByEmptySpace, validateInputLength } from '@/common'

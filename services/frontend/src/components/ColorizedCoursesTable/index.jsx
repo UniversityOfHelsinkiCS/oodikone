@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Divider, Loader, Tab } from 'semantic-ui-react'
 
 import { getCurrentSemester } from '@/common'

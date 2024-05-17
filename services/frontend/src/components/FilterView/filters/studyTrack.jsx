@@ -1,7 +1,6 @@
 /* eslint-disable camelcase */
 import _ from 'lodash'
 import moment from 'moment'
-import React from 'react'
 import { Dropdown, Form } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'

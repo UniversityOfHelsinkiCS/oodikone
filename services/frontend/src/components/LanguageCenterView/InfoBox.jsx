@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Button, Icon, Message } from 'semantic-ui-react'
 
 export const InfoBox = () => {

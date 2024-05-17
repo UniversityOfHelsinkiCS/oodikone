@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Button, Divider, Loader, Message, Popup } from 'semantic-ui-react'
 import { utils, writeFile } from 'xlsx'
 

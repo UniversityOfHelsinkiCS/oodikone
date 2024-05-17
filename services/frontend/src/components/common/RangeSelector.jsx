@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import React, { useState, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { Range, getTrackBackground } from 'react-range'
 import { Input } from 'semantic-ui-react'
 

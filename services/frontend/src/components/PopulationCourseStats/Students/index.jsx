@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import React, { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button, Icon, Item, Pagination } from 'semantic-ui-react'
 

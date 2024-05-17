@@ -1,5 +1,4 @@
 /* eslint-disable react/no-this-in-sfc */
-import React from 'react'
 import ReactHighcharts from 'react-highcharts'
 
 const colors = ['#7cb5ec', '#90ed7d', '#434348', '#f7a35c', '#FFF000', '#2b908f', '#f45b5b', '#91e8e1']

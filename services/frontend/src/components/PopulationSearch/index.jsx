@@ -1,4 +1,3 @@
-import React from 'react'
 import { connect } from 'react-redux'
 import { Link, useHistory, useLocation } from 'react-router-dom'
 import { Button, Divider, Form, Header, Icon, Segment } from 'semantic-ui-react'

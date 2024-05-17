@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Divider, Dropdown, Form, Icon, Loader, Message, Radio } from 'semantic-ui-react'
 
 import {

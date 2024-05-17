@@ -1,5 +1,3 @@
-import React from 'react'
-
 import { getAllProgrammesOfStudent, reformatDate } from '@/common'
 
 const noProgrammeDuringCourse = {

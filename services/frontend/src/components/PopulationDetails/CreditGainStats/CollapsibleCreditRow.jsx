@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Table, Progress, Icon } from 'semantic-ui-react'
 
 import { ExternalCreditFilterToggle } from './ExternalCreditFilterToggle'

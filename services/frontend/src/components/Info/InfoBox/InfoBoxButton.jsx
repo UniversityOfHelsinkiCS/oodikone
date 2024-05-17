@@ -1,4 +1,3 @@
-import React from 'react'
 import { Button, Icon } from 'semantic-ui-react'
 
 export const InfoBoxButton = ({ cypress, toggleOpen }) => {

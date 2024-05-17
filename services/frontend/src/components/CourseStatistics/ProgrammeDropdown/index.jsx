@@ -1,6 +1,5 @@
 import { orderBy } from 'lodash'
 import { arrayOf, func, number, oneOfType, shape, string } from 'prop-types'
-import React from 'react'
 import { Form } from 'semantic-ui-react'
 
 import { ClearableItem } from './ClearableItem'

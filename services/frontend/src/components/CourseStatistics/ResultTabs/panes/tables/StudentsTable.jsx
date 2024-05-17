@@ -1,7 +1,7 @@
 import { uniq } from 'lodash'
 import { bool, object } from 'prop-types'
 import qs from 'query-string'
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Header, Icon, Item } from 'semantic-ui-react'

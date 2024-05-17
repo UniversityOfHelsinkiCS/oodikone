@@ -1,6 +1,6 @@
 import { flatten, uniq } from 'lodash'
 import { number, shape, string } from 'prop-types'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { Dropdown, Header, Table } from 'semantic-ui-react'
 

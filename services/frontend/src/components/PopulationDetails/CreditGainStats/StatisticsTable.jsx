@@ -1,5 +1,4 @@
 import _ from 'lodash'
-import React from 'react'
 import { Table } from 'semantic-ui-react'
 
 import { getStudentTotalCredits } from '@/common'

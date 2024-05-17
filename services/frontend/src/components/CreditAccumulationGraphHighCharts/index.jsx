@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import _ from 'lodash'
 import moment from 'moment'
-import React, { useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { renderToString } from 'react-dom/server'
 import ReactHighstock from 'react-highcharts/ReactHighstock'
 import { Button, Radio } from 'semantic-ui-react'

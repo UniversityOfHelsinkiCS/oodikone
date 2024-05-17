@@ -1,5 +1,3 @@
-import React from 'react'
-
 import { gradeFilter } from '@/components/FilterView/filters'
 import { FilterToggle } from '@/components/FilterView/FilterToggle'
 import { useFilters } from '@/components/FilterView/useFilters'

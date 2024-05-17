@@ -1,5 +1,5 @@
 import moment from 'moment'
-import React, { useRef } from 'react'
+import { useRef } from 'react'
 import Datetime from 'react-datetime'
 import { Icon, Button } from 'semantic-ui-react'
 import 'moment/locale/fi'

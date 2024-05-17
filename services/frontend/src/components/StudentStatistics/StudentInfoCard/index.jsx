@@ -1,4 +1,3 @@
-import React from 'react'
 import { Button, Card, Icon } from 'semantic-ui-react'
 
 import { callApi } from '@/apiConnection'

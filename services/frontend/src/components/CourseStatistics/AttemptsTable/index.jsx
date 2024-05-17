@@ -1,5 +1,4 @@
 import { arrayOf, bool, func, string } from 'prop-types'
-import React from 'react'
 import { Table } from 'semantic-ui-react'
 import { courseDataWithRealisationsType } from '@/constants/types'
 import { FoldableRow } from './foldableRow'

@@ -1,6 +1,5 @@
 import { produce } from 'immer'
 import _ from 'lodash'
-import React from 'react'
 
 import { setFilterOptions } from '@/redux/filters'
 

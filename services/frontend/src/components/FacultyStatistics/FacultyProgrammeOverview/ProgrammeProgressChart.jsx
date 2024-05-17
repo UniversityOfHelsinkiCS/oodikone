@@ -1,5 +1,4 @@
 /* eslint-disable react/no-this-in-sfc */
-import React from 'react'
 import ReactHighcharts from 'react-highcharts'
 
 import { generateGradientColors } from '@/common'

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Divider, Header, Loader, Message, Segment } from 'semantic-ui-react'
 
 import { getTargetCreditsForProgramme } from '@/common'

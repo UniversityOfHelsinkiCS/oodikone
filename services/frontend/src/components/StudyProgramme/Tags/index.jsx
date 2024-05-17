@@ -1,6 +1,6 @@
 import moment from 'moment'
 import { string } from 'prop-types'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import Datetime from 'react-datetime'
 import { Link } from 'react-router-dom'
 import { Button, Confirm, Form, Header, Icon, Item, List, Message, Popup, Segment } from 'semantic-ui-react'

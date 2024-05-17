@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Divider, Loader, Message } from 'semantic-ui-react'
 
 import { getGraduationGraphTitle } from '@/common'

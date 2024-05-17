@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 
 import { DataTable } from '@/components/StudyProgramme/BasicOverview/DataTable'
 import { StackedBarChart } from '@/components/StudyProgramme/BasicOverview/StackedBarChart'

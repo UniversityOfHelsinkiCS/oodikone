@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import { Link, useHistory } from 'react-router-dom'
 import { Segment, Icon, Item } from 'semantic-ui-react'
 

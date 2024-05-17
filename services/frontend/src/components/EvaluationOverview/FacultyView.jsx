@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Divider, Header, Loader, Message } from 'semantic-ui-react'
 
 import { facultyToolTips } from '@/common/InfoToolTips'

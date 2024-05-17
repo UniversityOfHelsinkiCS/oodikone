@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import moment from 'moment'
 import qs from 'query-string'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import ReactHighcharts from 'react-highcharts'
 import { useLocation } from 'react-router-dom'
 import { Dropdown, Radio, Segment } from 'semantic-ui-react'

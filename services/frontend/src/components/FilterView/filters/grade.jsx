@@ -1,5 +1,4 @@
 import fp from 'lodash/fp'
-import React from 'react'
 import { Checkbox, Form } from 'semantic-ui-react'
 
 import { getHighestGradeOrEnrollmentOfCourseBetweenRange } from '@/common'

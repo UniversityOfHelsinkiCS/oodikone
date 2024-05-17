@@ -1,4 +1,4 @@
-import React, { createContext, useState, useCallback, useContext, useEffect } from 'react'
+import { createContext, useState, useCallback, useContext, useEffect } from 'react'
 
 import { callApi } from '@/apiConnection'
 import { DEFAULT_LANG, LANGUAGE_CODES } from '@/constants'

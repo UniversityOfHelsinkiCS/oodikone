@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Button, Form, Modal, TextArea } from 'semantic-ui-react'
 
 import { textAndDescriptionSearch } from '@/common'

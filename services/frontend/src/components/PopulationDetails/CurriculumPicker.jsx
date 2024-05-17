@@ -1,5 +1,5 @@
 import { sortBy } from 'lodash'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Dropdown, Form, Input, Radio } from 'semantic-ui-react'
 
 import { useGetCurriculumsQuery, useGetCurriculumOptionsQuery } from '@/redux/populationCourses'

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Divider, Grid, Icon } from 'semantic-ui-react'
 
 import { CreditsGainedTable } from './CreditsGainedTable'

@@ -1,5 +1,4 @@
 import { flatten, sortBy } from 'lodash'
-import React from 'react'
 import { useSelector } from 'react-redux'
 import { Button, Icon, Popup } from 'semantic-ui-react'
 import { utils, writeFile } from 'xlsx'

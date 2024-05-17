@@ -1,4 +1,3 @@
-import React from 'react'
 import { Form, Radio } from 'semantic-ui-react'
 
 import { filterToolTips } from '@/common/InfoToolTips'

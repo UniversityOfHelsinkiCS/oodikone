@@ -1,4 +1,3 @@
-import React from 'react'
 import { Radio, Segment, SegmentGroup } from 'semantic-ui-react'
 
 import { courseStatisticsToolTips } from '@/common/InfoToolTips'

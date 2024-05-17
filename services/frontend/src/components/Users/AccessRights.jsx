@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Button, Form, Header, Icon, List, Message, Popup } from 'semantic-ui-react'
 
 import { createLocaleComparator, isNewStudyProgramme, textAndDescriptionSearch } from '@/common'

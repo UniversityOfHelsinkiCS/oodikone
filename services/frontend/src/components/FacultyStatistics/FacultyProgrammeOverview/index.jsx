@@ -1,4 +1,3 @@
-import React from 'react'
 import { Button, Divider, Loader, Message, Popup } from 'semantic-ui-react'
 
 import { getCreditCategories } from '@/common'

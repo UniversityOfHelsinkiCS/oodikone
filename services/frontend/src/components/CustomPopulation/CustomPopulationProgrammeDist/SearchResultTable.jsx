@@ -1,5 +1,4 @@
 import { array, arrayOf, bool, func, string } from 'prop-types'
-import React from 'react'
 import { Segment, Table } from 'semantic-ui-react'
 
 import './searchResultsTable.css'

@@ -1,5 +1,4 @@
 import _ from 'lodash'
-import React from 'react'
 import { Form, Dropdown } from 'semantic-ui-react'
 
 import { createFilter } from './createFilter'

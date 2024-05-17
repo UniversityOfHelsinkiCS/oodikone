@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
 import { Header, Loader, Segment, Tab } from 'semantic-ui-react'
 

@@ -1,6 +1,6 @@
 import { sortBy } from 'lodash'
 import { arrayOf, bool, func, shape, string } from 'prop-types'
-import React from 'react'
+import { memo } from 'react'
 import { Table } from 'semantic-ui-react'
 
 import { getActiveYears } from '@/components/CourseStatistics/courseStatisticsUtils'
@@ -72,4 +72,4 @@ const areEqual = (prevProps, nextProps) => {
   return prevProps.courses.every(c1 => nextProps.courses.some(c2 => c1.code === c2.code))
 }
 
-export const MemoizedCourseTable = React.memo(CourseTable, areEqual)
+export const MemoizedCourseTable = memo(CourseTable, areEqual)

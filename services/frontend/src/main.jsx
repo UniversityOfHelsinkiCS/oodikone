@@ -1,6 +1,5 @@
 // eslint-disable-next-line import/no-unused-modules
-import React from 'react'
-import ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
 import { BrowserRouter } from 'react-router-dom'
 
@@ -16,7 +15,7 @@ import { initializeSentry } from './util/sentry'
 
 initializeSentry()
 
-ReactDOM.render(
+createRoot(document.getElementById('root')).render(
   <Provider store={store}>
     <CommonContext>
       <BrowserRouter basename={basePath}>
@@ -25,6 +24,5 @@ ReactDOM.render(
         </ErrorBoundary>
       </BrowserRouter>
     </CommonContext>
-  </Provider>,
-  document.getElementById('root')
+  </Provider>
 )

@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react'
+import { Suspense } from 'react'
 import { Redirect, Route, Switch } from 'react-router-dom'
 
 import { CloseToGraduation } from '@/components/CloseToGraduation'

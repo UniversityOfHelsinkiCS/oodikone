@@ -1,5 +1,3 @@
-import React from 'react'
-
 import { Pane } from './Pane'
 import { StudentsTable } from './tables/StudentsTable'
 

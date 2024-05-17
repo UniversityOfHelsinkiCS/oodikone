@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import moment from 'moment'
 import qs from 'query-string'
-import React, { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { Form, Header, Input, Segment } from 'semantic-ui-react'
 import { getStudentToTargetCourseDateMap, getUnifyTextIn } from '@/common'

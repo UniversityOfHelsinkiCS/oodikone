@@ -1,4 +1,3 @@
-import React from 'react'
 import { Divider, Grid } from 'semantic-ui-react'
 
 import { StatisticsTable } from './StatisticsTable'

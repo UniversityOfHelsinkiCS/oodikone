@@ -1,6 +1,5 @@
 import { minBy } from 'lodash'
 import { arrayOf, func, number, object, oneOfType, shape, string } from 'prop-types'
-import React from 'react'
 import { Card, Icon } from 'semantic-ui-react'
 
 import { reformatDate } from '@/common'

@@ -1,4 +1,3 @@
-import React from 'react'
 import { Button, Icon, Table, Label } from 'semantic-ui-react'
 
 const roundValue = value => {

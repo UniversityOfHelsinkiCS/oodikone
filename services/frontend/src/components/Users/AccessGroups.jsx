@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Form, Button, Message } from 'semantic-ui-react'
 
 import { useGetAccessGroupsQuery, useModifyAccessGroupsMutation } from '@/redux/users'

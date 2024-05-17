@@ -1,6 +1,5 @@
 import { produce } from 'immer'
 import _ from 'lodash'
-import React from 'react'
 import { Dropdown } from 'semantic-ui-react'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { createFilter } from '../createFilter'

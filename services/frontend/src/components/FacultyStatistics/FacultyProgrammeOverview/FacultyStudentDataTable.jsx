@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { Button, Icon, Label, Popup, Table } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -185,7 +185,7 @@ export const FacultyStudentDataTable = ({
         <Table.Body>
           {years.map((year, yearIndex) => {
             return (
-              <React.Fragment key={`${year}-fragment`}>
+              <Fragment key={`${year}-fragment`}>
                 <Table.Row className={year === 'Total' ? 'total-row-cell' : ''} key={`${year}-faculty-row}`}>
                   {tableStats[year].map((value, valueIndex) => {
                     if (valueIndex === 0)
@@ -260,7 +260,7 @@ export const FacultyStudentDataTable = ({
                       </Table.Row>
                     )
                   })}
-              </React.Fragment>
+              </Fragment>
             )
           })}
         </Table.Body>

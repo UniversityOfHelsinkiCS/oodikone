@@ -1,5 +1,5 @@
 import { max, min, range } from 'lodash'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Header, Item, Icon, Loader, Segment } from 'semantic-ui-react'
 

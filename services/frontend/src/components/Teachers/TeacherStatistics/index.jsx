@@ -1,5 +1,5 @@
 import moment from 'moment'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Form, Segment, Dropdown, Button, Message } from 'semantic-ui-react'
 
 import { createLocaleComparator, getFullStudyProgrammeRights } from '@/common'

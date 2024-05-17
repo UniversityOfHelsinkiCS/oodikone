@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button, Form, Header, Icon, Message, Modal, TextArea } from 'semantic-ui-react'
 
 import { useTitle } from '@/common/hooks'

@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/browser'
-import React, { Component, Suspense } from 'react'
+import { Component, Suspense } from 'react'
 import { connect } from 'react-redux'
 import { Loader } from 'semantic-ui-react'
 

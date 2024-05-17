@@ -1,5 +1,4 @@
 import { flatten } from 'lodash'
-import React from 'react'
 import { connect, useSelector } from 'react-redux'
 import { Form, Header, Label, Segment } from 'semantic-ui-react'
 

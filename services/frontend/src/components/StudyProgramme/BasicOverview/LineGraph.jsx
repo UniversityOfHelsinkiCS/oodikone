@@ -1,4 +1,3 @@
-import React from 'react'
 import ReactHighcharts from 'react-highcharts'
 
 import '../studyprogramme.css'

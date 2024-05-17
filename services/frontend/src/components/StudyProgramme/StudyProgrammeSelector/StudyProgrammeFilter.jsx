@@ -1,4 +1,3 @@
-import React from 'react'
 import { Form, FormField, FormInput } from 'semantic-ui-react'
 
 export const StudyProgrammeFilter = ({ handleFilterChange, studyProgrammes }) => {

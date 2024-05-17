@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button, Dropdown, Form, Message, Modal, TextArea } from 'semantic-ui-react'
 
 import { useCreateStudentTagsMutation } from '@/redux/tags'
