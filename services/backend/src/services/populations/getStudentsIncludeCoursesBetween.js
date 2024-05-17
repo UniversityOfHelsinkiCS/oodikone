@@ -78,6 +78,9 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
   if (studentnumbers.length === 0)
     return { students: [], enrollments: [], credits: [], extents: [], semesters: [], elementdetails: [], courses: [] }
 
+  // eslint-disable-next-line no-console
+  console.time('Big db query in getStudentsIncludeCoursesBetween took')
+
   const [courses, enrollments, students, credits, extents, semesters, elementdetails] = await Promise.all([
     Course.findAll({
       attributes: [sequelize.literal('DISTINCT ON("code") code'), 'name'],
@@ -257,6 +260,9 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
       }
     ),
   ])
+
+  // eslint-disable-next-line no-console
+  console.timeEnd('Big db query in getStudentsIncludeCoursesBetween took')
 
   students.forEach(student => {
     student.tags = studentNumberToTags[student.studentnumber] || []
