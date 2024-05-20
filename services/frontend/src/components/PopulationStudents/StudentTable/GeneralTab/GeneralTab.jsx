@@ -650,7 +650,6 @@ export const GeneralTab = ({
       data={selectedStudents.map(studentNumber => students[studentNumber])}
       featureName="students"
       onlyExportColumns={hiddenNameAndEmailForExcel}
-      style={{ height: '80vh' }}
       title="General student information"
     />
   )

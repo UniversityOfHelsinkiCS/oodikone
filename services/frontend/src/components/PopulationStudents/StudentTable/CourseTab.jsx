@@ -1,4 +1,4 @@
-import _, { isNumber, orderBy, sortBy, uniqBy } from 'lodash'
+import { isNumber, orderBy, sortBy, sumBy, uniqBy } from 'lodash'
 import { useCallback, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { Icon, Tab } from 'semantic-ui-react'
@@ -58,10 +58,10 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
 
   const totalMandatoryPassed = useCallback(
     studentNumber =>
-      _.sumBy(Array.from(new Set(mandatoryCourses.defaultProgrammeCourses.map(({ code }) => code))), code =>
+      sumBy(Array.from(new Set(mandatoryCourses.defaultProgrammeCourses.map(({ code }) => code))), code =>
         hasPassedMandatory(studentNumber, code)
       ) +
-      _.sumBy(Array.from(new Set(mandatoryCourses.secondProgrammeCourses.map(({ code }) => code))), code =>
+      sumBy(Array.from(new Set(mandatoryCourses.secondProgrammeCourses.map(({ code }) => code))), code =>
         hasPassedMandatory(studentNumber, code)
       ),
     [mandatoryCourses, hasPassedMandatory]
@@ -73,7 +73,6 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
     nameColumns.push({
       key: 'studentnumber',
       title: 'Student number',
-      cellProps: { title: 'Student number' },
       getRowVal: student => (student.total ? '*' : student.studentNumber),
       getRowContent: student =>
         student.total ? 'Summary:' : <StudentInfoItem showSisuLink student={student} tab="Mandatory courses table" />,
@@ -85,14 +84,12 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
           key: 'lastname',
           title: 'Last name',
           getRowVal: student => (student.total ? null : student.lastname),
-          cellProps: { title: 'last name' },
           export: false,
         },
         {
           key: 'firstname',
           title: 'Given names',
           getRowVal: student => (student.total ? null : student.firstnames),
-          cellProps: { title: 'first names' },
           export: false,
         }
       )
@@ -109,7 +106,6 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
               .filter(isNumber)
               .reduce((acc, e) => acc + e, 0)
           : totalMandatoryPassed(student.studentNumber),
-      cellProps: { title: 'Total passed' },
     })
 
     const mandatoryCourseLabels = []
@@ -293,23 +289,20 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
 
     return [row(totals, { ignoreFilters: true, ignoreSorting: true }), ...students]
   }, [students, mandatoryCourses, hasPassedMandatory, mandatoryPassed])
+
   return (
     <Tab.Pane loading={pending}>
-      <div style={{ display: 'flex' }}>
-        <div style={{ maxHeight: '80vh', width: '100%' }}>
-          {mandatoryCourses?.defaultProgrammeCourses.length > 0 && (
-            <SortableTable
-              columns={columns}
-              data={data}
-              featureName="courses"
-              firstColumnSticky
-              onlyExportColumns={hiddenNameAndEmailForExcel}
-              tableId="course-of-population-students"
-              title="Courses of population's students"
-            />
-          )}
-        </div>
-      </div>
+      {mandatoryCourses?.defaultProgrammeCourses.length > 0 && (
+        <SortableTable
+          columns={columns}
+          data={data}
+          featureName="courses"
+          firstColumnSticky
+          onlyExportColumns={hiddenNameAndEmailForExcel}
+          tableId="course-of-population-students"
+          title="Courses of population's students"
+        />
+      )}
     </Tab.Pane>
   )
 }
