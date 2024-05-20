@@ -51,7 +51,7 @@ const formatStudent = student => {
     secondary_email: secondaryEmail,
   } = student
   const semesterEnrollments = {}
-  for (const enrollment of student.studyplans[0].studyright.semester_enrollments) {
+  for (const enrollment of student.studyplans[0].studyright.semesterEnrollments) {
     semesterEnrollments[enrollment.semestercode] = {
       type: enrollment.enrollmenttype,
       statutoryAbsence: enrollment.statutoryAbsence,
@@ -64,13 +64,14 @@ const formatStudent = student => {
   )?.element_detail
   const programmeCodeToProviderCode = mapToProviders([programmeCode])[0]
   const { latestAttainmentDates, thesisData } = findThesisAndLatestAttainments(student, programmeCodeToProviderCode)
-  const studyTrack = studyrightElements?.find(element => element?.element_detail.type === 30)?.element_detail
+  const studyTrack =
+    studyrightElements?.find(element => element?.element_detail.type === 30)?.element_detail?.name ?? null
 
   return {
     student: { studentNumber, name, sis_person_id, email, phoneNumber, secondaryEmail },
     studyright: {
       startDate: startOfStudyright,
-      semesterEnrollments: student.studyplans[0].studyright.semester_enrollments,
+      semesterEnrollments: student.studyplans[0].studyright.semesterEnrollments,
     },
     thesisInfo: thesisData
       ? {
@@ -120,7 +121,7 @@ const findStudentsCloseToGraduation = async () =>
           include: [
             {
               model: Studyright,
-              attributes: ['semester_enrollments', 'startdate', 'studyrightid'],
+              attributes: ['semesterEnrollments', 'startdate', 'studyrightid'],
               where: {
                 graduated: 0,
                 cancelled: false,
@@ -129,6 +130,11 @@ const findStudentsCloseToGraduation = async () =>
                 {
                   model: StudyrightElement,
                   attributes: ['code'],
+                  where: {
+                    enddate: {
+                      [Op.gte]: new Date(),
+                    },
+                  },
                   include: [
                     {
                       model: ElementDetail,

@@ -80,7 +80,7 @@ const getColumns = (
     {
       key: 'studytrack',
       title: 'Study track',
-      getRowVal: row => getTextIn(row.programme.studyTrack?.name),
+      getRowVal: row => getTextIn(row.programme.studyTrack),
       displayColumn: studyTrackVisible,
     },
     {
@@ -184,7 +184,7 @@ const getColumns = (
 export const CloseToGraduation = () => {
   useTitle('Students close to graduation')
 
-  const { data: students, isError, isLoading } = useGetStudentsCloseToGraduationQuery()
+  const { data: students = [], isError, isLoading } = useGetStudentsCloseToGraduationQuery()
   const { data: faculties = [] } = useGetFacultiesQuery()
   const { data: semesterData = [] } = useGetSemestersQuery()
   const programmes = useFilteredAndFormattedElementDetails()
@@ -209,17 +209,18 @@ export const CloseToGraduation = () => {
 
   const handleDisplayedDataChange = students => setRowCount(students.length)
 
-  const columns = getColumns(
-    getTextIn,
-    namesVisible,
-    semesterEnrollmentsVisible,
-    chosenProgrammes.length === 1,
-    allSemestersMap,
-    {
-      getSemesterEnrollmentsContent,
-      getSemesterEnrollmentsVal,
-    }
-  )
+  const filteredStudents = students.filter(s => {
+    if (chosenProgrammes.length > 0) return chosenProgrammes.includes(s.programme.code)
+    return chosenFaculties.length === 0 || chosenFaculties.includes(s.programme.code.slice(1, 4))
+  })
+
+  const studyTrackVisible =
+    chosenProgrammes.length === 1 && filteredStudents.some(student => student.programme.studyTrack != null)
+
+  const columns = getColumns(getTextIn, namesVisible, semesterEnrollmentsVisible, studyTrackVisible, allSemestersMap, {
+    getSemesterEnrollmentsContent,
+    getSemesterEnrollmentsVal,
+  })
 
   const renderContent = () => {
     if (isError) {
@@ -240,10 +241,6 @@ export const CloseToGraduation = () => {
       .filter(p => !p.value.startsWith('MH') && !p.value.includes('+'))
       .filter(p => (chosenFaculties.length > 0 ? chosenFaculties.includes(p.value.slice(1, 4)) : true))
       .sort(createLocaleComparator('text'))
-    const filteredStudents = students.filter(s => {
-      if (chosenProgrammes.length > 0) return chosenProgrammes.includes(s.programme.code)
-      return chosenFaculties.length === 0 || chosenFaculties.includes(s.programme.code.slice(1, 4))
-    })
 
     return (
       <>
