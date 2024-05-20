@@ -15,7 +15,7 @@ describe('Study guidance group tests', () => {
         cy.init('/studyguidancegroups')
         cy.contains('Access denied')
         cy.contains(
-          "You're currently not allowed to see this page. Please contant oodikone@helsinki.fi, if this is a mistake."
+          "You don't currently have permission to view this page. If you believe this is a mistake, please contact oodikone@helsinki.fi."
         )
       })
     })
