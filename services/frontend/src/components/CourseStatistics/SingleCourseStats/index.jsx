@@ -146,15 +146,15 @@ const SingleCourseStats = ({
     if (codes.includes(ALL.value)) return () => true
 
     const { programmes } = stats
-    const studentNumbers = []
+    const studentNumbers = new Set()
     codes.forEach(code => {
       if (programmes[code]) {
-        studentNumbers.push(...flatten(Object.values(programmes[code].students)))
+        const students = Object.values(programmes[code].students).flat()
+        students.forEach(student => studentNumbers.add(student))
       }
     })
 
-    const numberset = new Set(studentNumbers)
-    return studentnumber => numberset.has(studentnumber)
+    return studentnumber => studentNumbers.has(studentnumber)
   }
 
   const validProgrammeCode = code => {
@@ -396,7 +396,9 @@ const SingleCourseStats = ({
         value: 'EXCLUDED',
       })
     }
-    return result.filter(({ key }) => !comparison.includes('EXCLUDED') || !excludedProgrammes.includes(key))
+    return result.filter(
+      ({ key }) => !primary.includes(key) && (!comparison.includes('EXCLUDED') || !excludedProgrammes.includes(key))
+    )
   }
 
   const showPopulation = () => {
