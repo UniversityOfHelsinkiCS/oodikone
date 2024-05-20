@@ -181,7 +181,7 @@ export const PopulationCourseStatsFlat = ({ courses, filteredStudents, studentAm
 
   const panes = [
     {
-      menuItem: 'pass/fail',
+      menuItem: 'Pass/fail',
       render: () => (
         <Tab.Pane>
           <PassFailEnrollments flat />
@@ -189,7 +189,7 @@ export const PopulationCourseStatsFlat = ({ courses, filteredStudents, studentAm
       ),
     },
     {
-      menuItem: 'grades',
+      menuItem: 'Grades',
       render: () => (
         <Tab.Pane>
           <GradeDistribution flat />

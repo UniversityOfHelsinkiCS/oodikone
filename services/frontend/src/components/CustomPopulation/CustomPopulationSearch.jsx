@@ -128,11 +128,11 @@ export const CustomPopulationSearch = ({ setCustomPopulationState }) => {
         <SearchHistory
           handleSearch={({ id }) => onSelectSearch(id)}
           header="Saved populations"
-          items={searches.map(s => ({
-            ...s,
-            text: s.name,
-            timestamp: new Date(s.updatedAt),
-            params: { id: s.id },
+          items={searches.map(search => ({
+            ...search,
+            text: search.name,
+            timestamp: new Date(search.updatedAt),
+            params: { id: search.id },
           }))}
           updateItem={() => null}
         />

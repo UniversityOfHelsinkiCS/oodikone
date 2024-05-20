@@ -1,13 +1,12 @@
 import { sortBy } from 'lodash'
 import moment from 'moment'
-import { arrayOf, bool, func, instanceOf, oneOfType, shape, string } from 'prop-types'
 import { useState } from 'react'
-import { Form, Icon, Header, Segment } from 'semantic-ui-react'
+import { Form, Header, Icon, Segment } from 'semantic-ui-react'
 
-export const SearchHistory = ({ items, handleSearch, updateItem, disabled, header }) => {
+export const SearchHistory = ({ disabled, handleSearch, header, items, updateItem }) => {
   const [selected, setSelected] = useState(null)
 
-  const sortedItems = sortBy(items, i => -new Date(i.timestamp).getTime())
+  const sortedItems = sortBy(items, item => -new Date(item.timestamp).getTime())
 
   const handleChange = (_event, { value }) => {
     if (!value) {
@@ -15,9 +14,11 @@ export const SearchHistory = ({ items, handleSearch, updateItem, disabled, heade
       setSelected(null)
       return
     }
-    if (disabled) return
+    if (disabled) {
+      return
+    }
     setSelected(value)
-    const target = sortedItems.find(i => i.id === value)
+    const target = sortedItems.find(item => item.id === value)
     handleSearch(target.params)
     updateItem(target)
   }
@@ -25,10 +26,8 @@ export const SearchHistory = ({ items, handleSearch, updateItem, disabled, heade
   return (
     <Segment>
       <Header disabled={disabled}>
-        <>
-          <Icon name="clock outline" />
-          {header}
-        </>
+        <Icon name="clock outline" />
+        {header}
       </Header>
       <Form.Dropdown
         clearable
@@ -42,7 +41,7 @@ export const SearchHistory = ({ items, handleSearch, updateItem, disabled, heade
           key: id,
           value: id,
           text,
-          description: moment(timestamp).format('DD.MM.YYYY LT'),
+          description: moment(timestamp).format('DD.MM.YYYY HH:mm'),
         }))}
         placeholder="Select a previous search"
         search
@@ -53,23 +52,4 @@ export const SearchHistory = ({ items, handleSearch, updateItem, disabled, heade
       />
     </Segment>
   )
-}
-
-SearchHistory.defaultProps = {
-  disabled: false,
-  header: 'Previous searches',
-}
-
-SearchHistory.propTypes = {
-  items: arrayOf(
-    shape({
-      text: string,
-      params: shape({}),
-      timestamp: oneOfType([instanceOf(Date), string]),
-    })
-  ).isRequired,
-  handleSearch: func.isRequired,
-  updateItem: func.isRequired,
-  disabled: bool,
-  header: string,
 }
