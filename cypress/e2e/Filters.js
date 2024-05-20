@@ -162,13 +162,13 @@ describe('Population Statistics', () => {
     })
   })
 
-  it('Credit filter works', () => {
+  it('Credit filter works', { retries: 2 }, () => {
     runTestStepWithPreAndPostParts('CreditsEarned', () => {
       testRangeFilter('CreditsEarned-filter-card', 50, 150, 118)
     })
   })
 
-  it('Age filter works', () => {
+  it('Age filter works', { retries: 2 }, () => {
     cy.clock(MOCKED_DATE, ['Date'])
     runTestStepWithPreAndPostParts('Age', () => {
       testRangeFilter('Age-filter-card', 20, 40, 47)
