@@ -72,7 +72,7 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
 
     nameColumns.push({
       key: 'studentnumber',
-      title: 'Student Number',
+      title: 'Student number',
       cellProps: { title: 'Student number' },
       getRowVal: student => (student.total ? '*' : student.studentNumber),
       getRowContent: student =>
@@ -100,7 +100,7 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
 
     nameColumns.push({
       key: 'totalpassed',
-      title: 'Total Passed',
+      title: 'Total passed',
       filterType: 'range',
       vertical: true,
       getRowVal: student =>

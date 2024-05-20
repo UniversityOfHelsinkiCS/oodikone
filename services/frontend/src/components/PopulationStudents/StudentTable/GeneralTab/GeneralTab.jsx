@@ -335,7 +335,7 @@ export const GeneralTab = ({
   const availableCreditsColumns = {
     all: sole => ({
       key: 'credits-all',
-      title: sole ? 'All Credits' : 'All',
+      title: sole ? 'All credits' : 'All',
       filterType: 'range',
       getRowVal: student => student.allCredits || student.credits,
     }),

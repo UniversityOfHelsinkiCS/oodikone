@@ -106,7 +106,7 @@ export const GradeDistribution = ({ flat, onlyIamRights }) => {
           })),
           {
             key: 'other-passed',
-            title: 'Other Passed',
+            title: 'Other passed',
             cellProps: { style: { textAlign: 'right' } },
             filterType: 'range',
             getRowVal: row => row.otherPassed,

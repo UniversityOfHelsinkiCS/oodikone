@@ -80,7 +80,7 @@ const getColumns = (labelsToCourses, getTextIn) => {
       key: 'secondary_email-child',
       title: 'Secondary email',
       getRowVal: student => (student.secondaryEmail ? student.secondaryEmail : ''),
-      headerProps: { title: 'Secondary Email' },
+      headerProps: { title: 'Secondary email' },
     },
   ]
 

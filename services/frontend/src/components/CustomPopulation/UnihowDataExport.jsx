@@ -11,10 +11,10 @@ import {
 export const UnihowDataExport = ({ students }) => {
   const getXlsx = () => {
     const data = students.map(student => ({
-      'Student Number': student.studentNumber,
-      'Total Credits (no transferred credits)': getStudentTotalCredits(student, false),
-      'Grade Mean (no transferred credits)': getStudentGradeMean(student, false),
-      'Grade Mean Weighted by ECTS (no transferred credits)': getStudentGradeMeanWeightedByCredits(student, false),
+      'Student number': student.studentNumber,
+      'Total credits (no transferred credits)': getStudentTotalCredits(student, false),
+      'Grade mean (no transferred credits)': getStudentGradeMean(student, false),
+      'Grade mean weighted by ECTS (no transferred credits)': getStudentGradeMeanWeightedByCredits(student, false),
     }))
 
     const sheet = utils.json_to_sheet(data)
