@@ -3,7 +3,7 @@ const crypto = require('crypto')
 const courseService = require('../services/courses')
 const { faculties } = require('../services/organisations')
 const { validateParamLength } = require('../util')
-const { getFullStudyProgrammeRights } = require('../util/utils')
+const { getFullStudyProgrammeRights, hasFullAccessToStudentData } = require('../util/utils')
 
 router.get('/v2/coursesmulti', async (req, res) => {
   let results = { courses: [] }
@@ -38,12 +38,12 @@ router.get('/v3/courseyearlystats', async (req, res) => {
     user: { roles, programmeRights },
   } = req
 
-  const allowedRoles = roles && ['admin', 'courseStatistics'].find(role => roles.includes(role))
+  const userHasFullAccessToStudentData = hasFullAccessToStudentData(roles)
+  const userHasCorrectRole = userHasFullAccessToStudentData || roles.includes('courseStatistics')
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
 
-  // If user has rights to see at least one programme, then they are allowed
-  // to see all of them
-  if (!allowedRoles && fullStudyProgrammeRights.length === 0) {
+  // If user has rights to see at least one programme, then they are allowed to see all of them
+  if (!userHasCorrectRole && fullStudyProgrammeRights.length === 0) {
     return res.status(403).json({ error: 'No programmes so no access to course stats' })
   }
 
@@ -54,9 +54,9 @@ router.get('/v3/courseyearlystats', async (req, res) => {
   if (!codes) {
     res.status(422).send('Missing required query parameters')
   } else {
-    // Studentnumbers should be obfuscated to all other users except admins
-    // and users with rights to any specific study programmes
-    const anonymize = allowedRoles !== 'admin' && fullStudyProgrammeRights.length === 0
+    // Student numbers should be obfuscated to all other users except admins,
+    // fullSisuAccess users, and users with rights to any specific study programmes
+    const anonymize = !userHasFullAccessToStudentData && fullStudyProgrammeRights.length === 0
     const anonymizationSalt = anonymize ? crypto.randomBytes(12).toString('hex') : null
     const results = await courseService.courseYearlyStats(codes, separate, anonymizationSalt, combineSubstitutions)
     res.json(results)
