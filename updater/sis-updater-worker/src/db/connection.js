@@ -21,7 +21,7 @@ class DbConnections extends EventEmitter {
       pool: {
         max: 25,
         min: 0,
-        acquire: 10000,
+        acquire: 20000,
         idle: 300000000,
       },
       password: SIS_PASSWORD,
