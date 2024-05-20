@@ -106,6 +106,12 @@ router.post('/refresh_language_center_data', async (req, res) => {
   res.status(200).json('Added job for refreshing language center data')
 })
 
+router.post('/refresh-close-to-graduation', async (req, res) => {
+  logger.info(`${req.user.userId} requested refresh of close to graduation data`)
+  jobMaker.closeToGraduation()
+  res.status(200).json('Added job for refreshing close to graduation data')
+})
+
 router.get('/abort', async (_req, res) => {
   await abort()
   res.status(200).json()

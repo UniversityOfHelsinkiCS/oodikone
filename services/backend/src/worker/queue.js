@@ -34,6 +34,7 @@ const jobMaker = {
   statistics: () => addJob('statistics'),
   languagecenter: () => addJob('languagecenter'),
   studyplansUpdate: days => addJob('studyplansUpdate', { days }, 7200),
+  closeToGraduation: () => addJob('closeToGraduation'),
 }
 
 module.exports = { jobMaker, getJobs }

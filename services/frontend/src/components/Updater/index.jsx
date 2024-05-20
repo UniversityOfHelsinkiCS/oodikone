@@ -1,5 +1,6 @@
 /* eslint-disable no-alert */
 import { useEffect, useState } from 'react'
+import ReactMarkdown from 'react-markdown'
 import { Button, Form, Header, Message, Radio, Segment, TextArea } from 'semantic-ui-react'
 
 import { callApi } from '@/apiConnection'
@@ -37,6 +38,8 @@ export const Updater = () => {
   const refreshStudyProgrammes = () => apiCall('study programmes', '/updater/refresh_study_programmes_v2', 'post')
   const refreshLanguageCenterData = () =>
     apiCall('language center data', '/updater/refresh_language_center_data', 'post')
+  const refreshCloseToGraduationData = () =>
+    apiCall('close to graduation data', '/updater/refresh-close-to-graduation', 'post')
   const getJobs = () => callApi('/updater/jobs', 'get')
 
   const updateJobs = async () => {
@@ -75,53 +78,32 @@ export const Updater = () => {
     <Segment>
       <Message style={{ fontSize: '16px' }}>
         <Message.Header>Update data</Message.Header>
-        <p>
-          <b>Updater sis-db - Update meta</b> Updates organisations, study modules, course units, study levels,
-          education types, credit types <br />
-          <b>Updater sis-db - Update students</b> Updates 1000 students at one click in development and all in
-          production environment.
-          <br />
-          <b>Updater sis-db - Update curriculums</b> Updates all study programmes and their curriculums. This takes a
-          few minutes, and breaks the curriculum features for that time, so do not run in production unnecessarily.
-          <br />
-          <b>Updater redis - Update redis</b> Updates updater redis. <br />
-          <b>Oodikone redis - Refresh oodikone statistics</b> Refresh studyright associations and the last two years of
-          teacher leaderboard.
-          <br />
-          <b>Oodikone redis - Refresh all teacher leaderboards</b> Refresh all leaderboard statistics from 1963 until
-          today. Might take some time.
-          <br />
-          <b>Oodikone redis - Refresh faculties</b> Refresh data for all faculties for all tabs (time consuming).
-          <br />
-          <b>Oodikone redis - Refresh study programmes</b> Refresh data for new study programmes for basic and
-          studytrack tabs (time consuming).
-          <br />
-          <b>Oodikone redis - Refresh language center data</b> Refresh data for language center view.
-          <br />
-          <button
-            onClick={() => {
-              setError(true)
-            }}
-            type="button"
-          >
-            Cause frontend crash
-          </button>
-        </p>
+        <ReactMarkdown>
+          {`**Updater sis-db - Update meta** Updates organisations, study modules, course units, study levels, education types, credit types  
+          **Updater sis-db - Update students** Updates 1000 students at one click in development and all in production environment.  
+          **Updater sis-db - Update curriculums** Updates all study programmes and their curriculums. This takes a few minutes, and breaks the curriculum features for that time, so do not run in production unnecessarily.  
+          **Updater redis - Update redis** Updates updater redis.  
+          **Oodikone redis - Refresh all teacher leaderboards** Refresh all leaderboard statistics from 1963 until today. Might take some time.  
+          **Oodikone redis - Refresh oodikone statistics** Refresh studyright associations and the last two years of teacher leaderboard.  
+          **Oodikone redis - Refresh faculties** Refresh data for all faculties for all tabs (time consuming).  
+          **Oodikone redis - Refresh study programmes** Refresh data for new study programmes for basic and studytrack tabs (time consuming).  
+          **Oodikone redis - Refresh language center data** Refresh data for language center view.  
+          **Oodikone redis - Refresh close to graduation data** Refresh data for close to graduation view.`}
+        </ReactMarkdown>
+        <Button color="red" onClick={() => setError(true)}>
+          Cause frontend crash
+        </Button>
       </Message>
       <Form>
         <Header>Updater (data pulled from importer db and brought to oodikone db)</Header>
         <Form.Group>
-          <Form.Button content="Update meta" onClick={() => updateSISMeta()} />
-          <Form.Button content="Update students" onClick={() => updateSISStudents()} />
-          <Form.Button
-            content="Update students individually (don't click)"
-            onClick={() => updateSISStudentsIndividually()}
-          />
+          <Form.Button content="Update meta" onClick={updateSISMeta} />
+          <Form.Button content="Update students" onClick={updateSISStudents} />
+          <Form.Button content="Update students individually (don't click)" onClick={updateSISStudentsIndividually} />
           <Form.Button
             content="Update curriculums"
             onClick={() => {
-              // eslint-disable-next-line no-restricted-globals
-              if (confirm('This breaks all curriculum-related features for a few minutes. Continue?')) {
+              if (window.confirm('This breaks all curriculum-related features for a few minutes. Continue?')) {
                 updateSISProgrammes()
               }
             }}
@@ -130,43 +112,41 @@ export const Updater = () => {
         <Header>Refresh data (calculations done by oodikone-backend and cached in redis)</Header>
         {displayJobStatus()}
         <Form.Group style={{ maxWidth: '10em' }}>
-          <Form.Button content="Refresh updater redis cache" onClick={() => refreshSISRedisCache()} />
+          <Form.Button content="Refresh updater redis cache" onClick={refreshSISRedisCache} />
           <Form.Button
             content="Refresh all teacher leaderboards"
             onClick={() => {
-              // eslint-disable-next-line no-restricted-globals
-              if (confirm('This is not ran in worker yet. Continue?')) refreshAllTeacherLeaderboards()
+              if (window.confirm('This is not ran in worker yet. Continue?')) refreshAllTeacherLeaderboards()
             }}
           />
-          <Form.Button content="Refresh oodikone statistics" onClick={() => refreshStatisticsV2()} />
-          <Form.Button content="Refresh faculties" onClick={() => refreshFaculties()} />
-          <Form.Button content="Refresh study programmes" onClick={() => refreshStudyProgrammes()} />
-          <Form.Button content="Refresh language center data" onClick={() => refreshLanguageCenterData()} />
+          <Form.Button content="Refresh oodikone statistics" onClick={refreshStatisticsV2} />
+          <Form.Button content="Refresh faculties" onClick={refreshFaculties} />
+          <Form.Button content="Refresh study programmes" onClick={refreshStudyProgrammes} />
+          <Form.Button content="Refresh language center data" onClick={refreshLanguageCenterData} />
+          <Form.Button content="Refresh close to graduation data" onClick={refreshCloseToGraduationData} />
         </Form.Group>
       </Form>
-      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-        <Form.Group>
-          <Header>
-            Update custom list of items (students & courses in updater, programmes & faculties computed on backend)
-          </Header>
-          <TextArea onChange={(_, { value }) => setCustomList(value)} style={{ width: '25%' }} />
-          <div style={{ display: 'flex', flexDirection: 'row', gap: '2em', marginTop: '2em' }}>
-            {['students', 'courses', 'faculties', 'programmes'].map(thisType => (
-              <Radio
-                checked={type === thisType}
-                data-cy={`${thisType}-button`}
-                key={thisType}
-                label={thisType}
-                name="modeRadioGroup"
-                onChange={() => setType(thisType)}
-                style={{ fontSize: '24px', paddingTop: '10px' }}
-                value={thisType}
-              />
-            ))}
-            <Form.Button content="Update custom list of items" icon="refresh" onClick={updateSISCustomList} />
-          </div>
-        </Form.Group>
-      </div>
+      <Form.Group>
+        <Header>
+          Update custom list of items (students & courses in updater, programmes & faculties computed on backend)
+        </Header>
+        <TextArea onChange={(_, { value }) => setCustomList(value)} style={{ width: '25%' }} />
+        <div style={{ display: 'flex', flexDirection: 'row', gap: '2em', marginTop: '2em' }}>
+          {['students', 'courses', 'faculties', 'programmes'].map(thisType => (
+            <Radio
+              checked={type === thisType}
+              data-cy={`${thisType}-button`}
+              key={thisType}
+              label={thisType}
+              name="modeRadioGroup"
+              onChange={() => setType(thisType)}
+              style={{ fontSize: '24px', paddingTop: '10px' }}
+              value={thisType}
+            />
+          ))}
+          <Form.Button content="Update custom list of items" icon="refresh" onClick={updateSISCustomList} />
+        </div>
+      </Form.Group>
       <Header>Stop updater (aborts all updating processes in the worker, also those started by a cron-job)</Header>
       <Form.Group>
         <Form.Button content="Stop Updating" negative onClick={abortSisUpdater} />
@@ -174,13 +154,11 @@ export const Updater = () => {
       <Segment>
         <Header>Status messages</Header>
         <Button content="Clear messages" onClick={() => setMessages([])} />
-        {messages.map(message => {
-          return (
-            <Header key={`${message.time.getTime()}-${message.message}`} style={{ color: message.color }}>
-              {message.time.toLocaleTimeString()}: {message.message}
-            </Header>
-          )
-        })}
+        {messages.map(message => (
+          <Header key={`${message.time.getTime()}-${message.message}`} style={{ color: message.color }}>
+            {message.time.toLocaleTimeString()}: {message.message}
+          </Header>
+        ))}
       </Segment>
     </Segment>
   )

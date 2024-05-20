@@ -112,7 +112,7 @@ const dailyJobs = () => {
   refreshProgrammes()
   jobMaker.languagecenter()
   jobMaker.statistics()
-  refreshCloseToGraduating()
+  jobMaker.closeToGraduation()
 }
 
 const startCron = () => {
@@ -146,4 +146,5 @@ module.exports = {
   refreshProgramme,
   refreshProgrammes,
   refreshLanguageCenterData,
+  refreshCloseToGraduating,
 }

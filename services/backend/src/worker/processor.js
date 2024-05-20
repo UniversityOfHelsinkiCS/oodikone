@@ -1,4 +1,10 @@
-const { refreshLanguageCenterData, refreshProgramme, refreshStatistics, refreshFaculty } = require('../events')
+const {
+  refreshLanguageCenterData,
+  refreshProgramme,
+  refreshStatistics,
+  refreshFaculty,
+  refreshCloseToGraduating,
+} = require('../events')
 const { studyplansUpdate } = require('../services/sisUpdaterService')
 
 const logger = require('../util/logger')
@@ -14,6 +20,7 @@ const refreshers = {
   faculty: refreshFaculty,
   programme: refreshProgramme,
   statistics: refreshStatistics,
+  closeToGraduation: refreshCloseToGraduating,
 }
 
 module.exports = async job => {
