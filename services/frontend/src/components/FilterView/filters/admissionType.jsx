@@ -1,28 +1,34 @@
 import { Form, Dropdown } from 'semantic-ui-react'
+
+import { ADMISSION_TYPES } from '@/common'
 import { createFilter } from './createFilter'
 
-// Naming follows convention from SIS API (e.g urn:code:admissiont-type:m for "Muu")
-// Except changed Koepisteet to Valintakoe
-const ADMISSION_TYPES = {
-  M: 'Muu',
-  KM: 'Kilpailumenestys',
-  TV: 'Todistusvalinta',
-  AV: 'Avoin väylä',
-  KP: 'Valintakoe',
-  YP: 'Yhteispisteet',
-  N: null,
+const findAllStudyrightsForProgramme = (student, programme) => {
+  return student.studyrights.filter(studyright =>
+    studyright.studyright_elements.some(element => element.code === programme)
+  )
 }
 
-const filter = code => value => student =>
-  student.studyrights.some(studyright => {
-    const fixedValue = value !== 'Valintakoe' ? value : 'Koepisteet'
-    return (
-      studyright.studyright_elements.some(element => element.code === code) &&
+export const filter = code => value => student => {
+  const programmeStudyrights = findAllStudyrightsForProgramme(student, code)
+  const fixedValue = value !== 'Valintakoe' ? value : 'Koepisteet'
+
+  if (programmeStudyrights.length === 0) return false
+
+  if (programmeStudyrights.length === 1) {
+    return value === null || value === 'Ei valintatapaa'
+      ? !programmeStudyrights[0].admission_type
+      : programmeStudyrights[0].admission_type === fixedValue
+  }
+
+  return programmeStudyrights.some(
+    studyright =>
+      !studyright.cancelled &&
       (value === null || value === 'Ei valintatapaa'
         ? !studyright.admission_type
         : studyright.admission_type === fixedValue)
-    )
-  })
+  )
+}
 
 const AdmissionTypeFilterCard = ({ options, onOptionsChange, withoutSelf, code }) => {
   const { selected } = options

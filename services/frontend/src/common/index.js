@@ -74,7 +74,7 @@ export const getStudentTotalCredits = (student, includeTransferredCredits = true
   const passedCourses = includeTransferredCredits
     ? student.courses.filter(course => course.passed && !course.isStudyModuleCredit)
     : student.courses.filter(course => course.passed && !course.isStudyModuleCredit && course.credittypecode !== 9)
-  return Math.round(100 * passedCourses.reduce((a, b) => a + b.credits, 0)) / 100
+  return passedCourses.reduce((a, b) => a + b.credits, 0)
 }
 
 const getGradedCourses = (student, includeTransferredCredits = true) =>
@@ -445,6 +445,18 @@ export const getFullStudyProgrammeRights = programmeRights =>
   programmeRights ? programmeRights.filter(({ limited }) => !limited).map(({ code }) => code) : []
 
 export const isNewStudyProgramme = programmeCode => ['MH', 'KH', 'T9'].includes(programmeCode.slice(0, 2))
+
+// Naming follows convention from SIS API (e.g urn:code:admissiont-type:m for "Muu")
+// Except changed Koepisteet to Valintakoe
+export const ADMISSION_TYPES = {
+  M: 'Muu',
+  KM: 'Kilpailumenestys',
+  TV: 'Todistusvalinta',
+  AV: 'Avoin väylä',
+  KP: 'Valintakoe',
+  YP: 'Yhteispisteet',
+  N: null,
+}
 
 // These are the new Bachelor's programmes in Matlu, that have BH possibility
 export const bachelorHonoursProgrammes = [

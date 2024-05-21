@@ -1,33 +1,19 @@
 import { Divider, Grid } from 'semantic-ui-react'
 
+import { ADMISSION_TYPES } from '@/common'
+import { filter as admissionTypeFilter } from '@/components/FilterView/filters/admissionType'
 import { StatisticsTable } from './StatisticsTable'
 
-const admissionTypes = [
-  'Todistusvalinta',
-  'Valintakoe',
-  'Yhteispisteet',
-  'Avoin väylä',
-  'Kilpailumenestys',
-  'Muu',
-  null,
-]
+const admissionTypes = Object.values(ADMISSION_TYPES)
 
 export const StatisticsTab = ({ allStudents, query }) => {
   if (!allStudents || !allStudents.length || !query) return null
 
   const { studyRights } = query
 
-  const filterFunction = (student, type) =>
-    student.studyrights.some(
-      studyright =>
-        studyright.studyright_elements.some(element => element.code === studyRights?.programme) &&
-        type === studyright.admission_type
-    )
-
   const getStatisticsTable = type => {
-    const filteredStudents = allStudents.filter(student =>
-      filterFunction(student, type !== 'Valintakoe' ? type : 'Koepisteet')
-    )
+    const filteredStudents = allStudents.filter(admissionTypeFilter(studyRights?.programme)(type))
+
     return (
       <StatisticsTable
         filteredStudents={filteredStudents}
@@ -37,7 +23,8 @@ export const StatisticsTab = ({ allStudents, query }) => {
     )
   }
 
-  const admissionTypesAvailable = !allStudents.every(student => filterFunction(student, null))
+  const admissionTypesAvailable =
+    allStudents.length !== allStudents.filter(admissionTypeFilter(studyRights?.programme)(null)).length
 
   return (
     <Grid centered padded>

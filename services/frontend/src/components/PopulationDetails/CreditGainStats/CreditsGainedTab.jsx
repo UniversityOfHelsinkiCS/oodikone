@@ -1,36 +1,19 @@
-import { useState } from 'react'
-import { Divider, Grid, Icon } from 'semantic-ui-react'
+import { Divider, Grid } from 'semantic-ui-react'
 
+import { ADMISSION_TYPES } from '@/common'
+import { filter as admissionTypeFilter } from '@/components/FilterView/filters/admissionType'
 import { CreditsGainedTable } from './CreditsGainedTable'
 
-const admissionTypes = [
-  'Todistusvalinta',
-  'Valintakoe',
-  'Yhteispisteet',
-  'Avoin väylä',
-  'Kilpailumenestys',
-  'Muu',
-  null,
-]
+const admissionTypes = Object.values(ADMISSION_TYPES)
 
 export const CreditsGainedTab = ({ allStudents, creditDateFilterOptions, programmeGoalTime, query, year }) => {
-  const [show, setShow] = useState(false)
-
   if (!allStudents || !allStudents.length || !query) return null
 
   const { studyRights } = query
 
-  const filterFunction = (student, type) => {
-    const fixedType = type === 'Valintakoe' ? 'Koepisteet' : type
-    return student.studyrights.some(
-      studyright =>
-        studyright.studyright_elements.some(element => element.code === studyRights?.programme) &&
-        fixedType === studyright.admission_type
-    )
-  }
-
   const getCreditsGainedTable = type => {
-    const filteredStudents = allStudents.filter(student => filterFunction(student, type))
+    const filteredStudents = allStudents.filter(admissionTypeFilter(studyRights?.programme)(type))
+
     return (
       <CreditsGainedTable
         creditDateFilterOptions={creditDateFilterOptions}
@@ -43,32 +26,26 @@ export const CreditsGainedTab = ({ allStudents, creditDateFilterOptions, program
     )
   }
 
-  const admissionTypesAvailable = !allStudents.every(student => filterFunction(student, null))
+  const admissionTypesAvailable =
+    allStudents.length !== allStudents.filter(admissionTypeFilter(studyRights?.programme)(null)).length
 
   return (
-    <Grid>
-      <Grid.Row>
-        <Grid.Column data-cy="credits-gained-main-table" width={16}>
-          <CreditsGainedTable
-            creditDateFilterOptions={creditDateFilterOptions}
-            filteredStudents={allStudents}
-            programmeGoalTime={programmeGoalTime}
-            type="All students of the class"
-            year={year}
-          />
-        </Grid.Column>
+    <Grid centered padded>
+      <Grid.Row data-cy="credits-gained-main-table">
+        <CreditsGainedTable
+          creditDateFilterOptions={creditDateFilterOptions}
+          filteredStudents={allStudents}
+          programmeGoalTime={programmeGoalTime}
+          type="All students of the class"
+          year={year}
+        />
       </Grid.Row>
       {admissionTypesAvailable && (
-        <Divider
-          className="credits-gained-divider"
-          horizontal
-          onClick={() => setShow(!show)}
-          style={{ cursor: 'pointer', marginBottom: !show && '50px' }}
-        >
-          By admission type <Icon name={`angle ${show ? 'down' : 'right'}`} />
-        </Divider>
+        <>
+          <Divider horizontal>By admission type</Divider>
+          <Grid.Row>{admissionTypes.map(type => getCreditsGainedTable(type))}</Grid.Row>
+        </>
       )}
-      {show && <Grid.Row>{admissionTypes.map(type => getCreditsGainedTable(type))}</Grid.Row>}
     </Grid>
   )
 }
