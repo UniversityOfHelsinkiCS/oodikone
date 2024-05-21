@@ -373,7 +373,6 @@ export const SearchForm = ({ onProgress }) => {
       <SearchHistory
         disabled={isLoading}
         handleSearch={onSearchHistorySelected}
-        header="Previous searches"
         items={searchHistory.map(item => {
           item.timestamp = new Date(item.timestamp)
           return item

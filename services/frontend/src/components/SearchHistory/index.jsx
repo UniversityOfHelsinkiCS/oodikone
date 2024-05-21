@@ -3,7 +3,7 @@ import moment from 'moment'
 import { useState } from 'react'
 import { Form, Header, Icon, Segment } from 'semantic-ui-react'
 
-export const SearchHistory = ({ disabled, handleSearch, header, items, updateItem }) => {
+export const SearchHistory = ({ disabled, handleSearch, header = 'Previous searches', items, updateItem }) => {
   const [selected, setSelected] = useState(null)
 
   const sortedItems = sortBy(items, item => -new Date(item.timestamp).getTime())
