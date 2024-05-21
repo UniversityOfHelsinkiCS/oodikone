@@ -155,10 +155,12 @@ export const Students = ({ filteredStudents }) => {
             Courses passed by students
             <Pagination
               activePage={page + 1}
-              ellipsisItem={null}
-              firstItem={null}
-              lastItem={null}
+              ellipsisItem={{ content: <Icon name="ellipsis horizontal" />, icon: true }}
+              firstItem={{ content: <Icon name="angle double left" />, icon: true }}
+              lastItem={{ content: <Icon name="angle double right" />, icon: true }}
+              nextItem={{ content: <Icon name="angle right" />, icon: true }}
               onPageChange={(_event, { activePage }) => setPage(activePage - 1)}
+              prevItem={{ content: <Icon name="angle left" />, icon: true }}
               secondary
               size="mini"
               style={{ marginLeft: '1em' }}

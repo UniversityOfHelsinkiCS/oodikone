@@ -67,10 +67,10 @@ export const CurriculumPicker = ({ setCurriculum, programmeCodes, disabled, year
         'key'
       )}
       style={{
+        background: '#e3e3e3',
+        marginLeft: '10px',
         padding: '4px',
         paddingLeft: '8px',
-        marginLeft: '10px',
-        background: '#e3e3e3',
       }}
       value={chosenCurriculum.id}
     />
