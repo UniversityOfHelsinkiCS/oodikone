@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { Table, Progress, Icon } from 'semantic-ui-react'
+import { Table, Icon } from 'semantic-ui-react'
 
+import { ProgressBarWithLabel } from '@/components/common/ProgressBarWithLabel'
 import { ExternalCreditFilterToggle } from './ExternalCreditFilterToggle'
 
 export const CollapsibleCreditRow = ({ min, max, studentCount, filteredLength, months }) => {
@@ -13,11 +14,11 @@ export const CollapsibleCreditRow = ({ min, max, studentCount, filteredLength, m
     }
 
     const factor = months * (5 / 12)
-    const newLimits = []
-    ;[0, 1, 2].forEach(n => {
+    const newLimits = [0, 1, 2].reduce((acc, n) => {
       const min = Math.ceil(max - n * factor - factor)
-      newLimits.push([min === 0 ? 1 : min, Math.ceil(max - n * factor), true])
-    })
+      acc.push([min === 0 ? 1 : min, Math.ceil(max - n * factor), true])
+      return acc
+    }, [])
 
     setLimits(newLimits)
   }
@@ -27,7 +28,7 @@ export const CollapsibleCreditRow = ({ min, max, studentCount, filteredLength, m
 
   return (
     <>
-      <Table.Row onClick={isCollapsible ? () => collapse() : undefined} style={{ cursor: isCollapsible && 'pointer' }}>
+      <Table.Row onClick={isCollapsible ? collapse : undefined} style={{ cursor: isCollapsible && 'pointer' }}>
         <Table.Cell collapsing>
           <ExternalCreditFilterToggle max={max} min={min} />
         </Table.Cell>
@@ -39,36 +40,22 @@ export const CollapsibleCreditRow = ({ min, max, studentCount, filteredLength, m
         <Table.Cell>{!isCollapsed && studentCount(min, max)}</Table.Cell>
         <Table.Cell>
           {filteredLength && !isCollapsed && (
-            <Progress
-              className="credit-stats-progress-bar"
-              percent={Math.round((studentCount(min, max) / filteredLength) * 100)}
-              progress
-            />
+            <ProgressBarWithLabel total={filteredLength} value={studentCount(min, max)} />
           )}
         </Table.Cell>
       </Table.Row>
       {limits.map(([imin, imax]) => (
-        <Table.Row key={`table-row-${imin}-${imax}`} style={{ backgroundColor: 'lightgray' }}>
+        <Table.Row key={`table-row-${imin}-${imax}`} style={{ backgroundColor: '#e1e1e1' }}>
           <Table.Cell collapsing>
-            <div style={{ display: 'flex' }}>
-              <ExternalCreditFilterToggle max={imax} min={imin} />
-            </div>
+            <ExternalCreditFilterToggle max={imax} min={imin} />
           </Table.Cell>
-          <Table.Cell>
-            {/* TODO NO NO NO NO */}
-            <span style={{ color: 'lightgray', userSelect: 'none' }}>AAA</span>
+          <Table.Cell style={{ paddingLeft: '2em' }}>
             {imax === 0 ? 0 : `${imin} ≤ credits`}
             {imax > 0 && ` < ${imax}`}
           </Table.Cell>
           <Table.Cell>{studentCount(imin, imax)}</Table.Cell>
           <Table.Cell>
-            {filteredLength && (
-              <Progress
-                className="credit-stats-progress-bar"
-                percent={Math.round((studentCount(imin, imax) / filteredLength) * 100)}
-                progress
-              />
-            )}
+            {filteredLength && <ProgressBarWithLabel total={filteredLength} value={studentCount(imin, imax)} />}
           </Table.Cell>
         </Table.Row>
       ))}

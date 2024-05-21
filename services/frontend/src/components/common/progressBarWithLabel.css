@@ -1,0 +1,15 @@
+.progress-bar-with-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5em;
+}
+
+.progress-bar-with-label .ui.progress {
+  width: 130px;
+  margin-bottom: 0;
+}
+
+.progress-bar-with-label .ui.progress .bar {
+  min-width: 0;
+}
