@@ -24,31 +24,31 @@ export const populationStatisticsToolTips = {
   CreditStatistics: `
   **Credits gained**
 
-  Taulukko kertoo opintopistekertymän valitulle opiskelijapopulaatiolle. Opintopisteluokat on suhteutettu tarkasteltavan populaation aloitusvuoteen. 
-  Ylin luokka kertoo siksi aina tavoiteajassa etenevien määrän ja suhteellisen osuuden. 
+  Taulukko kertoo opintopistekertymän valitulle opiskelijapopulaatiolle. Opintopisteluokat on suhteutettu tarkasteltavan populaation aloitusvuoteen. Ylin luokka kertoo siksi aina tavoiteajassa etenevien määrän ja suhteellisen osuuden. 
 
   Opintopisteet sisältävät opiskelijoiden **kaikki opintopisteet**, eli siis myös ennen valitun tutkinnon alkamista suoritetut opinnot.
 
   Huom! Nollasuorittajissa on mukana myös poissaolevaksi ilmoittautuneet, ellei heitä ole erikseen suodatettu populaatiosta pois.
 
-  Kategorioita voi myös itsessään käyttää suodattimina. Klikkaamalla rivin vasemmassa reunassa olevaa suodatinta jäävät näkyviin vain sen kategorian opiskelijat.
-  Suodatin aukeaa samalla ikkunan vasempaan laitaan, josta sitä voi käyttää vapaavalintaisilla arvoilla.
-  
-  **Credit statistics**
+  Kategorioita voi myös itsessään käyttää suodattimina. Klikkaamalla rivin vasemmassa reunassa olevaa suodatinta jäävät näkyviin vain kyseisen kategorian opiskelijat. Suodatin aukeaa samalla ikkunan vasempaan laitaan, josta sitä voi käyttää vapaavalintaisilla arvoilla.
 
-  Taulukko kertoo kaikkien tarkasteluun valittujen opiskelijoiden opintopistemääristä tähän päivään mennessä. Statistiikka on suodatettu käytettyjen filttereiden mukaan.
-  Esimerkiksi, jos mukaan on valittu vain naisopiskelijat, statistiikat koskevat vain heitä. 
-  
-  + **Total** on kokonaisopintopistemäärä kyseiselle populaatiolle.
-  + **Mean** kuvaa opintopistemäärän opiskelijakohtaista keskiarvoa.
-  + **Keskihajonta** kuvaa vaihtelua opintopistemäärissä. Karkeasti, mitä suurempi keskihajonta, sitä enemmän opintopistemäärissä on vaihtelua opiskelijoiden kesken.
-  + **Min ja Max** kertovat pienimmän ja suurimman opintopistemäärän, jotka jollain opiskelijoilla kyseisessä populaatiossa on.
+  **Statistics**
+
+  Taulukko kertoo kaikkien tarkasteluun valittujen opiskelijoiden opintopistemääristä tähän päivään mennessä. Statistiikka on suodatettu käytettyjen filttereiden mukaan. Esimerkiksi, jos mukaan on valittu vain naisopiskelijat, statistiikat koskevat vain heitä. 
+
+  + **Total credits** on kokonaisopintopistemäärä kyseiselle populaatiolle.
+  + **Average** kuvaa opintopistemäärän opiskelijakohtaista keskiarvoa.
+  + **Median** on keskimmäinen opintopistemäärä, joka saadaan järjestämällä opintopistemäärät suuruusjärjestykseen ja valitsemalla keskimmäinen arvo. Mikäli opiskelijoita on parillinen määrä, mediaani on kahden keskimmäisen arvon keskiarvo.
+  + **Standard deviation** (keskihajonta) kuvaa vaihtelua opintopistemäärissä. Karkeasti, mitä suurempi keskihajonta, sitä enemmän opintopistemäärissä on vaihtelua opiskelijoiden kesken.
+  + **Minimum** ja **Maximum** kertovat pienimmän ja suurimman opintopistemäärän, jotka jollain opiskelijoilla kyseisessä populaatiossa on.
 
   Mikäli valintatapatieto kyseiselle populaatiolle on saatavissa, näytetään myös samat statistiikat per valintatapa.  
 
-  **Distribution Development**
+  **Distribution development**
 
-  Pylväsdiagrammi kertoo opiskelijoiden jakauman opintopistehaarukoihin kalenterivuosittain, lukuvuosittain tai lukukausittain eriteltynä. Valmistuneita opiskelijoita ei sisällytetä valmistumisen jälkeisiin pylväisiin.
+  Pylväsdiagrammi kertoo opiskelijoiden jakauman opintopistehaarukoihin kalenterivuosittain, lukuvuosittain tai lukukausittain eriteltynä. Välien järjestystä pylväässä voi muuttaa valitsemalla **Stack ordering** -valikosta haluamansa järjestyksen.
+
+  Pylväiden osat toimivat myös suodattimina. Klikkaamalla pylvään osaa näkyviin jäävät vain kyseiset opiskelijat (esimerkiksi keväällä 2024 0–30 opintopistettä suorittaneet).
 
   **Cumulative**-valinnan ollessa käytössä kunkin opiskelijan kaikki aiemmat opintopisteet lasketaan mukaan opintopistemäärään. Muutoin vain pylvästä vastaavalla aikavälillä kirjatut opintopisteet otetaan huomioon.
   `,

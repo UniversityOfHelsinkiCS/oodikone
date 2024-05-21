@@ -165,7 +165,7 @@ describe('Population Statistics tests', () => {
       }
 
       cy.get("[data-cy='credits-gained-table-body'] td:nth-child(3)").then($els => {
-        const sum = [...$els].map($el => parseInt($el.innerText)).reduce((a, b) => a + b, 0)
+        const sum = [...$els].map($el => parseInt($el.innerText, 10)).reduce((a, b) => a + b, 0)
         expect(sum).to.equal(170)
       })
 
@@ -182,7 +182,6 @@ describe('Population Statistics tests', () => {
           if (!$parentDiv.hasClass('active')) cy.get("[data-cy='Credit statistics']").click()
         })
       cy.contains('Credits gained').click()
-      cy.get('.credits-gained-divider').click()
       cy.get("[data-cy='credits-gained-table-Avoin väylä']").should('exist')
       cy.get("[data-cy='credits-gained-table-Yhteispisteet']").should('exist')
       cy.get("[data-cy='credits-gained-table-Muu']").should('exist')
@@ -198,8 +197,9 @@ describe('Population Statistics tests', () => {
         })
       cy.get("[data-cy='credit-stats-tab'] > .menu > :nth-child(2)").click()
 
-      cy.get("[data-cy='credit-stats-table-name-header']").should('contain', 'Statistic for n = 170 Students')
-      cy.get("[data-cy='credit-stats-mean']").should('contain', '114.74')
+      cy.get("[data-cy='credit-stats-population-size']").should('contain', 'n = 170')
+      cy.get("[data-cy='credit-stats-average']").should('contain', '114.74')
+      cy.get("[data-cy='credit-stats-median']").should('contain', '109.00')
       cy.get("[data-cy='credit-stats-stdev']").should('contain', '65.53')
       cy.get("[data-cy='credit-stats-min']").should('contain', '5')
       cy.get("[data-cy='credit-stats-max']").should('contain', '314')

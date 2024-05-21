@@ -3,45 +3,50 @@ import { Table } from 'semantic-ui-react'
 
 import { getStudentTotalCredits } from '@/common'
 
+const calculateMedian = arr => {
+  const sortedArr = _.sortBy(arr)
+  const midIndex = Math.floor(sortedArr.length / 2)
+  return sortedArr.length % 2 !== 0 ? sortedArr[midIndex] : (sortedArr[midIndex - 1] + sortedArr[midIndex]) / 2
+}
+
 export const StatisticsTable = ({ filteredStudents, type }) => {
   if (!filteredStudents || !filteredStudents.length) return null
   const credits = filteredStudents.map(student => getStudentTotalCredits(student))
-  const formatNumber = (x, decimals) => (Number.isNaN(x) || !x ? 0 : x).toFixed(decimals)
-  const mean = _.mean(credits)
-  const stdev = Math.sqrt(_.sum(_.map(credits, credit => (credit - mean) * (credit - mean))) / credits.length)
+  const average = _.mean(credits)
+  const median = calculateMedian(credits)
+  const stdev = Math.sqrt(_.mean(credits.map(value => (value - average) ** 2)))
 
   return (
     <div className="statistics-table">
-      <h3>{type}</h3>
+      <h3 style={{ marginBottom: '0.1em' }}>{type}</h3>
+      <div data-cy="credit-stats-population-size">
+        <em>n</em> = {credits.length}
+      </div>
       <Table celled collapsing>
-        <Table.Header>
-          <Table.Row>
-            <Table.HeaderCell data-cy="credit-stats-table-name-header">
-              {`Statistic for n = ${credits.length} Students`}
-            </Table.HeaderCell>
-            <Table.HeaderCell>Credits Earned</Table.HeaderCell>
-          </Table.Row>
-        </Table.Header>
         <Table.Body>
           <Table.Row>
-            <Table.Cell>Total</Table.Cell>
-            <Table.Cell data-cy="credit-stats-total">{formatNumber(_.sum(credits))}</Table.Cell>
+            <Table.Cell>Total credits</Table.Cell>
+            <Table.Cell data-cy="credit-stats-total">{_.sum(credits).toFixed(2)}</Table.Cell>
           </Table.Row>
           <Table.Row>
             <Table.Cell>Average</Table.Cell>
-            <Table.Cell data-cy="credit-stats-mean">{formatNumber(mean, 2)}</Table.Cell>
+            <Table.Cell data-cy="credit-stats-average">{average.toFixed(2)}</Table.Cell>
           </Table.Row>
           <Table.Row>
-            <Table.Cell>Standard Deviation</Table.Cell>
-            <Table.Cell data-cy="credit-stats-stdev">{formatNumber(stdev, 2)}</Table.Cell>
+            <Table.Cell>Median</Table.Cell>
+            <Table.Cell data-cy="credit-stats-median">{median.toFixed(2)}</Table.Cell>
           </Table.Row>
           <Table.Row>
-            <Table.Cell>Min</Table.Cell>
-            <Table.Cell data-cy="credit-stats-min">{formatNumber(_.min(credits), 0)}</Table.Cell>
+            <Table.Cell>Standard deviation</Table.Cell>
+            <Table.Cell data-cy="credit-stats-stdev">{stdev.toFixed(2)}</Table.Cell>
           </Table.Row>
           <Table.Row>
-            <Table.Cell>Max</Table.Cell>
-            <Table.Cell data-cy="credit-stats-max">{formatNumber(_.max(credits), 0)}</Table.Cell>
+            <Table.Cell>Minimum</Table.Cell>
+            <Table.Cell data-cy="credit-stats-min">{_.min(credits)}</Table.Cell>
+          </Table.Row>
+          <Table.Row>
+            <Table.Cell>Maximum</Table.Cell>
+            <Table.Cell data-cy="credit-stats-max">{_.max(credits)}</Table.Cell>
           </Table.Row>
         </Table.Body>
       </Table>

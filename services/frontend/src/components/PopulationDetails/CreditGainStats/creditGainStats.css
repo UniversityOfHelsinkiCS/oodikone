@@ -6,11 +6,6 @@
   margin: 10px auto;
 }
 
-#credit-gain-stats .credits-gained-divider:hover {
-  color: gray;
-  cursor: pointer;
-}
-
 #credit-gain-stats .collapsing + th,
 #credit-gain-stats .collapsing + td {
   border-left: none;
@@ -22,10 +17,6 @@
 
 #credit-gain-stats .statistics-table tbody td:nth-child(2) {
   text-align: right;
-}
-
-#credit-gain-stats .credit-stats-progress-bar {
-  margin: 0;
 }
 
 #credit-gain-stats .collapsing {
