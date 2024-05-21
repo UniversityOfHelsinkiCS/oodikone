@@ -202,17 +202,14 @@ const RowComponent = ({ data, isGroup, parents }) => {
 
     const content = getCellContent(column, data, isGroup, parents)
 
+    if (!Number.isNaN(Number(content))) {
+      cellProps.style = { ...cellProps.style, textAlign: 'right' }
+    }
+
     if (content != null) {
       cells.push(
         <td colSpan={columnSpans[column.key]} key={column.key + cellProps.title} {...cellProps}>
-          <div
-            style={{
-              textAlign: !Number.isNaN(Number(content)) ? 'right' : 'left',
-              ...cellProps.style,
-            }}
-          >
-            <ColumnContent column={column} data={data} isGroup={isGroup} parents={parents} />
-          </div>
+          <ColumnContent column={column} data={data} isGroup={isGroup} parents={parents} />
         </td>
       )
     } else if (column.children && column.children.length > 0) {

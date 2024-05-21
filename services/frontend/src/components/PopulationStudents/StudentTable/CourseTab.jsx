@@ -75,7 +75,7 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
       title: 'Student number',
       getRowVal: student => (student.total ? '*' : student.studentNumber),
       getRowContent: student =>
-        student.total ? 'Summary:' : <StudentInfoItem showSisuLink student={student} tab="Mandatory courses table" />,
+        student.total ? 'Summary' : <StudentInfoItem showSisuLink student={student} tab="Mandatory courses table" />,
     })
 
     if (namesVisible) {
@@ -170,7 +170,7 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
     columns.push(
       {
         key: 'general',
-        title: <b>Labels:</b>,
+        title: <b>Labels</b>,
         textTitle: null,
         children: nameColumns,
       },
