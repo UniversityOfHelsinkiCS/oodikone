@@ -13,8 +13,10 @@ import '@/components/PopulationStudents/populationStudents.css'
 import { useGetStudyGuidanceGroupPopulationCoursesQuery } from '@/redux/studyGuidanceGroups'
 
 const getMandatoryPassed = (mandatoryCourses, populationCourses, studyGuidanceCourses) => {
-  if (!mandatoryCourses || !mandatoryCourses.defaultProgrammeCourses || (!populationCourses && !studyGuidanceCourses))
+  if (!mandatoryCourses || !mandatoryCourses.defaultProgrammeCourses || (!populationCourses && !studyGuidanceCourses)) {
     return {}
+  }
+
   const mandatoryCodes = [
     ...mandatoryCourses.defaultProgrammeCourses
       .filter(course => course.visible && course.visible.visibility)
@@ -24,24 +26,26 @@ const getMandatoryPassed = (mandatoryCourses, populationCourses, studyGuidanceCo
       .map(course => course.code),
   ]
 
-  let mandatoryPassed = {}
   const popCourses = populationCourses || studyGuidanceCourses
-  if (popCourses?.coursestatistics) {
-    const courseStats = popCourses.coursestatistics
-    mandatoryPassed = mandatoryCodes.reduce((obj, code) => {
-      const foundCourse = !!courseStats.find(course => course.course.code === code)
 
-      const passedArray = foundCourse
-        ? Object.keys(courseStats.find(course => course.course.code === code).students.passed)
-        : []
-      obj[code] = passedArray
-      return obj
-    }, {})
+  if (!popCourses.coursestatistics) {
+    return {}
   }
+
+  const courseStats = popCourses.coursestatistics
+  const mandatoryPassed = mandatoryCodes.reduce((passed, code) => {
+    const foundCourse = !!courseStats.find(course => course.course.code === code)
+    const passedStudents = foundCourse
+      ? Object.keys(courseStats.find(course => course.course.code === code).students.passed)
+      : []
+    passed[code] = passedStudents
+    return passed
+  }, {})
+
   return mandatoryPassed
 }
 
-const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
+const CoursesTable = ({ curriculum, students, studyGuidanceCourses }) => {
   const { getTextIn } = useLanguage()
   const { visible: namesVisible } = useStudentNameVisibility()
   const mandatoryCourses = curriculum
@@ -71,7 +75,7 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
     const nameColumns = []
 
     nameColumns.push({
-      key: 'studentnumber',
+      key: 'studentNumber',
       title: 'Student number',
       getRowVal: student => (student.total ? '*' : student.studentNumber),
       getRowContent: student =>
@@ -81,13 +85,13 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
     if (namesVisible) {
       nameColumns.push(
         {
-          key: 'lastname',
+          key: 'lastName',
           title: 'Last name',
           getRowVal: student => (student.total ? null : student.lastname),
           export: false,
         },
         {
-          key: 'firstname',
+          key: 'givenNames',
           title: 'Given names',
           getRowVal: student => (student.total ? null : student.firstnames),
           export: false,
@@ -96,7 +100,7 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
     }
 
     nameColumns.push({
-      key: 'totalpassed',
+      key: 'totalPassed',
       title: 'Total passed',
       filterType: 'range',
       vertical: true,
@@ -104,63 +108,73 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
         student.total
           ? Object.values(student)
               .filter(isNumber)
-              .reduce((acc, e) => acc + e, 0)
+              .reduce((total, courses) => total + courses, 0)
           : totalMandatoryPassed(student.studentNumber),
     })
 
     const mandatoryCourseLabels = []
     const defaultCourses = mandatoryCourses?.defaultProgrammeCourses || []
     const combinedCourses = mandatoryCourses?.secondProgrammeCourses || []
-    const coursesList = [...defaultCourses, ...combinedCourses]
-    const labelToMandatoryCourses = coursesList.reduce((acc, e) => {
-      const label = e.label ? e.label.label : ''
-      acc[label] = acc[label] || []
-      if (acc[label].some(l => l.code === e.code)) return acc
-      acc[label].push(e)
-      if (e.label) mandatoryCourseLabels.push({ ...e.label, code: e.parent_code })
-      else mandatoryCourseLabels.push({ id: 'null', label: '', code: '' })
-      return acc
+    const courses = [...defaultCourses, ...combinedCourses]
+    const labelToMandatoryCourses = courses.reduce((labels, course) => {
+      const label = course.label ? course.label.label : ''
+      labels[label] = labels[label] || []
+      if (labels[label].some(label => label.code === course.code)) {
+        return labels
+      }
+      labels[label].push(course)
+      if (course.label) {
+        mandatoryCourseLabels.push({ ...course.label, code: course.parent_code })
+      } else {
+        mandatoryCourseLabels.push({ id: 'null', label: '', code: '' })
+      }
+      return labels
     }, {})
 
-    const sortedlabels = orderBy(
-      uniqBy(mandatoryCourseLabels, l => l.label),
-      [e => e.orderNumber],
+    const sortedLabels = orderBy(
+      uniqBy(mandatoryCourseLabels, course => course.label),
+      [label => label.orderNumber],
       ['asc']
     )
 
-    const { visibleLabels, visibleCourseCodes } = coursesList.reduce(
-      (acc, cur) => {
-        if (cur.visible && cur.visible.visibility) {
-          acc.visibleLabels.add(cur.parent_code)
-          acc.visibleCourseCodes.add(cur.code)
+    const { visibleLabels, visibleCourseCodes } = courses.reduce(
+      (total, course) => {
+        if (course.visible && course.visible.visibility) {
+          total.visibleLabels.add(course.parent_code)
+          total.visibleCourseCodes.add(course.code)
         }
-
-        return acc
+        return total
       },
       { visibleLabels: new Set(), visibleCourseCodes: new Set() }
     )
 
-    const getTotalRowVal = (t, m) => t[m.code]
+    const getTotalRowVal = (total, code) => total[code]
 
     const findBestGrade = (courses, code) => {
       const course = populationCourses?.coursestatistics?.find(course => course.course.code === code)
-      if (!course) return null
+      if (!course) {
+        return null
+      }
+
       const { substitutions } = course.course
       const courseAttainments = courses.filter(
         course =>
           [code, `AY${code}`, `A${code}`].includes(course.course_code) ||
-          substitutions.some(sub =>
-            [sub, `AY${sub}`, sub.startsWith('A') && sub.substring(1)].includes(course.course_code)
+          substitutions.some(substitution =>
+            [substitution, `AY${substitution}`, substitution.startsWith('A') && substitution.substring(1)].includes(
+              course.course_code
+            )
           )
       )
 
-      const bestGrade =
-        courseAttainments.length > 0
-          ? sortBy(courseAttainments, element => {
-              const order = { 5: 0, 4: 1, 3: 2, 2: 3, 1: 4, HT: 5, TT: 6, 'Hyv.': 7, 'Hyl.': 8 }
-              return order[element.grade]
-            })[0].grade
-          : null
+      if (courseAttainments.length === 0) {
+        return null
+      }
+
+      const bestGrade = sortBy(courseAttainments, element => {
+        const order = { 5: 0, 4: 1, 3: 2, 2: 3, 1: 4, HT: 5, TT: 6, 'Hyv.': 7, 'Hyl.': 8 }
+        return order[element.grade]
+      })[0].grade
 
       return bestGrade
     }
@@ -174,94 +188,108 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
         textTitle: null,
         children: nameColumns,
       },
-      ...sortedlabels
+      ...sortedLabels
         .filter(({ code }) => visibleLabels.has(code))
-        .map(e => ({
-          key: e.id + e.code,
+        .map(label => ({
+          key: label.id + label.code,
           title: (
-            <div key={e.code} style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
-              <div key={`${e.code}-${e.id}`}>{e.code}</div>
-              <div key={`${e.code}${e.id}`} style={{ color: 'gray', fontWeight: 'normal' }}>
-                {e.id}
+            <div key={label.code} style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>
+              <div key={`${label.code}-${label.id}`}>{label.code}</div>
+              <div key={`${label.code}${label.id}`} style={{ color: 'gray', fontWeight: 'normal' }}>
+                {label.id}
               </div>
             </div>
           ),
-          textTitle: e.code,
+          textTitle: label.code,
           thickBorders: true,
-          children: sortBy(labelToMandatoryCourses[e.label], [
-            m => {
-              const res = m.code.match(/\d+/)
-              return res ? Number(res[0]) : Number.MAX_VALUE
+          children: sortBy(labelToMandatoryCourses[label.label], [
+            mandatoryCourse => {
+              const codeDigits = mandatoryCourse.code.match(/\d+/)
+              return codeDigits ? Number(codeDigits[0]) : Number.MAX_VALUE
             },
             'code',
           ])
             .filter(course => visibleCourseCodes.has(course.code))
-            .map(m => ({
-              key: `${m.label ? m.label.label : 'fix'}-${m.code}`, // really quick and dirty fix
+            .map(mandatoryCourse => ({
+              key: `${mandatoryCourse.label ? mandatoryCourse.label.label : 'no-label'}-${mandatoryCourse.code}`,
               title: (
                 <div
-                  key={`${m.code}-${m.label ? m.label.label : 'fix'}`}
-                  style={{ maxWidth: '15em', whiteSpace: 'normal', overflow: 'hidden', width: 'max-content' }}
+                  key={`${mandatoryCourse.code}-${mandatoryCourse.label ? mandatoryCourse.label.label : 'no-label'}`}
+                  style={{ maxWidth: '15em', overflow: 'hidden', whiteSpace: 'normal', width: 'max-content' }}
                 >
-                  <div key={`${m.label ? m.label.label : 'fix'}-${m.code}`}>{m.code}</div>
                   <div
-                    key={`${m.label ? m.label.label : 'fix'}-${getTextIn(m.name)}`}
+                    key={`${mandatoryCourse.label ? mandatoryCourse.label.label : 'no-label'}-${mandatoryCourse.code}`}
+                  >
+                    {mandatoryCourse.code}
+                  </div>
+                  <div
+                    key={`${mandatoryCourse.label ? mandatoryCourse.label.label : 'no-label'}-${getTextIn(mandatoryCourse.name)}`}
                     style={{ color: 'gray', fontWeight: 'normal' }}
                   >
-                    {getTextIn(m.name)}
+                    {getTextIn(mandatoryCourse.name)}
                   </div>
                 </div>
               ),
-              textTitle: m.code,
+              textTitle: mandatoryCourse.code,
               vertical: true,
               forceToolsMode: 'dangling',
               cellProps: student => {
-                if (!student.courses) return null
-                const bestGrade = findBestGrade(student.courses, m.code)
+                if (!student.courses) {
+                  return null
+                }
+                const bestGrade = findBestGrade(student.courses, mandatoryCourse.code)
                 const gradeText = bestGrade ? `\nGrade: ${bestGrade}` : ''
                 const studentCode = student.studentNumber ? `\nStudent number:  ${student.studentNumber}` : ''
                 return {
-                  title: `${m.code}, ${getTextIn(m.name)}${studentCode} ${gradeText}`,
+                  title: `${mandatoryCourse.code}, ${getTextIn(mandatoryCourse.name)}${studentCode} ${gradeText}`,
                   style: {
-                    verticalAlign: 'middle',
                     textAlign: 'center',
+                    verticalAlign: 'middle',
                   },
                 }
               },
-              headerProps: { title: `${m.code}, ${getTextIn(m.name)}` },
+              headerProps: { title: `${mandatoryCourse.code}, ${getTextIn(mandatoryCourse.name)}` },
               getRowVal: student => {
-                if (student.total) return getTotalRowVal(student, m)
-
-                return hasPassedMandatory(student.studentNumber, m.code) ? 'Passed' : ''
+                if (student.total) {
+                  return getTotalRowVal(student, mandatoryCourse.code)
+                }
+                return hasPassedMandatory(student.studentNumber, mandatoryCourse.code) ? 'Passed' : ''
               },
               getRowExportVal: student => {
-                if (student.total) return getTotalRowVal(student, m)
+                if (student.total) {
+                  return getTotalRowVal(student, mandatoryCourse.code)
+                }
 
-                const bestGrade = findBestGrade(student.courses, m.code)
-
+                const bestGrade = findBestGrade(student.courses, mandatoryCourse.code)
                 if (!bestGrade) {
                   if (
                     student.enrollments &&
                     student.enrollments.some(
-                      enrollment => enrollment.course_code === m.code && enrollment.state === 'ENROLLED'
+                      enrollment => enrollment.course_code === mandatoryCourse.code && enrollment.state === 'ENROLLED'
                     )
                   ) {
                     return 0
                   }
                   return ''
                 }
-
-                if (bestGrade === 'Hyl.') return 0
-                if (['1', '2', '3', '4', '5'].includes(bestGrade)) return parseInt(bestGrade, 10)
+                if (bestGrade === 'Hyl.') {
+                  return 0
+                }
+                if (['1', '2', '3', '4', '5'].includes(bestGrade)) {
+                  return parseInt(bestGrade, 10)
+                }
                 return bestGrade
               },
               getRowContent: student => {
-                if (student.total) return getTotalRowVal(student, m)
-                return hasPassedMandatory(student.studentNumber, m.code) ? (
-                  <Icon color="green" fitted name="check" />
-                ) : null
+                if (student.total) {
+                  return getTotalRowVal(student, mandatoryCourse.code)
+                }
+                if (hasPassedMandatory(student.studentNumber, mandatoryCourse.code)) {
+                  return <Icon color="green" fitted name="check" />
+                }
+                return null
               },
-              code: m.code,
+              code: mandatoryCourse.code,
             })),
         }))
     )
@@ -271,19 +299,26 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
 
   const data = useMemo(() => {
     const totals = students.reduce(
-      (acc, student) => {
+      (total, student) => {
         const passedCourses = new Set()
         if (mandatoryCourses.defaultProgrammeCourses) {
-          mandatoryCourses.defaultProgrammeCourses.forEach(m => {
-            if (passedCourses.has(m.code)) return
-            passedCourses.add(m.code)
-            if (hasPassedMandatory(student.studentNumber, m.code)) ++acc[m.code]
+          mandatoryCourses.defaultProgrammeCourses.forEach(mandatoryCourse => {
+            if (passedCourses.has(mandatoryCourse.code)) {
+              return
+            }
+            passedCourses.add(mandatoryCourse.code)
+            if (hasPassedMandatory(student.studentNumber, mandatoryCourse.code)) {
+              ++total[mandatoryCourse.code]
+            }
           })
         }
-        return acc
+        return total
       },
       mandatoryCourses.defaultProgrammeCourses
-        ? mandatoryCourses.defaultProgrammeCourses.reduce((acc, e) => ({ ...acc, [e.code]: 0 }), { total: true })
+        ? mandatoryCourses.defaultProgrammeCourses.reduce(
+            (total, mandatoryCourse) => ({ ...total, [mandatoryCourse.code]: 0 }),
+            { total: true }
+          )
         : { total: true }
     )
 
@@ -307,19 +342,19 @@ const CoursesTable = ({ students, studyGuidanceCourses, curriculum }) => {
   )
 }
 
-// study guidance groups -feature uses different population + rtk query, so it needs to
-// be rendered differently also here: TODO: refactor things nicely
-const StudyGuidanceGroupCoursesTabContainer = ({ students, group, curriculum }) => {
+const StudyGuidanceGroupCoursesTabContainer = ({ curriculum, group, students }) => {
   const groupStudentNumbers = group?.members?.map(({ personStudentNumber }) => personStudentNumber) || []
   const populationsCourses = useGetStudyGuidanceGroupPopulationCoursesQuery({
     studentnumberlist: groupStudentNumbers,
     year: group?.tags?.year,
   }).data
-  if (populationsCourses.pending) return null
+  if (populationsCourses.pending) {
+    return null
+  }
   return <CoursesTable curriculum={curriculum} students={students} studyGuidanceCourses={populationsCourses} />
 }
 
-export const CoursesTabContainer = ({ students, variant, studyGuidanceGroup, curriculum }) => {
+export const CoursesTabContainer = ({ curriculum, students, studyGuidanceGroup, variant }) => {
   if (variant === 'studyGuidanceGroupPopulation') {
     return (
       <StudyGuidanceGroupCoursesTabContainer curriculum={curriculum} group={studyGuidanceGroup} students={students} />
