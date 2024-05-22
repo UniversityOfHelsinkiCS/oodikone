@@ -134,13 +134,13 @@ export const hiddenNameAndEmailForExcel = [
   },
   {
     key: 'hidden-email',
-    title: 'E-mail',
+    title: 'Email',
     getRowVal: student => student.email ?? '',
     export: true,
   },
   {
     key: 'hidden-secondary-email',
-    title: 'Secondary e-mail',
+    title: 'Secondary email',
     getRowVal: student => student.secondaryEmail ?? '',
     export: true,
   },
