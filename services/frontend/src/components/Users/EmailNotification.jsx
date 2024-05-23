@@ -1,17 +1,16 @@
 import { useState } from 'react'
-import { Button, Modal, Message } from 'semantic-ui-react'
+import { Button, Message, Modal } from 'semantic-ui-react'
 
 import { useGetUserAccessEmailPreviewQuery, useSendUserAccessEmailMutation } from '@/redux/users'
 import { EmailPreview } from './EmailPreview'
 
-const SendEmailButton = props => <Button basic content="Preview email ..." fluid positive {...props} />
-
+const SendEmailButton = props => <Button basic content="Preview email" fluid positive {...props} />
 const DisabledEmailButton = props => (
   <Button basic content="Cannot send email - user has no email address" disabled fluid {...props} />
 )
 
-const SendFailBanner = ({ userEmail }) => <Message error header={`Email could not be sent to ${userEmail}`} />
 const SendSuccessBanner = ({ userEmail }) => <Message header={`Email sent to ${userEmail}`} success />
+const SendFailBanner = ({ userEmail }) => <Message error header={`Email could not be sent to ${userEmail}`} />
 
 export const EmailNotification = ({ userEmail }) => {
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -29,7 +28,11 @@ export const EmailNotification = ({ userEmail }) => {
     return null
   }
 
-  return userEmail ? (
+  if (!userEmail) {
+    return <DisabledEmailButton />
+  }
+
+  return (
     <>
       <SendEmailButton onClick={() => setConfirmOpen(true)} />
       <Modal onClose={() => setConfirmOpen(false)} open={confirmOpen}>
@@ -64,7 +67,5 @@ export const EmailNotification = ({ userEmail }) => {
         </Modal.Actions>
       </Modal>
     </>
-  ) : (
-    <DisabledEmailButton />
   )
 }

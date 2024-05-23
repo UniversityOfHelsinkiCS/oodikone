@@ -1,5 +1,5 @@
 import { useHistory, useParams } from 'react-router-dom'
-import { Button, Card, Divider, Popup, Segment, Loader, Message } from 'semantic-ui-react'
+import { Button, Card, Divider, Loader, Message, Popup, Segment } from 'semantic-ui-react'
 
 import { useGetAuthorizedUserQuery, useShowAsUser } from '@/redux/auth'
 import { useGetUserQuery } from '@/redux/users'
@@ -49,45 +49,43 @@ export const UserPage = () => {
 
   return (
     <Segment className="contentSegment" loading={isLoading}>
-      <div>
-        <Button content="Back" icon="arrow circle left" onClick={() => history.push('/users')} />
-        <Divider />
-        <Card.Group>
-          {!user.sisu_person_id && (
-            <Message
-              content="All their roles and access rights might not be displayed."
-              header="This user does not have a person id"
-              icon="exclamation circle"
-              info
-              negative
-              style={{ margin: '1rem 0' }}
-            />
-          )}
-          {renderUserInfoCard()}
-          <Card fluid>
-            <Card.Content>
-              <Card.Header content="Roles" />
-              <AccessGroups user={user} />
-            </Card.Content>
-          </Card>
-          <Card fluid>
-            <Card.Content>
-              <Card.Header content="Study programme access rights" />
+      <Button content="Back" icon="arrow circle left" onClick={() => history.push('/users')} />
+      <Divider />
+      <Card.Group>
+        {!user.sisu_person_id && (
+          <Message
+            content="All their roles and access rights might not be displayed."
+            header="This user does not have a person id"
+            icon="exclamation circle"
+            info
+            negative
+            style={{ margin: '1rem 0' }}
+          />
+        )}
+        {renderUserInfoCard()}
+        <Card fluid>
+          <Card.Content>
+            <Card.Header content="Roles" />
+            <AccessGroups user={user} />
+          </Card.Content>
+        </Card>
+        <Card fluid>
+          <Card.Content>
+            <Card.Header content="Study programme access rights" />
+            <Divider />
+            <AccessRights user={user} />
+          </Card.Content>
+        </Card>
+        <Card fluid>
+          <Card.Content>
+            <Card.Header content="Send email about receiving access to Oodikone" />
+            <Card.Description>
               <Divider />
-              <AccessRights user={user} />
-            </Card.Content>
-          </Card>
-          <Card fluid>
-            <Card.Content>
-              <Card.Header content="Send email about receiving access to oodikone" />
-              <Card.Description>
-                <Divider />
-                <EmailNotification userEmail={user.email} />
-              </Card.Description>
-            </Card.Content>
-          </Card>
-        </Card.Group>
-      </div>
+              <EmailNotification userEmail={user.email} />
+            </Card.Description>
+          </Card.Content>
+        </Card>
+      </Card.Group>
     </Segment>
   )
 }
