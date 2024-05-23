@@ -43,8 +43,14 @@ export const CurriculumPicker = ({ setCurriculum, programmeCodes, disabled, year
     setCurriculum({ ...chosenCurriculumData, version: chosenCurriculum?.curriculum_period_ids })
   }, [chosenCurriculumData])
 
+  const convertPeriodIdToYear = curriculumPeriodId => {
+    const versionNumber = parseInt(curriculumPeriodId.slice(-2), 10)
+    const year = versionNumber + 1949
+    return year
+  }
+
   const formatCurriculumOptions = curriculum => {
-    const years = sortBy(curriculum.curriculum_period_ids)
+    const years = sortBy(curriculum.curriculum_period_ids.map(convertPeriodIdToYear))
     if (years.length === 0) {
       return 'error'
     }

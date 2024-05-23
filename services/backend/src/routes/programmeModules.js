@@ -9,7 +9,7 @@ router.get('/v3/curriculum-options/:code', async (req, res) => {
 
 router.get('/v3/curriculum/:code/:periodIds', async (req, res) => {
   const { code, periodIds } = req.params
-  const result = await getCoursesAndModules(code, periodIds.replace(' ', '').split(','))
+  const result = await getCoursesAndModules(code, periodIds)
   res.json({
     defaultProgrammeCourses: result.defaultProgrammeCourses.courses,
     defaultProgrammeModules: result.defaultProgrammeCourses.modules,

@@ -1,19 +1,15 @@
 const { Op } = require('sequelize')
+
+const { dbConnections } = require('../database/connection')
+const { ProgrammeModule } = require('../models')
 const { ExcludedCourse } = require('../models/models_kone')
 const logger = require('../util/logger')
 const { combinedStudyprogrammes } = require('./studyprogramme/studyprogrammeHelpers')
-const { dbConnections } = require('../database/connection')
-const { ProgrammeModule } = require('../models')
 
 const getCurriculumVersions = async code => {
   try {
     const result = await ProgrammeModule.findAll({ where: { code } })
-    if (!result) return
-    const modified = result.map(r => ({
-      ...r.toJSON(),
-      curriculum_period_ids: r.curriculum_period_ids.map(id => parseInt(id.substring(6), 10) + 1949),
-    }))
-    return modified
+    return result
   } catch (e) {
     logger.error(`Error when searching curriculum versions for code: ${code}`)
     logger.error(e)
@@ -78,12 +74,11 @@ const labelProgammes = (modules, excludedCourses) => {
   })
 }
 
-const getCoursesAndModulesForProgramme = async (code, period_ids) => {
-  if (!period_ids) return {}
-  const result = await recursivelyGetModuleAndChildren(
-    code,
-    period_ids.map(id => `hy-lv-${id - 1949}`)
-  )
+const getCoursesAndModulesForProgramme = async (code, periodIds) => {
+  if (!periodIds) {
+    return {}
+  }
+  const result = await recursivelyGetModuleAndChildren(code, periodIds.split(','))
   const courses = result.filter(r => r.type === 'course')
   const modules = result.filter(r => r.type === 'module')
   const excludedCourses = await ExcludedCourse.findAll({
@@ -92,7 +87,7 @@ const getCoursesAndModulesForProgramme = async (code, period_ids) => {
         [Op.eq]: code,
       },
       curriculum_version: {
-        [Op.eq]: period_ids.join(','),
+        [Op.eq]: periodIds,
       },
     },
   })
@@ -109,11 +104,11 @@ const getCoursesAndModulesForProgramme = async (code, period_ids) => {
   return { courses: labelProgammes(modifiedCourses, excludedCourses), modules }
 }
 
-const getCoursesAndModules = async (code, period_ids) => {
-  const defaultProgrammeCourses = await getCoursesAndModulesForProgramme(code, period_ids)
+const getCoursesAndModules = async (code, periodIds) => {
+  const defaultProgrammeCourses = await getCoursesAndModulesForProgramme(code, periodIds)
   if (Object.keys(combinedStudyprogrammes).includes(code)) {
     const secondProgramme = combinedStudyprogrammes[code]
-    const secondProgrammeCourses = await getCoursesAndModulesForProgramme(secondProgramme, period_ids)
+    const secondProgrammeCourses = await getCoursesAndModulesForProgramme(secondProgramme, periodIds)
     return { defaultProgrammeCourses, secondProgrammeCourses }
   }
   return { defaultProgrammeCourses, secondProgrammeCourses: { courses: [], modules: [] } }
