@@ -9,8 +9,7 @@ router.get('/', async (_req, res) => {
 })
 
 router.get('/access_groups', async (_req, res) => {
-  const result = await userService.getAccessGroups()
-  res.json(result)
+  res.json(userService.roles)
 })
 
 router.get('/:uid', async (req, res) => {
@@ -24,9 +23,10 @@ router.get('/:uid', async (req, res) => {
 })
 
 router.post('/modifyaccess', async (req, res) => {
+  const { username, accessgroups } = req.body
   try {
-    const result = await userService.modifyAccess(req.body)
-    res.status(200).json(result)
+    await userService.modifyAccess(username, accessgroups)
+    res.status(204).end()
   } catch (e) {
     res.status(400).json(e)
   }
@@ -54,15 +54,15 @@ router.post('/email', async (req, res) => {
 router.post('/:uid/elements', async (req, res) => {
   const { uid } = req.params
   const { codes } = req.body
-  const user = await userService.enableElementDetails(uid, codes)
-  res.json(user)
+  await userService.modifyElementDetails(uid, codes, true)
+  res.status(204).end()
 })
 
 router.delete('/:uid/elements', async (req, res) => {
   const { uid } = req.params
   const { codes } = req.body
-  const user = await userService.removeElementDetails(uid, codes)
-  res.json(user)
+  await userService.modifyElementDetails(uid, codes, false)
+  res.status(204).end()
 })
 
 module.exports = router

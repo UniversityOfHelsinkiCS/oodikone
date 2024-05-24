@@ -10,8 +10,8 @@ router.post('/language', async (req, res) => {
     return res.status(400).json('invalid language')
   }
   try {
-    const result = await userService.updateUser(userId, { language })
-    return res.status(200).json(result)
+    await userService.updateUser(userId, { language })
+    return res.status(204).end()
   } catch (e) {
     return res.status(e.response.status).json(e.response.data)
   }

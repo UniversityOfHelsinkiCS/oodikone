@@ -1,426 +1,231 @@
-const { Op } = require('sequelize')
-const LRU = require('lru-cache')
+const { LRUCache } = require('lru-cache')
 const _ = require('lodash')
 
 const { getStudentnumbersByElementdetails } = require('./students')
 const { sendNotificationAboutNewUser } = require('./mailservice')
 const { checkStudyGuidanceGroupsAccess, getAllStudentsUserHasInGroups } = require('./studyGuidanceGroups')
-const { User, UserElementDetails, AccessGroup } = require('../models/models_user')
+const { User } = require('../models/models_user')
 const { getUserIams, getAllUserAccess, getUserIamAccess } = require('../util/jami')
-const { createLocaleComparator, getFullStudyProgrammeRights } = require('../util/utils')
+const { createLocaleComparator, getFullStudyProgrammeRights, hasFullAccessToStudentData } = require('../util/utils')
 const { sequelizeUser } = require('../database/connection')
 
 const courseStatisticsGroup = 'grp-oodikone-basic-users'
 const facultyStatisticsGroup = 'grp-oodikone-users'
 
-// Max 25 users can be stored in the cache
-const userDataCache = new LRU({
-  max: 25,
-  length: () => 1,
-  maxAge: 1000 * 60 * 60,
-})
-
-// Stuff to work with old userservice based user-db (separate microservice, now deprecated)
-const userIncludes = [
-  {
-    separate: true,
-    model: UserElementDetails,
-    as: 'programme',
-  },
-  {
-    model: AccessGroup,
-    as: 'accessgroup',
-    attributes: ['id', 'group_code', 'group_info'],
-  },
+const roles = [
+  'teachers',
+  'admin',
+  'courseStatistics',
+  'studyGuidanceGroups',
+  'facultyStatistics',
+  'openUniSearch',
+  'katselmusViewer',
+  'fullSisuAccess',
 ]
 
-const accessGroupsByCodes = async codes =>
-  await AccessGroup.findAll({
-    where: {
-      group_code: {
-        [Op.in]: codes,
-      },
-    },
+// Max 25 users can be stored in the cache, and the data is valid for 1 hour
+const userDataCache = new LRUCache({ max: 25, ttl: 1000 * 60 * 60 })
+
+const findUser = async where => User.findOne({ where })
+
+const deleteOutdatedUsers = async () => {
+  const outdatedUsersCTE =
+    "WITH outdated_users AS (SELECT id FROM users WHERE last_login < CURRENT_DATE - INTERVAL '18 months')"
+
+  const queries = [
+    `${outdatedUsersCTE} DELETE FROM user_faculties WHERE "userId" IN (SELECT id FROM outdated_users)`,
+    `${outdatedUsersCTE} DELETE FROM user_accessgroup WHERE "userId" IN (SELECT id FROM outdated_users)`,
+    `${outdatedUsersCTE} DELETE FROM user_elementdetails WHERE "userId" IN (SELECT id FROM outdated_users)`,
+    `${outdatedUsersCTE} DELETE FROM users WHERE id IN (SELECT id FROM outdated_users) RETURNING id`,
+  ]
+
+  return await sequelizeUser.transaction(async t => {
+    const results = await Promise.all(queries.map(query => sequelizeUser.query(query, { transaction: t })))
+    return results[results.length - 1][0].length
   })
+}
 
-const byUsername = async username =>
-  await User.findOne({
-    where: {
-      username,
-    },
-    include: userIncludes,
-  })
+const modifyAccess = async (username, roles) => {
+  const user = await findUser({ username })
+  const rolesToAdd = Object.keys(roles).filter(code => roles[code])
+  user.roles = rolesToAdd
+  await user.save()
+  userDataCache.delete(username)
+}
 
-const byId = async id =>
-  await User.findOne({
-    where: {
-      id,
-    },
-    include: userIncludes,
-  })
-
-const deleteOutdatedUsers = async () =>
-  await sequelizeUser.transaction(async t => {
-    const outdatedUsersCTE = `
-      WITH outdated_users AS (
-        SELECT id FROM users
-        WHERE last_login IS NULL OR last_login < CURRENT_DATE - INTERVAL '18 months'
-      )`
-
-    await sequelizeUser.query(
-      `${outdatedUsersCTE} DELETE FROM user_faculties WHERE "userId" IN (SELECT id FROM outdated_users)`,
-      { transaction: t }
-    )
-    await sequelizeUser.query(
-      `${outdatedUsersCTE} DELETE FROM user_accessgroup WHERE "userId" IN (SELECT id FROM outdated_users)`,
-      { transaction: t }
-    )
-    await sequelizeUser.query(
-      `${outdatedUsersCTE} DELETE FROM user_elementdetails WHERE "userId" IN (SELECT id FROM outdated_users)`,
-      { transaction: t }
-    )
-    const [results] = await sequelizeUser.query(
-      `${outdatedUsersCTE} DELETE FROM users WHERE id IN (SELECT id FROM outdated_users) RETURNING id`,
-      { transaction: t }
-    )
-
-    return results.length
-  })
-
-const addProgrammes = async (id, codes) => {
-  for (const code of codes) {
-    await UserElementDetails.upsert({ userId: id, elementDetailCode: code })
+const modifyElementDetails = async (id, codes, enable) => {
+  const user = await findUser({ id })
+  if (enable === true) {
+    user.programmeRights = _.uniq([...user.programmeRights, ...codes])
+  } else {
+    user.programmeRights = user.programmeRights.filter(code => !codes.includes(code))
   }
-  const user = await byId(id)
-  userDataCache.del(user.username)
-}
-
-const removeProgrammes = async (id, codes) => {
-  for (const code of codes) {
-    await UserElementDetails.destroy({
-      where: { userId: id, elementDetailCode: code },
-    })
-  }
-  const user = await byId(id)
-  userDataCache.del(user.username)
-}
-
-const modifyRights = async (username, rights) => {
-  const rightsToAdd = Object.entries(rights)
-    .map(([code, val]) => {
-      if (val === true) {
-        return code
-      }
-      return undefined
-    })
-    .filter(code => code)
-  const rightsToRemove = Object.entries(rights)
-    .map(([code, val]) => {
-      if (val === false) {
-        return code
-      }
-      return undefined
-    })
-    .filter(code => code)
-
-  const user = await byUsername(username)
-  const accessGroupsToAdd = await accessGroupsByCodes(rightsToAdd)
-  const accessGroupsToRemove = await accessGroupsByCodes(rightsToRemove)
-
-  await user.addAccessgroup(accessGroupsToAdd)
-  await user.removeAccessgroup(accessGroupsToRemove)
-  userDataCache.del(username)
-}
-
-const modifyAccess = async body => {
-  const { username, accessgroups } = body
-  await modifyRights(username, accessgroups)
-  userDataCache.del(username)
-  const updatedUser = await byUsername(username)
-  return updatedUser
-}
-
-const enableElementDetails = async (id, codes) => {
-  await addProgrammes(id, codes)
-  const user = await byId(id)
-  userDataCache.del(user.username)
-  return user
-}
-
-const removeElementDetails = async (id, codes) => {
-  await removeProgrammes(id, codes)
-  const user = await byId(id)
-  userDataCache.del(user.userId)
-  return user
+  await user.save()
+  userDataCache.delete(user.username)
 }
 
 const updateUser = async (username, fields) => {
-  const user = await byUsername(username)
-  if (!user) {
-    throw new Error(`User ${username} not found`)
-  }
-  await User.upsert({ id: user.id, ...fields })
-  user.update(fields)
-
-  userDataCache.del(username)
-
-  const updatedUser = await byUsername(username)
-  return updatedUser
+  const user = await findUser({ username })
+  if (!user) throw new Error(`User ${username} not found`)
+  await user.update(fields)
+  userDataCache.delete(username)
 }
 
-const getAccessGroups = async () => await AccessGroup.findAll()
+const getStudyProgrammeRights = (iamAccess, specialGroup, userProgrammes) => [
+  ...(specialGroup?.fullSisuAccess
+    ? []
+    : Object.entries(iamAccess || {}).map(([code, rights]) => ({
+        code,
+        limited: !rights.admin,
+        isIamBased: true,
+      }))),
+  ...userProgrammes.map(code => ({ code, limited: false, isIamBased: false })),
+]
 
-const getStudyProgrammeRights = (iamAccess, specialGroup, userProgrammes) => {
-  const iamBasedProgrammes = []
+const formatUser = async (user, getStudentAccess = true) => {
+  const { roles } = user
+  const fullStudyProgrammeRights = getFullStudyProgrammeRights(user.programmeRights)
 
-  for (const [programmeCode, rights] of Object.entries(iamAccess || {})) {
-    if (specialGroup.kosu || rights.admin) {
-      iamBasedProgrammes.push({ code: programmeCode, limited: false, isIamBased: true })
-    } else {
-      iamBasedProgrammes.push({ code: programmeCode, limited: true, isIamBased: true })
-    }
-  }
-
-  return [
-    ...iamBasedProgrammes,
-    ...userProgrammes.map(({ elementDetailCode }) => ({
-      code: elementDetailCode,
-      limited: false,
-      isIamBased: false,
-    })),
-  ]
-}
-
-const formatUser = async (userFromDb, extraRights, programmeRights, getStudentAccess = true) => {
-  const accessGroups = userFromDb.accessgroup.map(entry => entry.group_code)
-
-  const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
-
-  const {
-    dataValues: {
-      id,
-      username: userId,
-      full_name: name,
-      email,
-      language,
-      sisu_person_id: sisPersonId,
-      iam_groups: iamGroups,
-    },
-  } = userFromDb
-
-  const studentsUserCanAccess = getStudentAccess
-    ? _.uniqBy(
-        (
-          await Promise.all([
-            getStudentnumbersByElementdetails(fullStudyProgrammeRights),
-            getAllStudentsUserHasInGroups(sisPersonId),
-          ])
-        ).flat()
-      )
-    : []
+  // No need to fetch student numbers if the user already has full access to student data
+  const studentsUserCanAccess =
+    !getStudentAccess || hasFullAccessToStudentData(roles)
+      ? []
+      : _.uniqBy(
+          (
+            await Promise.all([
+              getStudentnumbersByElementdetails(fullStudyProgrammeRights),
+              getAllStudentsUserHasInGroups(user.sisu_person_id),
+            ])
+          ).flat()
+        )
 
   // attribute naming is a bit confusing, but it's used so widely in oodikone, that it's not probably worth changing
   return {
-    id, // our internal id, not the one from sis, (e.g. 101)
-    userId, // acually username (e.g. mluukkai)
-    name,
-    language,
-    sisPersonId, //
-    iamGroups,
-    email,
-    roles: accessGroups,
+    id: user.id, // our internal id, not the one from sis, (e.g. 101)
+    username: user.username, // acually username (e.g. mluukkai)
+    name: user.fullName,
+    language: user.language,
+    sisPersonId: user.sisuPersonId,
+    email: user.email,
+    roles,
     studentsUserCanAccess, // studentnumbers used in various parts of backend. For admin this is usually empty, since no programmes / faculties are set.
-    isAdmin: accessGroups.includes('admin'),
-    programmeRights,
+    isAdmin: roles.includes('admin'),
+    programmeRights: user.programmeRights,
+    iamGroups: user.iamGroups || [],
+    mockedBy: user.mockedBy,
+    lastLogin: user.lastLogin,
   }
 }
 
-const updateAccessGroups = async (username, iamGroups = [], specialGroup = {}, sisId, user) => {
+const formatUserForFrontend = async user => {
+  const formattedUser = await formatUser(user, false)
+  return _.omit(formattedUser, ['studentsUserCanAccess', 'isAdmin', 'mockedBy', 'userId'])
+}
+
+const updateAccessGroups = async (username, iamGroups, specialGroup, sisId) => {
   const { jory, hyOne, superAdmin, openUni, katselmusViewer, fullSisuAccess } = specialGroup
+  const userFromDb = await findUser({ username })
+  const currentAccessGroups = userFromDb.roles
 
-  const userFromDb = user || (await byUsername(username))
-  const formattedUser = await formatUser(userFromDb, [], [], Boolean(sisId))
+  const newAccessGroups = [
+    ...(currentAccessGroups.includes('studyGuidanceGroups') || (await checkStudyGuidanceGroupsAccess(sisId))
+      ? ['studyGuidanceGroups']
+      : []),
+    ...(iamGroups.includes(courseStatisticsGroup) ? ['courseStatistics'] : []),
+    ...(jory || iamGroups.includes(facultyStatisticsGroup) ? ['facultyStatistics'] : []),
+    ...(hyOne || currentAccessGroups.includes('teachers') ? ['teachers'] : []),
+    ...(superAdmin || currentAccessGroups.includes('admin') ? ['admin'] : []),
+    ...(openUni ? ['openUniSearch'] : []),
+    ...(katselmusViewer ? ['katselmusViewer'] : []),
+    ...(fullSisuAccess ? ['fullSisuAccess'] : []),
+  ]
 
-  const { roles: currentAccessGroups } = formattedUser
-
-  // Modify accessgroups based on current groups and iamGroups
-  const newAccessGroups = []
-  if (currentAccessGroups.includes('studyGuidanceGroups') || (sisId && (await checkStudyGuidanceGroupsAccess(sisId))))
-    newAccessGroups.push('studyGuidanceGroups')
-  if (iamGroups.includes(courseStatisticsGroup)) newAccessGroups.push('courseStatistics')
-  if (jory || iamGroups.includes(facultyStatisticsGroup)) newAccessGroups.push('facultyStatistics')
-  if (hyOne || currentAccessGroups.includes('teachers')) newAccessGroups.push('teachers')
-  if (superAdmin || currentAccessGroups.includes('admin')) newAccessGroups.push('admin')
-  if (openUni) newAccessGroups.push('openUniSearch')
-  if (katselmusViewer) newAccessGroups.push('katselmusViewer')
-  if (fullSisuAccess) newAccessGroups.push('fullSisuAccess')
-
-  const accessGroups = await accessGroupsByCodes(newAccessGroups)
-
-  // In the difference method "the order and references of result values are determined by the first array." https://lodash.com/docs/4.17.15#difference
-  // Both directions needs to be checked in order to update roles when the access should no longer exists.
-  if (
-    _.difference(newAccessGroups, currentAccessGroups).length > 0 ||
-    _.difference(currentAccessGroups, newAccessGroups).length > 0
-  ) {
-    userFromDb.setAccessgroup(accessGroups.map(({ id }) => id))
+  if (!_.isEqual(newAccessGroups.sort(), currentAccessGroups.sort())) {
+    userFromDb.roles = newAccessGroups
+    await userFromDb.save()
   }
-
-  return { newAccessGroups, accessGroups }
 }
 
 const findAll = async () => {
-  const allUsers = await User.findAll({
-    include: userIncludes,
-  })
-
-  const userIds = allUsers.map(user => user.dataValues.sisu_person_id)
-
-  const userAccess = await getAllUserAccess(userIds)
-
-  const userAccessMap = userAccess.reduce((obj, cur) => {
-    obj[cur.id] = cur
-    return obj
-  }, {})
+  const users = (await User.findAll()).map(user => user.toJSON())
+  const userAccess = await getAllUserAccess(users.map(user => user.sisuPersonId))
+  const userAccessMap = _.keyBy(userAccess, 'id')
 
   const formattedUsers = await Promise.all(
-    allUsers.map(async user => {
-      const { iamGroups, specialGroup, access } = userAccessMap[user.sisu_person_id] || {}
-
-      const { accessGroups } = await updateAccessGroups(user.username, iamGroups, specialGroup, null, user)
-
-      return {
-        ...user.get(),
-        iam_groups: iamGroups || [],
-        accessgroup: accessGroups,
-        programmeRights: getStudyProgrammeRights(access, specialGroup, user.programme),
-      }
+    users.map(async user => {
+      const { iamGroups, specialGroup, access } = userAccessMap[user.sisuPersonId] || {}
+      const programmeRights = getStudyProgrammeRights(access, specialGroup, user.programmeRights)
+      const formattedUser = await formatUserForFrontend({ ...user, programmeRights, iamGroups })
+      return formattedUser
     })
   )
-  return formattedUsers.sort(createLocaleComparator('full_name'))
+  return formattedUsers.sort(createLocaleComparator('name'))
 }
 
 const findOne = async id => {
-  const user = await byId(id)
-  if (!user) {
-    throw new Error(`User with id ${id} not found`)
-  }
+  const user = (await findUser({ id })).toJSON()
+  if (!user) throw new Error(`User with id ${id} not found`)
 
-  const userIams = await getUserIams(user.sisu_person_id)
-
-  user.iamGroups = userIams
-
-  const { iamAccess, specialGroup } = await getUserIamAccess(user.sisu_person_id, user.iamGroups)
-
-  const { accessGroups } = await updateAccessGroups(user.username, userIams, specialGroup)
-
-  return {
-    ...user.get(),
-    iam_groups: iamAccess || [],
-    accessgroup: accessGroups,
-    programmeRights: getStudyProgrammeRights(iamAccess, specialGroup, user.programme),
-  }
+  const iamGroups = await getUserIams(user.sisuPersonId)
+  const { iamAccess, specialGroup } = await getUserIamAccess(user.sisuPersonId, iamGroups)
+  const programmeRights = getStudyProgrammeRights(iamAccess, specialGroup, user.programmeRights)
+  const formattedUser = await formatUserForFrontend({ ...user, programmeRights, iamGroups })
+  return formattedUser
 }
 
-const getOrganizationAccess = async user => {
-  if (!user.iamGroups) user.iamGroups = user.iam_groups
-
-  if (user.iamGroups.length === 0) return {}
-
-  const { iamAccess, specialGroup } = await getUserIamAccess(user.sisu_person_id ?? user.id, user.iamGroups)
-
-  const access = {}
-  if (_.isObject(iamAccess)) {
-    Object.keys(iamAccess).forEach(code => {
-      access[code] = iamAccess[code]
-    })
-  }
-
-  return { access, specialGroup }
+const getOrganizationAccess = async (sisPersonId, iamGroups) => {
+  if (!iamGroups.length) return {}
+  const { iamAccess, specialGroup } = await getUserIamAccess(sisPersonId, iamGroups)
+  return { access: iamAccess || {}, specialGroup }
 }
 
 const getMockedUser = async ({ userToMock, mockedBy }) => {
-  // Using different keys for users being mocked to prevent users from seeing
-  // themselves as mocked. Also, if the user is already logged in, we don't want
-  // the regular data from the cache because that doesn't have the mockedBy field
-  if (userDataCache.has(`mocking-as-${userToMock}`)) {
-    const userFromCache = userDataCache.get(`mocking-as-${userToMock}`)
-    if (userFromCache.mockedBy !== mockedBy) {
-      userFromCache.mockedBy = mockedBy
-      userDataCache.set(`mocking-as-${userToMock}`, userFromCache)
+  // Using different keys for users being mocked to prevent users from seeing themselves as mocked. Also, if the user
+  // is already logged in, we don't want the regular data from the cache because that doesn't have the mockedBy field
+  const cacheKey = `mocking-as-${userToMock}`
+  if (userDataCache.has(cacheKey)) {
+    const cachedUser = userDataCache.get(cacheKey)
+    if (cachedUser.mockedBy !== mockedBy) {
+      cachedUser.mockedBy = mockedBy
+      userDataCache.set(cacheKey, cachedUser)
     }
-    return userFromCache
+    return cachedUser
   }
 
-  const userFromDb = await byUsername(userToMock)
-  userFromDb.iamGroups = await getUserIams(userFromDb.sisu_person_id)
+  const userFromDb = (await findUser({ username: userToMock })).toJSON()
+  const iamGroups = await getUserIams(userFromDb.sisuPersonId)
+  const { access, specialGroup } = await getOrganizationAccess(userFromDb.sisuPersonId, iamGroups)
+  const programmeRights = getStudyProgrammeRights(access, specialGroup, userFromDb.programmeRights)
 
-  const { access = {}, specialGroup = {} } = await getOrganizationAccess(userFromDb)
-
-  const iamRights = Object.keys(access)
-
-  const programmeRights = getStudyProgrammeRights(access, specialGroup, userFromDb.programme)
-
-  const formattedUser = await formatUser(userFromDb, specialGroup.kosu ? iamRights : [], programmeRights)
-
-  const toReturn = {
-    ...formattedUser,
-    iamRights,
-    specialGroup,
-    mockedBy,
-    iamGroups: userFromDb.iamGroups,
-  }
-  userDataCache.set(`mocking-as-${userToMock}`, toReturn)
-
-  return toReturn
+  const mockedUser = await formatUser({ ...userFromDb, iamGroups, programmeRights, mockedBy })
+  userDataCache.set(cacheKey, mockedUser)
+  return mockedUser
 }
 
-const getUser = async ({ username, name, email, iamGroups, iamRights, specialGroup, sisId, access }) => {
-  if (userDataCache.has(username)) {
-    return userDataCache.get(username)
-  }
+const getUser = async ({ username, name, email, iamGroups, specialGroup, sisId, access }) => {
+  if (userDataCache.has(username)) return userDataCache.get(username)
 
   const isNewUser = !(await User.findOne({ where: { username } }))
-  const language = 'fi'
+  await User.upsert({ fullName: name, username, email, sisuPersonId: sisId, lastLogin: new Date() })
+  await updateAccessGroups(username, iamGroups, specialGroup, sisId)
+  const userFromDb = (await findUser({ username })).toJSON()
 
-  await User.upsert({
-    full_name: name,
-    username,
-    email,
-    language,
-    sisu_person_id: sisId,
-    last_login: new Date(),
-  })
-
-  const userFromDb = await byUsername(username)
-  userFromDb.iamGroups = await getUserIams(userFromDb.sisu_person_id)
-  const programmeRights = getStudyProgrammeRights(access, specialGroup, userFromDb.programme)
-  const formattedUser = await formatUser(userFromDb, specialGroup.kosu ? iamRights : [], programmeRights)
-
-  const { newAccessGroups } = await updateAccessGroups(username, iamGroups, specialGroup, sisId)
-
+  const programmeRights = getStudyProgrammeRights(access, specialGroup, userFromDb.programmeRights)
+  const user = await formatUser({ ...userFromDb, iamGroups, programmeRights })
   if (isNewUser) await sendNotificationAboutNewUser({ userId: username, userFullName: name })
-
-  const toReturn = {
-    ...formattedUser,
-    iamRights,
-    iamGroups: userFromDb.iamGroups,
-    roles: newAccessGroups,
-  }
-  userDataCache.set(username, toReturn)
-  return toReturn
+  userDataCache.set(username, user)
+  return user
 }
 
 module.exports = {
   updateUser,
-  enableElementDetails,
-  removeElementDetails,
+  modifyElementDetails,
   findAll,
   findOne,
   modifyAccess,
-  getAccessGroups,
   getUser,
   getMockedUser,
   getOrganizationAccess,
   deleteOutdatedUsers,
+  roles,
 }

@@ -28,8 +28,9 @@ const accessLogger = morgan((tokens, req, res) => {
   ].join(' ')
 
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(user.programmeRights)
+  const iamBasedRights = user.programmeRights.filter(right => right.isIamBased)
 
-  const usingIamRights = user.iamRights.some(programmeCode => tokens.url(req, res).includes(programmeCode))
+  const usingIamRights = iamBasedRights.some(right => tokens.url(req, res).includes(right.code))
   const onlyIamRights = !user.isAdmin && fullStudyProgrammeRights.length === 0
 
   logger.info(message, {

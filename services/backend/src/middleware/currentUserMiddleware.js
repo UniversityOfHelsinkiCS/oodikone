@@ -5,7 +5,7 @@ const { requiredGroup } = require('../conf-backend')
 const _ = require('lodash')
 const logger = require('../util/logger')
 
-const parseIamGroups = iamGroups => iamGroups?.split(';').filter(Boolean) ?? []
+const parseIamGroups = iamGroups => iamGroups?.split(';') ?? []
 
 const hasRequiredIamGroup = (iamGroups, iamRights) =>
   _.intersection(iamGroups, requiredGroup).length > 0 || iamRights.length > 0
@@ -36,7 +36,7 @@ const currentUserMiddleware = async (req, _res, next) => {
   }
 
   const iamGroups = parseIamGroups(hygroupcn)
-  const { access = {}, specialGroup = {} } = await getOrganizationAccess({ id: sisId, iamGroups })
+  const { access = {}, specialGroup = {} } = await getOrganizationAccess(sisId, iamGroups)
   const iamRights = Object.keys(access)
 
   if (!hasRequiredIamGroup(iamGroups, iamRights)) {
@@ -44,19 +44,12 @@ const currentUserMiddleware = async (req, _res, next) => {
     throw new ApplicationError(`User '${username}' does not have required iam group`, 403, { logoutUrl })
   }
 
-  let user = await getUser({
-    username,
-    name,
-    email,
-    iamGroups,
-    iamRights,
-    specialGroup,
-    sisId,
-    access,
-  })
+  let user
 
-  if (showAsUser && user.isAdmin) {
+  if (showAsUser && specialGroup?.superAdmin) {
     user = await getMockedUser({ userToMock: showAsUser, mockedBy: username })
+  } else {
+    user = await getUser({ username, name, email, iamGroups, specialGroup, sisId, access })
   }
 
   Sentry.setUser({ username: user.mockedBy ?? username })

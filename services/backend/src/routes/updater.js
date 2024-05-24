@@ -75,7 +75,7 @@ router.get('/update/v2/programmes', async (_req, res) => {
 })
 
 router.get('/refresh_redis_cache', async (req, res) => {
-  logger.info(`${req.user.userId} requested refresh of redis cache`)
+  logger.info(`${req.user.username} requested refresh of redis cache`)
   const response = await updateSISRedisCache()
   if (response) {
     res.status(200).json('Refreshing SIS redis cache scheduled')
@@ -83,31 +83,31 @@ router.get('/refresh_redis_cache', async (req, res) => {
 })
 
 router.post('/refresh_statistic_v2', async (req, res) => {
-  logger.info(`${req.user.userId} requested refresh of statistics`)
+  logger.info(`${req.user.username} requested refresh of statistics`)
   jobMaker.statistics()
   res.status(200).json('Teacher and study programme statistics refreshed')
 })
 
 router.post('/refresh_study_programmes_v2', async (req, res) => {
-  logger.info(`${req.user.userId} requested refresh of study programmes`)
+  logger.info(`${req.user.username} requested refresh of study programmes`)
   refreshProgrammes()
   res.status(200).json('Added job for refreshing study programme overviews')
 })
 
 router.post('/refresh_faculties_v2', async (req, res) => {
-  logger.info(`${req.user.userId} requested refresh of faculties`)
+  logger.info(`${req.user.username} requested refresh of faculties`)
   refreshFaculties()
   res.status(200).json('Added job for refreshing faculties')
 })
 
 router.post('/refresh_language_center_data', async (req, res) => {
-  logger.info(`${req.user.userId} requested refresh of language center data`)
+  logger.info(`${req.user.username} requested refresh of language center data`)
   jobMaker.languagecenter()
   res.status(200).json('Added job for refreshing language center data')
 })
 
 router.post('/refresh-close-to-graduation', async (req, res) => {
-  logger.info(`${req.user.userId} requested refresh of close to graduation data`)
+  logger.info(`${req.user.username} requested refresh of close to graduation data`)
   jobMaker.closeToGraduation()
   res.status(200).json('Added job for refreshing close to graduation data')
 })
