@@ -1,17 +1,18 @@
 const crypto = require('crypto')
-const Sentry = require('@sentry/node')
 const router = require('express').Router()
 const _ = require('lodash')
-const populationService = require('../services/populations')
-const studentService = require('../services/students')
-const StudyrightService = require('../services/studyrights')
-const CourseService = require('../services/courses')
-const StatMergeService = require('../services/statMerger')
-const { mapToProviders, getFullStudyProgrammeRights, hasFullAccessToStudentData } = require('../util/utils')
+const Sentry = require('@sentry/node')
+
+const courseService = require('../services/courses')
 const { encrypt, decrypt } = require('../services/encrypt')
+const populationService = require('../services/populations')
+const statMergeService = require('../services/statMerger')
+const studentService = require('../services/students')
 const { mapCodesToIds } = require('../services/studyprogramme/studyprogrammeHelpers')
+const studyrightService = require('../services/studyrights')
 
 const { ApplicationError } = require('../util/customErrors')
+const { getFullStudyProgrammeRights, hasFullAccessToStudentData, mapToProviders } = require('../util/utils')
 
 const filterPersonalTags = (population, userId) => {
   return {
@@ -63,7 +64,7 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
       })
     )
     const multicoursestats = await multicoursestatPromises
-    const result = StatMergeService.populationCourseStatsMerger(multicoursestats)
+    const result = statMergeService.populationCourseStatsMerger(multicoursestats)
     if (result.error) {
       res.status(400).json(result)
       return
@@ -203,7 +204,7 @@ router.get('/v3/populationstatistics', async (req, res) => {
     )
     const multipopulationstudents = await multipopulationstudentPromises
 
-    const result = StatMergeService.populationStudentsMerger(multipopulationstudents)
+    const result = statMergeService.populationStudentsMerger(multipopulationstudents)
 
     if (result.error) {
       Sentry.captureException(new Error(result.error))
@@ -265,7 +266,7 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
     return res.status(400).json({ error: 'The body should have a yearcode and coursecode defined' })
   }
 
-  const maxYearsToCreatePopulationFrom = await CourseService.maxYearsToCreatePopulationFrom(JSON.parse(coursecodes))
+  const maxYearsToCreatePopulationFrom = await courseService.maxYearsToCreatePopulationFrom(JSON.parse(coursecodes))
   const toFromDiff = Math.abs(to - from + 1)
   // 2 semesters = 1 year
   const requestedYearsToCreatePopulationFrom = Math.ceil(separate ? toFromDiff / 2 : toFromDiff)
@@ -294,7 +295,7 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
   )
   let courseproviders = []
   if (!hasFullAccessToStudentData(roles)) {
-    courseproviders = await CourseService.getCourseProvidersForCourses(JSON.parse(coursecodes))
+    courseproviders = await courseService.getCourseProvidersForCourses(JSON.parse(coursecodes))
   }
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const rightsMappedToProviders = mapToProviders(fullStudyProgrammeRights)
@@ -372,7 +373,7 @@ router.get('/v3/populationstatistics/studyprogrammes', async (req, res) => {
     user: { roles, programmeRights },
   } = req
   if (hasFullAccessToStudentData(roles)) {
-    const studyrights = await StudyrightService.getAssociations()
+    const studyrights = await studyrightService.getAssociations()
     mapCodesToIds(studyrights.programmes)
     res.json(studyrights)
   } else {
@@ -380,28 +381,28 @@ router.get('/v3/populationstatistics/studyprogrammes', async (req, res) => {
     // For combined programme
     // If more programmes are combined, then a function might be a better idea to add moar rights
     if (allRights.includes('KH90_001') || allRights.includes('MH90_001')) allRights.push('KH90_001', 'MH90_001')
-    const studyrights = await StudyrightService.getFilteredAssociations(allRights)
+    const studyrights = await studyrightService.getFilteredAssociations(allRights)
     mapCodesToIds(studyrights.programmes)
     res.json(studyrights)
   }
 })
 
 router.get('/v3/populationstatistics/studyprogrammes/unfiltered', async (req, res) => {
-  const studyrights = await StudyrightService.getAssociations()
+  const studyrights = await studyrightService.getAssociations()
   res.json(studyrights)
 })
 
 router.get('/v3/populationstatistics/maxYearsToCreatePopulationFrom', async (req, res) => {
   const { courseCodes } = req.query
-  const maxYearsToCreatePopulationFromOpen = await CourseService.maxYearsToCreatePopulationFrom(
+  const maxYearsToCreatePopulationFromOpen = await courseService.maxYearsToCreatePopulationFrom(
     JSON.parse(courseCodes),
     'openStats'
   )
-  const maxYearsToCreatePopulationFromUni = await CourseService.maxYearsToCreatePopulationFrom(
+  const maxYearsToCreatePopulationFromUni = await courseService.maxYearsToCreatePopulationFrom(
     JSON.parse(courseCodes),
     'regularStats'
   )
-  const maxYearsToCreatePopulationFromBoth = await CourseService.maxYearsToCreatePopulationFrom(
+  const maxYearsToCreatePopulationFromBoth = await courseService.maxYearsToCreatePopulationFrom(
     JSON.parse(courseCodes),
     'unifyStats'
   )
