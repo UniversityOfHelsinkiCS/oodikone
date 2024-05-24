@@ -1,85 +1,46 @@
-const Sequelize = require('sequelize')
+const { BIGINT, STRING, ARRAY, DATE } = require('sequelize')
 const { sequelizeUser } = require('../database/connection')
-
-const UserElementDetails = sequelizeUser.define(
-  'user_elementdetails',
-  {
-    userId: {
-      primaryKey: true,
-      type: Sequelize.BIGINT,
-    },
-    elementDetailCode: {
-      primaryKey: true,
-      type: Sequelize.STRING,
-    },
-  },
-  {
-    tablename: 'user_elementdetails',
-  }
-)
-
-const AccessGroup = sequelizeUser.define('access_group', {
-  id: {
-    primaryKey: true,
-    type: Sequelize.BIGINT,
-    autoIncrement: true,
-  },
-  group_code: {
-    type: Sequelize.STRING,
-    unique: true,
-  },
-  group_info: {
-    type: Sequelize.STRING,
-  },
-  createdAt: {
-    type: Sequelize.DATE,
-  },
-  updatedAt: {
-    type: Sequelize.DATE,
-  },
-})
 
 const User = sequelizeUser.define(
   'users',
   {
     id: {
       primaryKey: true,
-      type: Sequelize.BIGINT,
+      type: BIGINT,
       autoIncrement: true,
     },
-    full_name: { type: Sequelize.STRING },
+    fullName: STRING,
     username: {
-      type: Sequelize.STRING,
+      type: STRING,
       unique: true,
     },
-    email: { type: Sequelize.STRING },
-    language: { type: Sequelize.STRING },
-    sisu_person_id: { type: Sequelize.STRING },
-    iam_groups: {
-      type: Sequelize.ARRAY(Sequelize.STRING),
+    email: STRING,
+    language: STRING,
+    sisuPersonId: STRING,
+    iamGroups: {
+      type: ARRAY(STRING),
       allowNull: false,
       defaultValue: [],
     },
-    last_login: { type: Sequelize.DATE },
+    lastLogin: DATE,
+    roles: {
+      type: ARRAY(STRING),
+      allowNull: false,
+      defaultValue: [],
+    },
+    programmeRights: {
+      type: ARRAY(STRING),
+      allowNull: false,
+      defaultValue: [],
+    },
   },
   {
     tableName: 'users',
     timestamps: false,
+    underscored: true,
   }
 )
 
-User.hasMany(UserElementDetails, { as: 'programme' })
-UserElementDetails.belongsTo(User)
-
-User.belongsToMany(AccessGroup, {
-  through: 'user_accessgroup',
-  as: 'accessgroup',
-})
-AccessGroup.belongsToMany(User, { through: 'user_accessgroup' })
-
 module.exports = {
   User,
-  UserElementDetails,
-  AccessGroup,
-  sequelizeUser,
 }
