@@ -21,7 +21,7 @@ const mapAndSortProgrammes = (programmes, elementdetails, getTextIn) =>
 const getUserFullProgrammeRights = programmeRights => programmeRights.filter(r => !r.limited).map(r => r.code)
 
 export const AccessRights = ({ user }) => {
-  const { id: uid, accessgroup, programmeRights } = user
+  const { id: uid, roles, programmeRights } = user
   const { getTextIn } = useLanguage()
   const [accessRightsToBeAdded, setAccessRightsToBeAdded] = useState([])
   const [accessRightsToBeRemoved, setAccessRightsToBeRemoved] = useState([])
@@ -74,11 +74,11 @@ export const AccessRights = ({ user }) => {
     getTextIn
   )
 
-  if (accessgroup.some(ag => ag.group_code === 'admin')) {
+  if (roles.some(role => role === 'admin')) {
     return <Message header="This user is an admin." icon="lock open" positive />
   }
 
-  if (accessgroup.some(ag => ag.group_code === 'fullSisuAccess')) {
+  if (roles.some(role => role === 'fullSisuAccess')) {
     return (
       <Message icon positive>
         <Icon name="lock open" />

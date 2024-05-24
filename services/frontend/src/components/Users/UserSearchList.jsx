@@ -57,10 +57,10 @@ export const UserSearchList = () => {
             key: 'NAME',
             title: 'Name',
             getRowVal: user => {
-              const nameparts = user.full_name.split(' ')
+              const nameparts = user.name.split(' ')
               return nameparts[nameparts.length - 1]
             },
-            getRowContent: user => user.full_name,
+            getRowContent: user => user.name,
           },
           {
             key: 'USERNAME',
@@ -79,18 +79,18 @@ export const UserSearchList = () => {
             filterType: 'multi',
             getRowContent: user => (
               <Label.Group>
-                {user.accessgroup
-                  .toSorted((a, b) => a.group_code.localeCompare(b.group_code))
-                  .map(({ group_code: code }) =>
-                    code === 'fullSisuAccess' ? (
-                      <Label color="orange" content={code} key={code} />
+                {user.roles
+                  .toSorted((a, b) => a.localeCompare(b))
+                  .map(role =>
+                    role === 'fullSisuAccess' ? (
+                      <Label color="orange" content={role} key={role} />
                     ) : (
-                      <Label content={code} key={code} />
+                      <Label content={role} key={role} />
                     )
                   )}
               </Label.Group>
             ),
-            getRowVal: user => user.accessgroup.map(ag => ag.group_code),
+            getRowVal: user => user.roles,
           },
           {
             key: 'PROGRAMMES',
@@ -98,7 +98,6 @@ export const UserSearchList = () => {
             sortable: false,
             filterType: 'multi',
             getRowVal: user => {
-              if (user.accessgroup.some(ag => ag.group_code === 'fullSisuAccess')) return []
               const uniqueRights = new Set(user.programmeRights.map(r => r.code))
               const programmeNames = []
               uniqueRights.forEach(right => {
@@ -117,19 +116,19 @@ export const UserSearchList = () => {
             filterType: 'multi',
             getRowContent: user => (
               <Label.Group>
-                {user.iam_groups.toSorted().map(iam => (
+                {user.iamGroups.toSorted().map(iam => (
                   <Label content={iam} key={iam} />
                 ))}
               </Label.Group>
             ),
-            getRowVal: user => user.iam_groups,
+            getRowVal: user => user.iamGroups,
           },
           {
             key: 'LASTLOGIN',
             title: 'Last login',
             filterType: 'date',
-            getRowVal: user => (user.last_login ? new Date(user.last_login) : null),
-            getRowContent: user => user.last_login && <p>{reformatDate(user.last_login, 'DD.MM.YYYY')}</p>,
+            getRowVal: user => user.lastLogin && new Date(user.lastLogin),
+            getRowContent: user => user.lastLogin && <p>{reformatDate(user.lastLogin, 'DD.MM.YYYY')}</p>,
           },
           {
             key: 'SHOWAS',

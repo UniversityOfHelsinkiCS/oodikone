@@ -10,13 +10,9 @@ import { isProduction } from '@/conf'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import './app.css'
 
-const addUserDetailsToLoggers = ({ id, userId, mockedBy }) => {
-  if (!isProduction || !id || !userId) return
-  Sentry.setUser({
-    id,
-    username: userId,
-    mockedBy,
-  })
+const addUserDetailsToLoggers = ({ id, username, mockedBy }) => {
+  if (!isProduction || !id || !username) return
+  Sentry.setUser({ id, username, mockedBy })
 }
 
 const Layout = ({ children }) => (
@@ -31,7 +27,7 @@ const Layout = ({ children }) => (
 )
 
 export const App = () => {
-  const { isLoading, error, id, userId, mockedBy } = useGetAuthorizedUserQuery()
+  const { isLoading, error, id, username, mockedBy } = useGetAuthorizedUserQuery()
 
   useEffect(() => {
     if (isProduction) {
@@ -40,8 +36,8 @@ export const App = () => {
   }, [])
 
   useEffect(() => {
-    addUserDetailsToLoggers({ id, userId, mockedBy })
-  }, [id, userId, mockedBy])
+    addUserDetailsToLoggers({ id, username, mockedBy })
+  }, [id, username, mockedBy])
 
   if (error) return <AccessDenied notEnabled />
 

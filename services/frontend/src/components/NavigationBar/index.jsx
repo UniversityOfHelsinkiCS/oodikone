@@ -44,7 +44,7 @@ const allNavigationItems = {
 }
 
 export const NavigationBar = () => {
-  const { isLoading, iamGroups, mockedBy, userId, roles, isAdmin, programmeRights, fullAccessToStudentData } =
+  const { isLoading, iamGroups, mockedBy, username, roles, isAdmin, programmeRights, fullAccessToStudentData } =
     useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const location = useLocation()
@@ -185,7 +185,7 @@ export const NavigationBar = () => {
 
   const renderStopMockingButton = () => (
     <Menu.Item>
-      <Button onClick={() => showAsUser(null)}>Stop mocking as {userId}</Button>
+      <Button onClick={() => showAsUser(null)}>Stop mocking as {username}</Button>
     </Menu.Item>
   )
 

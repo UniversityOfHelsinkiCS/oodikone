@@ -4,15 +4,14 @@ import { Form, Button, Message } from 'semantic-ui-react'
 import { useGetAccessGroupsQuery, useModifyAccessGroupsMutation } from '@/redux/users'
 
 export const AccessGroups = ({ user }) => {
-  const [selected, setSelected] = useState(user.accessgroup.map(({ group_code: code }) => code))
+  const [selected, setSelected] = useState(user.roles)
   const { data: accessGroups = [] } = useGetAccessGroupsQuery()
   const [mutateAccessGroups, result] = useModifyAccessGroupsMutation()
 
-  const groups = accessGroups.map(({ group_code: code, group_info: description }) => ({
+  const groups = accessGroups.map(code => ({
     key: code,
     text: code,
     value: code,
-    description,
   }))
 
   const submit = async () => {

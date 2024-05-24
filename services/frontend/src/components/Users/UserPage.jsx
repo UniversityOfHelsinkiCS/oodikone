@@ -11,7 +11,7 @@ export const UserPage = () => {
   const history = useHistory()
 
   const { userid } = useParams()
-  const { userId: currentUserId, isAdmin } = useGetAuthorizedUserQuery()
+  const { username: currentUserName, isAdmin } = useGetAuthorizedUserQuery()
   const showAsUser = useShowAsUser()
   const { data: user, isLoading, isError, error } = useGetUserQuery(userid)
 
@@ -23,7 +23,7 @@ export const UserPage = () => {
     <Card fluid>
       <Card.Content>
         <Card.Header>
-          {isAdmin && user.username !== currentUserId && (
+          {isAdmin && user.username !== currentUserName && (
             <Popup
               content="Show Oodikone as this user"
               trigger={
@@ -38,7 +38,7 @@ export const UserPage = () => {
               }
             />
           )}
-          {user.full_name}
+          {user.name}
         </Card.Header>
         <Divider />
         <Card.Meta content={user.username} />
@@ -52,7 +52,7 @@ export const UserPage = () => {
       <Button content="Back" icon="arrow circle left" onClick={() => history.push('/users')} />
       <Divider />
       <Card.Group>
-        {!user.sisu_person_id && (
+        {!user.sisPersonId && (
           <Message
             content="All their roles and access rights might not be displayed."
             header="This user does not have a person id"
