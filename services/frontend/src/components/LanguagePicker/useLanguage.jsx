@@ -1,8 +1,8 @@
 import { createContext, useState, useCallback, useContext, useEffect } from 'react'
 
-import { callApi } from '@/apiConnection'
 import { DEFAULT_LANG, LANGUAGE_CODES } from '@/constants'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
+import { useModifyLanguageMutation } from '@/redux/users'
 
 const LanguageContext = createContext([[], () => {}])
 LanguageContext.displayName = 'Language'
@@ -33,6 +33,7 @@ const getTextInWithLanguage = (texts, language) => {
 }
 export const useLanguage = () => {
   const [state, setState] = useContext(LanguageContext)
+  const [changeLanguage] = useModifyLanguageMutation()
 
   const getTextIn = useCallback(text => getTextInWithLanguage(text, state), [state])
 
@@ -48,7 +49,7 @@ export const useLanguage = () => {
     }
 
     setState(newLanguage)
-    callApi('/language', 'post', { language: newLanguage })
+    changeLanguage({ language: newLanguage })
   }
 
   return {

@@ -46,6 +46,13 @@ const usersApi = RTKApi.injectEndpoints({
         body: { email: recipientAddress },
       }),
     }),
+    modifyLanguage: builder.mutation({
+      query: ({ language }) => ({
+        url: '/users/language',
+        method: 'POST',
+        body: { language },
+      }),
+    }),
   }),
   overrideExisting: false,
 })
@@ -59,4 +66,5 @@ export const {
   useRemoveUserUnitsMutation,
   useGetUserAccessEmailPreviewQuery,
   useSendUserAccessEmailMutation,
+  useModifyLanguageMutation,
 } = usersApi

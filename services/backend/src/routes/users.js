@@ -2,17 +2,18 @@ const router = require('express').Router()
 const userService = require('../services/userService')
 const { sendNotificationAboutAccessToUser, previewNotificationAboutAccessToUser } = require('../services/mailservice')
 const logger = require('../util/logger')
+const auth = require('../middleware/auth')
 
-router.get('/', async (_req, res) => {
+router.get('/', auth.roles(['admin']), async (_req, res) => {
   const results = await userService.findAll()
   res.json(results)
 })
 
-router.get('/access_groups', async (_req, res) => {
+router.get('/access_groups', auth.roles(['admin']), async (_req, res) => {
   res.json(userService.roles)
 })
 
-router.get('/:uid', async (req, res) => {
+router.get('/:uid', auth.roles(['admin']), async (req, res) => {
   try {
     const { uid } = req.params
     const user = await userService.findOne(uid)
@@ -22,7 +23,7 @@ router.get('/:uid', async (req, res) => {
   }
 })
 
-router.post('/modifyaccess', async (req, res) => {
+router.post('/modifyaccess', auth.roles(['admin']), async (req, res) => {
   const { username, accessgroups } = req.body
   try {
     await userService.modifyAccess(username, accessgroups)
@@ -32,12 +33,12 @@ router.post('/modifyaccess', async (req, res) => {
   }
 })
 
-router.get('/email/preview', (_req, res) => {
+router.get('/email/preview', auth.roles(['admin']), (_req, res) => {
   const { accessMessageSubject, accessMessageText } = previewNotificationAboutAccessToUser()
   res.json({ subject: accessMessageSubject, html: accessMessageText })
 })
 
-router.post('/email', async (req, res) => {
+router.post('/email', auth.roles(['admin']), async (req, res) => {
   const userEmail = req.body.email
   if (!userEmail) {
     return res.status(400).json({ error: 'email is missing' })
@@ -51,18 +52,34 @@ router.post('/email', async (req, res) => {
   res.status(200).end()
 })
 
-router.post('/:uid/elements', async (req, res) => {
+router.post('/:uid/elements', auth.roles(['admin']), async (req, res) => {
   const { uid } = req.params
   const { codes } = req.body
   await userService.modifyElementDetails(uid, codes, true)
   res.status(204).end()
 })
 
-router.delete('/:uid/elements', async (req, res) => {
+router.delete('/:uid/elements', auth.roles(['admin']), async (req, res) => {
   const { uid } = req.params
   const { codes } = req.body
   await userService.modifyElementDetails(uid, codes, false)
   res.status(204).end()
+})
+
+router.post('/language', async (req, res) => {
+  const {
+    body: { language },
+    user: { username },
+  } = req
+  if (!['fi', 'sv', 'en'].includes(language)) {
+    return res.status(400).json('invalid language')
+  }
+  try {
+    await userService.updateUser(username, { language })
+    return res.status(204).end()
+  } catch (e) {
+    return res.status(500).json({ error: e.message })
+  }
 })
 
 module.exports = router
