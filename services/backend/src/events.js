@@ -124,8 +124,8 @@ const startCron = () => {
     })
     schedule('0 4 * * 3', async () => {
       logger.info("Deleting users who haven't logged in for 18 months")
-      const numberOfDeletedUsers = await deleteOutdatedUsers()
-      logger.info(`Deleted ${numberOfDeletedUsers} users.`)
+      const [, result] = await deleteOutdatedUsers()
+      logger.info(`Deleted ${result.rowCount} users.`)
     })
     schedule('0 19 * * 1', async () => {
       logger.info('Updating students whose studyplans have not been updated recently')

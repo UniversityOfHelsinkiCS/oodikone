@@ -28,22 +28,8 @@ const userDataCache = new LRUCache({ max: 25, ttl: 1000 * 60 * 60 })
 
 const findUser = async where => User.findOne({ where })
 
-const deleteOutdatedUsers = async () => {
-  const outdatedUsersCTE =
-    "WITH outdated_users AS (SELECT id FROM users WHERE last_login < CURRENT_DATE - INTERVAL '18 months')"
-
-  const queries = [
-    `${outdatedUsersCTE} DELETE FROM user_faculties WHERE "userId" IN (SELECT id FROM outdated_users)`,
-    `${outdatedUsersCTE} DELETE FROM user_accessgroup WHERE "userId" IN (SELECT id FROM outdated_users)`,
-    `${outdatedUsersCTE} DELETE FROM user_elementdetails WHERE "userId" IN (SELECT id FROM outdated_users)`,
-    `${outdatedUsersCTE} DELETE FROM users WHERE id IN (SELECT id FROM outdated_users) RETURNING id`,
-  ]
-
-  return await sequelizeUser.transaction(async t => {
-    const results = await Promise.all(queries.map(query => sequelizeUser.query(query, { transaction: t })))
-    return results[results.length - 1][0].length
-  })
-}
+const deleteOutdatedUsers = async () =>
+  sequelizeUser.query("DELETE FROM users WHERE last_login < CURRENT_DATE - INTERVAL '18 months'")
 
 const modifyAccess = async (username, roles) => {
   const user = await findUser({ username })

@@ -17,11 +17,6 @@ const User = sequelizeUser.define(
     email: STRING,
     language: STRING,
     sisuPersonId: STRING,
-    iamGroups: {
-      type: ARRAY(STRING),
-      allowNull: false,
-      defaultValue: [],
-    },
     lastLogin: DATE,
     roles: {
       type: ARRAY(STRING),
