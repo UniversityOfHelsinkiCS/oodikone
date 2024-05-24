@@ -1,46 +1,10 @@
 const { keyBy } = require('lodash')
-const {
-  checkThatSelectedStudentsAreUnderRequestedStudyright,
-  findCourses,
-  dateMonthsFromNow,
-  findCourseEnrollments,
-  parseQueryParams,
-  parseCreditInfo,
-} = require('./shared')
-const { studentnumbersWithAllStudyrightElements } = require('./studentnumbersWithAllStudyrightElements')
-const { encrypt } = require('../encrypt')
-const { CourseStatsCounter } = require('../courses/course_stats_counter')
+
 const { getPassingSemester } = require('../../util/semester')
-
-const isValidRequest = async (query, params) => {
-  const { studyRights, startDate, endDate, exchangeStudents, nondegreeStudents, transferredStudents } = params
-
-  if (!query.semesters.every(semester => semester === 'FALL' || semester === 'SPRING')) {
-    return { error: 'Semester should be either SPRING OR FALL' }
-  }
-  if (
-    query.studentStatuses &&
-    !query.studentStatuses.every(status => status === 'EXCHANGE' || status === 'NONDEGREE' || status === 'TRANSFERRED')
-  ) {
-    return { error: 'Student status should be either EXCHANGE or NONDEGREE or TRANSFERRED' }
-  }
-  if (query.selectedStudents) {
-    const allStudents = await studentnumbersWithAllStudyrightElements({
-      studyRights,
-      startDate,
-      endDate,
-      exchangeStudents,
-      nondegreeStudents,
-      transferredOutStudents: transferredStudents,
-      tag: query.tag,
-      transferredToStudents: true,
-      graduatedStudents: true,
-    })
-    const disallowedRequest = checkThatSelectedStudentsAreUnderRequestedStudyright(query.selectedStudents, allStudents)
-    if (disallowedRequest) return { error: 'Trying to request unauthorized students data' }
-  }
-  return null
-}
+const { CourseStatsCounter } = require('../courses/course_stats_counter')
+const { encrypt } = require('../encrypt')
+const { dateMonthsFromNow, findCourses, findCourseEnrollments, parseCreditInfo, parseQueryParams } = require('./shared')
+const { studentnumbersWithAllStudyrightElements } = require('./studentnumbersWithAllStudyrightElements')
 
 const getStudentsAndCourses = async (params, selectedStudents, studentnumberlist, courseCodes) => {
   if (!studentnumberlist) {
@@ -112,15 +76,14 @@ const bottlenecksOf = async (query, studentnumberlist, encryptdata = false) => {
         []
       )
     : []
+
   // To fix failed and enrolled, no grade filter options some not so clean and nice solutions were added
   // Get the data with actual 1. courses and filtered students. 2. all students by year, if provided.
-  const [[allstudents, courses, courseEnrollements], [, allCourses], error] = await Promise.all([
+  const [[allstudents, courses, courseEnrollements], [, allCourses]] = await Promise.all([
     getStudentsAndCourses(params, query.selectedStudents, studentnumberlist, query.courses),
     getStudentsAndCourses(params, allStudentsByYears, null, query.courses),
-    isValidRequest(query, params),
   ])
 
-  if (error) return error
   // Get the substitution codes for the fetch data by selscted students
   const substitutionCodes = Object.entries(courses).reduce(
     (res, [, obj]) => [...res, ...(obj?.substitutions || [])],

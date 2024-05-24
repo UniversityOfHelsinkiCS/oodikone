@@ -1,11 +1,12 @@
+const { sortBy } = require('lodash')
 const { Op } = require('sequelize')
-const { TagStudent } = require('../../models/models_kone')
-const { StudyrightElement, ElementDetail, Studyright, Transfer, Student } = require('../../models')
+
 const {
   dbConnections: { sequelize },
 } = require('../../database/connection')
+const { StudyrightElement, ElementDetail, Studyright, Transfer, Student } = require('../../models')
+const { TagStudent } = require('../../models/models_kone')
 const { count } = require('./shared')
-const { sortBy } = require('lodash')
 
 const studentnumbersWithAllStudyrightElements = async ({
   studyRights,

@@ -1,9 +1,10 @@
-const { Op } = require('sequelize')
 const moment = require('moment')
-const { Credit, Course, Studyright, ElementDetail, StudyrightElement } = require('../../models')
+const { Op } = require('sequelize')
+
 const {
   dbConnections: { sequelize },
 } = require('../../database/connection')
+const { Course, Credit, ElementDetail, Studyright, StudyrightElement } = require('../../models')
 const { semesterEnd, semesterStart } = require('../../util/semester')
 const { getAllProgrammes } = require('../studyrights')
 const { getCurrentSemester } = require('../semesters')
@@ -588,9 +589,6 @@ const findCourses = async (studentnumbers, beforeDate, courses = []) => {
   return res
 }
 
-const checkThatSelectedStudentsAreUnderRequestedStudyright = (selectedStudents, allStudents) =>
-  !selectedStudents.every(s => allStudents.includes(s))
-
 const parseCreditInfo = credit => ({
   studentnumber: credit.student_studentnumber,
   grade: credit.grade,
@@ -603,7 +601,6 @@ const parseCreditInfo = credit => ({
 module.exports = {
   count,
   parseCreditInfo,
-  checkThatSelectedStudentsAreUnderRequestedStudyright,
   findCourses,
   findCourseEnrollments,
   formatQueryParamArrays,

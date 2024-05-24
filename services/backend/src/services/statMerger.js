@@ -4,8 +4,8 @@ const populationCourseStatsMerger = multiyearstats => {
   stats.coursetypes = {}
   stats.disciplines = {}
   stats.coursestatistics = []
-
   stats.allStudents = 0
+
   multiyearstats.forEach(yearstats => {
     stats.coursetypes = { ...stats.coursetypes, ...yearstats.coursetypes }
     stats.disciplines = { ...stats.disciplines, ...yearstats.coursetypes }
@@ -60,6 +60,7 @@ const populationCourseStatsMerger = multiyearstats => {
           stats.coursestatistics[index].grades[grade].count += c.grades[grade].count
         }
       })
+
       Object.keys(c.students).forEach(key2 => {
         if (!stats.coursestatistics[index].students[key2]) {
           stats.coursestatistics[index].students[key2] = c.students[key2]

@@ -28,9 +28,9 @@ const filterPersonalTags = (population, userId) => {
 router.post('/v2/populationstatistics/courses', async (req, res) => {
   if (!req.body.year || !req.body.semesters || !req.body.studyRights) {
     Sentry.captureException(new Error('The body should have a year, semester and study rights defined'))
-    res.status(400).json({ error: 'The body should have a year, semester and study rights defined' })
-    return
+    return res.status(400).json({ error: 'The body should have a year, semester and study rights defined' })
   }
+
   if (!Array.isArray(req.body.studyRights)) {
     // studyRights should always be an array
     req.body.studyRights = [req.body.studyRights]
@@ -41,6 +41,26 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
   }
 
   const encrypted = req.body.selectedStudents[0]?.encryptedData
+
+  if (
+    !hasFullAccessToStudentData(req.user.roles) &&
+    !req.body.selectedStudents.every(student => req.user.studentsUserCanAccess.includes(student))
+  ) {
+    return res.status(403).json({ error: 'Trying to request unauthorized students data' })
+  }
+
+  if (!req.body.semesters.every(semester => semester === 'FALL' || semester === 'SPRING')) {
+    return res.status(400).json({ error: 'Semester should be either SPRING OR FALL' })
+  }
+
+  if (
+    req.body.studentStatuses &&
+    !req.body.studentStatuses.every(
+      status => status === 'EXCHANGE' || status === 'NONDEGREE' || status === 'TRANSFERRED'
+    )
+  ) {
+    return res.status(400).json({ error: 'Student status should be either EXCHANGE or NONDEGREE or TRANSFERRED' })
+  }
 
   if (req.body.years) {
     const upperYearBound = new Date().getFullYear() + 1
@@ -66,24 +86,21 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
     const multicoursestats = await multicoursestatPromises
     const result = statMergeService.populationCourseStatsMerger(multicoursestats)
     if (result.error) {
-      res.status(400).json(result)
-      return
+      return res.status(400).json(result)
     }
 
-    res.json(result)
-  } else {
-    if (encrypted) req.body.selectedStudents = req.body.selectedStudents.map(decrypt)
-
-    const result = await populationService.bottlenecksOf(req.body, null, encrypted)
-
-    if (result.error) {
-      Sentry.captureException(new Error(result.error))
-      res.status(400).json(result)
-      return
-    }
-
-    res.json(result)
+    return res.json(result)
   }
+
+  if (encrypted) req.body.selectedStudents = req.body.selectedStudents.map(decrypt)
+
+  const result = await populationService.bottlenecksOf(req.body, null, encrypted)
+  if (result.error) {
+    Sentry.captureException(new Error(result.error))
+    return res.status(400).json(result)
+  }
+
+  return res.json(result)
 })
 
 router.post('/v2/populationstatistics/coursesbytag', async (req, res) => {
