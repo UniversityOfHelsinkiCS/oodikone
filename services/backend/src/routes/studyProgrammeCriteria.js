@@ -1,10 +1,10 @@
+const router = require('express').Router()
+
 const {
   getCriteria,
   saveYearlyCourseCriteria,
   saveYearlyCreditCriteria,
 } = require('../services/studyprogramme/studyProgrammeCriteria')
-
-const router = require('express').Router()
 
 router.get('/', async (req, res) => {
   const studyProgramme = req.query?.programmecode

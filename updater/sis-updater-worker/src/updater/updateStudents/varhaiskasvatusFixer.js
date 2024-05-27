@@ -1,5 +1,5 @@
-const { Studyright, StudyrightElement } = require('../../db/models')
 const { selectFromByIds } = require('../../db')
+const { Studyright, StudyrightElement } = require('../../db/models')
 
 const studentsThatNeedToBeFixed = [
   { id: 'hy-hlo-109316006', started: '2019-04-30' },

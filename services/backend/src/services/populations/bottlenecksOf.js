@@ -1,10 +1,10 @@
 const { keyBy } = require('lodash')
 
+const { dateMonthsFromNow, findCourses, findCourseEnrollments, parseCreditInfo, parseQueryParams } = require('./shared')
+const { studentnumbersWithAllStudyrightElements } = require('./studentnumbersWithAllStudyrightElements')
 const { getPassingSemester } = require('../../util/semester')
 const { CourseStatsCounter } = require('../courses/course_stats_counter')
 const { encrypt } = require('../encrypt')
-const { dateMonthsFromNow, findCourses, findCourseEnrollments, parseCreditInfo, parseQueryParams } = require('./shared')
-const { studentnumbersWithAllStudyrightElements } = require('./studentnumbersWithAllStudyrightElements')
 
 const getStudentsAndCourses = async (params, selectedStudents, studentnumberlist, courseCodes) => {
   if (!studentnumberlist) {

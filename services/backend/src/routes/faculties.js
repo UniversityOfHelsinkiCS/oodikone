@@ -1,11 +1,10 @@
 const router = require('express').Router()
+
+const auth = require('../middleware/auth')
 const { combineFacultyBasics } = require('../services/faculty/facultyBasics')
 const { getFacultyCredits } = require('../services/faculty/facultyCredits')
-const { combineFacultyThesisWriters } = require('../services/faculty/facultyThesisWriters')
 const { countGraduationTimes } = require('../services/faculty/facultyGraduationTimes')
-const { updateFacultyOverview, updateFacultyProgressOverview } = require('../services/faculty/facultyUpdates')
-const { combineFacultyStudentProgress } = require('../services/faculty/facultyStudentProgress')
-const { combineFacultyStudents } = require('../services/faculty/facultyStudents')
+const { getFacultyList } = require('../services/faculty/facultyHelpers')
 const {
   getProgrammes,
   getBasicStats,
@@ -19,9 +18,11 @@ const {
   getFacultyProgressStats,
   setFacultyProgressStats,
 } = require('../services/faculty/facultyService')
+const { combineFacultyStudentProgress } = require('../services/faculty/facultyStudentProgress')
+const { combineFacultyStudents } = require('../services/faculty/facultyStudents')
+const { combineFacultyThesisWriters } = require('../services/faculty/facultyThesisWriters')
+const { updateFacultyOverview, updateFacultyProgressOverview } = require('../services/faculty/facultyUpdates')
 const logger = require('../util/logger')
-const { getFacultyList } = require('../services/faculty/facultyHelpers')
-const auth = require('../middleware/auth')
 
 // Faculty uses a lot of tools designed for Study programme.
 // Some of them have been copied here and slightly edited for faculty purpose.

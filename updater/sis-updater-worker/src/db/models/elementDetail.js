@@ -1,4 +1,5 @@
 const { Model, INTEGER, DATE, JSONB, STRING } = require('sequelize')
+
 const { dbConnections } = require('../connection')
 
 class ElementDetail extends Model {}

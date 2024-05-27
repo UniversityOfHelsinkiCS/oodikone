@@ -1,6 +1,7 @@
-const Sequelize = require('sequelize')
 const EventEmitter = require('events')
+const Sequelize = require('sequelize')
 const Umzug = require('umzug')
+
 const conf = require('../conf-backend')
 const logger = require('../util/logger')
 

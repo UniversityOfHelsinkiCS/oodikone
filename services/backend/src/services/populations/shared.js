@@ -6,8 +6,8 @@ const {
 } = require('../../database/connection')
 const { Course, Credit, ElementDetail, Studyright, StudyrightElement } = require('../../models')
 const { semesterEnd, semesterStart } = require('../../util/semester')
-const { getAllProgrammes } = require('../studyrights')
 const { getCurrentSemester } = require('../semesters')
+const { getAllProgrammes } = require('../studyrights')
 
 // Progress tab related helper functions.
 const createEmptyCriteriaYear = (criteria, year) => {

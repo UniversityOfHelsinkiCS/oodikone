@@ -1,12 +1,13 @@
 const router = require('express').Router()
 const moment = require('moment-timezone')
-const { getCustomOpenUniCourses } = require('../services/openUni/openUniStats')
+
 const {
   getOpenUniSearches,
   createNewSearch,
   deleteSearch,
   updateSearch,
 } = require('../services/openUni/openUniManageSearches')
+const { getCustomOpenUniCourses } = require('../services/openUni/openUniStats')
 
 router.get('/', async (req, res) => {
   const courseCodes = JSON.parse(req.query?.courselist) || []

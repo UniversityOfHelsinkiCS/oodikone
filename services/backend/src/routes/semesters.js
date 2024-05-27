@@ -1,4 +1,5 @@
 const router = require('express').Router()
+
 const { getSemestersAndYears } = require('../services/semesters')
 
 router.get('/semesters/codes', async (req, res) => {

@@ -1,9 +1,9 @@
 const { bottlenecksOf } = require('./bottlenecksOf')
+const { getStudentsCloseToGraduation } = require('./closeToGraduation')
 const { getStudentsIncludeCoursesBetween } = require('./getStudentsIncludeCoursesBetween')
 const { optimizedStatisticsOf } = require('./optimizedStatisticsOf')
-const { studentnumbersWithAllStudyrightElements } = require('./studentnumbersWithAllStudyrightElements')
 const { getEarliestYear } = require('./shared')
-const { getStudentsCloseToGraduation } = require('./closeToGraduation')
+const { studentnumbersWithAllStudyrightElements } = require('./studentnumbersWithAllStudyrightElements')
 
 module.exports = {
   bottlenecksOf,

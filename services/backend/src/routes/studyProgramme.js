@@ -1,12 +1,6 @@
 const router = require('express').Router()
-const { getBasicStatsForStudytrack } = require('../services/studyprogramme/studyprogrammeBasics')
-const { getCreditsProduced } = require('../services/providerCredits')
-const { getGraduationStatsForStudytrack } = require('../services/studyprogramme/studyprogrammeGraduations')
-const {
-  getStudyprogrammeCoursesForStudytrack,
-  getStudyprogrammeStatsForColorizedCoursesTable,
-} = require('../services/studyprogramme/studyprogrammeCourses')
-const { getStudytrackStatsForStudyprogramme } = require('../services/studyprogramme/studytrackStats')
+
+const { ElementDetail } = require('../models')
 const {
   getBasicStats,
   setBasicStats,
@@ -15,11 +9,18 @@ const {
   getStudytrackStats,
   setStudytrackStats,
 } = require('../services/analyticsService')
-const { updateBasicView, updateStudytrackView } = require('../services/studyprogramme/studyprogrammeUpdates')
+const { getCreditsProduced } = require('../services/providerCredits')
 const { getProgrammeName } = require('../services/studyprogramme')
-const logger = require('../util/logger')
+const { getBasicStatsForStudytrack } = require('../services/studyprogramme/studyprogrammeBasics')
+const {
+  getStudyprogrammeCoursesForStudytrack,
+  getStudyprogrammeStatsForColorizedCoursesTable,
+} = require('../services/studyprogramme/studyprogrammeCourses')
+const { getGraduationStatsForStudytrack } = require('../services/studyprogramme/studyprogrammeGraduations')
+const { updateBasicView, updateStudytrackView } = require('../services/studyprogramme/studyprogrammeUpdates')
+const { getStudytrackStatsForStudyprogramme } = require('../services/studyprogramme/studytrackStats')
 const { getAssociations } = require('../services/studyrights')
-const { ElementDetail } = require('../models')
+const logger = require('../util/logger')
 
 // For grafana statistics (idea stolen from Norppa)
 const logInfoForGrafana = async (code, combinedProgramme) => {

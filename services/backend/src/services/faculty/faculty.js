@@ -1,4 +1,19 @@
+const { uniqBy } = require('lodash')
 const { Op } = require('sequelize')
+
+const {
+  facultyFormatStudyright,
+  facultyFormatProgramme,
+  formatFacultyTransfer,
+  formatFacultyThesisWriter,
+  formatOrganization,
+  isNewProgramme,
+  mapCodesToIds,
+  facultyProgrammeStudents,
+} = require('./facultyHelpers')
+const {
+  dbConnections: { sequelize },
+} = require('../../database/connection')
 const {
   ElementDetail,
   Organization,
@@ -11,20 +26,6 @@ const {
   Credit,
   Course,
 } = require('../../models')
-const {
-  facultyFormatStudyright,
-  facultyFormatProgramme,
-  formatFacultyTransfer,
-  formatFacultyThesisWriter,
-  formatOrganization,
-  isNewProgramme,
-  mapCodesToIds,
-  facultyProgrammeStudents,
-} = require('./facultyHelpers')
-const { uniqBy } = require('lodash')
-const {
-  dbConnections: { sequelize },
-} = require('../../database/connection')
 
 const transferredFaculty = async (programmeCodeIn, programmeCodeOut, start, end) =>
   (

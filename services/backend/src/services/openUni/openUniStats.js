@@ -1,4 +1,5 @@
 const moment = require('moment')
+
 const { getCredits, getStudyRights, getEnrollments, getStudentInfo, getCourseNames } = require('./openUniSearches')
 
 const uniq = objects => [...new Set(objects)]

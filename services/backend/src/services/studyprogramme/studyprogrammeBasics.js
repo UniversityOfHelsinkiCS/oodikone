@@ -1,4 +1,6 @@
 const { indexOf } = require('lodash')
+
+const { transfersAway, transfersTo } = require('.')
 const {
   getCorrectStudentnumbers,
   getStatsBasis,
@@ -9,9 +11,8 @@ const {
   alltimeStartDate,
   alltimeEndDate,
 } = require('./studyprogrammeHelpers')
-const { transfersAway, transfersTo } = require('.')
-const { getYearStartAndEndDates } = require('../../util/semester')
 const { startedStudyrights, graduatedStudyRights } = require('./studyrightFinders')
+const { getYearStartAndEndDates } = require('../../util/semester')
 
 const getStartedStats = async ({ studyprogramme, years, isAcademicYear }) => {
   const { graphStats, tableStats } = getStatsBasis(years)

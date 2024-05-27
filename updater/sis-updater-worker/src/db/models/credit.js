@@ -1,4 +1,5 @@
 const { Model, DATE, INTEGER, STRING, DOUBLE, BOOLEAN } = require('sequelize')
+
 const { dbConnections } = require('../connection')
 
 class Credit extends Model {}

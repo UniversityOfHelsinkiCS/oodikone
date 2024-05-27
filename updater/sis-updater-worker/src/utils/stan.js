@@ -1,4 +1,5 @@
 const natsStreaming = require('node-nats-streaming')
+
 const { NATS_GROUP } = require('../config')
 
 const { HOSTNAME, SIS_NATS_URI, SIS_NATS_TOKEN } = process.env

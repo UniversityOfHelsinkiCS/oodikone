@@ -1,5 +1,6 @@
-const knex = require('knex')
 const EventEmitter = require('events')
+const knex = require('knex')
+
 const { isDev, runningInCI } = require('../config')
 const { logger } = require('../utils/logger')
 

@@ -1,5 +1,5 @@
-const { STRING } = require('sequelize')
-const Sequelize = require('sequelize')
+const { ARRAY, BIGINT, DATE, INTEGER, STRING } = require('sequelize')
+
 const { sequelizeKone } = require('../database/connection')
 
 const ExcludedCourse = sequelizeKone.define(
@@ -7,23 +7,23 @@ const ExcludedCourse = sequelizeKone.define(
   {
     id: {
       primaryKey: true,
-      type: Sequelize.INTEGER,
+      type: INTEGER,
       autoIncrement: true,
     },
     programme_code: {
-      type: Sequelize.STRING,
+      type: STRING,
     },
     curriculum_version: {
       type: STRING,
     },
     course_code: {
-      type: Sequelize.STRING,
+      type: STRING,
     },
     created_at: {
-      type: Sequelize.DATE,
+      type: DATE,
     },
     updated_at: {
-      type: Sequelize.DATE,
+      type: DATE,
     },
   },
   {
@@ -36,11 +36,11 @@ const TagStudent = sequelizeKone.define(
   {
     studentnumber: {
       primaryKey: true,
-      type: Sequelize.STRING,
+      type: STRING,
     },
     tag_id: {
       primaryKey: true,
-      type: Sequelize.BIGINT,
+      type: BIGINT,
     },
   },
   {
@@ -52,21 +52,21 @@ const Tag = sequelizeKone.define(
   'tag',
   {
     tagname: {
-      type: Sequelize.STRING,
+      type: STRING,
     },
     tag_id: {
       primaryKey: true,
-      type: Sequelize.BIGINT,
+      type: BIGINT,
       autoIncrement: true,
     },
     studytrack: {
-      type: Sequelize.STRING,
+      type: STRING,
     },
     year: {
-      type: Sequelize.STRING,
+      type: STRING,
     },
     personal_user_id: {
-      type: Sequelize.BIGINT,
+      type: BIGINT,
     },
   },
   {
@@ -77,17 +77,17 @@ const Tag = sequelizeKone.define(
 const CustomPopulationSearch = sequelizeKone.define('custom_population_searches', {
   id: {
     primaryKey: true,
-    type: Sequelize.BIGINT,
+    type: BIGINT,
     autoIncrement: true,
   },
   userId: {
-    type: Sequelize.BIGINT,
+    type: BIGINT,
   },
   name: {
-    type: Sequelize.STRING,
+    type: STRING,
   },
   students: {
-    type: Sequelize.ARRAY(Sequelize.STRING),
+    type: ARRAY(STRING),
   },
 })
 
@@ -97,18 +97,18 @@ const OpenUniPopulationSearch = sequelizeKone.define(
   {
     id: {
       primaryKey: true,
-      type: Sequelize.BIGINT,
+      type: BIGINT,
       autoIncrement: true,
     },
     userId: {
-      type: Sequelize.BIGINT,
+      type: BIGINT,
     },
     name: {
-      type: Sequelize.STRING,
+      type: STRING,
       allowNull: false,
     },
     courseCodes: {
-      type: Sequelize.ARRAY(Sequelize.STRING),
+      type: ARRAY(STRING),
     },
   },
   { underscored: true, timestamps: true }
@@ -125,40 +125,40 @@ const ProgressCriteria = sequelizeKone.define(
       type: STRING,
     },
     coursesYearOne: {
-      type: Sequelize.ARRAY(Sequelize.STRING),
+      type: ARRAY(STRING),
     },
     coursesYearTwo: {
-      type: Sequelize.ARRAY(Sequelize.STRING),
+      type: ARRAY(STRING),
     },
     coursesYearThree: {
-      type: Sequelize.ARRAY(Sequelize.STRING),
+      type: ARRAY(STRING),
     },
     coursesYearFour: {
-      type: Sequelize.ARRAY(Sequelize.STRING),
+      type: ARRAY(STRING),
     },
     coursesYearFive: {
-      type: Sequelize.ARRAY(Sequelize.STRING),
+      type: ARRAY(STRING),
     },
     coursesYearSix: {
-      type: Sequelize.ARRAY(Sequelize.STRING),
+      type: ARRAY(STRING),
     },
     creditsYearOne: {
-      type: Sequelize.INTEGER,
+      type: INTEGER,
     },
     creditsYearTwo: {
-      type: Sequelize.INTEGER,
+      type: INTEGER,
     },
     creditsYearThree: {
-      type: Sequelize.INTEGER,
+      type: INTEGER,
     },
     creditsYearFour: {
-      type: Sequelize.INTEGER,
+      type: INTEGER,
     },
     creditsYearFive: {
-      type: Sequelize.INTEGER,
+      type: INTEGER,
     },
     creditsYearSix: {
-      type: Sequelize.INTEGER,
+      type: INTEGER,
     },
   },
   { underscored: true, timestamps: true }
@@ -169,18 +169,18 @@ const StudyGuidanceGroupTag = sequelizeKone.define(
   {
     id: {
       primaryKey: true,
-      type: Sequelize.BIGINT,
+      type: BIGINT,
       autoIncrement: true,
     },
     studyGuidanceGroupId: {
-      type: Sequelize.STRING,
+      type: STRING,
       unique: true,
     },
     studyProgramme: {
-      type: Sequelize.STRING,
+      type: STRING,
     },
     year: {
-      type: Sequelize.STRING,
+      type: STRING,
     },
   },
   { underscored: true, timestamps: true }
@@ -191,10 +191,10 @@ const StudyProgrammePin = sequelizeKone.define(
   {
     userId: {
       primaryKey: true,
-      type: Sequelize.INTEGER,
+      type: INTEGER,
     },
     studyProgrammes: {
-      type: Sequelize.ARRAY(Sequelize.STRING),
+      type: ARRAY(STRING),
     },
   },
   { underscored: true, timestamps: false }
@@ -204,12 +204,12 @@ TagStudent.belongsTo(Tag, { foreignKey: 'tag_id', sourceKey: 'tag_id' })
 Tag.hasMany(TagStudent, { foreignKey: 'tag_id', sourceKey: 'tag_id' })
 
 module.exports = {
-  TagStudent,
-  Tag,
   CustomPopulationSearch,
-  OpenUniPopulationSearch,
   ExcludedCourse,
-  StudyGuidanceGroupTag,
+  OpenUniPopulationSearch,
   ProgressCriteria,
+  StudyGuidanceGroupTag,
   StudyProgrammePin,
+  Tag,
+  TagStudent,
 }

@@ -1,16 +1,16 @@
 const router = require('express').Router()
+
 const { refreshFaculties, refreshProgrammes } = require('../events')
 const {
-  updateSISMetadata,
-  updateSISStudents,
-  updateSISProgrammes,
-  updateSISRedisCache,
-  updateStudentsByStudentNumber,
   abort,
   updateCoursesByCourseCode,
+  updateSISMetadata,
+  updateSISProgrammes,
+  updateSISRedisCache,
+  updateSISStudents,
+  updateStudentsByStudentNumber,
   updateStudentsIndividually,
 } = require('../services/sisUpdaterService')
-
 const logger = require('../util/logger')
 const { jobMaker, getJobs } = require('../worker/queue')
 

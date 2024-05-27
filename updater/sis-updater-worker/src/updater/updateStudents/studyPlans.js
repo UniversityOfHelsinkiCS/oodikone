@@ -1,11 +1,11 @@
 const _ = require('lodash')
 const { Op } = require('sequelize')
 
-const { Studyplan } = require('../../db/models')
 const { selectFromByIds, bulkCreate } = require('../../db')
-const { getEducation } = require('../shared')
-const { studyplanMapper, sanitizeCourseCode } = require('../mapper')
+const { Studyplan } = require('../../db/models')
 const { isBaMa } = require('../../utils')
+const { studyplanMapper, sanitizeCourseCode } = require('../mapper')
+const { getEducation } = require('../shared')
 
 const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumber, groupedStudyRightSnapshots) => {
   const studyplans = studyplansAll.filter(plan => plan.primary)

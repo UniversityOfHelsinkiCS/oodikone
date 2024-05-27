@@ -1,7 +1,4 @@
-const { selectFromByIds, selectFromSnapshotsByIds } = require('../db')
 const { creditTypeIdsToCreditTypes } = require('./shared')
-const { updateStudents } = require('./updateStudents')
-const { updateProgrammeModules } = require('./updateProgrammeModules/updateProgrammeModules')
 const {
   updateOrganisations,
   updateStudyModules,
@@ -10,6 +7,9 @@ const {
   updateCreditTypes,
   updateStudyrightExtents,
 } = require('./updateMeta')
+const { updateProgrammeModules } = require('./updateProgrammeModules/updateProgrammeModules')
+const { updateStudents } = require('./updateStudents')
+const { selectFromByIds, selectFromSnapshotsByIds } = require('../db')
 
 const idToHandler = {
   students: updateStudents,

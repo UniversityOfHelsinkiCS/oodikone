@@ -1,5 +1,6 @@
 const { indexOf, isArray } = require('lodash')
 const moment = require('moment')
+
 const {
   startedStudyrights,
   graduatedStudyrights,
@@ -11,9 +12,9 @@ const {
   studyrightsByRightStartYear,
   getTransfersIn,
 } = require('./faculty')
-const { getStatsBasis, getYearsArray, defineYear } = require('../studyprogramme/studyprogrammeHelpers')
 const { findRightProgramme, isNewProgramme, checkTransfers, getExtentFilter } = require('./facultyHelpers')
 const { codes } = require('../../../config/programmeCodes')
+const { getStatsBasis, getYearsArray, defineYear } = require('../studyprogramme/studyprogrammeHelpers')
 
 const filterDuplicateStudyrights = studyrights => {
   // bachelor+master students have two studyrights (separated by two last digits in studyrightid)

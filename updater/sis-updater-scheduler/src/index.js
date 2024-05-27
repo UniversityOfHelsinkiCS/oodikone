@@ -1,8 +1,3 @@
-const { knexConnection } = require('./db/connection')
-const { logger } = require('./utils/logger')
-const { set: redisSet } = require('./utils/redis')
-const { schedule: scheduleCron } = require('./utils/cron')
-const { stan } = require('./utils/stan')
 const {
   isDev,
   REDIS_LAST_WEEKLY_SCHEDULE,
@@ -10,8 +5,13 @@ const {
   EXIT_AFTER_IMMEDIATES,
   SCHEDULE_IMMEDIATE,
 } = require('./config')
-const { startServer } = require('./server')
+const { knexConnection } = require('./db/connection')
 const { scheduleHourly, scheduleWeekly, schedulePrePurge, schedulePurge, isUpdaterActive } = require('./scheduler')
+const { startServer } = require('./server')
+const { schedule: scheduleCron } = require('./utils/cron')
+const { logger } = require('./utils/logger')
+const { set: redisSet } = require('./utils/redis')
+const { stan } = require('./utils/stan')
 
 stan.on('error', e => {
   logger.error({ message: `NATS connection failed: ${e}`, meta: e.stack })

@@ -1,7 +1,7 @@
 const { NATS_GROUP, SIS_PURGE_CHANNEL, REDIS_LAST_PREPURGE_INFO, SLACK_WEBHOOK } = require('./config')
 const { logger } = require('./utils/logger')
-const { stan, opts } = require('./utils/stan')
 const { set: redisSet, get: redisGet } = require('./utils/redis')
+const { stan, opts } = require('./utils/stan')
 
 const PURGE_ROWS_OLDER_THAN_DAYS = 30
 const MINIMUM_DAYS_BETWEEN_PREPURGE_AND_PURGE = 4

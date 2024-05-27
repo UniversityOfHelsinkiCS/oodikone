@@ -1,4 +1,5 @@
-const { getCriteria } = require('../studyprogramme/studyProgrammeCriteria')
+const moment = require('moment')
+
 const { getStudentsIncludeCoursesBetween } = require('./getStudentsIncludeCoursesBetween')
 const {
   parseQueryParams,
@@ -8,7 +9,7 @@ const {
   formatStudentsForApi,
 } = require('./shared')
 const { studentnumbersWithAllStudyrightElements } = require('./studentnumbersWithAllStudyrightElements')
-const moment = require('moment')
+const { getCriteria } = require('../studyprogramme/studyProgrammeCriteria')
 
 const optimizedStatisticsOf = async (query, studentnumberlist) => {
   const formattedQueryParams = formatQueryParamArrays(query, ['semesters', 'studentStatuses'])

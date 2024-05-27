@@ -1,8 +1,9 @@
+const router = require('express').Router()
+
+const { isFaculty, providersOfFaculty } = require('../services/organisations')
 const teachers = require('../services/teachers')
 const topteachers = require('../services/topteachers')
-const { isFaculty, providersOfFaculty } = require('../services/organisations')
-const router = require('express').Router()
-const { mapToProviders, getFullStudyProgrammeRights } = require('../util/utils')
+const { getFullStudyProgrammeRights, mapToProviders } = require('../util/utils')
 
 router.get('/', async (req, res) => {
   const { searchTerm } = req.query

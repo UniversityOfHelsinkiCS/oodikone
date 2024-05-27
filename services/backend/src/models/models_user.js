@@ -1,4 +1,5 @@
-const { BIGINT, STRING, ARRAY, DATE } = require('sequelize')
+const { ARRAY, BIGINT, DATE, STRING } = require('sequelize')
+
 const { sequelizeUser } = require('../database/connection')
 
 const User = sequelizeUser.define(

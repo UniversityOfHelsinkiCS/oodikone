@@ -1,4 +1,5 @@
 const { Op } = require('sequelize')
+
 const {
   Credit,
   Student,

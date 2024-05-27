@@ -1,4 +1,5 @@
 const { Op } = require('sequelize')
+
 const { Teacher, Credit, Course, Semester, Organization } = require('../models')
 
 const splitByEmptySpace = str => str.replace(/\s\s+/g, ' ').split(' ')

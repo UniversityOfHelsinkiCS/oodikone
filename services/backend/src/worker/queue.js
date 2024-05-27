@@ -1,4 +1,5 @@
 const { Queue } = require('bullmq')
+
 const { redis } = require('../conf-backend')
 
 const connection = {

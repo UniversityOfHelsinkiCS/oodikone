@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
-const Papa = require('papaparse')
 const fs = require('fs/promises')
+const Papa = require('papaparse')
 
 const parseCsv = async (fileName, fun) => {
   try {

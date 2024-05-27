@@ -1,5 +1,9 @@
+const moment = require('moment')
 const { Op } = require('sequelize')
-const { Tag, TagStudent } = require('../../models/models_kone')
+
+const {
+  dbConnections: { sequelize },
+} = require('../../database/connection')
 const {
   Course,
   Credit,
@@ -14,10 +18,7 @@ const {
   SemesterEnrollment,
   Transfer,
 } = require('../../models')
-const moment = require('moment')
-const {
-  dbConnections: { sequelize },
-} = require('../../database/connection')
+const { Tag, TagStudent } = require('../../models/models_kone')
 
 const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDate, studyright, tag) => {
   const studentTags = await TagStudent.findAll({

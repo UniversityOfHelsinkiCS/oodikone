@@ -1,4 +1,5 @@
 const { Op } = require('sequelize')
+
 const { ExcludedCourse } = require('../models/models_kone')
 
 const addExcludedCourses = async (programmecode, coursecodes, curriculum) => {

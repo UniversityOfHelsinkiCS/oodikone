@@ -1,4 +1,5 @@
 const { createCipheriv, createDecipheriv, randomBytes } = require('crypto')
+
 const { CRYPT_KEY } = require('../conf-backend')
 
 const algorithm = 'aes-256-cbc'

@@ -1,6 +1,7 @@
-const morgan = require('morgan')
-const logger = require('../util/logger')
 const _ = require('lodash')
+const morgan = require('morgan')
+
+const logger = require('../util/logger')
 const { getFullStudyProgrammeRights } = require('../util/utils')
 
 // So this appears to be a hack to get neatly formatted stats like response-time etc. from morgan

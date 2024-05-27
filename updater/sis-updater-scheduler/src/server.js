@@ -1,7 +1,8 @@
 const express = require('express')
+
 require('express-async-errors')
-const { logger } = require('./utils/logger')
-const { stan } = require('./utils/stan')
+const { SECRET_TOKEN, REDIS_LATEST_MESSAGE_RECEIVED } = require('./config')
+const { sendToSlack } = require('./purge')
 const {
   scheduleMeta,
   scheduleStudents,
@@ -9,9 +10,9 @@ const {
   scheduleByStudentNumbers,
   scheduleByCourseCodes,
 } = require('./scheduler')
-const { SECRET_TOKEN, REDIS_LATEST_MESSAGE_RECEIVED } = require('./config')
+const { logger } = require('./utils/logger')
 const { get: redisGet } = require('./utils/redis')
-const { sendToSlack } = require('./purge')
+const { stan } = require('./utils/stan')
 
 const bakeMessage =
   res =>

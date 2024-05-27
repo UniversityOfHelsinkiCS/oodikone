@@ -1,11 +1,12 @@
+const { Op } = require('sequelize')
+
+const { formatStudent } = require('./studyprogrammeHelpers')
 const {
   dbConnections: { sequelize },
 } = require('../../database/connection')
-const logger = require('../../util/logger')
-const { Op } = require('sequelize')
 const { Student, Credit, Studyright, StudyrightElement, SemesterEnrollment, Semester } = require('../../models')
+const logger = require('../../util/logger')
 const { getCurrentSemester } = require('../semesters')
-const { formatStudent } = require('./studyprogrammeHelpers')
 
 const studytrackStudents = async studentnumbers =>
   (

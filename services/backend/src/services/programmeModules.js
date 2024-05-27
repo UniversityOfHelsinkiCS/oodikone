@@ -1,10 +1,10 @@
 const { Op } = require('sequelize')
 
+const { combinedStudyprogrammes } = require('./studyprogramme/studyprogrammeHelpers')
 const { dbConnections } = require('../database/connection')
 const { ProgrammeModule } = require('../models')
 const { ExcludedCourse } = require('../models/models_kone')
 const logger = require('../util/logger')
-const { combinedStudyprogrammes } = require('./studyprogramme/studyprogrammeHelpers')
 
 const getCurriculumVersions = async code => {
   try {

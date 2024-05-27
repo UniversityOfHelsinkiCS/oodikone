@@ -1,4 +1,5 @@
 const { Model, STRING, DATE } = require('sequelize')
+
 const { dbConnections } = require('../connection')
 
 class Transfer extends Model {}

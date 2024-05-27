@@ -1,8 +1,9 @@
-const { dbConnections } = require('../../db/connection')
 const { chunk } = require('lodash')
-const { selectFromByIds, bulkCreate } = require('../../db')
-const { ProgrammeModule, ProgrammeModuleChild } = require('../../db/models')
+
 const ModuleResolver = require('./resolver')
+const { selectFromByIds, bulkCreate } = require('../../db')
+const { dbConnections } = require('../../db/connection')
+const { ProgrammeModule, ProgrammeModuleChild } = require('../../db/models')
 
 const resolveProgramme = async programme => {
   const responsibleOrg = programme.organisations

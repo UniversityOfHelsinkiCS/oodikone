@@ -1,5 +1,5 @@
-const { Credit, Enrollment, Studyright, Student, Course } = require('../../models')
-const { OpenUniPopulationSearch } = require('../../models/models_kone')
+const { Op } = require('sequelize')
+
 const {
   mapOpenCredits,
   mapOpenEnrollments,
@@ -7,7 +7,8 @@ const {
   mapStudyRights,
   mapCourseInfo,
 } = require('./openUniHelpers')
-const { Op } = require('sequelize')
+const { Credit, Enrollment, Studyright, Student, Course } = require('../../models')
+const { OpenUniPopulationSearch } = require('../../models/models_kone')
 
 const getCredits = async (courseCodes, startdate) =>
   (

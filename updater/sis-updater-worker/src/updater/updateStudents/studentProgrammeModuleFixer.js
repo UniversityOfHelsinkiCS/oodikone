@@ -1,6 +1,7 @@
-const { StudyrightElement, Credit, Course, Transfer } = require('../../db/models')
 const { Op } = require('sequelize')
+
 const { selectFromByIds } = require('../../db')
+const { StudyrightElement, Credit, Course, Transfer } = require('../../db/models')
 
 const getCodesToFix = async () => {
   const codes = await StudyrightElement.findAll({

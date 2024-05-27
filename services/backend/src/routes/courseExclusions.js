@@ -1,4 +1,5 @@
 const router = require('express').Router()
+
 const { addExcludedCourses, removeExcludedCourses } = require('../services/excludedCourses')
 
 router.delete('/v3/course_exclusions/:code', async (req, res) => {

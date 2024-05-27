@@ -1,7 +1,5 @@
-const logger = require('../../util/logger')
 const { findFacultyProgrammeCodes } = require('./faculty')
 const { combineFacultyBasics } = require('./facultyBasics')
-const { combineFacultyThesisWriters } = require('./facultyThesisWriters')
 const { countGraduationTimes } = require('./facultyGraduationTimes')
 const {
   setFacultyProgrammes,
@@ -13,8 +11,10 @@ const {
 } = require('./facultyService')
 const { combineFacultyStudentProgress } = require('./facultyStudentProgress')
 const { combineFacultyStudents } = require('./facultyStudents')
-const { computeCreditsProduced } = require('../providerCredits')
+const { combineFacultyThesisWriters } = require('./facultyThesisWriters')
+const logger = require('../../util/logger')
 const { setCreditStats } = require('../analyticsService')
+const { computeCreditsProduced } = require('../providerCredits')
 
 const updateFacultyOverview = async (faculty, statsType) => {
   const calendarNewSpecial = {

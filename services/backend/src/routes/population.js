@@ -1,7 +1,7 @@
+const Sentry = require('@sentry/node')
 const crypto = require('crypto')
 const router = require('express').Router()
 const _ = require('lodash')
-const Sentry = require('@sentry/node')
 
 const courseService = require('../services/courses')
 const { encrypt, decrypt } = require('../services/encrypt')
@@ -10,7 +10,6 @@ const statMergeService = require('../services/statMerger')
 const studentService = require('../services/students')
 const { mapCodesToIds } = require('../services/studyprogramme/studyprogrammeHelpers')
 const studyrightService = require('../services/studyrights')
-
 const { ApplicationError } = require('../util/customErrors')
 const { getFullStudyProgrammeRights, hasFullAccessToStudentData, mapToProviders } = require('../util/utils')
 

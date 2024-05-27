@@ -2,6 +2,7 @@ const os = require('os')
 const winston = require('winston')
 const { WinstonGelfTransporter } = require('winston-gelf-transporter')
 const Sentry = require('winston-sentry-log')
+
 const { isDev, isStaging, isProduction, sentryRelease, sentryEnvironment, runningInCI } = require('../config')
 
 const { combine, timestamp, printf, splat } = winston.format

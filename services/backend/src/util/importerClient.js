@@ -1,6 +1,7 @@
 const axios = require('axios')
-const { importerUrl, importerToken } = require('../conf-backend')
+
 const logger = require('./logger')
+const { importerUrl, importerToken } = require('../conf-backend')
 
 const importerClient = axios.create({
   headers: {

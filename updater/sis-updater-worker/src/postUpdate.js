@@ -1,13 +1,4 @@
 const { intersection } = require('lodash')
-const { get: redisGet, incrby: redisIncrementBy, set: redisSet } = require('./utils/redis')
-const { logger } = require('./utils/logger')
-const {
-  fixVarhaiskasvatusStudyRights,
-  fixVarhaiskasvatusGraduations,
-  studentsThatNeedToBeFixed,
-  graduationsThatNeedToBeFixed,
-} = require('./updater/updateStudents/varhaiskasvatusFixer')
-const studentProgrammeModuleFixer = require('./updater/updateStudents/studentProgrammeModuleFixer')
 
 const {
   REDIS_TOTAL_META_KEY,
@@ -15,6 +6,15 @@ const {
   REDIS_TOTAL_META_DONE_KEY,
   REDIS_TOTAL_STUDENTS_DONE_KEY,
 } = require('./config')
+const studentProgrammeModuleFixer = require('./updater/updateStudents/studentProgrammeModuleFixer')
+const {
+  fixVarhaiskasvatusStudyRights,
+  fixVarhaiskasvatusGraduations,
+  studentsThatNeedToBeFixed,
+  graduationsThatNeedToBeFixed,
+} = require('./updater/updateStudents/varhaiskasvatusFixer')
+const { logger } = require('./utils/logger')
+const { get: redisGet, incrby: redisIncrementBy, set: redisSet } = require('./utils/redis')
 
 const logStatus = async (type, count, done, scheduled, startTime, humanType) => {
   logger.info({

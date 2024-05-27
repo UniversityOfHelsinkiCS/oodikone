@@ -1,8 +1,9 @@
 const router = require('express').Router()
-const userService = require('../services/userService')
-const { sendNotificationAboutAccessToUser, previewNotificationAboutAccessToUser } = require('../services/mailservice')
-const logger = require('../util/logger')
+
 const auth = require('../middleware/auth')
+const { sendNotificationAboutAccessToUser, previewNotificationAboutAccessToUser } = require('../services/mailservice')
+const userService = require('../services/userService')
+const logger = require('../util/logger')
 
 router.get('/', auth.roles(['admin']), async (_req, res) => {
   const results = await userService.findAll()

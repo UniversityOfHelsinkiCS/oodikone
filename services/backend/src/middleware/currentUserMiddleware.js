@@ -1,8 +1,9 @@
 const Sentry = require('@sentry/node')
-const { ApplicationError } = require('../util/customErrors')
-const { getUser, getMockedUser, getOrganizationAccess } = require('../services/userService')
-const { requiredGroup } = require('../conf-backend')
 const _ = require('lodash')
+
+const { requiredGroup } = require('../conf-backend')
+const { getUser, getMockedUser, getOrganizationAccess } = require('../services/userService')
+const { ApplicationError } = require('../util/customErrors')
 const logger = require('../util/logger')
 
 const parseIamGroups = iamGroups => iamGroups?.split(';') ?? []

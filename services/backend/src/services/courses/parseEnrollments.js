@@ -1,4 +1,5 @@
 const crypto = require('crypto')
+
 const { formatStudyrightElement } = require('./parseCredits')
 
 const parseEnrollment = (enrollment, anonymizationSalt, studentNumberToSrElementsMap) => {
