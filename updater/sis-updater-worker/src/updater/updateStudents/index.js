@@ -1,16 +1,16 @@
-const { Op } = require('sequelize')
 const { flatten, groupBy, orderBy, has, get, uniq } = require('lodash')
+const { Op } = require('sequelize')
 
-const { Course, Student, SemesterEnrollment, Transfer, Enrollment } = require('../../db/models')
-const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate, selectFromActiveSnapshotsByIds } = require('../../db')
-const { getEducation, getUniOrgId, loadMapsIfNeeded } = require('../shared')
-const { studentMapper, semesterEnrollmentMapper, enrollmentMapper } = require('../mapper')
-const { isBaMa } = require('../../utils')
-const { updateStudyRights, updateStudyRightElements, updateElementDetails } = require('./studyRightUpdaters')
-const { getAttainmentsToBeExcluded } = require('./excludedPartialAttainments')
 const { updateAttainments } = require('./attainments')
+const { getAttainmentsToBeExcluded } = require('./excludedPartialAttainments')
 const { updateStudyplans, findStudentsToReupdate } = require('./studyPlans')
+const { updateStudyRights, updateStudyRightElements, updateElementDetails } = require('./studyRightUpdaters')
+const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate, selectFromActiveSnapshotsByIds } = require('../../db')
+const { Course, Student, SemesterEnrollment, Transfer, Enrollment } = require('../../db/models')
+const { isBaMa } = require('../../utils')
 const { logger } = require('../../utils/logger')
+const { studentMapper, semesterEnrollmentMapper, enrollmentMapper } = require('../mapper')
+const { getEducation, getUniOrgId, loadMapsIfNeeded } = require('../shared')
 
 // Accepted selection path is not available when degree programme doesn't have
 // studytrack or major subject. This is a known bug on SIS and has been reported

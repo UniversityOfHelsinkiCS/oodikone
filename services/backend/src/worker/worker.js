@@ -1,4 +1,5 @@
 const { Worker } = require('bullmq')
+
 const { redis } = require('../conf-backend')
 const logger = require('../util/logger')
 

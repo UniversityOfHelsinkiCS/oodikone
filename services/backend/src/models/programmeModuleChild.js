@@ -1,4 +1,5 @@
-const { Model, STRING, DATE } = require('sequelize')
+const { Model, DATE, STRING } = require('sequelize')
+
 const { dbConnections } = require('../database/connection')
 
 class ProgrammeModuleChild extends Model {}

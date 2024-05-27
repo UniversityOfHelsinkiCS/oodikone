@@ -1,10 +1,10 @@
+const router = require('express').Router()
+
 const {
   createStudyProgrammePin,
   getStudyProgrammePins,
   removeStudyProgrammePin,
 } = require('../services/studyProgrammePins')
-
-const router = require('express').Router()
 
 router.get('/', async (req, res) => {
   const userId = req.user.id

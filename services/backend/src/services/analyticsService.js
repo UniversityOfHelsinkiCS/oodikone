@@ -1,5 +1,6 @@
-const { redisClient } = require('./redis')
 const moment = require('moment')
+
+const { redisClient } = require('./redis')
 
 // Only new bachelor, masters and doctoral programmes get their data updated in redis every night, use redis for them
 const isUpdatedNewProgramme = code => code.includes('KH') || code.includes('MH') || /^(T)[0-9]{6}$/.test(code)

@@ -1,6 +1,7 @@
 const router = require('express').Router()
+
+const { changeGroupTags, getAllGroupsAndStudents } = require('../services/studyGuidanceGroups')
 const { logger } = require('../util/logger')
-const { getAllGroupsAndStudents, changeGroupTags } = require('../services/studyGuidanceGroups')
 
 router.get('/', async (req, res) => {
   const {

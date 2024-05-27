@@ -1,6 +1,7 @@
 const { indexOf } = require('lodash')
-const { mapToProviders } = require('../../util/utils')
+
 const { thesisWriters } = require('./faculty')
+const { mapToProviders } = require('../../util/utils')
 const {
   getStatsBasis,
   getYearsArray,

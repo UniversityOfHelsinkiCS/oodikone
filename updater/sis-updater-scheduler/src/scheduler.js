@@ -1,9 +1,7 @@
-const { chunk } = require('lodash')
 const { eachLimit } = require('async')
+const { chunk } = require('lodash')
 const uuid = require('uuid')
-const { knexConnection } = require('./db/connection')
-const { stan, opts } = require('./utils/stan')
-const { incrby: redisIncrementBy, get: redisGet } = require('./utils/redis')
+
 const {
   NATS_GROUP,
   SIS_UPDATER_SCHEDULE_CHANNEL,
@@ -18,8 +16,11 @@ const {
   LATEST_MESSAGE_RECEIVED_THRESHOLD,
   ENABLE_WORKER_REPORTING,
 } = require('./config')
+const { knexConnection } = require('./db/connection')
 const { startPrePurge, startPurge } = require('./purge')
 const { logger } = require('./utils/logger')
+const { incrby: redisIncrementBy, get: redisGet } = require('./utils/redis')
+const { stan, opts } = require('./utils/stan')
 
 const IMPORTER_TABLES = {
   attainments: 'attainments',

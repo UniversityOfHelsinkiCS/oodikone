@@ -1,7 +1,7 @@
 const router = require('express').Router()
-const { getFacultyList } = require('../services/faculty/facultyHelpers')
-const { getGraduationStats, getFacultyProgressStats } = require('../services/faculty/facultyService')
 
+const { getFacultyList } = require('../services/faculty/facultyHelpers')
+const { getFacultyProgressStats, getGraduationStats } = require('../services/faculty/facultyService')
 const { getMedian } = require('../services/studyprogramme/studyprogrammeHelpers')
 
 const degreeNames = ['bachelor', 'bachelorMaster', 'master', 'licentiate', 'doctor']

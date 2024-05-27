@@ -1,8 +1,8 @@
 const { getBasicStatsForStudytrack } = require('./studyprogrammeBasics')
 const { getGraduationStatsForStudytrack } = require('./studyprogrammeGraduations')
 const { getStudytrackStatsForStudyprogramme } = require('./studytrackStats')
-const { setBasicStats, setCreditStats, setGraduationStats, setStudytrackStats } = require('../analyticsService')
 const logger = require('../../util/logger')
+const { setBasicStats, setCreditStats, setGraduationStats, setStudytrackStats } = require('../analyticsService')
 const { computeCreditsProduced } = require('../providerCredits')
 
 const updateBasicView = async (code, combinedProgramme) => {

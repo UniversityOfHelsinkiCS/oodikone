@@ -1,5 +1,6 @@
-const redis = require('redis')
 const bluebird = require('bluebird')
+const redis = require('redis')
+
 const conf = require('../conf-backend')
 const logger = require('../util/logger')
 

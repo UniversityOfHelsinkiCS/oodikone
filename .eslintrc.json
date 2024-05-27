@@ -21,7 +21,17 @@
     "cypress/no-assigning-return-values": "off",
     "cypress/unsafe-to-chain-command": "off",
     "default-param-last": "off",
-    "import/order": "off",
+    "import/order": [
+      "error",
+      {
+        "alphabetize": { "order": "asc", "caseInsensitive": true },
+        "groups": [
+          ["builtin", "external"],
+          ["internal", "parent", "sibling", "index"]
+        ],
+        "newlines-between": "always"
+      }
+    ],
     "no-async-promise-executor": "off",
     "no-await-in-loop": "off",
     "no-console": "error",

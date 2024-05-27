@@ -1,11 +1,12 @@
 const { Op } = require('sequelize')
+
 const { whereStudents, sinceDate } = require('.')
-const { ElementDetail, Studyright, SemesterEnrollment } = require('../../models')
-const { StudyrightElement, Student } = require('../../models')
 const { formatStudyright } = require('./studyprogrammeHelpers')
 const {
   dbConnections: { sequelize },
 } = require('../../database/connection')
+const { ElementDetail, Studyright, SemesterEnrollment } = require('../../models')
+const { StudyrightElement, Student } = require('../../models')
 const { getCurrentSemester } = require('../semesters')
 
 const allStudyrights = async (studytrack, studentnumbers) =>

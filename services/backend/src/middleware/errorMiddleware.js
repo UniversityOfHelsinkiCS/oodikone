@@ -1,4 +1,5 @@
 const Sentry = require('@sentry/node')
+
 const { ApplicationError } = require('../util/customErrors')
 const logger = require('../util/logger')
 

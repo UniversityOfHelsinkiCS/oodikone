@@ -1,4 +1,5 @@
 const { Op } = require('sequelize')
+
 const { codes } = require('../../../config/programmeCodes')
 const { faculties } = require('../organisations')
 

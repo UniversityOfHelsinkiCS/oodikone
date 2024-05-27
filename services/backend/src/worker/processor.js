@@ -6,7 +6,6 @@ const {
   refreshCloseToGraduating,
 } = require('../events')
 const { studyplansUpdate } = require('../services/sisUpdaterService')
-
 const logger = require('../util/logger')
 
 // This bullmq worker processor has to be in a different file for it to be run in a sandboxed process.

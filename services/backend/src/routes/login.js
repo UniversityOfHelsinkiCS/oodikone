@@ -1,6 +1,7 @@
 const router = require('express').Router()
-const { ApplicationError } = require('../util/customErrors')
 const _ = require('lodash')
+
+const { ApplicationError } = require('../util/customErrors')
 
 router.get('/login', async (req, res) => {
   const { user, logoutUrl } = req

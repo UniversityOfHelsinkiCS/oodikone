@@ -1,16 +1,16 @@
 const { Op } = require('sequelize')
-const { Credit, Course, Organization, Enrollment } = require('../../models')
 
-const { parseCredit } = require('./parseCredits')
-const { parseEnrollment } = require('./parseEnrollments')
 const { CourseYearlyStatsCounter } = require('./course_yearly_stats_counter')
-const { sortMainCode } = require('../../util/utils')
+const { byNameAndOrCodeLike, byCodes } = require('./courseFinders')
 const {
   enrollmentsForCourses,
   creditsForCourses,
   getStudentNumberToSrElementsMap,
 } = require('./creditsAndEnrollmentsOfCourse')
-const { byNameAndOrCodeLike, byCodes } = require('./courseFinders')
+const { parseCredit } = require('./parseCredits')
+const { parseEnrollment } = require('./parseEnrollments')
+const { Credit, Course, Organization, Enrollment } = require('../../models')
+const { sortMainCode } = require('../../util/utils')
 
 const isOpenUniCourseCode = code => code.match(/^AY?(.+?)(?:en|fi|sv)?$/)
 

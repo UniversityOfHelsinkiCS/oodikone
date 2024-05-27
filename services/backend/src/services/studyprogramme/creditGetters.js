@@ -1,7 +1,8 @@
 const { Op } = require('sequelize')
-const { Credit, Course, Organization, CourseProvider } = require('../../models')
+
 const { whereStudents } = require('.')
 const { formatCredit } = require('./studyprogrammeHelpers')
+const { Credit, Course, Organization, CourseProvider } = require('../../models')
 
 const getCreditsForProvider = async (provider, codes, since) => {
   const credits = await Credit.findAll({

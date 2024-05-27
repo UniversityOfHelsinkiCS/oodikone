@@ -1,6 +1,7 @@
 const { each } = require('async')
-const { Semester, Organization, CREDIT_TYPE_CODES } = require('../db/models')
+
 const { selectAllFrom, selectAllFromSnapshots } = require('../db')
+const { Semester, Organization, CREDIT_TYPE_CODES } = require('../db/models')
 const { getObject: redisGet, setObject: redisSet, lock: redisLock, expire: redisExpire } = require('../utils/redis')
 
 const TIME_LIMIT_BETWEEN_RELOADS = 1000 * 60 * 30

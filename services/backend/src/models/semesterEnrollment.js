@@ -1,4 +1,5 @@
-const { Model, STRING, DATE, INTEGER, BOOLEAN } = require('sequelize')
+const { Model, BOOLEAN, DATE, INTEGER, STRING } = require('sequelize')
+
 const { dbConnections } = require('../database/connection')
 
 class SemesterEnrollment extends Model {}

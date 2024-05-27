@@ -1,11 +1,3 @@
-const { stan, opts } = require('./utils/stan')
-const { dbConnections } = require('./db/connection')
-const { loadMapsOnDemand } = require('./updater/shared')
-const { update } = require('./updater')
-const { postUpdate } = require('./postUpdate')
-const { purge, prePurge, purgeByStudentNumber } = require('./updater/purge')
-const { get: redisGet, set: redisSet } = require('./utils/redis')
-const { logger } = require('./utils/logger')
 const {
   SIS_UPDATER_SCHEDULE_CHANNEL,
   SIS_PURGE_CHANNEL,
@@ -17,6 +9,14 @@ const {
   REDIS_TOTAL_STUDENTS_DONE_KEY,
   REDIS_LATEST_MESSAGE_RECEIVED,
 } = require('./config')
+const { dbConnections } = require('./db/connection')
+const { postUpdate } = require('./postUpdate')
+const { update } = require('./updater')
+const { purge, prePurge, purgeByStudentNumber } = require('./updater/purge')
+const { loadMapsOnDemand } = require('./updater/shared')
+const { logger } = require('./utils/logger')
+const { get: redisGet, set: redisSet } = require('./utils/redis')
+const { stan, opts } = require('./utils/stan')
 
 const handleMessage = messageHandler => async msg => {
   let data = null

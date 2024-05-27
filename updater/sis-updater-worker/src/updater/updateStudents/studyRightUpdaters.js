@@ -1,7 +1,9 @@
-const { isBaMa } = require('../../utils')
 const { get, sortBy, sortedUniqBy, orderBy, uniqBy, flatMap } = require('lodash')
-const { ElementDetail, Studyright, StudyrightElement } = require('../../db/models')
+
 const { selectFromByIds, bulkCreate, selectAllFrom } = require('../../db')
+const { ElementDetail, Studyright, StudyrightElement } = require('../../db/models')
+const { isBaMa } = require('../../utils')
+const { termRegistrationTypeToEnrollmenttype } = require('../mapper')
 const {
   getEducation,
   getEducationType,
@@ -11,7 +13,6 @@ const {
   getSemesterByDate,
   educationTypeToExtentcode,
 } = require('../shared')
-const { termRegistrationTypeToEnrollmenttype } = require('../mapper')
 
 const isCancelled = (studyright, extentcode) => {
   if (

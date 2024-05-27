@@ -1,4 +1,5 @@
 const { readFileSync } = require('fs')
+
 const { logger } = require('../../utils/logger')
 
 const getAttainmentsToBeExcluded = () => {

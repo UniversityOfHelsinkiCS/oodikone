@@ -1,10 +1,10 @@
 const _ = require('lodash')
 const { Op } = require('sequelize')
 
-const { Course, Teacher, Credit, CreditTeacher, CourseProvider } = require('../../db/models')
 const { selectFromByIds, bulkCreate, getCourseUnitsByCodes } = require('../../db')
-const { mapTeacher, creditMapper, courseProviderMapper } = require('../mapper')
 const { dbConnections } = require('../../db/connection')
+const { Course, Teacher, Credit, CreditTeacher, CourseProvider } = require('../../db/models')
+const { mapTeacher, creditMapper, courseProviderMapper } = require('../mapper')
 
 const updateTeachers = async attainments => {
   const acceptorPersonIds = _.flatten(

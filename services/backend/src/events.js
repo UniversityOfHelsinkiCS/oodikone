@@ -1,23 +1,24 @@
 const { CronJob } = require('cron')
-const { refreshAssociationsInRedis } = require('./services/studyrights')
-const { getAllProgrammes } = require('./services/studyrights')
-const { updateBasicView, updateStudytrackView } = require('./services/studyprogramme/studyprogrammeUpdates')
-const { findAndSaveTeachers } = require('./services/topteachers')
-const { faculties } = require('./services/organisations')
-const { combinedStudyprogrammes } = require('./services/studyprogramme/studyprogrammeHelpers')
-const { updateFacultyOverview, updateFacultyProgressOverview } = require('./services/faculty/facultyUpdates')
+
 const { isProduction, runningInCI } = require('./conf-backend')
-const { getCurrentSemester } = require('./services/semesters')
-const logger = require('./util/logger')
-const { getAssociations } = require('./services/studyrights')
-const { redisClient } = require('./services/redis')
+const { updateFacultyOverview, updateFacultyProgressOverview } = require('./services/faculty/facultyUpdates')
 const { computeLanguageCenterData, LANGUAGE_CENTER_REDIS_KEY } = require('./services/languageCenterData')
-const { jobMaker } = require('./worker/queue')
-const { deleteOutdatedUsers } = require('./services/userService')
+const { faculties } = require('./services/organisations')
 const {
   findStudentsCloseToGraduation,
   CLOSE_TO_GRADUATION_REDIS_KEY,
 } = require('./services/populations/closeToGraduation')
+const { redisClient } = require('./services/redis')
+const { getCurrentSemester } = require('./services/semesters')
+const { combinedStudyprogrammes } = require('./services/studyprogramme/studyprogrammeHelpers')
+const { updateBasicView, updateStudytrackView } = require('./services/studyprogramme/studyprogrammeUpdates')
+const { refreshAssociationsInRedis } = require('./services/studyrights')
+const { getAllProgrammes } = require('./services/studyrights')
+const { getAssociations } = require('./services/studyrights')
+const { findAndSaveTeachers } = require('./services/topteachers')
+const { deleteOutdatedUsers } = require('./services/userService')
+const logger = require('./util/logger')
+const { jobMaker } = require('./worker/queue')
 
 const schedule = (cronTime, func) => new CronJob({ cronTime, onTick: func, start: true, timeZone: 'Europe/Helsinki' })
 

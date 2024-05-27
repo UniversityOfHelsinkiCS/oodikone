@@ -2,7 +2,6 @@ const _ = require('lodash')
 const { Op } = require('sequelize')
 
 const { getCurrentStudyYearStartDate, getNotCompletedForProgrammeCourses, getAllProgrammeCourses } = require('.')
-const { mapToProviders } = require('../../util/utils')
 const {
   getOwnStudentsForProgrammeCourses,
   getStudentsForProgrammeCourses,
@@ -11,6 +10,7 @@ const {
   getTransferStudentsForProgrammeCourses,
 } = require('./studentGetters')
 const { Credit, Enrollment } = require('../../models')
+const { mapToProviders } = require('../../util/utils')
 const { createArrayOfCourses } = require('../languageCenterData')
 
 const getCurrentYearStartDate = () => {

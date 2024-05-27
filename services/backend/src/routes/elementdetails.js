@@ -1,4 +1,5 @@
 const router = require('express').Router()
+
 const { getAllProgrammes, getAllElementDetails } = require('../services/studyrights')
 
 router.get('/elementdetails/all', async (_req, res) => {

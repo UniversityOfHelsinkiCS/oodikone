@@ -1,4 +1,6 @@
 const { Op } = require('sequelize')
+
+const { PURGE_LOCK, SIS_PURGE_CHANNEL } = require('../config')
 const {
   Organization,
   Course,
@@ -17,9 +19,8 @@ const {
   StudyrightElement,
   ProgrammeModule,
 } = require('../db/models')
-const { lock } = require('../utils/redis')
-const { PURGE_LOCK, SIS_PURGE_CHANNEL } = require('../config')
 const { logger } = require('../utils/logger')
+const { lock } = require('../utils/redis')
 const { stan } = require('../utils/stan')
 
 const tableToModel = {

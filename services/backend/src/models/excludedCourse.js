@@ -1,4 +1,5 @@
-const { Model, INTEGER, STRING, DATE } = require('sequelize')
+const { Model, DATE, INTEGER, STRING } = require('sequelize')
+
 const { dbConnections } = require('../database/connection')
 
 class ExcludedCourse extends Model {}

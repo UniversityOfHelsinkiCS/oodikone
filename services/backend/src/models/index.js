@@ -1,24 +1,24 @@
-const Organization = require('./organization')
-const CourseType = require('./courseType')
 const Course = require('./course')
-const Student = require('./student')
 const CourseProvider = require('./courseProvider')
-const Semester = require('./semester')
-const SemesterEnrollment = require('./semesterEnrollment')
-const Teacher = require('./teacher')
-const CreditType = require('./creditType')
+const CourseType = require('./courseType')
 const Credit = require('./credit')
 const CreditTeacher = require('./creditTeacher')
+const CreditType = require('./creditType')
 const ElementDetail = require('./elementDetail')
-const Studyplan = require('./studyplan')
-const StudyrightExtent = require('./studyrightExtent')
-const Studyright = require('./studyright')
-const StudyrightElement = require('./studyrightElement')
-const Transfer = require('./transfer')
+const Enrollment = require('./enrollment')
+const ExcludedCourse = require('./excludedCourse')
+const Organization = require('./organization')
 const ProgrammeModule = require('./programmeModule')
 const ProgrammeModuleChild = require('./programmeModuleChild')
-const ExcludedCourse = require('./excludedCourse')
-const Enrollment = require('./enrollment')
+const Semester = require('./semester')
+const SemesterEnrollment = require('./semesterEnrollment')
+const Student = require('./student')
+const Studyplan = require('./studyplan')
+const Studyright = require('./studyright')
+const StudyrightElement = require('./studyrightElement')
+const StudyrightExtent = require('./studyrightExtent')
+const Teacher = require('./teacher')
+const Transfer = require('./transfer')
 
 CourseType.hasMany(Course, { foreignKey: 'coursetypecode', sourceKey: 'coursetypecode' })
 Course.belongsTo(CourseType, { foreignKey: 'coursetypecode', targetKey: 'coursetypecode' })
@@ -121,25 +121,25 @@ ProgrammeModule.belongsToMany(ProgrammeModule, {
 Organization.hasMany(Organization, { foreignKey: 'parent_id', as: 'children' })
 
 module.exports = {
-  Organization,
   Course,
-  CourseType,
-  Student,
   CourseProvider,
-  Semester,
-  SemesterEnrollment,
-  Teacher,
-  CreditType,
+  CourseType,
   Credit,
   CreditTeacher,
+  CreditType,
   ElementDetail,
+  Enrollment,
+  ExcludedCourse,
+  Organization,
+  ProgrammeModule,
+  ProgrammeModuleChild,
+  Semester,
+  SemesterEnrollment,
+  Student,
   Studyplan,
   StudyrightExtent,
   Studyright,
   StudyrightElement,
+  Teacher,
   Transfer,
-  ProgrammeModule,
-  ProgrammeModuleChild,
-  ExcludedCourse,
-  Enrollment,
 }

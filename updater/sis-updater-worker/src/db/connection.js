@@ -1,10 +1,11 @@
+const EventEmitter = require('events')
 const knex = require('knex')
 const Sequelize = require('sequelize')
-const EventEmitter = require('events')
 const Umzug = require('umzug')
-const { lock } = require('../utils/redis')
+
 const { MIGRATIONS_LOCK, isDev, runningInCI } = require('../config')
 const { logger } = require('../utils/logger')
+const { lock } = require('../utils/redis')
 
 const { DB_URL, SIS_IMPORTER_HOST, SIS_IMPORTER_USER, SIS_IMPORTER_PASSWORD, SIS_IMPORTER_DATABASE, SIS_PASSWORD } =
   process.env

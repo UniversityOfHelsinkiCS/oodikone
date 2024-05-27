@@ -1,5 +1,6 @@
-const router = require('express').Router()
 const crypto = require('crypto')
+const router = require('express').Router()
+
 const courseService = require('../services/courses')
 const { faculties } = require('../services/organisations')
 const { validateParamLength } = require('../util')

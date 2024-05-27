@@ -1,17 +1,18 @@
 const router = require('express').Router()
-const { getCompletedCourses } = require('../services/completedCoursesSearch')
-const { getImporterClient } = require('../util/importerClient')
-
-const importerClient = getImporterClient()
 const _ = require('lodash')
+
+const { getCompletedCourses } = require('../services/completedCoursesSearch')
 const {
   getOpenUniSearches,
   createNewSearch,
   deleteSearch,
   updateSearch,
 } = require('../services/openUni/openUniManageSearches')
+const { getImporterClient } = require('../util/importerClient')
 const logger = require('../util/logger')
 const { hasFullAccessToStudentData } = require('../util/utils')
+
+const importerClient = getImporterClient()
 
 router.get('/', async (req, res) => {
   const studentNumbers = JSON.parse(req.query?.studentlist) || []

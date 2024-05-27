@@ -1,7 +1,8 @@
-const moment = require('moment')
 const { indexOf, uniqBy } = require('lodash')
+const moment = require('moment')
 
-const { mapToProviders } = require('../../util/utils')
+const { allTransfers } = require('.')
+const { getThesisCredits } = require('./creditGetters')
 const {
   getCorrectStudentnumbers,
   getStatsBasis,
@@ -16,16 +17,15 @@ const {
   getId,
   getGoal,
 } = require('./studyprogrammeHelpers')
-const { countTimeCategories, bachelorStudyright, getStatutoryAbsences } = require('../graduationHelpers')
-const { getAllProgrammes } = require('../studyrights')
 const {
   graduatedStudyRights,
   allStudyrights,
   previousStudyrights,
   followingStudyrights,
 } = require('./studyrightFinders')
-const { getThesisCredits } = require('./creditGetters')
-const { allTransfers } = require('.')
+const { mapToProviders } = require('../../util/utils')
+const { countTimeCategories, bachelorStudyright, getStatutoryAbsences } = require('../graduationHelpers')
+const { getAllProgrammes } = require('../studyrights')
 
 const checkStartdate = async (id, startdate) => {
   if (id.slice(-2) === '-1') {

@@ -1,9 +1,10 @@
+const _ = require('lodash')
+
+const { StudyGuidanceGroupTag } = require('../models/models_kone')
 const { getImporterClient } = require('../util/importerClient')
+const logger = require('../util/logger')
 
 const importerClient = getImporterClient()
-const { StudyGuidanceGroupTag } = require('../models/models_kone')
-const logger = require('../util/logger')
-const _ = require('lodash')
 
 const getGroupsFromImporter = async sisPersonId => {
   if (!importerClient) {
