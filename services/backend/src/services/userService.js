@@ -88,7 +88,8 @@ const formatUser = async (user, getStudentAccess = true) => {
   // attribute naming is a bit confusing, but it's used so widely in oodikone, that it's not probably worth changing
   return {
     id: user.id, // our internal id, not the one from sis, (e.g. 101)
-    username: user.username, // acually username (e.g. mluukkai)
+    userId: user.username, // This is only used for logging purposes (Grafana), please use either id or username for everything else
+    username: user.username,
     name: user.fullName,
     language: user.language,
     sisPersonId: user.sisuPersonId,
