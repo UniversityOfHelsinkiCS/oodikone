@@ -70,6 +70,7 @@ export const TimesAndPathsView = ({ faculty, setStudyProgrammes, studyProgrammes
             'On time': item.statistics.onTime || 0,
             'Max. year overtime': item.statistics.yearOver || 0,
             Overtime: item.statistics.wayOver || 0,
+            'Median study time (months)': item.y || 0,
           })
         })
       })
@@ -115,7 +116,7 @@ export const TimesAndPathsView = ({ faculty, setStudyProgrammes, studyProgrammes
           <Toggle
             cypress="GraduationTimeToggle"
             firstLabel="Breakdown"
-            secondLabel="Median times"
+            secondLabel="Median study times"
             setValue={setShowMedian}
             value={showMedian}
           />
