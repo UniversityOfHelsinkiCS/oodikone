@@ -1,24 +1,24 @@
 import { useState } from 'react'
 import { Divider, Message } from 'semantic-ui-react'
 
+import '@/components/FacultyStatistics/faculty.css'
 import { BreakdownBarChart } from './BreakdownBarChart'
 import { MedianBarChart } from './MedianBarChart'
-import '../faculty.css'
 
 const MedianDisplay = ({
-  handleClick,
-  data,
-  level,
-  goal,
-  label,
-  levelProgrammeData,
-  programmeNames,
   classSizes,
-  groupBy,
+  data,
+  goal,
   goalExceptions,
-  year,
+  groupBy,
+  handleClick,
+  label,
+  level,
+  levelProgrammeData,
   programmeData,
+  programmeNames,
   universityMode,
+  year,
 }) => {
   return (
     <div>
@@ -75,14 +75,14 @@ const MedianDisplay = ({
 }
 
 const BreakdownDisplay = ({
-  handleClick,
   data,
+  handleClick,
   label,
   levelProgrammeData,
-  programmeNames,
-  year,
   programmeData,
+  programmeNames,
   universityMode,
+  year,
 }) => {
   return (
     <div>
@@ -111,23 +111,24 @@ const BreakdownDisplay = ({
 }
 
 export const GraduationTimes = ({
-  title,
+  classSizes,
   data,
-  level,
   goal,
+  goalExceptions,
+  groupBy,
   label,
+  level,
   levelProgrammeData,
   programmeNames,
   showMedian,
-  classSizes,
-  groupBy,
-  goalExceptions,
+  title,
   universityMode,
 }) => {
   const [programmeData, setProgrammeData] = useState(false)
   const [year, setYear] = useState(null)
-  if (!data.some(a => a.amount > 0)) return null
-
+  if (!data.some(a => a.amount > 0)) {
+    return null
+  }
   const handleClick = (event, isFacultyGraph, seriesCategory = null) => {
     if (isFacultyGraph) {
       setYear(seriesCategory || event.point.name)
