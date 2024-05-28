@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import { useCallback, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button, Icon, Item, Pagination } from 'semantic-ui-react'
@@ -67,23 +66,19 @@ export const Students = ({ filteredStudents }) => {
 
   const pagedStudents = students.slice(page * 10, page * 10 + 10)
 
-  const data = useMemo(() => {
-    return _.chain(modules)
-      .map(({ module, courses }) =>
+  const data = useMemo(
+    () =>
+      modules.map(({ module, courses }) =>
         group(
           {
             key: `module-${module.code}`,
-            headerRowData: {
-              name: module.name,
-              code: module.code,
-              courses,
-            },
+            headerRowData: { name: module.name, code: module.code, courses },
           },
           courses
         )
-      )
-      .value()
-  }, [modules])
+      ),
+    [modules]
+  )
 
   const columns = useMemo(
     () => [

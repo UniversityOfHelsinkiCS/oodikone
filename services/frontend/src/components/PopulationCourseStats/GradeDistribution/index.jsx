@@ -130,18 +130,7 @@ export const GradeDistribution = ({ flat, onlyIamRights }) => {
         {
           key: `module-${module.code}`,
           module,
-          headerRowData: ({ definition: { module }, children }) => ({
-            name: module.name,
-            code: module.code,
-            attempts: _.chain(children).map('attempts').sum().value(),
-            otherPassed: _.chain(children).map('otherPassed').sum().value(),
-            grades: _.range(0, 6).map(grade => ({
-              count: _.chain(children)
-                .map(course => course.grades[grade]?.count ?? 0)
-                .sum()
-                .value(),
-            })),
-          }),
+          headerRowData: { name: module.name, code: module.code },
         },
         courses.map(mapCourseData)
       )
@@ -152,6 +141,7 @@ export const GradeDistribution = ({ flat, onlyIamRights }) => {
     <SortableTable
       columns={columns}
       data={data}
+      defaultSort={['attempts', 'desc']}
       expandedGroups={expandedGroups}
       featureName="grade_distribution"
       title="Grade distribution of courses"

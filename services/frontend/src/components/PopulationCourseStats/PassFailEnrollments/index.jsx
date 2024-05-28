@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Item, Icon } from 'semantic-ui-react'
@@ -8,25 +7,6 @@ import { SortableTable, group } from '@/components/SortableTable'
 import { CourseFilterToggle } from '../CourseFilterToggle'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
 import './passFailEnrollments.css'
-
-const createModuleAggregateRow = ({ definition, children }) => ({
-  label_code: definition.module.code,
-  label_name: definition.module.name,
-  stats: {
-    passed: _.chain(children).map('stats.passed').sum().value(),
-    retryPassed: _.chain(children).map('stats.retryPassed').sum().value(),
-    percentage: _.chain(children).map('stats.percentage').mean().value(),
-    percentageWithEnrollments: _.chain(children).map('stats.percentageWithEnrollments').mean().value(),
-    failed: _.chain(children).map('stats.failed').sum().value(),
-    failedMany: _.chain(children).map('stats.failedMany').sum().value(),
-    attempts: _.chain(children).map('stats.attempts').sum().value(),
-    perStudent: _.chain(children).map('stats.perStudent').mean().value(),
-    passedOfPopulation: _.chain(children).map('stats.passedOfPopulation').mean().value(),
-    triedOfPopulation: _.chain(children).map('stats.triedOfPopulation').mean().value(),
-    totalEnrolledNoGrade: _.chain(children).map('stats.totalEnrolledNoGrade').sum().value(),
-    totalStudents: _.chain(children).map('stats.totalStudents').sum().value(),
-  },
-})
 
 export const PassFailEnrollments = ({ flat, onlyIamRights }) => {
   const { modules, courseStatistics, onGoToCourseStatisticsClick, toggleGroupExpansion, expandedGroups } =
@@ -47,23 +27,15 @@ export const PassFailEnrollments = ({ flat, onlyIamRights }) => {
               {
                 key: 'course-name',
                 title: 'Name',
-                getRowVal: (row, isGroup) => getTextIn(isGroup ? row.label_name : row.name ?? row.course.name),
+                getRowVal: row => getTextIn(row.name ?? row.course.name),
                 cellProps: {
-                  style: {
-                    maxWidth: '20em',
-                    whiteSpace: 'normal',
-                    overflow: 'hidden',
-                  },
+                  style: { maxWidth: '20em', whiteSpace: 'normal' },
                 },
               },
               {
                 key: 'filter-toggle',
                 export: false,
-                getRowContent: (row, isGroup) => {
-                  if (isGroup) return null
-
-                  return <CourseFilterToggle course={row} />
-                },
+                getRowContent: (row, isGroup) => !isGroup && <CourseFilterToggle course={row} />,
               },
               {
                 key: 'go-to-course',
@@ -85,7 +57,8 @@ export const PassFailEnrollments = ({ flat, onlyIamRights }) => {
           {
             key: 'course-code',
             title: 'Code',
-            getRowVal: (row, isGroup) => (isGroup ? row.label_code : row.code ?? row.course.code),
+            getRowVal: row => row.code ?? row.course.code,
+            cellProps: { style: { textAlign: 'left' } },
           },
         ],
       },
@@ -97,28 +70,24 @@ export const PassFailEnrollments = ({ flat, onlyIamRights }) => {
           {
             key: 'total',
             title: 'Total\nstudents',
-            cellStyle: { textAlign: 'right' },
             filterType: 'range',
             getRowVal: row => row.stats?.totalStudents ?? 0,
           },
           {
             key: 'passed-total',
             title: 'Passed',
-            cellStyle: { textAlign: 'right' },
             filterType: 'range',
             getRowVal: row => row.stats?.passed ?? 0,
           },
           {
             key: 'failed-total',
             title: 'Failed',
-            cellStyle: { textAlign: 'right' },
             filterType: 'range',
             getRowVal: row => row.stats?.failed ?? 0,
           },
           {
             key: 'totalEnrolledNoGrade',
             title: 'Enrolled, \nno grade',
-            cellStyle: { textAlign: 'right' },
             filterType: 'range',
             getRowVal: row => row.stats?.totalEnrolledNoGrade ?? 0,
           },
@@ -143,7 +112,6 @@ export const PassFailEnrollments = ({ flat, onlyIamRights }) => {
               {
                 key: 'attempts-n',
                 title: 'Total',
-                cellStyle: { textAlign: 'right' },
                 filterType: 'range',
                 getRowVal: row => row.stats?.attempts,
               },
@@ -161,14 +129,12 @@ export const PassFailEnrollments = ({ flat, onlyIamRights }) => {
           {
             key: 'passed-after-retry',
             title: 'Passed\nafter retry',
-            cellStyle: { textAlign: 'right' },
             filterType: 'range',
             getRowVal: row => row.stats?.retryPassed ?? 0,
           },
           {
             key: 'failed-many',
             title: 'Failed\nmultiple times',
-            cellStyle: { textAlign: 'right' },
             filterType: 'range',
             getRowVal: row => row.stats?.failedMany ?? 0,
           },
@@ -217,25 +183,23 @@ export const PassFailEnrollments = ({ flat, onlyIamRights }) => {
       return courseStatistics.map(course => ({ ...course, code: course.course.code, name: course.course.name }))
     }
 
-    return _.chain(modules)
-      .map(({ module, courses }) =>
-        group(
-          {
-            key: `module-${module.code}`,
-            module,
-            headerRowData: createModuleAggregateRow,
-            columnOverrides: {},
-          },
-          courses
-        )
+    return modules.map(({ module, courses }) =>
+      group(
+        {
+          key: `module-${module.code}`,
+          module,
+          headerRowData: { code: module.code, name: module.name },
+        },
+        courses
       )
-      .value()
+    )
   }, [modules, courseStatistics])
 
   return (
     <SortableTable
       columns={columns}
       data={data}
+      defaultSort={['total', 'desc']}
       expandedGroups={expandedGroups}
       featureName="pass_and_fail"
       tableId="pass-and-fail-statistics-of-courses"

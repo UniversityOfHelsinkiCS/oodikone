@@ -8,22 +8,8 @@ import { clearCourseStats } from '@/redux/coursestats'
 import { GradeDistribution } from './GradeDistribution'
 import { PassFailEnrollments } from './PassFailEnrollments'
 import { PassingSemesters } from './PassingSemesters'
-import './populationCourseStats.css'
 import { PopulationCourseContext } from './PopulationCourseContext'
 import { Students } from './Students'
-
-const tableColumnNames = {
-  STUDENTS: 'students',
-  PASSED: 'passed',
-  RETRY_PASSED: 'retryPassed',
-  PERCENTAGE: 'percentage',
-  FAILED: 'failed',
-  FAILED_MANY: 'failedMany',
-  ATTEMPTS: 'attempts',
-  PER_STUDENT: 'perStudent',
-  PASSED_OF_POPULATION: 'passedOfPopulation',
-  TRIED_OF_POPULATION: 'triedOfPopulation',
-}
 
 const visibleCoursesFilter = ({ course }, mandatoryCourses) =>
   mandatoryCourses.defaultProgrammeCourses?.some(
@@ -115,8 +101,6 @@ const PopulationCourseStats = ({ filteredStudents, mandatoryCourses, courses, pe
     modules,
     courseStatistics: courses.coursestatistics,
     onGoToCourseStatisticsClick,
-    tableColumnNames,
-    courses,
     toggleGroupExpansion,
     expandedGroups,
   }
@@ -125,7 +109,7 @@ const PopulationCourseStats = ({ filteredStudents, mandatoryCourses, courses, pe
     {
       menuItem: 'Pass/fail',
       render: () => (
-        <Tab.Pane className="menuTab">
+        <Tab.Pane>
           <PassFailEnrollments
             expandedGroups={expandedGroups}
             onlyIamRights={onlyIamRights}
@@ -137,7 +121,7 @@ const PopulationCourseStats = ({ filteredStudents, mandatoryCourses, courses, pe
     {
       menuItem: 'Grades',
       render: () => (
-        <Tab.Pane className="menuTab">
+        <Tab.Pane>
           <GradeDistribution onlyIamRights={onlyIamRights} />
         </Tab.Pane>
       ),
@@ -145,7 +129,7 @@ const PopulationCourseStats = ({ filteredStudents, mandatoryCourses, courses, pe
     {
       menuItem: 'When passed',
       render: () => (
-        <Tab.Pane className="menuTab">
+        <Tab.Pane>
           <PassingSemesters onlyIamRights={onlyIamRights} />
         </Tab.Pane>
       ),
@@ -154,7 +138,7 @@ const PopulationCourseStats = ({ filteredStudents, mandatoryCourses, courses, pe
       menuItem: 'Students',
       hideIfOnlyIamRights: true,
       render: () => (
-        <Tab.Pane className="menuTab">
+        <Tab.Pane>
           <Students filteredStudents={filteredStudents} />
         </Tab.Pane>
       ),

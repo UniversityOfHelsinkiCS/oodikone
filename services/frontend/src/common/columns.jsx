@@ -38,7 +38,7 @@ export const getCopyableStudentNumberColumn = ({
       </>
     ),
     getRowVal: student => (!student.obfuscated ? student.studentNumber : 'hidden'),
-    getRowContent: student => <StudentInfoItem showSisuLink student={student} tab="General Tab" />,
+    getRowContent: student => <StudentInfoItem showSisuLink student={student} />,
   }
 }
 
@@ -76,10 +76,7 @@ export const getCopyableEmailColumn = ({
                   name="copy"
                   onClick={event => copyItemsToClipboard(event, fieldName)}
                   size="large"
-                  style={{
-                    float: 'right',
-                    marginLeft: '0.25em',
-                  }}
+                  style={{ marginLeft: '0.25em' }}
                   title="Click here to copy all emails onto your clipboard"
                 />
               }
@@ -91,11 +88,10 @@ export const getCopyableEmailColumn = ({
       },
       {
         key: 'copyEmail',
-        textTitle: 'Secondary email',
         sortable: false,
-        getRowVal: student => student.secondaryEmail,
         getRowContent: student =>
-          student.email && !student.obfuscated ? (
+          student.email &&
+          !student.obfuscated && (
             <Popup
               content="Email copied!"
               on="click"
@@ -103,17 +99,9 @@ export const getCopyableEmailColumn = ({
               onOpen={() => handlePopupOpen(student.studentNumber)}
               open={popupStates[student.studentNumber]}
               position="top right"
-              trigger={
-                <Icon
-                  link
-                  name="copy outline"
-                  onClick={() => navigator.clipboard.writeText(student.email)}
-                  style={{ float: 'right' }}
-                />
-              }
+              trigger={<Icon link name="copy outline" onClick={() => navigator.clipboard.writeText(student.email)} />}
             />
-          ) : null,
-        cellProps: { className: 'iconCellNoPointer' },
+          ),
       },
     ],
   }
