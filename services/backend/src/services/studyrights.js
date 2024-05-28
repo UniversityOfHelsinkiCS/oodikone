@@ -151,11 +151,6 @@ const getAllProgrammes = async () => {
   return elementDetails
 }
 
-const getAllElementDetails = async () => {
-  const elementDetails = ElementDetail.findAll()
-  return elementDetails
-}
-
 const associatedStudyrightElements = async (offset, limit) => {
   const studyrights = await Studyright.findAll({
     attributes: [],
@@ -336,5 +331,4 @@ module.exports = {
   getFilteredAssociations,
   refreshAssociationsInRedis,
   getAllProgrammes,
-  getAllElementDetails,
 }

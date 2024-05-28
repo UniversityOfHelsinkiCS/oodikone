@@ -18,7 +18,7 @@ import { AgeStats } from '@/components/PopulationDetails/AgeStats'
 import { CreditGainStats } from '@/components/PopulationDetails/CreditGainStats'
 import { PopulationStudentsContainer as PopulationStudents } from '@/components/PopulationStudents'
 import { SegmentDimmer } from '@/components/SegmentDimmer'
-import { useFilteredAndFormattedElementDetails } from '@/redux/elementdetails'
+import { useFilteredAndFormattedProgrammes } from '@/redux/populations'
 import { useGetProgressCriteriaQuery } from '@/redux/programmeProgressCriteria'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import {
@@ -299,7 +299,7 @@ const SingleStudyGroupViewWrapper = ({ group, isLoading, studyProgrammes, childr
 
 export const SingleStudyGuidanceGroupContainer = ({ group }) => {
   const groupStudentNumbers = group?.members?.map(({ personStudentNumber }) => personStudentNumber) || []
-  const studyProgrammes = useFilteredAndFormattedElementDetails()
+  const studyProgrammes = useFilteredAndFormattedProgrammes()
   const tags = {
     studyProgramme: group?.tags?.studyProgramme,
     year: null,

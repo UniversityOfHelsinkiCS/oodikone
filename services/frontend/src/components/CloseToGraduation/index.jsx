@@ -18,8 +18,8 @@ import { getSemestersPresentFunctions } from '@/components/PopulationStudents/St
 import { PaginatedSortableTable } from '@/components/SortableTable/PaginatedSortableTable'
 import { StudentNameVisibilityToggle, useStudentNameVisibility } from '@/components/StudentNameVisibilityToggle'
 import { useGetStudentsCloseToGraduationQuery } from '@/redux/closeToGraduation'
-import { useFilteredAndFormattedElementDetails } from '@/redux/elementdetails'
 import { useGetFacultiesQuery } from '@/redux/facultyStats'
+import { useFilteredAndFormattedProgrammes } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 
 const NUMBER_OF_DISPLAYED_SEMESTERS = 6
@@ -212,7 +212,7 @@ export const CloseToGraduation = () => {
   const { data: students = {}, isError, isLoading } = useGetStudentsCloseToGraduationQuery()
   const { data: faculties = [] } = useGetFacultiesQuery()
   const { data: semesterData = [] } = useGetSemestersQuery()
-  const programmes = useFilteredAndFormattedElementDetails()
+  const programmes = useFilteredAndFormattedProgrammes()
   const { getTextIn } = useLanguage()
   const { visible: namesVisible } = useStudentNameVisibility()
   const [chosenFaculties, setChosenFaculties] = useState([])

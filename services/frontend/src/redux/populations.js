@@ -1,4 +1,6 @@
 import { RTKApi, callController } from '@/apiConnection'
+import { getUnifiedProgrammeName } from '@/common'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 
 const initialState = {
   pending: false,
@@ -82,6 +84,38 @@ export const {
   useGetProgrammesQuery,
   useGetUnfilteredProgrammesQuery,
 } = populationApi
+
+// Returns only newest studyprogrammes and formats them to be used in semantic ui dropdowns
+export const useFilteredAndFormattedProgrammes = () => {
+  const { language, getTextIn } = useLanguage()
+  const { data } = useGetUnfilteredProgrammesQuery()
+  if (!data) return []
+
+  const programmes = Object.values(data.programmes || {})
+  const filteredAndFormatted = programmes
+    .filter(element => element.code.startsWith('KH') || element.code.startsWith('MH'))
+    .map(element => ({
+      key: element.code,
+      value: element.code,
+      description: element.code,
+      text: getTextIn(element.name),
+    }))
+
+  const combinedOptions = [
+    {
+      key: 'KH90_001+MH90_001',
+      value: 'KH90_001+MH90_001',
+      description: 'KH90_001+MH90_001',
+      text: getUnifiedProgrammeName(
+        getTextIn(data.programmes.KH90_001.name),
+        getTextIn(data.programmes.MH90_001.name),
+        language
+      ),
+    },
+  ]
+
+  return [...filteredAndFormatted, ...combinedOptions]
+}
 
 export const clearPopulations = () => ({
   type: 'CLEAR_POPULATIONS',
