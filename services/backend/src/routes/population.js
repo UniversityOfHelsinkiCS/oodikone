@@ -249,18 +249,20 @@ router.get('/v3/populationstatistics', async (req, res) => {
       !fullProgrammeRights.includes(studyRights.combinedProgramme)
     ) {
       result.students = result.students.map(student => {
-        const { iv, encryptedData } = encrypt(student.studentNumber)
-        const obfuscatedBirthDate = new Date(new Date(student.birthdate).setMonth(0, 0)) // only birth year for age distribution
+        const { iv, encryptedData: studentNumber } = encrypt(student.studentNumber)
+        const obfuscatedBirthDate = new Date(Date.UTC(new Date(student.birthdate).getUTCFullYear(), 0, 1)) // correct year for age distribution calculation but the date is always January 1st
         return {
           ...student,
           firstnames: '',
           lastname: '',
-          phone_number: '',
-          started: null,
+          phoneNumber: '',
           iv,
-          studentNumber: encryptedData,
+          studentNumber,
           name: '',
           email: '',
+          secondaryEmail: '',
+          sis_person_id: '',
+          enrollments: student.enrollments?.map(enrollment => ({ ...enrollment, studentnumber: studentNumber })),
           tags: [],
           birthdate: obfuscatedBirthDate,
           obfuscated: true,
