@@ -11,7 +11,7 @@ import { Toggle } from '@/components/StudyProgramme/Toggle'
 import { useGetFacultyGraduationTimesQuery } from '@/redux/facultyStats'
 import { GraduationTimes } from './GraduationTimes'
 
-export const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes }) => {
+export const TimesAndPathsView = ({ faculty, setStudyProgrammes, studyProgrammes }) => {
   const [showMedian, setShowMedian] = useState(false)
   const [groupByStartYear, setGroupByStartYear] = useState(false)
   const studyProgrammeFilter = studyProgrammes ? 'ALL_PROGRAMMES' : 'NEW_STUDY_PROGRAMMES'
@@ -19,14 +19,14 @@ export const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes
   const { getTextIn } = useLanguage()
 
   const groupBy = groupByStartYear ? 'byStartYear' : 'byGradYear'
-  const label = groupByStartYear ? 'Start year' : 'Graduation year'
+  const yearLabel = groupByStartYear ? 'Start year' : 'Graduation year'
   const data = graduationStats?.data?.[groupBy].medians
   const goals = graduationStats?.data?.goals
   const goalExceptions = { ...goals?.exceptions, needed: faculty?.code === 'H30' }
   const programmeData = graduationStats?.data?.[groupBy].programmes.medians
   const programmeNames = graduationStats?.data?.programmeNames
   const classSizes = graduationStats?.data?.classSizes
-  const commonProps = { label, programmeNames, showMedian, classSizes, goalExceptions }
+  const commonProps = { yearLabel, programmeNames, showMedian, classSizes, goalExceptions }
 
   const isFetchingOrLoading = graduationStats.isLoading || graduationStats.isFetching
 
@@ -66,7 +66,7 @@ export const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes
             Code: programmes[index],
             Abbreviation: item.name,
             Name: getTextIn(programmeNames[programmes[index]]),
-            Year: year,
+            [yearLabel]: year,
             'On time': item.statistics.onTime || 0,
             'Max. year overtime': item.statistics.yearOver || 0,
             Overtime: item.statistics.wayOver || 0,

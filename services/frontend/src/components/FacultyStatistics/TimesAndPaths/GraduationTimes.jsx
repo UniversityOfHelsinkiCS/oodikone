@@ -12,13 +12,13 @@ const MedianDisplay = ({
   goalExceptions,
   groupBy,
   handleClick,
-  label,
   level,
   levelProgrammeData,
   programmeData,
   programmeNames,
   universityMode,
   year,
+  yearLabel,
 }) => {
   return (
     <div>
@@ -44,9 +44,9 @@ const MedianDisplay = ({
           data={data}
           goal={goal}
           handleClick={handleClick}
-          label={label}
           programmeNames={programmeNames}
           universityMode={universityMode}
+          yearLabel={yearLabel}
         />
         {!programmeData ? (
           <div className="graduations-message">
@@ -62,11 +62,11 @@ const MedianDisplay = ({
             goal={goal}
             goalExceptions={goalExceptions}
             handleClick={handleClick}
-            label={label}
             level={level}
             programmeNames={programmeNames}
             universityMode={universityMode}
             year={year}
+            yearLabel={yearLabel}
           />
         )}
       </div>
@@ -77,17 +77,22 @@ const MedianDisplay = ({
 const BreakdownDisplay = ({
   data,
   handleClick,
-  label,
   levelProgrammeData,
   programmeData,
   programmeNames,
   universityMode,
   year,
+  yearLabel,
 }) => {
   return (
     <div>
       <div className="graduations-chart-container">
-        <BreakdownBarChart data={data} handleClick={handleClick} label={label} universityMode={universityMode} />
+        <BreakdownBarChart
+          data={data}
+          handleClick={handleClick}
+          universityMode={universityMode}
+          yearLabel={yearLabel}
+        />
         {!programmeData ? (
           <div className="graduations-message">
             <Message compact>
@@ -99,10 +104,10 @@ const BreakdownDisplay = ({
             data={levelProgrammeData[year]?.data}
             facultyGraph={false}
             handleClick={handleClick}
-            label={label}
             programmeNames={programmeNames}
             universityMode={universityMode}
             year={year}
+            yearLabel={yearLabel}
           />
         )}
       </div>
@@ -116,13 +121,13 @@ export const GraduationTimes = ({
   goal,
   goalExceptions,
   groupBy,
-  label,
   level,
   levelProgrammeData,
   programmeNames,
   showMedian,
   title,
   universityMode,
+  yearLabel,
 }) => {
   const [programmeData, setProgrammeData] = useState(false)
   const [year, setYear] = useState(null)
@@ -146,13 +151,13 @@ export const GraduationTimes = ({
         <BreakdownDisplay
           data={data}
           handleClick={handleClick}
-          label={label}
           level={level}
           levelProgrammeData={levelProgrammeData}
           programmeData={programmeData}
           programmeNames={programmeNames}
           universityMode={universityMode}
           year={year}
+          yearLabel={yearLabel}
         />
       ) : (
         <MedianDisplay
@@ -162,13 +167,13 @@ export const GraduationTimes = ({
           goalExceptions={goalExceptions}
           groupBy={groupBy}
           handleClick={handleClick}
-          label={label}
           level={level}
           levelProgrammeData={levelProgrammeData}
           programmeData={programmeData}
           programmeNames={programmeNames}
           universityMode={universityMode}
           year={year}
+          yearLabel={yearLabel}
         />
       )}
     </div>

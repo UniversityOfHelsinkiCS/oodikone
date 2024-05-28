@@ -2,18 +2,18 @@
 import ReactHighcharts from 'react-highcharts'
 
 export const MedianBarChart = ({
-  data,
-  goal,
-  handleClick,
-  facultyGraph = true,
-  year,
-  label,
-  programmeNames,
-  language = null,
   classSizes,
-  level,
+  data,
+  facultyGraph = true,
+  goal,
   goalExceptions,
+  handleClick,
+  language = null,
+  level,
+  programmeNames,
   universityMode,
+  year,
+  yearLabel,
 }) => {
   let modData = null
   if (!facultyGraph && goalExceptions.needed && ['master', 'bcMsCombo'].includes(level)) {
@@ -52,7 +52,7 @@ export const MedianBarChart = ({
   }
 
   const getDataLabel = (amount, category) => {
-    if (label === 'Start year') {
+    if (yearLabel === 'Start year') {
       return `${amount} graduated (${getPercentage(amount, category)} % of class)`
     }
     return `${amount} graduated`
@@ -65,7 +65,7 @@ export const MedianBarChart = ({
 
   const getTooltipText = (name, code, amount, y, statistics, realGoal) => {
     const sortingText =
-      label === 'Start year'
+      yearLabel === 'Start year'
         ? `<b>From class of ${facultyGraph ? name : year}, ${amount}/${getClassSize(code)} students have graduated</b>`
         : `<b>${amount} students graduated in year ${facultyGraph ? name : year}</b>`
     const timeText = `<br /><p>${sortingText}, <br /><b> median study time: ${y} months</p></b>`
@@ -86,7 +86,7 @@ export const MedianBarChart = ({
     if (universityMode) {
       return facultyGraph ? 'Graduation year' : 'Faculty'
     }
-    return facultyGraph ? label : 'Programme'
+    return facultyGraph ? yearLabel : 'Programme'
   }
 
   const config = {
@@ -201,7 +201,7 @@ export const MedianBarChart = ({
     },
   }
 
-  if (!facultyGraph) config.title.text = `Year ${year} by ${label.toLowerCase()}`
+  if (!facultyGraph) config.title.text = `Year ${year} by ${yearLabel.toLowerCase()}`
 
   return (
     <div className={`${facultyGraph ? 'faculty' : 'programmes'}-graph`}>
