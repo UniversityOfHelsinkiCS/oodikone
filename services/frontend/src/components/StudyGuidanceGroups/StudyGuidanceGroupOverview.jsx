@@ -17,17 +17,7 @@ const LinkToGroup = ({ group }) => {
   const history = useHistory()
   const destination = `/studyguidancegroups/${group.id}`
   return (
-    <Link
-      data-cy={`study-guidance-group-link-${group.id}`}
-      style={{
-        color: 'black',
-        display: 'inline-block',
-        height: '100%',
-        padding: '.78571429em .78571429em',
-        width: '100%',
-      }}
-      to={destination}
-    >
+    <Link data-cy={`study-guidance-group-link-${group.id}`} style={{ color: 'black' }} to={destination}>
       {getTextIn(group.name)}
       <Icon color="blue" name="level up alternate" onClick={() => history.push(destination)} />
     </Link>
@@ -212,11 +202,11 @@ const TagCell = ({ group, studyProgrammes, tagName }) => {
         <div style={{ ...cellWrapper, alignItems: 'baseline' }}>
           <p style={{ ...cellContent, textAlign: 'left' }}>{getText()}</p>
           <div style={{ ...cellContent, flexGrow: 0 }}>
-            <Button icon="pencil" onClick={() => toggleEdit()} size="tiny" />
+            <Button icon="pencil" onClick={toggleEdit} size="tiny" />
           </div>
         </div>
       ) : (
-        <Button content={`Add ${prettifyCamelCase(tagName)}`} icon="add" onClick={() => toggleEdit()} size="tiny" />
+        <Button content={`Add ${prettifyCamelCase(tagName)}`} icon="add" onClick={toggleEdit} size="tiny" />
       )}
     </>
   )
@@ -232,12 +222,6 @@ export const StudyGuidanceGroupOverview = ({ groups }) => {
       title: 'Name',
       getRowVal: group => getTextIn(group.name),
       getRowContent: group => <LinkToGroup group={group} />,
-      cellProps: {
-        style: {
-          padding: '0',
-        },
-        className: 'iconCellNoPointer',
-      },
     },
     {
       key: 'students',
@@ -245,11 +229,6 @@ export const StudyGuidanceGroupOverview = ({ groups }) => {
       filterType: 'range',
       getRowVal: group => group.members?.length || 0,
       getRowContent: group => group.members?.length || 0,
-      cellProps: {
-        style: {
-          textAlign: 'right',
-        },
-      },
     },
     {
       key: 'studyProgramme',
@@ -273,15 +252,17 @@ export const StudyGuidanceGroupOverview = ({ groups }) => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <div style={{ marginBottom: '30px' }}>
-        <StyledMessage>
-          <p>
-            Tällä sivulla pääset tarkastemaan ohjattavien opiskelijoidesi etenemistä ohjausryhmittäin. Voit halutessasi
-            lisätä ohjausryhmään aloitusvuoden ja koulutusohjelman, jolloin yksittäisen ohjausryhmän näkymään avautuu
-            lisäominaisuuksia.
-          </p>
-        </StyledMessage>
-      </div>
+      <StyledMessage style={{ marginBottom: '30px' }}>
+        <p>
+          Tällä sivulla pääset tarkastemaan ohjattavien opiskelijoidesi etenemistä ohjausryhmittäin. Voit halutessasi
+          lisätä ohjausryhmään aloitusvuoden ja koulutusohjelman, jolloin yksittäisen ohjausryhmän näkymään avautuu
+          lisäominaisuuksia.
+        </p>
+        <p>
+          Valitsemalla valikosta Special populations &gt; Students close to graduation voit tarkastella ohjausryhmiesi
+          lähellä valmistumista olevia opiskelijoita.
+        </p>
+      </StyledMessage>
       <div data-cy="Table-study-guidance-group-overview" style={{ margin: 'auto' }}>
         <SortableTable columns={headers} data={groups} hideHeaderBar singleLine={false} />
       </div>
