@@ -16,8 +16,6 @@ import { CheckStudentList } from './CheckStudentList'
 import { CoursesTabContainer as CoursesTab } from './StudentTable/CourseTab'
 import { GeneralTabContainer as GeneralTab } from './StudentTable/GeneralTab'
 import { ProgressTable } from './StudentTable/ProgressTab'
-import '@/components/PopulationCourseStats/populationCourseStats.css'
-import './populationStudents.css'
 
 const Panes = ({
   combinedProgramme,

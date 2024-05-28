@@ -8,8 +8,6 @@ import { StudentInfoItem } from '@/components/common/StudentInfoItem'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SortableTable, row } from '@/components/SortableTable'
 import { useStudentNameVisibility } from '@/components/StudentNameVisibilityToggle'
-import '@/components/PopulationCourseStats/populationCourseStats.css'
-import '@/components/PopulationStudents/populationStudents.css'
 import { useGetStudyGuidanceGroupPopulationCoursesQuery } from '@/redux/studyGuidanceGroups'
 
 const getMandatoryPassed = (mandatoryCourses, populationCourses, studyGuidanceCourses) => {
