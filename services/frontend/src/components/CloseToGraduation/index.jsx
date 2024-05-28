@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { useState } from 'react'
-import { Divider, Dropdown, Form, Icon, Loader, Message, Radio, Tab, Table } from 'semantic-ui-react'
+import { Divider, Dropdown, Form, Icon, Loader, Message, Radio, Tab } from 'semantic-ui-react'
 
 import {
   createLocaleComparator,
@@ -10,7 +10,9 @@ import {
   reformatDate,
 } from '@/common'
 import { useTitle } from '@/common/hooks'
+import { closeToGraduationToolTips } from '@/common/InfoToolTips'
 import { StudentInfoItem } from '@/components/common/StudentInfoItem'
+import { InfoBox } from '@/components/Info/InfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { getSemestersPresentFunctions } from '@/components/PopulationStudents/StudentTable/GeneralTab/columnHelpers/semestersPresent'
 import { PaginatedSortableTable } from '@/components/SortableTable/PaginatedSortableTable'
@@ -287,52 +289,8 @@ export const CloseToGraduation = () => {
     return (
       <Tab.Pane>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <InfoBox content={closeToGraduationToolTips} />
           <Form style={{ width: '100%', marginBottom: '1em' }}>
-            <Message info>
-              You can filter students by choosing a degree programme and/or a faculty. You can also select multiple
-              programmes or faculties. Please note that if you select a faculty, only the degree programmes of that
-              faculty will be shown.
-              <br />
-              <br />
-              Students are included in this list based on the number of credits they have completed in their primary
-              study plan. The limits for each study programme are as follows:
-              <Table basic="very" celled collapsing compact="very">
-                <Table.Body>
-                  <Table.Row>
-                    <Table.Cell>
-                      <b>Degree programme</b>
-                    </Table.Cell>
-                    <Table.Cell>
-                      <b>Limit</b>
-                    </Table.Cell>
-                  </Table.Row>
-                  <Table.Row>
-                    <Table.Cell>All bachelor's programmes</Table.Cell>
-                    <Table.Cell>160</Table.Cell>
-                  </Table.Row>
-                  <Table.Row>
-                    <Table.Cell>{programmes.find(p => p.value === 'MH90_001')?.text}</Table.Cell>
-                    <Table.Cell>150</Table.Cell>
-                  </Table.Row>
-                  <Table.Row>
-                    <Table.Cell>{programmes.find(p => p.value === 'MH30_001')?.text}</Table.Cell>
-                    <Table.Cell>330</Table.Cell>
-                  </Table.Row>
-                  <Table.Row>
-                    <Table.Cell>{programmes.find(p => p.value === 'MH30_003')?.text}</Table.Cell>
-                    <Table.Cell>300</Table.Cell>
-                  </Table.Row>
-                  <Table.Row>
-                    <Table.Cell>{programmes.find(p => p.value === 'MH30_004')?.text}</Table.Cell>
-                    <Table.Cell>115</Table.Cell>
-                  </Table.Row>
-                  <Table.Row>
-                    <Table.Cell>Other master's programmes</Table.Cell>
-                    <Table.Cell>85</Table.Cell>
-                  </Table.Row>
-                </Table.Body>
-              </Table>
-            </Message>
             <Form.Field>
               <label>Faculties</label>
               <Dropdown
