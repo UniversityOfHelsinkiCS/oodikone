@@ -32,7 +32,7 @@ const logInfoForGrafana = async (code, combinedProgramme) => {
   })
 }
 
-router.get('/v2/studyprogrammes/:id/basicstats', async (req, res) => {
+router.get('/:id/basicstats', async (req, res) => {
   const code = req.params.id
   const yearType = req.query?.year_type
   const specialGroups = req.query?.special_groups
@@ -55,7 +55,7 @@ router.get('/v2/studyprogrammes/:id/basicstats', async (req, res) => {
   return res.json(updated)
 })
 
-router.get('/v2/studyprogrammes/creditstats', async (req, res) => {
+router.get('/creditstats', async (req, res) => {
   const { codes: codesListString, isAcademicYear, includeSpecials } = req.query
   const codes = JSON.parse(codesListString)
   const stats = {}
@@ -65,7 +65,7 @@ router.get('/v2/studyprogrammes/creditstats', async (req, res) => {
   return res.json({ stats })
 })
 
-router.get('/v2/studyprogrammes/:id/graduationstats', async (req, res) => {
+router.get('/:id/graduationstats', async (req, res) => {
   const code = req.params.id
   const yearType = req.query?.year_type
   const specialGroups = req.query?.special_groups
@@ -87,7 +87,7 @@ router.get('/v2/studyprogrammes/:id/graduationstats', async (req, res) => {
   return res.json(updatedStats)
 })
 
-router.get('/v2/studyprogrammes/:id/coursestats', async (req, res) => {
+router.get('/:id/coursestats', async (req, res) => {
   const code = req.params.id
   const showByYear = req.query.academicyear
   const combinedProgramme = req.query?.combined_programme
@@ -103,7 +103,7 @@ router.get('/v2/studyprogrammes/:id/coursestats', async (req, res) => {
   }
 })
 
-router.get('/v2/studyprogrammes/:id/studytrackstats', async (req, res) => {
+router.get('/:id/studytrackstats', async (req, res) => {
   const code = req.params.id
   const graduated = req.query?.graduated
   const specialGroups = req.query?.special_groups
@@ -129,7 +129,7 @@ router.get('/v2/studyprogrammes/:id/studytrackstats', async (req, res) => {
   return res.json(updated)
 })
 
-router.get('/v2/studyprogrammes/:id/colorizedtablecoursestats', async (req, res) => {
+router.get('/:id/colorizedtablecoursestats', async (req, res) => {
   const code = req.params.id
 
   try {
@@ -140,7 +140,7 @@ router.get('/v2/studyprogrammes/:id/colorizedtablecoursestats', async (req, res)
   }
 })
 
-router.get('/v2/studyprogrammes/:id/update_basicview', async (req, res) => {
+router.get('/:id/update_basicview', async (req, res) => {
   const code = req.params.id
   const combinedProgramme = req.query?.combined_programme
   if (code) {
@@ -155,7 +155,7 @@ router.get('/v2/studyprogrammes/:id/update_basicview', async (req, res) => {
   res.status(422).end()
 })
 
-router.get('/v2/studyprogrammes/:id/update_studytrackview', async (req, res) => {
+router.get('/:id/update_studytrackview', async (req, res) => {
   const code = req.params.id
   const combinedProgramme = req.query?.combined_programme
   if (code) {
@@ -171,7 +171,7 @@ router.get('/v2/studyprogrammes/:id/update_studytrackview', async (req, res) => 
   res.status(422).end()
 })
 
-router.get('/v2/studyprogrammes/:id/evaluationstats', async (req, res) => {
+router.get('/:id/evaluationstats', async (req, res) => {
   const code = req.params.id
   const yearType = req.query?.year_type
   const specialGroups = req.query?.special_groups
