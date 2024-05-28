@@ -42,8 +42,9 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
   const encrypted = req.body.selectedStudents[0]?.encryptedData
 
   if (
+    !encrypted &&
     !hasFullAccessToStudentData(req.user.roles) &&
-    !req.body.selectedStudents.every(student => req.user.studentsUserCanAccess.includes(student))
+    req.body.selectedStudents.some(student => !req.user.studentsUserCanAccess.includes(student))
   ) {
     return res.status(403).json({ error: 'Trying to request unauthorized students data' })
   }
