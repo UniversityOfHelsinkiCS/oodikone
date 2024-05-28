@@ -24,15 +24,14 @@ const facultiesInOodi = [
   'Y01',
 ]
 
-const faculties = () => {
-  return Organization.findAll({
+const faculties = () =>
+  Organization.findAll({
     where: {
       code: {
         [Op.in]: facultiesInOodi,
       },
     },
   })
-}
 
 const providersOfFaculty = async facultyCode => {
   const [result] = await dbConnections.sequelize.query(
