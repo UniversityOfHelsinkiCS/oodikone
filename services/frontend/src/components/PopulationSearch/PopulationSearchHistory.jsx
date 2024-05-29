@@ -10,7 +10,6 @@ import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { InfoBox } from '@/components/Info/InfoBox'
 import { PopulationQueryCard } from '@/components/PopulationQueryCard'
 import { removePopulation, useGetProgrammesQuery } from '@/redux/populations'
-import { useGetTagsByStudyTrackQuery } from '@/redux/tags'
 import { FilterActiveNote } from './FilterActiveNote'
 import './populationSearch.css'
 
@@ -21,9 +20,6 @@ const getMonths = (year, term) => {
 
 const PopulationSearchHistory = ({ populations, removePopulation }) => {
   const { data: units } = useGetProgrammesQuery()
-  const { data: tags } = useGetTagsByStudyTrackQuery(populations?.query?.studyRights?.programme, {
-    skip: !populations?.query?.studyRights?.programme,
-  })
   const history = useHistory()
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false)
   const [semesters, setSemesters] = useState(
@@ -149,14 +145,10 @@ const PopulationSearchHistory = ({ populations, removePopulation }) => {
       <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
         <div>
           <PopulationQueryCard
-            key={`population-${populations.query.uuid}`}
             population={populations.data}
             query={populations.query}
-            queryId={0}
             removeSampleFn={removeThisPopulation}
-            tags={tags}
             units={[units.programmes[programmeCode], units.studyTracks[studyTrackCode]].filter(Boolean)}
-            updating={populations.updating}
           />
           <div style={{ marginLeft: '5px', marginTop: '15px' }}>
             <InfoBox content={populationStatisticsToolTips.QueryCard} />

@@ -1,4 +1,3 @@
-import fp from 'lodash/fp'
 import { Form, Dropdown, Message } from 'semantic-ui-react'
 
 import { createFilter } from './createFilter'
@@ -6,15 +5,27 @@ import { createFilter } from './createFilter'
 const TagsFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
   const name = 'tagsFilter'
 
-  const countsByTag = fp.flow(fp.map('tags'), fp.flatten, fp.countBy('tag.tagname'))(withoutSelf())
+  const tagCounts = withoutSelf().reduce((acc, student) => {
+    student.tags.forEach(tag => {
+      const {
+        tag_id: id,
+        tag: { tagname },
+      } = tag
+      if (!acc[id]) {
+        acc[id] = { count: 0, name: tagname }
+      }
+      acc[id].count += 1
+    })
+    return acc
+  }, {})
 
-  const dropdownOptions = Object.keys(countsByTag).map(tag => ({
-    key: `tag-${tag}`,
-    text: `${tag} (${countsByTag[tag]})`,
-    value: tag,
+  const dropdownOptions = Object.entries(tagCounts).map(([tagId, { count, name }]) => ({
+    key: `tag-${tagId}`,
+    text: `${name} (${count})`,
+    value: tagId,
   }))
 
-  if (Object.entries(countsByTag).length === 0) {
+  if (Object.entries(tagCounts).length === 0) {
     return (
       <Message color="orange" size="tiny">
         No tags have been defined for any of the selected students.
@@ -56,7 +67,7 @@ export const tagsFilter = createFilter({
   isActive: ({ selected }) => selected.length > 0,
 
   filter(student, { selected }) {
-    const tags = (student.tags ?? []).map(tag => tag.tag.tagname)
+    const tags = (student.tags ?? []).map(tag => tag.tag_id)
     return selected.some(tag => tags.includes(tag))
   },
 

@@ -5,10 +5,14 @@ import { Card, Icon } from 'semantic-ui-react'
 import { reformatDate } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { DISPLAY_DATE_FORMAT } from '@/constants'
+import { useGetTagsByStudyTrackQuery } from '@/redux/tags'
 
-export const PopulationQueryCard = ({ population, query, removeSampleFn, units, tags }) => {
+export const PopulationQueryCard = ({ population, query, removeSampleFn, units }) => {
   const { getTextIn } = useLanguage()
   const { uuid, year, semesters, months, studentStatuses, tag } = query
+  const { data: tags = [] } = useGetTagsByStudyTrackQuery(query?.studyRights?.programme, {
+    skip: !query?.studyRights?.programme,
+  })
   const tagname = tag && tags.length > 0 ? tags.find(t => t.tag_id === tag)?.tagname : ''
   const { students } = population
   const header = units.map(unit => getTextIn(unit.name)).join(', ')
