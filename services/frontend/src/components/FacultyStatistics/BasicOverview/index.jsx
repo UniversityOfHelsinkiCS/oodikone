@@ -47,31 +47,35 @@ export const BasicOverview = ({
   specialGroups,
   studyProgrammes,
 }) => {
+  const [showAll, setShowAll] = useState(false)
+  const { getTextIn } = useLanguage()
+
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
   const studyProgrammeFilter = studyProgrammes ? 'ALL_PROGRAMMES' : 'NEW_STUDY_PROGRAMMES'
   const special = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
-  const [showAll, setShowAll] = useState(false)
-  const credits = useGetFacultyCreditStatsQuery({
-    id: faculty?.code,
-    yearType,
-    studyProgrammeFilter,
-  })
+
   const basics = useGetFacultyBasicStatsQuery({
     id: faculty?.code,
     yearType,
     studyProgrammeFilter,
     specialGroups: special,
   })
+
   const thesisWriters = useGetFacultyThesisStatsQuery({
     id: faculty?.code,
     yearType,
     studyProgrammeFilter,
     specialGroups: special,
   })
-  const { getTextIn } = useLanguage()
+
+  const credits = useGetFacultyCreditStatsQuery({
+    id: faculty?.code,
+    yearType,
+    studyProgrammeFilter,
+  })
+
   const tableStats = credits.data ? makeTableStats(calculateTotals(credits.data), showAll, academicYear) : {}
   const graphStats = credits.data ? makeGraphData(calculateTotals(credits.data), showAll, academicYear) : null
-
   const programmeStats = credits.data?.ids.reduce((obj, id) => {
     return {
       ...obj,
@@ -130,6 +134,7 @@ export const BasicOverview = ({
       />
     </>
   )
+
   const isFetchingOrLoading =
     credits.isLoading ||
     credits.isFetching ||
@@ -403,9 +408,9 @@ export const BasicOverview = ({
               {getDivider(
                 'Credits produced by the faculty',
                 'CreditsProducedByTheFaculty',
-                credits?.data?.titles,
-                credits?.data?.tableStats,
-                credits?.data?.programmeTableStats,
+                tableStats?.titles,
+                tableStats?.data,
+                programmeStats,
                 credits?.data?.programmeNames
               )}
               <div>

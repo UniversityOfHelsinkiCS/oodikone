@@ -89,6 +89,7 @@ const setThesisWritersStats = async (data, yearType, programmeFilter, specialGro
   if (setOperationStatus !== 'OK') return null
   return dataToRedis
 }
+
 const getThesisWritersStats = async (id, yearType, programmeFilter, specialGroups) => {
   const redisKey = createRedisKeyForThesiswriters(id, yearType, programmeFilter, specialGroups)
   const dataFromRedis = await redisClient.getAsync(redisKey)
