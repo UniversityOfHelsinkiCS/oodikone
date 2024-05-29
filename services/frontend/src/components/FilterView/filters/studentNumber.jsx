@@ -6,31 +6,16 @@ import { filterToolTips } from '@/common/InfoToolTips'
 import { createFilter } from './createFilter'
 
 const IconButton = ({ onClick, ...props }) => (
-  <button
-    onClick={onClick}
-    style={{
-      alignSelf: 'stretch',
-      background: 'none',
-      border: 'none',
-      cursor: 'pointer',
-      padding: '0 0.15em',
-    }}
-    type="button"
-  >
-    <Icon {...props} style={_.merge(props.style ?? {}, { color: '#5a5a5a', marginRight: 0 })} />
-  </button>
+  <Button icon onClick={onClick} style={{ background: 'none', padding: '0 0.15em' }} type="button">
+    <Icon {...props} style={{ color: '#5a5a5a', marginRight: 0 }} />
+  </Button>
 )
 
 const EditableList = ({ value, onChange, renderLabel }) => {
   const [inputValue, setInput] = useState('')
 
   return (
-    <div
-      style={{
-        border: '1px solid #dbdbdb',
-        borderRadius: '3pt',
-      }}
-    >
+    <div style={{ border: '1px solid #dbdbdb', borderRadius: '3pt' }}>
       <ul
         style={{
           listStyle: 'none',
@@ -77,33 +62,22 @@ const EditableList = ({ value, onChange, renderLabel }) => {
           </li>
         )}
       </ul>
-      <div
-        style={{
-          alignItems: 'center',
-          borderTop: '1px solid #e6e6e7',
-          display: 'flex',
-          height: '1.75em',
-          width: '100%',
-        }}
-      >
+      <div style={{ borderTop: '1px solid #e6e6e7', display: 'flex', height: '1.75em' }}>
         <input
           onChange={event => setInput(event.target.value)}
           placeholder="Student number(s)"
           style={{
-            alignSelf: 'stretch',
             border: 'none',
-            borderBottomLeftRadius: '3pt',
+            outline: 'none',
             flexGrow: 1,
             fontSize: '0.9em',
             minWidth: 0,
             paddingLeft: '0.3em',
-            position: 'relative',
-            zIndex: 10,
           }}
           type="text"
           value={inputValue}
         />
-        <div style={{ alignSelf: 'stretch', backgroundColor: '#e6e6e7', width: '1px' }} />
+        <div style={{ backgroundColor: '#e6e6e7', width: '1px' }} />
         <IconButton
           name="plus"
           onClick={() => {
@@ -138,34 +112,25 @@ const StudentNumberFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
     })
   }
 
-  const labelRenderer = studentNumber =>
-    students.find(student => student.studentNumber === studentNumber) ? (
+  const labelRenderer = studentNumber => {
+    const studentIsPresent = students.some(student => student.studentNumber === studentNumber)
+    return (
       <Icon
-        name="check"
+        name={studentIsPresent ? 'check' : 'x'}
         style={{
-          color: '#31ac31',
+          color: studentIsPresent ? '#31ac31' : '#df4747',
           cursor: 'help',
           fontSize: '0.8em',
           marginLeft: '0.3em',
           position: 'relative',
           top: '-3px',
         }}
-        title="Filter was applied to this student"
-      />
-    ) : (
-      <Icon
-        name="x"
-        style={{
-          color: 'rgb(223, 71, 71)',
-          cursor: 'help',
-          fontSize: '0.8em',
-          marginLeft: '0.3em',
-          position: 'relative',
-          top: '-3px',
-        }}
-        title="This student was not present in the population"
+        title={
+          studentIsPresent ? 'Filter was applied to this student' : 'This student was not present in the population'
+        }
       />
     )
+  }
 
   return (
     <div>
