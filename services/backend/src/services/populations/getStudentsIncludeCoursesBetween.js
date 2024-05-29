@@ -27,6 +27,11 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
       {
         model: Tag,
         attributes: ['tag_id', 'tagname', 'personal_user_id'],
+        where: {
+          studytrack: {
+            [Op.in]: studyright,
+          },
+        },
       },
     ],
     where: {
