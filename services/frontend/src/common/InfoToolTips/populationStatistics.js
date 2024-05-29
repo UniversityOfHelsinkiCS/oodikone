@@ -1,17 +1,14 @@
 export const populationStatisticsToolTips = {
-  Advanced: `**Semesters:**  Jos haluaa tarkastella vain syyslukukaudella tai kevätlukukaudella aloittaneita, haluttu ajanjakso valitaan tästä.
+  Advanced: `Tässä näkymässä on **oletusarvoisesti** suodatettu pois
+  - vaihto-opiskelijat
+  - opiskelijat, joilla ei ole tutkintoon johtavaa opinto-oikeutta
+  - ohjelmasta poissiirtyneet opiskelijat
 
-  **Include:** Koulutusohjelmapopulaatiosta on oletusarvoisesti suodatettu pois ohjelmasta poissiirtyneet opiskelijat. Heidät voi sisällyttää mukaan lisäämällä ruksin ja noutamalla tulokset uudestaan (Fetch class with new settings).`,
-  // Koulutusohjelmapopulaatiosta on oletusarvoisesti suodatettu pois vaihto-opiskelijat ja erillisopinto-oikeudella opiskelevat. Näitä ryhmiä voi sisällyttää mukaan lisäämällä ruksin haluamaansa kohtaan.
-  QueryCard: `**Valitun koulutusohjelmavuosikurssin perustiedot.**
-  
-  **Sample size** luku sisältää läsnä- ja poissaolevaksi ilmoittautuneet opiskelijat, muttei "excludes"-ryhmiä, jotka voi määritellä "advanced settings" -kohdasta.
-  
-  **Fall** = 1.8. - 31.12. ilmoittautuneet ja **Spring** = 1.1. - 31.7. ilmoittautuneet.
-  
-  **Showing XX months**: Dataa näytetään ohjelman vuosikurssin alkamispäivästä lähtien haluttuun kuukauteen asti (oletusarvoisesti "tähän päivään").
-  
-  **Updated** kertoo milloin data on päivitetty.`,
+  Oletusarvoisia asetuksia voi muuttaa ”Advanced settings”-kohdassa.
+
+  **Starting semesters:** Jos haluaa tarkastella vain syyslukukaudella (1.8.–31.12.) tai kevätlukukaudella (1.1.–31.7.) aloittaneita, haluttu ajanjakso valitaan tästä.
+
+  **Include:** Oletusarvoisesti pois suodatetut ryhmät voi sisällyttää mukaan ja klikkaamalla ”Fetch class with new settings”-painiketta.`,
   CreditAccumulation: `**Credit accumulation**
   
   Opiskelijoiden kumulatiiviset opintopistekertymät opiskelijakohtaisina kuvaajina.
@@ -184,40 +181,6 @@ export const populationStatisticsToolTips = {
   **Programme**-sarake näyttää opiskelijan uusimman opinto-oikeuden. Jos opiskelijalla on opinto-oikeuksia muihinkin koulutusohjelmiin, ne näkyvät aikajärjestyksessä uusimmasta vanhimpaan Excel-tiedostossa, sekä laittamalla hiiri koulutusohjelman päälle.
 
   `,
-  Filters: {
-    Add: `Harmaata ”add” painiketta klikkaamalla aukeaa filters- eli suodatinvalikko, 
-    josta voi lisätä haluamiaan suodattimia, jotka rajaavat valittua populaatiota.`,
-    Filters: `Valitut suodattimet näkyvät tässä. Suodattimia voi poistaa klikkaamalla mustaa rastia.
-    <br> <br>
-    **Show excluded students only**: Tällä liukukytkimellä voi valita suodatuksien komplementin,
-    eli liukukytkin päällä saa näkyviin poissuodatetut opiskelijat.
-    <br> <br>
-    **Clear all filters**: Poistaa kerralla valitut filtterit.
-    <br> <br>
-    **Save filters as preset**: Voit tallentaa tekemäsi filtteri-yhdistelmän myöhempää käyttöä varten.`,
-    CreditsAtLeast: 'Suodattaa pois opiskelijat, joilla on alle annetun määrän opintopisteitä',
-    CreditsLessThan: 'Suodattaa pois opiskelijat, joilla on yli annetun määrän opintopisteitä',
-    GradeMeanFilter: 'Suodattaa pois opiskelijat, joilla on yli/alle annetun numeron keskiarvo',
-    CreditsLessThanFromMandatory: `Suodattaa pois opiskelijat, joilla on yli
-    annetun määrän opintopisteitä pakollisista kursseista`,
-    StartingThisSemester: 'Suodattaa opiskelijat, jotka aloittivat opiskelun valittuna lukuvuonna tai sitä ennen',
-    EnrollmentStatus: 'Näyttää opiskelijat, jotka olivat läsnä- tai poissaolevana valittuina lukukausina',
-    CanceledStudyright: 'Suodattaa opiskelijat, jotka ovat/eivät ole ilmoittautuneet läsnä- tai poissaoleviksi',
-    ExtentGraduated: 'Suodattaa opiskelijat, jotka ovat/eivät ole valmistuneet.',
-    TransferFilter: `Voit valita opiskelijat, jotka ovat vaihtaneet annetusta koulutusohjelmasta toiseen.
-      Vaihtaminen tarkoittaa sitä, kun opiskelija vaihtaa koulutusohjelmaansa kesken opinto-oikeutensa.
-      (eikä opiskelijaa joka saa opinto-oikeuden joltakin toiselta instituutiolta)`,
-    PriorityStudyright: 'placeholder',
-    TransferToStudyrightFilter: 'Suodattaa pois opiskelijat jotka eivät ole vaihtaneet kyseiseen ohjelmaan',
-    TagFilter: "Suodattaa opiskelijat jotka ovat/eivät ole merkitty valitulla 'tagilla'",
-    CourseCreditFilter: 'Suodattaa pois opikelijat joilla enemmän tai vähemmän opintopisteitä kurssista',
-    GradeFilter: 'Suodattaa pois opiskelijat joilla muu arvosana',
-    ProgrammeFilter: 'Suodattaa pois opiskelijat jotka eivät ole valitussa ohjelmassa',
-    CreditsBeforeStudyright:
-      'Suodattaa pois opiskelijat joilla vähemmän opintopisteitä ennen kyseisessä ohjelmassa aloittamista',
-    StudytrackFilter: 'Palauttaa opiskelijat joilla on valittu kyseinen suuntautumisvaihtoehto',
-  },
-  ProgrammeDistributionCustomPopulation: 'Näyttää opiskelijan viimeisimmän koulutusohjelman',
   ProgrammeDistributionCoursePopulation: 'Näyttää sen koulutusohjelman, jossa opiskelija oli suorittaessaan kurssin',
   GradeDistributionCoursePopulation: 'Näyttää korkeimman arvosanan, jonka opiskelija on saanut valitulla aikavälillä.',
   CreditDistributionCoursePopulation: 'Näyttää tiedekunta-/ohjelmankohtaisen opintopistejakauman.',
