@@ -275,7 +275,7 @@ const count = async (
           data.programmes.medians[level][year].data = [
             ...data.programmes.medians[level][year].data,
             {
-              y: progMedian,
+              median: progMedian,
               amount: programmes[level][year][prog.code].graduationAmounts,
               statistics: progStatistics,
               name: prog.name,
@@ -287,10 +287,10 @@ const count = async (
       data.medians[level] = [
         ...data.medians[level],
         {
-          y: median,
+          median,
           amount: graduationAmounts[level][year],
-          /* Include invidivual graduation times for the sake of university-level evaluation overview (UniversityView) 
-            which has to count medians by itself 
+          /* Include individual graduation times for the sake of university-level
+             evaluation overview (UniversityView) which has to count medians by itself 
           */
           times: graduationTimes[level][year],
           statistics,

@@ -240,7 +240,6 @@ export const BasicOverview = ({
           value={specialGroups}
         />
       </div>
-
       {isFetchingOrLoading ? (
         <Loader active style={{ marginTop: '15em' }} />
       ) : (
