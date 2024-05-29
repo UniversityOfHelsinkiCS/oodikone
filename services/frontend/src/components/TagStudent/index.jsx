@@ -1,30 +1,32 @@
 import { arrayOf, string, shape } from 'prop-types'
-import { Dropdown, Icon, Label, Table } from 'semantic-ui-react'
+import { useState } from 'react'
+import { Button, Dropdown, Icon, Label, Table } from 'semantic-ui-react'
 
 import { useDeleteStudentTagsMutation, useCreateStudentTagsMutation } from '@/redux/tags'
 import { useStudentNameVisibility } from '../StudentNameVisibilityToggle'
 
 export const TagStudent = ({ studentnumber, studentstags, studytrack, tagOptions, studentname, combinedProgramme }) => {
   const [deleteStudentTags] = useDeleteStudentTagsMutation()
-  const [createStudentTags] = useCreateStudentTagsMutation()
-
+  const [createStudentTags, { isLoading }] = useCreateStudentTagsMutation()
   const { visible: namesVisible } = useStudentNameVisibility()
-  const handleChange = (event, { value }) => {
-    event.preventDefault()
-    createStudentTags({
-      tags: [{ tag_id: value, studentnumber }],
+  const [selectedTags, setSelectedTags] = useState([])
+
+  const handleSave = async () => {
+    await createStudentTags({
+      tags: selectedTags.map(tag => ({ tag_id: tag, studentnumber })),
       studytrack,
       combinedProgramme,
     })
+    setSelectedTags([])
   }
 
-  const deleteTag = (event, tag) => {
+  const deleteTag = tag => {
     deleteStudentTags({ tagId: tag.tag_id, studentnumbers: [studentnumber], studytrack, combinedProgramme })
   }
 
   const studentsTags = studentstags.map(t => (
     <Label color={t.tag.personal_user_id ? 'purple' : null} key={`${studentnumber}-${t.tag.tag_id}`}>
-      {t.tag.tagname} <Icon link name="delete" onClick={event => deleteTag(event, t.tag)} />
+      {t.tag.tagname} <Icon link name="delete" onClick={() => deleteTag(t.tag)} />
     </Label>
   ))
 
@@ -34,15 +36,22 @@ export const TagStudent = ({ studentnumber, studentstags, studytrack, tagOptions
       <Table.Cell>{studentnumber}</Table.Cell>
       <Table.Cell>{studentsTags}</Table.Cell>
       <Table.Cell>
-        <Dropdown
-          onChange={handleChange}
-          options={tagOptions}
-          placeholder="Tag"
-          search
-          selectOnBlur={false}
-          selectOnNavigation={false}
-          selection
-        />
+        <div style={{ display: 'flex', gap: '0.5em' }}>
+          <Dropdown
+            clearable
+            multiple
+            onChange={(_, { value }) => setSelectedTags(value)}
+            options={tagOptions}
+            search
+            selectOnBlur={false}
+            selectOnNavigation={false}
+            selection
+            value={selectedTags}
+          />
+          <Button disabled={!selectedTags.length} loading={isLoading} onClick={handleSave} positive>
+            Save
+          </Button>
+        </div>
       </Table.Cell>
     </Table.Row>
   )
