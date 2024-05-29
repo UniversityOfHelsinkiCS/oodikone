@@ -178,7 +178,8 @@ export const PopulationStatistics = () => {
           selected: query?.studyRights?.studyTrack ? [query?.studyRights?.studyTrack] : [],
         },
         [tagsFilter.key]: {
-          selected: query?.tag ? [query.tag] : [],
+          includedTags: query?.tag ? [query.tag] : [],
+          excludedTags: [],
         },
       }}
       name="PopulationStatistics"
