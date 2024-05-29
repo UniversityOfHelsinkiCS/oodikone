@@ -64,7 +64,7 @@ router.get('/stats', async (req, res) => {
     ...new Set(
       await providers.reduce(
         async (acc, curr) =>
-          isFaculty(curr) ? [...(await acc), ...(await providersOfFaculty(curr))] : [...(await acc), curr],
+          (await isFaculty(curr)) ? [...(await acc), ...(await providersOfFaculty(curr))] : [...(await acc), curr],
         []
       )
     ),

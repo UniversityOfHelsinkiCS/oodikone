@@ -29,7 +29,7 @@ const refreshStudyrightAssociations = async () => {
 
 const refreshFaculties = async () => {
   logger.info('Adding jobs to refresh all faculties')
-  const facultyList = (await faculties()).filter(f => !['Y', 'H99', 'Y01', 'H92', 'H930'].includes(f.code))
+  const facultyList = await faculties()
   for (const faculty of facultyList) {
     jobMaker.faculty(faculty.code)
   }

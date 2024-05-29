@@ -3,32 +3,14 @@ const { Op } = require('sequelize')
 const { dbConnections } = require('../database/connection')
 const { Organization } = require('../models')
 
-// Have facultyfetching to work like it worked during oodi-db time
-const facultiesInOodi = [
-  'H10',
-  'H20',
-  'H30',
-  'H40',
-  'H50',
-  'H55',
-  'H57',
-  'H60',
-  'H70',
-  'H74',
-  'H80',
-  'H90',
-  'H92',
-  'H930',
-  'H99',
-  'Y',
-  'Y01',
-]
+const facultyParentIds = ['hy-org-2024-03-27-1', 'hy-org-2024-03-27-5']
 
 const faculties = () =>
   Organization.findAll({
+    attributes: ['id', 'code', 'name'],
     where: {
-      code: {
-        [Op.in]: facultiesInOodi,
+      parent_id: {
+        [Op.in]: facultyParentIds,
       },
     },
   })
@@ -45,7 +27,7 @@ const providersOfFaculty = async facultyCode => {
   return result.map(({ code }) => code)
 }
 
-const isFaculty = facultyCode => facultiesInOodi.includes(facultyCode)
+const isFaculty = async facultyCode => (await faculties()).some(faculty => faculty.code === facultyCode)
 
 module.exports = {
   faculties,
