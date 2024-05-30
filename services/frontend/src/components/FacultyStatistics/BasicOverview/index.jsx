@@ -252,14 +252,14 @@ export const BasicOverview = ({
         <>
           {studyProgrammeFilter === 'ALL_PROGRAMMES' && (
             <Message data-cy="FacultyProgrammesShownInfo">
-              Please note that the data is complete only for current Bachelor, Masters and Doctoral programmes.
+              Please note that the data is complete only for current Bachelor's, Master's and Doctoral programmes.
               Especially, credits and thesis writers contain only data for current programmes.
             </Message>
           )}
           {special === 'SPECIAL_EXCLUDED' && (
             <Message data-cy="FacultyExcludeSpecialsInfo">
-              Please note: exluding the special studyrights does not have any effects to credits produced by faculty
-              -view.
+              Please note that excluding the special studyrights does not affect the "Credits produced by the faculty"
+              view.
             </Message>
           )}
           {basics.isSuccess && basics.data && (
