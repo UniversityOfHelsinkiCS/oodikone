@@ -53,7 +53,6 @@ const getProgrammes = async (code, programmeFilter = 'NEW_STUDY_PROGRAMMES') => 
   if (programmes) return programmes
   let updatedProgrammes = await findFacultyProgrammeCodes(code, programmeFilter)
   if (updatedProgrammes) updatedProgrammes = await setFacultyProgrammes(code, updatedProgrammes, programmeFilter)
-
   return updatedProgrammes
 }
 
@@ -121,13 +120,6 @@ const getGraduationStats = async (id, programmeFilter, keepGraduationTimes = fal
   return data
 }
 
-const getFacultyProgressStats = async (id, specialGroups, graduated) => {
-  const redisKey = createRediskeyForFacultyProgress(id, specialGroups, graduated)
-  const dataFromRedis = await redisClient.getAsync(redisKey)
-  if (!dataFromRedis) return null
-  return JSON.parse(dataFromRedis)
-}
-
 const setFacultyProgressStats = async (data, specialGroups, graduated) => {
   const { id } = data
   const redisKey = createRediskeyForFacultyProgress(id, specialGroups, graduated)
@@ -141,8 +133,8 @@ const setFacultyProgressStats = async (data, specialGroups, graduated) => {
   return dataToRedis
 }
 
-const getFacultyStudentStats = async (id, specialGroups, graduated) => {
-  const redisKey = createRediskeyForFacultyStudents(id, specialGroups, graduated)
+const getFacultyProgressStats = async (id, specialGroups, graduated) => {
+  const redisKey = createRediskeyForFacultyProgress(id, specialGroups, graduated)
   const dataFromRedis = await redisClient.getAsync(redisKey)
   if (!dataFromRedis) return null
   return JSON.parse(dataFromRedis)
@@ -161,6 +153,13 @@ const setFacultyStudentStats = async (data, specialGroups, graduated) => {
   return dataToRedis
 }
 
+const getFacultyStudentStats = async (id, specialGroups, graduated) => {
+  const redisKey = createRediskeyForFacultyStudents(id, specialGroups, graduated)
+  const dataFromRedis = await redisClient.getAsync(redisKey)
+  if (!dataFromRedis) return null
+  return JSON.parse(dataFromRedis)
+}
+
 module.exports = {
   setFacultyProgrammes,
   getProgrammes,
@@ -170,8 +169,8 @@ module.exports = {
   getThesisWritersStats,
   setGraduationStats,
   getGraduationStats,
-  getFacultyProgressStats,
   setFacultyProgressStats,
-  getFacultyStudentStats,
+  getFacultyProgressStats,
   setFacultyStudentStats,
+  getFacultyStudentStats,
 }

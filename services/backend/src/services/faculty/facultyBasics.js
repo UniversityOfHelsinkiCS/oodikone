@@ -232,6 +232,7 @@ const getInsideTransfers = async (programmeCodes, allProgrammeCodes, since, incl
   const filteredTransfers = insiders.filter(tr => studyrights.includes(tr.studyrightid))
   return filteredTransfers
 }
+
 const getFacultyTransfers = async (
   programmes,
   programmeCodes,
@@ -374,6 +375,7 @@ const combineFacultyBasics = async (faculty, programmes, yearType, allProgrammeC
   }
   const transfersToAwayStudyrights = await getTransferredToAndAway(wantedProgrammeCodes, allProgrammeCodes, since)
   const transferInsideStudyrights = await getTransferredInside(wantedProgrammeCodes, allProgrammeCodes, since)
+
   // Started studying in faculty
   await getFacultyStarters(
     faculty,
