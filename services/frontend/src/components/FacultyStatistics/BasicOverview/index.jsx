@@ -153,15 +153,18 @@ export const BasicOverview = ({
       thesisWriters.isSuccess &&
       !thesisWriters.data)
 
-  if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
+  if (isError) {
+    return <h3>Something went wrong, please try refreshing the page.</h3>
+  }
 
   const creditSortingTitles = ['Code', 'Total', 'Degree', 'Open uni', 'Exchange', 'Transferred']
-  if (showAll) creditSortingTitles.push('Special', 'Other university')
-  let transferShortTitles = []
+  if (showAll) {
+    creditSortingTitles.push('Special', 'Other university')
+  }
+
+  const transferShortTitles = ['Code', 'Started', 'Graduated']
   if (special === 'SPECIAL_INCLUDED') {
-    transferShortTitles = ['Code', 'Started', 'Graduated', 'Transferred in', 'Transferred away', 'Transferred to']
-  } else {
-    transferShortTitles = ['Code', 'Started', 'Graduated']
+    transferShortTitles.push('Transferred in', 'Transferred away', 'Transferred to')
   }
 
   const options = {
@@ -174,7 +177,9 @@ export const BasicOverview = ({
   }
 
   const getChartPlotLinePlaces = programmeKeys => {
-    if (programmeKeys.length === 0) return []
+    if (programmeKeys.length === 0) {
+      return []
+    }
     let key = programmeKeys[0][1].slice(0, 2)
     if (!['KH', 'MH', 'T', 'LIS'].includes(key)) {
       key = 'OTHER'
