@@ -1,7 +1,7 @@
 const Sentry = require('@sentry/node')
 const _ = require('lodash')
 
-const { requiredGroup } = require('../conf-backend')
+const { requiredGroup, serviceProvider, logoutUrl } = require('../conf-backend')
 const { getUser, getMockedUser, getOrganizationAccess } = require('../services/userService')
 const { ApplicationError } = require('../util/customErrors')
 const logger = require('../util/logger')
@@ -11,7 +11,7 @@ const parseIamGroups = iamGroups => iamGroups?.split(';') ?? []
 const hasRequiredIamGroup = (iamGroups, iamRights) =>
   _.intersection(iamGroups, requiredGroup).length > 0 || iamRights.length > 0
 
-const currentUserMiddleware = async (req, _res, next) => {
+const toskaUserMiddleware = async (req, _res, next) => {
   const {
     'shib-session-id': sessionId,
     'x-show-as-user': showAsUser,
@@ -60,5 +60,27 @@ const currentUserMiddleware = async (req, _res, next) => {
 
   next()
 }
+
+const fdUserMiddleware = async (req, _res, next) => {
+  const { remote_user: remoteUser } = req.headers
+
+  if (!remoteUser) {
+    throw new ApplicationError('Not enough data in request headers, remote_user was missing', 403, { logoutUrl })
+  }
+
+  // getMockedUser (above) requires the superAdmin-role, which is only available via iamGroups, so it's not applicable here atm
+  const user = await getUser({ username: remoteUser })
+
+  if (!user) {
+    throw new ApplicationError(`Could not grant access with the eppn ${remoteUser}.`, 403, { logoutUrl })
+  }
+
+  req.user = user
+  req.logoutUrl = logoutUrl
+
+  next()
+}
+
+const currentUserMiddleware = serviceProvider === 'Toska' ? toskaUserMiddleware : fdUserMiddleware
 
 module.exports = currentUserMiddleware

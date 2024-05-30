@@ -2,7 +2,7 @@ const Sentry = require('@sentry/node')
 const axios = require('axios')
 
 const logger = require('./logger')
-const { importerToken, jamiUrl } = require('../conf-backend')
+const { importerToken, jamiUrl, serviceProvider } = require('../conf-backend')
 
 const jamiClient = axios.create({
   baseURL: jamiUrl,
@@ -69,7 +69,7 @@ const testJami = async () => {
   }
 }
 
-testJami()
+if (serviceProvider === 'Toska') testJami()
 
 module.exports = {
   getUserIamAccess,

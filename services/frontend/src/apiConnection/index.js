@@ -15,6 +15,7 @@ const getHeaders = () => {
     mail: 'grp-toska+mockmluukkai@helsinki.fi',
     hyPersonSisuId: 'hy-hlo-1441871',
     shib_logout_url: 'https://helsinki.fi/shibboleth-sp/Logout',
+    remote_user: 'mluukkai',
   }
   const headers = isDev ? { ...devUserHeaders } : {}
 
