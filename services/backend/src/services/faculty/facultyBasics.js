@@ -1,20 +1,20 @@
 const { indexOf, isArray } = require('lodash')
 const moment = require('moment')
 
-const {
-  startedStudyrights,
-  graduatedStudyrights,
-  transferredInsideFaculty,
-  transferredAway,
-  transferredTo,
-  getTransferredToAndAway,
-  getTransferredInside,
-  studyrightsByRightStartYear,
-  getTransfersIn,
-} = require('./faculty')
-const { findRightProgramme, isNewProgramme, checkTransfers, getExtentFilter } = require('./facultyHelpers')
 const { codes } = require('../../../config/programmeCodes')
-const { getStatsBasis, getYearsArray, defineYear } = require('../studyprogramme/studyprogrammeHelpers')
+const { defineYear, getStatsBasis, getYearsArray } = require('../studyprogramme/studyprogrammeHelpers')
+const {
+  getTransferredInside,
+  getTransferredToAndAway,
+  getTransfersIn,
+  graduatedStudyrights,
+  startedStudyrights,
+  studyrightsByRightStartYear,
+  transferredAway,
+  transferredInsideFaculty,
+  transferredTo,
+} = require('./faculty')
+const { checkTransfers, findRightProgramme, getExtentFilter, isNewProgramme } = require('./facultyHelpers')
 
 const filterDuplicateStudyrights = studyrights => {
   // bachelor+master students have two studyrights (separated by two last digits in studyrightid)

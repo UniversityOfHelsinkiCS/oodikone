@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 const _ = require('lodash')
 
-const { parseCsv } = require('./helpers')
 const { computeCreditsProduced } = require('../services/providerCredits')
+const { parseCsv } = require('./helpers')
 
 const diffs = []
 const noDiffCounter = 0

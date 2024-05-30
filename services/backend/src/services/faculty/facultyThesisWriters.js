@@ -1,15 +1,15 @@
 const { indexOf } = require('lodash')
 
-const { thesisWriters } = require('./faculty')
 const { mapToProviders } = require('../../util/utils')
 const {
-  getStatsBasis,
-  getYearsArray,
-  defineYear,
-  getCorrectStudentnumbers,
   alltimeEndDate,
   alltimeStartDate,
+  defineYear,
+  getCorrectStudentnumbers,
+  getStatsBasis,
+  getYearsArray,
 } = require('../studyprogramme/studyprogrammeHelpers')
+const { thesisWriters } = require('./faculty')
 
 const getFacultyThesisWriters = async ({ since, years, isAcademicYear, facultyProgrammes, includeAllSpecials }) => {
   const thesisTypes = ['urn:code:course-unit-type:bachelors-thesis', 'urn:code:course-unit-type:masters-thesis']

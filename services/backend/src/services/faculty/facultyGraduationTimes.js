@@ -1,11 +1,11 @@
 const moment = require('moment')
 
-const { graduatedStudyrights, studyrightsByRightStartYear, hasMasterRight } = require('./faculty')
-const { findRightProgramme, isNewProgramme } = require('./facultyHelpers')
-const { getProgrammes } = require('./facultyService')
 const { codes } = require('../../../config/programmeCodes')
 const { bachelorStudyright, countTimeCategories, getStatutoryAbsences } = require('../graduationHelpers')
-const { getYearsArray, getYearsObject, getMedian, defineYear } = require('../studyprogramme/studyprogrammeHelpers')
+const { defineYear, getMedian, getYearsArray, getYearsObject } = require('../studyprogramme/studyprogrammeHelpers')
+const { graduatedStudyrights, hasMasterRight, studyrightsByRightStartYear } = require('./faculty')
+const { findRightProgramme, isNewProgramme } = require('./facultyHelpers')
+const { getProgrammes } = require('./facultyService')
 
 const sortProgrammes = data => {
   const check = name => {

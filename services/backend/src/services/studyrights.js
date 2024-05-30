@@ -2,12 +2,12 @@ const _ = require('lodash')
 const moment = require('moment')
 const { Op, col, where, fn } = require('sequelize')
 
-const { redisClient } = require('./redis')
 const {
   dbConnections: { sequelize },
 } = require('../database/connection')
-const { Studyright, StudyrightElement, ElementDetail, Transfer } = require('../models')
+const { ElementDetail, Studyright, StudyrightElement, Transfer } = require('../models')
 const logger = require('../util/logger')
+const { redisClient } = require('./redis')
 
 const REDIS_KEY = 'STUDYRIGHT_ASSOCIATIONS_V2'
 

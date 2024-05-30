@@ -1,7 +1,7 @@
 const moment = require('moment')
 
-const { findFacultyProgrammeCodes } = require('./faculty')
 const { redisClient } = require('../redis')
+const { findFacultyProgrammeCodes } = require('./faculty')
 
 const createRedisKeyForFacultyProgrammes = (id, programmeFilter) => `FACULTY_PROGRAMMES_${id}_${programmeFilter}`
 const createRedisKeyForBasicStats = (id, yearType, programmeFilter, specialGroups) =>

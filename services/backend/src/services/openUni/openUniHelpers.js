@@ -8,7 +8,7 @@ const mapOpenCredits = credit => {
   }
 }
 
-const mapStundentInfo = student => {
+const mapStudentInfo = student => {
   const { email, secondary_email, studentnumber } = student
   return {
     studentnumber,
@@ -43,4 +43,4 @@ const mapCourseInfo = course => {
   }
 }
 
-module.exports = { mapOpenCredits, mapOpenEnrollments, mapStundentInfo, mapStudyRights, mapCourseInfo }
+module.exports = { mapOpenCredits, mapOpenEnrollments, mapStudentInfo, mapStudyRights, mapCourseInfo }
