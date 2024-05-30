@@ -6,13 +6,14 @@ import { userToolTips } from '@/common/InfoToolTips'
 import { FilterOldProgrammesToggle } from '@/components/common/FilterOldProgrammesToggle'
 import { InfoBox } from '@/components/Info/InfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { useGetAllElementDetailsQuery } from '@/redux/elementdetails'
 import { useGetUnfilteredProgrammesQuery } from '@/redux/populations'
 import { useAddUserUnitsMutation, useRemoveUserUnitsMutation } from '@/redux/users'
 
-const mapAndSortProgrammes = (programmes, allProgrammes, getTextIn) =>
+const mapAndSortProgrammes = (programmes, elementdetails, getTextIn) =>
   programmes
     .map(({ code, limited }) => {
-      const elementInfo = allProgrammes[code]
+      const elementInfo = elementdetails.find(element => element.code === code)
       return { code, name: getTextIn(elementInfo?.name), limited }
     })
     .sort(createLocaleComparator('name'))
@@ -25,9 +26,9 @@ export const AccessRights = ({ user }) => {
   const [accessRightsToBeAdded, setAccessRightsToBeAdded] = useState([])
   const [accessRightsToBeRemoved, setAccessRightsToBeRemoved] = useState([])
   const [filterOldProgrammes, setFilterOldProgrammes] = useState(true)
-  const { data: programmesAndStudyTracks = {} } = useGetUnfilteredProgrammesQuery()
-  const allProgrammes = programmesAndStudyTracks?.programmes || {}
-  const programmes = Object.values(allProgrammes || {})
+  const { data: elementdetails = [] } = useGetAllElementDetailsQuery()
+  const { data: allProgrammes } = useGetUnfilteredProgrammesQuery()
+  const programmes = Object.values(allProgrammes?.programmes || {})
     .filter(programme => !getUserFullProgrammeRights(programmeRights).includes(programme.code))
     .map(({ code, name }) => ({ code, name }))
   const [addUserUnitsMutation, addResult] = useAddUserUnitsMutation()
@@ -59,7 +60,7 @@ export const AccessRights = ({ user }) => {
 
   const currentRegularAccessRights = mapAndSortProgrammes(
     programmeRights.filter(({ isIamBased }) => !isIamBased),
-    allProgrammes,
+    elementdetails,
     getTextIn
   )
 
@@ -69,7 +70,7 @@ export const AccessRights = ({ user }) => {
 
   const currentIamAccessRights = mapAndSortProgrammes(
     programmeRights.filter(({ isIamBased }) => isIamBased),
-    allProgrammes,
+    elementdetails,
     getTextIn
   )
 

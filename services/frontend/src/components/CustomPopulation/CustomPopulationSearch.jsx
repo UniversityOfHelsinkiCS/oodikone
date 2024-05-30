@@ -10,7 +10,7 @@ import {
   useGetCustomPopulationSearchesQuery,
   useUpdateCustomPopulationSearchMutation,
 } from '@/redux/customPopulationSearch'
-import { useFilteredAndFormattedProgrammes } from '@/redux/populations'
+import { useFilteredAndFormattedElementDetails } from '@/redux/elementdetails'
 
 export const CustomPopulationSearch = ({ setCustomPopulationState }) => {
   const [modal, setModal] = useState(false)
@@ -18,7 +18,7 @@ export const CustomPopulationSearch = ({ setCustomPopulationState }) => {
   const [name, setName] = useState('')
   const [associatedProgramme, setAssociatedProgramme] = useState('')
   const [selectedSearch, setSelectedSearch] = useState(null)
-  const programmes = useFilteredAndFormattedProgrammes()
+  const programmes = useFilteredAndFormattedElementDetails()
 
   useTitle('Custom population')
 

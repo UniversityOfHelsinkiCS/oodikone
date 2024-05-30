@@ -25,8 +25,9 @@ import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/Po
 import { PopulationStudentsContainer as PopulationStudents } from '@/components/PopulationStudents'
 import { ProgressBar } from '@/components/ProgressBar'
 import { RightsNotification } from '@/components/RightsNotification'
+import { useFilteredAndFormattedElementDetails } from '@/redux/elementdetails'
 import { useGetStudentListCourseStatisticsQuery } from '@/redux/populationCourses'
-import { useGetCustomPopulationQuery, useFilteredAndFormattedProgrammes } from '@/redux/populations'
+import { useGetCustomPopulationQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { CustomPopulationProgrammeDist } from './CustomPopulationProgrammeDist'
 import { CustomPopulationSearch } from './CustomPopulationSearch'
@@ -105,7 +106,7 @@ const CustomPopulationContent = ({
   setCustomPopulationState,
   isFetchingPopulation,
 }) => {
-  const studyProgrammes = useFilteredAndFormattedProgrammes()
+  const studyProgrammes = useFilteredAndFormattedElementDetails()
   const [studentAmountLimit, setStudentAmountLimit] = useState(0)
 
   const discardedStudentNumbers = studentData?.discardedStudentNumbers

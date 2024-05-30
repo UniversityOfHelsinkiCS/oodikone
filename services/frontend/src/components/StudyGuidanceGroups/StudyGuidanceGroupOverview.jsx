@@ -7,7 +7,7 @@ import { textAndDescriptionSearch } from '@/common'
 import { useToggle } from '@/common/hooks'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SortableTable } from '@/components/SortableTable'
-import { useFilteredAndFormattedProgrammes } from '@/redux/populations'
+import { useFilteredAndFormattedElementDetails } from '@/redux/elementdetails'
 import { useChangeStudyGuidanceGroupTagsMutation } from '@/redux/studyGuidanceGroups'
 import { startYearToAcademicYear, StyledMessage } from './common'
 import './StudyGuidanceGroupOverview.css'
@@ -214,7 +214,7 @@ const TagCell = ({ group, studyProgrammes, tagName }) => {
 
 export const StudyGuidanceGroupOverview = ({ groups }) => {
   const { getTextIn } = useLanguage()
-  const studyProgrammes = useFilteredAndFormattedProgrammes()
+  const studyProgrammes = useFilteredAndFormattedElementDetails()
 
   const headers = [
     {
