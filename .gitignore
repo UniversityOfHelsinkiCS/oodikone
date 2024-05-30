@@ -46,3 +46,8 @@ jspm_packages/
 
 # Oodikone related stuff
 .databasedumps
+
+# Cypress
+cypress/downloads
+cypress/screenshots
+cypress/videos
