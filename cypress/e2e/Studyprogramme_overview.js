@@ -23,7 +23,7 @@ const getEmptyYears = isAcademicYear => {
 }
 
 describe('Studyprogramme overview', () => {
-  /* Basic information overview -tests*/
+  /* Basic information overview -tests */
   describe('Basic information -view works for basic user', () => {
     beforeEach(() => {
       cy.init('/study-programme')
@@ -221,7 +221,7 @@ describe('Studyprogramme overview', () => {
     })
   })
 
-  /* Studytrack overview -tests*/
+  /* Studytrack overview -tests */
   describe('Studytrack overview works for basic user', () => {
     beforeEach(() => {
       cy.init('/study-programme')
@@ -284,7 +284,7 @@ describe('Studyprogramme overview', () => {
     })
   })
 
-  /* Programme courses -tests*/
+  /* Programme courses -tests */
   describe('Programme courses works for basic user', () => {
     beforeEach(() => {
       cy.init('/study-programme')
@@ -397,7 +397,9 @@ describe('Studyprogramme overview', () => {
       cy.get('.form > .field > .dropdown > .visible').contains(name).click()
 
       cy.get('textarea').type('010113437')
-      cy.get('.positive').click()
+      cy.contains('Add tags').click()
+
+      cy.contains('Successfully added tags to students.')
 
       cy.contains('Students').click()
       cy.get('.prompt').type(student)
