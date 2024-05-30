@@ -4,6 +4,7 @@ const auth = require('../middleware/auth')
 const { combineFacultyBasics } = require('../services/faculty/facultyBasics')
 const { getFacultyCredits } = require('../services/faculty/facultyCredits')
 const { countGraduationTimes } = require('../services/faculty/facultyGraduationTimes')
+const { getFacultyList } = require('../services/faculty/facultyHelpers')
 const {
   getProgrammes,
   getBasicStats,
@@ -21,14 +22,13 @@ const { combineFacultyStudentProgress } = require('../services/faculty/facultySt
 const { combineFacultyStudents } = require('../services/faculty/facultyStudents')
 const { combineFacultyThesisWriters } = require('../services/faculty/facultyThesisWriters')
 const { updateFacultyOverview, updateFacultyProgressOverview } = require('../services/faculty/facultyUpdates')
-const { faculties } = require('../services/organisations')
 const logger = require('../util/logger')
 
 // Faculty uses a lot of tools designed for Study programme.
 // Some of them have been copied here and slightly edited for faculty purpose.
 
 router.get('/', async (_req, res) => {
-  const facultyList = await faculties()
+  const facultyList = await getFacultyList()
   res.json(facultyList)
 })
 

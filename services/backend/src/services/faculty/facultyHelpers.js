@@ -1,6 +1,14 @@
 const { Op } = require('sequelize')
 
 const { codes } = require('../../../config/programmeCodes')
+const { faculties } = require('../organisations')
+
+const getFacultyList = async () => {
+  const ignore = ['Y', 'H99', 'Y01', 'H92', 'H930']
+  const facultyList = (await faculties()).filter(f => !ignore.includes(f.code))
+  facultyList.sort((a, b) => (a.name.fi > b.name.fi ? 1 : -1))
+  return facultyList
+}
 
 const findRightProgramme = (studyrightElements, code) => {
   let programme = ''
@@ -20,21 +28,37 @@ const findRightProgramme = (studyrightElements, code) => {
   return { programme, programmeName }
 }
 
-const facultyFormatStudyright = studyright => ({
-  studyrightid: studyright.studyrightid,
-  studystartdate: studyright.studystartdate,
-  startdate: studyright.startdate,
-  enddate: studyright.enddate,
-  givendate: studyright.givendate,
-  graduated: studyright.graduated,
-  active: studyright.active,
-  prioritycode: studyright.prioritycode,
-  extentcode: studyright.extentcode,
-  facultyCode: studyright.facultyCode,
-  studentnumber: studyright.studentStudentnumber,
-  studyrightElements: studyright.studyright_elements,
-})
+const facultyFormatStudyright = studyright => {
+  const {
+    studyrightid,
+    studystartdate,
+    enddate,
+    givendate,
+    graduated,
+    active,
+    prioritycode,
+    extentcode,
+    studentStudentnumber,
+    studyright_elements,
+    startdate,
+    facultyCode,
+  } = studyright
 
+  return {
+    studyrightid,
+    studystartdate,
+    startdate,
+    enddate,
+    givendate,
+    graduated,
+    active,
+    prioritycode,
+    extentcode,
+    facultyCode,
+    studentnumber: studentStudentnumber,
+    studyrightElements: studyright_elements,
+  }
+}
 const facultyProgrammeStudents = student => {
   const { studentnumber, home_country_en, gender_code, semester_enrollments } = student
   return {
@@ -124,6 +148,7 @@ const mapCodesToIds = data => {
 }
 
 module.exports = {
+  getFacultyList,
   findRightProgramme,
   facultyFormatStudyright,
   facultyFormatProgramme,
