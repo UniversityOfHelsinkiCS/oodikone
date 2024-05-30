@@ -32,7 +32,7 @@ const backendPort = 8080
 const serviceProvider = process.env.SERVICE_PROVIDER || 'Toska'
 
 // Optional logout-url configuration
-const logoutUrl = serviceProvider === 'Toska' ? undefined : process.env.LOGOUT_URL
+const configLogoutUrl = serviceProvider === 'Toska' ? undefined : process.env.LOGOUT_URL
 
 // Other stuff
 const { DB_URL_KONE, DB_URL_USER, SECRET_TOKEN, SIS_UPDATER_URL, CRYPT_KEY } = process.env
@@ -80,5 +80,5 @@ module.exports = {
   importerToken,
   isDev,
   serviceProvider,
-  logoutUrl,
+  configLogoutUrl,
 }

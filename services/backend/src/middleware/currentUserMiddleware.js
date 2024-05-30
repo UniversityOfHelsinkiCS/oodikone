@@ -1,7 +1,7 @@
 const Sentry = require('@sentry/node')
 const _ = require('lodash')
 
-const { requiredGroup, serviceProvider, logoutUrl } = require('../conf-backend')
+const { requiredGroup, serviceProvider, configLogoutUrl, isDev } = require('../conf-backend')
 const { getUser, getMockedUser, getOrganizationAccess } = require('../services/userService')
 const { ApplicationError } = require('../util/customErrors')
 const logger = require('../util/logger')
@@ -62,21 +62,27 @@ const toskaUserMiddleware = async (req, _res, next) => {
 }
 
 const fdUserMiddleware = async (req, _res, next) => {
-  const { remote_user: remoteUser } = req.headers
+  const { remote_user: remoteUser, 'x-show-as-user': showAsUser } = req.headers
 
   if (!remoteUser) {
-    throw new ApplicationError('Not enough data in request headers, remote_user was missing', 403, { logoutUrl })
+    throw new ApplicationError('Not enough data in request headers, remote_user was missing', 403, { configLogoutUrl })
   }
 
-  // getMockedUser (above) requires the superAdmin-role, which is only available via iamGroups, so it's not applicable here atm
-  const user = await getUser({ username: remoteUser })
+  let user
+
+  // getMockedUser in production requires the superAdmin-role, which is only available via iamGroups, so it's now only implemented for the dev environment
+  if (showAsUser && isDev) {
+    user = await getMockedUser({ userToMock: showAsUser, mockedBy: remoteUser })
+  } else {
+    user = await getUser({ username: remoteUser })
+  }
 
   if (!user) {
-    throw new ApplicationError(`Could not grant access with the eppn ${remoteUser}.`, 403, { logoutUrl })
+    throw new ApplicationError(`Could not grant access with the eppn ${remoteUser}.`, 403, { configLogoutUrl })
   }
 
   req.user = user
-  req.logoutUrl = logoutUrl
+  req.logoutUrl = configLogoutUrl
 
   next()
 }

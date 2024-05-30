@@ -168,7 +168,7 @@ const getOrganizationAccess = async (sisPersonId, iamGroups) => {
   return { access: iamAccess || {}, specialGroup }
 }
 
-const getMockedUser = async ({ userToMock, mockedBy }) => {
+const basicGetMockedUser = async ({ userToMock, mockedBy }) => {
   // Using different keys for users being mocked to prevent users from seeing themselves as mocked. Also, if the user
   // is already logged in, we don't want the regular data from the cache because that doesn't have the mockedBy field
   const cacheKey = `mocking-as-${userToMock}`
@@ -189,6 +189,14 @@ const getMockedUser = async ({ userToMock, mockedBy }) => {
   const mockedUser = await formatUser({ ...userFromDb, iamGroups, programmeRights, mockedBy })
   userDataCache.set(cacheKey, mockedUser)
   return mockedUser
+}
+
+const fdGetMockedUser = async ({ userToMock, mockedBy }) => {
+  const mockedByFromDb = (await findUser({ username: mockedBy })).toJSON()
+
+  if (!mockedByFromDb) return null
+
+  return await basicGetMockedUser({ userToMock, mockedBy })
 }
 
 const toskaGetUser = async ({ username, name, email, iamGroups, specialGroup, sisId, access }) => {
@@ -222,6 +230,7 @@ const fdGetUser = async ({ username }) => {
   return user
 }
 
+const getMockedUser = serviceProvider === 'Toska' ? basicGetMockedUser : fdGetMockedUser
 const getUser = serviceProvider === 'Toska' ? toskaGetUser : fdGetUser
 
 module.exports = {
