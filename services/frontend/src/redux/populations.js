@@ -123,11 +123,6 @@ export const clearPopulations = () => ({
   type: 'CLEAR_POPULATIONS',
 })
 
-export const removePopulation = uuid => ({
-  type: 'REMOVE_POPULATION',
-  uuid,
-})
-
 export const reducer = (state = initialState, action) => {
   switch (action.type) {
     case 'GET_POPULATION_STATISTICS_ATTEMPT':
