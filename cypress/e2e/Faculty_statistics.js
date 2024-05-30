@@ -1,5 +1,11 @@
 /// <reference types="Cypress" />
 
+const moment = require('moment')
+const path = require('path')
+
+const timestamp = moment().format('YYYY-MM-DD')
+const downloadsFolder = Cypress.config('downloadsFolder')
+
 describe('Faculty overview', () => {
   describe('Faculty can be selected', () => {
     it('Faculties are listed and one can be chosen', () => {
@@ -11,7 +17,7 @@ describe('Faculty overview', () => {
     })
   })
 
-  describe('Faculty basic information: admin user', () => {
+  describe('Basic information: admin user', () => {
     beforeEach(() => {
       cy.init('/faculties', 'admin')
       cy.contains('a', 'Eläinlääketieteellinen tiedekunta').click()
@@ -27,7 +33,7 @@ describe('Faculty overview', () => {
     })
   })
 
-  describe('Faculty basic information: basic user', () => {
+  describe('Basic information: basic user', () => {
     beforeEach(() => {
       cy.init('/faculties')
       cy.contains('a', 'Maatalous-metsätieteellinen tiedekunta').click()
@@ -75,6 +81,21 @@ describe('Faculty overview', () => {
       cy.get('[data-cy="StudentsOfTheFaculty-info-content"]').should('be.visible')
       cy.get('[data-cy="StudentsOfTheFaculty-close-info"]').click()
       cy.get('[data-cy="StudentsOfTheFaculty-info-content"]').should('not.exist')
+    })
+
+    it('Data can be exported to Excel files', () => {
+      const sections = [
+        'StudentsOfTheFaculty',
+        'GraduatedOfTheFaculty',
+        'ThesisWritersOfTheFaculty',
+        'CreditsProducedByTheFaculty',
+      ]
+      sections.forEach(section => {
+        cy.get(`[data-cy="DownloadButton-${section}"]`).click()
+        const downloadedFile = `oodikone_H80_${section}_${timestamp}.xlsx`
+        cy.get(`[data-cy="DownloadButton-${section}"]`).click()
+        cy.readFile(path.join(downloadsFolder, downloadedFile))
+      })
     })
   })
 
@@ -221,6 +242,12 @@ describe('Faculty overview', () => {
           cy.contains('MH60_001')
         })
       })
+    })
+
+    it('Data can be exported to an Excel file', () => {
+      cy.get('[data-cy="DownloadButton-AverageGraduationTimes"]').click()
+      const downloadedFile = `oodikone_H60_graduation_times_${timestamp}.xlsx`
+      cy.readFile(path.join(downloadsFolder, downloadedFile))
     })
   })
 

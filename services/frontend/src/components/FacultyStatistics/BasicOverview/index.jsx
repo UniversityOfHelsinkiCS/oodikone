@@ -125,6 +125,7 @@ export const BasicOverview = ({
         content="Download statistics as xlsx file"
         trigger={
           <Button
+            data-cy={`DownloadButton-${toolTipText}`}
             floated="right"
             icon="download"
             onClick={() => exportToExcel(programmeNames, programmeStats, tableStats, titles, toolTipText)}

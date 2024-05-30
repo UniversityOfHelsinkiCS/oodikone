@@ -105,6 +105,7 @@ export const TimesAndPathsView = ({ faculty, setStudyProgrammes, studyProgrammes
           content="Download statistics as xlsx file"
           trigger={
             <Button
+              data-cy="DownloadButton-AverageGraduationTimes"
               floated="right"
               icon="download"
               onClick={() => exportToExcel(graduationStats, programmeNames)}
