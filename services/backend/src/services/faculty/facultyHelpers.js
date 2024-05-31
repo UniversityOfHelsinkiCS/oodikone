@@ -119,6 +119,12 @@ const checkTransfers = (studyright, insideTransfersStudyrights, transfersToOrAwa
   return allTransfers.includes(studyright.studentnumber)
 }
 
+const commissionedProgrammes = ['KH50_009', 'MH50_015', 'T923103-N']
+
+const checkCommissioned = studyright => {
+  return studyright.studyrightElements.some(element => commissionedProgrammes.includes(element.code))
+}
+
 const getExtentFilter = includeAllSpecials => {
   const filteredExtents = [16] // always filter out secondary subject students
   if (!includeAllSpecials) {
@@ -157,6 +163,7 @@ module.exports = {
   formatOrganization,
   isNewProgramme,
   checkTransfers,
+  checkCommissioned,
   getExtentFilter,
   mapCodesToIds,
   facultyProgrammeStudents,

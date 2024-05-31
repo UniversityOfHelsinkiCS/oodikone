@@ -14,7 +14,13 @@ const {
   transferredInsideFaculty,
   transferredTo,
 } = require('./faculty')
-const { checkTransfers, findRightProgramme, getExtentFilter, isNewProgramme } = require('./facultyHelpers')
+const {
+  checkCommissioned,
+  checkTransfers,
+  findRightProgramme,
+  getExtentFilter,
+  isNewProgramme,
+} = require('./facultyHelpers')
 
 const filterDuplicateStudyrights = studyrights => {
   // bachelor+master students have two studyrights (separated by two last digits in studyrightid)
@@ -91,9 +97,10 @@ const getFacultyStarters = async (
     const keys = Object.keys(codes)
 
     if (!includeAllSpecials) {
-      // We do not include inside transferred studyrights into faculty starters, but function below expect two arguments
       filteredStudyrights = filteredStudyrights.filter(
-        studyright => !checkTransfers(studyright, insideTransfersStudyrights, transfersToOrAwayStudyrights)
+        studyright =>
+          !checkTransfers(studyright, insideTransfersStudyrights, transfersToOrAwayStudyrights) &&
+          !checkCommissioned(studyright)
       )
     }
 
@@ -160,7 +167,9 @@ const getFacultyGraduates = async (
     let graduatedRights = await graduatedStudyrights(faculty, code, since, studyrightWhere)
     if (!includeAllSpecials) {
       graduatedRights = graduatedRights.filter(
-        studyright => !checkTransfers(studyright, insideTransfersStudyrights, transfersToOrAwayStudyrights)
+        studyright =>
+          !checkTransfers(studyright, insideTransfersStudyrights, transfersToOrAwayStudyrights) &&
+          !checkCommissioned(studyright)
       )
     }
     graduatedRights.forEach(({ enddate, extentcode, studyrightElements }) => {
