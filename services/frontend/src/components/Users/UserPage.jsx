@@ -1,6 +1,6 @@
 import { useHistory, useParams } from 'react-router-dom'
 import { Button, Card, Divider, Loader, Message, Popup, Segment } from 'semantic-ui-react'
-
+import { isDefaultServiceProvider } from '@/common'
 import { useGetAuthorizedUserQuery, useShowAsUser } from '@/redux/auth'
 import { useGetUserQuery } from '@/redux/users'
 import { AccessGroups } from './AccessGroups'
@@ -76,15 +76,17 @@ export const UserPage = () => {
             <AccessRights user={user} />
           </Card.Content>
         </Card>
-        <Card fluid>
-          <Card.Content>
-            <Card.Header content="Send email about receiving access to Oodikone" />
-            <Card.Description>
-              <Divider />
-              <EmailNotification userEmail={user.email} />
-            </Card.Description>
-          </Card.Content>
-        </Card>
+        {isDefaultServiceProvider() && (
+          <Card fluid>
+            <Card.Content>
+              <Card.Header content="Send email about receiving access to Oodikone" />
+              <Card.Description>
+                <Divider />
+                <EmailNotification userEmail={user.email} />
+              </Card.Description>
+            </Card.Content>
+          </Card>
+        )}
       </Card.Group>
     </Segment>
   )
