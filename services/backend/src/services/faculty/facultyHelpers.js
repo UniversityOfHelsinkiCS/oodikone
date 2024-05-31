@@ -111,12 +111,12 @@ const isNewProgramme = code => {
   return false
 }
 
-const checkTransfers = (s, insideTransfersStudyrights, transfersToOrAwayStudyrights) => {
+const checkTransfers = (studyright, insideTransfersStudyrights, transfersToOrAwayStudyrights) => {
   const allTransfers = [
-    ...insideTransfersStudyrights.map(sr => sr.studentnumber),
-    ...transfersToOrAwayStudyrights.map(sr => sr.studentnumber),
+    ...insideTransfersStudyrights.map(studyright => studyright.studentnumber),
+    ...transfersToOrAwayStudyrights.map(studyright => studyright.studentnumber),
   ]
-  return allTransfers.includes(s.studentnumber)
+  return allTransfers.includes(studyright.studentnumber)
 }
 
 const getExtentFilter = includeAllSpecials => {
