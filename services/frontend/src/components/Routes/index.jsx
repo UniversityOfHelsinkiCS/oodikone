@@ -131,7 +131,7 @@ export const Routes = () => (
         component={CloseToGraduation}
         exact
         path={routes.closeToGraduation}
-        requiredRoles={['admin', 'fullSisuAccess']}
+        requiredRoles={['fullSisuAccess', 'studyGuidanceGroups']}
       />
       <Redirect to="/" />
     </Switch>

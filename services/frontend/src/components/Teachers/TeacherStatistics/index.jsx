@@ -112,6 +112,7 @@ export const TeacherStatistics = () => {
       key: code,
       value: code,
       text: getTextIn(name),
+      description: code,
     }))
     .sort(createLocaleComparator('text'))
   const filteredOptions = semesters.filter(sem => {

@@ -2,18 +2,18 @@
 import ReactHighcharts from 'react-highcharts'
 
 export const MedianBarChart = ({
-  data,
-  goal,
-  handleClick,
-  facultyGraph = true,
-  year,
-  label,
-  programmeNames,
-  language = null,
   classSizes,
-  level,
+  data,
+  facultyGraph = true,
+  goal,
   goalExceptions,
+  handleClick,
+  language = null,
+  level,
+  programmeNames,
   universityMode,
+  year,
+  yearLabel,
 }) => {
   let modData = null
   if (!facultyGraph && goalExceptions.needed && ['master', 'bcMsCombo'].includes(level)) {
@@ -22,9 +22,9 @@ export const MedianBarChart = ({
     for (let i = 0; i < modData.length; i++) {
       if (Object.keys(goalExceptions).includes(modData[i].code)) {
         const realGoal = goal + goalExceptions[modData[i].code]
-        if (modData[i].y <= realGoal) {
+        if (modData[i].median <= realGoal) {
           modData[i].color = '#90A959'
-        } else if (modData[i].y <= realGoal + 12) {
+        } else if (modData[i].median <= realGoal + 12) {
           modData[i].color = '#FEE191'
         } else {
           modData[i].color = '#FB6962'
@@ -34,8 +34,8 @@ export const MedianBarChart = ({
     }
   }
 
-  const maxValue = data.reduce((max, { y }) => {
-    return y > max ? y : max
+  const maxValue = data.reduce((max, { median }) => {
+    return median > max ? median : max
   }, goal * 2)
 
   const getClassSize = category => {
@@ -52,7 +52,7 @@ export const MedianBarChart = ({
   }
 
   const getDataLabel = (amount, category) => {
-    if (label === 'Start year') {
+    if (yearLabel === 'Start year') {
       return `${amount} graduated (${getPercentage(amount, category)} % of class)`
     }
     return `${amount} graduated`
@@ -63,12 +63,12 @@ export const MedianBarChart = ({
     return data.length * t + 100
   }
 
-  const getTooltipText = (name, code, amount, y, statistics, realGoal) => {
+  const getTooltipText = (name, code, amount, median, statistics, realGoal) => {
     const sortingText =
-      label === 'Start year'
+      yearLabel === 'Start year'
         ? `<b>From class of ${facultyGraph ? name : year}, ${amount}/${getClassSize(code)} students have graduated</b>`
         : `<b>${amount} students graduated in year ${facultyGraph ? name : year}</b>`
-    const timeText = `<br /><p>${sortingText}, <br /><b> median study time: ${y} months</p></b>`
+    const timeText = `<br /><p>${sortingText}, <br /><b> median study time: ${median} months</p></b>`
     const statisticsText = `<br /><p>${statistics.onTime} graduated on time</p><br />
         <p>${statistics.yearOver} graduated max year overtime</p>
         <br /><p>${statistics.wayOver} graduated over year late</p>`
@@ -86,7 +86,7 @@ export const MedianBarChart = ({
     if (universityMode) {
       return facultyGraph ? 'Graduation year' : 'Faculty'
     }
-    return facultyGraph ? label : 'Programme'
+    return facultyGraph ? yearLabel : 'Programme'
   }
 
   const config = {
@@ -125,7 +125,10 @@ export const MedianBarChart = ({
     },
     series: [
       {
-        data: modData || data,
+        data: (modData || data).map(item => ({
+          ...item,
+          y: item.median,
+        })),
         dataLabels: [
           {
             align: 'left',
@@ -201,7 +204,7 @@ export const MedianBarChart = ({
     },
   }
 
-  if (!facultyGraph) config.title.text = `Year ${year} by ${label.toLowerCase()}`
+  if (!facultyGraph) config.title.text = `Year ${year} by ${yearLabel.toLowerCase()}`
 
   return (
     <div className={`${facultyGraph ? 'faculty' : 'programmes'}-graph`}>

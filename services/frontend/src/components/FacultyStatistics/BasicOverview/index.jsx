@@ -4,7 +4,7 @@ import { utils, writeFile } from 'xlsx'
 
 import { getTimestamp } from '@/common'
 import { facultyToolTips } from '@/common/InfoToolTips'
-import { makeTableStats, makeGraphData } from '@/components/common/CreditsProduced'
+import { makeGraphData, makeTableStats } from '@/components/common/CreditsProduced'
 import { sortProgrammeKeys } from '@/components/FacultyStatistics/facultyHelpers'
 import { InteractiveDataTable } from '@/components/FacultyStatistics/InteractiveDataView'
 import { InfoBox } from '@/components/Info/InfoBox'
@@ -14,8 +14,8 @@ import { StackedBarChart } from '@/components/StudyProgramme/BasicOverview/Stack
 import { Toggle } from '@/components/StudyProgramme/Toggle'
 import '@/components/FacultyStatistics/faculty.css'
 import {
-  useGetFacultyCreditStatsQuery,
   useGetFacultyBasicStatsQuery,
+  useGetFacultyCreditStatsQuery,
   useGetFacultyThesisStatsQuery,
 } from '@/redux/facultyStats'
 
@@ -35,7 +35,6 @@ const calculateTotals = stats => {
       }
     }
   }
-
   return totals
 }
 
@@ -48,31 +47,35 @@ export const BasicOverview = ({
   specialGroups,
   studyProgrammes,
 }) => {
+  const [showAll, setShowAll] = useState(false)
+  const { getTextIn } = useLanguage()
+
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
   const studyProgrammeFilter = studyProgrammes ? 'ALL_PROGRAMMES' : 'NEW_STUDY_PROGRAMMES'
   const special = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
-  const [showAll, setShowAll] = useState(false)
-  const credits = useGetFacultyCreditStatsQuery({
-    id: faculty?.code,
-    yearType,
-    studyProgrammeFilter,
-  })
+
   const basics = useGetFacultyBasicStatsQuery({
     id: faculty?.code,
     yearType,
     studyProgrammeFilter,
     specialGroups: special,
   })
+
   const thesisWriters = useGetFacultyThesisStatsQuery({
     id: faculty?.code,
     yearType,
     studyProgrammeFilter,
     specialGroups: special,
   })
-  const { getTextIn } = useLanguage()
+
+  const credits = useGetFacultyCreditStatsQuery({
+    id: faculty?.code,
+    yearType,
+    studyProgrammeFilter,
+  })
+
   const tableStats = credits.data ? makeTableStats(calculateTotals(credits.data), showAll, academicYear) : {}
   const graphStats = credits.data ? makeGraphData(calculateTotals(credits.data), showAll, academicYear) : null
-
   const programmeStats = credits.data?.ids.reduce((obj, id) => {
     return {
       ...obj,
@@ -80,9 +83,9 @@ export const BasicOverview = ({
     }
   }, {})
 
-  const downloadCsv = (titles, tableStats, programmeStats, programmeNames, toolTipText) => {
+  const exportToExcel = (programmeNames, programmeStats, tableStats, titles, toolTipText) => {
     const headers = titles.map(title => ({ label: title === '' ? 'Year' : title, key: title === '' ? 'Year' : title }))
-    const csvData = sortProgrammeKeys(Object.keys(programmeStats)).reduce(
+    const data = sortProgrammeKeys(Object.keys(programmeStats)).reduce(
       (results, programme) => [
         ...results,
         ...programmeStats[programme].map(yearRow => {
@@ -96,14 +99,14 @@ export const BasicOverview = ({
       []
     )
 
-    const tableStatsAsCsv = tableStats.map(yearArray =>
+    const tableStatsJson = tableStats.map(yearArray =>
       yearArray.reduce((result, value, yearIndex) => ({ ...result, [headers[yearIndex].key]: value }), {})
     )
 
     const book = utils.book_new()
-    const tableSheet = utils.json_to_sheet(tableStatsAsCsv)
+    const tableSheet = utils.json_to_sheet(tableStatsJson)
     utils.book_append_sheet(book, tableSheet, 'TableStats')
-    const sheet = utils.json_to_sheet(csvData)
+    const sheet = utils.json_to_sheet(data)
     utils.book_append_sheet(book, sheet, 'ProgrammeStats')
     writeFile(book, `oodikone_${faculty.code}_${toolTipText}_${getTimestamp()}.xlsx`)
   }
@@ -115,22 +118,24 @@ export const BasicOverview = ({
           {title}
         </Divider>
       </div>
-      <div style={{ marginBottom: '1em' }}>
+      <div style={{ marginBottom: '3em' }}>
         <InfoBox content={facultyToolTips[toolTipText]} cypress={toolTipText} />
       </div>
       <Popup
         content="Download statistics as xlsx file"
         trigger={
           <Button
+            data-cy={`DownloadButton-${toolTipText}`}
             floated="right"
             icon="download"
-            onClick={() => downloadCsv(titles, tableStats, programmeStats, programmeNames, toolTipText)}
+            onClick={() => exportToExcel(programmeNames, programmeStats, tableStats, titles, toolTipText)}
             style={{ backgroundColor: 'white', borderRadius: 0 }}
           />
         }
       />
     </>
   )
+
   const isFetchingOrLoading =
     credits.isLoading ||
     credits.isFetching ||
@@ -241,7 +246,6 @@ export const BasicOverview = ({
           value={specialGroups}
         />
       </div>
-
       {isFetchingOrLoading ? (
         <Loader active style={{ marginTop: '15em' }} />
       ) : (
@@ -405,9 +409,9 @@ export const BasicOverview = ({
               {getDivider(
                 'Credits produced by the faculty',
                 'CreditsProducedByTheFaculty',
-                credits?.data?.titles,
-                credits?.data?.tableStats,
-                credits?.data?.programmeTableStats,
+                tableStats?.titles,
+                tableStats?.data,
+                programmeStats,
                 credits?.data?.programmeNames
               )}
               <div>

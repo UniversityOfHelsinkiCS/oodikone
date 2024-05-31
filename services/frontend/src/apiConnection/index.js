@@ -113,6 +113,7 @@ export const RTKApi = createApi({
     'CustomPopulationSearches',
     'Semester',
     'Students',
+    'StudentTags',
     'StudyGuidanceGroups',
     'StudyProgrammePins',
     'Tags',

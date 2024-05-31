@@ -101,7 +101,7 @@ const formatStudent = student => {
   }
 }
 
-const findStudentsCloseToGraduation = async () =>
+const findStudentsCloseToGraduation = async studentNumbers =>
   (
     await Student.findAll({
       attributes: [
@@ -113,6 +113,13 @@ const findStudentsCloseToGraduation = async () =>
         'sis_person_id',
         'studentnumber',
       ],
+      where: studentNumbers
+        ? {
+            studentnumber: {
+              [Op.in]: studentNumbers,
+            },
+          }
+        : {},
       include: [
         {
           model: Studyplan,
@@ -205,12 +212,15 @@ const findStudentsCloseToGraduation = async () =>
       { bachelor: [], masterAndLicentiate: [] }
     )
 
-const getCloseToGraduationData = async () => {
-  const dataOnRedis = await redisClient.getAsync(CLOSE_TO_GRADUATION_REDIS_KEY)
-  if (dataOnRedis) return JSON.parse(dataOnRedis)
-  const freshData = await findStudentsCloseToGraduation()
-  redisClient.setAsync(CLOSE_TO_GRADUATION_REDIS_KEY, JSON.stringify(freshData))
-  return freshData
+const getCloseToGraduationData = async studentNumbers => {
+  if (!studentNumbers) {
+    const dataOnRedis = await redisClient.getAsync(CLOSE_TO_GRADUATION_REDIS_KEY)
+    if (dataOnRedis) return JSON.parse(dataOnRedis)
+    const freshData = await findStudentsCloseToGraduation()
+    redisClient.setAsync(CLOSE_TO_GRADUATION_REDIS_KEY, JSON.stringify(freshData))
+    return freshData
+  }
+  return findStudentsCloseToGraduation(studentNumbers)
 }
 
 module.exports = {

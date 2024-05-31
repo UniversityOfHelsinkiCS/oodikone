@@ -24,52 +24,47 @@ const StudyrightStatusFilterCard = ({ options, onOptionsChange, combinedProgramm
   const typeOfCombined = combinedProgrammeCode === 'MH90_001' ? 'Licentiate' : 'Master'
   return (
     <Form>
-      <div className="card-content">
-        <Form.Field style={{ display: 'flex', flexDirection: 'column' }}>
+      <Form.Field style={{ display: 'flex', flexDirection: 'column', gap: '0.5em' }}>
+        <Radio
+          checked={activeProgramme === null && activeCombinedProgramme === null}
+          data-cy="option-activity-status-all"
+          label="All"
+          name="radioGroup"
+          onChange={toggle(null, 'default')}
+        />
+        <Radio
+          checked={activeProgramme === true}
+          data-cy="option-active"
+          label={`Active ${restOfTitle}`}
+          name="radioGroup"
+          onChange={toggle(true, 'default')}
+        />
+        {combinedProgrammeCode && (
           <Radio
-            checked={activeProgramme === null && activeCombinedProgramme === null}
-            data-cy="option-activity-status-all"
-            label="All"
+            checked={activeCombinedProgramme === true}
+            data-cy="option-active-combined"
+            label={`Active ${typeOfCombined} studyright`}
             name="radioGroup"
-            onChange={toggle(null, 'default')}
+            onChange={toggle(true, 'combinedProgramme')}
           />
+        )}
+        <Radio
+          checked={activeProgramme === false}
+          data-cy="option-inactive"
+          label={`Inactive ${restOfTitle}`}
+          name="radioGroup"
+          onChange={toggle(false, 'default')}
+        />
+        {combinedProgrammeCode && (
           <Radio
-            checked={activeProgramme === true}
-            data-cy="option-active"
-            label={`Active ${restOfTitle}`}
+            checked={activeCombinedProgramme === false}
+            data-cy="option-inactive-combined"
+            label={`Inactive ${typeOfCombined} studyright`}
             name="radioGroup"
-            onChange={toggle(true, 'default')}
-            style={{ margin: '0.5rem 0' }}
+            onChange={toggle(false, 'combinedProgramme')}
           />
-          {combinedProgrammeCode && (
-            <Radio
-              checked={activeCombinedProgramme === true}
-              data-cy="option-active-combined"
-              label={`Active ${typeOfCombined} studyright`}
-              name="radioGroup"
-              onChange={toggle(true, 'combinedProgramme')}
-              style={{ margin: '0.5rem 0' }}
-            />
-          )}
-          <Radio
-            checked={activeProgramme === false}
-            data-cy="option-inactive"
-            label={`Inactive ${restOfTitle}`}
-            name="radioGroup"
-            onChange={toggle(false, 'default')}
-            style={{ margin: '0.5rem 0' }}
-          />
-          {combinedProgrammeCode && (
-            <Radio
-              checked={activeCombinedProgramme === false}
-              data-cy="option-inactive-combined"
-              label={`Inactive ${typeOfCombined} studyright`}
-              name="radioGroup"
-              onChange={toggle(false, 'combinedProgramme')}
-            />
-          )}
-        </Form.Field>
-      </div>
+        )}
+      </Form.Field>
     </Form>
   )
 }

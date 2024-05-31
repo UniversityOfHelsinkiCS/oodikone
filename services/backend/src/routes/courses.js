@@ -2,7 +2,6 @@ const crypto = require('crypto')
 const router = require('express').Router()
 
 const courseService = require('../services/courses')
-const { faculties } = require('../services/organisations')
 const { validateParamLength } = require('../util')
 const { getFullStudyProgrammeRights, hasFullAccessToStudentData } = require('../util/utils')
 
@@ -62,11 +61,6 @@ router.get('/v3/courseyearlystats', async (req, res) => {
     const results = await courseService.courseYearlyStats(codes, separate, anonymizationSalt, combineSubstitutions)
     res.json(results)
   }
-})
-
-router.get('/faculties-only', async (_req, res) => {
-  const facultyList = await faculties()
-  res.json(facultyList)
 })
 
 module.exports = router

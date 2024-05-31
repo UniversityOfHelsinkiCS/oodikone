@@ -167,4 +167,5 @@ router.get('/:id/update_progressview', auth.roles(['facultyStatistics', 'katselm
   }
   return res.status(422).end()
 })
+
 module.exports = router

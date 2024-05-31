@@ -2,58 +2,52 @@ import { flatten, uniq } from 'lodash'
 import { number, shape, string } from 'prop-types'
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
-import { Dropdown, Header, Table } from 'semantic-ui-react'
+import { Dropdown, Form, Header, Table } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 
-const CourseTableRow = ({ facultyCode, students, credits, facultyName }) => {
-  return (
-    <Table.Row>
-      <Table.Cell width={13}>
-        {facultyCode}, {facultyName}
-      </Table.Cell>
-      <Table.Cell width={2}>{students}</Table.Cell>
-      <Table.Cell width={1}>{credits}</Table.Cell>
-    </Table.Row>
-  )
-}
+const CourseTableRow = ({ facultyCode, students, credits, facultyName }) => (
+  <Table.Row>
+    <Table.Cell width={13}>
+      {facultyCode}, {facultyName}
+    </Table.Cell>
+    <Table.Cell width={2}>{students}</Table.Cell>
+    <Table.Cell width={1}>{credits}</Table.Cell>
+  </Table.Row>
+)
 
-const CourseTable = ({ course, courseInstance, selectedYear }) => {
-  const { coursecode } = course
+const CourseTable = ({ course, courseInstance }) => {
   const { getTextIn } = useLanguage()
 
-  const name = getTextIn(course.name)
-
   const rows = courseInstance ? (
-    Object.entries(courseInstance.faculties)
-      .sort(([facultyCodeA], [facultyCodeB]) => facultyCodeA.localeCompare(facultyCodeB))
-      .map(([facultyCode, instanceFaculty]) => (
-        <CourseTableRow
-          credits={instanceFaculty.credits}
-          facultyCode={facultyCode}
-          facultyName={getTextIn(instanceFaculty.name)}
-          key={`${coursecode}-${facultyCode}`}
-          students={instanceFaculty.students.length}
-        />
-      ))
+    [
+      ...Object.entries(courseInstance.faculties)
+        .sort(([facultyCodeA], [facultyCodeB]) => facultyCodeA.localeCompare(facultyCodeB))
+        .map(([facultyCode, instanceFaculty]) => (
+          <CourseTableRow
+            credits={instanceFaculty.credits}
+            facultyCode={facultyCode}
+            facultyName={getTextIn(instanceFaculty.name)}
+            key={`${course.coursecode}-${facultyCode}`}
+            students={instanceFaculty.students.length}
+          />
+        )),
+      <Table.Row key={`${course.coursecode}-total`} style={{ backgroundColor: '#f9fafb', fontWeight: 'bold' }}>
+        <Table.Cell width={13}>Total</Table.Cell>
+        <Table.Cell width={2}>{courseInstance.allStudents.length}</Table.Cell>
+        <Table.Cell width={1}>{courseInstance.allCredits}</Table.Cell>
+      </Table.Row>,
+    ]
   ) : (
     <Table.Row>
       <Table.Cell width={13}>No data for selected year</Table.Cell>
     </Table.Row>
   )
 
-  const getYearToShow = () => {
-    const alternativeYear = selectedYear ? `${1949 + Number(selectedYear)}-${1950 + Number(selectedYear)}` : ''
-    return courseInstance ? courseInstance.year : alternativeYear
-  }
-
   return (
     <>
       <Header>
-        {getYearToShow()} {coursecode}
-      </Header>
-      <Header size="small">
-        {name} ({coursecode})
+        {getTextIn(course.name)} ({course.coursecode})
       </Header>
       <Table compact>
         <Table.Header>
@@ -64,33 +58,14 @@ const CourseTable = ({ course, courseInstance, selectedYear }) => {
           </Table.Row>
         </Table.Header>
         <Table.Body>{rows}</Table.Body>
-        {courseInstance ? (
-          <Table.Footer>
-            <Table.Row>
-              <Table.HeaderCell style={{ fontWeight: '700' }} width={13}>
-                Total
-              </Table.HeaderCell>
-              <Table.HeaderCell style={{ fontWeight: '700' }} width={2}>
-                {courseInstance ? courseInstance.allStudents.length : 0}
-              </Table.HeaderCell>
-              <Table.HeaderCell style={{ fontWeight: '700' }} width={1}>
-                {courseInstance ? courseInstance.allCredits : 0}
-              </Table.HeaderCell>
-            </Table.Row>
-          </Table.Footer>
-        ) : null}
       </Table>
     </>
   )
 }
 
 export const FacultyLevelStatistics = () => {
-  const { language: activeLanguage } = useLanguage()
   const openOrRegular = useSelector(state => state.courseSearch.openOrRegular)
-  const { courseStats } = useSelector(({ courseStats }) => ({
-    courseStats: courseStats.data,
-    language: activeLanguage,
-  }))
+  const courseStats = useSelector(state => state.courseStats.data)
 
   const yearcodes = uniq(
     flatten(Object.values(courseStats).map(course => Object.keys(course[openOrRegular].facultyStats)))
@@ -111,31 +86,27 @@ export const FacultyLevelStatistics = () => {
       course,
       courseInstance: course[openOrRegular].facultyStats[selectedYear],
     }))
-    .sort((a, b) => (a.courseInstance === undefined) - (b.courseInstance === undefined))
+    .sort((a, b) => (a.courseInstance == null) - (b.courseInstance == null))
 
   const courseTables = yearsCourseStats.map(({ course, courseInstance }) => (
-    <CourseTable
-      course={course[openOrRegular]}
-      courseInstance={courseInstance}
-      key={course.unifyStats.coursecode}
-      selectedYear={selectedYear}
-    />
+    <CourseTable course={course[openOrRegular]} courseInstance={courseInstance} key={course.unifyStats.coursecode} />
   ))
 
   return (
-    <div>
-      Select year
-      <Dropdown
-        defaultValue={selectedYear}
-        fluid
-        onChange={(_event, data) => {
-          setSelectedYear(data.value)
-        }}
-        options={dropdownOptions}
-        selection
-      />
+    <>
+      <Form>
+        <Form.Field>
+          <label>Select academic year</label>
+          <Dropdown
+            defaultValue={selectedYear}
+            onChange={(_, { value }) => setSelectedYear(value)}
+            options={dropdownOptions}
+            selection
+          />
+        </Form.Field>
+      </Form>
       {courseTables}
-    </div>
+    </>
   )
 }
 
@@ -149,7 +120,6 @@ CourseTableRow.propTypes = {
 CourseTable.propTypes = {
   course: shape({}).isRequired,
   courseInstance: shape({}),
-  selectedYear: string.isRequired,
 }
 
 CourseTable.defaultProps = {

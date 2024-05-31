@@ -1,5 +1,5 @@
 import moment from 'moment'
-import { bool, func, object, shape } from 'prop-types'
+import { bool, object, shape } from 'prop-types'
 import qs from 'query-string'
 import { useState } from 'react'
 import { connect } from 'react-redux'
@@ -9,8 +9,7 @@ import { Button, Form } from 'semantic-ui-react'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { InfoBox } from '@/components/Info/InfoBox'
 import { PopulationQueryCard } from '@/components/PopulationQueryCard'
-import { removePopulation, useGetProgrammesQuery } from '@/redux/populations'
-import { useGetTagsByStudyTrackQuery } from '@/redux/tags'
+import { useGetProgrammesQuery } from '@/redux/populations'
 import { FilterActiveNote } from './FilterActiveNote'
 import './populationSearch.css'
 
@@ -19,11 +18,8 @@ const getMonths = (year, term) => {
   return Math.ceil(moment.duration(moment().diff(moment(start))).asMonths())
 }
 
-const PopulationSearchHistory = ({ populations, removePopulation }) => {
+const PopulationSearchHistory = ({ populations }) => {
   const { data: units } = useGetProgrammesQuery()
-  const { data: tags } = useGetTagsByStudyTrackQuery(populations?.query?.studyRights?.programme, {
-    skip: !populations?.query?.studyRights?.programme,
-  })
   const history = useHistory()
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false)
   const [semesters, setSemesters] = useState(
@@ -64,8 +60,6 @@ const PopulationSearchHistory = ({ populations, removePopulation }) => {
     const searchString = qs.stringify(queryObject)
     history.push({ search: searchString })
   }
-
-  const removeThisPopulation = uuid => removePopulation(uuid)
 
   const renderAdvancedSettingsSelector = () => {
     if (!showAdvancedSettings) {
@@ -142,24 +136,14 @@ const PopulationSearchHistory = ({ populations, removePopulation }) => {
     if (!units?.programmes || !populations.query || !populations.data.students) {
       return null
     }
-    const { programme: programmeCode, studyTrack: studyTrackCode } = populations.query.studyRights
 
     // I'm sorry about the awful layout fix but we are going to rework this whole area from ground up, so no point in wasting more time now.
     return (
       <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
         <div>
-          <PopulationQueryCard
-            key={`population-${populations.query.uuid}`}
-            population={populations.data}
-            query={populations.query}
-            queryId={0}
-            removeSampleFn={removeThisPopulation}
-            tags={tags}
-            units={[units.programmes[programmeCode], units.studyTracks[studyTrackCode]].filter(Boolean)}
-            updating={populations.updating}
-          />
+          <PopulationQueryCard population={populations.data} query={populations.query} />
           <div style={{ marginLeft: '5px', marginTop: '15px' }}>
-            <InfoBox content={populationStatisticsToolTips.QueryCard} />
+            <InfoBox content={populationStatisticsToolTips.Advanced} />
           </div>
         </div>
         <div style={{ marginLeft: '100px' }}>
@@ -176,10 +160,8 @@ const PopulationSearchHistory = ({ populations, removePopulation }) => {
               </Form.Field>
             </Form.Group>
           )}
-          <div>{renderAdvancedSettingsSelector()}</div>
-          <div>
-            {showAdvancedSettings ? <InfoBox content={populationStatisticsToolTips.Advanced} /> : <FilterActiveNote />}
-          </div>
+          {renderAdvancedSettingsSelector()}
+          <FilterActiveNote />
         </div>
       </div>
     )
@@ -189,7 +171,6 @@ const PopulationSearchHistory = ({ populations, removePopulation }) => {
 }
 
 PopulationSearchHistory.propTypes = {
-  removePopulation: func.isRequired,
   populations: shape({
     pending: bool,
     error: bool,
@@ -202,10 +183,4 @@ const mapStateToProps = ({ populations }) => ({
   populations,
 })
 
-const mapDispatchToProps = dispatch => ({
-  removePopulation: uuid => {
-    dispatch(removePopulation(uuid))
-  },
-})
-
-export const ConnectedPopulationSearchHistory = connect(mapStateToProps, mapDispatchToProps)(PopulationSearchHistory)
+export const ConnectedPopulationSearchHistory = connect(mapStateToProps)(PopulationSearchHistory)

@@ -163,8 +163,6 @@ export const PopulationStatistics = () => {
     </div>
   )
 
-  const selected = query?.studyRights?.studyTrack ? [query?.studyRights?.studyTrack] : undefined
-
   return (
     <FilterView
       displayTray={location.search !== ''}
@@ -177,7 +175,11 @@ export const PopulationStatistics = () => {
           studyStart: (students[0] || {}).studyrightStart,
         },
         [studyTrackFilter.key]: {
-          selected,
+          selected: query?.studyRights?.studyTrack ? [query?.studyRights?.studyTrack] : [],
+        },
+        [tagsFilter.key]: {
+          includedTags: query?.tag ? [query.tag] : [],
+          excludedTags: [],
         },
       }}
       name="PopulationStatistics"

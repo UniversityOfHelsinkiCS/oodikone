@@ -8,9 +8,9 @@ export const BreakdownBarChart = ({
   handleClick,
   facultyGraph = true,
   year = null,
-  label,
   programmeNames,
   universityMode,
+  yearLabel,
 }) => {
   const { language } = useLanguage()
 
@@ -55,7 +55,7 @@ export const BreakdownBarChart = ({
     if (universityMode) {
       return facultyGraph ? 'Graduation year' : 'Faculty'
     }
-    return facultyGraph ? label : 'Programme'
+    return facultyGraph ? yearLabel : 'Programme'
   }
 
   const config = {
@@ -126,7 +126,7 @@ export const BreakdownBarChart = ({
       },
     },
   }
-  if (!facultyGraph) config.title.text = `Year ${year} by ${label.toLowerCase()}`
+  if (!facultyGraph) config.title.text = `Year ${year} by ${yearLabel.toLowerCase()}`
 
   return (
     <div className={`${facultyGraph ? 'faculty' : 'programmes'}-breakdown-graph`}>

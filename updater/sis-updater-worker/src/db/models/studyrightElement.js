@@ -1,4 +1,4 @@
-const { Model, STRING, DATE } = require('sequelize')
+const { Model, DATE, STRING } = require('sequelize')
 
 const { dbConnections } = require('../connection')
 

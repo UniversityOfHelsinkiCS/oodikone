@@ -4,6 +4,12 @@ import { Dropdown, Form, Input, Radio } from 'semantic-ui-react'
 
 import { useGetCurriculumsQuery, useGetCurriculumOptionsQuery } from '@/redux/populationCourses'
 
+const convertPeriodIdToStartYear = curriculumPeriodId => {
+  const versionNumber = parseInt(curriculumPeriodId.slice(-2), 10)
+  const year = versionNumber + 1949
+  return year
+}
+
 const chooseCurriculumToFetch = (curriculums, selectedCurriculum, startYear) => {
   if (selectedCurriculum?.curriculum_period_ids) {
     return selectedCurriculum
@@ -13,7 +19,7 @@ const chooseCurriculumToFetch = (curriculums, selectedCurriculum, startYear) => 
       return curriculums[0]
     }
     const defaultCurriculum = curriculums.find(curriculum =>
-      curriculum.curriculum_period_ids.includes(parseInt(startYear, 10))
+      curriculum.curriculum_period_ids.some(id => `${convertPeriodIdToStartYear(id)}` === startYear)
     )
     return defaultCurriculum ?? curriculums[0]
   }
@@ -43,19 +49,10 @@ export const CurriculumPicker = ({ setCurriculum, programmeCodes, disabled, year
     setCurriculum({ ...chosenCurriculumData, version: chosenCurriculum?.curriculum_period_ids })
   }, [chosenCurriculumData])
 
-  const convertPeriodIdToYear = curriculumPeriodId => {
-    const versionNumber = parseInt(curriculumPeriodId.slice(-2), 10)
-    const year = versionNumber + 1949
-    return year
-  }
-
   const formatCurriculumOptions = curriculum => {
-    const years = sortBy(curriculum.curriculum_period_ids.map(convertPeriodIdToYear))
+    const years = sortBy(curriculum.curriculum_period_ids.map(convertPeriodIdToStartYear))
     if (years.length === 0) {
       return 'error'
-    }
-    if (years.length === 1) {
-      return `${years[0]} - ${years[0] + 1}`
     }
     return `${years[0]} - ${years[years.length - 1] + 1}`
   }
@@ -79,8 +76,7 @@ export const CurriculumPicker = ({ setCurriculum, programmeCodes, disabled, year
       style={{
         background: '#e3e3e3',
         marginLeft: '10px',
-        padding: '4px',
-        paddingLeft: '8px',
+        padding: '4px 4px 4px 8px',
       }}
       value={chosenCurriculum.id}
     />

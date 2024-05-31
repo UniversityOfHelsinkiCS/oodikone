@@ -12,16 +12,16 @@ export const TagModal = ({ combinedProgramme, studytrack, tags }) => {
   useEffect(() => {
     if (!isLoading) {
       if (isSuccess) {
-        setModalOpen(false)
         setSelected('')
         setInput('')
+        setTimeout(() => setModalOpen(false), 2000)
       }
     }
   }, [isLoading])
 
   const handleClick = async event => {
     event.preventDefault()
-    const studentnumbers = input.match(/[^\s,]+/g)
+    const studentnumbers = input.match(/[^\s,;]+/g)
     await createStudentTags({
       tags: studentnumbers.map(studentNumber => ({
         tag_id: selectedValue,
@@ -58,7 +58,8 @@ export const TagModal = ({ combinedProgramme, studytrack, tags }) => {
       <Modal.Content>
         <Form>
           <h2>Add a tag to students</h2>
-          <Message content="Adding tags to students failed." hidden={!isError} negative />
+          <Message content="Failed to add tags to students." hidden={!isError} negative />
+          <Message content="Successfully added tags to students." hidden={!isSuccess} positive />
           <Form.Field>
             <label>Select a tag to add</label>
             <Dropdown
@@ -72,8 +73,10 @@ export const TagModal = ({ combinedProgramme, studytrack, tags }) => {
             />
           </Form.Field>
           <Form.Field>
-            <label>Insert student numbers you wish to add the tag to (use commas to separate)</label>
-            <TextArea onChange={event => setInput(event.target.value)} placeholder="011111111" value={input} />
+            <label>
+              Insert student numbers you wish to tag. Separate each number with a comma, semicolon, space, or newline.
+            </label>
+            <TextArea onChange={(_, { value }) => setInput(value)} placeholder="011111111" rows={10} value={input} />
           </Form.Field>
         </Form>
       </Modal.Content>
@@ -81,7 +84,7 @@ export const TagModal = ({ combinedProgramme, studytrack, tags }) => {
         <Button content="Cancel" negative onClick={() => setModalOpen(false)} />
         <Button
           content="Add tags"
-          disabled={isLoading || selectedValue.length === 0 || !input.match(/[^\s,]+/g)}
+          disabled={isLoading || selectedValue.length === 0 || !input.match(/[^\s,;]+/g)}
           onClick={event => handleClick(event)}
           positive
         />

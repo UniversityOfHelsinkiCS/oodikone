@@ -1,24 +1,24 @@
 import { useState } from 'react'
 import { Divider, Message } from 'semantic-ui-react'
 
+import '@/components/FacultyStatistics/faculty.css'
 import { BreakdownBarChart } from './BreakdownBarChart'
 import { MedianBarChart } from './MedianBarChart'
-import '../faculty.css'
 
 const MedianDisplay = ({
-  handleClick,
-  data,
-  level,
-  goal,
-  label,
-  levelProgrammeData,
-  programmeNames,
   classSizes,
-  groupBy,
+  data,
+  goal,
   goalExceptions,
-  year,
+  groupBy,
+  handleClick,
+  level,
+  levelProgrammeData,
   programmeData,
+  programmeNames,
   universityMode,
+  year,
+  yearLabel,
 }) => {
   return (
     <div>
@@ -44,9 +44,9 @@ const MedianDisplay = ({
           data={data}
           goal={goal}
           handleClick={handleClick}
-          label={label}
           programmeNames={programmeNames}
           universityMode={universityMode}
+          yearLabel={yearLabel}
         />
         {!programmeData ? (
           <div className="graduations-message">
@@ -62,11 +62,11 @@ const MedianDisplay = ({
             goal={goal}
             goalExceptions={goalExceptions}
             handleClick={handleClick}
-            label={label}
             level={level}
             programmeNames={programmeNames}
             universityMode={universityMode}
             year={year}
+            yearLabel={yearLabel}
           />
         )}
       </div>
@@ -75,19 +75,24 @@ const MedianDisplay = ({
 }
 
 const BreakdownDisplay = ({
-  handleClick,
   data,
-  label,
+  handleClick,
   levelProgrammeData,
-  programmeNames,
-  year,
   programmeData,
+  programmeNames,
   universityMode,
+  year,
+  yearLabel,
 }) => {
   return (
     <div>
       <div className="graduations-chart-container">
-        <BreakdownBarChart data={data} handleClick={handleClick} label={label} universityMode={universityMode} />
+        <BreakdownBarChart
+          data={data}
+          handleClick={handleClick}
+          universityMode={universityMode}
+          yearLabel={yearLabel}
+        />
         {!programmeData ? (
           <div className="graduations-message">
             <Message compact>
@@ -99,10 +104,10 @@ const BreakdownDisplay = ({
             data={levelProgrammeData[year]?.data}
             facultyGraph={false}
             handleClick={handleClick}
-            label={label}
             programmeNames={programmeNames}
             universityMode={universityMode}
             year={year}
+            yearLabel={yearLabel}
           />
         )}
       </div>
@@ -111,23 +116,24 @@ const BreakdownDisplay = ({
 }
 
 export const GraduationTimes = ({
-  title,
+  classSizes,
   data,
-  level,
   goal,
-  label,
+  goalExceptions,
+  groupBy,
+  level,
   levelProgrammeData,
   programmeNames,
   showMedian,
-  classSizes,
-  groupBy,
-  goalExceptions,
+  title,
   universityMode,
+  yearLabel,
 }) => {
   const [programmeData, setProgrammeData] = useState(false)
   const [year, setYear] = useState(null)
-  if (!data.some(a => a.amount > 0)) return null
-
+  if (!data.some(a => a.amount > 0)) {
+    return null
+  }
   const handleClick = (event, isFacultyGraph, seriesCategory = null) => {
     if (isFacultyGraph) {
       setYear(seriesCategory || event.point.name)
@@ -145,13 +151,13 @@ export const GraduationTimes = ({
         <BreakdownDisplay
           data={data}
           handleClick={handleClick}
-          label={label}
           level={level}
           levelProgrammeData={levelProgrammeData}
           programmeData={programmeData}
           programmeNames={programmeNames}
           universityMode={universityMode}
           year={year}
+          yearLabel={yearLabel}
         />
       ) : (
         <MedianDisplay
@@ -161,13 +167,13 @@ export const GraduationTimes = ({
           goalExceptions={goalExceptions}
           groupBy={groupBy}
           handleClick={handleClick}
-          label={label}
           level={level}
           levelProgrammeData={levelProgrammeData}
           programmeData={programmeData}
           programmeNames={programmeNames}
           universityMode={universityMode}
           year={year}
+          yearLabel={yearLabel}
         />
       )}
     </div>

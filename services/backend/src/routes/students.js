@@ -11,7 +11,7 @@ const filterStudentTags = (student, userId) => {
   }
 }
 
-router.get('/students', async (req, res) => {
+router.get('/', async (req, res) => {
   const {
     user: { roles, studentsUserCanAccess },
     query: { searchTerm },
@@ -37,7 +37,7 @@ router.get('/students', async (req, res) => {
   res.json(results)
 })
 
-router.get('/students/:id', async (req, res) => {
+router.get('/:id', async (req, res) => {
   const { id: studentId } = req.params
   const {
     user: { id, roles, studentsUserCanAccess },

@@ -91,23 +91,15 @@ const PopulationSearchForm = ({ queries, onProgress, clearSelected, getPopulatio
   }
 
   const checkPreviousQuery = (query, previousQuery) => {
-    if (!previousQuery.studyRights) return false
     const sameMonths = query.months === previousQuery.months
-    const sameYear = query.Year === previousQuery.Year
-    const sameSemesters = previousQuery.semesters
-      ? isEqual(previousQuery.semesters, query.semesters)
-      : !(query.semesters.length > 0)
-    const studentStatusesArray =
-      typeof query.studentStatuses === 'string' ? [query.studentStatuses] : query.studentStatuses
-    const sameStudentStatuses = previousQuery.studentStatuses
-      ? isEqual(studentStatusesArray, previousQuery.studentStatuses)
-      : !(query.studentStatuses.length > 0)
-    const sameYears = previousQuery.years ? isEqual(previousQuery.years, query.years) : !query.years
-    const sameStudyrights = previousQuery.studyRights
-      ? isEqual(previousQuery.studyRights, query.studyRights)
-      : !query.studyRights
+    const sameYear = query.year === previousQuery.year
+    const sameSemesters = isEqual(previousQuery.semesters, query.semesters)
+    const sameStudentStatuses = isEqual(previousQuery.studentStatuses, query.studentStatuses)
+    const sameYears = isEqual(previousQuery.years, query.years)
+    const sameStudyrights = isEqual(previousQuery.studyRights, query.studyRights)
+    const sameTag = previousQuery.tag === query.tag
 
-    return sameStudyrights && sameMonths && sameYear && sameSemesters && sameStudentStatuses && sameYears
+    return sameStudyrights && sameMonths && sameYear && sameSemesters && sameStudentStatuses && sameYears && sameTag
   }
 
   const formatQueryParamsToArrays = (query, params) => {

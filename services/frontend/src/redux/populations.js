@@ -18,6 +18,7 @@ export const getPopulationStatistics = ({
   year,
   years,
   onProgress,
+  tag,
 }) => {
   const route = '/v3/populationstatistics/'
   const prefix = 'GET_POPULATION_STATISTICS_'
@@ -29,6 +30,7 @@ export const getPopulationStatistics = ({
     months,
     year,
     years,
+    tag,
   }
   const params = {
     semesters,
@@ -85,11 +87,6 @@ export const {
 
 export const clearPopulations = () => ({
   type: 'CLEAR_POPULATIONS',
-})
-
-export const removePopulation = uuid => ({
-  type: 'REMOVE_POPULATION',
-  uuid,
 })
 
 export const reducer = (state = initialState, action) => {

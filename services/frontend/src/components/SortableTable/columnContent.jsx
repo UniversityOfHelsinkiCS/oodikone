@@ -57,10 +57,7 @@ export const DataItem = ({ item, parents = [] }) => {
     columns: mergeColumnDefinitions(context.columns, item.definition.columnOverrides),
   }
 
-  const headerRowData =
-    typeof item.definition.headerRowData === 'function'
-      ? item.definition.headerRowData(item)
-      : item.definition.headerRowData
+  const { headerRowData } = item.definition
 
   const headerRow = (
     <SortableTableContext.Provider value={overriddenContext}>
@@ -203,7 +200,7 @@ const RowComponent = ({ data, isGroup, parents }) => {
     const content = getCellContent(column, data, isGroup, parents)
 
     if (!Number.isNaN(Number(content))) {
-      cellProps.style = { ...cellProps.style, textAlign: 'right' }
+      cellProps.style = { textAlign: 'right', ...cellProps.style }
     }
 
     if (content != null) {

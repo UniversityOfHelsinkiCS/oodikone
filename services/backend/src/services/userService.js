@@ -82,7 +82,7 @@ const formatUser = async (user, getStudentAccess = true) => {
           (
             await Promise.all([
               getStudentnumbersByElementdetails(fullStudyProgrammeRights),
-              getAllStudentsUserHasInGroups(user.sisu_person_id),
+              getAllStudentsUserHasInGroups(user.sisuPersonId),
             ])
           ).flat()
         )

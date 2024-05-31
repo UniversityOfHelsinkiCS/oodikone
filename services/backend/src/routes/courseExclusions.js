@@ -2,7 +2,7 @@ const router = require('express').Router()
 
 const { addExcludedCourses, removeExcludedCourses } = require('../services/excludedCourses')
 
-router.delete('/v3/course_exclusions/:code', async (req, res) => {
+router.delete('/:code', async (req, res) => {
   const { code: programmeCode } = req.params
   const { curriculumVersion, courseCodes } = req.body
   const result = await removeExcludedCourses({ programmeCode, curriculumVersion, courseCodes })
@@ -13,7 +13,7 @@ router.delete('/v3/course_exclusions/:code', async (req, res) => {
   res.json(result)
 })
 
-router.post('/v3/course_exclusions/:code', async (req, res) => {
+router.post('/:code', async (req, res) => {
   const { code } = req.params
   const { courseCodes, curriculumVersion } = req.body
   const result = await addExcludedCourses(code, courseCodes, curriculumVersion.join(','))
