@@ -28,6 +28,12 @@ const baseUrl = isDev ? '/api' : ''
 const frontUrl = process.env.FRONT_URL
 const backendPort = 8080
 
+// System run in whose environment
+const serviceProvider = process.env.SERVICE_PROVIDER || 'Toska'
+
+// Optional logout-url configuration
+const configLogoutUrl = serviceProvider === 'Toska' ? undefined : process.env.LOGOUT_URL
+
 // Other stuff
 const { DB_URL_KONE, DB_URL_USER, SECRET_TOKEN, SIS_UPDATER_URL, CRYPT_KEY } = process.env
 
@@ -73,4 +79,6 @@ module.exports = {
   importerUrl,
   importerToken,
   isDev,
+  serviceProvider,
+  configLogoutUrl,
 }
