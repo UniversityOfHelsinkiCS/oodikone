@@ -2,6 +2,7 @@ const _ = require('lodash')
 const { LRUCache } = require('lru-cache')
 
 const { sendNotificationAboutNewUser } = require('./mailservice')
+const { getSisuAuthData, personSearchQuery, getGraphqlData } = require('./oriProvider')
 const { getStudentnumbersByElementdetails } = require('./students')
 const { checkStudyGuidanceGroupsAccess, getAllStudentsUserHasInGroups } = require('./studyGuidanceGroups')
 const { serviceProvider } = require('../conf-backend')
@@ -230,6 +231,16 @@ const fdGetUser = async ({ username }) => {
   return user
 }
 
+const getUserFromSisuByEppn = async (newUserEppn, requesterEppn) => {
+  const { accessToken: requesterAccessToken } = await getSisuAuthData(requesterEppn)
+  const { tokenData: newUserTokenData } = await getSisuAuthData(newUserEppn)
+  const personData = await getGraphqlData(requesterAccessToken, {
+    query: personSearchQuery,
+    variables: { subjectUserId: newUserTokenData.personid },
+  })
+  return personData
+}
+
 const getMockedUser = serviceProvider === 'Toska' ? basicGetMockedUser : fdGetMockedUser
 const getUser = serviceProvider === 'Toska' ? toskaGetUser : fdGetUser
 
@@ -244,4 +255,5 @@ module.exports = {
   getOrganizationAccess,
   deleteOutdatedUsers,
   roles,
+  getUserFromSisuByEppn,
 }

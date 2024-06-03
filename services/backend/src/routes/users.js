@@ -83,4 +83,10 @@ router.post('/language', async (req, res) => {
   }
 })
 
+router.get('/get-from-sisu-by-eppn/:eppn', auth.roles(['admin']), async (req, res) => {
+  const { eppn } = req.params
+  const person = await userService.getUserFromSisuByEppn(eppn, eppn)
+  res.json(person)
+})
+
 module.exports = router
