@@ -1,25 +1,25 @@
 const moment = require('moment')
 
+const { getAcademicYearDates } = require('../../util/semester')
+const { countTimeCategories, getStatutoryAbsences } = require('../graduationHelpers')
 const { studytrackStudents, enrolledStudents, absentStudents } = require('./studentGetters')
 const {
+  getCorrectStudentnumbers,
+  getGoal,
   getMedian,
+  getPercentage,
   getStartDate,
   getYearsArray,
-  getPercentage,
   getYearsObject,
-  getCorrectStudentnumbers,
   tableTitles,
-  getGoal,
 } = require('./studyprogrammeHelpers')
 const {
   allStudyrights,
-  startedStudyrights,
-  inactiveStudyrights,
-  graduatedStudyRightsByStartDate,
   graduatedStudyRights,
+  graduatedStudyRightsByStartDate,
+  inactiveStudyrights,
+  startedStudyrights,
 } = require('./studyrightFinders')
-const { getAcademicYearDates } = require('../../util/semester')
-const { countTimeCategories, getStatutoryAbsences } = require('../graduationHelpers')
 
 const getUnique = studentnumbers => [...new Set(studentnumbers)]
 const getStudentData = (startDate, students) => {

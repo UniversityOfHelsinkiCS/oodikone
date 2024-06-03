@@ -1,9 +1,9 @@
 const { uniqBy, flatten, groupBy } = require('lodash')
 const _ = require('lodash')
 
-const { courseProviderMapper, courseMapper, mapCourseType, mapStudyrightExtent } = require('./mapper')
-const { selectFromByIdsOrderBy, bulkCreate } = require('../db')
-const { Organization, Course, CourseType, CourseProvider, CreditType, StudyrightExtent } = require('../db/models')
+const { bulkCreate, selectFromByIdsOrderBy } = require('../db')
+const { Course, CourseProvider, CourseType, CreditType, Organization, StudyrightExtent } = require('../db/models')
+const { courseMapper, courseProviderMapper, mapCourseType, mapStudyrightExtent } = require('./mapper')
 
 const updateOrganisations = async organisations => {
   await bulkCreate(Organization, organisations)

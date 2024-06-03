@@ -1,12 +1,12 @@
 const _ = require('lodash')
 const { Op } = require('sequelize')
 
-const { formatTransfer } = require('./studyprogrammeHelpers')
 const {
   dbConnections: { sequelize },
 } = require('../../database/connection')
-const { Credit, Course, Organization, ProgrammeModule, Transfer, Enrollment } = require('../../models')
+const { Course, Credit, Enrollment, Organization, ProgrammeModule, Transfer } = require('../../models')
 const logger = require('../../util/logger')
+const { formatTransfer } = require('./studyprogrammeHelpers')
 
 const whereStudents = studentnumbers => {
   return studentnumbers || { [Op.not]: null }

@@ -7,9 +7,12 @@ const { checkStudyGuidanceGroupsAccess, getAllStudentsUserHasInGroups } = requir
 const { serviceProvider } = require('../conf-backend')
 const { sequelizeUser } = require('../database/connection')
 const { User } = require('../models/models_user')
-const { getUserIams, getAllUserAccess, getUserIamAccess } =
+const { getAllUserAccess, getUserIams, getUserIamAccess } =
   serviceProvider === 'Toska' ? require('../util/jami') : require('../util/mami')
 const { createLocaleComparator, getFullStudyProgrammeRights, hasFullAccessToStudentData } = require('../util/utils')
+const { sendNotificationAboutNewUser } = require('./mailservice')
+const { getStudentnumbersByElementdetails } = require('./students')
+const { checkStudyGuidanceGroupsAccess, getAllStudentsUserHasInGroups } = require('./studyGuidanceGroups')
 
 const courseStatisticsGroup = 'grp-oodikone-basic-users'
 const facultyStatisticsGroup = 'grp-oodikone-users'
