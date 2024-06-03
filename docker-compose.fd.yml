@@ -10,7 +10,7 @@ services:
     container_name: adminer
     environment:
       ADMINER_DESIGN: pepa-linha
-    image: adminer:4.8.0
+    image: adminer:4.8.1
     ports:
       - 5050:8080
     volumes:
@@ -63,7 +63,7 @@ services:
       PGDATA: /data
       POSTGRES_DB: kone-db
       POSTGRES_HOST_AUTH_METHOD: trust
-    image: postgres:15.3
+    image: postgres:15.7
     volumes:
       - kone-db-data:/data
 
@@ -71,7 +71,7 @@ services:
     <<: *defaults
     command: 'redis-server --appendonly yes'
     container_name: redis
-    image: redis:6.2.13
+    image: redis:6.2.14
     ports:
       - '6379:6379'
     volumes:
@@ -84,7 +84,7 @@ services:
       PGDATA: /data
       POSTGRES_DB: sis-db
       POSTGRES_HOST_AUTH_METHOD: trust
-    image: postgres:15.3
+    image: postgres:15.7
     volumes:
       - sis-db-data:/data
     shm_size: 2gb
@@ -98,7 +98,7 @@ services:
       PGDATA: /data
       POSTGRES_DB: sis-importer-db
       POSTGRES_HOST_AUTH_METHOD: trust
-    image: postgres:15.3
+    image: postgres:15.7
     volumes:
       - sis-importer-db-data:/data
     ports:
@@ -108,7 +108,7 @@ services:
     <<: *defaults
     command: '-cid sis-updater-nats -m 8222 -p 4222 --max_channels 1000 --max_age 2h --hb_fail_count 2 --hb_timeout 10s --hb_interval 10s --auth dev --file_slice_max_bytes 0 --file_slice_max_age 60s --max_msgs 0 -store file -dir datastore'
     container_name: sis-updater-nats
-    image: nats-streaming:0.16.2
+    image: nats-streaming:0.25.6
 
   sis-updater-scheduler:
     <<: *defaults
@@ -166,7 +166,7 @@ services:
       PGDATA: /data
       POSTGRES_DB: user-db
       POSTGRES_HOST_AUTH_METHOD: trust
-    image: postgres:15.3
+    image: postgres:15.7
     volumes:
       - user-db-data:/data
     ports:
