@@ -210,4 +210,4 @@ University of Helsinki
 
 ## Tietosuoja / data protection
 
-See [tietosuoja.md](tietosuoja.md).
+See [tietosuoja.md](./documentation/tietosuoja.md).
