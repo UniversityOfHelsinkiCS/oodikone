@@ -1,17 +1,17 @@
 const _ = require('lodash')
 const { Op } = require('sequelize')
 
-const { getCurrentStudyYearStartDate, getNotCompletedForProgrammeCourses, getAllProgrammeCourses } = require('.')
-const {
-  getOwnStudentsForProgrammeCourses,
-  getStudentsForProgrammeCourses,
-  getStudentsWithoutStudyrightForProgrammeCourses,
-  getOtherStudentsForProgrammeCourses,
-  getTransferStudentsForProgrammeCourses,
-} = require('./studentGetters')
 const { Credit, Enrollment } = require('../../models')
 const { mapToProviders } = require('../../util/utils')
 const { createArrayOfCourses } = require('../languageCenterData')
+const {
+  getOtherStudentsForProgrammeCourses,
+  getOwnStudentsForProgrammeCourses,
+  getStudentsForProgrammeCourses,
+  getStudentsWithoutStudyrightForProgrammeCourses,
+  getTransferStudentsForProgrammeCourses,
+} = require('./studentGetters')
+const { getCurrentStudyYearStartDate, getNotCompletedForProgrammeCourses, getAllProgrammeCourses } = require('.')
 
 const getCurrentYearStartDate = () => {
   return new Date(new Date().getFullYear(), 0, 1)

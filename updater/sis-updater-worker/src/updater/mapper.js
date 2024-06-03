@@ -1,15 +1,15 @@
 const { sortBy, flatten, uniqBy } = require('lodash')
 
+const { getMinMaxDate } = require('../utils')
 const {
   educationTypeToExtentcode,
-  getSemesterByDate,
+  getCountry,
   getCreditTypeCodeFromAttainment,
   getGrade,
-  getUniOrgId,
   getSemester,
-  getCountry,
+  getSemesterByDate,
+  getUniOrgId,
 } = require('./shared')
-const { getMinMaxDate } = require('../utils')
 
 // Keeping previous oodi logic:
 // 0 = Not known 'urn:code:gender:not-known'

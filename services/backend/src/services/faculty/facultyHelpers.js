@@ -111,12 +111,18 @@ const isNewProgramme = code => {
   return false
 }
 
-const checkTransfers = (s, insideTransfersStudyrights, transfersToOrAwayStudyrights) => {
+const checkTransfers = (studyright, insideTransfersStudyrights, transfersToOrAwayStudyrights) => {
   const allTransfers = [
-    ...insideTransfersStudyrights.map(sr => sr.studentnumber),
-    ...transfersToOrAwayStudyrights.map(sr => sr.studentnumber),
+    ...insideTransfersStudyrights.map(studyright => studyright.studentnumber),
+    ...transfersToOrAwayStudyrights.map(studyright => studyright.studentnumber),
   ]
-  return allTransfers.includes(s.studentnumber)
+  return allTransfers.includes(studyright.studentnumber)
+}
+
+const commissionedProgrammes = ['KH50_009', 'MH50_015', 'T923103-N']
+
+const checkCommissioned = studyright => {
+  return studyright.studyrightElements.some(element => commissionedProgrammes.includes(element.code))
 }
 
 const getExtentFilter = includeAllSpecials => {
@@ -157,6 +163,7 @@ module.exports = {
   formatOrganization,
   isNewProgramme,
   checkTransfers,
+  checkCommissioned,
   getExtentFilter,
   mapCodesToIds,
   facultyProgrammeStudents,

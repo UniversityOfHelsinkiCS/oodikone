@@ -1,16 +1,16 @@
 const { flatten, groupBy, orderBy, has, get, uniq } = require('lodash')
 const { Op } = require('sequelize')
 
-const { updateAttainments } = require('./attainments')
-const { getAttainmentsToBeExcluded } = require('./excludedPartialAttainments')
-const { updateStudyplans, findStudentsToReupdate } = require('./studyPlans')
-const { updateStudyRights, updateStudyRightElements, updateElementDetails } = require('./studyRightUpdaters')
-const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate, selectFromActiveSnapshotsByIds } = require('../../db')
-const { Course, Student, SemesterEnrollment, Transfer, Enrollment } = require('../../db/models')
+const { bulkCreate, selectFromActiveSnapshotsByIds, selectFromByIds, selectFromSnapshotsByIds } = require('../../db')
+const { Course, Enrollment, SemesterEnrollment, Student, Transfer } = require('../../db/models')
 const { isBaMa } = require('../../utils')
 const { logger } = require('../../utils/logger')
 const { studentMapper, semesterEnrollmentMapper, enrollmentMapper } = require('../mapper')
 const { getEducation, getUniOrgId, loadMapsIfNeeded } = require('../shared')
+const { updateAttainments } = require('./attainments')
+const { getAttainmentsToBeExcluded } = require('./excludedPartialAttainments')
+const { updateStudyplans, findStudentsToReupdate } = require('./studyPlans')
+const { updateStudyRights, updateStudyRightElements, updateElementDetails } = require('./studyRightUpdaters')
 
 // Accepted selection path is not available when degree programme doesn't have
 // studytrack or major subject. This is a known bug on SIS and has been reported

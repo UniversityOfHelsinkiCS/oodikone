@@ -1,10 +1,10 @@
+const logger = require('../../util/logger')
 const {
   getOpenUniSearchesByUser,
   createOpenUniPopulationSearch,
   updateOpenUniPopulationSearch,
   deleteOpenUniSearch,
 } = require('./openUniSearches')
-const logger = require('../../util/logger')
 
 const getOpenUniSearches = async userId => {
   const savedSearches = await getOpenUniSearchesByUser(userId)

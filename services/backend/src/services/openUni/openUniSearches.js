@@ -1,14 +1,14 @@
 const { Op } = require('sequelize')
 
+const { Course, Credit, Enrollment, Student, Studyright } = require('../../models')
+const { OpenUniPopulationSearch } = require('../../models/models_kone')
 const {
+  mapCourseInfo,
   mapOpenCredits,
   mapOpenEnrollments,
-  mapStundentInfo,
+  mapStudentInfo,
   mapStudyRights,
-  mapCourseInfo,
 } = require('./openUniHelpers')
-const { Credit, Enrollment, Studyright, Student, Course } = require('../../models')
-const { OpenUniPopulationSearch } = require('../../models/models_kone')
 
 const getCredits = async (courseCodes, startdate) =>
   (
@@ -34,7 +34,7 @@ const getStudentInfo = async students =>
         },
       },
     })
-  ).map(mapStundentInfo)
+  ).map(mapStudentInfo)
 
 const getEnrollments = async (courseCodes, startdate, enddate) =>
   (

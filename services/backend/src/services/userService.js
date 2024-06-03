@@ -1,13 +1,13 @@
 const _ = require('lodash')
 const { LRUCache } = require('lru-cache')
 
+const { sequelizeUser } = require('../database/connection')
+const { User } = require('../models/models_user')
+const { getAllUserAccess, getUserIams, getUserIamAccess } = require('../util/jami')
+const { createLocaleComparator, getFullStudyProgrammeRights, hasFullAccessToStudentData } = require('../util/utils')
 const { sendNotificationAboutNewUser } = require('./mailservice')
 const { getStudentnumbersByElementdetails } = require('./students')
 const { checkStudyGuidanceGroupsAccess, getAllStudentsUserHasInGroups } = require('./studyGuidanceGroups')
-const { sequelizeUser } = require('../database/connection')
-const { User } = require('../models/models_user')
-const { getUserIams, getAllUserAccess, getUserIamAccess } = require('../util/jami')
-const { createLocaleComparator, getFullStudyProgrammeRights, hasFullAccessToStudentData } = require('../util/utils')
 
 const courseStatisticsGroup = 'grp-oodikone-basic-users'
 const facultyStatisticsGroup = 'grp-oodikone-users'
