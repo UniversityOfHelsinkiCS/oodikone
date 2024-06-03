@@ -53,7 +53,7 @@ services:
     ports:
       - 3000:3000
     environment:
-      SERVICE_PROVIDER: Funidata
+      SERVICE_PROVIDER: 'Fd'
     volumes:
       - frontend-nodemod:/opt/app-root/src/node_modules
       - ./services/frontend/:/opt/app-root/src
