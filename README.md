@@ -96,7 +96,7 @@ graph TB
 
 In development, backend and updater use the same redis, but in production they are separate.
 
-See also [older graph](documentation/Oodikone.png), which presents more information.
+See also the [older graph](documentation/img/oodikone.png) for more information.
 
 To read a bit more details about what updater-scheduler and updater-worker do, see their own READMEs:
 
@@ -105,7 +105,9 @@ To read a bit more details about what updater-scheduler and updater-worker do, s
 
 ### Documentation
 
-Folder `documentation` currently contains some notes on sis-db schema and is meant as a place for storing useful information on Oodikone to make life easier for future developers. Feel free to add anything relevant!
+The `documentation` directory contains some notes on sis-db schema and is meant as a place for storing useful information on Oodikone to make life easier for future developers. Feel free to add anything relevant!
+
+For internal meeting notes and sensitive information, see Toska GitLab.
 
 ### Basics
 
