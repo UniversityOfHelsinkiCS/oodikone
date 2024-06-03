@@ -1,9 +1,6 @@
 const _ = require('lodash')
 const { LRUCache } = require('lru-cache')
 
-const { sendNotificationAboutNewUser } = require('./mailservice')
-const { getStudentnumbersByElementdetails } = require('./students')
-const { checkStudyGuidanceGroupsAccess, getAllStudentsUserHasInGroups } = require('./studyGuidanceGroups')
 const { serviceProvider } = require('../conf-backend')
 const { sequelizeUser } = require('../database/connection')
 const { User } = require('../models/models_user')
