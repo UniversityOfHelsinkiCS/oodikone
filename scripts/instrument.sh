@@ -1,20 +1,30 @@
 #!/usr/bin/env bash
 
 # This script is used for instrumenting the frontend code
+# Counters are added for calculating the code coverage
 # Instrumented code is used for generating code coverage reports
 
 # Ensure the script exits if any command fails
 set -euo pipefail
 
+# Print status
+echo "Instrumenting code..."
+
 # Define the directories
-FRONTEND_SRC_DIR="services/frontend/src"
-FRONTEND_INSTRUMENTED_DIR="services/frontend/instrumented"
+SOURCE_DIR="services/frontend/src"
+INSTRU_DIR="services/frontend/instrumented"
 
-# Create instrumented directories if they don't exist
-mkdir -p $FRONTEND_INSTRUMENTED_DIR
+# Create the instrumented directory if it does not exist
+mkdir -p $INSTRU_DIR
 
-# Copy all files from src to instrumented directory
-cp -r $FRONTEND_SRC_DIR/* $FRONTEND_INSTRUMENTED_DIR
+# Instrument the code
+nyc instrument --all --compact=false $SOURCE_DIR $INSTRU_DIR
 
-# Instrument the copied code
-nyc instrument --in-place --compact=false $FRONTEND_INSTRUMENTED_DIR $FRONTEND_INSTRUMENTED_DIR
+# Copy remaining files without overwriting instrumented files
+# 
+# Images, CSS and other static files are not instrumended
+# but they are still needed to run the application
+rsync -av --quiet --ignore-existing $SOURCE_DIR/ $INSTRU_DIR/
+
+# Print status
+echo "Done!"

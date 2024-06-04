@@ -1,4 +1,4 @@
 {
   "all": true,
-  "include": ["services/frontend/instrumented/**/*.*"]
+  "include": ["services/frontend/src/**/*.*"]
 }
