@@ -6,16 +6,15 @@ import { SortableTable } from '../SortableTable'
 export const NewUserSection = ({ onAddUser }) => {
   const [eppn, setEppn] = useState('')
   const [user, setUser] = useState('')
-  const [showTable, setShowTable] = useState(true)
 
-  const [getUserFromSisuByEppnQuery, { data: userFromApi, isLoadingGetUser, isErrorGetUser }] =
+  const [getUserFromSisuByEppnQuery, { data: userFromApi, isLoading: isLoadingGetUser, isError: isErrorGetUser }] =
     useLazyGetUserFromSisuByEppnQuery()
-  const [addUserMutation, { data: addedUser, isLoadingAddUser, isErrorAddUser }] = useAddUserMutation()
+  const [addUserMutation, { data: addedUser, isLoading: isLoadingAddUser, isError: isErrorAddUser }] =
+    useAddUserMutation()
 
   useEffect(() => {
-    if (!isLoadingGetUser && !isErrorGetUser) {
+    if (!isLoadingGetUser && !isErrorAddUser) {
       setUser(userFromApi)
-      setShowTable(true)
     }
   }, [userFromApi, isLoadingGetUser, isErrorGetUser])
 
@@ -23,7 +22,6 @@ export const NewUserSection = ({ onAddUser }) => {
     if (!isLoadingAddUser && !isErrorAddUser) {
       setUser('')
       setEppn('')
-      setShowTable(false)
       onAddUser()
     }
   }, [addedUser, isLoadingAddUser, isErrorAddUser])
@@ -33,10 +31,12 @@ export const NewUserSection = ({ onAddUser }) => {
   }
 
   const getUser = event => {
-    setShowTable(false)
+    setUser('')
     event.preventDefault()
     getUserFromSisuByEppnQuery(eppn)
-    setUser(userFromApi)
+    // this is not stylish, but seems to be the only way to avoid the new user table showing for a short while
+    // before a failed query returns isError
+    setTimeout(() => setUser(userFromApi), 500)
   }
 
   const addUser = () => {
@@ -62,7 +62,7 @@ export const NewUserSection = ({ onAddUser }) => {
 
       {isErrorGetUser && <h4>Something went wrong, please try a different eppn.</h4>}
 
-      {showTable && user && (
+      {!isErrorGetUser && user && (
         <SortableTable
           columns={[
             {
