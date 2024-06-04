@@ -1,9 +1,11 @@
 const _ = require('lodash')
 const { LRUCache } = require('lru-cache')
 
+const { serviceProvider } = require('../conf-backend')
 const { sequelizeUser } = require('../database/connection')
 const { User } = require('../models/models_user')
-const { getAllUserAccess, getUserIams, getUserIamAccess } = require('../util/jami')
+const { getAllUserAccess, getUserIams, getUserIamAccess } =
+  serviceProvider === 'Toska' ? require('../util/jami') : require('../util/mami')
 const { createLocaleComparator, getFullStudyProgrammeRights, hasFullAccessToStudentData } = require('../util/utils')
 const { sendNotificationAboutNewUser } = require('./mailservice')
 const { getStudentnumbersByElementdetails } = require('./students')
@@ -166,7 +168,7 @@ const getOrganizationAccess = async (sisPersonId, iamGroups) => {
   return { access: iamAccess || {}, specialGroup }
 }
 
-const getMockedUser = async ({ userToMock, mockedBy }) => {
+const basicGetMockedUser = async ({ userToMock, mockedBy }) => {
   // Using different keys for users being mocked to prevent users from seeing themselves as mocked. Also, if the user
   // is already logged in, we don't want the regular data from the cache because that doesn't have the mockedBy field
   const cacheKey = `mocking-as-${userToMock}`
@@ -189,7 +191,15 @@ const getMockedUser = async ({ userToMock, mockedBy }) => {
   return mockedUser
 }
 
-const getUser = async ({ username, name, email, iamGroups, specialGroup, sisId, access }) => {
+const fdGetMockedUser = async ({ userToMock, mockedBy }) => {
+  const mockedByFromDb = (await findUser({ username: mockedBy })).toJSON()
+
+  if (!mockedByFromDb) return null
+
+  return await basicGetMockedUser({ userToMock, mockedBy })
+}
+
+const toskaGetUser = async ({ username, name, email, iamGroups, specialGroup, sisId, access }) => {
   if (userDataCache.has(username)) return userDataCache.get(username)
 
   const isNewUser = !(await User.findOne({ where: { username } }))
@@ -203,6 +213,25 @@ const getUser = async ({ username, name, email, iamGroups, specialGroup, sisId, 
   userDataCache.set(username, user)
   return user
 }
+
+const fdGetUser = async ({ username }) => {
+  if (userDataCache.has(username)) return userDataCache.get(username)
+
+  await User.upsert({ username, lastLogin: new Date() })
+
+  const userFromDb = (await findUser({ username })).toJSON()
+
+  if (!userFromDb) return null
+
+  const programmeRights = getStudyProgrammeRights({}, {}, userFromDb.programmeRights)
+  const user = await formatUser({ ...userFromDb, iamGroups: [], programmeRights })
+
+  userDataCache.set(username, user)
+  return user
+}
+
+const getMockedUser = serviceProvider === 'Toska' ? basicGetMockedUser : fdGetMockedUser
+const getUser = serviceProvider === 'Toska' ? toskaGetUser : fdGetUser
 
 module.exports = {
   updateUser,

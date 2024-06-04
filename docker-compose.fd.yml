@@ -38,6 +38,7 @@ services:
       SIS_UPDATER_URL: http://sis-updater-scheduler:8082
       IMPORTER_DB_API_URL: 'https://localhost:3005'
       JAMI_URL: 'http://jami:3003/'
+      SERVICE_PROVIDER: 'Fd'
     ports:
       - 8080:8080
     volumes:
