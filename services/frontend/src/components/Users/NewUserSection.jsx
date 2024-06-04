@@ -4,8 +4,8 @@ import { Form, FormGroup, Input, Button, Loader, Segment } from 'semantic-ui-rea
 import { useLazyGetUserFromSisuByEppnQuery, useAddUserMutation } from '@/redux/users'
 import { SortableTable } from '../SortableTable'
 
-export const NewUserSection = () => {
-  const [eppn, setEppn] = useState('')
+export const NewUserSection = ({ onAddUser }) => {
+  const [eppn, setEppn] = useState('olliperson@gmail.com')
   const [user, setUser] = useState('')
 
   const [getUserFromSisuByEppnQuery, { data: userFromApi, isLoading, isError }] = useLazyGetUserFromSisuByEppnQuery()
@@ -19,13 +19,15 @@ export const NewUserSection = () => {
     if (value) setEppn(value)
   }
 
-  const megayYhyy = () => {
+  const megayYhyy = event => {
+    event.preventDefault()
     getUserFromSisuByEppnQuery(eppn)
     setUser(userFromApi)
   }
 
   const addUser = () => {
     addUserMutation(user)
+    onAddUser()
   }
 
   const cancelUser = () => {
