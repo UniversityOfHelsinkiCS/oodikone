@@ -56,6 +56,13 @@ const usersApi = RTKApi.injectEndpoints({
         body: { language },
       }),
     }),
+    addUser: builder.mutation({
+      query: user => ({
+        url: '/users/add',
+        method: 'POST',
+        body: { user },
+      }),
+    }),
   }),
   overrideExisting: false,
 })
@@ -64,11 +71,12 @@ export const {
   useGetAllUsersQuery,
   useGetUserQuery,
   useGetAccessGroupsQuery,
-  useGetUserFromSisuByEppnQuery,
+  useLazyGetUserFromSisuByEppnQuery,
   useModifyAccessGroupsMutation,
   useAddUserUnitsMutation,
   useRemoveUserUnitsMutation,
   useGetUserAccessEmailPreviewQuery,
   useSendUserAccessEmailMutation,
   useModifyLanguageMutation,
+  useAddUserMutation,
 } = usersApi

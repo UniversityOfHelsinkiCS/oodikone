@@ -231,6 +231,17 @@ const fdGetUser = async ({ username }) => {
   return user
 }
 
+const addNewUser = async user => {
+  const name = user.first_name.concat(' ', user.last_name)
+  await User.upsert({
+    fullName: name,
+    username: user.eppn,
+    email: user.email_address,
+    sisuPersonId: user.id,
+    roles: ['courseStatistics'],
+  })
+}
+
 const getUserFromSisuByEppn = async (newUserEppn, requesterEppn) => {
   const { accessToken: requesterAccessToken } = await getSisuAuthData(requesterEppn)
   const { tokenData: newUserTokenData } = await getSisuAuthData(newUserEppn)
@@ -256,4 +267,5 @@ module.exports = {
   deleteOutdatedUsers,
   roles,
   getUserFromSisuByEppn,
+  addNewUser,
 }

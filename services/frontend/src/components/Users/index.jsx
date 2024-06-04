@@ -10,6 +10,7 @@ export const Users = () => {
   useTitle('Users')
   const { userid } = useParams()
 
+  // TODO: After OOD-9 merged this should be removed and used the real one
   const isDefaultProvider = () => {
     return false
   }

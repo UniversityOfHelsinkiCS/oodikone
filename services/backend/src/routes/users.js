@@ -89,4 +89,10 @@ router.get('/from-sisu-by-eppn/:eppn', auth.roles(['admin']), async (req, res) =
   res.json(person)
 })
 
+router.post('/add', async (req, res) => {
+  const { user } = req.body
+  const person = await userService.addNewUser(user)
+  res.json(person)
+})
+
 module.exports = router
