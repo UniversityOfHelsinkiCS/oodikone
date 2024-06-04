@@ -51,12 +51,8 @@
     "husky": "^8.0.1",
     "lint-staged": "^13.0.3",
     "node-actionlint": "^1.2.2",
-<<<<<<< HEAD
     "prettier": "3.3.0",
-=======
     "nyc": "^15.1.0",
-    "prettier": "3.2.5",
->>>>>>> 5b97958f9 (Add initial setup for code coverage)
     "stylelint": "^16.2.1",
     "stylelint-config-standard": "^36.0.0"
   },
