@@ -3,6 +3,7 @@
   "description": "An application for analyzing university data.",
   "scripts": {
     "cypress": "cypress",
+    "instrument": "./scripts/instrument.sh",
     "eslint": "eslint",
     "lint:all": "eslint --ext .js,.jsx services/ updater/ --report-unused-disable-directives",
     "stylelint": "stylelint",
@@ -11,6 +12,7 @@
     "cli": "./cli.sh",
     "oodikone": "./run.sh oodikone anon up --detach",
     "oodikone:real": "./run.sh oodikone real up --detach",
+    "oodikone:test": "./run.sh oodikone test up --detach",
     "updater": "./run.sh updater anon up --detach",
     "updater:real": "./run.sh updater real up --detach",
     "both": "./run.sh both anon up --detach",
@@ -34,6 +36,7 @@
   },
   "homepage": "https://github.com/UniversityOfHelsinkiCS/oodikone#readme",
   "devDependencies": {
+    "@cypress/code-coverage": "^3.12.39",
     "cypress": "^13.2.0",
     "eslint": "^8.56.0",
     "eslint-config-airbnb": "^19.0.4",
@@ -48,7 +51,12 @@
     "husky": "^8.0.1",
     "lint-staged": "^13.0.3",
     "node-actionlint": "^1.2.2",
+<<<<<<< HEAD
     "prettier": "3.3.0",
+=======
+    "nyc": "^15.1.0",
+    "prettier": "3.2.5",
+>>>>>>> 5b97958f9 (Add initial setup for code coverage)
     "stylelint": "^16.2.1",
     "stylelint-config-standard": "^36.0.0"
   },
