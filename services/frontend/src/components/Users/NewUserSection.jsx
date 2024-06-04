@@ -1,25 +1,39 @@
-/* eslint-disable no-unused-vars */
 import { useEffect, useState } from 'react'
 import { Form, FormGroup, Input, Button, Loader, Segment } from 'semantic-ui-react'
 import { useLazyGetUserFromSisuByEppnQuery, useAddUserMutation } from '@/redux/users'
 import { SortableTable } from '../SortableTable'
 
 export const NewUserSection = ({ onAddUser }) => {
-  const [eppn, setEppn] = useState('olliperson@gmail.com')
+  const [eppn, setEppn] = useState('')
   const [user, setUser] = useState('')
+  const [showTable, setShowTable] = useState(true)
 
-  const [getUserFromSisuByEppnQuery, { data: userFromApi, isLoading, isError }] = useLazyGetUserFromSisuByEppnQuery()
-  const [addUserMutation, { data }] = useAddUserMutation()
+  const [getUserFromSisuByEppnQuery, { data: userFromApi, isLoadingGetUser, isErrorGetUser }] =
+    useLazyGetUserFromSisuByEppnQuery()
+  const [addUserMutation, { data: addedUser, isLoadingAddUser, isErrorAddUser }] = useAddUserMutation()
 
   useEffect(() => {
-    setUser(userFromApi)
-  }, [userFromApi])
+    if (!isLoadingGetUser && !isErrorGetUser) {
+      setUser(userFromApi)
+      setShowTable(true)
+    }
+  }, [userFromApi, isLoadingGetUser, isErrorGetUser])
+
+  useEffect(() => {
+    if (!isLoadingAddUser && !isErrorAddUser) {
+      setUser('')
+      setEppn('')
+      setShowTable(false)
+      onAddUser()
+    }
+  }, [addedUser, isLoadingAddUser, isErrorAddUser])
 
   const handleEppnOnChange = (_, { value }) => {
     if (value) setEppn(value)
   }
 
-  const megayYhyy = event => {
+  const getUser = event => {
+    setShowTable(false)
     event.preventDefault()
     getUserFromSisuByEppnQuery(eppn)
     setUser(userFromApi)
@@ -27,27 +41,28 @@ export const NewUserSection = ({ onAddUser }) => {
 
   const addUser = () => {
     addUserMutation(user)
-    onAddUser()
   }
 
   const cancelUser = () => {
     setUser('')
   }
 
-  if (isLoading) return <Loader active inline="centered" />
+  if (isLoadingGetUser) return <Loader active inline="centered" />
 
   return (
     <Segment className="contentSegment">
       <Form>
         <FormGroup>
-          <Input onChange={handleEppnOnChange} placeholder="jee" value={eppn} />
-          <Button onClick={megayYhyy}>Jee</Button>
+          <Input onChange={handleEppnOnChange} placeholder="Enter user eppn" value={eppn} />
+          <Button color="blue" onClick={getUser}>
+            Fetch user from Sisu
+          </Button>
         </FormGroup>
       </Form>
 
-      {isError && <h4>Something went wrong try different eppn.</h4>}
+      {isErrorGetUser && <h4>Something went wrong, please try a different eppn.</h4>}
 
-      {user && (
+      {showTable && user && (
         <SortableTable
           columns={[
             {
@@ -71,12 +86,20 @@ export const NewUserSection = ({ onAddUser }) => {
             {
               key: 'ADDUSER',
               title: 'Add user',
-              getRowVal: () => <Button onClick={addUser}>Add</Button>,
+              getRowVal: () => (
+                <Button color="green" onClick={addUser}>
+                  Add
+                </Button>
+              ),
             },
             {
               key: 'CANCELUSER',
-              title: 'Cancel user',
-              getRowVal: () => <Button onClick={cancelUser}>Cancel</Button>,
+              title: 'Cancel',
+              getRowVal: () => (
+                <Button color="red" onClick={cancelUser}>
+                  Cancel
+                </Button>
+              ),
             },
           ]}
           data={[user]}

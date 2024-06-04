@@ -218,11 +218,13 @@ const toskaGetUser = async ({ username, name, email, iamGroups, specialGroup, si
 const fdGetUser = async ({ username }) => {
   if (userDataCache.has(username)) return userDataCache.get(username)
 
-  await User.upsert({ username, lastLogin: new Date() })
+  const userFromDbOrm = await findUser({ username })
+  if (!userFromDbOrm) return
 
-  const userFromDb = (await findUser({ username })).toJSON()
+  userFromDbOrm.lastLogin = new Date()
+  userFromDbOrm.save()
 
-  if (!userFromDb) return null
+  const userFromDb = userFromDbOrm.toJSON()
 
   const programmeRights = getStudyProgrammeRights({}, {}, userFromDb.programmeRights)
   const user = await formatUser({ ...userFromDb, iamGroups: [], programmeRights })
@@ -242,7 +244,7 @@ const addNewUser = async user => {
   })
 }
 
-const getUserFromSisuByEppn = async (newUserEppn, requesterEppn) => {
+const getUserFromSisuByEppn = async (requesterEppn, newUserEppn) => {
   const { accessToken: requesterAccessToken } = await getSisuAuthData(requesterEppn)
   const { tokenData: newUserTokenData } = await getSisuAuthData(newUserEppn)
   const personData = await getGraphqlData(requesterAccessToken, {
