@@ -12,6 +12,9 @@ const usersApi = RTKApi.injectEndpoints({
       query: uid => `/users/${uid}`,
       providesTags: result => (result ? [{ type: 'Users', id: result.id }] : []),
     }),
+    getUserFromSisuByEppn: builder.query({
+      query: eppn => `/users/from-sisu-by-eppn/${eppn}`,
+    }),
     modifyAccessGroups: builder.mutation({
       query: ({ username, accessgroups }) => ({
         url: '/users/modifyaccess',
@@ -61,6 +64,7 @@ export const {
   useGetAllUsersQuery,
   useGetUserQuery,
   useGetAccessGroupsQuery,
+  useGetUserFromSisuByEppnQuery,
   useModifyAccessGroupsMutation,
   useAddUserUnitsMutation,
   useRemoveUserUnitsMutation,
