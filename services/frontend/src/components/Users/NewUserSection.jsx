@@ -72,6 +72,8 @@ export const NewUserSection = ({ onAddUser }) => {
             {
               key: 'NAME',
               title: 'Name',
+              sortable: false,
+              filterable: false,
               getRowVal: user => {
                 const name = user.first_name.concat(' ', user.last_name)
                 return name
@@ -84,6 +86,8 @@ export const NewUserSection = ({ onAddUser }) => {
             {
               key: 'USERNAME',
               title: 'Username',
+              sortable: false,
+              filterable: false,
               getRowVal: user => user.eppn,
               getRowContent: user => user.eppn,
             },
