@@ -27,7 +27,7 @@ export const Users = () => {
   return (
     <div className="segmentContainer" style={{ marginBottom: '10px' }}>
       <Header className="segmentTitle" size="large">
-        Oodikone users and is default {isDefaultServiceProvider()}
+        Oodikone users
       </Header>
       {!userid && !isDefaultServiceProvider() && <NewUserSection onAddUser={onAddUser} />}
       {userid ? <UserPage /> : <UserSearchList isError={isError} isLoading={isLoading} users={users} />}
