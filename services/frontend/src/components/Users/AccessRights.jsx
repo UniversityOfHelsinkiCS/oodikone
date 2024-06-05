@@ -1,7 +1,11 @@
 import { useState } from 'react'
 import { Button, Form, Header, Icon, List, Message, Popup } from 'semantic-ui-react'
-
-import { createLocaleComparator, isNewStudyProgramme, textAndDescriptionSearch } from '@/common'
+import {
+  createLocaleComparator,
+  isNewStudyProgramme,
+  textAndDescriptionSearch,
+  isDefaultServiceProvider,
+} from '@/common'
 import { userToolTips } from '@/common/InfoToolTips'
 import { FilterOldProgrammesToggle } from '@/components/common/FilterOldProgrammesToggle'
 import { InfoBox } from '@/components/Info/InfoBox'
@@ -160,42 +164,46 @@ export const AccessRights = ({ user }) => {
           </List.Item>
         ))}
       </List>
-      <Header
-        content={`Current IAM group based study programme access rights (${currentIamAccessRights.length})`}
-        size="small"
-      />
-      <InfoBox content={userToolTips.IamGroupBasedAccess} />
-      <List divided>
-        {currentIamAccessRights.map(({ code, name, limited }) => (
-          <List.Item key={code}>
-            <div style={{ display: 'flex' }}>
-              <div style={{ flexGrow: 1 }}>
-                <List.Content content={`${name} (${code})`} />
-              </div>
-              <List.Content
-                content={
-                  <Popup
-                    content="Limited rights"
-                    position="top center"
-                    trigger={
-                      <Icon color={limited ? 'green' : 'grey'} disabled={!limited} name="exclamation triangle" />
+      {isDefaultServiceProvider() && (
+        <>
+          <Header
+            content={`Current IAM group based study programme access rights (${currentIamAccessRights.length})`}
+            size="small"
+          />
+          <InfoBox content={userToolTips.IamGroupBasedAccess} />
+          <List divided>
+            {currentIamAccessRights.map(({ code, name, limited }) => (
+              <List.Item key={code}>
+                <div style={{ display: 'flex' }}>
+                  <div style={{ flexGrow: 1 }}>
+                    <List.Content content={`${name} (${code})`} />
+                  </div>
+                  <List.Content
+                    content={
+                      <Popup
+                        content="Limited rights"
+                        position="top center"
+                        trigger={
+                          <Icon color={limited ? 'green' : 'grey'} disabled={!limited} name="exclamation triangle" />
+                        }
+                      />
                     }
                   />
-                }
-              />
-              <List.Content
-                content={
-                  <Popup
-                    content="Full rights"
-                    position="top center"
-                    trigger={<Icon color={!limited ? 'green' : 'grey'} disabled={limited} name="check circle" />}
+                  <List.Content
+                    content={
+                      <Popup
+                        content="Full rights"
+                        position="top center"
+                        trigger={<Icon color={!limited ? 'green' : 'grey'} disabled={limited} name="check circle" />}
+                      />
+                    }
                   />
-                }
-              />
-            </div>
-          </List.Item>
-        ))}
-      </List>
+                </div>
+              </List.Item>
+            ))}
+          </List>
+        </>
+      )}
       <Form.Button
         basic
         content="Save"

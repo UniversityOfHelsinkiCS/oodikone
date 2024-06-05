@@ -3,6 +3,7 @@ import moment from 'moment'
 
 import irtomikko from '@/assets/irtomikko.png'
 import toskaLogo from '@/assets/toska.svg'
+import { serviceProvider } from '@/conf'
 
 export const textAndDescriptionSearch = (dropDownOptions, param) =>
   filter(dropDownOptions, option =>
@@ -521,4 +522,8 @@ export const getEnrollmentTypeTextForExcel = (type, statutoryAbsence) => {
   if (type === 2) return 'Absent'
   if (type === 3) return 'Not enrolled'
   return 'No study right'
+}
+
+export const isDefaultServiceProvider = () => {
+  return serviceProvider && serviceProvider === 'Toska'
 }
