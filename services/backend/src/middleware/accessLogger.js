@@ -25,7 +25,7 @@ const accessLogger = morgan((tokens, req, res) => {
     `${(tokens['response-time'](req, res) || '0').split('.')[0]} ms`.padEnd(8, ' '),
     tokens.status(req, res),
     tokens.method(req, res),
-    tokens.url(req, res),
+    decodeURIComponent(tokens.url(req, res)),
   ].join(' ')
 
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(user.programmeRights)

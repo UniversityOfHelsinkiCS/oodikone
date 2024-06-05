@@ -86,8 +86,8 @@ class DbConnections extends EventEmitter {
           pattern: /\.js$/,
         },
       })
-      const migrations = await migrator.up()
-      logger.info({ message: 'Migrations up to date', meta: JSON.stringify(migrations) })
+      const migrations = (await migrator.up()).map(m => m.file)
+      logger.info({ message: 'Migrations up to date', meta: migrations })
     } catch (e) {
       logger.error({ message: 'Migration error', meta: JSON.stringify(e) })
       throw e

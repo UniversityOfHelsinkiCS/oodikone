@@ -4,25 +4,9 @@ const { WinstonGelfTransporter } = require('winston-gelf-transporter')
 
 const { isProduction } = require('../conf-backend')
 
-const { combine, timestamp, printf, splat } = winston.format
+const { combine, timestamp, printf } = winston.format
 
-const transports = []
-
-const formatDate = timestamp => {
-  if (!isProduction) return new Date(timestamp).toLocaleTimeString('fi-FI').replace(' klo', '')
-  return new Date(timestamp).toLocaleString('fi-FI').replace(' klo', '')
-}
-
-const consoleFormat = printf(
-  ({ level, message, timestamp }) => `${formatDate(timestamp).split(' ')} ${level}: ${message}`
-)
-
-transports.push(
-  new winston.transports.Console({
-    level: 'debug',
-    format: combine(splat(), timestamp(), consoleFormat),
-  })
-)
+const transports = [new winston.transports.Console()]
 
 if (isProduction) {
   transports.push(
@@ -40,7 +24,14 @@ if (isProduction) {
   )
 }
 
-const logger = winston.createLogger({ transports })
+const logger = winston.createLogger({
+  level: isProduction ? 'info' : 'debug',
+  format: combine(
+    timestamp({ format: isProduction ? 'D.M.YYYY,HH.mm.ss' : 'HH.mm.ss' }),
+    printf(({ level, message, timestamp, stack }) => `${timestamp} ${level}: ${stack ?? message}`)
+  ),
+  transports,
+})
 
 logger.on('error', e => console.error('Logging failed! Reason: ', e)) // eslint-disable-line no-console
 

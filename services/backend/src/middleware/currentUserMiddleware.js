@@ -41,7 +41,10 @@ const toskaUserMiddleware = async (req, _res, next) => {
   const iamRights = Object.keys(access)
 
   if (!hasRequiredIamGroup(iamGroups, iamRights)) {
-    logger.error({ message: 'User does not have required iam group', meta: { iamGroups, iamRights } })
+    logger.error({
+      message: 'User does not have required iam group',
+      meta: { username, name, email, iamGroups, iamRights },
+    })
     throw new ApplicationError(`User '${username}' does not have required iam group`, 403, { logoutUrl })
   }
 

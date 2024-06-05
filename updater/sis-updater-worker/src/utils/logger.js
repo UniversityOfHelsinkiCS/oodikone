@@ -5,11 +5,9 @@ const Sentry = require('winston-sentry-log')
 
 const { isDev, isStaging, isProduction, sentryRelease, sentryEnvironment, runningInCI } = require('../config')
 
-const { combine, timestamp, printf, splat } = winston.format
+const { combine, timestamp, printf } = winston.format
 
 const transports = []
-
-const formatDate = timestamp => new Date(timestamp).toLocaleString('fi-FI')
 
 if (isProduction && !isStaging && !runningInCI) {
   const options = {
@@ -24,53 +22,36 @@ if (isProduction && !isStaging && !runningInCI) {
   transports.push(new Sentry(options))
 }
 
-if (isDev) {
-  const devFormat = printf(
-    ({ level, message, timestamp, ...rest }) => `${formatDate(timestamp)} ${level}: ${message} ${JSON.stringify(rest)}`
-  )
+const devFormat = printf(
+  ({ level, message, timestamp, ...rest }) => `${timestamp} ${level}: ${message} ${JSON.stringify(rest)}`
+)
 
+const prodFormat = printf(({ timestamp, level, ...rest }) => JSON.stringify({ timestamp, level, ...rest }))
+
+transports.push(
+  new winston.transports.Console({
+    level: isDev ? 'debug' : 'info',
+    format: combine(
+      timestamp({ format: isDev ? 'HH.mm.ss' : 'D.M.YYYY klo HH.mm.ss' }),
+      isDev ? devFormat : prodFormat
+    ),
+  })
+)
+
+if (isProduction && !isStaging) {
   transports.push(
-    new winston.transports.Console({
-      level: 'debug',
-      format: combine(splat(), timestamp(), devFormat),
+    new WinstonGelfTransporter({
+      handleExceptions: true,
+      host: 'svm-116.cs.helsinki.fi',
+      port: 9503,
+      protocol: 'udp',
+      hostName: os.hostname(),
+      additional: {
+        app: 'updater-worker',
+        environment: 'production',
+      },
     })
   )
-} else {
-  const levels = {
-    error: 0,
-    warn: 1,
-    info: 2,
-    http: 3,
-    verbose: 4,
-    debug: 5,
-    silly: 6,
-  }
-
-  const prodFormat = printf(({ timestamp, level, ...rest }) =>
-    JSON.stringify({
-      timestamp: formatDate(timestamp),
-      level: levels[level],
-      ...rest,
-    })
-  )
-
-  transports.push(new winston.transports.Console({ format: combine(splat(), timestamp(), prodFormat) }))
-
-  if (isProduction && !isStaging) {
-    transports.push(
-      new WinstonGelfTransporter({
-        handleExceptions: true,
-        host: 'svm-116.cs.helsinki.fi',
-        port: 9503,
-        protocol: 'udp',
-        hostName: os.hostname(),
-        additional: {
-          app: 'updater-worker',
-          environment: 'production',
-        },
-      })
-    )
-  }
 }
 
 const logger = winston.createLogger({ transports })

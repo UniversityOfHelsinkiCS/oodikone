@@ -1,16 +1,12 @@
 class ApplicationError extends Error {
-  constructor(message, status, extra) {
-    super()
+  constructor(message = 'Something went wrong. Please try again.', status = 500, extra = {}) {
+    super(message)
 
     Error.captureStackTrace(this, this.constructor)
 
     this.name = this.constructor.name
-
-    this.message = message || 'Something went wrong. Please try again.'
-
-    this.status = status || 500
-
-    this.extra = extra || {}
+    this.status = status
+    this.extra = extra
   }
 
   toJSON() {
