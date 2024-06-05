@@ -7,16 +7,18 @@ export const NewUserSection = ({ onAddUser }) => {
   const [eppn, setEppn] = useState('')
   const [user, setUser] = useState('')
 
-  const [getUserFromSisuByEppnQuery, { data: userFromApi, isLoading: isLoadingGetUser, isError: isErrorGetUser }] =
-    useLazyGetUserFromSisuByEppnQuery()
+  const [
+    getUserFromSisuByEppnQuery,
+    { data: userFromApi, isLoading: isLoadingGetUser, isError: isErrorGetUser, isFetching },
+  ] = useLazyGetUserFromSisuByEppnQuery()
   const [addUserMutation, { data: addedUser, isLoading: isLoadingAddUser, isError: isErrorAddUser }] =
     useAddUserMutation()
 
   useEffect(() => {
-    if (!isLoadingGetUser && !isErrorAddUser) {
+    if (!isLoadingGetUser && !isErrorAddUser && !isFetching) {
       setUser(userFromApi)
     }
-  }, [userFromApi, isLoadingGetUser, isErrorGetUser])
+  }, [userFromApi, isLoadingGetUser, isErrorGetUser, isFetching])
 
   useEffect(() => {
     if (!isLoadingAddUser && !isErrorAddUser) {
@@ -34,9 +36,6 @@ export const NewUserSection = ({ onAddUser }) => {
     setUser('')
     event.preventDefault()
     getUserFromSisuByEppnQuery(eppn)
-    // this is not stylish, but seems to be the only way to avoid the new user table showing for a short while
-    // before a failed query returns isError
-    setTimeout(() => setUser(userFromApi), 500)
   }
 
   const addUser = () => {
