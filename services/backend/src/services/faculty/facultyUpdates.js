@@ -1,20 +1,20 @@
+const logger = require('../../util/logger')
+const { setCreditStats } = require('../analyticsService')
+const { computeCreditsProduced } = require('../providerCredits')
 const { findFacultyProgrammeCodes } = require('./faculty')
 const { combineFacultyBasics } = require('./facultyBasics')
 const { countGraduationTimes } = require('./facultyGraduationTimes')
 const {
-  setFacultyProgrammes,
   setBasicStats,
-  setThesisWritersStats,
-  setGraduationStats,
+  setFacultyProgrammes,
   setFacultyProgressStats,
   setFacultyStudentStats,
+  setGraduationStats,
+  setThesisWritersStats,
 } = require('./facultyService')
 const { combineFacultyStudentProgress } = require('./facultyStudentProgress')
 const { combineFacultyStudents } = require('./facultyStudents')
 const { combineFacultyThesisWriters } = require('./facultyThesisWriters')
-const logger = require('../../util/logger')
-const { setCreditStats } = require('../analyticsService')
-const { computeCreditsProduced } = require('../providerCredits')
 
 const updateFacultyOverview = async (faculty, statsType) => {
   const calendarNewSpecial = {

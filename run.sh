@@ -47,7 +47,7 @@ parse_params() {
     compose_command=${args[*]:1}
   else
     version=${args[1]}
-    [[ "$version" != "anon" && "$version" != "real" ]] && usage && \
+    [[ "$version" != "anon" && "$version" != "real" && "$version" != "test" ]] && usage && \
       die "Wrong version $version"
     compose_command=${args[*]:2}
   fi
@@ -69,6 +69,9 @@ parse_env() {
   env=""
   if [[ "$version" == "real" ]]; then
     env="--file docker-compose.yml --file docker-compose.real.yml"
+  fi
+  if [[ "$version" == "test" ]]; then
+    env="--file docker-compose.test.yml"
   fi
   return 0
 }

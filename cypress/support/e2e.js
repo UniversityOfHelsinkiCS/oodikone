@@ -13,6 +13,8 @@
 // https://on.cypress.io/configuration
 // ***********************************************************
 
+// eslint-disable-next-line import/no-extraneous-dependencies
+require('@cypress/code-coverage/support')
 require('./commands')
 
 // This error is benign and seems to be only present in Cypress

@@ -1,5 +1,5 @@
-const { getProgrammes } = require('./facultyService')
 const { getCreditsProduced } = require('../providerCredits')
+const { getProgrammes } = require('./facultyService')
 
 /* 
   Returns credits produced by the programmes of the faculty but also the credits where the provider is the faculty itself.

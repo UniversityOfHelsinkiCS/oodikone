@@ -3,9 +3,9 @@
 const axios = require('axios').default
 const _ = require('lodash')
 
-const { rapoToken, tokenImporterApi, importerDbApiUrl, nodeproxyUrl } = require('./conf')
-const { Student, Transfer, StudyrightElement, Studyright } = require('../models')
+const { Student, Studyright, StudyrightElement, Transfer } = require('../models')
 const { optimizedStatisticsOf } = require('../services/populations')
+const { importerDbApiUrl, nodeproxyUrl, rapoToken, tokenImporterApi } = require('./conf')
 
 const getFromRapo = async (urlStart, urlEnd) => {
   console.log({ urlStart, urlEnd })
