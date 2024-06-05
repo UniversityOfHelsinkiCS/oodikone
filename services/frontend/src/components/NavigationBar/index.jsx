@@ -1,7 +1,7 @@
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { Button, Dropdown, Label, Menu } from 'semantic-ui-react'
 
-import { checkUserAccess, getFullStudyProgrammeRights } from '@/common'
+import { checkUserAccess, getFullStudyProgrammeRights, isDefaultServiceProvider } from '@/common'
 import { LanguagePicker } from '@/components/LanguagePicker'
 import { adminerUrls, isDev } from '@/conf'
 import { useGetAuthorizedUserQuery, useLogoutMutation, useShowAsUser } from '@/redux/auth'
@@ -73,6 +73,8 @@ export const NavigationBar = () => {
           return
       } else if (key === 'faculty') {
         if (!checkUserAccess(['admin', 'fullSisuAccess', 'facultyStatistics'], roles)) return
+      } else if (key === 'feedback') {
+        if (!isDefaultServiceProvider()) return
       }
       const { reqRights } = allNavigationItems[key]
       if (!reqRights || reqRights.every(r => roles.includes(r) || (key === 'teachers' && isAdmin))) {
