@@ -64,7 +64,7 @@ export const NewUserSection = ({ onAddUser }) => {
 
       {isErrorGetUser && <h4>Something went wrong, please try a different eppn.</h4>}
 
-      {showAdded && <h4>Added user to the Oodikone user-database.</h4>}
+      {showAdded && addedUser && <h4> Added user to the Oodikone user-database.</h4>}
 
       {!isErrorGetUser && user && (
         <SortableTable

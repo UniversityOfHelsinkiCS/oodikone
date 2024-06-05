@@ -13,8 +13,9 @@ export const Users = () => {
   const { userid } = useParams()
   const [getAllUsersQuery, { data: users = [], isLoading, isError }] = useLazyGetAllUsersQuery()
   // TODO: After OOD-9 merged this should be removed and used the real one
+  // for now, set to false in order to activate the feature of adding new users from Sisu
   const isDefaultProvider = () => {
-    return false
+    return true
   }
 
   const onAddUser = () => {
