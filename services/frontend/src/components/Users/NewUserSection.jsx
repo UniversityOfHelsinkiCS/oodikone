@@ -6,6 +6,7 @@ import { SortableTable } from '../SortableTable'
 export const NewUserSection = ({ onAddUser }) => {
   const [eppn, setEppn] = useState('')
   const [user, setUser] = useState('')
+  const [showAdded, setShowAdded] = useState(false)
 
   const [
     getUserFromSisuByEppnQuery,
@@ -25,6 +26,8 @@ export const NewUserSection = ({ onAddUser }) => {
       setUser('')
       setEppn('')
       onAddUser()
+      setShowAdded(true)
+      setTimeout(() => setShowAdded(false), 2000)
     }
   }, [addedUser, isLoadingAddUser, isErrorAddUser])
 
@@ -60,6 +63,8 @@ export const NewUserSection = ({ onAddUser }) => {
       </Form>
 
       {isErrorGetUser && <h4>Something went wrong, please try a different eppn.</h4>}
+
+      {showAdded && <h4>Added user to the Oodikone user-database.</h4>}
 
       {!isErrorGetUser && user && (
         <SortableTable
