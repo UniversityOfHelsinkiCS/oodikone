@@ -1,18 +1,18 @@
 const { Op, col } = require('sequelize')
 
-const { getCurriculumVersion } = require('./shared')
 const {
+  Course,
+  Credit,
   ElementDetail,
+  Organization,
   Student,
   Studyplan,
   Studyright,
   StudyrightElement,
-  Credit,
-  Course,
-  Organization,
 } = require('../../models')
 const { mapToProviders } = require('../../util/utils')
 const { redisClient } = require('../redis')
+const { getCurriculumVersion } = require('./shared')
 
 const CLOSE_TO_GRADUATION_REDIS_KEY = 'CLOSE_TO_GRADUATION_DATA'
 

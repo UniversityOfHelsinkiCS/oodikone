@@ -1,20 +1,26 @@
 const { indexOf, isArray } = require('lodash')
 const moment = require('moment')
 
-const {
-  startedStudyrights,
-  graduatedStudyrights,
-  transferredInsideFaculty,
-  transferredAway,
-  transferredTo,
-  getTransferredToAndAway,
-  getTransferredInside,
-  studyrightsByRightStartYear,
-  getTransfersIn,
-} = require('./faculty')
-const { findRightProgramme, isNewProgramme, checkTransfers, getExtentFilter } = require('./facultyHelpers')
 const { codes } = require('../../../config/programmeCodes')
-const { getStatsBasis, getYearsArray, defineYear } = require('../studyprogramme/studyprogrammeHelpers')
+const { defineYear, getStatsBasis, getYearsArray } = require('../studyprogramme/studyprogrammeHelpers')
+const {
+  getTransferredInside,
+  getTransferredToAndAway,
+  getTransfersIn,
+  graduatedStudyrights,
+  startedStudyrights,
+  studyrightsByRightStartYear,
+  transferredAway,
+  transferredInsideFaculty,
+  transferredTo,
+} = require('./faculty')
+const {
+  checkCommissioned,
+  checkTransfers,
+  findRightProgramme,
+  getExtentFilter,
+  isNewProgramme,
+} = require('./facultyHelpers')
 
 const filterDuplicateStudyrights = studyrights => {
   // bachelor+master students have two studyrights (separated by two last digits in studyrightid)
@@ -85,13 +91,16 @@ const getFacultyStarters = async (
     const studyrights = await startedStudyrights(faculty, code, since, studyrightWhere)
     let filteredStudyrights = filterDuplicateStudyrights(studyrights)
     const insideTransfers = await getTransfersIn(code, start, end)
-    filteredStudyrights = filteredStudyrights.filter(s => !checkTransfers(s, insideTransfers, insideTransfers))
+    filteredStudyrights = filteredStudyrights.filter(
+      studyright => !checkTransfers(studyright, insideTransfers, insideTransfers)
+    )
     const keys = Object.keys(codes)
 
     if (!includeAllSpecials) {
-      // We do not include inside transferred studyrights into faculty starters, but function below expect two arguments
       filteredStudyrights = filteredStudyrights.filter(
-        s => !checkTransfers(s, insideTransfersStudyrights, transfersToOrAwayStudyrights)
+        studyright =>
+          !checkTransfers(studyright, insideTransfersStudyrights, transfersToOrAwayStudyrights) &&
+          !checkCommissioned(studyright)
       )
     }
 
@@ -120,6 +129,7 @@ const getFacultyStarters = async (
       }
     })
   }
+
   allBasics.studentInfo.graphStats.push({ name: 'Started studying (new in faculty)', data: startedGraphStats })
   programmeData.started = programmeTableStats
 
@@ -157,7 +167,9 @@ const getFacultyGraduates = async (
     let graduatedRights = await graduatedStudyrights(faculty, code, since, studyrightWhere)
     if (!includeAllSpecials) {
       graduatedRights = graduatedRights.filter(
-        s => !checkTransfers(s, insideTransfersStudyrights, transfersToOrAwayStudyrights)
+        studyright =>
+          !checkTransfers(studyright, insideTransfersStudyrights, transfersToOrAwayStudyrights) &&
+          !checkCommissioned(studyright)
       )
     }
     graduatedRights.forEach(({ enddate, extentcode, studyrightElements }) => {
@@ -220,6 +232,7 @@ const getFacultyGraduates = async (
     countsGraduations[year] = graduatedTableStats[year]
   })
 }
+
 // If includeAllSpecial false, inside transfers should contain only students started after 1.8.2017.
 const getInsideTransfers = async (programmeCodes, allProgrammeCodes, since, includeAllSpecials, faculty) => {
   if (includeAllSpecials) {
@@ -228,10 +241,11 @@ const getInsideTransfers = async (programmeCodes, allProgrammeCodes, since, incl
   const insiders = await transferredInsideFaculty(programmeCodes, allProgrammeCodes, since)
   const studyrights = (
     await studyrightsByRightStartYear(faculty, new Date(moment('2017-08-01', 'YYYY-MM-DD')).toUTCString())
-  ).map(sr => sr.studyrightid)
-  const filteredTransfers = insiders.filter(tr => studyrights.includes(tr.studyrightid))
+  ).map(studyright => studyright.studyrightid)
+  const filteredTransfers = insiders.filter(transfer => studyrights.includes(transfer.studyrightid))
   return filteredTransfers
 }
+
 const getFacultyTransfers = async (
   programmes,
   programmeCodes,
@@ -374,6 +388,7 @@ const combineFacultyBasics = async (faculty, programmes, yearType, allProgrammeC
   }
   const transfersToAwayStudyrights = await getTransferredToAndAway(wantedProgrammeCodes, allProgrammeCodes, since)
   const transferInsideStudyrights = await getTransferredInside(wantedProgrammeCodes, allProgrammeCodes, since)
+
   // Started studying in faculty
   await getFacultyStarters(
     faculty,

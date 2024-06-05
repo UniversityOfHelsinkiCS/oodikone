@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 const _ = require('lodash')
 
-const { parseCsv } = require('./helpers')
 const { computeCreditsProduced } = require('../services/providerCredits')
+const { parseCsv } = require('./helpers')
 
 const diffs = []
 const noDiffCounter = 0
@@ -150,7 +150,6 @@ const processIds = async (rawData, code, field) => {
   )
   const stats = await computeCreditsProduced(code, false, true, field)
   if (!stats.stats.ids) {
-    // console.log(stats)
     console.log({ rapoCredits })
     console.log('Edit getCreditsProduced code so that it saves a list of the relevant ids you want to compare.')
     return

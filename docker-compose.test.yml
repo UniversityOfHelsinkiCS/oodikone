@@ -1,3 +1,5 @@
+version: '2.1'
+
 x-defaults: &defaults
   restart: unless-stopped
 
@@ -10,7 +12,7 @@ services:
     container_name: adminer
     environment:
       ADMINER_DESIGN: pepa-linha
-    image: adminer:4.8.1
+    image: adminer:4.8.0
     ports:
       - 5050:8080
     volumes:
@@ -36,17 +38,16 @@ services:
       SECRET_TOKEN: dev
       SIS_DB_URL: postgres://postgres@sis-db:5432/sis-db
       SIS_UPDATER_URL: http://sis-updater-scheduler:8082
-      IMPORTER_DB_API_URL: 'https://localhost:3005'
+      IMPORTER_DB_API_URL: 'https://api-toska.apps.ocp-prod-0.k8s.it.helsinki.fi/importer'
       JAMI_URL: 'http://jami:3003/'
-      SERVICE_PROVIDER: 'Fd'
-      SIS_HOST: ${SIS_HOST:-https://sis-demo.funidata.fi}
-      SIS_GRAPHQL_APPLICATION_ACCOUNT: ${SIS_GRAPHQL_APPLICATION_ACCOUNT}
-      SIS_GRAPHQL_APPLICATION_KEY: ${SIS_GRAPHQL_APPLICATION_KEY}
     ports:
       - 8080:8080
+    profiles:
+      - oodikone
     volumes:
       - backend-nodemod:/opt/app-root/src/node_modules
       - ./services/backend/:/opt/app-root/src
+      - ./services/backend/instrumented:/opt/app-root/src/src
 
   frontend:
     <<: *defaults
@@ -56,18 +57,19 @@ services:
     container_name: frontend
     ports:
       - 3000:3000
+    profiles:
+      - oodikone
     volumes:
       - frontend-nodemod:/opt/app-root/src/node_modules
       - ./services/frontend/:/opt/app-root/src
+      - ./services/frontend/instrumented:/opt/app-root/src/src
 
   kone-db:
     <<: *defaults
     container_name: kone-db
-    environment:
-      PGDATA: /data
-      POSTGRES_DB: kone-db
-      POSTGRES_HOST_AUTH_METHOD: trust
-    image: postgres:15.7
+    image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/kone-db
+    profiles:
+      - oodikone
     volumes:
       - kone-db-data:/data
 
@@ -75,7 +77,7 @@ services:
     <<: *defaults
     command: 'redis-server --appendonly yes'
     container_name: redis
-    image: redis:6.2.14
+    image: redis:6.2.13
     ports:
       - '6379:6379'
     volumes:
@@ -84,11 +86,7 @@ services:
   sis-db:
     <<: *defaults
     container_name: sis-db
-    environment:
-      PGDATA: /data
-      POSTGRES_DB: sis-db
-      POSTGRES_HOST_AUTH_METHOD: trust
-    image: postgres:15.7
+    image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/sis-db
     volumes:
       - sis-db-data:/data
     shm_size: 2gb
@@ -98,11 +96,9 @@ services:
   sis-importer-db:
     <<: *defaults
     container_name: sis-importer-db
-    environment:
-      PGDATA: /data
-      POSTGRES_DB: sis-importer-db
-      POSTGRES_HOST_AUTH_METHOD: trust
-    image: postgres:15.7
+    image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/sis-importer-db
+    profiles:
+      - updater
     volumes:
       - sis-importer-db-data:/data
     ports:
@@ -112,7 +108,9 @@ services:
     <<: *defaults
     command: '-cid sis-updater-nats -m 8222 -p 4222 --max_channels 1000 --max_age 2h --hb_fail_count 2 --hb_timeout 10s --hb_interval 10s --auth dev --file_slice_max_bytes 0 --file_slice_max_age 60s --max_msgs 0 -store file -dir datastore'
     container_name: sis-updater-nats
-    image: nats-streaming:0.25.6
+    image: nats-streaming:0.16.2
+    profiles:
+      - updater
 
   sis-updater-scheduler:
     <<: *defaults
@@ -135,6 +133,8 @@ services:
       SIS_NATS_URI: sis-updater-nats://sis-updater-nats:4222
     ports:
       - 8082:8082
+    profiles:
+      - updater
     volumes:
       - sis-updater-scheduler-nodemod:/opt/app-root/src/node_modules
       - ./updater/sis-updater-scheduler/:/opt/app-root/src
@@ -159,6 +159,8 @@ services:
       SIS_PASSWORD: postgres
       SIS_NATS_TOKEN: dev
       SIS_NATS_URI: sis-updater-nats://sis-updater-nats:4222
+    profiles:
+      - updater
     volumes:
       - sis-updater-worker-nodemod:/opt/app-root/src/node_modules
       - ./updater/sis-updater-worker/:/opt/app-root/src
@@ -166,15 +168,37 @@ services:
   user-db:
     <<: *defaults
     container_name: user-db
-    environment:
-      PGDATA: /data
-      POSTGRES_DB: user-db
-      POSTGRES_HOST_AUTH_METHOD: trust
-    image: postgres:15.7
+    image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/user-db
+    profiles:
+      - oodikone
     volumes:
       - user-db-data:/data
+
+  jami:
+    <<: *defaults
+    image: quay.io/toska/jami:production
+    env_file:
+      - .env
+    environment:
+      - npm_config_cache=/tmp
+      - PORT=3003
+      - NODE_ENV=dev
+      - DATABASE_URL=postgres://postgres:postgres@jami-db:5432/postgres
     ports:
-      - 12347:5432
+      - 3003:3003
+    container_name: jami
+
+  jami-db:
+    <<: *defaults
+    image: postgres:13.2
+    environment:
+      - PGDATA=/data
+      - POSTGRES_PASSWORD=postgres
+    container_name: jami-db
+    ports:
+      - 5433:5432
+    volumes:
+      - jami-data:/data
 
 volumes:
   backend-nodemod:
@@ -186,3 +210,4 @@ volumes:
   sis-updater-scheduler-nodemod:
   sis-updater-worker-nodemod:
   user-db-data:
+  jami-data:
