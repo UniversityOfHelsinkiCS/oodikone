@@ -94,6 +94,8 @@ export const NewUserSection = ({ onAddUser }) => {
             {
               key: 'ADDUSER',
               title: 'Add user',
+              sortable: false,
+              filterable: false,
               getRowVal: () => (
                 <Button color="green" onClick={addUser}>
                   Add
@@ -103,6 +105,8 @@ export const NewUserSection = ({ onAddUser }) => {
             {
               key: 'CANCELUSER',
               title: 'Cancel',
+              sortable: false,
+              filterable: false,
               getRowVal: () => (
                 <Button color="red" onClick={cancelUser}>
                   Cancel
