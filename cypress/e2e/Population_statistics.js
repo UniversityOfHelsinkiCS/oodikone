@@ -1,7 +1,5 @@
 /// <reference types="Cypress" />
 // Now "Class statistics" in UI
-const moment = require('moment')
-const _ = require('lodash')
 
 describe('Population Statistics tests', () => {
   const pathToCSBach2017 =
@@ -141,12 +139,8 @@ describe('Population Statistics tests', () => {
         })
       cy.contains('Credits gained').click()
       cy.get("[data-cy='credits-gained-main-table']").should('contain', 'All students of the class')
-      const today = moment().endOf('month')
-      const months = Math.round(moment.duration(moment(today).diff(moment('2017-08-01'))).asMonths())
-      // Months are capped to goal time of the degree, 36 months is the goal time for bachelor's degree
-      const monthsForLimits = Math.min(36, months)
-      const limits = [1, ..._.range(1, 5).map(p => Math.ceil(monthsForLimits * ((p * 15) / 12))), null]
-      const ranges = _.range(1, limits.length).map(i => _.slice(limits, i - 1, i + 1))
+      const limits = [45, 90, 135, 180, null]
+      const ranges = limits.map((limit, i) => (i === 0 ? [1, limit] : [limits[i - 1], limit]))
 
       cy.get('.credits-gained-table').should('contain', '(n = 170)')
 

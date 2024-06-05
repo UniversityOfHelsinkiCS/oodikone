@@ -4,19 +4,19 @@ const openCompletedCoursesModal = () => {
   cy.get('button').contains('Search completed courses of students').click()
 }
 
+const hasLanded = () => {
+  cy.contains('Search completed courses')
+  cy.contains(
+    'Here you can search by a list of student and course numbers to see whether students have completed certain courses yet'
+  )
+}
+
 const openSearch = () => {
   cy.init('/completedcoursessearch')
   hasLanded()
 }
 const selectSavedCourselist = name => {
   cy.get('[data-cy="history-search"]').children().eq(0).type(name).type('{enter}')
-}
-
-const hasLanded = () => {
-  cy.contains('Search completed courses')
-  cy.contains(
-    'Here you can search by a list of student and course numbers to see whether students have completed certain courses yet'
-  )
 }
 
 const deleteAllSearches = () => {
@@ -143,11 +143,11 @@ describe('Courselist saving-related functions work', () => {
     openSearch()
     openCompletedCoursesModal()
     selectSavedCourselist(courseListNames[0])
-    cy.get('[data-cy="course-list-input"]').type(`,TKT10001`)
+    cy.get('[data-cy="course-list-input"]').type(',TKT10001')
     cy.get('button').contains('Save').click()
     openSearch()
     openCompletedCoursesModal()
     selectSavedCourselist(courseListNames[0])
-    cy.get('[data-cy="course-list-input"]').contains(`TKT10001`)
+    cy.get('[data-cy="course-list-input"]').contains('TKT10001')
   })
 })

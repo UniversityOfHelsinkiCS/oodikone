@@ -1,9 +1,8 @@
 /// <reference types="Cypress" />
 
-const moment = require('moment')
 const path = require('path')
 
-const timestamp = moment().format('YYYY-MM-DD')
+const timestamp = new Date().toISOString().split('T')[0] // YYYY-MM-DD
 const downloadsFolder = Cypress.config('downloadsFolder')
 
 describe('Faculty overview', () => {
