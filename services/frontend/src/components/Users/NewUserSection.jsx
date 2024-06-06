@@ -32,7 +32,7 @@ export const NewUserSection = ({ onAddUser }) => {
   }, [addedUser, isLoadingAddUser, isErrorAddUser])
 
   const getUser = event => {
-    if (!user) return
+    if (!eppn) return
     setUser('')
     event.preventDefault()
     getUserFromSisuByEppnQuery(eppn)
