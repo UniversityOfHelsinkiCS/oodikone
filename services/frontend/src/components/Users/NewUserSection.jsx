@@ -31,17 +31,15 @@ export const NewUserSection = ({ onAddUser }) => {
     }
   }, [addedUser, isLoadingAddUser, isErrorAddUser])
 
-  const handleEppnOnChange = (_, { value }) => {
-    if (value) setEppn(value)
-  }
-
   const getUser = event => {
+    if (!user) return
     setUser('')
     event.preventDefault()
     getUserFromSisuByEppnQuery(eppn)
   }
 
   const addUser = () => {
+    if (!user) return
     addUserMutation(user)
   }
 
@@ -55,7 +53,7 @@ export const NewUserSection = ({ onAddUser }) => {
     <Segment className="contentSegment">
       <Form>
         <FormGroup>
-          <Input onChange={handleEppnOnChange} placeholder="Enter user eppn" value={eppn} />
+          <Input onChange={e => setEppn(e.target.value)} placeholder="Enter user eppn" value={eppn} />
           <Button color="blue" onClick={getUser}>
             Fetch user from Sisu
           </Button>
