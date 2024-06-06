@@ -1,10 +1,16 @@
 const _ = require('lodash')
 const { Op } = require('sequelize')
 
-const { selectFromByIds, bulkCreate, getCourseUnitsByCodes } = require('../../db')
+const { selectFromByIds, bulkCreate, getCourseUnitsByCodes, selectOneById } = require('../../db')
 const { dbConnections } = require('../../db/connection')
 const { Course, Teacher, Credit, CreditTeacher, CourseProvider } = require('../../db/models')
-const { mapTeacher, creditMapper, courseProviderMapper } = require('../mapper')
+const {
+  mapTeacher,
+  creditMapper,
+  courseProviderMapper,
+  validAttainmentTypes,
+  customAttainmentTypes,
+} = require('../mapper')
 
 const updateTeachers = async attainments => {
   const acceptorPersonIds = _.flatten(
@@ -74,13 +80,6 @@ const updateAttainments = async (
     return res
   }, {})
 
-  const properAttainmentTypes = new Set([
-    'CourseUnitAttainment',
-    'ModuleAttainment',
-    'DegreeProgrammeAttainment',
-    'CustomCourseUnitAttainment',
-    'CustomModuleAttainment',
-  ])
   const creditTeachers = []
 
   const coursesToBeCreated = new Map()
@@ -100,7 +99,7 @@ const updateAttainments = async (
   const fixCustomCourseUnitAttainments = async attainments => {
     const addCourseUnitToCustomCourseUnitAttainments = (courses, attIdToCourseCode) => async att => {
       // Fix attainments with missing modules
-      if (modulesNotAvailable.includes(att.module_group_id) || modulesNotAvailable.includes(att.module_id)) {
+      if (modulesNotAvailable.includes(att.module_group_id)) {
         if (att.module_group_id === 'hy-SM-89304486') {
           const course = await Course.findOne({ where: { code: '71066' } })
           return { ...att, module_group_id: course.id }
@@ -110,19 +109,17 @@ const updateAttainments = async (
           return { ...att, module_group_id: course.id }
         }
         if (['hy-DP-65295180-ma', 'hy-DP-141512970', 'hy-DP-141513052'].includes(att.module_group_id)) {
-          const education = await selectFromByIds('educations', [att.module_group_id.replace('DP', 'EDU')])
-          if (education.length > 0) {
-            coursesToBeCreated.set(education[0].code, {
-              id: att.module_group_id,
-              name: education[0].name,
-              code: education[0].code,
-              main_course_code: education[0].code,
-              coursetypecode: att.study_level_urn,
-              course_unit_type: att.course_unit_type_urn,
-              substitutions: [],
-            })
-            return att
-          }
+          const { code, name } = await selectOneById('educations', att.module_group_id.replace('DP', 'EDU'))
+          coursesToBeCreated.set(code, {
+            id: att.module_group_id,
+            name,
+            code,
+            main_course_code: code,
+            coursetypecode: att.study_level_urn,
+            course_unit_type: att.course_unit_type_urn,
+            substitutions: [],
+          })
+          return att
         }
         coursesToBeCreated.set(att.module_group_id, {
           id: att.module_group_id,
@@ -140,31 +137,25 @@ const updateAttainments = async (
         return att
       }
 
-      if (att.type !== 'CustomCourseUnitAttainment' && att.type !== 'CustomModuleAttainment') return att
+      if (!customAttainmentTypes.includes(att.type)) return att
       const courseUnits = courses.filter(c => c.code === attIdToCourseCode[att.id])
-      let courseUnit = courseUnits.find(cu => {
-        const { startDate, endDate } = cu.validity_period
-        const attainment_date = new Date(att.attainment_date)
 
-        const isAfterStart = new Date(startDate) <= attainment_date
-        const isBeforeEnd = !endDate || new Date(endDate) > attainment_date
+      const isAfterStartAndBeforeEnd = (startDate, endDate, date) => {
+        const dateToCompare = new Date(date)
+        return new Date(startDate) <= dateToCompare && (!endDate || dateToCompare < new Date(endDate))
+      }
 
-        return isAfterStart && isBeforeEnd
-      })
+      let courseUnit = courseUnits.find(({ validity_period }) =>
+        isAfterStartAndBeforeEnd(validity_period.startDate, validity_period.endDate, att.attainment_date)
+      )
 
       // Sometimes registrations are fakd, see attainment hy-opinto-141561630.
       // The attainmentdate is outside of all courses, yet should be mapped.
       // Try to catch suitable courseUnit for this purpose
       if (!courseUnit) {
-        courseUnit = courseUnits.find(cu => {
-          const { startDate, endDate } = cu.validity_period
-          const date = new Date(att.registration_date)
-
-          const isAfterStart = new Date(startDate) <= date
-          const isBeforeEnd = !endDate || new Date(endDate) > date
-
-          return isAfterStart && isBeforeEnd
-        })
+        courseUnit = courseUnits.find(({ validity_period }) =>
+          isAfterStartAndBeforeEnd(validity_period.startDate, validity_period.endDate, att.registration_date)
+        )
       }
 
       // If there's no suitable courseunit, there isn't courseunit available at all.
@@ -172,11 +163,7 @@ const updateAttainments = async (
       if (!courseUnit) {
         const parsedCourseCode = attIdToCourseCode[att.id]
         // see if course exists
-        const course = await Course.findOne({
-          where: {
-            code: parsedCourseCode,
-          },
-        })
+        const course = await Course.findOne({ where: { code: parsedCourseCode } })
 
         // If course doesn't exist, create it
         if (!course) {
@@ -224,7 +211,7 @@ const updateAttainments = async (
     }
 
     const findMissingCourseCodes = (attainmentIdCodeMap, att) => {
-      if (att.type !== 'CustomCourseUnitAttainment' && att.type !== 'CustomModuleAttainment') {
+      if (!customAttainmentTypes.includes(att.type)) {
         return attainmentIdCodeMap
       }
       if (!att.code) return attainmentIdCodeMap
@@ -256,12 +243,10 @@ const updateAttainments = async (
 
   const fixedAttainments = await fixCustomCourseUnitAttainments(attainments)
 
-  const customTypes = new Set(['CustomModuleAttainment', 'CustomCourseUnitAttainment'])
-
   // If an attainment has been attached to two degrees, a duplicate custom attainment is made for it. This duplicate
   // should not show in the students attainments
   const doubleAttachment = (att, attainments) => {
-    if (!customTypes.has(att.type) && att.state !== 'INCLUDED') {
+    if (!customAttainmentTypes.includes(att.type) && att.state !== 'INCLUDED') {
       return false
     }
 
@@ -290,7 +275,7 @@ const updateAttainments = async (
     .filter(a => a.id !== null)
     .filter(
       a =>
-        properAttainmentTypes.has(a.type) &&
+        validAttainmentTypes.includes(a.type) &&
         !a.misregistration &&
         !attainmentsToBeExluced.has(a.id) &&
         !doubleAttachment(a, fixedAttainments)

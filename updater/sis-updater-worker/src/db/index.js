@@ -2,6 +2,8 @@ const { getLatestSnapshot, isActive, getActiveSnapshot } = require('../utils')
 const { logger } = require('../utils/logger')
 const { dbConnections } = require('./connection')
 
+const selectOneById = async (table, id) => dbConnections.knex(table).where('id', id).first()
+
 const selectFromByIds = async (table, ids, col = 'id') => dbConnections.knex(table).whereIn(col, ids)
 
 const selectFromByIdsOrderBy = async (table, ids, col = 'id', by, order = 'asc') =>
@@ -67,6 +69,7 @@ const bulkCreate = async (model, entities, transaction = null, properties = ['id
 const getCourseUnitsByCodes = codes => dbConnections.knex('course_units').whereIn('code', codes).select('*')
 
 module.exports = {
+  selectOneById,
   selectFromByIds,
   selectFromByIdsOrderBy,
   selectFromSnapshotsByIds,

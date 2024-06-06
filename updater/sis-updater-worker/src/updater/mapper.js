@@ -31,11 +31,12 @@ const parseGender = genderUrn => genderCodes[genderUrn] ?? '0'
 // See, e.g., TKT5
 const validStates = ['INCLUDED', 'SUBSTITUTED', 'ATTAINED']
 
+const customAttainmentTypes = ['CustomCourseUnitAttainment', 'CustomModuleAttainment']
+
 // Basically all types at the moment
-const validTypes = [
+const validAttainmentTypes = [
+  ...customAttainmentTypes,
   'CourseUnitAttainment',
-  'CustomCourseUnitAttainment',
-  'CustomModuleAttainment',
   'ModuleAttainment',
   'DegreeProgrammeAttainment',
 ]
@@ -59,7 +60,7 @@ const calculateTotalCreditsFromAttainments = attainments => {
     if (attainment.expiryDate < now) return false
     // Does not have any attainments attached to it, so is not a study module whose attainments have already been counted
     if (attainment.nodes && attainment.nodes[0] !== undefined) return false
-    if (!validTypes.includes(attainment.type)) return false
+    if (!validAttainmentTypes.includes(attainment.type)) return false
     // If the state is FAILED or IMPROVED it should not be counted to total
     if (!validStates.includes(attainment.state)) return false
     return true
@@ -500,4 +501,6 @@ module.exports = {
   enrollmentMapper,
   studyplanMapper,
   sanitizeCourseCode,
+  validAttainmentTypes,
+  customAttainmentTypes,
 }
