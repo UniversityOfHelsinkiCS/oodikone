@@ -4,6 +4,9 @@ WORKDIR /opt/app-root/src
 
 ENV NODE_ENV=development
 
+ARG SERVICE_PROVIDER
+ENV SERVICE_PROVIDER=$SERVICE_PROVIDER
+
 COPY ./package* ./
 RUN npm ci
 COPY . .

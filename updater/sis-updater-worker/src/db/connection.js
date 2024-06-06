@@ -1,14 +1,31 @@
 const EventEmitter = require('events')
+// eslint-disable-next-line import/no-unresolved
 const knex = require('knex')
+// eslint-disable-next-line import/no-unresolved
 const Sequelize = require('sequelize')
+// eslint-disable-next-line import/no-unresolved
 const Umzug = require('umzug')
 
-const { MIGRATIONS_LOCK, isDev, runningInCI } = require('../config')
+const { MIGRATIONS_LOCK, isDev, runningInCI, serviceProvider } = require('../config')
 const { logger } = require('../utils/logger')
 const { lock } = require('../utils/redis')
 
 const { DB_URL, SIS_IMPORTER_HOST, SIS_IMPORTER_USER, SIS_IMPORTER_PASSWORD, SIS_IMPORTER_DATABASE, SIS_PASSWORD } =
   process.env
+
+const buildListOfMigrations = () => {
+  // eslint-disable-next-line global-require
+  const fs = require('fs')
+  const folder = './src/db/migrations'
+  const migrations = []
+  fs.readdirSync(folder).forEach(file => migrations.push(file))
+  const toPutLast = migrations[0]
+  migrations.shift()
+  migrations.push(toPutLast)
+  return migrations
+}
+
+buildListOfMigrations()
 
 class DbConnections extends EventEmitter {
   constructor() {
@@ -59,6 +76,7 @@ class DbConnections extends EventEmitter {
       if (!this.seqConnection) {
         await this.sequelize.authenticate()
         await this.runMigrations()
+        if (serviceProvider === 'Fd') await this.runFdMigrations()
         this.establish('seqConnection')
       }
     } catch (e) {
@@ -83,6 +101,31 @@ class DbConnections extends EventEmitter {
         migrations: {
           params: [this.sequelize.getQueryInterface(), Sequelize],
           path: `${process.cwd()}/src/db/migrations`,
+          pattern: /\.js$/,
+        },
+      })
+      const migrations = await migrator.up()
+      logger.info({ message: 'Migrations up to date', meta: JSON.stringify(migrations) })
+    } catch (e) {
+      logger.error({ message: 'Migration error', meta: JSON.stringify(e) })
+      throw e
+    } finally {
+      unlock()
+    }
+  }
+
+  async runFdMigrations() {
+    const unlock = await lock(MIGRATIONS_LOCK, 1000 * 60 * 10)
+    try {
+      const migrator = new Umzug({
+        storage: 'sequelize',
+        storageOptions: {
+          sequelize: this.sequelize,
+          tableName: 'migrations',
+        },
+        migrations: {
+          params: [this.sequelize.getQueryInterface(), Sequelize],
+          path: `${process.cwd()}/src/db/migrations/fd_extra_migration`,
           pattern: /\.js$/,
         },
       })
