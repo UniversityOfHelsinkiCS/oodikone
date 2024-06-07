@@ -12,6 +12,8 @@ const ProgrammeModule = require('./programmeModule')
 const ProgrammeModuleChild = require('./programmeModuleChild')
 const Semester = require('./semester')
 const SemesterEnrollment = require('./semesterEnrollment')
+const SISStudyRight = require('./SISStudyRight')
+const SISStudyRightElement = require('./SISStudyRightElement')
 const Student = require('./student')
 const Studyplan = require('./studyplan')
 const Studyright = require('./studyright')
@@ -135,6 +137,8 @@ module.exports = {
   ProgrammeModuleChild,
   Semester,
   SemesterEnrollment,
+  SISStudyRight,
+  SISStudyRightElement,
   Student,
   Studyplan,
   StudyrightExtent,
