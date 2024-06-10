@@ -32,7 +32,10 @@ node_modules/
 # Output of 'npm pack'
 *.tgz
 
-# dotenv environment variables file
+# Misc
+*.sqz
+
+# Environment variable files
 .env
 .env.test
 .env.production
