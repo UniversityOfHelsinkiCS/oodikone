@@ -1,0 +1,19 @@
+{
+  "rustc": 18004373081649162931,
+  "features": "[\"fs\", \"process\", \"signal\"]",
+  "declared_features": "",
+  "target": 6681465452631038786,
+  "profile": 10243973527296709326,
+  "path": 6506042210982046510,
+  "deps": [
+    [2452538001284770427, "cfg_if", false, 14571128340992535395],
+    [4171369895214295011, "build_script_build", false, 195190146931657675],
+    [7803147409971559194, "bitflags", false, 3004817949360172232],
+    [8027162633395504296, "libc", false, 7343912106817141852]
+  ],
+  "local": [{ "CheckDepInfo": { "dep_info": "debug/.fingerprint/nix-a7d163ef44c5e407/dep-lib-nix" } }],
+  "rustflags": [],
+  "metadata": 7592889295042356366,
+  "config": 2202906307356721367,
+  "compile_kind": 0
+}

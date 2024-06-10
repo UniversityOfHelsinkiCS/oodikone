@@ -1,0 +1,14 @@
+{
+  "rustc": 18004373081649162931,
+  "features": "[]",
+  "declared_features": "",
+  "target": 17152168999702387428,
+  "profile": 10243973527296709326,
+  "path": 13413635025260459400,
+  "deps": [[4171369895214295011, "nix", false, 11866267062995663164]],
+  "local": [{ "CheckDepInfo": { "dep_info": "debug/.fingerprint/ctrlc-458d3b8cd4f0afc1/dep-lib-ctrlc" } }],
+  "rustflags": [],
+  "metadata": 14328005900965106661,
+  "config": 2202906307356721367,
+  "compile_kind": 0
+}
