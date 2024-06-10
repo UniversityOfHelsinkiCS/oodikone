@@ -28,7 +28,6 @@ export const CompletedCourses = () => {
         </p>
       </Message>
       <CompletedCoursesSearch setValues={setValues} />
-
       <div style={{ paddingTop: '25px' }}>
         {searchValues && searchValues.courseList?.length > 0 && searchValues.studentList?.length > 0 && (
           <CompletedCoursesSearchResults searchValues={searchValues} />

@@ -1,4 +1,5 @@
 import { isNumber, orderBy, sortBy, sumBy, uniqBy } from 'lodash'
+import moment from 'moment'
 import { useCallback, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { Icon, Tab } from 'semantic-ui-react'
@@ -284,6 +285,18 @@ const CoursesTable = ({ curriculum, students, studyGuidanceCourses }) => {
                 }
                 if (hasPassedMandatory(student.studentNumber, mandatoryCourse.code)) {
                   return <Icon color="green" fitted name="check" />
+                }
+                if (
+                  student.enrollments &&
+                  student.enrollments.some(
+                    enrollment => enrollment.course_code === mandatoryCourse.code && enrollment.state === 'ENROLLED'
+                  )
+                ) {
+                  const enrollmentDate = student.enrollments.find(
+                    enrollment => enrollment.course_code === mandatoryCourse.code && enrollment.state === 'ENROLLED'
+                  ).enrollment_date_time
+                  const color = moment(enrollmentDate) > moment().subtract(6, 'months') ? 'yellow' : 'grey'
+                  return <Icon color={color} fitted name="minus" />
                 }
                 return null
               },
