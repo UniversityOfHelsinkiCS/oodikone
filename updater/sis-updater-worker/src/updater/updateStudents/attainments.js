@@ -11,6 +11,7 @@ const {
   validAttainmentTypes,
   customAttainmentTypes,
 } = require('../mapper')
+const { universityOrgId } = require('../updateMeta')
 
 const updateTeachers = async attainments => {
   const acceptorPersonIds = _.flatten(
@@ -56,10 +57,7 @@ const updateAttainments = async (
     return res
   }, {})
 
-  const idsOfFaculties = dbConnections.knex
-    .select('id')
-    .from('organisations')
-    .where('parent_id', 'hy-university-root-id')
+  const idsOfFaculties = dbConnections.knex.select('id').from('organisations').where('parent_id', universityOrgId)
 
   const idsOfDegreeProgrammes = new Set(
     (await dbConnections.knex.select('id').from('organisations').whereIn('parent_id', idsOfFaculties)).map(

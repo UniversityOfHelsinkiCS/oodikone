@@ -9,6 +9,8 @@ const updateOrganisations = async organisations => {
   await bulkCreate(Organization, organisations)
 }
 
+const universityOrgId = 'hy-university-root-id'
+
 // sort substitutions so that main code is first
 const newLetterBasedCode = /^[A-Za-z]/ // new letter based codes come first
 const oldNumericCode = /^\d/ // old numeric codes come second
@@ -115,7 +117,7 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
 }
 
 const updateStudyModules = async studyModules => {
-  const hyStudyModules = studyModules.filter(s => !s.university_org_ids.includes('aalto-university-root-id'))
+  const hyStudyModules = studyModules.filter(s => s.university_org_ids.includes(universityOrgId))
   const attainments = await selectFromByIdsOrderBy(
     'attainments',
     hyStudyModules.map(s => s.id),
@@ -164,4 +166,5 @@ module.exports = {
   updateCourseTypes,
   updateCreditTypes,
   updateStudyrightExtents,
+  universityOrgId,
 }

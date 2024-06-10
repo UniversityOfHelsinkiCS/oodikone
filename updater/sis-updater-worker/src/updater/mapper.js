@@ -33,13 +33,12 @@ const validStates = ['INCLUDED', 'SUBSTITUTED', 'ATTAINED']
 
 const customAttainmentTypes = ['CustomCourseUnitAttainment', 'CustomModuleAttainment']
 
+const moduleTypes = ['ModuleAttainment', 'CustomModuleAttainment', 'DegreeProgrammeAttainment']
+
 // Basically all types at the moment
-const validAttainmentTypes = [
-  ...customAttainmentTypes,
-  'CourseUnitAttainment',
-  'ModuleAttainment',
-  'DegreeProgrammeAttainment',
-]
+const validAttainmentTypes = [...customAttainmentTypes, ...moduleTypes, 'CourseUnitAttainment']
+
+const isModule = courseType => moduleTypes.includes(courseType)
 
 const now = new Date()
 
@@ -135,9 +134,6 @@ const mapTeacher = person => ({
   id: person.id,
   name: person.first_names ? `${person.last_name} ${person.first_names}`.trim() : person.last_name,
 })
-
-const moduleTypes = new Set(['ModuleAttainment', 'CustomModuleAttainment', 'DegreeProgrammeAttainment'])
-const isModule = courseType => moduleTypes.has(courseType)
 
 const creditMapper =
   (
