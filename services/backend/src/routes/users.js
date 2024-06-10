@@ -93,7 +93,7 @@ router.get('/from-sisu-by-eppn/:newUserEppn', auth.roles(['admin']), async (req,
   res.json(person)
 })
 
-router.post('/add', async (req, res) => {
+router.post('/add', auth.roles(['admin']), async (req, res) => {
   const { user } = req.body
   const person = await userService.addNewUser(user)
   res.json(person)

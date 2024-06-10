@@ -240,7 +240,7 @@ const addNewUser = async user => {
     username: user.eppn,
     email: user.email_address,
     sisuPersonId: user.id,
-    roles: ['courseStatistics'],
+    roles: [],
   })
 }
 
