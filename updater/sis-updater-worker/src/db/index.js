@@ -2,7 +2,7 @@ const { getLatestSnapshot, isActive, getActiveSnapshot } = require('../utils')
 const { logger } = require('../utils/logger')
 const { dbConnections } = require('./connection')
 
-const selectOneById = async (table, id) => dbConnections.knex(table).where('id', id).first()
+const selectOneById = async (table, id, col = 'id') => dbConnections.knex(table).where(col, id).first()
 
 const selectFromByIds = async (table, ids, col = 'id') => dbConnections.knex(table).whereIn(col, ids)
 

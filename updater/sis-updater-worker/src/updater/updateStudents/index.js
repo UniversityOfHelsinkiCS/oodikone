@@ -9,6 +9,7 @@ const { studentMapper, semesterEnrollmentMapper, enrollmentMapper } = require('.
 const { getEducation, getUniOrgId, loadMapsIfNeeded } = require('../shared')
 const { updateAttainments } = require('./attainments')
 const { getAttainmentsToBeExcluded } = require('./excludedPartialAttainments')
+const { updateSISStudyRights, updateSISStudyRightElements } = require('./SISStudyRights')
 const { updateStudyplans, findStudentsToReupdate } = require('./studyPlans')
 const { updateStudyRights, updateStudyRightElements, updateElementDetails } = require('./studyRightUpdaters')
 
@@ -74,6 +75,18 @@ const groupStudyrightSnapshots = studyrightSnapshots => {
 
     res[id] = snapshotsWithRightDate
 
+    return res
+  }, {})
+}
+
+// Group snapshots by studyright id and order them so that the latest snapshot is the first element in the array
+const groupSISStudyRightSnapshots = studyrightSnapshots => {
+  const activeSnapshots = studyrightSnapshots.filter(s => s.document_state === 'ACTIVE')
+  const snapshotsByStudyRight = Object.entries(groupBy(activeSnapshots, 'id'))
+
+  return snapshotsByStudyRight.reduce((res, [studyRightId, snapshots]) => {
+    const orderedSnapshots = orderBy(snapshots, [s => Number(s.modification_ordinal)], ['desc'])
+    res[studyRightId] = orderedSnapshots
     return res
   }, {})
 }
@@ -215,6 +228,7 @@ const semesterEnrolmentsOfStudent = allSemesterEnrollments => {
   return semesterEnrollments
 }
 
+// We should get rid of the separate semesterEnrollment model and start using semesterEnrollments associated with study rights instead
 const updateTermRegistrations = async (termRegistrations, personIdToStudentNumber) => {
   const studyRightIds = termRegistrations.map(({ study_right_id }) => study_right_id)
   const studyRights = await selectFromSnapshotsByIds('studyrights', studyRightIds)
@@ -301,6 +315,12 @@ const updateStudents = async (personIds, iteration = 0) => {
       termRegistrations
     ),
   ])
+
+  const groupedSISStudyRightSnapshots = groupSISStudyRightSnapshots(studyrightSnapshots)
+
+  await updateSISStudyRights(groupedSISStudyRightSnapshots, personIdToStudentNumber, termRegistrations)
+
+  await updateSISStudyRightElements(Object.values(groupedSISStudyRightSnapshots), moduleGroupIdToCode)
 
   const mappedTransfers = await parseTransfers(groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber)
 
