@@ -206,6 +206,7 @@ const educationTypeToExtentcode = {
   'urn:code:education-type:degree-education:masters-degree': 2,
   'urn:code:education-type:degree-education:lic': 3,
   'urn:code:education-type:degree-education:doctor': 4,
+  'urn:code:education-type:degree-education:bachelors-and-masters-degree': 5,
   'urn:code:education-type:non-degree-education:updating-training': 6,
   'urn:code:education-type:non-degree-education:exchange-studies': 7,
   'urn:code:education-type:non-degree-education:open-university-studies': 9,
