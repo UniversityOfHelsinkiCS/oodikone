@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import { useSelector } from 'react-redux'
+import { Tab } from 'semantic-ui-react'
 
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetCustomPopulationQuery } from '@/redux/populations'
@@ -133,23 +134,31 @@ export const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) =
 
   if (variant === 'studyGuidanceGroupPopulation') {
     return (
-      <StudyGuidanceGroupGeneralTabContainer
-        columnKeysToInclude={columnKeysToInclude}
-        group={studyGuidanceGroup}
-        {...props}
-      />
+      <Tab.Pane>
+        <StudyGuidanceGroupGeneralTabContainer
+          columnKeysToInclude={columnKeysToInclude}
+          group={studyGuidanceGroup}
+          {...props}
+        />
+      </Tab.Pane>
     )
   }
 
   if (variant === 'customPopulation' || variant === 'coursePopulation') {
     return (
-      <CustomPopulationGeneralTabContainer
-        columnKeysToInclude={columnKeysToInclude}
-        group={studyGuidanceGroup}
-        {...props}
-      />
+      <Tab.Pane>
+        <CustomPopulationGeneralTabContainer
+          columnKeysToInclude={columnKeysToInclude}
+          group={studyGuidanceGroup}
+          {...props}
+        />
+      </Tab.Pane>
     )
   }
 
-  return <GeneralTab columnKeysToInclude={columnKeysToInclude} populations={populations} {...props} />
+  return (
+    <Tab.Pane>
+      <GeneralTab columnKeysToInclude={columnKeysToInclude} populations={populations} {...props} />
+    </Tab.Pane>
+  )
 }
