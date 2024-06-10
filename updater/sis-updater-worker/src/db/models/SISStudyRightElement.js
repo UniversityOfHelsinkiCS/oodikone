@@ -20,7 +20,6 @@ SISStudyRightElement.init(
     code: STRING,
     name: JSONB,
     studyTracks: JSONB,
-    facultyCode: STRING,
     createdAt: DATE,
     updatedAt: DATE,
   },
