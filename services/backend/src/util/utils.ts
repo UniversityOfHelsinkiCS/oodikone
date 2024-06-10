@@ -1,6 +1,6 @@
-const mapToProviders = programmeCodes => {
+const mapToProviders = (programmeCodes: string[]) => {
   return programmeCodes.map(r => {
-    const isNumber = str => !Number.isNaN(Number(str))
+    const isNumber = (str: string) => !Number.isNaN(Number(str))
     if (r.includes('_')) {
       const [left, right] = r.split('_')
       const prefix = [...left].filter(isNumber).join('')
@@ -63,7 +63,7 @@ const getFullStudyProgrammeRights = programmeRights =>
 
 const hasFullAccessToStudentData = roles => roles?.some(role => ['admin', 'fullSisuAccess'].includes(role))
 
-module.exports = {
+export default {
   mapToProviders,
   sortMainCode,
   getSortRank,
