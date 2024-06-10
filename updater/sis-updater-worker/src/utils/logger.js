@@ -23,7 +23,8 @@ if (isProduction && !isStaging && !runningInCI) {
 }
 
 const devFormat = printf(
-  ({ level, message, timestamp, ...rest }) => `${timestamp} ${level}: ${message} ${JSON.stringify(rest)}`
+  ({ timestamp, level, message, error, ...rest }) =>
+    `${timestamp} ${level}: ${message}${error ? ` ${error?.stack}` : ''}${rest ? ` ${JSON.stringify(rest)}` : ''}`
 )
 
 const prodFormat = printf(({ timestamp, level, ...rest }) => JSON.stringify({ timestamp, level, ...rest }))

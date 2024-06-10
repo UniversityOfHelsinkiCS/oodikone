@@ -57,10 +57,8 @@ const bulkCreate = async (model, entities, transaction = null, properties = ['id
     for (const entity of entities) {
       try {
         await model.upsert(entity, { fields: getColumnsToUpdate(model, properties) })
-      } catch (e) {
-        logger.error('Single-entity upsert failed.')
-        logger.error(JSON.stringify(entity, null, 2))
-        logger.error(e)
+      } catch (error) {
+        logger.error('Single-entity upsert failed.', { error, entity })
       }
     }
   }

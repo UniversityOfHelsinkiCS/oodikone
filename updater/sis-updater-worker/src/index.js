@@ -38,16 +38,16 @@ const handleMessage = messageHandler => async msg => {
       logger.info({ message: `Completion Ack ${data.id} (Success)` })
       stan.publish(`SIS_COMPLETED_CHANNEL-${data.id}`, JSON.stringify({ id: data.id, success: true }))
     }
-  } catch (e) {
+  } catch (error) {
     if (data.id) {
       logger.info({ message: `Completion Ack ${data.id} (Failure)` })
       stan.publish(
         `SIS_COMPLETED_CHANNEL-${data.id}`,
-        JSON.stringify({ id: data.id, success: false, message: e.message })
+        JSON.stringify({ id: data.id, success: false, message: error.message })
       )
     }
 
-    logger.error({ message: 'Failed handling message', meta: e.stack })
+    logger.error('Failed handling message', { error })
   } finally {
     try {
       msg.ack()
