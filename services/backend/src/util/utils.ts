@@ -63,7 +63,7 @@ const getFullStudyProgrammeRights = programmeRights =>
 
 const hasFullAccessToStudentData = roles => roles?.some(role => ['admin', 'fullSisuAccess'].includes(role))
 
-export default {
+module.exports = {
   mapToProviders,
   sortMainCode,
   getSortRank,
@@ -71,3 +71,5 @@ export default {
   getFullStudyProgrammeRights,
   hasFullAccessToStudentData,
 }
+
+export default {}
