@@ -20,6 +20,7 @@ SISStudyRight.init(
     extentCode: INTEGER,
     admissionType: STRING,
     semesterEnrollments: JSONB,
+    facultyCode: STRING,
     createdAt: DATE,
     updatedAt: DATE,
   },
