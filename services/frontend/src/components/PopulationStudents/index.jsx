@@ -3,13 +3,14 @@ import { useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { Tab } from 'semantic-ui-react'
 
-import { useTabChangeAnalytics } from '@/common/hooks'
+import { useTabChangeAnalytics, useToggle } from '@/common/hooks'
 import { coursePopulationToolTips, populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { InfoBox } from '@/components/Info/InfoBox'
 import { StudentNameVisibilityToggle } from '@/components/StudentNameVisibilityToggle'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetTagsByStudyTrackQuery } from '@/redux/tags'
 import { CheckStudentList } from './CheckStudentList'
+import { CombineSubstitutionsToggle } from './CombineSubstitutionsToggle'
 import { CoursesTabContainer as CoursesTab } from './StudentTable/CoursesTab'
 import { GeneralTabContainer as GeneralTab } from './StudentTable/GeneralTab'
 import { ProgressTable as ProgressTab } from './StudentTable/ProgressTab'
@@ -34,6 +35,7 @@ const Panes = ({
   year,
 }) => {
   const { handleTabChange } = useTabChangeAnalytics()
+  const [combineSubstitutions, toggleCombineSubstitutions] = useToggle(true)
   const programmeForTagsLink = combinedProgramme ? `${mainProgramme}+${combinedProgramme}` : mainProgramme
   const programme = studyGuidanceGroup?.tags?.studyProgramme || ''
   const correctCode = combinedProgramme ? `${mainProgramme}+${combinedProgramme}` : mainProgramme
@@ -99,7 +101,13 @@ const Panes = ({
   return (
     <>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <StudentNameVisibilityToggle />
+        <div style={{ display: 'flex', flexDirection: 'row', gap: '20px' }}>
+          <StudentNameVisibilityToggle />
+          <CombineSubstitutionsToggle
+            combineSubstitutions={combineSubstitutions}
+            toggleCombineSubstitutions={toggleCombineSubstitutions}
+          />
+        </div>
         {dataExport}
       </div>
       <Tab data-cy="student-table-tabs" onTabChange={handleTabChange} panes={panes} />
