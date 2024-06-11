@@ -271,7 +271,22 @@ const CoursesTable = ({ curriculum, students, studyGuidanceCourses }) => {
                 if (student.total) {
                   return getTotalRowVal(student, mandatoryCourse.code)
                 }
-                return hasPassedMandatory(student.studentNumber, mandatoryCourse.code) ? 'Passed' : ''
+                const bestGrade = findBestGrade(student.courses, mandatoryCourse.code)
+                if (bestGrade) {
+                  const passedMandatory = hasPassedMandatory(student.studentNumber, mandatoryCourse.code)
+                  if (passedMandatory) {
+                    return 4
+                  }
+                  return 3
+                }
+                if (hasActiveEnrollments(student, mandatoryCourse.code)) {
+                  const enrollmentDate = getEnrollmentDate(student, mandatoryCourse.code)
+                  if (moment(enrollmentDate) > moment().subtract(6, 'months')) {
+                    return 2
+                  }
+                  return 1
+                }
+                return 0
               },
               getRowExportVal: student => {
                 if (student.total) {
