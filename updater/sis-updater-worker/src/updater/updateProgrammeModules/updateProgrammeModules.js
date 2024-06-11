@@ -25,6 +25,7 @@ const resolveProgramme = async programme => {
     valid_from: programme?.validity_period?.startDate ?? null,
     valid_to: programme?.validity_period?.endDate ?? null,
     curriculum_period_ids: programme.curriculum_period_ids ?? [],
+    degreeProgramTypeUrn: programme.degree_program_type_urn,
     order: 0,
     children,
   }

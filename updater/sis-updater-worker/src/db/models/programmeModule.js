@@ -50,6 +50,9 @@ ProgrammeModule.init(
     updatedAt: {
       type: DATE,
     },
+    degreeProgramTypeUrn: {
+      type: STRING,
+    },
   },
   {
     underscored: true,
