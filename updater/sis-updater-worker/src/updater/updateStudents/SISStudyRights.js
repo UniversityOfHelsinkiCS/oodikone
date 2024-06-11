@@ -47,6 +47,8 @@ const studyRightMapper = (personIdToStudentNumber, admissionNamesById, semesterE
     ({ study_right_id }) => study_right_id === studyRight.id
   )?.term_registrations
   const studyRightEducation = getEducation(studyRight.education_id)
+  if (!studyRightEducation) return null
+
   const educationType = getEducationType(studyRightEducation.education_type)
   const extentCode = educationTypeToExtentcode[educationType.id] || educationTypeToExtentcode[educationType.parent_id]
 
@@ -175,16 +177,19 @@ const updateSISStudyRights = async (groupedStudyRights, personIdToStudentNumber,
     return acc
   }, [])
 
-  const formattedStudyRights = latestStudyRights.map(mapStudyRight)
+  const formattedStudyRights = latestStudyRights.map(mapStudyRight).filter(Boolean)
 
   await bulkCreate(SISStudyRight, formattedStudyRights)
+  return new Set(formattedStudyRights.map(studyRight => studyRight.id))
 }
 
-const updateSISStudyRightElements = async (groupedStudyRights, moduleGroupIdToCode) => {
+const updateSISStudyRightElements = async (groupedStudyRights, moduleGroupIdToCode, createdStudyRights) => {
   const studyRightElements = []
 
   for (const group of groupedStudyRights) {
     const latestSnapshot = group[0]
+    // This means that no study right with this id was created, so we don't want to create any study right elements for it either
+    if (!createdStudyRights.has(latestSnapshot.id)) continue
     const { phase1Programmes, phase2Programmes, phase1StudyTracks, phase2StudyTracks } =
       findFirstSnapshotDatesForProgrammesAndStudytracks(group)
 

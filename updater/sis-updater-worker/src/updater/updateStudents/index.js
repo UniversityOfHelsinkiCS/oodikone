@@ -318,9 +318,17 @@ const updateStudents = async (personIds, iteration = 0) => {
 
   const groupedSISStudyRightSnapshots = groupSISStudyRightSnapshots(studyrightSnapshots)
 
-  await updateSISStudyRights(groupedSISStudyRightSnapshots, personIdToStudentNumber, termRegistrations)
+  const createdStudyRights = await updateSISStudyRights(
+    groupedSISStudyRightSnapshots,
+    personIdToStudentNumber,
+    termRegistrations
+  )
 
-  await updateSISStudyRightElements(Object.values(groupedSISStudyRightSnapshots), moduleGroupIdToCode)
+  await updateSISStudyRightElements(
+    Object.values(groupedSISStudyRightSnapshots),
+    moduleGroupIdToCode,
+    createdStudyRights
+  )
 
   const mappedTransfers = await parseTransfers(groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber)
 
