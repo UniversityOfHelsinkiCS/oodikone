@@ -1,9 +1,8 @@
 const router = require('express').Router()
 
+const { isDev } = require('../conf-backend')
 const auth = require('../middleware/auth')
-const { sendNotificationAboutAccessToUser, previewNotificationAboutAccessToUser } = require('../services/mailservice')
 const userService = require('../services/userService')
-const logger = require('../util/logger')
 
 router.get('/', auth.roles(['admin']), async (_req, res) => {
   const results = await userService.findAll()
@@ -34,25 +33,6 @@ router.post('/modifyaccess', auth.roles(['admin']), async (req, res) => {
   }
 })
 
-router.get('/email/preview', auth.roles(['admin']), (_req, res) => {
-  const { accessMessageSubject, accessMessageText } = previewNotificationAboutAccessToUser()
-  res.json({ subject: accessMessageSubject, html: accessMessageText })
-})
-
-router.post('/email', auth.roles(['admin']), async (req, res) => {
-  const userEmail = req.body.email
-  if (!userEmail) {
-    return res.status(400).json({ error: 'email is missing' })
-  }
-
-  const result = await sendNotificationAboutAccessToUser(userEmail)
-  if (result.error) {
-    return res.status(400).json(result).end()
-  }
-  logger.info('Succesfully sent message about oodikone access to user')
-  res.status(200).end()
-})
-
 router.post('/:uid/elements', auth.roles(['admin']), async (req, res) => {
   const { uid } = req.params
   const { codes } = req.body
@@ -81,6 +61,21 @@ router.post('/language', async (req, res) => {
   } catch (e) {
     return res.status(500).json({ error: e.message })
   }
+})
+
+router.get('/from-sisu-by-eppn/:newUserEppn', auth.roles(['admin']), async (req, res) => {
+  let { username: requesterEppn } = req.user
+  const { newUserEppn } = req.params
+  // in order to test this feature in the dev environment we need to set an eppn that demo sisu will recognize
+  if (isDev && requesterEppn === 'mluukkai') requesterEppn = newUserEppn
+  const person = await userService.getUserFromSisuByEppn(requesterEppn, newUserEppn)
+  res.json(person)
+})
+
+router.post('/add', auth.roles(['admin']), async (req, res) => {
+  const { user } = req.body
+  const person = await userService.addNewUser(user)
+  res.json(person)
 })
 
 module.exports = router
