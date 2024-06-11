@@ -278,11 +278,8 @@ const CoursesTable = ({ curriculum, students, studyGuidanceCourses }) => {
                   return getTotalRowVal(student, mandatoryCourse.code)
                 }
                 const bestGrade = findBestGrade(student.courses, mandatoryCourse.code)
-                if (!bestGrade) {
-                  if (hasActiveEnrollments(student, mandatoryCourse.code)) {
-                    return 0
-                  }
-                  return ''
+                if (!bestGrade && hasActiveEnrollments(student, mandatoryCourse.code)) {
+                  return 0
                 }
                 if (bestGrade === 'Hyl.') {
                   return 0
@@ -290,14 +287,16 @@ const CoursesTable = ({ curriculum, students, studyGuidanceCourses }) => {
                 if (['1', '2', '3', '4', '5'].includes(bestGrade)) {
                   return parseInt(bestGrade, 10)
                 }
-                return bestGrade
+                return ''
               },
               getRowContent: student => {
                 if (student.total) {
                   return getTotalRowVal(student, mandatoryCourse.code)
                 }
-                if (hasPassedMandatory(student.studentNumber, mandatoryCourse.code)) {
-                  return <Icon color="green" fitted name="check" />
+                const bestGrade = findBestGrade(student.courses, mandatoryCourse.code)
+                if (bestGrade) {
+                  const passedMandatory = hasPassedMandatory(student.studentNumber, mandatoryCourse.code)
+                  return <Icon color={passedMandatory ? 'green' : 'grey'} fitted name="check" />
                 }
                 if (hasActiveEnrollments(student, mandatoryCourse.code)) {
                   const enrollmentDate = getEnrollmentDate(student, mandatoryCourse.code)
