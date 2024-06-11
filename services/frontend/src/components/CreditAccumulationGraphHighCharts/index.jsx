@@ -1,4 +1,6 @@
 /* eslint-disable camelcase */
+import exportData from 'highcharts/modules/export-data'
+import exporting from 'highcharts/modules/exporting'
 import _ from 'lodash'
 import moment from 'moment'
 import { useRef, useState } from 'react'
@@ -12,6 +14,9 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { DISPLAY_DATE_FORMAT, API_DATE_FORMAT } from '@/constants'
 import { CreditGraphTooltip } from './CreditGraphTooltip'
 import './creditAccumulationGraphHC.css'
+
+exporting(ReactHighstock.Highcharts)
+exportData(ReactHighstock.Highcharts)
 
 const SINGLE_GRAPH_GOAL_SERIES_NAME = 'Goal'
 
@@ -112,6 +117,10 @@ const createGraphOptions = ({
       height: graphHeight,
     },
     tooltip,
+    accessibility: {
+      // Accessibility module doesn't seem to work with Highstock, at least for large amounts of data
+      enabled: false,
+    },
   }
 }
 

@@ -1,7 +1,14 @@
+import accessibility from 'highcharts/modules/accessibility'
+import exportData from 'highcharts/modules/export-data'
+import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
 
 import { generateGradientColors } from '@/common'
 import { NoDataMessage } from '@/components/StudyProgramme/NoDataMessage'
+
+exporting(ReactHighcharts.Highcharts)
+exportData(ReactHighcharts.Highcharts)
+accessibility(ReactHighcharts.Highcharts)
 
 export const BarChart = ({ cypress, data, track }) => {
   if (!data || !data.creditGraphStats || !data.creditGraphStats[track])
@@ -9,13 +16,6 @@ export const BarChart = ({ cypress, data, track }) => {
   const correctData = data.creditGraphStats[track]
   const colors = generateGradientColors(correctData.length)
   const dataWithColors = Object.values(correctData).map((series, index) => ({ ...series, color: colors[index] }))
-
-  const getFileName = () => {
-    if (track === '' || track === 'studyprogramme') {
-      return `oodikone_progress_of_students_in_${data?.id}_by_study_start_year`
-    }
-    return `oodikone_progress_of_students_in_${data?.id}_${track}_by_study_start_year`
-  }
 
   const config = {
     title: {
@@ -42,16 +42,10 @@ export const BarChart = ({ cypress, data, track }) => {
       },
     },
     exporting: {
-      filename: getFileName(),
-      width: 2200,
-      height: 1400,
-      sourceWidth: 1200,
-      sourceHeight: 600,
-      buttons: {
-        contextButton: {
-          menuItems: ['viewFullscreen', 'downloadPNG', 'downloadSVG', 'downloadPDF'],
-        },
-      },
+      filename:
+        track === '' || track === 'studyprogramme'
+          ? `oodikone_progress_of_students_in_${data?.id}_by_study_start_year`
+          : `oodikone_progress_of_students_in_${data?.id}_${track}_by_study_start_year`,
     },
     yAxis: {
       allowDecimals: false,

@@ -1,4 +1,11 @@
+import accessibility from 'highcharts/modules/accessibility'
+import exportData from 'highcharts/modules/export-data'
+import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
+
+exporting(ReactHighcharts.Highcharts)
+exportData(ReactHighcharts.Highcharts)
+accessibility(ReactHighcharts.Highcharts)
 
 const colors = ['#003E65', '#1392c2', '#036415']
 
@@ -22,15 +29,6 @@ export const BarChart = ({ cypress, data }) => {
     },
     exporting: {
       filename: `oodikone_graduations_and_thesis_of_studyprogramme_${data?.id}`,
-      width: 2200,
-      height: 1400,
-      sourceWidth: 1200,
-      sourceHeight: 600,
-      buttons: {
-        contextButton: {
-          menuItems: ['viewFullscreen', 'downloadPNG', 'downloadSVG', 'downloadPDF'],
-        },
-      },
     },
     plotOptions: {
       column: {

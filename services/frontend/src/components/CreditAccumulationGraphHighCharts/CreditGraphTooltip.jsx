@@ -1,4 +1,3 @@
-import { arrayOf, object } from 'prop-types'
 import { Card, Icon } from 'semantic-ui-react'
 
 import './creditGraphTooltip.css'
@@ -51,27 +50,18 @@ const getCardDescription = (credits, grade, passed, isStudyModuleCredit) => (
   </Card.Description>
 )
 
-export const CreditGraphTooltip = ({ payload }) => {
-  if (payload && payload.length > 0) {
-    const { name } = payload[0]
-    const { title, credits, date, grade, passed, isStudyModuleCredit } = payload[0].payload
-    return (
-      <Card>
-        <Card.Content>
-          {getCardHeader(title, isStudyModuleCredit)}
-          {getCardMeta(name, date)}
-          {getCardDescription(credits, grade, passed, isStudyModuleCredit)}
-        </Card.Content>
-      </Card>
-    )
-  }
-  return null
-}
+export const CreditGraphTooltip = ({ payload = [] }) => {
+  if (payload.length === 0) return null
 
-CreditGraphTooltip.defaultProps = {
-  payload: [],
-}
-
-CreditGraphTooltip.propTypes = {
-  payload: arrayOf(object),
+  const { name } = payload[0]
+  const { title, credits, date, grade, passed, isStudyModuleCredit, course_code: code } = payload[0].payload
+  return (
+    <Card>
+      <Card.Content>
+        {getCardHeader(`${title} (${code})`, isStudyModuleCredit)}
+        {getCardMeta(name, date)}
+        {getCardDescription(credits, grade, passed, isStudyModuleCredit)}
+      </Card.Content>
+    </Card>
+  )
 }

@@ -1,3 +1,6 @@
+import accessibility from 'highcharts/modules/accessibility'
+import exportData from 'highcharts/modules/export-data'
+import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
 
 import {
@@ -6,6 +9,10 @@ import {
   getMaxValueOfSeries,
 } from '@/components/CourseStatistics/ResultTabs/panes/util'
 import { chartColor, color } from '@/styles/colors'
+
+exporting(ReactHighcharts.Highcharts)
+exportData(ReactHighcharts.Highcharts)
+accessibility(ReactHighcharts.Highcharts)
 
 const passRateAttemptGraphOptions = (isRelative, categories, max, title) => ({
   chart: {

@@ -1,7 +1,14 @@
 /* eslint-disable react/no-this-in-sfc */
+import accessibility from 'highcharts/modules/accessibility'
+import exportData from 'highcharts/modules/export-data'
+import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+
+exporting(ReactHighcharts.Highcharts)
+exportData(ReactHighcharts.Highcharts)
+accessibility(ReactHighcharts.Highcharts)
 
 const colors = ['#7cb5ec', '#90ed7d', '#434348', '#f7a35c', '#FFF000', '#2b908f', '#f45b5b', '#91e8e1']
 
@@ -100,16 +107,11 @@ export const CollapsedStackedBar = ({ data, labels, longLabels, names, plotLineP
       },
       stackLabels: {
         enabled: true,
-        style: {
-          color: 'gray',
-        },
-        fontSize: '24px',
       },
     },
     legend: {
       layout: 'horizontal',
       align: 'left',
-      fontSize: '24px',
       x: 20,
       verticalAlign: 'top',
       y: -10,
@@ -122,7 +124,6 @@ export const CollapsedStackedBar = ({ data, labels, longLabels, names, plotLineP
     tooltip: {
       shared: true,
       backgroundColor: 'white',
-      fontSize: '25px',
       formatter() {
         let tooltipString = `<b>${getTextIn(longLabels[this.x])}</b><br /><p>${this.x} - ${
           longLabels[this.x]?.code

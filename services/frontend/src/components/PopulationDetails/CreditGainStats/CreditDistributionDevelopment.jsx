@@ -1,3 +1,6 @@
+import accessibility from 'highcharts/modules/accessibility'
+import exportData from 'highcharts/modules/export-data'
+import exporting from 'highcharts/modules/exporting'
 import _ from 'lodash'
 import moment from 'moment'
 import qs from 'query-string'
@@ -12,6 +15,10 @@ import { studentNumberFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useGetSemestersQuery } from '@/redux/semesters'
+
+exporting(ReactHighcharts.Highcharts)
+exportData(ReactHighcharts.Highcharts)
+accessibility(ReactHighcharts.Highcharts)
 
 const StackOrdering = {
   ASCENDING: 'asc',

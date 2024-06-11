@@ -1,7 +1,14 @@
 /* eslint-disable react/no-this-in-sfc */
+import accessibility from 'highcharts/modules/accessibility'
+import exportData from 'highcharts/modules/export-data'
+import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+
+exporting(ReactHighcharts.Highcharts)
+exportData(ReactHighcharts.Highcharts)
+accessibility(ReactHighcharts.Highcharts)
 
 export const BreakdownBarChart = ({
   data,
@@ -88,7 +95,6 @@ export const BreakdownBarChart = ({
     },
     yAxis: {
       min: 0,
-      // max: maxValue,
       title: { text: 'Number of students' },
       labels: {
         overflow: 'justify',

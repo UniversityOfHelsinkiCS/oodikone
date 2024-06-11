@@ -1,15 +1,19 @@
+import accessibility from 'highcharts/modules/accessibility'
+import exportData from 'highcharts/modules/export-data'
+import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
 
 import { generateGradientColors } from '@/common'
+
+exporting(ReactHighcharts.Highcharts)
+exportData(ReactHighcharts.Highcharts)
+accessibility(ReactHighcharts.Highcharts)
 
 export const FacultyBarChart = ({ cypress, data }) => {
   if (!data.stats) return null
 
   const colors = generateGradientColors(Object.keys(data.stats).length)
   const dataWithColors = Object.values(data.stats).map((series, index) => ({ ...series, color: colors[index] }))
-  const getFileName = () => {
-    return `oodikone_progress_of_students_in_${data?.id}_by_study_start_year`
-  }
 
   const config = {
     title: {
@@ -36,16 +40,7 @@ export const FacultyBarChart = ({ cypress, data }) => {
       },
     },
     exporting: {
-      filename: getFileName(),
-      width: 2200,
-      height: 1400,
-      sourceWidth: 1200,
-      sourceHeight: 600,
-      buttons: {
-        contextButton: {
-          menuItems: ['viewFullscreen', 'downloadPNG', 'downloadSVG', 'downloadPDF'],
-        },
-      },
+      filename: `oodikone_progress_of_students_in_${data?.id}_by_study_start_year`,
     },
     yAxis: {
       allowDecimals: false,

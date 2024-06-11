@@ -1,5 +1,12 @@
 /* eslint-disable react/no-this-in-sfc */
+import accessibility from 'highcharts/modules/accessibility'
+import exportData from 'highcharts/modules/export-data'
+import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
+
+exporting(ReactHighcharts.Highcharts)
+exportData(ReactHighcharts.Highcharts)
+accessibility(ReactHighcharts.Highcharts)
 
 export const BreakdownBarChart = ({ data, title, byStartYear = false }) => {
   const statData = [

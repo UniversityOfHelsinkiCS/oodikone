@@ -1,5 +1,12 @@
 /* eslint-disable react/no-this-in-sfc */
+import accessibility from 'highcharts/modules/accessibility'
+import exportData from 'highcharts/modules/export-data'
+import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
+
+exporting(ReactHighcharts.Highcharts)
+exportData(ReactHighcharts.Highcharts)
+accessibility(ReactHighcharts.Highcharts)
 
 export const MedianBarChart = ({
   classSizes,
@@ -68,10 +75,8 @@ export const MedianBarChart = ({
       yearLabel === 'Start year'
         ? `<b>From class of ${facultyGraph ? name : year}, ${amount}/${getClassSize(code)} students have graduated</b>`
         : `<b>${amount} students graduated in year ${facultyGraph ? name : year}</b>`
-    const timeText = `<br /><p>${sortingText}, <br /><b> median study time: ${median} months</p></b>`
-    const statisticsText = `<br /><p>${statistics.onTime} graduated on time</p><br />
-        <p>${statistics.yearOver} graduated max year overtime</p>
-        <br /><p>${statistics.wayOver} graduated over year late</p>`
+    const timeText = `<br />${sortingText}<br /><b>median study time: ${median} months</b><br />`
+    const statisticsText = `<br />${statistics.onTime} graduated on time<br />${statistics.yearOver} graduated max year overtime<br />${statistics.wayOver} graduated over year late`
 
     if (!facultyGraph) {
       const goalText = realGoal ? `<br /><p><b>** Exceptional goal time: ${realGoal} months **</b></p>` : ''

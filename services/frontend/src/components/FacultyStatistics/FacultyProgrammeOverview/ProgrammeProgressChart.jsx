@@ -1,8 +1,15 @@
 /* eslint-disable react/no-this-in-sfc */
+import accessibility from 'highcharts/modules/accessibility'
+import exportData from 'highcharts/modules/export-data'
+import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
 
 import { generateGradientColors } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+
+exporting(ReactHighcharts.Highcharts)
+exportData(ReactHighcharts.Highcharts)
+accessibility(ReactHighcharts.Highcharts)
 
 export const ProgrammeProgressChart = ({ data, labels, longLabels, names }) => {
   const { getTextIn } = useLanguage()

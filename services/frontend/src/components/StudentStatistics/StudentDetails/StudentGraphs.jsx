@@ -1,3 +1,6 @@
+import accessibility from 'highcharts/modules/accessibility'
+import exportData from 'highcharts/modules/export-data'
+import exporting from 'highcharts/modules/exporting'
 import _ from 'lodash'
 import { useMemo, useState } from 'react'
 import ReactHighcharts from 'react-highcharts/ReactHighstock'
@@ -6,6 +9,10 @@ import { Input, Menu, Message, Tab } from 'semantic-ui-react'
 import { getStudyRightElementTargetDates, reformatDate } from '@/common'
 import { CreditAccumulationGraphHighCharts } from '@/components/CreditAccumulationGraphHighCharts'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+
+exporting(ReactHighcharts.Highcharts)
+exportData(ReactHighcharts.Highcharts)
+accessibility(ReactHighcharts.Highcharts)
 
 const getEarliestAttainmentDate = ({ courses }) => {
   if (!courses || !courses.length) return null

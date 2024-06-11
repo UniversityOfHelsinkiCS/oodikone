@@ -1,5 +1,12 @@
 /* eslint-disable react/no-this-in-sfc */
+import accessibility from 'highcharts/modules/accessibility'
+import exportData from 'highcharts/modules/export-data'
+import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
+
+exporting(ReactHighcharts.Highcharts)
+exportData(ReactHighcharts.Highcharts)
+accessibility(ReactHighcharts.Highcharts)
 
 export const MedianTimeBarChart = ({ data, goal, title, byStartYear }) => {
   if (!data) return null
@@ -25,16 +32,14 @@ export const MedianTimeBarChart = ({ data, goal, title, byStartYear }) => {
     return data.length * t + 100
   }
 
-  const getTooltipText = (amount, y, year, statistics, classSize = undefined) => {
+  const getTooltipText = (amount, y, year, statistics, classSize) => {
     const sortingText = byStartYear
       ? `<b>From class of ${year}, ${amount}/${classSize} students have graduated</b>`
       : `<b>${amount} students graduated in year ${year}</b>`
 
-    const timeText = `<br /><p>${sortingText}, <br /><b>median study time: ${y} months</p></b>`
+    const timeText = `<br />${sortingText}<br /><b>median study time: ${y} months</b><br />`
 
-    const statisticsText = `<br /><p>${statistics.onTime} graduated on time</p><br />
-        <p>${statistics.yearOver} graduated max year overtime</p>
-        <br /><p>${statistics.wayOver} graduated over year late</p>`
+    const statisticsText = `<br />${statistics.onTime} graduated on time<br />${statistics.yearOver} graduated max year overtime<br />${statistics.wayOver} graduated over year late`
 
     return `${timeText}${statisticsText}`
   }
