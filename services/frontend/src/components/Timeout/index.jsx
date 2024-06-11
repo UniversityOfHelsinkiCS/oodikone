@@ -28,14 +28,13 @@ export const Timeout = Composition =>
     }
 
     render() {
-      const { timeouts, setTimeout, clearTimeout, clearAllTimeouts } = this
+      const { setTimeout, clearTimeout, clearAllTimeouts } = this
 
       return (
         <Composition
           clearAllTimeouts={clearAllTimeouts}
           clearTimeout={clearTimeout}
           setTimeout={setTimeout}
-          timeouts={timeouts}
           {...this.props}
         />
       )

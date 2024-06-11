@@ -31,8 +31,6 @@ ProgrammeDropdown.propTypes = {
   label: string.isRequired,
   name: string.isRequired,
   onChange: func.isRequired,
-  onClear: func,
-  value: arrayOf(string),
   options: arrayOf(
     shape({
       code: oneOfType([string, number]),
@@ -42,9 +40,4 @@ ProgrammeDropdown.propTypes = {
       size: oneOfType([string, number]),
     })
   ).isRequired,
-}
-
-ProgrammeDropdown.defaultProps = {
-  value: [],
-  onClear: undefined,
 }

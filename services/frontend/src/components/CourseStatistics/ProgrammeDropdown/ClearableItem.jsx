@@ -21,7 +21,7 @@ const handler = onClick => event => {
   onClick()
 }
 
-export const ClearableItem = ({ name, onClear, icon, ...props }) => (
+export const ClearableItem = ({ name, onClear, icon = 'cancel', ...props }) => (
   <div style={styles.container} {...props}>
     <div style={styles.clear}>
       <Icon disabled={!onClear} name={icon} onClick={handler(onClear)} />
@@ -35,9 +35,4 @@ export const ClearableItem = ({ name, onClear, icon, ...props }) => (
 ClearableItem.propTypes = {
   name: string.isRequired,
   onClear: func.isRequired,
-  icon: string,
-}
-
-ClearableItem.defaultProps = {
-  icon: 'cancel',
 }

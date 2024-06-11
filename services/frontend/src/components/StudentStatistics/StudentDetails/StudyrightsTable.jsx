@@ -238,13 +238,9 @@ export const StudyrightsTable = ({ handleStartDateChange, showPopulationStatisti
   )
 }
 
-StudyrightsTable.defaultProps = {
-  studyrightid: '',
-}
-
 StudyrightsTable.propTypes = {
   student: shape({}).isRequired,
   handleStartDateChange: func.isRequired,
   showPopulationStatistics: func.isRequired,
-  studyrightid: string,
+  studyrightid: string.isRequired,
 }

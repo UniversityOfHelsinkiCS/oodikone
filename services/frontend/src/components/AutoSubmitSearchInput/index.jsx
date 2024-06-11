@@ -1,4 +1,4 @@
-import { bool, func, number, string } from 'prop-types'
+import { func, string } from 'prop-types'
 import { useEffect, useState } from 'react'
 import { Input } from 'semantic-ui-react'
 
@@ -14,14 +14,13 @@ const AutoSubmitSearchInput = ({
   clearTimeout,
   onChange,
   setTimeout,
-  icon,
   value,
-  latency,
+  latency = 250,
   placeholder,
-  minSearchLength,
+  minSearchLength = 0,
   doSearch,
-  loading,
-  disabled,
+  loading = false,
+  disabled = false,
   ...rest
 }) => {
   const [input, setInput] = useState(value)
@@ -60,7 +59,7 @@ const AutoSubmitSearchInput = ({
     <Input
       disabled={disabled}
       fluid
-      icon={icon}
+      icon="search"
       loading={loading}
       onChange={handleSearchChange}
       placeholder={placeholder}
@@ -75,23 +74,9 @@ AutoSubmitSearchInput.propTypes = {
   clearTimeout: func.isRequired,
   setTimeout: func.isRequired,
   doSearch: func.isRequired,
-  placeholder: string,
-  icon: string,
-  latency: number,
-  minSearchLength: number,
+  placeholder: string.isRequired,
   value: string.isRequired,
   onChange: func.isRequired,
-  loading: bool,
-  disabled: bool,
-}
-
-AutoSubmitSearchInput.defaultProps = {
-  placeholder: 'Search...',
-  icon: 'search',
-  latency: 250,
-  minSearchLength: 0,
-  loading: false,
-  disabled: false,
 }
 
 export const TimeoutAutoSubmitSearchInput = Timeout(AutoSubmitSearchInput)

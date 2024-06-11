@@ -7,21 +7,21 @@ import { getActiveYears } from '@/components/CourseStatistics/courseStatisticsUt
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import './courseTable.css'
 
-const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, mandatory = false, controlIcon }) => {
+const CourseTable = ({ courses, onSelectCourse, hidden, title, controlIcon }) => {
   const { getTextIn } = useLanguage()
   const noContent = courses.length === 0
   const sortCourses = courses => sortBy(courses, course => getTextIn(course.name))
 
   const getEmptyListRow = () => (
     <Table.Row>
-      <Table.Cell colSpan="3" content={emptyListText} />
+      <Table.Cell colSpan="3" content="No results." />
     </Table.Row>
   )
 
   const toCourseRow = course => (
     <Table.Row
       key={course.code}
-      onClick={() => (course.min_attainment_date || mandatory ? onSelectCourse(course) : null)}
+      onClick={() => (course.min_attainment_date ? onSelectCourse(course) : null)}
       style={{ cursor: 'pointer' }}
     >
       <Table.Cell width={10}>
@@ -54,15 +54,8 @@ CourseTable.propTypes = {
   onSelectCourse: func.isRequired,
   hidden: bool.isRequired,
   title: string.isRequired,
-  emptyListText: string,
+  // eslint-disable-next-line react/require-default-props
   controlIcon: string,
-  mandatory: bool,
-}
-
-CourseTable.defaultProps = {
-  emptyListText: 'No results.',
-  controlIcon: null,
-  mandatory: false,
 }
 
 const areEqual = (prevProps, nextProps) => {

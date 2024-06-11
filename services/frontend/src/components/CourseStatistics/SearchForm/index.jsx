@@ -1,5 +1,4 @@
 import { sortBy } from 'lodash'
-import { func } from 'prop-types'
 import qs from 'query-string'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -263,7 +262,6 @@ export const SearchForm = ({ onProgress }) => {
                 <AutoSubmitSearchInput
                   doSearch={fetchCourses}
                   loading={isLoading}
-                  minSearchLength={0}
                   onChange={cn => setState({ ...state, courseName: cn })}
                   placeholder="Search by entering a course name"
                   value={courseName}
@@ -275,7 +273,6 @@ export const SearchForm = ({ onProgress }) => {
                   data-cy="course-code-input"
                   doSearch={fetchCourses}
                   loading={isLoading}
-                  minSearchLength={0}
                   onChange={cc => setState({ ...state, courseCode: cc })}
                   placeholder="Search by a course code"
                   value={courseCode}
@@ -381,12 +378,4 @@ export const SearchForm = ({ onProgress }) => {
       />
     </>
   )
-}
-
-SearchForm.defaultProps = {
-  onProgress: null,
-}
-
-SearchForm.propTypes = {
-  onProgress: func,
 }

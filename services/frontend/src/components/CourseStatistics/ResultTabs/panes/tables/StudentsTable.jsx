@@ -1,5 +1,4 @@
 import { uniq } from 'lodash'
-import { bool, object } from 'prop-types'
 import qs from 'query-string'
 import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
@@ -233,14 +232,4 @@ export const StudentsTable = ({
       )}
     </div>
   )
-}
-
-StudentsTable.propTypes = {
-  data: object.isRequired,
-  separate: bool,
-  userHasAccessToAllStats: bool.isRequired,
-}
-
-StudentsTable.defaultProps = {
-  separate: false,
 }

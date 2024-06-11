@@ -1,4 +1,4 @@
-import { arrayOf, func, number, oneOfType, shape, string } from 'prop-types'
+import { shape } from 'prop-types'
 import { useEffect, useState } from 'react'
 import { Form, Tab } from 'semantic-ui-react'
 
@@ -19,16 +19,6 @@ const CourseTabDropdown = ({ options, doSelect, selected }) => (
     />
   </Form>
 )
-
-CourseTabDropdown.propTypes = {
-  options: arrayOf(shape({})).isRequired,
-  doSelect: func.isRequired,
-  selected: oneOfType([string, number]),
-}
-
-CourseTabDropdown.defaultProps = {
-  selected: null,
-}
 
 export const CoursesTab = ({ courses, semesters }) => {
   const { getTextIn } = useLanguage()

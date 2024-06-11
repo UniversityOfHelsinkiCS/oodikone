@@ -15,7 +15,7 @@ const styles = {
   },
 }
 
-export const DropdownItem = ({ name, code, size, description }) =>
+export const DropdownItem = ({ name, code, size, description = '' }) =>
   ['ALL', 'OTHER', 'EXCLUDED'].includes(code) ? (
     <Popup
       content={description}
@@ -44,12 +44,8 @@ export const DropdownItem = ({ name, code, size, description }) =>
     </div>
   )
 
-DropdownItem.defaultProps = {
-  description: '',
-}
 DropdownItem.propTypes = {
   name: string.isRequired,
   code: string.isRequired,
   size: oneOfType([number, string]).isRequired,
-  description: string,
 }

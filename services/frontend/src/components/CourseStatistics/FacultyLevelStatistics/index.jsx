@@ -1,5 +1,5 @@
 import { flatten, uniq } from 'lodash'
-import { number, shape, string } from 'prop-types'
+import { number, string } from 'prop-types'
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { Dropdown, Form, Header, Table } from 'semantic-ui-react'
@@ -115,13 +115,4 @@ CourseTableRow.propTypes = {
   students: number.isRequired,
   credits: number.isRequired,
   facultyName: string.isRequired,
-}
-
-CourseTable.propTypes = {
-  course: shape({}).isRequired,
-  courseInstance: shape({}),
-}
-
-CourseTable.defaultProps = {
-  courseInstance: null,
 }

@@ -1,4 +1,4 @@
-import { arrayOf, func, number, shape } from 'prop-types'
+import { arrayOf, func, shape } from 'prop-types'
 import { Form } from 'semantic-ui-react'
 
 export const YearFilter = ({ years, fromYear, toYear, handleChange }) => (
@@ -34,12 +34,5 @@ export const YearFilter = ({ years, fromYear, toYear, handleChange }) => (
 
 YearFilter.propTypes = {
   years: arrayOf(shape({})).isRequired,
-  fromYear: number,
-  toYear: number,
   handleChange: func.isRequired,
-}
-
-YearFilter.defaultProps = {
-  fromYear: undefined,
-  toYear: undefined,
 }
