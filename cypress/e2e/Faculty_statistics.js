@@ -162,7 +162,7 @@ describe('Faculty overview', () => {
       cy.get('[data-cy="Section-bachelor"]').should('be.visible')
       cy.get('[data-cy="Section-master"]').should('be.visible')
       cy.get('[data-cy="Section-master"]').within(() => {
-        cy.contains('Graduation year').should('be.visible')
+        cy.contains('text.highcharts-axis-title', 'Graduation year')
         cy.contains('.message', "Click a bar to view that year's programme level breakdown").should('be.visible')
       })
     })
@@ -188,7 +188,7 @@ describe('Faculty overview', () => {
         cy.get('div[class="programmes-graph"]').should('be.visible')
         cy.get('div[class="programmes-graph"]').within(() => {
           cy.contains('EDUK')
-          cy.contains('1 graduated').trigger('mouseover')
+          cy.get('[aria-label="EDUK, 40."]').trigger('mouseover')
           cy.contains('Kasvatustieteiden kandiohjelma')
           cy.contains('KH60_001')
         })
@@ -209,7 +209,7 @@ describe('Faculty overview', () => {
         cy.get('div[class="programmes-graph"]').should('be.visible')
         cy.get('div[class="programmes-graph"]').within(() => {
           cy.contains('EDUM')
-          cy.contains('24 graduated').trigger('mouseover')
+          cy.get('[aria-label="EDUM, 22."]').trigger('mouseover')
           cy.contains('Kasvatustieteiden maisteriohjelma')
           cy.contains('MH60_001')
         })
@@ -231,12 +231,12 @@ describe('Faculty overview', () => {
 
       cy.get('[data-cy="GraduationTimeToggle"]').click()
       cy.get('[data-cy="Section-master"]').within(() => {
-        cy.contains('16').click()
+        cy.get('[aria-label="2018, 16. On time."]').click()
         cy.get('div[class="programmes-breakdown-graph"]').should('be.visible')
         cy.get('div[class="programmes-breakdown-graph"]').within(() => {
           cy.contains('Year 2018 by start year')
           cy.contains('EDUM')
-          cy.contains('16').trigger('mouseover')
+          cy.get('[aria-label="EDUM, 3. Max. year overtime."]').trigger('mouseover')
           cy.contains('Kasvatustieteiden maisteriohjelma')
           cy.contains('MH60_001')
         })
