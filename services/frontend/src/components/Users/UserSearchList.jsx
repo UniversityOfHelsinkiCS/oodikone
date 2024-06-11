@@ -9,14 +9,12 @@ import { SortableTable } from '@/components/SortableTable'
 
 import { useShowAsUser } from '@/redux/auth'
 import { useGetAllElementDetailsQuery } from '@/redux/elementdetails'
-import { useGetAllUsersQuery } from '@/redux/users'
 
-export const UserSearchList = () => {
+export const UserSearchList = ({ users, isLoading, isError }) => {
   const { getTextIn } = useLanguage()
   const [popupTimeout, setPopupTimeout] = useState(null)
   const [popupOpen, setPopupOpen] = useState(false)
   const [userEmails, setUserEmails] = useState([])
-  const { data: users = [], isLoading, isError } = useGetAllUsersQuery()
   const { data: elementdetails = [] } = useGetAllElementDetailsQuery()
   const showAsUser = useShowAsUser()
 

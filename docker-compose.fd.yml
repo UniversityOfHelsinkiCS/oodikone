@@ -39,6 +39,9 @@ services:
       IMPORTER_DB_API_URL: 'https://localhost:3005'
       JAMI_URL: 'http://jami:3003/'
       SERVICE_PROVIDER: 'Fd'
+      SIS_HOST: ${SIS_HOST}
+      SIS_GRAPHQL_APPLICATION_ACCOUNT: ${SIS_GRAPHQL_APPLICATION_ACCOUNT}
+      SIS_GRAPHQL_APPLICATION_KEY: ${SIS_GRAPHQL_APPLICATION_KEY}
     ports:
       - 8080:8080
     volumes:

@@ -23,6 +23,11 @@ const jamiUrl = process.env.JAMI_URL || ''
 const importerUrl = process.env.IMPORTER_DB_API_URL || ''
 const importerToken = process.env.IMPORTER_DB_API_TOKEN || ''
 
+// Sisu
+const sisUrl = process.env.SIS_HOST
+const sisGrapqlAppAccount = process.env.SIS_GRAPHQL_APPLICATION_ACCOUNT
+const sisGrapqlAppKey = process.env.SIS_GRAPHQL_APPLICATION_KEY
+
 // Networking: Urls & ports
 const baseUrl = isDev ? '/api' : ''
 const frontUrl = process.env.FRONT_URL
@@ -81,4 +86,7 @@ module.exports = {
   isDev,
   serviceProvider,
   configLogoutUrl,
+  sisUrl,
+  sisGrapqlAppAccount,
+  sisGrapqlAppKey,
 }

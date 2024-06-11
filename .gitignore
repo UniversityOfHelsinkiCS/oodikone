@@ -49,3 +49,6 @@ cypress/videos/
 .nyc_output/
 coverage/
 instrumented/
+
+# pycharm 
+.idea

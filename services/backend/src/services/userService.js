@@ -4,12 +4,13 @@ const { LRUCache } = require('lru-cache')
 const { serviceProvider } = require('../conf-backend')
 const { sequelizeUser } = require('../database/connection')
 const { User } = require('../models/models_user')
-const { getAllUserAccess, getUserIams, getUserIamAccess } =
-  serviceProvider === 'Toska' ? require('../util/jami') : require('../util/mami')
 const { createLocaleComparator, getFullStudyProgrammeRights, hasFullAccessToStudentData } = require('../util/utils')
 const { sendNotificationAboutNewUser } = require('./mailservice')
+const { getSisuAuthData, personSearchQuery, getGraphqlData } = require('./oriProvider')
 const { getStudentnumbersByElementdetails } = require('./students')
 const { checkStudyGuidanceGroupsAccess, getAllStudentsUserHasInGroups } = require('./studyGuidanceGroups')
+const { getAllUserAccess, getUserIams, getUserIamAccess } =
+  serviceProvider === 'Toska' ? require('../util/jami') : require('../util/mami')
 
 const courseStatisticsGroup = 'grp-oodikone-basic-users'
 const facultyStatisticsGroup = 'grp-oodikone-users'
@@ -217,17 +218,40 @@ const toskaGetUser = async ({ username, name, email, iamGroups, specialGroup, si
 const fdGetUser = async ({ username }) => {
   if (userDataCache.has(username)) return userDataCache.get(username)
 
-  await User.upsert({ username, lastLogin: new Date() })
+  const userFromDbOrm = await findUser({ username })
+  if (!userFromDbOrm) return
 
-  const userFromDb = (await findUser({ username })).toJSON()
+  userFromDbOrm.lastLogin = new Date()
+  userFromDbOrm.save()
 
-  if (!userFromDb) return null
+  const userFromDb = userFromDbOrm.toJSON()
 
   const programmeRights = getStudyProgrammeRights({}, {}, userFromDb.programmeRights)
   const user = await formatUser({ ...userFromDb, iamGroups: [], programmeRights })
 
   userDataCache.set(username, user)
   return user
+}
+
+const addNewUser = async user => {
+  const name = user.first_name.concat(' ', user.last_name)
+  await User.upsert({
+    fullName: name,
+    username: user.eppn,
+    email: user.email_address,
+    sisuPersonId: user.id,
+    roles: [],
+  })
+}
+
+const getUserFromSisuByEppn = async (requesterEppn, newUserEppn) => {
+  const { accessToken: requesterAccessToken } = await getSisuAuthData(requesterEppn)
+  const { tokenData: newUserTokenData } = await getSisuAuthData(newUserEppn)
+  const personData = await getGraphqlData(requesterAccessToken, {
+    query: personSearchQuery,
+    variables: { subjectUserId: newUserTokenData.personid },
+  })
+  return personData
 }
 
 const getMockedUser = serviceProvider === 'Toska' ? basicGetMockedUser : fdGetMockedUser
@@ -244,4 +268,6 @@ module.exports = {
   getOrganizationAccess,
   deleteOutdatedUsers,
   roles,
+  getUserFromSisuByEppn,
+  addNewUser,
 }

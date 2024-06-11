@@ -2,7 +2,7 @@ const Sentry = require('@sentry/node')
 const cors = require('cors')
 const express = require('express')
 
-const { frontUrl } = require('./conf-backend')
+const { frontUrl, serviceProvider } = require('./conf-backend')
 const accessLogger = require('./middleware/accessLogger')
 const auth = require('./middleware/auth')
 const currentUserMiddleware = require('./middleware/currentUserMiddleware')
@@ -33,11 +33,15 @@ const tags = require('./routes/tags')
 const teachers = require('./routes/teachers')
 const university = require('./routes/university')
 const updater = require('./routes/updater')
-const users = require('./routes/users')
+const usersToska = require('./routes/users')
+const usersFd = require('./routes/usersFd')
 const initializeSentry = require('./util/sentry')
 
 module.exports = (app, url) => {
   initializeSentry(app)
+
+  const users = serviceProvider === 'Toska' ? usersToska : usersFd
+
   app.use(Sentry.Handlers.requestHandler())
   app.use(Sentry.Handlers.tracingHandler())
 
