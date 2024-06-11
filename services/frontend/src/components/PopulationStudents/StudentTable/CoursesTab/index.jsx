@@ -4,6 +4,7 @@ import { useCallback, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { Icon, Tab } from 'semantic-ui-react'
 
+import { reformatDate } from '@/common'
 import { hiddenNameAndEmailForExcel } from '@/common/columns'
 import { StudentInfoItem } from '@/components/common/StudentInfoItem'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -249,16 +250,21 @@ const CoursesTable = ({ curriculum, students, studyGuidanceCourses }) => {
                 if (!student.courses) {
                   return null
                 }
-                const bestGrade = findBestGrade(student.courses, mandatoryCourse.code)
-                const gradeText = bestGrade ? `\nGrade: ${bestGrade}` : ''
-                const studentCode = student.studentNumber ? `\nStudent number:  ${student.studentNumber}` : ''
-                return {
-                  title: `${mandatoryCourse.code}, ${getTextIn(mandatoryCourse.name)}${studentCode} ${gradeText}`,
+                const cellProps = {
+                  title: null,
                   style: {
                     textAlign: 'center',
                     verticalAlign: 'middle',
                   },
                 }
+                const bestGrade = findBestGrade(student.courses, mandatoryCourse.code)
+                if (bestGrade) {
+                  cellProps.title = `Grade: ${bestGrade}`
+                } else if (hasActiveEnrollments(student, mandatoryCourse.code)) {
+                  const enrollmentDate = reformatDate(getEnrollmentDate(student, mandatoryCourse.code), 'DD.MM.YYYY')
+                  cellProps.title = `Enrolled on ${enrollmentDate}`
+                }
+                return cellProps
               },
               headerProps: { title: `${mandatoryCourse.code}, ${getTextIn(mandatoryCourse.name)}` },
               getRowVal: student => {
