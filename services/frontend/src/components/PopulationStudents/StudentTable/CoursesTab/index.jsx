@@ -147,7 +147,37 @@ const CoursesTable = ({ curriculum, students, studyGuidanceCourses }) => {
       { visibleLabels: new Set(), visibleCourseCodes: new Set() }
     )
 
+    const getCourseTitle = mandatoryCourse => {
+      return (
+        <div
+          key={`${mandatoryCourse.code}-${mandatoryCourse.label ? mandatoryCourse.label.label : 'no-label'}`}
+          style={{ maxWidth: '15em', overflow: 'hidden', whiteSpace: 'normal', width: 'max-content' }}
+        >
+          <div key={`${mandatoryCourse.label ? mandatoryCourse.label.label : 'no-label'}-${mandatoryCourse.code}`}>
+            {mandatoryCourse.code}
+          </div>
+          <div
+            key={`${mandatoryCourse.label ? mandatoryCourse.label.label : 'no-label'}-${getTextIn(mandatoryCourse.name)}`}
+            style={{ color: 'gray', fontWeight: 'normal' }}
+          >
+            {getTextIn(mandatoryCourse.name)}
+          </div>
+        </div>
+      )
+    }
+
     const getTotalRowVal = (total, code) => total[code]
+
+    const hasActiveEnrollments = (student, code) => {
+      if (!student.enrollments) {
+        return false
+      }
+      return student.enrollments.some(enrollment => enrollment.course_code === code && enrollment.state === 'ENROLLED')
+    }
+
+    const getEnrollmentDate = (student, code) =>
+      student.enrollments.find(enrollment => enrollment.course_code === code && enrollment.state === 'ENROLLED')
+        .enrollment_date_time
 
     const findBestGrade = (courses, code) => {
       const course = populationCourses?.coursestatistics?.find(course => course.course.code === code)
@@ -211,24 +241,7 @@ const CoursesTable = ({ curriculum, students, studyGuidanceCourses }) => {
             .filter(course => visibleCourseCodes.has(course.code))
             .map(mandatoryCourse => ({
               key: `${mandatoryCourse.label ? mandatoryCourse.label.label : 'no-label'}-${mandatoryCourse.code}`,
-              title: (
-                <div
-                  key={`${mandatoryCourse.code}-${mandatoryCourse.label ? mandatoryCourse.label.label : 'no-label'}`}
-                  style={{ maxWidth: '15em', overflow: 'hidden', whiteSpace: 'normal', width: 'max-content' }}
-                >
-                  <div
-                    key={`${mandatoryCourse.label ? mandatoryCourse.label.label : 'no-label'}-${mandatoryCourse.code}`}
-                  >
-                    {mandatoryCourse.code}
-                  </div>
-                  <div
-                    key={`${mandatoryCourse.label ? mandatoryCourse.label.label : 'no-label'}-${getTextIn(mandatoryCourse.name)}`}
-                    style={{ color: 'gray', fontWeight: 'normal' }}
-                  >
-                    {getTextIn(mandatoryCourse.name)}
-                  </div>
-                </div>
-              ),
+              title: getCourseTitle(mandatoryCourse),
               textTitle: mandatoryCourse.code,
               vertical: true,
               forceToolsMode: 'dangling',
@@ -258,15 +271,9 @@ const CoursesTable = ({ curriculum, students, studyGuidanceCourses }) => {
                 if (student.total) {
                   return getTotalRowVal(student, mandatoryCourse.code)
                 }
-
                 const bestGrade = findBestGrade(student.courses, mandatoryCourse.code)
                 if (!bestGrade) {
-                  if (
-                    student.enrollments &&
-                    student.enrollments.some(
-                      enrollment => enrollment.course_code === mandatoryCourse.code && enrollment.state === 'ENROLLED'
-                    )
-                  ) {
+                  if (hasActiveEnrollments(student, mandatoryCourse.code)) {
                     return 0
                   }
                   return ''
@@ -286,15 +293,8 @@ const CoursesTable = ({ curriculum, students, studyGuidanceCourses }) => {
                 if (hasPassedMandatory(student.studentNumber, mandatoryCourse.code)) {
                   return <Icon color="green" fitted name="check" />
                 }
-                if (
-                  student.enrollments &&
-                  student.enrollments.some(
-                    enrollment => enrollment.course_code === mandatoryCourse.code && enrollment.state === 'ENROLLED'
-                  )
-                ) {
-                  const enrollmentDate = student.enrollments.find(
-                    enrollment => enrollment.course_code === mandatoryCourse.code && enrollment.state === 'ENROLLED'
-                  ).enrollment_date_time
+                if (hasActiveEnrollments(student, mandatoryCourse.code)) {
+                  const enrollmentDate = getEnrollmentDate(student, mandatoryCourse.code)
                   const color = moment(enrollmentDate) > moment().subtract(6, 'months') ? 'yellow' : 'grey'
                   return <Icon color={color} fitted name="minus" />
                 }
