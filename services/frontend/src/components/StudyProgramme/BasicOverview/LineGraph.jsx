@@ -11,7 +11,7 @@ accessibility(ReactHighcharts.Highcharts)
 
 const colors = ['#7cb5ec', '#90ed7d', '#434348', '#f7a35c', '#FFF000', '#2b908f', '#f45b5b', '#91e8e1']
 
-export const LineGraph = ({ cypress, data }) => {
+export const LineGraph = ({ cypress, data, exportFileName }) => {
   const dataWithColors = data?.graphStats.map((series, index) => ({
     ...series,
     color: colors[index],
@@ -26,7 +26,7 @@ export const LineGraph = ({ cypress, data }) => {
       enabled: false,
     },
     exporting: {
-      filename: `oodikone_student_statistics_of_studyprogramme_${data?.id}`,
+      filename: exportFileName,
     },
     chart: {
       height: '450px',

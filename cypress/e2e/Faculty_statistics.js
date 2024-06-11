@@ -90,10 +90,12 @@ describe('Faculty overview', () => {
         'CreditsProducedByTheFaculty',
       ]
       sections.forEach(section => {
-        cy.get(`[data-cy="DownloadButton-${section}"]`).click()
-        const downloadedFile = `oodikone_H80_${section}_${timestamp}.xlsx`
-        cy.get(`[data-cy="DownloadButton-${section}"]`).click()
-        cy.readFile(path.join(downloadsFolder, downloadedFile))
+        cy.get(`[data-cy="Graph-${section}"]`).within(() => {
+          cy.get('[aria-label="View chart menu, Chart"]').click()
+          cy.contains('li.highcharts-menu-item', 'Download XLS').click()
+          const downloadedFile = `oodikone_${section}_H80_${timestamp}.xls`
+          cy.readFile(path.join(downloadsFolder, downloadedFile))
+        })
       })
     })
   })

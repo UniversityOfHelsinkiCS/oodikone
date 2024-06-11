@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Divider, Loader, Message } from 'semantic-ui-react'
 
-import { getGraduationGraphTitle } from '@/common'
+import { getGraduationGraphTitle, getTimestamp } from '@/common'
 import { studyProgrammeToolTips } from '@/common/InfoToolTips'
 import { CreditsProduced } from '@/components/common/CreditsProduced'
 import { InfoBox } from '@/components/Info/InfoBox'
@@ -171,7 +171,11 @@ export const BasicOverview = ({
             <>
               {getDivider('Students of the studyprogramme', 'StudentsOfTheStudyprogramme')}
               <div className="section-container">
-                <LineGraph cypress="StudentsOfTheStudyprogramme" data={basics?.data} />
+                <LineGraph
+                  cypress="StudentsOfTheStudyprogramme"
+                  data={basics?.data}
+                  exportFileName={`oodikone_StudentsOfTheStudyProgramme_${studyprogramme}_${getTimestamp()}`}
+                />
                 <DataTable
                   cypress="StudentsOfTheStudyprogramme"
                   data={basics?.data?.tableStats}

@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { Button, Divider, Loader, Message, Popup } from 'semantic-ui-react'
-import { utils, writeFile } from 'xlsx'
+import { Divider, Loader, Message } from 'semantic-ui-react'
 
 import { getTimestamp } from '@/common'
 import { facultyToolTips } from '@/common/InfoToolTips'
@@ -8,7 +7,6 @@ import { makeGraphData, makeTableStats } from '@/components/common/CreditsProduc
 import { sortProgrammeKeys } from '@/components/FacultyStatistics/facultyHelpers'
 import { InteractiveDataTable } from '@/components/FacultyStatistics/InteractiveDataView'
 import { InfoBox } from '@/components/Info/InfoBox'
-import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { LineGraph } from '@/components/StudyProgramme/BasicOverview/LineGraph'
 import { StackedBarChart } from '@/components/StudyProgramme/BasicOverview/StackedBarChart'
 import { Toggle } from '@/components/StudyProgramme/Toggle'
@@ -48,7 +46,6 @@ export const BasicOverview = ({
   studyProgrammes,
 }) => {
   const [showAll, setShowAll] = useState(false)
-  const { getTextIn } = useLanguage()
 
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
   const studyProgrammeFilter = studyProgrammes ? 'ALL_PROGRAMMES' : 'NEW_STUDY_PROGRAMMES'
@@ -83,35 +80,7 @@ export const BasicOverview = ({
     }
   }, {})
 
-  const exportToExcel = (programmeNames, programmeStats, tableStats, titles, toolTipText) => {
-    const headers = titles.map(title => ({ label: title === '' ? 'Year' : title, key: title === '' ? 'Year' : title }))
-    const data = sortProgrammeKeys(Object.keys(programmeStats)).reduce(
-      (results, programme) => [
-        ...results,
-        ...programmeStats[programme].map(yearRow => {
-          return {
-            Programme: programme,
-            Name: getTextIn(programmeNames[programme]),
-            ...yearRow.reduce((result, value, valueIndex) => ({ ...result, [headers[valueIndex].key]: value }), {}),
-          }
-        }),
-      ],
-      []
-    )
-
-    const tableStatsJson = tableStats.map(yearArray =>
-      yearArray.reduce((result, value, yearIndex) => ({ ...result, [headers[yearIndex].key]: value }), {})
-    )
-
-    const book = utils.book_new()
-    const tableSheet = utils.json_to_sheet(tableStatsJson)
-    utils.book_append_sheet(book, tableSheet, 'TableStats')
-    const sheet = utils.json_to_sheet(data)
-    utils.book_append_sheet(book, sheet, 'ProgrammeStats')
-    writeFile(book, `oodikone_${faculty.code}_${toolTipText}_${getTimestamp()}.xlsx`)
-  }
-
-  const getDivider = (title, toolTipText, titles, tableStats, programmeStats, programmeNames) => (
+  const getDivider = (title, toolTipText) => (
     <>
       <div className="divider">
         <Divider data-cy={`Section-${toolTipText}`} horizontal>
@@ -121,18 +90,6 @@ export const BasicOverview = ({
       <div style={{ marginBottom: '3em' }}>
         <InfoBox content={facultyToolTips[toolTipText]} cypress={toolTipText} />
       </div>
-      <Popup
-        content="Download statistics as xlsx file"
-        trigger={
-          <Button
-            data-cy={`DownloadButton-${toolTipText}`}
-            floated="right"
-            icon="download"
-            onClick={() => exportToExcel(programmeNames, programmeStats, tableStats, titles, toolTipText)}
-            style={{ backgroundColor: 'white', borderRadius: 0 }}
-          />
-        }
-      />
     </>
   )
 
@@ -269,19 +226,13 @@ export const BasicOverview = ({
           )}
           {basics.isSuccess && basics.data && (
             <>
-              {getDivider(
-                'Students of the faculty',
-                'StudentsOfTheFaculty',
-                basics?.data?.studentInfo.titles,
-                basics?.data?.studentInfo.tableStats,
-                basics?.data?.studentInfo.programmeTableStats,
-                basics?.data?.programmeNames
-              )}
+              {getDivider('Students of the faculty', 'StudentsOfTheFaculty')}
               <div className="section-container">
                 <div className="graph-container-narrow">
                   <LineGraph
                     cypress="StudentsOfTheFaculty"
                     data={{ ...basics?.data.studentInfo, years: basics.data.years }}
+                    exportFileName={`oodikone_StudentsOfTheFaculty_${faculty?.code}_${getTimestamp()}`}
                   />
                 </div>
                 <div className="table-container-wide">
@@ -317,19 +268,13 @@ export const BasicOverview = ({
           )}
           {basics.isSuccess && basics.data && (
             <>
-              {getDivider(
-                'Graduated of the faculty',
-                'GraduatedOfTheFaculty',
-                basics?.data?.graduationInfo.titles,
-                basics?.data?.graduationInfo.tableStats,
-                basics?.data?.graduationInfo.programmeTableStats,
-                basics?.data?.programmeNames
-              )}
+              {getDivider('Graduated of the faculty', 'GraduatedOfTheFaculty')}
               <div className="section-container">
                 <div className="graph-container-narrow">
                   <LineGraph
                     cypress="GraduatedOfTheFaculty"
                     data={{ ...basics?.data.graduationInfo, years: basics.data.years }}
+                    exportFileName={`oodikone_GraduatedOfTheFaculty_${faculty?.code}_${getTimestamp()}`}
                   />
                 </div>
                 <div className="table-container-wide">
@@ -364,19 +309,13 @@ export const BasicOverview = ({
           )}
           {thesisWriters.isSuccess && thesisWriters.data && (
             <>
-              {getDivider(
-                'Thesis writers of the faculty',
-                'ThesisWritersOfTheFaculty',
-                thesisWriters?.data?.titles,
-                thesisWriters?.data.tableStats,
-                thesisWriters?.data.programmeTableStats,
-                thesisWriters?.data?.programmeNames
-              )}
+              {getDivider('Thesis writers of the faculty', 'ThesisWritersOfTheFaculty')}
               <div className="section-container">
                 <div className="graph-container-narrow">
                   <LineGraph
                     cypress="ThesisWritersOfTheFaculty"
                     data={{ ...thesisWriters?.data, years: thesisWriters?.data.years }}
+                    exportFileName={`oodikone_ThesisWritersOfTheFaculty_${faculty?.code}_${getTimestamp()}`}
                   />
                 </div>
                 <div className="table-container-wide">
@@ -411,14 +350,7 @@ export const BasicOverview = ({
           )}
           {credits.isSuccess && credits.data && (
             <>
-              {getDivider(
-                'Credits produced by the faculty',
-                'CreditsProducedByTheFaculty',
-                tableStats?.titles,
-                tableStats?.data,
-                programmeStats,
-                credits?.data?.programmeNames
-              )}
+              {getDivider('Credits produced by the faculty', 'CreditsProducedByTheFaculty')}
               <div>
                 <Toggle
                   cypress="showAllCreditsToggle"
@@ -432,6 +364,7 @@ export const BasicOverview = ({
                   <StackedBarChart
                     cypress="CreditsProducedByTheFaculty"
                     data={graphStats.data}
+                    exportFileName={`oodikone_CreditsProducedByTheFaculty_${faculty?.code}_${getTimestamp()}`}
                     labels={graphStats.years}
                     wideTable="narrow"
                   />

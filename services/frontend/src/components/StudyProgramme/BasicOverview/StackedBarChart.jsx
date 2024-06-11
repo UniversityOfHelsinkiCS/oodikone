@@ -10,7 +10,7 @@ accessibility(ReactHighcharts.Highcharts)
 
 const colors = ['#7cb5ec', '#90ed7d', '#434348', '#f7a35c', '#FFF000', '#2b908f', '#f45b5b', '#91e8e1']
 
-export const StackedBarChart = ({ cypress, data, labels, wideTable }) => {
+export const StackedBarChart = ({ cypress, data, labels, wideTable, exportFileName = 'chart' }) => {
   const dataWithColors = data?.map((series, index) => ({ ...series, color: colors[index] }))
 
   const config = {
@@ -30,7 +30,7 @@ export const StackedBarChart = ({ cypress, data, labels, wideTable }) => {
       height: '450px',
     },
     exporting: {
-      filename: `oodikone_credits_produced_by_studyprogramme_${data?.id}`,
+      filename: exportFileName,
     },
     plotOptions: {
       column: {
