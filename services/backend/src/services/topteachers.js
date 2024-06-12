@@ -1,6 +1,6 @@
 const { Op } = require('sequelize')
 
-const { Course, Credit, Semester, Teacher } = require('../models/init-models')
+const { Course, Credit, Semester, Teacher } = require('../database/connection')
 const logger = require('../util/logger')
 const { redisClient } = require('./redis')
 const { getCurrentSemester, getSemestersAndYears } = require('./semesters')

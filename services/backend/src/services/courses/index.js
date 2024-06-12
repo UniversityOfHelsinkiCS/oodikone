@@ -1,6 +1,6 @@
 const { Op } = require('sequelize')
 
-const { Course, Credit, Enrollment, Organization } = require('../../models/init-models')
+const { Course, Credit, Enrollment, Organization } = require('../../database/connection')
 const { sortMainCode } = require('../../util/utils')
 const { CourseYearlyStatsCounter } = require('./course_yearly_stats_counter')
 const { byCodes, byNameAndOrCodeLike } = require('./courseFinders')

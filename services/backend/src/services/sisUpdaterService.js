@@ -2,7 +2,7 @@ const axios = require('axios')
 const { Op } = require('sequelize')
 
 const { SIS_UPDATER_URL, SECRET_TOKEN } = require('../conf-backend')
-const { Studyplan, Student, StudyrightElement } = require('../models/init-models')
+const { Studyplan, Student, StudyrightElement } = require('../database/connection')
 const logger = require('../util/logger')
 
 const client = axios.create({ baseURL: SIS_UPDATER_URL })

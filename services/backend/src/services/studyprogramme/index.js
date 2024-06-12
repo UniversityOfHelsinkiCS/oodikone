@@ -4,7 +4,7 @@ const { Op } = require('sequelize')
 const {
   dbConnections: { sequelize },
 } = require('../../database/connection')
-const { Course, Credit, Enrollment, Organization, ProgrammeModule, Transfer } = require('../../models/init-models')
+const { Course, Credit, Enrollment, Organization, ProgrammeModule, Transfer } = require('../../database/connection')
 const logger = require('../../util/logger')
 const { formatTransfer } = require('./studyprogrammeHelpers')
 

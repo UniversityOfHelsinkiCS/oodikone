@@ -1,7 +1,7 @@
 const moment = require('moment')
 const { Op } = require('sequelize')
 
-const { Semester, SemesterEnrollment, Studyright } = require('../models/init-models')
+const { Semester, SemesterEnrollment, Studyright } = require('../database/connection')
 
 // categorize graduation times
 

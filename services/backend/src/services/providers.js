@@ -1,4 +1,4 @@
-const { Organization, Course } = require('../models/init-models')
+const { Organization, Course } = require('../database/connection')
 
 const getAllProviders = async () =>
   Organization.findAll({

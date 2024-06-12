@@ -1,6 +1,6 @@
 const { Op } = require('sequelize')
 
-const { Course } = require('../../models/init-models')
+const { Course } = require('../../database/connection')
 const { getSortRank } = require('../../util/utils')
 
 const nameLikeTerm = name => {

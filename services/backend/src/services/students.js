@@ -3,7 +3,7 @@ const { Op } = require('sequelize')
 const {
   dbConnections: { sequelize },
 } = require('../database/connection')
-const { initModels } = require('../models/init-models')
+const { initModels } = require('../database/connection')
 const { TagStudent, Tag } = require('../models/models_kone')
 const logger = require('../util/logger')
 

@@ -4,7 +4,7 @@ const { Op } = require('sequelize')
 const {
   dbConnections: { sequelize },
 } = require('../../database/connection')
-const { Course, Credit, ElementDetail, Studyright, StudyrightElement } = require('../../models/init-models')
+const { Course, Credit, ElementDetail, Studyright, StudyrightElement } = require('../../database/connection')
 const { semesterEnd, semesterStart } = require('../../util/semester')
 const { getCurrentSemester } = require('../semesters')
 const { getAllProgrammes } = require('../studyrights')

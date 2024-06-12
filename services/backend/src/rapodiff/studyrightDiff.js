@@ -3,7 +3,7 @@
 const axios = require('axios').default
 const _ = require('lodash')
 
-const { Student, Studyright, StudyrightElement, Transfer } = require('../models/init-models')
+const { Student, Studyright, StudyrightElement, Transfer } = require('../database/connection')
 const { optimizedStatisticsOf } = require('../services/populations')
 const { importerDbApiUrl, nodeproxyUrl, rapoToken, tokenImporterApi } = require('./conf')
 

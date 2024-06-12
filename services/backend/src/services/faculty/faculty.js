@@ -15,7 +15,7 @@ const {
   Studyright,
   StudyrightElement,
   Transfer,
-} = require('../../models/init-models')
+} = require('../../database/connection')
 const {
   facultyFormatProgramme,
   facultyFormatStudyright,

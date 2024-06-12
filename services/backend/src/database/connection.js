@@ -7,6 +7,44 @@ const logger = require('../util/logger')
 
 const { SIS_DB_URL } = process.env
 
+const { initModels } = require('../models/init-models')
+const { Sequelize: Seq } = require('sequelize')
+
+export const sequelize2 = new Seq({
+  username: 'postgres',
+  dialect: 'postgres',
+  database: 'sis-db',
+  host: 'sis-db',
+  port: 5432,
+  logging: false,
+})
+
+const {
+  Course,
+  CourseProviders,
+  CourseTypes,
+  Credit,
+  CreditTeachers,
+  CreditTypes,
+  ElementDetails,
+  Enrollment,
+  Migrations,
+  Organization,
+  ProgrammeModuleChildren,
+  ProgrammeModules,
+  SemesterEnrollments,
+  Semesters,
+  SisStudyRightElements,
+  SisStudyRights,
+  Student,
+  Studyplan,
+  Studyright,
+  StudyrightElements,
+  StudyrightExtents,
+  Teacher,
+  Transfers } = initModels(sequelize2)
+
+
 class DbConnection extends EventEmitter {
   constructor() {
     super()
@@ -113,4 +151,27 @@ module.exports = {
   sequelizeKone,
   sequelizeUser,
   initializeDatabaseConnection,
+  Course,
+  CourseProviders,
+  CourseTypes,
+  Credit,
+  CreditTeachers,
+  CreditTypes,
+  ElementDetails,
+  Enrollment,
+  Migrations,
+  Organization,
+  ProgrammeModuleChildren,
+  ProgrammeModules,
+  SemesterEnrollments,
+  Semesters,
+  SisStudyRightElements,
+  SisStudyRights,
+  Student,
+  Studyplan,
+  Studyright,
+  StudyrightElements,
+  StudyrightExtents,
+  Teacher,
+  Transfers
 }

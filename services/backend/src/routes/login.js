@@ -3,7 +3,7 @@ const _ = require('lodash')
 
 const { ApplicationError } = require('../util/customErrors')
 const { initializeDatabaseConnection } = require('../database/connection')
-const { initModels } = require('../models/init-models')
+const { initModels } = require('../database/connection')
 
 router.get('/', async (req, res) => {
   const { user, logoutUrl } = req

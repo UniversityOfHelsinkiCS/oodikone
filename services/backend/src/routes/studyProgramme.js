@@ -1,6 +1,6 @@
 const router = require('express').Router()
 
-const { ElementDetail } = require('../models/init-models')
+const { ElementDetail } = require('../database/connection')
 const {
   getBasicStats,
   setBasicStats,

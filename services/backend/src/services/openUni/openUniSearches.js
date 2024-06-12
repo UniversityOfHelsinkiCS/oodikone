@@ -1,6 +1,6 @@
 const { Op } = require('sequelize')
 
-const { Course, Credit, Enrollment, Student, Studyright } = require('../../models/init-models')
+const { Course, Credit, Enrollment, Student, Studyright } = require('../../database/connection')
 const { OpenUniPopulationSearch } = require('../../models/models_kone')
 const {
   mapCourseInfo,

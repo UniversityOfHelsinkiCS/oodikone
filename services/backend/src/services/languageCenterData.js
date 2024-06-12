@@ -1,7 +1,7 @@
 const { orderBy } = require('lodash')
 const { Op } = require('sequelize')
 
-const { Course, Credit, Enrollment, Studyright, StudyrightElement } = require('../models/init-models')
+const { Course, Credit, Enrollment, Studyright, StudyrightElement } = require('../database/connection')
 const { redisClient } = require('./redis')
 
 const LANGUAGE_CENTER_REDIS_KEY = 'LANGUAGE_CENTER_DATA'

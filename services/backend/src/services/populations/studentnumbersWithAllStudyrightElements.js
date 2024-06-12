@@ -4,7 +4,7 @@ const { Op } = require('sequelize')
 const {
   dbConnections: { sequelize },
 } = require('../../database/connection')
-const { ElementDetail, Student, Studyright, StudyrightElement, Transfer } = require('../../models/init-models')
+const { ElementDetail, Student, Studyright, StudyrightElement, Transfer } = require('../../database/connection')
 const { TagStudent } = require('../../models/models_kone')
 const { count } = require('./shared')
 

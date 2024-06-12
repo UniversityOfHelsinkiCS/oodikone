@@ -1,7 +1,7 @@
 const { Op } = require('sequelize')
 
 const { dbConnections } = require('../database/connection')
-const { ProgrammeModule } = require('../models/init-models')
+const { ProgrammeModule } = require('../database/connection')
 const { ExcludedCourse } = require('../models/models_kone')
 const logger = require('../util/logger')
 const { combinedStudyprogrammes } = require('./studyprogramme/studyprogrammeHelpers')
