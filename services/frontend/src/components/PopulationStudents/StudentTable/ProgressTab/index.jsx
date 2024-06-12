@@ -249,9 +249,7 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
             title: 'Student number',
             cellProps: { title: 'student number', className: 'studentNumber' },
             getRowVal: student => student.studentNumber,
-            getRowContent: student => (
-              <StudentInfoItem showSisuLink student={student} tab="Progress tab" view="Student progress table" />
-            ),
+            getRowContent: student => <StudentInfoItem showSisuLink student={student} />,
           },
         ],
       },

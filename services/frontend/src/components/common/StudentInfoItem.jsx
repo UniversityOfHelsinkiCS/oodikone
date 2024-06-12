@@ -3,7 +3,7 @@ import { Icon, Item } from 'semantic-ui-react'
 
 import { SisuLinkItem } from './SisuLinkItem'
 
-export const StudentInfoItem = ({ student, showSisuLink }) => {
+export const StudentInfoItem = ({ showSisuLink, student }) => {
   if (student.obfuscated) {
     return (
       <span style={student.obfuscated ? { fontStyle: 'italic', color: 'graytext' } : {}}>
@@ -11,6 +11,7 @@ export const StudentInfoItem = ({ student, showSisuLink }) => {
       </span>
     )
   }
+
   return (
     <div style={{ display: 'inline-flex' }}>
       <div>{student.studentNumber}</div>

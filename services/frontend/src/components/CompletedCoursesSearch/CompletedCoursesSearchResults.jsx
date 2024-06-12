@@ -50,7 +50,7 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
       title: 'Student number',
       cellProps: { style },
       getRowVal: student => student.studentNumber,
-      getRowContent: student => <StudentInfoItem showSisuLink student={student} view="Completed courses search tool" />,
+      getRowContent: student => <StudentInfoItem showSisuLink student={student} />,
     },
   ]
 
