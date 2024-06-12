@@ -40,17 +40,30 @@
 }
 
 .programmes-overview .ui.toggle.checkbox input:checked ~ label::before,
-.faculty-overview .ui.toggle.checkbox input:checked ~ label::before,
 .faculty-courses .ui.toggle.checkbox input:checked ~ label::before,
 .programmes-overview .ui.toggle.checkbox input:focus:checked ~ label::before,
-.faculty-overview .ui.toggle.checkbox input:focus:checked ~ label::before,
-.faculty-courses .ui.toggle.checkbox input:focus:checked ~ label::before {
+.faculty-courses .ui.toggle.checkbox input:focus:checked ~ label::before,
+.faculty-overview .ui.toggle.checkbox:not(.original-toggle-container .ui.toggle.checkbox) input:checked ~ label::before,
+.faculty-overview
+  .ui.toggle.checkbox:not(.original-toggle-container .ui.toggle.checkbox)
+  input:focus:checked
+  ~ label::before {
   background-color: rgb(0 0 0 / 5%) !important;
 }
 
+.original-toggle-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1em;
+}
+
 .faculty-overview .divider {
-  margin-bottom: 3em;
-  margin-top: 3em;
+  margin-bottom: 1em;
+  margin-top: 2em;
+}
+
+.faculty-overview .ok-infobox-collapsed {
+  margin-bottom: 1.5em;
 }
 
 .total-row-cell {

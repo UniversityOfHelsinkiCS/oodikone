@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Divider, Loader, Message } from 'semantic-ui-react'
+import { Divider, Loader, Message, Radio } from 'semantic-ui-react'
 
 import { getTimestamp } from '@/common'
 import { facultyToolTips } from '@/common/InfoToolTips'
@@ -11,6 +11,7 @@ import { LineGraph } from '@/components/StudyProgramme/BasicOverview/LineGraph'
 import { StackedBarChart } from '@/components/StudyProgramme/BasicOverview/StackedBarChart'
 import { Toggle } from '@/components/StudyProgramme/Toggle'
 import '@/components/FacultyStatistics/faculty.css'
+import '@/components/StudyProgramme/studyprogramme.css'
 import {
   useGetFacultyBasicStatsQuery,
   useGetFacultyCreditStatsQuery,
@@ -82,14 +83,10 @@ export const BasicOverview = ({
 
   const getDivider = (title, toolTipText) => (
     <>
-      <div className="divider">
-        <Divider data-cy={`Section-${toolTipText}`} horizontal>
-          {title}
-        </Divider>
-      </div>
-      <div style={{ marginBottom: '3em' }}>
-        <InfoBox content={facultyToolTips[toolTipText]} cypress={toolTipText} />
-      </div>
+      <Divider data-cy={`Section-${toolTipText}`} horizontal>
+        {title}
+      </Divider>
+      <InfoBox content={facultyToolTips[toolTipText]} cypress={toolTipText} />
     </>
   )
 
@@ -226,13 +223,12 @@ export const BasicOverview = ({
             <>
               {getDivider('Students of the faculty', 'StudentsOfTheFaculty')}
               <div className="section-container">
-                <div className="graph-container-narrow">
-                  <LineGraph
-                    cypress="StudentsOfTheFaculty"
-                    data={{ ...basics?.data.studentInfo, years: basics.data.years }}
-                    exportFileName={`oodikone_StudentsOfTheFaculty_${faculty?.code}_${getTimestamp()}`}
-                  />
-                </div>
+                <LineGraph
+                  cypress="StudentsOfTheFaculty"
+                  data={{ ...basics?.data.studentInfo, years: basics.data.years }}
+                  exportFileName={`oodikone_StudentsOfTheFaculty_${faculty?.code}_${getTimestamp()}`}
+                  wideTable
+                />
                 <div className="table-container-wide">
                   <InteractiveDataTable
                     cypress="StudentsOfTheFaculty"
@@ -268,14 +264,12 @@ export const BasicOverview = ({
             <>
               {getDivider('Graduated of the faculty', 'GraduatedOfTheFaculty')}
               <div className="section-container">
-                <div className="graph-container-narrow">
-                  <LineGraph
-                    cypress="GraduatedOfTheFaculty"
-                    data={{ ...basics?.data.graduationInfo, years: basics.data.years }}
-                    exportFileName={`oodikone_GraduatedOfTheFaculty_${faculty?.code}_${getTimestamp()}`}
-                  />
-                </div>
-                <div className="table-container-wide">
+                <LineGraph
+                  cypress="GraduatedOfTheFaculty"
+                  data={{ ...basics?.data.graduationInfo, years: basics.data.years }}
+                  exportFileName={`oodikone_GraduatedOfTheFaculty_${faculty?.code}_${getTimestamp()}`}
+                />
+                <div className="table-container">
                   <InteractiveDataTable
                     cypress="GraduatedOfTheFaculty"
                     dataProgrammeStats={basics?.data?.graduationInfo.programmeTableStats}
@@ -309,14 +303,12 @@ export const BasicOverview = ({
             <>
               {getDivider('Thesis writers of the faculty', 'ThesisWritersOfTheFaculty')}
               <div className="section-container">
-                <div className="graph-container-narrow">
-                  <LineGraph
-                    cypress="ThesisWritersOfTheFaculty"
-                    data={{ ...thesisWriters?.data, years: thesisWriters?.data.years }}
-                    exportFileName={`oodikone_ThesisWritersOfTheFaculty_${faculty?.code}_${getTimestamp()}`}
-                  />
-                </div>
-                <div className="table-container-wide">
+                <LineGraph
+                  cypress="ThesisWritersOfTheFaculty"
+                  data={{ ...thesisWriters?.data, years: thesisWriters?.data.years }}
+                  exportFileName={`oodikone_ThesisWritersOfTheFaculty_${faculty?.code}_${getTimestamp()}`}
+                />
+                <div className="table-container">
                   <InteractiveDataTable
                     cypress="ThesisWritersOfTheFaculty"
                     dataProgrammeStats={thesisWriters?.data.programmeTableStats}
@@ -349,24 +341,17 @@ export const BasicOverview = ({
           {credits.isSuccess && credits.data && (
             <>
               {getDivider('Credits produced by the faculty', 'CreditsProducedByTheFaculty')}
-              <div>
-                <Toggle
-                  cypress="showAllCreditsToggle"
-                  firstLabel="Show special categories"
-                  setValue={setShowAll}
-                  value={showAll}
-                />
+              <div className="original-toggle-container">
+                <Radio checked={showAll} label="Show special categories" onChange={() => setShowAll(!showAll)} toggle />
               </div>
               <div className="section-container">
-                <div className="graph-container-narrow">
-                  <StackedBarChart
-                    cypress="CreditsProducedByTheFaculty"
-                    data={graphStats.data}
-                    exportFileName={`oodikone_CreditsProducedByTheFaculty_${faculty?.code}_${getTimestamp()}`}
-                    labels={graphStats.years}
-                    wideTable="narrow"
-                  />
-                </div>
+                <StackedBarChart
+                  cypress="CreditsProducedByTheFaculty"
+                  data={graphStats.data}
+                  exportFileName={`oodikone_CreditsProducedByTheFaculty_${faculty?.code}_${getTimestamp()}`}
+                  labels={graphStats.years}
+                  wideTable
+                />
                 <div className="table-container-wide">
                   <InteractiveDataTable
                     cypress="CreditsProducedByTheFaculty"

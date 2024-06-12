@@ -64,12 +64,24 @@ body {
 }
 
 .studytrack-overview .ui.toggle.checkbox input:checked ~ label::before,
-.studyprogramme-overview .ui.toggle.checkbox input:checked ~ label::before,
 .studyprogramme-courses .ui.toggle.checkbox input:checked ~ label::before,
 .studytrack-overview .ui.toggle.checkbox input:focus:checked ~ label::before,
-.studyprogramme-overview .ui.toggle.checkbox input:focus:checked ~ label::before,
-.studyprogramme-courses .ui.toggle.checkbox input:focus:checked ~ label::before {
+.studyprogramme-courses .ui.toggle.checkbox input:focus:checked ~ label::before,
+.studyprogramme-overview
+  .ui.toggle.checkbox:not(.original-toggle-container .ui.toggle.checkbox)
+  input:checked
+  ~ label::before,
+.studyprogramme-overview
+  .ui.toggle.checkbox:not(.original-toggle-container .ui.toggle.checkbox)
+  input:focus:checked
+  ~ label::before {
   background-color: rgb(0 0 0 / 5%) !important;
+}
+
+.original-toggle-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1em;
 }
 
 .studyprogramme-overview .divider {
@@ -77,7 +89,8 @@ body {
 }
 
 .studytrack-overview .section-container,
-.studyprogramme-overview .section-container {
+.studyprogramme-overview .section-container,
+.faculty-overview .section-container {
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
@@ -91,26 +104,30 @@ body {
 }
 
 .studytrack-overview .graph-container,
-.studyprogramme-overview .graph-container {
+.studyprogramme-overview .graph-container,
+.faculty-overview .graph-container {
   min-width: 50%;
   height: 500px;
 }
 
 .studytrack-overview .graph-container-narrow,
-.studyprogramme-overview .graph-container-narrow {
+.studyprogramme-overview .graph-container-narrow,
+.faculty-overview .graph-container-narrow {
   min-width: 40%;
   height: 500px;
 }
 
 .studytrack-overview .table-container,
-.studyprogramme-overview .table-container {
+.studyprogramme-overview .table-container,
+.faculty-overview .table-container {
   max-width: 45%;
   margin-left: 1em;
   flex-grow: 2;
 }
 
 .studytrack-overview .table-container-wide,
-.studyprogramme-overview .table-container-wide {
+.studyprogramme-overview .table-container-wide,
+.faculty-overview .table-container-wide {
   max-width: 55%;
   margin-left: 1em;
   flex-grow: 2;
