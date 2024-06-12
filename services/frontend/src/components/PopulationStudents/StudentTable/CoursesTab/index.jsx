@@ -12,16 +12,16 @@ import { SortableTable, row } from '@/components/SortableTable'
 import { useStudentNameVisibility } from '@/components/StudentNameVisibilityToggle'
 import { useGetStudyGuidanceGroupPopulationCoursesQuery } from '@/redux/studyGuidanceGroups'
 
-const getMandatoryPassed = (mandatoryCourses, populationCourses, studyGuidanceCourses) => {
-  if (!mandatoryCourses || !mandatoryCourses.defaultProgrammeCourses || (!populationCourses && !studyGuidanceCourses)) {
+const getPassedStudents = (curriculum, populationCourses, studyGuidanceCourses) => {
+  if (!curriculum || !curriculum.defaultProgrammeCourses || (!populationCourses && !studyGuidanceCourses)) {
     return {}
   }
 
-  const mandatoryCodes = [
-    ...mandatoryCourses.defaultProgrammeCourses
+  const courseCodes = [
+    ...curriculum.defaultProgrammeCourses
       .filter(course => course.visible && course.visible.visibility)
       .map(course => course.code),
-    ...mandatoryCourses.secondProgrammeCourses
+    ...curriculum.secondProgrammeCourses
       .filter(course => course.visible && course.visible.visibility)
       .map(course => course.code),
   ]
@@ -33,7 +33,7 @@ const getMandatoryPassed = (mandatoryCourses, populationCourses, studyGuidanceCo
   }
 
   const courseStats = popCourses.coursestatistics
-  const mandatoryPassed = mandatoryCodes.reduce((passed, code) => {
+  const passedStudents = courseCodes.reduce((passed, code) => {
     const foundCourse = !!courseStats.find(course => course.course.code === code)
     const passedStudents = foundCourse
       ? Object.keys(courseStats.find(course => course.course.code === code).students.passed)
@@ -42,33 +42,33 @@ const getMandatoryPassed = (mandatoryCourses, populationCourses, studyGuidanceCo
     return passed
   }, {})
 
-  return mandatoryPassed
+  return passedStudents
 }
 
 const CoursesTable = ({ curriculum, showSubstitutions, students, studyGuidanceCourses }) => {
   const { getTextIn } = useLanguage()
   const { visible: namesVisible } = useStudentNameVisibility()
-  const mandatoryCourses = curriculum
   const { data: populationCourses, pending } = useSelector(state => state?.populationSelectedStudentCourses)
-  const mandatoryPassed = useMemo(
-    () => getMandatoryPassed(mandatoryCourses, populationCourses, studyGuidanceCourses),
-    [mandatoryCourses, populationCourses, studyGuidanceCourses]
+
+  const passedStudents = useMemo(
+    () => getPassedStudents(curriculum, populationCourses, studyGuidanceCourses),
+    [curriculum, populationCourses, studyGuidanceCourses]
   )
 
-  const hasPassedMandatory = useCallback(
-    (studentNumber, code) => mandatoryPassed[code] && mandatoryPassed[code].includes(studentNumber),
-    [mandatoryPassed]
+  const hasPassedCourse = useCallback(
+    (studentNumber, code) => passedStudents[code] && passedStudents[code].includes(studentNumber),
+    [passedStudents]
   )
 
-  const totalMandatoryPassed = useCallback(
+  const totalPassed = useCallback(
     studentNumber =>
-      sumBy(Array.from(new Set(mandatoryCourses.defaultProgrammeCourses.map(({ code }) => code))), code =>
-        hasPassedMandatory(studentNumber, code)
+      sumBy(Array.from(new Set(curriculum.defaultProgrammeCourses.map(({ code }) => code))), code =>
+        hasPassedCourse(studentNumber, code)
       ) +
-      sumBy(Array.from(new Set(mandatoryCourses.secondProgrammeCourses.map(({ code }) => code))), code =>
-        hasPassedMandatory(studentNumber, code)
+      sumBy(Array.from(new Set(curriculum.secondProgrammeCourses.map(({ code }) => code))), code =>
+        hasPassedCourse(studentNumber, code)
       ),
-    [mandatoryCourses, hasPassedMandatory]
+    [curriculum, hasPassedCourse]
   )
 
   const columns = useMemo(() => {
@@ -78,8 +78,7 @@ const CoursesTable = ({ curriculum, showSubstitutions, students, studyGuidanceCo
       key: 'studentNumber',
       title: 'Student number',
       getRowVal: student => (student.total ? '*' : student.studentNumber),
-      getRowContent: student =>
-        student.total ? 'Summary' : <StudentInfoItem showSisuLink student={student} tab="Mandatory courses table" />,
+      getRowContent: student => (student.total ? 'Summary' : <StudentInfoItem showSisuLink student={student} />),
     })
 
     if (namesVisible) {
@@ -109,14 +108,14 @@ const CoursesTable = ({ curriculum, showSubstitutions, students, studyGuidanceCo
           ? Object.values(student)
               .filter(isNumber)
               .reduce((total, courses) => total + courses, 0)
-          : totalMandatoryPassed(student.studentNumber),
+          : totalPassed(student.studentNumber),
     })
 
-    const mandatoryCourseLabels = []
-    const defaultCourses = mandatoryCourses?.defaultProgrammeCourses || []
-    const combinedCourses = mandatoryCourses?.secondProgrammeCourses || []
+    const courseLabels = []
+    const defaultCourses = curriculum?.defaultProgrammeCourses || []
+    const combinedCourses = curriculum?.secondProgrammeCourses || []
     const courses = [...defaultCourses, ...combinedCourses]
-    const labelToMandatoryCourses = courses.reduce((labels, course) => {
+    const labelToCourses = courses.reduce((labels, course) => {
       const label = course.label ? course.label.label : ''
       labels[label] = labels[label] || []
       if (labels[label].some(label => label.code === course.code)) {
@@ -124,15 +123,15 @@ const CoursesTable = ({ curriculum, showSubstitutions, students, studyGuidanceCo
       }
       labels[label].push(course)
       if (course.label) {
-        mandatoryCourseLabels.push({ ...course.label, code: course.parent_code })
+        courseLabels.push({ ...course.label, code: course.parent_code })
       } else {
-        mandatoryCourseLabels.push({ id: 'null', label: '', code: '' })
+        courseLabels.push({ id: 'null', label: '', code: '' })
       }
       return labels
     }, {})
 
     const sortedLabels = orderBy(
-      uniqBy(mandatoryCourseLabels, course => course.label),
+      uniqBy(courseLabels, course => course.label),
       [label => label.orderNumber],
       ['asc']
     )
@@ -148,20 +147,18 @@ const CoursesTable = ({ curriculum, showSubstitutions, students, studyGuidanceCo
       { visibleLabels: new Set(), visibleCourseCodes: new Set() }
     )
 
-    const getCourseTitle = mandatoryCourse => {
+    const getCourseTitle = course => {
       return (
         <div
-          key={`${mandatoryCourse.code}-${mandatoryCourse.label ? mandatoryCourse.label.label : 'no-label'}`}
+          key={`${course.code}-${course.label ? course.label.label : 'no-label'}`}
           style={{ maxWidth: '15em', overflow: 'hidden', whiteSpace: 'normal', width: 'max-content' }}
         >
-          <div key={`${mandatoryCourse.label ? mandatoryCourse.label.label : 'no-label'}-${mandatoryCourse.code}`}>
-            {mandatoryCourse.code}
-          </div>
+          <div key={`${course.label ? course.label.label : 'no-label'}-${course.code}`}>{course.code}</div>
           <div
-            key={`${mandatoryCourse.label ? mandatoryCourse.label.label : 'no-label'}-${getTextIn(mandatoryCourse.name)}`}
+            key={`${course.label ? course.label.label : 'no-label'}-${getTextIn(course.name)}`}
             style={{ color: 'gray', fontWeight: 'normal' }}
           >
-            {getTextIn(mandatoryCourse.name)}
+            {getTextIn(course.name)}
           </div>
         </div>
       )
@@ -188,7 +185,7 @@ const CoursesTable = ({ curriculum, showSubstitutions, students, studyGuidanceCo
 
     const isWithinSixMonths = date => moment(date) > moment().subtract(6, 'months')
 
-    const hasPassedSubstitution = (bestGrade, passedMandatory) => showSubstitutions && bestGrade && !passedMandatory
+    const hasPassedSubstitution = (bestGrade, passedCourse) => showSubstitutions && bestGrade && !passedCourse
 
     const getEnrollmentDate = (student, code) =>
       student.enrollments.find(enrollment => enrollment.course_code === code && enrollment.state === 'ENROLLED')
@@ -246,18 +243,18 @@ const CoursesTable = ({ curriculum, showSubstitutions, students, studyGuidanceCo
           ),
           textTitle: label.code,
           thickBorders: true,
-          children: sortBy(labelToMandatoryCourses[label.label], [
-            mandatoryCourse => {
-              const codeDigits = mandatoryCourse.code.match(/\d+/)
+          children: sortBy(labelToCourses[label.label], [
+            course => {
+              const codeDigits = course.code.match(/\d+/)
               return codeDigits ? Number(codeDigits[0]) : Number.MAX_VALUE
             },
             'code',
           ])
             .filter(course => visibleCourseCodes.has(course.code))
-            .map(mandatoryCourse => ({
-              key: `${mandatoryCourse.label ? mandatoryCourse.label.label : 'no-label'}-${mandatoryCourse.code}`,
-              title: getCourseTitle(mandatoryCourse),
-              textTitle: mandatoryCourse.code,
+            .map(course => ({
+              key: `${course.label ? course.label.label : 'no-label'}-${course.code}`,
+              title: getCourseTitle(course),
+              textTitle: course.code,
               vertical: true,
               forceToolsMode: 'dangling',
               cellProps: student => {
@@ -271,30 +268,29 @@ const CoursesTable = ({ curriculum, showSubstitutions, students, studyGuidanceCo
                     verticalAlign: 'middle',
                   },
                 }
-                const bestGrade = findBestGrade(student.courses, mandatoryCourse.code)
+                const bestGrade = findBestGrade(student.courses, course.code)
                 if (bestGrade) {
                   cellProps.title = `Grade: ${bestGrade}`
-                } else if (hasActiveEnrollments(student, mandatoryCourse.code)) {
-                  const enrollmentDate = reformatDate(getEnrollmentDate(student, mandatoryCourse.code), 'DD.MM.YYYY')
+                } else if (hasActiveEnrollments(student, course.code)) {
+                  const enrollmentDate = reformatDate(getEnrollmentDate(student, course.code), 'DD.MM.YYYY')
                   cellProps.title = `Enrolled on ${enrollmentDate}`
                 }
                 return cellProps
               },
-              headerProps: { title: `${mandatoryCourse.code}, ${getTextIn(mandatoryCourse.name)}` },
+              headerProps: { title: `${course.code}, ${getTextIn(course.name)}` },
               getRowVal: student => {
                 if (student.total) {
-                  return getTotalRowVal(student, mandatoryCourse.code)
+                  return getTotalRowVal(student, course.code)
                 }
-                const bestGrade = findBestGrade(student.courses, mandatoryCourse.code)
+                const bestGrade = findBestGrade(student.courses, course.code)
                 if (bestGrade) {
-                  const passedMandatory = hasPassedMandatory(student.studentNumber, mandatoryCourse.code)
-                  if (passedMandatory) {
+                  if (hasPassedCourse(student.studentNumber, course.code)) {
                     return 4
                   }
                   return 3
                 }
-                if (hasActiveEnrollments(student, mandatoryCourse.code)) {
-                  const enrollmentDate = getEnrollmentDate(student, mandatoryCourse.code)
+                if (hasActiveEnrollments(student, course.code)) {
+                  const enrollmentDate = getEnrollmentDate(student, course.code)
                   if (isWithinSixMonths(enrollmentDate)) {
                     return 2
                   }
@@ -304,76 +300,75 @@ const CoursesTable = ({ curriculum, showSubstitutions, students, studyGuidanceCo
               },
               getRowExportVal: student => {
                 if (student.total) {
-                  return getTotalRowVal(student, mandatoryCourse.code)
+                  return getTotalRowVal(student, course.code)
                 }
-                const bestGrade = findBestGrade(student.courses, mandatoryCourse.code)
-                const passedMandatory = hasPassedMandatory(student.studentNumber, mandatoryCourse.code)
-                if ((bestGrade && passedMandatory) || hasPassedSubstitution(bestGrade, passedMandatory)) {
+                const bestGrade = findBestGrade(student.courses, course.code)
+                const passedCourse = hasPassedCourse(student.studentNumber, course.code)
+                if ((bestGrade && passedCourse) || hasPassedSubstitution(bestGrade, passedCourse)) {
                   return getNumericGrade(bestGrade)
                 }
-                if (hasActiveEnrollments(student, mandatoryCourse.code)) {
+                if (hasActiveEnrollments(student, course.code)) {
                   return 0
                 }
                 return null
               },
               getRowContent: student => {
                 if (student.total) {
-                  return getTotalRowVal(student, mandatoryCourse.code)
+                  return getTotalRowVal(student, course.code)
                 }
-                const bestGrade = findBestGrade(student.courses, mandatoryCourse.code)
-                const passedMandatory = hasPassedMandatory(student.studentNumber, mandatoryCourse.code)
-                if (bestGrade && passedMandatory) {
+                const bestGrade = findBestGrade(student.courses, course.code)
+                const passedCourse = hasPassedCourse(student.studentNumber, course.code)
+                if (bestGrade && passedCourse) {
                   return <Icon color="green" fitted name="check" />
                 }
-                if (hasPassedSubstitution(bestGrade, passedMandatory)) {
+                if (hasPassedSubstitution(bestGrade, passedCourse)) {
                   return <Icon color="grey" fitted name="check" />
                 }
-                if (hasActiveEnrollments(student, mandatoryCourse.code)) {
-                  const enrollmentDate = getEnrollmentDate(student, mandatoryCourse.code)
+                if (hasActiveEnrollments(student, course.code)) {
+                  const enrollmentDate = getEnrollmentDate(student, course.code)
                   const color = isWithinSixMonths(enrollmentDate) ? 'yellow' : 'grey'
                   return <Icon color={color} fitted name="minus" />
                 }
                 return null
               },
-              code: mandatoryCourse.code,
+              code: course.code,
             })),
         }))
     )
 
     return columns
-  }, [namesVisible, mandatoryCourses, getTextIn])
+  }, [namesVisible, curriculum, getTextIn])
 
   const data = useMemo(() => {
     const totals = students.reduce(
       (total, student) => {
         const passedCourses = new Set()
-        if (mandatoryCourses.defaultProgrammeCourses) {
-          mandatoryCourses.defaultProgrammeCourses.forEach(mandatoryCourse => {
-            if (passedCourses.has(mandatoryCourse.code)) {
+        if (curriculum.defaultProgrammeCourses) {
+          curriculum.defaultProgrammeCourses.forEach(course => {
+            if (passedCourses.has(course.code)) {
               return
             }
-            passedCourses.add(mandatoryCourse.code)
-            if (hasPassedMandatory(student.studentNumber, mandatoryCourse.code)) {
-              ++total[mandatoryCourse.code]
+            passedCourses.add(course.code)
+            if (hasPassedCourse(student.studentNumber, course.code)) {
+              ++total[course.code]
             }
           })
         }
         return total
       },
-      mandatoryCourses.defaultProgrammeCourses
-        ? mandatoryCourses.defaultProgrammeCourses.reduce(
-            (total, mandatoryCourse) => ({ ...total, [mandatoryCourse.code]: 0 }),
-            { total: true }
-          )
+      curriculum.defaultProgrammeCourses
+        ? curriculum.defaultProgrammeCourses.reduce((total, course) => ({ ...total, [course.code]: 0 }), {
+            total: true,
+          })
         : { total: true }
     )
 
     return [row(totals, { ignoreFilters: true, ignoreSorting: true }), ...students]
-  }, [students, mandatoryCourses, hasPassedMandatory, mandatoryPassed])
+  }, [students, curriculum, hasPassedCourse, passedStudents])
 
   return (
     <Tab.Pane loading={pending}>
-      {mandatoryCourses?.defaultProgrammeCourses.length > 0 && (
+      {curriculum?.defaultProgrammeCourses.length > 0 && (
         <SortableTable
           columns={columns}
           data={data}
