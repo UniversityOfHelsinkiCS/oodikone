@@ -62,7 +62,7 @@ describe('Studyprogramme overview', () => {
         [2020, 4511, 4511, 0, 0, 406],
         [2019, 7117, 7097, 0, 0, 434],
         [2018, 5742, 5737, 0, 0, 150],
-        [2017, 1882, 1882, 0, 0, 186],
+        [2017, 1887, 1882, 0, 0, 186],
       ]
 
       cy.checkTableStats(tableContents, 'CreditsProducedByTheStudyprogramme')
@@ -104,7 +104,7 @@ describe('Studyprogramme overview', () => {
         [2020, 4511, 4511, 0, 0, 406],
         [2019, 7117, 7097, 0, 0, 434],
         [2018, 5742, 5737, 0, 0, 150],
-        [2017, 1882, 1882, 0, 0, 186],
+        [2017, 1887, 1882, 0, 0, 186],
       ]
 
       cy.checkTableStats(creditTableContents, 'CreditsProducedByTheStudyprogramme')
@@ -144,7 +144,7 @@ describe('Studyprogramme overview', () => {
         ['2020 - 2021', 352, 352, 0, 0, 296],
         ['2019 - 2020', 6966, 6966, 0, 0, 430],
         ['2018 - 2019', 7797, 7777, 0, 0, 259],
-        ['2017 - 2018', 4137, 4132, 0, 0, 191],
+        ['2017 - 2018', 4142, 4132, 0, 0, 191],
       ]
 
       cy.checkTableStats(creditTableContents, 'CreditsProducedByTheStudyprogramme')
