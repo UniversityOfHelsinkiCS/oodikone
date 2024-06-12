@@ -20,6 +20,7 @@ const faculties = require('./routes/faculties')
 const feedback = require('./routes/feedback')
 const languageCenterData = require('./routes/languageCenterData')
 const login = require('./routes/login')
+const testroute = require('./routes/testroute')
 const population = require('./routes/population')
 const programmeModules = require('./routes/programmeModules')
 const providers = require('./routes/providers')
@@ -43,6 +44,7 @@ module.exports = (app, url) => {
 
   app.use(cors({ credentials: true, origin: frontUrl }))
   app.use(express.json())
+  app.use(`${url}/testroute`, testroute)
 
   app.use(shibbolethCharsetMiddleware)
   app.use(currentUserMiddleware)

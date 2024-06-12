@@ -9,7 +9,7 @@ const {
   Studyplan,
   Studyright,
   StudyrightElement,
-} = require('../../models')
+} = require('../../models/init-models')
 const { mapToProviders } = require('../../util/utils')
 const { redisClient } = require('../redis')
 const { getCurriculumVersion } = require('./shared')

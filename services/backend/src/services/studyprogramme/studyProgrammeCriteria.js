@@ -1,4 +1,4 @@
-const { Course } = require('../../models')
+const { Course } = require('../../models/init-models')
 const { ProgressCriteria } = require('../../models/models_kone')
 const logger = require('../../util/logger')
 

@@ -1,7 +1,7 @@
 const { Op } = require('sequelize')
 
 const { dbConnections } = require('../database/connection')
-const { Organization } = require('../models')
+const { Organization } = require('../models/init-models')
 
 // Have facultyfetching to work like it worked during oodi-db time
 const facultiesInOodi = [

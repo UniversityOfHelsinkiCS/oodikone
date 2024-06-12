@@ -17,7 +17,7 @@ const {
   Semester,
   SemesterEnrollment,
   Transfer,
-} = require('../../models')
+} = require('../../models/init-models')
 const { Tag, TagStudent } = require('../../models/models_kone')
 
 const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDate, studyright, tag) => {

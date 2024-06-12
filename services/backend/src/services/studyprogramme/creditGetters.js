@@ -1,6 +1,6 @@
 const { Op } = require('sequelize')
 
-const { Course, CourseProvider, Credit, Organization } = require('../../models')
+const { Course, CourseProvider, Credit, Organization } = require('../../models/init-models')
 const { formatCredit } = require('./studyprogrammeHelpers')
 const { whereStudents } = require('.')
 

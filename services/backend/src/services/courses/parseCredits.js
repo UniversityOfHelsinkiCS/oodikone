@@ -1,6 +1,6 @@
 const crypto = require('crypto')
 
-const { Credit } = require('../../models')
+const { Credit } = require('../../models/init-models')
 
 const formatStudyrightElement = ({ code, element_detail, startdate, studyright: sr }) => {
   const studyright = sr.get({ plain: true })

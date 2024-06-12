@@ -1,7 +1,7 @@
 const _ = require('lodash')
 const { Op } = require('sequelize')
 
-const { Credit, Enrollment } = require('../../models')
+const { Credit, Enrollment } = require('../../models/init-models')
 const { mapToProviders } = require('../../util/utils')
 const { createArrayOfCourses } = require('../languageCenterData')
 const {

@@ -1,6 +1,12 @@
 {
   "compilerOptions": {
-    "target": "ES6"
+    "target": "ES6",
+    // For sequelize-typescript:
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "moduleResolution": "NodeNext",
+    "module": "NodeNext",
+    "baseUrl": ".",
   },
   "include": ["src/**/*"]
 }

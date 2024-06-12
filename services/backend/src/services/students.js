@@ -3,18 +3,7 @@ const { Op } = require('sequelize')
 const {
   dbConnections: { sequelize },
 } = require('../database/connection')
-const {
-  Student,
-  Credit,
-  Course,
-  Studyright,
-  StudyrightElement,
-  ElementDetail,
-  SemesterEnrollment,
-  Semester,
-  Studyplan,
-  Transfer,
-} = require('../models')
+const { initModels } = require('../models/init-models')
 const { TagStudent, Tag } = require('../models/models_kone')
 const logger = require('../util/logger')
 
@@ -338,7 +327,7 @@ const studentnumberLike = terms => {
 
 const bySearchTerm = async searchterm => {
   const terms = splitByEmptySpace(searchterm)
-  const matches = await Student.findAll({
+  const matches = await initModels.Student.findAll({
     include: {
       model: Studyright,
       include: {

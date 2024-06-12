@@ -9,7 +9,7 @@ const {
   StudyrightElement,
   ElementDetail,
   Enrollment,
-} = require('../../models')
+} = require('../../models/init-models')
 
 const creditsForCourses = async (codes, anonymizationSalt, unification) => {
   let is_open = false

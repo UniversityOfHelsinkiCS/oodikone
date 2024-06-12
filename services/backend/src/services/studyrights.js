@@ -5,7 +5,7 @@ const { Op, col, where, fn } = require('sequelize')
 const {
   dbConnections: { sequelize },
 } = require('../database/connection')
-const { ElementDetail, Studyright, StudyrightElement, Transfer } = require('../models')
+const { initModels } = require('../models/init-models')
 const logger = require('../util/logger')
 const { redisClient } = require('./redis')
 
@@ -152,7 +152,7 @@ const getAllProgrammes = async () => {
 }
 
 const getAllElementDetails = async () => {
-  const elementDetails = ElementDetail.findAll()
+  const elementDetails = initModels.elementDetails.findAll()
   return elementDetails
 }
 
