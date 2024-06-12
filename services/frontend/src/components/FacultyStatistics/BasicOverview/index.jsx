@@ -114,10 +114,8 @@ export const BasicOverview = ({
     return <h3>Something went wrong, please try refreshing the page.</h3>
   }
 
-  const creditSortingTitles = ['Code', 'Total', 'Degree', 'Open uni', 'Exchange', 'Transferred']
-  if (showAll) {
-    creditSortingTitles.push('Special', 'Other university')
-  }
+  const creditSortingTitles = ['Code', 'Total', 'Degree', 'Exchange', 'Open uni', 'Transferred']
+  if (showAll) creditSortingTitles.splice(5, 0, 'Other uni', 'Separate')
 
   const transferShortTitles = ['Code', 'Started', 'Graduated']
   if (special === 'SPECIAL_INCLUDED') {

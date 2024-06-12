@@ -1,8 +1,8 @@
 import { useState } from 'react'
+import { Radio } from 'semantic-ui-react'
 
 import { DataTable } from '@/components/StudyProgramme/BasicOverview/DataTable'
 import { StackedBarChart } from '@/components/StudyProgramme/BasicOverview/StackedBarChart'
-import { Toggle } from '@/components/StudyProgramme/Toggle'
 
 const getFormattedYear = (year, academicYear) => (academicYear ? `${year} - ${year + 1}` : `${year}`)
 
@@ -13,12 +13,11 @@ export const makeGraphData = (data, showAll, isAcademicYear) => {
       Object.keys(data)
         .flatMap(year => Object.keys(data[year]))
         .filter(key => key !== 'total' && key !== 'other')
-        .filter(key => showAll || !['agreement', 'special', 'separate'].includes(key))
+        .filter(key => showAll || !['agreement', 'separate'].includes(key))
     ),
   ]
   const names = {
     agreement: 'Other university',
-    special: 'Special studyright: non-degree',
     separate: 'Separate studies',
     basic: 'Degree students',
     'open-uni': 'Open university',
@@ -51,25 +50,25 @@ export const makeTableStats = (data, showAll, isAcademicYear) => {
     const basic = yearData?.basic || 0
     const openUni = yearData?.['open-uni'] || 0
     const exchange = yearData?.['incoming-exchange'] || 0
-    const special = yearData?.special || 0
+    const separate = yearData?.separate || 0
     const agreement = yearData?.agreement || 0
     const transferred = yearData?.transferred || 0
-    const total = basic + openUni + special + agreement
+    const total = basic + openUni + exchange + separate + agreement
 
     /* TODO: Other-category missing for now, clarify what go in that, and fix those */
     const yearStats = [
       getFormattedYear(year, isAcademicYear),
       Math.round(total),
       Math.round(basic),
-      Math.round(openUni),
       Math.round(exchange),
+      Math.round(openUni),
       Math.round(transferred),
     ]
-    if (showAll) yearStats.push(Math.round(special), Math.round(agreement))
+    if (showAll) yearStats.splice(5, 0, Math.round(agreement), Math.round(separate))
     tableStats.push(yearStats)
   }
-  const titles = ['', 'Total', 'Degree students', 'Open university', 'Exchange students', 'Transferred']
-  if (showAll) titles.push('Special', 'Other university')
+  const titles = ['', 'Total', 'Degree students', 'Exchange students', 'Open university', 'Transferred']
+  if (showAll) titles.splice(5, 0, 'Other university', 'Separate')
   return { data: tableStats, titles }
 }
 
@@ -85,13 +84,8 @@ export const CreditsProduced = ({ academicYear, data, secondData }) => {
 
   return (
     <>
-      <div>
-        <Toggle
-          cypress="showAllCreditsToggle"
-          firstLabel="Show special categories"
-          setValue={setShowAll}
-          value={showAll}
-        />
+      <div className="original-toggle-container">
+        <Radio checked={showAll} label="Show special categories" onChange={() => setShowAll(!showAll)} toggle />
       </div>
       <div className="section-container">
         <StackedBarChart

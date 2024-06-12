@@ -5,7 +5,7 @@ export const FilterOldProgrammesToggle = ({ checked, marginTop = '20px', onChang
     <Radio
       checked={checked}
       label="Filter out old and specialized programmes"
-      onChange={() => onChange(!checked)}
+      onChange={onChange}
       style={{ marginTop }}
       toggle
     />
