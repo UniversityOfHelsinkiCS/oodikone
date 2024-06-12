@@ -32,7 +32,7 @@ const associatedStudyrightElements = async (offset, limit) => {
       attributes: ['studyrightid', 'startdate', 'enddate'],
       include: {
         model: ElementDetail,
-        attributes: ['type', 'name', 'code'],
+        attributes: ['type', 'name', 'code', 'degree_programme_type_urn'],
       },
     },
     order: [['studyrightid', 'DESC']],
@@ -41,6 +41,7 @@ const associatedStudyrightElements = async (offset, limit) => {
     limit,
     offset,
   })
+  // studyrights.forEach(sr => console.log(sr.studyright_elements[0].element_detail.get()))
   const groupings = studyrights.map(({ studyright_elements: sres }) =>
     sres.map(sre => ({
       ...sre.element_detail.get(),
@@ -49,6 +50,7 @@ const associatedStudyrightElements = async (offset, limit) => {
       enddate: sre.get().enddate,
     }))
   )
+  // groupings.forEach(val => console.log(val))
   return groupings
 }
 
@@ -169,7 +171,7 @@ const refreshAssociationsInRedis = async () => {
 
 const getAssociations = async (doRefresh = false) => {
   const studyrights = await getAssociationsFromRedis()
-  if (!studyrights || doRefresh) {
+  if (!studyrights || doRefresh || 1 === 1) {
     const associations = await calculateAssociationsFromDb()
     await saveAssociationsToRedis(associations)
     return associations

@@ -32,6 +32,7 @@ class ModuleResolver {
       valid_to: mod?.validity_period?.endDate ?? null,
       curriculum_period_ids: mod.curriculum_period_ids ?? [],
       order: this.getOrder(mod.group_id),
+      degree_programme_type_urn: mod.degree_programme_type_urn,
       children,
     }
     return newMod

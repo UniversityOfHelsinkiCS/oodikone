@@ -15,6 +15,9 @@ ElementDetail.init(
     updatedAt: {
       type: DATE,
     },
+    degree_programme_type_urn: {
+      type: STRING,
+    },
   },
   {
     sequelize: dbConnections.sequelize,

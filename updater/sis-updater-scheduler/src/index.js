@@ -71,7 +71,15 @@ const handleImmediates = async () => {
 knexConnection.on('connect', async () => {
   logger.info('Knex database connection established successfully')
   startServer()
-  await handleImmediates()
+  try {
+    await scheduleWeekly()
+  } catch (e) {
+    logger.error({
+      message: `Weekly run failed: ${e.message}`,
+      meta: e.stack,
+    })
+  }
+  // await handleImmediates()
 
   // Monday-Friday at every minute 30
   scheduleCron('30 * * * 1-5', async () => {
