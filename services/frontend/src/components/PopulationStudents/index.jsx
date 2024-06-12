@@ -10,7 +10,7 @@ import { StudentNameVisibilityToggle } from '@/components/StudentNameVisibilityT
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetTagsByStudyTrackQuery } from '@/redux/tags'
 import { CheckStudentList } from './CheckStudentList'
-import { CombineSubstitutionsToggle } from './CombineSubstitutionsToggle'
+import { ShowSubstitutionsToggle } from './ShowSubstitutionsToggle'
 import { CoursesTabContainer as CoursesTab } from './StudentTable/CoursesTab'
 import { GeneralTabContainer as GeneralTab } from './StudentTable/GeneralTab'
 import { ProgressTable as ProgressTab } from './StudentTable/ProgressTab'
@@ -35,7 +35,7 @@ const Panes = ({
   year,
 }) => {
   const { handleTabChange } = useTabChangeAnalytics()
-  const [combineSubstitutions, toggleCombineSubstitutions] = useToggle(true)
+  const [showSubstitutions, toggleShowSubstitutions] = useToggle(false)
   const programmeForTagsLink = combinedProgramme ? `${mainProgramme}+${combinedProgramme}` : mainProgramme
   const programme = studyGuidanceGroup?.tags?.studyProgramme || ''
   const correctCode = combinedProgramme ? `${mainProgramme}+${combinedProgramme}` : mainProgramme
@@ -63,6 +63,7 @@ const Panes = ({
       render: () => (
         <CoursesTab
           curriculum={curriculum}
+          showSubstitutions={showSubstitutions}
           students={filteredStudents}
           studyGuidanceGroup={studyGuidanceGroup}
           variant={variant}
@@ -103,9 +104,9 @@ const Panes = ({
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', flexDirection: 'row', gap: '20px' }}>
           <StudentNameVisibilityToggle />
-          <CombineSubstitutionsToggle
-            combineSubstitutions={combineSubstitutions}
-            toggleCombineSubstitutions={toggleCombineSubstitutions}
+          <ShowSubstitutionsToggle
+            showSubstitutions={showSubstitutions}
+            toggleShowSubstitutions={toggleShowSubstitutions}
           />
         </div>
         {dataExport}

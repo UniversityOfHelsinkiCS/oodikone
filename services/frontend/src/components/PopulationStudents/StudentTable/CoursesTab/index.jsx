@@ -45,7 +45,7 @@ const getMandatoryPassed = (mandatoryCourses, populationCourses, studyGuidanceCo
   return mandatoryPassed
 }
 
-const CoursesTable = ({ curriculum, students, studyGuidanceCourses }) => {
+const CoursesTable = ({ curriculum, showSubstitutions, students, studyGuidanceCourses }) => {
   const { getTextIn } = useLanguage()
   const { visible: namesVisible } = useStudentNameVisibility()
   const mandatoryCourses = curriculum
@@ -169,12 +169,26 @@ const CoursesTable = ({ curriculum, students, studyGuidanceCourses }) => {
 
     const getTotalRowVal = (total, code) => total[code]
 
+    const getNumericGrade = grade => {
+      if (grade === 'Hyl.') {
+        return 0
+      }
+      if (['1', '2', '3', '4', '5'].includes(grade)) {
+        return parseInt(grade, 10)
+      }
+      return null
+    }
+
     const hasActiveEnrollments = (student, code) => {
       if (!student.enrollments) {
         return false
       }
       return student.enrollments.some(enrollment => enrollment.course_code === code && enrollment.state === 'ENROLLED')
     }
+
+    const isWithinSixMonths = date => moment(date) > moment().subtract(6, 'months')
+
+    const hasPassedSubstitution = (bestGrade, passedMandatory) => showSubstitutions && bestGrade && !passedMandatory
 
     const getEnrollmentDate = (student, code) =>
       student.enrollments.find(enrollment => enrollment.course_code === code && enrollment.state === 'ENROLLED')
@@ -281,7 +295,7 @@ const CoursesTable = ({ curriculum, students, studyGuidanceCourses }) => {
                 }
                 if (hasActiveEnrollments(student, mandatoryCourse.code)) {
                   const enrollmentDate = getEnrollmentDate(student, mandatoryCourse.code)
-                  if (moment(enrollmentDate) > moment().subtract(6, 'months')) {
+                  if (isWithinSixMonths(enrollmentDate)) {
                     return 2
                   }
                   return 1
@@ -293,29 +307,30 @@ const CoursesTable = ({ curriculum, students, studyGuidanceCourses }) => {
                   return getTotalRowVal(student, mandatoryCourse.code)
                 }
                 const bestGrade = findBestGrade(student.courses, mandatoryCourse.code)
-                if (!bestGrade && hasActiveEnrollments(student, mandatoryCourse.code)) {
+                const passedMandatory = hasPassedMandatory(student.studentNumber, mandatoryCourse.code)
+                if ((bestGrade && passedMandatory) || hasPassedSubstitution(bestGrade, passedMandatory)) {
+                  return getNumericGrade(bestGrade)
+                }
+                if (hasActiveEnrollments(student, mandatoryCourse.code)) {
                   return 0
                 }
-                if (bestGrade === 'Hyl.') {
-                  return 0
-                }
-                if (['1', '2', '3', '4', '5'].includes(bestGrade)) {
-                  return parseInt(bestGrade, 10)
-                }
-                return ''
+                return null
               },
               getRowContent: student => {
                 if (student.total) {
                   return getTotalRowVal(student, mandatoryCourse.code)
                 }
                 const bestGrade = findBestGrade(student.courses, mandatoryCourse.code)
-                if (bestGrade) {
-                  const passedMandatory = hasPassedMandatory(student.studentNumber, mandatoryCourse.code)
-                  return <Icon color={passedMandatory ? 'green' : 'grey'} fitted name="check" />
+                const passedMandatory = hasPassedMandatory(student.studentNumber, mandatoryCourse.code)
+                if (bestGrade && passedMandatory) {
+                  return <Icon color="green" fitted name="check" />
+                }
+                if (hasPassedSubstitution(bestGrade, passedMandatory)) {
+                  return <Icon color="grey" fitted name="check" />
                 }
                 if (hasActiveEnrollments(student, mandatoryCourse.code)) {
                   const enrollmentDate = getEnrollmentDate(student, mandatoryCourse.code)
-                  const color = moment(enrollmentDate) > moment().subtract(6, 'months') ? 'yellow' : 'grey'
+                  const color = isWithinSixMonths(enrollmentDate) ? 'yellow' : 'grey'
                   return <Icon color={color} fitted name="minus" />
                 }
                 return null
@@ -385,12 +400,12 @@ const StudyGuidanceGroupCoursesTabContainer = ({ curriculum, group, students }) 
   return <CoursesTable curriculum={curriculum} students={students} studyGuidanceCourses={populationsCourses} />
 }
 
-export const CoursesTabContainer = ({ curriculum, students, studyGuidanceGroup, variant }) => {
+export const CoursesTabContainer = ({ curriculum, showSubstitutions, students, studyGuidanceGroup, variant }) => {
   if (variant === 'studyGuidanceGroupPopulation') {
     return (
       <StudyGuidanceGroupCoursesTabContainer curriculum={curriculum} group={studyGuidanceGroup} students={students} />
     )
   }
 
-  return <CoursesTable curriculum={curriculum} students={students} />
+  return <CoursesTable curriculum={curriculum} showSubstitutions={showSubstitutions} students={students} />
 }
