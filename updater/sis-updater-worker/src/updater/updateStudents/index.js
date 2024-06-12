@@ -17,21 +17,24 @@ const { updateStudyRights, updateStudyRightElements, updateElementDetails } = re
 // studytrack or major subject. This is a known bug on SIS and has been reported
 // to funidata.
 // In these cases, degree programmes module group id must be fetched from education.
-const addSelectionPathIfNeeded = snapshot =>
-  Object.keys(snapshot.accepted_selection_path).length === 0
-    ? {
-        ...snapshot,
-        accepted_selection_path: {
-          educationPhase1GroupId: getEducation(snapshot.education_id).structure.phase1.options[0].moduleGroupId,
-        },
-      }
-    : snapshot
+const addSelectionPathIfNeeded = snapshot => {
+  if (Object.keys(snapshot.accepted_selection_path).length > 0) return snapshot
+
+  const correctModuleGroupId = getEducation(snapshot.education_id)?.structure.phase1.options[0].moduleGroupId
+  if (!correctModuleGroupId) return null
+
+  return {
+    ...snapshot,
+    accepted_selection_path: { educationPhase1GroupId: correctModuleGroupId },
+  }
+}
 
 // Parse useful snapshots from the whole list and enrich snapshots when needed
 const parseStudyrightSnapshots = studyrightSnapshots =>
   studyrightSnapshots.reduce((parsed, current) => {
     if (current.document_state !== 'ACTIVE') return parsed
-    parsed.push(addSelectionPathIfNeeded(current))
+    const snapshotWithSelectionPath = addSelectionPathIfNeeded(current)
+    if (snapshotWithSelectionPath) parsed.push(snapshotWithSelectionPath)
     return parsed
   }, [])
 
