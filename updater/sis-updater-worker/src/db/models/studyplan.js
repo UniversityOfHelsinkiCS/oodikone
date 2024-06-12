@@ -47,6 +47,9 @@ Studyplan.init(
     curriculum_period_id: {
       type: STRING,
     },
+    sis_study_right_id: {
+      type: STRING,
+    },
     createdAt: {
       type: DATE,
     },

@@ -473,13 +473,14 @@ const studyplanMapper =
         studentnumber,
         studyrightid:
           code.includes('MH') && educationStudyrights[studyplan.root_id][studyplan.user_id].hasBaMaEducation
-            ? `${educationStudyrights[studyplan.root_id][studyplan.user_id].studyRightId}-2`
-            : `${educationStudyrights[studyplan.root_id][studyplan.user_id].studyRightId}-1`,
+            ? `${studyrightId}-2`
+            : `${studyrightId}-1`,
         completed_credits,
         programme_code: code,
         included_courses: includedCourses,
         sisu_id: studyplan.id,
         curriculum_period_id: studyplan.curriculum_period_id,
+        sis_study_right_id: studyrightId,
       }
     })
   }
