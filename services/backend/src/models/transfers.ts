@@ -99,6 +99,8 @@ export class transfers extends Model<transfersAttributes, transfersCreationAttri
     tableName: 'transfers',
     schema: 'public',
     timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
     indexes: [
       {
         name: "transfers_pkey",

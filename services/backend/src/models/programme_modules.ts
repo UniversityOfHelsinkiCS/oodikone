@@ -113,6 +113,8 @@ export class programme_modules extends Model<programme_modulesAttributes, progra
     tableName: 'programme_modules',
     schema: 'public',
     timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
     indexes: [
       {
         name: "programme_modules_pkey",

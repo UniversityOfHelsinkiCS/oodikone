@@ -36,6 +36,8 @@ export class course_types extends Model<course_typesAttributes, course_typesCrea
     tableName: 'course_types',
     schema: 'public',
     timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
     indexes: [
       {
         name: "course_types_pkey",

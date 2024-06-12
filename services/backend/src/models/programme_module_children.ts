@@ -52,6 +52,8 @@ export class programme_module_children extends Model<programme_module_childrenAt
     tableName: 'programme_module_children',
     schema: 'public',
     timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
     indexes: [
       {
         name: "programme_module_children_pkey",

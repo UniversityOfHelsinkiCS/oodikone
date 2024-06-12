@@ -141,6 +141,8 @@ export class course extends Model<courseAttributes, courseCreationAttributes> im
     tableName: 'course',
     schema: 'public',
     timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
     indexes: [
       {
         name: "course_code",

@@ -113,6 +113,8 @@ export class organization extends Model<organizationAttributes, organizationCrea
     tableName: 'organization',
     schema: 'public',
     timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
     indexes: [
       {
         name: "organization_code",

@@ -255,6 +255,8 @@ export class student extends Model<studentAttributes, studentCreationAttributes>
     tableName: 'student',
     schema: 'public',
     timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
     indexes: [
       {
         name: "student_pkey",

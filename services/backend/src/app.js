@@ -1,37 +1,37 @@
-require('express-async-errors')
-const express = require('express')
+import 'express-async-errors'
+import express from 'express'
 
-const { baseUrl, backendPort } = require('./conf-backend')
-const { initializeDatabaseConnection, dbConnections } = require('./database/connection')
-const { startCron } = require('./events')
-const routes = require('./routes')
-const logger = require('./util/logger')
-require('./worker/worker')
+import { baseUrl, backendPort } from './conf-backend'
+import { initializeDatabaseConnection, dbConnections } from './database/connection'
+import { startCron } from './events'
+import routes from './routes'
+import { info, error } from './util/logger'
+import './worker/worker'
 
 initializeDatabaseConnection()
   .then(() => {
     dbConnections.connect()
 
     dbConnections.on('connect', () => {
-      logger.info('Connected to sis db successfully')
+      info('Connected to sis db successfully')
     })
 
     dbConnections.on('error', () => {
-      logger.error('Failed to connect to sis db!')
+      error('Failed to connect to sis db!')
     })
     startCron()
 
     const app = express()
     routes(app, baseUrl)
 
-    const server = app.listen(backendPort, () => logger.info(`Backend listening on port ${backendPort}!`))
+    const server = app.listen(backendPort, () => info(`Backend listening on port ${backendPort}!`))
     process.on('SIGTERM', () => {
       server.close(() => {
-        logger.info('Process terminated')
+        info('Process terminated')
       })
     })
   })
   .catch(e => {
     process.exitCode = 1
-    logger.error(e)
+    error(e)
   })

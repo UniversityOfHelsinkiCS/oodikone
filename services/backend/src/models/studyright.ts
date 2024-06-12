@@ -189,6 +189,8 @@ export class studyright extends Model<studyrightAttributes, studyrightCreationAt
     tableName: 'studyright',
     schema: 'public',
     timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
     indexes: [
       {
         name: "studyright_extentcode",

@@ -104,6 +104,8 @@ export class sis_study_right_elements extends Model<sis_study_right_elementsAttr
     tableName: 'sis_study_right_elements',
     schema: 'public',
     timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
     indexes: [
       {
         name: "sis_study_right_elements_pkey",

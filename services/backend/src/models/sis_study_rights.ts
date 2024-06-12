@@ -127,6 +127,8 @@ export class sis_study_rights extends Model<sis_study_rightsAttributes, sis_stud
     tableName: 'sis_study_rights',
     schema: 'public',
     timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
     indexes: [
       {
         name: "sis_study_rights_pkey",

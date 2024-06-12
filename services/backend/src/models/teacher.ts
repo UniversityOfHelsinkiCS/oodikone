@@ -48,6 +48,8 @@ export class teacher extends Model<teacherAttributes, teacherCreationAttributes>
     sequelize,
     tableName: 'teacher',
     schema: 'public',
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
     timestamps: true,
     indexes: [
       {

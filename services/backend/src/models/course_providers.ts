@@ -68,6 +68,8 @@ export class course_providers extends Model<course_providersAttributes, course_p
     tableName: 'course_providers',
     schema: 'public',
     timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
     indexes: [
       {
         name: "course_providers_coursecode",

@@ -134,6 +134,8 @@ export class semesters extends Model<semestersAttributes, semestersCreationAttri
   }, {
     sequelize,
     tableName: 'semesters',
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
     schema: 'public',
     timestamps: true,
     indexes: [
