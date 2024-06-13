@@ -10,47 +10,71 @@ import '@/components/StudentStatistics/StudentInfoCard/studentInfoCard.css'
 import { SortableTable } from '@/components/SortableTable'
 import { useStudentNameVisibility } from '@/components/StudentNameVisibilityToggle'
 
-const findRowContent = (student, courseCode, year, start, end, criteria) => {
-  if (courseCode.includes('Credits'))
-    return student.criteriaProgress[year] && student.criteriaProgress[year].credits ? (
-      <Icon color="green" fitted name="check" title="Checked" />
-    ) : null
-  const courses = student.courses.filter(
+const getCourses = (courseCode, criteria, student) => {
+  return student.courses.filter(
     course =>
       course.course_code === courseCode ||
       (criteria?.allCourses[courseCode] && criteria?.allCourses[courseCode].includes(course.course_code))
   )
+}
 
-  if (courses && courses.some(course => course.credittypecode === 9))
+const findRowContent = (student, courseCode, year, start, end, criteria) => {
+  if (courseCode.includes('Credits')) {
+    if (student.criteriaProgress[year] && student.criteriaProgress[year].credits) {
+      return <Icon color="green" fitted name="check" title="Checked" />
+    }
+    return null
+  }
+
+  const courses = getCourses(courseCode, criteria, student)
+
+  if (courses && courses.some(course => course.credittypecode === 9)) {
     return <Icon color="green" name="clipboard check" />
+  }
+
   if (
     courses &&
     courses.some(course => course.passed) &&
     courses.some(course => moment(course.date).isBetween(moment(start), moment(end)))
-  )
+  ) {
     return <Icon color="green" fitted name="check" />
-  if (courses && courses.some(course => course.passed)) return <Icon color="grey" fitted name="check" />
-  if (courses && courses.some(course => course.passed === false)) return <Icon color="red" fitted name="times" />
-  if (student.enrollments && student.enrollments.map(course => course.course_code).includes(courseCode))
+  }
+
+  if (courses && courses.some(course => course.passed)) {
+    return <Icon color="grey" fitted name="check" />
+  }
+
+  if (courses && courses.some(course => course.passed === false)) {
+    return <Icon color="red" fitted name="times" />
+  }
+
+  if (student.enrollments && student.enrollments.map(course => course.course_code).includes(courseCode)) {
     return <Icon color="grey" fitted name="minus" />
+  }
+
   return null
 }
 
-const findCsvText = (student, courseCode, year, criteria) => {
-  if (courseCode.includes('Credits'))
+const findExcelText = (courseCode, criteria, student, year) => {
+  if (courseCode.includes('Credits')) {
     return student.criteriaProgress[year] && student.criteriaProgress[year].credits ? 'Passed' : ''
-  const courses = student.courses.filter(
-    course =>
-      course.course_code === courseCode ||
-      (criteria?.allCourses[courseCode] && criteria?.allCourses[courseCode].includes(course.course_code))
-  )
-  if (courses && courses.some(course => course.passed)) return `Passed-${moment(courses[0].date).format('YYYY-MM-DD')}`
-  if (courses && courses.some(course => course.passed === false))
+  }
+
+  const courses = getCourses(courseCode, criteria, student)
+
+  if (courses && courses.some(course => course.passed)) {
+    return `Passed-${moment(courses[0].date).format('YYYY-MM-DD')}`
+  }
+
+  if (courses && courses.some(course => course.passed === false)) {
     return `Failed-${moment(courses[0].date).format('YYYY-MM-DD')}`
+  }
+
   if (student.enrollments && student.enrollments.map(course => course.course_code).includes(courseCode)) {
     const enrollment = student.enrollments.filter(enrollment => enrollment.course_code === courseCode)
     return `Enrollment-${moment(enrollment[0].enrollment_date_time).format('YYYY-MM-DD')}`
   }
+
   return ''
 }
 
@@ -71,15 +95,19 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
   const { getTextIn } = useLanguage()
   const isStudyGuidanceGroupProgramme = studyGuidanceGroupProgramme !== ''
   const creditMonths = [12, 24, 36, 48, 60, 72]
-  const mandatoryCourses = curriculum
-  const defaultCourses = keyBy(mandatoryCourses.defaultProgrammeCourses, 'code')
-  const coursesSecondProgramme = keyBy(mandatoryCourses.secondProgrammeCourses, 'code')
+  const defaultCourses = keyBy(curriculum.defaultProgrammeCourses, 'code')
+  const coursesSecondProgramme = keyBy(curriculum.secondProgrammeCourses, 'code')
 
   const getCourseName = courseCode => {
-    if (defaultCourses[courseCode]) return defaultCourses[courseCode].name
-    if (coursesSecondProgramme[courseCode]) return coursesSecondProgramme[courseCode].name
+    if (defaultCourses[courseCode]) {
+      return defaultCourses[courseCode].name
+    }
+    if (coursesSecondProgramme[courseCode]) {
+      return coursesSecondProgramme[courseCode].name
+    }
     return ''
   }
+
   const labelCriteria = Object.keys(criteria.courses).reduce((acc, year, index) => {
     acc[year] = [
       {
@@ -119,23 +147,22 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
   ]
 
   const nonCourse = ['Criteria', 'Credits']
-  const style = { verticalAlign: 'middle', textAlign: 'center' }
 
   const findProp = (info, student) => {
     const propObj = {
       title: '',
-      style,
+      style: { textAlign: 'center', verticalAlign: 'middle' },
     }
-    const courses = student.courses.filter(
-      course =>
-        course.course_code === info.code ||
-        (criteria?.allCourses[info.code] && criteria?.allCourses[info.code].includes(course.course_code))
-    )
-    if (nonCourse.includes(info.code)) return propObj
-    if (courses && courses.some(course => course.passed))
+    const courses = getCourses(info.code, criteria, student)
+    if (nonCourse.includes(info.code)) {
+      return propObj
+    }
+    if (courses && courses.some(course => course.passed)) {
       return { ...propObj, title: `Passed-${moment(courses[0].date).format('YYYY-MM-DD')}` }
-    if (courses && courses.some(course => course.passed === false))
+    }
+    if (courses && courses.some(course => course.passed === false)) {
       return { ...propObj, title: `Failed-${moment(courses[0].date).format('YYYY-MM-DD')}` }
+    }
     if (student.enrollments && student.enrollments.map(course => course.course_code).includes(info.code)) {
       const enrollment = student.enrollments.filter(enrollment => enrollment.course_code === info.code)
       return {
@@ -145,12 +172,14 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
     }
     return propObj
   }
+
   const helpTexts = {
     0: 'No information',
     1: 'Active',
     2: 'Absent',
     3: 'Inactive',
   }
+
   const getSemesterEnrollmentVal = (student, enrollmentIndex) => {
     const fall = student.semesterenrollments[enrollmentIndex]?.enrollmenttype ?? 0
     const spring = student.semesterenrollments[enrollmentIndex + 1]?.enrollmenttype ?? 0
@@ -158,6 +187,7 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
     const springText = `Spring: ${helpTexts[spring]}`
     return `${fallText} ${springText}`
   }
+
   const getEnrollmentSortingValue = (student, enrollmentIndex) => {
     const fall = student.semesterenrollments[enrollmentIndex]?.enrollmenttype ?? 0
     const spring = student.semesterenrollments[enrollmentIndex + 1]?.enrollmenttype ?? 0
@@ -168,6 +198,7 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
     }
     return multiply(fall) + multiply(spring)
   }
+
   const getSemesterEnrollmentContent = (student, enrollmentIndex) => {
     const enrollmentTypes = {
       0: { className: 'label-none' },
@@ -192,48 +223,55 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
   }
 
   const createContent = (labels, year, start, end, enrollStatusIndex) => {
-    return labels.map(m => ({
-      key: `${year}-${m.code}-${m.name.fi}`,
+    return labels.map(label => ({
+      key: `${year}-${label.code}-${label.name.fi}`,
       title: (
         <div
-          key={`${year}-${m.code}-${getTextIn(m.name)}`}
-          style={{ maxWidth: '7em', whiteSpace: 'normal', overflow: 'hidden', width: 'max-content' }}
+          key={`${year}-${label.code}-${getTextIn(label.name)}`}
+          style={{ maxWidth: '7em', overflow: 'hidden', whiteSpace: 'normal', width: 'max-content' }}
         >
-          <div key={`${m.code}-${year}`}>{m.code}</div>
-          <div key={`${getTextIn(m.name)}`} style={{ color: 'gray', fontWeight: 'normal' }}>
-            {getTextIn(m.name)}
+          <div key={`${label.code}-${year}`}>{label.code}</div>
+          <div key={`${getTextIn(label.name)}`} style={{ color: 'gray', fontWeight: 'normal' }}>
+            {getTextIn(label.name)}
           </div>
         </div>
       ),
       textTitle:
-        m.name === ''
-          ? `${m.code} ${enrollStatusIndex === 0 ? enrollStatusIndex + 1 : enrollStatusIndex}`
-          : `${m.code}-${getTextIn(m.name)}`,
-      headerProps: { title: `${m.code}, ${year}` },
-      cellProps: student => findProp(m, student),
+        label.name === ''
+          ? `${label.code} ${enrollStatusIndex === 0 ? enrollStatusIndex + 1 : enrollStatusIndex}`
+          : `${label.code}-${getTextIn(label.name)}`,
+      headerProps: { title: `${label.code}, ${year}` },
+      cellProps: student => findProp(label, student),
       getRowVal: student => {
-        if (m.code.includes('Criteria'))
+        if (label.code.includes('Criteria')) {
           return student.criteriaProgress[year] ? student.criteriaProgress[year].totalSatisfied : 0
-        if (m.code.includes('Enrollment')) return getEnrollmentSortingValue(student, enrollStatusIndex)
-        return findCsvText(student, m.code, year, criteria)
+        }
+        if (label.code.includes('Enrollment')) {
+          return getEnrollmentSortingValue(student, enrollStatusIndex)
+        }
+        return findExcelText(label.code, criteria, student, year)
       },
       // the following is hackish, but enrollment col needs to use the getRowVal for sorting
       // and getRowExportVal can't be defined for all the other columns to not override their getRowVal
-      getRowExportVal: !m.code.includes('Enrollment')
+      getRowExportVal: !label.code.includes('Enrollment')
         ? undefined
         : student => getSemesterEnrollmentVal(student, enrollStatusIndex),
       getRowContent: student => {
-        if (m.code.includes('Criteria'))
+        if (label.code.includes('Criteria')) {
           return student.criteriaProgress[year] ? student.criteriaProgress[year].totalSatisfied : 0
-        if (m.code.includes('Enrollment')) return getSemesterEnrollmentContent(student, enrollStatusIndex)
-        return findRowContent(student, m.code, year, start, end, criteria)
+        }
+        if (label.code.includes('Enrollment')) {
+          return getSemesterEnrollmentContent(student, enrollStatusIndex)
+        }
+        return findRowContent(student, label.code, year, start, end, criteria)
       },
     }))
   }
-  const acaYearStart = moment()
+
+  const academicYearStart = moment()
     .subtract(months - 1, 'months')
     .startOf('month')
-  const acaYearEnd = moment()
+  const academicYearEnd = moment()
     .subtract(months - 12, 'months')
     .endOf('month')
 
@@ -288,8 +326,8 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
         children: createContent(
           labelCriteria[criteriaHeaders[0].label],
           criteriaHeaders[0].year,
-          acaYearStart,
-          acaYearEnd,
+          academicYearStart,
+          academicYearEnd,
           0
         ),
       },
@@ -301,8 +339,8 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
       },
     ]
     if (months > 12) {
-      const startAca2 = moment(acaYearStart).add(1, 'years')
-      const endAca2 = moment(acaYearEnd).add(1, 'years')
+      const academicYearStart2 = moment(academicYearStart).add(1, 'years')
+      const academicYearEnd2 = moment(academicYearEnd).add(1, 'years')
       columns.push(
         {
           key: criteriaHeaders[1].title,
@@ -315,8 +353,8 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
           children: createContent(
             labelCriteria[criteriaHeaders[1].label],
             criteriaHeaders[1].year,
-            startAca2,
-            endAca2,
+            academicYearStart2,
+            academicYearEnd2,
             1
           ),
         },
@@ -329,8 +367,8 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
       )
     }
     if (months > 24) {
-      const startAca3 = moment(acaYearStart).add(24, 'months')
-      const endAca3 = moment(acaYearEnd).add(24, 'months')
+      const academicYearStart3 = moment(academicYearStart).add(24, 'months')
+      const academicYearEnd3 = moment(academicYearEnd).add(24, 'months')
       columns.push(
         {
           key: criteriaHeaders[2].title,
@@ -343,8 +381,8 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
           children: createContent(
             labelCriteria[criteriaHeaders[2].label],
             criteriaHeaders[2].year,
-            startAca3,
-            endAca3,
+            academicYearStart3,
+            academicYearEnd3,
             2
           ),
         },
@@ -356,8 +394,8 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
         }
       )
     }
-    // Lääkkis and HammasLääkkis do not have separate bachelor programme.
-    // Eläinlääkkis do have separate bachelor and master programmes, but we like to see it as one.
+    // Lääkis and Hammaslääkis do not have a separate bachelor's programme.
+    // Eläinlääkis does have a separate bachelor and master programmes, but we like to see it as one.
     if (['MH30_001', 'MH30_003', 'KH90_001'].includes(programme)) {
       criteriaHeaders.push(
         { title: months < 48 ? 'Academic Year 4 (in progress)' : 'Academic Year 4', year: 'year4', label: 'yearFour' },
@@ -365,8 +403,8 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
         { title: months < 72 ? 'Academic Year 6 (in progress)' : 'Academic Year 6', year: 'year6', label: 'yearSix' }
       )
       if (months > 36) {
-        const startAca4 = moment(acaYearStart).add(3, 'years')
-        const endAca4 = moment(acaYearEnd).add(3, 'years')
+        const academicYearStart4 = moment(academicYearStart).add(3, 'years')
+        const academicYearEnd4 = moment(academicYearEnd).add(3, 'years')
         columns.push(
           {
             key: criteriaHeaders[3].title,
@@ -379,8 +417,8 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
             children: createContent(
               labelCriteria[criteriaHeaders[3].label],
               criteriaHeaders[3].year,
-              startAca4,
-              endAca4,
+              academicYearStart4,
+              academicYearEnd4,
               3
             ),
           },
@@ -394,8 +432,8 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
       }
 
       if (months > 48) {
-        const startAca5 = moment(acaYearStart).add(4, 'years')
-        const endAca5 = moment(acaYearEnd).add(4, 'years')
+        const academicYearStart5 = moment(academicYearStart).add(4, 'years')
+        const academicYearEnd5 = moment(academicYearEnd).add(4, 'years')
         columns.push(
           {
             key: criteriaHeaders[4].title,
@@ -408,8 +446,8 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
             children: createContent(
               labelCriteria[criteriaHeaders[4].label],
               criteriaHeaders[4].year,
-              startAca5,
-              endAca5,
+              academicYearStart5,
+              academicYearEnd5,
               4
             ),
           },
@@ -422,8 +460,8 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
         )
       }
       if (months > 60) {
-        const startAca6 = moment(acaYearStart).add(5, 'years')
-        const endAca6 = moment(acaYearEnd).add(5, 'years')
+        const academicYearStart6 = moment(academicYearStart).add(5, 'years')
+        const academicYearEnd6 = moment(academicYearEnd).add(5, 'years')
         columns.push(
           {
             key: criteriaHeaders[5].title,
@@ -436,8 +474,8 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
             children: createContent(
               labelCriteria[criteriaHeaders[5].label],
               criteriaHeaders[5].year,
-              startAca6,
-              endAca6,
+              academicYearStart6,
+              academicYearEnd6,
               5
             ),
           },
@@ -450,7 +488,6 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
         )
       }
     }
-
     columns.push({
       key: 'hiddenFiles',
       title: '',
@@ -482,13 +519,14 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
     })
 
     return columns
-  }, [criteria, students, mandatoryCourses, getTextIn, namesVisible])
+  }, [criteria, students, curriculum, getTextIn, namesVisible])
 
   const isCriteriaSet =
     criteria && Object.keys(criteria.courses).some(yearCourses => criteria.courses[yearCourses].length > 0)
   const data = useMemo(() => {
     return students
   }, [students])
+
   return (
     <>
       {!isStudyGuidanceGroupProgramme && (
