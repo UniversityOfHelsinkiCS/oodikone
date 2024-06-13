@@ -300,17 +300,12 @@ const mapCodesToIds = data => {
 
   for (const prog of progs) {
     if (keys.includes(prog)) {
-      data[prog].progId = codes[prog].toUpperCase()
+      data[prog].progId = codes[prog]
     }
   }
 }
 
-const getId = code => {
-  if (Object.keys(codes).includes(code)) {
-    return codes[code].toUpperCase()
-  }
-  return ''
-}
+const getId = code => codes[code] ?? ''
 
 const getGoal = programme => {
   if (!programme) return 0

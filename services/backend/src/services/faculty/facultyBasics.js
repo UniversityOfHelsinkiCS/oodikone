@@ -109,7 +109,7 @@ const getFacultyStarters = async (
       let programmeId = programme
 
       if (keys.includes(programme)) {
-        programmeId = codes[programme].toUpperCase()
+        programmeId = codes[programme]
       }
 
       if (programmeFilter === 'ALL_PROGRAMMES' || isNewProgramme(programme)) {
@@ -178,7 +178,7 @@ const getFacultyGraduates = async (
       let programmeId = programme
 
       if (keys.includes(programme)) {
-        programmeId = codes[programme].toUpperCase()
+        programmeId = codes[programme]
       }
 
       if (programmeFilter === 'ALL_PROGRAMMES' || isNewProgramme(programme)) {

@@ -143,10 +143,7 @@ const mapCodesToIds = data => {
   const keys = Object.keys(codes)
   for (const prog of data) {
     if (keys.includes(prog.code)) {
-      prog.progId = codes[prog.code].toUpperCase()
-      if (prog.code === 'T923103' && !prog.progId.includes('-DP')) {
-        prog.progId += '-DP'
-      }
+      prog.progId = codes[prog.code]
     } else {
       prog.progId = prog.code
     }
