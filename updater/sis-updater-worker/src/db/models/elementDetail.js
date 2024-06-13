@@ -18,6 +18,9 @@ ElementDetail.init(
     degree_programme_type_urn: {
       type: STRING,
     },
+    education_type: {
+      type: STRING,
+    },
   },
   {
     sequelize: dbConnections.sequelize,
