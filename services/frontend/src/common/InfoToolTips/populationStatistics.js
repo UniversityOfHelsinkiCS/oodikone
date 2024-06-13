@@ -6,11 +6,11 @@ export const populationStatisticsToolTips = {
 
   Oletusarvoisia asetuksia voi muuttaa ”Advanced settings”-kohdassa.
 
-  **Starting semesters:** Jos haluaa tarkastella vain syyslukukaudella (1.8.–31.12.) tai kevätlukukaudella (1.1.–31.7.) aloittaneita, haluttu ajanjakso valitaan tästä.
+  **Starting semesters**: Jos haluaa tarkastella vain syyslukukaudella (1.8.–31.12.) tai kevätlukukaudella (1.1.–31.7.) aloittaneita, haluttu ajanjakso valitaan tästä.
 
-  **Include:** Oletusarvoisesti pois suodatetut ryhmät voi sisällyttää mukaan ja klikkaamalla ”Fetch class with new settings”-painiketta.`,
+  **Include**: Oletusarvoisesti pois suodatetut ryhmät voi sisällyttää mukaan ja klikkaamalla ”Fetch class with new settings”-painiketta.`,
   CreditAccumulation: `**Credit accumulation**
-  
+
   Opiskelijoiden kumulatiiviset opintopistekertymät opiskelijakohtaisina kuvaajina.
   Kun hiiren vie kuvaajien päälle, saa näkyviin jokaista kuvaajaa vastaavan opiskelijanumeron.
   Opiskelijanumeron yhteydessä olevaa ympyrää klikkaamalla siirtyy ”student statistics” puolelle ja näkee valitun opiskelijan opintotiedot.
@@ -39,7 +39,7 @@ export const populationStatisticsToolTips = {
   + **Standard deviation** (keskihajonta) kuvaa vaihtelua opintopistemäärissä. Karkeasti, mitä suurempi keskihajonta, sitä enemmän opintopistemäärissä on vaihtelua opiskelijoiden kesken.
   + **Minimum** ja **Maximum** kertovat pienimmän ja suurimman opintopistemäärän, jotka jollain opiskelijoilla kyseisessä populaatiossa on.
 
-  Mikäli valintatapatieto kyseiselle populaatiolle on saatavissa, näytetään myös samat statistiikat per valintatapa.  
+  Mikäli valintatapatieto kyseiselle populaatiolle on saatavissa, näytetään myös samat statistiikat per valintatapa.
 
   **Distribution development**
 
@@ -52,18 +52,18 @@ export const populationStatisticsToolTips = {
   CoursesOfClass: `**Courses of class**
 
   Tämä taulukko sisältää näkyvissä olevien opiskelijoiden kaikki kurssisuoritukset.
-  
+
   Opiskelijat on mahdollista suodattaa kurssin perusteella käyttämällä kurssirivin vasemmassa laidassa olevaa suodatinpainiketta.
   Kurssisuodatin aukeaa ikkunan vasempaan laitaan ja tarjoaa lisää vaihtoehtoja suodatukseen. Voit myös valita monta kurssia kerralla suodattimeen.
-  
+
   Klikkaamalla kurssin nimen vieressä olevaa sinistä nuolta, siirryt ko. kurssin **Course statistics** -näkymään.
 
-  Lisäksi kurssin nimi **name** ja koodisarakkeissa **code** suodatinkuvaketta  klikkaamalla tulee esiin hakukentät suodattamista varten.
+  Lisäksi kurssin nimi **name** ja koodisarakkeissa **code** suodatinkuvaketta klikkaamalla tulee esiin hakukentät suodattamista varten.
   Suodattimet saa tyhjennettyä painamalla kentän vieressä olevaa ruksia tai valitsemall valikon alaosasta **Reset column filter**.
 
-  **Huom! Nämä suodattimet vaikuttavat vain tähän taulukkoon, eivät koko populatioon.**  
+  **Huom! Nämä suodattimet vaikuttavat vain tähän taulukkoon, eivät koko populatioon.**
   Choose curriculum -valinta vaikuttaa siihen, minkä opetussuunnitelmakauden mukaiset kurssit näytetään taulukossa.
-  
+
   **Taulukot**
   - **Pass/fail** - näkymä sisältää kurssisuoritukset, hylätyt, yritykset sekä ilmoittautumistiedot. Huom.! ilmoittautumistiedot ovat saatavilla vain Sisun käyttöönoton jälkeiseltä ajalta.
     - **Total students** - sarake näyttää kaikkien opiskelijoiden määrän, mukaanlukien ilmoittautuneet ilman arvosanaa.
@@ -75,41 +75,41 @@ export const populationStatisticsToolTips = {
   CoursesOfPopulation: `**Courses of Population**
 
   Tämä taulukko sisältää näkyvissä olevien opiskelijoiden kaikki kurssisuoritukset.
-  
+
   Opiskelijat on mahdollista suodattaa kurssin perusteella käyttämällä kurssirivin vasemmassa laidassa olevaa suodatinpainiketta.
   Kurssisuodatin aukeaa ikkunan vasempaan laitaan ja tarjoaa lisää vaihtoehtoja suodatukseen. Voit myös valita monta kurssia kerralla suodattimeen.
-  
+
   Klikkaamalla kurssin nimen vieressä olevaa sinistä nuolta, siirryt ko. kurssin **Course statistics** -näkymään.
-  
+
   Taulukon tietoja voi suodattaa antamalla opiskelijoiden vähimmäismäärän kurssilla kenttään *Limit to courses where student number at least*.
-  Lisäksi kurssin nimi **name** ja koodisarakkeissa **code** suodatinkuvaketta  klikkaamalla tulee esiin hakukentät suodattamista varten.
+  Lisäksi kurssin nimi **name** ja koodisarakkeissa **code** suodatinkuvaketta klikkaamalla tulee esiin hakukentät suodattamista varten.
   Suodattimet saa tyhjennettyä painamalla kentän vieressä olevaa ruksia tai valitsemall valikon alaosasta **Reset column filter**.
-  
+
   **Huom! Nämä suodattimet vaikuttavat vain tähän taulukkoon, eivät koko populatioon.**
-  
+
   **Taulukot**
   - **Pass/fail** - näkymä sisältää kurssisuoritukset, hylätyt, yritykset sekä ilmoittautumistiedot. Huom.! ilmoittautumistiedot ovat saatavilla vain Sisun käyttöönoton jälkeiseltä ajalta.
-  - **grades** - arvosanajakauma.
+  - **Grades** - arvosanajakauma.
   `,
   Search: `Tässä osiossa voi tarkastella koulutusohjelmakohtaisia populaatioita sisäänottolukuvuoden mukaisesti, vuosikurssi kerrallaan.
   Uudet koulutusohjelmat ovat pääsääntöisesti alkaneet 1.8.2017, joten oletusvalinnat näyttävät tiedot tästä päivämäärästä lähtien.
 
-  - **Class of:** lukuvuosi, jolloin opiskelija on ilmoittautunut ensimmäisen kerran (läsnä- tai poissaolevaksi) ohjelmaan. Ilmoittautumisen opinto-oikeus voi olla ensi- tai toissijainen.
-  - **Study programme:** haluttu koulutusohjelma. Kiinnitetyt (suosikeiksi valitut) ohjelmat näkyvät ensimmäisinä valikossa. Kiinnitys on mahdollista koulutusohjelmalistauksessa.
+  - **Class of**: lukuvuosi, jolloin opiskelija on ilmoittautunut ensimmäisen kerran (läsnä- tai poissaolevaksi) ohjelmaan. Ilmoittautumisen opinto-oikeus voi olla ensi- tai toissijainen.
+  - **Study programme**: haluttu koulutusohjelma. Kiinnitetyt (suosikeiksi valitut) ohjelmat näkyvät ensimmäisinä valikossa. Kiinnitys on mahdollista koulutusohjelmalistauksessa.
   `,
   StudentsGuidanceGroups: `**Students**
 
-  Taulukko näyttää oletusarvoisesti vain opiskelijanumerot, mutta harmaata liukukytkintä klikkaamalla saa näkyviin opiskelijoiden nimet.
-  
-  Klikkaamalla opiskelijanumeron vieressä olevaa sinistä henkilösymbolia, siirryt kyseisen opiskelijan "student statistic" -näkymään.
-  
-  Klikkaamalla "Sisu"-nuolta, siirryt tarkastelemaan opiskelijan tietoja Sisu-järjestelmässä.
+  Taulukko näyttää oletusarvoisesti vain opiskelijanumerot. Valitsemalla "Show student names" saat näkyviin myös opiskelijoiden nimet.
+
+  Klikkaamalla opiskelijanumeron vieressä olevaa sinistä henkilösymbolia, siirryt kyseisen opiskelijan "Student statistics" -näkymään.
+
+  Klikkaamalla "Sisu"-kuvaketta, siirryt tarkastelemaan opiskelijan tietoja Sisu-järjestelmässä.
 
   **General**
-  
+
   Valikoituja selvennyksiä: 
   - **Credits**
-    - **All**  listaa opiskelijan suoritetut opintopisteet valitun tarkastelujakson  ajalta.
+    - **All** listaa opiskelijan suoritetut opintopisteet valitun tarkastelujakson ajalta
     - **Since** listaa opiskelijan suoritetut opintopisteet määritellystä ajankohdasta alkaen
   - **Start of studyright**: Opiskelijan valittuun ohjelmaan liittyvän opinto-oikeuden alkupäivä
   - **Study programme**: Näyttää opiskelijan uusimman opinto-oikeuden. Opiskelijan kaikki opinto-oikeudet näkyvät uusimmasta vanhimpaan Excel-tiedostossa, sekä laittamalla hiiri solun päälle.
@@ -118,20 +118,20 @@ export const populationStatisticsToolTips = {
   `,
   StudentsClass: `**Students**
 
-  Taulukko näyttää oletusarvoisesti vain opiskelijanumerot, mutta harmaata liukukytkintä klikkaamalla saa näkyviin opiskelijoiden nimet.
-  
-  Klikkaamalla opiskelijanumeron vieressä olevaa sinistä henkilösymbolia, siirryt kyseisen opiskelijan "student statistic" -näkymään.
-  
-  Klikkaamalla "Sisu"-nuolta, siirryt tarkastelemaan opiskelijan tietoja Sisu-järjestelmässä.
+  Taulukko näyttää oletusarvoisesti vain opiskelijanumerot. Valitsemalla "Show student names" saat näkyviin myös opiskelijoiden nimet.
+
+  Klikkaamalla opiskelijanumeron vieressä olevaa sinistä henkilösymbolia, siirryt kyseisen opiskelijan "Student statistics" -näkymään.
+
+  Klikkaamalla "Sisu"-kuvaketta, siirryt tarkastelemaan opiskelijan tietoja Sisu-järjestelmässä.
 
   **General**
-  
+
   Valikoituja selvennyksiä: 
   - **Credits**
-    - **All**  listaa opiskelijan suoritetut opintopisteet valitun tarkastelujakson  ajalta
+    - **All** listaa opiskelijan suoritetut opintopisteet valitun tarkastelujakson ajalta
     - **HOPS** listaa opiskelijan kaikki HOPSiin sijoitut opintopisteet (myös aiemmat suoritukset, eli ne jotka tehty ennen valittuun tarkastelujaksoon ja populaatioon kuulumista)
     - **Since start in programme** listaa opiskelijan ohjelmassa aloittamisen jälkeen suoritut opintopisteet
-  - **Transferred from:** opiskelijan vanha koulutusohjelma, josta opiskelija on siirtynyt uuteen.
+  - **Transferred from**: Owpiskelijan vanha koulutusohjelma, josta opiskelija on siirtynyt uuteen.
   - **Start of studyright**: Opiskelijan valittuun ohjelmaan liittyvän opinto-oikeuden alkupäivä
   - **Started in programme**: Opiskelijan ko. ohjelmassa aloituspäivämäärä. Kandi+maisteriopiskelijoille kandiksi valmistumispäivämäärä +1
   - **Semesters present**: Näyttää opiskelijan ilmoittautumiset lukukausittain. Laita hiiri solun yläpuolelle nähdäksesi tekstimuotoisen selityksen ilmoittautumisista.
@@ -147,13 +147,18 @@ export const populationStatisticsToolTips = {
       - _ = Ei ilmoittautumista
 
   **Courses**
-  
-  Tällä välilehdellä näkyy, mitä pakollisiksi määriteltyjä kursseja opiskelija on suorittanut.
 
-  
+  Tällä välilehdellä näkyy, mitä opetussuunnitelmaan kuuluvia kursseja opiskelija on suorittanut. Valitsemalla "Show substitutions" otetaan myös huomioon arvosanat vastaavista kursseista.
+
+  Merkkien selitykset:
+  - ✓ Vihreä tarkastusmerkki = Opiskelija on suorittanut kurssin hyväksytysti
+  - ✓ Harmaa tarkastusmerkki = Opiskelija on suorittanut kurssin vastaavalla kurssikoodilla
+  - — Keltainen viiva = Opiskelijalla on alle 6kk vanha ilmoittautuminen kurssille
+  - — Harmaa viiva = Opiskelijalla on yli 6kk vanha ilmoittautuminen kurssille
+
   **Tags**
-  
-  Opiskelijoille voi luoda tag:eja ryhmittelyä varten kohdassa "Study Program" > "Overview" > haluttu koulutusohjelma.
+
+  Opiskelijoille voi luoda tageja ryhmittelyä varten kohdassa "Study Program" > "Overview" > haluttu koulutusohjelma.
 
   **Progress**
 
@@ -161,25 +166,21 @@ export const populationStatisticsToolTips = {
   Tällä välilehdellä näkyy opintojen kehitys annettujen kriteerien mukaan akateemista vuotta kohti. Kurssi merkataan tehdyksi, jos sillä on suoritusmerkintä tai hyväksiluku 
   minä tahansa lukuvuonna. Opintopistekriteerin täyttämiseen vaaditaan, että opintopisteet on suoritettu kyseisen akateemisen vuoden aikana.
 
-
   **Huomaa**, että klikkaamalla taulukon yläreunassa olevaa kolme pistettä sisältävää kuvaketta, voit ladata itsellesi Excel tiedoston. Tiedosto sisältää lisäksi muita sarakkeita, kuten läsnäolon lukukausittain sekä yhteystiedot.
-  
-  ***Yhteystietojen käyttö on kuitenkin sallittua vain opintoneuvontaan liittyvissä asiossa.*** 
-  
+
+  **Yhteystietojen käyttö on kuitenkin sallittua vain opintoneuvontaan liittyvissä asiossa.**
   `,
   StudentsCustom: `**Students**
 
   Taulukko näyttää oletusarvoisesti vain opiskelijanumerot, mutta harmaata liukukytkintä klikkaamalla saa näkyviin opiskelijoiden nimet.
-  
+
   Klikkaamalla opiskelijanumeron vieressä olevaa sinistä henkilösymbolia, siirryt kyseisen opiskelijan "student statistic" -näkymään.
-  
+
   Klikkaamalla "Sisu"-nuolta, siirryt tarkastelemaan opiskelijan tietoja Sisu-järjestelmässä.
-  
+
   **All credits** listaa opiskelijan kaikki opintopisteet (myös aiemmat suoritukset, eli ne jotka tehty ennen valittuun tarkastelujaksoon ja populaatioon kuulumista)
 
-
   **Programme**-sarake näyttää opiskelijan uusimman opinto-oikeuden. Jos opiskelijalla on opinto-oikeuksia muihinkin koulutusohjelmiin, ne näkyvät aikajärjestyksessä uusimmasta vanhimpaan Excel-tiedostossa, sekä laittamalla hiiri koulutusohjelman päälle.
-
   `,
   ProgrammeDistributionCoursePopulation: 'Näyttää sen koulutusohjelman, jossa opiskelija oli suorittaessaan kurssin',
   GradeDistributionCoursePopulation: 'Näyttää korkeimman arvosanan, jonka opiskelija on saanut valitulla aikavälillä.',
