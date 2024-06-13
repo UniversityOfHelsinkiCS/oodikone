@@ -26,19 +26,20 @@ const getPassedStudents = (curriculum, populationCourses, studyGuidanceCourses) 
       .map(course => course.code),
   ]
 
-  const popCourses = populationCourses || studyGuidanceCourses
+  const { coursestatistics } = populationCourses || studyGuidanceCourses
 
-  if (!popCourses.coursestatistics) {
+  if (!coursestatistics) {
     return {}
   }
 
-  const courseStats = popCourses.coursestatistics
-  const passedStudents = courseCodes.reduce((passed, code) => {
-    const foundCourse = !!courseStats.find(course => course.course.code === code)
-    const passedStudents = foundCourse
-      ? Object.keys(courseStats.find(course => course.course.code === code).students.passed)
-      : []
-    passed[code] = passedStudents
+  const passedStudents = courseCodes.reduce((passed, courseCode) => {
+    passed[courseCode] = []
+    const foundCourse = !!coursestatistics.find(course => course.course.code === courseCode)
+    if (foundCourse) {
+      passed[courseCode] = Object.keys(
+        coursestatistics.find(course => course.course.code === courseCode).students.passed
+      )
+    }
     return passed
   }, {})
 
