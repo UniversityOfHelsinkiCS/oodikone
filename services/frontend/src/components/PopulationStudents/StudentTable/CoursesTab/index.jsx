@@ -147,17 +147,16 @@ const CoursesTable = ({ curriculum, showSubstitutions, students, studyGuidanceCo
       { visibleLabels: new Set(), visibleCourseCodes: new Set() }
     )
 
+    const getLabel = course => (course.label ? course.label.label : 'no-label')
+
     const getCourseTitle = course => {
       return (
         <div
-          key={`${course.code}-${course.label ? course.label.label : 'no-label'}`}
+          key={`${course.code}-${getLabel(course)}`}
           style={{ maxWidth: '15em', overflow: 'hidden', whiteSpace: 'normal', width: 'max-content' }}
         >
-          <div key={`${course.label ? course.label.label : 'no-label'}-${course.code}`}>{course.code}</div>
-          <div
-            key={`${course.label ? course.label.label : 'no-label'}-${getTextIn(course.name)}`}
-            style={{ color: 'gray', fontWeight: 'normal' }}
-          >
+          <div key={`${getLabel(course)}-${course.code}`}>{course.code}</div>
+          <div key={`${getLabel(course)}-${getTextIn(course.name)}`} style={{ color: 'gray', fontWeight: 'normal' }}>
             {getTextIn(course.name)}
           </div>
         </div>
@@ -252,7 +251,7 @@ const CoursesTable = ({ curriculum, showSubstitutions, students, studyGuidanceCo
           ])
             .filter(course => visibleCourseCodes.has(course.code))
             .map(course => ({
-              key: `${course.label ? course.label.label : 'no-label'}-${course.code}`,
+              key: `${getLabel(course)}-${course.code}`,
               title: getCourseTitle(course),
               textTitle: course.code,
               vertical: true,
