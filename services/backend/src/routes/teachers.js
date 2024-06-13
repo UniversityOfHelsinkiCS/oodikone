@@ -3,7 +3,7 @@ const router = require('express').Router()
 const { isFaculty, providersOfFaculty } = require('../services/organisations')
 const teachers = require('../services/teachers')
 const topteachers = require('../services/topteachers')
-const { getFullStudyProgrammeRights, mapToProviders } = require('../util/utils')
+const { getFullStudyProgrammeRights, mapToProviders, splitByEmptySpace } = require('../util/utils')
 
 router.get('/', async (req, res) => {
   const { searchTerm } = req.query
@@ -11,7 +11,7 @@ router.get('/', async (req, res) => {
 
   const trimmedSearchTerm = searchTerm.trim()
   if (
-    !teachers.splitByEmptySpace(trimmedSearchTerm).find(t => t.length >= 4) ||
+    !splitByEmptySpace(trimmedSearchTerm).find(t => t.length >= 4) ||
     (Number(trimmedSearchTerm) && trimmedSearchTerm.length < 6)
   ) {
     return res.status(400).json({ error: 'invalid searchTerm' })

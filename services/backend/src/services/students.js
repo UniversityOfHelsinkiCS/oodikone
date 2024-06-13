@@ -17,6 +17,7 @@ const {
 } = require('../models')
 const { TagStudent, Tag } = require('../models/models_kone')
 const logger = require('../util/logger')
+const { splitByEmptySpace } = require('../util/utils')
 
 const createStudent = student => Student.create(student)
 
@@ -300,10 +301,6 @@ const withId = async id => {
   }
 }
 
-const removeEmptySpaces = str => str.replace(/\s\s+/g, ' ')
-
-const splitByEmptySpace = str => removeEmptySpaces(str).split(' ')
-
 const likefy = term => `%${term}%`
 
 const columnLike = (column, term) => ({
@@ -444,6 +441,5 @@ module.exports = {
   filterStudentnumbersByAccessrights,
   findByCourseAndSemesters,
   findByTag,
-  splitByEmptySpace,
   getStudentnumbersByElementdetails,
 }

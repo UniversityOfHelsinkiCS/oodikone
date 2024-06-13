@@ -2,7 +2,7 @@ const router = require('express').Router()
 
 const Student = require('../services/students')
 const { ApplicationError } = require('../util/customErrors')
-const { hasFullAccessToStudentData } = require('../util/utils')
+const { hasFullAccessToStudentData, splitByEmptySpace } = require('../util/utils')
 
 const filterStudentTags = (student, userId) => {
   return {
@@ -21,7 +21,7 @@ router.get('/', async (req, res) => {
 
   if (
     trimmedSearchTerm &&
-    !Student.splitByEmptySpace(trimmedSearchTerm)
+    !splitByEmptySpace(trimmedSearchTerm)
       .slice(0, 2)
       .find(t => t.length > 3)
   ) {

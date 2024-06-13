@@ -63,6 +63,8 @@ const getFullStudyProgrammeRights = programmeRights =>
 
 const hasFullAccessToStudentData = roles => roles?.some(role => ['admin', 'fullSisuAccess'].includes(role))
 
+const splitByEmptySpace = str => str.split(/\s+/g)
+
 module.exports = {
   mapToProviders,
   sortMainCode,
@@ -70,4 +72,5 @@ module.exports = {
   createLocaleComparator,
   getFullStudyProgrammeRights,
   hasFullAccessToStudentData,
+  splitByEmptySpace,
 }

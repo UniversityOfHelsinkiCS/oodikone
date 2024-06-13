@@ -153,37 +153,6 @@ const getCorrectStartDate = studyright => {
     : studyright.startdate
 }
 
-const isMajorStudentCredit = (studyrights, attainmentDate, code) =>
-  studyrights.some(studyright => {
-    if (!studyright) return false
-    if (studyright.code !== code) return false
-    if ([6, 7, 9, 13, 14, 16, 18, 22, 23, 34, 99].includes(studyright.extentcode)) return false
-    const startDate = getCorrectStartDate(studyright)
-    if (!studyright.graduated) return new Date(attainmentDate) >= new Date(startDate)
-    return new Date(attainmentDate) >= new Date(startDate) && new Date(attainmentDate) <= new Date(studyright.enddate)
-  })
-
-const isNonMajorCredit = (studyrights, attainmentDate) => {
-  return studyrights.some(studyright => {
-    if (!studyright) return false
-    if ([6, 7, 9, 13, 14, 16, 18, 22, 23, 34, 99].includes(studyright.extentcode)) return false
-    const startDate = getCorrectStartDate(studyright)
-    if (!studyright.graduated) return new Date(attainmentDate) >= new Date(startDate)
-    return new Date(attainmentDate) >= new Date(startDate) && new Date(attainmentDate) <= new Date(studyright.enddate)
-  })
-}
-
-const isSpecialGroupCredit = (studyrights, attainment_date, transfers) =>
-  studyrights.some(studyright => {
-    if (!studyright) return true // If there is no studyright matching the credit, is not a major student credit
-    const startDate = getCorrectStartDate(studyright)
-    if (new Date(startDate) > new Date(attainment_date)) return true // Credits before the studyright started are not major student credits
-    if (studyright.enddate && new Date(attainment_date) > new Date(studyright.enddate)) return true // Credits after studyright are not major student credits
-    if ([6, 7, 9, 13, 14, 16, 18, 22, 23, 34, 99].includes(studyright.extentcode)) return true // Excludes non-degree studyrights and exchange students
-    if (transfers.includes(studyright.studyrightid)) return true // Excludes both transfers in and out of the programme
-    return false
-  })
-
 const getMedian = values => {
   if (values.length === 0) return 0
   values.sort((a, b) => a - b)
@@ -340,8 +309,6 @@ module.exports = {
   getYearsArray,
   getYearsObject,
   getStatsBasis,
-  isMajorStudentCredit,
-  isSpecialGroupCredit,
   getMedian,
   defineYear,
   getStartDate,
@@ -352,7 +319,6 @@ module.exports = {
   getPercentage,
   getCreditThresholds,
   tableTitles,
-  isNonMajorCredit,
   mapCodesToIds,
   getId,
   getGoal,
