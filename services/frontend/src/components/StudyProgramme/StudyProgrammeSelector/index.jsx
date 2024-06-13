@@ -115,11 +115,21 @@ export const StudyProgrammeSelector = ({ selected }) => {
         progId: `${programme.progId} - ${secondProgramme[0]?.progId}`,
       })
     }
-    if (programme.code.includes('KH')) {
+    console.log("codes", programme.code, programme.degree_programme_type_urn)
+    /*if (programme.code.includes('KH')) {
       bachelorProgrammes.push(programme)
     } else if (programme.code.includes('MH')) {
       masterProgrammes.push(programme)
     } else if (/^(T)[0-9]{6}$/.test(programme.code)) {
+      doctoralProgrammes.push(programme)
+    } else {
+      otherProgrammes.push(programme)
+    }*/
+    if (programme.degree_programme_type_urn && programme.degree_programme_type_urn.includes('kandi')) {
+      bachelorProgrammes.push(programme)
+    } else if (programme.degree_programme_type_urn && programme.degree_programme_type_urn.includes('master')) {
+      masterProgrammes.push(programme)
+    } else if (programme.degree_programme_type_urn && programme.degree_programme_type_urn.includes('doctor')) {
       doctoralProgrammes.push(programme)
     } else {
       otherProgrammes.push(programme)

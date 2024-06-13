@@ -268,7 +268,7 @@ const degreeProgrammesOfFaculty = async facultyCode =>
   uniqBy(
     (
       await ProgrammeModule.findAll({
-        attributes: ['code', 'name'],
+        attributes: ['code', 'name', 'degree_programme_type_urn'],
         include: {
           model: Organization,
           where: {

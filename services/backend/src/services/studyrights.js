@@ -81,8 +81,9 @@ const calculateAssociationsFromDb = async (chunksize = 100000) => {
   while (offset <= total) {
     const elementgroups = await associatedStudyrightElements(offset, chunksize)
     elementgroups.forEach(fullgroup => {
+      console.log(fullgroup)
       const group = fullgroup.filter(isValid)
-      group.forEach(({ type, code, name, studyrightid, startdate, enddate }) => {
+      group.forEach(({ type, code, name, studyrightid, startdate, enddate, degree_programme_type_urn }) => {
         if (type === StudyRightType.STUDYTRACK) {
           associations.studyTracks[code] = associations.studyTracks[code] || {
             type,
@@ -96,6 +97,7 @@ const calculateAssociationsFromDb = async (chunksize = 100000) => {
             name,
             code,
             enrollmentStartYears: {},
+            degree_programme_type_urn,
             studytracks: [],
           }
           const momentstartdate = moment(startdate)
@@ -114,7 +116,7 @@ const calculateAssociationsFromDb = async (chunksize = 100000) => {
                 const momentenddate = moment(enddate)
                 const estartdate = moment(e.startdate)
                 const eenddate = moment(e.enddate)
-                // check that programme and studytrack time ranges overlap
+                // check that programme and studytrack time ranges overlap>
                 if (
                   (momentstartdate <= estartdate && momentenddate >= estartdate) ||
                   (momentstartdate <= eenddate && momentenddate >= eenddate) ||
