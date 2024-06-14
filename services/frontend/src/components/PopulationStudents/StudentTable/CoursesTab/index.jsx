@@ -406,6 +406,9 @@ const CoursesTable = ({ curriculum, showSubstitutions, students, studyGuidanceCo
             if (hasPassedCourse(student.studentNumber, course.code)) {
               ++total[course.code]
             }
+            if (showSubstitutions && hasPassedSubstitutionCourse(student.studentNumber, course.code)) {
+              ++total[course.code]
+            }
           })
         }
         return total
@@ -418,7 +421,15 @@ const CoursesTable = ({ curriculum, showSubstitutions, students, studyGuidanceCo
     )
 
     return [row(totals, { ignoreFilters: true, ignoreSorting: true }), ...students]
-  }, [students, curriculum, hasPassedCourse, passedStudents])
+  }, [
+    showSubstitutions,
+    curriculum,
+    students,
+    passedStudents,
+    passedSubstitutionStudents,
+    hasPassedCourse,
+    hasPassedSubstitutionCourse,
+  ])
 
   return (
     <Tab.Pane loading={pending}>
