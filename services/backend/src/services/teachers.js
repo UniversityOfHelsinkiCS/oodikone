@@ -1,6 +1,9 @@
 const { Op } = require('sequelize')
 
-const { Teacher, Credit, Course, Semester, Organization } = require('../models')
+const {
+  dbConnections: { sequelize },
+} = require('../database/connection')
+const { Teacher, Credit, Course, Semester } = require('../models')
 const { splitByEmptySpace } = require('../util/utils')
 
 const likefy = term => `%${term}%`
@@ -50,10 +53,8 @@ const findTeacherCredits = teacherid =>
   })
 
 const parseCreditInfo = credit => ({
-  studentnumber: credit.student_studentnumber,
   credits: credit.credits,
   transferred: credit.credittypecode === 9,
-  grade: credit.grade,
   passed: Credit.passed(credit) || Credit.improved(credit),
   failed: Credit.failed(credit),
   course: credit.course,
@@ -62,27 +63,16 @@ const parseCreditInfo = credit => ({
 
 const markCredit = (stats, passed, failed, credits, transferred) => {
   if (!stats) {
-    stats = {
-      passed: 0,
-      failed: 0,
-      credits: 0,
-      transferred: 0,
-    }
+    stats = { passed: 0, failed: 0, credits: 0, transferred: 0 }
   }
   if (passed) {
-    return {
-      ...stats,
-      credits: transferred ? stats.credits : stats.credits + credits,
-      passed: stats.passed + 1,
-      transferred: transferred ? stats.transferred + credits : stats.transferred,
-    }
+    stats.credits = transferred ? stats.credits : stats.credits + credits
+    stats.passed += 1
+    stats.transferred = transferred ? stats.transferred + credits : stats.transferred
+  } else if (failed) {
+    stats.failed += 1
   }
-  if (failed) {
-    return {
-      ...stats,
-      failed: stats.failed + 1,
-    }
-  }
+
   return stats
 }
 
@@ -159,117 +149,59 @@ const teacherStats = async teacherid => {
   }
 }
 
-const activeTeachers = async (providers, semestercodeStart, semestercodeEnd) => {
-  const teachers = await Teacher.findAll({
-    attributes: ['id'],
-    include: {
-      model: Credit,
-      attributes: [],
-      required: true,
-      include: [
-        {
-          model: Course,
-          attributes: [],
-          required: true,
-          include: {
-            model: Organization,
-            attributes: [],
-            required: true,
-            where: {
-              code: {
-                [Op.in]: providers,
-              },
-            },
-          },
-        },
-        {
-          model: Semester,
-          required: true,
-          attributes: [],
-          where: {
-            semestercode: {
-              [Op.between]: [semestercodeStart, semestercodeEnd],
-            },
-          },
-        },
-      ],
-    },
-    where: {
-      id: {
-        [Op.notLike]: '%hy-hlo-org%',
-      },
-    },
-  })
-  return teachers.map(({ id }) => id)
+const getActiveTeachers = async (providers, startSemester, endSemester) => {
+  const [result] = await sequelize.query(
+    `
+    SELECT DISTINCT teacher.id
+    FROM teacher
+    JOIN credit_teachers ON teacher.id = credit_teachers.teacher_id
+    JOIN credit ON credit.id = credit_teachers.credit_id
+    JOIN course ON credit.course_id = course.id
+    JOIN course_providers ON course.id = course_providers.coursecode
+    JOIN organization ON organization.id = course_providers.organizationcode
+    WHERE credit.semestercode BETWEEN :startSemester AND :endSemester
+      AND organization.code IN (:providers)
+      AND teacher.id NOT LIKE 'hy-hlo-org%'
+    `,
+    { replacements: { providers, startSemester, endSemester } }
+  )
+  return result.map(({ id }) => id)
 }
 
-const getCredits = (teacherIds, semestercodeStart, semestercodeEnd) =>
-  Teacher.findAll({
-    attributes: ['name', 'id'],
-    include: {
-      model: Credit,
-      attributes: ['credits', 'grade', 'id', 'student_studentnumber', 'credittypecode', 'isStudyModule'],
-      include: [
-        {
-          model: Course,
-          required: true,
-        },
-        {
-          model: Semester,
-          required: true,
-          attributes: ['semestercode', 'name', 'yearname', 'yearcode'],
-          where: {
-            semestercode: {
-              [Op.between]: [semestercodeStart, semestercodeEnd],
-            },
-          },
-        },
-      ],
-    },
-    where: {
-      id: {
-        [Op.in]: teacherIds,
-      },
-    },
-  })
-
-const calculateCreditStatistics = credits =>
-  credits.reduce(
-    (stats, credit) => {
-      if (isRegularCourse(credit)) {
-        const { passed, failed, credits, transferred } = parseCreditInfo(credit)
-        return markCredit(stats, passed, failed, credits, transferred)
-      }
-      return stats
-    },
-    {
-      passed: 0,
-      failed: 0,
-      credits: 0,
-      transferred: 0,
-    }
+const getTeacherCredits = async (teacherIds, startSemester, endSemester) => {
+  const [result] = await sequelize.query(
+    `
+    SELECT teacher.name,
+      teacher.id,
+      COUNT(CASE WHEN credit.credittypecode IN (4, 7, 9) THEN 1 END)::INTEGER AS passed,
+      COUNT(CASE WHEN credit.credittypecode = 10 THEN 1 END)::INTEGER AS failed,
+      SUM(CASE WHEN credit.credittypecode = 9 THEN credit.credits ELSE 0 END)::INTEGER AS transferred,
+      SUM(CASE WHEN credit.credittypecode IN (4, 7) THEN credit.credits ELSE 0 END)::INTEGER AS credits
+    FROM teacher
+    JOIN credit_teachers ON teacher.id = credit_teachers.teacher_id
+    JOIN credit ON credit.id = credit_teachers.credit_id
+    WHERE credit.semestercode BETWEEN :startSemester AND :endSemester
+      AND credit."isStudyModule" = false
+      AND teacher.id IN (:teacherIds)
+    GROUP BY teacher.name,
+      teacher.id
+    `,
+    { replacements: { teacherIds, startSemester, endSemester } }
   )
+  return result.reduce((acc, { name, id, passed, failed, transferred, credits }) => {
+    acc[id] = { name, id, stats: { passed, failed, transferred, credits } }
+    return acc
+  }, {})
+}
 
-const yearlyStatistics = async (providers, semestercodeStart, semestercodeEnd) => {
-  const ids = await activeTeachers(providers, semestercodeStart, semestercodeEnd)
-  const teachers = await getCredits(ids, semestercodeStart, semestercodeEnd)
-  const statistics = teachers.reduce(
-    (acc, teacher) => ({
-      ...acc,
-      [teacher.id]: {
-        name: teacher.name,
-        id: teacher.id,
-        stats: calculateCreditStatistics(teacher.credits),
-      },
-    }),
-    {}
-  )
-  return statistics
+const yearlyStatistics = async (providers, startSemester, endSemester) => {
+  const ids = await getActiveTeachers(providers, startSemester, endSemester)
+  const teacherCredits = await getTeacherCredits(ids, startSemester, endSemester)
+  return teacherCredits
 }
 
 module.exports = {
   bySearchTerm,
   teacherStats,
   yearlyStatistics,
-  getCredits,
 }

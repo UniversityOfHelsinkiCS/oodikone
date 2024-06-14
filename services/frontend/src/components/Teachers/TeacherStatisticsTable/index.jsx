@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { Link, useHistory } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { Segment, Icon, Item } from 'semantic-ui-react'
 
 import { calculatePercentage } from '@/common'
@@ -12,8 +12,6 @@ const createColumnWithTitle = title => ({
 })
 
 export const TeacherStatisticsTable = ({ statistics, variant }) => {
-  const history = useHistory()
-
   const columns = [
     {
       key: 'credits',
@@ -35,46 +33,37 @@ export const TeacherStatisticsTable = ({ statistics, variant }) => {
   switch (variant) {
     case 'leaderboard':
       columns.unshift({
-        key: 'name-and-link',
-        mergeHeader: true,
-        merge: true,
-        children: [
-          createColumnWithTitle('name'),
-          {
-            key: 'link',
-            getRowContent: row => (
-              <Item as={Link} onClick={() => history.push(`/teachers/${row.id}`)} to={`/teachers/${row.id}`}>
-                <Icon name="level up alternate" />
-              </Item>
-            ),
-          },
-        ],
+        key: 'name',
+        title: 'Name',
+        getRowVal: row => row.name,
+        getRowContent: row => (
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5em' }}>
+            {row.name}
+            <Item as={Link} target="_blank" to={`/teachers/${row.id}`}>
+              <Icon name="level up alternate" />
+            </Item>
+          </div>
+        ),
       })
       break
     case 'course':
       columns.unshift(createColumnWithTitle('course name'))
       columns.unshift({
-        key: 'code-and-link',
-        mergeHeader: true,
-        merge: true,
-        children: [
-          {
-            key: 'code',
-            title: 'Course code',
-            getRowVal: row => row.id,
-          },
-          {
-            key: 'link',
-            getRowContent: row => (
-              <Item
-                as={Link}
-                to={`/coursestatistics?combineSubstitutions=true&courseCodes=["${row.id}"]&separate=false`}
-              >
-                <Icon name="level up alternate" />
-              </Item>
-            ),
-          },
-        ],
+        key: 'code',
+        title: 'Course code',
+        getRowVal: row => row.id,
+        formatValue: code => (
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5em' }}>
+            {code}
+            <Item
+              as={Link}
+              target="_blank"
+              to={`/coursestatistics?combineSubstitutions=true&courseCodes=["${code}"]&separate=false`}
+            >
+              <Icon name="level up alternate" />
+            </Item>
+          </div>
+        ),
       })
       break
     case 'semester':
@@ -99,6 +88,12 @@ export const TeacherStatisticsTable = ({ statistics, variant }) => {
   return statistics.length === 0 ? (
     <Segment basic content="No statistics found for the given query." />
   ) : (
-    <SortableTable columns={columns} data={data} featureName="teacher_statistics" title="Teacher statistics" />
+    <SortableTable
+      columns={columns}
+      data={data}
+      defaultSort={['name', 'asc']}
+      featureName="teacher_statistics"
+      title="Teacher statistics"
+    />
   )
 }

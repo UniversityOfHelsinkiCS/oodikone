@@ -1,0 +1,13 @@
+.searchContainer,
+.searchContainer .contentSegment {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.searchInput {
+  width: 100%;
+  max-width: 600px;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}

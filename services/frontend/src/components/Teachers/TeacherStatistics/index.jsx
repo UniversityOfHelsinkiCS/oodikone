@@ -1,8 +1,7 @@
-import moment from 'moment'
 import { useState } from 'react'
 import { Form, Segment, Dropdown, Button, Message } from 'semantic-ui-react'
 
-import { createLocaleComparator, getFullStudyProgrammeRights } from '@/common'
+import { createLocaleComparator, getCurrentSemester, getFullStudyProgrammeRights } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProvidersQuery } from '@/redux/providers'
@@ -30,7 +29,7 @@ export const TeacherStatistics = () => {
         .map(({ semestercode, name }, index) => ({
           key: index,
           value: semestercode,
-          text: name.en,
+          text: getTextIn(name),
         }))
 
   const setStartSemester = (_, { value }) => {
@@ -40,26 +39,9 @@ export const TeacherStatistics = () => {
     }
   }
 
-  /*
-    Maps new studyright codes to providercodes. Just a wild guess on how the codes are structured....
-    The same logic as in backend's mapToProviders function.
-    --------
-    KH50_005
-    500-K005
-    --------
-    KH57_001
-    500-K001
-    --------
-    KH74_001
-    740-K001
-    --------
-    KH80_003
-    800-K003
-    --------
-    etcetc...
-    */
-  const mapToProviders = rights =>
-    rights.map(r => {
+  /** Maps study programme codes to provider codes, for example `KH50_005` -> `500-K005`. The same logic as in backend's mapToProviders function. */
+  const mapToProviders = programmeCodes =>
+    programmeCodes.map(r => {
       const isNumber = str => !Number.isNaN(Number(str))
       if (r.includes('_')) {
         const [left, right] = r.split('_')
@@ -104,6 +86,8 @@ export const TeacherStatistics = () => {
       }))
     : []
 
+  const currentSemesterCode = getCurrentSemester(semesterData?.semesters)?.semestercode
+
   const userProviders = mapToProviders(fullStudyProgrammeRights)
   const invalidQueryParams = provs.length === 0 || !semesterStart
   const providerOptions = isAdmin ? providers : providers.filter(provider => userProviders.includes(provider.code))
@@ -115,14 +99,7 @@ export const TeacherStatistics = () => {
       description: code,
     }))
     .sort(createLocaleComparator('text'))
-  const filteredOptions = semesters.filter(sem => {
-    const options =
-      moment(new Date()).diff(new Date(`${new Date().getFullYear()}-8-1`), 'days') > 0
-        ? Number(sem.text.replace(/[^0-9]/g, '')) <= new Date().getFullYear()
-        : Number(sem.text.replace(/[^0-9]/g, '')) < new Date().getFullYear() ||
-          (Number(sem.text.replace(/[^0-9]/g, '')) === new Date().getFullYear() && sem.text.includes('Spring')) // so that current spring is included
-    return options
-  })
+
   return (
     <div>
       <Message
@@ -137,7 +114,7 @@ export const TeacherStatistics = () => {
               label="Start semester"
               name="semesterStart"
               onChange={setStartSemester}
-              options={filteredOptions}
+              options={semesters.filter(sem => sem.value <= currentSemesterCode)}
               placeholder="Semester"
               search
               selectOnBlur={false}
@@ -150,7 +127,7 @@ export const TeacherStatistics = () => {
               label="End semester"
               name="semesterEnd"
               onChange={setEndSemester}
-              options={filteredOptions.filter(semester => semester.value >= semesterStart)}
+              options={semesters.filter(sem => sem.value <= currentSemesterCode && sem.value >= semesterStart)}
               placeholder="Semester"
               search
               selectOnBlur={false}

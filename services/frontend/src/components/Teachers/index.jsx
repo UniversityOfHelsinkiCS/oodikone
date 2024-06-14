@@ -21,13 +21,10 @@ const TeachersTabs = () => {
   const history = useHistory()
   const { isAdmin } = useGetAuthorizedUserQuery()
   const [tab, setTab] = useTabs('t_tab', 0, history)
-  const panes = isAdmin
-    ? [
-        pane('Statistics', TeacherStatistics, 'table'),
-        pane('Leaderboard', TeacherLeaderBoard, 'trophy'),
-        pane('Search', TeacherSearchTab, 'user'),
-      ]
-    : [pane('Statistics', TeacherStatistics, 'table')]
+  const panes = [pane('Statistics', TeacherStatistics, 'table')]
+  if (isAdmin) {
+    panes.push(pane('Leaderboard', TeacherLeaderBoard, 'trophy'), pane('Search', TeacherSearchTab, 'user'))
+  }
 
   return (
     <Tab
