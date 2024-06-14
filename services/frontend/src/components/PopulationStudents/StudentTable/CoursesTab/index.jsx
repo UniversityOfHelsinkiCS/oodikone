@@ -12,12 +12,8 @@ import { SortableTable, row } from '@/components/SortableTable'
 import { useStudentNameVisibility } from '@/components/StudentNameVisibilityToggle'
 import { useGetStudyGuidanceGroupPopulationCoursesQuery } from '@/redux/studyGuidanceGroups'
 
-const getPassedStudents = (curriculum, populationCourses, studyGuidanceCourses) => {
-  if (!curriculum || !curriculum.defaultProgrammeCourses || (!populationCourses && !studyGuidanceCourses)) {
-    return {}
-  }
-
-  const courseCodes = [
+const getCourseCodes = curriculum => {
+  return [
     ...curriculum.defaultProgrammeCourses
       .filter(course => course.visible && course.visible.visibility)
       .map(course => course.code),
@@ -25,21 +21,60 @@ const getPassedStudents = (curriculum, populationCourses, studyGuidanceCourses) 
       .filter(course => course.visible && course.visible.visibility)
       .map(course => course.code),
   ]
+}
+
+const getPassedStudents = (curriculum, populationCourses, studyGuidanceCourses) => {
+  if (!curriculum || !curriculum.defaultProgrammeCourses || (!populationCourses && !studyGuidanceCourses)) {
+    return {}
+  }
+
+  const courseCodes = getCourseCodes(curriculum)
 
   const { coursestatistics } = populationCourses || studyGuidanceCourses
-
   if (!coursestatistics) {
     return {}
   }
 
   const passedStudents = courseCodes.reduce((passed, courseCode) => {
     passed[courseCode] = []
-    const foundCourse = !!coursestatistics.find(course => course.course.code === courseCode)
-    if (foundCourse) {
-      passed[courseCode] = Object.keys(
-        coursestatistics.find(course => course.course.code === courseCode).students.passed
-      )
+    const course = coursestatistics.find(course => course.course.code === courseCode)
+    if (course) {
+      passed[courseCode] = Object.keys(course.students.passed)
     }
+    return passed
+  }, {})
+
+  return passedStudents
+}
+
+const getPassedSubstitutionStudents = (curriculum, populationCourses, studyGuidanceCourses) => {
+  if (!curriculum || !curriculum.defaultProgrammeCourses || (!populationCourses && !studyGuidanceCourses)) {
+    return {}
+  }
+
+  const courseCodes = getCourseCodes(curriculum)
+
+  const { coursestatistics } = populationCourses || studyGuidanceCourses
+  if (!coursestatistics) {
+    return {}
+  }
+
+  const passedStudents = courseCodes.reduce((passed, courseCode) => {
+    const course = coursestatistics.find(course => course.course.code === courseCode)
+    if (!course) {
+      return passed
+    }
+    const { substitutions } = course.course
+    passed[courseCode] = []
+    substitutions.forEach(code => {
+      const course = coursestatistics.find(course => course.course.code === code)
+      if (course) {
+        const students = Object.keys(course.students.passed)
+        if (students.length > 0) {
+          passed[courseCode].push(...students)
+        }
+      }
+    })
     return passed
   }, {})
 
@@ -56,9 +91,20 @@ const CoursesTable = ({ curriculum, showSubstitutions, students, studyGuidanceCo
     [curriculum, populationCourses, studyGuidanceCourses]
   )
 
+  const passedSubstitutionStudents = useMemo(
+    () => getPassedSubstitutionStudents(curriculum, populationCourses, studyGuidanceCourses),
+    [curriculum, populationCourses, studyGuidanceCourses]
+  )
+
   const hasPassedCourse = useCallback(
     (studentNumber, code) => passedStudents[code] && passedStudents[code].includes(studentNumber),
     [passedStudents]
+  )
+
+  const hasPassedSubstitutionCourse = useCallback(
+    (studentNumber, code) =>
+      passedSubstitutionStudents[code] && passedSubstitutionStudents[code].includes(studentNumber),
+    [passedSubstitutionStudents]
   )
 
   const totalPassed = useCallback(
@@ -68,8 +114,16 @@ const CoursesTable = ({ curriculum, showSubstitutions, students, studyGuidanceCo
       ) +
       sumBy(Array.from(new Set(curriculum.secondProgrammeCourses.map(({ code }) => code))), code =>
         hasPassedCourse(studentNumber, code)
-      ),
-    [curriculum, hasPassedCourse]
+      ) +
+      (showSubstitutions
+        ? sumBy(Array.from(new Set(curriculum.defaultProgrammeCourses.map(({ code }) => code))), code =>
+            hasPassedSubstitutionCourse(studentNumber, code)
+          ) +
+          sumBy(Array.from(new Set(curriculum.secondProgrammeCourses.map(({ code }) => code))), code =>
+            hasPassedSubstitutionCourse(studentNumber, code)
+          )
+        : 0),
+    [curriculum, hasPassedCourse, hasPassedSubstitutionCourse, showSubstitutions]
   )
 
   const columns = useMemo(() => {
