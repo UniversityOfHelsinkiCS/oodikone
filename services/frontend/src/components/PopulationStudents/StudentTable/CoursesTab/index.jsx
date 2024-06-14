@@ -239,8 +239,6 @@ const CoursesTable = ({ curriculum, showSubstitutions, students, studyGuidanceCo
 
     const isWithinSixMonths = date => moment(date) > moment().subtract(6, 'months')
 
-    const hasPassedSubstitution = (bestGrade, passedCourse) => showSubstitutions && bestGrade && !passedCourse
-
     const getEnrollmentDate = (student, code) =>
       student.enrollments.find(enrollment => enrollment.course_code === code && enrollment.state === 'ENROLLED')
         .enrollment_date_time
@@ -358,7 +356,8 @@ const CoursesTable = ({ curriculum, showSubstitutions, students, studyGuidanceCo
                 }
                 const bestGrade = findBestGrade(student.courses, course.code)
                 const passedCourse = hasPassedCourse(student.studentNumber, course.code)
-                if ((bestGrade && passedCourse) || hasPassedSubstitution(bestGrade, passedCourse)) {
+                const passedSubstitutionCourse = hasPassedSubstitutionCourse(student.studentNumber, course.code)
+                if ((bestGrade && passedCourse) || passedSubstitutionCourse) {
                   return getNumericGrade(bestGrade)
                 }
                 if (hasActiveEnrollments(student, course.code)) {
@@ -372,10 +371,11 @@ const CoursesTable = ({ curriculum, showSubstitutions, students, studyGuidanceCo
                 }
                 const bestGrade = findBestGrade(student.courses, course.code)
                 const passedCourse = hasPassedCourse(student.studentNumber, course.code)
+                const passedSubstitutionCourse = hasPassedSubstitutionCourse(student.studentNumber, course.code)
                 if (bestGrade && passedCourse) {
                   return <Icon color="green" fitted name="check" />
                 }
-                if (hasPassedSubstitution(bestGrade, passedCourse)) {
+                if (passedSubstitutionCourse) {
                   return <Icon color="grey" fitted name="check" />
                 }
                 if (hasActiveEnrollments(student, course.code)) {
