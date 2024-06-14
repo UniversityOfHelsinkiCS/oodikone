@@ -357,7 +357,7 @@ const CoursesTable = ({ curriculum, showSubstitutions, students, studyGuidanceCo
                 const bestGrade = findBestGrade(student.courses, course.code)
                 const passedCourse = hasPassedCourse(student.studentNumber, course.code)
                 const passedSubstitutionCourse = hasPassedSubstitutionCourse(student.studentNumber, course.code)
-                if ((bestGrade && passedCourse) || passedSubstitutionCourse) {
+                if ((bestGrade && passedCourse) || (showSubstitutions && passedSubstitutionCourse)) {
                   return getNumericGrade(bestGrade)
                 }
                 if (hasActiveEnrollments(student, course.code)) {
@@ -375,7 +375,7 @@ const CoursesTable = ({ curriculum, showSubstitutions, students, studyGuidanceCo
                 if (bestGrade && passedCourse) {
                   return <Icon color="green" fitted name="check" />
                 }
-                if (passedSubstitutionCourse) {
+                if (showSubstitutions && passedSubstitutionCourse) {
                   return <Icon color="grey" fitted name="check" />
                 }
                 if (hasActiveEnrollments(student, course.code)) {
