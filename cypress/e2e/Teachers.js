@@ -11,7 +11,7 @@ describe('Teachers page tests', () => {
 
   it('Check Statistics', () => {
     cy.get(':nth-child(1) > .ui > .search').click()
-    cy.contains('Autumn 2020').click()
+    cy.contains('Syksy 2020').click()
     cy.cs('course-providers').click()
     cy.contains('Tietojenkäsittelytieteen kandiohjelma').click()
     cy.cs('course-providers').children('.icon').click()
@@ -25,15 +25,21 @@ describe('Teachers page tests', () => {
     cy.url().should('include', '/teachers')
     cy.get('.borderless > :nth-child(3)').click()
     cy.get('.prompt').type(teacher1.split()[0])
-    cy.contains(teacher1)
+    cy.contains('td', teacher1)
   })
 
   it('Can check teacher page', () => {
-    cy.url().should('include', '/teachers')
-    cy.get('.borderless > :nth-child(3)').click()
-    cy.get('.prompt').type(teacher1.split()[0])
-    cy.contains('td', teacher1).click()
-    cy.contains('Aineopintojen harjoitustyö: Tietokantasovellus')
+    cy.visit('/teachers/hy-hlo-51367956')
+    cy.contains('Landgraf Leo')
+    cy.get('.ok-sortable-table tbody tr')
+      .first()
+      .within(() => {
+        cy.contains('td:nth-child(1)', 'TKT20011')
+        cy.contains('td:nth-child(2)', 'Aineopintojen harjoitustyö: Tietokantasovellus')
+        cy.contains('td:nth-child(3)', '96')
+        cy.contains('td:nth-child(4)', '0')
+        cy.contains('td:nth-child(5)', '88.89%')
+      })
   })
 
   it('Check leaderboad works', () => {
