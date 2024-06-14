@@ -107,22 +107,28 @@ const CoursesTable = ({ curriculum, showSubstitutions, students, studyGuidanceCo
     [passedSubstitutionStudents]
   )
 
+  const getUniqueCourseCodes = courses => Array.from(new Set(courses.map(({ code }) => code)))
+
+  const calculatePassedCourses = (studentNumber, courses, hasPassed) => {
+    return sumBy(getUniqueCourseCodes(courses), code => hasPassed(studentNumber, code))
+  }
+
   const totalPassed = useCallback(
-    studentNumber =>
-      sumBy(Array.from(new Set(curriculum.defaultProgrammeCourses.map(({ code }) => code))), code =>
-        hasPassedCourse(studentNumber, code)
-      ) +
-      sumBy(Array.from(new Set(curriculum.secondProgrammeCourses.map(({ code }) => code))), code =>
-        hasPassedCourse(studentNumber, code)
-      ) +
-      (showSubstitutions
-        ? sumBy(Array.from(new Set(curriculum.defaultProgrammeCourses.map(({ code }) => code))), code =>
-            hasPassedSubstitutionCourse(studentNumber, code)
-          ) +
-          sumBy(Array.from(new Set(curriculum.secondProgrammeCourses.map(({ code }) => code))), code =>
-            hasPassedSubstitutionCourse(studentNumber, code)
-          )
-        : 0),
+    studentNumber => {
+      const { defaultProgrammeCourses, secondProgrammeCourses } = curriculum
+
+      let totalPassed = 0
+
+      totalPassed += calculatePassedCourses(studentNumber, defaultProgrammeCourses, hasPassedCourse)
+      totalPassed += calculatePassedCourses(studentNumber, secondProgrammeCourses, hasPassedCourse)
+
+      if (showSubstitutions) {
+        totalPassed += calculatePassedCourses(studentNumber, defaultProgrammeCourses, hasPassedSubstitutionCourse)
+        totalPassed += calculatePassedCourses(studentNumber, secondProgrammeCourses, hasPassedSubstitutionCourse)
+      }
+
+      return totalPassed
+    },
     [curriculum, hasPassedCourse, hasPassedSubstitutionCourse, showSubstitutions]
   )
 
