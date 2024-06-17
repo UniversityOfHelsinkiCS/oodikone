@@ -36,7 +36,6 @@ const getPassedStudents = (curriculum, populationCourses, studyGuidanceCourses) 
   }
 
   const passedStudents = courseCodes.reduce((passed, courseCode) => {
-    passed[courseCode] = []
     const course = coursestatistics.find(course => course.course.code === courseCode)
     if (course) {
       passed[courseCode] = Object.keys(course.students.passed)
@@ -60,21 +59,12 @@ const getPassedSubstitutionStudents = (curriculum, populationCourses, studyGuida
   }
 
   const passedStudents = courseCodes.reduce((passed, courseCode) => {
-    const course = coursestatistics.find(course => course.course.code === courseCode)
-    if (!course) {
-      return passed
+    const course = coursestatistics.find(course => course.course.substitutions.includes(courseCode))
+    if (course) {
+      course.course.substitutions.forEach(substitution => {
+        passed[substitution] = Object.keys(course.students.passed)
+      })
     }
-    const { substitutions } = course.course
-    passed[courseCode] = []
-    substitutions.forEach(code => {
-      const course = coursestatistics.find(course => course.course.code === code)
-      if (course) {
-        const students = Object.keys(course.students.passed)
-        if (students.length > 0) {
-          passed[courseCode].push(...students)
-        }
-      }
-    })
     return passed
   }, {})
 
