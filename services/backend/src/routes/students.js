@@ -1,6 +1,6 @@
 const router = require('express').Router()
 
-const Student = require('../services/students')
+const { bySearchTerm, bySearchTermAndStudentNumbers, withId } = require('../services/students')
 const { ApplicationError } = require('../util/customErrors')
 const { hasFullAccessToStudentData, splitByEmptySpace } = require('../util/utils')
 
@@ -31,8 +31,8 @@ router.get('/', async (req, res) => {
   let results = []
   if (trimmedSearchTerm) {
     results = hasFullAccessToStudentData(roles)
-      ? await Student.bySearchTerm(trimmedSearchTerm)
-      : await Student.bySearchTermAndStudentNumbers(trimmedSearchTerm, studentsUserCanAccess)
+      ? await bySearchTerm(trimmedSearchTerm)
+      : await bySearchTermAndStudentNumbers(trimmedSearchTerm, studentsUserCanAccess)
   }
   res.json(results)
 })
@@ -46,7 +46,7 @@ router.get('/:id', async (req, res) => {
   if (!hasFullAccessToStudentData(roles) && !studentsUserCanAccess.includes(studentId)) {
     throw new ApplicationError('Error finding student', 400)
   }
-  const student = await Student.withId(studentId)
+  const student = await withId(studentId)
   const filteredTags = filterStudentTags(student, id)
   res.json(filteredTags)
 })

@@ -19,18 +19,6 @@ const { TagStudent, Tag } = require('../models/models_kone')
 const logger = require('../util/logger')
 const { splitByEmptySpace } = require('../util/utils')
 
-const createStudent = student => Student.create(student)
-
-const updateStudent = student => {
-  return Student.update(student, {
-    where: {
-      studentnumber: {
-        [Op.eq]: student.studentnumber,
-      },
-    },
-  })
-}
-
 const byId = async id => {
   const [student, tags] = await Promise.all([
     Student.findByPk(id, {
@@ -435,8 +423,6 @@ const getStudentnumbersByElementdetails = async codes =>
 module.exports = {
   withId,
   bySearchTerm,
-  createStudent,
-  updateStudent,
   bySearchTermAndStudentNumbers,
   filterStudentnumbersByAccessrights,
   findByCourseAndSemesters,

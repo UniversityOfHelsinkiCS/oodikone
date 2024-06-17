@@ -7,7 +7,7 @@ const courseService = require('../services/courses')
 const { encrypt, decrypt } = require('../services/encrypt')
 const populationService = require('../services/populations')
 const statMergeService = require('../services/statMerger')
-const studentService = require('../services/students')
+const { findByTag, findByCourseAndSemesters } = require('../services/students')
 const { mapCodesToIds } = require('../services/studyprogramme/studyprogrammeHelpers')
 const studyrightService = require('../services/studyrights')
 const { ApplicationError } = require('../util/customErrors')
@@ -112,7 +112,7 @@ router.post('/v2/populationstatistics/coursesbytag', async (req, res) => {
   const {
     user: { roles, studentsUserCanAccess },
   } = req
-  const studentnumbers = await studentService.findByTag(tag)
+  const studentnumbers = await findByTag(tag)
   const studentnumberlist = hasFullAccessToStudentData(roles)
     ? studentnumbers
     : _.intersection(studentnumbers, studentsUserCanAccess)
@@ -294,13 +294,7 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
   }
 
   const semesters = ['FALL', 'SPRING']
-  const studentnumbers = await studentService.findByCourseAndSemesters(
-    JSON.parse(coursecodes),
-    from,
-    to,
-    separate,
-    unifyCourses
-  )
+  const studentnumbers = await findByCourseAndSemesters(JSON.parse(coursecodes), from, to, separate, unifyCourses)
   const result = await populationService.optimizedStatisticsOf(
     {
       // Useless, because studentnumbers are already filtered above by from & to.

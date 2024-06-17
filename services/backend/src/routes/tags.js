@@ -1,7 +1,7 @@
 const router = require('express').Router()
 const { difference } = require('lodash')
 
-const Students = require('../services/students')
+const { filterStudentnumbersByAccessrights } = require('../services/students')
 const Tags = require('../services/tags')
 const { getFullStudyProgrammeRights, hasFullAccessToStudentData } = require('../util/utils')
 
@@ -110,7 +110,7 @@ router.post('/studenttags', async (req, res) => {
 
   const studentnumbers = tags.map(t => t.studentnumber)
   const studentFromProgrammes = combinedProgramme ? [studytrack, combinedProgramme] : [studytrack]
-  const students = await Students.filterStudentnumbersByAccessrights(studentnumbers, studentFromProgrammes)
+  const students = await filterStudentnumbersByAccessrights(studentnumbers, studentFromProgrammes)
   const missingStudents = difference(studentnumbers, students)
   if (missingStudents.length !== 0)
     return res
