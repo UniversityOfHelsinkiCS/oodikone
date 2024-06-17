@@ -1,151 +1,152 @@
-const Course = require('./course')
-const CourseProvider = require('./courseProvider')
-const CourseType = require('./courseType')
-const Credit = require('./credit')
-const CreditTeacher = require('./creditTeacher')
-const CreditType = require('./creditType')
-const ElementDetail = require('./elementDetail')
-const Enrollment = require('./enrollment')
-const ExcludedCourse = require('./excludedCourse')
-const Organization = require('./organization')
-const ProgrammeModule = require('./programmeModule')
-const ProgrammeModuleChild = require('./programmeModuleChild')
-const Semester = require('./semester')
-const SemesterEnrollment = require('./semesterEnrollment')
-const SISStudyRight = require('./SISStudyRight')
-const SISStudyRightElement = require('./SISStudyRightElement')
-const Student = require('./student')
-const Studyplan = require('./studyplan')
+// const Course = require('./course')
+// const CourseProvider = require('./courseProvider')
+// const CourseType = require('./courseType')
+// const Credit = require('./credit')
+// const CreditTeacher = require('./creditTeacher')
+import { CreditType } from './creditType'
+// const { dbConnections } = require('../database/connection') 
+// const ElementDetail = require('./elementDetail')
+// const Enrollment = require('./enrollment')
+// const ExcludedCourse = require('./excludedCourse')
+// const Organization = require('./organization')
+// const ProgrammeModule = require('./programmeModule')
+// const ProgrammeModuleChild = require('./programmeModuleChild')
+// const Semester = require('./semester')
+// const SemesterEnrollment = require('./semesterEnrollment')
+// const SISStudyRight = require('./SISStudyRight')
+// const SISStudyRightElement = require('./SISStudyRightElement')
+// const Student = require('./student')
+// const Studyplan = require('./studyplan')
 import { Studyright } from './studyright'
-const StudyrightElement = require('./studyrightElement')
-const StudyrightExtent = require('./studyrightExtent')
-const Teacher = require('./teacher')
-const Transfer = require('./transfer')
-console.log({ Studyright })
-Studyright.initModel()
+// const StudyrightElement = require('./studyrightElement')
+// const StudyrightExtent = require('./studyrightExtent')
+// const Teacher = require('./teacher')
+// const Transfer = require('./transfer')
 
-CourseType.hasMany(Course, { foreignKey: 'coursetypecode', sourceKey: 'coursetypecode' })
-Course.belongsTo(CourseType, { foreignKey: 'coursetypecode', targetKey: 'coursetypecode' })
+// Studyright.initModel()
 
-Course.belongsToMany(Organization, { through: CourseProvider, foreignKey: 'coursecode' })
-Organization.belongsToMany(Course, { through: CourseProvider, foreignKey: 'organizationcode' })
+// CourseType.hasMany(Course, { foreignKey: 'coursetypecode', sourceKey: 'coursetypecode' })
+// Course.belongsTo(CourseType, { foreignKey: 'coursetypecode', targetKey: 'coursetypecode' })
 
-SemesterEnrollment.belongsTo(Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
-Student.hasMany(SemesterEnrollment, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
+// Course.belongsToMany(Organization, { through: CourseProvider, foreignKey: 'coursecode' })
+// Organization.belongsToMany(Course, { through: CourseProvider, foreignKey: 'organizationcode' })
 
-SemesterEnrollment.belongsTo(Semester, { foreignKey: 'semestercomposite', targetKey: 'composite' })
-Semester.hasMany(SemesterEnrollment, { foreignKey: 'semestercomposite', sourceKey: 'composite' })
+// SemesterEnrollment.belongsTo(Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
+// Student.hasMany(SemesterEnrollment, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
 
-ProgrammeModule.belongsTo(Organization, { foreignKey: 'organization_id' })
-Organization.hasMany(ProgrammeModule, { foreignKey: 'organization_id' })
+// SemesterEnrollment.belongsTo(Semester, { foreignKey: 'semestercomposite', targetKey: 'composite' })
+// Semester.hasMany(SemesterEnrollment, { foreignKey: 'semestercomposite', sourceKey: 'composite' })
 
-Credit.notUnnecessary = credit => {
-  return credit.credits > 0 && credit.credits <= 12
-}
+// ProgrammeModule.belongsTo(Organization, { foreignKey: 'organization_id' })
+// Organization.hasMany(ProgrammeModule, { foreignKey: 'organization_id' })
 
-const CREDIT_TYPE_CODES = {
-  PASSED: 4,
-  FAILED: 10,
-  IMPROVED: 7,
-  APPROVED: 9,
-}
+// Credit.notUnnecessary = credit => {
+//   return credit.credits > 0 && credit.credits <= 12
+// }
 
-Credit.passed = ({ credittypecode }) =>
-  credittypecode === CREDIT_TYPE_CODES.PASSED || credittypecode === CREDIT_TYPE_CODES.APPROVED
-Credit.failed = credit => credit.credittypecode === CREDIT_TYPE_CODES.FAILED
-Credit.improved = credit => credit.credittypecode === CREDIT_TYPE_CODES.IMPROVED
-Credit.belongsTo(Studyright, { foreignKey: 'studyright_id', targetKey: 'studyrightid', constraints: false })
-Studyright.hasMany(Credit, { foreignKey: 'studyright_id', constraints: false })
+// const CREDIT_TYPE_CODES = {
+//   PASSED: 4,
+//   FAILED: 10,
+//   IMPROVED: 7,
+//   APPROVED: 9,
+// }
 
-Credit.belongsTo(Student, { foreignKey: 'student_studentnumber', targetKey: 'studentnumber' })
-Student.hasMany(Credit, { foreignKey: 'student_studentnumber', sourceKey: 'studentnumber' })
+// Credit.passed = ({ credittypecode }) =>
+//   credittypecode === CREDIT_TYPE_CODES.PASSED || credittypecode === CREDIT_TYPE_CODES.APPROVED
+// Credit.failed = credit => credit.credittypecode === CREDIT_TYPE_CODES.FAILED
+// Credit.improved = credit => credit.credittypecode === CREDIT_TYPE_CODES.IMPROVED
+// Credit.belongsTo(Studyright, { foreignKey: 'studyright_id', targetKey: 'studyrightid', constraints: false })
+// Studyright.hasMany(Credit, { foreignKey: 'studyright_id', constraints: false })
 
-Credit.belongsTo(Course, { foreignKey: 'course_id' })
-Course.hasMany(Credit, { foreignKey: 'course_id' })
+// Credit.belongsTo(Student, { foreignKey: 'student_studentnumber', targetKey: 'studentnumber' })
+// Student.hasMany(Credit, { foreignKey: 'student_studentnumber', sourceKey: 'studentnumber' })
 
-Credit.belongsTo(CreditType, { foreignKey: 'credittypecode', targetKey: 'credittypecode' })
-Credit.belongsToMany(Teacher, { through: CreditTeacher, foreignKey: 'credit_id' })
-Teacher.belongsToMany(Credit, { through: CreditTeacher, foreignKey: 'teacher_id' })
+// Credit.belongsTo(Course, { foreignKey: 'course_id' })
+// Course.hasMany(Credit, { foreignKey: 'course_id' })
 
-Organization.hasMany(Studyright, { foreignKey: 'facultyCode', sourceKey: 'code' })
-Studyright.belongsTo(Organization, { foreignKey: 'facultyCode', targetKey: 'code' })
+// Credit.belongsTo(CreditType, { foreignKey: 'credittypecode', targetKey: 'credittypecode' })
+// Credit.belongsToMany(Teacher, { through: CreditTeacher, foreignKey: 'credit_id' })
+// Teacher.belongsToMany(Credit, { through: CreditTeacher, foreignKey: 'teacher_id' })
 
-Studyplan.belongsTo(Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
-Student.hasMany(Studyplan, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
+// Organization.hasMany(Studyright, { foreignKey: 'facultyCode', sourceKey: 'code' })
+// Studyright.belongsTo(Organization, { foreignKey: 'facultyCode', targetKey: 'code' })
 
-Studyplan.belongsTo(Studyright, { foreignKey: 'studyrightid', targetKey: 'studyrightid' })
-Studyright.hasMany(Studyplan, { foreignKey: 'studyrightid', sourceKey: 'studyrightid' })
+// Studyplan.belongsTo(Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
+// Student.hasMany(Studyplan, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
 
-Studyright.belongsTo(Student, { foreignKey: 'studentStudentnumber', targetKey: 'studentnumber' })
-Student.hasMany(Studyright, { foreignKey: 'studentStudentnumber', sourceKey: 'studentnumber' })
+// Studyplan.belongsTo(Studyright, { foreignKey: 'studyrightid', targetKey: 'studyrightid' })
+// Studyright.hasMany(Studyplan, { foreignKey: 'studyrightid', sourceKey: 'studyrightid' })
 
-StudyrightElement.belongsTo(Studyright, { foreignKey: 'studyrightid', targetKey: 'studyrightid' })
-Studyright.hasMany(StudyrightElement, { foreignKey: 'studyrightid', sourceKey: 'studyrightid' })
+// Studyright.belongsTo(Student, { foreignKey: 'studentStudentnumber', targetKey: 'studentnumber' })
+// Student.hasMany(Studyright, { foreignKey: 'studentStudentnumber', sourceKey: 'studentnumber' })
 
-StudyrightElement.belongsTo(ElementDetail, { foreignKey: 'code', targetKey: 'code' })
-ElementDetail.hasMany(StudyrightElement, { foreignKey: 'code', sourceKey: 'code' })
+// StudyrightElement.belongsTo(Studyright, { foreignKey: 'studyrightid', targetKey: 'studyrightid' })
+// Studyright.hasMany(StudyrightElement, { foreignKey: 'studyrightid', sourceKey: 'studyrightid' })
 
-StudyrightElement.belongsTo(Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
-Student.hasMany(StudyrightElement, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
+// StudyrightElement.belongsTo(ElementDetail, { foreignKey: 'code', targetKey: 'code' })
+// ElementDetail.hasMany(StudyrightElement, { foreignKey: 'code', sourceKey: 'code' })
 
-StudyrightExtent.hasMany(Studyright, { foreignKey: 'extentcode', sourceKey: 'extentcode' })
-Studyright.belongsTo(StudyrightExtent, { foreignKey: 'extentcode', targetKey: 'extentcode' })
+// StudyrightElement.belongsTo(Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
+// Student.hasMany(StudyrightElement, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
 
-Credit.belongsTo(Semester, { foreignKey: { name: 'semester_composite', allowNull: false } })
+// StudyrightExtent.hasMany(Studyright, { foreignKey: 'extentcode', sourceKey: 'extentcode' })
+// Studyright.belongsTo(StudyrightExtent, { foreignKey: 'extentcode', targetKey: 'extentcode' })
 
-Transfer.belongsTo(Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
-Student.hasMany(Transfer, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
+// Credit.belongsTo(Semester, { foreignKey: { name: 'semester_composite', allowNull: false } })
 
-Transfer.belongsTo(Studyright, { foreignKey: 'studyrightid', targetKey: 'studyrightid' })
-Studyright.hasMany(Transfer, { foreignKey: 'studyrightid', sourceKey: 'studyrightid' })
+// Transfer.belongsTo(Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
+// Student.hasMany(Transfer, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
 
-Transfer.belongsTo(ElementDetail, { as: 'source', foreignKey: 'sourcecode' })
-Transfer.belongsTo(ElementDetail, { as: 'target', foreignKey: 'targetcode' })
+// Transfer.belongsTo(Studyright, { foreignKey: 'studyrightid', targetKey: 'studyrightid' })
+// Studyright.hasMany(Transfer, { foreignKey: 'studyrightid', sourceKey: 'studyrightid' })
 
-Enrollment.belongsTo(Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
-Enrollment.belongsTo(Studyright, { foreignKey: 'studyright_id', targetKey: 'studyrightid', constraints: false })
-Studyright.hasMany(Enrollment, { foreignKey: 'studyright_id', constraints: false })
+// Transfer.belongsTo(ElementDetail, { as: 'source', foreignKey: 'sourcecode' })
+// Transfer.belongsTo(ElementDetail, { as: 'target', foreignKey: 'targetcode' })
 
-Student.hasMany(Enrollment, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
-Enrollment.belongsTo(Course, { foreignKey: 'course_id' })
-Course.hasMany(Enrollment, { foreignKey: 'course_id' })
-Enrollment.belongsTo(Semester, { foreignKey: { name: 'semester_composite', allowNull: false } })
+// Enrollment.belongsTo(Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
+// Enrollment.belongsTo(Studyright, { foreignKey: 'studyright_id', targetKey: 'studyrightid', constraints: false })
+// Studyright.hasMany(Enrollment, { foreignKey: 'studyright_id', constraints: false })
 
-ProgrammeModule.belongsToMany(ProgrammeModule, {
-  as: 'parents',
-  through: ProgrammeModuleChild,
-  foreignKey: 'child_id',
-})
-ProgrammeModule.belongsToMany(ProgrammeModule, {
-  as: 'children',
-  through: ProgrammeModuleChild,
-  foreignKey: 'parent_id',
-})
+// Student.hasMany(Enrollment, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
+// Enrollment.belongsTo(Course, { foreignKey: 'course_id' })
+// Course.hasMany(Enrollment, { foreignKey: 'course_id' })
+// Enrollment.belongsTo(Semester, { foreignKey: { name: 'semester_composite', allowNull: false } })
 
-Organization.hasMany(Organization, { foreignKey: 'parent_id', as: 'children' })
+// ProgrammeModule.belongsToMany(ProgrammeModule, {
+//   as: 'parents',
+//   through: ProgrammeModuleChild,
+//   foreignKey: 'child_id',
+// })
+// ProgrammeModule.belongsToMany(ProgrammeModule, {
+//   as: 'children',
+//   through: ProgrammeModuleChild,
+//   foreignKey: 'parent_id',
+// })
 
-module.exports = {
-  Course,
-  CourseProvider,
-  CourseType,
-  Credit,
-  CreditTeacher,
-  CreditType,
-  ElementDetail,
-  Enrollment,
-  ExcludedCourse,
-  Organization,
-  ProgrammeModule,
-  ProgrammeModuleChild,
-  Semester,
-  SemesterEnrollment,
-  SISStudyRight,
-  SISStudyRightElement,
-  Student,
-  Studyplan,
-  StudyrightExtent,
-  Studyright,
-  StudyrightElement,
-  Teacher,
-  Transfer,
+// Organization.hasMany(Organization, { foreignKey: 'parent_id', as: 'children' })
+
+ module.exports = {
+//   Course,
+//   CourseProvider,
+//   CourseType,
+//   Credit,
+//   CreditTeacher,
+   CreditType,
+//   ElementDetail,
+//   Enrollment,
+//   ExcludedCourse,
+//   Organization,
+//   ProgrammeModule,
+//   ProgrammeModuleChild,
+//   Semester,
+//   SemesterEnrollment,
+//   SISStudyRight,
+//   SISStudyRightElement,
+//   Student,
+//   Studyplan,
+//   StudyrightExtent,
+   Studyright,
+//   StudyrightElement,
+//   Teacher,
+//   Transfer,
 }

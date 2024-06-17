@@ -20,7 +20,7 @@
     "consistent-return": "off",
     "cypress/no-assigning-return-values": "off",
     "cypress/unsafe-to-chain-command": "off",
-    "eslint-plugin-import/extensions": [2, "never"],
+    "eslint-plugin-import/extensions": "off",
     "default-param-last": "off",
     "import/order": [
       "error",

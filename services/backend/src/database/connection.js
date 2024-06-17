@@ -1,11 +1,15 @@
+import { Sequelize } from 'sequelize-typescript'
 const EventEmitter = require('events')
-const Sequelize = require('sequelize')
 const Umzug = require('umzug')
 
 const conf = require('../conf-backend')
+
+import { CreditType } from '../models/creditType'
+
 const logger = require('../util/logger')
 
 const { SIS_DB_URL } = process.env
+
 
 class DbConnection extends EventEmitter {
   constructor() {
@@ -23,6 +27,7 @@ class DbConnection extends EventEmitter {
       },
       logging: false,
       password: conf.SIS_PASSWORD,
+      models: [CreditType],
     })
   }
 

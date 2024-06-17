@@ -1,34 +1,50 @@
-import * as Sequelize from 'sequelize';
+import * as Sequelize from 'sequelize'
 
 const { Model, JSONB, INTEGER, STRING, DATE, BOOLEAN } = Sequelize
 
-import { dbConnections } from '../database/connection';
-
 export interface studyrightAttributes {
-  studyrightid: string;
-  startdate?: Date;
-  enddate?: Date;
-  givendate?: Date;
-  studystartdate?: Date;
-  graduated?: number;
-  studentStudentnumber?: string;
-  facultyCode?: string;
-  prioritycode?: number;
-  extentcode?: number;
-  createdAt?: Date;
-  updatedAt?: Date;
-  admission_type?: string;
-  active?: number;
-  cancelled?: boolean;
-  actual_studyrightid?: string;
-  is_ba_ma?: boolean;
-  semesterEnrollments?: object;
+  studyrightid: string
+  startdate?: Date
+  enddate?: Date
+  givendate?: Date
+  studystartdate?: Date
+  graduated?: number
+  studentStudentnumber?: string
+  facultyCode?: string
+  prioritycode?: number
+  extentcode?: number
+  createdAt?: Date
+  updatedAt?: Date
+  admission_type?: string
+  active?: number
+  cancelled?: boolean
+  actual_studyrightid?: string
+  is_ba_ma?: boolean
+  semesterEnrollments?: object
 }
-export type studyrightPk = "studyrightid";
-export type studyrightId = Studyright[studyrightPk];
-export type studyrightOptionalAttributes = "startdate" | "enddate" | "givendate" | "studystartdate" | "graduated" | "studentStudentnumber" | "facultyCode" | "prioritycode" | "extentcode" | "createdAt" | "updatedAt" | "admission_type" | "active" | "cancelled" | "actual_studyrightid" | "is_ba_ma" | "semesterEnrollments";
 
-export type studyrightCreationAttributes = Sequelize.Optional<studyrightAttributes, studyrightOptionalAttributes>;
+export type studyrightPk = 'studyrightid'
+export type studyrightId = Studyright[studyrightPk]
+export type studyrightOptionalAttributes =
+  | 'startdate'
+  | 'enddate'
+  | 'givendate'
+  | 'studystartdate'
+  | 'graduated'
+  | 'studentStudentnumber'
+  | 'facultyCode'
+  | 'prioritycode'
+  | 'extentcode'
+  | 'createdAt'
+  | 'updatedAt'
+  | 'admission_type'
+  | 'active'
+  | 'cancelled'
+  | 'actual_studyrightid'
+  | 'is_ba_ma'
+  | 'semesterEnrollments'
+
+export type studyrightCreationAttributes = Sequelize.Optional<studyrightAttributes, studyrightOptionalAttributes>
 
 export class Studyright
   extends Model<studyrightAttributes, studyrightCreationAttributes>
@@ -54,7 +70,8 @@ export class Studyright
   declare semesterEnrollments?: object
 
   static initModel(): typeof Studyright {
-      return Studyright.init({
+    return Studyright.init(
+      {
         studyrightid: {
           primaryKey: true,
           type: STRING,
@@ -125,7 +142,6 @@ export class Studyright
       },
       {
         underscored: true,
-        sequelize: dbConnections.sequelize,
         modelName: 'studyright',
         tableName: 'studyright',
       }

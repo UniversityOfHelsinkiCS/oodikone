@@ -31,19 +31,20 @@ const studyProgrammeCriteria = require('./routes/studyProgrammeCriteria')
 const studyProgrammePins = require('./routes/studyProgrammePins')
 const tags = require('./routes/tags')
 const teachers = require('./routes/teachers')
+const testRoute = require('./routes/testRoute')
 const university = require('./routes/university')
 const updater = require('./routes/updater')
 const users = require('./routes/users')
 const initializeSentry = require('./util/sentry')
 
 module.exports = (app, url) => {
+  app.use(`${url}/testroute`, testRoute)
   initializeSentry(app)
   app.use(Sentry.Handlers.requestHandler())
   app.use(Sentry.Handlers.tracingHandler())
 
   app.use(cors({ credentials: true, origin: frontUrl }))
   app.use(express.json())
-
   app.use(shibbolethCharsetMiddleware)
   app.use(currentUserMiddleware)
   app.use(accessLogger)
