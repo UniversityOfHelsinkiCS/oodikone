@@ -23,7 +23,7 @@ const getCourseCodes = curriculum => {
   ]
 }
 
-const getPassedStudents = (curriculum, populationCourses, studyGuidanceCourses) => {
+const getPassedStudents = (curriculum, includeSubstitutions, populationCourses, studyGuidanceCourses) => {
   if (!curriculum || !curriculum.defaultProgrammeCourses || (!populationCourses && !studyGuidanceCourses)) {
     return {}
   }
@@ -35,40 +35,33 @@ const getPassedStudents = (curriculum, populationCourses, studyGuidanceCourses) 
     return {}
   }
 
-  const passedStudents = courseCodes.reduce((passed, courseCode) => {
-    const course = coursestatistics.find(course => course.course.code === courseCode)
-    if (course) {
-      passed[courseCode] = Object.keys(course.students.passed)
-    }
-    return passed
-  }, {})
-
-  return passedStudents
-}
-
-const getPassedSubstitutionStudents = (curriculum, populationCourses, studyGuidanceCourses) => {
-  if (!curriculum || !curriculum.defaultProgrammeCourses || (!populationCourses && !studyGuidanceCourses)) {
-    return {}
+  const getPassedWithSubstitutions = () => {
+    return courseCodes.reduce((passed, courseCode) => {
+      const course = coursestatistics.find(course => course.course.substitutions.includes(courseCode))
+      if (course) {
+        course.course.substitutions.forEach(substitution => {
+          passed[substitution] = Object.keys(course.students.passed)
+        })
+      }
+      return passed
+    }, {})
   }
 
-  const courseCodes = getCourseCodes(curriculum)
-
-  const { coursestatistics } = populationCourses || studyGuidanceCourses
-  if (!coursestatistics) {
-    return {}
+  const getPassedWithoutSubstitutions = () => {
+    return courseCodes.reduce((passed, courseCode) => {
+      const course = coursestatistics.find(course => course.course.code === courseCode)
+      if (course) {
+        passed[courseCode] = Object.keys(course.students.passed)
+      }
+      return passed
+    }, {})
   }
 
-  const passedStudents = courseCodes.reduce((passed, courseCode) => {
-    const course = coursestatistics.find(course => course.course.substitutions.includes(courseCode))
-    if (course) {
-      course.course.substitutions.forEach(substitution => {
-        passed[substitution] = Object.keys(course.students.passed)
-      })
-    }
-    return passed
-  }, {})
+  if (includeSubstitutions) {
+    return getPassedWithSubstitutions()
+  }
 
-  return passedStudents
+  return getPassedWithoutSubstitutions()
 }
 
 const CoursesTable = ({ curriculum, showSubstitutions, students, studyGuidanceCourses }) => {
@@ -77,12 +70,12 @@ const CoursesTable = ({ curriculum, showSubstitutions, students, studyGuidanceCo
   const { data: populationCourses, pending } = useSelector(state => state?.populationSelectedStudentCourses)
 
   const passedStudents = useMemo(
-    () => getPassedStudents(curriculum, populationCourses, studyGuidanceCourses),
+    () => getPassedStudents(curriculum, false, populationCourses, studyGuidanceCourses),
     [curriculum, populationCourses, studyGuidanceCourses]
   )
 
   const passedSubstitutionStudents = useMemo(
-    () => getPassedSubstitutionStudents(curriculum, populationCourses, studyGuidanceCourses),
+    () => getPassedStudents(curriculum, true, populationCourses, studyGuidanceCourses),
     [curriculum, populationCourses, studyGuidanceCourses]
   )
 
