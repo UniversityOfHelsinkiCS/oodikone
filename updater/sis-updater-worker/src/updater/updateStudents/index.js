@@ -88,7 +88,11 @@ const groupSISStudyRightSnapshots = studyrightSnapshots => {
   const snapshotsByStudyRight = Object.entries(groupBy(activeSnapshots, 'id'))
 
   return snapshotsByStudyRight.reduce((res, [studyRightId, snapshots]) => {
-    const orderedSnapshots = orderBy(snapshots, [s => Number(s.modification_ordinal)], ['desc'])
+    const orderedSnapshots = orderBy(
+      snapshots,
+      [s => new Date(s.snapshot_date_time), s => Number(s.modification_ordinal)],
+      ['desc', 'desc']
+    )
     res[studyRightId] = orderedSnapshots
     return res
   }, {})

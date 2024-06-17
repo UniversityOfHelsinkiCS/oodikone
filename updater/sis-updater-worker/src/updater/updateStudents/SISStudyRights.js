@@ -129,17 +129,24 @@ const findFirstSnapshotDatesForProgrammesAndStudytracks = studyRightSnapshots =>
   const phase1StudyTracks = {}
   const phase2StudyTracks = {}
 
+  const newestProgramme = programmes => Object.entries(programmes).sort((a, b) => b[1] - a[1])[0][0]
+
   for (let i = studyRightSnapshots.length - 1; i >= 0; i--) {
     const snapshot = studyRightSnapshots[i]
-    const { snapshot_date_time, accepted_selection_path } = snapshot
-    if (!accepted_selection_path || !snapshot_date_time) continue
+    const { snapshot_date_time, accepted_selection_path, valid } = snapshot
+    if (!accepted_selection_path) continue
 
     const { educationPhase1GroupId, educationPhase1ChildGroupId, educationPhase2GroupId, educationPhase2ChildGroupId } =
       accepted_selection_path
-    const normalizedDateTime = normalizeDateTime(new Date(snapshot_date_time))
+    const normalizedDateTime = normalizeDateTime(new Date(snapshot_date_time ?? valid.startDate))
 
-    if (educationPhase1GroupId && !phase1ProgrammeStartDates[educationPhase1GroupId]) {
-      phase1ProgrammeStartDates[educationPhase1GroupId] = normalizedDateTime
+    if (educationPhase1GroupId) {
+      if (!phase1ProgrammeStartDates[educationPhase1GroupId]) {
+        phase1ProgrammeStartDates[educationPhase1GroupId] = normalizedDateTime
+        // In most cases this shouldn't happen. There are a few rare cases (e.g. study right hy-opinoik-130863612) where the newer programme actually appears first time in an older snapshot than the older programme. In these situations, we want the start date of the newer programme to be after the start date of the older programme.
+      } else if (newestProgramme(phase1ProgrammeStartDates) !== educationPhase1GroupId) {
+        phase1ProgrammeStartDates[educationPhase1GroupId] = normalizedDateTime
+      }
     }
 
     // We only take one study track per group id (programme). Study track from a newer snapshot will replace the previous one.
@@ -147,8 +154,12 @@ const findFirstSnapshotDatesForProgrammesAndStudytracks = studyRightSnapshots =>
       phase1StudyTracks[educationPhase1GroupId] = educationPhase1ChildGroupId
     }
 
-    if (educationPhase2GroupId && !phase2ProgrammeStartDates[educationPhase2GroupId]) {
-      phase2ProgrammeStartDates[educationPhase2GroupId] = normalizedDateTime
+    if (educationPhase2GroupId) {
+      if (!phase2ProgrammeStartDates[educationPhase2GroupId]) {
+        phase2ProgrammeStartDates[educationPhase2GroupId] = normalizedDateTime
+      } else if (newestProgramme(phase2ProgrammeStartDates) !== educationPhase2GroupId) {
+        phase2ProgrammeStartDates[educationPhase2GroupId] = normalizedDateTime
+      }
     }
 
     if (educationPhase2ChildGroupId) {
@@ -157,8 +168,8 @@ const findFirstSnapshotDatesForProgrammesAndStudytracks = studyRightSnapshots =>
   }
 
   return {
-    phase1Programmes: Object.entries(phase1ProgrammeStartDates),
-    phase2Programmes: Object.entries(phase2ProgrammeStartDates),
+    phase1Programmes: Object.entries(phase1ProgrammeStartDates).sort((a, b) => a[1] - b[1]),
+    phase2Programmes: Object.entries(phase2ProgrammeStartDates).sort((a, b) => a[1] - b[1]),
     phase1StudyTracks,
     phase2StudyTracks,
   }
