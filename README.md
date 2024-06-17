@@ -211,6 +211,6 @@ If that does not help, try option 5: _Docker system prune_. Notice that this cle
 
 [Toska](https://toska.dev) - University of Helsinki
 
-## Tietosuoja / data protection
+## 🛡️ Tietosuoja / data protection
 
 See [tietosuoja.md](./documentation/tietosuoja.md).
