@@ -113,7 +113,6 @@ const dailyJobs = () => {
   refreshProgrammes()
   jobMaker.languagecenter()
   jobMaker.statistics()
-  jobMaker.closeToGraduation()
 }
 
 const startCron = () => {
@@ -122,6 +121,10 @@ const startCron = () => {
     schedule('0 23 * * *', async () => {
       logger.info('Running daily jobs from cron')
       dailyJobs()
+    })
+    // This needs to be its own job because refreshing study right associations in `refreshStatistics` causes some study right info to be not available, causing this job to fail
+    schedule('0 3 * * *', async () => {
+      jobMaker.closeToGraduation()
     })
     schedule('0 4 * * 3', async () => {
       logger.info("Deleting users who haven't logged in for 18 months")
