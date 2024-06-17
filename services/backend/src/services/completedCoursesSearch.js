@@ -43,7 +43,7 @@ const getCompletedCourses = async (studentNumbers, courseCodes) => {
   })
 
   const studentInfo = await Student.findAll({
-    attributes: ['studentnumber', 'firstnames', 'lastname', 'email', 'sis_person_id'],
+    attributes: ['studentnumber', 'firstnames', 'lastname', 'email', 'sis_person_id', 'secondary_email'],
     where: {
       studentnumber: {
         [Op.in]: studentNumbers,
@@ -90,6 +90,7 @@ const getCompletedCourses = async (studentNumbers, courseCodes) => {
     studentCredits[s.studentnumber].lastname = s.lastname
     studentCredits[s.studentnumber].email = s.email
     studentCredits[s.studentnumber].sis_person_id = s.sis_person_id
+    studentCredits[s.studentnumber].secondary_email = s.secondary_email
   })
 
   credits.forEach(credit => {
@@ -141,6 +142,7 @@ const getCompletedCourses = async (studentNumbers, courseCodes) => {
         firstnames: studentCredits[student].firstnames,
         lastname: studentCredits[student].lastname,
         email: studentCredits[student].email,
+        secondaryEmail: studentCredits[student].secondary_email,
       },
     ],
     []
