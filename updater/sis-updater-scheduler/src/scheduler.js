@@ -202,13 +202,13 @@ const getHourlyPersonsToUpdate = async () => {
   )
 }
 
-const scheduleByStudentNumbers = async (studentNumbers, individualMode = false) => {
+const scheduleByStudentNumbers = async studentNumbers => {
   logger.info('Scheduling by student numbers')
   const { knex } = knexConnection
   const personsToUpdate = await knex('persons').column('id', 'student_number').whereIn('student_number', studentNumbers)
 
   await eachLimit(
-    chunk(personsToUpdate, individualMode ? 1 : CHUNK_SIZE),
+    chunk(personsToUpdate, CHUNK_SIZE),
     10,
     async s => await createJobs(s, 'students', SIS_MISC_SCHEDULE_CHANNEL)
   )

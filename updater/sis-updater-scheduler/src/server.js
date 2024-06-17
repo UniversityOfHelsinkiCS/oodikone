@@ -84,12 +84,11 @@ app.get('/v1/programmes', async (_, res) => {
 })
 
 app.post('/v1/students', async (req, res) => {
-  const { individualMode } = req.body
   const studentnumbers = req.body.studentnumbers.map(n => (n[0] === '0' ? n : `0${n}`))
 
-  logger.info(`Scheduling ${studentnumbers.length} custom studentnumbers ${individualMode ? 'individually' : ''}`)
+  logger.info(`Scheduling ${studentnumbers.length} custom studentnumbers`)
 
-  await scheduleByStudentNumbers(studentnumbers, individualMode)
+  await scheduleByStudentNumbers(studentnumbers)
   res.locals.msg('Scheduled studentnumbers')
 })
 

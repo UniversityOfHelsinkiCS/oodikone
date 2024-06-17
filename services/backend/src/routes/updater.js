@@ -9,7 +9,6 @@ const {
   updateSISRedisCache,
   updateSISStudents,
   updateStudentsByStudentNumber,
-  updateStudentsIndividually,
 } = require('../services/sisUpdaterService')
 const logger = require('../util/logger')
 const { jobMaker, getJobs } = require('../worker/queue')
@@ -36,11 +35,6 @@ router.get('/update/v2/students', async (_req, res) => {
   if (response) {
     res.status(200).json('Update SIS students scheduled')
   }
-})
-
-router.get('/update/v2/students_individually', async (_req, res) => {
-  await updateStudentsIndividually()
-  res.status(200).send()
 })
 
 router.post('/update/v2/customlist/:type', async (req, res) => {
