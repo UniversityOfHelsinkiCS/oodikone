@@ -235,9 +235,17 @@ const CoursesTable = ({ curriculum, showSubstitutions, students, studyGuidanceCo
 
     const isWithinSixMonths = date => moment(date) > moment().subtract(6, 'months')
 
-    const getEnrollmentDate = (student, code) =>
-      student.enrollments.find(enrollment => enrollment.course_code === code && enrollment.state === 'ENROLLED')
-        .enrollment_date_time
+    const getCompletionDate = (student, code) => {
+      const course = student.courses.find(course => course.course_code === code && course.passed === true)
+      return course?.date || null
+    }
+
+    const getEnrollmentDate = (student, code) => {
+      const enrollment = student.enrollments.find(
+        enrollment => enrollment.course_code === code && enrollment.state === 'ENROLLED'
+      )
+      return enrollment.enrollment_date_time
+    }
 
     const findBestGrade = (courses, code) => {
       const course = populationCourses?.coursestatistics?.find(course => course.course.code === code)
@@ -317,8 +325,12 @@ const CoursesTable = ({ curriculum, showSubstitutions, students, studyGuidanceCo
                   },
                 }
                 const bestGrade = findBestGrade(student.courses, course.code)
+                const completionDate = getCompletionDate(student, course.code)
                 if (bestGrade) {
                   cellProps.title = `Grade: ${bestGrade}`
+                  if (completionDate) {
+                    cellProps.title += `\nCompleted on ${reformatDate(completionDate, 'DD.MM.YYYY')}`
+                  }
                 } else if (hasActiveEnrollments(student, course.code)) {
                   const enrollmentDate = reformatDate(getEnrollmentDate(student, course.code), 'DD.MM.YYYY')
                   cellProps.title = `Enrolled on ${enrollmentDate}`
