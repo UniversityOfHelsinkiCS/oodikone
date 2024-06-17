@@ -19,9 +19,9 @@ const { TagStudent, Tag } = require('../models/models_kone')
 const logger = require('../util/logger')
 const { splitByEmptySpace } = require('../util/utils')
 
-const byId = async id => {
+const byStudentNumber = async studentNumber => {
   const [student, tags] = await Promise.all([
-    Student.findByPk(id, {
+    Student.findByPk(studentNumber, {
       include: [
         {
           model: Credit,
@@ -43,19 +43,17 @@ const byId = async id => {
       ],
     }),
     TagStudent.findAll({
-      include: [
-        {
-          model: Tag,
-        },
-      ],
+      include: {
+        model: Tag,
+      },
       where: {
-        studentnumber: id,
+        studentnumber: studentNumber,
       },
     }),
   ])
   const studyrights = await Studyright.findAll({
     where: {
-      student_studentnumber: id,
+      student_studentnumber: studentNumber,
       [Op.not]: { prioritycode: 6 },
     },
     include: {
@@ -184,13 +182,12 @@ const findByTag = async tag => {
   ).map(st => st.studentnumber)
 }
 
-const formatStudent = async ({
+const formatStudent = ({
   firstnames,
   lastname,
   studentnumber,
   dateofuniversityenrollment,
   creditcount,
-  gender,
   credits,
   abbreviatedname,
   email,
@@ -266,7 +263,6 @@ const formatStudent = async ({
     courses: formattedCredits,
     name: abbreviatedname,
     transfers: transfers || [],
-    gender,
     email,
     semesterenrollments,
     updatedAt: updatedAt || createdAt,
@@ -276,11 +272,10 @@ const formatStudent = async ({
   }
 }
 
-const withId = async id => {
+const withStudentNumber = async studentNumber => {
   try {
-    const result = await byId(id)
-    const formattedStudent = await formatStudent(result)
-    return formattedStudent
+    const student = await byStudentNumber(studentNumber)
+    return formatStudent(student)
   } catch (e) {
     logger.error(`Error when fetching single student ${e}`)
     return {
@@ -321,62 +316,39 @@ const studentnumberLike = terms => {
   }
 }
 
-const bySearchTerm = async searchterm => {
+const bySearchTermAndStudentNumbers = async (searchterm, studentNumbers) => {
   const terms = splitByEmptySpace(searchterm)
-  const matches = await Student.findAll({
-    include: {
-      model: Studyright,
+  return (
+    await Student.findAll({
       include: {
-        model: StudyrightElement,
+        model: Studyright,
         include: {
-          model: ElementDetail,
-          where: {
-            type: {
-              [Op.in]: [10, 20, 30],
+          model: StudyrightElement,
+          include: {
+            model: ElementDetail,
+            where: {
+              type: 20,
             },
           },
         },
-      },
-      where: {
-        prioritycode: {
-          [Op.not]: 6,
-        },
-      },
-    },
-    where: {
-      [Op.or]: [nameLike(terms), studentnumberLike(terms)],
-    },
-  })
-  return await Promise.all(matches.map(async s => await formatStudent(s)))
-}
-
-const bySearchTermAndStudentNumbers = async (searchterm, studentnumbers) => {
-  const terms = splitByEmptySpace(searchterm)
-  const matches = await Student.findAll({
-    include: {
-      model: Studyright,
-      include: {
-        model: StudyrightElement,
-        include: {
-          model: ElementDetail,
-          where: {
-            type: {
-              [Op.in]: [10, 20, 30],
-            },
+        where: {
+          prioritycode: {
+            [Op.not]: 6,
           },
         },
       },
-    },
-    where: {
-      [Op.and]: {
-        [Op.or]: [nameLike(terms), studentnumberLike(terms)],
-        studentnumber: {
-          [Op.in]: studentnumbers,
-        },
-      },
-    },
-  })
-  return await Promise.all(matches.map(async s => await formatStudent(s)))
+      where: studentNumbers
+        ? {
+            [Op.and]: {
+              [Op.or]: [nameLike(terms), studentnumberLike(terms)],
+              studentnumber: {
+                [Op.in]: studentNumbers,
+              },
+            },
+          }
+        : { [Op.or]: [nameLike(terms), studentnumberLike(terms)] },
+    })
+  ).map(formatStudent)
 }
 
 const filterStudentnumbersByAccessrights = async (studentnumbers, codes) =>
@@ -421,8 +393,7 @@ const getStudentnumbersByElementdetails = async codes =>
   ).map(({ studentnumber }) => studentnumber)
 
 module.exports = {
-  withId,
-  bySearchTerm,
+  withStudentNumber,
   bySearchTermAndStudentNumbers,
   filterStudentnumbersByAccessrights,
   findByCourseAndSemesters,
