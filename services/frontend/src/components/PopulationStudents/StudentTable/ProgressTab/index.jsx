@@ -18,7 +18,29 @@ const getCourses = (courseCode, criteria, student) => {
   )
 }
 
-const findRowContent = (student, courseCode, year, start, end, criteria) => {
+const hasCreditTransfer = courses => courses && courses.some(course => course.credittypecode === 9)
+
+const hasPassedDuringAcademicYear = (courses, start, end) => {
+  return (
+    courses &&
+    courses.some(course => course.passed) &&
+    courses.some(course => moment(course.date).isBetween(moment(start), moment(end)))
+  )
+}
+
+const hasPassedOutsideAcademicYear = courses => courses && courses.some(course => course.passed)
+
+const hasFailed = courses => courses && courses.some(course => course.passed === false)
+
+const hasEnrolled = (student, courseCode) => {
+  return student.enrollments && student.enrollments.map(course => course.course_code).includes(courseCode)
+}
+
+const getEnrollment = (student, courseCode) => {
+  return student.enrollments.filter(enrollment => enrollment.course_code === courseCode)
+}
+
+const getRowContent = (student, courseCode, year, start, end, criteria) => {
   if (courseCode.includes('Credits')) {
     if (student.criteriaProgress[year] && student.criteriaProgress[year].credits) {
       return <Icon color="green" fitted name="check" title="Checked" />
@@ -28,50 +50,46 @@ const findRowContent = (student, courseCode, year, start, end, criteria) => {
 
   const courses = getCourses(courseCode, criteria, student)
 
-  if (courses && courses.some(course => course.credittypecode === 9)) {
+  if (hasCreditTransfer(courses)) {
     return <Icon color="green" name="clipboard check" />
   }
 
-  if (
-    courses &&
-    courses.some(course => course.passed) &&
-    courses.some(course => moment(course.date).isBetween(moment(start), moment(end)))
-  ) {
+  if (hasPassedDuringAcademicYear(courses, start, end)) {
     return <Icon color="green" fitted name="check" />
   }
 
-  if (courses && courses.some(course => course.passed)) {
+  if (hasPassedOutsideAcademicYear(courses)) {
     return <Icon color="grey" fitted name="check" />
   }
 
-  if (courses && courses.some(course => course.passed === false)) {
+  if (hasFailed(courses)) {
     return <Icon color="red" fitted name="times" />
   }
 
-  if (student.enrollments && student.enrollments.map(course => course.course_code).includes(courseCode)) {
+  if (hasEnrolled(student, courseCode)) {
     return <Icon color="grey" fitted name="minus" />
   }
 
   return null
 }
 
-const findExcelText = (courseCode, criteria, student, year) => {
+const getExcelText = (courseCode, criteria, student, year) => {
   if (courseCode.includes('Credits')) {
     return student.criteriaProgress[year] && student.criteriaProgress[year].credits ? 'Passed' : ''
   }
 
   const courses = getCourses(courseCode, criteria, student)
 
-  if (courses && courses.some(course => course.passed)) {
+  if (hasPassedOutsideAcademicYear(courses)) {
     return `Passed-${moment(courses[0].date).format('YYYY-MM-DD')}`
   }
 
-  if (courses && courses.some(course => course.passed === false)) {
+  if (hasFailed(courses)) {
     return `Failed-${moment(courses[0].date).format('YYYY-MM-DD')}`
   }
 
-  if (student.enrollments && student.enrollments.map(course => course.course_code).includes(courseCode)) {
-    const enrollment = student.enrollments.filter(enrollment => enrollment.course_code === courseCode)
+  if (hasEnrolled(student, courseCode)) {
+    const enrollment = getEnrollment(student, courseCode)
     return `Enrollment-${moment(enrollment[0].enrollment_date_time).format('YYYY-MM-DD')}`
   }
 
@@ -148,28 +166,33 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
 
   const nonCourse = ['Criteria', 'Credits']
 
-  const findProp = (info, student) => {
+  const getProp = (info, student) => {
     const propObj = {
       title: '',
       style: { textAlign: 'center', verticalAlign: 'middle' },
     }
+
     const courses = getCourses(info.code, criteria, student)
     if (nonCourse.includes(info.code)) {
       return propObj
     }
-    if (courses && courses.some(course => course.passed)) {
+
+    if (hasPassedOutsideAcademicYear(courses)) {
       return { ...propObj, title: `Passed-${moment(courses[0].date).format('YYYY-MM-DD')}` }
     }
-    if (courses && courses.some(course => course.passed === false)) {
+
+    if (hasFailed(courses)) {
       return { ...propObj, title: `Failed-${moment(courses[0].date).format('YYYY-MM-DD')}` }
     }
-    if (student.enrollments && student.enrollments.map(course => course.course_code).includes(info.code)) {
-      const enrollment = student.enrollments.filter(enrollment => enrollment.course_code === info.code)
+
+    if (hasEnrolled(student, info.code)) {
+      const enrollment = getEnrollment(student, info.code)
       return {
         ...propObj,
         title: `Enrollment-${moment(enrollment[0].enrollment_date_time).format('YYYY-MM-DD')}`,
       }
     }
+
     return propObj
   }
 
@@ -241,7 +264,7 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
           ? `${label.code} ${enrollStatusIndex === 0 ? enrollStatusIndex + 1 : enrollStatusIndex}`
           : `${label.code}-${getTextIn(label.name)}`,
       headerProps: { title: `${label.code}, ${year}` },
-      cellProps: student => findProp(label, student),
+      cellProps: student => getProp(label, student),
       getRowVal: student => {
         if (label.code.includes('Criteria')) {
           return student.criteriaProgress[year] ? student.criteriaProgress[year].totalSatisfied : 0
@@ -249,7 +272,7 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
         if (label.code.includes('Enrollment')) {
           return getEnrollmentSortingValue(student, enrollStatusIndex)
         }
-        return findExcelText(label.code, criteria, student, year)
+        return getExcelText(label.code, criteria, student, year)
       },
       // the following is hackish, but enrollment col needs to use the getRowVal for sorting
       // and getRowExportVal can't be defined for all the other columns to not override their getRowVal
@@ -263,7 +286,7 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
         if (label.code.includes('Enrollment')) {
           return getSemesterEnrollmentContent(student, enrollStatusIndex)
         }
-        return findRowContent(student, label.code, year, start, end, criteria)
+        return getRowContent(student, label.code, year, start, end, criteria)
       },
     }))
   }
@@ -430,7 +453,6 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
           }
         )
       }
-
       if (months > 48) {
         const academicYearStart5 = moment(academicYearStart).add(4, 'years')
         const academicYearEnd5 = moment(academicYearEnd).add(4, 'years')
@@ -489,7 +511,7 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
       }
     }
     columns.push({
-      key: 'hiddenFiles',
+      key: 'hiddenFields',
       title: '',
       mergeHeader: true,
       textTitle: null,
@@ -539,12 +561,11 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
         <p>
           <Icon color="green" fitted name="check" />: Student has passed the course in the academic year. <br />
           <Icon color="grey" fitted name="check" />: Student has passed the course outside of the corresponding academic
-          year. <br /> <Icon color="green" fitted name="clipboard check" />: Student has credit transfer for the course.
-          <br />
+          year. <br />
+          <Icon color="green" fitted name="clipboard check" />: Student has credit transfer for the course. <br />
           <Icon color="red" fitted name="times" />: Student has failed the course. <br />
           <Icon color="grey" fitted name="minus" />: Student has enrolled, but has not received any grade from the
-          course.
-          <br />
+          course. <br />
           <span className="enrollment-label-no-margin label-present" />: Student has an active semester enrollment.
           <br />
           <span className="enrollment-label-no-margin label-absent" />: Student has enrolled as absent. <br />
