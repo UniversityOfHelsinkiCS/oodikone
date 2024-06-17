@@ -6,8 +6,16 @@ const { encrypt } = require('../encrypt')
 const { dateMonthsFromNow, findCourses, findCourseEnrollments, parseCreditInfo, parseQueryParams } = require('./shared')
 const { studentnumbersWithAllStudyrightElements } = require('./studentnumbersWithAllStudyrightElements')
 
-const getStudentsAndCourses = async (params, selectedStudents, studentnumberlist, courseCodes) => {
-  if (!studentnumberlist) {
+const getAllStudents = async studentNumbers => {
+  const allStudents = studentNumbers.reduce((numbers, num) => {
+    numbers[num] = true
+    return numbers
+  }, {})
+  return allStudents
+}
+
+const getStudentsAndCourses = async (params, selectedStudents, studentNumbers, courseCodes) => {
+  if (!studentNumbers) {
     const { months, studyRights, startDate, endDate, exchangeStudents, nondegreeStudents, transferredStudents, tag } =
       params
     const studentnumbers =
@@ -24,10 +32,7 @@ const getStudentsAndCourses = async (params, selectedStudents, studentnumberlist
         graduatedStudents: true,
       }))
 
-    const allstudents = studentnumbers.reduce((numbers, num) => {
-      numbers[num] = true
-      return numbers
-    }, {})
+    const allStudents = await getAllStudents(studentnumbers)
     const courses = await findCourses(studentnumbers, dateMonthsFromNow(startDate, months), courseCodes)
     const foundCourseCodes = Object.keys(keyBy(courses, 'code'))
     const filteredCourseCodes = courseCodes?.filter(code => !foundCourseCodes.includes(code))
@@ -37,23 +42,21 @@ const getStudentsAndCourses = async (params, selectedStudents, studentnumberlist
       dateMonthsFromNow(startDate, months),
       filteredCourseCodes
     )
-    return [allstudents, courses, courseEnrollements]
+
+    return [allStudents, courses, courseEnrollements]
   }
   const { months, startDate } = params
   const beforeDate = months && startDate ? dateMonthsFromNow(startDate, months) : new Date()
-  const allstudents = studentnumberlist.reduce((numbers, num) => {
-    numbers[num] = true
-    return numbers
-  }, {})
-  const courses = await findCourses(studentnumberlist, beforeDate, courseCodes)
+  const allStudents = await getAllStudents(studentNumbers)
+  const courses = await findCourses(studentNumbers, beforeDate, courseCodes)
   const foundCourseCodes = Object.keys(keyBy(courses, 'code'))
   const filteredCourseCodes = courseCodes?.filter(code => !foundCourseCodes.includes(code))
 
-  const courseEnrollements = await findCourseEnrollments(studentnumberlist, beforeDate, filteredCourseCodes)
-  return [allstudents, courses, courseEnrollements]
+  const courseEnrollements = await findCourseEnrollments(studentNumbers, beforeDate, filteredCourseCodes)
+  return [allStudents, courses, courseEnrollements]
 }
 
-const bottlenecksOf = async (query, studentnumberlist, encryptdata = false) => {
+const bottlenecksOf = async (query, studentNumbers, encryptdata = false) => {
   const encryptStudentnumbers = bottlenecks => {
     for (const course of Object.keys(bottlenecks.coursestatistics)) {
       const encryptedStudentStats = {}
@@ -79,21 +82,21 @@ const bottlenecksOf = async (query, studentnumberlist, encryptdata = false) => {
 
   // To fix failed and enrolled, no grade filter options some not so clean and nice solutions were added
   // Get the data with actual 1. courses and filtered students. 2. all students by year, if provided.
-  const [[allstudents, courses, courseEnrollements], [, allCourses]] = await Promise.all([
-    getStudentsAndCourses(params, query.selectedStudents, studentnumberlist, query.courses),
+  const [[allStudents, courses, courseEnrollements], [, allCourses]] = await Promise.all([
+    getStudentsAndCourses(params, query.selectedStudents, studentNumbers, query.courses),
     getStudentsAndCourses(params, allStudentsByYears, null, query.courses),
   ])
 
-  // Get the substitution codes for the fetch data by selscted students
+  // Get the substitution codes for the fetch data by selected students
   const substitutionCodes = Object.entries(courses).reduce(
-    (res, [, obj]) => [...res, ...(obj?.substitutions || [])],
+    (codes, [, course]) => [...codes, ...(course?.substitutions || [])],
     []
   )
   const codes = Object.keys(keyBy(courses, 'code')).map(code => code)
-  // Filter substitution courses for fetched courses -> by this we avoid the situation in which there is only
-  // courses with old course codes. Frontend NEEDS in most cases the current course.
+  // Filter substitution courses for fetched courses -> by this we avoid the situation in which there
+  // are only courses with old course codes. Frontend NEEDS in most cases the current course.
   const substitutionCourses = allCourses.filter(
-    obj => substitutionCodes.includes(obj.code) && !codes.includes(obj.code)
+    course => substitutionCodes.includes(course.code) && !codes.includes(course.code)
   )
   const bottlenecks = {
     disciplines: {},
@@ -102,34 +105,33 @@ const bottlenecksOf = async (query, studentnumberlist, encryptdata = false) => {
 
   const stats = {}
   const startYear = parseInt(query.year, 10)
-  const allstudentslength = Object.keys(allstudents).length
   let coursesToLoop = courses.concat(substitutionCourses)
-  const codesList = coursesToLoop.map(course => course.code)
-  // This fix problem when Enrolled no grade is chosen. The sql query for fetching
-  // credits do not fetch enrollments if no credits found for selected students.
-  // This and other sql query ensures that enrollments are added.
+  const courseCodes = coursesToLoop.map(course => course.code)
+
+  // This fixes a problem when "Enrolled, no grade" is chosen. The SQL query for fetching
+  // credits does not fetch enrollments if no credits are found for selected students.
+  // This and other SQL query ensures that enrollments are added.
   const coursesOnlyWithEnrollments = courseEnrollements.filter(
-    course => !codesList.includes(course.code) && course.enrollments
+    course => !courseCodes.includes(course.code) && course.enrollments
   )
   coursesToLoop = coursesToLoop.concat(coursesOnlyWithEnrollments)
 
   const coursesByCode = keyBy(coursesToLoop, 'code')
   for (const course of coursesToLoop) {
     const { course_type } = course
-    let maincourse = course
+    let mainCourse = course
 
     if (course.main_course_code && course.main_course_code !== course.code) {
-      const newmain = coursesByCode[course.main_course_code]
-
-      if (newmain) {
-        maincourse = newmain
+      const newMainCourse = coursesByCode[course.main_course_code]
+      if (newMainCourse) {
+        mainCourse = newMainCourse
       }
     }
 
-    if (!stats[maincourse.code]) {
-      stats[maincourse.code] = new CourseStatsCounter(maincourse.code, maincourse.name, allstudentslength)
+    if (!stats[mainCourse.code]) {
+      stats[mainCourse.code] = new CourseStatsCounter(mainCourse.code, mainCourse.name, Object.keys(allStudents).length)
     }
-    const coursestats = stats[maincourse.code]
+    const coursestats = stats[mainCourse.code]
     coursestats.addCourseType(course_type.coursetypecode, course_type.name)
     coursestats.addCourseSubstitutions(course.substitutions)
     bottlenecks.coursetypes[course_type.coursetypecode] = course_type.name
@@ -151,14 +153,16 @@ const bottlenecksOf = async (query, studentnumberlist, encryptdata = false) => {
       })
     }
 
-    stats[maincourse.code] = coursestats
+    stats[mainCourse.code] = coursestats
   }
 
   const allStats = Object.values(stats).map(coursestatistics => coursestatistics.getFinalStats())
   bottlenecks.coursestatistics = allStats.filter(course => course.stats.students > 0)
-  bottlenecks.allStudents = allstudentslength
+  bottlenecks.allStudents = Object.keys(allStudents).length
 
-  if (encryptdata) encryptStudentnumbers(bottlenecks)
+  if (encryptdata) {
+    encryptStudentnumbers(bottlenecks)
+  }
 
   return bottlenecks
 }
