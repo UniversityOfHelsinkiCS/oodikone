@@ -148,7 +148,7 @@ export const populationStatisticsToolTips = {
 
   **Courses**
 
-  Tällä välilehdellä näkyy, mitä opetussuunnitelmaan kuuluvia kursseja opiskelija on suorittanut. Valitsemalla "Show substitutions" otetaan myös huomioon arvosanat vastaavista kursseista.
+  Tällä välilehdellä näkyy, mitä opetussuunnitelmaan kuuluvia kursseja opiskelija on suorittanut. Valitsemalla "Include substitutions" otetaan mukaan myös arvosanat vastaavista kursseista.
 
   Merkkien selitykset:
   - ✓ Vihreä tarkastusmerkki = Opiskelija on suorittanut kurssin hyväksytysti

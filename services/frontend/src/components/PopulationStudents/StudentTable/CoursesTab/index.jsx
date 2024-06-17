@@ -64,7 +64,7 @@ const getPassedStudents = (curriculum, includeSubstitutions, populationCourses, 
   return getPassedWithoutSubstitutions()
 }
 
-const CoursesTable = ({ curriculum, showSubstitutions, students, studyGuidanceCourses }) => {
+const CoursesTable = ({ curriculum, includeSubstitutions, students, studyGuidanceCourses }) => {
   const { getTextIn } = useLanguage()
   const { visible: namesVisible } = useStudentNameVisibility()
   const { data: populationCourses, pending } = useSelector(state => state?.populationSelectedStudentCourses)
@@ -105,14 +105,14 @@ const CoursesTable = ({ curriculum, showSubstitutions, students, studyGuidanceCo
       totalPassed += calculatePassedCourses(studentNumber, defaultProgrammeCourses, hasPassedCourse)
       totalPassed += calculatePassedCourses(studentNumber, secondProgrammeCourses, hasPassedCourse)
 
-      if (showSubstitutions) {
+      if (includeSubstitutions) {
         totalPassed += calculatePassedCourses(studentNumber, defaultProgrammeCourses, hasPassedSubstitutionCourse)
         totalPassed += calculatePassedCourses(studentNumber, secondProgrammeCourses, hasPassedSubstitutionCourse)
       }
 
       return totalPassed
     },
-    [curriculum, hasPassedCourse, hasPassedSubstitutionCourse, showSubstitutions]
+    [curriculum, hasPassedCourse, hasPassedSubstitutionCourse, includeSubstitutions]
   )
 
   const columns = useMemo(() => {
@@ -358,7 +358,7 @@ const CoursesTable = ({ curriculum, showSubstitutions, students, studyGuidanceCo
                 const bestGrade = findBestGrade(student.courses, course.code)
                 const passedCourse = hasPassedCourse(student.studentNumber, course.code)
                 const passedSubstitutionCourse = hasPassedSubstitutionCourse(student.studentNumber, course.code)
-                if ((bestGrade && passedCourse) || (showSubstitutions && passedSubstitutionCourse)) {
+                if ((bestGrade && passedCourse) || (includeSubstitutions && passedSubstitutionCourse)) {
                   return getNumericGrade(bestGrade)
                 }
                 if (hasActiveEnrollments(student, course.code)) {
@@ -376,7 +376,7 @@ const CoursesTable = ({ curriculum, showSubstitutions, students, studyGuidanceCo
                 if (bestGrade && passedCourse) {
                   return <Icon color="green" fitted name="check" />
                 }
-                if (showSubstitutions && passedSubstitutionCourse) {
+                if (includeSubstitutions && passedSubstitutionCourse) {
                   return <Icon color="grey" fitted name="check" />
                 }
                 if (hasActiveEnrollments(student, course.code)) {
@@ -407,7 +407,7 @@ const CoursesTable = ({ curriculum, showSubstitutions, students, studyGuidanceCo
             if (hasPassedCourse(student.studentNumber, course.code)) {
               ++total[course.code]
             }
-            if (showSubstitutions && hasPassedSubstitutionCourse(student.studentNumber, course.code)) {
+            if (includeSubstitutions && hasPassedSubstitutionCourse(student.studentNumber, course.code)) {
               ++total[course.code]
             }
           })
@@ -423,7 +423,7 @@ const CoursesTable = ({ curriculum, showSubstitutions, students, studyGuidanceCo
 
     return [row(totals, { ignoreFilters: true, ignoreSorting: true }), ...students]
   }, [
-    showSubstitutions,
+    includeSubstitutions,
     curriculum,
     students,
     passedStudents,
@@ -461,12 +461,12 @@ const StudyGuidanceGroupCoursesTabContainer = ({ curriculum, group, students }) 
   return <CoursesTable curriculum={curriculum} students={students} studyGuidanceCourses={populationsCourses} />
 }
 
-export const CoursesTabContainer = ({ curriculum, showSubstitutions, students, studyGuidanceGroup, variant }) => {
+export const CoursesTabContainer = ({ curriculum, includeSubstitutions, students, studyGuidanceGroup, variant }) => {
   if (variant === 'studyGuidanceGroupPopulation') {
     return (
       <StudyGuidanceGroupCoursesTabContainer curriculum={curriculum} group={studyGuidanceGroup} students={students} />
     )
   }
 
-  return <CoursesTable curriculum={curriculum} showSubstitutions={showSubstitutions} students={students} />
+  return <CoursesTable curriculum={curriculum} includeSubstitutions={includeSubstitutions} students={students} />
 }
