@@ -23,14 +23,14 @@ const getCourseCodes = curriculum => {
   ]
 }
 
-const getPassedStudents = (curriculum, includeSubstitutions, populationCourses, studyGuidanceCourses) => {
-  if (!curriculum || !curriculum.defaultProgrammeCourses || (!populationCourses && !studyGuidanceCourses)) {
+const getPassedStudents = (curriculum, includeSubstitutions, populationCourses) => {
+  if (!curriculum || !curriculum.defaultProgrammeCourses || !populationCourses) {
     return {}
   }
 
   const courseCodes = getCourseCodes(curriculum)
 
-  const { coursestatistics } = populationCourses || studyGuidanceCourses
+  const { coursestatistics } = populationCourses
   if (!coursestatistics) {
     return {}
   }
@@ -73,19 +73,18 @@ const getPassedStudents = (curriculum, includeSubstitutions, populationCourses, 
   return getPassedMainCourse()
 }
 
-const CoursesTable = ({ curriculum, includeSubstitutions, students, studyGuidanceCourses }) => {
+const CoursesTable = ({ curriculum, includeSubstitutions, populationCourses, students }) => {
   const { getTextIn } = useLanguage()
   const { visible: namesVisible } = useStudentNameVisibility()
-  const { data: populationCourses, pending } = useSelector(state => state?.populationSelectedStudentCourses)
 
   const passedStudents = useMemo(
-    () => getPassedStudents(curriculum, false, populationCourses, studyGuidanceCourses),
-    [curriculum, populationCourses, studyGuidanceCourses]
+    () => getPassedStudents(curriculum, false, populationCourses),
+    [(curriculum, populationCourses)]
   )
 
   const passedSubstitutionStudents = useMemo(
-    () => getPassedStudents(curriculum, true, populationCourses, studyGuidanceCourses),
-    [curriculum, populationCourses, studyGuidanceCourses]
+    () => getPassedStudents(curriculum, true, populationCourses),
+    [curriculum, populationCourses]
   )
 
   const hasPassedCourse = useCallback(
@@ -442,40 +441,48 @@ const CoursesTable = ({ curriculum, includeSubstitutions, students, studyGuidanc
   ])
 
   return (
-    <Tab.Pane loading={pending}>
-      {curriculum?.defaultProgrammeCourses.length > 0 && (
-        <SortableTable
-          columns={columns}
-          data={data}
-          featureName="courses"
-          firstColumnSticky
-          onlyExportColumns={hiddenNameAndEmailForExcel}
-          tableId="course-of-population-students"
-          title="Courses of population's students"
-        />
-      )}
-    </Tab.Pane>
+    <SortableTable
+      columns={columns}
+      data={data}
+      featureName="courses"
+      firstColumnSticky
+      onlyExportColumns={hiddenNameAndEmailForExcel}
+      tableId="course-of-population-students"
+      title="Courses of population's students"
+    />
   )
 }
 
-const StudyGuidanceGroupCoursesTabContainer = ({ curriculum, group, students }) => {
-  const groupStudentNumbers = group?.members?.map(({ personStudentNumber }) => personStudentNumber) || []
-  const populationsCourses = useGetStudyGuidanceGroupPopulationCoursesQuery({
-    studentnumberlist: groupStudentNumbers,
-    year: group?.tags?.year,
-  }).data
-  if (populationsCourses.pending) {
-    return null
-  }
-  return <CoursesTable curriculum={curriculum} students={students} studyGuidanceCourses={populationsCourses} />
-}
-
 export const CoursesTabContainer = ({ curriculum, includeSubstitutions, students, studyGuidanceGroup, variant }) => {
+  const groupStudentNumbers = studyGuidanceGroup?.members?.map(({ personStudentNumber }) => personStudentNumber) || []
+  const studyGuidanceGroupPopulationsCourses = useGetStudyGuidanceGroupPopulationCoursesQuery({
+    studentnumberlist: groupStudentNumbers,
+    year: studyGuidanceGroup?.tags?.year,
+  }).data
+
+  const { data: populationCourses, pending } = useSelector(state => state?.populationSelectedStudentCourses)
+
   if (variant === 'studyGuidanceGroupPopulation') {
     return (
-      <StudyGuidanceGroupCoursesTabContainer curriculum={curriculum} group={studyGuidanceGroup} students={students} />
+      <Tab.Pane loading={studyGuidanceGroupPopulationsCourses.pending || !curriculum}>
+        <CoursesTable
+          curriculum={curriculum}
+          includeSubstitutions={includeSubstitutions}
+          populationCourses={studyGuidanceGroupPopulationsCourses}
+          students={students}
+        />
+      </Tab.Pane>
     )
   }
 
-  return <CoursesTable curriculum={curriculum} includeSubstitutions={includeSubstitutions} students={students} />
+  return (
+    <Tab.Pane loading={pending || !curriculum}>
+      <CoursesTable
+        curriculum={curriculum}
+        includeSubstitutions={includeSubstitutions}
+        populationCourses={populationCourses}
+        students={students}
+      />
+    </Tab.Pane>
+  )
 }
