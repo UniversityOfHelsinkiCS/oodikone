@@ -3,12 +3,11 @@ const { Op, col } = require('sequelize')
 const {
   Course,
   Credit,
-  ElementDetail,
   Organization,
   Student,
   Studyplan,
-  Studyright,
-  StudyrightElement,
+  SISStudyRight,
+  SISStudyRightElement,
 } = require('../../models')
 const { mapToProviders } = require('../../util/utils')
 const { redisClient } = require('../redis')
@@ -16,12 +15,12 @@ const { getCurriculumVersion } = require('./shared')
 
 const CLOSE_TO_GRADUATION_REDIS_KEY = 'CLOSE_TO_GRADUATION_DATA'
 
-const findThesisAndLatestAttainments = (student, providerCode) => {
+const findThesisAndLatestAttainments = (studyPlan, attainments, providerCode) => {
   let thesisData
   const latestAttainmentDates = {}
   const thesisCodes = ['urn:code:course-unit-type:bachelors-thesis', 'urn:code:course-unit-type:masters-thesis']
 
-  for (const attainment of student.credits) {
+  for (const attainment of attainments) {
     if (
       thesisCodes.includes(attainment.course?.course_unit_type) &&
       attainment.course.organizations.some(org => org.code === providerCode)
@@ -31,7 +30,7 @@ const findThesisAndLatestAttainments = (student, providerCode) => {
     if (!latestAttainmentDates.total) {
       latestAttainmentDates.total = attainment.attainment_date
     }
-    if (!latestAttainmentDates.hops && student.studyplans[0].included_courses.includes(attainment.course?.code)) {
+    if (!latestAttainmentDates.hops && studyPlan.included_courses.includes(attainment.course?.code)) {
       latestAttainmentDates.hops = attainment.attainment_date
     }
     if (thesisData && latestAttainmentDates.total && latestAttainmentDates.hops) {
@@ -51,54 +50,51 @@ const formatStudent = student => {
     phone_number: phoneNumber,
     secondary_email: secondaryEmail,
   } = student
-  const semesterEnrollments = {}
-  for (const enrollment of student.studyplans[0].studyright.semesterEnrollments) {
-    semesterEnrollments[enrollment.semestercode] = {
-      type: enrollment.enrollmenttype,
-      statutoryAbsence: enrollment.statutoryAbsence,
-    }
-  }
-  const {
-    studyright_elements: studyrightElements,
-    startdate: startOfStudyright,
-    isBaMa,
-  } = student.studyplans[0].studyright
-  const programmeCode = student.studyplans[0].programme_code
-  const programme = studyrightElements?.find(
-    element => element?.element_detail.type === 20 && element.code === programmeCode
-  )
-  const programmeCodeToProviderCode = mapToProviders([programmeCode])[0]
-  const { latestAttainmentDates, thesisData } = findThesisAndLatestAttainments(student, programmeCodeToProviderCode)
-  const studyTrack =
-    studyrightElements?.find(element => element?.element_detail.type === 30)?.element_detail?.name ?? null
+  return student.studyplans.reduce((acc, studyPlan) => {
+    const { studyRight } = studyPlan
+    const { studyRightElements, startDate: startOfStudyright, extentCode, semesterEnrollments } = studyRight
+    const renamedSemesterEnrollments = semesterEnrollments.map(enrollment => ({
+      enrollmenttype: enrollment.type,
+      semestercode: enrollment.semester,
+    }))
 
-  return {
-    student: { studentNumber, name, sis_person_id, email, phoneNumber, secondaryEmail },
-    studyright: {
-      startDate: startOfStudyright,
-      semesterEnrollments: student.studyplans[0].studyright.semesterEnrollments,
-      isBaMa,
-    },
-    thesisInfo: thesisData
-      ? {
-          grade: thesisData.grade,
-          attainmentDate: thesisData.attainment_date,
-          courseCode: thesisData.course.code,
-        }
-      : null,
-    programme: {
-      code: programme?.element_detail?.code,
-      name: programme?.element_detail?.name,
-      studyTrack,
-      startedAt: programme?.startdate,
-    },
-    latestAttainmentDates,
-    curriculumPeriod: getCurriculumVersion(student.studyplans[0].curriculum_period_id),
-    credits: {
-      hops: student.studyplans[0].completed_credits,
-      all: student.creditcount,
-    },
-  }
+    const { programmeCode, programmeName, studyTrack, startDate: programmeStartDate } = studyRightElements[0]
+    const programmeCodeToProviderCode = mapToProviders([programmeCode])[0]
+    const { latestAttainmentDates, thesisData } = findThesisAndLatestAttainments(
+      studyPlan,
+      student.credits,
+      programmeCodeToProviderCode
+    )
+
+    acc.push({
+      student: { studentNumber, name, sis_person_id, email, phoneNumber, secondaryEmail },
+      studyright: {
+        startDate: startOfStudyright,
+        semesterEnrollments: renamedSemesterEnrollments,
+        isBaMa: extentCode === 5,
+      },
+      thesisInfo: thesisData
+        ? {
+            grade: thesisData.grade,
+            attainmentDate: thesisData.attainment_date,
+            courseCode: thesisData.course.code,
+          }
+        : null,
+      programme: {
+        code: programmeCode,
+        name: programmeName,
+        studyTrack: studyTrack ? studyTrack.name : null,
+        startedAt: programmeStartDate,
+      },
+      latestAttainmentDates,
+      curriculumPeriod: getCurriculumVersion(studyPlan.curriculum_period_id),
+      credits: {
+        hops: studyPlan.completed_credits,
+        all: student.creditcount,
+      },
+    })
+    return acc
+  }, [])
 }
 
 const findStudentsCloseToGraduation = async studentNumbers =>
@@ -139,39 +135,24 @@ const findStudentsCloseToGraduation = async studentNumbers =>
           },
           include: [
             {
-              model: Studyright,
-              attributes: ['semesterEnrollments', 'startdate', 'studyrightid', 'isBaMa'],
-              where: {
-                graduated: 0,
-                cancelled: false,
-              },
+              model: SISStudyRight,
+              as: 'studyRight',
+              attributes: ['semesterEnrollments', 'startDate', 'extentCode'],
+              where: { cancelled: false },
               include: [
                 {
-                  model: StudyrightElement,
-                  attributes: ['code', 'startdate'],
+                  model: SISStudyRightElement,
+                  as: 'studyRightElements',
                   where: {
-                    enddate: {
+                    graduated: false,
+                    endDate: {
                       [Op.gte]: new Date(),
                     },
-                  },
-                  include: [
-                    {
-                      model: ElementDetail,
-                      attributes: ['code', 'name', 'type'],
-                      where: {
-                        [Op.or]: [
-                          {
-                            '$studyplans.programme_code$': {
-                              [Op.eq]: col('studyplans->studyright->studyright_elements.code'),
-                            },
-                          },
-                          {
-                            type: 30,
-                          },
-                        ],
-                      },
+                    '$studyplans.programme_code$': {
+                      [Op.eq]: col('studyplans->studyRight->studyRightElements.code'),
                     },
-                  ],
+                  },
+                  attributes: [['code', 'programmeCode'], ['name', 'programmeName'], 'startDate', 'studyTrack'],
                 },
               ],
             },
@@ -180,9 +161,7 @@ const findStudentsCloseToGraduation = async studentNumbers =>
         {
           model: Credit,
           attributes: ['attainment_date', 'grade'],
-          where: {
-            credittypecode: 4,
-          },
+          where: { credittypecode: 4 },
           include: {
             model: Course,
             attributes: ['code', 'course_unit_type'],
@@ -199,7 +178,7 @@ const findStudentsCloseToGraduation = async studentNumbers =>
       order: [[{ model: Credit }, 'attainment_date', 'DESC']],
     })
   )
-    .map(student => formatStudent(student.toJSON()))
+    .flatMap(student => formatStudent(student.toJSON()))
     .reduce(
       (acc, student) => {
         if (student.programme.code.startsWith('KH')) {
