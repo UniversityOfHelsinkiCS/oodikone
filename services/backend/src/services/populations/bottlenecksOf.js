@@ -148,8 +148,7 @@ const bottlenecksOf = async (query, studentNumbers, encryptData = false) => {
     stats[mainCourse.code] = coursestats
   }
 
-  const allStats = Object.values(stats).map(coursestatistics => coursestatistics.getFinalStats())
-  bottlenecks.coursestatistics = allStats.filter(course => course.stats.students > 0)
+  bottlenecks.coursestatistics = Object.values(stats).map(coursestatistics => coursestatistics.getFinalStats())
   bottlenecks.allStudents = allStudents
 
   if (encryptData) {
