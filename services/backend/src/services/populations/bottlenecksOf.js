@@ -6,14 +6,6 @@ const { encrypt } = require('../encrypt')
 const { dateMonthsFromNow, findCourses, findCourseEnrollments, parseCreditInfo, parseQueryParams } = require('./shared')
 const { studentnumbersWithAllStudyrightElements } = require('./studentnumbersWithAllStudyrightElements')
 
-const getAllStudents = async studentNumbers => {
-  const allStudents = studentNumbers.reduce((numbers, num) => {
-    numbers[num] = true
-    return numbers
-  }, {})
-  return allStudents
-}
-
 const getStudentsAndCourses = async (params, selectedStudents, studentNumbers, courseCodes) => {
   if (!studentNumbers) {
     const { months, studyRights, startDate, endDate, exchangeStudents, nondegreeStudents, transferredStudents, tag } =
@@ -32,7 +24,7 @@ const getStudentsAndCourses = async (params, selectedStudents, studentNumbers, c
         graduatedStudents: true,
       }))
 
-    const allStudents = await getAllStudents(studentnumbers)
+    const allStudents = studentnumbers.length
     const courses = await findCourses(studentnumbers, dateMonthsFromNow(startDate, months), courseCodes)
     const foundCourseCodes = Object.keys(keyBy(courses, 'code'))
     const filteredCourseCodes = courseCodes?.filter(code => !foundCourseCodes.includes(code))
@@ -47,7 +39,7 @@ const getStudentsAndCourses = async (params, selectedStudents, studentNumbers, c
 
   const { months, startDate } = params
   const beforeDate = months && startDate ? dateMonthsFromNow(startDate, months) : new Date()
-  const allStudents = await getAllStudents(studentNumbers)
+  const allStudents = studentNumbers.length
   const courses = await findCourses(studentNumbers, beforeDate, courseCodes)
   const foundCourseCodes = Object.keys(keyBy(courses, 'code'))
   const filteredCourseCodes = courseCodes?.filter(code => !foundCourseCodes.includes(code))
@@ -129,7 +121,7 @@ const bottlenecksOf = async (query, studentNumbers, encryptData = false) => {
     }
 
     if (!stats[mainCourse.code]) {
-      stats[mainCourse.code] = new CourseStatsCounter(mainCourse.code, mainCourse.name, Object.keys(allStudents).length)
+      stats[mainCourse.code] = new CourseStatsCounter(mainCourse.code, mainCourse.name, allStudents)
     }
     const coursestats = stats[mainCourse.code]
     coursestats.addCourseType(course_type.coursetypecode, course_type.name)
@@ -158,7 +150,7 @@ const bottlenecksOf = async (query, studentNumbers, encryptData = false) => {
 
   const allStats = Object.values(stats).map(coursestatistics => coursestatistics.getFinalStats())
   bottlenecks.coursestatistics = allStats.filter(course => course.stats.students > 0)
-  bottlenecks.allStudents = Object.keys(allStudents).length
+  bottlenecks.allStudents = allStudents
 
   if (encryptData) {
     encryptStudentNumbers(bottlenecks)
