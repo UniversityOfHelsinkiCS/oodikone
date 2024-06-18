@@ -9,9 +9,7 @@ const {
 const studentProgrammeModuleFixer = require('./updater/updateStudents/studentProgrammeModuleFixer')
 const {
   fixVarhaiskasvatusStudyRights,
-  fixVarhaiskasvatusGraduations,
   studentsThatNeedToBeFixed,
-  graduationsThatNeedToBeFixed,
 } = require('./updater/updateStudents/varhaiskasvatusFixer')
 const { logger } = require('./utils/logger')
 const { get: redisGet, incrby: redisIncrementBy, set: redisSet } = require('./utils/redis')
@@ -45,15 +43,6 @@ const postUpdate = async (updateMsg, currentChunkStartTime) => {
   )
   if (studentsToBeFixed.length > 0) {
     await fixVarhaiskasvatusStudyRights(studentsToBeFixed)
-  }
-
-  const graduationsToBeFixed = intersection(
-    updateMsg.entityIds || [],
-    graduationsThatNeedToBeFixed.map(s => s.id)
-  )
-
-  if (graduationsToBeFixed.length > 0) {
-    await fixVarhaiskasvatusGraduations(graduationsToBeFixed)
   }
 
   const type = updateMsg.type === 'students' ? 'STUDENTS' : 'META'
