@@ -15,12 +15,12 @@ const { getCurriculumVersion } = require('./shared')
 
 const CLOSE_TO_GRADUATION_REDIS_KEY = 'CLOSE_TO_GRADUATION_DATA'
 
-const findThesisAndLatestAttainments = (student, providerCode) => {
+const findThesisAndLatestAttainments = (studyPlan, attainments, providerCode) => {
   let thesisData
   const latestAttainmentDates = {}
   const thesisCodes = ['urn:code:course-unit-type:bachelors-thesis', 'urn:code:course-unit-type:masters-thesis']
 
-  for (const attainment of student.credits) {
+  for (const attainment of attainments) {
     if (
       thesisCodes.includes(attainment.course?.course_unit_type) &&
       attainment.course.organizations.some(org => org.code === providerCode)
@@ -30,7 +30,7 @@ const findThesisAndLatestAttainments = (student, providerCode) => {
     if (!latestAttainmentDates.total) {
       latestAttainmentDates.total = attainment.attainment_date
     }
-    if (!latestAttainmentDates.hops && student.studyplans[0].included_courses.includes(attainment.course?.code)) {
+    if (!latestAttainmentDates.hops && studyPlan.included_courses.includes(attainment.course?.code)) {
       latestAttainmentDates.hops = attainment.attainment_date
     }
     if (thesisData && latestAttainmentDates.total && latestAttainmentDates.hops) {
@@ -50,45 +50,51 @@ const formatStudent = student => {
     phone_number: phoneNumber,
     secondary_email: secondaryEmail,
   } = student
-  const studyPlan = student.studyplans[0]
-  const { studyRight } = studyPlan
-  const { studyRightElements, startDate: startOfStudyright, extentCode, semesterEnrollments } = studyRight
-  const renamedSemesterEnrollments = semesterEnrollments.map(enrollment => ({
-    enrollmenttype: enrollment.type,
-    semestercode: enrollment.semester,
-  }))
+  return student.studyplans.reduce((acc, studyPlan) => {
+    const { studyRight } = studyPlan
+    const { studyRightElements, startDate: startOfStudyright, extentCode, semesterEnrollments } = studyRight
+    const renamedSemesterEnrollments = semesterEnrollments.map(enrollment => ({
+      enrollmenttype: enrollment.type,
+      semestercode: enrollment.semester,
+    }))
 
-  const { programmeCode, programmeName, studyTrack, startDate: programmeStartDate } = studyRightElements[0]
-  const programmeCodeToProviderCode = mapToProviders([programmeCode])[0]
-  const { latestAttainmentDates, thesisData } = findThesisAndLatestAttainments(student, programmeCodeToProviderCode)
+    const { programmeCode, programmeName, studyTrack, startDate: programmeStartDate } = studyRightElements[0]
+    const programmeCodeToProviderCode = mapToProviders([programmeCode])[0]
+    const { latestAttainmentDates, thesisData } = findThesisAndLatestAttainments(
+      studyPlan,
+      student.credits,
+      programmeCodeToProviderCode
+    )
 
-  return {
-    student: { studentNumber, name, sis_person_id, email, phoneNumber, secondaryEmail },
-    studyright: {
-      startDate: startOfStudyright,
-      semesterEnrollments: renamedSemesterEnrollments,
-      isBaMa: extentCode === 5,
-    },
-    thesisInfo: thesisData
-      ? {
-          grade: thesisData.grade,
-          attainmentDate: thesisData.attainment_date,
-          courseCode: thesisData.course.code,
-        }
-      : null,
-    programme: {
-      code: programmeCode,
-      name: programmeName,
-      studyTrack: studyTrack ? studyTrack.name : null,
-      startedAt: programmeStartDate,
-    },
-    latestAttainmentDates,
-    curriculumPeriod: getCurriculumVersion(studyPlan.curriculum_period_id),
-    credits: {
-      hops: studyPlan.completed_credits,
-      all: student.creditcount,
-    },
-  }
+    acc.push({
+      student: { studentNumber, name, sis_person_id, email, phoneNumber, secondaryEmail },
+      studyright: {
+        startDate: startOfStudyright,
+        semesterEnrollments: renamedSemesterEnrollments,
+        isBaMa: extentCode === 5,
+      },
+      thesisInfo: thesisData
+        ? {
+            grade: thesisData.grade,
+            attainmentDate: thesisData.attainment_date,
+            courseCode: thesisData.course.code,
+          }
+        : null,
+      programme: {
+        code: programmeCode,
+        name: programmeName,
+        studyTrack: studyTrack ? studyTrack.name : null,
+        startedAt: programmeStartDate,
+      },
+      latestAttainmentDates,
+      curriculumPeriod: getCurriculumVersion(studyPlan.curriculum_period_id),
+      credits: {
+        hops: studyPlan.completed_credits,
+        all: student.creditcount,
+      },
+    })
+    return acc
+  }, [])
 }
 
 const findStudentsCloseToGraduation = async studentNumbers =>
@@ -139,6 +145,9 @@ const findStudentsCloseToGraduation = async studentNumbers =>
                   as: 'studyRightElements',
                   where: {
                     graduated: false,
+                    endDate: {
+                      [Op.gte]: new Date(),
+                    },
                     '$studyplans.programme_code$': {
                       [Op.eq]: col('studyplans->studyRight->studyRightElements.code'),
                     },
@@ -169,7 +178,7 @@ const findStudentsCloseToGraduation = async studentNumbers =>
       order: [[{ model: Credit }, 'attainment_date', 'DESC']],
     })
   )
-    .map(student => formatStudent(student.toJSON()))
+    .flatMap(student => formatStudent(student.toJSON()))
     .reduce(
       (acc, student) => {
         if (student.programme.code.startsWith('KH')) {
