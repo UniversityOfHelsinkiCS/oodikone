@@ -19,8 +19,8 @@ router.get('/:uid', auth.roles(['admin']), async (req, res) => {
     const { uid } = req.params
     const user = await userService.findOne(uid)
     return res.json(user)
-  } catch (e) {
-    return res.status(400).json({ error: e.message })
+  } catch (error) {
+    return res.status(400).json({ error: error.message })
   }
 })
 
@@ -29,8 +29,8 @@ router.post('/modifyaccess', auth.roles(['admin']), async (req, res) => {
   try {
     await userService.modifyAccess(username, accessgroups)
     res.status(204).end()
-  } catch (e) {
-    res.status(400).json(e)
+  } catch (error) {
+    res.status(400).json(error)
   }
 })
 
@@ -78,8 +78,8 @@ router.post('/language', async (req, res) => {
   try {
     await userService.updateUser(username, { language })
     return res.status(204).end()
-  } catch (e) {
-    return res.status(500).json({ error: e.message })
+  } catch (error) {
+    return res.status(500).json({ error: error.message })
   }
 })
 

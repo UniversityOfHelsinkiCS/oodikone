@@ -193,7 +193,7 @@ router.get('/v3/populationstatistics', async (req, res) => {
       res.status(403).json([])
       return
     }
-  } catch (e) {
+  } catch (error) {
     res.status(400).json({ error: 'The query had invalid studyRights' })
     return
   }
@@ -390,7 +390,7 @@ router.get('/v3/populationstatistics/studyprogrammes', async (req, res) => {
     mapCodesToIds(studyrights.programmes)
     res.json(studyrights)
   } else {
-    const allRights = _.uniq(programmeRights.map(p => p.code))
+    const allRights = _.uniq(programmeRights.map(programme => programme.code))
     // For combined programme
     // If more programmes are combined, then a function might be a better idea to add moar rights
     if (allRights.includes('KH90_001') || allRights.includes('MH90_001')) allRights.push('KH90_001', 'MH90_001')

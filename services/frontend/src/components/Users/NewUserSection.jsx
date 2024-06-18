@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Form, FormGroup, Input, Button, Loader, Segment } from 'semantic-ui-react'
+import { Button, Form, FormGroup, Input, Loader, Segment } from 'semantic-ui-react'
 import { useLazyGetUserFromSisuByEppnQuery, useAddUserMutation } from '@/redux/users'
 import { SortableTable } from '../SortableTable'
 
@@ -53,7 +53,7 @@ export const NewUserSection = ({ onAddUser }) => {
     <Segment className="contentSegment">
       <Form>
         <FormGroup>
-          <Input onChange={e => setEppn(e.target.value)} placeholder="Enter user eppn" value={eppn} />
+          <Input onChange={event => setEppn(event.target.value)} placeholder="Enter user eppn" value={eppn} />
           <Button color="blue" onClick={getUser}>
             Fetch user from Sisu
           </Button>

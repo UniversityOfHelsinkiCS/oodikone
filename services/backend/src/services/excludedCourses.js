@@ -4,7 +4,11 @@ const { ExcludedCourse } = require('../models/models_kone')
 
 const addExcludedCourses = async (programmecode, coursecodes, curriculum) => {
   return ExcludedCourse.bulkCreate(
-    coursecodes.map(c => ({ programme_code: programmecode, curriculum_version: curriculum, course_code: c }))
+    coursecodes.map(courseCode => ({
+      programme_code: programmecode,
+      curriculum_version: curriculum,
+      course_code: courseCode,
+    }))
   )
 }
 

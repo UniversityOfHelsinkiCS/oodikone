@@ -35,8 +35,8 @@ router.get('/', async (req, res) => {
     ])
     if (teacherRightsToStudents && Array.isArray(teacherRightsToStudents.data))
       studentsUserCanAccess.push(...teacherRightsToStudents.data)
-  } catch (e) {
-    logger.error(`Importer teacher-rights request failed with message: ${e?.message}`)
+  } catch (error) {
+    logger.error(`Importer teacher-rights request failed with message: ${error?.message}`)
   }
 
   const filteredStudentNumbers = hasFullAccessToStudentData(roles)

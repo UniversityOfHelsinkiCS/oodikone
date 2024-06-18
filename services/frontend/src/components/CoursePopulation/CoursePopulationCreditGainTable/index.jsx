@@ -87,7 +87,7 @@ export const CoursePopulationCreditGainTable = ({
       programmeCredits[programme.code] = { name: programme.name, students: [], credits: 0 }
     }
 
-    const faculty = faculties?.find(fac => fac.code === programme.facultyCode) || {
+    const faculty = faculties?.find(faculty => faculty.code === programme.facultyCode) || {
       // in case there isn't a faculty associated with studyright
       code: '0000',
       name: { en: 'No associated faculty', fi: 'Ei tiedekuntaa suorituksen hetkellä' },

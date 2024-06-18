@@ -275,11 +275,11 @@ export const CloseToGraduation = () => {
 
     if (isLoading) return <Loader active inline="centered" />
 
-    const facultyOptions = faculties.map(f => ({
-      key: f.code,
-      text: getTextIn(f.name),
-      value: f.code,
-      description: f.code,
+    const facultyOptions = faculties.map(faculty => ({
+      key: faculty.code,
+      text: getTextIn(faculty.name),
+      value: faculty.code,
+      description: faculty.code,
     }))
     const programmeOptions = programmes
       .filter(p => !p.value.includes('+') && p.value.startsWith(bachelorStudentsAreDisplayed ? 'KH' : 'MH'))

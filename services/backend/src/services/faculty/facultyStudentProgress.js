@@ -84,7 +84,9 @@ const createYearlyTitles = (start, limitList) => {
 const filterOutTransfers = async (studyrights, programmeCode, startDate, endDate) => {
   const transferredIn = await getTransfersIn(programmeCode, startDate, endDate)
   const transferredOut = await getTransfersOut(programmeCode, startDate, endDate)
-  const filteredStudyrights = studyrights.filter(sr => !checkTransfers(sr, transferredIn, transferredOut))
+  const filteredStudyrights = studyrights.filter(
+    studyright => !checkTransfers(studyright, transferredIn, transferredOut)
+  )
   return filteredStudyrights
 }
 
@@ -192,7 +194,9 @@ const combineFacultyStudentProgress = async (faculty, programmes, specialGroups,
         studyrights = await filterOutTransfers(studyrights, code, startDate, endDate)
       }
       if (code.includes('KH')) {
-        const allBachelors = studyrights.filter(sr => sr.extentcode === 1).map(sr => sr.studentnumber)
+        const allBachelors = studyrights
+          .filter(studyright => studyright.extentcode === 1)
+          .map(studyright => studyright.studentnumber)
         const students = await studytrackStudents(allBachelors)
         const { progData, creditCounts } = getStudentData(startDate, students, 'KH', bachelorlimits, limitKeys)
 
@@ -204,11 +208,11 @@ const combineFacultyStudentProgress = async (faculty, programmes, specialGroups,
         bachelorProgress[progId][indexOf(reversedYears, year)] = limitKeys.map(key => progData[key])
       } else if (code.includes('MH')) {
         const allMsStudents = studyrights
-          .filter(sr => sr.extentcode === 2 && sr.studyrightid.slice(-2) !== '-2')
-          .map(sr => sr.studentnumber)
+          .filter(studyright => studyright.extentcode === 2 && studyright.studyrightid.slice(-2) !== '-2')
+          .map(studyright => studyright.studentnumber)
         const allBcMsStudents = studyrights
-          .filter(sr => sr.extentcode === 2 && sr.studyrightid.slice(-2) === '-2')
-          .map(sr => sr.studentnumber)
+          .filter(studyright => studyright.extentcode === 2 && studyright.studyrightid.slice(-2) === '-2')
+          .map(studyright => studyright.studentnumber)
         const bcMsStudents = await studytrackStudents(allBcMsStudents)
         const msStudents = await studytrackStudents(allMsStudents)
 
@@ -249,7 +253,9 @@ const combineFacultyStudentProgress = async (faculty, programmes, specialGroups,
           bcmsProgress[progId][indexOf(reversedYears, year)] = limitKeys.map(key => bcMsProgdata[key])
         }
       } else {
-        const all = studyrights.filter(sr => sr.extentcode === 4 || sr.extentcode === 3).map(sr => sr.studentnumber)
+        const all = studyrights
+          .filter(studyright => studyright.extentcode === 4 || studyright.extentcode === 3)
+          .map(studyright => studyright.studentnumber)
         const doctoralStudents = await studytrackStudents(all)
         const { creditThresholdKeys, creditThresholdAmounts } = getCreditThresholds(code)
 

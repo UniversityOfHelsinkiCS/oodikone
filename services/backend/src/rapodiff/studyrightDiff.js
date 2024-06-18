@@ -37,7 +37,7 @@ const getFromOodikone = async (programme, year) => {
   }
 
   const theStudyrights = student => {
-    const theOne = s => s.studyright_elements.find(e => e.code === programme)
+    const theOne = studyright => studyright.studyright_elements.find(element => element.code === programme)
     // in some rare cases student may have more than one studyright for same programme
     return student.studyrights.filter(theOne)
   }
@@ -67,7 +67,7 @@ const getFromOodikone = async (programme, year) => {
     .filter(notGraduated)
     .filter(notTransferred)
     .filter(isNotAmongKnownProblems)
-    .map(s => s.studentNumber)
+    .map(student => student.studentNumber)
 }
 
 const isAcuallyActive = async student => {

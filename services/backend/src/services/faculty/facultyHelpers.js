@@ -5,7 +5,7 @@ const { faculties } = require('../organisations')
 
 const getFacultyList = async () => {
   const ignore = ['Y', 'H99', 'Y01', 'H92', 'H930']
-  const facultyList = (await faculties()).filter(f => !ignore.includes(f.code))
+  const facultyList = (await faculties()).filter(faculty => !ignore.includes(faculty.code))
   facultyList.sort((a, b) => (a.name.fi > b.name.fi ? 1 : -1))
   return facultyList
 }

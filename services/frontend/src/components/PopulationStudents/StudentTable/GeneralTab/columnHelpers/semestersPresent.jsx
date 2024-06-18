@@ -37,7 +37,7 @@ export const getSemestersPresentFunctions = ({
     const { first } = filteredStudents.reduce(
       ({ first }, student) => {
         if (!student.semesterenrollments) return { first: 9999, last: 0 }
-        const newFirst = Math.min(first, ...student.semesterenrollments.map(e => e.semestercode))
+        const newFirst = Math.min(first, ...student.semesterenrollments.map(enrollment => enrollment.semestercode))
         return { first: isFall(newFirst) ? newFirst : newFirst - 1 }
       },
       { first: 9999 }
@@ -60,20 +60,20 @@ export const getSemestersPresentFunctions = ({
     return 'No study right'
   }
 
-  const graduatedOnSemester = (student, sem, programmeCode) => {
+  const graduatedOnSemester = (student, semester, programmeCode) => {
     if (!programmeCode) return 0
     const firstGraduation = studentToStudyrightEndMap[student.studentNumber]
     const secondGraduation = studentToSecondStudyrightEndMap[student.studentNumber]
     if (
       firstGraduation &&
-      moment(firstGraduation).isBetween(allSemestersMap[sem].startdate, allSemestersMap[sem].enddate)
+      moment(firstGraduation).isBetween(allSemestersMap[semester].startdate, allSemestersMap[semester].enddate)
     ) {
       if (!isMastersProgramme(programmeCode)) return 1
       return 2
     }
     if (
       secondGraduation &&
-      moment(secondGraduation).isBetween(allSemestersMap[sem].startdate, allSemestersMap[sem].enddate)
+      moment(secondGraduation).isBetween(allSemestersMap[semester].startdate, allSemestersMap[semester].enddate)
     )
       return 2
     return 0
@@ -84,7 +84,7 @@ export const getSemestersPresentFunctions = ({
     if (!student.semesterenrollments && !studyright) return ''
     const semesterIcons = []
 
-    const getSemesterJSX = (sem, enrollmenttype, statutoryAbsence, graduated, key) => {
+    const getSemesterJSX = (semester, enrollmenttype, statutoryAbsence, graduated, key) => {
       let type = 'none'
       if (enrollmenttype === 1) type = 'present'
       if (enrollmenttype === 2) type = 'absent'
@@ -94,7 +94,7 @@ export const getSemestersPresentFunctions = ({
       const onHoverString = () => {
         const graduationText = graduated !== 0 ? `(graduated as ${graduated === 1 ? 'Bachelor' : 'Master'})` : ''
         return `${enrollmentTypeText(enrollmenttype, statutoryAbsence)} in ${getTextIn(
-          allSemestersMap[sem].name
+          allSemestersMap[semester].name
         )} ${graduationText}`
       }
 
@@ -128,7 +128,10 @@ export const getSemestersPresentFunctions = ({
           position="bottom center"
           size="tiny"
           trigger={
-            <div className={`enrollment-label-no-margin label-${type} ${isFall(sem) ? '' : 'margin-right'}`} key={key}>
+            <div
+              className={`enrollment-label-no-margin label-${type} ${isFall(semester) ? '' : 'margin-right'}`}
+              key={key}
+            >
               {graduated > 0 && graduationCrown}
             </div>
           }
@@ -136,17 +139,17 @@ export const getSemestersPresentFunctions = ({
       )
     }
 
-    for (let sem = firstSemester; sem <= lastSemester; sem++) {
+    for (let semester = firstSemester; semester <= lastSemester; semester++) {
       const { enrollmenttype, statutoryAbsence } = student.semesterEnrollmentsMap
-        ? student.semesterEnrollmentsMap[sem] || {}
-        : studyright[0].semesterEnrollments?.find(e => e.semestercode === sem) || {}
+        ? student.semesterEnrollmentsMap[semester] || {}
+        : studyright[0].semesterEnrollments?.find(enrollment => enrollment.semestercode === semester) || {}
       semesterIcons.push(
         getSemesterJSX(
-          sem,
+          semester,
           enrollmenttype,
           statutoryAbsence,
-          graduatedOnSemester(student, sem, programmeCode),
-          `${student.studentNumber}-${sem}`
+          graduatedOnSemester(student, semester, programmeCode),
+          `${student.studentNumber}-${semester}`
         )
       )
     }

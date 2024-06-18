@@ -31,7 +31,7 @@ initializeDatabaseConnection()
       })
     })
   })
-  .catch(e => {
+  .catch(error => {
     process.exitCode = 1
-    logger.error(e)
+    logger.error(error)
   })

@@ -41,7 +41,7 @@ export const createMaps = ({ selectedStudents, students, programmeCode, combined
 
   const studentToSecondStudyrightEndMap = selectedStudents.reduce((res, studentNumber) => {
     const targetStudyright = students[studentNumber].studyrights.find(studyright =>
-      studyright.studyright_elements.some(e => e.code === combinedProgrammeCode)
+      studyright.studyright_elements.some(element => element.code === combinedProgrammeCode)
     )
     res[studentNumber] = targetStudyright && targetStudyright.graduated === 1 ? targetStudyright.enddate : null
     return res

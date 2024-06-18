@@ -98,8 +98,8 @@ export const enrollmentStatusFilter = createFilter({
   ),
 
   filter(student, { status, semesters }) {
-    return semesters.every(sem => {
-      const enrollment = student.semesterenrollments.find(enrl => enrl.semestercode === sem)
+    return semesters.every(semester => {
+      const enrollment = student.semesterenrollments.find(enrl => enrl.semestercode === semester)
       // If enrollment info not found, return false. This may or may not be what we want?
       return enrollment ? enrollment.enrollmenttype === status : false
     })

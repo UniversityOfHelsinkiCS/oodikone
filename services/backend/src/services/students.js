@@ -78,7 +78,7 @@ const byStudentNumber = async studentNumber => {
   })
   const semesters = await Semester.findAll()
   const mappedEnrollments = student.semester_enrollments.map(enrollment => {
-    const semester = semesters.find(sem => sem.semestercode === enrollment.semestercode)
+    const semester = semesters.find(semester => semester.semestercode === enrollment.semestercode)
     return {
       ...enrollment.dataValues,
       name: semester.name,
@@ -88,9 +88,9 @@ const byStudentNumber = async studentNumber => {
   })
   student.semester_enrollments = mappedEnrollments
 
-  student.tags = tags.map(t => ({
-    ...t.get(),
-    programme: tagprogrammes.find(p => p.code === t.tag.studytrack),
+  student.tags = tags.map(tag => ({
+    ...tag.get(),
+    programme: tagprogrammes.find(programme => programme.code === tag.tag.studytrack),
   }))
   return student
 }
@@ -203,7 +203,7 @@ const formatStudent = ({
   const toCourse = ({ id, grade, credits, credittypecode, is_open, attainment_date, course, isStudyModule }) => {
     try {
       course = course.get()
-    } catch (e) {
+    } catch (error) {
       // TODO: this should not be here 1.6.2021
       course = {
         code: '99999 - MISSING FROM SIS',
@@ -276,10 +276,10 @@ const withStudentNumber = async studentNumber => {
   try {
     const student = await byStudentNumber(studentNumber)
     return formatStudent(student)
-  } catch (e) {
-    logger.error(`Error when fetching single student ${e}`)
+  } catch (error) {
+    logger.error(`Error when fetching single student ${error}`)
     return {
-      error: e,
+      error,
     }
   }
 }

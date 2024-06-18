@@ -166,8 +166,8 @@ const getNotCompletedForProgrammeCourses = async (from, to, programmeCourses) =>
         type: 'notCompleted',
         isStudyModule: course.isStudyModule,
       }))
-  } catch (e) {
-    logger.error(`getNotCompletedForProgrammeCourses failed ${e}`)
+  } catch (error) {
+    logger.error(`getNotCompletedForProgrammeCourses failed ${error}`)
   }
 }
 

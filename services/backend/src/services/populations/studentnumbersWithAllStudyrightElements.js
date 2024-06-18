@@ -46,7 +46,7 @@ const studentnumbersWithAllStudyrightElements = async ({
     })
     studentWhere.where = {
       student_studentnumber: {
-        [Op.in]: taggedStudentnumbers.map(sn => sn.studentnumber),
+        [Op.in]: taggedStudentnumbers.map(student => student.studentnumber),
       },
     }
   }
@@ -177,7 +177,7 @@ const studentnumbersWithAllStudyrightElements = async ({
       })
     ).map(s => s.studentnumber)
 
-    studentnumberlist = studentnumberlist.filter(sn => !transfersOut.includes(sn))
+    studentnumberlist = studentnumberlist.filter(studentNumber => !transfersOut.includes(studentNumber))
   }
 
   // fetch students that have transferred to the programme and filter out these studentnumbers
@@ -199,7 +199,7 @@ const studentnumbersWithAllStudyrightElements = async ({
         raw: true,
       })
     ).map(s => s.studentnumber)
-    studentnumberlist = studentnumberlist.filter(sn => !transfersTo.includes(sn))
+    studentnumberlist = studentnumberlist.filter(studentNumber => !transfersTo.includes(studentNumber))
   }
 
   // fetch students that have graduated from the programme and filter out these studentnumbers
@@ -232,8 +232,8 @@ const studentnumbersWithAllStudyrightElements = async ({
           },
         },
       })
-    ).map(s => s.studentnumber)
-    studentnumberlist = studentnumberlist.filter(sn => !graduated.includes(sn))
+    ).map(student => student.studentnumber)
+    studentnumberlist = studentnumberlist.filter(studentNumber => !graduated.includes(studentNumber))
   }
 
   return studentnumberlist

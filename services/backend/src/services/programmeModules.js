@@ -10,9 +10,9 @@ const getCurriculumVersions = async code => {
   try {
     const result = await ProgrammeModule.findAll({ where: { code } })
     return result
-  } catch (e) {
+  } catch (error) {
     logger.error(`Error when searching curriculum versions for code: ${code}`)
-    logger.error(e)
+    logger.error(error)
     return null
   }
 }
@@ -33,9 +33,9 @@ const recursivelyGetModuleAndChildren = async (code, curriculum_period_ids) => {
       { replacements: [code, curriculum_period_ids, curriculum_period_ids] }
     )
     return result
-  } catch (e) {
+  } catch (error) {
     logger.error(`Error when searching modules and children with code: ${code}`)
-    logger.error(e)
+    logger.error(error)
     return null
   }
 }

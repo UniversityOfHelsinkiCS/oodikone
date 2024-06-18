@@ -160,8 +160,8 @@ router.get('/:id/update_progressview', auth.roles(['facultyStatistics', 'katselm
     let result = null
     try {
       result = await updateFacultyProgressOverview(code)
-    } catch (e) {
-      logger.error(`Failed to update faculty ${code} progress tab stats: ${e}`)
+    } catch (error) {
+      logger.error(`Failed to update faculty ${code} progress tab stats: ${error}`)
     }
     return res.json(result)
   }

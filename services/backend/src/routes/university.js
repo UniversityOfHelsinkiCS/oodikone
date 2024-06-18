@@ -10,7 +10,7 @@ router.get('/allprogressstats', async (req, res) => {
   const specialGroups = req.query?.specialsIncluded === 'true' ? 'SPECIAL_INCLUDED' : 'SPECIAL_EXCLUDED'
   const graduated = req.query?.graduated
   const allFaculties = await getFacultyList()
-  const facultyCodes = allFaculties.map(f => f.code)
+  const facultyCodes = allFaculties.map(faculty => faculty.code)
   const codeToData = {}
 
   for (const facultyCode of facultyCodes) {
@@ -27,9 +27,9 @@ router.get('/allprogressstats', async (req, res) => {
     yearlyBcMsTitles: codeToData.H50.yearlyBcMsTitles,
     yearlyMasterTitles: codeToData.H50.yearlyMasterTitles,
     yearlyLicentiateTitles: codeToData.H50.yearlyLicentiateTitles,
-    programmeNames: allFaculties.reduce((obj, fac) => {
-      const { name, ...rest } = fac.dataValues
-      obj[fac.code] = { ...rest, ...name }
+    programmeNames: allFaculties.reduce((obj, faculty) => {
+      const { name, ...rest } = faculty.dataValues
+      obj[faculty.code] = { ...rest, ...name }
       return obj
     }, {}),
     bachelorsProgStats: {},
@@ -84,10 +84,10 @@ router.get('/allprogressstats', async (req, res) => {
   return res.status(200).json(universityData)
 })
 
-router.get('/allgraduationstats', async (req, res) => {
+router.get('/allgraduationstats', async (_req, res) => {
   const degreeNames = ['bachelor', 'bcMsCombo', 'master', 'licentiate', 'doctor']
   const allFaculties = await getFacultyList()
-  const facultyCodes = allFaculties.map(f => f.code)
+  const facultyCodes = allFaculties.map(faculty => faculty.code)
   const facultyData = {}
   const timesArrays = [] // keep book of these to null them in the end, large lists not used in frontend
   for (const facultyCode of facultyCodes) {
@@ -157,9 +157,9 @@ router.get('/allgraduationstats', async (req, res) => {
       doctor: 48,
       licentiate: 78,
     },
-    programmeNames: allFaculties.reduce((obj, fac) => {
-      const { name, ...rest } = fac.dataValues
-      obj[fac.code] = { ...rest, ...name }
+    programmeNames: allFaculties.reduce((obj, faculty) => {
+      const { name, ...rest } = faculty.dataValues
+      obj[faculty.code] = { ...rest, ...name }
       return obj
     }, {}),
     byGradYear: { medians: {}, programmes: { medians: {} } },

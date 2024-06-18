@@ -98,8 +98,8 @@ router.get('/:id/coursestats', async (req, res) => {
   try {
     const data = await getStudyprogrammeCoursesForStudytrack(date.getTime(), code, showByYear, combinedProgramme)
     return res.json(data)
-  } catch (e) {
-    logger.error({ message: `Failed to get code ${code} programme courses stats`, meta: `${e}` })
+  } catch (error) {
+    logger.error({ message: `Failed to get code ${code} programme courses stats`, meta: `${error}` })
   }
 })
 
@@ -135,8 +135,8 @@ router.get('/:id/colorizedtablecoursestats', async (req, res) => {
   try {
     const data = await getStudyprogrammeStatsForColorizedCoursesTable(code)
     return res.json(data)
-  } catch (e) {
-    logger.error({ message: `Failed to get code ${code} colorized table course stats`, meta: `${e}` })
+  } catch (error) {
+    logger.error({ message: `Failed to get code ${code} colorized table course stats`, meta: `${error}` })
   }
 })
 
@@ -147,8 +147,8 @@ router.get('/:id/update_basicview', async (req, res) => {
     let result = null
     try {
       result = await updateBasicView(code, combinedProgramme)
-    } catch (e) {
-      logger.error({ message: `Failed to update code ${code} ${combinedProgramme} basic stats`, meta: `${e}` })
+    } catch (error) {
+      logger.error({ message: `Failed to update code ${code} ${combinedProgramme} basic stats`, meta: `${error}` })
     }
     return res.json(result)
   }
@@ -163,8 +163,8 @@ router.get('/:id/update_studytrackview', async (req, res) => {
     try {
       const associations = await getAssociations()
       result = await updateStudytrackView(code, combinedProgramme, associations)
-    } catch (e) {
-      logger.error({ message: `Failed to update code ${code} ${combinedProgramme} studytrack stats`, meta: `${e}` })
+    } catch (error) {
+      logger.error({ message: `Failed to update code ${code} ${combinedProgramme} studytrack stats`, meta: `${error}` })
     }
     return res.json(result)
   }

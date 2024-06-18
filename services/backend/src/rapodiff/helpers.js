@@ -12,8 +12,8 @@ const parseCsv = async (fileName, fun) => {
     }
     const data = await Papa.parsePromise(file)
     await fun(data?.data)
-  } catch (e) {
-    console.log(e)
+  } catch (error) {
+    console.log(error)
   }
 }
 

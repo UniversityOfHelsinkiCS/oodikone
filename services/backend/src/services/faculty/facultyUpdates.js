@@ -82,9 +82,9 @@ const updateFacultyOverview = async (faculty, statsType) => {
     allProgrammes = await setFacultyProgrammes(faculty, all, 'ALL_PROGRAMMES')
     newProgrammes = await setFacultyProgrammes(faculty, onlyNew, 'NEW_STUDY_PROGRAMMES')
     allProgrammes?.data.forEach(prog => allProgrammeCodes.push(prog.code))
-  } catch (e) {
-    logger.error(`Faculty updates: programme stats failed with error: ${e}`)
-    logger.error(`Stack: ${e.stack}`)
+  } catch (error) {
+    logger.error(`Faculty updates: programme stats failed with error: ${error}`)
+    logger.error(`Stack: ${error.stack}`)
   }
 
   for (const option of options) {
@@ -118,9 +118,9 @@ const updateFacultyOverview = async (faculty, statsType) => {
         )
         await setThesisWritersStats(updateThesisWriters, yearType, programmeFilter, specialGroups)
       }
-    } catch (e) {
-      logger.error(`Faculty updates: basic/thesis-writers/credits stats failed with error ${e}`)
-      logger.error(`Stack: ${e.stack}`)
+    } catch (error) {
+      logger.error(`Faculty updates: basic/thesis-writers/credits stats failed with error ${error}`)
+      logger.error(`Stack: ${error.stack}`)
     }
   }
 
@@ -154,9 +154,9 @@ const updateFacultyProgressOverview = async faculty => {
   try {
     const onlyNew = await findFacultyProgrammeCodes(faculty, 'NEW_STUDY_PROGRAMMES')
     newProgrammes = await setFacultyProgrammes(faculty, onlyNew, 'NEW_STUDY_PROGRAMMES')
-  } catch (e) {
-    logger.error(`Faculty stats: all programme stats failed with error ${e}`)
-    logger.error(`Stack: ${e.stack}`)
+  } catch (error) {
+    logger.error(`Faculty stats: all programme stats failed with error ${error}`)
+    logger.error(`Stack: ${error.stack}`)
   }
 
   for (const option of options) {
@@ -176,9 +176,9 @@ const updateFacultyProgressOverview = async faculty => {
         graduated
       )
       await setFacultyProgressStats(updateFacultyProgressStats, specialGroups, graduated)
-    } catch (e) {
-      logger.error(`Faculty stats: progress stats failed with error ${e}`)
-      logger.error(`Stack: ${e.stack}`)
+    } catch (error) {
+      logger.error(`Faculty stats: progress stats failed with error ${error}`)
+      logger.error(`Stack: ${error.stack}`)
     }
   }
   return 'OK'

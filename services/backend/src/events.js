@@ -29,7 +29,7 @@ const refreshStudyrightAssociations = async () => {
 
 const refreshFaculties = async () => {
   logger.info('Adding jobs to refresh all faculties')
-  const facultyList = (await faculties()).filter(f => !['Y', 'H99', 'Y01', 'H92', 'H930'].includes(f.code))
+  const facultyList = (await faculties()).filter(faculty => !['Y', 'H99', 'Y01', 'H92', 'H930'].includes(faculty.code))
   for (const faculty of facultyList) {
     jobMaker.faculty(faculty.code)
   }
@@ -43,8 +43,8 @@ const refreshFaculty = async code => {
     await updateFacultyProgressOverview(code)
     const time = new Date().getTime() - start
     logger.info(`Updated faculty ${code} (took ${(time / 1000 / 60).toFixed(2)} minutes)`)
-  } catch (e) {
-    logger.error({ message: `Failed to update stats for faculty ${code} with type ALL`, meta: `${e}` })
+  } catch (error) {
+    logger.error({ message: `Failed to update stats for faculty ${code} with type ALL`, meta: `${error}` })
   }
 }
 
@@ -53,7 +53,7 @@ const refreshProgrammes = async () => {
   // Filters out old programmes and special ones like Fitech studies. Filters also out the programmes starting with
   // 2_ or ending with _2. Those programmes are mapped to correct programme (studentProgrammeModuleFixer.js)
   const codes = (await getAllProgrammes())
-    .map(p => p.code)
+    .map(programme => programme.code)
     .filter(
       code =>
         (code.includes('KH') && !code.startsWith('2_KH') && !code.endsWith('_2')) ||

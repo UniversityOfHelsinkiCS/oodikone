@@ -114,7 +114,7 @@ export const TeacherStatistics = () => {
               label="Start semester"
               name="semesterStart"
               onChange={setStartSemester}
-              options={semesters.filter(sem => sem.value <= currentSemesterCode)}
+              options={semesters.filter(semester => semester.value <= currentSemesterCode)}
               placeholder="Semester"
               search
               selectOnBlur={false}
@@ -127,7 +127,9 @@ export const TeacherStatistics = () => {
               label="End semester"
               name="semesterEnd"
               onChange={setEndSemester}
-              options={semesters.filter(sem => sem.value <= currentSemesterCode && sem.value >= semesterStart)}
+              options={semesters.filter(
+                semester => semester.value <= currentSemesterCode && semester.value >= semesterStart
+              )}
               placeholder="Semester"
               search
               selectOnBlur={false}

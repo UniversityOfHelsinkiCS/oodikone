@@ -139,12 +139,14 @@ class CourseYearlyStatsCounter {
 
     const enrollment = { studentnumber, state, enrollment_date_time }
     this.groups[groupcode].allEnrollments.push(enrollment)
-    const oldEnrollment = this.groups[groupcode].enrollments.find(e => e.studentnumber === studentnumber)
+    const oldEnrollment = this.groups[groupcode].enrollments.find(
+      enrollment => enrollment.studentnumber === studentnumber
+    )
     if (!oldEnrollment) return this.groups[groupcode].enrollments.push({ studentnumber, state, enrollment_date_time })
     if (oldEnrollment.state === 'ENROLLED' || oldEnrollment.state === 'CONFIRMED') return
     if (state !== 'ENROLLED' || state !== 'CONFIRMED') return
     this.groups[groupcode].enrollments = this.groups[groupcode].enrollments
-      .filter(e => e.studentnumber !== studentnumber)
+      .filter(enrollment => enrollment.studentnumber !== studentnumber)
       .concat([enrollment])
   }
 

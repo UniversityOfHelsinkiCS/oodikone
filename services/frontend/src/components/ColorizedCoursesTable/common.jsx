@@ -21,16 +21,16 @@ export const courseNameColumn = getTextIn => ({
 export const calculateTotals = (courses, semesters, faculties) => {
   const facultiesTotal = { ...emptyFields }
   const totalRow = { ...emptyFields, cellStats: {} }
-  semesters.forEach(sem => {
-    totalRow[sem] = { ...emptyFields }
+  semesters.forEach(semester => {
+    totalRow[semester] = { ...emptyFields }
     courses.forEach(course => {
-      const stats = course.bySemesters[sem]
+      const stats = course.bySemesters[semester]
       if (!stats) return
 
-      totalRow[sem].completions += stats.completions
-      totalRow[sem].enrollments += stats.enrollments
-      totalRow[sem].rejected += stats.rejected
-      totalRow[sem].difference += stats.difference ?? 0
+      totalRow[semester].completions += stats.completions
+      totalRow[semester].enrollments += stats.enrollments
+      totalRow[semester].rejected += stats.rejected
+      totalRow[semester].difference += stats.difference ?? 0
       totalRow.completions += stats.completions
       totalRow.enrollments += stats.enrollments
       totalRow.rejected += stats.rejected
@@ -41,15 +41,15 @@ export const calculateTotals = (courses, semesters, faculties) => {
       facultiesTotal.difference += stats.difference ?? 0
     })
     if (faculties) {
-      faculties.forEach(fac => {
-        totalRow[sem][fac] = { ...emptyFields }
+      faculties.forEach(faculty => {
+        totalRow[semester][faculty] = { ...emptyFields }
         courses.forEach(course => {
-          const stats = course.bySemesters[sem]?.[fac]
+          const stats = course.bySemesters[semester]?.[faculty]
           if (!stats) return
-          totalRow[sem][fac].completions += stats.completions
-          totalRow[sem][fac].enrollments += stats.enrollments
-          totalRow[sem][fac].rejected += stats.rejected
-          totalRow[sem][fac].difference += stats.difference ?? 0
+          totalRow[semester][faculty].completions += stats.completions
+          totalRow[semester][faculty].enrollments += stats.enrollments
+          totalRow[semester][faculty].rejected += stats.rejected
+          totalRow[semester][faculty].difference += stats.difference ?? 0
         })
       })
     }

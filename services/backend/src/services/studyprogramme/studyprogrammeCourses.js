@@ -75,7 +75,7 @@ const makeYearlyPromises = (years, academicYear, type, programmeCourses, studypr
 
 const getStudyprogrammeStatsForColorizedCoursesTable = async studyprogramme => {
   const courses = await getAllProgrammeCourses(mapToProviders([studyprogramme])[0])
-  const courseCodes = courses.map(c => c.code)
+  const courseCodes = courses.map(course => course.code)
 
   const credits = await Credit.findAll({
     attributes: ['course_code', 'student_studentnumber', 'semestercode', 'attainment_date'],
@@ -101,45 +101,48 @@ const getStudyprogrammeStatsForColorizedCoursesTable = async studyprogramme => {
   const studentList = new Set()
   const attemptsByStudents = {}
 
-  credits.forEach(c => {
-    const sn = c.student_studentnumber
-    studentList.add(sn)
-    if (!attemptsByStudents[sn]) {
-      attemptsByStudents[sn] = []
+  credits.forEach(credit => {
+    const studentNumber = credit.student_studentnumber
+    studentList.add(studentNumber)
+    if (!attemptsByStudents[studentNumber]) {
+      attemptsByStudents[studentNumber] = []
     }
-    attemptsByStudents[sn].push({
-      studentNumber: sn,
-      courseCode: c.course_code,
+    attemptsByStudents[studentNumber].push({
+      studentNumber,
+      courseCode: credit.course_code,
       completed: true,
-      date: c.attainment_date,
-      semestercode: c.semestercode,
+      date: credit.attainment_date,
+      semestercode: credit.semestercode,
     })
   })
 
-  enrollments.forEach(e => {
-    const sn = e.studentnumber
-    if (!attemptsByStudents[sn]) {
-      attemptsByStudents[sn] = []
+  enrollments.forEach(enrollment => {
+    const studentNumber = enrollment.studentnumber
+    if (!attemptsByStudents[studentNumber]) {
+      attemptsByStudents[studentNumber] = []
     }
-    studentList.add(sn)
+    studentList.add(studentNumber)
     if (
-      attemptsByStudents[sn].find(
-        att => !att.completed && att.semestercode === e.semestercode && att.courseCode === e.course_code
+      attemptsByStudents[studentNumber].find(
+        attempt =>
+          !attempt.completed &&
+          attempt.semestercode === enrollment.semestercode &&
+          attempt.courseCode === enrollment.course_code
       )
     )
       return
-    attemptsByStudents[sn].push({
-      studentNumber: sn,
-      courseCode: e.course_code,
+    attemptsByStudents[studentNumber].push({
+      studentNumber,
+      courseCode: enrollment.course_code,
       completed: false,
-      date: e.enrollment_date_time,
-      semestercode: e.semestercode,
-      enrolled: e.state === 'ENROLLED',
+      date: enrollment.enrollment_date_time,
+      semestercode: enrollment.semestercode,
+      enrolled: enrollment.state === 'ENROLLED',
     })
   })
 
   const attemptsArray = []
-  studentList.forEach(sn => attemptsArray.push(...attemptsByStudents[sn]))
+  studentList.forEach(studentNumber => attemptsArray.push(...attemptsByStudents[studentNumber]))
 
   const unorderedTableData = await createArrayOfCourses(attemptsArray, courses)
 
@@ -275,7 +278,7 @@ const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme,
 
     return acc
   }, {})
-  const ayCourses = Object.keys(allCourses).filter(c => c.startsWith('AY'))
+  const ayCourses = Object.keys(allCourses).filter(courseCode => courseCode.startsWith('AY'))
   const properties = [
     'totalAllStudents',
     'totalPassed',

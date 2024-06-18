@@ -55,7 +55,7 @@ router.get('/stats', async (req, res) => {
   }
   const providerRights = mapToProviders(fullStudyProgrammeRights)
 
-  if (!(providers.every(p => providerRights.includes(p)) || roles.includes('admin'))) {
+  if (!(providers.every(provider => providerRights.includes(provider)) || roles.includes('admin'))) {
     return res.status(403).send('You do not have rights to see this data')
   }
 

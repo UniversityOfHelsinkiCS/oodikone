@@ -14,7 +14,7 @@ const mapCourseData = course => ({
   attempts: _.chain(course.grades).values().map('count').sum().value(),
   otherPassed: _.chain(course.grades)
     .omit(_.range(0, 6))
-    .filter(g => g.status.passingGrade || g.status.improvedGrade)
+    .filter(grade => grade.status.passingGrade || grade.status.improvedGrade)
     .map('count')
     .sum()
     .value(),
@@ -22,7 +22,7 @@ const mapCourseData = course => ({
     ...course.grades,
     0: {
       count: _.chain(course.grades)
-        .filter(g => g.status.failingGrade)
+        .filter(grade => grade.status.failingGrade)
         .map('count')
         .sum()
         .value(),

@@ -31,12 +31,15 @@ class DbConnection extends EventEmitter {
       await this.sequelize.authenticate()
       this.emit('connect')
       this.established = true
-    } catch (e) {
+    } catch (error) {
       if (attempt > this.RETRY_ATTEMPTS) {
-        this.emit('error', e)
+        this.emit('error', error)
         return
       }
-      logger.error({ message: `Sis database connection failed! Attempt ${attempt}/${this.RETRY_ATTEMPTS}`, meta: e })
+      logger.error({
+        message: `Sis database connection failed! Attempt ${attempt}/${this.RETRY_ATTEMPTS}`,
+        meta: error,
+      })
       setTimeout(() => this.connect(attempt + 1), 1000 * attempt)
     }
   }

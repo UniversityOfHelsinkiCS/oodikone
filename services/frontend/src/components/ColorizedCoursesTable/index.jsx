@@ -17,7 +17,7 @@ export const ColorizedCoursesTable = ({ fetchDataHook, studyProgramme, title, pa
     semesterData &&
     Object.values(semesterData.semesters).filter(
       // 135 = Fall 2017
-      sem => sem.semestercode >= 135 && sem.semestercode <= currentSemester.semestercode
+      semester => semester.semestercode >= 135 && semester.semestercode <= currentSemester.semestercode
     )
 
   const { data, isFetching, isLoading, isError } = fetchDataHook({ id: studyProgramme })

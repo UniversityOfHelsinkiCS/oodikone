@@ -65,12 +65,14 @@ const findRelevantStudyright = (attainmentDate, studyrights) => {
 }
 
 const getDegreeStudyright = (studyrights, date, semestercode) =>
-  studyrights?.find(sr => {
-    const rightExtentCode = [1, 2, 3, 4].includes(sr.extentcode)
+  studyrights?.find(studyright => {
+    const rightExtentCode = [1, 2, 3, 4].includes(studyright.extentcode)
     const rightDates =
-      new Date(sr.startdate).getTime() <= new Date(date).getTime() &&
-      new Date(date).getTime() <= new Date(sr.enddate).getTime()
-    const enrolled = sr.semesterEnrollments?.some(e => e.semestercode === semestercode && e.enrollmenttype === 1)
+      new Date(studyright.startdate).getTime() <= new Date(date).getTime() &&
+      new Date(date).getTime() <= new Date(studyright.enddate).getTime()
+    const enrolled = studyright.semesterEnrollments?.some(
+      enrollment => enrollment.semestercode === semestercode && enrollment.enrollmenttype === 1
+    )
     return rightExtentCode && rightDates && enrolled
   })
 

@@ -1,6 +1,6 @@
 const { Op, where, fn, col } = require('sequelize')
 
-const { Credit, Enrollment, Student, Course } = require('../models')
+const { Course, Credit, Enrollment, Student } = require('../models')
 
 const getCompletedCourses = async (studentNumbers, courseCodes) => {
   let courses = await Course.findAll({
@@ -82,15 +82,15 @@ const getCompletedCourses = async (studentNumbers, courseCodes) => {
 
   const studentCredits = {}
 
-  studentInfo.forEach(s => {
-    if (!studentCredits[s.studentnumber]) {
-      studentCredits[s.studentnumber] = { credits: [], enrollments: [] }
+  studentInfo.forEach(student => {
+    if (!studentCredits[student.studentnumber]) {
+      studentCredits[student.studentnumber] = { credits: [], enrollments: [] }
     }
-    studentCredits[s.studentnumber].firstnames = s.firstnames
-    studentCredits[s.studentnumber].lastname = s.lastname
-    studentCredits[s.studentnumber].email = s.email
-    studentCredits[s.studentnumber].sis_person_id = s.sis_person_id
-    studentCredits[s.studentnumber].secondary_email = s.secondary_email
+    studentCredits[student.studentnumber].firstnames = student.firstnames
+    studentCredits[student.studentnumber].lastname = student.lastname
+    studentCredits[student.studentnumber].email = student.email
+    studentCredits[student.studentnumber].sis_person_id = student.sis_person_id
+    studentCredits[student.studentnumber].secondary_email = student.secondary_email
   })
 
   credits.forEach(credit => {
@@ -151,7 +151,7 @@ const getCompletedCourses = async (studentNumbers, courseCodes) => {
   students.forEach(student => {
     courseCodes.forEach(courseCode => {
       const [latestEnrollment] = student.allEnrollments
-        .filter(e => e.courseCode === courseCode || e.substitution === courseCode)
+        .filter(enrollment => enrollment.courseCode === courseCode || enrollment.substitution === courseCode)
         .sort((a, b) => new Date(b.date) - new Date(a.date))
       student.enrollments[courseCode] = latestEnrollment
     })

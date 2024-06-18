@@ -29,8 +29,8 @@ module.exports = async job => {
       return
     }
     await refreshers[job.id.split('-')[0]](job.data?.code)
-  } catch (e) {
-    logger.error(e.stack)
-    throw e
+  } catch (error) {
+    logger.error(error.stack)
+    throw error
   }
 }

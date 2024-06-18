@@ -58,9 +58,9 @@ const updateBasicView = async (code, combinedProgramme) => {
         },
       })
       await setGraduationStats(graduationStats, option.yearType, option.specialGroups)
-    } catch (e) {
-      logger.error(`Programme basic stats failed: ${e}`)
-      logger.error(`Stack: ${e.stack}`)
+    } catch (error) {
+      logger.error(`Programme basic stats failed: ${error}`)
+      logger.error(`Stack: ${error.stack}`)
     }
   }
   return 'OK'
@@ -103,8 +103,8 @@ const updateStudytrackView = async (code, combinedProgramme, associations) => {
         associations,
       })
       await setStudytrackStats(stats, option.graduated, option.specialGroups)
-    } catch (e) {
-      logger.error(`Studytrack stats update failed ${e}`)
+    } catch (error) {
+      logger.error(`Studytrack stats update failed ${error}`)
     }
   }
 

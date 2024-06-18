@@ -34,8 +34,8 @@ export const findCorrectProgramme = (student, coursecodes, semesters, startDate,
     year => moment(year.startdate).isSame(startDate, 'day') && moment(year.enddate).isSame(endDate, 'day')
   )?.yearcode
   const correctSemesters = Object.values(semesters.semesters || {})
-    .filter(sem => sem.yearcode === yearcode)
-    .map(sem => sem.semestercode)
+    .filter(semester => semester.yearcode === yearcode)
+    .map(semester => semester.semestercode)
   let programme
   const courseAttainment = student.courses.filter(
     a =>

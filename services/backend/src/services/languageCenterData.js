@@ -6,10 +6,13 @@ const { redisClient } = require('./redis')
 
 const LANGUAGE_CENTER_REDIS_KEY = 'LANGUAGE_CENTER_DATA'
 
-const isBetween = (start, date, end) =>
-  new Date(start).getTime() <= new Date(date).getTime() && new Date(date).getTime() <= new Date(end).getTime()
+const isBetween = (start, date, end) => {
+  return new Date(start).getTime() <= new Date(date).getTime() && new Date(date).getTime() <= new Date(end).getTime()
+}
 
-const findStudyright = (studyrights, date) => studyrights?.find(sr => isBetween(sr.startdate, date, sr.enddate))
+const findStudyright = (studyrights, date) => {
+  return studyrights?.find(studyright => isBetween(studyright.startdate, date, studyright.enddate))
+}
 
 const getDifference = stats => {
   const value = stats.enrollments - stats.completions
@@ -63,16 +66,16 @@ const createArrayOfCourses = async (attempts, courses) => {
   }, {})
 
   const courseList = courses
-    .map(c => ({ ...c, bySemesters: { ...semesterStatsMap[c.code], cellStats: {} } }))
+    .map(course => ({ ...course, bySemesters: { ...semesterStatsMap[course.code], cellStats: {} } }))
     .filter(course => course.bySemesters)
 
   courseList.forEach(course => {
-    Object.keys(semestersObject).forEach(sem => {
-      const stats = course.bySemesters[sem]
+    Object.keys(semestersObject).forEach(semester => {
+      const stats = course.bySemesters[semester]
       if (!stats) return
       stats.difference = getDifference(stats)
-      Object.keys(facultyObject).forEach(fac => {
-        const stats = course.bySemesters[sem]?.[fac]
+      Object.keys(facultyObject).forEach(faculty => {
+        const stats = course.bySemesters[semester]?.[faculty]
         if (!stats) return
         stats.difference = getDifference(stats)
       })
@@ -127,52 +130,55 @@ const computeLanguageCenterData = async () => {
     return obj
   }, {})
 
-  credits.forEach(c => {
-    c.faculty = attemptStudyrightToFacultyMap[c.studyright_id]
+  credits.forEach(credit => {
+    credit.faculty = attemptStudyrightToFacultyMap[credit.studyright_id]
   })
-  enrollments.forEach(c => {
-    c.faculty = attemptStudyrightToFacultyMap[c.studyright_id]
+  enrollments.forEach(enrollment => {
+    enrollment.faculty = attemptStudyrightToFacultyMap[enrollment.studyright_id]
   })
 
   const studentList = new Set()
   const attemptsByStudents = {}
 
-  credits.forEach(c => {
-    const sn = c.student_studentnumber
-    studentList.add(sn)
-    if (!attemptsByStudents[sn]) {
-      attemptsByStudents[sn] = []
+  credits.forEach(credit => {
+    const studentNumber = credit.student_studentnumber
+    studentList.add(studentNumber)
+    if (!attemptsByStudents[studentNumber]) {
+      attemptsByStudents[studentNumber] = []
     }
-    attemptsByStudents[sn].push({
-      studentNumber: sn,
-      courseCode: c.course_code,
+    attemptsByStudents[studentNumber].push({
+      studentNumber,
+      courseCode: credit.course_code,
       completed: true,
-      date: c.attainment_date,
-      faculty: attemptStudyrightToFacultyMap[c.studyright_id],
-      semestercode: c.semestercode,
+      date: credit.attainment_date,
+      faculty: attemptStudyrightToFacultyMap[credit.studyright_id],
+      semestercode: credit.semestercode,
     })
   })
 
-  enrollments.forEach(e => {
-    const sn = e.studentnumber
-    if (!attemptsByStudents[sn]) {
-      attemptsByStudents[sn] = []
+  enrollments.forEach(enrollment => {
+    const studentNumber = enrollment.studentnumber
+    if (!attemptsByStudents[studentNumber]) {
+      attemptsByStudents[studentNumber] = []
     }
-    studentList.add(sn)
+    studentList.add(studentNumber)
     if (
-      attemptsByStudents[sn].find(
-        att => !att.completed && att.semestercode === e.semestercode && att.courseCode === e.course_code
+      attemptsByStudents[studentNumber].find(
+        attempt =>
+          !attempt.completed &&
+          attempt.semestercode === enrollment.semestercode &&
+          attempt.courseCode === enrollment.course_code
       )
     )
       return
-    attemptsByStudents[sn].push({
-      studentNumber: sn,
-      courseCode: e.course_code,
+    attemptsByStudents[studentNumber].push({
+      studentNumber,
+      courseCode: enrollment.course_code,
       completed: false,
-      date: e.enrollment_date_time,
-      faculty: attemptStudyrightToFacultyMap[e.studyright_id],
-      semestercode: e.semestercode,
-      enrolled: e.state === 'ENROLLED',
+      date: enrollment.enrollment_date_time,
+      faculty: attemptStudyrightToFacultyMap[enrollment.studyright_id],
+      semestercode: enrollment.semestercode,
+      enrolled: enrollment.state === 'ENROLLED',
     })
   })
 
@@ -201,18 +207,18 @@ const computeLanguageCenterData = async () => {
     findStudyright(studentnumberToStudyrightsMap[studentNumber], date)?.facultyCode
 
   const attemptsArray = []
-  studentList.forEach(sn => attemptsArray.push(...attemptsByStudents[sn]))
+  studentList.forEach(studentNumber => attemptsArray.push(...attemptsByStudents[studentNumber]))
   // 93033 Avoin yliopisto, yhteistyöoppilaitokset"
   // 93034 Kesäyliopistot
   const isOpenUni = code => ['9301', 'H930', '93033', '93034'].includes(code)
   const isMisc = code => ['H906', 'H401'].includes(code) // Language center, Alexander institute (very few numbers)
 
-  attemptsArray.forEach(item => {
-    if (item.faculty) {
-      if (isOpenUni(item.faculty)) {
-        item.faculty = 'OPEN'
-      } else if (isMisc(item.faculty) || !item.faculty.substring(0, 3).match('^H\\d')) {
-        item.faculty = 'OTHER'
+  attemptsArray.forEach(attempt => {
+    if (attempt.faculty) {
+      if (isOpenUni(attempt.faculty)) {
+        attempt.faculty = 'OPEN'
+      } else if (isMisc(attempt.faculty) || !attempt.faculty.substring(0, 3).match('^H\\d')) {
+        attempt.faculty = 'OTHER'
       }
       return
     }
@@ -220,13 +226,13 @@ const computeLanguageCenterData = async () => {
     // Credit or enrollment did not have studyright_id. Find based on date,
     // and if studyrightElement is not found, check studyrights because open uni rights
     // do not have studyrightelements
-    const faculty = getFaculty(item.studentNumber, item.date)
+    const faculty = getFaculty(attempt.studentNumber, attempt.date)
     if (isOpenUni(faculty)) {
-      item.faculty = 'OPEN'
+      attempt.faculty = 'OPEN'
     } else if (faculty?.substring(0, 3).match('^H\\d')) {
-      item.faculty = !isMisc(faculty) ? faculty : 'OTHER'
+      attempt.faculty = !isMisc(faculty) ? faculty : 'OTHER'
     } else {
-      item.faculty = 'OTHER'
+      attempt.faculty = 'OTHER'
     }
   })
 

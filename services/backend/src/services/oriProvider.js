@@ -16,7 +16,7 @@ const getSisuAccessToken = async eppn => {
       },
       { 'content-type': 'application/json' }
     )
-  } catch (e) {
+  } catch (error) {
     throw new ApplicationError(
       'Could not find the user in Sisu, either with the eppn of the user or the new person.',
       404
@@ -68,7 +68,7 @@ const getGraphqlData = async (accessToken, queryObject) => {
   let graphQlResponse
   try {
     graphQlResponse = await axios(config)
-  } catch (e) {
+  } catch (error) {
     throw new ApplicationError('Graphql request failed for unclear reasons.', 500)
   }
   return graphQlResponse.data.data.private_person

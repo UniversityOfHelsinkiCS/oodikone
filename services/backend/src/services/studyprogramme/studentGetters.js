@@ -149,8 +149,8 @@ const getStudentsForProgrammeCourses = async (from, to, programmeCourses) => {
       isStudyModule: course.isStudyModule,
     }))
     return result
-  } catch (e) {
-    logger.error(`getStudentsForProgrammeCourses() function failed ${e}`)
+  } catch (error) {
+    logger.error(`getStudentsForProgrammeCourses() function failed ${error}`)
   }
 }
 

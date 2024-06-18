@@ -35,8 +35,8 @@ const createNewSearch = async (userId, name, courseCodes) => {
     const created = await createOpenUniPopulationSearch(userId, name, courseCodes)
     if (!created) return null
     return created
-  } catch (e) {
-    logger.error(`Couldn't create new open uni search instance: ${e}`)
+  } catch (error) {
+    logger.error(`Couldn't create new open uni search instance: ${error}`)
     return null
   }
 }
@@ -46,8 +46,8 @@ const deleteSearch = async (userId, id) => {
     const deleted = await deleteOpenUniSearch(userId, id)
     if (!deleted) return null
     return deleted
-  } catch (e) {
-    logger.error(`Couldn't delete open uni search instance: ${e}`)
+  } catch (error) {
+    logger.error(`Couldn't delete open uni search instance: ${error}`)
     return null
   }
 }
@@ -57,8 +57,8 @@ const updateSearch = async (userId, id, courseCodes) => {
     const updated = await updateOpenUniPopulationSearch(userId, id, courseCodes)
     if (!updated) return null
     return updated
-  } catch (e) {
-    logger.error(`Couldn't update open uni search instance: ${e}`)
+  } catch (error) {
+    logger.error(`Couldn't update open uni search instance: ${error}`)
   }
 }
 
