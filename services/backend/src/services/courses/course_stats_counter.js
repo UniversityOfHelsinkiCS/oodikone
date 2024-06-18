@@ -191,14 +191,14 @@ class CourseStatsCounter {
           .reduce((acc, key) => [...acc, ...[...this.enrollments[key]].map(studentnumber => studentnumber)], [])
       : []
     const allStudents = Object.keys(students.all).map(student => student)
-    const fileredEnrolledNoGrade = this.enrollments.ENROLLED
+    const filteredEnrolledNoGrade = this.enrollments.ENROLLED
       ? [...this.enrollments.ENROLLED]
           .filter(student => !studs.includes(student) && !allStudents.includes(student))
           .reduce((acc, student) => ({ ...acc, [student]: true }), {})
       : {}
 
-    students.all = { ...students.all, ...fileredEnrolledNoGrade }
-    students.enrolledNoGrade = fileredEnrolledNoGrade
+    students.all = { ...students.all, ...filteredEnrolledNoGrade }
+    students.enrolledNoGrade = filteredEnrolledNoGrade
     stats.students = lengthOf(students.all)
     stats.passed = lengthOf(students.passed)
     stats.failed = lengthOf(students.failed)
@@ -211,7 +211,7 @@ class CourseStatsCounter {
     stats.perStudent = stats.attempts / (stats.passed + stats.failed)
     stats.passingSemestersCumulative = this.getPassingSemestersCumulative()
     stats.totalStudents = stats.students
-    stats.totalEnrolledNoGrade = lengthOf(fileredEnrolledNoGrade)
+    stats.totalEnrolledNoGrade = lengthOf(filteredEnrolledNoGrade)
     stats.percentageWithEnrollments = percentageOf(stats.passed, stats.totalStudents)
     return {
       stats,

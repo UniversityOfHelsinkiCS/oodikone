@@ -36,28 +36,28 @@ const getStudentsAndCourses = async (params, selectedStudents, studentNumbers, c
     const courses = await findCourses(studentnumbers, dateMonthsFromNow(startDate, months), courseCodes)
     const foundCourseCodes = Object.keys(keyBy(courses, 'code'))
     const filteredCourseCodes = courseCodes?.filter(code => !foundCourseCodes.includes(code))
-
-    const courseEnrollements = await findCourseEnrollments(
+    const courseEnrollments = await findCourseEnrollments(
       studentnumbers,
       dateMonthsFromNow(startDate, months),
       filteredCourseCodes
     )
 
-    return [allStudents, courses, courseEnrollements]
+    return [allStudents, courses, courseEnrollments]
   }
+
   const { months, startDate } = params
   const beforeDate = months && startDate ? dateMonthsFromNow(startDate, months) : new Date()
   const allStudents = await getAllStudents(studentNumbers)
   const courses = await findCourses(studentNumbers, beforeDate, courseCodes)
   const foundCourseCodes = Object.keys(keyBy(courses, 'code'))
   const filteredCourseCodes = courseCodes?.filter(code => !foundCourseCodes.includes(code))
+  const courseEnrollments = await findCourseEnrollments(studentNumbers, beforeDate, filteredCourseCodes)
 
-  const courseEnrollements = await findCourseEnrollments(studentNumbers, beforeDate, filteredCourseCodes)
-  return [allStudents, courses, courseEnrollements]
+  return [allStudents, courses, courseEnrollments]
 }
 
-const bottlenecksOf = async (query, studentNumbers, encryptdata = false) => {
-  const encryptStudentnumbers = bottlenecks => {
+const bottlenecksOf = async (query, studentNumbers, encryptData = false) => {
+  const encryptStudentNumbers = bottlenecks => {
     for (const course of Object.keys(bottlenecks.coursestatistics)) {
       const encryptedStudentStats = {}
       for (const data of Object.keys(bottlenecks.coursestatistics[course].students)) {
@@ -160,8 +160,8 @@ const bottlenecksOf = async (query, studentNumbers, encryptdata = false) => {
   bottlenecks.coursestatistics = allStats.filter(course => course.stats.students > 0)
   bottlenecks.allStudents = Object.keys(allStudents).length
 
-  if (encryptdata) {
-    encryptStudentnumbers(bottlenecks)
+  if (encryptData) {
+    encryptStudentNumbers(bottlenecks)
   }
 
   return bottlenecks
