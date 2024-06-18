@@ -35,19 +35,28 @@ const getPassedStudents = (curriculum, includeSubstitutions, populationCourses, 
     return {}
   }
 
-  const getPassedWithSubstitutions = () => {
+  const getPassedSubstitution = () => {
     return courseCodes.reduce((passed, courseCode) => {
-      const course = coursestatistics.find(course => course.course.substitutions.includes(courseCode))
-      if (course) {
-        course.course.substitutions.forEach(substitution => {
-          passed[substitution] = Object.keys(course.students.passed)
-        })
+      const course = coursestatistics.find(course => course.course.code === courseCode)
+      if (!course) {
+        return passed
       }
+      const { substitutions } = course.course
+      passed[courseCode] = []
+      substitutions.forEach(code => {
+        const course = coursestatistics.find(course => course.course.code === code)
+        if (course) {
+          const students = Object.keys(course.students.passed)
+          if (students.length > 0) {
+            passed[courseCode].push(...students)
+          }
+        }
+      })
       return passed
     }, {})
   }
 
-  const getPassedWithoutSubstitutions = () => {
+  const getPassedMainCourse = () => {
     return courseCodes.reduce((passed, courseCode) => {
       const course = coursestatistics.find(course => course.course.code === courseCode)
       if (course) {
@@ -58,10 +67,10 @@ const getPassedStudents = (curriculum, includeSubstitutions, populationCourses, 
   }
 
   if (includeSubstitutions) {
-    return getPassedWithSubstitutions()
+    return getPassedSubstitution()
   }
 
-  return getPassedWithoutSubstitutions()
+  return getPassedMainCourse()
 }
 
 const CoursesTable = ({ curriculum, includeSubstitutions, students, studyGuidanceCourses }) => {
