@@ -15,6 +15,7 @@ import { Transfer } from './transfer'
 import { ProgrammeModule } from './programmeModule'
 import { ProgrammeModuleChild } from './programmeModuleChild'
 import { Organization } from './organization'
+import { CourseProvider } from './courseProvider'
 
 Credit.notUnnecessary = credit => {
   return credit.credits > 0 && credit.credits <= 12
@@ -48,5 +49,6 @@ export {
   Studyplan,
   ProgrammeModule,
   ProgrammeModuleChild,
-  Organization
+  Organization,
+  CourseProvider
 }

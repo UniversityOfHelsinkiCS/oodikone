@@ -1,5 +1,7 @@
-import { Model, Table, Column, DataType, PrimaryKey, ForeignKey, HasMany } from "sequelize-typescript"
+import { Model, Table, Column, DataType, PrimaryKey, ForeignKey, HasMany, BelongsToMany } from "sequelize-typescript"
 import { Credit } from "./credit"
+import { Organization } from "./organization"
+import { CourseProvider } from "./courseProvider"
 
 @Table({
   underscored: true,
@@ -17,6 +19,9 @@ export class Course extends Model {
 
   @HasMany(() => Credit, { foreignKey: 'course_id', sourceKey: 'id' })
   credits: Credit[]
+
+  @BelongsToMany(() => Organization, () => CourseProvider, 'coursecode')
+  providers: CourseProvider[]
 
   @Column(DataType.STRING)
   name: string

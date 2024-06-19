@@ -1,4 +1,7 @@
-import { Model, Table, Column, PrimaryKey, DataType, ForeignKey } from 'sequelize-typescript'
+import { Model, Table, Column, PrimaryKey, DataType, ForeignKey, BelongsTo, BelongsToMany } from 'sequelize-typescript'
+import { Organization } from './organization'
+import { CourseProvider } from './courseProvider'
+import { Course } from './course'
 
 @Table({
   underscored: true,
@@ -9,6 +12,9 @@ export class ProgrammeModule extends Model {
   @PrimaryKey
   @Column(DataType.STRING)
   id: string
+
+  @BelongsTo(() => Organization, { foreignKey: 'organization_id' })
+  organization: Organization
 
   @Column(DataType.STRING)
   group_id: string

@@ -19,6 +19,7 @@ import {
   ProgrammeModule,
   ProgrammeModuleChild,
   Organization,
+  CourseProvider
 } from '../models/index'
 import { Tag } from '../models/kone/tag'
 import { TagStudent } from '../models/kone/tagStudent'
@@ -62,7 +63,8 @@ class DbConnection extends EventEmitter {
         Studyplan,
         ProgrammeModule,
         ProgrammeModuleChild,
-        Organization
+        Organization,
+        CourseProvider
       ],
     })
   }
