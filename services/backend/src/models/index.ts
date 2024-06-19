@@ -12,6 +12,9 @@ import { StudyrightElement } from './studyrightElement'
 import { ElementDetail } from './elementDetail'
 import { Studyplan } from './studyplan'
 import { Transfer } from './transfer'
+import { ProgrammeModule } from './programmeModule'
+import { ProgrammeModuleChild } from './programmeModuleChild'
+import { Organization } from './organization'
 
 Credit.notUnnecessary = credit => {
   return credit.credits > 0 && credit.credits <= 12
@@ -42,5 +45,8 @@ export {
   StudyrightElement,
   ElementDetail,
   Transfer,
-  Studyplan
+  Studyplan,
+  ProgrammeModule,
+  ProgrammeModuleChild,
+  Organization
 }
