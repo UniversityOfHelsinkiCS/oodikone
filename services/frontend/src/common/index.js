@@ -21,22 +21,6 @@ export const checkUserAccess = (requiredRoles, roles) => {
   return intersection(requiredRoles, roles).length > 0
 }
 
-export const getStudentToStudyrightStartMap = (students, programmeCode) => {
-  return students.reduce((res, student) => {
-    const currentStudyright = student.studyrights?.find(studyright =>
-      studyright.studyright_elements.some(element => element.code === programmeCode)
-    )
-    if (currentStudyright?.studyrightid && currentStudyright.studyrightid.slice(-2) === '-2') {
-      const bachelorId = currentStudyright.studyrightid.replace(/-2$/, '-1')
-      const bacherlorStudyright = student.studyrights.find(studyright => studyright.studyrightid === bachelorId)
-      res[student.studentNumber] = bacherlorStudyright?.startdate || null
-    } else {
-      res[student.studentNumber] = currentStudyright?.startdate || null
-    }
-    return res
-  }, {})
-}
-
 export const getGraduationGraphTitle = (studyProgramme, doCombo = false) => {
   if (!studyProgramme) return ''
   if (['MH30_001', 'MH30_003'].includes(studyProgramme)) return 'Licenciate studyright'
