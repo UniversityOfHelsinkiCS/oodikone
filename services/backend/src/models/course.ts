@@ -1,4 +1,5 @@
-import { Model, Table, Column, DataType, PrimaryKey, ForeignKey } from "sequelize-typescript"
+import { Model, Table, Column, DataType, PrimaryKey, ForeignKey, HasMany } from "sequelize-typescript"
+import { Credit } from "./credit"
 
 @Table({
   underscored: true,
@@ -13,6 +14,9 @@ export class Course extends Model {
   @ForeignKey(() => Course)
   @Column(DataType.STRING)
   code: string
+
+  @HasMany(() => Credit, { foreignKey: 'course_id', sourceKey: 'id' })
+  credits: Credit[]
 
   @Column(DataType.STRING)
   name: string

@@ -1,4 +1,5 @@
-import { Model, Table, Column, PrimaryKey, DataType } from 'sequelize-typescript'
+import { Model, Table, Column, PrimaryKey, DataType, HasMany } from 'sequelize-typescript'
+import { Studyright } from './studyright'
 
 @Table({
   underscored: true,
@@ -18,4 +19,7 @@ export class StudyrightExtent extends Model {
 
   @Column(DataType.DATE)
   updatedAt: Date
+
+  @HasMany(() => Studyright, { foreignKey: 'extentcode', sourceKey: 'extentcode' })
+  studyrights: Studyright[]
 }

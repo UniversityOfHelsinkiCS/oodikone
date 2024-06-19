@@ -1,4 +1,5 @@
-import { Model, Table, Column, PrimaryKey, DataType } from 'sequelize-typescript'
+import { Model, Table, Column, PrimaryKey, DataType, HasMany } from 'sequelize-typescript'
+import { SemesterEnrollment } from './semesterEnrollment'
 
 @Table({
   underscored: true,
@@ -9,6 +10,9 @@ export class Semester extends Model {
   @PrimaryKey
   @Column(DataType.STRING)
   composite: string
+
+  @HasMany(() => SemesterEnrollment, { foreignKey: 'semestercomposite', sourceKey: 'composite' })
+  semesterEnrollments: SemesterEnrollment[]
 
   @Column(DataType.INTEGER)
   semestercode: number

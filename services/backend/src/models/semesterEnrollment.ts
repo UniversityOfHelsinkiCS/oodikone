@@ -15,6 +15,9 @@ export class SemesterEnrollment extends Model {
   @Column(DataType.STRING)
   org: string
 
+  @BelongsTo(() => Semester, { foreignKey: 'semestercomposite', targetKey: 'composite' })
+  semester: Semester
+
   @ForeignKey(() => Student)
   @Column(DataType.STRING)
   studentnumber: string
@@ -25,7 +28,6 @@ export class SemesterEnrollment extends Model {
   @Column(DataType.INTEGER)
   semestercode: number
 
-  @ForeignKey(() => Semester)
   @Column(DataType.DATE)
   semestercomposite: string
 
