@@ -51,7 +51,9 @@ const studentnumbersWithAllStudyrightElements = async ({
     }
   }
 
-  const students = await Studyright.findAll({
+  let students 
+  try {
+  students = await Studyright.findAll({
     attributes: ['student_studentnumber', 'graduated', 'enddate'],
     include: {
       model: StudyrightElement,
@@ -92,30 +94,42 @@ const studentnumbersWithAllStudyrightElements = async ({
     having: count('studyright_elements.code', studyRights.length, true),
     raw: true,
   })
+  } catch (e) {
+    console.log(e)
+  }
 
   const studentnumbers = [...new Set(students.map(s => s.student_studentnumber))]
   // bit hacky solution, but this is used to filter out studentnumbers who have since changed studytracks
-  const rights = await Studyright.findAll({
-    attributes: ['studyrightid'],
-    where: {
-      studentStudentnumber: {
-        [Op.in]: studentnumbers,
-      },
-    },
-    include: {
-      attributes: [],
-      model: StudyrightElement,
+  let rights
+  try {
+    rights = await Studyright.findAll({
+      attributes: ['studyrightid'],
       where: {
-        code: {
-          [Op.in]: studyRights,
+        studentStudentnumber: {
+          [Op.in]: studentnumbers,
         },
       },
-    },
-    group: ['studyright.studyrightid'],
-    having: count('studyright_elements.id', studyRights.length, true),
-    raw: true,
-  })
+      include: {
+        attributes: [],
+        model: StudyrightElement,
+        where: {
+          code: {
+            [Op.in]: studyRights,
+          },
+        },
+      },
+      group: ['studyright.studyrightid'],
+      having: count('studyright_elements.id', studyRights.length, true),
+      raw: true,
+    })
+  } catch (e) {
+    console.log(e)
+    throw new Error("AASD")
+  }
 
+
+
+  console.log("starting")
   // bit hacky solution, but this is used to filter out studentnumbers who have since changed studytracks
   const allStudytracksForStudents = await StudyrightElement.findAll({
     where: {

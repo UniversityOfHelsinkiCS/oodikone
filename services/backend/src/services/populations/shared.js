@@ -354,8 +354,9 @@ const getOptionsForStudents = async (students, code, level) => {
         [Op.in]: students,
       },
     },
-    order: [[StudyrightElement, 'startdate', 'DESC']],
+    order: [[{ model: StudyrightElement, as: 'studyright_elements' }, 'startdate', 'DESC']],
     attributes: ['studentStudentnumber', 'givendate'],
+    logging: console.log
   })
 
   return options

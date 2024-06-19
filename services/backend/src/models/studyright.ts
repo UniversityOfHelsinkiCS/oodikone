@@ -41,8 +41,8 @@ export class Studyright extends Model {
   cancelled: boolean
 
   @ForeignKey(() => Student)
-  @Column(DataType.STRING)
-  student_studentnumber: string
+  @Column({ field: 'student_studentnumber', type: DataType.STRING })
+  studentStudentnumber: string
 
   @Column(DataType.STRING)
   faculty_code: string
