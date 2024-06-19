@@ -2,13 +2,23 @@ import { Sequelize } from 'sequelize-typescript'
 const EventEmitter = require('events')
 const Umzug = require('umzug')
 const conf = require('../conf-backend')
-import { CreditType } from '../models/creditType'
-import { Credit } from '../models/credit'
-import { Studyright } from '../models/studyright'
-import { Course } from '../models/course'
-import { Enrollment } from '../models/enrollment'
-import { Student } from '../models/student'
-import { StudyrightElement } from '../models/studyrightElement'
+import {
+  CreditType,
+  Studyright,
+  Student,
+  Enrollment,
+  Credit,
+  SemesterEnrollment,
+  Semester,
+  Course,
+  StudyrightExtent,
+  StudyrightElement,
+  ElementDetail,
+  Transfer,
+  Studyplan
+} from '../models'
+import { Tag } from '../models/kone/tag'
+import { TagStudent } from '../models/kone/tagStudent'
 
 const logger = require('../util/logger')
 
@@ -30,7 +40,20 @@ class DbConnection extends EventEmitter {
       },
       logging: false,
       password: conf.SIS_PASSWORD,
-      models: [CreditType, Credit, Studyright, Enrollment, Course, Student, StudyrightElement],
+      models: [CreditType,
+        Studyright,
+        Student,
+        Enrollment,
+        Credit,
+        SemesterEnrollment,
+        Semester,
+        Course,
+        StudyrightExtent,
+        StudyrightElement,
+        ElementDetail,
+        Transfer,
+        Studyplan
+      ],
     })
   }
 
@@ -57,6 +80,7 @@ const sequelizeKone = new Sequelize(conf.DB_URL_KONE, {
   searchPath: conf.DB_SCHEMA_KONE,
   logging: false,
   password: conf.KONE_PASSWORD,
+  models: [Tag, TagStudent]
 })
 
 sequelizeKone.query(`SET SESSION search_path to ${conf.DB_SCHEMA_KONE}`)

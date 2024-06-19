@@ -2,7 +2,7 @@ const router = require('express').Router()
 
 const Student = require('../services/students')
 const { ApplicationError } = require('../util/customErrors')
-const { hasFullAccessToStudentData } = require('../util/utils')
+const { hasFullAccessToStudentData } = require('../util/utils.ts')
 
 const filterStudentTags = (student, userId) => {
   return {

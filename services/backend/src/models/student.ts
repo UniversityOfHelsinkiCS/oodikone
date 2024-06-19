@@ -1,4 +1,5 @@
-import { Model, Table, Column, PrimaryKey, DataType } from 'sequelize-typescript'
+import { Model, Table, Column, PrimaryKey, DataType, HasMany } from 'sequelize-typescript'
+import { Credit } from './credit'
 
 @Table({
   underscored: true,
@@ -20,7 +21,7 @@ export class Student extends Model {
   abbreviatedname: string
 
   @Column(DataType.DATE)
-  birthdate: string
+  birthdate: Date
 
   @Column(DataType.STRING)
   creditcount: string
@@ -28,7 +29,7 @@ export class Student extends Model {
   @Column(DataType.DATE)
   dateofuniversityenrollment: Date
 
-  @Column(DataType.INTEGER)
+  @Column(DataType.STRING)
   email: string
 
   @Column(DataType.STRING)
@@ -72,4 +73,7 @@ export class Student extends Model {
 
   @Column(DataType.DATE)
   updatedAt: Date
+
+  @HasMany(() => Credit)
+  credits: Credit
 }

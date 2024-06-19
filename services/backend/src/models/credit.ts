@@ -1,6 +1,7 @@
 import { BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript'
 import { CreditType } from './creditType';
 import { Studyright } from './studyright';
+import { Student } from './student';
 
 @Table({
   underscored: false,
@@ -16,8 +17,12 @@ export class Credit extends Model {
   grade: string;
   @Column(DataType.STRING)
 
+  @ForeignKey(() => Student)
   @Column(DataType.STRING)
   student_studentnumber: string;
+
+  @BelongsTo(() => Student)
+  student: Student
 
   @Column(DataType.DOUBLE)
   credits: number;

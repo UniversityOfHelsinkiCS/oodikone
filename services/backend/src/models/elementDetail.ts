@@ -5,7 +5,7 @@ import { Model, Table, Column, PrimaryKey, DataType } from 'sequelize-typescript
   modelName: 'element_detail',
   tableName: 'element_details',
 })
-export class StudyrightExtent extends Model {
+export class ElementDetail extends Model {
   @PrimaryKey
   @Column(DataType.INTEGER)
   code: number

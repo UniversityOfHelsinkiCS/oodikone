@@ -15,7 +15,8 @@ const {
   Studyplan,
   Transfer,
 } = require('../models')
-const { TagStudent, Tag } = require('../models/models_kone')
+const { TagStudent } = require('../models/kone/tagStudent')
+const { Tag } = require('../models/kone/tag')
 const logger = require('../util/logger')
 
 const createStudent = student => Student.create(student)
@@ -294,6 +295,7 @@ const withId = async id => {
     return formattedStudent
   } catch (e) {
     logger.error(`Error when fetching single student ${e}`)
+    console.log(e)
     return {
       error: e,
     }
