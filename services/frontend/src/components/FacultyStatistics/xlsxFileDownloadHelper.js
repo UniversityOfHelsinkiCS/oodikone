@@ -63,7 +63,7 @@ export const downloadStudentTableCsv = (studentStats, programmeNames, faculty, s
       [year]: [
         ...new Set(
           Object.keys(countriesExtra[year]).reduce(
-            (acc, prog) => [...acc, ...Object.keys(countriesExtra[year][prog])].sort(),
+            (acc, programme) => [...acc, ...Object.keys(countriesExtra[year][programme])].sort(),
             []
           )
         ),

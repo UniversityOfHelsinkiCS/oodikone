@@ -98,7 +98,6 @@ export const ExportModal = ({ open, onOpen, onClose, data, columns, featureName 
           Exporting {flatData.length} rows into an Excel (.xlsx) file. Choose which columns you want to include in the
           generated field from the list below.
         </p>
-
         <div>
           <Button
             disabled={selected.length === exportColumns.length}
@@ -115,7 +114,7 @@ export const ExportModal = ({ open, onOpen, onClose, data, columns, featureName 
             <Table.Row key="TitleRow">
               <Table.HeaderCell />
               <Table.HeaderCell>Column</Table.HeaderCell>
-              <Table.HeaderCell>Sample Values</Table.HeaderCell>
+              <Table.HeaderCell>Sample values</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
           <Table.Body>

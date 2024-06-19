@@ -159,14 +159,14 @@ export const InteractiveDataTable = ({
                                 ? dataProgrammeStats[programme][yearIndex].slice(sliceStart)
                                 : null
                             )
-                            .filter(prog => !!prog)
+                            .filter(programme => !!programme)
                         : keyOrder[yearIndex]
                             ?.map(programme =>
                               dataProgrammeStats[programme]
                                 ? dataProgrammeStats[programme][yearIndex].slice(sliceStart)
                                 : null
                             )
-                            .filter(prog => !!prog)
+                            .filter(programme => !!programme)
                     }
                     differenceData={Object.keys(differenceToPrevYears)?.reduce(
                       (yearlyObject, programme) => ({

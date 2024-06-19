@@ -435,7 +435,7 @@ const SingleCourseStats = ({
 
   const options = filteredProgrammes
     .map(({ text, ...rest }) => ({ text: typeof text === 'string' ? text : getTextIn(text), ...rest }))
-    .map(prog => ({ ...prog, name: prog.text }))
+    .map(programme => ({ ...programme, name: programme.text }))
 
   return (
     <div>

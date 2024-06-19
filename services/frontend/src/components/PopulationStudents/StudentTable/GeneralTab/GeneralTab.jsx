@@ -488,13 +488,17 @@ export const GeneralTab = ({
       getRowContent: student => getStudyProgrammeContent(student),
       getRowVal: student => {
         const programmesToUse = programmeCode
-          ? studentProgrammesMap[student.studentNumber]?.programmes.filter(prog => prog.code !== programmeCode)
+          ? studentProgrammesMap[student.studentNumber]?.programmes.filter(
+              programme => programme.code !== programmeCode
+            )
           : studentProgrammesMap[student.studentNumber]?.programmes
         return programmesToUse.map(programme => getTextIn(programme.name))
       },
       getRowExportVal: student => {
         const programmesToUse = programmeCode
-          ? studentProgrammesMap[student.studentNumber]?.programmes.filter(prog => prog.code !== programmeCode)
+          ? studentProgrammesMap[student.studentNumber]?.programmes.filter(
+              programme => programme.code !== programmeCode
+            )
           : studentProgrammesMap[student.studentNumber]?.programmes
         return programmesToUse.map(programme => getTextIn(programme.name)).join('; ')
       },
