@@ -1,5 +1,9 @@
-import { Model, Table, Column, PrimaryKey, DataType, HasMany } from 'sequelize-typescript'
+import { Model, Table, Column, PrimaryKey, DataType, HasMany, ForeignKey } from 'sequelize-typescript'
 import { Credit } from './credit'
+import { SemesterEnrollment } from './semesterEnrollment'
+import { Studyplan } from './studyplan'
+import { Transfer } from './transfer'
+import { Studyright } from './studyright'
 
 @Table({
   underscored: true,
@@ -17,8 +21,17 @@ export class Student extends Model {
   @Column(DataType.STRING)
   firstnames: string
 
+  @HasMany(() => Studyright)
+  studyrights: Studyright[]
+
   @Column(DataType.STRING)
   abbreviatedname: string
+
+  @HasMany(() => Studyplan)
+  studyplans: Studyplan[]
+
+  @HasMany(() => Transfer)
+  transfers: Transfer[]
 
   @Column(DataType.DATE)
   birthdate: Date
@@ -35,14 +48,14 @@ export class Student extends Model {
   @Column(DataType.STRING)
   secondary_email: string
 
+  @HasMany(() => SemesterEnrollment)
+  semester_enrollments: SemesterEnrollment[]
+
   @Column(DataType.STRING)
   national_student_number: string
 
   @Column(DataType.STRING)
   phone_number: string
-
-  @Column(DataType.STRING)
-  studyright_id: string
 
   @Column(DataType.STRING)
   country_fi: string

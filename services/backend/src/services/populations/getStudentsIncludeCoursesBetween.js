@@ -18,7 +18,8 @@ const {
   SemesterEnrollment,
   Transfer,
 } = require('../../models')
-const { Tag, TagStudent } = require('../../models/models_kone')
+const { Tag } = require('../../models/kone/tag')
+const { TagStudent } = require('../../models/kone/tagStudent')
 
 const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDate, studyright, tag) => {
   const studentTags = await TagStudent.findAll({

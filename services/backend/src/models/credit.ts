@@ -2,6 +2,7 @@ import { BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } fro
 import { CreditType } from './creditType';
 import { Studyright } from './studyright';
 import { Student } from './student';
+import { Course } from './course';
 
 @Table({
   underscored: false,
@@ -43,6 +44,10 @@ export class Credit extends Model {
   @Column(DataType.STRING)
   course_code: string;
 
+  @BelongsTo(() => Course)
+  course: Course
+
+  @ForeignKey(() => Course)
   @Column(DataType.STRING)
   course_id: string;
 

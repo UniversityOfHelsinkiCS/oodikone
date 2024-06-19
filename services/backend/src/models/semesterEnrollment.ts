@@ -1,4 +1,4 @@
-import { Model, Table, Column, PrimaryKey, DataType, ForeignKey } from 'sequelize-typescript'
+import { Model, Table, Column, PrimaryKey, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript'
 import { Semester } from './semester'
 import { Student } from './student'
 
@@ -18,6 +18,9 @@ export class SemesterEnrollment extends Model {
   @ForeignKey(() => Student)
   @Column(DataType.STRING)
   studentnumber: string
+
+  @BelongsTo(() => Student)
+  student: Student
 
   @Column(DataType.INTEGER)
   semestercode: number

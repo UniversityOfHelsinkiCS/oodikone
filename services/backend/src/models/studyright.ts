@@ -1,4 +1,6 @@
-import { Table, Model, DataType, Column, PrimaryKey } from "sequelize-typescript"
+import { Table, Model, DataType, Column, PrimaryKey, ForeignKey, HasMany } from "sequelize-typescript"
+import { Student } from "./student"
+import { StudyrightElement } from "./studyrightElement"
 
 @Table({
   underscored: true,
@@ -10,6 +12,10 @@ export class Studyright extends Model {
   @Column(DataType.INTEGER)
   studyrightid: string
 
+  @HasMany(() => StudyrightElement)
+  studyrightElements: StudyrightElement[]
+
+  @ForeignKey(() => StudyrightElement)
   @Column(DataType.STRING)
   actual_studyrightid: string
   
@@ -34,6 +40,7 @@ export class Studyright extends Model {
   @Column(DataType.BOOLEAN)
   cancelled: boolean
   
+  @ForeignKey(() => Student)
   @Column(DataType.STRING)
   studentStudentnumber: string
 

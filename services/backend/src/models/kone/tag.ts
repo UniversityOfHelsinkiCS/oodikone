@@ -7,13 +7,13 @@ import { TagStudent } from './tagStudent'
 })
 export class Tag extends Model {
   @PrimaryKey
+  @ForeignKey(() => TagStudent)
   @Column(DataType.BIGINT)
   tag_id: bigint
 
   @BelongsTo(() => TagStudent)
   tagStudent: TagStudent
 
-  @ForeignKey(() => TagStudent)
   @Column(DataType.STRING)
   tagname: string
 

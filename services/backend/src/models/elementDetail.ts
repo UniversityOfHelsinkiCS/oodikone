@@ -1,14 +1,14 @@
 import { Model, Table, Column, PrimaryKey, DataType } from 'sequelize-typescript'
 
 @Table({
-  underscored: true,
+  underscored: false,
   modelName: 'element_detail',
   tableName: 'element_details',
 })
 export class ElementDetail extends Model {
   @PrimaryKey
-  @Column(DataType.INTEGER)
-  code: number
+  @Column(DataType.STRING)
+  code: string
 
   @Column(DataType.JSONB)
   name: object

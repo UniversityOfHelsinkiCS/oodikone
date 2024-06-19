@@ -1,7 +1,7 @@
-import { Model, Table, Column, DataType, PrimaryKey } from "sequelize-typescript"
+import { Model, Table, Column, DataType, PrimaryKey, ForeignKey } from "sequelize-typescript"
 
 @Table({
-  underscored: false,
+  underscored: true,
   modelName: 'course',
   tableName: 'course',
 })
@@ -10,6 +10,7 @@ export class Course extends Model {
   @Column(DataType.STRING)
   id: string
 
+  @ForeignKey(() => Course)
   @Column(DataType.STRING)
   code: string
 
@@ -32,10 +33,10 @@ export class Course extends Model {
   min_attainment_date: Date
   
   @Column(DataType.DATE)
-  createdAt: Date
+  created_at: Date
   
   @Column(DataType.DATE)
-  updatedAt: Date
+  updated_at: Date
 
   @Column(DataType.JSONB)
   substitutions: object

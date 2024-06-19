@@ -1,6 +1,7 @@
-import { Model, Table, Column, PrimaryKey, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript'
+import { Model, Table, Column, PrimaryKey, DataType, ForeignKey, BelongsTo, HasMany } from 'sequelize-typescript'
 import { Student } from './student'
 import { Studyright } from './studyright'
+import { ElementDetail } from './elementDetail'
 
 @Table({
   underscored: false,
@@ -11,6 +12,9 @@ export class StudyrightElement extends Model {
   @PrimaryKey
   @Column(DataType.STRING)
   id: string
+
+  @BelongsTo(() => ElementDetail)
+  elementDetail: ElementDetail
 
   @Column(DataType.STRING)
   startdate: string
@@ -25,6 +29,7 @@ export class StudyrightElement extends Model {
   @BelongsTo(() => Studyright)
   studyright: Studyright
 
+  @ForeignKey(() => ElementDetail)
   @Column(DataType.STRING)
   code: string
 
