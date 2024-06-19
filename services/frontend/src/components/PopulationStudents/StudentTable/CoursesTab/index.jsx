@@ -218,13 +218,11 @@ const CoursesTable = ({ curriculum, includeSubstitutions, populationCourses, stu
     const getTotalRowVal = (total, code) => total[code]
 
     const getNumericGrade = grade => {
-      if (grade === 'Hyl.') {
-        return 0
+      const numericGrade = parseInt(grade, 10)
+      if (Number.isInteger(numericGrade)) {
+        return numericGrade
       }
-      if (['1', '2', '3', '4', '5'].includes(grade)) {
-        return parseInt(grade, 10)
-      }
-      return null
+      return grade
     }
 
     const hasActiveEnrollments = (student, code) => {

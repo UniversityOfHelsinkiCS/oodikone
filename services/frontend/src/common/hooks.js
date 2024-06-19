@@ -1,6 +1,6 @@
 import { isEqual } from 'lodash'
 import qs from 'query-string'
-import { useCallback, useState, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { SEARCH_HISTORY_VERSION } from '@/constants'
 

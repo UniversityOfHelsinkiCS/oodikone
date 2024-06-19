@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-import { Icon, Card, Portal, Popup, Button } from 'semantic-ui-react'
+import { Button, Card, Icon, Popup, Portal } from 'semantic-ui-react'
 
 import './style.css'
 
@@ -9,8 +9,8 @@ const Header = ({ children, actions, onClickExport }) => {
   const { isFullscreen, setFullscreen } = useContext(FigureContext)
 
   return (
-    <Card.Content style={{ flexGrow: 0, display: 'flex', alignItems: 'center', padding: '1em', height: '3.25em' }}>
-      <div style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>{children}</div>
+    <Card.Content style={{ alignItems: 'center', display: 'flex', flexGrow: 0, height: '3.25em', padding: '1em' }}>
+      <div style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>{children}</div>
       <div style={{ flexGrow: 1 }} />
       <div style={{ marginRight: '1em' }}>{actions}</div>
       <Button
@@ -32,7 +32,7 @@ const Header = ({ children, actions, onClickExport }) => {
           />
         }
       >
-        Toggle Fullscreen
+        Toggle fullscreen
       </Popup>
     </Card.Content>
   )
@@ -74,7 +74,7 @@ export const FigureContainer = ({ children, style }) => {
     <FigureContext.Provider value={{ isFullscreen, setFullscreen }}>
       {isFullscreen ? (
         <Portal open={isFullscreen}>
-          <div style={{ inset: '70px 0px 0px 0px', position: 'absolute', zIndex: 3, height: '10000vh' }}>
+          <div style={{ height: '10000vh', inset: '70px 0px 0px 0px', position: 'absolute', zIndex: 3 }}>
             <Card fluid style={{ position: 'sticky', margin: 0, inset: 0, height: '100vh', zIndex: 2 }}>
               {children}
             </Card>
