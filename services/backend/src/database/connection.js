@@ -1,15 +1,18 @@
 import { Sequelize } from 'sequelize-typescript'
 const EventEmitter = require('events')
 const Umzug = require('umzug')
-
 const conf = require('../conf-backend')
-
 import { CreditType } from '../models/creditType'
+import { Credit } from '../models/credit'
+import { Studyright } from '../models/studyright'
+import { Course } from '../models/course'
+import { Enrollment } from '../models/enrollment'
+import { Student } from '../models/student'
+import { StudyrightElement } from '../models/studyrightElement'
 
 const logger = require('../util/logger')
 
 const { SIS_DB_URL } = process.env
-
 
 class DbConnection extends EventEmitter {
   constructor() {
@@ -27,9 +30,10 @@ class DbConnection extends EventEmitter {
       },
       logging: false,
       password: conf.SIS_PASSWORD,
-      models: [CreditType],
+      models: [CreditType, Credit, Studyright, Enrollment, Course, Student, StudyrightElement],
     })
   }
+
 
   async connect(attempt = 1) {
     try {

@@ -4,6 +4,9 @@
 // const Credit = require('./credit')
 // const CreditTeacher = require('./creditTeacher')
 import { CreditType } from './creditType'
+import { Student } from './student'
+import { Enrollment } from './enrollment'
+import { CreditType } from './creditType'
 // const { dbConnections } = require('../database/connection') 
 // const ElementDetail = require('./elementDetail')
 // const Enrollment = require('./enrollment')
@@ -125,7 +128,7 @@ import { Studyright } from './studyright'
 
 // Organization.hasMany(Organization, { foreignKey: 'parent_id', as: 'children' })
 
- module.exports = {
+module.exports = {
 //   Course,
 //   CourseProvider,
 //   CourseType,
@@ -146,7 +149,10 @@ import { Studyright } from './studyright'
 //   Studyplan,
 //   StudyrightExtent,
    Studyright,
-//   StudyrightElement,
+  Student,
+  Enrollment,
+  Credit
+   //   StudyrightElement,
 //   Teacher,
 //   Transfer,
 }
