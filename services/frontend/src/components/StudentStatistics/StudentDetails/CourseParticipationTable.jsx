@@ -5,6 +5,7 @@ import { Divider, Header, Icon, Item, Label } from 'semantic-ui-react'
 import { getTextInWithOpen, reformatDate } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { StudentCourseTable } from '@/components/StudentStatistics/StudentCourseTable'
+import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 
 // Some courses are without AY in the beginning in the studyplan even though the credits are registered with AY.
 const isInStudyPlan = (plan, code) =>
@@ -38,7 +39,7 @@ export const CourseParticipationTable = ({ student, studyrightid }) => {
 
     acc[academicYear].push([
       isIncluded,
-      reformatDate(date, 'DD.MM.YYYY'),
+      reformatDate(date, DISPLAY_DATE_FORMAT),
       <div
         key={`${course.code}-${new Date(date).getTime()}-course-${grade}`}
         style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}

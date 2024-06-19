@@ -8,6 +8,7 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SegmentDimmer } from '@/components/SegmentDimmer'
 import { SortableTable } from '@/components/SortableTable'
 import { useStudentNameVisibility } from '@/components/StudentNameVisibilityToggle'
+import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 import { useSearchStudentsQuery } from '@/redux/students'
 
 const getStudyrights = (student, getTextIn) => {
@@ -99,7 +100,7 @@ export const StudentSearch = () => {
         getRowContent: student => (
           <StudentPageLink
             studentNumber={student.studentNumber}
-            text={student.started ? reformatDate(new Date(student.started), 'DD.MM.YYYY') : 'Unavailable'}
+            text={student.started ? reformatDate(new Date(student.started), DISPLAY_DATE_FORMAT) : 'Unavailable'}
           />
         ),
       },

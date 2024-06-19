@@ -8,6 +8,7 @@ import { calculatePercentage, getTargetCreditsForProgramme, reformatDate } from 
 import { studentToolTips } from '@/common/InfoToolTips'
 import { HoverableHelpPopup } from '@/components/common/HoverableHelpPopup'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 import { useGetProgrammesQuery } from '@/redux/populations'
 
 export const StudyrightsTable = ({ handleStartDateChange, showPopulationStatistics, student, studyrightid }) => {
@@ -79,7 +80,7 @@ export const StudyrightsTable = ({ handleStartDateChange, showPopulationStatisti
       return (
         <div>
           <p style={{ color: 'green', fontWeight: 'bolder', marginBottom: 0 }}>GRADUATED</p>
-          <p style={{ color: 'grey', marginTop: 0 }}>{reformatDate(studyright.enddate, 'DD.MM.YYYY')}</p>
+          <p style={{ color: 'grey', marginTop: 0 }}>{reformatDate(studyright.enddate, DISPLAY_DATE_FORMAT)}</p>
         </div>
       )
     if (studyright.active)
@@ -112,9 +113,9 @@ export const StudyrightsTable = ({ handleStartDateChange, showPopulationStatisti
       .reverse()
       .map(programme => (
         <p key={`${programme.name}-${programme.startdate}`}>
-          {`${programme.name} (${reformatDate(getActualStartDate(programme), 'DD.MM.YYYY')} - ${reformatDate(
+          {`${programme.name} (${reformatDate(getActualStartDate(programme), DISPLAY_DATE_FORMAT)} - ${reformatDate(
             getAcualEndDate(programme.enddate, studyright.graduated),
-            'DD.MM.YYYY'
+            DISPLAY_DATE_FORMAT
           )})`}
           {programmeCodes.includes(programme.code) && (
             <Item as={Link} to={showPopulationStatistics(programme.code, programme.startdate)}>
@@ -134,9 +135,9 @@ export const StudyrightsTable = ({ handleStartDateChange, showPopulationStatisti
 
         return studytrack ? (
           <p key={`${studytrack.name}-${studytrack.startdate}`}>
-            {`${studytrack.name} (${reformatDate(studytrack.startdate, 'DD.MM.YYYY')} - ${reformatDate(
+            {`${studytrack.name} (${reformatDate(studytrack.startdate, DISPLAY_DATE_FORMAT)} - ${reformatDate(
               getAcualEndDate(studytrack.enddate, studyright.graduated),
-              'DD.MM.YYYY'
+              DISPLAY_DATE_FORMAT
             )})`}
             <br />
           </p>

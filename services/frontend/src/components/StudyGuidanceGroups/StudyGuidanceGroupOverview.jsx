@@ -7,6 +7,7 @@ import { textAndDescriptionSearch } from '@/common'
 import { useToggle } from '@/common/hooks'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SortableTable } from '@/components/SortableTable'
+import { YEAR_DATE_FORMAT } from '@/constants/date'
 import { useFilteredAndFormattedElementDetails } from '@/redux/elementdetails'
 import { useChangeStudyGuidanceGroupTagsMutation } from '@/redux/studyGuidanceGroups'
 import { startYearToAcademicYear, StyledMessage } from './common'
@@ -136,11 +137,11 @@ const AssociateTagForm = ({ formErrors, formValues, group, handleChange, selectF
           <Datetime
             className="guidance-group-overview-year-tag-selector"
             closeOnSelect
-            dateFormat="YYYY"
+            dateFormat={YEAR_DATE_FORMAT}
             initialValue={group.tags?.[tagName]}
             inputProps={{ readOnly: true }}
             name={tagName}
-            onChange={value => handleChange(tagName, value?.format('YYYY'))}
+            onChange={value => handleChange(tagName, value?.format(YEAR_DATE_FORMAT))}
             renderInput={({ value, ...rest }) => {
               return (
                 <div>

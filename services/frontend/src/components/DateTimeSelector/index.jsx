@@ -5,6 +5,7 @@ import { Icon, Button } from 'semantic-ui-react'
 import 'moment/locale/fi'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import './style.css'
 
@@ -45,7 +46,7 @@ export const DateTimeSelector = ({ value, onChange, before, after, showSemesters
             paddingLeft: value ? '1em !important' : undefined,
           }}
         >
-          {value === null ? 'Select date' : moment(value).format('DD.MM.YYYY')}
+          {value === null ? 'Select date' : moment(value).format(DISPLAY_DATE_FORMAT)}
           {value !== null && (
             <Icon
               name="x"

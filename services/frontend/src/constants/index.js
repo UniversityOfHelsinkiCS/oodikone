@@ -1,7 +1,4 @@
 export const DEFAULT_LANG = 'fi'
-export const DISPLAY_DATE_FORMAT = 'DD.MM.YYYY'
-export const DISPLAY_DATE_FORMAT_DEV = 'DD.MM.YYYY HH:mm:ss'
-export const API_DATE_FORMAT = 'YYYY.MM.DD'
 
 export const PRIORITYCODE_TEXTS = {
   1: 'Main',

@@ -14,6 +14,7 @@ import { useFilters } from '@/components/FilterView/useFilters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SortableTable } from '@/components/SortableTable'
 import { PRIORITYCODE_TEXTS } from '@/constants'
+import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { createMaps } from './columnHelpers/createMaps'
@@ -265,12 +266,12 @@ export const GeneralTab = ({
     const { startDate, endDate } = creditDateFilterOptions
 
     if (startDate && !endDate) {
-      creditColumnTitle = `Since ${moment(startDate).format('DD.MM.YYYY')}`
+      creditColumnTitle = `Since ${moment(startDate).format(DISPLAY_DATE_FORMAT)}`
     } else if (endDate && !startDate) {
-      creditColumnTitle = `Before ${moment(endDate).format('DD.MM.YYYY')}`
+      creditColumnTitle = `Before ${moment(endDate).format(DISPLAY_DATE_FORMAT)}`
     } else if (endDate && startDate) {
-      creditColumnTitle = `Between ${moment(startDate).format('DD.MM.YYYY')} and ${moment(endDate).format(
-        'DD.MM.YYYY'
+      creditColumnTitle = `Between ${moment(startDate).format(DISPLAY_DATE_FORMAT)} and ${moment(endDate).format(
+        DISPLAY_DATE_FORMAT
       )}`
     }
   }
@@ -282,10 +283,10 @@ export const GeneralTab = ({
     if (group?.tags?.year && !since) {
       title += `Since 1.8.${group.tags.year}`
     } else {
-      title += since ? `Since ${moment(since).format('DD.MM.YYYY')}` : 'Since 1.1.1970'
+      title += since ? `Since ${moment(since).format(DISPLAY_DATE_FORMAT)}` : 'Since 1.1.1970'
     }
     if (until) {
-      title += `\nuntil ${moment(until).format('DD.MM.YYYY')}`
+      title += `\nuntil ${moment(until).format(DISPLAY_DATE_FORMAT)}`
     }
     return title
   }

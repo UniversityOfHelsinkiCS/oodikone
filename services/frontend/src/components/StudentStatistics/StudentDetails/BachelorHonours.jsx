@@ -9,6 +9,7 @@ import {
   reformatDate,
 } from '@/common'
 import { CurriculumPicker } from '@/components/PopulationDetails/CurriculumPicker'
+import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 
 export const BachelorHonours = ({ absentYears, programmeCode, student }) => {
   const [curriculum, setCurriculum] = useState(null)
@@ -99,7 +100,7 @@ export const BachelorHonours = ({ absentYears, programmeCode, student }) => {
   const dataRows = modules =>
     modules.map(mod => (
       <Table.Row key={mod.course_code}>
-        <Table.Cell>{reformatDate(mod.date, 'DD.MM.YYYY')}</Table.Cell>
+        <Table.Cell>{reformatDate(mod.date, DISPLAY_DATE_FORMAT)}</Table.Cell>
         <Table.Cell>
           {mod.course.name.fi} ({mod.course_code})
         </Table.Cell>

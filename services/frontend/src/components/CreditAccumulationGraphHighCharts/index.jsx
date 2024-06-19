@@ -11,7 +11,7 @@ import { Button, Radio } from 'semantic-ui-react'
 import { reformatDate, getStudyRightElementTargetDates } from '@/common'
 import { useDeepMemo } from '@/common/hooks'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { DISPLAY_DATE_FORMAT, API_DATE_FORMAT } from '@/constants'
+import { API_DATE_FORMAT, DISPLAY_DATE_FORMAT } from '@/constants/date'
 import { CreditGraphTooltip } from './CreditGraphTooltip'
 import './creditAccumulationGraphHC.css'
 

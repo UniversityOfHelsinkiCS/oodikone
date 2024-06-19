@@ -9,6 +9,7 @@ import { Input, Menu, Message, Tab } from 'semantic-ui-react'
 import { getStudyRightElementTargetDates, reformatDate } from '@/common'
 import { CreditAccumulationGraphHighCharts } from '@/components/CreditAccumulationGraphHighCharts'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 
 exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
@@ -133,7 +134,7 @@ const gradeMeanSeries = (student, chunksize, semesters, getTextIn) => {
     const creditSum = curr.reduce((a, b) => a + b.credits, 0)
     if (curr.length > 0)
       acc.push({
-        name: `${curr.length} courses between ${reformatDate(curr[0].date, 'DD.MM.YYYY')} and ${reformatDate(curr[curr.length - 1].date, 'DD.MM.YYYY')}`,
+        name: `${curr.length} courses between ${reformatDate(curr[0].date, DISPLAY_DATE_FORMAT)} and ${reformatDate(curr[curr.length - 1].date, DISPLAY_DATE_FORMAT)}`,
         y: gradeSum / creditSum,
         x: new Date(curr[curr.length - 1].date).getTime(),
       })

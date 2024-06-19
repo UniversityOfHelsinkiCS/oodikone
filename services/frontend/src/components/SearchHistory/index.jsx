@@ -3,6 +3,8 @@ import moment from 'moment'
 import { useState } from 'react'
 import { Form, Header, Icon, Segment } from 'semantic-ui-react'
 
+import { DISPLAY_DATE_FORMAT_DEV } from '@/constants/date'
+
 export const SearchHistory = ({ disabled, handleSearch, header = 'Previous searches', items, updateItem }) => {
   const [selected, setSelected] = useState(null)
 
@@ -41,7 +43,7 @@ export const SearchHistory = ({ disabled, handleSearch, header = 'Previous searc
           key: id,
           value: id,
           text,
-          description: moment(timestamp).format('DD.MM.YYYY HH:mm'),
+          description: moment(timestamp).format(DISPLAY_DATE_FORMAT_DEV),
         }))}
         placeholder="Select a previous search"
         search

@@ -19,13 +19,12 @@ import { useSearchHistory } from '@/common/hooks'
 import { FilterOldProgrammesToggle } from '@/components/common/FilterOldProgrammesToggle'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SearchHistory } from '@/components/SearchHistory'
+import { YEAR_DATE_FORMAT } from '@/constants/date'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { getPopulationStatistics, clearPopulations, useGetProgrammesQuery } from '@/redux/populations'
 import { clearSelected } from '@/redux/populationSelectedStudentCourses'
 import { useGetStudyProgrammePinsQuery } from '@/redux/studyProgrammePins'
 import './populationSearch.css'
-
-const YEAR_DATE_FORMAT = 'YYYY'
 
 const months = (year, term) => {
   const start = term === 'FALL' ? `${year}-08-01` : moment(`${year}-01-01`).add(1, 'years')
@@ -327,7 +326,10 @@ const PopulationSearchForm = ({ queries, onProgress, clearSelected, getPopulatio
             isValidDate={validYearCheck}
             onChange={handleYearSelection}
             renderInput={dateInputProps => (
-              <input {...dateInputProps} value={`${year}-${moment().year(year).add(1, 'years').format('YYYY')}`} />
+              <input
+                {...dateInputProps}
+                value={`${year}-${moment().year(year).add(1, 'years').format(YEAR_DATE_FORMAT)}`}
+              />
             )}
             renderYear={(p, selectableYear) =>
               selectableYear <= currentYear && selectableYear >= 1900 ? (

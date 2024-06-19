@@ -6,6 +6,7 @@ import { Button, Label, Loader, Popup, Segment } from 'semantic-ui-react'
 import { reformatDate, isDefaultServiceProvider } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SortableTable } from '@/components/SortableTable'
+import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 
 import { useShowAsUser } from '@/redux/auth'
 import { useGetAllElementDetailsQuery } from '@/redux/elementdetails'
@@ -106,7 +107,7 @@ export const UserSearchList = ({ users, isLoading, isError }) => {
       title: 'Last login',
       filterType: 'date',
       getRowVal: user => user.lastLogin && new Date(user.lastLogin),
-      getRowContent: user => user.lastLogin && <p>{reformatDate(user.lastLogin, 'DD.MM.YYYY')}</p>,
+      getRowContent: user => user.lastLogin && <p>{reformatDate(user.lastLogin, DISPLAY_DATE_FORMAT)}</p>,
     },
     {
       key: 'SHOWAS',

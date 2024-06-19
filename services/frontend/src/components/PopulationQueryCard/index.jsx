@@ -2,7 +2,7 @@ import { minBy } from 'lodash'
 import { Card } from 'semantic-ui-react'
 
 import { reformatDate } from '@/common'
-import { DISPLAY_DATE_FORMAT } from '@/constants'
+import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 import { useGetTagsByStudyTrackQuery } from '@/redux/tags'
 
 export const PopulationQueryCard = ({ population, query }) => {

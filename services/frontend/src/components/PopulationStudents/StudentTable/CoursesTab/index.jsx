@@ -10,6 +10,7 @@ import { StudentInfoItem } from '@/components/common/StudentInfoItem'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SortableTable, row } from '@/components/SortableTable'
 import { useStudentNameVisibility } from '@/components/StudentNameVisibilityToggle'
+import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 import { useGetStudyGuidanceGroupPopulationCoursesQuery } from '@/redux/studyGuidanceGroups'
 
 const getCourseCodes = curriculum => {
@@ -328,10 +329,10 @@ const CoursesTable = ({ curriculum, includeSubstitutions, populationCourses, stu
                 if (bestGrade) {
                   cellProps.title = `Grade: ${bestGrade}`
                   if (completionDate) {
-                    cellProps.title += `\nCompleted on ${reformatDate(completionDate, 'DD.MM.YYYY')}`
+                    cellProps.title += `\nCompleted on ${reformatDate(completionDate, DISPLAY_DATE_FORMAT)}`
                   }
                 } else if (hasActiveEnrollments(student, course.code)) {
-                  const enrollmentDate = reformatDate(getEnrollmentDate(student, course.code), 'DD.MM.YYYY')
+                  const enrollmentDate = reformatDate(getEnrollmentDate(student, course.code), DISPLAY_DATE_FORMAT)
                   cellProps.title = `Enrolled on ${enrollmentDate}`
                 }
                 return cellProps

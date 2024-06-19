@@ -3,6 +3,7 @@ import { Table } from 'semantic-ui-react'
 
 import { hopsFilter as studyPlanFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
+import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 import { CollapsibleCreditRow } from './CollapsibleCreditRow'
 
 export const CreditsGainedTable = ({ creditDateFilterOptions, filteredStudents, programmeGoalTime, type, year }) => {
@@ -29,7 +30,7 @@ export const CreditsGainedTable = ({ creditDateFilterOptions, filteredStudents, 
   const { startDate, endDate } = creditDateFilterOptions || { start, end }
   if (startDate !== null && endDate !== null) {
     months = getMonths(startDate, endDate)
-    title = `${moment(startDate).format('DD.MM.YYYY')} and ${moment(endDate).format('DD.MM.YYYY')}`
+    title = `${moment(startDate).format(DISPLAY_DATE_FORMAT)} and ${moment(endDate).format(DISPLAY_DATE_FORMAT)}`
     creditList = filteredStudents.map(student =>
       student.courses.length > 0
         ? student.courses.reduce(
@@ -46,7 +47,7 @@ export const CreditsGainedTable = ({ creditDateFilterOptions, filteredStudents, 
     )
   } else if (startDate !== null) {
     months = getMonths(startDate, end)
-    title = `${moment(startDate).format('DD.MM.YYYY')} and ${moment(end).format('DD.MM.YYYY')}`
+    title = `${moment(startDate).format(DISPLAY_DATE_FORMAT)} and ${moment(end).format(DISPLAY_DATE_FORMAT)}`
     creditList = filteredStudents.map(student =>
       student.courses.length > 0
         ? student.courses.reduce(
@@ -58,7 +59,7 @@ export const CreditsGainedTable = ({ creditDateFilterOptions, filteredStudents, 
     )
   } else if (endDate !== null) {
     months = getMonths(start, endDate)
-    title = `${moment(start).format('DD.MM.YYYY')} and ${moment(endDate).format('DD.MM.YYYY')}`
+    title = `${moment(start).format(DISPLAY_DATE_FORMAT)} and ${moment(endDate).format(DISPLAY_DATE_FORMAT)}`
     creditList = filteredStudents.map(student =>
       student.courses.length > 0
         ? student.courses.reduce(
@@ -70,7 +71,7 @@ export const CreditsGainedTable = ({ creditDateFilterOptions, filteredStudents, 
     )
   } else {
     months = getMonths(start, end)
-    title = `${moment(start).format('DD.MM.YYYY')} and ${moment(end).format('DD.MM.YYYY')}`
+    title = `${moment(start).format(DISPLAY_DATE_FORMAT)} and ${moment(end).format(DISPLAY_DATE_FORMAT)}`
     creditList = filteredStudents.map(student => student.credits)
   }
 
