@@ -1,4 +1,4 @@
-import { Model, Table, Column, PrimaryKey, DataType } from 'sequelize-typescript'
+import { Model, Table, Column, PrimaryKey, DataType, BelongsTo, HasMany } from 'sequelize-typescript'
 import { StudyrightElement } from './studyrightElement'
 
 @Table({
@@ -22,4 +22,7 @@ export class ElementDetail extends Model {
 
   @Column(DataType.DATE)
   createdAt: Date
+
+  @HasMany(() => StudyrightElement, { foreignKey: 'code', sourceKey: 'code' })
+  studyrightElements: StudyrightElement
 }

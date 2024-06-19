@@ -13,7 +13,7 @@ export class StudyrightElement extends Model {
   @Column(DataType.STRING)
   id: string
 
-  @HasOne(() => ElementDetail, 'code')
+  @BelongsTo(() => ElementDetail, { foreignKey: 'code', targetKey: 'code'})
   element_detail: ElementDetail
 
   @Column(DataType.STRING)
