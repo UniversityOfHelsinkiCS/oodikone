@@ -1,4 +1,4 @@
-import { Model, Table, Column, PrimaryKey, DataType, HasMany, ForeignKey } from 'sequelize-typescript'
+import { Model, Table, Column, PrimaryKey, DataType, HasMany } from 'sequelize-typescript'
 import { Credit } from './credit'
 import { SemesterEnrollment } from './semesterEnrollment'
 import { Studyplan } from './studyplan'

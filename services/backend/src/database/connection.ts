@@ -1,7 +1,7 @@
 import { Sequelize } from 'sequelize-typescript'
-const EventEmitter = require('events')
-const Umzug = require('umzug')
-const conf = require('../conf-backend')
+import EventEmitter from 'events'
+import Umzug from 'umzug'
+import conf from '../conf-backend'
 import {
   CreditType,
   Studyright,
@@ -15,16 +15,19 @@ import {
   StudyrightElement,
   ElementDetail,
   Transfer,
-  Studyplan
-} from '../models'
+  Studyplan,
+} from '../models/index'
 import { Tag } from '../models/kone/tag'
 import { TagStudent } from '../models/kone/tagStudent'
 
-const logger = require('../util/logger')
+import logger from '../util/logger'
 
 const { SIS_DB_URL } = process.env
 
 class DbConnection extends EventEmitter {
+  sequelize: Sequelize
+  RETRY_ATTEMPTS: number
+  established: boolean
   constructor() {
     super()
     this.RETRY_ATTEMPTS = 15
@@ -40,7 +43,8 @@ class DbConnection extends EventEmitter {
       },
       logging: false,
       password: conf.SIS_PASSWORD,
-      models: [CreditType,
+      models: [
+        CreditType,
         Studyright,
         Student,
         Enrollment,
@@ -52,11 +56,10 @@ class DbConnection extends EventEmitter {
         StudyrightElement,
         ElementDetail,
         Transfer,
-        Studyplan
+        Studyplan,
       ],
     })
   }
-
 
   async connect(attempt = 1) {
     try {
@@ -75,12 +78,12 @@ class DbConnection extends EventEmitter {
 }
 
 // Old-style kone + user db connections
-const sequelizeKone = new Sequelize(conf.DB_URL_KONE, {
-  schema: conf.DB_SCHEMA_KONE,
-  searchPath: conf.DB_SCHEMA_KONE,
+const sequelizeKone = new Sequelize(conf.DB_URL_KONE as string, {
+  schema: conf.DB_SCHEMA_KONE as string,
+  searchPath: conf.DB_SCHEMA_KONE as string,
   logging: false,
-  password: conf.KONE_PASSWORD,
-  models: [Tag, TagStudent]
+  password: conf.KONE_PASSWORD as string,
+  models: [Tag, TagStudent],
 })
 
 sequelizeKone.query(`SET SESSION search_path to ${conf.DB_SCHEMA_KONE}`)
@@ -141,9 +144,4 @@ const initializeDatabaseConnection = async () => {
 
 const dbConnections = new DbConnection()
 
-module.exports = {
-  dbConnections,
-  sequelizeKone,
-  sequelizeUser,
-  initializeDatabaseConnection,
-}
+export { dbConnections, sequelizeKone, sequelizeUser, initializeDatabaseConnection }

@@ -14,7 +14,7 @@ export class StudyrightElement extends Model {
   id: string
 
   @BelongsTo(() => ElementDetail)
-  elementDetail: ElementDetail
+  element_detail: ElementDetail
 
   @Column(DataType.STRING)
   startdate: string

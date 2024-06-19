@@ -75,4 +75,8 @@ export class Credit extends Model {
 
   @BelongsTo(() => Studyright)
   studyright: Studyright;
+  static notUnnecessary: (credit: any) => boolean;
+  static passed: ({ credittypecode }: { credittypecode: any; }) => boolean;
+  static failed: (credit: any) => boolean;
+  static improved: (credit: any) => boolean;
 }

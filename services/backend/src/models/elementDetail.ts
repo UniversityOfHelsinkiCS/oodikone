@@ -1,4 +1,5 @@
 import { Model, Table, Column, PrimaryKey, DataType } from 'sequelize-typescript'
+import { StudyrightElement } from './studyrightElement'
 
 @Table({
   underscored: false,
