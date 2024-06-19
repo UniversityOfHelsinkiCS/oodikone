@@ -3,7 +3,7 @@ import { Table } from 'semantic-ui-react'
 
 import { hopsFilter as studyPlanFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
-import { DISPLAY_DATE_FORMAT } from '@/constants/date'
+import { DISPLAY_DATE_FORMAT, ISO_DATE_FORMAT } from '@/constants/date'
 import { CollapsibleCreditRow } from './CollapsibleCreditRow'
 
 export const CreditsGainedTable = ({ creditDateFilterOptions, filteredStudents, programmeGoalTime, type, year }) => {
@@ -23,7 +23,7 @@ export const CreditsGainedTable = ({ creditDateFilterOptions, filteredStudents, 
   }
 
   const start = moment(`${year}-08-01`)
-  const end = moment().format('YYYY-MM-DD')
+  const end = moment().format(ISO_DATE_FORMAT)
 
   let title = ''
   let months = 0

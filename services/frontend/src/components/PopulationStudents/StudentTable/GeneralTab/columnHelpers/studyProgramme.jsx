@@ -1,4 +1,5 @@
 import { getAllProgrammesOfStudent, reformatDate } from '@/common'
+import { ISO_DATE_FORMAT } from '@/constants/date'
 
 const noProgrammeDuringCourse = {
   en: 'No programme at time of course',
@@ -145,12 +146,12 @@ export const getStudyProgrammeFunctions = ({
 
   const getStudyStartDate = student => {
     if (programmeCode !== undefined) {
-      return reformatDate(studentToProgrammeStartMap[student.studentNumber], 'YYYY-MM-DD')
+      return reformatDate(studentToProgrammeStartMap[student.studentNumber], ISO_DATE_FORMAT)
     }
 
     const programme = studentProgrammesMap[student.studentNumber]?.programmes[0]
     if (programme?.startdate) {
-      return reformatDate(programme.startdate, 'YYYY-MM-DD')
+      return reformatDate(programme.startdate, ISO_DATE_FORMAT)
     }
     return '-'
   }

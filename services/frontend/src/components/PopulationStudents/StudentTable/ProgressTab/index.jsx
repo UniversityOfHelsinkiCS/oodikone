@@ -9,6 +9,7 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import '@/components/StudentStatistics/StudentInfoCard/studentInfoCard.css'
 import { SortableTable } from '@/components/SortableTable'
 import { useStudentNameVisibility } from '@/components/StudentNameVisibilityToggle'
+import { ISO_DATE_FORMAT } from '@/constants/date'
 
 const getCourses = (courseCode, criteria, student) => {
   return student.courses.filter(
@@ -81,16 +82,16 @@ const getExcelText = (courseCode, criteria, student, year) => {
   const courses = getCourses(courseCode, criteria, student)
 
   if (hasPassedOutsideAcademicYear(courses)) {
-    return `Passed-${moment(courses[0].date).format('YYYY-MM-DD')}`
+    return `Passed-${moment(courses[0].date).format(ISO_DATE_FORMAT)}`
   }
 
   if (hasFailed(courses)) {
-    return `Failed-${moment(courses[0].date).format('YYYY-MM-DD')}`
+    return `Failed-${moment(courses[0].date).format(ISO_DATE_FORMAT)}`
   }
 
   if (hasEnrolled(student, courseCode)) {
     const enrollment = getEnrollment(student, courseCode)
-    return `Enrollment-${moment(enrollment[0].enrollment_date_time).format('YYYY-MM-DD')}`
+    return `Enrollment-${moment(enrollment[0].enrollment_date_time).format(ISO_DATE_FORMAT)}`
   }
 
   return ''
@@ -178,18 +179,18 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
     }
 
     if (hasPassedOutsideAcademicYear(courses)) {
-      return { ...propObj, title: `Passed-${moment(courses[0].date).format('YYYY-MM-DD')}` }
+      return { ...propObj, title: `Passed-${moment(courses[0].date).format(ISO_DATE_FORMAT)}` }
     }
 
     if (hasFailed(courses)) {
-      return { ...propObj, title: `Failed-${moment(courses[0].date).format('YYYY-MM-DD')}` }
+      return { ...propObj, title: `Failed-${moment(courses[0].date).format(ISO_DATE_FORMAT)}` }
     }
 
     if (hasEnrolled(student, info.code)) {
       const enrollment = getEnrollment(student, info.code)
       return {
         ...propObj,
-        title: `Enrollment-${moment(enrollment[0].enrollment_date_time).format('YYYY-MM-DD')}`,
+        title: `Enrollment-${moment(enrollment[0].enrollment_date_time).format(ISO_DATE_FORMAT)}`,
       }
     }
 

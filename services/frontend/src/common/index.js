@@ -4,6 +4,7 @@ import moment from 'moment'
 import irtomikko from '@/assets/irtomikko.png'
 import toskaLogo from '@/assets/toska.svg'
 import { serviceProvider } from '@/conf'
+import { ISO_DATE_FORMAT } from '@/constants/date'
 
 export const textAndDescriptionSearch = (dropDownOptions, param) =>
   filter(dropDownOptions, option =>
@@ -53,7 +54,7 @@ export const reformatDate = (date, outputFormat) => {
   return parsedDate
 }
 
-export const getTimestamp = () => moment().format('YYYY-MM-DD')
+export const getTimestamp = () => moment().format(ISO_DATE_FORMAT)
 
 export const getStudentTotalCredits = (student, includeTransferredCredits = true) => {
   const passedCourses = includeTransferredCredits

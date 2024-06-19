@@ -17,6 +17,7 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { getSemestersPresentFunctions } from '@/components/PopulationStudents/StudentTable/GeneralTab/columnHelpers/semestersPresent'
 import { PaginatedSortableTable } from '@/components/SortableTable/PaginatedSortableTable'
 import { StudentNameVisibilityToggle, useStudentNameVisibility } from '@/components/StudentNameVisibilityToggle'
+import { ISO_DATE_FORMAT } from '@/constants/date'
 import { useGetStudentsCloseToGraduationQuery } from '@/redux/closeToGraduation'
 import { useFilteredAndFormattedElementDetails } from '@/redux/elementdetails'
 import { useGetFacultiesQuery } from '@/redux/facultyStats'
@@ -90,14 +91,14 @@ const getColumns = (
       key: 'startOfStudyright',
       title: 'Start of studyright',
       getRowVal: row => row.studyright.startDate,
-      formatValue: date => reformatDate(date, 'YYYY-MM-DD'),
+      formatValue: date => reformatDate(date, ISO_DATE_FORMAT),
       filterType: 'date',
     },
     {
       key: 'startedInProgramme',
       title: 'Started in programme',
       getRowVal: row => row.programme.startedAt,
-      formatValue: date => reformatDate(date, 'YYYY-MM-DD'),
+      formatValue: date => reformatDate(date, ISO_DATE_FORMAT),
       filterType: 'date',
       displayColumn: !bachelorStudentsAreDisplayed,
       helpText:
@@ -175,7 +176,7 @@ const getColumns = (
           ? {
               style: { textAlign: 'center' },
               title: [
-                `Attainment date: ${reformatDate(row.thesisInfo.attainmentDate, 'YYYY-MM-DD')}`,
+                `Attainment date: ${reformatDate(row.thesisInfo.attainmentDate, ISO_DATE_FORMAT)}`,
                 `Course code: ${row.thesisInfo.courseCode}`,
                 `Grade: ${row.thesisInfo.grade}`,
               ].join('\n'),
@@ -190,14 +191,14 @@ const getColumns = (
         {
           key: 'latestAttainmentHops',
           title: 'HOPS',
-          getRowVal: row => reformatDate(row.latestAttainmentDates.hops, 'YYYY-MM-DD'),
+          getRowVal: row => reformatDate(row.latestAttainmentDates.hops, ISO_DATE_FORMAT),
           filterType: 'date',
           helpText: 'The date when the student last completed a course in their primary study plan',
         },
         {
           key: 'latestAttainmentTotal',
           title: 'Total',
-          getRowVal: row => reformatDate(row.latestAttainmentDates.total, 'YYYY-MM-DD'),
+          getRowVal: row => reformatDate(row.latestAttainmentDates.total, ISO_DATE_FORMAT),
           filterType: 'date',
           helpText: 'The date when the student last completed any course at the university',
         },

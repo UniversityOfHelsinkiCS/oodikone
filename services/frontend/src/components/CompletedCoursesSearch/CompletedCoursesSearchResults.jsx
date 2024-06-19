@@ -7,6 +7,7 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { RightsNotification } from '@/components/RightsNotification'
 import { SortableTable } from '@/components/SortableTable'
 import { StudentNameVisibilityToggle, useStudentNameVisibility } from '@/components/StudentNameVisibilityToggle'
+import { ISO_DATE_FORMAT } from '@/constants/date'
 import { useGetCompletedCoursesQuery } from '@/redux/completedCoursesSearch'
 
 const getColumns = (courses, showStudentNames, getTextIn) => {
@@ -27,7 +28,7 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
         return <Icon color="grey" fitted name="minus" />
       }
 
-      return `Latest enrollment: ${moment(enrollment.date).format('YYYY-MM-DD')}`
+      return `Latest enrollment: ${moment(enrollment.date).format(ISO_DATE_FORMAT)}`
     }
 
     const substitutionString = completion.substitution ? ` as ${completion.substitution}` : ''
@@ -61,10 +62,10 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
       return { style }
     }
     const title = credit
-      ? `Passed on ${moment(credit.date).format('YYYY-MM-DD')}\nCourse code: ${
+      ? `Passed on ${moment(credit.date).format(ISO_DATE_FORMAT)}\nCourse code: ${
           credit.substitution ? credit.substitution : credit.courseCode
         }`
-      : `Last enrollment on ${moment(enrollment.date).format('YYYY-MM-DD')}\nCourse code ${
+      : `Last enrollment on ${moment(enrollment.date).format(ISO_DATE_FORMAT)}\nCourse code ${
           enrollment.substitution ? enrollment.substitution : enrollment.courseCode
         }`
     return { style, title }

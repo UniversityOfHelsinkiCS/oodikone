@@ -14,7 +14,7 @@ import { useFilters } from '@/components/FilterView/useFilters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SortableTable } from '@/components/SortableTable'
 import { PRIORITYCODE_TEXTS } from '@/constants'
-import { DISPLAY_DATE_FORMAT } from '@/constants/date'
+import { DISPLAY_DATE_FORMAT, ISO_DATE_FORMAT, ISO_DATE_FORMAT_DEV } from '@/constants/date'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { createMaps } from './columnHelpers/createMaps'
@@ -427,7 +427,7 @@ export const GeneralTab = ({
       key: 'studyrightStart',
       title: 'Start of\nstudyright',
       filterType: 'date',
-      getRowVal: student => reformatDate(studentToStudyrightStartMap[student.studentNumber], 'YYYY-MM-DD'),
+      getRowVal: student => reformatDate(studentToStudyrightStartMap[student.studentNumber], ISO_DATE_FORMAT),
     },
     studyStartDate: {
       key: 'studyStartDate',
@@ -464,7 +464,7 @@ export const GeneralTab = ({
       filterType: 'date',
       getRowVal: student =>
         studentToStudyrightEndMap[student.studentNumber]
-          ? reformatDate(studentToStudyrightEndMap[student.studentNumber], 'YYYY-MM-DD')
+          ? reformatDate(studentToStudyrightEndMap[student.studentNumber], ISO_DATE_FORMAT)
           : '',
     },
     endDateCombinedProg: {
@@ -473,7 +473,7 @@ export const GeneralTab = ({
       filterType: 'date',
       getRowVal: student =>
         studentToSecondStudyrightEndMap[student.studentNumber]
-          ? reformatDate(studentToSecondStudyrightEndMap[student.studentNumber], 'YYYY-MM-DD')
+          ? reformatDate(studentToSecondStudyrightEndMap[student.studentNumber], ISO_DATE_FORMAT)
           : '',
     },
     startYear: {
@@ -538,7 +538,7 @@ export const GeneralTab = ({
       title: 'Attainment date',
       getRowVal: student => {
         const { date } = getGradeAndDate(student)
-        return date ? reformatDate(date, 'YYYY-MM-DD') : 'No attainment'
+        return date ? reformatDate(date, ISO_DATE_FORMAT) : 'No attainment'
       },
     },
     enrollmentDate: {
@@ -546,7 +546,7 @@ export const GeneralTab = ({
       title: 'Enrollment date',
       getRowVal: student => {
         const date = getEnrollmentDate(student)
-        return date ? reformatDate(date, 'YYYY-MM-DD') : 'No enrollment'
+        return date ? reformatDate(date, ISO_DATE_FORMAT) : 'No enrollment'
       },
     },
     language: {
@@ -596,7 +596,7 @@ export const GeneralTab = ({
           .map(course => course.date)
         if (!dates.length) return ''
         const latestDate = dates.sort((a, b) => new Date(b) - new Date(a))[0]
-        return reformatDate(latestDate, 'YYYY-MM-DD')
+        return reformatDate(latestDate, ISO_DATE_FORMAT)
       },
       helpText: getTextIn({
         fi: 'Päivämäärä, jolloin opiskelija on viimeksi suorittanut hyväksytysti kurssin, joka sisältyy hänen HOPSiinsa.',
@@ -629,7 +629,7 @@ export const GeneralTab = ({
       key: 'updatedAt',
       title: 'Last updated at',
       filterType: 'date',
-      getRowVal: student => reformatDate(student.updatedAt, isAdmin ? 'YYYY-MM-DD HH:mm:ss' : 'YYYY-MM-DD'),
+      getRowVal: student => reformatDate(student.updatedAt, isAdmin ? ISO_DATE_FORMAT_DEV : ISO_DATE_FORMAT),
     },
   }
 
