@@ -4,7 +4,6 @@ import moment from 'moment'
 import irtomikko from '@/assets/irtomikko.png'
 import toskaLogo from '@/assets/toska.svg'
 import { serviceProvider } from '@/conf'
-import { ISO_DATE_FORMAT } from '@/constants/date'
 
 export const textAndDescriptionSearch = (dropDownOptions, param) =>
   filter(dropDownOptions, option =>
@@ -42,19 +41,7 @@ export const getUnifiedProgrammeName = (bachelor, masterLisentiate, language) =>
   return bachelor
 }
 
-export const momentFromFormat = (date, format) => moment(date, format)
-
 export const isFall = semester => semester % 2 === 1
-
-export const reformatDate = (date, outputFormat) => {
-  if (!date) {
-    return 'Unavailable'
-  }
-  const parsedDate = moment(date).local().format(outputFormat)
-  return parsedDate
-}
-
-export const getTimestamp = () => moment().format(ISO_DATE_FORMAT)
 
 export const getStudentTotalCredits = (student, includeTransferredCredits = true) => {
   const passedCourses = includeTransferredCredits
@@ -106,13 +93,10 @@ export const getUnifyTextIn = unifyCourses => {
   switch (unifyCourses) {
     case 'regularStats':
       return '(normal)'
-
     case 'openStats':
       return '(open)'
-
     case 'unifyStats':
       return '(open and normal)'
-
     default:
       return ''
   }
@@ -489,17 +473,6 @@ export const languageAbbreviations = {
 }
 
 export const showAsUserKey = 'showAsUser'
-
-export const getAge = date => {
-  const today = new Date()
-  const birthDate = new Date(date)
-  let age = today.getFullYear() - birthDate.getFullYear()
-  const monthDifference = today.getMonth() - birthDate.getMonth()
-  if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
-    age--
-  }
-  return age
-}
 
 export const getEnrollmentTypeTextForExcel = (type, statutoryAbsence) => {
   if (type === 1) return 'Present'

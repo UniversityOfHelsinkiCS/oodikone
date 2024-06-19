@@ -2,15 +2,10 @@ import _ from 'lodash'
 import { useState } from 'react'
 import { Divider, Dropdown, Form, Icon, Loader, Message, Radio, Tab } from 'semantic-ui-react'
 
-import {
-  createLocaleComparator,
-  getCurrentSemester,
-  getEnrollmentTypeTextForExcel,
-  isFall,
-  reformatDate,
-} from '@/common'
+import { createLocaleComparator, getCurrentSemester, getEnrollmentTypeTextForExcel, isFall } from '@/common'
 import { useTitle } from '@/common/hooks'
 import { closeToGraduationToolTips } from '@/common/InfoToolTips'
+import { reformatDate } from '@/common/timeAndDate'
 import { StudentInfoItem } from '@/components/common/StudentInfoItem'
 import { InfoBox } from '@/components/Info/InfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'

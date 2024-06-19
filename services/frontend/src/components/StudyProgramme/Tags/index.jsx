@@ -5,7 +5,7 @@ import Datetime from 'react-datetime'
 import { Link } from 'react-router-dom'
 import { Button, Confirm, Form, Header, Icon, Item, List, Message, Popup, Segment } from 'semantic-ui-react'
 
-import { reformatDate } from '@/common'
+import { reformatDate } from '@/common/timeAndDate'
 import { SortableTable } from '@/components/SortableTable'
 import { TagModal } from '@/components/StudyProgramme/TagModal'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'

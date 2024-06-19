@@ -1,6 +1,6 @@
 import { utils, writeFile } from 'xlsx'
 
-import { getTimestamp } from '@/common'
+import { getTimestamp } from '@/common/timeAndDate'
 import { sortProgrammeKeys } from './facultyHelpers'
 
 export const downloadStudentTableCsv = (studentStats, programmeNames, faculty, sortedkeys, getTextIn) => {

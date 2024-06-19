@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Divider, Loader, Message, Radio } from 'semantic-ui-react'
 
-import { getTimestamp } from '@/common'
 import { facultyToolTips } from '@/common/InfoToolTips'
+import { getTimestamp } from '@/common/timeAndDate'
 import { makeGraphData, makeTableStats } from '@/components/common/CreditsProduced'
 import { sortProgrammeKeys } from '@/components/FacultyStatistics/facultyHelpers'
 import { InteractiveDataTable } from '@/components/FacultyStatistics/InteractiveDataView'

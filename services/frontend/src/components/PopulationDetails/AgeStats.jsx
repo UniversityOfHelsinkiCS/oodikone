@@ -2,7 +2,8 @@ import { arrayOf, object, shape } from 'prop-types'
 import { Fragment, useState } from 'react'
 import { Icon, Progress, Radio, Table } from 'semantic-ui-react'
 
-import { getAge, getFullStudyProgrammeRights } from '@/common'
+import { getFullStudyProgrammeRights } from '@/common'
+import { getAge } from '@/common/timeAndDate'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 
 const getAverageAge = ages => {

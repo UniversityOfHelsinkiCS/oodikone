@@ -3,7 +3,7 @@ import { useCallback, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Container, Search, Segment } from 'semantic-ui-react'
 
-import { reformatDate } from '@/common'
+import { reformatDate } from '@/common/timeAndDate'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SegmentDimmer } from '@/components/SegmentDimmer'
 import { SortableTable } from '@/components/SortableTable'

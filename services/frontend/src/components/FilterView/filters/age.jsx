@@ -1,8 +1,8 @@
 import _ from 'lodash'
 import { useCallback, useMemo } from 'react'
 
-import { getAge } from '@/common'
 import { useDebounce } from '@/common/hooks'
+import { getAge } from '@/common/timeAndDate'
 import { RangeSelector } from '@/components/common/RangeSelector'
 import { createFilter } from './createFilter'
 

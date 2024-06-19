@@ -7,15 +7,9 @@ import { connect } from 'react-redux'
 import { useHistory, useLocation } from 'react-router-dom'
 import { Button, Form, Grid, Icon, Message } from 'semantic-ui-react'
 
-import {
-  cancelablePromise,
-  createPinnedFirstComparator,
-  isNewStudyProgramme,
-  momentFromFormat,
-  reformatDate,
-  textAndDescriptionSearch,
-} from '@/common'
+import { cancelablePromise, createPinnedFirstComparator, isNewStudyProgramme, textAndDescriptionSearch } from '@/common'
 import { useSearchHistory } from '@/common/hooks'
+import { momentFromFormat, reformatDate } from '@/common/timeAndDate'
 import { FilterOldProgrammesToggle } from '@/components/common/FilterOldProgrammesToggle'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SearchHistory } from '@/components/SearchHistory'

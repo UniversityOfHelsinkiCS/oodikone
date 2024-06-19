@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Button, Checkbox, Modal, Table } from 'semantic-ui-react'
 import { utils, writeFile } from 'xlsx'
 
-import { getTimestamp } from '@/common'
+import { getTimestamp } from '@/common/timeAndDate'
 import { cloneColumns, DataItemType, getColumnTitle, getDataItemType } from './common'
 import { ExportVisitor } from './visitors/ExportVisitor'
 import { ValueVisitor } from './visitors/ValueVisitor'

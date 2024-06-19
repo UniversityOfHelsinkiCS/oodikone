@@ -6,8 +6,8 @@ import {
   bachelorHonoursProgrammes as bachelorCodes,
   bachelorHonoursBasicModules as basicHonoursModules,
   bachelorHonoursIntermediateModules as intermediateHonoursModules,
-  reformatDate,
 } from '@/common'
+import { reformatDate } from '@/common/timeAndDate'
 import { CurriculumPicker } from '@/components/PopulationDetails/CurriculumPicker'
 import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 

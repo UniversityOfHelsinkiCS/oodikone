@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Divider, Loader, Message } from 'semantic-ui-react'
 
-import { getGraduationGraphTitle, getTimestamp } from '@/common'
+import { getGraduationGraphTitle } from '@/common'
 import { studyProgrammeToolTips } from '@/common/InfoToolTips'
+import { getTimestamp } from '@/common/timeAndDate'
 import { CreditsProduced } from '@/components/common/CreditsProduced'
 import { InfoBox } from '@/components/Info/InfoBox'
 import { BreakdownBarChart } from '@/components/StudyProgramme/BreakdownBarChart'

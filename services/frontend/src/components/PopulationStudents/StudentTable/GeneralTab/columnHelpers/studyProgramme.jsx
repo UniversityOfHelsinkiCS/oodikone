@@ -1,4 +1,5 @@
-import { getAllProgrammesOfStudent, reformatDate } from '@/common'
+import { getAllProgrammesOfStudent } from '@/common'
+import { reformatDate } from '@/common/timeAndDate'
 import { ISO_DATE_FORMAT } from '@/constants/date'
 
 const noProgrammeDuringCourse = {

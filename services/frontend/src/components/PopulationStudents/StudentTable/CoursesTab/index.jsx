@@ -1,11 +1,10 @@
 import { isNumber, orderBy, sortBy, sumBy, uniqBy } from 'lodash'
-import moment from 'moment'
 import { useCallback, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { Icon, Tab } from 'semantic-ui-react'
 
-import { reformatDate } from '@/common'
 import { hiddenNameAndEmailForExcel } from '@/common/columns'
+import { isWithinSixMonths, reformatDate } from '@/common/timeAndDate'
 import { StudentInfoItem } from '@/components/common/StudentInfoItem'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SortableTable, row } from '@/components/SortableTable'
@@ -232,8 +231,6 @@ const CoursesTable = ({ curriculum, includeSubstitutions, populationCourses, stu
       }
       return student.enrollments.some(enrollment => enrollment.course_code === code && enrollment.state === 'ENROLLED')
     }
-
-    const isWithinSixMonths = date => moment(date) > moment().subtract(6, 'months')
 
     const getCompletionDate = (student, code) => {
       const course = student.courses.find(course => course.course_code === code && course.passed === true)

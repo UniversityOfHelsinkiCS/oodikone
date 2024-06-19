@@ -2,13 +2,9 @@ import _ from 'lodash'
 import moment from 'moment'
 import { useState } from 'react'
 
-import {
-  getEnrollmentTypeTextForExcel,
-  getHighestGradeOfCourseBetweenRange,
-  getStudentTotalCredits,
-  reformatDate,
-} from '@/common'
+import { getEnrollmentTypeTextForExcel, getHighestGradeOfCourseBetweenRange, getStudentTotalCredits } from '@/common'
 import { getCopyableEmailColumn, getCopyableStudentNumberColumn, hiddenNameAndEmailForExcel } from '@/common/columns'
+import { reformatDate } from '@/common/timeAndDate'
 import { creditDateFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'

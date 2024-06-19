@@ -2,6 +2,7 @@ import moment from 'moment'
 import { Icon, Loader } from 'semantic-ui-react'
 
 import { hiddenNameAndEmailForExcel } from '@/common/columns'
+import { isWithinSixMonths } from '@/common/timeAndDate'
 import { StudentInfoItem } from '@/components/common/StudentInfoItem'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { RightsNotification } from '@/components/RightsNotification'
@@ -22,7 +23,7 @@ const getColumns = (courses, showStudentNames, getTextIn) => {
         return icon ? null : ''
       }
       if (icon) {
-        if (moment(enrollment.date) > moment().subtract(6, 'months')) {
+        if (isWithinSixMonths(enrollment.date)) {
           return <Icon color="yellow" fitted name="minus" />
         }
         return <Icon color="grey" fitted name="minus" />
