@@ -87,13 +87,13 @@ const createArrayOfCourses = async (attempts, courses) => {
 
 const computeLanguageCenterData = async () => {
   const courses = await getLanguageCenterCourses()
+  const autumnSemester2017 = 135
 
   const credits = await Credit.findAll({
     attributes: ['course_code', 'student_studentnumber', 'semestercode', 'attainment_date', 'studyright_id'],
     where: {
       [Op.or]: [{ course_code: { [Op.like]: 'KK%' } }, { course_code: { [Op.like]: 'AYKK%' } }],
-      // 135 = autumn 2017
-      semestercode: { [Op.gte]: 135 },
+      semestercode: { [Op.gte]: autumnSemester2017 },
       credittypecode: 4,
     },
     raw: true,
@@ -103,7 +103,7 @@ const computeLanguageCenterData = async () => {
     attributes: ['studentnumber', 'semestercode', 'course_code', 'enrollment_date_time', 'studyright_id', 'state'],
     where: {
       [Op.or]: [{ course_code: { [Op.like]: 'KK%' } }, { course_code: { [Op.like]: 'AYKK%' } }],
-      semestercode: { [Op.gte]: 135 },
+      semestercode: { [Op.gte]: autumnSemester2017 },
       state: { [Op.in]: ['ENROLLED', 'REJECTED'] },
     },
     raw: true,
@@ -137,12 +137,12 @@ const computeLanguageCenterData = async () => {
     enrollment.faculty = attemptStudyrightToFacultyMap[enrollment.studyright_id]
   })
 
-  const studentList = new Set()
+  const studentNumbers = new Set()
   const attemptsByStudents = {}
 
   credits.forEach(credit => {
     const studentNumber = credit.student_studentnumber
-    studentList.add(studentNumber)
+    studentNumbers.add(studentNumber)
     if (!attemptsByStudents[studentNumber]) {
       attemptsByStudents[studentNumber] = []
     }
@@ -161,7 +161,7 @@ const computeLanguageCenterData = async () => {
     if (!attemptsByStudents[studentNumber]) {
       attemptsByStudents[studentNumber] = []
     }
-    studentList.add(studentNumber)
+    studentNumbers.add(studentNumber)
     if (
       attemptsByStudents[studentNumber].find(
         attempt =>
@@ -169,8 +169,9 @@ const computeLanguageCenterData = async () => {
           attempt.semestercode === enrollment.semestercode &&
           attempt.courseCode === enrollment.course_code
       )
-    )
+    ) {
       return
+    }
     attemptsByStudents[studentNumber].push({
       studentNumber,
       courseCode: enrollment.course_code,
@@ -185,7 +186,7 @@ const computeLanguageCenterData = async () => {
   const studyrightElements = await StudyrightElement.findAll({
     attributes: ['studentnumber', 'startdate', 'enddate', 'code', 'studyrightid'],
     where: {
-      studentnumber: { [Op.in]: Array.from(studentList.values()) },
+      studentnumber: { [Op.in]: Array.from(studentNumbers.values()) },
     },
     raw: true,
   })
@@ -206,14 +207,14 @@ const computeLanguageCenterData = async () => {
     findStudyright(studyrightElementsMap[studentNumber], date)?.code ||
     findStudyright(studentnumberToStudyrightsMap[studentNumber], date)?.facultyCode
 
-  const attemptsArray = []
-  studentList.forEach(studentNumber => attemptsArray.push(...attemptsByStudents[studentNumber]))
-  // 93033 Avoin yliopisto, yhteistyöoppilaitokset"
+  const attempts = []
+  studentNumbers.forEach(studentNumber => attempts.push(...attemptsByStudents[studentNumber]))
+  // 93033 Avoin yliopisto, yhteistyöoppilaitokset
   // 93034 Kesäyliopistot
   const isOpenUni = code => ['9301', 'H930', '93033', '93034'].includes(code)
   const isMisc = code => ['H906', 'H401'].includes(code) // Language center, Alexander institute (very few numbers)
 
-  attemptsArray.forEach(attempt => {
+  attempts.forEach(attempt => {
     if (attempt.faculty) {
       if (isOpenUni(attempt.faculty)) {
         attempt.faculty = 'OPEN'
@@ -236,9 +237,9 @@ const computeLanguageCenterData = async () => {
     }
   })
 
-  const faculties = [...new Set(attemptsArray.map(({ faculty }) => faculty))]
+  const faculties = [...new Set(attempts.map(({ faculty }) => faculty))]
 
-  const unorderedTableData = await createArrayOfCourses(attemptsArray, courses)
+  const unorderedTableData = await createArrayOfCourses(attempts, courses)
 
   const tableData = orderBy(unorderedTableData, 'code')
 

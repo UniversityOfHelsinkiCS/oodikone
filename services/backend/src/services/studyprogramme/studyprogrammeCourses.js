@@ -75,14 +75,14 @@ const makeYearlyPromises = (years, academicYear, type, programmeCourses, studypr
 
 const getStudyprogrammeStatsForColorizedCoursesTable = async studyprogramme => {
   const courses = await getAllProgrammeCourses(mapToProviders([studyprogramme])[0])
+  const autumnSemester2017 = 135
   const courseCodes = courses.map(course => course.code)
 
   const credits = await Credit.findAll({
     attributes: ['course_code', 'student_studentnumber', 'semestercode', 'attainment_date'],
     where: {
       course_code: { [Op.in]: courseCodes },
-      // 135 = autumn 2017
-      semestercode: { [Op.gte]: 135 },
+      semestercode: { [Op.gte]: autumnSemester2017 },
       credittypecode: 4,
     },
     raw: true,
@@ -92,7 +92,7 @@ const getStudyprogrammeStatsForColorizedCoursesTable = async studyprogramme => {
     attributes: ['studentnumber', 'semestercode', 'course_code', 'enrollment_date_time', 'state'],
     where: {
       course_code: { [Op.in]: courseCodes },
-      semestercode: { [Op.gte]: 135 },
+      semestercode: { [Op.gte]: autumnSemester2017 },
       state: { [Op.in]: ['ENROLLED', 'REJECTED'] },
     },
     raw: true,
