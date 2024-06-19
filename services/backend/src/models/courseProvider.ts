@@ -10,7 +10,7 @@ import { Course } from './course'
 export class CourseProvider extends Model {
   @PrimaryKey
   @Column(DataType.STRING)
-  id!: string
+  composite: string
 
   @ForeignKey(() => Course)
   @Column(DataType.STRING)

@@ -21,7 +21,7 @@ export class Course extends Model {
   credits: Credit[]
 
   @BelongsToMany(() => Organization, () => CourseProvider, 'coursecode')
-  providers: CourseProvider[]
+  courseProviders: CourseProvider[]
 
   @Column(DataType.STRING)
   name: string
