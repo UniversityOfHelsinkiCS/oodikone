@@ -17,14 +17,13 @@ import { PopulationCourses } from './PopulationCourses'
 
 export const PopulationDetails = ({
   curriculum,
-  setCurriculum,
   filteredStudents,
-  queryIsSet,
   isLoading,
-  query,
-  dataExport,
-  selectedStudentsByYear,
   programmeCodes,
+  query,
+  queryIsSet,
+  selectedStudentsByYear,
+  setCurriculum,
 }) => {
   const { isLoading: authLoading, programmeRights, fullAccessToStudentData } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
@@ -134,7 +133,6 @@ export const PopulationDetails = ({
           <PopulationStudents
             criteria={criteria?.data}
             curriculum={curriculum}
-            dataExport={dataExport}
             filteredStudents={filteredStudents}
             programmeCode={query?.studyRights?.programme}
             variant="population"

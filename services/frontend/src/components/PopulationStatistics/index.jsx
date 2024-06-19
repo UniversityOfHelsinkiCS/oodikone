@@ -38,7 +38,6 @@ import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { makePopulationsToData } from '@/selectors/populationDetails'
-import { DataExport } from './DataExport'
 
 const getYearText = year => {
   if (year === 'All') return ''
@@ -201,16 +200,9 @@ export const PopulationStatistics = () => {
           {students?.length === 0 && location.search !== '' && !isLoading && noStudentsMessage()}
           <Segment className="contentSegment">
             <PopulationSearch combinedProgrammeCode={combinedProgrammeCode} />
-            {location.search !== '' ? (
+            {location.search !== '' && (
               <PopulationDetails
                 curriculum={curriculum}
-                dataExport={
-                  <DataExport
-                    curriculumYears={curriculum?.version}
-                    programmeCode={query?.studyRights?.programme}
-                    students={filteredStudents}
-                  />
-                }
                 filteredStudents={filteredStudents}
                 isLoading={isLoading}
                 programmeCodes={programmeCodes}
@@ -219,7 +211,7 @@ export const PopulationStatistics = () => {
                 selectedStudentsByYear={selectedStudentsByYear}
                 setCurriculum={setCurriculum}
               />
-            ) : null}
+            )}
           </Segment>
         </div>
       )}
