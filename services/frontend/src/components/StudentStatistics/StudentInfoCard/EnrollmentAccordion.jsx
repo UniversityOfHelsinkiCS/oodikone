@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import { useState } from 'react'
 import { Icon, Accordion, Table, Popup } from 'semantic-ui-react'
 
@@ -11,48 +10,36 @@ const calculateSemesterEnrollmentsByStudyright = (semestersAndYears, studyrights
   const programmeNames = {}
   let firstYear
 
-  const enrollmentsByStudyright = Object.values(studyrights).reduce((enrollments, studyright) => {
-    // Let's choose the first studyright as they are all linked to the same actual (Sisu) studyright
-    studyright[0].semesterEnrollments.forEach(enrollment => {
-      const year = years[semesters[enrollment.semestercode].yearcode]
-      const enrollmentYear = new Date(year.startdate).getFullYear()
+  const studyRightsWithSemesterEnrollments = [
+    ...studyrights.reduce((enrollments, studyRight) => {
+      if (!studyRight.semesterEnrollments) return enrollments
+      const { semesterEnrollments, id: studyRightId, studyRightElements } = studyRight
 
-      if (!firstYear || enrollmentYear < firstYear) {
-        firstYear = enrollmentYear
+      enrollments.add(studyRightId)
+
+      for (const enrollment of semesterEnrollments) {
+        const year = years[semesters[enrollment.semester].yearcode]
+        const enrollmentYear = new Date(year.startdate).getFullYear()
+        if (!firstYear || enrollmentYear < firstYear) firstYear = enrollmentYear
       }
 
-      const studyrightId = studyright[0].actual_studyrightid
-      if (!enrollments[studyrightId]) {
-        enrollments[studyrightId] = {}
-      }
-      enrollments[studyrightId][enrollment.semestercode] = enrollment.enrollmenttype
-    })
+      programmeNames[studyRightId] = studyRightElements.map(element => element.name)
 
-    studyright.forEach(element => {
-      const studyrightId = element.actual_studyrightid
-      if (!programmeNames[studyrightId]) {
-        programmeNames[studyrightId] = []
-      }
-      element.studyright_elements
-        .filter(element => element.element_detail.type === 20)
-        .forEach(element => {
-          programmeNames[studyrightId].push(element.element_detail.name)
-        })
-    })
-    return enrollments
-  }, {})
+      return enrollments
+    }, new Set()),
+  ]
 
-  return { enrollmentsByStudyright, programmeNames, firstYear }
+  return { studyRightsWithSemesterEnrollments, programmeNames, firstYear }
 }
 
-const getProgrammeEndDateForStudyright = (studyright, extentCode) => {
-  const graduatedStudyright = studyright.find(element => element.extentcode === extentCode && element.graduated === 1)
-  if (!graduatedStudyright) return null
-
-  const { enddate, code } = graduatedStudyright.studyright_elements.find(
-    element => element.enddate === graduatedStudyright.enddate
+const getProgrammeEndDateForStudyright = (studyright, phase) => {
+  const graduatedFromProgramme = studyright.studyRightElements.find(
+    element => element.phase === phase && element.graduated
   )
-  return { enddate, programmeCode: code }
+  if (!graduatedFromProgramme) return null
+
+  const { endDate, code: programmeCode } = graduatedFromProgramme
+  return { endDate, programmeCode }
 }
 
 const processStudyrights = (studyrights, student, firstDisplayedYear, getTextIn, semestersAndYears) =>
@@ -70,16 +57,16 @@ const processStudyrights = (studyrights, student, firstDisplayedYear, getTextIn,
 
     const masterInfo = getProgrammeEndDateForStudyright(studyright, 2)
     if (masterInfo) {
-      const { enddate, programmeCode } = masterInfo
+      const { endDate, programmeCode } = masterInfo
       baseArguments.programmeCode = programmeCode
-      studentToSecondStudyrightEndMap[student.studentNumber] = enddate
+      studentToSecondStudyrightEndMap[student.studentNumber] = endDate
     }
 
     const bachelorInfo = getProgrammeEndDateForStudyright(studyright, 1)
     if (bachelorInfo) {
-      const { enddate, programmeCode } = bachelorInfo
+      const { endDate, programmeCode } = bachelorInfo
       baseArguments.programmeCode = programmeCode
-      studentToStudyrightEndMap[student.studentNumber] = enddate
+      studentToStudyrightEndMap[student.studentNumber] = endDate
     }
 
     const { getSemesterEnrollmentsContent } = getSemestersPresentFunctions({
@@ -88,7 +75,7 @@ const processStudyrights = (studyrights, student, firstDisplayedYear, getTextIn,
       studentToSecondStudyrightEndMap,
     })
 
-    acc[studyright[0].actual_studyrightid] = getSemesterEnrollmentsContent(student, studyright)
+    acc[studyright.id] = getSemesterEnrollmentsContent(student, studyright)
     return acc
   }, {})
 
@@ -97,33 +84,18 @@ export const EnrollmentAccordion = ({ student }) => {
   const [active, setActive] = useState(false)
   const { getTextIn } = useLanguage()
 
-  if (!semestersAndYears || !student) return null
+  if (!semestersAndYears || !student || student.studyRights.length === 0) return null
 
-  const { studyrights } = student
+  const { studyRights } = student
 
-  const studyrightsGroupedByStudyright = _.groupBy(
-    studyrights?.filter(
-      studyright => studyright.semesterEnrollments !== null && studyright.studyright_elements.length > 0
-    ),
-    'actual_studyrightid'
-  )
-
-  if (Object.keys(studyrightsGroupedByStudyright).length === 0) return null
-
-  const { enrollmentsByStudyright, programmeNames, firstYear } = calculateSemesterEnrollmentsByStudyright(
+  const { studyRightsWithSemesterEnrollments, programmeNames, firstYear } = calculateSemesterEnrollmentsByStudyright(
     semestersAndYears,
-    studyrightsGroupedByStudyright
+    studyRights
   )
 
   const firstDisplayedYear = `${Math.max(new Date().getFullYear() - 10, firstYear)}`
 
-  const semesterEnrollments = processStudyrights(
-    Object.values(studyrightsGroupedByStudyright),
-    student,
-    firstDisplayedYear,
-    getTextIn,
-    semestersAndYears
-  )
+  const semesterEnrollments = processStudyrights(studyRights, student, firstDisplayedYear, getTextIn, semestersAndYears)
 
   return (
     <Accordion style={{ marginBottom: active ? '0.5em' : 0 }}>
@@ -147,16 +119,16 @@ export const EnrollmentAccordion = ({ student }) => {
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {Object.entries(enrollmentsByStudyright).map(([studyrightId]) => (
-              <Table.Row key={studyrightId}>
+            {studyRightsWithSemesterEnrollments.map(studyRightId => (
+              <Table.Row key={studyRightId}>
                 <Table.Cell>
-                  {_.flatten(programmeNames[studyrightId])
-                    .map(getTextIn)
-                    .map(element => (
-                      <p key={element}>{element}</p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25em' }}>
+                    {programmeNames[studyRightId].map(getTextIn).map(element => (
+                      <div key={element}>{element}</div>
                     ))}
+                  </div>
                 </Table.Cell>
-                <Table.Cell>{semesterEnrollments[studyrightId]}</Table.Cell>
+                <Table.Cell>{semesterEnrollments[studyRightId]}</Table.Cell>
               </Table.Row>
             ))}
           </Table.Body>

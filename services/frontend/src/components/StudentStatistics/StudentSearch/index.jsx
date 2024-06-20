@@ -11,21 +11,10 @@ import { useStudentNameVisibility } from '@/components/StudentNameVisibilityTogg
 import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 import { useSearchStudentsQuery } from '@/redux/students'
 
-const getStudyrights = (student, getTextIn) => {
-  if (!student.studyrights || student.studyrights.length === 0) return []
-  const elements = student.studyrights
-    .filter(studyright => studyright.active && !studyright.graduated)
-    .reduce(
-      (res, studyright) => [
-        ...res,
-        ...studyright.studyright_elements
-          .filter(elem => elem.element_detail.type === 20 && new Date(elem.enddate) > new Date())
-          .map(element => getTextIn(element.element_detail.name)),
-      ],
-      []
-    )
-  return elements.sort()
-}
+const getProgrammes = (studyRights, getTextIn) =>
+  studyRights
+    .reduce((res, studyRight) => [...res, ...studyRight.studyRightElements.map(element => getTextIn(element.name))], [])
+    .sort()
 
 const StudentPageLink = ({ studentNumber, text }) => (
   <Link style={{ color: 'black' }} to={`/students/${studentNumber}`}>
@@ -57,13 +46,13 @@ export const StudentSearch = () => {
     if (isLoading) return <div style={{ margin: 100 }} />
 
     const formatStudents = students =>
-      students.map(({ studentNumber, credits, started, lastname, firstnames, studyrights }) => ({
+      students.map(({ studentNumber, credits, started, lastname, firstnames, studyRights }) => ({
         studentNumber,
         started,
         credits,
         lastname,
         firstnames,
-        studyrights,
+        studyRights,
       }))
 
     const displayedStudents = formatStudents(students)
@@ -115,9 +104,8 @@ export const StudentSearch = () => {
         title: 'Active studyrights',
         sortable: false,
         filterType: 'multi',
-        getRowVal: student => getStudyrights(student, getTextIn),
-        getRowContent: student =>
-          getStudyrights(student, getTextIn).map(studyright => <div key={`${studyright}`}>{studyright}</div>),
+        getRowVal: student => getProgrammes(student.studyRights, getTextIn),
+        formatValue: programmes => programmes.map(programme => <div key={`${programme}`}>{programme}</div>),
       },
     ]
 

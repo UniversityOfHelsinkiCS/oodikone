@@ -22,18 +22,14 @@ const getEarliestAttainmentDate = ({ courses }) => {
   return courses[0].date
 }
 
-const getCoursesIncludedInStudyPlan = (student, selectedStudyRight) => {
-  const studyPlan = student.studyplans.find(plan => plan.studyrightid === selectedStudyRight.studyrightid)
-  if (!studyPlan) return []
+const getCoursesIncludedInStudyPlan = (student, studyPlan) =>
+  student.courses.filter(({ course }) => studyPlan.included_courses.includes(course.code))
 
-  return student.courses.filter(({ course_code: courseCode }) => studyPlan.included_courses.includes(courseCode))
-}
-
-const resolveGraphStartDate = (student, graphYearStart, selectedStudyRight, studyRightTargetStart) => {
+const resolveGraphStartDate = (student, graphYearStart, selectedStudyPlan, studyRightTargetStart) => {
   const earliestAttainmentDate = getEarliestAttainmentDate(student)
-  if (!selectedStudyRight)
+  if (!selectedStudyPlan)
     return Math.min(new Date(earliestAttainmentDate).getTime(), new Date(graphYearStart || new Date()).getTime())
-  const filteredCourses = getCoursesIncludedInStudyPlan(student, selectedStudyRight)
+  const filteredCourses = getCoursesIncludedInStudyPlan(student, selectedStudyPlan)
 
   return Math.min(
     ..._.flattenDeep(filteredCourses.map(({ date }) => new Date(date).getTime())),
@@ -41,28 +37,51 @@ const resolveGraphStartDate = (student, graphYearStart, selectedStudyRight, stud
   )
 }
 
-const resolveGraphEndDate = (dates, selectedStudyRight, student, studyRightTargetEnd) => {
-  if (!selectedStudyRight) return Math.max(...(dates || []), new Date().getTime())
-  const filteredCourses = getCoursesIncludedInStudyPlan(student, selectedStudyRight)
+const resolveGraphEndDate = (dates, selectedStudyPlan, student, studyRightTargetEnd, selectedStudyRightElement) => {
+  if (!selectedStudyPlan) return Math.max(...(dates || []), new Date().getTime())
+  const filteredCourses = getCoursesIncludedInStudyPlan(student, selectedStudyPlan)
 
-  return Math.max(
+  const comparedValues = [
     new Date(studyRightTargetEnd).getTime(),
-    ..._.flattenDeep(filteredCourses.map(({ date }) => new Date(date).getTime()))
-  )
+    ..._.flattenDeep(filteredCourses.map(({ date }) => new Date(date).getTime())),
+  ]
+  if (selectedStudyRightElement?.graduated) {
+    const graduationDate = new Date(selectedStudyRightElement.endDate)
+    // Add 50 days to graduation date to make sure the graduation text is visible in the graph
+    graduationDate.setDate(graduationDate.getDate() + 50)
+    comparedValues.push(graduationDate.getTime())
+  }
+
+  return Math.max(...comparedValues)
 }
 
-const CreditsGraph = ({ graphYearStart, student, absences, studyRightId }) => {
-  const selectedStudyRight = student.studyrights.find(({ studyrightid }) => studyrightid === studyRightId)
-  const dates = _.flattenDeep(student.courses.map(({ date }) => new Date(date).getTime()))
-  const [studyRightTargetStart, studyRightTargetEnd] = getStudyRightElementTargetDates(selectedStudyRight, absences)
-  const selectedStart = new Date(
-    resolveGraphStartDate(student, graphYearStart, selectedStudyRight, studyRightTargetStart)
+const CreditsGraph = ({ graphYearStart, student, absences, selectedStudyPlanId }) => {
+  const selectedStudyPlan = student.studyplans.find(({ id }) => id === selectedStudyPlanId)
+  const studyRightId = selectedStudyPlan?.sis_study_right_id
+  const selectedStudyRight = student.studyRights.find(({ id }) => id === studyRightId)
+  const selectedStudyRightElement = selectedStudyRight?.studyRightElements.find(
+    ({ code }) => code === selectedStudyPlan.programme_code
   )
-  const endDate = resolveGraphEndDate(dates, selectedStudyRight, student, studyRightTargetEnd)
+  const creditDates = student.courses.map(({ date }) => new Date(date))
+  const [studyRightTargetStart, studyRightTargetEnd] = getStudyRightElementTargetDates(
+    selectedStudyRightElement,
+    absences
+  )
+  const selectedStart = new Date(
+    resolveGraphStartDate(student, graphYearStart, selectedStudyPlan, studyRightTargetStart)
+  )
+  const endDate = resolveGraphEndDate(
+    creditDates,
+    selectedStudyPlan,
+    student,
+    studyRightTargetEnd,
+    selectedStudyRightElement
+  )
   return (
     <CreditAccumulationGraphHighCharts
       absences={absences}
       endDate={endDate}
+      selectedStudyPlan={selectedStudyPlan}
       singleStudent
       startDate={selectedStart}
       students={[student]}
@@ -226,7 +245,7 @@ const GradeGraph = ({ semesters, student }) => {
   )
 }
 
-export const StudentGraphs = ({ absences, graphYearStart, semesters, student, studyRightId }) => {
+export const StudentGraphs = ({ absences, graphYearStart, semesters, student, selectedStudyPlanId }) => {
   const panes = [
     {
       menuItem: 'Credit graph',
@@ -235,8 +254,8 @@ export const StudentGraphs = ({ absences, graphYearStart, semesters, student, st
           <CreditsGraph
             absences={absences}
             graphYearStart={graphYearStart}
+            selectedStudyPlanId={selectedStudyPlanId}
             student={student}
-            studyRightId={studyRightId}
           />
         </Tab.Pane>
       ),

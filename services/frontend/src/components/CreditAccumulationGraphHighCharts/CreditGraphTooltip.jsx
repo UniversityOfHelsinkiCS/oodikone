@@ -54,11 +54,11 @@ export const CreditGraphTooltip = ({ payload = [] }) => {
   if (payload.length === 0) return null
 
   const { name } = payload[0]
-  const { title, credits, date, grade, passed, isStudyModuleCredit, course_code: code } = payload[0].payload
+  const { credits, date, grade, passed, isStudyModuleCredit, courseCode, courseName } = payload[0].payload
   return (
     <Card>
       <Card.Content>
-        {getCardHeader(`${title} (${code})`, isStudyModuleCredit)}
+        {getCardHeader(`${courseName} (${courseCode})`, isStudyModuleCredit)}
         {getCardMeta(name, date)}
         {getCardDescription(credits, grade, passed, isStudyModuleCredit)}
       </Card.Content>

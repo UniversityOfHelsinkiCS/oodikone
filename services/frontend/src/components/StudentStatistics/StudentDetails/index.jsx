@@ -1,4 +1,4 @@
-import { isEmpty, sortBy } from 'lodash'
+import { isEmpty } from 'lodash'
 import moment from 'moment'
 import { useState } from 'react'
 import { Loader, Message } from 'semantic-ui-react'
@@ -16,7 +16,7 @@ import { TagsTable } from './TagsTable'
 
 export const StudentDetails = ({ studentNumber }) => {
   const [graphYearStart, setGraphYear] = useState(null)
-  const [studyrightid, setStudyrightid] = useState('')
+  const [selectedStudyPlanId, setSelectedStudyPlanId] = useState(null)
   let honoursCode
   const { data: semesters } = useGetSemestersQuery()
   const { data: programmesAndStudyTracks } = useGetProgrammesQuery()
@@ -121,18 +121,19 @@ export const StudentDetails = ({ studentNumber }) => {
     )
   }
 
-  const handleStartDateChange = (elements, id) => {
-    if (id === studyrightid) {
+  const handleStudyPlanChange = id => {
+    if (id === selectedStudyPlanId) {
+      setSelectedStudyPlanId(null)
       setGraphYear(null)
-      setStudyrightid('')
-      return
+    } else {
+      setSelectedStudyPlanId(id)
+      const { programme_code: programmeCode, sis_study_right_id: studyRightId } = student.studyplans.find(
+        plan => plan.id === id
+      )
+      const studyRight = student.studyRights.find(studyright => studyright.id === studyRightId)
+      const programme = studyRight.studyRightElements.find(element => element.code === programmeCode)
+      setGraphYear(programme.startDate)
     }
-
-    const getTarget = () => sortBy(elements.programmes, 'startdate', ['desc'])[0] || { startdate: graphYearStart }
-
-    const { startdate } = getTarget()
-    setGraphYear(startdate)
-    setStudyrightid(id)
   }
 
   if (isLoading) return <Loader active />
@@ -148,19 +149,19 @@ export const StudentDetails = ({ studentNumber }) => {
       <StudentGraphs
         absences={getAbsentYears()}
         graphYearStart={graphYearStart}
+        selectedStudyPlanId={selectedStudyPlanId}
         semesters={semesters}
         student={student}
-        studyRightId={studyrightid}
       />
       <TagsTable student={student} />
       <StudyrightsTable
-        handleStartDateChange={handleStartDateChange}
+        handleStudyPlanChange={handleStudyPlanChange}
+        selectedStudyPlanId={selectedStudyPlanId}
         showPopulationStatistics={showPopulationStatistics}
         student={student}
-        studyrightid={studyrightid}
       />
       {honoursCode && <BachelorHonours absentYears={getAbsentYears()} programmeCode={honoursCode} student={student} />}
-      <CourseParticipationTable student={student} studyrightid={studyrightid} />
+      <CourseParticipationTable selectedStudyPlanId={selectedStudyPlanId} student={student} />
     </>
   )
 }

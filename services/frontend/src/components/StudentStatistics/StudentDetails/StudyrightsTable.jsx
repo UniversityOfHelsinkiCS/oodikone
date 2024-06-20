@@ -1,10 +1,10 @@
-import { sortBy } from 'lodash'
-import { func, shape, string } from 'prop-types'
+import { orderBy } from 'lodash'
 import ReactMarkdown from 'react-markdown'
 import { Link } from 'react-router-dom'
-import { Button, Divider, Header, Icon, Item, Popup, Segment, Table } from 'semantic-ui-react'
+import { Button, Divider, Header, Icon, Item, Popup, Table } from 'semantic-ui-react'
 
 import { calculatePercentage, getTargetCreditsForProgramme } from '@/common'
+import { useCurrentSemester } from '@/common/hooks'
 import { studentToolTips } from '@/common/InfoToolTips'
 import { reformatDate } from '@/common/timeAndDate'
 import { HoverableHelpPopup } from '@/components/common/HoverableHelpPopup'
@@ -12,166 +12,94 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 import { useGetProgrammesQuery } from '@/redux/populations'
 
-export const StudyrightsTable = ({ handleStartDateChange, showPopulationStatistics, student, studyrightid }) => {
+const studyRightIsActive = (studyRight, currentSemester) =>
+  studyRight.semesterEnrollments?.find(({ type, semester }) => semester === currentSemester && [1, 2].includes(type)) !=
+  null
+
+export const StudyrightsTable = ({ handleStudyPlanChange, showPopulationStatistics, student, selectedStudyPlanId }) => {
   const { getTextIn } = useLanguage()
   const { data: programmesAndStudyTracks } = useGetProgrammesQuery()
-  const programmes = programmesAndStudyTracks?.programmes
+  const { semestercode: currentSemesterCode } = useCurrentSemester()
 
-  const programmeCodes = programmes ? Object.keys(programmes) : []
+  const programmeCodes = Object.keys(programmesAndStudyTracks?.programmes || {})
   const studyRightHeaders = ['Programme', 'Study track', 'Status', 'Completed']
 
   if (!student) return null
 
-  const studyRightRows = student.studyrights
-    .filter(studyright => studyright.studyright_elements.length > 0)
-    .map(studyright => {
-      const programmes = sortBy(studyright.studyright_elements, 'enddate')
-        .filter(element => element.element_detail.type === 20)
-        .map(programme => ({
-          code: programme.code,
-          startdate: programme.startdate ?? studyright.studystartdate,
-          studystartdate: studyright.studystartdate,
-          enddate: programme.enddate,
-          name: getTextIn(programme.element_detail.name),
-          isFilterable:
-            !studyright.cancelled &&
-            student.studyplans.map(plan => plan.programme_code).includes(programme.element_detail.code),
-        }))
-      const studytracks = sortBy(studyright.studyright_elements, 'enddate')
-        .filter(element => element.element_detail.type === 30)
-        .map(studytrack => ({
-          startdate: studytrack.startdate,
-          enddate: studytrack.enddate,
-          name: getTextIn(studytrack.element_detail.name),
-        }))
-      return {
-        studyrightid: studyright.studyrightid,
-        graduated: studyright.graduated,
-        enddate: studyright.enddate,
-        active: studyright.active,
-        cancelled: studyright.cancelled,
-        elements: { programmes, studytracks },
-      }
-    })
+  // Study right elements are sorted by end date in descending order in the backend so the newest programme is the first one
+  const formatStudyRightRow = (studyRight, phase, programmes) => {
+    const studyPlanId = student.studyplans.find(
+      plan => plan.sis_study_right_id === studyRight.id && plan.programme_code === programmes[0].code
+    )?.id
+    return {
+      key: `${studyRight.id}-${phase}`,
+      studyRightId: studyRight.id,
+      graduated: programmes[0].graduated,
+      endDate: programmes[0].endDate,
+      studyPlanId,
+      active: studyRightIsActive(studyRight, currentSemesterCode),
+      cancelled: studyRight.cancelled,
+      programmes,
+    }
+  }
+
+  const studyRightRows = orderBy(
+    student.studyRights.flatMap(studyRight => {
+      // Phases 1 and 2 (usually bachelor and master) are still separated as different rows, even though they're now under the same study right
+      const phase1Programmes = studyRight.studyRightElements.filter(({ phase }) => phase === 1)
+      const phase2Programmes = studyRight.studyRightElements.filter(({ phase }) => phase === 2)
+
+      const result = [formatStudyRightRow(studyRight, 1, phase1Programmes)]
+
+      if (phase2Programmes.length > 0) result.push(formatStudyRightRow(studyRight, 2, phase2Programmes))
+      return result
+    }),
+    ['endDate'],
+    ['desc']
+  )
 
   if (studyRightRows.length === 0) return null
 
-  const filterDuplicates = (elem1, _index, array) => {
-    for (let i = 0; i < array.length; i++) {
-      const elem2 = array[i]
-      if (
-        elem1.name === elem2.name &&
-        ((elem1.startdate > elem2.startdate && elem1.enddate <= elem2.enddate) ||
-          (elem1.enddate < elem2.enddate && elem1.startdate >= elem2.startdate))
-      ) {
-        return false
-      }
-    }
-    return true
-  }
-
   const renderStatus = studyright => {
-    if (studyright.cancelled)
-      return (
-        <div style={{ display: 'flex' }}>
-          <p style={{ color: 'black', fontWeight: 'bolder' }}>CANCELLED</p>
-        </div>
+    let text = <div style={{ color: 'red', fontWeight: 'bolder' }}>INACTIVE</div>
+
+    if (studyright.graduated) {
+      text = (
+        <>
+          <div style={{ color: 'green', fontWeight: 'bolder' }}>GRADUATED</div>
+          <div style={{ color: 'grey' }}>{reformatDate(studyright.endDate, DISPLAY_DATE_FORMAT)}</div>
+        </>
       )
-    if (studyright.graduated)
-      return (
-        <div>
-          <p style={{ color: 'green', fontWeight: 'bolder', marginBottom: 0 }}>GRADUATED</p>
-          <p style={{ color: 'grey', marginTop: 0 }}>{reformatDate(studyright.enddate, DISPLAY_DATE_FORMAT)}</p>
-        </div>
-      )
-    if (studyright.active)
-      return (
-        <div style={{ display: 'flex' }}>
-          <p style={{ color: 'blue', fontWeight: 'bolder' }}>ACTIVE</p>
-        </div>
-      )
-    return (
-      <div style={{ display: 'flex' }}>
-        <p style={{ color: 'red', fontWeight: 'bolder' }}>INACTIVE</p>
-      </div>
-    )
-  }
+    } else if (studyright.active) {
+      text = <div style={{ color: 'blue', fontWeight: 'bolder' }}>ACTIVE</div>
+    } else if (studyright.cancelled) {
+      text = <div style={{ color: 'black', fontWeight: 'bolder' }}>CANCELLED</div>
+    }
 
-  const getActualStartDate = studyright =>
-    new Date(studyright.startdate).getTime() > new Date(studyright.studystartdate).getTime()
-      ? studyright.startdate
-      : studyright.studystartdate
-
-  // End dates of study rights are semi-open intervals, subtract 1 day to get acual end date
-  const getAcualEndDate = (endDate, graduated) => {
-    if (!endDate) return null
-    if (graduated) return new Date(endDate)
-    return new Date(new Date(endDate).setDate(new Date(endDate).getDate() - 1))
-  }
-
-  const renderProgrammes = studyright =>
-    sortBy(studyright.elements.programmes.filter(filterDuplicates), 'startdate')
-      .reverse()
-      .map(programme => (
-        <p key={`${programme.name}-${programme.startdate}`}>
-          {`${programme.name} (${reformatDate(getActualStartDate(programme), DISPLAY_DATE_FORMAT)} - ${reformatDate(
-            getAcualEndDate(programme.enddate, studyright.graduated),
-            DISPLAY_DATE_FORMAT
-          )})`}
-          {programmeCodes.includes(programme.code) && (
-            <Item as={Link} to={showPopulationStatistics(programme.code, programme.startdate)}>
-              <Icon name="level up alternate" />
-            </Item>
-          )}
-        </p>
-      ))
-
-  const renderStudytracks = studyright => {
-    const studytracks = studyright.elements.studytracks.filter(filterDuplicates)
-
-    return sortBy(studyright.elements.programmes.filter(filterDuplicates), 'startdate')
-      .reverse()
-      .map(programme => {
-        const studytrack = studytracks.find(studytrack => studytrack.startdate === programme.startdate)
-
-        return studytrack ? (
-          <p key={`${studytrack.name}-${studytrack.startdate}`}>
-            {`${studytrack.name} (${reformatDate(studytrack.startdate, DISPLAY_DATE_FORMAT)} - ${reformatDate(
-              getAcualEndDate(studytrack.enddate, studyright.graduated),
-              DISPLAY_DATE_FORMAT
-            )})`}
-            <br />
-          </p>
-        ) : (
-          <p key={`empty-row-${Math.random()}`}>
-            <br />
-          </p>
-        )
-      })
+    return <div style={{ display: 'flex', flexDirection: 'column' }}>{text}</div>
   }
 
   const renderCompletionPercent = (studyright, student) => {
-    const programmeCodes = studyright.elements.programmes.filter(filterDuplicates).map(programme => programme.code)
-    const studyplan = student.studyplans.find(
-      studyplan =>
-        programmeCodes.includes(studyplan.programme_code) && studyplan.studyrightid === studyright.studyrightid
+    const newestProgrammeCode = studyright.programmes[0].code
+    const studyPlan = student.studyplans.find(
+      studyPlan =>
+        newestProgrammeCode === studyPlan.programme_code && studyPlan.sis_study_right_id === studyright.studyRightId
     )
-    if (!studyplan) return <>-</>
+    if (!studyPlan) return <>-</>
 
-    const { completed_credits: completedCredits } = studyplan
-    const credits = completedCredits || 0
+    const { completed_credits: credits = 0 } = studyPlan
     if (studyright.graduated) return `${credits} cr`
-    const totalCredits = getTargetCreditsForProgramme(programmeCodes[0])
+    const totalCredits = getTargetCreditsForProgramme(newestProgrammeCode)
     const completedPercentage = calculatePercentage(credits, totalCredits, 0)
     return `${completedPercentage} (${credits} cr)`
   }
 
   return (
-    <Segment basic>
-      <Divider horizontal>
+    <>
+      <Divider horizontal style={{ margin: '2em 0' }}>
         <Header as="h4">Filter credits by study right</Header>
       </Divider>
-      <Table className="fixed-header">
+      <Table>
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell />
@@ -190,59 +118,65 @@ export const StudyrightsTable = ({ handleStartDateChange, showPopulationStatisti
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {studyRightRows.map(studyright => {
-            if (studyright.elements.programmes.length > 0) {
-              const rowIsFilterable = studyright.elements.programmes.some(programme => programme.isFilterable)
+          {studyRightRows.map(studyRight => {
+            const numberOfProgrammes = studyRight.programmes.length
+            const rowIsFilterable = studyRight.studyPlanId != null
+
+            return studyRight.programmes.map(({ name, startDate, endDate, code, studyTrack }, index) => {
+              const isFirstRow = index === 0
               return (
                 <Table.Row
-                  key={studyright.studyrightid}
-                  onClick={() =>
-                    rowIsFilterable ? handleStartDateChange(studyright.elements, studyright.studyrightid) : null
-                  }
+                  key={`${studyRight.key}-${code}`}
+                  onClick={() => (rowIsFilterable ? handleStudyPlanChange(studyRight.studyPlanId) : null)}
                   style={{ cursor: rowIsFilterable ? 'pointer' : 'not-allowed' }}
                 >
-                  <Table.Cell>
-                    <Popup
-                      content={
-                        rowIsFilterable
-                          ? 'Display credits included in the study plan of this study right'
-                          : 'This study right does not have a study plan'
-                      }
-                      size="mini"
-                      trigger={
-                        <div>
-                          <Button
-                            basic={studyright.studyrightid !== studyrightid}
-                            disabled={!rowIsFilterable}
-                            icon
-                            onClick={() => handleStartDateChange(studyright.elements, studyright.studyrightid)}
-                            primary={studyright.studyrightid === studyrightid}
-                            size="mini"
-                          >
-                            <Icon name="filter" />
-                          </Button>
-                        </div>
-                      }
-                    />
+                  {isFirstRow && (
+                    <Table.Cell rowSpan={numberOfProgrammes}>
+                      <Popup
+                        content={
+                          rowIsFilterable
+                            ? 'Display credits included in the study plan of this study right'
+                            : 'This study right does not have a study plan'
+                        }
+                        size="mini"
+                        trigger={
+                          <div>
+                            <Button
+                              basic={studyRight.studyPlanId !== selectedStudyPlanId}
+                              disabled={!rowIsFilterable}
+                              icon
+                              onClick={() => handleStudyPlanChange(studyRight.studyPlanId)}
+                              primary={studyRight.studyPlanId === selectedStudyPlanId}
+                              size="mini"
+                            >
+                              <Icon name="filter" />
+                            </Button>
+                          </div>
+                        }
+                      />
+                    </Table.Cell>
+                  )}
+                  <Table.Cell style={{ border: !isFirstRow && 'none' }}>
+                    {`${getTextIn(name)} (${reformatDate(startDate, DISPLAY_DATE_FORMAT)}–${reformatDate(endDate, DISPLAY_DATE_FORMAT)})`}
+                    {programmeCodes.includes(code) && (
+                      <Item as={Link} to={showPopulationStatistics(code, startDate)}>
+                        <Icon name="level up alternate" />
+                      </Item>
+                    )}
                   </Table.Cell>
-                  <Table.Cell>{studyright.elements.programmes.length > 0 && renderProgrammes(studyright)}</Table.Cell>
-                  <Table.Cell>{renderStudytracks(studyright)}</Table.Cell>
-                  <Table.Cell>{renderStatus(studyright)}</Table.Cell>
-                  <Table.Cell>{renderCompletionPercent(studyright, student)}</Table.Cell>
+                  <Table.Cell style={{ border: !isFirstRow && 'none' }}>
+                    {studyTrack && <div>{`${getTextIn(studyTrack.name)}`}</div>}
+                  </Table.Cell>
+                  {isFirstRow && <Table.Cell rowSpan={numberOfProgrammes}>{renderStatus(studyRight)}</Table.Cell>}
+                  {isFirstRow && (
+                    <Table.Cell rowSpan={numberOfProgrammes}>{renderCompletionPercent(studyRight, student)}</Table.Cell>
+                  )}
                 </Table.Row>
               )
-            }
-            return null
+            })
           })}
         </Table.Body>
       </Table>
-    </Segment>
+    </>
   )
-}
-
-StudyrightsTable.propTypes = {
-  student: shape({}).isRequired,
-  handleStartDateChange: func.isRequired,
-  showPopulationStatistics: func.isRequired,
-  studyrightid: string.isRequired,
 }

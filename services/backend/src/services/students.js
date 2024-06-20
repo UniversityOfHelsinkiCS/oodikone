@@ -7,13 +7,13 @@ const {
   Student,
   Credit,
   Course,
-  Studyright,
   StudyrightElement,
   ElementDetail,
   SemesterEnrollment,
   Semester,
   Studyplan,
-  Transfer,
+  SISStudyRight,
+  SISStudyRightElement,
 } = require('../models')
 const { TagStudent, Tag } = require('../models/models_kone')
 const logger = require('../util/logger')
@@ -22,12 +22,36 @@ const { splitByEmptySpace } = require('../util/utils')
 const byStudentNumber = async studentNumber => {
   const [student, tags] = await Promise.all([
     Student.findByPk(studentNumber, {
+      attributes: [
+        'firstnames',
+        'lastname',
+        'studentnumber',
+        'dateofuniversityenrollment',
+        'creditcount',
+        'creditcount',
+        'abbreviatedname',
+        'email',
+        'updatedAt',
+        'createdAt',
+        'sis_person_id',
+      ],
       include: [
         {
           model: Credit,
+          attributes: ['grade', 'credits', 'credittypecode', 'is_open', 'attainment_date', 'isStudyModule'],
           separate: true,
           include: {
             model: Course,
+            attributes: ['code', 'name'],
+          },
+        },
+        {
+          model: SISStudyRight,
+          as: 'studyRights',
+          include: {
+            required: true,
+            model: SISStudyRightElement,
+            as: 'studyRightElements',
           },
         },
         {
@@ -35,11 +59,16 @@ const byStudentNumber = async studentNumber => {
         },
         {
           model: Studyplan,
-          attributes: ['included_courses', 'programme_code', 'completed_credits', 'studyrightid'],
+          attributes: ['id', 'included_courses', 'programme_code', 'completed_credits', 'sis_study_right_id'],
         },
-        {
-          model: Transfer,
-        },
+      ],
+      order: [
+        [
+          { model: SISStudyRight, as: 'studyRights' },
+          { model: SISStudyRightElement, as: 'studyRightElements' },
+          'endDate',
+          'desc',
+        ],
       ],
     }),
     TagStudent.findAll({
@@ -51,24 +80,6 @@ const byStudentNumber = async studentNumber => {
       },
     }),
   ])
-  const studyrights = await Studyright.findAll({
-    where: {
-      student_studentnumber: studentNumber,
-      [Op.not]: { prioritycode: 6 },
-    },
-    include: {
-      model: StudyrightElement,
-      include: {
-        model: ElementDetail,
-        where: {
-          type: {
-            [Op.in]: [10, 20, 30],
-          },
-        },
-      },
-    },
-  })
-  student.studyrights = studyrights
   const tagprogrammes = await ElementDetail.findAll({
     where: {
       code: {
@@ -191,36 +202,23 @@ const formatStudent = ({
   credits,
   abbreviatedname,
   email,
-  studyrights,
+  studyRights,
   semester_enrollments,
-  transfers,
   studyplans,
   updatedAt,
   createdAt,
   tags,
   sis_person_id,
 }) => {
-  const toCourse = ({ id, grade, credits, credittypecode, is_open, attainment_date, course, isStudyModule }) => {
-    try {
-      course = course.get()
-    } catch (error) {
-      // TODO: this should not be here 1.6.2021
-      course = {
-        code: '99999 - MISSING FROM SIS',
-        name: 'missing',
-        coursetypecode: 'missing',
-      }
-    }
+  const toCourse = ({ grade, credits, credittypecode, is_open, attainment_date, course, isStudyModule }) => {
+    course = course.toJSON()
 
     return {
-      id,
       course: {
         code: course.code,
         name: course.name,
-        coursetypecode: course.coursetypecode,
       },
       date: attainment_date,
-      course_code: course.code,
       passed: Credit.passed({ credittypecode }) || Credit.improved({ credittypecode }),
       grade,
       credits,
@@ -230,7 +228,7 @@ const formatStudent = ({
     }
   }
 
-  studyrights = studyrights || []
+  studyRights = studyRights || []
   semester_enrollments = semester_enrollments || []
   studyplans = studyplans || []
   const semesterenrollments = semester_enrollments.map(
@@ -251,18 +249,16 @@ const formatStudent = ({
   const formattedCredits = credits
     .sort((a, b) => new Date(a.attainment_date) - new Date(b.attainment_date))
     .map(toCourse)
-    .filter(c => c.course.name !== 'missing')
 
   return {
     firstnames,
     lastname,
-    studyrights,
+    studyRights,
     studentNumber: studentnumber,
     started: dateofuniversityenrollment,
     credits: creditcount || 0,
     courses: formattedCredits,
     name: abbreviatedname,
-    transfers: transfers || [],
     email,
     semesterenrollments,
     updatedAt: updatedAt || createdAt,
@@ -320,20 +316,20 @@ const bySearchTermAndStudentNumbers = async (searchterm, studentNumbers) => {
   const terms = splitByEmptySpace(searchterm)
   return (
     await Student.findAll({
+      attributes: ['studentnumber', 'firstnames', 'lastname', 'creditcount', 'dateofuniversityenrollment'],
       include: {
-        model: Studyright,
+        model: SISStudyRight,
+        as: 'studyRights',
+        attributes: ['id'],
         include: {
-          model: StudyrightElement,
-          include: {
-            model: ElementDetail,
-            where: {
-              type: 20,
+          model: SISStudyRightElement,
+          as: 'studyRightElements',
+          attributes: ['name'],
+          required: true,
+          where: {
+            endDate: {
+              [Op.gte]: new Date(),
             },
-          },
-        },
-        where: {
-          prioritycode: {
-            [Op.not]: 6,
           },
         },
       },

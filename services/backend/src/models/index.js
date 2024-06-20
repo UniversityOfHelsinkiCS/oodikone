@@ -77,6 +77,9 @@ Studyright.hasMany(Studyplan, { foreignKey: 'studyrightid', sourceKey: 'studyrig
 Studyright.belongsTo(Student, { foreignKey: 'studentStudentnumber', targetKey: 'studentnumber' })
 Student.hasMany(Studyright, { foreignKey: 'studentStudentnumber', sourceKey: 'studentnumber' })
 
+SISStudyRight.belongsTo(Student, { foreignKey: 'student_number' })
+Student.hasMany(SISStudyRight, { as: 'studyRights', foreignKey: 'student_number' })
+
 StudyrightElement.belongsTo(Studyright, { foreignKey: 'studyrightid', targetKey: 'studyrightid' })
 Studyright.hasMany(StudyrightElement, { foreignKey: 'studyrightid', sourceKey: 'studyrightid' })
 

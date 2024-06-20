@@ -3,6 +3,7 @@ import qs from 'query-string'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { SEARCH_HISTORY_VERSION } from '@/constants'
+import { useGetSemestersQuery } from '@/redux/semesters'
 
 export const useTabChangeAnalytics = () => {
   const previousTabIndex = useRef(0)
@@ -273,4 +274,12 @@ export const useDeepMemo = (factory, dependencies) => {
   }
 
   return ref.current.result
+}
+
+export const useCurrentSemester = () => {
+  const { data: semesterData } = useGetSemestersQuery()
+  if (!semesterData) return null
+  return Object.values(semesterData.semesters).find(
+    semester => new Date(semester.startdate) <= new Date() && new Date(semester.enddate) >= new Date()
+  )
 }

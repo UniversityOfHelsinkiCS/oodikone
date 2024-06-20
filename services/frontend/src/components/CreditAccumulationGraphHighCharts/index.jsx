@@ -129,7 +129,9 @@ const sortCoursesByDate = courses =>
   [...courses].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 
 const filterCoursesByStudyPlan = (plan, courses) =>
-  !plan ? courses : courses.filter(({ course_code }) => plan.included_courses.includes(course_code))
+  !plan
+    ? courses
+    : courses.filter(({ course, course_code }) => plan.included_courses.includes(course_code || course.code))
 
 const filterCoursesByDate = (courses, date) => courses.filter(course => moment(course.date).isSameOrAfter(moment(date)))
 
@@ -154,7 +156,9 @@ const filterCourses = (
     )
   if (byStudyPlanOfCode)
     return filterCoursesByStudyPlan(
-      student.studyplans.find(plan => plan.programme_code === byStudyPlanOfCode && plan.studyrightid === studyrightid),
+      student.studyplans.find(
+        plan => plan.programme_code === byStudyPlanOfCode && plan.sis_study_right_id === studyrightid
+      ),
       student.courses
     )
   if (singleStudent) return student.courses
@@ -162,21 +166,22 @@ const filterCourses = (
 }
 
 const reduceCreditsToPoints = ({ credits, points, singleStudent }, course) => {
-  const gainedCredits = course.passed && !course.isStudyModuleCredit ? course.credits : 0
+  // Only include passed and transferred courses
+  if (![4, 9].includes(course.credittypecode)) return { points, credits, singleStudent }
+
+  const gainedCredits = !course.isStudyModuleCredit ? course.credits : 0
 
   const point = {
     x: new Date(course.date).getTime(),
     y: credits + gainedCredits,
   }
 
-  if (singleStudent) {
-    Object.assign(point, {
-      name: course.course_code,
-    })
-  }
+  if (singleStudent) point.name = course.course.code
+
+  points.push(point)
 
   return {
-    points: [...points, point],
+    points,
     credits: credits + gainedCredits,
     singleStudent,
   }
@@ -191,7 +196,7 @@ const singleStudentTooltipFormatter = (point, student, getTextIn) => {
   }
 
   const targetCourse = sortCoursesByDate(student.courses).find(
-    ({ course_code: courseCode, date }) => point.key === courseCode && point.x === new Date(date).getTime()
+    ({ course, date }) => point.key === course.code && point.x === new Date(date).getTime()
   )
 
   if (!targetCourse.course) {
@@ -203,8 +208,9 @@ const singleStudentTooltipFormatter = (point, student, getTextIn) => {
       name: student.studentNumber,
       payload: {
         ...targetCourse,
+        courseCode: targetCourse.course.code,
+        courseName: getTextIn(targetCourse.course.name),
         date: reformatDate(targetCourse.date, DISPLAY_DATE_FORMAT),
-        title: getTextIn(targetCourse.course.name),
       },
     },
   ]
@@ -272,42 +278,21 @@ const createGoalSeries = (starting, ending, absences) => {
   }
 }
 
-const resolveStudyRightElement = ({ studyright_elements }) => {
-  if (!studyright_elements || !studyright_elements.length) return {}
-  return (
-    studyright_elements
-      .filter(element => element.element_detail.type === 20)
-      .sort((a, b) => new Date(b.startdate) - new Date(a.startdate))[0] || {}
-  )
-}
-
 const filterGraduations = (student, selectedStudyRight, getTextIn) => {
-  const graduated = student.studyrights.filter(({ graduated }) => graduated)
+  const graduations = student.studyRights
+    .flatMap(studyRight => studyRight.studyRightElements)
+    .filter(element => element.graduated)
   if (!selectedStudyRight)
-    return graduated.map(({ enddate, studyright_elements }) => {
-      const studyrightElem = studyright_elements
-        ? studyright_elements.filter(ele => ele.element_detail?.type === 20)
-        : []
-      let elemName = ''
-      if (studyrightElem.length > 0) {
-        elemName = getTextIn(_.orderBy(studyrightElem, 'enddate', 'desc')[0].element_detail?.name)
-      }
-      return {
-        value: new Date(enddate).getTime(),
-        studyright: elemName,
-      }
-    })
-  const selectedGraduation = graduated.find(({ studyrightid }) => studyrightid === selectedStudyRight.studyrightid)
-  if (!selectedGraduation) return []
-  const element = selectedGraduation.studyright_elements
-    ? selectedGraduation.studyright_elements.filter(ele => ele.element_detail?.type === 20)
-    : []
-  return [
-    {
-      value: new Date(selectedGraduation.enddate).getTime(),
-      studyright: element.length > 0 ? getTextIn(element[0].element_detail?.name) : '',
-    },
-  ]
+    return graduations.map(({ endDate, name }) => ({
+      value: new Date(endDate).getTime(),
+      studyright: getTextIn(name),
+    }))
+  const selectedGraduation = graduations.filter(({ studyRightId }) => studyRightId === selectedStudyRight.id)
+  if (selectedGraduation.length === 0) return []
+  return selectedGraduation.map(({ endDate, name }) => ({
+    value: new Date(endDate).getTime(),
+    studyright: getTextIn(name),
+  }))
 }
 
 const addGraduation = (points, graduation, notFirst) => {
@@ -368,14 +353,13 @@ const createStudentCreditLines = (
   studyPlanFilterIsActive,
   cutStudyPlanCredits,
   programmeCodes,
-  customStudyStartYear
+  customStudyStartYear,
+  selectedStudyPlan
 ) =>
   students.map(student => {
     const { studyrightStart } = student
     const startDate = singleStudent ? selectedStartDate : studyrightStart
-    const { code } = resolveStudyRightElement(
-      student.studyrights.find(({ studyrightid }) => studyrightid === studyRightId) || {}
-    )
+    const code = selectedStudyPlan?.programme_code
     const studyPlanProgrammeCode = singleStudent
       ? code
       : studyPlanFilterIsActive && programmeCodes?.length > 0 && programmeCodes[0]
@@ -420,22 +404,21 @@ const createStudentCreditLines = (
     }
   })
 
-const findTransferName = (student, transfer) =>
-  student.studyrights
-    .flatMap(studyright => studyright.studyright_elements)
-    .find(element => element.code === transfer.targetcode)?.element_detail.name
-
-const filterTransfers = (student, getTextIn) => {
-  const transferTimes = student.transfers.map(transfer => {
-    const transferToName = getTextIn(findTransferName(student, transfer))
-    return {
-      value: new Date(transfer.transferdate).getTime(),
-      studyright: transferToName ? `to ${transferToName}` : '',
+const filterTransfers = (student, getTextIn) =>
+  student.studyRights.reduce((transfers, studyRight) => {
+    const phase1Programmes = studyRight.studyRightElements.filter(element => element.phase === 1)
+    const phase2Programmes = studyRight.studyRightElements.filter(element => element.phase === 2)
+    for (const programmes of [phase1Programmes, phase2Programmes]) {
+      // The oldest study right element is ignored, as there can be no transfer to it
+      for (const element of programmes.toSpliced(-1)) {
+        transfers.push({
+          value: new Date(element.startDate),
+          studyright: `to ${getTextIn(element.name)}`,
+        })
+      }
     }
-  })
-  const removeOverlapping = transferTimes.filter((transfer, i, a) => a.indexOf(transfer) === i)
-  return removeOverlapping
-}
+    return transfers
+  }, [])
 
 export const CreditAccumulationGraphHighCharts = ({
   students,
@@ -448,15 +431,14 @@ export const CreditAccumulationGraphHighCharts = ({
   customPopulation = false,
   studyPlanFilterIsActive,
   customStudyStartYear,
+  selectedStudyPlan,
 }) => {
   const chartRef = useRef()
   const { getTextIn } = useLanguage()
   const [graphHeight, setGraphHeight] = useState(700)
   const [cutStudyPlanCredits, setCutStudyPlanCredits] = useState(false)
   const selectedStudyRight =
-    singleStudent && studyRightId
-      ? students[0].studyrights.find(({ studyrightid }) => studyrightid === studyRightId)
-      : null
+    singleStudent && studyRightId ? students[0].studyRights.find(({ id }) => id === studyRightId) : null
 
   const seriesData = useDeepMemo(
     () =>
@@ -468,7 +450,8 @@ export const CreditAccumulationGraphHighCharts = ({
         studyPlanFilterIsActive,
         cutStudyPlanCredits,
         programmeCodes,
-        customStudyStartYear
+        customStudyStartYear,
+        selectedStudyPlan
       ),
     [
       students,
@@ -479,22 +462,32 @@ export const CreditAccumulationGraphHighCharts = ({
       cutStudyPlanCredits,
       programmeCodes,
       customStudyStartYear,
+      selectedStudyPlan,
     ]
   )
 
   if (singleStudent) {
+    const studyPlanProgrammeCode = selectedStudyPlan ? selectedStudyPlan.programme_code : null
+    const correctStudyRightElement = selectedStudyRight?.studyRightElements.find(
+      element => element.code === studyPlanProgrammeCode
+    )
     const startDate = selectedStudyRight
-      ? selectedStudyRight.studyright_elements
-          .filter(({ element_detail }) => element_detail.type === 20)
-          .sort((a, b) => new Date(a.startdate) - new Date(b.startdate))[0].startdate
-      : _.chain(students[0].studyrights || students[0].courses)
-          .map(element => new Date(element.startdate || element.date))
+      ? selectedStudyRight.studyRightElements
+          .filter(element => element.phase === correctStudyRightElement.phase)
+          .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))[0].startDate
+      : _.chain(students[0].studyRights || students[0].courses)
+          .map(element => new Date(element.startDate || element.date))
           .sortBy()
           .head()
           .defaultTo(new Date())
           .value()
           .getTime()
-    const [, studyRightTargetEnd] = getStudyRightElementTargetDates(selectedStudyRight, absences)
+    const [, studyRightTargetEnd] = getStudyRightElementTargetDates(
+      selectedStudyRight?.studyRightElements
+        .filter(element => element.phase === correctStudyRightElement.phase)
+        .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))[0],
+      absences
+    )
     const ending = selectedStudyRight
       ? new Date(studyRightTargetEnd).getTime()
       : new Date(endDate || new Date()).getTime()
@@ -568,14 +561,14 @@ export const CreditAccumulationGraphHighCharts = ({
     <div className="graphContainer">
       <div className="graph-options">
         <div>
-          {!singleStudent && studyPlanFilterIsActive ? (
+          {!singleStudent && studyPlanFilterIsActive && (
             <Radio
               checked={cutStudyPlanCredits}
               label="Display credits from study right start"
               onChange={() => setCutStudyPlanCredits(!cutStudyPlanCredits)}
               toggle
             />
-          ) : null}
+          )}
         </div>
 
         <div>

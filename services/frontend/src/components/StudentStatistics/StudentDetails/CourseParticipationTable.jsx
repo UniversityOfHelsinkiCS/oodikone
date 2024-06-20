@@ -25,11 +25,11 @@ const getIcon = (credittypecode, isStudyModuleCredit, passed) => {
   return passed ? <Icon color="green" name="check" /> : <Icon color="red" name="times" />
 }
 
-export const CourseParticipationTable = ({ student, studyrightid }) => {
+export const CourseParticipationTable = ({ student, selectedStudyPlanId }) => {
   const { getTextIn } = useLanguage()
   if (!student) return null
 
-  const studyPlan = student?.studyplans.find(plan => plan.studyrightid === studyrightid)
+  const studyPlan = student?.studyplans.find(plan => plan.id === selectedStudyPlanId)
 
   const courseRowsByAcademicYear = student.courses.reduceRight((acc, attainment) => {
     const { course, credits, credittypecode, date, grade, isOpenCourse, isStudyModuleCredit, passed } = attainment
