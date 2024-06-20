@@ -36,7 +36,7 @@ export const getPopulationStatistics = ({
     semesters,
     studentStatuses,
     months,
-    studyRights,
+    studyRights: JSON.stringify(studyRights),
     year,
     years,
   }
