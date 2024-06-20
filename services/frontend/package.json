@@ -10,7 +10,7 @@
     "@reduxjs/toolkit": "^2.2.3",
     "@sentry/browser": "^6.18.2",
     "@sentry/tracing": "^6.18.2",
-    "axios": "^0.28.0",
+    "axios": "^0.27.2",
     "highcharts": "^11.4.3",
     "immer": "^10.0.4",
     "lodash": "^4.17.21",
