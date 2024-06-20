@@ -4,8 +4,9 @@ module.exports = {
     await queryInterface.addIndex('organization', ['code'], {
       unique: true,
     })
-    await queryInterface.addConstraint('studyright', ['faculty_code'], {
-      type: 'foreign key',
+    await queryInterface.addConstraint('studyright', {
+      fields: ['faculty_code'],
+      type: 'FOREIGN KEY',
       name: 'faculty_code_fk',
       references: {
         table: 'organization',
