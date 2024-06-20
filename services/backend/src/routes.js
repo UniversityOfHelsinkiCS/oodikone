@@ -1,4 +1,5 @@
 const Sentry = require('@sentry/node')
+const compression = require('compression')
 const cors = require('cors')
 const express = require('express')
 
@@ -47,6 +48,7 @@ module.exports = (app, url) => {
 
   app.use(cors({ credentials: true, origin: frontUrl }))
   app.use(express.json())
+  app.use(compression())
 
   app.use(shibbolethCharsetMiddleware)
   app.use(currentUserMiddleware)
