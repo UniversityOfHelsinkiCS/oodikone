@@ -1,13 +1,12 @@
 module.exports = {
   up: async queryInterface => {
     return queryInterface.sequelize.transaction(async transaction => {
-      await queryInterface.sequelize.query('ALTER TABLE tag_student DROP CONSTRAINT "tag_student_tag_id_fkey"', {
-        transaction,
-      })
+      await queryInterface.removeConstraint('tag_student', 'tag_student_tag_id_fkey', { transaction })
       await queryInterface.sequelize.query('DELETE FROM tag_student WHERE tag_id IS NULL', { transaction })
       await queryInterface.removeConstraint('tag', 'tag_tag_id_key', { transaction })
-      await queryInterface.addConstraint('tag', ['tag_id'], {
+      await queryInterface.addConstraint('tag', {
         type: 'primary key',
+        fields: ['tag_id'],
         transaction,
       })
       await queryInterface.sequelize.query(
@@ -15,8 +14,9 @@ module.exports = {
         { transaction }
       )
       await queryInterface.removeColumn('tag_student', 'id', { transaction })
-      await queryInterface.addConstraint('tag_student', ['studentnumber', 'tag_id'], {
+      await queryInterface.addConstraint('tag_student', {
         type: 'primary key',
+        fields: ['studentnumber', 'tag_id'],
         transaction,
       })
     })
