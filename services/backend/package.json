@@ -24,7 +24,7 @@
     "morgan": "^1.10.0",
     "papaparse": "^5.4.1",
     "pg": "^8.11.5",
-    "redis": "^3.1.2",
+    "redis": "^4.0.0",
     "sequelize": "^6.37.3",
     "umzug": "^2.3.0",
     "unfuck-utf8-headers-middleware": "^1.0.1",
