@@ -35,19 +35,9 @@ const mapStudentInfo = student => {
   }
 }
 
-const mapStudyRights = studyright => {
-  const { enddate, startdate, student } = studyright
-  return {
-    startdate,
-    enddate,
-    studyrightStudentnumber: student.studentnumber,
-  }
-}
-
 module.exports = {
   mapCourseInfo,
   mapOpenCredits,
   mapOpenEnrollments,
   mapStudentInfo,
-  mapStudyRights,
 }

@@ -1,14 +1,8 @@
 const { Op } = require('sequelize')
 
-const { Course, Credit, Enrollment, Student, Studyright } = require('../../models')
+const { Course, Credit, Enrollment, Student, SISStudyRight } = require('../../models')
 const { OpenUniPopulationSearch } = require('../../models/models_kone')
-const {
-  mapCourseInfo,
-  mapOpenCredits,
-  mapOpenEnrollments,
-  mapStudentInfo,
-  mapStudyRights,
-} = require('./openUniHelpers')
+const { mapCourseInfo, mapOpenCredits, mapOpenEnrollments, mapStudentInfo } = require('./openUniHelpers')
 
 const getCredits = async (courseCodes, startdate) =>
   (
@@ -66,26 +60,19 @@ const getCourseNames = async courseCodes =>
     })
   ).map(mapCourseInfo)
 
-const getStudyRights = async students =>
-  (
-    await Studyright.findAll({
-      include: [
-        {
-          model: Student,
-          attributes: ['studentnumber'],
-          required: true,
-        },
-      ],
-      where: {
-        student_studentnumber: {
-          [Op.in]: students.length > 0 ? students : { [Op.not]: null },
-        },
-        extentcode: {
-          [Op.in]: [1, 2, 3, 4],
-        },
+const getStudyRights = async students => {
+  return await SISStudyRight.findAll({
+    attributes: ['startDate', 'endDate', 'studentNumber'],
+    where: {
+      studentNumber: {
+        [Op.in]: students.length > 0 ? students : { [Op.not]: null },
       },
-    })
-  ).map(mapStudyRights)
+      extentCode: {
+        [Op.in]: [1, 2, 3, 4, 5],
+      },
+    },
+  })
+}
 
 const getOpenUniSearchesByUser = async userId => {
   return await OpenUniPopulationSearch.findAll({

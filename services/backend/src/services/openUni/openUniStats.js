@@ -15,6 +15,7 @@ const calculateTotalsForStudent = async (studentStats, studentNumber) => {
     }
   })
 }
+
 const getCustomOpenUniCourses = async (courseCodes, startDate, endDate) => {
   const ayCourseCodes = courseCodes.map(courseCode => `AY${courseCode}`)
   const allCourseCodes = courseCodes.concat(ayCourseCodes)
@@ -27,18 +28,20 @@ const getCustomOpenUniCourses = async (courseCodes, startDate, endDate) => {
 
   const allStudyRights = await getStudyRights(students)
   const studentInfo = await getStudentInfo(students)
+
   // Filter out current studyrights:
-  // Case 1: Both startdate and enddate are outside of the given interval
-  // Case 2: Startdate is inside of the given interval and enddate is outside
-  // Case 3: Startdate is before the interval start and the enddate is within the interval
+  // Case 1: Both start date and end date are outside of the given interval
+  // Case 2: Start date is inside of the given interval and end date is outside
+  // Case 3: Start date is before the interval start and the end date is within the interval
   const studentsWithCurrentStudyRight = allStudyRights
     .filter(
-      right =>
-        moment(right.startdate).isBetween(startDate, moment()) ||
-        (moment(right.startdate).isSameOrBefore(startDate) && moment(right.enddate).isSameOrAfter(moment())) ||
-        moment(right.enddate).isSameOrBefore(moment())
+      studyRight =>
+        moment(studyRight.startDate).isBetween(startDate, moment()) ||
+        (moment(studyRight.startDate).isSameOrBefore(startDate) &&
+          moment(studyRight.endDate).isSameOrAfter(moment())) ||
+        moment(studyRight.endDate).isSameOrBefore(moment())
     )
-    .map(right => right.studyrightStudentnumber)
+    .map(studyRight => studyRight.studentNumber)
   const uniqueStudentsWithCurrentStudyRight = uniq(studentsWithCurrentStudyRight)
 
   const studentStats = {}
