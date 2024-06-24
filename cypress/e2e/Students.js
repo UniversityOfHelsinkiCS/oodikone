@@ -101,7 +101,9 @@ describe('Students tests', () => {
   it('Can jump to population page', () => {
     cy.get('.prompt').type(student.studentnumber)
     cy.contains('td a', student.studentnumber).click()
-    cy.get('i.level.up.alternate.icon').eq(0).click()
+    cy.contains('.ui.table', 'Completed').within(() => {
+      cy.get('i.level.up.alternate.icon').click()
+    })
     cy.contains('Tietojenkäsittelytieteen kandiohjelma')
     cy.contains('class size')
   })
