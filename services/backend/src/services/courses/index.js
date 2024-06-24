@@ -1,3 +1,4 @@
+const crypto = require('crypto')
 const { Op } = require('sequelize')
 
 const { Course, Credit, Enrollment, Organization } = require('../../models')
@@ -9,8 +10,86 @@ const {
   enrollmentsForCourses,
   getStudentNumberToSrElementsMap,
 } = require('./creditsAndEnrollmentsOfCourse')
-const { parseCredit } = require('./parseCredits')
-const { parseEnrollment } = require('./parseEnrollments')
+
+const formatStudyrightElement = ({ code, element_detail, startdate, studyright: sr }) => {
+  const studyright = sr.get({ plain: true })
+  return {
+    code,
+    name: element_detail.name,
+    startdate,
+    faculty_code: studyright.faculty_code || null,
+    organization: studyright.organization
+      ? {
+          name: studyright.organization.name,
+          code: studyright.organization.code,
+        }
+      : null,
+  }
+}
+
+const parseCredit = (credit, anonymizationSalt, studentNumberToSrElementsMap) => {
+  const { semester, grade, course_code, credits, attainment_date, student_studentnumber: studentnumber } = credit
+  const { yearcode, yearname, semestercode, name: semestername } = semester
+
+  const studyrightElements = studentNumberToSrElementsMap[studentnumber] || []
+
+  const formattedCredit = {
+    yearcode,
+    yearname,
+    semestercode,
+    semestername,
+    attainment_date,
+    coursecode: course_code,
+    grade,
+    passed: !Credit.failed(credit) || Credit.passed(credit) || Credit.improved(credit),
+    studentnumber,
+    programmes: studyrightElements.map(formatStudyrightElement),
+    credits,
+  }
+
+  if (anonymizationSalt) {
+    const anonymizedStudentNumber = crypto
+      .createHash('sha256')
+      .update(`${studentnumber}${anonymizationSalt}`)
+      .digest('hex')
+
+    formattedCredit.obfuscated = true
+    formattedCredit.studentnumber = anonymizedStudentNumber
+  }
+
+  return formattedCredit
+}
+
+const parseEnrollment = (enrollment, anonymizationSalt, studentNumberToSrElementsMap) => {
+  const { studentnumber, semester, state, enrollment_date_time, course_code } = enrollment
+  const { yearcode, yearname, semestercode, name: semestername } = semester
+
+  const studyrightElements = studentNumberToSrElementsMap[studentnumber] || []
+
+  const formattedEnrollment = {
+    yearcode,
+    yearname,
+    semestercode,
+    semestername,
+    coursecode: course_code,
+    state,
+    enrollment_date_time,
+    studentnumber,
+    programmes: studyrightElements.map(formatStudyrightElement),
+  }
+
+  if (anonymizationSalt) {
+    const anonymizedStudentNumber = crypto
+      .createHash('sha256')
+      .update(`${studentnumber}${anonymizationSalt}`)
+      .digest('hex')
+
+    formattedEnrollment.obfuscated = true
+    formattedEnrollment.studentnumber = anonymizedStudentNumber
+  }
+
+  return formattedEnrollment
+}
 
 const isOpenUniCourseCode = code => code.match(/^AY?(.+?)(?:en|fi|sv)?$/)
 
