@@ -66,7 +66,9 @@ export const FacultyStatistics = () => {
             requiredRights={requiredRights}
             setGraduatedGroup={setGraduatedGroup}
             setSpecialGroups={setSpecialGroups}
+            setStudyProgrammes={setStudyProgrammes}
             specialGroups={specialGroups}
+            studyProgrammes={studyProgrammes}
           />
         ),
       },

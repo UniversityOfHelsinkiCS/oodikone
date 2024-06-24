@@ -112,7 +112,8 @@ router.get('/:id/progressstats', auth.roles(['facultyStatistics', 'katselmusView
   const code = req.params.id
   const specialGroups = req.query?.special_groups
   const graduated = req.query?.graduated
-  const programmes = await getProgrammes(code, 'NEW_STUDY_PROGRAMMES')
+  const programmeFilter = req.query?.programme_filter
+  const programmes = await getProgrammes(code, programmeFilter)
   if (!programmes) return res.status(422).end()
 
   if (!code) return res.status(422).end()
