@@ -131,14 +131,15 @@ router.get('/:id/studentstats', auth.roles(['facultyStatistics', 'katselmusViewe
   const code = req.params.id
   const specialGroups = req.query?.special_groups
   const graduated = req.query?.graduated
+  const programmeFilter = req.query?.programme_filter
 
   if (!code) return res.status(422).end()
   const data = await getFacultyStudentStats(code, specialGroups, graduated)
   if (data) return res.json(data)
-  const newProgrammes = await getProgrammes(code, 'NEW_STUDY_PROGRAMMES')
-  if (!newProgrammes) return res.status(422).end()
+  const programmes = await getProgrammes(code, programmeFilter)
+  if (!programmes) return res.status(422).end()
 
-  let updateStats = await combineFacultyStudents(code, newProgrammes.data, specialGroups, graduated)
+  let updateStats = await combineFacultyStudents(code, programmes.data, specialGroups, graduated)
   if (updateStats) {
     updateStats = await setFacultyStudentStats(updateStats, specialGroups, graduated)
   }

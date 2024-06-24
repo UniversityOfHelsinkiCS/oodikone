@@ -114,6 +114,7 @@ export const FacultyProgrammeOverview = ({
     id: faculty.code,
     specialGroups: specials,
     graduated,
+    studyProgrammeFilter,
   })
 
   const isFetchingOrLoading =

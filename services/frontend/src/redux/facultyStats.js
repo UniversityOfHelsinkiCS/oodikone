@@ -34,8 +34,8 @@ const facultystatsApi = RTKApi.injectEndpoints({
       query: () => '/university/allgraduationstats',
     }),
     getFacultyStudentStats: builder.query({
-      query: ({ id, specialGroups, graduated }) =>
-        `/faculties/${id}/studentstats?special_groups=${specialGroups}&graduated=${graduated}`,
+      query: ({ id, specialGroups, graduated, studyProgrammeFilter }) =>
+        `/faculties/${id}/studentstats?special_groups=${specialGroups}&graduated=${graduated}&programme_filter=${studyProgrammeFilter}`,
     }),
     updateFacultyBasicView: builder.query({
       query: ({ id, statsType }) => `/faculties/${id}/update_basicview?stats_type=${statsType}`,
