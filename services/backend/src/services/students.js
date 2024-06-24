@@ -7,7 +7,6 @@ const {
   Student,
   Credit,
   Course,
-  StudyrightElement,
   ElementDetail,
   SemesterEnrollment,
   Semester,
@@ -353,11 +352,16 @@ const filterStudentnumbersByAccessrights = async (studentnumbers, codes) =>
       attributes: ['studentnumber'],
       include: {
         attributes: [],
-        model: StudyrightElement,
+        model: SISStudyRight,
+        as: 'studyRights',
         required: true,
-        where: {
-          code: {
-            [Op.in]: codes,
+        include: {
+          model: SISStudyRightElement,
+          as: 'studyRightElements',
+          where: {
+            code: {
+              [Op.in]: codes,
+            },
           },
         },
       },
@@ -376,11 +380,16 @@ const getStudentnumbersByElementdetails = async codes =>
       attributes: ['studentnumber'],
       include: {
         attributes: [],
-        model: StudyrightElement,
+        model: SISStudyRight,
+        as: 'studyRights',
         required: true,
-        where: {
-          code: {
-            [Op.in]: codes,
+        include: {
+          model: SISStudyRightElement,
+          as: 'studyRightElements',
+          where: {
+            code: {
+              [Op.in]: codes,
+            },
           },
         },
       },
