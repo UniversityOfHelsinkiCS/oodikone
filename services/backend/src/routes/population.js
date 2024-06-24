@@ -3,13 +3,13 @@ const crypto = require('crypto')
 const router = require('express').Router()
 const _ = require('lodash')
 
-const courseService = require('../services/courses')
+const { maxYearsToCreatePopulationFrom, getCourseProvidersForCourses } = require('../services/courses')
 const { encrypt, decrypt } = require('../services/encrypt')
-const populationService = require('../services/populations')
-const statMergeService = require('../services/statMerger')
+const { bottlenecksOf, optimizedStatisticsOf } = require('../services/populations')
+const { populationStudentsMerger, populationCourseStatsMerger } = require('../services/statMerger')
 const { findByTag, findByCourseAndSemesters } = require('../services/students')
 const { mapCodesToIds } = require('../services/studyprogramme/studyprogrammeHelpers')
-const studyrightService = require('../services/studyrights')
+const { getAssociations, getFilteredAssociations } = require('../services/studyrights')
 const { ApplicationError } = require('../util/customErrors')
 const { getFullStudyProgrammeRights, hasFullAccessToStudentData, mapToProviders } = require('../util/utils')
 
@@ -79,12 +79,12 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
         }
         const newMonths = (upperYearBound - Number(year)) * 12
         const query = { ...req.body, year, months: newMonths }
-        const coursestatistics = populationService.bottlenecksOf(query, null, encrypted)
+        const coursestatistics = bottlenecksOf(query, null, encrypted)
         return coursestatistics
       })
     )
     const multicoursestats = await multicoursestatPromises
-    const result = statMergeService.populationCourseStatsMerger(multicoursestats)
+    const result = populationCourseStatsMerger(multicoursestats)
     if (result.error) {
       return res.status(400).json(result)
     }
@@ -94,7 +94,7 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
 
   if (encrypted) req.body.selectedStudents = req.body.selectedStudents.map(decrypt)
 
-  const result = await populationService.bottlenecksOf(req.body, null, encrypted)
+  const result = await bottlenecksOf(req.body, null, encrypted)
   if (result.error) {
     Sentry.captureException(new Error(result.error))
     return res.status(400).json(result)
@@ -117,7 +117,7 @@ router.post('/v2/populationstatistics/coursesbytag', async (req, res) => {
     ? studentnumbers
     : _.intersection(studentnumbers, studentsUserCanAccess)
 
-  const result = await populationService.bottlenecksOf(
+  const result = await bottlenecksOf(
     {
       year: 1900,
       studyRights: [],
@@ -150,7 +150,7 @@ router.post('/v2/populationstatistics/coursesbystudentnumberlist', async (req, r
   const studentnumberlist = hasFullAccessToStudentData(roles)
     ? studentnumbersInReq
     : _.intersection(studentnumbersInReq, studentsUserCanAccess)
-  const result = await populationService.bottlenecksOf(
+  const result = await bottlenecksOf(
     {
       year: query?.year ?? 1900,
       studyRights: query?.studyRights ?? [],
@@ -207,7 +207,7 @@ router.get('/v3/populationstatistics', async (req, res) => {
     const multipopulationstudentPromises = Promise.all(
       req.query.years.map(year => {
         const newMonths = (upperYearBound - Number(year)) * 12
-        const populationStudents = populationService.optimizedStatisticsOf(
+        const populationStudents = optimizedStatisticsOf(
           {
             ...req.query,
             studyRights: { programme: studyRights.programme },
@@ -221,7 +221,7 @@ router.get('/v3/populationstatistics', async (req, res) => {
     )
     const multipopulationstudents = await multipopulationstudentPromises
 
-    const result = statMergeService.populationStudentsMerger(multipopulationstudents)
+    const result = populationStudentsMerger(multipopulationstudents)
 
     if (result.error) {
       Sentry.captureException(new Error(result.error))
@@ -231,7 +231,7 @@ router.get('/v3/populationstatistics', async (req, res) => {
 
     res.json(filterPersonalTags(result, userId))
   } else {
-    const result = await populationService.optimizedStatisticsOf({
+    const result = await optimizedStatisticsOf({
       ...req.query,
       studyRights: { programme: studyRights.programme },
     })
@@ -285,17 +285,17 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
     return res.status(400).json({ error: 'The body should have a yearcode and coursecode defined' })
   }
 
-  const maxYearsToCreatePopulationFrom = await courseService.maxYearsToCreatePopulationFrom(JSON.parse(coursecodes))
+  const maxYearsForPopulation = await maxYearsToCreatePopulationFrom(JSON.parse(coursecodes))
   const toFromDiff = Math.abs(to - from + 1)
   // 2 semesters = 1 year
   const requestedYearsToCreatePopulationFrom = Math.ceil(separate ? toFromDiff / 2 : toFromDiff)
-  if (requestedYearsToCreatePopulationFrom > maxYearsToCreatePopulationFrom) {
-    return res.status(400).json({ error: `Max years to create population from is ${maxYearsToCreatePopulationFrom}` })
+  if (requestedYearsToCreatePopulationFrom > maxYearsForPopulation) {
+    return res.status(400).json({ error: `Max years to create population from is ${maxYearsForPopulation}` })
   }
 
   const semesters = ['FALL', 'SPRING']
   const studentnumbers = await findByCourseAndSemesters(JSON.parse(coursecodes), from, to, separate, unifyCourses)
-  const result = await populationService.optimizedStatisticsOf(
+  const result = await optimizedStatisticsOf(
     {
       // Useless, because studentnumbers are already filtered above by from & to.
       // We should probably refactor this to avoid more confusement.
@@ -308,7 +308,7 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
   )
   let courseproviders = []
   if (!hasFullAccessToStudentData(roles)) {
-    courseproviders = await courseService.getCourseProvidersForCourses(JSON.parse(coursecodes))
+    courseproviders = await getCourseProvidersForCourses(JSON.parse(coursecodes))
   }
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const rightsMappedToProviders = mapToProviders(fullStudyProgrammeRights)
@@ -360,7 +360,7 @@ router.post('/v3/populationstatisticsbystudentnumbers', async (req, res) => {
     tags?.studyProgramme && tags?.studyProgramme.includes('+')
       ? tags?.studyProgramme.split('+')[0]
       : tags?.studyProgramme
-  const result = await populationService.optimizedStatisticsOf(
+  const result = await optimizedStatisticsOf(
     {
       year: tags?.year || 1900,
       studyRights: studyProgrammeCode ? [studyProgrammeCode] : [],
@@ -386,7 +386,7 @@ router.get('/v3/populationstatistics/studyprogrammes', async (req, res) => {
     user: { roles, programmeRights },
   } = req
   if (hasFullAccessToStudentData(roles)) {
-    const studyrights = await studyrightService.getAssociations()
+    const studyrights = await getAssociations()
     mapCodesToIds(studyrights.programmes)
     res.json(studyrights)
   } else {
@@ -394,31 +394,25 @@ router.get('/v3/populationstatistics/studyprogrammes', async (req, res) => {
     // For combined programme
     // If more programmes are combined, then a function might be a better idea to add moar rights
     if (allRights.includes('KH90_001') || allRights.includes('MH90_001')) allRights.push('KH90_001', 'MH90_001')
-    const studyrights = await studyrightService.getFilteredAssociations(allRights)
+    const studyrights = await getFilteredAssociations(allRights)
     mapCodesToIds(studyrights.programmes)
     res.json(studyrights)
   }
 })
 
 router.get('/v3/populationstatistics/studyprogrammes/unfiltered', async (req, res) => {
-  const studyrights = await studyrightService.getAssociations()
+  const studyrights = await getAssociations()
   res.json(studyrights)
 })
 
 router.get('/v3/populationstatistics/maxYearsToCreatePopulationFrom', async (req, res) => {
   const { courseCodes } = req.query
-  const maxYearsToCreatePopulationFromOpen = await courseService.maxYearsToCreatePopulationFrom(
-    JSON.parse(courseCodes),
-    'openStats'
-  )
-  const maxYearsToCreatePopulationFromUni = await courseService.maxYearsToCreatePopulationFrom(
+  const maxYearsToCreatePopulationFromOpen = await maxYearsToCreatePopulationFrom(JSON.parse(courseCodes), 'openStats')
+  const maxYearsToCreatePopulationFromUni = await maxYearsToCreatePopulationFrom(
     JSON.parse(courseCodes),
     'regularStats'
   )
-  const maxYearsToCreatePopulationFromBoth = await courseService.maxYearsToCreatePopulationFrom(
-    JSON.parse(courseCodes),
-    'unifyStats'
-  )
+  const maxYearsToCreatePopulationFromBoth = await maxYearsToCreatePopulationFrom(JSON.parse(courseCodes), 'unifyStats')
   return res.json({
     openCourses: maxYearsToCreatePopulationFromOpen,
     uniCourses: maxYearsToCreatePopulationFromUni,

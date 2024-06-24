@@ -17,11 +17,6 @@ const categories = {
   [ID.OPENUNI]: category('Open University', 'TOP_TEACHERS_OPEN_UNI_V2'),
 }
 
-const deleteCategory = async categoryid => {
-  const { rediskey } = categories[categoryid]
-  await redisClient.delAsync(rediskey)
-}
-
 const getTeacherStats = async (categoryid, yearcode) => {
   const { rediskey } = categories[categoryid]
   const category = await redisClient.hgetAsync(rediskey, yearcode)
@@ -147,12 +142,8 @@ const findAndSaveTeachers = async (startcode = 1, to) => {
 }
 
 module.exports = {
-  deleteCategory,
   getTeacherStats,
-  setTeacherStats,
   getCategoriesAndYears,
-  findTopTeachers,
   findAndSaveTeachers,
-  findAndSaveTopTeachers,
   ID,
 }

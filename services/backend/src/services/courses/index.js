@@ -14,20 +14,6 @@ const { parseEnrollment } = require('./parseEnrollments')
 
 const isOpenUniCourseCode = code => code.match(/^AY?(.+?)(?:en|fi|sv)?$/)
 
-const unifyOpenUniversity = code => {
-  const regexresult = isOpenUniCourseCode(code)
-  if (!regexresult) return code
-  return regexresult[1]
-}
-
-const allCodeAlternatives = async code => {
-  const course = await Course.findOne({
-    where: { code },
-  })
-
-  return sortMainCode([...course.substitutions, code])
-}
-
 const yearlyStatsOfNew = async (
   coursecode,
   separate,
@@ -272,8 +258,6 @@ const getCourseProvidersForCourses = async codes => {
 module.exports = {
   courseYearlyStats,
   maxYearsToCreatePopulationFrom,
-  unifyOpenUniversity,
-  allCodeAlternatives,
   getCourseProvidersForCourses,
   byCodes,
   byNameAndOrCodeLike,

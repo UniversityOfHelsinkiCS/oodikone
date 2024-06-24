@@ -1,144 +1,12 @@
 const _ = require('lodash')
 const moment = require('moment')
-const { Op, col, where, fn } = require('sequelize')
+const { Op } = require('sequelize')
 
-const {
-  dbConnections: { sequelize },
-} = require('../database/connection')
 const { ElementDetail, Studyright, StudyrightElement, Transfer } = require('../models')
 const logger = require('../util/logger')
 const { redisClient } = require('./redis')
 
 const REDIS_KEY = 'STUDYRIGHT_ASSOCIATIONS_V2'
-
-const byStudent = studentNumber => {
-  return Studyright.findAll({
-    where: {
-      student_studentnumber: {
-        [Op.eq]: studentNumber,
-      },
-    },
-  })
-}
-
-const studentNumbersWithAllStudyRightElements = async (codes, startedAfter, startedBefore) => {
-  const studyrights = await StudyrightElement.findAll({
-    attributes: ['studentnumber'],
-    where: {
-      code: {
-        [Op.in]: codes,
-      },
-      startdate: {
-        [Op.between]: [startedAfter, startedBefore],
-      },
-    },
-    group: [col('studentnumber')],
-    having: where(fn('count', fn('distinct', col('code'))), {
-      [Op.eq]: codes.length,
-    }),
-  })
-  return studyrights.map(srelement => srelement.studentnumber)
-}
-
-const removeDuplicatesFromValues = obj => {
-  Object.keys(obj).forEach(key => {
-    obj[key] = _.uniq(obj[key])
-  })
-  return obj
-}
-
-const associationArraysToMapping = associations => {
-  const mapping = associations.reduce((mappings, result) => {
-    const { associations } = result
-    associations.forEach(code => {
-      const codes = mappings[code] || []
-      mappings[code] = codes.concat(associations)
-    })
-    return mappings
-  }, {})
-  return removeDuplicatesFromValues(mapping)
-}
-
-const uniqueStudyrightCodeArrays = elementcodes =>
-  sequelize.query(
-    `
-  SELECT
-    DISTINCT(array_agg(studyright_elements.code)) AS associations
-  FROM
-    studyright_elements
-  INNER JOIN
-    element_details
-  ON
-    studyright_elements.code = element_details.code
-    AND
-    element_details.type IN (10, 20)
-    AND
-    studyright_elements.code IN(:elementcodes)
-  GROUP BY
-    studyright_elements.studyrightid
-  ;
-`,
-    {
-      type: sequelize.QueryTypes.SELECT,
-      replacements: { elementcodes },
-    }
-  )
-
-const allUniqueStudyrightCodeArrays = () =>
-  sequelize.query(
-    `
-  SELECT
-    DISTINCT(array_agg(studyright_elements.code)) AS associations
-  FROM
-    studyright_elements
-  INNER JOIN
-    element_details
-  ON
-    studyright_elements.code = element_details.code
-  WHERE
-    element_details.type IN (10, 20)
-  GROUP BY
-    studyright_elements.studyrightid
-  ;
-`,
-    {
-      type: sequelize.QueryTypes.SELECT,
-    }
-  )
-
-const uniqueStudyrightAssocations = elementcodes => {
-  if (elementcodes === undefined) {
-    return allUniqueStudyrightCodeArrays()
-  }
-  return uniqueStudyrightCodeArrays(elementcodes)
-}
-
-const getAssociatedStudyrights = async elementcodes => {
-  const codesByStudyrights = await uniqueStudyrightAssocations(elementcodes)
-  return associationArraysToMapping(codesByStudyrights)
-}
-
-const formatStudyrightElements = (elements, associations) =>
-  elements.map(element => ({
-    id: element.code,
-    name: element.name,
-    enabled: true,
-    type: element.type,
-    associations: associations && associations[element.code],
-  }))
-
-const getAllStudyrightElementsAndAssociations = async () => {
-  let studyright_elements = await redisClient.getAsync('studyright_elements')
-  if (!studyright_elements) {
-    const [associations, studyrightelements] = await Promise.all([getAssociatedStudyrights(), ElementDetail.findAll()])
-    await redisClient.setAsync(
-      'studyright_elements',
-      JSON.stringify(formatStudyrightElements(studyrightelements, associations))
-    )
-    studyright_elements = await redisClient.getAsync('studyright_elements')
-  }
-  return JSON.parse(studyright_elements)
-}
 
 const getAllProgrammes = async () => {
   const elementDetails = ElementDetail.findAll({
@@ -328,10 +196,6 @@ const getFilteredAssociations = async codes => {
 }
 
 module.exports = {
-  byStudent,
-  studentNumbersWithAllStudyRightElements,
-  getAssociatedStudyrights,
-  getAllStudyrightElementsAndAssociations,
   getAssociations,
   getFilteredAssociations,
   refreshAssociationsInRedis,

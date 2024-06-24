@@ -1,8 +1,8 @@
 const router = require('express').Router()
 
 const { isFaculty, providersOfFaculty } = require('../services/organisations')
-const teachers = require('../services/teachers')
-const topteachers = require('../services/topteachers')
+const { bySearchTerm, yearlyStatistics, teacherStats } = require('../services/teachers')
+const { ID, getTeacherStats, findAndSaveTeachers, getCategoriesAndYears } = require('../services/topteachers')
 const { getFullStudyProgrammeRights, mapToProviders, splitByEmptySpace } = require('../util/utils')
 
 router.get('/', async (req, res) => {
@@ -17,28 +17,28 @@ router.get('/', async (req, res) => {
     return res.status(400).json({ error: 'invalid searchTerm' })
   }
 
-  const result = await teachers.bySearchTerm(trimmedSearchTerm)
+  const result = await bySearchTerm(trimmedSearchTerm)
   res.json(result)
 })
 
 router.get('/top', async (req, res) => {
-  const { yearcode, category = topteachers.ID.ALL } = req.query
+  const { yearcode, category = ID.ALL } = req.query
   if (!yearcode) {
     return res.status(422).send('Missing required yearcode query param')
   }
 
-  const result = await topteachers.getTeacherStats(category, yearcode)
+  const result = await getTeacherStats(category, yearcode)
   res.json(result)
 })
 
 router.post('/top', async (req, res) => {
   const { startyearcode, endyearcode } = req.body
   res.status(200).end()
-  await topteachers.findAndSaveTeachers(startyearcode, endyearcode)
+  await findAndSaveTeachers(startyearcode, endyearcode)
 })
 
 router.get('/top/categories', async (_req, res) => {
-  const result = await topteachers.getCategoriesAndYears()
+  const result = await getCategoriesAndYears()
   res.json(result)
 })
 
@@ -70,13 +70,13 @@ router.get('/stats', async (req, res) => {
     ),
   ]
 
-  const result = await teachers.yearlyStatistics(parsedProviders, semesterStart, semesterEnd || semesterStart + 1)
+  const result = await yearlyStatistics(parsedProviders, semesterStart, semesterEnd || semesterStart + 1)
   res.json(result)
 })
 
 router.get('/:id', async (req, res) => {
   const { id } = req.params
-  const result = await teachers.teacherStats(id)
+  const result = await teacherStats(id)
   if (!result) {
     return res.status(404).send()
   }

@@ -2,7 +2,15 @@ const router = require('express').Router()
 const { difference } = require('lodash')
 
 const { filterStudentnumbersByAccessrights } = require('../services/students')
-const Tags = require('../services/tags')
+const {
+  findTagsByStudytrack,
+  createNewTag,
+  deleteTag,
+  getStudentTagsByStudytrack,
+  createMultipleStudentTags,
+  findTagsFromStudytrackById,
+  deleteMultipleStudentTags,
+} = require('../services/tags')
 const { getFullStudyProgrammeRights, hasFullAccessToStudentData } = require('../util/utils')
 
 const filterRelevantTags = (tags, userId) => {
@@ -30,7 +38,7 @@ router.get('/tags/:studytrack', async (req, res) => {
   // Respond with null and 200 instead of 403 if the user isn't authorized to view the tags. This is to avoid unnecessary noise in Sentry
   if (userIsUnauthorized(fullStudyProgrammeRights, programmeCodes, roles)) return res.json(null)
 
-  const tags = await Tags.findTagsByStudytrack(studytrack)
+  const tags = await findTagsByStudytrack(studytrack)
   res.status(200).json(filterRelevantTags(tags, id))
 })
 
@@ -46,8 +54,8 @@ router.post('/tags', async (req, res) => {
   const programmeCodes = studytrack.includes('KH') && studytrack.includes('MH') ? studytrack.split('-') : [studytrack]
   if (userIsUnauthorized(fullStudyProgrammeRights, programmeCodes, roles)) return res.status(403).end()
 
-  await Tags.createNewTag({ studytrack, tagname, year, personal_user_id })
-  const tags = await Tags.findTagsByStudytrack(studytrack)
+  await createNewTag({ studytrack, tagname, year, personal_user_id })
+  const tags = await findTagsByStudytrack(studytrack)
   res.status(200).json(filterRelevantTags(tags, id))
 })
 
@@ -65,8 +73,8 @@ router.delete('/tags', async (req, res) => {
   if (userIsUnauthorized(fullStudyProgrammeRights, programmeCodes, roles) && !(tag.personal_user_id === id))
     return res.status(403).end()
 
-  await Tags.deleteTag(tag)
-  const t = await Tags.findTagsByStudytrack(tag.studytrack)
+  await deleteTag(tag)
+  const t = await findTagsByStudytrack(tag.studytrack)
   res.status(200).json(filterRelevantTags(t, id))
 })
 
@@ -88,7 +96,7 @@ router.get('/studenttags/:studytrack', async (req, res) => {
   )
     return res.json(null)
 
-  const result = await Tags.getStudentTagsByStudytrack(studytrack)
+  const result = await getStudentTagsByStudytrack(studytrack)
   res.status(200).json(filterRelevantStudentTags(result, id))
 })
 
@@ -103,7 +111,7 @@ router.post('/studenttags', async (req, res) => {
   if (userIsUnauthorized(fullStudyProgrammeRights, [studytrack, combinedProgramme], roles)) return res.status(403).end()
 
   const studytrackCode = combinedProgramme ? `${studytrack}-${combinedProgramme}` : studytrack
-  const existingTags = await Tags.findTagsByStudytrack(studytrackCode)
+  const existingTags = await findTagsByStudytrack(studytrackCode)
   const existingTagids = existingTags.map(t => t.tag_id)
   const tagids = [...new Set(tags.map(t => t.tag_id))]
   if (!tagids.find(t => existingTagids.includes(t))) return res.status(400).json({ error: 'The tag does not exist' })
@@ -117,7 +125,7 @@ router.post('/studenttags', async (req, res) => {
       .status(400)
       .json({ error: `Could not find the following students from the programme: ${missingStudents.join(', ')}` })
 
-  await Tags.createMultipleStudentTags(tags)
+  await createMultipleStudentTags(tags)
   res.status(204).end()
 })
 
@@ -132,10 +140,10 @@ router.delete('/studenttags', async (req, res) => {
   if (userIsUnauthorized(fullStudyProgrammeRights, [studytrack, combinedProgramme], roles)) return res.status(403).end()
 
   const studytrackCode = combinedProgramme ? `${studytrack}-${combinedProgramme}` : studytrack
-  const tags = await Tags.findTagsFromStudytrackById(studytrackCode, [tagId])
+  const tags = await findTagsFromStudytrackById(studytrackCode, [tagId])
   if (tags.length === 0) return res.status(403).json({ error: 'The tag does not exist' })
 
-  await Tags.deleteMultipleStudentTags(tagId, studentnumbers)
+  await deleteMultipleStudentTags(tagId, studentnumbers)
   res.status(204).end()
 })
 
