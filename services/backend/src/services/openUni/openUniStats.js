@@ -29,19 +29,25 @@ const getCustomOpenUniCourses = async (courseCodes, startDate, endDate) => {
   const allStudyRights = await getStudyRights(students)
   const studentInfo = await getStudentInfo(students)
 
-  // Filter out current studyrights:
-  // Case 1: Both start date and end date are outside of the given interval
-  // Case 2: Start date is inside of the given interval and end date is outside
-  // Case 3: Start date is before the interval start and the end date is within the interval
+  const isStartDateOutsideInterval = (studyRight, startDate) => {
+    return moment(studyRight.startDate).isBetween(startDate, moment())
+  }
+
+  const isStartDateInsideAndEndDateOutside = (studyRight, startDate) => {
+    return moment(studyRight.startDate).isSameOrBefore(startDate) && moment(studyRight.endDate).isSameOrAfter(moment())
+  }
+
+  const isEndDateBeforeNow = studyRight => moment(studyRight.endDate).isSameOrBefore(moment())
+
   const studentsWithCurrentStudyRight = allStudyRights
     .filter(
       studyRight =>
-        moment(studyRight.startDate).isBetween(startDate, moment()) ||
-        (moment(studyRight.startDate).isSameOrBefore(startDate) &&
-          moment(studyRight.endDate).isSameOrAfter(moment())) ||
-        moment(studyRight.endDate).isSameOrBefore(moment())
+        isStartDateOutsideInterval(studyRight, startDate) ||
+        isStartDateInsideAndEndDateOutside(studyRight, startDate) ||
+        isEndDateBeforeNow(studyRight)
     )
     .map(studyRight => studyRight.studentNumber)
+
   const uniqueStudentsWithCurrentStudyRight = uniq(studentsWithCurrentStudyRight)
 
   const studentStats = {}
