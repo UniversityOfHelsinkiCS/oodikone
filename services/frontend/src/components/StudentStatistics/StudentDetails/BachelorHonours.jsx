@@ -1,5 +1,5 @@
 import moment from 'moment'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Accordion, Divider, Header, Icon, Label, Table } from 'semantic-ui-react'
 
 import {
@@ -8,101 +8,90 @@ import {
   bachelorHonoursIntermediateModules as intermediateHonoursModules,
 } from '@/common'
 import { reformatDate } from '@/common/timeAndDate'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { CurriculumPicker } from '@/components/PopulationDetails/CurriculumPicker'
 import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 
 export const BachelorHonours = ({ absentYears, programmeCode, student }) => {
   const [curriculum, setCurriculum] = useState(null)
-  const [studentsModules, setModules] = useState([])
-  const [otherModules, setOther] = useState([])
   const [showHonoursModules, setShowHonoursModules] = useState(false)
-  const [studyStartDate, setStartDate] = useState('')
-  const [honors, setHonors] = useState(false)
-  const [graduated, setGraduated] = useState(false)
-  const [inspection, setInspection] = useState(false)
-  const [reason, setReason] = useState(null)
-  const mandatoryModules = { defaultProgrammeResults: curriculum?.defaultProgrammeModules }
+  const { defaultProgrammeModules: mandatoryModules } = curriculum ?? {}
+  const { getTextIn } = useLanguage()
 
-  useEffect(() => {
-    if (programmeCode) {
-      const bachelorStudyrights = student.studyrights.filter(studyright => studyright.extentcode === 1)
-      const studyrightWithNewestProgramme = bachelorStudyrights.find(studyright =>
-        studyright.studyright_elements.map(element => element.code).includes(programmeCode)
-      )
-      if (studyrightWithNewestProgramme) {
-        setStartDate(moment(studyrightWithNewestProgramme.startdate))
-        setGraduated(!!studyrightWithNewestProgramme.graduated)
-      }
-    }
-  }, [programmeCode, student])
+  if (!student?.courses || !student?.studyRights) return null
 
-  useEffect(() => {
-    if (!mandatoryModules?.defaultProgrammeResults?.length) return
-    const mandatoryModuleCodes = mandatoryModules.defaultProgrammeResults
-      ? mandatoryModules.defaultProgrammeResults.map(mod => mod.code)
-      : []
-    const degreeModule = student.courses.find(mod => bachelorCodes.includes(mod.course_code))
-    const basicModules = student.courses.filter(mod => basicHonoursModules[programmeCode].includes(mod.course_code))
-    const intermediateModules = student.courses.filter(mod =>
-      intermediateHonoursModules[programmeCode].includes(mod.course_code)
-    )
+  let studyStartDate
+  let reason
+  let graduated = false
+  let inspection = false
+  let inTime = false
 
-    let honoursModules = []
-    if (degreeModule) honoursModules = [...honoursModules, degreeModule]
-    if (basicModules.length) honoursModules = [...honoursModules, ...basicModules]
-    if (intermediateModules.length) honoursModules = [...honoursModules, ...intermediateModules]
-    const honoursModulesCodes = honoursModules?.map(mod => mod.course_code)
+  const studyRightWithCorrectProgramme = student.studyRights.find(studyRight =>
+    studyRight.studyRightElements.some(element => element.code === programmeCode)
+  )
 
-    setModules(honoursModules)
-    setOther(
-      student.courses.filter(
-        course => !honoursModulesCodes.includes(course.course_code) && mandatoryModuleCodes.includes(course.course_code)
-      )
-    )
+  if (studyRightWithCorrectProgramme) {
+    studyStartDate = moment(studyRightWithCorrectProgramme.startDate)
+    graduated = !!studyRightWithCorrectProgramme.studyRightElements.find(element => element.code === programmeCode)
+      .graduated
+  }
 
-    let inTime = false
+  const mandatoryModuleCodes = mandatoryModules ? mandatoryModules.map(mod => mod.code).filter(Boolean) : []
 
-    if (degreeModule) {
-      const graduationDate = moment(degreeModule.date)
-      const yearsForGraduation = moment.duration(graduationDate.diff(studyStartDate)).asYears()
+  const degreeModule = student.courses.find(mod => bachelorCodes.includes(mod.course.code))
+  const basicModules = student.courses.filter(mod => basicHonoursModules[programmeCode].includes(mod.course.code))
+  const intermediateModules = student.courses.filter(mod =>
+    intermediateHonoursModules[programmeCode].includes(mod.course.code)
+  )
 
-      // calculate time student has been absent during bachelors degree
-      const timeAbsent = absentYears.reduce((acc, curr) => {
-        const start = moment(curr.startdate)
-        const end = moment(curr.enddate)
+  const mainModules = []
+  if (degreeModule) mainModules.push(degreeModule)
+  if (basicModules.length) mainModules.push(...basicModules)
+  if (intermediateModules.length) mainModules.push(...intermediateModules)
+  const mainModuleCodes = mainModules.map(mod => mod.course.code)
 
-        // if absent years are not in the degree start and end range return acc
-        if (start < studyStartDate || start > graduationDate) return acc
-        const diff = moment.duration(end.diff(start)).asYears()
-        return acc + diff
-      }, 0)
-      // round because absent count too accurate i.e. if a person has been absent a whole year
-      // timeAbsent = 0.99... or something similar < 1 so in the name of fairness round a bit.
-      inTime = yearsForGraduation <= 3 + Math.round(timeAbsent * 10) / 10
-    }
+  const otherModules = student.courses.filter(
+    course => !mainModuleCodes.includes(course.course.code) && mandatoryModuleCodes.includes(course.course.code)
+  )
 
-    const allBasicUnderFour = basicModules.every(mod => Number(mod.grade) < 4)
-    const basicAboveFour = basicModules.find(mod => Number(mod.grade) > 3)
-    const allIntermediateUnderFour = intermediateModules.every(mod => Number(mod.grade) < 4)
-    const intermediateAboveFour = intermediateModules.find(mod => Number(mod.grade) > 3)
+  if (degreeModule) {
+    const graduationDate = moment(degreeModule.date)
+    const yearsForGraduation = moment.duration(graduationDate.diff(studyStartDate)).asYears()
 
-    setHonors(basicAboveFour && intermediateAboveFour && inTime)
+    // calculate time student has been absent during bachelors degree
+    const timeAbsent = absentYears.reduce((acc, curr) => {
+      const start = moment(curr.startdate)
+      const end = moment(curr.enddate)
 
-    if (!inTime) {
-      setReason(degreeModule ? 'Did not graduate in time' : 'Has not graduated')
-    } else if (inTime && graduated && honoursModules.length < 3 && honoursModules.length > 4) {
-      setInspection(true)
-    } else if (graduated && (allBasicUnderFour || allIntermediateUnderFour)) {
-      setReason('Module grades too low')
-    }
-  }, [curriculum?.defaultProgrammeModules, student])
+      // if absent years are not in the degree start and end range return acc
+      if (start < studyStartDate || start > graduationDate) return acc
+      const diff = moment.duration(end.diff(start)).asYears()
+      return acc + diff
+    }, 0)
+    // round because absent count too accurate i.e. if a person has been absent a whole year
+    // timeAbsent = 0.99... or something similar < 1 so in the name of fairness round a bit.
+    inTime = yearsForGraduation <= 3 + Math.round(timeAbsent * 10) / 10
+  }
+
+  const basicAtLeastFour = basicModules.find(mod => Number(mod.grade) >= 4)
+  const intermediateAtLeastFour = intermediateModules.find(mod => Number(mod.grade) >= 4)
+
+  const honors = basicAtLeastFour && intermediateAtLeastFour && inTime
+
+  if (!inTime) {
+    reason = degreeModule ? 'Did not graduate in time' : 'Has not graduated'
+  } else if (inTime && graduated && (mainModules.length < 3 || mainModules.length > 4)) {
+    inspection = true
+  } else if (graduated && !(basicAtLeastFour && intermediateAtLeastFour)) {
+    reason = 'Module grades too low'
+  }
 
   const dataRows = modules =>
     modules.map(mod => (
-      <Table.Row key={mod.course_code}>
+      <Table.Row key={mod.course.code}>
         <Table.Cell>{reformatDate(mod.date, DISPLAY_DATE_FORMAT)}</Table.Cell>
         <Table.Cell>
-          {mod.course.name.fi} ({mod.course_code})
+          {getTextIn(mod.course.name)} ({mod.course.code})
         </Table.Cell>
         <Table.Cell>{mod.grade}</Table.Cell>
       </Table.Row>
@@ -113,15 +102,13 @@ export const BachelorHonours = ({ absentYears, programmeCode, student }) => {
       <Table.Header>
         <Table.Row>
           <Table.HeaderCell>Date</Table.HeaderCell>
-          <Table.HeaderCell>Course</Table.HeaderCell>
+          <Table.HeaderCell>Module</Table.HeaderCell>
           <Table.HeaderCell>Grade</Table.HeaderCell>
         </Table.Row>
       </Table.Header>
       <Table.Body>{dataRows(data)}</Table.Body>
     </Table>
   )
-
-  if (!programmeCode || !student || !student.courses || !student.studyrights) return null
 
   return (
     <>
@@ -159,7 +146,7 @@ export const BachelorHonours = ({ absentYears, programmeCode, student }) => {
           </Accordion.Title>
           <Accordion.Content active={showHonoursModules}>
             <h4>Main Modules</h4>
-            {studentsModules.length > 0 && dataTable(studentsModules)}
+            {mainModules.length > 0 && dataTable(mainModules)}
             <h4>Other Modules</h4>
             {otherModules.length > 0 && dataTable(otherModules)}
           </Accordion.Content>

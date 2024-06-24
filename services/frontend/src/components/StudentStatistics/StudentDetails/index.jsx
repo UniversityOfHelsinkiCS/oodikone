@@ -1,11 +1,10 @@
-import { isEmpty } from 'lodash'
+import { isEmpty, orderBy } from 'lodash'
 import moment from 'moment'
 import { useState } from 'react'
 import { Loader, Message } from 'semantic-ui-react'
 
-import { bachelorHonoursProgrammes as bachelorCodes, getNewestProgramme } from '@/common'
+import { bachelorHonoursProgrammes as bachelorCodes } from '@/common'
 import { StudentInfoCard } from '@/components/StudentStatistics/StudentInfoCard'
-import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { useGetStudentQuery } from '@/redux/students'
 import { BachelorHonours } from './BachelorHonours'
@@ -19,17 +18,22 @@ export const StudentDetails = ({ studentNumber }) => {
   const [selectedStudyPlanId, setSelectedStudyPlanId] = useState(null)
   let honoursCode
   const { data: semesters } = useGetSemestersQuery()
-  const { data: programmesAndStudyTracks } = useGetProgrammesQuery()
-  const programmes = programmesAndStudyTracks?.programmes
   const { data: student, isLoading, isError } = useGetStudentQuery(studentNumber)
 
-  if (programmes && student && student.studyrights) {
-    const bachelorStudyrights = student.studyrights.filter(studyright => studyright.extentcode === 1)
-    const newestBachelorProgramme = getNewestProgramme(bachelorStudyrights, student.studentNumber, null, programmes)
+  if (student?.studyRights) {
+    const bachelorStudyRights = orderBy(
+      student.studyRights
+        .filter(studyRight => [1, 5].includes(studyRight.extentCode))
+        .flatMap(studyRight => studyRight.studyRightElements)
+        .filter(element => element.phase === 1),
+      ['startDate'],
+      ['desc']
+    )
+    const [newestBachelorProgramme] = bachelorStudyRights
     // currently only for matlu
-    const shouldRender = bachelorCodes.includes(newestBachelorProgramme.code)
-    if (!shouldRender && honoursCode !== null) honoursCode = null
-    if (shouldRender) honoursCode = newestBachelorProgramme.code
+    if (bachelorCodes.includes(newestBachelorProgramme?.code)) {
+      honoursCode = newestBachelorProgramme.code
+    }
   }
 
   const getAbsentYears = () => {
