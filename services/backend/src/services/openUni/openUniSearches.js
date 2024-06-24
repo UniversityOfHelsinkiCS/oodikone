@@ -7,7 +7,7 @@ const { mapCourseInfo, mapOpenCredits, mapOpenEnrollments, mapStudentInfo } = re
 const getCredits = async (courseCodes, startdate) =>
   (
     await Credit.findAll({
-      attributes: ['course_code', 'student_studentnumber', 'grade', 'attainment_date'],
+      attributes: ['attainment_date', 'course_code', 'grade', 'student_studentnumber'],
       where: {
         course_code: {
           [Op.in]: courseCodes,
@@ -22,6 +22,7 @@ const getCredits = async (courseCodes, startdate) =>
 const getStudentInfo = async students =>
   (
     await Student.findAll({
+      attributes: ['studentnumber', 'email', 'secondary_email'],
       where: {
         studentnumber: {
           [Op.in]: students,
@@ -33,6 +34,7 @@ const getStudentInfo = async students =>
 const getEnrollments = async (courseCodes, startdate, enddate) =>
   (
     await Enrollment.findAll({
+      attributes: ['course_code', 'enrollment_date_time', 'studentnumber'],
       where: {
         course_code: {
           [Op.in]: courseCodes,

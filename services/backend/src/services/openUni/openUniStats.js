@@ -21,7 +21,7 @@ const getCustomOpenUniCourses = async (courseCodes, startDate, endDate) => {
   const allCourseCodes = courseCodes.concat(ayCourseCodes)
   const allCredits = await getCredits(allCourseCodes, startDate)
   const allEnrollments = await getEnrollments(allCourseCodes, startDate, endDate)
-  const students = uniq(allEnrollments.map(enrollment => enrollment.enrollmentStudentnumber))
+  const students = uniq(allEnrollments.map(enrollment => enrollment.enrollmentStudentNumber))
   const courses = await getCourseNames(courseCodes)
   const passedGrades = ['1', '2', '3', '4', '5', 'Hyv.', 'hyv.', 'HT', 'TT']
   const failedGrades = ['Hyl.', 'HYL', '0']
@@ -61,57 +61,54 @@ const getCustomOpenUniCourses = async (courseCodes, startDate, endDate) => {
     }
   }
 
-  for (const { studentnumber, email, secondary_email } of studentInfo) {
-    // Check if the student has existing studyright: if yes, then stop here
-    if (!uniqueStudentsWithCurrentStudyRight.includes(studentnumber)) {
-      if (!(studentnumber in studentStats)) {
-        studentStats[studentnumber] = {
-          courseInfo: courseCodes.reduce(
-            (acc, code) => ({ ...acc, [code.replace('AY', '')]: getEmptyCourseInfo() }),
-            {}
-          ),
-          email,
-          secondaryEmail: secondary_email,
-          totals: { passed: 0, failed: 0, unfinished: 0 },
-        }
-      }
-      for (const { course_code, attainment_date, student_studentnumber, grade } of allCredits) {
-        if (student_studentnumber === studentnumber) {
-          const courseCode = course_code.replace('AY', '')
-          if (
-            passedGrades.includes(grade) &&
-            (!studentStats[studentnumber].courseInfo[courseCode].status.passed ||
-              moment(studentStats[studentnumber].courseInfo[courseCode].status.passed).isBefore(attainment_date, 'day'))
-          ) {
-            studentStats[studentnumber].courseInfo[courseCode].status.passed = attainment_date
-          } else if (
-            failedGrades.includes(grade) &&
-            !studentStats[studentnumber].courseInfo[courseCode].status.passed &&
-            (!studentStats[studentnumber].courseInfo[courseCode].status.failed ||
-              moment(studentStats[studentnumber].courseInfo[courseCode].status.failed).isBefore(attainment_date, 'day'))
-          ) {
-            studentStats[studentnumber].courseInfo[courseCode].status.failed = attainment_date
-          }
-        }
-      }
-      for (const { enrollmentStudentnumber, course_code, enrollment_date_time } of allEnrollments) {
-        if (enrollmentStudentnumber === studentnumber) {
-          const courseCode = course_code.replace('AY', '')
-          if (
-            !studentStats[studentnumber].courseInfo[courseCode].status.passed &&
-            !studentStats[studentnumber].courseInfo[courseCode].status.failed &&
-            (!studentStats[studentnumber].courseInfo[courseCode].status.unfinished ||
-              moment(studentStats[studentnumber].courseInfo[courseCode].status.unfinished).isBefore(
-                enrollment_date_time,
-                'day'
-              ))
-          ) {
-            studentStats[studentnumber].courseInfo[courseCode].status.unfinished = enrollment_date_time
-          }
-        }
-      }
-      await calculateTotalsForStudent(studentStats, studentnumber)
+  for (const { studentNumber, email, secondaryEmail } of studentInfo) {
+    if (uniqueStudentsWithCurrentStudyRight.includes(studentNumber)) {
+      continue
     }
+    if (!(studentNumber in studentStats)) {
+      studentStats[studentNumber] = {
+        courseInfo: courseCodes.reduce((acc, code) => ({ ...acc, [code.replace('AY', '')]: getEmptyCourseInfo() }), {}),
+        email,
+        secondaryEmail,
+        totals: { passed: 0, failed: 0, unfinished: 0 },
+      }
+    }
+    for (const { attainmentCourseCode, attainmentDate, attainmentStudentNumber, attainmentGrade } of allCredits) {
+      if (attainmentStudentNumber === studentNumber) {
+        const courseCode = attainmentCourseCode.replace('AY', '')
+        if (
+          passedGrades.includes(attainmentGrade) &&
+          (!studentStats[studentNumber].courseInfo[courseCode].status.passed ||
+            moment(studentStats[studentNumber].courseInfo[courseCode].status.passed).isBefore(attainmentDate, 'day'))
+        ) {
+          studentStats[studentNumber].courseInfo[courseCode].status.passed = attainmentDate
+        } else if (
+          failedGrades.includes(attainmentGrade) &&
+          !studentStats[studentNumber].courseInfo[courseCode].status.passed &&
+          (!studentStats[studentNumber].courseInfo[courseCode].status.failed ||
+            moment(studentStats[studentNumber].courseInfo[courseCode].status.failed).isBefore(attainmentDate, 'day'))
+        ) {
+          studentStats[studentNumber].courseInfo[courseCode].status.failed = attainmentDate
+        }
+      }
+    }
+    for (const { enrollmentStudentNumber, enrollmentCourseCode, enrollmentDateTime } of allEnrollments) {
+      if (enrollmentStudentNumber === studentNumber) {
+        const courseCode = enrollmentCourseCode.replace('AY', '')
+        if (
+          !studentStats[studentNumber].courseInfo[courseCode].status.passed &&
+          !studentStats[studentNumber].courseInfo[courseCode].status.failed &&
+          (!studentStats[studentNumber].courseInfo[courseCode].status.unfinished ||
+            moment(studentStats[studentNumber].courseInfo[courseCode].status.unfinished).isBefore(
+              enrollmentDateTime,
+              'day'
+            ))
+        ) {
+          studentStats[studentNumber].courseInfo[courseCode].status.unfinished = enrollmentDateTime
+        }
+      }
+    }
+    await calculateTotalsForStudent(studentStats, studentNumber)
   }
   const openUniStats = { students: studentStats, courses }
   return openUniStats

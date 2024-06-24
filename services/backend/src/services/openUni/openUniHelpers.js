@@ -7,31 +7,30 @@ const mapCourseInfo = course => {
 }
 
 const mapOpenCredits = credit => {
-  const { course_code, attainment_date, student_studentnumber, grade } = credit
+  const { attainment_date, course_code, grade, student_studentnumber } = credit
   return {
-    course_code,
-    attainment_date,
-    student_studentnumber,
-    grade,
+    attainmentCourseCode: course_code,
+    attainmentDate: attainment_date,
+    attainmentGrade: grade,
+    attainmentStudentNumber: student_studentnumber,
   }
 }
 
 const mapOpenEnrollments = enrollment => {
-  const { studentnumber, course_code, state, enrollment_date_time } = enrollment
+  const { course_code, enrollment_date_time, studentnumber } = enrollment
   return {
-    enrollmentStudentnumber: studentnumber,
-    course_code,
-    state,
-    enrollment_date_time,
+    enrollmentCourseCode: course_code,
+    enrollmentDateTime: enrollment_date_time,
+    enrollmentStudentNumber: studentnumber,
   }
 }
 
 const mapStudentInfo = student => {
-  const { email, secondary_email, studentnumber } = student
+  const { studentnumber, email, secondary_email } = student
   return {
-    studentnumber,
+    studentNumber: studentnumber,
     email,
-    secondary_email,
+    secondaryEmail: secondary_email,
   }
 }
 
