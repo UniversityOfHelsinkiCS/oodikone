@@ -1,41 +1,41 @@
 const moment = require('moment')
 
-const { getCredits, getStudyRights, getEnrollments, getStudentInfo, getCourseNames } = require('./openUniSearches')
+const { getCourseNames, getCredits, getEnrollments, getStudentInfo, getStudyRights } = require('./openUniSearches')
 
 const uniq = objects => [...new Set(objects)]
 
-const calculateTotalsForStudent = async (studentStats, studentnumber) => {
-  Object.keys(studentStats[studentnumber].courseInfo).forEach(course => {
-    if (studentStats[studentnumber].courseInfo[course].status.passed) {
-      studentStats[studentnumber].totals.passed += 1
-    } else if (studentStats[studentnumber].courseInfo[course].status.failed) {
-      studentStats[studentnumber].totals.failed += 1
-    } else if (studentStats[studentnumber].courseInfo[course].status.unfinished) {
-      studentStats[studentnumber].totals.unfinished += 1
+const calculateTotalsForStudent = async (studentStats, studentNumber) => {
+  Object.keys(studentStats[studentNumber].courseInfo).forEach(course => {
+    if (studentStats[studentNumber].courseInfo[course].status.passed) {
+      studentStats[studentNumber].totals.passed += 1
+    } else if (studentStats[studentNumber].courseInfo[course].status.failed) {
+      studentStats[studentNumber].totals.failed += 1
+    } else if (studentStats[studentNumber].courseInfo[course].status.unfinished) {
+      studentStats[studentNumber].totals.unfinished += 1
     }
   })
 }
-const getCustomOpenUniCourses = async (courseCodes, startdate, enddate) => {
+const getCustomOpenUniCourses = async (courseCodes, startDate, endDate) => {
   const ayCourseCodes = courseCodes.map(courseCode => `AY${courseCode}`)
   const allCourseCodes = courseCodes.concat(ayCourseCodes)
-  const allCredits = await getCredits(allCourseCodes, startdate)
-  const allEnrollments = await getEnrollments(allCourseCodes, startdate, enddate)
+  const allCredits = await getCredits(allCourseCodes, startDate)
+  const allEnrollments = await getEnrollments(allCourseCodes, startDate, endDate)
   const students = uniq(allEnrollments.map(enrollment => enrollment.enrollmentStudentnumber))
   const courses = await getCourseNames(courseCodes)
   const passedGrades = ['1', '2', '3', '4', '5', 'Hyv.', 'hyv.', 'HT', 'TT']
   const failedGrades = ['Hyl.', 'HYL', '0']
 
-  const allStudyrights = await getStudyRights(students)
+  const allStudyRights = await getStudyRights(students)
   const studentInfo = await getStudentInfo(students)
   // Filter out current studyrights:
   // Case 1: Both startdate and enddate are outside of the given interval
   // Case 2: Startdate is inside of the given interval and enddate is outside
   // Case 3: Startdate is before the interval start and the enddate is within the interval
-  const studentsWithCurrentStudyRight = allStudyrights
+  const studentsWithCurrentStudyRight = allStudyRights
     .filter(
       right =>
-        moment(right.startdate).isBetween(startdate, moment()) ||
-        (moment(right.startdate).isSameOrBefore(startdate) && moment(right.enddate).isSameOrAfter(moment())) ||
+        moment(right.startdate).isBetween(startDate, moment()) ||
+        (moment(right.startdate).isSameOrBefore(startDate) && moment(right.enddate).isSameOrAfter(moment())) ||
         moment(right.enddate).isSameOrBefore(moment())
     )
     .map(right => right.studyrightStudentnumber)
