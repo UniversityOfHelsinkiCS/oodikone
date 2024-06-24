@@ -82,6 +82,14 @@ describe('Students tests', () => {
       .and('include', 'https://sisu.helsinki.fi/tutor/role/staff/student/hy-hlo-84830887/basic/basic-info')
   })
 
+  it('Bachelor Honours section is shown', () => {
+    cy.get('.prompt').type(student.studentnumber)
+    cy.contains('td a', student.studentnumber).click()
+    cy.contains('h4', 'Bachelor Honours')
+    cy.contains('.tag.label', 'Not qualified for Honours')
+    cy.contains('.tag.label', 'Has not graduated')
+  })
+
   it('Searching with bad inputs doesnt yield results', () => {
     cy.get('.prompt').type('SWAG LITTINEN')
     cy.contains('Student number').should('not.exist')
