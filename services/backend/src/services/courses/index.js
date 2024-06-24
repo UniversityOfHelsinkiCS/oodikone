@@ -11,21 +11,18 @@ const {
   getStudentNumberToSrElementsMap,
 } = require('./creditsAndEnrollmentsOfCourse')
 
-const formatStudyrightElement = ({ code, element_detail, startdate, studyright: sr }) => {
-  const studyright = sr.get({ plain: true })
-  return {
-    code,
-    name: element_detail.name,
-    startdate,
-    faculty_code: studyright.faculty_code || null,
-    organization: studyright.organization
-      ? {
-          name: studyright.organization.name,
-          code: studyright.organization.code,
-        }
-      : null,
-  }
-}
+const formatStudyrightElement = ({ code, name, startDate, studyRight }) => ({
+  code,
+  name,
+  startdate: startDate,
+  faculty_code: studyRight.facultyCode || null,
+  organization: studyRight.organization
+    ? {
+        name: studyRight.organization.name,
+        code: studyRight.organization.code,
+      }
+    : null,
+})
 
 const parseCredit = (credit, anonymizationSalt, studentNumberToSrElementsMap) => {
   const { semester, grade, course_code, credits, attainment_date, student_studentnumber: studentnumber } = credit
@@ -115,7 +112,7 @@ const yearlyStatsOfNew = async (
   }
 
   const [credits, enrollments, course] = await Promise.all([
-    creditsForCourses(codes, anonymizationSalt, unification),
+    creditsForCourses(codes, unification),
     enrollmentsForCourses(codes, unification),
     Course.findOne({
       where: {

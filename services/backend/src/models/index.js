@@ -68,6 +68,9 @@ Teacher.belongsToMany(Credit, { through: CreditTeacher, foreignKey: 'teacher_id'
 Organization.hasMany(Studyright, { foreignKey: 'facultyCode', sourceKey: 'code' })
 Studyright.belongsTo(Organization, { foreignKey: 'facultyCode', targetKey: 'code' })
 
+SISStudyRight.belongsTo(Organization, { foreignKey: 'faculty_code', targetKey: 'code' })
+Organization.hasMany(SISStudyRight, { foreignKey: 'faculty_code', sourceKey: 'code' })
+
 Studyplan.belongsTo(Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
 Student.hasMany(Studyplan, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
 

@@ -4,14 +4,13 @@ const {
   Credit,
   Student,
   Semester,
-  Studyright,
   Organization,
-  StudyrightElement,
-  ElementDetail,
   Enrollment,
+  SISStudyRight,
+  SISStudyRightElement,
 } = require('../../models')
 
-const creditsForCourses = async (codes, anonymizationSalt, unification) => {
+const creditsForCourses = async (codes, unification) => {
   let is_open = false
 
   if (unification === 'open') is_open = true
@@ -52,46 +51,40 @@ const creditsForCourses = async (codes, anonymizationSalt, unification) => {
 }
 
 const getStudentNumberToSrElementsMap = async studentNumbers => {
-  const studyrights = await Studyright.findAll({
-    attributes: ['prioritycode', 'faculty_code', 'student_studentnumber', 'studyrightid'],
+  const studyRights = await SISStudyRight.findAll({
+    attributes: ['facultyCode', 'id', 'studentNumber'],
     where: {
-      prioritycode: {
-        [Op.eq]: 1,
+      studentNumber: {
+        [Op.in]: studentNumbers,
       },
-      student_studentnumber: { [Op.in]: studentNumbers },
     },
     include: {
       model: Organization,
+      attributes: ['name', 'code'],
     },
   })
 
-  const studyrightMap = studyrights.reduce((obj, cur) => {
-    obj[cur.studyrightid] = cur
+  const studyRightMap = studyRights.reduce((obj, cur) => {
+    obj[cur.id] = cur.toJSON()
     return obj
   }, {})
 
-  const studyrightIds = Object.keys(studyrightMap)
+  const studyRightIds = Object.keys(studyRightMap)
 
-  const studyrightElements = await StudyrightElement.findAll({
-    attributes: ['code', 'startdate', 'studentnumber', 'studyrightid'],
-    include: [
-      {
-        model: ElementDetail,
-        attributes: ['name', 'type'],
-        where: {
-          type: {
-            [Op.eq]: 20,
-          },
-        },
+  const studyRightElements = await SISStudyRightElement.findAll({
+    attributes: ['code', 'name', 'startDate', 'studyRightId'],
+    where: {
+      studyRightId: {
+        [Op.in]: studyRightIds,
       },
-    ],
-    where: { studyrightid: { [Op.in]: studyrightIds } },
+    },
   })
 
-  return studyrightElements.reduce((obj, cur) => {
-    if (!obj[cur.studentnumber]) obj[cur.studentnumber] = []
-    cur.studyright = studyrightMap[cur.studyrightid]
-    obj[cur.studentnumber].push(cur)
+  return studyRightElements.reduce((obj, cur) => {
+    const studyRight = studyRightMap[cur.studyRightId]
+    const { studentNumber } = studyRight
+    if (!obj[studentNumber]) obj[studentNumber] = []
+    obj[studentNumber].push({ ...cur.toJSON(), studyRight })
     return obj
   }, {})
 }
