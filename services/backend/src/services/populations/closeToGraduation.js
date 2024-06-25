@@ -9,7 +9,7 @@ const {
   SISStudyRight,
   SISStudyRightElement,
 } = require('../../models')
-const { mapToProviders } = require('../../util')
+const { mapToProviders } = require('../../util/map')
 const { redisClient } = require('../redis')
 const { getCurriculumVersion } = require('./shared')
 

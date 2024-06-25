@@ -17,4 +17,4 @@ const getSortRank = code => {
   return 3 // if no hit, put before open uni courses
 }
 
-module.exports = getSortRank
+module.exports = { getSortRank }

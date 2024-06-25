@@ -10,8 +10,9 @@ const { populationStudentsMerger, populationCourseStatsMerger } = require('../se
 const { findByTag, findByCourseAndSemesters } = require('../services/students')
 const { mapCodesToIds } = require('../services/studyprogramme/studyprogrammeHelpers')
 const { getAssociations, getFilteredAssociations } = require('../services/studyrights')
-const { getFullStudyProgrammeRights, hasFullAccessToStudentData, mapToProviders } = require('../util')
+const { getFullStudyProgrammeRights, hasFullAccessToStudentData } = require('../util')
 const { ApplicationError } = require('../util/customErrors')
+const { mapToProviders } = require('../util/map')
 
 const filterPersonalTags = (population, userId) => {
   return {

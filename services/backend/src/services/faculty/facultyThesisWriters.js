@@ -1,6 +1,6 @@
 const { indexOf } = require('lodash')
 
-const { mapToProviders } = require('../../util')
+const { mapToProviders } = require('../../util/map')
 const {
   alltimeEndDate,
   alltimeStartDate,
