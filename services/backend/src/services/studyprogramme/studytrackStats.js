@@ -14,7 +14,6 @@ const {
   tableTitles,
 } = require('./studyprogrammeHelpers')
 const {
-  allStudyrights,
   graduatedStudyRights,
   graduatedStudyRightsByStartDate,
   inactiveStudyrights,
@@ -224,7 +223,7 @@ const getStudytrackDataForTheYear = async ({
       let graduatedByStartSecondProg = []
       // Get all the studyrights and students for the calculations
       if (year !== 'Total') {
-        all = await allStudyrights(track, studentnumbers)
+        all = studentnumbers
         ;({ data: studentData, creditCounts: creditCountData } = getStudentData(startDate, students))
         otherCountriesCount[track][year] = studentData.otherCountriesCounts
         started = await startedStudyrights(track, startDate, startedStudentnumbers)
