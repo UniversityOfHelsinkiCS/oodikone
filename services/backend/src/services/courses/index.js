@@ -3,8 +3,8 @@ const { Op } = require('sequelize')
 
 const { Course, Credit, Enrollment, Organization } = require('../../models')
 const { getSortRank } = require('../../util/sortRank')
-const { CourseYearlyStatsCounter } = require('./course_yearly_stats_counter')
 const { byCodes, byNameAndOrCodeLike } = require('./courseFinders')
+const { CourseYearlyStatsCounter } = require('./courseYearlyStatsCounter')
 const {
   creditsForCourses,
   enrollmentsForCourses,

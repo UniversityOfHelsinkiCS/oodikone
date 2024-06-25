@@ -1,7 +1,7 @@
 const { keyBy } = require('lodash')
 
 const { getPassingSemester } = require('../../util/semester')
-const { CourseStatsCounter } = require('../courses/course_stats_counter')
+const { CourseStatsCounter } = require('../courses/courseStatsCounter')
 const { encrypt } = require('../encrypt')
 const { dateMonthsFromNow, findCourses, findCourseEnrollments, parseCreditInfo, parseQueryParams } = require('./shared')
 const { studentnumbersWithAllStudyrightElements } = require('./studentnumbersWithAllStudyrightElements')
