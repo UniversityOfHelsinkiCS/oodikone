@@ -1,9 +1,4 @@
-const mapObject = (obj, schema) => {
-  return Object.keys(schema).reduce((acc, key) => {
-    acc[key] = obj[schema[key]]
-    return acc
-  }, {})
-}
+const { mapObject } = require('../../util/map')
 
 const mapCourseInfo = course =>
   mapObject(course, {

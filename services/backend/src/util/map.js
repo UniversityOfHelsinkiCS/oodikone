@@ -1,3 +1,14 @@
+const getNestedProperty = (obj, path) => {
+  return path.split('.').reduce((acc, part) => acc && acc[part], obj)
+}
+
+const mapObject = (obj, schema) => {
+  return Object.keys(schema).reduce((acc, key) => {
+    acc[key] = getNestedProperty(obj, schema[key])
+    return acc
+  }, {})
+}
+
 const mapToProviders = programmeCodes => {
   return programmeCodes.map(programmeCode => {
     const isNumber = str => !Number.isNaN(Number(str))
@@ -24,4 +35,7 @@ const mapToProviders = programmeCodes => {
   })
 }
 
-module.exports = { mapToProviders }
+module.exports = {
+  mapObject,
+  mapToProviders,
+}

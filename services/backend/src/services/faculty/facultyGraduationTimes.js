@@ -1,7 +1,7 @@
 const moment = require('moment')
 
 const { codes } = require('../../../config/programmeCodes')
-const { bachelorStudyright, countTimeCategories, getStatutoryAbsences } = require('../graduationHelpers')
+const { countTimeCategories, getBachelorStudyRight, getStatutoryAbsences } = require('../graduationHelpers')
 const { defineYear, getMedian, getYearsArray, getYearsObject } = require('../studyprogramme/studyprogrammeHelpers')
 const { graduatedStudyrights, hasMasterRight, studyrightsByRightStartYear } = require('./faculty')
 const { findRightProgramme, isNewProgramme } = require('./facultyHelpers')
@@ -34,7 +34,7 @@ const getSortedProgIds = progs => {
 }
 
 const findBachelorStartdate = async id => {
-  const studyright = await bachelorStudyright(id)
+  const studyright = await getBachelorStudyRight(id)
   if (studyright) return studyright.startdate
   return null
 }
