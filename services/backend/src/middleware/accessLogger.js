@@ -1,8 +1,8 @@
 const _ = require('lodash')
 const morgan = require('morgan')
 
+const { getFullStudyProgrammeRights } = require('../util')
 const logger = require('../util/logger')
-const { getFullStudyProgrammeRights } = require('../util/utils')
 
 // So this appears to be a hack to get neatly formatted stats like response-time etc. from morgan
 // without actually using morgan what it's used for (LOGGING REQUESTS!).

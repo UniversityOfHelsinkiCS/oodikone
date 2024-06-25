@@ -1,7 +1,7 @@
 const { indexOf, uniqBy } = require('lodash')
 const moment = require('moment')
 
-const { mapToProviders } = require('../../util/utils')
+const { mapToProviders } = require('../../util')
 const { countTimeCategories, bachelorStudyright, getStatutoryAbsences } = require('../graduationHelpers')
 const { getAllProgrammes } = require('../studyrights')
 const { getThesisCredits } = require('./creditGetters')

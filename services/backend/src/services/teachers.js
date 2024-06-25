@@ -3,8 +3,8 @@ const { Op } = require('sequelize')
 const {
   dbConnections: { sequelize },
 } = require('../database/connection')
-const { Teacher, Credit, Course, Semester } = require('../models')
-const { splitByEmptySpace } = require('../util/utils')
+const { Credit, Course, Semester, Teacher } = require('../models')
+const { splitByEmptySpace } = require('../util')
 
 const likefy = term => `%${term}%`
 

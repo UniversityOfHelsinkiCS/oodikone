@@ -2,7 +2,7 @@ const _ = require('lodash')
 const { Op } = require('sequelize')
 
 const { Credit, Enrollment } = require('../../models')
-const { mapToProviders } = require('../../util/utils')
+const { mapToProviders } = require('../../util')
 const { createArrayOfCourses } = require('../languageCenterData')
 const {
   getOtherStudentsForProgrammeCourses,

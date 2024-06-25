@@ -11,7 +11,7 @@ const {
   findTagsFromStudytrackById,
   deleteMultipleStudentTags,
 } = require('../services/tags')
-const { getFullStudyProgrammeRights, hasFullAccessToStudentData } = require('../util/utils')
+const { getFullStudyProgrammeRights, hasFullAccessToStudentData } = require('../util')
 
 const filterRelevantTags = (tags, userId) => {
   return tags.filter(tag => !tag.personal_user_id || tag.personal_user_id === userId)

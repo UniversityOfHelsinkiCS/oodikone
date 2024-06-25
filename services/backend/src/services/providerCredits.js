@@ -1,4 +1,4 @@
-const { mapToProviders } = require('../util/utils')
+const { mapToProviders } = require('../util')
 const { getCreditStats, setCreditStats } = require('./analyticsService')
 const { getCourseCodesOfProvider } = require('./providers')
 const { allTransfers } = require('./studyprogramme')

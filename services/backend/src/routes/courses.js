@@ -2,8 +2,7 @@ const crypto = require('crypto')
 const router = require('express').Router()
 
 const { byNameAndOrCodeLike, byCodes, courseYearlyStats } = require('../services/courses')
-const { validateParamLength } = require('../util')
-const { getFullStudyProgrammeRights, hasFullAccessToStudentData } = require('../util/utils')
+const { getFullStudyProgrammeRights, hasFullAccessToStudentData, validateParamLength } = require('../util')
 
 router.get('/v2/coursesmulti', async (req, res) => {
   let results = { courses: [] }

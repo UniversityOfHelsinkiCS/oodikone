@@ -2,7 +2,7 @@ const crypto = require('crypto')
 const { Op } = require('sequelize')
 
 const { Course, Credit, Enrollment, Organization } = require('../../models')
-const { sortMainCode } = require('../../util/utils')
+const { getSortRank } = require('../../util/sortRank')
 const { CourseYearlyStatsCounter } = require('./course_yearly_stats_counter')
 const { byCodes, byNameAndOrCodeLike } = require('./courseFinders')
 const {
@@ -10,6 +10,13 @@ const {
   enrollmentsForCourses,
   getStudentNumberToSrElementsMap,
 } = require('./creditsAndEnrollmentsOfCourse')
+
+const sortMainCode = codes => {
+  if (!codes) {
+    return []
+  }
+  return codes.sort((x, y) => getSortRank(y) - getSortRank(x))
+}
 
 const formatStudyrightElement = ({ code, name, startDate, studyRight }) => ({
   code,

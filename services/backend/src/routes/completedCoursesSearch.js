@@ -8,9 +8,9 @@ const {
   deleteSearch,
   updateSearch,
 } = require('../services/openUni/openUniManageSearches')
+const { hasFullAccessToStudentData } = require('../util')
 const { getImporterClient } = require('../util/importerClient')
 const logger = require('../util/logger')
-const { hasFullAccessToStudentData } = require('../util/utils')
 
 const importerClient = getImporterClient()
 
