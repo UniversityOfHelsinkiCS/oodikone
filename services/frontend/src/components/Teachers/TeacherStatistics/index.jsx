@@ -142,6 +142,7 @@ export const TeacherStatistics = () => {
           <TeacherStatisticsTable statistics={teacherStats} variant="leaderboard" />
         </Segment>
       )}
+      {!isLoading && !isFetching && teacherData && teacherStats.length === 0 && <Message content="No teachers found" />}
     </div>
   )
 }

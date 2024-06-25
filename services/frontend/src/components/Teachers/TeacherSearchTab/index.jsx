@@ -1,7 +1,7 @@
 import { debounce } from 'lodash'
 import { useState, useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import { Message, Icon, Search, Segment, Item } from 'semantic-ui-react'
+import { Message, Icon, Item, Search, Segment } from 'semantic-ui-react'
 
 import { splitByEmptySpace, validateInputLength } from '@/common'
 import { SortableTable } from '@/components/SortableTable'
