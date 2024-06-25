@@ -1,13 +1,5 @@
-const getNestedProperty = (obj, path) => {
-  return path.split('.').reduce((acc, part) => acc && acc[part], obj)
-}
-
-const mapObject = (obj, schema) => {
-  return Object.keys(schema).reduce((acc, key) => {
-    acc[key] = getNestedProperty(obj, schema[key])
-    return acc
-  }, {})
-}
+// Identical logic can be found in the backend (src/util/map.js)
+// If the logic changes, remember to update the backend as well
 
 const handleUnderscoreProgrammeCode = programmeCode => {
   const [left, right] = programmeCode.split('_')
@@ -28,7 +20,7 @@ const handleDoctoralProgrammeCode = programmeCode => {
   return `${courseProvider}`
 }
 
-const mapToProviders = programmeCodes => {
+export const mapToProviders = programmeCodes => {
   return programmeCodes.map(programmeCode => {
     if (programmeCode.includes('_')) {
       return handleUnderscoreProgrammeCode(programmeCode)
@@ -38,9 +30,4 @@ const mapToProviders = programmeCodes => {
     }
     return programmeCode
   })
-}
-
-module.exports = {
-  mapObject,
-  mapToProviders,
 }
