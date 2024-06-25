@@ -37,7 +37,7 @@ const byStudentNumber = async studentNumber => {
       include: [
         {
           model: Credit,
-          attributes: ['grade', 'credits', 'credittypecode', 'is_open', 'attainment_date', 'isStudyModule'],
+          attributes: ['id', 'grade', 'credits', 'credittypecode', 'is_open', 'attainment_date', 'isStudyModule'],
           separate: true,
           include: {
             model: Course,
@@ -209,13 +209,13 @@ const formatStudent = ({
   tags,
   sis_person_id,
 }) => {
-  const toCourse = ({ grade, credits, credittypecode, is_open, attainment_date, course, isStudyModule }) => {
-    course = course.toJSON()
+  const toCourse = ({ id, grade, credits, credittypecode, is_open, attainment_date, course, isStudyModule }) => {
+    if (course) course = course.toJSON()
 
     return {
       course: {
-        code: course.code,
-        name: course.name,
+        code: course ? course.code : id,
+        name: course ? course.name : `credit-${id}-no-course-attached`,
       },
       date: attainment_date,
       passed: Credit.passed({ credittypecode }) || Credit.improved({ credittypecode }),
