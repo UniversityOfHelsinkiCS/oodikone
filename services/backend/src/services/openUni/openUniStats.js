@@ -6,38 +6,76 @@ const uniq = objects => [...new Set(objects)]
 
 const calculateTotalsForStudent = async (studentStats, studentNumber) => {
   Object.keys(studentStats[studentNumber].courseInfo).forEach(course => {
-    if (studentStats[studentNumber].courseInfo[course].status.passed) {
+    const { status } = studentStats[studentNumber].courseInfo[course]
+    if (status.passed) {
       studentStats[studentNumber].totals.passed += 1
-    } else if (studentStats[studentNumber].courseInfo[course].status.failed) {
+    } else if (status.failed) {
       studentStats[studentNumber].totals.failed += 1
-    } else if (studentStats[studentNumber].courseInfo[course].status.unfinished) {
+    } else if (status.unfinished) {
       studentStats[studentNumber].totals.unfinished += 1
     }
   })
 }
 
-const getCustomOpenUniCourses = async (courseCodes, startDate, endDate) => {
+const getAllCourseCodes = courseCodes => {
   const ayCourseCodes = courseCodes.map(courseCode => `AY${courseCode}`)
-  const allCourseCodes = courseCodes.concat(ayCourseCodes)
+  return courseCodes.concat(ayCourseCodes)
+}
+
+const isStartDateOutsideInterval = (studyRight, startDate) => {
+  return moment(studyRight.startDate).isBetween(startDate, moment())
+}
+
+const isStartDateInsideAndEndDateOutside = (studyRight, startDate) => {
+  return moment(studyRight.startDate).isSameOrBefore(startDate) && moment(studyRight.endDate).isSameOrAfter(moment())
+}
+
+const isEndDateBeforeNow = studyRight => moment(studyRight.endDate).isSameOrBefore(moment())
+
+const getEmptyCourseInfo = () => ({
+  status: {
+    passed: null,
+    failed: null,
+    unfinished: null,
+  },
+})
+
+const updatePassedStatus = (courseInfo, attainmentDate) => {
+  if (!courseInfo.status.passed || moment(courseInfo.status.passed).isBefore(attainmentDate, 'day')) {
+    courseInfo.status.passed = attainmentDate
+  }
+}
+
+const updateFailedStatus = (courseInfo, attainmentDate) => {
+  if (
+    !courseInfo.status.passed &&
+    (!courseInfo.status.failed || moment(courseInfo.status.failed).isBefore(attainmentDate, 'day'))
+  ) {
+    courseInfo.status.failed = attainmentDate
+  }
+}
+
+const updateUnfinishedStatus = (courseInfo, enrollmentDateTime) => {
+  if (
+    !courseInfo.status.passed &&
+    !courseInfo.status.failed &&
+    (!courseInfo.status.unfinished || moment(courseInfo.status.unfinished).isBefore(enrollmentDateTime, 'day'))
+  ) {
+    courseInfo.status.unfinished = enrollmentDateTime
+  }
+}
+
+const getCustomOpenUniCourses = async (courseCodes, startDate, endDate) => {
+  const allCourseCodes = getAllCourseCodes(courseCodes)
   const allCredits = await getCredits(allCourseCodes, startDate)
   const allEnrollments = await getEnrollments(allCourseCodes, startDate, endDate)
-  const students = uniq(allEnrollments.map(enrollment => enrollment.enrollmentStudentNumber))
   const courses = await getCourseNames(courseCodes)
-  const passedGrades = ['1', '2', '3', '4', '5', 'Hyv.', 'hyv.', 'HT', 'TT']
-  const failedGrades = ['Hyl.', 'HYL', '0']
-
+  const students = uniq(allEnrollments.map(enrollment => enrollment.enrollmentStudentNumber))
   const allStudyRights = await getStudyRights(students)
   const studentInfo = await getStudentInfo(students)
 
-  const isStartDateOutsideInterval = (studyRight, startDate) => {
-    return moment(studyRight.startDate).isBetween(startDate, moment())
-  }
-
-  const isStartDateInsideAndEndDateOutside = (studyRight, startDate) => {
-    return moment(studyRight.startDate).isSameOrBefore(startDate) && moment(studyRight.endDate).isSameOrAfter(moment())
-  }
-
-  const isEndDateBeforeNow = studyRight => moment(studyRight.endDate).isSameOrBefore(moment())
+  const passedGrades = ['1', '2', '3', '4', '5', 'Hyv.', 'hyv.', 'HT', 'TT']
+  const failedGrades = ['Hyl.', 'HYL', '0']
 
   const studentsWithCurrentStudyRight = allStudyRights
     .filter(
@@ -51,15 +89,6 @@ const getCustomOpenUniCourses = async (courseCodes, startDate, endDate) => {
   const uniqueStudentsWithCurrentStudyRight = uniq(studentsWithCurrentStudyRight)
 
   const studentStats = {}
-  const getEmptyCourseInfo = () => {
-    return {
-      status: {
-        passed: null,
-        failed: null,
-        unfinished: null,
-      },
-    }
-  }
 
   for (const { studentNumber, email, secondaryEmail } of studentInfo) {
     if (uniqueStudentsWithCurrentStudyRight.includes(studentNumber)) {
@@ -73,39 +102,21 @@ const getCustomOpenUniCourses = async (courseCodes, startDate, endDate) => {
         totals: { passed: 0, failed: 0, unfinished: 0 },
       }
     }
+    const studentCourses = studentStats[studentNumber].courseInfo
     for (const { attainmentCourseCode, attainmentDate, attainmentStudentNumber, attainmentGrade } of allCredits) {
       if (attainmentStudentNumber === studentNumber) {
         const courseCode = attainmentCourseCode.replace('AY', '')
-        if (
-          passedGrades.includes(attainmentGrade) &&
-          (!studentStats[studentNumber].courseInfo[courseCode].status.passed ||
-            moment(studentStats[studentNumber].courseInfo[courseCode].status.passed).isBefore(attainmentDate, 'day'))
-        ) {
-          studentStats[studentNumber].courseInfo[courseCode].status.passed = attainmentDate
-        } else if (
-          failedGrades.includes(attainmentGrade) &&
-          !studentStats[studentNumber].courseInfo[courseCode].status.passed &&
-          (!studentStats[studentNumber].courseInfo[courseCode].status.failed ||
-            moment(studentStats[studentNumber].courseInfo[courseCode].status.failed).isBefore(attainmentDate, 'day'))
-        ) {
-          studentStats[studentNumber].courseInfo[courseCode].status.failed = attainmentDate
+        if (passedGrades.includes(attainmentGrade)) {
+          updatePassedStatus(studentCourses[courseCode], attainmentDate)
+        } else if (failedGrades.includes(attainmentGrade)) {
+          updateFailedStatus(studentCourses[courseCode], attainmentDate)
         }
       }
     }
     for (const { enrollmentStudentNumber, enrollmentCourseCode, enrollmentDateTime } of allEnrollments) {
       if (enrollmentStudentNumber === studentNumber) {
         const courseCode = enrollmentCourseCode.replace('AY', '')
-        if (
-          !studentStats[studentNumber].courseInfo[courseCode].status.passed &&
-          !studentStats[studentNumber].courseInfo[courseCode].status.failed &&
-          (!studentStats[studentNumber].courseInfo[courseCode].status.unfinished ||
-            moment(studentStats[studentNumber].courseInfo[courseCode].status.unfinished).isBefore(
-              enrollmentDateTime,
-              'day'
-            ))
-        ) {
-          studentStats[studentNumber].courseInfo[courseCode].status.unfinished = enrollmentDateTime
-        }
+        updateUnfinishedStatus(studentCourses[courseCode], enrollmentDateTime)
       }
     }
     await calculateTotalsForStudent(studentStats, studentNumber)
