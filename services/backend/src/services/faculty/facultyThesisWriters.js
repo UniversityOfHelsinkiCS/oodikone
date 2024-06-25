@@ -12,7 +12,14 @@ const {
 const { thesisWriters } = require('./faculty')
 
 const getFacultyThesisWriters = async ({ since, years, isAcademicYear, facultyProgrammes, includeAllSpecials }) => {
-  const thesisTypes = ['urn:code:course-unit-type:bachelors-thesis', 'urn:code:course-unit-type:masters-thesis']
+  const thesisTypes = [
+    'urn:code:course-unit-type:bachelors-thesis',
+    'urn:code:course-unit-type:amk-bachelors-thesis',
+    'urn:code:course-unit-type:masters-thesis',
+    'urn:code:course-unit-type:amk-masters-thesis',
+    'urn:code:course-unit-type:licentiate-thesis',
+    'urn:code:course-unit-type:doctors-thesis',
+  ]
 
   const bachelors = getStatsBasis(years)
   const masters = getStatsBasis(years)
@@ -44,11 +51,11 @@ const getFacultyThesisWriters = async ({ since, years, isAcademicYear, facultyPr
       }
       programmeCounts[progId][thesisYear][0] += 1
 
-      if (courseUnitType === thesisTypes[0]) {
+      if (courseUnitType.endsWith('bachelors-thesis')) {
         bachelors.graphStats[indexOf(years, thesisYear)] += 1
         bachelors.tableStats[thesisYear] += 1
         programmeCounts[progId][thesisYear][1] += 1
-      } else if (courseUnitType === thesisTypes[1]) {
+      } else if (courseUnitType.endsWith('masters-thesis')) {
         masters.graphStats[indexOf(years, thesisYear)] += 1
         masters.tableStats[thesisYear] += 1
         programmeCounts[progId][thesisYear][2] += 1
