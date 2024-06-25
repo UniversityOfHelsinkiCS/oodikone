@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { defaults } from 'lodash'
 import { useRef, useState } from 'react'
 import { Icon, Popup } from 'semantic-ui-react'
 
@@ -21,7 +21,7 @@ export const InfoWithHelpTooltip = ({ children, tooltip, containerStyle = {}, ..
     </div>
   )
 
-  const popupProps = _.defaults(rest, {
+  const popupProps = defaults(rest, {
     position: 'right center',
   })
 

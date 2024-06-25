@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { range } from 'lodash'
 import { useState } from 'react'
 import { Divider, Dropdown, Form, Icon, Loader, Message, Radio, Tab } from 'semantic-ui-react'
 
@@ -31,7 +31,7 @@ const getColumns = (
 ) => {
   const { getSemesterEnrollmentsContent, getSemesterEnrollmentsVal } = semesterEnrollmentFunctions
   const currentSemesterCode = getCurrentSemester(allSemestersMap)?.semestercode
-  const semestersToInclude = _.range(
+  const semestersToInclude = range(
     isFall(currentSemesterCode)
       ? currentSemesterCode - NUMBER_OF_DISPLAYED_SEMESTERS + 2
       : currentSemesterCode - NUMBER_OF_DISPLAYED_SEMESTERS + 1,

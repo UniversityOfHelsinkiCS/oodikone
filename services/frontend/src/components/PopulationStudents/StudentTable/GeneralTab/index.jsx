@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { chain } from 'lodash'
 import { useSelector } from 'react-redux'
 import { Tab } from 'semantic-ui-react'
 
@@ -126,7 +126,7 @@ export const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) =
   const nameColumnsToAdd = namesVisible ? ['email', 'lastname', 'firstname'] : []
   const adminColumnsToFilter = isAdmin ? [] : ['priority', 'extent', 'updatedAt']
 
-  const columnKeysToInclude = _.chain(baseColumns)
+  const columnKeysToInclude = chain(baseColumns)
     .union(columnsByVariant[variant])
     .union(nameColumnsToAdd)
     .difference(adminColumnsToFilter)

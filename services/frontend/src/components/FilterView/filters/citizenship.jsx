@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { orderBy } from 'lodash'
 import { Form, Dropdown } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -26,7 +26,7 @@ const CitizenshipFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
     return citizenships
   }, [])
 
-  const sortedDropdownOptions = _.orderBy(dropdownOptions, ['count', 'text'], ['desc', 'asc'])
+  const sortedDropdownOptions = orderBy(dropdownOptions, ['count', 'text'], ['desc', 'asc'])
 
   return (
     <div className="card-content">

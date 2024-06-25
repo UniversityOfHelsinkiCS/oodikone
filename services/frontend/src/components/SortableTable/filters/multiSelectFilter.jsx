@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { flattenDeep, uniq } from 'lodash'
 import { useMemo, useState } from 'react'
 import { Checkbox, Dropdown, Input } from 'semantic-ui-react'
 import { useContextSelector } from 'use-context-selector'
@@ -7,7 +7,7 @@ import { SortableTableContext, getColumnValue } from '@/components/SortableTable
 
 const MultiSelectFilterComponent = ({ column, options, dispatch }) => {
   const columnValues = useContextSelector(SortableTableContext, context => context.values[column.key]) ?? []
-  const uniqueColumnValues = _.uniq(_.flattenDeep(columnValues))
+  const uniqueColumnValues = uniq(flattenDeep(columnValues))
 
   const [searchTerm, setSearchTerm] = useState('')
   const { selectedFilters } = options
@@ -16,7 +16,7 @@ const MultiSelectFilterComponent = ({ column, options, dispatch }) => {
     if (uniqueColumnValues.length === 0) {
       return []
     }
-    const filteredValues = _.uniq(uniqueColumnValues)
+    const filteredValues = uniq(uniqueColumnValues)
       .filter(value => value.toLowerCase().includes(searchTerm.toLowerCase()))
       .sort()
       .map(value => (

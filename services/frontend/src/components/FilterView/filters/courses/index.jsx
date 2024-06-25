@@ -1,5 +1,5 @@
 import { produce } from 'immer'
-import _ from 'lodash'
+import { keyBy } from 'lodash'
 import { Dropdown } from 'semantic-ui-react'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { createFilter } from '../createFilter'
@@ -85,7 +85,7 @@ export const courseFilter = createFilter({
     courseFilters: {},
   },
 
-  precompute: ({ args }) => _.keyBy(args.courses, 'course.code'),
+  precompute: ({ args }) => keyBy(args.courses, 'course.code'),
 
   isActive: ({ courseFilters }) => Object.entries(courseFilters).length > 0,
 

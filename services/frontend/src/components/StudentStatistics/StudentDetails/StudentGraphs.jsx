@@ -1,7 +1,7 @@
 import accessibility from 'highcharts/modules/accessibility'
 import exportData from 'highcharts/modules/export-data'
 import exporting from 'highcharts/modules/exporting'
-import _ from 'lodash'
+import { chunk, flattenDeep, groupBy } from 'lodash'
 import { useMemo, useState } from 'react'
 import ReactHighcharts from 'react-highcharts/ReactHighstock'
 import { Input, Menu, Message, Tab } from 'semantic-ui-react'
@@ -32,7 +32,7 @@ const resolveGraphStartDate = (student, graphYearStart, selectedStudyPlan, study
   const filteredCourses = getCoursesIncludedInStudyPlan(student, selectedStudyPlan)
 
   return Math.min(
-    ..._.flattenDeep(filteredCourses.map(({ date }) => new Date(date).getTime())),
+    ...flattenDeep(filteredCourses.map(({ date }) => new Date(date).getTime())),
     new Date(studyRightTargetStart).getTime()
   )
 }
@@ -43,7 +43,7 @@ const resolveGraphEndDate = (dates, selectedStudyPlan, student, studyRightTarget
 
   const comparedValues = [
     new Date(studyRightTargetEnd).getTime(),
-    ..._.flattenDeep(filteredCourses.map(({ date }) => new Date(date).getTime())),
+    ...flattenDeep(filteredCourses.map(({ date }) => new Date(date).getTime())),
   ]
   if (selectedStudyRightElement?.graduated) {
     const graduationDate = new Date(selectedStudyRightElement.endDate)
@@ -125,7 +125,7 @@ const gradeMeanSeries = (student, chunksize, semesters, getTextIn) => {
     course => !Number.isNaN(Number(course.grade)) && !course.isStudyModuleCredit && course.passed
   )
 
-  const coursesGroupedByDate = _.groupBy(filteredCourses, 'date')
+  const coursesGroupedByDate = groupBy(filteredCourses, 'date')
 
   const gradesAndMeans = Object.values(coursesGroupedByDate).reduce(
     (acc, courses) => {
@@ -147,7 +147,7 @@ const gradeMeanSeries = (student, chunksize, semesters, getTextIn) => {
   )
 
   const size = Number(chunksize) ? chunksize : 3
-  const chunks = _.chunk(gradesAndMeans.grades, size)
+  const chunks = chunk(gradesAndMeans.grades, size)
 
   const groupMeans = chunks.reduce((acc, curr) => {
     const gradeSum = curr.reduce((a, b) => a + b.grade * b.credits, 0)

@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { chain, range } from 'lodash'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Item, Icon, Button } from 'semantic-ui-react'
@@ -117,7 +117,7 @@ export const PassingSemesters = ({ onlyIamRights }) => {
               (cumulativeStats ? row.stats?.passingSemesters : row.stats?.passingSemestersCumulative)?.BEFORE,
             cellProps: { style: { textAlign: 'right' } },
           },
-          ..._.range(0, 6).map(i => yearColumn(i, cumulativeStats)),
+          ...range(0, 6).map(i => yearColumn(i, cumulativeStats)),
         ],
       },
     ]
@@ -129,7 +129,7 @@ export const PassingSemesters = ({ onlyIamRights }) => {
 
   const data = useMemo(
     () =>
-      _.chain(modules)
+      chain(modules)
         .map(({ module, courses }) =>
           group(
             {

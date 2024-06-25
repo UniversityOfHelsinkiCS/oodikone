@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { flatten, fromPairs, isArray, map, mapValues, sampleSize, uniq } from 'lodash'
 
 import { getColumnValue, getRowOptions } from '@/components/SortableTable/common'
 import { DataVisitor } from './DataVisitor'
@@ -9,7 +9,7 @@ export class ValueVisitor extends DataVisitor {
     this.columns = columns
     this.exportMode = options?.exportMode
     this.honourIgnoreFilters = options?.honourIgnoreFilters
-    this.values = _.fromPairs(_.map(columns, column => [column.key, new Set()]))
+    this.values = fromPairs(map(columns, column => [column.key, new Set()]))
   }
 
   visitRow(ctx) {
@@ -24,14 +24,14 @@ export class ValueVisitor extends DataVisitor {
   }
 
   sample(n) {
-    return _.mapValues(this.values, v => {
+    return mapValues(this.values, v => {
       let array = [...v.values()]
 
-      if (array.some(child => _.isArray(child))) {
-        array = _.uniq(_.flatten(array))
+      if (array.some(child => isArray(child))) {
+        array = uniq(flatten(array))
       }
 
-      return _.sampleSize(array, n)
+      return sampleSize(array, n)
     })
   }
 }

@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { isEqual } from 'lodash'
 import { useState, useRef } from 'react'
 import { Icon, Header } from 'semantic-ui-react'
 
@@ -13,7 +13,7 @@ const useChange = value => {
     return true
   }
 
-  const change = !_.isEqual(value, prevValue.current)
+  const change = !isEqual(value, prevValue.current)
 
   prevValue.current = value
 

@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { isEqual } from 'lodash'
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button, Label, Loader, Popup, Segment } from 'semantic-ui-react'
@@ -26,8 +26,10 @@ export const UserSearchList = ({ users, isLoading, isError }) => {
 
   const handleDisplayedDataChange = useCallback(
     users => {
-      const newEmails = users.filter(u => u.email).map(u => u.email)
-      if (!_.isEqual(newEmails, userEmails)) setUserEmails(newEmails)
+      const newEmails = users.filter(user => user.email).map(user => user.email)
+      if (!isEqual(newEmails, userEmails)) {
+        setUserEmails(newEmails)
+      }
     },
     [userEmails]
   )

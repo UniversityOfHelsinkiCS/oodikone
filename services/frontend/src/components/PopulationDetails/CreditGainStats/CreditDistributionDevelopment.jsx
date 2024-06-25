@@ -1,7 +1,7 @@
 import accessibility from 'highcharts/modules/accessibility'
 import exportData from 'highcharts/modules/export-data'
 import exporting from 'highcharts/modules/exporting'
-import _ from 'lodash'
+import { chain, range, sortBy } from 'lodash'
 import moment from 'moment'
 import qs from 'query-string'
 import { useState } from 'react'
@@ -32,7 +32,7 @@ const splitStudentCredits = (student, timeSlots, cumulative) => {
 
   const results = new Array(timeSlots.length).fill(0)
 
-  _.chain(student.courses)
+  chain(student.courses)
     .filter(course => course.passed && !course.isStudyModuleCredit && moment(course.date).isAfter(timeSlots[0].start))
     .orderBy(course => moment(course.date), ['asc'])
     .forEach(course => {
@@ -149,7 +149,7 @@ export const CreditDistributionDevelopment = ({ students, programme, combinedPro
 
     if (timeDivision === TimeDivision.CALENDAR_YEAR) {
       const startYear = months === undefined ? year : moment().year() - Math.ceil(months / 12)
-      return _.range(startYear, moment().year() + 1).map(year => ({
+      return range(startYear, moment().year() + 1).map(year => ({
         start: moment({ year }),
         end: moment({ year }).endOf('year'),
         label: year,
@@ -157,11 +157,11 @@ export const CreditDistributionDevelopment = ({ students, programme, combinedPro
     }
 
     if (timeDivision === TimeDivision.ACADEMIC_YEAR) {
-      return _.chain(semesters)
+      return chain(semesters)
         .groupBy('yearcode')
         .values()
         .map(([a, b]) => {
-          const s = _.sortBy([moment(a.startdate), moment(a.enddate), moment(b.startdate), moment(b.enddate)])
+          const s = sortBy([moment(a.startdate), moment(a.enddate), moment(b.startdate), moment(b.enddate)])
           return [s[0], s[s.length - 1]]
         })
         .filter(([a, b]) => startDate.isBefore(b) && moment().isAfter(a))

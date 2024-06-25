@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import exportData from 'highcharts/modules/export-data'
 import exporting from 'highcharts/modules/exporting'
-import _ from 'lodash'
+import { chain, flatten, flow } from 'lodash'
 import moment from 'moment'
 import { useRef, useState } from 'react'
 import { renderToString } from 'react-dom/server'
@@ -364,7 +364,7 @@ const createStudentCreditLines = (
       ? code
       : studyPlanFilterIsActive && programmeCodes?.length > 0 && programmeCodes[0]
 
-    const { points } = _.flow(
+    const { points } = flow(
       () =>
         filterCourses(
           student,
@@ -475,7 +475,7 @@ export const CreditAccumulationGraphHighCharts = ({
       ? selectedStudyRight.studyRightElements
           .filter(element => element.phase === correctStudyRightElement.phase)
           .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))[0].startDate
-      : _.chain(students[0].studyRights || students[0].courses)
+      : chain(students[0].studyRights || students[0].courses)
           .map(element => new Date(element.startDate || element.date))
           .sortBy()
           .head()
@@ -502,7 +502,7 @@ export const CreditAccumulationGraphHighCharts = ({
     if (customStudyStartYear) return new Date(customStudyStartYear).getTime()
     const studyRightStartFromStudent = new Date(students[0]?.studyrightStart ?? new Date(null))
     if (studyRightStartFromStudent.getFullYear() < 2000)
-      return Math.min(..._.flatten(students.map(({ courses }) => courses.map(({ date }) => new Date(date).getTime()))))
+      return Math.min(...flatten(students.map(({ courses }) => courses.map(({ date }) => new Date(date).getTime()))))
     return studyRightStartFromStudent.getTime()
   }
 
@@ -510,7 +510,7 @@ export const CreditAccumulationGraphHighCharts = ({
     if (startDate) return new Date(startDate).getTime()
     if (customPopulation)
       return Math.min(
-        ..._.flatten(
+        ...flatten(
           students.map(({ courses }) => {
             return courses.map(({ date }) => new Date(date).getTime())
           })
@@ -521,7 +521,7 @@ export const CreditAccumulationGraphHighCharts = ({
     if (studyPlanFilterIsActive) {
       // math.min may return a infinite value, if beginning of course credits is selected and student's courses are filtered accordingly.
       const startPoint = Math.min(
-        ..._.flatten(students.map(({ courses }) => courses.map(({ date }) => new Date(date).getTime())))
+        ...flatten(students.map(({ courses }) => courses.map(({ date }) => new Date(date).getTime())))
       )
       return startPoint !== Infinity ? startPoint : studyRightStart
     }

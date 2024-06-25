@@ -1,4 +1,4 @@
-const _ = require('lodash')
+const { orderBy, range } = require('lodash')
 const { Op } = require('sequelize')
 
 const { Credit, Enrollment } = require('../../models')
@@ -146,7 +146,7 @@ const getStudyprogrammeStatsForColorizedCoursesTable = async studyprogramme => {
 
   const unorderedTableData = await createArrayOfCourses(attemptsArray, courses)
 
-  const tableData = _.orderBy(unorderedTableData, 'code')
+  const tableData = orderBy(unorderedTableData, 'code')
 
   return { tableData }
 }
@@ -155,7 +155,7 @@ const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme,
   const startDate =
     academicYear === 'ACADEMIC_YEAR' ? await getCurrentStudyYearStartDate(unixMillis) : getCurrentYearStartDate()
   const startYear = startDate.getFullYear()
-  const yearRange = _.range(2017, startYear + 1)
+  const yearRange = range(2017, startYear + 1)
   const mainProgrammeCourses = await getAllStudyprogrammeCourses(studyprogramme)
   const secondProgrammeCourses = combinedProgramme ? await getAllStudyprogrammeCourses(combinedProgramme) : []
   const programmeCourses = [...mainProgrammeCourses, ...secondProgrammeCourses]

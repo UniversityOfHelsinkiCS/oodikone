@@ -1,4 +1,4 @@
-const _ = require('lodash')
+const { omit } = require('lodash')
 const morgan = require('morgan')
 
 const { getFullStudyProgrammeRights } = require('../util')
@@ -36,7 +36,7 @@ const accessLogger = morgan((tokens, req, res) => {
 
   logger.info(message, {
     // don't log student list which might be huge
-    ..._.omit(meta, ['studentsUserCanAccess']),
+    ...omit(meta, ['studentsUserCanAccess']),
     // pass this as a custom field so we can filter by it in graylog
     isUsageStats: true,
     // needed for Grafana IAM users panel

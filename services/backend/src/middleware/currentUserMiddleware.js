@@ -1,5 +1,5 @@
 const Sentry = require('@sentry/node')
-const _ = require('lodash')
+const { intersection } = require('lodash')
 
 const { requiredGroup, serviceProvider, configLogoutUrl, isDev } = require('../conf-backend')
 const { getUser, getMockedUser, getOrganizationAccess } = require('../services/userService')
@@ -8,8 +8,9 @@ const logger = require('../util/logger')
 
 const parseIamGroups = iamGroups => iamGroups?.split(';') ?? []
 
-const hasRequiredIamGroup = (iamGroups, iamRights) =>
-  _.intersection(iamGroups, requiredGroup).length > 0 || iamRights.length > 0
+const hasRequiredIamGroup = (iamGroups, iamRights) => {
+  return intersection(iamGroups, requiredGroup).length > 0 || iamRights.length > 0
+}
 
 const toskaUserMiddleware = async (req, _res, next) => {
   const {

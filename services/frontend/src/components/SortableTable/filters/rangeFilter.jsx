@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { clamp, isNumber, max, min } from 'lodash'
 import { useMemo } from 'react'
 import { Icon } from 'semantic-ui-react'
 import { useContextSelector } from 'use-context-selector'
@@ -10,16 +10,16 @@ import { SortableTableContext, getColumnValue } from '@/components/SortableTable
 const RangeColumnFilterComponent = ({ column, options, dispatch }) => {
   const values = useContextSelector(SortableTableContext, ctx => ctx.values[column.key]) ?? []
 
-  const min = _.min(values.filter(_.isNumber)) ?? 0
-  const max = _.max(values.filter(_.isNumber)) ?? 0
+  const minValue = min(values.filter(isNumber)) ?? 0
+  const maxValue = max(values.filter(isNumber)) ?? 0
 
   const value = useMemo(() => {
     if (options.range) {
-      return [_.clamp(options.range[0], min, max), _.clamp(options.range[1], min, max)]
+      return [clamp(options.range[0], minValue, maxValue), clamp(options.range[1], minValue, maxValue)]
     }
 
-    return [min, max]
-  }, [options.range, min, max])
+    return [minValue, maxValue]
+  }, [options.range, minValue, maxValue])
 
   const onChange = range =>
     dispatch({
@@ -30,14 +30,14 @@ const RangeColumnFilterComponent = ({ column, options, dispatch }) => {
   const [range, setRange, , dirty] = useDebounce(value, 100, onChange)
 
   const handleChange = ([newMin, newMax]) => {
-    if (newMin === min && newMax === max) {
+    if (newMin === minValue && newMax === maxValue) {
       dispatch({
         type: 'RESET',
       })
     } else {
       setRange([
-        typeof newMin === 'number' && !Number.isNaN(newMin) ? newMin : min,
-        typeof newMax === 'number' && !Number.isNaN(newMax) ? newMax : max,
+        typeof newMin === 'number' && !Number.isNaN(newMin) ? newMin : minValue,
+        typeof newMax === 'number' && !Number.isNaN(newMax) ? newMax : maxValue,
       ])
     }
   }
@@ -55,7 +55,7 @@ const RangeColumnFilterComponent = ({ column, options, dispatch }) => {
         </div>
         {dirty && <Icon loading name="spinner" />}
       </div>
-      <RangeSelector max={max} min={min} onChange={handleChange} value={range} />
+      <RangeSelector max={maxValue} min={minValue} onChange={handleChange} value={range} />
     </div>
   )
 }

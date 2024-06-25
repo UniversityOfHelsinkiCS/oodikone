@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { chain, includes, uniq } from 'lodash'
 import { useMemo, useState } from 'react'
 import { Dropdown, Icon, Input } from 'semantic-ui-react'
 import { useContextSelector } from 'use-context-selector'
@@ -26,7 +26,7 @@ const DefaultColumnFilterComponent = ({ column, options, dispatch }) => {
       return []
     }
     const stringComparator = createLocaleComparator()
-    const t = _.uniq(values)
+    const t = uniq(values)
       .filter(
         value =>
           search === '' ||
@@ -97,10 +97,10 @@ const DefaultColumnFilterComponent = ({ column, options, dispatch }) => {
         onClick={event => event.stopPropagation()}
         onKeyDown={event => {
           if (event.keyCode === 13) {
-            const visibleValues = _.uniq(values).filter(value => search === '' || `${value}`.indexOf(search) > -1)
+            const visibleValues = uniq(values).filter(value => search === '' || `${value}`.indexOf(search) > -1)
 
-            const visibleTypes = _.chain(valueFilters)
-              .filter(f => _.includes(visibleValues, f.value))
+            const visibleTypes = chain(valueFilters)
+              .filter(f => includes(visibleValues, f.value))
               .map('type')
               .uniq()
               .value()
@@ -184,7 +184,7 @@ export const defaultColumnFilter = {
       values = [values]
     }
 
-    return _.chain(options.valueFilters)
+    return chain(options.valueFilters)
       .reduce((acc, { type, value }) => {
         const result = values.reduce((acc2, columnValue) => {
           if (acc2 !== null) {

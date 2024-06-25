@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { mapValues } from 'lodash'
 import { useCallback, useEffect, useMemo, useReducer, useState } from 'react'
 import { Icon } from 'semantic-ui-react'
 
@@ -150,7 +150,7 @@ export const SortableTable = ({
 
   const values = useMemo(
     () =>
-      _.mapValues(ValueVisitor.visit(data, Object.values(columnsByKey), { honourIgnoreFilters: true }).values, set => [
+      mapValues(ValueVisitor.visit(data, Object.values(columnsByKey), { honourIgnoreFilters: true }).values, set => [
         ...set,
       ]),
     [data, columnsByKey]

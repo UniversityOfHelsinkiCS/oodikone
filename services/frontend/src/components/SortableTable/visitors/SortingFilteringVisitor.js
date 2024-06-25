@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { chain } from 'lodash'
 
 import { getColumnValue, getRowOptions } from '@/components/SortableTable/common'
 import { DataVisitor } from './DataVisitor'
@@ -60,7 +60,7 @@ export class SortingFilteringVisitor extends DataVisitor {
   visitRow(ctx) {
     if (getRowOptions(ctx.item).ignoreFilters) return ctx.item
 
-    const passes = _.chain(this.state.columnOptions)
+    const passes = chain(this.state.columnOptions)
       .toPairs()
       .filter(([, options]) => options.filterOptions !== undefined)
       .map(([column, { filterOptions }]) => {
