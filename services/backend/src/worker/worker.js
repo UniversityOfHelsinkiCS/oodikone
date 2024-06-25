@@ -22,9 +22,9 @@ worker.on('completed', job => {
 })
 
 // If there is no error event listener, the worker stops taking jobs after any error.
-worker.on('error', err => {
+worker.on('error', error => {
   logger.error('Job returned error:')
-  logger.error(err.toString())
+  logger.error(error.toString())
 })
 
 worker.on('failed', job => {
