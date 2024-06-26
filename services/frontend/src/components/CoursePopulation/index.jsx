@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { chain } from 'lodash'
 import moment from 'moment'
 import qs from 'query-string'
 import { useEffect, useMemo, useState } from 'react'
@@ -184,7 +184,7 @@ export const CoursePopulation = () => {
   ]
 
   const studyRightPredicate = (student, studyrightElement) => {
-    const date = _.chain(student)
+    const date = chain(student)
       .get('courses')
       .filter(course => codes.includes(course.course_code))
       .map('date')

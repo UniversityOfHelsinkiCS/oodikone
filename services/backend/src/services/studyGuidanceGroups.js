@@ -1,4 +1,4 @@
-const _ = require('lodash')
+const { uniqBy } = require('lodash')
 
 const { StudyGuidanceGroupTag } = require('../models/models_kone')
 const { getImporterClient } = require('../util/importerClient')
@@ -33,7 +33,7 @@ const getAllGroupsAndStudents = async sisPersonId => {
 }
 
 const getAllStudentsUserHasInGroups = async sisPersonId =>
-  _.uniqBy(
+  uniqBy(
     (await getGroupsFromImporter(sisPersonId))
       .map(group => group.members)
       .flat()

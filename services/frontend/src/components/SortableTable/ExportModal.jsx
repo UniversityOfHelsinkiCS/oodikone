@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { map, includes, uniq } from 'lodash'
 import { useEffect, useMemo, useState } from 'react'
 import { Button, Checkbox, Modal, Table } from 'semantic-ui-react'
 import { utils, writeFile } from 'xlsx'
@@ -53,10 +53,10 @@ const flattenData = data => {
 export const ExportModal = ({ open, onOpen, onClose, data, columns, featureName }) => {
   const exportColumns = useMemo(() => getExportColumns(columns), [columns])
   const flatData = useMemo(() => flattenData(data), [data])
-  const [selected, setSelected] = useState(_.uniq(_.map(exportColumns, 'key')))
+  const [selected, setSelected] = useState(uniq(map(exportColumns, 'key')))
 
   useEffect(() => {
-    setSelected(_.uniq(_.map(exportColumns, 'key')))
+    setSelected(uniq(map(exportColumns, 'key')))
   }, [exportColumns])
 
   const sampledValues = useMemo(
@@ -65,7 +65,7 @@ export const ExportModal = ({ open, onOpen, onClose, data, columns, featureName 
   )
 
   const handleExport = () => {
-    const columns = exportColumns.filter(ec => _.includes(selected, ec.key))
+    const columns = exportColumns.filter(ec => includes(selected, ec.key))
     const { rows } = ExportVisitor.visit(data, columns)
     const sheet = utils.json_to_sheet(rows)
     const book = utils.book_new()
@@ -121,7 +121,7 @@ export const ExportModal = ({ open, onOpen, onClose, data, columns, featureName 
             {exportColumns.map(column => (
               <Table.Row key={column.key} onClick={() => toggleSelection(column.key)} style={{ cursor: 'pointer' }}>
                 <Table.Cell collapsing verticalAlign="middle">
-                  <Checkbox checked={_.includes(selected, column.key)} />
+                  <Checkbox checked={includes(selected, column.key)} />
                 </Table.Cell>
                 <Table.Cell collapsing>{getColumnTitle(column)}</Table.Cell>
                 <Table.Cell style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>

@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { chain, get } from 'lodash'
 import fp from 'lodash/fp'
 import moment from 'moment'
 import { useMemo } from 'react'
@@ -28,7 +28,7 @@ const ProgrammeFilterCard = ({
 
   const visibleProgrammes = fp.flow(
     fp.flatMap(student =>
-      _.get(studentToProgrammeMap, student.studentNumber, []).map(programme => ({ student, programme }))
+      get(studentToProgrammeMap, student.studentNumber, []).map(programme => ({ student, programme }))
     ),
     fp.groupBy('student.studentNumber'),
     fp.pickBy(fp.some(({ programme }) => options.selectedProgrammes.every(pcode => programme.code === pcode))),
@@ -48,7 +48,7 @@ const ProgrammeFilterCard = ({
 
   const dropdownOptions = useMemo(
     () =>
-      _.chain(visibleProgrammes)
+      chain(visibleProgrammes)
         .concat(selectedProgrammes.map(code => programmes.find(programme => programme && programme.code === code)))
         .map(programme => {
           const code = programme?.code ?? NO_PROGRAMME.code
@@ -213,7 +213,7 @@ export const programmeFilter = createFilter({
     if (options.mode) {
       let modePredicate = MODE_PREDICATES[options.mode]
 
-      const additional = _.get(args, 'additionalModes', []).find(mode => mode.key === options.mode)?.predicate
+      const additional = get(args, 'additionalModes', []).find(mode => mode.key === options.mode)?.predicate
 
       if (!modePredicate && additional) {
         modePredicate = additional
@@ -233,7 +233,7 @@ export const programmeFilter = createFilter({
 
   filter({ studentNumber }, { selectedProgrammes }, { precomputed: { studentToProgrammeMap } }) {
     return selectedProgrammes.every(pcode =>
-      _.get(studentToProgrammeMap, studentNumber, []).some(({ code }) => code === pcode)
+      get(studentToProgrammeMap, studentNumber, []).some(({ code }) => code === pcode)
     )
   },
 

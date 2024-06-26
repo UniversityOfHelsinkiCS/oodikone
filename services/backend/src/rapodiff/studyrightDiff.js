@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 
 const axios = require('axios').default
-const _ = require('lodash')
+const { difference, intersection } = require('lodash')
 
 const { Student, Studyright, StudyrightElement, Transfer } = require('../models')
 const { optimizedStatisticsOf } = require('../services/populations')
@@ -12,7 +12,7 @@ const getFromRapo = async (urlStart, urlEnd) => {
   const { data: rapoStuffLasna } = await axios.get(urlStart)
   const { data: rapoStuffLasnaMinus } = await axios.get(urlEnd)
 
-  const rapoStudents = _.difference(
+  const rapoStudents = difference(
     rapoStuffLasna.map(s => s.opiskelijanumero),
     rapoStuffLasnaMinus.map(s => s.opiskelijanumero)
   )
@@ -159,8 +159,8 @@ const programme_diff_year = async (programme, facultyCode, year, brief = false) 
     .concat(rapoStudentPoissaLaki)
     .filter(isNotAmongKnownProblems)
 
-  const onlyInOodikone = _.difference(oodikoneStudents, rapoStudents)
-  const onlyInRapo = _.difference(rapoStudents, oodikoneStudents)
+  const onlyInOodikone = difference(oodikoneStudents, rapoStudents)
+  const onlyInRapo = difference(rapoStudents, oodikoneStudents)
 
   const wrongMissingInRapo = []
   for (const student of onlyInOodikone) {
@@ -184,8 +184,8 @@ const programme_diff_year = async (programme, facultyCode, year, brief = false) 
     }
   }
 
-  const checkOodikoneOnly = _.difference(onlyInOodikone, wrongMissingInRapo)
-  const checkRapoOnly = _.difference(onlyInRapo, transferred)
+  const checkOodikoneOnly = difference(onlyInOodikone, wrongMissingInRapo)
+  const checkRapoOnly = difference(onlyInRapo, transferred)
 
   if (!brief) {
     console.log('vuosi', year)
@@ -272,8 +272,8 @@ const msc_programme_diff_year = async (programme, facultyCode, year, brief = fal
 
   const rapoStudents = rapoStudentsLasna.concat(rapoStudentsPoissa).concat(rapoStudentPoissaLaki)
 
-  const onlyInOodikone = _.difference(oodikoneStudents, rapoStudents)
-  const onlyInRapo = _.difference(rapoStudents, oodikoneStudents)
+  const onlyInOodikone = difference(oodikoneStudents, rapoStudents)
+  const onlyInRapo = difference(rapoStudents, oodikoneStudents)
 
   const wrongInRapo = []
   for (const student of onlyInOodikone) {
@@ -292,9 +292,9 @@ const msc_programme_diff_year = async (programme, facultyCode, year, brief = fal
     }
   }
 
-  const checkOodikoneOnly = _.difference(onlyInOodikone, wrongInRapo)
-  const checkRapoOnly = _.difference(onlyInRapo, transferred)
-  const both = _.intersection(oodikoneStudents, rapoStudents)
+  const checkOodikoneOnly = difference(onlyInOodikone, wrongInRapo)
+  const checkRapoOnly = difference(onlyInRapo, transferred)
+  const both = intersection(oodikoneStudents, rapoStudents)
 
   console.log('vuosi', year)
 

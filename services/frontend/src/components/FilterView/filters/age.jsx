@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { max, min } from 'lodash'
 import { useCallback, useMemo } from 'react'
 
 import { useDebounce } from '@/common/hooks'
@@ -44,8 +44,8 @@ export const ageFilter = createFilter({
     const ages = students.map(student => getAge(student.birthdate)).filter(age => !Number.isNaN(age))
 
     return {
-      min: _.min(ages),
-      max: _.max(ages),
+      min: min(ages),
+      max: max(ages),
     }
   },
 

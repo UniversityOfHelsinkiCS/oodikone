@@ -1,7 +1,7 @@
 const { Op } = require('sequelize')
 
 const { Course } = require('../../models')
-const { getSortRank } = require('../../util/utils')
+const { getSortRank } = require('../../util/sortRank')
 
 const nameLikeTerm = name => {
   if (!name) {

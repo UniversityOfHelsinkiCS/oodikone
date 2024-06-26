@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { orderBy } from 'lodash'
 import { Form, Dropdown } from 'semantic-ui-react'
 
 import { createFilter } from './createFilter'
@@ -23,7 +23,7 @@ const CurriculumPeriodFilterCard = ({ options, onOptionsChange, withoutSelf }) =
     return curriculumPeriods
   }, [])
 
-  const sortedDropdownOptions = _.orderBy(dropdownOptions, ['text', 'count'], ['asc', 'desc'])
+  const sortedDropdownOptions = orderBy(dropdownOptions, ['text', 'count'], ['asc', 'desc'])
 
   return (
     <div className="card-content">

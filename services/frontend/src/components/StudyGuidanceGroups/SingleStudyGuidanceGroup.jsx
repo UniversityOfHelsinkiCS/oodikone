@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { map } from 'lodash'
 import moment from 'moment'
 import { useState } from 'react'
 import { useHistory } from 'react-router-dom'
@@ -50,7 +50,7 @@ const SingleStudyGroupContent = ({ filteredStudents, group }) => {
   }
 
   const { data: courses, isLoading: coursesAreLoading } = useGetStudyGuidanceGroupPopulationCoursesQuery({
-    studentnumberlist: _.map(filteredStudents, 'studentNumber'),
+    studentnumberlist: map(filteredStudents, 'studentNumber'),
     year: group?.tags?.year,
   })
 

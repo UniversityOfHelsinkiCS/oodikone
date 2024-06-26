@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-const _ = require('lodash')
+const { orderBy } = require('lodash')
 
 const { computeCreditsProduced } = require('../services/providerCredits')
 const { parseCsv } = require('./helpers')
@@ -67,7 +67,7 @@ const process = async data => {
     diff(rapoProgrammeData[programmeCode], okProgrammeData.stats, programmeCode)
   }
   const fieldToSortBy = 'diff' // 'percentage'
-  const orderedDiffs = _.orderBy(diffs, fieldToSortBy, 'asc')
+  const orderedDiffs = orderBy(diffs, fieldToSortBy, 'asc')
   orderedDiffs.forEach(diff => console.log(diff.diffStr))
   console.log(`${diffs.length} diffs found with current settings. Numbers with no diff: ${noDiffCounter}`)
   const totalDiff = orderedDiffs.reduce((sum, cur) => cur.diff + sum, 0)

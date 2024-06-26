@@ -17,9 +17,9 @@ const {
   Transfer,
 } = require('../../models')
 const {
-  facultyFormatProgramme,
-  facultyFormatStudyright,
-  facultyProgrammeStudents,
+  formatFacultyProgramme,
+  formatFacultyProgrammeStudents,
+  formatFacultyStudyRight,
   formatFacultyThesisWriter,
   formatFacultyTransfer,
   formatOrganization,
@@ -70,7 +70,7 @@ const startedStudyrights = async (faculty, code, since, studyRightWhere) =>
         ...studyRightWhere,
       },
     })
-  ).map(facultyFormatStudyright)
+  ).map(formatFacultyStudyRight)
 
 const graduatedStudyrights = async (faculty, code, since, studyrightWhere) =>
   (
@@ -97,7 +97,7 @@ const graduatedStudyrights = async (faculty, code, since, studyrightWhere) =>
         ...studyrightWhere,
       },
     })
-  ).map(facultyFormatStudyright)
+  ).map(formatFacultyStudyRight)
 
 const studyrightsByRightStartYear = async (faculty, code, since, graduated = 1) =>
   (
@@ -124,7 +124,7 @@ const studyrightsByRightStartYear = async (faculty, code, since, graduated = 1) 
         graduated,
       },
     })
-  ).map(facultyFormatStudyright)
+  ).map(formatFacultyStudyRight)
 
 const getStudyRightsByExtent = async (faculty, startDate, endDate, code, extents, graduated) =>
   (
@@ -167,7 +167,7 @@ const getStudyRightsByExtent = async (faculty, startDate, endDate, code, extents
         ],
       },
     })
-  ).map(facultyFormatStudyright)
+  ).map(formatFacultyStudyRight)
 
 const getStudyRightsByBachelorStart = async (faculty, startDate, endDate, code, extents, graduated) =>
   (
@@ -195,7 +195,7 @@ const getStudyRightsByBachelorStart = async (faculty, startDate, endDate, code, 
         },
       },
     })
-  ).map(facultyFormatStudyright)
+  ).map(formatFacultyStudyRight)
 
 const getStudentsByStudentnumbers = async studentnumbers =>
   (
@@ -208,7 +208,7 @@ const getStudentsByStudentnumbers = async studentnumbers =>
         attributes: ['semestercode', 'enrollmenttype'],
       },
     })
-  ).map(facultyProgrammeStudents)
+  ).map(formatFacultyProgrammeStudents)
 
 const hasMasterRight = async id => {
   return await Studyright.findOne({
@@ -279,7 +279,7 @@ const degreeProgrammesOfFaculty = async facultyCode =>
         },
         group: ['programme_module.code', 'programme_module.name', 'organization.id'],
       })
-    ).map(facultyFormatProgramme),
+    ).map(formatFacultyProgramme),
     'code'
   )
 

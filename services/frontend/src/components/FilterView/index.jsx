@@ -1,5 +1,5 @@
 import { produce } from 'immer'
-import _ from 'lodash'
+import { find, get, keyBy } from 'lodash'
 import fp from 'lodash/fp'
 import { useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -12,10 +12,10 @@ const resolveFilterOptions = (store, filters, initialOptions) => {
   return fp.flow(
     fp.map(({ key, defaultOptions }) => [
       key,
-      [store[key]?.options, !store[key] ? _.get(initialOptions, key) : null, defaultOptions],
+      [store[key]?.options, !store[key] ? get(initialOptions, key) : null, defaultOptions],
     ]),
     fp.fromPairs,
-    fp.mapValues(values => _.find(values))
+    fp.mapValues(values => find(values))
   )(filters)
 }
 
@@ -29,7 +29,7 @@ export const FilterView = ({
 }) => {
   const storeFilterOptions = useSelector(state => selectViewFilters(state, name))
   const filters = pFilters.map(filter => (typeof filter === 'function' ? filter() : filter))
-  const filtersByKey = _.keyBy(filters, 'key')
+  const filtersByKey = keyBy(filters, 'key')
   const filterOptions = useMemo(
     () => resolveFilterOptions(storeFilterOptions, filters, initialOptions),
     [storeFilterOptions, filters, initialOptions]

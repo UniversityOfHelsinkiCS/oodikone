@@ -1,7 +1,7 @@
 const Sentry = require('@sentry/node')
 const crypto = require('crypto')
 const router = require('express').Router()
-const _ = require('lodash')
+const { difference, intersection, uniq } = require('lodash')
 
 const { maxYearsToCreatePopulationFrom, getCourseProvidersForCourses } = require('../services/courses')
 const { encrypt, decrypt } = require('../services/encrypt')
@@ -10,8 +10,9 @@ const { populationStudentsMerger, populationCourseStatsMerger } = require('../se
 const { findByTag, findByCourseAndSemesters } = require('../services/students')
 const { mapCodesToIds } = require('../services/studyprogramme/studyprogrammeHelpers')
 const { getAssociations, getFilteredAssociations } = require('../services/studyrights')
+const { getFullStudyProgrammeRights, hasFullAccessToStudentData } = require('../util')
 const { ApplicationError } = require('../util/customErrors')
-const { getFullStudyProgrammeRights, hasFullAccessToStudentData, mapToProviders } = require('../util/utils')
+const { mapToProviders } = require('../util/map')
 
 const filterPersonalTags = (population, userId) => {
   return {
@@ -115,7 +116,7 @@ router.post('/v2/populationstatistics/coursesbytag', async (req, res) => {
   const studentnumbers = await findByTag(tag)
   const studentnumberlist = hasFullAccessToStudentData(roles)
     ? studentnumbers
-    : _.intersection(studentnumbers, studentsUserCanAccess)
+    : intersection(studentnumbers, studentsUserCanAccess)
 
   const result = await bottlenecksOf(
     {
@@ -149,7 +150,7 @@ router.post('/v2/populationstatistics/coursesbystudentnumberlist', async (req, r
 
   const studentnumberlist = hasFullAccessToStudentData(roles)
     ? studentnumbersInReq
-    : _.intersection(studentnumbersInReq, studentsUserCanAccess)
+    : intersection(studentnumbersInReq, studentsUserCanAccess)
   const result = await bottlenecksOf(
     {
       year: query?.year ?? 1900,
@@ -317,7 +318,7 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
   const studentsUserCanAccess =
     hasFullAccessToStudentData(roles) || found
       ? new Set(studentnumbers)
-      : new Set(_.intersection(studentnumbers, allStudentsUserCanAccess))
+      : new Set(intersection(studentnumbers, allStudentsUserCanAccess))
 
   const randomHash = crypto.randomBytes(12).toString('hex')
   const obfuscateStudent = ({ studyrights, studentNumber, courses, gender_code }) => ({
@@ -354,7 +355,7 @@ router.post('/v3/populationstatisticsbystudentnumbers', async (req, res) => {
   } = req
   const filteredStudentNumbers = hasFullAccessToStudentData(roles)
     ? studentnumberlist
-    : _.intersection(studentnumberlist, studentsUserCanAccess)
+    : intersection(studentnumberlist, studentsUserCanAccess)
 
   const studyProgrammeCode =
     tags?.studyProgramme && tags?.studyProgramme.includes('+')
@@ -376,7 +377,7 @@ router.post('/v3/populationstatisticsbystudentnumbers', async (req, res) => {
 
   result.studyProgramme = tags?.studyProgramme
 
-  const discardedStudentNumbers = _.difference(studentnumberlist, filteredStudentNumbers)
+  const discardedStudentNumbers = difference(studentnumberlist, filteredStudentNumbers)
 
   res.status(200).json({ ...filterPersonalTags(result, id), discardedStudentNumbers })
 })
@@ -390,7 +391,7 @@ router.get('/v3/populationstatistics/studyprogrammes', async (req, res) => {
     mapCodesToIds(studyrights.programmes)
     res.json(studyrights)
   } else {
-    const allRights = _.uniq(programmeRights.map(programme => programme.code))
+    const allRights = uniq(programmeRights.map(programme => programme.code))
     // For combined programme
     // If more programmes are combined, then a function might be a better idea to add moar rights
     if (allRights.includes('KH90_001') || allRights.includes('MH90_001')) allRights.push('KH90_001', 'MH90_001')

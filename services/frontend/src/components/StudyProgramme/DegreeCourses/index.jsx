@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { orderBy } from 'lodash'
 import { useEffect, useState } from 'react'
 import { Container } from 'semantic-ui-react'
 
@@ -65,7 +65,7 @@ export const DegreeCoursesTable = ({ studyProgramme, combinedProgramme, year }) 
     }
 
     setDefaultModules(
-      _.orderBy(
+      orderBy(
         Object.entries(defaultModules).map(([module, courses]) => ({
           module,
           courses,
@@ -75,7 +75,7 @@ export const DegreeCoursesTable = ({ studyProgramme, combinedProgramme, year }) 
       )
     )
     setSecondProgrammeModules(
-      _.orderBy(
+      orderBy(
         Object.entries(secondProgrammeModules).map(([module, courses]) => ({
           module,
           courses,

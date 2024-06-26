@@ -2,25 +2,38 @@ const moment = require('moment')
 const { Op } = require('sequelize')
 
 const { Semester, SemesterEnrollment, Studyright } = require('../models')
-
-// categorize graduation times
+const { mapObject } = require('../util/map')
 
 const countTimeCategories = (times, goal) => {
   const statistics = { onTime: 0, yearOver: 0, wayOver: 0 }
   times.forEach(time => {
-    if (time <= goal) statistics.onTime += 1
-    else if (time <= goal + 12) statistics.yearOver += 1
-    else statistics.wayOver += 1
+    if (time <= goal) {
+      statistics.onTime += 1
+    } else if (time <= goal + 12) {
+      statistics.yearOver += 1
+    } else {
+      statistics.wayOver += 1
+    }
   })
   return statistics
 }
 
-// discount staturory absences from graduation times
-
-const formatAbsence = absence => {
-  const { semestercode, semester } = absence
-  return { semestercode, start: semester.startdate, end: semester.enddate }
+const getBachelorStudyRight = async id => {
+  return await Studyright.findOne({
+    attributes: ['startdate'],
+    where: {
+      studyrightid: id,
+      extentcode: 1,
+    },
+  })
 }
+
+const mapAbsence = absence =>
+  mapObject(absence, {
+    semestercode: 'semestercode',
+    start: 'semester.startdate',
+    end: 'semester.enddate',
+  })
 
 const statutoryAbsences = async (studentnumber, startdate, enddate) =>
   (
@@ -43,7 +56,7 @@ const statutoryAbsences = async (studentnumber, startdate, enddate) =>
         statutory_absence: true,
       },
     })
-  ).map(formatAbsence)
+  ).map(mapAbsence)
 
 const getStatutoryAbsences = async (studentnumber, startdate, enddate) => {
   const absences = await statutoryAbsences(studentnumber, startdate, enddate)
@@ -54,20 +67,8 @@ const getStatutoryAbsences = async (studentnumber, startdate, enddate) => {
   return 0
 }
 
-// count bachelor time in Bc+Ms studyrights to master graduation times
-
-const bachelorStudyright = async id => {
-  return await Studyright.findOne({
-    attributes: ['startdate'],
-    where: {
-      studyrightid: id,
-      extentcode: 1,
-    },
-  })
-}
-
 module.exports = {
   countTimeCategories,
+  getBachelorStudyRight,
   getStatutoryAbsences,
-  bachelorStudyright,
 }

@@ -3,7 +3,8 @@ const router = require('express').Router()
 const { isFaculty, providersOfFaculty } = require('../services/organisations')
 const { bySearchTerm, yearlyStatistics, teacherStats } = require('../services/teachers')
 const { ID, getTeacherStats, findAndSaveTeachers, getCategoriesAndYears } = require('../services/topteachers')
-const { getFullStudyProgrammeRights, mapToProviders, splitByEmptySpace } = require('../util/utils')
+const { getFullStudyProgrammeRights, splitByEmptySpace } = require('../util')
+const { mapToProviders } = require('../util/map')
 
 router.get('/', async (req, res) => {
   const { searchTerm } = req.query

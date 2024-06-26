@@ -1,6 +1,6 @@
 /* eslint-disable no-return-assign */
 import { produce } from 'immer'
-import _ from 'lodash'
+import { chain, clone, includes, range, toPairs } from 'lodash'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Icon, Popup } from 'semantic-ui-react'
 import { useContextSelector } from 'use-context-selector'
@@ -124,9 +124,9 @@ const Orientable = ({ orientation, children, ...rest }) => {
 }
 
 export const createHeaders = (columns, columnDepth, dispatch) => {
-  let stack = _.clone(columns)
+  let stack = clone(columns)
 
-  const rows = _.range(0, columnDepth).map(() => [])
+  const rows = range(0, columnDepth).map(() => [])
   let i = 0
   columns.forEach(col => {
     if (!col.children) return
@@ -273,7 +273,7 @@ export const injectParentPointers = columns => {
 }
 
 export const calculateGroupDepth = data => {
-  return _.chain(data)
+  return chain(data)
     .map(item => (getDataItemType(item) === DataItemType.Group ? 1 + calculateGroupDepth(item.children) : 0))
     .max()
     .value()
@@ -327,7 +327,7 @@ export const insertGroupColumns = (columns, groupDepth, toggleGroup, expandedGro
       noHeader: false,
     })
 
-    const groupColumns = _.range(0, groupDepth).map(i => ({
+    const groupColumns = range(0, groupDepth).map(i => ({
       key: `__group_${i}`,
       export: false,
       cellProps: (__, _isGroup, [group]) => ({
@@ -338,10 +338,7 @@ export const insertGroupColumns = (columns, groupDepth, toggleGroup, expandedGro
       getRowContent: (__, isGroup, parents) =>
         isGroup &&
         parents.length === i + 1 && (
-          <Icon
-            name={`chevron ${_.includes(expandedGroups, parents[0].key) ? 'down' : 'right'}`}
-            style={{ margin: 0 }}
-          />
+          <Icon name={`chevron ${includes(expandedGroups, parents[0].key) ? 'down' : 'right'}`} style={{ margin: 0 }} />
         ),
     }))
 
@@ -350,12 +347,12 @@ export const insertGroupColumns = (columns, groupDepth, toggleGroup, expandedGro
 }
 
 export const extractColumnKeys = columns => {
-  return _.chain(columns)
+  return chain(columns)
     .flatMap(column => {
       const pairs = [{ key: column.key, column }]
 
       if (column.children) {
-        _.toPairs(extractColumnKeys(column.children)).forEach(([key, column]) => pairs.push({ key, column }))
+        toPairs(extractColumnKeys(column.children)).forEach(([key, column]) => pairs.push({ key, column }))
       }
 
       return pairs

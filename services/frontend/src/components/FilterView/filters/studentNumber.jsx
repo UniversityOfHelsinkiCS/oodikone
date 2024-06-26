@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { difference, includes, union } from 'lodash'
 import { useState } from 'react'
 import { Button, Icon } from 'semantic-ui-react'
 
@@ -42,7 +42,7 @@ const EditableList = ({ value, onChange, renderLabel }) => {
             <IconButton
               name="x"
               onClick={() => {
-                onChange(_.difference(value, [studentNumber]))
+                onChange(difference(value, [studentNumber]))
               }}
             />
           </li>
@@ -82,7 +82,7 @@ const EditableList = ({ value, onChange, renderLabel }) => {
           name="plus"
           onClick={() => {
             const parts = inputValue.split(/[^0-9]+/)
-            onChange(_.union(value, parts))
+            onChange(union(value, parts))
             setInput('')
           }}
           title="Add to list"
@@ -91,7 +91,7 @@ const EditableList = ({ value, onChange, renderLabel }) => {
           name="minus"
           onClick={() => {
             const parts = inputValue.split(/[^0-9]+/)
-            onChange(_.difference(value, parts))
+            onChange(difference(value, parts))
             setInput('')
           }}
           title="Remove from list"
@@ -170,8 +170,8 @@ export const studentNumberFilter = createFilter({
 
   filter(student, { allowlist, blocklist }) {
     return (
-      (allowlist.length === 0 || _.includes(allowlist, student.studentNumber)) &&
-      (blocklist.length === 0 || !_.includes(blocklist, student.studentNumber))
+      (allowlist.length === 0 || includes(allowlist, student.studentNumber)) &&
+      (blocklist.length === 0 || !includes(blocklist, student.studentNumber))
     )
   },
 
@@ -180,7 +180,7 @@ export const studentNumberFilter = createFilter({
   actions: {
     addToAllowlist: (options, students) => {
       const sns = Array.isArray(students) ? students : [students]
-      options.allowlist = _.union(options.allowlist, sns)
+      options.allowlist = union(options.allowlist, sns)
     },
 
     setAllowlist: (options, students) => {
@@ -190,7 +190,7 @@ export const studentNumberFilter = createFilter({
 
     addToBlocklist: (options, students) => {
       const sns = Array.isArray(students) ? students : [students]
-      options.blocklist = _.union(options.blocklist, sns)
+      options.blocklist = union(options.blocklist, sns)
     },
 
     setBlocklist: (options, students) => {

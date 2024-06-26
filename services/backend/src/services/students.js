@@ -15,8 +15,8 @@ const {
   SISStudyRightElement,
 } = require('../models')
 const { TagStudent, Tag } = require('../models/models_kone')
+const { splitByEmptySpace } = require('../util')
 const logger = require('../util/logger')
-const { splitByEmptySpace } = require('../util/utils')
 
 const byStudentNumber = async studentNumber => {
   const [student, tags] = await Promise.all([

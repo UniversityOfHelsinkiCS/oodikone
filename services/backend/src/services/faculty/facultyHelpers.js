@@ -1,6 +1,7 @@
 const { Op } = require('sequelize')
 
 const { codes } = require('../../../config/programmeCodes')
+const { mapObject } = require('../../util/map')
 const { faculties } = require('../organisations')
 
 const getFacultyList = async () => {
@@ -28,38 +29,24 @@ const findRightProgramme = (studyrightElements, code) => {
   return { programme, programmeName }
 }
 
-const facultyFormatStudyright = studyright => {
-  const {
-    studyrightid,
-    studystartdate,
-    enddate,
-    givendate,
-    graduated,
-    active,
-    prioritycode,
-    extentcode,
-    studentStudentnumber,
-    studyright_elements,
-    startdate,
-    facultyCode,
-  } = studyright
-
-  return {
-    studyrightid,
-    studystartdate,
-    startdate,
-    enddate,
-    givendate,
-    graduated,
-    active,
-    prioritycode,
-    extentcode,
-    facultyCode,
-    studentnumber: studentStudentnumber,
-    studyrightElements: studyright_elements,
-  }
+const formatFacultyStudyRight = studyright => {
+  return mapObject(studyright, {
+    studyrightid: 'studyrightid',
+    studystartdate: 'studystartdate',
+    startdate: 'startdate',
+    enddate: 'enddate',
+    givendate: 'givendate',
+    graduated: 'graduated',
+    active: 'active',
+    prioritycode: 'prioritycode',
+    extentcode: 'extentcode',
+    studentnumber: 'studentStudentnumber',
+    studyrightElements: 'studyright_elements',
+    facultyCode: 'facultyCode',
+  })
 }
-const facultyProgrammeStudents = student => {
+
+const formatFacultyProgrammeStudents = student => {
   const { studentnumber, home_country_en, gender_code, semester_enrollments } = student
   return {
     stundetNumber: studentnumber,
@@ -69,30 +56,30 @@ const facultyProgrammeStudents = student => {
   }
 }
 const formatFacultyTransfer = transfer => {
-  const { sourcecode, targetcode, transferdate, studyrightid, studentnumber } = transfer
-  return {
-    sourcecode,
-    targetcode,
-    transferdate,
-    studyrightid,
-    studentnumber,
-  }
+  return mapObject(transfer, {
+    sourcecode: 'sourcecode',
+    targetcode: 'targetcode',
+    transferdate: 'transferdate',
+    studyrightid: 'studyrightid',
+    studentnumber: 'studentnumber',
+  })
 }
 
-const facultyFormatProgramme = programme => {
-  const { code, name } = programme
-  return { code, name }
+const formatFacultyProgramme = programme => {
+  return mapObject(programme, {
+    code: 'code',
+    name: 'name',
+  })
 }
 
 const formatFacultyThesisWriter = credit => {
-  const { course_code, credits, attainment_date, student_studentnumber, course } = credit
-  return {
-    course_code,
-    credits,
-    attainment_date,
-    student_studentnumber,
-    courseUnitType: course.course_unit_type,
-  }
+  return mapObject(credit, {
+    course_code: 'course_code',
+    credits: 'credits',
+    attainment_date: 'attainment_date',
+    student_studentnumber: 'student_studentnumber',
+    courseUnitType: 'course.course_unit_type',
+  })
 }
 
 const formatOrganization = org => {
@@ -153,8 +140,9 @@ const mapCodesToIds = data => {
 module.exports = {
   getFacultyList,
   findRightProgramme,
-  facultyFormatStudyright,
-  facultyFormatProgramme,
+  formatFacultyProgramme,
+  formatFacultyProgrammeStudents,
+  formatFacultyStudyRight,
   formatFacultyTransfer,
   formatFacultyThesisWriter,
   formatOrganization,
@@ -163,5 +151,4 @@ module.exports = {
   checkCommissioned,
   getExtentFilter,
   mapCodesToIds,
-  facultyProgrammeStudents,
 }

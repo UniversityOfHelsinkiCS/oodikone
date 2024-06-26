@@ -1,7 +1,7 @@
 const { indexOf } = require('lodash')
 
 const { serviceProvider } = require('../../conf-backend')
-const { mapToProviders } = require('../../util/utils')
+const { mapToProviders } = require('../../util/map')
 const {
   alltimeEndDate,
   alltimeStartDate,

@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { chain, range } from 'lodash'
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Icon, Item } from 'semantic-ui-react'
@@ -11,9 +11,9 @@ import { UsePopulationCourseContext } from '../PopulationCourseContext'
 const mapCourseData = course => ({
   name: course.course.name,
   code: course.course.code,
-  attempts: _.chain(course.grades).values().map('count').sum().value(),
-  otherPassed: _.chain(course.grades)
-    .omit(_.range(0, 6))
+  attempts: chain(course.grades).values().map('count').sum().value(),
+  otherPassed: chain(course.grades)
+    .omit(range(0, 6))
     .filter(grade => grade.status.passingGrade || grade.status.improvedGrade)
     .map('count')
     .sum()
@@ -21,7 +21,7 @@ const mapCourseData = course => ({
   grades: {
     ...course.grades,
     0: {
-      count: _.chain(course.grades)
+      count: chain(course.grades)
         .filter(grade => grade.status.failingGrade)
         .map('count')
         .sum()
@@ -97,7 +97,7 @@ export const GradeDistribution = ({ flat, onlyIamRights }) => {
             filterType: 'range',
             getRowVal: row => row.attempts,
           },
-          ..._.range(0, 6).map(grade => ({
+          ...range(0, 6).map(grade => ({
             key: `grade-${grade}`,
             title: `${grade}`,
             cellProps: { style: { textAlign: 'right' } },

@@ -3,8 +3,8 @@ const { Op } = require('sequelize')
 const {
   dbConnections: { sequelize },
 } = require('../database/connection')
-const { Teacher, Credit, Course, Semester } = require('../models')
-const { splitByEmptySpace } = require('../util/utils')
+const { Credit, Course, Semester, Teacher } = require('../models')
+const { splitByEmptySpace } = require('../util')
 
 const likefy = term => `%${term}%`
 
@@ -196,6 +196,9 @@ const getTeacherCredits = async (teacherIds, startSemester, endSemester) => {
 
 const yearlyStatistics = async (providers, startSemester, endSemester) => {
   const ids = await getActiveTeachers(providers, startSemester, endSemester)
+  if (!ids || ids.length === 0) {
+    return []
+  }
   const teacherCredits = await getTeacherCredits(ids, startSemester, endSemester)
   return teacherCredits
 }

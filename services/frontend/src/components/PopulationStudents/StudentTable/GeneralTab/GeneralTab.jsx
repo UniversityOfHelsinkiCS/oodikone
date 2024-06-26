@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { chain, range } from 'lodash'
 import moment from 'moment'
 import { useState } from 'react'
 
@@ -443,7 +443,7 @@ export const GeneralTab = ({
       key: 'semesterEnrollmentsForExcel',
       title: 'Enrollment status',
       displayColumn: false,
-      children: _.range(getFirstSemester(), getLastSemester() + 1).map(semester => ({
+      children: range(getFirstSemester(), getLastSemester() + 1).map(semester => ({
         key: `${semester}`,
         title: getTextIn(allSemestersMap[`${semester}`]?.name),
         displayColumn: false,
@@ -639,7 +639,7 @@ export const GeneralTab = ({
     {}
   )
 
-  const columns = _.chain(columnKeysToInclude)
+  const columns = chain(columnKeysToInclude)
     .map(colKey => columnsAvailable[colKey])
     .filter(col => !!col)
     .sortBy(col => orderOfColumns[col.key])

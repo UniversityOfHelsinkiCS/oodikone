@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { get } from 'lodash'
 import moment from 'moment'
 import { Form, Radio } from 'semantic-ui-react'
 
@@ -118,8 +118,8 @@ export const studyrightStatusFilter = createFilter({
   render: (props, { args }) => (
     <StudyrightStatusFilterCard
       {...props}
-      code={_.get(args, 'code')}
-      combinedProgrammeCode={_.get(args, 'combinedProgrammeCode')}
+      code={get(args, 'code')}
+      combinedProgrammeCode={get(args, 'combinedProgrammeCode')}
     />
   ),
 })

@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { clamp, noop } from 'lodash'
 import { useState, useCallback } from 'react'
 import { Range, getTrackBackground } from 'react-range'
 import { Input } from 'semantic-ui-react'
@@ -35,7 +35,7 @@ export const RangeSelector = ({ min, max, value, onChange, disabled = false }) =
     [value[0]]
   )
 
-  const rangeValues = [_.clamp(value[0], min, max), _.clamp(value[1], min, max)]
+  const rangeValues = [clamp(value[0], min, max), clamp(value[1], min, max)]
 
   const isDisabled =
     disabled ||
@@ -50,7 +50,7 @@ export const RangeSelector = ({ min, max, value, onChange, disabled = false }) =
       <Range
         max={isDisabled ? 1 : max}
         min={isDisabled ? 0 : min}
-        onChange={isDisabled ? _.noop : onChange}
+        onChange={isDisabled ? noop : onChange}
         renderThumb={({ props }) => (
           <div
             {...props}

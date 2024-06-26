@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import _ from 'lodash'
+import { chain, get } from 'lodash'
 import moment from 'moment'
 import { Dropdown, Form } from 'semantic-ui-react'
 
@@ -12,7 +12,7 @@ const StudyTrackFilterCard = ({ activeAt, code, onOptionsChange, options, withou
 
   const activeAtMoment = activeAt && moment(activeAt)
 
-  const dropdownOptions = _.chain(withoutSelf())
+  const dropdownOptions = chain(withoutSelf())
     .filter(student => !student.transferredStudyright)
     .flatMap(student => student.studyrights)
     .map(studyright => studyright.studyright_elements)
@@ -73,7 +73,7 @@ export const studyTrackFilter = createFilter({
   },
   isActive: ({ selected }) => (selected !== undefined ? selected.length > 0 : false),
   filter: (student, { selected, args }) => {
-    const activeAt = _.get(args, 'activeAt', moment())
+    const activeAt = get(args, 'activeAt', moment())
 
     return student.studyrights
       .filter(({ studyright_elements, graduated }) =>
@@ -94,6 +94,6 @@ export const studyTrackFilter = createFilter({
       .some(code => selected.includes(code))
   },
   render: (props, { args }) => (
-    <StudyTrackFilterCard {...props} activeAt={_.get(args, 'activeAt')} code={_.get(args, 'code')} />
+    <StudyTrackFilterCard {...props} activeAt={get(args, 'activeAt')} code={get(args, 'code')} />
   ),
 })

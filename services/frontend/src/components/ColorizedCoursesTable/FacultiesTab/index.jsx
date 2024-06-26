@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { cloneDeep } from 'lodash'
 import { useMemo } from 'react'
 
 import {
@@ -39,7 +39,7 @@ export const FacultiesTab = () => {
   }, [data, facultyMap])
 
   const tableData = useMemo(() => {
-    const tableData = [_.cloneDeep(totalRow), ..._.cloneDeep(data.tableData)]
+    const tableData = [cloneDeep(totalRow), ...cloneDeep(data.tableData)]
     tableData.forEach(course => {
       const facultiesTotal = { ...emptyFields }
       selectedSemesters.forEach(semestercode => {

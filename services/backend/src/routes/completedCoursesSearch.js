@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const _ = require('lodash')
+const { difference, intersection } = require('lodash')
 
 const { getCompletedCourses } = require('../services/completedCoursesSearch')
 const {
@@ -8,9 +8,9 @@ const {
   deleteSearch,
   updateSearch,
 } = require('../services/openUni/openUniManageSearches')
+const { hasFullAccessToStudentData } = require('../util')
 const { getImporterClient } = require('../util/importerClient')
 const logger = require('../util/logger')
-const { hasFullAccessToStudentData } = require('../util/utils')
 
 const importerClient = getImporterClient()
 
@@ -41,9 +41,9 @@ router.get('/', async (req, res) => {
 
   const filteredStudentNumbers = hasFullAccessToStudentData(roles)
     ? studentNumbers
-    : _.intersection(studentNumbers, studentsUserCanAccess)
+    : intersection(studentNumbers, studentsUserCanAccess)
   const completedCourses = await getCompletedCourses(filteredStudentNumbers, courseCodes)
-  const discardedStudentNumbers = _.difference(
+  const discardedStudentNumbers = difference(
     studentNumbers,
     completedCourses.students.map(s => s.studentNumber)
   )

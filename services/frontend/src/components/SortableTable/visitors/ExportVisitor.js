@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { chain } from 'lodash'
 
 import { getColumnTitle, getColumnValue } from '@/components/SortableTable/common'
 import { DataVisitor } from './DataVisitor'
@@ -11,7 +11,7 @@ export class ExportVisitor extends DataVisitor {
   }
 
   visitRow(ctx) {
-    const row = _.chain(this.columns)
+    const row = chain(this.columns)
       .map(column => [getColumnTitle(column).replaceAll('\n', ' '), getColumnValue(ctx, column, true)])
       .fromPairs()
       .value()

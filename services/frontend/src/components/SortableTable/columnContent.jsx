@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { assign, clone, includes, isEqual, merge } from 'lodash'
 import { memo } from 'react'
 import { useContext, useContextSelector } from 'use-context-selector'
 
@@ -36,7 +36,7 @@ const mergeColumnDefinitions = (original, overlay) => {
     const orig = byKey[columnKey]
 
     if (orig !== undefined) {
-      _.assign(orig, _.merge(orig, overlayDef))
+      assign(orig, merge(orig, overlayDef))
     }
   })
 
@@ -65,7 +65,7 @@ export const DataItem = ({ item, parents = [] }) => {
     </SortableTableContext.Provider>
   )
 
-  const childRows = _.includes(context.state.expandedGroups, item.definition.key)
+  const childRows = includes(context.state.expandedGroups, item.definition.key)
     ? item.children.map(child => <DataItem item={child} key={getKey(item)} parents={[item.definition, ...parents]} />)
     : undefined
 
@@ -170,7 +170,7 @@ const RowComponent = ({ data, isGroup, parents }) => {
 
   const cells = []
 
-  const stack = _.clone(columns)
+  const stack = clone(columns)
 
   while (stack.length > 0) {
     const [column] = stack.splice(0, 1)
@@ -178,7 +178,7 @@ const RowComponent = ({ data, isGroup, parents }) => {
     let cellProps = resolveProp(column.cellProps) ?? {}
 
     if (column.parent?.merge && column.childIndex > 0) {
-      cellProps = _.merge(cellProps, {
+      cellProps = merge(cellProps, {
         style: { borderLeft: 'none', paddingLeft: 0 },
       })
     }
@@ -188,7 +188,7 @@ const RowComponent = ({ data, isGroup, parents }) => {
     }
 
     if (column.cellStyle) {
-      cellProps = _.merge(cellProps, {
+      cellProps = merge(cellProps, {
         style: column.cellStyle,
       })
     }
@@ -226,7 +226,7 @@ const RowComponent = ({ data, isGroup, parents }) => {
 const Row = memo(
   RowComponent,
   (prevProps, nextProps) =>
-    _.isEqual(prevProps.data, nextProps.data) &&
-    _.isEqual(prevProps.isGroup, nextProps.isGroup) &&
-    _.isEqual(prevProps.parents, nextProps.parents)
+    isEqual(prevProps.data, nextProps.data) &&
+    isEqual(prevProps.isGroup, nextProps.isGroup) &&
+    isEqual(prevProps.parents, nextProps.parents)
 )

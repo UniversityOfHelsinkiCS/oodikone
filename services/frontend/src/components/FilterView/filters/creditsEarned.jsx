@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { max, min } from 'lodash'
 import { useMemo } from 'react'
 
 import { getStudentTotalCredits } from '@/common'
@@ -49,8 +49,8 @@ export const creditsEarnedFilter = createFilter({
     const credits = students.map(getStudentTotalCredits).filter(n => !Number.isNaN(n))
 
     return {
-      max: _.max(credits),
-      min: _.min(credits),
+      max: max(credits),
+      min: min(credits),
     }
   },
 

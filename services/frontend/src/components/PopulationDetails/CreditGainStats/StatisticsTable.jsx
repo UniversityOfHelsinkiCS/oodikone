@@ -1,10 +1,10 @@
-import _ from 'lodash'
+import { max, mean, min, sortBy, sum } from 'lodash'
 import { Table } from 'semantic-ui-react'
 
 import { getStudentTotalCredits } from '@/common'
 
 const calculateMedian = arr => {
-  const sortedArr = _.sortBy(arr)
+  const sortedArr = sortBy(arr)
   const midIndex = Math.floor(sortedArr.length / 2)
   return sortedArr.length % 2 !== 0 ? sortedArr[midIndex] : (sortedArr[midIndex - 1] + sortedArr[midIndex]) / 2
 }
@@ -12,9 +12,9 @@ const calculateMedian = arr => {
 export const StatisticsTable = ({ filteredStudents, type }) => {
   if (!filteredStudents || !filteredStudents.length) return null
   const credits = filteredStudents.map(student => getStudentTotalCredits(student))
-  const average = _.mean(credits)
+  const average = mean(credits)
   const median = calculateMedian(credits)
-  const stdev = Math.sqrt(_.mean(credits.map(value => (value - average) ** 2)))
+  const stdev = Math.sqrt(mean(credits.map(value => (value - average) ** 2)))
 
   return (
     <div className="statistics-table">
@@ -26,7 +26,7 @@ export const StatisticsTable = ({ filteredStudents, type }) => {
         <Table.Body>
           <Table.Row>
             <Table.Cell>Total credits</Table.Cell>
-            <Table.Cell data-cy="credit-stats-total">{_.sum(credits).toFixed(2)}</Table.Cell>
+            <Table.Cell data-cy="credit-stats-total">{sum(credits).toFixed(2)}</Table.Cell>
           </Table.Row>
           <Table.Row>
             <Table.Cell>Average</Table.Cell>
@@ -42,11 +42,11 @@ export const StatisticsTable = ({ filteredStudents, type }) => {
           </Table.Row>
           <Table.Row>
             <Table.Cell>Minimum</Table.Cell>
-            <Table.Cell data-cy="credit-stats-min">{_.min(credits)}</Table.Cell>
+            <Table.Cell data-cy="credit-stats-min">{min(credits)}</Table.Cell>
           </Table.Row>
           <Table.Row>
             <Table.Cell>Maximum</Table.Cell>
-            <Table.Cell data-cy="credit-stats-max">{_.max(credits)}</Table.Cell>
+            <Table.Cell data-cy="credit-stats-max">{max(credits)}</Table.Cell>
           </Table.Row>
         </Table.Body>
       </Table>

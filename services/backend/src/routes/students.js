@@ -1,8 +1,8 @@
 const router = require('express').Router()
 
 const { bySearchTermAndStudentNumbers, withStudentNumber } = require('../services/students')
+const { hasFullAccessToStudentData, splitByEmptySpace } = require('../util')
 const { ApplicationError } = require('../util/customErrors')
-const { hasFullAccessToStudentData, splitByEmptySpace } = require('../util/utils')
 
 const filterStudentTags = (student, userId) => {
   return {

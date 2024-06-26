@@ -2,7 +2,7 @@ const router = require('express').Router()
 
 const { getCloseToGraduationData } = require('../services/populations/closeToGraduation')
 const { getAllStudentsUserHasInGroups } = require('../services/studyGuidanceGroups')
-const { hasFullAccessToStudentData } = require('../util/utils')
+const { hasFullAccessToStudentData } = require('../util')
 
 router.get('/', async (req, res) => {
   if (hasFullAccessToStudentData(req.user.roles)) {

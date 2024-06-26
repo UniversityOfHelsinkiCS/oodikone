@@ -1,4 +1,4 @@
-const { mapToProviders } = require('../util/utils')
+const { mapToProviders } = require('../util/map')
 const { getCreditStats, setCreditStats } = require('./analyticsService')
 const { getCourseCodesOfProvider } = require('./providers')
 const { allTransfers } = require('./studyprogramme')
@@ -7,7 +7,7 @@ const { defineYear, getCorrectStartDate } = require('./studyprogramme/studyprogr
 const { getStudyRights } = require('./studyprogramme/studyrightFinders')
 
 /**
- * Rapo-kategoriat 9.2.2024, joiden perusteella tämä koodi on tehty. Numerot täsmäävät vain 2022 alkaen, koska sisu/oodi ero.
+  Rapo-kategoriat 9.2.2024, joiden perusteella tämä koodi on tehty. Numerot täsmäävät vain 2022 alkaen, koska sisu/oodi ero.
   
   'basic'
   Perustutkinto-opiskelijat: niiden opiskelijoiden opintopisteet, joilla on oikeus suorittaa alempi tai 
@@ -36,7 +36,6 @@ const { getStudyRights } = require('./studyprogramme/studyrightFinders')
   Possible ambiguities / mistakes:
   Rapo may use createddate instead of attainment_date to determine if student had active studyright.
   This is probably very rare to cause differences, only one such was found in MH60_001
-
 */
 
 const getCategory = (extent, degreeStudyright) => {

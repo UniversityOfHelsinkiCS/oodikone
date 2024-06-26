@@ -1,4 +1,4 @@
-const _ = require('lodash')
+const { pick } = require('lodash')
 const moment = require('moment')
 const { Op } = require('sequelize')
 
@@ -179,7 +179,7 @@ const getAssociations = async (doRefresh = false) => {
 
 const getFilteredAssociations = async codes => {
   const associations = await getAssociations()
-  associations.programmes = _.pick(associations.programmes, codes)
+  associations.programmes = pick(associations.programmes, codes)
 
   const studyTracks = []
   Object.keys(associations.programmes).forEach(k => {
@@ -188,9 +188,9 @@ const getFilteredAssociations = async codes => {
       studyTracks.push(...Object.keys(yearData.studyTracks))
     })
   })
-  associations.studyTracks = _.pick(associations.studyTracks, studyTracks)
+  associations.studyTracks = pick(associations.studyTracks, studyTracks)
   Object.keys(associations.studyTracks).forEach(k => {
-    associations.studyTracks[k].programmes = _.pick(associations.studyTracks[k].programmes, codes)
+    associations.studyTracks[k].programmes = pick(associations.studyTracks[k].programmes, codes)
   })
   return associations
 }

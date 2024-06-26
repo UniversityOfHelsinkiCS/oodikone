@@ -1,4 +1,4 @@
-const _ = require('lodash')
+const { memoize } = require('lodash')
 const { Op } = require('sequelize')
 
 const {
@@ -171,7 +171,7 @@ const getNotCompletedForProgrammeCourses = async (from, to, programmeCourses) =>
   }
 }
 
-const getCurrentStudyYearStartDate = _.memoize(
+const getCurrentStudyYearStartDate = memoize(
   async unixMillis =>
     new Date(
       (

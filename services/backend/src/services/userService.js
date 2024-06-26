@@ -1,10 +1,10 @@
-const _ = require('lodash')
+const { isEqual, keyBy, omit, uniq, uniqBy } = require('lodash')
 const { LRUCache } = require('lru-cache')
 
 const { serviceProvider } = require('../conf-backend')
 const { sequelizeUser } = require('../database/connection')
 const { User } = require('../models/models_user')
-const { createLocaleComparator, getFullStudyProgrammeRights, hasFullAccessToStudentData } = require('../util/utils')
+const { createLocaleComparator, getFullStudyProgrammeRights, hasFullAccessToStudentData } = require('../util')
 const { sendNotificationAboutNewUser } = require('./mailservice')
 const { getSisuAuthData, personSearchQuery, getGraphqlData } = require('./oriProvider')
 const { getStudentnumbersByElementdetails } = require('./students')
@@ -45,7 +45,7 @@ const modifyAccess = async (username, roles) => {
 const modifyElementDetails = async (id, codes, enable) => {
   const user = await findUser({ id })
   if (enable === true) {
-    user.programmeRights = _.uniq([...user.programmeRights, ...codes])
+    user.programmeRights = uniq([...user.programmeRights, ...codes])
   } else {
     user.programmeRights = user.programmeRights.filter(code => !codes.includes(code))
   }
@@ -79,7 +79,7 @@ const formatUser = async (user, getStudentAccess = true) => {
   const studentsUserCanAccess =
     !getStudentAccess || hasFullAccessToStudentData(roles)
       ? []
-      : _.uniqBy(
+      : uniqBy(
           (
             await Promise.all([
               getStudentnumbersByElementdetails(fullStudyProgrammeRights),
@@ -109,7 +109,7 @@ const formatUser = async (user, getStudentAccess = true) => {
 
 const formatUserForFrontend = async user => {
   const formattedUser = await formatUser(user, false)
-  return _.omit(formattedUser, ['studentsUserCanAccess', 'isAdmin', 'mockedBy', 'userId'])
+  return omit(formattedUser, ['studentsUserCanAccess', 'isAdmin', 'mockedBy', 'userId'])
 }
 
 const updateAccessGroups = async (username, iamGroups, specialGroup, sisId) => {
@@ -130,7 +130,7 @@ const updateAccessGroups = async (username, iamGroups, specialGroup, sisId) => {
     ...(fullSisuAccess ? ['fullSisuAccess'] : []),
   ]
 
-  if (!_.isEqual(newAccessGroups.sort(), currentAccessGroups.sort())) {
+  if (!isEqual(newAccessGroups.sort(), currentAccessGroups.sort())) {
     userFromDb.roles = newAccessGroups
     await userFromDb.save()
   }
@@ -139,7 +139,7 @@ const updateAccessGroups = async (username, iamGroups, specialGroup, sisId) => {
 const findAll = async () => {
   const users = (await User.findAll()).map(user => user.toJSON())
   const userAccess = await getAllUserAccess(users.map(user => user.sisuPersonId))
-  const userAccessMap = _.keyBy(userAccess, 'id')
+  const userAccessMap = keyBy(userAccess, 'id')
 
   const formattedUsers = await Promise.all(
     users.map(async user => {

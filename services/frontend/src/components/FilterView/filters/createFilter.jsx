@@ -1,5 +1,5 @@
 import { produce } from 'immer'
-import _ from 'lodash'
+import { mapValues } from 'lodash'
 
 import { setFilterOptions } from '@/redux/filters'
 
@@ -21,7 +21,7 @@ export const createFilter = options => {
   /**
    * Selectors are wrapped redux selectors that act on the filter's options.
    */
-  const selectors = _.mapValues(selectorFuncs, selector => {
+  const selectors = mapValues(selectorFuncs, selector => {
     if (selector.length === 1) {
       const wrapper = options => selector(options)
       wrapper.filter = options.key
@@ -41,7 +41,7 @@ export const createFilter = options => {
    * dispatch function. You need to use the dipatch function obtained form
    * the useFilterDispatch hook.
    */
-  const actions = _.mapValues(actionFuncs, (action, name) => payload => (view, getContext) => {
+  const actions = mapValues(actionFuncs, (action, name) => payload => (view, getContext) => {
     const ctx = getContext(options.key)
 
     return setFilterOptions({
