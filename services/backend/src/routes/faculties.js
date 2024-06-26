@@ -117,12 +117,12 @@ router.get('/:id/progressstats', auth.roles(['facultyStatistics', 'katselmusView
   if (!programmes) return res.status(422).end()
 
   if (!code) return res.status(422).end()
-  const data = await getFacultyProgressStats(code, specialGroups, graduated)
+  const data = await getFacultyProgressStats(code, specialGroups, graduated, programmeFilter)
   if (data) return res.json(data)
 
   let updateStats = await combineFacultyStudentProgress(code, programmes.data, specialGroups, graduated)
   if (updateStats) {
-    updateStats = await setFacultyProgressStats(updateStats, specialGroups, graduated)
+    updateStats = await setFacultyProgressStats(updateStats, specialGroups, graduated, programmeFilter)
   }
   return res.json(updateStats)
 })
@@ -134,14 +134,14 @@ router.get('/:id/studentstats', auth.roles(['facultyStatistics', 'katselmusViewe
   const programmeFilter = req.query?.programme_filter
 
   if (!code) return res.status(422).end()
-  const data = await getFacultyStudentStats(code, specialGroups, graduated)
+  const data = await getFacultyStudentStats(code, specialGroups, graduated, programmeFilter)
   if (data) return res.json(data)
   const programmes = await getProgrammes(code, programmeFilter)
   if (!programmes) return res.status(422).end()
 
   let updateStats = await combineFacultyStudents(code, programmes.data, specialGroups, graduated)
   if (updateStats) {
-    updateStats = await setFacultyStudentStats(updateStats, specialGroups, graduated)
+    updateStats = await setFacultyStudentStats(updateStats, specialGroups, graduated, programmeFilter)
   }
   return res.json(updateStats)
 })
