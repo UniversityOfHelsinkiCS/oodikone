@@ -150,35 +150,38 @@ const updateFacultyProgressOverview = async faculty => {
   }
   const options = [specialGraduated, specialNotGraduated, notSpecialGraduated, notSpecialNotGraduated]
 
-  let newProgrammes = []
-  try {
-    const onlyNew = await findFacultyProgrammeCodes(faculty, 'NEW_STUDY_PROGRAMMES')
-    newProgrammes = await setFacultyProgrammes(faculty, onlyNew, 'NEW_STUDY_PROGRAMMES')
-  } catch (error) {
-    logger.error(`Faculty stats: all programme stats failed with error ${error}`)
-    logger.error(`Stack: ${error.stack}`)
-  }
-
-  for (const option of options) {
-    const { specialGroups, graduated } = option
+  for (const progFilter of ['ALL_PROGRAMMES', 'NEW_STUDY_PROGRAMMES']) {
+    let programmes = []
     try {
-      const updateFacultyStudentStats = await combineFacultyStudents(
-        faculty,
-        newProgrammes.data,
-        specialGroups,
-        graduated
-      )
-      await setFacultyStudentStats(updateFacultyStudentStats, specialGroups, graduated)
-      const updateFacultyProgressStats = await combineFacultyStudentProgress(
-        faculty,
-        newProgrammes.data,
-        specialGroups,
-        graduated
-      )
-      await setFacultyProgressStats(updateFacultyProgressStats, specialGroups, graduated)
+      const foundFacultyProgrammeCodes = await findFacultyProgrammeCodes(faculty, progFilter)
+      programmes = await setFacultyProgrammes(faculty, foundFacultyProgrammeCodes, progFilter)
     } catch (error) {
-      logger.error(`Faculty stats: progress stats failed with error ${error}`)
+      logger.error(`Faculty stats: all programme stats failed with error ${error}`)
       logger.error(`Stack: ${error.stack}`)
+    }
+
+    for (const option of options) {
+      const { specialGroups, graduated } = option
+      try {
+        const updateFacultyStudentStats = await combineFacultyStudents(
+          faculty,
+          programmes.data,
+          specialGroups,
+          graduated
+        )
+
+        await setFacultyStudentStats(updateFacultyStudentStats, specialGroups, graduated, progFilter)
+        const updateFacultyProgressStats = await combineFacultyStudentProgress(
+          faculty,
+          programmes.data,
+          specialGroups,
+          graduated
+        )
+        await setFacultyProgressStats(updateFacultyProgressStats, specialGroups, graduated, progFilter)
+      } catch (error) {
+        logger.error(`Faculty stats: progress stats failed with error ${error}`)
+        logger.error(`Stack: ${error.stack}`)
+      }
     }
   }
   return 'OK'
