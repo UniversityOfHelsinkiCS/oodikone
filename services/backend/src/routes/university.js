@@ -1,5 +1,7 @@
 const router = require('express').Router()
 
+const { magicFacultyCode } = require('../../config/facultyCodes')
+const { serviceProvider } = require('../conf-backend')
 const { getFacultyList } = require('../services/faculty/facultyHelpers')
 const { getFacultyProgressStats, getGraduationStats } = require('../services/faculty/facultyService')
 const { getMedian } = require('../services/studyprogramme/studyprogrammeHelpers')
@@ -22,11 +24,11 @@ router.get('/allprogressstats', async (req, res) => {
   }
 
   const universityData = {
-    years: codeToData.H50.years,
-    yearlyBachelorTitles: codeToData.H50.yearlyBachelorTitles,
-    yearlyBcMsTitles: codeToData.H50.yearlyBcMsTitles,
-    yearlyMasterTitles: codeToData.H50.yearlyMasterTitles,
-    yearlyLicentiateTitles: codeToData.H50.yearlyLicentiateTitles,
+    years: codeToData[magicFacultyCode].years,
+    yearlyBachelorTitles: codeToData[magicFacultyCode].yearlyBachelorTitles,
+    yearlyBcMsTitles: codeToData[magicFacultyCode].yearlyBcMsTitles,
+    yearlyMasterTitles: codeToData[magicFacultyCode].yearlyMasterTitles,
+    yearlyLicentiateTitles: codeToData[magicFacultyCode].yearlyLicentiateTitles,
     programmeNames: allFaculties.reduce((obj, faculty) => {
       const { name, ...rest } = faculty.dataValues
       obj[faculty.code] = { ...rest, ...name }
@@ -90,8 +92,9 @@ router.get('/allgraduationstats', async (_req, res) => {
   const facultyCodes = allFaculties.map(faculty => faculty.code)
   const facultyData = {}
   const timesArrays = [] // keep book of these to null them in the end, large lists not used in frontend
+  const programmeFilter = serviceProvider === 'Toska' ? 'NEW_STUDY_PROGRAMME' : 'ALL_PROGRAMMES'
   for (const facultyCode of facultyCodes) {
-    const data = await getGraduationStats(facultyCode, 'NEW_STUDY_PROGRAMMES', true)
+    const data = await getGraduationStats(facultyCode, programmeFilter, true)
     if (!data) return res.status(500).json({ message: `Did not find data for ${facultyCode}` })
     facultyData[facultyCode] = data
   }
