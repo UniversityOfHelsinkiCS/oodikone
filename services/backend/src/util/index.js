@@ -18,10 +18,26 @@ const splitByEmptySpace = str => str.split(/\s+/g)
 
 const validateParamLength = (param, minLength) => param && param.trim().length >= minLength
 
+const sortByProgrammeCode = (a, b) => {
+  const getPrefixPriority = code => {
+    if (code.startsWith('KH')) return 1
+    if (code.startsWith('MH')) return 2
+    return 3
+  }
+
+  const priorityA = getPrefixPriority(a)
+  const priorityB = getPrefixPriority(b)
+  if (priorityA !== priorityB) {
+    return priorityA - priorityB
+  }
+  return a.localeCompare(b)
+}
+
 module.exports = {
   createLocaleComparator,
   getFullStudyProgrammeRights,
   hasFullAccessToStudentData,
   splitByEmptySpace,
   validateParamLength,
+  sortByProgrammeCode,
 }

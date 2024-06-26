@@ -3,38 +3,54 @@ const { Op } = require('sequelize')
 const {
   dbConnections: { sequelize },
 } = require('../../database/connection')
-const { ElementDetail, SemesterEnrollment, Studyright } = require('../../models')
-const { Student, StudyrightElement } = require('../../models')
+const {
+  ElementDetail,
+  SemesterEnrollment,
+  Studyright,
+  Student,
+  StudyrightElement,
+  SISStudyRight,
+  SISStudyRightElement,
+} = require('../../models')
 const { getCurrentSemester } = require('../semesters')
 const { formatStudyright } = require('./studyprogrammeHelpers')
 const { whereStudents, sinceDate } = require('.')
 
-const allStudyrights = async (studytrack, studentnumbers) =>
-  (
-    await Studyright.findAll({
-      include: [
-        {
-          model: StudyrightElement,
-          required: true,
-          include: {
-            model: ElementDetail,
-            required: true,
-            where: {
-              code: studytrack,
-            },
-          },
-        },
-        {
-          model: Student,
-          attributes: ['studentnumber'],
-          required: true,
-        },
-      ],
+const getStudyRightsInProgramme = async programmeCode => {
+  const studyRights = await SISStudyRight.findAll({
+    attributes: ['id'],
+    include: {
+      model: SISStudyRightElement,
+      as: 'studyRightElements',
+      attributes: [],
       where: {
-        student_studentnumber: whereStudents(studentnumbers),
+        code: programmeCode,
+      },
+    },
+    where: {
+      studentNumber: {
+        [Op.not]: null,
+      },
+      extentCode: 5,
+    },
+  })
+
+  return (
+    await SISStudyRight.findAll({
+      attributes: ['id'],
+      include: {
+        model: SISStudyRightElement,
+        as: 'studyRightElements',
+        attributes: ['phase', 'code', 'name', 'startDate', 'endDate'],
+      },
+      where: {
+        id: {
+          [Op.in]: studyRights.map(studyRight => studyRight.toJSON().id),
+        },
       },
     })
-  ).map(formatStudyright)
+  ).map(studyRight => studyRight.toJSON())
+}
 
 const startedStudyrights = async (studytrack, since, studentnumbers) =>
   (
@@ -215,40 +231,6 @@ const followingStudyrights = async (since, programmes, studentnumbers) =>
     })
   ).map(formatStudyright)
 
-const previousStudyrights = async (programmes, studentnumbers) =>
-  (
-    await Studyright.findAll({
-      include: [
-        {
-          model: StudyrightElement,
-          required: true,
-          where: {
-            code: {
-              [Op.in]: programmes.map(p => p.code),
-            },
-          },
-          include: [
-            {
-              model: ElementDetail,
-              attributes: ['name', 'code', 'type'],
-            },
-          ],
-          attributes: ['code'],
-        },
-        {
-          model: Student,
-          attributes: ['studentnumber'],
-          required: true,
-        },
-      ],
-      where: {
-        extentcode: 1,
-        student_studentnumber: whereStudents(studentnumbers),
-      },
-      order: [[StudyrightElement, 'startdate', 'DESC']],
-    })
-  ).map(formatStudyright)
-
 const getStudyRights = async students =>
   (
     await Studyright.findAll({
@@ -288,12 +270,11 @@ const getStudyRights = async students =>
   ).map(formatStudyright)
 
 module.exports = {
-  allStudyrights,
+  getStudyRightsInProgramme,
   startedStudyrights,
   graduatedStudyRights,
   graduatedStudyRightsByStartDate,
   inactiveStudyrights,
-  previousStudyrights,
   followingStudyrights,
   getStudyRights,
 }

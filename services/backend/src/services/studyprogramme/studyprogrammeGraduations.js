@@ -1,6 +1,7 @@
-const { indexOf, uniqBy } = require('lodash')
+const { indexOf, uniqBy, orderBy } = require('lodash')
 const moment = require('moment')
 
+const { sortByProgrammeCode } = require('../../util')
 const { mapToProviders } = require('../../util/map')
 const { countTimeCategories, getBachelorStudyRight, getStatutoryAbsences } = require('../graduationHelpers')
 const { getAllProgrammes } = require('../studyrights')
@@ -19,12 +20,7 @@ const {
   getYearsArray,
   getYearsObject,
 } = require('./studyprogrammeHelpers')
-const {
-  allStudyrights,
-  followingStudyrights,
-  graduatedStudyRights,
-  previousStudyrights,
-} = require('./studyrightFinders')
+const { getStudyRightsInProgramme, followingStudyrights, graduatedStudyRights } = require('./studyrightFinders')
 const { allTransfers } = require('.')
 
 const checkStartdate = async (id, startdate) => {
@@ -162,50 +158,35 @@ const getTransferStudyrightMap = async (studyprogramme, since) => {
 const formatStats = (stats, years) => {
   const tableStats = Object.values(stats)
     .filter(p => years.map(year => p[year]).find(started => started !== 0)) // Filter out programmes with no-one started between the selected years
-    .map(p => [p.code, getId(p.code), p.name.fi, ...years.map(year => p[year])])
+    .map(p => [p.code, getId(p.code), p.name, ...years.map(year => p[year])])
+    .sort((a, b) => sortByProgrammeCode(a[0], b[0]))
 
   const graphStats = Object.values(stats)
     .filter(p => years.map(year => p[year]).find(started => started !== 0)) // Filter out programmes with no-one started between the selected years
-    .map(p => ({ name: p.name.fi, code: p.code, data: years.map(year => p[year]) }))
+    .map(p => ({ name: p.name, code: p.code, data: years.map(year => p[year]) }))
+    .sort((a, b) => sortByProgrammeCode(a.code, b.code))
 
   return { tableStats, graphStats }
 }
 
-const getProgrammesBeforeStarting = async ({ studyprogramme, since, years, isAcademicYear, includeAllSpecials }) => {
-  const all = await allStudyrights(studyprogramme)
-  const allStudents = all.map(s => s.studentNumber)
+const getProgrammesBeforeStarting = async ({ studyprogramme, years, isAcademicYear, includeAllSpecials }) => {
+  const studyRights = await getStudyRightsInProgramme(studyprogramme)
 
-  // Get studyrights for bachelor studyprogrammes. This excludes studytracks.
-  const programmes = await getAllProgrammes()
-  const studyrightsBeforeMasters = await previousStudyrights(programmes, allStudents)
-  const studyprogrammeCodes = uniqBy(studyrightsBeforeMasters, 'code').map(s => ({ code: s.code, name: s.name }))
-  const stats = {}
-  studyprogrammeCodes.forEach(c => {
-    stats[c.code] = { ...c, ...getYearsObject({ years }) }
-  })
-
-  // Map transfers to the Master's programme
-  const transfers = await getTransferStudyrightMap(studyprogramme, since)
-
-  studyrightsBeforeMasters.forEach(({ studentNumber, code, givendate }) => {
-    const masterStudyright = all.find(s => s.studentNumber === studentNumber)
-    const transfer = transfers.get(masterStudyright.studyrightid)
-
-    // If special studyrights are excluded, transfers to the master's programme should be excluded
-    if (!includeAllSpecials && transfers.get(masterStudyright.studyrightid)) {
-      return
+  const stats = studyRights.reduce((acc, studyRight) => {
+    const phase1Programmes = studyRight.studyRightElements.filter(elem => elem.phase === 1)
+    const [latestPhase1Programme] = orderBy(phase1Programmes, ['endDate'], ['desc'])
+    if (!acc[latestPhase1Programme.code]) {
+      acc[latestPhase1Programme.code] = { ...latestPhase1Programme, ...getYearsObject({ years }) }
     }
+    const phase2Programmes = studyRight.studyRightElements.filter(elem => elem.phase === 2)
 
-    // If all studyrights are included, and transfer exists, define the start year in the programme, based on when the student transferred to it
-    // Otherwise, the year is defined based on when the student started in the chosen master's programme
-    const programmeStartDate = includeAllSpecials && transfer ? transfer.transferdate : masterStudyright?.studystartdate
-    const startYear = defineYear(programmeStartDate, isAcademicYear)
+    // If there's more than one programme of phase 2, the student has transferred from/to another programme
+    if (!includeAllSpecials && phase2Programmes.length > 1) return acc
 
-    // The master studyright should have been given on the same date as the bachelor's
-    if (years.includes(startYear) && code && masterStudyright.givendate.getTime() === givendate.getTime()) {
-      stats[code][startYear] += 1
-    }
-  })
+    const startDateInProgramme = phase2Programmes.find(elem => elem.code === studyprogramme).startDate
+    acc[latestPhase1Programme.code][defineYear(startDateInProgramme, isAcademicYear)] += 1
+    return acc
+  }, {})
 
   const graphAndTableStats = formatStats(stats, years)
   return graphAndTableStats
