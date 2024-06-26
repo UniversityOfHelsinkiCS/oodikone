@@ -16,16 +16,17 @@ const { getCurrentSemester } = require('../semesters')
 const { formatStudyright } = require('./studyprogrammeHelpers')
 const { whereStudents, sinceDate } = require('.')
 
-const getStudyRightsInProgramme = async programmeCode => {
+const getStudyRightsInProgramme = async (programmeCode, onlyGraduated) => {
+  const where = { code: programmeCode }
+  if (onlyGraduated) where.graduated = true
+
   const studyRights = await SISStudyRight.findAll({
     attributes: ['id'],
     include: {
       model: SISStudyRightElement,
       as: 'studyRightElements',
       attributes: [],
-      where: {
-        code: programmeCode,
-      },
+      where,
     },
     where: {
       studentNumber: {
@@ -37,7 +38,7 @@ const getStudyRightsInProgramme = async programmeCode => {
 
   return (
     await SISStudyRight.findAll({
-      attributes: ['id'],
+      attributes: ['id', 'studentNumber'],
       include: {
         model: SISStudyRightElement,
         as: 'studyRightElements',
@@ -195,42 +196,6 @@ const inactiveStudyrights = async (studytrack, studentnumbers) => {
   )
 }
 
-const followingStudyrights = async (since, programmes, studentnumbers) =>
-  (
-    await Studyright.findAll({
-      include: [
-        {
-          model: StudyrightElement,
-          required: true,
-          where: {
-            code: {
-              [Op.in]: programmes.map(p => p.code),
-            },
-          },
-          include: [
-            {
-              model: ElementDetail,
-              attributes: ['name', 'code', 'type'],
-            },
-          ],
-          attributes: ['code'],
-        },
-        {
-          model: Student,
-          attributes: ['studentnumber'],
-          required: true,
-        },
-      ],
-      where: {
-        studystartdate: {
-          [Op.gte]: since,
-        },
-        extentcode: 2,
-        student_studentnumber: whereStudents(studentnumbers),
-      },
-    })
-  ).map(formatStudyright)
-
 const getStudyRights = async students =>
   (
     await Studyright.findAll({
@@ -275,6 +240,5 @@ module.exports = {
   graduatedStudyRights,
   graduatedStudyRightsByStartDate,
   inactiveStudyrights,
-  followingStudyrights,
   getStudyRights,
 }
