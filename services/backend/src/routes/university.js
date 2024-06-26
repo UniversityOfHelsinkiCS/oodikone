@@ -1,6 +1,6 @@
 const router = require('express').Router()
 
-const { magic_faculty_code } = require('../../config/facultyCodes')
+const { magicFacultyCode } = require('../../config/facultyCodes')
 const { serviceProvider } = require('../conf-backend')
 const { getFacultyList } = require('../services/faculty/facultyHelpers')
 const { getFacultyProgressStats, getGraduationStats } = require('../services/faculty/facultyService')
@@ -24,11 +24,11 @@ router.get('/allprogressstats', async (req, res) => {
   }
 
   const universityData = {
-    years: codeToData[magic_faculty_code].years,
-    yearlyBachelorTitles: codeToData[magic_faculty_code].yearlyBachelorTitles,
-    yearlyBcMsTitles: codeToData[magic_faculty_code].yearlyBcMsTitles,
-    yearlyMasterTitles: codeToData[magic_faculty_code].yearlyMasterTitles,
-    yearlyLicentiateTitles: codeToData[magic_faculty_code].yearlyLicentiateTitles,
+    years: codeToData[magicFacultyCode].years,
+    yearlyBachelorTitles: codeToData[magicFacultyCode].yearlyBachelorTitles,
+    yearlyBcMsTitles: codeToData[magicFacultyCode].yearlyBcMsTitles,
+    yearlyMasterTitles: codeToData[magicFacultyCode].yearlyMasterTitles,
+    yearlyLicentiateTitles: codeToData[magicFacultyCode].yearlyLicentiateTitles,
     programmeNames: allFaculties.reduce((obj, faculty) => {
       const { name, ...rest } = faculty.dataValues
       obj[faculty.code] = { ...rest, ...name }

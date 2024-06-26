@@ -18,9 +18,9 @@ const facultyCodes = [
   'Y01',
 ]
 
-const magic_faculty_code = 'H50'
+const magicFacultyCode = 'H50'
 
 module.exports = {
   facultyCodes,
-  magic_faculty_code,
+  magicFacultyCode,
 }
