@@ -2,7 +2,6 @@ import moment from 'moment'
 import { Icon, Loader } from 'semantic-ui-react'
 
 import { hiddenNameAndEmailForExcel } from '@/common/columns'
-import { isWithinSixMonths } from '@/common/timeAndDate'
 import { StudentInfoItem } from '@/components/common/StudentInfoItem'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { RightsNotification } from '@/components/RightsNotification'
@@ -10,6 +9,7 @@ import { SortableTable } from '@/components/SortableTable'
 import { StudentNameVisibilityToggle, useStudentNameVisibility } from '@/components/StudentNameVisibilityToggle'
 import { ISO_DATE_FORMAT } from '@/constants/date'
 import { useGetCompletedCoursesQuery } from '@/redux/completedCoursesSearch'
+import { isWithinSixMonths } from '@/util/timeAndDate'
 
 const getColumns = (courses, showStudentNames, getTextIn) => {
   const isPassed = credit => [4, 7, 9].includes(credit)

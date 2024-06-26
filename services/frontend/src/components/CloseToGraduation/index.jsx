@@ -5,7 +5,6 @@ import { Divider, Dropdown, Form, Icon, Loader, Message, Radio, Tab } from 'sema
 import { createLocaleComparator, getCurrentSemester, getEnrollmentTypeTextForExcel, isFall } from '@/common'
 import { useTitle } from '@/common/hooks'
 import { closeToGraduationToolTips } from '@/common/InfoToolTips'
-import { reformatDate } from '@/common/timeAndDate'
 import { StudentInfoItem } from '@/components/common/StudentInfoItem'
 import { InfoBox } from '@/components/Info/InfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -17,6 +16,7 @@ import { useGetStudentsCloseToGraduationQuery } from '@/redux/closeToGraduation'
 import { useFilteredAndFormattedElementDetails } from '@/redux/elementdetails'
 import { useGetFacultiesQuery } from '@/redux/facultyStats'
 import { useGetSemestersQuery } from '@/redux/semesters'
+import { reformatDate } from '@/util/timeAndDate'
 
 const NUMBER_OF_DISPLAYED_SEMESTERS = 6
 

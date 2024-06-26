@@ -1,6 +1,6 @@
 import { getAllProgrammesOfStudent } from '@/common'
-import { reformatDate } from '@/common/timeAndDate'
 import { ISO_DATE_FORMAT } from '@/constants/date'
+import { reformatDate } from '@/util/timeAndDate'
 
 const noProgrammeDuringCourse = {
   en: 'No programme at time of course',

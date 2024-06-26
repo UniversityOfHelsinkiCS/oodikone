@@ -5,11 +5,11 @@ import Datetime from 'react-datetime'
 import { Link } from 'react-router-dom'
 import { Button, Confirm, Form, Header, Icon, Item, List, Message, Popup, Segment } from 'semantic-ui-react'
 
-import { reformatDate } from '@/common/timeAndDate'
 import { SortableTable } from '@/components/SortableTable'
 import { TagModal } from '@/components/StudyProgramme/TagModal'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useCreateTagMutation, useGetTagsByStudyTrackQuery, useDeleteTagMutation } from '@/redux/tags'
+import { reformatDate } from '@/util/timeAndDate'
 
 const YEAR_DATE_FORMAT = 'YYYY'
 

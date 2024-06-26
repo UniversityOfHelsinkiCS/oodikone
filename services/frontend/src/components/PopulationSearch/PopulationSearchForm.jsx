@@ -9,7 +9,6 @@ import { Button, Form, Grid, Icon, Message } from 'semantic-ui-react'
 
 import { cancelablePromise, createPinnedFirstComparator, isNewStudyProgramme, textAndDescriptionSearch } from '@/common'
 import { useSearchHistory } from '@/common/hooks'
-import { momentFromFormat, reformatDate } from '@/common/timeAndDate'
 import { FilterOldProgrammesToggle } from '@/components/common/FilterOldProgrammesToggle'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SearchHistory } from '@/components/SearchHistory'
@@ -18,6 +17,7 @@ import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { getPopulationStatistics, clearPopulations, useGetProgrammesQuery } from '@/redux/populations'
 import { clearSelected } from '@/redux/populationSelectedStudentCourses'
 import { useGetStudyProgrammePinsQuery } from '@/redux/studyProgrammePins'
+import { momentFromFormat, reformatDate } from '@/util/timeAndDate'
 import './populationSearch.css'
 
 const months = (year, term) => {

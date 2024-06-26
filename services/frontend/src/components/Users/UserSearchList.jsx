@@ -4,13 +4,12 @@ import { Link } from 'react-router-dom'
 import { Button, Label, Loader, Popup, Segment } from 'semantic-ui-react'
 
 import { isDefaultServiceProvider } from '@/common'
-import { reformatDate } from '@/common/timeAndDate'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SortableTable } from '@/components/SortableTable'
 import { DISPLAY_DATE_FORMAT } from '@/constants/date'
-
 import { useShowAsUser } from '@/redux/auth'
 import { useGetAllElementDetailsQuery } from '@/redux/elementdetails'
+import { reformatDate } from '@/util/timeAndDate'
 
 export const UserSearchList = ({ users, isLoading, isError }) => {
   const { getTextIn } = useLanguage()

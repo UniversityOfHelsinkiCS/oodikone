@@ -6,11 +6,11 @@ import { Button, Divider, Header, Icon, Item, Popup, Table } from 'semantic-ui-r
 import { calculatePercentage, getTargetCreditsForProgramme } from '@/common'
 import { useCurrentSemester } from '@/common/hooks'
 import { studentToolTips } from '@/common/InfoToolTips'
-import { reformatDate } from '@/common/timeAndDate'
 import { HoverableHelpPopup } from '@/components/common/HoverableHelpPopup'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 import { useGetProgrammesQuery } from '@/redux/populations'
+import { reformatDate } from '@/util/timeAndDate'
 
 const studyRightIsActive = (studyRight, currentSemester) =>
   studyRight.semesterEnrollments?.find(({ type, semester }) => semester === currentSemester && [1, 2].includes(type)) !=

@@ -3,13 +3,13 @@ import { useCallback, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Container, Search, Segment } from 'semantic-ui-react'
 
-import { reformatDate } from '@/common/timeAndDate'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SegmentDimmer } from '@/components/SegmentDimmer'
 import { SortableTable } from '@/components/SortableTable'
 import { useStudentNameVisibility } from '@/components/StudentNameVisibilityToggle'
 import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 import { useSearchStudentsQuery } from '@/redux/students'
+import { reformatDate } from '@/util/timeAndDate'
 
 const getProgrammes = (studyRights, getTextIn) =>
   studyRights

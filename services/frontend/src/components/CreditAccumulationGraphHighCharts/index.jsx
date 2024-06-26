@@ -10,9 +10,9 @@ import { Button, Radio } from 'semantic-ui-react'
 
 import { getStudyRightElementTargetDates } from '@/common'
 import { useDeepMemo } from '@/common/hooks'
-import { reformatDate } from '@/common/timeAndDate'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { API_DATE_FORMAT, DISPLAY_DATE_FORMAT } from '@/constants/date'
+import { reformatDate } from '@/util/timeAndDate'
 import { CreditGraphTooltip } from './CreditGraphTooltip'
 import './creditAccumulationGraphHC.css'
 

@@ -3,8 +3,8 @@ import { Fragment, useState } from 'react'
 import { Icon, Progress, Radio, Table } from 'semantic-ui-react'
 
 import { getFullStudyProgrammeRights } from '@/common'
-import { getAge } from '@/common/timeAndDate'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
+import { getAge } from '@/util/timeAndDate'
 
 const getAverageAge = ages => {
   if (ages.length === 0) return 0

@@ -3,12 +3,12 @@ import { Button, Divider, Loader, Popup } from 'semantic-ui-react'
 import { utils, writeFile } from 'xlsx'
 
 import { facultyToolTips } from '@/common/InfoToolTips'
-import { getTimestamp } from '@/common/timeAndDate'
 import '@/components/FacultyStatistics/faculty.css'
 import { InfoBox } from '@/components/Info/InfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Toggle } from '@/components/StudyProgramme/Toggle'
 import { useGetFacultyGraduationTimesQuery } from '@/redux/facultyStats'
+import { getTimestamp } from '@/util/timeAndDate'
 import { GraduationTimes } from './GraduationTimes'
 
 export const TimesAndPathsView = ({ faculty, setStudyProgrammes, studyProgrammes }) => {

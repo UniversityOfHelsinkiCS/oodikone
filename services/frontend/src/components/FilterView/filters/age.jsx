@@ -2,8 +2,8 @@ import { max, min } from 'lodash'
 import { useCallback, useMemo } from 'react'
 
 import { useDebounce } from '@/common/hooks'
-import { getAge } from '@/common/timeAndDate'
 import { RangeSelector } from '@/components/common/RangeSelector'
+import { getAge } from '@/util/timeAndDate'
 import { createFilter } from './createFilter'
 
 const AgeFilterCard = ({ options, onOptionsChange, bounds }) => {

@@ -2,7 +2,7 @@ import { Button, Popup } from 'semantic-ui-react'
 import { utils, writeFile } from 'xlsx'
 
 import { getStudentGradeMean, getStudentGradeMeanWeightedByCredits, getStudentTotalCredits } from '@/common'
-import { getTimestamp } from '@/common/timeAndDate'
+import { getTimestamp } from '@/util/timeAndDate'
 
 export const UnihowDataExport = ({ students }) => {
   const getXlsx = () => {

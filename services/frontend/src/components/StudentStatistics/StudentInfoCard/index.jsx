@@ -1,11 +1,11 @@
 import { Button, Card, Icon } from 'semantic-ui-react'
 
 import { callApi } from '@/apiConnection'
-import { reformatDate } from '@/common/timeAndDate'
 import { SisuLinkItem } from '@/components/common/SisuLinkItem'
 import { useStudentNameVisibility } from '@/components/StudentNameVisibilityToggle'
 import { DISPLAY_DATE_FORMAT, DISPLAY_DATE_FORMAT_DEV } from '@/constants/date'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
+import { reformatDate } from '@/util/timeAndDate'
 import { EnrollmentAccordion } from './EnrollmentAccordion'
 import './studentInfoCard.css'
 

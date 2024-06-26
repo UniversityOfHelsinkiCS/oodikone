@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Divider, Loader, Message, Radio } from 'semantic-ui-react'
 
 import { facultyToolTips } from '@/common/InfoToolTips'
-import { getTimestamp } from '@/common/timeAndDate'
 import { makeGraphData, makeTableStats } from '@/components/common/CreditsProduced'
 import { sortProgrammeKeys } from '@/components/FacultyStatistics/facultyHelpers'
 import { InteractiveDataTable } from '@/components/FacultyStatistics/InteractiveDataView'
@@ -17,6 +16,7 @@ import {
   useGetFacultyCreditStatsQuery,
   useGetFacultyThesisStatsQuery,
 } from '@/redux/facultyStats'
+import { getTimestamp } from '@/util/timeAndDate'
 
 const calculateTotals = stats => {
   const totals = {}

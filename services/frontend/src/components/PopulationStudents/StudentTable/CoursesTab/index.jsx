@@ -4,13 +4,13 @@ import { useSelector } from 'react-redux'
 import { Icon, Tab } from 'semantic-ui-react'
 
 import { hiddenNameAndEmailForExcel } from '@/common/columns'
-import { isWithinSixMonths, reformatDate } from '@/common/timeAndDate'
 import { StudentInfoItem } from '@/components/common/StudentInfoItem'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SortableTable, row } from '@/components/SortableTable'
 import { useStudentNameVisibility } from '@/components/StudentNameVisibilityToggle'
 import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 import { useGetStudyGuidanceGroupPopulationCoursesQuery } from '@/redux/studyGuidanceGroups'
+import { isWithinSixMonths, reformatDate } from '@/util/timeAndDate'
 
 const getCourseCodes = curriculum => {
   return [

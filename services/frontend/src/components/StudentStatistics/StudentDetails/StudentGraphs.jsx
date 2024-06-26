@@ -7,10 +7,10 @@ import ReactHighcharts from 'react-highcharts/ReactHighstock'
 import { Input, Menu, Message, Tab } from 'semantic-ui-react'
 
 import { getStudyRightElementTargetDates } from '@/common'
-import { reformatDate } from '@/common/timeAndDate'
 import { CreditAccumulationGraphHighCharts } from '@/components/CreditAccumulationGraphHighCharts'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { DISPLAY_DATE_FORMAT } from '@/constants/date'
+import { reformatDate } from '@/util/timeAndDate'
 
 exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)

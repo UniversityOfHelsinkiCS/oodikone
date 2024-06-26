@@ -7,10 +7,10 @@ import {
   bachelorHonoursBasicModules as basicHonoursModules,
   bachelorHonoursIntermediateModules as intermediateHonoursModules,
 } from '@/common'
-import { reformatDate } from '@/common/timeAndDate'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { CurriculumPicker } from '@/components/PopulationDetails/CurriculumPicker'
 import { DISPLAY_DATE_FORMAT } from '@/constants/date'
+import { reformatDate } from '@/util/timeAndDate'
 
 export const BachelorHonours = ({ absentYears, programmeCode, student }) => {
   const [curriculum, setCurriculum] = useState(null)

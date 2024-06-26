@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom'
 import { Divider, Header, Icon, Item, Label } from 'semantic-ui-react'
 
 import { getTextInWithOpen } from '@/common'
-import { reformatDate } from '@/common/timeAndDate'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { StudentCourseTable } from '@/components/StudentStatistics/StudentCourseTable'
 import { DISPLAY_DATE_FORMAT } from '@/constants/date'
+import { reformatDate } from '@/util/timeAndDate'
 
 // Some courses are without AY in the beginning in the studyplan even though the credits are registered with AY.
 const isInStudyPlan = (plan, code) =>
