@@ -92,10 +92,19 @@ const studyRightElementMapper =
     if (!code || !correctStartDate) return null
 
     const educationInfo = await selectOneById('modules', moduleGroupId.replace('EDU', 'DP'), 'group_id')
-    const endDate = isLastProgramme(programmes, index)
-      ? latestSnapshot.study_right_graduation?.[`phase${phase}GraduationDate`] ??
+    let endDate
+    if (isLastProgramme(programmes, index)) {
+      endDate =
+        latestSnapshot.study_right_graduation?.[`phase${phase}GraduationDate`] ??
         addDaysToDate(latestSnapshot.valid.endDate, -1)
-      : addDaysToDate(programmes[index + 1][1], -1)
+    } else {
+      const nextProgrammeStartDate = new Date(programmes[index + 1][1])
+      if (nextProgrammeStartDate.toDateString() === new Date(correctStartDate).toDateString()) {
+        endDate = nextProgrammeStartDate
+      } else {
+        endDate = addDaysToDate(nextProgrammeStartDate, -1)
+      }
+    }
 
     // Graduation only set for the latest programme
     const graduated =
