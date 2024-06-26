@@ -50,18 +50,19 @@ const updateCourseByYear = (criteria, criteriaYear, course, criteriaChecked, yea
   }
 }
 
-const updateCreditcriteriaInfo = (criteria, criteriaYear, criteriaChecked, yearToAdd, academicYears, academicYear) => {
-  if (criteria.courses) {
-    if (criteriaChecked?.[yearToAdd]) {
-      criteriaChecked[yearToAdd].totalSatisfied +=
-        Object.keys(criteriaChecked?.[yearToAdd].coursesSatisfied).filter(
-          course => criteriaChecked?.[yearToAdd].coursesSatisfied[course] !== null
-        ).length || 0
-    }
-    if (academicYears[academicYear] >= criteria?.credits[criteriaYear] && criteria?.credits[criteriaYear] > 0) {
-      criteriaChecked[yearToAdd].credits = true
-      criteriaChecked[yearToAdd].totalSatisfied += 1
-    }
+const updateCreditCriteriaInfo = (criteria, criteriaYear, criteriaChecked, yearToAdd, academicYears, academicYear) => {
+  if (!criteria.courses) {
+    return
+  }
+  if (criteriaChecked?.[yearToAdd]) {
+    criteriaChecked[yearToAdd].totalSatisfied +=
+      Object.keys(criteriaChecked?.[yearToAdd].coursesSatisfied).filter(
+        course => criteriaChecked?.[yearToAdd].coursesSatisfied[course] !== null
+      ).length || 0
+  }
+  if (academicYears[academicYear] >= criteria?.credits[criteriaYear] && criteria?.credits[criteriaYear] > 0) {
+    criteriaChecked[yearToAdd].credits = true
+    criteriaChecked[yearToAdd].totalSatisfied += 1
   }
 }
 
@@ -181,12 +182,12 @@ const formatStudentForPopulationStatistics = (
       })
     }
 
-    updateCreditcriteriaInfo(criteria, 'yearOne', criteriaChecked, 'year1', academicYears, 'first')
-    updateCreditcriteriaInfo(criteria, 'yearTwo', criteriaChecked, 'year2', academicYears, 'second')
-    updateCreditcriteriaInfo(criteria, 'yearThree', criteriaChecked, 'year3', academicYears, 'third')
-    updateCreditcriteriaInfo(criteria, 'yearFour', criteriaChecked, 'year4', academicYears, 'fourth')
-    updateCreditcriteriaInfo(criteria, 'yearFive', criteriaChecked, 'year5', academicYears, 'fifth')
-    updateCreditcriteriaInfo(criteria, 'yearSix', criteriaChecked, 'year6', academicYears, 'sixth')
+    updateCreditCriteriaInfo(criteria, 'yearOne', criteriaChecked, 'year1', academicYears, 'first')
+    updateCreditCriteriaInfo(criteria, 'yearTwo', criteriaChecked, 'year2', academicYears, 'second')
+    updateCreditCriteriaInfo(criteria, 'yearThree', criteriaChecked, 'year3', academicYears, 'third')
+    updateCreditCriteriaInfo(criteria, 'yearFour', criteriaChecked, 'year4', academicYears, 'fourth')
+    updateCreditCriteriaInfo(criteria, 'yearFive', criteriaChecked, 'year5', academicYears, 'fifth')
+    updateCreditCriteriaInfo(criteria, 'yearSix', criteriaChecked, 'year6', academicYears, 'sixth')
     return criteriaChecked
   }
 
