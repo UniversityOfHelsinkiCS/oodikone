@@ -68,8 +68,8 @@ Teacher.belongsToMany(Credit, { through: CreditTeacher, foreignKey: 'teacher_id'
 Organization.hasMany(Studyright, { foreignKey: 'facultyCode', sourceKey: 'code' })
 Studyright.belongsTo(Organization, { foreignKey: 'facultyCode', targetKey: 'code' })
 
-SISStudyRight.belongsTo(Organization, { foreignKey: 'faculty_code', targetKey: 'code' })
-Organization.hasMany(SISStudyRight, { foreignKey: 'faculty_code', sourceKey: 'code' })
+SISStudyRight.belongsTo(Organization, { foreignKey: 'facultyCode', targetKey: 'code' })
+Organization.hasMany(SISStudyRight, { foreignKey: 'facultyCode', sourceKey: 'code' })
 
 Studyplan.belongsTo(Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
 Student.hasMany(Studyplan, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
@@ -80,8 +80,8 @@ Studyright.hasMany(Studyplan, { foreignKey: 'studyrightid', sourceKey: 'studyrig
 Studyright.belongsTo(Student, { foreignKey: 'studentStudentnumber', targetKey: 'studentnumber' })
 Student.hasMany(Studyright, { foreignKey: 'studentStudentnumber', sourceKey: 'studentnumber' })
 
-SISStudyRight.belongsTo(Student, { foreignKey: 'student_number' })
-Student.hasMany(SISStudyRight, { as: 'studyRights', foreignKey: 'student_number' })
+SISStudyRight.belongsTo(Student, { foreignKey: 'studentNumber' })
+Student.hasMany(SISStudyRight, { as: 'studyRights', foreignKey: 'studentNumber' })
 
 StudyrightElement.belongsTo(Studyright, { foreignKey: 'studyrightid', targetKey: 'studyrightid' })
 Studyright.hasMany(StudyrightElement, { foreignKey: 'studyrightid', sourceKey: 'studyrightid' })
