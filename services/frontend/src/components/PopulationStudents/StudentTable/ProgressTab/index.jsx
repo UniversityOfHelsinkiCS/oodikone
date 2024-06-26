@@ -109,6 +109,24 @@ const createEmptyHidden = nthHiddenColumn => {
   ]
 }
 
+const isMedicalDegree = programme => ['MH30_001', 'MH30_003', 'KH90_001'].includes(programme)
+
+const getCriteriaHeaders = (months, programme) => {
+  const criteriaHeaders = [
+    { title: months < 12 ? 'Academic year 1 (in progress)' : 'Academic year 1', year: 'year1', label: 'yearOne' },
+    { title: months < 24 ? 'Academic year 2 (in progress)' : 'Academic year 2', year: 'year2', label: 'yearTwo' },
+    { title: months < 36 ? 'Academic year 3 (in progress)' : 'Academic year 3', year: 'year3', label: 'yearThree' },
+  ]
+  if (isMedicalDegree(programme)) {
+    criteriaHeaders.push(
+      { title: months < 48 ? 'Academic year 4 (in progress)' : 'Academic year 4', year: 'year4', label: 'yearFour' },
+      { title: months < 60 ? 'Academic year 5 (in progress)' : 'Academic year 5', year: 'year5', label: 'yearFive' },
+      { title: months < 72 ? 'Academic year 6 (in progress)' : 'Academic year 6', year: 'year6', label: 'yearSix' }
+    )
+  }
+  return criteriaHeaders
+}
+
 export const ProgressTable = ({ curriculum, criteria, students, months, programme, studyGuidanceGroupProgramme }) => {
   const { visible: namesVisible } = useStudentNameVisibility()
   const { getTextIn } = useLanguage()
@@ -159,11 +177,7 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
     return acc
   }, {})
 
-  const criteriaHeaders = [
-    { title: months < 12 ? 'Academic Year 1 (in progress)' : 'Academic Year 1', year: 'year1', label: 'yearOne' },
-    { title: months < 24 ? 'Academic Year 2 (in progress)' : 'Academic Year 2', year: 'year2', label: 'yearTwo' },
-    { title: months < 36 ? 'Academic Year 3 (in progress)' : 'Academic Year 3', year: 'year3', label: 'yearThree' },
-  ]
+  const criteriaHeaders = getCriteriaHeaders(months, programme)
 
   const nonCourse = ['Criteria', 'Credits']
 
@@ -300,6 +314,30 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
     .endOf('month')
 
   const columns = useMemo(() => {
+    const generateYearColumns = (startYear, endYear, criteriaIndex) => ({
+      key: criteriaHeaders[criteriaIndex].title,
+      title: (
+        <div style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
+          <div>{criteriaHeaders[criteriaIndex].title}</div>
+        </div>
+      ),
+      textTitle: null,
+      children: createContent(
+        labelCriteria[criteriaHeaders[criteriaIndex].label],
+        criteriaHeaders[criteriaIndex].year,
+        startYear,
+        endYear,
+        criteriaIndex
+      ),
+    })
+
+    const generateHiddenColumn = index => ({
+      key: `hidden-${index}`,
+      textTitle: null,
+      mergeHeader: true,
+      children: createEmptyHidden(index),
+    })
+
     const columns = [
       {
         key: 'general',
@@ -339,178 +377,32 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
           },
         ],
       },
-      {
-        key: criteriaHeaders[0].title,
-        title: (
-          <div style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
-            <div>{criteriaHeaders[0].title}</div>
-          </div>
-        ),
-        textTitle: null,
-        children: createContent(
-          labelCriteria[criteriaHeaders[0].label],
-          criteriaHeaders[0].year,
-          academicYearStart,
-          academicYearEnd,
-          0
-        ),
-      },
-      {
-        key: 'hidden-1',
-        textTitle: null,
-        mergeHeader: true,
-        children: createEmptyHidden(1),
-      },
+      generateYearColumns(academicYearStart, academicYearEnd, 0),
+      generateHiddenColumn(1),
     ]
-    if (months > 12) {
-      const academicYearStart2 = moment(academicYearStart).add(1, 'years')
-      const academicYearEnd2 = moment(academicYearEnd).add(1, 'years')
-      columns.push(
-        {
-          key: criteriaHeaders[1].title,
-          title: (
-            <div style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
-              <div>{criteriaHeaders[1].title}</div>
-            </div>
-          ),
-          textTitle: null,
-          children: createContent(
-            labelCriteria[criteriaHeaders[1].label],
-            criteriaHeaders[1].year,
-            academicYearStart2,
-            academicYearEnd2,
-            1
-          ),
-        },
-        {
-          key: 'hidden-2',
-          textTitle: null,
-          mergeHeader: true,
-          children: createEmptyHidden(2),
-        }
-      )
-    }
-    if (months > 24) {
-      const academicYearStart3 = moment(academicYearStart).add(24, 'months')
-      const academicYearEnd3 = moment(academicYearEnd).add(24, 'months')
-      columns.push(
-        {
-          key: criteriaHeaders[2].title,
-          title: (
-            <div style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
-              <div>{criteriaHeaders[2].title}</div>
-            </div>
-          ),
-          textTitle: null,
-          children: createContent(
-            labelCriteria[criteriaHeaders[2].label],
-            criteriaHeaders[2].year,
-            academicYearStart3,
-            academicYearEnd3,
-            2
-          ),
-        },
-        {
-          key: 'hidden-3',
-          textTitle: null,
-          mergeHeader: true,
-          children: createEmptyHidden(3),
-        }
-      )
-    }
-    // Lääkis and Hammaslääkis do not have a separate bachelor's programme.
-    // Eläinlääkis does have a separate bachelor and master programmes, but we like to see it as one.
-    if (['MH30_001', 'MH30_003', 'KH90_001'].includes(programme)) {
-      criteriaHeaders.push(
-        { title: months < 48 ? 'Academic Year 4 (in progress)' : 'Academic Year 4', year: 'year4', label: 'yearFour' },
-        { title: months < 60 ? 'Academic Year 5 (in progress)' : 'Academic Year 5', year: 'year5', label: 'yearFive' },
-        { title: months < 72 ? 'Academic Year 6 (in progress)' : 'Academic Year 6', year: 'year6', label: 'yearSix' }
-      )
-      if (months > 36) {
-        const academicYearStart4 = moment(academicYearStart).add(3, 'years')
-        const academicYearEnd4 = moment(academicYearEnd).add(3, 'years')
+
+    const addYearColumns = year => {
+      if (months > year * 12) {
         columns.push(
-          {
-            key: criteriaHeaders[3].title,
-            title: (
-              <div style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
-                <div>{criteriaHeaders[3].title}</div>
-              </div>
-            ),
-            textTitle: null,
-            children: createContent(
-              labelCriteria[criteriaHeaders[3].label],
-              criteriaHeaders[3].year,
-              academicYearStart4,
-              academicYearEnd4,
-              3
-            ),
-          },
-          {
-            key: 'hidden-4',
-            textTitle: null,
-            mergeHeader: true,
-            children: createEmptyHidden(4),
-          }
-        )
-      }
-      if (months > 48) {
-        const academicYearStart5 = moment(academicYearStart).add(4, 'years')
-        const academicYearEnd5 = moment(academicYearEnd).add(4, 'years')
-        columns.push(
-          {
-            key: criteriaHeaders[4].title,
-            title: (
-              <div style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
-                <div>{criteriaHeaders[4].title}</div>
-              </div>
-            ),
-            textTitle: null,
-            children: createContent(
-              labelCriteria[criteriaHeaders[4].label],
-              criteriaHeaders[4].year,
-              academicYearStart5,
-              academicYearEnd5,
-              4
-            ),
-          },
-          {
-            key: 'hidden-5',
-            textTitle: null,
-            mergeHeader: true,
-            children: createEmptyHidden(5),
-          }
-        )
-      }
-      if (months > 60) {
-        const academicYearStart6 = moment(academicYearStart).add(5, 'years')
-        const academicYearEnd6 = moment(academicYearEnd).add(5, 'years')
-        columns.push(
-          {
-            key: criteriaHeaders[5].title,
-            title: (
-              <div key={criteriaHeaders[5].title} style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
-                <div>{criteriaHeaders[5].title}</div>
-              </div>
-            ),
-            textTitle: null,
-            children: createContent(
-              labelCriteria[criteriaHeaders[5].label],
-              criteriaHeaders[5].year,
-              academicYearStart6,
-              academicYearEnd6,
-              5
-            ),
-          },
-          {
-            key: 'hidden-6',
-            textTitle: null,
-            mergeHeader: true,
-            children: createEmptyHidden(6),
-          }
+          generateYearColumns(
+            moment(academicYearStart).add(year, 'years'),
+            moment(academicYearEnd).add(year, 'years'),
+            year
+          ),
+          generateHiddenColumn(year + 1)
         )
       }
     }
+
+    addYearColumns(1)
+    addYearColumns(2)
+
+    if (isMedicalDegree(programme)) {
+      addYearColumns(3)
+      addYearColumns(4)
+      addYearColumns(5)
+    }
+
     columns.push({
       key: 'hiddenFields',
       title: '',
