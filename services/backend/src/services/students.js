@@ -42,6 +42,7 @@ const byStudentNumber = async studentNumber => {
           include: {
             model: Course,
             attributes: ['code', 'name'],
+            required: true,
           },
         },
         {
