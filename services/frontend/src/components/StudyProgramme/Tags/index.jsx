@@ -7,11 +7,10 @@ import { Button, Confirm, Form, Header, Icon, Item, List, Message, Popup, Segmen
 
 import { SortableTable } from '@/components/SortableTable'
 import { TagModal } from '@/components/StudyProgramme/TagModal'
+import { YEAR_DATE_FORMAT } from '@/constants/date'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useCreateTagMutation, useGetTagsByStudyTrackQuery, useDeleteTagMutation } from '@/redux/tags'
 import { reformatDate } from '@/util/timeAndDate'
-
-const YEAR_DATE_FORMAT = 'YYYY'
 
 export const Tags = ({ studyprogramme, combinedProgramme }) => {
   const [tagname, setTagname] = useState('')
