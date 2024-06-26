@@ -9,7 +9,7 @@ const { semesterEnd, semesterStart } = require('../../util/semester')
 const { getCurrentSemester } = require('../semesters')
 const { getAllProgrammes } = require('../studyrights')
 
-// Progress tab related helper functions.
+// Progress tab related helper functions
 const createEmptyCriteriaYear = (criteria, year) => {
   return {
     credits: false,
@@ -120,13 +120,13 @@ const formatStudentForPopulationStatistics = (
     language,
     studyright_id,
   }) => {
-    const attainment_date_normailized =
+    const attainmentDateNormalized =
       attainment_date < startDate ? startDateMoment.clone().add(1, 'day').toISOString() : attainment_date
     const passed = Credit.passed({ credittypecode })
 
     return {
       course_code,
-      date: attainment_date_normailized,
+      date: attainmentDateNormalized,
       passed,
       grade: passed ? grade : 'Hyl.',
       credits,
@@ -136,6 +136,7 @@ const formatStudentForPopulationStatistics = (
       studyright_id,
     }
   }
+
   const criteriaCoursesBySubstitutions = criteria?.allCourses
     ? Object.keys(criteria.allCourses).reduce((acc, courseCode) => {
         acc[courseCode] = courseCode
@@ -240,11 +241,11 @@ const count = (column, count, distinct = false) => {
 const parseQueryParams = query => {
   const { semesters, studentStatuses, studyRights, months, year, tag } = query
   const startDate = semesters.includes('FALL')
-    ? `${year}-${semesterStart[semesters.find(s => s === 'FALL')]}`
-    : `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterStart[semesters.find(s => s === 'SPRING')]}`
+    ? `${year}-${semesterStart[semesters.find(semester => semester === 'FALL')]}`
+    : `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterStart[semesters.find(semester => semester === 'SPRING')]}`
   const endDate = semesters.includes('SPRING')
-    ? `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd[semesters.find(s => s === 'SPRING')]}`
-    : `${year}-${semesterEnd[semesters.find(s => s === 'FALL')]}`
+    ? `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd[semesters.find(semester => semester === 'SPRING')]}`
+    : `${year}-${semesterEnd[semesters.find(semester => semester === 'FALL')]}`
   const exchangeStudents = studentStatuses && studentStatuses.includes('EXCHANGE')
   const nondegreeStudents = studentStatuses && studentStatuses.includes('NONDEGREE')
   const transferredStudents = studentStatuses && studentStatuses.includes('TRANSFERRED')
@@ -253,8 +254,7 @@ const parseQueryParams = query => {
     exchangeStudents,
     nondegreeStudents,
     transferredStudents,
-    // if someone passes something falsy like null as the studyright, remove it so it doesn't break
-    // the sequelize query
+    // Remove falsy values so the query doesn't break
     studyRights: (Array.isArray(studyRights) ? studyRights : Object.values(studyRights)).filter(Boolean),
     months,
     startDate,
@@ -320,7 +320,7 @@ const getOptionsForStudents = async (students, code, level) => {
             [Op.in]: students,
           },
           code: {
-            [Op.in]: programmes.map(p => p.code),
+            [Op.in]: programmes.map(programme => programme.code),
           },
         },
         include: [
@@ -385,6 +385,7 @@ const formatStudentsForApi = async (
     acc[e.studentnumber].push(e)
     return acc
   }, {})
+
   const result = students.reduce(
     (stats, student) => {
       student.transfers.forEach(transfer => {
@@ -429,21 +430,21 @@ const formatStudentsForApi = async (
     }
   )
 
-  const transferredStudyright = s => {
-    const transferred_from = s.transfers.find(
-      t =>
-        t.targetcode === studyRights.programme &&
-        // add bit of flex for students that transferred just before the startdate
-        moment(t.transferdate).isBetween(startDateMoment.subtract(1, 'd'), endDateMoment.add(1, 'd'))
+  const transferredStudyright = student => {
+    const transferredFrom = student.transfers.find(
+      transfer =>
+        transfer.targetcode === studyRights.programme &&
+        // Add bit of flex for students that transferred just before the startdate
+        moment(transfer.transferdate).isBetween(startDateMoment.subtract(1, 'd'), endDateMoment.add(1, 'd'))
     )
-    if (transferred_from) {
-      s.transferredStudyright = true
-      s.transferSource = transferred_from.sourcecode
+    if (transferredFrom) {
+      student.transferredStudyright = true
+      student.transferSource = transferredFrom.sourcecode
     } else {
-      s.transferredStudyright = false
-      s.transferSource = null
+      student.transferredStudyright = false
+      student.transferSource = null
     }
-    return s
+    return student
   }
 
   const returnvalue = {
@@ -458,11 +459,13 @@ const formatStudentsForApi = async (
   return returnvalue
 }
 
-const formatQueryParamArrays = (query, params) => {
+const formatQueryParamsToArrays = (query, params) => {
   const res = { ...query }
-  params.forEach(p => {
-    if (!res[p]) return
-    res[p] = Array.isArray(res[p]) ? res[p] : [res[p]]
+  params.forEach(param => {
+    if (!res[param]) {
+      return
+    }
+    res[param] = Array.isArray(res[param]) ? res[param] : [res[param]]
   })
   return res
 }
@@ -472,9 +475,17 @@ const getSubstitutions = async codes => {
   return [...new Set(courses.map(({ code, substitutions }) => [code, ...substitutions]).flat())]
 }
 
-// This duplicate code is added here to ensure that we get the enrollments in cases no credits found for the selected students.
+const getCourseCodes = async courses => {
+  if (courses.length === 0) {
+    return ['DUMMY']
+  }
+  const courseCodes = await getSubstitutions(courses)
+  return courseCodes
+}
+
+// This duplicate code is added here to ensure that we get the enrollments in cases no credits found for the selected students
 const findCourseEnrollments = async (studentnumbers, beforeDate, courses = []) => {
-  const courseCodes = courses.length > 0 ? await getSubstitutions(courses) : ['DUMMY']
+  const courseCodes = await getCourseCodes(courses)
   const res = await sequelize.query(
     `
       SELECT DISTINCT ON (course.id)
@@ -516,7 +527,7 @@ const findCourseEnrollments = async (studentnumbers, beforeDate, courses = []) =
 }
 
 const findCourses = async (studentnumbers, beforeDate, courses = []) => {
-  const courseCodes = courses.length > 0 ? await getSubstitutions(courses) : ['DUMMY']
+  const courseCodes = await getCourseCodes(courses)
   const res = await sequelize.query(
     `
       SELECT DISTINCT ON (course.id)
@@ -587,7 +598,7 @@ module.exports = {
   parseCreditInfo,
   findCourses,
   findCourseEnrollments,
-  formatQueryParamArrays,
+  formatQueryParamsToArrays,
   formatStudentsForApi,
   parseQueryParams,
   getOptionsForStudents,

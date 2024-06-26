@@ -4,7 +4,7 @@ const { getCriteria } = require('../studyprogramme/studyProgrammeCriteria')
 const { getStudentsIncludeCoursesBetween } = require('./getStudentsIncludeCoursesBetween')
 const {
   dateMonthsFromNow,
-  formatQueryParamArrays,
+  formatQueryParamsToArrays,
   formatStudentsForApi,
   getOptionsForStudents,
   parseQueryParams,
@@ -12,7 +12,7 @@ const {
 const { studentnumbersWithAllStudyrightElements } = require('./studentnumbersWithAllStudyrightElements')
 
 const optimizedStatisticsOf = async (query, studentnumberlist) => {
-  const formattedQueryParams = formatQueryParamArrays(query, ['semesters', 'studentStatuses'])
+  const formattedQueryParams = formatQueryParamsToArrays(query, ['semesters', 'studentStatuses'])
 
   if (!formattedQueryParams.semesters.every(semester => semester === 'FALL' || semester === 'SPRING')) {
     return { error: 'Semester should be either SPRING OR FALL' }

@@ -95,11 +95,15 @@ const PopulationSearchForm = ({ queries, onProgress, clearSelected, getPopulatio
     return sameStudyrights && sameMonths && sameYear && sameSemesters && sameStudentStatuses && sameYears && sameTag
   }
 
+  // Identical logic can be found in the backend (src/services/populations/shared.js)
+  // If the logic changes, remember to update the backend as well
   const formatQueryParamsToArrays = (query, params) => {
     const res = { ...query }
-    params.forEach(p => {
-      if (!res[p]) return
-      res[p] = Array.isArray(res[p]) ? res[p] : [res[p]]
+    params.forEach(param => {
+      if (!res[param]) {
+        return
+      }
+      res[param] = Array.isArray(res[param]) ? res[param] : [res[param]]
     })
     return res
   }
