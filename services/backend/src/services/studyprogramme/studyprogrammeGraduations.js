@@ -163,6 +163,8 @@ const getProgrammesBeforeStarting = async ({ studyprogramme, years, isAcademicYe
   const studyRights = await getStudyRightsInProgramme(studyprogramme, false)
 
   const stats = studyRights.reduce((acc, studyRight) => {
+    // If the extent code is something else, that means the student hasn't continued from a bachelor's programme
+    if (studyRight.extentCode !== 5) return acc
     const phase1Programmes = studyRight.studyRightElements.filter(elem => elem.phase === 1)
     const [latestPhase1Programme] = orderBy(phase1Programmes, ['endDate'], ['desc'])
     if (!acc[latestPhase1Programme.code]) {

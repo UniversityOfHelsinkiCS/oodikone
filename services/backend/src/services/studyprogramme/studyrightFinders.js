@@ -32,13 +32,12 @@ const getStudyRightsInProgramme = async (programmeCode, onlyGraduated) => {
       studentNumber: {
         [Op.not]: null,
       },
-      extentCode: 5,
     },
   })
 
   return (
     await SISStudyRight.findAll({
-      attributes: ['id', 'studentNumber'],
+      attributes: ['id', 'extentCode', 'semesterEnrollments'],
       include: {
         model: SISStudyRightElement,
         as: 'studyRightElements',
