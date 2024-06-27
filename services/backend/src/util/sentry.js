@@ -1,13 +1,13 @@
 const Sentry = require('@sentry/node')
 const Tracing = require('@sentry/tracing')
 
-const { sentryRelease, sentryEnvironment, runningInCI, isStaging } = require('../conf-backend')
+const { sentryRelease, sentryEnvironment, runningInCI, isStaging, sentryDSN } = require('../conf-backend')
 
 const initializeSentry = app => {
-  if (!sentryRelease || !sentryEnvironment || runningInCI || isStaging) return
+  if (!sentryRelease || !sentryEnvironment || runningInCI || isStaging || !sentryDSN) return
 
   Sentry.init({
-    dsn: 'https://b6d3f10ac9a2c333461c74312bfb71d1@toska.cs.helsinki.fi/14',
+    dsn: sentryDSN,
     environment: sentryEnvironment,
     release: sentryRelease,
     integrations: [new Sentry.Integrations.Http({ tracing: true }), new Tracing.Integrations.Express({ app })],

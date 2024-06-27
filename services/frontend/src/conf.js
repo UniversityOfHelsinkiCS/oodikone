@@ -6,6 +6,7 @@ export const inStaging = process.env.REACT_APP_STAGING === 'true'
 // Sentry
 export const sentryRelease = process.env.REACT_APP_SENTRY_RELEASE || ''
 export const sentryEnvironment = process.env.REACT_APP_SENTRY_ENVIRONMENT || ''
+export const sentryDSN = process.env.SENTRY_DSN || ''
 export const runningInCypress = typeof window !== 'undefined' && !!window.Cypress
 
 // Adminer is only used in dev mode, imo hardcoding this url here is ok.

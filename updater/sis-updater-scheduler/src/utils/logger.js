@@ -3,7 +3,15 @@ const winston = require('winston')
 const { WinstonGelfTransporter } = require('winston-gelf-transporter')
 const Sentry = require('winston-sentry-log')
 
-const { isDev, isStaging, isProduction, sentryRelease, sentryEnvironment, runningInCI } = require('../config')
+const {
+  isDev,
+  isStaging,
+  isProduction,
+  sentryRelease,
+  sentryEnvironment,
+  sentryDSN,
+  runningInCI,
+} = require('../config')
 
 const { combine, timestamp, printf, splat } = winston.format
 
@@ -11,10 +19,10 @@ const formatDate = timestamp => new Date(timestamp).toLocaleString('fi-FI')
 
 const transports = []
 
-if (isProduction && !isStaging && !runningInCI) {
+if (isProduction && !isStaging && !runningInCI && sentryDSN) {
   const options = {
     config: {
-      dsn: 'https://b9947dc630a74f00b4db6afd50cfa906@toska.cs.helsinki.fi/17',
+      dsn: sentryDSN,
       environment: sentryEnvironment,
       release: sentryRelease,
     },

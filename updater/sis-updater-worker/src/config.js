@@ -17,4 +17,5 @@ module.exports.REDIS_LAST_COMPLETED_SCHEDULE = 'LAST_COMPLETED_SCHEDULE'
 // Sentry
 module.exports.sentryRelease = process.env.SENTRY_RELEASE || ''
 module.exports.sentryEnvironment = process.env.SENTRY_ENVIRONMENT || ''
+module.exports.sentryDSN = process.env.SENTRY_DSN || ''
 module.exports.runningInCI = process.env.CI === 'true'

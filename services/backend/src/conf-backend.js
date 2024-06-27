@@ -6,6 +6,7 @@ const isProduction = !isStaging && process.env.NODE_ENV === 'production'
 // Sentry
 const sentryRelease = process.env.SENTRY_RELEASE || ''
 const sentryEnvironment = process.env.SENTRY_ENVIRONMENT || ''
+const sentryDSN = process.env.SENTRY_DSN || ''
 const runningInCI = process.env.CI === 'true'
 
 // IAM group
@@ -75,6 +76,7 @@ module.exports = {
   runningInCI,
   sentryRelease,
   sentryEnvironment,
+  sentryDSN,
   isProduction,
   pateToken,
   jamiUrl,
