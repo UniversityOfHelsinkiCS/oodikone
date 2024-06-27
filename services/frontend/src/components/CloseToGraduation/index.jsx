@@ -13,9 +13,9 @@ import { PaginatedSortableTable } from '@/components/SortableTable/PaginatedSort
 import { StudentNameVisibilityToggle, useStudentNameVisibility } from '@/components/StudentNameVisibilityToggle'
 import { ISO_DATE_FORMAT } from '@/constants/date'
 import { useGetStudentsCloseToGraduationQuery } from '@/redux/closeToGraduation'
-import { useFilteredAndFormattedElementDetails } from '@/redux/elementdetails'
 import { useGetFacultiesQuery } from '@/redux/facultyStats'
 import { useGetSemestersQuery } from '@/redux/semesters'
+import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
 import { reformatDate } from '@/util/timeAndDate'
 
 const NUMBER_OF_DISPLAYED_SEMESTERS = 6
@@ -208,7 +208,7 @@ export const CloseToGraduation = () => {
   const { data: students = {}, isError, isLoading } = useGetStudentsCloseToGraduationQuery()
   const { data: faculties = [] } = useGetFacultiesQuery()
   const { data: semesterData = [] } = useGetSemestersQuery()
-  const programmes = useFilteredAndFormattedElementDetails()
+  const studyProgrammes = useFilteredAndFormattedStudyProgrammes()
   const { getTextIn } = useLanguage()
   const { visible: namesVisible } = useStudentNameVisibility()
   const [chosenFaculties, setChosenFaculties] = useState([])
@@ -256,7 +256,7 @@ export const CloseToGraduation = () => {
     }
   )
 
-  const onTabChange = (e, { activeIndex }) => {
+  const onTabChange = (_event, { activeIndex }) => {
     setActiveTabIndex(activeIndex)
     setChosenFaculties([])
     setChosenProgrammes([])
@@ -277,9 +277,12 @@ export const CloseToGraduation = () => {
       value: faculty.code,
       description: faculty.code,
     }))
-    const programmeOptions = programmes
-      .filter(p => !p.value.includes('+') && p.value.startsWith(bachelorStudentsAreDisplayed ? 'KH' : 'MH'))
-      .filter(p => (chosenFaculties.length > 0 ? chosenFaculties.includes(p.value.slice(1, 4)) : true))
+    const programmeOptions = studyProgrammes
+      .filter(
+        programme =>
+          !programme.value.includes('+') && programme.value.startsWith(bachelorStudentsAreDisplayed ? 'KH' : 'MH')
+      )
+      .filter(programme => (chosenFaculties.length > 0 ? chosenFaculties.includes(programme.value.slice(1, 4)) : true))
       .sort(createLocaleComparator('text'))
 
     return (

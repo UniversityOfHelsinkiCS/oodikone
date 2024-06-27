@@ -10,18 +10,17 @@ import {
   useGetCustomPopulationSearchesQuery,
   useUpdateCustomPopulationSearchMutation,
 } from '@/redux/customPopulationSearch'
-import { useFilteredAndFormattedElementDetails } from '@/redux/elementdetails'
+import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
 
 export const CustomPopulationSearch = ({ setCustomPopulationState }) => {
+  useTitle('Custom population')
+
   const [modal, setModal] = useState(false)
   const [input, setInput] = useState('')
   const [name, setName] = useState('')
   const [associatedProgramme, setAssociatedProgramme] = useState('')
   const [selectedSearch, setSelectedSearch] = useState(null)
-  const programmes = useFilteredAndFormattedElementDetails()
-
-  useTitle('Custom population')
-
+  const studyProgrammes = useFilteredAndFormattedStudyProgrammes()
   const { data: searches, isFetching } = useGetCustomPopulationSearchesQuery()
   const [createSearch] = useCreateCustomPopulationSearchMutation()
   const [updateSearch] = useUpdateCustomPopulationSearchMutation()
@@ -119,7 +118,7 @@ export const CustomPopulationSearch = ({ setCustomPopulationState }) => {
             closeOnChange
             name="Associated programme"
             onChange={(_, value) => setAssociatedProgramme(value?.value)}
-            options={programmes}
+            options={studyProgrammes}
             placeholder="Select associated study programme for the population"
             search={textAndDescriptionSearch}
             value={associatedProgramme}

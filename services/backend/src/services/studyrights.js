@@ -1,27 +1,18 @@
 const { pick } = require('lodash')
 const moment = require('moment')
-const { Op } = require('sequelize')
+const { col, fn } = require('sequelize')
 
-const { ElementDetail, Studyright, StudyrightElement, Transfer } = require('../models')
+const { ElementDetail, SISStudyRightElement, Studyright, StudyrightElement, Transfer } = require('../models')
 const logger = require('../util/logger')
 const { redisClient } = require('./redis')
 
 const REDIS_KEY = 'STUDYRIGHT_ASSOCIATIONS_V2'
 
-const getAllProgrammes = async () => {
-  const elementDetails = ElementDetail.findAll({
-    where: {
-      type: {
-        [Op.in]: [20],
-      },
-    },
+const getProgrammesFromStudyRights = async () => {
+  const programmes = await SISStudyRightElement.findAll({
+    attributes: [[fn('DISTINCT', col('code')), 'code'], 'name'],
   })
-  return elementDetails
-}
-
-const getAllElementDetails = async () => {
-  const elementDetails = ElementDetail.findAll()
-  return elementDetails
+  return programmes
 }
 
 const associatedStudyrightElements = async (offset, limit) => {
@@ -35,9 +26,7 @@ const associatedStudyrightElements = async (offset, limit) => {
         attributes: ['type', 'name', 'code'],
       },
     },
-    order: [['studyrightid', 'DESC']],
-    // ^Use order when chunking with offset & limit,
-    // otherwise results are random and there will be misses
+    order: [['studyrightid', 'DESC']], // Use order when chunking with offset & limit, otherwise results are random and there will be misses
     limit,
     offset,
   })
@@ -198,7 +187,6 @@ const getFilteredAssociations = async codes => {
 module.exports = {
   getAssociations,
   getFilteredAssociations,
+  getProgrammesFromStudyRights,
   refreshAssociationsInRedis,
-  getAllProgrammes,
-  getAllElementDetails,
 }

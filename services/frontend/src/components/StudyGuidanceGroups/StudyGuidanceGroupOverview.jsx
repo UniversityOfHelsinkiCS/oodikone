@@ -8,8 +8,8 @@ import { useToggle } from '@/common/hooks'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SortableTable } from '@/components/SortableTable'
 import { YEAR_DATE_FORMAT } from '@/constants/date'
-import { useFilteredAndFormattedElementDetails } from '@/redux/elementdetails'
 import { useChangeStudyGuidanceGroupTagsMutation } from '@/redux/studyGuidanceGroups'
+import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
 import { startYearToAcademicYear, StyledMessage } from './common'
 import './StudyGuidanceGroupOverview.css'
 
@@ -215,7 +215,7 @@ const TagCell = ({ group, studyProgrammes, tagName }) => {
 
 export const StudyGuidanceGroupOverview = ({ groups }) => {
   const { getTextIn } = useLanguage()
-  const studyProgrammes = useFilteredAndFormattedElementDetails()
+  const studyProgrammes = useFilteredAndFormattedStudyProgrammes()
 
   const headers = [
     {

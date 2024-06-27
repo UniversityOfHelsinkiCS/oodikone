@@ -25,10 +25,10 @@ import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/Po
 import { PopulationStudentsContainer as PopulationStudents } from '@/components/PopulationStudents'
 import { ProgressBar } from '@/components/ProgressBar'
 import { RightsNotification } from '@/components/RightsNotification'
-import { useFilteredAndFormattedElementDetails } from '@/redux/elementdetails'
 import { useGetStudentListCourseStatisticsQuery } from '@/redux/populationCourses'
 import { useGetCustomPopulationQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
+import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
 import { CustomPopulationProgrammeDist } from './CustomPopulationProgrammeDist'
 import { CustomPopulationSearch } from './CustomPopulationSearch'
 import { UnihowDataExport } from './UnihowDataExport'
@@ -106,7 +106,7 @@ const CustomPopulationContent = ({
   setCustomPopulationState,
   isFetchingPopulation,
 }) => {
-  const studyProgrammes = useFilteredAndFormattedElementDetails()
+  const studyProgrammes = useFilteredAndFormattedStudyProgrammes()
   const [studentAmountLimit, setStudentAmountLimit] = useState(0)
 
   const discardedStudentNumbers = studentData?.discardedStudentNumbers
@@ -207,7 +207,7 @@ const CustomPopulationContent = ({
                 {associatedProgramme && (
                   <Label
                     color="blue"
-                    content={studyProgrammes.find(p => p.key === associatedProgramme).text}
+                    content={studyProgrammes.find(programme => programme.key === associatedProgramme).text}
                     style={{ marginLeft: '2em' }}
                     tag
                   />

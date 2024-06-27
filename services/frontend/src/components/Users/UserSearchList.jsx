@@ -8,7 +8,7 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SortableTable } from '@/components/SortableTable'
 import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 import { useShowAsUser } from '@/redux/auth'
-import { useGetAllElementDetailsQuery } from '@/redux/elementdetails'
+import { useGetStudyProgrammesQuery } from '@/redux/studyProgramme'
 import { reformatDate } from '@/util/timeAndDate'
 
 export const UserSearchList = ({ users, isLoading, isError }) => {
@@ -16,7 +16,7 @@ export const UserSearchList = ({ users, isLoading, isError }) => {
   const [popupTimeout, setPopupTimeout] = useState(null)
   const [popupOpen, setPopupOpen] = useState(false)
   const [userEmails, setUserEmails] = useState([])
-  const { data: elementdetails = [] } = useGetAllElementDetailsQuery()
+  const { data: studyProgrammes = [] } = useGetStudyProgrammesQuery()
   const showAsUser = useShowAsUser()
 
   const copyEmailsToClipboard = () => {
@@ -93,11 +93,13 @@ export const UserSearchList = ({ users, isLoading, isError }) => {
       sortable: false,
       filterType: 'multi',
       getRowVal: user => {
-        const uniqueRights = new Set(user.programmeRights.map(r => r.code))
+        const uniqueRights = new Set(user.programmeRights.map(programmeRight => programmeRight.code))
         const programmeNames = []
         uniqueRights.forEach(right => {
-          const element = elementdetails.find(element => element.code === right)
-          if (element) programmeNames.push(getTextIn(element.name))
+          const studyProgramme = studyProgrammes.find(studyProgramme => studyProgramme.code === right)
+          if (studyProgramme) {
+            programmeNames.push(getTextIn(studyProgramme.name))
+          }
         })
         return programmeNames
       },

@@ -19,7 +19,7 @@ const {
 const { getGraduationStatsForStudytrack } = require('../services/studyProgramme/studyProgrammeGraduations')
 const { updateBasicView, updateStudytrackView } = require('../services/studyProgramme/studyProgrammeUpdates')
 const { getStudytrackStatsForStudyprogramme } = require('../services/studyProgramme/studyTrackStats')
-const { getAssociations } = require('../services/studyrights')
+const { getAssociations, getProgrammesFromStudyRights } = require('../services/studyrights')
 const logger = require('../util/logger')
 
 // For grafana statistics (idea stolen from Norppa)
@@ -31,6 +31,11 @@ const logInfoForGrafana = async (code, combinedProgramme) => {
     studyprogrammeCode: programmeCode,
   })
 }
+
+router.get('/', async (_req, res) => {
+  const studyProgrammes = await getProgrammesFromStudyRights()
+  res.json(studyProgrammes)
+})
 
 router.get('/creditstats', async (req, res) => {
   const { codes: codesListString, isAcademicYear, includeSpecials } = req.query
