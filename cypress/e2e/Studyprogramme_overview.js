@@ -42,13 +42,13 @@ describe('Studyprogramme overview', () => {
     it('Basic information contains correct students', () => {
       const years = getEmptyYears()
       const tableContents = [
-        // [Year, Started, Graduated, Transferred Away, Transferred to]
-        ...years.map(year => [year, 0, 0, 0, 0]),
-        [2021, 0, 0, 1, 0],
-        [2020, 10, 35, 2, 2],
-        [2019, 86, 17, 1, 1],
-        [2018, 161, 1, 0, 0],
-        [2017, 171, 0, 0, 0],
+        // [Year, Started studying, Accepted, Graduated, Transferred Away, Transferred to]
+        ...years.map(year => [year, 0, 0, 0, 0, 0]),
+        [2021, 0, 0, 0, 1, 0],
+        [2020, 13, 10, 35, 2, 2],
+        [2019, 96, 86, 17, 1, 1],
+        [2018, 161, 161, 1, 0, 0],
+        [2017, 158, 171, 0, 0, 0],
       ]
 
       cy.checkTableStats(tableContents, 'StudentsOfTheStudyprogramme')
@@ -87,13 +87,13 @@ describe('Studyprogramme overview', () => {
       cy.get('[data-cy=StudentToggle]').click()
       const years = getEmptyYears()
       const studentTableContents = [
-        // [Year, Started, Graduated]
-        ...years.map(year => [year, 0, 0]),
-        [2021, 0, 0],
-        [2020, 10, 35],
-        [2019, 86, 17],
-        [2018, 161, 1],
-        [2017, 171, 0],
+        // [Year, Started studying, Accepted, Graduated]
+        ...years.map(year => [year, 0, 0, 0]),
+        [2021, 0, 0, 0],
+        [2020, 13, 10, 35],
+        [2019, 96, 86, 17],
+        [2018, 161, 161, 1],
+        [2017, 158, 171, 0],
       ]
 
       cy.checkTableStats(studentTableContents, 'StudentsOfTheStudyprogramme')
@@ -128,13 +128,13 @@ describe('Studyprogramme overview', () => {
       const isAcademicYear = true
       const years = getEmptyYears(isAcademicYear)
       const studentTableContents = [
-        // [Year, Started, Graduated, Transferred away, Transferred to]
-        ...years.map(year => [year, 0, 0, 0, 0]),
-        ['2021 - 2022', 0, 0, 0, 0],
-        ['2020 - 2021', 10, 6, 3, 2],
-        ['2019 - 2020', 86, 38, 1, 0],
-        ['2018 - 2019', 161, 8, 0, 1],
-        ['2017 - 2018', 171, 1, 0, 0],
+        // [Year, Started studying, Accepted, Graduated, Transferred away, Transferred to]
+        ...years.map(year => [year, 0, 0, 0, 0, 0]),
+        ['2021 - 2022', 0, 0, 0, 0, 0],
+        ['2020 - 2021', 12, 10, 6, 3, 2],
+        ['2019 - 2020', 96, 86, 38, 1, 0],
+        ['2018 - 2019', 161, 161, 8, 0, 1],
+        ['2017 - 2018', 159, 171, 1, 0, 0],
       ]
       cy.checkTableStats(studentTableContents, 'StudentsOfTheStudyprogramme')
 
