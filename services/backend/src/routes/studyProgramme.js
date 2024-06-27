@@ -1,6 +1,6 @@
 const router = require('express').Router()
 
-const { ElementDetail } = require('../models')
+const { SISStudyRightElement } = require('../models')
 const {
   getBasicStats,
   setBasicStats,
@@ -24,7 +24,7 @@ const logger = require('../util/logger')
 
 // For grafana statistics (idea stolen from Norppa)
 const logInfoForGrafana = async (code, combinedProgramme) => {
-  const programme = await ElementDetail.findOne({ where: { code } })
+  const programme = await SISStudyRightElement.findOne({ where: { code } })
   const programmeCode = combinedProgramme ? `${programme.code}-${combinedProgramme}` : programme.code
   logger.info('Study Programme', {
     studyprogrammeName: combinedProgramme ? `${programme.name.fi} + maisteri` : programme.name.fi,
