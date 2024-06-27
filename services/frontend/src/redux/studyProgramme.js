@@ -37,7 +37,6 @@ const studyProgrammeApi = RTKApi.injectEndpoints({
       query: ({ id, academicyear, combinedProgramme }) =>
         `/v2/studyprogrammes/${id}/coursestats?academicyear=${academicyear}&combined_programme=${combinedProgramme}`,
     }),
-    // Tilannekuvalomake
     getEvaluationStats: builder.query({
       query: ({ id, yearType, specialGroups, graduated }) =>
         `/v2/studyprogrammes/${id}/evaluationstats?year_type=${yearType}&special_groups=${specialGroups}&graduated=${graduated}`,
@@ -62,44 +61,53 @@ export const {
   useGetColorizedTableCourseStatsQuery,
 } = studyProgrammeApi
 
+const getFilteredAndFormattedStudyProgrammes = (getTextIn, isLoading, studyProgrammes) => {
+  if (isLoading) {
+    return []
+  }
+
+  return studyProgrammes
+    .filter(studyProgramme => studyProgramme.code.startsWith('KH') || studyProgramme.code.startsWith('MH'))
+    .map(studyProgramme => ({
+      key: studyProgramme.code,
+      value: studyProgramme.code,
+      description: studyProgramme.code,
+      text: getTextIn(studyProgramme.name),
+    }))
+}
+
+const getDataForCombined = (isLoading, studyProgrammes) => {
+  const combinedProgrammeCodes = ['KH90_001', 'MH90_001']
+  if (isLoading) {
+    return {}
+  }
+  return studyProgrammes
+    .filter(studyProgramme => combinedProgrammeCodes.includes(studyProgramme.code))
+    .reduce((acc, studyProgramme) => ({ ...acc, [studyProgramme.code]: studyProgramme.name }), {})
+}
+
+const getCombinedOptions = (dataForCombined, getTextIn, isLoading, language) => {
+  if (isLoading && !dataForCombined) {
+    return []
+  }
+  return [
+    {
+      key: 'KH90_001+MH90_001',
+      value: 'KH90_001+MH90_001',
+      description: 'KH90_001+MH90_001',
+      text: getUnifiedProgrammeName(getTextIn(dataForCombined.KH90_001), getTextIn(dataForCombined.MH90_001), language),
+    },
+  ]
+}
+
 /*
  * Returns only newest study programmes and formats them to be used in Semantic UI dropdown menus
  */
 export const useFilteredAndFormattedStudyProgrammes = () => {
   const { data: studyProgrammes, isLoading } = useGetStudyProgrammesQuery()
   const { language, getTextIn } = useLanguage()
-  const filteredAndFormatted = isLoading
-    ? []
-    : studyProgrammes
-        .filter(studyProgramme => studyProgramme.code.startsWith('KH') || studyProgramme.code.startsWith('MH'))
-        .map(studyProgramme => ({
-          key: studyProgramme.code,
-          value: studyProgramme.code,
-          description: studyProgramme.code,
-          text: getTextIn(studyProgramme.name),
-        }))
-  const combinedProgrammeCodes = ['KH90_001', 'MH90_001']
-  const dataForCombined = isLoading
-    ? {}
-    : studyProgrammes
-        .filter(studyProgramme => combinedProgrammeCodes.includes(studyProgramme.code))
-        .reduce((acc, studyProgramme) => ({ ...acc, [studyProgramme.code]: studyProgramme.name }), {})
-
-  const combinedOptions =
-    isLoading && !dataForCombined
-      ? []
-      : [
-          {
-            key: 'KH90_001+MH90_001',
-            value: 'KH90_001+MH90_001',
-            description: 'KH90_001+MH90_001',
-            text: getUnifiedProgrammeName(
-              getTextIn(dataForCombined.KH90_001),
-              getTextIn(dataForCombined.MH90_001),
-              language
-            ),
-          },
-        ]
-
+  const filteredAndFormatted = getFilteredAndFormattedStudyProgrammes(getTextIn, isLoading, studyProgrammes)
+  const dataForCombined = getDataForCombined(isLoading, studyProgrammes)
+  const combinedOptions = getCombinedOptions(dataForCombined, getTextIn, isLoading, language)
   return [...filteredAndFormatted, ...combinedOptions]
 }
