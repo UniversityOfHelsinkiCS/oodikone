@@ -186,7 +186,7 @@ const getFilteredAssociations = async codes => {
 
 module.exports = {
   getAssociations,
-  getFilteredAssociations,
   getProgrammesFromStudyRights,
+  getFilteredAssociations,
   refreshAssociationsInRedis,
 }

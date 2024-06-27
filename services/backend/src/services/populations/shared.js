@@ -7,7 +7,7 @@ const {
 const { Course, Credit, ElementDetail, Studyright, StudyrightElement } = require('../../models')
 const { semesterEnd, semesterStart } = require('../../util/semester')
 const { getCurrentSemester } = require('../semesters')
-const { getAllProgrammes } = require('../studyrights')
+const { getProgrammesFromStudyRights } = require('../studyrights')
 
 // Progress tab related helper functions
 const createEmptyCriteriaYear = (criteria, year) => {
@@ -283,7 +283,7 @@ const getOptionsForStudents = async (students, code, level) => {
     throw new Error(`Invalid study level ${level}`)
   }
 
-  const programmes = await getAllProgrammes()
+  const programmes = await getProgrammesFromStudyRights()
 
   const currentStudyrights = await Studyright.findAll({
     include: [

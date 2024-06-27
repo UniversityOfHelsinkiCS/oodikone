@@ -12,7 +12,7 @@ const { redisClient } = require('./services/redis')
 const { getCurrentSemester } = require('./services/semesters')
 const { combinedStudyprogrammes } = require('./services/studyProgramme/studyProgrammeHelpers')
 const { updateBasicView, updateStudytrackView } = require('./services/studyProgramme/studyProgrammeUpdates')
-const { refreshAssociationsInRedis, getAllProgrammes, getAssociations } = require('./services/studyrights')
+const { getAssociations, getProgrammesFromStudyRights, refreshAssociationsInRedis } = require('./services/studyrights')
 const { findAndSaveTeachers } = require('./services/topteachers')
 const { deleteOutdatedUsers } = require('./services/userService')
 const logger = require('./util/logger')
@@ -50,7 +50,8 @@ const refreshProgrammes = async () => {
   logger.info('Refreshing studyprogramme and studytrack overview statistics for all programmes')
   // Filters out old programmes and special ones like Fitech studies. Filters also out the programmes starting with
   // 2_ or ending with _2. Those programmes are mapped to correct programme (studentProgrammeModuleFixer.js)
-  const codes = (await getAllProgrammes())
+  const programmes = await getProgrammesFromStudyRights()
+  const codes = programmes
     .map(programme => programme.code)
     .filter(
       code =>
