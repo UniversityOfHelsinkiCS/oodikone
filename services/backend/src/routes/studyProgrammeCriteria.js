@@ -4,7 +4,7 @@ const {
   getCriteria,
   saveYearlyCourseCriteria,
   saveYearlyCreditCriteria,
-} = require('../services/studyprogramme/studyProgrammeCriteria')
+} = require('../services/studyProgramme/studyProgrammeCriteria')
 
 router.get('/', async (req, res) => {
   const studyProgramme = req.query?.programmecode

@@ -4,7 +4,7 @@ const { dbConnections } = require('../database/connection')
 const { ProgrammeModule } = require('../models')
 const { ExcludedCourse } = require('../models/models_kone')
 const logger = require('../util/logger')
-const { combinedStudyprogrammes } = require('./studyprogramme/studyprogrammeHelpers')
+const { combinedStudyprogrammes } = require('./studyProgramme/studyProgrammeHelpers')
 
 const getCurriculumVersions = async code => {
   try {

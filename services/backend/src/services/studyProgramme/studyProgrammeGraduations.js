@@ -18,8 +18,8 @@ const {
   getThesisType,
   getYearsArray,
   getYearsObject,
-} = require('./studyprogrammeHelpers')
-const { getStudyRightsInProgramme, graduatedStudyRights } = require('./studyrightFinders')
+} = require('./studyProgrammeHelpers')
+const { getStudyRightsInProgramme, graduatedStudyRights } = require('./studyRightFinders')
 
 const checkStartdate = async (id, startdate) => {
   if (id.slice(-2) === '-1') {

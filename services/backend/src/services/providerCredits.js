@@ -1,10 +1,10 @@
 const { mapToProviders } = require('../util/map')
 const { getCreditStats, setCreditStats } = require('./analyticsService')
 const { getCourseCodesOfProvider } = require('./providers')
-const { allTransfers } = require('./studyprogramme')
-const { getCreditsForProvider, getTransferredCredits } = require('./studyprogramme/creditGetters')
-const { defineYear, getCorrectStartDate } = require('./studyprogramme/studyprogrammeHelpers')
-const { getStudyRights } = require('./studyprogramme/studyrightFinders')
+const { allTransfers } = require('./studyProgramme')
+const { getCreditsForProvider, getTransferredCredits } = require('./studyProgramme/creditGetters')
+const { defineYear, getCorrectStartDate } = require('./studyProgramme/studyProgrammeHelpers')
+const { getStudyRights } = require('./studyProgramme/studyRightFinders')
 
 /**
   Rapo-kategoriat 9.2.2024, joiden perusteella tämä koodi on tehty. Numerot täsmäävät vain 2022 alkaen, koska sisu/oodi ero.

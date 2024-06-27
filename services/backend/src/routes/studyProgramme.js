@@ -10,15 +10,15 @@ const {
   setStudytrackStats,
 } = require('../services/analyticsService')
 const { getCreditsProduced } = require('../services/providerCredits')
-const { getProgrammeName } = require('../services/studyprogramme')
-const { getBasicStatsForStudytrack } = require('../services/studyprogramme/studyprogrammeBasics')
+const { getProgrammeName } = require('../services/studyProgramme')
+const { getBasicStatsForStudytrack } = require('../services/studyProgramme/studyProgrammeBasics')
 const {
   getStudyprogrammeCoursesForStudytrack,
   getStudyprogrammeStatsForColorizedCoursesTable,
-} = require('../services/studyprogramme/studyprogrammeCourses')
-const { getGraduationStatsForStudytrack } = require('../services/studyprogramme/studyprogrammeGraduations')
-const { updateBasicView, updateStudytrackView } = require('../services/studyprogramme/studyprogrammeUpdates')
-const { getStudytrackStatsForStudyprogramme } = require('../services/studyprogramme/studytrackStats')
+} = require('../services/studyProgramme/studyProgrammeCourses')
+const { getGraduationStatsForStudytrack } = require('../services/studyProgramme/studyProgrammeGraduations')
+const { updateBasicView, updateStudytrackView } = require('../services/studyProgramme/studyProgrammeUpdates')
+const { getStudytrackStatsForStudyprogramme } = require('../services/studyProgramme/studyTrackStats')
 const { getAssociations } = require('../services/studyrights')
 const logger = require('../util/logger')
 
@@ -31,6 +31,16 @@ const logInfoForGrafana = async (code, combinedProgramme) => {
     studyprogrammeCode: programmeCode,
   })
 }
+
+router.get('/creditstats', async (req, res) => {
+  const { codes: codesListString, isAcademicYear, includeSpecials } = req.query
+  const codes = JSON.parse(codesListString)
+  const stats = {}
+  for (const code of codes) {
+    stats[code] = await getCreditsProduced(code, isAcademicYear !== 'false', includeSpecials !== 'false')
+  }
+  return res.json({ stats })
+})
 
 router.get('/:id/basicstats', async (req, res) => {
   const code = req.params.id
@@ -53,16 +63,6 @@ router.get('/:id/basicstats', async (req, res) => {
   })
   if (updated) await setBasicStats(updated, yearType, specialGroups)
   return res.json(updated)
-})
-
-router.get('/creditstats', async (req, res) => {
-  const { codes: codesListString, isAcademicYear, includeSpecials } = req.query
-  const codes = JSON.parse(codesListString)
-  const stats = {}
-  for (const code of codes) {
-    stats[code] = await getCreditsProduced(code, isAcademicYear !== 'false', includeSpecials !== 'false')
-  }
-  return res.json({ stats })
 })
 
 router.get('/:id/graduationstats', async (req, res) => {

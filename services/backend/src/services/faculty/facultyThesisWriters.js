@@ -9,7 +9,7 @@ const {
   getCorrectStudentnumbers,
   getStatsBasis,
   getYearsArray,
-} = require('../studyprogramme/studyprogrammeHelpers')
+} = require('../studyProgramme/studyProgrammeHelpers')
 const { thesisWriters } = require('./faculty')
 
 const getFacultyThesisWriters = async ({ since, years, isAcademicYear, facultyProgrammes, includeAllSpecials }) => {

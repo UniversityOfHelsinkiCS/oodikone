@@ -1,13 +1,13 @@
 const { getAcademicYearDates } = require('../../util/semester')
-const { absentStudents, enrolledStudents } = require('../studyprogramme/studentGetters')
+const { absentStudents, enrolledStudents } = require('../studyProgramme/studentGetters')
 const {
   getPercentage,
   getStartDate,
   getYearsArray,
   getYearsObject,
   tableTitles,
-} = require('../studyprogramme/studyprogrammeHelpers')
-const { inactiveStudyrights, graduatedStudyRights } = require('../studyprogramme/studyrightFinders')
+} = require('../studyProgramme/studyProgrammeHelpers')
+const { inactiveStudyrights, graduatedStudyRights } = require('../studyProgramme/studyRightFinders')
 const { getStudyRightsByExtent, getStudentsByStudentnumbers, getTransfersIn } = require('./faculty')
 const { checkTransfers } = require('./facultyHelpers')
 

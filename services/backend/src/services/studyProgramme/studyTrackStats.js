@@ -12,13 +12,13 @@ const {
   getYearsArray,
   getYearsObject,
   tableTitles,
-} = require('./studyprogrammeHelpers')
+} = require('./studyProgrammeHelpers')
 const {
   graduatedStudyRights,
   graduatedStudyRightsByStartDate,
   inactiveStudyrights,
   startedStudyrights,
-} = require('./studyrightFinders')
+} = require('./studyRightFinders')
 
 const getUnique = studentnumbers => [...new Set(studentnumbers)]
 const getStudentData = (startDate, students) => {

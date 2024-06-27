@@ -2,7 +2,7 @@ const { indexOf, isArray } = require('lodash')
 const moment = require('moment')
 
 const { codes } = require('../../../config/programmeCodes')
-const { defineYear, getStatsBasis, getYearsArray } = require('../studyprogramme/studyprogrammeHelpers')
+const { defineYear, getStatsBasis, getYearsArray } = require('../studyProgramme/studyProgrammeHelpers')
 const {
   getTransferredInside,
   getTransferredToAndAway,

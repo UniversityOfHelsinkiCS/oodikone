@@ -1,6 +1,6 @@
 const moment = require('moment')
 
-const { getCriteria } = require('../studyprogramme/studyProgrammeCriteria')
+const { getCriteria } = require('../studyProgramme/studyProgrammeCriteria')
 const { getStudentsIncludeCoursesBetween } = require('./getStudentsIncludeCoursesBetween')
 const {
   dateMonthsFromNow,

@@ -4,7 +4,7 @@ const { magicFacultyCode } = require('../../config/facultyCodes')
 const { serviceProvider } = require('../conf-backend')
 const { getFacultyList } = require('../services/faculty/facultyHelpers')
 const { getFacultyProgressStats, getGraduationStats } = require('../services/faculty/facultyService')
-const { getMedian } = require('../services/studyprogramme/studyprogrammeHelpers')
+const { getMedian } = require('../services/studyProgramme/studyProgrammeHelpers')
 
 const degreeNames = ['bachelor', 'bachelorMaster', 'master', 'licentiate', 'doctor']
 

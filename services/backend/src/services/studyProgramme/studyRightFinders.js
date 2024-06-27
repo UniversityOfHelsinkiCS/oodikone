@@ -13,7 +13,7 @@ const {
   SISStudyRightElement,
 } = require('../../models')
 const { getCurrentSemester } = require('../semesters')
-const { formatStudyright } = require('./studyprogrammeHelpers')
+const { formatStudyright } = require('./studyProgrammeHelpers')
 const { whereStudents, sinceDate } = require('.')
 
 const getStudyRightsInProgramme = async (programmeCode, onlyGraduated) => {
