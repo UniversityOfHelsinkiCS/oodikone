@@ -1,0 +1,60 @@
+version: '2'
+
+checks:
+  argument-count:
+    enabled: true
+    config:
+      threshold: 4
+  complex-logic:
+    enabled: true
+    config:
+      threshold: 4
+  file-lines:
+    enabled: true
+    config:
+      threshold: 250
+  method-complexity:
+    enabled: true
+    config:
+      threshold: 5
+  method-count:
+    enabled: true
+    config:
+      threshold: 20
+  method-lines:
+    enabled: true
+    config:
+      threshold: 25
+  nested-control-flow:
+    enabled: true
+    config:
+      threshold: 4
+  return-statements:
+    enabled: false
+  similar-code:
+    enabled: true
+    config:
+      threshold: # Language-specific defaults. Overrides affect all languages.
+  identical-code:
+    enabled: true
+    config:
+      threshold: # Language-specific defaults. Overrides affect all languages.
+
+exclude_patterns:
+  - '.github/'
+  - '.husky/'
+  - '.vscode/'
+  - 'adminerplugins/'
+  - 'anonyymioodi/'
+  - 'cypress/'
+  - 'documentation/'
+  - 'scripts/'
+  - 'services/backend/src/database/migrations_kone/'
+  - 'services/backend/src/database/migrations_user/'
+  - 'services/backend/src/models/'
+  - 'updater/sis-updater-worker/src/db/migrations/'
+  - 'updater/sis-updater-worker/src/db/models/'
+  - '**/*.json'
+  - '**/*.md'
+  - '**/*.sh'
+  - '**/*.yml'
