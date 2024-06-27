@@ -223,12 +223,14 @@ const getCreditThresholds = () => {
 
 const tableTitles = {
   basics: {
-    SPECIAL_EXCLUDED: ['', 'Started studying', 'Graduated'],
-    SPECIAL_INCLUDED: ['', 'Started studying', 'Graduated', 'Transferred away', 'Transferred to'],
+    SPECIAL_EXCLUDED: ['', 'Started studying', 'Accepted', 'Graduated'],
+    SPECIAL_INCLUDED: ['', 'Started studying', 'Accepted', 'Graduated', 'Transferred away', 'Transferred to'],
     SPECIAL_EXCLUDED_COMBINED_PROGRAMME: [
       '',
       'Started studying bachelor',
       'Started studying licentiate',
+      'Accepted bachelor',
+      'Accepted licentiate',
       'Graduated bachelor',
       'Graduated licentiate',
     ],
@@ -236,6 +238,8 @@ const tableTitles = {
       '',
       'Started studying bachelor',
       'Started studying licentiate',
+      'Accepted bachelor',
+      'Accepted licentiate',
       'Graduated bachelor',
       'Graduated licentiate',
       'Transferred away',

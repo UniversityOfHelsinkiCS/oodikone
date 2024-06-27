@@ -14,15 +14,15 @@ export const studyProgrammeToolTips = {
   Graduated excluded: Valinnasta on poistettu ohjelmasta jo valmistuneet opiskelijat.
   `,
   StudentsOfTheStudyprogramme: `
-  **Started studying**: Sisältää kyseisenä vuonna aloittaneet opiskelijat (aloitetut opinto-oikeudet). Opiskelija on myös voinut myöhemmin keskeyttää opintonsa tai siirtyä pois ohjelmasta.\n
+  **Started studying**: Sisältää opiskelijat, jotka ovat kyseisenä vuonna ilmoittautuneet ensimmäistä kertaa läsnäolevaksi koulutusohjelmassa. Opiskelija on voinut myös myöhemmin keskeyttää opintonsa tai siirtyä pois ohjelmasta.
 
-  **Graduated**: Sisältää kyseisenä vuonna valmistuneet opiskelijat riippumatta siitä, minä vuonna opiskeluoikeus ohjelmaan on myönnetty. Jaottelu on tehty opinto-oikeuden päättymispäivän (=valmistumispäivän) perusteella.
+  **Accepted**: Sisältää opiskelijat, joiden opiskeluoikeus koulutusohjelmassa on alkanut kyseisenä vuonna. Opiskelija on saattanut ilmoittautua poissaolevaksi tai jättää lukuvuosi-ilmoittautumisen kokonaan tekemättä.
+
+  **Graduated**: Sisältää kyseisenä vuonna valmistuneet opiskelijat riippumatta siitä, minä vuonna opiskeluoikeus ohjelmaan on myönnetty.
     
-  **Transferred away**: Sisältää kyseisenä vuonna pois ohjelmasta siirtyneet opiskelijat (opinto-oikeudet). Sama opiskelija voi esiintyä tilastoissa useana vuonna, mikäli hän on siirtynyt ohjelmaan ja siitä pois useasti.
+  **Transferred away**: Sisältää kyseisenä vuonna pois ohjelmasta siirtyneet opiskelijat (opiskeluoikeudet). Sama opiskelija voi esiintyä tilastoissa useana vuonna, mikäli hän on siirtynyt ohjelmaan ja siitä pois useasti.
   
-  **Transferred to**: Sisältää kyseisenä vuonna ohjelmaan siirtyneet opiskelijat (opinto-oikeudet).
-
-  HUOM! Ohjelmaan siirtyneiden määrä on erityisen suuri vuonna 2020, jolloin vanhoista koulutusohjelmista luovuttiin ja opiskelijat siirtyivät uusiin ohjelmiin.
+  **Transferred to**: Sisältää kyseisenä vuonna ohjelmaan siirtyneet opiskelijat (opiskeluoikeudet). Ohjelmaan siirtyneiden määrä on erityisen suuri vuonna 2020, jolloin opiskelijat siirtyivät vanhoista koulutusohjelmista uusiin ohjelmiin.
   `,
   CreditsProducedByTheStudyprogramme: `
   Sisältää opintopisteet suoritusvuosittain. Suoritukset on jaoteltu Sisussa näkyvän kurssin suorituspäivän mukaan. Kategoriat vastaavat Rapon kategorioita. Pistemäärät ovat osin epätarkkoja ennen vuotta 2022 sisu-oodi-erojen vuoksi.
