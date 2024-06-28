@@ -11,13 +11,16 @@ import {
   SemesterEnrollment,
   Semester,
   Studyplan,
+  SISStudyRight,
+  SISStudyRightElement,
 } from '../models/index'
 import { TagStudent } from '../models/kone/tagStudent'
 import { Tag } from '../models/kone/tag'
 import logger from '../util/logger'
+const { splitByEmptySpace } = require('../util/utils')
 
 const byStudentNumber = async studentNumber => {
-  const [student, tags] = await Promise.all([
+  const [student, tags] = (await Promise.all([
     Student.findByPk(studentNumber, {
       attributes: [
         'firstnames',
@@ -77,7 +80,7 @@ const byStudentNumber = async studentNumber => {
         studentnumber: studentNumber,
       },
     }),
-  ])
+  ])) as [Student & { tags: any }, any]
   const tagprogrammes = await ElementDetail.findAll({
     where: {
       code: {
@@ -245,7 +248,7 @@ const formatStudent = ({
   }
 
   const formattedCredits = credits
-    .sort((a, b) => new Date(a.attainment_date) - new Date(b.attainment_date))
+    .sort((a, b) => new Date(a.attainment_date).getTime() - new Date(b.attainment_date).getTime())
     .map(toCourse)
 
   return {
