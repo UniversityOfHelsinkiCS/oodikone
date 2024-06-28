@@ -3,6 +3,10 @@ const router = require('express').Router()
 const { bySearchTermAndStudentNumbers, withStudentNumber } = require('../services/students')
 const { hasFullAccessToStudentData, splitByEmptySpace } = require('../util')
 const { ApplicationError } = require('../util/customErrors')
+<<<<<<< HEAD
+=======
+const { hasFullAccessToStudentData } = require('../util/utils.ts')
+>>>>>>> 95ff6989e (Add typescript & typed most models)
 
 const filterStudentTags = (student, userId) => {
   return {

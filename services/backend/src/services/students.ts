@@ -1,9 +1,9 @@
-const { Op } = require('sequelize')
+import { Op } from 'sequelize'
 
 const {
   dbConnections: { sequelize },
 } = require('../database/connection')
-const {
+import {
   Student,
   Credit,
   Course,
@@ -11,12 +11,10 @@ const {
   SemesterEnrollment,
   Semester,
   Studyplan,
-  SISStudyRight,
-  SISStudyRightElement,
-} = require('../models')
-const { TagStudent, Tag } = require('../models/models_kone')
-const { splitByEmptySpace } = require('../util')
-const logger = require('../util/logger')
+} from '../models/index'
+import { TagStudent } from '../models/kone/tagStudent'
+import { Tag } from '../models/kone/tag'
+import logger from '../util/logger'
 
 const byStudentNumber = async studentNumber => {
   const [student, tags] = await Promise.all([

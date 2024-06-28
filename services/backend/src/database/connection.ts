@@ -1,13 +1,43 @@
-const EventEmitter = require('events')
-const Sequelize = require('sequelize')
-const Umzug = require('umzug')
+import { Sequelize } from 'sequelize-typescript'
+import EventEmitter from 'events'
+import Umzug from 'umzug'
+import conf from '../conf-backend'
+import {
+  Course,
+  CourseProvider,
+  CourseType,
+  Credit,
+  CreditTeacher,
+  CreditType,
+  ElementDetail,
+  Enrollment,
+  ExcludedCourse,
+  Organization,
+  ProgrammeModule,
+  ProgrammeModuleChild,
+  Semester,
+  SemesterEnrollment,
+  SISStudyRight,
+  SISStudyRightElement,
+  Student,
+  Studyplan,
+  Studyright,
+  StudyrightExtent,
+  StudyrightElement,
+  Teacher,
+  Transfer,
+} from '../models/index'
+import { Tag } from '../models/kone/tag'
+import { TagStudent } from '../models/kone/tagStudent'
 
-const conf = require('../conf-backend')
-const logger = require('../util/logger')
+import logger from '../util/logger'
 
 const { SIS_DB_URL } = process.env
 
 class DbConnection extends EventEmitter {
+  sequelize: Sequelize
+  RETRY_ATTEMPTS: number
+  established: boolean
   constructor() {
     super()
     this.RETRY_ATTEMPTS = 15
@@ -23,6 +53,31 @@ class DbConnection extends EventEmitter {
       },
       logging: false,
       password: conf.SIS_PASSWORD,
+      models: [
+        Course,
+        CourseProvider,
+        CourseType,
+        Credit,
+        CreditTeacher,
+        CreditType,
+        ElementDetail,
+        Enrollment,
+        ExcludedCourse,
+        Organization,
+        ProgrammeModule,
+        ProgrammeModuleChild,
+        Semester,
+        SemesterEnrollment,
+        SISStudyRight,
+        SISStudyRightElement,
+        Student,
+        Studyplan,
+        Studyright,
+        StudyrightExtent,
+        StudyrightElement,
+        Teacher,
+        Transfer,
+      ],
     })
   }
 
@@ -46,11 +101,12 @@ class DbConnection extends EventEmitter {
 }
 
 // Old-style kone + user db connections
-const sequelizeKone = new Sequelize(conf.DB_URL_KONE, {
-  schema: conf.DB_SCHEMA_KONE,
-  searchPath: conf.DB_SCHEMA_KONE,
+const sequelizeKone = new Sequelize(conf.DB_URL_KONE as string, {
+  schema: conf.DB_SCHEMA_KONE as string,
+  searchPath: conf.DB_SCHEMA_KONE as string,
   logging: false,
-  password: conf.KONE_PASSWORD,
+  password: conf.KONE_PASSWORD as string,
+  models: [Tag, TagStudent],
 })
 
 sequelizeKone.query(`SET SESSION search_path to ${conf.DB_SCHEMA_KONE}`)
@@ -111,9 +167,4 @@ const initializeDatabaseConnection = async () => {
 
 const dbConnections = new DbConnection()
 
-module.exports = {
-  dbConnections,
-  sequelizeKone,
-  sequelizeUser,
-  initializeDatabaseConnection,
-}
+export { dbConnections, sequelizeKone, sequelizeUser, initializeDatabaseConnection }

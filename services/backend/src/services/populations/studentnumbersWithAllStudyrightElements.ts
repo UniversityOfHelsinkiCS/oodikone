@@ -96,25 +96,25 @@ const studentnumbersWithAllStudyrightElements = async ({
   const studentnumbers = [...new Set(students.map(s => s.student_studentnumber))]
   // bit hacky solution, but this is used to filter out studentnumbers who have since changed studytracks
   const rights = await Studyright.findAll({
-    attributes: ['studyrightid'],
-    where: {
-      studentStudentnumber: {
-        [Op.in]: studentnumbers,
-      },
-    },
-    include: {
-      attributes: [],
-      model: StudyrightElement,
+      attributes: ['studyrightid'],
       where: {
-        code: {
-          [Op.in]: studyRights,
+        studentStudentnumber: {
+          [Op.in]: studentnumbers,
         },
       },
-    },
-    group: ['studyright.studyrightid'],
-    having: count('studyright_elements.id', studyRights.length, true),
-    raw: true,
-  })
+      include: {
+        attributes: [],
+        model: StudyrightElement,
+        where: {
+          code: {
+            [Op.in]: studyRights,
+          },
+        },
+      },
+      group: ['studyright.studyrightid'],
+      having: count('studyright_elements.id', studyRights.length, true),
+      raw: true,
+    })
 
   // bit hacky solution, but this is used to filter out studentnumbers who have since changed studytracks
   const allStudytracksForStudents = await StudyrightElement.findAll({

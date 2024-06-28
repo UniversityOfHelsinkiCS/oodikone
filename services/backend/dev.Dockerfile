@@ -13,4 +13,4 @@ COPY ./package* ./
 RUN npm ci
 COPY . .
 
-CMD ["node_modules/.bin/nodemon", "index.js"]
+CMD ["npx", "tsx", "watch", "--clear-screen=false", "index.js"]

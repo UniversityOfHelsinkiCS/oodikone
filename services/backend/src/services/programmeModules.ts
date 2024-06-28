@@ -1,10 +1,9 @@
-const { Op } = require('sequelize')
-
-const { dbConnections } = require('../database/connection')
-const { ProgrammeModule } = require('../models')
-const { ExcludedCourse } = require('../models/models_kone')
-const logger = require('../util/logger')
-const { combinedStudyprogrammes } = require('./studyProgramme/studyProgrammeHelpers')
+import { Op } from 'sequelize'
+import { dbConnections } from '../database/connection'
+import { ProgrammeModule } from '../models'
+import { ExcludedCourse } from '../models/models_kone'
+import logger from '../util/logger'
+import { combinedStudyprogrammes } from './studyProgramme/studyProgrammeHelpers'
 
 const getCurriculumVersions = async code => {
   try {
@@ -79,8 +78,8 @@ const getCoursesAndModulesForProgramme = async (code, periodIds) => {
     return {}
   }
   const result = await recursivelyGetModuleAndChildren(code, periodIds.split(','))
-  const courses = result.filter(r => r.type === 'course')
-  const modules = result.filter(r => r.type === 'module')
+  const courses = result.filter((r: any) => r.type === 'course')
+  const modules = result.filter((r: any) => r.type === 'module')
   const excludedCourses = await ExcludedCourse.findAll({
     where: {
       programme_code: {
@@ -91,9 +90,9 @@ const getCoursesAndModulesForProgramme = async (code, periodIds) => {
       },
     },
   })
-  const modulesMap = modules.reduce((obj, cur) => ({ ...obj, [cur.id]: cur }), {})
+  const modulesMap = modules.reduce((obj: object, cur: any) => ({ ...obj, [cur.id]: cur }), {})
   const modifiedCourses = courses
-    .map(c => modifyParent(c, modulesMap, code))
+    .map(c => modifyParent(c, modulesMap))
     .filter(c => !c.faulty)
     .filter(
       (course1, index, array) =>

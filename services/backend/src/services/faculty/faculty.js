@@ -45,23 +45,22 @@ const transferredFaculty = async (programmeCodeIn, programmeCodeOut, start, end)
       },
     })
   ).map(formatFacultyTransfer)
-
 const startedStudyrights = async (faculty, code, since, studyRightWhere) =>
-  (
-    await Studyright.findAll({
-      include: [
-        {
-          model: StudyrightElement,
-          required: true,
-          where: {
-            code,
-          },
-          include: {
-            model: ElementDetail,
+    (
+      await Studyright.findAll({
+        include: [
+          {
+            model: StudyrightElement,
             required: true,
+            where: {
+              code,
+            },
+            include: {
+              model: ElementDetail,
+              required: true,
+            },
           },
-        },
-      ],
+        ],
       where: {
         facultyCode: faculty,
         startdate: {
@@ -72,7 +71,7 @@ const startedStudyrights = async (faculty, code, since, studyRightWhere) =>
     })
   ).map(formatFacultyStudyRight)
 
-const graduatedStudyrights = async (faculty, code, since, studyrightWhere) =>
+  const graduatedStudyrights = async (faculty, code, since, studyrightWhere) =>
   (
     await Studyright.findAll({
       include: [
