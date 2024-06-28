@@ -405,6 +405,16 @@ export const getFullStudyProgrammeRights = programmeRights =>
 
 export const isNewStudyProgramme = programmeCode => ['MH', 'KH', 'T9'].includes(programmeCode.slice(0, 2))
 
+/**
+ * Extracts items from a string separated by commas, semicolons, spaces, or newlines.
+ * @param {string} input - The input string containing items.
+ * @returns An array of extracted items.
+ */
+export const extractItems = input => {
+  const items = input.match(/[^\s,;]+/g) ?? []
+  return [...items]
+}
+
 // Naming follows convention from SIS API (e.g urn:code:admissiont-type:m for "Muu")
 // Except changed Koepisteet to Valintakoe
 export const ADMISSION_TYPES = {

@@ -7,9 +7,7 @@ const openCustomPopupForm = () => {
 const fillName = () => {
   const name = `TEST-${new Date().getTime()}`
   cy.contains('Insert name for this custom population if you wish to save it')
-    .siblings()
-    .get('input[placeholder=name]')
-    .type(name)
+  cy.get('[data-cy="custom-population-name-input"]').type(name)
   return name
 }
 
@@ -40,20 +38,17 @@ const deleteAllSearches = () => {
     })
 }
 
-const fillForm = content => {
-  cy.contains('Insert student numbers you wish to use for population here')
-    .siblings()
-    .get('textarea')
-    .type(content.join('\n'))
+const fillForm = (content, separator) => {
+  cy.get('[data-cy="student-number-input"]').type(content.join(separator))
 }
 
 const search = () => {
   cy.get('button').contains('Search population').click()
 }
 
-const searchFor = studentnumbers => {
+const searchFor = (studentnumbers, separator) => {
   openCustomPopupForm()
-  fillForm(studentnumbers)
+  fillForm(studentnumbers, separator)
   search()
 }
 
@@ -74,8 +69,19 @@ const containsSpecificStudents = (studentnumbers = []) => {
   studentnumbers.forEach(s => cy.contains(s))
 }
 
+const checkRightsNotification = studentNumbers => {
+  cy.get('[data-cy="rights-notification"]').within(() => {
+    cy.contains(
+      'The following students information could not be displayed. This could be either because they do not exist, or you do not have the right to view their information.'
+    )
+    cy.get('ul').within(() => {
+      studentNumbers.forEach(number => cy.get('li').contains(number))
+    })
+  })
+}
+
 describe('Custom population tests', () => {
-  const nonExistentStudentNumbers = ['123', 'X', '-', ' ']
+  const nonExistentStudentNumbers = ['123', 'X', '-']
   beforeEach(() => {
     cy.init('/custompopulation')
     cy.url().should('include', '/custompopulation')
@@ -83,7 +89,7 @@ describe('Custom population tests', () => {
   })
 
   after(() => {
-    cy.visit(`${Cypress.config().baseUrl}/custompopulation`)
+    cy.visit('/custompopulation')
     cy.url().should('include', '/custompopulation')
     cy.contains('Custom population')
     cy.get('button').contains('Custom population').click()
@@ -92,9 +98,8 @@ describe('Custom population tests', () => {
 
   describe('Custom population searching', () => {
     it('Finds a proper population', () => {
-      cy.fixture('customPopulations').then(({ studentNumbersForCSStudentsSet1 }) => {
-        const students = studentNumbersForCSStudentsSet1
-        searchFor(students)
+      cy.fixture('customPopulations').then(({ studentNumbersForCSStudentsSet1: students }) => {
+        searchFor(students, '\n')
         hasLanded()
         containsAmountOfStudents(students.length)
         containsSpecificStudents(students)
@@ -102,17 +107,18 @@ describe('Custom population tests', () => {
     })
 
     it("Doesn't return non-existing students", () => {
-      cy.fixture('customPopulations').then(({ studentNumbersForCSStudentsSet1 }) => {
-        const students = [...studentNumbersForCSStudentsSet1, ...nonExistentStudentNumbers]
-        searchFor(students)
+      cy.fixture('customPopulations').then(({ studentNumbersForCSStudentsSet1: students }) => {
+        searchFor([...students, ...nonExistentStudentNumbers], ' ')
         hasLanded()
-        containsAmountOfStudents(studentNumbersForCSStudentsSet1.length)
-        containsSpecificStudents(studentNumbersForCSStudentsSet1)
+        containsAmountOfStudents(students.length)
+        containsSpecificStudents(students)
+        checkRightsNotification(nonExistentStudentNumbers)
       })
     })
 
     it("Doesn't find empty custom population", () => {
-      searchFor(nonExistentStudentNumbers)
+      searchFor(nonExistentStudentNumbers, ',')
+      checkRightsNotification(nonExistentStudentNumbers)
       cy.contains('Credit accumulation').should('not.exist')
       cy.contains('Programme distribution').should('not.exist')
       cy.contains('Courses of population').should('not.exist')
@@ -120,10 +126,11 @@ describe('Custom population tests', () => {
     })
 
     it("Doesn't return students user has no right to", () => {
-      // TODO: check that this doesn't create false positives, since this test goes
-      // through even if following students are not in anon sis-db.
+      // These students exist in the database, but the user doesn't have the right to view them
       const studentsForEduBachStudents = ['014990067', '013069465', '014853890']
-      searchFor(studentsForEduBachStudents)
+      // Two semicolons on purpose, the page should be able to handle it
+      searchFor(studentsForEduBachStudents, ';;')
+      checkRightsNotification(studentsForEduBachStudents)
       cy.contains('Credit accumulation').should('not.exist')
       cy.contains('Programme distribution').should('not.exist')
       cy.contains('Courses of population').should('not.exist')
@@ -133,11 +140,14 @@ describe('Custom population tests', () => {
 
   describe('Custom population search saving', () => {
     it('Saves a custom population search', { retries: 2 }, () => {
-      cy.fixture('customPopulations').then(({ studentNumbersForCSStudentsSet1 }) => {
-        const students = studentNumbersForCSStudentsSet1
+      cy.fixture('customPopulations').then(({ studentNumbersForCSStudentsSet1: students }) => {
         openCustomPopupForm()
+        cy.contains(
+          'Insert student numbers you wish to use for population. Separate each number with a comma, semicolon, space, or newline.'
+        )
         const name = fillName()
-        fillForm(students)
+        // A comma and a newline on purpose, the page should be able to handle it
+        fillForm(students, ',\n')
         save()
 
         // Round 1
@@ -148,10 +158,9 @@ describe('Custom population tests', () => {
         containsSpecificStudents(students)
 
         // Round 2
-        cy.visit(`${Cypress.config().baseUrl}/custompopulation`)
-        cy.url().should('include', '/custompopulation')
+        cy.visit('/custompopulation')
         cy.contains('Custom population')
-        cy.get('button').contains('Custom population').click()
+        openCustomPopupForm()
         selectSavedPopulation(name)
         search()
         cy.contains(`Custom population "${name}"`)
@@ -161,35 +170,34 @@ describe('Custom population tests', () => {
     })
 
     it('Updates a custom population search', () => {
-      cy.fixture('customPopulations').then(({ studentNumbersForCSStudentsSet1, studentNumbersForCSStudentsSet2 }) => {
-        const students1 = studentNumbersForCSStudentsSet1
-        const students2 = studentNumbersForCSStudentsSet2
-        openCustomPopupForm()
-        const name = fillName()
-        fillForm(students1)
-        save()
+      cy.fixture('customPopulations').then(
+        ({ studentNumbersForCSStudentsSet1: students1, studentNumbersForCSStudentsSet2: students2 }) => {
+          openCustomPopupForm()
+          const name = fillName()
+          fillForm(students1, ' ')
+          save()
 
-        selectSavedPopulation(name)
-        search()
-        cy.contains(`Custom population "${name}"`)
-        containsAmountOfStudents(students1.length)
-        containsSpecificStudents(students1)
-        cy.contains('Custom population')
-        cy.get('button').contains('Custom population').click()
-        selectSavedPopulation(name)
-        fillForm([...students1, ...students2])
-        save()
+          selectSavedPopulation(name)
+          search()
+          cy.contains(`Custom population "${name}"`)
+          containsAmountOfStudents(students1.length)
+          containsSpecificStudents(students1)
+          cy.contains('Custom population')
+          openCustomPopupForm()
+          selectSavedPopulation(name)
+          fillForm(['\n', ...students2], ', ')
+          save()
 
-        cy.visit(`${Cypress.config().baseUrl}/custompopulation`)
-        cy.url().should('include', '/custompopulation')
-        cy.contains('Custom population')
-        cy.get('button').contains('Custom population').click()
-        selectSavedPopulation(name)
-        search()
-        cy.contains(`Custom population "${name}"`)
-        containsAmountOfStudents(students1.length + students2.length)
-        containsSpecificStudents([...students1, ...students2])
-      })
+          cy.visit('/custompopulation')
+          cy.contains('Custom population')
+          openCustomPopupForm()
+          selectSavedPopulation(name)
+          search()
+          cy.contains(`Custom population "${name}"`)
+          containsAmountOfStudents(students1.length + students2.length)
+          containsSpecificStudents([...students1, ...students2])
+        }
+      )
     })
   })
 })

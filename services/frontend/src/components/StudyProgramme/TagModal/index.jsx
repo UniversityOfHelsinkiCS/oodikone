@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Button, Dropdown, Form, Message, Modal, TextArea } from 'semantic-ui-react'
 
+import { extractItems } from '@/common'
 import { useCreateStudentTagsMutation } from '@/redux/tags'
 
 export const TagModal = ({ combinedProgramme, studytrack, tags }) => {
@@ -8,6 +9,7 @@ export const TagModal = ({ combinedProgramme, studytrack, tags }) => {
   const [input, setInput] = useState('')
   const [selectedValue, setSelected] = useState('')
   const [createStudentTags, { isError, isLoading, isSuccess }] = useCreateStudentTagsMutation()
+  const parsedStudentNumbers = extractItems(input)
 
   useEffect(() => {
     if (!isLoading) {
@@ -21,9 +23,8 @@ export const TagModal = ({ combinedProgramme, studytrack, tags }) => {
 
   const handleClick = async event => {
     event.preventDefault()
-    const studentnumbers = input.match(/[^\s,;]+/g)
     await createStudentTags({
-      tags: studentnumbers.map(studentNumber => ({
+      tags: parsedStudentNumbers.map(studentNumber => ({
         tag_id: selectedValue,
         studentnumber: studentNumber,
       })),
@@ -84,7 +85,7 @@ export const TagModal = ({ combinedProgramme, studytrack, tags }) => {
         <Button content="Cancel" negative onClick={() => setModalOpen(false)} />
         <Button
           content="Add tags"
-          disabled={isLoading || selectedValue.length === 0 || !input.match(/[^\s,;]+/g)}
+          disabled={isLoading || selectedValue.length === 0 || !parsedStudentNumbers.length}
           onClick={event => handleClick(event)}
           positive
         />

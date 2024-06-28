@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Button, Form, Modal, TextArea } from 'semantic-ui-react'
 
-import { textAndDescriptionSearch } from '@/common'
+import { extractItems, textAndDescriptionSearch } from '@/common'
 import { useTitle } from '@/common/hooks'
 import { SearchHistory } from '@/components/SearchHistory'
 import {
@@ -41,15 +41,8 @@ export const CustomPopulationSearch = ({ setCustomPopulationState }) => {
     clearForm()
   }
 
-  const parseInput = studentNumbers =>
-    studentNumbers
-      .split(/[\s,]+/)
-      .map(code => code.trim())
-      .filter(s => s !== '')
-      .map(s => (s.length === 8 ? `0${s}` : s))
-
   const onSave = () => {
-    const students = parseInput(input)
+    const students = extractItems(input)
     if (selectedSearch) {
       updateSearch({ id: selectedSearch.id, students })
     } else {
@@ -79,7 +72,8 @@ export const CustomPopulationSearch = ({ setCustomPopulationState }) => {
 
   const onClicker = event => {
     event.preventDefault()
-    const studentNumbers = parseInput(input)
+    const studentNumbers = extractItems(input)
+
     setCustomPopulationState({ selectedSearch, studentNumbers, associatedProgramme })
     handleClose()
   }
@@ -101,15 +95,25 @@ export const CustomPopulationSearch = ({ setCustomPopulationState }) => {
         <Form>
           <h2>New custom population</h2>
           <Form.Field>
-            <em>Insert name for this custom population if you wish to save it</em>
-            <Form.Input disabled={!!selectedSearch} onChange={handleNameChange} placeholder="name" value={name} />
+            <label>Insert name for this custom population if you wish to save it</label>
+            <Form.Input
+              data-cy="custom-population-name-input"
+              disabled={!!selectedSearch}
+              onChange={handleNameChange}
+              placeholder="name"
+              value={name}
+            />
           </Form.Field>
           <Form.Field>
-            <em>Insert student numbers you wish to use for population here</em>
+            <label>
+              Insert student numbers you wish to use for population. Separate each number with a comma, semicolon,
+              space, or newline.
+            </label>
             <TextArea
-              data-cy="student-no-input"
-              onChange={event => setInput(event.target.value)}
+              data-cy="student-number-input"
+              onChange={(_, { value }) => setInput(value)}
               placeholder="011111111"
+              rows={10}
               value={input}
             />
           </Form.Field>
