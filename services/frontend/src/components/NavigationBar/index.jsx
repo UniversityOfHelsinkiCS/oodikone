@@ -11,11 +11,11 @@ const allNavigationItems = {
   university: { key: 'university', label: 'University', path: '/university' },
   faculty: { key: 'faculties', label: 'Faculties', path: '/faculties' },
   populations: {
+    key: 'studyProgramme',
     items: [
       { key: 'class', label: 'Class statistics', path: '/populations' },
       { key: 'overview', label: 'Overview', path: '/study-programme' },
     ],
-    key: 'studyProgramme',
     label: 'Programmes',
   },
   courseStatistics: { key: 'courseStatistics', label: 'Courses', path: '/coursestatistics' },
@@ -29,6 +29,7 @@ const allNavigationItems = {
     reqRights: ['studyGuidanceGroups'],
   },
   customPopulations: {
+    key: 'customPopulation',
     items: [
       { key: 'customSearch', label: 'Custom population', path: '/custompopulation' },
       { key: 'openUniSearch', label: 'Fetch open uni students by courses', path: '/openunipopulation' },
@@ -36,7 +37,6 @@ const allNavigationItems = {
       { key: 'languageCenterView', label: 'Language center view', path: '/languagecenterview' },
       { key: 'closeToGraduation', label: 'Students close to graduation', path: '/close-to-graduation' },
     ],
-    key: 'customPopulation',
     label: 'Special populations',
   },
   updater: { key: 'updater', label: 'Updater', path: '/updater', reqRights: ['admin'] },
@@ -48,13 +48,14 @@ export const NavigationBar = () => {
     useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const location = useLocation()
-
   const showAsUser = useShowAsUser()
   const [logout] = useLogoutMutation()
 
   const refreshNavigationRoutes = () => {
     const visibleNavigationItems = {}
-    if (isLoading) return visibleNavigationItems
+    if (isLoading) {
+      return visibleNavigationItems
+    }
     Object.keys(allNavigationItems).forEach(key => {
       if (key === 'populations') {
         if (!fullAccessToStudentData && programmeRights.length === 0) return
@@ -86,9 +87,14 @@ export const NavigationBar = () => {
 
   const renderHome = () => (
     <Menu.Item as={Link} tabIndex="-1" to="/">
-      <span className="logo">
-        <h2 className="logoText">oodikone</h2>
+      <span>
+        <h2>oodikone</h2>
       </span>
+      {isDev && (
+        <Label className="devRibbon" color="red">
+          dev
+        </Label>
+      )}
     </Menu.Item>
   )
 

@@ -15,11 +15,3 @@
   align-items: center;
   background-color: pink;
 }
-
-.logo {
-  text-decoration: none;
-}
-
-.logoText {
-  color: var(--black);
-}
