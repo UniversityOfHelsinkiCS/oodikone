@@ -4,6 +4,7 @@ import { SemesterEnrollment } from './semesterEnrollment'
 import { Studyplan } from './studyplan'
 import { Transfer } from './transfer'
 import { Studyright } from './studyright'
+import { Enrollment } from './enrollment'
 
 @Table({
   underscored: true,
@@ -24,6 +25,9 @@ export class Student extends Model {
   @HasMany(() => Studyright)
   studyrights: Studyright[]
 
+  @HasMany(() => Enrollment, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
+  enrollments: Enrollment[]
+  
   @Column(DataType.STRING)
   abbreviatedname: string
 

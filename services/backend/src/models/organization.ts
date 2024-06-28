@@ -2,6 +2,7 @@ import { BelongsToMany, Column, DataType, HasMany, Model, PrimaryKey, Table } fr
 import { ProgrammeModule } from "./programmeModule"
 import { CourseProvider } from "./courseProvider"
 import { Course } from "./course"
+import { Studyright } from "./studyright"
 
 @Table({
   underscored: true,
@@ -15,6 +16,9 @@ export class Organization extends Model {
 
   @HasMany(() => ProgrammeModule, { foreignKey: 'organization_id' })
   programmeModules: ProgrammeModule[]
+
+  @HasMany(() => Studyright, { sourceKey: 'code' })
+  studyrights: Studyright[]
 
   @BelongsToMany(() => Course, () => CourseProvider, 'organizationcode')
   courses: Course[]

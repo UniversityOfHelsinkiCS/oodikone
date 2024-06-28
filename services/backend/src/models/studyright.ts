@@ -1,11 +1,12 @@
-import { Table, Model, DataType, Column, PrimaryKey, ForeignKey, HasMany } from 'sequelize-typescript'
+import { Table, Model, DataType, Column, PrimaryKey, ForeignKey, HasMany, BelongsTo } from 'sequelize-typescript'
 import { Student } from './student'
 import { StudyrightElement } from './studyrightElement'
+import { Organization } from './organization'
 
 @Table({
   modelName: 'studyright',
   tableName: 'studyright',
-  timestamps: false
+  timestamps: false,
 })
 export class Studyright extends Model {
   @PrimaryKey
@@ -18,6 +19,9 @@ export class Studyright extends Model {
   @ForeignKey(() => StudyrightElement)
   @Column(DataType.STRING)
   actual_studyrightid: string
+
+  @BelongsTo(() => Organization, { targetKey: 'code' })
+  organization: Organization
 
   @Column(DataType.STRING)
   startdate: string
@@ -44,8 +48,12 @@ export class Studyright extends Model {
   @Column({ field: 'student_studentnumber', type: DataType.STRING })
   studentStudentnumber: string
 
-  @Column(DataType.STRING)
-  faculty_code: string
+  @BelongsTo(() => Student)
+  student: Student
+
+  @ForeignKey(() => Organization)
+  @Column({ field: 'faculty_code', type: DataType.STRING})
+  facultyCode: string
 
   @Column(DataType.INTEGER)
   prioritycode: number
