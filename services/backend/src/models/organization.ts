@@ -3,6 +3,7 @@ import { ProgrammeModule } from "./programmeModule"
 import { CourseProvider } from "./courseProvider"
 import { Course } from "./course"
 import { Studyright } from "./studyright"
+import { SISStudyRight } from "./SISStudyRight"
 
 @Table({
   underscored: true,
@@ -17,7 +18,13 @@ export class Organization extends Model {
   @HasMany(() => ProgrammeModule, { foreignKey: 'organization_id' })
   programmeModules: ProgrammeModule[]
 
-  @HasMany(() => Studyright, { sourceKey: 'code' })
+  @HasMany(() => Organization, {foreignKey: 'parent_id', as: 'children'})
+  children: Organization[]
+
+  @HasMany(() => SISStudyRight, { foreignKey: 'facultyCode', sourceKey: 'code' })
+  SISStudyRights: SISStudyRight[]
+
+  @HasMany(() => Studyright, { foreignKey: 'facultyCode', sourceKey: 'code' })
   studyrights: Studyright[]
 
   @BelongsToMany(() => Course, () => CourseProvider, 'organizationcode')

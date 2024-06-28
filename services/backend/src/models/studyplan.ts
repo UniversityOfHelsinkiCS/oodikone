@@ -1,6 +1,7 @@
-import { Model, Table, Column, PrimaryKey, DataType, ForeignKey } from 'sequelize-typescript'
+import { Model, Table, Column, PrimaryKey, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript'
 import { Student } from './student'
 import { Studyright } from './studyright'
+import { SISStudyRight } from './SISStudyRight'
 
 @Table({
   underscored: false,
@@ -11,6 +12,9 @@ export class Studyplan extends Model {
   @PrimaryKey
   @Column(DataType.STRING)
   id!: string
+
+  @BelongsTo(() => SISStudyRight, { as: 'studyRight', foreignKey: 'sis_study_right_id' })
+  SISStudyRight: SISStudyRight
 
   @ForeignKey(() => Student)
   @Column(DataType.STRING)

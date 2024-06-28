@@ -1,0 +1,27 @@
+import { Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript'
+import { Teacher } from './teacher'
+import { Credit } from './credit'
+
+@Table({
+  underscored: false,
+  modelName: 'credit_teacher',
+  tableName: 'credit_teachers',})
+export class CreditTeacher extends Model {
+  @PrimaryKey
+  @Column(DataType.STRING)
+  composite!: string
+
+  @ForeignKey(() => Credit)
+  @Column(DataType.STRING)
+  credit_id: string
+
+  @ForeignKey(() => Teacher)
+  @Column(DataType.STRING)
+  teacher_id: string
+
+  @Column(DataType.DATE)
+  createdAt: Date
+
+  @Column(DataType.DATE)
+  updatedAt: Date
+}

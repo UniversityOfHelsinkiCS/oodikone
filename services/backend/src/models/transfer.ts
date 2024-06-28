@@ -1,4 +1,4 @@
-import { Model, Table, Column, PrimaryKey, DataType, ForeignKey } from 'sequelize-typescript'
+import { Model, Table, Column, PrimaryKey, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript'
 import { ElementDetail } from './elementDetail'
 import { Studyright } from './studyright'
 import { Student } from './student'
@@ -12,6 +12,18 @@ export class Transfer extends Model {
   @PrimaryKey
   @Column(DataType.STRING)
   id: string
+
+  @BelongsTo(() => Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
+  student: Student
+
+  @BelongsTo(() => Studyright, { foreignKey: 'studyrightid', targetKey: 'studyrightid' })
+  studyright: Studyright
+
+  @BelongsTo(() => ElementDetail, { foreignKey: 'sourcecode' })
+  source: ElementDetail
+
+  @BelongsTo(() => ElementDetail, { foreignKey: 'targetcode' })
+  target: ElementDetail
 
   @ForeignKey(() => ElementDetail)
   @Column(DataType.STRING)

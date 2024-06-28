@@ -5,6 +5,8 @@ import { Studyplan } from './studyplan'
 import { Transfer } from './transfer'
 import { Studyright } from './studyright'
 import { Enrollment } from './enrollment'
+import { SISStudyRight } from './SISStudyRight'
+import { StudyrightElement } from './studyrightElement'
 
 @Table({
   underscored: true,
@@ -22,19 +24,28 @@ export class Student extends Model {
   @Column(DataType.STRING)
   firstnames: string
 
-  @HasMany(() => Studyright)
+  @HasMany(() => Studyright, { foreignKey: 'studentStudentnumber', sourceKey: 'studentnumber' })
   studyrights: Studyright[]
 
   @HasMany(() => Enrollment, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
   enrollments: Enrollment[]
   
+  @HasMany(() => SISStudyRight, { foreignKey: 'studentNumber' })
+  studyRights: SISStudyRight[]
+
+  @HasMany(() => SemesterEnrollment, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
+  semester_enrollments: SemesterEnrollment[]
+
+  @HasMany(() => StudyrightElement, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
+  studyrightElements: StudyrightElement[]
+
   @Column(DataType.STRING)
   abbreviatedname: string
 
   @HasMany(() => Studyplan)
   studyplans: Studyplan[]
 
-  @HasMany(() => Transfer)
+  @HasMany(() => Transfer, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
   transfers: Transfer[]
 
   @Column(DataType.DATE)
@@ -51,9 +62,6 @@ export class Student extends Model {
 
   @Column(DataType.STRING)
   secondary_email: string
-
-  @HasMany(() => SemesterEnrollment)
-  semester_enrollments: SemesterEnrollment[]
 
   @Column(DataType.STRING)
   national_student_number: string

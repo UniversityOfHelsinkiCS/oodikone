@@ -1,4 +1,3 @@
-
 import { Student } from './student'
 import { Enrollment } from './enrollment'
 import { CreditType } from './creditType'
@@ -16,6 +15,12 @@ import { ProgrammeModule } from './programmeModule'
 import { ProgrammeModuleChild } from './programmeModuleChild'
 import { Organization } from './organization'
 import { CourseProvider } from './courseProvider'
+import { SISStudyRight } from './SISStudyRight'
+import { SISStudyRightElement } from './SISStudyRightElement'
+import { CourseType } from './courseType'
+import { CreditTeacher } from './creditTeacher'
+import { ExcludedCourse } from './excludedCourse'
+import { Teacher } from './teacher'
 
 Credit.notUnnecessary = credit => {
   return credit.credits > 0 && credit.credits <= 12
@@ -34,21 +39,27 @@ Credit.failed = credit => credit.credittypecode === CREDIT_TYPE_CODES.FAILED
 Credit.improved = credit => credit.credittypecode === CREDIT_TYPE_CODES.IMPROVED
 
 export {
-  CreditType,
-  Studyright,
-  Student,
-  Enrollment,
-  Credit,
-  SemesterEnrollment,
-  Semester,
   Course,
-  StudyrightExtent,
-  StudyrightElement,
+  CourseProvider,
+  CourseType,
+  Credit,
+  CreditTeacher,
+  CreditType,
   ElementDetail,
-  Transfer,
-  Studyplan,
+  Enrollment,
+  ExcludedCourse,
+  Organization,
   ProgrammeModule,
   ProgrammeModuleChild,
-  Organization,
-  CourseProvider
+  Semester,
+  SemesterEnrollment,
+  SISStudyRight,
+  SISStudyRightElement,
+  Student,
+  Studyplan,
+  Studyright,
+  StudyrightExtent,
+  StudyrightElement,
+  Teacher,
+  Transfer,
 }

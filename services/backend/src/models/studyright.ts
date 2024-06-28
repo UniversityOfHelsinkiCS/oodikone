@@ -2,6 +2,10 @@ import { Table, Model, DataType, Column, PrimaryKey, ForeignKey, HasMany, Belong
 import { Student } from './student'
 import { StudyrightElement } from './studyrightElement'
 import { Organization } from './organization'
+import { Studyplan } from './studyplan'
+import { StudyrightExtent } from './studyrightExtent'
+import { Transfer } from './transfer'
+import { Enrollment } from './enrollment'
 
 @Table({
   modelName: 'studyright',
@@ -13,15 +17,30 @@ export class Studyright extends Model {
   @Column(DataType.INTEGER)
   studyrightid: string
 
-  @HasMany(() => StudyrightElement)
+  @HasMany(() => StudyrightElement, { foreignKey: 'studyrightid', sourceKey: 'studyrightid' })
   studyright_elements: StudyrightElement[]
+
+  @BelongsTo(() => StudyrightExtent, { foreignKey: 'extentcode', targetKey: 'extentcode' })
+  studyrightExtent: StudyrightExtent
 
   @ForeignKey(() => StudyrightElement)
   @Column(DataType.STRING)
   actual_studyrightid: string
 
+  @HasMany(() => Enrollment, { foreignKey: 'studyright_id', constraints: false })
+  enrollments: Enrollment[]
+
+  @BelongsTo(() => Student, { foreignKey: 'studentStudentnumber', targetKey: 'studentnumber' })
+  student: Student
+
   @BelongsTo(() => Organization, { targetKey: 'code' })
   organization: Organization
+
+  @HasMany(() => Transfer, { foreignKey: 'studyrightid', sourceKey: 'studyrightid' })
+  transfers: Transfer[]
+
+  @HasMany(() => Studyplan, { foreignKey: 'studyrightid', sourceKey: 'studyrightid' })
+  studyplans: Studyplan[]
 
   @Column(DataType.STRING)
   startdate: string
@@ -47,9 +66,6 @@ export class Studyright extends Model {
   @ForeignKey(() => Student)
   @Column({ field: 'student_studentnumber', type: DataType.STRING })
   studentStudentnumber: string
-
-  @BelongsTo(() => Student)
-  student: Student
 
   @ForeignKey(() => Organization)
   @Column({ field: 'faculty_code', type: DataType.STRING})

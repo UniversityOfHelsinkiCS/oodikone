@@ -1,9 +1,11 @@
-import { BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript'
+import { BelongsTo, BelongsToMany, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript'
 import { CreditType } from './creditType'
 import { Studyright } from './studyright'
 import { Student } from './student'
 import { Course } from './course'
 import { Semester } from './semester'
+import { Teacher } from './teacher'
+import { CreditTeacher } from './creditTeacher'
 
 @Table({
   underscored: false,
@@ -26,7 +28,7 @@ export class Credit extends Model {
   @BelongsTo(() => Semester, { foreignKey: { name: 'semester_composite', allowNull: false } })
   semester: Semester
 
-  @BelongsTo(() => Student)
+  @BelongsTo(() => Student, { foreignKey: 'student_studentnumber', targetKey: 'studentnumber' })
   student: Student
 
   @Column(DataType.DOUBLE)
@@ -39,8 +41,11 @@ export class Credit extends Model {
   @Column(DataType.INTEGER)
   credittypecode: number
 
-  @BelongsTo(() => CreditType)
+  @BelongsTo(() => CreditType, { foreignKey: 'credittypecode', targetKey: 'credittypecode' })
   creditType: CreditType
+
+  @BelongsToMany(() => Teacher, () => CreditTeacher, 'credit_id')
+  teachers: Teacher[]
 
   @Column(DataType.DATE)
   attainment_date: Date
@@ -48,7 +53,7 @@ export class Credit extends Model {
   @Column(DataType.STRING)
   course_code: string
 
-  @BelongsTo(() => Course)
+  @BelongsTo(() => Course, { foreignKey: 'course_id' })
   course: Course
 
   @ForeignKey(() => Course)

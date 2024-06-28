@@ -1,6 +1,8 @@
 import { Column, Table, DataType, Model, PrimaryKey, BelongsTo } from "sequelize-typescript"
 import { Student } from "./student"
 import { Semester } from "./semester"
+import { Studyright } from "./studyright"
+import { Course } from "./course"
 
 @Table({
   underscored: false,
@@ -17,6 +19,12 @@ export class Enrollment extends Model {
 
   @BelongsTo(() => Semester, { foreignKey: { name: 'semester_composite', allowNull: false } })
   semester: Semester
+
+  @BelongsTo(() => Studyright,  { foreignKey: 'studyright_id', targetKey: 'studyrightid', constraints: false })
+  studyright: Studyright
+
+  @BelongsTo(() => Course, { foreignKey: 'course_id' })
+  course: Course
 
   @Column(DataType.STRING)
   studentnumber: string

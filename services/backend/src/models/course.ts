@@ -1,7 +1,9 @@
-import { Model, Table, Column, DataType, PrimaryKey, ForeignKey, HasMany, BelongsToMany } from "sequelize-typescript"
+import { Model, Table, Column, DataType, PrimaryKey, ForeignKey, HasMany, BelongsToMany, BelongsTo } from "sequelize-typescript"
 import { Credit } from "./credit"
 import { Organization } from "./organization"
 import { CourseProvider } from "./courseProvider"
+import { CourseType } from "./courseType"
+import { Enrollment } from "./enrollment"
 
 @Table({
   underscored: true,
@@ -17,9 +19,21 @@ export class Course extends Model {
   @Column(DataType.STRING)
   code: string
 
+  @ForeignKey(()=> CourseType)
+  @Column(DataType.STRING)
+  coursetypecode: string
+
+  @BelongsTo(() => CourseType, { foreignKey: 'coursetypecode', targetKey: 'coursetypecode' })
+  courseType: CourseType
+
   @HasMany(() => Credit, { foreignKey: 'course_id', sourceKey: 'id' })
   credits: Credit[]
 
+  @HasMany(() => Enrollment, { foreignKey: 'course_id' })
+  enrollments: Enrollment[]
+
+  // TODO not sure if this is correct: Should the field be organizations instead?
+  // Then we would not have the provider share info?
   @BelongsToMany(() => Organization, () => CourseProvider, 'coursecode')
   courseProviders: CourseProvider[]
 

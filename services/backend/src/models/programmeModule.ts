@@ -2,6 +2,7 @@ import { Model, Table, Column, PrimaryKey, DataType, ForeignKey, BelongsTo, Belo
 import { Organization } from './organization'
 import { CourseProvider } from './courseProvider'
 import { Course } from './course'
+import { ProgrammeModuleChild } from './programmeModuleChild'
 
 @Table({
   underscored: true,
@@ -15,6 +16,12 @@ export class ProgrammeModule extends Model {
 
   @BelongsTo(() => Organization, { foreignKey: 'organization_id' })
   organization: Organization
+
+  @BelongsToMany(() => ProgrammeModule, () => ProgrammeModuleChild, 'child_id')
+  parents: ProgrammeModule[]
+
+  @BelongsToMany(() => ProgrammeModule, () => ProgrammeModuleChild, 'parent_id')
+  children: ProgrammeModule[]
 
   @Column(DataType.STRING)
   group_id: string
