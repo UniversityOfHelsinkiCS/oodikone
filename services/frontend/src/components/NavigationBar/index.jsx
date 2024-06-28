@@ -90,11 +90,7 @@ export const NavigationBar = () => {
       <span>
         <h2>oodikone</h2>
       </span>
-      {isDev && (
-        <Label className="devRibbon" color="red">
-          dev
-        </Label>
-      )}
+      {isDev && <Label color="red">dev</Label>}
     </Menu.Item>
   )
 
