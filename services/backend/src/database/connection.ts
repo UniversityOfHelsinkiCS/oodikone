@@ -103,7 +103,7 @@ class DbConnection extends EventEmitter {
 // Old-style kone + user db connections
 const sequelizeKone = new Sequelize(conf.DB_URL_KONE as string, {
   schema: conf.DB_SCHEMA_KONE as string,
-  searchPath: conf.DB_SCHEMA_KONE as string,
+  // searchPath: conf.DB_SCHEMA_KONE as string, // TODO is this necessary
   logging: false,
   password: conf.KONE_PASSWORD as string,
   models: [Tag, TagStudent],
@@ -123,7 +123,7 @@ const initializeDatabaseConnection = async () => {
   for (const [seq, dbName] of [
     [sequelizeKone, 'kone-db'],
     [sequelizeUser, 'user-db'],
-  ]) {
+  ] as const) {
     logger.info(`Connecting to ${dbName}...`)
     for (let round = 1; round <= rounds; round++) {
       try {

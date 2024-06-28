@@ -1,9 +1,5 @@
 const { Op, where, fn, col } = require('sequelize')
-const { Course } = require('../models/course')
-const { Credit } = require('../models/credit')
-const { Enrollment } = require('../models/enrollment')
-const { Student } = require('../models/student')
-const { Course, Credit, Enrollment, Student } = require('../models')
+const { Course, Credit, Enrollment, Student } = require('../models/index')
 
 const getCompletedCourses = async (studentNumbers, courseCodes) => {
   let courses = await Course.findAll({
