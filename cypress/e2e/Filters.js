@@ -346,7 +346,7 @@ describe('Custom Population Statistics', () => {
     cy.fixture('customPopulations').then(({ studentNumbersForCSStudentsSet1, studentNumbersForCSStudentsSet2 }) => {
       const students = [...studentNumbersForCSStudentsSet1, ...studentNumbersForCSStudentsSet2]
       runTestStepWithPreAndPostParts = createRunTestStepWithPreAndPostPartsFunction(students.length)
-      cy.cs('student-no-input').click().type(students.join('\n'))
+      cy.cs('student-number-input').click().type(students.join('\n'))
     })
     cy.cs('search-button').click()
   })

@@ -1,7 +1,7 @@
 /// <reference types="Cypress" />
 
 const openCustomPopupForm = () => {
-  cy.get('button').contains('Custom population').click()
+  cy.get('[data-cy="custom-pop-search-button"]').click()
 }
 
 const fillName = () => {
@@ -43,7 +43,7 @@ const fillForm = (content, separator) => {
 }
 
 const search = () => {
-  cy.get('button').contains('Search population').click()
+  cy.get('[data-cy="search-button"]').click()
 }
 
 const searchFor = (studentnumbers, separator) => {
