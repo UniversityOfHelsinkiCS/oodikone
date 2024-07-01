@@ -304,6 +304,14 @@ const getGoal = programme => {
   return 48 // unknown, likely old doctor or licentiate
 }
 
+const isOldOrObsolete = code => {
+  return (
+    (code.includes('KH') && !code.startsWith('2_KH') && !code.endsWith('_2')) ||
+    (code.includes('MH') && !code.startsWith('2_MH') && !code.endsWith('_2')) ||
+    /^(T)[0-9]{6}$/.test(code)
+  )
+}
+
 module.exports = {
   getCorrectStudentnumbers,
   formatStudyright,
@@ -327,4 +335,5 @@ module.exports = {
   getId,
   getGoal,
   getCorrectStartDate,
+  isOldOrObsolete,
 }
