@@ -44,6 +44,9 @@ ProgrammeModule.init(
     curriculum_period_ids: {
       type: ARRAY(TEXT),
     },
+    degreeProgrammeType: {
+      type: STRING,
+    },
     createdAt: {
       type: DATE,
     },
