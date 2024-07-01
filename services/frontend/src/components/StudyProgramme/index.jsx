@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
 import { Container, Header, Menu, Segment, Tab } from 'semantic-ui-react'
 
@@ -7,7 +7,6 @@ import { useTabs, useTitle } from '@/common/hooks'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgrammesQuery } from '@/redux/populations'
-import { useGetProgressCriteriaQuery } from '@/redux/programmeProgressCriteria'
 import { BasicOverview } from './BasicOverview'
 import { DegreeCoursesTable } from './DegreeCourses'
 import { ProgrammeCourses } from './ProgrammeCourses'
@@ -31,7 +30,6 @@ export const StudyProgramme = () => {
   const { studyProgrammeId } = useParams()
   const { data: programmesAndStudyTracks } = useGetProgrammesQuery()
   const programmes = programmesAndStudyTracks?.programmes
-  const progressCriteria = useGetProgressCriteriaQuery({ programmeCode: studyProgrammeId })
   const { language, getTextIn } = useLanguage()
   const { isAdmin, fullAccessToStudentData, programmeRights } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
@@ -39,18 +37,18 @@ export const StudyProgramme = () => {
   const [academicYear, setAcademicYear] = useState(false)
   const [specialGroups, setSpecialGroups] = useState(false)
   const [graduated, setGraduated] = useState(false)
-  const emptyCriteria = {
-    courses: { yearOne: [], yearTwo: [], yearThree: [] },
-    credits: { yearOne: 0, yearTwo: 0, yearThree: 0 },
-  }
-  const [criteria, setCriteria] = useState(progressCriteria?.data ? progressCriteria.data : emptyCriteria)
   useTitle('Study programmes')
 
-  useEffect(() => {
-    if (progressCriteria.data) {
-      setCriteria(progressCriteria.data)
-    }
-  }, [progressCriteria.data])
+  if (!studyProgrammeId) {
+    return (
+      <Container>
+        <Header className="segmentTitle" size="large">
+          Study programmes
+        </Header>
+        <StudyProgrammeSelector />
+      </Container>
+    )
+  }
 
   const programmeId =
     studyProgrammeId && studyProgrammeId.includes('+') ? studyProgrammeId.split('+')[0] : studyProgrammeId
@@ -106,9 +104,8 @@ export const StudyProgramme = () => {
         render: () => (
           <DegreeCoursesTable
             combinedProgramme={secondProgrammeId}
-            criteria={criteria}
-            setCriteria={setCriteria}
             studyProgramme={programmeId}
+            year={`${new Date().getFullYear()}`}
           />
         ),
       })
@@ -130,17 +127,6 @@ export const StudyProgramme = () => {
   const programmeLetterId = programmes?.[programmeId]?.progId
   const secondProgrammeLetterId = programmes?.[secondProgrammeId]?.progId
   const panes = getPanes()
-
-  if (!studyProgrammeId) {
-    return (
-      <Container>
-        <Header className="segmentTitle" size="large">
-          Study programmes
-        </Header>
-        <StudyProgrammeSelector selected={studyProgrammeId !== undefined} />
-      </Container>
-    )
-  }
 
   return (
     <div className="segmentContainer">

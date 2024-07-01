@@ -1,13 +1,15 @@
 import { useState } from 'react'
 import { Container, Message, Form } from 'semantic-ui-react'
+import { useAddProgressCriteriaCreditsMutation } from '@/redux/programmeProgressCriteria'
 
-export const CreditCriteriaForm = ({ criteria, studyProgramme, addProgressCriteriaCredits }) => {
+export const CreditCriteriaForm = ({ criteria, studyProgramme }) => {
   const [creditsLimit1, setCreditsLimit1] = useState('')
   const [creditsLimit2, setCreditsLimit2] = useState('')
   const [creditsLimit3, setCreditsLimit3] = useState('')
   const [creditsLimit4, setCreditsLimit4] = useState('')
   const [creditsLimit5, setCreditsLimit5] = useState('')
   const [creditsLimit6, setCreditsLimit6] = useState('')
+  const [addProgressCriteriaCredits] = useAddProgressCriteriaCreditsMutation()
 
   const setCreditsLimitCriteria = () => {
     const credits = {

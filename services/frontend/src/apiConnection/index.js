@@ -111,6 +111,7 @@ export const RTKApi = createApi({
   reducerPath: 'api',
   tagTypes: [
     'CustomPopulationSearches',
+    'ProgressCriteria',
     'Semester',
     'Students',
     'StudentTags',
