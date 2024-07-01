@@ -129,6 +129,7 @@ const studyRightElementMapper =
       studyRightId: latestSnapshot.id,
       studyTrack,
       graduated,
+      degreeProgrammeType: educationInfo?.degree_program_type_urn,
     }
   }
 
