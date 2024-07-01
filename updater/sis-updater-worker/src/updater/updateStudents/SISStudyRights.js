@@ -155,6 +155,14 @@ const findFirstSnapshotDatesForProgrammesAndStudytracks = studyRightSnapshots =>
         phase1ProgrammeStartDates[educationPhase1GroupId] = normalizedDateTime
         // In most cases this shouldn't happen. There are a few rare cases (e.g. study right hy-opinoik-130863612) where the newer programme actually appears first time in an older snapshot than the older programme. In these situations, we want the start date of the newer programme to be after the start date of the older programme.
       } else if (newestProgramme(phase1ProgrammeStartDates) !== educationPhase1GroupId) {
+        const anotherProgrammeWithSameDate = Object.keys(phase1ProgrammeStartDates).find(
+          groupId => phase1ProgrammeStartDates[groupId].getTime() === normalizedDateTime.getTime()
+        )
+        // If there are many snapshots with the same date, we treat the last programme as the correct one
+        if (anotherProgrammeWithSameDate) {
+          delete phase1ProgrammeStartDates[anotherProgrammeWithSameDate]
+          continue
+        }
         phase1ProgrammeStartDates[educationPhase1GroupId] = normalizedDateTime
       }
     }
