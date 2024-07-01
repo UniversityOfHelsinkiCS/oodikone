@@ -1,17 +1,8 @@
 const { indexOf, orderBy } = require('lodash')
 
 const { getSemestersAndYears } = require('../semesters')
-const {
-  alltimeEndDate,
-  alltimeStartDate,
-  defineYear,
-  getCorrectStudentnumbers,
-  getStartDate,
-  getStatsBasis,
-  getYearsArray,
-  tableTitles,
-} = require('./studyProgrammeHelpers')
-const { graduatedStudyRights, getStudyRightsInProgramme } = require('./studyRightFinders')
+const { defineYear, getStartDate, getStatsBasis, getYearsArray, tableTitles } = require('./studyProgrammeHelpers')
+const { getStudyRightsInProgramme } = require('./studyRightFinders')
 const { transfersAway, transfersTo } = require('.')
 
 const getDateOfFirstSemesterPresent = (semesterEnrollments, semesters, currentSemester, since) => {
@@ -71,28 +62,26 @@ const getStartedStats = async ({ studyprogramme, years, isAcademicYear }) => {
   return { startedStudying, accepted }
 }
 
-const getGraduatedStats = async ({ studyprogramme, since, years, isAcademicYear, includeAllSpecials }) => {
+const getGraduatedStats = async ({ studyprogramme, years, isAcademicYear, includeAllSpecials }) => {
   const { graphStats, tableStats } = getStatsBasis(years)
-  if (!studyprogramme) return { graphStats, tableStats }
-  const studentnumbersOfTheYear = await getCorrectStudentnumbers({
-    codes: [studyprogramme],
-    startDate: alltimeStartDate,
-    endDate: alltimeEndDate,
-    includeAllSpecials,
-    includeTransferredTo: includeAllSpecials,
-  })
-  const studyrights = await graduatedStudyRights(studyprogramme, since, studentnumbersOfTheYear)
-  studyrights.forEach(({ enddate, studyrightElements }) => {
-    // Check that the study right element ending to graduation belong to study programme
-    const elements = studyrightElements.filter(
-      sre => new Date(sre.enddate).toDateString() === new Date(enddate).toDateString()
+  const graduatedStudyRights = await getStudyRightsInProgramme(studyprogramme, true)
+
+  for (const studyRight of graduatedStudyRights) {
+    const correctStudyRightElement = studyRight.studyRightElements.find(element => element.code === studyprogramme)
+    if (!correctStudyRightElement) continue
+    const [firstStudyRightElementWithSamePhase] = orderBy(
+      studyRight.studyRightElements.filter(element => element.phase === correctStudyRightElement.phase),
+      ['startDate'],
+      ['asc']
     )
-    if (elements.length) {
-      const graduationYear = defineYear(enddate, isAcademicYear)
-      graphStats[indexOf(years, graduationYear)] += 1
-      tableStats[graduationYear] += 1
+    // This means the student has been transferred from another study programme
+    if (firstStudyRightElementWithSamePhase.code !== correctStudyRightElement.code && !includeAllSpecials) {
+      continue
     }
-  })
+    const graduationYear = defineYear(new Date(correctStudyRightElement.endDate), isAcademicYear)
+    graphStats[indexOf(years, graduationYear)] += 1
+    tableStats[graduationYear] += 1
+  }
 
   return { graphStats, tableStats }
 }
