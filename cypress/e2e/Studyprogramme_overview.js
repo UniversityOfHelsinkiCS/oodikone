@@ -181,8 +181,8 @@ describe('Studyprogramme overview', () => {
         cy.contains('2020')
         cy.contains('35 graduated').trigger('mouseover')
         cy.contains('median study time: 34 months')
-        cy.contains('32 graduated on time')
-        cy.contains('3 graduated max year overtime')
+        cy.contains('30 graduated on time')
+        cy.contains('5 graduated max year overtime')
       })
 
       cy.get('[data-cy=Graph-ProgrammesBeforeOrAfter')
