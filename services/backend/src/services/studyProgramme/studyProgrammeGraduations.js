@@ -5,6 +5,7 @@ const { sortByProgrammeCode } = require('../../util')
 const { mapToProviders } = require('../../util/map')
 const { countTimeCategories, getBachelorStudyRight, getStatutoryAbsences } = require('../graduationHelpers')
 const { getThesisCredits } = require('./creditGetters')
+const { getGraduatedStats } = require('./studyProgrammeBasics')
 const {
   alltimeEndDate,
   alltimeStartDate,
@@ -39,33 +40,6 @@ const addGraduation = async (studyright, isAcademicYear, amounts, times) => {
 
   amounts[graduationYear] += 1
   times[graduationYear] = [...times[graduationYear], timeToGraduation]
-}
-
-const getGraduatedStats = async ({ studyprogramme, since, years, isAcademicYear, includeAllSpecials }) => {
-  const { graphStats, tableStats } = getStatsBasis(years)
-  if (!studyprogramme) return { graphStats, tableStats }
-  const studentnumbers = await getCorrectStudentnumbers({
-    codes: [studyprogramme],
-    startDate: alltimeStartDate,
-    endDate: alltimeEndDate,
-    includeAllSpecials,
-    includeTransferredTo: includeAllSpecials,
-  })
-
-  const studyrights = await graduatedStudyRights(studyprogramme, since, studentnumbers)
-  studyrights.forEach(({ enddate, studyrightElements }) => {
-    // Check that the study right element ending to graduation belong to study programme
-    const elements = studyrightElements.filter(
-      sre => new Date(sre.enddate).toDateString() === new Date(enddate).toDateString()
-    )
-    if (elements.length) {
-      const graduationYear = defineYear(enddate, isAcademicYear)
-      graphStats[indexOf(years, graduationYear)] += 1
-      tableStats[graduationYear] += 1
-    }
-  })
-
-  return { graphStats, tableStats }
 }
 
 const getThesisStats = async ({ studyprogramme, since, years, isAcademicYear, includeAllSpecials }) => {
@@ -127,8 +101,7 @@ const getGraduationTimeStats = async ({ studyprogramme, since, years, isAcademic
   const times = { medians: [], goal }
   const comboTimes = { medians: [], goal: goal + 36 }
 
-  const rev = [...years].reverse()
-  for (const year of rev) {
+  for (const year of years.toReversed()) {
     const median = getMedian(graduationTimes[year])
     const statistics = countTimeCategories(graduationTimes[year], goal)
     times.medians = [...times.medians, { y: median, amount: graduationAmounts[year], name: year, statistics }]
@@ -270,32 +243,14 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, combinedProgram
 
   const graphStats = combinedProgramme
     ? [
-        {
-          name: 'Graduated bachelor',
-          data: graduated.graphStats,
-        },
-        {
-          name: 'Wrote thesis bachelor',
-          data: thesis.graphStats,
-        },
-        {
-          name: 'Graduated licentiate',
-          data: graduatedSecondProgramme.graphStats,
-        },
-        {
-          name: 'Wrote thesis licentiate',
-          data: thesisSecondProgramme.graphStats,
-        },
+        { name: 'Graduated bachelor', data: graduated.graphStats },
+        { name: 'Wrote thesis bachelor', data: thesis.graphStats },
+        { name: 'Graduated licentiate', data: graduatedSecondProgramme.graphStats },
+        { name: 'Wrote thesis licentiate', data: thesisSecondProgramme.graphStats },
       ]
     : [
-        {
-          name: 'Graduated students',
-          data: graduated.graphStats,
-        },
-        {
-          name: 'Wrote thesis',
-          data: thesis.graphStats,
-        },
+        { name: 'Graduated students', data: graduated.graphStats },
+        { name: 'Wrote thesis', data: thesis.graphStats },
       ]
 
   return {
@@ -305,12 +260,7 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, combinedProgram
     titles: combinedProgramme ? combinedTitles : titles,
     graphStats:
       studyprogramme.includes('LIS') || studyprogramme.includes('T')
-        ? [
-            {
-              name: 'Graduated students',
-              data: graduated.graphStats,
-            },
-          ]
+        ? [{ name: 'Graduated students', data: graduated.graphStats }]
         : graphStats,
     graduationTimes: graduationTimeStats.times,
     doCombo: graduationTimeStats.doCombo,

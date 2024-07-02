@@ -4,6 +4,13 @@ const { getSemestersAndYears } = require('../semesters')
 const { defineYear, getStartDate, getStatsBasis, getYearsArray, tableTitles } = require('./studyProgrammeHelpers')
 const { getStudyRightsInProgramme } = require('./studyRightFinders')
 
+const getStudyRightElementsWithPhase = (studyRight, phase) =>
+  orderBy(
+    studyRight.studyRightElements.filter(sre => sre.phase === phase),
+    ['startDate'],
+    ['asc']
+  )
+
 const getDateOfFirstSemesterPresent = (semesterEnrollments, semesters, currentSemester, since) => {
   if (!semesterEnrollments) return null
   for (const enrollment of semesterEnrollments) {
@@ -23,11 +30,8 @@ const getStartedStats = async ({ studyprogramme, years, isAcademicYear }) => {
 
   for (const studyRight of studyRightsOfProgramme) {
     const studyRightElement = studyRight.studyRightElements.find(sre => sre.code === studyprogramme)
-    const [firstStudyRightElementWithSamePhase] = orderBy(
-      studyRight.studyRightElements.filter(sre => sre.phase === studyRightElement.phase),
-      ['startDate'],
-      ['asc']
-    )
+    const [firstStudyRightElementWithSamePhase] = getStudyRightElementsWithPhase(studyRight, studyRightElement.phase)
+
     // This means the student has been transferred from another study programme
     if (firstStudyRightElementWithSamePhase.code !== studyRightElement.code) {
       continue
@@ -68,10 +72,9 @@ const getGraduatedStats = async ({ studyprogramme, years, isAcademicYear, includ
   for (const studyRight of graduatedStudyRights) {
     const correctStudyRightElement = studyRight.studyRightElements.find(element => element.code === studyprogramme)
     if (!correctStudyRightElement) continue
-    const [firstStudyRightElementWithSamePhase] = orderBy(
-      studyRight.studyRightElements.filter(element => element.phase === correctStudyRightElement.phase),
-      ['startDate'],
-      ['asc']
+    const [firstStudyRightElementWithSamePhase] = getStudyRightElementsWithPhase(
+      studyRight,
+      correctStudyRightElement.phase
     )
     // This means the student has been transferred from another study programme
     if (firstStudyRightElementWithSamePhase.code !== correctStudyRightElement.code && !includeAllSpecials) {
@@ -93,11 +96,7 @@ const getTransferredStats = async ({ studyprogramme, years, isAcademicYear, comb
 
   for (const studyRight of [...studyRights, ...secondStudyRights]) {
     const studyRightElement = studyRight.studyRightElements.find(element => element.code === studyprogramme)
-    const studyRightElementsWithSamePhase = orderBy(
-      studyRight.studyRightElements.filter(element => element.phase === studyRightElement.phase),
-      ['startDate'],
-      ['asc']
-    )
+    const studyRightElementsWithSamePhase = getStudyRightElementsWithPhase(studyRight, studyRightElement.phase)
     if (studyRightElementsWithSamePhase.length === 1) continue
     const [firstStudyRightElementWithSamePhase] = studyRightElementsWithSamePhase
     if (
@@ -213,14 +212,8 @@ const getBasicStatsForStudytrack = async ({ studyprogramme, combinedProgramme, s
   const { includeAllSpecials, isAcademicYear } = settings
   const since = getStartDate(studyprogramme, isAcademicYear)
   const years = getYearsArray(since.getFullYear(), isAcademicYear)
-  const queryParameters = { studyprogramme, since, years, isAcademicYear, includeAllSpecials, combinedProgramme }
-  const queryParametersCombinedProg = {
-    studyprogramme: combinedProgramme,
-    since,
-    years,
-    isAcademicYear,
-    includeAllSpecials,
-  }
+  const queryParameters = { studyprogramme, years, isAcademicYear, includeAllSpecials, combinedProgramme }
+  const queryParametersCombinedProg = { studyprogramme: combinedProgramme, years, isAcademicYear, includeAllSpecials }
   const { startedStudying, accepted } = await getStartedStats(queryParameters)
   const { startedStudying: startedStudyingSecondProg, accepted: acceptedSecondProg } =
     await getStartedStats(queryParametersCombinedProg)
@@ -270,4 +263,5 @@ const getBasicStatsForStudytrack = async ({ studyprogramme, combinedProgramme, s
 
 module.exports = {
   getBasicStatsForStudytrack,
+  getGraduatedStats,
 }
