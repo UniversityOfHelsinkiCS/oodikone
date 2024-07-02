@@ -141,7 +141,7 @@ const getColumns = (
       filterType: 'range',
       displayColumn: semesterEnrollmentsVisible,
       export: false,
-      getRowContent: row => getSemesterEnrollmentsContent(row.student, [row.studyright]),
+      getRowContent: row => getSemesterEnrollmentsContent(row.student, row.studyright),
       getRowVal: row => getSemesterEnrollmentsVal(row.student, row.studyright),
     },
     {

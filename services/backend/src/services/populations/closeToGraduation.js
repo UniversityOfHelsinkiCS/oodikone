@@ -42,21 +42,10 @@ const findThesisAndLatestAttainments = (studyPlan, attainments, providerCode) =>
 }
 
 const formatStudent = student => {
-  const {
-    studentnumber: studentNumber,
-    abbreviatedname: name,
-    sis_person_id,
-    email,
-    phone_number: phoneNumber,
-    secondary_email: secondaryEmail,
-  } = student
+  const { studentNumber, name, sis_person_id, email, phoneNumber, secondaryEmail } = student
   return student.studyplans.reduce((acc, studyPlan) => {
     const { studyRight } = studyPlan
     const { studyRightElements, startDate: startOfStudyright, extentCode, semesterEnrollments } = studyRight
-    const renamedSemesterEnrollments = semesterEnrollments.map(enrollment => ({
-      enrollmenttype: enrollment.type,
-      semestercode: enrollment.semester,
-    }))
 
     const { programmeCode, programmeName, studyTrack, startDate: programmeStartDate } = studyRightElements[0]
     const programmeCodeToProviderCode = mapToProviders([programmeCode])[0]
@@ -70,7 +59,7 @@ const formatStudent = student => {
       student: { studentNumber, name, sis_person_id, email, phoneNumber, secondaryEmail },
       studyright: {
         startDate: startOfStudyright,
-        semesterEnrollments: renamedSemesterEnrollments,
+        semesterEnrollments,
         isBaMa: extentCode === 5,
       },
       thesisInfo: thesisData
@@ -101,13 +90,13 @@ const findStudentsCloseToGraduation = async studentNumbers =>
   (
     await Student.findAll({
       attributes: [
-        'abbreviatedname',
+        ['abbreviatedname', 'name'],
         'creditcount',
         'email',
-        'phone_number',
-        'secondary_email',
+        ['phone_number', 'phoneNumber'],
+        ['secondary_email', 'secondaryEmail'],
         'sis_person_id',
-        'studentnumber',
+        ['studentnumber', 'studentNumber'],
       ],
       where: studentNumbers
         ? {
