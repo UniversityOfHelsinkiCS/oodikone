@@ -1,3 +1,4 @@
+const { orderBy } = require('lodash')
 const { codes } = require('../../../config/programmeCodes')
 const { studentnumbersWithAllStudyrightElements } = require('../populations')
 
@@ -312,6 +313,13 @@ const isOldOrObsolete = code => {
   )
 }
 
+const getStudyRightElementsWithPhase = (studyRight, phase) =>
+  orderBy(
+    studyRight.studyRightElements.filter(sre => sre.phase === phase),
+    ['startDate'],
+    ['asc']
+  )
+
 module.exports = {
   getCorrectStudentnumbers,
   formatStudyright,
@@ -336,4 +344,5 @@ module.exports = {
   getGoal,
   getCorrectStartDate,
   isOldOrObsolete,
+  getStudyRightElementsWithPhase,
 }

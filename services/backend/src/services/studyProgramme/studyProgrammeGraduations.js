@@ -3,7 +3,8 @@ const moment = require('moment')
 
 const { sortByProgrammeCode } = require('../../util')
 const { mapToProviders } = require('../../util/map')
-const { countTimeCategories, getBachelorStudyRight, getStatutoryAbsences } = require('../graduationHelpers')
+const { countTimeCategories } = require('../graduationHelpers')
+const { getSemestersAndYears } = require('../semesters')
 const { getThesisCredits } = require('./creditGetters')
 const { getGraduatedStats } = require('./studyProgrammeBasics')
 const {
@@ -19,27 +20,29 @@ const {
   getThesisType,
   getYearsArray,
   getYearsObject,
+  getStudyRightElementsWithPhase,
 } = require('./studyProgrammeHelpers')
-const { getStudyRightsInProgramme, graduatedStudyRights } = require('./studyRightFinders')
+const { getStudyRightsInProgramme } = require('./studyRightFinders')
 
-const checkStartdate = async (id, startdate) => {
-  if (id.slice(-2) === '-1') {
-    return startdate
-  }
-  const studyright = await getBachelorStudyRight(id.replace(/-2$/, '-1'))
-  if (studyright) return studyright.startdate
-  return null
+const calculateAbsenceInMonths = (absence, startDate, endDate) => {
+  const absenceStart = moment(absence.startdate)
+  const absenceEnd = moment(absence.enddate)
+
+  if (absenceStart.isAfter(endDate) || absenceEnd.isBefore(startDate)) return 0
+
+  // Without 'true' as the third argument, the result will be truncated, not rounded (e.g. 4.999 would be 4, not 5). This is why we use Math.round() instead
+  return Math.round(absenceEnd.diff(absenceStart, 'months', true))
 }
 
-const addGraduation = async (studyright, isAcademicYear, amounts, times) => {
-  const startdate = await checkStartdate(studyright.studyrightid, studyright.startdate)
-  const graduationYear = defineYear(studyright.enddate, isAcademicYear)
-  const totalTimeToGraduation = moment(studyright.enddate).diff(moment(startdate), 'months')
-  const statutoryAbsences = await getStatutoryAbsences(studyright.studentNumber, startdate, studyright.enddate)
-  const timeToGraduation = totalTimeToGraduation - statutoryAbsences
-
-  amounts[graduationYear] += 1
-  times[graduationYear] = [...times[graduationYear], timeToGraduation]
+const calculateDurationOfStudies = (startDate, graduationDate, semesterEnrollments, semesters) => {
+  const semestersWithStatutoryAbsence = semesterEnrollments
+    .filter(enrollment => enrollment.statutoryAbsence)
+    .map(enrollment => enrollment.semester)
+  const monthsToSubtract = semestersWithStatutoryAbsence.reduce(
+    (acc, semester) => acc + calculateAbsenceInMonths(semesters[semester], startDate, graduationDate),
+    0
+  )
+  return Math.round(moment(graduationDate).subtract(monthsToSubtract, 'months').diff(moment(startDate), 'months', true))
 }
 
 const getThesisStats = async ({ studyprogramme, since, years, isAcademicYear, includeAllSpecials }) => {
@@ -67,33 +70,41 @@ const getThesisStats = async ({ studyprogramme, since, years, isAcademicYear, in
   return { graphStats, tableStats }
 }
 
-const getGraduationTimeStats = async ({ studyprogramme, since, years, isAcademicYear, includeAllSpecials }) => {
-  const graduationAmounts = getYearsObject({ years })
-  const graduationTimes = getYearsObject({ years, emptyArrays: true })
+const getGraduationTimeStats = async ({ studyprogramme, years, isAcademicYear, includeAllSpecials }) => {
   if (!studyprogramme) return { times: { medians: [], goal: 0 }, doCombo: false, comboTimes: { medians: [], goal: 0 } }
   // for bc+ms combo
   const doCombo = studyprogramme.startsWith('MH') && !['MH30_001', 'MH30_003'].includes(studyprogramme)
-  const graduationAmountsCombo = getYearsObject({ years })
+  const graduationTimes = getYearsObject({ years, emptyArrays: true })
   const graduationTimesCombo = getYearsObject({ years, emptyArrays: true })
+  const { semesters } = await getSemestersAndYears()
 
-  const studentnumbers = await getCorrectStudentnumbers({
-    codes: [studyprogramme],
-    startDate: alltimeStartDate,
-    endDate: alltimeEndDate,
-    includeAllSpecials,
-    includeTransferredTo: includeAllSpecials,
-  })
-  const studyrights = await graduatedStudyRights(studyprogramme, since, studentnumbers)
-  // for masters, separate bc+ms combo from just ms students (except some medical progs)
-  for (const right of studyrights) {
-    const elements = right.studyrightElements.filter(
-      element => new Date(element.enddate).toDateString() === new Date(right.enddate).toDateString()
+  const graduatedStudyRights = await getStudyRightsInProgramme(studyprogramme, true)
+
+  for (const studyRight of graduatedStudyRights) {
+    const correctStudyRightElement = studyRight.studyRightElements.find(element => element.code === studyprogramme)
+    const countAsBachelorMaster = doCombo && studyRight.extentCode === 5
+    const [firstStudyRightElementWithSamePhase] = getStudyRightElementsWithPhase(
+      studyRight,
+      correctStudyRightElement.phase
     )
-    if (elements.length === 0) continue
-    if (doCombo && right.studyrightid.slice(-2) === '-2') {
-      await addGraduation(right, isAcademicYear, graduationAmountsCombo, graduationTimesCombo)
+    // This means the student has been transferred from another study programme
+    if (firstStudyRightElementWithSamePhase.code !== correctStudyRightElement.code && !includeAllSpecials) {
+      continue
+    }
+
+    const startDate = countAsBachelorMaster
+      ? getStudyRightElementsWithPhase(studyRight, 1)[0]?.startDate
+      : firstStudyRightElementWithSamePhase.startDate
+    if (!startDate) continue
+
+    const graduationDate = correctStudyRightElement.endDate
+
+    const duration = calculateDurationOfStudies(startDate, graduationDate, studyRight.semesterEnrollments, semesters)
+    const graduationYear = defineYear(graduationDate, isAcademicYear)
+    if (countAsBachelorMaster) {
+      graduationTimesCombo[graduationYear].push(duration)
     } else {
-      await addGraduation(right, isAcademicYear, graduationAmounts, graduationTimes)
+      graduationTimes[graduationYear].push(duration)
     }
   }
 
@@ -104,15 +115,12 @@ const getGraduationTimeStats = async ({ studyprogramme, since, years, isAcademic
   for (const year of years.toReversed()) {
     const median = getMedian(graduationTimes[year])
     const statistics = countTimeCategories(graduationTimes[year], goal)
-    times.medians = [...times.medians, { y: median, amount: graduationAmounts[year], name: year, statistics }]
+    times.medians.push({ y: median, amount: graduationTimes[year].length, name: year, statistics })
 
     if (doCombo) {
       const median = getMedian(graduationTimesCombo[year])
       const statistics = countTimeCategories(graduationTimesCombo[year], goal + 36)
-      comboTimes.medians = [
-        ...comboTimes.medians,
-        { y: median, amount: graduationAmountsCombo[year], name: year, statistics },
-      ]
+      comboTimes.medians.push({ y: median, amount: graduationTimesCombo[year].length, name: year, statistics })
     }
   }
   return { times, doCombo, comboTimes }
@@ -148,7 +156,7 @@ const getProgrammesBeforeStarting = async ({ studyprogramme, years, isAcademicYe
     // If there's more than one programme of phase 2, the student has transferred from/to another programme
     if (!includeAllSpecials && phase2Programmes.length > 1) return acc
 
-    const startDateInProgramme = phase2Programmes.find(elem => elem.code === studyprogramme).startDate
+    const startDateInProgramme = phase2Programmes.find(elem => elem.code === studyprogramme)?.startDate
     acc[latestPhase1Programme.code][defineYear(startDateInProgramme, isAcademicYear)] += 1
     return acc
   }, {})

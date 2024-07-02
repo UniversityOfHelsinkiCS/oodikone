@@ -1,15 +1,15 @@
-const { indexOf, orderBy } = require('lodash')
+const { indexOf } = require('lodash')
 
 const { getSemestersAndYears } = require('../semesters')
-const { defineYear, getStartDate, getStatsBasis, getYearsArray, tableTitles } = require('./studyProgrammeHelpers')
+const {
+  defineYear,
+  getStartDate,
+  getStatsBasis,
+  getYearsArray,
+  tableTitles,
+  getStudyRightElementsWithPhase,
+} = require('./studyProgrammeHelpers')
 const { getStudyRightsInProgramme } = require('./studyRightFinders')
-
-const getStudyRightElementsWithPhase = (studyRight, phase) =>
-  orderBy(
-    studyRight.studyRightElements.filter(sre => sre.phase === phase),
-    ['startDate'],
-    ['asc']
-  )
 
 const getDateOfFirstSemesterPresent = (semesterEnrollments, semesters, currentSemester, since) => {
   if (!semesterEnrollments) return null
