@@ -1,48 +1,88 @@
-# Mystery numbers
+# Numeric types
 
-Sis data uses some numeric classifiers that are not self-explanatory and (most) previously needed to be deciphered from existing code.
-Some mystery numbers are gathered here for convenience. Feel free to add anything that could be useful. Remember to use the spelling used in code to enable project wide search.
+Data used in Oodikone contains some numeric types (or _magic numbers_) that are not self-explanatory. The values of the numeric types are gathered here for convenience and quick reference.
 
-## extentcode
+## Extent code
 
-(from **studyright**)
+Appears in model Studyright (db: `studyright`) as _extentcode_ (db: `extentcode`) and in model SISStudyRight (db: `sis_study_rights`) as _extentCode_ (db: `extent_code`). Values are defined in the database table `studyright_extents`.
 
-These are actually defined in db table studyright_extents. Tells studyright level or type, eg. bachelor's degree or non-degree studies.
+| value | meaning                                             |
+| ----: | :-------------------------------------------------- |
+|     1 | Bachelor's degree                                   |
+|     2 | Master's degree                                     |
+|     3 | Licensiate                                          |
+|     4 | Doctor                                              |
+|     5 | Bachelor's and Master's degree                      |
+|     6 | Continuing education                                |
+|     7 | Exchange studies                                    |
+|     9 | Open University studies                             |
+|    13 | Non-degree pedagogical studies for teachers         |
+|    14 | Contract training                                   |
+|    16 | Studies for secondary school students               |
+|    18 | Specialisation studies                              |
+|    22 | Non-degree programme for special education teachers |
+|    23 | Specialist training in medicine and dentistry       |
+|    31 | Summer and winter school                            |
+|    34 | Exchange studies (postgraduate studies)             |
+|    99 | Non-Degree studies                                  |
 
-## prioritycode
+## Priority code
 
-(from **studyright**)
+> [!WARNING]  
+> Obsolete, to be deprecated
 
-1: Primary
+Appears in model Studyright (db: `studyright`) as _prioritycode_ (db: `prioritycode`).
 
-2: Secondary
+| value | meaning   | notes                                                                                       |
+| ----: | :-------- | :------------------------------------------------------------------------------------------ |
+|     1 | Primary   |                                                                                             |
+|     2 | Secondary |                                                                                             |
+|     5 | Rescinded | seemingly not in use anymore                                                                |
+|     6 | Option    | Ba+Ma students can add a master programme to their study plan before graduating as bachelor |
+|    30 | Graduated |                                                                                             |
 
-5: Rescinded (Seemingly not in use anymore)
+## Type
 
-6: Option (Bachelor+master studyright students can add a master programme to their study plan before graduation in bachelor programme: marked as option in Oodikone)
+> [!WARNING]  
+> Obsolete, to be deprecated
 
-30: Graduated
+Appears in model ElementDetails (db: `element_details`) as _type_ (db: `type`).
 
-## type
+| value | meaning                                          |
+| ----: | :----------------------------------------------- |
+|    20 | study programme                                  |
+|    30 | module, studytrack or kokonaisuus e.g. neurology |
 
-(from **element_details**)
+## Enrollment type
 
-20: A study programme
+Appears in model SemesterEnrollment (db: `semester_enrollments`) as _enrollmenttype_ (db: `enrollmenttype`).
 
-30: Module/Studytrack/kokonaisuus? Eg. Neurology
+| value | meaning  | notes                            |
+| ----: | :------- | :------------------------------- |
+|     1 | Present  |                                  |
+|     2 | Absent   |                                  |
+|     3 | Inactive | neither 1 or 2 has been declared |
 
-## enrollmenttype
+## Credit type code
 
-(from **semester_enrollments**)
+Appears in model Credit (db: `credit`) as _credittypecode_ (db: `credittypecode`). Values are defined in the database table `credit_types`.
 
-1: Present
+Completed/Improved/Transferred/Failed
 
-2: Absent
+| value | meaning          |
+| ----: | :--------------- |
+|     4 | Completed        |
+|     7 | Improved (grade) |
+|     9 | Transferred      |
+|    10 | Failed           |
 
-3: Inactive (neither 1 or 2 has been declared)
+## Gender code
 
-## credittypecode
+Appears in model Student (db: `student`) as _gender_code_ (db: `gender_code`).
 
-(from **credit**)
-
-Defined in credit_types db table. Completed/Improved/Transferred/Failed
+| value | meaning |
+| ----: | :------ |
+|     0 | Unknown |
+|     1 | Male    |
+|     2 | Female  |
+|     3 | Other   |
