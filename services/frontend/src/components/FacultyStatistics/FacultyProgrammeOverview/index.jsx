@@ -97,19 +97,24 @@ export const FacultyProgrammeOverview = ({
   setGraduatedGroup,
   setSpecialGroups,
   specialGroups,
+  studyProgrammes,
+  setStudyProgrammes,
 }) => {
   const specials = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
   const graduated = graduatedGroup ? 'GRADUATED_EXCLUDED' : 'GRADUATED_INCLUDED'
+  const studyProgrammeFilter = studyProgrammes ? 'ALL_PROGRAMMES' : 'NEW_STUDY_PROGRAMMES'
   const { getTextIn } = useLanguage()
   const progressStats = useGetFacultyProgressStatsQuery({
     id: faculty?.code,
     specialGroups: specials,
     graduated,
+    studyProgrammeFilter,
   })
   const studentStats = useGetFacultyStudentStatsQuery({
     id: faculty.code,
     specialGroups: specials,
     graduated,
+    studyProgrammeFilter,
   })
 
   const isFetchingOrLoading =
@@ -181,6 +186,14 @@ export const FacultyProgrammeOverview = ({
           setValue={setGraduatedGroup}
           toolTips={facultyToolTips.GraduatedToggle}
           value={graduatedGroup}
+        />
+        <Toggle
+          cypress="ProgrammeToggle"
+          firstLabel="New study programmes"
+          secondLabel="All study programmes"
+          setValue={setStudyProgrammes}
+          toolTips={facultyToolTips.ProgrammeToggle}
+          value={studyProgrammes}
         />
       </div>
       {isFetchingOrLoading ? (

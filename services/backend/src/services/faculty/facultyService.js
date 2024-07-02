@@ -10,10 +10,10 @@ const createRedisKeyForThesiswriters = (id, yearType, programmeFilter, specialGr
   `FACULTY_THESIS_WRITERS_STATS_${id}_${yearType}_${programmeFilter}_${specialGroups}`
 const createRedisKeyForGraduationTimeStats = (id, programmeFilter) =>
   `FACULTY_GRADUATION_TIME_STATS_${id}_${programmeFilter}`
-const createRediskeyForFacultyProgress = (id, special_groups, graduated) =>
-  `FACULTY_PROGRESS_STATS_${id}_${special_groups}_${graduated}`
-const createRediskeyForFacultyStudents = (id, special_groups, graduated) =>
-  `FACULTY_STUDENTS_STATS_${id}_${special_groups}_${graduated}`
+const createRediskeyForFacultyProgress = (id, special_groups, graduated, programmeFilter) =>
+  `FACULTY_PROGRESS_STATS_${id}_${special_groups}_${graduated}_${programmeFilter}`
+const createRediskeyForFacultyStudents = (id, special_groups, graduated, programmeFilter) =>
+  `FACULTY_STUDENTS_STATS_${id}_${special_groups}_${graduated}_${programmeFilter}`
 
 /*
   Faculty data objects have graduation times left in as arrays, so that
@@ -120,9 +120,9 @@ const getGraduationStats = async (id, programmeFilter, keepGraduationTimes = fal
   return data
 }
 
-const setFacultyProgressStats = async (data, specialGroups, graduated) => {
+const setFacultyProgressStats = async (data, specialGroups, graduated, programmeFilter) => {
   const { id } = data
-  const redisKey = createRediskeyForFacultyProgress(id, specialGroups, graduated)
+  const redisKey = createRediskeyForFacultyProgress(id, specialGroups, graduated, programmeFilter)
   const dataToRedis = {
     ...data,
     status: 'DONE',
@@ -133,16 +133,16 @@ const setFacultyProgressStats = async (data, specialGroups, graduated) => {
   return dataToRedis
 }
 
-const getFacultyProgressStats = async (id, specialGroups, graduated) => {
-  const redisKey = createRediskeyForFacultyProgress(id, specialGroups, graduated)
+const getFacultyProgressStats = async (id, specialGroups, graduated, programmeFilter) => {
+  const redisKey = createRediskeyForFacultyProgress(id, specialGroups, graduated, programmeFilter)
   const dataFromRedis = await redisClient.getAsync(redisKey)
   if (!dataFromRedis) return null
   return JSON.parse(dataFromRedis)
 }
 
-const setFacultyStudentStats = async (data, specialGroups, graduated) => {
+const setFacultyStudentStats = async (data, specialGroups, graduated, programmeFilter) => {
   const { id } = data
-  const redisKey = createRediskeyForFacultyStudents(id, specialGroups, graduated)
+  const redisKey = createRediskeyForFacultyStudents(id, specialGroups, graduated, programmeFilter)
   const dataToRedis = {
     ...data,
     status: 'DONE',
@@ -153,8 +153,8 @@ const setFacultyStudentStats = async (data, specialGroups, graduated) => {
   return dataToRedis
 }
 
-const getFacultyStudentStats = async (id, specialGroups, graduated) => {
-  const redisKey = createRediskeyForFacultyStudents(id, specialGroups, graduated)
+const getFacultyStudentStats = async (id, specialGroups, graduated, programmeFilter) => {
+  const redisKey = createRediskeyForFacultyStudents(id, specialGroups, graduated, programmeFilter)
   const dataFromRedis = await redisClient.getAsync(redisKey)
   if (!dataFromRedis) return null
   return JSON.parse(dataFromRedis)
