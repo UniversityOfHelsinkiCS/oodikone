@@ -6,105 +6,61 @@ const { getGraduationStatsForStudytrack } = require('./studyProgrammeGraduations
 const { getStudytrackStatsForStudyprogramme } = require('./studyTrackStats')
 
 const updateBasicView = async (code, combinedProgramme) => {
-  const specialCalendar = {
-    yearType: 'CALENDAR_YEAR',
-    specialGroups: 'SPECIAL_INCLUDED',
-  }
-  const specialAcademic = {
-    yearType: 'ACADEMIC_YEAR',
-    specialGroups: 'SPECIAL_INCLUDED',
-  }
-  const specialExcludedCalendar = {
-    yearType: 'CALENDAR_YEAR',
-    specialGroups: 'SPECIAL_EXCLUDED',
-  }
+  const yearOptions = ['CALENDAR_YEAR', 'ACADEMIC_YEAR']
+  const specialGroupOptions = ['SPECIAL_INCLUDED', 'SPECIAL_EXCLUDED']
 
-  const specialExcludedAcademic = {
-    yearType: 'ACADEMIC_YEAR',
-    specialGroups: 'SPECIAL_EXCLUDED',
-  }
+  for (const yearType of yearOptions) {
+    for (const specialGroup of specialGroupOptions) {
+      try {
+        const isAcademicYear = yearType === 'ACADEMIC_YEAR'
+        const includeAllSpecials = specialGroup === 'SPECIAL_INCLUDED'
 
-  const options = [specialCalendar, specialAcademic, specialExcludedCalendar, specialExcludedAcademic]
-  for (const option of options) {
-    try {
-      const basicStats = await getBasicStatsForStudytrack({
-        studyprogramme: code,
-        combinedProgramme,
-        settings: {
-          isAcademicYear: option.yearType === 'ACADEMIC_YEAR',
-          includeAllSpecials: option.specialGroups === 'SPECIAL_INCLUDED',
-        },
-      })
-      await setBasicStats(basicStats, option.yearType, option.specialGroups)
+        const basicStats = await getBasicStatsForStudytrack({
+          studyprogramme: code,
+          combinedProgramme,
+          settings: { isAcademicYear, includeAllSpecials },
+        })
+        await setBasicStats(basicStats, yearType, specialGroup)
 
-      const creditStats = await computeCreditsProduced(
-        code,
-        option.yearType === 'ACADEMIC_YEAR',
-        option.specialGroups === 'SPECIAL_INCLUDED'
-      )
+        const creditStats = await computeCreditsProduced(code, isAcademicYear, includeAllSpecials)
+        await setCreditStats(creditStats, isAcademicYear, includeAllSpecials)
 
-      await setCreditStats(
-        creditStats,
-        option.yearType === 'ACADEMIC_YEAR',
-        option.specialGroups === 'SPECIAL_INCLUDED'
-      )
-
-      const graduationStats = await getGraduationStatsForStudytrack({
-        studyprogramme: code,
-        combinedProgramme,
-        settings: {
-          isAcademicYear: option.yearType === 'ACADEMIC_YEAR',
-          includeAllSpecials: option.specialGroups === 'SPECIAL_INCLUDED',
-        },
-      })
-      await setGraduationStats(graduationStats, option.yearType, option.specialGroups)
-    } catch (error) {
-      logger.error(`Programme basic stats failed: ${error}`)
-      logger.error(`Stack: ${error.stack}`)
+        const graduationStats = await getGraduationStatsForStudytrack({
+          studyprogramme: code,
+          combinedProgramme,
+          settings: { isAcademicYear, includeAllSpecials },
+        })
+        await setGraduationStats(graduationStats, yearType, specialGroup)
+      } catch (error) {
+        logger.error(`Programme basic stats failed: ${error}`)
+        logger.error(`Stack: ${error.stack}`)
+      }
     }
   }
+
   return 'OK'
 }
 
 const updateStudytrackView = async (code, combinedProgramme, associations) => {
-  const specialGraduated = {
-    graduated: 'GRADUATED_INCLUDED',
-    specialGroups: 'SPECIAL_INCLUDED',
-  }
-  const specialExcludedGraduated = {
-    graduated: 'GRADUATED_INCLUDED',
-    specialGroups: 'SPECIAL_EXCLUDED',
-  }
-  const specialGraduatedExcluded = {
-    graduated: 'GRADUATED_EXCLUDED',
-    specialGroups: 'SPECIAL_INCLUDED',
-  }
-  const specialExcludedGraduatedExcluded = {
-    graduated: 'GRADUATED_EXCLUDED',
-    specialGroups: 'SPECIAL_EXCLUDED',
-  }
+  const graduatedOptions = ['GRADUATED_INCLUDED', 'GRADUATED_EXCLUDED']
+  const specialGroupOptions = ['SPECIAL_INCLUDED', 'SPECIAL_EXCLUDED']
 
-  const options = [
-    specialGraduated,
-    specialExcludedGraduated,
-    specialGraduatedExcluded,
-    specialExcludedGraduatedExcluded,
-  ]
-
-  for (const option of options) {
-    try {
-      const stats = await getStudytrackStatsForStudyprogramme({
-        studyprogramme: code,
-        combinedProgramme,
-        settings: {
-          specialGroups: option.specialGroups === 'SPECIAL_INCLUDED',
-          graduated: option.graduated === 'GRADUATED_INCLUDED',
-        },
-        associations,
-      })
-      await setStudytrackStats(stats, option.graduated, option.specialGroups)
-    } catch (error) {
-      logger.error(`Studytrack stats update failed ${error}`)
+  for (const graduated of graduatedOptions) {
+    for (const specialGroup of specialGroupOptions) {
+      try {
+        const stats = await getStudytrackStatsForStudyprogramme({
+          studyprogramme: code,
+          combinedProgramme,
+          settings: {
+            specialGroups: specialGroup === 'SPECIAL_INCLUDED',
+            graduated: graduated === 'GRADUATED_INCLUDED',
+          },
+          associations,
+        })
+        await setStudytrackStats(stats, graduated, specialGroup)
+      } catch (error) {
+        logger.error(`Studytrack stats update failed ${error}`)
+      }
     }
   }
 

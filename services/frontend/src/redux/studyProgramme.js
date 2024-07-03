@@ -61,11 +61,7 @@ export const {
   useGetColorizedTableCourseStatsQuery,
 } = studyProgrammeApi
 
-const getFilteredAndFormattedStudyProgrammes = (getTextIn, isLoading, studyProgrammes) => {
-  if (isLoading) {
-    return []
-  }
-
+const getFilteredAndFormattedStudyProgrammes = (getTextIn, studyProgrammes) => {
   return studyProgrammes
     .filter(studyProgramme => studyProgramme.code.startsWith('KH') || studyProgramme.code.startsWith('MH'))
     .map(studyProgramme => ({
@@ -76,38 +72,34 @@ const getFilteredAndFormattedStudyProgrammes = (getTextIn, isLoading, studyProgr
     }))
 }
 
-const getDataForCombined = (isLoading, studyProgrammes) => {
+const getDataForCombined = studyProgrammes => {
   const combinedProgrammeCodes = ['KH90_001', 'MH90_001']
-  if (isLoading) {
-    return {}
-  }
   return studyProgrammes
     .filter(studyProgramme => combinedProgrammeCodes.includes(studyProgramme.code))
     .reduce((acc, studyProgramme) => ({ ...acc, [studyProgramme.code]: studyProgramme.name }), {})
 }
 
-const getCombinedOptions = (dataForCombined, getTextIn, isLoading, language) => {
-  if (isLoading && !dataForCombined) {
-    return []
-  }
+const getCombinedOptions = (dataForCombined, getTextIn, language) => {
   return [
     {
       key: 'KH90_001+MH90_001',
       value: 'KH90_001+MH90_001',
       description: 'KH90_001+MH90_001',
-      text: getUnifiedProgrammeName(getTextIn(dataForCombined.KH90_001), getTextIn(dataForCombined.MH90_001), language),
+      text: getUnifiedProgrammeName(
+        getTextIn(dataForCombined?.KH90_001),
+        getTextIn(dataForCombined?.MH90_001),
+        language
+      ),
     },
   ]
 }
 
-/*
- * Returns only newest study programmes and formats them to be used in Semantic UI dropdown menus
- */
+/** Returns only newest study programmes and formats them to be used in Semantic UI dropdown menus */
 export const useFilteredAndFormattedStudyProgrammes = () => {
-  const { data: studyProgrammes, isLoading } = useGetStudyProgrammesQuery()
+  const { data: studyProgrammes = [] } = useGetStudyProgrammesQuery()
   const { language, getTextIn } = useLanguage()
-  const filteredAndFormatted = getFilteredAndFormattedStudyProgrammes(getTextIn, isLoading, studyProgrammes)
-  const dataForCombined = getDataForCombined(isLoading, studyProgrammes)
-  const combinedOptions = getCombinedOptions(dataForCombined, getTextIn, isLoading, language)
+  const filteredAndFormatted = getFilteredAndFormattedStudyProgrammes(getTextIn, studyProgrammes)
+  const dataForCombined = getDataForCombined(studyProgrammes)
+  const combinedOptions = getCombinedOptions(dataForCombined, getTextIn, language)
   return [...filteredAndFormatted, ...combinedOptions]
 }
