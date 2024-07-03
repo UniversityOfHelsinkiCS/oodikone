@@ -172,6 +172,11 @@ const findFirstSnapshotDatesForProgrammesAndStudytracks = studyRightSnapshots =>
       phase1StudyTracks[educationPhase1GroupId] = educationPhase1ChildGroupId
     }
 
+    // If there's no study track in a newer snapshot with the same programme, we conclude that the study track has been removed
+    if (!educationPhase1ChildGroupId && phase1StudyTracks[educationPhase1GroupId]) {
+      delete phase1StudyTracks[educationPhase1GroupId]
+    }
+
     if (educationPhase2GroupId) {
       if (!phase2ProgrammeStartDates[educationPhase2GroupId]) {
         phase2ProgrammeStartDates[educationPhase2GroupId] = normalizedDateTime
@@ -182,6 +187,10 @@ const findFirstSnapshotDatesForProgrammesAndStudytracks = studyRightSnapshots =>
 
     if (educationPhase2ChildGroupId) {
       phase2StudyTracks[educationPhase2GroupId] = educationPhase2ChildGroupId
+    }
+
+    if (!educationPhase2ChildGroupId && phase2StudyTracks[educationPhase2GroupId]) {
+      delete phase2StudyTracks[educationPhase2GroupId]
     }
   }
 
