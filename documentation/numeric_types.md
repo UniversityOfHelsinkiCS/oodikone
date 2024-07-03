@@ -53,6 +53,23 @@ Appears in model ElementDetails (db: `element_details`) as _type_ (db: `type`).
 |    20 | study programme                                  |
 |    30 | module, studytrack or kokonaisuus e.g. neurology |
 
+## Phase
+
+Appears in model SISStudyRightElement (db: `sis_study_right_elements`) as _phase_ (db: `phase`).
+
+In Finland it is common for new students to be awarded the study right to both a bachelor's and a master's programme when they are admitted to the university. In Oodikone these two-phase study rights are marked with the [extent code](#extent-code) 5. In the study right elements of these study rights, phase 2 marks the second phase of the study right.
+
+For example: Student is awarded the study right in the bachelor's programme in computer science with the extent code 5. The study right element for study right in the bachelor's programme is marked with phase 1. After graduating from the bachelor's programme, the student continues their studies in the master's programme in computer science. The new study right element for the study right in the master's programme is marked with phase 2.
+
+All study right elements for other study rights (extent code other than 5) are marked with phase 1.
+
+The level of the programme (bachelor's, master's etc.) of the study right can be directly checked from degreeProgrammeType (db: `degree_programme_tpye`) in model SISStudyRightElement (db: `sis_study_right_elements`).
+
+| value | meaning  |
+| ----: | :------- |
+|     1 | any      |
+|     2 | master's |
+
 ## Enrollment type
 
 Appears in model SemesterEnrollment (db: `semester_enrollments`) as _enrollmenttype_ (db: `enrollmenttype`).
