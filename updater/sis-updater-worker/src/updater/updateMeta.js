@@ -3,13 +3,12 @@ const _ = require('lodash')
 
 const { bulkCreate, selectFromByIdsOrderBy } = require('../db')
 const { Course, CourseProvider, CourseType, CreditType, Organization, StudyrightExtent } = require('../db/models')
+const { universityOrgId } = require('../../../../services/backend/config/organisationConstants')
 const { courseMapper, courseProviderMapper, mapCourseType, mapStudyrightExtent } = require('./mapper')
 
 const updateOrganisations = async organisations => {
   await bulkCreate(Organization, organisations)
 }
-
-const universityOrgId = 'hy-university-root-id'
 
 // sort substitutions so that main code is first
 const newLetterBasedCode = /^[A-Za-z]/ // new letter based codes come first
@@ -166,5 +165,4 @@ module.exports = {
   updateCourseTypes,
   updateCreditTypes,
   updateStudyrightExtents,
-  universityOrgId,
 }

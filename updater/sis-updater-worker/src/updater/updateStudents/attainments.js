@@ -11,7 +11,7 @@ const {
   validAttainmentTypes,
   customAttainmentTypes,
 } = require('../mapper')
-const { universityOrgId } = require('../updateMeta')
+const { universityOrgId } = require('../../../../../services/backend/config/organisationConstants')
 
 const updateTeachers = async attainments => {
   const acceptorPersonIds = _.flatten(
