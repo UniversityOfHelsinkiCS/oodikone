@@ -210,7 +210,7 @@ const initializeTableStats = (
 
 const getBasicStatsForStudytrack = async ({ studyprogramme, combinedProgramme, settings }) => {
   const { includeAllSpecials, isAcademicYear } = settings
-  const since = getStartDate(studyprogramme, isAcademicYear)
+  const since = getStartDate(isAcademicYear)
   const years = getYearsArray(since.getFullYear(), isAcademicYear)
   const queryParameters = { studyprogramme, years, isAcademicYear, includeAllSpecials, combinedProgramme }
   const queryParametersCombinedProg = { studyprogramme: combinedProgramme, years, isAcademicYear, includeAllSpecials }

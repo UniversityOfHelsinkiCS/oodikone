@@ -172,12 +172,7 @@ const defineYear = (date, isAcademicYear) => {
   return `${year} - ${year + 1}`
 }
 
-const getStartDate = (studyprogramme, isAcademicYear) => {
-  if ((studyprogramme.includes('KH') || studyprogramme.includes('MH')) && isAcademicYear) return new Date('2017-08-01')
-  if (studyprogramme.includes('KH') || studyprogramme.includes('MH')) return new Date('2017-01-01')
-  if (isAcademicYear) return new Date('2017-08-01')
-  return new Date('2017-01-01')
-}
+const getStartDate = isAcademicYear => (isAcademicYear ? new Date('2017-08-01') : new Date('2017-01-01'))
 
 const alltimeStartDate = new Date('1900-01-01')
 const alltimeEndDate = new Date()

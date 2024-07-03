@@ -205,7 +205,7 @@ const combineFacultyStudents = async (code, programmes, specialGroups, graduated
   // Only academic years are considered
   const includeAllSpecials = specialGroups === 'SPECIAL_INCLUDED'
   const includeGraduated = graduated === 'GRADUATED_INCLUDED'
-  const since = getStartDate(code, true)
+  const since = getStartDate(true)
   const years = getYearsArray(since.getFullYear(), true, true)
   const settings = { includeAllSpecials, includeGraduated }
   const facultyTableStats = getYearsObject({ years, emptyArrays: true })

@@ -198,7 +198,7 @@ const getProgrammesBeforeOrAfter = async (studyprogramme, queryParameters) => {
 
 const getGraduationStatsForStudytrack = async ({ studyprogramme, combinedProgramme, settings }) => {
   const { isAcademicYear, includeAllSpecials } = settings
-  const since = getStartDate(studyprogramme, isAcademicYear)
+  const since = getStartDate(isAcademicYear)
   const years = getYearsArray(since.getFullYear(), isAcademicYear)
   const queryParameters = { studyprogramme, since, years, isAcademicYear, includeAllSpecials }
   const combinedQueryParameters = {

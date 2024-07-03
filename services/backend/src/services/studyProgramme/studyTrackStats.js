@@ -414,7 +414,7 @@ const getEmptyStatsObjects = (years, studytracks, studyprogramme, combinedProgra
 const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, combinedProgramme, settings, associations }) => {
   const isAcademicYear = true
   const includeYearsCombined = true
-  const since = getStartDate(studyprogramme, isAcademicYear)
+  const since = getStartDate(isAcademicYear)
   const years = getYearsArray(since.getFullYear(), isAcademicYear, includeYearsCombined)
 
   const studytracks = associations.programmes[studyprogramme]
