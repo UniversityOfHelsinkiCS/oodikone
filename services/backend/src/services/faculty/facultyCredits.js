@@ -1,13 +1,11 @@
 const { getCreditsProduced } = require('../providerCredits')
-const { isOldOrObsolete } = require('../studyProgramme/studyProgrammeHelpers')
+const { isRelevantProgramme } = require('../studyProgramme/studyProgrammeHelpers')
 const { getProgrammes } = require('./facultyService')
 
-/* 
-  Returns credits produced by the programmes of the faculty but also the credits where the provider is the faculty itself.
-*/
+/** Returns credits produced by the programmes of the faculty but also the credits where the provider is the faculty itself. */
 const getFacultyCredits = async (facultyCode, isAcademicYear) => {
   const allProgrammes = (await getProgrammes(facultyCode)).data
-  const programmes = allProgrammes.filter(({ code }) => isOldOrObsolete(code))
+  const programmes = allProgrammes.filter(({ code }) => isRelevantProgramme(code))
   const facultyCredits = await getCreditsProduced(facultyCode, isAcademicYear)
 
   const stats = { [facultyCode]: facultyCredits, codes: [facultyCode], programmeNames: {}, ids: [facultyCode] }

@@ -300,7 +300,7 @@ const getGoal = programme => {
   return 48 // unknown, likely old doctor or licentiate
 }
 
-const isOldOrObsolete = code => {
+const isRelevantProgramme = code => {
   return (
     (code.includes('KH') && !code.startsWith('2_KH') && !code.endsWith('_2')) ||
     (code.includes('MH') && !code.startsWith('2_MH') && !code.endsWith('_2')) ||
@@ -338,6 +338,6 @@ module.exports = {
   getId,
   getGoal,
   getCorrectStartDate,
-  isOldOrObsolete,
+  isRelevantProgramme,
   getStudyRightElementsWithPhase,
 }

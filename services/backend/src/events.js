@@ -10,7 +10,7 @@ const {
 } = require('./services/populations/closeToGraduation')
 const { redisClient } = require('./services/redis')
 const { getCurrentSemester } = require('./services/semesters')
-const { combinedStudyprogrammes, isOldOrObsolete } = require('./services/studyProgramme/studyProgrammeHelpers')
+const { combinedStudyprogrammes, isRelevantProgramme } = require('./services/studyProgramme/studyProgrammeHelpers')
 const { updateBasicView, updateStudytrackView } = require('./services/studyProgramme/studyProgrammeUpdates')
 const { getAssociations, getProgrammesFromStudyRights, refreshAssociationsInRedis } = require('./services/studyrights')
 const { findAndSaveTeachers } = require('./services/topteachers')
@@ -50,7 +50,7 @@ const refreshProgrammes = async () => {
   logger.info('Refreshing studyprogramme and studytrack overview statistics for all programmes')
 
   const programmes = await getProgrammesFromStudyRights()
-  const codes = programmes.map(programme => programme.code).filter(code => isOldOrObsolete(code))
+  const codes = programmes.map(programme => programme.code).filter(code => isRelevantProgramme(code))
 
   // Ensure that studyright associations are refreshed before launching jobs, otherwise each job will do it
   await getAssociations()
