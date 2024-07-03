@@ -1,4 +1,4 @@
-const organisationConstants = [
+const facultyCodes = [
   'H10',
   'H20',
   'H30',
@@ -20,10 +20,7 @@ const organisationConstants = [
 
 const magicFacultyCode = 'H50'
 
-const universityOrgId = 'hy-university-root-id'
-
 module.exports = {
-  facultyCodes: organisationConstants,
+  facultyCodes,
   magicFacultyCode,
-  universityOrgId,
 }

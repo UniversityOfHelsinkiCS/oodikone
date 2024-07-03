@@ -1,9 +1,8 @@
 const { uniqBy, flatten, groupBy } = require('lodash')
 const _ = require('lodash')
-
+const { rootOrgId } = require('../config')
 const { bulkCreate, selectFromByIdsOrderBy } = require('../db')
 const { Course, CourseProvider, CourseType, CreditType, Organization, StudyrightExtent } = require('../db/models')
-const { universityOrgId } = require('../../../../services/backend/config/organisationConstants')
 const { courseMapper, courseProviderMapper, mapCourseType, mapStudyrightExtent } = require('./mapper')
 
 const updateOrganisations = async organisations => {
@@ -116,7 +115,7 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
 }
 
 const updateStudyModules = async studyModules => {
-  const hyStudyModules = studyModules.filter(s => s.university_org_ids.includes(universityOrgId))
+  const hyStudyModules = studyModules.filter(s => s.university_org_ids.includes(rootOrgId))
   const attainments = await selectFromByIdsOrderBy(
     'attainments',
     hyStudyModules.map(s => s.id),
