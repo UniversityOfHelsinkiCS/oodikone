@@ -1,4 +1,4 @@
-const { Model, ARRAY, DATE, INTEGER, STRING } = require('sequelize')
+const { Model, ARRAY, DATE, DOUBLE, STRING } = require('sequelize')
 
 const { dbConnections } = require('../connection')
 
@@ -42,7 +42,7 @@ Studyplan.init(
       type: STRING,
     },
     completed_credits: {
-      type: INTEGER,
+      type: DOUBLE,
     },
     curriculum_period_id: {
       type: STRING,
