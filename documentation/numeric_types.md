@@ -63,7 +63,7 @@ For example: Student is awarded the study right in the bachelor's programme in c
 
 All study right elements for other study rights (extent code other than 5) are marked with phase 1.
 
-The level of the programme (bachelor's, master's etc.) of the study right can be directly checked from degreeProgrammeType (db: `degree_programme_tpye`) in model SISStudyRightElement (db: `sis_study_right_elements`).
+The level of the programme (bachelor's, master's etc.) of the study right can be directly checked from degreeProgrammeType (db: `degree_programme_type`) in model SISStudyRightElement (db: `sis_study_right_elements`).
 
 | value | meaning  |
 | ----: | :------- |
