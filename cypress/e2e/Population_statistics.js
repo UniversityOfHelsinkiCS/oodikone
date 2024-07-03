@@ -100,7 +100,9 @@ describe('Population Statistics tests', () => {
         .then($parentDiv => {
           if (!$parentDiv.hasClass('active')) cy.contains('Students (170)').click()
         })
-      cy.get('[data-cy=student-table-tabs]').contains('Tags').click()
+      cy.get('[data-cy=student-table-tabs]').within(() => {
+        cy.contains('Tags').click()
+      })
       cy.contains('No tags defined. You can define them here.').find('a').click()
       cy.contains('Tags').click()
       cy.contains('Tietojenkäsittelytieteen kandiohjelma')
