@@ -94,27 +94,32 @@ const getTransferredStats = async ({ studyprogramme, years, isAcademicYear, comb
   const transferredAway = getStatsBasis(years)
   const transferredTo = getStatsBasis(years)
 
-  for (const studyRight of [...studyRights, ...secondStudyRights]) {
-    const studyRightElement = studyRight.studyRightElements.find(element => element.code === studyprogramme)
-    const studyRightElementsWithSamePhase = getStudyRightElementsWithPhase(studyRight, studyRightElement.phase)
-    if (studyRightElementsWithSamePhase.length === 1) continue
-    const [firstStudyRightElementWithSamePhase] = studyRightElementsWithSamePhase
-    if (
-      firstStudyRightElementWithSamePhase.code !== studyRightElement.code &&
-      studyRightElement.startDate <= new Date()
-    ) {
-      const transferYear = defineYear(studyRightElement.startDate, isAcademicYear)
-      transferredTo.graphStats[indexOf(years, transferYear)] += 1
-      transferredTo.tableStats[transferYear] += 1
-    } else if (
-      firstStudyRightElementWithSamePhase.code === studyRightElement.code &&
-      studyRightElement.endDate <= new Date()
-    ) {
-      const transferYear = defineYear(studyRightElement.endDate, isAcademicYear)
-      transferredAway.graphStats[indexOf(years, transferYear)] += 1
-      transferredAway.tableStats[transferYear] += 1
+  const calculateTransferredStats = (studyRights, programme) => {
+    for (const studyRight of studyRights) {
+      const studyRightElement = studyRight.studyRightElements.find(element => element.code === programme)
+      const studyRightElementsWithSamePhase = getStudyRightElementsWithPhase(studyRight, studyRightElement.phase)
+      if (studyRightElementsWithSamePhase.length === 1) continue
+      const [firstStudyRightElementWithSamePhase] = studyRightElementsWithSamePhase
+      if (
+        firstStudyRightElementWithSamePhase.code !== studyRightElement.code &&
+        studyRightElement.startDate <= new Date()
+      ) {
+        const transferYear = defineYear(studyRightElement.startDate, isAcademicYear)
+        transferredTo.graphStats[indexOf(years, transferYear)] += 1
+        transferredTo.tableStats[transferYear] += 1
+      } else if (
+        firstStudyRightElementWithSamePhase.code === studyRightElement.code &&
+        studyRightElement.endDate <= new Date()
+      ) {
+        const transferYear = defineYear(studyRightElement.endDate, isAcademicYear)
+        transferredAway.graphStats[indexOf(years, transferYear)] += 1
+        transferredAway.tableStats[transferYear] += 1
+      }
     }
   }
+
+  calculateTransferredStats(studyRights, studyprogramme)
+  calculateTransferredStats(secondStudyRights, combinedProgramme)
 
   return { transferredAway, transferredTo }
 }
