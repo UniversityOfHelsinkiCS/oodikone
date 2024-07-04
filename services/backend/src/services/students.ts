@@ -17,11 +17,11 @@ import {
 import { TagStudent } from '../models/kone/tagStudent'
 import { Tag } from '../models/kone/tag'
 import logger from '../util/logger'
-const { splitByEmptySpace } = require('../util/utils')
+import { splitByEmptySpace } from '../util'
 
 const byStudentNumber = async studentNumber => {
   const [student, tags] = (await Promise.all([
-    Student.findByPk(studentNumber, {
+    (Student as any).findByPk(studentNumber, {
       attributes: [
         'firstnames',
         'lastname',
