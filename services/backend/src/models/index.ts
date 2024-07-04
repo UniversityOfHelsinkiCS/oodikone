@@ -22,21 +22,17 @@ import { StudyrightExtent } from './studyrightExtent'
 import { Teacher } from './teacher'
 import { Transfer } from './transfer'
 
-Credit.notUnnecessary = credit => {
-  return credit.credits > 0 && credit.credits <= 12
+enum CreditTypeCode {
+  PASSED = 4,
+  IMPROVED = 7,
+  APPROVED = 9,
+  FAILED = 10,
 }
 
-const CREDIT_TYPE_CODES = {
-  PASSED: 4,
-  FAILED: 10,
-  IMPROVED: 7,
-  APPROVED: 9,
-}
-
-Credit.passed = ({ credittypecode }) =>
-  credittypecode === CREDIT_TYPE_CODES.PASSED || credittypecode === CREDIT_TYPE_CODES.APPROVED
-Credit.failed = credit => credit.credittypecode === CREDIT_TYPE_CODES.FAILED
-Credit.improved = credit => credit.credittypecode === CREDIT_TYPE_CODES.IMPROVED
+Credit.passed = credit => [CreditTypeCode.PASSED, CreditTypeCode.APPROVED].includes(credit.credittypecode)
+Credit.failed = credit => credit.credittypecode === CreditTypeCode.FAILED
+Credit.improved = credit => credit.credittypecode === CreditTypeCode.IMPROVED
+Credit.notUnnecessary = credit => credit.credits > 0 && credit.credits <= 12
 
 export {
   Course,
