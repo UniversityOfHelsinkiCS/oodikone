@@ -1,5 +1,5 @@
 const { Op } = require('sequelize')
-const { ignoredFacultyCodes } = require('../../../config/facultyCodes')
+const { ignoredFacultyCodes } = require('../../../config/organisationConstants')
 
 const { codes } = require('../../../config/programmeCodes')
 const { mapObject } = require('../../util/map')

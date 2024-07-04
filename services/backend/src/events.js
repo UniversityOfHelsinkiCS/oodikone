@@ -1,6 +1,6 @@
 const { CronJob } = require('cron')
 
-const { ignoredFacultyCodes } = require('../config/facultyCodes')
+const { ignoredFacultyCodes } = require('../config/organisationConstants')
 const { isProduction, runningInCI } = require('./conf-backend')
 const { updateFacultyOverview, updateFacultyProgressOverview } = require('./services/faculty/facultyUpdates')
 const { computeLanguageCenterData, LANGUAGE_CENTER_REDIS_KEY } = require('./services/languageCenterData')

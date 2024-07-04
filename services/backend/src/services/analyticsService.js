@@ -1,5 +1,5 @@
 const moment = require('moment')
-const { facultyCodes } = require('../../config/facultyCodes')
+const { facultyCodes } = require('../../config/organisationConstants')
 
 const { redisClient } = require('./redis')
 
