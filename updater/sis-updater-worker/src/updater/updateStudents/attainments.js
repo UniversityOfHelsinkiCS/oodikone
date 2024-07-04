@@ -1,6 +1,6 @@
 const _ = require('lodash')
 const { Op } = require('sequelize')
-
+const { rootOrgId } = require('../../config')
 const { selectFromByIds, bulkCreate, getCourseUnitsByCodes, selectOneById } = require('../../db')
 const { dbConnections } = require('../../db/connection')
 const { Course, Teacher, Credit, CreditTeacher, CourseProvider } = require('../../db/models')
@@ -11,7 +11,6 @@ const {
   validAttainmentTypes,
   customAttainmentTypes,
 } = require('../mapper')
-const { universityOrgId } = require('../updateMeta')
 
 const updateTeachers = async attainments => {
   const acceptorPersonIds = _.flatten(
@@ -57,7 +56,7 @@ const updateAttainments = async (
     return res
   }, {})
 
-  const idsOfFaculties = dbConnections.knex.select('id').from('organisations').where('parent_id', universityOrgId)
+  const idsOfFaculties = dbConnections.knex.select('id').from('organisations').where('parent_id', rootOrgId)
 
   const idsOfDegreeProgrammes = new Set(
     (await dbConnections.knex.select('id').from('organisations').whereIn('parent_id', idsOfFaculties)).map(

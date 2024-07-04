@@ -47,6 +47,10 @@ html {
   cursor: pointer;
 }
 
+.ui.tiny.label.secondary-label {
+  padding: 0.375em 0.55em;
+}
+
 /* --SEMANTIC UI STICKY TABLE HEADERS-- */
 
 .fixed-header thead tr:first-child th,

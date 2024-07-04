@@ -10,7 +10,7 @@ Appears in model Studyright (db: `studyright`) as _extentcode_ (db: `extentcode`
 | ----: | :-------------------------------------------------- |
 |     1 | Bachelor's degree                                   |
 |     2 | Master's degree                                     |
-|     3 | Licensiate                                          |
+|     3 | Licentiate                                          |
 |     4 | Doctor                                              |
 |     5 | Bachelor's and Master's degree                      |
 |     6 | Continuing education                                |

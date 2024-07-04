@@ -1,6 +1,6 @@
 const { uniqBy, flatten, groupBy } = require('lodash')
 const _ = require('lodash')
-
+const { rootOrgId } = require('../config')
 const { bulkCreate, selectFromByIdsOrderBy } = require('../db')
 const { Course, CourseProvider, CourseType, CreditType, Organization, StudyrightExtent } = require('../db/models')
 const { courseMapper, courseProviderMapper, mapCourseType, mapStudyrightExtent } = require('./mapper')
@@ -8,8 +8,6 @@ const { courseMapper, courseProviderMapper, mapCourseType, mapStudyrightExtent }
 const updateOrganisations = async organisations => {
   await bulkCreate(Organization, organisations)
 }
-
-const universityOrgId = 'hy-university-root-id'
 
 // sort substitutions so that main code is first
 const newLetterBasedCode = /^[A-Za-z]/ // new letter based codes come first
@@ -117,16 +115,16 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
 }
 
 const updateStudyModules = async studyModules => {
-  const hyStudyModules = studyModules.filter(s => s.university_org_ids.includes(universityOrgId))
+  const organizationStudyModules = studyModules.filter(s => s.university_org_ids.includes(rootOrgId))
   const attainments = await selectFromByIdsOrderBy(
     'attainments',
-    hyStudyModules.map(s => s.id),
+    organizationStudyModules.map(s => s.id),
     'module_id',
     'attainment_date'
   )
 
   const courseIdToAttainments = groupBy(attainments, 'module_id')
-  const groupIdToCourse = groupBy(hyStudyModules, 'group_id')
+  const groupIdToCourse = groupBy(organizationStudyModules, 'group_id')
 
   await updateCourses(courseIdToAttainments, groupIdToCourse)
 }
@@ -166,5 +164,4 @@ module.exports = {
   updateCourseTypes,
   updateCreditTypes,
   updateStudyrightExtents,
-  universityOrgId,
 }

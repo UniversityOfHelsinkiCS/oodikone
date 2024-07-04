@@ -101,6 +101,11 @@ const getGraduationTimeStats = async ({ studyprogramme, years, isAcademicYear, i
 
     const duration = calculateDurationOfStudies(startDate, graduationDate, studyRight.semesterEnrollments, semesters)
     const graduationYear = defineYear(graduationDate, isAcademicYear)
+
+    if (!graduationTimes[graduationYear] || !graduationTimesCombo[graduationYear]) {
+      continue
+    }
+
     if (countAsBachelorMaster) {
       graduationTimesCombo[graduationYear].push(duration)
     } else {
