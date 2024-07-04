@@ -49,9 +49,6 @@ export class SISStudyRight extends Model {
   @Column(DataType.JSONB)
   semesterEnrollments: object
 
-  @Column(DataType.BOOLEAN)
-  facultyCode: boolean
-
   @Column(DataType.DATE)
   createdAt: Date
 

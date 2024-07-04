@@ -14,7 +14,7 @@ import { CreditTeacher } from './creditTeacher'
 })
 export class Credit extends Model {
   @PrimaryKey
-  @Column(DataType.INTEGER)
+  @Column(DataType.STRING)
   id!: string
 
   // TODO This could be typed more accurately, to hold all possible values that exist in db

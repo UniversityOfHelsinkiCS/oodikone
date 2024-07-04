@@ -24,6 +24,8 @@ export class Student extends Model {
   @Column(DataType.STRING)
   firstnames: string
 
+
+  
   @HasMany(() => Studyright, { foreignKey: 'studentStudentnumber', sourceKey: 'studentnumber' })
   studyrights: Studyright[]
 
