@@ -1,11 +1,13 @@
-import { BelongsTo, BelongsToMany, Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript'
+import { BelongsToMany, Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript'
+
 import { Credit } from './credit'
 import { CreditTeacher } from './creditTeacher'
 
 @Table({
   underscored: true,
   modelName: 'teacher',
-  tableName: 'teacher',})
+  tableName: 'teacher',
+})
 export class Teacher extends Model {
   @PrimaryKey
   @Column(DataType.STRING)

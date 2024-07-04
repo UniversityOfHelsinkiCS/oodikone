@@ -1,8 +1,9 @@
 import { BelongsTo, Column, DataType, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript'
+
 import { Organization } from './organization'
-import { Studyplan } from './studyplan'
-import { Student } from './student'
 import { SISStudyRightElement } from './SISStudyRightElement'
+import { Student } from './student'
+import { Studyplan } from './studyplan'
 
 @Table({
   underscored: true,

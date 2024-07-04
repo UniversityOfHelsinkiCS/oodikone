@@ -1,11 +1,13 @@
 import { Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript'
-import { Teacher } from './teacher'
+
 import { Credit } from './credit'
+import { Teacher } from './teacher'
 
 @Table({
   underscored: false,
   modelName: 'credit_teacher',
-  tableName: 'credit_teachers',})
+  tableName: 'credit_teachers',
+})
 export class CreditTeacher extends Model {
   @PrimaryKey
   @Column(DataType.STRING)

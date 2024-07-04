@@ -1,7 +1,6 @@
-import { Model, Table, Column, PrimaryKey, DataType, ForeignKey, BelongsTo, BelongsToMany } from 'sequelize-typescript'
+import { BelongsTo, BelongsToMany, Column, Model, DataType, PrimaryKey, Table } from 'sequelize-typescript'
+
 import { Organization } from './organization'
-import { CourseProvider } from './courseProvider'
-import { Course } from './course'
 import { ProgrammeModuleChild } from './programmeModuleChild'
 
 @Table({

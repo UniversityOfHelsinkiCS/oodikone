@@ -1,5 +1,5 @@
 import { BelongsTo, Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript'
-import { Organization } from './organization'
+
 import { SISStudyRight } from './SISStudyRight'
 
 @Table({
@@ -11,7 +11,7 @@ export class SISStudyRightElement extends Model {
   @Column(DataType.STRING)
   id!: string
 
-  @BelongsTo(() => SISStudyRight, { foreignKey: 'studyRightId'})
+  @BelongsTo(() => SISStudyRight, { foreignKey: 'studyRightId' })
   studyRight: SISStudyRight
 
   @Column(DataType.DATE)

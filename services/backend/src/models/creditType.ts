@@ -1,4 +1,4 @@
-import { Table, Column, DataType, PrimaryKey, CreatedAt, UpdatedAt, Model } from 'sequelize-typescript'
+import { Column, DataType, CreatedAt, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
 @Table({
   underscored: true,

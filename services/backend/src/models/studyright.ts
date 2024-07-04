@@ -1,11 +1,12 @@
-import { Table, Model, DataType, Column, PrimaryKey, ForeignKey, HasMany, BelongsTo } from 'sequelize-typescript'
-import { Student } from './student'
-import { StudyrightElement } from './studyrightElement'
+import { BelongsTo, Column, DataType, ForeignKey, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript'
+
+import { Enrollment } from './enrollment'
 import { Organization } from './organization'
+import { Student } from './student'
 import { Studyplan } from './studyplan'
+import { StudyrightElement } from './studyrightElement'
 import { StudyrightExtent } from './studyrightExtent'
 import { Transfer } from './transfer'
-import { Enrollment } from './enrollment'
 
 @Table({
   modelName: 'studyright',
@@ -68,7 +69,7 @@ export class Studyright extends Model {
   studentStudentnumber: string
 
   @ForeignKey(() => Organization)
-  @Column({ field: 'faculty_code', type: DataType.STRING})
+  @Column({ field: 'faculty_code', type: DataType.STRING })
   facultyCode: string
 
   @Column(DataType.INTEGER)

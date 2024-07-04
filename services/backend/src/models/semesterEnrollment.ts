@@ -1,4 +1,5 @@
-import { Model, Table, Column, PrimaryKey, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript'
+import { BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript'
+
 import { Semester } from './semester'
 import { Student } from './student'
 

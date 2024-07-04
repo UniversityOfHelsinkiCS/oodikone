@@ -1,13 +1,13 @@
-import { Model, Table, Column, DataType, ForeignKey, BelongsTo, PrimaryKey } from 'sequelize-typescript'
-import { Tag } from './tag'
+import { BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript'
+
 import { Student } from '../student'
+import { Tag } from './tag'
 
 @Table({
   modelName: 'tag_student',
   tableName: 'tag_student',
 })
 export class TagStudent extends Model {
-
   @PrimaryKey
   @ForeignKey(() => Tag)
   @Column(DataType.BIGINT)

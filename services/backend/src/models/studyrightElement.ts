@@ -1,7 +1,8 @@
-import { Model, Table, Column, PrimaryKey, DataType, ForeignKey, BelongsTo, HasMany, HasOne } from 'sequelize-typescript'
+import { BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript'
+
+import { ElementDetail } from './elementDetail'
 import { Student } from './student'
 import { Studyright } from './studyright'
-import { ElementDetail } from './elementDetail'
 
 @Table({
   underscored: false,
@@ -13,7 +14,7 @@ export class StudyrightElement extends Model {
   @Column(DataType.STRING)
   id: string
 
-  @BelongsTo(() => ElementDetail, { foreignKey: 'code', targetKey: 'code'})
+  @BelongsTo(() => ElementDetail, { foreignKey: 'code', targetKey: 'code' })
   element_detail: ElementDetail
 
   @Column(DataType.STRING)

@@ -1,12 +1,13 @@
-import { Model, Table, Column, PrimaryKey, DataType, HasMany } from 'sequelize-typescript'
+import { Column, DataType, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript'
+
 import { Credit } from './credit'
-import { SemesterEnrollment } from './semesterEnrollment'
-import { Studyplan } from './studyplan'
-import { Transfer } from './transfer'
-import { Studyright } from './studyright'
 import { Enrollment } from './enrollment'
+import { SemesterEnrollment } from './semesterEnrollment'
 import { SISStudyRight } from './SISStudyRight'
+import { Studyplan } from './studyplan'
+import { Studyright } from './studyright'
 import { StudyrightElement } from './studyrightElement'
+import { Transfer } from './transfer'
 
 @Table({
   underscored: true,
@@ -31,7 +32,7 @@ export class Student extends Model {
 
   @HasMany(() => Enrollment, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
   enrollments: Enrollment[]
-  
+
   @HasMany(() => SISStudyRight, { foreignKey: 'studentNumber' })
   studyRights: SISStudyRight[]
 

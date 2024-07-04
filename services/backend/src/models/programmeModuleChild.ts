@@ -1,4 +1,5 @@
-import { Model, Table, Column, PrimaryKey, DataType, ForeignKey } from 'sequelize-typescript'
+import { Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript'
+
 import { ProgrammeModule } from './programmeModule'
 
 @Table({

@@ -1,9 +1,20 @@
-import { Model, Table, Column, DataType, PrimaryKey, ForeignKey, HasMany, BelongsToMany, BelongsTo } from "sequelize-typescript"
-import { Credit } from "./credit"
-import { Organization } from "./organization"
-import { CourseProvider } from "./courseProvider"
-import { CourseType } from "./courseType"
-import { Enrollment } from "./enrollment"
+import {
+  BelongsTo,
+  BelongsToMany,
+  Column,
+  DataType,
+  ForeignKey,
+  HasMany,
+  Model,
+  PrimaryKey,
+  Table,
+} from 'sequelize-typescript'
+
+import { Credit } from './credit'
+import { Enrollment } from './enrollment'
+import { Organization } from './organization'
+import { CourseProvider } from './courseProvider'
+import { CourseType } from './courseType'
 
 @Table({
   underscored: true,
@@ -19,7 +30,7 @@ export class Course extends Model {
   @Column(DataType.STRING)
   code: string
 
-  @ForeignKey(()=> CourseType)
+  @ForeignKey(() => CourseType)
   @Column(DataType.STRING)
   coursetypecode: string
 
@@ -39,7 +50,7 @@ export class Course extends Model {
 
   @Column(DataType.STRING)
   name: string
-  
+
   @Column(DataType.DATE)
   latest_instance_date: Date
 
@@ -51,13 +62,13 @@ export class Course extends Model {
 
   @Column(DataType.DATE)
   max_attainment_date: Date
-  
+
   @Column(DataType.DATE)
   min_attainment_date: Date
-  
+
   @Column(DataType.DATE)
   created_at: Date
-  
+
   @Column(DataType.DATE)
   updated_at: Date
 

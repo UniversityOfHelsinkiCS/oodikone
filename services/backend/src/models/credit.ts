@@ -1,11 +1,12 @@
 import { BelongsTo, BelongsToMany, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript'
-import { CreditType } from './creditType'
-import { Studyright } from './studyright'
-import { Student } from './student'
+
 import { Course } from './course'
-import { Semester } from './semester'
-import { Teacher } from './teacher'
 import { CreditTeacher } from './creditTeacher'
+import { CreditType } from './creditType'
+import { Semester } from './semester'
+import { Student } from './student'
+import { Studyright } from './studyright'
+import { Teacher } from './teacher'
 
 @Table({
   underscored: false,

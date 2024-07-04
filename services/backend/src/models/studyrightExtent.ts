@@ -1,4 +1,5 @@
-import { Model, Table, Column, PrimaryKey, DataType, HasMany } from 'sequelize-typescript'
+import { Column, DataType, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript'
+
 import { Studyright } from './studyright'
 
 @Table({

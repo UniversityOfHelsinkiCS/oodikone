@@ -1,9 +1,10 @@
-import { BelongsToMany, Column, DataType, HasMany, Model, PrimaryKey, Table } from "sequelize-typescript"
-import { ProgrammeModule } from "./programmeModule"
-import { CourseProvider } from "./courseProvider"
-import { Course } from "./course"
-import { Studyright } from "./studyright"
-import { SISStudyRight } from "./SISStudyRight"
+import { BelongsToMany, Column, DataType, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript'
+
+import { Course } from './course'
+import { CourseProvider } from './courseProvider'
+import { ProgrammeModule } from './programmeModule'
+import { SISStudyRight } from './SISStudyRight'
+import { Studyright } from './studyright'
 
 @Table({
   underscored: true,
@@ -18,7 +19,7 @@ export class Organization extends Model {
   @HasMany(() => ProgrammeModule, { foreignKey: 'organization_id' })
   programmeModules: ProgrammeModule[]
 
-  @HasMany(() => Organization, {foreignKey: 'parent_id', as: 'children'})
+  @HasMany(() => Organization, { foreignKey: 'parent_id', as: 'children' })
   children: Organization[]
 
   @HasMany(() => SISStudyRight, { foreignKey: 'facultyCode', sourceKey: 'code' })
@@ -29,7 +30,7 @@ export class Organization extends Model {
 
   @BelongsToMany(() => Course, () => CourseProvider, 'organizationcode')
   courses: Course[]
-  
+
   @Column(DataType.STRING)
   code: string
 
@@ -44,5 +45,4 @@ export class Organization extends Model {
 
   @Column(DataType.DATE)
   updatedAt: Date
-  
 }
