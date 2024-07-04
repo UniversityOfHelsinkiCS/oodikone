@@ -161,6 +161,7 @@ services:
       SIS_PASSWORD: postgres
       SIS_NATS_TOKEN: dev
       SIS_NATS_URI: sis-updater-nats://sis-updater-nats:4222
+      ROOT_ORG_ID: ${ROOT_ORG_ID}
     volumes:
       - sis-updater-worker-nodemod:/opt/app-root/src/node_modules
       - ./updater/sis-updater-worker/:/opt/app-root/src
