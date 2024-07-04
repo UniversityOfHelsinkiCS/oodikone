@@ -36,6 +36,10 @@ export class Studyplan extends Model {
   @Column(DataType.INTEGER)
   completed_credits: number
 
+  @ForeignKey(() => SISStudyRight)
+  @Column(DataType.STRING)
+  sis_study_right_id: string
+
   @Column(DataType.STRING)
   curriculum_period_id: string
 

@@ -36,10 +36,7 @@ export class SISStudyRightElement extends Model {
   name: object
 
   @Column(DataType.JSONB)
-  studyTracks: object
-
-  @Column(DataType.STRING)
-  facultyCode: string
+  studyTrack: object
 
   @Column(DataType.DATE)
   createdAt: Date

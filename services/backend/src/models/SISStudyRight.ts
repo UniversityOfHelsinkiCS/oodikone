@@ -23,7 +23,7 @@ export class SISStudyRight extends Model {
   student: Student
 
   @HasMany(() => SISStudyRightElement, { foreignKey: 'studyRightId' })
-  studyrightElements: SISStudyRightElement[]
+  studyRightElements: SISStudyRightElement[]
 
   @Column(DataType.DATE)
   startDate: Date
