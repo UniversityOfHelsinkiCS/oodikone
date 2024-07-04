@@ -11,60 +11,35 @@ const {
   Organization,
   ProgrammeModule,
   SemesterEnrollment,
+  SISStudyRight,
+  SISStudyRightElement,
   Student,
   Studyright,
   StudyrightElement,
-  Transfer,
 } = require('../../models')
+const { isNewProgramme, mapCodesToIds } = require('./facultyHelpers')
 const {
   formatFacultyProgramme,
   formatFacultyProgrammeStudents,
   formatFacultyStudyRight,
   formatFacultyThesisWriter,
-  formatFacultyTransfer,
   formatOrganization,
-  isNewProgramme,
-  mapCodesToIds,
-} = require('./facultyHelpers')
+} = require('./format')
 
-const transferredFaculty = async (programmeCodeIn, programmeCodeOut, start, end) =>
+const getStartedStudyRights = async (faculty, code, since, studyRightWhere) =>
   (
-    await Transfer.findAll({
-      where: {
-        transferdate: {
-          [Op.between]: [start, end],
+    await SISStudyRight.findAll({
+      include: {
+        model: SISStudyRightElement,
+        as: 'studyRightElements',
+        attributes: ['code', 'name', 'phase', 'startDate'],
+        where: {
+          code,
         },
-        [Op.or]: [
-          {
-            sourcecode: programmeCodeOut,
-          },
-          {
-            targetcode: programmeCodeIn,
-          },
-        ],
       },
-    })
-  ).map(formatFacultyTransfer)
-
-const startedStudyrights = async (faculty, code, since, studyRightWhere) =>
-  (
-    await Studyright.findAll({
-      include: [
-        {
-          model: StudyrightElement,
-          required: true,
-          where: {
-            code,
-          },
-          include: {
-            model: ElementDetail,
-            required: true,
-          },
-        },
-      ],
       where: {
         facultyCode: faculty,
-        startdate: {
+        startDate: {
           [Op.gte]: since,
         },
         ...studyRightWhere,
@@ -72,29 +47,24 @@ const startedStudyrights = async (faculty, code, since, studyRightWhere) =>
     })
   ).map(formatFacultyStudyRight)
 
-const graduatedStudyrights = async (faculty, code, since, studyrightWhere) =>
+const getGraduatedStudyRights = async (faculty, code, since, studyRightWhere) =>
   (
-    await Studyright.findAll({
-      include: [
-        {
-          model: StudyrightElement,
-          required: true,
-          where: {
-            code,
-          },
-          include: {
-            model: ElementDetail,
-            required: true,
-          },
+    await SISStudyRight.findAll({
+      include: {
+        model: SISStudyRightElement,
+        as: 'studyRightElements',
+        attributes: ['code', 'endDate', 'graduated', 'name', 'phase'],
+        where: {
+          code,
+          graduated: true,
         },
-      ],
+      },
       where: {
         facultyCode: faculty,
-        enddate: {
+        endDate: {
           [Op.gte]: since,
         },
-        graduated: 1,
-        ...studyrightWhere,
+        ...studyRightWhere,
       },
     })
   ).map(formatFacultyStudyRight)
@@ -218,49 +188,6 @@ const hasMasterRight = async id => {
     },
   })
 }
-
-const transferredInsideFaculty = async (programmes, allProgrammeCodes, since) =>
-  (
-    await Transfer.findAll({
-      where: {
-        transferdate: {
-          [Op.gte]: since,
-        },
-        sourcecode: allProgrammeCodes,
-        targetcode: programmes,
-      },
-    })
-  ).map(formatFacultyTransfer)
-
-const transferredAway = async (programmes, allProgrammeCodes, since) =>
-  (
-    await Transfer.findAll({
-      where: {
-        transferdate: {
-          [Op.gte]: since,
-        },
-        sourcecode: programmes,
-        targetcode: {
-          [Op.notIn]: allProgrammeCodes,
-        },
-      },
-    })
-  ).map(formatFacultyTransfer)
-
-const transferredTo = async (programmes, allProgrammeCodes, since) =>
-  (
-    await Transfer.findAll({
-      where: {
-        transferdate: {
-          [Op.gte]: since,
-        },
-        sourcecode: {
-          [Op.notIn]: allProgrammeCodes,
-        },
-        targetcode: programmes,
-      },
-    })
-  ).map(formatFacultyTransfer)
 
 const degreeProgrammesOfFaculty = async facultyCode =>
   // Some programmenames are different, causing this to return multiples of same codes.
@@ -392,39 +319,14 @@ const findFacultyProgrammeCodes = async (faculty, programmeFilter) => {
   return allProgrammes
 }
 
-const getTransferredToAndAway = async (programmeCodes, allProgrammeCodes, since) => {
-  const awayTransfers = await transferredAway(programmeCodes, allProgrammeCodes, since)
-  const toTransfers = await transferredTo(programmeCodes, allProgrammeCodes, since)
-  return [...toTransfers, ...awayTransfers]
-}
-
-const getTransferredInside = async (programmeCodes, allProgrammeCodes, since) => {
-  return await transferredInsideFaculty(programmeCodes, allProgrammeCodes, since)
-}
-
-const getTransfersOut = async (programmeCode, start, end) => {
-  return await transferredFaculty([], [programmeCode], start, end)
-}
-
-const getTransfersIn = async (programmeCode, start, end) => {
-  return await transferredFaculty([programmeCode], [], start, end)
-}
-
 module.exports = {
-  startedStudyrights,
-  graduatedStudyrights,
-  studyrightsByRightStartYear,
-  hasMasterRight,
-  transferredInsideFaculty,
-  transferredAway,
-  transferredTo,
-  thesisWriters,
   findFacultyProgrammeCodes,
-  getTransferredToAndAway,
-  getTransferredInside,
+  getGraduatedStudyRights,
+  getStartedStudyRights,
   getStudyRightsByExtent,
   getStudyRightsByBachelorStart,
   getStudentsByStudentnumbers,
-  getTransfersOut,
-  getTransfersIn,
+  hasMasterRight,
+  studyrightsByRightStartYear,
+  thesisWriters,
 }
