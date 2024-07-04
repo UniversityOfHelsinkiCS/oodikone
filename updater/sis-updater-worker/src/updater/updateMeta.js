@@ -115,16 +115,16 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
 }
 
 const updateStudyModules = async studyModules => {
-  const hyStudyModules = studyModules.filter(s => s.university_org_ids.includes(rootOrgId))
+  const organizationStudyModules = studyModules.filter(s => s.university_org_ids.includes(rootOrgId))
   const attainments = await selectFromByIdsOrderBy(
     'attainments',
-    hyStudyModules.map(s => s.id),
+    organizationStudyModules.map(s => s.id),
     'module_id',
     'attainment_date'
   )
 
   const courseIdToAttainments = groupBy(attainments, 'module_id')
-  const groupIdToCourse = groupBy(hyStudyModules, 'group_id')
+  const groupIdToCourse = groupBy(organizationStudyModules, 'group_id')
 
   await updateCourses(courseIdToAttainments, groupIdToCourse)
 }
