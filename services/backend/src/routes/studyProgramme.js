@@ -164,17 +164,18 @@ router.get('/:id/update_basicview', async (req, res) => {
 router.get('/:id/update_studytrackview', async (req, res) => {
   const code = req.params.id
   const combinedProgramme = req.query?.combined_programme
-  if (code) {
-    let result = null
-    try {
-      const associations = await getAssociations()
-      result = await updateStudytrackView(code, combinedProgramme, associations)
-    } catch (error) {
-      logger.error({ message: `Failed to update code ${code} ${combinedProgramme} studytrack stats`, meta: `${error}` })
-    }
-    return res.json(result)
+  if (!code) {
+    return res.status(400).json({ error: 'Missing code' })
   }
-  res.status(422).end()
+  try {
+    const associations = await getAssociations()
+    const result = await updateStudytrackView(code, combinedProgramme, associations)
+    return res.json(result)
+  } catch (error) {
+    const message = `Failed to update study track stats for programme ${code}${combinedProgramme ? `+${combinedProgramme}` : ''}`
+    logger.error(message, { error })
+    return res.status(500).json({ error: message })
+  }
 })
 
 router.get('/:id/evaluationstats', async (req, res) => {

@@ -147,25 +147,32 @@ router.get('/:id/studentstats', auth.roles(['facultyStatistics', 'katselmusViewe
 router.get('/:id/update_basicview', auth.roles(['facultyStatistics', 'katselmusViewer']), async (req, res) => {
   const code = req.params.id
   const statsType = req.query?.stats_type
-  if (code) {
+  if (!code) {
+    return res.status(400).json({ error: 'Missing code' })
+  }
+  try {
     const result = await updateFacultyOverview(code, statsType)
     return res.json(result)
+  } catch (error) {
+    const message = `Failed to update basic stats for faculty ${code}`
+    logger.error(message, { error })
+    return res.status(500).json({ error: message })
   }
-  return res.status(422).end()
 })
 
 router.get('/:id/update_progressview', auth.roles(['facultyStatistics', 'katselmusViewer']), async (req, res) => {
   const code = req.params.id
-  if (code) {
-    let result = null
-    try {
-      result = await updateFacultyProgressOverview(code)
-    } catch (error) {
-      logger.error(`Failed to update faculty ${code} progress tab stats: ${error}`)
-    }
-    return res.json(result)
+  if (!code) {
+    return res.status(400).json({ error: 'Missing code' })
   }
-  return res.status(422).end()
+  try {
+    const result = await updateFacultyProgressOverview(code)
+    return res.json(result)
+  } catch (error) {
+    const message = `Failed to update progress tab stats for faculty ${code}`
+    logger.error(message, { error })
+    return res.status(500).json({ error: message })
+  }
 })
 
 module.exports = router

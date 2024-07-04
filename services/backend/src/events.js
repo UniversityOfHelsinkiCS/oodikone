@@ -34,16 +34,8 @@ const refreshFaculties = async () => {
 }
 
 const refreshFaculty = async code => {
-  logger.info('Started updating faculty')
-  const start = new Date().getTime()
-  try {
-    await updateFacultyOverview(code, 'ALL')
-    await updateFacultyProgressOverview(code)
-    const time = new Date().getTime() - start
-    logger.info(`Updated faculty ${code} (took ${(time / 1000 / 60).toFixed(2)} minutes)`)
-  } catch (error) {
-    logger.error({ message: `Failed to update stats for faculty ${code} with type ALL`, meta: `${error}` })
-  }
+  await updateFacultyOverview(code, 'ALL')
+  await updateFacultyProgressOverview(code)
 }
 
 const refreshProgrammes = async () => {
