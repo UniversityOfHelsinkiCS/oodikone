@@ -47,7 +47,11 @@ export const CourseParticipationTable = ({ student, selectedStudyPlanId }) => {
       >
         {getTextInWithOpen(course, getTextIn, isOpenCourse, isStudyModuleCredit)}
         {credittypecode === 7 && (
-          <Label content={getTextIn({ fi: 'TOISSIJAINEN', en: 'SECONDARY', sv: 'SEKUNDÄR' })} size="tiny" />
+          <Label
+            className="secondary-label"
+            content={getTextIn({ fi: 'TOISSIJAINEN', en: 'SECONDARY', sv: 'SEKUNDÄR' })}
+            size="tiny"
+          />
         )}
       </div>,
       <div key={`${course.code}-${new Date(date).getTime()}-grade-${grade}`}>

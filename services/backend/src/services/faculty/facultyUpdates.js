@@ -1,4 +1,3 @@
-const logger = require('../../util/logger')
 const { setCreditStats } = require('../analyticsService')
 const { computeCreditsProduced } = require('../providerCredits')
 const { findFacultyProgrammeCodes } = require('./faculty')
@@ -76,51 +75,41 @@ const updateFacultyOverview = async (faculty, statsType) => {
   let newProgrammes = []
   const allProgrammeCodes = []
 
-  try {
-    const all = await findFacultyProgrammeCodes(faculty, 'ALL_PROGRAMMES')
-    const onlyNew = await findFacultyProgrammeCodes(faculty, 'NEW_STUDY_PROGRAMMES')
-    allProgrammes = await setFacultyProgrammes(faculty, all, 'ALL_PROGRAMMES')
-    newProgrammes = await setFacultyProgrammes(faculty, onlyNew, 'NEW_STUDY_PROGRAMMES')
-    allProgrammes?.data.forEach(prog => allProgrammeCodes.push(prog.code))
-  } catch (error) {
-    logger.error(`Faculty updates: programme stats failed with error: ${error}`)
-    logger.error(`Stack: ${error.stack}`)
-  }
+  const all = await findFacultyProgrammeCodes(faculty, 'ALL_PROGRAMMES')
+  const onlyNew = await findFacultyProgrammeCodes(faculty, 'NEW_STUDY_PROGRAMMES')
+  allProgrammes = await setFacultyProgrammes(faculty, all, 'ALL_PROGRAMMES')
+  newProgrammes = await setFacultyProgrammes(faculty, onlyNew, 'NEW_STUDY_PROGRAMMES')
+  allProgrammes?.data.forEach(prog => allProgrammeCodes.push(prog.code))
 
   for (const option of options) {
     const { yearType, programmeFilter, specialGroups } = option
-    try {
-      if (statsType === 'ALL' || statsType === 'STUDENT') {
-        const updatedStudentInfo = await combineFacultyBasics(
-          faculty,
-          programmeFilter === 'ALL_PROGRAMMES' ? allProgrammes.data : newProgrammes.data,
-          yearType,
-          allProgrammeCodes,
-          programmeFilter,
-          specialGroups
-        )
-        await setBasicStats(updatedStudentInfo, option.yearType, option.programmeFilter, option.specialGroups)
-      }
-      if ((statsType === 'ALL' || statsType === 'CREDITS') && specialGroups !== 'SPECIAL_EXCLUDED') {
-        const updatedCredits = await computeCreditsProduced(
-          faculty,
-          yearType === 'ACADEMIC_YEAR',
-          specialGroups === 'SPECIAL_INCLUDED'
-        )
-        await setCreditStats(updatedCredits, yearType === 'ACADEMIC_YEAR', specialGroups === 'SPECIAL_INCLUDED')
-      }
-      if (statsType === 'ALL' || statsType === 'THESIS') {
-        const updateThesisWriters = await combineFacultyThesisWriters(
-          faculty,
-          programmeFilter === 'ALL_PROGRAMMES' ? allProgrammes.data : newProgrammes.data,
-          yearType,
-          specialGroups
-        )
-        await setThesisWritersStats(updateThesisWriters, yearType, programmeFilter, specialGroups)
-      }
-    } catch (error) {
-      logger.error(`Faculty updates: basic/thesis-writers/credits stats failed with error ${error}`)
-      logger.error(`Stack: ${error.stack}`)
+    if (statsType === 'ALL' || statsType === 'STUDENT') {
+      const updatedStudentInfo = await combineFacultyBasics(
+        faculty,
+        programmeFilter === 'ALL_PROGRAMMES' ? allProgrammes.data : newProgrammes.data,
+        yearType,
+        allProgrammeCodes,
+        programmeFilter,
+        specialGroups
+      )
+      await setBasicStats(updatedStudentInfo, option.yearType, option.programmeFilter, option.specialGroups)
+    }
+    if ((statsType === 'ALL' || statsType === 'CREDITS') && specialGroups !== 'SPECIAL_EXCLUDED') {
+      const updatedCredits = await computeCreditsProduced(
+        faculty,
+        yearType === 'ACADEMIC_YEAR',
+        specialGroups === 'SPECIAL_INCLUDED'
+      )
+      await setCreditStats(updatedCredits, yearType === 'ACADEMIC_YEAR', specialGroups === 'SPECIAL_INCLUDED')
+    }
+    if (statsType === 'ALL' || statsType === 'THESIS') {
+      const updateThesisWriters = await combineFacultyThesisWriters(
+        faculty,
+        programmeFilter === 'ALL_PROGRAMMES' ? allProgrammes.data : newProgrammes.data,
+        yearType,
+        specialGroups
+      )
+      await setThesisWritersStats(updateThesisWriters, yearType, programmeFilter, specialGroups)
     }
   }
 
@@ -151,35 +140,25 @@ const updateFacultyProgressOverview = async faculty => {
   const options = [specialGraduated, specialNotGraduated, notSpecialGraduated, notSpecialNotGraduated]
 
   let newProgrammes = []
-  try {
-    const onlyNew = await findFacultyProgrammeCodes(faculty, 'NEW_STUDY_PROGRAMMES')
-    newProgrammes = await setFacultyProgrammes(faculty, onlyNew, 'NEW_STUDY_PROGRAMMES')
-  } catch (error) {
-    logger.error(`Faculty stats: all programme stats failed with error ${error}`)
-    logger.error(`Stack: ${error.stack}`)
-  }
+  const onlyNew = await findFacultyProgrammeCodes(faculty, 'NEW_STUDY_PROGRAMMES')
+  newProgrammes = await setFacultyProgrammes(faculty, onlyNew, 'NEW_STUDY_PROGRAMMES')
 
   for (const option of options) {
     const { specialGroups, graduated } = option
-    try {
-      const updateFacultyStudentStats = await combineFacultyStudents(
-        faculty,
-        newProgrammes.data,
-        specialGroups,
-        graduated
-      )
-      await setFacultyStudentStats(updateFacultyStudentStats, specialGroups, graduated)
-      const updateFacultyProgressStats = await combineFacultyStudentProgress(
-        faculty,
-        newProgrammes.data,
-        specialGroups,
-        graduated
-      )
-      await setFacultyProgressStats(updateFacultyProgressStats, specialGroups, graduated)
-    } catch (error) {
-      logger.error(`Faculty stats: progress stats failed with error ${error}`)
-      logger.error(`Stack: ${error.stack}`)
-    }
+    const updateFacultyStudentStats = await combineFacultyStudents(
+      faculty,
+      newProgrammes.data,
+      specialGroups,
+      graduated
+    )
+    await setFacultyStudentStats(updateFacultyStudentStats, specialGroups, graduated)
+    const updateFacultyProgressStats = await combineFacultyStudentProgress(
+      faculty,
+      newProgrammes.data,
+      specialGroups,
+      graduated
+    )
+    await setFacultyProgressStats(updateFacultyProgressStats, specialGroups, graduated)
   }
   return 'OK'
 }

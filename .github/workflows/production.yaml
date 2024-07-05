@@ -33,6 +33,7 @@ jobs:
             BUILT_AT=${{ steps.get_current_time.outputs.NOW }}
             SENTRY_RELEASE=${{ steps.extract_version.outputs.VERSION }}
             SENTRY_ENVIRONMENT=production
+            SENTRY_DSN=${{ secrets.OODIKONE_SENTRY_DSN }}
 
       - name: Push to quay.io
         uses: redhat-actions/push-to-registry@v2

@@ -52,6 +52,9 @@ export class ProgrammeModule extends Model {
   @Column(DataType.ARRAY(DataType.STRING))
   curriculum_period_ids: string[]
 
+  @Column(DataType.STRING)
+  degreeProgrammeType: string
+
   @Column(DataType.DATE)
   createdAt: Date
 

@@ -313,8 +313,13 @@ const updateStudents = async (personIds, iteration = 0) => {
 
   await bulkCreate(Student, mappedStudents)
 
+  const groupedSISStudyRightSnapshots = groupSISStudyRightSnapshots(studyrightSnapshots)
+
   const [moduleGroupIdToCode, formattedStudyRights] = await Promise.all([
-    updateElementDetails(flatten(Object.values(groupedStudyRightSnapshots))),
+    updateElementDetails([
+      ...flatten(Object.values(groupedStudyRightSnapshots)),
+      ...flatten(Object.values(groupedSISStudyRightSnapshots)),
+    ]),
     updateStudyRights(
       groupedStudyRightSnapshots,
       personIdToStudentNumber,
@@ -322,8 +327,6 @@ const updateStudents = async (personIds, iteration = 0) => {
       termRegistrations
     ),
   ])
-
-  const groupedSISStudyRightSnapshots = groupSISStudyRightSnapshots(studyrightSnapshots)
 
   const createdStudyRights = await updateSISStudyRights(
     groupedSISStudyRightSnapshots,

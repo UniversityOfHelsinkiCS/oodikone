@@ -71,7 +71,7 @@ parse_env() {
     env="--file docker-compose.yml --file docker-compose.real.yml"
   fi
   if [[ "$version" == "test" ]]; then
-    env="--file docker-compose.test.yml"
+    env="--file docker-compose.yml --file docker-compose.test.yml"
   fi
   return 0
 }

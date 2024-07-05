@@ -38,6 +38,9 @@ export class SISStudyRightElement extends Model {
   @Column(DataType.JSONB)
   studyTrack: object
 
+  @Column(DataType.STRING)
+  degreeProgrammeType: string
+
   @Column(DataType.DATE)
   createdAt: Date
 

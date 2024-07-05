@@ -28,7 +28,10 @@ const logger = winston.createLogger({
   level: isProduction ? 'info' : 'debug',
   format: combine(
     timestamp({ format: isProduction ? 'D.M.YYYY,HH.mm.ss' : 'HH.mm.ss' }),
-    printf(({ level, message, timestamp, stack }) => `${timestamp} ${level}: ${stack ?? message}`)
+    printf(({ level, message, timestamp, error }) => {
+      const log = `${timestamp} ${level}: ${message}`
+      return error?.stack ? `${log}\n${error.stack}` : log
+    })
   ),
   transports,
 })

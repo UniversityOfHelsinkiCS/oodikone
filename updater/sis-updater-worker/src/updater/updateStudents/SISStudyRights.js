@@ -129,6 +129,7 @@ const studyRightElementMapper =
       studyRightId: latestSnapshot.id,
       studyTrack,
       graduated,
+      degreeProgrammeType: educationInfo?.degree_program_type_urn,
     }
   }
 
@@ -154,6 +155,14 @@ const findFirstSnapshotDatesForProgrammesAndStudytracks = studyRightSnapshots =>
         phase1ProgrammeStartDates[educationPhase1GroupId] = normalizedDateTime
         // In most cases this shouldn't happen. There are a few rare cases (e.g. study right hy-opinoik-130863612) where the newer programme actually appears first time in an older snapshot than the older programme. In these situations, we want the start date of the newer programme to be after the start date of the older programme.
       } else if (newestProgramme(phase1ProgrammeStartDates) !== educationPhase1GroupId) {
+        const anotherProgrammeWithSameDate = Object.keys(phase1ProgrammeStartDates).find(
+          groupId => phase1ProgrammeStartDates[groupId].getTime() === normalizedDateTime.getTime()
+        )
+        // If there are many snapshots with the same date, we treat the last programme as the correct one
+        if (anotherProgrammeWithSameDate) {
+          delete phase1ProgrammeStartDates[anotherProgrammeWithSameDate]
+          continue
+        }
         phase1ProgrammeStartDates[educationPhase1GroupId] = normalizedDateTime
       }
     }
@@ -161,6 +170,11 @@ const findFirstSnapshotDatesForProgrammesAndStudytracks = studyRightSnapshots =>
     // We only take one study track per group id (programme). Study track from a newer snapshot will replace the previous one.
     if (educationPhase1ChildGroupId) {
       phase1StudyTracks[educationPhase1GroupId] = educationPhase1ChildGroupId
+    }
+
+    // If there's no study track in a newer snapshot with the same programme, we conclude that the study track has been removed
+    if (!educationPhase1ChildGroupId && phase1StudyTracks[educationPhase1GroupId]) {
+      delete phase1StudyTracks[educationPhase1GroupId]
     }
 
     if (educationPhase2GroupId) {
@@ -173,6 +187,10 @@ const findFirstSnapshotDatesForProgrammesAndStudytracks = studyRightSnapshots =>
 
     if (educationPhase2ChildGroupId) {
       phase2StudyTracks[educationPhase2GroupId] = educationPhase2ChildGroupId
+    }
+
+    if (!educationPhase2ChildGroupId && phase2StudyTracks[educationPhase2GroupId]) {
+      delete phase2StudyTracks[educationPhase2GroupId]
     }
   }
 

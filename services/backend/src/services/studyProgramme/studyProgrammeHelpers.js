@@ -1,3 +1,4 @@
+const { orderBy } = require('lodash')
 const { codes } = require('../../../config/programmeCodes')
 const { studentnumbersWithAllStudyrightElements } = require('../populations')
 
@@ -171,12 +172,7 @@ const defineYear = (date, isAcademicYear) => {
   return `${year} - ${year + 1}`
 }
 
-const getStartDate = (studyprogramme, isAcademicYear) => {
-  if ((studyprogramme.includes('KH') || studyprogramme.includes('MH')) && isAcademicYear) return new Date('2017-08-01')
-  if (studyprogramme.includes('KH') || studyprogramme.includes('MH')) return new Date('2017-01-01')
-  if (isAcademicYear) return new Date('2017-08-01')
-  return new Date('2017-01-01')
-}
+const getStartDate = isAcademicYear => (isAcademicYear ? new Date('2017-08-01') : new Date('2017-01-01'))
 
 const alltimeStartDate = new Date('1900-01-01')
 const alltimeEndDate = new Date()
@@ -304,6 +300,21 @@ const getGoal = programme => {
   return 48 // unknown, likely old doctor or licentiate
 }
 
+const isRelevantProgramme = code => {
+  return (
+    (code.includes('KH') && !code.startsWith('2_KH') && !code.endsWith('_2')) ||
+    (code.includes('MH') && !code.startsWith('2_MH') && !code.endsWith('_2')) ||
+    /^(T)[0-9]{6}$/.test(code)
+  )
+}
+
+const getStudyRightElementsWithPhase = (studyRight, phase) =>
+  orderBy(
+    studyRight.studyRightElements.filter(sre => sre.phase === phase),
+    ['startDate'],
+    ['asc']
+  )
+
 module.exports = {
   getCorrectStudentnumbers,
   formatStudyright,
@@ -327,4 +338,6 @@ module.exports = {
   getId,
   getGoal,
   getCorrectStartDate,
+  isRelevantProgramme,
+  getStudyRightElementsWithPhase,
 }

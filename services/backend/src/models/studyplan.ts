@@ -34,7 +34,7 @@ export class Studyplan extends Model {
   @Column(DataType.STRING)
   sisu_id: string
 
-  @Column(DataType.INTEGER)
+  @Column(DataType.DOUBLE)
   completed_credits: number
 
   @ForeignKey(() => SISStudyRight)

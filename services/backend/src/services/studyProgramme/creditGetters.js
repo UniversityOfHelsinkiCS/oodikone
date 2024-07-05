@@ -116,11 +116,10 @@ const getTransferredCredits = async (provider, since) =>
 
 const getThesisCredits = async (provider, since, thesisType, studentnumbers) =>
   await Credit.findAll({
-    attributes: ['id', 'course_code', 'credits', 'attainment_date', 'student_studentnumber'],
+    attributes: ['attainment_date'],
     include: {
       model: Course,
       attributes: ['code'],
-      required: true,
       where: {
         course_unit_type: {
           [Op.in]: thesisType,
@@ -128,7 +127,9 @@ const getThesisCredits = async (provider, since, thesisType, studentnumbers) =>
       },
       include: {
         model: Organization,
-        required: true,
+        through: {
+          attributes: [],
+        },
         where: {
           code: provider,
         },

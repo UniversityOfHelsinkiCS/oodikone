@@ -198,8 +198,6 @@ const getProgrammeName = async code => {
 }
 
 module.exports = {
-  transfersAway,
-  transfersTo,
   allTransfers,
   getCurrentStudyYearStartDate,
   getAllProgrammeCourses,

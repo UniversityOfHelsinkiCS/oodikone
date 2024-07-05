@@ -16,7 +16,7 @@ import { StudyProgrammeFilter } from './StudyProgrammeFilter'
 import { StudyProgrammeLink } from './StudyProgrammeLink'
 import { StudyProgrammeTable } from './StudyProgrammeTable'
 
-export const StudyProgrammeSelector = ({ selected }) => {
+export const StudyProgrammeSelector = () => {
   const { getTextIn } = useLanguage()
   const { data: programmesAndStudyTracks } = useGetProgrammesQuery()
   const studyProgrammes = Object.values(programmesAndStudyTracks?.programmes || {})
@@ -37,7 +37,6 @@ export const StudyProgrammeSelector = ({ selected }) => {
   const pinnedProgrammes = studyProgrammePins?.studyProgrammes || []
   const pinnedFirstComparator = createPinnedFirstComparator(pinnedProgrammes)
 
-  if (selected) return null
   if (!studyProgrammes) return <Loader active>Loading</Loader>
 
   const isPinned = programmeCode => pinnedProgrammes.includes(programmeCode)

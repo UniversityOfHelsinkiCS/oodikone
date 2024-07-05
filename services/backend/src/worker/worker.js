@@ -1,4 +1,5 @@
 const { Worker } = require('bullmq')
+const moment = require('moment')
 
 const { redis } = require('../conf-backend')
 const logger = require('../util/logger')
@@ -18,7 +19,12 @@ const worker = new Worker('refresh-redis-data', `${__dirname}/processor.js`, {
 })
 
 worker.on('completed', job => {
-  logger.info(`Completed job: ${job.id}`)
+  const timeUsed = moment.duration(moment(job.finishedOn).diff(job.processedOn, undefined, true))
+  if (timeUsed.seconds() > 60) {
+    logger.info(`Completed job: ${job.id} (took ${timeUsed.asMinutes().toFixed(3)} minutes)`)
+  } else {
+    logger.info(`Completed job: ${job.id} (took ${timeUsed.asSeconds().toFixed(3)} seconds)`)
+  }
 })
 
 // If there is no error event listener, the worker stops taking jobs after any error.
@@ -28,9 +34,7 @@ worker.on('error', error => {
 })
 
 worker.on('failed', job => {
-  const reason = job?.failedReason ?? ''
-  const id = job?.id ?? ''
-  logger.error(`Job ${id} failed.${reason}`)
+  logger.error(`Job ${job?.id ?? ''} failed. ${job?.stacktrace ? `${job.stacktrace.join('')}` : ''}`)
 })
 
 worker.on('active', job => {

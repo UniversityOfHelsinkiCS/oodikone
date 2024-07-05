@@ -10,7 +10,7 @@ const {
 } = require('./services/populations/closeToGraduation')
 const { redisClient } = require('./services/redis')
 const { getCurrentSemester } = require('./services/semesters')
-const { combinedStudyprogrammes } = require('./services/studyProgramme/studyProgrammeHelpers')
+const { combinedStudyprogrammes, isRelevantProgramme } = require('./services/studyProgramme/studyProgrammeHelpers')
 const { updateBasicView, updateStudytrackView } = require('./services/studyProgramme/studyProgrammeUpdates')
 const { getAssociations, getProgrammesFromStudyRights, refreshAssociationsInRedis } = require('./services/studyrights')
 const { findAndSaveTeachers } = require('./services/topteachers')
@@ -34,31 +34,15 @@ const refreshFaculties = async () => {
 }
 
 const refreshFaculty = async code => {
-  logger.info('Started updating faculty')
-  const start = new Date().getTime()
-  try {
-    await updateFacultyOverview(code, 'ALL')
-    await updateFacultyProgressOverview(code)
-    const time = new Date().getTime() - start
-    logger.info(`Updated faculty ${code} (took ${(time / 1000 / 60).toFixed(2)} minutes)`)
-  } catch (error) {
-    logger.error({ message: `Failed to update stats for faculty ${code} with type ALL`, meta: `${error}` })
-  }
+  await updateFacultyOverview(code, 'ALL')
+  await updateFacultyProgressOverview(code)
 }
 
 const refreshProgrammes = async () => {
   logger.info('Refreshing studyprogramme and studytrack overview statistics for all programmes')
-  // Filters out old programmes and special ones like Fitech studies. Filters also out the programmes starting with
-  // 2_ or ending with _2. Those programmes are mapped to correct programme (studentProgrammeModuleFixer.js)
+
   const programmes = await getProgrammesFromStudyRights()
-  const codes = programmes
-    .map(programme => programme.code)
-    .filter(
-      code =>
-        (code.includes('KH') && !code.startsWith('2_KH') && !code.endsWith('_2')) ||
-        (code.includes('MH') && !code.startsWith('2_MH') && !code.endsWith('_2')) ||
-        /^(T)[0-9]{6}$/.test(code)
-    )
+  const codes = programmes.map(programme => programme.code).filter(code => isRelevantProgramme(code))
 
   // Ensure that studyright associations are refreshed before launching jobs, otherwise each job will do it
   await getAssociations()

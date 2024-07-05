@@ -29,6 +29,10 @@ const getJobs = async type => {
   return jobs
 }
 
+const removeWaitingJobs = async () => {
+  await queue.drain()
+}
+
 const jobMaker = {
   faculty: code => addJob('faculty', { code }),
   programme: code => addJob('programme', { code }),
@@ -38,4 +42,4 @@ const jobMaker = {
   closeToGraduation: () => addJob('closeToGraduation'),
 }
 
-module.exports = { jobMaker, getJobs }
+module.exports = { jobMaker, getJobs, removeWaitingJobs }

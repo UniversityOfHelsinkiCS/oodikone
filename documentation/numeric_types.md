@@ -1,48 +1,105 @@
-# Mystery numbers
+# Numeric types
 
-Sis data uses some numeric classifiers that are not self-explanatory and (most) previously needed to be deciphered from existing code.
-Some mystery numbers are gathered here for convenience. Feel free to add anything that could be useful. Remember to use the spelling used in code to enable project wide search.
+Data used in Oodikone contains some numeric types (or _magic numbers_) that are not self-explanatory. The values of the numeric types are gathered here for convenience and quick reference.
 
-## extentcode
+## Extent code
 
-(from **studyright**)
+Appears in model Studyright (db: `studyright`) as _extentcode_ (db: `extentcode`) and in model SISStudyRight (db: `sis_study_rights`) as _extentCode_ (db: `extent_code`). Values are defined in the database table `studyright_extents`.
 
-These are actually defined in db table studyright_extents. Tells studyright level or type, eg. bachelor's degree or non-degree studies.
+| value | meaning                                             |
+| ----: | :-------------------------------------------------- |
+|     1 | Bachelor's degree                                   |
+|     2 | Master's degree                                     |
+|     3 | Licentiate                                          |
+|     4 | Doctor                                              |
+|     5 | Bachelor's and Master's degree                      |
+|     6 | Continuing education                                |
+|     7 | Exchange studies                                    |
+|     9 | Open University studies                             |
+|    13 | Non-degree pedagogical studies for teachers         |
+|    14 | Contract training                                   |
+|    16 | Studies for secondary school students               |
+|    18 | Specialisation studies                              |
+|    22 | Non-degree programme for special education teachers |
+|    23 | Specialist training in medicine and dentistry       |
+|    31 | Summer and winter school                            |
+|    34 | Exchange studies (postgraduate studies)             |
+|    99 | Non-Degree studies                                  |
 
-## prioritycode
+## Priority code
 
-(from **studyright**)
+> [!WARNING]  
+> Obsolete, to be deprecated
 
-1: Primary
+Appears in model Studyright (db: `studyright`) as _prioritycode_ (db: `prioritycode`).
 
-2: Secondary
+| value | meaning   | notes                                                                                       |
+| ----: | :-------- | :------------------------------------------------------------------------------------------ |
+|     1 | Primary   |                                                                                             |
+|     2 | Secondary |                                                                                             |
+|     5 | Rescinded | seemingly not in use anymore                                                                |
+|     6 | Option    | Ba+Ma students can add a master programme to their study plan before graduating as bachelor |
+|    30 | Graduated |                                                                                             |
 
-5: Rescinded (Seemingly not in use anymore)
+## Type
 
-6: Option (Bachelor+master studyright students can add a master programme to their study plan before graduation in bachelor programme: marked as option in Oodikone)
+> [!WARNING]  
+> Obsolete, to be deprecated
 
-30: Graduated
+Appears in model ElementDetails (db: `element_details`) as _type_ (db: `type`).
 
-## type
+| value | meaning                                          |
+| ----: | :----------------------------------------------- |
+|    20 | study programme                                  |
+|    30 | module, studytrack or kokonaisuus e.g. neurology |
 
-(from **element_details**)
+## Phase
 
-20: A study programme
+Appears in model SISStudyRightElement (db: `sis_study_right_elements`) as _phase_ (db: `phase`).
 
-30: Module/Studytrack/kokonaisuus? Eg. Neurology
+In Finland it is common for new students to be awarded the study right to both a bachelor's and a master's programme when they are admitted to the university. In Oodikone these two-phase study rights are marked with the [extent code](#extent-code) 5. In the study right elements of these study rights, phase 2 marks the second phase of the study right.
 
-## enrollmenttype
+For example: Student is awarded the study right in the bachelor's programme in computer science with the extent code 5. The study right element for study right in the bachelor's programme is marked with phase 1. After graduating from the bachelor's programme, the student continues their studies in the master's programme in computer science. The new study right element for the study right in the master's programme is marked with phase 2.
 
-(from **semester_enrollments**)
+All study right elements for other study rights (extent code other than 5) are marked with phase 1.
 
-1: Present
+The level of the programme (bachelor's, master's etc.) of the study right can be directly checked from degreeProgrammeType (db: `degree_programme_type`) in model SISStudyRightElement (db: `sis_study_right_elements`).
 
-2: Absent
+| value | meaning  |
+| ----: | :------- |
+|     1 | any      |
+|     2 | master's |
 
-3: Inactive (neither 1 or 2 has been declared)
+## Enrollment type
 
-## credittypecode
+Appears in model SemesterEnrollment (db: `semester_enrollments`) as _enrollmenttype_ (db: `enrollmenttype`).
 
-(from **credit**)
+| value | meaning  | notes                            |
+| ----: | :------- | :------------------------------- |
+|     1 | Present  |                                  |
+|     2 | Absent   |                                  |
+|     3 | Inactive | neither 1 or 2 has been declared |
 
-Defined in credit_types db table. Completed/Improved/Transferred/Failed
+## Credit type code
+
+Appears in model Credit (db: `credit`) as _credittypecode_ (db: `credittypecode`). Values are defined in the database table `credit_types`.
+
+Completed/Improved/Transferred/Failed
+
+| value | meaning          |
+| ----: | :--------------- |
+|     4 | Completed        |
+|     7 | Improved (grade) |
+|     9 | Transferred      |
+|    10 | Failed           |
+
+## Gender code
+
+Appears in model Student (db: `student`) as _gender_code_ (db: `gender_code`).
+
+| value | meaning |
+| ----: | :------ |
+|     0 | Unknown |
+|     1 | Male    |
+|     2 | Female  |
+|     3 | Other   |

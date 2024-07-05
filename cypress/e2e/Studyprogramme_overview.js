@@ -131,8 +131,8 @@ describe('Studyprogramme overview', () => {
         // [Year, Started studying, Accepted, Graduated, Transferred away, Transferred to]
         ...years.map(year => [year, 0, 0, 0, 0, 0]),
         ['2021 - 2022', 0, 0, 0, 0, 0],
-        ['2020 - 2021', 12, 10, 6, 3, 2],
-        ['2019 - 2020', 96, 86, 38, 1, 0],
+        ['2020 - 2021', 12, 10, 6, 1, 2],
+        ['2019 - 2020', 96, 86, 38, 3, 0],
         ['2018 - 2019', 161, 161, 8, 0, 1],
         ['2017 - 2018', 159, 171, 1, 0, 0],
       ]
@@ -153,9 +153,11 @@ describe('Studyprogramme overview', () => {
 
     it('Basic information graphs render', () => {
       cy.get('[data-cy=Graph-StudentsOfTheStudyprogramme')
-        .should('contain', 'Started')
+        .should('contain', 'Started studying')
+        .should('contain', 'Accepted')
         .should('contain', 'Graduated')
         .should('contain', 'Transferred away')
+        .should('contain', 'Transferred to')
 
       cy.get('[data-cy=Graph-CreditsProducedByTheStudyprogramme')
         .should('contain', 'Degree students')
@@ -176,11 +178,11 @@ describe('Studyprogramme overview', () => {
       cy.get('[data-cy=GraduationTimeToggle]').click()
       cy.get('[data-cy=graduation-times-graphBachelor]').within(() => {
         cy.contains('Graduation year')
-        cy.contains('2019')
-        cy.contains('17 graduated').trigger('mouseover')
-        cy.contains('study time: 23 months')
-        cy.contains('17 graduated on time')
-        cy.contains('0 graduated max year overtime')
+        cy.contains('2020')
+        cy.contains('35 graduated').trigger('mouseover')
+        cy.contains('median study time: 34 months')
+        cy.contains('30 graduated on time')
+        cy.contains('5 graduated max year overtime')
       })
 
       cy.get('[data-cy=Graph-ProgrammesBeforeOrAfter')
@@ -206,9 +208,9 @@ describe('Studyprogramme overview', () => {
         cy.contains('Graduation year')
         cy.contains('2020')
         cy.contains('24 graduated').trigger('mouseover')
-        cy.contains('study time: 22 months')
-        cy.contains('20 graduated on time')
-        cy.contains('4 graduated max year overtime')
+        cy.contains('study time: 22.5 months')
+        cy.contains('19 graduated on time')
+        cy.contains('5 graduated max year overtime')
       })
 
       cy.get('[data-cy=graduation-times-graphBachelor]').within(() => {

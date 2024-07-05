@@ -4,6 +4,7 @@ const programmeProgressCriteria = RTKApi.injectEndpoints({
   endpoints: builder => ({
     getProgressCriteria: builder.query({
       query: ({ programmeCode }) => `/programmecriteria?programmecode=${programmeCode}`,
+      providesTags: ['ProgressCriteria'],
     }),
     addProgressCriteriaCourse: builder.mutation({
       query: ({ programmeCode, courses, year }) => ({
@@ -15,6 +16,7 @@ const programmeProgressCriteria = RTKApi.injectEndpoints({
           year,
         },
       }),
+      invalidatesTags: ['ProgressCriteria'],
     }),
     addProgressCriteriaCredits: builder.mutation({
       query: ({ programmeCode, credits }) => ({
@@ -25,6 +27,7 @@ const programmeProgressCriteria = RTKApi.injectEndpoints({
           credits,
         },
       }),
+      invalidatesTags: ['ProgressCriteria'],
     }),
   }),
   overrideExisting: false,

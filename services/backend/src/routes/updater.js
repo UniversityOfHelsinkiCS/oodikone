@@ -11,7 +11,7 @@ const {
   updateStudentsByStudentNumber,
 } = require('../services/sisUpdaterService')
 const logger = require('../util/logger')
-const { jobMaker, getJobs } = require('../worker/queue')
+const { jobMaker, getJobs, removeWaitingJobs } = require('../worker/queue')
 
 const refreshFacultiesByList = list => {
   list.forEach(code => jobMaker.faculty(code))
@@ -115,6 +115,11 @@ router.get('/jobs', async (_req, res) => {
   const waiting = await getJobs('waiting')
   const active = await getJobs('active')
   res.status(200).json({ waiting, active })
+})
+
+router.delete('/jobs', async (_req, res) => {
+  await removeWaitingJobs()
+  res.status(200).end()
 })
 
 module.exports = router

@@ -3,11 +3,7 @@ import { useEffect, useState } from 'react'
 import { Container } from 'semantic-ui-react'
 
 import { CurriculumPicker } from '@/components/PopulationDetails/CurriculumPicker'
-import {
-  useAddProgressCriteriaCourseMutation,
-  useAddProgressCriteriaCreditsMutation,
-  useGetProgressCriteriaQuery,
-} from '@/redux/programmeProgressCriteria'
+import { useGetProgressCriteriaQuery } from '@/redux/programmeProgressCriteria'
 import { CreditCriteriaForm } from './CreditCriteriaForm'
 import { DegreeCourseTableView } from './DegreeCourseTableView'
 
@@ -15,33 +11,12 @@ export const DegreeCoursesTable = ({ studyProgramme, combinedProgramme, year }) 
   const [defaultModules, setDefaultModules] = useState([])
   const [curriculum, setCurriculum] = useState(null)
   const [secondProgrammeModules, setSecondProgrammeModules] = useState([])
-  const [addProgressCriteriaCourse, { data: courseData }] = useAddProgressCriteriaCourseMutation()
-  const [addProgressCriteriaCredits, { data: creditsData }] = useAddProgressCriteriaCreditsMutation()
-  const progressCriteria = useGetProgressCriteriaQuery({ programmeCode: studyProgramme })
+  const { data: progressCriteria } = useGetProgressCriteriaQuery({ programmeCode: studyProgramme })
   const emptyCriteria = {
     courses: { yearOne: [], yearTwo: [], yearThree: [], yearFour: [], yearFive: [], yearSix: [] },
     credits: { yearOne: 0, yearTwo: 0, yearThree: 0, yearFour: 0, yearFive: 0, yearSix: 0 },
   }
-
-  const [criteria, setCriteria] = useState(progressCriteria?.data ? progressCriteria.data : emptyCriteria)
-
-  useEffect(() => {
-    if (progressCriteria.data) {
-      setCriteria(progressCriteria.data)
-    }
-  }, [progressCriteria.data])
-
-  useEffect(() => {
-    if (courseData) {
-      setCriteria(courseData)
-    }
-  }, [courseData])
-
-  useEffect(() => {
-    if (creditsData) {
-      setCriteria(creditsData)
-    }
-  }, [creditsData])
+  const criteria = progressCriteria ?? emptyCriteria
 
   useEffect(() => {
     if (!curriculum || !curriculum?.defaultProgrammeCourses?.length) return
@@ -99,15 +74,10 @@ export const DegreeCoursesTable = ({ studyProgramme, combinedProgramme, year }) 
         </h3>
       </div>
       {(studyProgramme.includes('KH') || ['MH30_001', 'MH30_003'].includes(studyProgramme)) && (
-        <CreditCriteriaForm
-          addProgressCriteriaCredits={addProgressCriteriaCredits}
-          criteria={criteria}
-          studyProgramme={studyProgramme}
-        />
+        <CreditCriteriaForm criteria={criteria} studyProgramme={studyProgramme} />
       )}
       {defaultModules && defaultModules.length > 1 && (
         <DegreeCourseTableView
-          addProgressCriteriaCourse={addProgressCriteriaCourse}
           combinedProgramme=""
           criteria={criteria}
           curriculum={curriculum}
@@ -117,7 +87,6 @@ export const DegreeCoursesTable = ({ studyProgramme, combinedProgramme, year }) 
       )}
       {secondProgrammeModules.length > 0 && (
         <DegreeCourseTableView
-          addProgressCriteriaCourse={addProgressCriteriaCourse}
           combinedProgramme={combinedProgramme}
           criteria={criteria}
           curriculum={curriculum}

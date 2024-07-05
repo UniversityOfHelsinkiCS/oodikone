@@ -1,7 +1,7 @@
 /* eslint-disable no-alert */
 import { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { Button, Form, Header, Message, Radio, Segment, TextArea } from 'semantic-ui-react'
+import { Button, Form, Header, Message, Radio, Segment, Table, TextArea } from 'semantic-ui-react'
 
 import { callApi } from '@/apiConnection'
 import { useTitle } from '@/common/hooks'
@@ -40,6 +40,7 @@ export const Updater = () => {
   const refreshCloseToGraduationData = () =>
     apiCall('close to graduation data', '/updater/refresh-close-to-graduation', 'post')
   const getJobs = () => callApi('/updater/jobs', 'get')
+  const removeWaitingJobs = () => callApi('/updater/jobs', 'delete')
 
   const updateJobs = async () => {
     const jobs = await getJobs()
@@ -53,16 +54,16 @@ export const Updater = () => {
   const displayJobStatus = () => {
     if (!jobs) return <Message>Loading job statuses...</Message>
     return (
-      <Message style={{ fontSize: '20px' }}>
+      <Message style={{ fontSize: '1.1rem' }}>
         <Button icon="refresh" onClick={updateJobs} size="big" />
         <p>Jobs running: {jobs.active?.length}</p>
-        <ul>
+        <ul style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, 1fr)' }}>
           {jobs.active.map(job => (
             <li key={job.name}>{job.name}</li>
           ))}
         </ul>
         <p>Jobs waiting: {jobs.waiting?.length}</p>
-        <ul>
+        <ul style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, 1fr)' }}>
           {jobs.waiting.map(job => (
             <li key={job.name}>{job.name}</li>
           ))}
@@ -79,7 +80,7 @@ export const Updater = () => {
         <Message.Header>Update data</Message.Header>
         <ReactMarkdown>
           {`**Updater sis-db - Update meta** Updates organisations, study modules, course units, study levels, education types, credit types  
-          **Updater sis-db - Update students** Updates 1000 students at one click in development and all in production environment.  
+          **Updater sis-db - Update students** Updates 1000 students at one click in development and all in production environment. Takes about 5 hours in production.  
           **Updater sis-db - Update curriculums** Updates all study programmes and their curriculums. This takes a few minutes, and breaks the curriculum features for that time, so do not run in production unnecessarily.  
           **Updater redis - Update redis** Updates updater redis.  
           **Oodikone redis - Refresh all teacher leaderboards** Refresh all leaderboard statistics from 1963 until today. Might take some time.  
@@ -145,10 +146,33 @@ export const Updater = () => {
           <Form.Button content="Update custom list of items" icon="refresh" onClick={updateSISCustomList} />
         </div>
       </Form.Group>
-      <Header>Stop updater (aborts all updating processes in the worker, also those started by a cron-job)</Header>
-      <Form.Group>
-        <Form.Button content="Stop Updating" negative onClick={abortSisUpdater} />
-      </Form.Group>
+      <Segment>
+        <Header>Stop updating</Header>
+        <Table collapsing>
+          <Table.Body>
+            <Table.Row>
+              <Table.Cell>
+                <ReactMarkdown>
+                  Aborts all updating processes in the worker, also those started by a cron-job
+                </ReactMarkdown>
+              </Table.Cell>
+              <Table.Cell>
+                <Form.Button content="Stop updater-worker" negative onClick={abortSisUpdater} />
+              </Table.Cell>
+            </Table.Row>
+            <Table.Row>
+              <Table.Cell>
+                <ReactMarkdown>
+                  Removes all jobs **waiting** in the queue (listed above under *Jobs waiting*)
+                </ReactMarkdown>
+              </Table.Cell>
+              <Table.Cell>
+                <Form.Button content="Remove waiting jobs" negative onClick={removeWaitingJobs} />
+              </Table.Cell>
+            </Table.Row>
+          </Table.Body>
+        </Table>
+      </Segment>
       <Segment>
         <Header>Status messages</Header>
         <Button content="Clear messages" onClick={() => setMessages([])} />

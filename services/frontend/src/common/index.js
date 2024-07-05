@@ -31,13 +31,13 @@ export const getGraduationGraphTitle = (studyProgramme, doCombo = false) => {
   return 'Doctoral studyright'
 }
 
-export const getUnifiedProgrammeName = (bachelor, masterLisentiate, language) => {
+export const getUnifiedProgrammeName = (bachelor, masterLicentiate, language) => {
   if (language === 'fi')
     return `${bachelor} ja ${
-      masterLisentiate?.includes('lisensiaatin') ? 'lisensiaatin koulutusohjelma' : 'maisterin koulutusohjelma'
+      masterLicentiate?.includes('lisensiaatin') ? 'lisensiaatin koulutusohjelma' : 'maisterin koulutusohjelma'
     }`
-  if (language === 'en') return `${bachelor?.split(' ')[0]} and ${masterLisentiate}`
-  if (language === 'sv') return `${bachelor?.split('programmet')[0]}- och ${masterLisentiate}`
+  if (language === 'en') return `${bachelor?.split(' ')[0]} and ${masterLicentiate}`
+  if (language === 'sv') return `${bachelor?.split('programmet')[0]}- och ${masterLicentiate}`
   return bachelor
 }
 

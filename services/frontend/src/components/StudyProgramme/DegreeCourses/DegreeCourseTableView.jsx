@@ -3,6 +3,7 @@ import { Button, Dropdown, Icon, Label, Table } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useRemoveCourseExclusionMutation, useSetCourseExclusionMutation } from '@/redux/courseExclusions'
+import { useAddProgressCriteriaCourseMutation } from '@/redux/programmeProgressCriteria'
 
 const getYear = criterionYear => {
   if (criterionYear === 1) return 'yearOne'
@@ -25,7 +26,6 @@ const moduleVisibilityColor = visibility => {
 }
 
 export const DegreeCourseTableView = ({
-  addProgressCriteriaCourse,
   combinedProgramme,
   criteria,
   curriculum,
@@ -37,6 +37,8 @@ export const DegreeCourseTableView = ({
   const [modules, setModules] = useState(initialModules)
   const [setExclusion] = useSetCourseExclusionMutation()
   const [removeExclusion] = useRemoveCourseExclusionMutation()
+  const [addProgressCriteriaCourse] = useAddProgressCriteriaCourseMutation()
+
   const version = curriculum.version?.join(',')
   useEffect(() => {
     setModules(initialModules)

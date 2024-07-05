@@ -1,18 +1,15 @@
-const { indexOf, orderBy } = require('lodash')
+const { indexOf } = require('lodash')
 
 const { getSemestersAndYears } = require('../semesters')
 const {
-  alltimeEndDate,
-  alltimeStartDate,
   defineYear,
-  getCorrectStudentnumbers,
   getStartDate,
   getStatsBasis,
   getYearsArray,
   tableTitles,
+  getStudyRightElementsWithPhase,
 } = require('./studyProgrammeHelpers')
-const { graduatedStudyRights, getStudyRightsInProgramme } = require('./studyRightFinders')
-const { transfersAway, transfersTo } = require('.')
+const { getStudyRightsInProgramme } = require('./studyRightFinders')
 
 const getDateOfFirstSemesterPresent = (semesterEnrollments, semesters, currentSemester, since) => {
   if (!semesterEnrollments) return null
@@ -33,11 +30,8 @@ const getStartedStats = async ({ studyprogramme, years, isAcademicYear }) => {
 
   for (const studyRight of studyRightsOfProgramme) {
     const studyRightElement = studyRight.studyRightElements.find(sre => sre.code === studyprogramme)
-    const [firstStudyRightElementWithSamePhase] = orderBy(
-      studyRight.studyRightElements.filter(sre => sre.phase === studyRightElement.phase),
-      ['startDate'],
-      ['asc']
-    )
+    const [firstStudyRightElementWithSamePhase] = getStudyRightElementsWithPhase(studyRight, studyRightElement.phase)
+
     // This means the student has been transferred from another study programme
     if (firstStudyRightElementWithSamePhase.code !== studyRightElement.code) {
       continue
@@ -71,70 +65,63 @@ const getStartedStats = async ({ studyprogramme, years, isAcademicYear }) => {
   return { startedStudying, accepted }
 }
 
-const getGraduatedStats = async ({ studyprogramme, since, years, isAcademicYear, includeAllSpecials }) => {
+const getGraduatedStats = async ({ studyprogramme, years, isAcademicYear, includeAllSpecials }) => {
   const { graphStats, tableStats } = getStatsBasis(years)
-  if (!studyprogramme) return { graphStats, tableStats }
-  const studentnumbersOfTheYear = await getCorrectStudentnumbers({
-    codes: [studyprogramme],
-    startDate: alltimeStartDate,
-    endDate: alltimeEndDate,
-    includeAllSpecials,
-    includeTransferredTo: includeAllSpecials,
-  })
-  const studyrights = await graduatedStudyRights(studyprogramme, since, studentnumbersOfTheYear)
-  studyrights.forEach(({ enddate, studyrightElements }) => {
-    // Check that the study right element ending to graduation belong to study programme
-    const elements = studyrightElements.filter(
-      sre => new Date(sre.enddate).toDateString() === new Date(enddate).toDateString()
+  const graduatedStudyRights = await getStudyRightsInProgramme(studyprogramme, true)
+
+  for (const studyRight of graduatedStudyRights) {
+    const correctStudyRightElement = studyRight.studyRightElements.find(element => element.code === studyprogramme)
+    if (!correctStudyRightElement) continue
+    const [firstStudyRightElementWithSamePhase] = getStudyRightElementsWithPhase(
+      studyRight,
+      correctStudyRightElement.phase
     )
-    if (elements.length) {
-      const graduationYear = defineYear(enddate, isAcademicYear)
-      graphStats[indexOf(years, graduationYear)] += 1
-      tableStats[graduationYear] += 1
+    // This means the student has been transferred from another study programme
+    if (firstStudyRightElementWithSamePhase.code !== correctStudyRightElement.code && !includeAllSpecials) {
+      continue
     }
-  })
+    const graduationYear = defineYear(new Date(correctStudyRightElement.endDate), isAcademicYear)
+    graphStats[indexOf(years, graduationYear)] += 1
+    tableStats[graduationYear] += 1
+  }
 
   return { graphStats, tableStats }
 }
 
-const getTransferredAwayStats = async ({ studyprogramme, since, years, isAcademicYear, combinedProgramme }) => {
-  const studyrights = await transfersAway(studyprogramme, since)
-  const secondStudyrights = combinedProgramme ? await transfersAway(combinedProgramme, since) : []
-  const { graphStats, tableStats } = getStatsBasis(years)
+const getTransferredStats = async ({ studyprogramme, years, isAcademicYear, combinedProgramme }) => {
+  const studyRights = await getStudyRightsInProgramme(studyprogramme, false)
+  const secondStudyRights = combinedProgramme ? await getStudyRightsInProgramme(combinedProgramme, false) : []
+  const transferredAway = getStatsBasis(years)
+  const transferredTo = getStatsBasis(years)
 
-  studyrights.forEach(({ transferdate }) => {
-    const transferYear = defineYear(transferdate, isAcademicYear)
-    graphStats[indexOf(years, transferYear)] += 1
-    tableStats[transferYear] += 1
-  })
+  const calculateTransferredStats = (studyRights, programme) => {
+    for (const studyRight of studyRights) {
+      const studyRightElement = studyRight.studyRightElements.find(element => element.code === programme)
+      const studyRightElementsWithSamePhase = getStudyRightElementsWithPhase(studyRight, studyRightElement.phase)
+      if (studyRightElementsWithSamePhase.length === 1) continue
+      const [firstStudyRightElementWithSamePhase] = studyRightElementsWithSamePhase
+      if (
+        firstStudyRightElementWithSamePhase.code !== studyRightElement.code &&
+        studyRightElement.startDate <= new Date()
+      ) {
+        const transferYear = defineYear(studyRightElement.startDate, isAcademicYear)
+        transferredTo.graphStats[indexOf(years, transferYear)] += 1
+        transferredTo.tableStats[transferYear] += 1
+      } else if (
+        firstStudyRightElementWithSamePhase.code === studyRightElement.code &&
+        studyRightElement.endDate <= new Date()
+      ) {
+        const transferYear = defineYear(studyRightElement.endDate, isAcademicYear)
+        transferredAway.graphStats[indexOf(years, transferYear)] += 1
+        transferredAway.tableStats[transferYear] += 1
+      }
+    }
+  }
 
-  secondStudyrights.forEach(({ transferdate }) => {
-    const transferYear = defineYear(transferdate, isAcademicYear)
-    graphStats[indexOf(years, transferYear)] += 1
-    tableStats[transferYear] += 1
-  })
+  calculateTransferredStats(studyRights, studyprogramme)
+  calculateTransferredStats(secondStudyRights, combinedProgramme)
 
-  return { graphStats, tableStats }
-}
-
-const getTransferredToStats = async ({ studyprogramme, since, years, isAcademicYear, combinedProgramme }) => {
-  const studyrights = await transfersTo(studyprogramme, since)
-  const secondStudyrights = combinedProgramme ? await transfersTo(combinedProgramme, since) : []
-  const { graphStats, tableStats } = getStatsBasis(years)
-
-  studyrights.forEach(({ transferdate }) => {
-    const transferYear = defineYear(transferdate, isAcademicYear)
-    graphStats[indexOf(years, transferYear)] += 1
-    tableStats[transferYear] += 1
-  })
-
-  secondStudyrights.forEach(({ transferdate }) => {
-    const transferYear = defineYear(transferdate, isAcademicYear)
-    graphStats[indexOf(years, transferYear)] += 1
-    tableStats[transferYear] += 1
-  })
-
-  return { graphStats, tableStats }
+  return { transferredAway, transferredTo }
 }
 
 const initializeGraphStats = (
@@ -228,24 +215,17 @@ const initializeTableStats = (
 
 const getBasicStatsForStudytrack = async ({ studyprogramme, combinedProgramme, settings }) => {
   const { includeAllSpecials, isAcademicYear } = settings
-  const since = getStartDate(studyprogramme, isAcademicYear)
+  const since = getStartDate(isAcademicYear)
   const years = getYearsArray(since.getFullYear(), isAcademicYear)
-  const queryParameters = { studyprogramme, since, years, isAcademicYear, includeAllSpecials, combinedProgramme }
-  const queryParametersCombinedProg = {
-    studyprogramme: combinedProgramme,
-    since,
-    years,
-    isAcademicYear,
-    includeAllSpecials,
-  }
+  const queryParameters = { studyprogramme, years, isAcademicYear, includeAllSpecials, combinedProgramme }
+  const queryParametersCombinedProg = { studyprogramme: combinedProgramme, years, isAcademicYear, includeAllSpecials }
   const { startedStudying, accepted } = await getStartedStats(queryParameters)
   const { startedStudying: startedStudyingSecondProg, accepted: acceptedSecondProg } =
     await getStartedStats(queryParametersCombinedProg)
 
   const graduated = await getGraduatedStats(queryParameters)
   const graduatedSecondProg = await getGraduatedStats(queryParametersCombinedProg)
-  const transferredAway = await getTransferredAwayStats(queryParameters)
-  const transferredTo = await getTransferredToStats(queryParameters)
+  const { transferredAway, transferredTo } = await getTransferredStats(queryParameters)
 
   const reversedYears = getYearsArray(since.getFullYear(), isAcademicYear).reverse()
   const key = includeAllSpecials ? 'SPECIAL_INCLUDED' : 'SPECIAL_EXCLUDED'
@@ -288,4 +268,5 @@ const getBasicStatsForStudytrack = async ({ studyprogramme, combinedProgramme, s
 
 module.exports = {
   getBasicStatsForStudytrack,
+  getGraduatedStats,
 }

@@ -46,23 +46,14 @@ const getStudentData = (startDate, students) => {
   return { data, creditCounts }
 }
 // type: either Bc + Ms combo or Bc/Ms/T/anything else
-const addGraduation = async ({ studentNumber, startdate, enddate, graduationAmounts, times, track, type, year }) => {
+const addGraduation = async ({ studentNumber, startdate, enddate, times, type }) => {
   const totalTimeToGraduation = moment(enddate).diff(moment(startdate), 'months')
   const statutoryAbsences = await getStatutoryAbsences(studentNumber, startdate, enddate)
   const timeToGraduation = totalTimeToGraduation - statutoryAbsences
-  graduationAmounts[track][type][year] += 1
-  times[type] = [...times[type], timeToGraduation]
+  times[type].push(timeToGraduation)
 }
 
-const getGraduationTimeStats = async ({
-  year,
-  graduated,
-  track,
-  graduationAmounts,
-  graduationTimes,
-  classSize,
-  doCombo,
-}) => {
+const getGraduationTimeStats = async ({ year, graduated, track, graduationTimes, classSize, doCombo }) => {
   if (year === 'Total') {
     return
   }
@@ -71,27 +62,9 @@ const getGraduationTimeStats = async ({
   const times = { combo: [], basic: [] }
   for (const { enddate, startdate, studyrightid, studentNumber } of graduated) {
     if (doCombo && studyrightid.slice(-2) === '-2') {
-      await addGraduation({
-        studentNumber,
-        startdate,
-        enddate,
-        graduationAmounts,
-        times,
-        track,
-        type: 'combo',
-        year,
-      })
+      await addGraduation({ studentNumber, startdate, enddate, times, type: 'combo' })
     } else {
-      await addGraduation({
-        studentNumber,
-        startdate,
-        enddate,
-        graduationAmounts,
-        times,
-        track,
-        type: 'basic',
-        year,
-      })
+      await addGraduation({ studentNumber, startdate, enddate, times, type: 'basic' })
     }
   }
 
@@ -99,21 +72,22 @@ const getGraduationTimeStats = async ({
   const medianCombo = getMedian(times.combo)
   const statistics = countTimeCategories(times.basic, graduationTimes.goals.basic)
   const statisticsCombo = countTimeCategories(times.combo, graduationTimes.goals.combo)
-  graduationTimes[track].medians.combo = [
-    ...graduationTimes[track].medians.combo,
-    {
-      y: medianCombo,
-      amount: graduationAmounts[track].combo[year],
-      name: year,
-      statistics: statisticsCombo,
-      classSize,
-    },
-  ]
 
-  graduationTimes[track].medians.basic = [
-    ...graduationTimes[track].medians.basic,
-    { y: median, amount: graduationAmounts[track].basic[year], name: year, statistics, classSize },
-  ]
+  graduationTimes[track].medians.combo.push({
+    y: medianCombo,
+    amount: times.combo.length,
+    name: year,
+    statistics: statisticsCombo,
+    classSize,
+  })
+
+  graduationTimes[track].medians.basic.push({
+    y: median,
+    amount: times.basic.length,
+    name: year,
+    statistics,
+    classSize,
+  })
 }
 
 const getStats = (
@@ -177,10 +151,8 @@ const getStudytrackDataForTheYear = async ({
   const {
     mainStatsByYear,
     mainStatsByTrack,
-    graduationAmounts,
     graduationTimes,
     graduationTimesSecondProg,
-    graduationAmountsSecondProg,
     totalAmounts,
     emptyTracks,
     totals,
@@ -345,7 +317,6 @@ const getStudytrackDataForTheYear = async ({
         year,
         graduated: graduatedByStartdate,
         track,
-        graduationAmounts,
         graduationTimes,
         classSize: totalAmounts[track][year],
         doCombo,
@@ -355,7 +326,6 @@ const getStudytrackDataForTheYear = async ({
           year,
           graduated: graduatedByStartSecondProg,
           track: combinedProgramme,
-          graduationAmounts: graduationAmountsSecondProg,
           graduationTimes: graduationTimesSecondProg,
           classSize: totalAmounts[studyprogramme][year],
           doCombo: true,
@@ -398,7 +368,6 @@ const getStudytrackOptions = (studyprogramme, studytrackNames, studytracks, empt
 const getEmptyStatsObjects = (years, studytracks, studyprogramme, combinedProgramme) => {
   const mainStatsByYear = getYearsObject({ years, emptyArrays: true })
   const mainStatsByTrack = {}
-  const graduationAmounts = {}
   const goal = getGoal(studyprogramme)
   const goalSecondProg = getGoal(combinedProgramme)
   const graduationTimes = { goals: { basic: goal, combo: goal + 36 } }
@@ -407,9 +376,6 @@ const getEmptyStatsObjects = (years, studytracks, studyprogramme, combinedProgra
     goals: { basic: goal, combo: goal + goalSecondProg },
   }
   const otherCountriesCount = {}
-  const graduationAmountsSecondProg = {
-    [combinedProgramme]: { basic: getYearsObject({ years }), combo: getYearsObject({ years }) },
-  }
 
   const totalAmounts = {}
   const emptyTracks = new Map()
@@ -418,7 +384,6 @@ const getEmptyStatsObjects = (years, studytracks, studyprogramme, combinedProgra
   studytracks.forEach(async track => {
     otherCountriesCount[track] = {}
     mainStatsByTrack[track] = []
-    graduationAmounts[track] = { basic: getYearsObject({ years }), combo: getYearsObject({ years }) }
     totalAmounts[track] = getYearsObject({ years })
     totals[track] = {
       all: [],
@@ -435,9 +400,7 @@ const getEmptyStatsObjects = (years, studytracks, studyprogramme, combinedProgra
   return {
     mainStatsByYear,
     mainStatsByTrack,
-    graduationAmounts,
     graduationTimes,
-    graduationAmountsSecondProg,
     graduationTimesSecondProg,
     totalAmounts,
     emptyTracks,
@@ -451,7 +414,7 @@ const getEmptyStatsObjects = (years, studytracks, studyprogramme, combinedProgra
 const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, combinedProgramme, settings, associations }) => {
   const isAcademicYear = true
   const includeYearsCombined = true
-  const since = getStartDate(studyprogramme, isAcademicYear)
+  const since = getStartDate(isAcademicYear)
   const years = getYearsArray(since.getFullYear(), isAcademicYear, includeYearsCombined)
 
   const studytracks = associations.programmes[studyprogramme]

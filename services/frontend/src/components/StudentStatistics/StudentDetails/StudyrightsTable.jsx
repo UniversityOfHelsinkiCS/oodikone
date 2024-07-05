@@ -1,4 +1,5 @@
 import { orderBy } from 'lodash'
+import moment from 'moment'
 import ReactMarkdown from 'react-markdown'
 import { Link } from 'react-router-dom'
 import { Button, Divider, Header, Icon, Item, Popup, Table } from 'semantic-ui-react'
@@ -16,7 +17,7 @@ const studyRightIsActive = (studyRight, currentSemester) =>
   studyRight.semesterEnrollments?.find(({ type, semester }) => semester === currentSemester && [1, 2].includes(type)) !=
   null
 
-export const StudyrightsTable = ({ handleStudyPlanChange, showPopulationStatistics, student, selectedStudyPlanId }) => {
+export const StudyrightsTable = ({ handleStudyPlanChange, student, selectedStudyPlanId }) => {
   const { getTextIn } = useLanguage()
   const { data: programmesAndStudyTracks } = useGetProgrammesQuery()
   const { semestercode: currentSemesterCode } = useCurrentSemester()
@@ -92,6 +93,12 @@ export const StudyrightsTable = ({ handleStudyPlanChange, showPopulationStatisti
     const totalCredits = getTargetCreditsForProgramme(newestProgrammeCode)
     const completedPercentage = calculatePercentage(credits, totalCredits, 0)
     return `${completedPercentage} (${credits} cr)`
+  }
+
+  const showPopulationStatistics = (studyprogramme, date) => {
+    const year = moment(date).isBefore(moment(`${date.slice(0, 4)}-08-01`)) ? date.slice(0, 4) - 1 : date.slice(0, 4)
+    const months = Math.ceil(moment.duration(moment().diff(`${year}-08-01`)).asMonths())
+    return `/populations?months=${months}&semesters=FALL&semesters=SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&year=${year}`
   }
 
   return (
