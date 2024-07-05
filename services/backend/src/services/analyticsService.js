@@ -1,11 +1,11 @@
 const moment = require('moment')
-const { facultyCodes } = require('../../config/organisationConstants')
-
+const { facultyCodes, ignoredFacultyCodes } = require('../../config/organisationConstants')
 const { redisClient } = require('./redis')
 
 // Only new bachelor, masters and doctoral programmes get their data updated in redis every night, use redis for them
 const isUpdatedNewProgramme = code => code.includes('KH') || code.includes('MH') || /^(T)[0-9]{6}$/.test(code)
-const isFaculty = code => facultyCodes.includes(code)
+const filteredFacultyCodes = facultyCodes.filter(item => !ignoredFacultyCodes.includes(item))
+const isFaculty = code => filteredFacultyCodes.includes(code)
 const createRedisKeyForBasicStats = (id, yearType, specialGroups) => `BASIC_STATS_${id}_${yearType}_${specialGroups}`
 const createRedisKeyForCreditStats = (id, yearType, specialGroups) => `CREDIT_STATS_${id}_${yearType}_${specialGroups}`
 const createRedisKeyForGraduationStats = (id, yearType, specialGroups) =>
