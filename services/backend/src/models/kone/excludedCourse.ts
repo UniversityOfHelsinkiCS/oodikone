@@ -1,4 +1,4 @@
-import { Column, DataType, Model, PrimaryKey, Table } from "sequelize-typescript"
+import { Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript'
 
 @Table({
   underscored: true,

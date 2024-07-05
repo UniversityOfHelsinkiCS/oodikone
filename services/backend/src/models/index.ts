@@ -7,7 +7,6 @@ import { CreditTeacher } from './creditTeacher'
 import { CreditType } from './creditType'
 import { ElementDetail } from './elementDetail'
 import { Enrollment } from './enrollment'
-import { ExcludedCourse } from './excludedCourse'
 import { Organization } from './organization'
 import { ProgrammeModule } from './programmeModule'
 import { ProgrammeModuleChild } from './programmeModuleChild'
@@ -37,7 +36,6 @@ export {
   CreditType,
   ElementDetail,
   Enrollment,
-  ExcludedCourse,
   Organization,
   ProgrammeModule,
   ProgrammeModuleChild,

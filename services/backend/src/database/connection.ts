@@ -1,6 +1,7 @@
 import { Sequelize } from 'sequelize-typescript'
 import EventEmitter from 'events'
 import Umzug from 'umzug'
+
 import conf from '../conf-backend'
 import {
   Course,
@@ -11,7 +12,6 @@ import {
   CreditType,
   ElementDetail,
   Enrollment,
-  ExcludedCourse,
   Organization,
   ProgrammeModule,
   ProgrammeModuleChild,
@@ -26,9 +26,17 @@ import {
   StudyrightElement,
   Teacher,
   Transfer,
-} from '../models/index'
-import { Tag } from '../models/kone/tag'
-import { TagStudent } from '../models/kone/tagStudent'
+} from '../models'
+import {
+  CustomPopulationSearch,
+  ExcludedCourse,
+  OpenUniPopulationSearch,
+  ProgressCriteria,
+  StudyGuidanceGroupTag,
+  StudyProgrammePin,
+  Tag,
+  TagStudent,
+} from '../models/kone'
 
 import logger from '../util/logger'
 
@@ -62,7 +70,6 @@ class DbConnection extends EventEmitter {
         CreditType,
         ElementDetail,
         Enrollment,
-        ExcludedCourse,
         Organization,
         ProgrammeModule,
         ProgrammeModuleChild,
@@ -106,7 +113,16 @@ const sequelizeKone = new Sequelize(conf.DB_URL_KONE as string, {
   // searchPath: conf.DB_SCHEMA_KONE as string, // TODO is this necessary
   logging: false,
   password: conf.KONE_PASSWORD as string,
-  models: [Tag, TagStudent],
+  models: [
+    CustomPopulationSearch,
+    ExcludedCourse,
+    OpenUniPopulationSearch,
+    ProgressCriteria,
+    StudyGuidanceGroupTag,
+    StudyProgrammePin,
+    Tag,
+    TagStudent,
+  ],
 })
 
 sequelizeKone.query(`SET SESSION search_path to ${conf.DB_SCHEMA_KONE}`)
@@ -117,7 +133,7 @@ const sequelizeUser = new Sequelize(conf.DB_URL_USER, {
 })
 
 const initializeDatabaseConnection = async () => {
-  const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+  const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
   const rounds = 60
 
   for (const [seq, dbName] of [
