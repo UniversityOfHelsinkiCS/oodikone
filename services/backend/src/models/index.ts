@@ -1,3 +1,4 @@
+import { CreditTypeCode } from '../types/creditTypeCode'
 import { Course } from './course'
 import { CourseProvider } from './courseProvider'
 import { CourseType } from './courseType'
@@ -22,17 +23,10 @@ import { StudyrightExtent } from './studyrightExtent'
 import { Teacher } from './teacher'
 import { Transfer } from './transfer'
 
-enum CreditTypeCode {
-  PASSED = 4,
-  IMPROVED = 7,
-  APPROVED = 9,
-  FAILED = 10,
-}
-
-Credit.passed = credit => [CreditTypeCode.PASSED, CreditTypeCode.APPROVED].includes(credit.credittypecode)
-Credit.failed = credit => credit.credittypecode === CreditTypeCode.FAILED
-Credit.improved = credit => credit.credittypecode === CreditTypeCode.IMPROVED
-Credit.notUnnecessary = credit => credit.credits > 0 && credit.credits <= 12
+Credit.passed = ({ credittypecode }) => [CreditTypeCode.PASSED, CreditTypeCode.APPROVED].includes(credittypecode)
+Credit.failed = ({ credittypecode }) => credittypecode === CreditTypeCode.FAILED
+Credit.improved = ({ credittypecode }) => credittypecode === CreditTypeCode.IMPROVED
+Credit.notUnnecessary = ({ credits }) => credits > 0 && credits <= 12
 
 export {
   Course,

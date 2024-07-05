@@ -1,5 +1,6 @@
 import { BelongsTo, BelongsToMany, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript'
 
+import { CreditTypeCode } from '../types/creditTypeCode'
 import { Course } from './course'
 import { CreditTeacher } from './creditTeacher'
 import { CreditType } from './creditType'
@@ -40,7 +41,7 @@ export class Credit extends Model {
 
   @ForeignKey(() => CreditType)
   @Column(DataType.INTEGER)
-  credittypecode: number
+  credittypecode: CreditTypeCode
 
   @BelongsTo(() => CreditType, { foreignKey: 'credittypecode', targetKey: 'credittypecode' })
   creditType: CreditType
@@ -86,8 +87,8 @@ export class Credit extends Model {
   @BelongsTo(() => Studyright)
   studyright: Studyright
 
-  static passed: (credit: any) => boolean
-  static failed: (credit: any) => boolean
-  static improved: (credit: any) => boolean
-  static notUnnecessary: (credit: any) => boolean
+  static passed: ({ credittypecode }: { credittypecode: CreditTypeCode }) => boolean
+  static failed: ({ credittypecode }: { credittypecode: CreditTypeCode }) => boolean
+  static improved: ({ credittypecode }: { credittypecode: CreditTypeCode }) => boolean
+  static notUnnecessary: ({ credits }: { credits: number }) => boolean
 }

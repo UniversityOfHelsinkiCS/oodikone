@@ -1,5 +1,7 @@
 import { Column, DataType, CreatedAt, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
+import { CreditTypeCode } from '../types/creditTypeCode'
+
 @Table({
   underscored: true,
   modelName: 'credit_type',
@@ -8,7 +10,7 @@ import { Column, DataType, CreatedAt, Model, PrimaryKey, Table, UpdatedAt } from
 export class CreditType extends Model {
   @PrimaryKey
   @Column(DataType.INTEGER)
-  credittypecode!: number
+  credittypecode!: CreditTypeCode
 
   @Column(DataType.JSONB)
   name!: object
