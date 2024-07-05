@@ -20,11 +20,11 @@ const worker = new Worker('refresh-redis-data', `${__dirname}/processor.js`, {
 
 worker.on('completed', job => {
   const timeUsed = moment.duration(moment(job.finishedOn).diff(job.processedOn, undefined, true))
-  if (timeUsed.seconds() > 60) {
-    logger.info(`Completed job: ${job.id} (took ${timeUsed.asMinutes().toFixed(3)} minutes)`)
-  } else {
-    logger.info(`Completed job: ${job.id} (took ${timeUsed.asSeconds().toFixed(3)} seconds)`)
-  }
+  const formattedTime =
+    timeUsed.asSeconds() > 60
+      ? `${timeUsed.asMinutes().toFixed(3)} minutes`
+      : `${timeUsed.asSeconds().toFixed(3)} seconds`
+  logger.info(`Completed job: ${job.id} (took ${formattedTime})`)
 })
 
 // If there is no error event listener, the worker stops taking jobs after any error.
@@ -33,8 +33,8 @@ worker.on('error', error => {
   logger.error(error.toString())
 })
 
-worker.on('failed', job => {
-  logger.error(`Job ${job?.id ?? ''} failed. ${job?.stacktrace ? `${job.stacktrace.join('')}` : ''}`)
+worker.on('failed', (job, error) => {
+  logger.error(`Job ${job.id} failed. ${error.stack ?? ''}`)
 })
 
 worker.on('active', job => {
