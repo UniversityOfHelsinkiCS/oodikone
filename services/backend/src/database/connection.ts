@@ -37,6 +37,7 @@ import {
   Tag,
   TagStudent,
 } from '../models/kone'
+import { User } from '../models/user'
 
 import logger from '../util/logger'
 
@@ -130,6 +131,7 @@ sequelizeKone.query(`SET SESSION search_path to ${conf.DB_SCHEMA_KONE}`)
 const sequelizeUser = new Sequelize(conf.DB_URL_USER, {
   logging: false,
   password: conf.USER_PASSWORD,
+  models: [User],
 })
 
 const initializeDatabaseConnection = async () => {
