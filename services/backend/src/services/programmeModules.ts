@@ -1,7 +1,7 @@
 import { Op } from 'sequelize'
 import { dbConnections } from '../database/connection'
 import { ProgrammeModule } from '../models'
-import { ExcludedCourse } from '../models/models_kone'
+import { ExcludedCourse } from '../models/kone'
 import logger from '../util/logger'
 import { combinedStudyprogrammes } from './studyProgramme/studyProgrammeHelpers'
 

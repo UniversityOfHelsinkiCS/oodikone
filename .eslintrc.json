@@ -20,8 +20,8 @@
     "consistent-return": "off",
     "cypress/no-assigning-return-values": "off",
     "cypress/unsafe-to-chain-command": "off",
-    "eslint-plugin-import/extensions": ["never", 2],
     "default-param-last": "off",
+    "import/extensions": ["error", "never"],
     "import/order": [
       "error",
       {
@@ -72,6 +72,13 @@
     "no-shadow": "off",
     "prettier/prettier": "error",
     "quotes": ["error", "single", { "avoidEscape": true }]
+  },
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+      }
+    }
   },
   "ignorePatterns": ["node_modules/", "build/", "**/*migrations*/**"]
 }

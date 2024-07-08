@@ -1,4 +1,4 @@
-const { CustomPopulationSearch } = require('../models/models_kone')
+const { CustomPopulationSearch } = require('../models/kone')
 
 const getCustomPopulationSearchesByUser = async userId =>
   CustomPopulationSearch.findAll({

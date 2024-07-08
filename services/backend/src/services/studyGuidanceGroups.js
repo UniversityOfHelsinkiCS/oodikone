@@ -1,6 +1,6 @@
 const { uniqBy } = require('lodash')
 
-const { StudyGuidanceGroupTag } = require('../models/models_kone')
+const { StudyGuidanceGroupTag } = require('../models/kone')
 const { getImporterClient } = require('../util/importerClient')
 const logger = require('../util/logger')
 

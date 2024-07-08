@@ -3,7 +3,7 @@ const { LRUCache } = require('lru-cache')
 
 const { serviceProvider } = require('../conf-backend')
 const { sequelizeUser } = require('../database/connection')
-const { User } = require('../models/models_user')
+const { User } = require('../models/user')
 const { createLocaleComparator, getFullStudyProgrammeRights, hasFullAccessToStudentData } = require('../util')
 const { sendNotificationAboutNewUser } = require('./mailservice')
 const { getSisuAuthData, personSearchQuery, getGraphqlData } = require('./oriProvider')

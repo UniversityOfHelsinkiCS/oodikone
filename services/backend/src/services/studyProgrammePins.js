@@ -1,6 +1,6 @@
 const { Op } = require('sequelize')
 
-const { StudyProgrammePin } = require('../models/models_kone')
+const { StudyProgrammePin } = require('../models/kone')
 
 const findPinsByUserId = async userId => {
   return await StudyProgrammePin.findOne({

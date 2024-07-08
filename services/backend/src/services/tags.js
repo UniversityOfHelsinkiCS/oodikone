@@ -1,6 +1,6 @@
 const { Op } = require('sequelize')
 
-const { Tag, TagStudent } = require('../models/models_kone')
+const { Tag, TagStudent } = require('../models/kone')
 
 const findTagsByStudytrack = async studytrack => {
   return Tag.findAll({

@@ -5,7 +5,7 @@ const {
   dbConnections: { sequelize },
 } = require('../../database/connection')
 const { ElementDetail, Student, Studyright, StudyrightElement, Transfer } = require('../../models')
-const { TagStudent } = require('../../models/models_kone')
+const { TagStudent } = require('../../models/kone')
 const { count } = require('./shared')
 
 const studentnumbersWithAllStudyrightElements = async ({
@@ -96,25 +96,25 @@ const studentnumbersWithAllStudyrightElements = async ({
   const studentnumbers = [...new Set(students.map(s => s.student_studentnumber))]
   // bit hacky solution, but this is used to filter out studentnumbers who have since changed studytracks
   const rights = await Studyright.findAll({
-      attributes: ['studyrightid'],
+    attributes: ['studyrightid'],
+    where: {
+      studentStudentnumber: {
+        [Op.in]: studentnumbers,
+      },
+    },
+    include: {
+      attributes: [],
+      model: StudyrightElement,
       where: {
-        studentStudentnumber: {
-          [Op.in]: studentnumbers,
+        code: {
+          [Op.in]: studyRights,
         },
       },
-      include: {
-        attributes: [],
-        model: StudyrightElement,
-        where: {
-          code: {
-            [Op.in]: studyRights,
-          },
-        },
-      },
-      group: ['studyright.studyrightid'],
-      having: count('studyright_elements.id', studyRights.length, true),
-      raw: true,
-    })
+    },
+    group: ['studyright.studyrightid'],
+    having: count('studyright_elements.id', studyRights.length, true),
+    raw: true,
+  })
 
   // bit hacky solution, but this is used to filter out studentnumbers who have since changed studytracks
   const allStudytracksForStudents = await StudyrightElement.findAll({

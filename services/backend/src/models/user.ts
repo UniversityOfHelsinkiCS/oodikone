@@ -1,4 +1,4 @@
-import { AllowNull, Column, DataType, Default, Model, PrimaryKey, Table, Unique } from 'sequelize-typescript'
+import { Column, DataType, Default, Model, PrimaryKey, Table, Unique } from 'sequelize-typescript'
 
 @Table({
   underscored: true,
@@ -30,12 +30,10 @@ export class User extends Model {
   @Column(DataType.DATE)
   lastLogin: Date
 
-  @AllowNull(false)
   @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   roles: string[]
 
-  @AllowNull(false)
   @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   programmeRights: string[]
