@@ -1,4 +1,4 @@
-const allFacultyCodes = [
+const facultyCodes = [
   'H10',
   'H20',
   'H30',
@@ -23,7 +23,7 @@ const magicFacultyCode = 'H50'
 const ignoredFacultyCodes = ['Y', 'H99', 'Y01', 'H92', 'H930']
 
 module.exports = {
-  facultyCodes: allFacultyCodes,
+  facultyCodes,
   magicFacultyCode,
   ignoredFacultyCodes,
 }
