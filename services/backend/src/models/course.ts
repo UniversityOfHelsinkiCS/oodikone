@@ -13,10 +13,10 @@ import {
 } from 'sequelize-typescript'
 
 import { Credit } from './credit'
-import { Enrollment } from './enrollment'
-import { Organization } from './organization'
 import { CourseProvider } from './courseProvider'
 import { CourseType } from './courseType'
+import { Enrollment } from './enrollment'
+import { Organization } from './organization'
 
 @Table({
   underscored: false,
@@ -45,10 +45,8 @@ export class Course extends Model {
   @HasMany(() => Enrollment, { foreignKey: 'course_id' })
   enrollments: Enrollment[]
 
-  // TODO not sure if this is correct: Should the field be organizations instead?
-  // Then we would not have the provider share info?
   @BelongsToMany(() => Organization, () => CourseProvider, 'coursecode')
-  courseProviders: CourseProvider[]
+  organizations: Organization[]
 
   @Column(DataType.BOOLEAN)
   is_study_module: boolean

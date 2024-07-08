@@ -164,7 +164,7 @@ const findStudentsCloseToGraduation = async studentNumbers =>
           },
         },
       ],
-      order: [[{ model: Credit }, 'attainment_date', 'DESC']],
+      order: [[{ model: Credit, as: 'credits' }, 'attainment_date', 'DESC']],
     })
   )
     .flatMap(student => formatStudent(student.toJSON()))

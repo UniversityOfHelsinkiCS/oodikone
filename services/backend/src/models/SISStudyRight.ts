@@ -3,6 +3,7 @@ import {
   Column,
   CreatedAt,
   DataType,
+  ForeignKey,
   HasMany,
   Model,
   PrimaryKey,
@@ -27,11 +28,8 @@ export class SISStudyRight extends Model {
   @BelongsTo(() => Organization, { foreignKey: 'facultyCode', targetKey: 'code' })
   organization: Organization
 
-  @HasMany(() => Studyplan, { as: 'studyPlans', foreignKey: 'sis_study_right_id' })
+  @HasMany(() => Studyplan)
   studyPlans: Studyplan[]
-
-  @BelongsTo(() => Student, { foreignKey: 'studentNumber' })
-  student: Student
 
   @HasMany(() => SISStudyRightElement, { foreignKey: 'studyRightId' })
   studyRightElements: SISStudyRightElement[]
@@ -48,8 +46,12 @@ export class SISStudyRight extends Model {
   @Column(DataType.BOOLEAN)
   cancelled: boolean
 
+  @ForeignKey(() => Student)
   @Column(DataType.STRING)
   studentNumber: string
+
+  @BelongsTo(() => Student)
+  student: Student
 
   @Column(DataType.INTEGER)
   extentCode: number

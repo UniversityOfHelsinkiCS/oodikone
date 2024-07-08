@@ -42,8 +42,8 @@ export class Studyplan extends Model {
   @Column(DataType.STRING)
   sis_study_right_id: string
 
-  @BelongsTo(() => SISStudyRight, { foreignKey: 'sis_study_right_id' })
-  sisStudyRight: SISStudyRight
+  @BelongsTo(() => SISStudyRight, { foreignKey: 'sis_study_right_id', targetKey: 'id', as: 'studyRight' })
+  studyRight: SISStudyRight
 
   @Column(DataType.STRING)
   programme_code: string
