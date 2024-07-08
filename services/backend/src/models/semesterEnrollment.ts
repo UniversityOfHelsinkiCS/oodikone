@@ -30,7 +30,7 @@ export class SemesterEnrollment extends Model {
   @Column(DataType.STRING)
   studentnumber: string
 
-  @BelongsTo(() => Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
+  @BelongsTo(() => Student)
   student: Student
 
   @Column(DataType.INTEGER)
@@ -40,7 +40,7 @@ export class SemesterEnrollment extends Model {
   @Column(DataType.STRING)
   semestercomposite: string
 
-  @BelongsTo(() => Semester, { foreignKey: 'semestercomposite', targetKey: 'composite' })
+  @BelongsTo(() => Semester)
   semester: Semester
 
   @Column(DataType.DATE)

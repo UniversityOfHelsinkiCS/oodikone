@@ -59,10 +59,7 @@ export class Enrollment extends Model {
   is_open: boolean
 
   @ForeignKey(() => Studyright)
-  @Column({
-    type: DataType.STRING,
-    allowNull: true,
-  })
+  @Column({ type: DataType.STRING, allowNull: true })
   studyright_id: string
 
   @BelongsTo(() => Studyright, { foreignKey: 'studyright_id', targetKey: 'studyrightid', constraints: false })

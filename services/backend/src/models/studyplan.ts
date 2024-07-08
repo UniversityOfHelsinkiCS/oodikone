@@ -24,9 +24,12 @@ export class Studyplan extends Model {
   @Column(DataType.STRING)
   id: string
 
-  @BelongsTo(() => Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
+  @ForeignKey(() => Student)
   @Column(DataType.STRING)
   studentnumber: string
+
+  @BelongsTo(() => Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
+  student: Student
 
   @ForeignKey(() => Studyright)
   @Column(DataType.STRING)
@@ -40,7 +43,7 @@ export class Studyplan extends Model {
   sis_study_right_id: string
 
   @BelongsTo(() => SISStudyRight, { foreignKey: 'sis_study_right_id' })
-  studyRight: SISStudyRight
+  sisStudyRight: SISStudyRight
 
   @Column(DataType.STRING)
   programme_code: string
