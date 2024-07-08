@@ -1,12 +1,12 @@
 const { Op } = require('sequelize')
+const { ignoredFacultyCodes } = require('../../../config/organisationConstants')
 
 const { codes } = require('../../../config/programmeCodes')
 const { mapObject } = require('../../util/map')
 const { faculties } = require('../organisations')
 
 const getFacultyList = async () => {
-  const ignore = ['Y', 'H99', 'Y01', 'H92', 'H930']
-  const facultyList = (await faculties()).filter(faculty => !ignore.includes(faculty.code))
+  const facultyList = (await faculties()).filter(faculty => !ignoredFacultyCodes.includes(faculty.code))
   facultyList.sort((a, b) => (a.name.fi > b.name.fi ? 1 : -1))
   return facultyList
 }

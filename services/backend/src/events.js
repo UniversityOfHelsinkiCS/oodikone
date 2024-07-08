@@ -1,5 +1,6 @@
 const { CronJob } = require('cron')
 
+const { ignoredFacultyCodes } = require('../config/organisationConstants')
 const { isProduction, runningInCI } = require('./conf-backend')
 const { updateFacultyOverview, updateFacultyProgressOverview } = require('./services/faculty/facultyUpdates')
 const { computeLanguageCenterData, LANGUAGE_CENTER_REDIS_KEY } = require('./services/languageCenterData')
@@ -27,7 +28,7 @@ const refreshStudyrightAssociations = async () => {
 
 const refreshFaculties = async () => {
   logger.info('Adding jobs to refresh all faculties')
-  const facultyList = (await faculties()).filter(faculty => !['Y', 'H99', 'Y01', 'H92', 'H930'].includes(faculty.code))
+  const facultyList = (await faculties()).filter(faculty => !ignoredFacultyCodes.includes(faculty.code))
   for (const faculty of facultyList) {
     jobMaker.faculty(faculty.code)
   }
