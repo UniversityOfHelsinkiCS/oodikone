@@ -1,4 +1,14 @@
-import { BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript'
+import {
+  BelongsTo,
+  Column,
+  CreatedAt,
+  DataType,
+  ForeignKey,
+  Model,
+  PrimaryKey,
+  Table,
+  UpdatedAt,
+} from 'sequelize-typescript'
 
 import { Semester } from './semester'
 import { Student } from './student'
@@ -16,9 +26,6 @@ export class SemesterEnrollment extends Model {
   @Column(DataType.STRING)
   org: string
 
-  @BelongsTo(() => Semester, { foreignKey: 'semestercomposite', targetKey: 'composite' })
-  semester: Semester
-
   @ForeignKey(() => Student)
   @Column(DataType.STRING)
   studentnumber: string
@@ -29,8 +36,12 @@ export class SemesterEnrollment extends Model {
   @Column(DataType.INTEGER)
   semestercode: number
 
-  @Column(DataType.DATE)
+  @ForeignKey(() => Semester)
+  @Column(DataType.STRING)
   semestercomposite: string
+
+  @BelongsTo(() => Semester, { foreignKey: 'semestercomposite', targetKey: 'composite' })
+  semester: Semester
 
   @Column(DataType.DATE)
   enrollment_date: Date
@@ -38,9 +49,11 @@ export class SemesterEnrollment extends Model {
   @Column(DataType.BOOLEAN)
   statutory_absence: boolean
 
+  @CreatedAt
   @Column(DataType.DATE)
   createdAt: Date
 
+  @UpdatedAt
   @Column(DataType.DATE)
   updatedAt: Date
 }

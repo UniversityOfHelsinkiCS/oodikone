@@ -9,7 +9,7 @@ import { AllowNull, Column, DataType, Default, Model, PrimaryKey, Table, Unique 
 export class User extends Model {
   @PrimaryKey
   @Column(DataType.BIGINT)
-  id!: bigint
+  id: bigint
 
   @Column(DataType.STRING)
   fullName: string

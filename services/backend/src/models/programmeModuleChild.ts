@@ -1,4 +1,4 @@
-import { Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript'
+import { Column, CreatedAt, DataType, ForeignKey, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
 import { ProgrammeModule } from './programmeModule'
 
@@ -19,9 +19,11 @@ export class ProgrammeModuleChild extends Model {
   @Column(DataType.STRING)
   childId: string
 
-  @Column(DataType.JSONB)
-  createdAt: object
+  @CreatedAt
+  @Column(DataType.DATE)
+  createdAt: Date
 
-  @Column(DataType.STRING)
-  updatedAt: string
+  @UpdatedAt
+  @Column(DataType.DATE)
+  updatedAt: Date
 }

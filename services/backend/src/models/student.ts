@@ -1,4 +1,4 @@
-import { Column, DataType, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript'
+import { Column, CreatedAt, DataType, HasMany, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
 import { Credit } from './credit'
 import { Enrollment } from './enrollment'
@@ -25,37 +25,38 @@ export class Student extends Model {
   @Column(DataType.STRING)
   firstnames: string
 
-
-  
-  @HasMany(() => Studyright, { foreignKey: 'studentStudentnumber', sourceKey: 'studentnumber' })
-  studyrights: Studyright[]
+  @Column(DataType.STRING)
+  abbreviatedname: string
 
   @HasMany(() => Enrollment, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
   enrollments: Enrollment[]
 
+  @HasMany(() => SemesterEnrollment, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
+  semester_enrollments: SemesterEnrollment[]
+
   @HasMany(() => SISStudyRight, { foreignKey: 'studentNumber' })
   studyRights: SISStudyRight[]
 
-  @HasMany(() => SemesterEnrollment, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
-  semester_enrollments: SemesterEnrollment[]
+  @HasMany(() => Studyright, { foreignKey: 'studentStudentnumber', sourceKey: 'studentnumber' })
+  studyrights: Studyright[]
 
   @HasMany(() => StudyrightElement, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
   studyrightElements: StudyrightElement[]
 
-  @Column(DataType.STRING)
-  abbreviatedname: string
-
-  @HasMany(() => Studyplan)
+  @HasMany(() => Studyplan, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
   studyplans: Studyplan[]
 
   @HasMany(() => Transfer, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
   transfers: Transfer[]
 
+  @HasMany(() => Credit, { foreignKey: 'student_studentnumber', sourceKey: 'studentnumber' })
+  credits: Credit
+
   @Column(DataType.DATE)
   birthdate: Date
 
-  @Column(DataType.STRING)
-  creditcount: string
+  @Column(DataType.INTEGER)
+  creditcount: number
 
   @Column(DataType.DATE)
   dateofuniversityenrollment: Date
@@ -96,12 +97,11 @@ export class Student extends Model {
   @Column(DataType.STRING)
   sis_person_id: string
 
+  @CreatedAt
   @Column(DataType.DATE)
   createdAt: Date
 
+  @UpdatedAt
   @Column(DataType.DATE)
   updatedAt: Date
-
-  @HasMany(() => Credit)
-  credits: Credit
 }

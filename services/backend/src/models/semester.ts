@@ -1,4 +1,14 @@
-import { Column, DataType, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript'
+import {
+  Column,
+  CreatedAt,
+  DataType,
+  ForeignKey,
+  HasMany,
+  Model,
+  PrimaryKey,
+  Table,
+  UpdatedAt,
+} from 'sequelize-typescript'
 
 import { SemesterEnrollment } from './semesterEnrollment'
 
@@ -12,6 +22,10 @@ export class Semester extends Model {
   @Column(DataType.STRING)
   composite: string
 
+  @ForeignKey(() => SemesterEnrollment)
+  @Column(DataType.STRING)
+  semestercomposite: string
+
   @HasMany(() => SemesterEnrollment, { foreignKey: 'semestercomposite', sourceKey: 'composite' })
   semesterEnrollments: SemesterEnrollment[]
 
@@ -20,6 +34,9 @@ export class Semester extends Model {
 
   @Column(DataType.JSONB)
   name: object
+
+  @Column(DataType.INTEGER)
+  startYear: number
 
   @Column(DataType.DATE)
   startdate: Date
@@ -31,20 +48,19 @@ export class Semester extends Model {
   yearcode: number
 
   @Column(DataType.STRING)
-  org: string
+  yearname: string
 
   @Column(DataType.STRING)
-  yearname: string
+  org: string
 
   @Column(DataType.INTEGER)
   termIndex: number
 
-  @Column(DataType.INTEGER)
-  startYear: number
-
+  @CreatedAt
   @Column(DataType.DATE)
   createdAt: Date
 
+  @UpdatedAt
   @Column(DataType.DATE)
   updatedAt: Date
 }

@@ -9,7 +9,7 @@ import { Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript
 export class ProgressCriteria extends Model {
   @PrimaryKey
   @Column(DataType.STRING)
-  code: bigint
+  code: string
 
   @Column(DataType.STRING)
   curriculumVersion: string

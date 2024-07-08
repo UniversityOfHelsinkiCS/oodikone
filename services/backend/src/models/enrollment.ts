@@ -1,4 +1,14 @@
-import { BelongsTo, Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript'
+import {
+  BelongsTo,
+  Column,
+  CreatedAt,
+  DataType,
+  ForeignKey,
+  Model,
+  PrimaryKey,
+  Table,
+  UpdatedAt,
+} from 'sequelize-typescript'
 
 import { Course } from './course'
 import { Semester } from './semester'
@@ -15,20 +25,12 @@ export class Enrollment extends Model {
   @Column(DataType.STRING)
   id: string
 
-  @BelongsTo(() => Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
-  student: Student
-
-  @BelongsTo(() => Semester, { foreignKey: { name: 'semester_composite', allowNull: false } })
-  semester: Semester
-
-  @BelongsTo(() => Studyright, { foreignKey: 'studyright_id', targetKey: 'studyrightid', constraints: false })
-  studyright: Studyright
-
-  @BelongsTo(() => Course, { foreignKey: 'course_id' })
-  course: Course
-
+  @ForeignKey(() => Student)
   @Column(DataType.STRING)
   studentnumber: string
+
+  @BelongsTo(() => Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
+  student: Student
 
   @Column(DataType.STRING)
   course_code: string
@@ -37,26 +39,43 @@ export class Enrollment extends Model {
   state: string
 
   @Column(DataType.DATE)
-  enrollment_date_time: string
+  enrollment_date_time: Date
 
+  @ForeignKey(() => Course)
   @Column(DataType.STRING)
   course_id: string
 
+  @ForeignKey(() => Semester)
   @Column(DataType.STRING)
   semester_composite: string
 
+  @BelongsTo(() => Semester, { foreignKey: 'semester_composite', targetKey: 'composite' })
+  semester: Semester
+
   @Column(DataType.INTEGER)
-  semestercode: string
+  semestercode: number
 
-  @Column(DataType.STRING)
-  createdAt: string
+  @Column(DataType.BOOLEAN)
+  is_open: boolean
 
-  @Column(DataType.STRING)
-  updatedAt: string
-
-  @Column(DataType.STRING)
-  is_open: string
-
-  @Column(DataType.STRING)
+  @ForeignKey(() => Studyright)
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
   studyright_id: string
+
+  @BelongsTo(() => Studyright, { foreignKey: 'studyright_id', targetKey: 'studyrightid', constraints: false })
+  studyright: Studyright
+
+  @BelongsTo(() => Course, { foreignKey: 'course_id', targetKey: 'id' })
+  course: Course
+
+  @CreatedAt
+  @Column(DataType.DATE)
+  createdAt: Date
+
+  @UpdatedAt
+  @Column(DataType.DATE)
+  updatedAt: Date
 }

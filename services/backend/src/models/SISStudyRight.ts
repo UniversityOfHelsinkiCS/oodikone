@@ -1,4 +1,14 @@
-import { BelongsTo, Column, DataType, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript'
+import {
+  BelongsTo,
+  Column,
+  CreatedAt,
+  DataType,
+  HasMany,
+  Model,
+  PrimaryKey,
+  Table,
+  UpdatedAt,
+} from 'sequelize-typescript'
 
 import { Organization } from './organization'
 import { SISStudyRightElement } from './SISStudyRightElement'
@@ -12,13 +22,13 @@ import { Studyplan } from './studyplan'
 export class SISStudyRight extends Model {
   @PrimaryKey
   @Column(DataType.STRING)
-  id!: string
+  id: string
 
   @BelongsTo(() => Organization, { foreignKey: 'facultyCode', targetKey: 'code' })
   organization: Organization
 
   @HasMany(() => Studyplan, { as: 'studyPlans', foreignKey: 'sis_study_right_id' })
-  studyplans: Studyplan[]
+  studyPlans: Studyplan[]
 
   @BelongsTo(() => Student, { foreignKey: 'studentNumber' })
   student: Student
@@ -50,9 +60,11 @@ export class SISStudyRight extends Model {
   @Column(DataType.JSONB)
   semesterEnrollments: object
 
+  @CreatedAt
   @Column(DataType.DATE)
   createdAt: Date
 
+  @UpdatedAt
   @Column(DataType.DATE)
   updatedAt: Date
 }

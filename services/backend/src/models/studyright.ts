@@ -1,4 +1,15 @@
-import { BelongsTo, Column, DataType, ForeignKey, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript'
+import {
+  BelongsTo,
+  Column,
+  CreatedAt,
+  DataType,
+  ForeignKey,
+  HasMany,
+  Model,
+  PrimaryKey,
+  Table,
+  UpdatedAt,
+} from 'sequelize-typescript'
 
 import { Enrollment } from './enrollment'
 import { Organization } from './organization'
@@ -78,12 +89,6 @@ export class Studyright extends Model {
   @Column(DataType.INTEGER)
   extentcode: number
 
-  @Column({ field: 'created_at', type: DataType.DATE })
-  created_at: Date
-
-  @Column({ field: 'updated_at', type: DataType.DATE })
-  updated_at: Date
-
   @Column(DataType.STRING)
   admission_type: string
 
@@ -92,4 +97,12 @@ export class Studyright extends Model {
 
   @Column({ field: 'semester_enrollments', type: DataType.JSONB })
   semesterEnrollments: object
+
+  @CreatedAt
+  @Column({ field: 'created_at', type: DataType.DATE })
+  created_at: Date
+
+  @UpdatedAt
+  @Column({ field: 'updated_at', type: DataType.DATE })
+  updated_at: Date
 }

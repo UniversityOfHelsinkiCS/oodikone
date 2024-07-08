@@ -1,4 +1,4 @@
-import { Column, DataType, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript'
+import { Column, CreatedAt, DataType, HasMany, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
 import { Course } from './course'
 
@@ -16,11 +16,13 @@ export class CourseType extends Model {
   courses: Course[]
 
   @Column(DataType.JSONB)
-  type: object
+  name: object
 
+  @CreatedAt
   @Column(DataType.DATE)
   createdAt: Date
 
+  @UpdatedAt
   @Column(DataType.DATE)
   updatedAt: Date
 }

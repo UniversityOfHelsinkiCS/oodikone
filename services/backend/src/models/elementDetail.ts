@@ -1,4 +1,4 @@
-import { Column, DataType, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript'
+import { Column, CreatedAt, DataType, HasMany, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
 import { StudyrightElement } from './studyrightElement'
 
@@ -18,12 +18,14 @@ export class ElementDetail extends Model {
   @Column(DataType.INTEGER)
   type: number
 
-  @Column(DataType.DATE)
-  updatedAt: Date
+  @HasMany(() => StudyrightElement, { foreignKey: 'code', sourceKey: 'code' })
+  studyrightElements: StudyrightElement
 
+  @CreatedAt
   @Column(DataType.DATE)
   createdAt: Date
 
-  @HasMany(() => StudyrightElement, { foreignKey: 'code', sourceKey: 'code' })
-  studyrightElements: StudyrightElement
+  @UpdatedAt
+  @Column(DataType.DATE)
+  updatedAt: Date
 }

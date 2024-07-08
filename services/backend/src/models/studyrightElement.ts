@@ -1,4 +1,14 @@
-import { BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript'
+import {
+  BelongsTo,
+  Column,
+  CreatedAt,
+  DataType,
+  ForeignKey,
+  Model,
+  PrimaryKey,
+  Table,
+  UpdatedAt,
+} from 'sequelize-typescript'
 
 import { ElementDetail } from './elementDetail'
 import { Student } from './student'
@@ -41,9 +51,11 @@ export class StudyrightElement extends Model {
   @Column(DataType.STRING)
   studentnumber: string
 
+  @CreatedAt
   @Column(DataType.DATE)
   createdAt: Date
 
+  @UpdatedAt
   @Column(DataType.DATE)
   updatedAt: Date
 }

@@ -1,4 +1,4 @@
-import { BelongsToMany, Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript'
+import { BelongsToMany, Column, CreatedAt, DataType, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
 import { Credit } from './credit'
 import { CreditTeacher } from './creditTeacher'
@@ -11,17 +11,19 @@ import { CreditTeacher } from './creditTeacher'
 export class Teacher extends Model {
   @PrimaryKey
   @Column(DataType.STRING)
-  id!: string
-
-  @BelongsToMany(() => Credit, () => CreditTeacher)
-  credits: Credit[]
+  id: string
 
   @Column(DataType.STRING)
   name: string
 
+  @BelongsToMany(() => Credit, () => CreditTeacher)
+  credits: Credit[]
+
+  @CreatedAt
   @Column(DataType.DATE)
   createdAt: Date
 
+  @UpdatedAt
   @Column(DataType.DATE)
   updatedAt: Date
 }

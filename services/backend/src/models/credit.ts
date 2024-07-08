@@ -1,4 +1,15 @@
-import { BelongsTo, BelongsToMany, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript'
+import {
+  BelongsTo,
+  BelongsToMany,
+  Column,
+  CreatedAt,
+  DataType,
+  ForeignKey,
+  Model,
+  PrimaryKey,
+  Table,
+  UpdatedAt,
+} from 'sequelize-typescript'
 
 import { CreditTypeCode } from '../types/creditTypeCode'
 import { Course } from './course'
@@ -17,7 +28,7 @@ import { Teacher } from './teacher'
 export class Credit extends Model {
   @PrimaryKey
   @Column(DataType.STRING)
-  id!: string
+  id: string
 
   // TODO This could be typed more accurately, to hold all possible values that exist in db
   @Column(DataType.STRING)
@@ -71,14 +82,11 @@ export class Credit extends Model {
   @Column(DataType.STRING)
   org: string
 
-  @Column(DataType.DATE)
-  createdAt: string
-
-  @Column(DataType.DATE)
-  updatedAt: string
-
   @Column(DataType.STRING)
   language: string
+
+  @Column(DataType.BOOLEAN)
+  is_open: boolean
 
   @ForeignKey(() => Studyright)
   @Column(DataType.STRING)
@@ -86,6 +94,14 @@ export class Credit extends Model {
 
   @BelongsTo(() => Studyright)
   studyright: Studyright
+
+  @CreatedAt
+  @Column(DataType.DATE)
+  createdAt: Date
+
+  @UpdatedAt
+  @Column(DataType.DATE)
+  updatedAt: Date
 
   static passed: ({ credittypecode }: { credittypecode: CreditTypeCode }) => boolean
   static failed: ({ credittypecode }: { credittypecode: CreditTypeCode }) => boolean

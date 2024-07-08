@@ -9,7 +9,7 @@ import { Column, DataType, Model, PrimaryKey, Table, Unique } from 'sequelize-ty
 export class StudyGuidanceGroupTag extends Model {
   @PrimaryKey
   @Column(DataType.BIGINT)
-  id!: bigint
+  id: bigint
 
   @Unique
   @Column(DataType.STRING)

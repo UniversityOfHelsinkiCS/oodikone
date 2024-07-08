@@ -8,7 +8,7 @@ import { Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript
 export class ExcludedCourse extends Model {
   @PrimaryKey
   @Column(DataType.INTEGER)
-  id!: number
+  id: number
 
   @Column(DataType.STRING)
   programme_code: string

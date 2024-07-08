@@ -1,4 +1,4 @@
-import { BelongsTo, Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript'
+import { BelongsTo, Column, CreatedAt, DataType, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
 import { SISStudyRight } from './SISStudyRight'
 
@@ -9,7 +9,7 @@ import { SISStudyRight } from './SISStudyRight'
 export class SISStudyRightElement extends Model {
   @PrimaryKey
   @Column(DataType.STRING)
-  id!: string
+  id: string
 
   @BelongsTo(() => SISStudyRight, { foreignKey: 'studyRightId' })
   studyRight: SISStudyRight
@@ -41,9 +41,11 @@ export class SISStudyRightElement extends Model {
   @Column(DataType.STRING)
   degreeProgrammeType: string
 
+  @CreatedAt
   @Column(DataType.DATE)
   createdAt: Date
 
+  @UpdatedAt
   @Column(DataType.DATE)
   updatedAt: Date
 }

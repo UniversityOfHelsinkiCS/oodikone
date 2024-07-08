@@ -9,13 +9,13 @@ import { Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript
 export class OpenUniPopulationSearch extends Model {
   @PrimaryKey
   @Column(DataType.BIGINT)
-  id!: bigint
+  id: bigint
 
   @Column(DataType.BIGINT)
   userId: bigint
 
   @Column(DataType.STRING)
-  name!: string
+  name: string
 
   @Column(DataType.ARRAY(DataType.STRING))
   courseCodes: string[]

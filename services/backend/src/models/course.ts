@@ -2,12 +2,14 @@ import {
   BelongsTo,
   BelongsToMany,
   Column,
+  CreatedAt,
   DataType,
   ForeignKey,
   HasMany,
   Model,
   PrimaryKey,
   Table,
+  UpdatedAt,
 } from 'sequelize-typescript'
 
 import { Credit } from './credit'
@@ -17,7 +19,7 @@ import { CourseProvider } from './courseProvider'
 import { CourseType } from './courseType'
 
 @Table({
-  underscored: true,
+  underscored: false,
   modelName: 'course',
   tableName: 'course',
 })
@@ -48,8 +50,11 @@ export class Course extends Model {
   @BelongsToMany(() => Organization, () => CourseProvider, 'coursecode')
   courseProviders: CourseProvider[]
 
-  @Column(DataType.STRING)
-  name: string
+  @Column(DataType.BOOLEAN)
+  is_study_module: boolean
+
+  @Column(DataType.JSONB)
+  name: object
 
   @Column(DataType.DATE)
   latest_instance_date: Date
@@ -66,11 +71,19 @@ export class Course extends Model {
   @Column(DataType.DATE)
   min_attainment_date: Date
 
-  @Column(DataType.DATE)
-  created_at: Date
+  @CreatedAt
+  @Column({
+    field: 'created_at',
+    type: DataType.DATE,
+  })
+  createdAt: Date
 
-  @Column(DataType.DATE)
-  updated_at: Date
+  @UpdatedAt
+  @Column({
+    field: 'updated_at',
+    type: DataType.DATE,
+  })
+  updatedAt: Date
 
   @Column(DataType.JSONB)
   substitutions: object
@@ -78,6 +91,9 @@ export class Course extends Model {
   @Column(DataType.STRING)
   course_unit_type: string
 
-  @Column(DataType.STRING)
-  main_course_code: string
+  @Column({
+    field: 'main_course_code',
+    type: DataType.STRING,
+  })
+  mainCourseCode: string
 }

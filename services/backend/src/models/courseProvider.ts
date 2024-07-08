@@ -1,4 +1,4 @@
-import { Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript'
+import { Column, CreatedAt, DataType, ForeignKey, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
 import { Course } from './course'
 import { Organization } from './organization'
@@ -7,6 +7,12 @@ import { Organization } from './organization'
   underscored: true,
   modelName: 'course_provider',
   tableName: 'course_providers',
+  indexes: [
+    {
+      unique: true,
+      fields: ['coursecode', 'organizationcode'],
+    },
+  ],
 })
 export class CourseProvider extends Model {
   @PrimaryKey
@@ -24,9 +30,11 @@ export class CourseProvider extends Model {
   @Column(DataType.STRING)
   organizationcode: string
 
+  @CreatedAt
   @Column(DataType.DATE)
   createdAt: Date
 
+  @UpdatedAt
   @Column(DataType.DATE)
   updatedAt: Date
 }

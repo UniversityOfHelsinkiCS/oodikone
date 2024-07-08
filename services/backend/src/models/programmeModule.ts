@@ -1,4 +1,15 @@
-import { BelongsTo, BelongsToMany, Column, Model, DataType, PrimaryKey, Table } from 'sequelize-typescript'
+import {
+  BelongsTo,
+  BelongsToMany,
+  Column,
+  CreatedAt,
+  ForeignKey,
+  Model,
+  DataType,
+  PrimaryKey,
+  Table,
+  UpdatedAt,
+} from 'sequelize-typescript'
 
 import { Organization } from './organization'
 import { ProgrammeModuleChild } from './programmeModuleChild'
@@ -12,9 +23,6 @@ export class ProgrammeModule extends Model {
   @PrimaryKey
   @Column(DataType.STRING)
   id: string
-
-  @BelongsTo(() => Organization, { foreignKey: 'organization_id' })
-  organization: Organization
 
   @BelongsToMany(() => ProgrammeModule, () => ProgrammeModuleChild, 'child_id')
   parents: ProgrammeModule[]
@@ -40,8 +48,12 @@ export class ProgrammeModule extends Model {
   @Column(DataType.STRING)
   studyLevel: string
 
+  @ForeignKey(() => Organization)
   @Column(DataType.STRING)
   organization_id: string
+
+  @BelongsTo(() => Organization, { foreignKey: 'organization_id' })
+  organization: Organization
 
   @Column(DataType.DATE)
   valid_from: Date
@@ -55,9 +67,11 @@ export class ProgrammeModule extends Model {
   @Column(DataType.STRING)
   degreeProgrammeType: string
 
+  @CreatedAt
   @Column(DataType.DATE)
   createdAt: Date
 
+  @UpdatedAt
   @Column(DataType.DATE)
   updatedAt: Date
 }

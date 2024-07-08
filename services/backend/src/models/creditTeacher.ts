@@ -1,4 +1,14 @@
-import { Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript'
+import {
+  Column,
+  CreatedAt,
+  DataType,
+  ForeignKey,
+  Model,
+  PrimaryKey,
+  Table,
+  Unique,
+  UpdatedAt,
+} from 'sequelize-typescript'
 
 import { Credit } from './credit'
 import { Teacher } from './teacher'
@@ -10,8 +20,9 @@ import { Teacher } from './teacher'
 })
 export class CreditTeacher extends Model {
   @PrimaryKey
+  @Unique
   @Column(DataType.STRING)
-  composite!: string
+  composite: string
 
   @ForeignKey(() => Credit)
   @Column(DataType.STRING)
@@ -21,9 +32,11 @@ export class CreditTeacher extends Model {
   @Column(DataType.STRING)
   teacher_id: string
 
+  @CreatedAt
   @Column(DataType.DATE)
   createdAt: Date
 
+  @UpdatedAt
   @Column(DataType.DATE)
   updatedAt: Date
 }
