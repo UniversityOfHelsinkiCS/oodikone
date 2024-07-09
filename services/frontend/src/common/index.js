@@ -427,7 +427,7 @@ export const ADMISSION_TYPES = {
   N: null,
 }
 
-// These are the new Bachelor's programmes in Matlu, that have BH possibility
+// These are the Bachelor's programmes in Matlu, that have BH possibility
 export const bachelorHonoursProgrammes = [
   'KH50_001',
   'KH50_002',
