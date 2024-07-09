@@ -37,9 +37,11 @@ const getAbsentYears = (semesterEnrollments, semesters) => {
   if (semesterEnrollments.length) {
     let runningSemestercode = semesterEnrollments[0].semestercode
     while (runningSemestercode <= latestSemester) {
-      if (!mappedSemesterenrollments[runningSemestercode])
+      if (!mappedSemesterenrollments[runningSemestercode]) {
         patchedSemesterenrollments.push({ semestercode: runningSemestercode, enrollmenttype: -1 })
-      else patchedSemesterenrollments.push(mappedSemesterenrollments[runningSemestercode])
+      } else {
+        patchedSemesterenrollments.push(mappedSemesterenrollments[runningSemestercode])
+      }
       runningSemestercode++
     }
   }
@@ -72,9 +74,11 @@ const getAbsentYears = (semesterEnrollments, semesters) => {
         absence.semestercode === currentSemestercode + 1 &&
         absence.enrollmenttype === currentType &&
         absence.statutoryAbsence === currentStatutory
-      )
+      ) {
         res[res.length - 1].enddate = absence.enddate
-      else res.push(absence)
+      } else {
+        res.push(absence)
+      }
       currentSemestercode = absence.semestercode
       currentType = absence.enrollmenttype
       currentStatutory = absence.statutoryAbsence
@@ -92,17 +96,21 @@ const getAbsentYears = (semesterEnrollments, semesters) => {
 export const StudentDetails = ({ studentNumber }) => {
   const [graphYearStart, setGraphYear] = useState(null)
   const [selectedStudyPlanId, setSelectedStudyPlanId] = useState(null)
-  let honoursCode
   const { data: semestersAndYears } = useGetSemestersQuery()
   const { data: student, isLoading, isError } = useGetStudentQuery(studentNumber)
+  let honoursCode
 
-  if (isLoading) return <Loader active />
+  if (isLoading) {
+    return <Loader active />
+  }
 
-  if (isError) {
+  if (isError || student.error) {
     return <Message header="Student not found or no sufficient permissions" icon="warning sign" negative size="big" />
   }
 
-  if (!student || !studentNumber || isEmpty(student) || !semestersAndYears) return null
+  if (!student || !studentNumber || isEmpty(student) || !semestersAndYears) {
+    return null
+  }
 
   if (student.studyRights) {
     const bachelorStudyRights = orderBy(
@@ -114,7 +122,6 @@ export const StudentDetails = ({ studentNumber }) => {
       ['desc']
     )
     const [newestBachelorProgramme] = bachelorStudyRights
-    // currently only for matlu
     if (bachelorCodes.includes(newestBachelorProgramme?.code)) {
       honoursCode = newestBachelorProgramme.code
     }
@@ -127,9 +134,9 @@ export const StudentDetails = ({ studentNumber }) => {
     } else {
       setSelectedStudyPlanId(id)
       const { programme_code: programmeCode, sis_study_right_id: studyRightId } = student.studyplans.find(
-        plan => plan.id === id
+        studyPlan => studyPlan.id === id
       )
-      const studyRight = student.studyRights.find(studyright => studyright.id === studyRightId)
+      const studyRight = student.studyRights.find(studyRight => studyRight.id === studyRightId)
       const programme = studyRight.studyRightElements.find(element => element.code === programmeCode)
       setGraphYear(programme.startDate)
     }
