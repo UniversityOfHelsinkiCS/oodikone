@@ -4,7 +4,8 @@
     "moduleResolution": "nodenext",
     "module": "nodenext",
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "outDir": "dist"
   },
   "include": ["src/**/*"]
 }
