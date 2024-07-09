@@ -70,6 +70,8 @@ services:
       POSTGRES_DB: kone-db
       POSTGRES_HOST_AUTH_METHOD: trust
     image: postgres:15.7
+    ports:
+      - 12349:5432
     volumes:
       - kone-db-data:/data
 
@@ -97,19 +99,6 @@ services:
     ports:
       - 12345:5432
 
-  sis-importer-db:
-    <<: *defaults
-    container_name: sis-importer-db
-    environment:
-      PGDATA: /data
-      POSTGRES_DB: sis-importer-db
-      POSTGRES_HOST_AUTH_METHOD: trust
-    image: postgres:15.7
-    volumes:
-      - sis-importer-db-data:/data
-    ports:
-      - 12346:5432
-
   sis-updater-nats:
     <<: *defaults
     command: '-cid sis-updater-nats -m 8222 -p 4222 --max_channels 1000 --max_age 2h --hb_fail_count 2 --hb_timeout 10s --hb_interval 10s --auth dev --file_slice_max_bytes 0 --file_slice_max_age 60s --max_msgs 0 -store file -dir datastore'
@@ -122,17 +111,19 @@ services:
       <<: *build_defaults
       context: updater/sis-updater-scheduler
     container_name: sis-updater-scheduler
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
     depends_on:
       - redis
-      - sis-importer-db
       - sis-updater-nats
     environment:
       REDIS_URI: //redis:6379
       SECRET_TOKEN: dev
-      SIS_IMPORTER_DATABASE: sis-importer-db
-      SIS_IMPORTER_HOST: sis-importer-db
-      SIS_IMPORTER_PASSWORD: postgres
-      SIS_IMPORTER_USER: postgres
+      SIS_IMPORTER_HOST: ${SIS_IMPORTER_DB_HOST:-host.docker.internal}
+      SIS_IMPORTER_PORT: ${SIS_IMPORTER_DB_PORT:-15234}
+      SIS_IMPORTER_DATABASE: importer-db
+      SIS_IMPORTER_PASSWORD: dev
+      SIS_IMPORTER_USER: dev
       SIS_NATS_TOKEN: dev
       SIS_NATS_URI: sis-updater-nats://sis-updater-nats:4222
     ports:
@@ -149,15 +140,17 @@ services:
     depends_on:
       - redis
       - sis-db
-      - sis-importer-db
       - sis-updater-nats
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
     environment:
       DB_URL: postgres://postgres@sis-db:5432/sis-db
       REDIS_URI: //redis:6379
-      SIS_IMPORTER_DATABASE: sis-importer-db
-      SIS_IMPORTER_HOST: sis-importer-db
-      SIS_IMPORTER_PASSWORD: postgres
-      SIS_IMPORTER_USER: postgres
+      SIS_IMPORTER_HOST: ${SIS_IMPORTER_DB_HOST:-host.docker.internal}
+      SIS_IMPORTER_PORT: ${SIS_IMPORTER_DB_PORT:-15234}
+      SIS_IMPORTER_DATABASE: importer-db
+      SIS_IMPORTER_PASSWORD: dev
+      SIS_IMPORTER_USER: dev
       SIS_PASSWORD: postgres
       SIS_NATS_TOKEN: dev
       SIS_NATS_URI: sis-updater-nats://sis-updater-nats:4222
@@ -189,3 +182,10 @@ volumes:
   sis-updater-scheduler-nodemod:
   sis-updater-worker-nodemod:
   user-db-data:
+
+networks:
+  default:
+    name: oodikone
+  importer:
+    name: importer_network
+    external: true
