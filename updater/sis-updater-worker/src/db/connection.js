@@ -7,8 +7,15 @@ const { MIGRATIONS_LOCK, isDev, runningInCI } = require('../config')
 const { logger } = require('../utils/logger')
 const { lock } = require('../utils/redis')
 
-const { DB_URL, SIS_IMPORTER_HOST, SIS_IMPORTER_USER, SIS_IMPORTER_PASSWORD, SIS_IMPORTER_DATABASE, SIS_PASSWORD } =
-  process.env
+const {
+  DB_URL,
+  SIS_IMPORTER_HOST,
+  SIS_IMPORTER_PORT,
+  SIS_IMPORTER_USER,
+  SIS_IMPORTER_PASSWORD,
+  SIS_IMPORTER_DATABASE,
+  SIS_PASSWORD,
+} = process.env
 
 class DbConnections extends EventEmitter {
   constructor() {
@@ -46,6 +53,7 @@ class DbConnections extends EventEmitter {
             password: SIS_IMPORTER_PASSWORD,
             database: SIS_IMPORTER_DATABASE,
             ssl: !isDev && !runningInCI,
+            port: SIS_IMPORTER_PORT,
           },
           pool: {
             min: 0,

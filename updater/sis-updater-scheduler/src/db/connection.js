@@ -4,7 +4,8 @@ const knex = require('knex')
 const { isDev, runningInCI } = require('../config')
 const { logger } = require('../utils/logger')
 
-const { SIS_IMPORTER_HOST, SIS_IMPORTER_USER, SIS_IMPORTER_PASSWORD, SIS_IMPORTER_DATABASE } = process.env
+const { SIS_IMPORTER_HOST, SIS_IMPORTER_PORT, SIS_IMPORTER_USER, SIS_IMPORTER_PASSWORD, SIS_IMPORTER_DATABASE } =
+  process.env
 
 class KnexConnection extends EventEmitter {
   constructor() {
@@ -17,6 +18,7 @@ class KnexConnection extends EventEmitter {
       this.knex = knex({
         client: 'pg',
         connection: {
+          port: SIS_IMPORTER_PORT,
           host: SIS_IMPORTER_HOST,
           user: SIS_IMPORTER_USER,
           password: SIS_IMPORTER_PASSWORD,
