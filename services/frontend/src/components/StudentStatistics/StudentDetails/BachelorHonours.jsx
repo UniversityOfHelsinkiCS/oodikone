@@ -76,7 +76,7 @@ export const BachelorHonours = ({ absentYears, programmeCode, student }) => {
   const basicAtLeastFour = basicModules.find(mod => Number(mod.grade) >= 4)
   const intermediateAtLeastFour = intermediateModules.find(mod => Number(mod.grade) >= 4)
 
-  const honors = basicAtLeastFour && intermediateAtLeastFour && inTime
+  const honours = basicAtLeastFour && intermediateAtLeastFour && inTime
 
   if (!inTime) {
     reason = degreeModule ? 'Did not graduate in time' : 'Has not graduated'
@@ -117,11 +117,11 @@ export const BachelorHonours = ({ absentYears, programmeCode, student }) => {
       </Divider>
       <Header as="h5">Qualified</Header>
       <Label
-        color={honors ? 'green' : 'red'}
-        content={honors ? 'Qualified for Honours' : 'Not qualified for Honours'}
+        color={honours ? 'green' : 'red'}
+        content={honours ? 'Qualified for Honours' : 'Not qualified for Honours'}
         tag
       />
-      {!honors && reason && <Label color="red" content={reason} tag />}
+      {!honours && reason && <Label color="red" content={reason} tag />}
       {inspection && <Label color="blue" content="Might need further inspection" tag />}
       <div style={{ marginTop: '15px', marginBottom: '15px' }}>
         Select curriculum version used for checking Bachelor Honours eligibility
@@ -132,7 +132,7 @@ export const BachelorHonours = ({ absentYears, programmeCode, student }) => {
           year={new Date().getFullYear()}
         />
       </div>
-      {honors ? (
+      {honours ? (
         <Accordion>
           <Accordion.Title
             active={showHonoursModules}
