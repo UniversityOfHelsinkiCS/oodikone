@@ -1,14 +1,13 @@
-const { sortBy } = require('lodash')
-const { Op } = require('sequelize')
+import { sortBy } from 'lodash'
+import { Op } from 'sequelize'
 
-const {
-  dbConnections: { sequelize },
-} = require('../../database/connection')
-const { ElementDetail, Student, Studyright, StudyrightElement, Transfer } = require('../../models')
-const { TagStudent } = require('../../models/kone')
-const { count } = require('./shared')
+import { dbConnections } from '../../database/connection'
+const { sequelize } = dbConnections
+import { ElementDetail, Student, Studyright, StudyrightElement, Transfer } from '../../models'
+import { TagStudent } from '../../models/kone'
+import { count } from './shared'
 
-const studentnumbersWithAllStudyrightElements = async ({
+export const studentnumbersWithAllStudyrightElements = async ({
   studyRights,
   startDate,
   endDate,
@@ -36,7 +35,7 @@ const studentnumbersWithAllStudyrightElements = async ({
     },
   }
 
-  const studentWhere = {}
+  const studentWhere = { where: {} }
   if (tag) {
     const taggedStudentnumbers = await TagStudent.findAll({
       attributes: ['studentnumber'],
@@ -62,10 +61,12 @@ const studentnumbersWithAllStudyrightElements = async ({
           [Op.in]: studyRights,
         },
       },
-      include: {
-        model: ElementDetail,
-        attributes: [],
-      },
+      include: [
+        {
+          model: ElementDetail,
+          attributes: [],
+        },
+      ],
     },
     group: [sequelize.col('studyright.studyrightid')],
     where: {
@@ -93,8 +94,7 @@ const studentnumbersWithAllStudyrightElements = async ({
     raw: true,
   })
 
-  const studentnumbers = [...new Set(students.map(s => s.student_studentnumber))]
-  // bit hacky solution, but this is used to filter out studentnumbers who have since changed studytracks
+  const studentnumbers = [...new Set(students.map(student => student.studentStudentnumber))]
   const rights = await Studyright.findAll({
     attributes: ['studyrightid'],
     where: {
@@ -120,7 +120,7 @@ const studentnumbersWithAllStudyrightElements = async ({
   const allStudytracksForStudents = await StudyrightElement.findAll({
     where: {
       studyrightid: {
-        [Op.in]: rights.map(r => r.studyrightid),
+        [Op.in]: rights.map(studyRight => studyRight.studyrightid),
       },
     },
     include: {
@@ -175,7 +175,7 @@ const studentnumbersWithAllStudyrightElements = async ({
         },
         raw: true,
       })
-    ).map(s => s.studentnumber)
+    ).map(student => student.studentnumber)
 
     studentnumberlist = studentnumberlist.filter(studentNumber => !transfersOut.includes(studentNumber))
   }
@@ -237,8 +237,4 @@ const studentnumbersWithAllStudyrightElements = async ({
   }
 
   return studentnumberlist
-}
-
-module.exports = {
-  studentnumbersWithAllStudyrightElements,
 }
