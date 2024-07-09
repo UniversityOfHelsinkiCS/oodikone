@@ -1,8 +1,7 @@
-import { Op } from 'sequelize'
+import { Op, QueryTypes } from 'sequelize'
 
-const {
-  dbConnections: { sequelize },
-} = require('../database/connection')
+import { dbConnections } from '../database/connection'
+const { sequelize } = dbConnections
 import {
   Student,
   Credit,
@@ -123,7 +122,7 @@ const getUnifyStatus = unifyCourses => {
   }
 }
 
-const findByCourseAndSemesters = async (coursecodes, from, to, separate, unifyCourses = 'unifyStats') => {
+export const findByCourseAndSemesters = async (coursecodes, from, to, separate, unifyCourses = 'unifyStats') => {
   const { startdate, semestercode: fromSemester } = await Semester.findOne({
     where: {
       [separate ? 'semestercode' : 'yearcode']: from,
@@ -174,14 +173,14 @@ const findByCourseAndSemesters = async (coursecodes, from, to, separate, unifyCo
 `,
       {
         replacements: { coursecodes, minYearCode: from, maxYearCode: to, isOpen: getUnifyStatus(unifyCourses) },
-        type: sequelize.QueryTypes.SELECT,
+        type: QueryTypes.SELECT,
         raw: true,
       }
     )
-  ).map(st => st.studentnumber)
+  ).map(studentNumber => studentNumber)
 }
 
-const findByTag = async tag => {
+export const findByTag = async tag => {
   return (
     await TagStudent.findAll({
       attributes: ['studentnumber'],
@@ -194,7 +193,7 @@ const findByTag = async tag => {
   ).map(st => st.studentnumber)
 }
 
-const formatStudent = ({
+const formatSharedStudentData = ({
   firstnames,
   lastname,
   studentnumber,
@@ -208,7 +207,6 @@ const formatStudent = ({
   studyplans,
   updatedAt,
   createdAt,
-  tags,
   sis_person_id,
 }) => {
   const toCourse = ({ grade, credits, credittypecode, is_open, attainment_date, course, isStudyModule }) => {
@@ -264,12 +262,23 @@ const formatStudent = ({
     semesterenrollments,
     updatedAt: updatedAt || createdAt,
     studyplans,
-    tags,
     sis_person_id,
   }
 }
 
-const withStudentNumber = async studentNumber => {
+const formatStudent = studentData => {
+  const formattedData = formatSharedStudentData(studentData)
+  return {
+    ...formattedData,
+    tags: studentData.tags,
+  }
+}
+
+const formatStudentWithoutTags = studentData => {
+  return formatSharedStudentData(studentData)
+}
+
+export const withStudentNumber = async studentNumber => {
   try {
     const student = await byStudentNumber(studentNumber)
     return formatStudent(student)
@@ -313,7 +322,7 @@ const studentnumberLike = terms => {
   }
 }
 
-const bySearchTermAndStudentNumbers = async (searchterm, studentNumbers) => {
+export const bySearchTermAndStudentNumbers = async (searchterm, studentNumbers) => {
   const terms = splitByEmptySpace(searchterm)
   return (
     await Student.findAll({
@@ -322,17 +331,19 @@ const bySearchTermAndStudentNumbers = async (searchterm, studentNumbers) => {
         model: SISStudyRight,
         as: 'studyRights',
         attributes: ['id'],
-        include: {
-          model: SISStudyRightElement,
-          as: 'studyRightElements',
-          attributes: ['name'],
-          required: true,
-          where: {
-            endDate: {
-              [Op.gte]: new Date(),
+        include: [
+          {
+            model: SISStudyRightElement,
+            as: 'studyRightElements',
+            attributes: ['name'],
+            required: true,
+            where: {
+              endDate: {
+                [Op.gte]: new Date(),
+              },
             },
           },
-        },
+        ],
       },
       where: studentNumbers
         ? {
@@ -345,10 +356,10 @@ const bySearchTermAndStudentNumbers = async (searchterm, studentNumbers) => {
           }
         : { [Op.or]: [nameLike(terms), studentnumberLike(terms)] },
     })
-  ).map(formatStudent)
+  ).map(formatStudentWithoutTags)
 }
 
-const filterStudentnumbersByAccessrights = async (studentnumbers, codes) =>
+export const filterStudentnumbersByAccessrights = async (studentnumbers, codes) =>
   (
     await Student.findAll({
       attributes: ['studentnumber'],
@@ -357,15 +368,17 @@ const filterStudentnumbersByAccessrights = async (studentnumbers, codes) =>
         model: SISStudyRight,
         as: 'studyRights',
         required: true,
-        include: {
-          model: SISStudyRightElement,
-          as: 'studyRightElements',
-          where: {
-            code: {
-              [Op.in]: codes,
+        include: [
+          {
+            model: SISStudyRightElement,
+            as: 'studyRightElements',
+            where: {
+              code: {
+                [Op.in]: codes,
+              },
             },
           },
-        },
+        ],
       },
       where: {
         studentnumber: {
@@ -376,7 +389,7 @@ const filterStudentnumbersByAccessrights = async (studentnumbers, codes) =>
     })
   ).map(({ studentnumber }) => studentnumber)
 
-const getStudentnumbersByElementdetails = async codes =>
+export const getStudentnumbersByElementdetails = async codes =>
   (
     await Student.findAll({
       attributes: ['studentnumber'],
@@ -385,25 +398,18 @@ const getStudentnumbersByElementdetails = async codes =>
         model: SISStudyRight,
         as: 'studyRights',
         required: true,
-        include: {
-          model: SISStudyRightElement,
-          as: 'studyRightElements',
-          where: {
-            code: {
-              [Op.in]: codes,
+        include: [
+          {
+            model: SISStudyRightElement,
+            as: 'studyRightElements',
+            where: {
+              code: {
+                [Op.in]: codes,
+              },
             },
           },
-        },
+        ],
       },
       raw: true,
     })
   ).map(({ studentnumber }) => studentnumber)
-
-module.exports = {
-  withStudentNumber,
-  bySearchTermAndStudentNumbers,
-  filterStudentnumbersByAccessrights,
-  findByCourseAndSemesters,
-  findByTag,
-  getStudentnumbersByElementdetails,
-}
