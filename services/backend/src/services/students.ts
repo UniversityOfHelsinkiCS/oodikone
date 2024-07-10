@@ -106,17 +106,14 @@ const byStudentNumber = async studentNumber => {
   return student
 }
 
-const getUnifyStatus = unifyCourses => {
+const getUnifyStatus = (unifyCourses: string): [boolean, boolean?] => {
   switch (unifyCourses) {
     case 'unifyStats':
       return [true, false]
-
     case 'openStats':
       return [true]
-
     case 'regularStats':
       return [false]
-
     default:
       return [true, false]
   }
@@ -131,6 +128,7 @@ export const findByCourseAndSemesters = async (coursecodes, from, to, separate, 
     limit: 1,
     raw: true,
   })
+
   const { enddate, semestercode: toSemester } = await Semester.findOne({
     where: {
       [separate ? 'semestercode' : 'yearcode']: to,
@@ -139,45 +137,53 @@ export const findByCourseAndSemesters = async (coursecodes, from, to, separate, 
     limit: 1,
     raw: true,
   })
-  return (
-    await sequelize.query(
-      `
-  SELECT
-    studentnumber
-  FROM
-    student s
-  WHERE
-    EXISTS (
-      SELECT
-        1
-      FROM
-        credit c
-      WHERE
-        c.student_studentnumber = s.studentnumber
-        AND c.course_code IN (:coursecodes)
-        AND c.is_open IN (:isOpen)
-        AND c.attainment_date BETWEEN '${startdate.toISOString()}' AND '${enddate.toISOString()}'
-    )
-    OR EXISTS (
-      SELECT
-        1
-      FROM
-        enrollment e
-      WHERE
-        e.studentnumber = s.studentnumber
-        AND e.course_code IN (:coursecodes)
-        AND e.semestercode BETWEEN ${fromSemester} AND ${toSemester}
-        AND e.enrollment_date_time >= '2021-05-31'
-        AND e.state IN ('ENROLLED', 'CONFIRMED')
-    );
-`,
-      {
-        replacements: { coursecodes, minYearCode: from, maxYearCode: to, isOpen: getUnifyStatus(unifyCourses) },
-        type: QueryTypes.SELECT,
-        raw: true,
-      }
-    )
-  ).map(studentNumber => studentNumber)
+
+  const unifyStatus = getUnifyStatus(unifyCourses)
+
+  type QueryResult = {
+    studentnumber: string
+  }[]
+
+  const queryResult: QueryResult = await sequelize.query(
+    `
+    SELECT
+      studentnumber
+    FROM
+      student s
+    WHERE
+      EXISTS (
+        SELECT
+          1
+        FROM
+          credit c
+        WHERE
+          c.student_studentnumber = s.studentnumber
+          AND c.course_code IN (:coursecodes)
+          AND c.is_open IN (:isOpen)
+          AND c.attainment_date BETWEEN '${startdate.toISOString()}' AND '${enddate.toISOString()}'
+      )
+      OR EXISTS (
+        SELECT
+          1
+        FROM
+          enrollment e
+        WHERE
+          e.studentnumber = s.studentnumber
+          AND e.course_code IN (:coursecodes)
+          AND e.semestercode BETWEEN ${fromSemester} AND ${toSemester}
+          AND e.enrollment_date_time >= '2021-05-31'
+          AND e.state IN ('ENROLLED', 'CONFIRMED')
+      );
+    `,
+    {
+      replacements: { coursecodes, minYearCode: from, maxYearCode: to, isOpen: unifyStatus },
+      type: QueryTypes.SELECT,
+      raw: true,
+    }
+  )
+
+  const studentNumbers = queryResult.map(result => result.studentnumber)
+  return studentNumbers
 }
 
 export const findByTag = async tag => {
