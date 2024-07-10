@@ -1,4 +1,4 @@
-import { Column, DataType, Model, PrimaryKey, Table, Unique } from 'sequelize-typescript'
+import { AutoIncrement, Column, DataType, Model, PrimaryKey, Table, Unique } from 'sequelize-typescript'
 
 @Table({
   underscored: true,
@@ -8,6 +8,7 @@ import { Column, DataType, Model, PrimaryKey, Table, Unique } from 'sequelize-ty
 })
 export class StudyGuidanceGroupTag extends Model {
   @PrimaryKey
+  @AutoIncrement
   @Column(DataType.BIGINT)
   id: bigint
 

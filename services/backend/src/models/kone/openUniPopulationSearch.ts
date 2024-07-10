@@ -1,4 +1,4 @@
-import { Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript'
+import { AutoIncrement, Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript'
 
 @Table({
   underscored: true,
@@ -8,6 +8,7 @@ import { Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript
 })
 export class OpenUniPopulationSearch extends Model {
   @PrimaryKey
+  @AutoIncrement
   @Column(DataType.BIGINT)
   id: bigint
 

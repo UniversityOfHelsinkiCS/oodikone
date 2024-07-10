@@ -1,4 +1,4 @@
-import { Column, DataType, Default, Model, PrimaryKey, Table, Unique } from 'sequelize-typescript'
+import { AutoIncrement, Column, DataType, Default, Model, PrimaryKey, Table, Unique } from 'sequelize-typescript'
 
 @Table({
   underscored: true,
@@ -8,6 +8,7 @@ import { Column, DataType, Default, Model, PrimaryKey, Table, Unique } from 'seq
 })
 export class User extends Model {
   @PrimaryKey
+  @AutoIncrement
   @Column(DataType.BIGINT)
   id: bigint
 
