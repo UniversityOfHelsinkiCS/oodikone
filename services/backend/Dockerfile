@@ -27,7 +27,7 @@ RUN npm ci
 
 COPY . .
 
-RUN npm run tsc
+RUN npx tsc
 
 RUN cp -r config dist/
 RUN cp package.json dist/
@@ -36,6 +36,6 @@ RUN cp index.js dist/
 
 RUN find src -name '*.js' -exec cp --parents {} dist \;
 
-RUN cd dist && npm ci --omit=dev
+RUN npm prune --production
 
 CMD ["node", "dist/index.js"]
