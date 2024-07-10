@@ -102,11 +102,13 @@ const initGradeScaleIdToGradeIdsToGrades = async () =>
           localId,
           numericCorrespondence,
           passed,
-          abbreviation: { fi },
+          abbreviation: { fi, en, sv },
         } = curr
+
+        const abbr = fi || en || sv || 'Unknown'
         if (!res[localId])
           res[localId] = {
-            value: numericCorrespondence || fi,
+            value: numericCorrespondence || abbr,
             passed,
           }
         return res
