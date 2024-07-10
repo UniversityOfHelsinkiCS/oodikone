@@ -4,7 +4,6 @@ const { termRegistrationTypeToEnrollmenttype } = require('../mapper')
 const {
   getEducation,
   getSemester,
-  getUniOrgId,
   getEducationType,
   educationTypeToExtentcode,
   getOrganisationCode,
@@ -33,11 +32,7 @@ const getStudyRightSemesterEnrollments = (studyright, semesterEnrollments) => {
     } = termRegistration
 
     const type = termRegistrationTypeToEnrollmenttype(termRegistrationType)
-    const { semestercode: semester } = getSemester(
-      getUniOrgId(studyright.organisation_id),
-      studyYearStartYear,
-      termIndex
-    )
+    const { semestercode: semester } = getSemester(studyYearStartYear, termIndex)
     return type === 2 ? { type, semester, statutoryAbsence } : { type, semester }
   })
 }

@@ -231,7 +231,7 @@ const semesterEnrollmentMapper =
 
     const enrollmenttype = termRegistrationTypeToEnrollmenttype(termRegistrationType)
     const studentnumber = personIdToStudentNumber[studentId]
-    const { semestercode } = getSemester(studyrightToUniOrgId[studyRightId], studyYearStartYear, termIndex)
+    const { semestercode } = getSemester(studyYearStartYear, termIndex)
     const enrollment_date = registrationDate
     const org = studyrightToUniOrgId[studyRightId]
 
