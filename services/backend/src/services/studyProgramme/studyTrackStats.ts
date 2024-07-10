@@ -1,9 +1,10 @@
-const moment = require('moment')
+import moment from 'moment'
 
-const { getAcademicYearDates } = require('../../util/semester')
-const { countTimeCategories, getStatutoryAbsences } = require('../graduationHelpers')
-const { studytrackStudents, enrolledStudents, absentStudents } = require('./studentGetters')
-const {
+import { GenderCode } from '../../types/genderCode'
+import { getAcademicYearDates } from '../../util/semester'
+import { countTimeCategories, getStatutoryAbsences } from '../graduationHelpers'
+import { studytrackStudents, enrolledStudents, absentStudents } from './studentGetters'
+import {
   getCorrectStudentnumbers,
   getGoal,
   getMedian,
@@ -12,13 +13,13 @@ const {
   getYearsArray,
   getYearsObject,
   tableTitles,
-} = require('./studyProgrammeHelpers')
-const {
+} from './studyProgrammeHelpers'
+import {
   graduatedStudyRights,
   graduatedStudyRightsByStartDate,
   inactiveStudyrights,
   startedStudyrights,
-} = require('./studyRightFinders')
+} from './studyRightFinders'
 
 const getUnique = studentnumbers => [...new Set(studentnumbers)]
 const getStudentData = (startDate, students) => {
@@ -31,9 +32,9 @@ const getStudentData = (startDate, students) => {
       .reduce((prev, curr) => (prev += curr.credits), 0)
     creditCounts.push(creditcount)
 
-    data.male += genderCode === '1' ? 1 : 0
-    data.female += genderCode === '2' ? 1 : 0
-    data.otherUnkown += ['0', '3'].includes(genderCode) ? 1 : 0
+    data.male += genderCode === GenderCode.MALE ? 1 : 0
+    data.female += genderCode === GenderCode.FEMALE ? 1 : 0
+    data.otherUnkown += [GenderCode.OTHER, GenderCode.UNKNOWN].includes(genderCode) ? 1 : 0
     data.finnish += homeCountryEn === 'Finland' ? 1 : 0
     data.otherCountries += homeCountryEn !== 'Finland' ? 1 : 0
     if (homeCountryEn !== 'Finland') {
@@ -183,7 +184,7 @@ const getStudytrackDataForTheYear = async ({
       const students = await studytrackStudents(studentnumbers)
 
       let all = []
-      let studentData = {}
+      let studentData = { male: 0, female: 0, otherUnkown: 0, finnish: 0, otherCountries: 0, otherCountriesCounts: {} }
       let creditCountData = []
       let started = []
       let enrolled = []
@@ -411,7 +412,12 @@ const getEmptyStatsObjects = (years, studytracks, studyprogramme, combinedProgra
 
 // Combines all the data for the Populations and Studytracks -view
 // At the moment combined programme is thought to have only one track, the programme itself
-const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, combinedProgramme, settings, associations }) => {
+export const getStudytrackStatsForStudyprogramme = async ({
+  studyprogramme,
+  combinedProgramme,
+  settings,
+  associations,
+}) => {
   const isAcademicYear = true
   const includeYearsCombined = true
   const since = getStartDate(isAcademicYear)
@@ -455,8 +461,4 @@ const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, combinedPro
     includeGraduated: settings.graduated,
     populationTitles: [...tableTitles.studytracksStart, ...graduatedTitles, ...tableTitles.studytracksEnd],
   }
-}
-
-module.exports = {
-  getStudytrackStatsForStudyprogramme,
 }

@@ -1,15 +1,16 @@
-const { getAcademicYearDates } = require('../../util/semester')
-const { absentStudents, enrolledStudents } = require('../studyProgramme/studentGetters')
-const {
+import { GenderCode } from '../../types/genderCode'
+import { getAcademicYearDates } from '../../util/semester'
+import { absentStudents, enrolledStudents } from '../studyProgramme/studentGetters'
+import {
   getPercentage,
   getStartDate,
   getYearsArray,
   getYearsObject,
   tableTitles,
-} = require('../studyProgramme/studyProgrammeHelpers')
-const { inactiveStudyrights, graduatedStudyRights } = require('../studyProgramme/studyRightFinders')
-const { getStudyRightsByExtent, getStudentsByStudentnumbers, getTransfersIn } = require('./faculty')
-const { checkTransfers } = require('./facultyHelpers')
+} from '../studyProgramme/studyProgrammeHelpers'
+import { inactiveStudyrights, graduatedStudyRights } from '../studyProgramme/studyRightFinders'
+import { getStudyRightsByExtent, getStudentsByStudentnumbers, getTransfersIn } from './faculty'
+import { checkTransfers } from './facultyHelpers'
 
 const emptyTotals = () => {
   return {
@@ -64,9 +65,9 @@ const addTotalsProgramme = (programmeTableStats, progId, year, totals) => {
 const getStudentData = (students, facultyExtra, year, code) => {
   const data = { female: 0, male: 0, finnish: 0, otherCountries: 0, otherUnknown: 0 }
   students.forEach(({ genderCode, homeCountryEn }) => {
-    data.male += genderCode === '1' ? 1 : 0
-    data.female += genderCode === '2' ? 1 : 0
-    data.otherUnknown += ['0', '3'].includes(genderCode) ? 1 : 0
+    data.male += genderCode === GenderCode.MALE ? 1 : 0
+    data.female += genderCode === GenderCode.FEMALE ? 1 : 0
+    data.otherUnknown += [GenderCode.OTHER, GenderCode.UNKNOWN].includes(genderCode) ? 1 : 0
     data.finnish += homeCountryEn === 'Finland' ? 1 : 0
     data.otherCountries += homeCountryEn !== 'Finland' ? 1 : 0
     if (!Object.keys(facultyExtra[year][code]).includes(homeCountryEn) && homeCountryEn !== 'Finland') {
@@ -201,7 +202,7 @@ const getFacultyDataForYear = async ({
 }
 
 // Combines all the data for faculty students table
-const combineFacultyStudents = async (code, programmes, specialGroups, graduated) => {
+export const combineFacultyStudents = async (code, programmes, specialGroups, graduated) => {
   // Only academic years are considered
   const includeAllSpecials = specialGroups === 'SPECIAL_INCLUDED'
   const includeGraduated = graduated === 'GRADUATED_INCLUDED'
@@ -249,5 +250,3 @@ const combineFacultyStudents = async (code, programmes, specialGroups, graduated
   }
   return studentsData
 }
-
-module.exports = { combineFacultyStudents }

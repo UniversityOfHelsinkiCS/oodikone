@@ -1,5 +1,6 @@
 import { Column, CreatedAt, DataType, HasMany, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
+import { GenderCode } from '../types/genderCode'
 import { Credit } from './credit'
 import { Enrollment } from './enrollment'
 import { SemesterEnrollment } from './semesterEnrollment'
@@ -92,7 +93,7 @@ export class Student extends Model {
   home_country_en: string
 
   @Column(DataType.STRING)
-  gender_code: string
+  gender_code: GenderCode
 
   @Column(DataType.STRING)
   sis_person_id: string
