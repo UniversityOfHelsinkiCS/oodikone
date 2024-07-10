@@ -23,7 +23,7 @@ ENV SENTRY_RELEASE=$SENTRY_RELEASE
 
 COPY ./package*.json ./
 
-RUN npm ci
+RUN npm ci --include=dev
 
 COPY . .
 
