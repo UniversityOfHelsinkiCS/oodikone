@@ -178,7 +178,6 @@ volumes:
   kone-db-data:
   redis-data:
   sis-db-data:
-  sis-importer-db-data:
   sis-updater-scheduler-nodemod:
   sis-updater-worker-nodemod:
   user-db-data:
