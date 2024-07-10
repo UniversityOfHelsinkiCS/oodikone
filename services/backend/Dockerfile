@@ -36,6 +36,4 @@ RUN cp index.js dist/
 
 RUN find src -name '*.js' -exec cp --parents {} dist \;
 
-RUN npm prune --production
-
 CMD ["node", "dist/index.js"]
