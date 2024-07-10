@@ -21,8 +21,17 @@ ENV SENTRY_ENVIRONMENT=$SENTRY_ENVIRONMENT
 ARG SENTRY_RELEASE
 ENV SENTRY_RELEASE=$SENTRY_RELEASE
 
-COPY ./package* ./
-RUN npm ci --omit-dev
 COPY . .
 
-CMD ["node", "index.js"]
+RUN npm run tsc
+
+RUN cp -r config dist/
+RUN cp package.json dist/
+RUN cp package-lock.json dist/
+RUN cp index.js dist/
+
+RUN find src -name '*.js' -exec cp --parents {} dist \;
+
+RUN cd dist && npm ci --omit=dev
+
+CMD ["node", "dist/index.js"]

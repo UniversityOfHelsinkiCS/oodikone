@@ -5,7 +5,12 @@
     "module": "nodenext",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "outDir": "dist"
+    "outDir": "dist",
+    "rootDir": ".",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": false
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
+  "exclude": ["dist", "instrumented", "node_modules"]
 }
