@@ -27,7 +27,7 @@ RUN npm ci
 
 COPY . .
 
-RUN npx tsc
+RUN npm run build
 
 RUN cp -r config dist/
 RUN cp package.json dist/
