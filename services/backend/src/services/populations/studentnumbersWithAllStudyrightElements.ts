@@ -91,7 +91,6 @@ export const studentnumbersWithAllStudyrightElements = async ({
     group: [sequelize.col('studyright.studyrightid')],
     having: count('studyright_elements.code', studyRights.length, true),
     raw: true,
-    logging: console.log,
   })
 
   const studentnumbers = [...new Set(students.map(student => student.student_studentnumber))]
