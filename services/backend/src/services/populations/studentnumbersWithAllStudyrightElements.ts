@@ -1,8 +1,7 @@
 import { sortBy } from 'lodash'
-import { Op } from 'sequelize'
-
 import { dbConnections } from '../../database/connection'
 const { sequelize } = dbConnections
+import { Op } from 'sequelize'
 import { ElementDetail, Student, Studyright, StudyrightElement, Transfer } from '../../models'
 import { TagStudent } from '../../models/kone'
 import { count } from './shared'
@@ -35,7 +34,7 @@ export const studentnumbersWithAllStudyrightElements = async ({
     },
   }
 
-  const studentWhere = { where: {} }
+  const studentWhere: Record<string, any> = {}
   if (tag) {
     const taggedStudentnumbers = await TagStudent.findAll({
       attributes: ['studentnumber'],
@@ -68,7 +67,6 @@ export const studentnumbersWithAllStudyrightElements = async ({
         },
       ],
     },
-    group: [sequelize.col('studyright.studyrightid')],
     where: {
       [Op.or]: [
         {
@@ -90,8 +88,10 @@ export const studentnumbersWithAllStudyrightElements = async ({
       ...studyrightWhere,
     },
     ...studentWhere,
+    group: [sequelize.col('studyright.studyrightid')],
     having: count('studyright_elements.code', studyRights.length, true),
     raw: true,
+    logging: console.log,
   })
 
   const studentnumbers = [...new Set(students.map(student => student.student_studentnumber))]
