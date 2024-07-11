@@ -1,10 +1,10 @@
-const { uniqBy } = require('lodash')
-const { Op } = require('sequelize')
+import { uniqBy } from 'lodash'
+import { Op } from 'sequelize'
 
-const {
-  dbConnections: { sequelize },
-} = require('../../database/connection')
-const {
+import { dbConnections } from '../../database/connection'
+const { sequelize } = dbConnections
+import { ExtentCode } from '../../types/extentCode'
+import {
   Course,
   Credit,
   ElementDetail,
@@ -15,18 +15,18 @@ const {
   Studyright,
   StudyrightElement,
   Transfer,
-} = require('../../models')
-const {
+} from '../../models'
+import {
   formatFacultyProgramme,
   formatFacultyProgrammeStudents,
   formatFacultyStudyRight,
   formatFacultyThesisWriter,
   formatFacultyTransfer,
   formatOrganization,
-} = require('./facultyFormatHelpers')
-const { isNewProgramme, mapCodesToIds } = require('./facultyHelpers')
+} from './facultyFormatHelpers'
+import { isNewProgramme, mapCodesToIds } from './facultyHelpers'
 
-const transferredFaculty = async (programmeCodeIn, programmeCodeOut, start, end) =>
+export const transferredFaculty = async (programmeCodeIn, programmeCodeOut, start, end) =>
   (
     await Transfer.findAll({
       where: {
@@ -45,7 +45,7 @@ const transferredFaculty = async (programmeCodeIn, programmeCodeOut, start, end)
     })
   ).map(formatFacultyTransfer)
 
-const startedStudyrights = async (faculty, code, since, studyRightWhere) =>
+export const startedStudyrights = async (faculty, code, since, studyRightWhere) =>
   (
     await Studyright.findAll({
       include: [
@@ -55,10 +55,12 @@ const startedStudyrights = async (faculty, code, since, studyRightWhere) =>
           where: {
             code,
           },
-          include: {
-            model: ElementDetail,
-            required: true,
-          },
+          include: [
+            {
+              model: ElementDetail,
+              required: true,
+            },
+          ],
         },
       ],
       where: {
@@ -71,7 +73,7 @@ const startedStudyrights = async (faculty, code, since, studyRightWhere) =>
     })
   ).map(formatFacultyStudyRight)
 
-const graduatedStudyrights = async (faculty, code, since, studyrightWhere) =>
+export const graduatedStudyrights = async (faculty, code, since, studyrightWhere) =>
   (
     await Studyright.findAll({
       include: [
@@ -81,10 +83,12 @@ const graduatedStudyrights = async (faculty, code, since, studyrightWhere) =>
           where: {
             code,
           },
-          include: {
-            model: ElementDetail,
-            required: true,
-          },
+          include: [
+            {
+              model: ElementDetail,
+              required: true,
+            },
+          ],
         },
       ],
       where: {
@@ -98,7 +102,7 @@ const graduatedStudyrights = async (faculty, code, since, studyrightWhere) =>
     })
   ).map(formatFacultyStudyRight)
 
-const studyrightsByRightStartYear = async (faculty, code, since, graduated = 1) =>
+export const studyrightsByRightStartYear = async (faculty, code, since, graduated = 1) =>
   (
     await Studyright.findAll({
       include: [
@@ -109,10 +113,12 @@ const studyrightsByRightStartYear = async (faculty, code, since, graduated = 1) 
             code,
           },
           required: true,
-          include: {
-            model: ElementDetail,
-            required: true,
-          },
+          include: [
+            {
+              model: ElementDetail,
+              required: true,
+            },
+          ],
         },
       ],
       where: {
@@ -125,7 +131,7 @@ const studyrightsByRightStartYear = async (faculty, code, since, graduated = 1) 
     })
   ).map(formatFacultyStudyRight)
 
-const getStudyRightsByExtent = async (faculty, startDate, endDate, code, extents, graduated) =>
+export const getStudyRightsByExtent = async (faculty, startDate, endDate, code, extents, graduated) =>
   (
     await Studyright.findAll({
       include: {
@@ -135,10 +141,12 @@ const getStudyRightsByExtent = async (faculty, startDate, endDate, code, extents
         where: {
           code,
         },
-        include: {
-          model: ElementDetail,
-          attributes: [],
-        },
+        include: [
+          {
+            model: ElementDetail,
+            attributes: [],
+          },
+        ],
       },
       group: [sequelize.col('studyright.studyrightid')],
       where: {
@@ -168,7 +176,7 @@ const getStudyRightsByExtent = async (faculty, startDate, endDate, code, extents
     })
   ).map(formatFacultyStudyRight)
 
-const getStudyRightsByBachelorStart = async (faculty, startDate, endDate, code, extents, graduated) =>
+export const getStudyRightsByBachelorStart = async (faculty, startDate, endDate, code, extents, graduated) =>
   (
     await Studyright.findAll({
       include: {
@@ -196,7 +204,7 @@ const getStudyRightsByBachelorStart = async (faculty, startDate, endDate, code, 
     })
   ).map(formatFacultyStudyRight)
 
-const getStudentsByStudentnumbers = async studentnumbers =>
+export const getStudentsByStudentnumbers = async studentnumbers =>
   (
     await Student.findAll({
       where: {
@@ -209,16 +217,16 @@ const getStudentsByStudentnumbers = async studentnumbers =>
     })
   ).map(formatFacultyProgrammeStudents)
 
-const hasMasterRight = async id => {
+export const hasMasterRight = async id => {
   return await Studyright.findOne({
     where: {
       studyrightid: id,
-      extentcode: 2,
+      extentcode: ExtentCode.MASTER,
     },
   })
 }
 
-const transferredInsideFaculty = async (programmes, allProgrammeCodes, since) =>
+export const transferredInsideFaculty = async (programmes, allProgrammeCodes, since) =>
   (
     await Transfer.findAll({
       where: {
@@ -231,7 +239,7 @@ const transferredInsideFaculty = async (programmes, allProgrammeCodes, since) =>
     })
   ).map(formatFacultyTransfer)
 
-const transferredAway = async (programmes, allProgrammeCodes, since) =>
+export const transferredAway = async (programmes, allProgrammeCodes, since) =>
   (
     await Transfer.findAll({
       where: {
@@ -246,7 +254,7 @@ const transferredAway = async (programmes, allProgrammeCodes, since) =>
     })
   ).map(formatFacultyTransfer)
 
-const transferredTo = async (programmes, allProgrammeCodes, since) =>
+export const transferredTo = async (programmes, allProgrammeCodes, since) =>
   (
     await Transfer.findAll({
       where: {
@@ -261,7 +269,7 @@ const transferredTo = async (programmes, allProgrammeCodes, since) =>
     })
   ).map(formatFacultyTransfer)
 
-const degreeProgrammesOfFaculty = async facultyCode =>
+export const degreeProgrammesOfFaculty = async facultyCode =>
   // Some programmenames are different, causing this to return multiples of same codes.
   // Hence the uniqBy
   uniqBy(
@@ -282,7 +290,7 @@ const degreeProgrammesOfFaculty = async facultyCode =>
     'code'
   )
 
-const facultyOrganizationId = async faculty => {
+export const facultyOrganizationId = async faculty => {
   return await Organization.findOne({
     attributes: ['id'],
     where: {
@@ -291,7 +299,7 @@ const facultyOrganizationId = async faculty => {
   })
 }
 
-const getChildOrganizations = async facultyId =>
+export const getChildOrganizations = async facultyId =>
   (
     await Organization.findAll({
       attributes: ['id', 'name', 'code', 'parent_id'],
@@ -301,7 +309,7 @@ const getChildOrganizations = async facultyId =>
     })
   ).map(formatOrganization)
 
-const thesisWriters = async (provider, since, thesisTypes, students) =>
+export const thesisWriters = async (provider, since, thesisTypes, students) =>
   (
     await Credit.findAll({
       attributes: ['id', 'course_code', 'attainment_date', 'student_studentnumber'],
@@ -314,14 +322,16 @@ const thesisWriters = async (provider, since, thesisTypes, students) =>
             [Op.in]: thesisTypes,
           },
         },
-        include: {
-          model: Organization,
-          attributes: [],
-          required: true,
-          where: {
-            code: provider,
+        include: [
+          {
+            model: Organization,
+            attributes: [],
+            required: true,
+            where: {
+              code: provider,
+            },
           },
-        },
+        ],
       },
       where: {
         credittypecode: 4,
@@ -338,7 +348,7 @@ const thesisWriters = async (provider, since, thesisTypes, students) =>
 
 // Some programme modules are not directly associated to a faculty (organization).
 // Some have intermediate organizations, such as department, so the connection must be digged up
-const findFacultyProgrammeCodes = async (faculty, programmeFilter) => {
+export const findFacultyProgrammeCodes = async (faculty, programmeFilter) => {
   let allProgrammes = []
   let allProgrammeCodes = []
 
@@ -391,39 +401,20 @@ const findFacultyProgrammeCodes = async (faculty, programmeFilter) => {
   return allProgrammes
 }
 
-const getTransferredToAndAway = async (programmeCodes, allProgrammeCodes, since) => {
+export const getTransferredToAndAway = async (programmeCodes, allProgrammeCodes, since) => {
   const awayTransfers = await transferredAway(programmeCodes, allProgrammeCodes, since)
   const toTransfers = await transferredTo(programmeCodes, allProgrammeCodes, since)
   return [...toTransfers, ...awayTransfers]
 }
 
-const getTransferredInside = async (programmeCodes, allProgrammeCodes, since) => {
+export const getTransferredInside = async (programmeCodes, allProgrammeCodes, since) => {
   return await transferredInsideFaculty(programmeCodes, allProgrammeCodes, since)
 }
 
-const getTransfersOut = async (programmeCode, start, end) => {
+export const getTransfersOut = async (programmeCode, start, end) => {
   return await transferredFaculty([], [programmeCode], start, end)
 }
 
-const getTransfersIn = async (programmeCode, start, end) => {
+export const getTransfersIn = async (programmeCode, start, end) => {
   return await transferredFaculty([programmeCode], [], start, end)
-}
-
-module.exports = {
-  startedStudyrights,
-  graduatedStudyrights,
-  studyrightsByRightStartYear,
-  hasMasterRight,
-  transferredInsideFaculty,
-  transferredAway,
-  transferredTo,
-  thesisWriters,
-  findFacultyProgrammeCodes,
-  getTransferredToAndAway,
-  getTransferredInside,
-  getStudyRightsByExtent,
-  getStudyRightsByBachelorStart,
-  getStudentsByStudentnumbers,
-  getTransfersOut,
-  getTransfersIn,
 }
