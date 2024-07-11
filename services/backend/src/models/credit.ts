@@ -75,6 +75,9 @@ export class Credit extends Model {
   @Column(DataType.STRING)
   semester_composite: string
 
+  @Column(DataType.INTEGER)
+  semestercode: number
+
   @Column(DataType.BOOLEAN)
   isStudyModule: boolean
 
