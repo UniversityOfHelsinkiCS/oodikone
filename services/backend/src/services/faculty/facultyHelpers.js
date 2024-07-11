@@ -40,7 +40,7 @@ const formatFacultyStudyRight = studyright => {
     active: 'active',
     prioritycode: 'prioritycode',
     extentcode: 'extentcode',
-    studentnumber: 'studentStudentnumber',
+    studentnumber: 'student_studentnumber',
     studyrightElements: 'studyright_elements',
     facultyCode: 'facultyCode',
   })

@@ -38,7 +38,7 @@ export class Student extends Model {
   @HasMany(() => SISStudyRight)
   studyRights: SISStudyRight[]
 
-  @HasMany(() => Studyright, { foreignKey: 'studentStudentnumber', sourceKey: 'studentnumber' })
+  @HasMany(() => Studyright)
   studyrights: Studyright[]
 
   @HasMany(() => StudyrightElement, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })

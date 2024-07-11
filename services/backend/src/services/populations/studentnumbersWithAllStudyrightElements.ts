@@ -94,11 +94,11 @@ export const studentnumbersWithAllStudyrightElements = async ({
     raw: true,
   })
 
-  const studentnumbers = [...new Set(students.map(student => student.studentStudentnumber))]
+  const studentnumbers = [...new Set(students.map(student => student.student_studentnumber))]
   const rights = await Studyright.findAll({
     attributes: ['studyrightid'],
     where: {
-      studentStudentnumber: {
+      student_studentnumber: {
         [Op.in]: studentnumbers,
       },
     },

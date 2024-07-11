@@ -304,11 +304,11 @@ const getOptionsForStudents = async (students, code, level) => {
         [Op.in]: students,
       },
     },
-    attributes: ['studentStudentnumber', 'givendate'],
+    attributes: ['student_studentnumber', 'givendate'],
   })
 
   const currentStudyrightsMap = currentStudyrights.reduce((obj, studyright) => {
-    obj[studyright.studentStudentnumber] = studyright.givendate
+    obj[studyright.student_studentnumber] = studyright.givendate
     return obj
   }, {})
 
@@ -340,14 +340,16 @@ const getOptionsForStudents = async (students, code, level) => {
       },
     },
     order: [[{ model: StudyrightElement, as: 'studyright_elements' }, 'startdate', 'DESC']],
-    attributes: ['studentStudentnumber', 'givendate'],
+    attributes: ['student_studentnumber', 'givendate'],
   })
 
   return options
-    .filter(m => m.studentStudentnumber in currentStudyrightsMap)
-    .filter(m => m.givendate.getTime() === currentStudyrightsMap[m.studentStudentnumber].getTime())
+    .filter(studyRight => studyRight.student_studentnumber in currentStudyrightsMap)
+    .filter(
+      studyRight => studyRight.givendate.getTime() === currentStudyrightsMap[studyRight.student_studentnumber].getTime()
+    )
     .reduce((obj, element) => {
-      obj[element.studentStudentnumber] = {
+      obj[element.student_studentnumber] = {
         code: element.studyright_elements[0].code,
         name: element.studyright_elements[0].element_detail.name,
       }

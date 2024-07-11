@@ -26,7 +26,7 @@ import { Transfer } from './transfer'
 })
 export class Studyright extends Model {
   @PrimaryKey
-  @Column(DataType.INTEGER)
+  @Column(DataType.STRING)
   studyrightid: string
 
   @HasMany(() => StudyrightElement, { foreignKey: 'studyrightid', sourceKey: 'studyrightid' })
@@ -42,7 +42,7 @@ export class Studyright extends Model {
   @HasMany(() => Enrollment, { foreignKey: 'studyright_id', constraints: false })
   enrollments: Enrollment[]
 
-  @BelongsTo(() => Student, { foreignKey: 'studentStudentnumber', targetKey: 'studentnumber' })
+  @BelongsTo(() => Student)
   student: Student
 
   @BelongsTo(() => Organization, { targetKey: 'code' })
@@ -76,8 +76,8 @@ export class Studyright extends Model {
   cancelled: boolean
 
   @ForeignKey(() => Student)
-  @Column({ field: 'student_studentnumber', type: DataType.STRING })
-  studentStudentnumber: string
+  @Column(DataType.STRING)
+  student_studentnumber: string
 
   @ForeignKey(() => Organization)
   @Column({ field: 'faculty_code', type: DataType.STRING })

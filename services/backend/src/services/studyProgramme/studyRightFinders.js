@@ -212,7 +212,7 @@ const getStudyRights = async students =>
         'semesterEnrollments',
       ],
       where: {
-        studentStudentnumber: students,
+        student_studentnumber: students,
       },
       include: [
         {
