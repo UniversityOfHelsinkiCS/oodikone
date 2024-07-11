@@ -29,6 +29,4 @@ COPY . .
 
 RUN npm run build
 
-RUN npm prune
-
 CMD ["node", "dist/index.js"]
