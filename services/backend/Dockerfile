@@ -29,11 +29,6 @@ COPY . .
 
 RUN npm run build
 
-RUN cp -r config dist/
-RUN cp package.json dist/
-RUN cp package-lock.json dist/
-RUN cp index.js dist/
-
-RUN find src -name '*.js' -exec cp --parents {} dist \;
+RUN npm prune
 
 CMD ["node", "dist/index.js"]
