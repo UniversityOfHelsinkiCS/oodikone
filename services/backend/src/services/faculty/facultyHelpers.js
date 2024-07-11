@@ -13,7 +13,7 @@ const getFacultyList = async () => {
 
 const findRightProgramme = (studyrightElements, code) => {
   let programme = ''
-  let programmeName = ''
+  let programmeName = {}
   let studyRightElement = null
 
   if (studyrightElements) {

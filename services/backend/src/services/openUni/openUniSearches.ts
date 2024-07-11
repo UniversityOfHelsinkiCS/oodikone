@@ -1,10 +1,11 @@
-const { Op } = require('sequelize')
+import { Op } from 'sequelize'
 
-const { Course, Credit, Enrollment, Student, SISStudyRight } = require('../../models')
-const { OpenUniPopulationSearch } = require('../../models/kone')
-const { mapCourseInfo, mapOpenCredits, mapOpenEnrollments, mapStudentInfo } = require('./openUniHelpers')
+import { Course, Credit, Enrollment, Student, SISStudyRight } from '../../models'
+import { OpenUniPopulationSearch } from '../../models/kone'
+import { ExtentCode } from '../../types/extentCode'
+import { mapCourseInfo, mapOpenCredits, mapOpenEnrollments, mapStudentInfo } from './openUniHelpers'
 
-const getCredits = async (courseCodes, startdate) =>
+export const getCredits = async (courseCodes: string[], startdate: Date) =>
   (
     await Credit.findAll({
       attributes: ['attainment_date', 'course_code', 'grade', 'student_studentnumber'],
@@ -19,19 +20,19 @@ const getCredits = async (courseCodes, startdate) =>
     })
   ).map(mapOpenCredits)
 
-const getStudentInfo = async students =>
+export const getStudentInfo = async (studentNumbers: string[]) =>
   (
     await Student.findAll({
       attributes: ['studentnumber', 'email', 'secondary_email'],
       where: {
         studentnumber: {
-          [Op.in]: students,
+          [Op.in]: studentNumbers,
         },
       },
     })
   ).map(mapStudentInfo)
 
-const getEnrollments = async (courseCodes, startdate, enddate) =>
+export const getEnrollments = async (courseCodes: string[], startDate: Date, endDate: Date) =>
   (
     await Enrollment.findAll({
       attributes: ['course_code', 'enrollment_date_time', 'studentnumber'],
@@ -42,15 +43,15 @@ const getEnrollments = async (courseCodes, startdate, enddate) =>
         is_open: true,
         enrollment_date_time: {
           [Op.and]: {
-            [Op.lte]: enddate,
-            [Op.gte]: startdate,
+            [Op.lte]: endDate,
+            [Op.gte]: startDate,
           },
         },
       },
     })
   ).map(mapOpenEnrollments)
 
-const getCourseNames = async courseCodes =>
+export const getCourseNames = async (courseCodes: string[]) =>
   (
     await Course.findAll({
       attributes: ['code', 'name'],
@@ -62,21 +63,27 @@ const getCourseNames = async courseCodes =>
     })
   ).map(mapCourseInfo)
 
-const getStudyRights = async students => {
+export const getStudyRights = async (studentNumbers: string[]) => {
   return await SISStudyRight.findAll({
     attributes: ['startDate', 'endDate', 'studentNumber'],
     where: {
       studentNumber: {
-        [Op.in]: students.length > 0 ? students : { [Op.not]: null },
+        [Op.in]: studentNumbers.length > 0 ? studentNumbers : { [Op.not]: null },
       },
       extentCode: {
-        [Op.in]: [1, 2, 3, 4, 5],
+        [Op.in]: [
+          ExtentCode.BACHELOR,
+          ExtentCode.BACHELOR_AND_MASTER,
+          ExtentCode.MASTER,
+          ExtentCode.LICENTIATE,
+          ExtentCode.DOCTOR,
+        ],
       },
     },
   })
 }
 
-const getOpenUniSearchesByUser = async userId => {
+export const getOpenUniSearchesByUser = async (userId: bigint) => {
   return await OpenUniPopulationSearch.findAll({
     where: {
       userId,
@@ -84,7 +91,7 @@ const getOpenUniSearchesByUser = async userId => {
   })
 }
 
-const createOpenUniPopulationSearch = async (userId, name, courseCodes) => {
+export const createOpenUniPopulationSearch = async (userId: bigint, name: string, courseCodes: string[]) => {
   return await OpenUniPopulationSearch.create({
     userId,
     name,
@@ -92,7 +99,7 @@ const createOpenUniPopulationSearch = async (userId, name, courseCodes) => {
   })
 }
 
-const updateOpenUniPopulationSearch = async (userId, id, courseCodes) => {
+export const updateOpenUniPopulationSearch = async (userId: bigint, id: bigint, courseCodes: string[]) => {
   const searchToUpdate = await OpenUniPopulationSearch.findOne({
     where: {
       userId,
@@ -100,27 +107,18 @@ const updateOpenUniPopulationSearch = async (userId, id, courseCodes) => {
     },
   })
 
-  if (!searchToUpdate) return null
+  if (!searchToUpdate) {
+    return null
+  }
+
   return await searchToUpdate.update({ courseCodes })
 }
 
-const deleteOpenUniSearch = async (userId, id) => {
+export const deleteOpenUniSearch = async (userId: bigint, id: bigint) => {
   return await OpenUniPopulationSearch.destroy({
     where: {
       userId,
       id,
     },
   })
-}
-
-module.exports = {
-  getCredits,
-  getEnrollments,
-  getStudyRights,
-  getStudentInfo,
-  getCourseNames,
-  getOpenUniSearchesByUser,
-  createOpenUniPopulationSearch,
-  updateOpenUniPopulationSearch,
-  deleteOpenUniSearch,
 }
