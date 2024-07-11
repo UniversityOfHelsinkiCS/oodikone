@@ -114,7 +114,7 @@ const getFacultyDataForYear = async ({
     if (!Object.keys(facultyExtra.Total).includes(code)) facultyExtra.Total[code] = {}
 
     const toTransfers = await getTransfersIn(code, startDate, endDate)
-    const allStudyrights = await getStudyRightsByExtent(faculty, startDate, endDate, code, extents, graduated)
+    const allStudyrights: any = await getStudyRightsByExtent(faculty, startDate, endDate, code, extents, graduated)
     let allStudents = []
     if (includeAllSpecials) {
       allStudents = [...new Set([...allStudyrights.map(studyright => studyright.studentnumber)])]
