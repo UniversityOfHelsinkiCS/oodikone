@@ -41,8 +41,6 @@ import { User } from '../models/user'
 
 import logger from '../util/logger'
 
-const { SIS_DB_URL } = process.env
-
 class DbConnection extends EventEmitter {
   sequelize: Sequelize
   RETRY_ATTEMPTS: number
@@ -52,7 +50,7 @@ class DbConnection extends EventEmitter {
     this.RETRY_ATTEMPTS = 15
     this.established = false
 
-    this.sequelize = new Sequelize(SIS_DB_URL, {
+    this.sequelize = new Sequelize(conf.SIS_DB_URL as string, {
       dialect: 'postgres',
       pool: {
         max: 25,

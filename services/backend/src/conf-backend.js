@@ -41,7 +41,7 @@ const serviceProvider = process.env.SERVICE_PROVIDER || 'Toska'
 const configLogoutUrl = serviceProvider === 'Toska' ? undefined : process.env.LOGOUT_URL
 
 // Other stuff
-const { DB_URL_KONE, DB_URL_USER, SECRET_TOKEN, SIS_UPDATER_URL, CRYPT_KEY } = process.env
+const { DB_URL_KONE, DB_URL_USER, SECRET_TOKEN, SIS_DB_URL, SIS_UPDATER_URL, CRYPT_KEY } = process.env
 
 let DB_MAX_CONNECTIONS = parseInt(process.env.DB_MAX_CONNECTIONS, 10)
 if (Number.isNaN(DB_MAX_CONNECTIONS)) {
@@ -72,6 +72,7 @@ module.exports = {
   USER_PASSWORD,
   SIS_PASSWORD,
   requiredGroup,
+  SIS_DB_URL,
   SIS_UPDATER_URL,
   runningInCI,
   sentryRelease,
