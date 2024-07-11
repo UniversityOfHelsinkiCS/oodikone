@@ -2,38 +2,41 @@ import { Op } from 'sequelize'
 import { ignoredFacultyCodes } from '../../../config/organisationConstants'
 
 import { codes } from '../../../config/programmeCodes'
+import { Organization } from '../../models'
+import { ExtentCode } from '../../types/extentCode'
 import { mapObject } from '../../util/map'
 import { getOrganizations } from '../organizations'
 
-export const getFaculties = async () => {
+export const getFaculties = async (): Promise<Organization[]> => {
   const faculties = (await getOrganizations()).filter(faculty => !ignoredFacultyCodes.includes(faculty.code))
   return faculties
 }
 
-export const getSortedFaculties = async () => {
+export const getSortedFaculties = async (): Promise<Organization[]> => {
   const faculties = await getFaculties()
   return faculties.sort((a, b) => (a.name.fi > b.name.fi ? 1 : -1))
 }
 
-const findRightProgramme = (studyrightElements, code) => {
+export const findRightProgramme = (studyRightElements: any, code: string) => {
   let programme = ''
   let programmeName = {}
   let studyRightElement = null
 
-  if (studyrightElements) {
-    studyRightElement = studyrightElements
-      .filter(sre => sre.element_detail.type === 20)
-      .filter(sre => sre.code === code)
+  if (studyRightElements) {
+    studyRightElement = studyRightElements
+      .filter(element => element.element_detail.type === 20)
+      .filter(element => element.code === code)
 
     if (studyRightElement.length > 0) {
       programme = studyRightElement[0].code
       programmeName = studyRightElement[0].element_detail.name
     }
   }
+
   return { programme, programmeName }
 }
 
-const formatFacultyStudyRight = studyright => {
+export const formatFacultyStudyRight = studyright => {
   return mapObject(studyright, {
     studyrightid: 'studyrightid',
     studystartdate: 'studystartdate',
@@ -50,7 +53,7 @@ const formatFacultyStudyRight = studyright => {
   })
 }
 
-const formatFacultyProgrammeStudents = student => {
+export const formatFacultyProgrammeStudents = student => {
   const { studentnumber, home_country_en, gender_code, semester_enrollments } = student
   return {
     stundetNumber: studentnumber,
@@ -59,7 +62,8 @@ const formatFacultyProgrammeStudents = student => {
     semesters: semester_enrollments.map(s => s.dataValues),
   }
 }
-const formatFacultyTransfer = transfer => {
+
+export const formatFacultyTransfer = transfer => {
   return mapObject(transfer, {
     sourcecode: 'sourcecode',
     targetcode: 'targetcode',
@@ -69,14 +73,14 @@ const formatFacultyTransfer = transfer => {
   })
 }
 
-const formatFacultyProgramme = programme => {
+export const formatFacultyProgramme = programme => {
   return mapObject(programme, {
     code: 'code',
     name: 'name',
   })
 }
 
-const formatFacultyThesisWriter = credit => {
+export const formatFacultyThesisWriter = credit => {
   return mapObject(credit, {
     course_code: 'course_code',
     credits: 'credits',
@@ -86,23 +90,23 @@ const formatFacultyThesisWriter = credit => {
   })
 }
 
-const formatOrganization = org => {
+export const formatOrganization = org => {
   const { id, name, code, parent_id } = org
   return { id, name, code, parentId: parent_id }
 }
 
 const newProgrammes = [/^KH/, /^MH/, /^T/, /^LI/, /^K-/, /^FI/, /^00901$/, /^00910$/]
 
-const isNewProgramme = code => {
+export const isNewProgramme = (programmeCode: string) => {
   for (let i = 0; i < newProgrammes.length; i++) {
-    if (newProgrammes[i].test(code)) {
+    if (newProgrammes[i].test(programmeCode)) {
       return true
     }
   }
   return false
 }
 
-const checkTransfers = (studyright, insideTransfersStudyrights, transfersToOrAwayStudyrights) => {
+export const checkTransfers = (studyright, insideTransfersStudyrights, transfersToOrAwayStudyrights) => {
   const allTransfers = [
     ...insideTransfersStudyrights.map(studyright => studyright.studentnumber),
     ...transfersToOrAwayStudyrights.map(studyright => studyright.studentnumber),
@@ -112,46 +116,41 @@ const checkTransfers = (studyright, insideTransfersStudyrights, transfersToOrAwa
 
 const commissionedProgrammes = ['KH50_009', 'MH50_015', 'T923103-N']
 
-const checkCommissioned = studyright => {
+export const checkCommissioned = studyright => {
   return studyright.studyrightElements.some(element => commissionedProgrammes.includes(element.code))
 }
 
-const getExtentFilter = includeAllSpecials => {
-  const filteredExtents = [16] // always filter out secondary subject students
+export const getExtentFilter = (includeAllSpecials: boolean) => {
+  const filteredExtents = [ExtentCode.STUDIES_FOR_SECONDARY_SCHOOL_STUDENTS]
   if (!includeAllSpecials) {
-    filteredExtents.push(6, 7, 9, 13, 14, 18, 22, 23, 34, 99)
+    filteredExtents.push(
+      ExtentCode.CONTINUING_EDUCATION,
+      ExtentCode.EXCHANGE_STUDIES,
+      ExtentCode.OPEN_UNIVERSITY_STUDIES,
+      ExtentCode.NON_DEGREE_PEGAGOGICAL_STUDIES_FOR_TEACHERS,
+      ExtentCode.CONTRACT_TRAINING,
+      ExtentCode.SPECIALIZATION_STUDIES,
+      ExtentCode.NON_DEGREE_PROGRAMME_FOR_SPECIAL_EDUCATION_TEACHERS,
+      ExtentCode.SPECIALIST_TRAINING_IN_MEDICINE_AND_DENTISTRY,
+      ExtentCode.EXCHANGE_STUDIES_POSTGRADUATE,
+      ExtentCode.NON_DEGREE_STUDIES
+    )
   }
-  const studyrightWhere = {
+  const studyRightWhere = {
     extentcode: {
       [Op.notIn]: filteredExtents,
     },
   }
-  return studyrightWhere
+  return studyRightWhere
 }
 
-const mapCodesToIds = data => {
+export const mapCodesToIds = data => {
   // Add programme id e.g. TKT
-  const keys = Object.keys(codes)
-  for (const prog of data) {
-    if (keys.includes(prog.code)) {
-      prog.progId = codes[prog.code]
+  for (const programme of data) {
+    if (Object.keys(codes).includes(programme.code)) {
+      programme.progId = codes[programme.code]
     } else {
-      prog.progId = prog.code
+      programme.progId = programme.code
     }
   }
-}
-
-module.exports = {
-  findRightProgramme,
-  formatFacultyProgramme,
-  formatFacultyProgrammeStudents,
-  formatFacultyStudyRight,
-  formatFacultyTransfer,
-  formatFacultyThesisWriter,
-  formatOrganization,
-  isNewProgramme,
-  checkTransfers,
-  checkCommissioned,
-  getExtentFilter,
-  mapCodesToIds,
 }
