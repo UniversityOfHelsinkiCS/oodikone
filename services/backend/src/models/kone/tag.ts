@@ -1,4 +1,4 @@
-import { BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript'
+import { AutoIncrement, BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript'
 
 import { TagStudent } from './tagStudent'
 
@@ -8,6 +8,7 @@ import { TagStudent } from './tagStudent'
 })
 export class Tag extends Model {
   @PrimaryKey
+  @AutoIncrement
   @ForeignKey(() => TagStudent)
   @Column(DataType.BIGINT)
   tag_id: bigint
