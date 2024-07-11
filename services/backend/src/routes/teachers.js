@@ -1,6 +1,6 @@
 const router = require('express').Router()
 
-const { isFaculty, providersOfFaculty } = require('../services/organisations')
+const { isFaculty, providersOfFaculty } = require('../services/organizations')
 const { bySearchTerm, yearlyStatistics, teacherStats } = require('../services/teachers')
 const { ID, getTeacherStats, findAndSaveTeachers, getCategoriesAndYears } = require('../services/topteachers')
 const { getFullStudyProgrammeRights, splitByEmptySpace } = require('../util')

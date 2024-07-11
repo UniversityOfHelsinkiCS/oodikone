@@ -4,7 +4,7 @@ const { facultyCodes } = require('../../config/organisationConstants')
 const { dbConnections } = require('../database/connection')
 const { Organization } = require('../models')
 
-const faculties = () =>
+const getOrganizations = () =>
   Organization.findAll({
     where: {
       code: {
@@ -28,7 +28,7 @@ const providersOfFaculty = async facultyCode => {
 const isFaculty = facultyCode => facultyCodes.includes(facultyCode)
 
 module.exports = {
-  faculties,
+  getOrganizations,
   isFaculty,
   providersOfFaculty,
 }

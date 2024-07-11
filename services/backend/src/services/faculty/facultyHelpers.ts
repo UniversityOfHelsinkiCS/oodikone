@@ -1,14 +1,18 @@
-const { Op } = require('sequelize')
-const { ignoredFacultyCodes } = require('../../../config/organisationConstants')
+import { Op } from 'sequelize'
+import { ignoredFacultyCodes } from '../../../config/organisationConstants'
 
-const { codes } = require('../../../config/programmeCodes')
-const { mapObject } = require('../../util/map')
-const { faculties } = require('../organisations')
+import { codes } from '../../../config/programmeCodes'
+import { mapObject } from '../../util/map'
+import { getOrganizations } from '../organizations'
 
-const getFacultyList = async () => {
-  const facultyList = (await faculties()).filter(faculty => !ignoredFacultyCodes.includes(faculty.code))
-  facultyList.sort((a, b) => (a.name.fi > b.name.fi ? 1 : -1))
-  return facultyList
+export const getFaculties = async () => {
+  const faculties = (await getOrganizations()).filter(faculty => !ignoredFacultyCodes.includes(faculty.code))
+  return faculties
+}
+
+export const getSortedFaculties = async () => {
+  const faculties = await getFaculties()
+  return faculties.sort((a, b) => (a.name.fi > b.name.fi ? 1 : -1))
 }
 
 const findRightProgramme = (studyrightElements, code) => {
@@ -138,7 +142,6 @@ const mapCodesToIds = data => {
 }
 
 module.exports = {
-  getFacultyList,
   findRightProgramme,
   formatFacultyProgramme,
   formatFacultyProgrammeStudents,

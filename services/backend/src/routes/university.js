@@ -2,7 +2,7 @@ const router = require('express').Router()
 
 const { magicFacultyCode } = require('../../config/organisationConstants')
 const { serviceProvider } = require('../conf-backend')
-const { getFacultyList } = require('../services/faculty/facultyHelpers')
+const { getSortedFaculties } = require('../services/faculty/facultyHelpers')
 const { getFacultyProgressStats, getGraduationStats } = require('../services/faculty/facultyService')
 const { getMedian } = require('../services/studyProgramme/studyProgrammeHelpers')
 
@@ -11,7 +11,7 @@ const degreeNames = ['bachelor', 'bachelorMaster', 'master', 'licentiate', 'doct
 router.get('/allprogressstats', async (req, res) => {
   const specialGroups = req.query?.specialsIncluded === 'true' ? 'SPECIAL_INCLUDED' : 'SPECIAL_EXCLUDED'
   const graduated = req.query?.graduated
-  const allFaculties = await getFacultyList()
+  const allFaculties = await getSortedFaculties()
   const facultyCodes = allFaculties.map(faculty => faculty.code)
   const codeToData = {}
 
@@ -88,7 +88,7 @@ router.get('/allprogressstats', async (req, res) => {
 
 router.get('/allgraduationstats', async (_req, res) => {
   const degreeNames = ['bachelor', 'bcMsCombo', 'master', 'licentiate', 'doctor']
-  const allFaculties = await getFacultyList()
+  const allFaculties = await getSortedFaculties()
   const facultyCodes = allFaculties.map(faculty => faculty.code)
   const facultyData = {}
   const timesArrays = [] // keep book of these to null them in the end, large lists not used in frontend

@@ -4,7 +4,7 @@ const auth = require('../middleware/auth')
 const { combineFacultyBasics } = require('../services/faculty/facultyBasics')
 const { getFacultyCredits } = require('../services/faculty/facultyCredits')
 const { countGraduationTimes } = require('../services/faculty/facultyGraduationTimes')
-const { getFacultyList } = require('../services/faculty/facultyHelpers')
+const { getSortedFaculties } = require('../services/faculty/facultyHelpers')
 const {
   getProgrammes,
   getBasicStats,
@@ -28,8 +28,8 @@ const logger = require('../util/logger')
 // Some of them have been copied here and slightly edited for faculty purpose.
 
 router.get('/', async (_req, res) => {
-  const facultyList = await getFacultyList()
-  res.json(facultyList)
+  const faculties = await getSortedFaculties()
+  res.json(faculties)
 })
 
 router.get('/:id/basicstats', auth.roles(['facultyStatistics', 'katselmusViewer']), async (req, res) => {

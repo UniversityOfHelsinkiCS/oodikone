@@ -10,6 +10,7 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
+import { Name } from '../types/name'
 import { Course } from './course'
 import { CourseProvider } from './courseProvider'
 import { ProgrammeModule } from './programmeModule'
@@ -29,8 +30,8 @@ export class Organization extends Model {
   @Column(DataType.STRING)
   code: string
 
-  @Column(DataType.STRING)
-  name: object
+  @Column(DataType.JSONB)
+  name: Name
 
   @Column(DataType.STRING)
   parent_id: string
