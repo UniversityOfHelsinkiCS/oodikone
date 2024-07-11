@@ -11,6 +11,7 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
+import { ExtentCode } from '../types/extentCode'
 import { Organization } from './organization'
 import { SISStudyRightElement } from './SISStudyRightElement'
 import { Student } from './student'
@@ -54,7 +55,7 @@ export class SISStudyRight extends Model {
   student: Student
 
   @Column(DataType.INTEGER)
-  extentCode: number
+  extentCode: ExtentCode
 
   @Column(DataType.STRING)
   admissionType: string

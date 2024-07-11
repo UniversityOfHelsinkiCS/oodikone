@@ -11,6 +11,7 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
+import { ExtentCode } from '../types/extentCode'
 import { Enrollment } from './enrollment'
 import { Organization } from './organization'
 import { Student } from './student'
@@ -31,9 +32,6 @@ export class Studyright extends Model {
 
   @HasMany(() => StudyrightElement, { foreignKey: 'studyrightid', sourceKey: 'studyrightid' })
   studyright_elements: StudyrightElement[]
-
-  @BelongsTo(() => StudyrightExtent, { foreignKey: 'extentcode', targetKey: 'extentcode' })
-  studyrightExtent: StudyrightExtent
 
   @ForeignKey(() => StudyrightElement)
   @Column(DataType.STRING)
@@ -87,7 +85,10 @@ export class Studyright extends Model {
   prioritycode: number
 
   @Column(DataType.INTEGER)
-  extentcode: number
+  extentcode: ExtentCode
+
+  @BelongsTo(() => StudyrightExtent, { foreignKey: 'extentcode', targetKey: 'extentcode' })
+  studyrightExtent: StudyrightExtent
 
   @Column(DataType.STRING)
   admission_type: string

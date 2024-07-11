@@ -1,5 +1,5 @@
-import { Sequelize } from 'sequelize-typescript'
 import EventEmitter from 'events'
+import { Sequelize } from 'sequelize-typescript'
 import Umzug from 'umzug'
 
 import conf from '../conf-backend'
@@ -22,8 +22,8 @@ import {
   Student,
   Studyplan,
   Studyright,
-  StudyrightExtent,
   StudyrightElement,
+  StudyrightExtent,
   Teacher,
   Transfer,
 } from '../models'
@@ -79,8 +79,8 @@ class DbConnection extends EventEmitter {
         Student,
         Studyplan,
         Studyright,
-        StudyrightExtent,
         StudyrightElement,
+        StudyrightExtent,
         Teacher,
         Transfer,
       ],

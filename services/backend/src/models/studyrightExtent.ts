@@ -1,5 +1,6 @@
 import { Column, CreatedAt, DataType, HasMany, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
+import { ExtentCode } from '../types/extentCode'
 import { Studyright } from './studyright'
 
 @Table({
@@ -10,7 +11,7 @@ import { Studyright } from './studyright'
 export class StudyrightExtent extends Model {
   @PrimaryKey
   @Column(DataType.INTEGER)
-  extentcode: number
+  extentcode: ExtentCode
 
   @Column(DataType.STRING)
   name: string
