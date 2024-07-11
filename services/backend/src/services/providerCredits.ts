@@ -1,13 +1,14 @@
-const { mapToProviders } = require('../util/map')
-const { getCreditStats, setCreditStats } = require('./analyticsService')
-const { getCourseCodesOfProvider } = require('./providers')
-const { allTransfers } = require('./studyProgramme')
-const { getCreditsForProvider, getTransferredCredits } = require('./studyProgramme/creditGetters')
-const { defineYear, getCorrectStartDate } = require('./studyProgramme/studyProgrammeHelpers')
-const { getStudyRights } = require('./studyProgramme/studyRightFinders')
+import { ExtentCode } from '../types/extentCode'
+import { mapToProviders } from '../util/map'
+import { getCreditStats, setCreditStats } from './analyticsService'
+import { getCourseCodesOfProvider } from './providers'
+import { allTransfers } from './studyProgramme'
+import { getCreditsForProvider, getTransferredCredits } from './studyProgramme/creditGetters'
+import { defineYear, getCorrectStartDate } from './studyProgramme/studyProgrammeHelpers'
+import { getStudyRights } from './studyProgramme/studyRightFinders'
 
 /**
-  Rapo-kategoriat 9.2.2024, joiden perusteella tämä koodi on tehty. Numerot täsmäävät vain 2022 alkaen, koska sisu/oodi ero.
+  Rapo-kategoriat 9.2.2024, joiden perusteella tämä koodi on tehty. Numerot täsmäävät vain 2022 alkaen, koska Sisu/Oodi ero.
   
   'basic'
   Perustutkinto-opiskelijat: niiden opiskelijoiden opintopisteet, joilla on oikeus suorittaa alempi tai 
@@ -38,13 +39,34 @@ const { getStudyRights } = require('./studyProgramme/studyRightFinders')
   This is probably very rare to cause differences, only one such was found in MH60_001
 */
 
-const getCategory = (extent, degreeStudyright) => {
-  if ([7, 34].includes(extent)) return 'incoming-exchange' // Saapuvat vaihto-opiskelijat
-  if ([9, 31].includes(extent) && !degreeStudyright) return 'open-uni' // Avoimen opiskeluoikeus, ei tutkinto-opiskelija
-  if ([14, 16].includes(extent)) return 'agreement' // Korkeakoulujen väliset yhteistyöopinnot
-  if ([13, 18, 22, 23, 99].includes(extent)) return 'separate' // Erillisoikeus
-  if ([1, 2].includes(extent) || (degreeStudyright && [1, 2].includes(degreeStudyright.extentcode))) return 'basic' // Rapo-kategoria: Perustutkinto-opiskelijat
-  return 'other' // TODO: These still happen, but not a lot. Should be investigated which go here and where they should go instead
+const getCategory = (extentCode: number, degreeStudyright: any): string => {
+  if ([ExtentCode.EXCHANGE_STUDIES, ExtentCode.EXCHANGE_STUDIES_POSTGRADUATE].includes(extentCode)) {
+    return 'incoming-exchange'
+  }
+  if ([ExtentCode.OPEN_UNIVERSITY_STUDIES, ExtentCode.SUMMER_AND_WINTER_SCHOOL].includes(extentCode)) {
+    return 'open-uni'
+  }
+  if ([ExtentCode.CONTRACT_TRAINING, ExtentCode.STUDIES_FOR_SECONDARY_SCHOOL_STUDENTS].includes(extentCode)) {
+    return 'agreement'
+  }
+  if (
+    [
+      ExtentCode.NON_DEGREE_PEGAGOGICAL_STUDIES_FOR_TEACHERS,
+      ExtentCode.SPECIALIZATION_STUDIES,
+      ExtentCode.NON_DEGREE_PROGRAMME_FOR_SPECIAL_EDUCATION_TEACHERS,
+      ExtentCode.SPECIALIST_TRAINING_IN_MEDICINE_AND_DENTISTRY,
+      ExtentCode.NON_DEGREE_STUDIES,
+    ].includes(extentCode)
+  ) {
+    return 'separate'
+  }
+  if (
+    [ExtentCode.BACHELOR, ExtentCode.MASTER].includes(extentCode) ||
+    (degreeStudyright && [ExtentCode.BACHELOR, ExtentCode.MASTER].includes(degreeStudyright.extentcode))
+  ) {
+    return 'basic'
+  }
+  return 'other'
 }
 
 /*
@@ -76,7 +98,7 @@ const getDegreeStudyright = (studyrights, date, semestercode) =>
   })
 
 /* Calculates credits produced by provider (programme or faculty) */
-const computeCreditsProduced = async (providerCode, isAcademicYear, specialIncluded = true) => {
+export const computeCreditsProduced = async (providerCode, isAcademicYear, specialIncluded = true) => {
   const since = new Date('2017-01-01')
   const rapoFormattedProviderCode = mapToProviders([providerCode])[0]
   const courses = await getCourseCodesOfProvider(rapoFormattedProviderCode)
@@ -151,15 +173,10 @@ const computeCreditsProduced = async (providerCode, isAcademicYear, specialInclu
   return { stats, id: providerCode }
 }
 
-const getCreditsProduced = async (provider, isAcademicYear, specialIncluded = true) => {
+export const getCreditsProduced = async (provider, isAcademicYear: boolean, specialIncluded = true) => {
   let data = await getCreditStats(provider, isAcademicYear, specialIncluded)
   if (data) return data
   data = await computeCreditsProduced(provider, isAcademicYear, specialIncluded)
   await setCreditStats(data, isAcademicYear, specialIncluded)
   return data
-}
-
-module.exports = {
-  getCreditsProduced,
-  computeCreditsProduced,
 }
