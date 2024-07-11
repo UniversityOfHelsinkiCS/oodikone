@@ -23,9 +23,8 @@ const {
   formatFacultyThesisWriter,
   formatFacultyTransfer,
   formatOrganization,
-  isNewProgramme,
-  mapCodesToIds,
-} = require('./facultyHelpers')
+} = require('./facultyFormatHelpers')
+const { isNewProgramme, mapCodesToIds } = require('./facultyHelpers')
 
 const transferredFaculty = async (programmeCodeIn, programmeCodeOut, start, end) =>
   (

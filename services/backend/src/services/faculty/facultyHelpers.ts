@@ -4,7 +4,6 @@ import { ignoredFacultyCodes } from '../../../config/organisationConstants'
 import { codes } from '../../../config/programmeCodes'
 import { Organization } from '../../models'
 import { ExtentCode } from '../../types/extentCode'
-import { mapObject } from '../../util/map'
 import { getOrganizations } from '../organizations'
 
 export const getFaculties = async (): Promise<Organization[]> => {
@@ -34,65 +33,6 @@ export const findRightProgramme = (studyRightElements: any, code: string) => {
   }
 
   return { programme, programmeName }
-}
-
-export const formatFacultyStudyRight = studyright => {
-  return mapObject(studyright, {
-    studyrightid: 'studyrightid',
-    studystartdate: 'studystartdate',
-    startdate: 'startdate',
-    enddate: 'enddate',
-    givendate: 'givendate',
-    graduated: 'graduated',
-    active: 'active',
-    prioritycode: 'prioritycode',
-    extentcode: 'extentcode',
-    studentnumber: 'student_studentnumber',
-    studyrightElements: 'studyright_elements',
-    facultyCode: 'facultyCode',
-  })
-}
-
-export const formatFacultyProgrammeStudents = student => {
-  const { studentnumber, home_country_en, gender_code, semester_enrollments } = student
-  return {
-    stundetNumber: studentnumber,
-    homeCountryEn: home_country_en,
-    genderCode: gender_code,
-    semesters: semester_enrollments.map(s => s.dataValues),
-  }
-}
-
-export const formatFacultyTransfer = transfer => {
-  return mapObject(transfer, {
-    sourcecode: 'sourcecode',
-    targetcode: 'targetcode',
-    transferdate: 'transferdate',
-    studyrightid: 'studyrightid',
-    studentnumber: 'studentnumber',
-  })
-}
-
-export const formatFacultyProgramme = programme => {
-  return mapObject(programme, {
-    code: 'code',
-    name: 'name',
-  })
-}
-
-export const formatFacultyThesisWriter = credit => {
-  return mapObject(credit, {
-    course_code: 'course_code',
-    credits: 'credits',
-    attainment_date: 'attainment_date',
-    student_studentnumber: 'student_studentnumber',
-    courseUnitType: 'course.course_unit_type',
-  })
-}
-
-export const formatOrganization = org => {
-  const { id, name, code, parent_id } = org
-  return { id, name, code, parentId: parent_id }
 }
 
 const newProgrammes = [/^KH/, /^MH/, /^T/, /^LI/, /^K-/, /^FI/, /^00901$/, /^00910$/]
