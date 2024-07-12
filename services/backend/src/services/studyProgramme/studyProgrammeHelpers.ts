@@ -1,10 +1,10 @@
-const { orderBy } = require('lodash')
+import { orderBy } from 'lodash'
 
-const { codes } = require('../../../config/programmeCodes')
-const { studentnumbersWithAllStudyrightElements } = require('../populations')
+import { codes } from '../../../config/programmeCodes'
+import { ExtentCode } from '../../types/extentCode'
+import { studentnumbersWithAllStudyrightElements } from '../populations'
 
-// Helper functions
-const getCorrectStudentnumbers = async ({
+export const getCorrectStudentnumbers = async ({
   codes,
   startDate,
   endDate,
@@ -34,16 +34,20 @@ const getCorrectStudentnumbers = async ({
   return studentnumbers
 }
 
-const resolveStudyRightCode = studyright_elements => {
-  if (!studyright_elements) return null
-  const studyRightElement = studyright_elements
-    .filter(sre => sre.element_detail.type === 20)
-    .sort((a, b) => new Date(b.startdate) - new Date(a.startdate))[0]
-  if (studyRightElement) return studyRightElement.code
+export const resolveStudyRightCode = studyRightElements => {
+  if (!studyRightElements) {
+    return null
+  }
+  const studyRightElement = studyRightElements
+    .filter(element => element.element_detail.type === 20)
+    .sort((a, b) => new Date(b.startdate).getTime() - new Date(a.startdate).getTime())[0]
+  if (studyRightElement) {
+    return studyRightElement.code
+  }
   return null
 }
 
-const formatStudyright = studyright => {
+export const formatStudyright = studyright => {
   const {
     studyrightid,
     startdate,
@@ -85,7 +89,7 @@ const formatStudyright = studyright => {
   }
 }
 
-const formatStudent = student => {
+export const formatStudent = student => {
   const { studentnumber, gender_code, home_country_en, creditcount, credits } = student
   return {
     studentNumber: studentnumber,
@@ -96,7 +100,7 @@ const formatStudent = student => {
   }
 }
 
-const formatCredit = credit => {
+export const formatCredit = credit => {
   const { student_studentnumber, course_code, credits, attainment_date, studyright_id, id, semestercode } = credit
   const code = course_code.replace('AY', '')
   return {
@@ -111,7 +115,7 @@ const formatCredit = credit => {
   }
 }
 
-const formatTransfer = transfer => {
+export const formatTransfer = transfer => {
   const { sourcecode, targetcode, transferdate, studyrightid } = transfer
   return {
     sourcecode,
@@ -121,10 +125,16 @@ const formatTransfer = transfer => {
   }
 }
 
-const getYearsArray = (since, isAcademicYear, yearsCombined) => {
-  const years = []
+export const getYearsArray = (
+  since: number,
+  isAcademicYear: boolean,
+  yearsCombined: boolean = false
+): Array<number | string> => {
+  const years: Array<number | string> = []
   const allYears = 'Total'
-  if (yearsCombined) years.push(allYears)
+  if (yearsCombined) {
+    years.push(allYears)
+  }
   const today = new Date()
   const until = isAcademicYear && today.getMonth() < 7 ? today.getFullYear() - 1 : today.getFullYear()
   for (let i = since; i <= until; i++) {
@@ -134,7 +144,7 @@ const getYearsArray = (since, isAcademicYear, yearsCombined) => {
   return years
 }
 
-const getYearsObject = ({ years, emptyArrays = false }) => {
+export const getYearsObject = ({ years, emptyArrays = false }) => {
   let yearsObject = {}
   for (const year of years) {
     yearsObject = { ...yearsObject, [year]: emptyArrays ? [] : 0 }
@@ -142,28 +152,32 @@ const getYearsObject = ({ years, emptyArrays = false }) => {
   return yearsObject
 }
 
-const getStatsBasis = years => {
+export const getStatsBasis = years => {
   return {
     graphStats: new Array(years.length).fill(0),
     tableStats: getYearsObject({ years }),
   }
 }
-// Take studystartdate for master students with Bachelor-Master studyright.
-const getCorrectStartDate = studyright => {
-  return studyright.studyrightid.slice(-2) === '-2' && studyright.extentcode === 2
-    ? studyright.studystartdate
-    : studyright.startdate
+
+export const getCorrectStartDate = studyRight => {
+  return studyRight.studyrightid.slice(-2) === '-2' && studyRight.extentcode === ExtentCode.MASTER
+    ? studyRight.studystartdate
+    : studyRight.startdate
 }
 
-const getMedian = values => {
-  if (values.length === 0) return 0
+export const getMedian = (values: number[]): number => {
+  if (values.length === 0) {
+    return 0
+  }
   values.sort((a, b) => a - b)
   const half = Math.floor(values.length / 2)
-  if (values.length % 2) return values[half]
+  if (values.length % 2) {
+    return values[half]
+  }
   return (values[half - 1] + values[half]) / 2.0
 }
 
-const defineYear = (date, isAcademicYear) => {
+export const defineYear = (date, isAcademicYear) => {
   if (!date) return ''
   const year = date.getFullYear()
   if (!isAcademicYear) return year
@@ -173,13 +187,13 @@ const defineYear = (date, isAcademicYear) => {
   return `${year} - ${year + 1}`
 }
 
-const getStartDate = isAcademicYear => (isAcademicYear ? new Date('2017-08-01') : new Date('2017-01-01'))
+export const getStartDate = isAcademicYear => (isAcademicYear ? new Date('2017-08-01') : new Date('2017-01-01'))
 
-const alltimeStartDate = new Date('1900-01-01')
-const alltimeEndDate = new Date()
+export const alltimeStartDate = new Date('1900-01-01')
+export const alltimeEndDate = new Date()
 
 // In the object programmes should be {bachelorCode: masterCode}
-const combinedStudyprogrammes = { KH90_001: 'MH90_001' }
+export const combinedStudyprogrammes = { KH90_001: 'MH90_001' }
 
 // There are 9 course_unit_types
 // 1. urn:code:course-unit-type:regular
@@ -193,24 +207,27 @@ const combinedStudyprogrammes = { KH90_001: 'MH90_001' }
 // 9. urn:code:course-unit-type:practical-training-homeland
 // Four of these are thesis types
 
-const getThesisType = studyprogramme => {
-  if (studyprogramme.includes('MH') || studyprogramme.includes('ma'))
+export const getThesisType = (studyProgramme: string): string[] => {
+  if (studyProgramme.includes('MH') || studyProgramme.includes('ma')) {
     return ['urn:code:course-unit-type:masters-thesis']
-  if (studyprogramme.includes('KH') || studyprogramme.includes('ba'))
+  }
+  if (studyProgramme.includes('KH') || studyProgramme.includes('ba')) {
     return ['urn:code:course-unit-type:bachelors-thesis']
-  if (/^(T)[0-9]{6}$/.test(studyprogramme))
+  }
+  if (/^(T)[0-9]{6}$/.test(studyProgramme)) {
     return ['urn:code:course-unit-type:doctors-thesis', 'urn:code:course-unit-type:licentiate-thesis']
+  }
   return ['urn:code:course-unit-type:doctors-thesis', 'urn:code:course-unit-type:licentiate-thesis']
 }
 
-const getPercentage = (value, total) => {
+export const getPercentage = (value: number, total: number): string => {
   if (typeof value !== 'number' || typeof total !== 'number') return 'NA'
   if (total === 0) return 'NA'
   if (value === 0) return '0 %'
   return `${((value / total) * 100).toFixed(1)} %`
 }
 
-const getCreditThresholds = () => {
+export const getCreditThresholds = (): Record<string, number[] | string[]> => {
   // Only doctoral and licentiate study programmes (40 study credits) use this as of September 2023
   return {
     creditThresholdKeys: ['lte10', 'lte20', 'lte30', 'lte40', 'mte40'],
@@ -218,7 +235,7 @@ const getCreditThresholds = () => {
   }
 }
 
-const tableTitles = {
+export const tableTitles = {
   basics: {
     SPECIAL_EXCLUDED: ['', 'Started studying', 'Accepted', 'Graduated'],
     SPECIAL_INCLUDED: ['', 'Started studying', 'Accepted', 'Graduated', 'Transferred away', 'Transferred to'],
@@ -263,7 +280,7 @@ const tableTitles = {
   studytracksEnd: ['Men', 'Women', 'Other/\nUnknown', 'Finland', 'Other'],
 }
 
-const mapCodesToIds = data => {
+export const mapCodesToIds = data => {
   // Add programme id e.g. TKT
   const keys = Object.keys(codes)
   const progs = Object.keys(data)
@@ -275,10 +292,12 @@ const mapCodesToIds = data => {
   }
 }
 
-const getId = code => codes[code] ?? ''
+export const getId = (code: string): string => codes[code] ?? ''
 
-const getGoal = programme => {
-  if (!programme) return 0
+export const getGoal = programme => {
+  if (!programme) {
+    return 0
+  }
   if (programme.startsWith('KH') || programme.endsWith('-ba')) {
     return 36
   }
@@ -301,7 +320,7 @@ const getGoal = programme => {
   return 48 // unknown, likely old doctor or licentiate
 }
 
-const isRelevantProgramme = code => {
+export const isRelevantProgramme = (code: string): boolean => {
   return (
     (code.includes('KH') && !code.startsWith('2_KH') && !code.endsWith('_2')) ||
     (code.includes('MH') && !code.startsWith('2_MH') && !code.endsWith('_2')) ||
@@ -309,36 +328,10 @@ const isRelevantProgramme = code => {
   )
 }
 
-const getStudyRightElementsWithPhase = (studyRight, phase) =>
-  orderBy(
-    studyRight.studyRightElements.filter(sre => sre.phase === phase),
+export const getStudyRightElementsWithPhase = (studyRight, phase) => {
+  return orderBy(
+    studyRight.studyRightElements.filter(element => element.phase === phase),
     ['startDate'],
     ['asc']
   )
-
-module.exports = {
-  getCorrectStudentnumbers,
-  formatStudyright,
-  formatStudent,
-  formatTransfer,
-  formatCredit,
-  getYearsArray,
-  getYearsObject,
-  getStatsBasis,
-  getMedian,
-  defineYear,
-  getStartDate,
-  alltimeStartDate,
-  alltimeEndDate,
-  combinedStudyprogrammes,
-  getThesisType,
-  getPercentage,
-  getCreditThresholds,
-  tableTitles,
-  mapCodesToIds,
-  getId,
-  getGoal,
-  getCorrectStartDate,
-  isRelevantProgramme,
-  getStudyRightElementsWithPhase,
 }
