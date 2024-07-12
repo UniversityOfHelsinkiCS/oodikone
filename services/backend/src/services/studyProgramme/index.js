@@ -6,7 +6,7 @@ const {
 } = require('../../database/connection')
 const { Course, Credit, Enrollment, Organization, ProgrammeModule, Transfer } = require('../../models')
 const logger = require('../../util/logger')
-const { formatTransfer } = require('./studyProgrammeHelpers')
+const { formatTransfer } = require('./format')
 
 const whereStudents = studentnumbers => {
   return studentnumbers || { [Op.not]: null }

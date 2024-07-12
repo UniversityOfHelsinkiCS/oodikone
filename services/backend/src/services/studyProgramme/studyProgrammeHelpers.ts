@@ -1,7 +1,6 @@
 import { orderBy } from 'lodash'
 
 import { codes } from '../../../config/programmeCodes'
-import { ElementDetailType } from '../../types/elementDetailType'
 import { ExtentCode } from '../../types/extentCode'
 import { studentnumbersWithAllStudyrightElements } from '../populations'
 
@@ -35,100 +34,12 @@ export const getCorrectStudentnumbers = async ({
   return studentnumbers
 }
 
-const resolveStudyRightCode = (studyRightElements: any[]) => {
-  if (!studyRightElements) {
-    return null
-  }
-  const studyRightElement = studyRightElements
-    .filter(element => element.element_detail.type === ElementDetailType.PROGRAMME)
-    .sort((a, b) => new Date(b.startdate).getTime() - new Date(a.startdate).getTime())[0]
-  if (!studyRightElement) {
-    return null
-  }
-  return studyRightElement.code
-}
-
-export const formatStudyright = studyright => {
-  const {
-    studyrightid,
-    startdate,
-    studystartdate,
-    enddate,
-    givendate,
-    graduated,
-    active,
-    prioritycode,
-    extentcode,
-    student,
-    studyright_elements,
-    cancelled,
-    facultyCode,
-    actual_studyrightid,
-    semesterEnrollments,
-  } = studyright
-  return {
-    studyrightid,
-    startdate,
-    studystartdate,
-    enddate,
-    givendate,
-    graduated,
-    active,
-    prioritycode,
-    extentcode,
-    studentNumber: student.studentnumber,
-    code: resolveStudyRightCode(studyright_elements),
-    studyrightElements: studyright_elements,
-    cancelled,
-    facultyCode,
-    actual_studyrightid,
-    semesterEnrollments,
-    name:
-      studyright_elements?.length && studyright_elements[0].element_detail && studyright_elements[0].element_detail.name
-        ? studyright_elements[0].element_detail.name
-        : null,
-  }
-}
-
-export const formatStudent = student => {
-  const { studentnumber, gender_code, home_country_en, creditcount, credits } = student
-  return {
-    studentNumber: studentnumber,
-    genderCode: gender_code,
-    homeCountryEn: home_country_en,
-    creditcount,
-    credits,
-  }
-}
-
-export const formatCredit = credit => {
-  const { student_studentnumber, course_code, credits, attainment_date, studyright_id, id, semestercode } = credit
-  const code = course_code.replace('AY', '')
-  return {
-    id: `${student_studentnumber}-${code}`, // For getting unique credits for each course code and student number
-    acualId: id,
-    studentNumber: student_studentnumber,
-    courseCode: code,
-    credits,
-    attainmentDate: attainment_date,
-    studyrightId: studyright_id,
-    semestercode,
-  }
-}
-
-export const formatTransfer = transfer => {
-  return {
-    sourcecode: transfer.sourcecode,
-    targetcode: transfer.targetcode,
-    transferdate: transfer.transferdate,
-    studyrightid: transfer.studyrightid,
-  }
-}
-
-export const getYearsArray = (since, isAcademicYear, yearsCombined) => {
+export const getYearsArray = (since: number, isAcademicYear: boolean, yearsCombined: boolean) => {
   const years = []
   const allYears = 'Total'
-  if (yearsCombined) years.push(allYears)
+  if (yearsCombined) {
+    years.push(allYears)
+  }
   const today = new Date()
   const until = isAcademicYear && today.getMonth() < 7 ? today.getFullYear() - 1 : today.getFullYear()
   for (let i = since; i <= until; i++) {
@@ -319,7 +230,7 @@ export const getGoal = programme => {
   return 48 // unknown, likely old doctor or licentiate
 }
 
-export const isRelevantProgramme = code => {
+export const isRelevantProgramme = (code: string): boolean => {
   return (
     (code.includes('KH') && !code.startsWith('2_KH') && !code.endsWith('_2')) ||
     (code.includes('MH') && !code.startsWith('2_MH') && !code.endsWith('_2')) ||
@@ -327,9 +238,9 @@ export const isRelevantProgramme = code => {
   )
 }
 
-export const getStudyRightElementsWithPhase = (studyRight, phase) => {
+export const getStudyRightElementsWithPhase = (studyRight, phase: number) => {
   return orderBy(
-    studyRight.studyRightElements.filter(sre => sre.phase === phase),
+    studyRight.studyRightElements.filter(element => element.phase === phase),
     ['startDate'],
     ['asc']
   )

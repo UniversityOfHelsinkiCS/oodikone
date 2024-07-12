@@ -6,7 +6,7 @@ const {
 const { Credit, Semester, SemesterEnrollment, Student, Studyright, StudyrightElement } = require('../../models')
 const logger = require('../../util/logger')
 const { getCurrentSemester } = require('../semesters')
-const { formatStudent } = require('./studyProgrammeHelpers')
+const { formatStudent } = require('./format')
 
 const studytrackStudents = async studentnumbers =>
   (

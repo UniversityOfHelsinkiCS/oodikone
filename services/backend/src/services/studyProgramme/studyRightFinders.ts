@@ -1,9 +1,8 @@
-const { Op } = require('sequelize')
+import { Op } from 'sequelize'
 
-const {
-  dbConnections: { sequelize },
-} = require('../../database/connection')
-const {
+import { dbConnections } from '../../database/connection'
+const { sequelize } = dbConnections
+import {
   ElementDetail,
   SemesterEnrollment,
   Studyright,
@@ -11,14 +10,17 @@ const {
   StudyrightElement,
   SISStudyRight,
   SISStudyRightElement,
-} = require('../../models')
-const { getCurrentSemester } = require('../semesters')
-const { formatStudyright } = require('./studyProgrammeHelpers')
-const { whereStudents, sinceDate } = require('.')
+} from '../../models'
+import { ElementDetailType } from '../../types/elementDetailType'
+import { getCurrentSemester } from '../semesters'
+import { formatStudyright } from './format'
+import { whereStudents, sinceDate } from '.'
 
-const getStudyRightsInProgramme = async (programmeCode, onlyGraduated) => {
-  const where = { code: programmeCode }
-  if (onlyGraduated) where.graduated = true
+export const getStudyRightsInProgramme = async (programmeCode: string, onlyGraduated: boolean) => {
+  const where: Record<string, any> = { code: programmeCode }
+  if (onlyGraduated) {
+    where.graduated = true
+  }
 
   const studyRights = await SISStudyRight.findAll({
     attributes: ['id'],
@@ -52,20 +54,22 @@ const getStudyRightsInProgramme = async (programmeCode, onlyGraduated) => {
   ).map(studyRight => studyRight.toJSON())
 }
 
-const startedStudyrights = async (studytrack, since, studentnumbers) =>
+export const startedStudyrights = async (studytrack: string, since: Date, studentnumbers: string[]) =>
   (
     await Studyright.findAll({
       include: [
         {
           model: StudyrightElement,
           required: true,
-          include: {
-            model: ElementDetail,
-            required: true,
-            where: {
-              code: studytrack,
+          include: [
+            {
+              model: ElementDetail,
+              required: true,
+              where: {
+                code: studytrack,
+              },
             },
-          },
+          ],
         },
         {
           model: Student,
@@ -82,8 +86,13 @@ const startedStudyrights = async (studytrack, since, studentnumbers) =>
     })
   ).map(formatStudyright)
 
-const graduatedStudyRightsByStartDate = async (studytrack, startDate, endDate, combined) => {
-  const query = {
+export const graduatedStudyRightsByStartDate = async (
+  studytrack: string,
+  startDate: Date,
+  endDate: Date,
+  combined: boolean
+) => {
+  const query: Record<string, any> = {
     include: [
       {
         model: StudyrightElement,
@@ -123,20 +132,22 @@ const graduatedStudyRightsByStartDate = async (studytrack, startDate, endDate, c
   return (await Studyright.findAll(query)).map(formatStudyright)
 }
 
-const graduatedStudyRights = async (studytrack, since, studentnumbers) =>
+export const graduatedStudyRights = async (studytrack: string, since: Date, studentnumbers: string[]) =>
   (
     await Studyright.findAll({
       include: [
         {
           model: StudyrightElement,
           required: true,
-          include: {
-            model: ElementDetail,
-            required: true,
-            where: {
-              code: studytrack,
+          include: [
+            {
+              model: ElementDetail,
+              required: true,
+              where: {
+                code: studytrack,
+              },
             },
-          },
+          ],
         },
         {
           model: Student,
@@ -152,7 +163,7 @@ const graduatedStudyRights = async (studytrack, since, studentnumbers) =>
     })
   ).map(formatStudyright)
 
-const inactiveStudyrights = async (studytrack, studentnumbers) => {
+export const inactiveStudyrights = async (studytrack: string, studentnumbers: string[]) => {
   const currentSemester = await getCurrentSemester()
   const students = await Student.findAll({
     attributes: ['studentnumber'],
@@ -190,12 +201,13 @@ const inactiveStudyrights = async (studytrack, studentnumbers) => {
   return students.filter(
     student =>
       student.studyrights[0].enddate <= new Date() ||
-      !student.semester_enrollments.find(enrollment => enrollment.semestercode === currentSemester) ||
-      student.semester_enrollments.find(enrollment => enrollment.semestercode === currentSemester).enrollmenttype === 3
+      !student.semester_enrollments.find(enrollment => enrollment.semestercode === currentSemester.semestercode) ||
+      student.semester_enrollments.find(enrollment => enrollment.semestercode === currentSemester.semestercode)
+        .enrollmenttype === 3
   )
 }
 
-const getStudyRights = async students =>
+export const getStudyRights = async students =>
   (
     await Studyright.findAll({
       attributes: [
@@ -217,12 +229,14 @@ const getStudyRights = async students =>
       include: [
         {
           model: StudyrightElement,
-          include: {
-            model: ElementDetail,
-            where: {
-              type: 20,
+          include: [
+            {
+              model: ElementDetail,
+              where: {
+                type: ElementDetailType.PROGRAMME,
+              },
             },
-          },
+          ],
         },
         {
           model: Student,
@@ -232,12 +246,3 @@ const getStudyRights = async students =>
       ],
     })
   ).map(formatStudyright)
-
-module.exports = {
-  getStudyRightsInProgramme,
-  startedStudyrights,
-  graduatedStudyRights,
-  graduatedStudyRightsByStartDate,
-  inactiveStudyrights,
-  getStudyRights,
-}
