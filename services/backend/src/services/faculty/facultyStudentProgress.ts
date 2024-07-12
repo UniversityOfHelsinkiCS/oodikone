@@ -1,11 +1,12 @@
-const { indexOf, inRange } = require('lodash')
-const moment = require('moment')
+import { indexOf, inRange } from 'lodash'
+import moment from 'moment'
 
-const { getAcademicYearDates } = require('../../util/semester')
-const { studytrackStudents } = require('../studyProgramme/studentGetters')
-const { getCreditThresholds, getYearsArray } = require('../studyProgramme/studyProgrammeHelpers')
-const { getStudyRightsByExtent, getStudyRightsByBachelorStart, getTransfersIn, getTransfersOut } = require('./faculty')
-const { checkTransfers } = require('./facultyHelpers')
+import { ExtentCode } from '../../types/extentCode'
+import { getAcademicYearDates } from '../../util/semester'
+import { studytrackStudents } from '../studyProgramme/studentGetters'
+import { getCreditThresholds, getYearsArray } from '../studyProgramme/studyProgrammeHelpers'
+import { getStudyRightsByExtent, getStudyRightsByBachelorStart, getTransfersIn, getTransfersOut } from './faculty'
+import { checkTransfers } from './facultyHelpers'
 
 const getStudentData = (
   startDate,
@@ -90,7 +91,7 @@ const filterOutTransfers = async (studyrights, programmeCode, startDate, endDate
   return filteredStudyrights
 }
 
-const combineFacultyStudentProgress = async (faculty, programmes, specialGroups, graduated) => {
+export const combineFacultyStudentProgress = async (faculty, programmes, specialGroups, graduated) => {
   const since = new Date('2017-08-01')
   const includeAllSpecials = specialGroups === 'SPECIAL_INCLUDED'
   const includeGraduated = graduated === 'GRADUATED_INCLUDED'
@@ -109,6 +110,7 @@ const combineFacultyStudentProgress = async (faculty, programmes, specialGroups,
     programmeNames: {},
     bachelorsProgStats: {},
     bcMsProgStats: {},
+    licentiateProgStats: {},
     mastersProgStats: {},
     doctoralProgStats: {},
     creditCounts: {
@@ -176,14 +178,25 @@ const combineFacultyStudentProgress = async (faculty, programmes, specialGroups,
     progressStats.creditCounts.doctor[year] = []
 
     for (const { progId, code, name } of programmes) {
-      let extentcodes = [1, 2, 3, 4]
+      const extentCodes = [ExtentCode.BACHELOR, ExtentCode.MASTER, ExtentCode.LICENTIATE, ExtentCode.DOCTOR]
       if (includeAllSpecials) {
-        extentcodes = [...extentcodes, ...[6, 7, 9, 13, 14, 22, 23, 34, 99]]
+        extentCodes.push(
+          ExtentCode.CONTINUING_EDUCATION,
+          ExtentCode.EXCHANGE_STUDIES,
+          ExtentCode.OPEN_UNIVERSITY_STUDIES,
+          ExtentCode.NON_DEGREE_PEGAGOGICAL_STUDIES_FOR_TEACHERS,
+          ExtentCode.CONTRACT_TRAINING,
+          ExtentCode.NON_DEGREE_PROGRAMME_FOR_SPECIAL_EDUCATION_TEACHERS,
+          ExtentCode.SPECIALIST_TRAINING_IN_MEDICINE_AND_DENTISTRY,
+          ExtentCode.EXCHANGE_STUDIES_POSTGRADUATE,
+          ExtentCode.NON_DEGREE_STUDIES
+        )
       }
+
       // For bachelor-master we want to have the start of the bachelor programme of the student.
       let studyrights = code.includes('MH')
-        ? await getStudyRightsByBachelorStart(faculty, startDate, endDate, code, extentcodes, graduationStatus)
-        : await getStudyRightsByExtent(faculty, startDate, endDate, code, extentcodes, graduationStatus)
+        ? await getStudyRightsByBachelorStart(faculty, startDate, endDate, code, extentCodes, graduationStatus)
+        : await getStudyRightsByExtent(faculty, startDate, endDate, code, extentCodes, graduationStatus)
 
       // Get credit threshold values: 'combined study programme' is false and 'only master studyright' is true
 
@@ -195,7 +208,7 @@ const combineFacultyStudentProgress = async (faculty, programmes, specialGroups,
       }
       if (code.includes('KH')) {
         const allBachelors = studyrights
-          .filter(studyright => studyright.extentcode === 1)
+          .filter(studyright => studyright.extentcode === ExtentCode.BACHELOR)
           .map(studyright => studyright.studentnumber)
         const students = await studytrackStudents(allBachelors)
         const { progData, creditCounts } = getStudentData(startDate, students, 'KH', bachelorlimits, limitKeys)
@@ -208,10 +221,14 @@ const combineFacultyStudentProgress = async (faculty, programmes, specialGroups,
         bachelorProgress[progId][indexOf(reversedYears, year)] = limitKeys.map(key => progData[key])
       } else if (code.includes('MH')) {
         const allMsStudents = studyrights
-          .filter(studyright => studyright.extentcode === 2 && studyright.studyrightid.slice(-2) !== '-2')
+          .filter(
+            studyright => studyright.extentcode === ExtentCode.MASTER && studyright.studyrightid.slice(-2) !== '-2'
+          )
           .map(studyright => studyright.studentnumber)
         const allBcMsStudents = studyrights
-          .filter(studyright => studyright.extentcode === 2 && studyright.studyrightid.slice(-2) === '-2')
+          .filter(
+            studyright => studyright.extentcode === ExtentCode.MASTER && studyright.studyrightid.slice(-2) === '-2'
+          )
           .map(studyright => studyright.studentnumber)
         const bcMsStudents = await studytrackStudents(allBcMsStudents)
         const msStudents = await studytrackStudents(allMsStudents)
@@ -254,10 +271,10 @@ const combineFacultyStudentProgress = async (faculty, programmes, specialGroups,
         }
       } else {
         const all = studyrights
-          .filter(studyright => studyright.extentcode === 4 || studyright.extentcode === 3)
+          .filter(studyright => [ExtentCode.LICENTIATE, ExtentCode.DOCTOR].includes(studyright.extentcode))
           .map(studyright => studyright.studentnumber)
         const doctoralStudents = await studytrackStudents(all)
-        const { creditThresholdKeys, creditThresholdAmounts } = getCreditThresholds(code)
+        const { creditThresholdKeys, creditThresholdAmounts } = getCreditThresholds()
 
         const { data, creditCounts } = getStudentData(
           startDate,
@@ -294,6 +311,6 @@ const combineFacultyStudentProgress = async (faculty, programmes, specialGroups,
   progressStats.doctoralProgStats = Object.keys(doctoralProgress)
     .filter(prog => !doctoralProgress[prog].every(year => year.every(value => value === 0)))
     .reduce((result, prog) => ({ ...result, [prog]: doctoralProgress[prog] }), {})
+
   return progressStats
 }
-module.exports = { combineFacultyStudentProgress }

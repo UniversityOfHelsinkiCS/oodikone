@@ -1,4 +1,5 @@
 const { orderBy } = require('lodash')
+
 const { codes } = require('../../../config/programmeCodes')
 const { studentnumbersWithAllStudyrightElements } = require('../populations')
 
