@@ -1,14 +1,15 @@
-const { Op } = require('sequelize')
+import { Op, QueryTypes } from 'sequelize'
 
-const {
-  dbConnections: { sequelize },
-} = require('../../database/connection')
-const { Credit, Semester, SemesterEnrollment, Student, Studyright, StudyrightElement } = require('../../models')
-const logger = require('../../util/logger')
-const { getCurrentSemester } = require('../semesters')
-const { formatStudent } = require('./format')
+import { dbConnections } from '../../database/connection'
+const { sequelize } = dbConnections
+import { Credit, Semester, SemesterEnrollment, Student, Studyright, StudyrightElement } from '../../models'
+import { CreditTypeCode } from '../../types/creditTypeCode'
+import { EnrollmentType } from '../../types/enrollmentType'
+import logger from '../../util/logger'
+import { getCurrentSemester } from '../semesters'
+import { formatStudent } from './format'
 
-const studytrackStudents = async studentnumbers =>
+export const studytrackStudents = async (studentNumbers: string[]) =>
   (
     await Student.findAll({
       include: {
@@ -18,19 +19,19 @@ const studytrackStudents = async studentnumbers =>
         where: {
           isStudyModule: false,
           credittypecode: {
-            [Op.in]: [4, 9],
+            [Op.in]: [CreditTypeCode.PASSED, CreditTypeCode.APPROVED],
           },
         },
       },
       where: {
         studentnumber: {
-          [Op.in]: studentnumbers,
+          [Op.in]: studentNumbers,
         },
       },
     })
   ).map(formatStudent)
 
-const enrolledStudents = async (studytrack, studentnumbers) => {
+export const enrolledStudents = async (studyTrack: string, studentNumbers: string[]) => {
   const currentSemester = await getCurrentSemester()
 
   const students = await Student.findAll({
@@ -43,7 +44,7 @@ const enrolledStudents = async (studytrack, studentnumbers) => {
             model: StudyrightElement,
             required: true,
             where: {
-              code: studytrack,
+              code: studyTrack,
             },
           },
         ],
@@ -65,20 +66,20 @@ const enrolledStudents = async (studytrack, studentnumbers) => {
           },
         ],
         where: {
-          enrollmenttype: 1,
+          enrollmenttype: EnrollmentType.PRESENT,
         },
       },
     ],
     where: {
       studentnumber: {
-        [Op.in]: studentnumbers,
+        [Op.in]: studentNumbers,
       },
     },
   })
 
-  return students.filter(s => s.semester_enrollments?.length)
+  return students.filter(student => student.semester_enrollments?.length)
 }
-const absentStudents = async (studytrack, studentnumbers) => {
+export const absentStudents = async (studyTrack: string, studentNumbers: string[]) => {
   const currentSemester = await getCurrentSemester()
   const students = await Student.findAll({
     attributes: ['studentnumber'],
@@ -90,7 +91,7 @@ const absentStudents = async (studytrack, studentnumbers) => {
             model: StudyrightElement,
             required: true,
             where: {
-              code: studytrack,
+              code: studyTrack,
             },
           },
         ],
@@ -104,24 +105,26 @@ const absentStudents = async (studytrack, studentnumbers) => {
         model: SemesterEnrollment,
         attributes: ['semestercode'],
         where: {
-          enrollmenttype: 2,
+          enrollmenttype: EnrollmentType.ABSENT,
           semestercode: currentSemester.semestercode,
         },
       },
     ],
     where: {
       studentnumber: {
-        [Op.in]: studentnumbers,
+        [Op.in]: studentNumbers,
       },
     },
   })
-
   return students
 }
-const getStudentsForProgrammeCourses = async (from, to, programmeCourses) => {
-  if (!programmeCourses.length) return []
+
+export const getStudentsForProgrammeCourses = async (from: Date, to: Date, programmeCourses: string[]) => {
+  if (!programmeCourses.length) {
+    return []
+  }
   try {
-    const res = await sequelize.query(
+    const result: Array<Record<string, any>> = await sequelize.query(
       `
       WITH Dist AS (
         SELECT DISTINCT cr.student_studentnumber AS student, cr.credits AS credits, 
@@ -136,11 +139,11 @@ const getStudentsForProgrammeCourses = async (from, to, programmeCourses) => {
          GROUP BY dist.code, dist.course_name, dist."isStudyModule";
       `,
       {
-        type: sequelize.QueryTypes.SELECT,
+        type: QueryTypes.SELECT,
         replacements: { from, to, programmeCourses },
       }
     )
-    const result = res.map(course => ({
+    return result.map(course => ({
       code: course.code,
       name: course.course_name,
       totalPassed: parseInt(course.total_students, 10),
@@ -148,15 +151,21 @@ const getStudentsForProgrammeCourses = async (from, to, programmeCourses) => {
       type: 'passed',
       isStudyModule: course.isStudyModule,
     }))
-    return result
   } catch (error) {
     logger.error(`getStudentsForProgrammeCourses() function failed ${error}`)
   }
 }
 
-const getOwnStudentsForProgrammeCourses = async (from, to, programmeCourses, studyprogramme) => {
-  if (!programmeCourses.length) return []
-  const res = await sequelize.query(
+export const getOwnStudentsForProgrammeCourses = async (
+  from: Date,
+  to: Date,
+  programmeCourses: string[],
+  studyprogramme: string
+) => {
+  if (!programmeCourses.length) {
+    return []
+  }
+  const result: Array<Record<string, any>> = await sequelize.query(
     `
     WITH Dist AS (
       SELECT DISTINCT cr.student_studentnumber AS student, cr.credits AS credits,
@@ -175,25 +184,29 @@ const getOwnStudentsForProgrammeCourses = async (from, to, programmeCourses, stu
        GROUP BY dist.code, course_name, "isStudyModule";
       `,
     {
-      type: sequelize.QueryTypes.SELECT,
+      type: QueryTypes.SELECT,
       replacements: { from, to, programmeCourses, studyprogramme },
     }
   )
-  return res.map(course => {
-    const res = {
-      code: course.code,
-      name: course.course_name,
-      totalProgrammeStudents: parseInt(course.total_students, 10),
-      totalProgrammeCredits: parseInt(course.total_credits, 10),
-      type: 'ownProgramme',
-    }
-    return res
-  })
+  return result.map(course => ({
+    code: course.code,
+    name: course.course_name,
+    totalProgrammeStudents: parseInt(course.total_students, 10),
+    totalProgrammeCredits: parseInt(course.total_credits, 10),
+    type: 'ownProgramme',
+  }))
 }
 
-const getOtherStudentsForProgrammeCourses = async (from, to, programmeCourses, studyprogramme) => {
-  if (!programmeCourses.length) return []
-  const res = await sequelize.query(
+export const getOtherStudentsForProgrammeCourses = async (
+  from: Date,
+  to: Date,
+  programmeCourses: string[],
+  studyprogramme: string
+) => {
+  if (!programmeCourses.length) {
+    return []
+  }
+  const result: Array<Record<string, any>> = await sequelize.query(
     `
     WITH Dist AS (
       SELECT DISTINCT cr.student_studentnumber AS student, cr.credits AS credits,
@@ -220,11 +233,11 @@ const getOtherStudentsForProgrammeCourses = async (from, to, programmeCourses, s
       GROUP BY dist.code, course_name, "isStudyModule";
       `,
     {
-      type: sequelize.QueryTypes.SELECT,
+      type: QueryTypes.SELECT,
       replacements: { from, to, programmeCourses, studyprogramme },
     }
   )
-  return res.map(course => ({
+  return result.map(course => ({
     code: course.code,
     name: course.course_name,
     totalOtherProgrammeStudents: parseInt(course.total_students, 10),
@@ -234,9 +247,11 @@ const getOtherStudentsForProgrammeCourses = async (from, to, programmeCourses, s
   }))
 }
 
-const getTransferStudentsForProgrammeCourses = async (from, to, programmeCourses) => {
-  if (!programmeCourses.length) return []
-  const res = await sequelize.query(
+export const getTransferStudentsForProgrammeCourses = async (from: Date, to: Date, programmeCourses: string[]) => {
+  if (!programmeCourses.length) {
+    return []
+  }
+  const result: Array<Record<string, any>> = await sequelize.query(
     `
     WITH Dist AS (
       SELECT DISTINCT cr.student_studentnumber AS student, cr.credits AS credits,
@@ -251,11 +266,11 @@ const getTransferStudentsForProgrammeCourses = async (from, to, programmeCourses
       GROUP BY dist.code, course_name, "isStudyModule";
       `,
     {
-      type: sequelize.QueryTypes.SELECT,
+      type: QueryTypes.SELECT,
       replacements: { from, to, programmeCourses },
     }
   )
-  return res.map(course => ({
+  return result.map(course => ({
     code: course.code,
     name: course.course_name,
     totalTransferStudents: parseInt(course.total_students, 10),
@@ -265,9 +280,15 @@ const getTransferStudentsForProgrammeCourses = async (from, to, programmeCourses
   }))
 }
 
-const getStudentsWithoutStudyrightForProgrammeCourses = async (from, to, programmeCourses) => {
-  if (!programmeCourses.length) return []
-  const res = await sequelize.query(
+export const getStudentsWithoutStudyrightForProgrammeCourses = async (
+  from: Date,
+  to: Date,
+  programmeCourses: string[]
+) => {
+  if (!programmeCourses.length) {
+    return []
+  }
+  const result: Array<Record<string, any>> = await sequelize.query(
     `
     WITH Dist AS (
       SELECT DISTINCT cr.student_studentnumber AS student, cr.credits AS credits,
@@ -287,26 +308,15 @@ const getStudentsWithoutStudyrightForProgrammeCourses = async (from, to, program
       GROUP BY dist.code, course_name, "isStudyModule";
       `,
     {
-      type: sequelize.QueryTypes.SELECT,
+      type: QueryTypes.SELECT,
       replacements: { from, to, programmeCourses },
     }
   )
-  return res.map(course => ({
+  return result.map(course => ({
     code: course.code,
     name: course.course_name,
     totalWithoutStudyrightStudents: parseInt(course.total_students, 10),
     totalWithoutStudyrightCredits: parseInt(course.total_credits, 10),
     type: 'noStudyright',
   }))
-}
-
-module.exports = {
-  getStudentsForProgrammeCourses,
-  getOwnStudentsForProgrammeCourses,
-  getStudentsWithoutStudyrightForProgrammeCourses,
-  getOtherStudentsForProgrammeCourses,
-  getTransferStudentsForProgrammeCourses,
-  studytrackStudents,
-  enrolledStudents,
-  absentStudents,
 }

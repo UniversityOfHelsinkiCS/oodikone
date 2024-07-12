@@ -1,3 +1,4 @@
+import { EnrollmentType } from '../types/enrollmentType'
 import { ExtentCode } from '../types/extentCode'
 import { mapToProviders } from '../util/map'
 import { getCreditStats, setCreditStats } from './analyticsService'
@@ -87,14 +88,14 @@ const findRelevantStudyright = (attainmentDate, studyrights) => {
 
 const getDegreeStudyright = (studyrights, date, semestercode) =>
   studyrights?.find(studyright => {
-    const rightExtentCode = [1, 2, 3, 4].includes(studyright.extentcode)
+    const rightExtentCodes = [ExtentCode.BACHELOR, ExtentCode.MASTER, ExtentCode.LICENTIATE, ExtentCode.DOCTOR]
     const rightDates =
       new Date(studyright.startdate).getTime() <= new Date(date).getTime() &&
       new Date(date).getTime() <= new Date(studyright.enddate).getTime()
     const enrolled = studyright.semesterEnrollments?.some(
-      enrollment => enrollment.semestercode === semestercode && enrollment.enrollmenttype === 1
+      enrollment => enrollment.semestercode === semestercode && enrollment.enrollmenttype === EnrollmentType.PRESENT
     )
-    return rightExtentCode && rightDates && enrolled
+    return rightExtentCodes.includes(studyright.extentcode) && rightDates && enrolled
   })
 
 /* Calculates credits produced by provider (programme or faculty) */
@@ -119,11 +120,11 @@ export const computeCreditsProduced = async (providerCode, isAcademicYear, speci
 
   const students = [...new Set(credits.map(({ studentNumber }) => studentNumber))]
 
-  const transfers = (await allTransfers(providerCode, since)).map(t => t.studyrightid)
+  const transfers = (await allTransfers(providerCode, since)).map(transfer => transfer.studyrightid)
 
   let studyrights = await getStudyRights(students)
   if (!specialIncluded) {
-    studyrights = studyrights.filter(s => !transfers.includes(s.studyrightid))
+    studyrights = studyrights.filter(studyRight => !transfers.includes(studyRight.studyrightid))
   }
 
   const studyrightIdToStudyrightMap = studyrights.reduce((obj, cur) => {
@@ -165,7 +166,9 @@ export const computeCreditsProduced = async (providerCode, isAcademicYear, speci
   }
   transferredCredits.forEach(({ createdate, credits }) => {
     const attainmentYear = defineYear(createdate, isAcademicYear)
-    if (!stats[attainmentYear]) stats[attainmentYear] = { transferred: 0 }
+    if (!stats[attainmentYear]) {
+      stats[attainmentYear] = { transferred: 0 }
+    }
     stats[attainmentYear].transferred += credits || 0
     // Transferred not counted in total
   })

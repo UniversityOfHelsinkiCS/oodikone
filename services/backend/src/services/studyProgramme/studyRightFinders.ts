@@ -12,6 +12,7 @@ import {
   SISStudyRightElement,
 } from '../../models'
 import { ElementDetailType } from '../../types/elementDetailType'
+import { EnrollmentType } from '../../types/enrollmentType'
 import { getCurrentSemester } from '../semesters'
 import { formatStudyright } from './format'
 import { whereStudents, sinceDate } from '.'
@@ -203,7 +204,7 @@ export const inactiveStudyrights = async (studytrack: string, studentnumbers: st
       student.studyrights[0].enddate <= new Date() ||
       !student.semester_enrollments.find(enrollment => enrollment.semestercode === currentSemester.semestercode) ||
       student.semester_enrollments.find(enrollment => enrollment.semestercode === currentSemester.semestercode)
-        .enrollmenttype === 3
+        .enrollmenttype === EnrollmentType.INACTIVE
   )
 }
 

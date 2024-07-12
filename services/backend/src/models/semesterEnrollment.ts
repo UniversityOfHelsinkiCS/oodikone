@@ -10,6 +10,7 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
+import { EnrollmentType } from '../types/enrollmentType'
 import { Semester } from './semester'
 import { Student } from './student'
 
@@ -21,7 +22,7 @@ import { Student } from './student'
 export class SemesterEnrollment extends Model {
   @PrimaryKey
   @Column(DataType.INTEGER)
-  enrollmenttype: number
+  enrollmenttype: EnrollmentType
 
   @Column(DataType.STRING)
   org: string
