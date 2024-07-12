@@ -1,22 +1,11 @@
-const getNestedProperty = (obj, path) => {
-  return path.split('.').reduce((acc, part) => acc && acc[part], obj)
-}
-
-const mapObject = (obj, schema) => {
-  return Object.keys(schema).reduce((acc, key) => {
-    acc[key] = getNestedProperty(obj, schema[key])
-    return acc
-  }, {})
-}
-
-const handleUnderscoreProgrammeCode = programmeCode => {
+const handleUnderscoreProgrammeCode = (programmeCode: string): string => {
   const [left, right] = programmeCode.split('_')
   const prefix = [...left].filter(char => !Number.isNaN(Number(char))).join('')
   const suffix = `${left[0]}${right}`
   return `${prefix}0-${suffix}`
 }
 
-const handleDoctoralProgrammeCode = programmeCode => {
+const handleDoctoralProgrammeCode = (programmeCode: string): string => {
   const numbers = programmeCode.substring(1)
   const courseProvider = Number(`7${numbers}`)
   if (courseProvider < 7920111 && courseProvider > 7920102) {
@@ -28,7 +17,7 @@ const handleDoctoralProgrammeCode = programmeCode => {
   return `${courseProvider}`
 }
 
-const mapToProviders = programmeCodes => {
+export const mapToProviders = (programmeCodes: string[]): string[] => {
   return programmeCodes.map(programmeCode => {
     if (programmeCode.includes('_')) {
       return handleUnderscoreProgrammeCode(programmeCode)
@@ -38,9 +27,4 @@ const mapToProviders = programmeCodes => {
     }
     return programmeCode
   })
-}
-
-module.exports = {
-  mapObject,
-  mapToProviders,
 }

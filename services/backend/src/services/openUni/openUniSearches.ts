@@ -3,7 +3,7 @@ import { Op } from 'sequelize'
 import { Course, Credit, Enrollment, Student, SISStudyRight } from '../../models'
 import { OpenUniPopulationSearch } from '../../models/kone'
 import { ExtentCode } from '../../types/extentCode'
-import { mapCourseInfo, mapOpenCredits, mapOpenEnrollments, mapStudentInfo } from './openUniHelpers'
+import { formatCourseInfo, formatOpenCredits, formatOpenEnrollments, formatStudentInfo } from './format'
 
 export const getCredits = async (courseCodes: string[], startdate: Date) =>
   (
@@ -18,7 +18,7 @@ export const getCredits = async (courseCodes: string[], startdate: Date) =>
         },
       },
     })
-  ).map(mapOpenCredits)
+  ).map(formatOpenCredits)
 
 export const getStudentInfo = async (studentNumbers: string[]) =>
   (
@@ -30,7 +30,7 @@ export const getStudentInfo = async (studentNumbers: string[]) =>
         },
       },
     })
-  ).map(mapStudentInfo)
+  ).map(formatStudentInfo)
 
 export const getEnrollments = async (courseCodes: string[], startDate: Date, endDate: Date) =>
   (
@@ -49,7 +49,7 @@ export const getEnrollments = async (courseCodes: string[], startDate: Date, end
         },
       },
     })
-  ).map(mapOpenEnrollments)
+  ).map(formatOpenEnrollments)
 
 export const getCourseNames = async (courseCodes: string[]) =>
   (
@@ -61,7 +61,7 @@ export const getCourseNames = async (courseCodes: string[]) =>
         },
       },
     })
-  ).map(mapCourseInfo)
+  ).map(formatCourseInfo)
 
 export const getStudyRights = async (studentNumbers: string[]) => {
   return await SISStudyRight.findAll({
