@@ -1,5 +1,6 @@
 import { Column, CreatedAt, DataType, HasMany, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
+import { ElementDetailType } from '../types/elementDetailType'
 import { StudyrightElement } from './studyrightElement'
 
 @Table({
@@ -16,7 +17,7 @@ export class ElementDetail extends Model {
   name: object
 
   @Column(DataType.INTEGER)
-  type: number
+  type: ElementDetailType
 
   @HasMany(() => StudyrightElement, { foreignKey: 'code', sourceKey: 'code' })
   studyrightElements: StudyrightElement

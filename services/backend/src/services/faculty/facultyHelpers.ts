@@ -4,6 +4,7 @@ import { ignoredFacultyCodes } from '../../../config/organisationConstants'
 import { codes } from '../../../config/programmeCodes'
 import { Organization } from '../../models'
 import { ExtentCode } from '../../types/extentCode'
+import { ElementDetailType } from '../../types/elementDetailType'
 import { getOrganizations } from '../organizations'
 
 export const getFaculties = async (): Promise<Organization[]> => {
@@ -23,7 +24,7 @@ export const findRightProgramme = (studyRightElements: any, code: string) => {
 
   if (studyRightElements) {
     studyRightElement = studyRightElements
-      .filter(element => element.element_detail.type === 20)
+      .filter(element => element.element_detail.type === ElementDetailType.PROGRAMME)
       .filter(element => element.code === code)
 
     if (studyRightElement.length > 0) {

@@ -4,6 +4,7 @@ import { Op, QueryTypes } from 'sequelize'
 import { dbConnections } from '../../database/connection'
 const { sequelize } = dbConnections
 import { Course, Credit, ElementDetail, Studyright, StudyrightElement } from '../../models'
+import { ElementDetailType } from '../../types/elementDetailType'
 import { ExtentCode } from '../../types/extentCode'
 import { semesterEnd, semesterStart } from '../../util/semester'
 import { getCurrentSemester } from '../semesters'
@@ -376,7 +377,7 @@ export const formatStudentsForApi = async (
   elementdetails = elementdetails.reduce(
     (acc, elementDetail) => {
       acc.data[elementDetail.code] = elementDetail
-      if (elementDetail.type === 20) {
+      if (elementDetail.type === ElementDetailType.PROGRAMME) {
         acc.programmes.push(elementDetail.code)
       }
       return acc
