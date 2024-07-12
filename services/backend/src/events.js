@@ -27,7 +27,7 @@ const refreshStudyrightAssociations = async () => {
 
 const refreshFaculties = async () => {
   logger.info('Adding jobs to refresh all faculties')
-  const faculties = getFaculties()
+  const faculties = await getFaculties()
   for (const faculty of faculties) {
     jobMaker.faculty(faculty.code)
   }
