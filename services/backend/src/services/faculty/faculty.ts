@@ -4,6 +4,7 @@ import { Op } from 'sequelize'
 import { dbConnections } from '../../database/connection'
 const { sequelize } = dbConnections
 import { ExtentCode } from '../../types/extentCode'
+import { PriorityCode } from '../../types/priorityCode'
 import {
   Course,
   Credit,
@@ -134,7 +135,7 @@ export const getStudyRightsByExtent = async (faculty, startDate, endDate, code, 
           [Op.in]: extents,
         },
         prioritycode: {
-          [Op.not]: 6,
+          [Op.not]: PriorityCode.OPTION,
         },
         graduated: {
           [Op.in]: graduated,
@@ -171,7 +172,7 @@ export const getStudyRightsByBachelorStart = async (faculty, startDate, endDate,
           [Op.in]: extents,
         },
         prioritycode: {
-          [Op.not]: 6,
+          [Op.not]: PriorityCode.OPTION,
         },
         graduated: {
           [Op.in]: graduated,

@@ -12,6 +12,7 @@ import {
 } from 'sequelize-typescript'
 
 import { ExtentCode } from '../types/extentCode'
+import { PriorityCode } from '../types/priorityCode'
 import { Enrollment } from './enrollment'
 import { Organization } from './organization'
 import { Student } from './student'
@@ -82,7 +83,7 @@ export class Studyright extends Model {
   facultyCode: string
 
   @Column(DataType.INTEGER)
-  prioritycode: number
+  prioritycode: PriorityCode
 
   @Column(DataType.INTEGER)
   extentcode: ExtentCode
