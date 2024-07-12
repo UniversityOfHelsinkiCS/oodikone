@@ -1,7 +1,9 @@
 import { sortBy } from 'lodash'
+import { Op } from 'sequelize'
+
 import { dbConnections } from '../../database/connection'
 const { sequelize } = dbConnections
-import { Op } from 'sequelize'
+import { ExtentCode } from '../../types/extentCode'
 import { ElementDetail, Student, Studyright, StudyrightElement, Transfer } from '../../models'
 import { TagStudent } from '../../models/kone'
 import { count } from './shared'
@@ -17,12 +19,21 @@ export const studentnumbersWithAllStudyrightElements = async ({
   transferredToStudents,
   graduatedStudents,
 }) => {
-  const filteredExtents = [16] // always filter out secondary subject students
+  const filteredExtents = [ExtentCode.STUDIES_FOR_SECONDARY_SCHOOL_STUDENTS]
   if (!exchangeStudents) {
-    filteredExtents.push(7, 34)
+    filteredExtents.push(ExtentCode.EXCHANGE_STUDIES, ExtentCode.EXCHANGE_STUDIES_POSTGRADUATE)
   }
   if (!nondegreeStudents) {
-    filteredExtents.push(6, 9, 13, 14, 18, 22, 23, 99)
+    filteredExtents.push(
+      ExtentCode.CONTINUING_EDUCATION,
+      ExtentCode.OPEN_UNIVERSITY_STUDIES,
+      ExtentCode.NON_DEGREE_PEGAGOGICAL_STUDIES_FOR_TEACHERS,
+      ExtentCode.CONTRACT_TRAINING,
+      ExtentCode.SPECIALIZATION_STUDIES,
+      ExtentCode.NON_DEGREE_PROGRAMME_FOR_SPECIAL_EDUCATION_TEACHERS,
+      ExtentCode.SPECIALIST_TRAINING_IN_MEDICINE_AND_DENTISTRY,
+      ExtentCode.NON_DEGREE_STUDIES
+    )
   }
 
   const studyrightWhere = {

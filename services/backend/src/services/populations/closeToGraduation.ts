@@ -1,4 +1,4 @@
-const { Op, col } = require('sequelize')
+const { col, Op } = require('sequelize')
 
 const {
   Course,
@@ -9,15 +9,16 @@ const {
   SISStudyRight,
   SISStudyRightElement,
 } = require('../../models')
+import { ExtentCode } from '../../types/extentCode'
 const { mapToProviders } = require('../../util/map')
 const { redisClient } = require('../redis')
 const { getCurriculumVersion } = require('./shared')
 
-const CLOSE_TO_GRADUATION_REDIS_KEY = 'CLOSE_TO_GRADUATION_DATA'
+export const CLOSE_TO_GRADUATION_REDIS_KEY = 'CLOSE_TO_GRADUATION_DATA'
 
 const findThesisAndLatestAttainments = (studyPlan, attainments, providerCode) => {
   let thesisData
-  const latestAttainmentDates = {}
+  const latestAttainmentDates: Record<string, any> = {}
   const thesisCodes = ['urn:code:course-unit-type:bachelors-thesis', 'urn:code:course-unit-type:masters-thesis']
 
   for (const attainment of attainments) {
@@ -60,7 +61,7 @@ const formatStudent = student => {
       studyright: {
         startDate: startOfStudyright,
         semesterEnrollments,
-        isBaMa: extentCode === 5,
+        isBaMa: extentCode === ExtentCode.BACHELOR_AND_MASTER,
       },
       thesisInfo: thesisData
         ? {
@@ -86,7 +87,7 @@ const formatStudent = student => {
   }, [])
 }
 
-const findStudentsCloseToGraduation = async studentNumbers =>
+const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =>
   (
     await Student.findAll({
       attributes: [
@@ -180,19 +181,15 @@ const findStudentsCloseToGraduation = async studentNumbers =>
       { bachelor: [], masterAndLicentiate: [] }
     )
 
-const getCloseToGraduationData = async studentNumbers => {
+export const getCloseToGraduationData = async studentNumbers => {
   if (!studentNumbers) {
     const dataOnRedis = await redisClient.getAsync(CLOSE_TO_GRADUATION_REDIS_KEY)
-    if (dataOnRedis) return JSON.parse(dataOnRedis)
+    if (dataOnRedis) {
+      return JSON.parse(dataOnRedis)
+    }
     const freshData = await findStudentsCloseToGraduation()
     redisClient.setAsync(CLOSE_TO_GRADUATION_REDIS_KEY, JSON.stringify(freshData))
     return freshData
   }
   return findStudentsCloseToGraduation(studentNumbers)
-}
-
-module.exports = {
-  findStudentsCloseToGraduation,
-  getCloseToGraduationData,
-  CLOSE_TO_GRADUATION_REDIS_KEY,
 }

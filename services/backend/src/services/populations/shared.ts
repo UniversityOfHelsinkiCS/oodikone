@@ -1,15 +1,14 @@
-const moment = require('moment')
-const { Op } = require('sequelize')
+import moment from 'moment'
+import { Op, QueryTypes } from 'sequelize'
 
-const {
-  dbConnections: { sequelize },
-} = require('../../database/connection')
-const { Course, Credit, ElementDetail, Studyright, StudyrightElement } = require('../../models')
-const { semesterEnd, semesterStart } = require('../../util/semester')
-const { getCurrentSemester } = require('../semesters')
-const { getProgrammesFromStudyRights } = require('../studyrights')
+import { dbConnections } from '../../database/connection'
+const { sequelize } = dbConnections
+import { Course, Credit, ElementDetail, Studyright, StudyrightElement } from '../../models'
+import { ExtentCode } from '../../types/extentCode'
+import { semesterEnd, semesterStart } from '../../util/semester'
+import { getCurrentSemester } from '../semesters'
+import { getProgrammesFromStudyRights } from '../studyrights'
 
-// Progress tab related helper functions
 const createEmptyCriteriaYear = (criteria, year) => {
   return {
     credits: false,
@@ -66,8 +65,10 @@ const updateCreditCriteriaInfo = (criteria, criteriaYear, criteriaChecked, yearT
   }
 }
 
-const getCurriculumVersion = curriculumPeriodId => {
-  if (!curriculumPeriodId) return null
+export const getCurriculumVersion = curriculumPeriodId => {
+  if (!curriculumPeriodId) {
+    return null
+  }
   const versionNumber = parseInt(curriculumPeriodId.slice(-2), 10)
   const year = versionNumber + 1949
   const startYear = Math.floor((year - 1) / 3) * 3 + 1
@@ -230,16 +231,16 @@ const formatStudentForPopulationStatistics = (
   }
 }
 
-const dateMonthsFromNow = (date, months) => moment(date).add(months, 'months').format('YYYY-MM-DD')
+export const dateMonthsFromNow = (date, months) => moment(date).add(months, 'months').format('YYYY-MM-DD')
 
-const count = (column, count, distinct = false) => {
+export const count = (column, count, distinct = false) => {
   const countable = !distinct ? sequelize.col(column) : sequelize.fn('DISTINCT', sequelize.col(column))
   return sequelize.where(sequelize.fn('COUNT', countable), {
     [Op.eq]: count,
   })
 }
 
-const parseQueryParams = query => {
+export const parseQueryParams = query => {
   const { semesters, studentStatuses, studyRights, months, year, tag } = query
   const startDate = semesters.includes('FALL')
     ? `${year}-${semesterStart[semesters.find(semester => semester === 'FALL')]}`
@@ -264,21 +265,23 @@ const parseQueryParams = query => {
   }
 }
 
-const getOptionsForStudents = async (students, code, level) => {
-  if (!code || !students.length) return {}
+export const getOptionsForStudents = async (studentNumbers: string[], code: string, level: 'BSC' | 'MSC') => {
+  if (!code || !studentNumbers.length) {
+    return {}
+  }
 
-  let graduated
-  let currentExtent
-  let optionExtent
+  let graduated: { graduated?: number }
+  let currentExtent: ExtentCode
+  let optionExtent: ExtentCode
 
   if (level === 'BSC') {
     graduated = { graduated: 1 }
-    currentExtent = 1
-    optionExtent = 2
+    currentExtent = ExtentCode.BACHELOR
+    optionExtent = ExtentCode.MASTER
   } else if (level === 'MSC') {
     graduated = {}
-    currentExtent = 2
-    optionExtent = 1
+    currentExtent = ExtentCode.MASTER
+    optionExtent = ExtentCode.BACHELOR
   } else {
     throw new Error(`Invalid study level ${level}`)
   }
@@ -291,7 +294,7 @@ const getOptionsForStudents = async (students, code, level) => {
         model: StudyrightElement,
         where: {
           studentnumber: {
-            [Op.in]: students,
+            [Op.in]: studentNumbers,
           },
           code,
         },
@@ -301,7 +304,7 @@ const getOptionsForStudents = async (students, code, level) => {
       ...graduated,
       extentcode: currentExtent,
       student_studentnumber: {
-        [Op.in]: students,
+        [Op.in]: studentNumbers,
       },
     },
     attributes: ['student_studentnumber', 'givendate'],
@@ -318,7 +321,7 @@ const getOptionsForStudents = async (students, code, level) => {
         model: StudyrightElement,
         where: {
           studentnumber: {
-            [Op.in]: students,
+            [Op.in]: studentNumbers,
           },
           code: {
             [Op.in]: programmes.map(programme => programme.code),
@@ -336,7 +339,7 @@ const getOptionsForStudents = async (students, code, level) => {
     where: {
       extentcode: optionExtent,
       student_studentnumber: {
-        [Op.in]: students,
+        [Op.in]: studentNumbers,
       },
     },
     order: [[{ model: StudyrightElement, as: 'studyright_elements' }, 'startdate', 'DESC']],
@@ -357,7 +360,7 @@ const getOptionsForStudents = async (students, code, level) => {
     }, {})
 }
 
-const formatStudentsForApi = async (
+export const formatStudentsForApi = async (
   { students, enrollments, credits, extents, semesters, elementdetails, courses },
   startDate,
   endDate,
@@ -371,21 +374,23 @@ const formatStudentsForApi = async (
   const currentSemester = (await getCurrentSemester()).semestercode
 
   elementdetails = elementdetails.reduce(
-    (acc, e) => {
-      acc.data[e.code] = e
-      if (e.type === 20) acc.programmes.push(e.code)
+    (acc, elementDetail) => {
+      acc.data[elementDetail.code] = elementDetail
+      if (elementDetail.type === 20) {
+        acc.programmes.push(elementDetail.code)
+      }
       return acc
     },
     { programmes: [], data: {} }
   )
-  credits = credits.reduce((acc, e) => {
-    acc[e.student_studentnumber] = acc[e.student_studentnumber] || []
-    acc[e.student_studentnumber].push(e)
+  credits = credits.reduce((acc, credit) => {
+    acc[credit.student_studentnumber] = acc[credit.student_studentnumber] || []
+    acc[credit.student_studentnumber].push(credit)
     return acc
   }, {})
-  enrollments = enrollments.reduce((acc, e) => {
-    acc[e.studentnumber] = acc[e.studentnumber] || []
-    acc[e.studentnumber].push(e)
+  enrollments = enrollments.reduce((acc, enrollment) => {
+    acc[enrollment.studentnumber] = acc[enrollment.studentnumber] || []
+    acc[enrollment.studentnumber].push(enrollment)
     return acc
   }, {})
 
@@ -462,7 +467,7 @@ const formatStudentsForApi = async (
   return returnvalue
 }
 
-const formatQueryParamsToArrays = (query, params) => {
+export const formatQueryParamsToArrays = (query, params) => {
   const res = { ...query }
   params.forEach(param => {
     if (!res[param]) {
@@ -473,9 +478,18 @@ const formatQueryParamsToArrays = (query, params) => {
   return res
 }
 
-const getSubstitutions = async codes => {
-  const courses = await Course.findAll({ where: { code: codes }, attributes: ['code', 'substitutions'], raw: true })
-  return [...new Set(courses.map(({ code, substitutions }) => [code, ...substitutions]).flat())]
+const getSubstitutions = async (codes: string[]) => {
+  const courses = await Course.findAll({
+    attributes: ['code', 'substitutions'],
+    where: { code: codes },
+    raw: true,
+  })
+
+  const substitutions = [
+    ...new Set(courses.flatMap(({ code, substitutions }) => [code, ...Object.values(substitutions).flat()])),
+  ]
+
+  return substitutions
 }
 
 const getCourseCodes = async courses => {
@@ -487,7 +501,7 @@ const getCourseCodes = async courses => {
 }
 
 // This duplicate code is added here to ensure that we get the enrollments in cases no credits found for the selected students
-const findCourseEnrollments = async (studentnumbers, beforeDate, courses = []) => {
+export const findCourseEnrollments = async (studentnumbers, beforeDate, courses = []) => {
   const courseCodes = await getCourseCodes(courses)
   const res = await sequelize.query(
     `
@@ -523,13 +537,13 @@ const findCourseEnrollments = async (studentnumbers, beforeDate, courses = []) =
         courseCodes,
         skipCourseCodeFilter: courses.length === 0,
       },
-      type: sequelize.QueryTypes.SELECT,
+      type: QueryTypes.SELECT,
     }
   )
   return res
 }
 
-const findCourses = async (studentnumbers, beforeDate, courses = []) => {
+export const findCourses = async (studentnumbers, beforeDate, courses = []) => {
   const courseCodes = await getCourseCodes(courses)
   const res = await sequelize.query(
     `
@@ -580,14 +594,14 @@ const findCourses = async (studentnumbers, beforeDate, courses = []) => {
         courseCodes,
         skipCourseCodeFilter: courses.length === 0,
       },
-      type: sequelize.QueryTypes.SELECT,
+      type: QueryTypes.SELECT,
     }
   )
 
   return res
 }
 
-const parseCreditInfo = credit => ({
+export const parseCreditInfo = credit => ({
   studentnumber: credit.student_studentnumber,
   grade: credit.grade,
   passingGrade: Credit.passed(credit),
@@ -595,16 +609,3 @@ const parseCreditInfo = credit => ({
   improvedGrade: Credit.improved(credit),
   date: credit.attainment_date,
 })
-
-module.exports = {
-  count,
-  parseCreditInfo,
-  findCourses,
-  findCourseEnrollments,
-  formatQueryParamsToArrays,
-  formatStudentsForApi,
-  parseQueryParams,
-  getOptionsForStudents,
-  dateMonthsFromNow,
-  getCurriculumVersion,
-}
