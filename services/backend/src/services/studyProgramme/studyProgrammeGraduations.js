@@ -1,13 +1,13 @@
-import { indexOf, orderBy } from 'lodash'
-import moment from 'moment'
+const { indexOf, orderBy } = require('lodash')
+const moment = require('moment')
 
-import { sortByProgrammeCode } from '../../util'
-import { mapToProviders } from '../../util/map'
-import { countTimeCategories } from '../graduationHelpers'
-import { getSemestersAndYears } from '../semesters'
-import { getThesisCredits } from './creditGetters'
-import { getGraduatedStats } from './studyProgrammeBasics'
-import {
+const { sortByProgrammeCode } = require('../../util')
+const { mapToProviders } = require('../../util/map')
+const { countTimeCategories } = require('../graduationHelpers')
+const { getSemestersAndYears } = require('../semesters')
+const { getThesisCredits } = require('./creditGetters')
+const { getGraduatedStats } = require('./studyProgrammeBasics')
+const {
   alltimeEndDate,
   alltimeStartDate,
   defineYear,
@@ -21,17 +21,14 @@ import {
   getYearsArray,
   getYearsObject,
   getStudyRightElementsWithPhase,
-} from './studyProgrammeHelpers'
-import { getStudyRightsInProgramme } from './studyRightFinders'
-import { ExtentCode } from '../../types/extentCode'
+} = require('./studyProgrammeHelpers')
+const { getStudyRightsInProgramme } = require('./studyRightFinders')
 
-const calculateAbsenceInMonths = (absence, startDate, endDate): number => {
+const calculateAbsenceInMonths = (absence, startDate, endDate) => {
   const absenceStart = moment(absence.startdate)
   const absenceEnd = moment(absence.enddate)
 
-  if (absenceStart.isAfter(endDate) || absenceEnd.isBefore(startDate)) {
-    return 0
-  }
+  if (absenceStart.isAfter(endDate) || absenceEnd.isBefore(startDate)) return 0
 
   // Without 'true' as the third argument, the result will be truncated, not rounded (e.g. 4.999 would be 4, not 5). This is why we use Math.round() instead
   return Math.round(absenceEnd.diff(absenceStart, 'months', true))
@@ -134,21 +131,15 @@ const getGraduationTimeStats = async ({ studyprogramme, years, isAcademicYear, i
   return { times, doCombo, comboTimes }
 }
 
-type ProgrammeStats = {
-  code: string
-  name: string
-  [year: string]: number | string
-}
-
-const formatStats = (stats: Record<string, ProgrammeStats>, years: string[]) => {
+const formatStats = (stats, years) => {
   const tableStats = Object.values(stats)
-    .filter(programme => years.map(year => programme[year]).find(started => started !== 0))
-    .map(programme => [programme.code, getId(programme.code), programme.name, ...years.map(year => programme[year])])
+    .filter(p => years.map(year => p[year]).find(started => started !== 0)) // Filter out programmes with no-one started between the selected years
+    .map(p => [p.code, getId(p.code), p.name, ...years.map(year => p[year])])
     .sort((a, b) => sortByProgrammeCode(a[0], b[0]))
 
   const graphStats = Object.values(stats)
-    .filter(programme => years.map(year => programme[year]).find(started => started !== 0))
-    .map(programme => ({ name: programme.name, code: programme.code, data: years.map(year => programme[year]) }))
+    .filter(p => years.map(year => p[year]).find(started => started !== 0)) // Filter out programmes with no-one started between the selected years
+    .map(p => ({ name: p.name, code: p.code, data: years.map(year => p[year]) }))
     .sort((a, b) => sortByProgrammeCode(a.code, b.code))
 
   return { tableStats, graphStats }
@@ -159,22 +150,18 @@ const getProgrammesBeforeStarting = async ({ studyprogramme, years, isAcademicYe
 
   const stats = studyRights.reduce((acc, studyRight) => {
     // If the extent code is something else, that means the student hasn't continued from a bachelor's programme
-    if (studyRight.extentCode !== ExtentCode.BACHELOR_AND_MASTER) {
-      return acc
-    }
-    const phase1Programmes = studyRight.studyRightElements.filter(element => element.phase === 1)
+    if (studyRight.extentCode !== 5) return acc
+    const phase1Programmes = studyRight.studyRightElements.filter(elem => elem.phase === 1)
     const [latestPhase1Programme] = orderBy(phase1Programmes, ['endDate'], ['desc'])
     if (!acc[latestPhase1Programme.code]) {
       acc[latestPhase1Programme.code] = { ...latestPhase1Programme, ...getYearsObject({ years }) }
     }
-    const phase2Programmes = studyRight.studyRightElements.filter(element => element.phase === 2)
+    const phase2Programmes = studyRight.studyRightElements.filter(elem => elem.phase === 2)
 
     // If there's more than one programme of phase 2, the student has transferred from/to another programme
-    if (!includeAllSpecials && phase2Programmes.length > 1) {
-      return acc
-    }
+    if (!includeAllSpecials && phase2Programmes.length > 1) return acc
 
-    const startDateInProgramme = phase2Programmes.find(element => element.code === studyprogramme)?.startDate
+    const startDateInProgramme = phase2Programmes.find(elem => elem.code === studyprogramme)?.startDate
     acc[latestPhase1Programme.code][defineYear(startDateInProgramme, isAcademicYear)] += 1
     return acc
   }, {})
@@ -187,18 +174,15 @@ const getProgrammesAfterGraduation = async ({ studyprogramme, years, isAcademicY
   const studyRights = await getStudyRightsInProgramme(studyprogramme, true)
 
   const stats = studyRights.reduce((acc, studyRight) => {
-    const phase1Programmes = studyRight.studyRightElements.filter(element => element.phase === 1)
+    const phase1Programmes = studyRight.studyRightElements.filter(elem => elem.phase === 1)
 
     // If there's more than one programme of phase 1, the student has transferred from/to another programme
-    if (!includeAllSpecials && phase1Programmes.length > 1) {
-      return acc
-    }
+    if (!includeAllSpecials && phase1Programmes.length > 1) return acc
 
-    const phase2Programmes = studyRight.studyRightElements.filter(element => element.phase === 2)
+    const phase2Programmes = studyRight.studyRightElements.filter(elem => elem.phase === 2)
     const [firstPhase2Programme] = orderBy(phase2Programmes, ['startDate'], ['asc'])
-    if (!firstPhase2Programme) {
-      return acc
-    }
+    if (!firstPhase2Programme) return acc
+
     if (!acc[firstPhase2Programme.code]) {
       acc[firstPhase2Programme.code] = { ...firstPhase2Programme, ...getYearsObject({ years }) }
     }
@@ -217,7 +201,7 @@ const getProgrammesBeforeOrAfter = async (studyprogramme, queryParameters) => {
   return null
 }
 
-export const getGraduationStatsForStudytrack = async ({ studyprogramme, combinedProgramme, settings }) => {
+const getGraduationStatsForStudytrack = async ({ studyprogramme, combinedProgramme, settings }) => {
   const { isAcademicYear, includeAllSpecials } = settings
   const since = getStartDate(isAcademicYear)
   const years = getYearsArray(since.getFullYear(), isAcademicYear)
@@ -299,4 +283,8 @@ export const getGraduationStatsForStudytrack = async ({ studyprogramme, combined
     programmesBeforeOrAfterGraphStats: programmesBeforeOrAfter?.graphStats,
     programmesBeforeOrAfterTitles,
   }
+}
+
+module.exports = {
+  getGraduationStatsForStudytrack,
 }

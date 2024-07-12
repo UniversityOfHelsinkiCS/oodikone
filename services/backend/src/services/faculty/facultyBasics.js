@@ -1,27 +1,26 @@
-import { indexOf, isArray } from 'lodash'
-import moment from 'moment'
+const { indexOf, isArray } = require('lodash')
+const moment = require('moment')
 
-import { codes } from '../../../config/programmeCodes'
-import { ExtentCode } from '../../types/extentCode'
-import { defineYear, getStatsBasis, getYearsArray } from '../studyProgramme/studyProgrammeHelpers'
-import {
-  getGraduatedStudyRights,
-  getStartedStudyRights,
-  getStudyRightsByStudyRightStartYear,
+const { codes } = require('../../../config/programmeCodes')
+const { defineYear, getStatsBasis, getYearsArray } = require('../studyProgramme/studyProgrammeHelpers')
+const {
   getTransferredInside,
   getTransferredToAndAway,
   getTransfersIn,
+  graduatedStudyrights,
+  startedStudyrights,
+  studyrightsByRightStartYear,
   transferredAway,
   transferredInsideFaculty,
   transferredTo,
-} from './faculty'
-import {
+} = require('./faculty')
+const {
   checkCommissioned,
   checkTransfers,
   findRightProgramme,
   getExtentFilter,
   isNewProgramme,
-} from './facultyHelpers'
+} = require('./facultyHelpers')
 
 const filterDuplicateStudyrights = studyrights => {
   // bachelor+master students have two studyrights (separated by two last digits in studyrightid)
@@ -85,11 +84,11 @@ const getFacultyStarters = async (
   const startedGraphStats = [...graphStats]
   const startedTableStats = { ...tableStats }
   const programmeTableStats = {}
-  const studyRightWhere = getExtentFilter(includeAllSpecials)
+  const studyrightWhere = getExtentFilter(includeAllSpecials)
   const start = new Date('2017-01-01').toUTCString()
   const end = new Date()
   for (const code of programmes) {
-    const studyrights = await getStartedStudyRights(faculty, since, code, studyRightWhere)
+    const studyrights = await startedStudyrights(faculty, code, since, studyrightWhere)
     let filteredStudyrights = filterDuplicateStudyrights(studyrights)
     const insideTransfers = await getTransfersIn(code, start, end)
     filteredStudyrights = filteredStudyrights.filter(
@@ -163,9 +162,9 @@ const getFacultyGraduates = async (
     graduatedTableStats[year] = [0, 0, 0, 0, 0]
   })
   const keys = Object.keys(codes)
-  const studyRightWhere = getExtentFilter(includeAllSpecials)
+  const studyrightWhere = getExtentFilter(includeAllSpecials)
   for (const code of programmes) {
-    let graduatedRights = await getGraduatedStudyRights(faculty, since, code, studyRightWhere)
+    let graduatedRights = await graduatedStudyrights(faculty, code, since, studyrightWhere)
     if (!includeAllSpecials) {
       graduatedRights = graduatedRights.filter(
         studyright =>
@@ -195,15 +194,15 @@ const getFacultyGraduates = async (
         }
         programmeTableStats[programmeId][endYear][0] += 1
 
-        if (extentcode === ExtentCode.BACHELOR) {
+        if (extentcode === 1) {
           graduatedGraphStats[1][indexOf(yearsArray, endYear)] += 1
           graduatedTableStats[endYear][1] += 1
           programmeTableStats[programmeId][endYear][1] += 1
-        } else if (extentcode === ExtentCode.MASTER) {
+        } else if (extentcode === 2) {
           graduatedGraphStats[2][indexOf(yearsArray, endYear)] += 1
           graduatedTableStats[endYear][2] += 1
           programmeTableStats[programmeId][endYear][2] += 1
-        } else if (extentcode === ExtentCode.DOCTOR) {
+        } else if (extentcode === 4) {
           graduatedGraphStats[3][indexOf(yearsArray, endYear)] += 1
           graduatedTableStats[endYear][3] += 1
           programmeTableStats[programmeId][endYear][3] += 1
@@ -240,11 +239,10 @@ const getInsideTransfers = async (programmeCodes, allProgrammeCodes, since, incl
     return await transferredInsideFaculty(programmeCodes, allProgrammeCodes, since)
   }
   const insiders = await transferredInsideFaculty(programmeCodes, allProgrammeCodes, since)
-  const sinceDate = moment('2017-08-01', 'YYYY-MM-DD').toDate()
-  const studyRights = (await getStudyRightsByStudyRightStartYear(faculty, sinceDate)).map(
-    studyright => studyright.studyrightid
-  )
-  const filteredTransfers = insiders.filter(transfer => studyRights.includes(transfer.studyrightid))
+  const studyrights = (
+    await studyrightsByRightStartYear(faculty, new Date(moment('2017-08-01', 'YYYY-MM-DD')).toUTCString())
+  ).map(studyright => studyright.studyrightid)
+  const filteredTransfers = insiders.filter(transfer => studyrights.includes(transfer.studyrightid))
   return filteredTransfers
 }
 
@@ -356,41 +354,18 @@ const getFacultyTransfers = async (
   })
 }
 
-type YearlyStats = {
-  [year: string]: number[]
-}
-
-type ProgrammeData = {
-  started: {
-    [programmeId: string]: YearlyStats
-  }
-  graduated: {
-    [programmeId: string]: YearlyStats
-  }
-  transferred: {
-    [programmeId: string]: YearlyStats
-  }
-}
-
-export const combineFacultyBasics = async (
-  faculty: string,
-  programmes,
-  yearType: string,
-  allProgrammeCodes: string[],
-  programmeFilter: string,
-  special: string
-) => {
-  const counts: { [year: string]: number[] } = {}
-  const countsGraduations: { [year: string]: number[] } = {}
-  const years: string[] = []
-  const programmeData: ProgrammeData = { started: {}, graduated: {}, transferred: {} }
+const combineFacultyBasics = async (faculty, programmes, yearType, allProgrammeCodes, programmeFilter, special) => {
+  const counts = {}
+  const countsGraduations = {}
+  const years = []
+  const programmeData = {}
   const isAcademicYear = yearType === 'ACADEMIC_YEAR'
   const includeAllSpecials = special === 'SPECIAL_INCLUDED'
   const since = isAcademicYear ? new Date('2017-08-01') : new Date('2017-01-01')
   const yearsArray = getYearsArray(since.getFullYear(), isAcademicYear)
   const { graphStats, tableStats } = getStatsBasis(yearsArray)
   Object.keys(tableStats).forEach(year => years.push(year))
-  const wantedProgrammeCodes = programmes.map(programme => programme.code)
+  const wantedProgrammeCodes = programmes.map(prog => prog.code)
 
   const allBasics = {
     id: faculty,
@@ -486,8 +461,8 @@ export const combineFacultyBasics = async (
   )
   allCodes = [...new Set(allCodes)]
 
-  const studentInfo: { [prog: string]: { [year: string]: any[] } } = {}
-  const graduationInfo: { [prog: string]: { [year: string]: any[] } } = {}
+  const studentInfo = {}
+  const graduationInfo = {}
 
   allCodes.forEach(code => {
     if (!(code in studentInfo)) studentInfo[code] = {}
@@ -528,3 +503,5 @@ export const combineFacultyBasics = async (
 
   return allBasics
 }
+
+module.exports = { combineFacultyBasics }

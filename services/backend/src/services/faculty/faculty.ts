@@ -45,7 +45,7 @@ export const transferredFaculty = async (programmeCodeIn, programmeCodeOut, star
     })
   ).map(formatFacultyTransfer)
 
-export const getStartedStudyRights = async (faculty: string, since: Date, code: string, studyRightWhere) =>
+export const startedStudyrights = async (faculty, code, since, studyRightWhere) =>
   (
     await Studyright.findAll({
       include: [
@@ -73,7 +73,7 @@ export const getStartedStudyRights = async (faculty: string, since: Date, code: 
     })
   ).map(formatFacultyStudyRight)
 
-export const getGraduatedStudyRights = async (faculty: string, since: Date, code: string, studyrightWhere?) =>
+export const graduatedStudyrights = async (faculty, code, since, studyrightWhere) =>
   (
     await Studyright.findAll({
       include: [
@@ -102,12 +102,7 @@ export const getGraduatedStudyRights = async (faculty: string, since: Date, code
     })
   ).map(formatFacultyStudyRight)
 
-export const getStudyRightsByStudyRightStartYear = async (
-  faculty: string,
-  since: Date,
-  graduated: number | number[] = 1,
-  code?: string
-) =>
+export const studyrightsByRightStartYear = async (faculty, code, since, graduated = 1) =>
   (
     await Studyright.findAll({
       include: [
