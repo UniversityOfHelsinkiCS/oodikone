@@ -44,8 +44,8 @@ export class Transfer extends Model {
   @Column(DataType.STRING)
   targetcode: string
 
-  @Column(DataType.STRING)
-  transferdate: string
+  @Column(DataType.DATE)
+  transferdate: Date
 
   @ForeignKey(() => Student)
   @Column(DataType.STRING)

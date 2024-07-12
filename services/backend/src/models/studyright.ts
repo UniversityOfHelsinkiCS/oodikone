@@ -52,8 +52,8 @@ export class Studyright extends Model {
   @HasMany(() => Studyplan, { foreignKey: 'studyrightid', sourceKey: 'studyrightid' })
   studyplans: Studyplan[]
 
-  @Column(DataType.STRING)
-  startdate: string
+  @Column(DataType.DATE)
+  startdate: Date
 
   @Column(DataType.DATE)
   enddate: Date
@@ -61,8 +61,8 @@ export class Studyright extends Model {
   @Column(DataType.DATE)
   givendate: Date
 
-  @Column(DataType.STRING)
-  studystartdate: string
+  @Column(DataType.DATE)
+  studystartdate: Date
 
   @Column(DataType.STRING)
   graduated: string
