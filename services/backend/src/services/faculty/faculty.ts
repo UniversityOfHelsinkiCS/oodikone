@@ -14,36 +14,15 @@ import {
   Student,
   Studyright,
   StudyrightElement,
-  Transfer,
 } from '../../models'
 import {
   formatFacultyProgramme,
   formatFacultyProgrammeStudents,
   formatFacultyStudyRight,
   formatFacultyThesisWriter,
-  formatFacultyTransfer,
   formatOrganization,
 } from './facultyFormatHelpers'
 import { isNewProgramme, mapCodesToIds } from './facultyHelpers'
-
-export const transferredFaculty = async (programmeCodeIn, programmeCodeOut, start, end) =>
-  (
-    await Transfer.findAll({
-      where: {
-        transferdate: {
-          [Op.between]: [start, end],
-        },
-        [Op.or]: [
-          {
-            sourcecode: programmeCodeOut,
-          },
-          {
-            targetcode: programmeCodeIn,
-          },
-        ],
-      },
-    })
-  ).map(formatFacultyTransfer)
 
 export const startedStudyrights = async (faculty, code, since, studyRightWhere) =>
   (
@@ -226,49 +205,6 @@ export const hasMasterRight = async id => {
   })
 }
 
-export const transferredInsideFaculty = async (programmes, allProgrammeCodes, since) =>
-  (
-    await Transfer.findAll({
-      where: {
-        transferdate: {
-          [Op.gte]: since,
-        },
-        sourcecode: allProgrammeCodes,
-        targetcode: programmes,
-      },
-    })
-  ).map(formatFacultyTransfer)
-
-export const transferredAway = async (programmes, allProgrammeCodes, since) =>
-  (
-    await Transfer.findAll({
-      where: {
-        transferdate: {
-          [Op.gte]: since,
-        },
-        sourcecode: programmes,
-        targetcode: {
-          [Op.notIn]: allProgrammeCodes,
-        },
-      },
-    })
-  ).map(formatFacultyTransfer)
-
-export const transferredTo = async (programmes, allProgrammeCodes, since) =>
-  (
-    await Transfer.findAll({
-      where: {
-        transferdate: {
-          [Op.gte]: since,
-        },
-        sourcecode: {
-          [Op.notIn]: allProgrammeCodes,
-        },
-        targetcode: programmes,
-      },
-    })
-  ).map(formatFacultyTransfer)
-
 export const degreeProgrammesOfFaculty = async facultyCode =>
   // Some programmenames are different, causing this to return multiples of same codes.
   // Hence the uniqBy
@@ -399,22 +335,4 @@ export const findFacultyProgrammeCodes = async (faculty, programmeFilter) => {
   mapCodesToIds(allProgrammes)
 
   return allProgrammes
-}
-
-export const getTransferredToAndAway = async (programmeCodes, allProgrammeCodes, since) => {
-  const awayTransfers = await transferredAway(programmeCodes, allProgrammeCodes, since)
-  const toTransfers = await transferredTo(programmeCodes, allProgrammeCodes, since)
-  return [...toTransfers, ...awayTransfers]
-}
-
-export const getTransferredInside = async (programmeCodes, allProgrammeCodes, since) => {
-  return await transferredInsideFaculty(programmeCodes, allProgrammeCodes, since)
-}
-
-export const getTransfersOut = async (programmeCode, start, end) => {
-  return await transferredFaculty([], [programmeCode], start, end)
-}
-
-export const getTransfersIn = async (programmeCode, start, end) => {
-  return await transferredFaculty([programmeCode], [], start, end)
 }

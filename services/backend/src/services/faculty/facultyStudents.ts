@@ -9,8 +9,9 @@ import {
   tableTitles,
 } from '../studyProgramme/studyProgrammeHelpers'
 import { inactiveStudyrights, graduatedStudyRights } from '../studyProgramme/studyRightFinders'
-import { getStudyRightsByExtent, getStudentsByStudentnumbers, getTransfersIn } from './faculty'
+import { getStudyRightsByExtent, getStudentsByStudentnumbers } from './faculty'
 import { checkTransfers } from './facultyHelpers'
+import { getTransfersIn } from './facultyTransfers'
 
 const emptyTotals = () => {
   return {

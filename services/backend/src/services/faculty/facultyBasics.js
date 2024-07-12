@@ -3,17 +3,7 @@ const moment = require('moment')
 
 const { codes } = require('../../../config/programmeCodes')
 const { defineYear, getStatsBasis, getYearsArray } = require('../studyProgramme/studyProgrammeHelpers')
-const {
-  getTransferredInside,
-  getTransferredToAndAway,
-  getTransfersIn,
-  graduatedStudyrights,
-  startedStudyrights,
-  studyrightsByRightStartYear,
-  transferredAway,
-  transferredInsideFaculty,
-  transferredTo,
-} = require('./faculty')
+const { graduatedStudyrights, startedStudyrights, studyrightsByRightStartYear } = require('./faculty')
 const {
   checkCommissioned,
   checkTransfers,
@@ -21,6 +11,14 @@ const {
   getExtentFilter,
   isNewProgramme,
 } = require('./facultyHelpers')
+const {
+  getTransferredInside,
+  getTransferredToAndAway,
+  getTransfersIn,
+  transferredAway,
+  transferredInsideFaculty,
+  transferredTo,
+} = require('./facultyTransfers')
 
 const filterDuplicateStudyrights = studyrights => {
   // bachelor+master students have two studyrights (separated by two last digits in studyrightid)

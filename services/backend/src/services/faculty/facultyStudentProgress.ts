@@ -5,8 +5,9 @@ import { ExtentCode } from '../../types/extentCode'
 import { getAcademicYearDates } from '../../util/semester'
 import { studytrackStudents } from '../studyProgramme/studentGetters'
 import { getCreditThresholds, getYearsArray } from '../studyProgramme/studyProgrammeHelpers'
-import { getStudyRightsByExtent, getStudyRightsByBachelorStart, getTransfersIn, getTransfersOut } from './faculty'
+import { getStudyRightsByExtent, getStudyRightsByBachelorStart } from './faculty'
 import { checkTransfers } from './facultyHelpers'
+import { getTransfersIn, getTransfersOut } from './facultyTransfers'
 
 const getStudentData = (
   startDate,

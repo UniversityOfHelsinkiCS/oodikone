@@ -33,15 +33,15 @@ const getPassingSemester = (startYear, date) => {
 const getAcademicYearDates = (year, since) => {
   if (year === 'Total') {
     return {
-      startDate: new Date(`${since.getFullYear()}-${semesterStart.FALL}`).toUTCString(),
-      endDate: new Date(`${moment(new Date()).add(1, 'years').format('YYYY')}-${semesterEnd.SPRING}`).toUTCString(),
+      startDate: new Date(`${since.getFullYear()}-${semesterStart.FALL}`),
+      endDate: new Date(`${moment(new Date()).add(1, 'years').format('YYYY')}-${semesterEnd.SPRING}`),
     }
   }
   const startYear = year.slice(0, 4)
   const endYear = moment(startYear, 'YYYY').add(1, 'years').format('YYYY')
   return {
-    startDate: new Date(moment.tz(`${startYear}-${semesterStart.FALL}`, 'Europe/Helsinki').format()).toUTCString(),
-    endDate: new Date(`${endYear}-${semesterEnd.SPRING}`).toUTCString(),
+    startDate: new Date(moment.tz(`${startYear}-${semesterStart.FALL}`, 'Europe/Helsinki').format()),
+    endDate: new Date(`${endYear}-${semesterEnd.SPRING}`),
   }
 }
 
