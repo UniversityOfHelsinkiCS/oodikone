@@ -1,5 +1,6 @@
 import { BelongsTo, Column, CreatedAt, DataType, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
+import { Phase } from '../types/phase'
 import { SISStudyRight } from './SISStudyRight'
 
 @Table({
@@ -24,7 +25,7 @@ export class SISStudyRightElement extends Model {
   graduated: boolean
 
   @Column(DataType.INTEGER)
-  phase: number
+  phase: Phase
 
   @Column(DataType.STRING)
   studyRightId: string

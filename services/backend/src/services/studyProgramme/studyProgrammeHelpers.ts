@@ -2,6 +2,7 @@ import { orderBy } from 'lodash'
 
 import { codes } from '../../../config/programmeCodes'
 import { ExtentCode } from '../../types/extentCode'
+import { Phase } from '../../types/phase'
 import { studentnumbersWithAllStudyrightElements } from '../populations'
 
 export const getCorrectStudentnumbers = async ({
@@ -238,7 +239,7 @@ export const isRelevantProgramme = (code: string): boolean => {
   )
 }
 
-export const getStudyRightElementsWithPhase = (studyRight, phase: number) => {
+export const getStudyRightElementsWithPhase = (studyRight, phase: Phase) => {
   return orderBy(
     studyRight.studyRightElements.filter(element => element.phase === phase),
     ['startDate'],
