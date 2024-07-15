@@ -417,36 +417,13 @@ const updateElementDetails = async studyRights => {
       acc[30].add(educationPhase2ChildGroupId)
       return acc
     },
-    { 10: new Set(), 20: new Set(), 30: new Set() }
+    { 20: new Set(), 30: new Set() }
   )
   const programmes = await selectFromByIds(
     'modules',
     [...groupedEducationPhases[20]].filter(a => !!a),
     'group_id'
   )
-  // Find the educations instead of module if module information not there
-  // add also the wanted information to programmes.
-  // Note: the modules and educations are differs from each other. However, both entities contains
-  // code, (programme) name and type that are necessary for the elementDetail table.
-  const foundProgrammeGroupIds = programmes.map(prog => prog.group_id)
-  if ([...new Set(foundProgrammeGroupIds)].length < [...groupedEducationPhases[20]].filter(a => !!a).length) {
-    const programmeGroupIds = [...new Set(foundProgrammeGroupIds)]
-    const notFoundGroupIds = [...groupedEducationPhases[20]]
-      .filter(a => !!a)
-      .filter(id => programmeGroupIds.includes(id))
-    const educationIds = studyRights
-      .filter(
-        sr =>
-          !notFoundGroupIds.includes(sr.accepted_selection_path.educationPhase1GroupId) &&
-          !notFoundGroupIds.includes(sr.accepted_selection_path.educationPhase2GroupId)
-      )
-      .map(sr => sr.education_id)
-    const educationInfo = await selectFromByIds('educations', educationIds)
-    const mappedEducationInfo = educationInfo.map(education => {
-      return { ...education, group_id: education.group_id.replace('EDU', 'DP'), type: 20 }
-    })
-    if (educationIds.length > 0) programmes.push(...mappedEducationInfo)
-  }
 
   const studytracks = await selectFromByIds(
     'modules',
