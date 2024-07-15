@@ -50,7 +50,7 @@ class DbConnection extends EventEmitter {
     this.RETRY_ATTEMPTS = 15
     this.established = false
 
-    this.sequelize = new Sequelize(conf.SIS_DB_URL as string, {
+    this.sequelize = new Sequelize(conf.SIS_DB_URL, {
       dialect: 'postgres',
       pool: {
         max: 25,
@@ -107,11 +107,10 @@ class DbConnection extends EventEmitter {
 }
 
 // Old-style kone + user db connections
-const sequelizeKone = new Sequelize(conf.DB_URL_KONE as string, {
-  schema: conf.DB_SCHEMA_KONE as string,
-  // searchPath: conf.DB_SCHEMA_KONE as string, // TODO is this necessary
+const sequelizeKone = new Sequelize(conf.DB_URL_KONE, {
+  schema: conf.DB_SCHEMA_KONE,
   logging: false,
-  password: conf.KONE_PASSWORD as string,
+  password: conf.KONE_PASSWORD,
   models: [
     CustomPopulationSearch,
     ExcludedCourse,
@@ -168,12 +167,11 @@ const initializeDatabaseConnection = async () => {
         params: [seq.getQueryInterface(), Sequelize],
         path: `${process.cwd()}/src/database/${migrationsFolder}`,
         pattern: /\.js$/,
-        schema,
       },
     })
     try {
       const migrations = await migrator.up()
-      logger.info({ message: `${dbName} migrations up to date: `, meta: migrations.map(m => m.file) })
+      logger.info({ message: `${dbName} migrations up to date: `, meta: migrations.map(migration => migration.file) })
     } catch (error) {
       logger.error({ message: `${dbName} migrations failed`, meta: error })
       throw error

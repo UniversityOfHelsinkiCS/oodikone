@@ -10,6 +10,7 @@
   "dependencies": {
     "@sentry/node": "^5.30.0",
     "@sentry/tracing": "^6.18.2",
+    "@types/umzug": "^2.3.7",
     "axios": "^0.28.1",
     "bluebird": "^3.7.2",
     "bullmq": "^4.14.2",
