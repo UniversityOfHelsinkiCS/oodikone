@@ -28,6 +28,7 @@ services:
       - user-db
     env_file:
       - .env
+    tty: true
     environment:
       DB_URL_KONE: postgres://postgres@kone-db:5432/kone-db
       DB_URL_USER: postgres://postgres@user-db:5432/user-db

@@ -13,4 +13,4 @@ COPY ./package* ./
 RUN npm ci
 COPY . .
 
-CMD ["npx", "tsx", "watch", "--clear-screen=false", "index.js"]
+CMD ["node_modules/.bin/tsx", "watch", "--clear-screen=false", "index.js"]
