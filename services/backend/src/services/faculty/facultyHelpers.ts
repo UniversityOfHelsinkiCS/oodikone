@@ -38,27 +38,22 @@ export const findRightProgramme = (studyRightElements: any, code: string) => {
 
 const newProgrammes = [/^KH/, /^MH/, /^T/, /^LI/, /^K-/, /^FI/, /^00901$/, /^00910$/]
 
-export const isNewProgramme = (programmeCode: string) => {
-  for (let i = 0; i < newProgrammes.length; i++) {
-    if (newProgrammes[i].test(programmeCode)) {
-      return true
-    }
-  }
-  return false
+export const isNewProgramme = (programmeCode: string): boolean => {
+  return newProgrammes.some(pattern => pattern.test(programmeCode))
 }
 
-export const checkTransfers = (studyright, insideTransfersStudyrights, transfersToOrAwayStudyrights) => {
+const commissionedProgrammes = ['KH50_009', 'MH50_015', 'T923103-N']
+
+export const checkCommissioned = (studyRight: any): boolean => {
+  return studyRight.studyrightElements.some(element => commissionedProgrammes.includes(element.code))
+}
+
+export const checkTransfers = (studyright, insideTransfersStudyrights, transfersToOrAwayStudyrights): boolean => {
   const allTransfers = [
     ...insideTransfersStudyrights.map(studyright => studyright.studentnumber),
     ...transfersToOrAwayStudyrights.map(studyright => studyright.studentnumber),
   ]
   return allTransfers.includes(studyright.studentnumber)
-}
-
-const commissionedProgrammes = ['KH50_009', 'MH50_015', 'T923103-N']
-
-export const checkCommissioned = studyright => {
-  return studyright.studyrightElements.some(element => commissionedProgrammes.includes(element.code))
 }
 
 export const getExtentFilter = (includeAllSpecials: boolean) => {
