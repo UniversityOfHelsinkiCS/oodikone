@@ -20,15 +20,14 @@ import {
   transferredTo,
 } from './facultyTransfers'
 
-const filterDuplicateStudyrights = studyrights => {
+const filterDuplicateStudyrights = (studyRights: { studyrightid: string }[]) => {
   // bachelor+master students have two studyrights (separated by two last digits in studyrightid)
   // choose only bachelor one, so we don't count start of masters as starting in faculty
   const rightsToCount = {}
-
-  studyrights.forEach(right => {
-    const id = right.studyrightid.slice(0, -2)
-    if (right.studyrightid.slice(-2) === '-1') {
-      rightsToCount[id] = right
+  studyRights.forEach(studyRight => {
+    const id = studyRight.studyrightid.slice(0, -2)
+    if (studyRight.studyrightid.slice(-2) === '-1') {
+      rightsToCount[id] = studyRight
     }
   })
   return Object.values(rightsToCount)
@@ -82,12 +81,11 @@ const getFacultyStarters = async (
   const startedGraphStats = [...graphStats]
   const startedTableStats = { ...tableStats }
   const programmeTableStats = {}
-  const studyrightWhere = getExtentFilter(includeAllSpecials)
   const start = new Date('2017-01-01')
   const end = new Date()
   for (const code of programmes) {
-    const studyrights = await startedStudyrights(faculty, code, since, studyrightWhere)
-    let filteredStudyrights = filterDuplicateStudyrights(studyrights)
+    const studyRights = await startedStudyrights(faculty, since, code, includeAllSpecials)
+    let filteredStudyrights = filterDuplicateStudyrights(studyRights)
     const insideTransfers = await getTransfersIn(code, start, end)
     filteredStudyrights = filteredStudyrights.filter(
       studyright => !checkTransfers(studyright, insideTransfers, insideTransfers)

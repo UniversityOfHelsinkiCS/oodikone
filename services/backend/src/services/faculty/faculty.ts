@@ -23,35 +23,44 @@ import {
   formatFacultyThesisWriter,
   formatOrganization,
 } from './facultyFormatHelpers'
-import { isNewProgramme, mapCodesToIds } from './facultyHelpers'
+import { getExtentFilter, isNewProgramme, mapCodesToIds } from './facultyHelpers'
 
-export const startedStudyrights = async (faculty, code, since, studyRightWhere) =>
-  (
-    await Studyright.findAll({
-      include: [
-        {
-          model: StudyrightElement,
-          required: true,
-          where: {
-            code,
+export const startedStudyrights = async (
+  facultyCode: string,
+  since: Date,
+  code: string,
+  includeAllSpecials: boolean
+) => {
+  const studyRightWhere = getExtentFilter(includeAllSpecials)
+
+  const query = {
+    include: [
+      {
+        model: StudyrightElement,
+        required: true,
+        where: {
+          code,
+        },
+        include: [
+          {
+            model: ElementDetail,
+            required: true,
           },
-          include: [
-            {
-              model: ElementDetail,
-              required: true,
-            },
-          ],
-        },
-      ],
-      where: {
-        facultyCode: faculty,
-        startdate: {
-          [Op.gte]: since,
-        },
-        ...studyRightWhere,
+        ],
       },
-    })
-  ).map(formatFacultyStudyRight)
+    ],
+    where: {
+      facultyCode,
+      startdate: {
+        [Op.gte]: since,
+      },
+      ...studyRightWhere,
+    },
+  }
+
+  const studyRights = await Studyright.findAll(query)
+  return studyRights.map(formatFacultyStudyRight)
+}
 
 export const graduatedStudyrights = async (faculty, code, since, studyrightWhere?) =>
   (
