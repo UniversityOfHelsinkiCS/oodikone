@@ -164,25 +164,8 @@ export const FacultyProgrammeOverview = ({
   const doctorStats = calculateStats(progressStats?.data?.creditCounts?.doctor, 40, 0, 5)
 
   const hasNonZeroStats = stats => {
-    const allValuesZero = values => {
-      return values.every(value => parseFloat(value) === 0)
-    }
-
-    const { tableStats, chartStats } = stats
-
-    for (const row of tableStats) {
-      if (allValuesZero(row)) {
-        return false
-      }
-    }
-
-    for (const chart of chartStats) {
-      if (allValuesZero(chart.data)) {
-        return false
-      }
-    }
-
-    return true
+    const allValuesZero = values => values.every(value => parseFloat(value) === 0)
+    return stats.chartStats.some(row => !allValuesZero(row.data))
   }
 
   return (
