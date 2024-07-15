@@ -10,8 +10,10 @@
     "rootDir": ".",
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "strict": false
+    "strict": false,
+    "sourceMap": true,
+    "sourceRoot": "/",
+    "inlineSources": true
   },
-  "include": ["index.js", "src/**/*"],
-  "exclude": ["dist", "instrumented", "node_modules"]
+  "include": ["src/**/*", "index.js"]
 }

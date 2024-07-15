@@ -80,5 +80,5 @@
       }
     }
   },
-  "ignorePatterns": ["node_modules/", "build/", "**/*migrations*/**"]
+  "ignorePatterns": ["build/", "dist/", "instrumented/", "node_modules/", "**/*migrations*/**"]
 }
