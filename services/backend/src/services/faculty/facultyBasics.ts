@@ -1,24 +1,24 @@
-const { indexOf, isArray } = require('lodash')
-const moment = require('moment')
+import { indexOf, isArray } from 'lodash'
+import moment from 'moment'
 
-const { programmeCodes } = require('../../config/programmeCodes')
-const { defineYear, getStatsBasis, getYearsArray } = require('../studyProgramme/studyProgrammeHelpers')
-const { graduatedStudyrights, startedStudyrights, studyrightsByRightStartYear } = require('./faculty')
-const {
+import { programmeCodes } from '../../config/programmeCodes'
+import { defineYear, getStatsBasis, getYearsArray } from '../studyProgramme/studyProgrammeHelpers'
+import { graduatedStudyrights, startedStudyrights, studyrightsByRightStartYear } from './faculty'
+import {
   checkCommissioned,
   checkTransfers,
   findRightProgramme,
   getExtentFilter,
   isNewProgramme,
-} = require('./facultyHelpers')
-const {
+} from './facultyHelpers'
+import {
   getTransferredInside,
   getTransferredToAndAway,
   getTransfersIn,
   transferredAway,
   transferredInsideFaculty,
   transferredTo,
-} = require('./facultyTransfers')
+} from './facultyTransfers'
 
 const filterDuplicateStudyrights = studyrights => {
   // bachelor+master students have two studyrights (separated by two last digits in studyrightid)
@@ -83,7 +83,7 @@ const getFacultyStarters = async (
   const startedTableStats = { ...tableStats }
   const programmeTableStats = {}
   const studyrightWhere = getExtentFilter(includeAllSpecials)
-  const start = new Date('2017-01-01').toUTCString()
+  const start = new Date('2017-01-01')
   const end = new Date()
   for (const code of programmes) {
     const studyrights = await startedStudyrights(faculty, code, since, studyrightWhere)
@@ -237,9 +237,9 @@ const getInsideTransfers = async (programmeCodes, allProgrammeCodes, since, incl
     return await transferredInsideFaculty(programmeCodes, allProgrammeCodes, since)
   }
   const insiders = await transferredInsideFaculty(programmeCodes, allProgrammeCodes, since)
-  const studyrights = (
-    await studyrightsByRightStartYear(faculty, new Date(moment('2017-08-01', 'YYYY-MM-DD')).toUTCString())
-  ).map(studyright => studyright.studyrightid)
+  const studyrights = (await studyrightsByRightStartYear(faculty, moment('2017-08-01', 'YYYY-MM-DD').toDate())).map(
+    studyright => studyright.studyrightid
+  )
   const filteredTransfers = insiders.filter(transfer => studyrights.includes(transfer.studyrightid))
   return filteredTransfers
 }
@@ -352,11 +352,18 @@ const getFacultyTransfers = async (
   })
 }
 
-const combineFacultyBasics = async (faculty, programmes, yearType, allProgrammeCodes, programmeFilter, special) => {
+export const combineFacultyBasics = async (
+  faculty,
+  programmes,
+  yearType,
+  allProgrammeCodes,
+  programmeFilter,
+  special
+) => {
   const counts = {}
   const countsGraduations = {}
   const years = []
-  const programmeData = {}
+  const programmeData: { started?: object; graduated?: object; transferred?: object } = {}
   const isAcademicYear = yearType === 'ACADEMIC_YEAR'
   const includeAllSpecials = special === 'SPECIAL_INCLUDED'
   const since = isAcademicYear ? new Date('2017-08-01') : new Date('2017-01-01')
@@ -501,5 +508,3 @@ const combineFacultyBasics = async (faculty, programmes, yearType, allProgrammeC
 
   return allBasics
 }
-
-module.exports = { combineFacultyBasics }

@@ -118,7 +118,7 @@ const addGraduation = async (
 
 const getClassSizes = async (faculty, programmeCodes, since, classSizes, programmeFilter, years) => {
   for (const code of programmeCodes) {
-    const studyrights = await studyrightsByRightStartYear(faculty, code, since, [0, 1])
+    const studyrights = await studyrightsByRightStartYear(faculty, since, code, [0, 1])
 
     // get all received studyrights for each year
     // a transferred student is counted into new programmes class size i.e.
@@ -214,7 +214,7 @@ const count = async (
     if (mode === 'gradYear') {
       studyrights = await graduatedStudyrights(faculty, code, since)
     } else {
-      studyrights = await studyrightsByRightStartYear(faculty, code, since)
+      studyrights = await studyrightsByRightStartYear(faculty, since, code)
     }
     for (const right of studyrights) {
       const { enddate, startdate, studyrightid, extentcode, studyrightElements, studentnumber } = right
