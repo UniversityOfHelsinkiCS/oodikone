@@ -53,7 +53,7 @@ export const startedStudyrights = async (faculty, code, since, studyRightWhere) 
     })
   ).map(formatFacultyStudyRight)
 
-export const graduatedStudyrights = async (faculty, code, since, studyrightWhere) =>
+export const graduatedStudyrights = async (faculty, code, since, studyrightWhere?) =>
   (
     await Studyright.findAll({
       include: [
@@ -82,7 +82,7 @@ export const graduatedStudyrights = async (faculty, code, since, studyrightWhere
     })
   ).map(formatFacultyStudyRight)
 
-export const studyrightsByRightStartYear = async (faculty, code, since, graduated = 1) =>
+export const studyrightsByRightStartYear = async (faculty, code, since, graduated: number | number[] = 1) =>
   (
     await Studyright.findAll({
       include: [

@@ -35,7 +35,7 @@ export const getCorrectStudentnumbers = async ({
   return studentnumbers
 }
 
-export const getYearsArray = (since: number, isAcademicYear: boolean, yearsCombined: boolean) => {
+export const getYearsArray = (since: number, isAcademicYear: boolean, yearsCombined?: boolean) => {
   const years = []
   const allYears = 'Total'
   if (yearsCombined) {

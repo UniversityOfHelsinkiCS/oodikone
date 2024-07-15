@@ -1,18 +1,19 @@
-const moment = require('moment')
+import moment from 'moment'
 
-const { programmeCodes } = require('../../config/programmeCodes')
-const { countTimeCategories, getBachelorStudyRight, getStatutoryAbsences } = require('../graduationHelpers')
-const { defineYear, getMedian, getYearsArray, getYearsObject } = require('../studyProgramme/studyProgrammeHelpers')
-const { graduatedStudyrights, hasMasterRight, studyrightsByRightStartYear } = require('./faculty')
-const { findRightProgramme, isNewProgramme } = require('./facultyHelpers')
-const { getProgrammes } = require('./facultyService')
+import { programmeCodes } from '../../config/programmeCodes'
+import { ExtentCode } from '../../types/extentCode'
+import { countTimeCategories, getBachelorStudyRight, getStatutoryAbsences } from '../graduationHelpers'
+import { defineYear, getMedian, getYearsArray, getYearsObject } from '../studyProgramme/studyProgrammeHelpers'
+import { graduatedStudyrights, hasMasterRight, studyrightsByRightStartYear } from './faculty'
+import { findRightProgramme, isNewProgramme } from './facultyHelpers'
+import { getProgrammes } from './facultyService'
 
-const sortProgrammes = data => {
+const sortProgrammes = programmes => {
   const check = name => {
     if (Number.isNaN(name[0])) return -1
     return 1
   }
-  data.sort((a, b) => {
+  programmes.sort((a, b) => {
     if (check(a.name) === check(b.name)) return a.name.localeCompare(b.name)
     return check(a.name) - check(b.name)
   })
@@ -52,7 +53,7 @@ const hasMS = async (programme, elements, studyrightid) => {
     return false
   }
   if (programme === 'KH60_001') {
-    return !elements.some(el => ['EDUK-VO', '0371', '620050-ba', '620030-ba'].includes(el.dataValues.code))
+    return !elements.some(element => ['EDUK-VO', '0371', '620050-ba', '620030-ba'].includes(element.dataValues.code))
   }
   if (programme === 'KH55_001') {
     const result = await hasMasterRight(studyrightid.replace(/-1$/, '-2'))
@@ -80,18 +81,18 @@ const addGraduation = async (
 
   if (programme === 'MH30_001' || programme === 'MH30_003') {
     level = 'bcMsCombo'
-  } else if (extentcode === 1) {
+  } else if (extentcode === ExtentCode.BACHELOR) {
     level = 'bachelor'
-  } else if (extentcode === 2) {
+  } else if (extentcode === ExtentCode.MASTER) {
     if (studyrightid.slice(-2) === '-2') {
       level = 'bcMsCombo'
       actualStartdate = await findBachelorStartdate(studyrightid.replace(/-2$/, '-1'))
     } else {
       level = 'master'
     }
-  } else if (extentcode === 4) {
+  } else if (extentcode === ExtentCode.DOCTOR) {
     level = 'doctor'
-  } else if (extentcode === 3) {
+  } else if (extentcode === ExtentCode.LICENTIATE) {
     level = 'licentiate'
   } else {
     return
@@ -104,8 +105,9 @@ const addGraduation = async (
   graduationAmounts[level][year] += 1
   graduationTimes[level][year] = [...graduationTimes[level][year], timeToGraduation]
 
-  if (!(programme in programmes[level][year]))
+  if (!(programme in programmes[level][year])) {
     programmes[level][year][programme] = { graduationTimes: [], graduationAmounts: 0 }
+  }
 
   programmes[level][year][programme].graduationAmounts += 1
   programmes[level][year][programme].graduationTimes = [
@@ -132,9 +134,9 @@ const getClassSizes = async (faculty, programmeCodes, since, classSizes, program
 
       if (code === 'MH30_001' || code === 'MH30_003') {
         level = 'bcMsCombo'
-      } else if (extentcode === 1) {
+      } else if (extentcode === ExtentCode.BACHELOR) {
         level = 'bachelor'
-      } else if (extentcode === 2) {
+      } else if (extentcode === ExtentCode.MASTER) {
         if (studyrightid.slice(-2) === '-2') {
           level = 'bcMsCombo'
           actualStartdate = await findBachelorStartdate(studyrightid.replace(/-2$/, '-1'))
@@ -143,9 +145,9 @@ const getClassSizes = async (faculty, programmeCodes, since, classSizes, program
         } else {
           level = 'master'
         }
-      } else if (extentcode === 4) {
+      } else if (extentcode === ExtentCode.DOCTOR) {
         level = 'doctor'
-      } else if (extentcode === 3) {
+      } else if (extentcode === ExtentCode.LICENTIATE) {
         level = 'licentiate'
       } else {
         continue
@@ -162,7 +164,7 @@ const getClassSizes = async (faculty, programmeCodes, since, classSizes, program
       }
 
       if (!(code in classSizes.programmes)) {
-        if (extentcode === 2) {
+        if (extentcode === ExtentCode.MASTER) {
           classSizes.programmes[code] = {}
           classSizes.programmes[code].bcMsCombo = getYearsObject({ years, emptyArrays: false })
           classSizes.programmes[code].master = getYearsObject({ years, emptyArrays: false })
@@ -171,7 +173,7 @@ const getClassSizes = async (faculty, programmeCodes, since, classSizes, program
         }
       }
 
-      if (extentcode === 2 && ['master', 'bcMsCombo'].includes(level)) {
+      if (extentcode === ExtentCode.MASTER && ['master', 'bcMsCombo'].includes(level)) {
         classSizes.programmes[code][level][startYear] += 1
       } else {
         classSizes.programmes[code][startYear] += 1
@@ -289,9 +291,8 @@ const count = async (
         {
           median,
           amount: graduationAmounts[level][year],
-          /* Include individual graduation times for the sake of university-level
-             evaluation overview (UniversityView) which has to count medians by itself 
-          */
+          // Include individual graduation times for the sake of university-level
+          // evaluation overview which has to count medians by itself
           times: graduationTimes[level][year],
           statistics,
           name: year,
@@ -303,7 +304,7 @@ const count = async (
   return data
 }
 
-const countGraduationTimes = async (faculty, programmeFilter) => {
+export const countGraduationTimes = async (faculty, programmeFilter) => {
   const programmes = (await getProgrammes(faculty, programmeFilter)).data
   const isAcademicYear = false
   const since = isAcademicYear ? new Date('2017-08-01') : new Date('2017-01-01')
@@ -369,5 +370,3 @@ const countGraduationTimes = async (faculty, programmeFilter) => {
 
   return { id: faculty, goals, byGradYear, byStartYear, programmeNames, classSizes }
 }
-
-module.exports = { countGraduationTimes }
