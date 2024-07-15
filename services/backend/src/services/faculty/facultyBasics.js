@@ -1,7 +1,7 @@
 const { indexOf, isArray } = require('lodash')
 const moment = require('moment')
 
-const { codes } = require('../../../config/programmeCodes')
+const { programmeCodes } = require('../../config/programmeCodes')
 const { defineYear, getStatsBasis, getYearsArray } = require('../studyProgramme/studyProgrammeHelpers')
 const { graduatedStudyrights, startedStudyrights, studyrightsByRightStartYear } = require('./faculty')
 const {
@@ -92,7 +92,7 @@ const getFacultyStarters = async (
     filteredStudyrights = filteredStudyrights.filter(
       studyright => !checkTransfers(studyright, insideTransfers, insideTransfers)
     )
-    const keys = Object.keys(codes)
+    const keys = Object.keys(programmeCodes)
 
     if (!includeAllSpecials) {
       filteredStudyrights = filteredStudyrights.filter(
@@ -107,7 +107,7 @@ const getFacultyStarters = async (
       let programmeId = programme
 
       if (keys.includes(programme)) {
-        programmeId = codes[programme]
+        programmeId = programmeCodes[programme]
       }
 
       if (programmeFilter === 'ALL_PROGRAMMES' || isNewProgramme(programme)) {
@@ -159,7 +159,7 @@ const getFacultyGraduates = async (
   Object.keys(tableStats).forEach(year => {
     graduatedTableStats[year] = [0, 0, 0, 0, 0]
   })
-  const keys = Object.keys(codes)
+  const keys = Object.keys(programmeCodes)
   const studyrightWhere = getExtentFilter(includeAllSpecials)
   for (const code of programmes) {
     let graduatedRights = await graduatedStudyrights(faculty, code, since, studyrightWhere)
@@ -176,7 +176,7 @@ const getFacultyGraduates = async (
       let programmeId = programme
 
       if (keys.includes(programme)) {
-        programmeId = codes[programme]
+        programmeId = programmeCodes[programme]
       }
 
       if (programmeFilter === 'ALL_PROGRAMMES' || isNewProgramme(programme)) {

@@ -1,6 +1,6 @@
 // Map programme codes to "letter indentifier"
 
-const codes = {
+export const programmeCodes = {
   KH10_001: 'TUK',
   MH10_001: 'TUM',
   KH20_001: 'ON',
@@ -136,5 +136,3 @@ const codes = {
   T923106: 'MATRENA',
   T923107: 'DOCS',
 }
-
-module.exports = { codes }

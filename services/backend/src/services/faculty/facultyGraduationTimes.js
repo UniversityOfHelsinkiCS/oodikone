@@ -1,6 +1,6 @@
 const moment = require('moment')
 
-const { codes } = require('../../../config/programmeCodes')
+const { programmeCodes } = require('../../config/programmeCodes')
 const { countTimeCategories, getBachelorStudyRight, getStatutoryAbsences } = require('../graduationHelpers')
 const { defineYear, getMedian, getYearsArray, getYearsObject } = require('../studyProgramme/studyProgrammeHelpers')
 const { graduatedStudyrights, hasMasterRight, studyrightsByRightStartYear } = require('./faculty')
@@ -22,8 +22,8 @@ const getSortedProgIds = progs => {
   let programmes = []
 
   for (const prog of progs) {
-    if (Object.keys(codes).includes(prog)) {
-      const name = codes[prog]
+    if (Object.keys(programmeCodes).includes(prog)) {
+      const name = programmeCodes[prog]
       programmes = [...programmes, { name, code: prog }]
     } else {
       programmes = [...programmes, { name: prog, code: prog }]

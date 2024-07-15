@@ -1,7 +1,7 @@
 import { Op } from 'sequelize'
-import { ignoredFacultyCodes } from '../../../config/organisationConstants'
+import { ignoredFacultyCodes } from '../../config/organizationConstants'
 
-import { codes } from '../../../config/programmeCodes'
+import { programmeCodes } from '../../config/programmeCodes'
 import { Organization } from '../../models'
 import { ExtentCode } from '../../types/extentCode'
 import { ElementDetailType } from '../../types/elementDetailType'
@@ -88,8 +88,8 @@ export const getExtentFilter = (includeAllSpecials: boolean) => {
 export const mapCodesToIds = data => {
   // Add programme id e.g. TKT
   for (const programme of data) {
-    if (Object.keys(codes).includes(programme.code)) {
-      programme.progId = codes[programme.code]
+    if (Object.keys(programmeCodes).includes(programme.code)) {
+      programme.progId = programmeCodes[programme.code]
     } else {
       programme.progId = programme.code
     }

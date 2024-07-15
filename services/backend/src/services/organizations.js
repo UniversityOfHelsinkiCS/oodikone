@@ -1,6 +1,6 @@
 const { Op } = require('sequelize')
 
-const { facultyCodes } = require('../../config/organisationConstants')
+const { facultyCodes } = require('../config/organizationConstants')
 const { dbConnections } = require('../database/connection')
 const { Organization } = require('../models')
 

@@ -12,6 +12,6 @@
     "skipLibCheck": true,
     "strict": false
   },
-  "include": ["config/**/*", "index.js", "src/**/*"],
+  "include": ["index.js", "src/**/*"],
   "exclude": ["dist", "instrumented", "node_modules"]
 }

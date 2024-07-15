@@ -1,6 +1,6 @@
 import { orderBy } from 'lodash'
 
-import { codes } from '../../../config/programmeCodes'
+import { programmeCodes } from '../../config/programmeCodes'
 import { ExtentCode } from '../../types/extentCode'
 import { Phase } from '../../types/phase'
 import { studentnumbersWithAllStudyrightElements } from '../populations'
@@ -195,17 +195,17 @@ export const tableTitles = {
 
 export const mapCodesToIds = data => {
   // Add programme id e.g. TKT
-  const keys = Object.keys(codes)
+  const keys = Object.keys(programmeCodes)
   const progs = Object.keys(data)
 
   for (const prog of progs) {
     if (keys.includes(prog)) {
-      data[prog].progId = codes[prog]
+      data[prog].progId = programmeCodes[prog]
     }
   }
 }
 
-export const getId = (code: string): string => codes[code] ?? ''
+export const getId = (code: string): string => programmeCodes[code] ?? ''
 
 export const getGoal = programme => {
   if (!programme) return 0

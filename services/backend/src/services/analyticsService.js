@@ -1,5 +1,5 @@
 const moment = require('moment')
-const { facultyCodes, ignoredFacultyCodes } = require('../../config/organisationConstants')
+const { facultyCodes, ignoredFacultyCodes } = require('../config/organizationConstants')
 const { redisClient } = require('./redis')
 
 // Only new bachelor, masters and doctoral programmes get their data updated in redis every night, use redis for them
