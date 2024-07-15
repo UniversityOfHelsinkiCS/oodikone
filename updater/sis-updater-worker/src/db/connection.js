@@ -52,8 +52,8 @@ class DbConnections extends EventEmitter {
             user: SIS_IMPORTER_USER,
             password: SIS_IMPORTER_PASSWORD,
             database: SIS_IMPORTER_DATABASE,
-            ssl: !isDev && !runningInCI,
             port: SIS_IMPORTER_PORT,
+            ssl: !isDev && !runningInCI ? { rejectUnauthorized: false } : false,
           },
           pool: {
             min: 0,

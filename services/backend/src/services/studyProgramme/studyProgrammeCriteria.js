@@ -1,5 +1,5 @@
 const { Course } = require('../../models')
-const { ProgressCriteria } = require('../../models/models_kone')
+const { ProgressCriteria } = require('../../models/kone')
 const logger = require('../../util/logger')
 
 const getCriteriaByStudyProgramme = async code => {

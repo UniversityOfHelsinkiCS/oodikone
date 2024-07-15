@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES6",
+    "allowJs": true,
+    "moduleResolution": "nodenext",
+    "module": "nodenext",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "outDir": "dist",
+    "rootDir": ".",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": false
+  },
+  "include": ["config/**/*", "index.js", "src/**/*"],
+  "exclude": ["dist", "instrumented", "node_modules"]
+}

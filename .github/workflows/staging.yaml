@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - tsMerge
     paths:
       - '.github/workflows/test.yaml'
       - '.github/workflows/staging.yaml'

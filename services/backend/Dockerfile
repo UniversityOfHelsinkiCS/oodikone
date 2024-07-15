@@ -21,8 +21,12 @@ ENV SENTRY_ENVIRONMENT=$SENTRY_ENVIRONMENT
 ARG SENTRY_RELEASE
 ENV SENTRY_RELEASE=$SENTRY_RELEASE
 
-COPY ./package* ./
-RUN npm ci --omit-dev
+COPY ./package*.json ./
+
+RUN npm ci --include=dev
+
 COPY . .
 
-CMD ["node", "index.js"]
+RUN npm run build
+
+CMD ["node", "dist/index.js"]

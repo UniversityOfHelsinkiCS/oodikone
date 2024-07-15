@@ -25,6 +25,10 @@ const logger = require('../util/logger')
 // For grafana statistics (idea stolen from Norppa)
 const logInfoForGrafana = async (code, combinedProgramme) => {
   const programme = await SISStudyRightElement.findOne({ where: { code } })
+  if (!programme) {
+    logger.error('Study Programme not found', { studyprogrammeCode: code })
+    return
+  }
   const programmeCode = combinedProgramme ? `${programme.code}-${combinedProgramme}` : programme.code
   logger.info('Study Programme', {
     studyprogrammeName: combinedProgramme ? `${programme.name.fi} + maisteri` : programme.name.fi,
@@ -52,11 +56,15 @@ router.get('/:id/basicstats', async (req, res) => {
   const yearType = req.query?.year_type
   const specialGroups = req.query?.special_groups
   const combinedProgramme = req.query?.combined_programme
-  if (!code) return res.status(422).end()
+  if (!code) {
+    return res.status(422).end()
+  }
 
   logInfoForGrafana(code, combinedProgramme)
   const data = await getBasicStats(code, combinedProgramme, yearType, specialGroups)
-  if (data) return res.json(data)
+  if (data) {
+    return res.json(data)
+  }
 
   const updated = await getBasicStatsForStudytrack({
     studyprogramme: req.params.id,

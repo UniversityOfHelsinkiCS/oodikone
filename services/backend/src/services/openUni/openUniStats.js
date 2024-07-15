@@ -70,9 +70,9 @@ const getCustomOpenUniCourses = async (courseCodes, startDate, endDate) => {
   const allCredits = await getCredits(allCourseCodes, startDate)
   const allEnrollments = await getEnrollments(allCourseCodes, startDate, endDate)
   const courses = await getCourseNames(courseCodes)
-  const students = uniq(allEnrollments.map(enrollment => enrollment.enrollmentStudentNumber))
-  const allStudyRights = await getStudyRights(students)
-  const studentInfo = await getStudentInfo(students)
+  const studentNumbers = uniq(allEnrollments.map(enrollment => enrollment.enrollmentStudentNumber))
+  const allStudyRights = await getStudyRights(studentNumbers)
+  const studentInfo = await getStudentInfo(studentNumbers)
 
   const passedGrades = ['1', '2', '3', '4', '5', 'Hyv.', 'hyv.', 'HT', 'TT']
   const failedGrades = ['Hyl.', 'HYL', '0']

@@ -25,4 +25,4 @@ export const apiBasePath = `${basePath}/api`
 export const builtAt = process.env.REACT_APP_BUILT_AT || ''
 
 // Service provider depending this hiding some not needed features default value Toska
-export const serviceProvider = process.env.SERVICE_PROVIDER || 'Toska'
+export const serviceProvider = process.env.REACT_APP_SERVICE_PROVIDER || 'Toska'

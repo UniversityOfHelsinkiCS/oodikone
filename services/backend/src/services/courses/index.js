@@ -270,7 +270,6 @@ const courseYearlyStats = async (coursecodes, separate, anonymizationSalt, combi
     attributes: ['student_studentnumber'],
     where: { course_code: { [Op.in]: coursecodes } },
   })
-
   const enrollment = await Enrollment.findAll({
     attributes: ['studentnumber'],
     where: { course_code: { [Op.in]: coursecodes } },

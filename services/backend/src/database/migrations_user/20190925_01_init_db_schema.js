@@ -29,7 +29,6 @@ CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 -- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
 --
 
-COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
 
 SET search_path = public, pg_catalog;
@@ -52,7 +51,6 @@ CREATE TABLE access_groups (
 );
 
 
-ALTER TABLE access_groups OWNER TO postgres;
 
 --
 -- Name: access_groups_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -66,7 +64,6 @@ CREATE SEQUENCE access_groups_id_seq
     CACHE 1;
 
 
-ALTER TABLE access_groups_id_seq OWNER TO postgres;
 
 --
 -- Name: access_groups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -87,7 +84,6 @@ CREATE TABLE affiliations (
 );
 
 
-ALTER TABLE affiliations OWNER TO postgres;
 
 --
 -- Name: affiliations_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -101,7 +97,6 @@ CREATE SEQUENCE affiliations_id_seq
     CACHE 1;
 
 
-ALTER TABLE affiliations_id_seq OWNER TO postgres;
 
 --
 -- Name: affiliations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -122,7 +117,6 @@ CREATE TABLE faculty_programmes (
 );
 
 
-ALTER TABLE faculty_programmes OWNER TO postgres;
 
 --
 -- Name: hibernate_sequence; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -136,7 +130,6 @@ CREATE SEQUENCE hibernate_sequence
     CACHE 1;
 
 
-ALTER TABLE hibernate_sequence OWNER TO postgres;
 
 --
 -- Name: hy_groups; Type: TABLE; Schema: public; Owner: postgres
@@ -150,7 +143,6 @@ CREATE TABLE hy_groups (
 );
 
 
-ALTER TABLE hy_groups OWNER TO postgres;
 
 --
 -- Name: hy_groups_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -164,7 +156,6 @@ CREATE SEQUENCE hy_groups_id_seq
     CACHE 1;
 
 
-ALTER TABLE hy_groups_id_seq OWNER TO postgres;
 
 --
 -- Name: hy_groups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -183,7 +174,6 @@ CREATE TABLE sequence (
 );
 
 
-ALTER TABLE sequence OWNER TO postgres;
 
 --
 -- Name: user_accessgroup; Type: TABLE; Schema: public; Owner: postgres
@@ -198,7 +188,6 @@ CREATE TABLE user_accessgroup (
 );
 
 
-ALTER TABLE user_accessgroup OWNER TO postgres;
 
 --
 -- Name: user_accessgroup_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -212,7 +201,6 @@ CREATE SEQUENCE user_accessgroup_id_seq
     CACHE 1;
 
 
-ALTER TABLE user_accessgroup_id_seq OWNER TO postgres;
 
 --
 -- Name: user_accessgroup_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -234,7 +222,6 @@ CREATE TABLE user_affiliation (
 );
 
 
-ALTER TABLE user_affiliation OWNER TO postgres;
 
 --
 -- Name: user_affiliation_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -248,7 +235,6 @@ CREATE SEQUENCE user_affiliation_id_seq
     CACHE 1;
 
 
-ALTER TABLE user_affiliation_id_seq OWNER TO postgres;
 
 --
 -- Name: user_affiliation_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -269,7 +255,6 @@ CREATE TABLE user_elementdetails (
 );
 
 
-ALTER TABLE user_elementdetails OWNER TO postgres;
 
 --
 -- Name: user_faculties; Type: TABLE; Schema: public; Owner: postgres
@@ -283,7 +268,6 @@ CREATE TABLE user_faculties (
 );
 
 
-ALTER TABLE user_faculties OWNER TO postgres;
 
 --
 -- Name: user_hy_group; Type: TABLE; Schema: public; Owner: postgres
@@ -298,7 +282,6 @@ CREATE TABLE user_hy_group (
 );
 
 
-ALTER TABLE user_hy_group OWNER TO postgres;
 
 --
 -- Name: user_hy_group_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -312,7 +295,6 @@ CREATE SEQUENCE user_hy_group_id_seq
     CACHE 1;
 
 
-ALTER TABLE user_hy_group_id_seq OWNER TO postgres;
 
 --
 -- Name: user_hy_group_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -332,7 +314,6 @@ CREATE TABLE user_unit (
 );
 
 
-ALTER TABLE user_unit OWNER TO postgres;
 
 --
 -- Name: user_unit_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -346,7 +327,6 @@ CREATE SEQUENCE user_unit_id_seq
     CACHE 1;
 
 
-ALTER TABLE user_unit_id_seq OWNER TO postgres;
 
 --
 -- Name: user_unit_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -368,7 +348,6 @@ CREATE TABLE users (
 );
 
 
-ALTER TABLE users OWNER TO postgres;
 
 --
 -- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -382,7 +361,6 @@ CREATE SEQUENCE users_id_seq
     CACHE 1;
 
 
-ALTER TABLE users_id_seq OWNER TO postgres;
 
 --
 -- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
