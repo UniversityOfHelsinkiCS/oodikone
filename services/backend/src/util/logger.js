@@ -4,7 +4,7 @@ const { WinstonGelfTransporter } = require('winston-gelf-transporter')
 
 const { isProduction } = require('../conf-backend')
 
-const { combine, timestamp, printf } = winston.format
+const { colorize, combine, timestamp, printf } = winston.format
 
 const transports = [new winston.transports.Console()]
 
@@ -27,6 +27,7 @@ if (isProduction) {
 const logger = winston.createLogger({
   level: isProduction ? 'info' : 'debug',
   format: combine(
+    colorize(),
     timestamp({ format: isProduction ? 'D.M.YYYY,HH.mm.ss' : 'HH.mm.ss' }),
     printf(({ level, message, timestamp, error }) => {
       const log = `${timestamp} ${level}: ${message}`
