@@ -58,3 +58,6 @@ instrumented/
 
 # pycharm 
 .idea
+
+# fd specific
+environments/

@@ -8,7 +8,6 @@ const {
   getEducation,
   getEducationType,
   getOrganisationCode,
-  getUniOrgId,
   getSemester,
   getSemesterByDate,
   educationTypeToExtentcode,
@@ -39,7 +38,7 @@ const isCancelled = (studyright, extentcode) => {
   return false
 }
 
-const getStudyrightSemesterEnrollments = (studyright, termRegistrations) => {
+const getStudyrightSemesterEnrollments = termRegistrations => {
   if (!termRegistrations || !Array.isArray(termRegistrations) || termRegistrations.length === 0) return null
   return termRegistrations.map(termRegistration => {
     const {
@@ -49,7 +48,7 @@ const getStudyrightSemesterEnrollments = (studyright, termRegistrations) => {
     } = termRegistration
 
     const enrollmenttype = termRegistrationTypeToEnrollmenttype(termRegistrationType)
-    const { semestercode } = getSemester(getUniOrgId(studyright.organisation_id), studyYearStartYear, termIndex)
+    const { semestercode } = getSemester(studyYearStartYear, termIndex)
     return { enrollmenttype, semestercode, statutoryAbsence }
   })
 }
@@ -76,7 +75,6 @@ const updateStudyRights = async (
       cancelled,
       isBaMa: isBaMa(getEducation(studyright.education_id)),
       semesterEnrollments: getStudyrightSemesterEnrollments(
-        studyright,
         allTermRegistrations.find(termRegistration => termRegistration.study_right_id === studyright.id)
           ?.term_registrations
       ),
@@ -101,12 +99,10 @@ const updateStudyRights = async (
 
     // If the student has registered to be absent or attending for this semester, the studyright is active
     if (termRegistrations) {
-      const studyrightToUniOrgId = getUniOrgId(studyright.organisation_id)
-
       const activeSemesters = termRegistrations.reduce((res, curr) => {
         if (!curr || !curr.studyTerm) return res
         const { studyTerm, termRegistrationType } = curr
-        const { semestercode } = getSemester(studyrightToUniOrgId, studyTerm.studyYearStartYear, studyTerm.termIndex)
+        const { semestercode } = getSemester(studyTerm.studyYearStartYear, studyTerm.termIndex)
         if (['ATTENDING', 'NONATTENDING'].includes(termRegistrationType)) {
           return res.concat(semestercode)
         }

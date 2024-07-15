@@ -4,7 +4,6 @@ const { termRegistrationTypeToEnrollmenttype } = require('../mapper')
 const {
   getEducation,
   getSemester,
-  getUniOrgId,
   getEducationType,
   educationTypeToExtentcode,
   getOrganisationCode,
@@ -23,7 +22,7 @@ const addDaysToDate = (date, days) => {
   return newDate
 }
 
-const getStudyRightSemesterEnrollments = (studyright, semesterEnrollments) => {
+const getStudyRightSemesterEnrollments = semesterEnrollments => {
   if (!semesterEnrollments || semesterEnrollments.length === 0) return null
   return semesterEnrollments.map(termRegistration => {
     const {
@@ -33,11 +32,7 @@ const getStudyRightSemesterEnrollments = (studyright, semesterEnrollments) => {
     } = termRegistration
 
     const type = termRegistrationTypeToEnrollmenttype(termRegistrationType)
-    const { semestercode: semester } = getSemester(
-      getUniOrgId(studyright.organisation_id),
-      studyYearStartYear,
-      termIndex
-    )
+    const { semestercode: semester } = getSemester(studyYearStartYear, termIndex)
     return type === 2 ? { type, semester, statutoryAbsence } : { type, semester }
   })
 }
@@ -63,7 +58,7 @@ const studyRightMapper = (personIdToStudentNumber, admissionNamesById, semesterE
     studentNumber: personIdToStudentNumber[studyRight.person_id],
     extentCode,
     admissionType: admissionNamesById[studyRight.admission_type_urn],
-    semesterEnrollments: getStudyRightSemesterEnrollments(studyRight, semesterEnrollmentsForStudyRight),
+    semesterEnrollments: getStudyRightSemesterEnrollments(semesterEnrollmentsForStudyRight),
     facultyCode: getOrganisationCode(studyRight.organisation_id),
   }
 }

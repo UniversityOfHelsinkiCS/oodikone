@@ -18,7 +18,7 @@ const localMapToRedisKey = {
   educationIdToEducation: 'EDUCATION_ID_TO_EDUCATION',
   gradeScaleIdToGradeIdsToGrades: 'GRADE_SCALE_ID_TO_GRADE_SCALE_IDS_TO_GRADES',
   orgToUniOrgId: 'ORG_TO_UNI_ORG_ID',
-  orgToStartYearToSemesters: 'ORG_TO_START_YEAR_TO_SEMESTERS',
+  startYearToSemesters: 'START_YEAR_TO_SEMESTERS',
   countries: 'COUNTRIES',
 }
 
@@ -29,7 +29,7 @@ const localMaps = {
   educationIdToEducation: null,
   gradeScaleIdToGradeIdsToGrades: null,
   orgToUniOrgId: null,
-  orgToStartYearToSemesters: null,
+  startYearToSemesters: null,
   countries: null,
 }
 
@@ -132,26 +132,26 @@ const initOrgToUniOrgId = async () => {
 
 const getUniOrgId = orgId => localMaps.orgToUniOrgId[orgId]
 
-const initOrgToStartYearToSemesters = async () =>
+const initStartYearToSemesters = async () =>
   redisSet(
-    localMapToRedisKey.orgToStartYearToSemesters,
+    localMapToRedisKey.startYearToSemesters,
     (await Semester.findAll()).reduce((res, curr) => {
-      if (!res[curr.org]) res[curr.org] = {}
-      if (!res[curr.org][curr.startYear]) {
-        res[curr.org][curr.startYear] = {}
+      if (!res[curr.startYear]) {
+        res[curr.startYear] = {}
         if (curr.startYear === FIRST_SEMESTER_START_YEAR) {
           for (let i = 1900; i < FIRST_SEMESTER_START_YEAR; i++) {
-            res[curr.org][i] = { 0: curr, 1: curr }
+            res[i] = { 0: curr, 1: curr }
           }
         }
       }
-      res[curr.org][curr.startYear][curr.termIndex] = curr
+      res[curr.startYear][curr.termIndex] = curr
       return res
     }, {})
   )
 
-const getSemester = (uniOrgId, studyYearStartYear, termIndex) =>
-  localMaps.orgToStartYearToSemesters[uniOrgId][studyYearStartYear][termIndex]
+const getSemester = (studyYearStartYear, termIndex) => {
+  return localMaps.startYearToSemesters[studyYearStartYear][termIndex]
+}
 
 const initCountries = async () =>
   redisSet(
@@ -170,7 +170,7 @@ const calculateMapsToRedis = async () =>
     initEducationIdToEducation(),
     initGradeScaleIdToGradeIdsToGrades(),
     initOrgToUniOrgId(),
-    initOrgToStartYearToSemesters(),
+    initStartYearToSemesters(),
     initCountries(),
   ])
 
