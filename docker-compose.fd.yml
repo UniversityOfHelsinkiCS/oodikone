@@ -58,7 +58,7 @@ services:
     environment:
       SERVICE_PROVIDER: 'Fd'
     volumes:
-      - ./services/frontend/:/opt/app-root/src
+      - ./services/frontend/src/:/opt/app-root/src/src
 
   kone-db:
     <<: *defaults
