@@ -163,6 +163,28 @@ export const FacultyProgrammeOverview = ({
   const licentiateStats = calculateStats(progressStats?.data?.creditCounts?.licentiate, 360)
   const doctorStats = calculateStats(progressStats?.data?.creditCounts?.doctor, 40, 0, 5)
 
+  const hasNonZeroStats = stats => {
+    const allValuesZero = values => {
+      return values.every(value => parseFloat(value) === 0)
+    }
+
+    const { tableStats, chartStats } = stats
+
+    for (const row of tableStats) {
+      if (allValuesZero(row)) {
+        return false
+      }
+    }
+
+    for (const chart of chartStats) {
+      if (allValuesZero(chart.data)) {
+        return false
+      }
+    }
+
+    return true
+  }
+
   return (
     <div className="faculty-overview">
       <div className="toggle-container">
@@ -230,7 +252,6 @@ export const FacultyProgrammeOverview = ({
               </div>
             </>
           )}
-
           {progressStats.isSuccess && progressStats.data && (
             <>
               {getDivider(
@@ -263,69 +284,77 @@ export const FacultyProgrammeOverview = ({
                   />
                 }
               />
-              {getDivider('Bachelor', 'BachelorStudentsOfTheFacultyByStartingYear', 'no-infobox')}
-              <div className="section-container">
-                <div className="graph-container">
-                  <FacultyBarChart
-                    cypress="FacultyBachelorsProgress"
-                    data={{
-                      id: faculty.code,
-                      stats: bachelorStats.chartStats,
-                      years: progressStats?.data.years,
-                    }}
-                  />
-                </div>
-                <div className="table-container">
-                  <FacultyProgressTable
-                    cypress="FacultyBachelorsProgressTable"
-                    data={bachelorStats.tableStats}
-                    programmeNames={progressStats?.data.programmeNames}
-                    programmeStats={progressStats?.data.bachelorsProgStats}
-                    progressTitles={progressStats?.data.yearlyBachelorTitles}
-                    progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
-                    sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.bachelorsProgStats).map(
-                      listObj => listObj[0]
-                    )}
-                    titles={bachelorStats.tableTitles}
-                  />
-                </div>
-              </div>
-              {getDivider(
-                faculty.code === 'H90' ? 'Bachelor + Licentiate' : 'Bachelor + Master',
-                'ProgressOfBachelorMaster',
-                'no-infobox'
+              {hasNonZeroStats(bachelorStats) && (
+                <>
+                  {getDivider('Bachelor', 'BachelorStudentsOfTheFacultyByStartingYear', 'no-infobox')}
+                  <div className="section-container">
+                    <div className="graph-container">
+                      <FacultyBarChart
+                        cypress="FacultyBachelorsProgress"
+                        data={{
+                          id: faculty.code,
+                          stats: bachelorStats.chartStats,
+                          years: progressStats?.data.years,
+                        }}
+                      />
+                    </div>
+                    <div className="table-container">
+                      <FacultyProgressTable
+                        cypress="FacultyBachelorsProgressTable"
+                        data={bachelorStats.tableStats}
+                        programmeNames={progressStats?.data.programmeNames}
+                        programmeStats={progressStats?.data.bachelorsProgStats}
+                        progressTitles={progressStats?.data.yearlyBachelorTitles}
+                        progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
+                        sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.bachelorsProgStats).map(
+                          listObj => listObj[0]
+                        )}
+                        titles={bachelorStats.tableTitles}
+                      />
+                    </div>
+                  </div>
+                </>
               )}
-              <Message data-cy="FacultyProgrammesShownInfo">
-                Please note: The starting year is the studyright start in the bachelor programme. The credits are
-                computed by the start date of the bachelor programme and at the moment, they do not include any
-                transferred credits. Thus, in these statistics some students have less credits than in reality.
-              </Message>
-              <div className="section-container">
-                <div className="graph-container">
-                  <FacultyBarChart
-                    cypress="FacultyBachelorMastersProgress"
-                    data={{
-                      id: faculty.code,
-                      stats: bachelorMasterStats.chartStats,
-                      years: progressStats?.data.years,
-                    }}
-                  />
-                </div>
-                <div className="table-container">
-                  <FacultyProgressTable
-                    cypress="FacultyBachelorMasterProgressTable"
-                    data={bachelorMasterStats.tableStats}
-                    programmeNames={progressStats?.data.programmeNames}
-                    programmeStats={progressStats?.data.bcMsProgStats}
-                    progressTitles={progressStats?.data.yearlyBcMsTitles}
-                    sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.bcMsProgStats).map(
-                      listObj => listObj[0]
-                    )}
-                    titles={bachelorMasterStats.tableTitles}
-                  />
-                </div>
-              </div>
-              {!(faculty.code === 'H90') && (
+              {hasNonZeroStats(bachelorMasterStats) && (
+                <>
+                  {getDivider(
+                    faculty.code === 'H90' ? 'Bachelor + Licentiate' : 'Bachelor + Master',
+                    'ProgressOfBachelorMaster',
+                    'no-infobox'
+                  )}
+                  <Message data-cy="FacultyProgrammesShownInfo">
+                    Please note: The starting year is the studyright start in the bachelor programme. The credits are
+                    computed by the start date of the bachelor programme and at the moment, they do not include any
+                    transferred credits. Thus, in these statistics some students have less credits than in reality.
+                  </Message>
+                  <div className="section-container">
+                    <div className="graph-container">
+                      <FacultyBarChart
+                        cypress="FacultyBachelorMastersProgress"
+                        data={{
+                          id: faculty.code,
+                          stats: bachelorMasterStats.chartStats,
+                          years: progressStats?.data.years,
+                        }}
+                      />
+                    </div>
+                    <div className="table-container">
+                      <FacultyProgressTable
+                        cypress="FacultyBachelorMasterProgressTable"
+                        data={bachelorMasterStats.tableStats}
+                        programmeNames={progressStats?.data.programmeNames}
+                        programmeStats={progressStats?.data.bcMsProgStats}
+                        progressTitles={progressStats?.data.yearlyBcMsTitles}
+                        sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.bcMsProgStats).map(
+                          listObj => listObj[0]
+                        )}
+                        titles={bachelorMasterStats.tableTitles}
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+              {hasNonZeroStats(masterStats) && !(faculty.code === 'H90') && (
                 <>
                   {getDivider('Master', 'MasterStudentsOfTheFacultyByStartingYear', 'no-infobox')}
                   <div className="section-container">
@@ -355,7 +384,7 @@ export const FacultyProgrammeOverview = ({
                   </div>
                 </>
               )}
-              {faculty.code === 'H30' && (
+              {hasNonZeroStats(licentiateStats) && faculty.code === 'H30' && (
                 <>
                   {getDivider('Licentiate', 'LicentiateStudentsOfTheFacultyByStartingYear', 'no-infobox')}
                   <div className="section-container">
@@ -385,31 +414,35 @@ export const FacultyProgrammeOverview = ({
                   </div>
                 </>
               )}
-              {getDivider('Doctor', 'DoctoralStudentsOfTheFacultyByStartingYear', 'no-infobox')}
-              <div className="section-container">
-                <div className="graph-container">
-                  <FacultyBarChart
-                    cypress="FacultyDoctoralProgress"
-                    data={{
-                      id: faculty.code,
-                      stats: doctorStats.chartStats,
-                      years: progressStats?.data.years,
-                    }}
-                  />
-                </div>
-                <div className="table-container">
-                  <FacultyProgressTable
-                    cypress="FacultyDoctoralProgressTable"
-                    data={doctorStats.tableStats}
-                    programmeNames={progressStats?.data.programmeNames}
-                    programmeStats={progressStats?.data.doctoralProgStats}
-                    sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.doctoralProgStats).map(
-                      listObj => listObj[0]
-                    )}
-                    titles={doctorStats.tableTitles}
-                  />
-                </div>
-              </div>
+              {hasNonZeroStats(doctorStats) && (
+                <>
+                  {getDivider('Doctor', 'DoctoralStudentsOfTheFacultyByStartingYear', 'no-infobox')}
+                  <div className="section-container">
+                    <div className="graph-container">
+                      <FacultyBarChart
+                        cypress="FacultyDoctoralProgress"
+                        data={{
+                          id: faculty.code,
+                          stats: doctorStats.chartStats,
+                          years: progressStats?.data.years,
+                        }}
+                      />
+                    </div>
+                    <div className="table-container">
+                      <FacultyProgressTable
+                        cypress="FacultyDoctoralProgressTable"
+                        data={doctorStats.tableStats}
+                        programmeNames={progressStats?.data.programmeNames}
+                        programmeStats={progressStats?.data.doctoralProgStats}
+                        sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.doctoralProgStats).map(
+                          listObj => listObj[0]
+                        )}
+                        titles={doctorStats.tableTitles}
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
             </>
           )}
         </div>
