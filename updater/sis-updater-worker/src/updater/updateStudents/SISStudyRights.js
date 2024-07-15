@@ -22,7 +22,7 @@ const addDaysToDate = (date, days) => {
   return newDate
 }
 
-const getStudyRightSemesterEnrollments = (studyright, semesterEnrollments) => {
+const getStudyRightSemesterEnrollments = semesterEnrollments => {
   if (!semesterEnrollments || semesterEnrollments.length === 0) return null
   return semesterEnrollments.map(termRegistration => {
     const {
@@ -58,7 +58,7 @@ const studyRightMapper = (personIdToStudentNumber, admissionNamesById, semesterE
     studentNumber: personIdToStudentNumber[studyRight.person_id],
     extentCode,
     admissionType: admissionNamesById[studyRight.admission_type_urn],
-    semesterEnrollments: getStudyRightSemesterEnrollments(studyRight, semesterEnrollmentsForStudyRight),
+    semesterEnrollments: getStudyRightSemesterEnrollments(semesterEnrollmentsForStudyRight),
     facultyCode: getOrganisationCode(studyRight.organisation_id),
   }
 }
