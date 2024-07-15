@@ -13,7 +13,7 @@ const {
   runningInCI,
 } = require('../config')
 
-const { combine, timestamp, printf } = winston.format
+const { colorize, combine, timestamp, printf } = winston.format
 
 const transports = []
 
@@ -41,6 +41,7 @@ transports.push(
   new winston.transports.Console({
     level: isDev ? 'debug' : 'info',
     format: combine(
+      colorize(),
       timestamp({ format: isDev ? 'HH.mm.ss' : 'D.M.YYYY klo HH.mm.ss' }),
       isDev ? devFormat : prodFormat
     ),
@@ -65,7 +66,7 @@ if (isProduction && !isStaging) {
 
 const logger = winston.createLogger({ transports })
 
-logger.on('error', e => console.error('Logging failed. Reason: ', e)) // eslint-disable-line no-console
+logger.on('error', error => console.error('Logging failed. Reason: ', error)) // eslint-disable-line no-console
 
 module.exports = {
   logger,
