@@ -2,6 +2,7 @@ import { indexOf, isArray } from 'lodash'
 import moment from 'moment'
 
 import { programmeCodes } from '../../config/programmeCodes'
+import { ExtentCode } from '../../types/extentCode'
 import { defineYear, getStatsBasis, getYearsArray } from '../studyProgramme/studyProgrammeHelpers'
 import { graduatedStudyrights, startedStudyrights, studyrightsByRightStartYear } from './faculty'
 import { checkCommissioned, checkTransfers, findRightProgramme, isNewProgramme } from './facultyHelpers'
@@ -183,15 +184,15 @@ const getFacultyGraduates = async (
         }
         programmeTableStats[programmeId][endYear][0] += 1
 
-        if (extentcode === 1) {
+        if (extentcode === ExtentCode.BACHELOR) {
           graduatedGraphStats[1][indexOf(yearsArray, endYear)] += 1
           graduatedTableStats[endYear][1] += 1
           programmeTableStats[programmeId][endYear][1] += 1
-        } else if (extentcode === 2) {
+        } else if (extentcode === ExtentCode.MASTER) {
           graduatedGraphStats[2][indexOf(yearsArray, endYear)] += 1
           graduatedTableStats[endYear][2] += 1
           programmeTableStats[programmeId][endYear][2] += 1
-        } else if (extentcode === 4) {
+        } else if (extentcode === ExtentCode.DOCTOR) {
           graduatedGraphStats[3][indexOf(yearsArray, endYear)] += 1
           graduatedTableStats[endYear][3] += 1
           programmeTableStats[programmeId][endYear][3] += 1
