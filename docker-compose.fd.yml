@@ -45,7 +45,8 @@ services:
     ports:
       - 8080:8080
     volumes:
-      - ./services/backend/:/opt/app-root/src
+      - ./services/backend/src:/opt/app-root/src/src
+      - ./environments/ha:/opt/app-root/config
 
   frontend:
     <<: *defaults
@@ -56,7 +57,7 @@ services:
     ports:
       - 3000:3000
     environment:
-      SERVICE_PROVIDER: 'Fd'
+      REACT_APP_SERVICE_PROVIDER: 'Fd'
     volumes:
       - ./services/frontend/src/:/opt/app-root/src/src
 
