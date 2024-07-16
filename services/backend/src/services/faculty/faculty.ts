@@ -62,34 +62,43 @@ export const startedStudyrights = async (
   return studyRights.map(formatFacultyStudyRight)
 }
 
-export const graduatedStudyrights = async (faculty, code, since, studyrightWhere?) =>
-  (
-    await Studyright.findAll({
-      include: [
-        {
-          model: StudyrightElement,
-          required: true,
-          where: {
-            code,
+export const graduatedStudyrights = async (
+  facultyCode: string,
+  since: Date,
+  code: string,
+  includeAllSpecials?: boolean
+) => {
+  const studyRightWhere = includeAllSpecials !== undefined ? getExtentFilter(includeAllSpecials) : {}
+
+  const query: Record<string, any> = {
+    include: [
+      {
+        model: StudyrightElement,
+        required: true,
+        where: {
+          code,
+        },
+        include: [
+          {
+            model: ElementDetail,
+            required: true,
           },
-          include: [
-            {
-              model: ElementDetail,
-              required: true,
-            },
-          ],
-        },
-      ],
-      where: {
-        facultyCode: faculty,
-        enddate: {
-          [Op.gte]: since,
-        },
-        graduated: 1,
-        ...studyrightWhere,
+        ],
       },
-    })
-  ).map(formatFacultyStudyRight)
+    ],
+    where: {
+      facultyCode,
+      enddate: {
+        [Op.gte]: since,
+      },
+      graduated: 1,
+      ...studyRightWhere,
+    },
+  }
+
+  const studyRights = await Studyright.findAll(query)
+  return studyRights.map(formatFacultyStudyRight)
+}
 
 export const studyrightsByRightStartYear = async (
   facultyCode: string,

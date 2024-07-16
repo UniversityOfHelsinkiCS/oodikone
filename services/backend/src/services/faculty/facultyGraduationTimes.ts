@@ -212,7 +212,7 @@ const count = async (
   for (const code of programmeCodes) {
     let studyrights = null
     if (mode === 'gradYear') {
-      studyrights = await graduatedStudyrights(faculty, code, since)
+      studyrights = await graduatedStudyrights(faculty, since, code)
     } else {
       studyrights = await studyrightsByRightStartYear(faculty, since, code)
     }

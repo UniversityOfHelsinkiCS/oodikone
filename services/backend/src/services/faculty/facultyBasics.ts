@@ -4,13 +4,7 @@ import moment from 'moment'
 import { programmeCodes } from '../../config/programmeCodes'
 import { defineYear, getStatsBasis, getYearsArray } from '../studyProgramme/studyProgrammeHelpers'
 import { graduatedStudyrights, startedStudyrights, studyrightsByRightStartYear } from './faculty'
-import {
-  checkCommissioned,
-  checkTransfers,
-  findRightProgramme,
-  getExtentFilter,
-  isNewProgramme,
-} from './facultyHelpers'
+import { checkCommissioned, checkTransfers, findRightProgramme, isNewProgramme } from './facultyHelpers'
 import {
   getTransferredInside,
   getTransferredToAndAway,
@@ -158,9 +152,8 @@ const getFacultyGraduates = async (
     graduatedTableStats[year] = [0, 0, 0, 0, 0]
   })
   const keys = Object.keys(programmeCodes)
-  const studyrightWhere = getExtentFilter(includeAllSpecials)
   for (const code of programmes) {
-    let graduatedRights = await graduatedStudyrights(faculty, code, since, studyrightWhere)
+    let graduatedRights = await graduatedStudyrights(faculty, since, code, includeAllSpecials)
     if (!includeAllSpecials) {
       graduatedRights = graduatedRights.filter(
         studyright =>
