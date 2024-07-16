@@ -10,7 +10,6 @@
   "dependencies": {
     "@sentry/node": "^5.30.0",
     "@sentry/tracing": "^6.18.2",
-    "@types/umzug": "^2.3.7",
     "axios": "^0.28.1",
     "bluebird": "^3.7.2",
     "bullmq": "^4.14.2",
@@ -38,6 +37,7 @@
   "devDependencies": {
     "@types/lodash": "^4.17.6",
     "@types/node": "^20.14.2",
+    "@types/umzug": "^2.3.7",
     "@types/validator": "^13.12.0",
     "nodemon": "^3.1.0",
     "ts-node": "^10.9.2",

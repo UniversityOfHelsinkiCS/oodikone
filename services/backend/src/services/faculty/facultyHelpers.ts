@@ -1,6 +1,6 @@
 import { Op } from 'sequelize'
-import { ignoredFacultyCodes } from '../../config/organizationConstants'
 
+import { ignoredFacultyCodes } from '../../config/organizationConstants'
 import { programmeCodes } from '../../config/programmeCodes'
 import { Organization } from '../../models'
 import { ExtentCode } from '../../types/extentCode'
