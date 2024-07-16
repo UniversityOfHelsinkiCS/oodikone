@@ -2,10 +2,6 @@ import { uniqBy } from 'lodash'
 import { Op } from 'sequelize'
 
 import { dbConnections } from '../../database/connection'
-const { sequelize } = dbConnections
-import { CreditTypeCode } from '../../types/creditTypeCode'
-import { ExtentCode } from '../../types/extentCode'
-import { PriorityCode } from '../../types/priorityCode'
 import {
   Course,
   Credit,
@@ -17,6 +13,9 @@ import {
   Studyright,
   StudyrightElement,
 } from '../../models'
+import { CreditTypeCode } from '../../types/creditTypeCode'
+import { ExtentCode } from '../../types/extentCode'
+import { PriorityCode } from '../../types/priorityCode'
 import {
   formatFacultyProgramme,
   formatFacultyProgrammeStudents,
@@ -25,6 +24,8 @@ import {
   formatOrganization,
 } from './facultyFormatHelpers'
 import { getExtentFilter, isNewProgramme, mapCodesToIds } from './facultyHelpers'
+
+const { sequelize } = dbConnections
 
 export const startedStudyrights = async (
   facultyCode: string,
@@ -350,7 +351,7 @@ export const findFacultyProgrammeCodes = async (facultyCode: string, programmeFi
   for (const org of facultyChildOrganizations) {
     const childAssociationProgrammes = await degreeProgrammesOfFaculty(org.code)
     if (childAssociationProgrammes.length > 0) {
-      // eslint-disable-next-line no-loop-func
+      // eslint-disable-next-line @typescript-eslint/no-loop-func
       childAssociationProgrammes.forEach(programme => {
         if (!(programme.code in allProgrammeCodes)) {
           allProgrammes = allProgrammes.concat([programme])
@@ -364,7 +365,7 @@ export const findFacultyProgrammeCodes = async (facultyCode: string, programmeFi
         for (const gcOrg of grandChildren) {
           const associatedProgrammes = await degreeProgrammesOfFaculty(gcOrg.code)
           if (associatedProgrammes.length > 0) {
-            // eslint-disable-next-line no-loop-func
+            // eslint-disable-next-line @typescript-eslint/no-loop-func
             associatedProgrammes.forEach(programme => {
               if (!(programme.code in allProgrammeCodes)) {
                 allProgrammes = allProgrammes.concat([programme])

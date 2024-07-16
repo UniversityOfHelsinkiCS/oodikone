@@ -1,7 +1,6 @@
 import { Op } from 'sequelize'
 
 import { dbConnections } from '../../database/connection'
-const { sequelize } = dbConnections
 import {
   ElementDetail,
   SemesterEnrollment,
@@ -16,6 +15,8 @@ import { EnrollmentType } from '../../types/enrollmentType'
 import { getCurrentSemester } from '../semesters'
 import { formatStudyright } from './format'
 import { whereStudents, sinceDate } from '.'
+
+const { sequelize } = dbConnections
 
 export const getStudyRightsInProgramme = async (programmeCode: string, onlyGraduated: boolean) => {
   const where: Record<string, any> = { code: programmeCode }

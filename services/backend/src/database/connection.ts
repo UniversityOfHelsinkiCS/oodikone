@@ -43,8 +43,11 @@ import logger from '../util/logger'
 
 class DbConnection extends EventEmitter {
   sequelize: Sequelize
+
   RETRY_ATTEMPTS: number
+
   established: boolean
+
   constructor() {
     super()
     this.RETRY_ATTEMPTS = 15

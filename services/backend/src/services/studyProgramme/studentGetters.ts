@@ -1,13 +1,14 @@
 import { Op, QueryTypes } from 'sequelize'
 
 import { dbConnections } from '../../database/connection'
-const { sequelize } = dbConnections
 import { Credit, Semester, SemesterEnrollment, Student, Studyright, StudyrightElement } from '../../models'
 import { CreditTypeCode } from '../../types/creditTypeCode'
 import { EnrollmentType } from '../../types/enrollmentType'
 import logger from '../../util/logger'
 import { getCurrentSemester } from '../semesters'
 import { formatStudent } from './format'
+
+const { sequelize } = dbConnections
 
 export const studytrackStudents = async (studentNumbers: string[]) =>
   (

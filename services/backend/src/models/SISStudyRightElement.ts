@@ -1,5 +1,7 @@
+/* eslint-disable import/no-cycle */
 import { BelongsTo, Column, CreatedAt, DataType, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
+import { Name } from '../types/name'
 import { Phase } from '../types/phase'
 import { SISStudyRight } from './SISStudyRight'
 
@@ -34,10 +36,13 @@ export class SISStudyRightElement extends Model {
   code: string
 
   @Column(DataType.JSONB)
-  name: object
+  name: Name
 
   @Column(DataType.JSONB)
-  studyTrack: object
+  studyTrack: {
+    code: string
+    name: Name
+  }
 
   @Column(DataType.STRING)
   degreeProgrammeType: string

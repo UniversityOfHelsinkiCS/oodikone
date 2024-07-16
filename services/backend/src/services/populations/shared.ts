@@ -2,13 +2,14 @@ import moment from 'moment'
 import { Op, QueryTypes } from 'sequelize'
 
 import { dbConnections } from '../../database/connection'
-const { sequelize } = dbConnections
 import { Course, Credit, ElementDetail, Studyright, StudyrightElement } from '../../models'
 import { ElementDetailType } from '../../types/elementDetailType'
 import { ExtentCode } from '../../types/extentCode'
 import { semesterEnd, semesterStart } from '../../util/semester'
 import { getCurrentSemester } from '../semesters'
 import { getProgrammesFromStudyRights } from '../studyrights'
+
+const { sequelize } = dbConnections
 
 const createEmptyCriteriaYear = (criteria, year) => {
   return {

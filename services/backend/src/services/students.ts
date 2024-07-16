@@ -1,7 +1,6 @@
 import { Op, QueryTypes } from 'sequelize'
 
 import { dbConnections } from '../database/connection'
-const { sequelize } = dbConnections
 import {
   Student,
   Credit,
@@ -12,11 +11,12 @@ import {
   Studyplan,
   SISStudyRight,
   SISStudyRightElement,
-} from '../models/index'
-import { TagStudent } from '../models/kone/tagStudent'
-import { Tag } from '../models/kone/tag'
-import logger from '../util/logger'
+} from '../models'
+import { Tag, TagStudent } from '../models/kone'
 import { splitByEmptySpace } from '../util'
+import logger from '../util/logger'
+
+const { sequelize } = dbConnections
 
 const byStudentNumber = async studentNumber => {
   const [student, tags] = (await Promise.all([

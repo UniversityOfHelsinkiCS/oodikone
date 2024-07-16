@@ -1,4 +1,4 @@
-const mapToProviders = (programmeCodes: string[]) => {
+export const mapToProviders = (programmeCodes: string[]) => {
   return programmeCodes.map(r => {
     const isNumber = (str: string) => !Number.isNaN(Number(str))
     if (r.includes('_')) {
@@ -36,7 +36,7 @@ const bscsCode = /BSCS??/
 
 const codeRegexes = [openUniCodeA, openUniCode, bscsCode, oldNumericCode, newLetterBasedCode, digi]
 
-const getSortRank = (code: string) => {
+export const getSortRank = (code: string) => {
   for (let i = 0; i < codeRegexes.length; i++) {
     if (codeRegexes[i].test(code)) {
       return i
@@ -45,7 +45,7 @@ const getSortRank = (code: string) => {
   return 3 // if no hit, put before open uni courses
 }
 
-const sortMainCode = (codes: string[] | undefined) => {
+export const sortMainCode = (codes: string[] | undefined) => {
   if (!codes) return []
   return codes.sort((x, y) => getSortRank(y) - getSortRank(x))
 }
@@ -53,24 +53,14 @@ const sortMainCode = (codes: string[] | undefined) => {
 /** Returns a sorting function that can be used to sort strings so that Finnish alphabetical order is respected.
  * @param {string} field - The field to sort by (optional: if not given, the function will sort by the strings themselves)
  */
-const createLocaleComparator = (field: string | null = null) => {
+export const createLocaleComparator = (field: string | null = null) => {
   if (!field) return (val1: string, val2: string) => val1.localeCompare(val2, 'fi', { sensitivity: 'accent' })
   return (val1: string, val2: string) => val1[field].localeCompare(val2[field], 'fi', { sensitivity: 'accent' })
 }
 
-const getFullStudyProgrammeRights = programmeRights =>
+export const getFullStudyProgrammeRights = programmeRights =>
   programmeRights.filter(({ limited }) => !limited).map(({ code }) => code)
 
 // TODO better type for roles
-const hasFullAccessToStudentData = (roles: string[]) => roles?.some(role => ['admin', 'fullSisuAccess'].includes(role))
-
-module.exports = {
-  mapToProviders,
-  sortMainCode,
-  getSortRank,
-  createLocaleComparator,
-  getFullStudyProgrammeRights,
-  hasFullAccessToStudentData,
-}
-
-export default {}
+export const hasFullAccessToStudentData = (roles: string[]) =>
+  roles?.some(role => ['admin', 'fullSisuAccess'].includes(role))

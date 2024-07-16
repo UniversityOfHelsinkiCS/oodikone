@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import { Column, CreatedAt, DataType, ForeignKey, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
 import { Course } from './course'

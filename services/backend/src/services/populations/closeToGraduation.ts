@@ -34,13 +34,26 @@ const findThesisAndLatestAttainments = (studyPlan, attainments, providerCode) =>
   return { latestAttainmentDates, thesisData }
 }
 
-const formatStudent = student => {
-  const { studentNumber, name, sis_person_id, email, phoneNumber, secondaryEmail } = student
+const formatStudent = (student: Student) => {
+  const {
+    studentnumber: studentNumber,
+    abbreviatedname: name,
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    sis_person_id,
+    email,
+    phone_number: phoneNumber,
+    secondary_email: secondaryEmail,
+  } = student
   return student.studyplans.reduce((acc, studyPlan) => {
     const { studyRight } = studyPlan
     const { studyRightElements, startDate: startOfStudyright, extentCode, semesterEnrollments } = studyRight
 
-    const { programmeCode, programmeName, studyTrack, startDate: programmeStartDate } = studyRightElements[0]
+    const {
+      code: programmeCode,
+      name: programmeName,
+      studyTrack,
+      startDate: programmeStartDate,
+    } = studyRightElements[0]
     const programmeCodeToProviderCode = mapToProviders([programmeCode])[0]
     const { latestAttainmentDates, thesisData } = findThesisAndLatestAttainments(
       studyPlan,
@@ -83,13 +96,13 @@ export const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =
   (
     await Student.findAll({
       attributes: [
-        ['abbreviatedname', 'name'],
+        'abbreviatedname',
         'creditcount',
         'email',
-        ['phone_number', 'phoneNumber'],
-        ['secondary_email', 'secondaryEmail'],
+        'phone_number',
+        'secondary_email',
         'sis_person_id',
-        ['studentnumber', 'studentNumber'],
+        'studentnumber',
       ],
       where: studentNumbers
         ? {
@@ -134,7 +147,7 @@ export const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =
                       [Op.eq]: col('studyplans->studyRight->studyRightElements.code'),
                     },
                   },
-                  attributes: [['code', 'programmeCode'], ['name', 'programmeName'], 'startDate', 'studyTrack'],
+                  attributes: ['code', 'name', 'startDate', 'studyTrack'],
                 },
               ],
             },

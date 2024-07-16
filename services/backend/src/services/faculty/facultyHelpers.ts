@@ -3,8 +3,8 @@ import { Op } from 'sequelize'
 import { ignoredFacultyCodes } from '../../config/organizationConstants'
 import { programmeCodes } from '../../config/programmeCodes'
 import { Organization } from '../../models'
-import { ExtentCode } from '../../types/extentCode'
 import { ElementDetailType } from '../../types/elementDetailType'
+import { ExtentCode } from '../../types/extentCode'
 import { getOrganizations } from '../organizations'
 
 export const getFaculties = async (): Promise<Organization[]> => {

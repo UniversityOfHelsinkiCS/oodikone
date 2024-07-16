@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import { BelongsToMany, Column, CreatedAt, DataType, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
 import { Credit } from './credit'

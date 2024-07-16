@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import {
   BelongsTo,
   Column,
@@ -11,12 +12,12 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
+import { EnrollmentType } from '../types/enrollmentType'
 import { ExtentCode } from '../types/extentCode'
 import { Organization } from './organization'
 import { SISStudyRightElement } from './SISStudyRightElement'
 import { Student } from './student'
 import { Studyplan } from './studyplan'
-import { EnrollmentType } from '../types/enrollmentType'
 
 type SemesterEnrollment = {
   type: EnrollmentType

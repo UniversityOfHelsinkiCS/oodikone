@@ -1,16 +1,16 @@
-const { indexOf } = require('lodash')
+import { indexOf } from 'lodash'
 
-const { serviceProvider } = require('../../conf-backend')
-const { mapToProviders } = require('../../util/map')
-const {
+import { serviceProvider } from '../../conf-backend'
+import { mapToProviders } from '../../util/map'
+import {
   alltimeEndDate,
   alltimeStartDate,
   defineYear,
   getCorrectStudentnumbers,
   getStatsBasis,
   getYearsArray,
-} = require('../studyProgramme/studyProgrammeHelpers')
-const { thesisWriters } = require('./faculty')
+} from '../studyProgramme/studyProgrammeHelpers'
+import { thesisWriters } from './faculty'
 
 const getFacultyThesisWriters = async ({ since, years, isAcademicYear, facultyProgrammes, includeAllSpecials }) => {
   const bachelorsThesisTypes = ['urn:code:course-unit-type:bachelors-thesis']
@@ -108,7 +108,7 @@ const getFacultyThesisWritersForProgrammes = async (
   allThesisWriters.programmeNames = programmeNames
 }
 
-const combineFacultyThesisWriters = async (faculty, facultyProgrammes, yearType, specialGroups) => {
+export const combineFacultyThesisWriters = async (faculty, facultyProgrammes, yearType, specialGroups) => {
   const allThesisWriters = {
     id: faculty,
     years: [],
@@ -127,5 +127,3 @@ const combineFacultyThesisWriters = async (faculty, facultyProgrammes, yearType,
 
   return allThesisWriters
 }
-
-module.exports = { combineFacultyThesisWriters }

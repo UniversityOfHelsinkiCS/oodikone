@@ -266,7 +266,7 @@ const getStudytrackDataForTheYear = async ({
 
       // If the track has no stats for that year, it should be removed from the table and dropdown options
       if (all.length === 0) {
-        // eslint-disable-next-line no-unused-expressions
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
         emptyTracks.has(track) ? emptyTracks.set(track, emptyTracks.get(track) + 1) : emptyTracks.set(track, 1)
         return
       }

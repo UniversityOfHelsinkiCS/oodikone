@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import { Column, CreatedAt, DataType, HasMany, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
 import { ExtentCode } from '../types/extentCode'

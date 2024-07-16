@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import {
   BelongsTo,
   BelongsToMany,
@@ -106,7 +107,10 @@ export class Credit extends Model {
   updatedAt: Date
 
   static passed: ({ credittypecode }: { credittypecode: CreditTypeCode }) => boolean
+
   static failed: ({ credittypecode }: { credittypecode: CreditTypeCode }) => boolean
+
   static improved: ({ credittypecode }: { credittypecode: CreditTypeCode }) => boolean
+
   static notUnnecessary: ({ credits }: { credits: number }) => boolean
 }

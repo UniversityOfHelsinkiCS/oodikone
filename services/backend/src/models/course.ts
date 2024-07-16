@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import {
   BelongsTo,
   BelongsToMany,
@@ -12,9 +13,9 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
-import { Credit } from './credit'
 import { CourseProvider } from './courseProvider'
 import { CourseType } from './courseType'
+import { Credit } from './credit'
 import { Enrollment } from './enrollment'
 import { Organization } from './organization'
 

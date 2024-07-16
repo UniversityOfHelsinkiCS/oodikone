@@ -2,11 +2,12 @@ import { sortBy } from 'lodash'
 import { Op } from 'sequelize'
 
 import { dbConnections } from '../../database/connection'
-const { sequelize } = dbConnections
-import { ExtentCode } from '../../types/extentCode'
 import { ElementDetail, Student, Studyright, StudyrightElement, Transfer } from '../../models'
 import { TagStudent } from '../../models/kone'
+import { ExtentCode } from '../../types/extentCode'
 import { count } from './shared'
+
+const { sequelize } = dbConnections
 
 export const studentnumbersWithAllStudyrightElements = async ({
   studyRights,
