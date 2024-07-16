@@ -13,6 +13,7 @@ import {
 
 import { Name } from '../types/name'
 import { Phase } from '../types/phase'
+import { StudyTrack } from '../types/studyTrack'
 import { SISStudyRight } from './SISStudyRight'
 
 @Table({
@@ -50,7 +51,7 @@ export class SISStudyRightElement extends Model {
   name: Name
 
   @Column(DataType.JSONB)
-  studyTrack: Name
+  studyTrack: StudyTrack
 
   @Column(DataType.STRING)
   degreeProgrammeType: string
