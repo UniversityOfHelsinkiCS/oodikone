@@ -16,6 +16,13 @@ import { Organization } from './organization'
 import { SISStudyRightElement } from './SISStudyRightElement'
 import { Student } from './student'
 import { Studyplan } from './studyplan'
+import { EnrollmentType } from '../types/enrollmentType'
+
+type SemesterEnrollment = {
+  type: EnrollmentType
+  semester: number
+  statutoryAbsence?: boolean
+}
 
 @Table({
   underscored: true,
@@ -61,7 +68,7 @@ export class SISStudyRight extends Model {
   admissionType: string
 
   @Column(DataType.JSONB)
-  semesterEnrollments: object
+  semesterEnrollments: SemesterEnrollment[] | null
 
   @CreatedAt
   @Column(DataType.DATE)
