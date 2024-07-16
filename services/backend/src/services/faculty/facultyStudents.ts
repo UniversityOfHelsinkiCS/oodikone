@@ -1,3 +1,4 @@
+import { ExtentCode } from '../../types/extentCode'
 import { GenderCode } from '../../types/genderCode'
 import { getAcademicYearDates } from '../../util/semester'
 import { absentStudents, enrolledStudents } from '../studyProgramme/studentGetters'
@@ -101,9 +102,20 @@ const getFacultyDataForYear = async ({
 }) => {
   const { includeAllSpecials, includeGraduated } = settings
   const { startDate, endDate } = getAcademicYearDates(year, since)
-  const extents = [1, 2, 3, 4]
+  const extents = [ExtentCode.BACHELOR, ExtentCode.MASTER, ExtentCode.LICENTIATE, ExtentCode.DOCTOR]
   if (includeAllSpecials) {
-    extents.push(6, 7, 9, 13, 14, 18, 22, 23, 34, 99) // 16 is always excluded
+    extents.push(
+      ExtentCode.CONTINUING_EDUCATION,
+      ExtentCode.EXCHANGE_STUDIES,
+      ExtentCode.OPEN_UNIVERSITY_STUDIES,
+      ExtentCode.NON_DEGREE_PEGAGOGICAL_STUDIES_FOR_TEACHERS,
+      ExtentCode.CONTRACT_TRAINING,
+      ExtentCode.SPECIALIZATION_STUDIES,
+      ExtentCode.NON_DEGREE_PROGRAMME_FOR_SPECIAL_EDUCATION_TEACHERS,
+      ExtentCode.SPECIALIST_TRAINING_IN_MEDICINE_AND_DENTISTRY,
+      ExtentCode.EXCHANGE_STUDIES_POSTGRADUATE,
+      ExtentCode.NON_DEGREE_STUDIES
+    )
   }
   const graduated = [0]
   if (includeGraduated) {
