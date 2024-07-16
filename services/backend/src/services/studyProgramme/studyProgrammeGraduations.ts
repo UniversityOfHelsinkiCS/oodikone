@@ -1,13 +1,15 @@
-const { indexOf, orderBy } = require('lodash')
-const moment = require('moment')
+import { indexOf, orderBy } from 'lodash'
+import moment from 'moment'
 
-const { sortByProgrammeCode } = require('../../util')
-const { mapToProviders } = require('../../util/map')
-const { countTimeCategories } = require('../graduationHelpers')
-const { getSemestersAndYears } = require('../semesters')
-const { getThesisCredits } = require('./creditGetters')
-const { getGraduatedStats } = require('./studyProgrammeBasics')
-const {
+import { ExtentCode } from '../../types/extentCode'
+import { Name } from '../../types/name'
+import { sortByProgrammeCode } from '../../util'
+import { mapToProviders } from '../../util/map'
+import { countTimeCategories } from '../graduationHelpers'
+import { getSemestersAndYears } from '../semesters'
+import { getThesisCredits } from './creditGetters'
+import { getGraduatedStats } from './studyProgrammeBasics'
+import {
   alltimeEndDate,
   alltimeStartDate,
   defineYear,
@@ -21,8 +23,8 @@ const {
   getYearsArray,
   getYearsObject,
   getStudyRightElementsWithPhase,
-} = require('./studyProgrammeHelpers')
-const { getStudyRightsInProgramme } = require('./studyRightFinders')
+} from './studyProgrammeHelpers'
+import { getStudyRightsInProgramme } from './studyRightFinders'
 
 const calculateAbsenceInMonths = (absence, startDate, endDate) => {
   const absenceStart = moment(absence.startdate)
@@ -82,7 +84,7 @@ const getGraduationTimeStats = async ({ studyprogramme, years, isAcademicYear, i
 
   for (const studyRight of graduatedStudyRights) {
     const correctStudyRightElement = studyRight.studyRightElements.find(element => element.code === studyprogramme)
-    const countAsBachelorMaster = doCombo && studyRight.extentCode === 5
+    const countAsBachelorMaster = doCombo && studyRight.extentCode === ExtentCode.BACHELOR_AND_MASTER
     const [firstStudyRightElementWithSamePhase] = getStudyRightElementsWithPhase(
       studyRight,
       correctStudyRightElement.phase
@@ -131,7 +133,7 @@ const getGraduationTimeStats = async ({ studyprogramme, years, isAcademicYear, i
   return { times, doCombo, comboTimes }
 }
 
-const formatStats = (stats, years) => {
+const formatStats = (stats: { code: string; name: Name }[], years) => {
   const tableStats = Object.values(stats)
     .filter(p => years.map(year => p[year]).find(started => started !== 0)) // Filter out programmes with no-one started between the selected years
     .map(p => [p.code, getId(p.code), p.name, ...years.map(year => p[year])])
@@ -201,7 +203,7 @@ const getProgrammesBeforeOrAfter = async (studyprogramme, queryParameters) => {
   return null
 }
 
-const getGraduationStatsForStudytrack = async ({ studyprogramme, combinedProgramme, settings }) => {
+export const getGraduationStatsForStudytrack = async ({ studyprogramme, combinedProgramme, settings }) => {
   const { isAcademicYear, includeAllSpecials } = settings
   const since = getStartDate(isAcademicYear)
   const years = getYearsArray(since.getFullYear(), isAcademicYear)
@@ -283,8 +285,4 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, combinedProgram
     programmesBeforeOrAfterGraphStats: programmesBeforeOrAfter?.graphStats,
     programmesBeforeOrAfterTitles,
   }
-}
-
-module.exports = {
-  getGraduationStatsForStudytrack,
 }
