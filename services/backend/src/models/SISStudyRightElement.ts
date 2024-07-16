@@ -1,15 +1,5 @@
 /* eslint-disable import/no-cycle */
-import {
-  BelongsTo,
-  Column,
-  CreatedAt,
-  DataType,
-  ForeignKey,
-  Model,
-  PrimaryKey,
-  Table,
-  UpdatedAt,
-} from 'sequelize-typescript'
+import { BelongsTo, Column, CreatedAt, DataType, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
 import { Name, Phase, StudyTrack } from '../types'
 import { SISStudyRight } from './SISStudyRight'
@@ -35,11 +25,10 @@ export class SISStudyRightElement extends Model {
   @Column(DataType.INTEGER)
   phase: Phase
 
-  @ForeignKey(() => SISStudyRight)
   @Column(DataType.STRING)
   studyRightId: string
 
-  @BelongsTo(() => SISStudyRight)
+  @BelongsTo(() => SISStudyRight, { foreignKey: 'studyRightId' })
   studyRight: SISStudyRight
 
   @Column(DataType.STRING)
