@@ -13,7 +13,7 @@ const {
   runningInCI,
 } = require('../config')
 
-const { colorize, combine, timestamp, printf } = winston.format
+const { colorize, combine, timestamp, printf, uncolorize } = winston.format
 
 const transports = []
 
@@ -41,7 +41,7 @@ transports.push(
   new winston.transports.Console({
     level: isDev ? 'debug' : 'info',
     format: combine(
-      colorize(),
+      isDev ? colorize() : uncolorize(),
       timestamp({ format: isDev ? 'HH.mm.ss' : 'D.M.YYYY klo HH.mm.ss' }),
       isDev ? devFormat : prodFormat
     ),
