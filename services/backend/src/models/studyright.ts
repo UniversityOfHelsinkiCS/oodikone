@@ -44,9 +44,6 @@ export class Studyright extends Model {
   @BelongsTo(() => Student)
   student: Student
 
-  @BelongsTo(() => Organization, { targetKey: 'code' })
-  organization: Organization
-
   @HasMany(() => Transfer, { foreignKey: 'studyrightid', sourceKey: 'studyrightid' })
   transfers: Transfer[]
 
@@ -81,6 +78,9 @@ export class Studyright extends Model {
   @ForeignKey(() => Organization)
   @Column({ field: 'faculty_code', type: DataType.STRING })
   facultyCode: string
+
+  @BelongsTo(() => Organization)
+  organization: Organization
 
   @Column(DataType.INTEGER)
   prioritycode: PriorityCode
