@@ -1,5 +1,15 @@
 /* eslint-disable import/no-cycle */
-import { BelongsTo, Column, CreatedAt, DataType, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
+import {
+  BelongsTo,
+  Column,
+  CreatedAt,
+  DataType,
+  ForeignKey,
+  Model,
+  PrimaryKey,
+  Table,
+  UpdatedAt,
+} from 'sequelize-typescript'
 
 import { Name } from '../types/name'
 import { Phase } from '../types/phase'
@@ -14,9 +24,6 @@ export class SISStudyRightElement extends Model {
   @Column(DataType.STRING)
   id: string
 
-  @BelongsTo(() => SISStudyRight, { foreignKey: 'studyRightId' })
-  studyRight: SISStudyRight
-
   @Column(DataType.DATE)
   startDate: Date
 
@@ -29,8 +36,12 @@ export class SISStudyRightElement extends Model {
   @Column(DataType.INTEGER)
   phase: Phase
 
+  @ForeignKey(() => SISStudyRight)
   @Column(DataType.STRING)
   studyRightId: string
+
+  @BelongsTo(() => SISStudyRight)
+  studyRight: SISStudyRight
 
   @Column(DataType.STRING)
   code: string
@@ -39,10 +50,7 @@ export class SISStudyRightElement extends Model {
   name: Name
 
   @Column(DataType.JSONB)
-  studyTrack: {
-    code: string
-    name: Name
-  }
+  studyTrack: Name
 
   @Column(DataType.STRING)
   degreeProgrammeType: string
