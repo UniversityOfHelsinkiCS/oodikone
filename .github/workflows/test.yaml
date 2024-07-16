@@ -24,8 +24,8 @@ jobs:
         run: npm ci && cd services/frontend && npm ci && cd ../backend && npm ci
       - name: 'Run Stylelint for CSS files'
         run: npm run stylelint "services/frontend/src/**/*.css"
-      - name: 'Run ESLint for JS files'
-        run: npm run eslint -- --ext .jsx,.js services --report-unused-disable-directives
+      - name: 'Run ESLint for JS and TS files'
+        run: npm run eslint -- --ext .js,.jsx,.ts,.tsx services --report-unused-disable-directives
 
   # === Build database images ===
   build_backend:

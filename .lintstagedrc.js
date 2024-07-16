@@ -4,8 +4,9 @@ const dockerCmdBase = `docker run --rm --volume ${cwd}:/oodikone --workdir /oodi
 const relativeFilePaths = files => [...files.map(file => path.relative(cwd, file))].join(' ')
 
 module.exports = {
-  '{services,updater}/**/*.{js,jsx}': files => `eslint --fix ${files.join(' ')} --report-unused-disable-directives`,
-  '*.{js,json,md,yml,yaml,html,css}': files => `prettier --write ${files.join(' ')}`,
+  '{services,updater}/**/*.{js,jsx,ts,tsx}': files =>
+    `eslint --fix ${files.join(' ')} --report-unused-disable-directives`,
+  '*.{js,jsx,ts,tsx,json,md,yml,yaml,html,css}': files => `prettier --write ${files.join(' ')}`,
   '*.css': files => `stylelint --fix ${files.join(' ')}`,
   Dockerfile: files =>
     `${dockerCmdBase} hadolint/hadolint:v2.12.0 hadolint --ignore DL3006 ${relativeFilePaths(files)}`,
