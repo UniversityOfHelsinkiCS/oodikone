@@ -169,7 +169,7 @@ export const getSemestersPresentFunctions = ({
   const getSemesterEnrollmentsVal = (student, studyright) => {
     if (!student && !studyright) return 0
     const enrollmentsToCount = studyright ? studyright.semesterEnrollments : student.semesterenrollments
-    return enrollmentsToCount.reduce(
+    return (enrollmentsToCount ?? []).reduce(
       (prev, cur) =>
         prev +
         (cur.semestercode >= firstSemester && cur.semestercode <= lastSemester && cur.enrollmenttype === 1 ? 1 : 0),

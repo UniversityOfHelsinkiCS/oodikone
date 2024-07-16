@@ -153,6 +153,9 @@ const getColumns = (
         title: getTextIn(allSemestersMap[`${semester}`]?.name),
         displayColumn: false,
         getRowVal: student => {
+          if (!student.studyright.semesterEnrollments) {
+            return 'Not enrolled'
+          }
           const enrollment = student.studyright.semesterEnrollments.find(
             enrollment => enrollment.semestercode === semester
           )
