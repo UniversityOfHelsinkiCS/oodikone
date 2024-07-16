@@ -96,9 +96,9 @@ export const combineFacultyStudentProgress = async (faculty, programmes, special
   const since = new Date('2017-08-01')
   const includeAllSpecials = specialGroups === 'SPECIAL_INCLUDED'
   const includeGraduated = graduated === 'GRADUATED_INCLUDED'
-  let graduationStatus = [0]
+  const graduationStatus = [0]
   if (includeGraduated) {
-    graduationStatus = [0, 1]
+    graduationStatus.push(1)
   }
   const yearsArray = getYearsArray(since.getFullYear(), true, true)
   const progressStats = {

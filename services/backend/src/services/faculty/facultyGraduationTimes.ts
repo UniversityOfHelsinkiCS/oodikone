@@ -47,7 +47,7 @@ const getProgrammeObjectBasis = (years, levels, emptyObject = true) => {
   )
 }
 
-const hasMS = async (programme, elements, studyrightid) => {
+const hasMS = async (programme: string, elements, studyrightid: string): Promise<boolean> => {
   // Only bachelor studyright: socCom, kasvatustiede - varhaiskasvatus track, farmasia - applied only to Bc = farmaseutti,
   if (['KH74_001', '620050-ba', '620030-ba', '520091-ba'].includes(programme)) {
     return false
@@ -56,8 +56,8 @@ const hasMS = async (programme, elements, studyrightid) => {
     return !elements.some(element => ['EDUK-VO', '0371', '620050-ba', '620030-ba'].includes(element.dataValues.code))
   }
   if (programme === 'KH55_001') {
-    const result = await hasMasterRight(studyrightid.replace(/-1$/, '-2'))
-    if (!result) {
+    const hasRight = await hasMasterRight(studyrightid.replace(/-1$/, '-2'))
+    if (!hasRight) {
       return false
     }
   }

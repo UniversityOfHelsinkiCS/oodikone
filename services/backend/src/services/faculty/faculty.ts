@@ -3,6 +3,7 @@ import { Op } from 'sequelize'
 
 import { dbConnections } from '../../database/connection'
 const { sequelize } = dbConnections
+import { CreditTypeCode } from '../../types/creditTypeCode'
 import { ExtentCode } from '../../types/extentCode'
 import { PriorityCode } from '../../types/priorityCode'
 import {
@@ -137,191 +138,212 @@ export const studyrightsByRightStartYear = async (
   return studyRights.map(formatFacultyStudyRight)
 }
 
-export const getStudyRightsByExtent = async (faculty, startDate, endDate, code, extents, graduated) =>
-  (
-    await Studyright.findAll({
-      include: {
-        model: StudyrightElement,
-        attributes: [],
-        required: true,
-        where: {
-          code,
-        },
-        include: [
-          {
-            model: ElementDetail,
-            attributes: [],
-          },
-        ],
-      },
-      group: [sequelize.col('studyright.studyrightid')],
+export const getStudyRightsByExtent = async (
+  facultyCode: string,
+  startDate: Date,
+  endDate: Date,
+  code: string,
+  extentCodes: ExtentCode[],
+  graduated: number[]
+) => {
+  const query: Record<string, any> = {
+    include: {
+      model: StudyrightElement,
+      attributes: [],
+      required: true,
       where: {
-        facultyCode: faculty,
-        extentcode: {
-          [Op.in]: extents,
-        },
-        prioritycode: {
-          [Op.not]: PriorityCode.OPTION,
-        },
-        graduated: {
-          [Op.in]: graduated,
-        },
-        [Op.and]: [
-          sequelize.where(
-            sequelize.fn(
-              'GREATEST',
-              sequelize.col('studyright_elements.startdate'),
-              sequelize.col('studyright.startdate')
-            ),
-            {
-              [Op.between]: [startDate, endDate],
-            }
-          ),
-        ],
+        code,
       },
-    })
-  ).map(formatFacultyStudyRight)
-
-export const getStudyRightsByBachelorStart = async (faculty, startDate, endDate, code, extents, graduated) =>
-  (
-    await Studyright.findAll({
-      include: {
-        model: StudyrightElement,
-        required: true,
-        where: {
-          code,
+      include: [
+        {
+          model: ElementDetail,
+          attributes: [],
         },
-      },
-      where: {
-        facultyCode: faculty,
-        extentcode: {
-          [Op.in]: extents,
-        },
-        prioritycode: {
-          [Op.not]: PriorityCode.OPTION,
-        },
-        graduated: {
-          [Op.in]: graduated,
-        },
-        startdate: {
-          [Op.between]: [startDate, endDate],
-        },
-      },
-    })
-  ).map(formatFacultyStudyRight)
-
-export const getStudentsByStudentnumbers = async studentnumbers =>
-  (
-    await Student.findAll({
-      where: {
-        studentnumber: studentnumbers,
-      },
-      include: {
-        model: SemesterEnrollment,
-        attributes: ['semestercode', 'enrollmenttype'],
-      },
-    })
-  ).map(formatFacultyProgrammeStudents)
-
-export const hasMasterRight = async id => {
-  return await Studyright.findOne({
+      ],
+    },
+    group: [sequelize.col('studyright.studyrightid')],
     where: {
-      studyrightid: id,
+      facultyCode,
+      extentcode: {
+        [Op.in]: extentCodes,
+      },
+      prioritycode: {
+        [Op.not]: PriorityCode.OPTION,
+      },
+      graduated: {
+        [Op.in]: graduated,
+      },
+      [Op.and]: [
+        sequelize.where(
+          sequelize.fn(
+            'GREATEST',
+            sequelize.col('studyright_elements.startdate'),
+            sequelize.col('studyright.startdate')
+          ),
+          {
+            [Op.between]: [startDate, endDate],
+          }
+        ),
+      ],
+    },
+  }
+
+  const studyRights = await Studyright.findAll(query)
+  return studyRights.map(formatFacultyStudyRight)
+}
+
+export const getStudyRightsByBachelorStart = async (
+  facultyCode: string,
+  startDate: Date,
+  endDate: Date,
+  code: string,
+  extentCodes: ExtentCode[],
+  graduated: number[]
+) => {
+  const query: Record<string, any> = {
+    include: {
+      model: StudyrightElement,
+      required: true,
+      where: {
+        code,
+      },
+    },
+    where: {
+      facultyCode,
+      extentcode: {
+        [Op.in]: extentCodes,
+      },
+      prioritycode: {
+        [Op.not]: PriorityCode.OPTION,
+      },
+      graduated: {
+        [Op.in]: graduated,
+      },
+      startdate: {
+        [Op.between]: [startDate, endDate],
+      },
+    },
+  }
+
+  const studyRights = await Studyright.findAll(query)
+  return studyRights.map(formatFacultyStudyRight)
+}
+
+export const getStudentsByStudentnumbers = async (studentNumbers: string[]) => {
+  const query: Record<string, any> = {
+    where: {
+      studentnumber: studentNumbers,
+    },
+    include: {
+      model: SemesterEnrollment,
+      attributes: ['semestercode', 'enrollmenttype'],
+    },
+  }
+  const students = await Student.findAll(query)
+  return students.map(formatFacultyProgrammeStudents)
+}
+
+export const hasMasterRight = async (studyRightId: string): Promise<boolean> => {
+  const studyRight = await Studyright.findOne({
+    where: {
+      studyrightid: studyRightId,
       extentcode: ExtentCode.MASTER,
     },
   })
+  return studyRight !== null
 }
 
-export const degreeProgrammesOfFaculty = async facultyCode =>
-  // Some programmenames are different, causing this to return multiples of same codes.
-  // Hence the uniqBy
-  uniqBy(
-    (
-      await ProgrammeModule.findAll({
-        attributes: ['code', 'name'],
-        include: {
-          model: Organization,
-          where: {
-            code: {
-              [Op.startsWith]: facultyCode,
-            },
-          },
+export const degreeProgrammesOfFaculty = async (facultyCode: string) => {
+  const query: Record<string, any> = {
+    attributes: ['code', 'name'],
+    include: {
+      model: Organization,
+      where: {
+        code: {
+          [Op.startsWith]: facultyCode,
         },
-        group: ['programme_module.code', 'programme_module.name', 'organization.id'],
-      })
-    ).map(formatFacultyProgramme),
-    'code'
-  )
+      },
+    },
+    group: ['programme_module.code', 'programme_module.name', 'organization.id'],
+  }
 
-export const facultyOrganizationId = async faculty => {
+  const programmes = await ProgrammeModule.findAll(query)
+  return uniqBy(programmes.map(formatFacultyProgramme), 'code')
+}
+
+export const facultyOrganizationId = async (facultyCode: string) => {
   return await Organization.findOne({
     attributes: ['id'],
     where: {
-      code: faculty,
+      code: facultyCode,
     },
   })
 }
 
-export const getChildOrganizations = async facultyId =>
-  (
-    await Organization.findAll({
-      attributes: ['id', 'name', 'code', 'parent_id'],
-      where: {
-        parent_id: facultyId,
-      },
-    })
-  ).map(formatOrganization)
+export const getChildOrganizations = async (facultyId: string) => {
+  const query: Record<string, any> = {
+    attributes: ['id', 'name', 'code', 'parent_id'],
+    where: {
+      parent_id: facultyId,
+    },
+  }
 
-export const thesisWriters = async (provider, since, thesisTypes, students) =>
-  (
-    await Credit.findAll({
-      attributes: ['id', 'course_code', 'attainment_date', 'student_studentnumber'],
-      include: {
-        model: Course,
-        attributes: ['course_unit_type'],
-        required: true,
-        where: {
-          course_unit_type: {
-            [Op.in]: thesisTypes,
-          },
-        },
-        include: [
-          {
-            model: Organization,
-            attributes: [],
-            required: true,
-            where: {
-              code: provider,
-            },
-          },
-        ],
-      },
+  const organizations = await Organization.findAll(query)
+  return organizations.map(formatOrganization)
+}
+
+export const thesisWriters = async (provider: string, since: Date, thesisTypes: string[], studentNumbers: string[]) => {
+  const query: Record<string, any> = {
+    attributes: ['id', 'course_code', 'attainment_date', 'student_studentnumber'],
+    include: {
+      model: Course,
+      attributes: ['course_unit_type'],
+      required: true,
       where: {
-        credittypecode: 4,
-        isStudyModule: {
-          [Op.not]: true,
+        course_unit_type: {
+          [Op.in]: thesisTypes,
         },
-        attainment_date: {
-          [Op.gte]: since,
-        },
-        student_studentnumber: students.length > 0 ? students : { [Op.not]: null },
       },
-    })
-  ).map(formatFacultyThesisWriter)
+      include: [
+        {
+          model: Organization,
+          attributes: [],
+          required: true,
+          where: {
+            code: provider,
+          },
+        },
+      ],
+    },
+    where: {
+      credittypecode: CreditTypeCode.PASSED,
+      isStudyModule: {
+        [Op.not]: true,
+      },
+      attainment_date: {
+        [Op.gte]: since,
+      },
+      student_studentnumber: studentNumbers.length > 0 ? studentNumbers : { [Op.not]: null },
+    },
+  }
+
+  const thesisWriterCredits = await Credit.findAll(query)
+  return thesisWriterCredits.map(formatFacultyThesisWriter)
+}
 
 // Some programme modules are not directly associated to a faculty (organization).
 // Some have intermediate organizations, such as department, so the connection must be digged up
-export const findFacultyProgrammeCodes = async (faculty, programmeFilter) => {
+export const findFacultyProgrammeCodes = async (facultyCode: string, programmeFilter: string) => {
   let allProgrammes = []
   let allProgrammeCodes = []
 
-  const directAssociationProgrammes = await degreeProgrammesOfFaculty(faculty)
+  const directAssociationProgrammes = await degreeProgrammesOfFaculty(facultyCode)
 
   allProgrammes = allProgrammes.concat(directAssociationProgrammes)
-  allProgrammeCodes = allProgrammeCodes.concat(directAssociationProgrammes.map(prog => prog.code))
+  allProgrammeCodes = allProgrammeCodes.concat(directAssociationProgrammes.map(programme => programme.code))
 
   // find faculty's organization id and its direct child organizations
-  const { id } = await facultyOrganizationId(faculty)
+  const { id } = await facultyOrganizationId(facultyCode)
   const facultyChildOrganizations = await getChildOrganizations(id)
 
   // get programme modules that have a faculty child as organization(_id)
@@ -329,10 +351,10 @@ export const findFacultyProgrammeCodes = async (faculty, programmeFilter) => {
     const childAssociationProgrammes = await degreeProgrammesOfFaculty(org.code)
     if (childAssociationProgrammes.length > 0) {
       // eslint-disable-next-line no-loop-func
-      childAssociationProgrammes.forEach(prog => {
-        if (!(prog.code in allProgrammeCodes)) {
-          allProgrammes = allProgrammes.concat([prog])
-          allProgrammeCodes = allProgrammeCodes.concat([prog.code])
+      childAssociationProgrammes.forEach(programme => {
+        if (!(programme.code in allProgrammeCodes)) {
+          allProgrammes = allProgrammes.concat([programme])
+          allProgrammeCodes = allProgrammeCodes.concat([programme.code])
         }
       })
     } else {
@@ -343,10 +365,10 @@ export const findFacultyProgrammeCodes = async (faculty, programmeFilter) => {
           const associatedProgrammes = await degreeProgrammesOfFaculty(gcOrg.code)
           if (associatedProgrammes.length > 0) {
             // eslint-disable-next-line no-loop-func
-            associatedProgrammes.forEach(prog => {
-              if (!(prog.code in allProgrammeCodes)) {
-                allProgrammes = allProgrammes.concat([prog])
-                allProgrammeCodes = allProgrammeCodes.concat([prog.code])
+            associatedProgrammes.forEach(programme => {
+              if (!(programme.code in allProgrammeCodes)) {
+                allProgrammes = allProgrammes.concat([programme])
+                allProgrammeCodes = allProgrammeCodes.concat([programme.code])
               }
             })
           }
@@ -356,7 +378,7 @@ export const findFacultyProgrammeCodes = async (faculty, programmeFilter) => {
   }
 
   if (programmeFilter === 'NEW_STUDY_PROGRAMMES') {
-    allProgrammes = allProgrammes.filter(prog => isNewProgramme(prog.code))
+    allProgrammes = allProgrammes.filter(programme => isNewProgramme(programme.code))
   }
 
   mapCodesToIds(allProgrammes)
