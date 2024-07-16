@@ -32,26 +32,26 @@ export class Studyright extends Model {
   @Column(DataType.STRING)
   studyrightid: string
 
-  @HasMany(() => StudyrightElement)
+  @HasMany(() => StudyrightElement, { foreignKey: 'studyrightid', sourceKey: 'studyrightid' })
   studyright_elements: StudyrightElement[]
 
   @ForeignKey(() => StudyrightElement)
   @Column(DataType.STRING)
   actual_studyrightid: string
 
-  @HasMany(() => Enrollment)
+  @HasMany(() => Enrollment, { foreignKey: 'studyright_id', constraints: false })
   enrollments: Enrollment[]
 
   @BelongsTo(() => Student)
   student: Student
 
-  @BelongsTo(() => Organization)
+  @BelongsTo(() => Organization, { targetKey: 'code' })
   organization: Organization
 
-  @HasMany(() => Transfer)
+  @HasMany(() => Transfer, { foreignKey: 'studyrightid', sourceKey: 'studyrightid' })
   transfers: Transfer[]
 
-  @HasMany(() => Studyplan)
+  @HasMany(() => Studyplan, { foreignKey: 'studyrightid', sourceKey: 'studyrightid' })
   studyplans: Studyplan[]
 
   @Column(DataType.DATE)
@@ -86,11 +86,10 @@ export class Studyright extends Model {
   @Column(DataType.INTEGER)
   prioritycode: PriorityCode
 
-  @ForeignKey(() => StudyrightExtent)
   @Column(DataType.INTEGER)
   extentcode: ExtentCode
 
-  @BelongsTo(() => StudyrightExtent)
+  @BelongsTo(() => StudyrightExtent, { foreignKey: 'extentcode', targetKey: 'extentcode' })
   studyrightExtent: StudyrightExtent
 
   @Column(DataType.STRING)

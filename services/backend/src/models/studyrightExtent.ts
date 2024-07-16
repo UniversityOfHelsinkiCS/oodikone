@@ -17,7 +17,7 @@ export class StudyrightExtent extends Model {
   @Column(DataType.STRING)
   name: string
 
-  @HasMany(() => Studyright)
+  @HasMany(() => Studyright, { foreignKey: 'extentcode', sourceKey: 'extentcode' })
   studyrights: Studyright[]
 
   @CreatedAt

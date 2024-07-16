@@ -37,13 +37,13 @@ export class Course extends Model {
   @Column(DataType.STRING)
   coursetypecode: string
 
-  @BelongsTo(() => CourseType)
+  @BelongsTo(() => CourseType, { foreignKey: 'coursetypecode', targetKey: 'coursetypecode' })
   courseType: CourseType
 
-  @HasMany(() => Credit)
+  @HasMany(() => Credit, { foreignKey: 'course_id', sourceKey: 'id' })
   credits: Credit[]
 
-  @HasMany(() => Enrollment)
+  @HasMany(() => Enrollment, { foreignKey: 'course_id' })
   enrollments: Enrollment[]
 
   @BelongsToMany(() => Organization, () => CourseProvider, 'coursecode')

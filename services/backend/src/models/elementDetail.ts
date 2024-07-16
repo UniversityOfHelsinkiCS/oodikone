@@ -20,7 +20,7 @@ export class ElementDetail extends Model {
   @Column(DataType.INTEGER)
   type: ElementDetailType
 
-  @HasMany(() => StudyrightElement)
+  @HasMany(() => StudyrightElement, { foreignKey: 'code', sourceKey: 'code' })
   studyrightElements: StudyrightElement
 
   @CreatedAt

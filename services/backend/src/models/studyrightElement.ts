@@ -25,6 +25,9 @@ export class StudyrightElement extends Model {
   @Column(DataType.STRING)
   id: string
 
+  @BelongsTo(() => ElementDetail, { foreignKey: 'code', targetKey: 'code' })
+  element_detail: ElementDetail
+
   @Column(DataType.STRING)
   startdate: string
 
@@ -35,22 +38,19 @@ export class StudyrightElement extends Model {
   @Column(DataType.STRING)
   studyrightid: string
 
-  @BelongsTo(() => Studyright)
+  @BelongsTo(() => Studyright, { foreignKey: 'studyrightid', targetKey: 'studyrightid' })
   studyright: Studyright
+
+  @BelongsTo(() => Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
+  student: Student
 
   @ForeignKey(() => ElementDetail)
   @Column(DataType.STRING)
   code: string
 
-  @BelongsTo(() => ElementDetail)
-  element_detail: ElementDetail
-
   @ForeignKey(() => Student)
   @Column(DataType.STRING)
   studentnumber: string
-
-  @BelongsTo(() => Student)
-  student: Student
 
   @CreatedAt
   @Column(DataType.DATE)

@@ -30,7 +30,7 @@ export class Student extends Model {
   @Column(DataType.STRING)
   abbreviatedname: string
 
-  @HasMany(() => Enrollment)
+  @HasMany(() => Enrollment, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
   enrollments: Enrollment[]
 
   @HasMany(() => SemesterEnrollment)
@@ -42,16 +42,16 @@ export class Student extends Model {
   @HasMany(() => Studyright)
   studyrights: Studyright[]
 
-  @HasMany(() => StudyrightElement)
+  @HasMany(() => StudyrightElement, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
   studyrightElements: StudyrightElement[]
 
-  @HasMany(() => Studyplan)
+  @HasMany(() => Studyplan, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
   studyplans: Studyplan[]
 
-  @HasMany(() => Transfer)
+  @HasMany(() => Transfer, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
   transfers: Transfer[]
 
-  @HasMany(() => Credit)
+  @HasMany(() => Credit, { foreignKey: 'student_studentnumber', sourceKey: 'studentnumber' })
   credits: Credit
 
   @Column(DataType.DATE)

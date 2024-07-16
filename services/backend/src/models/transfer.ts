@@ -25,19 +25,25 @@ export class Transfer extends Model {
   @Column(DataType.STRING)
   id: string
 
+  @BelongsTo(() => Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
+  student: Student
+
+  @BelongsTo(() => Studyright, { foreignKey: 'studyrightid', targetKey: 'studyrightid' })
+  studyright: Studyright
+
+  @BelongsTo(() => ElementDetail, { foreignKey: 'sourcecode' })
+  source: ElementDetail
+
+  @BelongsTo(() => ElementDetail, { foreignKey: 'targetcode' })
+  target: ElementDetail
+
   @ForeignKey(() => ElementDetail)
   @Column(DataType.STRING)
   sourcecode: string
 
-  @BelongsTo(() => ElementDetail)
-  source: ElementDetail
-
   @ForeignKey(() => ElementDetail)
   @Column(DataType.STRING)
   targetcode: string
-
-  @BelongsTo(() => ElementDetail)
-  target: ElementDetail
 
   @Column(DataType.DATE)
   transferdate: Date
@@ -46,15 +52,9 @@ export class Transfer extends Model {
   @Column(DataType.STRING)
   studentnumber: string
 
-  @BelongsTo(() => Student)
-  student: Student
-
   @ForeignKey(() => Studyright)
   @Column(DataType.STRING)
   studyrightid: string
-
-  @BelongsTo(() => Studyright)
-  studyright: Studyright
 
   @CreatedAt
   @Column(DataType.DATE)
