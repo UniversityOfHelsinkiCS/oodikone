@@ -1,18 +1,10 @@
-const { col, Op } = require('sequelize')
+import { col, Op } from 'sequelize'
 
-const {
-  Course,
-  Credit,
-  Organization,
-  Student,
-  Studyplan,
-  SISStudyRight,
-  SISStudyRightElement,
-} = require('../../models')
+import { Course, Credit, Organization, Student, Studyplan, SISStudyRight, SISStudyRightElement } from '../../models'
 import { ExtentCode } from '../../types/extentCode'
-const { mapToProviders } = require('../../util/map')
-const { redisClient } = require('../redis')
-const { getCurriculumVersion } = require('./shared')
+import { mapToProviders } from '../../util/map'
+import { redisClient } from '../redis'
+import { getCurriculumVersion } from './shared'
 
 export const CLOSE_TO_GRADUATION_REDIS_KEY = 'CLOSE_TO_GRADUATION_DATA'
 
@@ -87,7 +79,7 @@ const formatStudent = student => {
   }, [])
 }
 
-const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =>
+export const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =>
   (
     await Student.findAll({
       attributes: [
@@ -152,17 +144,21 @@ const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =>
           model: Credit,
           attributes: ['attainment_date', 'grade'],
           where: { credittypecode: 4 },
-          include: {
-            model: Course,
-            attributes: ['code', 'course_unit_type'],
-            include: {
-              model: Organization,
-              attributes: ['code'],
-              through: {
-                attributes: [],
-              },
+          include: [
+            {
+              model: Course,
+              attributes: ['code', 'course_unit_type'],
+              include: [
+                {
+                  model: Organization,
+                  attributes: ['code'],
+                  through: {
+                    attributes: [],
+                  },
+                },
+              ],
             },
-          },
+          ],
         },
       ],
       order: [[{ model: Credit, as: 'credits' }, 'attainment_date', 'DESC']],
