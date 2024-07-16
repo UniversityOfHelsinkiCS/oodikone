@@ -1,7 +1,7 @@
 import moment from 'moment'
 
 import { programmeCodes } from '../../config/programmeCodes'
-import { ExtentCode } from '../../types/extentCode'
+import { ExtentCode } from '../../types'
 import { countTimeCategories, getBachelorStudyRight, getStatutoryAbsences } from '../graduationHelpers'
 import { defineYear, getMedian, getYearsArray, getYearsObject } from '../studyProgramme/studyProgrammeHelpers'
 import { graduatedStudyrights, hasMasterRight, studyrightsByRightStartYear } from './faculty'

@@ -12,8 +12,7 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
-import { EnrollmentType } from '../types/enrollmentType'
-import { ExtentCode } from '../types/extentCode'
+import { EnrollmentType, ExtentCode } from '../types'
 import { Organization } from './organization'
 import { SISStudyRightElement } from './SISStudyRightElement'
 import { Student } from './student'

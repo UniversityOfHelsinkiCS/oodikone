@@ -11,7 +11,7 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
-import { Name } from '../types/name'
+import { Name } from '../types'
 import { Course } from './course'
 import { CourseProvider } from './courseProvider'
 import { ProgrammeModule } from './programmeModule'

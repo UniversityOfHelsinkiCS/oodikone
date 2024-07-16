@@ -1,4 +1,4 @@
-import { CreditTypeCode } from '../types/creditTypeCode'
+import { CreditTypeCode } from '../types'
 import { Course } from './course'
 import { CourseProvider } from './courseProvider'
 import { CourseType } from './courseType'

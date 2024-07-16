@@ -1,6 +1,6 @@
 import moment from 'moment'
 
-import { GenderCode } from '../../types/genderCode'
+import { GenderCode } from '../../types'
 import { getAcademicYearDates } from '../../util/semester'
 import { countTimeCategories, getStatutoryAbsences } from '../graduationHelpers'
 import { studytrackStudents, enrolledStudents, absentStudents } from './studentGetters'

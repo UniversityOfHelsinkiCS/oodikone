@@ -1,4 +1,4 @@
-import { ElementDetailType } from '../../types/elementDetailType'
+import { ElementDetailType } from '../../types'
 
 const resolveStudyRightCode = (studyRightElements: any[]) => {
   if (!studyRightElements) {

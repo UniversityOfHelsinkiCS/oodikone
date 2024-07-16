@@ -1,7 +1,7 @@
 /* eslint-disable import/no-cycle */
 import { Column, CreatedAt, DataType, HasMany, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
-import { ElementDetailType } from '../types/elementDetailType'
+import { ElementDetailType } from '../types'
 import { StudyrightElement } from './studyrightElement'
 
 @Table({

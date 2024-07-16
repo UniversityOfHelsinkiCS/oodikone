@@ -12,7 +12,7 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
-import { CreditTypeCode } from '../types/creditTypeCode'
+import { CreditTypeCode } from '../types'
 import { Course } from './course'
 import { CreditTeacher } from './creditTeacher'
 import { CreditType } from './creditType'

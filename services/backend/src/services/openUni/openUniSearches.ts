@@ -2,7 +2,7 @@ import { Op } from 'sequelize'
 
 import { Course, Credit, Enrollment, Student, SISStudyRight } from '../../models'
 import { OpenUniPopulationSearch } from '../../models/kone'
-import { ExtentCode } from '../../types/extentCode'
+import { ExtentCode } from '../../types'
 import { formatCourseInfo, formatOpenCredits, formatOpenEnrollments, formatStudentInfo } from './format'
 
 export const getCredits = async (courseCodes: string[], startdate: Date) =>

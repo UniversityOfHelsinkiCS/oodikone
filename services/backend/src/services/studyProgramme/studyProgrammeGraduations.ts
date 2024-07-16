@@ -1,8 +1,7 @@
 import { indexOf, orderBy } from 'lodash'
 import moment from 'moment'
 
-import { ExtentCode } from '../../types/extentCode'
-import { Name } from '../../types/name'
+import { ExtentCode, Name } from '../../types'
 import { sortByProgrammeCode } from '../../util'
 import { mapToProviders } from '../../util/map'
 import { countTimeCategories } from '../graduationHelpers'

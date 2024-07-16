@@ -1,8 +1,7 @@
 import { orderBy } from 'lodash'
 
 import { programmeCodes } from '../../config/programmeCodes'
-import { ExtentCode } from '../../types/extentCode'
-import { Phase } from '../../types/phase'
+import { ExtentCode, Phase } from '../../types'
 import { studentnumbersWithAllStudyrightElements } from '../populations'
 
 export const getCorrectStudentnumbers = async ({

@@ -11,9 +11,7 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
-import { Name } from '../types/name'
-import { Phase } from '../types/phase'
-import { StudyTrack } from '../types/studyTrack'
+import { Name, Phase, StudyTrack } from '../types'
 import { SISStudyRight } from './SISStudyRight'
 
 @Table({

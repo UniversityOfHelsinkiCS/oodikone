@@ -1,7 +1,7 @@
 /* eslint-disable import/no-cycle */
 import { Column, CreatedAt, DataType, HasMany, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
-import { Name } from '../types/name'
+import { Name } from '../types'
 import { SemesterEnrollment } from './semesterEnrollment'
 
 @Table({

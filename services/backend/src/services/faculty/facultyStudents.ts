@@ -1,5 +1,4 @@
-import { ExtentCode } from '../../types/extentCode'
-import { GenderCode } from '../../types/genderCode'
+import { ExtentCode, GenderCode } from '../../types'
 import { getAcademicYearDates } from '../../util/semester'
 import { absentStudents, enrolledStudents } from '../studyProgramme/studentGetters'
 import {

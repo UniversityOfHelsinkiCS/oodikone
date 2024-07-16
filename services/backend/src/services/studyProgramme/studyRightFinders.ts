@@ -10,8 +10,7 @@ import {
   SISStudyRight,
   SISStudyRightElement,
 } from '../../models'
-import { ElementDetailType } from '../../types/elementDetailType'
-import { EnrollmentType } from '../../types/enrollmentType'
+import { ElementDetailType, EnrollmentType } from '../../types'
 import { getCurrentSemester } from '../semesters'
 import { formatStudyright } from './format'
 import { whereStudents, sinceDate } from '.'

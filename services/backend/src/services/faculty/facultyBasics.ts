@@ -2,7 +2,7 @@ import { indexOf, isArray } from 'lodash'
 import moment from 'moment'
 
 import { programmeCodes } from '../../config/programmeCodes'
-import { ExtentCode } from '../../types/extentCode'
+import { ExtentCode } from '../../types'
 import { defineYear, getStatsBasis, getYearsArray } from '../studyProgramme/studyProgrammeHelpers'
 import { graduatedStudyrights, startedStudyrights, studyrightsByRightStartYear } from './faculty'
 import { checkCommissioned, checkTransfers, findRightProgramme, isNewProgramme } from './facultyHelpers'

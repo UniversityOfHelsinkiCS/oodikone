@@ -13,9 +13,7 @@ import {
   Studyright,
   StudyrightElement,
 } from '../../models'
-import { CreditTypeCode } from '../../types/creditTypeCode'
-import { ExtentCode } from '../../types/extentCode'
-import { PriorityCode } from '../../types/priorityCode'
+import { CreditTypeCode, ExtentCode, PriorityCode } from '../../types'
 import {
   formatFacultyProgramme,
   formatFacultyProgrammeStudents,

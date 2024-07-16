@@ -2,7 +2,7 @@ import moment from 'moment'
 import { Op } from 'sequelize'
 
 import { Semester, SemesterEnrollment, Studyright } from '../models'
-import { ExtentCode } from '../types/extentCode'
+import { ExtentCode } from '../types'
 
 interface Absence {
   semesterCode: string

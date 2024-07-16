@@ -2,7 +2,7 @@ import moment from 'moment'
 import { Op } from 'sequelize'
 
 import { Semester } from '../models'
-import { Name } from '../types/name'
+import { Name } from '../types'
 
 type SemestersAndYears = {
   years: {

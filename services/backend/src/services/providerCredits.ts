@@ -1,5 +1,4 @@
-import { EnrollmentType } from '../types/enrollmentType'
-import { ExtentCode } from '../types/extentCode'
+import { EnrollmentType, ExtentCode } from '../types'
 import { mapToProviders } from '../util/map'
 import { getCreditStats, setCreditStats } from './analyticsService'
 import { getCourseCodesOfProvider } from './providers'

@@ -1,7 +1,7 @@
 import { indexOf, inRange } from 'lodash'
 import moment from 'moment'
 
-import { ExtentCode } from '../../types/extentCode'
+import { ExtentCode } from '../../types'
 import { getAcademicYearDates } from '../../util/semester'
 import { studytrackStudents } from '../studyProgramme/studentGetters'
 import { getCreditThresholds, getYearsArray } from '../studyProgramme/studyProgrammeHelpers'

@@ -1,6 +1,6 @@
 import { Column, CreatedAt, DataType, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
-import { CreditTypeCode } from '../types/creditTypeCode'
+import { CreditTypeCode } from '../types'
 
 @Table({
   underscored: true,

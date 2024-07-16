@@ -4,7 +4,7 @@ import { Op } from 'sequelize'
 import { dbConnections } from '../../database/connection'
 import { ElementDetail, Student, Studyright, StudyrightElement, Transfer } from '../../models'
 import { TagStudent } from '../../models/kone'
-import { ExtentCode } from '../../types/extentCode'
+import { ExtentCode } from '../../types'
 import { count } from './shared'
 
 const { sequelize } = dbConnections
