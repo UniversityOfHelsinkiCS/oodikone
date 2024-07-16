@@ -4,6 +4,7 @@ import {
   Column,
   CreatedAt,
   DataType,
+  ForeignKey,
   HasMany,
   Model,
   PrimaryKey,
@@ -34,19 +35,20 @@ export class Organization extends Model {
   @Column(DataType.JSONB)
   name: Name
 
+  @ForeignKey(() => Organization)
   @Column(DataType.STRING)
   parent_id: string
 
-  @HasMany(() => Organization, { foreignKey: 'parent_id', as: 'children' })
+  @HasMany(() => Organization)
   children: Organization[]
 
-  @HasMany(() => ProgrammeModule, { foreignKey: 'organization_id' })
+  @HasMany(() => ProgrammeModule)
   programmeModules: ProgrammeModule[]
 
-  @HasMany(() => SISStudyRight, { foreignKey: 'facultyCode', sourceKey: 'code' })
+  @HasMany(() => SISStudyRight)
   SISStudyRights: SISStudyRight[]
 
-  @HasMany(() => Studyright, { foreignKey: 'facultyCode', sourceKey: 'code' })
+  @HasMany(() => Studyright)
   studyrights: Studyright[]
 
   @BelongsToMany(() => Course, () => CourseProvider, 'organizationcode')

@@ -30,7 +30,7 @@ export class Enrollment extends Model {
   @Column(DataType.STRING)
   studentnumber: string
 
-  @BelongsTo(() => Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
+  @BelongsTo(() => Student)
   student: Student
 
   @Column(DataType.STRING)
@@ -46,11 +46,14 @@ export class Enrollment extends Model {
   @Column(DataType.STRING)
   course_id: string
 
+  @BelongsTo(() => Course)
+  course: Course
+
   @ForeignKey(() => Semester)
   @Column(DataType.STRING)
   semester_composite: string
 
-  @BelongsTo(() => Semester, { foreignKey: 'semester_composite', targetKey: 'composite' })
+  @BelongsTo(() => Semester)
   semester: Semester
 
   @Column(DataType.INTEGER)
@@ -60,14 +63,11 @@ export class Enrollment extends Model {
   is_open: boolean
 
   @ForeignKey(() => Studyright)
-  @Column({ type: DataType.STRING, allowNull: true })
+  @Column(DataType.STRING)
   studyright_id: string
 
-  @BelongsTo(() => Studyright, { foreignKey: 'studyright_id', targetKey: 'studyrightid', constraints: false })
+  @BelongsTo(() => Studyright)
   studyright: Studyright
-
-  @BelongsTo(() => Course, { foreignKey: 'course_id', targetKey: 'id' })
-  course: Course
 
   @CreatedAt
   @Column(DataType.DATE)

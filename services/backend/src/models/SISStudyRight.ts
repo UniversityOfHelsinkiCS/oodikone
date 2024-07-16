@@ -34,13 +34,17 @@ export class SISStudyRight extends Model {
   @Column(DataType.STRING)
   id: string
 
-  @BelongsTo(() => Organization, { foreignKey: 'facultyCode', targetKey: 'code' })
+  @ForeignKey(() => Organization)
+  @Column(DataType.STRING)
+  facultyCode: string
+
+  @BelongsTo(() => Organization)
   organization: Organization
 
   @HasMany(() => Studyplan)
   studyPlans: Studyplan[]
 
-  @HasMany(() => SISStudyRightElement, { foreignKey: 'studyRightId' })
+  @HasMany(() => SISStudyRightElement)
   studyRightElements: SISStudyRightElement[]
 
   @Column(DataType.DATE)

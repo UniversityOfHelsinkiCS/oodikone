@@ -38,11 +38,8 @@ export class Credit extends Model {
   @Column(DataType.STRING)
   student_studentnumber: string
 
-  @BelongsTo(() => Student, { foreignKey: 'student_studentnumber', targetKey: 'studentnumber' })
+  @BelongsTo(() => Student)
   student: Student
-
-  @BelongsTo(() => Semester, { foreignKey: 'semester_composite' })
-  semester: Semester
 
   @Column(DataType.DOUBLE)
   credits: number
@@ -51,7 +48,7 @@ export class Credit extends Model {
   @Column(DataType.INTEGER)
   credittypecode: CreditTypeCode
 
-  @BelongsTo(() => CreditType, { foreignKey: 'credittypecode', targetKey: 'credittypecode' })
+  @BelongsTo(() => CreditType)
   creditType: CreditType
 
   @Column(DataType.DATE)
@@ -66,15 +63,19 @@ export class Credit extends Model {
   @Column(DataType.STRING)
   course_code: string
 
-  @BelongsTo(() => Course, { foreignKey: 'course_id' })
-  course: Course
-
   @ForeignKey(() => Course)
   @Column(DataType.STRING)
   course_id: string
 
+  @BelongsTo(() => Course)
+  course: Course
+
+  @ForeignKey(() => Semester)
   @Column(DataType.STRING)
   semester_composite: string
+
+  @BelongsTo(() => Semester)
+  semester: Semester
 
   @Column(DataType.INTEGER)
   semestercode: number

@@ -53,7 +53,7 @@ export class ProgrammeModule extends Model {
   @Column(DataType.STRING)
   organization_id: string
 
-  @BelongsTo(() => Organization, { foreignKey: 'organization_id' })
+  @BelongsTo(() => Organization)
   organization: Organization
 
   @Column(DataType.DATE)
