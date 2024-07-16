@@ -1,6 +1,7 @@
 import { Column, CreatedAt, DataType, HasMany, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
 import { SemesterEnrollment } from './semesterEnrollment'
+import { Name } from '../types/name'
 
 @Table({
   underscored: true,
@@ -19,7 +20,7 @@ export class Semester extends Model {
   semestercode: number
 
   @Column(DataType.JSONB)
-  name: object
+  name: Name
 
   @Column(DataType.INTEGER)
   startYear: number
