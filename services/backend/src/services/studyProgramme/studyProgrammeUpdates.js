@@ -35,7 +35,7 @@ const updateBasicView = async (code, combinedProgramme) => {
   return 'OK'
 }
 
-const updateStudytrackView = async (code, combinedProgramme, associations) => {
+const updateStudytrackView = async (code, combinedProgramme) => {
   const graduatedOptions = ['GRADUATED_INCLUDED', 'GRADUATED_EXCLUDED']
   const specialGroupOptions = ['SPECIAL_INCLUDED', 'SPECIAL_EXCLUDED']
 
@@ -48,7 +48,6 @@ const updateStudytrackView = async (code, combinedProgramme, associations) => {
           specialGroups: specialGroup === 'SPECIAL_INCLUDED',
           graduated: graduated === 'GRADUATED_INCLUDED',
         },
-        associations,
       })
       await setStudytrackStats(stats, graduated, specialGroup)
     }

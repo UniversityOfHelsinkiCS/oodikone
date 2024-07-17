@@ -19,7 +19,7 @@ const {
 const { getGraduationStatsForStudytrack } = require('../services/studyProgramme/studyProgrammeGraduations')
 const { updateBasicView, updateStudytrackView } = require('../services/studyProgramme/studyProgrammeUpdates')
 const { getStudytrackStatsForStudyprogramme } = require('../services/studyProgramme/studyTrackStats')
-const { getAssociations, getProgrammesFromStudyRights } = require('../services/studyrights')
+const { getProgrammesFromStudyRights } = require('../services/studyrights')
 const logger = require('../util/logger')
 
 // For grafana statistics (idea stolen from Norppa)
@@ -128,7 +128,6 @@ router.get('/:id/studytrackstats', async (req, res) => {
   const data = await getStudytrackStats(code, combinedProgramme, graduated, specialGroups)
   if (data) return res.json(data)
 
-  const associations = await getAssociations()
   const updated = await getStudytrackStatsForStudyprogramme({
     studyprogramme: code,
     combinedProgramme,
@@ -136,7 +135,6 @@ router.get('/:id/studytrackstats', async (req, res) => {
       graduated: graduated === 'GRADUATED_INCLUDED',
       specialGroups: specialGroups === 'SPECIAL_INCLUDED',
     },
-    associations,
   })
   if (updated) await setStudytrackStats(updated, graduated, specialGroups)
   return res.json(updated)
@@ -176,8 +174,7 @@ router.get('/:id/update_studytrackview', async (req, res) => {
     return res.status(400).json({ error: 'Missing code' })
   }
   try {
-    const associations = await getAssociations()
-    const result = await updateStudytrackView(code, combinedProgramme, associations)
+    const result = await updateStudytrackView(code, combinedProgramme)
     return res.json(result)
   } catch (error) {
     const message = `Failed to update study track stats for programme ${code}${combinedProgramme ? `+${combinedProgramme}` : ''}`
@@ -214,7 +211,6 @@ router.get('/:id/evaluationstats', async (req, res) => {
 
   let progressData = await getStudytrackStats(code, combinedProgramme, graduated, specialGroups)
   if (!progressData) {
-    const associations = await getAssociations()
     const updated = await getStudytrackStatsForStudyprogramme({
       studyprogramme: code,
       combinedProgramme,
@@ -222,7 +218,6 @@ router.get('/:id/evaluationstats', async (req, res) => {
         graduated: graduated === 'GRADUATED_INCLUDED',
         specialGroups: specialGroups === 'SPECIAL_INCLUDED',
       },
-      associations,
     })
     if (updated) {
       await setStudytrackStats(updated, graduated, specialGroups)

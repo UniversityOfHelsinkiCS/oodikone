@@ -25,7 +25,7 @@ export const getCurrentSemester = async () => {
       },
     },
   })
-  return currentSemester
+  return currentSemester!
 }
 
 export const getSemestersAndYears = async () => {

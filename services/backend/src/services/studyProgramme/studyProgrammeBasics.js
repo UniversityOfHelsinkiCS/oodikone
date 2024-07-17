@@ -16,7 +16,12 @@ const getDateOfFirstSemesterPresent = (semesterEnrollments, semesters, currentSe
   for (const enrollment of semesterEnrollments) {
     if (enrollment.type !== 1) continue
     const semesterInfo = semesters[enrollment.semester]
-    if (semesterInfo.startdate >= since && semesterInfo.semestercode <= currentSemester) return semesterInfo.startdate
+    if (
+      semesterInfo.startdate <= since &&
+      since <= semesterInfo.enddate &&
+      semesterInfo.semestercode <= currentSemester
+    )
+      return semesterInfo.startdate
   }
   return null
 }
@@ -269,4 +274,5 @@ const getBasicStatsForStudytrack = async ({ studyprogramme, combinedProgramme, s
 module.exports = {
   getBasicStatsForStudytrack,
   getGraduatedStats,
+  getDateOfFirstSemesterPresent,
 }

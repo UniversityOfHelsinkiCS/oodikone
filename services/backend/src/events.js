@@ -53,13 +53,12 @@ const refreshProgrammes = async () => {
 }
 
 const refreshProgramme = async code => {
-  const associations = await getAssociations()
   await updateBasicView(code, '')
-  await updateStudytrackView(code, '', associations)
+  await updateStudytrackView(code, '')
 
   const combinedProgramme = combinedStudyprogrammes[code] || ''
   await updateBasicView(code, combinedProgramme)
-  await updateStudytrackView(code, combinedProgramme, associations)
+  await updateStudytrackView(code, combinedProgramme)
 }
 
 const refreshTeacherLeaderboard = async () => {

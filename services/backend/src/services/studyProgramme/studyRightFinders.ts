@@ -1,4 +1,4 @@
-import { Op } from 'sequelize'
+import { Includeable, Op } from 'sequelize'
 
 import { dbConnections } from '../../database/connection'
 import {
@@ -9,15 +9,20 @@ import {
   StudyrightElement,
   SISStudyRight,
   SISStudyRightElement,
+  Credit,
 } from '../../models'
-import { ElementDetailType, EnrollmentType } from '../../types'
+import { CreditTypeCode, ElementDetailType, EnrollmentType } from '../../types'
 import { getCurrentSemester } from '../semesters'
 import { formatStudyright } from './format'
 import { whereStudents, sinceDate } from '.'
 
 const { sequelize } = dbConnections
 
-export const getStudyRightsInProgramme = async (programmeCode: string, onlyGraduated: boolean) => {
+export const getStudyRightsInProgramme = async (
+  programmeCode: string,
+  onlyGraduated: boolean,
+  includeStudentsAndCredits = false
+) => {
   const where: Record<string, any> = { code: programmeCode }
   if (onlyGraduated) {
     where.graduated = true
@@ -38,14 +43,38 @@ export const getStudyRightsInProgramme = async (programmeCode: string, onlyGradu
     },
   })
 
+  const include: Includeable[] = [
+    {
+      model: SISStudyRightElement,
+      as: 'studyRightElements',
+      attributes: ['phase', 'code', 'name', 'startDate', 'endDate', 'graduated', 'studyTrack'],
+    },
+  ]
+
+  if (includeStudentsAndCredits) {
+    include.push({
+      model: Student,
+      attributes: ['gender_code', 'home_country_en'],
+      include: [
+        {
+          model: Credit,
+          attributes: ['attainment_date', 'credits'],
+          where: {
+            isStudyModule: false,
+            credittypecode: {
+              [Op.in]: [CreditTypeCode.PASSED, CreditTypeCode.APPROVED],
+            },
+          },
+          required: false,
+        },
+      ],
+    })
+  }
+
   return (
     await SISStudyRight.findAll({
-      attributes: ['id', 'extentCode', 'semesterEnrollments'],
-      include: {
-        model: SISStudyRightElement,
-        as: 'studyRightElements',
-        attributes: ['phase', 'code', 'name', 'startDate', 'endDate'],
-      },
+      attributes: ['id', 'extentCode', 'semesterEnrollments', 'studentNumber'],
+      include,
       where: {
         id: {
           [Op.in]: studyRights.map(studyRight => studyRight.toJSON().id),
@@ -54,38 +83,6 @@ export const getStudyRightsInProgramme = async (programmeCode: string, onlyGradu
     })
   ).map(studyRight => studyRight.toJSON())
 }
-
-export const startedStudyrights = async (studytrack: string, since: Date, studentnumbers: string[]) =>
-  (
-    await Studyright.findAll({
-      include: [
-        {
-          model: StudyrightElement,
-          required: true,
-          include: [
-            {
-              model: ElementDetail,
-              required: true,
-              where: {
-                code: studytrack,
-              },
-            },
-          ],
-        },
-        {
-          model: Student,
-          attributes: ['studentnumber'],
-          required: true,
-        },
-      ],
-      where: {
-        studystartdate: {
-          [Op.gte]: since,
-        },
-        student_studentnumber: whereStudents(studentnumbers),
-      },
-    })
-  ).map(formatStudyright)
 
 export const graduatedStudyRightsByStartDate = async (
   studytrack: string,
@@ -204,7 +201,7 @@ export const inactiveStudyrights = async (studytrack: string, studentnumbers: st
       student.studyrights[0].enddate <= new Date() ||
       !student.semester_enrollments.find(enrollment => enrollment.semestercode === currentSemester.semestercode) ||
       student.semester_enrollments.find(enrollment => enrollment.semestercode === currentSemester.semestercode)
-        .enrollmenttype === EnrollmentType.INACTIVE
+        ?.enrollmenttype === EnrollmentType.INACTIVE
   )
 }
 
