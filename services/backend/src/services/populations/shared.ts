@@ -4,7 +4,7 @@ import { Op, QueryTypes } from 'sequelize'
 import { dbConnections } from '../../database/connection'
 import { Course, Credit, ElementDetail, Studyright, StudyrightElement } from '../../models'
 import { ElementDetailType, ExtentCode } from '../../types'
-import { semesterEnd, semesterStart } from '../../util/semester'
+import { SemesterEnd, SemesterStart } from '../../util/semester'
 import { getCurrentSemester } from '../semesters'
 import { getProgrammesFromStudyRights } from '../studyrights'
 
@@ -243,12 +243,17 @@ export const count = (column, count, distinct = false) => {
 
 export const parseQueryParams = query => {
   const { semesters, studentStatuses, studyRights, months, year, tag } = query
-  const startDate = semesters.includes('FALL')
-    ? `${year}-${semesterStart[semesters.find(semester => semester === 'FALL')]}`
-    : `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterStart[semesters.find(semester => semester === 'SPRING')]}`
-  const endDate = semesters.includes('SPRING')
-    ? `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd[semesters.find(semester => semester === 'SPRING')]}`
-    : `${year}-${semesterEnd[semesters.find(semester => semester === 'FALL')]}`
+  const hasFall = semesters.includes('FALL')
+  const hasSpring = semesters.includes('SPRING')
+
+  const startDate = hasFall
+    ? `${year}-${SemesterStart.FALL}`
+    : `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${SemesterStart.SPRING}`
+
+  const endDate = hasSpring
+    ? `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${SemesterEnd.SPRING}`
+    : `${year}-${SemesterEnd.FALL}`
+
   const exchangeStudents = studentStatuses && studentStatuses.includes('EXCHANGE')
   const nondegreeStudents = studentStatuses && studentStatuses.includes('NONDEGREE')
   const transferredStudents = studentStatuses && studentStatuses.includes('TRANSFERRED')
