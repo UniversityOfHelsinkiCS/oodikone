@@ -1,6 +1,7 @@
 const router = require('express').Router()
 
 const { isDev } = require('../config')
+const { roles } = require('../config/roles')
 const auth = require('../middleware/auth')
 const userService = require('../services/userService')
 
@@ -10,7 +11,7 @@ router.get('/', auth.roles(['admin']), async (_req, res) => {
 })
 
 router.get('/access_groups', auth.roles(['admin']), async (_req, res) => {
-  res.json(userService.roles)
+  res.json(roles)
 })
 
 router.get('/:uid', auth.roles(['admin']), async (req, res) => {

@@ -1,9 +1,3 @@
-export type Role =
-  | 'admin'
-  | 'courseStatistics'
-  | 'facultyStatistics'
-  | 'fullSisuAccess'
-  | 'katselmusViewer'
-  | 'openUniSearch'
-  | 'studyGuidanceGroups'
-  | 'teachers'
+import { roles } from '../config/roles'
+
+export type Role = (typeof roles)[number]
