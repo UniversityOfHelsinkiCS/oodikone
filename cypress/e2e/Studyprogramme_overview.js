@@ -45,9 +45,9 @@ describe('Studyprogramme overview', () => {
         // [Year, Started studying, Accepted, Graduated, Transferred Away, Transferred to]
         ...years.map(year => [year, 0, 0, 0, 0, 0]),
         [2021, 0, 0, 0, 1, 0],
-        [2020, 13, 10, 35, 2, 2],
-        [2019, 96, 86, 17, 1, 1],
-        [2018, 161, 161, 1, 0, 0],
+        [2020, 10, 10, 35, 2, 2],
+        [2019, 83, 86, 17, 1, 1],
+        [2018, 150, 161, 1, 0, 0],
         [2017, 158, 171, 0, 0, 0],
       ]
 
@@ -90,9 +90,9 @@ describe('Studyprogramme overview', () => {
         // [Year, Started studying, Accepted, Graduated]
         ...years.map(year => [year, 0, 0, 0]),
         [2021, 0, 0, 0],
-        [2020, 13, 10, 35],
-        [2019, 96, 86, 17],
-        [2018, 161, 161, 1],
+        [2020, 10, 10, 35],
+        [2019, 83, 86, 17],
+        [2018, 150, 161, 1],
         [2017, 158, 171, 0],
       ]
 
@@ -131,10 +131,10 @@ describe('Studyprogramme overview', () => {
         // [Year, Started studying, Accepted, Graduated, Transferred away, Transferred to]
         ...years.map(year => [year, 0, 0, 0, 0, 0]),
         ['2021 - 2022', 0, 0, 0, 0, 0],
-        ['2020 - 2021', 12, 10, 6, 1, 2],
-        ['2019 - 2020', 96, 86, 38, 3, 0],
-        ['2018 - 2019', 161, 161, 8, 0, 1],
-        ['2017 - 2018', 159, 171, 1, 0, 0],
+        ['2020 - 2021', 10, 10, 6, 1, 2],
+        ['2019 - 2020', 83, 86, 38, 3, 0],
+        ['2018 - 2019', 150, 161, 8, 0, 1],
+        ['2017 - 2018', 158, 171, 1, 0, 0],
       ]
       cy.checkTableStats(studentTableContents, 'StudentsOfTheStudyprogramme')
 
@@ -240,27 +240,28 @@ describe('Studyprogramme overview', () => {
 
     it('Students of the studyprogramme are shown correctly', () => {
       const tableContents = [
-        // [Year, All, Started studying, Currently enrolled, Absent, Inactive, Graduated, Men, Women, other/unknown Finnish, other]
+        // [Year, All, Started studying, Present, Absent, Inactive, Graduated, Men, Women, Other/Unknown, Finland, Other]
         ['2020 - 2021', 12, 10, 0, 0, 12, 0, 10, 2, 0, 12, 0],
-        ['2019 - 2020', 86, 86, 0, 0, 85, 1, 65, 21, 0, 86, 0],
-        ['2018 - 2019', 162, 161, 0, 0, 151, 11, 118, 44, 0, 161, 1],
-        ['2017 - 2018', 171, 171, 0, 0, 129, 42, 135, 36, 0, 166, 5],
-        ['Total', 431, 428, 0, 0, 377, 54, 328, 103, 0, 425, 6],
+        ['2019 - 2020', 86, 83, 0, 0, 85, 1, 65, 21, 0, 86, 0],
+        ['2018 - 2019', 162, 150, 0, 0, 151, 11, 118, 44, 0, 161, 1],
+        ['2017 - 2018', 171, 158, 0, 0, 130, 41, 135, 36, 0, 166, 5],
+        ['Total', 431, 401, 0, 0, 378, 53, 328, 103, 0, 425, 6],
       ]
 
       cy.checkTableStats(tableContents, 'StudytrackOverview')
     })
 
     it('Student progress data is shown correctly', () => {
+      const years = getEmptyYears(true)
       const tableContents = [
-        ['2023 - 2024', 0, 0, 0, 0, 0, 0, 0, 0],
-        ['2022 - 2023', 0, 0, 0, 0, 0, 0, 0, 0],
+        // [Year, All, < 30 credits, 30–60 credits, 60–90 credits, 90–120 credits, 120–150 credits, 150–180 credits, ≥ 180 credits]
+        ...years.map(year => [year, 0, 0, 0, 0, 0, 0, 0, 0]),
         ['2021 - 2022', 0, 0, 0, 0, 0, 0, 0, 0],
         ['2020 - 2021', 12, 12, 0, 0, 0, 0, 0, 0],
         ['2019 - 2020', 86, 26, 34, 21, 5, 0, 0, 0],
-        ['2018 - 2019', 162, 10, 27, 47, 36, 26, 12, 4],
+        ['2018 - 2019', 162, 10, 28, 47, 35, 26, 12, 4],
         ['2017 - 2018', 171, 20, 21, 26, 22, 22, 33, 27],
-        ['Total', 431, 68, 82, 94, 63, 48, 45, 31],
+        ['Total', 431, 68, 83, 94, 62, 48, 45, 31],
       ]
 
       cy.checkTableStats(tableContents, 'StudytrackProgress')
