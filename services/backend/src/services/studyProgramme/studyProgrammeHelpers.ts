@@ -190,7 +190,7 @@ export const tableTitles = {
       'Transferred credits',
     ],
   },
-  studytracksStart: ['', 'All', 'Started studying', 'Currently enrolled', 'Absent', 'Inactive'],
+  studytracksStart: ['', 'All', 'Started\nstudying', 'Present', 'Absent', 'Inactive'],
   studytracksBasic: ['Graduated'],
   studytracksCombined: {
     licentiate: ['Graduated bachelor', 'Graduated licentiate'],

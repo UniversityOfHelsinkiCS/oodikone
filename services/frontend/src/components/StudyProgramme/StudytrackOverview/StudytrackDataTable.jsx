@@ -207,7 +207,7 @@ const getRow = ({
     return null
   }
 
-  const correctStudytrack = row[0].split(', ')[1]
+  const correctStudytrack = row[0]
   const title =
     studytracks[correctStudytrack] === undefined
       ? correctStudytrack
@@ -339,7 +339,7 @@ export const StudytrackDataTable = ({
               }
               style={{ borderLeftWidth: 'thick' }}
             >
-              Status
+              Current status
             </Table.HeaderCell>
             <Table.HeaderCell colSpan={!showPercentages ? 3 : 6} style={{ borderLeftWidth: 'thick' }}>
               Gender

@@ -70,6 +70,13 @@ export const StudytrackOverview = ({
     chartStats,
     tableTitles: creditTableTitles,
   } = calculateStats(stats?.data?.creditCounts, getTargetCreditsForProgramme(programmeCode))
+  if (chartStats) {
+    chartStats.forEach(creditCategory => {
+      const [total, ...years] = creditCategory.data
+      creditCategory.data = [total, ...years.reverse()]
+    })
+  }
+
   const creditTableStats = {}
   creditTableStats[studyprogramme] = tableStats
   const creditChartData = { creditGraphStats: {}, years: stats?.data?.years }

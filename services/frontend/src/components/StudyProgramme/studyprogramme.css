@@ -147,6 +147,10 @@ body {
   margin: 2em 0 5em;
 }
 
+.studytrack-overview .datatable th {
+  white-space: pre-line;
+}
+
 .studytrack-overview .no-data-message {
   margin: 20px 0;
 }
