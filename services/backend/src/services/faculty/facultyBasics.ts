@@ -15,10 +15,10 @@ import {
   transferredTo,
 } from './facultyTransfers'
 
-const filterDuplicateStudyrights = (studyRights: { studyrightid: string }[]) => {
+const filterDuplicateStudyrights = (studyRights: Awaited<ReturnType<typeof startedStudyrights>>) => {
   // bachelor+master students have two studyrights (separated by two last digits in studyrightid)
   // choose only bachelor one, so we don't count start of masters as starting in faculty
-  const rightsToCount = {}
+  const rightsToCount: Record<string, Awaited<ReturnType<typeof startedStudyrights>>[number]> = {}
   studyRights.forEach(studyRight => {
     const id = studyRight.studyrightid.slice(0, -2)
     if (studyRight.studyrightid.slice(-2) === '-1') {
