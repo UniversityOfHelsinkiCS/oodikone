@@ -3,12 +3,7 @@ import { Op } from 'sequelize'
 import { Transfer } from '../../models'
 import { formatFacultyTransfer } from './facultyFormatHelpers'
 
-export const transferredFaculty = async (
-  programmeCodeIn: string[],
-  programmeCodeOut: string[],
-  start: Date,
-  end: Date
-) =>
+const transferredFaculty = async (programmeCodeIn: string[], programmeCodeOut: string[], start: Date, end: Date) =>
   (
     await Transfer.findAll({
       where: {

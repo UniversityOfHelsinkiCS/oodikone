@@ -252,7 +252,7 @@ export const hasMasterRight = async (studyRightId: string): Promise<boolean> => 
   return studyRight !== null
 }
 
-export const degreeProgrammesOfFaculty = async (facultyCode: string) => {
+const degreeProgrammesOfFaculty = async (facultyCode: string) => {
   const query: Record<string, any> = {
     attributes: ['code', 'name'],
     include: {
@@ -270,7 +270,7 @@ export const degreeProgrammesOfFaculty = async (facultyCode: string) => {
   return uniqBy(programmes.map(formatFacultyProgramme), 'code')
 }
 
-export const facultyOrganizationId = async (facultyCode: string) => {
+const facultyOrganizationId = async (facultyCode: string) => {
   return await Organization.findOne({
     attributes: ['id'],
     where: {
@@ -279,7 +279,7 @@ export const facultyOrganizationId = async (facultyCode: string) => {
   })
 }
 
-export const getChildOrganizations = async (facultyId: string) => {
+const getChildOrganizations = async (facultyId: string) => {
   const query: Record<string, any> = {
     attributes: ['id', 'name', 'code', 'parent_id'],
     where: {
