@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-    "target": "ES6",
+    "target": "ES2021",
+    "lib": ["ES2023"],
     "allowJs": true,
     "moduleResolution": "nodenext",
     "module": "nodenext",
@@ -10,7 +11,12 @@
     "rootDir": ".",
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "strict": false,
+    "strict": true,
+    // The three options below would be automatically enabled with strict: true
+    // We should also remove strictNullChecks: false as soon as all the current errors are fixed
+    "strictNullChecks": false,
+    "strictPropertyInitialization": false,
+    "noImplicitAny": false,
     "sourceMap": true,
     "sourceRoot": "/",
     "inlineSources": true
