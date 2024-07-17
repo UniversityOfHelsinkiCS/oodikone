@@ -8,7 +8,7 @@ const bscsCode = /BSCS??/
 
 const codeRegexes = [openUniCodeA, openUniCode, bscsCode, oldNumericCode, newLetterBasedCode, digi]
 
-const getSortRank = code => {
+export const getSortRank = (code: string): number => {
   for (let i = 0; i < codeRegexes.length; i++) {
     if (codeRegexes[i].test(code)) {
       return i
@@ -16,5 +16,3 @@ const getSortRank = code => {
   }
   return 3 // if no hit, put before open uni courses
 }
-
-module.exports = { getSortRank }
