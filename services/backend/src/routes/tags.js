@@ -26,6 +26,10 @@ const userIsUnauthorized = (programmeRights, programmeCodes, roles) =>
   !programmeRights.includes(programmeCodes[1]) &&
   !hasFullAccessToStudentData(roles)
 
+const getProgrammeCodes = studytrack => {
+  return studytrack.includes('KH') && studytrack.includes('MH') ? studytrack.split('-') : [studytrack]
+}
+
 router.get('/tags/:studytrack', async (req, res) => {
   const { studytrack } = req.params
   const {
@@ -33,7 +37,7 @@ router.get('/tags/:studytrack', async (req, res) => {
   } = req
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
 
-  const programmeCodes = studytrack.includes('KH') && studytrack.includes('MH') ? studytrack.split('-') : [studytrack]
+  const programmeCodes = getProgrammeCodes(studytrack)
 
   // Respond with null and 200 instead of 403 if the user isn't authorized to view the tags. This is to avoid unnecessary noise in Sentry
   if (userIsUnauthorized(fullStudyProgrammeRights, programmeCodes, roles)) return res.json(null)
@@ -51,7 +55,7 @@ router.post('/tags', async (req, res) => {
   } = req
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
 
-  const programmeCodes = studytrack.includes('KH') && studytrack.includes('MH') ? studytrack.split('-') : [studytrack]
+  const programmeCodes = getProgrammeCodes(studytrack)
   if (userIsUnauthorized(fullStudyProgrammeRights, programmeCodes, roles)) return res.status(403).end()
 
   await createNewTag({ studytrack, tagname, year, personal_user_id })
@@ -86,7 +90,7 @@ router.get('/studenttags/:studytrack', async (req, res) => {
 
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
 
-  const programmeCodes = studytrack.includes('KH') && studytrack.includes('MH') ? studytrack.split('-') : [studytrack]
+  const programmeCodes = getProgrammeCodes(studytrack)
 
   // Respond with null and 200 instead of 403 if the user isn't authorized to view the tags. This is to avoid unnecessary noise in Sentry
   if (
