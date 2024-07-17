@@ -1,12 +1,13 @@
-const { Op } = require('sequelize')
+import { Op } from 'sequelize'
 
-const { Course } = require('../../models')
-const { getSortRank } = require('../../util/sortRank')
+import { Course } from '../../models'
+import { getSortRank } from '../../util/sortRank'
 
-const nameLikeTerm = name => {
+const nameLikeTerm = (name: string) => {
   if (!name) {
     return undefined
   }
+
   const term = `%${name.trim()}%`
   return {
     name: {
@@ -25,37 +26,32 @@ const nameLikeTerm = name => {
   }
 }
 
-const byCodes = codes => {
-  return Course.findAll({
-    where: {
-      code: {
-        [Op.in]: codes,
-      },
+const escapeRegExp = (string: string): string => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+const codeLikeTerm = (code: string) => {
+  if (!code) {
+    return undefined
+  }
+  return {
+    code: {
+      // Starts with code or has AY/A in front of the code (case-insensitive)
+      [Op.iRegexp]: `^(AY|A)?${escapeRegExp(code)}`,
     },
-  })
+  }
 }
 
-const escapeRegExp = string => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-
-const codeLikeTerm = code =>
-  !code
-    ? undefined
-    : {
-        code: {
-          // Starts with code or has AY/A in front of the code (case-insensitive)
-          [Op.iRegexp]: `^(AY|A)?${escapeRegExp(code)}`,
-        },
-      }
-
-const byNameAndOrCodeLike = async (name, code) => {
-  const rawCourses = await Course.findAll({
+const getRawCourses = async (name: string, code: string) => {
+  return await Course.findAll({
     where: {
       ...nameLikeTerm(name),
       ...codeLikeTerm(code),
     },
     order: [['id', 'desc']],
   })
+}
 
+export const byNameAndOrCodeLike = async (name: string, code: string) => {
+  const rawCourses = await getRawCourses(name, code)
   const courses = rawCourses
     .map(course => {
       return { ...course.dataValues }
@@ -66,7 +62,9 @@ const byNameAndOrCodeLike = async (name, code) => {
   const visited = []
 
   const organizeSubgroups = course => {
-    if (visited.includes(course.code)) return
+    if (visited.includes(course.code)) {
+      return
+    }
 
     let temp = []
     if (course.substitutions !== null) {
@@ -75,7 +73,9 @@ const byNameAndOrCodeLike = async (name, code) => {
 
     temp.unshift(course)
     temp.forEach(cu => {
-      if (visited.includes(course.code)) return
+      if (visited.includes(course.code)) {
+        return
+      }
       visited.push(cu.id)
       cu.subsId = substitutionGroupIndex
     })
@@ -87,10 +87,16 @@ const byNameAndOrCodeLike = async (name, code) => {
       organizeSubgroups(course)
     }
   })
+
   return { courses }
 }
 
-module.exports = {
-  byNameAndOrCodeLike,
-  byCodes,
+export const byCodes = (codes: string[]): Promise<Course[]> => {
+  return Course.findAll({
+    where: {
+      code: {
+        [Op.in]: codes,
+      },
+    },
+  })
 }
