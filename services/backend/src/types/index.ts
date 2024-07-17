@@ -6,6 +6,7 @@ import { GenderCode } from './genderCode'
 import { Name } from './name'
 import { Phase } from './phase'
 import { PriorityCode } from './priorityCode'
+import { Role } from './role'
 import { StudyTrack } from './studyTrack'
 
 export {
@@ -17,5 +18,6 @@ export {
   Name,
   Phase,
   PriorityCode,
+  Role,
   StudyTrack,
 }

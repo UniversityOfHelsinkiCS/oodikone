@@ -1,5 +1,7 @@
 import { AutoIncrement, Column, DataType, Default, Model, PrimaryKey, Table, Unique } from 'sequelize-typescript'
 
+import { Role } from '../types'
+
 @Table({
   underscored: true,
   timestamps: false,
@@ -33,7 +35,7 @@ export class User extends Model {
 
   @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
-  roles: string[]
+  roles: Role[]
 
   @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
