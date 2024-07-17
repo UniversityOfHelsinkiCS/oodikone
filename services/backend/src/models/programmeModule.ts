@@ -12,6 +12,7 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
+import { Name } from '../types'
 import { Organization } from './organization'
 import { ProgrammeModuleChild } from './programmeModuleChild'
 
@@ -38,7 +39,7 @@ export class ProgrammeModule extends Model {
   code: string
 
   @Column(DataType.JSONB)
-  name: object
+  name: Name
 
   @Column(DataType.STRING)
   type: string

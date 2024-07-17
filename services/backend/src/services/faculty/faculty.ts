@@ -333,29 +333,28 @@ export const thesisWriters = async (provider: string, since: Date, thesisTypes: 
 // Some programme modules are not directly associated to a faculty (organization).
 // Some have intermediate organizations, such as department, so the connection must be digged up
 export const findFacultyProgrammeCodes = async (facultyCode: string, programmeFilter: string) => {
-  let allProgrammes = []
-  let allProgrammeCodes = []
-
   const directAssociationProgrammes = await degreeProgrammesOfFaculty(facultyCode)
 
-  allProgrammes = allProgrammes.concat(directAssociationProgrammes)
-  allProgrammeCodes = allProgrammeCodes.concat(directAssociationProgrammes.map(programme => programme.code))
+  let allProgrammes = directAssociationProgrammes
+  const allProgrammeCodes = directAssociationProgrammes.map(programme => programme.code)
 
   // find faculty's organization id and its direct child organizations
-  const { id } = await facultyOrganizationId(facultyCode)
-  const facultyChildOrganizations = await getChildOrganizations(id)
+  const facultyOrganization = await facultyOrganizationId(facultyCode)
+  if (!facultyOrganization) {
+    return []
+  }
+  const facultyChildOrganizations = await getChildOrganizations(facultyOrganization.id)
 
   // get programme modules that have a faculty child as organization(_id)
   for (const org of facultyChildOrganizations) {
     const childAssociationProgrammes = await degreeProgrammesOfFaculty(org.code)
     if (childAssociationProgrammes.length > 0) {
-      // eslint-disable-next-line @typescript-eslint/no-loop-func
-      childAssociationProgrammes.forEach(programme => {
-        if (!(programme.code in allProgrammeCodes)) {
-          allProgrammes = allProgrammes.concat([programme])
-          allProgrammeCodes = allProgrammeCodes.concat([programme.code])
+      for (const programme of childAssociationProgrammes) {
+        if (!allProgrammeCodes.includes(programme.code)) {
+          allProgrammes.push(programme)
+          allProgrammeCodes.push(programme.code)
         }
-      })
+      }
     } else {
       // dig deeper
       const grandChildren = await getChildOrganizations(org.id)
@@ -366,8 +365,8 @@ export const findFacultyProgrammeCodes = async (facultyCode: string, programmeFi
             // eslint-disable-next-line @typescript-eslint/no-loop-func
             associatedProgrammes.forEach(programme => {
               if (!(programme.code in allProgrammeCodes)) {
-                allProgrammes = allProgrammes.concat([programme])
-                allProgrammeCodes = allProgrammeCodes.concat([programme.code])
+                allProgrammes.push(programme)
+                allProgrammeCodes.push(programme.code)
               }
             })
           }

@@ -1,3 +1,5 @@
+import { ProgrammeModule } from '../../models'
+
 export const formatFacultyStudyRight = studyright => {
   return {
     studyrightid: studyright.studyrightid,
@@ -34,7 +36,7 @@ export const formatFacultyTransfer = transfer => {
   }
 }
 
-export const formatFacultyProgramme = programme => {
+export const formatFacultyProgramme = (programme: ProgrammeModule) => {
   return {
     code: programme.code,
     name: programme.name,

@@ -75,8 +75,8 @@ const getGraduationTimeStats = async ({ studyprogramme, years, isAcademicYear, i
   if (!studyprogramme) return { times: { medians: [], goal: 0 }, doCombo: false, comboTimes: { medians: [], goal: 0 } }
   // for bc+ms combo
   const doCombo = studyprogramme.startsWith('MH') && !['MH30_001', 'MH30_003'].includes(studyprogramme)
-  const graduationTimes = getYearsObject({ years, emptyArrays: true })
-  const graduationTimesCombo = getYearsObject({ years, emptyArrays: true })
+  const graduationTimes: Record<string, number[]> = getYearsObject({ years, emptyArrays: true })
+  const graduationTimesCombo: Record<string, number[]> = getYearsObject({ years, emptyArrays: true })
   const { semesters } = await getSemestersAndYears()
 
   const graduatedStudyRights = await getStudyRightsInProgramme(studyprogramme, true)

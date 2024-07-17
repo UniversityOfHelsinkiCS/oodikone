@@ -12,14 +12,13 @@ export const getCorrectStudentnumbers = async ({
   includeTransferredTo,
   includeGraduated = true,
 }) => {
-  let studentnumbers = []
   const exchangeStudents = includeAllSpecials
   const nondegreeStudents = includeAllSpecials
   const transferredOutStudents = includeAllSpecials
   const transferredToStudents = includeTransferredTo
   const graduatedStudents = includeGraduated
 
-  studentnumbers = await studentnumbersWithAllStudyrightElements({
+  const studentNumbers = await studentnumbersWithAllStudyrightElements({
     studyRights: codes,
     startDate,
     endDate,
@@ -31,11 +30,15 @@ export const getCorrectStudentnumbers = async ({
     graduatedStudents,
   })
 
-  return studentnumbers
+  return studentNumbers
 }
 
-export const getYearsArray = (since: number, isAcademicYear: boolean, yearsCombined?: boolean) => {
-  const years = []
+export function getYearsArray(since: number, isAcademicYear: true, yearsCombined?: boolean): string[]
+export function getYearsArray(since: number, isAcademicYear: false, yearsCombined: true): Array<'Total' | number>
+export function getYearsArray(since: number, isAcademicYear: false, yearsCombined?: false): number[]
+export function getYearsArray(since: number, isAcademicYear: boolean, yearsCombined?: boolean): Array<string | number>
+export function getYearsArray(since: number, isAcademicYear: boolean, yearsCombined?: boolean) {
+  const years: Array<string | number> = []
   const allYears = 'Total'
   if (yearsCombined) {
     years.push(allYears)
@@ -49,17 +52,19 @@ export const getYearsArray = (since: number, isAcademicYear: boolean, yearsCombi
   return years
 }
 
-export const getYearsObject = ({ years, emptyArrays = false }) => {
-  let yearsObject = {}
-  for (const year of years) {
-    yearsObject = { ...yearsObject, [year]: emptyArrays ? [] : 0 }
-  }
-  return yearsObject
+export function getYearsObject(params: { years: Array<string | number>; emptyArrays: true }): Record<string, []>
+export function getYearsObject(params: { years: Array<string | number>; emptyArrays?: false }): Record<string, 0>
+export function getYearsObject(params: { years: Array<string | number>; emptyArrays?: boolean }) {
+  const { years, emptyArrays = false } = params
+  return years.reduce<Record<string, 0 | []>>((acc, year) => {
+    acc[year] = emptyArrays ? [] : 0
+    return acc
+  }, {})
 }
 
-export const getStatsBasis = years => {
+export const getStatsBasis = (years: Array<string | number>) => {
   return {
-    graphStats: new Array(years.length).fill(0),
+    graphStats: new Array<0>(years.length).fill(0),
     tableStats: getYearsObject({ years }),
   }
 }
@@ -82,7 +87,9 @@ export const getMedian = (values: number[]): number => {
   return (values[half - 1] + values[half]) / 2.0
 }
 
-export const defineYear = (date: Date, isAcademicYear: boolean): number | string => {
+export function defineYear(date: Date, isAcademicYear: true): string
+export function defineYear(date: Date, isAcademicYear: false): number
+export function defineYear(date: Date, isAcademicYear: boolean) {
   if (!date) {
     return ''
   }
