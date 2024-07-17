@@ -1,4 +1,8 @@
-class ApplicationError extends Error {
+export class ApplicationError extends Error {
+  status: number
+
+  extra: Record<string, unknown>
+
   constructor(message = 'Something went wrong. Please try again.', status = 500, extra = {}) {
     super(message)
 
@@ -15,8 +19,4 @@ class ApplicationError extends Error {
       ...this.extra,
     }
   }
-}
-
-module.exports = {
-  ApplicationError,
 }

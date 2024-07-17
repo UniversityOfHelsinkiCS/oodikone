@@ -87,6 +87,7 @@ module.exports = {
   importerUrl,
   importerToken,
   isDev,
+  isStaging,
   serviceProvider,
   configLogoutUrl,
   sisUrl,
