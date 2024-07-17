@@ -1,6 +1,6 @@
 import { indexOf } from 'lodash'
 
-import { serviceProvider } from '../../conf-backend'
+import { serviceProvider } from '../../config'
 import { mapToProviders } from '../../util/map'
 import {
   alltimeEndDate,

@@ -1,6 +1,6 @@
 const router = require('express').Router()
 
-const { serviceProvider } = require('../conf-backend')
+const { serviceProvider } = require('../config')
 const { magicFacultyCode } = require('../config/organizationConstants')
 const { getSortedFaculties } = require('../services/faculty/facultyHelpers')
 const { getFacultyProgressStats, getGraduationStats } = require('../services/faculty/facultyService')

@@ -2,7 +2,7 @@ import EventEmitter from 'events'
 import { Sequelize } from 'sequelize-typescript'
 import Umzug from 'umzug'
 
-import conf from '../conf-backend'
+import conf from '../config'
 import {
   Course,
   CourseProvider,

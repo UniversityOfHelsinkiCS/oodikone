@@ -1,6 +1,6 @@
 const headersMiddleware = require('unfuck-utf8-headers-middleware')
 
-const serviceProvider = require('../conf-backend')
+const serviceProvider = require('../config')
 
 const headers =
   serviceProvider === 'Toska'

@@ -1,7 +1,7 @@
 const Sentry = require('@sentry/node')
 const { intersection } = require('lodash')
 
-const { requiredGroup, serviceProvider, configLogoutUrl, isDev } = require('../conf-backend')
+const { requiredGroup, serviceProvider, configLogoutUrl, isDev } = require('../config')
 const { getUser, getMockedUser, getOrganizationAccess } = require('../services/userService')
 const { ApplicationError } = require('../util/customErrors')
 const logger = require('../util/logger')

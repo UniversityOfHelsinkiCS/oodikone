@@ -1,6 +1,6 @@
 const axios = require('axios')
 
-const { isProduction, pateToken } = require('../conf-backend')
+const { isProduction, pateToken } = require('../config')
 const { ApplicationError } = require('../util/customErrors')
 
 const pateClient = axios.create({

@@ -1,6 +1,6 @@
 const axios = require('axios')
 
-const { sisUrl, sisGrapqlAppAccount, sisGrapqlAppKey } = require('../conf-backend')
+const { sisUrl, sisGrapqlAppAccount, sisGrapqlAppKey } = require('../config')
 const { ApplicationError } = require('../util/customErrors')
 
 const getSisuAccessToken = async eppn => {

@@ -1,7 +1,7 @@
 const Sentry = require('@sentry/node')
 const Tracing = require('@sentry/tracing')
 
-const { sentryRelease, sentryEnvironment, runningInCI, isStaging, sentryDSN } = require('../conf-backend')
+const { sentryRelease, sentryEnvironment, runningInCI, isStaging, sentryDSN } = require('../config')
 
 const initializeSentry = app => {
   if (!sentryRelease || !sentryEnvironment || runningInCI || isStaging || !sentryDSN) return

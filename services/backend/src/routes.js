@@ -3,7 +3,7 @@ const compression = require('compression')
 const cors = require('cors')
 const express = require('express')
 
-const { frontUrl, serviceProvider } = require('./conf-backend')
+const { frontUrl, serviceProvider } = require('./config')
 const accessLogger = require('./middleware/accessLogger')
 const auth = require('./middleware/auth')
 const currentUserMiddleware = require('./middleware/currentUserMiddleware')

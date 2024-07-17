@@ -1,7 +1,7 @@
 const { Worker } = require('bullmq')
 const moment = require('moment')
 
-const { redis } = require('../conf-backend')
+const { redis } = require('../config')
 const logger = require('../util/logger')
 
 const connection = {

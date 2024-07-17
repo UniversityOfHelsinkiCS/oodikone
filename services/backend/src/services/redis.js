@@ -1,7 +1,7 @@
 const bluebird = require('bluebird')
 const redis = require('redis')
 
-const conf = require('../conf-backend')
+const conf = require('../config')
 const logger = require('../util/logger')
 
 bluebird.promisifyAll(redis.RedisClient.prototype)

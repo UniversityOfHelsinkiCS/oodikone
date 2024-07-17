@@ -1,7 +1,7 @@
 require('express-async-errors')
 const express = require('express')
 
-const { baseUrl, backendPort } = require('./conf-backend')
+const { baseUrl, backendPort } = require('./config')
 const { initializeDatabaseConnection, dbConnections } = require('./database/connection')
 const { startCron } = require('./events')
 const routes = require('./routes')

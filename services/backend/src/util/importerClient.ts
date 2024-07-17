@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { importerUrl, importerToken } from '../conf-backend'
+import { importerUrl, importerToken } from '../config'
 import logger from './logger'
 
 const importerClient = axios.create({

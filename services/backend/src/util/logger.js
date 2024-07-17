@@ -2,7 +2,7 @@ const os = require('os')
 const winston = require('winston')
 const { WinstonGelfTransporter } = require('winston-gelf-transporter')
 
-const { isProduction } = require('../conf-backend')
+const { isProduction } = require('../config')
 
 const { colorize, combine, timestamp, printf } = winston.format
 

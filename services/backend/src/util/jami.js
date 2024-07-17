@@ -1,7 +1,7 @@
 const Sentry = require('@sentry/node')
 const axios = require('axios')
 
-const { importerToken, jamiUrl, serviceProvider } = require('../conf-backend')
+const { importerToken, jamiUrl, serviceProvider } = require('../config')
 const logger = require('./logger')
 
 const jamiClient = axios.create({

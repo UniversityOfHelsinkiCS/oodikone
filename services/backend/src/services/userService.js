@@ -1,7 +1,7 @@
 const { isEqual, keyBy, omit, uniq, uniqBy } = require('lodash')
 const { LRUCache } = require('lru-cache')
 
-const { serviceProvider } = require('../conf-backend')
+const { serviceProvider } = require('../config')
 const { sequelizeUser } = require('../database/connection')
 const { User } = require('../models/user')
 const { createLocaleComparator, getFullStudyProgrammeRights, hasFullAccessToStudentData } = require('../util')

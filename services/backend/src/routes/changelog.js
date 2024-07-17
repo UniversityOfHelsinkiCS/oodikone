@@ -1,7 +1,7 @@
 const axios = require('axios')
 const router = require('express').Router()
 
-const { isDev } = require('../conf-backend')
+const { isDev } = require('../config')
 
 const changelog = {}
 
