@@ -82,6 +82,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - release_frontend
+      - release_backend
 
     steps:
       - uses: actions/checkout@v4
@@ -90,11 +91,17 @@ jobs:
         id: extract_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
-      - name: Pull image and create a container
+      - name: Pull frontend image and create a container
         run: docker create --name frontend quay.io/toska/oodikone-frontend:production
 
-      - name: Copy assets from the container
+      - name: Pull backend image and create a container
+        run: docker create --name backend quay.io/toska/oodikone-backend:production
+
+      - name: Copy assets from the frontend container
         run: docker cp frontend:/opt/app-root/src/build ./build
+
+      - name: Copy assets from the backend container
+        run: docker cp backend:/opt/app-root/src/dist ./dist
 
       - name: Create Sentry release
         uses: getsentry/action-release@v1
@@ -106,7 +113,7 @@ jobs:
         with:
           environment: production
           set_commits: 'skip'
-          sourcemaps: './build/assets'
+          sourcemaps: './build/assets ./dist'
           url_prefix: '~/assets'
           version: ${{ steps.extract_version.outputs.VERSION }}
 
