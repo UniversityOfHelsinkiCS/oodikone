@@ -12,9 +12,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "strict": true,
-    // The three options below would be automatically enabled with strict: true
-    // We should also remove strictNullChecks: false as soon as all the current errors are fixed
-    "strictNullChecks": false,
+    // The two options below would be automatically enabled with strict: true
     "strictPropertyInitialization": false,
     "noImplicitAny": false,
     "sourceMap": true,
