@@ -98,13 +98,8 @@ const initGradeScaleIdToGradeIdsToGrades = async () =>
     localMapToRedisKey.gradeScaleIdToGradeIdsToGrades,
     (await selectAllFrom('grade_scales')).reduce((res, curr) => {
       res[curr.id] = curr.grades.reduce((res, curr) => {
-        const {
-          localId,
-          numericCorrespondence,
-          passed,
-          abbreviation: { fi, en, sv },
-        } = curr
-
+        const { localId, numericCorrespondence, passed, abbreviation } = curr
+        const { fi, en, sv } = abbreviation || {}
         const abbr = fi || en || sv || 'Unknown'
         if (!res[localId])
           res[localId] = {
