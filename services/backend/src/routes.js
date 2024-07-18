@@ -42,8 +42,6 @@ module.exports = (app, url) => {
   app.use(`${url}/testroute`, testRoute)
   initializeSentry(app)
 
-  const users = serviceProvider === 'Toska' ? usersToska : usersFd
-
   app.use(Sentry.Handlers.requestHandler())
   app.use(Sentry.Handlers.tracingHandler())
 
@@ -73,7 +71,13 @@ module.exports = (app, url) => {
   app.use(`${url}/university`, university)
   app.use(`${url}/updater`, auth.roles(['admin']), updater)
   app.use(`${url}/teachers`, auth.roles(['teachers']), teachers)
-  app.use(`${url}/users`, users)
+
+  if (serviceProvider === 'Toska') {
+    app.use(`${url}/users`, usersToska)
+  } else {
+    app.use(`${url}/users`, usersToska)
+    app.use(`${url}/users`, usersFd)
+  }
   app.use(`${url}/feedback`, feedback)
   app.use(`${url}/custom-population-search`, customPopulationSearch)
   app.use(`${url}/studyguidancegroups`, auth.roles(['studyGuidanceGroups']), studyGuidanceGroups)

@@ -45,9 +45,8 @@ services:
     ports:
       - 8080:8080
     volumes:
+      - ./environments/ha:/opt/app-root/src/src/environment
       - ./services/backend/src:/opt/app-root/src/src
-      - ./environments/ha:/opt/app-root/config
-
   frontend:
     <<: *defaults
     build:

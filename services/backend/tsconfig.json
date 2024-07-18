@@ -19,7 +19,8 @@
     "noImplicitAny": false,
     "sourceMap": true,
     "sourceRoot": "/",
-    "inlineSources": true
+    "inlineSources": true,
+    "resolveJsonModule": true
   },
   "include": ["src/**/*", "index.js"]
 }
