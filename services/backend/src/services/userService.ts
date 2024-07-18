@@ -23,8 +23,6 @@ const facultyStatisticsGroup = 'grp-oodikone-users'
 // Max 25 users can be stored in the cache, and the data is valid for 1 hour
 const userDataCache = new LRUCache({ max: 25, ttl: 1000 * 60 * 60 })
 
-const findUser = async where => User.findOne({ where })
-
 export const deleteOutdatedUsers = async () => {
   return sequelizeUser.query("DELETE FROM users WHERE last_login < CURRENT_DATE - INTERVAL '18 months'")
 }
@@ -34,7 +32,10 @@ const isRole = (role: string): role is Role => {
 }
 
 export const modifyAccess = async (username: string, rolesOfUser: Record<string, boolean>) => {
-  const user = await findUser({ username })
+  const user = await User.findOne({ where: { username } })
+  if (!user) {
+    throw new Error(`User ${username} not found`)
+  }
   const newRoles = Object.keys(rolesOfUser).filter(role => isRole(role) && rolesOfUser[role]) as Role[]
   user.roles = newRoles
   await user.save()
@@ -42,7 +43,10 @@ export const modifyAccess = async (username: string, rolesOfUser: Record<string,
 }
 
 export const modifyElementDetails = async (id: bigint, codes: string[], enable: boolean) => {
-  const user = await findUser({ id })
+  const user = await User.findOne({ where: { id } })
+  if (!user) {
+    throw new Error(`User with id ${id} not found`)
+  }
   if (enable === true) {
     user.programmeRights = uniq([...user.programmeRights, ...codes])
   } else {
@@ -53,7 +57,7 @@ export const modifyElementDetails = async (id: bigint, codes: string[], enable: 
 }
 
 export const updateUser = async (username: string, fields: Array<Record<string, any>>) => {
-  const user = await findUser({ username })
+  const user = await User.findOne({ where: { username } })
   if (!user) {
     throw new Error(`User ${username} not found`)
   }
@@ -107,7 +111,7 @@ const formatUser = async (user: ExpandedUser, getStudentAccess: boolean = true) 
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(user.detailedProgrammeRights)
   const shouldFetchStudentAccess = getStudentAccess && !hasFullAccessToStudentData(user.roles)
 
-  let studentsUserCanAccess = []
+  let studentsUserCanAccess: string[] = []
   if (shouldFetchStudentAccess) {
     const promises = [
       getStudentnumbersByElementdetails(fullStudyProgrammeRights),
@@ -152,7 +156,10 @@ const updateAccessGroups = async (
   sisId: string
 ) => {
   const { jory, hyOne, superAdmin, openUni, katselmusViewer, fullSisuAccess } = specialGroup
-  const userFromDb = await findUser({ username })
+  const userFromDb = await User.findOne({ where: { username } })
+  if (!userFromDb) {
+    throw new Error(`User ${username} not found`)
+  }
   const currentAccessGroups = userFromDb.roles
 
   const newAccessGroups = [
@@ -191,7 +198,7 @@ export const findAll = async () => {
 }
 
 export const findOne = async (id: bigint) => {
-  const user = (await findUser({ id })).toJSON()
+  const user = (await User.findOne({ where: { id } }))?.toJSON()
   if (!user) {
     throw new Error(`User with id ${id} not found`)
   }
@@ -223,7 +230,7 @@ const basicGetMockedUser = async ({ userToMock, mockedBy }: { userToMock: string
     return cachedUser
   }
 
-  const userFromDb = (await findUser({ username: userToMock })).toJSON()
+  const userFromDb = (await User.findOne({ where: { username: userToMock } }))?.toJSON()
   const iamGroups = await getUserIams(userFromDb.sisuPersonId)
   const { access, specialGroup } = await getOrganizationAccess(userFromDb.sisuPersonId, iamGroups)
   const detailedProgrammeRights = getStudyProgrammeRights(access, specialGroup, userFromDb.programmeRights)
@@ -233,7 +240,7 @@ const basicGetMockedUser = async ({ userToMock, mockedBy }: { userToMock: string
 }
 
 const fdGetMockedUser = async ({ userToMock, mockedBy }: { userToMock: string; mockedBy: string }) => {
-  const mockedByFromDb = (await findUser({ username: mockedBy })).toJSON()
+  const mockedByFromDb = (await User.findOne({ where: { username: mockedBy } }))?.toJSON()
   if (!mockedByFromDb) {
     return null
   }
@@ -264,7 +271,7 @@ const toskaGetUser = async ({
   const isNewUser = !(await User.findOne({ where: { username } }))
   await User.upsert({ fullName: name, username, email, sisuPersonId: sisId, lastLogin: new Date() })
   await updateAccessGroups(username, iamGroups, specialGroup, sisId)
-  const userFromDb = (await findUser({ username })).toJSON()
+  const userFromDb = (await User.findOne({ where: { username } }))?.toJSON()
 
   const detailedProgrammeRights = getStudyProgrammeRights(access, specialGroup, userFromDb.programmeRights)
   const user = await formatUser({ ...userFromDb, iamGroups, detailedProgrammeRights })
@@ -280,7 +287,7 @@ const fdGetUser = async ({ username }: { username: string }) => {
     return userDataCache.get(username)
   }
 
-  const userFromDbOrm = await findUser({ username })
+  const userFromDbOrm = await User.findOne({ where: { username } })
   if (!userFromDbOrm) {
     return
   }
