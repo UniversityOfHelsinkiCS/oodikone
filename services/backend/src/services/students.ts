@@ -111,7 +111,7 @@ const byStudentNumber = async (studentNumber: string) => {
   student.semester_enrollments = mappedEnrollments as Array<SemesterEnrollmentWithNameAndYear>
 
   return {
-    ...student,
+    ...(student.dataValues as Student),
     tags: tags.map(tag => ({
       ...tag.get(),
       programme: tagprogrammes.find(programme => programme.code === tag.tag.studytrack),
