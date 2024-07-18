@@ -63,13 +63,13 @@ export const updateUser = async (username: string, fields: Array<Record<string, 
 
 type IamAccess = Record<string, Record<'read' | 'write' | 'admin', boolean>>
 
-type ProgrammeRights = {
+type DetailedProgrammeRights = {
   code: string
   limited: boolean
   isIamBased: boolean
 }
 
-const getIamBasedRights = (iamAccess: IamAccess): ProgrammeRights[] => {
+const getIamBasedRights = (iamAccess: IamAccess): DetailedProgrammeRights[] => {
   if (!iamAccess) {
     return []
   }
@@ -81,7 +81,7 @@ const getIamBasedRights = (iamAccess: IamAccess): ProgrammeRights[] => {
   }))
 }
 
-const getUserProgrammesRights = (userProgrammes: string[]): ProgrammeRights[] => {
+const getUserProgrammesRights = (userProgrammes: string[]): DetailedProgrammeRights[] => {
   return userProgrammes.map(code => ({
     code,
     limited: false,
@@ -93,7 +93,7 @@ const getStudyProgrammeRights = (
   iamAccess: IamAccess,
   specialGroup: Record<string, boolean>,
   userProgrammes: string[]
-): ProgrammeRights[] => {
+): DetailedProgrammeRights[] => {
   const hasFullSisuAccess = specialGroup?.fullSisuAccess
 
   const iamBasedRights = hasFullSisuAccess ? [] : getIamBasedRights(iamAccess)
@@ -103,7 +103,11 @@ const getStudyProgrammeRights = (
   return studyProgrammeRights
 }
 
-type ExpandedUser = User & { iamGroups: string[]; mockedBy?: string; programmeRights: ProgrammeRights[] }
+type ExpandedUser = User & {
+  iamGroups: string[]
+  mockedBy?: string
+  detailedProgrammeRights: DetailedProgrammeRights[]
+}
 
 const formatUser = async (user: ExpandedUser, getStudentAccess: boolean = true) => {
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(user.programmeRights)
@@ -133,7 +137,7 @@ const formatUser = async (user: ExpandedUser, getStudentAccess: boolean = true) 
     roles: user.roles,
     studentsUserCanAccess,
     isAdmin: user.roles.includes('admin'),
-    programmeRights: user.programmeRights,
+    programmeRights: user.detailedProgrammeRights,
     iamGroups: user.iamGroups || [],
     mockedBy: user.mockedBy,
     lastLogin: user.lastLogin,
@@ -177,15 +181,15 @@ const updateAccessGroups = async (
 }
 
 export const findAll = async () => {
-  const users = (await User.findAll()).map(user => user.toJSON()) as User[]
+  const users = (await User.findAll()).map(user => user.toJSON())
   const userAccess = await getAllUserAccess(users.map(user => user.sisuPersonId))
   const userAccessMap = keyBy(userAccess, 'id')
 
   const formattedUsers = await Promise.all(
     users.map(async user => {
       const { iamGroups, specialGroup, access } = userAccessMap[user.sisuPersonId] || {}
-      const programmeRights = getStudyProgrammeRights(access, specialGroup, user.programmeRights)
-      const formattedUser = await formatUserForFrontend({ ...user, programmeRights, iamGroups })
+      const detailedProgrammeRights = getStudyProgrammeRights(access, specialGroup, user.programmeRights)
+      const formattedUser = await formatUserForFrontend({ ...user, detailedProgrammeRights, iamGroups })
       return formattedUser
     })
   )
@@ -225,11 +229,11 @@ const basicGetMockedUser = async ({ userToMock, mockedBy }: { userToMock: string
     return cachedUser
   }
 
-  const userFromDb = (await findUser({ username: userToMock })).toJSON() as User
+  const userFromDb = (await findUser({ username: userToMock })).toJSON()
   const iamGroups = await getUserIams(userFromDb.sisuPersonId)
   const { access, specialGroup } = await getOrganizationAccess(userFromDb.sisuPersonId, iamGroups)
-  const programmeRights = getStudyProgrammeRights(access, specialGroup, userFromDb.programmeRights)
-  const mockedUser = await formatUser({ ...userFromDb, iamGroups, programmeRights, mockedBy })
+  const detailedProgrammeRights = getStudyProgrammeRights(access, specialGroup, userFromDb.programmeRights)
+  const mockedUser = await formatUser({ ...userFromDb, iamGroups, detailedProgrammeRights, mockedBy })
   userDataCache.set(cacheKey, mockedUser)
   return mockedUser
 }
@@ -268,8 +272,8 @@ const toskaGetUser = async ({
   await updateAccessGroups(username, iamGroups, specialGroup, sisId)
   const userFromDb = (await findUser({ username })).toJSON()
 
-  const programmeRights = getStudyProgrammeRights(access, specialGroup, userFromDb.programmeRights)
-  const user = await formatUser({ ...userFromDb, iamGroups, programmeRights })
+  const detailedProgrammeRights = getStudyProgrammeRights(access, specialGroup, userFromDb.programmeRights)
+  const user = await formatUser({ ...userFromDb, iamGroups, detailedProgrammeRights })
   if (isNewUser) {
     await sendNotificationAboutNewUser({ userId: username, userFullName: name })
   }
