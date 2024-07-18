@@ -114,6 +114,8 @@ The `documentation` directory contains some notes on the sis-db schema and is me
 
 For internal meeting notes and sensitive information, see Toska GitLab.
 
+[SortableTable documentation](./services/frontend/src/components/SortableTable/README.md)
+
 ### Basics
 
 The development environment is entirely configured in the `docker-compose.yml` file located in this repository. The file defines the services for Oodikone's two main components: **oodikone** and **updater**.
