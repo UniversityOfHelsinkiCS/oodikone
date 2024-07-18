@@ -1,7 +1,7 @@
 import { Role } from '../types'
 
 type Comparator = (val1: string, val2: string) => number
-type FieldComparator = (val1: Record<string, string>, val2: Record<string, string>) => number
+type FieldComparator = (val1: Record<string, any>, val2: Record<string, any>) => number
 
 /**
  * Returns a sorting function that can be used to sort strings so that Finnish alphabetical order is respected.
@@ -14,7 +14,22 @@ export function createLocaleComparator(field?: string): Comparator | FieldCompar
   if (!field) {
     return comparator
   }
-  return (val1: Record<string, string>, val2: Record<string, string>) => comparator(val1[field], val2[field])
+
+  return (val1: Record<string, any>, val2: Record<string, any>) => {
+    const fieldVal1 = val1[field]
+    const fieldVal2 = val2[field]
+
+    if (typeof fieldVal1 === 'string' && typeof fieldVal2 === 'string') {
+      return comparator(fieldVal1, fieldVal2)
+    }
+    if (fieldVal1 === fieldVal2) {
+      return 0
+    }
+    if (fieldVal1 > fieldVal2) {
+      return 1
+    }
+    return -1
+  }
 }
 
 export const getFullStudyProgrammeRights = programmeRights => {
