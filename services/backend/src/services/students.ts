@@ -13,14 +13,21 @@ import {
   SISStudyRightElement,
 } from '../models'
 import { Tag, TagStudent } from '../models/kone'
+import { Name } from '../types'
 import { splitByEmptySpace } from '../util'
 import logger from '../util/logger'
 
 const { sequelize } = dbConnections
 
-const byStudentNumber = async studentNumber => {
-  const [student, tags] = (await Promise.all([
-    (Student as any).findByPk(studentNumber, {
+type SemesterEnrollmentWithNameAndYear = SemesterEnrollment & {
+  name?: Name
+  yearname?: string
+  startYear?: number
+}
+
+const byStudentNumber = async (studentNumber: string) => {
+  const [student, tags] = await Promise.all([
+    Student.findByPk(studentNumber, {
       attributes: [
         'firstnames',
         'lastname',
@@ -39,20 +46,24 @@ const byStudentNumber = async studentNumber => {
           model: Credit,
           attributes: ['grade', 'credits', 'credittypecode', 'is_open', 'attainment_date', 'isStudyModule'],
           separate: true,
-          include: {
-            model: Course,
-            attributes: ['code', 'name'],
-            required: true,
-          },
+          include: [
+            {
+              model: Course,
+              attributes: ['code', 'name'],
+              required: true,
+            },
+          ],
         },
         {
           model: SISStudyRight,
           as: 'studyRights',
-          include: {
-            required: true,
-            model: SISStudyRightElement,
-            as: 'studyRightElements',
-          },
+          include: [
+            {
+              required: true,
+              model: SISStudyRightElement,
+              as: 'studyRightElements',
+            },
+          ],
         },
         {
           model: SemesterEnrollment,
@@ -79,7 +90,7 @@ const byStudentNumber = async studentNumber => {
         studentnumber: studentNumber,
       },
     }),
-  ])) as [Student & { tags: any }, any]
+  ])
   const tagprogrammes = await ElementDetail.findAll({
     where: {
       code: {
@@ -91,22 +102,26 @@ const byStudentNumber = async studentNumber => {
   const mappedEnrollments = student.semester_enrollments.map(enrollment => {
     const semester = semesters.find(semester => semester.semestercode === enrollment.semestercode)!
     return {
-      ...enrollment.dataValues,
+      ...(enrollment.dataValues as SemesterEnrollment),
       name: semester.name,
       yearname: semester.yearname,
       startYear: semester.startYear,
     }
   })
-  student.semester_enrollments = mappedEnrollments
+  student.semester_enrollments = mappedEnrollments as Array<SemesterEnrollmentWithNameAndYear>
 
-  student.tags = tags.map(tag => ({
-    ...tag.get(),
-    programme: tagprogrammes.find(programme => programme.code === tag.tag.studytrack),
-  }))
-  return student
+  return {
+    ...student,
+    tags: tags.map(tag => ({
+      ...tag.get(),
+      programme: tagprogrammes.find(programme => programme.code === tag.tag.studytrack),
+    })),
+  }
 }
 
-const getUnifyStatus = (unifyCourses: string): [boolean, boolean?] => {
+export type UnifyStatus = 'unifyStats' | 'openStats' | 'regularStats' | undefined
+
+const getUnifyStatus = (unifyCourses: UnifyStatus): [boolean] | [boolean, false] => {
   switch (unifyCourses) {
     case 'unifyStats':
       return [true, false]
@@ -119,7 +134,14 @@ const getUnifyStatus = (unifyCourses: string): [boolean, boolean?] => {
   }
 }
 
-export const findByCourseAndSemesters = async (coursecodes, from, to, separate, unifyCourses = 'unifyStats') => {
+/* from & to are semestercodes if separate = false, or yearcodes in case separate is true. */
+export const findByCourseAndSemesters = async (
+  coursecodes: string[],
+  from: number,
+  to: number,
+  separate: boolean,
+  unifyCourses: UnifyStatus = 'unifyStats'
+) => {
   const startSemester = await Semester.findOne({
     where: {
       [separate ? 'semestercode' : 'yearcode']: from,
@@ -193,7 +215,7 @@ export const findByCourseAndSemesters = async (coursecodes, from, to, separate, 
   return studentNumbers
 }
 
-export const findByTag = async tag => {
+export const findByTag = async (tag: string) => {
   return (
     await TagStudent.findAll({
       attributes: ['studentnumber'],
@@ -221,8 +243,8 @@ const formatSharedStudentData = ({
   updatedAt,
   createdAt,
   sis_person_id,
-}) => {
-  const toCourse = ({ grade, credits, credittypecode, is_open, attainment_date, course, isStudyModule }) => {
+}: Partial<Omit<Student, 'semester_enrollments'>> & { semester_enrollments: SemesterEnrollmentWithNameAndYear[] }) => {
+  const toCourse = ({ grade, credits, credittypecode, is_open, attainment_date, course, isStudyModule }: Credit) => {
     course = course.toJSON()
 
     return {
@@ -279,7 +301,11 @@ const formatSharedStudentData = ({
   }
 }
 
-const formatStudent = studentData => {
+const formatStudent = (
+  studentData: Partial<Omit<Student, 'semester_enrollments'>> & {
+    semester_enrollments: SemesterEnrollmentWithNameAndYear[]
+  } & { tags: TagStudent[] }
+) => {
   const formattedData = formatSharedStudentData(studentData)
   return {
     ...formattedData,
@@ -287,11 +313,15 @@ const formatStudent = studentData => {
   }
 }
 
-const formatStudentWithoutTags = studentData => {
+const formatStudentWithoutTags = (
+  studentData: Partial<Omit<Student, 'semester_enrollments'>> & {
+    semester_enrollments: SemesterEnrollmentWithNameAndYear[]
+  }
+) => {
   return formatSharedStudentData(studentData)
 }
 
-export const withStudentNumber = async studentNumber => {
+export const withStudentNumber = async (studentNumber: string) => {
   try {
     const student = await byStudentNumber(studentNumber)
     return formatStudent(student)
@@ -303,15 +333,15 @@ export const withStudentNumber = async studentNumber => {
   }
 }
 
-const likefy = term => `%${term}%`
+const likefy = (term: string) => `%${term}%`
 
-const columnLike = (column, term) => ({
+const columnLike = (column: string, term: string) => ({
   [column]: {
     [Op.iLike]: likefy(term),
   },
 })
 
-const nameLike = terms => {
+const nameLike = (terms: string[]) => {
   const [first, second] = terms
   if (!second) {
     return columnLike('abbreviatedname', first)
@@ -369,7 +399,7 @@ export const bySearchTermAndStudentNumbers = async (searchterm: string, studentN
   ).map(formatStudentWithoutTags)
 }
 
-export const filterStudentnumbersByAccessrights = async (studentnumbers, codes) =>
+export const filterStudentnumbersByAccessrights = async (studentnumbers: string[], codes: string[]) =>
   (
     await Student.findAll({
       attributes: ['studentnumber'],
@@ -399,7 +429,7 @@ export const filterStudentnumbersByAccessrights = async (studentnumbers, codes) 
     })
   ).map(({ studentnumber }) => studentnumber)
 
-export const getStudentnumbersByElementdetails = async codes =>
+export const getStudentnumbersByElementdetails = async (codes: string) =>
   (
     await Student.findAll({
       attributes: ['studentnumber'],
