@@ -17,6 +17,7 @@ import { Organization } from './organization'
 import { SISStudyRightElement } from './SISStudyRightElement'
 import { Student } from './student'
 import { Studyplan } from './studyplan'
+import { StudyrightExtent } from './studyrightExtent'
 
 export type SemesterEnrollment = {
   type: EnrollmentType
@@ -65,6 +66,7 @@ export class SISStudyRight extends Model {
   @BelongsTo(() => Student)
   student: Student
 
+  @ForeignKey(() => StudyrightExtent)
   @Column(DataType.INTEGER)
   extentCode: ExtentCode
 
