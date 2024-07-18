@@ -197,8 +197,8 @@ export const findOne = async (id: bigint) => {
   }
   const iamGroups = await getUserIams(user.sisuPersonId)
   const { iamAccess, specialGroup } = await getUserIamAccess(user.sisuPersonId, iamGroups)
-  const programmeRights = getStudyProgrammeRights(iamAccess, specialGroup, user.programmeRights)
-  const formattedUser = await formatUserForFrontend({ ...user, programmeRights, iamGroups })
+  const detailedProgrammeRights = getStudyProgrammeRights(iamAccess, specialGroup, user.programmeRights)
+  const formattedUser = await formatUserForFrontend({ ...user, detailedProgrammeRights, iamGroups })
   return formattedUser
 }
 
