@@ -35,7 +35,13 @@ const devFormat = printf(
     `${timestamp} ${level}: ${message}${error ? ` ${error?.stack}` : ''}${rest ? ` ${JSON.stringify(rest)}` : ''}`
 )
 
-const prodFormat = printf(({ timestamp, level, ...rest }) => JSON.stringify({ timestamp, level, ...rest }))
+const prodFormat = printf(({ timestamp, level, message, error, ...rest }) => {
+  const log = { timestamp, level, message, ...rest }
+  if (error) {
+    log.error = error?.stack
+  }
+  return JSON.stringify(log)
+})
 
 transports.push(
   new winston.transports.Console({
