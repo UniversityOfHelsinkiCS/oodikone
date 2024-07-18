@@ -1,7 +1,7 @@
-import { Role } from '../types'
+import { DetailedProgrammeRights, Role } from '../types'
 
 type Comparator = (val1: string, val2: string) => number
-type FieldComparator = (val1: Record<string, string>, val2: Record<string, string>) => number
+type FieldComparator = (val1: Record<string, any>, val2: Record<string, any>) => number
 
 /**
  * Returns a sorting function that can be used to sort strings so that Finnish alphabetical order is respected.
@@ -10,26 +10,30 @@ type FieldComparator = (val1: Record<string, string>, val2: Record<string, strin
 export function createLocaleComparator(field: string): FieldComparator
 export function createLocaleComparator(): Comparator
 export function createLocaleComparator(field?: string): Comparator | FieldComparator {
-  type ValidArrayItem = string | Record<string, string>
-  return (val1: ValidArrayItem, val2: ValidArrayItem) => {
-    if (typeof val1 === 'string' && typeof val2 === 'string') {
-      return val1.localeCompare(val2, 'fi', { sensitivity: 'accent' })
+  const comparator: Comparator = (val1, val2) => val1.localeCompare(val2, 'fi', { sensitivity: 'accent' })
+  if (!field) {
+    return comparator
+  }
+
+  return (val1: Record<string, any>, val2: Record<string, any>) => {
+    const fieldVal1 = val1[field]
+    const fieldVal2 = val2[field]
+
+    if (typeof fieldVal1 === 'string' && typeof fieldVal2 === 'string') {
+      return comparator(fieldVal1, fieldVal2)
     }
-    if (
-      typeof val1 === 'object' &&
-      typeof val2 === 'object' &&
-      field &&
-      typeof val1[field] === 'string' &&
-      typeof val2[field] === 'string'
-    ) {
-      return val1[field].localeCompare(val2[field], 'fi', { sensitivity: 'accent' })
+    if (fieldVal1 === fieldVal2) {
+      return 0
     }
-    throw new Error('Invalid arguments')
+    if (fieldVal1 > fieldVal2) {
+      return 1
+    }
+    return -1
   }
 }
 
-export const getFullStudyProgrammeRights = programmeRights => {
-  return programmeRights.filter(({ limited }) => !limited).map(({ code }) => code)
+export const getFullStudyProgrammeRights = (detailedProgrammeRights: DetailedProgrammeRights[]) => {
+  return detailedProgrammeRights.filter(({ limited }) => !limited).map(({ code }) => code)
 }
 
 export const hasFullAccessToStudentData = (roles?: Role[]) => {

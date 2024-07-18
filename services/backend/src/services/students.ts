@@ -431,7 +431,7 @@ export const filterStudentnumbersByAccessrights = async (studentnumbers: string[
     })
   ).map(({ studentnumber }) => studentnumber)
 
-export const getStudentnumbersByElementdetails = async (codes: string) =>
+export const getStudentnumbersByElementdetails = async (codes: string[]) =>
   (
     await Student.findAll({
       attributes: ['studentnumber'],
