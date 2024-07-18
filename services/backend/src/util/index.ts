@@ -10,11 +10,22 @@ type FieldComparator = (val1: Record<string, string>, val2: Record<string, strin
 export function createLocaleComparator(field: string): FieldComparator
 export function createLocaleComparator(): Comparator
 export function createLocaleComparator(field?: string): Comparator | FieldComparator {
-  const comparator: Comparator = (val1, val2) => val1.localeCompare(val2, 'fi', { sensitivity: 'accent' })
-  if (!field) {
-    return comparator
+  type ValidArrayItem = string | Record<string, string>
+  return (val1: ValidArrayItem, val2: ValidArrayItem) => {
+    if (typeof val1 === 'string' && typeof val2 === 'string') {
+      return val1.localeCompare(val2, 'fi', { sensitivity: 'accent' })
+    }
+    if (
+      typeof val1 === 'object' &&
+      typeof val2 === 'object' &&
+      field &&
+      typeof val1[field] === 'string' &&
+      typeof val2[field] === 'string'
+    ) {
+      return val1[field].localeCompare(val2[field], 'fi', { sensitivity: 'accent' })
+    }
+    throw new Error('Invalid arguments')
   }
-  return (val1: Record<string, string>, val2: Record<string, string>) => comparator(val1[field], val2[field])
 }
 
 export const getFullStudyProgrammeRights = programmeRights => {
