@@ -3,6 +3,7 @@ import { ElementDetailType } from './elementDetailType'
 import { EnrollmentType } from './enrollmentType'
 import { ExtentCode } from './extentCode'
 import { GenderCode } from './genderCode'
+import { Language } from './language'
 import { Name } from './name'
 import { Phase } from './phase'
 import { PriorityCode } from './priorityCode'
@@ -15,6 +16,7 @@ export {
   EnrollmentType,
   ExtentCode,
   GenderCode,
+  Language,
   Name,
   Phase,
   PriorityCode,

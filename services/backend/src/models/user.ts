@@ -1,6 +1,6 @@
 import { AutoIncrement, Column, DataType, Default, Model, PrimaryKey, Table, Unique } from 'sequelize-typescript'
 
-import { Role } from '../types'
+import { Language, Role } from '../types'
 
 @Table({
   underscored: true,
@@ -24,8 +24,9 @@ export class User extends Model {
   @Column(DataType.STRING)
   email: string
 
+  @Default('fi')
   @Column(DataType.STRING)
-  language: string
+  language: Language
 
   @Column(DataType.STRING)
   sisuPersonId: string
