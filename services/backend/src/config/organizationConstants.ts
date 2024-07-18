@@ -1,23 +1,4 @@
-export const facultyCodes = [
-  'H10',
-  'H20',
-  'H30',
-  'H40',
-  'H50',
-  'H55',
-  'H57',
-  'H60',
-  'H70',
-  'H74',
-  'H80',
-  'H90',
-  'H92',
-  'H930',
-  'H99',
-  'Y',
-  'Y01',
-]
+// Linter was not having any of this so neeeded to add resolveJsonModule:true to tsconfig
+// export const { facultyCodes, ignoredFacultyCodes, magicFacultyCode } = require('../environment/organizationConfig.json')
 
-export const magicFacultyCode = 'H50'
-
-export const ignoredFacultyCodes = ['Y', 'H99', 'Y01', 'H92', 'H930']
+export { facultyCodes, ignoredFacultyCodes, magicFacultyCode } from '../environment/organizationConfig.json'
