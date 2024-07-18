@@ -46,3 +46,11 @@ export const sortByProgrammeCode = (a: string, b: string) => {
   }
   return a.localeCompare(b)
 }
+
+/**
+ * Returns the keys of the given object as an array of strings, typed as the keys of the object.
+ * @param obj The object whose keys are to be returned.
+ */
+export const keysOf = <T extends object>(obj: T) => {
+  return Object.keys(obj) as Array<keyof T>
+}

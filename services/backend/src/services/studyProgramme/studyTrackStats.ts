@@ -2,6 +2,7 @@ import moment from 'moment'
 
 import { Credit, SISStudyRight, SISStudyRightElement } from '../../models'
 import { GenderCode, EnrollmentType, ExtentCode } from '../../types'
+import { keysOf } from '../../util'
 import { countTimeCategories } from '../graduationHelpers'
 import { getSemestersAndYears } from '../semesters'
 import { getDateOfFirstSemesterPresent } from './studyProgrammeBasics'
@@ -375,7 +376,7 @@ const getMainStatsByTrackAndYear = async (
         yearlyStats.Total[track] = getEmptyYear()
       }
 
-      for (const field of Object.keys(yearlyStats[year][track]) as Array<keyof (typeof yearlyStats)[string][string]>) {
+      for (const field of keysOf(yearlyStats[year][track])) {
         if (field !== 'otherCountriesCounts') {
           yearlyStats.Total[track][field] += yearlyStats[year][track][field]
           continue
