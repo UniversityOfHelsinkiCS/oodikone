@@ -20,75 +20,12 @@ import { SortingFilteringVisitor } from './visitors/SortingFilteringVisitor'
 import { ValueVisitor } from './visitors/ValueVisitor'
 import './style.css'
 
+// NOTE
 /*
-*** SortableTable documentation ***
-Please update this when making changes inside SortableTable,
+Documentation in README.md of this folder.
+Please update it when making changes inside SortableTable,
 if they affect how the table and its columns are used.
 Future uusihenkilö's will thank you.
-
---- SortableTable usage ---
-
-tableId: id-property of the <table> tag
-title: Table title
-featureName: Describes the feature in the Excel filename: "oodikone_{featureName}_{timeStamp}.xlsx". Defaults to "export"
-*data: Array of data items
-*columns: Array of columns, see fields of columns below
-onlyExportColumns: Array of columns, never shown but always added to export as the first columns
-singleLine: default true, set to false to allow line wrapping (may make lines different size)
-stretch: sets table's css width to 100%
-actions: JSX to add in the top right corner of the table, for example buttons
-hideHeaderBar: Hides the header bar that has a table icon, title, fullscreen button and menu/buttons
-style: css style object of the whole table
-striped: The style where every other row is grey. Boolean, default is true.
-firstColumnSticky: Boolean, default is false. If true, the first column is sticky
-defaultSort: [columnkey, order] of default sort column and order. For example ['name', 'desc']
-toggleGroupExpansion: Function which is called when group of rows is collapsed or expanded
-expandedGroups: Array (or set?) of keys of rows are supposed to be expanded. These two are used
-    only in population of courses
-maxHeight: Overwrite the maximum height. Defaults to 80vh if not set.
-useFilteredDataOnExport: If true, uses filtered data (the data that's shown after applying all the selected filters) on exports. Defaults to true.
-handleDisplayedDataChange: A function that is called with the displayed data when it changes. Can be used to update the state in the parent component.
-pageNumber: The current page number, used for pagination (should be used through the component PaginatedSortableTable).
-rowsPerPage: The number of rows per page, used for pagination (should be used through the component PaginatedSortableTable).
-
---- Column usage: (* = required field) ---
-
-- Fields that concern whole column or header
-
-*key: Column key, unique
-*title: Column header title (<th>). Can be either string or JSX. For string title, newlines are replaced by space for export.
-textTitle: Required for excel, if title is JSX. Set to null to exclude a parent header from export
-headerProps: These are given to header as: <th {...headerProps}>
-sortable: set to false if you want to disable column sorting. If multiple columns merged, set it to all
-filterable: same as sortable but for filter
-forceToolsMode: Forces the filter and sort tools in header to either 'dangling', 'floating' or 'fixed'
-helpText: If defined, shows question mark in header, which displays the helpText on hover
-thickBorders: if true, adds thicker border to right side of column
-export: set to false to omit this AND children from excel export. Notice: To only hide parent header, use textTitle: null
-children: column objects. If this is defined, the column object is only a header, and you should only
-          use cell value getters (getRowVal etc) in columns where children is undefined
-displayColumn: set to false to hide whole column. Does not affect exporting
-vertical: If true, header is vertical
-noHeader: Just removes header, I think (not sure of the point of this, since you can just omit title)
-
-- Fields that set cell content or properties. Can receive either a value, or a function that takes data
-  item as an argument, and returns value for specific row (for example student => student.studentNumber)
-
-cellProps: given to each cell like <td {...cellProps}>. Use for style, hover title, etc.
-cellStyle: Basically shorthand for cellProps: { style: ... }
-filterType: options are 'date', 'range' and 'multi' (or default if left empty). Check the filters folder
-  for examples and documentation (at least multiSelectFilter.jsx has a good description how it works)
-getRowVal: Get single cell value. This will be used for sorting and filtering, and displayed unless overridden.
-getRowContent: Single cell JSX: Overrides getRowVal for value to display, but does not affect excel
-getRowExportVal: Overrides getRowVal for excel
-formatValue: Same as getRowContent, but avoids recalculating value already calculated in getRowVal.
-
---- Miscellaneous information ---
-
-* Single rows can ignore filters or sorting by row options. To do this, import row-function
-  from SortableTable-folder, and create data row with it (instead of just value as normally).
-  For example, data can be set like this to have a totals-row on the top:
-    [row(totals, { ignoreFilters: true, ignoreSorting: true }), ...students]
 */
 
 export const SortableTable = ({
