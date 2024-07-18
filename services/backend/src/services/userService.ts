@@ -5,7 +5,7 @@ import { serviceProvider } from '../config'
 import { roles } from '../config/roles'
 import { sequelizeUser } from '../database/connection'
 import { User } from '../models/user'
-import { Role } from '../types'
+import { DetailedProgrammeRights, Role } from '../types'
 import { createLocaleComparator, getFullStudyProgrammeRights, hasFullAccessToStudentData } from '../util'
 import jami from '../util/jami'
 import mami from '../util/mami'
@@ -63,12 +63,6 @@ export const updateUser = async (username: string, fields: Array<Record<string, 
 
 type IamAccess = Record<string, Record<'read' | 'write' | 'admin', boolean>>
 
-type DetailedProgrammeRights = {
-  code: string
-  limited: boolean
-  isIamBased: boolean
-}
-
 const getIamBasedRights = (iamAccess: IamAccess): DetailedProgrammeRights[] => {
   if (!iamAccess) {
     return []
@@ -110,7 +104,7 @@ type ExpandedUser = User & {
 }
 
 const formatUser = async (user: ExpandedUser, getStudentAccess: boolean = true) => {
-  const fullStudyProgrammeRights = getFullStudyProgrammeRights(user.programmeRights)
+  const fullStudyProgrammeRights = getFullStudyProgrammeRights(user.detailedProgrammeRights)
   const shouldFetchStudentAccess = getStudentAccess && !hasFullAccessToStudentData(user.roles)
 
   let studentsUserCanAccess = []

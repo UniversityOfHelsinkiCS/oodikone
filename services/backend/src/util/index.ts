@@ -1,4 +1,4 @@
-import { Role } from '../types'
+import { DetailedProgrammeRights, Role } from '../types'
 
 type Comparator = (val1: string, val2: string) => number
 type FieldComparator = (val1: Record<string, any>, val2: Record<string, any>) => number
@@ -32,8 +32,8 @@ export function createLocaleComparator(field?: string): Comparator | FieldCompar
   }
 }
 
-export const getFullStudyProgrammeRights = programmeRights => {
-  return programmeRights.filter(({ limited }) => !limited).map(({ code }) => code)
+export const getFullStudyProgrammeRights = (detailedProgrammeRights: DetailedProgrammeRights[]) => {
+  return detailedProgrammeRights.filter(({ limited }) => !limited).map(({ code }) => code)
 }
 
 export const hasFullAccessToStudentData = (roles?: Role[]) => {

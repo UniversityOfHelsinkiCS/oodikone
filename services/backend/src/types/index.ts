@@ -1,4 +1,5 @@
 import { CreditTypeCode } from './creditTypeCode'
+import { DetailedProgrammeRights } from './detailedProgrammeRights'
 import { ElementDetailType } from './elementDetailType'
 import { EnrollmentType } from './enrollmentType'
 import { ExtentCode } from './extentCode'
@@ -12,6 +13,7 @@ import { StudyTrack } from './studyTrack'
 
 export {
   CreditTypeCode,
+  DetailedProgrammeRights,
   ElementDetailType,
   EnrollmentType,
   ExtentCode,
