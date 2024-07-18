@@ -34,7 +34,6 @@ export class Studyright extends Model {
   @HasMany(() => StudyrightElement, { foreignKey: 'studyrightid', sourceKey: 'studyrightid' })
   studyright_elements: StudyrightElement[]
 
-  @ForeignKey(() => StudyrightElement)
   @Column(DataType.STRING)
   actual_studyrightid: string
 
