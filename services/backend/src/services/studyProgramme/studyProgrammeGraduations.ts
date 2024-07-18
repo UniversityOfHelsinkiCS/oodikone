@@ -35,7 +35,7 @@ const calculateAbsenceInMonths = (absence, startDate, endDate) => {
   return Math.round(absenceEnd.diff(absenceStart, 'months', true))
 }
 
-const calculateDurationOfStudies = (startDate, graduationDate, semesterEnrollments, semesters) => {
+export const calculateDurationOfStudies = (startDate, graduationDate, semesterEnrollments, semesters) => {
   const semestersWithStatutoryAbsence = semesterEnrollments
     .filter(enrollment => enrollment.statutoryAbsence)
     .map(enrollment => enrollment.semester)

@@ -1,6 +1,5 @@
-import { Includeable, Op } from 'sequelize'
+import { Includeable, Op, col, fn } from 'sequelize'
 
-import { dbConnections } from '../../database/connection'
 import {
   ElementDetail,
   SemesterEnrollment,
@@ -11,12 +10,10 @@ import {
   SISStudyRightElement,
   Credit,
 } from '../../models'
-import { CreditTypeCode, ElementDetailType, EnrollmentType } from '../../types'
+import { CreditTypeCode, ElementDetailType, EnrollmentType, Name, StudyTrack } from '../../types'
 import { getCurrentSemester } from '../semesters'
 import { formatStudyright } from './format'
 import { whereStudents, sinceDate } from '.'
-
-const { sequelize } = dbConnections
 
 export const getStudyRightsInProgramme = async (
   programmeCode: string,
@@ -84,51 +81,24 @@ export const getStudyRightsInProgramme = async (
   ).map(studyRight => studyRight.toJSON())
 }
 
-export const graduatedStudyRightsByStartDate = async (
-  studytrack: string,
-  startDate: Date,
-  endDate: Date,
-  combined: boolean
-) => {
-  const query: Record<string, any> = {
-    include: [
-      {
-        model: StudyrightElement,
-        required: true,
-        include: {
-          model: ElementDetail,
-          where: {
-            code: studytrack,
-          },
-        },
+export const getStudyTracksForProgramme = async (studyProgramme: string) =>
+  (
+    await SISStudyRightElement.findAll({
+      attributes: [[fn('DISTINCT', col('study_track')), 'studyTrack']],
+      where: {
+        code: studyProgramme,
+        studyTrack: { [Op.not]: null },
       },
-      {
-        model: Student,
-        attributes: ['studentnumber'],
-        required: true,
+    })
+  )
+    .map(studyTrack => studyTrack.toJSON().studyTrack as StudyTrack)
+    .reduce<Record<string, Name | 'All students of the programme'>>(
+      (acc, track) => {
+        acc[track.code] = track.name
+        return acc
       },
-    ],
-    where: {
-      graduated: 1,
-      student_studentnumber: {
-        [Op.not]: null,
-      },
-    },
-  }
-  if (!combined) {
-    // This logic is based on function studentnumbersWithAllStudyrightElements from ./populations.js as the goal is to find the students
-    // who have started their studies in the programme between startDate and endDate (i.e. the same logic as in class statistics)
-    query.where[Op.and] = [
-      sequelize.where(
-        sequelize.fn('GREATEST', sequelize.col('studyright_elements.startdate'), sequelize.col('studyright.startdate')),
-        { [Op.between]: [startDate, endDate] }
-      ),
-    ]
-  } else {
-    query.where.startdate = { [Op.between]: [startDate, endDate] }
-  }
-  return (await Studyright.findAll(query)).map(formatStudyright)
-}
+      { [studyProgramme]: 'All students of the programme' }
+    )
 
 export const graduatedStudyRights = async (studytrack: string, since: Date, studentnumbers: string[]) =>
   (
