@@ -91,6 +91,7 @@ const byStudentNumber = async (studentNumber: string) => {
       },
     }),
   ])
+  if (!student) return null
   const tagprogrammes = await ElementDetail.findAll({
     where: {
       code: {
@@ -324,6 +325,7 @@ const formatStudentWithoutTags = (
 export const withStudentNumber = async (studentNumber: string) => {
   try {
     const student = await byStudentNumber(studentNumber)
+    if (!student) return null
     return formatStudent(student)
   } catch (error) {
     logger.error(`Error when fetching single student ${error}`)
