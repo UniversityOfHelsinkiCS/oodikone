@@ -1,6 +1,7 @@
 /* eslint-disable import/no-cycle */
 import { Column, CreatedAt, DataType, HasMany, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
+import { Name } from '../types'
 import { Course } from './course'
 
 @Table({
@@ -17,7 +18,7 @@ export class CourseType extends Model {
   courses: Course[]
 
   @Column(DataType.JSONB)
-  name: object
+  name: Required<Name>
 
   @CreatedAt
   @Column(DataType.DATE)

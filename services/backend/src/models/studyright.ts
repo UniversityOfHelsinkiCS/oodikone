@@ -12,7 +12,7 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
-import { ExtentCode, PriorityCode } from '../types'
+import { EnrollmentType, ExtentCode, PriorityCode } from '../types'
 import { Enrollment } from './enrollment'
 import { Organization } from './organization'
 import { Student } from './student'
@@ -98,7 +98,7 @@ export class Studyright extends Model {
   is_ba_ma: boolean
 
   @Column({ field: 'semester_enrollments', type: DataType.JSONB })
-  semesterEnrollments: object
+  semesterEnrollments: Array<{ semestercode: number; enrollmenttype: EnrollmentType; statutoryAbsence: boolean }> | null
 
   @CreatedAt
   @Column({ field: 'created_at', type: DataType.DATE })

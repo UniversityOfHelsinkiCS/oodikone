@@ -53,7 +53,7 @@ class DbConnection extends EventEmitter {
     this.RETRY_ATTEMPTS = 15
     this.established = false
 
-    this.sequelize = new Sequelize(conf.SIS_DB_URL, {
+    this.sequelize = new Sequelize(conf.SIS_DB_URL!, {
       dialect: 'postgres',
       pool: {
         max: 25,
@@ -110,7 +110,7 @@ class DbConnection extends EventEmitter {
 }
 
 // Old-style kone + user db connections
-const sequelizeKone = new Sequelize(conf.DB_URL_KONE, {
+const sequelizeKone = new Sequelize(conf.DB_URL_KONE!, {
   schema: conf.DB_SCHEMA_KONE,
   logging: false,
   password: conf.KONE_PASSWORD,
@@ -128,7 +128,7 @@ const sequelizeKone = new Sequelize(conf.DB_URL_KONE, {
 
 sequelizeKone.query(`SET SESSION search_path to ${conf.DB_SCHEMA_KONE}`)
 
-const sequelizeUser = new Sequelize(conf.DB_URL_USER, {
+const sequelizeUser = new Sequelize(conf.DB_URL_USER!, {
   logging: false,
   password: conf.USER_PASSWORD,
   models: [User],

@@ -1,6 +1,6 @@
-import { ProgrammeModule } from '../../models'
+import { ProgrammeModule, Studyright } from '../../models'
 
-export const formatFacultyStudyRight = studyright => {
+export const formatFacultyStudyRight = (studyright: Studyright) => {
   return {
     studyrightid: studyright.studyrightid,
     studystartdate: studyright.studystartdate,

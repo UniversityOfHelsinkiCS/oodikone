@@ -52,7 +52,7 @@ export class Student extends Model {
   transfers: Transfer[]
 
   @HasMany(() => Credit, { foreignKey: 'student_studentnumber', sourceKey: 'studentnumber' })
-  credits: Credit
+  credits: Credit[]
 
   @Column(DataType.DATE)
   birthdate: Date

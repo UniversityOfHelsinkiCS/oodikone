@@ -146,7 +146,7 @@ export const getPercentage = (value: number, total: number): string => {
   return `${((value / total) * 100).toFixed(1)} %`
 }
 
-export const getCreditThresholds = (): Record<string, Array<number | string>> => {
+export const getCreditThresholds = () => {
   // Only doctoral and licentiate study programmes (40 study credits) use this as of September 2023
   return {
     creditThresholdKeys: ['lte10', 'lte20', 'lte30', 'lte40', 'mte40'],

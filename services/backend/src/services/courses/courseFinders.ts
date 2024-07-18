@@ -51,22 +51,21 @@ const getRawCourses = async (name: string, code: string) => {
 }
 
 export const byNameAndOrCodeLike = async (name: string, code: string) => {
+  type CourseWithSubsId = Course & { subsId?: number }
   const rawCourses = await getRawCourses(name, code)
-  const courses = rawCourses
-    .map(course => {
-      return { ...course.dataValues }
-    })
+  const courses: CourseWithSubsId[] = rawCourses
+    .map(course => ({ ...course.dataValues }))
     .sort((x, y) => getSortRank(y.code) - getSortRank(x.code))
 
   let substitutionGroupIndex = 0
-  const visited = []
+  const visited: string[] = []
 
-  const organizeSubgroups = course => {
+  const organizeSubgroups = (course: CourseWithSubsId) => {
     if (visited.includes(course.code)) {
       return
     }
 
-    let temp = []
+    let temp: CourseWithSubsId[] = []
     if (course.substitutions !== null) {
       temp = courses.filter(c => course.substitutions.includes(c.code))
     }
@@ -91,7 +90,7 @@ export const byNameAndOrCodeLike = async (name: string, code: string) => {
   return { courses }
 }
 
-export const byCodes = (codes: string[]): Promise<Course[]> => {
+export const byCodes = (codes: string[]) => {
   return Course.findAll({
     where: {
       code: {

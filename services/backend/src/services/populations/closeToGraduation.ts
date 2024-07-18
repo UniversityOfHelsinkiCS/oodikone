@@ -1,16 +1,55 @@
 import { col, Op } from 'sequelize'
 
 import { Course, Credit, Organization, Student, Studyplan, SISStudyRight, SISStudyRightElement } from '../../models'
-import { ExtentCode } from '../../types'
+import type { SemesterEnrollment } from '../../models/SISStudyRight'
+import { ExtentCode, Name } from '../../types'
 import { mapToProviders } from '../../util/map'
 import { redisClient } from '../redis'
 import { getCurriculumVersion } from './shared'
 
 export const CLOSE_TO_GRADUATION_REDIS_KEY = 'CLOSE_TO_GRADUATION_DATA'
 
-const findThesisAndLatestAttainments = (studyPlan, attainments, providerCode) => {
+type LatestAttainmentDates = {
+  total?: Date
+  hops?: Date
+}
+
+type AccumulatorType = {
+  student: {
+    studentNumber: string
+    name: string
+    sis_person_id: string
+    email: string
+    phoneNumber: string
+    secondaryEmail: string
+  }
+  studyright: {
+    startDate: Date
+    semesterEnrollments: SemesterEnrollment[] | null
+    isBaMa: boolean
+  }
+  thesisInfo: {
+    grade: string
+    attainmentDate: Date
+    courseCode: string
+  } | null
+  programme: {
+    code: string
+    name: Name
+    studyTrack: Name | null
+    startedAt: Date
+  }
+  latestAttainmentDates: LatestAttainmentDates
+  curriculumPeriod: string | null
+  credits: {
+    hops: number
+    all: number
+  }
+}
+
+const findThesisAndLatestAttainments = (studyPlan: Studyplan, attainments: Credit[], providerCode: string) => {
   let thesisData
-  const latestAttainmentDates: Record<string, any> = {}
+  const latestAttainmentDates: LatestAttainmentDates = {}
   const thesisCodes = ['urn:code:course-unit-type:bachelors-thesis', 'urn:code:course-unit-type:masters-thesis']
 
   for (const attainment of attainments) {
@@ -44,7 +83,7 @@ const formatStudent = (student: Student) => {
     phone_number: phoneNumber,
     secondary_email: secondaryEmail,
   } = student
-  return student.studyplans.reduce((acc, studyPlan) => {
+  return student.studyplans.reduce<AccumulatorType[]>((acc, studyPlan) => {
     const { studyRight } = studyPlan
     const { studyRightElements, startDate: startOfStudyright, extentCode, semesterEnrollments } = studyRight
 
@@ -187,7 +226,7 @@ export const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =
         }
         return acc
       },
-      { bachelor: [], masterAndLicentiate: [] }
+      { bachelor: [] as AccumulatorType[], masterAndLicentiate: [] as AccumulatorType[] }
     )
 
 export const getCloseToGraduationData = async studentNumbers => {

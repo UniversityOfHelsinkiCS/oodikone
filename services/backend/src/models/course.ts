@@ -13,6 +13,7 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
+import { Name } from '../types'
 import { CourseProvider } from './courseProvider'
 import { CourseType } from './courseType'
 import { Credit } from './credit'
@@ -53,7 +54,7 @@ export class Course extends Model {
   is_study_module: boolean
 
   @Column(DataType.JSONB)
-  name: object
+  name: Name
 
   @Column(DataType.DATE)
   latest_instance_date: Date
@@ -85,7 +86,7 @@ export class Course extends Model {
   updatedAt: Date
 
   @Column(DataType.JSONB)
-  substitutions: object
+  substitutions: string[]
 
   @Column(DataType.STRING)
   course_unit_type: string

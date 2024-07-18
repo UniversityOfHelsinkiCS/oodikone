@@ -114,9 +114,19 @@ const getGraduationTimeStats = async ({ studyprogramme, years, isAcademicYear, i
     }
   }
 
+  type GraduationTimes = {
+    medians: Array<{
+      y: number
+      amount: number
+      name: any
+      statistics: { onTime: number; yearOver: number; wayOver: number }
+    }>
+    goal: number
+  }
+
   const goal = getGoal(studyprogramme)
-  const times = { medians: [], goal }
-  const comboTimes = { medians: [], goal: goal + 36 }
+  const times: GraduationTimes = { medians: [], goal }
+  const comboTimes: GraduationTimes = { medians: [], goal: goal + 36 }
 
   for (const year of years.toReversed()) {
     const median = getMedian(graduationTimes[year])

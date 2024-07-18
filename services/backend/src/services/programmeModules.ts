@@ -1,7 +1,8 @@
-import { Op } from 'sequelize'
+import { Op, QueryTypes } from 'sequelize'
 import { dbConnections } from '../database/connection'
 import { ProgrammeModule } from '../models'
 import { ExcludedCourse } from '../models/kone'
+import { Name } from '../types'
 import logger from '../util/logger'
 import { combinedStudyprogrammes } from './studyProgramme/studyProgrammeHelpers'
 
@@ -18,8 +19,30 @@ const getCurriculumVersions = async code => {
 
 const recursivelyGetModuleAndChildren = async (code, curriculum_period_ids) => {
   const connection = dbConnections.sequelize
+  type ModuleWithChildren = Pick<
+    ProgrammeModule,
+    | 'id'
+    | 'code'
+    | 'name'
+    | 'type'
+    | 'order'
+    | 'organization_id'
+    | 'valid_from'
+    | 'valid_to'
+    | 'group_id'
+    | 'curriculum_period_ids'
+  > & {
+    parent_id: string
+    created_at: Date
+    updated_at: Date
+    study_level: string | null
+    degree_programme_type: string | null
+    module_order: number | null
+    parent_name: Name
+    parent_code: string | null
+  }
   try {
-    const [result] = await connection.query(
+    const result: ModuleWithChildren[] = await connection.query(
       `WITH RECURSIVE children as (
         SELECT DISTINCT pm.*, 0 AS module_order, NULL::jsonb AS parent_name, NULL AS parent_code, NULL as parent_id FROM programme_modules pm
         WHERE pm.code = ? AND ARRAY[?]::text[] && curriculum_period_ids
@@ -29,7 +52,7 @@ const recursivelyGetModuleAndChildren = async (code, curriculum_period_ids) => {
         WHERE c.id = pmc.parent_id AND pm.group_id = pmc.child_id AND (ARRAY[?]::text[] && pm.curriculum_period_ids OR pm.type = 'course' OR pm.code is null)
         GROUP BY pm.id, c.name, c.code, c.order, c.id
       ) SELECT * FROM children`,
-      { replacements: [code, curriculum_period_ids, curriculum_period_ids] }
+      { replacements: [code, curriculum_period_ids, curriculum_period_ids], type: QueryTypes.SELECT }
     )
     return result
   } catch (error) {
@@ -41,7 +64,7 @@ const recursivelyGetModuleAndChildren = async (code, curriculum_period_ids) => {
 
 const modifyParent = (course, moduleMap) => {
   let parent = moduleMap[course.parent_id]
-  const parents = []
+  const parents: any[] = []
   while (parent) {
     parents.push(parent)
     parent = moduleMap[parent.parent_id]
@@ -78,8 +101,11 @@ const getCoursesAndModulesForProgramme = async (code, periodIds) => {
     return {}
   }
   const result = await recursivelyGetModuleAndChildren(code, periodIds.split(','))
-  const courses = result.filter((r: any) => r.type === 'course')
-  const modules = result.filter((r: any) => r.type === 'module')
+  if (!result) {
+    return {}
+  }
+  const courses = result.filter(r => r.type === 'course')
+  const modules = result.filter(r => r.type === 'module')
   const excludedCourses = await ExcludedCourse.findAll({
     where: {
       programme_code: {

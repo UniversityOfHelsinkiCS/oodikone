@@ -243,7 +243,7 @@ const getFacultyTransfers = async (
   since,
   isAcademicYear,
   yearsArray,
-  graphStats,
+  graphStats: 0[],
   tableStats,
   allBasics,
   counts,
@@ -258,15 +258,15 @@ const getFacultyTransfers = async (
     includeAllSpecials,
     faculty
   )
-  let transferGraphStats = []
+  const transferGraphStats: Array<Array<number>> = []
   const transferTableStats = {}
   if (includeAllSpecials) {
-    transferGraphStats = [[...graphStats], [...graphStats], [...graphStats]]
+    transferGraphStats.push([...graphStats], [...graphStats], [...graphStats])
     Object.keys(tableStats).forEach(year => {
       transferTableStats[year] = [0, 0, 0]
     })
   } else {
-    transferGraphStats = [[...graphStats]]
+    transferGraphStats.push([...graphStats])
     Object.keys(tableStats).forEach(year => {
       transferTableStats[year] = [0]
     })
@@ -352,24 +352,23 @@ export const combineFacultyBasics = async (
   programmeFilter,
   special
 ) => {
-  const counts = {}
-  const countsGraduations = {}
-  const years = []
-  const programmeData: { started?: object; graduated?: object; transferred?: object } = {}
+  const counts: Record<string, any[]> = {}
+  const countsGraduations: Record<string, any[]> = {}
+  const programmeData = { started: {}, graduated: {}, transferred: {} }
   const isAcademicYear = yearType === 'ACADEMIC_YEAR'
   const includeAllSpecials = special === 'SPECIAL_INCLUDED'
   const since = isAcademicYear ? new Date('2017-08-01') : new Date('2017-01-01')
   const yearsArray = getYearsArray(since.getFullYear(), isAcademicYear)
   const { graphStats, tableStats } = getStatsBasis(yearsArray)
-  Object.keys(tableStats).forEach(year => years.push(year))
+  const years = [...Object.keys(tableStats)]
   const wantedProgrammeCodes = programmes.map(prog => prog.code)
 
   const allBasics = {
     id: faculty,
-    years: [],
+    years: [] as string[],
     programmeNames: {},
     studentInfo: {
-      tableStats: [],
+      tableStats: [] as any[],
       graphStats: [],
       titles: includeAllSpecials
         ? ['', 'Started studying', 'Graduated', 'Transferred inside', 'Transferred away', 'Transferred to']
@@ -377,7 +376,7 @@ export const combineFacultyBasics = async (
       programmeTableStats: {},
     },
     graduationInfo: {
-      tableStats: [],
+      tableStats: [] as any[],
       graphStats: [],
       titles: ['', 'All', 'Bachelors', 'Masters', 'Doctors', 'Others'],
       programmeTableStats: {},

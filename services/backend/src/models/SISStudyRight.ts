@@ -18,7 +18,7 @@ import { SISStudyRightElement } from './SISStudyRightElement'
 import { Student } from './student'
 import { Studyplan } from './studyplan'
 
-type SemesterEnrollment = {
+export type SemesterEnrollment = {
   type: EnrollmentType
   semester: number
   statutoryAbsence?: boolean

@@ -2,7 +2,7 @@ import { Op } from 'sequelize'
 
 import { ignoredFacultyCodes } from '../../config/organizationConstants'
 import { programmeCodes } from '../../config/programmeCodes'
-import { Organization } from '../../models'
+import { Organization, StudyrightElement } from '../../models'
 import { ElementDetailType, ExtentCode } from '../../types'
 import { getOrganizations } from '../organizations'
 
@@ -13,22 +13,25 @@ export const getFaculties = async (): Promise<Organization[]> => {
 
 export const getSortedFaculties = async (): Promise<Organization[]> => {
   const faculties = await getFaculties()
-  return faculties.sort((a, b) => (a.name.fi > b.name.fi ? 1 : -1))
+  return faculties.sort((a, b) => {
+    const nameA = a.name.fi ?? ''
+    const nameB = b.name.fi ?? ''
+    return nameA.localeCompare(nameB)
+  })
 }
 
-export const findRightProgramme = (studyRightElements: any, code: string) => {
+export const findRightProgramme = (studyRightElements: StudyrightElement[], code: string) => {
   let programme = ''
   let programmeName = {}
-  let studyRightElement = null
 
   if (studyRightElements) {
-    studyRightElement = studyRightElements
+    const matchingStudyRightElements = studyRightElements
       .filter(element => element.element_detail.type === ElementDetailType.PROGRAMME)
       .filter(element => element.code === code)
 
-    if (studyRightElement.length > 0) {
-      programme = studyRightElement[0].code
-      programmeName = studyRightElement[0].element_detail.name
+    if (matchingStudyRightElements.length > 0) {
+      programme = matchingStudyRightElements[0].code
+      programmeName = matchingStudyRightElements[0].element_detail.name
     }
   }
 

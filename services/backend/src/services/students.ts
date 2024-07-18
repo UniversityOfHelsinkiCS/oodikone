@@ -89,7 +89,7 @@ const byStudentNumber = async studentNumber => {
   })
   const semesters = await Semester.findAll()
   const mappedEnrollments = student.semester_enrollments.map(enrollment => {
-    const semester = semesters.find(semester => semester.semestercode === enrollment.semestercode)
+    const semester = semesters.find(semester => semester.semestercode === enrollment.semestercode)!
     return {
       ...enrollment.dataValues,
       name: semester.name,
@@ -120,7 +120,7 @@ const getUnifyStatus = (unifyCourses: string): [boolean, boolean?] => {
 }
 
 export const findByCourseAndSemesters = async (coursecodes, from, to, separate, unifyCourses = 'unifyStats') => {
-  const { startdate, semestercode: fromSemester } = await Semester.findOne({
+  const startSemester = await Semester.findOne({
     where: {
       [separate ? 'semestercode' : 'yearcode']: from,
     },
@@ -129,7 +129,7 @@ export const findByCourseAndSemesters = async (coursecodes, from, to, separate, 
     raw: true,
   })
 
-  const { enddate, semestercode: toSemester } = await Semester.findOne({
+  const endSemester = await Semester.findOne({
     where: {
       [separate ? 'semestercode' : 'yearcode']: to,
     },
@@ -137,6 +137,13 @@ export const findByCourseAndSemesters = async (coursecodes, from, to, separate, 
     limit: 1,
     raw: true,
   })
+
+  if (!startSemester || !endSemester) {
+    return []
+  }
+
+  const { startdate, semestercode: fromSemester } = startSemester
+  const { enddate, semestercode: toSemester } = endSemester
 
   const unifyStatus = getUnifyStatus(unifyCourses)
 
@@ -317,10 +324,7 @@ const nameLike = terms => {
   }
 }
 
-const studentnumberLike = terms => {
-  if (terms.length !== 1) {
-    return undefined
-  }
+const studentnumberLike = (terms: string[]) => {
   return {
     studentnumber: {
       [Op.iLike]: likefy(terms[0]),
@@ -328,7 +332,7 @@ const studentnumberLike = terms => {
   }
 }
 
-export const bySearchTermAndStudentNumbers = async (searchterm, studentNumbers) => {
+export const bySearchTermAndStudentNumbers = async (searchterm: string, studentNumbers?: string[]) => {
   const terms = splitByEmptySpace(searchterm)
   return (
     await Student.findAll({

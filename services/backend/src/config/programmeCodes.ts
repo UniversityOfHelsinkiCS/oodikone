@@ -135,4 +135,4 @@ export const programmeCodes = {
   T923105: 'DOMAST',
   T923106: 'MATRENA',
   T923107: 'DOCS',
-}
+} as const

@@ -42,7 +42,7 @@ export class ProgrammeModule extends Model {
   name: Name
 
   @Column(DataType.STRING)
-  type: string
+  type: 'course' | 'module'
 
   @Column(DataType.INTEGER)
   order: number

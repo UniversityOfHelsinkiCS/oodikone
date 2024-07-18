@@ -25,7 +25,7 @@ export class CourseProvider extends Model {
   coursecode: string
 
   @Column(DataType.JSONB)
-  shares: object
+  shares: Array<{ share: number; startDate?: string; endDate?: string }> | null
 
   @ForeignKey(() => Organization)
   @Column(DataType.STRING)

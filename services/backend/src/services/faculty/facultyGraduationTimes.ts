@@ -8,8 +8,10 @@ import { graduatedStudyrights, hasMasterRight, studyrightsByRightStartYear } fro
 import { findRightProgramme, isNewProgramme } from './facultyHelpers'
 import { getProgrammes } from './facultyService'
 
-const sortProgrammes = programmes => {
-  const check = name => {
+type Programme = { name: string; code: string }
+
+const sortProgrammes = (programmes: Programme[]) => {
+  const check = (name: string) => {
     if (Number.isNaN(name[0])) return -1
     return 1
   }
@@ -19,15 +21,15 @@ const sortProgrammes = programmes => {
   })
 }
 
-const getSortedProgIds = progs => {
-  let programmes = []
+const getSortedProgIds = (progs: string[]) => {
+  const programmes: Programme[] = []
 
   for (const prog of progs) {
-    if (Object.keys(programmeCodes).includes(prog)) {
-      const name = programmeCodes[prog]
-      programmes = [...programmes, { name, code: prog }]
+    const name = programmeCodes[prog] ? programmeCodes[prog as keyof typeof programmeCodes] : null
+    if (name) {
+      programmes.push({ name, code: prog })
     } else {
-      programmes = [...programmes, { name: prog, code: prog }]
+      programmes.push({ name: prog, code: prog })
     }
   }
   sortProgrammes(programmes)
@@ -77,7 +79,7 @@ const addGraduation = async (
   programme
 ) => {
   let actualStartdate = startdate
-  let level = null
+  let level: string | null = null
 
   if (programme === 'MH30_001' || programme === 'MH30_003') {
     level = 'bcMsCombo'
@@ -130,7 +132,7 @@ const getClassSizes = async (faculty, programmeCodes, since, classSizes, program
       if (programmeFilter === 'NEW_STUDY_PROGRAMMES' && !isNewProgramme(code)) continue
 
       let actualStartdate = startdate
-      let level = null
+      let level: string | null = null
 
       if (code === 'MH30_001' || code === 'MH30_003') {
         level = 'bcMsCombo'
@@ -139,7 +141,7 @@ const getClassSizes = async (faculty, programmeCodes, since, classSizes, program
       } else if (extentcode === ExtentCode.MASTER) {
         if (studyrightid.slice(-2) === '-2') {
           level = 'bcMsCombo'
-          actualStartdate = await findBachelorStartdate(studyrightid.replace(/-2$/, '-1'))
+          actualStartdate = (await findBachelorStartdate(studyrightid.replace(/-2$/, '-1')))!
         } else if (code.includes('KH')) {
           level = 'bachelor' // Some rare faculties have one/two outliers with extent 2 for bachelor
         } else {
@@ -210,12 +212,10 @@ const count = async (
     data.medians[level] = []
   })
   for (const code of programmeCodes) {
-    let studyrights = null
-    if (mode === 'gradYear') {
-      studyrights = await graduatedStudyrights(faculty, since, code)
-    } else {
-      studyrights = await studyrightsByRightStartYear(faculty, since, code)
-    }
+    const studyrights =
+      mode === 'gradYear'
+        ? await graduatedStudyrights(faculty, since, code)
+        : await studyrightsByRightStartYear(faculty, since, code)
     for (const right of studyrights) {
       const { enddate, startdate, studyrightid, extentcode, studyrightElements, studentnumber } = right
       const { programme, programmeName } = findRightProgramme(studyrightElements, code)
@@ -225,12 +225,7 @@ const count = async (
         programmeNames[programme] = programmeName
       }
 
-      let year = null
-      if (mode === 'gradYear') {
-        year = defineYear(enddate, false)
-      } else {
-        year = defineYear(startdate, false)
-      }
+      const year = mode === 'gradYear' ? defineYear(enddate, false) : defineYear(startdate, false)
 
       await addGraduation(
         extentcode,

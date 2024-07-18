@@ -9,14 +9,17 @@ import { getStudyRightsByExtent, getStudyRightsByBachelorStart } from './faculty
 import { checkTransfers } from './facultyHelpers'
 import { getTransfersIn, getTransfersOut } from './facultyTransfers'
 
+type Limits = ReturnType<typeof createLimits>
+
+const LIMIT_KEYS = ['zero', 't5', 't4', 't3', 't2', 't1'] as const
+
 const getStudentData = (
   startDate,
   students,
-  prog,
-  limits = [],
-  limitKeys = [],
-  thresholdKeys = [],
-  thresholdAmounts = []
+  limits: Limits = [],
+  limitKeys: typeof LIMIT_KEYS | [] = [],
+  thresholdKeys: string[] = [],
+  thresholdAmounts: number[] = []
 ) => {
   const data = {}
   const programmeData = {}
@@ -33,7 +36,7 @@ const getStudentData = (
   })
 
   // Data is only used for doctoral programmes, otherwise only programmeData is needed
-  if (prog === 'T') {
+  if (limitKeys.length === 0) {
     creditCounts.forEach(creditCount => {
       thresholdKeys.some((thresholdKey, index) => {
         if (
@@ -104,10 +107,10 @@ export const combineFacultyStudentProgress = async (faculty, programmes, special
   const progressStats = {
     id: faculty,
     years: yearsArray,
-    yearlyBachelorTitles: [],
-    yearlyBcMsTitles: [],
-    yearlyMasterTitles: [],
-    yearlyLicentiateTitles: [],
+    yearlyBachelorTitles: [] as Array<ReturnType<typeof createYearlyTitles>>,
+    yearlyBcMsTitles: [] as Array<ReturnType<typeof createYearlyTitles>>,
+    yearlyMasterTitles: [] as Array<ReturnType<typeof createYearlyTitles>>,
+    yearlyLicentiateTitles: [] as Array<ReturnType<typeof createYearlyTitles>>,
     programmeNames: {},
     bachelorsProgStats: {},
     bcMsProgStats: {},
@@ -125,11 +128,12 @@ export const combineFacultyStudentProgress = async (faculty, programmes, special
 
   const reversedYears = [...yearsArray].reverse()
 
-  const limitKeys = ['zero', 't5', 't4', 't3', 't2', 't1']
-  let bachelorlimits = []
-  let masterlimits = []
-  let bcmslimits = []
-  let licentiatelimits = []
+  type Limits = ReturnType<typeof createLimits>
+
+  let bachelorlimits: Limits = []
+  let masterlimits: Limits = []
+  let bcmslimits: Limits = []
+  let licentiatelimits: Limits = []
   const bachelorProgress = {}
   const masterProgress = {}
   const bcmsProgress = {}
@@ -164,13 +168,10 @@ export const combineFacultyStudentProgress = async (faculty, programmes, special
     } else {
       licentiatelimits = createLimits(months, 0)
     }
-    progressStats.yearlyBachelorTitles = [...progressStats.yearlyBachelorTitles, createYearlyTitles(0, bachelorlimits)]
-    progressStats.yearlyMasterTitles = [...progressStats.yearlyMasterTitles, createYearlyTitles(0, masterlimits)]
-    progressStats.yearlyLicentiateTitles = [
-      ...progressStats.yearlyLicentiateTitles,
-      createYearlyTitles(0, licentiatelimits),
-    ]
-    progressStats.yearlyBcMsTitles = [...progressStats.yearlyBcMsTitles, createYearlyTitles(0, bcmslimits)]
+    progressStats.yearlyBachelorTitles.push(createYearlyTitles(0, bachelorlimits))
+    progressStats.yearlyMasterTitles.push(createYearlyTitles(0, masterlimits))
+    progressStats.yearlyLicentiateTitles.push(createYearlyTitles(0, licentiatelimits))
+    progressStats.yearlyBcMsTitles.push(createYearlyTitles(0, bcmslimits))
 
     progressStats.creditCounts.bachelor[year] = []
     progressStats.creditCounts.bachelorMaster[year] = []
@@ -212,14 +213,14 @@ export const combineFacultyStudentProgress = async (faculty, programmes, special
           .filter(studyright => studyright.extentcode === ExtentCode.BACHELOR)
           .map(studyright => studyright.studentnumber)
         const students = await studytrackStudents(allBachelors)
-        const { progData, creditCounts } = getStudentData(startDate, students, 'KH', bachelorlimits, limitKeys)
+        const { progData, creditCounts } = getStudentData(startDate, students, bachelorlimits, LIMIT_KEYS)
 
         progressStats.creditCounts.bachelor[year] = [...progressStats.creditCounts.bachelor[year], ...creditCounts]
 
         if (!(progId in bachelorProgress)) {
           bachelorProgress[progId] = new Array(reversedYears.length - 1)
         }
-        bachelorProgress[progId][indexOf(reversedYears, year)] = limitKeys.map(key => progData[key])
+        bachelorProgress[progId][indexOf(reversedYears, year)] = LIMIT_KEYS.map(key => progData[key])
       } else if (code.includes('MH')) {
         const allMsStudents = studyrights
           .filter(
@@ -237,16 +238,14 @@ export const combineFacultyStudentProgress = async (faculty, programmes, special
         const { progData: bcMsProgdata, creditCounts: creditCountsBcMs } = getStudentData(
           startDate,
           bcMsStudents,
-          'MH',
           bcmslimits,
-          limitKeys
+          LIMIT_KEYS
         )
         const { progData: msProgdata, creditCounts: creditCountsMaster } = getStudentData(
           startDate,
           msStudents,
-          'MH',
           masterlimits,
-          limitKeys
+          LIMIT_KEYS
         )
         if (['MH30_001', 'MH30_003'].includes(code)) {
           progressStats.creditCounts.licentiate[year] = [
@@ -256,7 +255,7 @@ export const combineFacultyStudentProgress = async (faculty, programmes, special
           if (!(progId in licentiateProgress)) {
             licentiateProgress[progId] = new Array(reversedYears.length - 1)
           }
-          licentiateProgress[progId][indexOf(reversedYears, year)] = limitKeys.map(key => msProgdata[key])
+          licentiateProgress[progId][indexOf(reversedYears, year)] = LIMIT_KEYS.map(key => msProgdata[key])
         } else {
           progressStats.creditCounts.bachelorMaster[year] = [
             ...progressStats.creditCounts.bachelorMaster[year],
@@ -267,8 +266,8 @@ export const combineFacultyStudentProgress = async (faculty, programmes, special
             masterProgress[progId] = new Array(reversedYears.length - 1)
             bcmsProgress[progId] = new Array(reversedYears.length - 1)
           }
-          masterProgress[progId][indexOf(reversedYears, year)] = limitKeys.map(key => msProgdata[key])
-          bcmsProgress[progId][indexOf(reversedYears, year)] = limitKeys.map(key => bcMsProgdata[key])
+          masterProgress[progId][indexOf(reversedYears, year)] = LIMIT_KEYS.map(key => msProgdata[key])
+          bcmsProgress[progId][indexOf(reversedYears, year)] = LIMIT_KEYS.map(key => bcMsProgdata[key])
         }
       } else {
         const all = studyrights
@@ -280,7 +279,6 @@ export const combineFacultyStudentProgress = async (faculty, programmes, special
         const { data, creditCounts } = getStudentData(
           startDate,
           doctoralStudents,
-          'T',
           [],
           [],
           creditThresholdKeys,

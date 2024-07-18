@@ -1,7 +1,7 @@
 /* eslint-disable import/no-cycle */
 import { Column, CreatedAt, DataType, HasMany, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
-import { ElementDetailType } from '../types'
+import { ElementDetailType, Name } from '../types'
 import { StudyrightElement } from './studyrightElement'
 
 @Table({
@@ -15,7 +15,7 @@ export class ElementDetail extends Model {
   code: string
 
   @Column(DataType.JSONB)
-  name: object
+  name: Name
 
   @Column(DataType.INTEGER)
   type: ElementDetailType
