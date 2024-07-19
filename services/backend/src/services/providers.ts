@@ -1,11 +1,13 @@
-const { Organization, Course } = require('../models')
+import { Course, Organization } from '../models'
 
-const getAllProviders = async () =>
-  Organization.findAll({
+export const getAllProviders = async () => {
+  const providers = Organization.findAll({
     attributes: ['code', 'name'],
   })
+  return providers
+}
 
-const getCourseCodesOfProvider = async provider => {
+export const getCourseCodesOfProvider = async (provider: string) => {
   const coursesByProvider = await Course.findAll({
     attributes: ['id', 'code', 'substitutions'],
     include: {
@@ -21,15 +23,12 @@ const getCourseCodesOfProvider = async provider => {
   })
 
   const coursesWithOpenUniSubstitutions = coursesByProvider.map(({ code, substitutions }) => {
-    if (!substitutions || !substitutions.length) return [code]
+    if (!substitutions || !substitutions.length) {
+      return [code]
+    }
     const alternatives = [`AY-${code}`, `AY${code}`, `A-${code}`]
     return [code].concat(substitutions.filter(sub => alternatives.includes(sub)))
   })
 
   return coursesWithOpenUniSubstitutions.flat()
-}
-
-module.exports = {
-  getAllProviders,
-  getCourseCodesOfProvider,
 }
