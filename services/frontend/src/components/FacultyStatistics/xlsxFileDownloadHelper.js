@@ -11,25 +11,31 @@ export const downloadStudentTableCsv = (studentStats, programmeNames, faculty, s
     .map(year => year)
     .reverse()
 
-  let counter = 0
-  const tableStatsAsCsv = years.map(year =>
-    studentStats.data.facultyTableStats[year].reduce((result, value) => {
-      let header = '%'
-      if (typeof value !== 'string') {
-        header = tableHeaders[counter]
-        counter += 1
-      } else {
-        header = `${tableHeaders[counter - 1]} %`
-        if (counter >= tableHeaders.length) counter = 0
-      }
-      return { ...result, [header]: value }
-    }, {})
+  const processTableData = (data, tableHeaders) => {
+    let counter = 0
+    return data.map(row =>
+      row.reduce((result, value) => {
+        let header = '%'
+        if (typeof value !== 'string') {
+          header = tableHeaders[counter]
+          counter += 1
+        } else {
+          header = `${tableHeaders[counter - 1]} %`
+          if (counter >= tableHeaders.length) counter = 0
+        }
+        return { ...result, [header]: value }
+      }, {})
+    )
+  }
+
+  const tableStatsAsCsv = processTableData(
+    years.map(year => studentStats.data.facultyTableStats[year]),
+    tableHeaders
   )
   const tableSheet = utils.json_to_sheet(tableStatsAsCsv)
   utils.book_append_sheet(book, tableSheet, 'TotalTableStats')
 
   const programmeStats = studentStats?.data?.programmeStats || {}
-  counter = 0
   const progressStatsToCsv = sortedkeys.reduce(
     (results, programme) => [
       ...results,
@@ -38,17 +44,7 @@ export const downloadStudentTableCsv = (studentStats, programmeNames, faculty, s
           'Academic Year': years[yearIndex],
           Programme: programme,
           Name: getTextIn(programmeNames[programme]),
-          ...programmeStats[programme][yearRow].reduce((result, value) => {
-            let header = '%'
-            if (typeof value !== 'string') {
-              header = tableHeaders[counter]
-              counter += 1
-            } else {
-              header = `${tableHeaders[counter - 1]} %`
-              if (counter >= tableHeaders.length) counter = 0
-            }
-            return { ...result, [header]: value }
-          }, {}),
+          ...processTableData([programmeStats[programme][yearRow]], tableHeaders)[0],
         }
       }),
     ],
@@ -62,10 +58,9 @@ export const downloadStudentTableCsv = (studentStats, programmeNames, faculty, s
       ...result,
       [year]: [
         ...new Set(
-          Object.keys(countriesExtra[year]).reduce(
-            (acc, programme) => [...acc, ...Object.keys(countriesExtra[year][programme])].sort(),
-            []
-          )
+          Object.keys(countriesExtra[year])
+            .reduce((acc, programme) => [...acc, ...Object.keys(countriesExtra[year][programme])], [])
+            .sort()
         ),
       ],
     }),
