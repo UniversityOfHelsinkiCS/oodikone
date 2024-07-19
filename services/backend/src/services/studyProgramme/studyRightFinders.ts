@@ -10,7 +10,7 @@ import {
   SISStudyRightElement,
   Credit,
 } from '../../models'
-import { CreditTypeCode, ElementDetailType, EnrollmentType, Name, StudyTrack } from '../../types'
+import { CreditTypeCode, ElementDetailType, EnrollmentType, Name } from '../../types'
 import { getCurrentSemester } from '../semesters'
 import { formatStudyright } from './format'
 import { whereStudents, sinceDate } from '.'
@@ -74,11 +74,11 @@ export const getStudyRightsInProgramme = async (
       include,
       where: {
         id: {
-          [Op.in]: studyRights.map(studyRight => studyRight.toJSON().id),
+          [Op.in]: studyRights.map(studyRight => studyRight.toJSON<SISStudyRight>().id),
         },
       },
     })
-  ).map(studyRight => studyRight.toJSON())
+  ).map(studyRight => studyRight.toJSON<SISStudyRight>())
 }
 
 export const getStudyTracksForProgramme = async (studyProgramme: string) =>
@@ -91,7 +91,7 @@ export const getStudyTracksForProgramme = async (studyProgramme: string) =>
       },
     })
   )
-    .map(studyTrack => studyTrack.toJSON().studyTrack as StudyTrack)
+    .map(studyTrack => studyTrack.toJSON().studyTrack)
     .reduce<Record<string, Name | 'All students of the programme'>>(
       (acc, track) => {
         acc[track.code] = track.name

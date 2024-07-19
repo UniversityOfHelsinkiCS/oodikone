@@ -89,6 +89,7 @@ export const getMedian = (values: number[]): number => {
 
 export function defineYear(date: Date, isAcademicYear: true): string
 export function defineYear(date: Date, isAcademicYear: false): number
+export function defineYear(date: Date, isAcademicYear: boolean): string | number
 export function defineYear(date: Date, isAcademicYear: boolean) {
   if (!date) {
     return ''
