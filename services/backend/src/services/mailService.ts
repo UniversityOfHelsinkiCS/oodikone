@@ -1,7 +1,7 @@
-const axios = require('axios')
+import axios from 'axios'
 
-const { isProduction, pateToken } = require('../config')
-const { ApplicationError } = require('../util/customErrors')
+import { isProduction, pateToken } from '../config'
+import { ApplicationError } from '../util/customErrors'
 
 const pateClient = axios.create({
   baseURL: 'https://api-toska.apps.ocp-prod-0.k8s.it.helsinki.fi/pate/',
@@ -26,7 +26,13 @@ const sendEmail = async (options = {}) => {
   return await pateClient.post('/', options)
 }
 
-const sendFeedbackToToska = async ({ feedbackContent, user }) => {
+export const sendFeedbackToToska = async ({
+  feedbackContent,
+  user,
+}: {
+  feedbackContent: string
+  user: { name: string; userId: string; email: string }
+}) => {
   const { name, userId, email } = user
   const userDetails = `Sent by ${name}, userid: ${userId}, email: ${email}`
   const text = [feedbackContent, userDetails].join('<br />')
@@ -48,7 +54,7 @@ const sendFeedbackToToska = async ({ feedbackContent, user }) => {
   })
 }
 
-const sendNotificationAboutNewUser = ({ userId, userFullName }) =>
+export const sendNotificationAboutNewUser = ({ userId, userFullName }: { userId: string; userFullName: string }) =>
   sendEmail({
     template,
     emails: [
@@ -78,9 +84,9 @@ NOTE! If the automatic logging out from all services was not successful when log
 If you have defined your browser to restore your previous session in connection with starting the browser, logging out may also require deleting the cookies of the listed services in addition to closing the browser windows.<br/>\n
 See the instructions for clearing the browser cache: <a href="https://helpdesk.it.helsinki.fi/en/help/1002">https://helpdesk.it.helsinki.fi/en/help/1002</a><br/>\n`
 
-const previewNotificationAboutAccessToUser = () => ({ accessMessageSubject, accessMessageText })
+export const previewNotificationAboutAccessToUser = () => ({ accessMessageSubject, accessMessageText })
 
-const sendNotificationAboutAccessToUser = userEmail =>
+export const sendNotificationAboutAccessToUser = (userEmail: string) =>
   sendEmail({
     template,
     emails: [
@@ -97,10 +103,3 @@ const sendNotificationAboutAccessToUser = userEmail =>
       disableToska: false,
     },
   })
-
-module.exports = {
-  sendFeedbackToToska,
-  sendNotificationAboutNewUser,
-  sendNotificationAboutAccessToUser,
-  previewNotificationAboutAccessToUser,
-}

@@ -1,6 +1,6 @@
 const router = require('express').Router()
 
-const { sendFeedbackToToska } = require('../services/mailservice')
+const { sendFeedbackToToska } = require('../services/mailService')
 const logger = require('../util/logger')
 
 router.post('/email', async req => {

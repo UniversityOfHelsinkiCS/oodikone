@@ -2,7 +2,7 @@ const router = require('express').Router()
 
 const { roles } = require('../config/roles')
 const auth = require('../middleware/auth')
-const { sendNotificationAboutAccessToUser, previewNotificationAboutAccessToUser } = require('../services/mailservice')
+const { sendNotificationAboutAccessToUser, previewNotificationAboutAccessToUser } = require('../services/mailService')
 const userService = require('../services/userService')
 const logger = require('../util/logger')
 
