@@ -35,7 +35,7 @@ export const downloadStudentTableCsv = (studentStats, programmeNames, faculty, s
       ...results,
       ...Object.keys(programmeStats[programme]).map((yearRow, yearIndex) => {
         return {
-          'Acdemic Year': years[yearIndex],
+          'Academic Year': years[yearIndex],
           Programme: programme,
           Name: getTextIn(programmeNames[programme]),
           ...programmeStats[programme][yearRow].reduce((result, value) => {
@@ -89,7 +89,7 @@ export const downloadStudentTableCsv = (studentStats, programmeNames, faculty, s
       (result, programme) => [
         ...result,
         {
-          'Acdemic Year': year,
+          'Academic Year': year,
           Programme: programme,
           Name: getTextIn(programmeNamesByCode[programme]),
           ...countriesHeadersForEachYear[year].reduce(
