@@ -4,7 +4,7 @@ const { ApplicationError } = require('../util/customErrors')
 const logger = require('../util/logger')
 
 const errorHandler = (error, _req, res, next) => {
-  logger.error(error)
+  logger.error(error.message, { error })
 
   Sentry.captureException(error)
 
