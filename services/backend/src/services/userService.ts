@@ -297,8 +297,8 @@ const fdGetUser = async ({ username }: { username: string }) => {
 
   const userFromDb = userFromDbOrm.toJSON()
 
-  const programmeRights = getStudyProgrammeRights({}, {}, userFromDb.programmeRights)
-  const user = await formatUser({ ...userFromDb, iamGroups: [], programmeRights })
+  const detailedProgrammeRights = getStudyProgrammeRights({}, {}, userFromDb.programmeRights)
+  const user = await formatUser({ ...userFromDb, iamGroups: [], detailedProgrammeRights })
 
   userDataCache.set(username, user)
   return user
