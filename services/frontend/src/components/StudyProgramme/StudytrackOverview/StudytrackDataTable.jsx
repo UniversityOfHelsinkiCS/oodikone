@@ -6,8 +6,6 @@ import { Toggle } from '@/components/StudyProgramme/Toggle'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { PopulationLink } from './PopulationLink'
 
-const getKey = year => `${year}-${Math.random()}`
-
 const shouldBeHidden = (showPercentages, value) => !showPercentages && typeof value === 'string' && value.includes('%')
 
 const getCellClass = value => (value === 'Total' ? 'total-row-cell' : '')
@@ -33,44 +31,35 @@ const getStyleForCombined = index => {
 }
 
 const createCountriesContent = ({ otherCountriesStats, studyprogramme, year }) => {
-  if (
-    !otherCountriesStats ||
-    !otherCountriesStats[studyprogramme] ||
-    !otherCountriesStats[studyprogramme][year] ||
-    Object.keys(otherCountriesStats[studyprogramme][year]).length === 0
-  )
-    return <p key={Math.random()}>No data</p>
-  const countriesData = otherCountriesStats[studyprogramme][year]
+  const countriesData = otherCountriesStats?.[studyprogramme]?.[year]
+
+  if (!countriesData || Object.keys(countriesData).length === 0) return null
+
   return Object.keys(countriesData)
     .sort()
-    .map(key => (
-      <p key={Math.random()} style={{ margin: 0 }}>
-        {key}: <b>{countriesData[key]}</b>
-      </p>
+    .map(country => (
+      <div key={country}>
+        {country}: <b>{countriesData[country]}</b>
+      </div>
     ))
 }
 
-const getBasicTableCell = ({ combinedProgramme, index, row, value }) => {
-  return (
-    <Table.Cell
-      className={getCellClass(row[0])}
-      key={getKey(value)}
-      style={combinedProgramme ? getStyleForCombined(index) : getStyleForBasic(index)}
-      textAlign="right"
-    >
-      {value}
-    </Table.Cell>
-  )
-}
+const getBasicTableCell = ({ combinedProgramme, index, row, value }) => (
+  <Table.Cell
+    className={getCellClass(row[0])}
+    key={`${index}-${value}`}
+    style={combinedProgramme ? getStyleForCombined(index) : getStyleForBasic(index)}
+    textAlign="right"
+  >
+    {value}
+  </Table.Cell>
+)
 
-const getCountriesPopup = ({ combinedProgramme, index, otherCountriesStats, row, studyprogramme, value, year }) => {
-  return (
-    <Popup
-      content={createCountriesContent({ otherCountriesStats, studyprogramme, year })}
-      key={`${row[0]}-${getKey(value)}`}
-      trigger={getBasicTableCell({ combinedProgramme, index, row, value })}
-    />
-  )
+const getOtherCountriesCell = ({ combinedProgramme, index, otherCountriesStats, row, studyprogramme, value, year }) => {
+  const countriesPopupContent = createCountriesContent({ otherCountriesStats, studyprogramme, year })
+  const tableCell = getBasicTableCell({ combinedProgramme, index, row, value })
+  if (!countriesPopupContent) return tableCell
+  return <Popup content={countriesPopupContent} key={`${studyprogramme}-${year}`} trigger={tableCell} />
 }
 
 const getFirstCell = ({
@@ -83,22 +72,20 @@ const getFirstCell = ({
   studyprogramme,
   year,
   yearlyData,
-}) => {
-  return (
-    <Table.Cell className={getCellClass(year)} key={getKey(year)} onClick={setShow}>
-      {yearlyData.length > 1 && <Icon name={`${show ? 'angle down' : 'angle right'}`} />}
-      {year}
-      {(fullAccessToStudentData || allRights.includes(studyprogramme) || allRights.includes(combinedProgramme)) && (
-        <PopulationLink
-          combinedProgramme={combinedProgramme}
-          studyprogramme={studyprogramme}
-          year={year}
-          years={calendarYears}
-        />
-      )}
-    </Table.Cell>
-  )
-}
+}) => (
+  <Table.Cell className={getCellClass(year)} key={year} onClick={setShow}>
+    {yearlyData.length > 1 && <Icon name={`${show ? 'angle down' : 'angle right'}`} />}
+    {year}
+    {(fullAccessToStudentData || allRights.includes(studyprogramme) || allRights.includes(combinedProgramme)) && (
+      <PopulationLink
+        combinedProgramme={combinedProgramme}
+        studyprogramme={studyprogramme}
+        year={year}
+        years={calendarYears}
+      />
+    )}
+  </Table.Cell>
+)
 
 const getSingleTrackRow = ({
   allRights,
@@ -110,47 +97,46 @@ const getSingleTrackRow = ({
   row,
   showPercentages,
   studyprogramme,
-}) => {
-  return (
-    <Table.Row className="regular-row" key={getKey(row[0])}>
-      {row.map((value, index) => {
-        if (shouldBeHidden(showPercentages, value)) return null
-        if (index === row.length - 2 && otherCountriesStats)
-          return getCountriesPopup({
-            combinedProgramme,
-            index,
-            otherCountriesStats,
-            row,
-            studyprogramme: code,
-            value,
-            year: row[0],
-          })
-        return (
-          <Table.Cell
-            className={getCellClass(row[0])}
-            key={getKey(row[0])}
-            style={combinedProgramme ? getStyleForCombined(index) : getStyleForBasic(index)}
-            textAlign="left"
-          >
-            {value}
-            {index === 0 &&
-              (fullAccessToStudentData ||
-                allRights.includes(studyprogramme) ||
-                allRights.includes(combinedProgramme)) && (
-                <PopulationLink
-                  combinedProgramme={combinedProgramme}
-                  studyprogramme={studyprogramme}
-                  studytrack={code}
-                  year={row[0]}
-                  years={calendarYears}
-                />
-              )}
-          </Table.Cell>
-        )
-      })}
-    </Table.Row>
-  )
-}
+}) => (
+  <Table.Row className="regular-row" key={`${code}-${row[0]}`}>
+    {row.map((value, index) => {
+      if (shouldBeHidden(showPercentages, value)) return null
+      if (index === row.length - 2 && otherCountriesStats)
+        return getOtherCountriesCell({
+          combinedProgramme,
+          index,
+          otherCountriesStats,
+          row,
+          studyprogramme: code,
+          value,
+          year: row[0],
+        })
+      return (
+        <Table.Cell
+          className={getCellClass(row[0])}
+          // eslint-disable-next-line react/no-array-index-key
+          key={`${code}-${row[0]}-${index}`}
+          style={combinedProgramme ? getStyleForCombined(index) : getStyleForBasic(index)}
+          textAlign="left"
+        >
+          {value}
+          {index === 0 &&
+            (fullAccessToStudentData ||
+              allRights.includes(studyprogramme) ||
+              allRights.includes(combinedProgramme)) && (
+              <PopulationLink
+                combinedProgramme={combinedProgramme}
+                studyprogramme={studyprogramme}
+                studytrack={code}
+                year={row[0]}
+                years={calendarYears}
+              />
+            )}
+        </Table.Cell>
+      )
+    })}
+  </Table.Row>
+)
 
 const getRow = ({
   allRights,
@@ -160,6 +146,7 @@ const getRow = ({
   fullAccessToStudentData,
   otherCountriesStats,
   row,
+  index: yearIndex,
   setShow,
   show,
   showPercentages,
@@ -172,7 +159,7 @@ const getRow = ({
 
   if (years.includes(row[0])) {
     return (
-      <Table.Row className="header-row" key={getKey(row[0])}>
+      <Table.Row className="header-row" key={`${yearIndex}-${row[0]}`}>
         {row.map((value, index) => {
           if (shouldBeHidden(showPercentages, value)) return null
           if (index === 0)
@@ -188,7 +175,7 @@ const getRow = ({
               yearlyData,
             })
           if (index === row.length - 2 && otherCountriesStats)
-            return getCountriesPopup({
+            return getOtherCountriesCell({
               combinedProgramme,
               index,
               otherCountriesStats,
@@ -214,12 +201,13 @@ const getRow = ({
       : `${getTextIn(studytracks[correctStudytrack])}, ${correctStudytrack}`
 
   return (
-    <Table.Row className="regular-row" key={getKey(row[0])}>
+    <Table.Row className="regular-row" key={title}>
       {row.map((value, index) => {
         if (shouldBeHidden(showPercentages, value)) return null
         if (index === 0) {
           return (
-            <Table.Cell key={getKey(row[0])} style={{ paddingLeft: '50px' }} textAlign="left">
+            // eslint-disable-next-line react/no-array-index-key
+            <Table.Cell key={`${title}-${index}`} style={{ paddingLeft: '50px' }} textAlign="left">
               {title}
               {(fullAccessToStudentData ||
                 allRights.includes(studyprogramme) ||
@@ -236,7 +224,7 @@ const getRow = ({
           )
         }
         if (index === row.length - 2 && otherCountriesStats) {
-          return getCountriesPopup({
+          return getOtherCountriesCell({
             combinedProgramme,
             index,
             otherCountriesStats,
