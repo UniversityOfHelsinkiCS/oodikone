@@ -3,7 +3,7 @@ import { utils, writeFile } from 'xlsx'
 import { getTimestamp } from '@/util/timeAndDate'
 import { sortProgrammeKeys } from './facultyHelpers'
 
-export const downloadStudentTableCsv = (studentStats, programmeNames, faculty, sortedkeys, getTextIn) => {
+export const downloadStudentTable = (studentStats, programmeNames, faculty, sortedkeys, getTextIn) => {
   const book = utils.book_new()
   const tableHeaders = studentStats.data.titles.slice(1)
   const countriesExtra = studentStats.data.facultyTableStatsExtra
@@ -28,15 +28,15 @@ export const downloadStudentTableCsv = (studentStats, programmeNames, faculty, s
     )
   }
 
-  const tableStatsAsCsv = processTableData(
+  const tableStats = processTableData(
     years.map(year => studentStats.data.facultyTableStats[year]),
     tableHeaders
   )
-  const tableSheet = utils.json_to_sheet(tableStatsAsCsv)
+  const tableSheet = utils.json_to_sheet(tableStats)
   utils.book_append_sheet(book, tableSheet, 'TotalTableStats')
 
   const programmeStats = studentStats?.data?.programmeStats || {}
-  const progressStatsToCsv = sortedkeys.reduce(
+  const progressStats = sortedkeys.reduce(
     (results, programme) => [
       ...results,
       ...Object.keys(programmeStats[programme]).map((yearRow, yearIndex) => {
@@ -50,7 +50,7 @@ export const downloadStudentTableCsv = (studentStats, programmeNames, faculty, s
     ],
     []
   )
-  const sheet = utils.json_to_sheet(progressStatsToCsv)
+  const sheet = utils.json_to_sheet(progressStats)
   utils.book_append_sheet(book, sheet, 'FacultyProgrammeStats')
 
   const countriesHeadersForEachYear = years.reduce(
@@ -105,7 +105,7 @@ export const downloadStudentTableCsv = (studentStats, programmeNames, faculty, s
   writeFile(book, `oodikone_${faculty.code}_programme_stats_${getTimestamp()}.xlsx`)
 }
 
-export const downloadProgressTableCsv = (progressStats, programmeNames, faculty, getTextIn) => {
+export const downloadProgressTable = (progressStats, programmeNames, faculty, getTextIn) => {
   const bachelorStats = progressStats?.bachelorStats
   const bachelorMasterStats = progressStats?.bachelorMasterStats
   const masterStats = progressStats?.masterStats
@@ -131,13 +131,13 @@ export const downloadProgressTableCsv = (progressStats, programmeNames, faculty,
   tableData.forEach(tableStats => {
     counter += 1
     if (tableStats.length > 0) {
-      const tableStatsAsCsv = tableStats.map(yearArray =>
+      const tableStatsAsXlsx = tableStats.map(yearArray =>
         yearArray.reduce(
           (result, value, yearIndex) => ({ ...result, [tableHeadersData[counter][yearIndex]]: value }),
           {}
         )
       )
-      const tableSheet = utils.json_to_sheet(tableStatsAsCsv)
+      const tableSheet = utils.json_to_sheet(tableStatsAsXlsx)
       utils.book_append_sheet(book, tableSheet, `TableStats-${sheetNames[counter]}`)
     }
   })
@@ -164,7 +164,7 @@ export const downloadProgressTableCsv = (progressStats, programmeNames, faculty,
   programmeData.forEach(programmes => {
     counter += 1
     if (programmes) {
-      const progressStatsToCsv = sortProgrammeKeys(Object.keys(programmes), faculty.code).reduce(
+      const progressStats = sortProgrammeKeys(Object.keys(programmes), faculty.code).reduce(
         (results, programme) => [
           ...results,
           ...programmes[programme].map((yearRow, yearIndex) => {
@@ -188,7 +188,7 @@ export const downloadProgressTableCsv = (progressStats, programmeNames, faculty,
         ],
         []
       )
-      const sheet = utils.json_to_sheet(progressStatsToCsv)
+      const sheet = utils.json_to_sheet(progressStats)
       utils.book_append_sheet(book, sheet, sheetNames[counter])
     }
   })

@@ -3,10 +3,7 @@ import { Button, Divider, Loader, Message, Popup } from 'semantic-ui-react'
 import { getCreditCategories } from '@/common'
 import { facultyToolTips } from '@/common/InfoToolTips'
 import { sortProgrammeKeys } from '@/components/FacultyStatistics/facultyHelpers'
-import {
-  downloadProgressTableCsv,
-  downloadStudentTableCsv,
-} from '@/components/FacultyStatistics/xlsxFileDownloadHelper'
+import { downloadProgressTable, downloadStudentTable } from '@/components/FacultyStatistics/xlsxFileDownloadHelper'
 import '@/components/FacultyStatistics/faculty.css'
 import { InfoBox } from '@/components/Info/InfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -207,7 +204,7 @@ export const FacultyProgrammeOverview = ({
                     floated="right"
                     icon="download"
                     onClick={() =>
-                      downloadStudentTableCsv(
+                      downloadStudentTable(
                         studentStats,
                         studentStats?.data?.programmeNames,
                         faculty,
@@ -250,7 +247,7 @@ export const FacultyProgrammeOverview = ({
                     floated="right"
                     icon="download"
                     onClick={() =>
-                      downloadProgressTableCsv(
+                      downloadProgressTable(
                         {
                           ...progressStats,
                           bachelorStats,
