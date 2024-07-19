@@ -107,53 +107,32 @@ export const studyProgrammeToolTips = {
 
   **Mikäli valittuna on maisteriohjelma:** Sisältää kandiohjelmat, joissa tämän ohjelman opiskelijat ovat opiskelleet ennen tuloaan maisteriohjelmaan. Vuosijaottelu on tehty maisteriohjelmassa aloittamisen perusteella.
   `,
-  StudytrackOverview: `  
-  Kuvaa koulutusohjelman kyseiseen ohjelmaan opinto-oikeudella varustettujen opiskelijoiden etenemistä opintopisteissä mitattuna. Esimerkiksi 2020-2021 aloittaneiden opintopistejakaumaa.
-  
-  HUOM!
-  - **All** Sisältää kaikki opiskelijat, joiden opinto-oikeudella on aloituspäivä kyseisenä vuonna, riippumatta siitä, onko opiskelija aloittanut opiskelemaan ko. vuonna. 
-  - **Started studying** Sisältää kyseisenä vuonna aloittaneet opiskelijat (aloitetut opinto-oikeudet). Opiskelija on myös voinut myöhemmin keskeyttää opintonsa tai siirtyä pois ohjelmasta.
-  - **Inactive** Sisältää kaikki opinto-oikeudet, jotka ovat alkaneet kyseisenä vuonna, mutta jotka ovat sittemmin vanhentuneet ilman, että opiskelija on valmistunut ohjelmasta. Sisältää myös opinto-oikeudet,
-  joissa opiskelija on laiminlyönyt ilmoittautumisen tälle lukukaudelle.
+  StudytrackOverview: `
+  - **All**: Opiskelijat, joiden opiskeluoikeus on alkanut kyseisenä lukuvuonna. Jos valittuna on maisteriohjelma, kandiohjelmasta maisteriohjelmaan siirtyneet opiskelijat lasketaan sen lukuvuoden opiskelijoihin, jolloin he ovat siirtyneet maisteriohjelmaan. 
+  - **Started studying**: Opiskelijat, jotka ovat ilmoittautuneet läsnäolevaksi samana lukuvuonna kuin heidän opiskeluoikeutensa on alkanut. Opiskelija on voinut myöhemmin keskeyttää opintonsa tai siirtyä pois ohjelmasta.
 
-  Kenttien **Currently enrolled, Absent, Inactive** ja **Graduated** arvot tuottavat yhteenlaskettuna kentän **All** arvon.
-  
-  Mukana ovat oletusarvoisesti myös ohjelmaan ja siitä pois siirtyneet opiskelijat.
-  Taulukko näyttää myös näistä opiskelijoista miesten, naisten ja suomalaisten osuudet sekä valmistuneiden määrän. 
+  **Current status** kuvastaa opiskelijoiden tilannetta tällä hetkellä.
+  - **Present**: Käynnissä olevalle lukukaudelle **läsnäolevaksi** ilmoittautuneet opiskelijat, jotka eivät ole valmistuneet koulutusohjelmasta
+  - **Absent**: Käynnissä olevalle lukukaudelle **poissaolevaksi** ilmoittautuneet opiskelijat, jotka eivät ole valmistuneet koulutusohjelmasta
+  - **Graduated**: Koulutusohjelmasta valmistuneet opiskelijat
+  - **Inactive**: Opiskelijat, jotka eivät ole valmistuneet koulutusohjelmasta eivätkä ilmoittautuneet läsnä- tai poissaolevaksi käynnissä olevalle lukukaudelle
 
-  Yläosan valikosta on mahdollista valita tarkasteluun yhden opintosuunnan opiskelijat. Sekä opiskelijoiden yleistiedot että edistyminen opintopisteittäin
-  kuvaavat tällöin kyseisen opintosuunnan opiskelijoita.
-  `,
-  StudytrackOverviewCombinedProgramme: `  
-  Kuvaa koulutusohjelman kyseiseen ohjelmaan opinto-oikeudella varustettujen opiskelijoiden etenemistä opintopisteissä mitattuna. Esimerkiksi 2020-2021 aloittaneiden opintopistejakaumaa.
-  
-  HUOM!
-  - **All** Sisältää kaikki opiskelijat, joiden opinto-oikeudella on aloituspäivä kyseisenä vuonna, riippumatta siitä, onko opiskelija aloittanut opiskelemaan ko. vuonna. 
-  - **Started studying** Sisältää kaikki opiskelijat, jotka ovat aloittaneet opiskelemaan koulutusohjelmassa kyseisenä lukuvuonna.
-  - **Inactive** Sisältää kaikki opinto-oikeudet, jotka ovat alkaneet kyseisenä vuonna, mutta jotka ovat sittemmin vanhentuneet ilman, että opiskelija on valmistunut ohjelmasta. Sisältää myös opinto-oikeudet,
-  joissa opiskelija on laiminlyönyt ilmoittautumisen tälle lukukaudelle.
+  Lukukausi-ilmoittautumisissa huomioidaan vain se opiskeluoikeus, joka liittyy tarkasteltavaan koulutusohjelmaan. Vaikka opiskelija olisi ilmoittautunut toiseen opiskeluoikeuteen läsnäolevaksi, mutta hän on laiminlyönyt ilmoittautumisen tarkasteltavaan koulutusohjelmaan liittyvään opiskeluoikeuteen, hänet lasketaan ryhmään ”Inactive”.
 
-  - Kenttien **Currently enrolled, Absent, Inactive** ja **Graduated licentiate** (tai **Graduated master**) arvot tuottavat yhteenlaskettuna kentän **All** arvon.
-  - Lisäksi kenttien **Currently enrolled, Absent, Inactive** arvot sisältävät opiskelijat, joilla on kyseinen status riippumatta siitä, onko opiskelija kandi- vai maisterivaiheen opiskelija.
-  
-  Mukana ovat oletusarvoisesti myös ohjelmaan ja siitä pois siirtyneet opiskelijat.
-  Taulukko näyttää myös näistä opiskelijoista miesten, naisten ja suomalaisten osuudet sekä valmistuneiden määrän. 
+  Paksummilla pystyviivoilla eroteltujen kategorioiden (**Current status**, **Gender**, **Countries**) sarakkeet tuottavat yhteenlaskettuna kentän **All** arvon.
 
-  Yläosan valikosta on mahdollista valita tarkasteluun yhden opintosuunnan opiskelijat. Sekä opiskelijoiden yleistiedot että edistyminen opintopisteittäin
-  kuvaavat tällöin kyseisen opintosuunnan opiskelijoita.
+  Jos sivun yläosassa on valittuna ”All studyrights” (oletus), mukana ovat myös ohjelmaan siirtyneet opiskelijat.
+
+  Yläosan valikosta on mahdollista valita tarkasteluun yhden opintosuunnan opiskelijat. Luvut kuvaavat tällöin kyseisen opintosuunnan opiskelijoita.
   `,
   StudytrackProgress: `
-  Kuvaa koulutusohjelman kyseiseen ohjelmaan opinto-oikeudella varustettujen opiskelijoiden etenemistä opintopisteissä mitattuna. Esimerkiksi 2020-2021 aloittaneiden opintopistejakaumaa.
-  
-  Pisterajat toimivat siten, että jos välit ovat esimerkiksi 20-40 ja 40-60, niin 40 opintopistettä saanut opiskelija sijoittuu ainoastaan 40-60 väliin. 39.9 saanut sijoittuu 20-40 väliin.
+  Kuvaa koulutusohjelmassa tiettynä lukuvuonna aloittaneiden opiskelijoiden etenemistä opintopisteissä mitattuna. Esimerkiksi kategoriaan 20–40 kuuluvat opiskelijat, jotka ovat suorittaneet **vähintään 20**, mutta **alle 40** opintopistettä.
 
-  HUOM! Mukana ovat myös muuhun kuin valittuun koulutusohjelmaan tai opintosuuntaan tehdyt opintopisteet.
+  Opintopistekertymään on laskettu kaikki suoritukset, jotka opiskelija on suorittanut koulutusohjelmaan siirryttyään. Myös hyväksiluetut ja muuhun kuin valittuun koulutusohjelmaan tai opintosuuntaan tehdyt suoritukset lasketaan mukaan. Esimerkiksi jos opiskelija on valmistunut kandiohjelmasta 20.6.2020 ja siirtynyt maisteriohjelmaan seuraavana päivänä, ennen 21.6.2020 tehtyjä suorituksia ei huomioida opintopistekertymässä.
 
-  Vain 1.8. alkaen rekisteröidyt suoritukset ovat mukana. Esimerkiksi jos opiskelija on aloittanut ohjelmassa 10.8.2020 ja hänellä on ennen 1.8.2020 rekisteröityjä suorituksia, niitä ei huomioida lukuvuoden 2020-2021 opintopistekertymässä.
+  Jos sivun yläosassa on valittuna ”All studyrights” (oletus), mukana ovat myös ohjelmaan siirtyneet opiskelijat.
 
-  Mukana ovat oletusarvoisesti myös ohjelmaan siirtyneet opiskelijat.
-
-  Mikäli yläosan valikosta valittuna on jokin tietty opintosuunta, myös nämä graafit ja taulukot kuvaavat kyseisen opintosuunnan opiskelijoita.    
+  Mikäli sivun yläosan valikosta on valittuna jokin tietty opintosuunta, myös nämä tilastot kuvaavat vain kyseisen opintosuunnan opiskelijoita.    
   `,
   Name: `
   Pitkät kurssinimet on lyhennetty. Näet ne kokonaan laittamalla hiiren nimen yläpuolelle.
@@ -162,3 +141,17 @@ export const studyProgrammeToolTips = {
   Sisältää opiskelijat, jotka ovat ilmoittautuneet kurssille, mutta eivät ole suorittaneet sitä ja opiskelijat, jotka ovat saaneet hylätyn arvosanan.
   `,
 }
+
+studyProgrammeToolTips.StudytrackOverviewCombinedProgramme = studyProgrammeToolTips.StudytrackOverview.replace(
+  'Jos valittuna on maisteriohjelma, kandiohjelmasta maisteriohjelmaan siirtyneet opiskelijat lasketaan sen lukuvuoden opiskelijoihin, jolloin he ovat siirtyneet maisteriohjelmaan.',
+  ''
+)
+  .replace(
+    '- **Graduated**: Koulutusohjelmasta valmistuneet opiskelijat',
+    '- **Graduated bachelor**: Kandidaatiksi valmistuneet opiskelijat\n  - **Graduated licentiate**: Lisensiaatiksi valmistuneet opiskelijat'
+  )
+  .replaceAll('valmistuneet koulutusohjelmasta', 'valmistuneet lisensiaatiksi')
+  .replace(
+    'kentän **All** arvon.',
+    'kentän **All** arvon (lukuun ottamatta *Current status* -kategorian **Graduated bachelor** -saraketta).'
+  )
