@@ -1,6 +1,6 @@
 const router = require('express').Router()
 
-const { isFaculty, providersOfFaculty } = require('../services/organizations')
+const { getProvidersOfFaculty, isFaculty } = require('../services/organizations')
 const { bySearchTerm, yearlyStatistics, teacherStats } = require('../services/teachers')
 const { ID, getTeacherStats, findAndSaveTeachers, getCategoriesAndYears } = require('../services/topteachers')
 const { getFullStudyProgrammeRights, splitByEmptySpace } = require('../util')
@@ -65,7 +65,7 @@ router.get('/stats', async (req, res) => {
     ...new Set(
       await providers.reduce(
         async (acc, curr) =>
-          isFaculty(curr) ? [...(await acc), ...(await providersOfFaculty(curr))] : [...(await acc), curr],
+          isFaculty(curr) ? [...(await acc), ...(await getProvidersOfFaculty(curr))] : [...(await acc), curr],
         []
       )
     ),
