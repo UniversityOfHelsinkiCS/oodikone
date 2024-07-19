@@ -2,7 +2,7 @@ import moment from 'moment'
 
 import { Credit, SISStudyRight, SISStudyRightElement } from '../../models'
 import { GenderCode, EnrollmentType, ExtentCode } from '../../types'
-import { keysOf } from '../../util'
+import { createLocaleComparator, keysOf } from '../../util'
 import { countTimeCategories } from '../graduationHelpers'
 import { getSemestersAndYears } from '../semesters'
 import { getDateOfFirstSemesterPresent } from './studyProgrammeBasics'
@@ -79,6 +79,9 @@ const getGraduationTimeStats = (
         }
         ;(finalGraduationTimes[programmeOrTrack] as ProgrammeOrStudyTrackGraduationStats).medians[type].push(final)
       }
+      ;(finalGraduationTimes[programmeOrTrack] as ProgrammeOrStudyTrackGraduationStats).medians[type].sort(
+        createLocaleComparator('name', true)
+      )
     }
   }
 
