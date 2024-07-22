@@ -65,40 +65,22 @@ export const studyProgrammeToolTips = {
   AverageGraduationTimes: `
   Yksittäinen palkki kertoo, kuinka moni opiskelija on valmistunut kyseisenä vuonna/lukuvuonna.
 
-  Vihreä **vaakapalkki** kuvaa tavoiteajassa (tai alle) valmistuneita, keltainen palkki korkeintaan vuoden tavoiteajasta myöhässä valmistuneita
-  ja punainen yli vuoden tavoiteajan ylittäneitä.
+  Vihreä **vaakapalkki** kuvaa tavoiteajassa valmistuneita, keltainen 12 kuukauden sisällä tavoiteajasta valmistuneita ja punainen yli 12 kuukautta tavoiteajan ylittäneitä.
 
-  **Breakdown**: Näyttää, kuinka moni kyseisenä kalenteri- tai lukuvuotena valmistuneista opiskelijoista valmistui ajallaan, korkeintaan vuoden myöhässä tavoiteajasta tai tätä myöhemmin.
+  **Breakdown**: Näyttää, kuinka moni kyseisenä kalenteri- tai lukuvuotena valmistuneista opiskelijoista valmistui tavoiteajassa, 12 kuukauden sisällä tavoiteajasta tai tätä myöhemmin.
 
-  **Median time**: Näyttää kyseisenä kalenteri- tai lukuvuotena valmistuneiden opiskelijoiden opintojen keston **mediaanin** kuukausina.
-  Vihreä **katkoviiva** kuvastaa tavoiteaikaa. Keltainen katkoviiva on tavoiteaika + yksi vuosi.\n
+  **Median time**: Näyttää kyseisenä kalenteri- tai lukuvuotena valmistuneiden opiskelijoiden opintojen keston **mediaanin** kuukausina. Vihreä **katkoviiva** kuvastaa tavoiteaikaa. Keltainen katkoviiva on tavoiteaika + 12 kuukautta.
 
   Valmistumisajoista on vähennetty lakisääteiset poissaolot.`,
   AverageGraduationTimesStudytracks: `
   Yksittäinen palkki kertoo, kuinka moni kyseisenä **lukuvuotena ALOITTANEISTA** opiskelijoista on valmistunut.
 
-  Vihreä **vaakapalkki** kuvaa tavoiteajassa (tai alle) valmistuneita, keltainen palkki korkeintaan vuoden tavoiteajasta myöhässä valmistuneita
-  ja punainen yli vuoden tavoiteajan ylittäneitä.
+  Vihreä **vaakapalkki** kuvaa tavoiteajassa valmistuneita, keltainen 12 kuukauden sisällä tavoiteajasta valmistuneita ja punainen yli 12 kuukautta tavoiteajan ylittäneitä.
 
-  **Breakdown**: Näyttää, kuinka moni kyseisenä lukuvuotena aloittaneista, jo valmistuneista, opiskelijoista on valmistui ajallaan, korkeintaan vuoden myöhässä tavoiteajasta tai tätä myöhemmin.
+  **Breakdown**: Näyttää, kuinka moni kyseisenä lukuvuotena aloittaneista, jo valmistuneista, opiskelijoista valmistui tavoiteajassa, 12 kuukauden sisällä tavoiteajasta tai tätä myöhemmin.
 
-  **Median time**: Näyttää valmistuneiden opiskelijoiden opintojen keston **mediaanin** kuukausina sekä heidän prosentuaalisen osuutensa koko vuosikurssista.
-  Vihreä **katkoviiva** kuvastaa tavoiteaikaa. Keltainen katkoviiva on tavoiteaika + yksi vuosi.
-  
-  
-  Valmistumisajoista on vähennetty lakisääteiset poissaolot.`,
-  AverageGraduationTimesStudytracksMaster: `
-  Yksittäinen palkki kertoo, kuinka moni kyseisenä **lukuvuotena ALOITTANEISTA** opiskelijoista on valmistunut.
-  **Bachelor + master studyright** kuvaajassa vuosi on kandiohjelman aloitusvuosi.
+  **Median time**: Näyttää valmistuneiden opiskelijoiden opintojen keston **mediaanin** kuukausina sekä heidän prosentuaalisen osuutensa koko vuosikurssista. Vihreä **katkoviiva** kuvastaa tavoiteaikaa. Keltainen katkoviiva on tavoiteaika + 12 kuukautta.
 
-  Vihreä **vaakapalkki** kuvaa tavoiteajassa (tai alle) valmistuneita, keltainen palkki korkeintaan vuoden tavoiteajasta myöhässä valmistuneita
-  ja punainen yli vuoden tavoiteajan ylittäneitä.
-
-  **Breakdown**: Näyttää, kuinka moni kyseisenä lukuvuotena aloittaneista, jo valmistuneista, opiskelijoista on valmistui ajallaan, korkeintaan vuoden myöhässä tavoiteajasta tai tätä myöhemmin.
-
-  **Median time**: Näyttää valmistuneiden opiskelijoiden opintojen keston **mediaanin** kuukausina sekä heidän prosentuaalisen osuutensa koko vuosikurssista.
-  Vihreä **katkoviiva** kuvastaa tavoiteaikaa. Keltainen katkoviiva on tavoiteaika + yksi vuosi.
-  
   Valmistumisajoista on vähennetty lakisääteiset poissaolot.`,
   ProgrammesBeforeOrAfter: `
   **Mikäli valittuna on kandiohjelma:** Sisältää maisteriohjelmat, joissa tämän kandiohjelman opiskelijat ovat aloittaneet valmistuttuaan kandeiksi. Vuosijaottelu on tehty maisteriohjelmassa aloittamisen perusteella.
@@ -154,4 +136,18 @@ studyProgrammeToolTips.StudytrackOverviewCombinedProgramme = studyProgrammeToolT
   .replace(
     'kentän **All** arvon.',
     'kentän **All** arvon (lukuun ottamatta *Current status* -kategorian **Graduated bachelor** -saraketta).'
+  )
+
+studyProgrammeToolTips.StudytrackProgressEvaluationOverview = studyProgrammeToolTips.StudytrackProgress.replace(
+  'Jos sivun yläosassa on valittuna ”All studyrights” (oletus), mukana ovat myös ohjelmaan siirtyneet opiskelijat.',
+  ''
+).replace(
+  'Mikäli sivun yläosan valikosta on valittuna jokin tietty opintosuunta, myös nämä tilastot kuvaavat vain kyseisen opintosuunnan opiskelijoita.',
+  ''
+)
+
+studyProgrammeToolTips.AverageGraduationTimesStudytracksMaster =
+  studyProgrammeToolTips.AverageGraduationTimesStudytracks.replace(
+    'on valmistunut.',
+    'on valmistunut.\n\n**Bachelor + master studyright** -kuvaajassa vuosi on kandiohjelman aloitusvuosi.'
   )

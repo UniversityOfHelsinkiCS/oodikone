@@ -119,17 +119,20 @@ export const ProgrammeView = ({ studyprogramme }) => {
                 studytracks; credits produced by the programme; population backgrounds and enrollment statuses.
               </p>
               <p>
-                Access the full Studyprogramme Overview by clicking 'Studyprogramme' in the top navigation bar and then
-                'Overview'. Alternatively, you can select 'Search by class' to explore studyprogrammes by starting class
-                with interactive statistics and visualizations.
+                Access the full Studyprogramme Overview by clicking 'Programmes' in the top navigation bar and then
+                'Overview'. Alternatively, you can select 'Class statistics' to explore studyprogrammes by starting
+                class with interactive statistics and visualizations.
               </p>
               <p>
                 Note that both views have access restrictions. If you can't access either view and feel you should have
-                access, please contact oodikone@helsinki.fi.
+                access, please contact <a href="mailto:oodikone@helsinki.fi">oodikone@helsinki.fi</a>.
               </p>
             </Message>
             <div>
-              {getDivider('Progress of students of the studyprogramme by starting year', 'StudytrackProgress')}
+              {getDivider(
+                'Progress of students of the studyprogramme by starting year',
+                'StudytrackProgressEvaluationOverview'
+              )}
               <Toggle
                 cypress="GraduatedToggle"
                 firstLabel="Graduated included"
