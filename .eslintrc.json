@@ -104,6 +104,12 @@
     "import/resolver": {
       "node": {
         "extensions": [".js", ".jsx", ".ts", ".tsx"]
+      },
+      "eslint-import-resolver-custom-alias": {
+        "alias": {
+          "@": "./services/backend/src"
+        },
+        "extensions": [".js", ".ts"]
       }
     }
   },

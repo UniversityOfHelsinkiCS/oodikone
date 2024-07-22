@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { Router } from 'express'
 
-import { isDev } from '../config'
+import { isDev } from '@/config'
 
 const router = Router()
 
