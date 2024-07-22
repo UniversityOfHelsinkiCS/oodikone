@@ -31,7 +31,6 @@ const studyProgrammeCriteria = require('./routes/studyProgrammeCriteria')
 const studyProgrammePins = require('./routes/studyProgrammePins')
 const tags = require('./routes/tags')
 const teachers = require('./routes/teachers')
-const testRoute = require('./routes/testRoute')
 const university = require('./routes/university')
 const updater = require('./routes/updater')
 const usersToska = require('./routes/users')
@@ -39,7 +38,6 @@ const usersFd = require('./routes/usersFd')
 const initializeSentry = require('./util/sentry')
 
 module.exports = (app, url) => {
-  app.use(`${url}/testroute`, testRoute)
   initializeSentry(app)
 
   app.use(Sentry.Handlers.requestHandler())
