@@ -1,16 +1,16 @@
-import { InferAttributes } from 'sequelize'
-import { AutoIncrement, Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript'
+import { CreationOptional, InferAttributes, InferCreationAttributes } from 'sequelize'
+import { Column, DataType, Model, PrimaryKey, Table, AutoIncrement, Default } from 'sequelize-typescript'
 
 @Table({
   underscored: true,
   modelName: 'excluded_course',
   tableName: 'excluded_courses',
 })
-export class ExcludedCourse extends Model<InferAttributes<ExcludedCourse>> {
+export class ExcludedCourse extends Model<InferAttributes<ExcludedCourse>, InferCreationAttributes<ExcludedCourse>> {
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.INTEGER)
-  id!: number
+  id!: CreationOptional<number>
 
   @Column(DataType.STRING)
   programme_code!: string
@@ -21,9 +21,11 @@ export class ExcludedCourse extends Model<InferAttributes<ExcludedCourse>> {
   @Column(DataType.STRING)
   curriculum_version!: string
 
+  @Default(DataType.NOW)
   @Column(DataType.DATE)
-  createdAt!: Date
+  createdAt!: CreationOptional<Date>
 
+  @Default(DataType.NOW)
   @Column(DataType.DATE)
-  updatedAt!: Date
+  updatedAt!: CreationOptional<Date>
 }

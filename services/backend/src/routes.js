@@ -12,7 +12,7 @@ const shibbolethCharsetMiddleware = require('./middleware/shibbolethCharsetMiddl
 const changelog = require('./routes/changelog').default
 const closeToGraduation = require('./routes/closeToGraduation').default
 const completedCoursesSearch = require('./routes/completedCoursesSearch')
-const courseExclusions = require('./routes/courseExclusions')
+const courseExclusions = require('./routes/courseExclusions').default
 const courses = require('./routes/courses')
 const customOpenUniSearch = require('./routes/customOpenUniSearch')
 const customPopulationSearch = require('./routes/customPopulationSearch')
@@ -69,7 +69,6 @@ module.exports = (app, url) => {
   app.use(`${url}/university`, university)
   app.use(`${url}/updater`, auth.roles(['admin']), updater)
   app.use(`${url}/teachers`, auth.roles(['teachers']), teachers)
-
   if (serviceProvider === 'Toska') {
     app.use(`${url}/users`, usersToska)
   } else {
