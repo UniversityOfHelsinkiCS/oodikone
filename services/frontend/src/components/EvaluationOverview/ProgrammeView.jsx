@@ -159,16 +159,14 @@ export const ProgrammeView = ({ studyprogramme }) => {
                   setValue={setShowMedian}
                   value={showMedian}
                 />
-                <div className="toggle-container">
-                  <Toggle
-                    cypress="YearToggle"
-                    firstLabel="Calendar year"
-                    secondLabel="Academic year"
-                    setValue={setAcademicYear}
-                    toolTips={studyProgrammeToolTips.YearToggle}
-                    value={academicYear}
-                  />
-                </div>
+                <Toggle
+                  cypress="YearToggle"
+                  firstLabel="Calendar year"
+                  secondLabel="Academic year"
+                  setValue={setAcademicYear}
+                  toolTips={studyProgrammeToolTips.YearToggle}
+                  value={academicYear}
+                />
               </div>
               <div className={`section-container${doCombo ? '' : '-centered'}`}>
                 {showMedian ? displayMedian() : displayBreakdown()}
