@@ -57,6 +57,10 @@ const toskaUserMiddleware = async (req, _res, next) => {
     user = await getUser({ username, name, email, iamGroups, specialGroup, sisId, access })
   }
 
+  if (!user) {
+    throw new ApplicationError(`Username ${username} not found.`, 403, { logoutUrl })
+  }
+
   Sentry.setUser({ username: user.mockedBy ?? username })
 
   req.user = user

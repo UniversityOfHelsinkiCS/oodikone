@@ -4,6 +4,7 @@ import { InferAttributes } from 'sequelize'
 import { User } from '../models/user'
 import { DetailedProgrammeRights } from './detailedProgrammeRights'
 import { Language } from './language'
+import { Role } from './role'
 
 export type ExpandedUser = InferAttributes<User> & {
   iamGroups: string[]
@@ -19,7 +20,7 @@ export type FormattedUser = {
   language: Language
   sisPersonId: string
   email: string
-  roles: string[]
+  roles: Role[]
   studentsUserCanAccess: string[]
   isAdmin: boolean
   programmeRights: DetailedProgrammeRights[]

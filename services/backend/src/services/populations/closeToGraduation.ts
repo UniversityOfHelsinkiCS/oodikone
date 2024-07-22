@@ -229,7 +229,7 @@ export const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =
       { bachelor: [] as AccumulatorType[], masterAndLicentiate: [] as AccumulatorType[] }
     )
 
-export const getCloseToGraduationData = async studentNumbers => {
+export const getCloseToGraduationData = async (studentNumbers?: string[]) => {
   if (!studentNumbers) {
     const dataOnRedis = await redisClient.getAsync(CLOSE_TO_GRADUATION_REDIS_KEY)
     if (dataOnRedis) {
