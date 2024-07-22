@@ -1,4 +1,5 @@
 /* eslint-disable import/no-cycle */
+import { InferAttributes } from 'sequelize'
 import { Column, CreatedAt, DataType, HasMany, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
 import { ExtentCode } from '../types'
@@ -9,22 +10,22 @@ import { Studyright } from './studyright'
   modelName: 'studyright_extent',
   tableName: 'studyright_extents',
 })
-export class StudyrightExtent extends Model {
+export class StudyrightExtent extends Model<InferAttributes<StudyrightExtent>> {
   @PrimaryKey
   @Column(DataType.INTEGER)
-  extentcode: ExtentCode
+  extentcode!: ExtentCode
 
   @Column(DataType.STRING)
-  name: string
+  name!: string
 
   @HasMany(() => Studyright, { foreignKey: 'extentcode', sourceKey: 'extentcode' })
-  studyrights: Studyright[]
+  studyrights!: Studyright[]
 
   @CreatedAt
   @Column(DataType.DATE)
-  createdAt: Date
+  createdAt!: Date
 
   @UpdatedAt
   @Column(DataType.DATE)
-  updatedAt: Date
+  updatedAt!: Date
 }

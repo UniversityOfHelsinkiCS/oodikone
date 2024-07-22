@@ -1,4 +1,5 @@
 /* eslint-disable import/no-cycle */
+import { InferAttributes } from 'sequelize'
 import { BelongsToMany, Column, CreatedAt, DataType, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
 import { Credit } from './credit'
@@ -9,22 +10,22 @@ import { CreditTeacher } from './creditTeacher'
   modelName: 'teacher',
   tableName: 'teacher',
 })
-export class Teacher extends Model {
+export class Teacher extends Model<InferAttributes<Teacher>> {
   @PrimaryKey
   @Column(DataType.STRING)
-  id: string
+  id!: string
 
   @Column(DataType.STRING)
-  name: string
+  name!: string
 
   @BelongsToMany(() => Credit, () => CreditTeacher)
-  credits: Credit[]
+  credits!: Credit[]
 
   @CreatedAt
   @Column(DataType.DATE)
-  createdAt: Date
+  createdAt!: Date
 
   @UpdatedAt
   @Column(DataType.DATE)
-  updatedAt: Date
+  updatedAt!: Date
 }

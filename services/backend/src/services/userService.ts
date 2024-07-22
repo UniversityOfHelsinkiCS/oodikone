@@ -1,11 +1,12 @@
 import { isEqual, keyBy, omit, uniq } from 'lodash'
 import { LRUCache } from 'lru-cache'
+import { InferAttributes } from 'sequelize'
 
 import { serviceProvider } from '../config'
 import { roles } from '../config/roles'
 import { sequelizeUser } from '../database/connection'
 import { User } from '../models/user'
-import { DetailedProgrammeRights, Role } from '../types'
+import { DetailedProgrammeRights, ExpandedUser, FormattedUser, Role } from '../types'
 import { createLocaleComparator, getFullStudyProgrammeRights, hasFullAccessToStudentData } from '../util'
 import jami from '../util/jami'
 import mami from '../util/mami'
@@ -56,7 +57,7 @@ export const modifyElementDetails = async (id: bigint, codes: string[], enable: 
   userDataCache.delete(user.username)
 }
 
-export const updateUser = async (username: string, fields: Array<Record<string, any>>) => {
+export const updateUser = async (username: string, fields: Partial<Record<keyof InferAttributes<User>, any>>) => {
   const user = await User.findOne({ where: { username } })
   if (!user) {
     throw new Error(`User ${username} not found`)
@@ -101,12 +102,6 @@ const getStudyProgrammeRights = (
   return studyProgrammeRights
 }
 
-type ExpandedUser = User & {
-  iamGroups: string[]
-  mockedBy?: string
-  detailedProgrammeRights: DetailedProgrammeRights[]
-}
-
 const formatUser = async (user: ExpandedUser, getStudentAccess: boolean = true) => {
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(user.detailedProgrammeRights)
   const shouldFetchStudentAccess = getStudentAccess && !hasFullAccessToStudentData(user.roles)
@@ -124,8 +119,8 @@ const formatUser = async (user: ExpandedUser, getStudentAccess: boolean = true) 
     studentsUserCanAccess = uniq(flatStudentNumbers)
   }
 
-  const formattedUser = {
-    id: user.id,
+  const formattedUser: FormattedUser = {
+    id: user.id as unknown as string,
     userId: user.username,
     username: user.username,
     name: user.fullName,
@@ -231,6 +226,7 @@ const basicGetMockedUser = async ({ userToMock, mockedBy }: { userToMock: string
   }
 
   const userFromDb = (await User.findOne({ where: { username: userToMock } }))?.toJSON()
+  if (!userFromDb) return null
   const iamGroups = await getUserIams(userFromDb.sisuPersonId)
   const { access, specialGroup } = await getOrganizationAccess(userFromDb.sisuPersonId, iamGroups)
   const detailedProgrammeRights = getStudyProgrammeRights(access, specialGroup, userFromDb.programmeRights)
@@ -271,7 +267,7 @@ const toskaGetUser = async ({
   const isNewUser = !(await User.findOne({ where: { username } }))
   await User.upsert({ fullName: name, username, email, sisuPersonId: sisId, lastLogin: new Date() })
   await updateAccessGroups(username, iamGroups, specialGroup, sisId)
-  const userFromDb = (await User.findOne({ where: { username } }))?.toJSON()
+  const userFromDb = (await User.findOne({ where: { username } }))!.toJSON()
 
   const detailedProgrammeRights = getStudyProgrammeRights(access, specialGroup, userFromDb.programmeRights)
   const user = await formatUser({ ...userFromDb, iamGroups, detailedProgrammeRights })
@@ -312,6 +308,7 @@ export const addNewUser = async user => {
     email: user.email_address,
     sisuPersonId: user.id,
     roles: [],
+    lastLogin: new Date(),
   })
 }
 

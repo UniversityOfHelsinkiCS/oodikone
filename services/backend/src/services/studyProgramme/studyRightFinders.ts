@@ -33,11 +33,6 @@ export const getStudyRightsInProgramme = async (
       attributes: [],
       where,
     },
-    where: {
-      studentNumber: {
-        [Op.not]: null,
-      },
-    },
   })
 
   const include: Includeable[] = [
@@ -74,24 +69,25 @@ export const getStudyRightsInProgramme = async (
       include,
       where: {
         id: {
-          [Op.in]: studyRights.map(studyRight => studyRight.toJSON<SISStudyRight>().id),
+          [Op.in]: studyRights.map(studyRight => studyRight.toJSON().id),
         },
       },
     })
-  ).map(studyRight => studyRight.toJSON<SISStudyRight>())
+  ).map(studyRight => studyRight.toJSON())
 }
 
-export const getStudyTracksForProgramme = async (studyProgramme: string) =>
-  (
-    await SISStudyRightElement.findAll({
-      attributes: [[fn('DISTINCT', col('study_track')), 'studyTrack']],
-      where: {
-        code: studyProgramme,
-        studyTrack: { [Op.not]: null },
-      },
-    })
-  )
-    .map(studyTrack => studyTrack.toJSON().studyTrack)
+export const getStudyTracksForProgramme = async (studyProgramme: string) => {
+  const result: Array<Pick<SISStudyRightElement, 'studyTrack'>> = await SISStudyRightElement.findAll({
+    attributes: [[fn('DISTINCT', col('study_track')), 'studyTrack']],
+    where: {
+      code: studyProgramme,
+    },
+    raw: true,
+  })
+
+  return result
+    .map(studyTrack => studyTrack.studyTrack)
+    .filter(studyTrack => studyTrack != null)
     .reduce<Record<string, Name | 'All students of the programme'>>(
       (acc, track) => {
         acc[track.code] = track.name
@@ -99,6 +95,7 @@ export const getStudyTracksForProgramme = async (studyProgramme: string) =>
       },
       { [studyProgramme]: 'All students of the programme' }
     )
+}
 
 export const graduatedStudyRights = async (studytrack: string, since: Date, studentnumbers: string[]) =>
   (

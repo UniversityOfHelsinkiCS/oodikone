@@ -1,4 +1,5 @@
 /* eslint-disable import/no-cycle */
+import { InferAttributes } from 'sequelize'
 import {
   BelongsTo,
   Column,
@@ -18,47 +19,47 @@ import { SISStudyRight } from './SISStudyRight'
   underscored: true,
   tableName: 'sis_study_right_elements',
 })
-export class SISStudyRightElement extends Model {
+export class SISStudyRightElement extends Model<InferAttributes<SISStudyRightElement>> {
   @PrimaryKey
   @Column(DataType.STRING)
-  id: string
+  id!: string
 
   @Column(DataType.DATE)
-  startDate: Date
+  startDate!: Date
 
   @Column(DataType.DATE)
-  endDate: Date
+  endDate!: Date
 
   @Column(DataType.BOOLEAN)
-  graduated: boolean
+  graduated!: boolean
 
   @Column(DataType.INTEGER)
-  phase: Phase
+  phase!: Phase
 
   @ForeignKey(() => SISStudyRight)
   @Column(DataType.STRING)
-  studyRightId: string
+  studyRightId!: string
 
   @BelongsTo(() => SISStudyRight, { foreignKey: 'studyRightId' })
-  studyRight: SISStudyRight
+  studyRight!: SISStudyRight
 
   @Column(DataType.STRING)
-  code: string
+  code!: string
 
   @Column(DataType.JSONB)
-  name: Name
+  name!: Name
 
   @Column(DataType.JSONB)
-  studyTrack: StudyTrack
+  studyTrack!: StudyTrack | null
 
   @Column(DataType.STRING)
-  degreeProgrammeType: string
+  degreeProgrammeType!: string
 
   @CreatedAt
   @Column(DataType.DATE)
-  createdAt: Date
+  createdAt!: Date
 
   @UpdatedAt
   @Column(DataType.DATE)
-  updatedAt: Date
+  updatedAt!: Date
 }

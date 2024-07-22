@@ -1,3 +1,4 @@
+import { InferAttributes } from 'sequelize'
 import { AutoIncrement, Column, DataType, Model, PrimaryKey, Table, Unique } from 'sequelize-typescript'
 
 @Table({
@@ -6,19 +7,19 @@ import { AutoIncrement, Column, DataType, Model, PrimaryKey, Table, Unique } fro
   modelName: 'study_guidance_group_tag',
   tableName: 'study_guidance_group_tags',
 })
-export class StudyGuidanceGroupTag extends Model {
+export class StudyGuidanceGroupTag extends Model<InferAttributes<StudyGuidanceGroupTag>> {
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.BIGINT)
-  id: bigint
+  id!: bigint
 
   @Unique
   @Column(DataType.STRING)
-  studyGuidanceGroupId: string
+  studyGuidanceGroupId!: string
 
   @Column(DataType.STRING)
-  studyProgramme: string
+  studyProgramme!: string
 
   @Column(DataType.STRING)
-  year: string
+  year!: string
 }

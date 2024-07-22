@@ -1,4 +1,5 @@
 /* eslint-disable import/no-cycle */
+import { InferAttributes } from 'sequelize'
 import {
   BelongsTo,
   BelongsToMany,
@@ -21,59 +22,59 @@ import { ProgrammeModuleChild } from './programmeModuleChild'
   modelName: 'programme_module',
   tableName: 'programme_modules',
 })
-export class ProgrammeModule extends Model {
+export class ProgrammeModule extends Model<InferAttributes<ProgrammeModule>> {
   @PrimaryKey
   @Column(DataType.STRING)
-  id: string
+  id!: string
 
   @BelongsToMany(() => ProgrammeModule, () => ProgrammeModuleChild, 'child_id')
-  parents: ProgrammeModule[]
+  parents!: ProgrammeModule[]
 
   @BelongsToMany(() => ProgrammeModule, () => ProgrammeModuleChild, 'parent_id')
-  children: ProgrammeModule[]
+  children!: ProgrammeModule[]
 
   @Column(DataType.STRING)
-  group_id: string
+  group_id!: string
 
   @Column(DataType.STRING)
-  code: string
+  code!: string
 
   @Column(DataType.JSONB)
-  name: Name
+  name!: Name
 
   @Column(DataType.STRING)
-  type: 'course' | 'module'
+  type!: 'course' | 'module'
 
   @Column(DataType.INTEGER)
-  order: number
+  order!: number
 
   @Column(DataType.STRING)
-  studyLevel: string
+  studyLevel!: string
 
   @ForeignKey(() => Organization)
   @Column(DataType.STRING)
-  organization_id: string
+  organization_id!: string
 
   @BelongsTo(() => Organization, { foreignKey: 'organization_id' })
-  organization: Organization
+  organization!: Organization
 
   @Column(DataType.DATE)
-  valid_from: Date
+  valid_from!: Date
 
   @Column(DataType.DATE)
-  valid_to: Date
+  valid_to!: Date
 
   @Column(DataType.ARRAY(DataType.STRING))
-  curriculum_period_ids: string[]
+  curriculum_period_ids!: string[]
 
   @Column(DataType.STRING)
-  degreeProgrammeType: string
+  degreeProgrammeType!: string
 
   @CreatedAt
   @Column(DataType.DATE)
-  createdAt: Date
+  createdAt!: Date
 
   @UpdatedAt
   @Column(DataType.DATE)
-  updatedAt: Date
+  updatedAt!: Date
 }

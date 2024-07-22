@@ -18,6 +18,7 @@ const {
 } = require('../services/studyProgramme/studyProgrammeCourses')
 const { getGraduationStatsForStudytrack } = require('../services/studyProgramme/studyProgrammeGraduations')
 const { updateBasicView, updateStudytrackView } = require('../services/studyProgramme/studyProgrammeUpdates')
+const { getStudyRightsInProgramme } = require('../services/studyProgramme/studyRightFinders')
 const { getStudytrackStatsForStudyprogramme } = require('../services/studyProgramme/studyTrackStats')
 const { getProgrammesFromStudyRights } = require('../services/studyrights')
 const logger = require('../util/logger')
@@ -128,6 +129,7 @@ router.get('/:id/studytrackstats', async (req, res) => {
   const data = await getStudytrackStats(code, combinedProgramme, graduated, specialGroups)
   if (data) return res.json(data)
 
+  const studyRightsOfProgramme = await getStudyRightsInProgramme(code, false, true)
   const updated = await getStudytrackStatsForStudyprogramme({
     studyprogramme: code,
     combinedProgramme,
@@ -135,6 +137,7 @@ router.get('/:id/studytrackstats', async (req, res) => {
       graduated: graduated === 'GRADUATED_INCLUDED',
       specialGroups: specialGroups === 'SPECIAL_INCLUDED',
     },
+    studyRightsOfProgramme,
   })
   if (updated) await setStudytrackStats(updated, graduated, specialGroups)
   return res.json(updated)
@@ -211,6 +214,7 @@ router.get('/:id/evaluationstats', async (req, res) => {
 
   let progressData = await getStudytrackStats(code, combinedProgramme, graduated, specialGroups)
   if (!progressData) {
+    const studyRightsOfProgramme = await getStudyRightsInProgramme(code, false, true)
     const updated = await getStudytrackStatsForStudyprogramme({
       studyprogramme: code,
       combinedProgramme,
@@ -218,6 +222,7 @@ router.get('/:id/evaluationstats', async (req, res) => {
         graduated: graduated === 'GRADUATED_INCLUDED',
         specialGroups: specialGroups === 'SPECIAL_INCLUDED',
       },
+      studyRightsOfProgramme,
     })
     if (updated) {
       await setStudytrackStats(updated, graduated, specialGroups)

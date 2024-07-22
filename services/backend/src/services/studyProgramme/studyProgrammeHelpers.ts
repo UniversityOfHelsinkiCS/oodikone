@@ -1,7 +1,10 @@
 import { orderBy } from 'lodash'
+import { InferAttributes } from 'sequelize'
 
 import { programmeCodes } from '../../config/programmeCodes'
+import { SISStudyRight, Studyright } from '../../models'
 import { ExtentCode, Phase } from '../../types'
+import { keysOf } from '../../util'
 import { studentnumbersWithAllStudyrightElements } from '../populations'
 
 export const getCorrectStudentnumbers = async ({
@@ -69,13 +72,13 @@ export const getStatsBasis = (years: Array<string | number>) => {
   }
 }
 
-export const getCorrectStartDate = studyRight => {
+export const getCorrectStartDate = (studyRight: InferAttributes<Studyright>) => {
   return studyRight.studyrightid.slice(-2) === '-2' && studyRight.extentcode === ExtentCode.MASTER
     ? studyRight.studystartdate
     : studyRight.startdate
 }
 
-export const getMedian = (values: number[]): number => {
+export const getMedian = (values: number[]) => {
   if (values.length === 0) {
     return 0
   }
@@ -105,7 +108,7 @@ export function defineYear(date: Date, isAcademicYear: boolean) {
   return `${year} - ${year + 1}`
 }
 
-export const getStartDate = (isAcademicYear: boolean): Date => {
+export const getStartDate = (isAcademicYear: boolean) => {
   return isAcademicYear ? new Date('2017-08-01') : new Date('2017-01-01')
 }
 
@@ -113,7 +116,7 @@ export const alltimeStartDate = new Date('1900-01-01')
 export const alltimeEndDate = new Date()
 
 // In the object programmes should be {bachelorCode: masterCode}
-export const combinedStudyprogrammes = { KH90_001: 'MH90_001' }
+export const combinedStudyprogrammes = { KH90_001: 'MH90_001' } as const
 
 // There are 9 course_unit_types
 // 1. urn:code:course-unit-type:regular
@@ -127,20 +130,17 @@ export const combinedStudyprogrammes = { KH90_001: 'MH90_001' }
 // 9. urn:code:course-unit-type:practical-training-homeland
 // Four of these are thesis types
 
-export const getThesisType = (studyProgramme: string): string[] => {
+export const getThesisType = (studyProgramme: string) => {
   if (studyProgramme.includes('MH') || studyProgramme.includes('ma')) {
     return ['urn:code:course-unit-type:masters-thesis']
   }
   if (studyProgramme.includes('KH') || studyProgramme.includes('ba')) {
     return ['urn:code:course-unit-type:bachelors-thesis']
   }
-  if (/^(T)[0-9]{6}$/.test(studyProgramme)) {
-    return ['urn:code:course-unit-type:doctors-thesis', 'urn:code:course-unit-type:licentiate-thesis']
-  }
   return ['urn:code:course-unit-type:doctors-thesis', 'urn:code:course-unit-type:licentiate-thesis']
 }
 
-export const getPercentage = (value: number, total: number): string => {
+export const getPercentage = (value: any, total: any) => {
   if (typeof value !== 'number' || typeof total !== 'number') return 'NA'
   if (total === 0) return 'NA'
   if (value === 0) return '0 %'
@@ -198,12 +198,12 @@ export const tableTitles = {
     master: ['Graduated bachelor', 'Graduated master'],
   },
   studytracksEnd: ['Men', 'Women', 'Other/\nUnknown', 'Finland', 'Other'],
-}
+} as const
 
-export const mapCodesToIds = data => {
+export const mapCodesToIds = (data: Record<string, any>) => {
   // Add programme id e.g. TKT
-  const keys = Object.keys(programmeCodes)
-  const progs = Object.keys(data)
+  const keys = keysOf(programmeCodes)
+  const progs = Object.keys(data) as Array<keyof typeof programmeCodes>
 
   for (const prog of progs) {
     if (keys.includes(prog)) {
@@ -212,9 +212,10 @@ export const mapCodesToIds = data => {
   }
 }
 
-export const getId = (code: string): string => programmeCodes[code] ?? ''
+export const getId = (code: string) =>
+  code in programmeCodes ? programmeCodes[code as keyof typeof programmeCodes] : ''
 
-export const getGoal = programme => {
+export const getGoal = (programme?: string) => {
   if (!programme) return 0
   if (programme.startsWith('KH') || programme.endsWith('-ba')) {
     return 36
@@ -238,7 +239,7 @@ export const getGoal = programme => {
   return 48 // unknown, likely old doctor or licentiate
 }
 
-export const isRelevantProgramme = (code: string): boolean => {
+export const isRelevantProgramme = (code: string) => {
   return (
     (code.includes('KH') && !code.startsWith('2_KH') && !code.endsWith('_2')) ||
     (code.includes('MH') && !code.startsWith('2_MH') && !code.endsWith('_2')) ||
@@ -246,7 +247,7 @@ export const isRelevantProgramme = (code: string): boolean => {
   )
 }
 
-export const getStudyRightElementsWithPhase = (studyRight, phase: Phase) => {
+export const getStudyRightElementsWithPhase = (studyRight: InferAttributes<SISStudyRight>, phase: Phase) => {
   return orderBy(
     studyRight.studyRightElements.filter(element => element.phase === phase),
     ['startDate'],

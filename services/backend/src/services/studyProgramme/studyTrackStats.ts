@@ -1,8 +1,10 @@
 import moment from 'moment'
+import { InferAttributes } from 'sequelize'
 
 import { Credit, SISStudyRight, SISStudyRightElement } from '../../models'
+import type { SemesterEnrollment } from '../../models/SISStudyRight'
 import { GenderCode, EnrollmentType, ExtentCode } from '../../types'
-import { keysOf } from '../../util'
+import { createLocaleComparator, keysOf } from '../../util'
 import { countTimeCategories } from '../graduationHelpers'
 import { getSemestersAndYears } from '../semesters'
 import { getDateOfFirstSemesterPresent } from './studyProgrammeBasics'
@@ -18,7 +20,7 @@ import {
   defineYear,
   getStudyRightElementsWithPhase,
 } from './studyProgrammeHelpers'
-import { getStudyRightsInProgramme, getStudyTracksForProgramme } from './studyRightFinders'
+import { getStudyTracksForProgramme } from './studyRightFinders'
 
 const getCreditCount = (credits: Credit[], startDate: Date) =>
   credits
@@ -79,6 +81,9 @@ const getGraduationTimeStats = (
         }
         ;(finalGraduationTimes[programmeOrTrack] as ProgrammeOrStudyTrackGraduationStats).medians[type].push(final)
       }
+      ;(finalGraduationTimes[programmeOrTrack] as ProgrammeOrStudyTrackGraduationStats).medians[type].sort(
+        createLocaleComparator('name', true)
+      )
     }
   }
 
@@ -105,6 +110,10 @@ const getEmptyYear = () => ({
 })
 
 type YearlyData = Record<string, ReturnType<typeof getEmptyYear>>
+
+type StudyRightWithSemesterEnrollments = InferAttributes<SISStudyRight> & {
+  semesterEnrollments: SemesterEnrollment[]
+}
 
 const combineStats = (
   years: string[],
@@ -183,10 +192,9 @@ const getMainStatsByTrackAndYear = async (
   studyProgramme: string,
   includeGraduated: boolean,
   includeAllSpecials: boolean,
+  studyRightsOfProgramme: Array<InferAttributes<SISStudyRight>>,
   combinedProgramme?: string
 ) => {
-  const studyRightsOfProgramme = await getStudyRightsInProgramme(studyProgramme, false, true)
-
   const yearlyStats: Record<string, YearlyData> = {}
 
   const { semesters } = await getSemestersAndYears()
@@ -200,7 +208,7 @@ const getMainStatsByTrackAndYear = async (
   const updateCounts = (
     year: string,
     programmeOrStudyTrack: string,
-    studyRight: SISStudyRight,
+    studyRight: StudyRightWithSemesterEnrollments,
     hasTransferredToProgramme: boolean,
     startedInProgramme: Date,
     studyRightElement: SISStudyRightElement
@@ -334,15 +342,21 @@ const getMainStatsByTrackAndYear = async (
   })
 
   for (const studyRight of studyRightsOfProgramme) {
+    if (!studyRight.semesterEnrollments) continue
     const studyRightElement = studyRight.studyRightElements.find(element => element.code === studyProgramme)
     if (!studyRightElement) continue
     if (!includeGraduated && studyRightElement.graduated) {
       continue
     }
 
-    const [firstStudyRightElementWithSamePhase] = getStudyRightElementsWithPhase(studyRight, studyRightElement.phase)
-    const hasTransferredToProgramme = firstStudyRightElementWithSamePhase.code !== studyRightElement.code
-    if (!includeAllSpecials && hasTransferredToProgramme) {
+    const studyRightElementsWithSamePhase = getStudyRightElementsWithPhase(studyRight, studyRightElement.phase)
+    const hasTransferredToProgramme =
+      studyRightElementsWithSamePhase[0].code !== studyRightElement.code && studyRightElement.startDate < new Date()
+    const hasTransferredFromProgramme =
+      studyRightElementsWithSamePhase[studyRightElementsWithSamePhase.length - 1].code !== studyRightElement.code &&
+      studyRightElement.endDate < new Date()
+
+    if (!includeAllSpecials && (hasTransferredToProgramme || hasTransferredFromProgramme)) {
       continue
     }
 
@@ -354,7 +368,7 @@ const getMainStatsByTrackAndYear = async (
     updateCounts(
       startYear,
       studyProgramme,
-      studyRight,
+      studyRight as StudyRightWithSemesterEnrollments,
       hasTransferredToProgramme,
       startedInProgramme,
       studyRightElement
@@ -362,7 +376,14 @@ const getMainStatsByTrackAndYear = async (
 
     const studyTrack = studyRightElement.studyTrack?.code ?? null
     if (studyTrack) {
-      updateCounts(startYear, studyTrack, studyRight, hasTransferredToProgramme, startedInProgramme, studyRightElement)
+      updateCounts(
+        startYear,
+        studyTrack,
+        studyRight as StudyRightWithSemesterEnrollments,
+        hasTransferredToProgramme,
+        startedInProgramme,
+        studyRightElement
+      )
     }
     creditCounts[startYear].push(getCreditCount(studyRight.student.credits, startedInProgramme))
   }
@@ -431,10 +452,12 @@ export const getStudytrackStatsForStudyprogramme = async ({
   studyprogramme,
   combinedProgramme,
   settings,
+  studyRightsOfProgramme,
 }: {
   studyprogramme: string
   combinedProgramme?: string
   settings: { graduated: boolean; specialGroups: boolean }
+  studyRightsOfProgramme: Array<InferAttributes<SISStudyRight>>
 }) => {
   const isAcademicYear = true
   const includeYearsCombined = true
@@ -449,6 +472,7 @@ export const getStudytrackStatsForStudyprogramme = async ({
     studyprogramme,
     settings.graduated,
     settings.specialGroups,
+    studyRightsOfProgramme,
     combinedProgramme
   )
 

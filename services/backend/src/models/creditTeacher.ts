@@ -1,4 +1,5 @@
 /* eslint-disable import/no-cycle */
+import { InferAttributes } from 'sequelize'
 import {
   Column,
   CreatedAt,
@@ -19,25 +20,25 @@ import { Teacher } from './teacher'
   modelName: 'credit_teacher',
   tableName: 'credit_teachers',
 })
-export class CreditTeacher extends Model {
+export class CreditTeacher extends Model<InferAttributes<CreditTeacher>> {
   @PrimaryKey
   @Unique
   @Column(DataType.STRING)
-  composite: string
+  composite!: string
 
   @ForeignKey(() => Credit)
   @Column(DataType.STRING)
-  credit_id: string
+  credit_id!: string
 
   @ForeignKey(() => Teacher)
   @Column(DataType.STRING)
-  teacher_id: string
+  teacher_id!: string
 
   @CreatedAt
   @Column(DataType.DATE)
-  createdAt: Date
+  createdAt!: Date
 
   @UpdatedAt
   @Column(DataType.DATE)
-  updatedAt: Date
+  updatedAt!: Date
 }

@@ -1,3 +1,4 @@
+import { InferAttributes } from 'sequelize'
 import { Column, CreatedAt, DataType, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
 import { CreditTypeCode, Name } from '../types'
@@ -7,19 +8,19 @@ import { CreditTypeCode, Name } from '../types'
   modelName: 'credit_type',
   tableName: 'credit_types',
 })
-export class CreditType extends Model {
+export class CreditType extends Model<InferAttributes<CreditType>> {
   @PrimaryKey
   @Column(DataType.INTEGER)
-  credittypecode: CreditTypeCode
+  credittypecode!: CreditTypeCode
 
   @Column(DataType.JSONB)
-  name: Required<Name>
+  name!: Required<Name>
 
   @CreatedAt
   @Column(DataType.DATE)
-  createdAt: Date
+  createdAt!: Date
 
   @UpdatedAt
   @Column(DataType.DATE)
-  updatedAt: Date
+  updatedAt!: Date
 }

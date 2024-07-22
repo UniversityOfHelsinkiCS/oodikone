@@ -1,4 +1,5 @@
 /* eslint-disable import/no-cycle */
+import { InferAttributes } from 'sequelize'
 import { AutoIncrement, BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript'
 
 import { Student } from '../student'
@@ -8,18 +9,18 @@ import { Tag } from './tag'
   modelName: 'tag_student',
   tableName: 'tag_student',
 })
-export class TagStudent extends Model {
+export class TagStudent extends Model<InferAttributes<TagStudent>> {
   @PrimaryKey
   @AutoIncrement
   @ForeignKey(() => Tag)
   @Column(DataType.BIGINT)
-  tag_id: bigint
+  tag_id!: bigint
 
   @PrimaryKey
   @ForeignKey(() => Student)
   @Column(DataType.STRING)
-  studentnumber: string
+  studentnumber!: string
 
   @BelongsTo(() => Tag)
-  tag: Tag
+  tag!: Tag
 }

@@ -1,4 +1,5 @@
 /* eslint-disable import/no-cycle */
+import { InferAttributes } from 'sequelize'
 import {
   BelongsTo,
   Column,
@@ -20,43 +21,43 @@ import { Studyright } from './studyright'
   modelName: 'studyright_element',
   tableName: 'studyright_elements',
 })
-export class StudyrightElement extends Model {
+export class StudyrightElement extends Model<InferAttributes<StudyrightElement>> {
   @PrimaryKey
   @Column(DataType.STRING)
-  id: string
+  id!: string
 
   @BelongsTo(() => ElementDetail, { foreignKey: 'code', targetKey: 'code' })
-  element_detail: ElementDetail
+  element_detail!: ElementDetail
 
   @Column(DataType.STRING)
-  startdate: string
+  startdate!: string
 
   @Column(DataType.DATE)
-  enddate: Date
+  enddate!: Date
 
   @ForeignKey(() => Studyright)
   @Column(DataType.STRING)
-  studyrightid: string
+  studyrightid!: string
 
   @BelongsTo(() => Studyright, { foreignKey: 'studyrightid', targetKey: 'studyrightid' })
-  studyright: Studyright
+  studyright!: Studyright
 
   @BelongsTo(() => Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
-  student: Student
+  student!: Student
 
   @ForeignKey(() => ElementDetail)
   @Column(DataType.STRING)
-  code: string
+  code!: string
 
   @ForeignKey(() => Student)
   @Column(DataType.STRING)
-  studentnumber: string
+  studentnumber!: string
 
   @CreatedAt
   @Column(DataType.DATE)
-  createdAt: Date
+  createdAt!: Date
 
   @UpdatedAt
   @Column(DataType.DATE)
-  updatedAt: Date
+  updatedAt!: Date
 }

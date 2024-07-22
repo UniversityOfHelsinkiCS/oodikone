@@ -1,3 +1,5 @@
+/* eslint-disable import/no-cycle */
+import { CreationOptional, InferAttributes, InferCreationAttributes } from 'sequelize'
 import { AutoIncrement, Column, DataType, Default, Model, PrimaryKey, Table, Unique } from 'sequelize-typescript'
 
 import { Language, Role } from '../types'
@@ -8,37 +10,37 @@ import { Language, Role } from '../types'
   modelName: 'users',
   tableName: 'users',
 })
-export class User extends Model {
+export class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.BIGINT)
-  id: bigint
+  id!: CreationOptional<bigint>
 
   @Column(DataType.STRING)
-  fullName: string
+  fullName!: string
 
   @Unique
   @Column(DataType.STRING)
-  username: string
+  username!: string
 
   @Column(DataType.STRING)
-  email: string
+  email!: string
 
   @Default('fi')
   @Column(DataType.STRING)
-  language: Language
+  language!: CreationOptional<Language>
 
   @Column(DataType.STRING)
-  sisuPersonId: string
+  sisuPersonId!: string
 
   @Column(DataType.DATE)
-  lastLogin: Date
+  lastLogin!: Date
 
   @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
-  roles: Role[]
+  roles!: CreationOptional<Role[]>
 
   @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
-  programmeRights: string[]
+  programmeRights!: CreationOptional<string[]>
 }

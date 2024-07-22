@@ -1,6 +1,7 @@
 import { indexOf, orderBy } from 'lodash'
 import moment from 'moment'
 
+import type { SemesterEnrollment } from '../../models/SISStudyRight'
 import { ExtentCode, Name, StudyTrack } from '../../types'
 import { sortByProgrammeCode } from '../../util'
 import { mapToProviders } from '../../util/map'
@@ -9,10 +10,7 @@ import { getSemestersAndYears } from '../semesters'
 import { getThesisCredits } from './creditGetters'
 import { getGraduatedStats } from './studyProgrammeBasics'
 import {
-  alltimeEndDate,
-  alltimeStartDate,
   defineYear,
-  getCorrectStudentnumbers,
   getGoal,
   getId,
   getMedian,
@@ -25,7 +23,11 @@ import {
 } from './studyProgrammeHelpers'
 import { getStudyRightsInProgramme } from './studyRightFinders'
 
-const calculateAbsenceInMonths = (absence, startDate, endDate) => {
+const calculateAbsenceInMonths = (
+  absence: Awaited<ReturnType<typeof getSemestersAndYears>>['semesters'][string],
+  startDate: Date,
+  endDate: Date
+) => {
   const absenceStart = moment(absence.startdate)
   const absenceEnd = moment(absence.enddate)
 
@@ -35,7 +37,12 @@ const calculateAbsenceInMonths = (absence, startDate, endDate) => {
   return Math.round(absenceEnd.diff(absenceStart, 'months', true))
 }
 
-export const calculateDurationOfStudies = (startDate, graduationDate, semesterEnrollments, semesters) => {
+export const calculateDurationOfStudies = (
+  startDate: Date,
+  graduationDate: Date,
+  semesterEnrollments: SemesterEnrollment[],
+  semesters: Awaited<ReturnType<typeof getSemestersAndYears>>['semesters']
+) => {
   const semestersWithStatutoryAbsence = semesterEnrollments
     .filter(enrollment => enrollment.statutoryAbsence)
     .map(enrollment => enrollment.semester)
@@ -46,42 +53,46 @@ export const calculateDurationOfStudies = (startDate, graduationDate, semesterEn
   return Math.round(moment(graduationDate).subtract(monthsToSubtract, 'months').diff(moment(startDate), 'months', true))
 }
 
-const getThesisStats = async ({ studyprogramme, since, years, isAcademicYear, includeAllSpecials }) => {
+const getGraduationTimeAndThesisWriterStats = async ({
+  studyprogramme,
+  years,
+  isAcademicYear,
+  includeAllSpecials,
+}: {
+  studyprogramme?: string
+  years: Array<string | number>
+  isAcademicYear: boolean
+  includeAllSpecials: boolean
+}) => {
   const { graphStats, tableStats } = getStatsBasis(years)
-  if (!studyprogramme) return { graphStats, tableStats }
-  const providercode = mapToProviders([studyprogramme])[0]
-  const thesisType = getThesisType(studyprogramme)
-
-  const studentnumbers = await getCorrectStudentnumbers({
-    codes: [studyprogramme],
-    startDate: alltimeStartDate,
-    endDate: alltimeEndDate,
-    includeAllSpecials,
-    includeTransferredTo: includeAllSpecials,
-  })
-
-  const credits = await getThesisCredits(providercode, since, thesisType, studentnumbers)
-
-  credits?.forEach(({ attainment_date }) => {
-    const attainmentYear = defineYear(attainment_date, isAcademicYear)
-    graphStats[indexOf(years, attainmentYear)] += 1
-    tableStats[attainmentYear] += 1
-  })
-
-  return { graphStats, tableStats }
-}
-
-const getGraduationTimeStats = async ({ studyprogramme, years, isAcademicYear, includeAllSpecials }) => {
-  if (!studyprogramme) return { times: { medians: [], goal: 0 }, doCombo: false, comboTimes: { medians: [], goal: 0 } }
+  if (!studyprogramme) {
+    return {
+      times: { medians: [], goal: 0 },
+      doCombo: false,
+      comboTimes: { medians: [], goal: 0 },
+      thesisGraphStats: graphStats,
+      thesisTableStats: tableStats,
+    }
+  }
   // for bc+ms combo
   const doCombo = studyprogramme.startsWith('MH') && !['MH30_001', 'MH30_003'].includes(studyprogramme)
   const graduationTimes: Record<string, number[]> = getYearsObject({ years, emptyArrays: true })
   const graduationTimesCombo: Record<string, number[]> = getYearsObject({ years, emptyArrays: true })
   const { semesters } = await getSemestersAndYears()
 
-  const graduatedStudyRights = await getStudyRightsInProgramme(studyprogramme, true)
+  const studyRights = await getStudyRightsInProgramme(studyprogramme, false)
+  const studentNumbers = studyRights.map(sr => sr.studentNumber)
+  const thesisCredits = await getThesisCredits(
+    mapToProviders([studyprogramme])[0],
+    getThesisType(studyprogramme),
+    studentNumbers
+  )
+  const thesisWriterMap = thesisCredits.reduce<Record<string, Date>>((acc, credit) => {
+    acc[credit.student_studentnumber] = credit.attainment_date
+    return acc
+  }, {})
 
-  for (const studyRight of graduatedStudyRights) {
+  for (const studyRight of studyRights) {
     const correctStudyRightElement = studyRight.studyRightElements.find(element => element.code === studyprogramme)
     if (!correctStudyRightElement) continue
     const countAsBachelorMaster = doCombo && studyRight.extentCode === ExtentCode.BACHELOR_AND_MASTER
@@ -93,6 +104,15 @@ const getGraduationTimeStats = async ({ studyprogramme, years, isAcademicYear, i
     if (firstStudyRightElementWithSamePhase.code !== correctStudyRightElement.code && !includeAllSpecials) {
       continue
     }
+
+    if (studyRight.studentNumber in thesisWriterMap) {
+      const thesisDate = thesisWriterMap[studyRight.studentNumber]
+      const thesisYear = defineYear(thesisDate, isAcademicYear)
+      graphStats[indexOf(years, thesisYear)] += 1
+      tableStats[thesisYear] += 1
+    }
+
+    if (!correctStudyRightElement.graduated || !studyRight.semesterEnrollments) continue
 
     const startDate = countAsBachelorMaster
       ? getStudyRightElementsWithPhase(studyRight, 1)[0]?.startDate
@@ -140,7 +160,7 @@ const getGraduationTimeStats = async ({ studyprogramme, years, isAcademicYear, i
       comboTimes.medians.push({ y: median, amount: graduationTimesCombo[year].length, name: year, statistics })
     }
   }
-  return { times, doCombo, comboTimes }
+  return { times, doCombo, comboTimes, thesisGraphStats: graphStats, thesisTableStats: tableStats }
 }
 
 const formatStats = (stats: Record<string, ProgrammeWithYears>, years: Array<string | number>) => {
@@ -267,14 +287,11 @@ export const getGraduationStatsForStudytrack = async ({
     includeAllSpecials,
   }
 
-  const thesis = await getThesisStats(queryParameters)
-  const thesisSecondProgramme = await getThesisStats(combinedQueryParameters)
-
   const graduated = await getGraduatedStats(queryParameters)
   const graduatedSecondProgramme = await getGraduatedStats(combinedQueryParameters)
 
-  const graduationTimeStats = await getGraduationTimeStats(queryParameters)
-  const graduationTimeStatsSecondProg = await getGraduationTimeStats(combinedQueryParameters)
+  const graduationTimeStats = await getGraduationTimeAndThesisWriterStats(queryParameters)
+  const graduationTimeStatsSecondProg = await getGraduationTimeAndThesisWriterStats(combinedQueryParameters)
 
   const programmesBeforeOrAfter = await getProgrammesBeforeOrAfter(studyprogramme, queryParameters)
 
@@ -296,11 +313,11 @@ export const getGraduationStatsForStudytrack = async ({
     ? reversedYears.map(year => [
         year,
         graduated.tableStats[year],
-        thesis.tableStats[year],
+        graduationTimeStats.thesisTableStats[year],
         graduatedSecondProgramme.tableStats[year],
-        thesisSecondProgramme.tableStats[year],
+        graduationTimeStatsSecondProg.thesisTableStats[year],
       ])
-    : reversedYears.map(year => [year, graduated.tableStats[year], thesis.tableStats[year]])
+    : reversedYears.map(year => [year, graduated.tableStats[year], graduationTimeStats.thesisTableStats[year]])
 
   const tableStats =
     studyprogramme.includes('LIS') || studyprogramme.includes('T')
@@ -310,13 +327,13 @@ export const getGraduationStatsForStudytrack = async ({
   const graphStats = combinedProgramme
     ? [
         { name: 'Graduated bachelor', data: graduated.graphStats },
-        { name: 'Wrote thesis bachelor', data: thesis.graphStats },
+        { name: 'Wrote thesis bachelor', data: graduationTimeStats.thesisGraphStats },
         { name: 'Graduated licentiate', data: graduatedSecondProgramme.graphStats },
-        { name: 'Wrote thesis licentiate', data: thesisSecondProgramme.graphStats },
+        { name: 'Wrote thesis licentiate', data: graduationTimeStatsSecondProg.thesisGraphStats },
       ]
     : [
         { name: 'Graduated students', data: graduated.graphStats },
-        { name: 'Wrote thesis', data: thesis.graphStats },
+        { name: 'Wrote thesis', data: graduationTimeStats.thesisGraphStats },
       ]
 
   return {

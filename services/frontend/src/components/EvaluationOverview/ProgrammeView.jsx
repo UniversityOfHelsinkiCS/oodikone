@@ -119,17 +119,20 @@ export const ProgrammeView = ({ studyprogramme }) => {
                 studytracks; credits produced by the programme; population backgrounds and enrollment statuses.
               </p>
               <p>
-                Access the full Studyprogramme Overview by clicking 'Studyprogramme' in the top navigation bar and then
-                'Overview'. Alternatively, you can select 'Search by class' to explore studyprogrammes by starting class
-                with interactive statistics and visualizations.
+                Access the full Studyprogramme Overview by clicking 'Programmes' in the top navigation bar and then
+                'Overview'. Alternatively, you can select 'Class statistics' to explore studyprogrammes by starting
+                class with interactive statistics and visualizations.
               </p>
               <p>
                 Note that both views have access restrictions. If you can't access either view and feel you should have
-                access, please contact oodikone@helsinki.fi.
+                access, please contact <a href="mailto:oodikone@helsinki.fi">oodikone@helsinki.fi</a>.
               </p>
             </Message>
             <div>
-              {getDivider('Progress of students of the studyprogramme by starting year', 'StudytrackProgress')}
+              {getDivider(
+                'Progress of students of the studyprogramme by starting year',
+                'StudytrackProgressEvaluationOverview'
+              )}
               <Toggle
                 cypress="GraduatedToggle"
                 firstLabel="Graduated included"
@@ -156,16 +159,14 @@ export const ProgrammeView = ({ studyprogramme }) => {
                   setValue={setShowMedian}
                   value={showMedian}
                 />
-                <div className="toggle-container">
-                  <Toggle
-                    cypress="YearToggle"
-                    firstLabel="Calendar year"
-                    secondLabel="Academic year"
-                    setValue={setAcademicYear}
-                    toolTips={studyProgrammeToolTips.YearToggle}
-                    value={academicYear}
-                  />
-                </div>
+                <Toggle
+                  cypress="YearToggle"
+                  firstLabel="Calendar year"
+                  secondLabel="Academic year"
+                  setValue={setAcademicYear}
+                  toolTips={studyProgrammeToolTips.YearToggle}
+                  value={academicYear}
+                />
               </div>
               <div className={`section-container${doCombo ? '' : '-centered'}`}>
                 {showMedian ? displayMedian() : displayBreakdown()}
@@ -181,12 +182,17 @@ export const ProgrammeView = ({ studyprogramme }) => {
                   <div className="section-container">
                     <StackedBarChart
                       cypress="ProgrammesBeforeOrAfter"
-                      data={graduationData?.programmesBeforeOrAfterGraphStats}
+                      data={graduationData?.programmesBeforeOrAfterGraphStats.map(programme => ({
+                        ...programme,
+                        name: getTextIn(programme.name),
+                      }))}
                       labels={graduationData?.years}
                       wideTable
                     />
                     <DataTable
-                      data={graduationData?.programmesBeforeOrAfterTableStats}
+                      data={graduationData?.programmesBeforeOrAfterTableStats.map(programme =>
+                        programme.with(2, getTextIn(programme[2]))
+                      )}
                       titles={graduationData?.programmesBeforeOrAfterTitles}
                       wideTable
                     />

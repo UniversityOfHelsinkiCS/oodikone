@@ -1,34 +1,38 @@
 import { DetailedProgrammeRights, Role } from '../types'
 
-type Comparator = (val1: string, val2: string) => number
-type FieldComparator = (val1: Record<string, any>, val2: Record<string, any>) => number
+const isObjectWithKey = (obj: unknown, key: string): obj is Record<string, unknown> => {
+  return typeof obj === 'object' && obj !== null && key in obj
+}
 
 /**
  * Returns a sorting function that can be used to sort strings so that Finnish alphabetical order is respected.
- * @param field The field to sort by (optional: if not given, the function will sort by the strings themselves)
+ * @param key The key to sort by (optional: if not given, the function will sort by the strings themselves)
+ * @param desc If true, the function will sort in descending order (optional: defaults to `false`)
  */
-export function createLocaleComparator(field: string): FieldComparator
-export function createLocaleComparator(): Comparator
-export function createLocaleComparator(field?: string): Comparator | FieldComparator {
-  const comparator: Comparator = (val1, val2) => val1.localeCompare(val2, 'fi', { sensitivity: 'accent' })
-  if (!field) {
-    return comparator
-  }
+export const createLocaleComparator = (key?: string, desc: boolean = false) => {
+  return (val1: unknown, val2: unknown): number => {
+    let val1ToCompare: unknown
+    let val2ToCompare: unknown
 
-  return (val1: Record<string, any>, val2: Record<string, any>) => {
-    const fieldVal1 = val1[field]
-    const fieldVal2 = val2[field]
+    if (key) {
+      if (isObjectWithKey(val1, key) && isObjectWithKey(val2, key)) {
+        val1ToCompare = val1[key]
+        val2ToCompare = val2[key]
+      } else {
+        throw new Error('Invalid arguments: expected objects with the specified key')
+      }
+    } else {
+      val1ToCompare = val1
+      val2ToCompare = val2
+    }
 
-    if (typeof fieldVal1 === 'string' && typeof fieldVal2 === 'string') {
-      return comparator(fieldVal1, fieldVal2)
+    if (typeof val1ToCompare !== 'string' || typeof val2ToCompare !== 'string') {
+      throw new Error('Invalid arguments: expected strings or objects with string properties')
     }
-    if (fieldVal1 === fieldVal2) {
-      return 0
-    }
-    if (fieldVal1 > fieldVal2) {
-      return 1
-    }
-    return -1
+
+    const comparisonResult = val1ToCompare.localeCompare(val2ToCompare, 'fi', { sensitivity: 'accent' })
+
+    return desc ? -comparisonResult : comparisonResult
   }
 }
 

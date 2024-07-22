@@ -1,4 +1,5 @@
 /* eslint-disable import/no-cycle */
+import { InferAttributes } from 'sequelize'
 import { Column, CreatedAt, DataType, HasMany, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
 import { Name } from '../types'
@@ -9,22 +10,22 @@ import { Course } from './course'
   modelName: 'course_type',
   tableName: 'course_types',
 })
-export class CourseType extends Model {
+export class CourseType extends Model<InferAttributes<CourseType>> {
   @PrimaryKey
   @Column(DataType.STRING)
-  coursetypecode: string
+  coursetypecode!: string
 
   @HasMany(() => Course)
-  courses: Course[]
+  courses!: Course[]
 
   @Column(DataType.JSONB)
-  name: Required<Name>
+  name!: Required<Name>
 
   @CreatedAt
   @Column(DataType.DATE)
-  createdAt: Date
+  createdAt!: Date
 
   @UpdatedAt
   @Column(DataType.DATE)
-  updatedAt: Date
+  updatedAt!: Date
 }
