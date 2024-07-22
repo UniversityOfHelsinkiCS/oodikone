@@ -38,7 +38,7 @@
     "@types/umzug": "^2.3.7",
     "@types/validator": "^13.12.0",
     "tsx": "^4.16.2",
-    "typescript": "^5.4.5"
+    "typescript": "^5.5.3"
   },
   "overrides": {
     "winston-gelf-transporter": {
