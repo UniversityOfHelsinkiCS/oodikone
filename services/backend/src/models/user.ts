@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import { CreationOptional, InferAttributes, InferCreationAttributes } from 'sequelize'
 import { AutoIncrement, Column, DataType, Default, Model, PrimaryKey, Table, Unique } from 'sequelize-typescript'
 

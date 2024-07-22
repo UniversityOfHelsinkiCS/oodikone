@@ -6,7 +6,7 @@ import { serviceProvider } from '../config'
 import { roles } from '../config/roles'
 import { sequelizeUser } from '../database/connection'
 import { User } from '../models/user'
-import { DetailedProgrammeRights, Role } from '../types'
+import { DetailedProgrammeRights, ExpandedUser, FormattedUser, Role } from '../types'
 import { createLocaleComparator, getFullStudyProgrammeRights, hasFullAccessToStudentData } from '../util'
 import jami from '../util/jami'
 import mami from '../util/mami'
@@ -102,12 +102,6 @@ const getStudyProgrammeRights = (
   return studyProgrammeRights
 }
 
-type ExpandedUser = InferAttributes<User> & {
-  iamGroups: string[]
-  mockedBy?: string
-  detailedProgrammeRights: DetailedProgrammeRights[]
-}
-
 const formatUser = async (user: ExpandedUser, getStudentAccess: boolean = true) => {
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(user.detailedProgrammeRights)
   const shouldFetchStudentAccess = getStudentAccess && !hasFullAccessToStudentData(user.roles)
@@ -125,8 +119,8 @@ const formatUser = async (user: ExpandedUser, getStudentAccess: boolean = true) 
     studentsUserCanAccess = uniq(flatStudentNumbers)
   }
 
-  const formattedUser = {
-    id: user.id,
+  const formattedUser: FormattedUser = {
+    id: user.id as unknown as string,
     userId: user.username,
     username: user.username,
     name: user.fullName,
