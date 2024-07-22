@@ -7,6 +7,7 @@ import { ExtentCode } from './extentCode'
 import { GenderCode } from './genderCode'
 import { Language } from './language'
 import { Name } from './name'
+import { OodikoneRequest } from './oodikoneRequest'
 import { Phase } from './phase'
 import { PriorityCode } from './priorityCode'
 import { Role } from './role'
@@ -24,6 +25,7 @@ export {
   GenderCode,
   Language,
   Name,
+  OodikoneRequest,
   Phase,
   PriorityCode,
   Role,

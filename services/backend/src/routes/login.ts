@@ -1,17 +1,16 @@
-import { Request, Response, Router } from 'express'
+import { Response, Router } from 'express'
 import { omit } from 'lodash'
 
-import { FormattedUser } from '../types'
+import { OodikoneRequest } from '../types'
 import { ApplicationError } from '../util/customErrors'
 
 const router = Router()
 
-interface CustomRequest extends Request {
-  user?: FormattedUser
+interface LoginRequest extends OodikoneRequest {
   logoutUrl?: string
 }
 
-router.get('/', async (req: CustomRequest, res: Response) => {
+router.get('/', async (req: LoginRequest, res: Response) => {
   const { user, logoutUrl } = req
 
   if (!user) {
