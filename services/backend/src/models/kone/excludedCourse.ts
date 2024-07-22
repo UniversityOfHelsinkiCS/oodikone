@@ -1,5 +1,5 @@
 import { InferAttributes } from 'sequelize'
-import { Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript'
+import { AutoIncrement, Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript'
 
 @Table({
   underscored: true,
@@ -8,6 +8,7 @@ import { Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript
 })
 export class ExcludedCourse extends Model<InferAttributes<ExcludedCourse>> {
   @PrimaryKey
+  @AutoIncrement
   @Column(DataType.INTEGER)
   id!: number
 
