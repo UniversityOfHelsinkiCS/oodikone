@@ -1,7 +1,6 @@
 import axios from 'axios'
 
 import { isProduction, pateToken } from '../config'
-import { FormattedUser } from '../types'
 import { ApplicationError } from '../util/customErrors'
 
 const pateClient = axios.create({
@@ -32,7 +31,7 @@ export const sendFeedbackToToska = async ({
   user,
 }: {
   feedbackContent: string
-  user: FormattedUser
+  user: { name: string; userId: string; email: string }
 }) => {
   const { name, userId, email } = user
   const userDetails = `Sent by ${name}, userid: ${userId}, email: ${email}`
