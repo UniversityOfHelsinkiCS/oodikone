@@ -20,7 +20,7 @@ const CourseTable = ({ courses, onSelectCourse, hidden, title, controlIcon }) =>
 
   const toCourseRow = course => (
     <Table.Row
-      key={course.code}
+      key={course.id}
       onClick={() => (course.min_attainment_date ? onSelectCourse(course) : null)}
       style={{ cursor: 'pointer' }}
     >
