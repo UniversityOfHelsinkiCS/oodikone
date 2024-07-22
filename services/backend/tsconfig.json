@@ -16,10 +16,7 @@
     "sourceMap": true,
     "sourceRoot": "/",
     "inlineSources": true,
-    "resolveJsonModule": true,
-    "paths": {
-      "@/*": ["./src/*"]
-    }
+    "resolveJsonModule": true
   },
   "include": ["src/**/*", "index.js"]
 }
