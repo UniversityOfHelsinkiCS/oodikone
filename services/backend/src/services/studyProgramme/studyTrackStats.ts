@@ -19,6 +19,7 @@ import {
   tableTitles,
   defineYear,
   getStudyRightElementsWithPhase,
+  hasTransferredFromOrToProgramme,
 } from './studyProgrammeHelpers'
 import { getStudyTracksForProgramme } from './studyRightFinders'
 
@@ -280,10 +281,6 @@ const getMainStatsByTrackAndYear = async (
     if (!hasGraduated) return
     const countAsBachelorMaster = doCombo && studyRight.extentCode === ExtentCode.BACHELOR_AND_MASTER
     const [firstStudyRightElementWithSamePhase] = getStudyRightElementsWithPhase(studyRight, studyRightElement.phase)
-    // This means the student has been transferred from another study programme
-    if (firstStudyRightElementWithSamePhase.code !== studyRightElement.code && !includeAllSpecials) {
-      return
-    }
 
     const startDate = countAsBachelorMaster
       ? getStudyRightElementsWithPhase(studyRight, 1)[0]?.startDate
@@ -349,12 +346,10 @@ const getMainStatsByTrackAndYear = async (
       continue
     }
 
-    const studyRightElementsWithSamePhase = getStudyRightElementsWithPhase(studyRight, studyRightElement.phase)
-    const hasTransferredToProgramme =
-      studyRightElementsWithSamePhase[0].code !== studyRightElement.code && studyRightElement.startDate < new Date()
-    const hasTransferredFromProgramme =
-      studyRightElementsWithSamePhase[studyRightElementsWithSamePhase.length - 1].code !== studyRightElement.code &&
-      studyRightElement.endDate < new Date()
+    const [hasTransferredFromProgramme, hasTransferredToProgramme] = hasTransferredFromOrToProgramme(
+      studyRight,
+      studyRightElement
+    )
 
     if (!includeAllSpecials && (hasTransferredToProgramme || hasTransferredFromProgramme)) {
       continue

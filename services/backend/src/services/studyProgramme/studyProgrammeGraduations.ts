@@ -20,6 +20,7 @@ import {
   getYearsArray,
   getYearsObject,
   getStudyRightElementsWithPhase,
+  hasTransferredFromOrToProgramme,
 } from './studyProgrammeHelpers'
 import { getStudyRightsInProgramme } from './studyRightFinders'
 
@@ -100,8 +101,9 @@ const getGraduationTimeAndThesisWriterStats = async ({
       studyRight,
       correctStudyRightElement.phase
     )
-    // This means the student has been transferred from another study programme
-    if (firstStudyRightElementWithSamePhase.code !== correctStudyRightElement.code && !includeAllSpecials) {
+    const hasTransferred = hasTransferredFromOrToProgramme(studyRight, correctStudyRightElement)
+
+    if (!includeAllSpecials && hasTransferred.some(fromOrTo => fromOrTo === true)) {
       continue
     }
 
@@ -198,6 +200,8 @@ const getProgrammesBeforeStarting = async ({
   const studyRights = await getStudyRightsInProgramme(studyprogramme, false)
 
   const stats = studyRights.reduce<Record<string, ProgrammeWithYears>>((acc, studyRight) => {
+    const studyRightElement = studyRight.studyRightElements.find(element => element.code === studyprogramme)
+    if (!studyRightElement) return acc
     // If the extent code is something else, that means the student hasn't continued from a bachelor's programme
     if (studyRight.extentCode !== ExtentCode.BACHELOR_AND_MASTER) return acc
     const phase1Programmes = studyRight.studyRightElements.filter(elem => elem.phase === 1)
@@ -212,8 +216,9 @@ const getProgrammesBeforeStarting = async ({
     }
     const phase2Programmes = studyRight.studyRightElements.filter(elem => elem.phase === 2)
 
-    // If there's more than one programme of phase 2, the student has transferred from/to another programme
-    if (!includeAllSpecials && phase2Programmes.length > 1) return acc
+    const hasTransferred = hasTransferredFromOrToProgramme(studyRight, studyRightElement)
+
+    if (!includeAllSpecials && hasTransferred.some(fromOrTo => fromOrTo === true)) return acc
 
     const startDateInProgramme = phase2Programmes.find(elem => elem.code === studyprogramme)?.startDate
     if (!startDateInProgramme) return acc
@@ -234,10 +239,11 @@ const getProgrammesAfterGraduation = async ({
   const studyRights = await getStudyRightsInProgramme(studyprogramme, true)
 
   const stats = studyRights.reduce<Record<string, ProgrammeWithYears>>((acc, studyRight) => {
-    const phase1Programmes = studyRight.studyRightElements.filter(elem => elem.phase === 1)
+    const studyRightElement = studyRight.studyRightElements.find(element => element.code === studyprogramme)
+    if (!studyRightElement) return acc
+    const hasTransferred = hasTransferredFromOrToProgramme(studyRight, studyRightElement)
 
-    // If there's more than one programme of phase 1, the student has transferred from/to another programme
-    if (!includeAllSpecials && phase1Programmes.length > 1) return acc
+    if (!includeAllSpecials && hasTransferred.some(fromOrTo => fromOrTo === true)) return acc
 
     const phase2Programmes = studyRight.studyRightElements.filter(elem => elem.phase === 2)
     const [firstPhase2Programme] = orderBy(phase2Programmes, ['startDate'], ['asc'])

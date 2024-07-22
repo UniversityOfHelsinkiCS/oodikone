@@ -8,6 +8,7 @@ const {
   getYearsArray,
   tableTitles,
   getStudyRightElementsWithPhase,
+  hasTransferredFromOrToProgramme,
 } = require('./studyProgrammeHelpers')
 const { getStudyRightsInProgramme } = require('./studyRightFinders')
 
@@ -35,12 +36,10 @@ const getStartedStats = async ({ studyprogramme, years, isAcademicYear }) => {
 
   for (const studyRight of studyRightsOfProgramme) {
     const studyRightElement = studyRight.studyRightElements.find(sre => sre.code === studyprogramme)
-    const [firstStudyRightElementWithSamePhase] = getStudyRightElementsWithPhase(studyRight, studyRightElement.phase)
 
-    // This means the student has been transferred from another study programme
-    if (firstStudyRightElementWithSamePhase.code !== studyRightElement.code) {
-      continue
-    }
+    const [, hasTransferredToProgramme] = hasTransferredFromOrToProgramme(studyRight, studyRightElement)
+
+    if (hasTransferredToProgramme) continue
 
     const startedInProgramme = new Date(studyRightElement.startDate)
     const startedInProgrammeYear = defineYear(startedInProgramme, isAcademicYear)
@@ -77,14 +76,12 @@ const getGraduatedStats = async ({ studyprogramme, years, isAcademicYear, includ
   for (const studyRight of graduatedStudyRights) {
     const correctStudyRightElement = studyRight.studyRightElements.find(element => element.code === studyprogramme)
     if (!correctStudyRightElement) continue
-    const [firstStudyRightElementWithSamePhase] = getStudyRightElementsWithPhase(
-      studyRight,
-      correctStudyRightElement.phase
-    )
-    // This means the student has been transferred from another study programme
-    if (firstStudyRightElementWithSamePhase.code !== correctStudyRightElement.code && !includeAllSpecials) {
+
+    const hasTransferred = hasTransferredFromOrToProgramme(studyRight, correctStudyRightElement)
+    if (!includeAllSpecials && hasTransferred.some(fromOrTo => fromOrTo === true)) {
       continue
     }
+
     const graduationYear = defineYear(new Date(correctStudyRightElement.endDate), isAcademicYear)
     graphStats[indexOf(years, graduationYear)] += 1
     tableStats[graduationYear] += 1

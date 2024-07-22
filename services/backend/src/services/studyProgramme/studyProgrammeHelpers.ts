@@ -2,7 +2,7 @@ import { orderBy } from 'lodash'
 import { InferAttributes } from 'sequelize'
 
 import { programmeCodes } from '../../config/programmeCodes'
-import { SISStudyRight, Studyright } from '../../models'
+import { SISStudyRight, SISStudyRightElement, Studyright } from '../../models'
 import { ExtentCode, Phase } from '../../types'
 import { keysOf } from '../../util'
 import { studentnumbersWithAllStudyrightElements } from '../populations'
@@ -253,4 +253,18 @@ export const getStudyRightElementsWithPhase = (studyRight: InferAttributes<SISSt
     ['startDate'],
     ['asc']
   )
+}
+
+export const hasTransferredFromOrToProgramme = (
+  studyRight: InferAttributes<SISStudyRight>,
+  studyRightElement: SISStudyRightElement
+): [boolean, boolean] => {
+  const studyRightElementsWithSamePhase = getStudyRightElementsWithPhase(studyRight, studyRightElement.phase)
+  const hasTransferredToProgramme =
+    studyRightElementsWithSamePhase[0].code !== studyRightElement.code && studyRightElement.startDate < new Date()
+  const hasTransferredFromProgramme =
+    studyRightElementsWithSamePhase[studyRightElementsWithSamePhase.length - 1].code !== studyRightElement.code &&
+    studyRightElement.endDate < new Date()
+
+  return [hasTransferredFromProgramme, hasTransferredToProgramme]
 }
