@@ -1,10 +1,10 @@
-const { Op } = require('sequelize')
+import { Op } from 'sequelize'
 
-const { Course, CourseProvider, Credit, Organization } = require('../../models')
-const { formatCredit } = require('./format')
-const { whereStudents } = require('.')
+import { Course, CourseProvider, Credit, Organization } from '../../models'
+import { CreditTypeCode } from '../../types'
+import { formatCredit } from './format'
 
-const getCreditsForProvider = async (provider, codes, since) => {
+export const getCreditsForProvider = async (provider: string, codes: string[], since: Date) => {
   const credits = await Credit.findAll({
     where: {
       course_code: { [Op.in]: codes },
@@ -33,26 +33,26 @@ const getCreditsForProvider = async (provider, codes, since) => {
     raw: true,
   })
 
-  const organizationIdToCodeMap = organizations.reduce((obj, org) => {
+  const organizationIdToCodeMap = organizations.reduce<Record<string, string>>((obj, org) => {
     obj[org.id] = org.code
     return obj
   }, {})
 
-  const courseIdToShareMap = providers.reduce((obj, provider) => {
+  const courseIdToShareMap = providers.reduce<Record<string, CourseProvider[]>>((obj, provider) => {
     if (!obj[provider.coursecode]) obj[provider.coursecode] = []
     obj[provider.coursecode].push(provider)
     return obj
   }, {})
 
-  const courseIdToShare = (courseId, attainmentDate) => {
+  const courseIdToShare = (courseId: string, attainmentDate: Date) => {
     const providers = courseIdToShareMap[courseId]
     const relevantProvider = providers.find(p => organizationIdToCodeMap[p.organizationcode] === provider)
     if (!relevantProvider?.shares) return 0
     const relevantShare = relevantProvider.shares
       .filter(share => {
-        const startMatches = new Date(share.startDate) <= attainmentDate || !share.startDate
-        const endMatches = new Date(share.endDate) >= attainmentDate || !share.endDate
-        const bothArentNull = share.startDate || share.endDate
+        const startMatches = share.startDate == null || new Date(share.startDate) <= attainmentDate
+        const endMatches = share.endDate == null || new Date(share.endDate) >= attainmentDate
+        const bothArentNull = share.startDate != null || share.endDate != null
         return startMatches && endMatches && bothArentNull
       })
       // The next mess is for cases where there are multiple shares with only startdate or enddate.
@@ -82,29 +82,29 @@ const getCreditsForProvider = async (provider, codes, since) => {
   }
 
   return credits
-    .map(cr => ({ ...cr, credits: cr.credits * courseIdToShare(cr.course_id, cr.attainment_date, cr.id) }))
+    .map(cr => ({ ...cr, credits: cr.credits * courseIdToShare(cr.course_id, cr.attainment_date) }))
     .map(formatCredit)
 }
 
-const getTransferredCredits = async (provider, since) =>
+export const getTransferredCredits = async (provider: string, since: Date) =>
   await Credit.findAll({
     attributes: ['id', 'course_code', 'credits', 'attainment_date', 'createdate'],
     include: {
       model: Course,
       attributes: ['code'],
       required: true,
-      include: {
-        model: Organization,
-        required: true,
-        where: {
-          code: provider,
+      include: [
+        {
+          model: Organization,
+          required: true,
+          where: {
+            code: provider,
+          },
         },
-      },
+      ],
     },
     where: {
-      credittypecode: {
-        [Op.eq]: [9],
-      },
+      credittypecode: CreditTypeCode.APPROVED,
       isStudyModule: {
         [Op.not]: true,
       },
@@ -114,43 +114,37 @@ const getTransferredCredits = async (provider, since) =>
     },
   })
 
-const getThesisCredits = async (provider, since, thesisType, studentnumbers) =>
+export const getThesisCredits = async (provider: string, thesisType: string[], studentnumbers: string[]) =>
   await Credit.findAll({
-    attributes: ['attainment_date'],
+    attributes: ['attainment_date', 'student_studentnumber'],
     include: {
       model: Course,
-      attributes: ['code'],
+      attributes: [],
       where: {
         course_unit_type: {
           [Op.in]: thesisType,
         },
       },
-      include: {
-        model: Organization,
-        through: {
+      include: [
+        {
+          model: Organization,
           attributes: [],
+          through: {
+            attributes: [],
+          },
+          where: {
+            code: provider,
+          },
         },
-        where: {
-          code: provider,
-        },
-      },
+      ],
     },
     where: {
-      credittypecode: {
-        [Op.notIn]: [10, 9, 7],
-      },
+      credittypecode: CreditTypeCode.PASSED,
       isStudyModule: {
         [Op.not]: true,
       },
-      attainment_date: {
-        [Op.gte]: since,
+      student_studentnumber: {
+        [Op.in]: studentnumbers,
       },
-      student_studentnumber: whereStudents(studentnumbers),
     },
   })
-
-module.exports = {
-  getCreditsForProvider,
-  getTransferredCredits,
-  getThesisCredits,
-}
