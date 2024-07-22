@@ -1,4 +1,5 @@
 import { Op, QueryTypes } from 'sequelize'
+
 import { dbConnections } from '../database/connection'
 import { ProgrammeModule } from '../models'
 import { ExcludedCourse } from '../models/kone'
@@ -6,7 +7,7 @@ import { Name } from '../types'
 import logger from '../util/logger'
 import { combinedStudyprogrammes } from './studyProgramme/studyProgrammeHelpers'
 
-const getCurriculumVersions = async code => {
+export const getCurriculumVersions = async (code: string) => {
   try {
     const result = await ProgrammeModule.findAll({ where: { code } })
     return result
@@ -17,7 +18,7 @@ const getCurriculumVersions = async code => {
   }
 }
 
-const recursivelyGetModuleAndChildren = async (code, curriculum_period_ids) => {
+const recursivelyGetModuleAndChildren = async (code: string, curriculum_period_ids) => {
   const connection = dbConnections.sequelize
   type ModuleWithChildren = Pick<
     ProgrammeModule,
@@ -96,7 +97,7 @@ const labelProgammes = (modules, excludedCourses) => {
   })
 }
 
-const getCoursesAndModulesForProgramme = async (code, periodIds) => {
+const getCoursesAndModulesForProgramme = async (code: string, periodIds: string) => {
   if (!periodIds) {
     return {}
   }
@@ -129,7 +130,7 @@ const getCoursesAndModulesForProgramme = async (code, periodIds) => {
   return { courses: labelProgammes(modifiedCourses, excludedCourses), modules }
 }
 
-const getCoursesAndModules = async (code, periodIds) => {
+export const getCoursesAndModules = async (code: string, periodIds: string) => {
   const defaultProgrammeCourses = await getCoursesAndModulesForProgramme(code, periodIds)
   if (Object.keys(combinedStudyprogrammes).includes(code)) {
     const secondProgramme = combinedStudyprogrammes[code]
@@ -138,5 +139,3 @@ const getCoursesAndModules = async (code, periodIds) => {
   }
   return { defaultProgrammeCourses, secondProgrammeCourses: { courses: [], modules: [] } }
 }
-
-module.exports = { getCoursesAndModules, getCurriculumVersions }

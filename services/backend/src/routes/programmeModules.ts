@@ -1,6 +1,8 @@
-const router = require('express').Router()
+import { Router } from 'express'
 
-const { getCoursesAndModules, getCurriculumVersions } = require('../services/programmeModules')
+import { getCoursesAndModules, getCurriculumVersions } from '../services/programmeModules'
+
+const router = Router()
 
 router.get('/v3/curriculum-options/:code', async (req, res) => {
   const { code } = req.params
@@ -19,4 +21,4 @@ router.get('/v3/curriculum/:code/:periodIds', async (req, res) => {
   })
 })
 
-module.exports = router
+export default router
