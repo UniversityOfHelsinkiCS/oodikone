@@ -2,6 +2,7 @@ import moment from 'moment'
 import { InferAttributes } from 'sequelize'
 
 import { Credit, SISStudyRight, SISStudyRightElement } from '../../models'
+import type { SemesterEnrollment } from '../../models/SISStudyRight'
 import { GenderCode, EnrollmentType, ExtentCode } from '../../types'
 import { createLocaleComparator, keysOf } from '../../util'
 import { countTimeCategories } from '../graduationHelpers'
@@ -110,6 +111,10 @@ const getEmptyYear = () => ({
 
 type YearlyData = Record<string, ReturnType<typeof getEmptyYear>>
 
+type StudyRightWithSemesterEnrollments = InferAttributes<SISStudyRight> & {
+  semesterEnrollments: SemesterEnrollment[]
+}
+
 const combineStats = (
   years: string[],
   yearlyStats: Record<string, YearlyData>,
@@ -203,7 +208,7 @@ const getMainStatsByTrackAndYear = async (
   const updateCounts = (
     year: string,
     programmeOrStudyTrack: string,
-    studyRight: InferAttributes<SISStudyRight>,
+    studyRight: StudyRightWithSemesterEnrollments,
     hasTransferredToProgramme: boolean,
     startedInProgramme: Date,
     studyRightElement: SISStudyRightElement
@@ -337,6 +342,7 @@ const getMainStatsByTrackAndYear = async (
   })
 
   for (const studyRight of studyRightsOfProgramme) {
+    if (!studyRight.semesterEnrollments) continue
     const studyRightElement = studyRight.studyRightElements.find(element => element.code === studyProgramme)
     if (!studyRightElement) continue
     if (!includeGraduated && studyRightElement.graduated) {
@@ -362,7 +368,7 @@ const getMainStatsByTrackAndYear = async (
     updateCounts(
       startYear,
       studyProgramme,
-      studyRight,
+      studyRight as StudyRightWithSemesterEnrollments,
       hasTransferredToProgramme,
       startedInProgramme,
       studyRightElement
@@ -370,7 +376,14 @@ const getMainStatsByTrackAndYear = async (
 
     const studyTrack = studyRightElement.studyTrack?.code ?? null
     if (studyTrack) {
-      updateCounts(startYear, studyTrack, studyRight, hasTransferredToProgramme, startedInProgramme, studyRightElement)
+      updateCounts(
+        startYear,
+        studyTrack,
+        studyRight as StudyRightWithSemesterEnrollments,
+        hasTransferredToProgramme,
+        startedInProgramme,
+        studyRightElement
+      )
     }
     creditCounts[startYear].push(getCreditCount(studyRight.student.credits, startedInProgramme))
   }
