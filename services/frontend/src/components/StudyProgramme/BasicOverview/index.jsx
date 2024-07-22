@@ -234,14 +234,14 @@ export const BasicOverview = ({
                       cypress="ProgrammesBeforeOrAfter"
                       data={graduations?.data?.programmesBeforeOrAfterGraphStats.map(programme => ({
                         ...programme,
-                        name: typeof programme.name === 'string' ? programme.name : getTextIn(programme.name),
+                        name: getTextIn(programme.name),
                       }))}
                       labels={graduations?.data?.years}
                       wideTable
                     />
                     <DataTable
                       data={graduations?.data?.programmesBeforeOrAfterTableStats.map(programme =>
-                        programme.with(2, typeof programme[2] === 'string' ? programme[2] : getTextIn(programme[2]))
+                        programme.with(2, getTextIn(programme[2]))
                       )}
                       titles={graduations?.data?.programmesBeforeOrAfterTitles}
                       wideTable

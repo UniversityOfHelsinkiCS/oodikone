@@ -181,12 +181,17 @@ export const ProgrammeView = ({ studyprogramme }) => {
                   <div className="section-container">
                     <StackedBarChart
                       cypress="ProgrammesBeforeOrAfter"
-                      data={graduationData?.programmesBeforeOrAfterGraphStats}
+                      data={graduationData?.programmesBeforeOrAfterGraphStats.map(programme => ({
+                        ...programme,
+                        name: getTextIn(programme.name),
+                      }))}
                       labels={graduationData?.years}
                       wideTable
                     />
                     <DataTable
-                      data={graduationData?.programmesBeforeOrAfterTableStats}
+                      data={graduationData?.programmesBeforeOrAfterTableStats.map(programme =>
+                        programme.with(2, getTextIn(programme[2]))
+                      )}
                       titles={graduationData?.programmesBeforeOrAfterTitles}
                       wideTable
                     />
