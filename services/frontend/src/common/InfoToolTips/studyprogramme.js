@@ -103,7 +103,7 @@ export const studyProgrammeToolTips = {
 
   Paksummilla pystyviivoilla eroteltujen kategorioiden (**Current status**, **Gender**, **Countries**) sarakkeet tuottavat yhteenlaskettuna kentän **All** arvon.
 
-  Jos sivun yläosassa on valittuna ”All studyrights” (oletus), mukana ovat myös ohjelmaan siirtyneet opiskelijat.
+  Jos sivun yläosassa on valittuna ”All studyrights” (oletus), mukana ovat myös ohjelmaan siirtyneet ja ohjelmasta pois siirtyneet opiskelijat.
 
   Yläosan valikosta on mahdollista valita tarkasteluun yhden opintosuunnan opiskelijat. Luvut kuvaavat tällöin kyseisen opintosuunnan opiskelijoita.
   `,
@@ -112,7 +112,7 @@ export const studyProgrammeToolTips = {
 
   Opintopistekertymään on laskettu kaikki suoritukset, jotka opiskelija on suorittanut koulutusohjelmaan siirryttyään. Myös hyväksiluetut ja muuhun kuin valittuun koulutusohjelmaan tai opintosuuntaan tehdyt suoritukset lasketaan mukaan. Esimerkiksi jos opiskelija on valmistunut kandiohjelmasta 20.6.2020 ja siirtynyt maisteriohjelmaan seuraavana päivänä, ennen 21.6.2020 tehtyjä suorituksia ei huomioida opintopistekertymässä.
 
-  Jos sivun yläosassa on valittuna ”All studyrights” (oletus), mukana ovat myös ohjelmaan siirtyneet opiskelijat.
+  Jos sivun yläosassa on valittuna ”All studyrights” (oletus), mukana ovat myös ohjelmaan siirtyneet ja ohjelmasta pois siirtyneet opiskelijat.
 
   Mikäli sivun yläosan valikosta on valittuna jokin tietty opintosuunta, myös nämä tilastot kuvaavat vain kyseisen opintosuunnan opiskelijoita.    
   `,
@@ -139,7 +139,7 @@ studyProgrammeToolTips.StudytrackOverviewCombinedProgramme = studyProgrammeToolT
   )
 
 studyProgrammeToolTips.StudytrackProgressEvaluationOverview = studyProgrammeToolTips.StudytrackProgress.replace(
-  'Jos sivun yläosassa on valittuna ”All studyrights” (oletus), mukana ovat myös ohjelmaan siirtyneet opiskelijat.',
+  'Jos sivun yläosassa on valittuna ”All studyrights” (oletus), mukana ovat myös ohjelmaan siirtyneet ja ohjelmasta pois siirtyneet opiskelijat.',
   ''
 ).replace(
   'Mikäli sivun yläosan valikosta on valittuna jokin tietty opintosuunta, myös nämä tilastot kuvaavat vain kyseisen opintosuunnan opiskelijoita.',

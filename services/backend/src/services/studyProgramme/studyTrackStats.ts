@@ -343,9 +343,14 @@ const getMainStatsByTrackAndYear = async (
       continue
     }
 
-    const [firstStudyRightElementWithSamePhase] = getStudyRightElementsWithPhase(studyRight, studyRightElement.phase)
-    const hasTransferredToProgramme = firstStudyRightElementWithSamePhase.code !== studyRightElement.code
-    if (!includeAllSpecials && hasTransferredToProgramme) {
+    const studyRightElementsWithSamePhase = getStudyRightElementsWithPhase(studyRight, studyRightElement.phase)
+    const hasTransferredToProgramme =
+      studyRightElementsWithSamePhase[0].code !== studyRightElement.code && studyRightElement.startDate < new Date()
+    const hasTransferredFromProgramme =
+      studyRightElementsWithSamePhase[studyRightElementsWithSamePhase.length - 1].code !== studyRightElement.code &&
+      studyRightElement.endDate < new Date()
+
+    if (!includeAllSpecials && (hasTransferredToProgramme || hasTransferredFromProgramme)) {
       continue
     }
 
