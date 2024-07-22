@@ -33,6 +33,7 @@
     "winston-gelf-transporter": "^1.0.2"
   },
   "devDependencies": {
+    "@types/express": "^4.17.21",
     "@types/lodash": "^4.17.6",
     "@types/node": "^20.14.2",
     "@types/umzug": "^2.3.7",
