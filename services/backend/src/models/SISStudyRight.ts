@@ -1,4 +1,5 @@
 /* eslint-disable import/no-cycle */
+import { InferAttributes } from 'sequelize'
 import {
   BelongsTo,
   Column,
@@ -29,58 +30,58 @@ export type SemesterEnrollment = {
   underscored: true,
   tableName: 'sis_study_rights',
 })
-export class SISStudyRight extends Model {
+export class SISStudyRight extends Model<InferAttributes<SISStudyRight>> {
   @PrimaryKey
   @Column(DataType.STRING)
-  id: string
+  id!: string
 
   @ForeignKey(() => Organization)
   @Column(DataType.STRING)
-  facultyCode: string
+  facultyCode!: string
 
   @BelongsTo(() => Organization, { foreignKey: 'facultyCode', targetKey: 'code' })
-  organization: Organization
+  organization!: Organization
 
   @HasMany(() => Studyplan)
-  studyPlans: Studyplan[]
+  studyPlans!: Studyplan[]
 
   @HasMany(() => SISStudyRightElement, { foreignKey: 'studyRightId' })
-  studyRightElements: SISStudyRightElement[]
+  studyRightElements!: SISStudyRightElement[]
 
   @Column(DataType.DATE)
-  startDate: Date
+  startDate!: Date
 
   @Column(DataType.DATE)
-  endDate: Date
+  endDate!: Date
 
   @Column(DataType.DATE)
-  studyStartDate: Date
+  studyStartDate!: Date
 
   @Column(DataType.BOOLEAN)
-  cancelled: boolean
+  cancelled!: boolean
 
   @ForeignKey(() => Student)
   @Column(DataType.STRING)
-  studentNumber: string
+  studentNumber!: string
 
   @BelongsTo(() => Student)
-  student: Student
+  student!: Student
 
   @ForeignKey(() => StudyrightExtent)
   @Column(DataType.INTEGER)
-  extentCode: ExtentCode
+  extentCode!: ExtentCode
 
   @Column(DataType.STRING)
-  admissionType: string
+  admissionType!: string
 
   @Column(DataType.JSONB)
-  semesterEnrollments: SemesterEnrollment[] | null
+  semesterEnrollments!: SemesterEnrollment[] | null
 
   @CreatedAt
   @Column(DataType.DATE)
-  createdAt: Date
+  createdAt!: Date
 
   @UpdatedAt
   @Column(DataType.DATE)
-  updatedAt: Date
+  updatedAt!: Date
 }

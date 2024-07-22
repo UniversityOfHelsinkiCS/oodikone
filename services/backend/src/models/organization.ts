@@ -1,4 +1,5 @@
 /* eslint-disable import/no-cycle */
+import { InferAttributes } from 'sequelize'
 import {
   BelongsToMany,
   Column,
@@ -23,40 +24,40 @@ import { Studyright } from './studyright'
   modelName: 'organization',
   tableName: 'organization',
 })
-export class Organization extends Model {
+export class Organization extends Model<InferAttributes<Organization>> {
   @PrimaryKey
   @Column(DataType.STRING)
-  id: string
+  id!: string
 
   @Column(DataType.STRING)
-  code: string
+  code!: string
 
   @Column(DataType.JSONB)
-  name: Name
+  name!: Name
 
   @Column(DataType.STRING)
-  parent_id: string
+  parent_id!: string
 
   @HasMany(() => Organization, { foreignKey: 'parent_id', as: 'children' })
-  children: Organization[]
+  children!: Organization[]
 
   @HasMany(() => ProgrammeModule, { foreignKey: 'organization_id' })
-  programmeModules: ProgrammeModule[]
+  programmeModules!: ProgrammeModule[]
 
   @HasMany(() => SISStudyRight, { foreignKey: 'facultyCode', sourceKey: 'code' })
-  SISStudyRights: SISStudyRight[]
+  SISStudyRights!: SISStudyRight[]
 
   @HasMany(() => Studyright, { foreignKey: 'facultyCode', sourceKey: 'code' })
-  studyrights: Studyright[]
+  studyrights!: Studyright[]
 
   @BelongsToMany(() => Course, () => CourseProvider, 'organizationcode')
-  courses: Course[]
+  courses!: Course[]
 
   @CreatedAt
   @Column(DataType.DATE)
-  createdAt: Date
+  createdAt!: Date
 
   @UpdatedAt
   @Column(DataType.DATE)
-  updatedAt: Date
+  updatedAt!: Date
 }

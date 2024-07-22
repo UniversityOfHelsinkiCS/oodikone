@@ -1,4 +1,5 @@
 /* eslint-disable import/no-cycle */
+import { InferAttributes } from 'sequelize'
 import { Column, CreatedAt, DataType, ForeignKey, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
 import { ProgrammeModule } from './programmeModule'
@@ -8,23 +9,23 @@ import { ProgrammeModule } from './programmeModule'
   modelName: 'programme_module_child',
   tableName: 'programme_module_children',
 })
-export class ProgrammeModuleChild extends Model {
+export class ProgrammeModuleChild extends Model<InferAttributes<ProgrammeModuleChild>> {
   @PrimaryKey
   @Column(DataType.STRING)
-  composite: string
+  composite!: string
 
   @ForeignKey(() => ProgrammeModule)
   @Column(DataType.STRING)
-  parentId: string
+  parentId!: string
 
   @Column(DataType.STRING)
-  childId: string
+  childId!: string
 
   @CreatedAt
   @Column(DataType.DATE)
-  createdAt: Date
+  createdAt!: Date
 
   @UpdatedAt
   @Column(DataType.DATE)
-  updatedAt: Date
+  updatedAt!: Date
 }

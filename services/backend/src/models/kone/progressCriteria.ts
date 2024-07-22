@@ -1,3 +1,4 @@
+import { InferAttributes } from 'sequelize'
 import { Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript'
 
 @Table({
@@ -6,47 +7,47 @@ import { Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript
   modelName: 'progress_criteria',
   tableName: 'progress_criteria',
 })
-export class ProgressCriteria extends Model {
+export class ProgressCriteria extends Model<InferAttributes<ProgressCriteria>> {
   @PrimaryKey
   @Column(DataType.STRING)
-  code: string
+  code!: string
 
   @Column(DataType.STRING)
-  curriculumVersion: string
+  curriculumVersion!: string
 
   @Column(DataType.ARRAY(DataType.STRING))
-  coursesYearOne: string[]
+  coursesYearOne!: string[]
 
   @Column(DataType.ARRAY(DataType.STRING))
-  coursesYearTwo: string[]
+  coursesYearTwo!: string[]
 
   @Column(DataType.ARRAY(DataType.STRING))
-  coursesYearThree: string[]
+  coursesYearThree!: string[]
 
   @Column(DataType.ARRAY(DataType.STRING))
-  coursesYearFour: string[]
+  coursesYearFour!: string[]
 
   @Column(DataType.ARRAY(DataType.STRING))
-  coursesYearFive: string[]
+  coursesYearFive!: string[]
 
   @Column(DataType.ARRAY(DataType.STRING))
-  coursesYearSix: string[]
+  coursesYearSix!: string[]
 
   @Column(DataType.INTEGER)
-  creditsYearOne: number
+  creditsYearOne!: number
 
   @Column(DataType.INTEGER)
-  creditsYearTwo: number
+  creditsYearTwo!: number
 
   @Column(DataType.INTEGER)
-  creditsYearThree: number
+  creditsYearThree!: number
 
   @Column(DataType.INTEGER)
-  creditsYearFour: number
+  creditsYearFour!: number
 
   @Column(DataType.INTEGER)
-  creditsYearFive: number
+  creditsYearFive!: number
 
   @Column(DataType.INTEGER)
-  creditsYearSix: number
+  creditsYearSix!: number
 }

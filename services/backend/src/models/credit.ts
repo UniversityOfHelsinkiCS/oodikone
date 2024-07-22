@@ -1,4 +1,5 @@
 /* eslint-disable import/no-cycle */
+import { InferAttributes } from 'sequelize'
 import {
   BelongsTo,
   BelongsToMany,
@@ -26,85 +27,85 @@ import { Teacher } from './teacher'
   modelName: 'credit',
   tableName: 'credit',
 })
-export class Credit extends Model {
+export class Credit extends Model<InferAttributes<Credit>> {
   @PrimaryKey
   @Column(DataType.STRING)
-  id: string
+  id!: string
 
   @Column(DataType.STRING)
-  grade: string
+  grade!: string
 
   @ForeignKey(() => Student)
   @Column(DataType.STRING)
-  student_studentnumber: string
+  student_studentnumber!: string
 
   @BelongsTo(() => Student, { foreignKey: 'student_studentnumber', targetKey: 'studentnumber' })
-  student: Student
+  student!: Student
 
   @BelongsTo(() => Semester, { foreignKey: 'semester_composite' })
-  semester: Semester
+  semester!: Semester
 
   @Column(DataType.DOUBLE)
-  credits: number
+  credits!: number
 
   @ForeignKey(() => CreditType)
   @Column(DataType.INTEGER)
-  credittypecode: CreditTypeCode
+  credittypecode!: CreditTypeCode
 
   @BelongsTo(() => CreditType, { foreignKey: 'credittypecode', targetKey: 'credittypecode' })
-  creditType: CreditType
+  creditType!: CreditType
 
   @Column(DataType.DATE)
-  createdate: Date
+  createdate!: Date
 
   @Column(DataType.DATE)
-  attainment_date: Date
+  attainment_date!: Date
 
   @BelongsToMany(() => Teacher, () => CreditTeacher, 'credit_id')
-  teachers: Teacher[]
+  teachers!: Teacher[]
 
   @Column(DataType.STRING)
-  course_code: string
+  course_code!: string
 
   @BelongsTo(() => Course, { foreignKey: 'course_id' })
-  course: Course
+  course!: Course
 
   @ForeignKey(() => Course)
   @Column(DataType.STRING)
-  course_id: string
+  course_id!: string
 
   @Column(DataType.STRING)
-  semester_composite: string
+  semester_composite!: string
 
   @Column(DataType.INTEGER)
-  semestercode: number
+  semestercode!: number
 
   @Column(DataType.BOOLEAN)
-  isStudyModule: boolean
+  isStudyModule!: boolean
 
   @Column(DataType.STRING)
-  org: string
+  org!: string
 
   @Column(DataType.STRING)
-  language: string
+  language!: string
 
   @Column(DataType.BOOLEAN)
-  is_open: boolean
+  is_open!: boolean
 
   @ForeignKey(() => Studyright)
   @Column(DataType.STRING)
-  studyright_id: string
+  studyright_id!: string
 
   @BelongsTo(() => Studyright)
-  studyright: Studyright
+  studyright!: Studyright
 
   @CreatedAt
   @Column(DataType.DATE)
-  createdAt: Date
+  createdAt!: Date
 
   @UpdatedAt
   @Column(DataType.DATE)
-  updatedAt: Date
+  updatedAt!: Date
 
   static passed: ({ credittypecode }: { credittypecode: CreditTypeCode }) => boolean
 

@@ -1,4 +1,5 @@
 /* eslint-disable import/no-cycle */
+import { InferAttributes } from 'sequelize'
 import {
   BelongsTo,
   Column,
@@ -26,85 +27,89 @@ import { Transfer } from './transfer'
   tableName: 'studyright',
   timestamps: false,
 })
-export class Studyright extends Model {
+export class Studyright extends Model<InferAttributes<Studyright>> {
   @PrimaryKey
   @Column(DataType.STRING)
-  studyrightid: string
+  studyrightid!: string
 
   @HasMany(() => StudyrightElement, { foreignKey: 'studyrightid', sourceKey: 'studyrightid' })
-  studyright_elements: StudyrightElement[]
+  studyright_elements!: StudyrightElement[]
 
   @ForeignKey(() => StudyrightElement)
   @Column(DataType.STRING)
-  actual_studyrightid: string
+  actual_studyrightid!: string
 
   @HasMany(() => Enrollment, { foreignKey: 'studyright_id', constraints: false })
-  enrollments: Enrollment[]
+  enrollments!: Enrollment[]
 
   @BelongsTo(() => Student)
-  student: Student
+  student!: Student
 
   @BelongsTo(() => Organization, { targetKey: 'code' })
-  organization: Organization
+  organization!: Organization
 
   @HasMany(() => Transfer, { foreignKey: 'studyrightid', sourceKey: 'studyrightid' })
-  transfers: Transfer[]
+  transfers!: Transfer[]
 
   @HasMany(() => Studyplan, { foreignKey: 'studyrightid', sourceKey: 'studyrightid' })
-  studyplans: Studyplan[]
+  studyplans!: Studyplan[]
 
   @Column(DataType.DATE)
-  startdate: Date
+  startdate!: Date
 
   @Column(DataType.DATE)
-  enddate: Date
+  enddate!: Date
 
   @Column(DataType.DATE)
-  givendate: Date
+  givendate!: Date
 
   @Column(DataType.DATE)
-  studystartdate: Date
+  studystartdate!: Date
 
   @Column(DataType.STRING)
-  graduated: string
+  graduated!: string
 
   @Column(DataType.STRING)
-  active: string
+  active!: string
 
   @Column(DataType.BOOLEAN)
-  cancelled: boolean
+  cancelled!: boolean
 
   @ForeignKey(() => Student)
   @Column(DataType.STRING)
-  student_studentnumber: string
+  student_studentnumber!: string
 
   @ForeignKey(() => Organization)
   @Column({ field: 'faculty_code', type: DataType.STRING })
-  facultyCode: string
+  facultyCode!: string
 
   @Column(DataType.INTEGER)
-  prioritycode: PriorityCode
+  prioritycode!: PriorityCode
 
   @Column(DataType.INTEGER)
-  extentcode: ExtentCode
+  extentcode!: ExtentCode
 
   @BelongsTo(() => StudyrightExtent, { foreignKey: 'extentcode', targetKey: 'extentcode' })
-  studyrightExtent: StudyrightExtent
+  studyrightExtent!: StudyrightExtent
 
   @Column(DataType.STRING)
-  admission_type: string
+  admission_type!: string
 
   @Column(DataType.BOOLEAN)
-  is_ba_ma: boolean
+  is_ba_ma!: boolean
 
   @Column({ field: 'semester_enrollments', type: DataType.JSONB })
-  semesterEnrollments: Array<{ semestercode: number; enrollmenttype: EnrollmentType; statutoryAbsence: boolean }> | null
+  semesterEnrollments!: Array<{
+    semestercode: number
+    enrollmenttype: EnrollmentType
+    statutoryAbsence: boolean
+  }> | null
 
   @CreatedAt
   @Column({ field: 'created_at', type: DataType.DATE })
-  created_at: Date
+  created_at!: Date
 
   @UpdatedAt
   @Column({ field: 'updated_at', type: DataType.DATE })
-  updated_at: Date
+  updated_at!: Date
 }

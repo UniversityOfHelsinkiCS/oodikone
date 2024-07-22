@@ -1,4 +1,5 @@
 /* eslint-disable import/no-cycle */
+import { InferAttributes } from 'sequelize'
 import { Column, CreatedAt, DataType, HasMany, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
 import { GenderCode } from '../types'
@@ -16,94 +17,94 @@ import { Transfer } from './transfer'
   modelName: 'student',
   tableName: 'student',
 })
-export class Student extends Model {
+export class Student extends Model<InferAttributes<Student>> {
   @PrimaryKey
   @Column(DataType.STRING)
-  studentnumber: string
+  studentnumber!: string
 
   @Column(DataType.STRING)
-  lastname: string
+  lastname!: string
 
   @Column(DataType.STRING)
-  firstnames: string
+  firstnames!: string
 
   @Column(DataType.STRING)
-  abbreviatedname: string
+  abbreviatedname!: string
 
   @HasMany(() => Enrollment, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
-  enrollments: Enrollment[]
+  enrollments!: Enrollment[]
 
   @HasMany(() => SemesterEnrollment)
-  semester_enrollments: SemesterEnrollment[]
+  semester_enrollments!: SemesterEnrollment[]
 
   @HasMany(() => SISStudyRight)
-  studyRights: SISStudyRight[]
+  studyRights!: SISStudyRight[]
 
   @HasMany(() => Studyright)
-  studyrights: Studyright[]
+  studyrights!: Studyright[]
 
   @HasMany(() => StudyrightElement, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
-  studyrightElements: StudyrightElement[]
+  studyrightElements!: StudyrightElement[]
 
   @HasMany(() => Studyplan, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
-  studyplans: Studyplan[]
+  studyplans!: Studyplan[]
 
   @HasMany(() => Transfer, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
-  transfers: Transfer[]
+  transfers!: Transfer[]
 
   @HasMany(() => Credit, { foreignKey: 'student_studentnumber', sourceKey: 'studentnumber' })
-  credits: Credit[]
+  credits!: Credit[]
 
   @Column(DataType.DATE)
-  birthdate: Date
+  birthdate!: Date
 
   @Column(DataType.INTEGER)
-  creditcount: number
+  creditcount!: number
 
   @Column(DataType.DATE)
-  dateofuniversityenrollment: Date
+  dateofuniversityenrollment!: Date
 
   @Column(DataType.STRING)
-  email: string
+  email!: string
 
   @Column(DataType.STRING)
-  secondary_email: string
+  secondary_email!: string
 
   @Column(DataType.STRING)
-  national_student_number: string
+  national_student_number!: string
 
   @Column(DataType.STRING)
-  phone_number: string
+  phone_number!: string
 
   @Column(DataType.STRING)
-  country_fi: string
+  country_fi!: string
 
   @Column(DataType.STRING)
-  country_sv: string
+  country_sv!: string
 
   @Column(DataType.STRING)
-  country_en: string
+  country_en!: string
 
   @Column(DataType.STRING)
-  home_country_fi: string
+  home_country_fi!: string
 
   @Column(DataType.STRING)
-  home_country_sv: string
+  home_country_sv!: string
 
   @Column(DataType.STRING)
-  home_country_en: string
+  home_country_en!: string
 
   @Column(DataType.STRING)
-  gender_code: GenderCode
+  gender_code!: GenderCode
 
   @Column(DataType.STRING)
-  sis_person_id: string
+  sis_person_id!: string
 
   @CreatedAt
   @Column(DataType.DATE)
-  createdAt: Date
+  createdAt!: Date
 
   @UpdatedAt
   @Column(DataType.DATE)
-  updatedAt: Date
+  updatedAt!: Date
 }

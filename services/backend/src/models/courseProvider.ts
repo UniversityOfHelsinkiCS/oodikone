@@ -1,4 +1,5 @@
 /* eslint-disable import/no-cycle */
+import { InferAttributes } from 'sequelize'
 import { Column, CreatedAt, DataType, ForeignKey, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
 import { Course } from './course'
@@ -15,27 +16,27 @@ import { Organization } from './organization'
     },
   ],
 })
-export class CourseProvider extends Model {
+export class CourseProvider extends Model<InferAttributes<CourseProvider>> {
   @PrimaryKey
   @Column(DataType.STRING)
-  composite: string
+  composite!: string
 
   @ForeignKey(() => Course)
   @Column(DataType.STRING)
-  coursecode: string
+  coursecode!: string
 
   @Column(DataType.JSONB)
-  shares: Array<{ share: number; startDate?: string; endDate?: string }> | null
+  shares!: Array<{ share: number; startDate?: string; endDate?: string }> | null
 
   @ForeignKey(() => Organization)
   @Column(DataType.STRING)
-  organizationcode: string
+  organizationcode!: string
 
   @CreatedAt
   @Column(DataType.DATE)
-  createdAt: Date
+  createdAt!: Date
 
   @UpdatedAt
   @Column(DataType.DATE)
-  updatedAt: Date
+  updatedAt!: Date
 }

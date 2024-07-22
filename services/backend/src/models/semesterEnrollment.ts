@@ -1,4 +1,5 @@
 /* eslint-disable import/no-cycle */
+import { InferAttributes } from 'sequelize'
 import {
   BelongsTo,
   Column,
@@ -20,42 +21,42 @@ import { Student } from './student'
   modelName: 'semester_enrollment',
   tableName: 'semester_enrollments',
 })
-export class SemesterEnrollment extends Model {
+export class SemesterEnrollment extends Model<InferAttributes<SemesterEnrollment>> {
   @PrimaryKey
   @Column(DataType.INTEGER)
-  enrollmenttype: EnrollmentType
+  enrollmenttype!: EnrollmentType
 
   @Column(DataType.STRING)
-  org: string
+  org!: string
 
   @ForeignKey(() => Student)
   @Column(DataType.STRING)
-  studentnumber: string
+  studentnumber!: string
 
   @BelongsTo(() => Student)
-  student: Student
+  student!: Student
 
   @Column(DataType.INTEGER)
-  semestercode: number
+  semestercode!: number
 
   @ForeignKey(() => Semester)
   @Column(DataType.STRING)
-  semestercomposite: string
+  semestercomposite!: string
 
   @BelongsTo(() => Semester)
-  semester: Semester
+  semester!: Semester
 
   @Column(DataType.DATE)
-  enrollment_date: Date
+  enrollment_date!: Date
 
   @Column(DataType.BOOLEAN)
-  statutory_absence: boolean
+  statutory_absence!: boolean
 
   @CreatedAt
   @Column(DataType.DATE)
-  createdAt: Date
+  createdAt!: Date
 
   @UpdatedAt
   @Column(DataType.DATE)
-  updatedAt: Date
+  updatedAt!: Date
 }

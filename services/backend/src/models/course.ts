@@ -1,4 +1,5 @@
 /* eslint-disable import/no-cycle */
+import { InferAttributes } from 'sequelize'
 import {
   BelongsTo,
   BelongsToMany,
@@ -25,75 +26,75 @@ import { Organization } from './organization'
   modelName: 'course',
   tableName: 'course',
 })
-export class Course extends Model {
+export class Course extends Model<InferAttributes<Course>> {
   @PrimaryKey
   @Column(DataType.STRING)
-  id: string
+  id!: string
 
   @ForeignKey(() => Course)
   @Column(DataType.STRING)
-  code: string
+  code!: string
 
   @ForeignKey(() => CourseType)
   @Column(DataType.STRING)
-  coursetypecode: string
+  coursetypecode!: string
 
   @BelongsTo(() => CourseType, { foreignKey: 'coursetypecode', targetKey: 'coursetypecode' })
-  courseType: CourseType
+  courseType!: CourseType
 
   @HasMany(() => Credit, { foreignKey: 'course_id', sourceKey: 'id' })
-  credits: Credit[]
+  credits!: Credit[]
 
   @HasMany(() => Enrollment, { foreignKey: 'course_id' })
-  enrollments: Enrollment[]
+  enrollments!: Enrollment[]
 
   @BelongsToMany(() => Organization, () => CourseProvider, 'coursecode')
-  organizations: Organization[]
+  organizations!: Organization[]
 
   @Column(DataType.BOOLEAN)
-  is_study_module: boolean
+  is_study_module!: boolean
 
   @Column(DataType.JSONB)
-  name: Name
+  name!: Name
 
   @Column(DataType.DATE)
-  latest_instance_date: Date
+  latest_instance_date!: Date
 
   @Column(DataType.DATE)
-  startdate: Date
+  startdate!: Date
 
   @Column(DataType.DATE)
-  enddate: Date
+  enddate!: Date
 
   @Column(DataType.DATE)
-  max_attainment_date: Date
+  max_attainment_date!: Date
 
   @Column(DataType.DATE)
-  min_attainment_date: Date
+  min_attainment_date!: Date
 
   @CreatedAt
   @Column({
     field: 'created_at',
     type: DataType.DATE,
   })
-  createdAt: Date
+  createdAt!: Date
 
   @UpdatedAt
   @Column({
     field: 'updated_at',
     type: DataType.DATE,
   })
-  updatedAt: Date
+  updatedAt!: Date
 
   @Column(DataType.JSONB)
-  substitutions: string[]
+  substitutions!: string[]
 
   @Column(DataType.STRING)
-  course_unit_type: string
+  course_unit_type!: string
 
   @Column({
     field: 'main_course_code',
     type: DataType.STRING,
   })
-  mainCourseCode: string
+  mainCourseCode!: string
 }
