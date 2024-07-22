@@ -18,10 +18,6 @@ router.get('/', async (req: CustomRequest, res: Response) => {
     throw new ApplicationError('User not found', 404)
   }
 
-  if (!logoutUrl) {
-    throw new ApplicationError('Logout URL is missing')
-  }
-
   res.send({
     user: omit(user, ['studentsUserCanAccess']),
     logoutUrl,
