@@ -1,4 +1,5 @@
 import moment from 'moment'
+import { InferAttributes } from 'sequelize'
 
 import { Credit, SISStudyRight, SISStudyRightElement } from '../../models'
 import { GenderCode, EnrollmentType, ExtentCode } from '../../types'
@@ -18,7 +19,7 @@ import {
   defineYear,
   getStudyRightElementsWithPhase,
 } from './studyProgrammeHelpers'
-import { getStudyRightsInProgramme, getStudyTracksForProgramme } from './studyRightFinders'
+import { getStudyTracksForProgramme } from './studyRightFinders'
 
 const getCreditCount = (credits: Credit[], startDate: Date) =>
   credits
@@ -186,10 +187,9 @@ const getMainStatsByTrackAndYear = async (
   studyProgramme: string,
   includeGraduated: boolean,
   includeAllSpecials: boolean,
+  studyRightsOfProgramme: Array<InferAttributes<SISStudyRight>>,
   combinedProgramme?: string
 ) => {
-  const studyRightsOfProgramme = await getStudyRightsInProgramme(studyProgramme, false, true)
-
   const yearlyStats: Record<string, YearlyData> = {}
 
   const { semesters } = await getSemestersAndYears()
@@ -203,7 +203,7 @@ const getMainStatsByTrackAndYear = async (
   const updateCounts = (
     year: string,
     programmeOrStudyTrack: string,
-    studyRight: SISStudyRight,
+    studyRight: InferAttributes<SISStudyRight>,
     hasTransferredToProgramme: boolean,
     startedInProgramme: Date,
     studyRightElement: SISStudyRightElement
@@ -434,10 +434,12 @@ export const getStudytrackStatsForStudyprogramme = async ({
   studyprogramme,
   combinedProgramme,
   settings,
+  studyRightsOfProgramme,
 }: {
   studyprogramme: string
   combinedProgramme?: string
   settings: { graduated: boolean; specialGroups: boolean }
+  studyRightsOfProgramme: Array<InferAttributes<SISStudyRight>>
 }) => {
   const isAcademicYear = true
   const includeYearsCombined = true
@@ -452,6 +454,7 @@ export const getStudytrackStatsForStudyprogramme = async ({
     studyprogramme,
     settings.graduated,
     settings.specialGroups,
+    studyRightsOfProgramme,
     combinedProgramme
   )
 

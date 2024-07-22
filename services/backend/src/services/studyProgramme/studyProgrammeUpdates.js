@@ -2,6 +2,7 @@ const { setBasicStats, setCreditStats, setGraduationStats, setStudytrackStats } 
 const { computeCreditsProduced } = require('../providerCredits')
 const { getBasicStatsForStudytrack } = require('./studyProgrammeBasics')
 const { getGraduationStatsForStudytrack } = require('./studyProgrammeGraduations')
+const { getStudyRightsInProgramme } = require('./studyRightFinders')
 const { getStudytrackStatsForStudyprogramme } = require('./studyTrackStats')
 
 const updateBasicView = async (code, combinedProgramme) => {
@@ -38,6 +39,7 @@ const updateBasicView = async (code, combinedProgramme) => {
 const updateStudytrackView = async (code, combinedProgramme) => {
   const graduatedOptions = ['GRADUATED_INCLUDED', 'GRADUATED_EXCLUDED']
   const specialGroupOptions = ['SPECIAL_INCLUDED', 'SPECIAL_EXCLUDED']
+  const studyRightsOfProgramme = await getStudyRightsInProgramme(code, false, true)
 
   for (const graduated of graduatedOptions) {
     for (const specialGroup of specialGroupOptions) {
@@ -48,6 +50,7 @@ const updateStudytrackView = async (code, combinedProgramme) => {
           specialGroups: specialGroup === 'SPECIAL_INCLUDED',
           graduated: graduated === 'GRADUATED_INCLUDED',
         },
+        studyRightsOfProgramme,
       })
       await setStudytrackStats(stats, graduated, specialGroup)
     }
