@@ -1,4 +1,4 @@
-import { Op, QueryTypes } from 'sequelize'
+import { InferAttributes, Op, QueryTypes } from 'sequelize'
 
 import { dbConnections } from '../database/connection'
 import {
@@ -112,7 +112,7 @@ const byStudentNumber = async (studentNumber: string) => {
   student.semester_enrollments = mappedEnrollments as Array<SemesterEnrollmentWithNameAndYear>
 
   return {
-    ...(student.dataValues as Student),
+    ...student.dataValues,
     tags: tags.map(tag => ({
       ...tag.get(),
       programme: tagprogrammes.find(programme => programme.code === tag.tag.studytrack),
@@ -122,7 +122,7 @@ const byStudentNumber = async (studentNumber: string) => {
 
 export type UnifyStatus = 'unifyStats' | 'openStats' | 'regularStats' | undefined
 
-const getUnifyStatus = (unifyCourses: UnifyStatus): [boolean] | [boolean, false] => {
+const getUnifyStatus = (unifyCourses: UnifyStatus): [boolean] | [true, false] => {
   switch (unifyCourses) {
     case 'unifyStats':
       return [true, false]
@@ -305,7 +305,7 @@ const formatSharedStudentData = ({
 const formatStudent = (
   studentData: Partial<Omit<Student, 'semester_enrollments'>> & {
     semester_enrollments: SemesterEnrollmentWithNameAndYear[]
-  } & { tags: TagStudent[] }
+  } & { tags: Array<InferAttributes<TagStudent> & { programme?: ElementDetail }> }
 ) => {
   const formattedData = formatSharedStudentData(studentData)
   return {

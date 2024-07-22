@@ -1,4 +1,4 @@
-import { Op } from 'sequelize'
+import { InferAttributes, Op, WhereOptions } from 'sequelize'
 
 import { Course, Credit, Enrollment, Student, SISStudyRight } from '../../models'
 import { OpenUniPopulationSearch } from '../../models/kone'
@@ -64,22 +64,27 @@ export const getCourseNames = async (courseCodes: string[]) =>
   ).map(formatCourseInfo)
 
 export const getStudyRights = async (studentNumbers: string[]) => {
+  const where: WhereOptions<InferAttributes<SISStudyRight>> = {
+    extentCode: {
+      [Op.in]: [
+        ExtentCode.BACHELOR,
+        ExtentCode.BACHELOR_AND_MASTER,
+        ExtentCode.MASTER,
+        ExtentCode.LICENTIATE,
+        ExtentCode.DOCTOR,
+      ],
+    },
+  }
+
+  if (studentNumbers.length > 0) {
+    where.studentNumber = {
+      [Op.in]: studentNumbers,
+    }
+  }
+
   return await SISStudyRight.findAll({
     attributes: ['startDate', 'endDate', 'studentNumber'],
-    where: {
-      studentNumber: {
-        [Op.in]: studentNumbers.length > 0 ? studentNumbers : { [Op.not]: null },
-      },
-      extentCode: {
-        [Op.in]: [
-          ExtentCode.BACHELOR,
-          ExtentCode.BACHELOR_AND_MASTER,
-          ExtentCode.MASTER,
-          ExtentCode.LICENTIATE,
-          ExtentCode.DOCTOR,
-        ],
-      },
-    },
+    where,
   })
 }
 
