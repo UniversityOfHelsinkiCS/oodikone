@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 import { Redirect, Route, Switch } from 'react-router-dom'
-
+import { isDefaultServiceProvider } from '@/common'
 import { CloseToGraduation } from '@/components/CloseToGraduation'
 import { CompletedCourses } from '@/components/CompletedCoursesSearch'
 import { CoursePopulation } from '@/components/CoursePopulation'
@@ -48,7 +48,7 @@ export const Routes = () => (
   <Suspense fallback={<SegmentDimmer isLoading />}>
     <Switch>
       <Route component={FrontPage} exact path="/" />
-      <Route component={Feedback} exact path={routes.feedback} />
+      {isDefaultServiceProvider() && <Route component={Feedback} exact path={routes.feedback} />}
       <ProtectedRoute
         component={PopulationStatistics}
         exact
@@ -99,12 +99,14 @@ export const Routes = () => (
         requireUserHasRights
         requiredRoles={['admin', 'fullSisuAccess', 'studyGuidanceGroups']}
       />
-      <ProtectedRoute
-        component={CustomOpenUniPopulation}
-        exact
-        path={routes.customOpenUniPopulation}
-        requiredRoles={['admin', 'openUniSearch']}
-      />
+      {isDefaultServiceProvider() && (
+        <ProtectedRoute
+          component={CustomOpenUniPopulation}
+          exact
+          path={routes.customOpenUniPopulation}
+          requiredRoles={['admin', 'openUniSearch']}
+        />
+      )}
       <ProtectedRoute component={CompletedCourses} exact path={routes.completedCoursesSearch} />
       <ProtectedRoute component={Updater} exact path={routes.updater} requireUserHasRights requiredRoles={['admin']} />
       <ProtectedRoute
@@ -113,13 +115,15 @@ export const Routes = () => (
         path={routes.studyGuidanceGroups}
         requiredRoles={['studyGuidanceGroups']}
       />
-      <ProtectedRoute
-        component={LanguageCenterView}
-        exact
-        path={routes.languageCenterView}
-        requireUserHasRights
-        requiredRoles={['admin']}
-      />
+      {isDefaultServiceProvider() && (
+        <ProtectedRoute
+          component={LanguageCenterView}
+          exact
+          path={routes.languageCenterView}
+          requireUserHasRights
+          requiredRoles={['admin']}
+        />
+      )}
       <ProtectedRoute
         component={EvaluationOverview}
         exact
