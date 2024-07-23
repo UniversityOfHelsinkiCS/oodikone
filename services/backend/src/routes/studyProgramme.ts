@@ -1,41 +1,29 @@
-const router = require('express').Router()
+import { Router } from 'express'
 
-const { SISStudyRightElement } = require('../models')
-const {
+import {
   getBasicStats,
   setBasicStats,
   getGraduationStats,
   setGraduationStats,
   getStudytrackStats,
   setStudytrackStats,
-} = require('../services/analyticsService')
-const { getCreditsProduced } = require('../services/providerCredits')
-const { getProgrammeName } = require('../services/studyProgramme')
-const { getBasicStatsForStudytrack } = require('../services/studyProgramme/studyProgrammeBasics')
-const {
+} from '../services/analyticsService'
+import { getCreditsProduced } from '../services/providerCredits'
+import { getProgrammeName } from '../services/studyProgramme'
+import { getBasicStatsForStudytrack } from '../services/studyProgramme/studyProgrammeBasics'
+import {
   getStudyprogrammeCoursesForStudytrack,
   getStudyprogrammeStatsForColorizedCoursesTable,
-} = require('../services/studyProgramme/studyProgrammeCourses')
-const { getGraduationStatsForStudytrack } = require('../services/studyProgramme/studyProgrammeGraduations')
-const { updateBasicView, updateStudytrackView } = require('../services/studyProgramme/studyProgrammeUpdates')
-const { getStudyRightsInProgramme } = require('../services/studyProgramme/studyRightFinders')
-const { getStudytrackStatsForStudyprogramme } = require('../services/studyProgramme/studyTrackStats')
-const { getProgrammesFromStudyRights } = require('../services/studyrights')
-const logger = require('../util/logger')
+} from '../services/studyProgramme/studyProgrammeCourses'
+import { getGraduationStatsForStudytrack } from '../services/studyProgramme/studyProgrammeGraduations'
+import { updateBasicView, updateStudytrackView } from '../services/studyProgramme/studyProgrammeUpdates'
+import { getStudyRightsInProgramme } from '../services/studyProgramme/studyRightFinders'
+import { getStudytrackStatsForStudyprogramme } from '../services/studyProgramme/studyTrackStats'
+import { getProgrammesFromStudyRights } from '../services/studyrights'
+import logger from '../util/logger'
+import { logInfoForGrafana } from '../util/logInfoForGrafana'
 
-// For grafana statistics (idea stolen from Norppa)
-const logInfoForGrafana = async (code, combinedProgramme) => {
-  const programme = await SISStudyRightElement.findOne({ where: { code } })
-  if (!programme) {
-    logger.error('Study Programme not found', { studyprogrammeCode: code })
-    return
-  }
-  const programmeCode = combinedProgramme ? `${programme.code}-${combinedProgramme}` : programme.code
-  logger.info('Study Programme', {
-    studyprogrammeName: combinedProgramme ? `${programme.name.fi} + maisteri` : programme.name.fi,
-    studyprogrammeCode: programmeCode,
-  })
-}
+const router = Router()
 
 router.get('/', async (_req, res) => {
   const studyProgrammes = await getProgrammesFromStudyRights()
@@ -43,10 +31,9 @@ router.get('/', async (_req, res) => {
 })
 
 router.get('/creditstats', async (req, res) => {
-  const { codes: codesListString, isAcademicYear, includeSpecials } = req.query
-  const codes = JSON.parse(codesListString)
+  const { codes, isAcademicYear, includeSpecials } = req.query
   const stats = {}
-  for (const code of codes) {
+  for (const code of JSON.parse(codes as string)) {
     stats[code] = await getCreditsProduced(code, isAcademicYear !== 'false', includeSpecials !== 'false')
   }
   return res.json({ stats })
@@ -56,7 +43,7 @@ router.get('/:id/basicstats', async (req, res) => {
   const code = req.params.id
   const yearType = req.query?.year_type
   const specialGroups = req.query?.special_groups
-  const combinedProgramme = req.query?.combined_programme
+  const combinedProgramme = req.query?.combined_programme as string
   if (!code) {
     return res.status(422).end()
   }
@@ -75,7 +62,9 @@ router.get('/:id/basicstats', async (req, res) => {
       includeAllSpecials: specialGroups === 'SPECIAL_INCLUDED',
     },
   })
-  if (updated) await setBasicStats(updated, yearType, specialGroups)
+  if (updated) {
+    await setBasicStats(updated, yearType, specialGroups)
+  }
   return res.json(updated)
 })
 
@@ -83,12 +72,16 @@ router.get('/:id/graduationstats', async (req, res) => {
   const code = req.params.id
   const yearType = req.query?.year_type
   const specialGroups = req.query?.special_groups
-  const combinedProgramme = req.query?.combined_programme
-
-  if (!code) return res.status(422).end()
+  const combinedProgramme = req.query?.combined_programme as string
+  if (!code) {
+    return res.status(422).end()
+  }
 
   const data = await getGraduationStats(code, combinedProgramme, yearType, specialGroups)
-  if (data) return res.json(data)
+  if (data) {
+    return res.json(data)
+  }
+
   const updatedStats = await getGraduationStatsForStudytrack({
     studyprogramme: req.params.id,
     combinedProgramme,
@@ -97,17 +90,18 @@ router.get('/:id/graduationstats', async (req, res) => {
       includeAllSpecials: specialGroups === 'SPECIAL_INCLUDED',
     },
   })
-  if (updatedStats) await setGraduationStats(updatedStats, yearType, specialGroups)
+  if (updatedStats) {
+    await setGraduationStats(updatedStats, yearType, specialGroups)
+  }
   return res.json(updatedStats)
 })
 
 router.get('/:id/coursestats', async (req, res) => {
   const code = req.params.id
   const showByYear = req.query.academicyear
-  const combinedProgramme = req.query?.combined_programme
+  const combinedProgramme = req.query?.combined_programme as string
   const date = new Date()
   date.setHours(23, 59, 59, 999)
-
   logInfoForGrafana(code, combinedProgramme)
   try {
     const data = await getStudyprogrammeCoursesForStudytrack(date.getTime(), code, showByYear, combinedProgramme)
@@ -121,13 +115,16 @@ router.get('/:id/studytrackstats', async (req, res) => {
   const code = req.params.id
   const graduated = req.query?.graduated
   const specialGroups = req.query?.special_groups
-  const combinedProgramme = req.query?.combined_programme
-
-  if (!code) return res.status(422).end()
+  const combinedProgramme = req.query?.combined_programme as string
+  if (!code) {
+    return res.status(422).end()
+  }
 
   logInfoForGrafana(code, combinedProgramme)
   const data = await getStudytrackStats(code, combinedProgramme, graduated, specialGroups)
-  if (data) return res.json(data)
+  if (data) {
+    return res.json(data)
+  }
 
   const studyRightsOfProgramme = await getStudyRightsInProgramme(code, false, true)
   const updated = await getStudytrackStatsForStudyprogramme({
@@ -139,13 +136,14 @@ router.get('/:id/studytrackstats', async (req, res) => {
     },
     studyRightsOfProgramme,
   })
-  if (updated) await setStudytrackStats(updated, graduated, specialGroups)
+  if (updated) {
+    await setStudytrackStats(updated, graduated, specialGroups)
+  }
   return res.json(updated)
 })
 
 router.get('/:id/colorizedtablecoursestats', async (req, res) => {
   const code = req.params.id
-
   try {
     const data = await getStudyprogrammeStatsForColorizedCoursesTable(code)
     return res.json(data)
@@ -191,9 +189,9 @@ router.get('/:id/evaluationstats', async (req, res) => {
   const yearType = req.query?.year_type
   const specialGroups = req.query?.special_groups
   const graduated = req.query?.graduated
-
-  if (!code) return res.status(422).end()
-
+  if (!code) {
+    return res.status(422).end()
+  }
   // Statistics for Tilannekuvalomake view
   const combinedProgramme = ''
   let gradData = await getGraduationStats(code, combinedProgramme, yearType, specialGroups)
@@ -248,4 +246,4 @@ router.get('/:id/evaluationstats', async (req, res) => {
   return res.json(data)
 })
 
-module.exports = router
+export default router
