@@ -26,7 +26,7 @@ const nameLikeTerm = (name: string) => {
   }
 }
 
-const escapeRegExp = (string: string): string => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+const escapeRegExp = (string: string) => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
 const codeLikeTerm = (code: string) => {
   if (!code) {

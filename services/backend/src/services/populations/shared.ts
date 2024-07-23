@@ -498,7 +498,7 @@ const getSubstitutions = async (codes: string[]) => {
   return substitutions
 }
 
-const getCourseCodes = async courses => {
+const getCourseCodes = async (courses: string[]) => {
   if (courses.length === 0) {
     return ['DUMMY']
   }

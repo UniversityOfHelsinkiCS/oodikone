@@ -13,7 +13,7 @@ router.get('/', async (req, res) => {
   if (studyProgramme !== '' && !studyProgramme) {
     return res.status(422).end()
   }
-  const studyProgrammeCriteria = await getCriteria(studyProgramme)
+  const studyProgrammeCriteria = await getCriteria(studyProgramme as string)
   return res.json(studyProgrammeCriteria)
 })
 
