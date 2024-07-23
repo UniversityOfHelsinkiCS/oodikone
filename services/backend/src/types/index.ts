@@ -2,6 +2,7 @@
 import { CreditTypeCode } from './creditTypeCode'
 import { DetailedProgrammeRights } from './detailedProgrammeRights'
 import { ElementDetailType } from './elementDetailType'
+import { EnrollmentState } from './enrollmentState'
 import { EnrollmentType } from './enrollmentType'
 import { ExtentCode } from './extentCode'
 import { GenderCode } from './genderCode'
@@ -18,6 +19,7 @@ export {
   CreditTypeCode,
   DetailedProgrammeRights,
   ElementDetailType,
+  EnrollmentState,
   EnrollmentType,
   ExpandedUser,
   ExtentCode,

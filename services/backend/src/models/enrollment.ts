@@ -12,6 +12,7 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
+import { EnrollmentState } from '../types'
 import { Course } from './course'
 import { Semester } from './semester'
 import { Student } from './student'
@@ -38,7 +39,7 @@ export class Enrollment extends Model<InferAttributes<Enrollment>> {
   course_code!: string
 
   @Column(DataType.STRING)
-  state!: string
+  state!: EnrollmentState
 
   @Column(DataType.DATE)
   enrollment_date_time!: Date
