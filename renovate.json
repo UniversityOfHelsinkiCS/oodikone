@@ -15,5 +15,8 @@
       "versioning": "node"
     }
   ],
-  "rebaseWhen": "never"
+  "rebaseWhen": "never",
+  "vulnerabilityAlerts": {
+    "labels": ["security"]
+  }
 }
