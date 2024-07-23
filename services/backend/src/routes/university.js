@@ -8,6 +8,14 @@ const { getMedian } = require('../services/studyProgramme/studyProgrammeHelpers'
 
 const degreeNames = ['bachelor', 'bachelorMaster', 'master', 'licentiate', 'doctor']
 
+const getProgrammeNames = faculties => {
+  return faculties.reduce((obj, faculty) => {
+    const { name, ...rest } = faculty.dataValues
+    obj[faculty.code] = { ...rest, ...name }
+    return obj
+  }, {})
+}
+
 router.get('/allprogressstats', async (req, res) => {
   const specialGroups = req.query?.specialsIncluded === 'true' ? 'SPECIAL_INCLUDED' : 'SPECIAL_EXCLUDED'
   const graduated = req.query?.graduated
@@ -29,11 +37,7 @@ router.get('/allprogressstats', async (req, res) => {
     yearlyBcMsTitles: codeToData[magicFacultyCode].yearlyBcMsTitles,
     yearlyMasterTitles: codeToData[magicFacultyCode].yearlyMasterTitles,
     yearlyLicentiateTitles: codeToData[magicFacultyCode].yearlyLicentiateTitles,
-    programmeNames: allFaculties.reduce((obj, faculty) => {
-      const { name, ...rest } = faculty.dataValues
-      obj[faculty.code] = { ...rest, ...name }
-      return obj
-    }, {}),
+    programmeNames: getProgrammeNames(allFaculties),
     bachelorsProgStats: {},
     creditCounts: {
       bachelor: {},
@@ -160,11 +164,7 @@ router.get('/allgraduationstats', async (_req, res) => {
       doctor: 48,
       licentiate: 78,
     },
-    programmeNames: allFaculties.reduce((obj, faculty) => {
-      const { name, ...rest } = faculty.dataValues
-      obj[faculty.code] = { ...rest, ...name }
-      return obj
-    }, {}),
+    programmeNames: getProgrammeNames(allFaculties),
     byGradYear: { medians: {}, programmes: { medians: {} } },
     classSizes: { programmes: {} },
   }
