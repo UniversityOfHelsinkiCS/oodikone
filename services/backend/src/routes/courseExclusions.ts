@@ -1,13 +1,24 @@
-import { Router } from 'express'
+import { Response, Router } from 'express'
 
 import { addExcludedCourses, removeExcludedCourses } from '../services/excludedCourses'
+import { OodikoneRequest } from '../types'
 
 const router = Router()
 
-router.post('/:code', async (req, res) => {
+interface ExcludedCoursesRequest extends OodikoneRequest {
+  body: {
+    courseCodes: string[]
+    curriculumVersion: string
+  }
+  params: {
+    code: string
+  }
+}
+
+router.post('/:code', async (req: ExcludedCoursesRequest, res: Response) => {
   const { code: programmeCode } = req.params
   const { courseCodes, curriculumVersion } = req.body
-  const result = await addExcludedCourses(programmeCode, courseCodes, curriculumVersion.join(','))
+  const result = await addExcludedCourses(programmeCode, courseCodes, curriculumVersion)
   if (!result) {
     res.status(400).end()
     return
@@ -15,9 +26,9 @@ router.post('/:code', async (req, res) => {
   res.json(result)
 })
 
-router.delete('/:code', async (req, res) => {
+router.delete('/:code', async (req: ExcludedCoursesRequest, res: Response) => {
   const { code: programmeCode } = req.params
-  const { curriculumVersion, courseCodes } = req.body
+  const { courseCodes, curriculumVersion } = req.body
   const result = await removeExcludedCourses(programmeCode, courseCodes, curriculumVersion)
   if (!result) {
     res.status(400).end()

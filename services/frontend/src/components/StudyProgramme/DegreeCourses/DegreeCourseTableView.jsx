@@ -92,7 +92,7 @@ export const DegreeCourseTableView = ({
     setExclusion({
       programmeCode: excludeFromProgramme,
       courseCodes: module.courses.filter(course => course.visible.visibility).map(course => course.code),
-      curriculumVersion: curriculum.version,
+      curriculumVersion: version,
     })
     setModuleVisibility(code, false)
   }
@@ -147,7 +147,7 @@ export const DegreeCourseTableView = ({
           setExclusion({
             programmeCode: excludeFromProgramme,
             courseCodes: [course.code],
-            curriculumVersion: curriculum.version,
+            curriculumVersion: version,
           })
           setCourseVisibility(course.code, false)
         }}
