@@ -1,18 +1,20 @@
-const Sentry = require('@sentry/node')
-const { intersection } = require('lodash')
+import Sentry from '@sentry/node'
+import { NextFunction, Response } from 'express'
+import { intersection } from 'lodash'
 
-const { requiredGroup, serviceProvider, configLogoutUrl, isDev } = require('../config')
-const { getUser, getMockedUser, getOrganizationAccess } = require('../services/userService')
-const { ApplicationError } = require('../util/customErrors')
-const logger = require('../util/logger')
+import { configLogoutUrl, isDev, requiredGroup, serviceProvider } from '../config'
+import { getMockedUser, getMockedUserFd, getOrganizationAccess, getUserFd, getUserToska } from '../services/userService'
+import { OodikoneRequest } from '../types'
+import { ApplicationError } from '../util/customErrors'
+import logger from '../util/logger'
 
-const parseIamGroups = iamGroups => iamGroups?.split(';') ?? []
+const parseIamGroups = (iamGroups: string) => iamGroups?.split(';') ?? []
 
-const hasRequiredIamGroup = (iamGroups, iamRights) => {
+const hasRequiredIamGroup = (iamGroups: string[], iamRights: string[]) => {
   return intersection(iamGroups, requiredGroup).length > 0 || iamRights.length > 0
 }
 
-const toskaUserMiddleware = async (req, _res, next) => {
+const toskaUserMiddleware = async (req: OodikoneRequest, _res: Response, next: NextFunction) => {
   const {
     'shib-session-id': sessionId,
     'x-show-as-user': showAsUser,
@@ -24,8 +26,7 @@ const toskaUserMiddleware = async (req, _res, next) => {
     uid: username,
   } = req.headers
 
-  const missingHeaders = []
-
+  const missingHeaders: string[] = []
   if (!sessionId) missingHeaders.push('shib-session-id')
   if (!username) missingHeaders.push('uid')
 
@@ -37,8 +38,8 @@ const toskaUserMiddleware = async (req, _res, next) => {
     )
   }
 
-  const iamGroups = parseIamGroups(hygroupcn)
-  const { access = {}, specialGroup = {} } = await getOrganizationAccess(sisId, iamGroups)
+  const iamGroups = parseIamGroups(hygroupcn as string)
+  const { access = {}, specialGroup = {} } = await getOrganizationAccess(sisId as string, iamGroups)
   const iamRights = Object.keys(access)
 
   if (!hasRequiredIamGroup(iamGroups, iamRights)) {
@@ -52,9 +53,17 @@ const toskaUserMiddleware = async (req, _res, next) => {
   let user
 
   if (showAsUser && specialGroup?.superAdmin) {
-    user = await getMockedUser({ userToMock: showAsUser, mockedBy: username })
+    user = await getMockedUser({ userToMock: showAsUser as string, mockedBy: username as string })
   } else {
-    user = await getUser({ username, name, email, iamGroups, specialGroup, sisId, access })
+    user = await getUserToska({
+      username: username as string,
+      name: name as string,
+      email: email as string,
+      iamGroups,
+      specialGroup,
+      sisId: sisId as string,
+      access,
+    })
   }
 
   if (!user) {
@@ -64,12 +73,12 @@ const toskaUserMiddleware = async (req, _res, next) => {
   Sentry.setUser({ username: user.mockedBy ?? username })
 
   req.user = user
-  req.logoutUrl = logoutUrl
+  req.logoutUrl = logoutUrl as string
 
   next()
 }
 
-const fdUserMiddleware = async (req, _res, next) => {
+const fdUserMiddleware = async (req: OodikoneRequest, _res: Response, next: NextFunction) => {
   const { remote_user: remoteUser, 'x-show-as-user': showAsUser } = req.headers
 
   if (!remoteUser) {
@@ -80,9 +89,9 @@ const fdUserMiddleware = async (req, _res, next) => {
 
   // getMockedUser in production requires the superAdmin-role, which is only available via iamGroups, so it's now only implemented for the dev environment
   if (showAsUser && isDev) {
-    user = await getMockedUser({ userToMock: showAsUser, mockedBy: remoteUser })
+    user = await getMockedUserFd({ userToMock: showAsUser as string, mockedBy: remoteUser as string })
   } else {
-    user = await getUser({ username: remoteUser })
+    user = await getUserFd({ username: remoteUser as string })
   }
 
   if (!user) {
@@ -97,4 +106,4 @@ const fdUserMiddleware = async (req, _res, next) => {
 
 const currentUserMiddleware = serviceProvider === 'Toska' ? toskaUserMiddleware : fdUserMiddleware
 
-module.exports = currentUserMiddleware
+export default currentUserMiddleware
