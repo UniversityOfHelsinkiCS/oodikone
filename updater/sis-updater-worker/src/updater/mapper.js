@@ -500,4 +500,5 @@ module.exports = {
   sanitizeCourseCode,
   validAttainmentTypes,
   customAttainmentTypes,
+  isModule,
 }

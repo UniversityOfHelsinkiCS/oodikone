@@ -10,6 +10,7 @@ const {
   courseProviderMapper,
   validAttainmentTypes,
   customAttainmentTypes,
+  isModule,
 } = require('../mapper')
 
 const updateTeachers = async attainments => {
@@ -94,7 +95,7 @@ const updateAttainments = async (
   ]
   // This mayhem fixes missing course_unit references for CustomCourseUnitAttainments.
   const fixCustomCourseUnitAttainments = async attainments => {
-    const addCourseUnitToCustomCourseUnitAttainments = (courses, attIdToCourseCode) => async att => {
+    const addCourseUnitToCustomCourseUnitAttainments = courses => async att => {
       // Fix attainments with missing modules
       if (modulesNotAvailable.includes(att.module_group_id)) {
         if (att.module_group_id === 'hy-SM-89304486') {
@@ -140,21 +141,12 @@ const updateAttainments = async (
       // If there's no suitable courseunit, there isn't courseunit available at all.
       // --> Course should be created, if it doesn't exist in sis db
       if (!courseUnit) {
-        const parsedCourseCode = attIdToCourseCode[att.id]
         courseUnit = {
           id: att.id,
           name: att.name,
           code: att.code,
           latest_instance_date: att.attainment_date,
-          is_study_module: !(
-            att.type in
-            [
-              'StudyModuleAttainment',
-              'CustomStudyModuleAttainment',
-              'DegreeProgrammeAttainment',
-              'CustomDegreeProgrammeAttainment',
-            ]
-          ),
+          is_study_module: isModule(att.type),
           coursetypecode: att.study_level_urn,
           max_attainment_date: att.attainment_date,
           min_attainment_date: att.attainment_date,
@@ -172,8 +164,7 @@ const updateAttainments = async (
 
         // If there's no courseprovider, try to create course provider
         if (!courseProvider) {
-          // parsedCourseCode but method wants groupId ? sis-importer model has no groupId :<
-          const mapCourseProvider = courseProviderMapper(parsedCourseCode)
+          const mapCourseProvider = courseProviderMapper(att.id)
 
           // Only map provider if it is responsible and it is degree programme
           const correctProvider = att.organisations.find(
@@ -220,11 +211,7 @@ const updateAttainments = async (
     const attainmentIdCourseCodeMapForCustomCourseUnitAttainments = attainments.reduce(findMissingCourseCodes, {})
     const missingCodes = Object.values(attainmentIdCourseCodeMapForCustomCourseUnitAttainments)
     const courses = await getCourseUnitsByCodes(missingCodes)
-    return await Promise.all(
-      attainments.map(
-        addCourseUnitToCustomCourseUnitAttainments(courses, attainmentIdCourseCodeMapForCustomCourseUnitAttainments)
-      )
-    )
+    return await Promise.all(attainments.map(addCourseUnitToCustomCourseUnitAttainments(courses)))
   }
 
   const fixedAttainments = await fixCustomCourseUnitAttainments(attainments)
