@@ -6,11 +6,7 @@ import { ApplicationError } from '../util/customErrors'
 
 const router = Router()
 
-interface LoginRequest extends OodikoneRequest {
-  logoutUrl?: string
-}
-
-router.get('/', async (req: LoginRequest, res: Response) => {
+router.get('/', async (req: OodikoneRequest, res: Response) => {
   const { user, logoutUrl } = req
 
   if (!user) {

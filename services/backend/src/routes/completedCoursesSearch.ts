@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Response, Router } from 'express'
 import { difference, intersection } from 'lodash'
 
 import { getCompletedCourses } from '../services/completedCoursesSearch'
@@ -17,9 +17,16 @@ const router = Router()
 
 const importerClient = getImporterClient()
 
-router.get('/', async (req: OodikoneRequest, res) => {
-  const studentNumbers = JSON.parse(req.query?.studentlist as string) || []
-  const courseCodes = JSON.parse(req.query?.courselist as string) || []
+interface GetSearchRequest extends OodikoneRequest {
+  query: {
+    studentlist: string
+    courselist: string
+  }
+}
+
+router.get('/', async (req: GetSearchRequest, res: Response) => {
+  const studentNumbers = JSON.parse(req.query?.studentlist) || []
+  const courseCodes = JSON.parse(req.query?.courselist) || []
   const { roles, studentsUserCanAccess, sisPersonId: teacherId } = req.user!
   if (!Array.isArray(studentNumbers)) {
     return res.status(400).json({ error: 'Student numbers must be of type array' })
@@ -56,16 +63,23 @@ router.get('/', async (req: OodikoneRequest, res) => {
   return res.json({ discardedStudentNumbers, ...completedCourses })
 })
 
-router.get('/searches', async (req: OodikoneRequest, res) => {
+router.get('/searches', async (req: OodikoneRequest, res: Response) => {
   const userId = req.user!.id
   const foundSearches = await getOpenUniSearches(userId)
   return res.json(foundSearches)
 })
 
-router.post('/searches', async (req: OodikoneRequest, res) => {
+interface CreateSearchRequest extends OodikoneRequest {
+  body: {
+    courselist: string[]
+    name: string
+  }
+}
+
+router.post('/searches', async (req: CreateSearchRequest, res: Response) => {
   const courseCodes = req.body?.courselist || []
-  const userId = req.user!.id
   const name = req.body?.name
+  const userId = req.user!.id
 
   if (!name) {
     return res.status(400).json({ error: 'Courselist name missing' })
@@ -87,7 +101,16 @@ router.post('/searches', async (req: OodikoneRequest, res) => {
   })
 })
 
-router.put('/searches/:id', async (req: OodikoneRequest, res) => {
+interface UpdateSearchRequest extends OodikoneRequest {
+  body: {
+    courselist: string[]
+  }
+  params: {
+    id: string
+  }
+}
+
+router.put('/searches/:id', async (req: UpdateSearchRequest, res: Response) => {
   const id = req.params?.id
   const courseCodes = req.body?.courselist || []
   const userId = req.user!.id
@@ -107,7 +130,13 @@ router.put('/searches/:id', async (req: OodikoneRequest, res) => {
   })
 })
 
-router.delete('/searches/:id', async (req: OodikoneRequest, res) => {
+interface DeleteSearchRequest extends OodikoneRequest {
+  params: {
+    id: string
+  }
+}
+
+router.delete('/searches/:id', async (req: DeleteSearchRequest, res) => {
   const id = req.params?.id
   const userId = req.user!.id
   if (!id || !userId) {

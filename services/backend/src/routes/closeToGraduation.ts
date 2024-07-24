@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Response, Router } from 'express'
 
 import { getCloseToGraduationData } from '../services/populations/closeToGraduation'
 import { getAllStudentsUserHasInGroups } from '../services/studyGuidanceGroups'
@@ -7,7 +7,7 @@ import { hasFullAccessToStudentData } from '../util'
 
 const router = Router()
 
-router.get('/', async (req: OodikoneRequest, res) => {
+router.get('/', async (req: OodikoneRequest, res: Response) => {
   const { user } = req
   if (hasFullAccessToStudentData(user!.roles)) {
     const result = await getCloseToGraduationData()
