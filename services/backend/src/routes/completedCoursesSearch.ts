@@ -108,12 +108,12 @@ router.put('/searches/:id', async (req: OodikoneRequest, res) => {
 })
 
 router.delete('/searches/:id', async (req: OodikoneRequest, res) => {
-  const id = BigInt(req.params?.id)
+  const id = req.params?.id
   const userId = req.user!.id
   if (!id || !userId) {
     return res.status(422).end()
   }
-  const deletedSearch = await deleteSearch(userId, id)
+  const deletedSearch = await deleteSearch(userId, BigInt(id))
   if (!deletedSearch) {
     return res.status(404).json({ error: 'Courselist could not be found' })
   }
