@@ -13,7 +13,7 @@ export type ExpandedUser = InferAttributes<User> & {
 }
 
 export type FormattedUser = {
-  id: string
+  id: bigint
   userId: string
   username: string
   name: string

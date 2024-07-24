@@ -120,7 +120,7 @@ const formatUser = async (user: ExpandedUser, getStudentAccess: boolean = true) 
   }
 
   const formattedUser: FormattedUser = {
-    id: user.id as unknown as string,
+    id: user.id,
     userId: user.username,
     username: user.username,
     name: user.fullName,
@@ -217,7 +217,7 @@ export const getMockedUser = async ({ userToMock, mockedBy }: { userToMock: stri
   // is already logged in, we don't want the regular data from the cache because that doesn't have the mockedBy field
   const cacheKey = `mocking-as-${userToMock}`
   if (userDataCache.has(cacheKey)) {
-    const cachedUser = userDataCache.get(cacheKey) as User & { mockedBy: string }
+    const cachedUser = userDataCache.get(cacheKey) as FormattedUser
     if (cachedUser.mockedBy !== mockedBy) {
       cachedUser.mockedBy = mockedBy
       userDataCache.set(cacheKey, cachedUser)
@@ -226,7 +226,9 @@ export const getMockedUser = async ({ userToMock, mockedBy }: { userToMock: stri
   }
 
   const userFromDb = (await User.findOne({ where: { username: userToMock } }))?.toJSON()
-  if (!userFromDb) return null
+  if (!userFromDb) {
+    return null
+  }
   const iamGroups = await getUserIams(userFromDb.sisuPersonId)
   const { access, specialGroup } = await getOrganizationAccess(userFromDb.sisuPersonId, iamGroups)
   const detailedProgrammeRights = getStudyProgrammeRights(access, specialGroup, userFromDb.programmeRights)
@@ -261,7 +263,7 @@ export const getUserToska = async ({
   access: IamAccess
 }) => {
   if (userDataCache.has(username)) {
-    return userDataCache.get(username)
+    return userDataCache.get(username) as FormattedUser
   }
 
   const isNewUser = !(await User.findOne({ where: { username } }))
@@ -280,12 +282,12 @@ export const getUserToska = async ({
 
 export const getUserFd = async ({ username }: { username: string }) => {
   if (userDataCache.has(username)) {
-    return userDataCache.get(username)
+    return userDataCache.get(username) as FormattedUser
   }
 
   const userFromDbOrm = await User.findOne({ where: { username } })
   if (!userFromDbOrm) {
-    return
+    return null
   }
 
   userFromDbOrm.lastLogin = new Date()
