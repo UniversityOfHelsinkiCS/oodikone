@@ -168,7 +168,7 @@ const initializeDatabaseConnection = async () => {
       },
       migrations: {
         params: [seq.getQueryInterface(), Sequelize],
-        path: `${process.cwd()}/src/database/${migrationsFolder}`,
+        path: `${process.cwd()}${conf.isProduction ? '/dist' : ''}/src/database/${migrationsFolder}`,
         pattern: /\.js$/,
       },
     })
