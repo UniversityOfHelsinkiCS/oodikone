@@ -88,7 +88,7 @@ export const getStudyRights = async (studentNumbers: string[]) => {
   })
 }
 
-export const getOpenUniSearchesByUser = async (userId: bigint) => {
+export const getOpenUniSearchesByUser = async (userId: string) => {
   return await OpenUniPopulationSearch.findAll({
     where: {
       userId,
@@ -96,7 +96,7 @@ export const getOpenUniSearchesByUser = async (userId: bigint) => {
   })
 }
 
-export const createOpenUniPopulationSearch = async (userId: bigint, name: string, courseCodes: string[]) => {
+export const createOpenUniPopulationSearch = async (userId: string, name: string, courseCodes: string[]) => {
   return await OpenUniPopulationSearch.create({
     userId,
     name,
@@ -104,7 +104,7 @@ export const createOpenUniPopulationSearch = async (userId: bigint, name: string
   })
 }
 
-export const updateOpenUniPopulationSearch = async (userId: bigint, id: bigint, courseCodes: string[]) => {
+export const updateOpenUniPopulationSearch = async (userId: string, id: string, courseCodes: string[]) => {
   const searchToUpdate = await OpenUniPopulationSearch.findOne({
     where: {
       userId,
@@ -119,7 +119,7 @@ export const updateOpenUniPopulationSearch = async (userId: bigint, id: bigint, 
   return await searchToUpdate.update({ courseCodes })
 }
 
-export const deleteOpenUniSearch = async (userId: bigint, id: bigint) => {
+export const deleteOpenUniSearch = async (userId: string, id: string) => {
   return await OpenUniPopulationSearch.destroy({
     where: {
       userId,

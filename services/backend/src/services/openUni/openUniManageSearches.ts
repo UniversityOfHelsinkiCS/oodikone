@@ -7,14 +7,14 @@ import {
 } from './openUniSearches'
 
 type FoundSearch = {
-  id: bigint
-  userId: bigint
+  id: string
+  userId: string
   name: string
   courseList: string[]
   updatedAt: Date
 }
 
-export const getOpenUniSearches = async (userId: bigint) => {
+export const getOpenUniSearches = async (userId: string) => {
   const savedSearches = await getOpenUniSearchesByUser(userId)
   if (savedSearches === undefined) {
     return []
@@ -34,7 +34,7 @@ export const getOpenUniSearches = async (userId: bigint) => {
   return foundSearches
 }
 
-export const createNewSearch = async (userId: bigint, name: string, courseCodes: string[]) => {
+export const createNewSearch = async (userId: string, name: string, courseCodes: string[]) => {
   const savedSearches = await getOpenUniSearchesByUser(userId)
   if (savedSearches && savedSearches.some(search => search.name === name)) {
     return null
@@ -51,7 +51,7 @@ export const createNewSearch = async (userId: bigint, name: string, courseCodes:
   }
 }
 
-export const deleteSearch = async (userId: bigint, id: bigint) => {
+export const deleteSearch = async (userId: string, id: string) => {
   try {
     const deleted = await deleteOpenUniSearch(userId, id)
     if (!deleted) {
@@ -64,7 +64,7 @@ export const deleteSearch = async (userId: bigint, id: bigint) => {
   }
 }
 
-export const updateSearch = async (userId: bigint, id: bigint, courseCodes: string[]) => {
+export const updateSearch = async (userId: string, id: string, courseCodes: string[]) => {
   try {
     const updated = await updateOpenUniPopulationSearch(userId, id, courseCodes)
     if (!updated) {

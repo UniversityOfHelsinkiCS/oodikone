@@ -13,7 +13,7 @@ export class Tag extends Model<InferAttributes<Tag>> {
   @AutoIncrement
   @ForeignKey(() => TagStudent)
   @Column(DataType.BIGINT)
-  tag_id!: bigint
+  tag_id!: string
 
   @BelongsTo(() => TagStudent)
   tagStudent!: TagStudent
@@ -28,5 +28,5 @@ export class Tag extends Model<InferAttributes<Tag>> {
   year!: string
 
   @Column(DataType.BIGINT)
-  personal_user_id!: bigint
+  personal_user_id!: string
 }

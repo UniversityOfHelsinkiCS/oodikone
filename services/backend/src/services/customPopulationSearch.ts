@@ -1,6 +1,6 @@
 import { CustomPopulationSearch } from '../models/kone'
 
-export const getCustomPopulationSearchesByUser = async (userId: bigint) => {
+export const getCustomPopulationSearchesByUser = async (userId: string) => {
   return CustomPopulationSearch.findAll({
     where: {
       userId,
@@ -8,7 +8,7 @@ export const getCustomPopulationSearchesByUser = async (userId: bigint) => {
   })
 }
 
-export const createCustomPopulationSearch = async (name: string, userId: bigint, students: string[]) => {
+export const createCustomPopulationSearch = async (name: string, userId: string, students: string[]) => {
   return CustomPopulationSearch.create({
     name,
     userId,
@@ -16,7 +16,7 @@ export const createCustomPopulationSearch = async (name: string, userId: bigint,
   })
 }
 
-export const updateCustomPopulationSearch = async (userId: bigint, id: bigint, students: string[]) => {
+export const updateCustomPopulationSearch = async (userId: string, id: string, students: string[]) => {
   const targetCustomPopulationSearch = await CustomPopulationSearch.findOne({
     where: {
       id,
@@ -33,7 +33,7 @@ export const updateCustomPopulationSearch = async (userId: bigint, id: bigint, s
   })
 }
 
-export const deleteCustomPopulationSearch = async (userId: bigint, id: bigint) => {
+export const deleteCustomPopulationSearch = async (userId: string, id: string) => {
   return CustomPopulationSearch.destroy({
     where: {
       id,

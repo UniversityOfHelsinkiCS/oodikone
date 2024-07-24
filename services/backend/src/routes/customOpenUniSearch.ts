@@ -53,7 +53,7 @@ router.post('/searches', async (req: OodikoneRequest, res) => {
 })
 
 router.put('/searches/:id', async (req: OodikoneRequest, res) => {
-  const id = BigInt(req.params?.id)
+  const id = req.params?.id
   const courseCodes = req.body?.courselist || []
   const userId = req.user!.id
   if (!id || !userId) {
@@ -73,7 +73,7 @@ router.put('/searches/:id', async (req: OodikoneRequest, res) => {
 })
 
 router.delete('/searches/:id', async (req: OodikoneRequest, res) => {
-  const id = BigInt(req.params?.id)
+  const id = req.params?.id
   const userId = req.user!.id
   if (!id || !userId) {
     return res.status(422).end()

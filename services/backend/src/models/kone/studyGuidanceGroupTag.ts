@@ -11,7 +11,7 @@ export class StudyGuidanceGroupTag extends Model<InferAttributes<StudyGuidanceGr
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.BIGINT)
-  id!: bigint
+  id!: string
 
   @Unique
   @Column(DataType.STRING)

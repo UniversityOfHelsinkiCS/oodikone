@@ -43,7 +43,7 @@ export const modifyAccess = async (username: string, rolesOfUser: Record<string,
   userDataCache.delete(username)
 }
 
-export const modifyElementDetails = async (id: bigint, codes: string[], enable: boolean) => {
+export const modifyElementDetails = async (id: string, codes: string[], enable: boolean) => {
   const user = await User.findOne({ where: { id } })
   if (!user) {
     throw new Error(`User with id ${id} not found`)
@@ -192,7 +192,7 @@ export const findAll = async () => {
   return formattedUsers.sort(createLocaleComparator('name'))
 }
 
-export const findOne = async (id: bigint) => {
+export const findOne = async (id: string) => {
   const user = (await User.findOne({ where: { id } }))?.toJSON()
   if (!user) {
     throw new Error(`User with id ${id} not found`)

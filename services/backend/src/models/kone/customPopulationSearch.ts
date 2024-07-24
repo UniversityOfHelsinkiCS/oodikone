@@ -13,10 +13,10 @@ export class CustomPopulationSearch extends Model<
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.BIGINT)
-  id!: CreationOptional<bigint>
+  id!: CreationOptional<string>
 
   @Column(DataType.BIGINT)
-  userId!: bigint
+  userId!: string
 
   @Column(DataType.STRING)
   name!: string
