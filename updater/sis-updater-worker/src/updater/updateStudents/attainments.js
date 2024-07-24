@@ -10,6 +10,7 @@ const {
   courseProviderMapper,
   validAttainmentTypes,
   customAttainmentTypes,
+  isModule,
 } = require('../mapper')
 
 const updateTeachers = async attainments => {
@@ -94,7 +95,7 @@ const updateAttainments = async (
   ]
   // This mayhem fixes missing course_unit references for CustomCourseUnitAttainments.
   const fixCustomCourseUnitAttainments = async attainments => {
-    const addCourseUnitToCustomCourseUnitAttainments = (courses, attIdToCourseCode) => async att => {
+    const addCourseUnitToCustomCourseUnitAttainments = courses => async att => {
       // Fix attainments with missing modules
       if (modulesNotAvailable.includes(att.module_group_id)) {
         if (att.module_group_id === 'hy-SM-89304486') {
@@ -135,54 +136,35 @@ const updateAttainments = async (
       }
 
       if (!customAttainmentTypes.includes(att.type)) return att
-      const courseUnits = courses.filter(c => c.code === attIdToCourseCode[att.id])
-
-      const isAfterStartAndBeforeEnd = (startDate, endDate, date) => {
-        const dateToCompare = new Date(date)
-        return new Date(startDate) <= dateToCompare && (!endDate || dateToCompare < new Date(endDate))
-      }
-
-      let courseUnit = courseUnits.find(({ validity_period }) =>
-        isAfterStartAndBeforeEnd(validity_period.startDate, validity_period.endDate, att.attainment_date)
-      )
-
-      // Sometimes registrations are fakd, see attainment hy-opinto-141561630.
-      // The attainmentdate is outside of all courses, yet should be mapped.
-      // Try to catch suitable courseUnit for this purpose
-      if (!courseUnit) {
-        courseUnit = courseUnits.find(({ validity_period }) =>
-          isAfterStartAndBeforeEnd(validity_period.startDate, validity_period.endDate, att.registration_date)
-        )
-      }
+      let courseUnit = courses.find(c => c.id === att.course_unit_id)
 
       // If there's no suitable courseunit, there isn't courseunit available at all.
       // --> Course should be created, if it doesn't exist in sis db
       if (!courseUnit) {
-        const parsedCourseCode = attIdToCourseCode[att.id]
-        // see if course exists
-        const course = await Course.findOne({ where: { code: parsedCourseCode } })
-
-        // If course doesn't exist, create it
-        if (!course) {
-          coursesToBeCreated.set(parsedCourseCode, {
-            id: parsedCourseCode,
-            name: att.name,
-            code: parsedCourseCode,
-            coursetypecode: att.study_level_urn,
-            course_unit_type: att.course_unit_type_urn,
-          })
+        courseUnit = {
+          id: att.id,
+          name: att.name,
+          code: att.code,
+          latest_instance_date: att.attainment_date,
+          is_study_module: isModule(att.type),
+          coursetypecode: att.study_level_urn,
+          max_attainment_date: att.attainment_date,
+          min_attainment_date: att.attainment_date,
+          substitutions: [],
+          course_unit_type: att.course_unit_type_urn,
         }
+        coursesToBeCreated.set(att.id, courseUnit)
 
         // see if course has provider
         const courseProvider = await CourseProvider.findOne({
           where: {
-            coursecode: course ? course.id : parsedCourseCode,
+            coursecode: att.course_unit_id,
           },
         })
 
         // If there's no courseprovider, try to create course provider
         if (!courseProvider) {
-          const mapCourseProvider = courseProviderMapper(parsedCourseCode)
+          const mapCourseProvider = courseProviderMapper(att.id)
 
           // Only map provider if it is responsible and it is degree programme
           const correctProvider = att.organisations.find(
@@ -195,11 +177,9 @@ const updateAttainments = async (
           }
         }
 
-        courseUnit = course || { id: parsedCourseCode, code: parsedCourseCode }
         courseUnit.group_id = courseUnit.id
       }
 
-      if (!courseUnit) return att
       // Add the course to the mapping objects for creditMapper to work properly.
       courseUnitIdToCourseGroupId[courseUnit.id] = courseUnit.group_id
       courseGroupIdToCourseCode[courseUnit.group_id] = courseUnit.code
@@ -231,11 +211,7 @@ const updateAttainments = async (
     const attainmentIdCourseCodeMapForCustomCourseUnitAttainments = attainments.reduce(findMissingCourseCodes, {})
     const missingCodes = Object.values(attainmentIdCourseCodeMapForCustomCourseUnitAttainments)
     const courses = await getCourseUnitsByCodes(missingCodes)
-    return await Promise.all(
-      attainments.map(
-        addCourseUnitToCustomCourseUnitAttainments(courses, attainmentIdCourseCodeMapForCustomCourseUnitAttainments)
-      )
-    )
+    return await Promise.all(attainments.map(addCourseUnitToCustomCourseUnitAttainments(courses)))
   }
 
   const fixedAttainments = await fixCustomCourseUnitAttainments(attainments)

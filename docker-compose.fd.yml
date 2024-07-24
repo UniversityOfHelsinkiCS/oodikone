@@ -131,6 +131,9 @@ services:
 
   sis-updater-worker:
     <<: *defaults
+    deploy:
+      replicas: 2
+      mode: replicated
     build:
       <<: *build_defaults
       context: updater/sis-updater-worker

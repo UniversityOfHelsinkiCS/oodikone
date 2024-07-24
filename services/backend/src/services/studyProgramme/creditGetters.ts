@@ -46,7 +46,7 @@ export const getCreditsForProvider = async (provider: string, codes: string[], s
 
   const courseIdToShare = (courseId: string, attainmentDate: Date) => {
     const providers = courseIdToShareMap[courseId]
-    const relevantProvider = providers.find(p => organizationIdToCodeMap[p.organizationcode] === provider)
+    const relevantProvider = providers?.find(p => organizationIdToCodeMap[p.organizationcode] === provider)
     if (!relevantProvider?.shares) return 0
     const relevantShare = relevantProvider.shares
       .filter(share => {
