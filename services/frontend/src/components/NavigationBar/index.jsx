@@ -96,7 +96,12 @@ export const NavigationBar = () => {
 
   const showSearch = item => {
     if (item.key === 'class' || item.key === 'overview') return true
-    if (checkUserAccess(['admin', 'openUniSearch'], roles) && item.key === 'openUniSearch') return true
+    if (
+      checkUserAccess(['admin', 'openUniSearch'], roles) &&
+      item.key === 'openUniSearch' &&
+      isDefaultServiceProvider()
+    )
+      return true
     if (
       (checkUserAccess(['admin', 'fullSisuAccess', 'studyGuidanceGroups'], roles) ||
         fullStudyProgrammeRights.length > 0) &&
@@ -106,7 +111,8 @@ export const NavigationBar = () => {
     if (item.key === 'completedCoursesSearch') return true
     if (
       (checkUserAccess(['admin'], roles) || iamGroups.includes('grp-kielikeskus-esihenkilot')) &&
-      item.key === 'languageCenterView'
+      item.key === 'languageCenterView' &&
+      isDefaultServiceProvider()
     )
       return true
     if (item.key === 'closeToGraduation' && checkUserAccess(['admin', 'fullSisuAccess', 'studyGuidanceGroups'], roles))

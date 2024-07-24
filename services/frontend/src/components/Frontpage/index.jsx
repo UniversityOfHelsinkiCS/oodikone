@@ -1,7 +1,6 @@
 import { Fragment, useState } from 'react'
 import { Button, Container, Divider, Grid, Header, Image, Icon, List } from 'semantic-ui-react'
-
-import { checkUserAccess, getFullStudyProgrammeRights, images } from '@/common'
+import { checkUserAccess, getFullStudyProgrammeRights, images, isDefaultServiceProvider } from '@/common'
 import { useTitle } from '@/common/hooks'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { Changelog } from './Changelog'
@@ -54,7 +53,7 @@ export const FrontPage = () => {
       content: <p>View detailed information for a given student</p>,
     },
     {
-      show: true,
+      show: isDefaultServiceProvider(),
       title: 'Feedback',
       content: (
         <p>
