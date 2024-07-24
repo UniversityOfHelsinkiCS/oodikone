@@ -14,7 +14,7 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.BIGINT)
-  id!: CreationOptional<bigint>
+  id!: CreationOptional<string>
 
   @Column(DataType.STRING)
   fullName!: string

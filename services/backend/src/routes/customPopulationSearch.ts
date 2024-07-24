@@ -11,7 +11,7 @@ import { OodikoneRequest } from '../types'
 const router = Router()
 
 router.get('/', async (req: OodikoneRequest, res) => {
-  const id = req.user!.id as unknown as bigint
+  const { id } = req.user!
   const customPopulationSearches = await getCustomPopulationSearchesByUser(id)
   res.json(customPopulationSearches)
 })
@@ -29,7 +29,7 @@ router.post('/', async (req: OodikoneRequest, res) => {
     return res.status(400).json({ error: 'Students must be of type array' })
   }
 
-  const id = user!.id as unknown as bigint
+  const { id } = user!
   const customPopulationSearch = await createCustomPopulationSearch(name, id, students || [])
   res.json(customPopulationSearch)
 })
@@ -38,8 +38,8 @@ router.put('/:id', async (req: OodikoneRequest, res) => {
   const {
     body: { students },
   } = req
-  const id = req.params.id as unknown as bigint
-  const userId = req.user!.id as unknown as bigint
+  const { id } = req.params
+  const userId = req.user!.id
 
   if (!id) {
     return res.status(400).json({ error: 'Id missing' })
@@ -60,8 +60,8 @@ router.put('/:id', async (req: OodikoneRequest, res) => {
 })
 
 router.delete('/:id', async (req: OodikoneRequest, res) => {
-  const id = req.params.id as unknown as bigint
-  const userId = req.user!.id as unknown as bigint
+  const { id } = req.params
+  const userId = req.user!.id
 
   if (!id) {
     return res.status(400).json({ error: 'Id missing' })
