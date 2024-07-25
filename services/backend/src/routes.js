@@ -4,7 +4,7 @@ const cors = require('cors')
 const express = require('express')
 
 const { frontUrl, serviceProvider } = require('./config')
-const accessLogger = require('./middleware/accessLogger')
+const accessLogger = require('./middleware/accessLogger').default
 const auth = require('./middleware/auth')
 const currentUserMiddleware = require('./middleware/currentUserMiddleware').default
 const errorMiddleware = require('./middleware/errorMiddleware')
