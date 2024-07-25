@@ -7,7 +7,7 @@ const { frontUrl, serviceProvider } = require('./config')
 const accessLogger = require('./middleware/accessLogger').default
 const auth = require('./middleware/auth')
 const currentUserMiddleware = require('./middleware/currentUserMiddleware').default
-const errorMiddleware = require('./middleware/errorMiddleware')
+const errorHandler = require('./middleware/errorHandler').default
 const shibbolethCharsetMiddleware = require('./middleware/shibbolethCharsetMiddleware')
 const changelog = require('./routes/changelog').default
 const closeToGraduation = require('./routes/closeToGraduation').default
@@ -85,5 +85,5 @@ module.exports = (app, url) => {
     res.status(404).json(results)
   })
   app.use(Sentry.Handlers.errorHandler())
-  app.use(errorMiddleware)
+  app.use(errorHandler)
 }
