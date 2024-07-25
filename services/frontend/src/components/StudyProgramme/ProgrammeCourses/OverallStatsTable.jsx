@@ -17,132 +17,102 @@ const getColumns = (getTextIn, showStudents) => {
   if (showStudents) {
     columns = [
       {
-        key: 'Course',
-        title: 'Course info',
-        parent: true,
-        children: [
-          {
-            key: 'code',
-            mergeHeader: true,
-            merge: true,
-            children: [
-              {
-                key: 'course_code',
-                title: 'Code ',
-                export: true,
-                getRowVal: course => course.code,
-                getRowContent: course => course.code,
-              },
-              {
-                key: 'go-to-course',
-                export: false,
-                getRowContent: course => (
-                  <Item
-                    as={Link}
-                    to={`/coursestatistics?courseCodes=["${encodeURIComponent(
-                      course.code
-                    )}"]&separate=false&unifyOpenUniCourses=false`}
-                  >
-                    <Icon name="level up alternate" />
-                  </Item>
-                ),
-              },
-            ],
-          },
-          {
-            key: 'name',
-            title: 'Name',
-            getRowVal: course => getTextIn(course.name),
-            getRowContent: course =>
-              getTextIn(course.name).length > 46 ? `${getTextIn(course.name).slice(0, 44)}...` : getTextIn(course.name),
-            cellProps: course => {
-              return { title: getTextIn(course.name) }
-            },
-          },
-        ],
+        key: 'code',
+        title: 'Code',
+        getRowVal: course => course.code,
+        formatValue: code => (
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5em' }}>
+            {code}
+            <Item
+              as={Link}
+              target="_blank"
+              to={`/coursestatistics?courseCodes=["${encodeURIComponent(code)}"]&separate=false&unifyOpenUniCourses=false`}
+            >
+              <Icon name="level up alternate" />
+            </Item>
+          </div>
+        ),
+      },
+      {
+        key: 'name',
+        title: 'Name',
+        helpText: studyProgrammeToolTips.Name,
+        getRowVal: course => getTextIn(course.name),
+        formatValue: name => (
+          <div style={{ maxWidth: '400px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</div>
+        ),
+        cellProps: course => {
+          return { title: getTextIn(course.name) }
+        },
       },
       {
         key: 'total',
-        title: '',
-        parent: true,
-        children: [
-          {
-            key: 'total',
-            title: 'Total',
-            cellStyle: { textAlign: 'right' },
-            filterType: 'range',
-            getRowVal: course => course.totalAllStudents,
-            getRowContent: course => course.totalAllStudents,
-          },
-        ],
+        title: 'Total',
+        filterType: 'range',
+        getRowVal: course => course.totalAllStudents,
       },
       {
         key: 'breakdown',
         title: 'Breakdown of total',
         parent: true,
+        sortable: false,
+        filterable: false,
         children: [
           {
             key: 'passed',
             title: 'Passed',
-            cellStyle: { textAlign: 'right' },
             filterType: 'range',
             getRowVal: course => course.totalAllPassed,
-            getRowContent: course => course.totalAllPassed,
           },
           {
             key: 'not-completed',
-            title: 'Not completed',
-            cellStyle: { textAlign: 'right' },
+            title: 'Not\ncompleted',
             filterType: 'range',
             getRowVal: course => course.totalAllNotCompleted,
-            getRowContent: course => course.totalAllNotCompleted,
           },
         ],
       },
       {
         key: 'breakdown-passed',
-        title: 'Breakdown statistics of passed students',
+        title: 'Breakdown of passed students',
         parent: true,
+        sortable: false,
+        filterable: false,
         children: [
           {
             key: 'totalOwnProgramme',
-            title: 'Major students',
-            cellStyle: { textAlign: 'right' },
+            title: 'Major\nstudents',
             filterType: 'range',
             getRowVal: course => course.totalProgrammeStudents,
-            getRowContent: course => course.totalProgrammeStudents,
           },
           {
             key: 'totalOtherProgramme',
-            title: 'Non-major students',
-            cellStyle: { textAlign: 'right' },
+            title: 'Non-major\nstudents',
             filterType: 'range',
             getRowVal: course => course.totalOtherProgrammeStudents,
-            getRowContent: course => course.totalOtherProgrammeStudents,
           },
           {
             key: 'totalWithoutStudyright',
-            title: 'Non-degree students',
-            cellStyle: { textAlign: 'right' },
+            title: 'Non-degree\nstudents',
             filterType: 'range',
             getRowVal: course => course.totalWithoutStudyrightStudents,
-            getRowContent: course => course.totalWithoutStudyrightStudents,
           },
         ],
       },
       {
         key: 'exluded',
-        title: 'Not included to passed',
+        title: 'Not included in\ntotal nor passed',
         parent: true,
+        sortable: false,
+        filterable: false,
         children: [
           {
             key: 'transfer',
-            title: 'Transferred students',
+            title: 'Transferred\nstudents',
             helpText: studyProgrammeToolTips.TransferredCourses,
             cellStyle: { textAlign: 'right' },
             filterType: 'range',
             getRowVal: course => course.totalTransferStudents,
-            getRowContent: course => course.totalTransferStudents,
           },
         ],
       },
@@ -151,82 +121,62 @@ const getColumns = (getTextIn, showStudents) => {
     columns = [
       {
         key: 'code',
-        mergeHeader: true,
-        merge: true,
-        children: [
-          {
-            key: 'course_code',
-            title: 'Code ',
-            export: true,
-            getRowVal: course => course.code,
-            getRowContent: course => course.code,
-          },
-          {
-            key: 'go-to-course',
-            export: false,
-            getRowContent: course => (
-              <Item
-                as={Link}
-                to={`/coursestatistics?courseCodes=["${encodeURIComponent(
-                  course.code
-                )}"]&separate=false&unifyOpenUniCourses=false`}
-              >
-                <Icon name="level up alternate" />
-              </Item>
-            ),
-          },
-        ],
+        title: 'Code',
+        getRowVal: course => course.code,
+        formatValue: code => (
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5em' }}>
+            {code}
+            <Item
+              as={Link}
+              target="_blank"
+              to={`/coursestatistics?courseCodes=["${encodeURIComponent(code)}"]&separate=false&unifyOpenUniCourses=false`}
+            >
+              <Icon name="level up alternate" />
+            </Item>
+          </div>
+        ),
       },
       {
         key: 'name',
         title: 'Name',
         helpText: studyProgrammeToolTips.Name,
         getRowVal: course => getTextIn(course.name),
-        getRowContent: course =>
-          getTextIn(course.name).length > 46 ? `${getTextIn(course.name).slice(0, 44)}...` : getTextIn(course.name),
-        cellProps: course => {
-          return { title: getTextIn(course.name) }
-        },
+        formatValue: name => (
+          <div style={{ maxWidth: '400px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</div>
+        ),
+        cellProps: course => ({
+          title: getTextIn(course.name),
+        }),
       },
       {
         key: 'total',
-        title: 'Total credits',
-        cellStyle: { textAlign: 'right' },
+        title: 'Total\ncredits',
         filterType: 'range',
         getRowVal: course => course.totalAllCredits,
-        getRowContent: course => course.totalAllCredits,
       },
       {
         key: 'totalOwnProgramme',
-        title: 'Major credits',
-        cellStyle: { textAlign: 'right' },
+        title: 'Major\ncredits',
         filterType: 'range',
         getRowVal: course => course.totalProgrammeCredits,
-        getRowContent: course => course.totalProgrammeCredits,
       },
       {
         key: 'totalOtherProgramme',
-        title: 'Non-major credits',
-        cellStyle: { textAlign: 'right' },
+        title: 'Non-major\ncredits',
         filterType: 'range',
         getRowVal: course => course.totalOtherProgrammeCredits,
-        getRowContent: course => course.totalOtherProgrammeCredits,
       },
       {
         key: 'totalWithoutStudyright',
-        title: 'Non-degree credits',
-        cellStyle: { textAlign: 'right' },
+        title: 'Non-degree\ncredits',
         filterType: 'range',
         getRowVal: course => course.totalWithoutStudyrightCredits,
-        getRowContent: course => course.totalWithoutStudyrightCredits,
       },
       {
         key: 'totalTransfer',
-        title: 'Transferred credits',
-        cellStyle: { textAlign: 'right' },
+        title: 'Transferred\ncredits',
         filterType: 'range',
         getRowVal: course => course.totalTransferCredits,
-        getRowContent: course => course.totalTransferCredits,
       },
     ]
   }
