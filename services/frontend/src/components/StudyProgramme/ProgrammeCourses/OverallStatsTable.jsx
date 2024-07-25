@@ -358,7 +358,7 @@ export const OverallStatsTable = ({ studyProgramme, combinedProgramme, academicY
           content={
             showStudents
               ? studyProgrammeToolTips.StudentsOfProgrammeCourses
-              : studyProgrammeToolTips.CreditsProducedByTheStudyprogramme
+              : studyProgrammeToolTips.CreditsOfProgrammeCourses
           }
           cypress="programme-courses"
         />

@@ -43,6 +43,20 @@ export const studyProgrammeToolTips = {
 
   **Other university**: Korkeakoulujen väliset yhteistyöopinnot: opintosuoritukset, jotka on tehty korkeakoulujen väliseen yhteistyösopimukseen perustuvalla opiskeluoikeudella.
   `,
+  CreditsOfProgrammeCourses: `
+  Sisältää opintopisteet suoritusvuosittain. Suoritukset on jaoteltu Sisussa näkyvän kurssin suorituspäivän mukaan.
+
+  **Major credits**: Sisältää ne opintopisteet, joiden suorittajalla on suoritushetkellä ollut ensisijainen opinto-oikeus kyseiseen koulutusohjelmaan. Sisältää myös ohjelmaan siirtyneet ensisijaiset opiskelijat.
+
+  **Non-major credits**: Sisältää koulutusohjelman tuottamat opintopisteet, joiden suorittajalla ei ole ollut suoritushetkellä ensisijaista opinto-oikeutta kyseiseen koulutusohjelmaan. Sisältää
+  esimerkiksi vaihto-opiskelijat ja erillisopinto-oikeudella opiskelevat. Sisältää myös opintopisteet, jotka opiskelija on suorittanut koulutusohjelmaan ennen opintojen aloittamista koulutusohjelmassa tai opintojen päätyttyä.
+
+  **Non-degree credits**: Opiskelijat, joilla ei ole tutkinto-oikeutta Helsingin yliopistossa.
+    
+  **Transferred credits**: Sisältää opintopisteet, jotka on suoritettu kyseisenä vuonna, ja hyväksiluettu tähän koulutusohjelmaan. Mukana ovat kaikenlaisilla opinto-oikeuksilla hyväksiluetut opintopisteet. **Luku ei sisälly total-sarakkeeseen**.
+
+  **Type**: Kertoo onko kyseessä kurssi (course) vai opintokokonaisuus (module).
+  `,
   StudentsOfProgrammeCourses: `
   Sisältää kurssien opiskelijat.
 
@@ -55,12 +69,12 @@ export const studyProgrammeToolTips = {
 
   **Transferred students**: Sisältää opiskelijat, jotka ovat suorittaneet kyseisenä vuonna hyväksiluettuja opintopisteitä tähän koulutusohjelmaan. Mukana ovat kaikenlaisilla opinto-oikeuksilla hyväksiluetut opintopisteet. Lukua **ei lasketa mukaan Total-sarakkeeseen**.
 
-  **Type**: Kertoo onko kyseessä kurssi vai opintokokonaisuus.
+  **Type**: Kertoo onko kyseessä kurssi (course) vai opintokokonaisuus (module).
   `,
   GraduatedAndThesisWritersOfTheProgramme: `
-  **Wrote thesis**: Sisältää kyseisenä vuonna kandidaatintutkielman tai pro gradu-tutkielman hyväksytysti suorittaneet opiskelijat. Mukana ei ole mahdollisia arvosanan korotuksia.
+  **Wrote thesis**: Sisältää kyseisenä vuonna kandidaatin- tai maisterintutkielman hyväksytysti suorittaneet opiskelijat. Mukana ei ole mahdollisia arvosanan korotuksia.
 
-  **Graduated**: Sisältää kyseisenä vuonna valmistuneet opiskelijat riippumatta siitä, minä vuonna opiskeluoikeus ohjelmaan on myönnetty. Jaottelu on tehty opinto-oikeuden päättymispäivän (=valmistumispäivän) perusteella.
+  **Graduated**: Sisältää kyseisenä vuonna valmistuneet opiskelijat riippumatta siitä, minä vuonna opiskeluoikeus ohjelmaan on myönnetty. Jaottelu on tehty valmistumispäivän perusteella.
   `,
   AverageGraduationTimes: `
   Yksittäinen palkki kertoo, kuinka moni opiskelija on valmistunut kyseisenä vuonna/lukuvuonna.
