@@ -166,12 +166,12 @@ export const saveYearlyCourseCriteria = async (studyProgramme: string, courses: 
       4: 'coursesYearFour',
       5: 'coursesYearFive',
       6: 'coursesYearSix',
-    }
-
-    const yearToUpdate = years[year]
-    if (!yearToUpdate) {
+    } as const
+    if (!(year in years)) {
       throw new Error(`Invalid year: ${year}`)
     }
+
+    const yearToUpdate = years[year as keyof typeof years]
 
     const updatedCriteria = await studyProgrammeToUpdate.update({ [yearToUpdate]: courses })
     return await formatCriteria(updatedCriteria)

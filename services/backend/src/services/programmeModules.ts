@@ -18,30 +18,32 @@ export const getCurriculumVersions = async (code: string) => {
   }
 }
 
-const recursivelyGetModuleAndChildren = async (code: string, curriculum_period_ids) => {
+type ModuleWithChildren = Pick<
+  ProgrammeModule,
+  | 'id'
+  | 'code'
+  | 'name'
+  | 'type'
+  | 'order'
+  | 'organization_id'
+  | 'valid_from'
+  | 'valid_to'
+  | 'group_id'
+  | 'curriculum_period_ids'
+> & {
+  parent_id: string
+  created_at: Date
+  updated_at: Date
+  study_level: string | null
+  degree_programme_type: string | null
+  module_order: number | null
+  parent_name: Name
+  parent_code: string | null
+}
+
+const recursivelyGetModuleAndChildren = async (code: string, curriculum_period_ids: string[]) => {
   const connection = dbConnections.sequelize
-  type ModuleWithChildren = Pick<
-    ProgrammeModule,
-    | 'id'
-    | 'code'
-    | 'name'
-    | 'type'
-    | 'order'
-    | 'organization_id'
-    | 'valid_from'
-    | 'valid_to'
-    | 'group_id'
-    | 'curriculum_period_ids'
-  > & {
-    parent_id: string
-    created_at: Date
-    updated_at: Date
-    study_level: string | null
-    degree_programme_type: string | null
-    module_order: number | null
-    parent_name: Name
-    parent_code: string | null
-  }
+
   try {
     const result: ModuleWithChildren[] = await connection.query(
       `WITH RECURSIVE children as (
@@ -63,7 +65,7 @@ const recursivelyGetModuleAndChildren = async (code: string, curriculum_period_i
   }
 }
 
-const modifyParent = (course, moduleMap) => {
+const modifyParent = (course: ModuleWithChildren, moduleMap: Record<string, ModuleWithChildren>) => {
   let parent = moduleMap[course.parent_id]
   const parents: any[] = []
   while (parent) {
@@ -79,12 +81,12 @@ const modifyParent = (course, moduleMap) => {
     parent = parents.find(m => m.code)
   }
   if (!parent) {
-    return { faulty: true }
+    return null
   }
   return { ...course, parent_id: parent.id, parent_code: parent.code, parent_name: parent.name }
 }
 
-const labelProgammes = (modules, excludedCourses) => {
+const labelProgammes = (modules: ModuleWithChildren[], excludedCourses: ExcludedCourse[]) => {
   return modules.map(module => {
     const label = {
       id: module.parent_name.fi,
@@ -117,10 +119,10 @@ const getCoursesAndModulesForProgramme = async (code: string, periodIds: string)
       },
     },
   })
-  const modulesMap = modules.reduce((obj: object, cur: any) => ({ ...obj, [cur.id]: cur }), {})
+  const modulesMap = modules.reduce<Record<string, ModuleWithChildren>>((obj, cur) => ({ ...obj, [cur.id]: cur }), {})
   const modifiedCourses = courses
     .map(c => modifyParent(c, modulesMap))
-    .filter(c => !c.faulty)
+    .filter(c => c != null)
     .filter(
       (course1, index, array) =>
         array.findIndex(course2 => course1.code === course2.code && course1.parent_code === course2.parent_code) ===
@@ -132,8 +134,8 @@ const getCoursesAndModulesForProgramme = async (code: string, periodIds: string)
 
 export const getCoursesAndModules = async (code: string, periodIds: string) => {
   const defaultProgrammeCourses = await getCoursesAndModulesForProgramme(code, periodIds)
-  if (Object.keys(combinedStudyprogrammes).includes(code)) {
-    const secondProgramme = combinedStudyprogrammes[code]
+  if (code in combinedStudyprogrammes) {
+    const secondProgramme = combinedStudyprogrammes[code as keyof typeof combinedStudyprogrammes]
     const secondProgrammeCourses = await getCoursesAndModulesForProgramme(secondProgramme, periodIds)
     return { defaultProgrammeCourses, secondProgrammeCourses }
   }

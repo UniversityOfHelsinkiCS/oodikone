@@ -1,6 +1,8 @@
+import { InferAttributes } from 'sequelize'
+import { Credit, Student, Studyright, StudyrightElement, Transfer } from '../../models'
 import { ElementDetailType } from '../../types'
 
-const resolveStudyRightCode = (studyRightElements: any[]) => {
+const resolveStudyRightCode = (studyRightElements: StudyrightElement[]) => {
   if (!studyRightElements) {
     return null
   }
@@ -13,7 +15,7 @@ const resolveStudyRightCode = (studyRightElements: any[]) => {
   return studyRightElement.code
 }
 
-export const formatStudyright = studyright => {
+export const formatStudyright = (studyright: Studyright) => {
   return {
     studyrightid: studyright.studyrightid,
     startdate: studyright.startdate,
@@ -40,7 +42,7 @@ export const formatStudyright = studyright => {
   }
 }
 
-export const formatStudent = student => {
+export const formatStudent = (student: Student) => {
   return {
     studentNumber: student.studentnumber,
     genderCode: student.gender_code,
@@ -50,7 +52,7 @@ export const formatStudent = student => {
   }
 }
 
-export const formatCredit = credit => {
+export const formatCredit = (credit: InferAttributes<Credit>) => {
   const code = credit.course_code.replace('AY', '')
   return {
     id: `${credit.student_studentnumber}-${code}`, // For getting unique credits for each course code and student number
@@ -64,7 +66,7 @@ export const formatCredit = credit => {
   }
 }
 
-export const formatTransfer = transfer => {
+export const formatTransfer = (transfer: InferAttributes<Transfer>) => {
   return {
     sourcecode: transfer.sourcecode,
     targetcode: transfer.targetcode,
