@@ -8,7 +8,7 @@ const accessLogger = require('./middleware/accessLogger').default
 const auth = require('./middleware/auth')
 const currentUserMiddleware = require('./middleware/currentUserMiddleware').default
 const errorHandler = require('./middleware/errorHandler').default
-const shibbolethCharsetMiddleware = require('./middleware/shibbolethCharsetMiddleware')
+const headersMiddleware = require('./middleware/headers').default
 const changelog = require('./routes/changelog').default
 const closeToGraduation = require('./routes/closeToGraduation').default
 const completedCoursesSearch = require('./routes/completedCoursesSearch').default
@@ -47,7 +47,7 @@ module.exports = (app, url) => {
   app.use(express.json())
   app.use(compression())
 
-  app.use(shibbolethCharsetMiddleware)
+  app.use(headersMiddleware)
   app.use(currentUserMiddleware)
   app.use(accessLogger)
   app.use(`${url}/login`, login)
