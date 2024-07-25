@@ -1,16 +1,16 @@
-import { Router } from 'express'
+import { Response, Router } from 'express'
 
 import { createStudyProgrammePin, getStudyProgrammePins, removeStudyProgrammePin } from '../services/studyProgrammePins'
 import { OodikoneRequest } from '../types'
 
 const router = Router()
 
-router.get('/', async (req: OodikoneRequest, res) => {
+router.get('/', async (req: OodikoneRequest, res: Response) => {
   const result = await getStudyProgrammePins(req.user!.id)
   return res.json(result)
 })
 
-router.post('/', async (req: OodikoneRequest, res) => {
+router.post('/', async (req: OodikoneRequest, res: Response) => {
   const { programmeCode } = req.body
   if (!programmeCode) {
     return res.status(400).end()
@@ -19,7 +19,7 @@ router.post('/', async (req: OodikoneRequest, res) => {
   return res.status(201).end()
 })
 
-router.delete('/', async (req: OodikoneRequest, res) => {
+router.delete('/', async (req: OodikoneRequest, res: Response) => {
   const { programmeCode } = req.body
   if (!programmeCode) {
     return res.status(400).end()

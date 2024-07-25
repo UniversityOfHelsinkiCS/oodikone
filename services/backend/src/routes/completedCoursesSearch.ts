@@ -136,7 +136,7 @@ interface DeleteSearchRequest extends OodikoneRequest {
   }
 }
 
-router.delete('/searches/:id', async (req: DeleteSearchRequest, res) => {
+router.delete('/searches/:id', async (req: DeleteSearchRequest, res: Response) => {
   const id = req.params?.id
   const userId = req.user!.id
   if (!id || !userId) {

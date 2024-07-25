@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Response, Router } from 'express'
 import moment from 'moment-timezone'
 
 import {
@@ -12,7 +12,7 @@ import { OodikoneRequest } from '../types'
 
 const router = Router()
 
-router.get('/', async (req: OodikoneRequest, res) => {
+router.get('/', async (req: OodikoneRequest, res: Response) => {
   const courseCodes = JSON.parse(req.query?.courselist as string) || []
   const startdate = req.query?.startdate || moment('01-08-2017 00:00:00', 'DD-MM-YYYY')
   const enddate = req.query?.enddate || moment().endOf('day')
@@ -23,13 +23,13 @@ router.get('/', async (req: OodikoneRequest, res) => {
   return res.json(customOpenUniSearches)
 })
 
-router.get('/searches', async (req: OodikoneRequest, res) => {
+router.get('/searches', async (req: OodikoneRequest, res: Response) => {
   const userId = req.user!.id
   const foundSearches = await getOpenUniSearches(userId)
   return res.json(foundSearches)
 })
 
-router.post('/searches', async (req: OodikoneRequest, res) => {
+router.post('/searches', async (req: OodikoneRequest, res: Response) => {
   const courseCodes = req.body?.courselist || []
   const userId = req.user!.id
   const name = req.body?.name
@@ -52,7 +52,7 @@ router.post('/searches', async (req: OodikoneRequest, res) => {
   })
 })
 
-router.put('/searches/:id', async (req: OodikoneRequest, res) => {
+router.put('/searches/:id', async (req: OodikoneRequest, res: Response) => {
   const id = req.params?.id
   const courseCodes = req.body?.courselist || []
   const userId = req.user!.id
@@ -72,7 +72,7 @@ router.put('/searches/:id', async (req: OodikoneRequest, res) => {
   })
 })
 
-router.delete('/searches/:id', async (req: OodikoneRequest, res) => {
+router.delete('/searches/:id', async (req: OodikoneRequest, res: Response) => {
   const id = req.params?.id
   const userId = req.user!.id
   if (!id || !userId) {

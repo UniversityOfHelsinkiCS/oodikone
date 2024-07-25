@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Response, Router } from 'express'
 
 import {
   getCustomPopulationSearchesByUser,
@@ -10,13 +10,13 @@ import { OodikoneRequest } from '../types'
 
 const router = Router()
 
-router.get('/', async (req: OodikoneRequest, res) => {
+router.get('/', async (req: OodikoneRequest, res: Response) => {
   const { id } = req.user!
   const customPopulationSearches = await getCustomPopulationSearchesByUser(id)
   res.json(customPopulationSearches)
 })
 
-router.post('/', async (req: OodikoneRequest, res) => {
+router.post('/', async (req: OodikoneRequest, res: Response) => {
   const {
     user,
     body: { name, students },
@@ -34,7 +34,7 @@ router.post('/', async (req: OodikoneRequest, res) => {
   res.json(customPopulationSearch)
 })
 
-router.put('/:id', async (req: OodikoneRequest, res) => {
+router.put('/:id', async (req: OodikoneRequest, res: Response) => {
   const {
     body: { students },
   } = req
@@ -59,7 +59,7 @@ router.put('/:id', async (req: OodikoneRequest, res) => {
   res.json(updatedPopulationSearch)
 })
 
-router.delete('/:id', async (req: OodikoneRequest, res) => {
+router.delete('/:id', async (req: OodikoneRequest, res: Response) => {
   const { id } = req.params
   const userId = req.user!.id
 

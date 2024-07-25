@@ -1,15 +1,22 @@
-import { Router } from 'express'
+import { Response, Router } from 'express'
 
 import {
   getCriteria,
   saveYearlyCourseCriteria,
   saveYearlyCreditCriteria,
 } from '../services/studyProgramme/studyProgrammeCriteria'
+import { OodikoneRequest } from '../types'
 
 const router = Router()
 
-router.get('/', async (req, res) => {
-  const studyProgramme = req.query?.programmecode
+interface StudyProgrammeCriteriaRequest extends OodikoneRequest {
+  query: {
+    programmecode: string
+  }
+}
+
+router.get('/', async (req: StudyProgrammeCriteriaRequest, res: Response) => {
+  const studyProgramme = req.query.programmecode
   if (studyProgramme !== '' && !studyProgramme) {
     return res.status(422).end()
   }
@@ -17,7 +24,15 @@ router.get('/', async (req, res) => {
   return res.json(studyProgrammeCriteria)
 })
 
-router.post('/courses', async (req, res) => {
+interface CriteriaCoursesRequest extends OodikoneRequest {
+  body: {
+    code: string
+    courses: string[]
+    year: number
+  }
+}
+
+router.post('/courses', async (req: CriteriaCoursesRequest, res: Response) => {
   const { code, courses, year } = req.body
   if (!code || !courses || !year) {
     return res.status(400).end()
@@ -26,7 +41,14 @@ router.post('/courses', async (req, res) => {
   return res.json(studyProgrammeCriteria)
 })
 
-router.post('/credits', async (req, res) => {
+interface CriteriaCreditsRequest extends OodikoneRequest {
+  body: {
+    code: string
+    credits: Record<string, string>
+  }
+}
+
+router.post('/credits', async (req: CriteriaCreditsRequest, res: Response) => {
   const { code, credits } = req.body
   if (!code || !credits) {
     return res.status(400).end()
