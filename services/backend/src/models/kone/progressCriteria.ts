@@ -1,4 +1,4 @@
-import { InferAttributes } from 'sequelize'
+import { CreationOptional, InferAttributes, InferCreationAttributes } from 'sequelize'
 import { Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript'
 
 @Table({
@@ -7,13 +7,16 @@ import { Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript
   modelName: 'progress_criteria',
   tableName: 'progress_criteria',
 })
-export class ProgressCriteria extends Model<InferAttributes<ProgressCriteria>> {
+export class ProgressCriteria extends Model<
+  InferAttributes<ProgressCriteria>,
+  InferCreationAttributes<ProgressCriteria>
+> {
   @PrimaryKey
   @Column(DataType.STRING)
   code!: string
 
   @Column(DataType.STRING)
-  curriculumVersion!: string
+  curriculumVersion!: CreationOptional<string>
 
   @Column(DataType.ARRAY(DataType.STRING))
   coursesYearOne!: string[]

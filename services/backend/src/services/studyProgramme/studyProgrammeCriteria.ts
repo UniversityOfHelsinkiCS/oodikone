@@ -85,7 +85,6 @@ const createCriteria = async (
 ) => {
   const newProgrammeCriteria = {
     code: studyProgramme,
-    curriculumVersion: '',
     coursesYearOne: courses.year1,
     coursesYearTwo: courses.year2,
     coursesYearThree: courses.year3,
