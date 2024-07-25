@@ -6,6 +6,7 @@ import { EnrollmentState } from './enrollmentState'
 import { EnrollmentType } from './enrollmentType'
 import { ExtentCode } from './extentCode'
 import { GenderCode } from './genderCode'
+import { IamAccess } from './iamAccess'
 import { Language } from './language'
 import { Name } from './name'
 import { OodikoneRequest } from './oodikoneRequest'
@@ -25,6 +26,7 @@ export {
   ExtentCode,
   FormattedUser,
   GenderCode,
+  IamAccess,
   Language,
   Name,
   OodikoneRequest,
