@@ -33,7 +33,7 @@ const tags = require('./routes/tags')
 const teachers = require('./routes/teachers')
 const university = require('./routes/university')
 const updater = require('./routes/updater')
-const usersToska = require('./routes/users')
+const usersToska = require('./routes/users').default
 const usersFd = require('./routes/usersFd')
 const initializeSentry = require('./util/sentry')
 

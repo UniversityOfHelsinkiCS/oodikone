@@ -4,7 +4,7 @@ import { intersection } from 'lodash'
 
 import { configLogoutUrl, isDev, requiredGroup, serviceProvider } from '../config'
 import { getMockedUser, getMockedUserFd, getOrganizationAccess, getUserFd, getUserToska } from '../services/userService'
-import { FormattedUser, OodikoneRequest } from '../types'
+import { FormattedUser, IamAccess, OodikoneRequest } from '../types'
 import { ApplicationError } from '../util/customErrors'
 import logger from '../util/logger'
 
@@ -12,6 +12,55 @@ const parseIamGroups = (iamGroups: string) => iamGroups?.split(';') ?? []
 
 const hasRequiredIamGroup = (iamGroups: string[], iamRights: string[]) => {
   return intersection(iamGroups, requiredGroup).length > 0 || iamRights.length > 0
+}
+
+const getUser = async (
+  showAsUser: string | undefined,
+  username: string,
+  name: string,
+  email: string,
+  iamGroups: string[],
+  specialGroup: Record<string, boolean>,
+  sisId: string,
+  iamAccess: IamAccess
+) => {
+  if (showAsUser && specialGroup?.superAdmin) {
+    return await getMockedUser({ userToMock: showAsUser as string, mockedBy: username as string })
+  }
+  return await getUserToska({
+    username: username as string,
+    name: name as string,
+    email: email as string,
+    iamGroups,
+    specialGroup,
+    sisId: sisId as string,
+    iamAccess,
+  })
+}
+
+type Headers = {
+  host?: string
+  'user-agent'?: string
+  accept?: string
+  'accept-language'?: string
+  'accept-encoding'?: string
+  referer?: string
+  displayname?: string
+  hygroupcn?: string
+  hypersonsisuid?: string
+  mail?: string
+  remote_user?: string
+  'shib-session-id'?: string
+  shib_logout_url?: string
+  uid?: string
+  'x-show-as-user'?: string
+  connection?: string
+  cookie?: string
+  'sec-fetch-dest'?: string
+  'sec-fetch-mode'?: string
+  'sec-fetch-site'?: string
+  'if-none-match'?: string
+  priority?: string
 }
 
 const toskaUserMiddleware = async (req: OodikoneRequest, _res: Response, next: NextFunction) => {
@@ -24,7 +73,7 @@ const toskaUserMiddleware = async (req: OodikoneRequest, _res: Response, next: N
     mail: email,
     shib_logout_url: logoutUrl,
     uid: username,
-  } = req.headers
+  } = req.headers as Headers
 
   const missingHeaders: string[] = []
   if (!sessionId) missingHeaders.push('shib-session-id')
@@ -39,8 +88,8 @@ const toskaUserMiddleware = async (req: OodikoneRequest, _res: Response, next: N
   }
 
   const iamGroups = parseIamGroups(hygroupcn as string)
-  const { access = {}, specialGroup = {} } = await getOrganizationAccess(sisId as string, iamGroups)
-  const iamRights = Object.keys(access)
+  const { iamAccess = {}, specialGroup = {} } = await getOrganizationAccess(sisId as string, iamGroups)
+  const iamRights = Object.keys(iamAccess)
 
   if (!hasRequiredIamGroup(iamGroups, iamRights)) {
     logger.error({
@@ -50,27 +99,12 @@ const toskaUserMiddleware = async (req: OodikoneRequest, _res: Response, next: N
     throw new ApplicationError(`User '${username}' does not have required iam group`, 403, { logoutUrl })
   }
 
-  let user: FormattedUser | null
-
-  if (showAsUser && specialGroup?.superAdmin) {
-    user = await getMockedUser({ userToMock: showAsUser as string, mockedBy: username as string })
-  } else {
-    user = await getUserToska({
-      username: username as string,
-      name: name as string,
-      email: email as string,
-      iamGroups,
-      specialGroup,
-      sisId: sisId as string,
-      access,
-    })
-  }
-
+  const user = await getUser(showAsUser, username!, name!, email!, iamGroups, specialGroup, sisId!, iamAccess)
   if (!user) {
     throw new ApplicationError(`Username ${username} not found.`, 403, { logoutUrl })
   }
 
-  Sentry.setUser({ username: user.mockedBy ?? (username as string) })
+  Sentry.setUser({ username: user.mockedBy ?? username! })
 
   req.user = user
   req.logoutUrl = logoutUrl as string
@@ -87,7 +121,8 @@ const fdUserMiddleware = async (req: OodikoneRequest, _res: Response, next: Next
 
   let user: FormattedUser | null
 
-  // getMockedUser in production requires the superAdmin-role, which is only available via iamGroups, so it's now only implemented for the dev environment
+  // getMockedUser in production requires the superAdmin role, which is only available
+  // via iamGroups, so it's now only implemented for the dev environment
   if (showAsUser && isDev) {
     user = await getMockedUserFd({ userToMock: showAsUser as string, mockedBy: remoteUser as string })
   } else {

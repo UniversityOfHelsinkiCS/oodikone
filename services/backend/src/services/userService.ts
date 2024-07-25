@@ -6,9 +6,9 @@ import { serviceProvider } from '../config'
 import { roles } from '../config/roles'
 import { sequelizeUser } from '../database/connection'
 import { User } from '../models/user'
-import { DetailedProgrammeRights, ExpandedUser, FormattedUser, Role } from '../types'
+import { DetailedProgrammeRights, ExpandedUser, FormattedUser, IamAccess, Role } from '../types'
 import { createLocaleComparator, getFullStudyProgrammeRights, hasFullAccessToStudentData } from '../util'
-import jami from '../util/jami'
+import * as jami from '../util/jami'
 import mami from '../util/mami'
 import { sendNotificationAboutNewUser } from './mailService'
 import { getSisuAuthData, personSearchQuery, getGraphqlData } from './oriProvider'
@@ -28,7 +28,7 @@ export const deleteOutdatedUsers = async () => {
   return sequelizeUser.query("DELETE FROM users WHERE last_login < CURRENT_DATE - INTERVAL '18 months'")
 }
 
-const isRole = (role: string): role is Role => {
+const isRole = (role: string) => {
   return (roles as readonly string[]).includes(role)
 }
 
@@ -65,8 +65,6 @@ export const updateUser = async (username: string, fields: Partial<Record<keyof 
   await user.update(fields)
   userDataCache.delete(username)
 }
-
-type IamAccess = Record<string, Record<'read' | 'write' | 'admin', boolean>>
 
 const getIamBasedRights = (iamAccess: IamAccess): DetailedProgrammeRights[] => {
   if (!iamAccess) {
@@ -209,7 +207,7 @@ export const getOrganizationAccess = async (sisPersonId: string, iamGroups: stri
     return {}
   }
   const { iamAccess, specialGroup } = await getUserIamAccess(sisPersonId, iamGroups)
-  return { access: iamAccess || {}, specialGroup }
+  return { iamAccess, specialGroup }
 }
 
 export const getMockedUser = async ({ userToMock, mockedBy }: { userToMock: string; mockedBy: string }) => {
@@ -230,8 +228,8 @@ export const getMockedUser = async ({ userToMock, mockedBy }: { userToMock: stri
     return null
   }
   const iamGroups = await getUserIams(userFromDb.sisuPersonId)
-  const { access, specialGroup } = await getOrganizationAccess(userFromDb.sisuPersonId, iamGroups)
-  const detailedProgrammeRights = getStudyProgrammeRights(access, specialGroup, userFromDb.programmeRights)
+  const { iamAccess, specialGroup } = await getOrganizationAccess(userFromDb.sisuPersonId, iamGroups)
+  const detailedProgrammeRights = getStudyProgrammeRights(iamAccess, specialGroup, userFromDb.programmeRights)
   const mockedUser = await formatUser({ ...userFromDb, iamGroups, detailedProgrammeRights, mockedBy })
   userDataCache.set(cacheKey, mockedUser)
   return mockedUser
@@ -252,7 +250,7 @@ export const getUserToska = async ({
   iamGroups,
   specialGroup,
   sisId,
-  access,
+  iamAccess,
 }: {
   username: string
   name: string
@@ -260,7 +258,7 @@ export const getUserToska = async ({
   iamGroups: string[]
   specialGroup: Record<string, boolean>
   sisId: string
-  access: IamAccess
+  iamAccess: IamAccess
 }) => {
   if (userDataCache.has(username)) {
     return userDataCache.get(username) as FormattedUser
@@ -271,7 +269,7 @@ export const getUserToska = async ({
   await updateAccessGroups(username, iamGroups, specialGroup, sisId)
   const userFromDb = (await User.findOne({ where: { username } }))!.toJSON()
 
-  const detailedProgrammeRights = getStudyProgrammeRights(access, specialGroup, userFromDb.programmeRights)
+  const detailedProgrammeRights = getStudyProgrammeRights(iamAccess, specialGroup, userFromDb.programmeRights)
   const user = await formatUser({ ...userFromDb, iamGroups, detailedProgrammeRights })
   if (isNewUser) {
     await sendNotificationAboutNewUser({ userId: username, userFullName: name })
