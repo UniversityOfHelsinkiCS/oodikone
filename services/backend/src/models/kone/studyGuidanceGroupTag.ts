@@ -1,4 +1,4 @@
-import { InferAttributes } from 'sequelize'
+import { CreationOptional, InferAttributes } from 'sequelize'
 import { AutoIncrement, Column, DataType, Model, PrimaryKey, Table, Unique } from 'sequelize-typescript'
 
 @Table({
@@ -11,15 +11,15 @@ export class StudyGuidanceGroupTag extends Model<InferAttributes<StudyGuidanceGr
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.BIGINT)
-  id!: string
+  id?: CreationOptional<string>
 
   @Unique
   @Column(DataType.STRING)
   studyGuidanceGroupId!: string
 
   @Column(DataType.STRING)
-  studyProgramme!: string
+  studyProgramme!: string | null
 
   @Column(DataType.STRING)
-  year!: string
+  year!: string | null
 }
