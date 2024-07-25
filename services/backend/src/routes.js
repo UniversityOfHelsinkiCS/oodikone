@@ -34,7 +34,7 @@ const teachers = require('./routes/teachers')
 const university = require('./routes/university')
 const updater = require('./routes/updater')
 const usersToska = require('./routes/users').default
-const usersFd = require('./routes/usersFd')
+const usersFd = require('./routes/usersFd').default
 const initializeSentry = require('./util/sentry')
 
 module.exports = (app, url) => {
