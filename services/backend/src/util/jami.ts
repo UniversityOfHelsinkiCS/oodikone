@@ -1,8 +1,9 @@
-const Sentry = require('@sentry/node')
-const axios = require('axios')
+import * as Sentry from '@sentry/node'
+import axios from 'axios'
 
-const { importerToken, jamiUrl, serviceProvider } = require('../config')
-const logger = require('./logger')
+import { importerToken, jamiUrl, serviceProvider } from '../config'
+import { IamAccess } from '../types'
+import logger from './logger'
 
 const jamiClient = axios.create({
   baseURL: jamiUrl,
@@ -11,51 +12,61 @@ const jamiClient = axios.create({
   },
 })
 
-const getUserIamAccess = async (sisPersonId, iamGroups, attempt = 1) => {
-  if (iamGroups.length === 0) return {}
+type UserIamAccess = {
+  iamAccess?: IamAccess
+  specialGroup?: Record<string, boolean>
+}
 
+export const getUserIamAccess = async (
+  sisPersonId: string,
+  iamGroups: string[],
+  attempt: number = 1
+): Promise<UserIamAccess> => {
+  if (iamGroups.length === 0) {
+    return {}
+  }
   try {
     const { data: iamAccess } = await jamiClient.post('/', {
       userId: sisPersonId,
       iamGroups,
       getSisuAccess: true,
     })
-
-    const { specialGroup } = iamAccess
+    const { specialGroup } = iamAccess as { specialGroup: Record<string, boolean> }
     delete iamAccess.specialGroup
-
     return { iamAccess, specialGroup }
   } catch (error) {
     if (attempt > 3) {
       logger.error('[Jami] error: ', error)
       Sentry.captureException(error)
-
       return {}
     }
-
     return getUserIamAccess(sisPersonId, iamGroups, attempt + 1)
   }
 }
 
-const getUserIams = async userId => {
+export const getUserIams = async (userId: string) => {
   try {
     const { data } = await jamiClient.get(`/${userId}`)
-
-    return data.iamGroups
-  } catch (error) {
+    return data.iamGroups as string[]
+  } catch (error: any) {
     if (error.response.status !== 404) {
       logger.error('[Jami] error: ', error)
       Sentry.captureException(error)
     }
-
     return []
   }
 }
 
-const getAllUserAccess = async userIds => {
-  const { data } = await jamiClient.post('access-and-special-groups', { userIds })
+type Access = {
+  id: string
+  iamGroups: string[]
+  access: IamAccess
+  specialGroup: Record<string, boolean>
+}
 
-  return data
+export const getAllUserAccess = async (userIds: string[]) => {
+  const { data } = await jamiClient.post('access-and-special-groups', { userIds })
+  return data as Access[]
 }
 
 const testJami = async () => {
@@ -69,10 +80,6 @@ const testJami = async () => {
   }
 }
 
-if (serviceProvider === 'Toska') testJami()
-
-module.exports = {
-  getUserIamAccess,
-  getUserIams,
-  getAllUserAccess,
+if (serviceProvider === 'Toska') {
+  testJami()
 }
