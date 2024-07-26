@@ -1,44 +1,43 @@
-const { Op } = require('sequelize')
+import { Op } from 'sequelize'
 
-const { Course, Credit, Semester, Teacher } = require('../models')
-const logger = require('../util/logger')
-const { redisClient } = require('./redis')
-const { getCurrentSemester, getSemestersAndYears } = require('./semesters')
+import { Course, Credit, Semester, Teacher } from '../../models'
+import logger from '../../util/logger'
+import { redisClient } from '../redis'
+import { getCurrentSemester, getSemestersAndYears } from '../semesters'
+import { CreditsWithTeachersForYear, isRegularCourse } from './helpers'
 
-const category = (name, rediskey) => ({ name, rediskey })
-
-const ID = {
-  ALL: 'all',
-  OPENUNI: 'openuni',
+export enum CategoryID {
+  ALL = 'all',
+  OPEN_UNI = 'openuni',
 }
 
 const categories = {
-  [ID.ALL]: category('All', 'TOP_TEACHERS_ALL_V2'),
-  [ID.OPENUNI]: category('Open University', 'TOP_TEACHERS_OPEN_UNI_V2'),
+  [CategoryID.ALL]: { name: 'All', redisKey: 'TOP_TEACHERS_ALL_V2' },
+  [CategoryID.OPEN_UNI]: { name: 'Open University', redisKey: 'TOP_TEACHERS_OPEN_UNI_V2' },
 }
 
-const getTeacherStats = async (categoryid, yearcode) => {
-  const { rediskey } = categories[categoryid]
-  const category = await redisClient.hgetAsync(rediskey, yearcode)
+export const getTeacherStats = async (categoryId: string, yearCode: number) => {
+  const { redisKey } = categories[categoryId]
+  const category = await redisClient.hgetAsync(redisKey, yearCode)
   return JSON.parse(category) || []
 }
 
-const setTeacherStats = async (categoryid, yearcode, stats) => {
-  const { rediskey } = categories[categoryid]
+const setTeacherStats = async (categoryId: string, yearCode: number, stats) => {
+  const { redisKey } = categories[categoryId]
   const data = { stats, updated: new Date() }
-  await redisClient.hsetAsync(rediskey, yearcode, JSON.stringify(data))
+  await redisClient.hsetAsync(redisKey, yearCode, JSON.stringify(data))
 }
 
-const getCategoriesAndYears = async () => {
-  const { years } = await getSemestersAndYears(new Date())
+export const getCategoriesAndYears = async () => {
+  const { years } = await getSemestersAndYears()
   return {
     years: Object.values(years),
     categories: Object.entries(categories).map(([id, { name }]) => ({ id, name })),
   }
 }
 
-const creditsWithTeachersForYear = yearcode =>
-  Credit.findAll({
+const getCreditsWithTeachersForYear = async (yearCode: number) => {
+  const credits: CreditsWithTeachersForYear[] = await Credit.findAll({
     attributes: ['id', 'credits', 'credittypecode', 'isStudyModule', 'is_open'],
     include: [
       {
@@ -47,7 +46,7 @@ const creditsWithTeachersForYear = yearcode =>
         attributes: [],
         where: {
           yearcode: {
-            [Op.eq]: yearcode,
+            [Op.eq]: yearCode,
           },
         },
       },
@@ -63,6 +62,8 @@ const creditsWithTeachersForYear = yearcode =>
       },
     ],
   })
+  return credits
+}
 
 const updatedStats = (statistics, teacher, passed, failed, credits, transferred) => {
   const { id, name } = teacher
@@ -84,9 +85,7 @@ const updatedStats = (statistics, teacher, passed, failed, credits, transferred)
   return stats
 }
 
-const isRegularCourse = credit => !credit.isStudyModule
-
-const filterTopTeachers = (stats, limit = 50) =>
+const filterTopTeachers = (stats, limit: number = 50) =>
   Object.values(stats)
     .sort((t1, t2) => t2.credits - t1.credits)
     .slice(0, limit)
@@ -95,8 +94,8 @@ const filterTopTeachers = (stats, limit = 50) =>
       credits: Math.floor(credits),
     }))
 
-const findTopTeachers = async yearcode => {
-  const credits = await creditsWithTeachersForYear(yearcode)
+const findTopTeachers = async (yearCode: number) => {
+  const credits = await getCreditsWithTeachersForYear(yearCode)
   const all = {}
   const openuni = {}
   credits
@@ -126,24 +125,17 @@ const findTopTeachers = async yearcode => {
   }
 }
 
-const findAndSaveTopTeachers = async yearcode => {
-  const { all, openuni } = await findTopTeachers(yearcode)
-  await setTeacherStats(ID.OPENUNI, yearcode, openuni)
-  await setTeacherStats(ID.ALL, yearcode, all)
+const findAndSaveTopTeachers = async (yearCode: number) => {
+  const { all, openuni } = await findTopTeachers(yearCode)
+  await setTeacherStats(CategoryID.OPEN_UNI, yearCode, openuni)
+  await setTeacherStats(CategoryID.ALL, yearCode, all)
 }
 
-const findAndSaveTeachers = async (startcode = 1, to) => {
-  const endcode = to || (await getCurrentSemester()).getDataValue('yearcode')
-  for (let code = startcode; code <= endcode; code++) {
+export const findAndSaveTeachers = async (endCode: number, startCode: number = 1) => {
+  const endYearCode = endCode || (await getCurrentSemester()).getDataValue('yearcode')
+  for (let code = startCode; code <= endYearCode; code++) {
     await findAndSaveTopTeachers(code)
     logger.info(`Teacher leaderboard for yearcode ${code} calculated`)
   }
   logger.info('Teacher leaderboard calculations done')
-}
-
-module.exports = {
-  getTeacherStats,
-  getCategoriesAndYears,
-  findAndSaveTeachers,
-  ID,
 }

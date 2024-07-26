@@ -13,7 +13,7 @@ const { getCurrentSemester } = require('./services/semesters')
 const { combinedStudyprogrammes, isRelevantProgramme } = require('./services/studyProgramme/studyProgrammeHelpers')
 const { updateBasicView, updateStudytrackView } = require('./services/studyProgramme/studyProgrammeUpdates')
 const { getAssociations, getProgrammesFromStudyRights, refreshAssociationsInRedis } = require('./services/studyrights')
-const { findAndSaveTeachers } = require('./services/topteachers')
+const { findAndSaveTeachers } = require('./services/teachers/top')
 const { deleteOutdatedUsers } = require('./services/userService')
 const logger = require('./util/logger')
 const { jobMaker } = require('./worker/queue')
@@ -64,7 +64,7 @@ const refreshProgramme = async code => {
 const refreshTeacherLeaderboard = async () => {
   // refresh this and previous year
   const currentSemestersYearCode = (await getCurrentSemester()).getDataValue('yearcode')
-  await findAndSaveTeachers(currentSemestersYearCode - 1, currentSemestersYearCode)
+  await findAndSaveTeachers(currentSemestersYearCode, currentSemestersYearCode - 1)
 }
 
 const refreshStatistics = async () => {
