@@ -104,7 +104,7 @@ export const studyProgrammeToolTips = {
   **Mikäli valittuna on maisteriohjelma:** Sisältää kandiohjelmat, joissa tämän ohjelman opiskelijat ovat opiskelleet ennen tuloaan maisteriohjelmaan. Vuosijaottelu on tehty maisteriohjelmassa aloittamisen perusteella.
   `,
   StudytrackOverview: `
-  - **All**: Opiskelijat, joiden opiskeluoikeus on alkanut kyseisenä lukuvuonna. Jos valittuna on maisteriohjelma, kandiohjelmasta maisteriohjelmaan siirtyneet opiskelijat lasketaan sen lukuvuoden opiskelijoihin, jolloin he ovat siirtyneet maisteriohjelmaan. 
+  - **All**: Opiskelijat, joiden opiskeluoikeus on alkanut kyseisenä lukuvuonna. Opiskelijoiden, joiden opiskeluoikeuteen kuuluu sekä kandidaatin että maisterin tutkinnon suoritusoikeus, aloituspäivä maisteriohjelmassa on kandidaatin tutkinnon valmistumispäivän jälkeinen päivä.
   - **Started studying**: Opiskelijat, jotka ovat ilmoittautuneet läsnäolevaksi samana lukuvuonna kuin heidän opiskeluoikeutensa on alkanut. Opiskelija on voinut myöhemmin keskeyttää opintonsa tai siirtyä pois ohjelmasta.
 
   **Current status** kuvastaa opiskelijoiden tilannetta tällä hetkellä.
@@ -139,7 +139,7 @@ export const studyProgrammeToolTips = {
 }
 
 studyProgrammeToolTips.StudytrackOverviewCombinedProgramme = studyProgrammeToolTips.StudytrackOverview.replace(
-  'Jos valittuna on maisteriohjelma, kandiohjelmasta maisteriohjelmaan siirtyneet opiskelijat lasketaan sen lukuvuoden opiskelijoihin, jolloin he ovat siirtyneet maisteriohjelmaan.',
+  'Opiskelijoiden, joiden opiskeluoikeuteen kuuluu sekä kandidaatin että maisterin tutkinnon suoritusoikeus, aloituspäivä maisteriohjelmassa on kandidaatin tutkinnon valmistumispäivän jälkeinen päivä.',
   ''
 )
   .replace(
