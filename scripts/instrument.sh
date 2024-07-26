@@ -7,12 +7,12 @@
 # Ensure the script exits if any command fails
 set -euo pipefail
 
-# Print status
-echo "Instrumenting code..."
-
 # Define the directories
 SOURCE_DIR="services/frontend/src"
 INSTRU_DIR="services/frontend/instrumented"
+
+# Print status
+echo -n "Instrumenting frontend code... "
 
 # Create the instrumented directory if it does not exist
 mkdir -p $INSTRU_DIR
