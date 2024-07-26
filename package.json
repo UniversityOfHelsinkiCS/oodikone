@@ -3,6 +3,8 @@
   "description": "An application for analyzing university data.",
   "scripts": {
     "cypress": "cypress",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run --browser chrome",
     "instrument": "./scripts/instrument.sh",
     "eslint": "eslint",
     "lint:all": "eslint --ext .js,.jsx,.ts,.tsx services/ updater/ --report-unused-disable-directives",
