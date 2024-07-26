@@ -90,11 +90,15 @@ const refreshCloseToGraduating = async () => {
   logger.info('Students close to graduating updated!')
 }
 
-const dailyJobs = () => {
-  refreshFaculties()
-  refreshProgrammes()
-  jobMaker.languagecenter()
-  jobMaker.statistics()
+const dailyJobs = async () => {
+  try {
+    await refreshProgrammes()
+    await refreshFaculties()
+    jobMaker.languagecenter()
+    jobMaker.statistics()
+  } catch (error) {
+    logger.error('Daily jobs failed', error)
+  }
 }
 
 const startCron = () => {
@@ -102,10 +106,10 @@ const startCron = () => {
     logger.info('Cronjob for refreshing stats started: runs daily at 23:00.')
     schedule('0 23 * * *', async () => {
       logger.info('Running daily jobs from cron')
-      dailyJobs()
+      await dailyJobs()
     })
     // This needs to be its own job because refreshing study right associations in `refreshStatistics` causes some study right info to be not available, causing this job to fail
-    schedule('0 3 * * *', async () => {
+    schedule('0 3 * * *', () => {
       jobMaker.closeToGraduation()
     })
     schedule('0 4 * * 3', async () => {
@@ -113,11 +117,11 @@ const startCron = () => {
       const [, result] = await deleteOutdatedUsers()
       logger.info(`Deleted ${result.rowCount} users.`)
     })
-    schedule('0 19 * * 1', async () => {
+    schedule('0 19 * * 1', () => {
       logger.info('Updating students whose studyplans have not been updated recently')
       jobMaker.studyplansUpdate(4)
     })
-    schedule('0 10 * * 2', async () => {
+    schedule('0 10 * * 2', () => {
       logger.info('Updating students whose studyplans have not been updated recently')
       jobMaker.studyplansUpdate(5)
     })

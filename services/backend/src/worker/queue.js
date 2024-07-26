@@ -25,7 +25,12 @@ const addJob = (type, data, keep) => {
 }
 
 const getJobs = async type => {
-  const jobs = await queue.getJobs(type)
+  let jobs = []
+  if (type === 'waiting') {
+    jobs = await queue.getWaiting()
+  } else if (type === 'active') {
+    jobs = await queue.getActive()
+  }
   return jobs
 }
 
