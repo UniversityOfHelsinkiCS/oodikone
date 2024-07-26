@@ -12,7 +12,11 @@ export const DataTable = ({ cypress, data, titles, wideTable }) => {
     <div className={`table-container${wideTable ? '-wide' : ''}`}>
       <Table celled data-cy={`Table-${cypress}`}>
         <Table.Header>
-          <Table.Row>{titles?.map(title => <Table.HeaderCell key={title}>{title}</Table.HeaderCell>)}</Table.Row>
+          <Table.Row>
+            {titles?.map(title => (
+              <Table.HeaderCell key={title}>{title}</Table.HeaderCell>
+            ))}
+          </Table.Row>
         </Table.Header>
         <Table.Body>
           {data?.map(yearArray => (

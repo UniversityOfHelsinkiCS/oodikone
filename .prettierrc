@@ -6,6 +6,5 @@
   "tabWidth": 2,
   "useTabs": false,
   "jsxSingleQuote": false,
-  "trailingComma": "es5",
-  "parser": "typescript"
+  "trailingComma": "es5"
 }
