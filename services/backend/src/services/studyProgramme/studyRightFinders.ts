@@ -2,7 +2,6 @@ import { Includeable, Op, col, fn } from 'sequelize'
 
 import {
   ElementDetail,
-  SemesterEnrollment,
   Studyright,
   Student,
   StudyrightElement,
@@ -10,10 +9,8 @@ import {
   SISStudyRightElement,
   Credit,
 } from '../../models'
-import { CreditTypeCode, ElementDetailType, EnrollmentType, Name } from '../../types'
-import { getCurrentSemester } from '../semesters'
+import { CreditTypeCode, ElementDetailType, Name } from '../../types'
 import { formatStudyright } from './format'
-import { whereStudents, sinceDate } from '.'
 
 export const getStudyRightsInProgramme = async (
   programmeCode: string,
@@ -95,81 +92,6 @@ export const getStudyTracksForProgramme = async (studyProgramme: string) => {
       },
       { [studyProgramme]: 'All students of the programme' }
     )
-}
-
-export const graduatedStudyRights = async (studytrack: string, since: Date, studentnumbers: string[]) =>
-  (
-    await Studyright.findAll({
-      include: [
-        {
-          model: StudyrightElement,
-          required: true,
-          include: [
-            {
-              model: ElementDetail,
-              required: true,
-              where: {
-                code: studytrack,
-              },
-            },
-          ],
-        },
-        {
-          model: Student,
-          attributes: ['studentnumber'],
-          required: true,
-        },
-      ],
-      where: {
-        graduated: 1,
-        enddate: sinceDate(since),
-        student_studentnumber: whereStudents(studentnumbers),
-      },
-    })
-  ).map(formatStudyright)
-
-export const inactiveStudyrights = async (studytrack: string, studentnumbers: string[]) => {
-  const currentSemester = await getCurrentSemester()
-  const students = await Student.findAll({
-    attributes: ['studentnumber'],
-    include: [
-      {
-        model: Studyright,
-        required: true,
-        include: [
-          {
-            model: StudyrightElement,
-            required: true,
-            where: {
-              code: studytrack,
-            },
-          },
-        ],
-        attributes: ['studyrightid', 'enddate'],
-        where: {
-          graduated: 0,
-          active: 0,
-        },
-      },
-      {
-        model: SemesterEnrollment,
-        attributes: ['semestercode', 'enrollmenttype'],
-      },
-    ],
-    where: {
-      studentnumber: {
-        [Op.in]: studentnumbers,
-      },
-    },
-  })
-
-  return students.filter(
-    student =>
-      student.studyrights[0].enddate <= new Date() ||
-      !student.semester_enrollments.find(enrollment => enrollment.semestercode === currentSemester.semestercode) ||
-      student.semester_enrollments.find(enrollment => enrollment.semestercode === currentSemester.semestercode)
-        ?.enrollmenttype === EnrollmentType.INACTIVE
-  )
 }
 
 export const getStudyRights = async students =>

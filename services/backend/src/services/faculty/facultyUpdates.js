@@ -1,6 +1,6 @@
 const { setCreditStats } = require('../analyticsService')
 const { computeCreditsProduced } = require('../providerCredits')
-const { findFacultyProgrammeCodes } = require('./faculty')
+const { getDegreeProgrammesOfFaculty } = require('./faculty')
 const { combineFacultyBasics } = require('./facultyBasics')
 const { countGraduationTimes } = require('./facultyGraduationTimes')
 const {
@@ -75,8 +75,9 @@ const updateFacultyOverview = async (faculty, statsType) => {
   let newProgrammes = []
   const allProgrammeCodes = []
 
-  const all = await findFacultyProgrammeCodes(faculty, 'ALL_PROGRAMMES')
-  const onlyNew = await findFacultyProgrammeCodes(faculty, 'NEW_STUDY_PROGRAMMES')
+  const all = await getDegreeProgrammesOfFaculty(faculty, false)
+  const onlyNew = await getDegreeProgrammesOfFaculty(faculty, true)
+
   allProgrammes = await setFacultyProgrammes(faculty, all, 'ALL_PROGRAMMES')
   newProgrammes = await setFacultyProgrammes(faculty, onlyNew, 'NEW_STUDY_PROGRAMMES')
   allProgrammes?.data.forEach(prog => allProgrammeCodes.push(prog.code))
@@ -140,17 +141,12 @@ const updateFacultyProgressOverview = async faculty => {
   const options = [specialGraduated, specialNotGraduated, notSpecialGraduated, notSpecialNotGraduated]
 
   let newProgrammes = []
-  const onlyNew = await findFacultyProgrammeCodes(faculty, 'NEW_STUDY_PROGRAMMES')
+  const onlyNew = await getDegreeProgrammesOfFaculty(faculty, true)
   newProgrammes = await setFacultyProgrammes(faculty, onlyNew, 'NEW_STUDY_PROGRAMMES')
 
   for (const option of options) {
     const { specialGroups, graduated } = option
-    const updateFacultyStudentStats = await combineFacultyStudents(
-      faculty,
-      newProgrammes.data,
-      specialGroups,
-      graduated
-    )
+    const updateFacultyStudentStats = await combineFacultyStudents(faculty, onlyNew, specialGroups, graduated)
     await setFacultyStudentStats(updateFacultyStudentStats, specialGroups, graduated)
     const updateFacultyProgressStats = await combineFacultyStudentProgress(
       faculty,

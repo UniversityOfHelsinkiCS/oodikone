@@ -1,4 +1,4 @@
-import { ProgrammeModule, Studyright } from '../../models'
+import { Credit, Studyright, Transfer } from '../../models'
 
 export const formatFacultyStudyRight = (studyright: Studyright) => {
   return {
@@ -17,16 +17,7 @@ export const formatFacultyStudyRight = (studyright: Studyright) => {
   }
 }
 
-export const formatFacultyProgrammeStudents = student => {
-  return {
-    stundentNumber: student.studentnumber,
-    homeCountryEn: student.home_country_en,
-    genderCode: student.gender_code,
-    semesters: student.semester_enrollments.map(enrollment => enrollment.dataValues),
-  }
-}
-
-export const formatFacultyTransfer = transfer => {
+export const formatFacultyTransfer = (transfer: Transfer) => {
   return {
     sourcecode: transfer.sourcecode,
     targetcode: transfer.targetcode,
@@ -36,28 +27,12 @@ export const formatFacultyTransfer = transfer => {
   }
 }
 
-export const formatFacultyProgramme = (programme: ProgrammeModule) => {
-  return {
-    code: programme.code,
-    name: programme.name,
-  }
-}
-
-export const formatFacultyThesisWriter = credit => {
+export const formatFacultyThesisWriter = (credit: Credit) => {
   return {
     course_code: credit.course_code,
     credits: credit.credits,
     attainment_date: credit.attainment_date,
     student_studentnumber: credit.student_studentnumber,
     courseUnitType: credit.course.course_unit_type,
-  }
-}
-
-export const formatOrganization = organization => {
-  return {
-    id: organization.id,
-    name: organization.name,
-    code: organization.code,
-    parentId: organization.parent_id,
   }
 }

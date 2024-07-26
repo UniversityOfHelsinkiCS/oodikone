@@ -1,10 +1,9 @@
 import { Op, QueryTypes } from 'sequelize'
 
 import { dbConnections } from '../../database/connection'
-import { Credit, Semester, SemesterEnrollment, Student, Studyright, StudyrightElement } from '../../models'
-import { CreditTypeCode, EnrollmentType } from '../../types'
+import { Credit, Student } from '../../models'
+import { CreditTypeCode } from '../../types'
 import logger from '../../util/logger'
-import { getCurrentSemester } from '../semesters'
 import { formatStudent } from './format'
 
 const { sequelize } = dbConnections
@@ -30,94 +29,6 @@ export const studytrackStudents = async (studentNumbers: string[]) =>
       },
     })
   ).map(formatStudent)
-
-export const enrolledStudents = async (studyTrack: string, studentNumbers: string[]) => {
-  const currentSemester = await getCurrentSemester()
-
-  const students = await Student.findAll({
-    attributes: ['studentnumber'],
-    include: [
-      {
-        model: Studyright,
-        include: [
-          {
-            model: StudyrightElement,
-            required: true,
-            where: {
-              code: studyTrack,
-            },
-          },
-        ],
-        attributes: ['studyrightid'],
-        where: {
-          graduated: 0,
-          active: 1,
-        },
-      },
-      {
-        model: SemesterEnrollment,
-        attributes: ['semestercode', 'enrollmenttype'],
-        include: [
-          {
-            model: Semester,
-            where: {
-              semestercode: currentSemester.semestercode,
-            },
-          },
-        ],
-        where: {
-          enrollmenttype: EnrollmentType.PRESENT,
-        },
-      },
-    ],
-    where: {
-      studentnumber: {
-        [Op.in]: studentNumbers,
-      },
-    },
-  })
-
-  return students.filter(student => student.semester_enrollments?.length)
-}
-export const absentStudents = async (studyTrack: string, studentNumbers: string[]) => {
-  const currentSemester = await getCurrentSemester()
-  const students = await Student.findAll({
-    attributes: ['studentnumber'],
-    include: [
-      {
-        model: Studyright,
-        include: [
-          {
-            model: StudyrightElement,
-            required: true,
-            where: {
-              code: studyTrack,
-            },
-          },
-        ],
-        attributes: ['studyrightid'],
-        where: {
-          graduated: 0,
-          active: 1,
-        },
-      },
-      {
-        model: SemesterEnrollment,
-        attributes: ['semestercode'],
-        where: {
-          enrollmenttype: EnrollmentType.ABSENT,
-          semestercode: currentSemester.semestercode,
-        },
-      },
-    ],
-    where: {
-      studentnumber: {
-        [Op.in]: studentNumbers,
-      },
-    },
-  })
-  return students
-}
 
 export const getStudentsForProgrammeCourses = async (from: Date, to: Date, programmeCourses: string[]) => {
   if (!programmeCourses.length) {

@@ -1,7 +1,6 @@
 import { Op } from 'sequelize'
 
 import { ignoredFacultyCodes } from '../../config/organizationConstants'
-import { programmeCodes } from '../../config/programmeCodes'
 import { Organization, StudyrightElement } from '../../models'
 import { ElementDetailType, ExtentCode } from '../../types'
 import { getOrganizations } from '../organizations'
@@ -80,15 +79,4 @@ export const getExtentFilter = (includeAllSpecials: boolean) => {
     },
   }
   return studyRightWhere
-}
-
-export const mapCodesToIds = data => {
-  // Add programme id e.g. TKT
-  for (const programme of data) {
-    if (Object.keys(programmeCodes).includes(programme.code)) {
-      programme.progId = programmeCodes[programme.code]
-    } else {
-      programme.progId = programme.code
-    }
-  }
 }

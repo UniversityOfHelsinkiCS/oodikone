@@ -8,14 +8,6 @@ const { Course, Credit, Enrollment, Organization, ProgrammeModule, Transfer } = 
 const logger = require('../../util/logger')
 const { formatTransfer } = require('./format')
 
-const whereStudents = studentnumbers => {
-  return studentnumbers || { [Op.not]: null }
-}
-
-const sinceDate = since => {
-  return since ? { [Op.gte]: since } : { [Op.not]: null }
-}
-
 const transfersAway = async (studytrack, since) =>
   (
     await Transfer.findAll({
@@ -203,6 +195,4 @@ module.exports = {
   getAllProgrammeCourses,
   getProgrammeName,
   getNotCompletedForProgrammeCourses,
-  whereStudents,
-  sinceDate,
 }

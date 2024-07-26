@@ -1,6 +1,7 @@
 const router = require('express').Router()
 
 const auth = require('../middleware/auth')
+const { getDegreeProgrammesOfFaculty } = require('../services/faculty/faculty')
 const { combineFacultyBasics } = require('../services/faculty/facultyBasics')
 const { getFacultyCredits } = require('../services/faculty/facultyCredits')
 const { countGraduationTimes } = require('../services/faculty/facultyGraduationTimes')
@@ -134,10 +135,10 @@ router.get('/:id/studentstats', auth.roles(['facultyStatistics', 'katselmusViewe
   if (!code) return res.status(422).end()
   const data = await getFacultyStudentStats(code, specialGroups, graduated)
   if (data) return res.json(data)
-  const newProgrammes = await getProgrammes(code, 'NEW_STUDY_PROGRAMMES')
-  if (!newProgrammes) return res.status(422).end()
+  const newProgrammes = await getDegreeProgrammesOfFaculty(code, true)
+  if (!newProgrammes.length) return res.status(422).end()
 
-  let updateStats = await combineFacultyStudents(code, newProgrammes.data, specialGroups, graduated)
+  let updateStats = await combineFacultyStudents(code, newProgrammes, specialGroups, graduated)
   if (updateStats) {
     updateStats = await setFacultyStudentStats(updateStats, specialGroups, graduated)
   }

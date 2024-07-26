@@ -1,7 +1,7 @@
 const moment = require('moment')
 
 const { redisClient } = require('../redis')
-const { findFacultyProgrammeCodes } = require('./faculty')
+const { getDegreeProgrammesOfFaculty } = require('./faculty')
 
 const createRedisKeyForFacultyProgrammes = (id, programmeFilter) => `FACULTY_PROGRAMMES_${id}_${programmeFilter}`
 const createRedisKeyForBasicStats = (id, yearType, programmeFilter, specialGroups) =>
@@ -51,7 +51,7 @@ const getFacultyProgrammesFromRedis = async (id, programmeFilter) => {
 const getProgrammes = async (code, programmeFilter = 'NEW_STUDY_PROGRAMMES') => {
   const programmes = await getFacultyProgrammesFromRedis(code, programmeFilter)
   if (programmes) return programmes
-  let updatedProgrammes = await findFacultyProgrammeCodes(code, programmeFilter)
+  let updatedProgrammes = await getDegreeProgrammesOfFaculty(code, programmeFilter === 'NEW_STUDY_PROGRAMMES')
   if (updatedProgrammes) updatedProgrammes = await setFacultyProgrammes(code, updatedProgrammes, programmeFilter)
   return updatedProgrammes
 }

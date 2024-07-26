@@ -1,6 +1,7 @@
-import { uniqBy } from 'lodash'
-import { Op } from 'sequelize'
+import moment from 'moment'
+import { InferAttributes, Op, QueryTypes } from 'sequelize'
 
+import { programmeCodes } from '../../config/programmeCodes'
 import { dbConnections } from '../../database/connection'
 import {
   Course,
@@ -8,20 +9,13 @@ import {
   ElementDetail,
   Organization,
   ProgrammeModule,
-  SemesterEnrollment,
-  Student,
   Studyright,
   StudyrightElement,
 } from '../../models'
 import { CreditTypeCode, ExtentCode, PriorityCode } from '../../types'
-import {
-  formatFacultyProgramme,
-  formatFacultyProgrammeStudents,
-  formatFacultyStudyRight,
-  formatFacultyThesisWriter,
-  formatOrganization,
-} from './facultyFormatHelpers'
-import { getExtentFilter, isNewProgramme, mapCodesToIds } from './facultyHelpers'
+import { getSemestersAndYears } from '../semesters'
+import { formatFacultyStudyRight, formatFacultyThesisWriter } from './facultyFormatHelpers'
+import { getExtentFilter } from './facultyHelpers'
 
 const { sequelize } = dbConnections
 
@@ -228,20 +222,6 @@ export const getStudyRightsByBachelorStart = async (
   return studyRights.map(formatFacultyStudyRight)
 }
 
-export const getStudentsByStudentnumbers = async (studentNumbers: string[]) => {
-  const query: Record<string, any> = {
-    where: {
-      studentnumber: studentNumbers,
-    },
-    include: {
-      model: SemesterEnrollment,
-      attributes: ['semestercode', 'enrollmenttype'],
-    },
-  }
-  const students = await Student.findAll(query)
-  return students.map(formatFacultyProgrammeStudents)
-}
-
 export const hasMasterRight = async (studyRightId: string): Promise<boolean> => {
   const studyRight = await Studyright.findOne({
     where: {
@@ -250,45 +230,6 @@ export const hasMasterRight = async (studyRightId: string): Promise<boolean> => 
     },
   })
   return studyRight !== null
-}
-
-const degreeProgrammesOfFaculty = async (facultyCode: string) => {
-  const query: Record<string, any> = {
-    attributes: ['code', 'name'],
-    include: {
-      model: Organization,
-      where: {
-        code: {
-          [Op.startsWith]: facultyCode,
-        },
-      },
-    },
-    group: ['programme_module.code', 'programme_module.name', 'organization.id'],
-  }
-
-  const programmes = await ProgrammeModule.findAll(query)
-  return uniqBy(programmes.map(formatFacultyProgramme), 'code')
-}
-
-const facultyOrganizationId = async (facultyCode: string) => {
-  return await Organization.findOne({
-    attributes: ['id'],
-    where: {
-      code: facultyCode,
-    },
-  })
-}
-
-const getChildOrganizations = async (facultyId: string) => {
-  const query: Record<string, any> = {
-    attributes: ['id', 'name', 'code', 'parent_id'],
-    where: {
-      parent_id: facultyId,
-    },
-  }
-
-  const organizations = await Organization.findAll(query)
-  return organizations.map(formatOrganization)
 }
 
 export const thesisWriters = async (provider: string, since: Date, thesisTypes: string[], studentNumbers: string[]) => {
@@ -330,56 +271,82 @@ export const thesisWriters = async (provider: string, since: Date, thesisTypes: 
   return thesisWriterCredits.map(formatFacultyThesisWriter)
 }
 
+const curriculumPeriodIdToYearCode = (curriculumPeriodId: string) => curriculumPeriodId.slice(-2)
+
 // Some programme modules are not directly associated to a faculty (organization).
 // Some have intermediate organizations, such as department, so the connection must be digged up
-export const findFacultyProgrammeCodes = async (facultyCode: string, programmeFilter: string) => {
-  const directAssociationProgrammes = await degreeProgrammesOfFaculty(facultyCode)
-
-  let allProgrammes = directAssociationProgrammes
-  const allProgrammeCodes = directAssociationProgrammes.map(programme => programme.code)
-
-  // find faculty's organization id and its direct child organizations
-  const facultyOrganization = await facultyOrganizationId(facultyCode)
-  if (!facultyOrganization) {
-    return []
-  }
-  const facultyChildOrganizations = await getChildOrganizations(facultyOrganization.id)
-
-  // get programme modules that have a faculty child as organization(_id)
-  for (const org of facultyChildOrganizations) {
-    const childAssociationProgrammes = await degreeProgrammesOfFaculty(org.code)
-    if (childAssociationProgrammes.length > 0) {
-      for (const programme of childAssociationProgrammes) {
-        if (!allProgrammeCodes.includes(programme.code)) {
-          allProgrammes.push(programme)
-          allProgrammeCodes.push(programme.code)
-        }
+export const getDegreeProgrammesOfOrganization = async (organizationId: string, onlyCurrentProgrammes: boolean) => {
+  type ProgrammeModuleWithRelevantAttributes = Pick<
+    InferAttributes<ProgrammeModule>,
+    'code' | 'name' | 'degreeProgrammeType' | 'curriculum_period_ids'
+  > & { progId: string }
+  const programmesOfOrganization: Array<Omit<ProgrammeModuleWithRelevantAttributes, 'progId'>> = await sequelize.query(
+    `
+      SELECT code, name, degree_programme_type as "degreeProgrammeType", curriculum_period_ids
+      FROM programme_modules
+      WHERE organization_id IN (
+        WITH RECURSIVE cte AS (
+          SELECT id, parent_id
+          FROM organization
+          WHERE parent_id = :organizationId OR id = :organizationId
+          UNION ALL
+          SELECT o.id, o.parent_id
+          FROM organization o
+          INNER JOIN cte ON o.parent_id = cte.id
+        )
+        SELECT DISTINCT(id) FROM cte
+      )
+      ORDER BY code
+    `,
+    {
+      type: QueryTypes.SELECT,
+      replacements: { organizationId },
+    }
+  )
+  const programmesWithProgIds = programmesOfOrganization.map(programme => ({
+    ...programme,
+    progId:
+      programme.code in programmeCodes ? programmeCodes[programme.code as keyof typeof programmeCodes] : programme.code,
+  }))
+  const { years } = await getSemestersAndYears()
+  const relevantProgrammes: ProgrammeModuleWithRelevantAttributes[] = []
+  for (const programme of programmesWithProgIds) {
+    const yearsOfProgramme = programme.curriculum_period_ids.map(curriculumPeriodIdToYearCode)
+    if (onlyCurrentProgrammes) {
+      if (yearsOfProgramme.some(year => moment().isBetween(years[year].startdate, years[year].enddate))) {
+        relevantProgrammes.push(programme)
       }
-    } else {
-      // dig deeper
-      const grandChildren = await getChildOrganizations(org.id)
-      if (grandChildren.length > 0) {
-        for (const gcOrg of grandChildren) {
-          const associatedProgrammes = await degreeProgrammesOfFaculty(gcOrg.code)
-          if (associatedProgrammes.length > 0) {
-            // eslint-disable-next-line @typescript-eslint/no-loop-func
-            associatedProgrammes.forEach(programme => {
-              if (!(programme.code in allProgrammeCodes)) {
-                allProgrammes.push(programme)
-                allProgrammeCodes.push(programme.code)
-              }
-            })
-          }
-        }
-      }
+      continue
+    }
+
+    const currentProgrammeInArray = relevantProgrammes.find(p => p.code === programme.code)
+    if (!currentProgrammeInArray) {
+      relevantProgrammes.push(programme)
+      continue
+    }
+    const maximumEndDateForCurrentProgramme = moment.max(
+      currentProgrammeInArray.curriculum_period_ids.map(id => years[curriculumPeriodIdToYearCode(id)].enddate)
+    )
+    if (yearsOfProgramme.some(year => years[year].enddate.isAfter(maximumEndDateForCurrentProgramme))) {
+      relevantProgrammes.splice(
+        relevantProgrammes.findIndex(p => p.code === programme.code),
+        1,
+        programme
+      )
     }
   }
+  return relevantProgrammes
+}
 
-  if (programmeFilter === 'NEW_STUDY_PROGRAMMES') {
-    allProgrammes = allProgrammes.filter(programme => isNewProgramme(programme.code))
+export const getDegreeProgrammesOfFaculty = async (facultyCode: string, onlyCurrentProgrammes: boolean) => {
+  const organization = await Organization.findOne({
+    attributes: ['id'],
+    where: {
+      code: facultyCode,
+    },
+  })
+  if (!organization) {
+    throw new Error(`The organization with the code ${facultyCode} was not found.`)
   }
-
-  mapCodesToIds(allProgrammes)
-
-  return allProgrammes
+  return getDegreeProgrammesOfOrganization(organization.id, onlyCurrentProgrammes)
 }
