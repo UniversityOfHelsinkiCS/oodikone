@@ -12,7 +12,15 @@ import { OodikoneRequest } from '../types'
 
 const router = Router()
 
-router.get('/', async (req: OodikoneRequest, res: Response) => {
+interface GetSearchRequest extends OodikoneRequest {
+  query: {
+    courselist: string
+    startdate: string
+    enddate: string
+  }
+}
+
+router.get('/', async (req: GetSearchRequest, res: Response) => {
   const courseCodes = JSON.parse(req.query?.courselist as string) || []
   const startdate = req.query?.startdate || moment('01-08-2017 00:00:00', 'DD-MM-YYYY')
   const enddate = req.query?.enddate || moment().endOf('day')
@@ -29,10 +37,17 @@ router.get('/searches', async (req: OodikoneRequest, res: Response) => {
   return res.json(foundSearches)
 })
 
-router.post('/searches', async (req: OodikoneRequest, res: Response) => {
+interface CreateSearchRequest extends OodikoneRequest {
+  body: {
+    courselist: string[]
+    name: string
+  }
+}
+
+router.post('/searches', async (req: CreateSearchRequest, res: Response) => {
   const courseCodes = req.body?.courselist || []
-  const userId = req.user!.id
   const name = req.body?.name
+  const userId = req.user!.id
   if (!name) {
     return res.status(400).json({ error: 'Name missing' })
   }
@@ -52,7 +67,16 @@ router.post('/searches', async (req: OodikoneRequest, res: Response) => {
   })
 })
 
-router.put('/searches/:id', async (req: OodikoneRequest, res: Response) => {
+interface UpdateSearchRequest extends OodikoneRequest {
+  body: {
+    courselist: string[]
+  }
+  params: {
+    id: string
+  }
+}
+
+router.put('/searches/:id', async (req: UpdateSearchRequest, res: Response) => {
   const id = req.params?.id
   const courseCodes = req.body?.courselist || []
   const userId = req.user!.id
@@ -72,7 +96,13 @@ router.put('/searches/:id', async (req: OodikoneRequest, res: Response) => {
   })
 })
 
-router.delete('/searches/:id', async (req: OodikoneRequest, res: Response) => {
+interface DeleteSearchRequest extends OodikoneRequest {
+  params: {
+    id: string
+  }
+}
+
+router.delete('/searches/:id', async (req: DeleteSearchRequest, res: Response) => {
   const id = req.params?.id
   const userId = req.user!.id
   if (!id || !userId) {

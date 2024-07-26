@@ -80,14 +80,12 @@ router.post('/searches', async (req: CreateSearchRequest, res: Response) => {
   const courseCodes = req.body?.courselist || []
   const name = req.body?.name
   const userId = req.user!.id
-
   if (!name) {
-    return res.status(400).json({ error: 'Courselist name missing' })
+    return res.status(400).json({ error: 'Name missing' })
   }
   if (courseCodes && !Array.isArray(courseCodes)) {
     return res.status(400).json({ error: 'Courselist must be type of array' })
   }
-
   const createdSearch = await createNewSearch(userId, name, courseCodes)
   if (!createdSearch) {
     return res.status(400).json({ error: 'Failed to create courselist' })
