@@ -1,9 +1,4 @@
 services:
-  backend:
-    volumes:
-      - backend-nodemod:/opt/app-root/src/node_modules
-      - ./services/backend/instrumented:/opt/app-root/src/src
-
   frontend:
     volumes:
       - frontend-nodemod:/opt/app-root/src/node_modules
