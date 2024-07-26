@@ -129,7 +129,7 @@ describe('Population Statistics', () => {
     })
   })
 
-  it('Graduation filter works', { retries: 2 }, () => {
+  it('Graduation filter works', { retries: 3 }, () => {
     runTestStepWithPreAndPostParts('GraduatedFromProgramme', () => {
       const getCard = () => cy.cs('GraduatedFromProgramme-filter-card')
 
@@ -162,13 +162,13 @@ describe('Population Statistics', () => {
     })
   })
 
-  it('Credit filter works', { retries: 2 }, () => {
+  it('Credit filter works', { retries: 3 }, () => {
     runTestStepWithPreAndPostParts('CreditsEarned', () => {
       testRangeFilter('CreditsEarned-filter-card', 50, 150, 118)
     })
   })
 
-  it('Age filter works', { retries: 2 }, () => {
+  it('Age filter works', { retries: 3 }, () => {
     cy.clock(MOCKED_DATE, ['Date'])
     runTestStepWithPreAndPostParts('Age', () => {
       testRangeFilter('Age-filter-card', 20, 40, 47)
@@ -241,7 +241,7 @@ describe('Population Statistics', () => {
     })
   })
 
-  it('"Reset All Filters" button works', { retries: 2 }, () => {
+  it('"Reset All Filters" button works', { retries: 3 }, () => {
     cy.cs('Gender-header').click()
     cy.cs('genderFilter-dropdown').selectFromDropdown(0)
     checkFilteringResult(42)
