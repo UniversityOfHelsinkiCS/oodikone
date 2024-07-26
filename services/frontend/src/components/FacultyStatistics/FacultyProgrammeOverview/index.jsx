@@ -25,7 +25,13 @@ const getDivider = (title, toolTipText, content, cypress) => (
 )
 
 const getKey = (programmeKeys, index) => {
-  return programmeKeys[index][1].startsWith('T') ? 'T' : programmeKeys[index][1].slice(0, 2)
+  if (programmeKeys[index][1].startsWith('T') || programmeKeys[index][1].startsWith('LIS')) {
+    return 'T'
+  }
+  if (programmeKeys[index][1].includes('KH')) {
+    return 'KH'
+  }
+  return 'MH'
 }
 
 const isBetween = (number, lowerLimit, upperLimit) => {
@@ -126,8 +132,9 @@ export const FacultyProgrammeOverview = ({
     const plotLinePlaces = [[0, key]]
     for (let i = 0; i < programmeKeys.length - 1; i++) {
       if (
-        (programmeKeys[i][1].startsWith('KH') && programmeKeys[i + 1][1].startsWith('MH')) ||
-        (programmeKeys[i][1].startsWith('MH') && programmeKeys[i + 1][1].startsWith('T'))
+        (programmeKeys[i][1].includes('KH') && programmeKeys[i + 1][1].includes('MH')) ||
+        (programmeKeys[i][1].includes('MH') &&
+          (programmeKeys[i + 1][1].startsWith('T') || programmeKeys[i + 1][1].startsWith('LIS')))
       ) {
         const key = getKey(programmeKeys, i + 1)
         plotLinePlaces.push([i + 1, key])
@@ -136,10 +143,19 @@ export const FacultyProgrammeOverview = ({
     return plotLinePlaces
   }
   const sortedProgrammeKeysStudents = studentStats?.data?.programmeStats
-    ? sortProgrammeKeys(
-        Object.keys(studentStats.data.programmeStats).map(obj => [studentStats.data.programmeNames[obj]?.id, obj]),
-        faculty.code
-      )
+    ? Object.keys(studentStats?.data?.programmeStats || {})
+        .sort((a, b) => {
+          const priority = {
+            'urn:code:degree-program-type:bachelors-degree': 1,
+            'urn:code:degree-program-type:masters-degree': 2,
+          }
+
+          const aPriority = priority[studentStats.data.programmeNames[a].degreeProgrammeType] || 3
+          const bPriority = priority[studentStats.data.programmeNames[b].degreeProgrammeType] || 3
+
+          return aPriority - bPriority
+        })
+        .map(obj => [studentStats.data.programmeNames[obj]?.id, obj])
     : []
 
   const getSortedProgrammeKeysProgress = studyLevelStats => {
