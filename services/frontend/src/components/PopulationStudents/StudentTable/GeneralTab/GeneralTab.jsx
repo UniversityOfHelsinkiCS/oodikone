@@ -343,7 +343,7 @@ export const GeneralTab = ({
       getRowVal: student =>
         student.hopsCredits !== undefined
           ? student.hopsCredits
-          : student.studyplans?.find(plan => plan.programme_code === programmeCode)?.completed_credits ?? 0,
+          : (student.studyplans?.find(plan => plan.programme_code === programmeCode)?.completed_credits ?? 0),
     }),
     hopsCombinedProg: () => ({
       key: 'credits-hopsCombinedProg',

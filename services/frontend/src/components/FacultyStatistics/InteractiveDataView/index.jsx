@@ -133,9 +133,7 @@ export const InteractiveDataTable = ({
       <Table celled data-cy={`Table-${cypress}`}>
         <Table.Header>
           <Table.Row key={`random-header-row-${Math.random()}`} textAlign="center">
-            {titles?.map(title => (
-              <Table.HeaderCell key={title}>{title}</Table.HeaderCell>
-            ))}
+            {titles?.map(title => <Table.HeaderCell key={title}>{title}</Table.HeaderCell>)}
           </Table.Row>
         </Table.Header>
         <Table.Body>

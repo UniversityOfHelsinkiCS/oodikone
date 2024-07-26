@@ -87,7 +87,7 @@ export const PopulationCourses = ({
         />
       ) : (
         <PopulationCourseStatsFlat
-          courses={pending ? null : populationSelectedStudentCourses.data ?? []}
+          courses={pending ? null : (populationSelectedStudentCourses.data ?? [])}
           filteredStudents={filteredStudents}
           studentAmountLimit={studentAmountLimit}
         />

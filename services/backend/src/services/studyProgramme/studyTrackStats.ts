@@ -245,7 +245,7 @@ const getMainStatsByTrackAndYear = async (
 
     const hasGraduated = studyRightElement.graduated
     const hasGraduatedFromCombinedProgramme = combinedProgramme
-      ? studyRight.studyRightElements.find(element => element.code === combinedProgramme)?.graduated ?? false
+      ? (studyRight.studyRightElements.find(element => element.code === combinedProgramme)?.graduated ?? false)
       : false
 
     if (hasGraduated) {
