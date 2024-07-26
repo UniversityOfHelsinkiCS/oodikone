@@ -83,6 +83,10 @@
   margin: 2em 0 5em;
 }
 
+.programmes-overview .datatable th {
+  white-space: pre-line;
+}
+
 .programmes-overview .no-data-message {
   margin: 20px 0;
 }

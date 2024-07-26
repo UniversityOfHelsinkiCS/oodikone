@@ -137,7 +137,7 @@ export const FacultyProgrammeOverview = ({
   }
   const sortedProgrammeKeysStudents = studentStats?.data?.programmeStats
     ? sortProgrammeKeys(
-        Object.keys(studentStats?.data.programmeStats).map(obj => [obj, studentStats?.data?.programmeNames[obj]?.code]),
+        Object.keys(studentStats.data.programmeStats).map(obj => [studentStats.data.programmeNames[obj]?.id, obj]),
         faculty.code
       )
     : []
@@ -189,7 +189,7 @@ export const FacultyProgrammeOverview = ({
         <Loader active style={{ marginTop: '15em' }} />
       ) : (
         <div className="programmes-overview">
-          {studentStats && studentStats.data && (
+          {studentStats?.data && (
             <>
               {getDivider(
                 'Students of the faculty by starting year',
@@ -206,9 +206,9 @@ export const FacultyProgrammeOverview = ({
                     onClick={() =>
                       downloadStudentTable(
                         studentStats,
-                        studentStats?.data?.programmeNames,
+                        studentStats.data.programmeNames,
                         faculty,
-                        sortedProgrammeKeysStudents.map(listObj => listObj[0]),
+                        sortedProgrammeKeysStudents.map(listObj => listObj[1]),
                         getTextIn
                       )
                     }
@@ -223,7 +223,7 @@ export const FacultyProgrammeOverview = ({
                   programmeNames={studentStats?.data.programmeNames}
                   programmeStats={studentStats?.data.programmeStats}
                   requiredRights={requiredRights}
-                  sortedKeys={sortedProgrammeKeysStudents.map(listObj => listObj[0])}
+                  sortedKeys={sortedProgrammeKeysStudents.map(listObj => listObj[1])}
                   tableLinePlaces={getTableLinePlaces(sortedProgrammeKeysStudents)}
                   tableStats={studentStats?.data.facultyTableStats}
                   titles={studentStats?.data.titles}

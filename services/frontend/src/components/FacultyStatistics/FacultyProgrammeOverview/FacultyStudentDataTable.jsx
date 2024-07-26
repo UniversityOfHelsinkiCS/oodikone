@@ -15,20 +15,6 @@ const getStyle = index => {
 const backgroundColors = { KH: '#ffffff', MH: '#f2f6f7', T: '#e7edee' }
 const backgroundColorsDarks = { KH: '#f9f9f9', MH: '#eeeeee', T: '#dddddd' }
 
-const getTitlePopup = index => {
-  if (index === 0) return 'All'
-  if ([1, 2].includes(index)) return 'Started studying'
-  if ([3, 4].includes(index)) return 'Currently enrolled'
-  if ([5, 6].includes(index)) return 'Absent'
-  if ([7, 8].includes(index)) return 'Inactive'
-  if ([9, 10].includes(index)) return 'Graduated'
-  if ([11, 12].includes(index)) return 'Men'
-  if ([13, 14].includes(index)) return 'Women'
-  if ([15, 16].includes(index)) return 'Other/Unknown'
-  if ([17, 18].includes(index)) return 'Finland'
-  return 'Other'
-}
-
 const getRowStyle = (index, tableLinePlaces, dark = false) => {
   if (tableLinePlaces.length >= 3 && tableLinePlaces[2][0] <= index)
     return dark
@@ -67,14 +53,16 @@ const getTableCell = ({ year, programme, valIndex, rowIndex, tableLinePlaces, va
 }
 
 const getOtherCountriesList = ({ year, code, extraTableStats }) => {
-  if (Object.keys(extraTableStats?.[year]?.[code]).length === 0) return <p key={`${Math.random()}-nodata`}>No data</p>
-  const countriesData = extraTableStats[year][code]
+  const countriesData = extraTableStats?.[year]?.[code]
+
+  if (!countriesData || Object.keys(countriesData).length === 0) return null
+
   return Object.keys(countriesData)
     .sort()
-    .map(key => (
-      <p key={`${Math.random()}-${key}`} style={{ padding: 0, margin: 0 }}>
-        {key === 'null' ? 'Unknown' : key}: <b>{countriesData[key]}</b>
-      </p>
+    .map(country => (
+      <div key={country}>
+        {country}: <b>{countriesData[country]}</b>
+      </div>
     ))
 }
 
@@ -91,22 +79,17 @@ const getRows = ({
   return programmeStats[programme][year].map((value, valIndex) => {
     const key = `${programme}-${year}-${`${value}${valIndex}`}`
     if (!showPercentages && typeof value === 'string' && (value.includes('%') || value.includes('NA'))) return null
+    const tableCell = getTableCell({ year, programme, valIndex, rowIndex: index, tableLinePlaces, value })
     if (valIndex === 19) {
-      return (
-        <Popup
-          content={getOtherCountriesList({ year, code: programmeNames[programme].code, extraTableStats })}
-          key={key}
-          trigger={getTableCell({ year, programme, valIndex, rowIndex: index, tableLinePlaces, value })}
-        />
-      )
+      const countriesPopupContent = getOtherCountriesList({
+        year,
+        code: programmeNames[programme].code,
+        extraTableStats,
+      })
+      if (!countriesPopupContent) return tableCell
+      return <Popup content={countriesPopupContent} key={key} trigger={tableCell} />
     }
-    return (
-      <Popup
-        content={getTitlePopup(valIndex)}
-        key={key}
-        trigger={getTableCell({ year, programme, valIndex, rowIndex: index, tableLinePlaces, value })}
-      />
-    )
+    return tableCell
   })
 }
 
@@ -150,7 +133,7 @@ export const FacultyStudentDataTable = ({
           <Table.Row key="FirstHeader">
             <Table.HeaderCell colSpan={!showPercentages ? 3 : 4} />
             <Table.HeaderCell colSpan={!showPercentages ? 4 : 8} style={{ borderLeftWidth: 'thick' }}>
-              Status
+              Current status
             </Table.HeaderCell>
             <Table.HeaderCell colSpan={!showPercentages ? 3 : 6} style={{ borderLeftWidth: 'thick' }}>
               Gender
@@ -233,10 +216,10 @@ export const FacultyStudentDataTable = ({
                           <Popup
                             content={
                               <p>
-                                {programmeNames[programme].code} - {getTextIn(programmeNames[programme])}
+                                {programmeNames[programme].code} – {getTextIn(programmeNames[programme].name)}
                               </p>
                             }
-                            trigger={<b>{programme}</b>}
+                            trigger={<b>{programmeNames[programme].progId}</b>}
                           />
                           {requiredRights.programmeRights?.includes(programmeNames[programme].code) ||
                             (requiredRights.fullAccessToStudentData && (

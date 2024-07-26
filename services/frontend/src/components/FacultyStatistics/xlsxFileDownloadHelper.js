@@ -7,20 +7,26 @@ export const downloadStudentTable = (studentStats, programmeNames, faculty, sort
   const book = utils.book_new()
   const tableHeaders = studentStats.data.titles.slice(1)
   const countriesExtra = studentStats.data.facultyTableStatsExtra
-  const years = Object.keys(studentStats.data.facultyTableStats)
-    .map(year => year)
-    .reverse()
+  const years = Object.keys(studentStats.data.facultyTableStats).sort((a, b) => {
+    if (a === 'Total') return 1
+    if (b === 'Total') return -1
+
+    const yearA = parseInt(a.split(' - ')[0], 10)
+    const yearB = parseInt(b.split(' - ')[0], 10)
+
+    return yearB - yearA
+  })
 
   const processTableData = (data, tableHeaders) => {
     let counter = 0
     return data.map(row =>
       row.reduce((result, value) => {
-        let header = '%'
+        let header
         if (typeof value !== 'string') {
-          header = tableHeaders[counter]
+          header = tableHeaders[counter].replace('\n', ' ')
           counter += 1
         } else {
-          header = `${tableHeaders[counter - 1]} %`
+          header = counter === 0 ? '' : `${tableHeaders[counter - 1].replace('\n', ' ')} %`
           if (counter >= tableHeaders.length) counter = 0
         }
         return { ...result, [header]: value }
