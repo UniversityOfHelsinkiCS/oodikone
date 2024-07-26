@@ -170,7 +170,7 @@ export const FacultyStudentDataTable = ({
             return (
               <Fragment key={`${year}-fragment`}>
                 <Table.Row className={year === 'Total' ? 'total-row-cell' : ''} key={`${year}-faculty-row}`}>
-                  {tableStats[year].map((value, valueIndex) => {
+                  {tableStats[year]?.map((value, valueIndex) => {
                     if (valueIndex === 0)
                       return (
                         <Table.Cell key={`${year}-faculty-cell}`}>
@@ -206,7 +206,7 @@ export const FacultyStudentDataTable = ({
                 </Table.Row>
                 {yearsVisible[yearIndex] &&
                   sortedKeys.map((programme, index) => {
-                    return programmeStats[programme][year].length === 0 ? null : (
+                    return !programmeStats[programme][year] || programmeStats[programme][year].length === 0 ? null : (
                       <Table.Row className="regular-row" key={`${year}-regular-row-${programme}`}>
                         <Table.Cell
                           key={`${year}-${programme}`}
