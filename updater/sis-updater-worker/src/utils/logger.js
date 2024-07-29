@@ -11,6 +11,7 @@ const {
   sentryEnvironment,
   sentryDSN,
   runningInCI,
+  serviceProvider
 } = require('../config')
 
 const { colorize, combine, timestamp, printf, uncolorize } = winston.format
@@ -54,7 +55,7 @@ transports.push(
   })
 )
 
-if (isProduction && !isStaging) {
+if (isProduction && !isStaging && serviceProvider !== 'Fd') {
   transports.push(
     new WinstonGelfTransporter({
       handleExceptions: true,
