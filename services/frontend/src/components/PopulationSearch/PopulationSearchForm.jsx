@@ -329,13 +329,14 @@ const PopulationSearchForm = ({ queries, onProgress, clearSelected, getPopulatio
                 value={`${year}-${moment().year(year).add(1, 'years').format(YEAR_DATE_FORMAT)}`}
               />
             )}
-            renderYear={(p, selectableYear) =>
-              selectableYear <= currentYear && selectableYear >= 1900 ? (
-                <td {...p}>
+            renderYear={({ key, ...otherProps }, selectableYear) =>
+              selectableYear <= currentYear &&
+              selectableYear >= 1900 && (
+                <td key={key} {...otherProps}>
                   {`${selectableYear}`}-<br />
                   {`${selectableYear + 1}`}
                 </td>
-              ) : null
+              )
             }
             timeFormat={false}
           />
