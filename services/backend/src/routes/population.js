@@ -401,11 +401,6 @@ router.get('/v3/populationstatistics/studyprogrammes', async (req, res) => {
   }
 })
 
-router.get('/v3/populationstatistics/studyprogrammes/unfiltered', async (req, res) => {
-  const studyrights = await getAssociations()
-  res.json(studyrights)
-})
-
 router.get('/v3/populationstatistics/maxYearsToCreatePopulationFrom', async (req, res) => {
   const { courseCodes } = req.query
   const maxYearsToCreatePopulationFromOpen = await maxYearsToCreatePopulationFrom(JSON.parse(courseCodes), 'openStats')

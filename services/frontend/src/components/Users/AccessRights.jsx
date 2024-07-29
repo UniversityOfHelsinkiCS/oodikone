@@ -10,7 +10,6 @@ import { userToolTips } from '@/common/InfoToolTips'
 import { FilterOldProgrammesToggle } from '@/components/common/FilterOldProgrammesToggle'
 import { InfoBox } from '@/components/Info/InfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { useGetUnfilteredProgrammesQuery } from '@/redux/populations'
 import { useGetStudyProgrammesQuery } from '@/redux/studyProgramme'
 import { useAddUserUnitsMutation, useRemoveUserUnitsMutation } from '@/redux/users'
 
@@ -32,10 +31,6 @@ export const AccessRights = ({ user }) => {
   const [accessRightsToBeRemoved, setAccessRightsToBeRemoved] = useState([])
   const [filterOldProgrammes, setFilterOldProgrammes] = useState(true)
   const { data: studyProgrammes = [] } = useGetStudyProgrammesQuery()
-  const { data: allProgrammes } = useGetUnfilteredProgrammesQuery()
-  const programmes = Object.values(allProgrammes?.programmes || {})
-    .filter(programme => !getUserFullProgrammeRights(programmeRights).includes(programme.code))
-    .map(({ code, name }) => ({ code, name }))
   const [addUserUnitsMutation, addResult] = useAddUserUnitsMutation()
   const [removeUserUnitsMutation, removeResult] = useRemoveUserUnitsMutation()
 
@@ -50,7 +45,8 @@ export const AccessRights = ({ user }) => {
     }
   }
 
-  let options = programmes
+  let options = studyProgrammes
+    .filter(programme => !getUserFullProgrammeRights(programmeRights).includes(programme.code))
     .map(({ code, name }) => ({
       key: code,
       value: code,
