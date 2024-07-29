@@ -253,7 +253,7 @@ export class CourseStatsCounter {
 
   public getFinalStats() {
     const { stats, students } = this
-    const studs = this.enrollments
+    const enrolledStudents = this.enrollments
       ? Object.keys(this.enrollments)
           .filter(key => key !== EnrollmentState.ENROLLED && key !== 'semesters')
           .reduce(
@@ -264,9 +264,9 @@ export class CourseStatsCounter {
     const allStudents = Object.keys(students.all).map(student => student)
     const filteredEnrolledNoGrade = this.enrollments[EnrollmentState.ENROLLED]
       ? [...this.enrollments[EnrollmentState.ENROLLED]]
-          .filter(student => !studs.includes(student) && !allStudents.includes(student))
-          .reduce((acc, student) => ({ ...acc, [student]: true }), {})
-      : {}
+          .filter(student => !enrolledStudents.includes(student) && !allStudents.includes(student))
+          .reduce((acc, student) => ({ ...acc, [student]: true }), {} as Record<string, boolean>)
+      : ({} as Record<string, boolean>)
 
     students.all = { ...students.all, ...filteredEnrolledNoGrade }
     students.enrolledNoGrade = filteredEnrolledNoGrade
