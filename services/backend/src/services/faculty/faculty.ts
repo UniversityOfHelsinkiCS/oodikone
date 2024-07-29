@@ -11,43 +11,6 @@ import { getExtentFilter } from './facultyHelpers'
 
 const { sequelize } = dbConnections
 
-export const startedStudyrights = async (
-  facultyCode: string,
-  since: Date,
-  code: string,
-  includeAllSpecials: boolean
-) => {
-  const studyRightWhere = getExtentFilter(includeAllSpecials)
-
-  const query = {
-    include: [
-      {
-        model: StudyrightElement,
-        required: true,
-        where: {
-          code,
-        },
-        include: [
-          {
-            model: ElementDetail,
-            required: true,
-          },
-        ],
-      },
-    ],
-    where: {
-      facultyCode,
-      startdate: {
-        [Op.gte]: since,
-      },
-      ...studyRightWhere,
-    },
-  }
-
-  const studyRights = await Studyright.findAll(query)
-  return studyRights.map(formatFacultyStudyRight)
-}
-
 export const graduatedStudyrights = async (
   facultyCode: string,
   since: Date,

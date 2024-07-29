@@ -229,7 +229,7 @@ export const BasicOverview = ({
                   exportFileName={`oodikone_StudentsOfTheFaculty_${faculty?.code}_${getTimestamp()}`}
                   wideTable
                 />
-                <div className="table-container-wide">
+                <div className="table-container-wide datatable">
                   <InteractiveDataTable
                     cypress="StudentsOfTheFaculty"
                     dataProgrammeStats={basics?.data?.studentInfo.programmeTableStats}

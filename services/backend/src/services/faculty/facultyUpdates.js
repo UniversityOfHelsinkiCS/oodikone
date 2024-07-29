@@ -21,14 +21,8 @@ const programmeFilterOptions = ['ALL_PROGRAMMES', 'NEW_STUDY_PROGRAMMES']
 const graduatedOptions = ['GRADUATED_INCLUDED', 'GRADUATED_EXCLUDED']
 
 const updateFacultyOverview = async (faculty, statsType) => {
-  const allProgrammeCodes = []
-
   const all = await getDegreeProgrammesOfFaculty(faculty, false)
   const onlyNew = await getDegreeProgrammesOfFaculty(faculty, true)
-
-  const allProgrammes = await setFacultyProgrammes(faculty, all, 'ALL_PROGRAMMES')
-  const newProgrammes = await setFacultyProgrammes(faculty, onlyNew, 'NEW_STUDY_PROGRAMMES')
-  allProgrammes?.data.forEach(prog => allProgrammeCodes.push(prog.code))
 
   for (const yearType of yearOptions) {
     for (const specialGroups of specialGroupOptions) {
@@ -36,10 +30,8 @@ const updateFacultyOverview = async (faculty, statsType) => {
         if (statsType === 'ALL' || statsType === 'STUDENT') {
           const updatedStudentInfo = await combineFacultyBasics(
             faculty,
-            programmeFilter === 'ALL_PROGRAMMES' ? allProgrammes.data : newProgrammes.data,
+            programmeFilter === 'NEW_STUDY_PROGRAMMES' ? onlyNew : all,
             yearType,
-            allProgrammeCodes,
-            programmeFilter,
             specialGroups
           )
           await setBasicStats(updatedStudentInfo, yearType, programmeFilter, specialGroups)
@@ -53,8 +45,12 @@ const updateFacultyOverview = async (faculty, statsType) => {
           await setCreditStats(updatedCredits, yearType === 'ACADEMIC_YEAR', specialGroups === 'SPECIAL_INCLUDED')
         }
         if (statsType === 'ALL' || statsType === 'THESIS') {
-          const programmes = await getDegreeProgrammesOfFaculty(faculty, programmeFilter === 'NEW_STUDY_PROGRAMMES')
-          const updateThesisWriters = await combineFacultyThesisWriters(faculty, programmes, yearType, specialGroups)
+          const updateThesisWriters = await combineFacultyThesisWriters(
+            faculty,
+            programmeFilter === 'NEW_STUDY_PROGRAMMES' ? onlyNew : all,
+            yearType,
+            specialGroups
+          )
           await setThesisWritersStats(updateThesisWriters, yearType, programmeFilter, specialGroups)
         }
       }
