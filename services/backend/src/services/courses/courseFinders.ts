@@ -1,6 +1,7 @@
-import { InferAttributes, Op } from 'sequelize'
+import { Op } from 'sequelize'
 
 import { Course } from '../../models'
+import { CourseWithSubsId } from '../../types'
 import { getSortRank } from '../../util/sortRank'
 
 const nameLikeTerm = (name: string) => {
@@ -51,7 +52,6 @@ const getRawCourses = async (name: string, code: string) => {
 }
 
 export const byNameAndOrCodeLike = async (name: string, code: string) => {
-  type CourseWithSubsId = InferAttributes<Course> & { subsId?: number }
   const rawCourses = await getRawCourses(name, code)
   const courses: CourseWithSubsId[] = rawCourses
     .map(course => ({ ...course.dataValues }))
