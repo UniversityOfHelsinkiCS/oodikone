@@ -12,7 +12,7 @@ const { redisClient } = require('./services/redis')
 const { getCurrentSemester } = require('./services/semesters')
 const { combinedStudyprogrammes, isRelevantProgramme } = require('./services/studyProgramme/studyProgrammeHelpers')
 const { updateBasicView, updateStudytrackView } = require('./services/studyProgramme/studyProgrammeUpdates')
-const { getAssociations, getProgrammesFromStudyRights, refreshAssociationsInRedis } = require('./services/studyrights')
+const { getProgrammesFromStudyRights, refreshAssociationsInRedis } = require('./services/studyrights')
 const { findAndSaveTeachers } = require('./services/topteachers')
 const { deleteOutdatedUsers } = require('./services/userService')
 const logger = require('./util/logger')
@@ -44,8 +44,6 @@ const refreshProgrammes = async () => {
   const programmes = await getProgrammesFromStudyRights()
   const codes = programmes.map(programme => programme.code).filter(code => isRelevantProgramme(code))
 
-  // Ensure that studyright associations are refreshed before launching jobs, otherwise each job will do it
-  await getAssociations()
   for (const code of codes) {
     // If combined programme is given, this updates only the bachelor programme
     jobMaker.programme(code)
@@ -94,8 +92,9 @@ const dailyJobs = async () => {
   try {
     await refreshProgrammes()
     await refreshFaculties()
+    await refreshStatistics()
     jobMaker.languagecenter()
-    jobMaker.statistics()
+    jobMaker.closeToGraduation()
   } catch (error) {
     logger.error('Daily jobs failed', error)
   }
@@ -107,10 +106,6 @@ const startCron = () => {
     schedule('0 23 * * *', async () => {
       logger.info('Running daily jobs from cron')
       await dailyJobs()
-    })
-    // This needs to be its own job because refreshing study right associations in `refreshStatistics` causes some study right info to be not available, causing this job to fail
-    schedule('0 3 * * *', () => {
-      jobMaker.closeToGraduation()
     })
     schedule('0 4 * * 3', async () => {
       logger.info("Deleting users who haven't logged in for 18 months")
