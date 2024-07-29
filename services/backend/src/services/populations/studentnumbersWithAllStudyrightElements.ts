@@ -4,7 +4,7 @@ import { Op } from 'sequelize'
 import { dbConnections } from '../../database/connection'
 import { ElementDetail, Student, Studyright, StudyrightElement, Transfer } from '../../models'
 import { TagStudent } from '../../models/kone'
-import { ExtentCode, PriorityCode } from '../../types'
+import { ElementDetailType, ExtentCode, PriorityCode } from '../../types'
 import { count } from './shared'
 
 const { sequelize } = dbConnections
@@ -138,7 +138,7 @@ export const studentnumbersWithAllStudyrightElements = async ({
       model: ElementDetail,
       where: {
         type: {
-          [Op.eq]: 30,
+          [Op.eq]: ElementDetailType.MODULE,
         },
       },
     },
