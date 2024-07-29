@@ -4,7 +4,7 @@ import { Op } from 'sequelize'
 import { dbConnections } from '../../database/connection'
 import { ElementDetail, Student, Studyright, StudyrightElement, Transfer } from '../../models'
 import { TagStudent } from '../../models/kone'
-import { ExtentCode } from '../../types'
+import { ExtentCode, PriorityCode } from '../../types'
 import { count } from './shared'
 
 const { sequelize } = dbConnections
@@ -42,7 +42,7 @@ export const studentnumbersWithAllStudyrightElements = async ({
       [Op.notIn]: filteredExtents,
     },
     prioritycode: {
-      [Op.not]: 6,
+      [Op.not]: PriorityCode.OPTION,
     },
   }
 
