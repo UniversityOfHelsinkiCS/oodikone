@@ -35,7 +35,7 @@ describe('Faculty overview', () => {
   describe('Basic information: basic user', () => {
     beforeEach(() => {
       cy.init('/faculties')
-      cy.contains('a', 'Maatalous-metsätieteellinen tiedekunta').click()
+      cy.contains('a', 'Matemaattis-luonnontieteellinen tiedekunta').click()
     })
 
     it('Basic information tab show all graphs and tables', () => {
@@ -93,7 +93,7 @@ describe('Faculty overview', () => {
         cy.get(`[data-cy="Graph-${section}"]`).within(() => {
           cy.get('[aria-label="View chart menu, Chart"]').click()
           cy.contains('li.highcharts-menu-item', 'Download XLS').click()
-          const downloadedFile = `oodikone_${section}_H80_${timestamp}.xls`
+          const downloadedFile = `oodikone_${section}_H50_${timestamp}.xls`
           cy.readFile(path.join(downloadsFolder, downloadedFile))
         })
       })
