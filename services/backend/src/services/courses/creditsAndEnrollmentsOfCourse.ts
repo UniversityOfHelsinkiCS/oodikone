@@ -6,8 +6,8 @@ import { Unification } from './unification'
 
 const getIsOpen = (unification: Unification) => {
   const options: Record<Unification, boolean | object> = {
-    open: true,
-    regular: false,
+    open: { [Op.eq]: true },
+    regular: { [Op.eq]: false },
     unify: { [Op.in]: [false, true] },
   }
   return options[unification]
@@ -15,8 +15,7 @@ const getIsOpen = (unification: Unification) => {
 
 export const creditsForCourses = async (codes: string[], unification: Unification) => {
   const is_open = getIsOpen(unification)
-
-  return await Credit.findAll({
+  const credits = await Credit.findAll({
     include: [
       {
         model: Student,
@@ -36,13 +35,11 @@ export const creditsForCourses = async (codes: string[], unification: Unificatio
       course_code: {
         [Op.in]: codes,
       },
-      student_studentnumber: {
-        [Op.ne]: null,
-      },
-      [Op.or]: [{ is_open }, { is_open: null }],
+      is_open,
     },
     order: [['attainment_date', 'ASC']],
   })
+  return credits
 }
 
 export const getStudentNumberToSrElementsMap = async (studentNumbers: string[]) => {
@@ -88,8 +85,7 @@ export const getStudentNumberToSrElementsMap = async (studentNumbers: string[]) 
 
 export const enrollmentsForCourses = async (codes: string[], unification: Unification) => {
   const is_open = getIsOpen(unification)
-
-  return await Enrollment.findAll({
+  const enrollments = await Enrollment.findAll({
     include: [
       {
         model: Student,
@@ -109,12 +105,10 @@ export const enrollmentsForCourses = async (codes: string[], unification: Unific
       course_code: {
         [Op.in]: codes,
       },
-      studentnumber: {
-        [Op.ne]: null,
-      },
       enrollment_date_time: { [Op.gte]: new Date('2021-05-31') },
-      state: ['ENROLLED', 'CONFIRMED'],
-      [Op.or]: [{ is_open }, { is_open: null }],
+      state: ['ENROLLED', 'CONFIRMED'], // ? Does the "CONFIRMED" state really exist?
+      is_open,
     },
   })
+  return enrollments
 }
