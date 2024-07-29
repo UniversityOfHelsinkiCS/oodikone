@@ -84,9 +84,9 @@ router.get('/:id/thesisstats', auth.roles(['facultyStatistics', 'katselmusViewer
   if (!code) return res.status(422).end()
   const data = await getThesisWritersStats(code, yearType, programmeFilter, specialGroups)
   if (data) return res.json(data)
-  const programmes = await getProgrammes(code, programmeFilter)
-  if (!programmes) return res.status(422).end()
-  let updateStats = await combineFacultyThesisWriters(code, programmes.data, yearType, specialGroups)
+  const programmes = await getDegreeProgrammesOfFaculty(code, programmeFilter === 'NEW_STUDY_PROGRAMMES')
+  if (!programmes.length) return res.status(422).end()
+  let updateStats = await combineFacultyThesisWriters(code, programmes, yearType, specialGroups)
   if (updateStats) {
     updateStats = await setThesisWritersStats(updateStats, yearType, programmeFilter, specialGroups)
   }

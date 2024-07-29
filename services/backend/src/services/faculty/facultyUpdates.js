@@ -53,12 +53,8 @@ const updateFacultyOverview = async (faculty, statsType) => {
           await setCreditStats(updatedCredits, yearType === 'ACADEMIC_YEAR', specialGroups === 'SPECIAL_INCLUDED')
         }
         if (statsType === 'ALL' || statsType === 'THESIS') {
-          const updateThesisWriters = await combineFacultyThesisWriters(
-            faculty,
-            programmeFilter === 'ALL_PROGRAMMES' ? allProgrammes.data : newProgrammes.data,
-            yearType,
-            specialGroups
-          )
+          const programmes = await getDegreeProgrammesOfFaculty(faculty, programmeFilter === 'NEW_STUDY_PROGRAMMES')
+          const updateThesisWriters = await combineFacultyThesisWriters(faculty, programmes, yearType, specialGroups)
           await setThesisWritersStats(updateThesisWriters, yearType, programmeFilter, specialGroups)
         }
       }

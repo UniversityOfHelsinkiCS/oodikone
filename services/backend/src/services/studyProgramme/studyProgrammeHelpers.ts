@@ -1,40 +1,11 @@
 import { orderBy } from 'lodash'
 import { InferAttributes } from 'sequelize'
 
+import { serviceProvider } from '../../config'
 import { programmeCodes } from '../../config/programmeCodes'
 import { SISStudyRight, SISStudyRightElement, Studyright } from '../../models'
 import { ExtentCode, Phase } from '../../types'
 import { keysOf } from '../../util'
-import { studentnumbersWithAllStudyrightElements } from '../populations'
-
-export const getCorrectStudentnumbers = async ({
-  codes,
-  startDate,
-  endDate,
-  includeAllSpecials,
-  includeTransferredTo,
-  includeGraduated = true,
-}) => {
-  const exchangeStudents = includeAllSpecials
-  const nondegreeStudents = includeAllSpecials
-  const transferredOutStudents = includeAllSpecials
-  const transferredToStudents = includeTransferredTo
-  const graduatedStudents = includeGraduated
-
-  const studentNumbers = await studentnumbersWithAllStudyrightElements({
-    studyRights: codes,
-    startDate,
-    endDate,
-    exchangeStudents,
-    nondegreeStudents,
-    transferredOutStudents,
-    tag: null,
-    transferredToStudents,
-    graduatedStudents,
-  })
-
-  return studentNumbers
-}
 
 export function getYearsArray(since: number, isAcademicYear: true, yearsCombined?: boolean): string[]
 export function getYearsArray(since: number, isAcademicYear: false, yearsCombined: true): Array<'Total' | number>
@@ -112,9 +83,6 @@ export const getStartDate = (isAcademicYear: boolean) => {
   return isAcademicYear ? new Date('2017-08-01') : new Date('2017-01-01')
 }
 
-export const alltimeStartDate = new Date('1900-01-01')
-export const alltimeEndDate = new Date()
-
 // In the object programmes should be {bachelorCode: masterCode}
 export const combinedStudyprogrammes = { KH90_001: 'MH90_001' } as const
 
@@ -132,10 +100,19 @@ export const combinedStudyprogrammes = { KH90_001: 'MH90_001' } as const
 
 export const getThesisType = (studyProgramme: string) => {
   if (studyProgramme.includes('MH') || studyProgramme.includes('ma')) {
-    return ['urn:code:course-unit-type:masters-thesis']
+    const mastersThesisTypes = ['urn:code:course-unit-type:masters-thesis']
+    if (serviceProvider !== 'Toska') {
+      mastersThesisTypes.push('urn:code:course-unit-type:amk-masters-thesis')
+    }
+    return mastersThesisTypes
   }
+
   if (studyProgramme.includes('KH') || studyProgramme.includes('ba')) {
-    return ['urn:code:course-unit-type:bachelors-thesis']
+    const bachelorsThesisTypes = ['urn:code:course-unit-type:bachelors-thesis']
+    if (serviceProvider !== 'Toska') {
+      bachelorsThesisTypes.push('urn:code:course-unit-type:amk-bachelors-thesis')
+    }
+    return bachelorsThesisTypes
   }
   return ['urn:code:course-unit-type:doctors-thesis', 'urn:code:course-unit-type:licentiate-thesis']
 }

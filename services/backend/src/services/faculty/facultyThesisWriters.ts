@@ -1,129 +1,139 @@
-import { indexOf } from 'lodash'
+import { cloneDeep } from 'lodash'
 
-import { serviceProvider } from '../../config'
-import { mapToProviders } from '../../util/map'
-import {
-  alltimeEndDate,
-  alltimeStartDate,
-  defineYear,
-  getCorrectStudentnumbers,
-  getStatsBasis,
-  getYearsArray,
-} from '../studyProgramme/studyProgrammeHelpers'
-import { thesisWriters } from './faculty'
+import { getGraduationStats, setGraduationStats } from '../analyticsService'
+import { getGraduationStatsForStudytrack } from '../studyProgramme/studyProgrammeGraduations'
+import { getDegreeProgrammesOfFaculty } from './faculty'
 
-const getFacultyThesisWriters = async ({ since, years, isAcademicYear, facultyProgrammes, includeAllSpecials }) => {
-  const bachelorsThesisTypes = ['urn:code:course-unit-type:bachelors-thesis']
-  const mastersThesisTypes = ['urn:code:course-unit-type:masters-thesis']
-  if (serviceProvider !== 'Toska') {
-    bachelorsThesisTypes.push('urn:code:course-unit-type:amk-bachelors-thesis')
-    mastersThesisTypes.push('urn:code:course-unit-type:amk-masters-thesis')
-  }
-  const thesisTypes = [
-    ...bachelorsThesisTypes,
-    ...mastersThesisTypes,
-    'urn:code:course-unit-type:licentiate-thesis',
-    'urn:code:course-unit-type:doctors-thesis',
-  ]
-
-  const bachelors = getStatsBasis(years)
-  const masters = getStatsBasis(years)
-  const programmeCounts = {}
-  const programmeNames = {}
-
-  for (const { progId, code, name } of facultyProgrammes) {
-    if (code === 'MH70_008_2' || code.startsWith('LIS') || code.startsWith('T')) continue
-    const provider = mapToProviders([code])[0]
-    const students = await getCorrectStudentnumbers({
-      codes: [code],
-      startDate: alltimeStartDate,
-      endDate: alltimeEndDate,
-      includeAllSpecials,
-      includeTransferredTo: includeAllSpecials,
-    })
-
-    const thesisCourseCodes = await thesisWriters(provider, since, thesisTypes, students)
-    thesisCourseCodes?.forEach(({ attainment_date, courseUnitType }) => {
-      const thesisYear = defineYear(attainment_date, isAcademicYear)
-
-      if (!(progId in programmeCounts)) {
-        programmeCounts[progId] = {}
-
-        Object.keys(bachelors.tableStats).forEach(year => {
-          programmeCounts[progId][year] = [0, 0, 0]
-        })
-        programmeNames[progId] = { ...name, code }
-      }
-      programmeCounts[progId][thesisYear][0] += 1
-
-      if (bachelorsThesisTypes.includes(courseUnitType)) {
-        bachelors.graphStats[indexOf(years, thesisYear)] += 1
-        bachelors.tableStats[thesisYear] += 1
-        programmeCounts[progId][thesisYear][1] += 1
-      } else if (mastersThesisTypes.includes(courseUnitType)) {
-        masters.graphStats[indexOf(years, thesisYear)] += 1
-        masters.tableStats[thesisYear] += 1
-        programmeCounts[progId][thesisYear][2] += 1
-      }
-    })
-  }
-
-  return { bachelors, masters, programmeCounts, programmeNames }
+type ProgrammesOfOrganization = Awaited<ReturnType<typeof getDegreeProgrammesOfFaculty>>
+type ProgrammeName = {
+  code: string
+  en?: string
+  fi?: string
+  sv?: string
 }
 
-const getFacultyThesisWritersForProgrammes = async (
-  allThesisWriters,
-  facultyProgrammes,
-  isAcademicYear,
-  includeAllSpecials
+const calculateCombinedStats = async (
+  isAcademicYear: boolean,
+  includeAllSpecials: boolean,
+  facultyProgrammes: ProgrammesOfOrganization
 ) => {
-  const since = isAcademicYear ? new Date('2017-08-01') : new Date('2017-01-01')
-  const years = getYearsArray(since.getFullYear(), isAcademicYear)
-  const queryParameters = { since, years, isAcademicYear, facultyProgrammes, includeAllSpecials }
-  const { bachelors, masters, programmeCounts, programmeNames } = await getFacultyThesisWriters(queryParameters)
+  const degreeProgrammeTypes = {
+    bachelor: 'urn:code:degree-program-type:bachelors-degree',
+    master: 'urn:code:degree-program-type:masters-degree',
+  }
 
-  allThesisWriters.years = years.map(year => year.toString())
-  const reversedYears = years.reverse()
-  allThesisWriters.tableStats = reversedYears.map(year => [
-    year,
-    bachelors.tableStats[year] + masters.tableStats[year],
-    bachelors.tableStats[year],
-    masters.tableStats[year],
-  ])
-  allThesisWriters.graphStats.push({ name: 'Bachelors', data: bachelors.graphStats })
-  allThesisWriters.graphStats.push({ name: 'Masters', data: masters.graphStats })
+  const combinedGraphStats: Array<{ name: 'Bachelors' | 'Masters'; data?: number[] }> = [
+    { name: 'Bachelors' },
+    { name: 'Masters' },
+  ]
+  const programmeTableStats: Record<string, Array<Array<string | number>>> = {}
 
-  const programmes = programmeNames ? Object.keys(programmeNames) : facultyProgrammes.map(programme => programme.code)
-  programmes.forEach(programmeId => {
-    reversedYears.forEach(year => {
-      if (programmeCounts && programmeId in programmeCounts) {
-        if (!(programmeId in allThesisWriters.programmeTableStats)) {
-          allThesisWriters.programmeTableStats[programmeId] = []
-        }
-        allThesisWriters.programmeTableStats[programmeId].push([year, ...programmeCounts[programmeId][year]])
-      }
+  const newStats: Array<Awaited<ReturnType<typeof getGraduationStatsForStudytrack>>> = []
+  const combinedTableStats: Array<Array<string | number>> = []
+  let years: Array<string | number> = []
+  const programmeNames: Record<string, ProgrammeName> = {}
+
+  for (const programme of facultyProgrammes) {
+    if (!Object.values(degreeProgrammeTypes).includes(programme.degreeProgrammeType)) {
+      continue
+    }
+    const statsFromRedis = await getGraduationStats(
+      programme.code,
+      null,
+      isAcademicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR',
+      includeAllSpecials ? 'SPECIAL_INCLUDED' : 'SPECIAL_EXCLUDED'
+    )
+    if (statsFromRedis) {
+      newStats.push(statsFromRedis)
+      continue
+    }
+    const updatedStats = await getGraduationStatsForStudytrack({
+      studyprogramme: programme.code,
+      combinedProgramme: '',
+      settings: {
+        isAcademicYear,
+        includeAllSpecials,
+      },
     })
-  })
+    await setGraduationStats(
+      updatedStats,
+      isAcademicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR',
+      includeAllSpecials ? 'SPECIAL_INCLUDED' : 'SPECIAL_EXCLUDED'
+    )
+    newStats.push(updatedStats)
+  }
 
-  allThesisWriters.programmeNames = programmeNames
+  for (const { id, graphStats, tableStats, years: yearsFromStats } of newStats) {
+    if (!years.length) {
+      years = [...yearsFromStats]
+    }
+    const { degreeProgrammeType, progId, name, code } = facultyProgrammes.find(({ code }) => code === id)!
+    programmeNames[progId] = { ...name, code }
+    const thesisStats = graphStats.find(({ name }) => name === 'Wrote thesis')!
+    const isBachelor = degreeProgrammeType === degreeProgrammeTypes.bachelor
+    const isMaster = degreeProgrammeType === degreeProgrammeTypes.master
+    const correctIndex = isBachelor ? 0 : 1
+
+    if (!combinedGraphStats[correctIndex].data) {
+      combinedGraphStats[correctIndex].data = [...thesisStats.data]
+    } else {
+      for (let i = 0; i < thesisStats.data.length; i++) {
+        combinedGraphStats[correctIndex].data[i] += thesisStats.data[i]
+      }
+    }
+
+    const tableStatsForProgramme = tableStats.map(([year, , wroteThesis]) => [
+      year,
+      wroteThesis,
+      isBachelor ? wroteThesis : 0,
+      isMaster ? wroteThesis : 0,
+    ])
+    programmeTableStats[progId] = tableStatsForProgramme
+
+    if (!combinedTableStats.length) {
+      combinedTableStats.push(...cloneDeep(tableStatsForProgramme))
+    } else {
+      for (let i = 0; i < tableStatsForProgramme.length; i++) {
+        for (let j = 1; j < tableStatsForProgramme[i].length; j++) {
+          ;(combinedTableStats[i][j] as number) += tableStatsForProgramme[i][j] as number
+        }
+      }
+    }
+  }
+
+  return {
+    graphStats: combinedGraphStats,
+    programmeTableStats,
+    tableStats: combinedTableStats,
+    years,
+    programmeNames,
+  }
 }
 
-export const combineFacultyThesisWriters = async (faculty, facultyProgrammes, yearType, specialGroups) => {
-  const allThesisWriters = {
-    id: faculty,
-    years: [],
-    tableStats: [],
-    graphStats: [],
-    programmeTableStats: {},
-    titles: ['', 'All', 'Bachelors', 'Masters'],
-    programmeNames: {},
-    status: 'Done',
-    lastUpdated: '',
-  }
+export const combineFacultyThesisWriters = async (
+  faculty: string,
+  facultyProgrammes: Awaited<ReturnType<typeof getDegreeProgrammesOfFaculty>>,
+  yearType: 'ACADEMIC_YEAR' | 'CALENDAR_YEAR',
+  specialGroups: 'SPECIAL_INCLUDED' | 'SPECIAL_EXCLUDED'
+) => {
   const isAcademicYear = yearType === 'ACADEMIC_YEAR'
   const includeAllSpecials = specialGroups === 'SPECIAL_INCLUDED'
 
-  await getFacultyThesisWritersForProgrammes(allThesisWriters, facultyProgrammes, isAcademicYear, includeAllSpecials)
+  const { graphStats, programmeTableStats, tableStats, years, programmeNames } = await calculateCombinedStats(
+    isAcademicYear,
+    includeAllSpecials,
+    facultyProgrammes
+  )
 
-  return allThesisWriters
+  return {
+    id: faculty,
+    years,
+    tableStats,
+    graphStats,
+    programmeTableStats,
+    titles: ['', 'All', 'Bachelors', 'Masters'],
+    programmeNames,
+    status: 'Done',
+    lastUpdated: '',
+  }
 }

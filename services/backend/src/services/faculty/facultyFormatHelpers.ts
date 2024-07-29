@@ -1,4 +1,4 @@
-import { Credit, Studyright, Transfer } from '../../models'
+import { Studyright, Transfer } from '../../models'
 
 export const formatFacultyStudyRight = (studyright: Studyright) => {
   return {
@@ -24,15 +24,5 @@ export const formatFacultyTransfer = (transfer: Transfer) => {
     transferdate: transfer.transferdate,
     studyrightid: transfer.studyrightid,
     studentnumber: transfer.studentnumber,
-  }
-}
-
-export const formatFacultyThesisWriter = (credit: Credit) => {
-  return {
-    course_code: credit.course_code,
-    credits: credit.credits,
-    attainment_date: credit.attainment_date,
-    student_studentnumber: credit.student_studentnumber,
-    courseUnitType: credit.course.course_unit_type,
   }
 }

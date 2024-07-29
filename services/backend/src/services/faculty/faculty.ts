@@ -3,18 +3,10 @@ import { InferAttributes, Op, QueryTypes } from 'sequelize'
 
 import { programmeCodes } from '../../config/programmeCodes'
 import { dbConnections } from '../../database/connection'
-import {
-  Course,
-  Credit,
-  ElementDetail,
-  Organization,
-  ProgrammeModule,
-  Studyright,
-  StudyrightElement,
-} from '../../models'
-import { CreditTypeCode, ExtentCode, PriorityCode } from '../../types'
+import { ElementDetail, Organization, ProgrammeModule, Studyright, StudyrightElement } from '../../models'
+import { ExtentCode, PriorityCode } from '../../types'
 import { getSemestersAndYears } from '../semesters'
-import { formatFacultyStudyRight, formatFacultyThesisWriter } from './facultyFormatHelpers'
+import { formatFacultyStudyRight } from './facultyFormatHelpers'
 import { getExtentFilter } from './facultyHelpers'
 
 const { sequelize } = dbConnections
@@ -230,45 +222,6 @@ export const hasMasterRight = async (studyRightId: string): Promise<boolean> => 
     },
   })
   return studyRight !== null
-}
-
-export const thesisWriters = async (provider: string, since: Date, thesisTypes: string[], studentNumbers: string[]) => {
-  const query: Record<string, any> = {
-    attributes: ['id', 'course_code', 'attainment_date', 'student_studentnumber'],
-    include: {
-      model: Course,
-      attributes: ['course_unit_type'],
-      required: true,
-      where: {
-        course_unit_type: {
-          [Op.in]: thesisTypes,
-        },
-      },
-      include: [
-        {
-          model: Organization,
-          attributes: [],
-          required: true,
-          where: {
-            code: provider,
-          },
-        },
-      ],
-    },
-    where: {
-      credittypecode: CreditTypeCode.PASSED,
-      isStudyModule: {
-        [Op.not]: true,
-      },
-      attainment_date: {
-        [Op.gte]: since,
-      },
-      student_studentnumber: studentNumbers.length > 0 ? studentNumbers : { [Op.not]: null },
-    },
-  }
-
-  const thesisWriterCredits = await Credit.findAll(query)
-  return thesisWriterCredits.map(formatFacultyThesisWriter)
 }
 
 const curriculumPeriodIdToYearCode = (curriculumPeriodId: string) => curriculumPeriodId.slice(-2)
