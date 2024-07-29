@@ -5,7 +5,7 @@ import { Credit, Student, Semester, Organization, Enrollment, SISStudyRight, SIS
 import { Unification } from './unification'
 
 const getIsOpen = (unification: Unification) => {
-  const options: Record<Unification, boolean | object> = {
+  const options = {
     open: { [Op.eq]: true },
     regular: { [Op.eq]: false },
     unify: { [Op.in]: [false, true] },
