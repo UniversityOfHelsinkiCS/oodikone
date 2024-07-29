@@ -255,7 +255,7 @@ const updateTermRegistrations = async (termRegistrations, personIdToStudentNumbe
       )
   )
 
-  const enrolmentsByStudents = groupBy(allSementerEnrollments, e => e.studentnumber)
+  const enrolmentsByStudents = groupBy(allSementerEnrollments, enrollment => enrollment.studentnumber)
   const semesterEnrollments = flatten(Object.values(enrolmentsByStudents).map(semesterEnrolmentsOfStudent))
 
   await bulkCreate(SemesterEnrollment, semesterEnrollments)
@@ -348,13 +348,13 @@ const updateStudents = async (personIds, iteration = 0) => {
   )
 
   const studyRightIdToEducationType = bothStudyrights.reduce((res, curr) => {
-    const education = educations.find(e => e.id === curr.education_id)
+    const education = educations.find(education => education.id === curr.education_id)
     res[curr.id] = education ? education.education_type : null
     return res
   }, {})
 
-  const logError = (e, updatedItem) => {
-    logger.error({ message: `Failed to update ${updatedItem}`, meta: e })
+  const logError = (error, updatedItem) => {
+    logger.error({ message: `Failed to update ${updatedItem}`, meta: error })
   }
 
   await Promise.all([
@@ -364,25 +364,25 @@ const updateStudents = async (personIds, iteration = 0) => {
       personIdToStudentNumber,
       formattedStudyRights,
       mappedTransfers
-    ).catch(e => {
-      logError(e, 'studyright elements')
+    ).catch(error => {
+      logError(error, 'studyright elements')
     }),
     updateAttainments(attainments, personIdToStudentNumber, attainmentsToBeExluced, studyRightIdToEducationType).catch(
-      e => {
-        logError(e, 'attainments')
+      error => {
+        logError(error, 'attainments')
       }
     ),
-    updateTermRegistrations(termRegistrations, personIdToStudentNumber).catch(e => {
-      logError(e, 'term registrations')
+    updateTermRegistrations(termRegistrations, personIdToStudentNumber).catch(error => {
+      logError(error, 'term registrations')
     }),
-    updateEnrollments(enrollments, personIdToStudentNumber, studyRightIdToEducationType).catch(e => {
-      logError(e, 'enrollments')
+    updateEnrollments(enrollments, personIdToStudentNumber, studyRightIdToEducationType).catch(error => {
+      logError(error, 'enrollments')
     }),
-    updateStudyplans(studyplans, personIds, personIdToStudentNumber, groupedStudyRightSnapshots).catch(e => {
-      logError(e, 'studyplans')
+    updateStudyplans(studyplans, personIds, personIdToStudentNumber, groupedStudyRightSnapshots).catch(error => {
+      logError(error, 'studyplans')
     }),
-    bulkCreate(Transfer, mappedTransfers, null, ['studyrightid']).catch(e => {
-      logError(e, 'transfers')
+    bulkCreate(Transfer, mappedTransfers, null, ['studyrightid']).catch(error => {
+      logError(error, 'transfers')
     }),
   ])
 

@@ -2,16 +2,18 @@ const { maxBy } = require('lodash')
 
 const getLatestSnapshot = entities => {
   return maxBy(
-    entities.filter(e => e.document_state !== 'DELETED'),
-    e => e.modification_ordinal
+    entities.filter(entity => entity.document_state !== 'DELETED'),
+    entity => entity.modification_ordinal
   )
 }
 
 const getActiveSnapshot = entities => {
   const now = new Date()
   return maxBy(
-    entities.filter(e => e.document_state === 'ACTIVE').filter(e => now >= new Date(e.snapshot_date_time)),
-    e => new Date(e.snapshot_date_time)
+    entities
+      .filter(entity => entity.document_state === 'ACTIVE')
+      .filter(entity => now >= new Date(entity.snapshot_date_time)),
+    entity => new Date(entity.snapshot_date_time)
   )
 }
 

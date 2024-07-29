@@ -13,8 +13,8 @@ const { logger } = require('./utils/logger')
 const { set: redisSet } = require('./utils/redis')
 const { stan } = require('./utils/stan')
 
-stan.on('error', e => {
-  logger.error({ message: `NATS connection failed: ${e}`, meta: e.stack })
+stan.on('error', error => {
+  logger.error({ message: `NATS connection failed: ${error}`, meta: error.stack })
   if (!process.env.CI) process.exit(1)
 })
 
@@ -23,8 +23,8 @@ stan.on('connect', ({ clientID }) => {
   knexConnection.connect()
 })
 
-knexConnection.on('error', e => {
-  logger.error({ message: 'Knex database connection failed', meta: e.stack })
+knexConnection.on('error', error => {
+  logger.error({ message: 'Knex database connection failed', meta: error.stack })
   if (!process.env.CI) process.exit(1)
 })
 
@@ -56,10 +56,10 @@ const handleImmediates = async () => {
     if (EXIT_AFTER_IMMEDIATES) {
       process.exit(0)
     }
-  } catch (e) {
+  } catch (error) {
     logger.error({
-      message: `Running immediate job failed: ${e.message}`,
-      meta: e.stack,
+      message: `Running immediate job failed: ${error.message}`,
+      meta: error.stack,
     })
 
     if (EXIT_AFTER_IMMEDIATES) {
@@ -81,10 +81,10 @@ knexConnection.on('connect', async () => {
     try {
       logger.info('Starting hourly')
       await scheduleHourly()
-    } catch (e) {
+    } catch (error) {
       logger.error({
-        message: `Hourly run failed: ${e.message}`,
-        meta: e.stack,
+        message: `Hourly run failed: ${error.message}`,
+        meta: error.stack,
       })
     }
 
@@ -98,10 +98,10 @@ knexConnection.on('connect', async () => {
 
     try {
       await scheduleWeekly()
-    } catch (e) {
+    } catch (error) {
       logger.error({
-        message: `Weekly run failed: ${e.message}`,
-        meta: e.stack,
+        message: `Weekly run failed: ${error.message}`,
+        meta: error.stack,
       })
     }
 
@@ -115,10 +115,10 @@ knexConnection.on('connect', async () => {
 
     try {
       await schedulePrePurge()
-    } catch (e) {
+    } catch (error) {
       logger.error({
-        message: `Prepurge failed: ${e.message}`,
-        meta: e.stack,
+        message: `Prepurge failed: ${error.message}`,
+        meta: error.stack,
       })
     }
   })
@@ -131,10 +131,10 @@ knexConnection.on('connect', async () => {
 
     try {
       await schedulePurge()
-    } catch (e) {
+    } catch (error) {
       logger.error({
-        message: `Purge failed: ${e.message}`,
-        meta: e.stack,
+        message: `Purge failed: ${error.message}`,
+        meta: error.stack,
       })
     }
   })

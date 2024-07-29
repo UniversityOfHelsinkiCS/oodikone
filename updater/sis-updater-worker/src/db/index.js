@@ -53,7 +53,7 @@ const bulkCreate = async (model, entities, transaction = null, properties = ['id
       updateOnDuplicate: getColumnsToUpdate(model, properties),
       transaction,
     })
-  } catch (e) {
+  } catch (error) {
     for (const entity of entities) {
       try {
         await model.upsert(entity, { fields: getColumnsToUpdate(model, properties) })

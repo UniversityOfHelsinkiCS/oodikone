@@ -23,10 +23,10 @@ const handleMessage = messageHandler => async msg => {
 
   try {
     data = JSON.parse(msg.getData())
-  } catch (err) {
+  } catch (error) {
     logger.error({
       message: 'Failed to parse message',
-      meta: err.stack,
+      meta: error.stack,
     })
   }
 
@@ -52,9 +52,9 @@ const handleMessage = messageHandler => async msg => {
     try {
       msg.ack()
       await redisSet(REDIS_LATEST_MESSAGE_RECEIVED, new Date())
-    } catch (e) {
-      logger.error({ message: 'Failed acking message', meta: e.stack })
-      if (e.name === 'NatsError' && !process.env.CI) process.exit(1)
+    } catch (error) {
+      logger.error({ message: 'Failed acking message', meta: error.stack })
+      if (error.name === 'NatsError' && !process.env.CI) process.exit(1)
     }
   }
 }
@@ -117,8 +117,8 @@ const miscMsgHandler = async miscMessage => {
   await updateMsgHandler(msgInUpdateFormat)
 }
 
-stan.on('error', e => {
-  logger.error({ message: 'NATS connection failed', meta: e })
+stan.on('error', error => {
+  logger.error({ message: 'NATS connection failed', meta: error })
   if (!process.env.CI) process.exit(1)
 })
 
@@ -137,14 +137,14 @@ dbConnections.on('connect', async () => {
 
   const updaterChannel = stan.subscribe(SIS_UPDATER_SCHEDULE_CHANNEL, NATS_GROUP, opts)
   updaterChannel.on('message', handleMessage(updateMsgHandler))
-  updaterChannel.on('error', e => {
-    logger.error({ message: 'Updater channel error', meta: e.stack })
+  updaterChannel.on('error', error => {
+    logger.error({ message: 'Updater channel error', meta: error.stack })
   })
 
   const purgeChannel = stan.subscribe(SIS_PURGE_CHANNEL, NATS_GROUP, opts)
   purgeChannel.on('message', handleMessage(purgeMsgHandler))
-  purgeChannel.on('error', e => {
-    logger.error({ message: 'Purge channel error', meta: e.stack })
+  purgeChannel.on('error', error => {
+    logger.error({ message: 'Purge channel error', meta: error.stack })
   })
 
   const infoChannel = stan.subscribe('SIS_INFO_CHANNEL', NATS_GROUP, opts)
@@ -152,7 +152,7 @@ dbConnections.on('connect', async () => {
 
   const miscChannel = stan.subscribe(SIS_MISC_SCHEDULE_CHANNEL, NATS_GROUP, opts)
   miscChannel.on('message', handleMessage(miscMsgHandler))
-  miscChannel.on('error', e => {
-    logger.error({ message: 'Misc channel error', meta: e.stack })
+  miscChannel.on('error', error => {
+    logger.error({ message: 'Misc channel error', meta: error.stack })
   })
 })

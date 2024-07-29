@@ -296,7 +296,7 @@ const insertParentColumn = (rootColumns, childColumn, props = {}) => {
     collection = rootColumns
   }
 
-  const index = collection.findIndex(e => e.key === childColumn.key)
+  const index = collection.findIndex(element => element.key === childColumn.key)
 
   if (childColumn.parent && childColumn.parent.mergeHeader === childColumn.key) {
     childColumn.parent.mergeHeader = props.key

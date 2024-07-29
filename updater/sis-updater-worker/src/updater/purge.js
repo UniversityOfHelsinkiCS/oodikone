@@ -44,10 +44,10 @@ const tableToModel = {
 
 const sendToNats = (channel, data) =>
   new Promise((res, rej) => {
-    stan.publish(channel, JSON.stringify(data), err => {
-      if (err) {
-        logger.error({ message: 'Failed publishing to nats', meta: err.stack })
-        rej(err)
+    stan.publish(channel, JSON.stringify(data), error => {
+      if (error) {
+        logger.error({ message: 'Failed publishing to nats', meta: error.stack })
+        rej(error)
       }
       res()
     })

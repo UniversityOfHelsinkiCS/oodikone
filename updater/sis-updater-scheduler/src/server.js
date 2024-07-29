@@ -32,10 +32,10 @@ const auth = (req, res, next) => {
   res.locals.msg('Token missing or invalid', 403)
 }
 
-const errorBoundary = (err, _, res, next) => {
-  logger.error(err.stack)
+const errorBoundary = (error, _, res, next) => {
+  logger.error(error.stack)
   res.locals.msg('Internal server error', 500)
-  next(err)
+  next(error)
 }
 
 const app = express()
@@ -93,8 +93,8 @@ app.post('/v1/students', async (req, res) => {
 })
 
 app.get('/v1/rediscache', async (req, res) => {
-  stan.publish('SIS_INFO_CHANNEL', JSON.stringify({ message: 'RELOAD_REDIS' }), err => {
-    if (err) {
+  stan.publish('SIS_INFO_CHANNEL', JSON.stringify({ message: 'RELOAD_REDIS' }), error => {
+    if (error) {
       return res.locals.msg('Error sending reloading msg?')
     }
 
@@ -104,8 +104,8 @@ app.get('/v1/rediscache', async (req, res) => {
 })
 
 app.get('/v1/abort', async (req, res) => {
-  stan.publish('SIS_INFO_CHANNEL', JSON.stringify({ message: 'ABORT' }), err => {
-    if (err) {
+  stan.publish('SIS_INFO_CHANNEL', JSON.stringify({ message: 'ABORT' }), error => {
+    if (error) {
       return res.locals.msg('Error sending abort msg?')
     }
 

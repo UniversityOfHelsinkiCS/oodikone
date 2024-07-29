@@ -32,13 +32,13 @@ class KnexConnection extends EventEmitter {
       })
       await this.knex.raw('select 1+1 as result')
       this.emit('connect')
-    } catch (e) {
+    } catch (error) {
       if (attempt > this.RETRY_ATTEMPTS) {
-        this.emit('error', e)
+        this.emit('error', error)
         return
       }
       logger.error(`Knex database connection failed! Attempt ${attempt}/${this.RETRY_ATTEMPTS}`)
-      logger.error(`Error while connecting: ${JSON.stringify(e, null, 2)}`)
+      logger.error(`Error while connecting: ${JSON.stringify(error, null, 2)}`)
       setTimeout(() => this.connect(attempt + 1), 1000 * attempt)
     }
   }
