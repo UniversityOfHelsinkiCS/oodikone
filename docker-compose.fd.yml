@@ -38,7 +38,7 @@ services:
       SIS_UPDATER_URL: http://sis-updater-scheduler:8082
       IMPORTER_DB_API_URL: 'https://localhost:3005'
       JAMI_URL: 'http://jami:3003/'
-      SERVICE_PROVIDER: 'Fd'
+      SERVICE_PROVIDER: fd
       SIS_HOST: ${SIS_HOST}
       SIS_GRAPHQL_APPLICATION_ACCOUNT: ${SIS_GRAPHQL_APPLICATION_ACCOUNT}
       SIS_GRAPHQL_APPLICATION_KEY: ${SIS_GRAPHQL_APPLICATION_KEY}
@@ -57,7 +57,7 @@ services:
     ports:
       - 3000:3000
     environment:
-      REACT_APP_SERVICE_PROVIDER: 'Fd'
+      REACT_APP_SERVICE_PROVIDER: fd
     volumes:
       - ./services/frontend/src/:/opt/app-root/src/src
 
