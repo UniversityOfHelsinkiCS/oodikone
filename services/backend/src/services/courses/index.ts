@@ -205,7 +205,7 @@ const getYearlyStatsOfNew = async (
 
   return {
     ...statistics,
-    courseCode,
+    coursecode: courseCode,
     alternatives: codes,
     name: course?.name,
   }
