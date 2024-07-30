@@ -69,7 +69,7 @@ module.exports = (app, url) => {
   app.use(`${url}/university`, university)
   app.use(`${url}/updater`, auth.roles(['admin']), updater)
   app.use(`${url}/teachers`, auth.roles(['teachers']), teachers)
-  if (serviceProvider === 'Toska') {
+  if (serviceProvider === 'toska') {
     app.use(`${url}/users`, usersToska)
   } else {
     app.use(`${url}/users`, usersToska)

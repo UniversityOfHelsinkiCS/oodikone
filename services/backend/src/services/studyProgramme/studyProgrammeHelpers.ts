@@ -101,7 +101,7 @@ export const combinedStudyprogrammes = { KH90_001: 'MH90_001' } as const
 export const getThesisType = (studyProgramme: string) => {
   if (studyProgramme.includes('MH') || studyProgramme.includes('ma')) {
     const mastersThesisTypes = ['urn:code:course-unit-type:masters-thesis']
-    if (serviceProvider !== 'Toska') {
+    if (serviceProvider !== 'toska') {
       mastersThesisTypes.push('urn:code:course-unit-type:amk-masters-thesis')
     }
     return mastersThesisTypes
@@ -109,7 +109,7 @@ export const getThesisType = (studyProgramme: string) => {
 
   if (studyProgramme.includes('KH') || studyProgramme.includes('ba')) {
     const bachelorsThesisTypes = ['urn:code:course-unit-type:bachelors-thesis']
-    if (serviceProvider !== 'Toska') {
+    if (serviceProvider !== 'toska') {
       bachelorsThesisTypes.push('urn:code:course-unit-type:amk-bachelors-thesis')
     }
     return bachelorsThesisTypes

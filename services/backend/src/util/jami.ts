@@ -80,6 +80,6 @@ const testJami = async () => {
   }
 }
 
-if (serviceProvider === 'Toska') {
+if (serviceProvider === 'toska') {
   testJami()
 }

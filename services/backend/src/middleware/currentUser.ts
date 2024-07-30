@@ -139,6 +139,6 @@ const fdUserMiddleware = async (req: OodikoneRequest, _res: Response, next: Next
   next()
 }
 
-const currentUserMiddleware = serviceProvider === 'Toska' ? toskaUserMiddleware : fdUserMiddleware
+const currentUserMiddleware = serviceProvider === 'toska' ? toskaUserMiddleware : fdUserMiddleware
 
 export default currentUserMiddleware

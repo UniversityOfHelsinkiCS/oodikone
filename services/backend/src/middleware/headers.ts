@@ -5,6 +5,6 @@ import { serviceProvider } from '../config'
 const headersToska = ['uid', 'displayName', 'shib-session-id', 'hyGroupCn', 'mail', 'hyPersonSisuId']
 const headersOther = ['remote_user']
 
-const headers = serviceProvider === 'Toska' ? headersToska : headersOther
+const headers = serviceProvider === 'toska' ? headersToska : headersOther
 
 export default headersMiddleware(headers)
