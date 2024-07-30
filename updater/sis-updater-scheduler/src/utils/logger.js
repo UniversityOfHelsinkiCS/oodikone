@@ -11,7 +11,7 @@ const {
   sentryEnvironment,
   sentryDSN,
   runningInCI,
-  serviceProvider
+  serviceProvider,
 } = require('../config')
 
 const { combine, timestamp, printf, splat } = winston.format
@@ -34,7 +34,6 @@ if (isProduction && !isStaging && !runningInCI && sentryDSN) {
 }
 
 if (isDev) {
-
   const devFormat = printf(
     ({ level, message, timestamp, ...rest }) => `${formatDate(timestamp)} ${level}: ${message} ${JSON.stringify(rest)}`
   )

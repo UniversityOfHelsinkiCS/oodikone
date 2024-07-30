@@ -11,7 +11,7 @@ const {
   sentryEnvironment,
   sentryDSN,
   runningInCI,
-  serviceProvider
+  serviceProvider,
 } = require('../config')
 
 const { colorize, combine, timestamp, printf, uncolorize } = winston.format
