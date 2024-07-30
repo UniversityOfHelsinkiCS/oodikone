@@ -2,16 +2,8 @@
 import { Op } from 'sequelize'
 
 import { Credit, Student, Semester, Organization, Enrollment, SISStudyRight, SISStudyRightElement } from '../../models'
-import { Unification } from './unification'
-
-const getIsOpen = (unification: Unification) => {
-  const options = {
-    open: { [Op.eq]: true },
-    regular: { [Op.eq]: false },
-    unify: { [Op.in]: [false, true] },
-  }
-  return options[unification]
-}
+import { EnrollmentState } from '../../types'
+import { getIsOpen, Unification } from './helpers'
 
 export const creditsForCourses = async (codes: string[], unification: Unification) => {
   const is_open = getIsOpen(unification)
@@ -72,7 +64,7 @@ export const getStudentNumberToSrElementsMap = async (studentNumbers: string[]) 
     },
   })
 
-  return studyRightElements.reduce((obj, cur) => {
+  const studentNumberToSrElementsMap = studyRightElements.reduce((obj, cur) => {
     const studyRight = studyRightMap[cur.studyRightId]
     const { studentNumber } = studyRight
     if (!obj[studentNumber]) {
@@ -81,6 +73,7 @@ export const getStudentNumberToSrElementsMap = async (studentNumbers: string[]) 
     obj[studentNumber].push({ ...cur.toJSON(), studyRight })
     return obj
   }, {})
+  return studentNumberToSrElementsMap
 }
 
 export const enrollmentsForCourses = async (codes: string[], unification: Unification) => {
@@ -106,7 +99,7 @@ export const enrollmentsForCourses = async (codes: string[], unification: Unific
         [Op.in]: codes,
       },
       enrollment_date_time: { [Op.gte]: new Date('2021-05-31') },
-      state: ['ENROLLED', 'CONFIRMED'], // ? Does the "CONFIRMED" state really exist?
+      state: [EnrollmentState.ENROLLED, 'CONFIRMED'], // ? Does the "CONFIRMED" state really exist?
       is_open,
     },
   })

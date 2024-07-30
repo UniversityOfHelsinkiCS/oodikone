@@ -8,7 +8,6 @@ const nameLikeTerm = (name: string) => {
   if (!name) {
     return undefined
   }
-
   const term = `%${name.trim()}%`
   return {
     name: {
@@ -35,7 +34,6 @@ const codeLikeTerm = (code: string) => {
   }
   return {
     code: {
-      // Starts with code or has AY/A in front of the code (case-insensitive)
       [Op.iRegexp]: `^(AY|A)?${escapeRegExp(code)}`,
     },
   }
@@ -51,11 +49,12 @@ const getRawCourses = async (name: string, code: string) => {
   })
 }
 
-export const byNameAndOrCodeLike = async (name: string, code: string) => {
+// TODO: Remove horrible variable names "temp" and "cu"
+export const getCoursesByNameAndOrCode = async (name: string, code: string) => {
   const rawCourses = await getRawCourses(name, code)
   const courses: CourseWithSubsId[] = rawCourses
     .map(course => ({ ...course.dataValues }))
-    .sort((x, y) => getSortRank(y.code) - getSortRank(x.code))
+    .sort((a, b) => getSortRank(b.code) - getSortRank(a.code))
 
   let substitutionGroupIndex = 0
   const visited: string[] = []
@@ -90,7 +89,7 @@ export const byNameAndOrCodeLike = async (name: string, code: string) => {
   return { courses }
 }
 
-export const byCodes = (codes: string[]) => {
+export const getCoursesByCodes = (codes: string[]) => {
   return Course.findAll({
     where: {
       code: {
