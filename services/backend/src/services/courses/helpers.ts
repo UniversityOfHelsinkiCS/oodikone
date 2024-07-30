@@ -1,6 +1,6 @@
 import { Op } from 'sequelize'
 
-import { Name } from '../../types'
+import { Name, Unification } from '../../types'
 
 export type FormattedProgramme = {
   code: string
@@ -22,10 +22,4 @@ export const getIsOpen = (unification: Unification) => {
 export type OrganizationDetails = {
   code?: string
   name: Name
-}
-
-export enum Unification {
-  REGULAR = 'regular',
-  OPEN = 'open',
-  UNIFY = 'unify',
 }

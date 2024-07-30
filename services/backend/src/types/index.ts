@@ -15,6 +15,7 @@ export { Phase } from './phase'
 export { PriorityCode } from './priorityCode'
 export { Role } from './role'
 export { StudyTrack } from './studyTrack'
+export { Unification } from './unification'
 export { ExpandedUser, FormattedUser } from './user'
 
 /**
