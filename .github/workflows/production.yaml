@@ -142,7 +142,7 @@ jobs:
           environment: production
           set_commits: 'skip'
           sourcemaps: './dist'
-          url_prefix: '~/dist'
+          url_prefix: '~/opt/app-root/src/dist/'
           version: ${{ steps.extract_version.outputs.VERSION }}
 
   report_success:
