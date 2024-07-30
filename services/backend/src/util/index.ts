@@ -47,6 +47,23 @@ export const hasFullAccessToStudentData = (roles?: Role[]) => {
 
 export const isOpenUniCourseCode = (code: string) => code.match(/^AY?(.+?)(?:en|fi|sv)?$/)
 
+/**
+ * Returns the keys of the given object as an array of strings, typed as the keys of the object.
+ * @param obj The object whose keys are to be returned.
+ */
+export const keysOf = <T extends object>(obj: T) => {
+  return Object.keys(obj) as Array<keyof T>
+}
+
+export const lengthOf = (obj: object) => Object.keys(obj).length
+
+export const percentageOf = (num: number, denom: number) => {
+  if (denom === 0) {
+    return 0
+  }
+  return Math.round(((100 * num) / denom) * 100) / 100
+}
+
 export const splitByEmptySpace = (str: string) => str.split(/\s+/g)
 
 export const validateParamLength = (param: any, minLength: number) => {
@@ -66,12 +83,4 @@ export const sortByProgrammeCode = (a: string, b: string) => {
     return priorityA - priorityB
   }
   return a.localeCompare(b)
-}
-
-/**
- * Returns the keys of the given object as an array of strings, typed as the keys of the object.
- * @param obj The object whose keys are to be returned.
- */
-export const keysOf = <T extends object>(obj: T) => {
-  return Object.keys(obj) as Array<keyof T>
 }

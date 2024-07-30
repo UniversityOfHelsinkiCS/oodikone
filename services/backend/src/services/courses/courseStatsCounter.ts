@@ -1,12 +1,5 @@
 import { EnrollmentState, Name } from '../../types'
-
-const lengthOf = (obj: object) => Object.keys(obj).length
-const percentageOf = (num: number, denom: number) => {
-  if (denom === 0) {
-    return 0
-  }
-  return Math.round(((100 * num) / denom) * 100) / 100
-}
+import { lengthOf, percentageOf } from '../../util'
 
 const fall: string[] = []
 const spring: string[] = []
@@ -26,6 +19,28 @@ const initializePassingSemesters = () => {
     passingSemesters[spring[i]] = initialValue
   }
   return passingSemesters
+}
+
+const getEnrolledStudents = (enrollments: DynamicEnrollments) => {
+  if (enrollments) {
+    return Object.keys(enrollments)
+      .filter(key => key !== EnrollmentState.ENROLLED && key !== 'semesters')
+      .reduce((acc, key) => [...acc, ...[...enrollments[key]].map(studentNumber => studentNumber)], [] as string[])
+  }
+  return []
+}
+
+const getFilteredEnrolledNoGrade = (
+  enrollments: DynamicEnrollments,
+  enrolledStudents: string[],
+  allStudents: string[]
+) => {
+  if (enrollments[EnrollmentState.ENROLLED]) {
+    return [...enrollments[EnrollmentState.ENROLLED]]
+      .filter(student => !enrolledStudents.includes(student) && !allStudents.includes(student))
+      .reduce((acc, student) => ({ ...acc, [student]: true }), {} as Record<string, boolean>)
+  }
+  return {} as Record<string, boolean>
 }
 
 type DynamicEnrollments = {
@@ -253,20 +268,9 @@ export class CourseStatsCounter {
 
   public getFinalStats() {
     const { stats, students } = this
-    const enrolledStudents = this.enrollments
-      ? Object.keys(this.enrollments)
-          .filter(key => key !== EnrollmentState.ENROLLED && key !== 'semesters')
-          .reduce(
-            (acc, key) => [...acc, ...[...this.enrollments[key]].map(studentNumber => studentNumber)],
-            [] as string[]
-          )
-      : []
+    const enrolledStudents = getEnrolledStudents(this.enrollments)
     const allStudents = Object.keys(students.all).map(student => student)
-    const filteredEnrolledNoGrade = this.enrollments[EnrollmentState.ENROLLED]
-      ? [...this.enrollments[EnrollmentState.ENROLLED]]
-          .filter(student => !enrolledStudents.includes(student) && !allStudents.includes(student))
-          .reduce((acc, student) => ({ ...acc, [student]: true }), {} as Record<string, boolean>)
-      : ({} as Record<string, boolean>)
+    const filteredEnrolledNoGrade = getFilteredEnrolledNoGrade(this.enrollments, enrolledStudents, allStudents)
 
     students.all = { ...students.all, ...filteredEnrolledNoGrade }
     students.enrolledNoGrade = filteredEnrolledNoGrade
@@ -285,11 +289,6 @@ export class CourseStatsCounter {
     stats.totalEnrolledNoGrade = lengthOf(filteredEnrolledNoGrade)
     stats.percentageWithEnrollments = percentageOf(stats.passed, stats.totalStudents)
 
-    return {
-      stats,
-      students,
-      course: this.course,
-      grades: this.grades,
-    }
+    return { stats, students, course: this.course, grades: this.grades }
   }
 }
