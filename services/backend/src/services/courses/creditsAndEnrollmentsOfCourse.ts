@@ -99,7 +99,7 @@ export const enrollmentsForCourses = async (codes: string[], unification: Unific
         [Op.in]: codes,
       },
       enrollment_date_time: { [Op.gte]: new Date('2021-05-31') },
-      state: [EnrollmentState.ENROLLED, 'CONFIRMED'], // ? Does the "CONFIRMED" state really exist?
+      state: [EnrollmentState.ENROLLED, EnrollmentState.CONFIRMED],
       is_open,
     },
   })

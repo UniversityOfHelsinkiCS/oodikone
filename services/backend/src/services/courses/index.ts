@@ -3,6 +3,7 @@ import crypto from 'crypto'
 import { Op } from 'sequelize'
 
 import { Course, Credit, Enrollment, Organization, SISStudyRightElement } from '../../models'
+import { Name } from '../../types'
 import { isOpenUniCourseCode } from '../../util'
 import { getSortRank } from '../../util/sortRank'
 import { CourseYearlyStatsCounter } from './courseYearlyStatsCounter'
@@ -11,7 +12,7 @@ import {
   enrollmentsForCourses,
   getStudentNumberToSrElementsMap,
 } from './creditsAndEnrollmentsOfCourse'
-import { getIsOpen, Unification } from './helpers'
+import { FormattedProgramme, getIsOpen, Unification } from './helpers'
 
 const sortMainCode = (codes: string[]) => {
   if (!codes) {
@@ -20,21 +21,36 @@ const sortMainCode = (codes: string[]) => {
   return codes.sort((a, b) => getSortRank(b) - getSortRank(a))
 }
 
-const formatStudyRightElement = ({ code, name, startDate, studyRight }) => ({
-  code,
-  name,
-  startDate,
-  facultyCode: studyRight.facultyCode || null,
-  organization: studyRight.organization
+const formatStudyRightElement = (studyRightElement: SISStudyRightElement): FormattedProgramme => ({
+  code: studyRightElement.code,
+  name: studyRightElement.name,
+  startDate: studyRightElement.startDate,
+  facultyCode: studyRightElement.studyRight.facultyCode || null,
+  organization: studyRightElement.studyRight.organization
     ? {
-        name: studyRight.organization.name,
-        code: studyRight.organization.code,
+        name: studyRightElement.studyRight.organization.name,
+        code: studyRightElement.studyRight.organization.code,
       }
     : null,
 })
 
 const anonymizeStudentNumber = (studentNumber: string, anonymizationSalt: string) => {
   return crypto.createHash('sha256').update(`${studentNumber}${anonymizationSalt}`).digest('hex')
+}
+
+type FormattedCredit = {
+  yearCode: number
+  yearName: string
+  semesterCode: number
+  semesterName: Name
+  attainmentDate: Date
+  courseCode: string
+  grade: string
+  passed: boolean
+  studentNumber: string
+  programmes: FormattedProgramme[]
+  credits: number
+  obfuscated?: boolean
 }
 
 const parseCredit = (
@@ -53,8 +69,9 @@ const parseCredit = (
   const { yearcode: yearCode, yearname: yearName, semestercode: semesterCode, name: semesterName } = semester
 
   const studyRightElements = studentNumberToSrElementsMap[studentNumber] || []
+  const programmes = studyRightElements.map(formatStudyRightElement)
 
-  const formattedCredit: Record<string, any> = {
+  const formattedCredit: FormattedCredit = {
     yearCode,
     yearName,
     semesterCode,
@@ -64,16 +81,29 @@ const parseCredit = (
     grade,
     passed: !Credit.failed(credit) || Credit.passed(credit) || Credit.improved(credit),
     studentNumber,
-    programmes: studyRightElements.map(formatStudyRightElement),
+    programmes,
     credits,
   }
 
   if (anonymizationSalt) {
     formattedCredit.obfuscated = true
-    formattedCredit.studentnumber = anonymizeStudentNumber(studentNumber, anonymizationSalt)
+    formattedCredit.studentNumber = anonymizeStudentNumber(studentNumber, anonymizationSalt)
   }
 
   return formattedCredit
+}
+
+type FormattedEnrollment = {
+  yearCode: number
+  yearName: string
+  semesterCode: number
+  semesterName: Name
+  courseCode: string
+  state: string
+  enrollmentDateTime: Date
+  studentNumber: string
+  programmes: Array<Record<string, any>>
+  obfuscated?: boolean
 }
 
 const parseEnrollment = (
@@ -92,7 +122,7 @@ const parseEnrollment = (
 
   const studyRightElements = studentNumberToSrElementsMap[studentNumber] || []
 
-  const formattedEnrollment: Record<string, any> = {
+  const formattedEnrollment: FormattedEnrollment = {
     yearCode,
     yearName,
     semesterCode,
@@ -106,7 +136,7 @@ const parseEnrollment = (
 
   if (anonymizationSalt) {
     formattedEnrollment.obfuscated = true
-    formattedEnrollment.studentnumber = anonymizeStudentNumber(studentNumber, anonymizationSalt)
+    formattedEnrollment.studentNumber = anonymizeStudentNumber(studentNumber, anonymizationSalt)
   }
 
   return formattedEnrollment
@@ -162,7 +192,7 @@ const getYearlyStatsOfNew = async (
 
     const groupCode = separate ? semesterCode : yearCode
     const groupName = separate ? semesterName : yearName
-    const unknownProgramme = [
+    const unknownProgramme: FormattedProgramme[] = [
       {
         code: 'OTHER',
         name: {
@@ -170,7 +200,7 @@ const getYearlyStatsOfNew = async (
           fi: 'Muu',
           sv: 'Andra',
         },
-        faculty_code: 'OTHER',
+        facultyCode: 'OTHER',
         organization: {
           name: {
             en: 'Other',
