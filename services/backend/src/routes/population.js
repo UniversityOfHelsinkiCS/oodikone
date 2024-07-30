@@ -286,7 +286,8 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
     return res.status(400).json({ error: 'The body should have a yearcode and coursecode defined' })
   }
 
-  const maxYearsForPopulation = await maxYearsToCreatePopulationFrom(JSON.parse(coursecodes))
+  // TODO: Use Unification enum when TS is added to this file
+  const maxYearsForPopulation = await maxYearsToCreatePopulationFrom(JSON.parse(coursecodes), 'regular')
   const toFromDiff = Math.abs(to - from + 1)
   // 2 semesters = 1 year
   const requestedYearsToCreatePopulationFrom = Math.ceil(separate ? toFromDiff / 2 : toFromDiff)
@@ -403,12 +404,10 @@ router.get('/v3/populationstatistics/studyprogrammes', async (req, res) => {
 
 router.get('/v3/populationstatistics/maxYearsToCreatePopulationFrom', async (req, res) => {
   const { courseCodes } = req.query
-  const maxYearsToCreatePopulationFromOpen = await maxYearsToCreatePopulationFrom(JSON.parse(courseCodes), 'openStats')
-  const maxYearsToCreatePopulationFromUni = await maxYearsToCreatePopulationFrom(
-    JSON.parse(courseCodes),
-    'regularStats'
-  )
-  const maxYearsToCreatePopulationFromBoth = await maxYearsToCreatePopulationFrom(JSON.parse(courseCodes), 'unifyStats')
+  // TODO: Use Unification enum when TS is added to this file
+  const maxYearsToCreatePopulationFromOpen = await maxYearsToCreatePopulationFrom(JSON.parse(courseCodes), 'open')
+  const maxYearsToCreatePopulationFromUni = await maxYearsToCreatePopulationFrom(JSON.parse(courseCodes), 'regular')
+  const maxYearsToCreatePopulationFromBoth = await maxYearsToCreatePopulationFrom(JSON.parse(courseCodes), 'unify')
   return res.json({
     openCourses: maxYearsToCreatePopulationFromOpen,
     uniCourses: maxYearsToCreatePopulationFromUni,

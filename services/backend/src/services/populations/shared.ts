@@ -66,7 +66,7 @@ const updateCreditCriteriaInfo = (criteria, criteriaYear, criteriaChecked, yearT
   }
 }
 
-export const getCurriculumVersion = curriculumPeriodId => {
+export const getCurriculumVersion = (curriculumPeriodId: string) => {
   if (!curriculumPeriodId) {
     return null
   }
@@ -232,7 +232,9 @@ const formatStudentForPopulationStatistics = (
   }
 }
 
-export const dateMonthsFromNow = (date, months) => moment(date).add(months, 'months').format('YYYY-MM-DD')
+export const dateMonthsFromNow = (date: string, months: number) => {
+  return new Date(moment(date).add(months, 'months').format('YYYY-MM-DD'))
+}
 
 export const count = (column, count, distinct = false) => {
   const countable = !distinct ? sequelize.col(column) : sequelize.fn('DISTINCT', sequelize.col(column))
@@ -507,7 +509,7 @@ const getCourseCodes = async (courses: string[]) => {
 }
 
 // This duplicate code is added here to ensure that we get the enrollments in cases no credits found for the selected students
-export const findCourseEnrollments = async (studentnumbers, beforeDate, courses = []) => {
+export const findCourseEnrollments = async (studentNumbers: string[], beforeDate: Date, courses: string[] = []) => {
   const courseCodes = await getCourseCodes(courses)
   const res = await sequelize.query(
     `
@@ -538,7 +540,7 @@ export const findCourseEnrollments = async (studentnumbers, beforeDate, courses 
     `,
     {
       replacements: {
-        studentnumbers: studentnumbers.length > 0 ? studentnumbers : ['DUMMY'],
+        studentnumbers: studentNumbers.length > 0 ? studentNumbers : ['DUMMY'],
         beforeDate,
         courseCodes,
         skipCourseCodeFilter: courses.length === 0,
@@ -549,7 +551,7 @@ export const findCourseEnrollments = async (studentnumbers, beforeDate, courses 
   return res
 }
 
-export const findCourses = async (studentnumbers, beforeDate, courses = []) => {
+export const findCourses = async (studentNumbers: string[], beforeDate: Date, courses: string[] = []) => {
   const courseCodes = await getCourseCodes(courses)
   const res = await sequelize.query(
     `
@@ -595,7 +597,7 @@ export const findCourses = async (studentnumbers, beforeDate, courses = []) => {
     `,
     {
       replacements: {
-        studentnumbers: studentnumbers.length > 0 ? studentnumbers : ['DUMMY'],
+        studentnumbers: studentNumbers.length > 0 ? studentNumbers : ['DUMMY'],
         beforeDate,
         courseCodes,
         skipCourseCodeFilter: courses.length === 0,
@@ -607,7 +609,7 @@ export const findCourses = async (studentnumbers, beforeDate, courses = []) => {
   return res
 }
 
-export const parseCreditInfo = credit => ({
+export const parseCreditInfo = (credit: Credit) => ({
   studentnumber: credit.student_studentnumber,
   grade: credit.grade,
   passingGrade: Credit.passed(credit),

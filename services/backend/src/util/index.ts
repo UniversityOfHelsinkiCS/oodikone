@@ -45,6 +45,8 @@ export const hasFullAccessToStudentData = (roles?: Role[]) => {
   return roles != null && roles.some(role => rolesWithFullAccess.includes(role))
 }
 
+export const isOpenUniCourseCode = (code: string) => code.match(/^AY?(.+?)(?:en|fi|sv)?$/)
+
 export const splitByEmptySpace = (str: string) => str.split(/\s+/g)
 
 export const validateParamLength = (param: any, minLength: number) => {
