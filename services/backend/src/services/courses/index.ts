@@ -8,8 +8,8 @@ import { isOpenUniCourseCode } from '../../util'
 import { getSortRank } from '../../util/sortRank'
 import { CourseYearlyStatsCounter } from './courseYearlyStatsCounter'
 import {
-  creditsForCourses,
-  enrollmentsForCourses,
+  getCreditsForCourses,
+  getEnrollmentsForCourses,
   getStudentNumberToSrElementsMap,
 } from './creditsAndEnrollmentsOfCourse'
 import { FormattedProgramme, getIsOpen, Unification } from './helpers'
@@ -164,8 +164,8 @@ const getYearlyStatsOfNew = async (
   }
 
   const [credits, enrollments, course] = await Promise.all([
-    creditsForCourses(codes, unification),
-    enrollmentsForCourses(codes, unification),
+    getCreditsForCourses(codes, unification),
+    getEnrollmentsForCourses(codes, unification),
     Course.findOne({
       where: {
         code: courseCode,

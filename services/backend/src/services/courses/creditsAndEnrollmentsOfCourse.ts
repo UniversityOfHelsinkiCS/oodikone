@@ -1,13 +1,11 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { Op } from 'sequelize'
 
 import { Credit, Student, Semester, Organization, Enrollment, SISStudyRight, SISStudyRightElement } from '../../models'
 import { EnrollmentState } from '../../types'
 import { getIsOpen, Unification } from './helpers'
 
-export const creditsForCourses = async (codes: string[], unification: Unification) => {
-  const is_open = getIsOpen(unification)
-  const credits = await Credit.findAll({
+export const getCreditsForCourses = async (codes: string[], unification: Unification) => {
+  return await Credit.findAll({
     include: [
       {
         model: Student,
@@ -27,11 +25,10 @@ export const creditsForCourses = async (codes: string[], unification: Unificatio
       course_code: {
         [Op.in]: codes,
       },
-      is_open,
+      is_open: getIsOpen(unification),
     },
     order: [['attainment_date', 'ASC']],
   })
-  return credits
 }
 
 export const getStudentNumberToSrElementsMap = async (studentNumbers: string[]) => {
@@ -76,9 +73,8 @@ export const getStudentNumberToSrElementsMap = async (studentNumbers: string[]) 
   return studentNumberToSrElementsMap
 }
 
-export const enrollmentsForCourses = async (codes: string[], unification: Unification) => {
-  const is_open = getIsOpen(unification)
-  const enrollments = await Enrollment.findAll({
+export const getEnrollmentsForCourses = async (codes: string[], unification: Unification) => {
+  return await Enrollment.findAll({
     include: [
       {
         model: Student,
@@ -100,8 +96,7 @@ export const enrollmentsForCourses = async (codes: string[], unification: Unific
       },
       enrollment_date_time: { [Op.gte]: new Date('2021-05-31') },
       state: [EnrollmentState.ENROLLED, EnrollmentState.CONFIRMED],
-      is_open,
+      is_open: getIsOpen(unification),
     },
   })
-  return enrollments
 }
