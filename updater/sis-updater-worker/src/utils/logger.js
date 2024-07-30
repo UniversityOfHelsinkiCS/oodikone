@@ -55,7 +55,7 @@ transports.push(
   })
 )
 
-if (isProduction && !isStaging && serviceProvider !== 'Fd') {
+if (isProduction && !isStaging && serviceProvider !== 'fd') {
   transports.push(
     new WinstonGelfTransporter({
       handleExceptions: true,

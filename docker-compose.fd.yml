@@ -125,7 +125,7 @@ services:
       SIS_IMPORTER_USER: dev
       SIS_NATS_TOKEN: dev
       SIS_NATS_URI: sis-updater-nats://sis-updater-nats:4222
-      SERVICE_PROVIDER: 'Fd'
+      SERVICE_PROVIDER: fd
     ports:
       - 8082:8082
     volumes:
@@ -157,7 +157,7 @@ services:
       SIS_NATS_TOKEN: dev
       SIS_NATS_URI: sis-updater-nats://sis-updater-nats:4222
       ROOT_ORG_ID: ${ROOT_ORG_ID}
-      SERVICE_PROVIDER: 'Fd'
+      SERVICE_PROVIDER: fd
     volumes:
       - ./updater/sis-updater-worker/:/opt/app-root/src
 

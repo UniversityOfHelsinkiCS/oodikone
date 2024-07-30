@@ -65,7 +65,7 @@ if (isDev) {
 
   transports.push(new winston.transports.Console({ format: combine(splat(), timestamp(), prodFormat) }))
 
-  if (isProduction && !isStaging && serviceProvider !== 'Fd') {
+  if (isProduction && !isStaging && serviceProvider !== 'fd') {
     transports.push(
       new WinstonGelfTransporter({
         handleExceptions: true,
