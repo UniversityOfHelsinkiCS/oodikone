@@ -54,6 +54,17 @@ export const calculateDurationOfStudies = (
   return Math.round(moment(graduationDate).subtract(monthsToSubtract, 'months').diff(moment(startDate), 'months', true))
 }
 
+export type GraduationTimes = {
+  medians: Array<{
+    y: number
+    amount: number
+    name: string | number
+    statistics: { onTime: number; yearOver: number; wayOver: number }
+    times: number[]
+  }>
+  goal: number
+}
+
 const getGraduationTimeAndThesisWriterStats = async ({
   studyprogramme,
   years,
@@ -137,16 +148,6 @@ const getGraduationTimeAndThesisWriterStats = async ({
     }
   }
 
-  type GraduationTimes = {
-    medians: Array<{
-      y: number
-      amount: number
-      name: any
-      statistics: { onTime: number; yearOver: number; wayOver: number }
-    }>
-    goal: number
-  }
-
   const goal = getGoal(studyprogramme)
   const times: GraduationTimes = { medians: [], goal }
   const comboTimes: GraduationTimes = { medians: [], goal: goal + 36 }
@@ -154,12 +155,24 @@ const getGraduationTimeAndThesisWriterStats = async ({
   for (const year of years.toReversed()) {
     const median = getMedian(graduationTimes[year])
     const statistics = countTimeCategories(graduationTimes[year], goal)
-    times.medians.push({ y: median, amount: graduationTimes[year].length, name: year, statistics })
+    times.medians.push({
+      y: median,
+      amount: graduationTimes[year].length,
+      name: year,
+      statistics,
+      times: [...graduationTimes[year]],
+    })
 
     if (doCombo) {
       const median = getMedian(graduationTimesCombo[year])
       const statistics = countTimeCategories(graduationTimesCombo[year], goal + 36)
-      comboTimes.medians.push({ y: median, amount: graduationTimesCombo[year].length, name: year, statistics })
+      comboTimes.medians.push({
+        y: median,
+        amount: graduationTimesCombo[year].length,
+        name: year,
+        statistics,
+        times: [...graduationTimesCombo[year]],
+      })
     }
   }
   return { times, doCombo, comboTimes, thesisGraphStats: graphStats, thesisTableStats: tableStats }

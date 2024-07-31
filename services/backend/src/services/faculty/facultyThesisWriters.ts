@@ -2,9 +2,8 @@ import { cloneDeep } from 'lodash'
 
 import { getGraduationStats, setGraduationStats } from '../analyticsService'
 import { getGraduationStatsForStudytrack } from '../studyProgramme/studyProgrammeGraduations'
-import { getDegreeProgrammesOfFaculty } from './faculty'
+import { getDegreeProgrammesOfFaculty, ProgrammesOfOrganization } from './faculty'
 
-type ProgrammesOfOrganization = Awaited<ReturnType<typeof getDegreeProgrammesOfFaculty>>
 type ProgrammeName = {
   code: string
   en?: string

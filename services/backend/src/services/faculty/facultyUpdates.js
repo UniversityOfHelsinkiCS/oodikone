@@ -57,9 +57,9 @@ const updateFacultyOverview = async (faculty, statsType) => {
     }
   }
 
-  const updatedTimesAll = await countGraduationTimes(faculty, 'ALL_PROGRAMMES')
+  const updatedTimesAll = await countGraduationTimes(faculty, all)
   await setGraduationStats(updatedTimesAll, 'ALL_PROGRAMMES')
-  const updatedTimesNew = await countGraduationTimes(faculty, 'NEW_STUDY_PROGRAMMES')
+  const updatedTimesNew = await countGraduationTimes(faculty, onlyNew)
   await setGraduationStats(updatedTimesNew, 'NEW_STUDY_PROGRAMMES')
   return 'OK'
 }
