@@ -22,6 +22,62 @@ import { EnrollmentState, PriorityCode } from '../../types'
 
 const { sequelize } = dbConnections
 
+const getStudentTags = async (studyRights: string[], studentNumbers: string[]) => {
+  return await TagStudent.findAll({
+    attributes: ['tag_id', 'studentnumber'],
+    include: [
+      {
+        model: Tag,
+        attributes: ['tag_id', 'tagname', 'personal_user_id'],
+        where: {
+          studytrack: {
+            [Op.in]: studyRights,
+          },
+        },
+      },
+    ],
+    where: {
+      studentnumber: {
+        [Op.in]: studentNumbers,
+      },
+    },
+  })
+}
+
+const getCreditsOfStudent = async (
+  studentNumbers: string[],
+  studyRights: string[],
+  attainmentDateFrom: string | moment.Moment,
+  endDate: Date
+) => {
+  const studyPlans = await Studyplan.findAll({
+    where: { studentnumber: studentNumbers },
+    attributes: ['included_courses'],
+    raw: true,
+  })
+  const studyPlanCourses = Array.from(new Set([...studyPlans.map(plan => plan.included_courses)].flat()))
+
+  const creditsOfStudent = {
+    [Op.or]: [
+      {
+        attainment_date: {
+          [Op.between]: [attainmentDateFrom, endDate],
+        },
+      },
+      {
+        // takes into account possible progress tests taken earlier than the start date
+        course_code: ['320001', 'MH30_001'].includes(studyRights[0])
+          ? ['375063', '339101', ...studyPlanCourses]
+          : studyPlanCourses,
+      },
+    ],
+    student_studentnumber: {
+      [Op.in]: studentNumbers,
+    },
+  }
+  return creditsOfStudent
+}
+
 const getCourses = async (creditsOfStudent: any) => {
   return await Course.findAll({
     attributes: [literal('DISTINCT ON("code") code') as unknown as string, 'name'],
@@ -227,40 +283,22 @@ export const getStudentsIncludeCoursesBetween = async (
   studyRights: string[],
   tag
 ) => {
-  const studentTags = await TagStudent.findAll({
-    attributes: ['tag_id', 'studentnumber'],
-    include: [
-      {
-        model: Tag,
-        attributes: ['tag_id', 'tagname', 'personal_user_id'],
-        where: {
-          studytrack: {
-            [Op.in]: studyRights,
-          },
-        },
-      },
-    ],
-    where: {
-      studentnumber: {
-        [Op.in]: studentNumbers,
-      },
-    },
-  })
+  const studentTags = await getStudentTags(studyRights, studentNumbers)
 
-  const { studentnumbersWithTag, studentNumberToTags } = studentTags.reduce(
+  const { studentNumbersWithTag, studentNumberToTags } = studentTags.reduce(
     (acc, studentTag) => {
       acc.studentNumberToTags[studentTag.studentnumber] = acc.studentNumberToTags[studentTag.studentnumber] || []
       acc.studentNumberToTags[studentTag.studentnumber].push(studentTag)
       if (tag && studentTag.tag_id === tag.tag_id) {
-        acc.studentnumbersWithTag.push(studentTag.studentnumber)
+        acc.studentNumbersWithTag.push(studentTag.studentnumber)
       }
       return acc
     },
-    { studentnumbersWithTag: [] as string[], studentNumberToTags: {} as Record<string, TagStudent[]> }
+    { studentNumbersWithTag: [] as string[], studentNumberToTags: {} as Record<string, TagStudent[]> }
   )
 
   if (tag) {
-    studentNumbers = studentnumbersWithTag
+    studentNumbers = studentNumbersWithTag
   }
 
   if (studentNumbers.length === 0) {
@@ -268,31 +306,8 @@ export const getStudentsIncludeCoursesBetween = async (
   }
 
   const attainmentDateFrom = tag ? moment(startDate).year(tag.year) : startDate
-  const studyPlans = await Studyplan.findAll({
-    where: { studentnumber: studentNumbers },
-    attributes: ['included_courses'],
-    raw: true,
-  })
-  const studyPlanCourses = Array.from(new Set([...studyPlans.map(plan => plan.included_courses)].flat()))
 
-  const creditsOfStudent = {
-    [Op.or]: [
-      {
-        attainment_date: {
-          [Op.between]: [attainmentDateFrom, endDate],
-        },
-      },
-      {
-        // takes into account possible progress tests taken earlier than the start date
-        course_code: ['320001', 'MH30_001'].includes(studyRights[0])
-          ? ['375063', '339101', ...studyPlanCourses]
-          : studyPlanCourses,
-      },
-    ],
-    student_studentnumber: {
-      [Op.in]: studentNumbers,
-    },
-  }
+  const creditsOfStudent = await getCreditsOfStudent(studentNumbers, studyRights, attainmentDateFrom, endDate)
 
   const courses = await getCourses(creditsOfStudent)
   const enrollments = await getEnrollments(studentNumbers, attainmentDateFrom, endDate)
