@@ -96,7 +96,7 @@ router.get('/allgraduationstats', async (_req, res) => {
   const facultyCodes = allFaculties.map(faculty => faculty.code)
   const facultyData = {}
   const timesArrays = [] // keep book of these to null them in the end, large lists not used in frontend
-  const programmeFilter = serviceProvider === 'Toska' ? 'NEW_STUDY_PROGRAMMES' : 'ALL_PROGRAMMES'
+  const programmeFilter = serviceProvider === 'toska' ? 'NEW_STUDY_PROGRAMMES' : 'ALL_PROGRAMMES'
   for (const facultyCode of facultyCodes) {
     const data = await getGraduationStats(facultyCode, programmeFilter, true)
     if (!data) return res.status(500).json({ message: `Did not find data for ${facultyCode}` })

@@ -15,7 +15,7 @@ import { getSisuAuthData, personSearchQuery, getGraphqlData } from './oriProvide
 import { getStudentnumbersByElementdetails } from './students'
 import { checkStudyGuidanceGroupsAccess, getAllStudentsUserHasInGroups } from './studyGuidanceGroups'
 
-const userAccessUtils = serviceProvider === 'Toska' ? jami : mami
+const userAccessUtils = serviceProvider === 'toska' ? jami : mami
 const { getAllUserAccess, getUserIams, getUserIamAccess } = userAccessUtils
 
 const courseStatisticsGroup = 'grp-oodikone-basic-users'
