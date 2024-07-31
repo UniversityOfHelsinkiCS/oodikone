@@ -1,17 +1,15 @@
 export const studyProgrammeToolTips = {
   YearToggle: `
-  Academic year: Näyttää tilastot akateemisille vuosille jaoteltuna, esimerkiksi 1.8.2019-31.7.2020
-  Calendar year: Näyttää tilastot kalenterivuosille jaoteltuna, esimerkiksi 1.1.2019-31.12.2019 
+  **Calendar year**: Näyttää tilastot kalenterivuosille jaoteltuna (esim. 1.1.–31.12.2024)  
+  **Academic year**: Näyttää tilastot lukuvuosille jaoteltuna (esim. 1.8.2023–31.7.2024)
   `,
   StudentToggle: `
-  All studyrights: Valinnassa ovat mukana vaihto-opiskelijat, erillisoikeudella opiskelevat ja ohjelmaan siirtyneet opiskelijat sekä ohjelmasta pois siirtyneet opiskelijat.
-  
-  Special studyrights excluded: Valinnasta ja kaikista luvuista on poissuljettu kaikki edellä mainitut erikoisryhmät.
+  **All studyrights**: Valinnassa ovat mukana vaihto-opiskelijat, erillisoikeudella opiskelevat ja ohjelmaan siirtyneet opiskelijat sekä ohjelmasta pois siirtyneet opiskelijat.  
+  **Special studyrights excluded**: Valinnasta ja kaikista luvuista on poissuljettu kaikki edellä mainitut erikoisryhmät.
   `,
   GraduatedToggle: `
-  Graduated included: Valinnassa ovat mukana ohjelmasta jo valmistuneet opiskelijat.
-  
-  Graduated excluded: Valinnasta on poistettu ohjelmasta jo valmistuneet opiskelijat.
+  **Graduated included**: Valinnassa ovat mukana ohjelmasta jo valmistuneet opiskelijat.  
+  **Graduated excluded**: Valinnasta on poistettu ohjelmasta jo valmistuneet opiskelijat.
   `,
   StudentsOfTheStudyprogramme: `
   **Started studying**: Sisältää opiskelijat, jotka ovat kyseisenä vuonna ilmoittautuneet ensimmäistä kertaa läsnäolevaksi koulutusohjelmassa. Opiskelija on voinut myös myöhemmin keskeyttää opintonsa tai siirtyä pois ohjelmasta.
