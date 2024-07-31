@@ -18,9 +18,9 @@ const backgroundColorsDarks = { KH: '#f9f9f9', MH: '#eeeeee', T: '#dddddd' }
 const getRowStyle = (index, tableLinePlaces, dark = false) => {
   const backgroundColorsToUse = dark ? backgroundColorsDarks : backgroundColors
 
-  if (tableLinePlaces[2][0] <= index) return { backgroundColor: backgroundColorsToUse[tableLinePlaces[2][1]] }
+  if (tableLinePlaces[2]?.[0] <= index) return { backgroundColor: backgroundColorsToUse[tableLinePlaces[2][1]] }
 
-  if (tableLinePlaces[1][0] <= index) return { backgroundColor: backgroundColorsToUse[tableLinePlaces[1][1]] }
+  if (tableLinePlaces[1]?.[0] <= index) return { backgroundColor: backgroundColorsToUse[tableLinePlaces[1][1]] }
 
   return { backgroundColor: backgroundColorsToUse[tableLinePlaces[0][1]] }
 }
