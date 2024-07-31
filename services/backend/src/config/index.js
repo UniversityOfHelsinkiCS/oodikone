@@ -35,7 +35,7 @@ const frontUrl = process.env.FRONT_URL
 const backendPort = 8080
 
 // System run in whose environment
-const serviceProvider = process.env.SERVICE_PROVIDER || 'toska'
+const serviceProvider = process.env.SERVICE_PROVIDER ? process.env.SERVICE_PROVIDER.toLowerCase() : 'toska'
 
 // Optional logout-url configuration
 const configLogoutUrl = serviceProvider === 'toska' ? undefined : process.env.LOGOUT_URL

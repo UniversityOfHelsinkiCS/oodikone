@@ -14,7 +14,7 @@ module.exports.REDIS_TOTAL_STUDENTS_DONE_KEY = 'TOTAL_STUDENTS_DONE'
 module.exports.REDIS_LATEST_MESSAGE_RECEIVED = 'LATEST_MESSAGE_RECEIVED'
 module.exports.REDIS_LAST_COMPLETED_SCHEDULE = 'LAST_COMPLETED_SCHEDULE'
 module.exports.rootOrgId = process.env.ROOT_ORG_ID || 'hy-university-root-id'
-module.exports.serviceProvider = process.env.SERVICE_PROVIDER || ''
+module.exports.serviceProvider = process.env.SERVICE_PROVIDER ? process.env.SERVICE_PROVIDER.toLowerCase() : ''
 
 // Sentry
 module.exports.sentryRelease = process.env.SENTRY_RELEASE || ''
