@@ -266,22 +266,21 @@ export const countGraduationTimes = async (faculty: string, programmesOfFaculty:
 
   const goals = {
     bachelor: 36,
-    bcMsCombo: 60,
+    bcMsCombo: faculty === 'H90' ? 72 : 60,
     master: 24,
     doctor: 48,
     exceptions: {
       MH30_004: 6, // months more
       '420420-ma': 6,
-      MH30_001: 12,
-      '320011-ma': 12,
-      '320001-ma': 12,
-      MH30_003: 6,
-      '320002-ma': 12,
+      '420074-ma': 6,
+      '420119-ma': 6,
+      MH30_001: 48,
+      '320011-ma': 48,
+      '320001-ma': 48,
+      MH30_003: 42,
+      '320002-ma': 42,
+      '320009-ma': 42,
     },
-  }
-
-  if (faculty === 'H90') {
-    goals.bcMsCombo += 12
   }
 
   const programmeNames = programmesOfFaculty.reduce<Record<string, Name>>((acc, { code, name }) => {
