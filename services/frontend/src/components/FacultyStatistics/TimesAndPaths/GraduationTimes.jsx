@@ -93,7 +93,7 @@ const BreakdownDisplay = ({
           universityMode={universityMode}
           yearLabel={yearLabel}
         />
-        {!programmeData ? (
+        {!programmeData || !(year in levelProgrammeData) ? (
           <div className="graduations-message">
             <Message compact>
               Click a bar to view that year's {universityMode ? 'faculty' : 'programme'} level breakdown
@@ -101,7 +101,7 @@ const BreakdownDisplay = ({
           </div>
         ) : (
           <BreakdownBarChart
-            data={levelProgrammeData[year]?.data}
+            data={levelProgrammeData[year].data}
             facultyGraph={false}
             handleClick={handleClick}
             programmeNames={programmeNames}

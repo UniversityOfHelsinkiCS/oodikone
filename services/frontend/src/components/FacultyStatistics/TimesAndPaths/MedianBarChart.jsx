@@ -47,9 +47,6 @@ export const MedianBarChart = ({
 
   const getClassSize = category => {
     if (facultyGraph) return classSizes[category]
-    if (level === 'master' || level === 'bcMsCombo') {
-      return classSizes[category][level][year]
-    }
     return classSizes[category][year]
   }
 

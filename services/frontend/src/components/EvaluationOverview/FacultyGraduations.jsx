@@ -2,14 +2,14 @@ import { GraduationTimes } from '@/components/FacultyStatistics/TimesAndPaths/Gr
 
 export const FacultyGraduations = ({ faculty, graduationStats, groupByStartYear, showMedian, universityMode }) => {
   const groupBy = groupByStartYear ? 'byStartYear' : 'byGradYear'
-  const label = groupByStartYear ? 'Start year' : 'Graduation year'
+  const yearLabel = groupByStartYear ? 'Start year' : 'Graduation year'
   const data = graduationStats?.data?.[groupBy].medians
   const goals = graduationStats?.data?.goals
   const goalExceptions = { ...goals?.exceptions, needed: faculty === 'H30' }
   const programmeData = graduationStats?.data?.[groupBy].programmes.medians
   const programmeNames = graduationStats?.data?.programmeNames
   const classSizes = graduationStats?.data?.classSizes
-  const commonProps = { label, programmeNames, showMedian, classSizes, goalExceptions, universityMode }
+  const commonProps = { yearLabel, programmeNames, showMedian, classSizes, goalExceptions, universityMode, groupBy }
 
   return (
     <div>
@@ -24,7 +24,6 @@ export const FacultyGraduations = ({ faculty, graduationStats, groupByStartYear,
       <GraduationTimes
         data={data?.bcMsCombo}
         goal={goals?.bcMsCombo}
-        groupBy={groupBy}
         level="bcMsCombo"
         levelProgrammeData={programmeData?.bcMsCombo}
         title="Bachelor + Master"
