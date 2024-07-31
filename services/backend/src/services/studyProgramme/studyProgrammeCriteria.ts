@@ -1,14 +1,15 @@
 import { Course } from '../../models'
 import { ProgressCriteria } from '../../models/kone'
+import { Criteria } from '../../types'
 import logger from '../../util/logger'
 
-type Criteria = Omit<ProgressCriteria, 'curriculumVersion'>
+type CriteriaWithoutCurriculumVersion = Omit<ProgressCriteria, 'curriculumVersion'>
 
 const getCriteriaByStudyProgramme = async (code: string) => {
   if (code === '') {
     return null
   }
-  const criteria: Criteria | null = await ProgressCriteria.findOne({
+  const criteria: CriteriaWithoutCurriculumVersion | null = await ProgressCriteria.findOne({
     attributes: { exclude: ['curriculumVersion'] },
     where: {
       code,
@@ -33,27 +34,7 @@ const getSubstitutions = async (codes: string[]) => {
   return substitutions
 }
 
-type FormattedCriteria = {
-  courses: {
-    yearOne: string[]
-    yearTwo: string[]
-    yearThree: string[]
-    yearFour: string[]
-    yearFive: string[]
-    yearSix: string[]
-  }
-  allCourses: Record<string, string[]>
-  credits: {
-    yearOne: number
-    yearTwo: number
-    yearThree: number
-    yearFour: number
-    yearFive: number
-    yearSix: number
-  }
-}
-
-const formatCriteria = async (criteria: Criteria) => {
+const formatCriteria = async (criteria: CriteriaWithoutCurriculumVersion) => {
   const yearOne = criteria.coursesYearOne || []
   const yearTwo = criteria.coursesYearTwo || []
   const yearThree = criteria.coursesYearThree || []
@@ -63,7 +44,7 @@ const formatCriteria = async (criteria: Criteria) => {
   const courseCodes = [...yearOne, ...yearTwo, ...yearThree, ...yearFour, ...yearFive, ...yearSix]
   const allCourses = await getSubstitutions(courseCodes)
 
-  const formattedCriteria: FormattedCriteria = {
+  const formattedCriteria: Criteria = {
     courses: { yearOne, yearTwo, yearThree, yearFour, yearFive, yearSix },
     allCourses,
     credits: {
@@ -184,9 +165,9 @@ export const getCriteria = async (studyProgramme: string) => {
   if (studyProgrammeCriteria) {
     return await formatCriteria(studyProgrammeCriteria)
   }
-  const emptyCriteria = {
+  const emptyCriteria: Criteria = {
     courses: { yearOne: [], yearTwo: [], yearThree: [], yearFour: [], yearFive: [], yearSix: [] },
-    allCourses: [],
+    allCourses: {},
     credits: { yearOne: 0, yearTwo: 0, yearThree: 0, yearFour: 0, yearFive: 0, yearSix: 0 },
   }
   return emptyCriteria

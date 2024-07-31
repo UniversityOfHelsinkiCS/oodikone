@@ -1,6 +1,7 @@
 /* eslint-disable import/no-cycle */
 export { CourseWithSubsId } from './course'
 export { CreditTypeCode } from './creditTypeCode'
+export { Criteria } from './criteria'
 export { DetailedProgrammeRights } from './detailedProgrammeRights'
 export { ElementDetailType } from './elementDetailType'
 export { EnrollmentState } from './enrollmentState'
