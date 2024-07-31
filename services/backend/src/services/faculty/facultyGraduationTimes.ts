@@ -57,13 +57,18 @@ const getStatsByGraduationYear = async (facultyProgrammes: ProgrammesOfOrganizat
     if (!medians[level]) {
       medians[level] = cloneDeep(graduationTimes.medians).map(year => ({ ...omit(year, ['y']), median: year.y }))
     } else {
-      for (let i = 0; i < graduationTimes.medians.length; i++) {
-        medians[level][i].times.push(...graduationTimes.medians[i].times)
-        medians[level][i].median = getMedian(medians[level][i].times)
-        medians[level][i].amount += graduationTimes.medians[i].amount
-        medians[level][i].statistics.onTime += graduationTimes.medians[i].statistics.onTime
-        medians[level][i].statistics.yearOver += graduationTimes.medians[i].statistics.yearOver
-        medians[level][i].statistics.wayOver += graduationTimes.medians[i].statistics.wayOver
+      for (const statsForYear of graduationTimes.medians) {
+        const correctYear = medians[level].find(entry => entry.name === statsForYear.name)
+        if (!correctYear) {
+          medians[level].push({ ...omit(cloneDeep(statsForYear), ['y']), median: statsForYear.y })
+          continue
+        }
+        correctYear.times.push(...statsForYear.times)
+        correctYear.median = getMedian(correctYear.times)
+        correctYear.amount += statsForYear.amount
+        correctYear.statistics.onTime += statsForYear.statistics.onTime
+        correctYear.statistics.yearOver += statsForYear.statistics.yearOver
+        correctYear.statistics.wayOver += statsForYear.statistics.wayOver
       }
     }
 
@@ -71,13 +76,18 @@ const getStatsByGraduationYear = async (facultyProgrammes: ProgrammesOfOrganizat
       if (!medians.bcMsCombo) {
         medians.bcMsCombo = cloneDeep(comboTimes.medians).map(year => ({ ...omit(year, ['y']), median: year.y }))
       } else {
-        for (let i = 0; i < comboTimes.medians.length; i++) {
-          medians.bcMsCombo[i].times.push(...comboTimes.medians[i].times)
-          medians.bcMsCombo[i].median = getMedian(medians.bcMsCombo[i].times)
-          medians.bcMsCombo[i].amount += comboTimes.medians[i].amount
-          medians.bcMsCombo[i].statistics.onTime += comboTimes.medians[i].statistics.onTime
-          medians.bcMsCombo[i].statistics.yearOver += comboTimes.medians[i].statistics.yearOver
-          medians.bcMsCombo[i].statistics.wayOver += comboTimes.medians[i].statistics.wayOver
+        for (const statsForYear of comboTimes.medians) {
+          const correctYear = medians.bcMsCombo.find(entry => entry.name === statsForYear.name)
+          if (!correctYear) {
+            medians.bcMsCombo.push({ ...omit(cloneDeep(statsForYear), ['y']), median: statsForYear.y })
+            continue
+          }
+          correctYear.times.push(...statsForYear.times)
+          correctYear.median = getMedian(correctYear.times)
+          correctYear.amount += statsForYear.amount
+          correctYear.statistics.onTime += statsForYear.statistics.onTime
+          correctYear.statistics.yearOver += statsForYear.statistics.yearOver
+          correctYear.statistics.wayOver += statsForYear.statistics.wayOver
         }
       }
     }
@@ -168,14 +178,19 @@ const getStatsByStartYear = async (facultyProgrammes: ProgrammesOfOrganization) 
         return { ...omit(year, ['y', 'classSize']), median: year.y }
       })
     } else {
-      for (let i = 0; i < basicStats.length; i++) {
-        ;(classSizes[level][basicStats[i].name] as number) += basicStats[i].classSize
-        medians[level][i].times.push(...basicStats[i].times)
-        medians[level][i].median = getMedian(medians[level][i].times)
-        medians[level][i].amount += basicStats[i].amount
-        medians[level][i].statistics.onTime += basicStats[i].statistics.onTime
-        medians[level][i].statistics.yearOver += basicStats[i].statistics.yearOver
-        medians[level][i].statistics.wayOver += basicStats[i].statistics.wayOver
+      for (const statsForYear of basicStats) {
+        const correctYear = medians[level].find(entry => entry.name === statsForYear.name)
+        if (!correctYear) {
+          medians[level].push({ ...omit(cloneDeep(statsForYear), ['y', 'classSize']), median: statsForYear.y })
+          continue
+        }
+        ;(classSizes[level][statsForYear.name] as number) += statsForYear.classSize
+        correctYear.times.push(...statsForYear.times)
+        correctYear.median = getMedian(correctYear.times)
+        correctYear.amount += statsForYear.amount
+        correctYear.statistics.onTime += statsForYear.statistics.onTime
+        correctYear.statistics.yearOver += statsForYear.statistics.yearOver
+        correctYear.statistics.wayOver += statsForYear.statistics.wayOver
       }
     }
 
@@ -189,14 +204,19 @@ const getStatsByStartYear = async (facultyProgrammes: ProgrammesOfOrganization) 
           return { ...omit(year, ['y', 'classSize']), median: year.y }
         })
       } else {
-        for (let i = 0; i < comboStats.length; i++) {
-          ;(classSizes.bcMsCombo[comboStats[i].name] as number) += comboStats[i].classSize
-          medians.bcMsCombo[i].times.push(...comboStats[i].times)
-          medians.bcMsCombo[i].median = getMedian(medians.bcMsCombo[i].times)
-          medians.bcMsCombo[i].amount += comboStats[i].amount
-          medians.bcMsCombo[i].statistics.onTime += comboStats[i].statistics.onTime
-          medians.bcMsCombo[i].statistics.yearOver += comboStats[i].statistics.yearOver
-          medians.bcMsCombo[i].statistics.wayOver += comboStats[i].statistics.wayOver
+        for (const statsForYear of comboStats) {
+          const correctYear = medians.bcMsCombo.find(entry => entry.name === statsForYear.name)
+          if (!correctYear) {
+            medians.bcMsCombo.push({ ...omit(cloneDeep(statsForYear), ['y', 'classSize']), median: statsForYear.y })
+            continue
+          }
+          ;(classSizes.bcMsCombo[statsForYear.name] as number) += statsForYear.classSize
+          correctYear.times.push(...statsForYear.times)
+          correctYear.median = getMedian(correctYear.times)
+          correctYear.amount += statsForYear.amount
+          correctYear.statistics.onTime += statsForYear.statistics.onTime
+          correctYear.statistics.yearOver += statsForYear.statistics.yearOver
+          correctYear.statistics.wayOver += statsForYear.statistics.wayOver
         }
       }
     }
