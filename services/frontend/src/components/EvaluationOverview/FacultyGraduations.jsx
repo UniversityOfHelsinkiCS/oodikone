@@ -46,14 +46,6 @@ export const FacultyGraduations = ({ faculty, graduationStats, groupByStartYear,
         title="Doctor"
         {...commonProps}
       />
-      <GraduationTimes
-        data={data?.licentiate}
-        goal={goals?.licentiate}
-        level="licentiate"
-        levelProgrammeData={programmeData?.licentiate}
-        title="Licentiate"
-        {...commonProps}
-      />
     </div>
   )
 }

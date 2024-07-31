@@ -163,14 +163,6 @@ export const TimesAndPathsView = ({ faculty, setStudyProgrammes, studyProgrammes
             title="Doctor"
             {...commonProps}
           />
-          <GraduationTimes
-            data={data?.licentiate}
-            goal={goals?.licentiate}
-            level="licentiate"
-            levelProgrammeData={programmeData?.licentiate}
-            title="Licentiate"
-            {...commonProps}
-          />
         </div>
       </>
     )
