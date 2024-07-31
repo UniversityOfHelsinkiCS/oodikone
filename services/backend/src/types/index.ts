@@ -1,6 +1,7 @@
 /* eslint-disable import/no-cycle */
 export { CourseWithSubsId } from './course'
 export { CreditTypeCode } from './creditTypeCode'
+export { Criteria } from './criteria'
 export { DetailedProgrammeRights } from './detailedProgrammeRights'
 export { ElementDetailType } from './elementDetailType'
 export { EnrollmentState } from './enrollmentState'
@@ -15,6 +16,7 @@ export { Phase } from './phase'
 export { PriorityCode } from './priorityCode'
 export { Role } from './role'
 export { StudyTrack } from './studyTrack'
+export { Unification, UnifyStatus } from './unification'
 export { ExpandedUser, FormattedUser } from './user'
 
 /**

@@ -13,7 +13,7 @@ import {
   SISStudyRightElement,
 } from '../models'
 import { Tag, TagStudent } from '../models/kone'
-import { Name } from '../types'
+import { Name, UnifyStatus } from '../types'
 import { splitByEmptySpace } from '../util'
 import logger from '../util/logger'
 
@@ -119,8 +119,6 @@ const byStudentNumber = async (studentNumber: string) => {
     })),
   }
 }
-
-export type UnifyStatus = 'unifyStats' | 'openStats' | 'regularStats' | undefined
 
 const getUnifyStatus = (unifyCourses: UnifyStatus): [boolean] | [true, false] => {
   switch (unifyCourses) {

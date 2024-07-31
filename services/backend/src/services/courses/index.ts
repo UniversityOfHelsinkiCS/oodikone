@@ -3,7 +3,7 @@ import crypto from 'crypto'
 import { Op } from 'sequelize'
 
 import { Course, Credit, Enrollment, Organization, SISStudyRightElement } from '../../models'
-import { Name } from '../../types'
+import { Name, Unification } from '../../types'
 import { isOpenUniCourseCode } from '../../util'
 import { getSortRank } from '../../util/sortRank'
 import { CourseYearlyStatsCounter } from './courseYearlyStatsCounter'
@@ -12,7 +12,7 @@ import {
   getEnrollmentsForCourses,
   getStudentNumberToSrElementsMap,
 } from './creditsAndEnrollmentsOfCourse'
-import { FormattedProgramme, getIsOpen, Unification } from './helpers'
+import { FormattedProgramme, getIsOpen } from './helpers'
 
 const sortMainCode = (codes: string[]) => {
   if (!codes) {

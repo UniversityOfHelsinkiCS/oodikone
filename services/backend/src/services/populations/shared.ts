@@ -3,7 +3,7 @@ import { Op, QueryTypes } from 'sequelize'
 
 import { dbConnections } from '../../database/connection'
 import { Course, Credit, ElementDetail, Studyright, StudyrightElement } from '../../models'
-import { ElementDetailType, ExtentCode } from '../../types'
+import { ElementDetailType, ExtentCode, Criteria, Name } from '../../types'
 import { SemesterEnd, SemesterStart } from '../../util/semester'
 import { getCurrentSemester } from '../semesters'
 import { getProgrammesFromStudyRights } from '../studyrights'
@@ -359,23 +359,26 @@ export const getOptionsForStudents = async (studentNumbers: string[], code: stri
     .filter(
       studyRight => studyRight.givendate.getTime() === currentStudyrightsMap[studyRight.student_studentnumber].getTime()
     )
-    .reduce((obj, element) => {
-      obj[element.student_studentnumber] = {
-        code: element.studyright_elements[0].code,
-        name: element.studyright_elements[0].element_detail.name,
-      }
-      return obj
-    }, {})
+    .reduce(
+      (obj, element) => {
+        obj[element.student_studentnumber] = {
+          code: element.studyright_elements[0].code,
+          name: element.studyright_elements[0].element_detail.name,
+        }
+        return obj
+      },
+      {} as Record<string, { code: string; name: Name }>
+    )
 }
 
 export const formatStudentsForApi = async (
   { students, enrollments, credits, extents, semesters, elementdetails, courses },
-  startDate,
-  endDate,
-  { studyRights },
-  optionData,
-  criteria,
-  code
+  startDate: string,
+  endDate: string,
+  studyRights: string[],
+  optionData: Record<string, { code: string; name: Name }>,
+  criteria: Criteria,
+  code: string
 ) => {
   const startDateMoment = moment(startDate)
   const endDateMoment = moment(endDate)
@@ -449,7 +452,7 @@ export const formatStudentsForApi = async (
   const transferredStudyright = student => {
     const transferredFrom = student.transfers.find(
       transfer =>
-        transfer.targetcode === studyRights.programme &&
+        transfer.targetcode === studyRights[0] &&
         // Add bit of flex for students that transferred just before the startdate
         moment(transfer.transferdate).isBetween(startDateMoment.subtract(1, 'd'), endDateMoment.add(1, 'd'))
     )
@@ -475,15 +478,15 @@ export const formatStudentsForApi = async (
   return returnvalue
 }
 
-export const formatQueryParamsToArrays = (query, params) => {
-  const res = { ...query }
+export const formatQueryParamsToArrays = (query: Record<string, any>, params: string[]) => {
+  const result = { ...query }
   params.forEach(param => {
-    if (!res[param]) {
+    if (!result[param]) {
       return
     }
-    res[param] = Array.isArray(res[param]) ? res[param] : [res[param]]
+    result[param] = Array.isArray(result[param]) ? result[param] : [result[param]]
   })
-  return res
+  return result
 }
 
 const getSubstitutions = async (codes: string[]) => {
