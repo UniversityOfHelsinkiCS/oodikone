@@ -26,4 +26,5 @@ export const builtAt = process.env.REACT_APP_BUILT_AT || ''
 
 // Service provider depending this hiding some not needed features default value toska
 export const serviceProvider = process.env.REACT_APP_SERVICE_PROVIDER
-  ? process.env.REACT_APP_SERVICE_PROVIDER.toLowerCase() : 'toska'
+  ? process.env.REACT_APP_SERVICE_PROVIDER.toLowerCase()
+  : 'toska'
