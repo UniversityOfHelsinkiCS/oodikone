@@ -369,7 +369,7 @@ export const getOptionsForStudents = async (studentNumbers: string[], code: stri
 }
 
 export const formatStudentsForApi = async (
-  { students, enrollments, credits, extents, semesters, elementdetails, courses },
+  { students, enrollments, credits, extents, semesters, elementDetails, courses },
   startDate,
   endDate,
   { studyRights },
@@ -381,7 +381,7 @@ export const formatStudentsForApi = async (
   const endDateMoment = moment(endDate)
   const currentSemester = (await getCurrentSemester()).semestercode
 
-  elementdetails = elementdetails.reduce(
+  elementDetails = elementDetails.reduce(
     (acc, elementDetail) => {
       acc.data[elementDetail.code] = elementDetail
       if (elementDetail.type === ElementDetailType.PROGRAMME) {
@@ -469,21 +469,21 @@ export const formatStudentsForApi = async (
     extents,
     semesters,
     courses,
-    elementdetails,
+    elementDetails,
   }
 
   return returnvalue
 }
 
-export const formatQueryParamsToArrays = (query, params) => {
-  const res = { ...query }
+export const formatQueryParamsToArrays = (query: Record<string, any>, params: string[]) => {
+  const result = { ...query }
   params.forEach(param => {
-    if (!res[param]) {
+    if (!result[param]) {
       return
     }
-    res[param] = Array.isArray(res[param]) ? res[param] : [res[param]]
+    result[param] = Array.isArray(result[param]) ? result[param] : [result[param]]
   })
-  return res
+  return result
 }
 
 const getSubstitutions = async (codes: string[]) => {

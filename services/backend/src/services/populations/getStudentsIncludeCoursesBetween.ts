@@ -16,8 +16,7 @@ import {
   SemesterEnrollment,
   Transfer,
 } from '../../models'
-import { Tag } from '../../models/kone/tag'
-import { TagStudent } from '../../models/kone/tagStudent'
+import { Tag, TagStudent } from '../../models/kone'
 import { EnrollmentState, PriorityCode } from '../../types'
 
 const { sequelize } = dbConnections
