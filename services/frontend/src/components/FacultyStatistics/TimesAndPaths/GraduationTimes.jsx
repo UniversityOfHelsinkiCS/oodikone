@@ -48,7 +48,7 @@ const MedianDisplay = ({
           universityMode={universityMode}
           yearLabel={yearLabel}
         />
-        {!programmeData ? (
+        {!programmeData || !(year in levelProgrammeData) ? (
           <div className="graduations-message">
             <Message compact>
               Click a bar to view that year's {universityMode ? 'faculty' : 'programme'} level breakdown
@@ -57,7 +57,7 @@ const MedianDisplay = ({
         ) : (
           <MedianBarChart
             classSizes={classSizes?.programmes}
-            data={levelProgrammeData[year]?.data}
+            data={levelProgrammeData[year].data}
             facultyGraph={false}
             goal={goal}
             goalExceptions={goalExceptions}

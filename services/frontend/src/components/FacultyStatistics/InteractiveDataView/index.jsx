@@ -123,7 +123,7 @@ export const InteractiveDataTable = ({
             color={sorter === sorterName ? 'blue' : 'black'}
             content={sorterName}
             data-cy={`Menu-${cypress}-${sorterName}`}
-            icon={sortDir === 1 ? 'triangle down' : 'triangle up'}
+            icon={sortDir === -1 && sorter === sorterName ? 'triangle up' : 'triangle down'}
             key={sorterName}
             onClick={() => handleClick(sorterName, nameIndex)}
             style={{ borderRadius: '1px', fontSize: '14px', padding: '0 10px' }}
