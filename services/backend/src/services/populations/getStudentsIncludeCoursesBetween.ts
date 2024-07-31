@@ -275,6 +275,16 @@ const getElementDetails = async (studentNumbers: string[]) => {
   return elementDetails
 }
 
+type StudentsIncludeCoursesBetween = {
+  students: Array<Student & { tags?: TagStudent[] }>
+  enrollments: Enrollment[]
+  credits: Credit[]
+  extents: StudyrightExtent[]
+  semesters: Semester[]
+  elementdetails: ElementDetail[]
+  courses: Course[]
+}
+
 export const getStudentsIncludeCoursesBetween = async (
   studentNumbers: string[],
   startDate: string,
@@ -301,7 +311,15 @@ export const getStudentsIncludeCoursesBetween = async (
   }
 
   if (studentNumbers.length === 0) {
-    return { students: [], enrollments: [], credits: [], extents: [], semesters: [], elementDetails: [], courses: [] }
+    return {
+      students: [],
+      enrollments: [],
+      credits: [],
+      extents: [],
+      semesters: [],
+      elementdetails: [],
+      courses: [],
+    } as StudentsIncludeCoursesBetween
   }
 
   const attainmentDateFrom = tag ? moment(startDate).year(tag.year) : startDate
@@ -314,11 +332,19 @@ export const getStudentsIncludeCoursesBetween = async (
   const credits = await getCredits(creditsOfStudent)
   const extents = await getExtents(studentNumbers)
   const semesters = await getSemesters(studentNumbers, startDate, endDate)
-  const elementDetails = await getElementDetails(studentNumbers)
+  const elementdetails = await getElementDetails(studentNumbers)
 
   students.forEach(student => {
     student.tags = studentNumberToTags[student.studentnumber] || []
   })
 
-  return { students, enrollments, credits, extents, semesters, elementDetails, courses }
+  return {
+    students,
+    enrollments,
+    credits,
+    extents,
+    semesters,
+    elementdetails,
+    courses,
+  } as StudentsIncludeCoursesBetween
 }
