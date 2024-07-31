@@ -10,7 +10,7 @@ import {
   getOptionsForStudents,
   parseQueryParams,
 } from './shared'
-import { studentnumbersWithAllStudyrightElements } from './studentnumbersWithAllStudyrightElements'
+import { getStudentNumbersWithAllStudyRightElements } from './studentNumbersWithAllElements'
 
 type Query = {
   year?: number
@@ -42,7 +42,7 @@ export const optimizedStatisticsOf = async (query: Query, studentNumberList?: st
 
   const studentNumbers =
     studentNumberList ||
-    (await studentnumbersWithAllStudyrightElements({
+    (await getStudentNumbersWithAllStudyRightElements({
       studyRights,
       startDate: formattedStartDate,
       endDate,
