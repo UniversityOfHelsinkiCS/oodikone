@@ -90,9 +90,9 @@ const refreshCloseToGraduating = async () => {
 
 const dailyJobs = async () => {
   try {
+    await refreshStatistics()
     await refreshProgrammes()
     await refreshFaculties()
-    await refreshStatistics()
     jobMaker.languagecenter()
     jobMaker.closeToGraduation()
   } catch (error) {
