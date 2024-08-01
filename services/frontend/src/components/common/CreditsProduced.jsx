@@ -45,7 +45,7 @@ export const makeTableStats = (data, showAll, isAcademicYear) => {
   if (!data) return null
   const currentYear = new Date().getFullYear()
   const tableStats = []
-  for (let year = currentYear - (isAcademicYear ? 1 : 0); year >= 2017; year--) {
+  for (let year = currentYear - (isAcademicYear && new Date().getMonth() < 7 ? 1 : 0); year >= 2017; year--) {
     const yearData = data[getFormattedYear(year, isAcademicYear)]
     const basic = yearData?.basic || 0
     const openUni = yearData?.['open-uni'] || 0
