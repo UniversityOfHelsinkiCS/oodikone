@@ -25,8 +25,8 @@ export const BreakdownBarChart = ({ data, title, byStartYear = false }) => {
   }
 
   const getHeight = () => {
-    const t = data.length > 8 ? 80 : 110
-    return data.length * t + 100
+    const multiplier = data.length > 8 ? 80 : 110
+    return data.length * multiplier + 100
   }
 
   const getTooltipText = (seriesName, amount) => {

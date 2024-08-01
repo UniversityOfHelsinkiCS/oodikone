@@ -249,7 +249,10 @@ const updateTermRegistrations = async (termRegistrations, personIdToStudentNumbe
 
   const allSementerEnrollments = flatten(
     termRegistrations
-      .filter(t => t.student_id !== null && studyRights.some(r => r.id === t.study_right_id))
+      .filter(
+        termRegistration =>
+          termRegistration.student_id !== null && studyRights.some(r => r.id === termRegistration.study_right_id)
+      )
       .map(({ student_id, term_registrations, study_right_id }) =>
         term_registrations.map(mapSemesterEnrollment(student_id, study_right_id))
       )

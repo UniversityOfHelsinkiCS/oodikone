@@ -255,7 +255,7 @@ const courseProviderMapper =
     shares,
   })
 
-const timify = t => new Date(t).getTime()
+const timify = date => new Date(date).getTime()
 
 const courseMapper = courseIdToAttainments => (groupedCourse, substitutions) => {
   const [groupId, courses] = groupedCourse

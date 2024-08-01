@@ -10,7 +10,7 @@ export const PopulationQueryCard = ({ population, query }) => {
   const { data: tags = [] } = useGetTagsByStudyTrackQuery(query?.studyRights?.programme, {
     skip: !query?.studyRights?.programme,
   })
-  const tagname = tag ? tags.find(t => t.tag_id === tag)?.tagname : ''
+  const tagname = tag ? tags.find(currentTag => currentTag.tag_id === tag)?.tagname : ''
   const { students } = population
 
   if (!students.length) return null

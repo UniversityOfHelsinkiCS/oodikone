@@ -16,8 +16,8 @@ export const TeacherSearchTab = () => {
     isLoading,
     isUninitialized,
   } = useFindTeachersQuery(
-    { searchString: splitByEmptySpace(query.trim()).find(t => validateInputLength(t, 4)) },
-    { skip: !splitByEmptySpace(query.trim()).find(t => validateInputLength(t, 4)) }
+    { searchString: splitByEmptySpace(query.trim()).find(text => validateInputLength(text, 4)) },
+    { skip: !splitByEmptySpace(query.trim()).find(text => validateInputLength(text, 4)) }
   )
 
   const debouncedSetQuery = useCallback(

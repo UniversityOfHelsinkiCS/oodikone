@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
 
   const trimmedSearchTerm = searchTerm.trim()
   if (
-    !splitByEmptySpace(trimmedSearchTerm).find(t => t.length >= 4) ||
+    !splitByEmptySpace(trimmedSearchTerm).find(term => term.length >= 4) ||
     (Number(trimmedSearchTerm) && trimmedSearchTerm.length < 6)
   ) {
     return res.status(400).json({ error: 'invalid searchTerm' })

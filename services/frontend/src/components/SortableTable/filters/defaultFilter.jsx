@@ -26,7 +26,7 @@ const DefaultColumnFilterComponent = ({ column, options, dispatch }) => {
       return []
     }
     const stringComparator = createLocaleComparator()
-    const t = uniq(values)
+    const processedValues = uniq(values)
       .filter(
         value =>
           search === '' ||
@@ -85,7 +85,7 @@ const DefaultColumnFilterComponent = ({ column, options, dispatch }) => {
         )
       })
 
-    return t
+    return processedValues
   }, [values, search, valueFilters])
 
   return (

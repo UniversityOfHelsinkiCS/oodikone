@@ -28,11 +28,11 @@ const getStudentData = (
       .filter(credit => moment(credit.attainment_date).isSameOrAfter(startDate))
       .reduce((total, credit) => total + credit.credits, 0)
   )
-  thresholdKeys.forEach(t => {
-    data[t] = 0
+  thresholdKeys.forEach(threshold => {
+    data[threshold] = 0
   })
-  limitKeys.forEach(t => {
-    programmeData[t] = 0
+  limitKeys.forEach(limit => {
+    programmeData[limit] = 0
   })
 
   // Data is only used for doctoral programmes, otherwise only programmeData is needed

@@ -49,7 +49,7 @@
     "cypress/no-assigning-return-values": "off",
     "cypress/unsafe-to-chain-command": "off",
     "default-param-last": "off",
-    "id-denylist": ["error", "c", "e", "err"],
+    "id-denylist": ["error", "c", "e", "err", "t"],
     "import/extensions": ["error", "never"],
     "import/order": [
       "error",

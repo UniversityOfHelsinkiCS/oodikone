@@ -95,7 +95,7 @@ const byStudentNumber = async (studentNumber: string) => {
   const tagprogrammes = await ElementDetail.findAll({
     where: {
       code: {
-        [Op.in]: tags.map(t => t.tag.studytrack),
+        [Op.in]: tags.map(tag => tag.tag.studytrack),
       },
     },
   })
