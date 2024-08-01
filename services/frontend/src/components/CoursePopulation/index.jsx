@@ -86,7 +86,7 @@ export const CoursePopulation = () => {
     const targetProp = separate ? 'semestercode' : 'yearcode'
     const data = separate ? semesters.semesters : semesters.years
     const dataValues = Object.values(data)
-    const findDateByCode = code => dataValues.find(d => d[targetProp] === code)
+    const findDateByCode = code => dataValues.find(data => data[targetProp] === code)
 
     return {
       dateFrom: findDateByCode(Number(from)).startdate,
