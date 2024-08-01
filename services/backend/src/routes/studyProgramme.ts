@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Request, Response, Router } from 'express'
 
 import {
   getBasicStats,
@@ -25,12 +25,12 @@ import { logInfoForGrafana } from '../util/logInfoForGrafana'
 
 const router = Router()
 
-router.get('/', async (_req, res) => {
+router.get('/', async (_req: Request, res: Response) => {
   const studyProgrammes = await getProgrammesFromStudyRights()
   res.json(studyProgrammes)
 })
 
-router.get('/creditstats', async (req, res) => {
+router.get('/creditstats', async (req: Request, res: Response) => {
   const { codes, isAcademicYear, includeSpecials } = req.query
   const stats = {}
   for (const code of JSON.parse(codes as string)) {
@@ -39,7 +39,7 @@ router.get('/creditstats', async (req, res) => {
   return res.json({ stats })
 })
 
-router.get('/:id/basicstats', async (req, res) => {
+router.get('/:id/basicstats', async (req: Request, res: Response) => {
   const code = req.params.id
   const yearType = req.query?.year_type
   const specialGroups = req.query?.special_groups
@@ -68,7 +68,7 @@ router.get('/:id/basicstats', async (req, res) => {
   return res.json(updated)
 })
 
-router.get('/:id/graduationstats', async (req, res) => {
+router.get('/:id/graduationstats', async (req: Request, res: Response) => {
   const code = req.params.id
   const yearType = req.query?.year_type
   const specialGroups = req.query?.special_groups
@@ -96,7 +96,7 @@ router.get('/:id/graduationstats', async (req, res) => {
   return res.json(updatedStats)
 })
 
-router.get('/:id/coursestats', async (req, res) => {
+router.get('/:id/coursestats', async (req: Request, res: Response) => {
   const code = req.params.id
   const showByYear = req.query.academicyear
   const combinedProgramme = req.query?.combined_programme as string
@@ -111,7 +111,7 @@ router.get('/:id/coursestats', async (req, res) => {
   }
 })
 
-router.get('/:id/studytrackstats', async (req, res) => {
+router.get('/:id/studytrackstats', async (req: Request, res: Response) => {
   const code = req.params.id
   const graduated = req.query?.graduated
   const specialGroups = req.query?.special_groups
@@ -142,7 +142,7 @@ router.get('/:id/studytrackstats', async (req, res) => {
   return res.json(updated)
 })
 
-router.get('/:id/colorizedtablecoursestats', async (req, res) => {
+router.get('/:id/colorizedtablecoursestats', async (req: Request, res: Response) => {
   const code = req.params.id
   try {
     const data = await getStudyprogrammeStatsForColorizedCoursesTable(code)
@@ -152,7 +152,7 @@ router.get('/:id/colorizedtablecoursestats', async (req, res) => {
   }
 })
 
-router.get('/:id/update_basicview', async (req, res) => {
+router.get('/:id/update_basicview', async (req: Request, res: Response) => {
   const code = req.params.id
   const combinedProgramme = req.query?.combined_programme
   if (!code) {
@@ -168,7 +168,7 @@ router.get('/:id/update_basicview', async (req, res) => {
   }
 })
 
-router.get('/:id/update_studytrackview', async (req, res) => {
+router.get('/:id/update_studytrackview', async (req: Request, res: Response) => {
   const code = req.params.id
   const combinedProgramme = req.query?.combined_programme
   if (!code) {
@@ -184,7 +184,7 @@ router.get('/:id/update_studytrackview', async (req, res) => {
   }
 })
 
-router.get('/:id/evaluationstats', async (req, res) => {
+router.get('/:id/evaluationstats', async (req: Request, res: Response) => {
   const code = req.params.id
   const yearType = req.query?.year_type
   const specialGroups = req.query?.special_groups
