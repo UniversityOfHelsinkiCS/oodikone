@@ -33,12 +33,14 @@ const getCreditAmount = (course, hops, courseCode, startDate, addition) => {
 }
 
 const updateCourseByYear = (criteria, criteriaYear, course, criteriaChecked, yearToAdd, correctCode) => {
+  // TODO: Clean up this mess
   if (
     criteria?.courses &&
     criteria?.courses[criteriaYear] &&
     (criteria.courses[criteriaYear].includes(course.course_code) ||
       criteria.courses[criteriaYear].some(
-        c => criteria.allCourses[c] && criteria.allCourses[c].includes(course.course_code)
+        criteriaCourse =>
+          criteria.allCourses[criteriaCourse] && criteria.allCourses[criteriaCourse].includes(course.course_code)
       ))
   ) {
     if (

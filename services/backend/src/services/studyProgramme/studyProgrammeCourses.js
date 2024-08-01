@@ -63,9 +63,9 @@ const makeYearlyPromises = (years, academicYear, type, programmeCourses, studypr
         }
 
         res(
-          result.map(c => {
-            c.year = year
-            return c
+          result.map(course => {
+            course.year = year
+            return course
           })
         )
       })

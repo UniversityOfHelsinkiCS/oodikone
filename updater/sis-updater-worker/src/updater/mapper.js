@@ -263,8 +263,8 @@ const courseMapper = courseIdToAttainments => (groupedCourse, substitutions) => 
 
   const { min: startdate, max: enddate } = getMinMaxDate(
     courses,
-    c => c.validity_period.startDate,
-    c => c.validity_period.endDate
+    course => course.validity_period.startDate,
+    course => course.validity_period.endDate
   )
 
   const { min_attainment_date, max_attainment_date } = courses.reduce(
@@ -388,7 +388,7 @@ const studyplanMapper =
         .filter(({ parentModuleId }) => moduleIdToParentModuleCode[parentModuleId]?.has(code))
         .map(({ customCourseUnitAttainmentId }) => (attainmentIdToAttainment[customCourseUnitAttainmentId] || {}).code)
         .map(sanitizeCourseCode)
-        .filter(c => !!c)
+        .filter(course => !!course)
 
       const coursesFromAttainedModules = flatten(
         studyplan.module_selections
