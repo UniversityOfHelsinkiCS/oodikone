@@ -1,24 +1,23 @@
-import { Response, Router } from 'express'
+import { Request, Response, Router } from 'express'
 
 import { roles } from '../config/roles'
 import * as auth from '../middleware/auth'
 import { sendNotificationAboutAccessToUser, previewNotificationAboutAccessToUser } from '../services/mailService'
 import * as userService from '../services/userService'
-import { OodikoneRequest } from '../types'
 import logger from '../util/logger'
 
 const router = Router()
 
-router.get('/', auth.roles(['admin']), async (_req: OodikoneRequest, res: Response) => {
+router.get('/', auth.roles(['admin']), async (_req: Request, res: Response) => {
   const results = await userService.findAll()
   res.json(results)
 })
 
-router.get('/access_groups', auth.roles(['admin']), async (_req: OodikoneRequest, res: Response) => {
+router.get('/access_groups', auth.roles(['admin']), async (_req: Request, res: Response) => {
   res.json(roles)
 })
 
-interface UidRequest extends OodikoneRequest {
+interface UidRequest extends Request {
   params: {
     uid: string
   }
@@ -34,7 +33,7 @@ router.get('/:uid', auth.roles(['admin']), async (req: UidRequest, res: Response
   }
 })
 
-interface ModifyAccessRequest extends OodikoneRequest {
+interface ModifyAccessRequest extends Request {
   body: {
     username: string
     accessgroups: Record<string, boolean>
@@ -51,12 +50,12 @@ router.post('/modifyaccess', auth.roles(['admin']), async (req: ModifyAccessRequ
   }
 })
 
-router.get('/email/preview', auth.roles(['admin']), (_req: OodikoneRequest, res: Response) => {
+router.get('/email/preview', auth.roles(['admin']), (_req: Request, res: Response) => {
   const { accessMessageSubject, accessMessageText } = previewNotificationAboutAccessToUser()
   res.json({ subject: accessMessageSubject, html: accessMessageText })
 })
 
-interface EmailRequest extends OodikoneRequest {
+interface EmailRequest extends Request {
   body: {
     email: string
   }
@@ -77,7 +76,7 @@ router.post('/email', auth.roles(['admin']), async (req: EmailRequest, res: Resp
   res.status(200).end()
 })
 
-interface ElementsRequest extends OodikoneRequest {
+interface ElementsRequest extends Request {
   params: {
     uid: string
   }
@@ -100,7 +99,7 @@ router.delete('/:uid/elements', auth.roles(['admin']), async (req: ElementsReque
   res.status(204).end()
 })
 
-interface ChangeLanguageRequest extends OodikoneRequest {
+interface ChangeLanguageRequest extends Request {
   body: {
     language: string
   }
@@ -114,7 +113,7 @@ router.post('/language', async (req: ChangeLanguageRequest, res: Response) => {
     return res.status(400).json('Invalid language')
   }
   try {
-    await userService.updateUser(req.user!.username, { language })
+    await userService.updateUser(req.user.username, { language })
     return res.status(204).end()
   } catch (error: any) {
     return res.status(500).json({ error: error.message })

@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/node'
 import crypto from 'crypto'
-import { Response, Router } from 'express'
+import { Request, Response, Router } from 'express'
 import { difference, intersection, uniq } from 'lodash'
 
 import { maxYearsToCreatePopulationFrom, getCourseProvidersForCourses } from '../services/courses'
@@ -10,7 +10,7 @@ import { populationStudentsMerger, populationCourseStatsMerger } from '../servic
 import { findByTag, findByCourseAndSemesters } from '../services/students'
 import { mapCodesToIds } from '../services/studyProgramme/studyProgrammeHelpers'
 import { getAssociations, getFilteredAssociations } from '../services/studyrights'
-import { OodikoneRequest, Unification, UnifyStatus } from '../types'
+import { Unification, UnifyStatus } from '../types'
 import { getFullStudyProgrammeRights, hasFullAccessToStudentData } from '../util'
 import { ApplicationError } from '../util/customErrors'
 import { mapToProviders } from '../util/map'
@@ -33,7 +33,7 @@ const isEncryptedStudent = (student: string | EncryptedStudent) => {
 
 type EncryptedStudent = { iv: string; encryptedData: string }
 
-interface PostPopulationStatisticsRequest extends OodikoneRequest {
+interface PostPopulationStatisticsRequest extends Request {
   body: {
     year: string
     semesters: string[]
@@ -65,8 +65,8 @@ router.post('/v2/populationstatistics/courses', async (req: PostPopulationStatis
 
   if (
     !encrypted &&
-    !hasFullAccessToStudentData(req.user!.roles) &&
-    req.body.selectedStudents.some(student => !req.user!.studentsUserCanAccess.includes(student))
+    !hasFullAccessToStudentData(req.user.roles) &&
+    req.body.selectedStudents.some(student => !req.user.studentsUserCanAccess.includes(student))
   ) {
     return res.status(403).json({ error: 'Trying to request unauthorized students data' })
   }
@@ -121,7 +121,7 @@ router.post('/v2/populationstatistics/courses', async (req: PostPopulationStatis
   return res.json(result)
 })
 
-interface PostPopulationStatisticsByTagRequest extends OodikoneRequest {
+interface PostPopulationStatisticsByTagRequest extends Request {
   body: {
     tag: string
   }
@@ -130,7 +130,7 @@ interface PostPopulationStatisticsByTagRequest extends OodikoneRequest {
 router.post(
   '/v2/populationstatistics/coursesbytag',
   async (req: PostPopulationStatisticsByTagRequest, res: Response) => {
-    const { roles, studentsUserCanAccess } = req.user!
+    const { roles, studentsUserCanAccess } = req.user
     const { tag } = req.body
     if (!tag) {
       res.status(400).json({ error: 'The body should have a tag defined' })
@@ -163,7 +163,7 @@ router.post(
   }
 )
 
-interface PostPopulationStatisticsByStudentNumberListRequest extends OodikoneRequest {
+interface PostPopulationStatisticsByStudentNumberListRequest extends Request {
   body: {
     studentnumberlist: string[]
     year: string
@@ -176,7 +176,7 @@ interface PostPopulationStatisticsByStudentNumberListRequest extends OodikoneReq
 router.post(
   '/v2/populationstatistics/coursesbystudentnumberlist',
   async (req: PostPopulationStatisticsByStudentNumberListRequest, res: Response) => {
-    const { roles, studentsUserCanAccess } = req.user!
+    const { roles, studentsUserCanAccess } = req.user
     const {
       body: { studentnumberlist, ...query },
     } = req
@@ -207,7 +207,7 @@ router.post(
   }
 )
 
-interface GetPopulationStatisticsRequest extends OodikoneRequest {
+interface GetPopulationStatisticsRequest extends Request {
   query: {
     year: string
     semesters: string[]
@@ -219,7 +219,7 @@ interface GetPopulationStatisticsRequest extends OodikoneRequest {
 
 router.get('/v3/populationstatistics', async (req: GetPopulationStatisticsRequest, res: Response) => {
   const { year, semesters, studyRights: studyRightsJSON } = req.query
-  const { roles, programmeRights, id: userId } = req.user!
+  const { roles, programmeRights, id: userId } = req.user
   if (!year || !semesters || !studyRightsJSON) {
     res.status(400).json({ error: 'The query should have a year, semester and studyRights defined' })
     return
@@ -318,7 +318,7 @@ router.get('/v3/populationstatistics', async (req: GetPopulationStatisticsReques
   }
 })
 
-interface GetPopulationStatisticsByCourseRequest extends OodikoneRequest {
+interface GetPopulationStatisticsByCourseRequest extends Request {
   query: {
     coursecodes: string
     from: string
@@ -330,7 +330,7 @@ interface GetPopulationStatisticsByCourseRequest extends OodikoneRequest {
 
 router.get('/v3/populationstatisticsbycourse', async (req: GetPopulationStatisticsByCourseRequest, res: Response) => {
   const { coursecodes, from, to, separate: separateString, unifyCourses } = req.query
-  const { id, roles, studentsUserCanAccess: allStudentsUserCanAccess, programmeRights } = req.user!
+  const { id, roles, studentsUserCanAccess: allStudentsUserCanAccess, programmeRights } = req.user
 
   if (!coursecodes || !from || !to) {
     return res.status(400).json({ error: 'The body should have a yearcode and coursecode defined' })
@@ -406,7 +406,7 @@ router.get('/v3/populationstatisticsbycourse', async (req: GetPopulationStatisti
   res.json(filterPersonalTags(result, id))
 })
 
-interface PostByStudentNumbersRequest extends OodikoneRequest {
+interface PostByStudentNumbersRequest extends Request {
   body: {
     studentnumberlist: string[]
     tags?: {
@@ -418,7 +418,7 @@ interface PostByStudentNumbersRequest extends OodikoneRequest {
 
 router.post('/v3/populationstatisticsbystudentnumbers', async (req: PostByStudentNumbersRequest, res: Response) => {
   const { studentnumberlist, tags } = req.body
-  const { roles, id, studentsUserCanAccess } = req.user!
+  const { roles, id, studentsUserCanAccess } = req.user
   const filteredStudentNumbers = hasFullAccessToStudentData(roles)
     ? studentnumberlist
     : intersection(studentnumberlist, studentsUserCanAccess)
@@ -447,8 +447,8 @@ router.post('/v3/populationstatisticsbystudentnumbers', async (req: PostByStuden
   res.status(200).json({ ...filterPersonalTags(resultWithStudyProgramme, id), discardedStudentNumbers })
 })
 
-router.get('/v3/populationstatistics/studyprogrammes', async (req: OodikoneRequest, res: Response) => {
-  const { roles, programmeRights } = req.user!
+router.get('/v3/populationstatistics/studyprogrammes', async (req: Request, res: Response) => {
+  const { roles, programmeRights } = req.user
   if (hasFullAccessToStudentData(roles)) {
     const studyRights = await getAssociations()
     mapCodesToIds(studyRights.programmes)
@@ -463,7 +463,7 @@ router.get('/v3/populationstatistics/studyprogrammes', async (req: OodikoneReque
   res.json(studyRights)
 })
 
-interface GetMaxYearsRequest extends OodikoneRequest {
+interface GetMaxYearsRequest extends Request {
   query: {
     courseCodes: string
   }

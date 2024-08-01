@@ -1,13 +1,12 @@
-import { Response, Router } from 'express'
+import { Request, Response, Router } from 'express'
 
 import { changeGroupTags, getAllGroupsAndStudents } from '../services/studyGuidanceGroups'
-import { OodikoneRequest } from '../types'
 import logger from '../util/logger'
 
 const router = Router()
 
-router.get('/', async (req: OodikoneRequest, res: Response) => {
-  const { username, sisPersonId } = req.user!
+router.get('/', async (req: Request, res: Response) => {
+  const { username, sisPersonId } = req.user
   if (!sisPersonId) {
     logger.error(`User ${username} tried to access study guidance groups but personId was ${sisPersonId} in request`)
     return res.status(400).json({ error: 'Not possible to get groups without personId' })
@@ -15,7 +14,7 @@ router.get('/', async (req: OodikoneRequest, res: Response) => {
   return res.json(await getAllGroupsAndStudents(sisPersonId))
 })
 
-interface ChangeGroupTagsRequest extends OodikoneRequest {
+interface ChangeGroupTagsRequest extends Request {
   body: { studyProgramme?: string | null; year?: string | null }
   params: { id: string }
 }
@@ -26,7 +25,7 @@ router.put('/:id/tags', async (req: ChangeGroupTagsRequest, res: Response) => {
     body: tags,
     params: { id: groupId },
   } = req
-  const { username, sisPersonId } = user!
+  const { username, sisPersonId } = user
   if (!sisPersonId) {
     logger.error(
       `User ${username} tried to change study guidance group tags but personId was ${sisPersonId} in request`

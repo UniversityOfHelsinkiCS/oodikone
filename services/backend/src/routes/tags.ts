@@ -1,4 +1,4 @@
-import { Response, Router } from 'express'
+import { Request, Response, Router } from 'express'
 import { difference } from 'lodash'
 
 import { Tag, TagStudent } from '../models/kone'
@@ -14,7 +14,7 @@ import {
   TagFromFrontend,
   StudentTagFromFrontend,
 } from '../services/tags'
-import { OodikoneRequest, Role } from '../types'
+import { Role } from '../types'
 import { getFullStudyProgrammeRights, hasFullAccessToStudentData } from '../util'
 
 const router = Router()
@@ -44,7 +44,7 @@ const getStudyTrackCode = (studyTrack: string, combinedProgramme: string) => {
   return combinedProgramme ? `${studyTrack}-${combinedProgramme}` : studyTrack
 }
 
-interface GetTagsByStudyTrackRequest extends OodikoneRequest {
+interface GetTagsByStudyTrackRequest extends Request {
   params: {
     studytrack: string
   }
@@ -52,7 +52,7 @@ interface GetTagsByStudyTrackRequest extends OodikoneRequest {
 
 router.get('/tags/:studytrack', async (req: GetTagsByStudyTrackRequest, res: Response) => {
   const { studytrack } = req.params
-  const { roles, id, programmeRights } = req.user!
+  const { roles, id, programmeRights } = req.user
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const programmeCodes = getProgrammeCodes(studytrack)
 
@@ -66,7 +66,7 @@ router.get('/tags/:studytrack', async (req: GetTagsByStudyTrackRequest, res: Res
   res.status(200).json(filterRelevantTags(tags, id))
 })
 
-interface PostTagRequest extends OodikoneRequest {
+interface PostTagRequest extends Request {
   body: {
     tag: TagFromFrontend
   }
@@ -77,7 +77,7 @@ router.post('/tags', async (req: PostTagRequest, res: Response) => {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     tag: { studytrack, tagname, year, personal_user_id },
   } = req.body
-  const { roles, id, programmeRights } = req.user!
+  const { roles, id, programmeRights } = req.user
 
   if (!tagname || !studytrack || !year) {
     return res.status(400).json({ error: 'Missing required fields' })
@@ -94,7 +94,7 @@ router.post('/tags', async (req: PostTagRequest, res: Response) => {
   res.status(200).json(filterRelevantTags(tags, id))
 })
 
-interface DeleteTagRequest extends OodikoneRequest {
+interface DeleteTagRequest extends Request {
   body: {
     tag: {
       studytrack: string
@@ -106,7 +106,7 @@ interface DeleteTagRequest extends OodikoneRequest {
 
 router.delete('/tags', async (req: DeleteTagRequest, res: Response) => {
   const { tag } = req.body
-  const { roles, id, programmeRights } = req.user!
+  const { roles, id, programmeRights } = req.user
 
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const programmeCodes = getProgrammeCodes(tag.studytrack)
@@ -120,7 +120,7 @@ router.delete('/tags', async (req: DeleteTagRequest, res: Response) => {
   res.status(200).json(filterRelevantTags(tags, id))
 })
 
-interface GetStudentTagsByStudyTrackRequest extends OodikoneRequest {
+interface GetStudentTagsByStudyTrackRequest extends Request {
   params: {
     studytrack: string
   }
@@ -128,7 +128,7 @@ interface GetStudentTagsByStudyTrackRequest extends OodikoneRequest {
 
 router.get('/studenttags/:studytrack', async (req: GetStudentTagsByStudyTrackRequest, res: Response) => {
   const { studytrack } = req.params
-  const { roles, id, programmeRights } = req.user!
+  const { roles, id, programmeRights } = req.user
 
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const programmeCodes = getProgrammeCodes(studytrack)
@@ -141,7 +141,7 @@ router.get('/studenttags/:studytrack', async (req: GetStudentTagsByStudyTrackReq
   res.status(200).json(filterRelevantStudentTags(tags, id))
 })
 
-interface PostStudentTagsRequest extends OodikoneRequest {
+interface PostStudentTagsRequest extends Request {
   body: {
     tags: StudentTagFromFrontend[]
     studytrack: string
@@ -151,7 +151,7 @@ interface PostStudentTagsRequest extends OodikoneRequest {
 
 router.post('/studenttags', async (req: PostStudentTagsRequest, res: Response) => {
   const { tags, studytrack, combinedProgramme } = req.body
-  const { roles, programmeRights } = req.user!
+  const { roles, programmeRights } = req.user
 
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
 
@@ -180,7 +180,7 @@ router.post('/studenttags', async (req: PostStudentTagsRequest, res: Response) =
   res.status(204).end()
 })
 
-interface DeleteStudentTagsRequest extends OodikoneRequest {
+interface DeleteStudentTagsRequest extends Request {
   body: {
     tagId: string
     studentnumbers: string[]
@@ -191,7 +191,7 @@ interface DeleteStudentTagsRequest extends OodikoneRequest {
 
 router.delete('/studenttags', async (req: DeleteStudentTagsRequest, res: Response) => {
   const { tagId, studentnumbers, studytrack, combinedProgramme } = req.body
-  const { roles, programmeRights } = req.user!
+  const { roles, programmeRights } = req.user
 
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
 

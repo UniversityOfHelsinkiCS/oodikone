@@ -1,4 +1,4 @@
-import { Response, Router } from 'express'
+import { Request, Response, Router } from 'express'
 import moment from 'moment-timezone'
 
 import {
@@ -8,11 +8,10 @@ import {
   updateSearch,
 } from '../services/openUni/openUniManageSearches'
 import { getCustomOpenUniCourses } from '../services/openUni/openUniStats'
-import { OodikoneRequest } from '../types'
 
 const router = Router()
 
-interface GetSearchRequest extends OodikoneRequest {
+interface GetSearchRequest extends Request {
   query: {
     courselist: string
     startdate: string
@@ -31,13 +30,13 @@ router.get('/', async (req: GetSearchRequest, res: Response) => {
   return res.json(customOpenUniSearches)
 })
 
-router.get('/searches', async (req: OodikoneRequest, res: Response) => {
-  const userId = req.user!.id
+router.get('/searches', async (req: Request, res: Response) => {
+  const userId = req.user.id
   const foundSearches = await getOpenUniSearches(userId)
   return res.json(foundSearches)
 })
 
-interface CreateSearchRequest extends OodikoneRequest {
+interface CreateSearchRequest extends Request {
   body: {
     courselist: string[]
     name: string
@@ -47,7 +46,7 @@ interface CreateSearchRequest extends OodikoneRequest {
 router.post('/searches', async (req: CreateSearchRequest, res: Response) => {
   const courseCodes = req.body?.courselist || []
   const name = req.body?.name
-  const userId = req.user!.id
+  const userId = req.user.id
   if (!name) {
     return res.status(400).json({ error: 'Name missing' })
   }
@@ -67,7 +66,7 @@ router.post('/searches', async (req: CreateSearchRequest, res: Response) => {
   })
 })
 
-interface UpdateSearchRequest extends OodikoneRequest {
+interface UpdateSearchRequest extends Request {
   body: {
     courselist: string[]
   }
@@ -79,7 +78,7 @@ interface UpdateSearchRequest extends OodikoneRequest {
 router.put('/searches/:id', async (req: UpdateSearchRequest, res: Response) => {
   const id = req.params?.id
   const courseCodes = req.body?.courselist || []
-  const userId = req.user!.id
+  const userId = req.user.id
   if (!id || !userId) {
     return res.status(422).end()
   }
@@ -96,7 +95,7 @@ router.put('/searches/:id', async (req: UpdateSearchRequest, res: Response) => {
   })
 })
 
-interface DeleteSearchRequest extends OodikoneRequest {
+interface DeleteSearchRequest extends Request {
   params: {
     id: string
   }
@@ -104,7 +103,7 @@ interface DeleteSearchRequest extends OodikoneRequest {
 
 router.delete('/searches/:id', async (req: DeleteSearchRequest, res: Response) => {
   const id = req.params?.id
-  const userId = req.user!.id
+  const userId = req.user.id
   if (!id || !userId) {
     return res.status(422).end()
   }

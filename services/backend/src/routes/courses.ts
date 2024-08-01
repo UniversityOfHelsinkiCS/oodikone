@@ -1,14 +1,14 @@
 import crypto from 'crypto'
-import { Response, Router } from 'express'
+import { Request, Response, Router } from 'express'
 
 import { getCourseYearlyStats } from '../services/courses'
 import { getCoursesByNameAndOrCode, getCoursesByCodes } from '../services/courses/courseFinders'
-import { CourseWithSubsId, OodikoneRequest } from '../types'
+import { CourseWithSubsId } from '../types'
 import { getFullStudyProgrammeRights, hasFullAccessToStudentData, validateParamLength } from '../util'
 
 const router = Router()
 
-interface GetCoursesRequest extends OodikoneRequest {
+interface GetCoursesRequest extends Request {
   query: {
     name: string
     code: string
@@ -42,7 +42,7 @@ router.get('/v2/coursesmulti', async (req: GetCoursesRequest, res: Response) => 
   res.json(results)
 })
 
-interface GetCourseYearlyStatsRequest extends OodikoneRequest {
+interface GetCourseYearlyStatsRequest extends Request {
   query: {
     codes: string[]
     separate: string
@@ -51,7 +51,7 @@ interface GetCourseYearlyStatsRequest extends OodikoneRequest {
 }
 
 router.get('/v3/courseyearlystats', async (req: GetCourseYearlyStatsRequest, res: Response) => {
-  const { roles, programmeRights } = req.user!
+  const { roles, programmeRights } = req.user
 
   const userHasFullAccessToStudentData = hasFullAccessToStudentData(roles)
   const userHasCorrectRole = userHasFullAccessToStudentData || roles.includes('courseStatistics')
