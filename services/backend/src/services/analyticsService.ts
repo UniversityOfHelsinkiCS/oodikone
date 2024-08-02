@@ -20,7 +20,12 @@ const createRedisKeyForStudytrackStats = (id: string, graduated: string, special
   return `STUDYTRACK_STATS_${id}_${graduated}_${specialGroups}`
 }
 
-export const getBasicStats = async (id: string, combinedProgramme: string, yearType: string, specialGroups: string) => {
+export const getBasicStats = async (
+  id: string,
+  combinedProgramme: string | null,
+  yearType: string,
+  specialGroups: string
+) => {
   if (!isUpdatedNewProgramme(id)) {
     return null
   }
@@ -88,7 +93,7 @@ export const setCreditStats = async (data, isAcademicYear: boolean, specialGroup
 
 export const getGraduationStats = async (
   id: string,
-  combinedProgramme: string,
+  combinedProgramme: string | null,
   yearType: string,
   specialGroups: string
 ) => {
@@ -124,7 +129,7 @@ export const setGraduationStats = async (data, yearType: string, specialGroups: 
 
 export const getStudytrackStats = async (
   id: string,
-  combinedProgramme: string,
+  combinedProgramme: string | null,
   graduated: string,
   specialGroups: string
 ) => {
