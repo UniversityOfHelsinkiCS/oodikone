@@ -1,8 +1,8 @@
-const { Op } = require('sequelize')
+import { Op } from 'sequelize'
 
-const { StudyProgrammePin } = require('../models/kone')
+import { StudyProgrammePin } from '../models/kone'
 
-const findPinsByUserId = async userId => {
+const findPinsByUserId = async (userId: string) => {
   return await StudyProgrammePin.findOne({
     where: {
       userId: {
@@ -12,16 +12,15 @@ const findPinsByUserId = async userId => {
   })
 }
 
-const getStudyProgrammePins = async userId => {
+export const getStudyProgrammePins = async (userId: string) => {
   return await findPinsByUserId(userId)
 }
 
-const createStudyProgrammePin = async (userId, programmeCode) => {
+export const createStudyProgrammePin = async (userId: string, programmeCode: string) => {
   const existingPin = await findPinsByUserId(userId)
-
   if (!existingPin) {
     return await StudyProgrammePin.create({
-      userId,
+      userId: Number(userId),
       studyProgrammes: [programmeCode],
     })
   }
@@ -31,9 +30,8 @@ const createStudyProgrammePin = async (userId, programmeCode) => {
   return existingPin
 }
 
-const removeStudyProgrammePin = async (userId, programmeCode) => {
+export const removeStudyProgrammePin = async (userId: string, programmeCode: string) => {
   const existingPin = await findPinsByUserId(userId)
-
   if (!existingPin) {
     return null
   }
@@ -42,5 +40,3 @@ const removeStudyProgrammePin = async (userId, programmeCode) => {
   await existingPin.update({ studyProgrammes: updatedStudyProgrammes })
   return existingPin
 }
-
-module.exports = { createStudyProgrammePin, getStudyProgrammePins, removeStudyProgrammePin }
