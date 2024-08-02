@@ -125,13 +125,21 @@ const createGraphOptions = ({
   }
 }
 
-const sortCoursesByDate = courses =>
-  [...courses].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+const sortCoursesByDate = courses => {
+  return [...courses].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+}
 
-const filterCoursesByStudyPlan = (plan, courses) =>
-  !plan
-    ? courses
-    : courses.filter(({ course, course_code }) => plan.included_courses.includes(course_code || course.code))
+const filterCoursesByStudyPlan = (plan, courses) => {
+  if (!plan) {
+    return courses
+  }
+  return courses.filter(({ course_code }) => {
+    if (!course_code) {
+      return false
+    }
+    return plan.included_courses.includes(course_code)
+  })
+}
 
 const filterCoursesByDate = (courses, date) => courses.filter(course => moment(course.date).isSameOrAfter(moment(date)))
 
