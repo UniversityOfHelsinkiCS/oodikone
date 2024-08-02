@@ -27,8 +27,8 @@ const filterPersonalTags = (population: Record<string, any>, userId: string) => 
   }
 }
 
-const isEncryptedStudent = (student: string | EncryptedStudent) => {
-  return (student as EncryptedStudent).encryptedData !== undefined
+const isEncryptedStudent = (student?: string | EncryptedStudent) => {
+  return (student as EncryptedStudent)?.encryptedData !== undefined
 }
 
 type EncryptedStudent = { iv: string; encryptedData: string }
