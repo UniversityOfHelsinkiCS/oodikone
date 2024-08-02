@@ -28,6 +28,8 @@ services:
       - user-db
     env_file:
       - .env
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
     environment:
       DB_URL_KONE: postgres://postgres@kone-db:5432/kone-db
       DB_URL_USER: postgres://postgres@user-db:5432/user-db
@@ -42,6 +44,8 @@ services:
       SIS_HOST: ${SIS_HOST}
       SIS_GRAPHQL_APPLICATION_ACCOUNT: ${SIS_GRAPHQL_APPLICATION_ACCOUNT}
       SIS_GRAPHQL_APPLICATION_KEY: ${SIS_GRAPHQL_APPLICATION_KEY}
+      IMPORTER_DB_API_USER: dev_user
+      IMPORTER_DB_API_PASSWORD: dev_password
     ports:
       - 8080:8080
     volumes:
