@@ -133,11 +133,11 @@ const filterCoursesByStudyPlan = (plan, courses) => {
   if (!plan) {
     return courses
   }
-  return courses.filter(({ course_code }) => {
-    if (!course_code) {
+  return courses.filter(({ course, course_code }) => {
+    if (!course?.code && !course_code) {
       return false
     }
-    return plan.included_courses.includes(course_code)
+    return plan.included_courses.includes(course_code || course.code)
   })
 }
 
