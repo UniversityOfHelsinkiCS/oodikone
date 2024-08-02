@@ -175,6 +175,9 @@ router.get('/allgraduationstats', async (_req, res) => {
     unifyTotals(data.byGradYear.medians, universityData.byGradYear.medians, i === facultyCodes.length - 1)
     unifyProgrammeStats(universityData.byGradYear.programmes.medians, data.byGradYear.medians, facultyCode)
     for (const degree of degreeNames) {
+      if (!data.classSizes[degree]) {
+        continue
+      }
       if (!universityData.classSizes[degree]) {
         universityData.classSizes[degree] = data.classSizes[degree]
       } else {
