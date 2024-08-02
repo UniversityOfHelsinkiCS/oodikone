@@ -1,6 +1,7 @@
 const { CronJob } = require('cron')
 
 const { isProduction, runningInCI } = require('./config')
+const { getDegreeProgrammesOfFaculty } = require('./services/faculty/faculty')
 const { getFaculties } = require('./services/faculty/facultyHelpers')
 const { updateFacultyOverview, updateFacultyProgressOverview } = require('./services/faculty/facultyUpdates')
 const { computeLanguageCenterData, LANGUAGE_CENTER_REDIS_KEY } = require('./services/languageCenterData')
@@ -16,7 +17,7 @@ const { getProgrammesFromStudyRights, refreshAssociationsInRedis } = require('./
 const { findAndSaveTeachers } = require('./services/topteachers')
 const { deleteOutdatedUsers } = require('./services/userService')
 const logger = require('./util/logger')
-const { jobMaker } = require('./worker/queue')
+const { jobMaker, addToFlow } = require('./worker/queue')
 
 const schedule = (cronTime, func) => new CronJob({ cronTime, onTick: func, start: true, timeZone: 'Europe/Helsinki' })
 
@@ -30,6 +31,16 @@ const refreshFaculties = async () => {
   const faculties = await getFaculties()
   for (const faculty of faculties) {
     jobMaker.faculty(faculty.code)
+  }
+}
+
+const refreshProgrammesAndFaculties = async () => {
+  const facultyCodes = (await getFaculties()).map(faculty => faculty.code)
+  for (const faculty of facultyCodes) {
+    const programmeCodes = (await getDegreeProgrammesOfFaculty(faculty, true))
+      .map(prog => prog.code)
+      .filter(code => isRelevantProgramme(code))
+    await addToFlow(faculty, programmeCodes)
   }
 }
 
@@ -91,8 +102,7 @@ const refreshCloseToGraduating = async () => {
 const dailyJobs = async () => {
   try {
     await refreshStatistics()
-    await refreshProgrammes()
-    await refreshFaculties()
+    await refreshProgrammesAndFaculties()
     jobMaker.languagecenter()
     jobMaker.closeToGraduation()
   } catch (error) {

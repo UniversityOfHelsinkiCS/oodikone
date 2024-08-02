@@ -1,4 +1,4 @@
-const { Queue } = require('bullmq')
+const { Queue, FlowProducer } = require('bullmq')
 
 const { redis } = require('../config')
 
@@ -7,17 +7,25 @@ const connection = {
   port: 6379,
 }
 
-const queue = new Queue('refresh-redis-data', {
-  connection,
-  defaultJobOptions: {
-    attempts: 3,
-    removeOnComplete: true,
-    removeOnFail: true,
-    backoff: {
-      type: 'exponential',
-      delay: 60 * 1000,
-    },
+const defaultJobOptions = {
+  attempts: 3,
+  removeOnComplete: true,
+  removeOnFail: true,
+  backoff: {
+    type: 'exponential',
+    delay: 60 * 1000,
   },
+}
+
+const queueName = 'refresh-redis-data'
+
+const queue = new Queue(queueName, {
+  connection,
+  defaultJobOptions,
+})
+
+const flowProducer = new FlowProducer({
+  connection,
 })
 
 const addJob = (type, data, keep) => {
@@ -49,4 +57,36 @@ const jobMaker = {
   closeToGraduation: () => addJob('closeToGraduation'),
 }
 
-module.exports = { jobMaker, getJobs, removeWaitingJobs }
+const addToFlow = async (facultyCode, programmeCodes) => {
+  await flowProducer.add({
+    name: `faculty-${facultyCode}`,
+    data: {
+      code: facultyCode,
+    },
+    queueName,
+    children: programmeCodes.map(programmeCode => ({
+      name: `programme-${programmeCode}`,
+      data: {
+        code: programmeCode,
+      },
+      queueName,
+      opts: {
+        jobId: `programme-${programmeCode}`,
+        ...defaultJobOptions,
+      },
+    })),
+    opts: {
+      jobId: `faculty-${facultyCode}`,
+      ...defaultJobOptions,
+    },
+  })
+}
+
+module.exports = {
+  jobMaker,
+  getJobs,
+  removeWaitingJobs,
+  defaultJobOptions,
+  queueName,
+  addToFlow,
+}
