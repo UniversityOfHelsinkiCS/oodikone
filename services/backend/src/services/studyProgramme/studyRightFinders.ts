@@ -1,4 +1,4 @@
-import { Includeable, Op, col, fn } from 'sequelize'
+import { col, fn, Includeable, Op } from 'sequelize'
 
 import {
   ElementDetail,
@@ -94,7 +94,7 @@ export const getStudyTracksForProgramme = async (studyProgramme: string) => {
     )
 }
 
-export const getStudyRights = async students =>
+export const getStudyRights = async (studentNumbers: string[]) =>
   (
     await Studyright.findAll({
       attributes: [
@@ -111,7 +111,7 @@ export const getStudyRights = async students =>
         'semesterEnrollments',
       ],
       where: {
-        student_studentnumber: students,
+        student_studentnumber: studentNumbers,
       },
       include: [
         {
