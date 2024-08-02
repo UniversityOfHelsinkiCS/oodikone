@@ -56,8 +56,14 @@ cypress/videos/
 coverage/
 instrumented/
 
-# pycharm 
+# Pycharm 
 .idea
 
-# fd specific
+# VS Code
+.vscode/settings.json
+.vscode/tasks.json
+.vscode/launch.json
+.vscode/terminals.json
+
+# Funidata specific
 environments/
