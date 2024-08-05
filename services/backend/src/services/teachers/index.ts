@@ -1,39 +1,38 @@
-const { Op } = require('sequelize')
+import { Op, QueryTypes } from 'sequelize'
 
-const {
-  dbConnections: { sequelize },
-} = require('../database/connection')
-const { Credit, Course, Semester, Teacher } = require('../models')
-const { splitByEmptySpace } = require('../util')
+import { dbConnections } from '../../database/connection'
+import { Credit, Course, Semester, Teacher } from '../../models'
+import { CreditTypeCode } from '../../types'
+import { splitByEmptySpace } from '../../util'
+import { isRegularCourse } from './helpers'
 
-const likefy = term => `%${term}%`
+const likefy = (term: string) => `%${term}%`
 
-const nameLike = terms => ({
+const nameLike = (terms: string[]) => ({
   name: {
     [Op.and]: terms.map(term => ({ [Op.iLike]: likefy(term) })),
   },
 })
 
-const matchesId = searchTerm => ({ id: { [Op.eq]: searchTerm } })
+const matchesId = (searchTerm: string) => ({ id: { [Op.eq]: searchTerm } })
 
-const bySearchTerm = async rawTerm => {
-  const searchTerm = rawTerm.trim()
+export const getTeachersBySearchTerm = async (searchTerm: string) => {
   if (!searchTerm) {
     return []
   }
-  const terms = splitByEmptySpace(searchTerm)
+  const searchTerms = splitByEmptySpace(searchTerm)
   return Teacher.findAll({
     attributes: {
       exclude: ['createdAt', 'updatedAt'],
     },
     where: {
-      [Op.or]: [nameLike(terms), matchesId(searchTerm)],
+      [Op.or]: [nameLike(searchTerms), matchesId(searchTerm)],
     },
   })
 }
 
-const findTeacherCredits = teacherid =>
-  Teacher.findByPk(teacherid, {
+const findTeacherCredits = async (teacherId: string) => {
+  return await Teacher.findByPk(teacherId, {
     attributes: ['name', 'id'],
     include: {
       model: Credit,
@@ -51,17 +50,18 @@ const findTeacherCredits = teacherid =>
       ],
     },
   })
+}
 
-const parseCreditInfo = credit => ({
+const parseCreditInfo = (credit: Credit) => ({
   credits: credit.credits,
-  transferred: credit.credittypecode === 9,
+  transferred: credit.credittypecode === CreditTypeCode.APPROVED,
   passed: Credit.passed(credit) || Credit.improved(credit),
   failed: Credit.failed(credit),
   course: credit.course,
   semester: credit.semester,
 })
 
-const markCredit = (stats, passed, failed, credits, transferred) => {
+const markCredit = (stats, credits: number, passed: boolean, failed: boolean, transferred: boolean) => {
   if (!stats) {
     stats = { passed: 0, failed: 0, credits: 0, transferred: 0 }
   }
@@ -76,15 +76,15 @@ const markCredit = (stats, passed, failed, credits, transferred) => {
   return stats
 }
 
-const parseAndMarkCredit = (stats, key, credit) => {
+const parseAndMarkCredit = (stats, key, credit: Credit) => {
   const { passed, failed, credits, transferred } = parseCreditInfo(credit)
   return {
     ...stats,
-    [key]: markCredit(stats[key], passed, failed, credits, transferred),
+    [key]: markCredit(stats[key], credits, passed, failed, transferred),
   }
 }
 
-const markCreditForSemester = (semesters, credit) => {
+const markCreditForSemester = (semesters, credit: Credit) => {
   const { passed, failed, credits, semester, transferred } = parseCreditInfo(credit)
   const { semestercode, name } = semester
   const { stats, ...rest } = semesters[semestercode] || { id: semestercode, name }
@@ -92,12 +92,12 @@ const markCreditForSemester = (semesters, credit) => {
     ...semesters,
     [semestercode]: {
       ...rest,
-      stats: markCredit(stats, passed, failed, credits, transferred),
+      stats: markCredit(stats, credits, passed, failed, transferred),
     },
   }
 }
 
-const markCreditForYear = (years, credit) => {
+const markCreditForYear = (years, credit: Credit) => {
   const { passed, failed, credits, semester, transferred } = parseCreditInfo(credit)
   const { yearcode, yearname } = semester
   const { stats, ...rest } = years[yearcode] || { id: yearcode, name: yearname }
@@ -105,12 +105,12 @@ const markCreditForYear = (years, credit) => {
     ...years,
     [yearcode]: {
       ...rest,
-      stats: markCredit(stats, passed, failed, credits, transferred),
+      stats: markCredit(stats, credits, passed, failed, transferred),
     },
   }
 }
 
-const markCreditForCourse = (courses, credit) => {
+const markCreditForCourse = (courses, credit: Credit) => {
   const { passed, failed, credits, course, semester, transferred } = parseCreditInfo(credit)
   const { code, name } = course
   const { semestercode } = semester
@@ -119,22 +119,23 @@ const markCreditForCourse = (courses, credit) => {
     ...courses,
     [code]: {
       ...rest,
-      semesters: parseAndMarkCredit(semesters, semestercode, credit, transferred),
-      stats: markCredit(stats, passed, failed, credits, transferred),
+      semesters: parseAndMarkCredit(semesters, semestercode, credit),
+      stats: markCredit(stats, credits, passed, failed, transferred),
     },
   }
 }
 
-const isRegularCourse = credit => !credit.isStudyModule
-
-const teacherStats = async teacherid => {
-  const teacher = await findTeacherCredits(teacherid)
+export const getTeacherStatistics = async (teacherId: string) => {
+  const teacher = await findTeacherCredits(teacherId)
+  if (!teacher) {
+    return null
+  }
   const statistics = teacher.credits.filter(isRegularCourse).reduce(
     ({ semesters, years, courses, ...rest }, credit) => ({
       ...rest,
       semesters: markCreditForSemester(semesters, credit),
-      years: markCreditForYear(years, credit),
       courses: markCreditForCourse(courses, credit),
+      years: markCreditForYear(years, credit),
     }),
     {
       semesters: {},
@@ -149,8 +150,8 @@ const teacherStats = async teacherid => {
   }
 }
 
-const getActiveTeachers = async (providers, startSemester, endSemester) => {
-  const [result] = await sequelize.query(
+const getActiveTeachers = async (providers: string[], startSemester: number, endSemester: number) => {
+  const queryResult: Array<{ id: string }> = await dbConnections.sequelize.query(
     `
     SELECT DISTINCT teacher.id
     FROM teacher
@@ -163,13 +164,39 @@ const getActiveTeachers = async (providers, startSemester, endSemester) => {
       AND organization.code IN (:providers)
       AND teacher.id NOT LIKE 'hy-hlo-org%'
     `,
-    { replacements: { providers, startSemester, endSemester } }
+    {
+      replacements: { providers, startSemester, endSemester },
+      type: QueryTypes.SELECT,
+    }
   )
-  return result.map(({ id }) => id)
+  return queryResult.map(({ id }) => id)
 }
 
-const getTeacherCredits = async (teacherIds, startSemester, endSemester) => {
-  const [result] = await sequelize.query(
+type TeacherWithCredits = {
+  name: string
+  id: string
+  passed: number
+  failed: number
+  transferred: number
+  credits: number
+}
+
+type TeacherCredits = Record<
+  string,
+  {
+    name: string
+    id: string
+    stats: {
+      passed: number
+      failed: number
+      transferred: number
+      credits: number
+    }
+  }
+>
+
+const getTeacherCredits = async (teacherIds: string[], startSemester: number, endSemester: number) => {
+  const queryResult: Array<TeacherWithCredits> = await dbConnections.sequelize.query(
     `
     SELECT teacher.name,
       teacher.id,
@@ -186,25 +213,26 @@ const getTeacherCredits = async (teacherIds, startSemester, endSemester) => {
     GROUP BY teacher.name,
       teacher.id
     `,
-    { replacements: { teacherIds, startSemester, endSemester } }
+    {
+      replacements: { teacherIds, startSemester, endSemester },
+      type: QueryTypes.SELECT,
+    }
   )
-  return result.reduce((acc, { name, id, passed, failed, transferred, credits }) => {
+  return queryResult.reduce((acc, { name, id, passed, failed, transferred, credits }) => {
     acc[id] = { name, id, stats: { passed, failed, transferred, credits } }
     return acc
-  }, {})
+  }, {} as TeacherCredits)
 }
 
-const yearlyStatistics = async (providers, startSemester, endSemester) => {
-  const ids = await getActiveTeachers(providers, startSemester, endSemester)
-  if (!ids || ids.length === 0) {
-    return []
+export const getYearlyStatistics = async (
+  providers: string[],
+  startSemester: number,
+  endSemester: number = startSemester + 1
+) => {
+  const teacherIds = await getActiveTeachers(providers, startSemester, endSemester)
+  if (!teacherIds || teacherIds.length === 0) {
+    return {}
   }
-  const teacherCredits = await getTeacherCredits(ids, startSemester, endSemester)
+  const teacherCredits = await getTeacherCredits(teacherIds, startSemester, endSemester)
   return teacherCredits
-}
-
-module.exports = {
-  bySearchTerm,
-  teacherStats,
-  yearlyStatistics,
 }
