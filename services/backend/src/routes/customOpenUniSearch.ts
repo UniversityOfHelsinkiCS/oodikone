@@ -1,5 +1,4 @@
 import { Request, Response, Router } from 'express'
-import moment from 'moment-timezone'
 
 import {
   getOpenUniSearches,
@@ -21,12 +20,16 @@ interface GetSearchRequest extends Request {
 
 router.get('/', async (req: GetSearchRequest, res: Response) => {
   const courseCodes = JSON.parse(req.query?.courselist as string) || []
-  const startdate = req.query?.startdate || moment('01-08-2017 00:00:00', 'DD-MM-YYYY')
-  const enddate = req.query?.enddate || moment().endOf('day')
+  const startDate = req.query?.startdate !== 'null' ? new Date(req.query.startdate) : new Date(2017, 7, 1, 0, 0, 0)
+  const endDate = req.query?.enddate !== 'null' ? new Date(req.query.enddate) : new Date()
+  if (req.query?.enddate === 'null') {
+    endDate.setHours(23, 59, 59, 999)
+  }
+
   if (!Array.isArray(courseCodes)) {
     return res.status(400).json({ error: 'Courses must be of type array' })
   }
-  const customOpenUniSearches = await getCustomOpenUniCourses(courseCodes, startdate, enddate)
+  const customOpenUniSearches = await getCustomOpenUniCourses(courseCodes, startDate, endDate)
   return res.json(customOpenUniSearches)
 })
 
