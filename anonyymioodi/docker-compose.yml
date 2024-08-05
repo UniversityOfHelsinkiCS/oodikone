@@ -9,7 +9,7 @@ services:
       PGDATA: /data
       POSTGRES_DB: kone-db
       POSTGRES_HOST_AUTH_METHOD: trust
-    image: postgres:15.7
+    image: postgres:16.3
     profiles:
       - oodikone
 
@@ -20,7 +20,7 @@ services:
       PGDATA: /data
       POSTGRES_DB: sis-db
       POSTGRES_HOST_AUTH_METHOD: trust
-    image: postgres:15.7
+    image: postgres:16.3
     shm_size: 2gb
 
   sis-importer-db:
@@ -30,7 +30,7 @@ services:
       PGDATA: /data
       POSTGRES_DB: sis-importer-db
       POSTGRES_HOST_AUTH_METHOD: trust
-    image: postgres:15.7
+    image: postgres:16.3
     profiles:
       - updater
 
@@ -41,6 +41,6 @@ services:
       PGDATA: /data
       POSTGRES_DB: user-db
       POSTGRES_HOST_AUTH_METHOD: trust
-    image: postgres:15.7
+    image: postgres:16.3
     profiles:
       - oodikone
