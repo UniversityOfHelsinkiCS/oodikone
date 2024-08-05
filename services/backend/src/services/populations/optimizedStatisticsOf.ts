@@ -1,4 +1,4 @@
-import moment from 'moment'
+import moment from 'moment-timezone'
 
 import { Criteria, Name } from '../../types'
 import { getCriteria } from '../studyProgramme/studyProgrammeCriteria'
