@@ -61,7 +61,7 @@ const parseCreditInfo = (credit: Credit) => ({
   semester: credit.semester,
 })
 
-const markCredit = (stats, passed, failed, credits, transferred) => {
+const markCredit = (stats, credits: number, passed: boolean, failed: boolean, transferred: boolean) => {
   if (!stats) {
     stats = { passed: 0, failed: 0, credits: 0, transferred: 0 }
   }
@@ -76,15 +76,15 @@ const markCredit = (stats, passed, failed, credits, transferred) => {
   return stats
 }
 
-const parseAndMarkCredit = (stats, key, credit) => {
+const parseAndMarkCredit = (stats, key, credit: Credit) => {
   const { passed, failed, credits, transferred } = parseCreditInfo(credit)
   return {
     ...stats,
-    [key]: markCredit(stats[key], passed, failed, credits, transferred),
+    [key]: markCredit(stats[key], credits, passed, failed, transferred),
   }
 }
 
-const markCreditForSemester = (semesters, credit) => {
+const markCreditForSemester = (semesters, credit: Credit) => {
   const { passed, failed, credits, semester, transferred } = parseCreditInfo(credit)
   const { semestercode, name } = semester
   const { stats, ...rest } = semesters[semestercode] || { id: semestercode, name }
@@ -92,12 +92,12 @@ const markCreditForSemester = (semesters, credit) => {
     ...semesters,
     [semestercode]: {
       ...rest,
-      stats: markCredit(stats, passed, failed, credits, transferred),
+      stats: markCredit(stats, credits, passed, failed, transferred),
     },
   }
 }
 
-const markCreditForYear = (years, credit) => {
+const markCreditForYear = (years, credit: Credit) => {
   const { passed, failed, credits, semester, transferred } = parseCreditInfo(credit)
   const { yearcode, yearname } = semester
   const { stats, ...rest } = years[yearcode] || { id: yearcode, name: yearname }
@@ -105,12 +105,12 @@ const markCreditForYear = (years, credit) => {
     ...years,
     [yearcode]: {
       ...rest,
-      stats: markCredit(stats, passed, failed, credits, transferred),
+      stats: markCredit(stats, credits, passed, failed, transferred),
     },
   }
 }
 
-const markCreditForCourse = (courses, credit) => {
+const markCreditForCourse = (courses, credit: Credit) => {
   const { passed, failed, credits, course, semester, transferred } = parseCreditInfo(credit)
   const { code, name } = course
   const { semestercode } = semester
@@ -119,8 +119,8 @@ const markCreditForCourse = (courses, credit) => {
     ...courses,
     [code]: {
       ...rest,
-      semesters: parseAndMarkCredit(semesters, semestercode, credit, transferred),
-      stats: markCredit(stats, passed, failed, credits, transferred),
+      semesters: parseAndMarkCredit(semesters, semestercode, credit),
+      stats: markCredit(stats, credits, passed, failed, transferred),
     },
   }
 }
@@ -134,8 +134,8 @@ export const getTeacherStatistics = async (teacherId: string) => {
     ({ semesters, years, courses, ...rest }, credit) => ({
       ...rest,
       semesters: markCreditForSemester(semesters, credit),
-      years: markCreditForYear(years, credit),
       courses: markCreditForCourse(courses, credit),
+      years: markCreditForYear(years, credit),
     }),
     {
       semesters: {},

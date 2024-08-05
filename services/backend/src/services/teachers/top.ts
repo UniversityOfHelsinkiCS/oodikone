@@ -1,10 +1,12 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { Op } from 'sequelize'
 
 import { Course, Credit, Semester, Teacher } from '../../models'
+import { CreditTypeCode } from '../../types'
 import logger from '../../util/logger'
 import { redisClient } from '../redis'
 import { getCurrentSemester, getSemestersAndYears } from '../semesters'
-import { CreditsWithTeachersForYear, isRegularCourse } from './helpers'
+import { isRegularCourse } from './helpers'
 
 export enum CategoryID {
   ALL = 'all',
@@ -37,7 +39,7 @@ export const getCategoriesAndYears = async () => {
 }
 
 const getCreditsWithTeachersForYear = async (yearCode: number) => {
-  const credits: CreditsWithTeachersForYear[] = await Credit.findAll({
+  const credits = await Credit.findAll({
     attributes: ['id', 'credits', 'credittypecode', 'isStudyModule', 'is_open'],
     include: [
       {
@@ -65,9 +67,18 @@ const getCreditsWithTeachersForYear = async (yearCode: number) => {
   return credits
 }
 
-const updatedStats = (statistics, teacher, passed, failed, credits, transferred) => {
+type TeacherStats = { id: string; name: string; passed: number; failed: number; credits: number; transferred: number }
+
+const updatedStats = (
+  teacherStats: Record<string, TeacherStats>,
+  teacher: { id: string; name: string },
+  credits: number,
+  passed: boolean,
+  failed: boolean,
+  transferred: boolean
+) => {
   const { id, name } = teacher
-  const stats = statistics[id] || { id, name, passed: 0, failed: 0, credits: 0, transferred: 0 }
+  const stats = teacherStats[id] || { id, name, passed: 0, failed: 0, credits: 0, transferred: 0 }
   if (passed) {
     return {
       ...stats,
@@ -85,19 +96,20 @@ const updatedStats = (statistics, teacher, passed, failed, credits, transferred)
   return stats
 }
 
-const filterTopTeachers = (stats, limit: number = 50) =>
-  Object.values(stats)
+const filterTopTeachers = (stats: Record<string, TeacherStats>, limit: number = 50) => {
+  return Object.values(stats)
     .sort((t1, t2) => t2.credits - t1.credits)
     .slice(0, limit)
     .map(({ credits, ...rest }) => ({
       ...rest,
       credits: Math.floor(credits),
     }))
+}
 
 const findTopTeachers = async (yearCode: number) => {
   const credits = await getCreditsWithTeachersForYear(yearCode)
-  const all = {}
-  const openuni = {}
+  const all = {} as Record<string, TeacherStats>
+  const openuni = {} as Record<string, TeacherStats>
   credits
     .filter(isRegularCourse)
     .map(credit => {
@@ -107,15 +119,15 @@ const findTopTeachers = async (yearCode: number) => {
         .map(({ id, name }) => ({ id, name }))
       const passed = Credit.passed(credit) || Credit.improved(credit)
       const failed = Credit.failed(credit)
-      const transferred = credittypecode === 9
+      const transferred = credittypecode === CreditTypeCode.APPROVED
       return { passed, failed, credits, teachers, is_open, transferred }
     })
     .forEach(credit => {
       const { passed, failed, credits, teachers, is_open, transferred } = credit
       teachers.forEach(teacher => {
-        all[teacher.id] = updatedStats(all, teacher, passed, failed, credits, transferred)
+        all[teacher.id] = updatedStats(all, teacher, credits, passed, failed, transferred)
         if (is_open) {
-          openuni[teacher.id] = updatedStats(openuni, teacher, passed, failed, credits, transferred)
+          openuni[teacher.id] = updatedStats(openuni, teacher, credits, passed, failed, transferred)
         }
       })
     })

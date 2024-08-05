@@ -1,15 +1,14 @@
-import { Response, Router } from 'express'
+import { Request, Response, Router } from 'express'
 
 import { getProvidersOfFaculty, isFaculty } from '../services/organizations'
 import { getTeachersBySearchTerm, getTeacherStatistics, getYearlyStatistics } from '../services/teachers'
 import { CategoryID, getTeacherStats, findAndSaveTeachers, getCategoriesAndYears } from '../services/teachers/top'
-import { OodikoneRequest } from '../types'
 import { getFullStudyProgrammeRights, splitByEmptySpace } from '../util'
 import { mapToProviders } from '../util/map'
 
 const router = Router()
 
-interface GetTeachersRequest extends OodikoneRequest {
+interface GetTeachersRequest extends Request {
   query: {
     searchTerm: string
   }
@@ -32,7 +31,7 @@ router.get('/', async (req: GetTeachersRequest, res: Response) => {
   res.json(result)
 })
 
-interface GetTopTeachersRequest extends OodikoneRequest {
+interface GetTopTeachersRequest extends Request {
   query: {
     yearcode: string
     category?: string
@@ -49,7 +48,7 @@ router.get('/top', async (req: GetTopTeachersRequest, res: Response) => {
   res.json(result)
 })
 
-interface PostTopTeachersRequest extends OodikoneRequest {
+interface PostTopTeachersRequest extends Request {
   body: {
     startyearcode: string
     endyearcode: string
@@ -62,12 +61,12 @@ router.post('/top', async (req: PostTopTeachersRequest, res: Response) => {
   await findAndSaveTeachers(Number(endyearcode), Number(startyearcode))
 })
 
-router.get('/top/categories', async (_req: OodikoneRequest, res: Response) => {
+router.get('/top/categories', async (_req: Request, res: Response) => {
   const result = await getCategoriesAndYears()
   res.json(result)
 })
 
-interface GetTeacherStatsRequest extends OodikoneRequest {
+interface GetTeacherStatsRequest extends Request {
   query: {
     providers?: string[]
     semesterStart?: string
@@ -76,7 +75,7 @@ interface GetTeacherStatsRequest extends OodikoneRequest {
 }
 
 router.get('/stats', async (req: GetTeacherStatsRequest, res: Response) => {
-  const { roles, programmeRights } = req.user!
+  const { roles, programmeRights } = req.user
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
 
   const { providers, semesterStart, semesterEnd } = req.query
@@ -107,7 +106,7 @@ router.get('/stats', async (req: GetTeacherStatsRequest, res: Response) => {
   res.json(result)
 })
 
-interface GetTeacherByIdRequest extends OodikoneRequest {
+interface GetTeacherByIdRequest extends Request {
   params: {
     id: string
   }
