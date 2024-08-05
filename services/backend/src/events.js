@@ -1,6 +1,7 @@
 const { CronJob } = require('cron')
 
 const { isProduction, runningInCI } = require('./config')
+const { getDegreeProgrammesOfFaculty } = require('./services/faculty/faculty')
 const { getFaculties } = require('./services/faculty/facultyHelpers')
 const { updateFacultyOverview, updateFacultyProgressOverview } = require('./services/faculty/facultyUpdates')
 const { computeLanguageCenterData, LANGUAGE_CENTER_REDIS_KEY } = require('./services/languageCenterData')
@@ -12,11 +13,11 @@ const { redisClient } = require('./services/redis')
 const { getCurrentSemester } = require('./services/semesters')
 const { combinedStudyprogrammes, isRelevantProgramme } = require('./services/studyProgramme/studyProgrammeHelpers')
 const { updateBasicView, updateStudytrackView } = require('./services/studyProgramme/studyProgrammeUpdates')
-const { getAssociations, getProgrammesFromStudyRights, refreshAssociationsInRedis } = require('./services/studyrights')
+const { getProgrammesFromStudyRights, refreshAssociationsInRedis } = require('./services/studyrights')
 const { findAndSaveTeachers } = require('./services/teachers/top')
 const { deleteOutdatedUsers } = require('./services/userService')
 const logger = require('./util/logger')
-const { jobMaker } = require('./worker/queue')
+const { jobMaker, addToFlow } = require('./worker/queue')
 
 const schedule = (cronTime, func) => new CronJob({ cronTime, onTick: func, start: true, timeZone: 'Europe/Helsinki' })
 
@@ -33,6 +34,16 @@ const refreshFaculties = async () => {
   }
 }
 
+const refreshProgrammesAndFaculties = async () => {
+  const facultyCodes = (await getFaculties()).map(faculty => faculty.code)
+  for (const faculty of facultyCodes) {
+    const programmeCodes = (await getDegreeProgrammesOfFaculty(faculty, true))
+      .map(prog => prog.code)
+      .filter(code => isRelevantProgramme(code))
+    await addToFlow(faculty, programmeCodes)
+  }
+}
+
 const refreshFaculty = async code => {
   await updateFacultyOverview(code, 'ALL')
   await updateFacultyProgressOverview(code)
@@ -44,8 +55,6 @@ const refreshProgrammes = async () => {
   const programmes = await getProgrammesFromStudyRights()
   const codes = programmes.map(programme => programme.code).filter(code => isRelevantProgramme(code))
 
-  // Ensure that studyright associations are refreshed before launching jobs, otherwise each job will do it
-  await getAssociations()
   for (const code of codes) {
     // If combined programme is given, this updates only the bachelor programme
     jobMaker.programme(code)
@@ -90,11 +99,15 @@ const refreshCloseToGraduating = async () => {
   logger.info('Students close to graduating updated!')
 }
 
-const dailyJobs = () => {
-  refreshFaculties()
-  refreshProgrammes()
-  jobMaker.languagecenter()
-  jobMaker.statistics()
+const dailyJobs = async () => {
+  try {
+    await refreshStatistics()
+    await refreshProgrammesAndFaculties()
+    jobMaker.languagecenter()
+    jobMaker.closeToGraduation()
+  } catch (error) {
+    logger.error('Daily jobs failed', error)
+  }
 }
 
 const startCron = () => {
@@ -102,22 +115,18 @@ const startCron = () => {
     logger.info('Cronjob for refreshing stats started: runs daily at 23:00.')
     schedule('0 23 * * *', async () => {
       logger.info('Running daily jobs from cron')
-      dailyJobs()
-    })
-    // This needs to be its own job because refreshing study right associations in `refreshStatistics` causes some study right info to be not available, causing this job to fail
-    schedule('0 3 * * *', async () => {
-      jobMaker.closeToGraduation()
+      await dailyJobs()
     })
     schedule('0 4 * * 3', async () => {
       logger.info("Deleting users who haven't logged in for 18 months")
       const [, result] = await deleteOutdatedUsers()
       logger.info(`Deleted ${result.rowCount} users.`)
     })
-    schedule('0 19 * * 1', async () => {
+    schedule('0 19 * * 1', () => {
       logger.info('Updating students whose studyplans have not been updated recently')
       jobMaker.studyplansUpdate(4)
     })
-    schedule('0 10 * * 2', async () => {
+    schedule('0 10 * * 2', () => {
       logger.info('Updating students whose studyplans have not been updated recently')
       jobMaker.studyplansUpdate(5)
     })

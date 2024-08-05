@@ -436,7 +436,7 @@ const updateElementDetails = async studyRights => {
   // Sort to avoid deadlocks
   await bulkCreate(
     ElementDetail,
-    sortedUniqBy(sortBy([...mappedProgrammes, ...mappedStudytracks], ['code']), e => e.code),
+    sortedUniqBy(sortBy([...mappedProgrammes, ...mappedStudytracks], ['code']), element => element.code),
     null,
     ['code']
   )

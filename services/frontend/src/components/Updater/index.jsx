@@ -57,13 +57,13 @@ export const Updater = () => {
       <Message style={{ fontSize: '1.1rem' }}>
         <Button icon="refresh" onClick={updateJobs} size="big" />
         <p>Jobs running: {jobs.active?.length}</p>
-        <ul style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, 1fr)' }}>
+        <ul style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))' }}>
           {jobs.active.map(job => (
             <li key={job.name}>{job.name}</li>
           ))}
         </ul>
         <p>Jobs waiting: {jobs.waiting?.length}</p>
-        <ul style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, 1fr)' }}>
+        <ul style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))' }}>
           {jobs.waiting.map(job => (
             <li key={job.name}>{job.name}</li>
           ))}

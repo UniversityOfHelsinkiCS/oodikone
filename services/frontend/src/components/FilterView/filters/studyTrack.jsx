@@ -72,23 +72,9 @@ export const studyTrackFilter = createFilter({
     selected: [],
   },
   isActive: ({ selected }) => (selected !== undefined ? selected.length > 0 : false),
-  filter: (student, { selected, args }) => {
-    const activeAt = get(args, 'activeAt', moment())
-
+  filter: (student, { selected }) => {
     return student.studyrights
-      .filter(({ studyright_elements, graduated }) =>
-        studyright_elements.some(
-          element =>
-            element.element_detail.type === 30 &&
-            (!activeAt ||
-              moment(activeAt).isBetween(
-                moment(element.startdate),
-                graduated ? moment() : moment(element.enddate),
-                'day',
-                '[]'
-              ))
-        )
-      )
+      .filter(({ studyright_elements }) => studyright_elements.some(element => element.element_detail.type === 30))
       .flatMap(({ studyright_elements }) => studyright_elements)
       .map(element => element.element_detail.code)
       .some(code => selected.includes(code))

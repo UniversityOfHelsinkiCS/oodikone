@@ -60,7 +60,7 @@ export const ColorizedCoursesTable = ({ fetchDataHook, studyProgramme, title, pa
     },
   ]
 
-  const displayedPanes = panes.map(tab => possiblePanes.find(t => t.name === tab))
+  const displayedPanes = panes.map(tab => possiblePanes.find(pane => pane.name === tab))
 
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
 

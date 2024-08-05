@@ -28,8 +28,8 @@ export const MedianTimeBarChart = ({ data, goal, title, byStartYear }) => {
   }
 
   const getHeight = () => {
-    const t = data.length > 8 ? 35 : 55
-    return data.length * t + 100
+    const multiplier = data.length > 8 ? 35 : 55
+    return data.length * multiplier + 100
   }
 
   const getTooltipText = (amount, y, year, statistics, classSize) => {

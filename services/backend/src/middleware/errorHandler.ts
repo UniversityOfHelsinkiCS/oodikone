@@ -1,11 +1,10 @@
 import * as Sentry from '@sentry/node'
-import { NextFunction, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 
-import { OodikoneRequest } from '../types'
 import { ApplicationError } from '../util/customErrors'
 import logger from '../util/logger'
 
-const errorHandler = (error: any, _req: OodikoneRequest, res: Response, next: NextFunction) => {
+const errorHandler = (error: any, _req: Request, res: Response, next: NextFunction) => {
   logger.error(error.message, { error })
   Sentry.captureException(error)
 

@@ -36,9 +36,10 @@
       },
       "rules": {
         "import/prefer-default-export": "off",
+        "@typescript-eslint/lines-between-class-members": "off",
         "@typescript-eslint/no-explicit-any": "off",
-        "@typescript-eslint/return-await": "off",
-        "@typescript-eslint/no-shadow": "off"
+        "@typescript-eslint/no-shadow": "off",
+        "@typescript-eslint/return-await": "off"
       }
     }
   ],
@@ -48,6 +49,7 @@
     "cypress/no-assigning-return-values": "off",
     "cypress/unsafe-to-chain-command": "off",
     "default-param-last": "off",
+    "id-denylist": ["error", "c", "d", "e", "err", "t"],
     "import/extensions": ["error", "never"],
     "import/order": [
       "error",

@@ -2,6 +2,7 @@ const { orderBy, range } = require('lodash')
 const { Op } = require('sequelize')
 
 const { Credit, Enrollment } = require('../../models')
+const { isOpenUniCourseCode } = require('../../util')
 const { mapToProviders } = require('../../util/map')
 const { createArrayOfCourses } = require('../languageCenterData')
 const {
@@ -16,8 +17,6 @@ const { getCurrentStudyYearStartDate, getNotCompletedForProgrammeCourses, getAll
 const getCurrentYearStartDate = () => {
   return new Date(new Date().getFullYear(), 0, 1)
 }
-
-const isOpenUniCourseCode = code => code.match(/^AY?(.+?)(?:en|fi|sv)?$/)
 
 const getAllStudyprogrammeCourses = async studyprogramme => {
   const providerCode = mapToProviders([studyprogramme])[0]
@@ -64,9 +63,9 @@ const makeYearlyPromises = (years, academicYear, type, programmeCourses, studypr
         }
 
         res(
-          result.map(c => {
-            c.year = year
-            return c
+          result.map(course => {
+            course.year = year
+            return course
           })
         )
       })

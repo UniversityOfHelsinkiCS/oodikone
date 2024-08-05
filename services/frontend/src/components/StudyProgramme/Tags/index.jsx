@@ -167,7 +167,7 @@ export const Tags = ({ studyprogramme, combinedProgramme }) => {
             <Button
               color="green"
               content="Create a new tag"
-              disabled={!tagname.trim() || tags.some(t => t.tagname === tagname.trim())}
+              disabled={!tagname.trim() || tags.some(tag => tag.tagname === tagname.trim())}
               onClick={handleSubmit}
             />
             <TagModal combinedProgramme={combinedProgramme} studytrack={studyprogramme} tags={tags} />

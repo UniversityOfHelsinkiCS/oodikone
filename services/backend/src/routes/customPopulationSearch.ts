@@ -1,4 +1,4 @@
-import { Response, Router } from 'express'
+import { Request, Response, Router } from 'express'
 
 import {
   getCustomPopulationSearchesByUser,
@@ -6,21 +6,18 @@ import {
   updateCustomPopulationSearch,
   deleteCustomPopulationSearch,
 } from '../services/customPopulationSearch'
-import { OodikoneRequest } from '../types'
 
 const router = Router()
 
-router.get('/', async (req: OodikoneRequest, res: Response) => {
-  const { id } = req.user!
+router.get('/', async (req: Request, res: Response) => {
+  const { id } = req.user
   const customPopulationSearches = await getCustomPopulationSearchesByUser(id)
   res.json(customPopulationSearches)
 })
 
-router.post('/', async (req: OodikoneRequest, res: Response) => {
-  const {
-    user,
-    body: { name, students },
-  } = req
+router.post('/', async (req: Request, res: Response) => {
+  const { name, students } = req.body
+  const { id } = req.user
 
   if (!name) {
     return res.status(400).json({ error: 'Name missing' })
@@ -29,17 +26,14 @@ router.post('/', async (req: OodikoneRequest, res: Response) => {
     return res.status(400).json({ error: 'Students must be of type array' })
   }
 
-  const { id } = user!
   const customPopulationSearch = await createCustomPopulationSearch(name, id, students || [])
   res.json(customPopulationSearch)
 })
 
-router.put('/:id', async (req: OodikoneRequest, res: Response) => {
-  const {
-    body: { students },
-  } = req
+router.put('/:id', async (req: Request, res: Response) => {
+  const { students } = req.body
   const { id } = req.params
-  const userId = req.user!.id
+  const userId = req.user.id
 
   if (!id) {
     return res.status(400).json({ error: 'Id missing' })
@@ -59,9 +53,9 @@ router.put('/:id', async (req: OodikoneRequest, res: Response) => {
   res.json(updatedPopulationSearch)
 })
 
-router.delete('/:id', async (req: OodikoneRequest, res: Response) => {
+router.delete('/:id', async (req: Request, res: Response) => {
   const { id } = req.params
-  const userId = req.user!.id
+  const userId = req.user.id
 
   if (!id) {
     return res.status(400).json({ error: 'Id missing' })

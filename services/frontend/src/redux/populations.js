@@ -70,9 +70,6 @@ const populationApi = RTKApi.injectEndpoints({
     getProgrammes: builder.query({
       query: () => '/v3/populationstatistics/studyprogrammes',
     }),
-    getUnfilteredProgrammes: builder.query({
-      query: () => '/v3/populationstatistics/studyprogrammes/unfiltered',
-    }),
   }),
   overrideExisting: false,
 })
@@ -82,7 +79,6 @@ export const {
   useGetPopulationStatisticsByCourseQuery,
   useGetMaxYearsToCreatePopulationFromQuery,
   useGetProgrammesQuery,
-  useGetUnfilteredProgrammesQuery,
 } = populationApi
 
 export const clearPopulations = () => ({

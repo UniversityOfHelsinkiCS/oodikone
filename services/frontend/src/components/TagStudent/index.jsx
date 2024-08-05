@@ -24,9 +24,9 @@ export const TagStudent = ({ studentnumber, studentstags, studytrack, tagOptions
     deleteStudentTags({ tagId: tag.tag_id, studentnumbers: [studentnumber], studytrack, combinedProgramme })
   }
 
-  const studentsTags = studentstags.map(t => (
-    <Label color={t.tag.personal_user_id ? 'purple' : null} key={`${studentnumber}-${t.tag.tag_id}`}>
-      {t.tag.tagname} <Icon link name="delete" onClick={() => deleteTag(t.tag)} />
+  const studentsTags = studentstags.map(studentTag => (
+    <Label color={studentTag.tag.personal_user_id ? 'purple' : null} key={`${studentnumber}-${studentTag.tag.tag_id}`}>
+      {studentTag.tag.tagname} <Icon link name="delete" onClick={() => deleteTag(studentTag.tag)} />
     </Label>
   ))
 

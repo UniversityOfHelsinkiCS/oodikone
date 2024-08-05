@@ -1,40 +1,48 @@
-const moment = require('moment')
+import moment from 'moment-timezone'
 
-const { getCriteria } = require('../studyProgramme/studyProgrammeCriteria')
-const { getStudentsIncludeCoursesBetween } = require('./getStudentsIncludeCoursesBetween')
-const {
+import { Criteria, Name } from '../../types'
+import { getCriteria } from '../studyProgramme/studyProgrammeCriteria'
+import { getStudentsIncludeCoursesBetween } from './getStudentsIncludeCoursesBetween'
+import {
   dateMonthsFromNow,
   formatQueryParamsToArrays,
   formatStudentsForApi,
   getOptionsForStudents,
   parseQueryParams,
-} = require('./shared')
-const { studentnumbersWithAllStudyrightElements } = require('./studentnumbersWithAllStudyrightElements')
+} from './shared'
+import { getStudentNumbersWithAllStudyRightElements } from './studentNumbersWithAllElements'
 
-const optimizedStatisticsOf = async (query, studentnumberlist) => {
+type Query = {
+  year?: number
+  studyRights?: string[] | { programme: string }
+  semesters?: string[]
+  months?: number
+}
+
+const hasCorrectStatus = (studentStatuses: string[]) => {
+  return studentStatuses.every(status => ['EXCHANGE', 'NONDEGREE', 'TRANSFERRED'].includes(status))
+}
+
+export const optimizedStatisticsOf = async (query: Query, studentNumberList?: string[]) => {
   const formattedQueryParams = formatQueryParamsToArrays(query, ['semesters', 'studentStatuses'])
 
   if (!formattedQueryParams.semesters.every(semester => semester === 'FALL' || semester === 'SPRING')) {
     return { error: 'Semester should be either SPRING OR FALL' }
   }
 
-  if (
-    formattedQueryParams.studentStatuses &&
-    !formattedQueryParams.studentStatuses.every(
-      status => status === 'EXCHANGE' || status === 'NONDEGREE' || status === 'TRANSFERRED'
-    )
-  ) {
+  if (formattedQueryParams.studentStatuses && !hasCorrectStatus(formattedQueryParams.studentStatuses)) {
     return { error: 'Student status should be either EXCHANGE or NONDEGREE or TRANSFERRED' }
   }
+
   const { studyRights, startDate, months, endDate, exchangeStudents, nondegreeStudents, transferredStudents, tag } =
     parseQueryParams(formattedQueryParams)
 
   // db startdate is formatted to utc so need to change it when querying
   const formattedStartDate = new Date(moment.tz(startDate, 'Europe/Helsinki').format()).toUTCString()
 
-  const studentnumbers =
-    studentnumberlist ||
-    (await studentnumbersWithAllStudyrightElements({
+  const studentNumbers =
+    studentNumberList ||
+    (await getStudentNumbersWithAllStudyRightElements({
       studyRights,
       startDate: formattedStartDate,
       endDate,
@@ -47,19 +55,19 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
     }))
 
   const code = studyRights[0] || ''
-  let optionData = {}
-  let criteria = {}
+  let optionData = {} as Record<string, { code: string; name: Name }>
+  let criteria = {} as Criteria
   if (code.includes('MH')) {
-    optionData = await getOptionsForStudents(studentnumbers, code, 'MSC')
+    optionData = await getOptionsForStudents(studentNumbers, code, 'MSC')
   } else if (code.includes('KH')) {
-    optionData = await getOptionsForStudents(studentnumbers, code, 'BSC')
+    optionData = await getOptionsForStudents(studentNumbers, code, 'BSC')
   }
   if (code.includes('KH') || ['MH30_001', 'MH30_003'].includes(code)) {
     criteria = await getCriteria(code)
   }
   const { students, enrollments, credits, extents, semesters, elementdetails, courses } =
     await getStudentsIncludeCoursesBetween(
-      studentnumbers,
+      studentNumbers,
       startDate,
       dateMonthsFromNow(startDate, months),
       studyRights,
@@ -70,15 +78,11 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
     { students, enrollments, credits, extents, semesters, elementdetails, courses },
     startDate,
     endDate,
-    formattedQueryParams,
+    studyRights,
     optionData,
     criteria,
     code
   )
 
   return formattedStudents
-}
-
-module.exports = {
-  optimizedStatisticsOf,
 }

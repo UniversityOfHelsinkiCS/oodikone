@@ -52,10 +52,10 @@ const schedule = async (args, channel = SIS_UPDATER_SCHEDULE_CHANNEL) => {
 
       try {
         data = JSON.parse(msg.getData())
-      } catch (err) {
+      } catch (error) {
         logger.error({
           message: 'Unable to parse completion message.',
-          meta: err.stack,
+          meta: error.stack,
         })
 
         return
@@ -111,7 +111,7 @@ const scheduleFromDb = async ({
     knexBuilder.where('updated_at', '>=', new Date(lastHourlySchedule))
   }
   const entities = await knexBuilder
-  await eachLimit(chunk(entities, CHUNK_SIZE), 10, async e => await createJobs(e, scheduleId || table))
+  await eachLimit(chunk(entities, CHUNK_SIZE), 10, async entity => await createJobs(entity, scheduleId || table))
   return entities.length
 }
 
@@ -222,7 +222,11 @@ const scheduleByCourseCodes = async courseCodes => {
     .distinct('group_id')
     .pluck('group_id')
 
-  await eachLimit(chunk(coursesToUpdate, CHUNK_SIZE), 10, async c => await createJobs(c, IMPORTER_TABLES.courseUnits))
+  await eachLimit(
+    chunk(coursesToUpdate, CHUNK_SIZE),
+    10,
+    async course => await createJobs(course, IMPORTER_TABLES.courseUnits)
+  )
 }
 
 const isUpdaterActive = async () => {
@@ -242,10 +246,10 @@ const scheduleHourly = async () => {
     // between now and the last update
     const personsToUpdate = await getHourlyPersonsToUpdate()
 
-    await eachLimit(chunk(personsToUpdate, CHUNK_SIZE), 10, async s => await createJobs(s, 'students'))
-  } catch (e) {
-    logger.error({ message: 'Hourly scheduling failed', meta: e.stack })
-    throw e
+    await eachLimit(chunk(personsToUpdate, CHUNK_SIZE), 10, async students => await createJobs(students, 'students'))
+  } catch (error) {
+    logger.error({ message: 'Hourly scheduling failed', meta: error.stack })
+    throw error
   }
 }
 
@@ -255,13 +259,13 @@ const scheduleProgrammes = async () => {
 
   const modules = await knex('modules').where({ type: 'DegreeProgramme' })
 
-  const entityIds = modules.map(m => m.id)
+  const entityIds = modules.map(module => module.id)
 
   try {
     await createJobs(entityIds, 'programme_modules')
-  } catch (e) {
-    logger.error({ message: 'Programme module scheduling failed', meta: e.stack })
-    throw e
+  } catch (error) {
+    logger.error({ message: 'Programme module scheduling failed', meta: error.stack })
+    throw error
   }
 }
 
@@ -270,27 +274,27 @@ const scheduleWeekly = async () => {
     await scheduleMeta()
     await scheduleProgrammes()
     await scheduleStudents()
-  } catch (e) {
-    logger.error({ message: 'Weekly scheduling failed', meta: e.stack })
-    throw e
+  } catch (error) {
+    logger.error({ message: 'Weekly scheduling failed', meta: error.stack })
+    throw error
   }
 }
 
 const schedulePrePurge = async () => {
   try {
     await startPrePurge()
-  } catch (e) {
-    logger.error({ message: 'Purge failed', meta: e.stack })
-    throw e
+  } catch (error) {
+    logger.error({ message: 'Purge failed', meta: error.stack })
+    throw error
   }
 }
 
 const schedulePurge = async () => {
   try {
     await startPurge()
-  } catch (e) {
-    logger.error({ message: 'Purge failed', meta: e.stack })
-    throw e
+  } catch (error) {
+    logger.error({ message: 'Purge failed', meta: error.stack })
+    throw error
   }
 }
 

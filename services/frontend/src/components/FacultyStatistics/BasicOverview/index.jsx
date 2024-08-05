@@ -114,9 +114,9 @@ export const BasicOverview = ({
   const creditSortingTitles = ['Code', 'Total', 'Degree', 'Exchange', 'Open uni', 'Transferred']
   if (showAll) creditSortingTitles.splice(5, 0, 'Other uni', 'Separate')
 
-  const transferShortTitles = ['Code', 'Started', 'Graduated']
+  const transferShortTitles = ['Code', 'Started', 'Accepted', 'Graduated']
   if (special === 'SPECIAL_INCLUDED') {
-    transferShortTitles.push('Transferred in', 'Transferred away', 'Transferred to')
+    transferShortTitles.push('Transferred out', 'Transferred into')
   }
 
   const options = {
@@ -229,7 +229,7 @@ export const BasicOverview = ({
                   exportFileName={`oodikone_StudentsOfTheFaculty_${faculty?.code}_${getTimestamp()}`}
                   wideTable
                 />
-                <div className="table-container-wide">
+                <div className="table-container-wide datatable">
                   <InteractiveDataTable
                     cypress="StudentsOfTheFaculty"
                     dataProgrammeStats={basics?.data?.studentInfo.programmeTableStats}

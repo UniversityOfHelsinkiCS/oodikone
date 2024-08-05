@@ -1,16 +1,16 @@
-import { Router } from 'express'
+import { Request, Response, Router } from 'express'
 
 import { getCoursesAndModules, getCurriculumVersions } from '../services/programmeModules'
 
 const router = Router()
 
-router.get('/v3/curriculum-options/:code', async (req, res) => {
+router.get('/v3/curriculum-options/:code', async (req: Request, res: Response) => {
   const { code } = req.params
   const result = await getCurriculumVersions(code)
   res.json(result)
 })
 
-router.get('/v3/curriculum/:code/:periodIds', async (req, res) => {
+router.get('/v3/curriculum/:code/:periodIds', async (req: Request, res: Response) => {
   const { code, periodIds } = req.params
   const result = await getCoursesAndModules(code, periodIds)
   res.json({

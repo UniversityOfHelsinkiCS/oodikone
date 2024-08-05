@@ -1,10 +1,10 @@
 import * as Sentry from '@sentry/node'
-import { NextFunction, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { intersection } from 'lodash'
 
 import { configLogoutUrl, isDev, requiredGroup, serviceProvider } from '../config'
 import { getMockedUser, getMockedUserFd, getOrganizationAccess, getUserFd, getUserToska } from '../services/userService'
-import { FormattedUser, IamAccess, OodikoneRequest } from '../types'
+import { FormattedUser, IamAccess } from '../types'
 import { ApplicationError } from '../util/customErrors'
 import logger from '../util/logger'
 
@@ -63,7 +63,7 @@ type Headers = {
   priority?: string
 }
 
-const toskaUserMiddleware = async (req: OodikoneRequest, _res: Response, next: NextFunction) => {
+const toskaUserMiddleware = async (req: Request, _res: Response, next: NextFunction) => {
   const {
     'shib-session-id': sessionId,
     'x-show-as-user': showAsUser,
@@ -112,7 +112,7 @@ const toskaUserMiddleware = async (req: OodikoneRequest, _res: Response, next: N
   next()
 }
 
-const fdUserMiddleware = async (req: OodikoneRequest, _res: Response, next: NextFunction) => {
+const fdUserMiddleware = async (req: Request, _res: Response, next: NextFunction) => {
   const { remote_user: remoteUser, 'x-show-as-user': showAsUser } = req.headers
 
   if (!remoteUser) {
@@ -139,6 +139,6 @@ const fdUserMiddleware = async (req: OodikoneRequest, _res: Response, next: Next
   next()
 }
 
-const currentUserMiddleware = serviceProvider === 'Toska' ? toskaUserMiddleware : fdUserMiddleware
+const currentUserMiddleware = serviceProvider === 'toska' ? toskaUserMiddleware : fdUserMiddleware
 
 export default currentUserMiddleware

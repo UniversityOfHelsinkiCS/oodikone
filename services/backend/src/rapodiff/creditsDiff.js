@@ -130,8 +130,8 @@ const processIds = async (rawData, code, field) => {
       credits: parseFloat(row[10]),
       included: row[4] === '1',
     }))
-    .filter(c => !c.isModule && (field === 'transferred' || c.included))
-  const rapoIds = rapoData.filter(c => c.credits > 0 && c.type === field).map(row => row.id)
+    .filter(course => !course.isModule && (field === 'transferred' || course.included))
+  const rapoIds = rapoData.filter(course => course.credits > 0 && course.type === field).map(row => row.id)
   const rapoCredits = rapoData.reduce(
     (stats, cur) => {
       stats[cur.type] += cur.credits

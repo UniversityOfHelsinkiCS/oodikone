@@ -95,12 +95,12 @@ const calculateAssociationsFromDb = async (chunksize = 100000) => {
           const enrollmentStartYear = enrollmentStartYears[enrollment]
 
           group
-            .filter(e => e.studyrightid === studyrightid && e.code !== code)
-            .forEach(e => {
-              if (e.type === StudyRightType.STUDYTRACK) {
+            .filter(element => element.studyrightid === studyrightid && element.code !== code)
+            .forEach(element => {
+              if (element.type === StudyRightType.STUDYTRACK) {
                 const momentenddate = moment(enddate)
-                const estartdate = moment(e.startdate)
-                const eenddate = moment(e.enddate)
+                const estartdate = moment(element.startdate)
+                const eenddate = moment(element.enddate)
                 // check that programme and studytrack time ranges overlap
                 if (
                   (momentstartdate <= estartdate && momentenddate >= estartdate) ||
@@ -108,25 +108,25 @@ const calculateAssociationsFromDb = async (chunksize = 100000) => {
                   (estartdate <= momentstartdate && eenddate >= momentstartdate) ||
                   (estartdate <= momentenddate && eenddate >= momentenddate)
                 ) {
-                  enrollmentStartYear.studyTracks[e.code] = {
-                    type: e.type,
-                    name: e.name,
-                    code: e.code,
+                  enrollmentStartYear.studyTracks[element.code] = {
+                    type: element.type,
+                    name: element.name,
+                    code: element.code,
                   }
                   if (
-                    !associations.programmes[code].studytracks.includes(e.code) &&
-                    !transferedStudyrightIds.includes(e.studyrightid)
+                    !associations.programmes[code].studytracks.includes(element.code) &&
+                    !transferedStudyrightIds.includes(element.studyrightid)
                   ) {
-                    associations.programmes[code].studytracks.push(e.code)
+                    associations.programmes[code].studytracks.push(element.code)
                   }
                 }
-                associations.studyTracks[e.code] = associations.studyTracks[e.code] || {
-                  type: e.type,
-                  name: e.name,
-                  code: e.code,
+                associations.studyTracks[element.code] = associations.studyTracks[element.code] || {
+                  type: element.type,
+                  name: element.name,
+                  code: element.code,
                   programmes: {},
                 }
-                associations.studyTracks[e.code].programmes[code] = {
+                associations.studyTracks[element.code].programmes[code] = {
                   type,
                   name,
                   code,

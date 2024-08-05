@@ -2,24 +2,8 @@ import { studyProgrammeToolTips } from './studyprogramme'
 
 export const facultyToolTips = {
   ProgrammeToggle: `
-    New study programmes: Näyttää kaikissa luvuissa ja kuvaajissa pelkästään uuden opetussuunnitelman ohjelmat.
-    All programmes: Näyttää kaikissa luvuissa ja kuvaajissa kuvaajissa myös vanhan opetussuunnitelman ohjelmat.`,
-  YearToggle: `
-    Academic year: Näyttää tilastot akateemisille vuosille jaoteltuna, esimerkiksi 1.8.2019-31.7.2020
-    Calendar year: Näyttää tilastot kalenterivuosille jaoteltuna, esimerkiksi 1.1.2019-31.12.2019 
-    `,
-  StudentsOfTheFaculty: `
-  **Started studying**: Sisältää kyseisenä vuonna tiedekunnassa aloittaneet opiskelijat (aloitetut opinto-oikeudet) opiskelijat. Opiskelija on voinut myöhemmin keskeyttää opintonsa tai siirtyä pois ohjelmasta.
-    Kandi-maisteri-opinto-oikeudellisista opiskelijoista lasketaan vain kandissa ts. tiedekunnassa aloitus, ei toistamiseen enää maisteriopintojen aloitusta.\n
-  **Graduated**: Sisältää kyseisenä vuonna valmistuneet opiskelijat riippumatta siitä, minä vuonna opiskeluoikeus ohjelmaan on myönnetty. Jaottelu on tehty opinto-oikeuden päättymispäivän (=valmistumispäivän) perusteella.
-  
-  **Transferred inside**: Sisältää kyseisenä vuonna tiedekunnan sisällä siirtyneet opiskelijat (opinto-oikeudet). Ohjelmakohtaisissa tilastoissa siirto on laskettu kohdeohjelman tilastoihin.
-
-  **Transferred away**: Sisältää opiskelijat, joiden opinto-oikeuden vastuutiedekunta on muuttunut kyseisen vuoden aikana. Sama opiskelija voi esiintyä tilastoissa useana vuonna, mikäli vastuutiedekunta on muuttunut useasti takaisin tiedekuntaan ja pois siitä.
-  
-  **Transferred to**: Sisältää kyseisenä vuonna tiedekuntaan siirtyneet opiskelijat (opinto-oikeudet).
-
-  HUOM! Siirtyneiden määrä on erityisen suuri vuonna 2020, jolloin vanhoista koulutusohjelmista luovuttiin ja opiskelijat siirtyivät uusiin ohjelmiin.
+  **New study programmes**: Näyttää kaikissa luvuissa ja kuvaajissa pelkästään uuden opetussuunnitelman ohjelmat.  
+  **All study programmes**: Näyttää kaikissa luvuissa ja kuvaajissa kuvaajissa myös vanhan opetussuunnitelman ohjelmat.
   `,
   CreditsProducedByTheFaculty: `Sisältää opintopisteet suoritusvuosittain. Suoritukset on jaoteltu Sisussa näkyvän kurssin suorituspäivän mukaan. Kategoriat vastaavat Rapon kategorioita. Pistemäärät ovat osin epätarkkoja ennen vuotta 2022 sisu-oodi-erojen vuoksi.
 
@@ -41,59 +25,27 @@ export const facultyToolTips = {
 
   **Other university**: Korkeakoulujen väliset yhteistyöopinnot: opintosuoritukset, jotka on tehty korkeakoulujen väliseen yhteistyösopimukseen perustuvalla opiskeluoikeudella.
   `,
-
   GraduatedOfTheFaculty:
     'Sisältää kyseisenä vuonna tiedekunnasta valmistuneet opiskelijat riippumatta siitä, minä vuonna opiskeluoikeus ohjelmaan on myönnetty. Jaottelu on tehty opinto-oikeuden päättymispäivän (=valmistumispäivän) perusteella.',
   ThesisWritersOfTheFaculty:
-    'Sisältää kyseisenä vuonna kandidaatintutkielman tai pro gradu -tutkielman suorittaneet opiskelijat. Mukana ei ole mahdollisia arvosanan korotuksia.',
-  StudentToggle: `
-  All studyrights: Valinnassa ovat mukana vaihto-opiskelijat, erillisoikeudella opiskelevat ja ohjelmaan siirtyneet opiskelijat sekä ohjelmasta pois siirtyneet opiskelijat.\n
-  Special studyrights excluded: Valinnasta ja kaikista luvuista on poissuljettu kaikki edellä mainitut erikoisryhmät.
-  `,
-
-  // Graduation times
-  GroupByToggle: `Graduation year: Valmistuneet opiskelijat on ryhmitelty opintojen valmistumisvuoden perusteella.\n
-    Group by: Starting year: Valmistuneet opiskelijat on jaoteltu opinto-oikeuden alkuvuoden mukaan.
-  `,
+    'Sisältää kyseisenä vuonna kandidaatin- tai maisterintutkielman hyväksytysti suorittaneet opiskelijat. Mukana ei ole mahdollisia arvosanan korotuksia.',
   AverageGraduationTimes: `
   Opiskelijoiden keskimääräiset valmistumisajat tutkintotasoittain. 
 
-  - Bachelor: Kandidaatin tutkinnon suoritusajat
-  - Bachelor + Master: Kandi+maisteriopinto-oikeudella opiskelleiden ja siitä maisteriksi valmistuneiden suoritusajat
-  - Master: Pelkällä maisterintutkinnon opinto-oikeudella opiskelleiden suoritusajat
-  - Doctor: Tohtorin tutkinnon suoritusajat
-  - Licentiate: Lisensiaatin tutkinnon suoritusajat
+  - **Bachelor**: Kandidaatin tutkinnon suorittaneet opiskelijat
+  - **Bachelor + Master**: Opiskelijat, joiden opiskeluoikeuteen kuuluu **sekä kandidaatin että maisterin** tutkinnon suoritusoikeus
+  - **Master**: Opiskelijat, joiden opiskeluoikeuteen kuuluu **vain** maisterin tutkinnon suoritusoikeus
+  - **Doctor**: Tohtorin tutkinnon suorittaneet opiskelijat
 
-  Valmistumisajoista on **vähennetty lakisääteiset poissaolot**. 
+  Valmistumisajoista on **vähennetty lakisääteiset poissaolot**. Luvuissa ei ole mukana opiskelijoita, jotka ovat vaihtaneet koulutuohjelmaa saman opiskeluoikeuden sisällä (pois lukien kandiohjelmasta maisteriohjelmaan siirtyneet). Toisin sanoen luvut vastaavat *Study programme overview* -näkymän lukuja, kun näkymässä on valittuna *Special studyrights excluded*.
 
-  Palkissa oleva lukumäärä kertoo **montako opiskelijaa** kuhunkin valmistuneiden ryhmään kuuluu.
-
-  Vihreä **vaakapalkki** kuvaa tavoiteajassa (tai alle) valmistuneista, keltainen palkki korkeintaan vuodella tavoiteajan ylittäneitä
-  ja punainen yli vuodella tavoiteajan ylittäneitä.
-
-  Säädöt:
-
-  **Breakdown**: Näyttää, kuinka moni opiskelija valmistui ajallaan, korkeintaan vuoden myöhässä tavoiteajasta tai tätä myöhemmin.
-
-  **Median time**: Näyttää kyseisenä vuonna/lukuvuonna valmistuneiden opiskelijoiden opintojen keston **mediaanin** kuukausina.
-
-  **Graduation year**: Ryhmittelee tulokset valmistumisvuosittain. Näyttää siis vuonna xxxx valmistuneiden opiskelijoiden keskimääräiset valmistumisajat. 
-  Luvut ovat lopullisia (kuluva vuosi poislukien), sillä edeltäville vuosille ei tule uusia valmistumisia.
-
-  **Starting year**. Ryhmittelee tulokset opiskelijoiden opinto-oikeuden alkamisvuosittain. Näyttää siis vuonna xxxx aloittaneiden opiskelijoiden keskimääräiset valmistumisajat. Luvut voivat elää, koska osa vuonna xxxx 
-  aloittaneiden opiskelijoiden opinnoista voi olla edelleen kesken.
-
-  Mediaaninäkymässä vihreä **katkoviiva** kuvastaa tavoiteaikaa. Keltainen katkoviiva on tavoiteaika + yksi vuosi.\n
-
-  Tarkastellessa valmistumisaikoja aloitusvuosittain palkissa näkyy myös **kuinka suuri osa** kyseisenä vuonna tiedekuntaan/opinto-ohjelmaan opinto-oikeuden saaneista on valmistunut.
+  - **Breakdown**/**Median study times**:
+    - **Breakdown**: Näyttää, kuinka moni opiskelija valmistui tavoiteajassa (vihreä palkki), 12 kuukauden sisällä tavoiteajasta (keltainen palkki) tai tätä myöhemmin (punainen palkki).
+    - **Median study times**: Näyttää kyseisenä kalenteri- tai lukuvuonna aloittaneiden/valmistuneiden opiskelijoiden opintojen keston **mediaanin** kuukausina. Vihreä **katkoviiva** kuvastaa tavoiteaikaa. Keltainen katkoviiva on tavoiteaika + 12 kuukautta.  
+  - **Graduation year**/**Starting year**:
+    - **Graduation year**: Ryhmittelee opiskelijat valmistumisvuosittain (kalenterivuosi).
+    - **Starting year**: Ryhmittelee opiskelijat opiskeluoikeuden alkamisvuoden (lukuvuosi) perusteella. Bachelor + Master -kuvaajassa aloitusvuosi on aloitusvuosi kandiohjelmassa ja koulutusohjelma on maisteriohjelma, johon opiskelija on siirtynyt kandidaatiksi valmistumisen jälkeen.  
  `,
-
-  // Faculty Student population
-  GraduatedToggle: `
-  Graduated included: Valinnassa ovat mukana ohjelmasta jo valmistuneet opiskelijat.
-
-  Graduated excluded: Valinnasta on poistettu ohjelmasta jo valmistuneet opiskelijat.
-  `,
   StudentProgress: `
   Kuvaa tiedekuntaan kuuluvien eri ohjemien opinto-oikeudella varustettujen opiskelijoiden etenemistä opintopisteissä mitattuna. Esimerkiksi 2021-2022 aloittaneiden opintopistejakaumaa.
   
@@ -113,3 +65,11 @@ facultyToolTips.StudentsStatsOfTheFaculty = studyProgrammeToolTips.StudytrackOve
   'Yläosan valikosta on mahdollista valita tarkasteluun yhden opintosuunnan opiskelijat. Luvut kuvaavat tällöin kyseisen opintosuunnan opiskelijoita.',
   ''
 )
+facultyToolTips.StudentsOfTheFaculty =
+  'Taulukon luvut on laskettu **yhdistämällä** tiedekunnan koulutusohjelmien luvut. Näin ollen tämän näkymän luvut täsmäävät *Study programme* -näkymän lukuihin. Kategorioiden merkitykset ovat seuraavat:\n'
+    .concat(studyProgrammeToolTips.StudentsOfTheStudyprogramme)
+    .replace('Transferred away', 'Transferred out of programme')
+    .replace('Transferred to', 'Transferred into programme')
+facultyToolTips.GraduatedToggle = studyProgrammeToolTips.GraduatedToggle
+facultyToolTips.StudentToggle = studyProgrammeToolTips.StudentToggle
+facultyToolTips.YearToggle = studyProgrammeToolTips.YearToggle

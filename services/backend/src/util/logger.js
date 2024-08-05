@@ -2,13 +2,13 @@ const os = require('os')
 const winston = require('winston')
 const { WinstonGelfTransporter } = require('winston-gelf-transporter')
 
-const { isProduction } = require('../config')
+const { isProduction, serviceProvider } = require('../config')
 
 const { colorize, combine, timestamp, printf } = winston.format
 
 const transports = [new winston.transports.Console()]
 
-if (isProduction) {
+if (isProduction && serviceProvider !== 'fd') {
   transports.push(
     new WinstonGelfTransporter({
       handleExceptions: true,

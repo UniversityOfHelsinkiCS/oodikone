@@ -3,7 +3,7 @@ import { Op, QueryTypes } from 'sequelize'
 
 import { dbConnections } from '../../database/connection'
 import { Course, Credit, ElementDetail, Studyright, StudyrightElement } from '../../models'
-import { ElementDetailType, ExtentCode } from '../../types'
+import { ElementDetailType, ExtentCode, Criteria, Name } from '../../types'
 import { SemesterEnd, SemesterStart } from '../../util/semester'
 import { getCurrentSemester } from '../semesters'
 import { getProgrammesFromStudyRights } from '../studyrights'
@@ -33,12 +33,14 @@ const getCreditAmount = (course, hops, courseCode, startDate, addition) => {
 }
 
 const updateCourseByYear = (criteria, criteriaYear, course, criteriaChecked, yearToAdd, correctCode) => {
+  // TODO: Clean up this mess
   if (
     criteria?.courses &&
     criteria?.courses[criteriaYear] &&
     (criteria.courses[criteriaYear].includes(course.course_code) ||
       criteria.courses[criteriaYear].some(
-        c => criteria.allCourses[c] && criteria.allCourses[c].includes(course.course_code)
+        criteriaCourse =>
+          criteria.allCourses[criteriaCourse] && criteria.allCourses[criteriaCourse].includes(course.course_code)
       ))
   ) {
     if (
@@ -66,7 +68,7 @@ const updateCreditCriteriaInfo = (criteria, criteriaYear, criteriaChecked, yearT
   }
 }
 
-export const getCurriculumVersion = curriculumPeriodId => {
+export const getCurriculumVersion = (curriculumPeriodId: string) => {
   if (!curriculumPeriodId) {
     return null
   }
@@ -232,7 +234,9 @@ const formatStudentForPopulationStatistics = (
   }
 }
 
-export const dateMonthsFromNow = (date, months) => moment(date).add(months, 'months').format('YYYY-MM-DD')
+export const dateMonthsFromNow = (date: string, months: number) => {
+  return new Date(moment(date).add(months, 'months').format('YYYY-MM-DD'))
+}
 
 export const count = (column, count, distinct = false) => {
   const countable = !distinct ? sequelize.col(column) : sequelize.fn('DISTINCT', sequelize.col(column))
@@ -357,23 +361,26 @@ export const getOptionsForStudents = async (studentNumbers: string[], code: stri
     .filter(
       studyRight => studyRight.givendate.getTime() === currentStudyrightsMap[studyRight.student_studentnumber].getTime()
     )
-    .reduce((obj, element) => {
-      obj[element.student_studentnumber] = {
-        code: element.studyright_elements[0].code,
-        name: element.studyright_elements[0].element_detail.name,
-      }
-      return obj
-    }, {})
+    .reduce(
+      (obj, element) => {
+        obj[element.student_studentnumber] = {
+          code: element.studyright_elements[0].code,
+          name: element.studyright_elements[0].element_detail.name,
+        }
+        return obj
+      },
+      {} as Record<string, { code: string; name: Name }>
+    )
 }
 
 export const formatStudentsForApi = async (
   { students, enrollments, credits, extents, semesters, elementdetails, courses },
-  startDate,
-  endDate,
-  { studyRights },
-  optionData,
-  criteria,
-  code
+  startDate: string,
+  endDate: string,
+  studyRights: string[],
+  optionData: Record<string, { code: string; name: Name }>,
+  criteria: Criteria,
+  code: string
 ) => {
   const startDateMoment = moment(startDate)
   const endDateMoment = moment(endDate)
@@ -447,7 +454,7 @@ export const formatStudentsForApi = async (
   const transferredStudyright = student => {
     const transferredFrom = student.transfers.find(
       transfer =>
-        transfer.targetcode === studyRights.programme &&
+        transfer.targetcode === studyRights[0] &&
         // Add bit of flex for students that transferred just before the startdate
         moment(transfer.transferdate).isBetween(startDateMoment.subtract(1, 'd'), endDateMoment.add(1, 'd'))
     )
@@ -473,15 +480,15 @@ export const formatStudentsForApi = async (
   return returnvalue
 }
 
-export const formatQueryParamsToArrays = (query, params) => {
-  const res = { ...query }
+export const formatQueryParamsToArrays = (query: Record<string, any>, params: string[]) => {
+  const result = { ...query }
   params.forEach(param => {
-    if (!res[param]) {
+    if (!result[param]) {
       return
     }
-    res[param] = Array.isArray(res[param]) ? res[param] : [res[param]]
+    result[param] = Array.isArray(result[param]) ? result[param] : [result[param]]
   })
-  return res
+  return result
 }
 
 const getSubstitutions = async (codes: string[]) => {
@@ -507,7 +514,7 @@ const getCourseCodes = async (courses: string[]) => {
 }
 
 // This duplicate code is added here to ensure that we get the enrollments in cases no credits found for the selected students
-export const findCourseEnrollments = async (studentnumbers, beforeDate, courses = []) => {
+export const findCourseEnrollments = async (studentNumbers: string[], beforeDate: Date, courses: string[] = []) => {
   const courseCodes = await getCourseCodes(courses)
   const res = await sequelize.query(
     `
@@ -538,7 +545,7 @@ export const findCourseEnrollments = async (studentnumbers, beforeDate, courses 
     `,
     {
       replacements: {
-        studentnumbers: studentnumbers.length > 0 ? studentnumbers : ['DUMMY'],
+        studentnumbers: studentNumbers.length > 0 ? studentNumbers : ['DUMMY'],
         beforeDate,
         courseCodes,
         skipCourseCodeFilter: courses.length === 0,
@@ -549,7 +556,7 @@ export const findCourseEnrollments = async (studentnumbers, beforeDate, courses 
   return res
 }
 
-export const findCourses = async (studentnumbers, beforeDate, courses = []) => {
+export const findCourses = async (studentNumbers: string[], beforeDate: Date, courses: string[] = []) => {
   const courseCodes = await getCourseCodes(courses)
   const res = await sequelize.query(
     `
@@ -595,7 +602,7 @@ export const findCourses = async (studentnumbers, beforeDate, courses = []) => {
     `,
     {
       replacements: {
-        studentnumbers: studentnumbers.length > 0 ? studentnumbers : ['DUMMY'],
+        studentnumbers: studentNumbers.length > 0 ? studentNumbers : ['DUMMY'],
         beforeDate,
         courseCodes,
         skipCourseCodeFilter: courses.length === 0,
@@ -607,7 +614,7 @@ export const findCourses = async (studentnumbers, beforeDate, courses = []) => {
   return res
 }
 
-export const parseCreditInfo = credit => ({
+export const parseCreditInfo = (credit: Credit) => ({
   studentnumber: credit.student_studentnumber,
   grade: credit.grade,
   passingGrade: Credit.passed(credit),

@@ -147,7 +147,7 @@ export const getSemestersPresentFunctions = ({
         enrollmenttype = student.semesterEnrollmentsMap[semester]?.enrollmenttype
         statutoryAbsence = student.semesterEnrollmentsMap[semester]?.statutoryAbsence
       } else {
-        const enrollment = studyright.semesterEnrollments?.find(e => e.semester === semester)
+        const enrollment = studyright.semesterEnrollments?.find(enrollment => enrollment.semester === semester)
         enrollmenttype = enrollment?.type
         statutoryAbsence = enrollment?.statutoryAbsence
       }

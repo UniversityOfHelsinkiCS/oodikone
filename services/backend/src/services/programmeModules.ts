@@ -121,8 +121,8 @@ const getCoursesAndModulesForProgramme = async (code: string, periodIds: string)
   })
   const modulesMap = modules.reduce<Record<string, ModuleWithChildren>>((obj, cur) => ({ ...obj, [cur.id]: cur }), {})
   const modifiedCourses = courses
-    .map(c => modifyParent(c, modulesMap))
-    .filter(c => c != null)
+    .map(course => modifyParent(course, modulesMap))
+    .filter(course => course != null)
     .filter(
       (course1, index, array) =>
         array.findIndex(course2 => course1.code === course2.code && course1.parent_code === course2.parent_code) ===

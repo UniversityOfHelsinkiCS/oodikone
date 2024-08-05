@@ -3,133 +3,12 @@ import { InferAttributes, Op, QueryTypes } from 'sequelize'
 
 import { programmeCodes } from '../../config/programmeCodes'
 import { dbConnections } from '../../database/connection'
-import {
-  Course,
-  Credit,
-  ElementDetail,
-  Organization,
-  ProgrammeModule,
-  Studyright,
-  StudyrightElement,
-} from '../../models'
-import { CreditTypeCode, ExtentCode, PriorityCode } from '../../types'
+import { ElementDetail, Organization, ProgrammeModule, Studyright, StudyrightElement } from '../../models'
+import { ExtentCode, PriorityCode } from '../../types'
 import { getSemestersAndYears } from '../semesters'
-import { formatFacultyStudyRight, formatFacultyThesisWriter } from './facultyFormatHelpers'
-import { getExtentFilter } from './facultyHelpers'
+import { formatFacultyStudyRight } from './facultyFormatHelpers'
 
 const { sequelize } = dbConnections
-
-export const startedStudyrights = async (
-  facultyCode: string,
-  since: Date,
-  code: string,
-  includeAllSpecials: boolean
-) => {
-  const studyRightWhere = getExtentFilter(includeAllSpecials)
-
-  const query = {
-    include: [
-      {
-        model: StudyrightElement,
-        required: true,
-        where: {
-          code,
-        },
-        include: [
-          {
-            model: ElementDetail,
-            required: true,
-          },
-        ],
-      },
-    ],
-    where: {
-      facultyCode,
-      startdate: {
-        [Op.gte]: since,
-      },
-      ...studyRightWhere,
-    },
-  }
-
-  const studyRights = await Studyright.findAll(query)
-  return studyRights.map(formatFacultyStudyRight)
-}
-
-export const graduatedStudyrights = async (
-  facultyCode: string,
-  since: Date,
-  code: string,
-  includeAllSpecials?: boolean
-) => {
-  const studyRightWhere = includeAllSpecials !== undefined ? getExtentFilter(includeAllSpecials) : {}
-
-  const query: Record<string, any> = {
-    include: [
-      {
-        model: StudyrightElement,
-        required: true,
-        where: {
-          code,
-        },
-        include: [
-          {
-            model: ElementDetail,
-            required: true,
-          },
-        ],
-      },
-    ],
-    where: {
-      facultyCode,
-      enddate: {
-        [Op.gte]: since,
-      },
-      graduated: 1,
-      ...studyRightWhere,
-    },
-  }
-
-  const studyRights = await Studyright.findAll(query)
-  return studyRights.map(formatFacultyStudyRight)
-}
-
-export const studyrightsByRightStartYear = async (
-  facultyCode: string,
-  since: Date,
-  code: string | null = null,
-  graduated: number | number[] = 1
-) => {
-  const query: Record<string, any> = {
-    include: [
-      {
-        model: StudyrightElement,
-        attributes: ['code', 'startdate'],
-        required: true,
-        include: [
-          {
-            model: ElementDetail,
-            required: true,
-          },
-        ],
-      },
-    ],
-    where: {
-      facultyCode,
-      startdate: {
-        [Op.gte]: since,
-      },
-      graduated,
-    },
-  }
-
-  if (code !== null) {
-    query.include[0].where = { code }
-  }
-
-  const studyRights = await Studyright.findAll(query)
-  return studyRights.map(formatFacultyStudyRight)
-}
 
 export const getStudyRightsByExtent = async (
   facultyCode: string,
@@ -222,55 +101,6 @@ export const getStudyRightsByBachelorStart = async (
   return studyRights.map(formatFacultyStudyRight)
 }
 
-export const hasMasterRight = async (studyRightId: string): Promise<boolean> => {
-  const studyRight = await Studyright.findOne({
-    where: {
-      studyrightid: studyRightId,
-      extentcode: ExtentCode.MASTER,
-    },
-  })
-  return studyRight !== null
-}
-
-export const thesisWriters = async (provider: string, since: Date, thesisTypes: string[], studentNumbers: string[]) => {
-  const query: Record<string, any> = {
-    attributes: ['id', 'course_code', 'attainment_date', 'student_studentnumber'],
-    include: {
-      model: Course,
-      attributes: ['course_unit_type'],
-      required: true,
-      where: {
-        course_unit_type: {
-          [Op.in]: thesisTypes,
-        },
-      },
-      include: [
-        {
-          model: Organization,
-          attributes: [],
-          required: true,
-          where: {
-            code: provider,
-          },
-        },
-      ],
-    },
-    where: {
-      credittypecode: CreditTypeCode.PASSED,
-      isStudyModule: {
-        [Op.not]: true,
-      },
-      attainment_date: {
-        [Op.gte]: since,
-      },
-      student_studentnumber: studentNumbers.length > 0 ? studentNumbers : { [Op.not]: null },
-    },
-  }
-
-  const thesisWriterCredits = await Credit.findAll(query)
-  return thesisWriterCredits.map(formatFacultyThesisWriter)
-}
-
 const curriculumPeriodIdToYearCode = (curriculumPeriodId: string) => curriculumPeriodId.slice(-2)
 
 // Some programme modules are not directly associated to a faculty (organization).
@@ -337,6 +167,8 @@ export const getDegreeProgrammesOfOrganization = async (organizationId: string, 
   }
   return relevantProgrammes
 }
+
+export type ProgrammesOfOrganization = Awaited<ReturnType<typeof getDegreeProgrammesOfOrganization>>
 
 export const getDegreeProgrammesOfFaculty = async (facultyCode: string, onlyCurrentProgrammes: boolean) => {
   const organization = await Organization.findOne({

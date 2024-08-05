@@ -17,9 +17,12 @@ const client = redis.createClient({
 
 const redisPromisify = async (func, ...params) =>
   new Promise((res, rej) => {
-    func.call(client, ...params, (err, data) => {
-      if (err) rej(err)
-      else res(data)
+    func.call(client, ...params, (error, data) => {
+      if (error) {
+        rej(error)
+      } else {
+        res(data)
+      }
     })
   })
 

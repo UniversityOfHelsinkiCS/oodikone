@@ -1,26 +1,10 @@
-const { Op } = require('sequelize')
+import { Op } from 'sequelize'
 
-const {
-  Credit,
-  Student,
-  Semester,
-  Organization,
-  Enrollment,
-  SISStudyRight,
-  SISStudyRightElement,
-} = require('../../models')
+import { Credit, Student, Semester, Organization, Enrollment, SISStudyRight, SISStudyRightElement } from '../../models'
+import { EnrollmentState, Unification } from '../../types'
+import { getIsOpen } from './helpers'
 
-const creditsForCourses = async (codes, unification) => {
-  let is_open = false
-
-  if (unification === 'open') is_open = true
-
-  if (unification === 'unify') {
-    is_open = {
-      [Op.in]: [false, true],
-    }
-  }
-
+export const getCreditsForCourses = async (codes: string[], unification: Unification) => {
   return await Credit.findAll({
     include: [
       {
@@ -41,16 +25,13 @@ const creditsForCourses = async (codes, unification) => {
       course_code: {
         [Op.in]: codes,
       },
-      student_studentnumber: {
-        [Op.ne]: null,
-      },
-      [Op.or]: [{ is_open }, { is_open: null }],
+      is_open: getIsOpen(unification),
     },
     order: [['attainment_date', 'ASC']],
   })
 }
 
-const getStudentNumberToSrElementsMap = async studentNumbers => {
+export const getStudentNumberToSrElementsMap = async (studentNumbers: string[]) => {
   const studyRights = await SISStudyRight.findAll({
     attributes: ['facultyCode', 'id', 'studentNumber'],
     where: {
@@ -80,26 +61,19 @@ const getStudentNumberToSrElementsMap = async studentNumbers => {
     },
   })
 
-  return studyRightElements.reduce((obj, cur) => {
+  const studentNumberToSrElementsMap = studyRightElements.reduce((obj, cur) => {
     const studyRight = studyRightMap[cur.studyRightId]
     const { studentNumber } = studyRight
-    if (!obj[studentNumber]) obj[studentNumber] = []
+    if (!obj[studentNumber]) {
+      obj[studentNumber] = []
+    }
     obj[studentNumber].push({ ...cur.toJSON(), studyRight })
     return obj
   }, {})
+  return studentNumberToSrElementsMap
 }
 
-const enrollmentsForCourses = async (codes, unification) => {
-  let is_open = false
-
-  if (unification === 'open') is_open = true
-
-  if (unification === 'unify') {
-    is_open = {
-      [Op.in]: [false, true],
-    }
-  }
-
+export const getEnrollmentsForCourses = async (codes: string[], unification: Unification) => {
   return await Enrollment.findAll({
     include: [
       {
@@ -120,18 +94,9 @@ const enrollmentsForCourses = async (codes, unification) => {
       course_code: {
         [Op.in]: codes,
       },
-      studentnumber: {
-        [Op.ne]: null,
-      },
       enrollment_date_time: { [Op.gte]: new Date('2021-05-31') },
-      state: ['ENROLLED', 'CONFIRMED'],
-      [Op.or]: [{ is_open }, { is_open: null }],
+      state: [EnrollmentState.ENROLLED, EnrollmentState.CONFIRMED],
+      is_open: getIsOpen(unification),
     },
   })
-}
-
-module.exports = {
-  getStudentNumberToSrElementsMap,
-  enrollmentsForCourses,
-  creditsForCourses,
 }

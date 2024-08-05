@@ -1,13 +1,11 @@
-import { NextFunction, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 
-import { OodikoneRequest, Role } from '../types'
+import { Role } from '../types'
 
-export const roles = (requiredRoles: Role[]) => async (req: OodikoneRequest, res: Response, next: NextFunction) => {
-  if (req.user) {
-    const { roles } = req.user
-    if (requiredRoles.some(role => roles.includes(role)) || roles.includes('admin')) {
-      return next()
-    }
+export const roles = (requiredRoles: Role[]) => async (req: Request, res: Response, next: NextFunction) => {
+  const { roles } = req.user
+  if (requiredRoles.some(role => roles.includes(role)) || roles.includes('admin')) {
+    return next()
   }
 
   res.status(403).json({ error: 'Missing required roles' })

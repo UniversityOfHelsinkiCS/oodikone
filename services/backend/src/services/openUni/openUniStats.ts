@@ -1,10 +1,34 @@
-const moment = require('moment')
+import moment from 'moment'
 
-const { getCourseNames, getCredits, getEnrollments, getStudentInfo, getStudyRights } = require('./openUniSearches')
+import { SISStudyRight } from '../../models'
+import { getCourseNames, getCredits, getEnrollments, getStudentInfo, getStudyRights } from './openUniSearches'
+
+type CourseInfo = {
+  status: {
+    passed: Date | null
+    failed: Date | null
+    unfinished: Date | null
+  }
+}
+
+type StudentStats = {
+  [studentNumber: string]: {
+    courseInfo: {
+      [courseCode: string]: CourseInfo
+    }
+    email: string
+    secondaryEmail: string
+    totals: {
+      passed: number
+      failed: number
+      unfinished: number
+    }
+  }
+}
 
 const uniq = objects => [...new Set(objects)]
 
-const calculateTotalsForStudent = async (studentStats, studentNumber) => {
+const calculateTotalsForStudent = async (studentStats: StudentStats, studentNumber: string) => {
   Object.keys(studentStats[studentNumber].courseInfo).forEach(course => {
     const { status } = studentStats[studentNumber].courseInfo[course]
     if (status.passed) {
@@ -17,22 +41,22 @@ const calculateTotalsForStudent = async (studentStats, studentNumber) => {
   })
 }
 
-const getAllCourseCodes = courseCodes => {
+const getAllCourseCodes = (courseCodes: string[]) => {
   const ayCourseCodes = courseCodes.map(courseCode => `AY${courseCode}`)
   return courseCodes.concat(ayCourseCodes)
 }
 
-const isStartDateOutsideInterval = (studyRight, startDate) => {
+const isStartDateOutsideInterval = (studyRight: SISStudyRight, startDate: Date) => {
   return moment(studyRight.startDate).isBetween(startDate, moment())
 }
 
-const isStartDateInsideAndEndDateOutside = (studyRight, startDate) => {
+const isStartDateInsideAndEndDateOutside = (studyRight: SISStudyRight, startDate: Date) => {
   return moment(studyRight.startDate).isSameOrBefore(startDate) && moment(studyRight.endDate).isSameOrAfter(moment())
 }
 
-const isEndDateBeforeNow = studyRight => moment(studyRight.endDate).isSameOrBefore(moment())
+const isEndDateBeforeNow = (studyRight: SISStudyRight) => moment(studyRight.endDate).isSameOrBefore(moment())
 
-const getEmptyCourseInfo = () => ({
+const getEmptyCourseInfo = (): CourseInfo => ({
   status: {
     passed: null,
     failed: null,
@@ -40,13 +64,13 @@ const getEmptyCourseInfo = () => ({
   },
 })
 
-const updatePassedStatus = (courseInfo, attainmentDate) => {
+const updatePassedStatus = (courseInfo: CourseInfo, attainmentDate: Date) => {
   if (!courseInfo.status.passed || moment(courseInfo.status.passed).isBefore(attainmentDate, 'day')) {
     courseInfo.status.passed = attainmentDate
   }
 }
 
-const updateFailedStatus = (courseInfo, attainmentDate) => {
+const updateFailedStatus = (courseInfo: CourseInfo, attainmentDate: Date) => {
   if (
     !courseInfo.status.passed &&
     (!courseInfo.status.failed || moment(courseInfo.status.failed).isBefore(attainmentDate, 'day'))
@@ -55,7 +79,7 @@ const updateFailedStatus = (courseInfo, attainmentDate) => {
   }
 }
 
-const updateUnfinishedStatus = (courseInfo, enrollmentDateTime) => {
+const updateUnfinishedStatus = (courseInfo: CourseInfo, enrollmentDateTime: Date) => {
   if (
     !courseInfo.status.passed &&
     !courseInfo.status.failed &&
@@ -65,12 +89,12 @@ const updateUnfinishedStatus = (courseInfo, enrollmentDateTime) => {
   }
 }
 
-const getCustomOpenUniCourses = async (courseCodes, startDate, endDate) => {
+export const getCustomOpenUniCourses = async (courseCodes: string[], startDate: Date, endDate: Date) => {
   const allCourseCodes = getAllCourseCodes(courseCodes)
   const allCredits = await getCredits(allCourseCodes, startDate)
   const allEnrollments = await getEnrollments(allCourseCodes, startDate, endDate)
   const courses = await getCourseNames(courseCodes)
-  const studentNumbers = uniq(allEnrollments.map(enrollment => enrollment.enrollmentStudentNumber))
+  const studentNumbers = uniq(allEnrollments.map(enrollment => enrollment.enrollmentStudentNumber)) as string[]
   const allStudyRights = await getStudyRights(studentNumbers)
   const studentInfo = await getStudentInfo(studentNumbers)
 
@@ -88,7 +112,7 @@ const getCustomOpenUniCourses = async (courseCodes, startDate, endDate) => {
 
   const uniqueStudentsWithCurrentStudyRight = uniq(studentsWithCurrentStudyRight)
 
-  const studentStats = {}
+  const studentStats: StudentStats = {}
 
   for (const { studentNumber, email, secondaryEmail } of studentInfo) {
     if (uniqueStudentsWithCurrentStudyRight.includes(studentNumber)) {
@@ -124,5 +148,3 @@ const getCustomOpenUniCourses = async (courseCodes, startDate, endDate) => {
   const openUniStats = { students: studentStats, courses }
   return openUniStats
 }
-
-module.exports = { getCustomOpenUniCourses }

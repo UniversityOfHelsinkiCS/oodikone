@@ -48,7 +48,7 @@ const MedianDisplay = ({
           universityMode={universityMode}
           yearLabel={yearLabel}
         />
-        {!programmeData ? (
+        {!programmeData || !(year in levelProgrammeData) ? (
           <div className="graduations-message">
             <Message compact>
               Click a bar to view that year's {universityMode ? 'faculty' : 'programme'} level breakdown
@@ -57,7 +57,7 @@ const MedianDisplay = ({
         ) : (
           <MedianBarChart
             classSizes={classSizes?.programmes}
-            data={levelProgrammeData[year]?.data}
+            data={levelProgrammeData[year].data}
             facultyGraph={false}
             goal={goal}
             goalExceptions={goalExceptions}
@@ -93,7 +93,7 @@ const BreakdownDisplay = ({
           universityMode={universityMode}
           yearLabel={yearLabel}
         />
-        {!programmeData ? (
+        {!programmeData || !(year in levelProgrammeData) ? (
           <div className="graduations-message">
             <Message compact>
               Click a bar to view that year's {universityMode ? 'faculty' : 'programme'} level breakdown
@@ -101,7 +101,7 @@ const BreakdownDisplay = ({
           </div>
         ) : (
           <BreakdownBarChart
-            data={levelProgrammeData[year]?.data}
+            data={levelProgrammeData[year].data}
             facultyGraph={false}
             handleClick={handleClick}
             programmeNames={programmeNames}
@@ -131,9 +131,9 @@ export const GraduationTimes = ({
 }) => {
   const [programmeData, setProgrammeData] = useState(false)
   const [year, setYear] = useState(null)
-  if (!data.some(a => a.amount > 0)) {
-    return null
-  }
+
+  if (!data) return null
+
   const handleClick = (event, isFacultyGraph, seriesCategory = null) => {
     if (isFacultyGraph) {
       setYear(seriesCategory || event.point.name)

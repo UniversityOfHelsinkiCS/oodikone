@@ -42,26 +42,11 @@ router.get('/:id/basicstats', auth.roles(['facultyStatistics', 'katselmusViewer'
   if (!code) return res.status(422).end()
   const data = await getBasicStats(code, yearType, programmeFilter, specialGroups)
   if (data) return res.json(data)
-  const wantedProgrammes = await getProgrammes(code, programmeFilter)
-  if (!wantedProgrammes) return res.status(422).end()
 
-  // all programmes are required for correct sorting of transfers
-  const allProgrammeCodes = []
-  if (programmeFilter === 'NEW_STUDY_PROGRAMMES') {
-    const allProgs = await getProgrammes(code, 'ALL_PROGRAMMES')
-    allProgs?.data.forEach(prog => allProgrammeCodes.push(prog.code))
-  } else {
-    wantedProgrammes?.data.forEach(prog => allProgrammeCodes.push(prog.code))
-  }
+  const programmes = await getDegreeProgrammesOfFaculty(code, programmeFilter === 'NEW_STUDY_PROGRAMMES')
+  if (!programmes.length) return res.status(422).end()
 
-  let updatedStats = await combineFacultyBasics(
-    code,
-    wantedProgrammes.data,
-    yearType,
-    allProgrammeCodes,
-    programmeFilter,
-    specialGroups
-  )
+  let updatedStats = await combineFacultyBasics(code, programmes, yearType, specialGroups)
   if (updatedStats) {
     updatedStats = await setBasicStats(updatedStats, yearType, programmeFilter, specialGroups)
   }
@@ -84,9 +69,9 @@ router.get('/:id/thesisstats', auth.roles(['facultyStatistics', 'katselmusViewer
   if (!code) return res.status(422).end()
   const data = await getThesisWritersStats(code, yearType, programmeFilter, specialGroups)
   if (data) return res.json(data)
-  const programmes = await getProgrammes(code, programmeFilter)
-  if (!programmes) return res.status(422).end()
-  let updateStats = await combineFacultyThesisWriters(code, programmes.data, yearType, specialGroups)
+  const programmes = await getDegreeProgrammesOfFaculty(code, programmeFilter === 'NEW_STUDY_PROGRAMMES')
+  if (!programmes.length) return res.status(422).end()
+  let updateStats = await combineFacultyThesisWriters(code, programmes, yearType, specialGroups)
   if (updateStats) {
     updateStats = await setThesisWritersStats(updateStats, yearType, programmeFilter, specialGroups)
   }
@@ -102,7 +87,8 @@ router.get('/:id/graduationtimes', auth.roles(['facultyStatistics', 'katselmusVi
   if (data) {
     return res.json(data)
   }
-  let updatedStats = await countGraduationTimes(code, programmeFilter)
+  const programmes = await getDegreeProgrammesOfFaculty(code, programmeFilter === 'NEW_STUDY_PROGRAMMES')
+  let updatedStats = await countGraduationTimes(code, programmes)
   if (updatedStats) {
     updatedStats = await setGraduationStats(updatedStats, programmeFilter)
   }

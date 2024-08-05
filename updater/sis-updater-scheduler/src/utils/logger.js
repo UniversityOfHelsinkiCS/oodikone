@@ -11,6 +11,7 @@ const {
   sentryEnvironment,
   sentryDSN,
   runningInCI,
+  serviceProvider,
 } = require('../config')
 
 const { combine, timestamp, printf, splat } = winston.format
@@ -64,7 +65,7 @@ if (isDev) {
 
   transports.push(new winston.transports.Console({ format: combine(splat(), timestamp(), prodFormat) }))
 
-  if (isProduction && !isStaging) {
+  if (isProduction && !isStaging && serviceProvider !== 'fd') {
     transports.push(
       new WinstonGelfTransporter({
         handleExceptions: true,
@@ -83,7 +84,7 @@ if (isDev) {
 
 const logger = winston.createLogger({ transports })
 
-logger.on('error', e => console.error('Logging failed! Reason: ', e)) // eslint-disable-line no-console
+logger.on('error', error => console.error('Logging failed! Reason: ', error)) // eslint-disable-line no-console
 
 module.exports = {
   logger,

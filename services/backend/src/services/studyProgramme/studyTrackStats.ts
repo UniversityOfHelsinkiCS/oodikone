@@ -23,6 +23,19 @@ import {
 } from './studyProgrammeHelpers'
 import { getStudyTracksForProgramme } from './studyRightFinders'
 
+type MedianEntry = {
+  amount: number
+  classSize: number
+  name: string
+  statistics: ReturnType<typeof countTimeCategories>
+  y: number
+  times: number[]
+}
+
+export type ProgrammeOrStudyTrackGraduationStats = {
+  medians: { basic: MedianEntry[]; combo: MedianEntry[] }
+}
+
 const getCreditCount = (credits: Credit[], startDate: Date) =>
   credits
     .filter(credit => moment(credit.attainment_date).isSameOrAfter(startDate))
@@ -35,18 +48,6 @@ const getGraduationTimeStats = (
   mainStatsByTrack: ReturnType<typeof combineStats>['mainStatsByTrack'],
   combinedProgramme?: string
 ) => {
-  type MedianEntry = {
-    amount: number
-    classSize: number
-    name: string
-    statistics: ReturnType<typeof countTimeCategories>
-    y: number
-  }
-
-  type ProgrammeOrStudyTrackGraduationStats = {
-    medians: { basic: MedianEntry[]; combo: MedianEntry[] }
-  }
-
   type Goals = { basic: number; combo: number }
 
   type GraduationTimes = {
@@ -79,6 +80,7 @@ const getGraduationTimeStats = (
           name: year,
           statistics: countTimeCategories(oneYearStats, finalGraduationTimes.goals[type]),
           y: getMedian(oneYearStats),
+          times: [...oneYearStats],
         }
         ;(finalGraduationTimes[programmeOrTrack] as ProgrammeOrStudyTrackGraduationStats).medians[type].push(final)
       }

@@ -35,7 +35,7 @@ describe('Faculty overview', () => {
   describe('Basic information: basic user', () => {
     beforeEach(() => {
       cy.init('/faculties')
-      cy.contains('a', 'Maatalous-metsätieteellinen tiedekunta').click()
+      cy.contains('a', 'Matemaattis-luonnontieteellinen tiedekunta').click()
     })
 
     it('Basic information tab show all graphs and tables', () => {
@@ -93,7 +93,7 @@ describe('Faculty overview', () => {
         cy.get(`[data-cy="Graph-${section}"]`).within(() => {
           cy.get('[aria-label="View chart menu, Chart"]').click()
           cy.contains('li.highcharts-menu-item', 'Download XLS').click()
-          const downloadedFile = `oodikone_${section}_H80_${timestamp}.xls`
+          const downloadedFile = `oodikone_${section}_H50_${timestamp}.xls`
           cy.readFile(path.join(downloadsFolder, downloadedFile))
         })
       })
@@ -181,7 +181,7 @@ describe('Faculty overview', () => {
         cy.contains('1 graduated').should('have.length', 1)
         cy.contains('1 graduated').trigger('mouseover')
         cy.contains('1 students graduated in year 2019')
-        cy.contains('median study time: 40 months')
+        cy.contains('median study time: 41 months')
         cy.contains('0 graduated on time')
         cy.contains('1 graduated max year overtime')
 
@@ -190,7 +190,7 @@ describe('Faculty overview', () => {
         cy.get('div[class="programmes-graph"]').should('be.visible')
         cy.get('div[class="programmes-graph"]').within(() => {
           cy.contains('EDUK')
-          cy.get('[aria-label="EDUK, 40."]').trigger('mouseover')
+          cy.get('[aria-label="EDUK, 41."]').trigger('mouseover')
           cy.contains('Kasvatustieteiden kandiohjelma')
           cy.contains('KH60_001')
         })
@@ -201,17 +201,17 @@ describe('Faculty overview', () => {
         cy.contains('24 graduated').should('have.length', 1)
         cy.contains('24 graduated').trigger('mouseover')
         cy.contains('24 students graduated in year 2020')
-        cy.contains('median study time: 22 months')
+        cy.contains('median study time: 22.5 months')
         cy.contains('0 graduated over year late')
-        cy.contains('20 graduated on time')
-        cy.contains('4 graduated max year overtime')
+        cy.contains('19 graduated on time')
+        cy.contains('5 graduated max year overtime')
 
         cy.contains('24 graduated').click()
         cy.contains('Year 2020 by graduation year')
         cy.get('div[class="programmes-graph"]').should('be.visible')
         cy.get('div[class="programmes-graph"]').within(() => {
           cy.contains('EDUM')
-          cy.get('[aria-label="EDUM, 22."]').trigger('mouseover')
+          cy.get('[aria-label="EDUM, 22.5."]').trigger('mouseover')
           cy.contains('Kasvatustieteiden maisteriohjelma')
           cy.contains('MH60_001')
         })
@@ -226,19 +226,19 @@ describe('Faculty overview', () => {
 
       cy.get('[data-cy="Section-master"]').within(() => {
         cy.get('div[class="faculty-graph"]')
-        cy.contains('19 graduated (44.2 % of class)').should('have.length', 1)
-        cy.contains('19 graduated').trigger('mouseover')
-        cy.contains('From class of 2018, 19/43 students have graduated')
+        cy.contains('18 graduated (40 % of class)').should('have.length', 1)
+        cy.contains('18 graduated').trigger('mouseover')
+        cy.contains('From class of 2018 - 2019, 18/45 students have graduated')
       })
 
       cy.get('[data-cy="GraduationTimeToggle"]').click()
       cy.get('[data-cy="Section-master"]').within(() => {
-        cy.get('[aria-label="2018, 16. On time."]').click()
+        cy.get('[aria-label="2018 - 2019, 14. On time."]').click()
         cy.get('div[class="programmes-breakdown-graph"]').should('be.visible')
         cy.get('div[class="programmes-breakdown-graph"]').within(() => {
-          cy.contains('Year 2018 by start year')
+          cy.contains('Year 2018 - 2019 by start year')
           cy.contains('EDUM')
-          cy.get('[aria-label="EDUM, 3. Max. year overtime."]').trigger('mouseover')
+          cy.get('[aria-label="EDUM, 4. Max. year overtime."]').trigger('mouseover')
           cy.contains('Kasvatustieteiden maisteriohjelma')
           cy.contains('MH60_001')
         })

@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import { CreditTypeCode } from '../types'
 import { Course } from './course'
 import { CourseProvider } from './courseProvider'

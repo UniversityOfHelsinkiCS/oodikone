@@ -1,20 +1,19 @@
-import { Response, Router } from 'express'
+import { Request, Response, Router } from 'express'
 
 import { isDev } from '../config'
 import * as auth from '../middleware/auth'
 import * as userService from '../services/userService'
-import { OodikoneRequest } from '../types'
 
 const router = Router()
 
-interface NewUserEppnRequest extends OodikoneRequest {
+interface NewUserEppnRequest extends Request {
   params: {
     newUserEppn: string
   }
 }
 
 router.get('/from-sisu-by-eppn/:newUserEppn', auth.roles(['admin']), async (req: NewUserEppnRequest, res: Response) => {
-  let { username: requesterEppn } = req.user!
+  let { username: requesterEppn } = req.user
   const { newUserEppn } = req.params
   // In order to test this feature in the dev environment we need to set an eppn that demo sisu will recognize
   if (isDev && requesterEppn === 'mluukkai') {
@@ -24,7 +23,7 @@ router.get('/from-sisu-by-eppn/:newUserEppn', auth.roles(['admin']), async (req:
   res.json(person)
 })
 
-interface AddUserRequest extends OodikoneRequest {
+interface AddUserRequest extends Request {
   body: {
     user: any // TODO: Funidata, what is the type of user?
   }

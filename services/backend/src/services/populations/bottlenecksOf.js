@@ -4,7 +4,7 @@ const { getPassingSemester } = require('../../util/semester')
 const { CourseStatsCounter } = require('../courses/courseStatsCounter')
 const { encrypt } = require('../encrypt')
 const { dateMonthsFromNow, findCourses, findCourseEnrollments, parseCreditInfo, parseQueryParams } = require('./shared')
-const { studentnumbersWithAllStudyrightElements } = require('./studentnumbersWithAllStudyrightElements')
+const { getStudentNumbersWithAllStudyRightElements } = require('./studentNumbersWithAllElements')
 
 const getStudentsAndCourses = async (params, selectedStudents, studentNumbers, courseCodes) => {
   if (!studentNumbers) {
@@ -12,7 +12,7 @@ const getStudentsAndCourses = async (params, selectedStudents, studentNumbers, c
       params
     const studentnumbers =
       selectedStudents ||
-      (await studentnumbersWithAllStudyrightElements({
+      (await getStudentNumbersWithAllStudyRightElements({
         studyRights,
         startDate,
         endDate,

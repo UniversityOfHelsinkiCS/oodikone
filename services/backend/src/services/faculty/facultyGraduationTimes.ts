@@ -1,367 +1,305 @@
-import moment from 'moment'
+import { cloneDeep, omit } from 'lodash'
 
-import { programmeCodes } from '../../config/programmeCodes'
-import { ExtentCode } from '../../types'
-import { countTimeCategories, getBachelorStudyRight, getStatutoryAbsences } from '../graduationHelpers'
-import { defineYear, getMedian, getYearsArray, getYearsObject } from '../studyProgramme/studyProgrammeHelpers'
-import { graduatedStudyrights, hasMasterRight, studyrightsByRightStartYear } from './faculty'
-import { findRightProgramme, isNewProgramme } from './facultyHelpers'
-import { getProgrammes } from './facultyService'
+import { Name } from '../../types'
+import { getGraduationStats, getStudytrackStats, setGraduationStats, setStudytrackStats } from '../analyticsService'
+import { getGraduationStatsForStudytrack, GraduationTimes } from '../studyProgramme/studyProgrammeGraduations'
+import { getMedian } from '../studyProgramme/studyProgrammeHelpers'
+import { getStudyRightsInProgramme } from '../studyProgramme/studyRightFinders'
+import {
+  getStudytrackStatsForStudyprogramme,
+  ProgrammeOrStudyTrackGraduationStats,
+} from '../studyProgramme/studyTrackStats'
+import type { ProgrammesOfOrganization } from './faculty'
 
-type Programme = { name: string; code: string }
+type LevelGraduationStats = Omit<GraduationTimes['medians'][number], 'y'> & { median: number }
 
-const sortProgrammes = (programmes: Programme[]) => {
-  const check = (name: string) => {
-    if (Number.isNaN(name[0])) return -1
-    return 1
-  }
-  programmes.sort((a, b) => {
-    if (check(a.name) === check(b.name)) return a.name.localeCompare(b.name)
-    return check(a.name) - check(b.name)
-  })
+type ProgrammeStats = {
+  data: Array<Omit<LevelGraduationStats, 'times'> & { code: string }>
+  programmes: string[]
 }
 
-const getSortedProgIds = (progs: string[]) => {
-  const programmes: Programme[] = []
+const programmeTypes = {
+  'urn:code:degree-program-type:bachelors-degree': 'bachelor',
+  'urn:code:degree-program-type:masters-degree': 'master',
+  'urn:code:degree-program-type:doctor': 'doctor',
+} as const
 
-  for (const prog of progs) {
-    const name = programmeCodes[prog] ? programmeCodes[prog as keyof typeof programmeCodes] : null
-    if (name) {
-      programmes.push({ name, code: prog })
-    } else {
-      programmes.push({ name: prog, code: prog })
+const getStatsByGraduationYear = async (facultyProgrammes: ProgrammesOfOrganization) => {
+  const newStats: Array<Awaited<ReturnType<typeof getGraduationStatsForStudytrack>>> = []
+  const medians: Record<string, LevelGraduationStats[]> = {}
+  const programmes: { medians: Record<string, Record<string, ProgrammeStats>> } = { medians: {} }
+
+  for (const programme of facultyProgrammes) {
+    if (!(programme.degreeProgrammeType in programmeTypes)) {
+      continue
     }
-  }
-  sortProgrammes(programmes)
-  return programmes
-}
-
-const findBachelorStartdate = async id => {
-  const studyright = await getBachelorStudyRight(id)
-  if (studyright) return studyright.startdate
-  return null
-}
-
-const getProgrammeObjectBasis = (years, levels, emptyObject = true) => {
-  return levels.reduce(
-    (acc, level) => ({ ...acc, [level]: years.reduce((acc, year) => ({ ...acc, [year]: emptyObject ? {} : 0 }), {}) }),
-    {}
-  )
-}
-
-const hasMS = async (programme: string, elements, studyrightid: string): Promise<boolean> => {
-  // Only bachelor studyright: socCom, kasvatustiede - varhaiskasvatus track, farmasia - applied only to Bc = farmaseutti,
-  if (['KH74_001', '620050-ba', '620030-ba', '520091-ba'].includes(programme)) {
-    return false
-  }
-  if (programme === 'KH60_001') {
-    return !elements.some(element => ['EDUK-VO', '0371', '620050-ba', '620030-ba'].includes(element.dataValues.code))
-  }
-  if (programme === 'KH55_001') {
-    const hasRight = await hasMasterRight(studyrightid.replace(/-1$/, '-2'))
-    if (!hasRight) {
-      return false
+    const statsFromRedis = await getGraduationStats(programme.code, '', 'CALENDAR_YEAR', 'SPECIAL_INCLUDED')
+    if (statsFromRedis) {
+      newStats.push(statsFromRedis)
+      continue
     }
-  }
-  return true
-}
-
-const addGraduation = async (
-  extentcode,
-  startdate,
-  studyrightid,
-  enddate,
-  studentnumber,
-  graduationAmounts,
-  graduationTimes,
-  year,
-  programmes,
-  programme
-) => {
-  let actualStartdate = startdate
-  let level: string | null = null
-
-  if (programme === 'MH30_001' || programme === 'MH30_003') {
-    level = 'bcMsCombo'
-  } else if (extentcode === ExtentCode.BACHELOR) {
-    level = 'bachelor'
-  } else if (extentcode === ExtentCode.MASTER) {
-    if (studyrightid.slice(-2) === '-2') {
-      level = 'bcMsCombo'
-      actualStartdate = await findBachelorStartdate(studyrightid.replace(/-2$/, '-1'))
-    } else {
-      level = 'master'
-    }
-  } else if (extentcode === ExtentCode.DOCTOR) {
-    level = 'doctor'
-  } else if (extentcode === ExtentCode.LICENTIATE) {
-    level = 'licentiate'
-  } else {
-    return
-  }
-
-  const absoluteTimeToGraduation = moment(enddate).diff(moment(actualStartdate), 'months')
-  const statutoryAbsences = await getStatutoryAbsences(studentnumber, actualStartdate, enddate)
-  const timeToGraduation = absoluteTimeToGraduation - statutoryAbsences
-
-  graduationAmounts[level][year] += 1
-  graduationTimes[level][year] = [...graduationTimes[level][year], timeToGraduation]
-
-  if (!(programme in programmes[level][year])) {
-    programmes[level][year][programme] = { graduationTimes: [], graduationAmounts: 0 }
-  }
-
-  programmes[level][year][programme].graduationAmounts += 1
-  programmes[level][year][programme].graduationTimes = [
-    ...programmes[level][year][programme].graduationTimes,
-    timeToGraduation,
-  ]
-}
-
-const getClassSizes = async (faculty, programmeCodes, since, classSizes, programmeFilter, years) => {
-  for (const code of programmeCodes) {
-    const studyrights = await studyrightsByRightStartYear(faculty, since, code, [0, 1])
-
-    // get all received studyrights for each year
-    // a transferred student is counted into new programmes class size i.e.
-    // students who received studyright on year X and graduated/will be graduating from programme Y
-    // if we only counted those who started fresh in the new programme we could get a bigger number of graduates
-    // than the class size, as the graduatation time count only looks at a degree as whole studyright
-    for (const right of studyrights) {
-      const { startdate, studyrightid, extentcode, studyrightElements } = right
-      if (programmeFilter === 'NEW_STUDY_PROGRAMMES' && !isNewProgramme(code)) continue
-
-      let actualStartdate = startdate
-      let level: string | null = null
-
-      if (code === 'MH30_001' || code === 'MH30_003') {
-        level = 'bcMsCombo'
-      } else if (extentcode === ExtentCode.BACHELOR) {
-        level = 'bachelor'
-      } else if (extentcode === ExtentCode.MASTER) {
-        if (studyrightid.slice(-2) === '-2') {
-          level = 'bcMsCombo'
-          actualStartdate = (await findBachelorStartdate(studyrightid.replace(/-2$/, '-1')))!
-        } else if (code.includes('KH')) {
-          level = 'bachelor' // Some rare faculties have one/two outliers with extent 2 for bachelor
-        } else {
-          level = 'master'
-        }
-      } else if (extentcode === ExtentCode.DOCTOR) {
-        level = 'doctor'
-      } else if (extentcode === ExtentCode.LICENTIATE) {
-        level = 'licentiate'
-      } else {
-        continue
-      }
-      const startYear = defineYear(actualStartdate, false)
-
-      // On faculty level, count started bachelor rights to BcMsCombo as well  --> useful class size even if master studies have yet not started
-      // On programme level BcMsCombo sizes are iffy as many students haven't started masters yet --> no Ms programme element to count
-      if (level !== 'bcMsCombo') {
-        classSizes[level][startYear] += 1
-        if (level === 'bachelor' && (await hasMS(code, studyrightElements, studyrightid))) {
-          classSizes.bcMsCombo[startYear] += 1
-        }
-      }
-
-      if (!(code in classSizes.programmes)) {
-        if (extentcode === ExtentCode.MASTER) {
-          classSizes.programmes[code] = {}
-          classSizes.programmes[code].bcMsCombo = getYearsObject({ years, emptyArrays: false })
-          classSizes.programmes[code].master = getYearsObject({ years, emptyArrays: false })
-        } else {
-          classSizes.programmes[code] = getYearsObject({ years, emptyArrays: false })
-        }
-      }
-
-      if (extentcode === ExtentCode.MASTER && ['master', 'bcMsCombo'].includes(level)) {
-        classSizes.programmes[code][level][startYear] += 1
-      } else {
-        classSizes.programmes[code][startYear] += 1
-      }
-    }
-  }
-}
-
-const count = async (
-  faculty,
-  programmeCodes,
-  since,
-  years,
-  yearsList,
-  levels,
-  programmeFilter,
-  programmeNames,
-  goals,
-  mode
-) => {
-  const graduationAmounts = {}
-  const graduationTimes = {}
-  const programmes = getProgrammeObjectBasis(yearsList, levels)
-  const data = {
-    medians: {},
-    programmes: {
-      medians: getProgrammeObjectBasis(yearsList, levels),
-    },
-  }
-
-  levels.forEach(level => {
-    graduationAmounts[level] = getYearsObject({ years: yearsList })
-    graduationTimes[level] = getYearsObject({ years: yearsList, emptyArrays: true })
-    data.medians[level] = []
-  })
-  for (const code of programmeCodes) {
-    const studyrights =
-      mode === 'gradYear'
-        ? await graduatedStudyrights(faculty, since, code)
-        : await studyrightsByRightStartYear(faculty, since, code)
-    for (const right of studyrights) {
-      const { enddate, startdate, studyrightid, extentcode, studyrightElements, studentnumber } = right
-      const { programme, programmeName } = findRightProgramme(studyrightElements, code)
-      if (programmeFilter === 'NEW_STUDY_PROGRAMMES' && !isNewProgramme(programme)) continue
-
-      if (!(programme in programmeNames)) {
-        programmeNames[programme] = programmeName
-      }
-
-      const year = mode === 'gradYear' ? defineYear(enddate, false) : defineYear(startdate, false)
-
-      await addGraduation(
-        extentcode,
-        startdate,
-        studyrightid,
-        enddate,
-        studentnumber,
-        graduationAmounts,
-        graduationTimes,
-        year,
-        programmes,
-        programme
-      )
-    }
-  }
-  years.forEach(year => {
-    levels.forEach(level => {
-      const median = getMedian(graduationTimes[level][year])
-      const statistics = { onTime: 0, yearOver: 0, wayOver: 0 }
-
-      // Programme level breakdown
-      data.programmes.medians[level][year] = { programmes: [], data: [] }
-      const programmeCodes = Object.keys(programmes[level][year])
-      const programmeIds = getSortedProgIds(programmeCodes)
-
-      if (programmeIds.length > 0) {
-        for (const prog of programmeIds) {
-          const progMedian = getMedian(programmes[level][year][prog.code].graduationTimes)
-
-          let goal = goals[level]
-          if (faculty === 'H30' && Object.keys(goals.exceptions).includes(prog.code)) {
-            goal += goals.exceptions[prog.code]
-          }
-
-          const progStatistics = countTimeCategories(programmes[level][year][prog.code].graduationTimes, goal)
-          Object.keys(progStatistics).forEach(key => {
-            statistics[key] += progStatistics[key]
-          })
-
-          data.programmes.medians[level][year].programmes = [
-            ...data.programmes.medians[level][year].programmes,
-            prog.code,
-          ]
-          data.programmes.medians[level][year].data = [
-            ...data.programmes.medians[level][year].data,
-            {
-              median: progMedian,
-              amount: programmes[level][year][prog.code].graduationAmounts,
-              statistics: progStatistics,
-              name: prog.name,
-              code: prog.code,
-            },
-          ]
-        }
-      }
-      data.medians[level] = [
-        ...data.medians[level],
-        {
-          median,
-          amount: graduationAmounts[level][year],
-          // Include individual graduation times for the sake of university-level
-          // evaluation overview which has to count medians by itself
-          times: graduationTimes[level][year],
-          statistics,
-          name: year,
-        },
-      ]
+    const updatedStats = await getGraduationStatsForStudytrack({
+      studyprogramme: programme.code,
+      combinedProgramme: '',
+      settings: {
+        isAcademicYear: false,
+        includeAllSpecials: true,
+      },
     })
-  })
+    await setGraduationStats(updatedStats, 'CALENDAR_YEAR', 'SPECIAL_INCLUDED')
+    newStats.push(updatedStats)
+  }
 
-  return data
+  for (const { id: programmeCode, graduationTimes, comboTimes } of newStats) {
+    const { degreeProgrammeType, progId, code } = facultyProgrammes.find(({ code }) => code === programmeCode)!
+    const level = programmeTypes[degreeProgrammeType as keyof typeof programmeTypes]
+
+    if (!medians[level]) {
+      medians[level] = cloneDeep(graduationTimes.medians).map(year => ({ ...omit(year, ['y']), median: year.y }))
+    } else {
+      for (const statsForYear of graduationTimes.medians) {
+        const correctYear = medians[level].find(entry => entry.name === statsForYear.name)
+        if (!correctYear) {
+          medians[level].push({ ...omit(cloneDeep(statsForYear), ['y']), median: statsForYear.y })
+          continue
+        }
+        correctYear.times.push(...statsForYear.times)
+        correctYear.median = getMedian(correctYear.times)
+        correctYear.amount += statsForYear.amount
+        correctYear.statistics.onTime += statsForYear.statistics.onTime
+        correctYear.statistics.yearOver += statsForYear.statistics.yearOver
+        correctYear.statistics.wayOver += statsForYear.statistics.wayOver
+      }
+    }
+
+    if (level === 'master' && comboTimes.medians.length) {
+      if (!medians.bcMsCombo) {
+        medians.bcMsCombo = cloneDeep(comboTimes.medians).map(year => ({ ...omit(year, ['y']), median: year.y }))
+      } else {
+        for (const statsForYear of comboTimes.medians) {
+          const correctYear = medians.bcMsCombo.find(entry => entry.name === statsForYear.name)
+          if (!correctYear) {
+            medians.bcMsCombo.push({ ...omit(cloneDeep(statsForYear), ['y']), median: statsForYear.y })
+            continue
+          }
+          correctYear.times.push(...statsForYear.times)
+          correctYear.median = getMedian(correctYear.times)
+          correctYear.amount += statsForYear.amount
+          correctYear.statistics.onTime += statsForYear.statistics.onTime
+          correctYear.statistics.yearOver += statsForYear.statistics.yearOver
+          correctYear.statistics.wayOver += statsForYear.statistics.wayOver
+        }
+      }
+    }
+
+    if (!programmes.medians[level]) {
+      programmes.medians[level] = {}
+    }
+
+    for (const year of graduationTimes.medians) {
+      if (year.y === 0) continue
+      if (!programmes.medians[level][year.name]) {
+        programmes.medians[level][year.name] = { data: [], programmes: [] }
+      }
+      programmes.medians[level][year.name].data.push(
+        omit({ ...cloneDeep(year), name: progId, code, median: year.y }, ['times', 'y'])
+      )
+      programmes.medians[level][year.name].programmes.push(code)
+    }
+
+    if (level === 'master' && comboTimes.medians.length) {
+      if (!programmes.medians.bcMsCombo) {
+        programmes.medians.bcMsCombo = {}
+      }
+      for (const year of comboTimes.medians) {
+        if (year.y === 0) continue
+        if (!programmes.medians.bcMsCombo[year.name]) {
+          programmes.medians.bcMsCombo[year.name] = { data: [], programmes: [] }
+        }
+        programmes.medians.bcMsCombo[year.name].data.push(
+          omit({ ...cloneDeep(year), name: progId, code, median: year.y }, ['times', 'y'])
+        )
+        programmes.medians.bcMsCombo[year.name].programmes.push(code)
+      }
+    }
+  }
+  return { medians, programmes }
 }
 
-export const countGraduationTimes = async (faculty, programmeFilter) => {
-  const programmes = (await getProgrammes(faculty, programmeFilter)).data
-  const isAcademicYear = false
-  const since = isAcademicYear ? new Date('2017-08-01') : new Date('2017-01-01')
-  const yearsList = getYearsArray(since.getFullYear(), isAcademicYear)
-  const levels = ['bachelor', 'bcMsCombo', 'master', 'doctor', 'licentiate']
-  const programmeNames = {}
+const getStatsByStartYear = async (facultyProgrammes: ProgrammesOfOrganization) => {
+  const newStats: Array<Awaited<ReturnType<typeof getStudytrackStatsForStudyprogramme>>> = []
+  const medians: Record<string, LevelGraduationStats[]> = {}
+  const programmes: { medians: Record<string, Record<string, ProgrammeStats>> } = { medians: {} }
+  const classSizes: Record<string, Record<string, number | Record<string, number>>> = { programmes: {} }
 
-  const years = [...yearsList].reverse()
+  for (const programme of facultyProgrammes) {
+    if (!(programme.degreeProgrammeType in programmeTypes)) {
+      continue
+    }
+    const statsFromRedis = await getStudytrackStats(programme.code, '', 'GRADUATED_INCLUDED', 'SPECIAL_EXCLUDED')
+    if (statsFromRedis) {
+      newStats.push(statsFromRedis)
+      continue
+    }
+
+    const studyRightsOfProgramme = await getStudyRightsInProgramme(programme.code, false, true)
+    const updatedStats = await getStudytrackStatsForStudyprogramme({
+      studyprogramme: programme.code,
+      combinedProgramme: '',
+      settings: {
+        graduated: true,
+        specialGroups: false,
+      },
+      studyRightsOfProgramme,
+    })
+    await setStudytrackStats(updatedStats, 'GRADUATED_INCLUDED', 'SPECIAL_EXCLUDED')
+    newStats.push(updatedStats)
+  }
+
+  for (const { id: programmeCode, graduationTimes } of newStats) {
+    const { degreeProgrammeType, progId, code } = facultyProgrammes.find(({ code }) => code === programmeCode)!
+    const level = programmeTypes[degreeProgrammeType as keyof typeof programmeTypes]
+    if (!(programmeCode in graduationTimes)) continue
+    const statsForProgramme = graduationTimes[programmeCode] as ProgrammeOrStudyTrackGraduationStats
+    const basicStats = statsForProgramme.medians.basic
+    const comboStats = statsForProgramme.medians.combo
+    const classSizesByYear = basicStats.reduce<Record<string, number>>(
+      (acc, year) => ({ ...acc, [year.name]: year.classSize }),
+      {}
+    )
+    classSizes.programmes[code] = classSizesByYear
+
+    if (!medians[level]) {
+      medians[level] = cloneDeep(basicStats).map(year => {
+        if (!classSizes[level]) {
+          classSizes[level] = {}
+        }
+        classSizes[level][year.name] = year.classSize
+        return { ...omit(year, ['y', 'classSize']), median: year.y }
+      })
+    } else {
+      for (const statsForYear of basicStats) {
+        const correctYear = medians[level].find(entry => entry.name === statsForYear.name)
+        if (!correctYear) {
+          medians[level].push({ ...omit(cloneDeep(statsForYear), ['y', 'classSize']), median: statsForYear.y })
+          continue
+        }
+        ;(classSizes[level][statsForYear.name] as number) += statsForYear.classSize
+        correctYear.times.push(...statsForYear.times)
+        correctYear.median = getMedian(correctYear.times)
+        correctYear.amount += statsForYear.amount
+        correctYear.statistics.onTime += statsForYear.statistics.onTime
+        correctYear.statistics.yearOver += statsForYear.statistics.yearOver
+        correctYear.statistics.wayOver += statsForYear.statistics.wayOver
+      }
+    }
+
+    if (level === 'master' && comboStats.length) {
+      if (!medians.bcMsCombo) {
+        medians.bcMsCombo = cloneDeep(comboStats).map(year => {
+          if (!classSizes.bcMsCombo) {
+            classSizes.bcMsCombo = {}
+          }
+          classSizes.bcMsCombo[year.name] = year.classSize
+          return { ...omit(year, ['y', 'classSize']), median: year.y }
+        })
+      } else {
+        for (const statsForYear of comboStats) {
+          const correctYear = medians.bcMsCombo.find(entry => entry.name === statsForYear.name)
+          if (!correctYear) {
+            medians.bcMsCombo.push({ ...omit(cloneDeep(statsForYear), ['y', 'classSize']), median: statsForYear.y })
+            continue
+          }
+          ;(classSizes.bcMsCombo[statsForYear.name] as number) += statsForYear.classSize
+          correctYear.times.push(...statsForYear.times)
+          correctYear.median = getMedian(correctYear.times)
+          correctYear.amount += statsForYear.amount
+          correctYear.statistics.onTime += statsForYear.statistics.onTime
+          correctYear.statistics.yearOver += statsForYear.statistics.yearOver
+          correctYear.statistics.wayOver += statsForYear.statistics.wayOver
+        }
+      }
+    }
+
+    if (!programmes.medians[level]) {
+      programmes.medians[level] = {}
+    }
+
+    for (const year of basicStats) {
+      if (year.y === 0) continue
+      if (!programmes.medians[level][year.name]) {
+        programmes.medians[level][year.name] = { data: [], programmes: [] }
+      }
+      programmes.medians[level][year.name].data.push(
+        omit({ ...cloneDeep(year), name: progId, code, median: year.y }, ['times', 'y', 'classSize'])
+      )
+      programmes.medians[level][year.name].programmes.push(code)
+    }
+
+    if (level === 'master' && comboStats.length) {
+      if (!programmes.medians.bcMsCombo) {
+        programmes.medians.bcMsCombo = {}
+      }
+      for (const year of comboStats) {
+        if (year.y === 0) continue
+        if (!programmes.medians.bcMsCombo[year.name]) {
+          programmes.medians.bcMsCombo[year.name] = { data: [], programmes: [] }
+        }
+        programmes.medians.bcMsCombo[year.name].data.push(
+          omit({ ...cloneDeep(year), name: progId, code, median: year.y }, ['times', 'y', 'classSize'])
+        )
+        programmes.medians.bcMsCombo[year.name].programmes.push(code)
+      }
+    }
+  }
+  return { medians, programmes, classSizes }
+}
+
+export const countGraduationTimes = async (faculty: string, programmesOfFaculty: ProgrammesOfOrganization) => {
+  const { medians: mediansByGraduationYear, programmes: programmesByGraduationYear } =
+    await getStatsByGraduationYear(programmesOfFaculty)
+  const {
+    medians: mediansByStartYear,
+    programmes: programmesByStartYear,
+    classSizes,
+  } = await getStatsByStartYear(programmesOfFaculty)
+
   const goals = {
     bachelor: 36,
-    bcMsCombo: 60,
+    bcMsCombo: faculty === 'H90' ? 72 : 60,
     master: 24,
     doctor: 48,
-    licentiate: 78,
     exceptions: {
       MH30_004: 6, // months more
       '420420-ma': 6,
-      MH30_001: 12,
-      '320011-ma': 12,
-      '320001-ma': 12,
-      MH30_003: 6,
-      '320002-ma': 12,
+      '420074-ma': 6,
+      '420119-ma': 6,
+      MH30_001: 48,
+      '320011-ma': 48,
+      '320001-ma': 48,
+      MH30_003: 42,
+      '320002-ma': 42,
+      '320009-ma': 42,
     },
   }
 
-  if (faculty === 'H90') {
-    goals.bcMsCombo += 12
+  const programmeNames = programmesOfFaculty.reduce<Record<string, Name>>((acc, { code, name }) => {
+    acc[code] = { ...name }
+    return acc
+  }, {})
+
+  return {
+    id: faculty,
+    goals,
+    byGradYear: {
+      medians: mediansByGraduationYear,
+      programmes: programmesByGraduationYear,
+    },
+    byStartYear: {
+      medians: mediansByStartYear,
+      programmes: programmesByStartYear,
+    },
+    programmeNames,
+    classSizes,
   }
-
-  // We count studyrights (vs. studyright_elements)
-  // This way we get the whole time for a degree, even if the student was transferred to a new programme
-  // E.g. started 8/2016 in old Bc, transferred to new 10/2020, graduated from new 1/2021 --> total 53 months (not 3)
-  const programmeCodes = programmes.map(prog => prog.code)
-  const byGradYear = await count(
-    faculty,
-    programmeCodes,
-    since,
-    years,
-    yearsList,
-    levels,
-    programmeFilter,
-    programmeNames,
-    goals,
-    'gradYear'
-  )
-
-  const byStartYear = await count(
-    faculty,
-    programmeCodes,
-    since,
-    years,
-    yearsList,
-    levels,
-    programmeFilter,
-    programmeNames,
-    goals,
-    'startYear'
-  )
-
-  const classSizes = getProgrammeObjectBasis(yearsList, levels, false)
-  classSizes.programmes = {}
-  await getClassSizes(faculty, programmeCodes, since, classSizes, programmeFilter, years)
-
-  return { id: faculty, goals, byGradYear, byStartYear, programmeNames, classSizes }
 }

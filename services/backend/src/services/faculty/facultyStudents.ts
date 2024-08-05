@@ -3,9 +3,8 @@ import { getStudytrackStats, setStudytrackStats } from '../analyticsService'
 import { getPercentage, tableTitles } from '../studyProgramme/studyProgrammeHelpers'
 import { getStudyRightsInProgramme } from '../studyProgramme/studyRightFinders'
 import { getStudytrackStatsForStudyprogramme } from '../studyProgramme/studyTrackStats'
-import { getDegreeProgrammesOfOrganization } from './faculty'
+import type { ProgrammesOfOrganization } from './faculty'
 
-type ProgrammesOfOrganization = Awaited<ReturnType<typeof getDegreeProgrammesOfOrganization>>
 type StudyTrackStats = Awaited<ReturnType<typeof getStudytrackStatsForStudyprogramme>>
 
 const calculateCombinedStats = (programmeCodes: string[], stats: StudyTrackStats[]) => {
