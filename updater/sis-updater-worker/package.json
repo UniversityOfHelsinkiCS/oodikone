@@ -14,7 +14,7 @@
     "redis": "^3.1.2",
     "redis-lock": "^0.1.4",
     "sequelize": "^6.0.0",
-    "umzug": "^2.3.0",
+    "umzug": "^3.0.0",
     "winston": "^3.13.0",
     "winston-gelf-transporter": "^1.0.2",
     "winston-sentry-log": "^1.0.26"
