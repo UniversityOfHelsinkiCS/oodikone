@@ -13,6 +13,8 @@ export enum CategoryID {
   OPEN_UNI = 'openuni',
 }
 
+type TeacherStats = { id: string; name: string; passed: number; failed: number; credits: number; transferred: number }
+
 const categories = {
   [CategoryID.ALL]: { name: 'All', redisKey: 'TOP_TEACHERS_ALL_V2' },
   [CategoryID.OPEN_UNI]: { name: 'Open University', redisKey: 'TOP_TEACHERS_OPEN_UNI_V2' },
@@ -24,7 +26,7 @@ export const getTeacherStats = async (categoryId: string, yearCode: number) => {
   return JSON.parse(category) || []
 }
 
-const setTeacherStats = async (categoryId: string, yearCode: number, stats) => {
+const setTeacherStats = async (categoryId: string, yearCode: number, stats: TeacherStats[]) => {
   const { redisKey } = categories[categoryId]
   const data = { stats, updated: new Date() }
   await redisClient.hsetAsync(redisKey, yearCode, JSON.stringify(data))
@@ -66,8 +68,6 @@ const getCreditsWithTeachersForYear = async (yearCode: number) => {
   })
   return credits
 }
-
-type TeacherStats = { id: string; name: string; passed: number; failed: number; credits: number; transferred: number }
 
 const updatedStats = (
   teacherStats: Record<string, TeacherStats>,
