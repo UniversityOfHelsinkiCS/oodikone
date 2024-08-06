@@ -44,6 +44,7 @@ const missingBasicAuthCredentials = (!importerDbApiUser || !importerDbApiPasswor
 
 export const getImporterClient = () => {
   if (serviceProvider === 'toska' && !importerToken) {
+    logger.error("I gots myself", serviceProvider, importerToken)
     logger.error("Importer token not set, can't return client!")
     return null
   }
