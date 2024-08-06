@@ -47,5 +47,6 @@ export const getImporterClient = () => {
     logger.error("Importer token not set, can't return client!")
     return null
   }
+  logger.error("just to debug, here we got:", serviceProvider, importerToken)
   return importerClient
 }
