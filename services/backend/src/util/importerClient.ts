@@ -30,13 +30,21 @@ const importerClient = axios.create({
 
 const missingBasicAuthCredentials = (!importerDbApiUser || !importerDbApiPassword)
 
-export const getImporterClient = () => {
+/*export const getImporterClient = () => {
   if (serviceProvider === 'toska' && !importerToken) {
     logger.error("Importer token not set, can't return client!")
     return null
   }
   else if (serviceProvider === 'fd' && missingBasicAuthCredentials) {
     logger.error("Basic auth credentials not set, can't return client!")
+    return null
+  }
+  return importerClient
+}*/
+
+export const getImporterClient = () => {
+  if (!importerToken) {
+    logger.error("Importer token not set, can't return client!")
     return null
   }
   return importerClient
