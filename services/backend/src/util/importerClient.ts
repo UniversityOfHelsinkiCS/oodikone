@@ -3,18 +3,6 @@ import axios from 'axios'
 import { importerUrl, importerToken, serviceProvider, importerDbApiUser, importerDbApiPassword } from '../config'
 import logger from './logger'
 
-const createEnvAuthHeader = () : { Authorization : string } | { token : string } => {
-  if (serviceProvider === 'toska') {
-    return createTokenHeader()
-  } else {
-    return createBasicAuthHeader()
-  }
-}
-
-const createTokenHeader = ()  => { 
-  return { token: importerToken }
-}
-
 const createBasicAuthHeader = () => {
   const auth = `${importerDbApiUser}:${importerDbApiPassword}`
   const token = Buffer.from(auth).toString('base64')
@@ -24,7 +12,7 @@ const createBasicAuthHeader = () => {
 }
 
 const toskaImporterClient = axios.create({
-  headers: createTokenHeader(),
+  headers: { token: importerToken },
   baseURL: importerUrl,
 })
 
