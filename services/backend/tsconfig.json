@@ -13,6 +13,7 @@
     "skipLibCheck": true,
     "strict": true,
     "noImplicitAny": false,
+    "noErrorTruncation": true,
     "sourceMap": true,
     "sourceRoot": "/",
     "inlineSources": true,
