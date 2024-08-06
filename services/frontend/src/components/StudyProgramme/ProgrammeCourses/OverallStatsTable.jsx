@@ -300,7 +300,6 @@ export const OverallStatsTable = ({ studyProgramme, combinedProgramme, academicY
         firstLabel="Show credits"
         secondLabel="Show students"
         setValue={setShowStudents}
-        toolTips={null}
         value={showStudents}
       />
       <div style={{ marginBottom: '1em' }}>

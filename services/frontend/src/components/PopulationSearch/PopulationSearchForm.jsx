@@ -218,7 +218,7 @@ const PopulationSearchForm = ({ queries, onProgress, clearSelected, getPopulatio
         ? `includes ${studentStatuses.map(status => status.toLowerCase()).join(', ')} students`
         : null
 
-    return [studyRightsText, timeText, studentStatusesText].filter(t => t).join(' - ')
+    return [studyRightsText, timeText, studentStatusesText].filter(text => text).join(' - ')
   }
 
   const handleSubmit = () => {

@@ -1,10 +1,10 @@
-import { Router } from 'express'
+import { Request, Response, Router } from 'express'
 
 import { getSemestersAndYears } from '../services/semesters'
 
 const router = Router()
 
-router.get('/', async (_req, res) => {
+router.get('/', async (_req: Request, res: Response) => {
   const providers = await getSemestersAndYears()
   res.json(providers)
 })

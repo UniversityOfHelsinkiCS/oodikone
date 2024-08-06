@@ -10,22 +10,22 @@ const populationCourseStatsMerger = multiyearstats => {
     stats.coursetypes = { ...stats.coursetypes, ...yearstats.coursetypes }
     stats.disciplines = { ...stats.disciplines, ...yearstats.coursetypes }
     stats.allStudents += yearstats.allStudents
-    yearstats.coursestatistics.forEach(c => {
-      if (!coursecodes.includes(c.course.code)) {
-        coursecodes.push(c.course.code)
-        stats.coursestatistics.push(c)
+    yearstats.coursestatistics.forEach(courseStats => {
+      if (!coursecodes.includes(courseStats.course.code)) {
+        coursecodes.push(courseStats.course.code)
+        stats.coursestatistics.push(courseStats)
         return
       }
 
-      const index = stats.coursestatistics.findIndex(s => s.course.code === c.course.code)
-      stats.coursestatistics[index].stats.attempts += c.stats.attempts
-      stats.coursestatistics[index].stats.failed += c.stats.failed
-      stats.coursestatistics[index].stats.failedMany += c.stats.failedMany
-      stats.coursestatistics[index].stats.improvedPassedGrade += c.stats.improvedPassedGrade
-      stats.coursestatistics[index].stats.passed += c.stats.passed
-      stats.coursestatistics[index].stats.students += c.stats.students
+      const index = stats.coursestatistics.findIndex(s => s.course.code === courseStats.course.code)
+      stats.coursestatistics[index].stats.attempts += courseStats.stats.attempts
+      stats.coursestatistics[index].stats.failed += courseStats.stats.failed
+      stats.coursestatistics[index].stats.failedMany += courseStats.stats.failedMany
+      stats.coursestatistics[index].stats.improvedPassedGrade += courseStats.stats.improvedPassedGrade
+      stats.coursestatistics[index].stats.passed += courseStats.stats.passed
+      stats.coursestatistics[index].stats.students += courseStats.stats.students
 
-      stats.coursestatistics[index].stats.retryPassed += c.stats.retryPassed
+      stats.coursestatistics[index].stats.retryPassed += courseStats.stats.retryPassed
 
       stats.coursestatistics[index].stats.perStudent =
         stats.coursestatistics[index].stats.attempts / stats.coursestatistics[index].stats.students
@@ -39,35 +39,36 @@ const populationCourseStatsMerger = multiyearstats => {
       stats.coursestatistics[index].stats.triedOfPopulation =
         (stats.coursestatistics[index].stats.students / stats.allStudents) * 100
 
-      Object.keys(c.stats.passingSemesters).forEach(key => {
+      Object.keys(courseStats.stats.passingSemesters).forEach(key => {
         if (!stats.coursestatistics[index].stats.passingSemesters[key]) {
           stats.coursestatistics[index].stats.passingSemesters[key] = 0
         }
-        stats.coursestatistics[index].stats.passingSemesters[key] += c.stats.passingSemesters[key]
+        stats.coursestatistics[index].stats.passingSemesters[key] += courseStats.stats.passingSemesters[key]
       })
 
-      Object.keys(c.stats.passingSemestersCumulative).forEach(key => {
+      Object.keys(courseStats.stats.passingSemestersCumulative).forEach(key => {
         if (!stats.coursestatistics[index].stats.passingSemestersCumulative[key]) {
           stats.coursestatistics[index].stats.passingSemestersCumulative[key] = 0
         }
-        stats.coursestatistics[index].stats.passingSemestersCumulative[key] += c.stats.passingSemestersCumulative[key]
+        stats.coursestatistics[index].stats.passingSemestersCumulative[key] +=
+          courseStats.stats.passingSemestersCumulative[key]
       })
 
-      Object.keys(c.grades).forEach(grade => {
+      Object.keys(courseStats.grades).forEach(grade => {
         if (!stats.coursestatistics[index].grades[grade]) {
-          stats.coursestatistics[index].grades[grade] = c.grades[grade]
+          stats.coursestatistics[index].grades[grade] = courseStats.grades[grade]
         } else {
-          stats.coursestatistics[index].grades[grade].count += c.grades[grade].count
+          stats.coursestatistics[index].grades[grade].count += courseStats.grades[grade].count
         }
       })
 
-      Object.keys(c.students).forEach(key2 => {
+      Object.keys(courseStats.students).forEach(key2 => {
         if (!stats.coursestatistics[index].students[key2]) {
-          stats.coursestatistics[index].students[key2] = c.students[key2]
+          stats.coursestatistics[index].students[key2] = courseStats.students[key2]
         } else {
           stats.coursestatistics[index].students[key2] = {
             ...stats.coursestatistics[index].students[key2],
-            ...c.students[key2],
+            ...courseStats.students[key2],
           }
         }
       })

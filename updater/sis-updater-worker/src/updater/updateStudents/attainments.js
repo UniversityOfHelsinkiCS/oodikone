@@ -136,7 +136,7 @@ const updateAttainments = async (
       }
 
       if (!customAttainmentTypes.includes(att.type)) return att
-      let courseUnit = courses.find(c => c.id === att.course_unit_id)
+      let courseUnit = courses.find(course => course.id === att.course_unit_id)
 
       // If there's no suitable courseunit, there isn't courseunit available at all.
       // --> Course should be created, if it doesn't exist in sis db
@@ -244,27 +244,31 @@ const updateAttainments = async (
   )
 
   const credits = fixedAttainments
-    .filter(a => a !== null)
-    .filter(a => a.id !== null)
+    .filter(attainment => attainment !== null)
+    .filter(attainment => attainment.id !== null)
     .filter(
-      a =>
-        validAttainmentTypes.includes(a.type) &&
-        !a.misregistration &&
-        !attainmentsToBeExluced.has(a.id) &&
-        !doubleAttachment(a, fixedAttainments)
+      attainment =>
+        validAttainmentTypes.includes(attainment.type) &&
+        !attainment.misregistration &&
+        !attainmentsToBeExluced.has(attainment.id) &&
+        !doubleAttachment(attainment, fixedAttainments)
     )
-    .map(a => {
-      const mappedCredit = mapCredit(a)
+    .map(attainment => {
+      const mappedCredit = mapCredit(attainment)
       if (mappedCredit) {
-        a.acceptor_persons
+        attainment.acceptor_persons
           .filter(p => p.roleUrn === 'urn:code:attainment-acceptor-type:approved-by' && !!p.personId)
           .forEach(p => {
-            creditTeachers.push({ composite: `${a.id}-${p.personId}`, credit_id: a.id, teacher_id: p.personId })
+            creditTeachers.push({
+              composite: `${attainment.id}-${p.personId}`,
+              credit_id: attainment.id,
+              teacher_id: p.personId,
+            })
           })
       }
       return mappedCredit
     })
-    .filter(c => !!c)
+    .filter(credit => !!credit)
 
   const courses = Array.from(coursesToBeCreated.values())
   await bulkCreate(Course, courses)

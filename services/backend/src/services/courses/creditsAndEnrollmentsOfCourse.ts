@@ -1,8 +1,8 @@
 import { Op } from 'sequelize'
 
 import { Credit, Student, Semester, Organization, Enrollment, SISStudyRight, SISStudyRightElement } from '../../models'
-import { EnrollmentState } from '../../types'
-import { getIsOpen, Unification } from './helpers'
+import { EnrollmentState, Unification } from '../../types'
+import { getIsOpen } from './helpers'
 
 export const getCreditsForCourses = async (codes: string[], unification: Unification) => {
   return await Credit.findAll({

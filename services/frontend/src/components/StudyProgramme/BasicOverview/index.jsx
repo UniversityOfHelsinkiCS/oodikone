@@ -221,7 +221,7 @@ export const BasicOverview = ({
               <div className={`section-container${doCombo ? '' : '-centered'}`}>
                 {showMedian ? displayMedian() : displayBreakdown()}
               </div>
-              {graduations?.data?.programmesBeforeOrAfterGraphStats && (
+              {graduations?.data?.programmesBeforeOrAfterGraphStats?.length && (
                 <>
                   {getDivider(
                     studyprogramme.includes('KH')

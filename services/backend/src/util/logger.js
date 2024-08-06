@@ -8,7 +8,7 @@ const { colorize, combine, timestamp, printf } = winston.format
 
 const transports = [new winston.transports.Console()]
 
-if (isProduction && serviceProvider !== 'Fd') {
+if (isProduction && serviceProvider !== 'fd') {
   transports.push(
     new WinstonGelfTransporter({
       handleExceptions: true,

@@ -2,11 +2,10 @@ import { cloneDeep } from 'lodash'
 
 import { getBasicStats, setBasicStats } from '../analyticsService'
 import { getBasicStatsForStudytrack } from '../studyProgramme/studyProgrammeBasics'
-import { getDegreeProgrammesOfFaculty } from './faculty'
+import type { ProgrammesOfOrganization } from './faculty'
 
 type ProgrammeName = { code: string; en?: string; fi?: string; sv?: string }
 
-type ProgrammesOfOrganization = Awaited<ReturnType<typeof getDegreeProgrammesOfFaculty>>
 type StudyTrackBasicStats = Awaited<ReturnType<typeof getBasicStatsForStudytrack>>
 
 const calculateCombinedStats = async (

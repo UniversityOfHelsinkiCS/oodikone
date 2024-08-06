@@ -10,7 +10,7 @@ export const getCreditsForProvider = async (provider: string, codes: string[], s
       course_code: { [Op.in]: codes },
       attainment_date: { [Op.gte]: since },
       isStudyModule: { [Op.not]: true },
-      credittypecode: 4,
+      credittypecode: CreditTypeCode.PASSED,
     },
     raw: true,
   })

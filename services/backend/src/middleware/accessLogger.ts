@@ -1,8 +1,8 @@
-import { Response } from 'express'
+import { Request, Response } from 'express'
 import { omit } from 'lodash'
 import morgan from 'morgan'
 
-import { FormattedUser, OodikoneRequest } from '../types'
+import { FormattedUser } from '../types'
 import { getFullStudyProgrammeRights } from '../util'
 import logger from '../util/logger'
 
@@ -23,7 +23,7 @@ interface Meta extends FormattedUser {
 // without actually using morgan what it's used for (LOGGING REQUESTS!).
 // Return undefined from here so that stuff isn't printed to console
 // so don't e.g. make it into an async function or it'll print [object Promise] on every request
-const accessLogger = morgan((tokens, req: OodikoneRequest, res: Response): undefined => {
+const accessLogger = morgan((tokens, req: Request, res: Response): undefined => {
   const fields = ['method', 'url', 'status', 'response-time', 'remote-addr', 'remote-user', 'user-agent', 'referrer']
   const { user } = req
   if (!user) {

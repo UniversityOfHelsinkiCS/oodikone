@@ -1,11 +1,10 @@
-import { Response, Router } from 'express'
+import { Request, Response, Router } from 'express'
 
 import { addExcludedCourses, removeExcludedCourses } from '../services/excludedCourses'
-import { OodikoneRequest } from '../types'
 
 const router = Router()
 
-interface ExcludedCoursesRequest extends OodikoneRequest {
+interface ExcludedCoursesRequest extends Request {
   body: {
     courseCodes: string[]
     curriculumVersion: string

@@ -1,15 +1,14 @@
-import { Response, Router } from 'express'
+import { Request, Response, Router } from 'express'
 
 import {
   getCriteria,
   saveYearlyCourseCriteria,
   saveYearlyCreditCriteria,
 } from '../services/studyProgramme/studyProgrammeCriteria'
-import { OodikoneRequest } from '../types'
 
 const router = Router()
 
-interface StudyProgrammeCriteriaRequest extends OodikoneRequest {
+interface StudyProgrammeCriteriaRequest extends Request {
   query: {
     programmecode: string
   }
@@ -24,7 +23,7 @@ router.get('/', async (req: StudyProgrammeCriteriaRequest, res: Response) => {
   return res.json(studyProgrammeCriteria)
 })
 
-interface CriteriaCoursesRequest extends OodikoneRequest {
+interface CriteriaCoursesRequest extends Request {
   body: {
     code: string
     courses: string[]
@@ -41,7 +40,7 @@ router.post('/courses', async (req: CriteriaCoursesRequest, res: Response) => {
   return res.json(studyProgrammeCriteria)
 })
 
-interface CriteriaCreditsRequest extends OodikoneRequest {
+interface CriteriaCreditsRequest extends Request {
   body: {
     code: string
     credits: Record<string, string>

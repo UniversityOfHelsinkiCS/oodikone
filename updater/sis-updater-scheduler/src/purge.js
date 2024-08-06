@@ -109,7 +109,7 @@ const setupPurge = before => {
 
 const handleStatusUpdate = (table, count, before) => {
   collectResponses(table, count)
-  if (TABLES_TO_PURGE.every(t => Object.keys(collectedPrePurgeTableData).includes(t))) {
+  if (TABLES_TO_PURGE.every(table => Object.keys(collectedPrePurgeTableData).includes(table))) {
     setupPurge(before)
     collectedPrePurgeTableData = {}
   }

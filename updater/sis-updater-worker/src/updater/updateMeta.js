@@ -132,7 +132,7 @@ const updateStudyModules = async studyModules => {
 const updateCourseUnits = async courseUnits => {
   const attainments = await selectFromByIdsOrderBy(
     'attainments',
-    courseUnits.map(c => c.id),
+    courseUnits.map(course => course.id),
     'course_unit_id',
     'attainment_date'
   )

@@ -482,5 +482,5 @@ export const getEnrollmentTypeTextForExcel = (type, statutoryAbsence) => {
 }
 
 export const isDefaultServiceProvider = () => {
-  return serviceProvider && serviceProvider === 'Toska'
+  return serviceProvider && serviceProvider === 'toska'
 }

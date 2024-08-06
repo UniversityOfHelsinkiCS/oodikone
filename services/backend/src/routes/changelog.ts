@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { Response, Router } from 'express'
+import { Request, Response, Router } from 'express'
 
 import { isDev } from '../config'
 
@@ -13,7 +13,7 @@ type ChangeLogData = {
 
 const changelog: { data?: ChangeLogData[] } = {}
 
-router.get('/', async (_req, res: Response) => {
+router.get('/', async (_req: Request, res: Response) => {
   if (changelog.data) {
     return res.status(200).send(changelog.data)
   }

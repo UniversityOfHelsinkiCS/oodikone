@@ -7,7 +7,7 @@ import { Toggle } from '@/components/StudyProgramme/Toggle'
 
 const getStyle = index => {
   if ([4, 12].includes(index)) return { backgroundColor: '#f9f9f9', borderLeftWidth: 'thick' }
-  if ([1, 4, 5, 8, 9, 12, 13, 16, 17, 20, 21].includes(index)) return { backgroundColor: '#f9f9f9' }
+  if ([1, 5, 8, 9, 13, 16, 17, 20, 21].includes(index)) return { backgroundColor: '#f9f9f9' }
   if (index === 18) return { borderLeftWidth: 'thick' }
   return {}
 }
@@ -16,21 +16,13 @@ const backgroundColors = { KH: '#ffffff', MH: '#f2f6f7', T: '#e7edee' }
 const backgroundColorsDarks = { KH: '#f9f9f9', MH: '#eeeeee', T: '#dddddd' }
 
 const getRowStyle = (index, tableLinePlaces, dark = false) => {
-  if (tableLinePlaces.length >= 3 && tableLinePlaces[2][0] <= index)
-    return dark
-      ? { backgroundColor: backgroundColorsDarks[tableLinePlaces[2][1]] }
-      : { backgroundColor: backgroundColors[tableLinePlaces[2][1]] }
-  if (tableLinePlaces.length >= 3 && tableLinePlaces[2][0] > index && tableLinePlaces[1][0] <= index)
-    return dark
-      ? { backgroundColor: backgroundColorsDarks[tableLinePlaces[1][1]] }
-      : { backgroundColor: backgroundColors[tableLinePlaces[1][1]] }
-  if (tableLinePlaces.length >= 2 && tableLinePlaces[1][0] > index && tableLinePlaces[0][0] <= index)
-    return dark
-      ? { backgroundColor: backgroundColorsDarks[tableLinePlaces[0][1]] }
-      : { backgroundColor: backgroundColors[tableLinePlaces[0][1]] }
-  return dark
-    ? { backgroundColor: backgroundColorsDarks[tableLinePlaces[0][1]] }
-    : { backgroundColor: backgroundColors[tableLinePlaces[0][1]] }
+  const backgroundColorsToUse = dark ? backgroundColorsDarks : backgroundColors
+
+  if (tableLinePlaces[2]?.[0] <= index) return { backgroundColor: backgroundColorsToUse[tableLinePlaces[2][1]] }
+
+  if (tableLinePlaces[1]?.[0] <= index) return { backgroundColor: backgroundColorsToUse[tableLinePlaces[1][1]] }
+
+  return { backgroundColor: backgroundColorsToUse[tableLinePlaces[0][1]] }
 }
 
 const getTableCell = ({ year, programme, valIndex, rowIndex, tableLinePlaces, value }) => {
@@ -154,9 +146,7 @@ export const FacultyStudentDataTable = ({
               <Table.HeaderCell
                 colSpan={index === 0 || index === 1 || !showPercentages ? 1 : 2}
                 key={title}
-                style={
-                  [3, 7, 10].includes(index) ? { fontWeight: 'bold', borderLeftWidth: 'thick' } : { fontWeight: 'bold' }
-                }
+                style={[3, 7, 10].includes(index) ? { borderLeftWidth: 'thick' } : {}}
                 textAlign="center"
               >
                 {title}

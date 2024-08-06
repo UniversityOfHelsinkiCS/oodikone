@@ -1,35 +1,35 @@
-const { setCreditStats } = require('../analyticsService')
-const { computeCreditsProduced } = require('../providerCredits')
-const { getDegreeProgrammesOfFaculty } = require('./faculty')
-const { combineFacultyBasics } = require('./facultyBasics')
-const { countGraduationTimes } = require('./facultyGraduationTimes')
-const {
+import { setCreditStats } from '../analyticsService'
+import { computeCreditsProduced } from '../providerCredits'
+import { getDegreeProgrammesOfFaculty } from './faculty'
+import { combineFacultyBasics } from './facultyBasics'
+import { countGraduationTimes } from './facultyGraduationTimes'
+import {
   setBasicStats,
   setFacultyProgrammes,
   setFacultyProgressStats,
   setFacultyStudentStats,
   setGraduationStats,
   setThesisWritersStats,
-} = require('./facultyService')
-const { combineFacultyStudentProgress } = require('./facultyStudentProgress')
-const { combineFacultyStudents } = require('./facultyStudents')
-const { combineFacultyThesisWriters } = require('./facultyThesisWriters')
+} from './facultyService'
+import { combineFacultyStudentProgress } from './facultyStudentProgress'
+import { combineFacultyStudents } from './facultyStudents'
+import { combineFacultyThesisWriters } from './facultyThesisWriters'
 
-const yearOptions = ['CALENDAR_YEAR', 'ACADEMIC_YEAR']
-const specialGroupOptions = ['SPECIAL_INCLUDED', 'SPECIAL_EXCLUDED']
-const programmeFilterOptions = ['ALL_PROGRAMMES', 'NEW_STUDY_PROGRAMMES']
-const graduatedOptions = ['GRADUATED_INCLUDED', 'GRADUATED_EXCLUDED']
+const yearOptions = ['CALENDAR_YEAR', 'ACADEMIC_YEAR'] as const
+const specialGroupOptions = ['SPECIAL_INCLUDED', 'SPECIAL_EXCLUDED'] as const
+const programmeFilterOptions = ['ALL_PROGRAMMES', 'NEW_STUDY_PROGRAMMES'] as const
+const graduatedOptions = ['GRADUATED_INCLUDED', 'GRADUATED_EXCLUDED'] as const
 
-const updateFacultyOverview = async (faculty, statsType) => {
-  const all = await getDegreeProgrammesOfFaculty(faculty, false)
-  const onlyNew = await getDegreeProgrammesOfFaculty(faculty, true)
+export const updateFacultyOverview = async (facultyCode: string, statsType: string) => {
+  const all = await getDegreeProgrammesOfFaculty(facultyCode, false)
+  const onlyNew = await getDegreeProgrammesOfFaculty(facultyCode, true)
 
   for (const yearType of yearOptions) {
     for (const specialGroups of specialGroupOptions) {
       for (const programmeFilter of programmeFilterOptions) {
         if (statsType === 'ALL' || statsType === 'STUDENT') {
           const updatedStudentInfo = await combineFacultyBasics(
-            faculty,
+            facultyCode,
             programmeFilter === 'NEW_STUDY_PROGRAMMES' ? onlyNew : all,
             yearType,
             specialGroups
@@ -38,7 +38,7 @@ const updateFacultyOverview = async (faculty, statsType) => {
         }
         if ((statsType === 'ALL' || statsType === 'CREDITS') && specialGroups !== 'SPECIAL_EXCLUDED') {
           const updatedCredits = await computeCreditsProduced(
-            faculty,
+            facultyCode,
             yearType === 'ACADEMIC_YEAR',
             specialGroups === 'SPECIAL_INCLUDED'
           )
@@ -46,7 +46,7 @@ const updateFacultyOverview = async (faculty, statsType) => {
         }
         if (statsType === 'ALL' || statsType === 'THESIS') {
           const updateThesisWriters = await combineFacultyThesisWriters(
-            faculty,
+            facultyCode,
             programmeFilter === 'NEW_STUDY_PROGRAMMES' ? onlyNew : all,
             yearType,
             specialGroups
@@ -57,24 +57,24 @@ const updateFacultyOverview = async (faculty, statsType) => {
     }
   }
 
-  const updatedTimesAll = await countGraduationTimes(faculty, 'ALL_PROGRAMMES')
+  const updatedTimesAll = await countGraduationTimes(facultyCode, all)
   await setGraduationStats(updatedTimesAll, 'ALL_PROGRAMMES')
-  const updatedTimesNew = await countGraduationTimes(faculty, 'NEW_STUDY_PROGRAMMES')
+  const updatedTimesNew = await countGraduationTimes(facultyCode, onlyNew)
   await setGraduationStats(updatedTimesNew, 'NEW_STUDY_PROGRAMMES')
   return 'OK'
 }
 
-const updateFacultyProgressOverview = async faculty => {
-  const onlyNew = await getDegreeProgrammesOfFaculty(faculty, true)
-  const newProgrammes = await setFacultyProgrammes(faculty, onlyNew, 'NEW_STUDY_PROGRAMMES')
+export const updateFacultyProgressOverview = async (facultyCode: string) => {
+  const onlyNew = await getDegreeProgrammesOfFaculty(facultyCode, true)
+  const newProgrammes = await setFacultyProgrammes(facultyCode, onlyNew, 'NEW_STUDY_PROGRAMMES')
 
   for (const graduated of graduatedOptions) {
     for (const specialGroups of specialGroupOptions) {
-      const updateFacultyStudentStats = await combineFacultyStudents(faculty, onlyNew, specialGroups, graduated)
+      const updateFacultyStudentStats = await combineFacultyStudents(facultyCode, onlyNew, specialGroups, graduated)
       await setFacultyStudentStats(updateFacultyStudentStats, specialGroups, graduated)
       const updateFacultyProgressStats = await combineFacultyStudentProgress(
-        faculty,
-        newProgrammes.data,
+        facultyCode,
+        newProgrammes?.data,
         specialGroups,
         graduated
       )
@@ -84,5 +84,3 @@ const updateFacultyProgressOverview = async faculty => {
 
   return 'OK'
 }
-
-module.exports = { updateFacultyOverview, updateFacultyProgressOverview }

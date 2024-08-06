@@ -20,7 +20,7 @@ const faculties = require('./routes/faculties')
 const feedback = require('./routes/feedback').default
 const languageCenterData = require('./routes/languageCenterData').default
 const login = require('./routes/login').default
-const population = require('./routes/population')
+const population = require('./routes/population').default
 const programmeModules = require('./routes/programmeModules').default
 const providers = require('./routes/providers').default
 const semesters = require('./routes/semesters').default
@@ -30,7 +30,7 @@ const studyProgramme = require('./routes/studyProgramme').default
 const studyProgrammeCriteria = require('./routes/studyProgrammeCriteria').default
 const studyProgrammePins = require('./routes/studyProgrammePins').default
 const tags = require('./routes/tags').default
-const teachers = require('./routes/teachers')
+const teachers = require('./routes/teachers').default
 const university = require('./routes/university')
 const updater = require('./routes/updater')
 const usersToska = require('./routes/users').default
@@ -69,7 +69,7 @@ module.exports = (app, url) => {
   app.use(`${url}/university`, university)
   app.use(`${url}/updater`, auth.roles(['admin']), updater)
   app.use(`${url}/teachers`, auth.roles(['teachers']), teachers)
-  if (serviceProvider === 'Toska') {
+  if (serviceProvider === 'toska') {
     app.use(`${url}/users`, usersToska)
   } else {
     app.use(`${url}/users`, usersToska)

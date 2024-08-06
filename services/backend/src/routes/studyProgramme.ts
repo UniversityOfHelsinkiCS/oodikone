@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Request, Response, Router } from 'express'
 
 import {
   getBasicStats,
@@ -25,25 +25,39 @@ import { logInfoForGrafana } from '../util/logInfoForGrafana'
 
 const router = Router()
 
-router.get('/', async (_req, res) => {
+router.get('/', async (_req: Request, res: Response) => {
   const studyProgrammes = await getProgrammesFromStudyRights()
   res.json(studyProgrammes)
 })
 
-router.get('/creditstats', async (req, res) => {
+interface GetCreditStatsRequest extends Request {
+  query: {
+    codes: string
+    isAcademicYear: string
+    includeSpecials: string
+  }
+}
+
+router.get('/creditstats', async (req: GetCreditStatsRequest, res: Response) => {
   const { codes, isAcademicYear, includeSpecials } = req.query
   const stats = {}
-  for (const code of JSON.parse(codes as string)) {
+  for (const code of JSON.parse(codes)) {
     stats[code] = await getCreditsProduced(code, isAcademicYear !== 'false', includeSpecials !== 'false')
   }
   return res.json({ stats })
 })
 
-router.get('/:id/basicstats', async (req, res) => {
+interface GetStatsRequest extends Request {
+  query: {
+    year_type: string
+    special_groups: string
+    combined_programme: string
+  }
+}
+
+router.get('/:id/basicstats', async (req: GetStatsRequest, res: Response) => {
   const code = req.params.id
-  const yearType = req.query?.year_type
-  const specialGroups = req.query?.special_groups
-  const combinedProgramme = req.query?.combined_programme as string
+  const { year_type: yearType, special_groups: specialGroups, combined_programme: combinedProgramme } = req.query
   if (!code) {
     return res.status(422).end()
   }
@@ -54,25 +68,23 @@ router.get('/:id/basicstats', async (req, res) => {
     return res.json(data)
   }
 
-  const updated = await getBasicStatsForStudytrack({
-    studyprogramme: req.params.id,
+  const updatedStats = await getBasicStatsForStudytrack({
+    studyprogramme: code,
     combinedProgramme,
     settings: {
       isAcademicYear: yearType === 'ACADEMIC_YEAR',
       includeAllSpecials: specialGroups === 'SPECIAL_INCLUDED',
     },
   })
-  if (updated) {
-    await setBasicStats(updated, yearType, specialGroups)
+  if (updatedStats) {
+    await setBasicStats(updatedStats, yearType, specialGroups)
   }
-  return res.json(updated)
+  return res.json(updatedStats)
 })
 
-router.get('/:id/graduationstats', async (req, res) => {
+router.get('/:id/graduationstats', async (req: GetStatsRequest, res: Response) => {
   const code = req.params.id
-  const yearType = req.query?.year_type
-  const specialGroups = req.query?.special_groups
-  const combinedProgramme = req.query?.combined_programme as string
+  const { year_type: yearType, special_groups: specialGroups, combined_programme: combinedProgramme } = req.query
   if (!code) {
     return res.status(422).end()
   }
@@ -83,7 +95,7 @@ router.get('/:id/graduationstats', async (req, res) => {
   }
 
   const updatedStats = await getGraduationStatsForStudytrack({
-    studyprogramme: req.params.id,
+    studyprogramme: code,
     combinedProgramme,
     settings: {
       isAcademicYear: yearType === 'ACADEMIC_YEAR',
@@ -93,13 +105,21 @@ router.get('/:id/graduationstats', async (req, res) => {
   if (updatedStats) {
     await setGraduationStats(updatedStats, yearType, specialGroups)
   }
+
   return res.json(updatedStats)
 })
 
-router.get('/:id/coursestats', async (req, res) => {
+interface GetCourseStatsRequest extends Request {
+  query: {
+    academicyear: string
+    combined_programme: string
+  }
+}
+
+router.get('/:id/coursestats', async (req: GetCourseStatsRequest, res: Response) => {
   const code = req.params.id
   const showByYear = req.query.academicyear
-  const combinedProgramme = req.query?.combined_programme as string
+  const combinedProgramme = req.query?.combined_programme
   const date = new Date()
   date.setHours(23, 59, 59, 999)
   logInfoForGrafana(code, combinedProgramme)
@@ -111,11 +131,17 @@ router.get('/:id/coursestats', async (req, res) => {
   }
 })
 
-router.get('/:id/studytrackstats', async (req, res) => {
+interface GetStudyTrackStatsRequest extends Request {
+  query: {
+    graduated: string
+    special_groups: string
+    combined_programme: string
+  }
+}
+
+router.get('/:id/studytrackstats', async (req: GetStudyTrackStatsRequest, res: Response) => {
   const code = req.params.id
-  const graduated = req.query?.graduated
-  const specialGroups = req.query?.special_groups
-  const combinedProgramme = req.query?.combined_programme as string
+  const { graduated, special_groups: specialGroups, combined_programme: combinedProgramme } = req.query
   if (!code) {
     return res.status(422).end()
   }
@@ -142,7 +168,7 @@ router.get('/:id/studytrackstats', async (req, res) => {
   return res.json(updated)
 })
 
-router.get('/:id/colorizedtablecoursestats', async (req, res) => {
+router.get('/:id/colorizedtablecoursestats', async (req: Request, res: Response) => {
   const code = req.params.id
   try {
     const data = await getStudyprogrammeStatsForColorizedCoursesTable(code)
@@ -152,7 +178,13 @@ router.get('/:id/colorizedtablecoursestats', async (req, res) => {
   }
 })
 
-router.get('/:id/update_basicview', async (req, res) => {
+interface GetUpdateViewRequest extends Request {
+  query: {
+    combined_programme: string
+  }
+}
+
+router.get('/:id/update_basicview', async (req: GetUpdateViewRequest, res: Response) => {
   const code = req.params.id
   const combinedProgramme = req.query?.combined_programme
   if (!code) {
@@ -168,7 +200,7 @@ router.get('/:id/update_basicview', async (req, res) => {
   }
 })
 
-router.get('/:id/update_studytrackview', async (req, res) => {
+router.get('/:id/update_studytrackview', async (req: GetUpdateViewRequest, res: Response) => {
   const code = req.params.id
   const combinedProgramme = req.query?.combined_programme
   if (!code) {
@@ -184,11 +216,17 @@ router.get('/:id/update_studytrackview', async (req, res) => {
   }
 })
 
-router.get('/:id/evaluationstats', async (req, res) => {
+interface GetEvaluationStatsRequest extends Request {
+  query: {
+    graduated: string
+    year_type: string
+    special_groups: string
+  }
+}
+
+router.get('/:id/evaluationstats', async (req: GetEvaluationStatsRequest, res: Response) => {
   const code = req.params.id
-  const yearType = req.query?.year_type
-  const specialGroups = req.query?.special_groups
-  const graduated = req.query?.graduated
+  const { graduated, year_type: yearType, special_groups: specialGroups } = req.query
   if (!code) {
     return res.status(422).end()
   }
@@ -197,7 +235,7 @@ router.get('/:id/evaluationstats', async (req, res) => {
   let gradData = await getGraduationStats(code, combinedProgramme, yearType, specialGroups)
   if (!gradData) {
     const updatedStats = await getGraduationStatsForStudytrack({
-      studyprogramme: req.params.id,
+      studyprogramme: code,
       combinedProgramme,
       settings: {
         isAcademicYear: yearType === 'ACADEMIC_YEAR',

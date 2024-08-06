@@ -368,7 +368,7 @@ describe('Custom Population Statistics', () => {
     runTestStepWithPreAndPostParts('Programme', () => {
       const card = cy.cs('Programme-filter-card')
       const programmeDropdown = card.cs('Programme-filter-dropdown').selectFromDropdown(0)
-      checkFilteringResult(5)
+      checkFilteringResult(3)
       programmeDropdown.get('i.delete').click()
     })
   })

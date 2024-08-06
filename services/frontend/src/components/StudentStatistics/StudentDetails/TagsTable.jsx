@@ -10,9 +10,9 @@ export const TagsTable = ({ student }) => {
   if (!student) return null
 
   const data = Object.values(
-    student.tags.reduce((acc, t) => {
-      if (!acc[t.programme.code]) acc[t.programme.code] = { programme: t.programme, tags: [] }
-      acc[t.tag.studytrack].tags.push(t)
+    student.tags.reduce((acc, tag) => {
+      if (!acc[tag.programme.code]) acc[tag.programme.code] = { programme: tag.programme, tags: [] }
+      acc[tag.tag.studytrack].tags.push(tag)
       return acc
     }, {})
   )
@@ -25,20 +25,24 @@ export const TagsTable = ({ student }) => {
           {
             key: 'PROGRAMME',
             title: 'Programme',
-            getRowVal: t => getTextIn(t.programme.name),
+            getRowVal: tag => getTextIn(tag.programme.name),
           },
           {
             key: 'CODE',
             title: 'Code',
-            getRowVal: t => t.programme.code,
+            getRowVal: tag => tag.programme.code,
           },
           {
             key: 'TAGS',
             title: 'Tags',
-            getRowVal: t => sortBy(t.tags.map(tt => tt.tag.tagname)).join(':'),
-            getRowContent: t =>
-              sortBy(t.tags, t => t.tag.tagname).map(t => (
-                <Label color={t.tag.personal_user_id ? 'purple' : null} content={t.tag.tagname} key={t.tag.tag_id} />
+            getRowVal: tag => sortBy(tag.tags.map(tt => tt.tag.tagname)).join(':'),
+            getRowContent: tag =>
+              sortBy(tag.tags, tag => tag.tag.tagname).map(tag => (
+                <Label
+                  color={tag.tag.personal_user_id ? 'purple' : null}
+                  content={tag.tag.tagname}
+                  key={tag.tag.tag_id}
+                />
               )),
           },
         ]}

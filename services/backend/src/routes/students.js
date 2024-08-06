@@ -23,7 +23,7 @@ router.get('/', async (req, res) => {
     trimmedSearchTerm &&
     !splitByEmptySpace(trimmedSearchTerm)
       .slice(0, 2)
-      .find(t => t.length > 2)
+      .find(term => term.length > 2)
   ) {
     throw new ApplicationError('at least one search term must be longer than 2 characters', 400)
   }

@@ -222,7 +222,11 @@ const scheduleByCourseCodes = async courseCodes => {
     .distinct('group_id')
     .pluck('group_id')
 
-  await eachLimit(chunk(coursesToUpdate, CHUNK_SIZE), 10, async c => await createJobs(c, IMPORTER_TABLES.courseUnits))
+  await eachLimit(
+    chunk(coursesToUpdate, CHUNK_SIZE),
+    10,
+    async course => await createJobs(course, IMPORTER_TABLES.courseUnits)
+  )
 }
 
 const isUpdaterActive = async () => {

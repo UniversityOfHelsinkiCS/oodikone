@@ -59,19 +59,19 @@ export const getCoursesByNameAndOrCode = async (name: string, code: string) => {
   let substitutionGroupIndex = 0
   const visited: string[] = []
 
-  const organizeSubgroups = (course: CourseWithSubsId) => {
-    if (visited.includes(course.code)) {
+  const organizeSubgroups = (courseWithSubsId: CourseWithSubsId) => {
+    if (visited.includes(courseWithSubsId.code)) {
       return
     }
 
     let temp: CourseWithSubsId[] = []
-    if (course.substitutions !== null) {
-      temp = courses.filter(c => course.substitutions.includes(c.code))
+    if (courseWithSubsId.substitutions !== null) {
+      temp = courses.filter(course => courseWithSubsId.substitutions.includes(course.code))
     }
 
-    temp.unshift(course)
+    temp.unshift(courseWithSubsId)
     temp.forEach(cu => {
-      if (visited.includes(course.code)) {
+      if (visited.includes(courseWithSubsId.code)) {
         return
       }
       visited.push(cu.id)

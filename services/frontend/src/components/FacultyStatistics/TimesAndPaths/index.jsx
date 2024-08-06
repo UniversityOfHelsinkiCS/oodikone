@@ -26,7 +26,7 @@ export const TimesAndPathsView = ({ faculty, setStudyProgrammes, studyProgrammes
   const programmeData = graduationStats?.data?.[groupBy].programmes.medians
   const programmeNames = graduationStats?.data?.programmeNames
   const classSizes = graduationStats?.data?.classSizes
-  const commonProps = { yearLabel, programmeNames, showMedian, classSizes, goalExceptions }
+  const commonProps = { yearLabel, programmeNames, showMedian, classSizes, goalExceptions, groupBy }
 
   const isFetchingOrLoading = graduationStats.isLoading || graduationStats.isFetching
 
@@ -141,7 +141,6 @@ export const TimesAndPathsView = ({ faculty, setStudyProgrammes, studyProgrammes
           <GraduationTimes
             data={data?.bcMsCombo}
             goal={goals?.bcMsCombo}
-            groupBy={groupBy}
             level="bcMsCombo"
             levelProgrammeData={programmeData?.bcMsCombo}
             title="Bachelor + Master"
@@ -161,14 +160,6 @@ export const TimesAndPathsView = ({ faculty, setStudyProgrammes, studyProgrammes
             level="doctor"
             levelProgrammeData={programmeData?.doctor}
             title="Doctor"
-            {...commonProps}
-          />
-          <GraduationTimes
-            data={data?.licentiate}
-            goal={goals?.licentiate}
-            level="licentiate"
-            levelProgrammeData={programmeData?.licentiate}
-            title="Licentiate"
             {...commonProps}
           />
         </div>

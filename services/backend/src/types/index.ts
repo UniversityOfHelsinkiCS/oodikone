@@ -1,6 +1,7 @@
 /* eslint-disable import/no-cycle */
 export { CourseWithSubsId } from './course'
 export { CreditTypeCode } from './creditTypeCode'
+export { Criteria } from './criteria'
 export { DetailedProgrammeRights } from './detailedProgrammeRights'
 export { ElementDetailType } from './elementDetailType'
 export { EnrollmentState } from './enrollmentState'
@@ -10,11 +11,11 @@ export { GenderCode } from './genderCode'
 export { IamAccess } from './iamAccess'
 export { Language } from './language'
 export { Name } from './name'
-export { OodikoneRequest } from './oodikoneRequest'
 export { Phase } from './phase'
 export { PriorityCode } from './priorityCode'
 export { Role } from './role'
 export { StudyTrack } from './studyTrack'
+export { Unification, UnifyStatus } from './unification'
 export { ExpandedUser, FormattedUser } from './user'
 
 /**

@@ -42,10 +42,9 @@ router.get('/:id/basicstats', auth.roles(['facultyStatistics', 'katselmusViewer'
   if (!code) return res.status(422).end()
   const data = await getBasicStats(code, yearType, programmeFilter, specialGroups)
   if (data) return res.json(data)
-  const wantedProgrammes = await getProgrammes(code, programmeFilter)
-  if (!wantedProgrammes) return res.status(422).end()
 
   const programmes = await getDegreeProgrammesOfFaculty(code, programmeFilter === 'NEW_STUDY_PROGRAMMES')
+  if (!programmes.length) return res.status(422).end()
 
   let updatedStats = await combineFacultyBasics(code, programmes, yearType, specialGroups)
   if (updatedStats) {
@@ -88,7 +87,8 @@ router.get('/:id/graduationtimes', auth.roles(['facultyStatistics', 'katselmusVi
   if (data) {
     return res.json(data)
   }
-  let updatedStats = await countGraduationTimes(code, programmeFilter)
+  const programmes = await getDegreeProgrammesOfFaculty(code, programmeFilter === 'NEW_STUDY_PROGRAMMES')
+  let updatedStats = await countGraduationTimes(code, programmes)
   if (updatedStats) {
     updatedStats = await setGraduationStats(updatedStats, programmeFilter)
   }

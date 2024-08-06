@@ -2,7 +2,7 @@ import { col, Op } from 'sequelize'
 
 import { Course, Credit, Organization, Student, Studyplan, SISStudyRight, SISStudyRightElement } from '../../models'
 import type { SemesterEnrollment } from '../../models/SISStudyRight'
-import { ExtentCode, Name } from '../../types'
+import { CreditTypeCode, ExtentCode, Name } from '../../types'
 import { mapToProviders } from '../../util/map'
 import { redisClient } from '../redis'
 import { getCurriculumVersion } from './shared'
@@ -195,7 +195,7 @@ export const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =
         {
           model: Credit,
           attributes: ['attainment_date', 'grade'],
-          where: { credittypecode: 4 },
+          where: { credittypecode: CreditTypeCode.PASSED },
           include: [
             {
               model: Course,
