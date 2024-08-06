@@ -2,9 +2,9 @@ import { Op, QueryTypes } from 'sequelize'
 
 import { dbConnections } from '../../database/connection'
 import { Credit, Course, Semester, Teacher } from '../../models'
-import { CreditTypeCode } from '../../types'
+import { CreditTypeCode, Name } from '../../types'
 import { splitByEmptySpace } from '../../util'
-import { isRegularCourse } from './helpers'
+import { isRegularCourse, TeacherStats } from './helpers'
 
 const likefy = (term: string) => `%${term}%`
 
@@ -61,9 +61,11 @@ const parseCreditInfo = (credit: Credit) => ({
   semester: credit.semester,
 })
 
-const markCredit = (stats, credits: number, passed: boolean, failed: boolean, transferred: boolean) => {
+type Stats = { credits: number; passed: number; failed: number; transferred: number }
+
+const markCredit = (stats: Stats, credits: number, passed: boolean, failed: boolean, transferred: boolean) => {
   if (!stats) {
-    stats = { passed: 0, failed: 0, credits: 0, transferred: 0 }
+    stats = { credits: 0, passed: 0, failed: 0, transferred: 0 }
   }
   if (passed) {
     stats.credits = transferred ? stats.credits : stats.credits + credits
@@ -72,19 +74,18 @@ const markCredit = (stats, credits: number, passed: boolean, failed: boolean, tr
   } else if (failed) {
     stats.failed += 1
   }
-
   return stats
 }
 
-const parseAndMarkCredit = (stats, key, credit: Credit) => {
+const parseAndMarkCredit = (stats: Record<number, any>, semesterCode: number, credit: Credit) => {
   const { passed, failed, credits, transferred } = parseCreditInfo(credit)
   return {
     ...stats,
-    [key]: markCredit(stats[key], credits, passed, failed, transferred),
+    [semesterCode]: markCredit(stats[semesterCode], credits, passed, failed, transferred),
   }
 }
 
-const markCreditForSemester = (semesters, credit: Credit) => {
+const markCreditForSemester = (semesters: Record<string, { id: number; name: Name; stats: Stats }>, credit: Credit) => {
   const { passed, failed, credits, semester, transferred } = parseCreditInfo(credit)
   const { semestercode, name } = semester
   const { stats, ...rest } = semesters[semestercode] || { id: semestercode, name }
@@ -97,7 +98,7 @@ const markCreditForSemester = (semesters, credit: Credit) => {
   }
 }
 
-const markCreditForYear = (years, credit: Credit) => {
+const markCreditForYear = (years: Record<number, any>, credit: Credit) => {
   const { passed, failed, credits, semester, transferred } = parseCreditInfo(credit)
   const { yearcode, yearname } = semester
   const { stats, ...rest } = years[yearcode] || { id: yearcode, name: yearname }
@@ -110,7 +111,7 @@ const markCreditForYear = (years, credit: Credit) => {
   }
 }
 
-const markCreditForCourse = (courses, credit: Credit) => {
+const markCreditForCourse = (courses: Record<string, any>, credit: Credit) => {
   const { passed, failed, credits, course, semester, transferred } = parseCreditInfo(credit)
   const { code, name } = course
   const { semestercode } = semester
@@ -172,15 +173,6 @@ const getActiveTeachers = async (providers: string[], startSemester: number, end
   return queryResult.map(({ id }) => id)
 }
 
-type TeacherWithCredits = {
-  name: string
-  id: string
-  passed: number
-  failed: number
-  transferred: number
-  credits: number
-}
-
 type TeacherCredits = Record<
   string,
   {
@@ -196,7 +188,7 @@ type TeacherCredits = Record<
 >
 
 const getTeacherCredits = async (teacherIds: string[], startSemester: number, endSemester: number) => {
-  const queryResult: Array<TeacherWithCredits> = await dbConnections.sequelize.query(
+  const queryResult: Array<TeacherStats> = await dbConnections.sequelize.query(
     `
     SELECT teacher.name,
       teacher.id,

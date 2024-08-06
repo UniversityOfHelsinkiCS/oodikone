@@ -6,14 +6,12 @@ import { CreditTypeCode } from '../../types'
 import logger from '../../util/logger'
 import { redisClient } from '../redis'
 import { getCurrentSemester, getSemestersAndYears } from '../semesters'
-import { isRegularCourse } from './helpers'
+import { isRegularCourse, TeacherStats } from './helpers'
 
 export enum CategoryID {
   ALL = 'all',
   OPEN_UNI = 'openuni',
 }
-
-type TeacherStats = { id: string; name: string; passed: number; failed: number; credits: number; transferred: number }
 
 const categories = {
   [CategoryID.ALL]: { name: 'All', redisKey: 'TOP_TEACHERS_ALL_V2' },

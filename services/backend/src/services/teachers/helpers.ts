@@ -1,5 +1,12 @@
 import { Credit } from '../../models'
 
-export type CreditsWithTeachersForYear = Pick<Credit, 'id' | 'credits' | 'credittypecode' | 'isStudyModule' | 'is_open'>
+export const isRegularCourse = (credit: Credit) => !credit.isStudyModule
 
-export const isRegularCourse = (credit: CreditsWithTeachersForYear) => !credit.isStudyModule
+export type TeacherStats = {
+  id: string
+  name: string
+  credits: number
+  passed: number
+  failed: number
+  transferred: number
+}
