@@ -6,7 +6,7 @@ import { getDegreeProgrammesOfFaculty } from './faculty'
 
 type Graduated = 'GRADUATED_INCLUDED' | 'GRADUATED_EXCLUDED'
 type SpecialGroups = 'SPECIAL_INCLUDED' | 'SPECIAL_EXCLUDED'
-type ProgrammeFilter = 'NEW_STUDY_PROGRAMMES' | 'ALL_STUDY_PROGRAMMES'
+type ProgrammeFilter = 'NEW_STUDY_PROGRAMMES' | 'ALL_PROGRAMMES'
 type YearType = 'ACADEMIC_YEAR' | 'CALENDAR_YEAR'
 
 const createRedisKeyForFacultyProgrammes = (id: string, programmeFilter: ProgrammeFilter) => {
@@ -52,7 +52,7 @@ const removeGraduationTimes = (data: GraduationData) => {
   )
 }
 
-const setFacultyProgrammes = async (id: string, data, programmeFilter: ProgrammeFilter) => {
+export const setFacultyProgrammes = async (id: string, data, programmeFilter: ProgrammeFilter) => {
   const redisKey = createRedisKeyForFacultyProgrammes(id, programmeFilter)
   const dataToRedis = {
     data,
@@ -87,19 +87,32 @@ export const getProgrammes = async (code: string, programmeFilter: ProgrammeFilt
   return updatedProgrammes
 }
 
-type Info = {
-  graphStats: Array<{ name: string; data: number[] }>
-  programmeTableStats: Record<string, number[]>
-  tableStats: Record<string, number[]>
+type GraduationInfo = {
+  graphStats: {
+    name: 'Bachelors' | 'Masters' | 'Doctors' | 'Others'
+    data?: number[]
+  }[]
+  programmeTableStats: Record<string, (string | number)[][]>
+  tableStats: (string | number)[][]
+  titles: string[]
+}
+
+type StudentInfo = {
+  graphStats: {
+    name: string
+    data: any
+  }[]
+  programmeTableStats: Record<string, any[][]>
+  tableStats: any[][]
   titles: string[]
 }
 
 type BasicData = {
-  graduationInfo: Info
+  graduationInfo: GraduationInfo
   id: string
   programmeNames: ProgrammeNames
-  studentInfo: Info
-  year: string[]
+  studentInfo: StudentInfo
+  years: Array<number | string>
 }
 
 export const setBasicStats = async (
@@ -140,10 +153,13 @@ type ProgrammeNames = Record<string, Name & { code: string }>
 
 type ThesisWriterData = {
   id: string
-  years: number[]
-  tableStats: Array<number[]>
-  graphStats: Array<number[]>
-  programmeTableStats: Record<string, Array<number[]>>
+  years: (string | number)[]
+  tableStats: (string | number)[][]
+  graphStats: {
+    name: 'Bachelors' | 'Masters'
+    data?: number[]
+  }[]
+  programmeTableStats: Record<string, (string | number)[][]>
   titles: string[]
   programmeNames: ProgrammeNames
   status: string
@@ -182,57 +198,26 @@ export const getThesisWritersStats = async (
   return JSON.parse(dataFromRedis) as ThesisWriterData & { status: string; lastUpdated: string }
 }
 
-type Statistics = { onTime: number; yearOver: number; wayOver: number }
-
-type YearMedian = {
-  amount: number
-  name: number
-  statistics: Statistics
-  times: number[] | null
-  median: number
-}
-
-type ProgrammeMedian = {
-  data: {
-    amount: number
-    name: string
-    statistics: Statistics
-    code: string
-    median: number
-  }
-  programmes: string[]
-}
-
 type MediansAndProgrammes = {
-  medians: {
-    bachelor: YearMedian[]
-    master: YearMedian[]
-    bcMsCombo: YearMedian[]
-    doctor: YearMedian[]
-  }
+  medians: Record<string, any[]>
   programmes: {
-    medians: {
-      bachelor: Record<string, ProgrammeMedian>
-      master: Record<string, ProgrammeMedian>
-      bcMsCombo: Record<string, ProgrammeMedian>
-      doctor: Record<string, ProgrammeMedian>
-    }
+    medians: Record<string, Record<string, any>>
   }
 }
 
 type GraduationData = {
   id: string
-  goals: number | Record<string, number>
+  goals: {
+    bachelor: number
+    bcMsCombo: number
+    master: number
+    doctor: number
+    exceptions: Record<string, number>
+  }
   byGradYear: MediansAndProgrammes
   byStartYear: MediansAndProgrammes
   programmeNames: Record<string, Name>
-  classSizes: {
-    programmes: Record<string, Record<string, number>>
-    bachelor: Record<string, number>
-    master: Record<string, number>
-    bcMsCombo: Record<string, number>
-    doctor: Record<string, number>
-  }
+  classSizes: Record<string, Record<string, number | Record<string, number>>>
 }
 
 export const setGraduationStats = async (data: GraduationData, programmeFilter: ProgrammeFilter) => {
@@ -326,9 +311,9 @@ export const getFacultyProgressStats = async (id: string, specialGroups: Special
 type FacultyStudentsData = {
   id: string
   years: string[]
-  facultyTableStats: Record<string, Array<number | string>>
+  facultyTableStats: Record<string, (string | number)[]>
   facultyTableStatsExtra: Record<string, Record<string, Record<string, number>>>
-  programmeStats: Record<string, Record<string, number[]>>
+  programmeStats: Record<string, Record<string, (string | number)[]>>
   titles: string[]
   programmeNames: Record<string, Name & { code: string; degreeProgrammeType: string; progId: string }>
 }
