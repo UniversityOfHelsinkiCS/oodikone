@@ -23,30 +23,32 @@ const createBasicAuthHeader = () => {
   }
 }
 
-const importerClient = axios.create({
-  headers: createEnvAuthHeader(),
+const toskaImporterClient = axios.create({
+  headers: createTokenHeader(),
+  baseURL: importerUrl,
+})
+
+const fdImporterClient = axios.create({
+  headers: createBasicAuthHeader(),
   baseURL: importerUrl,
 })
 
 const missingBasicAuthCredentials = (!importerDbApiUser || !importerDbApiPassword)
 
-/*export const getImporterClient = () => {
-  if (serviceProvider === 'toska' && !importerToken) {
-    logger.error("Importer token not set, can't return client!")
-    return null
-  }
-  else if (serviceProvider === 'fd' && missingBasicAuthCredentials) {
+const getFdImporterClient = () => {
+  if (missingBasicAuthCredentials) {
     logger.error("Basic auth credentials not set, can't return client!")
     return null
   }
-  return importerClient
-}*/
+  return toskaImporterClient
+}
 
-export const getImporterClient = () => {
-  if (serviceProvider === 'toska' && !importerToken) {
-    logger.error("I gots myself", serviceProvider, importerToken)
+const getToskaImporterClient = () => {
+  if (!importerToken) {
     logger.error("Importer token not set, can't return client!")
     return null
   }
-  return importerClient
+  return fdImporterClient
 }
+
+export const getImporterClient = serviceProvider === 'toska' ? getToskaImporterClient : getFdImporterClient
