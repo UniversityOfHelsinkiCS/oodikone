@@ -23,6 +23,8 @@ const jamiUrl = process.env.JAMI_URL || ''
 // Importer client
 const importerUrl = process.env.IMPORTER_DB_API_URL || ''
 const importerToken = process.env.IMPORTER_DB_API_TOKEN || ''
+const importerDbApiUser = process.env.IMPORTER_DB_API_USER || ''
+const importerDbApiPassword = process.env.IMPORTER_DB_API_PASSWORD || ''
 
 // Sisu
 const sisUrl = process.env.SIS_HOST
@@ -86,6 +88,8 @@ module.exports = {
   backendPort,
   importerUrl,
   importerToken,
+  importerDbApiUser,
+  importerDbApiPassword,
   isDev,
   isStaging,
   serviceProvider,
