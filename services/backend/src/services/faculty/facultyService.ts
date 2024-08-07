@@ -1,13 +1,8 @@
 import moment from 'moment'
 
-import { Name } from '../../types'
+import { Graduated, Name, ProgrammeFilter, SpecialGroups, YearType } from '../../types'
 import { redisClient } from '../redis'
 import { getDegreeProgrammesOfFaculty } from './faculty'
-
-type Graduated = 'GRADUATED_INCLUDED' | 'GRADUATED_EXCLUDED'
-type SpecialGroups = 'SPECIAL_INCLUDED' | 'SPECIAL_EXCLUDED'
-type ProgrammeFilter = 'NEW_STUDY_PROGRAMMES' | 'ALL_PROGRAMMES'
-type YearType = 'ACADEMIC_YEAR' | 'CALENDAR_YEAR'
 
 const createRedisKeyForFacultyProgrammes = (id: string, programmeFilter: ProgrammeFilter) => {
   return `FACULTY_PROGRAMMES_${id}_${programmeFilter}`
