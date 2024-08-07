@@ -1,3 +1,4 @@
+import { StatsType } from '../../types'
 import { setCreditStats } from '../analyticsService'
 import { computeCreditsProduced } from '../providerCredits'
 import { getDegreeProgrammesOfFaculty } from './faculty'
@@ -20,7 +21,7 @@ const specialGroupOptions = ['SPECIAL_INCLUDED', 'SPECIAL_EXCLUDED'] as const
 const programmeFilterOptions = ['ALL_PROGRAMMES', 'NEW_STUDY_PROGRAMMES'] as const
 const graduatedOptions = ['GRADUATED_INCLUDED', 'GRADUATED_EXCLUDED'] as const
 
-export const updateFacultyOverview = async (facultyCode: string, statsType: string) => {
+export const updateFacultyOverview = async (facultyCode: string, statsType: StatsType) => {
   const all = await getDegreeProgrammesOfFaculty(facultyCode, false)
   const onlyNew = await getDegreeProgrammesOfFaculty(facultyCode, true)
 
