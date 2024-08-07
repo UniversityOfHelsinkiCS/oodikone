@@ -1,46 +1,50 @@
-const axios = require('axios')
-const { Op } = require('sequelize')
+import axios from 'axios'
+import { Op } from 'sequelize'
 
-const { SIS_UPDATER_URL, SECRET_TOKEN } = require('../config')
-const { Studyplan } = require('../models')
+import { SECRET_TOKEN, SIS_UPDATER_URL } from '../config'
+import { Studyplan } from '../models'
 
 const client = axios.create({ baseURL: SIS_UPDATER_URL })
-
 const params = { params: { token: SECRET_TOKEN } }
 
-const updateSISStudents = async () => {
-  const response = await client.get('/v1/students', params)
+export const abortUpdate = async () => {
+  const response = await client.get('/v1/abort', params)
   return response.data
 }
 
-const updateStudentsByStudentNumber = async studentnumbers => {
-  const data = { studentnumbers }
-  const response = await client.post('/v1/students', data, params)
-  return response.data
-}
-
-const updateCoursesByCourseCode = async coursecodes => {
+export const updateSISCoursesByCourseCode = async (coursecodes: string[]) => {
   const data = { coursecodes }
   const response = await client.post('/v1/courses', data, params)
   return response.data
 }
 
-const updateSISMetadata = async () => {
+export const updateSISMetadata = async () => {
   const response = await client.get('/v1/meta', params)
   return response.data
 }
 
-const updateSISProgrammes = async () => {
+export const updateSISProgrammes = async () => {
   const response = await client.get('/v1/programmes', params)
   return response.data
 }
 
-const updateSISRedisCache = async () => {
+export const updateSISRedisCache = async () => {
   const response = await client.get('/v1/rediscache', params)
   return response.data
 }
 
-const studyplansUpdate = async days => {
+export const updateSISStudents = async () => {
+  const response = await client.get('/v1/students', params)
+  return response.data
+}
+
+export const updateSISStudentsByStudentNumber = async (studentnumbers: string[]) => {
+  const data = { studentnumbers }
+  const response = await client.post('/v1/students', data, params)
+  return response.data
+}
+
+export const updateSISStudyPlans = async (days: number) => {
   const limitDate = new Date()
   limitDate.setDate(limitDate.getDate() - days)
   const result = await Studyplan.findAll({
@@ -52,20 +56,4 @@ const studyplansUpdate = async days => {
   const studentnumbers = result.map(r => r.studentnumber)
   const response = await client.post('v1/studyplans', { studentnumbers }, params)
   return response.data
-}
-
-const abort = async () => {
-  const response = await client.get('/v1/abort', params)
-  return response.data
-}
-
-module.exports = {
-  updateSISMetadata,
-  updateSISStudents,
-  updateSISProgrammes,
-  updateStudentsByStudentNumber,
-  updateSISRedisCache,
-  abort,
-  updateCoursesByCourseCode,
-  studyplansUpdate,
 }

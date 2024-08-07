@@ -5,7 +5,7 @@ const {
   refreshFaculty,
   refreshCloseToGraduating,
 } = require('../events')
-const { studyplansUpdate } = require('../services/sisUpdaterService')
+const { updateSISStudyPlans } = require('../services/sisUpdaterService')
 const logger = require('../util/logger')
 
 // This bullmq worker processor has to be in a different file for it to be run in a sandboxed process.
@@ -25,7 +25,7 @@ const refreshers = {
 module.exports = async job => {
   try {
     if (job.name === 'studyplansUpdate') {
-      await studyplansUpdate(job.data.days)
+      await updateSISStudyPlans(job.data.days)
       return
     }
     await refreshers[job.id.split('-')[0]](job.data?.code)
