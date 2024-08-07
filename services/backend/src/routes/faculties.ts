@@ -1,12 +1,12 @@
-const router = require('express').Router()
+import { Request, Response, Router } from 'express'
 
-const auth = require('../middleware/auth')
-const { getDegreeProgrammesOfFaculty } = require('../services/faculty/faculty')
-const { combineFacultyBasics } = require('../services/faculty/facultyBasics')
-const { getFacultyCredits } = require('../services/faculty/facultyCredits')
-const { countGraduationTimes } = require('../services/faculty/facultyGraduationTimes')
-const { getSortedFaculties } = require('../services/faculty/facultyHelpers')
-const {
+import * as auth from '../middleware/auth'
+import { getDegreeProgrammesOfFaculty } from '../services/faculty/faculty'
+import { combineFacultyBasics } from '../services/faculty/facultyBasics'
+import { getFacultyCredits } from '../services/faculty/facultyCredits'
+import { countGraduationTimes } from '../services/faculty/facultyGraduationTimes'
+import { getSortedFaculties } from '../services/faculty/facultyHelpers'
+import {
   getProgrammes,
   getBasicStats,
   setBasicStats,
@@ -18,148 +18,249 @@ const {
   setFacultyStudentStats,
   getFacultyProgressStats,
   setFacultyProgressStats,
-} = require('../services/faculty/facultyService')
-const { combineFacultyStudentProgress } = require('../services/faculty/facultyStudentProgress')
-const { combineFacultyStudents } = require('../services/faculty/facultyStudents')
-const { combineFacultyThesisWriters } = require('../services/faculty/facultyThesisWriters')
-const { updateFacultyOverview, updateFacultyProgressOverview } = require('../services/faculty/facultyUpdates')
-const logger = require('../util/logger')
+} from '../services/faculty/facultyService'
+import { combineFacultyStudentProgress } from '../services/faculty/facultyStudentProgress'
+import { combineFacultyStudents } from '../services/faculty/facultyStudents'
+import { combineFacultyThesisWriters } from '../services/faculty/facultyThesisWriters'
+import { updateFacultyOverview, updateFacultyProgressOverview } from '../services/faculty/facultyUpdates'
+import { Graduated, ProgrammeFilter, SpecialGroups, StatsType, YearType } from '../types'
+import logger from '../util/logger'
 
 // Faculty uses a lot of tools designed for Study programme.
 // Some of them have been copied here and slightly edited for faculty purpose.
 
-router.get('/', async (_req, res) => {
+const router = Router()
+
+router.get('/', async (_req: Request, res: Response) => {
   const faculties = await getSortedFaculties()
   res.json(faculties)
 })
 
-router.get('/:id/basicstats', auth.roles(['facultyStatistics', 'katselmusViewer']), async (req, res) => {
-  const code = req.params.id
-  const yearType = req.query?.year_type
-  const programmeFilter = req.query?.programme_filter
-  const specialGroups = req.query?.special_groups
-
-  if (!code) return res.status(422).end()
-  const data = await getBasicStats(code, yearType, programmeFilter, specialGroups)
-  if (data) return res.json(data)
-
-  const programmes = await getDegreeProgrammesOfFaculty(code, programmeFilter === 'NEW_STUDY_PROGRAMMES')
-  if (!programmes.length) return res.status(422).end()
-
-  let updatedStats = await combineFacultyBasics(code, programmes, yearType, specialGroups)
-  if (updatedStats) {
-    updatedStats = await setBasicStats(updatedStats, yearType, programmeFilter, specialGroups)
+interface GetStatsRequest extends Request {
+  query: {
+    programme_filter: ProgrammeFilter
+    special_groups: SpecialGroups
+    year_type: YearType
   }
-  return res.json(updatedStats)
-})
+}
 
-router.get('/:id/creditstats', auth.roles(['facultyStatistics', 'katselmusViewer']), async (req, res) => {
-  const code = req.params.id
-  const { year_type: yearType } = req.query
-  const stats = await getFacultyCredits(code, yearType === 'ACADEMIC_YEAR')
-  return res.json(stats)
-})
+router.get(
+  '/:id/basicstats',
+  auth.roles(['facultyStatistics', 'katselmusViewer']),
+  async (req: GetStatsRequest, res: Response) => {
+    const code = req.params.id
+    if (!code) {
+      return res.status(422).end()
+    }
 
-router.get('/:id/thesisstats', auth.roles(['facultyStatistics', 'katselmusViewer']), async (req, res) => {
-  const code = req.params.id
-  const yearType = req.query?.year_type
-  const specialGroups = req.query?.special_groups
-  const programmeFilter = req.query?.programme_filter
+    const { year_type: yearType, programme_filter: programmeFilter, special_groups: specialGroups } = req.query
+    const data = await getBasicStats(code, yearType, programmeFilter, specialGroups)
+    if (data) {
+      return res.json(data)
+    }
 
-  if (!code) return res.status(422).end()
-  const data = await getThesisWritersStats(code, yearType, programmeFilter, specialGroups)
-  if (data) return res.json(data)
-  const programmes = await getDegreeProgrammesOfFaculty(code, programmeFilter === 'NEW_STUDY_PROGRAMMES')
-  if (!programmes.length) return res.status(422).end()
-  let updateStats = await combineFacultyThesisWriters(code, programmes, yearType, specialGroups)
-  if (updateStats) {
-    updateStats = await setThesisWritersStats(updateStats, yearType, programmeFilter, specialGroups)
+    const programmes = await getDegreeProgrammesOfFaculty(code, programmeFilter === 'NEW_STUDY_PROGRAMMES')
+    if (!programmes.length) {
+      return res.status(422).end()
+    }
+
+    // TODO: The types could be handled better. Possible null value is causing issues with TS.
+    let updatedStats: any = await combineFacultyBasics(code, programmes, yearType, specialGroups)
+    if (updatedStats) {
+      updatedStats = await setBasicStats(updatedStats, yearType, programmeFilter, specialGroups)
+    }
+    return res.json(updatedStats)
   }
-  return res.json(updateStats)
-})
+)
 
-router.get('/:id/graduationtimes', auth.roles(['facultyStatistics', 'katselmusViewer']), async (req, res) => {
-  const code = req.params.id
-  const programmeFilter = req.query?.programme_filter
-
-  if (!code) return res.status(422).end()
-  const data = await getGraduationStats(code, programmeFilter)
-  if (data) {
-    return res.json(data)
+interface GetCreditStatsRequest extends Request {
+  query: {
+    year_type: YearType
   }
-  const programmes = await getDegreeProgrammesOfFaculty(code, programmeFilter === 'NEW_STUDY_PROGRAMMES')
-  let updatedStats = await countGraduationTimes(code, programmes)
-  if (updatedStats) {
-    updatedStats = await setGraduationStats(updatedStats, programmeFilter)
+}
+
+router.get(
+  '/:id/creditstats',
+  auth.roles(['facultyStatistics', 'katselmusViewer']),
+  async (req: GetCreditStatsRequest, res: Response) => {
+    const code = req.params.id
+    const { year_type: yearType } = req.query
+    const stats = await getFacultyCredits(code, yearType === 'ACADEMIC_YEAR')
+    return res.json(stats)
   }
-  return res.json(updatedStats)
-})
+)
 
-router.get('/:id/progressstats', auth.roles(['facultyStatistics', 'katselmusViewer']), async (req, res) => {
-  const code = req.params.id
-  const specialGroups = req.query?.special_groups
-  const graduated = req.query?.graduated
-  const programmes = await getProgrammes(code, 'NEW_STUDY_PROGRAMMES')
-  if (!programmes) return res.status(422).end()
+router.get(
+  '/:id/thesisstats',
+  auth.roles(['facultyStatistics', 'katselmusViewer']),
+  async (req: GetStatsRequest, res: Response) => {
+    const code = req.params.id
+    if (!code) {
+      return res.status(422).end()
+    }
 
-  if (!code) return res.status(422).end()
-  const data = await getFacultyProgressStats(code, specialGroups, graduated)
-  if (data) return res.json(data)
+    const { year_type: yearType, programme_filter: programmeFilter, special_groups: specialGroups } = req.query
+    const data = await getThesisWritersStats(code, yearType, programmeFilter, specialGroups)
+    if (data) {
+      return res.json(data)
+    }
 
-  let updateStats = await combineFacultyStudentProgress(code, programmes.data, specialGroups, graduated)
-  if (updateStats) {
-    updateStats = await setFacultyProgressStats(updateStats, specialGroups, graduated)
+    const programmes = await getDegreeProgrammesOfFaculty(code, programmeFilter === 'NEW_STUDY_PROGRAMMES')
+    if (!programmes.length) {
+      return res.status(422).end()
+    }
+
+    let updatedStats: any = await combineFacultyThesisWriters(code, programmes, yearType, specialGroups)
+    if (updatedStats) {
+      updatedStats = await setThesisWritersStats(updatedStats, yearType, programmeFilter, specialGroups)
+    }
+    return res.json(updatedStats)
   }
-  return res.json(updateStats)
-})
+)
 
-router.get('/:id/studentstats', auth.roles(['facultyStatistics', 'katselmusViewer']), async (req, res) => {
-  const code = req.params.id
-  const specialGroups = req.query?.special_groups
-  const graduated = req.query?.graduated
-
-  if (!code) return res.status(422).end()
-  const data = await getFacultyStudentStats(code, specialGroups, graduated)
-  if (data) return res.json(data)
-  const newProgrammes = await getDegreeProgrammesOfFaculty(code, true)
-  if (!newProgrammes.length) return res.status(422).end()
-
-  let updateStats = await combineFacultyStudents(code, newProgrammes, specialGroups, graduated)
-  if (updateStats) {
-    updateStats = await setFacultyStudentStats(updateStats, specialGroups, graduated)
+interface GetGraduationStatsRequest extends Request {
+  query: {
+    programme_filter: ProgrammeFilter
   }
-  return res.json(updateStats)
-})
+}
 
-router.get('/:id/update_basicview', auth.roles(['facultyStatistics', 'katselmusViewer']), async (req, res) => {
-  const code = req.params.id
-  const statsType = req.query?.stats_type
-  if (!code) {
-    return res.status(400).json({ error: 'Missing code' })
-  }
-  try {
-    const result = await updateFacultyOverview(code, statsType)
-    return res.json(result)
-  } catch (error) {
-    const message = `Failed to update basic stats for faculty ${code}`
-    logger.error(message, { error })
-    return res.status(500).json({ error: message })
-  }
-})
+router.get(
+  '/:id/graduationtimes',
+  auth.roles(['facultyStatistics', 'katselmusViewer']),
+  async (req: GetGraduationStatsRequest, res: Response) => {
+    const code = req.params.id
+    if (!code) {
+      return res.status(422).end()
+    }
 
-router.get('/:id/update_progressview', auth.roles(['facultyStatistics', 'katselmusViewer']), async (req, res) => {
-  const code = req.params.id
-  if (!code) {
-    return res.status(400).json({ error: 'Missing code' })
-  }
-  try {
-    const result = await updateFacultyProgressOverview(code)
-    return res.json(result)
-  } catch (error) {
-    const message = `Failed to update progress tab stats for faculty ${code}`
-    logger.error(message, { error })
-    return res.status(500).json({ error: message })
-  }
-})
+    const { programme_filter: programmeFilter } = req.query
+    const data = await getGraduationStats(code, programmeFilter)
+    if (data) {
+      return res.json(data)
+    }
 
-module.exports = router
+    const programmes = await getDegreeProgrammesOfFaculty(code, programmeFilter === 'NEW_STUDY_PROGRAMMES')
+    if (!programmes) {
+      return res.status(422).end()
+    }
+
+    let updatedStats: any = await countGraduationTimes(code, programmes)
+    if (updatedStats) {
+      updatedStats = await setGraduationStats(updatedStats, programmeFilter)
+    }
+    return res.json(updatedStats)
+  }
+)
+
+interface GetProgressStatsRequest extends Request {
+  query: {
+    graduated: Graduated
+    special_groups: SpecialGroups
+  }
+}
+
+router.get(
+  '/:id/progressstats',
+  auth.roles(['facultyStatistics', 'katselmusViewer']),
+  async (req: GetProgressStatsRequest, res: Response) => {
+    const code = req.params.id
+    if (!code) {
+      return res.status(422).end()
+    }
+
+    const programmes = await getProgrammes(code, 'NEW_STUDY_PROGRAMMES')
+    if (!programmes) {
+      return res.status(422).end()
+    }
+
+    const { graduated, special_groups: specialGroups } = req.query
+    const data = await getFacultyProgressStats(code, specialGroups, graduated)
+    if (data) {
+      return res.json(data)
+    }
+
+    let updatedStats: any = await combineFacultyStudentProgress(code, programmes.data, specialGroups, graduated)
+    if (updatedStats) {
+      updatedStats = await setFacultyProgressStats(updatedStats, specialGroups, graduated)
+    }
+    return res.json(updatedStats)
+  }
+)
+
+interface GetStudentStatsRequest extends GetProgressStatsRequest {}
+
+router.get(
+  '/:id/studentstats',
+  auth.roles(['facultyStatistics', 'katselmusViewer']),
+  async (req: GetStudentStatsRequest, res: Response) => {
+    const code = req.params.id
+    if (!code) {
+      return res.status(422).end()
+    }
+
+    const { graduated, special_groups: specialGroups } = req.query
+
+    const data = await getFacultyStudentStats(code, specialGroups, graduated)
+    if (data) {
+      return res.json(data)
+    }
+
+    const newProgrammes = await getDegreeProgrammesOfFaculty(code, true)
+    if (!newProgrammes.length) {
+      return res.status(422).end()
+    }
+
+    let updatedStats: any = await combineFacultyStudents(code, newProgrammes, specialGroups, graduated)
+    if (updatedStats) {
+      updatedStats = await setFacultyStudentStats(updatedStats, specialGroups, graduated)
+    }
+    return res.json(updatedStats)
+  }
+)
+
+interface GetUpdateBasicViewRequest extends Request {
+  query: {
+    stats_type: StatsType
+  }
+}
+
+router.get(
+  '/:id/update_basicview',
+  auth.roles(['facultyStatistics', 'katselmusViewer']),
+  async (req: GetUpdateBasicViewRequest, res: Response) => {
+    const code = req.params.id
+    if (!code) {
+      return res.status(422).end()
+    }
+    const { stats_type: statsType } = req.query
+    try {
+      const result = await updateFacultyOverview(code, statsType)
+      return res.json(result)
+    } catch (error) {
+      const message = `Failed to update basic stats for faculty ${code}`
+      logger.error(message, { error })
+      return res.status(500).json({ error: message })
+    }
+  }
+)
+
+router.get(
+  '/:id/update_progressview',
+  auth.roles(['facultyStatistics', 'katselmusViewer']),
+  async (req: Request, res: Response) => {
+    const code = req.params.id
+    if (!code) {
+      return res.status(422).end()
+    }
+    try {
+      const result = await updateFacultyProgressOverview(code)
+      return res.json(result)
+    } catch (error) {
+      const message = `Failed to update progress tab stats for faculty ${code}`
+      logger.error(message, { error })
+      return res.status(500).json({ error: message })
+    }
+  }
+)
+
+export default router
