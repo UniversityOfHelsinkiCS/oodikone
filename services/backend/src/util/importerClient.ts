@@ -1,13 +1,13 @@
 import axios from 'axios'
 
-import { importerUrl, importerToken, serviceProvider, importerDbApiUser, importerDbApiPassword } from '../config'
+import { importerDbApiPassword, importerDbApiUser, importerToken, importerUrl, serviceProvider } from '../config'
 import logger from './logger'
 
 const createBasicAuthHeader = () => {
   const auth = `${importerDbApiUser}:${importerDbApiPassword}`
   const token = Buffer.from(auth).toString('base64')
   return {
-    Authorization: 'Basic ' + token
+    Authorization: `Basic ${token}`,
   }
 }
 
@@ -21,7 +21,7 @@ const fdImporterClient = axios.create({
   baseURL: importerUrl,
 })
 
-const missingBasicAuthCredentials = (!importerDbApiUser || !importerDbApiPassword)
+const missingBasicAuthCredentials = !importerDbApiUser || !importerDbApiPassword
 
 const getFdImporterClient = () => {
   if (missingBasicAuthCredentials) {
