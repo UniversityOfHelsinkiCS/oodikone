@@ -86,7 +86,7 @@
         "alias": {
           "@": "./services/frontend/src"
         },
-        "extensions": [".js", ".jsx"]
+        "extensions": [".js", ".jsx", ".ts", ".tsx"]
       }
     },
     "react": {
