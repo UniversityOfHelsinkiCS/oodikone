@@ -9,6 +9,34 @@
     "sourceType": "module"
   },
   "extends": ["../../.eslintrc.json", "plugin:react/jsx-runtime"],
+  "overrides": [
+    {
+      "files": ["**/*.ts"],
+      "env": {
+        "es2021": true,
+        "node": true
+      },
+      "extends": [
+        "airbnb-typescript",
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:prettier/recommended"
+      ],
+      "parser": "@typescript-eslint/parser",
+      "parserOptions": {
+        "ecmaVersion": 2021,
+        "sourceType": "module",
+        "project": ["./services/frontend/tsconfig.json", "./services/frontend/tsconfig.node.json"]
+      },
+      "rules": {
+        "import/prefer-default-export": "off",
+        "@typescript-eslint/lines-between-class-members": "off",
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-shadow": "off",
+        "@typescript-eslint/return-await": "off"
+      }
+    }
+  ],
   "rules": {
     "camelcase": "error",
     "consistent-return": "error",
