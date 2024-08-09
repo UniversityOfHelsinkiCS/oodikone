@@ -2,7 +2,7 @@ import moment from 'moment'
 
 import { ISO_DATE_FORMAT } from '@/constants/date'
 
-export const getAge = date => {
+export const getAge = (date: string) => {
   const today = new Date()
   const birthDate = new Date(date)
   let age = today.getFullYear() - birthDate.getFullYear()
@@ -15,11 +15,11 @@ export const getAge = date => {
 
 export const getTimestamp = () => moment().format(ISO_DATE_FORMAT)
 
-export const isWithinSixMonths = date => moment(date) > moment().subtract(6, 'months')
+export const isWithinSixMonths = (date: string) => moment(date) > moment().subtract(6, 'months')
 
-export const momentFromFormat = (date, format) => moment(date, format)
+export const momentFromFormat = (date: string, format: string) => moment(date, format)
 
-export const reformatDate = (date, outputFormat) => {
+export const reformatDate = (date: string, outputFormat: string) => {
   if (!date) {
     return 'Unavailable'
   }
