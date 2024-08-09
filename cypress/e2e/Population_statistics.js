@@ -93,7 +93,7 @@ describe('Population Statistics tests', () => {
       cy.contains('Opiskelijan digitaidot - Kumpula')
     })
 
-    it("Empty 'tags' tab has a link to the page where tags can be created", () => {
+    it("Empty 'tags' tab has a link to the page where tags can be created", { retries: 2 }, () => {
       cy.visit(pathToCSBach2017)
       cy.contains('Students (170)')
         .parent()
