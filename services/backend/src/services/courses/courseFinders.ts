@@ -49,40 +49,41 @@ const getRawCourses = async (name: string, code: string) => {
   })
 }
 
-// TODO: Remove horrible variable names "temp" and "cu"
-export const getCoursesByNameAndOrCode = async (name: string, code: string) => {
+const getCourses = async (name: string, code: string) => {
   const rawCourses = await getRawCourses(name, code)
   const courses: CourseWithSubsId[] = rawCourses
     .map(course => ({ ...course.dataValues }))
     .sort((a, b) => getSortRank(b.code) - getSortRank(a.code))
+  return courses
+}
 
+export const getCoursesByNameAndOrCode = async (name: string, code: string) => {
+  const courses = await getCourses(name, code)
   let substitutionGroupIndex = 0
-  const visited: string[] = []
+  const visitedCourses: string[] = []
 
-  const organizeSubgroups = (courseWithSubsId: CourseWithSubsId) => {
-    if (visited.includes(courseWithSubsId.code)) {
+  const assignSubstitutionGroup = (course: CourseWithSubsId) => {
+    if (visitedCourses.includes(course.code)) {
       return
     }
-
-    let temp: CourseWithSubsId[] = []
-    if (courseWithSubsId.substitutions !== null) {
-      temp = courses.filter(course => courseWithSubsId.substitutions.includes(course.code))
+    let relatedCourses: CourseWithSubsId[] = []
+    if (course.substitutions !== null) {
+      relatedCourses = courses.filter(currentCourse => course.substitutions.includes(currentCourse.code))
     }
-
-    temp.unshift(courseWithSubsId)
-    temp.forEach(cu => {
-      if (visited.includes(courseWithSubsId.code)) {
+    relatedCourses.unshift(course)
+    relatedCourses.forEach(relatedCourse => {
+      if (visitedCourses.includes(relatedCourse.id)) {
         return
       }
-      visited.push(cu.id)
-      cu.subsId = substitutionGroupIndex
+      visitedCourses.push(relatedCourse.id)
+      relatedCourse.subsId = substitutionGroupIndex
     })
   }
 
   courses.forEach(course => {
-    if (!visited.includes(course.id)) {
+    if (!visitedCourses.includes(course.id)) {
       substitutionGroupIndex++
-      organizeSubgroups(course)
+      assignSubstitutionGroup(course)
     }
   })
 
