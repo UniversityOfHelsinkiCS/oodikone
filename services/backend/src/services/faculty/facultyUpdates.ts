@@ -38,11 +38,7 @@ export const updateFacultyOverview = async (facultyCode: string, statsType: Stat
           await setBasicStats(updatedStudentInfo, yearType, programmeFilter, specialGroups)
         }
         if ((statsType === 'ALL' || statsType === 'CREDITS') && specialGroups !== 'SPECIAL_EXCLUDED') {
-          const updatedCredits = await computeCreditsProduced(
-            facultyCode,
-            yearType === 'ACADEMIC_YEAR',
-            specialGroups === 'SPECIAL_INCLUDED'
-          )
+          const updatedCredits = await computeCreditsProduced(facultyCode, yearType === 'ACADEMIC_YEAR')
           await setCreditStats(updatedCredits, yearType === 'ACADEMIC_YEAR', specialGroups === 'SPECIAL_INCLUDED')
         }
         if (statsType === 'ALL' || statsType === 'THESIS') {
