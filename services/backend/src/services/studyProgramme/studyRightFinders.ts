@@ -1,16 +1,7 @@
 import { col, fn, Includeable, Op } from 'sequelize'
 
-import {
-  ElementDetail,
-  Studyright,
-  Student,
-  StudyrightElement,
-  SISStudyRight,
-  SISStudyRightElement,
-  Credit,
-} from '../../models'
-import { CreditTypeCode, ElementDetailType, Name } from '../../types'
-import { formatStudyright } from './format'
+import { Student, SISStudyRight, SISStudyRightElement, Credit } from '../../models'
+import { CreditTypeCode, Name } from '../../types'
 
 export const getStudyRightsInProgramme = async (
   programmeCode: string,
@@ -94,42 +85,14 @@ export const getStudyTracksForProgramme = async (studyProgramme: string) => {
     )
 }
 
-export const getStudyRights = async (studentNumbers: string[]) =>
+export const getSISStudyRightsOfStudents = async (studentNumbers: string[]) =>
   (
-    await Studyright.findAll({
-      attributes: [
-        'studyrightid',
-        'startdate',
-        'studystartdate',
-        'enddate',
-        'graduated',
-        'prioritycode',
-        'extentcode',
-        'cancelled',
-        'facultyCode',
-        'actual_studyrightid',
-        'semesterEnrollments',
-      ],
+    await SISStudyRight.findAll({
       where: {
-        student_studentnumber: studentNumbers,
+        studentNumber: {
+          [Op.in]: studentNumbers,
+        },
       },
-      include: [
-        {
-          model: StudyrightElement,
-          include: [
-            {
-              model: ElementDetail,
-              where: {
-                type: ElementDetailType.PROGRAMME,
-              },
-            },
-          ],
-        },
-        {
-          model: Student,
-          attributes: ['studentnumber'],
-          required: true,
-        },
-      ],
+      attributes: ['id', 'studentNumber', 'extentCode', 'semesterEnrollments', 'startDate', 'endDate'],
     })
-  ).map(formatStudyright)
+  ).map(studyRight => studyRight.toJSON())

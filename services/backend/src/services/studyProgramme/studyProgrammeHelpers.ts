@@ -3,8 +3,8 @@ import { InferAttributes } from 'sequelize'
 
 import { serviceProvider } from '../../config'
 import { programmeCodes } from '../../config/programmeCodes'
-import { SISStudyRight, SISStudyRightElement, Studyright } from '../../models'
-import { ExtentCode, Phase } from '../../types'
+import { SISStudyRight, SISStudyRightElement } from '../../models'
+import { Phase } from '../../types'
 import { keysOf } from '../../util'
 
 export function getYearsArray(since: number, isAcademicYear: true, yearsCombined?: boolean): string[]
@@ -41,12 +41,6 @@ export const getStatsBasis = (years: Array<string | number>) => {
     graphStats: new Array<0>(years.length).fill(0),
     tableStats: getYearsObject({ years }),
   }
-}
-
-export const getCorrectStartDate = (studyRight: InferAttributes<Studyright>) => {
-  return studyRight.studyrightid.slice(-2) === '-2' && studyRight.extentcode === ExtentCode.MASTER
-    ? studyRight.studystartdate
-    : studyRight.startdate
 }
 
 export const getMedian = (values: number[]) => {

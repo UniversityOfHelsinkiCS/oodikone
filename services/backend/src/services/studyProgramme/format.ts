@@ -1,46 +1,6 @@
 import { InferAttributes } from 'sequelize'
-import { Credit, Student, Studyright, StudyrightElement, Transfer } from '../../models'
-import { ElementDetailType } from '../../types'
 
-const resolveStudyRightCode = (studyRightElements: StudyrightElement[]) => {
-  if (!studyRightElements) {
-    return null
-  }
-  const studyRightElement = studyRightElements
-    .filter(element => element.element_detail.type === ElementDetailType.PROGRAMME)
-    .sort((a, b) => new Date(b.startdate).getTime() - new Date(a.startdate).getTime())[0]
-  if (!studyRightElement) {
-    return null
-  }
-  return studyRightElement.code
-}
-
-export const formatStudyright = (studyright: Studyright) => {
-  return {
-    studyrightid: studyright.studyrightid,
-    startdate: studyright.startdate,
-    studystartdate: studyright.studystartdate,
-    enddate: studyright.enddate,
-    givendate: studyright.givendate,
-    graduated: studyright.graduated,
-    active: studyright.active,
-    prioritycode: studyright.prioritycode,
-    extentcode: studyright.extentcode,
-    studentNumber: studyright.student.studentnumber,
-    code: resolveStudyRightCode(studyright.studyright_elements),
-    studyrightElements: studyright.studyright_elements,
-    cancelled: studyright.cancelled,
-    facultyCode: studyright.facultyCode,
-    actual_studyrightid: studyright.actual_studyrightid,
-    semesterEnrollments: studyright.semesterEnrollments,
-    name:
-      studyright.studyright_elements?.length &&
-      studyright.studyright_elements[0].element_detail &&
-      studyright.studyright_elements[0].element_detail.name
-        ? studyright.studyright_elements[0].element_detail.name
-        : null,
-  }
-}
+import { Credit, Student } from '../../models'
 
 export const formatStudent = (student: Student) => {
   return {
@@ -63,14 +23,5 @@ export const formatCredit = (credit: InferAttributes<Credit>) => {
     attainmentDate: credit.attainment_date,
     studyrightId: credit.studyright_id,
     semestercode: credit.semestercode,
-  }
-}
-
-export const formatTransfer = (transfer: InferAttributes<Transfer>) => {
-  return {
-    sourcecode: transfer.sourcecode,
-    targetcode: transfer.targetcode,
-    transferdate: transfer.transferdate,
-    studyrightid: transfer.studyrightid,
   }
 }

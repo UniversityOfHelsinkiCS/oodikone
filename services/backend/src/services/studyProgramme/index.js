@@ -4,39 +4,8 @@ const { Op } = require('sequelize')
 const {
   dbConnections: { sequelize },
 } = require('../../database/connection')
-const { Course, Credit, Enrollment, Organization, ProgrammeModule, Transfer } = require('../../models')
+const { Course, Credit, Enrollment, Organization, ProgrammeModule } = require('../../models')
 const logger = require('../../util/logger')
-const { formatTransfer } = require('./format')
-
-const transfersAway = async (studytrack, since) =>
-  (
-    await Transfer.findAll({
-      where: {
-        transferdate: {
-          [Op.gte]: since,
-        },
-        sourcecode: studytrack,
-      },
-    })
-  ).map(formatTransfer)
-
-const transfersTo = async (studytrack, since) =>
-  (
-    await Transfer.findAll({
-      where: {
-        transferdate: {
-          [Op.gte]: since,
-        },
-        targetcode: studytrack,
-      },
-    })
-  ).map(formatTransfer)
-
-const allTransfers = async (studytrack, since) => {
-  const transferredTo = await transfersTo(studytrack, since)
-  const transferredAway = await transfersAway(studytrack, since)
-  return [...transferredTo, ...transferredAway]
-}
 
 const getAllProgrammeCourses = async providerCode => {
   const res = await Course.findAll({
@@ -190,7 +159,6 @@ const getProgrammeName = async code => {
 }
 
 module.exports = {
-  allTransfers,
   getCurrentStudyYearStartDate,
   getAllProgrammeCourses,
   getProgrammeName,

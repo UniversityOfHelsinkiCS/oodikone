@@ -1,11 +1,20 @@
+import { InferAttributes } from 'sequelize'
+
+import { SISStudyRight } from '../models'
 import { EnrollmentType, ExtentCode } from '../types'
 import { mapToProviders } from '../util/map'
 import { getCreditStats, setCreditStats } from './analyticsService'
 import { getCourseCodesOfProvider } from './providers'
-import { allTransfers } from './studyProgramme'
 import { getCreditsForProvider, getTransferredCredits } from './studyProgramme/creditGetters'
-import { defineYear, getCorrectStartDate } from './studyProgramme/studyProgrammeHelpers'
-import { getStudyRights } from './studyProgramme/studyRightFinders'
+import { defineYear } from './studyProgramme/studyProgrammeHelpers'
+import { getSISStudyRightsOfStudents } from './studyProgramme/studyRightFinders'
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const assertUnreachable = (x: never) => {
+  throw new Error("Didn't expect to get here")
+}
+
+const basicDegreeExtentCodes = [ExtentCode.BACHELOR, ExtentCode.MASTER, ExtentCode.BACHELOR_AND_MASTER]
 
 /**
   Rapo-kategoriat 9.2.2024, joiden perusteella tämä koodi on tehty. Numerot täsmäävät vain 2022 alkaen, koska Sisu/Oodi ero.
@@ -39,71 +48,61 @@ import { getStudyRights } from './studyProgramme/studyRightFinders'
   This is probably very rare to cause differences, only one such was found in MH60_001
 */
 
-const getCategory = (extentCode: number, degreeStudyright: any): string => {
-  if ([ExtentCode.EXCHANGE_STUDIES, ExtentCode.EXCHANGE_STUDIES_POSTGRADUATE].includes(extentCode)) {
-    return 'incoming-exchange'
-  }
-  if ([ExtentCode.OPEN_UNIVERSITY_STUDIES, ExtentCode.SUMMER_AND_WINTER_SCHOOL].includes(extentCode)) {
-    return 'open-uni'
-  }
-  if ([ExtentCode.CONTRACT_TRAINING, ExtentCode.STUDIES_FOR_SECONDARY_SCHOOL_STUDENTS].includes(extentCode)) {
-    return 'agreement'
-  }
-  if (
-    [
-      ExtentCode.NON_DEGREE_PEGAGOGICAL_STUDIES_FOR_TEACHERS,
-      ExtentCode.SPECIALIZATION_STUDIES,
-      ExtentCode.NON_DEGREE_PROGRAMME_FOR_SPECIAL_EDUCATION_TEACHERS,
-      ExtentCode.SPECIALIST_TRAINING_IN_MEDICINE_AND_DENTISTRY,
-      ExtentCode.NON_DEGREE_STUDIES,
-    ].includes(extentCode)
-  ) {
-    return 'separate'
-  }
-  if (
-    [ExtentCode.BACHELOR, ExtentCode.MASTER].includes(extentCode) ||
-    (degreeStudyright && [ExtentCode.BACHELOR, ExtentCode.MASTER].includes(degreeStudyright.extentcode))
-  ) {
+// TODO: How should licentiate and doctorate studies be categorized?
+const getCategory = (extentCode?: ExtentCode, degreeStudyRightExtentCode?: ExtentCode) => {
+  if (degreeStudyRightExtentCode && basicDegreeExtentCodes.includes(degreeStudyRightExtentCode)) {
     return 'basic'
   }
-  return 'other'
+  switch (extentCode) {
+    case ExtentCode.OPEN_UNIVERSITY_STUDIES:
+    case ExtentCode.SUMMER_AND_WINTER_SCHOOL:
+      return 'open-uni'
+    case ExtentCode.MASTER:
+    case ExtentCode.BACHELOR_AND_MASTER:
+    case ExtentCode.BACHELOR:
+      return 'basic'
+    case ExtentCode.NON_DEGREE_STUDIES:
+    case ExtentCode.SPECIALIST_TRAINING_IN_MEDICINE_AND_DENTISTRY:
+    case ExtentCode.NON_DEGREE_PEGAGOGICAL_STUDIES_FOR_TEACHERS:
+    case ExtentCode.NON_DEGREE_PROGRAMME_FOR_SPECIAL_EDUCATION_TEACHERS:
+    case ExtentCode.SPECIALIZATION_STUDIES:
+      return 'separate'
+    case ExtentCode.EXCHANGE_STUDIES:
+    case ExtentCode.EXCHANGE_STUDIES_POSTGRADUATE:
+      return 'incoming-exchange'
+    case ExtentCode.CONTRACT_TRAINING:
+    case ExtentCode.STUDIES_FOR_SECONDARY_SCHOOL_STUDENTS:
+      return 'agreement'
+    case ExtentCode.DOCTOR:
+    case ExtentCode.LICENTIATE:
+    case ExtentCode.CONTINUING_EDUCATION:
+    case undefined:
+      return 'other'
+    default:
+      return assertUnreachable(extentCode)
+  }
 }
 
-/*
-  If credit didn't include studyright (pre-sisu times mostly), try to find out relevant
-  other way. First check for same faculty as credit, but if not found, take first
-  without (both have to be active when course was completed)
-*/
-const findRelevantStudyRight = (attainmentDate: Date, studyRights) => {
+const getBasicDegreeStudyRight = (
+  studyRights: Array<InferAttributes<SISStudyRight>> | undefined,
+  date: Date,
+  semestercode: number
+) => {
   return studyRights?.find(studyRight => {
-    const startDate = getCorrectStartDate(studyRight)
-    if (!studyRight.graduated) return new Date(attainmentDate) >= new Date(startDate)
-    return (
-      new Date(studyRight.startdate).getTime() <= new Date(attainmentDate).getTime() &&
-      new Date(attainmentDate).getTime() <= new Date(studyRight.enddate).getTime()
-    )
-  })
-}
-
-const getDegreeStudyRight = (studyRights, date: Date, semesterCode: number) => {
-  return studyRights?.find(studyright => {
-    const rightExtentCodes = [ExtentCode.BACHELOR, ExtentCode.MASTER, ExtentCode.LICENTIATE, ExtentCode.DOCTOR]
     const rightDates =
-      new Date(studyright.startdate).getTime() <= new Date(date).getTime() &&
-      new Date(date).getTime() <= new Date(studyright.enddate).getTime()
-    const enrolled = studyright.semesterEnrollments?.some(
-      enrollment => enrollment.semestercode === semesterCode && enrollment.enrollmenttype === EnrollmentType.PRESENT
-    )
-    return rightExtentCodes.includes(studyright.extentcode) && rightDates && enrolled
+      new Date(studyRight.startDate).getTime() <= new Date(date).getTime() &&
+      new Date(date).getTime() <= new Date(studyRight.endDate).getTime()
+    const enrolledAsPresent =
+      studyRight.semesterEnrollments != null &&
+      studyRight.semesterEnrollments.some(
+        enrollment => enrollment.semester === semestercode && enrollment.type === EnrollmentType.PRESENT
+      )
+    return basicDegreeExtentCodes.includes(studyRight.extentCode) && rightDates && enrolledAsPresent
   })
 }
 
 /* Calculates credits produced by provider (programme or faculty) */
-export const computeCreditsProduced = async (
-  providerCode: string,
-  isAcademicYear: boolean,
-  specialIncluded: boolean = true
-) => {
+export const computeCreditsProduced = async (providerCode: string, isAcademicYear: boolean) => {
   const since = new Date('2017-01-01')
   const rapoFormattedProviderCode = mapToProviders([providerCode])[0]
   const courses = await getCourseCodesOfProvider(rapoFormattedProviderCode)
@@ -123,15 +122,11 @@ export const computeCreditsProduced = async (
   }
 
   const students = [...new Set(credits.map(({ studentNumber }) => studentNumber))]
-  const transfers = (await allTransfers(providerCode, since)).map(transfer => transfer.studyrightid)
 
-  let studyRights = await getStudyRights(students)
-  if (!specialIncluded) {
-    studyRights = studyRights.filter(studyRight => !transfers.includes(studyRight.studyrightid))
-  }
+  const studyRights = await getSISStudyRightsOfStudents(students)
 
   const studyRightIdToStudyRightMap = studyRights.reduce((obj, cur) => {
-    obj[cur.actual_studyrightid] = cur
+    obj[cur.id] = cur
     return obj
   }, {})
 
@@ -145,26 +140,24 @@ export const computeCreditsProduced = async (
 
   const stats = {}
 
-  credits.forEach(({ attainmentDate, studentNumber, credits, studyrightId, semestercode }) => {
-    const relevantStudyright = studyrightId
-      ? studyRightIdToStudyRightMap[studyrightId]
-      : findRelevantStudyRight(attainmentDate, studentNumberToStudyRightsMap[studentNumber])
+  for (const { attainmentDate, studentNumber, credits: numOfCredits, studyrightId, semestercode } of credits) {
+    const studyRightLinkedToAttainment = studyRightIdToStudyRightMap[studyrightId]
     const attainmentYear = defineYear(attainmentDate, isAcademicYear)
-    const degreeStudyRight = getDegreeStudyRight(
+    const degreeStudyRight = getBasicDegreeStudyRight(
       studentNumberToStudyRightsMap[studentNumber],
       attainmentDate,
       semestercode
     )
-    const category = relevantStudyright ? getCategory(relevantStudyright.extentcode, degreeStudyRight) : 'other'
-    if (!stats[attainmentYear]) {
-      stats[attainmentYear] = { transferred: 0 }
+
+    if (!studyRightLinkedToAttainment && !degreeStudyRight) {
+      continue
     }
-    stats[attainmentYear].total += credits
-    if (!stats[attainmentYear][category]) {
-      stats[attainmentYear][category] = 0
-    }
-    stats[attainmentYear][category] += credits
-  })
+
+    const category = getCategory(studyRightLinkedToAttainment?.extentCode, degreeStudyRight?.extentCode)
+    stats[attainmentYear] ??= {}
+    stats[attainmentYear][category] ??= 0
+    stats[attainmentYear][category] += numOfCredits || 0
+  }
 
   const transferredCredits = await getTransferredCredits(rapoFormattedProviderCode, since)
   if (vaasaProvider) {
@@ -173,11 +166,9 @@ export const computeCreditsProduced = async (
   }
   transferredCredits.forEach(({ createdate, credits }) => {
     const attainmentYear = defineYear(createdate, isAcademicYear)
-    if (!stats[attainmentYear]) {
-      stats[attainmentYear] = { transferred: 0 }
-    }
+    stats[attainmentYear] ??= {}
+    stats[attainmentYear].transferred ??= 0
     stats[attainmentYear].transferred += credits || 0
-    // Transferred not counted in total
   })
 
   return { stats, id: providerCode }
@@ -192,7 +183,7 @@ export const getCreditsProduced = async (
   if (data) {
     return data
   }
-  data = await computeCreditsProduced(providerCode, isAcademicYear, specialIncluded)
+  data = await computeCreditsProduced(providerCode, isAcademicYear)
   await setCreditStats(data, isAcademicYear, specialIncluded)
   return data
 }
