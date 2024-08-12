@@ -113,8 +113,9 @@ export const computeCreditsProduced = async (providerCode: string, isAcademicYea
   const vaasaCodes = {
     '200-K001': '200-K0012',
     '200-M001': '200-M0012',
-  }
-  const vaasaProvider = vaasaCodes[rapoFormattedProviderCode]
+  } as const
+  const vaasaProvider =
+    rapoFormattedProviderCode in vaasaCodes ? vaasaCodes[rapoFormattedProviderCode as keyof typeof vaasaCodes] : null
   if (vaasaProvider) {
     const courses = await getCourseCodesOfProvider(vaasaProvider)
     const vaasaCredits = await getCreditsForProvider(vaasaProvider, courses, since)
@@ -125,20 +126,23 @@ export const computeCreditsProduced = async (providerCode: string, isAcademicYea
 
   const studyRights = await getSISStudyRightsOfStudents(students)
 
-  const studyRightIdToStudyRightMap = studyRights.reduce((obj, cur) => {
+  const studyRightIdToStudyRightMap = studyRights.reduce<Record<string, InferAttributes<SISStudyRight>>>((obj, cur) => {
     obj[cur.id] = cur
     return obj
   }, {})
 
-  const studentNumberToStudyRightsMap = studyRights.reduce((obj, cur) => {
-    if (!obj[cur.studentNumber]) {
-      obj[cur.studentNumber] = []
-    }
-    obj[cur.studentNumber].push(cur)
-    return obj
-  }, {})
+  const studentNumberToStudyRightsMap = studyRights.reduce<Record<string, Array<InferAttributes<SISStudyRight>>>>(
+    (obj, cur) => {
+      if (!obj[cur.studentNumber]) {
+        obj[cur.studentNumber] = []
+      }
+      obj[cur.studentNumber].push(cur)
+      return obj
+    },
+    {}
+  )
 
-  const stats = {}
+  const stats: Record<string, Record<string, number>> = {}
 
   for (const { attainmentDate, studentNumber, credits: numOfCredits, studyrightId, semestercode } of credits) {
     const studyRightLinkedToAttainment = studyRightIdToStudyRightMap[studyrightId]
