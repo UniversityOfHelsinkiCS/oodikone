@@ -43,14 +43,14 @@ export const BasicOverview = ({
   academicYear,
   combinedProgramme,
   setAcademicYear,
-  setSpecialGroups,
-  specialGroups,
+  setSpecialGroupsExcluded,
+  specialGroupsExcluded,
   studyprogramme,
 }) => {
   const [showMedian, setShowMedian] = useState(false)
   const { getTextIn } = useLanguage()
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
-  const special = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
+  const special = specialGroupsExcluded ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
   const basics = useGetBasicStatsQuery({
     id: studyprogramme,
     combinedProgramme,
@@ -60,7 +60,7 @@ export const BasicOverview = ({
   const credits = useGetCreditStatsQuery({
     codes: [studyprogramme, combinedProgramme].filter(Boolean),
     isAcademicYear: academicYear,
-    specialGroups,
+    specialGroups: !specialGroupsExcluded,
   })
   const graduations = useGetGraduationStatsQuery({
     id: studyprogramme,
@@ -156,9 +156,9 @@ export const BasicOverview = ({
           cypress="StudentToggle"
           firstLabel="All studyrights"
           secondLabel="Special studyrights excluded"
-          setValue={setSpecialGroups}
+          setValue={setSpecialGroupsExcluded}
           toolTips={studyProgrammeToolTips.StudentToggle}
-          value={specialGroups}
+          value={specialGroupsExcluded}
         />
       </div>
       {isFetchingOrLoading ? (

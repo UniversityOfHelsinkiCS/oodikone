@@ -19,13 +19,13 @@ export const StudytrackOverview = ({
   combinedProgramme,
   graduated,
   setGraduated,
-  setSpecialGroups,
-  specialGroups,
+  setSpecialGroupsExcluded,
+  specialGroupsExcluded,
   studyprogramme,
 }) => {
   const [showMedian, setShowMedian] = useState(false)
   const [track, setTrack] = useState(studyprogramme)
-  const special = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
+  const special = specialGroupsExcluded ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
   const grad = graduated ? 'GRADUATED_EXCLUDED' : 'GRADUATED_INCLUDED'
   const stats = useGetStudytrackStatsQuery({
     id: studyprogramme,
@@ -37,7 +37,7 @@ export const StudytrackOverview = ({
     if (!track && stats?.data?.mainStatsByTrack[studyprogramme]) {
       setTrack(studyprogramme)
     }
-  }, [studyprogramme, track, stats, specialGroups])
+  }, [studyprogramme, track, stats, specialGroupsExcluded])
 
   const getDivider = (title, toolTipText) => (
     <>
@@ -94,9 +94,9 @@ export const StudytrackOverview = ({
               cypress="StudentToggle"
               firstLabel="All studyrights"
               secondLabel="Special studyrights excluded"
-              setValue={setSpecialGroups}
+              setValue={setSpecialGroupsExcluded}
               toolTips={studyProgrammeToolTips.StudentToggle}
-              value={specialGroups}
+              value={specialGroupsExcluded}
             />
             <Toggle
               cypress="GraduatedToggle"

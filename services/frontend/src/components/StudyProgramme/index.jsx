@@ -35,7 +35,7 @@ export const StudyProgramme = () => {
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const [tab, setTab] = useTabs('p_tab', 0, history)
   const [academicYear, setAcademicYear] = useState(false)
-  const [specialGroups, setSpecialGroups] = useState(false)
+  const [specialGroupsExcluded, setSpecialGroupsExcluded] = useState(false)
   const [graduated, setGraduated] = useState(false)
   useTitle('Study programmes')
 
@@ -63,8 +63,8 @@ export const StudyProgramme = () => {
           academicYear={academicYear}
           combinedProgramme={secondProgrammeId}
           setAcademicYear={setAcademicYear}
-          setSpecialGroups={setSpecialGroups}
-          specialGroups={specialGroups}
+          setSpecialGroupsExcluded={setSpecialGroupsExcluded}
+          specialGroupsExcluded={specialGroupsExcluded}
           studyprogramme={programmeId}
         />
       ),
@@ -76,8 +76,8 @@ export const StudyProgramme = () => {
           combinedProgramme={secondProgrammeId}
           graduated={graduated}
           setGraduated={setGraduated}
-          setSpecialGroups={setSpecialGroups}
-          specialGroups={specialGroups}
+          setSpecialGroupsExcluded={setSpecialGroupsExcluded}
+          specialGroupsExcluded={specialGroupsExcluded}
           studyprogramme={programmeId}
         />
       ),
