@@ -59,10 +59,25 @@ describe('Studyprogramme overview', () => {
       const tableContents = [
         ...years.map(year => [year, 0, 0]),
         [2021, 0, 0, 0, 0, 0],
-        [2020, 4511, 4511, 0, 0, 406],
-        [2019, 7117, 7097, 0, 0, 434],
-        [2018, 5742, 5737, 0, 0, 150],
-        [2017, 1887, 1882, 0, 0, 186],
+        [2020, 4751, 4751, 0, 0, 406],
+        [2019, 7350, 7330, 0, 0, 434],
+        [2018, 6348, 6343, 0, 0, 150],
+        [2017, 2457, 2457, 0, 0, 186],
+      ]
+
+      cy.checkTableStats(tableContents, 'CreditsProducedByTheStudyprogramme')
+    })
+
+    it("Toggling 'Show special categories' on displays additional information", () => {
+      cy.contains('Show special categories').click()
+      const years = getEmptyYears()
+      const tableContents = [
+        ...years.map(year => [year, 0, 0]),
+        [2021, 0, 0, 0, 0, 0],
+        [2020, 4751, 4751, 0, 0, 0, 0, 406],
+        [2019, 7350, 7330, 0, 0, 20, 0, 434],
+        [2018, 6348, 6343, 0, 0, 5, 0, 150],
+        [2017, 2457, 2457, 0, 0, 0, 0, 186],
       ]
 
       cy.checkTableStats(tableContents, 'CreditsProducedByTheStudyprogramme')
@@ -101,10 +116,10 @@ describe('Studyprogramme overview', () => {
       const creditTableContents = [
         ...years.map(year => [year, 0, 0]),
         [2021, 0, 0, 0, 0, 0],
-        [2020, 4511, 4511, 0, 0, 406],
-        [2019, 7117, 7097, 0, 0, 434],
-        [2018, 5742, 5737, 0, 0, 150],
-        [2017, 1887, 1882, 0, 0, 186],
+        [2020, 4751, 4751, 0, 0, 406],
+        [2019, 7350, 7330, 0, 0, 434],
+        [2018, 6348, 6343, 0, 0, 150],
+        [2017, 2457, 2457, 0, 0, 186],
       ]
 
       cy.checkTableStats(creditTableContents, 'CreditsProducedByTheStudyprogramme')
@@ -142,9 +157,9 @@ describe('Studyprogramme overview', () => {
         ...years.map(year => [year, 0, 0]),
         ['2021 - 2022', 0, 0, 0, 0, 0],
         ['2020 - 2021', 352, 352, 0, 0, 296],
-        ['2019 - 2020', 6966, 6966, 0, 0, 430],
-        ['2018 - 2019', 7797, 7777, 0, 0, 259],
-        ['2017 - 2018', 4142, 4132, 0, 0, 191],
+        ['2019 - 2020', 7338, 7338, 0, 0, 430],
+        ['2018 - 2019', 8475, 8455, 0, 0, 259],
+        ['2017 - 2018', 4741, 4736, 0, 0, 191],
       ]
 
       cy.checkTableStats(creditTableContents, 'CreditsProducedByTheStudyprogramme')
@@ -162,7 +177,7 @@ describe('Studyprogramme overview', () => {
       cy.get('[data-cy=Graph-CreditsProducedByTheStudyprogramme')
         .should('contain', 'Degree students')
         .should('contain', 'Transferred')
-        .should('contain', 7097)
+        .should('contain', 7330)
         .should('contain', 434)
 
       cy.get('[data-cy=Graph-GraduatedAndThesisWritersOfTheProgramme')
