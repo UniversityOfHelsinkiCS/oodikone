@@ -125,8 +125,6 @@ export const studyProgrammeToolTips = {
   Opintopistekertymään on laskettu kaikki suoritukset, jotka opiskelija on suorittanut koulutusohjelmaan siirryttyään. Myös hyväksiluetut ja muuhun kuin valittuun koulutusohjelmaan tai opintosuuntaan tehdyt suoritukset lasketaan mukaan. Esimerkiksi jos opiskelija on valmistunut kandiohjelmasta 20.6.2020 ja siirtynyt maisteriohjelmaan seuraavana päivänä, ennen 21.6.2020 tehtyjä suorituksia ei huomioida opintopistekertymässä.
 
   Jos sivun yläosassa on valittuna ”All studyrights” (oletus), mukana ovat myös ohjelmaan siirtyneet ja ohjelmasta pois siirtyneet opiskelijat.
-
-  Mikäli sivun yläosan valikosta on valittuna jokin tietty opintosuunta, myös nämä tilastot kuvaavat vain kyseisen opintosuunnan opiskelijoita.    
   `,
   Name: `
   Pitkät kurssinimet on lyhennetty. Näet ne kokonaan laittamalla hiiren nimen yläpuolelle.
@@ -152,9 +150,6 @@ studyProgrammeToolTips.StudytrackOverviewCombinedProgramme = studyProgrammeToolT
 
 studyProgrammeToolTips.StudytrackProgressEvaluationOverview = studyProgrammeToolTips.StudytrackProgress.replace(
   'Jos sivun yläosassa on valittuna ”All studyrights” (oletus), mukana ovat myös ohjelmaan siirtyneet ja ohjelmasta pois siirtyneet opiskelijat.',
-  ''
-).replace(
-  'Mikäli sivun yläosan valikosta on valittuna jokin tietty opintosuunta, myös nämä tilastot kuvaavat vain kyseisen opintosuunnan opiskelijoita.',
   ''
 )
 

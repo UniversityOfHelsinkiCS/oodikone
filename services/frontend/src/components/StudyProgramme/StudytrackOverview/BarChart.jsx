@@ -4,15 +4,13 @@ import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
 
 import { generateGradientColors } from '@/common'
-import { NoDataMessage } from '@/components/StudyProgramme/NoDataMessage'
 
 exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
 accessibility(ReactHighcharts.Highcharts)
 
 export const BarChart = ({ cypress, data, track }) => {
-  if (!data || !data.creditGraphStats || !data.creditGraphStats[track])
-    return <NoDataMessage message="No progress data for the studytrack found. Try with another studytrack" />
+  if (!data || !data.creditGraphStats || !data.creditGraphStats[track]) return null
   const correctData = data.creditGraphStats[track]
   const colors = generateGradientColors(correctData.length)
   const dataWithColors = Object.values(correctData).map((series, index) => ({ ...series, color: colors[index] }))
@@ -42,15 +40,9 @@ export const BarChart = ({ cypress, data, track }) => {
       },
     },
     exporting: {
-      filename:
-        track === '' || track === 'studyprogramme'
-          ? `oodikone_progress_of_students_in_${data?.id}_by_study_start_year`
-          : `oodikone_progress_of_students_in_${data?.id}_${track}_by_study_start_year`,
+      filename: `oodikone_progress_of_students_of_the_studyprogramme_${track}_by_starting_year`,
     },
     yAxis: {
-      allowDecimals: false,
-      min: 0,
-      reversed: false,
       title: '',
     },
   }

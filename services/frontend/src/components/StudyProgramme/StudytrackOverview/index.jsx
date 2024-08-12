@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Divider, Loader } from 'semantic-ui-react'
+import { Divider, Loader, Message } from 'semantic-ui-react'
 
 import { getGraduationGraphTitle, getTargetCreditsForProgramme } from '@/common'
 import { studyProgrammeToolTips } from '@/common/InfoToolTips'
@@ -126,23 +126,32 @@ export const StudytrackOverview = ({
             titles={stats?.data?.populationTitles}
             years={stats?.data?.years}
           />
-          {getDivider(
-            `Progress of students of ${
-              track === '' || track === studyprogramme
-                ? 'the studyprogramme by starting year'
-                : `the studytrack ${track} by starting year`
-            }`,
-            'StudytrackProgress'
+
+          {track === '' || track === studyprogramme ? (
+            <>
+              {getDivider('Progress of students of the studyprogramme by starting year', 'StudytrackProgress')}
+              <div style={{ marginBottom: '5em' }}>
+                <BarChart cypress="StudytrackProgress" data={creditChartData} track={track || studyprogramme} />
+                <BasicDataTable
+                  cypress="StudytrackProgress"
+                  data={creditTableStats}
+                  titles={creditTableTitles}
+                  track={track || studyprogramme}
+                />
+              </div>
+            </>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <Divider content={`Progress of students of the studytrack ${track} by starting year`} horizontal />
+              <Message
+                content="Currently progress data is only available for all students of the study programme. Please select ”All students of the programme” to view the progress data."
+                header="Data not available"
+                icon="info circle"
+                style={{ marginBottom: '2rem', marginTop: '2rem', maxWidth: '60%' }}
+                warning
+              />
+            </div>
           )}
-          <div style={{ marginBottom: '5em' }}>
-            <BarChart cypress="StudytrackProgress" data={creditChartData} track={track || studyprogramme} />
-            <BasicDataTable
-              cypress="StudytrackProgress"
-              data={creditTableStats}
-              titles={creditTableTitles}
-              track={track || studyprogramme}
-            />
-          </div>
           {stats?.isSuccess && stats?.data?.includeGraduated && stats?.data?.graduationTimes[track] && (
             <>
               {getDivider('Average graduation times', infoTextGraduationTimes)}
