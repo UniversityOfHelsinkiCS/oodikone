@@ -158,7 +158,7 @@ const updateAttainments = async (
         // see if course has provider
         const courseProvider = await CourseProvider.findOne({
           where: {
-            coursecode: att.course_unit_id,
+            coursecode: att.id,
           },
         })
 
