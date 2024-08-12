@@ -69,7 +69,6 @@ export const BasicOverview = ({
   const credits = useGetFacultyCreditStatsQuery({
     id: faculty?.code,
     yearType,
-    studyProgrammeFilter,
   })
 
   const tableStats = credits.data ? makeTableStats(calculateTotals(credits.data), showAll, academicYear) : {}
