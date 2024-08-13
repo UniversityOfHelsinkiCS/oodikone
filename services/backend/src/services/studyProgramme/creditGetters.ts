@@ -108,7 +108,7 @@ export const getTransferredCredits = async (provider: string, since: Date) =>
       isStudyModule: {
         [Op.not]: true,
       },
-      attainment_date: {
+      createdate: {
         [Op.gte]: since,
       },
     },

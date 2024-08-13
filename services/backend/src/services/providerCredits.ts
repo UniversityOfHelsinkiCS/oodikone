@@ -62,20 +62,20 @@ const getCategory = (extentCode?: ExtentCode, degreeStudyRightExtentCode?: Exten
     case ExtentCode.BACHELOR:
       return 'basic'
     case ExtentCode.NON_DEGREE_STUDIES:
-    case ExtentCode.SPECIALIST_TRAINING_IN_MEDICINE_AND_DENTISTRY:
     case ExtentCode.NON_DEGREE_PEGAGOGICAL_STUDIES_FOR_TEACHERS:
     case ExtentCode.NON_DEGREE_PROGRAMME_FOR_SPECIAL_EDUCATION_TEACHERS:
-    case ExtentCode.SPECIALIZATION_STUDIES:
       return 'separate'
     case ExtentCode.EXCHANGE_STUDIES:
     case ExtentCode.EXCHANGE_STUDIES_POSTGRADUATE:
       return 'incoming-exchange'
     case ExtentCode.CONTRACT_TRAINING:
-    case ExtentCode.STUDIES_FOR_SECONDARY_SCHOOL_STUDENTS:
       return 'agreement'
     case ExtentCode.DOCTOR:
     case ExtentCode.LICENTIATE:
     case ExtentCode.CONTINUING_EDUCATION:
+    case ExtentCode.SPECIALIZATION_STUDIES:
+    case ExtentCode.SPECIALIST_TRAINING_IN_MEDICINE_AND_DENTISTRY:
+    case ExtentCode.STUDIES_FOR_SECONDARY_SCHOOL_STUDENTS:
     case undefined:
       return 'other'
     default:
