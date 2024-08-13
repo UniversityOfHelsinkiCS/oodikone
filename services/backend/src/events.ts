@@ -10,7 +10,7 @@ import { redisClient } from './services/redis'
 import { getCurrentSemester } from './services/semesters'
 import { combinedStudyprogrammes, isRelevantProgramme } from './services/studyProgramme/studyProgrammeHelpers'
 import { updateBasicView, updateStudytrackView } from './services/studyProgramme/studyProgrammeUpdates'
-import { getProgrammesFromStudyRights, refreshAssociationsInRedis } from './services/studyrights'
+import { getProgrammesFromStudyRights } from './services/studyrights'
 import { findAndSaveTeachers } from './services/teachers/top'
 import { deleteOutdatedUsers } from './services/userService'
 import logger from './util/logger'
@@ -78,28 +78,15 @@ export const refreshProgrammes = async () => {
   }
 }
 
-const refreshStudyRightAssociations = async () => {
-  await refreshAssociationsInRedis()
-  logger.info('Studyright associations refreshed!')
-}
-
 const refreshTeacherLeaderboard = async () => {
+  logger.info('Refreshing statistics for teacher leaderboard')
   const currentSemestersYearCode = (await getCurrentSemester()).getDataValue('yearcode')
   await findAndSaveTeachers(currentSemestersYearCode, currentSemestersYearCode - 1)
 }
 
-export const refreshStatistics = async () => {
-  const statfuncs = [refreshStudyRightAssociations, refreshTeacherLeaderboard]
-  logger.info('Refreshing statistics')
-  for (const func of statfuncs) {
-    await func()
-  }
-  logger.info('Statistics refreshed!')
-}
-
 const dailyJobs = async () => {
   try {
-    await refreshStatistics()
+    await refreshTeacherLeaderboard()
     await refreshProgrammesAndFaculties()
     jobMaker.languagecenter()
     jobMaker.closeToGraduation()
