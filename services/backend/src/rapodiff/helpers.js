@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 const fs = require('fs/promises')
 const Papa = require('papaparse')
 
@@ -17,4 +16,21 @@ const parseCsv = async (fileName, fun) => {
   }
 }
 
-module.exports = { parseCsv }
+const printProgressBar = (total, current) => {
+  const barLength = 30
+  const progress = Math.floor((current / total) * barLength)
+  const empty = barLength - progress
+
+  const progressBar = `[${'#'.repeat(progress)}${'-'.repeat(empty)}]`
+  const percentage = Math.floor((current / total) * 100)
+
+  process.stdout.clearLine()
+  process.stdout.cursorTo(0)
+  process.stdout.write(`${progressBar} ${percentage} %`)
+
+  if (current >= total) {
+    console.log()
+  }
+}
+
+module.exports = { parseCsv, printProgressBar }

@@ -1,23 +1,37 @@
-/* eslint-disable no-console */
 const { orderBy } = require('lodash')
 
+// dbConnections must be imported to avoid Sequelize errors even if it's not used
+// eslint-disable-next-line no-unused-vars
+const { dbConnections } = require('../database/connection')
 const { computeCreditsProduced } = require('../services/providerCredits')
-const { parseCsv } = require('./helpers')
+const { parseCsv, printProgressBar } = require('./helpers')
 
 const diffs = []
-const noDiffCounter = 0
+let noDiffCounter = 0
 
 // Change weird rapo programmecodes to oodikone format, example: 300-M003 => MH30_003
 const transformProgrammeCode = oldCode => `${oldCode[4]}H${oldCode.slice(0, 2)}_${oldCode.slice(5, 8)}`
 
 const formatData = data =>
   data.reduce((obj, cur) => {
-    const parseNum = str => (str === '' ? 0 : parseInt(str, 10))
-    const [year, facultyCode, programmeInfo, basic, exchange, otherUni, openUni, special, total, abroad, other] = cur
+    const parseNum = str => (str === '' ? 0 : parseFloat(str.replace(',', '.')))
+    const [
+      year,
+      facultyCode,
+      programmeInfo,
+      basic,
+      exchange,
+      otherUni,
+      openUni,
+      special,
+      total,
+      transferredFromAbroad,
+      otherTransferred,
+    ] = cur
     const programmeCode = transformProgrammeCode(programmeInfo.split(' ')[0])
     if (!obj[programmeCode]) obj[programmeCode] = {}
     obj[programmeCode][year] = {
-      year,
+      year: parseNum(year),
       facultyCode,
       programmeInfo,
       basic: parseNum(basic),
@@ -26,7 +40,7 @@ const formatData = data =>
       'open-uni': parseNum(openUni),
       separate: parseNum(special),
       total: parseNum(total),
-      transferred: parseNum(abroad) + parseNum(other),
+      transferred: parseNum(transferredFromAbroad) + parseNum(otherTransferred),
     }
     return obj
   }, {})
@@ -40,35 +54,32 @@ const diff = (rapoData, okData, code) => {
       if (!ok) console.log(`Year ${year} not in rapo for code ${code}, skipping`)
       continue
     }
-    for (const field of ['basic', 'incoming-exchange', 'open-uni', 'agreement', 'separate', 'transferred', 'other']) {
+    for (const field of ['basic', 'incoming-exchange', 'open-uni', 'agreement', 'separate', 'transferred']) {
       const okValue = Math.round(ok[field] || 0)
       const rapoValue = Math.round(rapo[field] || 0)
       const diff = Math.abs(okValue - rapoValue)
-      const percentage =
-        rapoValue !== 0 || okValue !== 0 ? Number(((diff / Math.max(okValue, rapoValue)) * 100).toFixed(2)) : 0
-      const diffStr = `${field.padEnd(10, ' ')} ${year} ${code.padEnd(
-        10,
-        ' '
-      )} Difference: ${diff} Rapo: ${rapoValue} Oodikone: ${okValue} Percentage: ${percentage} %`
-      diffs.push({ field, diff, okValue, rapoValue, code, year, diffStr, percentage })
+      if (diff === 0) {
+        noDiffCounter++
+        continue
+      }
+      const percentage = rapoValue !== 0 ? Number(((diff / rapoValue) * 100).toFixed(2)) : 100
+      diffs.push({ field, year, code, okValue, rapoValue, diff, 'diff %': percentage })
     }
   }
 }
-let counter = 0
+
 const process = async data => {
+  let programmeCounter = 0
   const rapoProgrammeData = formatData(data.slice(1))
   const allProgrammeCodes = [...new Set(Object.keys(rapoProgrammeData))]
   for (const programmeCode of allProgrammeCodes) {
     const okProgrammeData = await computeCreditsProduced(programmeCode, false, true)
-    counter++
-    if (counter % 5 === 0) {
-      console.log(`Done ${Math.round((counter / allProgrammeCodes.length) * 100)} %`)
-    }
     diff(rapoProgrammeData[programmeCode], okProgrammeData.stats, programmeCode)
+    printProgressBar(allProgrammeCodes.length, ++programmeCounter)
   }
-  const fieldToSortBy = 'diff' // 'percentage'
+  const fieldToSortBy = 'diff' // 'diff %'
   const orderedDiffs = orderBy(diffs, fieldToSortBy, 'asc')
-  orderedDiffs.forEach(diff => console.log(diff.diffStr))
+  console.table(orderedDiffs)
   console.log(`${diffs.length} diffs found with current settings. Numbers with no diff: ${noDiffCounter}`)
   const totalDiff = orderedDiffs.reduce((sum, cur) => cur.diff + sum, 0)
   console.log('Total difference: ', totalDiff)

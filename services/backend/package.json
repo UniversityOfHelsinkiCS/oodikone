@@ -2,8 +2,7 @@
   "name": "backend",
   "private": true,
   "scripts": {
-    "build": "tsc",
-    "rapodiff": "node /opt/app-root/src/src/rapodiff.js"
+    "build": "tsc"
   },
   "dependencies": {
     "@sentry/node": "^5.30.0",

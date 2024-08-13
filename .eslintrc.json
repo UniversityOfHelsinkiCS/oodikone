@@ -41,6 +41,12 @@
         "@typescript-eslint/no-shadow": "off",
         "@typescript-eslint/return-await": "off"
       }
+    },
+    {
+      "files": ["services/backend/src/rapodiff/**/*"],
+      "rules": {
+        "no-console": "off"
+      }
     }
   ],
   "rules": {
