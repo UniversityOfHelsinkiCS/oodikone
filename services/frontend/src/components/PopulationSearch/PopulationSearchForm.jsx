@@ -47,8 +47,7 @@ const PopulationSearchForm = ({ queries, onProgress, clearSelected, getPopulatio
   const [searchHistory, addItemToSearchHistory, updateItemInSearchHistory] = useSearchHistory('populationSearch', 8)
   const [filterProgrammes, setFilterProgrammes] = useState(fullAccessToStudentData)
   const fetchPopulationPromises = useRef()
-  const { data: programmesAndStudyTracks, isLoading: programmesAreLoading } = useGetProgrammesQuery()
-  const { programmes = {} } = programmesAndStudyTracks || {}
+  const { data: programmes = {}, isLoading: programmesAreLoading } = useGetProgrammesQuery()
   const studyProgrammes =
     (programmes.KH90_001 || programmes.MH90_001) && !Object.keys(programmes).includes('KH90_001+MH90_001')
       ? {
@@ -69,7 +68,7 @@ const PopulationSearchForm = ({ queries, onProgress, clearSelected, getPopulatio
 
   const setState = newState => setTotalState({ ...totalState, ...newState })
 
-  const { query, isLoading, momentYear } = totalState
+  const { query, isLoading } = totalState
 
   const parseQueryFromUrl = () => {
     const initial = initialQuery()
@@ -288,17 +287,6 @@ const PopulationSearchForm = ({ queries, onProgress, clearSelected, getPopulatio
     handleYearSelection(previousYear)
   }
 
-  const validYearCheck = momentYear => {
-    if (!moment.isMoment(momentYear)) {
-      return false
-    }
-    if (!query.studyRights.programme) {
-      return momentYear.year() >= 1900 && momentYear.isSameOrBefore(moment().subtract(6, 'months'))
-    }
-
-    return studyProgrammes[query.studyRights.programme].enrollmentStartYears[momentYear.year()] != null
-  }
-
   const renderableList = list =>
     list.map(({ code, name }) => ({
       code,
@@ -314,14 +302,13 @@ const PopulationSearchForm = ({ queries, onProgress, clearSelected, getPopulatio
     const currentYear = moment().year()
     return (
       <Form.Group className="enrollmentSelectorGroup" key="year">
-        <Form.Field className="yearSelect" error={!validYearCheck(momentYear)}>
+        <Form.Field className="yearSelect">
           <label>Class of</label>
           <Datetime
             className="yearSelectInput"
             closeOnSelect
             control={Datetime}
             dateFormat={YEAR_DATE_FORMAT}
-            isValidDate={validYearCheck}
             onChange={handleYearSelection}
             renderInput={dateInputProps => (
               <input
@@ -419,11 +406,6 @@ const PopulationSearchForm = ({ queries, onProgress, clearSelected, getPopulatio
 
   let errorText = 'Selected population already in analysis'
   let isQueryInvalid = false
-
-  if (!validYearCheck(momentYear)) {
-    isQueryInvalid = true
-    errorText = 'Select a valid year'
-  }
 
   if (query.semesters.length === 0) {
     isQueryInvalid = true

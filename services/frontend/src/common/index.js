@@ -484,3 +484,5 @@ export const getEnrollmentTypeTextForExcel = (type, statutoryAbsence) => {
 export const isDefaultServiceProvider = () => {
   return serviceProvider && serviceProvider === 'toska'
 }
+
+export const yearCodeToCurriculumPeriodId = yearCode => (yearCode ? `hy-lv-${yearCode}` : null)

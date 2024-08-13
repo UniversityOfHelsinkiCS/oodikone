@@ -45,6 +45,8 @@ const configLogoutUrl = serviceProvider === 'toska' ? undefined : process.env.LO
 // Other stuff
 const { DB_URL_KONE, DB_URL_USER, SECRET_TOKEN, SIS_DB_URL, SIS_UPDATER_URL, CRYPT_KEY } = process.env
 
+const rootOrgId = process.env.ROOT_ORG_ID || 'hy-university-root-id'
+
 let DB_MAX_CONNECTIONS = parseInt(process.env.DB_MAX_CONNECTIONS, 10)
 if (Number.isNaN(DB_MAX_CONNECTIONS)) {
   DB_MAX_CONNECTIONS = 5 // sequelize's default
@@ -92,6 +94,7 @@ module.exports = {
   importerDbApiPassword,
   isDev,
   isStaging,
+  rootOrgId,
   serviceProvider,
   configLogoutUrl,
   sisUrl,

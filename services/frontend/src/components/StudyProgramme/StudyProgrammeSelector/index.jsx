@@ -2,7 +2,14 @@ import { debounce } from 'lodash'
 import { useState } from 'react'
 import { Loader, Message, Segment } from 'semantic-ui-react'
 
-import { createLocaleComparator, createPinnedFirstComparator, getUnifiedProgrammeName } from '@/common'
+import {
+  createLocaleComparator,
+  createPinnedFirstComparator,
+  getUnifiedProgrammeName,
+  yearCodeToCurriculumPeriodId,
+  isDefaultServiceProvider,
+} from '@/common'
+import { useCurrentSemester } from '@/common/hooks'
 import { FilterOldProgrammesToggle } from '@/components/common/FilterOldProgrammesToggle'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useGetProgrammesQuery } from '@/redux/populations'
@@ -18,8 +25,10 @@ import { StudyProgrammeTable } from './StudyProgrammeTable'
 
 export const StudyProgrammeSelector = () => {
   const { getTextIn } = useLanguage()
-  const { data: programmesAndStudyTracks } = useGetProgrammesQuery()
-  const studyProgrammes = Object.values(programmesAndStudyTracks?.programmes || {})
+  const { data: programmes, isLoading } = useGetProgrammesQuery()
+  const studyProgrammes = Object.values(programmes || {})
+  const currentSemester = useCurrentSemester()
+  const currentCurriculumPeriodId = yearCodeToCurriculumPeriodId(currentSemester?.yearcode)
   const [filter, setFilter] = useState('')
   const [otherProgrammesVisible, setOtherProgrammesVisible] = useState(false)
   const handleFilterChange = debounce(value => {
@@ -37,7 +46,7 @@ export const StudyProgrammeSelector = () => {
   const pinnedProgrammes = studyProgrammePins?.studyProgrammes || []
   const pinnedFirstComparator = createPinnedFirstComparator(pinnedProgrammes)
 
-  if (!studyProgrammes) return <Loader active>Loading</Loader>
+  if (isLoading || !currentCurriculumPeriodId) return <Loader active>Loading</Loader>
 
   const isPinned = programmeCode => pinnedProgrammes.includes(programmeCode)
 
@@ -114,11 +123,16 @@ export const StudyProgrammeSelector = () => {
         progId: `${programme.progId} - ${secondProgramme[0]?.progId}`,
       })
     }
-    if (programme.code.includes('KH')) {
+    if (isDefaultServiceProvider() && programme.code.startsWith('2_')) {
+      continue
+    }
+    if (!programme.curriculum_period_ids.includes(currentCurriculumPeriodId)) {
+      otherProgrammes.push(programme)
+    } else if (programme.degreeProgrammeType === 'urn:code:degree-program-type:bachelors-degree') {
       bachelorProgrammes.push(programme)
-    } else if (programme.code.includes('MH')) {
+    } else if (programme.degreeProgrammeType === 'urn:code:degree-program-type:masters-degree') {
       masterProgrammes.push(programme)
-    } else if (/^(T)[0-9]{6}$/.test(programme.code)) {
+    } else if (programme.degreeProgrammeType === 'urn:code:degree-program-type:doctor') {
       doctoralProgrammes.push(programme)
     } else {
       otherProgrammes.push(programme)

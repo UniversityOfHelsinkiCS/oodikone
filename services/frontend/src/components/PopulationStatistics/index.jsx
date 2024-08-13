@@ -59,8 +59,7 @@ export const PopulationStatistics = () => {
   const { data: allSemesters } = useGetSemestersQuery()
   const programmeCode = query?.studyRights?.programme
   const combinedProgrammeCode = query?.studyRights?.combinedProgramme ? query?.studyRights?.combinedProgramme : ''
-  const { data: programmesAndStudyTracks } = useGetProgrammesQuery()
-  const { programmes: studyProgrammes } = programmesAndStudyTracks || {}
+  const { data: studyProgrammes } = useGetProgrammesQuery()
   const programmes = {
     ...studyProgrammes,
     'KH90_001+MH90_001': {

@@ -3,14 +3,14 @@ import crypto from 'crypto'
 import { Request, Response, Router } from 'express'
 import { difference, intersection, uniq } from 'lodash'
 
+import { rootOrgId } from '../config'
 import { maxYearsToCreatePopulationFrom, getCourseProvidersForCourses } from '../services/courses'
 import { encrypt, decrypt } from '../services/encrypt'
+import { getDegreeProgrammesOfOrganization, ProgrammesOfOrganization } from '../services/faculty/faculty'
 import { bottlenecksOf, optimizedStatisticsOf } from '../services/populations'
 import { populationStudentsMerger, populationCourseStatsMerger } from '../services/statMerger'
 import { findByTag, findByCourseAndSemesters } from '../services/students'
-import { mapCodesToIds } from '../services/studyProgramme/studyProgrammeHelpers'
-import { getAssociations, getFilteredAssociations } from '../services/studyrights'
-import { Unification, UnifyStatus } from '../types'
+import { Unarray, Unification, UnifyStatus } from '../types'
 import { getFullStudyProgrammeRights, hasFullAccessToStudentData } from '../util'
 import { ApplicationError } from '../util/customErrors'
 import { mapToProviders } from '../util/map'
@@ -449,18 +449,22 @@ router.post('/v3/populationstatisticsbystudentnumbers', async (req: PostByStuden
 
 router.get('/v3/populationstatistics/studyprogrammes', async (req: Request, res: Response) => {
   const { roles, programmeRights } = req.user
-  if (hasFullAccessToStudentData(roles)) {
-    const studyRights = await getAssociations()
-    mapCodesToIds(studyRights.programmes)
-    return res.json(studyRights)
-  }
+  const programmes = await getDegreeProgrammesOfOrganization(rootOrgId, false)
   const allRights = uniq(programmeRights.map(programme => programme.code))
   if (allRights.includes('KH90_001') || allRights.includes('MH90_001')) {
     allRights.push('KH90_001', 'MH90_001')
   }
-  const studyRights = await getFilteredAssociations(allRights)
-  mapCodesToIds(studyRights.programmes)
-  res.json(studyRights)
+  const filteredProgrammes = hasFullAccessToStudentData(roles)
+    ? programmes
+    : programmes.filter(programme => allRights.includes(programme.code))
+  const formattedProgrammes = filteredProgrammes.reduce<Record<string, Unarray<ProgrammesOfOrganization>>>(
+    (acc, curr) => {
+      acc[curr.code] = curr
+      return acc
+    },
+    {}
+  )
+  res.json(formattedProgrammes)
 })
 
 interface GetMaxYearsRequest extends Request {

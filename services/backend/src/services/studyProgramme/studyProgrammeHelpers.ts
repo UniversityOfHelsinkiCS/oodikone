@@ -5,7 +5,6 @@ import { serviceProvider } from '../../config'
 import { programmeCodes } from '../../config/programmeCodes'
 import { SISStudyRight, SISStudyRightElement } from '../../models'
 import { Phase } from '../../types'
-import { keysOf } from '../../util'
 
 export function getYearsArray(since: number, isAcademicYear: true, yearsCombined?: boolean): string[]
 export function getYearsArray(since: number, isAcademicYear: false, yearsCombined: true): Array<'Total' | number>
@@ -170,18 +169,6 @@ export const tableTitles = {
   },
   studytracksEnd: ['Men', 'Women', 'Other/\nUnknown', 'Finland', 'Other'],
 } as const
-
-export const mapCodesToIds = (data: Record<string, any>) => {
-  // Add programme id e.g. TKT
-  const keys = keysOf(programmeCodes)
-  const progs = Object.keys(data) as Array<keyof typeof programmeCodes>
-
-  for (const prog of progs) {
-    if (keys.includes(prog)) {
-      data[prog].progId = programmeCodes[prog]
-    }
-  }
-}
 
 export const getId = (code: string) =>
   code in programmeCodes ? programmeCodes[code as keyof typeof programmeCodes] : ''

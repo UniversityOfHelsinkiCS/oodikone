@@ -19,10 +19,9 @@ const studyRightIsActive = (studyRight, currentSemester) =>
 
 export const StudyrightsTable = ({ handleStudyPlanChange, student, selectedStudyPlanId }) => {
   const { getTextIn } = useLanguage()
-  const { data: programmesAndStudyTracks } = useGetProgrammesQuery()
+  const { data: studyProgrammes } = useGetProgrammesQuery()
   const { semestercode: currentSemesterCode } = useCurrentSemester()
 
-  const programmeCodes = Object.keys(programmesAndStudyTracks?.programmes || {})
   const studyRightHeaders = ['Programme', 'Study track', 'Status', 'Completed']
 
   if (!student) return null
@@ -165,7 +164,7 @@ export const StudyrightsTable = ({ handleStudyPlanChange, student, selectedStudy
                   )}
                   <Table.Cell style={{ border: !isFirstRow && 'none' }}>
                     {`${getTextIn(name)} (${reformatDate(startDate, DISPLAY_DATE_FORMAT)}–${reformatDate(endDate, DISPLAY_DATE_FORMAT)})`}
-                    {programmeCodes.includes(code) && (
+                    {studyProgrammes != null && code in studyProgrammes && (
                       <Item as={Link} to={showPopulationStatistics(code, startDate)}>
                         <Icon name="level up alternate" />
                       </Item>

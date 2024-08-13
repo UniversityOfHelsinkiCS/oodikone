@@ -9,7 +9,6 @@ import { Button, Form } from 'semantic-ui-react'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { InfoBox } from '@/components/Info/InfoBox'
 import { PopulationQueryCard } from '@/components/PopulationQueryCard'
-import { useGetProgrammesQuery } from '@/redux/populations'
 import { FilterActiveNote } from './FilterActiveNote'
 import './populationSearch.css'
 
@@ -19,7 +18,6 @@ const getMonths = (year, term) => {
 }
 
 const PopulationSearchHistory = ({ populations }) => {
-  const { data: units } = useGetProgrammesQuery()
   const history = useHistory()
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false)
   const [semesters, setSemesters] = useState(
@@ -133,7 +131,7 @@ const PopulationSearchHistory = ({ populations }) => {
   }
 
   const renderQueryCards = () => {
-    if (!units?.programmes || !populations.query || !populations.data.students) {
+    if (!populations.query || !populations.data.students) {
       return null
     }
 

@@ -28,8 +28,7 @@ const createName = (studyProgrammeId, combibedProgrammeId, programmes, language,
 export const StudyProgramme = () => {
   const history = useHistory()
   const { studyProgrammeId } = useParams()
-  const { data: programmesAndStudyTracks } = useGetProgrammesQuery()
-  const programmes = programmesAndStudyTracks?.programmes
+  const { data: programmes } = useGetProgrammesQuery()
   const { language, getTextIn } = useLanguage()
   const { isAdmin, fullAccessToStudentData, programmeRights } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
