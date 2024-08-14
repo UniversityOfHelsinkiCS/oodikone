@@ -41,6 +41,7 @@ jobs:
             SENTRY_RELEASE=${{ github.sha }}
             SENTRY_ENVIRONMENT=staging
           context: services
+          file: services/backend/Dockerfile
           push: false
           tags: oodikone-backend:staging
           outputs: type=docker,dest=/tmp/backend.tar
