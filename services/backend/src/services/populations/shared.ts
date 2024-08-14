@@ -1,12 +1,12 @@
+import { orderBy } from 'lodash'
 import moment from 'moment'
 import { Op, QueryTypes } from 'sequelize'
 
 import { dbConnections } from '../../database/connection'
-import { Course, Credit, ElementDetail, Studyright, StudyrightElement } from '../../models'
-import { ElementDetailType, ExtentCode, Criteria, Name } from '../../types'
+import { Course, Credit, SISStudyRight, SISStudyRightElement } from '../../models'
+import { ElementDetailType, Criteria, Name } from '../../types'
 import { SemesterEnd, SemesterStart } from '../../util/semester'
 import { getCurrentSemester } from '../semesters'
-import { getProgrammesFromStudyRights } from '../studyrights'
 
 const { sequelize } = dbConnections
 
@@ -280,97 +280,63 @@ export const getOptionsForStudents = async (studentNumbers: string[], code: stri
     return {}
   }
 
-  let graduated: { graduated?: number }
-  let currentExtent: ExtentCode
-  let optionExtent: ExtentCode
-
-  if (level === 'BSC') {
-    graduated = { graduated: 1 }
-    currentExtent = ExtentCode.BACHELOR
-    optionExtent = ExtentCode.MASTER
-  } else if (level === 'MSC') {
-    graduated = {}
-    currentExtent = ExtentCode.MASTER
-    optionExtent = ExtentCode.BACHELOR
-  } else {
+  if (!['BSC', 'MSC'].includes(level)) {
     throw new Error(`Invalid study level ${level}`)
   }
 
-  const programmes = await getProgrammesFromStudyRights()
-
-  const currentStudyrights = await Studyright.findAll({
-    include: [
-      {
-        model: StudyrightElement,
-        where: {
-          studentnumber: {
-            [Op.in]: studentNumbers,
-          },
-          code,
-        },
-      },
-    ],
+  const studyRightElementsForStudyRight = await SISStudyRightElement.findAll({
+    attributes: [],
     where: {
-      ...graduated,
-      extentcode: currentExtent,
-      student_studentnumber: {
-        [Op.in]: studentNumbers,
-      },
+      code,
     },
-    attributes: ['student_studentnumber', 'givendate'],
-  })
-
-  const currentStudyrightsMap = currentStudyrights.reduce((obj, studyright) => {
-    obj[studyright.student_studentnumber] = studyright.givendate
-    return obj
-  }, {})
-
-  const options = await Studyright.findAll({
     include: [
       {
-        model: StudyrightElement,
+        model: SISStudyRight,
+        attributes: ['studentNumber'],
         where: {
-          studentnumber: {
+          studentNumber: {
             [Op.in]: studentNumbers,
-          },
-          code: {
-            [Op.in]: programmes.map(programme => programme.code),
           },
         },
         include: [
           {
-            model: ElementDetail,
-            attributes: ['name'],
+            model: SISStudyRightElement,
+            attributes: ['code', 'name', 'degreeProgrammeType', 'startDate', 'endDate'],
           },
         ],
-        attributes: ['code', 'startdate'],
       },
     ],
-    where: {
-      extentcode: optionExtent,
-      student_studentnumber: {
-        [Op.in]: studentNumbers,
-      },
-    },
-    order: [[{ model: StudyrightElement, as: 'studyright_elements' }, 'startdate', 'DESC']],
-    attributes: ['student_studentnumber', 'givendate'],
   })
 
-  return options
-    .filter(studyRight => studyRight.student_studentnumber in currentStudyrightsMap)
-    .filter(
-      studyRight => studyRight.givendate.getTime() === currentStudyrightsMap[studyRight.student_studentnumber].getTime()
-    )
-    .reduce(
-      (obj, element) => {
-        obj[element.student_studentnumber] = {
-          code: element.studyright_elements[0].code,
-          name: element.studyright_elements[0].element_detail.name,
-        }
-        return obj
-      },
-      {} as Record<string, { code: string; name: Name }>
-    )
+  return studyRightElementsForStudyRight.reduce<Record<string, { name: Name }>>((acc, { studyRight }) => {
+    let programme: SISStudyRightElement | null = null
+
+    if (level === 'MSC') {
+      const [latestBachelorsProgramme] = orderBy(
+        studyRight.studyRightElements.filter(
+          element => element.degreeProgrammeType === 'urn:code:degree-program-type:bachelors-degree'
+        ),
+        ['endDate'],
+        ['desc']
+      )
+      programme = latestBachelorsProgramme
+    } else if (level === 'BSC') {
+      const [firstMastersProgramme] = orderBy(
+        studyRight.studyRightElements.filter(
+          element => element.degreeProgrammeType === 'urn:code:degree-program-type:masters-degree'
+        ),
+        ['startDate'],
+        ['asc']
+      )
+      programme = firstMastersProgramme
+    }
+
+    if (programme) {
+      acc[studyRight.studentNumber] = { name: programme.name }
+    }
+
+    return acc
+  }, {})
 }
 
 export const formatStudentsForApi = async (
@@ -378,7 +344,7 @@ export const formatStudentsForApi = async (
   startDate: string,
   endDate: string,
   studyRights: string[],
-  optionData: Record<string, { code: string; name: Name }>,
+  optionData: Record<string, { name: Name }>,
   criteria: Criteria,
   code: string
 ) => {

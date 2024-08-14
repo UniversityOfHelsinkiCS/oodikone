@@ -55,7 +55,7 @@ export const optimizedStatisticsOf = async (query: Query, studentNumberList?: st
     }))
 
   const code = studyRights[0] || ''
-  let optionData = {} as Record<string, { code: string; name: Name }>
+  let optionData = {} as Record<string, { name: Name }>
   let criteria = {} as Criteria
   if (code.includes('MH')) {
     optionData = await getOptionsForStudents(studentNumbers, code, 'MSC')
