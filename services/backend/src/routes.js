@@ -14,6 +14,7 @@ const closeToGraduation = require('./routes/closeToGraduation').default
 const completedCoursesSearch = require('./routes/completedCoursesSearch').default
 const courseExclusions = require('./routes/courseExclusions').default
 const courses = require('./routes/courses').default
+const curriculumPeriods = require('./routes/curriculumPeriods').default
 const customOpenUniSearch = require('./routes/customOpenUniSearch').default
 const customPopulationSearch = require('./routes/customPopulationSearch').default
 const faculties = require('./routes/faculties').default
@@ -80,6 +81,7 @@ module.exports = (app, url) => {
   app.use(`${url}/studyguidancegroups`, auth.roles(['studyGuidanceGroups']), studyGuidanceGroups)
   app.use(`${url}/close-to-graduation`, auth.roles(['fullSisuAccess', 'studyGuidanceGroups']), closeToGraduation)
   app.use(`${url}/study-programme-pins`, studyProgrammePins)
+  app.use(`${url}/curriculum-periods`, curriculumPeriods)
   app.get('*', async (_, res) => {
     const results = { error: 'unknown endpoint' }
     res.status(404).json(results)

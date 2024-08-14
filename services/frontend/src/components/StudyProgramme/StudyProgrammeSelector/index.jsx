@@ -6,10 +6,9 @@ import {
   createLocaleComparator,
   createPinnedFirstComparator,
   getUnifiedProgrammeName,
-  yearCodeToCurriculumPeriodId,
   isDefaultServiceProvider,
 } from '@/common'
-import { useCurrentSemester } from '@/common/hooks'
+import { useCurrentCurriculumPeriod } from '@/common/hooks'
 import { FilterOldProgrammesToggle } from '@/components/common/FilterOldProgrammesToggle'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useGetProgrammesQuery } from '@/redux/populations'
@@ -27,8 +26,7 @@ export const StudyProgrammeSelector = () => {
   const { getTextIn } = useLanguage()
   const { data: programmes, isLoading } = useGetProgrammesQuery()
   const studyProgrammes = Object.values(programmes || {})
-  const currentSemester = useCurrentSemester()
-  const currentCurriculumPeriodId = yearCodeToCurriculumPeriodId(currentSemester?.yearcode)
+  const currentCurriculumPeriod = useCurrentCurriculumPeriod()
   const [filter, setFilter] = useState('')
   const [otherProgrammesVisible, setOtherProgrammesVisible] = useState(false)
   const handleFilterChange = debounce(value => {
@@ -46,7 +44,7 @@ export const StudyProgrammeSelector = () => {
   const pinnedProgrammes = studyProgrammePins?.studyProgrammes || []
   const pinnedFirstComparator = createPinnedFirstComparator(pinnedProgrammes)
 
-  if (isLoading || !currentCurriculumPeriodId) return <Loader active>Loading</Loader>
+  if (isLoading || !currentCurriculumPeriod) return <Loader active>Loading</Loader>
 
   const isPinned = programmeCode => pinnedProgrammes.includes(programmeCode)
 
@@ -126,7 +124,7 @@ export const StudyProgrammeSelector = () => {
     if (isDefaultServiceProvider() && programme.code.startsWith('2_')) {
       continue
     }
-    if (!programme.curriculum_period_ids.includes(currentCurriculumPeriodId)) {
+    if (!programme.curriculum_period_ids.includes(currentCurriculumPeriod.id)) {
       otherProgrammes.push(programme)
     } else if (programme.degreeProgrammeType === 'urn:code:degree-program-type:bachelors-degree') {
       bachelorProgrammes.push(programme)

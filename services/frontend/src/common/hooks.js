@@ -3,6 +3,7 @@ import qs from 'query-string'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { SEARCH_HISTORY_VERSION } from '@/constants'
+import { useGetCurriculumPeriodsQuery } from '@/redux/curriculumPeriods'
 import { useGetSemestersQuery } from '@/redux/semesters'
 
 export const useTabChangeAnalytics = () => {
@@ -281,5 +282,13 @@ export const useCurrentSemester = () => {
   if (!semesterData) return null
   return Object.values(semesterData.semesters).find(
     semester => new Date(semester.startdate) <= new Date() && new Date(semester.enddate) >= new Date()
+  )
+}
+
+export const useCurrentCurriculumPeriod = () => {
+  const { data: curriculumPeriods = [] } = useGetCurriculumPeriodsQuery()
+  return curriculumPeriods.find(
+    curriculumPeriod =>
+      new Date(curriculumPeriod.startDate) <= new Date() && new Date(curriculumPeriod.endDate) >= new Date()
   )
 }
