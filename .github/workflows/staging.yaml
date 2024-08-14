@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - oodikone-shared-2
     paths:
       - '.github/workflows/test.yaml'
       - '.github/workflows/staging.yaml'
@@ -41,7 +42,7 @@ jobs:
         with:
           image: oodikone-frontend
           tags: staging ${{ github.sha }}
-          context: services/frontend
+          context: services
           containerfiles: |
             services/frontend/Dockerfile
           build-args: |
@@ -88,40 +89,39 @@ jobs:
           registry: quay.io/toska
           username: toska+github
           password: ${{ secrets.QUAY_IO_TOKEN }}
-
-  report_success:
-    name: 'Report deployment success to oodikone notifications'
-    runs-on: ubuntu-latest
-    needs:
-      - release_frontend
-      - release_backend
-
-    if: success()
-
-    steps:
-      - uses: actions/checkout@v4
-      - name: 'Send notification to slack'
-        uses: UniversityOfHelsinkiCS/slackbot-action@v1.5
-        with:
-          webhook-url: ${{ secrets.WEBHOOK_URL }}
-          message-type: deployment
-          softa-url: https://toska-staging.cs.helsinki.fi/oodikone
-          deployment-target: staging
-
-  report_failure:
-    name: 'Report deployment failure to oodikone notifications'
-    runs-on: ubuntu-latest
-    needs:
-      - release_frontend
-      - release_backend
-
-    if: failure()
-
-    steps:
-      - uses: actions/checkout@v4
-      - name: 'Send notification to slack'
-        uses: UniversityOfHelsinkiCS/slackbot-action@v1.5
-        with:
-          webhook-url: ${{ secrets.WEBHOOK_URL }}
-          message-type: deployment-failure
-          deployment-target: staging
+#  report_success:
+#    name: 'Report deployment success to oodikone notifications'
+#    runs-on: ubuntu-latest
+#    needs:
+#      - release_frontend
+#      - release_backend
+#
+#    if: success()
+#
+#    steps:
+#      - uses: actions/checkout@v4
+#      - name: 'Send notification to slack'
+#        uses: UniversityOfHelsinkiCS/slackbot-action@v1.5
+#        with:
+#          webhook-url: ${{ secrets.WEBHOOK_URL }}
+#          message-type: deployment
+#          softa-url: https://toska-staging.cs.helsinki.fi/oodikone
+#          deployment-target: staging
+#
+#  report_failure:
+#    name: 'Report deployment failure to oodikone notifications'
+#    runs-on: ubuntu-latest
+#    needs:
+#      - release_frontend
+#      - release_backend
+#
+#    if: failure()
+#
+#    steps:
+#      - uses: actions/checkout@v4
+#      - name: 'Send notification to slack'
+#        uses: UniversityOfHelsinkiCS/slackbot-action@v1.5
+#        with:
+#          webhook-url: ${{ secrets.WEBHOOK_URL }}
+#          message-type: deployment-failure
+#          deployment-target: staging

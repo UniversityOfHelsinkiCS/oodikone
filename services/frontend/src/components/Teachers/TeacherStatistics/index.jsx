@@ -1,3 +1,4 @@
+import { mapToProviders } from 'oodikone-shared/util/mapToProviders'
 import { useState } from 'react'
 import { Button, Dropdown, Form, Message, Segment } from 'semantic-ui-react'
 
@@ -8,7 +9,6 @@ import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProvidersQuery } from '@/redux/providers'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { useLazyGetTeacherStatisticsQuery } from '@/redux/teachers'
-import { mapToProviders } from './mapToProviders'
 
 export const TeacherStatistics = () => {
   const { getTextIn } = useLanguage()

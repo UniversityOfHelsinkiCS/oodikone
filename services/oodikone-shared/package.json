@@ -1,0 +1,5 @@
+{
+  "name": "oodikone-shared",
+  "description": "Shared code between frontend and backend",
+  "main": "index.js"
+}

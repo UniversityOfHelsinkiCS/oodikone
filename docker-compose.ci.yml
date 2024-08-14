@@ -29,7 +29,8 @@ services:
     <<: *defaults
     container_name: frontend
     build:
-      context: services/frontend
+      context: services
+      dockerfile: frontend/Dockerfile
 
   kone-db:
     <<: *defaults
