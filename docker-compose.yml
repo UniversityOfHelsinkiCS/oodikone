@@ -46,6 +46,7 @@ services:
     volumes:
       - backend-nodemod:/opt/app-root/src/node_modules
       - ./services/backend/:/opt/app-root/src
+      - ./services/oodikone-shared/:/opt/app-root/oodikone-shared
 
   frontend:
     <<: *defaults
