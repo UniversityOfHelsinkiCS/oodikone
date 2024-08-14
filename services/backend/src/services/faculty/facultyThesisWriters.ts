@@ -73,11 +73,13 @@ const calculateCombinedStats = async (
     const isMaster = degreeProgrammeType === degreeProgrammeTypes.master
     const correctIndex = isBachelor ? 0 : 1
 
-    if (!combinedGraphStats[correctIndex].data) {
-      combinedGraphStats[correctIndex].data = [...thesisStats.data]
-    } else {
-      for (let i = 0; i < thesisStats.data.length; i++) {
-        combinedGraphStats[correctIndex].data[i] += thesisStats.data[i]
+    if (thesisStats) {
+      if (!combinedGraphStats[correctIndex].data) {
+        combinedGraphStats[correctIndex].data = [...thesisStats.data]
+      } else {
+        for (let i = 0; i < thesisStats.data.length; i++) {
+          combinedGraphStats[correctIndex].data[i] += thesisStats.data[i]
+        }
       }
     }
 
