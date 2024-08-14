@@ -34,6 +34,7 @@ const IMPORTER_TABLES = {
   studyrights: 'studyrights',
   termRegistrations: 'term_registrations',
   studyRightPrimalities: 'study_right_primalities',
+  curriculumPeriods: 'curriculum_periods',
 }
 
 const schedule = async (args, channel = SIS_UPDATER_SCHEDULE_CHANNEL) => {
@@ -150,6 +151,11 @@ const scheduleMeta = async (clean = true) => {
     distinct: 'group_id',
     pluck: 'group_id',
     limit: isDev ? DEV_SCHEDULE_COUNT : null,
+    clean,
+  })
+
+  await scheduleFromDb({
+    table: IMPORTER_TABLES.curriculumPeriods,
     clean,
   })
 }

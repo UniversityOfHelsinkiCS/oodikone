@@ -4,6 +4,7 @@ const CourseType = require('./courseType')
 const Credit = require('./credit')
 const CreditTeacher = require('./creditTeacher')
 const CreditType = require('./creditType')
+const CurriculumPeriod = require('./curriculumPeriod')
 const ElementDetail = require('./elementDetail')
 const Enrollment = require('./enrollment')
 const Organization = require('./organization')
@@ -124,6 +125,7 @@ module.exports = {
   CreditType,
   CourseType,
   CREDIT_TYPE_CODES,
+  CurriculumPeriod,
   ElementDetail,
   Enrollment,
   Organization,

@@ -6,6 +6,7 @@ import { CourseType } from './courseType'
 import { Credit } from './credit'
 import { CreditTeacher } from './creditTeacher'
 import { CreditType } from './creditType'
+import { CurriculumPeriod } from './curriculumPeriod'
 import { ElementDetail } from './elementDetail'
 import { Enrollment } from './enrollment'
 import { Organization } from './organization'
@@ -35,6 +36,7 @@ export {
   Credit,
   CreditTeacher,
   CreditType,
+  CurriculumPeriod,
   ElementDetail,
   Enrollment,
   Organization,

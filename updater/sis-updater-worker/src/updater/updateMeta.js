@@ -2,8 +2,22 @@ const { uniqBy, flatten, groupBy } = require('lodash')
 const _ = require('lodash')
 const { rootOrgId } = require('../config')
 const { bulkCreate, selectFromByIdsOrderBy } = require('../db')
-const { Course, CourseProvider, CourseType, CreditType, Organization, StudyrightExtent } = require('../db/models')
-const { courseMapper, courseProviderMapper, mapCourseType, mapStudyrightExtent } = require('./mapper')
+const {
+  Course,
+  CourseProvider,
+  CourseType,
+  CreditType,
+  CurriculumPeriod,
+  Organization,
+  StudyrightExtent,
+} = require('../db/models')
+const {
+  courseMapper,
+  courseProviderMapper,
+  mapCourseType,
+  mapStudyrightExtent,
+  mapCurriculumPeriod,
+} = require('./mapper')
 
 const updateOrganisations = async organisations => {
   await bulkCreate(Organization, organisations)
@@ -157,6 +171,11 @@ const updateStudyrightExtents = async educationTypes => {
   await bulkCreate(StudyrightExtent, uniqueExtents, null, ['extentcode'])
 }
 
+const updateCurriculumPeriods = async curriculumPeriods => {
+  const mappedCurriculumPeriods = curriculumPeriods.map(mapCurriculumPeriod)
+  await bulkCreate(CurriculumPeriod, mappedCurriculumPeriods)
+}
+
 module.exports = {
   updateOrganisations,
   updateStudyModules,
@@ -164,4 +183,5 @@ module.exports = {
   updateCourseTypes,
   updateCreditTypes,
   updateStudyrightExtents,
+  updateCurriculumPeriods,
 }

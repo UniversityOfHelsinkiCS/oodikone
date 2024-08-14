@@ -311,6 +311,14 @@ const mapStudyrightExtent = educationType => ({
   name: educationType.name,
 })
 
+const mapCurriculumPeriod = curriculumPeriod => ({
+  id: curriculumPeriod.id,
+  name: curriculumPeriod.name,
+  universityOrgId: curriculumPeriod.university_org_id,
+  startDate: new Date(curriculumPeriod.active_period.startDate),
+  endDate: new Date(curriculumPeriod.active_period.endDate),
+})
+
 const enrollmentMapper =
   (
     personIdToStudentNumber,
@@ -495,6 +503,7 @@ module.exports = {
   courseMapper,
   mapCourseType,
   mapStudyrightExtent,
+  mapCurriculumPeriod,
   enrollmentMapper,
   studyplanMapper,
   sanitizeCourseCode,
