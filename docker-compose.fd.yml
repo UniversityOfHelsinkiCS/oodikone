@@ -44,6 +44,7 @@ services:
       SIS_GRAPHQL_APPLICATION_KEY: ${SIS_GRAPHQL_APPLICATION_KEY}
       IMPORTER_DB_API_USER: dev_user
       IMPORTER_DB_API_PASSWORD: dev_password
+      ROOT_ORG_ID: ${ROOT_ORG_ID}
     ports:
       - 8080:8080
     volumes:
