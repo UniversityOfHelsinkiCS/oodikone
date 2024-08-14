@@ -23,7 +23,7 @@ COPY ./backend/package*.json ./
 
 RUN npm ci --include=dev
 
-COPY . .
+COPY ./backend .
 
 RUN npm run build
 
