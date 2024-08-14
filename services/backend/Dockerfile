@@ -19,7 +19,7 @@ ENV SENTRY_ENVIRONMENT=$SENTRY_ENVIRONMENT
 ARG SENTRY_RELEASE
 ENV SENTRY_RELEASE=$SENTRY_RELEASE
 
-COPY ./package*.json ./
+COPY ./backend/package*.json ./
 
 RUN npm ci --include=dev
 

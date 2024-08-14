@@ -73,7 +73,7 @@ jobs:
         with:
           image: oodikone-backend
           tags: staging ${{ github.sha }}
-          context: services/backend
+          context: services
           containerfiles: |
             services/backend/Dockerfile
           build-args: |
