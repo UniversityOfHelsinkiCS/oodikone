@@ -1,7 +1,7 @@
 import { Button, Icon, Table, Label } from 'semantic-ui-react'
 
 const roundValue = value => {
-  return Number.isInteger(value) ? value : value.toFixed(1)
+  return Number.isInteger(value) ? value : value?.toFixed(1)
 }
 
 export const ExpandableRow = ({ icon, yearArray, cypress, yearIndex, toggleVisibility, styles }) => {
