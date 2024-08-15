@@ -8,7 +8,7 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SortableTable } from '@/components/SortableTable'
 import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 import { useShowAsUser } from '@/redux/auth'
-import { useGetStudyProgrammesQuery } from '@/redux/studyProgramme'
+import { useGetProgrammesQuery } from '@/redux/populations'
 import { reformatDate } from '@/util/timeAndDate'
 
 export const UserSearchList = ({ users, isLoading, isError }) => {
@@ -16,7 +16,7 @@ export const UserSearchList = ({ users, isLoading, isError }) => {
   const [popupTimeout, setPopupTimeout] = useState(null)
   const [popupOpen, setPopupOpen] = useState(false)
   const [userEmails, setUserEmails] = useState([])
-  const { data: studyProgrammes = [] } = useGetStudyProgrammesQuery()
+  const { data: studyProgrammes = {} } = useGetProgrammesQuery()
   const showAsUser = useShowAsUser()
 
   const copyEmailsToClipboard = () => {
@@ -96,7 +96,7 @@ export const UserSearchList = ({ users, isLoading, isError }) => {
         const uniqueRights = new Set(user.programmeRights.map(programmeRight => programmeRight.code))
         const programmeNames = []
         uniqueRights.forEach(right => {
-          const studyProgramme = studyProgrammes.find(studyProgramme => studyProgramme.code === right)
+          const studyProgramme = studyProgrammes[right]
           if (studyProgramme) {
             programmeNames.push(getTextIn(studyProgramme.name))
           }

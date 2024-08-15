@@ -1,12 +1,10 @@
 import { RTKApi } from '@/apiConnection'
 import { getUnifiedProgrammeName } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { useGetProgrammesQuery } from './populations'
 
 const studyProgrammeApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
-    getStudyProgrammes: builder.query({
-      query: () => '/v2/studyprogrammes',
-    }),
     getBasicStats: builder.query({
       query: ({ id, yearType, specialGroups, combinedProgramme }) =>
         `/v2/studyprogrammes/${id}/basicstats?year_type=${yearType}&special_groups=${specialGroups}&combined_programme=${combinedProgramme}`,
@@ -49,7 +47,6 @@ const studyProgrammeApi = RTKApi.injectEndpoints({
 })
 
 export const {
-  useGetStudyProgrammesQuery,
   useGetBasicStatsQuery,
   useGetCreditStatsQuery,
   useGetGraduationStatsQuery,
@@ -96,7 +93,8 @@ const getCombinedOptions = (dataForCombined, getTextIn, language) => {
 
 /** Returns only newest study programmes and formats them to be used in Semantic UI dropdown menus */
 export const useFilteredAndFormattedStudyProgrammes = () => {
-  const { data: studyProgrammes = [] } = useGetStudyProgrammesQuery()
+  const { data = {} } = useGetProgrammesQuery()
+  const studyProgrammes = Object.values(data)
   const { language, getTextIn } = useLanguage()
   const filteredAndFormatted = getFilteredAndFormattedStudyProgrammes(getTextIn, studyProgrammes)
   const dataForCombined = getDataForCombined(studyProgrammes)

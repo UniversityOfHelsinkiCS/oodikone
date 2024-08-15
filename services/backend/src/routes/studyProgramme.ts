@@ -19,16 +19,10 @@ import { getGraduationStatsForStudytrack } from '../services/studyProgramme/stud
 import { updateBasicView, updateStudytrackView } from '../services/studyProgramme/studyProgrammeUpdates'
 import { getStudyRightsInProgramme } from '../services/studyProgramme/studyRightFinders'
 import { getStudytrackStatsForStudyprogramme } from '../services/studyProgramme/studyTrackStats'
-import { getProgrammesFromStudyRights } from '../services/studyrights'
 import logger from '../util/logger'
 import { logInfoForGrafana } from '../util/logInfoForGrafana'
 
 const router = Router()
-
-router.get('/', async (_req: Request, res: Response) => {
-  const studyProgrammes = await getProgrammesFromStudyRights()
-  res.json(studyProgrammes)
-})
 
 interface GetCreditStatsRequest extends Request {
   query: {

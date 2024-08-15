@@ -10,7 +10,7 @@ import { userToolTips } from '@/common/InfoToolTips'
 import { FilterOldProgrammesToggle } from '@/components/common/FilterOldProgrammesToggle'
 import { InfoBox } from '@/components/Info/InfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { useGetStudyProgrammesQuery } from '@/redux/studyProgramme'
+import { useGetProgrammesQuery } from '@/redux/populations'
 import { useAddUserUnitsMutation, useRemoveUserUnitsMutation } from '@/redux/users'
 
 const mapAndSortProgrammes = (programmes, studyProgrammes, getTextIn) => {
@@ -30,7 +30,8 @@ export const AccessRights = ({ user }) => {
   const [accessRightsToBeAdded, setAccessRightsToBeAdded] = useState([])
   const [accessRightsToBeRemoved, setAccessRightsToBeRemoved] = useState([])
   const [filterOldProgrammes, setFilterOldProgrammes] = useState(true)
-  const { data: studyProgrammes = [] } = useGetStudyProgrammesQuery()
+  const { data: programmes = {} } = useGetProgrammesQuery()
+  const studyProgrammes = Object.values(programmes)
   const [addUserUnitsMutation, addResult] = useAddUserUnitsMutation()
   const [removeUserUnitsMutation, removeResult] = useRemoveUserUnitsMutation()
 

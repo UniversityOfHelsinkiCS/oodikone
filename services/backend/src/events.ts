@@ -10,7 +10,6 @@ import { redisClient } from './services/redis'
 import { getCurrentSemester } from './services/semesters'
 import { combinedStudyprogrammes, isRelevantProgramme } from './services/studyProgramme/studyProgrammeHelpers'
 import { updateBasicView, updateStudytrackView } from './services/studyProgramme/studyProgrammeUpdates'
-import { getProgrammesFromStudyRights } from './services/studyrights'
 import { findAndSaveTeachers } from './services/teachers/top'
 import { deleteOutdatedUsers } from './services/userService'
 import logger from './util/logger'
@@ -70,9 +69,15 @@ export const refreshProgramme = async (code: string) => {
 
 export const refreshProgrammes = async () => {
   logger.info('Refreshing study programme and study track overview statistics for all programmes')
-  const programmes = await getProgrammesFromStudyRights()
-  const codes = programmes.map(programme => programme.code).filter(code => isRelevantProgramme(code))
-  for (const code of codes) {
+  const facultyCodes = (await getFaculties()).map(faculty => faculty.code)
+  const programmeCodes: string[] = []
+  for (const faculty of facultyCodes) {
+    const programmesOfFaculty = (await getDegreeProgrammesOfFaculty(faculty, true))
+      .map(programme => programme.code)
+      .filter(code => isRelevantProgramme(code))
+    programmeCodes.push(...programmesOfFaculty)
+  }
+  for (const code of programmeCodes) {
     // If combined programme is given, this updates only the bachelor programme
     jobMaker.programme(code)
   }
