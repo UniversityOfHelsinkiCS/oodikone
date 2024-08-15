@@ -1,4 +1,5 @@
 import { CronJob } from 'cron'
+import { helloWorld } from 'oodikone-shared'
 
 import { isProduction, runningInCI } from './config'
 import { getDegreeProgrammesOfFaculty } from './services/faculty/faculty'
@@ -15,6 +16,8 @@ import { findAndSaveTeachers } from './services/teachers/top'
 import { deleteOutdatedUsers } from './services/userService'
 import logger from './util/logger'
 import { jobMaker, addToFlow } from './worker/queue'
+
+helloWorld()
 
 const schedule = (cronTime: string, onTick: () => void) => {
   const onComplete = null

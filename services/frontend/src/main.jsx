@@ -1,4 +1,5 @@
 // eslint-disable-next-line import/no-unused-modules
+import { helloWorld } from 'oodikone-shared'
 import { createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
 import { BrowserRouter } from 'react-router-dom'
@@ -12,6 +13,8 @@ import { ConnectedErrorBoundary as ErrorBoundary } from './components/ErrorBound
 import { basePath } from './conf'
 import { store } from './redux'
 import { initializeSentry } from './util/sentry'
+
+helloWorld()
 
 initializeSentry()
 
