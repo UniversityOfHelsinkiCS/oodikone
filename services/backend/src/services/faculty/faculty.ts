@@ -1,3 +1,4 @@
+import { groupBy, orderBy } from 'lodash'
 import moment from 'moment'
 import { InferAttributes, Op, QueryTypes } from 'sequelize'
 
@@ -110,9 +111,10 @@ export const getDegreeProgrammesOfOrganization = async (organizationId: string, 
     InferAttributes<ProgrammeModule>,
     'code' | 'name' | 'degreeProgrammeType' | 'curriculum_period_ids'
   > & { progId: string }
-  const programmesOfOrganization: Array<Omit<ProgrammeModuleWithRelevantAttributes, 'progId'>> = await sequelize.query(
-    `
-      SELECT code, name, degree_programme_type as "degreeProgrammeType", curriculum_period_ids
+  const programmesOfOrganization: Array<Omit<ProgrammeModuleWithRelevantAttributes, 'progId'> & { valid_from: Date }> =
+    await sequelize.query(
+      `
+      SELECT code, name, degree_programme_type as "degreeProgrammeType", curriculum_period_ids, valid_from
       FROM programme_modules
       WHERE organization_id IN (
         WITH RECURSIVE cte AS (
@@ -128,43 +130,47 @@ export const getDegreeProgrammesOfOrganization = async (organizationId: string, 
       )
       ORDER BY code
     `,
-    {
-      type: QueryTypes.SELECT,
-      replacements: { organizationId },
-    }
-  )
+      {
+        type: QueryTypes.SELECT,
+        replacements: { organizationId },
+      }
+    )
   const programmesWithProgIds = programmesOfOrganization.map(programme => ({
     ...programme,
     progId:
       programme.code in programmeCodes ? programmeCodes[programme.code as keyof typeof programmeCodes] : programme.code,
   }))
+  const programmesGroupedByCode = groupBy(orderBy(programmesWithProgIds, ['valid_from'], ['desc']), prog => prog.code)
+
   const { years } = await getSemestersAndYears()
   const relevantProgrammes: ProgrammeModuleWithRelevantAttributes[] = []
-  for (const programme of programmesWithProgIds) {
-    const yearsOfProgramme = programme.curriculum_period_ids.map(curriculumPeriodIdToYearCode)
-    if (onlyCurrentProgrammes) {
-      if (yearsOfProgramme.some(year => moment().isBetween(years[year].startdate, years[year].enddate))) {
-        relevantProgrammes.push(programme)
-      }
-      continue
-    }
 
-    const currentProgrammeInArray = relevantProgrammes.find(p => p.code === programme.code)
-    if (!currentProgrammeInArray) {
-      relevantProgrammes.push(programme)
+  for (const programmeVersions of Object.values(programmesGroupedByCode)) {
+    // Programmes are ordered by valid_from in descending order, so the first one whose valid_from date isn't in the future, is the newest version
+    const newestProgrammeVersion = programmeVersions.find(prog => new Date() >= prog.valid_from)
+    if (!newestProgrammeVersion) {
       continue
     }
-    const maximumEndDateForCurrentProgramme = moment.max(
-      currentProgrammeInArray.curriculum_period_ids.map(id => years[curriculumPeriodIdToYearCode(id)].enddate)
-    )
-    if (yearsOfProgramme.some(year => years[year].enddate.isAfter(maximumEndDateForCurrentProgramme))) {
-      relevantProgrammes.splice(
-        relevantProgrammes.findIndex(p => p.code === programme.code),
-        1,
-        programme
-      )
+    const { code, name, degreeProgrammeType, progId } = newestProgrammeVersion
+    const yearsOfProgramme = programmeVersions
+      .map(prog => prog.curriculum_period_ids.map(curriculumPeriodIdToYearCode))
+      .flat()
+    const isRelevantProgramme =
+      !onlyCurrentProgrammes ||
+      (onlyCurrentProgrammes &&
+        yearsOfProgramme.some(year => moment().isBetween(years[year].startdate, years[year].enddate)))
+
+    if (isRelevantProgramme) {
+      relevantProgrammes.push({
+        code,
+        name,
+        degreeProgrammeType,
+        progId,
+        curriculum_period_ids: programmeVersions.map(prog => prog.curriculum_period_ids).flat(),
+      })
     }
   }
+
   return relevantProgrammes
 }
 
