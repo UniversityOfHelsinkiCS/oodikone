@@ -1,11 +1,11 @@
-const handleUnderscoreProgrammeCode = programmeCode => {
+const handleUnderscoreProgrammeCode = (programmeCode: string) => {
   const [left, right] = programmeCode.split('_')
-  const prefix = [...left].filter(char => !Number.isNaN(Number(char))).join('')
-  const suffix = `${left[0]}${right}`
+  const prefix = [...left!].filter(char => !Number.isNaN(Number(char))).join('')
+  const suffix = `${left![0]}${right}`
   return `${prefix}0-${suffix}`
 }
 
-const handleDoctoralProgrammeCode = programmeCode => {
+const handleDoctoralProgrammeCode = (programmeCode: string) => {
   const numbers = programmeCode.substring(1)
   const courseProvider = Number(`7${numbers}`)
   if (courseProvider < 7920111 && courseProvider > 7920102) {
@@ -17,7 +17,7 @@ const handleDoctoralProgrammeCode = programmeCode => {
   return `${courseProvider}`
 }
 
-const programmeCodeToProviderCode = programmeCode => {
+const programmeCodeToProviderCode = (programmeCode: string) => {
   if (programmeCode.includes('_')) {
     return handleUnderscoreProgrammeCode(programmeCode)
   }
@@ -27,8 +27,6 @@ const programmeCodeToProviderCode = programmeCode => {
   return programmeCode
 }
 
-const mapToProviders = programmeCodes => {
+export const mapToProviders = (programmeCodes: string[]) => {
   return programmeCodes.map(programmeCodeToProviderCode)
 }
-
-module.exports = { mapToProviders, programmeCodeToProviderCode }
