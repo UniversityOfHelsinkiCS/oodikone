@@ -13,7 +13,6 @@ import { updateBasicView, updateStudytrackView } from './services/studyProgramme
 import { getProgrammesFromStudyRights } from './services/studyrights'
 import { findAndSaveTeachers } from './services/teachers/top'
 import { deleteOutdatedUsers } from './services/userService'
-// eslint-disable-next-line import/extensions
 import { helloWorld } from './shared'
 import logger from './util/logger'
 import { jobMaker, addToFlow } from './worker/queue'

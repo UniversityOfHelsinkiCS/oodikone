@@ -1,4 +1,3 @@
-/* eslint-disable import/no-unresolved */
 import { useState } from 'react'
 import { Button, Dropdown, Form, Message, Segment } from 'semantic-ui-react'
 
