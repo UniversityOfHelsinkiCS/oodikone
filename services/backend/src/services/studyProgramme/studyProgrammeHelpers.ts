@@ -117,14 +117,6 @@ export const getPercentage = (value: any, total: any) => {
   return `${((value / total) * 100).toFixed(1)} %`
 }
 
-export const getCreditThresholds = () => {
-  // Only doctoral and licentiate study programmes (40 study credits) use this as of September 2023
-  return {
-    creditThresholdKeys: ['lte10', 'lte20', 'lte30', 'lte40', 'mte40'],
-    creditThresholdAmounts: [10, 20, 30, 40, 40],
-  }
-}
-
 export const tableTitles = {
   basics: {
     SPECIAL_EXCLUDED: ['', 'Started studying', 'Accepted', 'Graduated'],

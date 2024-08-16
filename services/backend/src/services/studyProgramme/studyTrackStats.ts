@@ -340,6 +340,10 @@ const getMainStatsByTrackAndYear = async (
     emptyArrays: true,
   })
 
+  const creditCountsCombo: Record<string, number[]> = doCombo
+    ? getYearsObject({ years: years.filter(year => year !== 'Total'), emptyArrays: true })
+    : {}
+
   for (const studyRight of studyRightsOfProgramme) {
     if (!studyRight.semesterEnrollments) continue
     const studyRightElement = studyRight.studyRightElements.find(element => element.code === studyProgramme)
@@ -382,7 +386,17 @@ const getMainStatsByTrackAndYear = async (
         studyRightElement
       )
     }
-    creditCounts[startYear].push(getCreditCount(studyRight.student.credits, startedInProgramme))
+    const countAsBachelorMaster = doCombo && studyRight.extentCode === ExtentCode.BACHELOR_AND_MASTER
+    if (countAsBachelorMaster) {
+      const startedInBachelor = getStudyRightElementsWithPhase(studyRight, 1)[0]?.startDate
+      if (startedInBachelor && years.includes(defineYear(startedInBachelor, true))) {
+        creditCountsCombo[defineYear(startedInBachelor, true)].push(
+          getCreditCount(studyRight.student.credits, startedInBachelor)
+        )
+      }
+    } else {
+      creditCounts[startYear].push(getCreditCount(studyRight.student.credits, startedInProgramme))
+    }
   }
 
   for (const year of Object.keys(yearlyStats)) {
@@ -438,6 +452,7 @@ const getMainStatsByTrackAndYear = async (
     mainStatsByTrack,
     otherCountriesCount,
     creditCounts,
+    creditCountsCombo,
     graduationTimes: finalGraduationTimes,
     graduationTimesSecondProg: finalCombinedGraduationTimes,
   }

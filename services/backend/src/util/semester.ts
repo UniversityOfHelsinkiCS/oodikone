@@ -36,23 +36,3 @@ export const getPassingSemester = (startYear: number, date: Date): string => {
 
   return yearCount < 6 ? `${yearCount}-${semester}` : 'LATER'
 }
-
-interface AcademicYearDates {
-  startDate: Date
-  endDate: Date
-}
-
-export const getAcademicYearDates = (year: string, since: Date): AcademicYearDates => {
-  if (year === 'Total') {
-    return {
-      startDate: new Date(`${since.getFullYear()}-${SemesterStart.FALL}`),
-      endDate: new Date(`${moment(new Date()).add(1, 'years').format('YYYY')}-${SemesterEnd.SPRING}`),
-    }
-  }
-  const startYear = year.slice(0, 4)
-  const endYear = moment(startYear, 'YYYY').add(1, 'years').format('YYYY')
-  return {
-    startDate: new Date(moment.tz(`${startYear}-${SemesterStart.FALL}`, 'Europe/Helsinki').format()),
-    endDate: new Date(`${endYear}-${SemesterEnd.SPRING}`),
-  }
-}

@@ -45,7 +45,7 @@ export const calculateStats = (
   numberOfCreditCategories = 7
 ) => {
   const tableStats = []
-  if (creditCounts === undefined) return tableStats
+  if (creditCounts === undefined) return null
 
   const limits = getCreditCategories(
     true,
@@ -173,12 +173,11 @@ export const FacultyProgrammeOverview = ({
     7
   )
   const masterStats = calculateStats(progressStats?.data?.creditCounts?.master, 120)
-  const licentiateStats = calculateStats(progressStats?.data?.creditCounts?.licentiate, 360)
   const doctorStats = calculateStats(progressStats?.data?.creditCounts?.doctor, 40, 0, 5)
 
   const hasNonZeroStats = stats => {
     const allValuesZero = values => values.every(value => parseFloat(value) === 0)
-    return stats.chartStats.some(row => !allValuesZero(row.data))
+    return stats?.chartStats.some(row => !allValuesZero(row.data))
   }
 
   return (
@@ -375,36 +374,6 @@ export const FacultyProgrammeOverview = ({
                           listObj => listObj[0]
                         )}
                         titles={masterStats.tableTitles}
-                      />
-                    </div>
-                  </div>
-                </>
-              )}
-              {hasNonZeroStats(licentiateStats) && faculty.code === 'H30' && (
-                <>
-                  {getDivider('Licentiate', 'LicentiateStudentsOfTheFacultyByStartingYear', 'no-infobox')}
-                  <div className="section-container">
-                    <div className="graph-container">
-                      <FacultyBarChart
-                        cypress="FacultyLicentiateProgress"
-                        data={{
-                          id: faculty.code,
-                          stats: licentiateStats.chartStats,
-                          years: progressStats?.data.years,
-                        }}
-                      />
-                    </div>
-                    <div className="table-container">
-                      <FacultyProgressTable
-                        cypress="FacultyLicentiateProgressTable"
-                        data={licentiateStats.tableStats}
-                        programmeNames={progressStats?.data.programmeNames}
-                        programmeStats={progressStats?.data.licentiateProgStats}
-                        progressTitles={progressStats?.data.yearlyLicentiateTitles}
-                        sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.licentiateProgStats).map(
-                          listObj => listObj[0]
-                        )}
-                        titles={licentiateStats.tableTitles}
                       />
                     </div>
                   </div>

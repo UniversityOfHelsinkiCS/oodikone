@@ -18,7 +18,7 @@ type ProgrammeStats = {
   programmes: string[]
 }
 
-const programmeTypes = {
+export const programmeTypes = {
   'urn:code:degree-program-type:bachelors-degree': 'bachelor',
   'urn:code:degree-program-type:masters-degree': 'master',
   'urn:code:degree-program-type:doctor': 'doctor',

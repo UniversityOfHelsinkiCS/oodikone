@@ -1,116 +1,24 @@
 import { groupBy, orderBy } from 'lodash'
 import moment from 'moment'
-import { InferAttributes, Op, QueryTypes } from 'sequelize'
+import { InferAttributes, QueryTypes } from 'sequelize'
 
 import { programmeCodes } from '../../config/programmeCodes'
 import { dbConnections } from '../../database/connection'
-import { ElementDetail, Organization, ProgrammeModule, Studyright, StudyrightElement } from '../../models'
-import { ExtentCode, PriorityCode } from '../../types'
+import { Organization, ProgrammeModule } from '../../models'
 import { getSemestersAndYears } from '../semesters'
-import { formatFacultyStudyRight } from './facultyFormatHelpers'
 
 const { sequelize } = dbConnections
 
-export const getStudyRightsByExtent = async (
-  facultyCode: string,
-  startDate: Date,
-  endDate: Date,
-  code: string,
-  extentCodes: ExtentCode[],
-  graduated: number[]
-) => {
-  const query: Record<string, any> = {
-    include: {
-      model: StudyrightElement,
-      attributes: [],
-      required: true,
-      where: {
-        code,
-      },
-      include: [
-        {
-          model: ElementDetail,
-          attributes: [],
-        },
-      ],
-    },
-    group: [sequelize.col('studyright.studyrightid')],
-    where: {
-      facultyCode,
-      extentcode: {
-        [Op.in]: extentCodes,
-      },
-      prioritycode: {
-        [Op.not]: PriorityCode.OPTION,
-      },
-      graduated: {
-        [Op.in]: graduated,
-      },
-      [Op.and]: [
-        sequelize.where(
-          sequelize.fn(
-            'GREATEST',
-            sequelize.col('studyright_elements.startdate'),
-            sequelize.col('studyright.startdate')
-          ),
-          {
-            [Op.between]: [startDate, endDate],
-          }
-        ),
-      ],
-    },
-  }
-
-  const studyRights = await Studyright.findAll(query)
-  return studyRights.map(formatFacultyStudyRight)
-}
-
-export const getStudyRightsByBachelorStart = async (
-  facultyCode: string,
-  startDate: Date,
-  endDate: Date,
-  code: string,
-  extentCodes: ExtentCode[],
-  graduated: number[]
-) => {
-  const query: Record<string, any> = {
-    include: {
-      model: StudyrightElement,
-      required: true,
-      where: {
-        code,
-      },
-    },
-    where: {
-      facultyCode,
-      extentcode: {
-        [Op.in]: extentCodes,
-      },
-      prioritycode: {
-        [Op.not]: PriorityCode.OPTION,
-      },
-      graduated: {
-        [Op.in]: graduated,
-      },
-      startdate: {
-        [Op.between]: [startDate, endDate],
-      },
-    },
-  }
-
-  const studyRights = await Studyright.findAll(query)
-  return studyRights.map(formatFacultyStudyRight)
-}
-
 const curriculumPeriodIdToYearCode = (curriculumPeriodId: string) => curriculumPeriodId.slice(-2)
+
+type ProgrammeModuleWithRelevantAttributes = Pick<
+  InferAttributes<ProgrammeModule>,
+  'code' | 'name' | 'degreeProgrammeType' | 'curriculum_period_ids'
+> & { progId: string }
 
 // Some programme modules are not directly associated to a faculty (organization).
 // Some have intermediate organizations, such as department, so the connection must be digged up
 export const getDegreeProgrammesOfOrganization = async (organizationId: string, onlyCurrentProgrammes: boolean) => {
-  type ProgrammeModuleWithRelevantAttributes = Pick<
-    InferAttributes<ProgrammeModule>,
-    'code' | 'name' | 'degreeProgrammeType' | 'curriculum_period_ids'
-  > & { progId: string }
   const programmesOfOrganization: Array<Omit<ProgrammeModuleWithRelevantAttributes, 'progId'> & { valid_from: Date }> =
     await sequelize.query(
       `

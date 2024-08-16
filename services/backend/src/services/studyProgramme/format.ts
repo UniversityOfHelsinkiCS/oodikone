@@ -1,16 +1,6 @@
 import { InferAttributes } from 'sequelize'
 
-import { Credit, Student } from '../../models'
-
-export const formatStudent = (student: Student) => {
-  return {
-    studentNumber: student.studentnumber,
-    genderCode: student.gender_code,
-    homeCountryEn: student.home_country_en,
-    creditcount: student.creditcount,
-    credits: student.credits,
-  }
-}
+import { Credit } from '../../models'
 
 export const formatCredit = (credit: InferAttributes<Credit>) => {
   const code = credit.course_code.replace('AY', '')

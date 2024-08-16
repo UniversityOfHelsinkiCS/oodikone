@@ -1,34 +1,9 @@
-import { Op, QueryTypes } from 'sequelize'
+import { QueryTypes } from 'sequelize'
 
 import { dbConnections } from '../../database/connection'
-import { Credit, Student } from '../../models'
-import { CreditTypeCode } from '../../types'
 import logger from '../../util/logger'
-import { formatStudent } from './format'
 
 const { sequelize } = dbConnections
-
-export const studytrackStudents = async (studentNumbers: string[]) =>
-  (
-    await Student.findAll({
-      include: {
-        model: Credit,
-        separate: true,
-        attributes: ['credits', 'attainment_date'],
-        where: {
-          isStudyModule: false,
-          credittypecode: {
-            [Op.in]: [CreditTypeCode.PASSED, CreditTypeCode.APPROVED],
-          },
-        },
-      },
-      where: {
-        studentnumber: {
-          [Op.in]: studentNumbers,
-        },
-      },
-    })
-  ).map(formatStudent)
 
 export const getStudentsForProgrammeCourses = async (from: Date, to: Date, programmeCourses: string[]) => {
   if (!programmeCourses.length) {

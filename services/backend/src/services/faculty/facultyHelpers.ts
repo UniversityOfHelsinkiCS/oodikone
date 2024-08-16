@@ -21,11 +21,3 @@ const commissionedProgrammes = ['KH50_009', 'MH50_015', 'T923103-N']
 export const checkCommissioned = (studyRight: any): boolean => {
   return studyRight.studyrightElements.some(element => commissionedProgrammes.includes(element.code))
 }
-
-export const checkTransfers = (studyright, insideTransfersStudyrights, transfersToOrAwayStudyrights): boolean => {
-  const allTransfers = [
-    ...insideTransfersStudyrights.map(studyright => studyright.studentnumber),
-    ...transfersToOrAwayStudyrights.map(studyright => studyright.studentnumber),
-  ]
-  return allTransfers.includes(studyright.studentnumber)
-}

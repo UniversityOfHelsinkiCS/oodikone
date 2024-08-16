@@ -7,7 +7,6 @@ import { getFacultyCredits } from '../services/faculty/facultyCredits'
 import { countGraduationTimes } from '../services/faculty/facultyGraduationTimes'
 import { getSortedFaculties } from '../services/faculty/facultyHelpers'
 import {
-  getProgrammes,
   getBasicStats,
   setBasicStats,
   getThesisWritersStats,
@@ -168,7 +167,7 @@ router.get(
       return res.status(422).end()
     }
 
-    const programmes = await getProgrammes(code, 'NEW_STUDY_PROGRAMMES')
+    const programmes = await getDegreeProgrammesOfFaculty(code, true)
     if (!programmes) {
       return res.status(422).end()
     }
@@ -179,7 +178,7 @@ router.get(
       return res.json(data)
     }
 
-    let updatedStats: any = await combineFacultyStudentProgress(code, programmes.data, specialGroups, graduated)
+    let updatedStats: any = await combineFacultyStudentProgress(code, programmes, specialGroups, graduated)
     if (updatedStats) {
       updatedStats = await setFacultyProgressStats(updatedStats, specialGroups, graduated)
     }
