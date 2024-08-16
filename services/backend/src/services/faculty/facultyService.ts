@@ -3,6 +3,7 @@ import moment from 'moment'
 import { Graduated, Name, ProgrammeFilter, SpecialGroups, YearType } from '../../types'
 import { redisClient } from '../redis'
 import { getDegreeProgrammesOfFaculty } from './faculty'
+import { FacultyProgressData } from './facultyStudentProgress'
 
 const createRedisKeyForFacultyProgrammes = (id: string, programmeFilter: ProgrammeFilter) => {
   return `FACULTY_PROGRAMMES_${id}_${programmeFilter}`
@@ -245,34 +246,6 @@ export const getGraduationStats = async (
     removeGraduationTimes(data)
   }
   return data
-}
-
-type Titles = Array<string[]>
-
-type ProgrammeStats = Record<string, Record<string, Array<number[]>>>
-
-type CreditCount = Record<string, number[]>
-
-type FacultyProgressData = {
-  id: string
-  years: string[]
-  yearlyBachelorTitles: Titles
-  yearlyBcMsTitles: Titles
-  yearlyMasterTitles: Titles
-  yearlyLicentiateTitles: Titles
-  programmeNames: ProgrammeNames
-  bachelorsProgStats: ProgrammeStats
-  bcMsProgStats: ProgrammeStats
-  licentiateProgStats: ProgrammeStats
-  mastersProgStats: ProgrammeStats
-  doctoralProgStats: ProgrammeStats
-  creditCounts: {
-    bachelor: CreditCount
-    bachelorMaster: CreditCount
-    master: CreditCount
-    licentiate: CreditCount
-    doctor: CreditCount
-  }
 }
 
 export const setFacultyProgressStats = async (

@@ -196,3 +196,5 @@ export const combineFacultyStudentProgress = async (
 
   return result
 }
+
+export type FacultyProgressData = Awaited<ReturnType<typeof combineFacultyStudentProgress>>
