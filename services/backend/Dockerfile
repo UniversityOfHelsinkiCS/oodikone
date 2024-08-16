@@ -21,7 +21,7 @@ ENV SENTRY_RELEASE=$SENTRY_RELEASE
 
 COPY ./backend/package*.json ./
 RUN npm ci --include=dev
-COPY ./shared ./backend/src/shared
+COPY ./shared ./src/shared
 COPY ./backend .
 
 RUN npm run build
