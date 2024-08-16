@@ -32,7 +32,7 @@ ENV REACT_APP_SERVICE_PROVIDER=$SERVICE_PROVIDER
 COPY ./frontend/package* ./
 RUN npm ci --include=dev
 COPY ./frontend .
-COPY ./shared/ ./frontend/src/shared
+COPY ./shared/ ./src/shared
 
 RUN npm run build && npm install -g serve@12.0.0
 
