@@ -122,7 +122,9 @@ export const studyProgrammeToolTips = {
   StudytrackProgress: `
   Kuvaa koulutusohjelmassa tiettynä lukuvuonna aloittaneiden opiskelijoiden etenemistä opintopisteissä mitattuna. Esimerkiksi kategoriaan 20–40 kuuluvat opiskelijat, jotka ovat suorittaneet **vähintään 20**, mutta **alle 40** opintopistettä.
 
-  Opintopistekertymään on laskettu kaikki suoritukset, jotka opiskelija on suorittanut koulutusohjelmaan siirryttyään. Myös hyväksiluetut ja muuhun kuin valittuun koulutusohjelmaan tai opintosuuntaan tehdyt suoritukset lasketaan mukaan. Esimerkiksi jos opiskelija on valmistunut kandiohjelmasta 20.6.2020 ja siirtynyt maisteriohjelmaan seuraavana päivänä, ennen 21.6.2020 tehtyjä suorituksia ei huomioida opintopistekertymässä.
+  Opintopistekertymään on laskettu kaikki suoritukset, jotka opiskelija on suorittanut koulutusohjelmaan siirryttyään. Myös hyväksiluetut ja muuhun kuin valittuun koulutusohjelmaan tai opintosuuntaan tehdyt suoritukset lasketaan mukaan.
+
+  Maisteriohjelmien tilastoissa opiskelijat jaetaan kahteen ryhmään: niihin, joilla on oikeus suorittaa sekä kandidaatin että maisterin tutkinto (**Bachelor + master studyright**) ja niihin, joilla on oikeus suorittaa vain maisterin tutkinto (**Master studyright**). *Bachelor + master studyright* -tilastoissa aloitusvuosi on opiskelijan aloitusvuosi kandiohjelmassa, ja mukana ovat kaikki suoritukset, jotka opiskelija on suorittanut aloitettuaan kandiohjelmassa.
 
   Jos sivun yläosassa on valittuna ”All studyrights” (oletus), mukana ovat myös ohjelmaan siirtyneet ja ohjelmasta pois siirtyneet opiskelijat.
   `,

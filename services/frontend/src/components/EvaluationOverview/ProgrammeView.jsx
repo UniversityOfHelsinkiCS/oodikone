@@ -10,8 +10,7 @@ import { DataTable } from '@/components/StudyProgramme/BasicOverview/DataTable'
 import { StackedBarChart } from '@/components/StudyProgramme/BasicOverview/StackedBarChart'
 import { BreakdownBarChart } from '@/components/StudyProgramme/BreakdownBarChart'
 import { MedianTimeBarChart } from '@/components/StudyProgramme/MedianTimeBarChart'
-import { BarChart } from '@/components/StudyProgramme/StudytrackOverview/BarChart'
-import { BasicDataTable } from '@/components/StudyProgramme/StudytrackOverview/BasicDataTable'
+import { ProgressOfStudents } from '@/components/StudyProgramme/StudytrackOverview/ProgressOfStudents'
 import { Toggle } from '@/components/StudyProgramme/Toggle'
 import '@/components/StudyProgramme/studyprogramme.css'
 import { useGetEvaluationStatsQuery } from '@/redux/studyProgramme'
@@ -32,15 +31,25 @@ export const ProgrammeView = ({ studyprogramme }) => {
     graduated: grad,
   })
 
-  const {
-    tableStats,
-    chartStats,
-    tableTitles: creditTableTitles,
-  } = calculateStats(statistics?.data?.creditCounts, getTargetCreditsForProgramme(studyprogramme))
-  const creditTableStats = {}
-  creditTableStats[studyprogramme] = tableStats
-  const creditChartData = { creditGraphStats: {}, years: statistics?.data?.years }
-  creditChartData.creditGraphStats[studyprogramme] = chartStats
+  const progressStats = calculateStats(statistics?.data?.creditCounts, getTargetCreditsForProgramme(studyprogramme))
+  if (progressStats?.chartStats) {
+    progressStats.chartStats.forEach(creditCategory => {
+      const [total, ...years] = creditCategory.data
+      creditCategory.data = [total, ...years.reverse()]
+    })
+  }
+
+  const progressComboStats =
+    Object.keys(statistics?.data?.creditCountsCombo || {}).length > 0
+      ? calculateStats(statistics.data.creditCountsCombo, getTargetCreditsForProgramme(studyprogramme) + 180)
+      : null
+
+  if (progressComboStats?.chartStats) {
+    progressComboStats.chartStats.forEach(creditCategory => {
+      const [total, ...years] = creditCategory.data
+      creditCategory.data = [total, ...years.reverse()]
+    })
+  }
 
   const programmeName = statistics?.data?.programmeName && getTextIn(statistics?.data?.programmeName)
 
@@ -141,15 +150,12 @@ export const ProgrammeView = ({ studyprogramme }) => {
                 toolTips={studyProgrammeToolTips.GraduatedToggle}
                 value={graduated}
               />
-              <div className="section-container">
-                <BarChart cypress="StudytrackProgress" data={creditChartData} track={studyprogramme} />
-                <BasicDataTable
-                  cypress="StudytrackProgress"
-                  data={creditTableStats}
-                  titles={creditTableTitles}
-                  track={studyprogramme}
-                />
-              </div>
+              <ProgressOfStudents
+                progressComboStats={progressComboStats}
+                progressStats={progressStats}
+                track={studyprogramme}
+                years={statistics.data.years}
+              />
               {getDivider('Graduation times', 'AverageGraduationTimes')}
               <div className="toggle-container">
                 <Toggle

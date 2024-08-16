@@ -272,6 +272,7 @@ router.get('/:id/evaluationstats', async (req: GetEvaluationStatsRequest, res: R
     lastUpdated: gradData.lastUpdated,
     graduations: gradData,
     creditCounts: progressData?.creditCounts,
+    creditCountsCombo: progressData?.creditCountsCombo,
     years: progressData?.years,
   }
 

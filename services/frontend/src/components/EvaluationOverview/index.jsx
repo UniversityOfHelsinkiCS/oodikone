@@ -1,14 +1,16 @@
 import { Redirect, useParams } from 'react-router-dom'
 import { Segment } from 'semantic-ui-react'
 
+import { useTitle } from '@/common/hooks'
 import { FacultyView } from './FacultyView'
 import { ProgrammeView } from './ProgrammeView'
 import { UniversityView } from './UniversityView'
 
 export const EvaluationOverview = () => {
   const { id, level } = useParams()
+  useTitle('Evaluation overview')
 
-  if (!(level === 'programme' || level === 'faculty' || level === 'university') || (level !== 'university' && !id)) {
+  if (!['programme', 'faculty', 'university'].includes(level) || (level !== 'university' && !id)) {
     return <Redirect to="/" />
   }
 

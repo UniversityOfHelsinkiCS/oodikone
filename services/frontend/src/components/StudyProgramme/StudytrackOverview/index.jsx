@@ -10,8 +10,7 @@ import { MedianTimeBarChart } from '@/components/StudyProgramme/MedianTimeBarCha
 import { Toggle } from '@/components/StudyProgramme/Toggle'
 import '@/components/StudyProgramme/studyprogramme.css'
 import { useGetStudytrackStatsQuery } from '@/redux/studyProgramme'
-import { BarChart } from './BarChart'
-import { BasicDataTable } from './BasicDataTable'
+import { ProgressOfStudents } from './ProgressOfStudents'
 import { StudytrackDataTable } from './StudytrackDataTable'
 import { StudytrackSelector } from './StudytrackSelector'
 
@@ -65,22 +64,25 @@ export const StudytrackOverview = ({
 
   const programmeCode = combinedProgramme ? `${studyprogramme}-${combinedProgramme}` : studyprogramme
 
-  const {
-    tableStats,
-    chartStats,
-    tableTitles: creditTableTitles,
-  } = calculateStats(stats?.data?.creditCounts, getTargetCreditsForProgramme(programmeCode))
-  if (chartStats) {
-    chartStats.forEach(creditCategory => {
+  const progressStats = calculateStats(stats?.data?.creditCounts, getTargetCreditsForProgramme(programmeCode))
+  if (progressStats?.chartStats) {
+    progressStats.chartStats.forEach(creditCategory => {
       const [total, ...years] = creditCategory.data
       creditCategory.data = [total, ...years.reverse()]
     })
   }
 
-  const creditTableStats = {}
-  creditTableStats[studyprogramme] = tableStats
-  const creditChartData = { creditGraphStats: {}, years: stats?.data?.years }
-  creditChartData.creditGraphStats[studyprogramme] = chartStats
+  const progressComboStats =
+    Object.keys(stats?.data?.creditCountsCombo || {}).length > 0
+      ? calculateStats(stats.data.creditCountsCombo, getTargetCreditsForProgramme(programmeCode) + 180)
+      : null
+
+  if (progressComboStats?.chartStats) {
+    progressComboStats.chartStats.forEach(creditCategory => {
+      const [total, ...years] = creditCategory.data
+      creditCategory.data = [total, ...years.reverse()]
+    })
+  }
 
   return (
     <div className="studytrack-overview">
@@ -130,15 +132,12 @@ export const StudytrackOverview = ({
           {track === '' || track === studyprogramme ? (
             <>
               {getDivider('Progress of students of the studyprogramme by starting year', 'StudytrackProgress')}
-              <div style={{ marginBottom: '5em' }}>
-                <BarChart cypress="StudytrackProgress" data={creditChartData} track={track || studyprogramme} />
-                <BasicDataTable
-                  cypress="StudytrackProgress"
-                  data={creditTableStats}
-                  titles={creditTableTitles}
-                  track={track || studyprogramme}
-                />
-              </div>
+              <ProgressOfStudents
+                progressComboStats={progressComboStats}
+                progressStats={progressStats}
+                track={track || studyprogramme}
+                years={stats?.data?.years}
+              />
             </>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

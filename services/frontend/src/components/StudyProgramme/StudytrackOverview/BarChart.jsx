@@ -9,7 +9,7 @@ exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
 accessibility(ReactHighcharts.Highcharts)
 
-export const BarChart = ({ cypress, data, track }) => {
+export const BarChart = ({ data, track }) => {
   if (!data || !data.creditGraphStats || !data.creditGraphStats[track]) return null
   const correctData = data.creditGraphStats[track]
   const colors = generateGradientColors(correctData.length)
@@ -47,9 +47,5 @@ export const BarChart = ({ cypress, data, track }) => {
     },
   }
 
-  return (
-    <div className="graph-container" data-cy={`Graph-${cypress}`}>
-      <ReactHighcharts config={config} />
-    </div>
-  )
+  return <ReactHighcharts config={config} />
 }
