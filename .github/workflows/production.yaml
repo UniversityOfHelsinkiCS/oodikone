@@ -26,7 +26,7 @@ jobs:
         with:
           image: oodikone-frontend
           tags: production ${{ github.sha }}
-          context: services/frontend
+          context: services
           containerfiles: |
             services/frontend/Dockerfile
           build-args: |
@@ -61,7 +61,7 @@ jobs:
         with:
           image: oodikone-backend
           tags: production ${{ github.sha }}
-          context: services/backend
+          context: services
           containerfiles: |
             services/backend/Dockerfile
           build-args: |
