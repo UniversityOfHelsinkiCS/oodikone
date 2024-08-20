@@ -1,0 +1,23 @@
+name: 'Lint code'
+
+on:
+  workflow_call:
+    inputs: {}
+
+jobs:
+  lint_backend_and_frontend:
+    name: 'Lint backend and frontend'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: 'Install dependencies'
+        run: npm ci && cd services/frontend && npm ci && cd ../backend && npm ci
+      - name: 'Create symlink for shared'
+        run: ln -s $PWD/services/shared $PWD/services/backend/src/shared && ln -s $PWD/services/shared $PWD/services/frontend/src/shared
+      - name: 'Run Stylelint for CSS files'
+        run: npm run stylelint "services/frontend/src/**/*.css"
+      - name: 'Run ESLint for JS files'
+        run: npm run eslint -- --ext .jsx,.js services --report-unused-disable-directives
