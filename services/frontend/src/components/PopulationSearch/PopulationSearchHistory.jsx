@@ -7,7 +7,7 @@ import { useHistory } from 'react-router-dom'
 import { Button, Form } from 'semantic-ui-react'
 
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
-import { InfoBox } from '@/components/Info/InfoBox'
+import { InfoBox } from '@/components/InfoBox'
 import { PopulationQueryCard } from '@/components/PopulationQueryCard'
 import { FilterActiveNote } from './FilterActiveNote'
 import './populationSearch.css'

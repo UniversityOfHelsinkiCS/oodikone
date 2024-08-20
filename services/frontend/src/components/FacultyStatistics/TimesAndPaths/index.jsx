@@ -4,7 +4,7 @@ import { utils, writeFile } from 'xlsx'
 
 import { facultyToolTips } from '@/common/InfoToolTips'
 import '@/components/FacultyStatistics/faculty.css'
-import { InfoBox } from '@/components/Info/InfoBox'
+import { InfoBox } from '@/components/InfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Toggle } from '@/components/StudyProgramme/Toggle'
 import { useGetFacultyGraduationTimesQuery } from '@/redux/facultyStats'

@@ -19,7 +19,7 @@ import {
   tagsFilter,
   transferredToProgrammeFilter,
 } from '@/components/FilterView/filters'
-import { InfoBox } from '@/components/Info/InfoBox'
+import { InfoBox } from '@/components/InfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
 import { PopulationStudentsContainer as PopulationStudents } from '@/components/PopulationStudents'

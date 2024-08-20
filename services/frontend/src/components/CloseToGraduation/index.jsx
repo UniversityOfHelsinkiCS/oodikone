@@ -6,7 +6,7 @@ import { createLocaleComparator, getCurrentSemester, getEnrollmentTypeTextForExc
 import { useTitle } from '@/common/hooks'
 import { closeToGraduationToolTips } from '@/common/InfoToolTips'
 import { StudentInfoItem } from '@/components/common/StudentInfoItem'
-import { InfoBox } from '@/components/Info/InfoBox'
+import { InfoBox } from '@/components/InfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { getSemestersPresentFunctions } from '@/components/PopulationStudents/StudentTable/GeneralTab/columnHelpers/semestersPresent'
 import { PaginatedSortableTable } from '@/components/SortableTable/PaginatedSortableTable'

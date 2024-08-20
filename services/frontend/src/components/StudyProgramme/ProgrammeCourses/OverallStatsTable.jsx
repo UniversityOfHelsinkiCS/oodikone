@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { Header, Item, Icon, Loader, Segment } from 'semantic-ui-react'
 
 import { studyProgrammeToolTips } from '@/common/InfoToolTips'
-import { InfoBox } from '@/components/Info/InfoBox'
+import { InfoBox } from '@/components/InfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SortableTable } from '@/components/SortableTable'
 import { Toggle } from '@/components/StudyProgramme/Toggle'

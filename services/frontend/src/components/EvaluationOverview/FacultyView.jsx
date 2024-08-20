@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Divider, Header, Loader, Message } from 'semantic-ui-react'
 
 import { facultyToolTips } from '@/common/InfoToolTips'
-import { InfoBox } from '@/components/Info/InfoBox'
+import { InfoBox } from '@/components/InfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Toggle } from '@/components/StudyProgramme/Toggle'
 import {
