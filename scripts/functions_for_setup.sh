@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-# This file includes functions that are used to setup oodikone. File doesn't run anything
-# by itself and should be sourced from other script.
+# This file includes functions that are used to setup Oodikone
+# File doesn't run anything by itself and should be sourced from other scripts
 
 # === Config ===
 
@@ -228,7 +228,7 @@ linting and formatting"
   infomsg "Building images"
   "$PROJECT_ROOT"/run.sh both anon build
 
-  successmsg "Setup ready, oodikone can be started! See README for more info."
+  successmsg "Setup ready, Oodikone can be started! See README for more info."
 }
 
 docker_prune() {

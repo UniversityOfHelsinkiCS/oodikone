@@ -48,12 +48,12 @@ set_custom_select_prompt() {
   PS3="Please enter your choice: "
 
   options=(
-    "Set up oodikone from scratch."
-    "Reset all real data."
-    "Reset single database."
+    "Set up Oodikone from scratch"
+    "Reset all real data"
+    "Reset single database"
     "Restore data from dumps"
     "Docker system prune"
-    "Quit."
+    "Quit"
   )
 }
 
@@ -66,11 +66,11 @@ set_custom_select_prompt
 while true; do
   select opt in "${options[@]}"; do
     case $opt in
-      "Set up oodikone from scratch.")
+      "Set up Oodikone from scratch")
         set_up_oodikone_from_scratch;;
-      "Reset all real data.")
+      "Reset all real data")
         reset_all_real_data;;
-      "Reset single database.")
+      "Reset single database")
         reset_single_database
         set_custom_select_prompt # Set prompt back to initial values
         ;;
@@ -78,7 +78,7 @@ while true; do
       restore_data_from_dumps;;
       "Docker system prune")
         docker_prune;;
-      "Quit.")
+      "Quit")
         break 2;;
       *) msg "${RED}Invalid option:${NOFORMAT} $REPLY
 ";;

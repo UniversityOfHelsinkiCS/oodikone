@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# This file includes some utility functions that are used in oodikone scripts.
+# This file includes some utility functions that are used in Oodikone scripts
 # Functions are based on https://betterdev.blog/minimal-safe-bash-script-template/
 
 # Print messages and logs that are not script output to stderr
@@ -27,7 +27,7 @@ warningmsg() {
 }
 
 # Quit and exit with given message and error code
-# By default uses exit code 1, message must be given.
+# By default uses exit code 1, message must be given
 die() {
   local msg=$1
   local code=${2-1}
