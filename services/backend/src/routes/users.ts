@@ -4,6 +4,8 @@ import { roles } from '../config/roles'
 import * as auth from '../middleware/auth'
 import { sendNotificationAboutAccessToUser, previewNotificationAboutAccessToUser } from '../services/mailService'
 import * as userService from '../services/userService'
+import { LANGUAGE_CODES } from '../shared/language'
+import { Language } from '../types'
 import logger from '../util/logger'
 
 const router = Router()
@@ -101,7 +103,7 @@ router.delete('/:uid/elements', auth.roles(['admin']), async (req: ElementsReque
 
 interface ChangeLanguageRequest extends Request {
   body: {
-    language: string
+    language: Language
   }
 }
 
@@ -109,7 +111,7 @@ router.post('/language', async (req: ChangeLanguageRequest, res: Response) => {
   const {
     body: { language },
   } = req
-  if (!['fi', 'sv', 'en'].includes(language)) {
+  if (!LANGUAGE_CODES.includes(language)) {
     return res.status(400).json('Invalid language')
   }
   try {

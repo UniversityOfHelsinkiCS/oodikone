@@ -1,8 +1,8 @@
 import { createContext, useState, useCallback, useContext, useEffect } from 'react'
 
-import { DEFAULT_LANG, LANGUAGE_CODES } from '@/constants'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useModifyLanguageMutation } from '@/redux/users'
+import { DEFAULT_LANG, LANGUAGE_CODES } from '@/shared/language'
 
 const LanguageContext = createContext([[], () => {}])
 LanguageContext.displayName = 'Language'

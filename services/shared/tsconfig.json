@@ -19,5 +19,5 @@
     "inlineSources": true,
     "resolveJsonModule": true
   },
-  "include": ["util/**/*", "index.ts"]
+  "include": ["**/*.ts"]
 }

@@ -1,6 +1,6 @@
 import { Dropdown } from 'semantic-ui-react'
 
-import { LANGUAGE_CODES } from '@/constants'
+import { LANGUAGE_CODES } from '@/shared/language'
 import { useLanguage } from './useLanguage'
 
 export const LanguagePicker = () => {
