@@ -11,7 +11,7 @@ import {
 } from '../studyProgramme/studyTrackStats'
 import type { ProgrammesOfOrganization } from './faculty'
 
-type LevelGraduationStats = Omit<GraduationTimes['medians'][number], 'y'> & { median: number }
+export type LevelGraduationStats = Omit<GraduationTimes['medians'][number], 'y'> & { median: number }
 
 type ProgrammeStats = {
   data: Array<Omit<LevelGraduationStats, 'times'> & { code: string }>
