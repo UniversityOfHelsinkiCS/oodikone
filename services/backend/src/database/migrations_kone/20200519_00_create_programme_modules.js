@@ -1,7 +1,7 @@
 const { STRING, DATE, JSONB } = require('sequelize')
 
 module.exports = {
-  up: async queryInterface => {
+  up: async ({ context: queryInterface }) => {
     await queryInterface.createTable('programme_modules', {
       id: {
         primaryKey: true,

@@ -4,7 +4,7 @@ const { INTEGER } = require('sequelize')
 // this has to be done
 
 module.exports = {
-  up: async queryInterface => {
+  up: async ({ context: queryInterface }) => {
     await queryInterface.addColumn('programme_modules', 'order', {
       type: INTEGER,
     })

@@ -1,5 +1,5 @@
 module.exports = {
-  up: async queryInterface => {
+  up: async ({ context: queryInterface }) => {
     await queryInterface.sequelize.query('DROP SEQUENCE "mandatory_courses_id_seq"')
     await queryInterface.sequelize.query('DROP SEQUENCE "mandatory_course_labels_id_seq"')
   },

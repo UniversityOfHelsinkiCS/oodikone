@@ -1,5 +1,5 @@
 module.exports = {
-  up: async queryInterface =>
+  up: async ({ context: queryInterface }) =>
     queryInterface.sequelize.query(
       `
 --

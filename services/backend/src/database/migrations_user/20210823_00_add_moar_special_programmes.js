@@ -1,5 +1,5 @@
 module.exports = {
-  up: async queryInterface =>
+  up: async ({ context: queryInterface }) =>
     queryInterface.sequelize.query(`
     --- Some kasvis special programmes
     INSERT INTO faculty_programmes VALUES ('H60', 'ED400', 'NOW()', 'NOW()');

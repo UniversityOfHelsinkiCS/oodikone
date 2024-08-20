@@ -1,10 +1,12 @@
+const { Op } = require('sequelize')
+
 module.exports = {
-  up: (queryInterface, Sequelize) => {
-    const Op = Sequelize.Op
+  up: ({ context: queryInterface }) => {
     return queryInterface.bulkDelete('access_groups', [
       {
         group_code: { [Op.in]: ['usage', 'coursegroups'] },
       },
     ])
   },
+  down: async () => {},
 }

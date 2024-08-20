@@ -1,5 +1,5 @@
 module.exports = {
-  up: async queryInterface => {
+  up: async ({ context: queryInterface }) => {
     await queryInterface.dropTable('access_groups')
   },
   down: async () => {},

@@ -1,7 +1,7 @@
 const { ARRAY, STRING } = require('sequelize')
 
 module.exports = {
-  up: async queryInterface => {
+  up: async ({ context: queryInterface }) => {
     await queryInterface.addColumn('users', 'roles', {
       type: ARRAY(STRING),
       allowNull: false,
@@ -34,7 +34,7 @@ module.exports = {
       WHERE users.id = subquery."userId"
     `)
   },
-  down: async queryInterface => {
+  down: async ({ context: queryInterface }) => {
     await queryInterface.removeColumn('users', 'roles')
     await queryInterface.removeColumn('users', 'programme_rights')
   },

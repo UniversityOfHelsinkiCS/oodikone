@@ -1,7 +1,9 @@
+const { BIGINT } = require('sequelize')
+
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
+  up: async ({ context: queryInterface }) => {
     await queryInterface.addColumn('tag', 'personal_user_id', {
-      type: Sequelize.BIGINT,
+      type: BIGINT,
     })
   },
   down: async () => {},

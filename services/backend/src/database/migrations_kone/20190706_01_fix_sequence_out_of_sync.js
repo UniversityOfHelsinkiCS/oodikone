@@ -1,5 +1,5 @@
 module.exports = {
-  up: async queryInterface => {
+  up: async ({ context: queryInterface }) => {
     return queryInterface.sequelize.transaction(async transaction => {
       await queryInterface.sequelize.query(
         "SELECT setval('mandatory_courses_id_seq', (SELECT MAX(id) FROM mandatory_courses))",

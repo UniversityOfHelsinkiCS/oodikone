@@ -1,7 +1,7 @@
 const { BIGINT, STRING, DATE, ARRAY } = require('sequelize')
 
 module.exports = {
-  up: async queryInterface => {
+  up: async ({ context: queryInterface }) => {
     await queryInterface.createTable('open_uni_population_searches', {
       id: {
         type: BIGINT,

@@ -1,5 +1,5 @@
 module.exports = {
-  up: async queryInterface => {
+  up: async ({ context: queryInterface }) => {
     return queryInterface.bulkDelete('access_groups', {
       group_code: 'oodilearn',
     })

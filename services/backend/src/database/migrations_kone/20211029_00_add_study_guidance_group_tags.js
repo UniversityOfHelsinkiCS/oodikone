@@ -1,7 +1,7 @@
 const { BIGINT, STRING, DATE } = require('sequelize')
 
 module.exports = {
-  up: async queryInterface => {
+  up: async ({ context: queryInterface }) => {
     await queryInterface.createTable(
       'study_guidance_group_tags',
       {

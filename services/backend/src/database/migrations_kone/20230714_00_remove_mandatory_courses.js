@@ -1,5 +1,5 @@
 module.exports = {
-  up: async queryInterface => {
+  up: async ({ context: queryInterface }) => {
     await queryInterface.dropTable('mandatory_courses')
     await queryInterface.dropTable('mandatory_course_labels')
   },

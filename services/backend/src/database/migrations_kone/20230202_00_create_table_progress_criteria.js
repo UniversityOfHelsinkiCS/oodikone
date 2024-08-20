@@ -1,7 +1,7 @@
 const { INTEGER, STRING, ARRAY, DATE } = require('sequelize')
 
 module.exports = {
-  up: async queryInterface => {
+  up: async ({ context: queryInterface }) => {
     await queryInterface.createTable('progress_criteria', {
       code: {
         type: STRING,

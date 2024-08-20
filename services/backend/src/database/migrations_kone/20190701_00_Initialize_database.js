@@ -1,5 +1,5 @@
 module.exports = {
-  up: async queryInterface => {
+  up: async ({ context: queryInterface }) => {
     await queryInterface.sequelize.query(`
 -- Adminer 4.6.2 PostgreSQL dump
 

@@ -1,6 +1,6 @@
 import EventEmitter from 'events'
 import { Sequelize } from 'sequelize-typescript'
-import Umzug from 'umzug'
+import { SequelizeStorage, Umzug } from 'umzug'
 
 import conf from '../config'
 import {
@@ -162,21 +162,16 @@ const initializeDatabaseConnection = async () => {
     const schema = dbName === 'kone-db' ? conf.DB_SCHEMA_KONE : undefined
     const migrationsFolder = dbName === 'kone-db' ? 'migrations_kone' : 'migrations_user'
     const migrator = new Umzug({
-      storage: 'sequelize',
-      storageOptions: {
-        sequelize: seq,
-        tableName: 'migrations',
-        schema,
-      },
+      storage: new SequelizeStorage({ sequelize: seq, tableName: 'migrations', schema }),
       migrations: {
-        params: [seq.getQueryInterface(), Sequelize],
-        path: `${process.cwd()}${conf.isProduction || conf.isStaging ? '/dist' : ''}/src/database/${migrationsFolder}`,
-        pattern: /\.js$/,
+        glob: `${process.cwd()}${conf.isProduction || conf.isStaging ? '/dist' : ''}/src/database/${migrationsFolder}/*.js`,
       },
+      context: seq.getQueryInterface(),
+      logger: console,
     })
     try {
-      const migrations = await migrator.up()
-      logger.info({ message: `${dbName} migrations up to date: `, meta: migrations.map(migration => migration.file) })
+      await migrator.up()
+      logger.info({ message: `${dbName} migrations up to date` })
     } catch (error) {
       logger.error({ message: `${dbName} migrations failed`, meta: error })
       throw error

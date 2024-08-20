@@ -1,5 +1,5 @@
 module.exports = {
-  up: queryInterface => {
+  up: ({ context: queryInterface }) => {
     return queryInterface.bulkDelete('access_groups', [
       {
         group_code: 'faculties',

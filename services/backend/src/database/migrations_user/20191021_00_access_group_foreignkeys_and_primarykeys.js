@@ -1,5 +1,5 @@
 module.exports = {
-  up: async queryInterface => {
+  up: async ({ context: queryInterface }) => {
     return queryInterface.sequelize.transaction(async transaction => {
       await queryInterface.sequelize.query(
         'ALTER TABLE user_accessgroup DROP CONSTRAINT IF EXISTS "user_accessgroup_accessGroupId_fkey"',

@@ -1,22 +1,24 @@
+const { ARRAY, STRING, INTEGER } = require('sequelize')
+
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
+  up: async ({ context: queryInterface }) => {
     await queryInterface.addColumn('progress_criteria', 'courses_year_four', {
-      type: Sequelize.ARRAY(Sequelize.STRING),
+      type: ARRAY(STRING),
     })
     await queryInterface.addColumn('progress_criteria', 'courses_year_five', {
-      type: Sequelize.ARRAY(Sequelize.STRING),
+      type: ARRAY(STRING),
     })
     await queryInterface.addColumn('progress_criteria', 'courses_year_six', {
-      type: Sequelize.ARRAY(Sequelize.STRING),
+      type: ARRAY(STRING),
     })
     await queryInterface.addColumn('progress_criteria', 'credits_year_four', {
-      type: Sequelize.INTEGER,
+      type: INTEGER,
     })
     await queryInterface.addColumn('progress_criteria', 'credits_year_five', {
-      type: Sequelize.INTEGER,
+      type: INTEGER,
     })
     await queryInterface.addColumn('progress_criteria', 'credits_year_six', {
-      type: Sequelize.INTEGER,
+      type: INTEGER,
     })
   },
   down: async () => {},

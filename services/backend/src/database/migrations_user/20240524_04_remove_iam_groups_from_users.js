@@ -1,5 +1,5 @@
 module.exports = {
-  up: async queryInterface => {
+  up: async ({ context: queryInterface }) => {
     await queryInterface.removeColumn('users', 'iam_groups')
   },
   down: async () => {},

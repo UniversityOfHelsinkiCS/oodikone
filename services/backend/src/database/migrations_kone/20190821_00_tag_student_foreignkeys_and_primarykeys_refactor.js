@@ -1,5 +1,5 @@
 module.exports = {
-  up: async queryInterface => {
+  up: async ({ context: queryInterface }) => {
     return queryInterface.sequelize.transaction(async transaction => {
       await queryInterface.removeConstraint('tag_student', 'tag_student_tag_id_fkey', { transaction })
       await queryInterface.sequelize.query('DELETE FROM tag_student WHERE tag_id IS NULL', { transaction })
