@@ -46,6 +46,7 @@ services:
     volumes:
       - backend-nodemod:/opt/app-root/src/node_modules
       - ./services/backend/:/opt/app-root/src
+      - ./services/shared/:/opt/app-root/src/src/shared
 
   frontend:
     <<: *defaults
@@ -60,6 +61,7 @@ services:
     volumes:
       - frontend-nodemod:/opt/app-root/src/node_modules
       - ./services/frontend/:/opt/app-root/src
+      - ./services/shared/:/opt/app-root/src/src/shared
 
   kone-db:
     <<: *defaults
