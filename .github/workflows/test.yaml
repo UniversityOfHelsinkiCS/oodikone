@@ -13,6 +13,7 @@ on:
 jobs:
   # === Static tests / linting ===
   lint_backend_and_frontend:
+    name: 'Lint backend and frontend'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
