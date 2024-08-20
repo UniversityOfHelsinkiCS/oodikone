@@ -1,0 +1,17 @@
+name: 'Lint code'
+description: 'Runs ESLint and Stylelint for frontend and backend'
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+    - name: 'Install dependencies'
+      run: npm ci && cd services/frontend && npm ci && cd ../backend && npm ci
+    - name: 'Create symlink for shared'
+      run: ln -s $PWD/services/shared $PWD/services/backend/src/shared && ln -s $PWD/services/shared $PWD/services/frontend/src/shared
+    - name: 'Run Stylelint for CSS files'
+      run: npm run stylelint "services/frontend/src/**/*.css"
+    - name: 'Run ESLint for JS and TS files'
+      run: npm run eslint -- --ext .js,.jsx,.ts,.tsx services --report-unused-disable-directives

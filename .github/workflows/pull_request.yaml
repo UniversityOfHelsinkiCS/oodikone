@@ -14,7 +14,11 @@ on:
 
 jobs:
   lint_backend_and_frontend:
-    uses: ./.github/workflows/lint.yaml
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lint backend and frontend
+        uses: ./.github/actions/lint
 
   test_end_to_end:
     runs-on: ubuntu-latest

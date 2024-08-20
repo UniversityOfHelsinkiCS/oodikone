@@ -13,7 +13,11 @@ on:
 jobs:
   # === Static tests / linting ===
   lint_backend_and_frontend:
-    uses: ./.github/workflows/lint.yaml
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lint backend and frontend
+        uses: ./.github/actions/lint
 
   # === Build database images ===
   build_backend:
