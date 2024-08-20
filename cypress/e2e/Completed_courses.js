@@ -1,4 +1,4 @@
-/// <reference types="Cypress" />
+/// <reference types="cypress" />
 
 const openCompletedCoursesModal = () => {
   cy.get('button').contains('Search completed courses of students').click()

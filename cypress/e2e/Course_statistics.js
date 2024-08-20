@@ -1,4 +1,4 @@
-/// <reference types="Cypress" />
+/// <reference types="cypress" />
 
 const checkGradeTable = gradesTableContents => {
   cy.get('[data-cy="Grade distribution"]')

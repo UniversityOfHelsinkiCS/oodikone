@@ -1,4 +1,4 @@
-/// <reference types="Cypress" />
+/// <reference types="cypress" />
 
 const deleteAllSearches = () => {
   cy.contains('Saved populations')

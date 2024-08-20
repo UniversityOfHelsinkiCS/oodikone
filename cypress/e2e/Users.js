@@ -1,4 +1,4 @@
-/// <reference types="Cypress" />
+/// <reference types="cypress" />
 
 describe('Users tests', () => {
   describe('Using user with just grp-oodikone-user, no other rights', () => {

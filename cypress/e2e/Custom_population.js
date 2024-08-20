@@ -1,4 +1,4 @@
-/// <reference types="Cypress" />
+/// <reference types="cypress" />
 
 const openCustomPopupForm = () => {
   cy.get('[data-cy="custom-pop-search-button"]').click()

@@ -1,4 +1,4 @@
-/// <reference types="Cypress" />
+/// <reference types="cypress" />
 // Now "Class statistics" in UI
 
 describe('Population Statistics tests', () => {

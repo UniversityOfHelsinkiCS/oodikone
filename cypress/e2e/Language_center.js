@@ -1,4 +1,4 @@
-/// <reference types="Cypress" />
+/// <reference types="cypress" />
 
 const hasLanded = () => {
   cy.contains('This view displays amounts')

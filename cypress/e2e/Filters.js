@@ -1,4 +1,4 @@
-/// <reference types="Cypress" />
+/// <reference types="cypress" />
 
 const MOCKED_DATE = new Date(2022, 6, 12).getTime()
 

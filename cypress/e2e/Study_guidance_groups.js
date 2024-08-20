@@ -1,4 +1,4 @@
-/// <reference types="Cypress" />
+/// <reference types="cypress" />
 
 describe('Study guidance group tests', () => {
   describe('Study guidance group overview page', () => {
