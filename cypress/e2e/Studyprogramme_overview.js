@@ -1,25 +1,12 @@
-/// <reference types="Cypress" />
+/// <reference types="cypress" />
+
+const { getEmptyYears } = require('../support/commands')
 
 const deleteTag = name => {
   cy.contains('td', name).siblings().contains('Delete').click()
   cy.contains('Are you sure you want to delete tag')
   cy.contains('Confirm').click()
   cy.contains('td', name).should('not.exist')
-}
-
-const getEmptyYears = isAcademicYear => {
-  const today = new Date()
-  const latestYear = isAcademicYear && today.getMonth() < 7 ? today.getFullYear() - 1 : today.getFullYear()
-
-  const years = []
-  for (let year = latestYear; year > 2021; year--) {
-    if (isAcademicYear) {
-      years.push(`${year} - ${year + 1}`)
-    } else {
-      years.push(year)
-    }
-  }
-  return years
 }
 
 describe('Studyprogramme overview', () => {

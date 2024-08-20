@@ -1,4 +1,4 @@
-/// <reference types="Cypress" />
+/// <reference types="cypress" />
 //
 // ! IMPORTANT: here we need to set keys to be all lowercase, since
 // ! we're replacing headers after they've left browser / frontend.
@@ -142,6 +142,7 @@ Cypress.Commands.add('checkTableStats', (correctStats, tableName) => {
   cy.get(`[data-cy=Table-${tableName}] tbody`).within(() => {
     correctStats.forEach((values, trIndex) => {
       cy.get('tr')
+        .filter(':visible')
         .eq(trIndex)
         .within(() => {
           values.forEach((value, tdIndex) => {
@@ -149,6 +150,25 @@ Cypress.Commands.add('checkTableStats', (correctStats, tableName) => {
           })
         })
     })
-    cy.get('tr').should('have.length', correctStats.length)
+    cy.get('tr').filter(':visible').should('have.length', correctStats.length)
   })
 })
+
+const getEmptyYears = isAcademicYear => {
+  const today = new Date()
+  const latestYear = isAcademicYear && today.getMonth() < 7 ? today.getFullYear() - 1 : today.getFullYear()
+
+  const years = []
+  for (let year = latestYear; year > 2021; year--) {
+    if (isAcademicYear) {
+      years.push(`${year} - ${year + 1}`)
+    } else {
+      years.push(year)
+    }
+  }
+  return years
+}
+
+module.exports = {
+  getEmptyYears,
+}
