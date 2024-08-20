@@ -228,6 +228,12 @@ linting and formatting"
   infomsg "Building images"
   "$PROJECT_ROOT"/run.sh both anon build
 
+  infomsg "Linking shared to backend"
+  ln -s "$PROJECT_ROOT"/services/shared "$PROJECT_ROOT"/services/backend/src/shared
+
+  infomsg "Linking shared to frontend"
+  ln -s "$PROJECT_ROOT"/services/shared "$PROJECT_ROOT"/services/frontend/src/shared
+
   successmsg "Setup ready, Oodikone can be started! See README for more info."
 }
 
