@@ -50,6 +50,7 @@ services:
     volumes:
       - ./environments/ha:/opt/app-root/src/src/environment
       - ./services/backend/src:/opt/app-root/src/src
+      - ./services/shared/:/opt/app-root/src/src/shared
 
   frontend:
     <<: *defaults
@@ -63,6 +64,7 @@ services:
       REACT_APP_SERVICE_PROVIDER: fd
     volumes:
       - ./services/frontend/src/:/opt/app-root/src/src
+      - ./services/shared/:/opt/app-root/src/src/shared
 
   kone-db:
     <<: *defaults

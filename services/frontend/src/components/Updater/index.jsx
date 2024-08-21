@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown'
 import { Button, Form, Header, Message, Radio, Segment, Table, TextArea } from 'semantic-ui-react'
 
 import { callApi } from '@/apiConnection'
+import { isDefaultServiceProvider } from '@/common'
 import { useTitle } from '@/common/hooks'
 
 export const Updater = () => {
@@ -121,7 +122,7 @@ export const Updater = () => {
           <Form.Button content="Refresh oodikone statistics" onClick={refreshStatisticsV2} />
           <Form.Button content="Refresh faculties" onClick={refreshFaculties} />
           <Form.Button content="Refresh study programmes" onClick={refreshStudyProgrammes} />
-          <Form.Button content="Refresh language center data" onClick={refreshLanguageCenterData} />
+          { isDefaultServiceProvider() && <Form.Button content="Refresh language center data" onClick={refreshLanguageCenterData} /> }
           <Form.Button content="Refresh close to graduation data" onClick={refreshCloseToGraduationData} />
         </Form.Group>
       </Form>
