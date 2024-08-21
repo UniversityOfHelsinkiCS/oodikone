@@ -40,15 +40,6 @@ export const ageFilter = createFilter({
 
   isActive: ({ min, max }) => min !== null || max !== null,
 
-  precompute: ({ students }) => {
-    const ages = students.map(student => getAge(student.birthdate)).filter(age => !Number.isNaN(age))
-
-    return {
-      min: min(ages),
-      max: max(ages),
-    }
-  },
-
   filter: (student, { min, max }) => {
     const age = getAge(student.birthdate)
 
@@ -63,5 +54,8 @@ export const ageFilter = createFilter({
     return true
   },
 
-  render: (props, { precomputed }) => <AgeFilterCard {...props} bounds={precomputed} />,
+  render: props => {
+    const ages = props.withoutSelf().map(student => getAge(student.birthdate))
+    return <AgeFilterCard {...props} bounds={{ min: min(ages), max: max(ages) }} />
+  },
 })

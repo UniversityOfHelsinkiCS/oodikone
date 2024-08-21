@@ -2,15 +2,9 @@ import moment from 'moment'
 
 import { ISO_DATE_FORMAT } from '@/constants/date'
 
-export const getAge = (date: string) => {
-  const today = new Date()
-  const birthDate = new Date(date)
-  let age = today.getFullYear() - birthDate.getFullYear()
-  const monthDifference = today.getMonth() - birthDate.getMonth()
-  if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
-    age--
-  }
-  return age
+export const getAge = (birthDate: string, integer = true, dateToCompare = moment()) => {
+  const age = dateToCompare.diff(moment(birthDate), 'years', true)
+  return integer ? Math.floor(age) : age
 }
 
 export const getTimestamp = () => moment().format(ISO_DATE_FORMAT)

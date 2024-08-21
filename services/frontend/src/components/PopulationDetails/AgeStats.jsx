@@ -1,30 +1,13 @@
+import { mean, groupBy } from 'lodash'
+import moment from 'moment'
 import { arrayOf, object, shape } from 'prop-types'
 import { Fragment, useState } from 'react'
-import { Icon, Progress, Radio, Table } from 'semantic-ui-react'
+import { Icon, Radio, Table } from 'semantic-ui-react'
 
 import { getFullStudyProgrammeRights } from '@/common'
+import { ProgressBarWithLabel } from '@/components/common/ProgressBarWithLabel'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { getAge } from '@/util/timeAndDate'
-
-const getAverageAge = ages => {
-  if (ages.length === 0) return 0
-  return (ages.reduce((total, age) => total + age, 0) / ages.length).toFixed(1)
-}
-
-const getAgeGroup = age => Math.floor(age / 5) * 5
-
-const separateAgesReducer = (counts, age) => {
-  const newCount = counts[age] ? ++counts[age] : 1
-  counts[age] = newCount
-  return counts
-}
-
-const groupedAgesReducer = (counts, age) => {
-  const ageGroup = getAgeGroup(age)
-  const newCount = counts[ageGroup] ? ++counts[ageGroup] : 1
-  counts[ageGroup] = newCount
-  return counts
-}
 
 export const AgeStats = ({ filteredStudents, query }) => {
   const [isGrouped, setIsGrouped] = useState(true)
@@ -32,17 +15,21 @@ export const AgeStats = ({ filteredStudents, query }) => {
   const { fullAccessToStudentData, programmeRights } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const onlyIamRights = !fullAccessToStudentData && fullStudyProgrammeRights.length === 0
-  const studentsAges = filteredStudents.map(student => getAge(student.birthdate)).sort((a, b) => b - a)
+
+  const currentAges = filteredStudents.reduce((ages, student) => {
+    ages.push(getAge(student.birthdate, false))
+    return ages
+  }, [])
 
   const getAges = grouped =>
-    Object.entries(studentsAges.reduce(grouped ? groupedAgesReducer : separateAgesReducer, {}))
+    Object.entries(groupBy(currentAges, age => (grouped ? Math.floor(age / 5) * 5 : Math.floor(age))))
+      .map(([age, arrayOfAges]) => [age, arrayOfAges.length])
       .sort((a, b) => Number(b[0]) - Number(a[0]))
-      .map(([key, value]) => [key, value])
 
   const getAgeCellContent = age => {
     if (!isGrouped) return age
-    if (age === '15') return '<20'
-    return `${age} - ${Number(age) + 4}`
+    if (age === '15') return '< 20'
+    return `${age}–${Number(age) + 4}`
   }
 
   const handleGroupExpand = index => {
@@ -53,102 +40,85 @@ export const AgeStats = ({ filteredStudents, query }) => {
     }
   }
 
-  const getActualStartDate = student => {
-    const actualStudyStartDate = student.studyrights.reduce((startdate, studyright) => {
-      if (startdate) return startdate
-      if (!studyright.studyright_elements.some(element => element.code === query.studyRights.programme)) {
-        return startdate
+  const averageAgeAtStudiesStart = mean(
+    filteredStudents.reduce((ages, student) => {
+      const studyRight = student.studyRights.find(sr =>
+        sr.studyRightElements.some(el => el.code === query.studyRights.programme)
+      )
+      if (studyRight) {
+        const startDateInProgramme = studyRight.studyRightElements.find(
+          el => el.code === query.studyRights.programme
+        ).startDate
+        ages.push(getAge(student.birthdate, false, moment(startDateInProgramme)))
       }
-      return new Date(studyright.startdate).getTime() > new Date(studyright.studystartdate).getTime()
-        ? studyright.startdate
-        : studyright.studystartdate
-    }, null)
-    return new Date(actualStudyStartDate)
-  }
+      return ages
+    }, [])
+  ).toFixed(1)
 
-  const getAverageAtStudiesStart = () => {
-    return getAverageAge(
-      filteredStudents.reduce((ages, student) => {
-        const timeSinceStudiesStart = new Date().getTime() - getActualStartDate(student).getTime()
-        const ageAtStudiestStart = getAge(new Date(student.birthdate).getTime() + timeSinceStudiesStart)
-        ages.push(Number(ageAtStudiestStart))
-        return ages
-      }, [])
-    )
-  }
+  const currentAverageAge = mean(currentAges).toFixed(1)
 
   return (
     <div>
-      {!onlyIamRights && (
-        <div style={{ marginTop: 15, marginBottom: 10 }}>
-          <Radio checked={isGrouped} label="Group ages" onChange={() => setIsGrouped(!isGrouped)} toggle />
-        </div>
-      )}
-      <div>
-        Average:{' '}
-        {getAverageAge(getAges(false).flatMap(([age, count]) => Array.from({ length: count }, () => Number(age))))}
+      <div>Current average age: {currentAverageAge}</div>
+      {query.studyRights?.programme && <div>Average age at studies start: {averageAgeAtStudiesStart}</div>}
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+        {!onlyIamRights && (
+          <Radio
+            checked={isGrouped}
+            label="Group ages"
+            onChange={() => setIsGrouped(!isGrouped)}
+            style={{ marginTop: '1rem' }}
+            toggle
+          />
+        )}
+        <Table celled collapsing compact>
+          <Table.Header>
+            <Table.Row>
+              <Table.HeaderCell>Current age</Table.HeaderCell>
+              <Table.HeaderCell>
+                Number of students <span style={{ fontWeight: 100 }}>(n={filteredStudents.length})</span>
+              </Table.HeaderCell>
+              <Table.HeaderCell>Percentage of population</Table.HeaderCell>
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>
+            {getAges(isGrouped).map(([age, count], index) => (
+              <Fragment key={age}>
+                <Table.Row
+                  onClick={!onlyIamRights ? () => handleGroupExpand(index) : null}
+                  style={!onlyIamRights ? { cursor: isGrouped ? 'pointer' : undefined } : {}}
+                >
+                  <Table.Cell>
+                    {getAgeCellContent(age)}{' '}
+                    {isGrouped && !onlyIamRights && (
+                      <Icon color="grey" name={expandedGroups.includes(index) ? 'caret down' : 'caret right'} />
+                    )}
+                  </Table.Cell>
+                  <Table.Cell>{count}</Table.Cell>
+                  <Table.Cell>
+                    <ProgressBarWithLabel total={filteredStudents.length} value={count} />
+                  </Table.Cell>
+                </Table.Row>
+                {isGrouped &&
+                  expandedGroups.includes(index) &&
+                  getAges(false)
+                    .filter(([nonGroupedAge]) => Math.floor(nonGroupedAge / 5) * 5 === Number(age))
+                    .map(([nonGroupedAge, nonGroupedAgeCount]) => {
+                      return (
+                        <Table.Row key={nonGroupedAge} style={{ backgroundColor: '#e1e1e1' }}>
+                          <Table.Cell style={{ paddingLeft: '1.5rem' }}>{nonGroupedAge}</Table.Cell>
+                          <Table.Cell>{nonGroupedAgeCount}</Table.Cell>
+                          <Table.Cell>
+                            <ProgressBarWithLabel total={filteredStudents.length} value={nonGroupedAgeCount} />
+                          </Table.Cell>
+                        </Table.Row>
+                      )
+                    })}
+              </Fragment>
+            ))}
+          </Table.Body>
+        </Table>
       </div>
-      {query.studyRights?.programme && <div>Average at studies start: {getAverageAtStudiesStart()}</div>}
-      <Table celled compact="very">
-        <Table.Header>
-          <Table.Row>
-            <Table.HeaderCell>Age</Table.HeaderCell>
-            <Table.HeaderCell>
-              Number of students <span style={{ fontWeight: 100 }}>(n={filteredStudents.length})</span>
-            </Table.HeaderCell>
-            <Table.HeaderCell>Percentage of population</Table.HeaderCell>
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          {getAges(isGrouped).map(([age, count], index) => (
-            <Fragment key={age}>
-              <Table.Row
-                onClick={!onlyIamRights ? () => handleGroupExpand(index) : null}
-                style={!onlyIamRights ? { cursor: isGrouped ? 'pointer' : undefined } : {}}
-              >
-                <Table.Cell>
-                  {getAgeCellContent(age)}{' '}
-                  {isGrouped && !onlyIamRights && (
-                    <Icon color="grey" name={expandedGroups.includes(index) ? 'caret down' : 'caret right'} />
-                  )}
-                </Table.Cell>
-                <Table.Cell>{count}</Table.Cell>
-                <Table.Cell>
-                  <Progress
-                    percent={Math.round((count / filteredStudents.length) * 100)}
-                    progress
-                    style={{ margin: 0 }}
-                  />
-                </Table.Cell>
-              </Table.Row>
-              {isGrouped &&
-                expandedGroups.includes(index) &&
-                Object.entries(
-                  studentsAges
-                    .filter(studentAge => studentAge + 1 > age && studentAge - 1 < Number(age) + 4)
-                    .reduce(separateAgesReducer, [])
-                )
-                  .sort((a, b) => Number(b[0]) - Number(a[0]))
-                  .map(([key, value]) => [key, value])
-                  .map(([nonGroupedAge, nonGroupedAgeCount]) => {
-                    return (
-                      <Table.Row key={nonGroupedAge} style={{ backgroundColor: 'lightgray' }}>
-                        <Table.Cell>{nonGroupedAge}</Table.Cell>
-                        <Table.Cell>{nonGroupedAgeCount}</Table.Cell>
-                        <Table.Cell>
-                          <Progress
-                            percent={Math.round((nonGroupedAgeCount / filteredStudents.length) * 100)}
-                            progress
-                            style={{ margin: 0 }}
-                          />
-                        </Table.Cell>
-                      </Table.Row>
-                    )
-                  })}
-            </Fragment>
-          ))}
-        </Table.Body>
-      </Table>
     </div>
   )
 }
