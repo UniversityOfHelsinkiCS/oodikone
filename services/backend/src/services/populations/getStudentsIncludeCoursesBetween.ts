@@ -1,5 +1,5 @@
 import moment from 'moment'
-import { literal, Op, QueryTypes } from 'sequelize'
+import { col, literal, Op, QueryTypes } from 'sequelize'
 
 import { dbConnections } from '../../database/connection'
 import {
@@ -15,9 +15,11 @@ import {
   Semester,
   SemesterEnrollment,
   Transfer,
+  SISStudyRight,
+  SISStudyRightElement,
 } from '../../models'
 import { Tag, TagStudent } from '../../models/kone'
-import { EnrollmentState, PriorityCode } from '../../types'
+import { EnrollmentState } from '../../types'
 
 const { sequelize } = dbConnections
 
@@ -166,6 +168,27 @@ const getStudents = async (studentNumbers: string[]) => {
         ],
       },
       {
+        model: SISStudyRight,
+        attributes: [
+          'id',
+          'startDate',
+          'endDate',
+          'extentCode',
+          'facultyCode',
+          'admissionType',
+          'cancelled',
+          'semesterEnrollments',
+        ],
+        separate: true,
+        include: [
+          {
+            model: SISStudyRightElement,
+            required: true,
+            attributes: ['code', 'name', 'studyTrack', 'graduated', 'startDate', 'endDate', 'degreeProgrammeType'],
+          },
+        ],
+      },
+      {
         model: SemesterEnrollment,
         attributes: ['enrollmenttype', 'semestercode', 'enrollment_date'],
         separate: true,
@@ -210,30 +233,12 @@ const getCredits = async (creditsOfStudent: any) => {
   })
 }
 
-const getExtents = async (studentNumbers: string[]) => {
-  return await StudyrightExtent.findAll({
-    attributes: [
-      literal('DISTINCT ON("studyright_extent"."extentcode") "studyright_extent"."extentcode"') as unknown as string,
-      'name',
-    ],
-    include: [
-      {
-        model: Studyright,
-        attributes: [],
-        required: true,
-        where: {
-          student_studentnumber: {
-            [Op.in]: studentNumbers,
-          },
-          prioritycode: {
-            [Op.not]: PriorityCode.OPTION,
-          },
-        },
-      },
-    ],
+const getExtents = () =>
+  StudyrightExtent.findAll({
+    attributes: ['extentcode', 'name'],
+    order: col('extentcode'),
     raw: true,
   })
-}
 
 const getSemesters = async (studentNumbers: string[], startDate: string, endDate: Date) => {
   return await Semester.findAll({
@@ -276,13 +281,13 @@ const getElementDetails = async (studentNumbers: string[]) => {
 }
 
 type StudentsIncludeCoursesBetween = {
-  students: Array<Student & { tags?: TagStudent[] }>
-  enrollments: Enrollment[]
-  credits: Credit[]
-  extents: StudyrightExtent[]
-  semesters: Semester[]
-  elementdetails: ElementDetail[]
-  courses: Course[]
+  students: Awaited<ReturnType<typeof getStudents>>
+  enrollments: Awaited<ReturnType<typeof getEnrollments>>
+  credits: Awaited<ReturnType<typeof getCredits>>
+  extents: Awaited<ReturnType<typeof getExtents>>
+  semesters: Awaited<ReturnType<typeof getSemesters>>
+  elementdetails: Awaited<ReturnType<typeof getElementDetails>>
+  courses: Awaited<ReturnType<typeof getCourses>>
 }
 
 export const getStudentsIncludeCoursesBetween = async (
@@ -326,13 +331,15 @@ export const getStudentsIncludeCoursesBetween = async (
 
   const creditsOfStudent = await getCreditsOfStudent(studentNumbers, studyRights, attainmentDateFrom, endDate)
 
-  const courses = await getCourses(creditsOfStudent)
-  const enrollments = await getEnrollments(studentNumbers, attainmentDateFrom, endDate)
-  const students = await getStudents(studentNumbers)
-  const credits = await getCredits(creditsOfStudent)
-  const extents = await getExtents(studentNumbers)
-  const semesters = await getSemesters(studentNumbers, startDate, endDate)
-  const elementdetails = await getElementDetails(studentNumbers)
+  const [courses, enrollments, students, credits, extents, semesters, elementdetails] = await Promise.all([
+    getCourses(creditsOfStudent),
+    getEnrollments(studentNumbers, attainmentDateFrom, endDate),
+    getStudents(studentNumbers),
+    getCredits(creditsOfStudent),
+    getExtents(),
+    getSemesters(studentNumbers, startDate, endDate),
+    getElementDetails(studentNumbers),
+  ])
 
   students.forEach(student => {
     student.tags = studentNumberToTags[student.studentnumber] || []

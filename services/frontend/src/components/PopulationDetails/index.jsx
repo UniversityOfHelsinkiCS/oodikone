@@ -48,8 +48,6 @@ export const PopulationDetails = ({
         programmeCodes={programmeCodes}
         students={filteredStudents}
         studyPlanFilterIsActive={studyPlanFilterIsActive}
-        title="Id"
-        trayOpen={() => {}}
       />
     )
     return (
