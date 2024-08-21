@@ -28,7 +28,7 @@ const getFdImporterClient = () => {
     logger.error("Basic auth credentials not set, can't return client!")
     return null
   }
-  return toskaImporterClient
+  return fdImporterClient
 }
 
 const getToskaImporterClient = () => {
@@ -36,7 +36,7 @@ const getToskaImporterClient = () => {
     logger.error("Importer token not set, can't return client!")
     return null
   }
-  return fdImporterClient
+  return toskaImporterClient
 }
 
 export const getImporterClient = serviceProvider === 'toska' ? getToskaImporterClient : getFdImporterClient

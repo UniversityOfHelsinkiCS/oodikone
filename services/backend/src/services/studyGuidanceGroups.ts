@@ -1,3 +1,5 @@
+import * as Sentry from '@sentry/node'
+import { AxiosError } from 'axios'
 import { uniq } from 'lodash'
 
 import { StudyGuidanceGroupTag } from '../models/kone'
@@ -55,6 +57,11 @@ const getGroupsFromImporter = async (sisPersonId: string) => {
     return studyGuidanceGroups
   } catch (error) {
     logger.error("Couldn't fetch users study guidance groups")
+    if (error instanceof AxiosError) {
+      logger.error(error.stack)
+      logger.error(JSON.stringify(error.response?.data))
+      Sentry.captureException(error)
+    }
     return []
   }
 }
