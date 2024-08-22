@@ -42,7 +42,10 @@ export const ageFilter = createFilter({
   precompute: ({ students }) => {
     const ages = students.map(student => getAge(student.birthdate))
 
-    return { min: Math.min(...ages), max: Math.max(...ages) }
+    return {
+      min: ages.length > 0 ? Math.min(...ages) : undefined,
+      max: ages.length > 0 ? Math.max(...ages) : undefined,
+    }
   },
 
   filter: (student, { min, max }) => {
