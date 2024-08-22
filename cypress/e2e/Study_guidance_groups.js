@@ -148,7 +148,7 @@ describe('Study guidance group tests', () => {
         const secondRowHeadings = ['All', 'HOPS', 'Since 1.8.2018']
         cy.cs('Students (3)').click()
         cy.get('[data-cy="student-table-tabs"] table thead tr').then($tr => {
-          const firstRowTexts = Array.from($tr[0].children).map(elem => elem.innerText.replace('\n', ' '))
+          const firstRowTexts = Array.from($tr[0].children).map(elem => elem.innerText.replaceAll('\n', ' '))
           expect(firstRowTexts).to.deep.equal(firstRowHeadings)
           const secondRowTexts = Array.from($tr[1].children)
             .filter(elem => elem.style.display !== 'none')
