@@ -3,13 +3,8 @@ import { useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
 import { Header, Message, Segment } from 'semantic-ui-react'
 
-import {
-  getFullStudyProgrammeRights,
-  getStudentTotalCredits,
-  getUnifiedProgrammeName,
-  isMastersProgramme,
-} from '@/common'
-import { useTitle } from '@/common/hooks'
+import { getFullStudyProgrammeRights, getStudentTotalCredits, getUnifiedProgrammeName } from '@/common'
+import { useDegreeProgrammeTypes, useTitle } from '@/common/hooks'
 import { FilterView } from '@/components/FilterView'
 import {
   admissionTypeFilter,
@@ -96,7 +91,9 @@ export const PopulationStatistics = () => {
     transferredToProgrammeFilter,
   ].filter(Boolean)
 
-  if (programmeCode && isMastersProgramme(programmeCode)) {
+  const degreeProgrammeType = useDegreeProgrammeTypes([programmeCode])
+
+  if (programmeCode && degreeProgrammeType[programmeCode] === 'urn:code:degree-program-type:masters-degree') {
     filters.push(
       studyrightTypeFilter({
         programme: programmeCode,

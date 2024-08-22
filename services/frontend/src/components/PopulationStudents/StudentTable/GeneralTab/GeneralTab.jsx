@@ -4,11 +4,11 @@ import { useState } from 'react'
 
 import { getEnrollmentTypeTextForExcel, getHighestGradeOfCourseBetweenRange, getStudentTotalCredits } from '@/common'
 import { getCopyableEmailColumn, getCopyableStudentNumberColumn, hiddenNameAndEmailForExcel } from '@/common/columns'
+import { useDegreeProgrammeTypes } from '@/common/hooks'
 import { creditDateFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SortableTable } from '@/components/SortableTable'
-import { PRIORITYCODE_TEXTS } from '@/constants'
 import { DISPLAY_DATE_FORMAT, ISO_DATE_FORMAT, ISO_DATE_FORMAT_DEV } from '@/constants/date'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetSemestersQuery } from '@/redux/semesters'
@@ -54,6 +54,11 @@ export const GeneralTab = ({
 
   const { data: populationStatistics, query } = populations
 
+  const queryStudyrights = query ? Object.values(query.studyRights) : []
+  const cleanedQueryStudyrights = queryStudyrights.filter(studyright => !!studyright)
+
+  const degreeProgrammeTypes = useDegreeProgrammeTypes(cleanedQueryStudyrights)
+
   if (!populationStatistics || !populationStatistics.elementdetails) return null
 
   const studyGuidanceGroupProgrammes =
@@ -97,9 +102,6 @@ export const GeneralTab = ({
     return ''
   }
 
-  const queryStudyrights = query ? Object.values(query.studyRights) : []
-  const cleanedQueryStudyrights = queryStudyrights.filter(studyright => !!studyright)
-
   const combinedProgrammeCode = getCombinedProgrammeCode(query, studyGuidanceGroupProgrammes)
 
   const {
@@ -111,55 +113,19 @@ export const GeneralTab = ({
 
   const transferFrom = student => getTextIn(populationStatistics.elementdetails.data[student.transferSource].name)
 
-  const studyrightCodes = (studyrights, value) => {
-    return studyrights
-      .filter(studyright => {
-        const { studyright_elements: studyrightElements } = studyright
-        return (
-          studyrightElements.filter(element => cleanedQueryStudyrights.includes(element.code)).length >=
-          cleanedQueryStudyrights.length
-        )
-      })
-      .map(a => a[value])
-  }
+  const getCorrectStudyRight = studyRights =>
+    studyRights.find(studyRight =>
+      cleanedQueryStudyrights.some(code => studyRight.studyRightElements.some(element => element.code === code))
+    )
 
-  const getStudyTrack = studyrights => {
-    let startdate = '1900-01-01'
-    let enddate = '2020-04-20'
-    const res = studyrightCodes(studyrights, 'studyright_elements').reduce((acc, elements) => {
-      elements
-        .filter(element => populationStatistics.elementdetails.data[element.code].type === 20)
-        .forEach(element => {
-          if (cleanedQueryStudyrights.includes(element.code)) {
-            startdate = element.startdate
-            enddate = element.enddate
-          }
-        })
-      elements
-        .filter(element => populationStatistics.elementdetails.data[element.code].type === 30)
-        .forEach(element => {
-          if (element.enddate > startdate && element.startdate <= enddate) {
-            acc.push({
-              name: populationStatistics.elementdetails.data[element.code].name.fi,
-              startdate: element.startdate,
-              enddate: element.enddate,
-            })
-          }
-        })
-      acc.sort((a, b) => new Date(b.startdate) - new Date(a.startdate))
+  const getStudyTracks = studyRights => {
+    const correctStudyRight = getCorrectStudyRight(studyRights)
+    return cleanedQueryStudyrights.reduce((acc, code) => {
+      const element = correctStudyRight.studyRightElements.find(element => element.code === code)
+      const studyTrack = element?.studyTrack ? getTextIn(element.studyTrack.name) : null
+      if (studyTrack) acc.push(studyTrack)
       return acc
     }, [])
-    return res
-  }
-
-  const priorityText = studyRights => {
-    const codes = studyrightCodes(studyRights, 'prioritycode')
-    return codes.map(code => (PRIORITYCODE_TEXTS[code] ? PRIORITYCODE_TEXTS[code] : code)).join(', ')
-  }
-
-  const extentCodes = studyRights => {
-    const codes = studyrightCodes(studyRights, 'extentcode')
-    return codes.join(', ')
   }
 
   const tags = tags => {
@@ -240,19 +206,12 @@ export const GeneralTab = ({
     clearTimeout(timeout[id])
   }
 
-  const containsStudyTracks = () => {
-    const studentsInfo = selectedStudents.map(studentNumber => students[studentNumber])
+  const containsStudyTracks = filteredStudents.some(student => getStudyTracks(student.studyRights).length > 0)
 
-    for (const { studyrights } of studentsInfo) {
-      const studyRightElements = studyrightCodes(studyrights, 'studyright_elements').flat()
-      if (studyRightElements.some(element => element.element_detail.type === 30)) {
-        return true
-      }
-    }
-    return false
-  }
-
-  const containsOption = cleanedQueryStudyrights.some(code => code.startsWith('MH') || code.startsWith('KH'))
+  const isBachelorsProgramme = Object.values(degreeProgrammeTypes).includes(
+    'urn:code:degree-program-type:bachelors-degree'
+  )
+  const isMastersProgramme = Object.values(degreeProgrammeTypes).includes('urn:code:degree-program-type:masters-degree')
 
   const shouldShowAdmissionType = parseInt(query?.year, 10) >= 2020 || parseInt(group?.tags?.year, 10) >= 2020
 
@@ -414,10 +373,10 @@ export const GeneralTab = ({
         return grade
       },
     },
-    studyTrack: containsStudyTracks() && {
+    studyTrack: containsStudyTracks && {
       key: 'studyTrack',
       title: 'Study track',
-      getRowVal: student => getStudyTrack(student.studyrights).map(studytrack => studytrack.name)[0],
+      getRowVal: student => getStudyTracks(student.studyRights).join(', '),
     },
     studyrightStart: {
       key: 'studyrightStart',
@@ -567,11 +526,13 @@ export const GeneralTab = ({
       getRowVal: student =>
         getTextIn({ fi: student.home_country_fi, en: student.home_country_en, sv: student.home_country_sv }),
     },
-    option: containsOption && {
+    option: (isBachelorsProgramme || isMastersProgramme) && {
       key: 'option',
-      title: cleanedQueryStudyrights.some(code => code.startsWith('MH')) ? 'Bachelor' : 'Master',
+      title: isMastersProgramme ? 'Bachelor' : 'Master',
       getRowVal: student => (student.option ? getTextIn(student.option.name) : ''),
-      formatValue: value => (value.length > 45 ? `${value.substring(0, 43)}...` : value),
+      formatValue: value => (
+        <div style={{ maxWidth: '290px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{value}</div>
+      ),
       cellProps: student => {
         return {
           title: student.option ? getTextIn(student.option.name) : '',
@@ -585,7 +546,7 @@ export const GeneralTab = ({
     },
     latestAttainmentDate: {
       key: 'latestAttainmentDate',
-      title: 'Latest attainment date',
+      title: 'Latest\nattainment\ndate',
       getRowVal: student => {
         const studyPlan = student.studyplans.find(plan => plan.programme_code === programmeCode)
         if (!studyPlan) return ''
@@ -602,15 +563,18 @@ export const GeneralTab = ({
         en: 'The date when the student last successfully completed a course included in their HOPS.',
       }),
     },
-    priority: {
-      key: 'priority',
-      title: 'Priority',
-      getRowVal: student => priorityText(student.studyrights),
-    },
     extent: {
       key: 'extent',
       title: 'Extent',
-      getRowVal: student => extentCodes(student.studyrights),
+      getRowVal: student =>
+        student.studyRights
+          .filter(
+            studyRight =>
+              studyRight.studyRightElements.filter(element => cleanedQueryStudyrights.includes(element.code)).length >=
+              cleanedQueryStudyrights.length
+          )
+          .map(studyRight => studyRight.extentCode)
+          .join(', '),
     },
     email: getCopyableEmailColumn({
       popupStates,
