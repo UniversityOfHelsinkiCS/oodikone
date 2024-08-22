@@ -47,6 +47,10 @@ const { DB_URL_KONE, DB_URL_USER, SECRET_TOKEN, SIS_DB_URL, SIS_UPDATER_URL, CRY
 
 const rootOrgId = process.env.ROOT_ORG_ID || 'hy-university-root-id'
 
+const languageCenterViewEnabled = process.env.LANGUAGE_CENTER_VIEW_ENABLED || true
+
+const concurrentWorkers = process.env.CONCURRENT_WORKERS || 2
+
 let DB_MAX_CONNECTIONS = parseInt(process.env.DB_MAX_CONNECTIONS, 10)
 if (Number.isNaN(DB_MAX_CONNECTIONS)) {
   DB_MAX_CONNECTIONS = 5 // sequelize's default
@@ -100,4 +104,5 @@ module.exports = {
   sisUrl,
   sisGrapqlAppAccount,
   sisGrapqlAppKey,
+  languageCenterViewEnabled,
 }

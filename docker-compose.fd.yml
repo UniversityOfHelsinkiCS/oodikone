@@ -62,6 +62,7 @@ services:
       - 3000:3000
     environment:
       REACT_APP_SERVICE_PROVIDER: fd
+      REACT_APP_LANGUAGE_CENTER_VIEW_ENABLED: false
     volumes:
       - ./services/frontend/src/:/opt/app-root/src/src
       - ./services/shared/:/opt/app-root/src/src/shared
