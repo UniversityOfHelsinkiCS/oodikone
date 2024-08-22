@@ -1,4 +1,3 @@
-import { max, min } from 'lodash'
 import { useCallback, useMemo } from 'react'
 
 import { useDebounce } from '@/common/hooks'
@@ -40,6 +39,12 @@ export const ageFilter = createFilter({
 
   isActive: ({ min, max }) => min !== null || max !== null,
 
+  precompute: ({ students }) => {
+    const ages = students.map(student => getAge(student.birthdate))
+
+    return { min: Math.min(...ages), max: Math.max(...ages) }
+  },
+
   filter: (student, { min, max }) => {
     const age = getAge(student.birthdate)
 
@@ -54,8 +59,5 @@ export const ageFilter = createFilter({
     return true
   },
 
-  render: props => {
-    const ages = props.withoutSelf().map(student => getAge(student.birthdate))
-    return <AgeFilterCard {...props} bounds={{ min: min(ages), max: max(ages) }} />
-  },
+  render: (props, { precomputed }) => <AgeFilterCard {...props} bounds={precomputed} />,
 })
