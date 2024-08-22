@@ -326,10 +326,9 @@ export const withStudentNumber = async (studentNumber: string) => {
     if (!student) return null
     return formatStudent(student)
   } catch (error) {
-    logger.error(`Error when fetching single student ${error}`)
-    return {
-      error,
-    }
+    logger.error(`Error when fetching single student`)
+    logger.error(error)
+    return null
   }
 }
 

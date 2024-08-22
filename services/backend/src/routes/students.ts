@@ -1,17 +1,26 @@
-const router = require('express').Router()
+import { Request, Response, Router } from 'express'
 
-const { bySearchTermAndStudentNumbers, withStudentNumber } = require('../services/students')
-const { hasFullAccessToStudentData, splitByEmptySpace } = require('../util')
-const { ApplicationError } = require('../util/customErrors')
+import { bySearchTermAndStudentNumbers, withStudentNumber } from '../services/students'
+import { hasFullAccessToStudentData, splitByEmptySpace } from '../util'
+import { ApplicationError } from '../util/customErrors'
 
-const filterStudentTags = (student, userId) => {
+const router = Router()
+
+const filterStudentTags = (student: Awaited<ReturnType<typeof withStudentNumber>>, userId: string) => {
+  if (!student) return null
   return {
     ...student,
     tags: (student.tags ?? []).filter(({ tag }) => !tag.personal_user_id || tag.personal_user_id === userId),
   }
 }
 
-router.get('/', async (req, res) => {
+interface GetStudentsRequest extends Request {
+  query: {
+    searchTerm: string
+  }
+}
+
+router.get('/', async (req: GetStudentsRequest, res: Response) => {
   const {
     user: { roles, studentsUserCanAccess },
     query: { searchTerm },
@@ -28,7 +37,7 @@ router.get('/', async (req, res) => {
     throw new ApplicationError('at least one search term must be longer than 2 characters', 400)
   }
 
-  let results = []
+  let results: Awaited<ReturnType<typeof bySearchTermAndStudentNumbers>> = []
   if (trimmedSearchTerm) {
     results = hasFullAccessToStudentData(roles)
       ? await bySearchTermAndStudentNumbers(trimmedSearchTerm)
@@ -37,7 +46,13 @@ router.get('/', async (req, res) => {
   res.json(results)
 })
 
-router.get('/:studentNumber', async (req, res) => {
+interface GetStudentRequest extends Request {
+  params: {
+    studentNumber: string
+  }
+}
+
+router.get('/:studentNumber', async (req: GetStudentRequest, res: Response) => {
   const { studentNumber } = req.params
   const {
     user: { id, roles, studentsUserCanAccess },
@@ -51,4 +66,4 @@ router.get('/:studentNumber', async (req, res) => {
   res.json(filteredTags)
 })
 
-module.exports = router
+export default router
