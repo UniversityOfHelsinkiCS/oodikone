@@ -6,6 +6,7 @@ import { Button, Form, Header, Message, Radio, Segment, Table, TextArea } from '
 import { callApi } from '@/apiConnection'
 import { isDefaultServiceProvider } from '@/common'
 import { useTitle } from '@/common/hooks'
+import { languageCenterViewEnabled } from '@/conf'
 
 export const Updater = () => {
   const [messages, setMessages] = useState([])
@@ -91,9 +92,9 @@ export const Updater = () => {
           **Oodikone redis - Refresh language center data** Refresh data for language center view.  
           **Oodikone redis - Refresh close to graduation data** Refresh data for close to graduation view.`}
         </ReactMarkdown>
-        <Button color="red" onClick={() => setError(true)}>
+        { isDefaultServiceProvider() && <Button color="red" onClick={() => setError(true)}>
           Cause frontend crash
-        </Button>
+        </Button> }
       </Message>
       <Form>
         <Header>Updater (data pulled from importer db and brought to oodikone db)</Header>
@@ -122,7 +123,7 @@ export const Updater = () => {
           <Form.Button content="Refresh oodikone statistics" onClick={refreshStatisticsV2} />
           <Form.Button content="Refresh faculties" onClick={refreshFaculties} />
           <Form.Button content="Refresh study programmes" onClick={refreshStudyProgrammes} />
-          { isDefaultServiceProvider() && <Form.Button content="Refresh language center data" onClick={refreshLanguageCenterData} /> }
+          { languageCenterViewEnabled && <Form.Button content="Refresh language center data" onClick={refreshLanguageCenterData} /> }
           <Form.Button content="Refresh close to graduation data" onClick={refreshCloseToGraduationData} />
         </Form.Group>
       </Form>
