@@ -3,30 +3,27 @@ import { Form, Dropdown } from 'semantic-ui-react'
 import { ADMISSION_TYPES } from '@/common'
 import { createFilter } from './createFilter'
 
-const findAllStudyrightsForProgramme = (student, programme) => {
-  return student.studyrights.filter(studyright =>
-    studyright.studyright_elements.some(element => element.code === programme)
-  )
-}
+const findAllStudyRightsForProgramme = (student, programme) =>
+  student.studyRights.filter(studyRight => studyRight.studyRightElements.some(el => el.code === programme))
 
 export const filter = code => value => student => {
-  const programmeStudyrights = findAllStudyrightsForProgramme(student, code)
+  const programmeStudyRights = findAllStudyRightsForProgramme(student, code)
   const fixedValue = value !== 'Valintakoe' ? value : 'Koepisteet'
 
-  if (programmeStudyrights.length === 0) return false
+  if (programmeStudyRights.length === 0) return false
 
-  if (programmeStudyrights.length === 1) {
+  if (programmeStudyRights.length === 1) {
     return value === null || value === 'Ei valintatapaa'
-      ? !programmeStudyrights[0].admission_type
-      : programmeStudyrights[0].admission_type === fixedValue
+      ? !programmeStudyRights[0].admissionType
+      : programmeStudyRights[0].admissionType === fixedValue
   }
 
-  return programmeStudyrights.some(
-    studyright =>
-      !studyright.cancelled &&
+  return programmeStudyRights.some(
+    studyRight =>
+      !studyRight.cancelled &&
       (value === null || value === 'Ei valintatapaa'
-        ? !studyright.admission_type
-        : studyright.admission_type === fixedValue)
+        ? !studyRight.admissionType
+        : studyRight.admissionType === fixedValue)
   )
 }
 
@@ -36,14 +33,20 @@ const AdmissionTypeFilterCard = ({ options, onOptionsChange, withoutSelf, code }
 
   const count = admissionType => withoutSelf().filter(filter(code)(admissionType)).length
 
-  const dropdownOptions = Object.entries(ADMISSION_TYPES).map(([key, admissionType]) => {
-    const value = admissionType || 'Ei valintatapaa'
-    return {
-      key,
-      text: `${value} (${count(admissionType)})`,
-      value,
-    }
-  })
+  const dropdownOptions = Object.entries(ADMISSION_TYPES)
+    .map(([key, admissionType]) => {
+      const value = admissionType || 'Ei valintatapaa'
+      const numberOfStudents = count(admissionType)
+      if (numberOfStudents === 0) return null
+      return {
+        key,
+        text: `${value} (${numberOfStudents})`,
+        value,
+        numberOfStudents,
+      }
+    })
+    .filter(a => a !== null)
+    .sort((a, b) => b.numberOfStudents - a.numberOfStudents)
 
   return (
     <div className="card-content">
@@ -54,11 +57,7 @@ const AdmissionTypeFilterCard = ({ options, onOptionsChange, withoutSelf, code }
           clearable
           data-cy={`${name}-dropdown`}
           fluid
-          onChange={(_, { value }) =>
-            onOptionsChange({
-              selected: value,
-            })
-          }
+          onChange={(_, { value }) => onOptionsChange({ selected: value })}
           options={dropdownOptions}
           placeholder="Choose admission type"
           selectOnBlur={false}
