@@ -351,7 +351,7 @@ export class CourseYearlyStatsCounter {
       if (anonymizationSalt && normalStats.students.studentnumbers.length < 6) {
         this.obfuscated = true
 
-        const gradeSpread = {}
+        const gradeSpread = {} as { [grade: string]: string[] }
         for (const grade of Object.keys(normalStats.attempts.grades)) {
           gradeSpread[grade] = []
         }
@@ -363,19 +363,19 @@ export class CourseYearlyStatsCounter {
           coursecode: rest.coursecode,
           attempts: {
             categories: {
-              failed: [],
-              passed: [],
+              failed: [] as string[],
+              passed: [] as string[],
             },
             grades: gradeSpread,
           },
           yearcode: rest.yearcode,
           students: {
             categories: {
-              passedFirst: [],
-              passedEventually: [],
-              neverPassed: [],
+              passedFirst: [] as string[],
+              passedEventually: [] as string[],
+              neverPassed: [] as string[],
             },
-            studentnumbers: [],
+            studentnumbers: [] as string[],
           },
         }
         return obfuscatedStats
