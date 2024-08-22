@@ -4,7 +4,7 @@ const express = require('express')
 const { baseUrl, backendPort } = require('./config')
 const { initializeDatabaseConnection, dbConnections } = require('./database/connection')
 const { startCron } = require('./events')
-const routes = require('./routes')
+const routes = require('./routes').default
 const logger = require('./util/logger')
 require('./worker/worker')
 
