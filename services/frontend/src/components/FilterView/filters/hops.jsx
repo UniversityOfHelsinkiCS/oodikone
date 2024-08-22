@@ -165,18 +165,13 @@ export const hopsFilter = createFilter({
   isActive: arg => arg?.activeProgramme || arg?.activeCombinedProgramme,
 
   filter: (student, { activeProgramme, activeCombinedProgramme }, { args }) => {
-    const { studyrightStart, studyplans } = student
-    const studyrightStartDate = new Date(studyrightStart)
-    const studyrights = student.studyrights
-      .filter(studyright => !studyright.cancelled)
-      ?.map(studyright => studyright.studyrightid)
-
-    const hops = studyplans.find(
-      plan => plan.programme_code === args.programmeCode && studyrights.includes(plan.studyrightid)
+    const studyRights = student.studyRights.filter(studyRight => !studyRight.cancelled).map(({ id }) => id)
+    const hops = student.studyplans.find(
+      plan => plan.programme_code === args.programmeCode && studyRights.includes(plan.sis_study_right_id)
     )
     const secondHops = args.combinedProgrammeCode
-      ? studyplans.find(
-          plan => plan.programme_code === args.combinedProgrammeCode && studyrights.includes(plan.studyrightid)
+      ? student.studyplans.find(
+          plan => plan.programme_code === args.combinedProgrammeCode && studyRights.includes(plan.sis_study_right_id)
         )
       : null
 
@@ -193,8 +188,7 @@ export const hopsFilter = createFilter({
       student.courses = [...new Set(hopsCourses)]
       return true
     }
-    const courses = student.courses.filter(({ date }) => new Date(date) >= studyrightStartDate)
-    student.courses = courses
+
     return true
   },
 
