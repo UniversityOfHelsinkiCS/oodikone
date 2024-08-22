@@ -202,16 +202,13 @@ set_up_oodikone_from_scratch() {
   )
 
   infomsg "Cleaning up docker setup and node_modules from possible previous installations"
-  local compose_down_args="--remove-orphans --volumes --rmi all"
-  "$PROJECT_ROOT"/run.sh both down "$compose_down_args" || infomsg "Cleaning errored, but will continue"
-  docker-compose --file "$PROJECT_ROOT"/docker-compose.ci.yml "$compose_down_args" || infomsg "Cleaning errored, but will continue"
+  "$PROJECT_ROOT"/run.sh both down --remove-orphans --volumes --rmi all || infomsg "Cleaning errored, but will continue"
   for folder in "${folders_to_set_up[@]}"; do
     cd "$folder" || die "Couldn't change directory to folder $folder"
     rm -rf node_modules|| die "Couldn't remove node_modules in folder $folder"
   done
 
-  infomsg "Installing npm packages locally to root and each subfolder to enable \
-linting and formatting"
+  infomsg "Installing npm packages locally to root and each subfolder to enable linting and formatting"
 
   for folder in "${folders_to_set_up[@]}"; do
     cd "$folder" || die "Couldn't change directory to folder $folder"
@@ -228,11 +225,20 @@ linting and formatting"
   infomsg "Building images"
   "$PROJECT_ROOT"/run.sh both anon build
 
-  infomsg "Linking shared to backend"
-  ln -s "$PROJECT_ROOT"/services/shared "$PROJECT_ROOT"/services/backend/src/shared
+  TARGET_PATH="$PROJECT_ROOT/services/shared"
+  LINK_PATHS=(
+    "$PROJECT_ROOT/services/backend/src/shared"
+    "$PROJECT_ROOT/services/frontend/src/shared"
+  )
 
-  infomsg "Linking shared to frontend"
-  ln -s "$PROJECT_ROOT"/services/shared "$PROJECT_ROOT"/services/frontend/src/shared
+  for SYMLINK_PATH in "${LINK_PATHS[@]}"; do
+    infomsg "Linking $TARGET_PATH to $SYMLINK_PATH"
+    if [ ! -L "$SYMLINK_PATH" ]; then
+      ln -s "$TARGET_PATH" "$SYMLINK_PATH"
+    else
+      infomsg "Symbolic link $SYMLINK_PATH already exists. Skipping creation."
+    fi
+  done
 
   successmsg "Setup ready, Oodikone can be started! See README for more info."
 }
