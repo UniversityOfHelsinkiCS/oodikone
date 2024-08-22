@@ -21,8 +21,8 @@ import { StudyProgramme } from '@/components/StudyProgramme'
 import { Teachers } from '@/components/Teachers'
 import { Updater } from '@/components/Updater'
 import { Users } from '@/components/Users'
-import { ProtectedRoute } from './ProtectedRoute'
 import { languageCenterViewEnabled } from '@/conf'
+import { ProtectedRoute } from './ProtectedRoute'
 
 const routes = {
   students: '/students/:studentNumber?',

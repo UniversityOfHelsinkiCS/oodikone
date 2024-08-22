@@ -105,4 +105,5 @@ module.exports = {
   sisGrapqlAppAccount,
   sisGrapqlAppKey,
   languageCenterViewEnabled,
+  concurrentWorkers,
 }

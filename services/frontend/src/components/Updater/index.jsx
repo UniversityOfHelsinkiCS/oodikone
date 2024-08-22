@@ -92,9 +92,11 @@ export const Updater = () => {
           **Oodikone redis - Refresh language center data** Refresh data for language center view.  
           **Oodikone redis - Refresh close to graduation data** Refresh data for close to graduation view.`}
         </ReactMarkdown>
-        { isDefaultServiceProvider() && <Button color="red" onClick={() => setError(true)}>
-          Cause frontend crash
-        </Button> }
+        {isDefaultServiceProvider() && (
+          <Button color="red" onClick={() => setError(true)}>
+            Cause frontend crash
+          </Button>
+        )}
       </Message>
       <Form>
         <Header>Updater (data pulled from importer db and brought to oodikone db)</Header>
@@ -123,7 +125,9 @@ export const Updater = () => {
           <Form.Button content="Refresh oodikone statistics" onClick={refreshStatisticsV2} />
           <Form.Button content="Refresh faculties" onClick={refreshFaculties} />
           <Form.Button content="Refresh study programmes" onClick={refreshStudyProgrammes} />
-          { languageCenterViewEnabled && <Form.Button content="Refresh language center data" onClick={refreshLanguageCenterData} /> }
+          {languageCenterViewEnabled && (
+            <Form.Button content="Refresh language center data" onClick={refreshLanguageCenterData} />
+          )}
           <Form.Button content="Refresh close to graduation data" onClick={refreshCloseToGraduationData} />
         </Form.Group>
       </Form>
