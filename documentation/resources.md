@@ -20,7 +20,8 @@ A collection of useful tools, documentation and other resources.
 ## Database
 
 - [pgcli](https://www.pgcli.com)
-  - A useful commandline tools to interact with the database
+  - A useful commandline tool to interact with the database
+  - Install: `$ pip install pgcli`
 - [Postgres documentation](https://www.postgresql.org/docs/15/index.html)
 - [Sequelize documentation](https://sequelize.org/docs/v6/)
 
@@ -43,9 +44,13 @@ A collection of useful tools, documentation and other resources.
 
 - [Semantic UI React documentation](https://react.semantic-ui.com)
 
+<!--
+
 ## Visual Studio Code
 
 _Todo: add relevant plugins_
+
+-->
 
 ## Web technologies
 
