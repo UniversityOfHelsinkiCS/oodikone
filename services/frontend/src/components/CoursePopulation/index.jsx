@@ -19,7 +19,6 @@ import {
   programmeFilter,
   startYearAtUniFilter,
   studentNumberFilter,
-  studyTrackFilter,
 } from '@/components/FilterView/filters'
 import { InfoBox } from '@/components/InfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -220,9 +219,6 @@ export const CoursePopulation = () => {
           courseCodes: codes,
           from: dateFrom,
           to: dateTo,
-        }),
-        studyTrackFilter({
-          activeAt: dateFrom,
         }),
       ]}
       initialOptions={{
