@@ -113,12 +113,15 @@ export const GeneralTab = ({
   const transferFrom = student => getTextIn(populationStatistics.elementdetails.data[student.transferSource].name)
 
   const getCorrectStudyRight = studyRights =>
-    studyRights.find(studyRight =>
+    studyRights?.find(studyRight =>
       cleanedQueryStudyrights.some(code => studyRight.studyRightElements.some(element => element.code === code))
     )
 
   const getStudyTracks = studyRights => {
     const correctStudyRight = getCorrectStudyRight(studyRights)
+    if (!correctStudyRight) {
+      return []
+    }
     return cleanedQueryStudyrights.reduce((acc, code) => {
       const element = correctStudyRight.studyRightElements.find(element => element.code === code)
       const studyTrack = element?.studyTrack ? getTextIn(element.studyTrack.name) : null
