@@ -68,20 +68,19 @@ export const GeneralTab = ({
 
   const programmeCode = query?.studyRights?.programme || studyGuidanceGroupProgrammes[0] || customPopulationProgramme
 
+  const getStudyRight = student =>
+    student.studyRights.find(studyRight =>
+      studyRight.studyRightElements.some(element => element.code === programmeCode)
+    )
+
   const createSemesterEnrollmentsMap = student => {
-    let semesterEnrollments
+    const semesterEnrollments = getStudyRight(student)?.semesterEnrollments
 
-    if (programmeCode) {
-      semesterEnrollments = student.studyrights.find(studyright =>
-        studyright.studyright_elements.some(element => element.code === programmeCode)
-      )?.semester_enrollments
-    }
+    if (!semesterEnrollments) return null
 
-    semesterEnrollments = semesterEnrollments ?? student.semesterenrollments
-
-    return semesterEnrollments.reduce((enrollments, { enrollmenttype, semestercode, statutoryAbsence }) => {
-      enrollments[semestercode] = {
-        enrollmenttype,
+    return semesterEnrollments.reduce((enrollments, { type, semester, statutoryAbsence }) => {
+      enrollments[semester] = {
+        enrollmenttype: type,
         statutoryAbsence: statutoryAbsence ?? false,
       }
       return enrollments
@@ -91,7 +90,7 @@ export const GeneralTab = ({
   const selectedStudents = filteredStudents.map(student => student.studentNumber)
   const students = filteredStudents.reduce((acc, student) => {
     acc[student.studentNumber] = columnKeysToInclude.includes('semesterEnrollments')
-      ? { ...student, semesterEnrollmentsMap: createSemesterEnrollmentsMap(student) }
+      ? { ...student, semesterEnrollmentsMap: programmeCode != null ? createSemesterEnrollmentsMap(student) : null }
       : student
     return acc
   }, {})
@@ -256,13 +255,6 @@ export const GeneralTab = ({
     return genders[genderCode]
   }
 
-  const getStudyright = student => {
-    const studyright = student.studyrights.find(studyright =>
-      studyright.studyright_elements.some(element => element.code === programmeCode)
-    )
-    return studyright
-  }
-
   let creditsColumn = null
   const creditColumnKeys = columnKeysToInclude.filter(key => key.indexOf('credits.') === 0)
 
@@ -407,12 +399,12 @@ export const GeneralTab = ({
         title: getTextIn(allSemestersMap[`${semester}`]?.name),
         displayColumn: false,
         getRowVal: student => {
-          const studyright = getStudyright(student)
-          if (!studyright) {
+          const studyRight = getStudyRight(student)
+          if (!studyRight) {
             return 'No study right'
           }
-          const enrollment = studyright.semester_enrollments?.find(enrollment => enrollment.semestercode === semester)
-          return getEnrollmentTypeTextForExcel(enrollment?.enrollmenttype, enrollment?.statutoryAbsence)
+          const enrollment = studyRight.semesterEnrollments?.find(enrollment => enrollment.semester === semester)
+          return getEnrollmentTypeTextForExcel(enrollment?.type, enrollment?.statutoryAbsence)
         },
       })),
     },
@@ -473,8 +465,8 @@ export const GeneralTab = ({
       export: true,
       displayColumn: false,
       getRowVal: student =>
-        student.semesterenrollments
-          ? student.semesterenrollments.filter(enrollment => enrollment.enrollmenttype === 1).length
+        student.semesterEnrollmentsMap
+          ? Object.values(student.semesterEnrollmentsMap).filter(enrollment => enrollment.enrollmenttype === 1).length
           : 0,
     },
     transferredFrom: {
@@ -486,8 +478,8 @@ export const GeneralTab = ({
       key: 'admissionType',
       title: 'Admission type',
       getRowVal: student => {
-        const studyright = getStudyright(student)
-        const admissionType = studyright && studyright.admission_type ? studyright.admission_type : 'Ei valintatapaa'
+        const studyRight = getStudyRight(student)
+        const admissionType = studyRight?.admissionType ?? 'Ei valintatapaa'
         return admissionType !== 'Koepisteet' ? admissionType : 'Valintakoe'
       },
     },
