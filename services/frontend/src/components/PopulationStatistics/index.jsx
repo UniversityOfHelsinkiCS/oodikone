@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom'
 import { Header, Message, Segment } from 'semantic-ui-react'
 
 import { getFullStudyProgrammeRights, getStudentTotalCredits, getUnifiedProgrammeName } from '@/common'
-import { useDegreeProgrammeTypes, useTitle } from '@/common/hooks'
+import { useCurrentSemester, useDegreeProgrammeTypes, useTitle } from '@/common/hooks'
 import { FilterView } from '@/components/FilterView'
 import {
   admissionTypeFilter,
@@ -45,6 +45,7 @@ export const PopulationStatistics = () => {
   const courses = useSelector(store => store.populationSelectedStudentCourses.data?.coursestatistics)
   const { query, queryIsSet, isLoading, selectedStudentsByYear, samples } = useSelector(makePopulationsToData)
   const [curriculum, setCurriculum] = useState(null)
+  const currentSemester = useCurrentSemester()
 
   const { fullAccessToStudentData, programmeRights } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
@@ -86,7 +87,7 @@ export const PopulationStatistics = () => {
     studentNumberFilter,
     startYearAtUniFilter,
     studyTrackFilter({ code: programmeCode }),
-    studyrightStatusFilter({ code: programmeCode, combinedProgrammeCode }),
+    studyrightStatusFilter({ code: programmeCode, combinedProgrammeCode, currentSemester }),
     tagsFilter,
     transferredToProgrammeFilter,
   ].filter(Boolean)

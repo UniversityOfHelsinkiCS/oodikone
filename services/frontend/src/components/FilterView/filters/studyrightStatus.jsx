@@ -1,5 +1,3 @@
-import { get } from 'lodash'
-import moment from 'moment'
 import { Form, Radio } from 'semantic-ui-react'
 
 import { filterToolTips } from '@/common/InfoToolTips'
@@ -85,41 +83,37 @@ export const studyrightStatusFilter = createFilter({
     activeProgramme !== null || activeCombinedProgramme !== null,
 
   filter: (student, { activeProgramme, activeCombinedProgramme }, { args }) => {
-    const { code, combinedProgrammeCode } = args
-    const now = moment(new Date())
-
-    const status = studyright => {
-      // Studyright is active if the student has enrolled (absent or present) for this semester and the studyright has not yet ended
-      if (activeProgramme === true || activeCombinedProgramme === true)
-        return (
-          studyright.active === 1 &&
-          ((studyright.enddate && moment(studyright.enddate).isAfter(now)) || !studyright.enddate)
-        )
-      // Studyright is inactive if the student has not enrolled for this semester or the studyright has expired
-      if (activeProgramme === false || activeCombinedProgramme === false)
-        return (
-          !studyright.graduated &&
-          (studyright.active === 0 || (studyright.enddate && moment(studyright.enddate).isBefore(now)))
-        )
+    const { code, combinedProgrammeCode, currentSemester } = args
+    if (!currentSemester) {
       return true
     }
 
-    const chosenCode = activeCombinedProgramme && combinedProgrammeCode ? combinedProgrammeCode : code
-    return student.studyrights.some(studyright => {
-      const correctStatus = status(studyright)
-      return (
-        correctStatus && studyright.studyright_elements.some(studyrightElement => studyrightElement.code === chosenCode)
-      )
-    })
+    const chosenCode = activeCombinedProgramme !== null && combinedProgrammeCode ? combinedProgrammeCode : code
+    const studyRight = student.studyRights.find(studyRight =>
+      studyRight.studyRightElements.some(element => element.code === chosenCode)
+    )
+
+    if (!studyRight || studyRight.studyRightElements.find(element => element.code === chosenCode).graduated) {
+      return false
+    }
+
+    const currentSemesterCode = currentSemester.semestercode
+    const enrollment = studyRight.semesterEnrollments?.find(enrollment => enrollment.semester === currentSemesterCode)
+
+    // Studyright is active if the student has enrolled (absent or present) for the current semester
+    if (activeProgramme === true || activeCombinedProgramme === true) {
+      return enrollment != null && [1, 2].includes(enrollment.type)
+    }
+
+    // Studyright is inactive if the student has not enrolled for the current semester
+    if (activeProgramme === false || activeCombinedProgramme === false) {
+      return enrollment == null || (enrollment && enrollment.type === 3)
+    }
+
+    return false
   },
 
-  component: StudyrightStatusFilterCard,
-
   render: (props, { args }) => (
-    <StudyrightStatusFilterCard
-      {...props}
-      code={get(args, 'code')}
-      combinedProgrammeCode={get(args, 'combinedProgrammeCode')}
-    />
+    <StudyrightStatusFilterCard {...props} combinedProgrammeCode={args.combinedProgrammeCode} />
   ),
 })
