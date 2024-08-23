@@ -182,13 +182,13 @@ const SingleStudyGroupFilterView = ({ courses, group, population, ...otherProps 
           ? [
               {
                 key: 'assoc-year',
-                label: 'Since assoc. year',
+                label: 'Since associated year',
                 description:
                   'Student has had a study right since the start year associated with this study guidance group.',
-                predicate: (_student, studyrightElement) =>
+                predicate: (_student, studyRightElement) =>
                   moment(createAcademicYearStartDate(group.tags?.year)).isBetween(
-                    studyrightElement.startdate,
-                    studyrightElement.enddate,
+                    studyRightElement.startDate,
+                    studyRightElement.endDate,
                     'day',
                     '[]'
                   ),
