@@ -47,7 +47,8 @@ const { DB_URL_KONE, DB_URL_USER, SECRET_TOKEN, SIS_DB_URL, SIS_UPDATER_URL, CRY
 
 const rootOrgId = process.env.ROOT_ORG_ID || 'hy-university-root-id'
 
-const languageCenterViewEnabled = process.env.LANGUAGE_CENTER_VIEW_ENABLED || true
+const languageCenterViewEnabled =
+  process.env.LANGUAGE_CENTER_VIEW_ENABLED == null ? true : process.env.LANGUAGE_CENTER_VIEW_ENABLED === 'true'
 
 const concurrentWorkers = process.env.CONCURRENT_WORKERS || 2
 

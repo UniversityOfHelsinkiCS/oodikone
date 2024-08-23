@@ -1,5 +1,6 @@
 import { Request, Response, Router } from 'express'
 
+import { languageCenterViewEnabled } from '../config'
 import { refreshFaculties, refreshProgrammes } from '../events'
 import {
   abortUpdate,
@@ -106,6 +107,8 @@ router.post('/refresh_faculties_v2', async (req: Request, res: Response) => {
 
 router.post('/refresh_language_center_data', async (req: Request, res: Response) => {
   logger.info(`${req.user.username} requested refresh of language center data`)
+  if (!languageCenterViewEnabled)
+    res.status(418).json({ error: 'The language center functionality is not activated in your environment.' })
   jobMaker.languagecenter()
   res.status(200).json('Added job for refreshing language center data')
 })
