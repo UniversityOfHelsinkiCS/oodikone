@@ -5,9 +5,13 @@ export const filterToolTips = {
       'Suodata opiskelijoita sen mukaan ovatko he joko ilmoittautuneet läsnä- tai poissaoleviksi tai jääneet passiivisiksi kyseiselle lukukaudelle. Huom. osa passiivisista opiskelijoista on jo valmistunut ko. ohjelmasta.',
   },
   studyrightStatus: {
-    label: 'Rajaa opiskelijoita opinto-oikeuden statuksen mukaan',
-    short:
-      'Opinto-oikeus on aktiivinen, mikäli opiskelija on ilmoittautunut läsnä- tai poissaolevaksi tälle lukukaudelle ja opinto-oikeus ei ole vielä päättynyt. \n Opinto-oikeus on passiivinen, jos opiskelija ei ole ilmoittautunut läsnä- tai poissaolevaksi tälle lukukaudelle tai opinto-oikeus on vanhentunut. Valmistuneet opiskelijat on suodatettu pois molemmista kategorioista.',
+    label: 'Rajaa opiskelijoita opiskeluoikeuden statuksen mukaan',
+    short: `
+  Opiskeluoikeus on **aktiivinen** (active), jos opiskelija on ilmoittautunut läsnä- tai poissaolevaksi käynnissä olevalle lukukaudelle.
+
+  Opiskeluoikeus on **passiivinen** (inactive), jos opiskelija ei ole ilmoittautunut läsnä- eikä poissaolevaksi käynnissä olevalle lukukaudelle.  
+
+  Lukukausi-ilmoittautumisissa huomioidaan vain se opiskeluoikeus, joka liittyy tarkasteltavaan koulutusohjelmaan. Valmistuneet opiskelijat on **suodatettu pois** molemmista kategorioista.`,
   },
   transferred: {
     label: 'Include and exclude students from this program',
