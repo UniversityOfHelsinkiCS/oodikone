@@ -127,11 +127,9 @@ const ProgrammeFilterCard = ({ additionalModes, onOptionsChange, options, studen
 }
 
 const getStudentProgrammes = student =>
-  (student?.studyRights ?? [])
-    .flatMap(studyRight =>
-      studyRight.studyRightElements.map(element => ({ ...element, cancelled: studyRight.cancelled }))
-    )
-    .filter(element => element.degreeProgrammeType != null)
+  (student?.studyRights ?? []).flatMap(studyRight =>
+    studyRight.studyRightElements.map(element => ({ ...element, cancelled: studyRight.cancelled }))
+  )
 
 const createStudentToProgrammeMap = (students, studyRightPredicate) => {
   const studentToProgrammeMap = {}
