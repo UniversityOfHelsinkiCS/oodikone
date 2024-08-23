@@ -1,6 +1,6 @@
 # Resources
 
-A collection of useful resources and documentation.
+A collection of useful tools, documentation and other resources.
 
 ## AI tools
 
@@ -19,6 +19,8 @@ A collection of useful resources and documentation.
 
 ## Database
 
+- [pgcli](https://www.pgcli.com)
+  - A useful commandline tools to interact with the database
 - [Postgres documentation](https://www.postgresql.org/docs/15/index.html)
 - [Sequelize documentation](https://sequelize.org/docs/v6/)
 
