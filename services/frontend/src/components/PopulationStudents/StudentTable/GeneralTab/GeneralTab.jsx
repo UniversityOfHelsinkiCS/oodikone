@@ -11,6 +11,7 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SortableTable } from '@/components/SortableTable'
 import { DISPLAY_DATE_FORMAT, ISO_DATE_FORMAT, ISO_DATE_FORMAT_DEV } from '@/constants/date'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
+import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { reformatDate } from '@/util/timeAndDate'
 import { createMaps } from './columnHelpers/createMaps'
@@ -37,6 +38,7 @@ export const GeneralTab = ({
     return obj
   }, {})
   const { isAdmin } = useGetAuthorizedUserQuery()
+  const { data: programmes = {} } = useGetProgrammesQuery()
 
   const fromSemester = from
     ? Object.values(semesterData.semesters)
@@ -60,7 +62,7 @@ export const GeneralTab = ({
 
   const currentSemester = useCurrentSemester()
 
-  if (!populationStatistics || !populationStatistics.elementdetails) return null
+  if (!populationStatistics) return null
 
   const studyGuidanceGroupProgrammes =
     group?.tags?.studyProgramme && group?.tags?.studyProgramme.includes('+')
@@ -120,7 +122,7 @@ export const GeneralTab = ({
     currentSemester: currentSemester?.semestercode,
   })
 
-  const transferFrom = student => getTextIn(populationStatistics.elementdetails.data[student.transferSource].name)
+  const transferFrom = student => getTextIn(programmes[student.transferSource]?.name) ?? student.transferSource
 
   const getCorrectStudyRight = studyRights =>
     studyRights?.find(studyRight =>

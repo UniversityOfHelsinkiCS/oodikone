@@ -1,11 +1,9 @@
 import moment from 'moment'
-import { col, literal, Op, QueryTypes } from 'sequelize'
+import { col, literal, Op } from 'sequelize'
 
-import { dbConnections } from '../../database/connection'
 import {
   Course,
   Credit,
-  ElementDetail,
   Enrollment,
   Student,
   Studyplan,
@@ -18,8 +16,6 @@ import {
 } from '../../models'
 import { Tag, TagStudent } from '../../models/kone'
 import { EnrollmentState } from '../../types'
-
-const { sequelize } = dbConnections
 
 const getStudentTags = async (studyRights: string[], studentNumbers: string[]) => {
   return await TagStudent.findAll({
@@ -238,26 +234,12 @@ const getSemesters = async (studentNumbers: string[], startDate: string, endDate
   })
 }
 
-const getElementDetails = async (studentNumbers: string[]) => {
-  const elementDetails: Array<Pick<ElementDetail, 'code' | 'name' | 'type'>> = await sequelize.query(
-    `SELECT DISTINCT ON (code) code, name, type FROM element_details WHERE
-      EXISTS (SELECT 1 FROM transfers WHERE studentnumber IN (:studentNumbers) AND (code = sourcecode OR code = targetcode)) OR
-      EXISTS (SELECT 1 FROM studyright_elements WHERE studentnumber IN (:studentNumbers) AND element_details.code = studyright_elements.code)`,
-    {
-      replacements: { studentNumbers },
-      type: QueryTypes.SELECT,
-    }
-  )
-  return elementDetails
-}
-
 type StudentsIncludeCoursesBetween = {
   students: Awaited<ReturnType<typeof getStudents>>
   enrollments: Awaited<ReturnType<typeof getEnrollments>>
   credits: Awaited<ReturnType<typeof getCredits>>
   extents: Awaited<ReturnType<typeof getExtents>>
   semesters: Awaited<ReturnType<typeof getSemesters>>
-  elementdetails: Awaited<ReturnType<typeof getElementDetails>>
   courses: Awaited<ReturnType<typeof getCourses>>
 }
 
@@ -302,27 +284,18 @@ export const getStudentsIncludeCoursesBetween = async (
 
   const creditsOfStudent = await getCreditsOfStudent(studentNumbers, studyRights, attainmentDateFrom, endDate)
 
-  const [courses, enrollments, students, credits, extents, semesters, elementdetails] = await Promise.all([
+  const [courses, enrollments, students, credits, extents, semesters] = await Promise.all([
     getCourses(creditsOfStudent),
     getEnrollments(studentNumbers, attainmentDateFrom, endDate),
     getStudents(studentNumbers),
     getCredits(creditsOfStudent),
     getExtents(),
     getSemesters(studentNumbers, startDate, endDate),
-    getElementDetails(studentNumbers),
   ])
 
   students.forEach(student => {
     student.tags = studentNumberToTags[student.studentnumber] || []
   })
 
-  return {
-    students,
-    enrollments,
-    credits,
-    extents,
-    semesters,
-    elementdetails,
-    courses,
-  } as StudentsIncludeCoursesBetween
+  return { students, enrollments, credits, extents, semesters, courses } as StudentsIncludeCoursesBetween
 }

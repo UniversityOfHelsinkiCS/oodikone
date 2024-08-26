@@ -4,7 +4,7 @@ import { Op, QueryTypes } from 'sequelize'
 
 import { dbConnections } from '../../database/connection'
 import { Course, Credit, SISStudyRight, SISStudyRightElement } from '../../models'
-import { ElementDetailType, Criteria, Name } from '../../types'
+import { Criteria, Name } from '../../types'
 import { SemesterStart } from '../../util/semester'
 import { getCurrentSemester } from '../semesters'
 
@@ -332,7 +332,7 @@ export const getOptionsForStudents = async (studentNumbers: string[], code: stri
 }
 
 export const formatStudentsForApi = async (
-  { students, enrollments, credits, extents, semesters, elementdetails, courses },
+  { students, enrollments, credits, extents, semesters, courses },
   startDate: string,
   endDate: string,
   studyRights: string[],
@@ -344,16 +344,6 @@ export const formatStudentsForApi = async (
   const endDateMoment = moment(endDate)
   const currentSemester = (await getCurrentSemester()).semestercode
 
-  elementdetails = elementdetails.reduce(
-    (acc, elementDetail) => {
-      acc.data[elementDetail.code] = elementDetail
-      if (elementDetail.type === ElementDetailType.PROGRAMME) {
-        acc.programmes.push(elementDetail.code)
-      }
-      return acc
-    },
-    { programmes: [], data: {} }
-  )
   credits = credits.reduce((acc, credit) => {
     acc[credit.student_studentnumber] = acc[credit.student_studentnumber] || []
     acc[credit.student_studentnumber].push(credit)
@@ -426,16 +416,13 @@ export const formatStudentsForApi = async (
     return student
   }
 
-  const returnvalue = {
+  return {
     students: result.students.map(transferredStudyright),
     transfers: result.transfers,
     extents,
     semesters,
     courses,
-    elementdetails,
   }
-
-  return returnvalue
 }
 
 export const formatQueryParamsToArrays = (query: Record<string, any>, params: string[]) => {

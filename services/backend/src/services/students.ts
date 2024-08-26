@@ -5,7 +5,7 @@ import {
   Student,
   Credit,
   Course,
-  ElementDetail,
+  ProgrammeModule,
   SemesterEnrollment,
   Semester,
   Studyplan,
@@ -83,8 +83,10 @@ const byStudentNumber = async (studentNumber: string) => {
       ],
     }),
     TagStudent.findAll({
+      attributes: ['tag_id'],
       include: {
         model: Tag,
+        attributes: ['personal_user_id', 'studytrack', 'tagname', 'year'],
       },
       where: {
         studentnumber: studentNumber,
@@ -92,7 +94,8 @@ const byStudentNumber = async (studentNumber: string) => {
     }),
   ])
   if (!student) return null
-  const tagprogrammes = await ElementDetail.findAll({
+  const tagprogrammes = await ProgrammeModule.findAll({
+    attributes: ['code', 'name'],
     where: {
       code: {
         [Op.in]: tags.map(tag => tag.tag.studytrack),
@@ -303,7 +306,9 @@ const formatSharedStudentData = ({
 const formatStudent = (
   studentData: Partial<Omit<Student, 'semester_enrollments'>> & {
     semester_enrollments: SemesterEnrollmentWithNameAndYear[]
-  } & { tags: Array<InferAttributes<TagStudent> & { programme?: ElementDetail }> }
+  } & {
+    tags: Array<InferAttributes<TagStudent> & { programme?: Pick<InferAttributes<ProgrammeModule>, 'code' | 'name'> }>
+  }
 ) => {
   const formattedData = formatSharedStudentData(studentData)
   return {
