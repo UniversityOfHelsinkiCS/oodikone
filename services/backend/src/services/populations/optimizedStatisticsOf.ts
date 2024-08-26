@@ -1,5 +1,3 @@
-import moment from 'moment-timezone'
-
 import { Criteria, Name } from '../../types'
 import { getCriteria } from '../studyProgramme/studyProgrammeCriteria'
 import { getStudentsIncludeCoursesBetween } from './getStudentsIncludeCoursesBetween'
@@ -37,21 +35,15 @@ export const optimizedStatisticsOf = async (query: Query, studentNumberList?: st
   const { studyRights, startDate, months, endDate, exchangeStudents, nondegreeStudents, transferredStudents, tag } =
     parseQueryParams(formattedQueryParams)
 
-  // db startdate is formatted to utc so need to change it when querying
-  const formattedStartDate = new Date(moment.tz(startDate, 'Europe/Helsinki').format()).toUTCString()
-
   const studentNumbers =
     studentNumberList ||
     (await getStudentNumbersWithAllStudyRightElements({
       studyRights,
-      startDate: formattedStartDate,
+      startDate,
       endDate,
       exchangeStudents,
       nondegreeStudents,
       transferredOutStudents: transferredStudents,
-      tag: null,
-      transferredToStudents: true,
-      graduatedStudents: true,
     }))
 
   const code = studyRights[0] || ''

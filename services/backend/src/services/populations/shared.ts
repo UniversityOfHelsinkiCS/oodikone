@@ -5,7 +5,7 @@ import { Op, QueryTypes } from 'sequelize'
 import { dbConnections } from '../../database/connection'
 import { Course, Credit, SISStudyRight, SISStudyRightElement } from '../../models'
 import { ElementDetailType, Criteria, Name } from '../../types'
-import { SemesterEnd, SemesterStart } from '../../util/semester'
+import { SemesterStart } from '../../util/semester'
 import { getCurrentSemester } from '../semesters'
 
 const { sequelize } = dbConnections
@@ -237,29 +237,22 @@ export const dateMonthsFromNow = (date: string, months: number) => {
   return new Date(moment(date).add(months, 'months').format('YYYY-MM-DD'))
 }
 
-export const count = (column, count, distinct = false) => {
-  const countable = !distinct ? sequelize.col(column) : sequelize.fn('DISTINCT', sequelize.col(column))
-  return sequelize.where(sequelize.fn('COUNT', countable), {
-    [Op.eq]: count,
-  })
-}
-
 export const parseQueryParams = query => {
   const { semesters, studentStatuses, studyRights, months, year, tag } = query
   const hasFall = semesters.includes('FALL')
   const hasSpring = semesters.includes('SPRING')
 
   const startDate = hasFall
-    ? `${year}-${SemesterStart.FALL}`
-    : `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${SemesterStart.SPRING}`
+    ? new Date(`${year}-${SemesterStart.FALL}`).toISOString()
+    : new Date(`${year + 1}-${SemesterStart.SPRING}`).toISOString()
 
   const endDate = hasSpring
-    ? `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${SemesterEnd.SPRING}`
-    : `${year}-${SemesterEnd.FALL}`
+    ? new Date(`${year + 1}-${SemesterStart.FALL}`).toISOString()
+    : new Date(`${year}-${SemesterStart.SPRING}`).toISOString()
 
-  const exchangeStudents = studentStatuses && studentStatuses.includes('EXCHANGE')
-  const nondegreeStudents = studentStatuses && studentStatuses.includes('NONDEGREE')
-  const transferredStudents = studentStatuses && studentStatuses.includes('TRANSFERRED')
+  const exchangeStudents = studentStatuses != null && studentStatuses.includes('EXCHANGE')
+  const nondegreeStudents = studentStatuses != null && studentStatuses.includes('NONDEGREE')
+  const transferredStudents = studentStatuses != null && studentStatuses.includes('TRANSFERRED')
 
   return {
     exchangeStudents,

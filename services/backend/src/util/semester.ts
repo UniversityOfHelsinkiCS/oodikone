@@ -16,13 +16,6 @@ export enum SemesterStart {
   FALL = '08-01',
 }
 
-// Sometimes start date is in UTC and sometimes not, add flexibility to this
-// End date must be then also in UTC, otherwice students may land into two academic years
-export enum SemesterEnd {
-  SPRING = '07-31T20:59:59.000Z',
-  FALL = '12-31T20:59:59.000Z',
-}
-
 export const getPassingSemester = (startYear: number, date: Date): string => {
   const mDate = moment(date).add(1, 'day')
   const year = mDate.year()
