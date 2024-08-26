@@ -61,7 +61,7 @@ export const findCorrectProgramme = (student, coursecodes, semesters, startDate,
     programme = getNewestProgrammeOfStudentAt(
       [correctStudyRight],
       currentSemester,
-      courseAttainment?.date ?? courseEnrollment.enrollment_date_time
+      courseAttainment?.date ?? courseEnrollment?.enrollment_date_time
     )
     if (programme) return programme
   }
