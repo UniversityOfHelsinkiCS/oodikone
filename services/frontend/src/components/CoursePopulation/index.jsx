@@ -1,14 +1,15 @@
-import { chain } from 'lodash'
-import moment from 'moment'
 import qs from 'query-string'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { Form, Header, Input, Segment } from 'semantic-ui-react'
 import { getStudentToTargetCourseDateMap, getUnifyTextIn } from '@/common'
-import { useProgress, useTitle } from '@/common/hooks'
+import { useCurrentSemester, useProgress, useTitle } from '@/common/hooks'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { PanelView } from '@/components/common/PanelView'
-import { CustomPopulationProgrammeDist } from '@/components/CustomPopulation/CustomPopulationProgrammeDist'
+import {
+  CustomPopulationProgrammeDist,
+  findCorrectProgramme,
+} from '@/components/CustomPopulation/CustomPopulationProgrammeDist'
 import { FilterView } from '@/components/FilterView'
 import {
   ageFilter,
@@ -32,12 +33,6 @@ import { useGetSingleCourseStatsQuery } from '@/redux/singleCourseStats'
 import { CoursePopulationCreditGainTable } from './CoursePopulationCreditGainTable'
 import { CoursePopulationGradeDist } from './CoursePopulationGradeDist'
 import { CoursePopulationLanguageDist } from './CoursePopulationLanguageDist'
-
-const NO_PROGRAMME = {
-  code: '00000',
-  name: { en: 'No programme', fi: 'Ei ohjelmaa' },
-  startdate: '',
-}
 
 export const CoursePopulation = () => {
   const location = useLocation()
@@ -79,6 +74,8 @@ export const CoursePopulation = () => {
     { courseCodes: codes, separate, combineSubstitutions },
     { skip: codes.length === 0 }
   )
+
+  const currentSemester = useCurrentSemester()
 
   const getFromToDates = (from, to, separate) => {
     if (!semesters.years || !semesters.semesters) return {}
@@ -139,14 +136,7 @@ export const CoursePopulation = () => {
       content: (
         <div>
           <InfoBox content={populationStatisticsToolTips.ProgrammeDistributionCoursePopulation} />
-          <CustomPopulationProgrammeDist
-            coursecode={codes}
-            from={dateFrom}
-            studentData={populationStatistics}
-            studentToTargetCourseDateMap={studentToTargetCourseDateMap}
-            students={filtered}
-            to={dateTo}
-          />
+          <CustomPopulationProgrammeDist coursecode={codes} from={dateFrom} students={filtered} to={dateTo} />
         </div>
       ),
     },
@@ -156,16 +146,7 @@ export const CoursePopulation = () => {
     },
     {
       title: 'Credit gains',
-      content: (
-        <CoursePopulationCreditGainTable
-          codes={codes}
-          from={dateFrom}
-          populationStatistics={populationStatistics}
-          studentToTargetCourseDateMap={studentToTargetCourseDateMap}
-          students={filtered}
-          to={dateTo}
-        />
-      ),
+      content: <CoursePopulationCreditGainTable codes={codes} from={dateFrom} students={filtered} to={dateTo} />,
     },
     {
       title: `Students (${filtered.length})`,
@@ -182,20 +163,6 @@ export const CoursePopulation = () => {
     },
   ]
 
-  const studyRightPredicate = (student, studyRightElement) => {
-    const date = chain(student)
-      .get('courses')
-      .filter(course => codes.includes(course.course_code))
-      .map('date')
-      .max()
-      .value()
-
-    return (
-      studyRightElement.code === NO_PROGRAMME.code ||
-      moment(date).isBetween(studyRightElement.startDate, studyRightElement.endDate, 'day', '[]')
-    )
-  }
-
   return (
     <FilterView
       filters={[
@@ -210,7 +177,17 @@ export const CoursePopulation = () => {
             {
               key: 'attainment',
               label: 'Attainment',
-              predicate: studyRightPredicate,
+              predicate: (student, studyRightElement) => {
+                const correctProgramme = findCorrectProgramme(
+                  student,
+                  codes,
+                  semesters.semesters,
+                  dateFrom,
+                  dateTo,
+                  currentSemester?.semestercode
+                )
+                return correctProgramme?.code === studyRightElement.code
+              },
               description: 'Student had an active study right at the time of course attainment.',
             },
           ],
