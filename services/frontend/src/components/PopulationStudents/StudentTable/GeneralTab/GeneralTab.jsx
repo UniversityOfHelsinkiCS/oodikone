@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 import { getEnrollmentTypeTextForExcel, getHighestGradeOfCourseBetweenRange, getStudentTotalCredits } from '@/common'
 import { getCopyableEmailColumn, getCopyableStudentNumberColumn, hiddenNameAndEmailForExcel } from '@/common/columns'
-import { useDegreeProgrammeTypes } from '@/common/hooks'
+import { useCurrentSemester, useDegreeProgrammeTypes } from '@/common/hooks'
 import { creditDateFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -15,7 +15,6 @@ import { useGetSemestersQuery } from '@/redux/semesters'
 import { reformatDate } from '@/util/timeAndDate'
 import { createMaps } from './columnHelpers/createMaps'
 import { getSemestersPresentFunctions } from './columnHelpers/semestersPresent'
-import { getStudyProgrammeFunctions } from './columnHelpers/studyProgramme'
 
 export const GeneralTab = ({
   group,
@@ -58,6 +57,8 @@ export const GeneralTab = ({
   const cleanedQueryStudyrights = queryStudyrights.filter(studyright => !!studyright)
 
   const degreeProgrammeTypes = useDegreeProgrammeTypes(cleanedQueryStudyrights)
+
+  const currentSemester = useCurrentSemester()
 
   if (!populationStatistics || !populationStatistics.elementdetails) return null
 
@@ -108,7 +109,16 @@ export const GeneralTab = ({
     studentToStudyrightEndMap,
     studentToProgrammeStartMap,
     studentToSecondStudyrightEndMap,
-  } = createMaps({ students, selectedStudents, programmeCode, combinedProgrammeCode, year })
+    studentToOtherProgrammesMap,
+  } = createMaps({
+    students,
+    selectedStudents,
+    programmeCode,
+    combinedProgrammeCode,
+    year,
+    getTextIn,
+    currentSemester: currentSemester?.semestercode,
+  })
 
   const transferFrom = student => getTextIn(populationStatistics.elementdetails.data[student.transferSource].name)
 
@@ -273,16 +283,6 @@ export const GeneralTab = ({
       year,
     })
 
-  const { getStudyProgrammeContent, studentProgrammesMap, getStudyStartDate } = getStudyProgrammeFunctions({
-    coursecode,
-    elementDetails: populationStatistics.elementdetails.data,
-    getTextIn,
-    programmeCode,
-    selectedStudents,
-    students,
-    studentToProgrammeStartMap,
-  })
-
   const availableCreditsColumns = {
     all: sole => ({
       key: 'credits-all',
@@ -314,7 +314,8 @@ export const GeneralTab = ({
         const credits = getStudentTotalCredits({
           ...student,
           courses: student.courses.filter(
-            course => new Date(course.date) >= studentToProgrammeStartMap[student.studentNumber]
+            course =>
+              new Date(course.date).getTime() >= new Date(studentToProgrammeStartMap[student.studentNumber]).getTime()
           ),
         })
         return credits
@@ -383,7 +384,7 @@ export const GeneralTab = ({
       key: 'studyStartDate',
       title: 'Started in\nprogramme',
       filterType: 'date',
-      getRowVal: student => getStudyStartDate(student),
+      getRowVal: student => reformatDate(studentToProgrammeStartMap[student.studentNumber], ISO_DATE_FORMAT),
     },
     semesterEnrollments: {
       key: 'semesterEnrollments',
@@ -439,25 +440,23 @@ export const GeneralTab = ({
       key: 'programme',
       title: programmeCode ? 'Other programmes' : 'Study programmes',
       filterType: 'multi',
-      getRowContent: student => getStudyProgrammeContent(student),
-      getRowVal: student => {
-        const programmesToUse = programmeCode
-          ? studentProgrammesMap[student.studentNumber]?.programmes.filter(
-              programme => programme.code !== programmeCode
-            )
-          : studentProgrammesMap[student.studentNumber]?.programmes
-        return programmesToUse.map(programme => getTextIn(programme.name))
+      getRowVal: student =>
+        studentToOtherProgrammesMap[student.studentNumber]?.programmes.map(programme => getTextIn(programme.name)),
+      formatValue: value => {
+        if (!value.length) return null
+
+        const formattedProgramme = value[0].length > 45 ? `${value[0].substring(0, 43)}...` : value[0]
+        if (value.length === 1) return formattedProgramme
+
+        return (
+          <>
+            {formattedProgramme} + {value.length - 1}
+          </>
+        )
       },
-      getRowExportVal: student => {
-        const programmesToUse = programmeCode
-          ? studentProgrammesMap[student.studentNumber]?.programmes.filter(
-              programme => programme.code !== programmeCode
-            )
-          : studentProgrammesMap[student.studentNumber]?.programmes
-        return programmesToUse.map(programme => getTextIn(programme.name)).join('; ')
-      },
+      getRowExportVal: student => studentToOtherProgrammesMap[student.studentNumber]?.getProgrammesList('; '),
       cellProps: student => {
-        return { title: studentProgrammesMap[student.studentNumber]?.getProgrammesList('\n') }
+        return { title: studentToOtherProgrammesMap[student.studentNumber]?.getProgrammesList('\n') }
       },
       helpText:
         'If student has more than one programme, hover your mouse on the cell to see the rest. They are also displayed in the exported Excel file.',
