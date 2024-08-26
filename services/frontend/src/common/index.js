@@ -146,7 +146,7 @@ const programmeIsActive = (studyRight, hasGraduated, currentSemesterCode) =>
 
 export const getAllProgrammesOfStudent = (studyRights, currentSemester) =>
   orderBy(
-    studyRights.flatMap(studyRight =>
+    studyRights?.flatMap(studyRight =>
       studyRight.studyRightElements
         .filter(element => element.degreeProgrammeType !== null)
         .map(element => ({ ...element, studyRight }))

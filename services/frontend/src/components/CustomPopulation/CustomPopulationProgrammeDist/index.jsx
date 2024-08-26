@@ -21,7 +21,7 @@ export const findCorrectProgramme = (student, coursecodes, semesters, startDate,
   )
 
   if (courseAttainment?.studyright_id) {
-    const correctStudyRight = student.studyRights.find(studyRight => studyRight.id === courseAttainment.studyright_id)
+    const correctStudyRight = student.studyRights?.find(studyRight => studyRight.id === courseAttainment.studyright_id)
     if (correctStudyRight) {
       programme = getNewestProgrammeOfStudentAt([correctStudyRight], currentSemester, courseAttainment.date)
     }
@@ -35,7 +35,7 @@ export const findCorrectProgramme = (student, coursecodes, semesters, startDate,
         moment(semester.enddate).isSameOrBefore(endDate, 'day')
     )
     .map(semester => semester.semestercode)
-  const courseEnrollment = student.enrollments.find(
+  const courseEnrollment = student.enrollments?.find(
     enrollment => coursecodes.includes(enrollment.course_code) && correctSemesters.includes(enrollment.semestercode)
   )
 
@@ -51,7 +51,7 @@ export const findCorrectProgramme = (student, coursecodes, semesters, startDate,
     if (programme) return programme
   }
 
-  const correctStudyplan = student.studyplans.find(studyplan =>
+  const correctStudyplan = student.studyplans?.find(studyplan =>
     studyplan.included_courses.some(course => coursecodes.includes(course))
   )
   if (correctStudyplan) {
