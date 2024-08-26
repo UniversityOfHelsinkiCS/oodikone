@@ -91,7 +91,6 @@ const formatStudentForPopulationStatistics = (
     email,
     secondary_email,
     phone_number,
-    studyrights,
     studyRights,
     studyplans,
     semester_enrollments,
@@ -196,13 +195,11 @@ const formatStudentForPopulationStatistics = (
     return criteriaChecked
   }
 
-  studyrights = studyrights || []
   const started = dateofuniversityenrollment
 
   return {
     firstnames,
     lastname,
-    studyrights,
     studyRights,
     started,
     studentNumber: studentnumber,

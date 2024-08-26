@@ -156,7 +156,7 @@ const filterCourses = (
     return filterCoursesByDate(
       filterCoursesByStudyPlan(
         student.studyplans.find(
-          plan => plan.programme_code === byStudyPlanOfCode && plan.studyrightid === studyrightid
+          plan => plan.programme_code === byStudyPlanOfCode && plan.sis_study_right_id === studyrightid
         ),
         student.courses
       ),
