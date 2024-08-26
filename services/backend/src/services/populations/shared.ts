@@ -248,7 +248,7 @@ export const parseQueryParams = query => {
 
   const endDate = hasSpring
     ? new Date(`${year + 1}-${SemesterStart.FALL}`).toISOString()
-    : new Date(`${year}-${SemesterStart.SPRING}`).toISOString()
+    : new Date(`${year + 1}-${SemesterStart.SPRING}`).toISOString()
 
   const exchangeStudents = studentStatuses != null && studentStatuses.includes('EXCHANGE')
   const nondegreeStudents = studentStatuses != null && studentStatuses.includes('NONDEGREE')
