@@ -105,6 +105,59 @@ export const getSortableColumn = opts => ({
   ...opts,
 })
 
+const accumulateGrades = (
+  series: Array<Record<string, number>>,
+  baseAccumulator: Record<string, number[]>,
+  getMergedKey: (key: string) => string,
+  failedKeys: string[] = []
+) => {
+  return series.reduce(
+    (acc, cur, i) => {
+      const currentEntries = Object.entries(cur)
+      let failed = 0
+
+      currentEntries.forEach(([k, v]) => {
+        const mergedKey = getMergedKey(k)
+        if (failedKeys.includes(mergedKey.toLowerCase())) {
+          failed += v
+        } else {
+          acc[mergedKey].push(v)
+        }
+      })
+
+      if (failed > 0 && acc[0]) {
+        acc[0].push(failed)
+      }
+
+      Object.entries(acc).forEach(([k, v]) => {
+        if (v.length < i + 1) {
+          acc[k].push(0)
+        }
+      })
+
+      return acc
+    },
+    { ...baseAccumulator }
+  )
+}
+
+const calculateTotal = (series: Record<string, number[]>) => {
+  return Object.keys(series).reduce((acc, curr) => {
+    const numOfGrades = series[curr][0]
+    return acc + numOfGrades
+  }, 0)
+}
+
+const calculateRelative = (series: Record<string, number[]>, total: number) => {
+  return Object.keys(series).reduce(
+    (acc, curr) => {
+      acc[curr] = `${Math.round((series[curr][0] / total) * 10000) / 100}%`
+      return acc
+    },
+    {} as Record<string, string>
+  )
+}
+
 export const getThesisGradeSpread = (series: Array<Record<string, number>>, isRelative?: boolean) => {
   const thesisGradeAccumulator = {
     L: [],
@@ -124,40 +177,16 @@ export const getThesisGradeSpread = (series: Array<Record<string, number>>, isRe
     'Hyv.': [],
   } as Record<string, number[]>
 
-  const newSeries = series.reduce(
-    (acc, cur, i) => {
-      const currentEntries = Object.entries(cur)
-      currentEntries.forEach(([k, v]) => {
-        const merged = k === 'LA' ? 'LUB' : k
-        acc[merged].push(v)
-      })
-      Object.entries(acc).forEach(([k, v]) => {
-        if (v.length < i + 1) {
-          acc[k].push(0)
-        }
-      })
+  const getMergedKey = (key: string) => (key === 'LA' ? 'LUB' : key)
 
-      return acc
-    },
-    { ...thesisGradeAccumulator }
-  )
-  const total = Object.keys(newSeries).reduce((acc, curr) => {
-    const numOfGrades = newSeries[curr][0]
-    return acc + numOfGrades
-  }, 0)
+  const newSeries = accumulateGrades(series, thesisGradeAccumulator, getMergedKey)
+  const total = calculateTotal(newSeries)
 
-  const relative = Object.keys(newSeries).reduce((acc, curr) => {
-    acc[curr] = `${Math.round((newSeries[curr][0] / total) * 10000) / 100}%`
-    return acc
-  }, {})
-
-  return isRelative ? relative : newSeries
+  return isRelative ? calculateRelative(newSeries, total) : newSeries
 }
 
 export const getGradeSpread = (series: Array<Record<string, number>>, isRelative?: boolean) => {
-  const failedKeys = ['eisa', 'hyl.', 'hyl', '0', 'luop']
-
-  const baseAccumulator = {
+  const gradeAccumulator = {
     0: [],
     1: [],
     2: [],
@@ -169,39 +198,14 @@ export const getGradeSpread = (series: Array<Record<string, number>>, isRelative
     'Hyv.': [],
   } as Record<string, number[]>
 
-  const newSeries = series.reduce(
-    (acc, cur, i) => {
-      const currentEntries = Object.entries(cur)
-      let failed = 0
-      currentEntries.forEach(([k, v]) => {
-        if (failedKeys.includes(k.toLowerCase())) {
-          failed += v
-        } else {
-          const parsedGrade = Number(k) ? Math.round(Number(k)) : k
-          acc[parsedGrade].push(v)
-        }
-      })
-      acc[0].push(failed)
-      Object.entries(acc).forEach(([k, v]) => {
-        if (v.length < i + 1) {
-          acc[k].push(0)
-        }
-      })
-      return acc
-    },
-    { ...baseAccumulator }
-  )
-  const total = Object.keys(newSeries).reduce((acc, curr) => {
-    const numOfGrades = newSeries[curr][0]
-    return acc + numOfGrades
-  }, 0)
+  const failedKeys = ['eisa', 'hyl.', 'hyl', '0', 'luop']
 
-  const relative = Object.keys(newSeries).reduce((acc, curr) => {
-    acc[curr] = `${Math.round((newSeries[curr][0] / total) * 10000) / 100}%`
-    return acc
-  }, {})
+  const getMergedKey = (key: string) => (Number(key) ? Math.round(Number(key)).toString() : key)
 
-  return isRelative ? relative : newSeries
+  const newSeries = accumulateGrades(series, gradeAccumulator, getMergedKey, failedKeys)
+  const total = calculateTotal(newSeries)
+
+  return isRelative ? calculateRelative(newSeries, total) : newSeries
 }
 
 export const defineCellColor = (rowObfuscated: boolean) => {
