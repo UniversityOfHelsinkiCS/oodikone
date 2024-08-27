@@ -10,7 +10,6 @@ import {
   StudyrightExtent,
   Semester,
   SemesterEnrollment,
-  Transfer,
   SISStudyRight,
   SISStudyRightElement,
 } from '../../models'
@@ -125,11 +124,6 @@ const getStudents = async (studentNumbers: string[]) => {
     ],
     include: [
       {
-        model: Transfer,
-        attributes: ['transferdate', 'sourcecode', 'targetcode'],
-        separate: true,
-      },
-      {
         model: SISStudyRight,
         attributes: [
           'id',
@@ -145,7 +139,7 @@ const getStudents = async (studentNumbers: string[]) => {
           {
             model: SISStudyRightElement,
             required: true,
-            attributes: ['code', 'name', 'studyTrack', 'graduated', 'startDate', 'endDate'],
+            attributes: ['code', 'name', 'studyTrack', 'graduated', 'startDate', 'endDate', 'phase'],
           },
         ],
       },

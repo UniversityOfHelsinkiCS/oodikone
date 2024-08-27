@@ -69,7 +69,6 @@ export const optimizedStatisticsOf = async (query: Query, studentNumberList?: st
     { students, enrollments, credits, extents, semesters, courses },
     startDate,
     endDate,
-    studyRights,
     optionData,
     criteria,
     code

@@ -7,6 +7,7 @@ import { Course, Credit, SISStudyRight, SISStudyRightElement } from '../../model
 import { Criteria, Name } from '../../types'
 import { SemesterStart } from '../../util/semester'
 import { getCurrentSemester } from '../semesters'
+import { hasTransferredFromOrToProgramme } from '../studyProgramme/studyProgrammeHelpers'
 
 const { sequelize } = dbConnections
 
@@ -99,7 +100,6 @@ const formatStudentForPopulationStatistics = (
     createdAt,
     gender_code,
     tags,
-    option,
     birthdate,
     sis_person_id,
     home_country_fi,
@@ -113,7 +113,8 @@ const formatStudentForPopulationStatistics = (
   endDateMoment,
   criteria,
   code,
-  currentSemester
+  currentSemester,
+  optionData
 ) => {
   const toCourse = ({
     grade,
@@ -153,6 +154,26 @@ const formatStudentForPopulationStatistics = (
     : {}
 
   const correctStudyplan = studyplans ? studyplans.filter(plan => plan.programme_code === code) : []
+
+  const option = studentnumber in optionData ? optionData[studentnumber] : null
+
+  let transferredStudyright = false
+  let transferSource = null
+
+  const correctStudyRight = studyRights.find(studyRight =>
+    studyRight.studyRightElements.some(element => element.code === code)
+  )
+  const correctStudyRightElement = correctStudyRight.studyRightElements.find(element => element.code === code)
+  const [, hasTransferredToProgramme] = hasTransferredFromOrToProgramme(correctStudyRight, correctStudyRightElement)
+  if (hasTransferredToProgramme) {
+    const transferredFromProgramme = correctStudyRight.studyRightElements.find(element =>
+      moment(element.endDate).isSame(moment(correctStudyRightElement.startDate).subtract(1, 'd'), 'day')
+    )?.code
+    if (transferredFromProgramme) {
+      transferredStudyright = true
+      transferSource = transferredFromProgramme
+    }
+  }
 
   const toProgressCriteria = () => {
     const criteriaChecked = {
@@ -230,6 +251,8 @@ const formatStudentForPopulationStatistics = (
     home_country_sv,
     criteriaProgress: toProgressCriteria(),
     curriculumVersion: getCurriculumVersion(correctStudyplan[0]?.curriculum_period_id),
+    transferredStudyright,
+    transferSource,
   }
 }
 
@@ -335,7 +358,6 @@ export const formatStudentsForApi = async (
   { students, enrollments, credits, extents, semesters, courses },
   startDate: string,
   endDate: string,
-  studyRights: string[],
   optionData: Record<string, { name: Name }>,
   criteria: Criteria,
   code: string
@@ -355,70 +377,21 @@ export const formatStudentsForApi = async (
     return acc
   }, {})
 
-  const result = students.reduce(
-    (stats, student) => {
-      student.transfers.forEach(transfer => {
-        const target = stats.transfers.targets[transfer.targetcode] || { sources: {} }
-        const source = stats.transfers.sources[transfer.sourcecode] || { targets: {} }
-        target.sources[transfer.sourcecode] = true
-        source.targets[transfer.targetcode] = true
-        stats.transfers.targets[transfer.targetcode] = target
-        stats.transfers.sources[transfer.sourcecode] = source
-      })
-
-      if (student.studentnumber in optionData) {
-        student.option = optionData[student.studentnumber]
-      } else {
-        student.option = null
-      }
-
-      stats.students.push(
-        formatStudentForPopulationStatistics(
-          student,
-          enrollments,
-          credits,
-          startDate,
-          startDateMoment,
-          endDateMoment,
-          criteria,
-          code,
-          currentSemester
-        )
-      )
-      return stats
-    },
-    {
-      students: [],
-      transfers: {
-        targets: {},
-        sources: {},
-      },
-      studyrights: {
-        programmes: [],
-      },
-    }
-  )
-
-  const transferredStudyright = student => {
-    const transferredFrom = student.transfers.find(
-      transfer =>
-        transfer.targetcode === studyRights[0] &&
-        // Add bit of flex for students that transferred just before the startdate
-        moment(transfer.transferdate).isBetween(startDateMoment.subtract(1, 'd'), endDateMoment.add(1, 'd'))
-    )
-    if (transferredFrom) {
-      student.transferredStudyright = true
-      student.transferSource = transferredFrom.sourcecode
-    } else {
-      student.transferredStudyright = false
-      student.transferSource = null
-    }
-    return student
-  }
-
   return {
-    students: result.students.map(transferredStudyright),
-    transfers: result.transfers,
+    students: students.map(student =>
+      formatStudentForPopulationStatistics(
+        student,
+        enrollments,
+        credits,
+        startDate,
+        startDateMoment,
+        endDateMoment,
+        criteria,
+        code,
+        currentSemester,
+        optionData
+      )
+    ),
     extents,
     semesters,
     courses,
