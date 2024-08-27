@@ -44,6 +44,7 @@ export const getMaxValueOfSeries = (series: Series[]) => {
 }
 
 const THESIS_GRADES = ['I', 'A', 'NSLA', 'LUB', 'CL', 'MCLA', 'ECLA', 'L']
+const SECOND_NATIONAL_LANGUAGE_GRADES = ['TT', 'HT']
 const PASS_FAIL_GRADES = ['0', 'Hyv.']
 const NUMERIC_GRADES = ['1', '2', '3', '4', '5']
 
@@ -52,7 +53,20 @@ export const isThesisGrades = (grades: Record<string, number>) => {
 }
 
 const isThesisSeries = (series: Array<Record<string, number>>) => {
-  return series && series.some(series => isThesisGrades(series))
+  return series && series.some(record => isThesisGrades(record))
+}
+
+const isSecondNationalLanguageSeries = (series: Array<Record<string, number>>) => {
+  return (
+    series &&
+    series.every(record => {
+      const grades = Object.keys(record)
+      const hasPassFailGrades = grades.some(grade => PASS_FAIL_GRADES.includes(grade))
+      const hasNumericGrades = grades.some(grade => NUMERIC_GRADES.includes(grade))
+      const hasSecondNationalLanguageGrades = grades.some(grade => SECOND_NATIONAL_LANGUAGE_GRADES.includes(grade))
+      return !hasNumericGrades && hasPassFailGrades && hasSecondNationalLanguageGrades
+    })
+  )
 }
 
 const isPassFailSeries = (series: Array<Record<string, number>>) => {
@@ -60,9 +74,10 @@ const isPassFailSeries = (series: Array<Record<string, number>>) => {
     series &&
     series.every(record => {
       const grades = Object.keys(record)
-      const hasPassFailGrade = grades.some(grade => PASS_FAIL_GRADES.includes(grade))
-      const hasNumericGrade = grades.some(grade => NUMERIC_GRADES.includes(grade))
-      return hasPassFailGrade && !hasNumericGrade
+      const hasPassFailGrades = grades.some(grade => PASS_FAIL_GRADES.includes(grade))
+      const hasNumericGrades = grades.some(grade => NUMERIC_GRADES.includes(grade))
+      const hasSecondNationalLanguageGrades = grades.some(grade => SECOND_NATIONAL_LANGUAGE_GRADES.includes(grade))
+      return !hasNumericGrades && hasPassFailGrades && !hasSecondNationalLanguageGrades
     })
   )
 }
@@ -70,6 +85,9 @@ const isPassFailSeries = (series: Array<Record<string, number>>) => {
 export const getSeriesType = (series: Array<Record<string, number>>) => {
   if (isThesisSeries(series)) {
     return 'thesis'
+  }
+  if (isSecondNationalLanguageSeries(series)) {
+    return 'second-national-language'
   }
   if (isPassFailSeries(series)) {
     return 'pass-fail'

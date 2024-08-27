@@ -102,12 +102,29 @@ const getGradeSeries = series => {
     }
   }
 
-  if (seriesType === 'pass-fail') {
+  if (seriesType === 'second-national-language') {
     return {
-      absolute: [getDataObject('0', newSeries[0], 'a'), getDataObject('Hyv.', newSeries['Hyv.'], 'i')],
+      absolute: [
+        getDataObject('0', newSeries[0], 'a'),
+        getDataObject('HT', newSeries.HT, 'b'),
+        getDataObject('TT', newSeries.TT, 'c'),
+        getDataObject('Hyv.', newSeries['Hyv.'], 'd'),
+      ],
       relative: [
         getDataObject('0', newSeries[0].map(absoluteToRelative(sumAll)), 'a'),
-        getDataObject('Hyv.', newSeries['Hyv.'].map(absoluteToRelative(sumAll)), 'i'),
+        getDataObject('HT', newSeries.HT.map(absoluteToRelative(sumAll)), 'b'),
+        getDataObject('TT', newSeries.TT.map(absoluteToRelative(sumAll)), 'c'),
+        getDataObject('Hyv.', newSeries['Hyv.'].map(absoluteToRelative(sumAll)), 'd'),
+      ],
+    }
+  }
+
+  if (seriesType === 'pass-fail') {
+    return {
+      absolute: [getDataObject('0', newSeries[0], 'a'), getDataObject('Hyv.', newSeries['Hyv.'], 'b')],
+      relative: [
+        getDataObject('0', newSeries[0].map(absoluteToRelative(sumAll)), 'a'),
+        getDataObject('Hyv.', newSeries['Hyv.'].map(absoluteToRelative(sumAll)), 'b'),
       ],
     }
   }
