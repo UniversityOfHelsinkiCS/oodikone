@@ -50,7 +50,7 @@ const rootOrgId = process.env.ROOT_ORG_ID || 'hy-university-root-id'
 const languageCenterViewEnabled =
   process.env.LANGUAGE_CENTER_VIEW_ENABLED == null ? true : process.env.LANGUAGE_CENTER_VIEW_ENABLED === 'true'
 
-const concurrentWorkers = process.env.CONCURRENT_WORKERS || 2
+const concurrentWorkers = process.env.CONCURRENT_WORKERS ? parseInt(process.env.CONCURRENT_WORKERS, 10) : 2
 
 let DB_MAX_CONNECTIONS = parseInt(process.env.DB_MAX_CONNECTIONS, 10)
 if (Number.isNaN(DB_MAX_CONNECTIONS)) {
