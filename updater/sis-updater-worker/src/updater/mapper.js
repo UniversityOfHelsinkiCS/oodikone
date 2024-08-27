@@ -479,10 +479,6 @@ const studyplanMapper =
       return {
         id,
         studentnumber,
-        studyrightid:
-          code.includes('MH') && educationStudyrights[studyplan.root_id][studyplan.user_id].hasBaMaEducation
-            ? `${studyrightId}-2`
-            : `${studyrightId}-1`,
         completed_credits,
         programme_code: code,
         included_courses: includedCourses,

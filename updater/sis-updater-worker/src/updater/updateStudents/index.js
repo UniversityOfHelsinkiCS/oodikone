@@ -1,9 +1,8 @@
-const { flatten, groupBy, orderBy, has, get, uniq } = require('lodash')
+const { flatten, groupBy, orderBy, uniq } = require('lodash')
 const { Op } = require('sequelize')
 
 const { bulkCreate, selectFromActiveSnapshotsByIds, selectFromByIds, selectFromSnapshotsByIds } = require('../../db')
-const { Course, Enrollment, SemesterEnrollment, Student, Transfer } = require('../../db/models')
-const { isBaMa } = require('../../utils')
+const { Course, Enrollment, SemesterEnrollment, Student } = require('../../db/models')
 const { logger } = require('../../utils/logger')
 const { studentMapper, semesterEnrollmentMapper, enrollmentMapper } = require('../mapper')
 const { getEducation, getUniOrgId, loadMapsIfNeeded } = require('../shared')
@@ -11,7 +10,6 @@ const { updateAttainments } = require('./attainments')
 const { getAttainmentsToBeExcluded } = require('./excludedPartialAttainments')
 const { updateSISStudyRights, updateSISStudyRightElements } = require('./SISStudyRights')
 const { updateStudyplans, findStudentsToReupdate } = require('./studyPlans')
-const { updateStudyRights, updateStudyRightElements, updateElementDetails } = require('./studyRightUpdaters')
 
 // Accepted selection path is not available when degree programme doesn't have
 // studytrack or major subject. This is a known bug on SIS and has been reported
@@ -96,73 +94,6 @@ const groupSISStudyRightSnapshots = studyrightSnapshots => {
     res[studyRightId] = orderedSnapshots
     return res
   }, {})
-}
-
-const parseTransfers = async (groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber) => {
-  const getTransfersFrom = (orderedSnapshots, studyrightid, educationId) => {
-    return orderedSnapshots.reduce((curr, snapshot, i) => {
-      if (i === 0) return curr
-
-      const studyRightEducation = getEducation(educationId)
-      if (!studyRightEducation) return curr
-
-      const usePhase2 =
-        isBaMa(studyRightEducation) && !!get(orderedSnapshots[i - 1], 'study_right_graduation.phase1GraduationDate')
-
-      if (usePhase2 && !get(orderedSnapshots[i - 1], 'accepted_selection_path.educationPhase2GroupId')) return curr
-
-      let mappedId
-
-      if (isBaMa(studyRightEducation)) {
-        if (usePhase2 && !!get(snapshot, 'accepted_selection_path.educationPhase2GroupId')) {
-          mappedId = `${studyrightid}-2`
-        } else {
-          mappedId = `${studyrightid}-1`
-        }
-      } else {
-        mappedId = `${studyrightid}-1` // studyrightid duplicatefix
-      }
-
-      const sourcecode =
-        moduleGroupIdToCode[
-          orderedSnapshots[i - 1].accepted_selection_path[
-            usePhase2 ? 'educationPhase2GroupId' : 'educationPhase1GroupId'
-          ]
-        ]
-
-      const targetcode =
-        moduleGroupIdToCode[
-          snapshot.accepted_selection_path[
-            usePhase2 && has(snapshot, 'accepted_selection_path.educationPhase2GroupId')
-              ? 'educationPhase2GroupId'
-              : 'educationPhase1GroupId'
-          ]
-        ]
-
-      if (!sourcecode || !targetcode || sourcecode === targetcode) return curr
-      // source === targetcode isn't really a change between programmes, but we should still update transferdate to
-      // newer snapshot date time
-      // but: updating requires some changes to this reducers logic, so this fix can be here for now
-
-      curr.push({
-        id: `${mappedId}-${snapshot.modification_ordinal}-${sourcecode}-${targetcode}`,
-        sourcecode,
-        targetcode,
-        transferdate: new Date(snapshot.first_snapshot_date_time || snapshot.snapshot_date_time),
-        studentnumber: personIdToStudentNumber[snapshot.person_id],
-        studyrightid: mappedId,
-      })
-
-      return curr
-    }, [])
-  }
-
-  const transfers = []
-  Object.values(groupedStudyRightSnapshots).forEach(snapshots => {
-    const orderedSnapshots = orderBy(snapshots, s => new Date(s.snapshot_date_time), 'asc')
-    transfers.push(...getTransfersFrom(orderedSnapshots, snapshots[0].id, snapshots[0].education_id))
-  })
-  return transfers
 }
 
 const updateEnrollments = async (enrollments, personIdToStudentNumber, studyRightIdToEducationType) => {
@@ -264,23 +195,38 @@ const updateTermRegistrations = async (termRegistrations, personIdToStudentNumbe
   await bulkCreate(SemesterEnrollment, semesterEnrollments)
 }
 
+const createModuleGroupIdToCodeMap = async studyRights => {
+  const groupIds = new Set()
+
+  for (const { accepted_selection_path } of studyRights) {
+    const { educationPhase1GroupId, educationPhase1ChildGroupId, educationPhase2GroupId, educationPhase2ChildGroupId } =
+      accepted_selection_path
+    groupIds.add(educationPhase1GroupId)
+    groupIds.add(educationPhase2GroupId)
+    groupIds.add(educationPhase1ChildGroupId)
+    groupIds.add(educationPhase2ChildGroupId)
+  }
+
+  const programmesAndStudyTracks = await selectFromByIds(
+    'modules',
+    [...groupIds].filter(a => !!a),
+    'group_id'
+  )
+
+  return programmesAndStudyTracks.reduce((acc, curr) => {
+    acc[curr.group_id] = curr.code
+    return acc
+  }, {})
+}
+
 const updateStudents = async (personIds, iteration = 0) => {
   await loadMapsIfNeeded()
 
-  const [
-    students,
-    studyrightSnapshots,
-    attainments,
-    termRegistrations,
-    studyRightPrimalities,
-    enrollments,
-    studyplans,
-  ] = await Promise.all([
+  const [students, studyrightSnapshots, attainments, termRegistrations, enrollments, studyplans] = await Promise.all([
     selectFromByIds('persons', personIds),
     selectFromByIds('studyrights', personIds, 'person_id'),
     selectFromByIds('attainments', personIds, 'person_id'),
     selectFromByIds('term_registrations', personIds, 'student_id'),
-    selectFromByIds('study_right_primalities', personIds, 'student_id'),
     selectFromByIds('enrolments', personIds, 'person_id'),
     selectFromByIds('plans', personIds, 'user_id'),
   ])
@@ -303,12 +249,6 @@ const updateStudents = async (personIds, iteration = 0) => {
     return res
   }, {})
 
-  const personIdToStudyRightIdToPrimality = studyRightPrimalities.reduce((res, curr) => {
-    if (!res[curr.student_id]) res[curr.student_id] = {}
-    res[curr.student_id][curr.study_right_id] = curr
-    return res
-  }, {})
-
   const attainmentsToBeExluced = getAttainmentsToBeExcluded()
   const mappedStudents = students
     .filter(s => s.student_number)
@@ -318,18 +258,7 @@ const updateStudents = async (personIds, iteration = 0) => {
 
   const groupedSISStudyRightSnapshots = groupSISStudyRightSnapshots(studyrightSnapshots)
 
-  const [moduleGroupIdToCode, formattedStudyRights] = await Promise.all([
-    updateElementDetails([
-      ...flatten(Object.values(groupedStudyRightSnapshots)),
-      ...flatten(Object.values(groupedSISStudyRightSnapshots)),
-    ]),
-    updateStudyRights(
-      groupedStudyRightSnapshots,
-      personIdToStudentNumber,
-      personIdToStudyRightIdToPrimality,
-      termRegistrations
-    ),
-  ])
+  const moduleGroupIdToCode = await createModuleGroupIdToCodeMap(flatten(Object.values(groupedSISStudyRightSnapshots)))
 
   const createdStudyRights = await updateSISStudyRights(
     groupedSISStudyRightSnapshots,
@@ -342,8 +271,6 @@ const updateStudents = async (personIds, iteration = 0) => {
     moduleGroupIdToCode,
     createdStudyRights
   )
-
-  const mappedTransfers = await parseTransfers(groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber)
 
   const educations = await selectFromByIds(
     'educations',
@@ -361,15 +288,6 @@ const updateStudents = async (personIds, iteration = 0) => {
   }
 
   await Promise.all([
-    updateStudyRightElements(
-      groupedStudyRightSnapshots,
-      moduleGroupIdToCode,
-      personIdToStudentNumber,
-      formattedStudyRights,
-      mappedTransfers
-    ).catch(error => {
-      logError(error, 'studyright elements')
-    }),
     updateAttainments(attainments, personIdToStudentNumber, attainmentsToBeExluced, studyRightIdToEducationType).catch(
       error => {
         logError(error, 'attainments')
@@ -383,9 +301,6 @@ const updateStudents = async (personIds, iteration = 0) => {
     }),
     updateStudyplans(studyplans, personIds, personIdToStudentNumber, groupedStudyRightSnapshots).catch(error => {
       logError(error, 'studyplans')
-    }),
-    bulkCreate(Transfer, mappedTransfers, null, ['studyrightid']).catch(error => {
-      logError(error, 'transfers')
     }),
   ])
 

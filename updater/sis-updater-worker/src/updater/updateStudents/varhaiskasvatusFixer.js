@@ -1,5 +1,7 @@
+const { Op } = require('sequelize')
+
 const { selectFromByIds } = require('../../db')
-const { Studyright, StudyrightElement } = require('../../db/models')
+const { SISStudyRight, SISStudyRightElement } = require('../../db/models')
 
 const studentsThatNeedToBeFixed = [
   { id: 'hy-hlo-109316006', started: '2019-04-30' },
@@ -24,32 +26,37 @@ const studentsThatNeedToBeFixed = [
 const fixVarhaiskasvatusStudyRights = async studentsToBeFixed => {
   const students = await selectFromByIds('persons', studentsToBeFixed)
   for (const student of students) {
-    const bsc = await StudyrightElement.findOne({
+    const studentInfo = studentsThatNeedToBeFixed.find(s => s.id === student.id)
+
+    const studyRight = await SISStudyRight.findOne({
       where: {
-        studentnumber: student.student_number,
-        code: 'KH60_001',
+        studentNumber: student.student_number,
       },
       include: {
-        model: Studyright,
-        attributes: ['graduated'],
+        model: SISStudyRightElement,
+        where: {
+          code: {
+            [Op.in]: ['KH60_001', 'MH60_001'],
+          },
+        },
       },
     })
 
-    bsc.startdate = new Date(studentsThatNeedToBeFixed.find(s => s.id === student.id).started)
-    await bsc.save()
-
-    const msc = await StudyrightElement.findOne({
-      where: {
-        studentnumber: student.student_number,
-        code: 'MH60_001',
-      },
-    })
-
-    if (bsc.studyright.graduated) {
-      const bscEnd = new Date(bsc.enddate)
-      bscEnd.setDate(bscEnd.getDate() + 1)
-      msc.startdate = bscEnd
-      await msc.save()
+    if (studyRight) {
+      const bachelorElement = studyRight.SISStudyRightElements.find(element => element.code === 'KH60_001')
+      if (bachelorElement) {
+        bachelorElement.startDate = new Date(studentInfo.started)
+        await bachelorElement.save()
+        if (bachelorElement.graduated) {
+          const masterElement = studyRight.SISStudyRightElements.find(element => element.code === 'MH60_001')
+          if (masterElement) {
+            const bscEndDate = new Date(bachelorElement.endDate)
+            bscEndDate.setDate(bscEndDate.getDate() + 1)
+            masterElement.startDate = bscEndDate
+            await masterElement.save()
+          }
+        }
+      }
     }
   }
 }
