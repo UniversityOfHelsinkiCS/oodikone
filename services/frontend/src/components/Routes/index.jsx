@@ -21,6 +21,7 @@ import { StudyProgramme } from '@/components/StudyProgramme'
 import { Teachers } from '@/components/Teachers'
 import { Updater } from '@/components/Updater'
 import { Users } from '@/components/Users'
+import { languageCenterViewEnabled } from '@/conf'
 import { ProtectedRoute } from './ProtectedRoute'
 
 const routes = {
@@ -115,7 +116,7 @@ export const Routes = () => (
         path={routes.studyGuidanceGroups}
         requiredRoles={['studyGuidanceGroups']}
       />
-      {isDefaultServiceProvider() && (
+      {languageCenterViewEnabled && (
         <ProtectedRoute
           component={LanguageCenterView}
           exact

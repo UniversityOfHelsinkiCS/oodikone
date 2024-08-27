@@ -3,7 +3,7 @@ import { Button, Dropdown, Label, Menu } from 'semantic-ui-react'
 
 import { checkUserAccess, getFullStudyProgrammeRights, isDefaultServiceProvider } from '@/common'
 import { LanguagePicker } from '@/components/LanguagePicker'
-import { adminerUrls, isDev } from '@/conf'
+import { adminerUrls, isDev, languageCenterViewEnabled } from '@/conf'
 import { useGetAuthorizedUserQuery, useLogoutMutation, useShowAsUser } from '@/redux/auth'
 import './navigationBar.css'
 
@@ -112,7 +112,7 @@ export const NavigationBar = () => {
     if (
       (checkUserAccess(['admin'], roles) || iamGroups.includes('grp-kielikeskus-esihenkilot')) &&
       item.key === 'languageCenterView' &&
-      isDefaultServiceProvider()
+      languageCenterViewEnabled
     )
       return true
     if (item.key === 'closeToGraduation' && checkUserAccess(['admin', 'fullSisuAccess', 'studyGuidanceGroups'], roles))

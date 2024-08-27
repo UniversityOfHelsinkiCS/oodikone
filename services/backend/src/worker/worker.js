@@ -2,7 +2,7 @@ const Sentry = require('@sentry/node')
 const { Worker } = require('bullmq')
 const moment = require('moment')
 
-const { redis } = require('../config')
+const { redis, concurrentWorkers } = require('../config')
 const logger = require('../util/logger')
 const { defaultJobOptions, queueName } = require('./queue')
 
@@ -17,7 +17,7 @@ process.execArgv = process.execArgv.filter(arg => !arg.includes('--max_old_space
 const worker = new Worker(queueName, `${__dirname}/processor.js`, {
   connection,
   useWorkerThreads: true,
-  concurrency: 2,
+  concurrency: concurrentWorkers,
 })
 
 worker.on('completed', job => {

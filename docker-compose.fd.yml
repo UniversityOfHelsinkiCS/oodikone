@@ -45,11 +45,13 @@ services:
       IMPORTER_DB_API_USER: dev_user
       IMPORTER_DB_API_PASSWORD: dev_password
       ROOT_ORG_ID: ${ROOT_ORG_ID}
+      LANGUAGE_CENTER_VIEW_ENABLED: 'false'
     ports:
       - 8080:8080
     volumes:
       - ./environments/ha:/opt/app-root/src/src/environment
       - ./services/backend/src:/opt/app-root/src/src
+      - ./services/shared/:/opt/app-root/src/src/shared
 
   frontend:
     <<: *defaults
@@ -61,8 +63,10 @@ services:
       - 3000:3000
     environment:
       REACT_APP_SERVICE_PROVIDER: fd
+      REACT_APP_LANGUAGE_CENTER_VIEW_ENABLED: 'false'
     volumes:
       - ./services/frontend/src/:/opt/app-root/src/src
+      - ./services/shared/:/opt/app-root/src/src/shared
 
   kone-db:
     <<: *defaults
