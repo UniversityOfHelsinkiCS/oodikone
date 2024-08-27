@@ -3,14 +3,7 @@ import { InferAttributes } from 'sequelize'
 import { Column, CreatedAt, DataType, HasMany, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
 import { GenderCode } from '../types'
-import { Credit } from './credit'
-import { Enrollment } from './enrollment'
-import { SemesterEnrollment } from './semesterEnrollment'
-import { SISStudyRight } from './SISStudyRight'
-import { Studyplan } from './studyplan'
-import { Studyright } from './studyright'
-import { StudyrightElement } from './studyrightElement'
-import { Transfer } from './transfer'
+import { Credit, Enrollment, SemesterEnrollment, SISStudyRight, Studyplan } from '.'
 
 @Table({
   underscored: true,
@@ -40,17 +33,8 @@ export class Student extends Model<InferAttributes<Student>> {
   @HasMany(() => SISStudyRight)
   studyRights!: SISStudyRight[]
 
-  @HasMany(() => Studyright)
-  studyrights!: Studyright[]
-
-  @HasMany(() => StudyrightElement, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
-  studyrightElements!: StudyrightElement[]
-
   @HasMany(() => Studyplan, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
   studyplans!: Studyplan[]
-
-  @HasMany(() => Transfer, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
-  transfers!: Transfer[]
 
   @HasMany(() => Credit, { foreignKey: 'student_studentnumber', sourceKey: 'studentnumber' })
   credits!: Credit[]

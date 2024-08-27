@@ -14,11 +14,7 @@ import {
 } from 'sequelize-typescript'
 
 import { EnrollmentType, ExtentCode } from '../types'
-import { Organization } from './organization'
-import { SISStudyRightElement } from './SISStudyRightElement'
-import { Student } from './student'
-import { Studyplan } from './studyplan'
-import { StudyrightExtent } from './studyrightExtent'
+import { Credit, Enrollment, Organization, SISStudyRightElement, Student, Studyplan, StudyrightExtent } from '.'
 
 export type SemesterEnrollment = {
   type: EnrollmentType
@@ -76,6 +72,12 @@ export class SISStudyRight extends Model<InferAttributes<SISStudyRight>> {
 
   @Column(DataType.JSONB)
   semesterEnrollments!: SemesterEnrollment[] | null
+
+  @HasMany(() => Credit, { foreignKey: 'studyright_id', sourceKey: 'id' })
+  credits!: Credit[]
+
+  @HasMany(() => Enrollment, { foreignKey: 'studyright_id', sourceKey: 'id' })
+  enrollments!: Enrollment[]
 
   @CreatedAt
   @Column(DataType.DATE)

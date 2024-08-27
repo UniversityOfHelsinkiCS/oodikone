@@ -13,10 +13,7 @@ import {
 } from 'sequelize-typescript'
 
 import { EnrollmentState } from '../types'
-import { Course } from './course'
-import { Semester } from './semester'
-import { Student } from './student'
-import { Studyright } from './studyright'
+import { Course, Semester, SISStudyRight, Student } from '.'
 
 @Table({
   underscored: false,
@@ -61,12 +58,12 @@ export class Enrollment extends Model<InferAttributes<Enrollment>> {
   @Column(DataType.BOOLEAN)
   is_open!: boolean
 
-  @ForeignKey(() => Studyright)
+  @ForeignKey(() => SISStudyRight)
   @Column({ type: DataType.STRING, allowNull: true })
   studyright_id!: string
 
-  @BelongsTo(() => Studyright, { foreignKey: 'studyright_id', targetKey: 'studyrightid', constraints: false })
-  studyright!: Studyright
+  @BelongsTo(() => SISStudyRight, { foreignKey: 'studyright_id', targetKey: 'id', constraints: false })
+  studyright!: SISStudyRight
 
   @BelongsTo(() => Course, { foreignKey: 'course_id', targetKey: 'id' })
   course!: Course

@@ -7,7 +7,6 @@ import { Credit } from './credit'
 import { CreditTeacher } from './creditTeacher'
 import { CreditType } from './creditType'
 import { CurriculumPeriod } from './curriculumPeriod'
-import { ElementDetail } from './elementDetail'
 import { Enrollment } from './enrollment'
 import { Organization } from './organization'
 import { ProgrammeModule } from './programmeModule'
@@ -18,11 +17,8 @@ import { SISStudyRight } from './SISStudyRight'
 import { SISStudyRightElement } from './SISStudyRightElement'
 import { Student } from './student'
 import { Studyplan } from './studyplan'
-import { Studyright } from './studyright'
-import { StudyrightElement } from './studyrightElement'
 import { StudyrightExtent } from './studyrightExtent'
 import { Teacher } from './teacher'
-import { Transfer } from './transfer'
 
 Credit.passed = ({ credittypecode }) => [CreditTypeCode.PASSED, CreditTypeCode.APPROVED].includes(credittypecode)
 Credit.failed = ({ credittypecode }) => credittypecode === CreditTypeCode.FAILED
@@ -37,7 +33,6 @@ export {
   CreditTeacher,
   CreditType,
   CurriculumPeriod,
-  ElementDetail,
   Enrollment,
   Organization,
   ProgrammeModule,
@@ -48,9 +43,6 @@ export {
   SISStudyRightElement,
   Student,
   Studyplan,
-  Studyright,
   StudyrightExtent,
-  StudyrightElement,
   Teacher,
-  Transfer,
 }

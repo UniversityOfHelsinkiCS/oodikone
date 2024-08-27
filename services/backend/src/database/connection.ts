@@ -11,7 +11,6 @@ import {
   CreditTeacher,
   CreditType,
   CurriculumPeriod,
-  ElementDetail,
   Enrollment,
   Organization,
   ProgrammeModule,
@@ -22,11 +21,8 @@ import {
   SISStudyRightElement,
   Student,
   Studyplan,
-  Studyright,
-  StudyrightElement,
   StudyrightExtent,
   Teacher,
-  Transfer,
 } from '../models'
 import {
   CustomPopulationSearch,
@@ -72,7 +68,6 @@ class DbConnection extends EventEmitter {
         CreditTeacher,
         CreditType,
         CurriculumPeriod,
-        ElementDetail,
         Enrollment,
         Organization,
         ProgrammeModule,
@@ -83,11 +78,8 @@ class DbConnection extends EventEmitter {
         SISStudyRightElement,
         Student,
         Studyplan,
-        Studyright,
-        StudyrightElement,
         StudyrightExtent,
         Teacher,
-        Transfer,
       ],
     })
   }

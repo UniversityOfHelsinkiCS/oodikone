@@ -13,11 +13,7 @@ import {
 } from 'sequelize-typescript'
 
 import { Name } from '../types'
-import { Course } from './course'
-import { CourseProvider } from './courseProvider'
-import { ProgrammeModule } from './programmeModule'
-import { SISStudyRight } from './SISStudyRight'
-import { Studyright } from './studyright'
+import { Course, CourseProvider, ProgrammeModule, SISStudyRight } from '.'
 
 @Table({
   underscored: true,
@@ -46,9 +42,6 @@ export class Organization extends Model<InferAttributes<Organization>> {
 
   @HasMany(() => SISStudyRight, { foreignKey: 'facultyCode', sourceKey: 'code' })
   SISStudyRights!: SISStudyRight[]
-
-  @HasMany(() => Studyright, { foreignKey: 'facultyCode', sourceKey: 'code' })
-  studyrights!: Studyright[]
 
   @BelongsToMany(() => Course, () => CourseProvider, 'organizationcode')
   courses!: Course[]

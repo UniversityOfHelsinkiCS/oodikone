@@ -14,13 +14,7 @@ import {
 } from 'sequelize-typescript'
 
 import { CreditTypeCode } from '../types'
-import { Course } from './course'
-import { CreditTeacher } from './creditTeacher'
-import { CreditType } from './creditType'
-import { Semester } from './semester'
-import { Student } from './student'
-import { Studyright } from './studyright'
-import { Teacher } from './teacher'
+import { Course, CreditTeacher, CreditType, Semester, SISStudyRight, Student, Teacher } from '.'
 
 @Table({
   underscored: false,
@@ -92,12 +86,12 @@ export class Credit extends Model<InferAttributes<Credit>> {
   @Column(DataType.BOOLEAN)
   is_open!: boolean
 
-  @ForeignKey(() => Studyright)
+  @ForeignKey(() => SISStudyRight)
   @Column(DataType.STRING)
   studyright_id!: string
 
-  @BelongsTo(() => Studyright)
-  studyright!: Studyright
+  @BelongsTo(() => SISStudyRight)
+  studyright!: SISStudyRight
 
   @CreatedAt
   @Column(DataType.DATE)

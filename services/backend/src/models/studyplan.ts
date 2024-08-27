@@ -12,9 +12,7 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
-import { SISStudyRight } from './SISStudyRight'
-import { Student } from './student'
-import { Studyright } from './studyright'
+import { Student, SISStudyRight } from '.'
 
 @Table({
   underscored: false,
@@ -32,13 +30,6 @@ export class Studyplan extends Model<InferAttributes<Studyplan>> {
 
   @BelongsTo(() => Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
   student!: Student
-
-  @ForeignKey(() => Studyright)
-  @Column(DataType.STRING)
-  studyrightid!: string
-
-  @BelongsTo(() => Studyright, { foreignKey: 'studyrightid', targetKey: 'studyrightid' })
-  studyright!: Studyright
 
   @ForeignKey(() => SISStudyRight)
   @Column(DataType.STRING)
