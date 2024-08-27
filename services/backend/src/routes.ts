@@ -3,7 +3,7 @@ import compression from 'compression'
 import cors from 'cors'
 import express, { Express } from 'express'
 
-import { frontUrl, serviceProvider } from './config'
+import { frontUrl, languageCenterViewEnabled, serviceProvider } from './config'
 import accessLogger from './middleware/accessLogger'
 import * as auth from './middleware/auth'
 import currentUserMiddleware from './middleware/currentUser'
@@ -65,7 +65,9 @@ const routes = (app: Express, url: string) => {
   app.use(`${url}/openunisearch`, auth.roles(['openUniSearch']), customOpenUniSearch)
   app.use(`${url}/changelog`, changelog)
   app.use(`${url}/completedcoursessearch`, completedCoursesSearch)
-  app.use(`${url}/languagecenterdata`, languageCenterData)
+  if (languageCenterViewEnabled) {
+    app.use(`${url}/languagecenterdata`, languageCenterData)
+  }
   app.use(`${url}/faculties`, faculties)
   app.use(`${url}/university`, university)
   app.use(`${url}/updater`, auth.roles(['admin']), updater)
