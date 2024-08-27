@@ -160,18 +160,20 @@ const formatStudentForPopulationStatistics = (
   let transferredStudyright = false
   let transferSource = null
 
-  const correctStudyRight = studyRights.find(studyRight =>
-    studyRight.studyRightElements.some(element => element.code === code)
-  )
-  const correctStudyRightElement = correctStudyRight.studyRightElements.find(element => element.code === code)
-  const [, hasTransferredToProgramme] = hasTransferredFromOrToProgramme(correctStudyRight, correctStudyRightElement)
-  if (hasTransferredToProgramme) {
-    const transferredFromProgramme = correctStudyRight.studyRightElements.find(element =>
-      moment(element.endDate).isSame(moment(correctStudyRightElement.startDate).subtract(1, 'd'), 'day')
-    )?.code
-    if (transferredFromProgramme) {
-      transferredStudyright = true
-      transferSource = transferredFromProgramme
+  if (code) {
+    const correctStudyRight = studyRights.find(studyRight =>
+      studyRight.studyRightElements.some(element => element.code === code)
+    )
+    const correctStudyRightElement = correctStudyRight.studyRightElements.find(element => element.code === code)
+    const [, hasTransferredToProgramme] = hasTransferredFromOrToProgramme(correctStudyRight, correctStudyRightElement)
+    if (hasTransferredToProgramme) {
+      const transferredFromProgramme = correctStudyRight.studyRightElements.find(element =>
+        moment(element.endDate).isSame(moment(correctStudyRightElement.startDate).subtract(1, 'd'), 'day')
+      )?.code
+      if (transferredFromProgramme) {
+        transferredStudyright = true
+        transferSource = transferredFromProgramme
+      }
     }
   }
 
