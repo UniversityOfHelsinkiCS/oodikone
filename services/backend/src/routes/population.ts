@@ -377,9 +377,9 @@ router.get('/v3/populationstatisticsbycourse', async (req: GetPopulationStatisti
       : new Set(intersection(studentNumbers, allStudentsUserCanAccess))
 
   const randomHash = crypto.randomBytes(12).toString('hex')
-  const obfuscateStudent = ({ studyrights, studentNumber, courses, gender_code }) => ({
+  const obfuscateStudent = ({ studyRights, studentNumber, courses, gender_code }) => ({
     courses,
-    studyrights,
+    studyRights,
     gender_code,
     studentNumber: crypto.createHash('md5').update(`${studentNumber}${randomHash}`).digest('hex'),
     firstnames: '',
