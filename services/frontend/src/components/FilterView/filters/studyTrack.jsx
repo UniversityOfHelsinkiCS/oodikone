@@ -1,43 +1,34 @@
-/* eslint-disable camelcase */
-import { chain, get } from 'lodash'
-import moment from 'moment'
 import { Dropdown, Form } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { createFilter } from './createFilter'
 
-const StudyTrackFilterCard = ({ activeAt, code, onOptionsChange, options, withoutSelf }) => {
+const StudyTrackFilterCard = ({ code, onOptionsChange, options, withoutSelf }) => {
   const { selected } = options
   const { getTextIn } = useLanguage()
 
-  const activeAtMoment = activeAt && moment(activeAt)
-
-  const dropdownOptions = chain(withoutSelf())
-    .filter(student => !student.transferredStudyright)
-    .flatMap(student => student.studyrights)
-    .map(studyright => studyright.studyright_elements)
-    .filter(element => element.some(element => element.code === code))
-    .flatMap()
-    .filter(
-      element =>
-        element.element_detail?.type === 30 &&
-        (activeAtMoment ? activeAtMoment.isBetween(element.startdate, element.enddate, 'day', '[]') : true)
-    )
-    .map(element => element.element_detail)
-    .keyBy('code')
-    .values()
-    .map(({ code, name }) => ({
-      key: code,
-      value: code,
-      text: `${getTextIn(name)} (${code})`,
-      content: (
-        <>
-          {getTextIn(name)}{' '}
-          <span style={{ whiteSpace: 'nowrap', color: 'rgb(136, 136, 136)', fontSize: '0.8em' }}>({code})</span>
-        </>
-      ),
-    }))
-    .value()
+  const dropdownOptions = withoutSelf()
+    .flatMap(student => student.studyRights)
+    .flatMap(studyRight => studyRight.studyRightElements)
+    .filter(element => element.code === code && element.studyTrack !== null)
+    .reduce((acc, element) => {
+      const { studyTrack } = element
+      if (acc.some(option => option.key === studyTrack.code)) {
+        return acc
+      }
+      acc.push({
+        key: studyTrack.code,
+        value: studyTrack.code,
+        text: `${getTextIn(studyTrack.name)} (${studyTrack.code})`,
+        content: (
+          <>
+            {getTextIn(studyTrack.name)}{' '}
+            <span style={{ whiteSpace: 'nowrap', color: '#888', fontSize: '0.8rem' }}>({studyTrack.code})</span>
+          </>
+        ),
+      })
+      return acc
+    }, [])
 
   const handleChange = (_, { value }) => {
     onOptionsChange({
@@ -72,14 +63,10 @@ export const studyTrackFilter = createFilter({
     selected: [],
   },
   isActive: ({ selected }) => (selected !== undefined ? selected.length > 0 : false),
-  filter: (student, { selected }) => {
-    return student.studyrights
-      .filter(({ studyright_elements }) => studyright_elements.some(element => element.element_detail.type === 30))
-      .flatMap(({ studyright_elements }) => studyright_elements)
-      .map(element => element.element_detail.code)
-      .some(code => selected.includes(code))
-  },
-  render: (props, { args }) => (
-    <StudyTrackFilterCard {...props} activeAt={get(args, 'activeAt')} code={get(args, 'code')} />
-  ),
+  filter: (student, { selected }, { args }) =>
+    student.studyRights
+      .flatMap(studyRight => studyRight.studyRightElements)
+      .filter(element => element.code === args.code && element.studyTrack !== null)
+      .some(element => selected.includes(element.studyTrack.code)),
+  render: (props, { args }) => <StudyTrackFilterCard {...props} code={args.code} />,
 })

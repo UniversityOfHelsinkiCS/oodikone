@@ -1,25 +1,21 @@
 import moment from 'moment'
-import { literal, Op, QueryTypes } from 'sequelize'
+import { col, literal, Op } from 'sequelize'
 
-import { dbConnections } from '../../database/connection'
 import {
   Course,
   Credit,
-  ElementDetail,
   Enrollment,
   Student,
   Studyplan,
-  Studyright,
-  StudyrightElement,
   StudyrightExtent,
   Semester,
   SemesterEnrollment,
   Transfer,
+  SISStudyRight,
+  SISStudyRightElement,
 } from '../../models'
 import { Tag, TagStudent } from '../../models/kone'
-import { EnrollmentState, PriorityCode } from '../../types'
-
-const { sequelize } = dbConnections
+import { EnrollmentState } from '../../types'
 
 const getStudentTags = async (studyRights: string[], studentNumbers: string[]) => {
   return await TagStudent.findAll({
@@ -134,34 +130,22 @@ const getStudents = async (studentNumbers: string[]) => {
         separate: true,
       },
       {
-        model: Studyright,
+        model: SISStudyRight,
         attributes: [
-          'studyrightid',
-          'startdate',
-          'enddate',
-          'extentcode',
-          'graduated',
-          'active',
-          'prioritycode',
-          'faculty_code',
-          'studystartdate',
-          'admission_type',
+          'id',
+          'extentCode',
+          'facultyCode',
+          'admissionType',
           'cancelled',
-          'is_ba_ma',
-          'semester_enrollments',
-          'actual_studyrightid',
+          'semesterEnrollments',
+          'startDate',
         ],
         separate: true,
         include: [
           {
-            model: StudyrightElement,
+            model: SISStudyRightElement,
             required: true,
-            attributes: ['id', 'startdate', 'enddate', 'studyrightid', 'code'],
-            include: [
-              {
-                model: ElementDetail,
-              },
-            ],
+            attributes: ['code', 'name', 'studyTrack', 'graduated', 'startDate', 'endDate'],
           },
         ],
       },
@@ -179,7 +163,13 @@ const getStudents = async (studentNumbers: string[]) => {
       },
       {
         model: Studyplan,
-        attributes: ['included_courses', 'programme_code', 'completed_credits', 'studyrightid', 'curriculum_period_id'],
+        attributes: [
+          'included_courses',
+          'programme_code',
+          'completed_credits',
+          'curriculum_period_id',
+          'sis_study_right_id',
+        ],
         separate: true,
       },
     ],
@@ -210,30 +200,12 @@ const getCredits = async (creditsOfStudent: any) => {
   })
 }
 
-const getExtents = async (studentNumbers: string[]) => {
-  return await StudyrightExtent.findAll({
-    attributes: [
-      literal('DISTINCT ON("studyright_extent"."extentcode") "studyright_extent"."extentcode"') as unknown as string,
-      'name',
-    ],
-    include: [
-      {
-        model: Studyright,
-        attributes: [],
-        required: true,
-        where: {
-          student_studentnumber: {
-            [Op.in]: studentNumbers,
-          },
-          prioritycode: {
-            [Op.not]: PriorityCode.OPTION,
-          },
-        },
-      },
-    ],
+const getExtents = () =>
+  StudyrightExtent.findAll({
+    attributes: ['extentcode', 'name'],
+    order: col('extentcode'),
     raw: true,
   })
-}
 
 const getSemesters = async (studentNumbers: string[], startDate: string, endDate: Date) => {
   return await Semester.findAll({
@@ -262,27 +234,13 @@ const getSemesters = async (studentNumbers: string[], startDate: string, endDate
   })
 }
 
-const getElementDetails = async (studentNumbers: string[]) => {
-  const elementDetails: Array<Pick<ElementDetail, 'code' | 'name' | 'type'>> = await sequelize.query(
-    `SELECT DISTINCT ON (code) code, name, type FROM element_details WHERE
-      EXISTS (SELECT 1 FROM transfers WHERE studentnumber IN (:studentNumbers) AND (code = sourcecode OR code = targetcode)) OR
-      EXISTS (SELECT 1 FROM studyright_elements WHERE studentnumber IN (:studentNumbers) AND element_details.code = studyright_elements.code)`,
-    {
-      replacements: { studentNumbers },
-      type: QueryTypes.SELECT,
-    }
-  )
-  return elementDetails
-}
-
 type StudentsIncludeCoursesBetween = {
-  students: Array<Student & { tags?: TagStudent[] }>
-  enrollments: Enrollment[]
-  credits: Credit[]
-  extents: StudyrightExtent[]
-  semesters: Semester[]
-  elementdetails: ElementDetail[]
-  courses: Course[]
+  students: Awaited<ReturnType<typeof getStudents>>
+  enrollments: Awaited<ReturnType<typeof getEnrollments>>
+  credits: Awaited<ReturnType<typeof getCredits>>
+  extents: Awaited<ReturnType<typeof getExtents>>
+  semesters: Awaited<ReturnType<typeof getSemesters>>
+  courses: Awaited<ReturnType<typeof getCourses>>
 }
 
 export const getStudentsIncludeCoursesBetween = async (
@@ -326,25 +284,18 @@ export const getStudentsIncludeCoursesBetween = async (
 
   const creditsOfStudent = await getCreditsOfStudent(studentNumbers, studyRights, attainmentDateFrom, endDate)
 
-  const courses = await getCourses(creditsOfStudent)
-  const enrollments = await getEnrollments(studentNumbers, attainmentDateFrom, endDate)
-  const students = await getStudents(studentNumbers)
-  const credits = await getCredits(creditsOfStudent)
-  const extents = await getExtents(studentNumbers)
-  const semesters = await getSemesters(studentNumbers, startDate, endDate)
-  const elementdetails = await getElementDetails(studentNumbers)
+  const [courses, enrollments, students, credits, extents, semesters] = await Promise.all([
+    getCourses(creditsOfStudent),
+    getEnrollments(studentNumbers, attainmentDateFrom, endDate),
+    getStudents(studentNumbers),
+    getCredits(creditsOfStudent),
+    getExtents(),
+    getSemesters(studentNumbers, startDate, endDate),
+  ])
 
   students.forEach(student => {
     student.tags = studentNumberToTags[student.studentnumber] || []
   })
 
-  return {
-    students,
-    enrollments,
-    credits,
-    extents,
-    semesters,
-    elementdetails,
-    courses,
-  } as StudentsIncludeCoursesBetween
+  return { students, enrollments, credits, extents, semesters, courses } as StudentsIncludeCoursesBetween
 }

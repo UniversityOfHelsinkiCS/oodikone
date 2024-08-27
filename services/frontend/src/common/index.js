@@ -1,4 +1,4 @@
-import { filter, intersection, maxBy, range } from 'lodash'
+import { filter, intersection, maxBy, orderBy, range } from 'lodash'
 import moment from 'moment'
 
 import irtomikko from '@/assets/irtomikko.png'
@@ -136,62 +136,37 @@ export const getStudentToTargetCourseDateMap = (students, codes) => {
   }, {})
 }
 
-export const getAllProgrammesOfStudent = (studyrights, studentNumber, studentToTargetCourseDateMap, elementDetails) => {
-  const studyprogrammes = []
-  studyrights
-    // Bachelor's, master's, licentiate and doctoral programmes, also medicine, dentistry and veterinary specialization training
-    .filter(studyright => studyright.extentcode < 5 || studyright.extentcode === 23)
-    .forEach(studyright => {
-      const facultyCode = studyright.faculty_code
-      const studyrightElements = studyright.studyright_elements.filter(
-        element =>
-          elementDetails[element.code] &&
-          elementDetails[element.code].type === 20 &&
-          (studentToTargetCourseDateMap && studentNumber
-            ? moment(studentToTargetCourseDateMap[studentNumber]).isBetween(
-                element.startdate,
-                element.enddate || moment(),
-                'day',
-                '[]'
-              )
-            : true)
-      )
-      if (studyrightElements.length > 0) {
-        const newestStudyrightElement = studyrightElements.sort(
-          (a, b) => new Date(b.startdate) - new Date(a.startdate) + (new Date(b.enddate) - new Date(a.enddate))
-        )[0]
-        studyprogrammes.push({
-          name: elementDetails[newestStudyrightElement.code].name,
-          startdate: newestStudyrightElement.startdate,
-          code: newestStudyrightElement.code,
-          facultyCode,
-          graduated: studyright.graduated,
-          active: studyright.active,
-        })
-      }
-    })
+const programmeIsActive = (studyRight, hasGraduated, currentSemesterCode) =>
+  !studyRight.cancelled &&
+  !hasGraduated &&
+  (currentSemesterCode == null ||
+    studyRight.semesterEnrollments?.find(
+      enrollment => enrollment.semester === currentSemesterCode && [1, 2].includes(enrollment.type)
+    ) != null)
 
-  studyprogrammes.sort((a, b) => new Date(b.startdate) - new Date(a.startdate))
+export const getAllProgrammesOfStudent = (studyRights, currentSemester) =>
+  orderBy(
+    studyRights?.flatMap(studyRight =>
+      studyRight.studyRightElements
+        .filter(element => element.degreeProgrammeType !== null)
+        .map(element => ({ ...element, studyRight }))
+    ),
+    ['startDate'],
+    ['desc']
+  ).map(({ code, name, graduated, studyRight, startDate }) => ({
+    code,
+    name,
+    graduated,
+    startDate,
+    active: programmeIsActive(studyRight, graduated, currentSemester),
+    facultyCode: studyRight.facultyCode,
+  }))
 
-  if (studyprogrammes.length > 0) {
-    return studyprogrammes
-  }
-
-  if (studentToTargetCourseDateMap) {
-    return [
-      {
-        name: { en: 'No programme at the time of attainment', fi: 'Ei ohjelmaa suorituksen hetkellä' },
-        startdate: '',
-        code: '00000',
-      },
-    ]
-  }
-
-  return [{ name: { en: 'No programme', fi: 'Ei ohjelmaa' }, startdate: '', code: '00000' }]
-}
-
-export const getNewestProgramme = (studyrights, studentNumber, studentToTargetCourseDateMap, elementDetails) => {
-  return getAllProgrammesOfStudent(studyrights, studentNumber, studentToTargetCourseDateMap, elementDetails)[0]
+export const getNewestProgrammeOfStudentAt = (studyRights, currentSemester, date) => {
+  const programmes = getAllProgrammesOfStudent(studyRights, currentSemester)
+  if (!programmes.length) return null
+  if (!date) return programmes[0]
+  return programmes.find(programme => moment(date).isSameOrAfter(programme.startDate)) ?? null
 }
 
 export const getHighestGradeOfCourseBetweenRange = (courses, lowerBound, upperBound) => {
@@ -219,17 +194,16 @@ export const getHighestGradeOrEnrollmentOfCourseBetweenRange = (courses, enrollm
   return grade
 }
 
-export const findStudyrightElementForClass = (studyrights, programme, year) => {
-  return studyrights
-    .flatMap(studyright => studyright.studyright_elements)
-    .find(element => {
-      if (element.code !== programme) return false
-      if (year === 'All') return true
-      const date = moment(new Date(`${year}-08-01`))
-      const endDate = moment(new Date(element.enddate))
-      return date.isBefore(endDate, undefined, '[]')
-    })
-}
+export const findStudyRightForClass = (studyRights, programmeCode, year) =>
+  studyRights.find(studyRight =>
+    studyRight.studyRightElements.some(
+      element =>
+        element.code === programmeCode &&
+        (year == null ||
+          year === 'All' ||
+          moment(element.startDate).isBetween(`${year}-08-01`, `${Number(year) + 1}-07-31`, 'day', '[]'))
+    )
+  )
 
 export const getTargetCreditsForProgramme = code => {
   if (code === 'MH30_001' || code === 'KH90_001-MH90_001') return 360

@@ -49,30 +49,23 @@ export const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) =
         'semesterEnrollmentsForExcel'
       )
     if (studyGuidanceGroup?.tags?.studyProgramme && studyGuidanceGroup?.tags?.year) {
-      columns.push(
-        'admissionType',
-        'studyrightStart',
-        'studyStartDate',
-        'studyStartDateActual',
-        'studyTrack',
-        'transferredFrom'
-      )
+      columns.push('admissionType', 'studyrightStart', 'studyStartDate', 'studyTrack', 'transferredFrom')
     }
     return columns
   }
 
   const getCustomPopulationColumns = () => {
-    const columns = ['credits.since', 'programme', 'startYear']
+    const columns = ['programme', 'startYear']
     if (props.customPopulationProgramme) {
       columns.push(
         'credits.hops',
+        'credits.studyright',
         'endDate',
         'semesterEnrollments',
         'semesterEnrollmentsAmount',
         'semesterEnrollmentsForExcel',
         'studyrightStart',
-        'studyStartDate',
-        'studyStartDateActual'
+        'studyStartDate'
       )
     }
     return columns
@@ -80,15 +73,7 @@ export const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) =
 
   const columnsByVariant = {
     customPopulation: getCustomPopulationColumns(),
-    coursePopulation: [
-      'enrollmentDate',
-      'gradeForSingleCourse',
-      'language',
-      'passDate',
-      'programme',
-      'startYear',
-      'studyStartDate',
-    ],
+    coursePopulation: ['enrollmentDate', 'gradeForSingleCourse', 'language', 'passDate', 'programme', 'startYear'],
     population: [
       'admissionType',
       'citizenship',
@@ -107,7 +92,6 @@ export const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) =
       'startYear',
       'studyrightStart',
       'studyStartDate',
-      'studyStartDateActual',
       'studyTrack',
       'transferredFrom',
     ],

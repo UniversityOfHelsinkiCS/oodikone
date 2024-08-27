@@ -7,7 +7,8 @@ import { rootOrgId } from '../config'
 import { maxYearsToCreatePopulationFrom, getCourseProvidersForCourses } from '../services/courses'
 import { encrypt, decrypt } from '../services/encrypt'
 import { getDegreeProgrammesOfOrganization, ProgrammesOfOrganization } from '../services/faculty/faculty'
-import { bottlenecksOf, optimizedStatisticsOf } from '../services/populations'
+import { bottlenecksOf } from '../services/populations/bottlenecksOf'
+import { optimizedStatisticsOf } from '../services/populations/optimizedStatisticsOf'
 import { populationStudentsMerger, populationCourseStatsMerger } from '../services/statMerger'
 import { findByTag, findByCourseAndSemesters } from '../services/students'
 import { Unarray, Unification, UnifyStatus } from '../types'
@@ -376,9 +377,9 @@ router.get('/v3/populationstatisticsbycourse', async (req: GetPopulationStatisti
       : new Set(intersection(studentNumbers, allStudentsUserCanAccess))
 
   const randomHash = crypto.randomBytes(12).toString('hex')
-  const obfuscateStudent = ({ studyrights, studentNumber, courses, gender_code }) => ({
+  const obfuscateStudent = ({ studyRights, studentNumber, courses, gender_code }) => ({
     courses,
-    studyrights,
+    studyRights,
     gender_code,
     studentNumber: crypto.createHash('md5').update(`${studentNumber}${randomHash}`).digest('hex'),
     firstnames: '',

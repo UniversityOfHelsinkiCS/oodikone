@@ -57,17 +57,13 @@ const splitStudentCredits = (student, timeSlots, cumulative) => {
   return results
 }
 
-const hasGraduatedAfter = (student, programme, slot) => {
-  const studyright = student.studyrights
-    .filter(studyright => studyright.studyright_elements.findIndex(element => element.code === programme) > -1)
-    .pop()
-  if (studyright === undefined) {
-    return false
-  }
-  return (
-    studyright.graduated &&
-    (moment(slot.end).isAfter(studyright.enddate) || moment(studyright.enddate).isBetween(slot.start, slot.end))
+const hasGraduatedBeforeDate = (student, programme, date) => {
+  const correctStudyRight = student.studyRights.find(studyRight =>
+    studyRight.studyRightElements.some(el => el.code === programme)
   )
+  if (!correctStudyRight) return false
+  const studyRightElement = correctStudyRight.studyRightElements.find(el => el.code === programme)
+  return studyRightElement.graduated && date.isAfter(studyRightElement.endDate, 'day')
 }
 
 const GRADUATED = Symbol('GRADUATED')
@@ -91,7 +87,7 @@ const getChartData = (students, timeSlots, programme, timeDivision, cumulative, 
     students
       .map((student, i) => [student, i])
       .forEach(([student, studentIndex]) => {
-        const hasGraduated = programme && hasGraduatedAfter(student, programme, slot)
+        const hasGraduated = programme && hasGraduatedBeforeDate(student, programme, moment(slot.end))
         const credits = studentCredits[studentIndex][timeSlotIndex]
 
         const rangeIndex = hasGraduated

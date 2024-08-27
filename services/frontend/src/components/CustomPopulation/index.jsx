@@ -137,8 +137,8 @@ const CustomPopulationContent = ({
       title: 'Programme distribution',
       content: (
         <div>
-          <InfoBox content={populationStatisticsToolTips.ProgrammeDistributionCoursePopulation} />
-          <CustomPopulationProgrammeDist studentData={studentData} students={filteredStudents} />
+          <InfoBox content={populationStatisticsToolTips.ProgrammeDistributionCustomPopulation} />
+          <CustomPopulationProgrammeDist students={filteredStudents} />
         </div>
       ),
     },

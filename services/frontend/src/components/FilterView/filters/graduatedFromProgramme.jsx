@@ -53,39 +53,27 @@ export const graduatedFromProgrammeFilter = createFilter({
     mode: null,
   },
 
-  precompute: ({ args }) => ({
-    isCombinedExtent: args.code && (!args.code.includes('_') || args.combinedProgrammeCode),
-    isLicentiate: args.combinedProgrammeCode === 'MH90_001',
-  }),
-
   isActive: ({ mode }) => mode !== null,
 
-  filter(student, { mode }, { args, precomputed }) {
-    let examinedStudyRights = student.studyrights
-
-    if (precomputed.isCombinedExtent && mode > 0) {
-      examinedStudyRights = student.studyrights.filter(studyright => studyright.extentcode === mode)
-    }
-
-    const keepGraduated = mode > 0
+  filter(student, { mode }, { args }) {
     const chosenProgrammeCode =
       (mode === 2 || mode === -1) && args.combinedProgrammeCode ? args.combinedProgrammeCode : args.code
-    return (
-      keepGraduated ===
-      examinedStudyRights.some(studyright =>
-        studyright.studyright_elements.some(element => {
-          const dateMatch = new Date(element.enddate) >= new Date(studyright.enddate)
-          return element.code === chosenProgrammeCode && dateMatch && studyright.graduated
-        })
-      )
+    const correctStudyRight = student.studyRights.find(studyRight =>
+      studyRight.studyRightElements.some(el => el.code === chosenProgrammeCode)
     )
+    const hasGraduated =
+      correctStudyRight != null &&
+      correctStudyRight.studyRightElements.find(el => el.code === chosenProgrammeCode).graduated
+    const keepGraduated = mode > 0
+
+    return keepGraduated === hasGraduated
   },
 
-  render: (props, { precomputed }) => (
+  render: (props, { args }) => (
     <GraduatedFromProgrammeFilterCard
       {...props}
-      isCombinedExtent={precomputed.isCombinedExtent}
-      isLicentiate={precomputed.isLicentiate}
+      isCombinedExtent={args.code && args.combinedProgrammeCode}
+      isLicentiate={args.combinedProgrammeCode === 'MH90_001'}
     />
   ),
 })

@@ -182,7 +182,12 @@ export const populationStatisticsToolTips = {
 
   **Programme**-sarake näyttää opiskelijan uusimman opinto-oikeuden. Jos opiskelijalla on opinto-oikeuksia muihinkin koulutusohjelmiin, ne näkyvät aikajärjestyksessä uusimmasta vanhimpaan Excel-tiedostossa, sekä laittamalla hiiri koulutusohjelman päälle.
   `,
-  ProgrammeDistributionCoursePopulation: 'Näyttää sen koulutusohjelman, jossa opiskelija oli suorittaessaan kurssin',
+  ProgrammeDistributionCoursePopulation: `Koulutusohjelma määritetään seuraavasti:
+  1. Jos suoritukseen tai ilmoittautumiseen liittyy opiskeluoikeus, käytetään kyseiseen opiskeluoikeuteen liittyvää koulutusohjelmaa, joka oli aktiivinen suorituksen tai ilmoittautumisen hetkellä
+  2. Jos kurssi on sijoitettu opintosuunnitelmaan (HOPS), käytetään sitä koulutusohjelmaa, jonka opintosuunnitelma on kyseessä
+  3. Jos suoritukseen tai ilmoittautumiseen ei liity opiskeluoikeutta eikä kurssia ole sijoitettu opintosuunnitelmaan, käytetään viimeisintä koulutusohjelmaa suorituksen tai ilmoittautumisen hetkellä`,
+  ProgrammeDistributionCustomPopulation:
+    'Taulukossa näytetään opiskelijoiden jakauma koulutusohjelmittain. Käytettävä koulutusohjelma on opiskelijan uusin koulutusohjelma.',
   GradeDistributionCoursePopulation: 'Näyttää korkeimman arvosanan, jonka opiskelija on saanut valitulla aikavälillä.',
   CreditDistributionCoursePopulation: 'Näyttää tiedekunta-/ohjelmankohtaisen opintopistejakauman.',
   LanguageDistributionCoursePopulation: 'Näyttää kielijakauman kurssin suorituskielistä.',

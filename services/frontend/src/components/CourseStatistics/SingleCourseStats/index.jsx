@@ -257,10 +257,12 @@ const SingleCourseStats = ({
   }
 
   const countStudentEnrollmentStats = (allAttempts, filteredEnrollments, displayEnrollments) => {
-    const enrolledStudentsWithNoGrade = filteredEnrollments.filter(({ studentnumber, state }) => {
-      if (state !== 'ENROLLED') return false
-      const hasFailed = allAttempts.categories.failed ? allAttempts.categories.failed.includes(studentnumber) : false
-      const hasPassed = allAttempts.categories.passed ? allAttempts.categories.passed.includes(studentnumber) : false
+    const enrolledStudentsWithNoGrade = filteredEnrollments.filter(({ studentNumber, state }) => {
+      if (state !== 'ENROLLED') {
+        return false
+      }
+      const hasFailed = allAttempts.categories.failed ? allAttempts.categories.failed.includes(studentNumber) : false
+      const hasPassed = allAttempts.categories.passed ? allAttempts.categories.passed.includes(studentNumber) : false
       return !hasFailed && !hasPassed
     })
     const enrollmentsByState = countEnrollmentStates(filteredEnrollments)

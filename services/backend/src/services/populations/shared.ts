@@ -4,8 +4,8 @@ import { Op, QueryTypes } from 'sequelize'
 
 import { dbConnections } from '../../database/connection'
 import { Course, Credit, SISStudyRight, SISStudyRightElement } from '../../models'
-import { ElementDetailType, Criteria, Name } from '../../types'
-import { SemesterEnd, SemesterStart } from '../../util/semester'
+import { Criteria, Name } from '../../types'
+import { SemesterStart } from '../../util/semester'
 import { getCurrentSemester } from '../semesters'
 
 const { sequelize } = dbConnections
@@ -91,7 +91,7 @@ const formatStudentForPopulationStatistics = (
     email,
     secondary_email,
     phone_number,
-    studyrights,
+    studyRights,
     studyplans,
     semester_enrollments,
     transfers,
@@ -195,13 +195,12 @@ const formatStudentForPopulationStatistics = (
     return criteriaChecked
   }
 
-  studyrights = studyrights || []
   const started = dateofuniversityenrollment
 
   return {
     firstnames,
     lastname,
-    studyrights,
+    studyRights,
     started,
     studentNumber: studentnumber,
     credits: creditcount || 0,
@@ -238,29 +237,22 @@ export const dateMonthsFromNow = (date: string, months: number) => {
   return new Date(moment(date).add(months, 'months').format('YYYY-MM-DD'))
 }
 
-export const count = (column, count, distinct = false) => {
-  const countable = !distinct ? sequelize.col(column) : sequelize.fn('DISTINCT', sequelize.col(column))
-  return sequelize.where(sequelize.fn('COUNT', countable), {
-    [Op.eq]: count,
-  })
-}
-
 export const parseQueryParams = query => {
   const { semesters, studentStatuses, studyRights, months, year, tag } = query
   const hasFall = semesters.includes('FALL')
   const hasSpring = semesters.includes('SPRING')
 
   const startDate = hasFall
-    ? `${year}-${SemesterStart.FALL}`
-    : `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${SemesterStart.SPRING}`
+    ? new Date(`${year}-${SemesterStart.FALL}`).toISOString()
+    : new Date(`${year + 1}-${SemesterStart.SPRING}`).toISOString()
 
   const endDate = hasSpring
-    ? `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${SemesterEnd.SPRING}`
-    : `${year}-${SemesterEnd.FALL}`
+    ? new Date(`${year + 1}-${SemesterStart.FALL}`).toISOString()
+    : new Date(`${year + 1}-${SemesterStart.SPRING}`).toISOString()
 
-  const exchangeStudents = studentStatuses && studentStatuses.includes('EXCHANGE')
-  const nondegreeStudents = studentStatuses && studentStatuses.includes('NONDEGREE')
-  const transferredStudents = studentStatuses && studentStatuses.includes('TRANSFERRED')
+  const exchangeStudents = studentStatuses != null && studentStatuses.includes('EXCHANGE')
+  const nondegreeStudents = studentStatuses != null && studentStatuses.includes('NONDEGREE')
+  const transferredStudents = studentStatuses != null && studentStatuses.includes('TRANSFERRED')
 
   return {
     exchangeStudents,
@@ -340,7 +332,7 @@ export const getOptionsForStudents = async (studentNumbers: string[], code: stri
 }
 
 export const formatStudentsForApi = async (
-  { students, enrollments, credits, extents, semesters, elementdetails, courses },
+  { students, enrollments, credits, extents, semesters, courses },
   startDate: string,
   endDate: string,
   studyRights: string[],
@@ -352,16 +344,6 @@ export const formatStudentsForApi = async (
   const endDateMoment = moment(endDate)
   const currentSemester = (await getCurrentSemester()).semestercode
 
-  elementdetails = elementdetails.reduce(
-    (acc, elementDetail) => {
-      acc.data[elementDetail.code] = elementDetail
-      if (elementDetail.type === ElementDetailType.PROGRAMME) {
-        acc.programmes.push(elementDetail.code)
-      }
-      return acc
-    },
-    { programmes: [], data: {} }
-  )
   credits = credits.reduce((acc, credit) => {
     acc[credit.student_studentnumber] = acc[credit.student_studentnumber] || []
     acc[credit.student_studentnumber].push(credit)
@@ -434,16 +416,13 @@ export const formatStudentsForApi = async (
     return student
   }
 
-  const returnvalue = {
+  return {
     students: result.students.map(transferredStudyright),
     transfers: result.transfers,
     extents,
     semesters,
     courses,
-    elementdetails,
   }
-
-  return returnvalue
 }
 
 export const formatQueryParamsToArrays = (query: Record<string, any>, params: string[]) => {

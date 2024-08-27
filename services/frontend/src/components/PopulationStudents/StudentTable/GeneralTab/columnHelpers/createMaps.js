@@ -1,55 +1,55 @@
-import { findStudyrightElementForClass } from '@/common'
+import { findStudyRightForClass, getAllProgrammesOfStudent } from '@/common'
 
-export const createMaps = ({ selectedStudents, students, programmeCode, combinedProgrammeCode, year }) => {
-  const studentToStudyrightStartMap = selectedStudents.reduce((res, studentNumber) => {
-    const currentStudyright = students[studentNumber].studyrights.find(studyright =>
-      findStudyrightElementForClass([studyright], programmeCode, year)
+export const createMaps = ({
+  selectedStudents,
+  students,
+  programmeCode,
+  combinedProgrammeCode,
+  year,
+  currentSemester,
+  getTextIn,
+}) => {
+  const studentToStudyrightStartMap = {}
+  const studentToStudyrightEndMap = {}
+  const studentToSecondStudyrightEndMap = {}
+  const studentToProgrammeStartMap = {}
+  const studentToOtherProgrammesMap = {}
+
+  for (const studentNumber of selectedStudents) {
+    const { studyRights } = students[studentNumber]
+    const studyRight = findStudyRightForClass(studyRights, programmeCode, year)
+    const studyRightElement = studyRight?.studyRightElements?.find(element => element.code === programmeCode)
+    const secondStudyRightElement = studyRight?.studyRightElements?.find(
+      element => element.code === combinedProgrammeCode
     )
-    if (currentStudyright?.studyrightid && currentStudyright.studyrightid.slice(-2) === '-2') {
-      const bachelorId = currentStudyright.studyrightid.replace(/-2$/, '-1')
-      const bacherlorStudyright = students[studentNumber].studyrights.find(
-        studyright => studyright.studyrightid === bachelorId
-      )
-      res[studentNumber] = bacherlorStudyright?.startdate || null
-    } else {
-      res[studentNumber] = currentStudyright?.startdate || null
+    const programmes = getAllProgrammesOfStudent(students[studentNumber]?.studyRights ?? [], currentSemester)
+    const programmesToUse = programmeCode ? programmes.filter(p => p.code !== programmeCode) : programmes
+
+    studentToStudyrightStartMap[studentNumber] = studyRight?.startDate ?? null
+    studentToProgrammeStartMap[studentNumber] = studyRightElement?.startDate ?? null
+    studentToStudyrightEndMap[studentNumber] = studyRightElement?.graduated ? studyRightElement.endDate : null
+    studentToSecondStudyrightEndMap[studentNumber] = secondStudyRightElement?.graduated
+      ? secondStudyRightElement.endDate
+      : null
+    studentToOtherProgrammesMap[studentNumber] = {
+      programmes: programmesToUse,
+      getProgrammesList: delimiter =>
+        programmesToUse
+          .map(programme => {
+            const programmeName = getTextIn(programme.name)
+            if (programme.graduated) return `${programmeName} (graduated)`
+            if (!programme.active) return `${programmeName} (inactive)`
+            return programmeName
+          })
+          .join(delimiter),
     }
-    return res
-  }, {})
+  }
 
-  const studentToProgrammeStartMap = selectedStudents.reduce((res, studentNumber) => {
-    const programmeStart = findStudyrightElementForClass(
-      students[studentNumber].studyrights,
-      programmeCode,
-      year
-    )?.startdate
-    // clean up odd bachelor start dates, (givendate)
-    const studyrightStart = new Date(studentToStudyrightStartMap[studentNumber])
-    res[studentNumber] = programmeStart
-      ? new Date(Math.max(new Date(programmeStart), studyrightStart))
-      : studyrightStart
-    return res
-  }, {})
-
-  const studentToStudyrightEndMap = selectedStudents.reduce((res, studentNumber) => {
-    const targetStudyright = students[studentNumber].studyrights.find(studyright =>
-      findStudyrightElementForClass([studyright], programmeCode, year)
-    )
-    res[studentNumber] = targetStudyright && targetStudyright.graduated === 1 ? targetStudyright.enddate : null
-    return res
-  }, {})
-
-  const studentToSecondStudyrightEndMap = selectedStudents.reduce((res, studentNumber) => {
-    const targetStudyright = students[studentNumber].studyrights.find(studyright =>
-      studyright.studyright_elements.some(element => element.code === combinedProgrammeCode)
-    )
-    res[studentNumber] = targetStudyright && targetStudyright.graduated === 1 ? targetStudyright.enddate : null
-    return res
-  }, {})
   return {
     studentToStudyrightStartMap,
     studentToStudyrightEndMap,
     studentToSecondStudyrightEndMap,
     studentToProgrammeStartMap,
+    studentToOtherProgrammesMap,
   }
 }

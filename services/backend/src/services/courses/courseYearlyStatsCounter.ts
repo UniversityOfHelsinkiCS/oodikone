@@ -1,4 +1,4 @@
-import { EnrollmentState, Name } from '../../types'
+import { EnrollmentState, Name, PassedCategory } from '../../types'
 import { FormattedProgramme, OrganizationDetails } from './helpers'
 
 type Programme = {
@@ -23,8 +23,10 @@ type FacultyYearStats = {
   allCredits: number
 }
 
+type Grades = { [grade: string]: string[] }
+
 type GroupAttempts = {
-  grades: { [grade: string]: string[] }
+  grades: Grades
   categories: {
     passed: string[]
     failed: string[]
@@ -54,7 +56,7 @@ type Group = {
 
 type Student = {
   earliestAttainment: Date
-  category: 'passedFirst' | 'passedEventually' | 'neverPassed'
+  category: PassedCategory
   code: number
 }
 
@@ -277,40 +279,49 @@ export class CourseYearlyStatsCounter {
     groupCode: number
   ) {
     if (!this.students.has(studentNumber)) {
-      if (passed) {
-        this.students.set(studentNumber, {
-          earliestAttainment: attainmentDate,
-          category: 'passedFirst',
-          code: groupCode,
-        })
-      } else {
-        this.students.set(studentNumber, {
-          earliestAttainment: attainmentDate,
-          category: 'neverPassed',
-          code: groupCode,
-        })
-      }
+      this.addNewStudent(studentNumber, passed, attainmentDate, groupCode)
     } else {
-      const student = this.students.get(studentNumber)
-      if (attainmentDate < student!.earliestAttainment) {
-        if (passed) {
-          this.students.set(studentNumber, {
-            earliestAttainment: attainmentDate,
-            category: 'passedFirst',
-            code: groupCode,
-          })
-        } else if (student!.category === 'passedFirst') {
-          this.students.set(studentNumber, {
-            earliestAttainment: attainmentDate,
-            category: 'passedEventually',
-            code: groupCode,
-          })
-        }
-      } else if (student!.category === 'neverPassed') {
-        if (passed) {
-          this.students.set(studentNumber, { ...student!, category: 'passedEventually' })
-        }
-      }
+      this.updateExistingStudent(studentNumber, passed, attainmentDate, groupCode)
+    }
+  }
+
+  private addNewStudent(studentNumber: string, passed: boolean, attainmentDate: Date, groupCode: number) {
+    const category = passed ? 'passedFirst' : 'neverPassed'
+    this.students.set(studentNumber, {
+      earliestAttainment: attainmentDate,
+      category,
+      code: groupCode,
+    })
+  }
+
+  private updateExistingStudent(studentNumber: string, passed: boolean, attainmentDate: Date, groupCode: number) {
+    const student = this.students.get(studentNumber)
+    if (attainmentDate < student!.earliestAttainment) {
+      this.updateCategoryForEarlierAttainment(studentNumber, passed, attainmentDate, groupCode, student!)
+    } else if (student!.category === 'neverPassed' && passed) {
+      this.students.set(studentNumber, { ...student!, category: 'passedEventually' })
+    }
+  }
+
+  private updateCategoryForEarlierAttainment(
+    studentNumber: string,
+    passed: boolean,
+    attainmentDate: Date,
+    groupCode: number,
+    student: Student
+  ) {
+    if (passed) {
+      this.students.set(studentNumber, {
+        earliestAttainment: attainmentDate,
+        category: 'passedFirst',
+        code: groupCode,
+      })
+    } else if (student.category === 'passedFirst') {
+      this.students.set(studentNumber, {
+        earliestAttainment: attainmentDate,
+        category: 'passedEventually',
+        code: groupCode,
+      })
     }
   }
 
@@ -329,9 +340,9 @@ export class CourseYearlyStatsCounter {
   }
 
   private parseGroupStatistics(anonymizationSalt: string | null) {
-    for (const [studentnumber, data] of this.students) {
-      this.groups[data.code].students.categories[data.category].push(studentnumber)
-      this.groups[data.code].students.studentnumbers.push(studentnumber)
+    for (const [studentNumber, data] of this.students) {
+      this.groups[data.code].students.categories[data.category].push(studentNumber)
+      this.groups[data.code].students.studentnumbers.push(studentNumber)
     }
 
     const groupStatistics = Object.values(this.groups).map(({ ...rest }) => {
@@ -339,23 +350,22 @@ export class CourseYearlyStatsCounter {
       const grades = {}
       Object.keys(students.grades).forEach(student => {
         const { grade, passed } = students.grades[student]
-        const parsed = passed ? grade : '0'
-        if (!grades[parsed]) grades[parsed] = []
-        grades[parsed].push(student)
+        const parsedGrade = passed ? grade : '0'
+        if (!grades[parsedGrade]) {
+          grades[parsedGrade] = []
+        }
+        grades[parsedGrade].push(student)
       })
       const normalStats = {
         ...rest,
         students: { ...students, grades },
       }
-
       if (anonymizationSalt && normalStats.students.studentnumbers.length < 6) {
         this.obfuscated = true
-
-        const gradeSpread = {}
+        const gradeSpread = {} as Grades
         for (const grade of Object.keys(normalStats.attempts.grades)) {
           gradeSpread[grade] = []
         }
-
         const obfuscatedStats = {
           obfuscated: true,
           code: rest.code,
@@ -363,19 +373,19 @@ export class CourseYearlyStatsCounter {
           coursecode: rest.coursecode,
           attempts: {
             categories: {
-              failed: [],
-              passed: [],
+              failed: [] as string[],
+              passed: [] as string[],
             },
             grades: gradeSpread,
           },
           yearcode: rest.yearcode,
           students: {
             categories: {
-              passedFirst: [],
-              passedEventually: [],
-              neverPassed: [],
+              passedFirst: [] as string[],
+              passedEventually: [] as string[],
+              neverPassed: [] as string[],
             },
-            studentnumbers: [],
+            studentnumbers: [] as string[],
           },
         }
         return obfuscatedStats

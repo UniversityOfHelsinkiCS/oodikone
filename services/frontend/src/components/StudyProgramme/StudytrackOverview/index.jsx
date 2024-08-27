@@ -153,7 +153,7 @@ export const StudytrackOverview = ({
           )}
           {stats?.isSuccess && stats?.data?.includeGraduated && stats?.data?.graduationTimes[track] && (
             <>
-              {getDivider('Average graduation times', infoTextGraduationTimes)}
+              {getDivider('Average graduation times by starting year', infoTextGraduationTimes)}
               <Toggle
                 cypress="GraduationTimeToggle"
                 firstLabel="Breakdown"

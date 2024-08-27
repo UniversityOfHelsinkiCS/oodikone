@@ -156,7 +156,7 @@ const filterCourses = (
     return filterCoursesByDate(
       filterCoursesByStudyPlan(
         student.studyplans.find(
-          plan => plan.programme_code === byStudyPlanOfCode && plan.studyrightid === studyrightid
+          plan => plan.programme_code === byStudyPlanOfCode && plan.sis_study_right_id === studyrightid
         ),
         student.courses
       ),
@@ -303,12 +303,11 @@ const filterGraduations = (student, selectedStudyRight, getTextIn) => {
   }))
 }
 
-const addGraduation = (points, graduation, notFirst) => {
-  const graduationX = new Date(graduation.enddate).getTime()
-  const index = points.findIndex(point => point.x > graduationX)
+const addGraduation = (points, graduationDate, notFirst) => {
+  const index = points.findIndex(point => point.x > graduationDate)
   let graduationY
   if (index <= 0) {
-    graduationY = graduationX > points[0].x ? points[points.length - 1].y : points[0].y
+    graduationY = graduationDate > points[0].x ? points[points.length - 1].y : points[0].y
   } else {
     const yBefore = points[index - 1].y
     const yAfter = points[index].y
@@ -330,28 +329,19 @@ const addGraduation = (points, graduation, notFirst) => {
   }
 
   points.push({
-    x: graduationX,
+    x: graduationDate,
     y: graduationY,
     marker: notFirst ? masterMarker : marker,
   })
   points.sort((a, b) => a.x - b.x)
 }
 
-const findGraduationsByCodes = (student, programmeCodes) => {
-  const graduations = student.studyrights
-    .filter(({ graduated }) => graduated)
-    .filter(({ studyright_elements }) =>
-      studyright_elements.find(
-        ({ element_detail }) => programmeCodes.includes(element_detail.code) && element_detail.type === 20
-      )
-    )
-  graduations.sort((a, b) => {
-    if (a.enddate > b.enddate) return 1
-    if (a.enddate === b.enddate) return 0
-    return -1
-  })
-  return graduations ?? []
-}
+const findGraduationsByCodes = (student, programmeCodes) =>
+  student.studyRights
+    .flatMap(studyRight => studyRight.studyRightElements)
+    .filter(({ graduated, code }) => graduated === true && programmeCodes.includes(code))
+    .map(({ endDate }) => new Date(endDate).getTime())
+    .sort((a, b) => a - b)
 
 const createStudentCreditLines = (
   students,
@@ -388,7 +378,7 @@ const createStudentCreditLines = (
       courses => courses.reduce(reduceCreditsToPoints, { credits: 0, points: [], singleStudent })
     )(student.courses)
 
-    const graduations = programmeCodes ? findGraduationsByCodes(student, programmeCodes) : []
+    const graduationDates = programmeCodes ? findGraduationsByCodes(student, programmeCodes) : []
 
     if (points?.length > 0) {
       if (!singleStudent && points[0].y !== 0 && students.length < 100) {
@@ -398,7 +388,7 @@ const createStudentCreditLines = (
           y: 0,
         })
       }
-      graduations.forEach((graduation, index) => addGraduation(points, graduation, index > 0))
+      graduationDates.forEach((graduationDate, index) => addGraduation(points, graduationDate, index > 0))
     }
 
     return {

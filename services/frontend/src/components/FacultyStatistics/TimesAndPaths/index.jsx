@@ -95,7 +95,7 @@ export const TimesAndPathsView = ({ faculty, setStudyProgrammes, studyProgrammes
       <>
         <div className="divider">
           <Divider data-cy="Section-AverageGraduationTimes" horizontal>
-            Average graduation times
+            Average graduation times by education level
           </Divider>
         </div>
         <div style={{ marginBottom: '3em' }}>

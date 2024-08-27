@@ -208,7 +208,7 @@ export const BasicOverview = ({
                   titles={graduations?.data?.titles}
                 />
               </div>
-              {getDivider('Average graduation times', 'AverageGraduationTimes')}
+              {getDivider('Average graduation times by year of graduation', 'AverageGraduationTimes')}
               <div className="toggle-container">
                 <Toggle
                   cypress="GraduationTimeToggle"

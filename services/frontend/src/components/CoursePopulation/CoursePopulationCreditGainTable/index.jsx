@@ -1,8 +1,8 @@
 import { maxBy } from 'lodash'
 import moment from 'moment'
-import { Tab, Table } from 'semantic-ui-react'
+import { Loader, Tab, Table } from 'semantic-ui-react'
 
-import { getNewestProgramme } from '@/common'
+import { useCurrentSemester } from '@/common/hooks'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { findCorrectProgramme } from '@/components/CustomPopulation/CustomPopulationProgrammeDist'
 import { InfoBox } from '@/components/InfoBox'
@@ -58,30 +58,28 @@ const CreditGainTable = ({ data, totalCredits, headerText }) => {
   )
 }
 
-export const CoursePopulationCreditGainTable = ({
-  students,
-  codes,
-  from,
-  to,
-  studentToTargetCourseDateMap,
-  populationStatistics,
-}) => {
+export const CoursePopulationCreditGainTable = ({ students, codes, from, to }) => {
   const { data: faculties } = useGetFacultiesQuery()
   const { data: semesters } = useGetSemestersQuery()
+  const currentSemester = useCurrentSemester()
   const programmeCredits = {}
   const facultyCredits = {}
+
+  if (!faculties || !semesters || !currentSemester) {
+    return (
+      <Loader active inline="centered">
+        Loading
+      </Loader>
+    )
+  }
 
   let totalCredits = 0
   students.forEach(student => {
     const courses = student.courses.filter(course => codes.includes(course.course_code))
-    const programme =
-      findCorrectProgramme(student, codes, semesters, from, to) ??
-      getNewestProgramme(
-        student.studyrights,
-        student.studentNumber,
-        studentToTargetCourseDateMap,
-        populationStatistics.elementdetails.data
-      )
+    const programme = findCorrectProgramme(student, codes, semesters, from, to, currentSemester) ?? {
+      name: { en: 'No programme at the time of attainment', fi: 'Ei ohjelmaa suorituksen hetkellä' },
+      code: '00000',
+    }
 
     if (!programmeCredits[programme.code]) {
       programmeCredits[programme.code] = { name: programme.name, students: [], credits: 0 }

@@ -1,76 +1,43 @@
-import { chain, get } from 'lodash'
-import fp from 'lodash/fp'
 import moment from 'moment'
-import { useMemo } from 'react'
 import { Dropdown } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { createFilter } from './createFilter'
 
-const NO_PROGRAMME = {
-  code: '00000',
-  name: { en: 'No programme', fi: 'Ei ohjelmaa' },
-  startdate: '',
-}
+const NO_PROGRAMME = { code: '00000', name: { en: 'No programme', fi: 'Ei ohjelmaa' } }
 
-const ProgrammeFilterCard = ({
-  additionalModes,
-  onOptionsChange,
-  options,
-  programmes,
-  studentToProgrammeMap,
-  studyRightPredicate,
-  withoutSelf,
-}) => {
+const ProgrammeFilterCard = ({ additionalModes, onOptionsChange, options, studentToProgrammeMap, withoutSelf }) => {
   const { getTextIn } = useLanguage()
   const { selectedProgrammes } = options
-  const name = 'programmeFilterCard'
 
-  const visibleProgrammes = fp.flow(
-    fp.flatMap(student =>
-      get(studentToProgrammeMap, student.studentNumber, []).map(programme => ({ student, programme }))
-    ),
-    fp.groupBy('student.studentNumber'),
-    fp.pickBy(fp.some(({ programme }) => options.selectedProgrammes.every(pcode => programme.code === pcode))),
-    fp.values,
-    fp.flatten,
-    fp.filter(({ student, programme }) => studyRightPredicate(student, programme)),
-    fp.map('programme'),
-    fp.reduce((acc, details) => {
-      if (!acc[details.code]) {
-        acc[details.code] = { ...details, studentCount: 0 }
+  const visibleProgrammes = withoutSelf().reduce((acc, student) => {
+    const studentsProgrammes = studentToProgrammeMap[student.studentNumber]
+    for (const programme of studentsProgrammes) {
+      const existingProgramme = acc.find(prog => prog.code === programme.code)
+      if (existingProgramme) {
+        existingProgramme.studentCount += 1
+      } else {
+        acc.push({ ...programme, studentCount: 1 })
       }
-      acc[details.code].studentCount += 1
-      return acc
-    }, {}),
-    fp.values
-  )(withoutSelf())
+    }
+    return acc
+  }, [])
 
-  const dropdownOptions = useMemo(
-    () =>
-      chain(visibleProgrammes)
-        .concat(selectedProgrammes.map(code => programmes.find(programme => programme && programme.code === code)))
-        .map(programme => {
-          const code = programme?.code ?? NO_PROGRAMME.code
-          const name = programme?.name ?? NO_PROGRAMME.name
-          const studentCount = programme?.studentCount ?? -1
-          return {
-            key: `programme-filter-value-${code}`,
-            text: getTextIn(name),
-            value: code,
-            content: (
-              <>
-                {getTextIn(name)}{' '}
-                <span style={{ color: 'rgb(136, 136, 136)', whiteSpace: 'nowrap' }}>({studentCount} students)</span>
-              </>
-            ),
-          }
-        })
-        .uniqBy('value')
-        .sort((a, b) => a.text.localeCompare(b.text))
-        .value(),
-    [programmes]
-  )
+  const dropdownOptions = visibleProgrammes
+    .map(({ code, name, studentCount }) => ({
+      key: `programme-filter-value-${code}`,
+      text: getTextIn(name),
+      value: code,
+      content: (
+        <>
+          {getTextIn(name)}{' '}
+          <span style={{ color: '#888', whiteSpace: 'nowrap' }}>
+            ({studentCount} student{studentCount === 1 ? '' : 's'})
+          </span>
+        </>
+      ),
+    }))
+    .sort((a, b) => a.text.localeCompare(b.text))
 
   const handleChange = (_, { value }) => {
     onOptionsChange({
@@ -108,7 +75,7 @@ const ProgrammeFilterCard = ({
         data-cy="Programme-filter-dropdown"
         fluid
         multiple
-        name={name}
+        name="programmeFilterCard"
         onChange={handleChange}
         options={dropdownOptions}
         placeholder="Select programme"
@@ -159,40 +126,46 @@ const ProgrammeFilterCard = ({
   )
 }
 
-const getStudentProgrammes = fp.flow(
-  fp.get('studyrights'),
-  fp.flatMap('studyright_elements'),
-  fp.filter(['element_detail.type', 20])
-)
+const getStudentProgrammes = student =>
+  (student?.studyRights ?? []).flatMap(studyRight =>
+    studyRight.studyRightElements.map(element => ({ ...element, cancelled: studyRight.cancelled }))
+  )
 
 const createStudentToProgrammeMap = (students, studyRightPredicate) => {
-  const studentProgrammePairs = []
+  const studentToProgrammeMap = {}
+  const programmes = []
 
-  students.forEach(student => {
+  for (const student of students) {
     const studentProgrammes = getStudentProgrammes(student)
-    if (!studentProgrammes.length)
-      studentProgrammePairs.push({ student, programme: { ...NO_PROGRAMME, element_detail: { ...NO_PROGRAMME } } })
-    studentProgrammes.forEach(programme => {
-      studentProgrammePairs.push({ student, programme })
-    })
-  })
 
-  const programmes = fp.flow(fp.map('programme.element_detail'), fp.uniqBy('code'))(studentProgrammePairs)
+    const filteredProgrammes = studentProgrammes.filter(programme => studyRightPredicate(student, programme))
 
-  const studentToProgrammeMap = fp.flow(
-    fp.filter(({ student, programme }) => studyRightPredicate(student, programme)),
-    fp.groupBy('student.studentNumber'),
-    fp.mapValues(fp.map('programme.element_detail'))
-  )(studentProgrammePairs)
+    if (!filteredProgrammes.length) {
+      studentToProgrammeMap[student.studentNumber] = [NO_PROGRAMME]
+      continue
+    }
+
+    studentToProgrammeMap[student.studentNumber] = filteredProgrammes.reduce((acc, { code, name }) => {
+      acc.push({ code, name })
+      return acc
+    }, [])
+
+    for (const { code, name } of filteredProgrammes) {
+      if (programmes.some(prog => prog.code === code)) {
+        continue
+      }
+      programmes.push({ code, name })
+    }
+  }
 
   return { programmes, studentToProgrammeMap }
 }
 
 const MODE_PREDICATES = {
   any: () => true,
-  active: (_, studyrightElement) =>
-    studyrightElement.code === NO_PROGRAMME.code ||
-    moment().isBetween(studyrightElement.startdate, studyrightElement.enddate, 'day', '[]'),
+  active: (_, studyRightElement) =>
+    !studyRightElement.cancelled &&
+    moment().isBetween(studyRightElement.startDate, studyRightElement.endDate, 'day', '[]'),
 }
 
 export const programmeFilter = createFilter({
@@ -213,7 +186,7 @@ export const programmeFilter = createFilter({
     if (options.mode) {
       let modePredicate = MODE_PREDICATES[options.mode]
 
-      const additional = get(args, 'additionalModes', []).find(mode => mode.key === options.mode)?.predicate
+      const additional = args?.additionalModes?.find(mode => mode.key === options.mode)?.predicate
 
       if (!modePredicate && additional) {
         modePredicate = additional
@@ -232,9 +205,7 @@ export const programmeFilter = createFilter({
   isActive: ({ selectedProgrammes }) => selectedProgrammes.length > 0,
 
   filter({ studentNumber }, { selectedProgrammes }, { precomputed: { studentToProgrammeMap } }) {
-    return selectedProgrammes.every(pcode =>
-      get(studentToProgrammeMap, studentNumber, []).some(({ code }) => code === pcode)
-    )
+    return selectedProgrammes.every(pcode => studentToProgrammeMap[studentNumber].some(({ code }) => code === pcode))
   },
 
   selectors: {
@@ -257,9 +228,7 @@ export const programmeFilter = createFilter({
     <ProgrammeFilterCard
       {...props}
       additionalModes={args?.additionalModes ?? []}
-      programmes={precomputed.programmes}
       studentToProgrammeMap={precomputed.studentToProgrammeMap}
-      studyRightPredicate={args?.studyRightPredicate ?? (() => true)}
     />
   ),
 })

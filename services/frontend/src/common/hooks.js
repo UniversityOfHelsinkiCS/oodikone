@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { SEARCH_HISTORY_VERSION } from '@/constants'
 import { useGetCurriculumPeriodsQuery } from '@/redux/curriculumPeriods'
+import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 
 export const useTabChangeAnalytics = () => {
@@ -291,4 +292,13 @@ export const useCurrentCurriculumPeriod = () => {
     curriculumPeriod =>
       new Date(curriculumPeriod.startDate) <= new Date() && new Date(curriculumPeriod.endDate) >= new Date()
   )
+}
+
+export const useDegreeProgrammeTypes = programmeCodes => {
+  const { data: degreeProgrammes } = useGetProgrammesQuery()
+  if (!degreeProgrammes) return {}
+  return programmeCodes.reduce((acc, programmeCode) => {
+    acc[programmeCode] = degreeProgrammes[programmeCode]?.degreeProgrammeType ?? null
+    return acc
+  }, {})
 }

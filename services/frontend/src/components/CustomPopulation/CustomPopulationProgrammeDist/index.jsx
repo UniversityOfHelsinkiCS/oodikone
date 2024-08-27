@@ -1,165 +1,111 @@
 import moment from 'moment'
-import { Progress } from 'semantic-ui-react'
 
-import { getNewestProgramme } from '@/common'
+import { getNewestProgrammeOfStudentAt } from '@/common'
+import { useCurrentSemester } from '@/common/hooks'
 import { FilterToggleIcon } from '@/components/common/FilterToggleIcon'
+import { ProgressBarWithLabel } from '@/components/common/ProgressBarWithLabel'
 import { isProgrammeSelected, toggleProgrammeSelection } from '@/components/FilterView/filters/programmes'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { SearchResultTable } from './SearchResultTable'
 
-const formatStudyright = (studyright, date) => {
-  if (!studyright) return undefined
-  const studyrightElementsDuringCourse =
-    studyright?.studyright_elements.filter(
-      element =>
-        element.element_detail.type === 20 && moment(date).isBetween(element.startdate, element.enddate, 'day', '[]')
-    ) || []
-  if (studyrightElementsDuringCourse.length === 0) {
-    return {
-      name: { en: 'No programme at the time of attainment', fi: 'Ei ohjelmaa suorituksen hetkellä' },
-      code: '00000',
-      facultyCode: '00000',
-    }
-  }
-  const { element_detail: elementDetail, code } = studyrightElementsDuringCourse.sort(
-    (a, b) => new Date(b.startdate) - new Date(a.startdate)
-  )[0]
-  return { name: elementDetail.name, code, facultyCode: studyright.faculty_code }
-}
-
-export const findCorrectProgramme = (student, coursecodes, semesters, startDate, endDate) => {
-  const yearcode = Object.values(semesters.years || {}).find(
-    year => moment(year.startdate).isSame(startDate, 'day') && moment(year.enddate).isSame(endDate, 'day')
-  )?.yearcode
-  const correctSemesters = Object.values(semesters.semesters || {})
-    .filter(semester => semester.yearcode === yearcode)
-    .map(semester => semester.semestercode)
+export const findCorrectProgramme = (student, coursecodes, semesters, startDate, endDate, currentSemester) => {
   let programme
-  const courseAttainment = student.courses.filter(
+
+  const courseAttainment = student.courses.find(
     a =>
       coursecodes.includes(a.course_code) &&
-      moment(a.date).isBetween(startDate, endDate, undefined, '[]') &&
+      moment(a.date).isBetween(startDate, endDate, 'date', '[]') &&
       a.credittypecode !== 7
-  )[0]
-  const courseEnrollments =
-    student.enrollments?.filter(enrollment => coursecodes.includes(enrollment.course_code)) || []
-  let studyrightIdOfCourse
-  const findStudyrightAssociatedWithCourse = (studyright, date) =>
-    studyright.studyright_elements.some(
-      element =>
-        element.element_detail.type === 20 &&
-        moment(date).isBetween(element.startdate, element.enddate, undefined, '[]')
+  )
+
+  if (courseAttainment?.studyright_id) {
+    const correctStudyRight = student.studyRights?.find(studyRight => studyRight.id === courseAttainment.studyright_id)
+    if (correctStudyRight) {
+      programme = getNewestProgrammeOfStudentAt([correctStudyRight], currentSemester, courseAttainment.date)
+    }
+    if (programme) return programme
+  }
+
+  const correctSemesters = Object.values(semesters.semesters || {})
+    .filter(
+      semester =>
+        moment(semester.startdate).isSameOrAfter(startDate, 'day') &&
+        moment(semester.enddate).isSameOrBefore(endDate, 'day')
     )
+    .map(semester => semester.semestercode)
+  const courseEnrollment = student.enrollments?.find(
+    enrollment => coursecodes.includes(enrollment.course_code) && correctSemesters.includes(enrollment.semestercode)
+  )
 
-  // First check if there's a studyright associated with the course attainment
-  if (courseAttainment) {
-    studyrightIdOfCourse = courseAttainment?.studyright_id
-    if (!studyrightIdOfCourse) {
-      const studyplanStudyrightId = student.studyplans.find(studyplan =>
-        studyplan.included_courses.some(course => coursecodes.includes(course))
-      )?.studyrightid
-      if (studyplanStudyrightId) {
-        studyrightIdOfCourse = student.studyrights.find(
-          studyright => studyright.studyrightid === studyplanStudyrightId
-        )?.actual_studyrightid
-      }
-    }
-    if (studyrightIdOfCourse) {
-      const correctStudyrights = student.studyrights.filter(
-        studyright => studyright.actual_studyrightid === studyrightIdOfCourse
+  if (courseEnrollment?.studyright_id) {
+    const correctStudyRight = student.studyRights.find(studyRight => studyRight.id === courseEnrollment.studyright_id)
+    if (correctStudyRight) {
+      programme = getNewestProgrammeOfStudentAt(
+        [correctStudyRight],
+        currentSemester,
+        courseEnrollment.enrollment_date_time
       )
-      const studyrightAssociatedWithCourse = correctStudyrights.find(studyright =>
-        findStudyrightAssociatedWithCourse(studyright, courseAttainment.date)
-      )
-      programme = formatStudyright(studyrightAssociatedWithCourse, courseAttainment.date)
     }
+    if (programme) return programme
   }
 
-  // If no studyright associated with the course attainment, check if there's a studyright associated with the course enrollment
-  if (!programme) {
-    const courseEnrollment = courseEnrollments.find(enrollment => correctSemesters.includes(enrollment.semestercode))
-    studyrightIdOfCourse = courseEnrollment?.studyright_id
-    if (studyrightIdOfCourse) {
-      const correctStudyrights = student.studyrights.filter(
-        studyright => studyright.actual_studyrightid === studyrightIdOfCourse
-      )
-      const studyrightAssociatedWithCourse = correctStudyrights.find(studyright =>
-        findStudyrightAssociatedWithCourse(studyright, courseEnrollment.enrollment_date_time)
-      )
-      programme = formatStudyright(studyrightAssociatedWithCourse, courseEnrollment.enrollment_date_time)
-    }
+  const correctStudyplan = student.studyplans?.find(studyplan =>
+    studyplan.included_courses.some(course => coursecodes.includes(course))
+  )
+  if (correctStudyplan) {
+    const correctStudyRight = student.studyRights.find(
+      studyRight => studyRight.id === correctStudyplan.sis_study_right_id
+    )
+    programme = getNewestProgrammeOfStudentAt(
+      [correctStudyRight],
+      currentSemester,
+      courseAttainment?.date ?? courseEnrollment?.enrollment_date_time
+    )
+    if (programme) return programme
   }
-  return programme
+
+  return getNewestProgrammeOfStudentAt(
+    student.studyRights,
+    currentSemester,
+    courseAttainment?.date ?? courseEnrollment?.enrollment_date_time
+  )
 }
 
-export const CustomPopulationProgrammeDist = ({
-  students,
-  studentToTargetCourseDateMap,
-  coursecode,
-  studentData,
-  from,
-  to,
-}) => {
+export const CustomPopulationProgrammeDist = ({ students, coursecode, from, to }) => {
   const { getTextIn } = useLanguage()
   const { data: semesters } = useGetSemestersQuery()
-  if (!semesters) return null
+  const currentSemester = useCurrentSemester()
+  if (!semesters || !currentSemester) return null
   const allProgrammes = {}
 
-  students.forEach(student => {
+  for (const student of students) {
     let programme
     if (coursecode) {
-      programme = findCorrectProgramme(student, coursecode, semesters, from, to)
+      programme = findCorrectProgramme(student, coursecode, semesters, from, to, currentSemester?.semestercode)
+    } else {
+      programme = getNewestProgrammeOfStudentAt(student.studyRights, currentSemester?.semestercode)
     }
 
-    // If no studyright associated with the course attainment or enrollment or there are no courseCodes,
-    // (custom population) just get the newest studyright at the time of the course attainment or enrollment
     if (!programme) {
-      programme = getNewestProgramme(
-        student.studyrights,
-        student.studentNumber,
-        studentToTargetCourseDateMap,
-        studentData.elementdetails?.data
-      )
+      programme = { code: '00000', name: { en: 'No programme', fi: 'Ei ohjelmaa' } }
     }
-    if (programme && programme.code === '00000' && coursecode) {
-      const filteredEnrollments = (student.enrollments || [])
-        .filter(({ course_code: courseCode }) => coursecode.includes(courseCode))
-        .sort((a, b) => new Date(b.enrollment_date_time) - new Date(a.enrollment_date_time))
-      programme = getNewestProgramme(
-        student.studyrights,
-        student.studentNumber,
-        { [student.studentNumber]: (filteredEnrollments[0] || {}).enrollment_date_time },
-        studentData.elementdetails?.data
-      )
+
+    if (!allProgrammes[programme.code]) {
+      allProgrammes[programme.code] = { programme, students: 0 }
     }
-    if (programme) {
-      if (!allProgrammes[programme.code]) {
-        allProgrammes[programme.code] = { programme, students: 0 }
-      }
-      allProgrammes[programme.code].students += 1
-    } else {
-      if (!allProgrammes['00000']) {
-        allProgrammes['00000'] = { programme: { name: { en: 'No programme', fi: 'Ei ohjelmaa' } }, students: 0 }
-      }
-      allProgrammes['00000'].students += 1
-    }
-  })
-  const rows = Object.entries(allProgrammes).map(([code, { programme, students: programmeStudents }]) => [
-    getTextIn(programme.name),
-    code,
-    programmeStudents,
-    <Progress
-      key={code}
-      precision={0}
-      progress="percent"
-      style={{ margin: 0 }}
-      total={students.length}
-      value={programmeStudents}
-    />,
-  ])
-  const sortedRows = rows.sort((a, b) => b[2] - a[2])
+    allProgrammes[programme.code].students += 1
+  }
+
+  const rows = Object.entries(allProgrammes)
+    .map(([code, { programme, students: programmeStudents }]) => [
+      getTextIn(programme.name),
+      code,
+      programmeStudents,
+      <ProgressBarWithLabel key={code} total={students.length} value={programmeStudents} />,
+    ])
+    .sort((a, b) => b[2] - a[2])
 
   const headers = ['Programme', 'Code', `Students (all=${students.length})`, 'Percentage of population']
 
@@ -168,7 +114,7 @@ export const CustomPopulationProgrammeDist = ({
       actionTrigger={row => <ProgrammeFilterToggleCell programme={row[1]} />}
       headers={headers}
       noResultText="placeholder"
-      rows={sortedRows}
+      rows={rows}
       selectable
     />
   )

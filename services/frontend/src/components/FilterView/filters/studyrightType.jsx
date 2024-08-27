@@ -1,6 +1,5 @@
 import { Form, Radio } from 'semantic-ui-react'
 
-import { findStudyrightElementForClass } from '@/common'
 import { createFilter } from './createFilter'
 
 const STUDYRIGHT_TYPES = {
@@ -50,17 +49,15 @@ export const studyrightTypeFilter = createFilter({
   isActive: ({ mode }) => mode !== 0,
 
   filter(student, { mode }, { args }) {
-    if (mode === 0) {
-      return true
-    }
+    if (mode === 0) return true
 
-    const isFound = findStudyrightElementForClass(
-      student.studyrights.filter(studyright => studyright.is_ba_ma),
-      args.programme,
-      args.year
+    const studyRight = student.studyRights.find(studyRight =>
+      studyRight.studyRightElements.some(el => el.code === args.programme)
     )
 
-    return !!isFound === (mode === 1)
+    if (!studyRight) return false
+
+    return mode === 1 ? studyRight.extentCode === 5 : studyRight.extentCode === 2
   },
 
   component: StudyrightTypeFilterCard,
