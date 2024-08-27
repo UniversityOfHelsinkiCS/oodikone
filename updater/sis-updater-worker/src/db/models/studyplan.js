@@ -21,16 +21,6 @@ Studyplan.init(
       onDelete: 'cascade',
       allowNull: false,
     },
-    studyrightid: {
-      type: STRING,
-      references: {
-        model: 'studyright',
-        key: 'studyrightid',
-      },
-      onUpdate: 'cascade',
-      onDelete: 'cascade',
-      allowNull: false,
-    },
     programme_code: {
       type: STRING,
       allowNull: false,
