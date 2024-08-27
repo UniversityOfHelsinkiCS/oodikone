@@ -83,7 +83,7 @@ const getColumns = (stats, showDetails, showGrades, userHasAccessToAllStats, alt
       filterType: 'range',
       getRowVal: s => (s.rowObfuscated ? 5 : s.students.withEnrollments.total),
       getRowContent: s => (s.rowObfuscated ? '5 or less students' : s.students.withEnrollments.total),
-      getCellProps: s => defineCellColor(s),
+      getCellProps: s => defineCellColor(s.rowObfuscated),
     },
     {
       key: 'TOTAL_PASSED',
