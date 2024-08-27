@@ -44,13 +44,37 @@ export const getMaxValueOfSeries = (series: Series[]) => {
 }
 
 const THESIS_GRADES = ['I', 'A', 'NSLA', 'LUB', 'CL', 'MCLA', 'ECLA', 'L']
+const PASS_FAIL_GRADES = ['0', 'Hyv.']
+const NUMERIC_GRADES = ['1', '2', '3', '4', '5']
 
 export const isThesisGrades = (grades: Record<string, number>) => {
   return Object.keys(grades).some(grade => THESIS_GRADES.includes(grade))
 }
 
-export const isThesisSeries = (series: Array<Record<string, number>>) => {
+const isThesisSeries = (series: Array<Record<string, number>>) => {
   return series && series.some(series => isThesisGrades(series))
+}
+
+const isPassFailSeries = (series: Array<Record<string, number>>) => {
+  return (
+    series &&
+    series.every(record => {
+      const grades = Object.keys(record)
+      const hasPassFailGrade = grades.some(grade => PASS_FAIL_GRADES.includes(grade))
+      const hasNumericGrade = grades.some(grade => NUMERIC_GRADES.includes(grade))
+      return hasPassFailGrade && !hasNumericGrade
+    })
+  )
+}
+
+export const getSeriesType = (series: Array<Record<string, number>>) => {
+  if (isThesisSeries(series)) {
+    return 'thesis'
+  }
+  if (isPassFailSeries(series)) {
+    return 'pass-fail'
+  }
+  return 'other'
 }
 
 export const absoluteToRelative = (all: number[]) => (p: number, i: number) => {
@@ -78,7 +102,7 @@ export const resolveGrades = stats => {
       )
     ),
   ] as string[]
-  if (allGrades.filter(grade => ['1', '2', '3', '4', '5'].includes(grade)).length) {
+  if (allGrades.filter(grade => NUMERIC_GRADES.includes(grade)).length) {
     allGrades.push(...['1', '2', '3', '4', '5'])
   }
   const grades = [...new Set(allGrades)]

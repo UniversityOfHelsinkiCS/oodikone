@@ -8,8 +8,8 @@ import {
   getDataObject,
   getGradeSpread,
   getMaxValueOfSeries,
+  getSeriesType,
   getThesisGradeSpread,
-  isThesisSeries,
 } from '@/components/CourseStatistics/ResultTabs/panes/util'
 import { chartColor, color } from '@/styles/colors'
 
@@ -64,61 +64,78 @@ const gradeGraphOptions = (isRelative, categories, max, title) => ({
   },
 })
 
-const getGradeSeries = series => {
-  const isGradeSeries = !isThesisSeries(series)
-  const newSeries = isGradeSeries ? getGradeSpread(series) : getThesisGradeSpread(series)
-  const sumAll = Object.values(newSeries)[0].map((_, index) =>
+const calculateSumAll = newSeries => {
+  return Object.values(newSeries)[0].map((_, index) =>
     Object.values(newSeries)
       .map(series => series[index])
       .reduce((a, b) => a + b, 0)
   )
-  return isGradeSeries
-    ? {
-        absolute: [
-          getDataObject('0', newSeries[0], 'a'),
-          getDataObject('1', newSeries[1], 'b'),
-          getDataObject('2', newSeries[2], 'c'),
-          getDataObject('3', newSeries[3], 'd'),
-          getDataObject('4', newSeries[4], 'e'),
-          getDataObject('5', newSeries[5], 'f'),
-          getDataObject('HT', newSeries.HT, 'g'),
-          getDataObject('TT', newSeries.TT, 'h'),
-          getDataObject('Hyv.', newSeries['Hyv.'], 'i'),
-        ],
-        relative: [
-          getDataObject('0', newSeries[0].map(absoluteToRelative(sumAll)), 'a'),
-          getDataObject('1', newSeries[1].map(absoluteToRelative(sumAll)), 'b'),
-          getDataObject('2', newSeries[2].map(absoluteToRelative(sumAll)), 'c'),
-          getDataObject('3', newSeries[3].map(absoluteToRelative(sumAll)), 'd'),
-          getDataObject('4', newSeries[4].map(absoluteToRelative(sumAll)), 'e'),
-          getDataObject('5', newSeries[5].map(absoluteToRelative(sumAll)), 'f'),
-          getDataObject('HT', newSeries.HT.map(absoluteToRelative(sumAll)), 'g'),
-          getDataObject('TT', newSeries.TT.map(absoluteToRelative(sumAll)), 'h'),
-          getDataObject('Hyv.', newSeries['Hyv.'].map(absoluteToRelative(sumAll)), 'i'),
-        ],
-      }
-    : {
-        absolute: [
-          getDataObject('I', newSeries.I, 'a'),
-          getDataObject('A', newSeries.A, 'b'),
-          getDataObject('NSLA', newSeries.NSLA, 'c'),
-          getDataObject('LUB', newSeries.LUB, 'd'),
-          getDataObject('CL', newSeries.CL, 'e'),
-          getDataObject('MCLA', newSeries.MCLA, 'f'),
-          getDataObject('ECLA', newSeries.ECLA, 'g'),
-          getDataObject('L', newSeries.L, 'h'),
-        ],
-        relative: [
-          getDataObject('I', newSeries.I.map(absoluteToRelative(sumAll)), 'a'),
-          getDataObject('A', newSeries.A.map(absoluteToRelative(sumAll)), 'b'),
-          getDataObject('NSLA', newSeries.NSLA.map(absoluteToRelative(sumAll)), 'c'),
-          getDataObject('LUB', newSeries.LUB.map(absoluteToRelative(sumAll)), 'd'),
-          getDataObject('CL', newSeries.CL.map(absoluteToRelative(sumAll)), 'e'),
-          getDataObject('MCLA', newSeries.MCLA.map(absoluteToRelative(sumAll)), 'f'),
-          getDataObject('ECLA', newSeries.ECLA.map(absoluteToRelative(sumAll)), 'g'),
-          getDataObject('L', newSeries.L.map(absoluteToRelative(sumAll)), 'h'),
-        ],
-      }
+}
+
+const getGradeSeries = series => {
+  const seriesType = getSeriesType(series)
+  const newSeries = seriesType === 'thesis' ? getThesisGradeSpread(series) : getGradeSpread(series)
+  const sumAll = calculateSumAll(newSeries)
+
+  if (seriesType === 'thesis') {
+    return {
+      absolute: [
+        getDataObject('I', newSeries.I, 'a'),
+        getDataObject('A', newSeries.A, 'b'),
+        getDataObject('NSLA', newSeries.NSLA, 'c'),
+        getDataObject('LUB', newSeries.LUB, 'd'),
+        getDataObject('CL', newSeries.CL, 'e'),
+        getDataObject('MCLA', newSeries.MCLA, 'f'),
+        getDataObject('ECLA', newSeries.ECLA, 'g'),
+        getDataObject('L', newSeries.L, 'h'),
+      ],
+      relative: [
+        getDataObject('I', newSeries.I.map(absoluteToRelative(sumAll)), 'a'),
+        getDataObject('A', newSeries.A.map(absoluteToRelative(sumAll)), 'b'),
+        getDataObject('NSLA', newSeries.NSLA.map(absoluteToRelative(sumAll)), 'c'),
+        getDataObject('LUB', newSeries.LUB.map(absoluteToRelative(sumAll)), 'd'),
+        getDataObject('CL', newSeries.CL.map(absoluteToRelative(sumAll)), 'e'),
+        getDataObject('MCLA', newSeries.MCLA.map(absoluteToRelative(sumAll)), 'f'),
+        getDataObject('ECLA', newSeries.ECLA.map(absoluteToRelative(sumAll)), 'g'),
+        getDataObject('L', newSeries.L.map(absoluteToRelative(sumAll)), 'h'),
+      ],
+    }
+  }
+
+  if (seriesType === 'pass-fail') {
+    return {
+      absolute: [getDataObject('0', newSeries[0], 'a'), getDataObject('Hyv.', newSeries['Hyv.'], 'i')],
+      relative: [
+        getDataObject('0', newSeries[0].map(absoluteToRelative(sumAll)), 'a'),
+        getDataObject('Hyv.', newSeries['Hyv.'].map(absoluteToRelative(sumAll)), 'i'),
+      ],
+    }
+  }
+
+  return {
+    absolute: [
+      getDataObject('0', newSeries[0], 'a'),
+      getDataObject('1', newSeries[1], 'b'),
+      getDataObject('2', newSeries[2], 'c'),
+      getDataObject('3', newSeries[3], 'd'),
+      getDataObject('4', newSeries[4], 'e'),
+      getDataObject('5', newSeries[5], 'f'),
+      getDataObject('HT', newSeries.HT, 'g'),
+      getDataObject('TT', newSeries.TT, 'h'),
+      getDataObject('Hyv.', newSeries['Hyv.'], 'i'),
+    ],
+    relative: [
+      getDataObject('0', newSeries[0].map(absoluteToRelative(sumAll)), 'a'),
+      getDataObject('1', newSeries[1].map(absoluteToRelative(sumAll)), 'b'),
+      getDataObject('2', newSeries[2].map(absoluteToRelative(sumAll)), 'c'),
+      getDataObject('3', newSeries[3].map(absoluteToRelative(sumAll)), 'd'),
+      getDataObject('4', newSeries[4].map(absoluteToRelative(sumAll)), 'e'),
+      getDataObject('5', newSeries[5].map(absoluteToRelative(sumAll)), 'f'),
+      getDataObject('HT', newSeries.HT.map(absoluteToRelative(sumAll)), 'g'),
+      getDataObject('TT', newSeries.TT.map(absoluteToRelative(sumAll)), 'h'),
+      getDataObject('Hyv.', newSeries['Hyv.'].map(absoluteToRelative(sumAll)), 'i'),
+    ],
+  }
 }
 
 const getGrades = students => {
