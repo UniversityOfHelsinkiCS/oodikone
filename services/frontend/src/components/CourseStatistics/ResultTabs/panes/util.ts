@@ -1,4 +1,5 @@
 import { flatten } from 'lodash'
+
 import { calculatePercentage } from '@/common'
 
 const gradesMap = {
@@ -17,25 +18,44 @@ const gradesMap = {
   MCLA: 5,
   ECLA: 6,
   L: 7,
+} as const
+
+const sortGrades = (a: string, b: string) => gradesMap[a] - gradesMap[b]
+
+type Series = {
+  name: string
+  data: number[]
+  stack: string
 }
 
-export const getDataObject = (name, data, stack) => ({ name, data, stack })
+export const getDataObject = (name: string, data: number[], stack: string): Series => {
+  return {
+    name,
+    data,
+    stack,
+  }
+}
 
-export const getMaxValueOfSeries = series =>
-  Object.values(series).reduce((acc, cur) => {
+export const getMaxValueOfSeries = (series: Series[]) => {
+  return Object.values(series).reduce((acc, cur) => {
     const curMax = Math.max(...cur.data.filter(n => !Number.isNaN(n)).map(Math.abs))
     return curMax >= acc ? curMax : acc
   }, 0)
+}
 
-const THESIS_GRADE_KEYS = ['I', 'A', 'NSLA', 'LUB', 'CL', 'MCLA', 'ECLA', 'L']
+const THESIS_GRADES = ['I', 'A', 'NSLA', 'LUB', 'CL', 'MCLA', 'ECLA', 'L']
 
-const sortGrades = (a, b) => gradesMap[a] - gradesMap[b]
+export const isThesisGrades = (grades: Record<string, number>) => {
+  return Object.keys(grades).some(grade => THESIS_GRADES.includes(grade))
+}
 
-export const isThesisGrades = grades => Object.keys(grades).some(key => THESIS_GRADE_KEYS.includes(key))
+export const isThesisSeries = (series: Array<Record<string, number>>) => {
+  return series && series.some(series => isThesisGrades(series))
+}
 
-export const isThesisSeries = series => series && series.some(series => isThesisGrades(series))
-
-export const absoluteToRelative = all => (p, i) => parseFloat(calculatePercentage(p, all[i]).slice(0, -1))
+export const absoluteToRelative = (all: number[]) => (p: number, i: number) => {
+  return parseFloat(calculatePercentage(p, all[i]).slice(0, -1))
+}
 
 export const resolveGrades = stats => {
   const failedGrades = ['eisa', 'hyl.', 'hyl', '0', 'luop']
@@ -47,22 +67,29 @@ export const resolveGrades = stats => {
       stats.map(({ students }) =>
         [...Object.keys(students.grades)].map(grade => {
           const parsedGrade = Number(grade) ? Math.round(Number(grade)).toString() : grade
-          if (failedGrades.includes(parsedGrade.toLowerCase())) return '0'
-          if (parsedGrade === 'LA') return 'LUB' // merge LA and LUB grades
+          if (failedGrades.includes(parsedGrade.toLowerCase())) {
+            return '0'
+          }
+          if (parsedGrade === 'LA') {
+            return 'LUB'
+          }
           return parsedGrade
         })
       )
     ),
-  ]
-
-  // If any of grades 1-5 is present, make sure that full the grade scale is present
-  if (allGrades.filter(grade => ['1', '2', '3', '4', '5'].includes(grade)).length)
+  ] as string[]
+  if (allGrades.filter(grade => ['1', '2', '3', '4', '5'].includes(grade)).length) {
     allGrades.push(...['1', '2', '3', '4', '5'])
+  }
   const grades = [...new Set(allGrades)]
 
   return grades.sort(sortGrades).map(grade => {
-    if (grade === '0') return { key: grade, title: 'Failed' }
-    if (otherPassedGrades.includes(grade.toLowerCase())) return { key: grade, title: 'Other passed' }
+    if (grade === '0') {
+      return { key: grade, title: 'Failed' }
+    }
+    if (otherPassedGrades.includes(grade.toLowerCase())) {
+      return { key: grade, title: 'Other passed' }
+    }
     return { key: grade, title: grade.charAt(0).toUpperCase() + grade.slice(1) }
   })
 }
@@ -78,7 +105,7 @@ export const getSortableColumn = opts => ({
   ...opts,
 })
 
-export const getThesisGradeSpread = (series, isRelative) => {
+export const getThesisGradeSpread = (series: Array<Record<string, number>>, isRelative?: boolean) => {
   const thesisGradeAccumulator = {
     L: [],
     ECLA: [],
@@ -95,7 +122,8 @@ export const getThesisGradeSpread = (series, isRelative) => {
     4: [],
     5: [],
     'Hyv.': [],
-  }
+  } as Record<string, number[]>
+
   const newSeries = series.reduce(
     (acc, cur, i) => {
       const currentEntries = Object.entries(cur)
@@ -103,7 +131,6 @@ export const getThesisGradeSpread = (series, isRelative) => {
         const merged = k === 'LA' ? 'LUB' : k
         acc[merged].push(v)
       })
-
       Object.entries(acc).forEach(([k, v]) => {
         if (v.length < i + 1) {
           acc[k].push(0)
@@ -127,7 +154,7 @@ export const getThesisGradeSpread = (series, isRelative) => {
   return isRelative ? relative : newSeries
 }
 
-export const getGradeSpread = (series, isRelative) => {
+export const getGradeSpread = (series: Array<Record<string, number>>, isRelative?: boolean) => {
   const failedKeys = ['eisa', 'hyl.', 'hyl', '0', 'luop']
 
   const baseAccumulator = {
@@ -140,7 +167,7 @@ export const getGradeSpread = (series, isRelative) => {
     HT: [],
     TT: [],
     'Hyv.': [],
-  }
+  } as Record<string, number[]>
 
   const newSeries = series.reduce(
     (acc, cur, i) => {
@@ -160,7 +187,6 @@ export const getGradeSpread = (series, isRelative) => {
           acc[k].push(0)
         }
       })
-
       return acc
     },
     { ...baseAccumulator }
@@ -178,6 +204,6 @@ export const getGradeSpread = (series, isRelative) => {
   return isRelative ? relative : newSeries
 }
 
-export const defineCellColor = s => {
-  return s.rowObfuscated && { style: { color: 'gray' } }
+export const defineCellColor = (rowObfuscated: boolean) => {
+  return rowObfuscated && { style: { color: 'gray' } }
 }
