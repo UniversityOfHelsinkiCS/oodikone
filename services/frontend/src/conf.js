@@ -31,7 +31,6 @@ export const serviceProvider = process.env.REACT_APP_SERVICE_PROVIDER
   : 'toska'
 
 // Variable that can be used to disable the language center view, by default the view is enabled
-export const languageCenterViewEnabled =
-  process.env.REACT_APP_LANGUAGE_CENTER_VIEW_ENABLED == null
-    ? true
-    : process.env.REACT_APP_LANGUAGE_CENTER_VIEW_ENABLED === 'true'
+export const languageCenterViewEnabled = !process.env.REACT_APP_LANGUAGE_CENTER_VIEW_ENABLED
+  ? true
+  : process.env.REACT_APP_LANGUAGE_CENTER_VIEW_ENABLED === 'true'

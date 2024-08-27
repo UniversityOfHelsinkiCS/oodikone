@@ -32,7 +32,6 @@ const getFdImporterClient = () => {
 }
 
 const getToskaImporterClient = () => {
-  logger.info('just to catch debug failure', importerToken)
   if (!importerToken) {
     logger.error("Importer token not set, can't return client!")
     return null
