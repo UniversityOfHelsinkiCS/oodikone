@@ -1,9 +1,8 @@
 /* eslint-disable import/no-cycle */
 import { InferAttributes } from 'sequelize'
-import { Column, CreatedAt, DataType, HasMany, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
+import { Column, CreatedAt, DataType, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
 import { Name } from '../types'
-import { SemesterEnrollment } from './semesterEnrollment'
 
 @Table({
   underscored: true,
@@ -14,9 +13,6 @@ export class Semester extends Model<InferAttributes<Semester>> {
   @PrimaryKey
   @Column(DataType.STRING)
   composite!: string
-
-  @HasMany(() => SemesterEnrollment)
-  semesterEnrollments!: SemesterEnrollment[]
 
   @Column(DataType.INTEGER)
   semestercode!: number

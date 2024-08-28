@@ -12,7 +12,6 @@ import { Organization } from './organization'
 import { ProgrammeModule } from './programmeModule'
 import { ProgrammeModuleChild } from './programmeModuleChild'
 import { Semester } from './semester'
-import { SemesterEnrollment } from './semesterEnrollment'
 import { SISStudyRight } from './SISStudyRight'
 import { SISStudyRightElement } from './SISStudyRightElement'
 import { Student } from './student'
@@ -38,7 +37,6 @@ export {
   ProgrammeModule,
   ProgrammeModuleChild,
   Semester,
-  SemesterEnrollment,
   SISStudyRight,
   SISStudyRightElement,
   Student,

@@ -223,7 +223,7 @@ const formatSharedStudentData = ({
   updatedAt,
   createdAt,
   sis_person_id,
-}: Partial<Omit<Student, 'semester_enrollments'>>) => {
+}: Partial<Student>) => {
   const toCourse = ({ grade, credits, credittypecode, is_open, attainment_date, course, isStudyModule }: Credit) => {
     course = course.toJSON()
 
@@ -267,7 +267,7 @@ const formatSharedStudentData = ({
 }
 
 const formatStudent = (
-  studentData: Partial<Omit<Student, 'semester_enrollments'>> & {
+  studentData: Partial<Student> & {
     tags: Array<InferAttributes<TagStudent> & { programme?: Pick<InferAttributes<ProgrammeModule>, 'code' | 'name'> }>
   }
 ) => {
@@ -278,7 +278,7 @@ const formatStudent = (
   }
 }
 
-const formatStudentWithoutTags = (studentData: Partial<Omit<Student, 'semester_enrollments'>>) => {
+const formatStudentWithoutTags = (studentData: Partial<Student>) => {
   return formatSharedStudentData(studentData)
 }
 

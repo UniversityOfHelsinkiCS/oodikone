@@ -3,7 +3,7 @@ import { InferAttributes } from 'sequelize'
 import { Column, CreatedAt, DataType, HasMany, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
 import { GenderCode } from '../types'
-import { Credit, Enrollment, SemesterEnrollment, SISStudyRight, Studyplan } from '.'
+import { Credit, Enrollment, SISStudyRight, Studyplan } from '.'
 
 @Table({
   underscored: true,
@@ -26,9 +26,6 @@ export class Student extends Model<InferAttributes<Student>> {
 
   @HasMany(() => Enrollment, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
   enrollments!: Enrollment[]
-
-  @HasMany(() => SemesterEnrollment)
-  semester_enrollments!: SemesterEnrollment[]
 
   @HasMany(() => SISStudyRight)
   studyRights!: SISStudyRight[]
