@@ -2,26 +2,6 @@ import { flatten } from 'lodash'
 
 import { calculatePercentage } from '@/common'
 
-const gradesMap = {
-  0: 0,
-  1: 10,
-  2: 20,
-  3: 30,
-  4: 40,
-  5: 50,
-  'Hyv.': 60,
-  I: 0,
-  A: 1,
-  LUB: 2,
-  NSLA: 3,
-  CL: 4,
-  MCLA: 5,
-  ECLA: 6,
-  L: 7,
-} as const
-
-const sortGrades = (a: string, b: string) => gradesMap[a] - gradesMap[b]
-
 type Series = {
   name: string
   data: number[]
@@ -99,17 +79,49 @@ export const absoluteToRelative = (all: number[]) => (p: number, i: number) => {
   return parseFloat(calculatePercentage(p, all[i]).slice(0, -1))
 }
 
-export const resolveGrades = stats => {
-  const failedGrades = ['eisa', 'hyl.', 'hyl', '0', 'luop']
-  const otherPassedGrades = ['hyv.', 'hyv']
+const gradesOrder = {
+  0: 0,
+  1: 10,
+  2: 20,
+  3: 30,
+  4: 40,
+  5: 50,
+  'Hyv.': 60,
+  I: 0,
+  A: 1,
+  LUB: 2,
+  NSLA: 3,
+  CL: 4,
+  MCLA: 5,
+  ECLA: 6,
+  L: 7,
+} as const
 
+const sortGrades = (a: string, b: string) => gradesOrder[a] - gradesOrder[b]
+
+const FAILED_GRADES = ['eisa', 'hyl.', 'hyl', '0', 'luop']
+const OTHER_PASSED_GRADES = ['hyv.', 'hyv']
+
+const getSortedGrades = (grades: string[]) => {
+  return grades.sort(sortGrades).map(grade => {
+    if (grade === '0') {
+      return { key: grade, title: 'Failed' }
+    }
+    if (OTHER_PASSED_GRADES.includes(grade.toLowerCase())) {
+      return { key: grade, title: 'Other passed' }
+    }
+    return { key: grade, title: grade.charAt(0).toUpperCase() + grade.slice(1) }
+  })
+}
+
+export const resolveGrades = stats => {
   const allGrades = [
     '0',
     ...flatten(
       stats.map(({ students }) =>
         [...Object.keys(students.grades)].map(grade => {
           const parsedGrade = Number(grade) ? Math.round(Number(grade)).toString() : grade
-          if (failedGrades.includes(parsedGrade.toLowerCase())) {
+          if (FAILED_GRADES.includes(parsedGrade.toLowerCase())) {
             return '0'
           }
           if (parsedGrade === 'LA') {
@@ -124,16 +136,7 @@ export const resolveGrades = stats => {
     allGrades.push(...['1', '2', '3', '4', '5'])
   }
   const grades = [...new Set(allGrades)]
-
-  return grades.sort(sortGrades).map(grade => {
-    if (grade === '0') {
-      return { key: grade, title: 'Failed' }
-    }
-    if (otherPassedGrades.includes(grade.toLowerCase())) {
-      return { key: grade, title: 'Other passed' }
-    }
-    return { key: grade, title: grade.charAt(0).toUpperCase() + grade.slice(1) }
-  })
+  return getSortedGrades(grades)
 }
 
 export const getSortableColumn = opts => ({
