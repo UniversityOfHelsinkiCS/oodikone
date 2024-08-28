@@ -1,6 +1,6 @@
 import moment from 'moment'
 
-import { Graduated, Name, ProgrammeFilter, SpecialGroups, YearType } from '../../types'
+import { DegreeProgrammeType, Graduated, Name, ProgrammeFilter, SpecialGroups, YearType } from '../../types'
 import { redisClient } from '../redis'
 import { getDegreeProgrammesOfFaculty } from './faculty'
 import { FacultyProgressData } from './facultyStudentProgress'
@@ -283,7 +283,10 @@ type FacultyStudentsData = {
   facultyTableStatsExtra: Record<string, Record<string, Record<string, number>>>
   programmeStats: Record<string, Record<string, (string | number)[]>>
   titles: string[]
-  programmeNames: Record<string, Name & { code: string; degreeProgrammeType: string; progId: string }>
+  programmeNames: Record<
+    string,
+    { name: Name; code: string; degreeProgrammeType: DegreeProgrammeType | null; progId: string }
+  >
 }
 
 export const setFacultyStudentStats = async (

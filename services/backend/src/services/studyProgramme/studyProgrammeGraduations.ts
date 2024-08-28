@@ -2,8 +2,8 @@ import { indexOf, orderBy } from 'lodash'
 import moment from 'moment'
 
 import type { SemesterEnrollment } from '../../models/SISStudyRight'
-import { ExtentCode, Name, StudyTrack } from '../../types'
-import { sortByProgrammeCode } from '../../util'
+import { DegreeProgrammeType, ExtentCode, Name, StudyTrack } from '../../types'
+import { getDegreeProgrammeType, sortByProgrammeCode } from '../../util'
 import { mapToProviders } from '../../util/map'
 import { countTimeCategories } from '../graduationHelpers'
 import { getSemestersAndYears } from '../semesters'
@@ -94,11 +94,8 @@ const getGraduationTimeAndThesisWriterStats = async ({
 
   const studyRights = await getStudyRightsInProgramme(studyprogramme, false)
   const studentNumbers = studyRights.map(sr => sr.studentNumber)
-  const thesisCredits = await getThesisCredits(
-    mapToProviders([studyprogramme])[0],
-    getThesisType(studyprogramme),
-    studentNumbers
-  )
+  const thesisType = await getThesisType(studyprogramme)
+  const thesisCredits = await getThesisCredits(mapToProviders([studyprogramme])[0], thesisType, studentNumbers)
   const thesisWriterMap = thesisCredits.reduce<Record<string, Date>>((acc, credit) => {
     acc[credit.student_studentnumber] = credit.attainment_date
     return acc
@@ -280,8 +277,13 @@ const getProgrammesAfterGraduation = async ({
 }
 
 const getProgrammesBeforeOrAfter = async (studyprogramme: string, queryParameters: QueryParameters) => {
-  if (studyprogramme.includes('KH')) return await getProgrammesAfterGraduation(queryParameters)
-  if (studyprogramme.includes('MH')) return await getProgrammesBeforeStarting(queryParameters)
+  const degreeProgrammeType = await getDegreeProgrammeType(studyprogramme)
+  if (degreeProgrammeType === DegreeProgrammeType.BACHELOR) {
+    return await getProgrammesAfterGraduation(queryParameters)
+  }
+  if (degreeProgrammeType === DegreeProgrammeType.MASTER) {
+    return await getProgrammesBeforeStarting(queryParameters)
+  }
   return null
 }
 

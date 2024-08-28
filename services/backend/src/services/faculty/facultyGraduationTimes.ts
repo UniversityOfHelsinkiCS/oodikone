@@ -1,6 +1,6 @@
 import { cloneDeep, omit } from 'lodash'
 
-import { Name } from '../../types'
+import { DegreeProgrammeType, Name } from '../../types'
 import { getGraduationStats, getStudytrackStats, setGraduationStats, setStudytrackStats } from '../analyticsService'
 import { getGraduationStatsForStudytrack, GraduationTimes } from '../studyProgramme/studyProgrammeGraduations'
 import { getMedian } from '../studyProgramme/studyProgrammeHelpers'
@@ -19,9 +19,9 @@ type ProgrammeStats = {
 }
 
 export const programmeTypes = {
-  'urn:code:degree-program-type:bachelors-degree': 'bachelor',
-  'urn:code:degree-program-type:masters-degree': 'master',
-  'urn:code:degree-program-type:doctor': 'doctor',
+  [DegreeProgrammeType.BACHELOR]: 'bachelor',
+  [DegreeProgrammeType.MASTER]: 'master',
+  [DegreeProgrammeType.DOCTOR]: 'doctor',
 } as const
 
 const getStatsByGraduationYear = async (facultyProgrammes: ProgrammesOfOrganization) => {
@@ -30,7 +30,7 @@ const getStatsByGraduationYear = async (facultyProgrammes: ProgrammesOfOrganizat
   const programmes: { medians: Record<string, Record<string, ProgrammeStats>> } = { medians: {} }
 
   for (const programme of facultyProgrammes) {
-    if (!(programme.degreeProgrammeType in programmeTypes)) {
+    if (programme.degreeProgrammeType == null || !(programme.degreeProgrammeType in programmeTypes)) {
       continue
     }
     const statsFromRedis = await getGraduationStats(programme.code, '', 'CALENDAR_YEAR', 'SPECIAL_INCLUDED')
@@ -133,7 +133,7 @@ const getStatsByStartYear = async (facultyProgrammes: ProgrammesOfOrganization) 
   const classSizes: Record<string, Record<string, number | Record<string, number>>> = { programmes: {} }
 
   for (const programme of facultyProgrammes) {
-    if (!(programme.degreeProgrammeType in programmeTypes)) {
+    if (programme.degreeProgrammeType == null || !(programme.degreeProgrammeType in programmeTypes)) {
       continue
     }
     const statsFromRedis = await getStudytrackStats(programme.code, '', 'GRADUATED_INCLUDED', 'SPECIAL_EXCLUDED')

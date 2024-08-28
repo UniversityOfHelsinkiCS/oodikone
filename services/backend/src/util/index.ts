@@ -1,3 +1,4 @@
+import { ProgrammeModule } from '../models'
 import { DetailedProgrammeRights, Role } from '../types'
 
 const isObjectWithKey = (obj: unknown, key: string): obj is Record<string, unknown> => {
@@ -83,4 +84,12 @@ export const sortByProgrammeCode = (a: string, b: string) => {
     return priorityA - priorityB
   }
   return a.localeCompare(b)
+}
+
+export const getDegreeProgrammeType = async (programmeCode: string) => {
+  const programmeModule = await ProgrammeModule.findOne({
+    attributes: ['degreeProgrammeType'],
+    where: { code: programmeCode },
+  })
+  return programmeModule ? programmeModule.degreeProgrammeType : null
 }

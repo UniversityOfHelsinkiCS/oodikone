@@ -4,7 +4,8 @@ import { InferAttributes } from 'sequelize'
 import { serviceProvider } from '../../config'
 import { programmeCodes } from '../../config/programmeCodes'
 import { SISStudyRight, SISStudyRightElement } from '../../models'
-import { Phase } from '../../types'
+import { DegreeProgrammeType, Phase } from '../../types'
+import { getDegreeProgrammeType } from '../../util'
 
 export function getYearsArray(since: number, isAcademicYear: true, yearsCombined?: boolean): string[]
 export function getYearsArray(since: number, isAcademicYear: false, yearsCombined: true): Array<'Total' | number>
@@ -91,8 +92,9 @@ export const combinedStudyprogrammes = { KH90_001: 'MH90_001' } as const
 // 9. urn:code:course-unit-type:practical-training-homeland
 // Four of these are thesis types
 
-export const getThesisType = (studyProgramme: string) => {
-  if (studyProgramme.includes('MH') || studyProgramme.includes('ma')) {
+export const getThesisType = async (studyProgramme: string) => {
+  const degreeProgrammeType = await getDegreeProgrammeType(studyProgramme)
+  if (degreeProgrammeType === DegreeProgrammeType.MASTER) {
     const mastersThesisTypes = ['urn:code:course-unit-type:masters-thesis']
     if (serviceProvider !== 'toska') {
       mastersThesisTypes.push('urn:code:course-unit-type:amk-masters-thesis')
@@ -100,13 +102,14 @@ export const getThesisType = (studyProgramme: string) => {
     return mastersThesisTypes
   }
 
-  if (studyProgramme.includes('KH') || studyProgramme.includes('ba')) {
+  if (degreeProgrammeType === DegreeProgrammeType.BACHELOR) {
     const bachelorsThesisTypes = ['urn:code:course-unit-type:bachelors-thesis']
     if (serviceProvider !== 'toska') {
       bachelorsThesisTypes.push('urn:code:course-unit-type:amk-bachelors-thesis')
     }
     return bachelorsThesisTypes
   }
+
   return ['urn:code:course-unit-type:doctors-thesis', 'urn:code:course-unit-type:licentiate-thesis']
 }
 

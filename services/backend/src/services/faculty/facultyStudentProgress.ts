@@ -107,7 +107,11 @@ export const combineFacultyStudentProgress = async (
 
   for (const { code: studyprogramme } of programmes) {
     const programmeInfo = allDegreeProgrammes.find(programme => programme.code === studyprogramme)
-    if (!programmeInfo || !(programmeInfo.degreeProgrammeType in programmeTypes)) {
+    if (
+      !programmeInfo ||
+      programmeInfo.degreeProgrammeType == null ||
+      !(programmeInfo.degreeProgrammeType in programmeTypes)
+    ) {
       continue
     }
     const statsFromRedis = await getStudytrackStats(studyprogramme, null, graduated, specialGroups)
@@ -147,7 +151,11 @@ export const combineFacultyStudentProgress = async (
 
   for (const stats of statsOfProgrammes) {
     const programmeInfo = allDegreeProgrammes.find(programme => programme.code === stats.id)
-    if (!programmeInfo || !(programmeInfo.degreeProgrammeType in programmeTypes)) {
+    if (
+      !programmeInfo ||
+      programmeInfo.degreeProgrammeType == null ||
+      !(programmeInfo.degreeProgrammeType in programmeTypes)
+    ) {
       continue
     }
 

@@ -12,7 +12,7 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
-import { Name, Phase, StudyTrack } from '../types'
+import { DegreeProgrammeType, Name, Phase, StudyTrack } from '../types'
 import { SISStudyRight } from './SISStudyRight'
 
 @Table({
@@ -53,7 +53,7 @@ export class SISStudyRightElement extends Model<InferAttributes<SISStudyRightEle
   studyTrack!: StudyTrack | null
 
   @Column(DataType.STRING)
-  degreeProgrammeType!: string
+  degreeProgrammeType!: DegreeProgrammeType
 
   @CreatedAt
   @Column(DataType.DATE)

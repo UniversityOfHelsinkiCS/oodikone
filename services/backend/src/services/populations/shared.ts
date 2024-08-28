@@ -4,7 +4,7 @@ import { Op, QueryTypes } from 'sequelize'
 
 import { dbConnections } from '../../database/connection'
 import { Course, Credit, SISStudyRight, SISStudyRightElement } from '../../models'
-import { Criteria, Name } from '../../types'
+import { Criteria, DegreeProgrammeType, Name } from '../../types'
 import { SemesterStart } from '../../util/semester'
 import { getCurrentSemester } from '../semesters'
 import { hasTransferredFromOrToProgramme } from '../studyProgramme/studyProgrammeHelpers'
@@ -288,12 +288,16 @@ export const parseQueryParams = query => {
   }
 }
 
-export const getOptionsForStudents = async (studentNumbers: string[], code: string, level: 'BSC' | 'MSC') => {
+export const getOptionsForStudents = async (
+  studentNumbers: string[],
+  code: string,
+  level: DegreeProgrammeType.BACHELOR | DegreeProgrammeType.MASTER
+) => {
   if (!code || !studentNumbers.length) {
     return {}
   }
 
-  if (!['BSC', 'MSC'].includes(level)) {
+  if (![DegreeProgrammeType.BACHELOR, DegreeProgrammeType.MASTER].includes(level)) {
     throw new Error(`Invalid study level ${level}`)
   }
 
@@ -324,20 +328,16 @@ export const getOptionsForStudents = async (studentNumbers: string[], code: stri
   return studyRightElementsForStudyRight.reduce<Record<string, { name: Name }>>((acc, { studyRight }) => {
     let programme: SISStudyRightElement | null = null
 
-    if (level === 'MSC') {
+    if (level === DegreeProgrammeType.MASTER) {
       const [latestBachelorsProgramme] = orderBy(
-        studyRight.studyRightElements.filter(
-          element => element.degreeProgrammeType === 'urn:code:degree-program-type:bachelors-degree'
-        ),
+        studyRight.studyRightElements.filter(element => element.degreeProgrammeType === DegreeProgrammeType.BACHELOR),
         ['endDate'],
         ['desc']
       )
       programme = latestBachelorsProgramme
-    } else if (level === 'BSC') {
+    } else {
       const [firstMastersProgramme] = orderBy(
-        studyRight.studyRightElements.filter(
-          element => element.degreeProgrammeType === 'urn:code:degree-program-type:masters-degree'
-        ),
+        studyRight.studyRightElements.filter(element => element.degreeProgrammeType === DegreeProgrammeType.MASTER),
         ['startDate'],
         ['asc']
       )

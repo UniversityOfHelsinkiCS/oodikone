@@ -13,7 +13,7 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
-import { Name } from '../types'
+import { DegreeProgrammeType, Name } from '../types'
 import { Organization } from './organization'
 import { ProgrammeModuleChild } from './programmeModuleChild'
 
@@ -68,7 +68,7 @@ export class ProgrammeModule extends Model<InferAttributes<ProgrammeModule>> {
   curriculum_period_ids!: string[]
 
   @Column(DataType.STRING)
-  degreeProgrammeType!: string
+  degreeProgrammeType!: DegreeProgrammeType | null
 
   @CreatedAt
   @Column(DataType.DATE)

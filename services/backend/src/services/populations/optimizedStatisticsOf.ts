@@ -1,4 +1,5 @@
-import { Criteria, Name } from '../../types'
+import { Criteria, DegreeProgrammeType, Name } from '../../types'
+import { getDegreeProgrammeType } from '../../util'
 import { getCriteria } from '../studyProgramme/studyProgrammeCriteria'
 import { getStudentsIncludeCoursesBetween } from './getStudentsIncludeCoursesBetween'
 import {
@@ -49,10 +50,10 @@ export const optimizedStatisticsOf = async (query: Query, studentNumberList?: st
   const code = studyRights[0] || ''
   let optionData = {} as Record<string, { name: Name }>
   let criteria = {} as Criteria
-  if (code.includes('MH')) {
-    optionData = await getOptionsForStudents(studentNumbers, code, 'MSC')
-  } else if (code.includes('KH')) {
-    optionData = await getOptionsForStudents(studentNumbers, code, 'BSC')
+
+  const degreeProgrammeType = await getDegreeProgrammeType(code)
+  if (degreeProgrammeType === DegreeProgrammeType.MASTER || degreeProgrammeType === DegreeProgrammeType.BACHELOR) {
+    optionData = await getOptionsForStudents(studentNumbers, code, degreeProgrammeType)
   }
   if (code.includes('KH') || ['MH30_001', 'MH30_003'].includes(code)) {
     criteria = await getCriteria(code)

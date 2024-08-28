@@ -2,7 +2,7 @@ import { col, Op } from 'sequelize'
 
 import { Course, Credit, Organization, Student, Studyplan, SISStudyRight, SISStudyRightElement } from '../../models'
 import type { SemesterEnrollment } from '../../models/SISStudyRight'
-import { CreditTypeCode, ExtentCode, Name } from '../../types'
+import { CreditTypeCode, DegreeProgrammeType, ExtentCode, Name } from '../../types'
 import { mapToProviders } from '../../util/map'
 import { redisClient } from '../redis'
 import { getCurriculumVersion } from './shared'
@@ -38,6 +38,7 @@ type AccumulatorType = {
     name: Name
     studyTrack: Name | null
     startedAt: Date
+    degreeProgrammeType: DegreeProgrammeType
   }
   latestAttainmentDates: LatestAttainmentDates
   curriculumPeriod: string | null
@@ -92,6 +93,7 @@ const formatStudent = (student: Student) => {
       name: programmeName,
       studyTrack,
       startDate: programmeStartDate,
+      degreeProgrammeType,
     } = studyRightElements[0]
     const programmeCodeToProviderCode = mapToProviders([programmeCode])[0]
     const { latestAttainmentDates, thesisData } = findThesisAndLatestAttainments(
@@ -119,6 +121,7 @@ const formatStudent = (student: Student) => {
         name: programmeName,
         studyTrack: studyTrack ? studyTrack.name : null,
         startedAt: programmeStartDate,
+        degreeProgrammeType,
       },
       latestAttainmentDates,
       curriculumPeriod: getCurriculumVersion(studyPlan.curriculum_period_id),
@@ -186,7 +189,7 @@ export const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =
                       [Op.eq]: col('studyplans->studyRight->studyRightElements.code'),
                     },
                   },
-                  attributes: ['code', 'name', 'startDate', 'studyTrack'],
+                  attributes: ['code', 'name', 'startDate', 'studyTrack', 'degreeProgrammeType'],
                 },
               ],
             },
@@ -219,7 +222,7 @@ export const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =
     .flatMap(student => formatStudent(student.toJSON()))
     .reduce(
       (acc, student) => {
-        if (student.programme.code.startsWith('KH')) {
+        if (student.programme.degreeProgrammeType === DegreeProgrammeType.BACHELOR) {
           acc.bachelor.push(student)
         } else {
           acc.masterAndLicentiate.push(student)

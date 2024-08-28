@@ -1,5 +1,6 @@
 import { cloneDeep } from 'lodash'
 
+import { DegreeProgrammeType } from '../../types'
 import { getGraduationStats, setGraduationStats } from '../analyticsService'
 import { getGraduationStatsForStudytrack } from '../studyProgramme/studyProgrammeGraduations'
 import { getDegreeProgrammesOfFaculty, ProgrammesOfOrganization } from './faculty'
@@ -16,10 +17,7 @@ const calculateCombinedStats = async (
   includeAllSpecials: boolean,
   facultyProgrammes: ProgrammesOfOrganization
 ) => {
-  const degreeProgrammeTypes = {
-    bachelor: 'urn:code:degree-program-type:bachelors-degree',
-    master: 'urn:code:degree-program-type:masters-degree',
-  }
+  const degreeProgrammeTypesToInclude = [DegreeProgrammeType.BACHELOR, DegreeProgrammeType.MASTER]
 
   const combinedGraphStats: Array<{ name: 'Bachelors' | 'Masters'; data?: number[] }> = [
     { name: 'Bachelors' },
@@ -33,7 +31,10 @@ const calculateCombinedStats = async (
   const programmeNames: Record<string, ProgrammeName> = {}
 
   for (const programme of facultyProgrammes) {
-    if (!Object.values(degreeProgrammeTypes).includes(programme.degreeProgrammeType)) {
+    if (
+      programme.degreeProgrammeType == null ||
+      !degreeProgrammeTypesToInclude.includes(programme.degreeProgrammeType)
+    ) {
       continue
     }
     const statsFromRedis = await getGraduationStats(
@@ -69,8 +70,8 @@ const calculateCombinedStats = async (
     const { degreeProgrammeType, progId, name, code } = facultyProgrammes.find(({ code }) => code === id)!
     programmeNames[progId] = { ...name, code }
     const thesisStats = graphStats.find(({ name }) => name === 'Wrote thesis')!
-    const isBachelor = degreeProgrammeType === degreeProgrammeTypes.bachelor
-    const isMaster = degreeProgrammeType === degreeProgrammeTypes.master
+    const isBachelor = degreeProgrammeType === DegreeProgrammeType.BACHELOR
+    const isMaster = degreeProgrammeType === DegreeProgrammeType.MASTER
     const correctIndex = isBachelor ? 0 : 1
 
     if (thesisStats) {

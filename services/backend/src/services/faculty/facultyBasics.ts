@@ -1,5 +1,6 @@
 import { cloneDeep } from 'lodash'
 
+import { DegreeProgrammeType } from '../../types'
 import { getBasicStats, setBasicStats } from '../analyticsService'
 import { getBasicStatsForStudytrack } from '../studyProgramme/studyProgrammeBasics'
 import type { ProgrammesOfOrganization } from './faculty'
@@ -61,15 +62,15 @@ const calculateCombinedStats = async (
   ]
   const combinedProgrammeTableStats: Record<string, Array<Array<string | number>>> = {}
   const combinedTableStats: Array<Array<string | number>> = []
-  const degreeProgrammeTypes = {
-    bachelor: 'urn:code:degree-program-type:bachelors-degree',
-    master: 'urn:code:degree-program-type:masters-degree',
-    doctor: 'urn:code:degree-program-type:doctor',
-  }
+  const degreeProgrammeTypesToInclude = [
+    DegreeProgrammeType.BACHELOR,
+    DegreeProgrammeType.MASTER,
+    DegreeProgrammeType.DOCTOR,
+  ]
   const degreeToIndex = {
-    'urn:code:degree-program-type:bachelors-degree': 0,
-    'urn:code:degree-program-type:masters-degree': 1,
-    'urn:code:degree-program-type:doctor': 2,
+    [DegreeProgrammeType.BACHELOR]: 0,
+    [DegreeProgrammeType.MASTER]: 1,
+    [DegreeProgrammeType.DOCTOR]: 2,
   } as const
 
   for (const stats of statsFromAllProgrammes) {
@@ -80,7 +81,9 @@ const calculateCombinedStats = async (
     programmeNames[progId] = { ...name, code }
     const graduatedStats = stats.graphStats.find(({ name }) => name === 'Graduated')!
     const correctIndex =
-      degreeProgrammeType in degreeToIndex ? degreeToIndex[degreeProgrammeType as keyof typeof degreeToIndex] : 3
+      degreeProgrammeType != null && degreeProgrammeType in degreeToIndex
+        ? degreeToIndex[degreeProgrammeType as keyof typeof degreeToIndex]
+        : 3
     if (!combinedGraphStats[correctIndex].data) {
       combinedGraphStats[correctIndex].data = [...graduatedStats.data]
     } else {
@@ -91,10 +94,10 @@ const calculateCombinedStats = async (
     const tableStatsForProgramme = stats.tableStats.map(([year, , , graduated]) => [
       year,
       graduated,
-      degreeProgrammeType === degreeProgrammeTypes.bachelor ? graduated : 0,
-      degreeProgrammeType === degreeProgrammeTypes.master ? graduated : 0,
-      degreeProgrammeType === degreeProgrammeTypes.doctor ? graduated : 0,
-      !Object.values(degreeProgrammeTypes).includes(degreeProgrammeType) ? graduated : 0,
+      degreeProgrammeType === DegreeProgrammeType.BACHELOR ? graduated : 0,
+      degreeProgrammeType === DegreeProgrammeType.MASTER ? graduated : 0,
+      degreeProgrammeType === DegreeProgrammeType.DOCTOR ? graduated : 0,
+      degreeProgrammeType !== null && !degreeProgrammeTypesToInclude.includes(degreeProgrammeType) ? graduated : 0,
     ])
     combinedProgrammeTableStats[progId] = tableStatsForProgramme
 

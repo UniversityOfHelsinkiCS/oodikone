@@ -33,12 +33,7 @@ const userIsUnauthorized = (programmeRights: string[], programmeCodes: string[],
   return lacksProgrammeAccess && !hasFullAccess
 }
 
-const getProgrammeCodes = (studyTrack: string) => {
-  if (studyTrack.includes('KH') && studyTrack.includes('MH')) {
-    return studyTrack.split('-')
-  }
-  return [studyTrack]
-}
+const getProgrammeCodes = (studyTrack: string) => (studyTrack.includes('-') ? studyTrack.split('-') : [studyTrack])
 
 const getStudyTrackCode = (studyTrack: string, combinedProgramme: string) => {
   return combinedProgramme ? `${studyTrack}-${combinedProgramme}` : studyTrack
