@@ -260,8 +260,8 @@ export const StudyGuidanceGroupOverview = ({ groups }) => {
           lisäominaisuuksia.
         </p>
         <p>
-          Valitsemalla valikosta Special populations &gt; Students close to graduation voit tarkastella ohjausryhmiesi
-          lähellä valmistumista olevia opiskelijoita.
+          <Link to="/close-to-graduation">Tässä näkymässä</Link> voit tarkastella ohjausryhmiesi lähellä valmistumista
+          olevia opiskelijoita.
         </p>
       </StyledMessage>
       <div data-cy="Table-study-guidance-group-overview" style={{ margin: 'auto' }}>
