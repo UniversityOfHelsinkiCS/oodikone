@@ -106,14 +106,14 @@ const getGradeSeries = (series: Array<Record<string, number>>) => {
     return {
       absolute: [
         getDataObject('0', newSeries[0], 'a'),
-        getDataObject('HT', newSeries.HT, 'b'),
-        getDataObject('TT', newSeries.TT, 'c'),
+        getDataObject('TT', newSeries.TT, 'b'),
+        getDataObject('HT', newSeries.HT, 'c'),
         getDataObject('Hyv.', newSeries['Hyv.'], 'd'),
       ],
       relative: [
         getDataObject('0', newSeries[0].map(absoluteToRelative(sumAll)), 'a'),
-        getDataObject('HT', newSeries.HT.map(absoluteToRelative(sumAll)), 'b'),
-        getDataObject('TT', newSeries.TT.map(absoluteToRelative(sumAll)), 'c'),
+        getDataObject('TT', newSeries.TT.map(absoluteToRelative(sumAll)), 'b'),
+        getDataObject('HT', newSeries.HT.map(absoluteToRelative(sumAll)), 'c'),
         getDataObject('Hyv.', newSeries['Hyv.'].map(absoluteToRelative(sumAll)), 'd'),
       ],
     }
