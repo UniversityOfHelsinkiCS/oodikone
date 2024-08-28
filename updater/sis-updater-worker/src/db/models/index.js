@@ -10,7 +10,6 @@ const Organization = require('./organization')
 const ProgrammeModule = require('./programmeModule')
 const ProgrammeModuleChild = require('./programmeModuleChild')
 const Semester = require('./semester')
-const SemesterEnrollment = require('./semesterEnrollment')
 const SISStudyRight = require('./SISStudyRight')
 const SISStudyRightElement = require('./SISStudyRightElement')
 const Student = require('./student')
@@ -30,12 +29,6 @@ Course.belongsTo(CourseType, { foreignKey: 'coursetypecode', targetKey: 'courset
 
 Course.belongsToMany(Organization, { through: CourseProvider, foreignKey: 'coursecode' })
 Organization.belongsToMany(Course, { through: CourseProvider, foreignKey: 'organizationcode' })
-
-SemesterEnrollment.belongsTo(Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
-Student.hasMany(SemesterEnrollment, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
-
-SemesterEnrollment.belongsTo(Semester, { foreignKey: 'semestercomposite', targetKey: 'composite' })
-Semester.hasMany(SemesterEnrollment, { foreignKey: 'semestercomposite', sourceKey: 'composite' })
 
 ProgrammeModule.belongsTo(Organization, { foreignKey: 'organization_id' })
 Organization.hasMany(ProgrammeModule, { foreignKey: 'organization_id' })
@@ -106,7 +99,6 @@ module.exports = {
   ProgrammeModule,
   ProgrammeModuleChild,
   Semester,
-  SemesterEnrollment,
   SISStudyRight,
   SISStudyRightElement,
   Student,

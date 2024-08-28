@@ -14,11 +14,7 @@ const TABLES_TO_PURGE = [
   'credit',
   'credit_teachers',
   'credit_types',
-  'element_details',
   'organization',
-  'semester_enrollments',
-  'studyright',
-  'studyright_elements',
   'studyright_extents',
   'teacher',
 ]

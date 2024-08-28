@@ -6,7 +6,6 @@ const {
   getCountry,
   getCreditTypeCodeFromAttainment,
   getGrade,
-  getSemester,
   getSemesterByDate,
   getUniOrgId,
 } = require('./shared')
@@ -219,32 +218,6 @@ const creditMapper =
 
 const termRegistrationTypeToEnrollmenttype = termRegistrationType =>
   ({ ATTENDING: 1, NONATTENDING: 2 })[termRegistrationType] ?? 3
-
-const semesterEnrollmentMapper =
-  (personIdToStudentNumber, studyrightToUniOrgId) => (studentId, studyRightId) => termRegistration => {
-    const {
-      studyTerm: { termIndex, studyYearStartYear },
-      registrationDate,
-      termRegistrationType,
-      statutoryAbsence,
-    } = termRegistration
-
-    const enrollmenttype = termRegistrationTypeToEnrollmenttype(termRegistrationType)
-    const studentnumber = personIdToStudentNumber[studentId]
-    const { semestercode } = getSemester(studyYearStartYear, termIndex)
-    const enrollment_date = registrationDate
-    const org = studyrightToUniOrgId[studyRightId]
-
-    return {
-      enrollmenttype,
-      studentnumber,
-      semestercode,
-      enrollment_date,
-      org,
-      semestercomposite: `${org}-${semestercode}`,
-      statutory_absence: statutoryAbsence,
-    }
-  }
 
 const courseProviderMapper =
   courseGroupId =>
@@ -494,7 +467,6 @@ module.exports = {
   mapTeacher,
   creditMapper,
   termRegistrationTypeToEnrollmenttype,
-  semesterEnrollmentMapper,
   courseProviderMapper,
   courseMapper,
   mapCourseType,

@@ -1,11 +1,11 @@
-const { flatten, groupBy, orderBy, uniq } = require('lodash')
+const { flatten, groupBy, orderBy } = require('lodash')
 const { Op } = require('sequelize')
 
-const { bulkCreate, selectFromActiveSnapshotsByIds, selectFromByIds, selectFromSnapshotsByIds } = require('../../db')
-const { Course, Enrollment, SemesterEnrollment, Student } = require('../../db/models')
+const { bulkCreate, selectFromActiveSnapshotsByIds, selectFromByIds } = require('../../db')
+const { Course, Enrollment, Student } = require('../../db/models')
 const { logger } = require('../../utils/logger')
-const { studentMapper, semesterEnrollmentMapper, enrollmentMapper } = require('../mapper')
-const { getEducation, getUniOrgId, loadMapsIfNeeded } = require('../shared')
+const { studentMapper, enrollmentMapper } = require('../mapper')
+const { getEducation, loadMapsIfNeeded } = require('../shared')
 const { updateAttainments } = require('./attainments')
 const { getAttainmentsToBeExcluded } = require('./excludedPartialAttainments')
 const { updateSISStudyRights, updateSISStudyRightElements } = require('./SISStudyRights')
@@ -145,56 +145,6 @@ const updateEnrollments = async (enrollments, personIdToStudentNumber, studyRigh
   await bulkCreate(Enrollment, mappedEnrollments)
 }
 
-// why we are using two terms for the same thing: term registration and semester enrollment
-const semesterEnrolmentsOfStudent = allSemesterEnrollments => {
-  const semesters = uniq(allSemesterEnrollments.map(s => s.semestercode))
-  const semesterEnrollments = semesters.map(semester => {
-    const enrollmentsForSemester = allSemesterEnrollments.filter(se => se.semestercode === semester)
-
-    const present = enrollmentsForSemester.find(se => se.enrollmenttype === 1)
-    if (present) {
-      return present
-    }
-    const absent = enrollmentsForSemester.find(se => se.enrollmenttype === 2)
-    if (absent) {
-      return absent
-    }
-
-    return enrollmentsForSemester[0]
-  })
-
-  return semesterEnrollments
-}
-
-// We should get rid of the separate semesterEnrollment model and start using semesterEnrollments associated with study rights instead
-const updateTermRegistrations = async (termRegistrations, personIdToStudentNumber) => {
-  const studyRightIds = termRegistrations.map(({ study_right_id }) => study_right_id)
-  const studyRights = await selectFromSnapshotsByIds('studyrights', studyRightIds)
-
-  const studyrightToUniOrgId = studyRights.reduce((res, curr) => {
-    res[curr.id] = getUniOrgId(curr.organisation_id)
-    return res
-  }, {})
-
-  const mapSemesterEnrollment = semesterEnrollmentMapper(personIdToStudentNumber, studyrightToUniOrgId)
-
-  const allSementerEnrollments = flatten(
-    termRegistrations
-      .filter(
-        termRegistration =>
-          termRegistration.student_id !== null && studyRights.some(r => r.id === termRegistration.study_right_id)
-      )
-      .map(({ student_id, term_registrations, study_right_id }) =>
-        term_registrations.map(mapSemesterEnrollment(student_id, study_right_id))
-      )
-  )
-
-  const enrolmentsByStudents = groupBy(allSementerEnrollments, enrollment => enrollment.studentnumber)
-  const semesterEnrollments = flatten(Object.values(enrolmentsByStudents).map(semesterEnrolmentsOfStudent))
-
-  await bulkCreate(SemesterEnrollment, semesterEnrollments)
-}
-
 const createModuleGroupIdToCodeMap = async studyRights => {
   const groupIds = new Set()
 
@@ -293,9 +243,6 @@ const updateStudents = async (personIds, iteration = 0) => {
         logError(error, 'attainments')
       }
     ),
-    updateTermRegistrations(termRegistrations, personIdToStudentNumber).catch(error => {
-      logError(error, 'term registrations')
-    }),
     updateEnrollments(enrollments, personIdToStudentNumber, studyRightIdToEducationType).catch(error => {
       logError(error, 'enrollments')
     }),
