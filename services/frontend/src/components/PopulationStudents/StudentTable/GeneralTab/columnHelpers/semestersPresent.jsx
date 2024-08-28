@@ -34,17 +34,9 @@ export const getSemestersPresentFunctions = ({
       }
     }
 
-    const { first } = filteredStudents.reduce(
-      ({ first }, student) => {
-        if (!student.semesterenrollments) return { first: 9999, last: 0 }
-        const newFirst = Math.min(first, ...student.semesterenrollments.map(enrollment => enrollment.semestercode))
-        return { first: isFall(newFirst) ? newFirst : newFirst - 1 }
-      },
-      { first: 9999 }
-    )
-    const last = isFall(currentSemesterCode) ? currentSemesterCode - 2 : currentSemesterCode
+    const last = isFall(currentSemesterCode) ? currentSemesterCode + 1 : currentSemesterCode
     return {
-      first: last - first > 14 ? last - 13 : first,
+      first: last - 13,
       last,
     }
   }
@@ -168,7 +160,12 @@ export const getSemestersPresentFunctions = ({
 
   const getSemesterEnrollmentsVal = (student, studyright) => {
     if (!student && !studyright) return 0
-    const enrollmentsToCount = studyright ? studyright.semesterEnrollments : student.semesterenrollments
+    const enrollmentsToCount = studyright
+      ? studyright.semesterEnrollments
+      : Object.keys(student.semesterEnrollmentsMap || {}).reduce((acc, semester) => {
+          acc.push({ semestercode: semester, enrollmenttype: student.semesterEnrollmentsMap[semester].enrollmenttype })
+          return acc
+        }, [])
     return (enrollmentsToCount ?? []).reduce(
       (prev, cur) =>
         prev +
