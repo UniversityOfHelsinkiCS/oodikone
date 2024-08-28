@@ -17,7 +17,7 @@ exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
 accessibility(ReactHighcharts.Highcharts)
 
-const gradeGraphOptions = (isRelative, categories, max, title) => ({
+const gradeGraphOptions = (isRelative: boolean, categories: string[], max: number, title: string) => ({
   chart: {
     type: 'column',
   },
@@ -64,7 +64,7 @@ const gradeGraphOptions = (isRelative, categories, max, title) => ({
   },
 })
 
-const calculateSumAll = newSeries => {
+const calculateSumAll = (newSeries: Record<string, number[]>) => {
   return Object.values(newSeries)[0].map((_, index) =>
     Object.values(newSeries)
       .map(series => series[index])
@@ -72,9 +72,12 @@ const calculateSumAll = newSeries => {
   )
 }
 
-const getGradeSeries = series => {
+const getGradeSeries = (series: Array<Record<string, number>>) => {
   const seriesType = getSeriesType(series)
-  const newSeries = seriesType === 'thesis' ? getThesisGradeSpread(series) : getGradeSpread(series)
+  const newSeries =
+    seriesType === 'thesis'
+      ? (getThesisGradeSpread(series) as Record<string, number[]>)
+      : (getGradeSpread(series) as Record<string, number[]>)
   const sumAll = calculateSumAll(newSeries)
 
   if (seriesType === 'thesis') {
