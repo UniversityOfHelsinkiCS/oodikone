@@ -17,20 +17,17 @@ exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
 accessibility(ReactHighcharts.Highcharts)
 
-const gradeGraphOptions = (isRelative: boolean, categories: string[], max: number, title: string) => ({
+const getGradeGraphOptions = (
+  colors: string[],
+  maxGradeValue: number,
+  isRelative: boolean,
+  statYears: string[],
+  title: string
+) => ({
   chart: {
     type: 'column',
   },
-  colors: [
-    color.red,
-    chartColor.blue,
-    chartColor.blue,
-    chartColor.blue,
-    chartColor.blue,
-    chartColor.blue,
-    color.green,
-    color.green,
-  ],
+  colors,
   credits: {
     enabled: false,
   },
@@ -41,15 +38,15 @@ const gradeGraphOptions = (isRelative: boolean, categories: string[], max: numbe
     enabled: false,
   },
   xAxis: {
-    categories,
+    categories: statYears,
   },
   yAxis: {
     allowDecimals: false,
     title: {
       text: isRelative ? 'Share of students' : 'Number of students',
     },
-    max,
-    floor: -max,
+    max: maxGradeValue,
+    floor: -maxGradeValue,
   },
   plotOptions: {
     column: {
@@ -172,14 +169,34 @@ export const GradeDistributionChart = ({ data, isRelative, userHasAccessToAllSta
   const grades = stats.map(year => getGrades(year.students))
 
   const gradeGraphSeries = getGradeSeries(grades)
+  const seriesType = getSeriesType(grades)
 
   const maxGradeValue = isRelative ? 100 : getMaxValueOfSeries(gradeGraphSeries.absolute)
+  const title = `Grades for group ${data.name}`
 
-  const primaryDistributionOptions = gradeGraphOptions(
+  const colors = {
+    other: [
+      color.red,
+      chartColor.blue,
+      chartColor.blue,
+      chartColor.blue,
+      chartColor.blue,
+      chartColor.blue,
+      color.green,
+      color.green,
+      color.green,
+    ],
+    'pass-fail': [color.red, color.green],
+    'second-national-language': [color.red, color.green, color.green, color.green],
+    thesis: [chartColor.blue],
+  }
+
+  const primaryDistributionOptions = getGradeGraphOptions(
+    colors[seriesType],
+    maxGradeValue,
     isRelative,
     statYears,
-    maxGradeValue,
-    `Grades for group ${data.name}`
+    title
   )
 
   return (
