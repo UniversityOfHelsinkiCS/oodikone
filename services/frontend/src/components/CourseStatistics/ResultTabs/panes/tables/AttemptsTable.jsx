@@ -61,8 +61,7 @@ const getGradeColumns = grades =>
 
 export const AttemptsTable = ({
   data: { stats, name },
-  settings: { showGrades, separate },
-  isRelative,
+  settings: { showGrades, separate, isRelative },
   userHasAccessToAllStats,
   headerVisible = false,
 }) => {
