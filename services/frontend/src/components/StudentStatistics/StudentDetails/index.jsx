@@ -12,85 +12,45 @@ import { StudentGraphs } from './StudentGraphs'
 import { StudyrightsTable } from './StudyrightsTable'
 import { TagsTable } from './TagsTable'
 
-const getAbsentYears = (semesterEnrollments, semesters) => {
-  if (!semesters) return []
-
-  const mappedSemesters = Object.values(semesters).reduce(
-    (acc, { semestercode, startdate, enddate }) => ({ ...acc, [semestercode]: { startdate, enddate } }),
-    {}
-  )
-
-  // If a student has been absent for a long period, then the enrollments aren't marked in oodi...
-  // Therefore we need to manually patch empty enrollment ranges with absences
-  const now = new Date().setHours(0, 0, 0, 0) // needs to be done due to semester table being a mess
-  const latestSemester = parseInt(
-    Object.entries(mappedSemesters).find(
-      ([, { startdate, enddate }]) => now <= new Date(enddate).getTime() && now >= new Date(startdate).getTime()
-    )[0],
-    10
-  )
-  const mappedSemesterenrollments = semesterEnrollments
-    .toSorted((a, b) => a.semestercode - b.semestercode)
-    .reduce((res, curr) => ({ ...res, [curr.semestercode]: curr }), {})
-
-  const patchedSemesterenrollments = []
-  if (semesterEnrollments.length) {
-    let runningSemestercode = semesterEnrollments[0].semestercode
-    while (runningSemestercode <= latestSemester) {
-      if (!mappedSemesterenrollments[runningSemestercode]) {
-        patchedSemesterenrollments.push({ semestercode: runningSemestercode, enrollmenttype: -1 })
-      } else {
-        patchedSemesterenrollments.push(mappedSemesterenrollments[runningSemestercode])
+const getAbsentYears = (studyRights, semesters) => {
+  const semesterEnrollments = studyRights.reduce((acc, { semesterEnrollments }) => {
+    if (semesterEnrollments == null) return acc
+    for (const enrollment of semesterEnrollments) {
+      const currentEnrollment = acc[enrollment.semester]
+      if (!currentEnrollment) {
+        acc[enrollment.semester] = {
+          semestercode: enrollment.semester,
+          enrollmenttype: enrollment.type,
+          statutoryAbsence: enrollment.statutoryAbsence ?? false,
+        }
+      } else if (currentEnrollment.enrollmenttype === 1) {
+        continue
+      } else if (enrollment.type === 2) {
+        currentEnrollment.enrollmenttype = enrollment.type
+        currentEnrollment.statutoryAbsence = enrollment.statutoryAbsence ?? false
       }
-      runningSemestercode++
+    }
+    return acc
+  }, {})
+
+  const minimumSemesterCode = Math.min(...Object.keys(semesterEnrollments))
+  const maximumSemesterCode = Math.max(...Object.keys(semesterEnrollments))
+
+  for (let i = minimumSemesterCode + 1; i < maximumSemesterCode; i++) {
+    if (!semesterEnrollments[i]) {
+      semesterEnrollments[i] = { semestercode: i, enrollmenttype: 3, statutoryAbsence: false }
     }
   }
 
-  const formatAbsence = ({ semestercode, enrollmenttype, statutoryAbsence }) => {
-    const { startdate, enddate } = mappedSemesters[semestercode]
-    return {
-      semestercode,
-      enrollmenttype,
-      statutoryAbsence,
-      startdate: new Date(startdate).getTime(),
-      enddate: new Date(enddate).getTime(),
-    }
-  }
+  const mergedEnrollments = Object.values(semesterEnrollments)
+    .filter(enrollments => enrollments.enrollmenttype !== 1)
+    .map(enrollment => ({
+      ...enrollment,
+      startdate: new Date(semesters[enrollment.semestercode].startdate).getTime(),
+      enddate: new Date(semesters[enrollment.semestercode].enddate).getTime(),
+    }))
 
-  const mergeAbsences = absences => {
-    const res = []
-    let currentSemestercode = -1
-    let currentType = 0
-    let currentStatutory = 0
-    if (absences.length) {
-      res.push(absences[0])
-      currentSemestercode = absences[0].semestercode
-      currentType = absences[0].enrollmenttype
-      currentStatutory = absences[0].statutoryAbsence
-    }
-    absences.forEach((absence, i) => {
-      if (i === 0) return
-      if (
-        absence.semestercode === currentSemestercode + 1 &&
-        absence.enrollmenttype === currentType &&
-        absence.statutoryAbsence === currentStatutory
-      ) {
-        res[res.length - 1].enddate = absence.enddate
-      } else {
-        res.push(absence)
-      }
-      currentSemestercode = absence.semestercode
-      currentType = absence.enrollmenttype
-      currentStatutory = absence.statutoryAbsence
-    })
-    return res
-  }
-
-  return mergeAbsences(
-    patchedSemesterenrollments
-      .filter(({ enrollmenttype }) => enrollmenttype !== 1) // 1 = present & 2 = absent
-      .map(absence => formatAbsence(absence))
-  )
+  return mergedEnrollments
 }
 
 export const StudentDetails = ({ studentNumber }) => {
@@ -142,7 +102,7 @@ export const StudentDetails = ({ studentNumber }) => {
     }
   }
 
-  const absences = getAbsentYears(student.semesterenrollments, semestersAndYears.semesters)
+  const absences = getAbsentYears(student.studyRights, semestersAndYears.semesters)
 
   return (
     <>

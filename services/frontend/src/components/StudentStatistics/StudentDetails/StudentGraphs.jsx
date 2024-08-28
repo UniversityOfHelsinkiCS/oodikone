@@ -2,6 +2,7 @@ import accessibility from 'highcharts/modules/accessibility'
 import exportData from 'highcharts/modules/export-data'
 import exporting from 'highcharts/modules/exporting'
 import { chunk, flattenDeep, groupBy } from 'lodash'
+import moment from 'moment'
 import { useMemo, useState } from 'react'
 import ReactHighcharts from 'react-highcharts/ReactHighstock'
 import { Input, Menu, Message, Tab } from 'semantic-ui-react'
@@ -90,20 +91,19 @@ const CreditsGraph = ({ graphYearStart, student, absences, selectedStudyPlanId }
   )
 }
 
-const semesterChunkify = (courses, semesterenrollments, semesters, getTextIn) => {
-  const semesterChunks = semesterenrollments
-    .toSorted((a, b) => a.semestercode - b.semestercode)
-    .reduce((acc, curr) => {
-      const currSemester = semesters.semesters[curr.semestercode]
-      const filteredcourses = courses.filter(
-        course =>
-          new Date(currSemester.startdate) <= new Date(course.date) &&
-          new Date(course.date) < new Date(currSemester.enddate)
-      )
-      const grades = { data: filteredcourses, semester: currSemester.name }
-      acc.push(grades)
-      return acc
-    }, [])
+const semesterChunkify = (courses, semesters, getTextIn) => {
+  const semesterChunks = courses.reduce((acc, curr) => {
+    const semester = semesters.find(
+      semester => moment(curr.date).isSameOrAfter(semester.startdate) && moment(curr.date).isBefore(semester.enddate)
+    )
+    const semesterData = acc.find(data => data.semester === semester.name)
+    if (semesterData) {
+      semesterData.data.push(curr)
+    } else {
+      acc.push({ data: [curr], semester: semester.name })
+    }
+    return acc
+  }, [])
 
   const semesterMeans = semesterChunks.reduce((acc, curr) => {
     const gradeSum = curr.data.reduce((a, b) => a + b.grade * b.credits, 0)
@@ -161,7 +161,7 @@ const gradeMeanSeries = (student, chunksize, semesters, getTextIn) => {
     return acc
   }, [])
 
-  const semesterMeans = semesterChunkify(gradesAndMeans.grades, student.semesterenrollments, semesters, getTextIn)
+  const semesterMeans = semesterChunkify(gradesAndMeans.grades, Object.values(semesters?.semesters ?? {}), getTextIn)
 
   return {
     totalMeans: [{ data: gradesAndMeans.mean }],

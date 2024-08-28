@@ -6,24 +6,17 @@ import {
   Credit,
   Course,
   ProgrammeModule,
-  SemesterEnrollment,
   Semester,
   Studyplan,
   SISStudyRight,
   SISStudyRightElement,
 } from '../models'
 import { Tag, TagStudent } from '../models/kone'
-import { Name, UnifyStatus } from '../types'
+import { UnifyStatus } from '../types'
 import { splitByEmptySpace } from '../util'
 import logger from '../util/logger'
 
 const { sequelize } = dbConnections
-
-type SemesterEnrollmentWithNameAndYear = SemesterEnrollment & {
-  name?: Name
-  yearname?: string
-  startYear?: number
-}
 
 const byStudentNumber = async (studentNumber: string) => {
   const [student, tags] = await Promise.all([
@@ -66,9 +59,6 @@ const byStudentNumber = async (studentNumber: string) => {
           ],
         },
         {
-          model: SemesterEnrollment,
-        },
-        {
           model: Studyplan,
           attributes: ['id', 'included_courses', 'programme_code', 'completed_credits', 'sis_study_right_id'],
         },
@@ -102,17 +92,6 @@ const byStudentNumber = async (studentNumber: string) => {
       },
     },
   })
-  const semesters = await Semester.findAll()
-  const mappedEnrollments = student.semester_enrollments.map(enrollment => {
-    const semester = semesters.find(semester => semester.semestercode === enrollment.semestercode)!
-    return {
-      ...(enrollment.dataValues as SemesterEnrollment),
-      name: semester.name,
-      yearname: semester.yearname,
-      startYear: semester.startYear,
-    }
-  })
-  student.semester_enrollments = mappedEnrollments as Array<SemesterEnrollmentWithNameAndYear>
 
   return {
     ...student.dataValues,
@@ -240,12 +219,11 @@ const formatSharedStudentData = ({
   abbreviatedname,
   email,
   studyRights,
-  semester_enrollments,
   studyplans,
   updatedAt,
   createdAt,
   sis_person_id,
-}: Partial<Omit<Student, 'semester_enrollments'>> & { semester_enrollments: SemesterEnrollmentWithNameAndYear[] }) => {
+}: Partial<Omit<Student, 'semester_enrollments'>>) => {
   const toCourse = ({ grade, credits, credittypecode, is_open, attainment_date, course, isStudyModule }: Credit) => {
     course = course.toJSON()
 
@@ -264,20 +242,6 @@ const formatSharedStudentData = ({
     }
   }
 
-  studyRights = studyRights || []
-  semester_enrollments = semester_enrollments || []
-  studyplans = studyplans || []
-  const semesterenrollments = semester_enrollments.map(
-    ({ semestercode, enrollmenttype, name, yearname, startYear, statutory_absence: statutoryAbsence }) => ({
-      yearname,
-      name,
-      startYear,
-      semestercode,
-      enrollmenttype,
-      statutoryAbsence,
-    })
-  )
-
   if (credits === undefined) {
     credits = []
   }
@@ -289,24 +253,21 @@ const formatSharedStudentData = ({
   return {
     firstnames,
     lastname,
-    studyRights,
+    studyRights: studyRights || [],
     studentNumber: studentnumber,
     started: dateofuniversityenrollment,
     credits: creditcount || 0,
     courses: formattedCredits,
     name: abbreviatedname,
     email,
-    semesterenrollments,
     updatedAt: updatedAt || createdAt,
-    studyplans,
+    studyplans: studyplans || [],
     sis_person_id,
   }
 }
 
 const formatStudent = (
   studentData: Partial<Omit<Student, 'semester_enrollments'>> & {
-    semester_enrollments: SemesterEnrollmentWithNameAndYear[]
-  } & {
     tags: Array<InferAttributes<TagStudent> & { programme?: Pick<InferAttributes<ProgrammeModule>, 'code' | 'name'> }>
   }
 ) => {
@@ -317,11 +278,7 @@ const formatStudent = (
   }
 }
 
-const formatStudentWithoutTags = (
-  studentData: Partial<Omit<Student, 'semester_enrollments'>> & {
-    semester_enrollments: SemesterEnrollmentWithNameAndYear[]
-  }
-) => {
+const formatStudentWithoutTags = (studentData: Partial<Omit<Student, 'semester_enrollments'>>) => {
   return formatSharedStudentData(studentData)
 }
 
