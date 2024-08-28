@@ -20,7 +20,6 @@ import {
   transferredToProgrammeFilter,
 } from '@/components/FilterView/filters'
 import { InfoBox } from '@/components/InfoBox'
-import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
 import { PopulationStudentsContainer as PopulationStudents } from '@/components/PopulationStudents'
 import { ProgressBar } from '@/components/ProgressBar'
@@ -34,7 +33,6 @@ import { CustomPopulationSearch } from './CustomPopulationSearch'
 import { UnihowDataExport } from './UnihowDataExport'
 
 export const CustomPopulation = () => {
-  const { language } = useLanguage()
   const [customPopulationState, setCustomPopulationState] = useState({
     selectedSearch: null,
     studentNumbers: [],
@@ -75,14 +73,14 @@ export const CustomPopulation = () => {
       creditDateFilter,
       enrollmentStatusFilter({
         allSemesters,
-        language,
+        programme: associatedProgramme,
       }),
     ]
     if (associatedProgramme) {
       filtersList.push(hopsFilter({ programmeCode: associatedProgramme, combinedProgrammeCode: '' }))
     }
     return filtersList
-  }, [courseStats, allSemesters, associatedProgramme, language])
+  }, [courseStats, allSemesters, associatedProgramme])
 
   return (
     <FilterView displayTray={custompop.length > 0} filters={filters} name="CustomPopulation" students={custompop}>

@@ -79,7 +79,7 @@ export const PopulationStatistics = () => {
     curriculumPeriodFilter,
     enrollmentStatusFilter({
       allSemesters: allSemesters?.semesters ?? [],
-      language,
+      programme: programmeCode,
     }),
     genderFilter,
     graduatedFromProgrammeFilter({ code: programmeCode, combinedProgrammeCode }),

@@ -157,12 +157,11 @@ const SingleStudyGroupContent = ({ filteredStudents, group }) => {
 const SingleStudyGroupFilterView = ({ courses, group, population, ...otherProps }) => {
   const semesterQuery = useGetSemestersQuery()
   const allSemesters = semesterQuery.data?.semesters
-  const { language } = useLanguage()
   const viewFilters = [
     filters.studentNumberFilter,
     filters.enrollmentStatusFilter({
       allSemesters: allSemesters ?? [],
-      language,
+      programme: group?.tags?.studyProgramme,
     }),
     filters.ageFilter,
     filters.genderFilter,

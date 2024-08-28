@@ -1,4 +1,3 @@
-import fp from 'lodash/fp'
 import { Dropdown, Form } from 'semantic-ui-react'
 
 import { filterToolTips } from '@/common/InfoToolTips'
@@ -88,20 +87,42 @@ export const enrollmentStatusFilter = createFilter({
 
   isActive: ({ status }) => status !== null,
 
-  precompute: fp.flow(
-    ({ students }) => students,
-    fp.map('semesterenrollments'),
-    fp.flatten,
-    fp.map('semestercode'),
-    fp.uniq,
-    semesterCodes => ({ semesterCodes })
-  ),
+  precompute: ({ students }) => {
+    const semesterCodes = new Set()
+    for (const student of students) {
+      for (const studyRight of student.studyRights) {
+        if (!studyRight.semesterEnrollments) continue
+        for (const enrollment of studyRight.semesterEnrollments) {
+          semesterCodes.add(enrollment.semester)
+        }
+      }
+    }
+    return { semesterCodes: [...semesterCodes] }
+  },
 
-  filter(student, { status, semesters }) {
+  filter(student, { status, semesters }, { args }) {
+    if (args.programme) {
+      const correctStudyRight = student.studyRights.find(studyRight =>
+        studyRight.studyRightElements.some(element => element.code === args.programme)
+      )
+      return correctStudyRight
+        ? semesters.every(semester => {
+            const enrollment = correctStudyRight.semesterEnrollments.find(
+              enrollment => enrollment.semester === semester
+            )
+            return enrollment ? enrollment.type === status : false
+          })
+        : false
+    }
+
+    const allEnrollments = student.studyRights
+      .flatMap(studyRight => studyRight.semesterEnrollments)
+      .filter(enrollment => enrollment != null)
+
     return semesters.every(semester => {
-      const enrollment = student.semesterenrollments.find(enrl => enrl.semestercode === semester)
+      const enrollments = allEnrollments.filter(enrl => enrl.semester === semester)
       // If enrollment info not found, return false. This may or may not be what we want?
-      return enrollment ? enrollment.enrollmenttype === status : false
+      return enrollments.length ? enrollments.some(enrl => enrl.type === status) : false
     })
   },
 
