@@ -1,18 +1,7 @@
 import moment from 'moment'
-import { col, literal, Op } from 'sequelize'
+import { literal, Op } from 'sequelize'
 
-import {
-  Course,
-  Credit,
-  Enrollment,
-  Student,
-  Studyplan,
-  StudyrightExtent,
-  Semester,
-  SemesterEnrollment,
-  SISStudyRight,
-  SISStudyRightElement,
-} from '../../models'
+import { Course, Credit, Enrollment, Student, Studyplan, SISStudyRight, SISStudyRightElement } from '../../models'
 import { Tag, TagStudent } from '../../models/kone'
 import { EnrollmentState } from '../../types'
 
@@ -144,18 +133,6 @@ const getStudents = async (studentNumbers: string[]) => {
         ],
       },
       {
-        model: SemesterEnrollment,
-        attributes: ['enrollmenttype', 'semestercode', 'enrollment_date'],
-        separate: true,
-        include: [
-          {
-            model: Semester,
-            attributes: [],
-            required: true,
-          },
-        ],
-      },
-      {
         model: Studyplan,
         attributes: [
           'included_courses',
@@ -194,46 +171,10 @@ const getCredits = async (creditsOfStudent: any) => {
   })
 }
 
-const getExtents = () =>
-  StudyrightExtent.findAll({
-    attributes: ['extentcode', 'name'],
-    order: col('extentcode'),
-    raw: true,
-  })
-
-const getSemesters = async (studentNumbers: string[], startDate: string, endDate: Date) => {
-  return await Semester.findAll({
-    attributes: [
-      literal('DISTINCT ON("semester"."semestercode") "semester"."semestercode"') as unknown as string,
-      'name',
-      'startdate',
-      'enddate',
-    ],
-    include: {
-      model: SemesterEnrollment,
-      attributes: [],
-      required: true,
-      where: {
-        studentnumber: {
-          [Op.in]: studentNumbers,
-        },
-      },
-    },
-    where: {
-      startdate: {
-        [Op.between]: [startDate, endDate],
-      },
-    },
-    raw: true,
-  })
-}
-
 type StudentsIncludeCoursesBetween = {
   students: Awaited<ReturnType<typeof getStudents>>
   enrollments: Awaited<ReturnType<typeof getEnrollments>>
   credits: Awaited<ReturnType<typeof getCredits>>
-  extents: Awaited<ReturnType<typeof getExtents>>
-  semesters: Awaited<ReturnType<typeof getSemesters>>
   courses: Awaited<ReturnType<typeof getCourses>>
 }
 
@@ -263,33 +204,23 @@ export const getStudentsIncludeCoursesBetween = async (
   }
 
   if (studentNumbers.length === 0) {
-    return {
-      students: [],
-      enrollments: [],
-      credits: [],
-      extents: [],
-      semesters: [],
-      elementdetails: [],
-      courses: [],
-    } as StudentsIncludeCoursesBetween
+    return { students: [], enrollments: [], credits: [], courses: [] } as StudentsIncludeCoursesBetween
   }
 
   const attainmentDateFrom = tag ? moment(startDate).year(tag.year) : startDate
 
   const creditsOfStudent = await getCreditsOfStudent(studentNumbers, studyRights, attainmentDateFrom, endDate)
 
-  const [courses, enrollments, students, credits, extents, semesters] = await Promise.all([
+  const [courses, enrollments, students, credits] = await Promise.all([
     getCourses(creditsOfStudent),
     getEnrollments(studentNumbers, attainmentDateFrom, endDate),
     getStudents(studentNumbers),
     getCredits(creditsOfStudent),
-    getExtents(),
-    getSemesters(studentNumbers, startDate, endDate),
   ])
 
   students.forEach(student => {
     student.tags = studentNumberToTags[student.studentnumber] || []
   })
 
-  return { students, enrollments, credits, extents, semesters, courses } as StudentsIncludeCoursesBetween
+  return { students, enrollments, credits, courses } as StudentsIncludeCoursesBetween
 }

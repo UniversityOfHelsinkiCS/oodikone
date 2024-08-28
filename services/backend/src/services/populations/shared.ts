@@ -94,7 +94,6 @@ const formatStudentForPopulationStatistics = (
     phone_number,
     studyRights,
     studyplans,
-    semester_enrollments,
     transfers,
     updatedAt,
     createdAt,
@@ -164,15 +163,17 @@ const formatStudentForPopulationStatistics = (
     const correctStudyRight = studyRights.find(studyRight =>
       studyRight.studyRightElements.some(element => element.code === code)
     )
-    const correctStudyRightElement = correctStudyRight.studyRightElements.find(element => element.code === code)
-    const [, hasTransferredToProgramme] = hasTransferredFromOrToProgramme(correctStudyRight, correctStudyRightElement)
-    if (hasTransferredToProgramme) {
-      const transferredFromProgramme = correctStudyRight.studyRightElements.find(element =>
-        moment(element.endDate).isSame(moment(correctStudyRightElement.startDate).subtract(1, 'd'), 'day')
-      )?.code
-      if (transferredFromProgramme) {
-        transferredStudyright = true
-        transferSource = transferredFromProgramme
+    if (correctStudyRight) {
+      const correctStudyRightElement = correctStudyRight.studyRightElements.find(element => element.code === code)
+      const [, hasTransferredToProgramme] = hasTransferredFromOrToProgramme(correctStudyRight, correctStudyRightElement)
+      if (hasTransferredToProgramme) {
+        const transferredFromProgramme = correctStudyRight.studyRightElements.find(element =>
+          moment(element.endDate).isSame(moment(correctStudyRightElement.startDate).subtract(1, 'd'), 'day')
+        )?.code
+        if (transferredFromProgramme) {
+          transferredStudyright = true
+          transferSource = transferredFromProgramme
+        }
       }
     }
   }
@@ -235,11 +236,6 @@ const formatStudentForPopulationStatistics = (
     email,
     secondaryEmail: secondary_email,
     phoneNumber: phone_number,
-    semesterenrollments: semester_enrollments
-      ? semester_enrollments
-          .sort((a, b) => a.semestercode - b.semestercode)
-          .filter(enrollment => enrollment.semestercode <= currentSemester + (currentSemester % 2))
-      : [],
     updatedAt: updatedAt || createdAt,
     tags: tags || [],
     studyrightStart: startDate,
@@ -357,7 +353,7 @@ export const getOptionsForStudents = async (studentNumbers: string[], code: stri
 }
 
 export const formatStudentsForApi = async (
-  { students, enrollments, credits, extents, semesters, courses },
+  { students, enrollments, credits, courses },
   startDate: string,
   endDate: string,
   optionData: Record<string, { name: Name }>,
@@ -394,8 +390,6 @@ export const formatStudentsForApi = async (
         optionData
       )
     ),
-    extents,
-    semesters,
     courses,
   }
 }

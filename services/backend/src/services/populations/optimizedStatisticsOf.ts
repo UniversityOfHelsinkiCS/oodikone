@@ -57,7 +57,7 @@ export const optimizedStatisticsOf = async (query: Query, studentNumberList?: st
   if (code.includes('KH') || ['MH30_001', 'MH30_003'].includes(code)) {
     criteria = await getCriteria(code)
   }
-  const { students, enrollments, credits, extents, semesters, courses } = await getStudentsIncludeCoursesBetween(
+  const { students, enrollments, credits, courses } = await getStudentsIncludeCoursesBetween(
     studentNumbers,
     startDate,
     dateMonthsFromNow(startDate, months),
@@ -66,7 +66,7 @@ export const optimizedStatisticsOf = async (query: Query, studentNumberList?: st
   )
 
   const formattedStudents = await formatStudentsForApi(
-    { students, enrollments, credits, extents, semesters, courses },
+    { students, enrollments, credits, courses },
     startDate,
     endDate,
     optionData,
