@@ -11,7 +11,7 @@
   "extends": ["../../.eslintrc.json", "plugin:react/jsx-runtime"],
   "overrides": [
     {
-      "files": ["**/*.ts"],
+      "files": ["**/*.ts", "**/*.tsx"],
       "env": {
         "es2021": true,
         "node": true
