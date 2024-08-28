@@ -23,7 +23,7 @@ export const color = {
   turquoise: '#79ccb3',
   violet: '#8884d8',
   white: '#fff',
-}
+} as const
 
 export const chartColor = {
   blue: '#178aa5',
@@ -31,4 +31,4 @@ export const chartColor = {
   greenLight: '#80e061',
   redDark: '#a03530',
   redLight: '#e2726d',
-}
+} as const
