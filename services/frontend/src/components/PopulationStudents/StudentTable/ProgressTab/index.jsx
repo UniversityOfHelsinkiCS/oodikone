@@ -10,6 +10,7 @@ import '@/components/StudentStatistics/StudentInfoCard/studentInfoCard.css'
 import { SortableTable } from '@/components/SortableTable'
 import { useStudentNameVisibility } from '@/components/StudentNameVisibilityToggle'
 import { ISO_DATE_FORMAT } from '@/constants/date'
+import { useGetSemestersQuery } from '@/redux/semesters'
 
 const getCourses = (courseCode, criteria, student) => {
   return student.courses.filter(
@@ -130,6 +131,7 @@ const getCriteriaHeaders = (months, programme) => {
 export const ProgressTable = ({ curriculum, criteria, students, months, programme, studyGuidanceGroupProgramme }) => {
   const { visible: namesVisible } = useStudentNameVisibility()
   const { getTextIn } = useLanguage()
+  const { data: semestersAndYears } = useGetSemestersQuery()
   const isStudyGuidanceGroupProgramme = studyGuidanceGroupProgramme !== ''
   const creditMonths = [12, 24, 36, 48, 60, 72]
   const defaultCourses = keyBy(curriculum.defaultProgrammeCourses, 'code')
@@ -211,6 +213,16 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
     return propObj
   }
 
+  const studentNumberToSemesterEnrollmentsMap = students.reduce((acc, student) => {
+    const correctStudyRight = student.studyRights.find(studyRight =>
+      studyRight.studyRightElements.some(element => element.code === programme)
+    )
+    if (correctStudyRight) {
+      acc[student.studentNumber] = correctStudyRight.semesterEnrollments
+    }
+    return acc
+  }, {})
+
   const helpTexts = {
     0: 'No information',
     1: 'Active',
@@ -218,17 +230,29 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
     3: 'Inactive',
   }
 
-  const getSemesterEnrollmentVal = (student, enrollmentIndex) => {
-    const fall = student.semesterenrollments[enrollmentIndex]?.enrollmenttype ?? 0
-    const spring = student.semesterenrollments[enrollmentIndex + 1]?.enrollmenttype ?? 0
+  const getSemesterEnrollmentVal = (student, semesters) => {
+    const fall =
+      studentNumberToSemesterEnrollmentsMap[student.studentNumber]?.find(
+        semester => semester.semester === Math.min(...semesters)
+      )?.type ?? 0
+    const spring =
+      studentNumberToSemesterEnrollmentsMap[student.studentNumber]?.find(
+        semester => semester.semester === Math.max(...semesters)
+      )?.type ?? 0
     const fallText = `Fall: ${helpTexts[fall]}`
     const springText = `Spring: ${helpTexts[spring]}`
     return `${fallText} ${springText}`
   }
 
-  const getEnrollmentSortingValue = (student, enrollmentIndex) => {
-    const fall = student.semesterenrollments[enrollmentIndex]?.enrollmenttype ?? 0
-    const spring = student.semesterenrollments[enrollmentIndex + 1]?.enrollmenttype ?? 0
+  const getEnrollmentSortingValue = (student, semesters) => {
+    const fall =
+      studentNumberToSemesterEnrollmentsMap[student.studentNumber]?.find(
+        semester => semester.semester === Math.min(...semesters)
+      )?.type ?? 0
+    const spring =
+      studentNumberToSemesterEnrollmentsMap[student.studentNumber]?.find(
+        semester => semester.semester === Math.max(...semesters)
+      )?.type ?? 0
     const multiply = num => {
       if (num === 1) return 1000
       if (num === 2) return 1
@@ -237,30 +261,33 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
     return multiply(fall) + multiply(spring)
   }
 
-  const getSemesterEnrollmentContent = (student, enrollmentIndex) => {
+  const getSemesterEnrollmentContent = (student, semesters) => {
     const enrollmentTypes = {
       0: { className: 'label-none' },
       1: { className: 'label-present' },
       2: { className: 'label-absent' },
       3: { className: 'label-passive' },
     }
-    const renderSemester = (enrollment, leftMargin) => {
-      const { className } = enrollmentTypes[enrollment]
-      return <div className={`enrollment-label${!leftMargin ? '-no-margin' : ''} ${className}`} />
-    }
-    const fall = student.semesterenrollments[enrollmentIndex]?.enrollmenttype ?? 0
-    const spring = student.semesterenrollments[enrollmentIndex + 1]?.enrollmenttype ?? 0
+    const fall =
+      studentNumberToSemesterEnrollmentsMap[student.studentNumber]?.find(
+        semester => semester.semester === Math.min(...semesters)
+      )?.type ?? 0
+    const spring =
+      studentNumberToSemesterEnrollmentsMap[student.studentNumber]?.find(
+        semester => semester.semester === Math.max(...semesters)
+      )?.type ?? 0
+
     const fallText = `Fall: ${helpTexts[fall]}`
     const springText = `Spring: ${helpTexts[spring]}`
     return (
-      <div title={`${fallText}\n${springText}`}>
-        {renderSemester(fall, false)}
-        {renderSemester(spring, true)}
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '0.2rem' }}>
+        <div className={`enrollment-label-no-margin ${enrollmentTypes[fall]?.className}`} title={fallText} />
+        <div className={`enrollment-label-no-margin ${enrollmentTypes[spring]?.className}`} title={springText} />
       </div>
     )
   }
 
-  const createContent = (labels, year, start, end, enrollStatusIndex) => {
+  const createContent = (labels, year, start, end, semesters) => {
     return labels.map(label => ({
       key: `${year}-${label.code}-${label.name.fi}`,
       title: (
@@ -274,10 +301,7 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
           </div>
         </div>
       ),
-      textTitle:
-        label.name === ''
-          ? `${label.code} ${enrollStatusIndex === 0 ? enrollStatusIndex + 1 : enrollStatusIndex}`
-          : `${label.code}-${getTextIn(label.name)}`,
+      textTitle: `${label.code}-${getTextIn(label.name)}`,
       headerProps: { title: `${label.code}, ${year}` },
       cellProps: student => getProp(label, student),
       getRowVal: student => {
@@ -285,7 +309,7 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
           return student.criteriaProgress[year] ? student.criteriaProgress[year].totalSatisfied : 0
         }
         if (label.code.includes('Enrollment')) {
-          return getEnrollmentSortingValue(student, enrollStatusIndex)
+          return getEnrollmentSortingValue(student, semesters)
         }
         return getExcelText(label.code, criteria, student, year)
       },
@@ -293,13 +317,13 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
       // and getRowExportVal can't be defined for all the other columns to not override their getRowVal
       getRowExportVal: !label.code.includes('Enrollment')
         ? undefined
-        : student => getSemesterEnrollmentVal(student, enrollStatusIndex),
+        : student => getSemesterEnrollmentVal(student, semesters),
       getRowContent: student => {
         if (label.code.includes('Criteria')) {
           return student.criteriaProgress[year] ? student.criteriaProgress[year].totalSatisfied : 0
         }
         if (label.code.includes('Enrollment')) {
-          return getSemesterEnrollmentContent(student, enrollStatusIndex)
+          return getSemesterEnrollmentContent(student, semesters)
         }
         return getRowContent(student, label.code, year, start, end, criteria)
       },
@@ -314,22 +338,31 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
     .endOf('month')
 
   const columns = useMemo(() => {
-    const generateYearColumns = (startYear, endYear, criteriaIndex) => ({
-      key: criteriaHeaders[criteriaIndex].title,
-      title: (
-        <div style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
-          <div>{criteriaHeaders[criteriaIndex].title}</div>
-        </div>
-      ),
-      textTitle: null,
-      children: createContent(
-        labelCriteria[criteriaHeaders[criteriaIndex].label],
-        criteriaHeaders[criteriaIndex].year,
-        startYear,
-        endYear,
-        criteriaIndex
-      ),
-    })
+    const generateYearColumns = (startYear, endYear, criteriaIndex) => {
+      const semesters = Object.values(semestersAndYears?.semesters || {})
+        .filter(
+          semester =>
+            moment(semester.startdate).isSameOrAfter(startYear) &&
+            moment(semester.enddate).isSameOrBefore(endYear.add(1, 'day'))
+        )
+        .map(semester => semester.semestercode)
+      return {
+        key: criteriaHeaders[criteriaIndex].title,
+        title: (
+          <div style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
+            <div>{criteriaHeaders[criteriaIndex].title}</div>
+          </div>
+        ),
+        textTitle: null,
+        children: createContent(
+          labelCriteria[criteriaHeaders[criteriaIndex].label],
+          criteriaHeaders[criteriaIndex].year,
+          startYear,
+          endYear,
+          semesters
+        ),
+      }
+    }
 
     const generateHiddenColumn = index => ({
       key: `hidden-${index}`,
