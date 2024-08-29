@@ -1,8 +1,8 @@
 import { InferAttributes } from 'sequelize'
 
 import { SISStudyRight } from '../models'
+import { mapToProviders } from '../shared/util/mapToProviders'
 import { EnrollmentType, ExtentCode } from '../types'
-import { mapToProviders } from '../util/map'
 import { getCreditStats, setCreditStats } from './analyticsService'
 import { getCourseCodesOfProvider } from './providers'
 import { getCreditsForProvider, getTransferredCredits } from './studyProgramme/creditGetters'

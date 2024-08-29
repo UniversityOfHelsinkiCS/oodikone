@@ -3,8 +3,8 @@ import { Request, Response, Router } from 'express'
 import { getProvidersOfFaculty, isFaculty } from '../services/organizations'
 import { getTeachersBySearchTerm, getTeacherStatistics, getYearlyStatistics } from '../services/teachers'
 import { CategoryID, getTeacherStats, findAndSaveTeachers, getCategoriesAndYears } from '../services/teachers/top'
+import { mapToProviders } from '../shared/util/mapToProviders'
 import { getFullStudyProgrammeRights, splitByEmptySpace } from '../util'
-import { mapToProviders } from '../util/map'
 
 const router = Router()
 

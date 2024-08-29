@@ -2,8 +2,8 @@ const { orderBy, range } = require('lodash')
 const { Op } = require('sequelize')
 
 const { Credit, Enrollment } = require('../../models')
+const { mapToProviders } = require('../../shared/util/mapToProviders')
 const { isOpenUniCourseCode } = require('../../util')
-const { mapToProviders } = require('../../util/map')
 const { createArrayOfCourses } = require('../languageCenterData')
 const {
   getOtherStudentsForProgrammeCourses,

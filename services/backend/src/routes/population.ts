@@ -11,10 +11,10 @@ import { bottlenecksOf } from '../services/populations/bottlenecksOf'
 import { optimizedStatisticsOf } from '../services/populations/optimizedStatisticsOf'
 import { populationStudentsMerger, populationCourseStatsMerger } from '../services/statMerger'
 import { findByTag, findByCourseAndSemesters } from '../services/students'
+import { mapToProviders } from '../shared/util/mapToProviders'
 import { Unarray, Unification, UnifyStatus } from '../types'
 import { getFullStudyProgrammeRights, hasFullAccessToStudentData } from '../util'
 import { ApplicationError } from '../util/customErrors'
-import { mapToProviders } from '../util/map'
 
 const router = Router()
 
