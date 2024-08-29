@@ -9,9 +9,14 @@ import { CurriculumPeriods, getCurriculumPeriods } from '../curriculumPeriods'
 
 const { sequelize } = dbConnections
 
-const mapCurriculumPeriodIdToYear = (curriculumPeriodId: string, cucciculumPeriods: CurriculumPeriods) => {
-  const cucciculumPeriod = cucciculumPeriods[curriculumPeriodId]
-  return { startDate: cucciculumPeriod.startDate, endDate: cucciculumPeriod.endDate }
+const mapCurriculumPeriodIdToYear = (curriculumPeriodId: string, curriculumPeriods: CurriculumPeriods) => {
+  const curriculumPeriod = curriculumPeriods[curriculumPeriodId]
+
+  if (curriculumPeriod) {
+    return { startDate: curriculumPeriod.startDate, endDate: curriculumPeriod.endDate }
+  }
+  // Returns impossible default if there is not curriculumPeriods for some reason
+  return { startDate: new Date('1800-08-01'), endDate: new Date('1801-08-01') }
 }
 
 type ProgrammeModuleWithRelevantAttributes = Pick<
@@ -84,7 +89,6 @@ export const getDegreeProgrammesOfOrganization = async (organizationId: string, 
       })
     }
   }
-
   return relevantProgrammes
 }
 
