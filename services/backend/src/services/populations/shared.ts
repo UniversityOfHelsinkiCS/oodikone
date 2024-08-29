@@ -6,7 +6,6 @@ import { dbConnections } from '../../database/connection'
 import { Course, Credit, SISStudyRight, SISStudyRightElement } from '../../models'
 import { Criteria, DegreeProgrammeType, Name } from '../../types'
 import { SemesterStart } from '../../util/semester'
-import { getCurrentSemester } from '../semesters'
 import { hasTransferredFromOrToProgramme } from '../studyProgramme/studyProgrammeHelpers'
 
 const { sequelize } = dbConnections
@@ -112,7 +111,6 @@ const formatStudentForPopulationStatistics = (
   endDateMoment,
   criteria,
   code,
-  currentSemester,
   optionData
 ) => {
   const toCourse = ({
@@ -362,7 +360,6 @@ export const formatStudentsForApi = async (
 ) => {
   const startDateMoment = moment(startDate)
   const endDateMoment = moment(endDate)
-  const currentSemester = (await getCurrentSemester()).semestercode
 
   credits = credits.reduce((acc, credit) => {
     acc[credit.student_studentnumber] = acc[credit.student_studentnumber] || []
@@ -386,7 +383,6 @@ export const formatStudentsForApi = async (
         endDateMoment,
         criteria,
         code,
-        currentSemester,
         optionData
       )
     ),
