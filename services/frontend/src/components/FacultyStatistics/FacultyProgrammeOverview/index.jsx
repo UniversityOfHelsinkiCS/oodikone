@@ -47,6 +47,8 @@ export const calculateStats = (
   const tableStats = []
   if (creditCounts === undefined) return null
 
+  if (Object.keys(creditCounts).length === 0) return null
+
   const limits = getCreditCategories(
     true,
     'academic-year',
