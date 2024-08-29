@@ -15,26 +15,14 @@ export const MedianTimeBarChart = ({ data, goal, title, byStartYear }) => {
     return y > max ? y : max
   }, goal * 2)
 
-  const getPercentage = (amount, classSize) => {
-    const percent = Math.round((amount / classSize) * 100 * 10) / 10
-    return Number.isNaN(percent) ? 0 : percent
-  }
-
-  const getDataLabel = (amount, classSize = undefined) => {
-    if (byStartYear) {
-      return `${amount} graduated (${getPercentage(amount, classSize)} % of class)`
-    }
-    return `${amount} graduated`
-  }
-
   const getHeight = () => {
     const multiplier = data.length > 8 ? 35 : 55
     return data.length * multiplier + 100
   }
 
-  const getTooltipText = (amount, y, year, statistics, classSize) => {
+  const getTooltipText = (amount, y, year, statistics) => {
     const sortingText = byStartYear
-      ? `<b>From class of ${year}, ${amount}/${classSize} students have graduated</b>`
+      ? `<b>From class of ${year}, ${amount} students have graduated</b>`
       : `<b>${amount} students graduated in year ${year}</b>`
 
     const timeText = `<br />${sortingText}<br /><b>median study time: ${y} months</b><br />`
@@ -57,7 +45,7 @@ export const MedianTimeBarChart = ({ data, goal, title, byStartYear }) => {
       fontSize: '25px',
       // eslint-disable-next-line
       formatter: function () {
-        return getTooltipText(this.point.amount, this.y, this.point.name, this.point.statistics, this.point?.classSize)
+        return getTooltipText(this.point.amount, this.y, this.point.name, this.point.statistics)
       },
     },
     plotOptions: {
@@ -82,7 +70,7 @@ export const MedianTimeBarChart = ({ data, goal, title, byStartYear }) => {
             },
             // eslint-disable-next-line
             formatter: function () {
-              return getDataLabel(this.point.amount, this.point?.classSize)
+              return `${this.point.amount} graduated`
             },
           },
         ],
