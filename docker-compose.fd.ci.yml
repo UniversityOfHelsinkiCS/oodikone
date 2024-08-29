@@ -1,0 +1,46 @@
+services:
+  oodikone-backend:
+    build:
+      context: ${OODIKONE_REPO:-../oodikone-contrib}/services
+      dockerfile: backend/Dockerfile
+      args:
+        SENTRY_ENVIRONMENT: ''
+        SENTRY_RELEASE: ''
+        SENTRY_DSN: ''
+        SERVICE_PROVIDER: fd
+        NODE_ENV: production
+    image: ${DOCKER_OODIKONE_NAMESPACE:-637423527834.dkr.ecr.eu-north-1.amazonaws.com/oodikone}/oodikone-backend:${DOCKER_IMAGE_TAG:-dev}
+
+  oodikone-frontend:
+    build:
+      context: ${OODIKONE_REPO:-../oodikone-contrib}/services
+      dockerfile: frontend/Dockerfile
+      args:
+        SENTRY_ENVIRONMENT: ''
+        SENTRY_RELEASE: ''
+        SENTRY_DSN: ''
+        SERVICE_PROVIDER: fd
+        LANGUAGE_CENTER_VIEW_ENABLED: 'false' # currently no intention to be enabled
+        NODE_ENV: production
+    image: ${DOCKER_OODIKONE_NAMESPACE:-637423527834.dkr.ecr.eu-north-1.amazonaws.com/oodikone}/oodikone-frontend:${DOCKER_IMAGE_TAG:-dev}
+
+  updater-scheduler:
+    build:
+      context: ${OODIKONE_REPO:-../oodikone-contrib}/updater/sis-updater-scheduler
+      args:
+        SENTRY_ENVIRONMENT: ''
+        SENTRY_RELEASE: ''
+        SENTRY_DSN: ''
+        NODE_ENV: production
+    image: ${DOCKER_OODIKONE_NAMESPACE:-637423527834.dkr.ecr.eu-north-1.amazonaws.com/oodikone}/updater-scheduler:${DOCKER_IMAGE_TAG:-dev}
+
+  updater-worker:
+    build:
+      context: ${OODIKONE_REPO:-../oodikone-contrib}/updater/sis-updater-worker
+      args:
+        SENTRY_ENVIRONMENT: ''
+        SENTRY_RELEASE: ''
+        SENTRY_DSN: ''
+        SERVICE_PROVIDER: fd
+        NODE_ENV: production
+    image: ${DOCKER_OODIKONE_NAMESPACE:-637423527834.dkr.ecr.eu-north-1.amazonaws.com/oodikone}/updater-worker:${DOCKER_IMAGE_TAG:-dev}
