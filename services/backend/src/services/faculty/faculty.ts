@@ -53,9 +53,6 @@ export const getDegreeProgrammesOfOrganization = async (organizationId: string, 
   }))
   const programmesGroupedByCode = groupBy(orderBy(programmesWithProgIds, ['valid_from'], ['desc']), prog => prog.code)
   const cucciculumPeriods = await getCurriculumPeriods()
-  // console.log('Jee')
-  // console.log(JSON.stringify(cucciculumPeriods))
-  // const { years } = await getSemestersAndYears()
   const relevantProgrammes: ProgrammeModuleWithRelevantAttributes[] = []
 
   for (const programmeVersions of Object.values(programmesGroupedByCode)) {
@@ -65,13 +62,6 @@ export const getDegreeProgrammesOfOrganization = async (organizationId: string, 
       continue
     }
     const { code, name, degreeProgrammeType, progId } = newestProgrammeVersion
-    // const yearsOfProgramme = programmeVersions
-    //   .map(prog => prog.curriculum_period_ids.map(curriculumPeriodIdToYearCode))
-    //   .flat()
-    // const isRelevantProgramme =
-    //   !onlyCurrentProgrammes ||
-    //   (onlyCurrentProgrammes &&
-    //     yearsOfProgramme.some(year => moment().isBetween(years[year].startdate, years[year].enddate)))
 
     const yearsOfProgramme = programmeVersions
       .map(prog =>
@@ -80,15 +70,9 @@ export const getDegreeProgrammesOfOrganization = async (organizationId: string, 
         })
       )
       .flat()
-    // console.log(JSON.stringify(yearsOfProgramme2))
     const isRelevantProgramme =
       !onlyCurrentProgrammes ||
       (onlyCurrentProgrammes && yearsOfProgramme.some(year => moment().isBetween(year.startDate, year.endDate)))
-    // console.log(`isRelevantProgramme2 ${isRelevantProgramme2} ${progId}`)
-    // if (onlyCurrentProgrammes && isRelevantProgramme2) {
-    //   console.log(`found relevant ${JSON.stringify(yearsOfProgramme2)} ${progId}`)
-    //   // console.log(progId)
-    // }
 
     if (isRelevantProgramme) {
       relevantProgrammes.push({
