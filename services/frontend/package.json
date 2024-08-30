@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "start": "vite",
-    "build": "vite build"
+    "build": "vite build",
+    "tsc": "tsc"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.3",
