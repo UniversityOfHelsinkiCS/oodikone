@@ -1,3 +1,5 @@
+/* eslint-disable func-names */
+/* eslint-disable object-shorthand */
 /* eslint-disable react/no-this-in-sfc */
 import accessibility from 'highcharts/modules/accessibility'
 import exportData from 'highcharts/modules/export-data'
@@ -8,19 +10,37 @@ exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
 accessibility(ReactHighcharts.Highcharts)
 
-export const MedianTimeBarChart = ({ data, goal, title, byStartYear }) => {
-  if (!data) return null
+type Statistics = { onTime: number; yearOver: number; wayOver: number }
 
-  const maxValue = data.reduce((max, { y }) => {
+interface MedianTimeBarChartProps {
+  byStartYear: boolean
+  data: Array<{
+    amount: number
+    classSize: number
+    name: string
+    statistics: Statistics
+    times: number[]
+    y: number
+  }>
+  goal: number
+  title: string
+}
+
+export const MedianTimeBarChart = ({ byStartYear, data, goal, title }: MedianTimeBarChartProps) => {
+  if (!data) {
+    return null
+  }
+
+  const maxValue = data.reduce((max: number, { y }) => {
     return y > max ? y : max
   }, goal * 2)
 
-  const getPercentage = (amount, classSize) => {
+  const getPercentage = (amount: number, classSize: number) => {
     const percent = Math.round((amount / classSize) * 100 * 10) / 10
     return Number.isNaN(percent) ? 0 : percent
   }
 
-  const getDataLabel = (amount, classSize = undefined) => {
+  const getDataLabel = (amount: number, classSize: number) => {
     if (byStartYear) {
       return `${amount} graduated (${getPercentage(amount, classSize)} % of class)`
     }
@@ -32,7 +52,7 @@ export const MedianTimeBarChart = ({ data, goal, title, byStartYear }) => {
     return data.length * multiplier + 100
   }
 
-  const getTooltipText = (amount, y, year, statistics, classSize) => {
+  const getTooltipText = (amount: number, y: number, year: string, statistics: Statistics, classSize: number) => {
     const sortingText = byStartYear
       ? `<b>From class of ${year}, ${amount}/${classSize} students have graduated</b>`
       : `<b>${amount} students graduated in year ${year}</b>`
@@ -55,9 +75,11 @@ export const MedianTimeBarChart = ({ data, goal, title, byStartYear }) => {
     tooltip: {
       backgroundColor: 'white',
       fontSize: '25px',
-      // eslint-disable-next-line
-      formatter: function () {
-        return getTooltipText(this.point.amount, this.y, this.point.name, this.point.statistics, this.point?.classSize)
+      formatter: function (this: {
+        y: number
+        point: { amount: number; name: string; statistics: Statistics; classSize: number }
+      }) {
+        return getTooltipText(this.point.amount, this.y, this.point.name, this.point.statistics, this.point.classSize)
       },
     },
     plotOptions: {
@@ -80,9 +102,8 @@ export const MedianTimeBarChart = ({ data, goal, title, byStartYear }) => {
             style: {
               textOutline: 'none',
             },
-            // eslint-disable-next-line
-            formatter: function () {
-              return getDataLabel(this.point.amount, this.point?.classSize)
+            formatter: function (this: { point: { amount: number; classSize: number } }) {
+              return getDataLabel(this.point.amount, this.point.classSize)
             },
           },
         ],
