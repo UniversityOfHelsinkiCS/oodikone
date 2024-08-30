@@ -1,30 +1,46 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { orderBy } from 'lodash'
 import moment from 'moment'
 import { Op, QueryTypes } from 'sequelize'
 
 import { dbConnections } from '../../database/connection'
-import { Course, Credit, SISStudyRight, SISStudyRightElement } from '../../models'
-import { Criteria, DegreeProgrammeType, Name } from '../../types'
+import { Course, Credit, Enrollment, SISStudyRight, SISStudyRightElement, Student, Studyplan } from '../../models'
+import { TagStudent } from '../../models/kone'
+import { CreditTypeCode, Criteria, DegreeProgrammeType, Name } from '../../types'
 import { SemesterStart } from '../../util/semester'
 import { hasTransferredFromOrToProgramme } from '../studyProgramme/studyProgrammeHelpers'
 
 const { sequelize } = dbConnections
 
-const createEmptyCriteriaYear = (criteria, year) => {
+type CoursesSatisfied = Record<string, string | null>
+
+type CriteriaYear = {
+  credits: boolean
+  totalSatisfied: number
+  coursesSatisfied: CoursesSatisfied
+}
+
+const createEmptyCriteriaYear = (criteria: Criteria, year: string): CriteriaYear => {
+  const emptyCourses: CoursesSatisfied = {}
+  const courses: CoursesSatisfied = criteria.courses[year]?.reduce((acc: CoursesSatisfied, course: string) => {
+    acc[course] = null
+    return acc
+  }, {} as CoursesSatisfied)
+  const coursesSatisfied = criteria?.courses && criteria?.courses[year] ? courses : emptyCourses
   return {
     credits: false,
     totalSatisfied: 0,
-    coursesSatisfied:
-      criteria?.courses && criteria?.courses[year]
-        ? criteria.courses[year].reduce((acc, course) => {
-            acc[course] = null
-            return acc
-          }, {})
-        : {},
+    coursesSatisfied,
   }
 }
 
-const getCreditAmount = (course, hops, courseCode, startDate, addition) => {
+const getCreditAmount = (
+  course: ParsedCourse,
+  hops: Studyplan[],
+  courseCode: string,
+  startDate: string,
+  addition: number
+) => {
   return moment(course.date).isBetween(moment(startDate), moment(startDate).add(addition, 'year')) &&
     hops.length > 0 &&
     (hops[0].included_courses.includes(courseCode) || hops[0].included_courses.includes(course.course_code))
@@ -32,14 +48,21 @@ const getCreditAmount = (course, hops, courseCode, startDate, addition) => {
     : 0
 }
 
-const updateCourseByYear = (criteria, criteriaYear, course, criteriaChecked, yearToAdd, correctCode) => {
+const updateCourseByYear = (
+  criteria: Criteria,
+  criteriaYear: string,
+  course: ParsedCourse,
+  criteriaChecked: Record<string, CriteriaYear>,
+  yearToAdd: string,
+  correctCode: string
+) => {
   // TODO: Clean up this mess
   if (
     criteria?.courses &&
     criteria?.courses[criteriaYear] &&
     (criteria.courses[criteriaYear].includes(course.course_code) ||
       criteria.courses[criteriaYear].some(
-        criteriaCourse =>
+        (criteriaCourse: string) =>
           criteria.allCourses[criteriaCourse] && criteria.allCourses[criteriaCourse].includes(course.course_code)
       ))
   ) {
@@ -52,7 +75,14 @@ const updateCourseByYear = (criteria, criteriaYear, course, criteriaChecked, yea
   }
 }
 
-const updateCreditCriteriaInfo = (criteria, criteriaYear, criteriaChecked, yearToAdd, academicYears, academicYear) => {
+const updateCreditCriteriaInfo = (
+  criteria: Criteria,
+  criteriaYear: string,
+  criteriaChecked: Record<string, CriteriaYear>,
+  yearToAdd: string,
+  academicYears: Record<string, number>,
+  academicYear: string
+) => {
   if (!criteria.courses) {
     return
   }
@@ -80,8 +110,50 @@ export const getCurriculumVersion = (curriculumPeriodId: string) => {
   return curriculumVersion
 }
 
+type ParsedCourse = {
+  course_code: string
+  date: string
+  passed: boolean
+  grade: string
+  credits: number
+  isStudyModuleCredit: boolean
+  credittypecode: CreditTypeCode
+  language: string
+  studyright_id: string
+}
+
 const formatStudentForPopulationStatistics = (
-  {
+  student: Student & { tags?: TagStudent[] },
+  enrollments: Record<string, Enrollment[]>,
+  credits: Record<string, Credit[]>,
+  startDate: string,
+  startDateMoment: moment.Moment,
+  endDateMoment: moment.Moment,
+  criteria: Criteria,
+  code: string,
+  optionData: Record<string, { name: Name }>
+) => {
+  const toCourse = (credit: Credit): ParsedCourse => {
+    const attainmentDateNormalized =
+      credit.attainment_date < new Date(startDate)
+        ? startDateMoment.clone().add(1, 'day').toISOString()
+        : credit.attainment_date
+    const passed = Credit.passed({ credittypecode: credit.credittypecode })
+
+    return {
+      course_code: credit.course_code,
+      date: attainmentDateNormalized as string,
+      passed,
+      grade: passed ? credit.grade : 'Hyl.',
+      credits: credit.credits,
+      isStudyModuleCredit: credit.isStudyModule,
+      credittypecode: credit.credittypecode,
+      language: credit.language,
+      studyright_id: credit.studyright_id,
+    }
+  }
+
+  const {
     firstnames,
     lastname,
     studentnumber,
@@ -93,7 +165,6 @@ const formatStudentForPopulationStatistics = (
     phone_number,
     studyRights,
     studyplans,
-    transfers,
     updatedAt,
     createdAt,
     gender_code,
@@ -103,59 +174,27 @@ const formatStudentForPopulationStatistics = (
     home_country_fi,
     home_country_sv,
     home_country_en,
-  },
-  enrollments,
-  credits,
-  startDate,
-  startDateMoment,
-  endDateMoment,
-  criteria,
-  code,
-  optionData
-) => {
-  const toCourse = ({
-    grade,
-    attainment_date,
-    credits,
-    course_code,
-    credittypecode,
-    isStudyModule,
-    language,
-    studyright_id,
-  }) => {
-    const attainmentDateNormalized =
-      attainment_date < startDate ? startDateMoment.clone().add(1, 'day').toISOString() : attainment_date
-    const passed = Credit.passed({ credittypecode })
-
-    return {
-      course_code,
-      date: attainmentDateNormalized,
-      passed,
-      grade: passed ? grade : 'Hyl.',
-      credits,
-      isStudyModuleCredit: isStudyModule,
-      credittypecode,
-      language,
-      studyright_id,
-    }
-  }
+  } = student
 
   const criteriaCoursesBySubstitutions = criteria?.allCourses
-    ? Object.keys(criteria.allCourses).reduce((acc, courseCode) => {
-        acc[courseCode] = courseCode
-        criteria.allCourses[courseCode].forEach(substitutionCode => {
-          acc[substitutionCode] = courseCode
-        })
-        return acc
-      }, {})
-    : {}
+    ? Object.keys(criteria.allCourses).reduce(
+        (acc, courseCode) => {
+          acc[courseCode] = courseCode
+          criteria.allCourses[courseCode].forEach(substitutionCode => {
+            acc[substitutionCode] = courseCode
+          })
+          return acc
+        },
+        {} as Record<string, string>
+      )
+    : ({} as Record<string, string>)
 
   const correctStudyplan = studyplans ? studyplans.filter(plan => plan.programme_code === code) : []
 
   const option = studentnumber in optionData ? optionData[studentnumber] : null
 
   let transferredStudyright = false
-  let transferSource = null
+  let transferSource: string | null = null
 
   if (code) {
     const correctStudyRight = studyRights.find(studyRight =>
@@ -163,10 +202,13 @@ const formatStudentForPopulationStatistics = (
     )
     if (correctStudyRight) {
       const correctStudyRightElement = correctStudyRight.studyRightElements.find(element => element.code === code)
-      const [, hasTransferredToProgramme] = hasTransferredFromOrToProgramme(correctStudyRight, correctStudyRightElement)
+      const [, hasTransferredToProgramme] = hasTransferredFromOrToProgramme(
+        correctStudyRight,
+        correctStudyRightElement!
+      )
       if (hasTransferredToProgramme) {
         const transferredFromProgramme = correctStudyRight.studyRightElements.find(element =>
-          moment(element.endDate).isSame(moment(correctStudyRightElement.startDate).subtract(1, 'd'), 'day')
+          moment(element.endDate).isSame(moment(correctStudyRightElement?.startDate).subtract(1, 'd'), 'day')
         )?.code
         if (transferredFromProgramme) {
           transferredStudyright = true
@@ -229,7 +271,6 @@ const formatStudentForPopulationStatistics = (
     courses: credits[studentnumber] ? credits[studentnumber].map(toCourse) : [],
     enrollments: enrollments[studentnumber],
     name: abbreviatedname,
-    transfers: transfers || [],
     gender_code,
     email,
     secondaryEmail: secondary_email,
@@ -351,7 +392,10 @@ export const getOptionsForStudents = async (
 }
 
 export const formatStudentsForApi = async (
-  { students, enrollments, credits, courses },
+  students: Array<Student & { tags?: TagStudent[] }>,
+  enrollments: Enrollment[],
+  credits: Credit[],
+  courses: Course[],
   startDate: string,
   endDate: string,
   optionData: Record<string, { name: Name }>,
@@ -361,23 +405,29 @@ export const formatStudentsForApi = async (
   const startDateMoment = moment(startDate)
   const endDateMoment = moment(endDate)
 
-  credits = credits.reduce((acc, credit) => {
-    acc[credit.student_studentnumber] = acc[credit.student_studentnumber] || []
-    acc[credit.student_studentnumber].push(credit)
-    return acc
-  }, {})
-  enrollments = enrollments.reduce((acc, enrollment) => {
-    acc[enrollment.studentnumber] = acc[enrollment.studentnumber] || []
-    acc[enrollment.studentnumber].push(enrollment)
-    return acc
-  }, {})
+  const creditsByStudent = credits.reduce(
+    (acc, credit) => {
+      acc[credit.student_studentnumber] = acc[credit.student_studentnumber] || []
+      acc[credit.student_studentnumber].push(credit)
+      return acc
+    },
+    {} as Record<string, Credit[]>
+  )
+  const enrollmentsByStudent = enrollments.reduce(
+    (acc, enrollment) => {
+      acc[enrollment.studentnumber] = acc[enrollment.studentnumber] || []
+      acc[enrollment.studentnumber].push(enrollment)
+      return acc
+    },
+    {} as Record<string, Enrollment[]>
+  )
 
   return {
     students: students.map(student =>
       formatStudentForPopulationStatistics(
         student,
-        enrollments,
-        credits,
+        enrollmentsByStudent,
+        creditsByStudent,
         startDate,
         startDateMoment,
         endDateMoment,

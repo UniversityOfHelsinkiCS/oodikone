@@ -183,7 +183,7 @@ export const getStudentsIncludeCoursesBetween = async (
   startDate: string,
   endDate: Date,
   studyRights: string[],
-  tag
+  tag?: Tag
 ) => {
   const studentTags = await getStudentTags(studyRights, studentNumbers)
 
@@ -207,7 +207,7 @@ export const getStudentsIncludeCoursesBetween = async (
     return { students: [], enrollments: [], credits: [], courses: [] } as StudentsIncludeCoursesBetween
   }
 
-  const attainmentDateFrom = tag ? moment(startDate).year(tag.year) : startDate
+  const attainmentDateFrom = tag && tag.year !== null ? moment(startDate).year(Number(tag.year)) : startDate
 
   const creditsOfStudent = await getCreditsOfStudent(studentNumbers, studyRights, attainmentDateFrom, endDate)
 

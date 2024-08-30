@@ -67,7 +67,10 @@ export const optimizedStatisticsOf = async (query: Query, studentNumberList?: st
   )
 
   const formattedStudents = await formatStudentsForApi(
-    { students, enrollments, credits, courses },
+    students,
+    enrollments,
+    credits,
+    courses,
     startDate,
     endDate,
     optionData,
