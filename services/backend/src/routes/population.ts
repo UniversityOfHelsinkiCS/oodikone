@@ -4,6 +4,7 @@ import { Request, Response, Router } from 'express'
 import { difference, intersection, uniq } from 'lodash'
 
 import { rootOrgId } from '../config'
+import { SISStudyRight } from '../models'
 import { maxYearsToCreatePopulationFrom, getCourseProvidersForCourses } from '../services/courses'
 import { encrypt, decrypt } from '../services/encrypt'
 import { getDegreeProgrammesOfOrganization, ProgrammesOfOrganization } from '../services/faculty/faculty'
@@ -12,7 +13,7 @@ import { optimizedStatisticsOf } from '../services/populations/optimizedStatisti
 import { populationStudentsMerger, populationCourseStatsMerger } from '../services/statMerger'
 import { findByTag, findByCourseAndSemesters } from '../services/students'
 import { mapToProviders } from '../shared/util/mapToProviders'
-import { Unarray, Unification, UnifyStatus } from '../types'
+import { GenderCode, ParsedCourse, Unarray, Unification, UnifyStatus } from '../types'
 import { getFullStudyProgrammeRights, hasFullAccessToStudentData } from '../util'
 import { ApplicationError } from '../util/customErrors'
 
@@ -272,7 +273,7 @@ router.get('/v3/populationstatistics', async (req: GetPopulationStatisticsReques
 
     res.json(filterPersonalTags(result, userId))
   } else {
-    const result = await optimizedStatisticsOf({
+    const result: any = await optimizedStatisticsOf({
       ...req.query,
       year: Number(req.query.year),
       studyRights: { programme: studyRights.programme },
@@ -352,7 +353,7 @@ router.get('/v3/populationstatisticsbycourse', async (req: GetPopulationStatisti
     separate,
     unifyCourses
   )
-  const result = await optimizedStatisticsOf(
+  const result: any = await optimizedStatisticsOf(
     {
       // Useless, because studentnumbers are already filtered above by from & to.
       // We should probably refactor this to avoid more confusement.
@@ -377,7 +378,17 @@ router.get('/v3/populationstatisticsbycourse', async (req: GetPopulationStatisti
       : new Set(intersection(studentNumbers, allStudentsUserCanAccess))
 
   const randomHash = crypto.randomBytes(12).toString('hex')
-  const obfuscateStudent = ({ studyRights, studentNumber, courses, gender_code }) => ({
+  const obfuscateStudent = ({
+    studyRights,
+    studentNumber,
+    courses,
+    gender_code,
+  }: {
+    studyRights: SISStudyRight[]
+    studentNumber: string
+    courses: ParsedCourse[]
+    gender_code: GenderCode
+  }) => ({
     courses,
     studyRights,
     gender_code,

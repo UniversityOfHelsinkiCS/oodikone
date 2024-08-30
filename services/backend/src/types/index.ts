@@ -1,5 +1,5 @@
 /* eslint-disable import/no-cycle */
-export { CourseWithSubsId } from './course'
+export { CourseWithSubsId, ParsedCourse } from './course'
 export { CreditTypeCode } from './creditTypeCode'
 export { Criteria } from './criteria'
 export { DetailedProgrammeRights } from './detailedProgrammeRights'

@@ -6,7 +6,7 @@ import { Op, QueryTypes } from 'sequelize'
 import { dbConnections } from '../../database/connection'
 import { Course, Credit, Enrollment, SISStudyRight, SISStudyRightElement, Student, Studyplan } from '../../models'
 import { TagStudent } from '../../models/kone'
-import { CreditTypeCode, Criteria, DegreeProgrammeType, Name } from '../../types'
+import { Criteria, DegreeProgrammeType, Name, ParsedCourse } from '../../types'
 import { SemesterStart } from '../../util/semester'
 import { hasTransferredFromOrToProgramme } from '../studyProgramme/studyProgrammeHelpers'
 
@@ -108,18 +108,6 @@ export const getCurriculumVersion = (curriculumPeriodId: string) => {
   const endYear = startYear + 3
   const curriculumVersion = `${startYear}-${endYear}`
   return curriculumVersion
-}
-
-type ParsedCourse = {
-  course_code: string
-  date: string
-  passed: boolean
-  grade: string
-  credits: number
-  isStudyModuleCredit: boolean
-  credittypecode: CreditTypeCode
-  language: string
-  studyright_id: string
 }
 
 const formatStudentForPopulationStatistics = (
