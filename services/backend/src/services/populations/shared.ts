@@ -21,12 +21,13 @@ type CriteriaYear = {
 }
 
 const createEmptyCriteriaYear = (criteria: Criteria, year: string): CriteriaYear => {
-  const emptyCourses: CoursesSatisfied = {}
-  const courses: CoursesSatisfied = criteria.courses[year]?.reduce((acc: CoursesSatisfied, course: string) => {
-    acc[course] = null
-    return acc
-  }, {} as CoursesSatisfied)
-  const coursesSatisfied = criteria?.courses && criteria?.courses[year] ? courses : emptyCourses
+  const coursesSatisfied: CoursesSatisfied =
+    criteria?.courses && criteria?.courses[year]
+      ? criteria.courses[year]?.reduce((acc: CoursesSatisfied, course: string) => {
+          acc[course] = null
+          return acc
+        }, {} as CoursesSatisfied)
+      : {}
   return {
     credits: false,
     totalSatisfied: 0,
