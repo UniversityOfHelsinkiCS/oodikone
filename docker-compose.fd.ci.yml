@@ -1,7 +1,7 @@
 services:
   oodikone-backend:
     build:
-      context: ${OODIKONE_REPO:-.}/servicess
+      context: ${OODIKONE_REPO:-.}/services
       dockerfile: backend/Dockerfile
       args:
         SENTRY_ENVIRONMENT: ''
