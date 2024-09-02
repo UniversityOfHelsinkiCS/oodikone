@@ -40,7 +40,7 @@ export const MedianTimeBarChart = ({ byStartYear, data, goal, title }: MedianTim
     return Number.isNaN(percent) ? 0 : percent
   }
 
-  const getDataLabel = (amount: string, classSize: number, title: string) => {
+  const getDataLabel = (amount: number, classSize: number, title: string) => {
     if (byStartYear && title !== 'Bachelor + master studyright') {
       return `${amount} graduated (${getPercentage(amount, classSize)} % of class)`
     }
