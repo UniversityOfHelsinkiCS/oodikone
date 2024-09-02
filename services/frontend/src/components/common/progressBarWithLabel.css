@@ -8,6 +8,7 @@
 .progress-bar-with-label .ui.progress {
   width: 130px;
   margin-bottom: 0;
+  flex-grow: 1;
 }
 
 .progress-bar-with-label .ui.progress .bar {
