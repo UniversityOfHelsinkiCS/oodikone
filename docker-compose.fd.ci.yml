@@ -1,7 +1,7 @@
 services:
   oodikone-backend:
     build:
-      context: ${OODIKONE_REPO:-../oodikone-contrib}/services
+      context: ${OODIKONE_REPO:-.}/servicess
       dockerfile: backend/Dockerfile
       args:
         SENTRY_ENVIRONMENT: ''
@@ -13,7 +13,7 @@ services:
 
   oodikone-frontend:
     build:
-      context: ${OODIKONE_REPO:-../oodikone-contrib}/services
+      context: ${OODIKONE_REPO:-.}/services
       dockerfile: frontend/Dockerfile
       args:
         SENTRY_ENVIRONMENT: ''
@@ -26,7 +26,7 @@ services:
 
   updater-scheduler:
     build:
-      context: ${OODIKONE_REPO:-../oodikone-contrib}/updater/sis-updater-scheduler
+      context: ${OODIKONE_REPO:-.}/updater/sis-updater-scheduler
       args:
         SENTRY_ENVIRONMENT: ''
         SENTRY_RELEASE: ''
@@ -36,7 +36,7 @@ services:
 
   updater-worker:
     build:
-      context: ${OODIKONE_REPO:-../oodikone-contrib}/updater/sis-updater-worker
+      context: ${OODIKONE_REPO:-.}/updater/sis-updater-worker
       args:
         SENTRY_ENVIRONMENT: ''
         SENTRY_RELEASE: ''
