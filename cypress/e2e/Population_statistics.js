@@ -137,6 +137,7 @@ describe('Population Statistics tests', () => {
     })
 
     it("'Credits gained' tab of 'Credit statistics' shows correct statistics for all students of the class and also students grouped by admission type", () => {
+      cy.clock(new Date('2024-08-30').getTime(), ['Date'])
       cy.visit(pathToMathBSc2020)
       const totalStudents = 27
       cy.contains('Credit statistics')
@@ -160,7 +161,6 @@ describe('Population Statistics tests', () => {
         }))
       }
 
-      cy.clock(new Date('2024-08-30').getTime(), ['Date'])
       cy.get("[data-cy='credits-gained-table-All students of the class'] table thead tr").within(() => {
         cy.get('th').eq(1).contains('Credits gained between 01.08.2020 and 30.08.2024 (49 months)')
         cy.get('th').eq(2).contains('Number of students')
