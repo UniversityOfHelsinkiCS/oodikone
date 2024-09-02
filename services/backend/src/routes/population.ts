@@ -266,11 +266,6 @@ router.get('/v3/populationstatistics', async (req: GetPopulationStatisticsReques
 
     const result = populationStudentsMerger(multipopulationstudents)
 
-    if (result.error) {
-      Sentry.captureException(new Error(result.error))
-      return res.status(400).end()
-    }
-
     res.json(filterPersonalTags(result, userId))
   } else {
     const result: any = await optimizedStatisticsOf({

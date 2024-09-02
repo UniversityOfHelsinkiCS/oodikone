@@ -78,28 +78,19 @@ const populationCourseStatsMerger = multiyearstats => {
 }
 
 const populationStudentsMerger = multiyearstudents => {
-  const samples = {}
-  samples.students = []
-  samples.extents = []
-  samples.semesters = []
-  samples.courses = []
-  samples.elementdetails = {}
-  samples.elementdetails.data = {}
-  samples.elementdetails.programmes = []
-  samples.transfers = {}
-  samples.transfers.targets = {}
-  samples.transfers.sources = {}
+  const samples = { students: [], courses: [] }
+  const uniqueCourseCodes = new Set()
 
-  multiyearstudents.forEach(year => {
+  for (const year of multiyearstudents) {
     samples.students = samples.students.concat(year.students)
-    samples.extents = samples.extents.concat(year.extents)
-    samples.semesters = samples.semesters.concat(year.semesters)
-    samples.courses = samples.courses.concat(year.courses)
-    samples.elementdetails.data = Object.assign(samples.elementdetails.data, year.elementdetails.data)
-    samples.elementdetails.programmes = samples.elementdetails.programmes.concat(year.elementdetails.programmes)
-    samples.transfers.targets = { ...samples.transfers.targets, ...year.transfers.targets }
-    samples.transfers.sources = { ...samples.transfers.sources, ...year.transfers.sources }
-  })
+    for (const course of year.courses) {
+      if (!uniqueCourseCodes.has(course.code)) {
+        uniqueCourseCodes.add(course.code)
+        samples.courses.push(course)
+      }
+    }
+  }
+
   return samples
 }
 
