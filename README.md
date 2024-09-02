@@ -191,7 +191,7 @@ Continuous integration (CI) works with Github actions and is defined in workflow
 - Updater is deployed to production when pushed if tests pass
 - Test databases can be updated, instructions in [anonyymioodi README](anonyymioodi/README.md)
 
-[Rapodiff](./services/backend/src/rapodiff/) can be used to check differences between Rapo API and Oodikone data.
+[Rapodiff](./services/backend/src/rapodiff/) can be used to check differences between Rapo and Oodikone data.
 
 ## ❓FAQ
 
@@ -199,7 +199,7 @@ Continuous integration (CI) works with Github actions and is defined in workflow
 
 You should always install the dependencies **inside** the container to have the application **inside** the container access them. Module might be missing for example when someone else installs a new library and you only pull the changes in package.json. Use `docker exec <service> npm ci` to install modules inside the container or `npm run install:docker` to install modules inside all packages (backend, frontend, sis-updater-scheduler and sis-updater-worker).
 
-### Studyguidance groups don't work on my machine
+### Study guidance groups don't work on my machine
 
 Make sure you have your VPN on.
 
@@ -208,6 +208,41 @@ Make sure you have your VPN on.
 First: Try `npm run cli` option 1: _Set up oodikone from scratch_ and then option 2 to download and restore databases (or option 4 to skip downloading, if you've done it recently).
 
 If that does not help, try option 5: _Docker system prune_. Notice that this clears up **all Docker data**, including data related to other projects. If this is not ok, you'll need to identify the Oodikone-specific Docker volumes yourself and caches and clear those invididually.
+
+### How to run tests locally faster
+
+Vite simplifies development but can be **very slow** when running tests. If you're curious about the reasons for this, you can read more in [this GitHub issue](https://github.com/cypress-io/cypress/issues/22968).
+
+To speed up testing, you can use Vite's preview mode. This will make the tests run faster, but keep in mind that you must rebuild the frontend code every time you make changes to it. To use the preview mode, follow these steps:
+
+1. Run `npm run build` in the `services/frontend` directory.
+2. Run `npm run preview` in the `services/frontend` directory and keep it running.
+3. Update the `baseUrl` in [cypress.config.js](./cypress.config.js) to `http://localhost:4173`.
+4. Start Oodikone with `npm run oodikone`.
+
+After these steps, you can run your tests:
+
+- Use `npm run cypress open` to open the Cypress UI and run the tests interactively.
+
+Tests can also be run in headless mode, similar to how they are run in the CI/CD pipeline. To do this, use:
+
+```bash
+npm run cypress:run -- --spec <file path>
+```
+
+For example:
+
+```bash
+npm run cypress:run -- --spec "cypress/e2e/Language_center.js"
+```
+
+Running tests in headless mode may also help if your browser keeps crashing when running tests interactively. If you want to run all tests, use:
+
+```bash
+npm run cypress:run
+```
+
+Remember to revert the `baseUrl` in [cypress.config.js](./cypress.config.js) to its original value when you're done.
 
 ## ✌🏼 Maintainers and contribution
 

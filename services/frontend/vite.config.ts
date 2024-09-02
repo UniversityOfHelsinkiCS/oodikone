@@ -19,6 +19,14 @@ export default defineConfig({
     host: true,
     port: 3000,
   },
+  preview: {
+    proxy: {
+      '/api/': {
+        target: 'http://localhost:8080',
+      },
+    },
+    port: 4173,
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
