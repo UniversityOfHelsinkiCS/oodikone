@@ -5,11 +5,19 @@ import { InferAttributes, QueryTypes } from 'sequelize'
 import { programmeCodes } from '../../config/programmeCodes'
 import { dbConnections } from '../../database/connection'
 import { Organization, ProgrammeModule } from '../../models'
-import { getSemestersAndYears } from '../semesters'
+import { CurriculumPeriods, getCurriculumPeriods } from '../curriculumPeriods'
 
 const { sequelize } = dbConnections
 
-const curriculumPeriodIdToYearCode = (curriculumPeriodId: string) => curriculumPeriodId.slice(-2)
+const mapCurriculumPeriodIdToYear = (curriculumPeriodId: string, curriculumPeriods: CurriculumPeriods) => {
+  const curriculumPeriod = curriculumPeriods[curriculumPeriodId]
+
+  if (curriculumPeriod) {
+    return { startDate: curriculumPeriod.startDate, endDate: curriculumPeriod.endDate }
+  }
+  // Returns impossible default if there is not curriculumPeriods for some reason
+  return { startDate: new Date('1800-08-01'), endDate: new Date('1801-08-01') }
+}
 
 type ProgrammeModuleWithRelevantAttributes = Pick<
   InferAttributes<ProgrammeModule>,
@@ -49,8 +57,7 @@ export const getDegreeProgrammesOfOrganization = async (organizationId: string, 
       programme.code in programmeCodes ? programmeCodes[programme.code as keyof typeof programmeCodes] : programme.code,
   }))
   const programmesGroupedByCode = groupBy(orderBy(programmesWithProgIds, ['valid_from'], ['desc']), prog => prog.code)
-
-  const { years } = await getSemestersAndYears()
+  const curriculumPeriods = await getCurriculumPeriods()
   const relevantProgrammes: ProgrammeModuleWithRelevantAttributes[] = []
 
   for (const programmeVersions of Object.values(programmesGroupedByCode)) {
@@ -60,13 +67,17 @@ export const getDegreeProgrammesOfOrganization = async (organizationId: string, 
       continue
     }
     const { code, name, degreeProgrammeType, progId } = newestProgrammeVersion
+
     const yearsOfProgramme = programmeVersions
-      .map(prog => prog.curriculum_period_ids.map(curriculumPeriodIdToYearCode))
+      .map(prog =>
+        prog.curriculum_period_ids.map(curriculumPeriodId => {
+          return mapCurriculumPeriodIdToYear(curriculumPeriodId, curriculumPeriods)
+        })
+      )
       .flat()
     const isRelevantProgramme =
       !onlyCurrentProgrammes ||
-      (onlyCurrentProgrammes &&
-        yearsOfProgramme.some(year => moment().isBetween(years[year].startdate, years[year].enddate)))
+      (onlyCurrentProgrammes && yearsOfProgramme.some(year => moment().isBetween(year.startDate, year.endDate)))
 
     if (isRelevantProgramme) {
       relevantProgrammes.push({
@@ -78,7 +89,6 @@ export const getDegreeProgrammesOfOrganization = async (organizationId: string, 
       })
     }
   }
-
   return relevantProgrammes
 }
 
