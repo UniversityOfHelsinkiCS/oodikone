@@ -5,54 +5,111 @@ const hasLanded = () => {
   cy.contains('Show number of')
 }
 
-/*
-  TODO FIX
-  These use dumb numbers, because actual_studyright update in db is not yet
-  in anon data, and the faculties do not get resolved.
-*/
+const chooseSemester = (semester, fromOrTo) => {
+  cy.get(`[data-cy="semester-${fromOrTo}"]`)
+    .click()
+    .within(() => {
+      cy.get('div.visible.menu.transition').within(() => {
+        cy.contains('div.item', semester).click()
+      })
+      cy.get('div.menu.transition').should('not.have.class', 'visible')
+    })
+}
+
+const checkNumbers = (numbers, numberOfColumns) => {
+  cy.get('table > tbody > tr:first').within(() => {
+    cy.get('td').should('have.length', numberOfColumns)
+    cy.get('td').eq(0).contains('All courses total')
+    numbers.forEach((number, index) => {
+      cy.get('td')
+        .eq(index + 1)
+        .contains(number)
+    })
+  })
+}
+
+const checkStyle = (styles, numberOfColumns) => {
+  cy.get('table > tbody > tr:first').within(() => {
+    cy.get('td').should('have.length', numberOfColumns)
+    styles.forEach((style, index) => {
+      cy.get('td')
+        .eq(index + 1)
+        .should('have.attr', 'style')
+        .and('include', style)
+    })
+  })
+}
 
 describe('When language center is opened', () => {
   describe('as an admin user', () => {
     beforeEach(() => {
       cy.init('/languagecenterview', 'admin')
       cy.get('[data-cy="completions-button"]').click()
-      cy.get('[data-cy="semester-from"]').click()
-      cy.contains('Syksy 2017').click()
-      cy.get('[data-cy="semester-to"]').click()
       hasLanded()
     })
 
-    it('Initial view is correct', () => {
-      cy.contains('All courses total')
-      cy.contains('Academic and Professional')
-      cy.contains('AYKK-RUKIRJ')
+    describe('Faculties tab', () => {
+      beforeEach(() => {
+        chooseSemester('Syksy 2017', 'from')
+        chooseSemester('Kevät 2024', 'to')
+      })
+
+      it('Initial view is correct', () => {
+        cy.contains('All courses total')
+        cy.contains('Academic and Professional')
+        cy.contains('AYKK-RUKIRJ')
+      })
+
+      it('Faculties tab shows numbers', () => {
+        cy.get('table > tbody > tr:first').within(() => {
+          cy.get('td').should('have.length', 15)
+          cy.get('td').eq(0).contains('All courses total')
+          const numbers = [36, 9, 30, 749, 15, 40, 6, 48, 1, 24, 1058, 56, 0, 2072]
+          numbers.forEach((number, index) => {
+            cy.get('td')
+              .eq(index + 1)
+              .contains(number)
+          })
+        })
+      })
+
+      it('Faculties tab "exceeding" button works', () => {
+        cy.get('[data-cy="difference-button"]').click()
+        checkNumbers([...new Array(12).fill(0), 1, 238], 15)
+      })
+
+      it('Faculties tab semester selector changes numbers', () => {
+        chooseSemester('Syksy 2020', 'from')
+        checkNumbers([28, 6, 24, 489, 4, 10, 2, 33, 0, 9, 535, 41, 0, 1181], 15)
+      })
     })
 
-    it('Faculties tab shows numbers', () => {
-      cy.contains('All courses total')
-      cy.contains('1363')
-    })
+    describe('Semester tab', () => {
+      beforeEach(() => {
+        cy.contains('By semesters').click()
+        chooseSemester('Syksy 2017', 'from')
+        chooseSemester('Kevät 2024', 'to')
+      })
 
-    it('Faculties tab "exceeding" button works', () => {
-      cy.get('[data-cy="difference-button"]').click()
-      cy.contains('0')
-      cy.contains('Total')
-      cy.contains('1363').should('not.exist')
-    })
+      it('Semester tab shows numbers', () => {
+        checkNumbers([69, 26, 298, 58, 342, 98, 437, 138, 310, 90, 123, 73, 9, 1, 2072], 16)
+      })
 
-    it('Faculties tab semester selector changes numbers', () => {
-      cy.get('[data-cy="semester-from"]').click()
-      cy.contains('Syksy 2020').click()
-      cy.contains('1363').should('not.exist')
-      cy.contains('All courses total')
-    })
+      it('Coloring mode works on semester tab', () => {
+        cy.contains('Compare to average of course').click()
+        const expectedAlphas = [0.04, 0.016, 0.17, 0.03, 0.192, 0.055, 0.247, 0.08, 0.176, 0.05, 0.07, 0.04, 0.004, 0]
 
-    it('Semester tab opens and contains coloring filter', () => {
-      cy.contains('By semesters').click()
-      cy.contains('1363')
-      cy.contains('Coloring mode')
+        checkStyle(
+          expectedAlphas.map(alpha => `background-color: rgba(0, 170, 0, ${alpha})`),
+          16
+        )
+        cy.get('table > tbody > tr:first').within(() => {
+          cy.get('td').eq(15).should('have.attr', 'style').and('not.include', 'background-color')
+        })
+      })
     })
   })
+
   describe('with a user with no rights', () => {
     it('"Access denied" is shown', () => {
       cy.init('/languagecenterview', 'norights')

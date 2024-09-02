@@ -1,27 +1,49 @@
 /// <reference types="cypress" />
 
+const visibleLinks = {
+  norights: ['University', 'Faculties', 'Special populations', 'Give feedback', 'Logout'],
+  onlycoursestatistics: ['University', 'Courses', 'Special populations', 'Give feedback', 'Logout'],
+}
+
+visibleLinks.basic = [...visibleLinks.onlycoursestatistics, 'Faculties', 'Programmes', 'Students']
+visibleLinks.admin = [...visibleLinks.basic, 'Teachers', 'Users', 'Updater']
+
 describe('Users tests', () => {
   describe('Using user with just grp-oodikone-user, no other rights', () => {
-    it('shows only frontpage, university, feedback', () => {
-      cy.init('', 'norights') // login with norights user
-      cy.get('[data-cy="navBar"]').contains('University').should('exist')
-      cy.get('[data-cy="navBar"]').contains('Give feedback').should('exist')
-
-      cy.get('[data-cy="navBar"]').contains('Programmes').should('not.exist')
-      cy.get('[data-cy="navBar"]').contains('Students').should('not.exist')
-      cy.get('[data-cy="navBar"]').contains('Courses').should('not.exist')
-      cy.get('[data-cy="navBar"]').contains('Teachers').should('not.exist')
-      cy.get('[data-cy="navBar"]').contains('Users').should('not.exist')
-      cy.get('[data-cy="navBar"]').contains('Faculty').should('not.exist')
-      cy.get('[data-cy="navBar"]').contains('Updater').should('not.exist')
+    it('shows correct tabs', () => {
+      cy.init('', 'norights')
+      cy.get('[data-cy=navBar]').children().should('have.length', 7)
+      cy.get('[data-cy=navBar]').within(() => {
+        for (const link of visibleLinks.norights) {
+          cy.contains(link)
+        }
+      })
     })
   })
 
-  // TODO: Add user right checks for onlycoursestats user (should be like above + should
-  // show course stats
-  //
-  // TODO: Add user right checks for basic user (should show also study programme,
-  // student stats, course stats
+  describe('Using as coursestatistics user', () => {
+    it('shows correct tabs', () => {
+      cy.init('', 'onlycoursestatistics')
+      cy.get('[data-cy=navBar]').children().should('have.length', 7)
+      cy.get('[data-cy=navBar]').within(() => {
+        for (const link of visibleLinks.onlycoursestatistics) {
+          cy.contains(link)
+        }
+      })
+    })
+  })
+
+  describe('Using as basic user', () => {
+    it('shows correct tabs', () => {
+      cy.init('')
+      cy.get('[data-cy=navBar]').children().should('have.length', 10)
+      cy.get('[data-cy=navBar]').within(() => {
+        for (const link of visibleLinks.basic) {
+          cy.contains(link)
+        }
+      })
+    })
+  })
 
   describe('Using as admin', () => {
     beforeEach(() => {
@@ -29,12 +51,12 @@ describe('Users tests', () => {
     })
 
     it('should see more stuff than others', () => {
-      cy.get('[data-cy="navBar"]').contains('Programmes').should('exist')
-      cy.get('[data-cy="navBar"]').contains('Students').should('exist')
-      cy.get('[data-cy="navBar"]').contains('Courses').should('exist')
-      // TODO: admin should probably see this as well, since can access this page: cy.get('[data-cy="navBar"]').contains('Teachers').should('exist')
-      cy.get('[data-cy="navBar"]').contains('Users').should('exist')
-      cy.get('[data-cy="navBar"]').contains('University').should('exist')
+      cy.get('[data-cy=navBar]').children().should('have.length', 13)
+      cy.get('[data-cy=navBar]').within(() => {
+        for (const link of visibleLinks.admin) {
+          cy.contains(link)
+        }
+      })
     })
 
     it("mocking normal user shows only the mocked user's programmes", () => {
@@ -44,10 +66,11 @@ describe('Users tests', () => {
       cy.contains('mocking as basic')
       cy.contains('Programmes').click().siblings().contains('Class statistics').click()
       cy.contains('label', 'Study programme')
-      cy.contains('label', 'Study programme')
         .siblings()
         .within(() => {
-          cy.get("div[role='option']").should('have.length', 2).contains('Tietojenkäsittelytieteen kandiohjelma')
+          cy.get("div[role='option']").should('have.length', 2)
+          cy.get("div[role='option']").eq(0).contains('Matemaattisten tieteiden kandiohjelma')
+          cy.get("div[role='option']").eq(1).contains('Matematiikan ja tilastotieteen maisteriohjelma')
         })
     })
   })

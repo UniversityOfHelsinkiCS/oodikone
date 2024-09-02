@@ -2,7 +2,7 @@
 
 const path = require('path')
 
-const timestamp = new Date().toISOString().split('T')[0] // YYYY-MM-DD
+const timestamp = new Date().toLocaleDateString('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit' }) // YYYY-MM-DD, taking the local time zone into account
 const downloadsFolder = Cypress.config('downloadsFolder')
 
 describe('Faculty overview', () => {
@@ -155,7 +155,7 @@ describe('Faculty overview', () => {
   describe('Average graduation times', () => {
     beforeEach(() => {
       cy.init('/faculties')
-      cy.contains('a', 'Kasvatustieteellinen tiedekunta').click()
+      cy.contains('a', 'Matemaattis-luonnontieteellinen tiedekunta').click()
       cy.contains('Graduation times').click()
     })
 
@@ -178,42 +178,51 @@ describe('Faculty overview', () => {
 
       cy.get('[data-cy="Section-bachelor"]').within(() => {
         cy.get('div[class="faculty-graph"]')
-        cy.contains('1 graduated').should('have.length', 1)
-        cy.contains('1 graduated').trigger('mouseover')
-        cy.contains('1 students graduated in year 2019')
-        cy.contains('median study time: 41 months')
-        cy.contains('0 graduated on time')
-        cy.contains('1 graduated max year overtime')
+        cy.contains('44 graduated').trigger('mouseover')
+        cy.contains('44 students graduated in year 2023')
+        cy.contains('median study time: 37.5 months')
+        cy.contains('21 graduated on time')
+        cy.contains('11 graduated max year overtime')
+        cy.contains('12 graduated over year late')
 
-        cy.contains('1 graduated').click()
-        cy.contains('Year 2019 by graduation year')
+        cy.contains('44 graduated').click()
+        cy.contains('Year 2023 by graduation year')
         cy.get('div[class="programmes-graph"]').should('be.visible')
         cy.get('div[class="programmes-graph"]').within(() => {
-          cy.contains('EDUK')
-          cy.get('[aria-label="EDUK, 41."]').trigger('mouseover')
-          cy.contains('Kasvatustieteiden kandiohjelma')
-          cy.contains('KH60_001')
+          cy.contains('MAT')
+          cy.get('[aria-label="MAT, 36."]').trigger('mouseover')
+          cy.contains('Matemaattisten tieteiden kandiohjelma')
+          cy.contains('KH50_001')
+          cy.contains('26 students graduated in year 2023')
+          cy.contains('median study time: 36 months')
+          cy.contains('14 graduated on time')
+          cy.contains('6 graduated max year overtime')
+          cy.contains('6 graduated over year late')
         })
       })
 
       cy.get('[data-cy="Section-master"]').within(() => {
         cy.get('div[class="faculty-graph"]')
-        cy.contains('24 graduated').should('have.length', 1)
-        cy.contains('24 graduated').trigger('mouseover')
-        cy.contains('24 students graduated in year 2020')
-        cy.contains('median study time: 22.5 months')
-        cy.contains('0 graduated over year late')
-        cy.contains('19 graduated on time')
-        cy.contains('5 graduated max year overtime')
+        cy.contains('4 graduated').trigger('mouseover')
+        cy.contains('4 students graduated in year 2023')
+        cy.contains('median study time: 23 months')
+        cy.contains('3 graduated on time')
+        cy.contains('0 graduated max year overtime')
+        cy.contains('1 graduated over year late')
 
-        cy.contains('24 graduated').click()
-        cy.contains('Year 2020 by graduation year')
+        cy.contains('4 graduated').click()
+        cy.contains('Year 2023 by graduation year')
         cy.get('div[class="programmes-graph"]').should('be.visible')
         cy.get('div[class="programmes-graph"]').within(() => {
-          cy.contains('EDUM')
-          cy.get('[aria-label="EDUM, 22.5."]').trigger('mouseover')
-          cy.contains('Kasvatustieteiden maisteriohjelma')
-          cy.contains('MH60_001')
+          cy.contains('MAST')
+          cy.get('[aria-label="MAST, 23."]').trigger('mouseover')
+          cy.contains('Matematiikan ja tilastotieteen maisteriohjelma')
+          cy.contains('MH50_001')
+          cy.contains('3 students graduated in year 2023')
+          cy.contains('median study time: 23 months')
+          cy.contains('2 graduated on time')
+          cy.contains('0 graduated max year overtime')
+          cy.contains('1 graduated over year late')
         })
       })
     })
@@ -221,33 +230,32 @@ describe('Faculty overview', () => {
     it('Graduation times grouping and time types can be toggled', () => {
       cy.get('[data-cy="GraduationTimeToggle"]').click()
       cy.get('[data-cy="GroupByToggle"]').click()
-      cy.get('[data-cy="Section-bachelor"]').should('not.exist')
       cy.get('[data-cy="Section-master"]').should('be.visible')
 
-      cy.get('[data-cy="Section-master"]').within(() => {
+      cy.get('[data-cy="Section-bachelor"]').within(() => {
         cy.get('div[class="faculty-graph"]')
-        cy.contains('18 graduated (40 % of class)').should('have.length', 1)
-        cy.contains('18 graduated').trigger('mouseover')
-        cy.contains('From class of 2018 - 2019, 18/45 students have graduated')
+        cy.contains('24 graduated (64.9 % of class)').trigger('mouseover')
+        cy.contains('From class of 2020 - 2021, 24/37 students have graduated')
       })
 
       cy.get('[data-cy="GraduationTimeToggle"]').click()
-      cy.get('[data-cy="Section-master"]').within(() => {
-        cy.get('[aria-label="2018 - 2019, 14. On time."]').click()
+      cy.get('[data-cy="Section-bachelor"]').within(() => {
+        cy.get('[aria-label="2018 - 2019, 29. On time."]').click()
         cy.get('div[class="programmes-breakdown-graph"]').should('be.visible')
         cy.get('div[class="programmes-breakdown-graph"]').within(() => {
           cy.contains('Year 2018 - 2019 by start year')
-          cy.contains('EDUM')
-          cy.get('[aria-label="EDUM, 4. Max. year overtime."]').trigger('mouseover')
-          cy.contains('Kasvatustieteiden maisteriohjelma')
-          cy.contains('MH60_001')
+          cy.contains('MAT')
+          cy.get('[aria-label="MAT, 20. Max. year overtime."]').trigger('mouseover')
+          cy.contains('Matemaattisten tieteiden kandiohjelma')
+          cy.contains('KH50_001')
+          cy.contains('Max. year overtime: 20')
         })
       })
     })
 
     it('Data can be exported to an Excel file', () => {
       cy.get('[data-cy="DownloadButton-AverageGraduationTimes"]').click()
-      const downloadedFile = `oodikone_H60_graduation_times_${timestamp}.xlsx`
+      const downloadedFile = `oodikone_H50_graduation_times_${timestamp}.xlsx`
       cy.readFile(path.join(downloadsFolder, downloadedFile))
     })
   })

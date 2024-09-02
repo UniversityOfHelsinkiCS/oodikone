@@ -43,7 +43,7 @@ const onlyIamRightsUserHeaders = {
   uid: 'onlyiamrights',
   displayname: 'Only IAM rights user',
   'shib-session-id': 'mock-cypress-session',
-  hygroupcn: 'hy-employees;hy-mltdk-tkt-jory',
+  hygroupcn: 'hy-employees;hy-mltdk-mat-jory',
   mail: 'grp-toska+mockonlyiamrightsuser@helsinki.fi',
   hypersonsisuid: 'hy-hlo-1111111',
 }
@@ -87,7 +87,7 @@ Cypress.Commands.add('init', (path = '', userId = 'basic') => {
     if (!headersToUse) throw Error(`${userId} is not valid user id!`)
     req.headers = headersToUse
   })
-  const baseUrl = Cypress.config().baseUrl
+  const { baseUrl } = Cypress.config()
   cy.visit(baseUrl.concat(path))
 })
 
@@ -99,9 +99,8 @@ Cypress.Commands.add('cs', { prevSubject: 'optional' }, (subject, name) => {
 
   if (subject === undefined) {
     return cy.get(selector)
-  } else {
-    return cy.wrap(subject).find(selector)
   }
+  return cy.wrap(subject).find(selector)
 })
 
 /**
@@ -128,16 +127,6 @@ Cypress.Commands.add('selectFromDropdown', { prevSubject: true }, (s, index) => 
   }
 })
 
-/**
- * Move to page with studyProgramme population
- */
-Cypress.Commands.add('selectStudyProgramme', name => {
-  cy.cs('navbar-studyProgramme').click()
-  cy.cs('navbar-class').click()
-  cy.cs('select-study-programme').click().children().contains(name).click()
-  cy.contains('See class').click()
-})
-
 Cypress.Commands.add('checkTableStats', (correctStats, tableName) => {
   cy.get(`[data-cy=Table-${tableName}] tbody`).within(() => {
     correctStats.forEach((values, trIndex) => {
@@ -159,7 +148,7 @@ const getEmptyYears = isAcademicYear => {
   const latestYear = isAcademicYear && today.getMonth() < 7 ? today.getFullYear() - 1 : today.getFullYear()
 
   const years = []
-  for (let year = latestYear; year > 2021; year--) {
+  for (let year = latestYear; year >= 2024; year--) {
     if (isAcademicYear) {
       years.push(`${year} - ${year + 1}`)
     } else {

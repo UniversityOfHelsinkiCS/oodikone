@@ -30,7 +30,7 @@ describe('Study guidance group tests', () => {
         cy.contains('Study guidance groups')
 
         const studyGuidanceGroupsTableContent = [
-          ['TKT kandit 2018', 3, 'Tietojenkäsittelytieteen kandiohjelma', '2018 - 2019'],
+          ['MAT kandit 2020', 3, 'Matemaattisten tieteiden kandiohjelma', '2020 - 2021'],
           ['Oma ohjausryhmä', 2, 'Add study programme', 'Add year'],
         ]
 
@@ -97,9 +97,9 @@ describe('Study guidance group tests', () => {
       })
 
       it('shows the correct labels', () => {
-        cy.get('.ui.medium.header').contains('TKT kandit 2018')
-        cy.get('.ui.blue.tag.label:first').contains('Tietojenkäsittelytieteen kandiohjelma')
-        cy.get('.ui.blue.tag.label:last').contains('2018 - 2019')
+        cy.get('.ui.medium.header').contains('MAT kandit 2020')
+        cy.get('.ui.blue.tag.label:first').contains('Matemaattisten tieteiden kandiohjelma')
+        cy.get('.ui.blue.tag.label:last').contains('2020 - 2021')
       })
 
       it('shows the correct panes', () => {
@@ -114,7 +114,7 @@ describe('Study guidance group tests', () => {
         cy.get('[data-cy="CreditDate-filter-card"][data-open="false"]')
         cy.get('.ui.primary.button').contains('Show starting from associated year').click()
         cy.get('[data-cy="CreditDate-filter-card"][data-open="true"]')
-        cy.get('.ui.mini.icon.button.credit-date-filter-input').contains('01.08.2018')
+        cy.get('.ui.mini.icon.button.credit-date-filter-input').contains('01.08.2020')
         cy.contains('Reset All Filters')
         cy.get('.ui.primary.button').contains('Show all credits').click()
         cy.get('[data-cy="CreditDate-filter-card"][data-open="false"]')
@@ -139,13 +139,14 @@ describe('Study guidance group tests', () => {
           'Start year at uni',
           'Other programmes',
           'Transferred from',
+          'Admission type',
           'Gender',
           'Citizenship',
           'Curriculum period',
           'Latest attainment date',
           'Tags',
         ]
-        const secondRowHeadings = ['All', 'HOPS', 'Since 1.8.2018']
+        const secondRowHeadings = ['All', 'HOPS', 'Since 1.8.2020']
         cy.cs('Students (3)').click()
         cy.get('[data-cy="student-table-tabs"] table thead tr').then($tr => {
           const firstRowTexts = Array.from($tr[0].children).map(elem => elem.innerText.replaceAll('\n', ' '))

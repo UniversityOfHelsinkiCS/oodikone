@@ -7,8 +7,8 @@ const deleteAllSearches = () => {
     .parent()
     .parent()
     .get('.dropdown')
-    .then(d => {
-      const searchItems = d.find('div[role=option] > span[class=text]')
+    .then(dropdown => {
+      const searchItems = dropdown.find('div[role=option] > span[class=text]')
       for (let i = 0; i < searchItems.length; i++) {
         if (searchItems[i].textContent.includes('TEST-')) {
           cy.get('[data-cy="history-search"]').children().eq(0).type(searchItems[i].textContent).type('{enter}')

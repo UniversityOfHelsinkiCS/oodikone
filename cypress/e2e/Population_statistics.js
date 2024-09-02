@@ -2,10 +2,10 @@
 // Now "Class statistics" in UI
 
 describe('Population Statistics tests', () => {
-  const pathToCSBach2017 =
-    '/populations?months=36&semesters=FALL&semesters=SPRING&studyRights={%22programme%22%3A%22KH50_005%22}&tag&year=2017'
-  const pathToCSMaster2019 =
-    '/populations?months=27&semesters=FALL&semesters=SPRING&studyRights=%7B%22programme%22%3A%22MH50_009%22%7D&tag&year=2019'
+  const pathToMathBSc2020 =
+    '/populations?months=49&semesters=FALL&semesters=SPRING&studyRights=%7B"programme"%3A"KH50_001"%7D&year=2020'
+  const pathToMathMSc2020 =
+    '/populations?months=49&semesters=FALL&semesters=SPRING&studyRights=%7B"programme"%3A"MH50_001"%7D&year=2020'
   describe('when using basic user', () => {
     beforeEach(() => {
       cy.init('/populations')
@@ -45,7 +45,7 @@ describe('Population Statistics tests', () => {
       cy.get('[data-cy=select-study-programme]')
         .click()
         .children()
-        .contains('Tietojenkäsittelytieteen maisteriohjelma')
+        .contains('Matematiikan ja tilastotieteen maisteriohjelma')
         .click()
       cy.contains('See class').should('be.enabled')
     })
@@ -55,18 +55,18 @@ describe('Population Statistics tests', () => {
       cy.get('[data-cy=select-study-programme]')
         .click()
         .children()
-        .contains('Tietojenkäsittelytieteen kandiohjelma')
+        .contains('Matemaattisten tieteiden kandiohjelma')
         .click()
       cy.contains('See class').click()
-      cy.contains('class size')
-      cy.contains('Tietojenkäsittelytieteen kandiohjelma')
+      cy.contains('Matemaattisten tieteiden kandiohjelma 2017 - 2018')
+      cy.contains('class size 47 students')
     })
 
     it('Population statistics is usable on general level', () => {
-      cy.visit(pathToCSBach2017)
+      cy.visit(pathToMathBSc2020)
       cy.cs('filtered-students')
-      cy.contains('Tietojenkäsittelytieteen kandiohjelma')
-      cy.contains('class size 170 students')
+      cy.contains('Matemaattisten tieteiden kandiohjelma')
+      cy.contains('class size 30 students')
       cy.contains('Excludes exchange students')
       cy.contains('Excludes students with non-degree study right')
       cy.contains('Excludes students who have transferred out of this programme')
@@ -74,66 +74,71 @@ describe('Population Statistics tests', () => {
     })
 
     it('Courses of class is displayed and link to individual course stats page works', () => {
-      cy.visit(pathToCSBach2017)
+      cy.visit(pathToMathBSc2020)
       cy.contains('Courses of class').click()
       cy.intercept('/api/v3/courseyearlystats**').as('coursePage')
-      cy.get('[data-cy=toggle-group-module-TKT1]').click()
-      cy.contains('td', 'TKT10002').siblings().find('i.level.up').click()
+      cy.get('[data-cy=toggle-group-module-MAT110]').click()
+      cy.contains('td', 'MAT11001').siblings().find('i.level.up').click()
       cy.wait('@coursePage')
       cy.url().should('include', '/coursestatistics')
-      cy.contains('TKT10002, 581325, AYTKT10002, A581325 Ohjelmoinnin perusteet')
+      cy.contains('MAT11001, 57033, AYMAT11001, A57033 Johdatus yliopistomatematiikkaan')
     })
 
     it('Courses of class curriculum selection works', () => {
-      cy.visit(pathToCSBach2017)
+      cy.visit(pathToMathBSc2020)
       cy.contains('Courses of class').click()
-      cy.get('Opiskelijan digitaidot - Kumpula').should('not.exist')
-      cy.get('[data-cy=curriculum-picker]').click()
-      cy.contains('2020 - 2026').click()
-      cy.contains('Opiskelijan digitaidot - Kumpula')
+      cy.get('[data-cy=curriculum-picker]').contains('2020 - 2023')
+      cy.get('[data-cy=toggle-group-module-MAT-tyo]')
+      cy.get('[data-cy=curriculum-picker]').click().contains('2023 - 2026').click()
+      cy.get('[data-cy=toggle-group-module-MAT-tyo]').should('not.exist')
     })
 
     it("Empty 'tags' tab has a link to the page where tags can be created", { retries: 2 }, () => {
-      cy.visit(pathToCSBach2017)
-      cy.contains('Students (170)')
+      cy.visit(pathToMathBSc2020)
+      cy.contains('Students (27)')
         .parent()
         .then($parentDiv => {
-          if (!$parentDiv.hasClass('active')) cy.contains('Students (170)').click()
+          if (!$parentDiv.hasClass('active')) cy.contains('Students (27)').click()
         })
       cy.get('[data-cy=student-table-tabs]').within(() => {
         cy.contains('Tags').click()
       })
       cy.contains('No tags defined. You can define them here.').find('a').click()
-      cy.contains('Tags').click()
-      cy.contains('Tietojenkäsittelytieteen kandiohjelma')
-      cy.contains('Create a new tag')
+      cy.url().should('include', '/study-programme/KH50_001?p_m_tab=0&p_tab=4')
+      cy.contains('Matemaattisten tieteiden kandiohjelma')
+      cy.contains('Create tags for study programme')
+      cy.contains('button', 'Create a new tag').should('be.disabled')
     })
 
     // This test sometimes fails on headless mode. It seems that the click on the
     // 'Fetch class with new settings' button doesn't always trigger history.push()
     // so the page doesn't reload. This is why waiting also doesn't help.
     it('Advanced settings work', { retries: 2 }, () => {
-      cy.visit(pathToCSBach2017)
+      cy.visit(pathToMathMSc2020)
       cy.get('[data-cy=advanced-toggle]').click()
       // only spring
       cy.cs('toggle-fall').click()
       cy.contains('Fetch class').click()
-      cy.contains('Students (0)')
+      cy.contains('Credit accumulation (for 17 students)')
+      cy.url().should('not.include', 'semesters=FALL')
       // only fall
       cy.get('[data-cy=advanced-toggle]').click()
       cy.cs('toggle-fall').click()
       cy.cs('toggle-spring').click()
       cy.contains('Fetch class').click()
-      cy.contains('Credit accumulation (for 170 students)')
+      cy.contains('Credit accumulation (for 9 students)')
+      cy.url().should('not.include', 'semesters=SPRING')
       // spring + fall
       cy.get('[data-cy=advanced-toggle]').click()
       cy.cs('toggle-spring').click()
       cy.contains('Fetch class').click()
-      cy.contains('Credit accumulation (for 170 students)')
+      cy.contains('Credit accumulation (for 26 students)')
+      cy.url().should('include', 'semesters=FALL&semesters=SPRING')
     })
 
-    it('Credit Statistics, Credits gained tab works', () => {
-      cy.selectStudyProgramme('Tietojenkäsittelytieteen kandiohjelma')
+    it("'Credits gained' tab of 'Credit statistics' shows correct statistics for all students of the class and also students grouped by admission type", () => {
+      cy.visit(pathToMathBSc2020)
+      const totalStudents = 27
       cy.contains('Credit statistics')
         .parent()
         .then($parentDiv => {
@@ -141,79 +146,123 @@ describe('Population Statistics tests', () => {
         })
       cy.contains('Credits gained').click()
       cy.get("[data-cy='credits-gained-main-table']").should('contain', 'All students of the class')
-      const limits = [45, 90, 135, 180, null]
-      const ranges = limits.map((limit, i) => (i === 0 ? [1, limit] : [limits[i - 1], limit]))
+      const limits = [1, 45, 90, 135, 180, null]
+      const ranges = limits.map((limit, i) => (i === 0 ? [null, 0] : [limits[i - 1], limit])).reverse()
 
-      cy.get('.credits-gained-table').should('contain', '(n = 170)')
-
-      for (const [start, end] of ranges) {
-        let value = 'credits'
-
-        if (start !== null) {
-          value = `${start} ≤ ${value}`
-        }
-
-        if (end !== null) {
-          value = `${value} < ${end}`
-        }
-
-        cy.get('.credits-gained-table').should('contain', value)
+      const getTableData = (selector, numbersOfStudents) => {
+        const studentsInCategory = numbersOfStudents.reduce((acc, val) => acc + val, 0)
+        return ranges.map((range, index) => ({
+          selector: `[data-cy='credits-gained-table-${selector}']`,
+          start: range[0],
+          end: range[1],
+          students: numbersOfStudents[index],
+          percentage: `${((numbersOfStudents[index] / studentsInCategory) * 100).toFixed(1)}%`,
+        }))
       }
 
-      cy.get("[data-cy='credits-gained-table-body'] td:nth-child(3)").then($els => {
-        const sum = [...$els].map($el => parseInt($el.innerText, 10)).reduce((a, b) => a + b, 0)
-        expect(sum).to.equal(170)
+      cy.clock(new Date('2024-08-30').getTime(), ['Date'])
+      cy.get("[data-cy='credits-gained-table-All students of the class'] table thead tr").within(() => {
+        cy.get('th').eq(1).contains('Credits gained between 01.08.2020 and 30.08.2024 (49 months)')
+        cy.get('th').eq(2).contains('Number of students')
+        cy.get('th').eq(2).contains(`(n = ${totalStudents})`)
+        cy.get('th').eq(3).contains('Percentage of population')
       })
 
-      cy.get("[data-cy='credits-gained-table-Ei valintatapaa']").should('not.exist')
-    })
-
-    it('Credit Statistics, Credits gained tab shows stats by admissions', () => {
-      cy.visit(pathToCSMaster2019)
-      cy.cs('filtered-students')
-      cy.contains('Credit statistics')
-      cy.get("[data-cy='Credit statistics']")
-        .parent()
-        .then($parentDiv => {
-          if (!$parentDiv.hasClass('active')) cy.get("[data-cy='Credit statistics']").click()
+      for (const category of [
+        getTableData('All students of the class', [9, 5, 7, 4, 2, 0]),
+        getTableData('Avoin väylä', [0, 1, 3, 2, 0, 0]),
+        getTableData('Muu', [0, 1, 1, 1, 0, 0]),
+        getTableData('Todistusvalinta', [9, 3, 3, 1, 2, 0]),
+      ]) {
+        category.forEach(({ selector, start, end, students, percentage }, index) => {
+          let value
+          if (start === null) {
+            value = '0'
+          } else if (end === null) {
+            value = `${start} ≤ credits`
+          } else {
+            value = `${start} ≤ credits < ${end}`
+          }
+          cy.get(`${selector} [data-cy='credits-gained-table-body']`).within(() => {
+            cy.get('tr')
+              .eq(index)
+              .within(() => {
+                cy.get('td').eq(1).contains(value)
+                cy.get('td').eq(2).contains(students)
+                cy.get('td').eq(3).contains(percentage)
+              })
+          })
         })
-      cy.contains('Credits gained').click()
-      cy.get("[data-cy='credits-gained-table-Avoin väylä']").should('exist')
-      cy.get("[data-cy='credits-gained-table-Yhteispisteet']").should('exist')
-      cy.get("[data-cy='credits-gained-table-Muu']").should('exist')
-      cy.get("[data-cy='credits-gained-table-Ei valintatapaa']").should('exist')
+      }
+
+      cy.get(
+        "[data-cy='credits-gained-table-All students of the class'] [data-cy='credits-gained-table-body'] td:nth-child(3)"
+      ).then(tds => {
+        const sum = [...tds].reduce((acc, td) => acc + parseInt(td.innerText, 10), 0)
+        expect(sum).to.equal(totalStudents)
+      })
     })
 
-    it('Credit Statistics, Statistics pane works', () => {
-      cy.selectStudyProgramme('Tietojenkäsittelytieteen kandiohjelma')
+    it("'Statistics' tab of 'Credit statistics' shows correct statistics for all students of the class and also students grouped by admission type", () => {
+      cy.visit(pathToMathBSc2020)
       cy.contains('Credit statistics')
         .parent()
         .then($parentDiv => {
           if (!$parentDiv.hasClass('active')) cy.contains('Credit statistics').click()
         })
       cy.get("[data-cy='credit-stats-tab'] > .menu > :nth-child(2)").click()
+      const rows = ['Total credits', 'Average', 'Median', 'Standard deviation', 'Minimum', 'Maximum']
+      const categories = [
+        {
+          selector: 'All students of the population',
+          data: ['3741.50', '138.57', '141.00', '58.82', '19', '267'],
+          size: 27,
+        },
+        {
+          selector: 'Muu',
+          data: ['359.00', '119.67', '111.00', '43.71', '71', '177'],
+          size: 3,
+        },
+        {
+          selector: 'Todistusvalinta',
+          data: ['2713.50', '150.75', '178.00', '64.33', '19', '267'],
+          size: 18,
+        },
+        {
+          selector: 'Avoin väylä',
+          data: ['669.00', '111.50', '103.50', '29.03', '82', '168'],
+          size: 6,
+        },
+      ]
 
-      cy.get("[data-cy='credit-stats-population-size']").should('contain', 'n = 170')
-      cy.get("[data-cy='credit-stats-average']").should('contain', '114.74')
-      cy.get("[data-cy='credit-stats-median']").should('contain', '109.00')
-      cy.get("[data-cy='credit-stats-stdev']").should('contain', '65.53')
-      cy.get("[data-cy='credit-stats-min']").should('contain', '5')
-      cy.get("[data-cy='credit-stats-max']").should('contain', '314')
+      for (const { selector, data, size } of categories) {
+        cy.get(`[data-cy='statistics-table-${selector}']`).within(() => {
+          cy.contains('h3', selector)
+          cy.contains("[data-cy='credit-stats-population-size']", `n = ${size}`)
+          cy.get('table tbody').within(() => {
+            rows.forEach((text, index) => {
+              cy.get('tr')
+                .eq(index)
+                .within(() => {
+                  cy.get('td').eq(0).contains(text)
+                  cy.get('td').eq(1).contains(data[index])
+                })
+            })
+          })
+        })
+      }
     })
   })
 
   describe('when using admin', () => {
-    beforeEach(() => {
-      cy.init(pathToCSBach2017, 'admin')
-    })
     it('Student list checking works as intended', () => {
-      const existing = '010113437'
-      const nonExisting = '66666666'
-      cy.visit(pathToCSBach2017)
-      cy.contains('Students (170)')
+      cy.init(pathToMathBSc2020, 'admin')
+      const existing = '433237'
+      const nonExisting = '550004'
+      cy.contains('Students (27)')
         .parent()
         .then($parentDiv => {
-          if (!$parentDiv.hasClass('active')) cy.contains('Students (170)').click()
+          if (!$parentDiv.hasClass('active')) cy.contains('Students (27)').click()
         })
       cy.contains(existing)
       cy.contains(nonExisting).should('not.exist')
@@ -227,16 +276,18 @@ describe('Population Statistics tests', () => {
         cy.contains('Student numbers in list but not in Sisu').click()
         cy.contains('#notfound', nonExisting)
         cy.contains('Student numbers in Sisu but not in list').click()
-        cy.contains('#notsearched', '010614509')
+        cy.contains('#notsearched', '457144')
       })
+      cy.contains('button', 'Close').click()
+      cy.contains('Student numbers in list and in Sisu').should('not.exist')
     })
   })
 
   describe('when using IAM user', () => {
     beforeEach(() => {
-      cy.init(pathToCSBach2017, 'onlyiamrights')
-      cy.contains('Tietojenkäsittelytieteen kandiohjelma')
-      cy.contains('class size 170 students')
+      cy.init(pathToMathBSc2020, 'onlyiamrights')
+      cy.contains('Matemaattisten tieteiden kandiohjelma 2020 - 2021')
+      cy.contains('class size 30 students')
     })
 
     it('Population statistics is visible', () => {
@@ -245,13 +296,39 @@ describe('Population Statistics tests', () => {
         cy.contains('Excludes students with non-degree study right')
         cy.contains('Excludes students who have transferred out of this programme')
       })
+    })
 
-      cy.contains('Credit accumulation (for 170 students)')
-      cy.contains('Credit statistics')
+    it('Only correct panes are visible', () => {
+      const correctPanes = [
+        'Credit accumulation (for 27 students)',
+        'Credit statistics',
+        'Age distribution',
+        'Courses of class',
+      ]
+      cy.get('.accordion.ui.fluid.styled').within(() => {
+        cy.get('.title').should('have.length', correctPanes.length)
+        correctPanes.forEach((pane, index) => {
+          cy.get('.title').eq(index).contains(pane)
+        })
+      })
+    })
+
+    it('Ages cannot be ungrouped', () => {
+      cy.contains('Age distribution')
+        .parent()
+        .then($parentDiv => {
+          if (!$parentDiv.hasClass('active')) cy.contains('Age distribution').click()
+        })
+      cy.contains('ui.checked.toggle.checkbox', 'Group ages').should('not.exist')
+    })
+
+    it('Age filter is not visible', () => {
+      cy.get("[data-cy='filtered-students']")
+      cy.get("[data-cy='Age-filter-card']").should('not.exist')
     })
 
     it('Students tab is not available', () => {
-      cy.contains('Students (170)').should('not.exist')
+      cy.contains('Students (27)').should('not.exist')
     })
   })
 })

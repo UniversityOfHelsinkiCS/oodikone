@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-const MOCKED_DATE = new Date(2022, 6, 12).getTime()
+const MOCKED_DATE = new Date('2024-08-30').getTime()
 
 const checkFilteringResult = studentCount => {
   cy.contains(`Students (${studentCount})`)
@@ -65,20 +65,20 @@ const createRunTestStepWithPreAndPostPartsFunction = amountWithoutFiltering => {
   }
 }
 
-describe('Population Statistics with CS master', () => {
-  const pathToCSMast2019 =
-    '/populations?months=36&semesters=FALL&semesters=SPRING&studyRights={%22programme%22%3A%22MH50_009%22}&tag&year=2019'
-  const defaultAmountOfStudents = 27
+describe("Population statistics with a master's programme", () => {
+  const pathToMathMSc2020 =
+    '/populations?months=49&semesters=FALL&semesters=SPRING&studyRights=%7B"programme"%3A"MH50_001"%7D&year=2020'
+  const defaultAmountOfStudents = 26
   const runTestStepWithPreAndPostParts = createRunTestStepWithPreAndPostPartsFunction(defaultAmountOfStudents)
   beforeEach(() => {
-    cy.init(pathToCSMast2019)
+    cy.init(pathToMathMSc2020)
   })
 
   it('Study track filter works', () => {
     runTestStepWithPreAndPostParts('StudyTrack', () => {
       const card = cy.cs('StudyTrack-filter-card')
       const programmeDropdown = card.cs('StudyTrack-filter-dropdown').selectFromDropdown(0)
-      checkFilteringResult(1)
+      checkFilteringResult(15)
       programmeDropdown.get('i.delete').click()
     })
   })
@@ -97,8 +97,8 @@ describe('Population Statistics with CS master', () => {
 
     it('works', () => {
       runTestStepWithPreAndPostParts('studyright-type', () => {
-        const expectedBaMaStudents = 27
-        const expectedMasterOnlyStudents = 0
+        const expectedBaMaStudents = 24
+        const expectedMasterOnlyStudents = 2
         cy.cs('studyright-type-filter-card').cs('bama').click()
         checkFilteringResult(expectedBaMaStudents)
         cy.cs('studyright-type-filter-card').cs('master').click()
@@ -111,16 +111,16 @@ describe('Population Statistics with CS master', () => {
 })
 
 describe('Population Statistics', () => {
-  const pathToCSBach2018 =
-    '/populations?months=36&semesters=FALL&semesters=SPRING&studyRights={%22programme%22%3A%22KH50_005%22}&tag&year=2018'
-  const defaultAmountOfStudents = 159
+  const pathToMathBSc2020 =
+    '/populations?months=49&semesters=FALL&semesters=SPRING&studyRights=%7B"programme"%3A"KH50_001"%7D&year=2020'
+  const defaultAmountOfStudents = 27
   const runTestStepWithPreAndPostParts = createRunTestStepWithPreAndPostPartsFunction(defaultAmountOfStudents)
 
   beforeEach(() => {
-    cy.init(pathToCSBach2018)
+    cy.init(pathToMathBSc2020)
   })
 
-  it('Transfer filter is on not transferred by default', () => {
+  it("Transfer filter is set to 'not transferred' by default", () => {
     cy.contains('By default only students who have not transferred to this study programme are shown.')
 
     runTestStepWithPreAndPostParts('TransferredToProgramme', () => {
@@ -133,7 +133,7 @@ describe('Population Statistics', () => {
     runTestStepWithPreAndPostParts('GraduatedFromProgramme', () => {
       const getCard = () => cy.cs('GraduatedFromProgramme-filter-card')
 
-      const graduated = 11
+      const graduated = 16
       getCard().cs('option-graduated-true').click()
       checkFilteringResult(graduated)
       getCard().cs('option-graduated-false').click()
@@ -142,45 +142,44 @@ describe('Population Statistics', () => {
     })
   })
 
-  // it('Transfer filter works', () => {
-  //   runTestStepWithPreAndPostParts('TransferredToProgramme', () => {
-  //     const transferred = 1
-  //     cy.cs('TransferredToProgramme-filter-card').cs('option-have').click()
-  //     checkFilteringResult(transferred)
-  //     cy.cs('TransferredToProgramme-filter-card').cs('option-all').click()
-  //     checkFilteringResult(defaultAmountOfStudents + transferred)
-  //     cy.cs('TransferredToProgramme-filter-card').cs('option-havenot').click()
-  //   })
-  // })
+  it('Transfer filter works', () => {
+    runTestStepWithPreAndPostParts('TransferredToProgramme', () => {
+      const transferred = 3
+      cy.cs('TransferredToProgramme-filter-card').cs('option-have').click()
+      checkFilteringResult(transferred)
+      cy.cs('TransferredToProgramme-filter-card').cs('option-all').click()
+      checkFilteringResult(defaultAmountOfStudents + transferred)
+      cy.cs('TransferredToProgramme-filter-card').cs('option-havenot').click()
+    })
+  })
 
   it('Enrollment filter works', () => {
     runTestStepWithPreAndPostParts('EnrollmentStatus', () => {
       cy.cs('enrollmentStatusFilter-status').selectFromDropdown(0)
       cy.cs('enrollmentStatusFilter-semesters').selectFromDropdown(5)
-      checkFilteringResult(148)
+      checkFilteringResult(25)
       clearSemanticUIMultipleDropDownSelection('enrollmentStatusFilter-semesters')
     })
   })
 
   it('Credit filter works', { retries: 3 }, () => {
     runTestStepWithPreAndPostParts('CreditsEarned', () => {
-      testRangeFilter('CreditsEarned-filter-card', 50, 150, 118)
+      testRangeFilter('CreditsEarned-filter-card', 50, 150, 12)
     })
   })
 
   it('Age filter works', { retries: 3 }, () => {
-    cy.clock(MOCKED_DATE, ['Date'])
     runTestStepWithPreAndPostParts('Age', () => {
-      testRangeFilter('Age-filter-card', 20, 40, 47)
+      testRangeFilter('Age-filter-card', 23, 30, 21)
     })
   })
 
   it('Gender filter works', () => {
     runTestStepWithPreAndPostParts('Gender', () => {
       cy.cs('genderFilter-dropdown').selectFromDropdown(0)
-      checkFilteringResult(42)
+      checkFilteringResult(13)
       cy.cs('genderFilter-dropdown').selectFromDropdown(1)
-      checkFilteringResult(117)
+      checkFilteringResult(14)
       cy.cs('genderFilter-dropdown').selectFromDropdown(2)
       checkFilteringResult(0)
       cy.cs('genderFilter-dropdown').selectFromDropdown(3)
@@ -194,48 +193,46 @@ describe('Population Statistics', () => {
       cy.cs('startYearAtUni-dropdown').selectFromDropdown(0)
       checkFilteringResult(1)
       clearSemanticUIMultipleDropDownSelection('startYearAtUni-dropdown')
-      cy.cs('startYearAtUni-dropdown').selectFromDropdown(14)
-      checkFilteringResult(136)
+      cy.cs('startYearAtUni-dropdown').selectFromDropdown(6)
+      checkFilteringResult(21)
       clearSemanticUIMultipleDropDownSelection('startYearAtUni-dropdown')
     })
   })
 
-  // Return when we have +2020 population with admission types in data
-  it.skip('Admission type filter works', () => {
-    runTestStepWithPreAndPostParts('AdmissionTypeFilter', () => {
+  it('Admission type filter works', () => {
+    runTestStepWithPreAndPostParts('AdmissionType', () => {
       cy.cs('admissionTypeFilter-dropdown').selectFromDropdown(0)
-      checkFilteringResult(5)
-      cy.cs('admissionTypeFilter-dropdown').selectFromDropdown(2)
-      checkFilteringResult(10)
+      checkFilteringResult(18)
+      cy.cs('admissionTypeFilter-dropdown').selectFromDropdown(1)
+      checkFilteringResult(6)
       clearSingleDropdownSelection('admissionTypeFilter-dropdown')
     })
   })
 
   it('Courses filter works', () => {
     runTestStepWithPreAndPostParts('Courses', () => {
-      const courses = ['TKT20002', 'MAT11002']
-      cy.cs('courseFilter-course-dropdown').click().contains(`${courses[0]} - Ohjelmistotekniikka`).click()
-      checkFilteringResult(133)
-      cy.cs(`courseFilter-${courses[0]}-dropdown`).selectFromDropdown(1)
-      checkFilteringResult(127)
-      cy.cs('courseFilter-course-dropdown')
-        .click()
-        .contains(`${courses[1]} - Lineaarialgebra ja matriisilaskenta I`)
-        .click()
-      checkFilteringResult(100)
-      cy.cs(`courseFilter-${courses[1]}-dropdown`).selectFromDropdown(2)
-      checkFilteringResult(1)
-      courses.forEach(course => cy.cs(`courseFilter-${course}-clear`).click())
+      const courses = [
+        { code: 'MAT21012', name: 'Differentiaaliyhtälöt I' },
+        { code: 'MFK-M204', name: 'Matematiikkaa kaikkialla' },
+      ]
+      cy.cs('courseFilter-course-dropdown').click().contains(`${courses[0].code} - ${courses[0].name}`).click()
+      checkFilteringResult(10)
+      cy.cs(`courseFilter-${courses[0].code}-dropdown`).selectFromDropdown(1) // Passed students
+      checkFilteringResult(8)
+      cy.cs('courseFilter-course-dropdown').click().contains(`${courses[1].code} - ${courses[1].name}`).click()
+      checkFilteringResult(6)
+      cy.cs(`courseFilter-${courses[1].code}-dropdown`).selectFromDropdown(1)
+      checkFilteringResult(5)
+      courses.forEach(({ code }) => cy.cs(`courseFilter-${code}-clear`).click())
     })
   })
 
   it('Filter combinations work', () => {
-    cy.clock(MOCKED_DATE, ['Date'])
     runTestStepWithPreAndPostParts('GraduatedFromProgramme', () => {
       runTestStepWithPreAndPostParts('Age', () => {
         const getCard = () => cy.cs('GraduatedFromProgramme-filter-card')
         getCard().cs('option-graduated-true').click()
-        testRangeFilter('Age-filter-card', 20, 30, 1)
+        testRangeFilter('Age-filter-card', 23, 30, 12)
         getCard().cs('option-all').click()
       })
     })
@@ -244,10 +241,10 @@ describe('Population Statistics', () => {
   it('"Reset All Filters" button works', { retries: 3 }, () => {
     cy.cs('Gender-header').click()
     cy.cs('genderFilter-dropdown').selectFromDropdown(0)
-    checkFilteringResult(42)
+    checkFilteringResult(13)
     cy.cs('StartYearAtUni-header').click()
-    cy.cs('startYearAtUni-dropdown').selectFromDropdown(7)
-    checkFilteringResult(33)
+    cy.cs('startYearAtUni-dropdown').selectFromDropdown(5)
+    checkFilteringResult(8)
     cy.cs('reset-all-filters').click()
     checkFilteringResult(defaultAmountOfStudents)
   })
@@ -258,21 +255,21 @@ describe('Population Statistics', () => {
 })
 
 describe('Course Statistics', () => {
-  const pathToDSAndAlgoSpring2019 =
-    '/coursepopulation?coursecodes=%5B%22TKT20001%22%2C%2258131%22%5D&from=138&separate=true&to=138&years=Kev%C3%A4t%202019&unifyCourses=unifyStats'
-  const defaultAmountOfStudents = 118
+  const pathToLimits2021 =
+    '/coursepopulation?coursecodes=%5B"MAT11003"%2C"57116"%2C"57016"%2C"AYMAT11003"%5D&from=72&separate=false&to=72&unifyCourses=unifyStats&years=2021-2022'
+  const defaultAmountOfStudents = 48
   const runTestStepWithPreAndPostParts = createRunTestStepWithPreAndPostPartsFunction(defaultAmountOfStudents)
 
   beforeEach(() => {
-    cy.init(pathToDSAndAlgoSpring2019)
+    cy.init(pathToLimits2021)
   })
 
   it('Grade filter works', () => {
     runTestStepWithPreAndPostParts('Grade', () => {
       cy.cs('gradeFilter-5').click()
-      checkFilteringResult(20)
+      checkFilteringResult(23)
       cy.cs('gradeFilter-3').click()
-      checkFilteringResult(38)
+      checkFilteringResult(29)
       cy.cs('gradeFilter-3').click()
       cy.cs('gradeFilter-5').click()
     })
@@ -284,29 +281,27 @@ describe('Course Statistics', () => {
     })
   })
 
-  // Let's skip this test until we have new set of test data
-  it.skip('Programme filter works', () => {
+  it('Programme filter works', () => {
     runTestStepWithPreAndPostParts('Programme', () => {
       const card = cy.cs('Programme-filter-card')
       const programmeDropdown = card.cs('Programme-filter-dropdown').selectFromDropdown(2)
-      checkFilteringResult(116)
+      checkFilteringResult(30)
       programmeDropdown.get('i.delete').click()
     })
   })
 
   it('Age filter works', () => {
-    cy.clock(MOCKED_DATE, ['Date'])
     runTestStepWithPreAndPostParts('Age', () => {
-      testRangeFilter('Age-filter-card', 20, 40, 33)
+      testRangeFilter('Age-filter-card', 21, 30, 36)
     })
   })
 
   it('Gender filter works', () => {
     runTestStepWithPreAndPostParts('Gender', () => {
       cy.cs('genderFilter-dropdown').selectFromDropdown(0)
-      checkFilteringResult(27)
+      checkFilteringResult(9)
       cy.cs('genderFilter-dropdown').selectFromDropdown(1)
-      checkFilteringResult(91)
+      checkFilteringResult(39)
       cy.cs('genderFilter-dropdown').selectFromDropdown(2)
       checkFilteringResult(0)
       cy.cs('genderFilter-dropdown').selectFromDropdown(3)
@@ -317,22 +312,22 @@ describe('Course Statistics', () => {
 
   it('Starting year filter works', () => {
     runTestStepWithPreAndPostParts('StartYearAtUni', () => {
-      cy.cs('startYearAtUni-dropdown').selectFromDropdown([0])
+      cy.cs('startYearAtUni-dropdown').selectFromDropdown(0)
       checkFilteringResult(1)
       clearSemanticUIMultipleDropDownSelection('startYearAtUni-dropdown')
-      cy.cs('startYearAtUni-dropdown').selectFromDropdown(13)
-      checkFilteringResult(71)
+      cy.cs('startYearAtUni-dropdown').selectFromDropdown(10)
+      checkFilteringResult(24)
       clearSemanticUIMultipleDropDownSelection('startYearAtUni-dropdown')
     })
   })
 
   it('Filter combinations work', () => {
-    cy.clock(MOCKED_DATE, ['Date'])
     runTestStepWithPreAndPostParts('Grade', () => {
       runTestStepWithPreAndPostParts('Age', () => {
-        cy.cs('gradeFilter-3').click()
-        testRangeFilter('Age-filter-card', 20, 30, 1)
-        cy.cs('gradeFilter-3').click()
+        cy.cs('gradeFilter-5').click()
+        checkFilteringResult(23)
+        testRangeFilter('Age-filter-card', 21, 30, 17)
+        cy.cs('gradeFilter-5').click()
       })
     })
   })
@@ -353,9 +348,8 @@ describe('Custom Population Statistics', () => {
   })
 
   it('Age filter works', () => {
-    cy.clock(MOCKED_DATE, ['Date'])
     runTestStepWithPreAndPostParts('Age', () => {
-      testRangeFilter('Age-filter-card', 20, 30, 1)
+      testRangeFilter('Age-filter-card', 24, 28, 5)
     })
   })
 
@@ -377,39 +371,38 @@ describe('Custom Population Statistics', () => {
   it('Gender filter works', () => {
     runTestStepWithPreAndPostParts('Gender', () => {
       cy.cs('genderFilter-dropdown').selectFromDropdown(0)
-      checkFilteringResult(3)
+      checkFilteringResult(5)
       cy.cs('genderFilter-dropdown').selectFromDropdown(1)
-      checkFilteringResult(2)
+      checkFilteringResult(3)
       cy.cs('genderFilter-dropdown').selectFromDropdown(2)
       checkFilteringResult(0)
       clearSingleDropdownSelection('genderFilter-dropdown')
-      checkFilteringResult(5, true)
     })
   })
 
   it('Starting year filter works', () => {
     runTestStepWithPreAndPostParts('StartYearAtUni', () => {
-      cy.cs('startYearAtUni-dropdown').selectFromDropdown([0])
-      checkFilteringResult(1)
+      cy.cs('startYearAtUni-dropdown').selectFromDropdown(0)
+      checkFilteringResult(2)
       clearSemanticUIMultipleDropDownSelection('startYearAtUni-dropdown')
-      cy.cs('startYearAtUni-dropdown').click()
     })
   })
 
   it('Courses filter works', () => {
     runTestStepWithPreAndPostParts('Courses', () => {
-      const courses = ['MAT11001', 'TKT20004']
-      cy.cs('courseFilter-course-dropdown').click().contains(`${courses[0]} - Johdatus yliopistomatematiikkaan`).click()
+      const courses = [
+        { code: 'MAT11005', name: 'Integraalilaskenta' },
+        { code: 'MAT21007', name: 'Mitta ja integraali' },
+      ]
+      cy.cs('courseFilter-course-dropdown').click().contains(`${courses[0].code} - ${courses[0].name}`).click()
+      checkFilteringResult(7)
+      cy.cs(`courseFilter-${courses[0].code}-dropdown`).selectFromDropdown(1)
+      checkFilteringResult(6)
+      cy.cs('courseFilter-course-dropdown').click().contains(`${courses[1].code} - ${courses[1].name}`).click()
       checkFilteringResult(5)
-      cy.cs(`courseFilter-${courses[0]}-dropdown`).selectFromDropdown(1)
-      checkFilteringResult(5)
-      cy.cs('courseFilter-course-dropdown').click().contains(`${courses[1]} - Tietoliikenteen perusteet`).click()
-      checkFilteringResult(5)
-      cy.cs(`courseFilter-${courses[1]}-dropdown`).selectFromDropdown(1)
-      checkFilteringResult(3)
-      cy.cs(`courseFilter-${courses[1]}-dropdown`).selectFromDropdown(2)
-      checkFilteringResult(1)
-      courses.forEach(course => cy.cs(`courseFilter-${course}-clear`).click())
+      cy.cs(`courseFilter-${courses[1].code}-dropdown`).selectFromDropdown(3)
+      checkFilteringResult(2)
+      courses.forEach(({ code }) => cy.cs(`courseFilter-${code}-clear`).click())
     })
   })
 })

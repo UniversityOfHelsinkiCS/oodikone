@@ -22,8 +22,8 @@ const selectSavedCourselist = name => {
 const deleteAllSearches = () => {
   cy.contains('Saved courselists')
     .get('.dropdown')
-    .then(d => {
-      const searchItems = d.find('div[role=option] > span[class=text]')
+    .then(dropdown => {
+      const searchItems = dropdown.find('div[role=option] > span[class=text]')
       for (let i = 0; i < searchItems.length; i++) {
         if (searchItems[i].textContent.includes('TEST-')) {
           cy.get('[data-cy="history-search"]').children().eq(0).type(searchItems[i].textContent).type('{enter}')
@@ -85,10 +85,12 @@ describe('When search modal is opened', () => {
     })
 
     it('Pushes the query to url', () => {
-      cy.url().should(
-        'include',
-        '/completedcoursessearch?courseList=TKT10001&courseList=TKT10002&courseList=TKT10003&courseList=TKT10004&studentList=010450938&studentList=010589388&studentList=010614509'
-      )
+      cy.fixture('completedCoursesData').then(({ studentSet1, coursesSet1 }) => {
+        cy.url().should(
+          'include',
+          `/completedcoursessearch?courseList=${coursesSet1.join('&courseList=')}&studentList=${studentSet1.join('&studentList=')}`
+        )
+      })
     })
 
     it('Finds correct students and courses', () => {
@@ -96,6 +98,8 @@ describe('When search modal is opened', () => {
         cy.get('[data-cy="completed-courses-table-div"]').should('contain.text', studentSet1[0])
         cy.get('[data-cy="completed-courses-table-div"]').should('contain.text', studentSet1[1])
         cy.get('[data-cy="completed-courses-table-div"]').should('contain.text', studentSet1[2])
+        cy.get('[data-cy="completed-courses-table-div"]').should('contain.text', studentSet1[3])
+        cy.get('[data-cy="completed-courses-table-div"]').should('contain.text', studentSet1[4])
         cy.get('[data-cy="completed-courses-table-div"]').should('contain.text', coursesSet1[0])
         cy.get('[data-cy="completed-courses-table-div"]').should('contain.text', coursesSet1[1])
         cy.get('[data-cy="completed-courses-table-div"]').should('contain.text', coursesSet1[2])

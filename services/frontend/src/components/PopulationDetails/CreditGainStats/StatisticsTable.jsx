@@ -17,7 +17,7 @@ export const StatisticsTable = ({ filteredStudents, type }) => {
   const stdev = Math.sqrt(mean(credits.map(value => (value - average) ** 2)))
 
   return (
-    <div className="statistics-table">
+    <div className="statistics-table" data-cy={`statistics-table-${type}`}>
       <h3 style={{ marginBottom: '0.1em' }}>{type}</h3>
       <div data-cy="credit-stats-population-size">
         <em>n</em> = {credits.length}
