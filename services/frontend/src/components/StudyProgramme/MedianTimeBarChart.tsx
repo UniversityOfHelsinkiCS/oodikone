@@ -40,8 +40,8 @@ export const MedianTimeBarChart = ({ byStartYear, data, goal, title }: MedianTim
     return Number.isNaN(percent) ? 0 : percent
   }
 
-  const getDataLabel = (amount: number, classSize: number) => {
-    if (byStartYear) {
+  const getDataLabel = (amount: number, classSize: number, title: string) => {
+    if (byStartYear && title !== 'Bachelor + master studyright') {
       return `${amount} graduated (${getPercentage(amount, classSize)} % of class)`
     }
     return `${amount} graduated`
@@ -52,10 +52,18 @@ export const MedianTimeBarChart = ({ byStartYear, data, goal, title }: MedianTim
     return data.length * multiplier + 100
   }
 
-  const getTooltipText = (amount: number, y: number, year: string, statistics: Statistics, classSize: number) => {
-    const sortingText = byStartYear
-      ? `<b>From class of ${year}, ${amount}/${classSize} students have graduated</b>`
-      : `<b>${amount} students graduated in year ${year}</b>`
+  const getTooltipText = (
+    amount: number,
+    y: number,
+    year: string,
+    statistics: Statistics,
+    classSize: number,
+    title: string
+  ) => {
+    const sortingText =
+      byStartYear && title !== 'Bachelor + master studyright'
+        ? `<b>From class of ${year}, ${amount}/${classSize} students have graduated</b>`
+        : `<b>${amount} students graduated in year ${year}</b>`
 
     const timeText = `<br />${sortingText}<br /><b>median study time: ${y} months</b><br />`
 
@@ -79,7 +87,14 @@ export const MedianTimeBarChart = ({ byStartYear, data, goal, title }: MedianTim
         y: number
         point: { amount: number; name: string; statistics: Statistics; classSize: number }
       }) {
-        return getTooltipText(this.point.amount, this.y, this.point.name, this.point.statistics, this.point.classSize)
+        return getTooltipText(
+          this.point.amount,
+          this.y,
+          this.point.name,
+          this.point.statistics,
+          this.point.classSize,
+          title
+        )
       },
     },
     plotOptions: {
@@ -103,7 +118,7 @@ export const MedianTimeBarChart = ({ byStartYear, data, goal, title }: MedianTim
               textOutline: 'none',
             },
             formatter: function (this: { point: { amount: number; classSize: number } }) {
-              return getDataLabel(this.point.amount, this.point.classSize)
+              return getDataLabel(this.point.amount, this.point.classSize, title)
             },
           },
         ],
