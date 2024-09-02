@@ -173,6 +173,8 @@ jobs:
             spec: cypress/e2e/Study_guidance_groups.js
           - name: 'Test evaluation overview'
             spec: cypress/e2e/Evaluation_overview.js
+          - name: 'Test university'
+            spec: cypress/e2e/University.js
     name: ${{ matrix.name }}
     steps:
       - uses: actions/checkout@v4
