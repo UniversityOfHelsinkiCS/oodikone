@@ -57,7 +57,7 @@ export const getDegreeProgrammesOfOrganization = async (organizationId: string, 
       programme.code in programmeCodes ? programmeCodes[programme.code as keyof typeof programmeCodes] : programme.code,
   }))
   const programmesGroupedByCode = groupBy(orderBy(programmesWithProgIds, ['valid_from'], ['desc']), prog => prog.code)
-  const cucciculumPeriods = await getCurriculumPeriods()
+  const curriculumPeriods = await getCurriculumPeriods()
   const relevantProgrammes: ProgrammeModuleWithRelevantAttributes[] = []
 
   for (const programmeVersions of Object.values(programmesGroupedByCode)) {
@@ -71,7 +71,7 @@ export const getDegreeProgrammesOfOrganization = async (organizationId: string, 
     const yearsOfProgramme = programmeVersions
       .map(prog =>
         prog.curriculum_period_ids.map(curriculumPeriodId => {
-          return mapCurriculumPeriodIdToYear(curriculumPeriodId, cucciculumPeriods)
+          return mapCurriculumPeriodIdToYear(curriculumPeriodId, curriculumPeriods)
         })
       )
       .flat()
