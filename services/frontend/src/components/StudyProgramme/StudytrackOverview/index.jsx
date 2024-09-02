@@ -169,14 +169,14 @@ export const StudytrackOverview = ({
                         byStartYear
                         data={stats?.data?.graduationTimes[track].medians.combo}
                         goal={stats?.data?.graduationTimes.goals.combo}
-                        title={getGraduationGraphTitle(track, stats?.data.doCombo)}
+                        title={getGraduationGraphTitle(studyprogramme, stats?.data.doCombo)}
                       />
                     )}
                     <MedianTimeBarChart
                       byStartYear
                       data={stats?.data?.graduationTimes[track].medians.basic}
                       goal={stats?.data?.graduationTimes.goals.basic}
-                      title={getGraduationGraphTitle(track, false)}
+                      title={getGraduationGraphTitle(studyprogramme, false)}
                     />
                     {combinedProgramme && (
                       <MedianTimeBarChart
