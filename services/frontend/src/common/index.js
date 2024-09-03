@@ -429,7 +429,7 @@ export const bachelorHonoursBasicModules = {
 // Similarly intermediate modules from Sisu programme structures. All modules
 // that can be found for the past years' structures taken into account
 export const bachelorHonoursIntermediateModules = {
-  KH50_001: ['mat217', 'MAT210', 'MAT220', 'MAT240', 'MAT213', 'MAT230', 'MAT218', 'MAT011'],
+  KH50_001: ['MAT217', 'MAT210', 'MAT220', 'MAT240', 'MAT213', 'MAT230', 'MAT218', 'MAT011'],
   KH50_002: ['FYS2100', 'FYS2200', 'FYS2300', 'FYS2400', 'FYS2500', 'FYS2600'],
   KH50_003: ['KEK200'],
   KH50_004: ['MFK-M200', 'MFK-F200', 'MFK-K200'],
