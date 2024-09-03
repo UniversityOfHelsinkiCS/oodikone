@@ -10,8 +10,6 @@ services:
       POSTGRES_DB: kone-db
       POSTGRES_HOST_AUTH_METHOD: trust
     image: postgres:15.8
-    profiles:
-      - oodikone
 
   sis-db:
     <<: *defaults
@@ -31,8 +29,6 @@ services:
       POSTGRES_DB: sis-importer-db
       POSTGRES_HOST_AUTH_METHOD: trust
     image: postgres:15.8
-    profiles:
-      - updater
 
   user-db:
     <<: *defaults
@@ -42,5 +38,3 @@ services:
       POSTGRES_DB: user-db
       POSTGRES_HOST_AUTH_METHOD: trust
     image: postgres:15.8
-    profiles:
-      - oodikone
