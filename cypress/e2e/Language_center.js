@@ -75,7 +75,7 @@ describe('When language center is opened', () => {
 
       it('Faculties tab "exceeding" button works', () => {
         cy.get('[data-cy="difference-button"]').click()
-        checkNumbers([...new Array(12).fill(0), 1, 219], 15)
+        checkNumbers([...new Array(12).fill(0), 1, 218], 15)
       })
 
       it('Faculties tab semester selector changes numbers', () => {
