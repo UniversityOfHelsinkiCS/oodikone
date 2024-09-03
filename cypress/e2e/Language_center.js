@@ -64,7 +64,7 @@ describe('When language center is opened', () => {
         cy.get('table > tbody > tr:first').within(() => {
           cy.get('td').should('have.length', 15)
           cy.get('td').eq(0).contains('All courses total')
-          const numbers = [36, 9, 30, 749, 15, 40, 6, 48, 1, 24, 1058, 56, 0, 2072]
+          const numbers = [36, 9, 33, 751, 15, 40, 6, 49, 1, 24, 1059, 53, 0, 2076]
           numbers.forEach((number, index) => {
             cy.get('td')
               .eq(index + 1)
@@ -75,12 +75,12 @@ describe('When language center is opened', () => {
 
       it('Faculties tab "exceeding" button works', () => {
         cy.get('[data-cy="difference-button"]').click()
-        checkNumbers([...new Array(12).fill(0), 1, 240], 15)
+        checkNumbers([...new Array(12).fill(0), 1, 219], 15)
       })
 
       it('Faculties tab semester selector changes numbers', () => {
         chooseSemester('Syksy 2020', 'from')
-        checkNumbers([28, 6, 24, 489, 4, 10, 2, 33, 0, 9, 535, 41, 0, 1181], 15)
+        checkNumbers([28, 6, 27, 491, 4, 10, 2, 34, 0, 9, 535, 38, 0, 1184], 15)
       })
     })
 
@@ -92,12 +92,12 @@ describe('When language center is opened', () => {
       })
 
       it('Semester tab shows numbers', () => {
-        checkNumbers([69, 26, 298, 58, 342, 98, 437, 138, 310, 90, 123, 73, 9, 1, 2072], 16)
+        checkNumbers([69, 26, 298, 58, 343, 98, 438, 138, 310, 90, 123, 74, 10, 1, 2076], 16)
       })
 
       it('Coloring mode works on semester tab', () => {
         cy.contains('Compare to average of course').click()
-        const expectedAlphas = [0.04, 0.016, 0.17, 0.03, 0.192, 0.055, 0.247, 0.08, 0.176, 0.05, 0.07, 0.04, 0.004, 0]
+        const expectedAlphas = [0.04, 0.016, 0.17, 0.03, 0.192, 0.055, 0.247, 0.08, 0.173, 0.05, 0.07, 0.043, 0.004, 0]
 
         checkStyle(
           expectedAlphas.map(alpha => `background-color: rgba(0, 170, 0, ${alpha})`),

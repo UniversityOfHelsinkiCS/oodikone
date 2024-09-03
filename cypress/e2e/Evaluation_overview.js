@@ -16,7 +16,7 @@ describe('Evaluation overview', () => {
 
     it('Progress data is shown correctly with graduated included', () => {
       cy.get('[data-cy="Graph-StudytrackProgress"]').within(() => {
-        const totalStats = ['13.4%', '6.9%', '9.2%', '9.2%', '4.6%', '6.0%', '50.7%']
+        const totalStats = ['12.9%', '6.9%', '9.7%', '9.2%', '3.7%', '6.0%', '51.6%']
         for (const stat of totalStats) {
           cy.contains(stat)
         }
@@ -28,12 +28,12 @@ describe('Evaluation overview', () => {
         ...years.map(year => [year, 0, 0, 0, 0, 0, 0, 0, 0]),
         ['2023 - 2024', 8, 8, 0, 0, 0, 0, 0, 0],
         ['2022 - 2023', 26, 9, 9, 4, 3, 0, 1, 0],
-        ['2021 - 2022', 32, 9, 2, 8, 8, 5, 0, 0],
+        ['2021 - 2022', 32, 8, 3, 8, 8, 5, 0, 0],
         ['2020 - 2021', 27, 2, 1, 3, 6, 2, 4, 9],
-        ['2019 - 2020', 33, 1, 1, 1, 1, 1, 3, 25],
-        ['2018 - 2019', 44, 0, 1, 1, 2, 0, 4, 36],
-        ['2017 - 2018', 47, 0, 1, 3, 0, 2, 1, 40],
-        ['Total', 217, 29, 15, 20, 20, 10, 13, 110],
+        ['2019 - 2020', 33, 1, 0, 2, 1, 0, 3, 26],
+        ['2018 - 2019', 44, 0, 1, 1, 2, 0, 3, 37],
+        ['2017 - 2018', 47, 0, 1, 3, 0, 1, 2, 40],
+        ['Total', 217, 28, 15, 21, 20, 8, 13, 112],
       ]
 
       cy.checkTableStats(tableContents, 'StudytrackProgress')
@@ -42,7 +42,7 @@ describe('Evaluation overview', () => {
     it('Progress data is shown correctly with graduated excluded', () => {
       cy.get('[data-cy=GraduatedToggle]').click()
       cy.get('[data-cy="Graph-StudytrackProgress"]').within(() => {
-        const totalStats = ['31.9%', '15.4%', '20.9%', '20.9%', '5.5%', '4.4%']
+        const totalStats = ['30.8%', '15.4%', '22.0%', '20.9%', '4.4%', '5.5%']
         for (const stat of totalStats) {
           cy.contains(stat)
         }
@@ -54,12 +54,12 @@ describe('Evaluation overview', () => {
         ...years.map(year => [year, 0, 0, 0, 0, 0, 0, 0, 0]),
         ['2023 - 2024', 8, 8, 0, 0, 0, 0, 0, 0],
         ['2022 - 2023', 24, 9, 8, 4, 3, 0, 0, 0],
-        ['2021 - 2022', 31, 9, 2, 8, 8, 4, 0, 0],
+        ['2021 - 2022', 31, 8, 3, 8, 8, 4, 0, 0],
         ['2020 - 2021', 11, 2, 1, 2, 5, 0, 0, 1],
-        ['2019 - 2020', 7, 1, 1, 1, 1, 0, 1, 2],
+        ['2019 - 2020', 7, 1, 0, 2, 1, 0, 0, 3],
         ['2018 - 2019', 5, 0, 1, 1, 2, 0, 0, 1],
-        ['2017 - 2018', 5, 0, 1, 3, 0, 1, 0, 0],
-        ['Total', 91, 29, 14, 19, 19, 5, 1, 4],
+        ['2017 - 2018', 5, 0, 1, 3, 0, 0, 1, 0],
+        ['Total', 91, 28, 14, 20, 19, 4, 1, 5],
       ]
 
       cy.checkTableStats(tableContents, 'StudytrackProgress')
@@ -203,7 +203,7 @@ describe('Evaluation overview', () => {
       describe('Bachelor stats', () => {
         it('graph with graduated included is shown correctly', () => {
           cy.get('[data-cy="Graph-FacultyBachelorsProgress"]').within(() => {
-            const totalStats = ['12.5%', '5.6%', '6.9%', '8.5%', '5.6%', '6.6%', '54.2%']
+            const totalStats = ['12.2%', '5.3%', '7.5%', '8.2%', '5.3%', '6.3%', '55.2%']
             for (const stat of totalStats) {
               cy.contains(stat)
             }
@@ -213,7 +213,7 @@ describe('Evaluation overview', () => {
         it('graph with graduated excluded is shown correctly', () => {
           cy.get('[data-cy="GraduatedToggle"]').click()
           cy.get('[data-cy="Graph-FacultyBachelorsProgress"]').within(() => {
-            const totalStats = ['31.3%', '13.3%', '16.4%', '20.3%', '7.0%', '3.1%', '8.6%']
+            const totalStats = ['30.5%', '12.5%', '18.0%', '19.5%', '7.0%', '3.1%', '9.4%']
             for (const stat of totalStats) {
               cy.contains(stat)
             }
@@ -227,12 +227,12 @@ describe('Evaluation overview', () => {
             ...years.map(year => [year, 0, 0, 0, 0, 0, 0, 0, 0]),
             ['2023 - 2024', 14, 13, 0, 0, 0, 0, 0, 1],
             ['2022 - 2023', 32, 11, 10, 6, 4, 0, 1, 0],
-            ['2021 - 2022', 44, 11, 4, 8, 11, 7, 1, 2],
+            ['2021 - 2022', 44, 10, 4, 9, 11, 7, 1, 2],
             ['2020 - 2021', 38, 3, 1, 3, 7, 3, 8, 13],
-            ['2019 - 2020', 50, 2, 1, 1, 2, 4, 6, 34],
-            ['2018 - 2019', 75, 0, 1, 1, 2, 2, 4, 65],
-            ['2017 - 2018', 66, 0, 1, 3, 1, 2, 1, 58],
-            ['Total', 319, 40, 18, 22, 27, 18, 21, 173],
+            ['2019 - 2020', 50, 2, 0, 2, 1, 4, 5, 36],
+            ['2018 - 2019', 75, 0, 1, 1, 2, 2, 3, 66],
+            ['2017 - 2018', 66, 0, 1, 3, 1, 1, 2, 58],
+            ['Total', 319, 39, 17, 24, 26, 17, 20, 176],
           ]
           cy.checkTableStats(tableContents, 'FacultyBachelorsProgress')
         })
@@ -245,12 +245,12 @@ describe('Evaluation overview', () => {
             ...years.map(year => [year, 0, 0, 0, 0, 0, 0, 0, 0]),
             ['2023 - 2024', 14, 13, 0, 0, 0, 0, 0, 1],
             ['2022 - 2023', 30, 11, 9, 6, 4, 0, 0, 0],
-            ['2021 - 2022', 41, 11, 4, 8, 11, 6, 0, 1],
+            ['2021 - 2022', 41, 10, 4, 9, 11, 6, 0, 1],
             ['2020 - 2021', 14, 3, 1, 2, 6, 0, 1, 1],
-            ['2019 - 2020', 14, 2, 1, 1, 2, 2, 3, 3],
+            ['2019 - 2020', 14, 2, 0, 2, 1, 3, 2, 4],
             ['2018 - 2019', 6, 0, 1, 1, 2, 0, 0, 2],
-            ['2017 - 2018', 9, 0, 1, 3, 1, 1, 0, 3],
-            ['Total', 128, 40, 17, 21, 26, 9, 4, 11],
+            ['2017 - 2018', 9, 0, 1, 3, 1, 0, 1, 3],
+            ['Total', 128, 39, 16, 23, 25, 9, 4, 12],
           ]
           cy.checkTableStats(tableContents, 'FacultyBachelorsProgress')
         })
@@ -259,7 +259,7 @@ describe('Evaluation overview', () => {
       describe('Bachelor + master stats', () => {
         it('graph with graduated included is shown correctly', () => {
           cy.get('[data-cy=Graph-FacultyBachelorMastersProgress]').within(() => {
-            const totalStats = ['23.6%', '9.6%', '10.7%', '12.9%', '12.4%', '11.2%', '19.7%']
+            const totalStats = ['21.3%', '8.4%', '10.1%', '14.0%', '12.4%', '6.7%', '27.0%']
             for (const stat of totalStats) {
               cy.contains(stat)
             }
@@ -269,7 +269,7 @@ describe('Evaluation overview', () => {
         it('graph with graduated excluded is shown correctly', () => {
           cy.get('[data-cy="GraduatedToggle"]').click()
           cy.get('[data-cy=Graph-FacultyBachelorMastersProgress]').within(() => {
-            const totalStats = ['31.8%', '12.4%', '14.7%', '16.3%', '14.7%', '3.9%', '6.2%']
+            const totalStats = ['28.7%', '11.6%', '14.0%', '18.6%', '15.5%', '3.1%', '8.5%']
             for (const stat of totalStats) {
               cy.contains(stat)
             }
@@ -284,11 +284,11 @@ describe('Evaluation overview', () => {
             ['2023 - 2024', 0, 0, 0, 0, 0, 0, 0, 0],
             ['2022 - 2023', 2, 2, 0, 0, 0, 0, 0, 0],
             ['2021 - 2022', 4, 2, 0, 0, 0, 1, 0, 1],
-            ['2020 - 2021', 23, 14, 3, 3, 0, 3, 0, 0],
-            ['2019 - 2020', 32, 7, 7, 7, 4, 4, 3, 0],
-            ['2018 - 2019', 63, 12, 1, 6, 13, 5, 11, 15],
-            ['2017 - 2018', 54, 5, 6, 3, 6, 9, 6, 19],
-            ['Total', 178, 42, 17, 19, 23, 22, 20, 35],
+            ['2020 - 2021', 23, 13, 2, 4, 0, 4, 0, 0],
+            ['2019 - 2020', 32, 7, 7, 4, 7, 3, 3, 1],
+            ['2018 - 2019', 63, 10, 2, 5, 13, 7, 4, 22],
+            ['2017 - 2018', 54, 4, 4, 5, 5, 7, 5, 24],
+            ['Total', 178, 38, 15, 18, 25, 22, 12, 48],
           ]
           cy.checkTableStats(tableContents, 'FacultyBachelorMastersProgress')
         })
@@ -302,11 +302,11 @@ describe('Evaluation overview', () => {
             ['2023 - 2024', 0, 0, 0, 0, 0, 0, 0, 0],
             ['2022 - 2023', 2, 2, 0, 0, 0, 0, 0, 0],
             ['2021 - 2022', 4, 2, 0, 0, 0, 1, 0, 1],
-            ['2020 - 2021', 21, 14, 2, 3, 0, 2, 0, 0],
-            ['2019 - 2020', 31, 7, 7, 7, 4, 4, 2, 0],
-            ['2018 - 2019', 41, 11, 1, 6, 12, 5, 2, 4],
-            ['2017 - 2018', 30, 5, 6, 3, 5, 7, 1, 3],
-            ['Total', 129, 41, 16, 19, 21, 19, 5, 8],
+            ['2020 - 2021', 21, 13, 2, 4, 0, 2, 0, 0],
+            ['2019 - 2020', 31, 7, 7, 4, 7, 3, 2, 1],
+            ['2018 - 2019', 41, 9, 2, 5, 12, 7, 1, 5],
+            ['2017 - 2018', 30, 4, 4, 5, 5, 7, 1, 4],
+            ['Total', 129, 37, 15, 18, 24, 20, 4, 11],
           ]
           cy.checkTableStats(tableContents, 'FacultyBachelorMastersProgress')
         })
@@ -315,7 +315,7 @@ describe('Evaluation overview', () => {
       describe('Master stats', () => {
         it('graph with graduated included is shown correctly', () => {
           cy.get('[data-cy=Graph-FacultyMastersProgress]').within(() => {
-            const totalStats = ['16.1%', '12.9%', '6.5%', '12.9%', '9.7%', '19.4%', '22.6%']
+            const totalStats = ['16.1%', '12.9%', '6.5%', '12.9%', '9.7%', '16.1%', '25.8%']
             for (const stat of totalStats) {
               cy.contains(stat)
             }
@@ -340,11 +340,11 @@ describe('Evaluation overview', () => {
             ['2023 - 2024', 4, 4, 0, 0, 0, 0, 0, 0],
             ['2022 - 2023', 5, 0, 1, 1, 2, 0, 0, 1],
             ['2021 - 2022', 8, 1, 2, 0, 2, 1, 1, 1],
-            ['2020 - 2021', 3, 0, 0, 0, 0, 0, 3, 0],
+            ['2020 - 2021', 3, 0, 0, 0, 0, 0, 2, 1],
             ['2019 - 2020', 7, 0, 0, 1, 0, 1, 1, 4],
             ['2018 - 2019', 2, 0, 0, 0, 0, 1, 0, 1],
             ['2017 - 2018', 2, 0, 1, 0, 0, 0, 1, 0],
-            ['Total', 31, 5, 4, 2, 4, 3, 6, 7],
+            ['Total', 31, 5, 4, 2, 4, 3, 5, 8],
           ]
           cy.checkTableStats(tableContents, 'FacultyMastersProgress')
         })
@@ -371,7 +371,7 @@ describe('Evaluation overview', () => {
       describe('Doctor stats', () => {
         it('graph with graduated included is shown correctly', () => {
           cy.get('[data-cy=Graph-FacultyDoctoralProgress]').within(() => {
-            const totalStats = ['6.0%', '20.0%', '14.0%', '18.0%', '42.0%']
+            const totalStats = ['6.0%', '18.0%', '16.0%', '14.0%', '46.0%']
             for (const stat of totalStats) {
               cy.contains(stat)
             }
@@ -381,7 +381,7 @@ describe('Evaluation overview', () => {
         it('graph with graduated excluded is shown correctly', () => {
           cy.get('[data-cy="GraduatedToggle"]').click()
           cy.get('[data-cy=Graph-FacultyDoctoralProgress]').within(() => {
-            const totalStats = ['9.1%', '24.2%', '12.1%', '18.2%', '36.4%']
+            const totalStats = ['9.1%', '24.2%', '12.1%', '15.2%', '39.4%']
             for (const stat of totalStats) {
               cy.contains(stat)
             }
@@ -396,11 +396,11 @@ describe('Evaluation overview', () => {
             ['2023 - 2024', 1, 1, 0, 0, 0, 0],
             ['2022 - 2023', 9, 1, 7, 1, 0, 0],
             ['2021 - 2022', 3, 1, 1, 0, 0, 1],
-            ['2020 - 2021', 5, 0, 0, 2, 2, 1],
+            ['2020 - 2021', 5, 0, 0, 2, 1, 2],
             ['2019 - 2020', 11, 0, 0, 1, 4, 6],
-            ['2018 - 2019', 14, 0, 2, 3, 2, 7],
-            ['2017 - 2018', 7, 0, 0, 0, 1, 6],
-            ['Total', 50, 3, 10, 7, 9, 21],
+            ['2018 - 2019', 14, 0, 1, 4, 2, 7],
+            ['2017 - 2018', 7, 0, 0, 0, 0, 7],
+            ['Total', 50, 3, 9, 8, 7, 23],
           ]
           cy.checkTableStats(tableContents, 'FacultyDoctoralProgress')
         })
@@ -414,11 +414,11 @@ describe('Evaluation overview', () => {
             ['2023 - 2024', 1, 1, 0, 0, 0, 0],
             ['2022 - 2023', 9, 1, 7, 1, 0, 0],
             ['2021 - 2022', 3, 1, 1, 0, 0, 1],
-            ['2020 - 2021', 4, 0, 0, 2, 1, 1],
+            ['2020 - 2021', 4, 0, 0, 2, 0, 2],
             ['2019 - 2020', 9, 0, 0, 1, 4, 4],
             ['2018 - 2019', 5, 0, 0, 0, 1, 4],
             ['2017 - 2018', 2, 0, 0, 0, 0, 2],
-            ['Total', 33, 3, 8, 4, 6, 12],
+            ['Total', 33, 3, 8, 4, 5, 13],
           ]
           cy.checkTableStats(tableContents, 'FacultyDoctoralProgress')
         })

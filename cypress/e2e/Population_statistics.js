@@ -215,7 +215,7 @@ describe('Population Statistics tests', () => {
       const categories = [
         {
           selector: 'All students of the population',
-          data: ['3741.50', '138.57', '141.00', '58.82', '19', '267'],
+          data: ['3773.50', '139.76', '141.00', '60.07', '19', '268'],
           size: 27,
         },
         {
@@ -225,12 +225,12 @@ describe('Population Statistics tests', () => {
         },
         {
           selector: 'Todistusvalinta',
-          data: ['2713.50', '150.75', '178.00', '64.33', '19', '267'],
+          data: ['2742.50', '152.36', '178.00', '65.75', '19', '268'],
           size: 18,
         },
         {
           selector: 'Avoin väylä',
-          data: ['669.00', '111.50', '103.50', '29.03', '82', '168'],
+          data: ['672.00', '112.00', '104.00', '29.40', '82', '169'],
           size: 6,
         },
       ]

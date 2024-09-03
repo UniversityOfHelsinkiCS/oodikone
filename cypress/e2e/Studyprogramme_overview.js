@@ -47,13 +47,13 @@ describe('Studyprogramme overview', () => {
       const years = getEmptyYears()
       const tableContents = [
         ...years.map(year => [year, 0, 0, 0, 0, 0]),
-        [2023, 1519, 1519, 0, 0, 197],
+        [2023, 1519, 1519, 0, 0, 222],
         [2022, 3235, 3205, 0, 30, 209],
-        [2021, 5133, 5108, 0, 25, 260],
-        [2020, 5801, 5796, 0, 5, 70],
-        [2019, 5295, 5295, 0, 0, 90],
+        [2021, 5133, 5108, 0, 25, 428],
+        [2020, 5801, 5796, 0, 5, 94],
+        [2019, 5295, 5295, 0, 0, 162],
         [2018, 3442, 3432, 0, 10, 21],
-        [2017, 1211, 1211, 0, 0, 168],
+        [2017, 1211, 1211, 0, 0, 189],
       ]
 
       cy.checkTableStats(tableContents, 'CreditsProducedByTheStudyprogramme')
@@ -64,13 +64,13 @@ describe('Studyprogramme overview', () => {
       const years = getEmptyYears()
       const tableContents = [
         ...years.map(year => [year, 0, 0, 0, 0, 0, 0, 0]),
-        [2023, 1519, 1519, 0, 0, 0, 0, 197],
+        [2023, 1519, 1519, 0, 0, 0, 0, 222],
         [2022, 3235, 3205, 0, 30, 0, 0, 209],
-        [2021, 5133, 5108, 0, 25, 0, 0, 260],
-        [2020, 5801, 5796, 0, 5, 0, 0, 70],
-        [2019, 5295, 5295, 0, 0, 0, 0, 90],
+        [2021, 5133, 5108, 0, 25, 0, 0, 428],
+        [2020, 5801, 5796, 0, 5, 0, 0, 94],
+        [2019, 5295, 5295, 0, 0, 0, 0, 162],
         [2018, 3442, 3432, 0, 10, 0, 0, 21],
-        [2017, 1211, 1211, 0, 0, 0, 0, 168],
+        [2017, 1211, 1211, 0, 0, 0, 0, 189],
       ]
 
       cy.checkTableStats(tableContents, 'CreditsProducedByTheStudyprogramme')
@@ -145,12 +145,12 @@ describe('Studyprogramme overview', () => {
       const creditTableContents = [
         ...years.map(year => [year, 0, 0, 0, 0, 0]),
         ['2023 - 2024', 160, 160, 0, 0, 67],
-        ['2022 - 2023', 2725, 2720, 0, 5, 312],
+        ['2022 - 2023', 2725, 2720, 0, 5, 337],
         ['2021 - 2022', 4092, 4042, 0, 50, 198],
-        ['2020 - 2021', 5420, 5415, 0, 5, 153],
-        ['2019 - 2020', 6043, 6043, 0, 0, 51],
-        ['2018 - 2019', 4846, 4841, 0, 5, 61],
-        ['2017 - 2018', 2350, 2345, 0, 5, 5],
+        ['2020 - 2021', 5420, 5415, 0, 5, 321],
+        ['2019 - 2020', 6043, 6043, 0, 0, 101],
+        ['2018 - 2019', 4846, 4841, 0, 5, 107],
+        ['2017 - 2018', 2350, 2345, 0, 5, 26],
       ]
 
       cy.checkTableStats(creditTableContents, 'CreditsProducedByTheStudyprogramme')
@@ -169,7 +169,7 @@ describe('Studyprogramme overview', () => {
         .should('contain', 'Degree students')
         .should('contain', 'Transferred')
         .should('contain', 5796)
-        .should('contain', 260)
+        .should('contain', 428)
 
       cy.get('[data-cy=Graph-GraduatedAndThesisWritersOfTheProgramme')
         .should('contain', 'Graduated students')
@@ -349,12 +349,12 @@ describe('Studyprogramme overview', () => {
         ...years.map(year => [year, 0, 0, 0, 0, 0, 0, 0, 0]),
         ['2023 - 2024', 8, 8, 0, 0, 0, 0, 0, 0],
         ['2022 - 2023', 26, 9, 9, 4, 3, 0, 1, 0],
-        ['2021 - 2022', 38, 9, 5, 11, 8, 5, 0, 0],
+        ['2021 - 2022', 38, 8, 6, 11, 8, 5, 0, 0],
         ['2020 - 2021', 30, 2, 1, 3, 7, 4, 4, 9],
-        ['2019 - 2020', 35, 1, 1, 1, 1, 2, 3, 26],
-        ['2018 - 2019', 45, 0, 1, 1, 2, 0, 4, 37],
-        ['2017 - 2018', 47, 0, 1, 3, 0, 2, 1, 40],
-        ['Total', 229, 29, 18, 23, 21, 13, 13, 112],
+        ['2019 - 2020', 35, 1, 0, 2, 1, 0, 4, 27],
+        ['2018 - 2019', 45, 0, 1, 1, 2, 0, 3, 38],
+        ['2017 - 2018', 47, 0, 1, 3, 0, 1, 2, 40],
+        ['Total', 229, 28, 18, 24, 21, 10, 14, 114],
       ]
 
       cy.checkTableStats(tableContents, 'StudytrackProgress')
@@ -365,7 +365,10 @@ describe('Studyprogramme overview', () => {
         .should('contain', 'Less than 30 credits')
         .should('contain', '30–60 credits')
         .should('contain', 'At least 180 credits')
-        .should('contain', '48.9%') // The percentage for total, at least 180 credits, to check that the graph renders
+        .should('contain', '49.8%') // The percentage for total, at least 180 credits, to check that the graph renders
+
+      cy.get('[data-cy=Graph-StudytrackProgress]').contains('49.8%').trigger('mouseover', { force: true })
+      cy.contains('At least 180 credits: 114')
 
       cy.get("[data-cy='graduation-times-graph-breakdownBachelor']").within(() => {
         cy.contains('Start year')
@@ -522,15 +525,15 @@ describe('Studyprogramme overview', () => {
         cy.get('tr')
           .eq(1)
           .within(() => {
-            cy.get('td').eq(0).contains('MAT22015')
-            cy.get('td').eq(1).contains('Stokastiset prosessit')
+            cy.get('td').eq(0).contains('odgi-zef0')
+            cy.get('td').eq(1).contains('Työ- ja organisaatiopsykologian perusopinnot')
           })
         cy.get('th').eq(0).click()
         cy.get('tr')
           .eq(1)
           .within(() => {
-            cy.get('td').eq(0).contains('MAT00100')
-            cy.get('td').eq(1).contains('Työkokemus')
+            cy.get('td').eq(0).contains('MAT-yht')
+            cy.get('td').eq(1).contains('Muut opinnot')
           })
 
         // Course name
@@ -554,8 +557,8 @@ describe('Studyprogramme overview', () => {
         cy.get('tr')
           .eq(1)
           .within(() => {
-            cy.get('td').eq(0).contains('MAT11001')
-            cy.get('td').eq(1).contains('Johdatus yliopistomatematiikkaan')
+            cy.get('td').eq(0).contains('MAT110')
+            cy.get('td').eq(1).contains('Matematiikka, perusopinnot')
           })
         cy.get('th').eq(2).click()
         cy.get('tr')

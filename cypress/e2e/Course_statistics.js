@@ -33,12 +33,12 @@ describe('Course Statistics tests', () => {
         const gradesTableContents = [
           [null, 'TT', 173],
           [null, 'No grade', 10],
-          [null, 'Hyl.', 7],
-          [null, 'HT', 177],
+          [null, 'Hyl.', 8],
+          [null, 'HT', 176],
         ]
         cy.contains('Search for courses')
         cy.get("input[placeholder='Search by a course code']").type('KK-RUKIRJ')
-        cy.contains('td', 'KK-RUKIRJ').click()
+        cy.contains('td', /^KK-RUKIRJ,/).click()
         cy.contains('Search for courses').should('not.exist')
         cy.contains(
           'KK-RULAAK2, KK-RUHYK, KK-RUKIRJ, 992912, AYKK-RUKIRJ, A992912 Toisen kotimaisen kielen kirjallinen taito, ruotsi (CEFR B1)'
