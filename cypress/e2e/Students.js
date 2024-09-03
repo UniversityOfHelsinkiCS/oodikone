@@ -8,6 +8,11 @@ const student = {
   email: 'sisutestidata134902@testisisudata.fi',
 }
 
+const typeStudentNumberAndClick = studentNumber => {
+  cy.get('.prompt').type(studentNumber)
+  cy.contains('td a', studentNumber).click()
+}
+
 describe('Students tests', () => {
   describe('when using basic user', () => {
     beforeEach(() => {
@@ -63,24 +68,21 @@ describe('Students tests', () => {
     })
 
     it("'Update student' button is not shown", () => {
-      cy.get('.prompt').type(student.studentnumber)
-      cy.contains('td a', student.studentnumber).click()
+      typeStudentNumberAndClick(student.studentnumber)
       cy.get('div.ui.fluid.card').within(() => {
         cy.contains('button', 'Update student').should('not.exist')
       })
     })
 
     it('Can get back to search menu', () => {
-      cy.get('.prompt').type(student.studentnumber)
-      cy.contains('td a', student.studentnumber).click()
+      typeStudentNumberAndClick(student.studentnumber)
       cy.go('back')
       cy.contains('Student number').should('not.exist')
       cy.contains('Credits').should('not.exist')
     })
 
     it('Can jump to course', () => {
-      cy.get('.prompt').type(student.studentnumber)
-      cy.contains('td a', student.studentnumber).click()
+      typeStudentNumberAndClick(student.studentnumber)
       cy.contains('Tilastollinen päättely I (MAT12004)')
         .parent()
         .siblings()
@@ -93,19 +95,29 @@ describe('Students tests', () => {
     })
 
     it('Has correct Sisu link', () => {
-      cy.get('.prompt').type(student.studentnumber)
-      cy.contains('td a', student.studentnumber).click()
+      typeStudentNumberAndClick(student.studentnumber)
       cy.get('[data-cy=sisulink] > a')
         .should('have.attr', 'href')
         .and('include', `https://sisu.helsinki.fi/tutor/role/staff/student/${student.sis_person_id}/basic/basic-info`)
     })
 
-    it('Bachelor Honours section is shown', () => {
-      cy.get('.prompt').type(student.studentnumber)
-      cy.contains('td a', student.studentnumber).click()
-      cy.contains('h4', 'Bachelor Honours')
-      cy.contains('.tag.label', 'Not qualified for Honours')
-      cy.contains('.tag.label', 'Has not graduated')
+    it('Semester enrollments can be toggled', () => {
+      typeStudentNumberAndClick(student.studentnumber)
+      const programmes = [
+        'Oikeustieteen tohtoriohjelma',
+        'Matemaattisten tieteiden kandiohjelma',
+        'Oikeustieteen maisterin koulutusohjelmaOikeusnotaarin koulutusohjelma',
+      ]
+      cy.get('div.ui.fluid.card').within(() => {
+        cy.contains('Enrollments').click()
+        cy.get('table tbody tr')
+          .should('have.length', 3)
+          .each(($tr, index) => {
+            cy.wrap($tr).within(() => {
+              cy.get('td').eq(0).should('have.text', programmes[index])
+            })
+          })
+      })
     })
 
     it('Searching with bad inputs doesnt yield results', () => {
@@ -117,13 +129,85 @@ describe('Students tests', () => {
     })
 
     it('Can jump to population page', () => {
-      cy.get('.prompt').type(student.studentnumber)
-      cy.contains('td a', student.studentnumber).click()
+      typeStudentNumberAndClick(student.studentnumber)
       cy.contains('.ui.table', 'Completed').within(() => {
         cy.get('i.level.up.alternate.icon').click()
       })
       cy.contains('Matemaattisten tieteiden kandiohjelma 2020 - 2021')
       cy.contains('class size 30 students')
+    })
+
+    it('Grade graph works in all three different modes', () => {
+      typeStudentNumberAndClick(student.studentnumber)
+      cy.contains('a.item', 'Grade graph').click()
+      cy.contains('text.highcharts-title', 'Grade plot')
+      cy.contains('a.item', 'Show group mean').click()
+      cy.get('.labeled.input').within(() => {
+        cy.contains('.label', 'Group size')
+        cy.get('input').should('have.value', '5')
+      })
+      cy.contains('.highcharts-container text', "Nov '22")
+      cy.contains('.highcharts-container text', "Jul '22").should('not.exist')
+      cy.contains('text.highcharts-title', 'Grade plot')
+      cy.get('.labeled.input').within(() => {
+        cy.contains('.label', 'Group size')
+        cy.get('input').clear().type('10')
+        cy.get('input').should('have.value', '10')
+      })
+      cy.contains('.highcharts-container text', "Jul '22")
+      cy.contains('.highcharts-container text', "Nov '22").should('not.exist')
+      cy.contains('a.item', 'Show semester mean').click()
+      cy.contains('.highcharts-container text', "Jan '22")
+    })
+
+    describe('Bachelor Honours section', () => {
+      it("Shows 'Qualified for Honours' tag and main modules info when the student is qualified", () => {
+        cy.visit('/students/495976')
+        cy.contains('.divider h4', 'Bachelor Honours')
+        cy.contains('.green.tag.label', 'Qualified for Honours')
+        cy.contains('Main courses and other modules').click()
+        cy.get('[data-cy=main-modules] tbody tr')
+          .should('have.length', 3)
+          .each(($tr, index) => {
+            const info = [
+              ['07.05.2020', 'Matemaattisten tieteiden kandiohjelma (KH50_001)', 'Hyv.'],
+              ['08.05.2018', 'Matematiikka, perusopinnot (MAT110)', '4'],
+              ['25.02.2020', 'Matematiikka, aineopinnot (MAT210)', '4'],
+            ]
+            cy.wrap($tr).within(() => {
+              info[index].forEach((text, i) => {
+                cy.get('td').eq(i).contains(text)
+              })
+            })
+          })
+      })
+
+      it("Shows 'Did not graduate in time' when the student has graduated but not in time", () => {
+        cy.visit('/students/540355')
+        cy.contains('.divider h4', 'Bachelor Honours')
+        cy.contains('.red.tag.label', 'Not qualified for Honours')
+        cy.contains('.red.tag.label', 'Did not graduate in time')
+      })
+
+      it("Shows 'Module grades too low' when the student has graduated in time but has too low grades", () => {
+        cy.visit('/students/547934')
+        cy.contains('.divider h4', 'Bachelor Honours')
+        cy.contains('.red.tag.label', 'Not qualified for Honours')
+        cy.contains('.red.tag.label', 'Module grades too low')
+      })
+
+      it("Shows 'Might need further inspection' when the student has graduated in time but has more than four main modules", () => {
+        cy.visit('/students/478837')
+        cy.contains('.divider h4', 'Bachelor Honours')
+        cy.contains('.blue.tag.label', 'Might need further inspection')
+      })
+
+      it("Shows 'Has not graduated' when the student has not graduated", () => {
+        cy.visit(`students/${student.studentnumber}`)
+        cy.contains('.divider h4', 'Bachelor Honours')
+        cy.contains('.red.tag.label', 'Not qualified for Honours')
+        cy.contains('.red.tag.label', 'Has not graduated')
+      })
     })
   })
 
@@ -134,17 +218,57 @@ describe('Students tests', () => {
     })
 
     it('Does not crash if student has no studyright or courses', () => {
-      const studentNumber = '450730'
-      cy.get('.prompt').type(studentNumber)
-      cy.contains('td a', studentNumber).click()
+      typeStudentNumberAndClick('450730')
       cy.contains('Credits: 0')
     })
 
     it("'Update student' button is shown", () => {
-      cy.get('.prompt').type(student.studentnumber)
-      cy.contains('td a', student.studentnumber).click()
+      typeStudentNumberAndClick(student.studentnumber)
       cy.get('div.ui.fluid.card').within(() => {
         cy.contains('button', 'Update student')
+      })
+    })
+
+    it('Bachelor Honours section is not shown for students outside of Faculty of Science', () => {
+      cy.visit('/students/453146')
+      cy.contains('.divider h4', 'Bachelor Honours').should('not.exist')
+    })
+
+    it('When a study plan is selected, courses included in the study plan are highlighted with a blue background', () => {
+      cy.visit('/students/550789')
+      cy.contains('table tbody tr', 'Kulttuurien tutkimuksen kandiohjelma (01.08.2020–30.06.2023)').within(() => {
+        cy.get('td').eq(0).click()
+      })
+      cy.contains('table tbody tr', 'Kandidaatintutkielma (KUKA-LIS222)')
+        .should('have.attr', 'style')
+        .and('equal', 'background-color: rgb(232, 244, 255);')
+    })
+
+    it('When a study plan is selected, the time frame of the credit graph is updated', () => {
+      cy.clock(new Date('2024-08-30').getTime(), ['Date'])
+      cy.visit('/students/550789')
+      cy.contains('.highcharts-container text', '2 Aug 2020')
+      cy.contains('.highcharts-container text', '30 Aug 2024')
+      cy.contains('table tbody tr', 'Kulttuurien tutkimuksen kandiohjelma (01.08.2020–30.06.2023)').within(() => {
+        cy.get('td').eq(0).click()
+      })
+      cy.contains('.highcharts-container text', '1 Aug 2020')
+      cy.contains('.highcharts-container text', '19 Aug 2023')
+    })
+
+    it("If there's a study plan corresponding to the degree programme, completed credits are displayed", () => {
+      cy.visit('/students/550789')
+      cy.contains('table tbody tr', 'Kulttuurien tutkimuksen kandiohjelma (01.08.2020–30.06.2023)').within(() => {
+        cy.get('td')
+          .eq(-1)
+          .contains(/^185 cr$/)
+      })
+    })
+
+    it("If there's a study plan corresponding to the degree programme and the student hasn't graduated, percentage of completion is also displayed", () => {
+      cy.visit('/students/458723')
+      cy.contains('table tbody tr', 'Oikeusnotaarin koulutusohjelma (01.08.2020–31.07.2027)').within(() => {
+        cy.get('td').eq(-1).contains('69% (125 cr)')
       })
     })
   })

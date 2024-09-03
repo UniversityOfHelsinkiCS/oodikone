@@ -97,8 +97,8 @@ export const BachelorHonours = ({ absentYears, programmeCode, student }) => {
       </Table.Row>
     ))
 
-  const dataTable = data => (
-    <Table>
+  const dataTable = (data, cypress) => (
+    <Table data-cy={cypress}>
       <Table.Header>
         <Table.Row>
           <Table.HeaderCell>Date</Table.HeaderCell>
@@ -146,9 +146,9 @@ export const BachelorHonours = ({ absentYears, programmeCode, student }) => {
           </Accordion.Title>
           <Accordion.Content active={showHonoursModules}>
             <h4>Main Modules</h4>
-            {mainModules.length > 0 && dataTable(mainModules)}
+            {mainModules.length > 0 && dataTable(mainModules, 'main-modules')}
             <h4>Other Modules</h4>
-            {otherModules.length > 0 && dataTable(otherModules)}
+            {otherModules.length > 0 && dataTable(otherModules, 'other-modules')}
           </Accordion.Content>
         </Accordion>
       ) : null}
