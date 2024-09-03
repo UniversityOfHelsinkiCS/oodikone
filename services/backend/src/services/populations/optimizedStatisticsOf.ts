@@ -8,6 +8,7 @@ import {
   formatStudentsForApi,
   getOptionsForStudents,
   parseQueryParams,
+  Query as FormattedQueryParams,
 } from './shared'
 import { getStudentNumbersWithAllStudyRightElements } from './studentNumbersWithAllElements'
 
@@ -34,7 +35,7 @@ export const optimizedStatisticsOf = async (query: Query, studentNumberList?: st
   }
 
   const { studyRights, startDate, months, endDate, exchangeStudents, nondegreeStudents, transferredStudents, tag } =
-    parseQueryParams(formattedQueryParams)
+    parseQueryParams(formattedQueryParams as FormattedQueryParams)
 
   const studentNumbers =
     studentNumberList ||

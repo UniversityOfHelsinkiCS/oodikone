@@ -53,11 +53,59 @@ type DynamicEnrollments = {
   }
 }
 
+export type CourseStatistics = {
+  stats: {
+    students: number
+    passed: number
+    failed: number
+    failedMany: number
+    retryPassed: number
+    attempts: number
+    improvedPassedGrade: number
+    percentage: number | undefined
+    passedOfPopulation: number | undefined
+    triedOfPopulation: number | undefined
+    perStudent: number | undefined
+    passingSemesters: Record<string, number>
+    passingSemestersCumulative?: Record<string, number>
+    totalStudents?: number
+    totalEnrolledNoGrade?: number
+    percentageWithEnrollments?: number
+  }
+  students: {
+    all: Record<string, boolean>
+    passed: Record<string, boolean>
+    failed: Record<string, boolean>
+    retryPassed: Record<string, boolean>
+    failedMany: Record<string, boolean>
+    improvedPassedGrade: Record<string, boolean>
+    markedToSemester: Record<string, boolean>
+    enrolledNoGrade: Record<string, boolean>
+  }
+  course: {
+    code: string
+    name: Name
+    disciplines: object
+    coursetypes: Record<string, Name>
+    substitutions: string[]
+  }
+  grades: {
+    [grade: string]: {
+      count: number
+      status: {
+        passingGrade: boolean
+        improvedGrade: boolean
+        failingGrade: boolean
+      }
+    }
+  }
+}
+
 export class CourseStatsCounter {
   private studentsInTotal: number
   private course: {
     code: string
-    name: string
+    name: Name
     disciplines: object
     coursetypes: Record<string, Name>
     substitutions: string[]
@@ -102,7 +150,7 @@ export class CourseStatsCounter {
     }
   }
 
-  constructor(code: string, name: string, studentsInTotal: number) {
+  constructor(code: string, name: Name, studentsInTotal: number) {
     this.studentsInTotal = studentsInTotal
     this.course = {
       code,
@@ -289,6 +337,6 @@ export class CourseStatsCounter {
     stats.totalEnrolledNoGrade = lengthOf(filteredEnrolledNoGrade)
     stats.percentageWithEnrollments = percentageOf(stats.passed, stats.totalStudents)
 
-    return { stats, students, course: this.course, grades: this.grades }
+    return { stats, students, course: this.course, grades: this.grades } as CourseStatistics
   }
 }
