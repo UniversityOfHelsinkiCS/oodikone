@@ -40,7 +40,7 @@ The quick guide should be enough for most purposes: updating schema, data, or th
 
 ### Sis-importer-db
 
-1. To generate a sample dump from test Sisu data, follow the instructions at [importer-db-staging-sampletaker](https://github.com/UniversityOfHelsinkiCS/sis-importer/blob/56f85b3196438426806072b923f41b16a1f7bfe1/importer-db-staging-sampletaker/README.md) inside the `sis-importer` repo.
+1. To generate a sample dump from test Sisu data, follow the instructions at [importer-db-staging-sampletaker](https://github.com/UniversityOfHelsinkiCS/sis-importer/tree/master/importer-db-staging-sampletaker) inside the `sis-importer` repo.
 
 2. Copy `sis-importer-db.sqz` into this folder.
 
