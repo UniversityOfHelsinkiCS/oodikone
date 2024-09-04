@@ -96,7 +96,7 @@ router.post('/v2/populationstatistics/courses', async (req: PostPopulationStatis
             : req.body.selectedStudentsByYear[year]
         }
         const newMonths = (upperYearBound - Number(year)) * 12
-        const query = { ...req.body, year, months: newMonths }
+        const query = { ...req.body, year, months: newMonths, selectedStudents: req.body.selectedStudents as string[] }
         const coursestatistics = bottlenecksOf(query, null, encrypted)
         return coursestatistics
       })
@@ -114,13 +114,14 @@ router.post('/v2/populationstatistics/courses', async (req: PostPopulationStatis
     req.body.selectedStudents = req.body.selectedStudents.map(decrypt)
   }
 
-  const result = await bottlenecksOf(req.body, null, encrypted)
-  if (result.error) {
-    Sentry.captureException(new Error(result.error))
-    return res.status(400).json(result)
+  const query = { ...req.body, selectedStudents: req.body.selectedStudents as string[] }
+  try {
+    const result = await bottlenecksOf(query, null, encrypted)
+    return res.json(result)
+  } catch (error: any) {
+    Sentry.captureException(new Error(error.message))
+    return res.status(400).end()
   }
-
-  return res.json(result)
 })
 
 interface PostPopulationStatisticsByTagRequest extends Request {
@@ -135,8 +136,7 @@ router.post(
     const { roles, studentsUserCanAccess } = req.user
     const { tag } = req.body
     if (!tag) {
-      res.status(400).json({ error: 'The body should have a tag defined' })
-      return
+      return res.status(400).json({ error: 'The body should have a tag defined' })
     }
 
     const studentNumbers = await findByTag(tag)
@@ -144,24 +144,22 @@ router.post(
       ? studentNumbers
       : intersection(studentNumbers, studentsUserCanAccess)
 
-    const result = await bottlenecksOf(
-      {
-        year: 1900,
-        studyRights: [],
-        semesters: ['FALL', 'SPRING'],
-        months: 10000,
-        tag,
-      },
-      studentNumberList
-    )
-
-    if (result.error) {
-      Sentry.captureException(new Error(result.error))
-      res.status(400).end()
-      return
+    try {
+      const result = await bottlenecksOf(
+        {
+          year: '1900',
+          studyRights: [],
+          semesters: ['FALL', 'SPRING'],
+          months: 10000,
+          tag,
+        },
+        studentNumberList
+      )
+      return res.json(result)
+    } catch (error: any) {
+      Sentry.captureException(new Error(error.message))
+      return res.status(400).end()
     }
-
-    res.json(result)
   }
 )
 
@@ -190,22 +188,22 @@ router.post(
     const studentNumbers = hasFullAccessToStudentData(roles)
       ? studentnumberlist
       : intersection(studentnumberlist, studentsUserCanAccess)
-    const result = await bottlenecksOf(
-      {
-        year: query?.year ?? 1900,
-        studyRights: query?.studyRights ?? [],
-        semesters: query?.semesters ?? ['FALL', 'SPRING'],
-        months: query?.months ?? 10000,
-      },
-      studentNumbers
-    )
-    if (result.error) {
-      Sentry.captureException(new Error(result.error))
-      res.status(400).json(result)
-      return
-    }
 
-    res.json(result)
+    try {
+      const result = await bottlenecksOf(
+        {
+          year: query?.year ?? 1900,
+          studyRights: query?.studyRights ?? [],
+          semesters: query?.semesters ?? ['FALL', 'SPRING'],
+          months: query?.months ?? 10000,
+        },
+        studentNumbers
+      )
+      return res.json(result)
+    } catch (error: any) {
+      Sentry.captureException(new Error(error.message))
+      return res.status(400).end()
+    }
   }
 )
 

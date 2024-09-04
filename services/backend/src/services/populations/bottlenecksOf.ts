@@ -1,15 +1,29 @@
-const { keyBy } = require('lodash')
+import { keyBy } from 'lodash'
 
-const { getPassingSemester } = require('../../util/semester')
-const { CourseStatsCounter } = require('../courses/courseStatsCounter')
-const { encrypt } = require('../encrypt')
-const { dateMonthsFromNow, findCourses, findCourseEnrollments, parseCreditInfo, parseQueryParams } = require('./shared')
-const { getStudentNumbersWithAllStudyRightElements } = require('./studentNumbersWithAllElements')
+import { Name } from '../../types'
+import { getPassingSemester } from '../../util/semester'
+import { CourseStatistics, CourseStatsCounter } from '../courses/courseStatsCounter'
+import { encrypt } from '../encrypt'
+import {
+  dateMonthsFromNow,
+  findCourses,
+  findCourseEnrollments,
+  Params,
+  parseCreditInfo,
+  parseQueryParams,
+  Query,
+  QueryResult,
+} from './shared'
+import { getStudentNumbersWithAllStudyRightElements } from './studentNumbersWithAllElements'
 
-const getStudentsAndCourses = async (params, selectedStudents, studentNumbers, courseCodes) => {
+const getStudentsAndCourses = async (
+  params: Params,
+  selectedStudents: string[] | undefined,
+  studentNumbers: string[] | null,
+  courseCodes: string[] | undefined
+) => {
   if (!studentNumbers) {
-    const { months, studyRights, startDate, endDate, exchangeStudents, nondegreeStudents, transferredStudents, tag } =
-      params
+    const { months, studyRights, startDate, endDate, exchangeStudents, nondegreeStudents, transferredStudents } = params
     const studentnumbers =
       selectedStudents ||
       (await getStudentNumbersWithAllStudyRightElements({
@@ -19,9 +33,6 @@ const getStudentsAndCourses = async (params, selectedStudents, studentNumbers, c
         exchangeStudents,
         nondegreeStudents,
         transferredOutStudents: transferredStudents,
-        tag,
-        transferredToStudents: true,
-        graduatedStudents: true,
       }))
 
     const allStudents = studentnumbers.length
@@ -48,8 +59,15 @@ const getStudentsAndCourses = async (params, selectedStudents, studentNumbers, c
   return [allStudents, courses, courseEnrollments]
 }
 
-const bottlenecksOf = async (query, studentNumbers, encryptData = false) => {
-  const encryptStudentNumbers = bottlenecks => {
+type Bottlenecks = {
+  disciplines: Record<string, string>
+  coursetypes: Record<string, Name>
+  coursestatistics: CourseStatistics[]
+  allStudents: number
+}
+
+export const bottlenecksOf = async (query: Query, studentNumbers: string[] | null, encryptData: boolean = false) => {
+  const encryptStudentNumbers = (bottlenecks: Bottlenecks) => {
     for (const course of Object.keys(bottlenecks.coursestatistics)) {
       const encryptedStudentStats = {}
       for (const data of Object.keys(bottlenecks.coursestatistics[course].students)) {
@@ -67,22 +85,22 @@ const bottlenecksOf = async (query, studentNumbers, encryptData = false) => {
   const params = parseQueryParams(query)
   const allStudentsByYears = query?.selectedStudentsByYear
     ? Object.keys(query.selectedStudentsByYear).reduce(
-        (res, year) => [...res, ...query.selectedStudentsByYear[year]],
-        []
+        (res, year) => [...res, ...query.selectedStudentsByYear![year]],
+        [] as string[]
       )
     : []
 
   // To fix failed and enrolled, no grade filter options some not so clean and nice solutions were added
   // Get the data with actual 1. courses and filtered students. 2. all students by year, if provided.
-  const [[allStudents, courses, courseEnrollements], [, allCourses]] = await Promise.all([
+  const [[allStudents, courses, courseEnrollements], [, allCourses]] = (await Promise.all([
     getStudentsAndCourses(params, query.selectedStudents, studentNumbers, query.courses),
     getStudentsAndCourses(params, allStudentsByYears, null, query.courses),
-  ])
+  ])) as [[number, QueryResult, QueryResult], [number, QueryResult]]
 
   // Get the substitution codes for the fetch data by selected students
   const substitutionCodes = Object.entries(courses).reduce(
     (codes, [, course]) => [...codes, ...(course?.substitutions || [])],
-    []
+    [] as string[]
   )
   const codes = Object.keys(keyBy(courses, 'code')).map(code => code)
   // Filter substitution courses for fetched courses -> by this we avoid the situation in which there
@@ -90,12 +108,14 @@ const bottlenecksOf = async (query, studentNumbers, encryptData = false) => {
   const substitutionCourses = allCourses.filter(
     course => substitutionCodes.includes(course.code) && !codes.includes(course.code)
   )
-  const bottlenecks = {
+  const bottlenecks: Bottlenecks = {
     disciplines: {},
     coursetypes: {},
+    coursestatistics: [],
+    allStudents: 0,
   }
 
-  const stats = {}
+  const stats = {} as Record<string, CourseStatsCounter>
   const startYear = parseInt(query.year, 10)
   let coursesToLoop = courses.concat(substitutionCourses)
   const courseCodes = coursesToLoop.map(course => course.code)
@@ -110,7 +130,6 @@ const bottlenecksOf = async (query, studentNumbers, encryptData = false) => {
 
   const coursesByCode = keyBy(coursesToLoop, 'code')
   for (const course of coursesToLoop) {
-    const { course_type } = course
     let mainCourse = course
 
     if (course.main_course_code && course.main_course_code !== course.code) {
@@ -123,15 +142,16 @@ const bottlenecksOf = async (query, studentNumbers, encryptData = false) => {
     if (!stats[mainCourse.code]) {
       stats[mainCourse.code] = new CourseStatsCounter(mainCourse.code, mainCourse.name, allStudents)
     }
+
     const coursestats = stats[mainCourse.code]
-    coursestats.addCourseType(course_type.coursetypecode, course_type.name)
+    coursestats.addCourseType(course.coursetypecode, course.name)
     coursestats.addCourseSubstitutions(course.substitutions)
-    bottlenecks.coursetypes[course_type.coursetypecode] = course_type.name
+    bottlenecks.coursetypes[course.coursetypecode] = course.name
     if (course.enrollments) {
       course.enrollments.forEach(({ studentnumber, state, enrollment_date_time }) => {
         if ((query?.selectedStudents && query?.selectedStudents.includes(studentnumber)) || !query?.selectedStudents) {
           const semester = getPassingSemester(startYear, enrollment_date_time)
-          coursestats.markEnrollment(studentnumber, state, semester, enrollment_date_time)
+          coursestats.markEnrollment(studentnumber, state, semester)
         }
       })
     }
@@ -156,8 +176,4 @@ const bottlenecksOf = async (query, studentNumbers, encryptData = false) => {
   }
 
   return bottlenecks
-}
-
-module.exports = {
-  bottlenecksOf,
 }

@@ -5,16 +5,16 @@ on:
     branches:
       - master
     paths:
-      - '.github/workflows/test.yaml'
-      - '.github/workflows/staging.yaml'
       - '.github/actions/**'
+      - '.github/workflows/staging.yaml'
+      - '.github/workflows/test.yaml'
       - 'cypress/**'
       - 'cypress.config.json'
       - 'services/**'
       - '!services/backend/src/rapodiff/**'
+      - 'updater/sis-updater-worker/src/db/migrations/**'
       - 'docker-compose.ci.yml'
       - 'package*.json'
-      - 'updater/sis-updater-worker/src/db/migrations/**'
 
 jobs:
   test:
@@ -90,7 +90,7 @@ jobs:
           password: ${{ secrets.QUAY_IO_TOKEN }}
 
   report_success:
-    name: 'Report deployment success to oodikone notifications'
+    name: 'Report deployment success to the "oodikone_notifications" channel'
     runs-on: ubuntu-latest
     needs:
       - release_frontend
@@ -100,7 +100,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: 'Send notification to slack'
+      - name: 'Send notification to Slack'
         uses: UniversityOfHelsinkiCS/slackbot-action@v1.5
         with:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
@@ -109,7 +109,7 @@ jobs:
           deployment-target: staging
 
   report_failure:
-    name: 'Report deployment failure to oodikone notifications'
+    name: 'Report deployment failure to the "oodikone_notifications" channel'
     runs-on: ubuntu-latest
     needs:
       - release_frontend
@@ -119,7 +119,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: 'Send notification to slack'
+      - name: 'Send notification to Slack'
         uses: UniversityOfHelsinkiCS/slackbot-action@v1.5
         with:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
