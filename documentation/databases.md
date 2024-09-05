@@ -9,6 +9,9 @@ Use Adminer or refer to the actual database for a detailed view of each model an
 The `sis-db` database contains information originating from Sisu.
 
 ```mermaid
+---
+title: sis-db
+---
 erDiagram
   enrollment }o--|| course : ""
   enrollment }o--|| semesters : ""
@@ -25,9 +28,9 @@ erDiagram
   credit }o--|| student : ""
   studyplan }o--|| student : ""
   studyplan }o--|| sis_study_rights : ""
+  sis_study_rights }o--|| study_right_extents : ""
   sis_study_rights }o--|| organization : ""
   sis_study_rights }o--|| student : ""
-  sis_study_rights }o--|| study_right_extents : ""
   sis_study_right_elements }o--|| sis_study_rights : ""
   course_providers }o--|| organization : ""
   course_providers }o--|| course : ""
@@ -41,6 +44,9 @@ erDiagram
 The `kone-db` database contains information used in various features of Oodikone. This functionality is native to Oodikone and not necessarily directly related to Sisu.
 
 ```mermaid
+---
+title: kone-db
+---
 erDiagram
   custom_population_searches
   excluded_courses
@@ -58,6 +64,9 @@ erDiagram
 The `user-db` database contains information about users of Oodikone.
 
 ```mermaid
+---
+title: user-db
+---
 erDiagram
   users
 ```
