@@ -8,7 +8,28 @@ Use Adminer or refer to the actual database for a detailed view of each model an
 
 The `sis-db` database contains information originating from Sisu.
 
-_To be documented._
+```mermaid
+erDiagram
+  course
+  course_providers
+  course_types
+  credit
+  credit_teachers
+  credit_types
+  curriculum_periods
+  enrollment
+  organization
+  programme_module_children
+  programme_modules
+  semester_enrollments
+  semesters
+  sis_study_right_elements
+  sis_study_rights
+  student
+  studyplan
+  studyright_extents
+  teacher
+```
 
 ## kone-db
 
