@@ -53,102 +53,69 @@ type DynamicEnrollments = {
   }
 }
 
-export type CourseStatistics = {
-  stats: {
-    students: number
-    passed: number
-    failed: number
-    failedMany: number
-    retryPassed: number
-    attempts: number
-    improvedPassedGrade: number
-    percentage: number | undefined
-    passedOfPopulation: number | undefined
-    triedOfPopulation: number | undefined
-    perStudent: number | undefined
-    passingSemesters: Record<string, number>
-    passingSemestersCumulative?: Record<string, number>
-    totalStudents?: number
-    totalEnrolledNoGrade?: number
-    percentageWithEnrollments?: number
-  }
-  students: {
-    all: Record<string, boolean>
-    passed: Record<string, boolean>
-    failed: Record<string, boolean>
-    retryPassed: Record<string, boolean>
-    failedMany: Record<string, boolean>
-    improvedPassedGrade: Record<string, boolean>
-    markedToSemester: Record<string, boolean>
-    enrolledNoGrade: Record<string, boolean>
-  }
-  course: {
-    code: string
-    name: Name
-    disciplines: object
-    coursetypes: Record<string, Name>
-    substitutions: string[]
-  }
-  grades: {
-    [grade: string]: {
-      count: number
-      status: {
-        passingGrade: boolean
-        improvedGrade: boolean
-        failingGrade: boolean
-      }
+type Stats = {
+  students: number
+  passed: number
+  failed: number
+  failedMany: number
+  retryPassed: number
+  attempts: number
+  improvedPassedGrade: number
+  percentage: number | undefined
+  passedOfPopulation: number | undefined
+  triedOfPopulation: number | undefined
+  perStudent: number | undefined
+  passingSemesters: Record<string, number>
+  passingSemestersCumulative?: Record<string, number>
+  totalStudents?: number
+  totalEnrolledNoGrade?: number
+  percentageWithEnrollments?: number
+}
+
+type Students = {
+  all: Record<string, boolean>
+  passed: Record<string, boolean>
+  failed: Record<string, boolean>
+  retryPassed: Record<string, boolean>
+  failedMany: Record<string, boolean>
+  improvedPassedGrade: Record<string, boolean>
+  markedToSemester: Record<string, boolean>
+  enrolledNoGrade: Record<string, boolean>
+}
+
+type Course = {
+  code: string
+  name: Name
+  disciplines: object
+  coursetypes: Record<string, Name>
+  substitutions: string[]
+}
+
+type Grades = {
+  [grade: string]: {
+    count: number
+    status: {
+      passingGrade: boolean
+      improvedGrade: boolean
+      failingGrade: boolean
     }
   }
 }
 
+export type CourseStatistics = {
+  stats: Stats
+  students: Students
+  course: Course
+  grades: Grades
+}
+
 export class CourseStatsCounter {
   private studentsInTotal: number
-  private course: {
-    code: string
-    name: Name
-    disciplines: object
-    coursetypes: Record<string, Name>
-    substitutions: string[]
-  }
-  private students: {
-    all: Record<string, boolean>
-    passed: Record<string, boolean>
-    failed: Record<string, boolean>
-    retryPassed: Record<string, boolean>
-    failedMany: Record<string, boolean>
-    improvedPassedGrade: Record<string, boolean>
-    markedToSemester: Record<string, boolean>
-    enrolledNoGrade: Record<string, boolean>
-  }
-  private stats: {
-    students: number
-    passed: number
-    failed: number
-    failedMany: number
-    retryPassed: number
-    attempts: number
-    improvedPassedGrade: number
-    percentage: number | undefined
-    passedOfPopulation: number | undefined
-    triedOfPopulation: number | undefined
-    perStudent: number | undefined
-    passingSemesters: Record<string, number>
-    passingSemestersCumulative?: Record<string, number>
-    totalStudents?: number
-    totalEnrolledNoGrade?: number
-    percentageWithEnrollments?: number
-  }
+  private course: Course
+  private students: Students
+  private stats: Stats
   private enrollments: DynamicEnrollments
-  private grades: {
-    [grade: string]: {
-      count: number
-      status: {
-        passingGrade: boolean
-        improvedGrade: boolean
-        failingGrade: boolean
-      }
-    }
-  }
+  private grades: Grades
 
   constructor(code: string, name: Name, studentsInTotal: number) {
     this.studentsInTotal = studentsInTotal
