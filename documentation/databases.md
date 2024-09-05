@@ -1,10 +1,12 @@
 # Databases
 
-Oodikone uses three separate databases, each for different purposes. This document contains a simplified overview of each database and the relations between models.
+Oodikone uses three main PostgreSQL databases, each for a different purpose. This document contains a simplified overview of each database and the relations between models.
 
 Use Adminer or refer to the actual database for a detailed view of each model and their attributes.
 
-## sis-db
+## Storage
+
+### sis-db
 
 The `sis-db` database contains information originating from Sisu.
 
@@ -39,7 +41,7 @@ erDiagram
   programme_modules }o--o| organization : "belong to"
 ```
 
-## kone-db
+### kone-db
 
 The `kone-db` database contains information used in various features of Oodikone. This functionality is native to Oodikone and not necessarily directly related to Sisu.
 
@@ -59,7 +61,7 @@ erDiagram
   tag_student
 ```
 
-## user-db
+### user-db
 
 The `user-db` database contains information about users of Oodikone.
 
@@ -70,3 +72,9 @@ title: user-db
 erDiagram
   users
 ```
+
+## Caching
+
+### Redis
+
+Redis is used in the backend to cache calculation results.
