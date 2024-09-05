@@ -10,25 +10,30 @@ The `sis-db` database contains information originating from Sisu.
 
 ```mermaid
 erDiagram
-  course
-  course_providers
+  enrollment }o--|| course : ""
+  enrollment }o--|| semesters : ""
+  enrollment }o--|| student : ""
+  semester_enrollments }o--|| semesters : ""
+  semester_enrollments }o--|| student : ""
+  credit_teachers }o--|| teacher : ""
   course_types
-  credit
-  credit_teachers
-  credit_types
   curriculum_periods
-  enrollment
-  organization
-  programme_module_children
-  programme_modules
-  semester_enrollments
-  semesters
-  sis_study_right_elements
-  sis_study_rights
-  student
-  studyplan
-  studyright_extents
-  teacher
+  credit_teachers }o--|| credit : ""
+  credit }o--|| course : ""
+  credit }o--|| semesters : ""
+  credit }o--|| credit_types : ""
+  credit }o--|| student : ""
+  studyplan }o--|| student : ""
+  studyplan }o--|| sis_study_rights : ""
+  sis_study_rights }o--|| organization : ""
+  sis_study_rights }o--|| student : ""
+  sis_study_rights }o--|| study_right_extents : ""
+  sis_study_right_elements }o--|| sis_study_rights : ""
+  course_providers }o--|| organization : ""
+  course_providers }o--|| course : ""
+  programme_module_children }o--|| programme_modules : "references parent"
+  programme_module_children }o--|| programme_modules : "references child"
+  programme_modules }o--o| organization : "belong to"
 ```
 
 ## kone-db
