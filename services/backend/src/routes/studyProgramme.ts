@@ -63,7 +63,7 @@ router.get('/:id/basicstats', async (req: GetStatsRequest, res: Response) => {
   }
 
   const updatedStats = await getBasicStatsForStudytrack({
-    studyprogramme: code,
+    studyProgramme: code,
     combinedProgramme,
     settings: {
       isAcademicYear: yearType === 'ACADEMIC_YEAR',
@@ -89,7 +89,7 @@ router.get('/:id/graduationstats', async (req: GetStatsRequest, res: Response) =
   }
 
   const updatedStats = await getGraduationStatsForStudytrack({
-    studyprogramme: code,
+    studyProgramme: code,
     combinedProgramme,
     settings: {
       isAcademicYear: yearType === 'ACADEMIC_YEAR',
@@ -229,7 +229,7 @@ router.get('/:id/evaluationstats', async (req: GetEvaluationStatsRequest, res: R
   let gradData = await getGraduationStats(code, combinedProgramme, yearType, specialGroups)
   if (!gradData) {
     const updatedStats = await getGraduationStatsForStudytrack({
-      studyprogramme: code,
+      studyProgramme: code,
       combinedProgramme,
       settings: {
         isAcademicYear: yearType === 'ACADEMIC_YEAR',

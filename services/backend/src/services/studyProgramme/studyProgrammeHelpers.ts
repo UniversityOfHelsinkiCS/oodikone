@@ -38,8 +38,8 @@ export function getYearsObject(params: { years: Array<string | number>; emptyArr
 
 export const getStatsBasis = (years: Array<string | number>) => {
   return {
-    graphStats: new Array<0>(years.length).fill(0),
-    tableStats: getYearsObject({ years }),
+    graphStats: new Array<number>(years.length).fill(0),
+    tableStats: getYearsObject({ years }) as Record<string, number>,
   }
 }
 

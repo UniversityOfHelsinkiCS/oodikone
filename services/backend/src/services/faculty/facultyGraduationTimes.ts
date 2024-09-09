@@ -39,7 +39,7 @@ const getStatsByGraduationYear = async (facultyProgrammes: ProgrammesOfOrganizat
       continue
     }
     const updatedStats = await getGraduationStatsForStudytrack({
-      studyprogramme: programme.code,
+      studyProgramme: programme.code,
       combinedProgramme: '',
       settings: {
         isAcademicYear: false,
