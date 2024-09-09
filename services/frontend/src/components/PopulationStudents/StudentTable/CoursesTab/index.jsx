@@ -450,17 +450,17 @@ const CoursesTable = ({ curriculum, includeSubstitutions, populationCourses, stu
 }
 
 export const CoursesTabContainer = ({ curriculum, includeSubstitutions, students, studyGuidanceGroup, variant }) => {
-  const groupStudentNumbers = studyGuidanceGroup?.members?.map(({ personStudentNumber }) => personStudentNumber) || []
-  const studyGuidanceGroupPopulationsCourses = useGetStudyGuidanceGroupPopulationCoursesQuery({
-    studentnumberlist: groupStudentNumbers,
-    year: studyGuidanceGroup?.tags?.year,
-  }).data
+  const { data: studyGuidanceGroupPopulationsCourses, isLoading: coursesAreLoading } =
+    useGetStudyGuidanceGroupPopulationCoursesQuery({
+      studentnumberlist: students.map(student => student.studentNumber).sort(),
+      year: studyGuidanceGroup?.tags?.year,
+    })
 
   const { data: populationCourses, pending } = useSelector(state => state?.populationSelectedStudentCourses)
 
   if (variant === 'studyGuidanceGroupPopulation') {
     return (
-      <Tab.Pane loading={studyGuidanceGroupPopulationsCourses.pending || !curriculum}>
+      <Tab.Pane loading={coursesAreLoading || !curriculum}>
         <CoursesTable
           curriculum={curriculum}
           includeSubstitutions={includeSubstitutions}
