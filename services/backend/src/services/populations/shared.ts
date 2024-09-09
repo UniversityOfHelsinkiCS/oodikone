@@ -512,7 +512,7 @@ export const findCourseEnrollments = async (studentNumbers: string[], beforeDate
         enrollment.data AS enrollments
       FROM course
       INNER JOIN course_types ON course_types.coursetypecode = course.coursetypecode
-      LEFT JOIN (
+      INNER JOIN (
         SELECT
           course_id,
           ARRAY_AGG(JSON_BUILD_OBJECT(

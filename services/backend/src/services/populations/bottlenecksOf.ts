@@ -123,9 +123,7 @@ export const bottlenecksOf = async (query: Query, studentNumbers: string[] | nul
   // This fixes a problem when "Enrolled, no grade" is chosen. The SQL query for fetching
   // credits does not fetch enrollments if no credits are found for selected students.
   // This and other SQL query ensures that enrollments are added.
-  const coursesOnlyWithEnrollments = courseEnrollements.filter(
-    course => !courseCodes.includes(course.code) && course.enrollments
-  )
+  const coursesOnlyWithEnrollments = courseEnrollements.filter(course => !courseCodes.includes(course.code))
   coursesToLoop = coursesToLoop.concat(coursesOnlyWithEnrollments)
 
   const coursesByCode = keyBy(coursesToLoop, 'code')
