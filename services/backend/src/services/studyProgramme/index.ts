@@ -133,9 +133,9 @@ export const getNotCompletedForProgrammeCourses = async (from: Date, to: Date, p
       .map(course => ({
         code: course.code,
         name: course.name,
-        totalNotCompleted: [...new Set(notCompletedByCourseCodes[course.code])].length,
         type: 'notCompleted',
         isStudyModule: course.isStudyModule,
+        totalNotCompleted: [...new Set(notCompletedByCourseCodes[course.code])].length,
       }))
   } catch (error) {
     logger.error(`getNotCompletedForProgrammeCourses failed ${error}`)
