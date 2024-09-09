@@ -18,8 +18,6 @@ erDiagram
   enrollment }o--|| course : ""
   enrollment }o--|| semesters : ""
   enrollment }o--|| student : ""
-  semester_enrollments }o--|| semesters : ""
-  semester_enrollments }o--|| student : ""
   credit_teachers }o--|| teacher : ""
   course_types
   curriculum_periods
@@ -30,7 +28,7 @@ erDiagram
   credit }o--|| student : ""
   studyplan }o--|| student : ""
   studyplan }o--|| sis_study_rights : ""
-  sis_study_rights }o--|| study_right_extents : ""
+  sis_study_rights }o--|| studyright_extents : ""
   sis_study_rights }o--|| organization : ""
   sis_study_rights }o--|| student : ""
   sis_study_right_elements }o--|| sis_study_rights : ""
