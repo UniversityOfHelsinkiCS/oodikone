@@ -267,7 +267,7 @@ router.get('/:id/evaluationstats', async (req: GetEvaluationStatsRequest, res: R
   delete gradData.titles
   const data = {
     id: code,
-    programmeName: programmeName?.name,
+    programmeName,
     status: gradData?.status,
     lastUpdated: gradData.lastUpdated,
     graduations: gradData,

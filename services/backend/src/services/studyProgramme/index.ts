@@ -1,14 +1,13 @@
-const { memoize } = require('lodash')
-const { Op } = require('sequelize')
+import { memoize } from 'lodash'
+import { Op, QueryTypes } from 'sequelize'
 
-const {
-  dbConnections: { sequelize },
-} = require('../../database/connection')
-const { Course, Credit, Enrollment, Organization, ProgrammeModule } = require('../../models')
-const logger = require('../../util/logger')
+import { dbConnections } from '../../database/connection'
+import { Course, Credit, Enrollment, Organization, ProgrammeModule } from '../../models'
+import { CreditTypeCode, EnrollmentState, Name } from '../../types'
+import logger from '../../util/logger'
 
-const getAllProgrammeCourses = async providerCode => {
-  const res = await Course.findAll({
+export const getAllProgrammeCourses = async (providerCode: string) => {
+  const courses = await Course.findAll({
     attributes: ['id', 'code', 'name', 'substitutions'],
     include: [
       {
@@ -25,10 +24,20 @@ const getAllProgrammeCourses = async providerCode => {
     ],
     raw: true,
   })
-  return res
+  return courses
 }
 
-const getNotCompletedForProgrammeCourses = async (from, to, programmeCourses) => {
+const getCourseCode = (code: string) => {
+  if (code.startsWith('AY')) {
+    return code.replace('AY', '')
+  }
+  if (code.startsWith('A')) {
+    return code.replace('A', '')
+  }
+  return code
+}
+
+export const getNotCompletedForProgrammeCourses = async (from: Date, to: Date, programmeCourses: string[]) => {
   try {
     const enrollmentsCourses = await Enrollment.findAll({
       attributes: ['studentnumber', 'course_code'],
@@ -36,27 +45,22 @@ const getNotCompletedForProgrammeCourses = async (from, to, programmeCourses) =>
         course_code: {
           [Op.in]: programmeCourses,
         },
-        studentnumber: {
-          [Op.ne]: null,
-        },
         enrollment_date_time: {
           [Op.between]: [from, to],
         },
-        state: 'ENROLLED',
+        state: EnrollmentState.ENROLLED,
       },
     })
-    const getCourseCode = code => {
-      if (code.startsWith('AY')) return code.replace('AY', '')
-      if (code.startsWith('A')) return code.replace('AY', '')
-      return code
-    }
-    const allEnrollments = {}
-    for (const { studentnumber, course_code } of enrollmentsCourses) {
-      const code = getCourseCode(course_code)
+
+    const allEnrollments = {} as Record<string, string[]>
+    for (const { studentnumber, course_code: courseCode } of enrollmentsCourses) {
+      const code = getCourseCode(courseCode)
       if (!(code in allEnrollments)) {
         allEnrollments[code] = []
       }
-      if (!allEnrollments[code].includes(studentnumber)) allEnrollments[code].push(studentnumber)
+      if (!allEnrollments[code].includes(studentnumber)) {
+        allEnrollments[code].push(studentnumber)
+      }
     }
 
     const credits = await Credit.findAll({
@@ -76,37 +80,40 @@ const getNotCompletedForProgrammeCourses = async (from, to, programmeCourses) =>
       },
     })
 
-    const creditsObj = credits.map(credit => {
+    const creditCourses = credits.map(credit => {
       return {
         code: getCourseCode(credit.course_code),
-        studentnumber: credit.student_studentnumber,
-        credittype: credit.credittypecode,
+        studentNumber: credit.student_studentnumber,
+        creditTypeCode: credit.credittypecode,
         courseName: credit.course.name,
         isStudyModule: credit.isStudyModule,
       }
     })
 
-    const passedByCourseCodes = {}
-    const notCompletedByCourseCodes = {}
-    const courses = {}
-    for (const course of creditsObj) {
+    const passedByCourseCodes = {} as Record<string, string[]>
+    const notCompletedByCourseCodes = {} as Record<string, string[]>
+    const courses = {} as Record<string, { code: string; name: Name; isStudyModule: boolean }>
+    for (const course of creditCourses) {
       if (!(course.code in courses)) {
         courses[course.code] = {
           code: course.code,
           name: course.courseName,
           isStudyModule: course.isStudyModule,
         }
-
         passedByCourseCodes[course.code] = []
         notCompletedByCourseCodes[course.code] = []
       }
-      if ([4, 7, 9].includes(course.credittype)) {
-        passedByCourseCodes[course.code].push(course.studentnumber)
+      if ([CreditTypeCode.PASSED, CreditTypeCode.IMPROVED, CreditTypeCode.APPROVED].includes(course.creditTypeCode)) {
+        passedByCourseCodes[course.code].push(course.studentNumber)
       }
-      if (course.credittype === 10 && !passedByCourseCodes[course.code].includes(course.studentnumber)) {
-        notCompletedByCourseCodes[course.code].push(course.studentnumber)
+      if (
+        course.creditTypeCode === CreditTypeCode.FAILED &&
+        !passedByCourseCodes[course.code].includes(course.studentNumber)
+      ) {
+        notCompletedByCourseCodes[course.code].push(course.studentNumber)
       }
     }
+
     // If student has enrollments, but no attainment for a particular course, they have no credit info.
     programmeCourses.forEach(courseCode => {
       if (allEnrollments[courseCode]) {
@@ -119,7 +126,10 @@ const getNotCompletedForProgrammeCourses = async (from, to, programmeCourses) =>
     })
 
     return Object.keys(courses)
-      .reduce((acc, val) => [...acc, { ...courses[val] }], [])
+      .reduce(
+        (acc, val) => [...acc, { ...courses[val] }],
+        [] as Array<{ code: string; name: Name; isStudyModule: boolean }>
+      )
       .map(course => ({
         code: course.code,
         name: course.name,
@@ -132,35 +142,29 @@ const getNotCompletedForProgrammeCourses = async (from, to, programmeCourses) =>
   }
 }
 
-const getCurrentStudyYearStartDate = memoize(
-  async unixMillis =>
-    new Date(
-      (
-        await sequelize.query(
-          `
-      SELECT startdate FROM SEMESTERS s WHERE yearcode = (SELECT yearcode FROM SEMESTERS WHERE startdate < :a ORDER BY startdate DESC LIMIT 1) ORDER BY startdate LIMIT 1;
-      `,
-          {
-            type: sequelize.QueryTypes.SELECT,
-            replacements: { a: new Date(unixMillis) },
-          }
-        )
-      )[0].startdate
-    )
-)
+export const getCurrentStudyYearStartDate = memoize(async (unixMillis: number) => {
+  const startDates: Array<{ startdate: Date }> = await dbConnections.sequelize.query(
+    `
+      SELECT startdate
+      FROM semesters s
+      WHERE yearcode = (SELECT yearcode FROM semesters WHERE startdate < :currentDate ORDER BY startdate DESC LIMIT 1)
+      ORDER BY startdate
+      LIMIT 1;
+    `,
+    {
+      type: QueryTypes.SELECT,
+      replacements: { currentDate: new Date(unixMillis) },
+    }
+  )
+  return new Date(startDates[0].startdate)
+})
 
-const getProgrammeName = async code => {
-  return ProgrammeModule.findOne({
+export const getProgrammeName = async (code: string) => {
+  const programmeName = await ProgrammeModule.findOne({
     attributes: ['name'],
     where: {
       code,
     },
   })
-}
-
-module.exports = {
-  getCurrentStudyYearStartDate,
-  getAllProgrammeCourses,
-  getProgrammeName,
-  getNotCompletedForProgrammeCourses,
+  return programmeName?.name
 }
