@@ -1,11 +1,11 @@
-const { setBasicStats, setCreditStats, setGraduationStats, setStudytrackStats } = require('../analyticsService')
-const { computeCreditsProduced } = require('../providerCredits')
-const { getBasicStatsForStudytrack } = require('./studyProgrammeBasics')
-const { getGraduationStatsForStudytrack } = require('./studyProgrammeGraduations')
-const { getStudyRightsInProgramme } = require('./studyRightFinders')
-const { getStudytrackStatsForStudyprogramme } = require('./studyTrackStats')
+import { setBasicStats, setCreditStats, setGraduationStats, setStudytrackStats } from '../analyticsService'
+import { computeCreditsProduced } from '../providerCredits'
+import { getBasicStatsForStudytrack } from './studyProgrammeBasics'
+import { getGraduationStatsForStudytrack } from './studyProgrammeGraduations'
+import { getStudyRightsInProgramme } from './studyRightFinders'
+import { getStudytrackStatsForStudyprogramme } from './studyTrackStats'
 
-const updateBasicView = async (code, combinedProgramme) => {
+export const updateBasicView = async (code: string, combinedProgramme: string) => {
   const yearOptions = ['CALENDAR_YEAR', 'ACADEMIC_YEAR']
   const specialGroupOptions = ['SPECIAL_INCLUDED', 'SPECIAL_EXCLUDED']
 
@@ -15,17 +15,17 @@ const updateBasicView = async (code, combinedProgramme) => {
       const includeAllSpecials = specialGroup === 'SPECIAL_INCLUDED'
 
       const basicStats = await getBasicStatsForStudytrack({
-        studyprogramme: code,
+        studyProgramme: code,
         combinedProgramme,
         settings: { isAcademicYear, includeAllSpecials },
       })
       await setBasicStats(basicStats, yearType, specialGroup)
 
-      const creditStats = await computeCreditsProduced(code, isAcademicYear, includeAllSpecials)
+      const creditStats = await computeCreditsProduced(code, isAcademicYear)
       await setCreditStats(creditStats, isAcademicYear, includeAllSpecials)
 
       const graduationStats = await getGraduationStatsForStudytrack({
-        studyprogramme: code,
+        studyProgramme: code,
         combinedProgramme,
         settings: { isAcademicYear, includeAllSpecials },
       })
@@ -36,7 +36,7 @@ const updateBasicView = async (code, combinedProgramme) => {
   return 'OK'
 }
 
-const updateStudytrackView = async (code, combinedProgramme) => {
+export const updateStudytrackView = async (code: string, combinedProgramme: string) => {
   const graduatedOptions = ['GRADUATED_INCLUDED', 'GRADUATED_EXCLUDED']
   const specialGroupOptions = ['SPECIAL_INCLUDED', 'SPECIAL_EXCLUDED']
   const studyRightsOfProgramme = await getStudyRightsInProgramme(code, false, true)
@@ -44,7 +44,7 @@ const updateStudytrackView = async (code, combinedProgramme) => {
   for (const graduated of graduatedOptions) {
     for (const specialGroup of specialGroupOptions) {
       const stats = await getStudytrackStatsForStudyprogramme({
-        studyprogramme: code,
+        studyProgramme: code,
         combinedProgramme,
         settings: {
           specialGroups: specialGroup === 'SPECIAL_INCLUDED',
@@ -57,9 +57,4 @@ const updateStudytrackView = async (code, combinedProgramme) => {
   }
 
   return 'OK'
-}
-
-module.exports = {
-  updateBasicView,
-  updateStudytrackView,
 }

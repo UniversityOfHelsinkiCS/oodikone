@@ -144,7 +144,7 @@ const getStatsByStartYear = async (facultyProgrammes: ProgrammesOfOrganization) 
 
     const studyRightsOfProgramme = await getStudyRightsInProgramme(programme.code, false, true)
     const updatedStats = await getStudytrackStatsForStudyprogramme({
-      studyprogramme: programme.code,
+      studyProgramme: programme.code,
       combinedProgramme: '',
       settings: {
         graduated: true,

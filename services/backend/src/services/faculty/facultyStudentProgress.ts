@@ -105,8 +105,8 @@ export const combineFacultyStudentProgress = async (
   const progressStats: Record<string, Record<string, number[][]>> = {}
   const yearlyTitles: Record<string, string[][]> = {}
 
-  for (const { code: studyprogramme } of programmes) {
-    const programmeInfo = allDegreeProgrammes.find(programme => programme.code === studyprogramme)
+  for (const { code: studyProgramme } of programmes) {
+    const programmeInfo = allDegreeProgrammes.find(programme => programme.code === studyProgramme)
     if (
       !programmeInfo ||
       programmeInfo.degreeProgrammeType == null ||
@@ -114,13 +114,13 @@ export const combineFacultyStudentProgress = async (
     ) {
       continue
     }
-    const statsFromRedis = await getStudytrackStats(studyprogramme, null, graduated, specialGroups)
+    const statsFromRedis = await getStudytrackStats(studyProgramme, null, graduated, specialGroups)
     if (statsFromRedis) {
       statsOfProgrammes.push(statsFromRedis)
     } else {
-      const studyRightsOfProgramme = await getStudyRightsInProgramme(studyprogramme, false, true)
+      const studyRightsOfProgramme = await getStudyRightsInProgramme(studyProgramme, false, true)
       const updatedStats = await getStudytrackStatsForStudyprogramme({
-        studyprogramme,
+        studyProgramme,
         settings: {
           graduated: graduated === 'GRADUATED_INCLUDED',
           specialGroups: specialGroups === 'SPECIAL_INCLUDED',

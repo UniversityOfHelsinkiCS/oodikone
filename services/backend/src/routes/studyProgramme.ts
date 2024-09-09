@@ -148,7 +148,7 @@ router.get('/:id/studytrackstats', async (req: GetStudyTrackStatsRequest, res: R
 
   const studyRightsOfProgramme = await getStudyRightsInProgramme(code, false, true)
   const updated = await getStudytrackStatsForStudyprogramme({
-    studyprogramme: code,
+    studyProgramme: code,
     combinedProgramme,
     settings: {
       graduated: graduated === 'GRADUATED_INCLUDED',
@@ -246,7 +246,7 @@ router.get('/:id/evaluationstats', async (req: GetEvaluationStatsRequest, res: R
   if (!progressData) {
     const studyRightsOfProgramme = await getStudyRightsInProgramme(code, false, true)
     const updated = await getStudytrackStatsForStudyprogramme({
-      studyprogramme: code,
+      studyProgramme: code,
       combinedProgramme,
       settings: {
         graduated: graduated === 'GRADUATED_INCLUDED',
