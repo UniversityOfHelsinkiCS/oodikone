@@ -86,8 +86,6 @@ type Students = {
 type Course = {
   code: string
   name: Name
-  disciplines: object
-  coursetypes: Record<string, Name>
   substitutions: string[]
 }
 
@@ -122,8 +120,6 @@ export class CourseStatsCounter {
     this.course = {
       code,
       name,
-      disciplines: {},
-      coursetypes: {},
       substitutions: [],
     }
     this.students = {
@@ -252,10 +248,6 @@ export class CourseStatsCounter {
   private markGrade(grade: string, passingGrade: boolean, failingGrade: boolean, improvedGrade: boolean) {
     const gradeCount = this.grades[grade] ? this.grades[grade].count || 0 : 0
     this.grades[grade] = { count: gradeCount + 1, status: { passingGrade, improvedGrade, failingGrade } }
-  }
-
-  public addCourseType(courseType: string, name: Name) {
-    this.course.coursetypes[courseType] = name
   }
 
   public addCourseSubstitutions(substitutions: string[]) {

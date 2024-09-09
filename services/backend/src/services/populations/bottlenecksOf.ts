@@ -1,6 +1,5 @@
 import { keyBy } from 'lodash'
 
-import { Name } from '../../types'
 import { getPassingSemester } from '../../util/semester'
 import { CourseStatistics, CourseStatsCounter } from '../courses/courseStatsCounter'
 import { encrypt } from '../encrypt'
@@ -60,8 +59,6 @@ const getStudentsAndCourses = async (
 }
 
 type Bottlenecks = {
-  disciplines: Record<string, string>
-  coursetypes: Record<string, Name>
   coursestatistics: CourseStatistics[]
   allStudents: number
 }
@@ -109,8 +106,6 @@ export const bottlenecksOf = async (query: Query, studentNumbers: string[] | nul
     course => substitutionCodes.includes(course.code) && !codes.includes(course.code)
   )
   const bottlenecks: Bottlenecks = {
-    disciplines: {},
-    coursetypes: {},
     coursestatistics: [],
     allStudents: 0,
   }
@@ -142,9 +137,7 @@ export const bottlenecksOf = async (query: Query, studentNumbers: string[] | nul
     }
 
     const coursestats = stats[mainCourse.code]
-    coursestats.addCourseType(course.coursetypecode, course.name)
     coursestats.addCourseSubstitutions(course.substitutions)
-    bottlenecks.coursetypes[course.coursetypecode] = course.name
     if (course.enrollments) {
       course.enrollments.forEach(({ studentnumber, state, enrollment_date_time }) => {
         if ((query?.selectedStudents && query?.selectedStudents.includes(studentnumber)) || !query?.selectedStudents) {

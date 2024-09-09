@@ -478,14 +478,6 @@ const getSubstitutions = async (codes: string[]) => {
   return substitutions
 }
 
-const getCourseCodes = async (courses: string[]) => {
-  if (courses.length === 0) {
-    return ['DUMMY']
-  }
-  const courseCodes = await getSubstitutions(courses)
-  return courseCodes
-}
-
 export type QueryResult = Array<{
   code: string
   name: Name
@@ -499,19 +491,16 @@ export type QueryResult = Array<{
 
 // This duplicate code is added here to ensure that we get the enrollments in cases no credits found for the selected students
 export const findCourseEnrollments = async (studentNumbers: string[], beforeDate: Date, courses: string[] = []) => {
-  const courseCodes = await getCourseCodes(courses)
+  const courseCodes = courses.length === 0 ? ['DUMMY'] : await getSubstitutions(courses)
   const result: QueryResult = await sequelize.query(
     `
       SELECT DISTINCT ON (course.id)
         course.code,
         course.name,
-        course.coursetypecode,
         course.substitutions,
         course.main_course_code,
-        course_types.name AS course_type,
         enrollment.data AS enrollments
       FROM course
-      INNER JOIN course_types ON course_types.coursetypecode = course.coursetypecode
       INNER JOIN (
         SELECT
           course_id,
@@ -525,7 +514,6 @@ export const findCourseEnrollments = async (studentNumbers: string[], beforeDate
         GROUP BY enrollment.course_id
       ) enrollment ON enrollment.course_id = course.id 
       WHERE :skipCourseCodeFilter OR course.code IN (:courseCodes)
-      -- GROUP BY 1, 2, 3, 4, 5, 6
     `,
     {
       replacements: {
@@ -541,16 +529,14 @@ export const findCourseEnrollments = async (studentNumbers: string[], beforeDate
 }
 
 export const findCourses = async (studentNumbers: string[], beforeDate: Date, courses: string[] = []) => {
-  const courseCodes = await getCourseCodes(courses)
+  const courseCodes = courses.length === 0 ? ['DUMMY'] : await getSubstitutions(courses)
   const result: QueryResult = await sequelize.query(
     `
       SELECT DISTINCT ON (course.id)
         course.code,
         course.name,
-        course.coursetypecode,
         course.substitutions,
         course.main_course_code,
-        course_types.name AS course_type,
         credit.data AS credits,
         enrollment.data AS enrollments
       FROM course
@@ -568,7 +554,6 @@ export const findCourses = async (studentNumbers: string[], beforeDate: Date, co
         WHERE student_studentnumber IN (:studentnumbers) AND attainment_date < :beforeDate
         GROUP BY credit.course_code
       ) credit ON credit.course_code = course.code
-      INNER JOIN course_types ON course_types.coursetypecode = course.coursetypecode
       LEFT JOIN (
         SELECT
           course_id,
@@ -582,7 +567,6 @@ export const findCourses = async (studentNumbers: string[], beforeDate: Date, co
         GROUP BY enrollment.course_id
       ) enrollment ON enrollment.course_id = course.id 
       WHERE :skipCourseCodeFilter OR course.code IN (:courseCodes)
-      -- GROUP BY 1, 2, 3, 4, 5, 6
     `,
     {
       replacements: {

@@ -1,14 +1,10 @@
 const populationCourseStatsMerger = multiyearstats => {
   const coursecodes = []
   const stats = {}
-  stats.coursetypes = {}
-  stats.disciplines = {}
   stats.coursestatistics = []
   stats.allStudents = 0
 
   multiyearstats.forEach(yearstats => {
-    stats.coursetypes = { ...stats.coursetypes, ...yearstats.coursetypes }
-    stats.disciplines = { ...stats.disciplines, ...yearstats.coursetypes }
     stats.allStudents += yearstats.allStudents
     yearstats.coursestatistics.forEach(courseStats => {
       if (!coursecodes.includes(courseStats.course.code)) {
