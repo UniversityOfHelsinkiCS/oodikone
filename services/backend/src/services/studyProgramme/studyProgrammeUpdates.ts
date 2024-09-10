@@ -3,7 +3,7 @@ import { computeCreditsProduced } from '../providerCredits'
 import { getBasicStatsForStudytrack } from './studyProgrammeBasics'
 import { getGraduationStatsForStudytrack } from './studyProgrammeGraduations'
 import { getStudyRightsInProgramme } from './studyRightFinders'
-import { getStudytrackStatsForStudyprogramme } from './studyTrackStats'
+import { getStudyTrackStatsForStudyProgramme } from './studyTrackStats'
 
 export const updateBasicView = async (code: string, combinedProgramme: string) => {
   const yearOptions = ['CALENDAR_YEAR', 'ACADEMIC_YEAR']
@@ -43,7 +43,7 @@ export const updateStudytrackView = async (code: string, combinedProgramme: stri
 
   for (const graduated of graduatedOptions) {
     for (const specialGroup of specialGroupOptions) {
-      const stats = await getStudytrackStatsForStudyprogramme({
+      const stats = await getStudyTrackStatsForStudyProgramme({
         studyProgramme: code,
         combinedProgramme,
         settings: {

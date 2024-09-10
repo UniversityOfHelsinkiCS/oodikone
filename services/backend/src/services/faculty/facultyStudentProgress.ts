@@ -6,7 +6,7 @@ import { Graduated, SpecialGroups, Unarray } from '../../types'
 import { getStudytrackStats, setStudytrackStats } from '../analyticsService'
 import { getYearsArray } from '../studyProgramme/studyProgrammeHelpers'
 import { getStudyRightsInProgramme } from '../studyProgramme/studyRightFinders'
-import { getStudytrackStatsForStudyprogramme } from '../studyProgramme/studyTrackStats'
+import { getStudyTrackStatsForStudyProgramme } from '../studyProgramme/studyTrackStats'
 import { getDegreeProgrammesOfOrganization, ProgrammesOfOrganization } from './faculty'
 import { programmeTypes } from './facultyGraduationTimes'
 
@@ -99,7 +99,7 @@ export const combineFacultyStudentProgress = async (
   graduated: Graduated
 ) => {
   const since = new Date('2017-08-01')
-  const statsOfProgrammes: Array<Awaited<ReturnType<typeof getStudytrackStatsForStudyprogramme>>> = []
+  const statsOfProgrammes: Array<Awaited<ReturnType<typeof getStudyTrackStatsForStudyProgramme>>> = []
   const allDegreeProgrammes = await getDegreeProgrammesOfOrganization(rootOrgId, false)
   const creditCounts: Record<string, Record<string, number[]>> = {}
   const progressStats: Record<string, Record<string, number[][]>> = {}
@@ -119,7 +119,7 @@ export const combineFacultyStudentProgress = async (
       statsOfProgrammes.push(statsFromRedis)
     } else {
       const studyRightsOfProgramme = await getStudyRightsInProgramme(studyProgramme, false, true)
-      const updatedStats = await getStudytrackStatsForStudyprogramme({
+      const updatedStats = await getStudyTrackStatsForStudyProgramme({
         studyProgramme,
         settings: {
           graduated: graduated === 'GRADUATED_INCLUDED',

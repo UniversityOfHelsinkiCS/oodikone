@@ -2,10 +2,10 @@ import { Unarray } from '../../types'
 import { getStudytrackStats, setStudytrackStats } from '../analyticsService'
 import { getPercentage, tableTitles } from '../studyProgramme/studyProgrammeHelpers'
 import { getStudyRightsInProgramme } from '../studyProgramme/studyRightFinders'
-import { getStudytrackStatsForStudyprogramme } from '../studyProgramme/studyTrackStats'
+import { getStudyTrackStatsForStudyProgramme } from '../studyProgramme/studyTrackStats'
 import type { ProgrammesOfOrganization } from './faculty'
 
-type StudyTrackStats = Awaited<ReturnType<typeof getStudytrackStatsForStudyprogramme>>
+type StudyTrackStats = Awaited<ReturnType<typeof getStudyTrackStatsForStudyProgramme>>
 
 const calculateCombinedStats = (programmeCodes: string[], stats: StudyTrackStats[]) => {
   const facultyTableStats: Record<string, Array<string | number>> = {}
@@ -74,7 +74,7 @@ export const combineFacultyStudents = async (
       continue
     }
     const studyRightsOfProgramme = await getStudyRightsInProgramme(studyProgramme, false, true)
-    const updatedStats = await getStudytrackStatsForStudyprogramme({
+    const updatedStats = await getStudyTrackStatsForStudyProgramme({
       studyProgramme,
       settings: {
         graduated: graduated === 'GRADUATED_INCLUDED',
