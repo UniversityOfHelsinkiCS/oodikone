@@ -67,18 +67,18 @@ export type GraduationTimes = {
 }
 
 const getGraduationTimeAndThesisWriterStats = async ({
-  studyprogramme,
+  studyProgramme,
   years,
   isAcademicYear,
   includeAllSpecials,
 }: {
-  studyprogramme?: string
+  studyProgramme?: string
   years: Array<string | number>
   isAcademicYear: boolean
   includeAllSpecials: boolean
 }) => {
   const { graphStats, tableStats } = getStatsBasis(years)
-  if (!studyprogramme) {
+  if (!studyProgramme) {
     return {
       times: { medians: [], goal: 0 },
       doCombo: false,
@@ -88,22 +88,22 @@ const getGraduationTimeAndThesisWriterStats = async ({
     }
   }
   // for bc+ms combo
-  const doCombo = studyprogramme.startsWith('MH') && !['MH30_001', 'MH30_003'].includes(studyprogramme)
+  const doCombo = studyProgramme.startsWith('MH') && !['MH30_001', 'MH30_003'].includes(studyProgramme)
   const graduationTimes: Record<string, number[]> = getYearsObject({ years, emptyArrays: true })
   const graduationTimesCombo: Record<string, number[]> = getYearsObject({ years, emptyArrays: true })
   const { semesters } = await getSemestersAndYears()
 
-  const studyRights = await getStudyRightsInProgramme(studyprogramme, false)
-  const studentNumbers = studyRights.map(sr => sr.studentNumber)
-  const thesisType = await getThesisType(studyprogramme)
-  const thesisCredits = await getThesisCredits(mapToProviders([studyprogramme])[0], thesisType, studentNumbers)
+  const studyRights = await getStudyRightsInProgramme(studyProgramme, false)
+  const studentNumbers = studyRights.map(studyRight => studyRight.studentNumber)
+  const thesisType = await getThesisType(studyProgramme)
+  const thesisCredits = await getThesisCredits(mapToProviders([studyProgramme])[0], thesisType, studentNumbers)
   const thesisWriterMap = thesisCredits.reduce<Record<string, Date>>((acc, credit) => {
     acc[credit.student_studentnumber] = credit.attainment_date
     return acc
   }, {})
 
   for (const studyRight of studyRights) {
-    const correctStudyRightElement = studyRight.studyRightElements.find(element => element.code === studyprogramme)
+    const correctStudyRightElement = studyRight.studyRightElements.find(element => element.code === studyProgramme)
     if (!correctStudyRightElement) continue
     const countAsBachelorMaster = doCombo && studyRight.extentCode === ExtentCode.BACHELOR_AND_MASTER
     const [firstStudyRightElementWithSamePhase] = getStudyRightElementsWithPhase(
@@ -150,7 +150,7 @@ const getGraduationTimeAndThesisWriterStats = async ({
     }
   }
 
-  const goal = getGoal(studyprogramme)
+  const goal = getGoal(studyProgramme)
   const times: GraduationTimes = { medians: [], goal }
   const comboTimes: GraduationTimes = { medians: [], goal: goal + 36 }
 

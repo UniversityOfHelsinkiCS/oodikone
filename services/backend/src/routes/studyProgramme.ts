@@ -18,7 +18,7 @@ import {
 import { getGraduationStatsForStudytrack } from '../services/studyProgramme/studyProgrammeGraduations'
 import { updateBasicView, updateStudytrackView } from '../services/studyProgramme/studyProgrammeUpdates'
 import { getStudyRightsInProgramme } from '../services/studyProgramme/studyRightFinders'
-import { getStudytrackStatsForStudyprogramme } from '../services/studyProgramme/studyTrackStats'
+import { getStudyTrackStatsForStudyProgramme } from '../services/studyProgramme/studyTrackStats'
 import logger from '../util/logger'
 import { logInfoForGrafana } from '../util/logInfoForGrafana'
 
@@ -147,7 +147,7 @@ router.get('/:id/studytrackstats', async (req: GetStudyTrackStatsRequest, res: R
   }
 
   const studyRightsOfProgramme = await getStudyRightsInProgramme(code, false, true)
-  const updated = await getStudytrackStatsForStudyprogramme({
+  const updated = await getStudyTrackStatsForStudyProgramme({
     studyProgramme: code,
     combinedProgramme,
     settings: {
@@ -245,7 +245,7 @@ router.get('/:id/evaluationstats', async (req: GetEvaluationStatsRequest, res: R
   let progressData = await getStudytrackStats(code, combinedProgramme, graduated, specialGroups)
   if (!progressData) {
     const studyRightsOfProgramme = await getStudyRightsInProgramme(code, false, true)
-    const updated = await getStudytrackStatsForStudyprogramme({
+    const updated = await getStudyTrackStatsForStudyProgramme({
       studyProgramme: code,
       combinedProgramme,
       settings: {
