@@ -39,6 +39,26 @@ const getTo = (academicYear: string, year: number) => {
   return academicYear === 'ACADEMIC_YEAR' ? new Date(year + 1, 6, 31, 23, 59, 59) : new Date(year, 11, 31, 23, 59, 59)
 }
 
+// * Combined return type, should be split into smaller types
+type Students = {
+  code: string
+  name: Name
+  type: string
+  isStudyModule?: boolean
+  year?: number
+  totalPassed?: number
+  totalAllCredits?: number
+  totalNotCompleted?: number
+  totalProgrammeStudents?: number
+  totalProgrammeCredits?: number
+  totalWithoutStudyrightStudents?: number
+  totalWithoutStudyrightCredits?: number
+  totalOtherProgrammeStudents?: number
+  totalOtherProgrammeCredits?: number
+  totalTransferStudents?: number
+  totalTransferCredits?: number
+}
+
 // TODO: It would be a good idea to split this into smaller functions
 // The amount of different return types makes this very messy
 const makeYearlyPromises = (
@@ -47,31 +67,14 @@ const makeYearlyPromises = (
   type: 'passed' | 'notCompleted' | 'ownStudents' | 'withoutStudyRight' | 'otherStudents' | 'transfer',
   programmeCourses: string[],
   studyProgramme?: string
-) => {
+): Promise<Students[]>[] => {
   return years.map(
     year =>
       // eslint-disable-next-line no-async-promise-executor
       new Promise(async res => {
         const from = getFrom(academicYear, year)
         const to = getTo(academicYear, year)
-        let result: Array<{
-          code: string
-          name: Name
-          type: string
-          isStudyModule?: boolean
-          year?: number
-          totalPassed?: number
-          totalAllCredits?: number
-          totalNotCompleted?: number
-          totalProgrammeStudents?: number
-          totalProgrammeCredits?: number
-          totalWithoutStudyrightStudents?: number
-          totalWithoutStudyrightCredits?: number
-          totalOtherProgrammeStudents?: number
-          totalOtherProgrammeCredits?: number
-          totalTransferStudents?: number
-          totalTransferCredits?: number
-        }> | null = null
+        let result: Students[] | null = null
 
         switch (type) {
           case 'passed':
@@ -97,7 +100,7 @@ const makeYearlyPromises = (
         }
 
         res(
-          result?.map(course => {
+          result.map(course => {
             course.year = year
             return course
           })
@@ -113,6 +116,13 @@ type Attempt = {
   date: Date
   semestercode: number
   enrolled?: boolean
+}
+
+type Course = {
+  code: string
+  name: Name
+  isStudyModule: boolean
+  years: Record<number, any>
 }
 
 export const getStudyProgrammeStatsForColorizedCoursesTable = async (studyProgramme: string) => {
@@ -266,68 +276,70 @@ export const getStudyProgrammeCoursesForStudyTrack = async (
     ...yearlyStudentsWithoutStudyRight.flat(),
     ...yearlyOtherProgrammeStudents.flat(),
     ...yearlyTransferStudents.flat(),
-  ].reduce((acc, curr) => {
-    if (curr.year > maxYear) {
-      maxYear = curr.year
-    }
-    if (!acc[curr.code]) {
-      acc[curr.code] = {
-        code: curr.code,
-        name: curr.name,
-        isStudyModule: curr.isStudyModule,
-        years: {},
+  ].reduce(
+    (acc, curr) => {
+      if (curr.year! > maxYear) {
+        maxYear = curr.year!
       }
-    }
-
-    if (!acc[curr.code].years[curr.year]) {
-      acc[curr.code].years[curr.year] = {
-        totalAllStudents: 0,
-        totalPassed: 0,
-        totalNotCompleted: 0,
-        totalAllCredits: 0,
-        totalProgrammeStudents: 0,
-        totalProgrammeCredits: 0,
-        totalOtherProgrammeStudents: 0,
-        totalOtherProgrammeCredits: 0,
-        totalWithoutStudyrightStudents: 0,
-        totalWithoutStudyrightCredits: 0,
-        totalTransferStudents: 0,
-        totalTransferCredits: 0,
-        isStudyModule: curr.isStudyModule,
+      if (!acc[curr.code]) {
+        acc[curr.code] = {
+          code: curr.code,
+          name: curr.name,
+          isStudyModule: curr.isStudyModule || false,
+          years: {},
+        }
       }
-    }
-    switch (curr.type) {
-      case 'passed':
-        acc[curr.code].years[curr.year].totalPassed += curr.totalPassed
-        acc[curr.code].years[curr.year].totalAllStudents += acc[curr.code].years[curr.year].totalPassed
-        acc[curr.code].years[curr.year].totalAllCredits += curr.totalAllcredits
-        break
-      case 'notCompleted':
-        acc[curr.code].years[curr.year].totalNotCompleted += curr.totalNotCompleted
-        acc[curr.code].years[curr.year].totalAllStudents += acc[curr.code].years[curr.year].totalNotCompleted
-        break
-      case 'ownProgramme':
-        acc[curr.code].years[curr.year].totalProgrammeStudents += curr.totalProgrammeStudents
-        acc[curr.code].years[curr.year].totalProgrammeCredits += curr.totalProgrammeCredits
-        break
-      case 'otherProgramme':
-        acc[curr.code].years[curr.year].totalOtherProgrammeStudents += curr.totalOtherProgrammeStudents
-        acc[curr.code].years[curr.year].totalOtherProgrammeCredits += curr.totalOtherProgrammeCredits
-        break
-      case 'noStudyright':
-        acc[curr.code].years[curr.year].totalWithoutStudyrightStudents += curr.totalWithoutStudyrightStudents
-        acc[curr.code].years[curr.year].totalWithoutStudyrightCredits += curr.totalWithoutStudyrightCredits
-        break
-      case 'transfer':
-        acc[curr.code].years[curr.year].totalTransferStudents += curr.totalTransferStudents
-        acc[curr.code].years[curr.year].totalTransferCredits += curr.totalTransferCredits
-        break
-      default:
-        break
-    }
 
-    return acc
-  }, {})
+      if (!acc[curr.code].years[curr.year!]) {
+        acc[curr.code].years[curr.year!] = {
+          totalAllStudents: 0,
+          totalPassed: 0,
+          totalNotCompleted: 0,
+          totalAllCredits: 0,
+          totalProgrammeStudents: 0,
+          totalProgrammeCredits: 0,
+          totalOtherProgrammeStudents: 0,
+          totalOtherProgrammeCredits: 0,
+          totalWithoutStudyrightStudents: 0,
+          totalWithoutStudyrightCredits: 0,
+          totalTransferStudents: 0,
+          totalTransferCredits: 0,
+          isStudyModule: curr.isStudyModule,
+        }
+      }
+      switch (curr.type) {
+        case 'passed':
+          acc[curr.code].years[curr.year!].totalPassed += curr.totalPassed
+          acc[curr.code].years[curr.year!].totalAllStudents += acc[curr.code].years[curr.year!].totalPassed
+          acc[curr.code].years[curr.year!].totalAllCredits += curr.totalAllCredits
+          break
+        case 'notCompleted':
+          acc[curr.code].years[curr.year!].totalNotCompleted += curr.totalNotCompleted
+          acc[curr.code].years[curr.year!].totalAllStudents += acc[curr.code].years[curr.year!].totalNotCompleted
+          break
+        case 'ownProgramme':
+          acc[curr.code].years[curr.year!].totalProgrammeStudents += curr.totalProgrammeStudents
+          acc[curr.code].years[curr.year!].totalProgrammeCredits += curr.totalProgrammeCredits
+          break
+        case 'otherProgramme':
+          acc[curr.code].years[curr.year!].totalOtherProgrammeStudents += curr.totalOtherProgrammeStudents
+          acc[curr.code].years[curr.year!].totalOtherProgrammeCredits += curr.totalOtherProgrammeCredits
+          break
+        case 'noStudyright':
+          acc[curr.code].years[curr.year!].totalWithoutStudyrightStudents += curr.totalWithoutStudyrightStudents
+          acc[curr.code].years[curr.year!].totalWithoutStudyrightCredits += curr.totalWithoutStudyrightCredits
+          break
+        case 'transfer':
+          acc[curr.code].years[curr.year!].totalTransferStudents += curr.totalTransferStudents
+          acc[curr.code].years[curr.year!].totalTransferCredits += curr.totalTransferCredits
+          break
+        default:
+          break
+      }
+      return acc
+    },
+    {} as Record<string, Course>
+  )
   const ayCourses = Object.keys(allCourses).filter(courseCode => courseCode.startsWith('AY'))
   const properties = [
     'totalAllStudents',
@@ -344,10 +356,14 @@ export const getStudyProgrammeCoursesForStudyTrack = async (
     'totalTransferStudents',
   ]
   ayCourses.forEach(ayCourse => {
-    const normCode = isOpenUniCourseCode(ayCourse)[1]
+    const openUniCourseCode = isOpenUniCourseCode(ayCourse)
+    if (!openUniCourseCode) {
+      return
+    }
+    const normCode = openUniCourseCode[1]
 
     if (allCourses[normCode]) {
-      const mergedCourse = {}
+      const mergedCourse = {} as Course
       mergedCourse.code = allCourses[normCode].code
       mergedCourse.name = allCourses[normCode].name
       mergedCourse.years = {}
@@ -373,7 +389,6 @@ export const getStudyProgrammeCoursesForStudyTrack = async (
           } else {
             mergedCourse.years[year] = { ...allCourses[normCode].years[year] }
           }
-
           if (allCourses[ayCourse].years[year]) {
             properties.forEach(prop => {
               mergedCourse.years[year][prop] += allCourses[ayCourse].years[year][prop]
