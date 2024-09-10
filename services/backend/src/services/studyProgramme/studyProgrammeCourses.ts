@@ -31,6 +31,14 @@ const getAllStudyProgrammeCourses = async (studyProgramme: string) => {
   }, [] as string[])
 }
 
+const getFrom = (academicYear: string, year: number) => {
+  return academicYear === 'ACADEMIC_YEAR' ? new Date(year, 7, 1, 0, 0, 0) : new Date(year, 0, 1, 0, 0, 0)
+}
+
+const getTo = (academicYear: string, year: number) => {
+  return academicYear === 'ACADEMIC_YEAR' ? new Date(year + 1, 6, 31, 23, 59, 59) : new Date(year, 11, 31, 23, 59, 59)
+}
+
 // TODO: It would be a good idea to split this into smaller functions
 // The amount of different return types makes this very messy
 const makeYearlyPromises = (
@@ -44,30 +52,26 @@ const makeYearlyPromises = (
     year =>
       // eslint-disable-next-line no-async-promise-executor
       new Promise(async res => {
-        const from = academicYear === 'ACADEMIC_YEAR' ? new Date(year, 7, 1, 0, 0, 0) : new Date(year, 0, 1, 0, 0, 0)
-        const to =
-          academicYear === 'ACADEMIC_YEAR' ? new Date(year + 1, 6, 31, 23, 59, 59) : new Date(year, 11, 31, 23, 59, 59)
-        let result:
-          | Array<{
-              code: string
-              name: Name
-              type: string
-              isStudyModule?: boolean
-              year?: number
-              totalPassed?: number
-              totalAllCredits?: number
-              totalNotCompleted?: number
-              totalProgrammeStudents?: number
-              totalProgrammeCredits?: number
-              totalWithoutStudyrightStudents?: number
-              totalWithoutStudyrightCredits?: number
-              totalOtherProgrammeStudents?: number
-              totalOtherProgrammeCredits?: number
-              totalTransferStudents?: number
-              totalTransferCredits?: number
-            }>
-          | null
-          | undefined = null
+        const from = getFrom(academicYear, year)
+        const to = getTo(academicYear, year)
+        let result: Array<{
+          code: string
+          name: Name
+          type: string
+          isStudyModule?: boolean
+          year?: number
+          totalPassed?: number
+          totalAllCredits?: number
+          totalNotCompleted?: number
+          totalProgrammeStudents?: number
+          totalProgrammeCredits?: number
+          totalWithoutStudyrightStudents?: number
+          totalWithoutStudyrightCredits?: number
+          totalOtherProgrammeStudents?: number
+          totalOtherProgrammeCredits?: number
+          totalTransferStudents?: number
+          totalTransferCredits?: number
+        }> | null = null
 
         switch (type) {
           case 'passed':

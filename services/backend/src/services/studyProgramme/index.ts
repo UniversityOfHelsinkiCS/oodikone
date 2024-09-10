@@ -139,6 +139,7 @@ export const getNotCompletedForProgrammeCourses = async (from: Date, to: Date, p
       }))
   } catch (error) {
     logger.error(`getNotCompletedForProgrammeCourses failed ${error}`)
+    return []
   }
 }
 
