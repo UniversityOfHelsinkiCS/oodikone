@@ -12,8 +12,8 @@ import { getCreditsProduced } from '../services/providerCredits'
 import { getProgrammeName } from '../services/studyProgramme'
 import { getBasicStatsForStudytrack } from '../services/studyProgramme/studyProgrammeBasics'
 import {
-  getStudyprogrammeCoursesForStudytrack,
-  getStudyprogrammeStatsForColorizedCoursesTable,
+  getStudyProgrammeCoursesForStudyTrack,
+  getStudyProgrammeStatsForColorizedCoursesTable,
 } from '../services/studyProgramme/studyProgrammeCourses'
 import { getGraduationStatsForStudytrack } from '../services/studyProgramme/studyProgrammeGraduations'
 import { updateBasicView, updateStudytrackView } from '../services/studyProgramme/studyProgrammeUpdates'
@@ -118,7 +118,7 @@ router.get('/:id/coursestats', async (req: GetCourseStatsRequest, res: Response)
   date.setHours(23, 59, 59, 999)
   logInfoForGrafana(code, combinedProgramme)
   try {
-    const data = await getStudyprogrammeCoursesForStudytrack(date.getTime(), code, showByYear, combinedProgramme)
+    const data = await getStudyProgrammeCoursesForStudyTrack(date.getTime(), code, showByYear, combinedProgramme)
     return res.json(data)
   } catch (error) {
     logger.error({ message: `Failed to get code ${code} programme courses stats`, meta: `${error}` })
@@ -165,7 +165,7 @@ router.get('/:id/studytrackstats', async (req: GetStudyTrackStatsRequest, res: R
 router.get('/:id/colorizedtablecoursestats', async (req: Request, res: Response) => {
   const code = req.params.id
   try {
-    const data = await getStudyprogrammeStatsForColorizedCoursesTable(code)
+    const data = await getStudyProgrammeStatsForColorizedCoursesTable(code)
     return res.json(data)
   } catch (error) {
     logger.error({ message: `Failed to get code ${code} colorized table course stats`, meta: `${error}` })
