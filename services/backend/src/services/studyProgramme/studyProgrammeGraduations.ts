@@ -1,9 +1,8 @@
 import { indexOf, orderBy } from 'lodash'
 import moment from 'moment'
 
-import type { SemesterEnrollment } from '../../models/SISStudyRight'
 import { mapToProviders } from '../../shared/util/mapToProviders'
-import { DegreeProgrammeType, ExtentCode, Name, StudyTrack } from '../../types'
+import { DegreeProgrammeType, ExtentCode, Name, SemesterEnrollment, StudyTrack } from '../../types'
 import { getDegreeProgrammeType, sortByProgrammeCode } from '../../util'
 import { countTimeCategories } from '../graduationHelpers'
 import { getSemestersAndYears } from '../semesters'
@@ -32,7 +31,9 @@ const calculateAbsenceInMonths = (
   const absenceStart = moment(absence.startdate)
   const absenceEnd = moment(absence.enddate)
 
-  if (absenceStart.isAfter(endDate) || absenceEnd.isBefore(startDate)) return 0
+  if (absenceStart.isAfter(endDate) || absenceEnd.isBefore(startDate)) {
+    return 0
+  }
 
   // Without 'true' as the third argument, the result will be truncated, not rounded (e.g. 4.999 would be 4, not 5). This is why we use Math.round() instead
   return Math.round(absenceEnd.diff(absenceStart, 'months', true))
@@ -66,18 +67,18 @@ export type GraduationTimes = {
 }
 
 const getGraduationTimeAndThesisWriterStats = async ({
-  studyprogramme,
+  studyProgramme,
   years,
   isAcademicYear,
   includeAllSpecials,
 }: {
-  studyprogramme?: string
+  studyProgramme?: string
   years: Array<string | number>
   isAcademicYear: boolean
   includeAllSpecials: boolean
 }) => {
   const { graphStats, tableStats } = getStatsBasis(years)
-  if (!studyprogramme) {
+  if (!studyProgramme) {
     return {
       times: { medians: [], goal: 0 },
       doCombo: false,
@@ -87,22 +88,22 @@ const getGraduationTimeAndThesisWriterStats = async ({
     }
   }
   // for bc+ms combo
-  const doCombo = studyprogramme.startsWith('MH') && !['MH30_001', 'MH30_003'].includes(studyprogramme)
+  const doCombo = studyProgramme.startsWith('MH') && !['MH30_001', 'MH30_003'].includes(studyProgramme)
   const graduationTimes: Record<string, number[]> = getYearsObject({ years, emptyArrays: true })
   const graduationTimesCombo: Record<string, number[]> = getYearsObject({ years, emptyArrays: true })
   const { semesters } = await getSemestersAndYears()
 
-  const studyRights = await getStudyRightsInProgramme(studyprogramme, false)
-  const studentNumbers = studyRights.map(sr => sr.studentNumber)
-  const thesisType = await getThesisType(studyprogramme)
-  const thesisCredits = await getThesisCredits(mapToProviders([studyprogramme])[0], thesisType, studentNumbers)
+  const studyRights = await getStudyRightsInProgramme(studyProgramme, false)
+  const studentNumbers = studyRights.map(studyRight => studyRight.studentNumber)
+  const thesisType = await getThesisType(studyProgramme)
+  const thesisCredits = await getThesisCredits(mapToProviders([studyProgramme])[0], thesisType, studentNumbers)
   const thesisWriterMap = thesisCredits.reduce<Record<string, Date>>((acc, credit) => {
     acc[credit.student_studentnumber] = credit.attainment_date
     return acc
   }, {})
 
   for (const studyRight of studyRights) {
-    const correctStudyRightElement = studyRight.studyRightElements.find(element => element.code === studyprogramme)
+    const correctStudyRightElement = studyRight.studyRightElements.find(element => element.code === studyProgramme)
     if (!correctStudyRightElement) continue
     const countAsBachelorMaster = doCombo && studyRight.extentCode === ExtentCode.BACHELOR_AND_MASTER
     const [firstStudyRightElementWithSamePhase] = getStudyRightElementsWithPhase(
@@ -122,12 +123,16 @@ const getGraduationTimeAndThesisWriterStats = async ({
       tableStats[thesisYear] += 1
     }
 
-    if (!correctStudyRightElement.graduated || !studyRight.semesterEnrollments) continue
+    if (!correctStudyRightElement.graduated || !studyRight.semesterEnrollments) {
+      continue
+    }
 
     const startDate = countAsBachelorMaster
       ? getStudyRightElementsWithPhase(studyRight, 1)[0]?.startDate
       : firstStudyRightElementWithSamePhase.startDate
-    if (!startDate) continue
+    if (!startDate) {
+      continue
+    }
 
     const graduationDate = correctStudyRightElement.endDate
 
@@ -145,7 +150,7 @@ const getGraduationTimeAndThesisWriterStats = async ({
     }
   }
 
-  const goal = getGoal(studyprogramme)
+  const goal = getGoal(studyProgramme)
   const times: GraduationTimes = { medians: [], goal }
   const comboTimes: GraduationTimes = { medians: [], goal: goal + 36 }
 
@@ -190,7 +195,7 @@ const formatStats = (stats: Record<string, ProgrammeWithYears>, years: Array<str
 }
 
 type QueryParameters = {
-  studyprogramme: string
+  studyProgramme: string
   since: Date
   years: Array<string | number>
   isAcademicYear: boolean
@@ -202,15 +207,15 @@ type ProgrammeWithYears = {
 } & StudyTrack
 
 const getProgrammesBeforeStarting = async ({
-  studyprogramme,
+  studyProgramme,
   years,
   isAcademicYear,
   includeAllSpecials,
 }: QueryParameters) => {
-  const studyRights = await getStudyRightsInProgramme(studyprogramme, false)
+  const studyRights = await getStudyRightsInProgramme(studyProgramme, false)
 
   const stats = studyRights.reduce<Record<string, ProgrammeWithYears>>((acc, studyRight) => {
-    const studyRightElement = studyRight.studyRightElements.find(element => element.code === studyprogramme)
+    const studyRightElement = studyRight.studyRightElements.find(element => element.code === studyProgramme)
     if (!studyRightElement) return acc
     // If the extent code is something else, that means the student hasn't continued from a bachelor's programme
     if (studyRight.extentCode !== ExtentCode.BACHELOR_AND_MASTER) return acc
@@ -230,7 +235,7 @@ const getProgrammesBeforeStarting = async ({
 
     if (!includeAllSpecials && hasTransferred.some(fromOrTo => fromOrTo === true)) return acc
 
-    const startDateInProgramme = phase2Programmes.find(elem => elem.code === studyprogramme)?.startDate
+    const startDateInProgramme = phase2Programmes.find(elem => elem.code === studyProgramme)?.startDate
     if (!startDateInProgramme) return acc
     ;(acc[latestPhase1Programme.code][defineYear(startDateInProgramme, isAcademicYear)] as number) += 1
     return acc
@@ -241,15 +246,15 @@ const getProgrammesBeforeStarting = async ({
 }
 
 const getProgrammesAfterGraduation = async ({
-  studyprogramme,
+  studyProgramme,
   years,
   isAcademicYear,
   includeAllSpecials,
 }: QueryParameters) => {
-  const studyRights = await getStudyRightsInProgramme(studyprogramme, true)
+  const studyRights = await getStudyRightsInProgramme(studyProgramme, true)
 
   const stats = studyRights.reduce<Record<string, ProgrammeWithYears>>((acc, studyRight) => {
-    const studyRightElement = studyRight.studyRightElements.find(element => element.code === studyprogramme)
+    const studyRightElement = studyRight.studyRightElements.find(element => element.code === studyProgramme)
     if (!studyRightElement) return acc
     const hasTransferred = hasTransferredFromOrToProgramme(studyRight, studyRightElement)
 
@@ -288,20 +293,20 @@ const getProgrammesBeforeOrAfter = async (studyprogramme: string, queryParameter
 }
 
 export const getGraduationStatsForStudytrack = async ({
-  studyprogramme,
+  studyProgramme,
   combinedProgramme,
   settings,
 }: {
-  studyprogramme: string
+  studyProgramme: string
   combinedProgramme?: string
   settings: { isAcademicYear: boolean; includeAllSpecials: boolean }
 }) => {
   const { isAcademicYear, includeAllSpecials } = settings
   const since = getStartDate(isAcademicYear)
-  const years = getYearsArray(since.getFullYear(), isAcademicYear)
-  const queryParameters = { studyprogramme, since, years, isAcademicYear, includeAllSpecials }
+  const years = getYearsArray(since.getFullYear(), isAcademicYear) as number[]
+  const queryParameters = { studyProgramme, since, years, isAcademicYear, includeAllSpecials }
   const combinedQueryParameters = {
-    studyprogramme: combinedProgramme,
+    studyProgramme: combinedProgramme || '',
     since,
     years,
     isAcademicYear,
@@ -314,12 +319,12 @@ export const getGraduationStatsForStudytrack = async ({
   const graduationTimeStats = await getGraduationTimeAndThesisWriterStats(queryParameters)
   const graduationTimeStatsSecondProg = await getGraduationTimeAndThesisWriterStats(combinedQueryParameters)
 
-  const programmesBeforeOrAfter = await getProgrammesBeforeOrAfter(studyprogramme, queryParameters)
+  const programmesBeforeOrAfter = await getProgrammesBeforeOrAfter(studyProgramme, queryParameters)
 
   const reversedYears = getYearsArray(since.getFullYear(), isAcademicYear).reverse()
 
   const titles =
-    studyprogramme.includes('LIS') || studyprogramme.includes('T')
+    studyProgramme.includes('LIS') || studyProgramme.includes('T')
       ? ['', 'Graduated']
       : ['', 'Graduated', 'Wrote thesis']
   const combinedTitles = [
@@ -341,7 +346,7 @@ export const getGraduationStatsForStudytrack = async ({
     : reversedYears.map(year => [year, graduated.tableStats[year], graduationTimeStats.thesisTableStats[year]])
 
   const tableStats =
-    studyprogramme.includes('LIS') || studyprogramme.includes('T')
+    studyProgramme.includes('LIS') || studyProgramme.includes('T')
       ? reversedYears.map(year => [year, graduated.tableStats[year]])
       : tableStatsDefault
 
@@ -358,12 +363,12 @@ export const getGraduationStatsForStudytrack = async ({
       ]
 
   return {
-    id: combinedProgramme ? `${studyprogramme}-${combinedProgramme}` : studyprogramme,
+    id: combinedProgramme ? `${studyProgramme}-${combinedProgramme}` : studyProgramme,
     years,
     tableStats,
     titles: combinedProgramme ? combinedTitles : titles,
     graphStats:
-      studyprogramme.includes('LIS') || studyprogramme.includes('T')
+      studyProgramme.includes('LIS') || studyProgramme.includes('T')
         ? [{ name: 'Graduated students', data: graduated.graphStats }]
         : graphStats,
     graduationTimes: graduationTimeStats.times,

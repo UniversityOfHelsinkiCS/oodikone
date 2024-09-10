@@ -2,10 +2,10 @@ import { Unarray } from '../../types'
 import { getStudytrackStats, setStudytrackStats } from '../analyticsService'
 import { getPercentage, tableTitles } from '../studyProgramme/studyProgrammeHelpers'
 import { getStudyRightsInProgramme } from '../studyProgramme/studyRightFinders'
-import { getStudytrackStatsForStudyprogramme } from '../studyProgramme/studyTrackStats'
+import { getStudyTrackStatsForStudyProgramme } from '../studyProgramme/studyTrackStats'
 import type { ProgrammesOfOrganization } from './faculty'
 
-type StudyTrackStats = Awaited<ReturnType<typeof getStudytrackStatsForStudyprogramme>>
+type StudyTrackStats = Awaited<ReturnType<typeof getStudyTrackStatsForStudyProgramme>>
 
 const calculateCombinedStats = (programmeCodes: string[], stats: StudyTrackStats[]) => {
   const facultyTableStats: Record<string, Array<string | number>> = {}
@@ -64,8 +64,8 @@ export const combineFacultyStudents = async (
   const programmeCodes = programmes.map(programme => programme.code)
   const newStats: StudyTrackStats[] = []
 
-  for (const studyprogramme of programmeCodes) {
-    const statsFromRedis = await getStudytrackStats(studyprogramme, null, graduated, specialGroups)
+  for (const studyProgramme of programmeCodes) {
+    const statsFromRedis = await getStudytrackStats(studyProgramme, null, graduated, specialGroups)
     if (statsFromRedis) {
       newStats.push(statsFromRedis)
       if (!years.length) {
@@ -73,9 +73,9 @@ export const combineFacultyStudents = async (
       }
       continue
     }
-    const studyRightsOfProgramme = await getStudyRightsInProgramme(studyprogramme, false, true)
-    const updatedStats = await getStudytrackStatsForStudyprogramme({
-      studyprogramme,
+    const studyRightsOfProgramme = await getStudyRightsInProgramme(studyProgramme, false, true)
+    const updatedStats = await getStudyTrackStatsForStudyProgramme({
+      studyProgramme,
       settings: {
         graduated: graduated === 'GRADUATED_INCLUDED',
         specialGroups: specialGroups === 'SPECIAL_INCLUDED',

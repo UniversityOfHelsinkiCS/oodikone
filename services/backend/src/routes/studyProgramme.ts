@@ -12,13 +12,13 @@ import { getCreditsProduced } from '../services/providerCredits'
 import { getProgrammeName } from '../services/studyProgramme'
 import { getBasicStatsForStudytrack } from '../services/studyProgramme/studyProgrammeBasics'
 import {
-  getStudyprogrammeCoursesForStudytrack,
-  getStudyprogrammeStatsForColorizedCoursesTable,
+  getStudyProgrammeCoursesForStudyTrack,
+  getStudyProgrammeStatsForColorizedCoursesTable,
 } from '../services/studyProgramme/studyProgrammeCourses'
 import { getGraduationStatsForStudytrack } from '../services/studyProgramme/studyProgrammeGraduations'
 import { updateBasicView, updateStudytrackView } from '../services/studyProgramme/studyProgrammeUpdates'
 import { getStudyRightsInProgramme } from '../services/studyProgramme/studyRightFinders'
-import { getStudytrackStatsForStudyprogramme } from '../services/studyProgramme/studyTrackStats'
+import { getStudyTrackStatsForStudyProgramme } from '../services/studyProgramme/studyTrackStats'
 import logger from '../util/logger'
 import { logInfoForGrafana } from '../util/logInfoForGrafana'
 
@@ -63,7 +63,7 @@ router.get('/:id/basicstats', async (req: GetStatsRequest, res: Response) => {
   }
 
   const updatedStats = await getBasicStatsForStudytrack({
-    studyprogramme: code,
+    studyProgramme: code,
     combinedProgramme,
     settings: {
       isAcademicYear: yearType === 'ACADEMIC_YEAR',
@@ -89,7 +89,7 @@ router.get('/:id/graduationstats', async (req: GetStatsRequest, res: Response) =
   }
 
   const updatedStats = await getGraduationStatsForStudytrack({
-    studyprogramme: code,
+    studyProgramme: code,
     combinedProgramme,
     settings: {
       isAcademicYear: yearType === 'ACADEMIC_YEAR',
@@ -118,7 +118,7 @@ router.get('/:id/coursestats', async (req: GetCourseStatsRequest, res: Response)
   date.setHours(23, 59, 59, 999)
   logInfoForGrafana(code, combinedProgramme)
   try {
-    const data = await getStudyprogrammeCoursesForStudytrack(date.getTime(), code, showByYear, combinedProgramme)
+    const data = await getStudyProgrammeCoursesForStudyTrack(date.getTime(), code, showByYear, combinedProgramme)
     return res.json(data)
   } catch (error) {
     logger.error({ message: `Failed to get code ${code} programme courses stats`, meta: `${error}` })
@@ -147,8 +147,8 @@ router.get('/:id/studytrackstats', async (req: GetStudyTrackStatsRequest, res: R
   }
 
   const studyRightsOfProgramme = await getStudyRightsInProgramme(code, false, true)
-  const updated = await getStudytrackStatsForStudyprogramme({
-    studyprogramme: code,
+  const updated = await getStudyTrackStatsForStudyProgramme({
+    studyProgramme: code,
     combinedProgramme,
     settings: {
       graduated: graduated === 'GRADUATED_INCLUDED',
@@ -165,7 +165,7 @@ router.get('/:id/studytrackstats', async (req: GetStudyTrackStatsRequest, res: R
 router.get('/:id/colorizedtablecoursestats', async (req: Request, res: Response) => {
   const code = req.params.id
   try {
-    const data = await getStudyprogrammeStatsForColorizedCoursesTable(code)
+    const data = await getStudyProgrammeStatsForColorizedCoursesTable(code)
     return res.json(data)
   } catch (error) {
     logger.error({ message: `Failed to get code ${code} colorized table course stats`, meta: `${error}` })
@@ -229,7 +229,7 @@ router.get('/:id/evaluationstats', async (req: GetEvaluationStatsRequest, res: R
   let gradData = await getGraduationStats(code, combinedProgramme, yearType, specialGroups)
   if (!gradData) {
     const updatedStats = await getGraduationStatsForStudytrack({
-      studyprogramme: code,
+      studyProgramme: code,
       combinedProgramme,
       settings: {
         isAcademicYear: yearType === 'ACADEMIC_YEAR',
@@ -245,8 +245,8 @@ router.get('/:id/evaluationstats', async (req: GetEvaluationStatsRequest, res: R
   let progressData = await getStudytrackStats(code, combinedProgramme, graduated, specialGroups)
   if (!progressData) {
     const studyRightsOfProgramme = await getStudyRightsInProgramme(code, false, true)
-    const updated = await getStudytrackStatsForStudyprogramme({
-      studyprogramme: code,
+    const updated = await getStudyTrackStatsForStudyProgramme({
+      studyProgramme: code,
       combinedProgramme,
       settings: {
         graduated: graduated === 'GRADUATED_INCLUDED',
@@ -267,7 +267,7 @@ router.get('/:id/evaluationstats', async (req: GetEvaluationStatsRequest, res: R
   delete gradData.titles
   const data = {
     id: code,
-    programmeName: programmeName?.name,
+    programmeName,
     status: gradData?.status,
     lastUpdated: gradData.lastUpdated,
     graduations: gradData,

@@ -39,7 +39,7 @@ const calculateCombinedStats = async (
       continue
     }
     const updatedStats = await getBasicStatsForStudytrack({
-      studyprogramme: programme.code,
+      studyProgramme: programme.code,
       combinedProgramme: '',
       settings: {
         isAcademicYear,
