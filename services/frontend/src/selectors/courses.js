@@ -20,6 +20,10 @@ const sortSubstitutions = course => {
 const filterCourseSearchResults = (courses, combineSubstitutions) => {
   const mergedCourses = {}
   courses.forEach(course => {
+    // Filter out courses made out of custom attainments (#4624)
+    if (/-\d{9}/.test(course.code)) {
+      return
+    }
     const groupId = combineSubstitutions ? course.subsId : course.code
 
     if (!(course.max_attainment_date && course.min_attainment_date)) {
