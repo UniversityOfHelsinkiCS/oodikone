@@ -1,4 +1,4 @@
-import { EnrollmentState, Name, PassedCategory } from '../../types'
+import { EnrollmentState, Name } from '../../types'
 import { FormattedProgramme, OrganizationDetails } from './helpers'
 
 type Programme = {
@@ -56,7 +56,7 @@ type Group = {
 
 type Student = {
   earliestAttainment: Date
-  category: PassedCategory
+  category: 'passedFirst' | 'passedEventually' | 'neverPassed'
   code: number
 }
 
