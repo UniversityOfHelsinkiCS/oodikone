@@ -1,6 +1,6 @@
 const _ = require('lodash')
 const { Op } = require('sequelize')
-const { rootOrgId } = require('../../config')
+const { rootOrgId, serviceProvider } = require('../../config')
 const { selectFromByIds, bulkCreate, getCourseUnitsByCodes, selectOneById } = require('../../db')
 const { dbConnections } = require('../../db/connection')
 const { Course, Teacher, Credit, CreditTeacher, CourseProvider } = require('../../db/models')
@@ -95,7 +95,7 @@ const updateAttainments = async (
   ]
   // This mayhem fixes missing course_unit references for CustomCourseUnitAttainments.
   const fixCustomCourseUnitAttainments = async attainments => {
-    const addCourseUnitToCustomCourseUnitAttainments = courses => async att => {
+    const addCourseUnitToCustomCourseUnitAttainments = (courses, attIdToCourseCode) => async att => {
       // Fix attainments with missing modules
       if (modulesNotAvailable.includes(att.module_group_id)) {
         if (att.module_group_id === 'hy-SM-89304486') {
@@ -136,35 +136,90 @@ const updateAttainments = async (
       }
 
       if (!customAttainmentTypes.includes(att.type)) return att
-      let courseUnit = courses.find(course => course.id === att.course_unit_id)
+      let courseUnit
+      if (serviceProvider === 'fd') {
+        courseUnit = courses.find(course => course.id === att.course_unit_id)
+      } else {
+        const courseUnits = courses.filter(course => course.code === attIdToCourseCode[att.id])
+
+        const isAfterStartAndBeforeEnd = (startDate, endDate, date) => {
+          const dateToCompare = new Date(date)
+          return new Date(startDate) <= dateToCompare && (!endDate || dateToCompare < new Date(endDate))
+        }
+
+        courseUnit = courseUnits.find(({ validity_period }) =>
+          isAfterStartAndBeforeEnd(validity_period.startDate, validity_period.endDate, att.attainment_date)
+        )
+
+        // Sometimes registrations are fakd, see attainment hy-opinto-141561630.
+        // The attainmentdate is outside of all courses, yet should be mapped.
+        // Try to catch suitable courseUnit for this purpose
+        if (!courseUnit) {
+          courseUnit = courseUnits.find(({ validity_period }) =>
+            isAfterStartAndBeforeEnd(validity_period.startDate, validity_period.endDate, att.registration_date)
+          )
+        }
+      }
+
+      let courseProvider
+      let course
 
       // If there's no suitable courseunit, there isn't courseunit available at all.
       // --> Course should be created, if it doesn't exist in sis db
       if (!courseUnit) {
-        courseUnit = {
-          id: att.id,
-          name: att.name,
-          code: att.code,
-          latest_instance_date: att.attainment_date,
-          is_study_module: isModule(att.type),
-          coursetypecode: att.study_level_urn,
-          max_attainment_date: att.attainment_date,
-          min_attainment_date: att.attainment_date,
-          substitutions: [],
-          course_unit_type: att.course_unit_type_urn,
-        }
-        coursesToBeCreated.set(att.id, courseUnit)
+        if (serviceProvider === 'fd') {
+          courseUnit = {
+            id: att.id,
+            name: att.name,
+            code: att.code,
+            latest_instance_date: att.attainment_date,
+            is_study_module: isModule(att.type),
+            coursetypecode: att.study_level_urn,
+            max_attainment_date: att.attainment_date,
+            min_attainment_date: att.attainment_date,
+            substitutions: [],
+            course_unit_type: att.course_unit_type_urn,
+          }
+          coursesToBeCreated.set(att.id, courseUnit)
+          courseProvider = await CourseProvider.findOne({
+            where: {
+              coursecode: att.id,
+            },
+          })
+        } else {
+          const parsedCourseCode = attIdToCourseCode[att.id]
 
-        // see if course has provider
-        const courseProvider = await CourseProvider.findOne({
-          where: {
-            coursecode: att.id,
-          },
-        })
+          // see if course exists
+          course = await Course.findOne({ where: { code: parsedCourseCode, id: parsedCourseCode } })
+
+          // If course doesn't exist, create it
+          if (!course) {
+            courseUnit = {
+              id: parsedCourseCode,
+              name: att.name,
+              code: parsedCourseCode,
+              latest_instance_date: att.attainment_date,
+              is_study_module: isModule(att.type),
+              coursetypecode: att.study_level_urn,
+              max_attainment_date: att.attainment_date,
+              min_attainment_date: att.attainment_date,
+              substitutions: [],
+              course_unit_type: att.course_unit_type_urn,
+            }
+            coursesToBeCreated.set(parsedCourseCode, courseUnit)
+            courseProvider = await CourseProvider.findOne({
+              where: {
+                coursecode: parsedCourseCode,
+              },
+            })
+          }
+        }
+
+        const courseIdToUse = serviceProvider === 'fd' ? att.id : attIdToCourseCode[att.id]
 
         // If there's no courseprovider, try to create course provider
         if (!courseProvider) {
-          const mapCourseProvider = courseProviderMapper(att.id)
+          const mapCourseProvider = courseProviderMapper(courseIdToUse)
 
           // Only map provider if it is responsible and it is degree programme
           const correctProvider = att.organisations.find(
@@ -177,6 +232,9 @@ const updateAttainments = async (
           }
         }
 
+        if (serviceProvider !== 'fd') {
+          courseUnit = course || { id: courseIdToUse, code: courseIdToUse }
+        }
         courseUnit.group_id = courseUnit.id
       }
 
@@ -211,7 +269,11 @@ const updateAttainments = async (
     const attainmentIdCourseCodeMapForCustomCourseUnitAttainments = attainments.reduce(findMissingCourseCodes, {})
     const missingCodes = Object.values(attainmentIdCourseCodeMapForCustomCourseUnitAttainments)
     const courses = await getCourseUnitsByCodes(missingCodes)
-    return await Promise.all(attainments.map(addCourseUnitToCustomCourseUnitAttainments(courses)))
+    return await Promise.all(
+      attainments.map(
+        addCourseUnitToCustomCourseUnitAttainments(courses, attainmentIdCourseCodeMapForCustomCourseUnitAttainments)
+      )
+    )
   }
 
   const fixedAttainments = await fixCustomCourseUnitAttainments(attainments)
