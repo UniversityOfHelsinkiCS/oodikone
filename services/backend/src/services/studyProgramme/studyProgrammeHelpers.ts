@@ -192,13 +192,7 @@ export const getGoal = (programme?: string) => {
   return 48 // unknown, likely old doctor or licentiate
 }
 
-export const isRelevantProgramme = (code: string) => {
-  return (
-    (code.includes('KH') && !code.startsWith('2_KH') && !code.endsWith('_2')) ||
-    (code.includes('MH') && !code.startsWith('2_MH') && !code.endsWith('_2')) ||
-    /^(T)[0-9]{6}$/.test(code)
-  )
-}
+export const isRelevantProgramme = (code: string) => /^(KH|MH)\d{2}_\d{3}$/.test(code) || /^T\d{6}$/.test(code)
 
 export const getStudyRightElementsWithPhase = (studyRight: InferAttributes<SISStudyRight>, phase: Phase) => {
   return orderBy(

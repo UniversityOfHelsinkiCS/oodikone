@@ -3,9 +3,8 @@ import moment from 'moment'
 import { facultyCodes, ignoredFacultyCodes } from '../config/organizationConstants'
 import { Graduated, SpecialGroups, YearType } from '../types'
 import { redisClient } from './redis'
+import { isRelevantProgramme } from './studyProgramme/studyProgrammeHelpers'
 
-// Only new bachelor, masters and doctoral programmes get their data updated in redis every night, use redis for them
-const isUpdatedNewProgramme = (code: string) => code.includes('KH') || code.includes('MH') || /^(T)[0-9]{6}$/.test(code)
 const filteredFacultyCodes = facultyCodes.filter(item => !ignoredFacultyCodes.includes(item))
 const isFaculty = (code: string) => filteredFacultyCodes.includes(code)
 
@@ -28,7 +27,7 @@ export const getBasicStats = async (
   yearType: YearType,
   specialGroups: SpecialGroups
 ) => {
-  if (!isUpdatedNewProgramme(id)) {
+  if (!isRelevantProgramme(id)) {
     return null
   }
   const searchkey = combinedProgramme ? `${id}-${combinedProgramme}` : id
@@ -48,7 +47,7 @@ export const setBasicStats = async (data, yearType: YearType, specialGroups: Spe
     status: 'DONE',
     lastUpdated: moment().format(),
   }
-  if (!isUpdatedNewProgramme(id)) {
+  if (!isRelevantProgramme(id)) {
     return dataToRedis
   }
   const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(dataToRedis))
@@ -83,7 +82,7 @@ export const setCreditStats = async (data, isAcademicYear: boolean, specialGroup
     status: 'DONE',
     lastUpdated: moment().format(),
   }
-  if (!isUpdatedNewProgramme(data.id) && !isFaculty(data.id)) {
+  if (!isRelevantProgramme(id) && !isFaculty(id)) {
     return dataToRedis
   }
   const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(dataToRedis))
@@ -99,7 +98,7 @@ export const getGraduationStats = async (
   yearType: YearType,
   specialGroups: SpecialGroups
 ) => {
-  if (!isUpdatedNewProgramme(id)) {
+  if (!isRelevantProgramme(id)) {
     return null
   }
   const searchkey = combinedProgramme ? `${id}-${combinedProgramme}` : id
@@ -119,7 +118,7 @@ export const setGraduationStats = async (data, yearType: YearType, specialGroups
     status: 'DONE',
     lastUpdated: moment().format(),
   }
-  if (!isUpdatedNewProgramme(id)) {
+  if (!isRelevantProgramme(id)) {
     return dataToRedis
   }
   const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(dataToRedis))
@@ -135,7 +134,7 @@ export const getStudytrackStats = async (
   graduated: Graduated,
   specialGroups: SpecialGroups
 ) => {
-  if (!isUpdatedNewProgramme(id)) {
+  if (!isRelevantProgramme(id)) {
     return null
   }
   const searchkey = combinedProgramme ? `${id}-${combinedProgramme}` : id
@@ -155,7 +154,7 @@ export const setStudytrackStats = async (data, graduated: Graduated, specialGrou
     status: 'DONE',
     lastUpdated: moment().format(),
   }
-  if (!isUpdatedNewProgramme(id)) {
+  if (!isRelevantProgramme(id)) {
     return dataToRedis
   }
   const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(dataToRedis))
