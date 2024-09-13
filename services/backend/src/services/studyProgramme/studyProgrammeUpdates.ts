@@ -6,8 +6,8 @@ import { getStudyRightsInProgramme } from './studyRightFinders'
 import { getStudyTrackStatsForStudyProgramme } from './studyTrackStats'
 
 export const updateBasicView = async (code: string, combinedProgramme: string) => {
-  const yearOptions = ['CALENDAR_YEAR', 'ACADEMIC_YEAR']
-  const specialGroupOptions = ['SPECIAL_INCLUDED', 'SPECIAL_EXCLUDED']
+  const yearOptions = ['CALENDAR_YEAR', 'ACADEMIC_YEAR'] as const
+  const specialGroupOptions = ['SPECIAL_INCLUDED', 'SPECIAL_EXCLUDED'] as const
 
   for (const yearType of yearOptions) {
     for (const specialGroup of specialGroupOptions) {
@@ -37,8 +37,8 @@ export const updateBasicView = async (code: string, combinedProgramme: string) =
 }
 
 export const updateStudytrackView = async (code: string, combinedProgramme: string) => {
-  const graduatedOptions = ['GRADUATED_INCLUDED', 'GRADUATED_EXCLUDED']
-  const specialGroupOptions = ['SPECIAL_INCLUDED', 'SPECIAL_EXCLUDED']
+  const graduatedOptions = ['GRADUATED_INCLUDED', 'GRADUATED_EXCLUDED'] as const
+  const specialGroupOptions = ['SPECIAL_INCLUDED', 'SPECIAL_EXCLUDED'] as const
   const studyRightsOfProgramme = await getStudyRightsInProgramme(code, false, true)
 
   for (const graduated of graduatedOptions) {

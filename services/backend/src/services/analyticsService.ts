@@ -1,5 +1,7 @@
 import moment from 'moment'
+
 import { facultyCodes, ignoredFacultyCodes } from '../config/organizationConstants'
+import { Graduated, SpecialGroups, YearType } from '../types'
 import { redisClient } from './redis'
 
 // Only new bachelor, masters and doctoral programmes get their data updated in redis every night, use redis for them
@@ -7,24 +9,24 @@ const isUpdatedNewProgramme = (code: string) => code.includes('KH') || code.incl
 const filteredFacultyCodes = facultyCodes.filter(item => !ignoredFacultyCodes.includes(item))
 const isFaculty = (code: string) => filteredFacultyCodes.includes(code)
 
-const createRedisKeyForBasicStats = (id: string, yearType: string, specialGroups: string) => {
+const createRedisKeyForBasicStats = (id: string, yearType: YearType, specialGroups: SpecialGroups) => {
   return `BASIC_STATS_${id}_${yearType}_${specialGroups}`
 }
-const createRedisKeyForCreditStats = (id: string, yearType: string, specialGroups: string) => {
+const createRedisKeyForCreditStats = (id: string, yearType: YearType, specialGroups: SpecialGroups) => {
   return `CREDIT_STATS_${id}_${yearType}_${specialGroups}`
 }
-const createRedisKeyForGraduationStats = (id: string, yearType: string, specialGroups: string) => {
+const createRedisKeyForGraduationStats = (id: string, yearType: YearType, specialGroups: SpecialGroups) => {
   return `GRADUATION_STATS_${id}_${yearType}_${specialGroups}`
 }
-const createRedisKeyForStudytrackStats = (id: string, graduated: string, specialGroups: string) => {
+const createRedisKeyForStudytrackStats = (id: string, graduated: Graduated, specialGroups: SpecialGroups) => {
   return `STUDYTRACK_STATS_${id}_${graduated}_${specialGroups}`
 }
 
 export const getBasicStats = async (
   id: string,
   combinedProgramme: string | null,
-  yearType: string,
-  specialGroups: string
+  yearType: YearType,
+  specialGroups: SpecialGroups
 ) => {
   if (!isUpdatedNewProgramme(id)) {
     return null
@@ -38,7 +40,7 @@ export const getBasicStats = async (
   return JSON.parse(dataFromRedis)
 }
 
-export const setBasicStats = async (data, yearType: string, specialGroups: string) => {
+export const setBasicStats = async (data, yearType: YearType, specialGroups: SpecialGroups) => {
   const { id } = data
   const redisKey = createRedisKeyForBasicStats(id, yearType, specialGroups)
   const dataToRedis = {
@@ -94,8 +96,8 @@ export const setCreditStats = async (data, isAcademicYear: boolean, specialGroup
 export const getGraduationStats = async (
   id: string,
   combinedProgramme: string | null,
-  yearType: string,
-  specialGroups: string
+  yearType: YearType,
+  specialGroups: SpecialGroups
 ) => {
   if (!isUpdatedNewProgramme(id)) {
     return null
@@ -109,7 +111,7 @@ export const getGraduationStats = async (
   return JSON.parse(dataFromRedis)
 }
 
-export const setGraduationStats = async (data, yearType: string, specialGroups: string) => {
+export const setGraduationStats = async (data, yearType: YearType, specialGroups: SpecialGroups) => {
   const { id } = data
   const redisKey = createRedisKeyForGraduationStats(id, yearType, specialGroups)
   const dataToRedis = {
@@ -130,8 +132,8 @@ export const setGraduationStats = async (data, yearType: string, specialGroups: 
 export const getStudytrackStats = async (
   id: string,
   combinedProgramme: string | null,
-  graduated: string,
-  specialGroups: string
+  graduated: Graduated,
+  specialGroups: SpecialGroups
 ) => {
   if (!isUpdatedNewProgramme(id)) {
     return null
@@ -145,7 +147,7 @@ export const getStudytrackStats = async (
   return JSON.parse(dataFromRedis)
 }
 
-export const setStudytrackStats = async (data, graduated: string, specialGroups: string) => {
+export const setStudytrackStats = async (data, graduated: Graduated, specialGroups: SpecialGroups) => {
   const { id } = data
   const redisKey = createRedisKeyForStudytrackStats(id, graduated, specialGroups)
   const dataToRedis = {

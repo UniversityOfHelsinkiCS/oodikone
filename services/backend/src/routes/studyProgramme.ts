@@ -19,6 +19,7 @@ import { getGraduationStatsForStudytrack } from '../services/studyProgramme/stud
 import { updateBasicView, updateStudytrackView } from '../services/studyProgramme/studyProgrammeUpdates'
 import { getStudyRightsInProgramme } from '../services/studyProgramme/studyRightFinders'
 import { getStudyTrackStatsForStudyProgramme } from '../services/studyProgramme/studyTrackStats'
+import { Graduated, SpecialGroups, YearType } from '../types'
 import logger from '../util/logger'
 import { logInfoForGrafana } from '../util/logInfoForGrafana'
 
@@ -43,8 +44,8 @@ router.get('/creditstats', async (req: GetCreditStatsRequest, res: Response) => 
 
 interface GetStatsRequest extends Request {
   query: {
-    year_type: string
-    special_groups: string
+    year_type: YearType
+    special_groups: SpecialGroups
     combined_programme: string
   }
 }
@@ -127,8 +128,8 @@ router.get('/:id/coursestats', async (req: GetCourseStatsRequest, res: Response)
 
 interface GetStudyTrackStatsRequest extends Request {
   query: {
-    graduated: string
-    special_groups: string
+    graduated: Graduated
+    special_groups: SpecialGroups
     combined_programme: string
   }
 }
@@ -212,9 +213,9 @@ router.get('/:id/update_studytrackview', async (req: GetUpdateViewRequest, res: 
 
 interface GetEvaluationStatsRequest extends Request {
   query: {
-    graduated: string
-    year_type: string
-    special_groups: string
+    graduated: Graduated
+    year_type: YearType
+    special_groups: SpecialGroups
   }
 }
 
