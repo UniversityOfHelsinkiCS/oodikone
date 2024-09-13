@@ -208,7 +208,7 @@ export const GradeDistributionChart = ({ data, isRelative, userHasAccessToAllSta
         }}
       />
       {!userHasAccessToAllStats && (
-        <span className="totalsDisclaimer">* Years with 5 students or less are shown as 0 in the chart</span>
+        <span className="totalsDisclaimer">* Years with 5 students or fewer are shown as 0 in the chart</span>
       )}
     </div>
   )

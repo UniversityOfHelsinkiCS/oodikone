@@ -13,7 +13,7 @@ export const FoldableRow = ({ courseData, onClickFn, userHasAccessToAllStats }) 
   const showCourseRealisations = hasRealisations && isUnfolded
 
   const getCell = (content, obfuscated) => (
-    <Table.Cell content={obfuscated ? '5 or less students' : content} style={{ color: obfuscated && 'gray' }} />
+    <Table.Cell content={obfuscated ? '5 or fewer students' : content} style={{ color: obfuscated && 'gray' }} />
   )
 
   const getRow = (rowId, rowData, isMainRow = true) => {

@@ -82,7 +82,7 @@ const getColumns = (stats, showGrades, userHasAccessToAllStats, alternatives, se
       }),
       filterType: 'range',
       getRowVal: s => (s.rowObfuscated ? 5 : s.students.withEnrollments.total),
-      getRowContent: s => (s.rowObfuscated ? '5 or less students' : s.students.withEnrollments.total),
+      getRowContent: s => (s.rowObfuscated ? '5 or fewer students' : s.students.withEnrollments.total),
       getCellProps: s => defineCellColor(s.rowObfuscated),
     },
     {
@@ -118,7 +118,7 @@ const getColumns = (stats, showGrades, userHasAccessToAllStats, alternatives, se
       filterType: 'range',
       helpText: 'Total count of students with a valid enrollment and no passing or failing grade.',
       getRowVal: s => (s.rowObfuscated ? 5 : s.students.enrolledStudentsWithNoGrade),
-      getRowContent: s => (s.rowObfuscated ? '5 or less students' : s.students.enrolledStudentsWithNoGrade),
+      getRowContent: s => (s.rowObfuscated ? '5 or fewer students' : s.students.enrolledStudentsWithNoGrade),
       cellProps: s => ({
         style: {
           textAlign: 'right',
@@ -131,7 +131,7 @@ const getColumns = (stats, showGrades, userHasAccessToAllStats, alternatives, se
       title: 'Pass-%',
       getRowVal: s => (s.rowObfuscated ? 0 : s.students.withEnrollments.passRate * 100),
       getRowContent: s =>
-        s.rowObfuscated ? '5 or less students' : formatPercentage(s.students.withEnrollments.passRate),
+        s.rowObfuscated ? '5 or fewer students' : formatPercentage(s.students.withEnrollments.passRate),
       filterType: 'range',
       cellProps: s => ({
         style: {
@@ -199,7 +199,7 @@ export const StudentsTable = ({
         title={`Student statistics for group ${name}`}
       />
       {!userHasAccessToAllStats && (
-        <span className="totalsDisclaimer">* Years with 5 students or less are NOT included in the total</span>
+        <span className="totalsDisclaimer">* Years with 5 students or fewer are NOT included in the total</span>
       )}
     </div>
   )

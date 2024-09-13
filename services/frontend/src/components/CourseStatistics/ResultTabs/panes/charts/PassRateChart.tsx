@@ -172,7 +172,7 @@ export const PassRateChart = ({ data, isRelative, userHasAccessToAllStats, viewM
         config={{ ...primaryGraphOptions, series: isRelative ? passGraphSeries.relative : passGraphSeries.absolute }}
       />
       {!userHasAccessToAllStats && (
-        <span className="totalsDisclaimer">* Years with 5 students or less are shown as 0 in the chart</span>
+        <span className="totalsDisclaimer">* Years with 5 students or fewer are shown as 0 in the chart</span>
       )}
     </div>
   )

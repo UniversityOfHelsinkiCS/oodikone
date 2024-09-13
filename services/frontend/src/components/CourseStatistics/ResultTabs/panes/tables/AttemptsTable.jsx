@@ -123,7 +123,7 @@ export const AttemptsTable = ({
     getSortableColumn({
       key: 'ATTEMPTS',
       title: 'Total\nattempts',
-      getRowVal: s => (s.rowObfuscated ? '5 or less students' : s.attempts),
+      getRowVal: s => (s.rowObfuscated ? '5 or fewer students' : s.attempts),
     }),
     getSortableColumn({
       key: 'PASSED',
@@ -173,7 +173,7 @@ export const AttemptsTable = ({
       getSortableColumn({
         key: 'ATTEMPTS',
         title: 'Total attempts',
-        getRowVal: s => (s.rowObfuscated ? '5 or less students' : s.attempts),
+        getRowVal: s => (s.rowObfuscated ? '5 or fewer students' : s.attempts),
       }),
       ...getGradeColumns(resolveGrades(stats)),
     ]
@@ -196,7 +196,7 @@ export const AttemptsTable = ({
         title={`Yearly attempt statistics for group ${name}`}
       />
       {!userHasAccessToAllStats && (
-        <span className="totalsDisclaimer">* Years with 5 students or less are NOT included in the total</span>
+        <span className="totalsDisclaimer">* Years with 5 students or fewer are NOT included in the total</span>
       )}
     </>
   )
