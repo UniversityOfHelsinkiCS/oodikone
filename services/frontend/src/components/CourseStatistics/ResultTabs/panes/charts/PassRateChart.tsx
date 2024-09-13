@@ -14,7 +14,7 @@ exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
 accessibility(ReactHighcharts.Highcharts)
 
-const passRateAttemptGraphOptions = (isRelative, categories, max, title) => ({
+const passRateAttemptGraphOptions = (isRelative: boolean, categories: string[], max: number, title: string) => ({
   chart: {
     type: 'column',
   },
@@ -49,7 +49,7 @@ const passRateAttemptGraphOptions = (isRelative, categories, max, title) => ({
   },
 })
 
-const passRateStudentGraphOptions = (isRelative, categories, max, title) => ({
+const passRateStudentGraphOptions = (isRelative: boolean, categories: string[], max: number, title: string) => ({
   chart: {
     type: 'column',
   },
@@ -87,9 +87,9 @@ const passRateStudentGraphOptions = (isRelative, categories, max, title) => ({
 })
 
 const getPassRateAttemptSeriesFromStats = stats => {
-  const all = []
-  const passed = []
-  const failed = []
+  const all = [] as number[]
+  const passed = [] as number[]
+  const failed = [] as number[]
 
   stats.forEach(year => {
     const { passed: p, failed: f } = year.attempts.categories
@@ -112,11 +112,11 @@ const getPassRateAttemptSeriesFromStats = stats => {
 }
 
 const getPassRateStudentSeriesFromStats = stats => {
-  const all = []
-  const passedFirst = []
-  const passedEventually = []
-  const neverPassed = []
-  const enrolledNoGrade = []
+  const all = [] as number[]
+  const passedFirst = [] as number[]
+  const passedEventually = [] as number[]
+  const neverPassed = [] as number[]
+  const enrolledNoGrade = [] as number[]
 
   stats.forEach(year => {
     const { passedFirst: pf, passedEventually: pe, neverPassed: np } = year.students.categories
@@ -146,11 +146,18 @@ const getPassRateStudentSeriesFromStats = stats => {
   }
 }
 
-export const PassRateChart = ({ data, isRelative, userHasAccessToAllStats, viewMode }) => {
-  const isAttemptsMode = viewMode === 'ATTEMPTS'
+interface PassRateChartProps {
+  data: any
+  isRelative: boolean
+  userHasAccessToAllStats: boolean
+  viewMode: 'ATTEMPTS' | 'STUDENTS'
+}
 
+export const PassRateChart = ({ data, isRelative, userHasAccessToAllStats, viewMode }: PassRateChartProps) => {
   const stats = data.stats.filter(stat => stat.name !== 'Total')
   const statYears = stats.map(year => year.name)
+
+  const isAttemptsMode = viewMode === 'ATTEMPTS'
   const passGraphSeries = isAttemptsMode
     ? getPassRateAttemptSeriesFromStats(stats)
     : getPassRateStudentSeriesFromStats(stats)
