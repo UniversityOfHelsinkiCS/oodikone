@@ -2,12 +2,8 @@ import moment from 'moment'
 
 import { DegreeProgrammeType, Graduated, Name, ProgrammeFilter, SpecialGroups, YearType } from '../../types'
 import { redisClient } from '../redis'
-import { getDegreeProgrammesOfFaculty } from './faculty'
 import { FacultyProgressData } from './facultyStudentProgress'
 
-const createRedisKeyForFacultyProgrammes = (id: string, programmeFilter: ProgrammeFilter) => {
-  return `FACULTY_PROGRAMMES_${id}_${programmeFilter}`
-}
 const createRedisKeyForBasicStats = (
   id: string,
   yearType: YearType,
@@ -46,41 +42,6 @@ const removeGraduationTimes = (data: GraduationData) => {
       yearStat.times = null
     })
   )
-}
-
-export const setFacultyProgrammes = async (id: string, data, programmeFilter: ProgrammeFilter) => {
-  const redisKey = createRedisKeyForFacultyProgrammes(id, programmeFilter)
-  const dataToRedis = {
-    data,
-    status: 'DONE',
-    lastUpdated: moment().format(),
-  }
-  const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(dataToRedis))
-  if (setOperationStatus !== 'OK') {
-    return null
-  }
-  return dataToRedis
-}
-
-const getFacultyProgrammesFromRedis = async (id: string, programmeFilter: ProgrammeFilter) => {
-  const redisKey = createRedisKeyForFacultyProgrammes(id, programmeFilter)
-  const dataFromRedis = await redisClient.getAsync(redisKey)
-  if (!dataFromRedis) {
-    return null
-  }
-  return JSON.parse(dataFromRedis)
-}
-
-export const getProgrammes = async (code: string, programmeFilter: ProgrammeFilter = 'NEW_STUDY_PROGRAMMES') => {
-  const programmes = await getFacultyProgrammesFromRedis(code, programmeFilter)
-  if (programmes) {
-    return programmes
-  }
-  let updatedProgrammes: any = await getDegreeProgrammesOfFaculty(code, programmeFilter === 'NEW_STUDY_PROGRAMMES')
-  if (updatedProgrammes) {
-    updatedProgrammes = await setFacultyProgrammes(code, updatedProgrammes, programmeFilter)
-  }
-  return updatedProgrammes
 }
 
 type GraduationInfo = {
