@@ -524,7 +524,7 @@ describe('Course Statistics tests', () => {
     cy.contains('Show population').should('not.exist')
     cy.contains('.tabular.menu a', 'Attempts').click()
 
-    const emptyYear = year => [year, null, '5 or less students', 'NA', 'NA', 'NA', 'NA', 'NA', 'NA', 'NA']
+    const emptyYear = year => [year, null, '5 or fewer students', 'NA', 'NA', 'NA', 'NA', 'NA', 'NA', 'NA']
 
     const attemptsTableContents = [
       // [time, passed, failed, passrate, total enrollments, enrolled, rejected, aborted]
