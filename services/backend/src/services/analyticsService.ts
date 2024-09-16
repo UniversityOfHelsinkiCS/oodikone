@@ -32,7 +32,7 @@ export const getBasicStats = async (
   }
   const searchkey = combinedProgramme ? `${id}-${combinedProgramme}` : id
   const redisKey = createRedisKeyForBasicStats(searchkey, yearType, specialGroups)
-  const dataFromRedis = await redisClient.getAsync(redisKey)
+  const dataFromRedis = await redisClient.get(redisKey)
   if (!dataFromRedis) {
     return null
   }
@@ -50,7 +50,7 @@ export const setBasicStats = async (data, yearType: YearType, specialGroups: Spe
   if (!isRelevantProgramme(id)) {
     return dataToRedis
   }
-  const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(dataToRedis))
+  const setOperationStatus = await redisClient.set(redisKey, JSON.stringify(dataToRedis))
   if (setOperationStatus !== 'OK') {
     return null
   }
@@ -63,7 +63,7 @@ export const getCreditStats = async (providerCode: string, isAcademicYear: boole
     isAcademicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR',
     specialGroups ? 'SPECIAL_INCLUDED' : 'SPECIAL_EXCLUDED'
   )
-  const dataFromRedis = await redisClient.getAsync(redisKey)
+  const dataFromRedis = await redisClient.get(redisKey)
   if (!dataFromRedis) {
     return null
   }
@@ -85,7 +85,7 @@ export const setCreditStats = async (data, isAcademicYear: boolean, specialGroup
   if (!isRelevantProgramme(id) && !isFaculty(id)) {
     return dataToRedis
   }
-  const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(dataToRedis))
+  const setOperationStatus = await redisClient.set(redisKey, JSON.stringify(dataToRedis))
   if (setOperationStatus !== 'OK') {
     return null
   }
@@ -103,7 +103,7 @@ export const getGraduationStats = async (
   }
   const searchkey = combinedProgramme ? `${id}-${combinedProgramme}` : id
   const redisKey = createRedisKeyForGraduationStats(searchkey, yearType, specialGroups)
-  const dataFromRedis = await redisClient.getAsync(redisKey)
+  const dataFromRedis = await redisClient.get(redisKey)
   if (!dataFromRedis) {
     return null
   }
@@ -121,7 +121,7 @@ export const setGraduationStats = async (data, yearType: YearType, specialGroups
   if (!isRelevantProgramme(id)) {
     return dataToRedis
   }
-  const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(dataToRedis))
+  const setOperationStatus = await redisClient.set(redisKey, JSON.stringify(dataToRedis))
   if (setOperationStatus !== 'OK') {
     return null
   }
@@ -139,7 +139,7 @@ export const getStudytrackStats = async (
   }
   const searchkey = combinedProgramme ? `${id}-${combinedProgramme}` : id
   const redisKey = createRedisKeyForStudytrackStats(searchkey, graduated, specialGroups)
-  const dataFromRedis = await redisClient.getAsync(redisKey)
+  const dataFromRedis = await redisClient.get(redisKey)
   if (!dataFromRedis) {
     return null
   }
@@ -157,7 +157,7 @@ export const setStudytrackStats = async (data, graduated: Graduated, specialGrou
   if (!isRelevantProgramme(id)) {
     return dataToRedis
   }
-  const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(dataToRedis))
+  const setOperationStatus = await redisClient.set(redisKey, JSON.stringify(dataToRedis))
   if (setOperationStatus !== 'OK') {
     return null
   }

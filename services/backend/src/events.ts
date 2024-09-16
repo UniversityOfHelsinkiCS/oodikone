@@ -25,7 +25,7 @@ const schedule = (cronTime: string, onTick: () => void) => {
 export const refreshCloseToGraduating = async () => {
   logger.info('Refreshing students close to graduating')
   const updatedData = await findStudentsCloseToGraduation()
-  await redisClient.setAsync(CLOSE_TO_GRADUATION_REDIS_KEY, JSON.stringify(updatedData))
+  await redisClient.set(CLOSE_TO_GRADUATION_REDIS_KEY, JSON.stringify(updatedData))
   logger.info('Students close to graduating updated!')
 }
 
@@ -45,7 +45,7 @@ export const refreshFaculties = async () => {
 export const refreshLanguageCenterData = async () => {
   logger.info('Refreshing language center data')
   const freshData = await computeLanguageCenterData()
-  await redisClient.setAsync(LANGUAGE_CENTER_REDIS_KEY, JSON.stringify(freshData))
+  await redisClient.set(LANGUAGE_CENTER_REDIS_KEY, JSON.stringify(freshData))
   logger.info('Language center data refreshed!')
 }
 

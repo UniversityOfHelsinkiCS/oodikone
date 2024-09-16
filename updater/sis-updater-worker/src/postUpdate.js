@@ -11,7 +11,7 @@ const {
   studentsThatNeedToBeFixed,
 } = require('./updater/updateStudents/varhaiskasvatusFixer')
 const { logger } = require('./utils/logger')
-const { get: redisGet, incrby: redisIncrementBy, set: redisSet } = require('./utils/redis')
+const { redisClient } = require('./utils/redis')
 
 const logStatus = async (type, count, done, scheduled, startTime, humanType) => {
   logger.info({
@@ -25,8 +25,8 @@ const logStatus = async (type, count, done, scheduled, startTime, humanType) => 
 }
 
 const handleUpdateEnding = async (doneKey, totalKey) => {
-  await redisSet(doneKey, 0)
-  await redisSet(totalKey, 0)
+  await redisClient.set(doneKey, 0)
+  await redisClient.set(totalKey, 0)
 }
 
 const postUpdate = async (updateMsg, currentChunkStartTime) => {
@@ -47,8 +47,8 @@ const postUpdate = async (updateMsg, currentChunkStartTime) => {
   const totalKey = type === 'STUDENTS' ? REDIS_TOTAL_STUDENTS_KEY : REDIS_TOTAL_META_KEY
   const doneKey = type === 'STUDENTS' ? REDIS_TOTAL_STUDENTS_DONE_KEY : REDIS_TOTAL_META_DONE_KEY
 
-  const totalScheduled = Number(await redisGet(totalKey))
-  const totalDone = Number(await redisIncrementBy(doneKey, count))
+  const totalScheduled = Number(await redisClient.get(totalKey))
+  const totalDone = await redisClient.incrBy(doneKey, count)
 
   logStatus(type, count, totalDone, totalScheduled, currentChunkStartTime, updateMsg.type)
 

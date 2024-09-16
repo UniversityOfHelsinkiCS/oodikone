@@ -85,7 +85,7 @@ export const setBasicStats = async (
     status: 'DONE',
     lastUpdated: moment().format(),
   }
-  const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(dataToRedis))
+  const setOperationStatus = await redisClient.set(redisKey, JSON.stringify(dataToRedis))
   if (setOperationStatus !== 'OK') {
     return null
   }
@@ -99,7 +99,7 @@ export const getBasicStats = async (
   specialGroups: SpecialGroups
 ) => {
   const redisKey = createRedisKeyForBasicStats(id, yearType, programmeFilter, specialGroups)
-  const dataFromRedis = await redisClient.getAsync(redisKey)
+  const dataFromRedis = await redisClient.get(redisKey)
   if (!dataFromRedis) {
     return null
   }
@@ -136,7 +136,7 @@ export const setThesisWritersStats = async (
     status: 'DONE',
     lastUpdated: moment().format(),
   }
-  const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(dataToRedis))
+  const setOperationStatus = await redisClient.set(redisKey, JSON.stringify(dataToRedis))
   if (setOperationStatus !== 'OK') return null
   return dataToRedis
 }
@@ -148,7 +148,7 @@ export const getThesisWritersStats = async (
   specialGroups: SpecialGroups
 ) => {
   const redisKey = createRedisKeyForThesiswriters(id, yearType, programmeFilter, specialGroups)
-  const dataFromRedis = await redisClient.getAsync(redisKey)
+  const dataFromRedis = await redisClient.get(redisKey)
   if (!dataFromRedis) {
     return null
   }
@@ -185,7 +185,7 @@ export const setGraduationStats = async (data: GraduationData, programmeFilter: 
     status: 'DONE',
     lastUpdated: moment().format(),
   }
-  const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(dataToRedis))
+  const setOperationStatus = await redisClient.set(redisKey, JSON.stringify(dataToRedis))
   if (setOperationStatus !== 'OK') {
     return null
   }
@@ -198,7 +198,7 @@ export const getGraduationStats = async (
   keepGraduationTimes: boolean = false
 ) => {
   const redisKey = createRedisKeyForGraduationTimeStats(id, programmeFilter)
-  const dataFromRedis = await redisClient.getAsync(redisKey)
+  const dataFromRedis = await redisClient.get(redisKey)
   if (!dataFromRedis) {
     return null
   }
@@ -221,7 +221,7 @@ export const setFacultyProgressStats = async (
     status: 'DONE',
     lastUpdated: moment().format(),
   }
-  const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(dataToRedis))
+  const setOperationStatus = await redisClient.set(redisKey, JSON.stringify(dataToRedis))
   if (setOperationStatus !== 'OK') {
     return null
   }
@@ -230,7 +230,7 @@ export const setFacultyProgressStats = async (
 
 export const getFacultyProgressStats = async (id: string, specialGroups: SpecialGroups, graduated: Graduated) => {
   const redisKey = createRedisKeyForFacultyProgress(id, specialGroups, graduated)
-  const dataFromRedis = await redisClient.getAsync(redisKey)
+  const dataFromRedis = await redisClient.get(redisKey)
   if (!dataFromRedis) {
     return null
   }
@@ -262,7 +262,7 @@ export const setFacultyStudentStats = async (
     status: 'DONE',
     lastUpdated: moment().format(),
   }
-  const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(dataToRedis))
+  const setOperationStatus = await redisClient.set(redisKey, JSON.stringify(dataToRedis))
   if (setOperationStatus !== 'OK') {
     return null
   }
@@ -271,7 +271,7 @@ export const setFacultyStudentStats = async (
 
 export const getFacultyStudentStats = async (id: string, specialGroups: SpecialGroups, graduated: Graduated) => {
   const redisKey = createRedisKeyForFacultyStudents(id, specialGroups, graduated)
-  const dataFromRedis = await redisClient.getAsync(redisKey)
+  const dataFromRedis = await redisClient.get(redisKey)
   if (!dataFromRedis) {
     return null
   }

@@ -1,6 +1,6 @@
 const { NATS_GROUP, SIS_PURGE_CHANNEL, REDIS_LAST_PREPURGE_INFO, SLACK_WEBHOOK } = require('./config')
 const { logger } = require('./utils/logger')
-const { set: redisSet, get: redisGet } = require('./utils/redis')
+const { redisClient } = require('./utils/redis')
 const { stan, opts } = require('./utils/stan')
 
 const PURGE_ROWS_OLDER_THAN_DAYS = 30
@@ -69,7 +69,7 @@ const prePurgeGetImportantDatesFromNow = () => {
 // Set so that purge can ever delete 30 days old data
 
 const getPrePurgeInfo = async () => {
-  const infoString = await redisGet(REDIS_LAST_PREPURGE_INFO)
+  const infoString = await redisClient.get(REDIS_LAST_PREPURGE_INFO)
   const info = JSON.parse(infoString)
   return info || {}
 }
@@ -77,7 +77,7 @@ const getPrePurgeInfo = async () => {
 const setPurgeInfo = async purgeTargetDate => {
   const purgeAfterDate = prePurgeGetImportantDatesFromNow().dateAfterWhichPurgeCanBeRun
   const info = { purgeAfterDate, purgeTargetDate }
-  await redisSet(REDIS_LAST_PREPURGE_INFO, JSON.stringify(info))
+  await redisClient.set(REDIS_LAST_PREPURGE_INFO, JSON.stringify(info))
 }
 
 const collectResponses = (table, count) => {

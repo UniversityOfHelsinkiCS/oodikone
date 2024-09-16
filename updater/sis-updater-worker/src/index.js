@@ -15,7 +15,7 @@ const { update } = require('./updater')
 const { purge, prePurge, purgeByStudentNumber } = require('./updater/purge')
 const { loadMapsOnDemand } = require('./updater/shared')
 const { logger } = require('./utils/logger')
-const { get: redisGet, set: redisSet } = require('./utils/redis')
+const { redisClient } = require('./utils/redis')
 const { stan, opts } = require('./utils/stan')
 
 const handleMessage = messageHandler => async msg => {
@@ -51,7 +51,7 @@ const handleMessage = messageHandler => async msg => {
   } finally {
     try {
       msg.ack()
-      await redisSet(REDIS_LATEST_MESSAGE_RECEIVED, new Date())
+      await redisClient.set(REDIS_LATEST_MESSAGE_RECEIVED, new Date().toISOString())
     } catch (error) {
       logger.error({ message: 'Failed acking message', meta: error.stack })
       if (error.name === 'NatsError' && !process.env.CI) process.exit(1)
@@ -61,7 +61,7 @@ const handleMessage = messageHandler => async msg => {
 
 const resetStatusToZero = async (...redisKeys) => {
   for (const key of redisKeys) {
-    await redisSet(key, 0)
+    await redisClient.set(key, 0)
   }
 }
 
@@ -87,8 +87,8 @@ const isAllowedToUpdateMsg = async updateMsg => {
   const doneKey = updateMsg.type === 'students' ? REDIS_TOTAL_STUDENTS_DONE_KEY : REDIS_TOTAL_META_DONE_KEY
   const totalKey = updateMsg.type === 'students' ? REDIS_TOTAL_STUDENTS_KEY : REDIS_TOTAL_META_KEY
 
-  const done = Number(await redisGet(doneKey))
-  const totalScheduled = Number(await redisGet(totalKey))
+  const done = Number(await redisClient.get(doneKey))
+  const totalScheduled = Number(await redisClient.get(totalKey))
 
   if (totalScheduled > done) return true
   await resetStatusToZero(doneKey, totalKey)

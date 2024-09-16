@@ -1,37 +1,18 @@
-const redis = require('redis')
+const { createClient } = require('redis')
 
-const redisRetry = ({ attempt, error }) => {
-  if (attempt > 100) {
-    throw new Error('Lost connection to Redis...', error)
-  }
+const { logger } = require('./logger')
 
-  return Math.min(attempt * 100, 5000)
-}
-
-const client = redis.createClient({
-  url: process.env.REDIS_URI,
-  retry_strategy: redisRetry,
+const redisClient = createClient({
+  url: `redis:${process.env.REDIS_URI}`,
 })
 
-const redisPromisify = async (func, ...params) =>
-  new Promise((res, rej) => {
-    func.call(client, ...params, (error, data) => {
-      if (error) {
-        rej(error)
-      } else {
-        res(data)
-      }
-    })
+redisClient
+  .connect()
+  .then(() => {
+    logger.info('Connected to Redis')
+  })
+  .catch(error => {
+    logger.error('Failed to connect to Redis', error)
   })
 
-const set = async (key, val) => await redisPromisify(client.set, key, val)
-
-const get = async key => await redisPromisify(client.get, key)
-
-const incrby = async (key, val) => await redisPromisify(client.incrby, key, val)
-
-module.exports = {
-  set,
-  get,
-  incrby,
-}
+module.exports = { redisClient }

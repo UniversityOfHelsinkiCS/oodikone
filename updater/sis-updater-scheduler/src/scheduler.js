@@ -19,7 +19,7 @@ const {
 const { knexConnection } = require('./db/connection')
 const { startPrePurge, startPurge } = require('./purge')
 const { logger } = require('./utils/logger')
-const { incrby: redisIncrementBy, get: redisGet } = require('./utils/redis')
+const { redisClient } = require('./utils/redis')
 const { stan, opts } = require('./utils/stan')
 
 const IMPORTER_TABLES = {
@@ -85,7 +85,7 @@ const schedule = async (args, channel = SIS_UPDATER_SCHEDULE_CHANNEL) => {
 
 const createJobs = async (entityIds, type, channel = SIS_UPDATER_SCHEDULE_CHANNEL) => {
   const redisKey = type === 'students' ? REDIS_TOTAL_STUDENTS_KEY : REDIS_TOTAL_META_KEY
-  await redisIncrementBy(redisKey, entityIds.length)
+  await redisClient.incrBy(redisKey, entityIds.length)
   await schedule({ entityIds, type }, channel)
 }
 
@@ -107,7 +107,7 @@ const scheduleFromDb = async ({
   if (limit) knexBuilder.limit(limit)
   if (whereIn) knexBuilder.whereIn(...whereIn)
   if (!clean) {
-    const lastHourlyScheduleFromRedis = await redisGet(REDIS_LAST_HOURLY_SCHEDULE)
+    const lastHourlyScheduleFromRedis = await redisClient.get(REDIS_LAST_HOURLY_SCHEDULE)
     const lastHourlySchedule = lastHourlyScheduleFromRedis ?? new Date(new Date().setHours(0, 0, 0, 0))
     knexBuilder.where('updated_at', '>=', new Date(lastHourlySchedule))
   }
@@ -174,7 +174,7 @@ const scheduleStudents = async () => {
 const getHourlyPersonsToUpdate = async () => {
   logger.info('Getting hourly persons to update')
   const { knex } = knexConnection
-  const lastHourlyScheduleFromRedis = await redisGet(REDIS_LAST_HOURLY_SCHEDULE)
+  const lastHourlyScheduleFromRedis = await redisClient.get(REDIS_LAST_HOURLY_SCHEDULE)
   const lastHourlySchedule = lastHourlyScheduleFromRedis ?? new Date(new Date().setHours(0, 0, 0, 0))
   const getUpdatedFrom = (table, pluck) => {
     const builder = knex(table).pluck(pluck)
@@ -236,7 +236,7 @@ const scheduleByCourseCodes = async courseCodes => {
 }
 
 const isUpdaterActive = async () => {
-  const latestUpdaterHandledMessage = await redisGet(REDIS_LATEST_MESSAGE_RECEIVED)
+  const latestUpdaterHandledMessage = await redisClient.get(REDIS_LATEST_MESSAGE_RECEIVED)
   return (
     latestUpdaterHandledMessage &&
     new Date().getTime() - new Date(latestUpdaterHandledMessage).getTime() <= LATEST_MESSAGE_RECEIVED_THRESHOLD

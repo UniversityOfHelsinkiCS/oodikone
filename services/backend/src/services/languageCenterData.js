@@ -219,10 +219,10 @@ const computeLanguageCenterData = async () => {
 }
 
 const getLanguageCenterData = async () => {
-  const dataOnRedis = await redisClient.getAsync(LANGUAGE_CENTER_REDIS_KEY)
+  const dataOnRedis = await redisClient.get(LANGUAGE_CENTER_REDIS_KEY)
   if (dataOnRedis) return JSON.parse(dataOnRedis)
   const freshData = await computeLanguageCenterData()
-  redisClient.setAsync(LANGUAGE_CENTER_REDIS_KEY, JSON.stringify(freshData))
+  await redisClient.set(LANGUAGE_CENTER_REDIS_KEY, JSON.stringify(freshData))
   return freshData
 }
 
