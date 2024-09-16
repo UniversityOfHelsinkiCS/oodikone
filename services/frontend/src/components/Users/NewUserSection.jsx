@@ -25,14 +25,12 @@ export const NewUserSection = ({ onAddUser }) => {
   }, [userFromApi, isLoadingGetUser, isErrorGetUser, isFetching])
 
   useEffect(() => {
-    if (!isLoadingAddUser && !isErrorAddUser) {
+    if (!isLoadingAddUser && !isErrorAddUser && addedUser) {
       setUser('')
       setEppn('')
       onAddUser()
-      if (addedUser) {
-        setShowAdded(true)
-        setTimeout(() => setShowAdded(false), 2000)
-      }
+      setShowAdded(true)
+      setTimeout(() => setShowAdded(false), 2000)
     }
     if (isErrorAddUser) {
       if (addUserError.status === 400) {

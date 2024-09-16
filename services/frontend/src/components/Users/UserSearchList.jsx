@@ -12,7 +12,7 @@ import { useGetProgrammesQuery } from '@/redux/populations'
 import { useDeleteUserMutation } from '@/redux/users'
 import { reformatDate } from '@/util/timeAndDate'
 
-export const UserSearchList = ({ refreshUserList, users, isLoading, isError }) => {
+export const UserSearchList = ({ getAllUsersQuery, users, isLoading, isError }) => {
   const { getTextIn } = useLanguage()
   const [popupTimeout, setPopupTimeout] = useState(null)
   const [popupOpen, setPopupOpen] = useState(false)
@@ -40,7 +40,7 @@ export const UserSearchList = ({ refreshUserList, users, isLoading, isError }) =
   useEffect(() => {
     if (deletedUser) {
       setConfirmDeleteId(null)
-      refreshUserList()
+      getAllUsersQuery()
     }
   }, [deletedUser])
 

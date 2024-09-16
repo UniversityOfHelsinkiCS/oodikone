@@ -317,7 +317,7 @@ export const addNewUser = async user => {
     })
     return true
   } catch (error) {
-    throw new Error('Could not add user to db.')
+    throw new Error('Could not add or update user.')
   }
 }
 

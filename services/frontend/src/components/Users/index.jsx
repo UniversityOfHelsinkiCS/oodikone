@@ -24,10 +24,6 @@ export const Users = () => {
     }
   }, [userid])
 
-  const refreshUserList = () => {
-    getAllUsersQuery()
-  }
-
   return (
     <div className="segmentContainer" style={{ marginBottom: '10px' }}>
       <Header className="segmentTitle" size="large">
@@ -37,7 +33,7 @@ export const Users = () => {
       {userid ? (
         <UserPage />
       ) : (
-        <UserSearchList isError={isError} isLoading={isLoading} refreshUserList={refreshUserList} users={users} />
+        <UserSearchList getAllUsersQuery={getAllUsersQuery} isError={isError} isLoading={isLoading} users={users} />
       )}
     </div>
   )
