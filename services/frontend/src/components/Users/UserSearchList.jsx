@@ -9,15 +9,19 @@ import { SortableTable } from '@/components/SortableTable'
 import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 import { useShowAsUser } from '@/redux/auth'
 import { useGetProgrammesQuery } from '@/redux/populations'
+import { useDeleteUserMutation } from '@/redux/users'
 import { reformatDate } from '@/util/timeAndDate'
 
-export const UserSearchList = ({ users, isLoading, isError }) => {
+export const UserSearchList = ({ refreshUserList, users, isLoading, isError }) => {
   const { getTextIn } = useLanguage()
   const [popupTimeout, setPopupTimeout] = useState(null)
   const [popupOpen, setPopupOpen] = useState(false)
   const [userEmails, setUserEmails] = useState([])
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null)
   const { data: studyProgrammes = {} } = useGetProgrammesQuery()
   const showAsUser = useShowAsUser()
+
+  const [deleteUserMutation, { data: deletedUser }] = useDeleteUserMutation()
 
   const copyEmailsToClipboard = () => {
     navigator.clipboard.writeText(userEmails.join('; '))
@@ -34,6 +38,13 @@ export const UserSearchList = ({ users, isLoading, isError }) => {
   )
 
   useEffect(() => {
+    if (deletedUser) {
+      setConfirmDeleteId(null)
+      refreshUserList()
+    }
+  }, [deletedUser])
+
+  useEffect(() => {
     return () => clearTimeout(popupTimeout)
   }, [])
 
@@ -45,6 +56,15 @@ export const UserSearchList = ({ users, isLoading, isError }) => {
   const handlePopupClose = () => {
     setPopupOpen(false)
     setPopupTimeout(null)
+  }
+
+  const deleteUser = userId => {
+    deleteUserMutation(userId)
+  }
+
+  const changeButton = userId => {
+    if (confirmDeleteId !== userId) setConfirmDeleteId(userId)
+    else deleteUser(userId)
   }
 
   const columnsWithoutIamGroups = [
@@ -119,6 +139,23 @@ export const UserSearchList = ({ users, isLoading, isError }) => {
       filterable: false,
       sortable: false,
       getRowVal: user => <Button basic circular icon="spy" onClick={() => showAsUser(user.username)} size="tiny" />,
+    },
+    {
+      key: 'DELETE',
+      title: 'Delete user',
+      filterable: false,
+      sortable: false,
+      getRowVal: user => (
+        <Button
+          color={confirmDeleteId !== user.id ? 'red' : 'black'}
+          id={`delete-${user.id}`}
+          onClick={() => changeButton(user.id)}
+          size="tiny"
+          style={{ width: '150px' }}
+        >
+          {confirmDeleteId !== user.id ? 'Delete user' : 'Click again to confirm deletion'}
+        </Button>
+      ),
     },
   ]
 

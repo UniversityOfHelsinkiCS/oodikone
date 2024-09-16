@@ -321,3 +321,11 @@ export const getUserFromSisuByEppn = async (requesterEppn: string, newUserEppn: 
   })
   return personData
 }
+
+export const deleteUserById = async userId => {
+  await User.destroy({
+    where: {
+      id: userId,
+    },
+  })
+}

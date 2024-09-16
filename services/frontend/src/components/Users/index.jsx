@@ -24,13 +24,21 @@ export const Users = () => {
     }
   }, [userid])
 
+  const refreshUserList = () => {
+    getAllUsersQuery()
+  }
+
   return (
     <div className="segmentContainer" style={{ marginBottom: '10px' }}>
       <Header className="segmentTitle" size="large">
         Oodikone users
       </Header>
       {!userid && !isDefaultServiceProvider() && <NewUserSection onAddUser={onAddUser} />}
-      {userid ? <UserPage /> : <UserSearchList isError={isError} isLoading={isLoading} users={users} />}
+      {userid ? (
+        <UserPage />
+      ) : (
+        <UserSearchList isError={isError} isLoading={isLoading} refreshUserList={refreshUserList} users={users} />
+      )}
     </div>
   )
 }

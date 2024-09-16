@@ -29,10 +29,26 @@ interface AddUserRequest extends Request {
   }
 }
 
+interface DeleteUserRequest extends Request {
+  body: {
+    userId: string // TODO: Funidata, what is the type of user?
+  }
+}
+
 router.post('/add', auth.roles(['admin']), async (req: AddUserRequest, res: Response) => {
   const { user } = req.body
   const person = await userService.addNewUser(user)
   res.json(person)
+})
+
+router.post('/delete', auth.roles(['admin']), async (req: DeleteUserRequest, res: Response) => {
+  const { userId } = req.body
+  try {
+    await userService.deleteUserById(userId)
+    res.json({ deleted: userId })
+  } catch (error) {
+    return res.status(400).json({ error: 'Deletion was unsuccessful with the user id included in the request' })
+  }
 })
 
 export default router
