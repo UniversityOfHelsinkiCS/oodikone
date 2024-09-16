@@ -140,6 +140,10 @@ export const UserSearchList = ({ refreshUserList, users, isLoading, isError }) =
       sortable: false,
       getRowVal: user => <Button basic circular icon="spy" onClick={() => showAsUser(user.username)} size="tiny" />,
     },
+  ]
+
+  const columnsWithoutIamGroupsWithDelete = [
+    ...columnsWithoutIamGroups,
     {
       key: 'DELETE',
       title: 'Delete user',
@@ -185,7 +189,7 @@ export const UserSearchList = ({ refreshUserList, users, isLoading, isError }) =
   return (
     <Segment className="contentSegment">
       <SortableTable
-        columns={isDefaultServiceProvider() ? columnsWithIamGroups : columnsWithoutIamGroups}
+        columns={isDefaultServiceProvider() ? columnsWithIamGroups : columnsWithoutIamGroupsWithDelete}
         data={users}
         handleDisplayedDataChange={handleDisplayedDataChange}
         hideHeaderBar
