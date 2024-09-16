@@ -54,8 +54,8 @@ const passRateStudentGraphOptions = (isRelative: boolean, categories: string[], 
     type: 'column',
   },
   colors: isRelative
-    ? [chartColor.greenLight, chartColor.greenDark, chartColor.redLight, chartColor.redDark]
-    : [chartColor.blue, chartColor.greenLight, chartColor.greenDark, chartColor.redLight, chartColor.redDark],
+    ? [chartColor.greenDark, chartColor.redDark, chartColor.redLight]
+    : [chartColor.blue, chartColor.greenDark, chartColor.redDark, chartColor.redLight],
   credits: {
     enabled: false,
   },
@@ -129,17 +129,17 @@ const getPassRateStudentSeriesFromStats = stats => {
     enrolledNoGrade.push(enrolledWithNoGrade || 0)
   })
 
+  const passed = passedFirst.map((value, index) => value + passedEventually[index])
+
   return {
     absolute: [
       getDataObject('all', all, 'a'),
-      getDataObject('passed on first try', passedFirst, 'b'),
-      getDataObject('passed eventually', passedEventually, 'b'),
+      getDataObject('passed', passed, 'b'),
       getDataObject('never passed', neverPassed, 'c'),
       getDataObject('enrolled, no grade', enrolledNoGrade, 'c'),
     ],
     relative: [
-      getDataObject('passed on first try', passedFirst.map(absoluteToRelative(all)), 'b'),
-      getDataObject('passed eventually', passedEventually.map(absoluteToRelative(all)), 'b'),
+      getDataObject('passed', passed.map(absoluteToRelative(all)), 'b'),
       getDataObject('never passed', neverPassed.map(absoluteToRelative(all)), 'c'),
       getDataObject('enrolled, no grade', enrolledNoGrade.map(absoluteToRelative(all)), 'c'),
     ],
