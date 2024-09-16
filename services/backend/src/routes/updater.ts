@@ -65,13 +65,6 @@ router.post('/update/v2/customlist/:type', async (req: PostCustomListRequest, re
   }
 })
 
-router.post('/update/v2/courses', async (req: Request, res: Response) => {
-  const response = await updateSISCoursesByCourseCode(req.body)
-  if (response) {
-    res.status(200).json('Update SIS courses scheduled')
-  }
-})
-
 router.get('/update/v2/programmes', async (_req: Request, res: Response) => {
   const response = await updateSISProgrammes()
   if (response) {
@@ -87,10 +80,12 @@ router.get('/refresh_redis_cache', async (req: Request, res: Response) => {
   }
 })
 
-router.post('/refresh_statistic_v2', async (req: Request, res: Response) => {
-  logger.info(`${req.user.username} requested refresh of statistics`)
-  jobMaker.statistics()
-  res.status(200).json('Teacher and study programme statistics refreshed')
+router.post('/refresh-teacher-leaderboard', async (req: Request, res: Response) => {
+  logger.info(
+    `${req.user.username} requested refresh of teacher leaderboard for the current and previous academic year`
+  )
+  jobMaker.teacherLeaderboard()
+  res.status(200).json('Teacher leaderboard for the current and previous academic year refreshed')
 })
 
 router.post('/refresh_study_programmes_v2', async (req: Request, res: Response) => {

@@ -17,7 +17,7 @@ export const Updater = () => {
 
   useTitle('Updater')
 
-  const apiCall = async (name, url, method, data) => {
+  const apiCall = async (url, method, data) => {
     try {
       const response = await callApi(url, method, data)
       setMessages(oldMessages => oldMessages.concat({ time: new Date(), message: response.data, color: 'green' }))
@@ -26,22 +26,21 @@ export const Updater = () => {
     }
   }
 
-  const updateSISMeta = () => apiCall('meta', '/updater/update/v2/meta', 'get')
-  const updateSISStudents = () => apiCall('students', '/updater/update/v2/students', 'get')
-  const updateSISProgrammes = () => apiCall('curriculums', '/updater/update/v2/programmes')
+  const updateSISMeta = () => apiCall('/updater/update/v2/meta')
+  const updateSISStudents = () => apiCall('/updater/update/v2/students')
+  const updateSISProgrammes = () => apiCall('/updater/update/v2/programmes')
   const updateSISCustomList = () =>
-    apiCall('custom list', `/updater/update/v2/customlist/${type}`, 'post', customList.trim().split('\n'))
-  const refreshStatisticsV2 = () => apiCall('statistics', '/updater/refresh_statistic_v2', 'post')
-  const abortSisUpdater = () => apiCall(null, '/updater/abort', 'get')
-  const refreshSISRedisCache = () => apiCall('Updater redis', '/updater/refresh_redis_cache', 'get')
-  const refreshAllTeacherLeaderboards = () => apiCall('teacher leaderboards', '/teachers/top', 'post')
-  const refreshFaculties = () => apiCall('faculties', '/updater/refresh_faculties_v2', 'post')
-  const refreshStudyProgrammes = () => apiCall('study programmes', '/updater/refresh_study_programmes_v2', 'post')
-  const refreshLanguageCenterData = () =>
-    apiCall('language center data', '/updater/refresh_language_center_data', 'post')
-  const refreshCloseToGraduationData = () =>
-    apiCall('close to graduation data', '/updater/refresh-close-to-graduation', 'post')
-  const getJobs = () => callApi('/updater/jobs', 'get')
+    apiCall(`/updater/update/v2/customlist/${type}`, 'post', customList.trim().split('\n'))
+  const refreshTeacherLeaderboardForCurrentAndPreviousYear = () =>
+    apiCall('/updater/refresh-teacher-leaderboard', 'post')
+  const abortSisUpdater = () => apiCall('/updater/abort')
+  const refreshSISRedisCache = () => apiCall('/updater/refresh_redis_cache')
+  const refreshAllTeacherLeaderboards = () => apiCall('/teachers/top', 'post')
+  const refreshFaculties = () => apiCall('/updater/refresh_faculties_v2', 'post')
+  const refreshStudyProgrammes = () => apiCall('/updater/refresh_study_programmes_v2', 'post')
+  const refreshLanguageCenterData = () => apiCall('/updater/refresh_language_center_data', 'post')
+  const refreshCloseToGraduationData = () => apiCall('/updater/refresh-close-to-graduation', 'post')
+  const getJobs = () => callApi('/updater/jobs')
   const removeWaitingJobs = () => callApi('/updater/jobs', 'delete')
 
   const updateJobs = async () => {
@@ -85,8 +84,8 @@ export const Updater = () => {
           **Updater sis-db - Update students** Updates 1000 students at one click in development and all in production environment. Takes about 5 hours in production.  
           **Updater sis-db - Update curriculums** Updates all study programmes and their curriculums. This takes a few minutes, and breaks the curriculum features for that time, so do not run in production unnecessarily.  
           **Updater redis - Update redis** Updates updater redis.  
-          **Oodikone redis - Refresh all teacher leaderboards** Refresh all leaderboard statistics from 1963 until today. Might take some time.  
-          **Oodikone redis - Refresh oodikone statistics** Refresh studyright associations and the last two years of teacher leaderboard.  
+          **Oodikone redis - Refresh all teacher leaderboards** Refresh all teacher leaderboard statistics from 1951 until today. Might take some time.  
+          **Oodikone redis - Refresh teacher leaderboards of current and previous year** Refresh teacher leaderboard statistics for current and previous academic year.  
           **Oodikone redis - Refresh faculties** Refresh data for all faculties for all tabs (time consuming).  
           **Oodikone redis - Refresh study programmes** Refresh data for new study programmes for basic and studytrack tabs (time consuming).  
           **Oodikone redis - Refresh language center data** Refresh data for language center view.  
@@ -122,7 +121,10 @@ export const Updater = () => {
               if (window.confirm('This is not ran in worker yet. Continue?')) refreshAllTeacherLeaderboards()
             }}
           />
-          <Form.Button content="Refresh oodikone statistics" onClick={refreshStatisticsV2} />
+          <Form.Button
+            content="Refresh teacher leaderboards of current and previous year"
+            onClick={refreshTeacherLeaderboardForCurrentAndPreviousYear}
+          />
           <Form.Button content="Refresh faculties" onClick={refreshFaculties} />
           <Form.Button content="Refresh study programmes" onClick={refreshStudyProgrammes} />
           {languageCenterViewEnabled && (

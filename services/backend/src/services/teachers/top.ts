@@ -141,8 +141,8 @@ const findAndSaveTopTeachers = async (yearCode: number) => {
   await setTeacherStats(CategoryID.ALL, yearCode, all)
 }
 
-export const findAndSaveTeachers = async (endCode: number, startCode: number = 1) => {
-  const endYearCode = endCode || (await getCurrentSemester()).getDataValue('yearcode')
+export const findAndSaveTeachers = async (endCode?: number, startCode: number = 1) => {
+  const endYearCode = endCode ?? (await getCurrentSemester()).getDataValue('yearcode')
   for (let code = startCode; code <= endYearCode; code++) {
     await findAndSaveTopTeachers(code)
     logger.info(`Teacher leaderboard for yearcode ${code} calculated`)

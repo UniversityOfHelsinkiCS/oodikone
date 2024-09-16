@@ -51,7 +51,7 @@ const removeWaitingJobs = async () => {
 const jobMaker = {
   faculty: code => addJob('faculty', { code }),
   programme: code => addJob('programme', { code }),
-  statistics: () => addJob('statistics'),
+  teacherLeaderboard: () => addJob('teacherLeaderboard'),
   languagecenter: () => addJob('languagecenter'),
   studyplansUpdate: days => addJob('studyplansUpdate', { days }, 7200),
   closeToGraduation: () => addJob('closeToGraduation'),

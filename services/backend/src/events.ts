@@ -83,7 +83,7 @@ export const refreshProgrammes = async () => {
   }
 }
 
-const refreshTeacherLeaderboard = async () => {
+export const refreshTeacherLeaderboard = async () => {
   logger.info('Refreshing statistics for teacher leaderboard')
   const currentSemestersYearCode = (await getCurrentSemester()).getDataValue('yearcode')
   await findAndSaveTeachers(currentSemestersYearCode, currentSemestersYearCode - 1)

@@ -50,15 +50,17 @@ router.get('/top', async (req: GetTopTeachersRequest, res: Response) => {
 
 interface PostTopTeachersRequest extends Request {
   body: {
-    startyearcode: string
-    endyearcode: string
+    startyearcode?: string
+    endyearcode?: string
   }
 }
 
 router.post('/top', async (req: PostTopTeachersRequest, res: Response) => {
   const { startyearcode, endyearcode } = req.body
+  const endYear = endyearcode ? Number(endyearcode) : undefined
+  const startYear = startyearcode ? Number(startyearcode) : undefined
   res.status(200).end()
-  await findAndSaveTeachers(Number(endyearcode), Number(startyearcode))
+  await findAndSaveTeachers(endYear, startYear)
 })
 
 router.get('/top/categories', async (_req: Request, res: Response) => {

@@ -1,7 +1,7 @@
 const {
   refreshLanguageCenterData,
   refreshProgramme,
-  refreshStatistics,
+  refreshTeacherLeaderboard,
   refreshFaculty,
   refreshCloseToGraduating,
 } = require('../events')
@@ -18,7 +18,7 @@ const refreshers = {
   languagecenter: refreshLanguageCenterData,
   faculty: refreshFaculty,
   programme: refreshProgramme,
-  statistics: refreshStatistics,
+  teacherLeaderboard: refreshTeacherLeaderboard,
   closeToGraduation: refreshCloseToGraduating,
 }
 
