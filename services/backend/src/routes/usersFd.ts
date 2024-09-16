@@ -23,22 +23,36 @@ router.get('/from-sisu-by-eppn/:newUserEppn', auth.roles(['admin']), async (req:
   res.json(person)
 })
 
+interface User {
+  id: string
+  first_name: string
+  last_name: string
+  call_name: string
+  eppn: string
+  email_address: string
+  student_number: string
+  phone_number: string
+  document_state: string
+}
+
 interface AddUserRequest extends Request {
   body: {
-    user: any // TODO: Funidata, what is the type of user?
+    user: User
   }
 }
 
 interface DeleteUserRequest extends Request {
   body: {
-    userId: string // TODO: Funidata, what is the type of user?
+    userId: string
   }
 }
 
 router.post('/add', auth.roles(['admin']), async (req: AddUserRequest, res: Response) => {
   const { user } = req.body
-  const person = await userService.addNewUser(user)
-  res.json(person)
+  const oldUser = await userService.findByUsername(user.eppn)
+  if (oldUser) return res.status(400).json({ error: 'Trying to add a user already present in the user database.' })
+  const success = await userService.addNewUser(user)
+  res.json(success)
 })
 
 router.post('/delete', auth.roles(['admin']), async (req: DeleteUserRequest, res: Response) => {
