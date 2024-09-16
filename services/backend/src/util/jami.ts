@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/node'
 import axios from 'axios'
 
-import { importerToken, jamiUrl, serviceProvider } from '../config'
+import { importerToken, isStaging, jamiUrl, serviceProvider } from '../config'
 import { IamAccess } from '../types'
 import logger from './logger'
 
@@ -29,7 +29,7 @@ export const getUserIamAccess = async (
     const { data: iamAccess } = await jamiClient.post('/', {
       userId: sisPersonId,
       iamGroups,
-      getSisuAccess: true,
+      getSisuAccess: !isStaging,
     })
     const { specialGroup } = iamAccess as { specialGroup: Record<string, boolean> }
     delete iamAccess.specialGroup
