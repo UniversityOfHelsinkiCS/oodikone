@@ -100,7 +100,7 @@ class DbConnections extends EventEmitter {
       logger.error({ message: 'Migration error', meta: JSON.stringify(error) })
       throw error
     } finally {
-      unlock()
+      await unlock()
     }
   }
 }

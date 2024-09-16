@@ -7,7 +7,7 @@ import { ProviderOrganization } from './common/ProviderOrganization'
 import { Setting } from './common/Setting'
 
 export const TableSettings = ({ availableStats, datasets, onChange, onSeparateChange, setSplitDirection, value }) => {
-  const { showDetails, showGrades, separate, splitDirection, viewMode } = value
+  const { showGrades, separate, splitDirection, viewMode } = value
 
   const settings = [
     <Setting key="gradeToggle" labelText="Show grades">
@@ -25,20 +25,6 @@ export const TableSettings = ({ availableStats, datasets, onChange, onSeparateCh
       <ProviderOrganization availableStats={availableStats} />
     </Setting>,
   ]
-
-  if (viewMode === 'STUDENTS') {
-    settings.unshift(
-      <Setting key="detailToggle" labelText="Show details">
-        <Radio
-          checked={showDetails}
-          data-cy="detailToggle"
-          key="detailToggle"
-          onChange={() => onChange({ ...value, showDetails: !showDetails })}
-          toggle
-        />
-      </Setting>
-    )
-  }
 
   if (datasets.filter(dataset => dataset).length > 1) {
     settings.push(

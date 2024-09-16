@@ -120,6 +120,7 @@ export const PopulationDetails = ({
           />
         </div>
       ),
+      alwaysRender: true,
     },
   ]
 

@@ -91,7 +91,7 @@ export const TeacherStatisticsTable = ({ statistics, variant }) => {
     <SortableTable
       columns={columns}
       data={data}
-      defaultSort={['name', 'asc']}
+      defaultSort={variant === 'leaderboard' ? ['credits', 'desc'] : ['name', 'asc']}
       featureName="teacher_statistics"
       title="Teacher statistics"
     />

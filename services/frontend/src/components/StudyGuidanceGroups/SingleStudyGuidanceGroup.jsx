@@ -1,4 +1,3 @@
-import { map } from 'lodash'
 import moment from 'moment'
 import { useState } from 'react'
 import { useHistory } from 'react-router-dom'
@@ -49,10 +48,16 @@ const SingleStudyGroupContent = ({ filteredStudents, group }) => {
     },
   }
 
-  const { data: courses, isLoading: coursesAreLoading } = useGetStudyGuidanceGroupPopulationCoursesQuery({
-    studentnumberlist: map(filteredStudents, 'studentNumber'),
+  const {
+    data: courses,
+    isLoading,
+    isFetching,
+  } = useGetStudyGuidanceGroupPopulationCoursesQuery({
+    studentnumberlist: filteredStudents.map(student => student.studentNumber).sort(),
     year: group?.tags?.year,
   })
+
+  const coursesAreLoading = isLoading || isFetching
 
   const creditDateFilterActive = useFilterSelector(creditDateFilter.selectors.isActive)
   const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions)
@@ -263,14 +268,13 @@ const SingleStudyGroupFilterView = ({ courses, group, population, ...otherProps 
   )
 }
 
-const SingleStudyGroupViewWrapper = ({ group, isLoading, studyProgrammes, children }) => {
+const SingleStudyGroupViewWrapper = ({ group, isLoading, children }) => {
   const history = useHistory()
   const { getTextIn } = useLanguage()
+  const studyProgrammes = useFilteredAndFormattedStudyProgrammes()
   const handleBack = () => {
     history.push('/studyguidancegroups')
   }
-
-  if (!group) return null
 
   return (
     <>
@@ -297,15 +301,13 @@ const SingleStudyGroupViewWrapper = ({ group, isLoading, studyProgrammes, childr
 }
 
 export const SingleStudyGuidanceGroupContainer = ({ group }) => {
-  const groupStudentNumbers = group?.members?.map(({ personStudentNumber }) => personStudentNumber) || []
-  const studyProgrammes = useFilteredAndFormattedStudyProgrammes()
-  const tags = {
-    studyProgramme: group?.tags?.studyProgramme,
-    year: null,
-  }
+  // Sorting is needed for RTK query cache to work properly
+  const groupStudentNumbers = group?.members?.map(({ personStudentNumber }) => personStudentNumber).sort() || []
   const { data, isLoading } = useGetStudyGuidanceGroupPopulationQuery({
     studentnumberlist: groupStudentNumbers,
-    tags,
+    tags: {
+      studyProgramme: group?.tags?.studyProgramme,
+    },
   })
   const { data: courses, isLoading: coursesAreLoading } = useGetStudyGuidanceGroupPopulationCoursesQuery({
     studentnumberlist: groupStudentNumbers,
@@ -326,7 +328,7 @@ export const SingleStudyGuidanceGroupContainer = ({ group }) => {
   }
 
   return (
-    <SingleStudyGroupViewWrapper group={group} isLoading={isLoading} studyProgrammes={studyProgrammes}>
+    <SingleStudyGroupViewWrapper group={group} isLoading={isLoading}>
       {isLoading || coursesAreLoading ? (
         <SegmentDimmer isLoading />
       ) : (

@@ -13,14 +13,8 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
-import { EnrollmentType, ExtentCode } from '../types'
+import { ExtentCode, SemesterEnrollment } from '../types'
 import { Credit, Enrollment, Organization, SISStudyRightElement, Student, Studyplan, StudyrightExtent } from '.'
-
-export type SemesterEnrollment = {
-  type: EnrollmentType
-  semester: number
-  statutoryAbsence?: boolean
-}
 
 @Table({
   underscored: true,

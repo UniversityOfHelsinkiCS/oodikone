@@ -6,7 +6,6 @@ import { combineFacultyBasics } from './facultyBasics'
 import { countGraduationTimes } from './facultyGraduationTimes'
 import {
   setBasicStats,
-  setFacultyProgrammes,
   setFacultyProgressStats,
   setFacultyStudentStats,
   setGraduationStats,
@@ -63,7 +62,6 @@ export const updateFacultyOverview = async (facultyCode: string, statsType: Stat
 
 export const updateFacultyProgressOverview = async (facultyCode: string) => {
   const onlyNew = await getDegreeProgrammesOfFaculty(facultyCode, true)
-  const newProgrammes = await setFacultyProgrammes(facultyCode, onlyNew, 'NEW_STUDY_PROGRAMMES')
 
   for (const graduated of graduatedOptions) {
     for (const specialGroups of specialGroupOptions) {
@@ -71,7 +69,7 @@ export const updateFacultyProgressOverview = async (facultyCode: string) => {
       await setFacultyStudentStats(updateFacultyStudentStats, specialGroups, graduated)
       const updateFacultyProgressStats = await combineFacultyStudentProgress(
         facultyCode,
-        newProgrammes?.data,
+        onlyNew,
         specialGroups,
         graduated
       )

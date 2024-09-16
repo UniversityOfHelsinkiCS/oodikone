@@ -146,7 +146,7 @@ jobs:
           version: ${{ steps.extract_version.outputs.VERSION }}
 
   report_success:
-    name: 'Report deployment success to oodikone notifications'
+    name: 'Report deployment success to the "oodikone_notifications" channel'
     runs-on: ubuntu-latest
     needs:
       - release_frontend
@@ -158,7 +158,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: 'Send notification to slack'
+      - name: 'Send notification to Slack'
         uses: UniversityOfHelsinkiCS/slackbot-action@v1.5
         with:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
@@ -167,7 +167,7 @@ jobs:
           deployment-target: production
 
   report_failure:
-    name: 'Report deployment failure to oodikone notifications'
+    name: 'Report deployment failure to the "oodikone_notifications" channel'
     runs-on: ubuntu-latest
     needs:
       - release_frontend
@@ -179,7 +179,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: 'Send notification to slack'
+      - name: 'Send notification to Slack'
         uses: UniversityOfHelsinkiCS/slackbot-action@v1.5
         with:
           webhook-url: ${{ secrets.WEBHOOK_URL }}

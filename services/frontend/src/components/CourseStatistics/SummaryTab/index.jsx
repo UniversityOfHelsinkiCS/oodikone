@@ -105,7 +105,7 @@ const SummaryTab = ({ setValue, onClickCourse }) => {
         userHasAccessToAllStats={userHasAccessToAllStats}
       />
       {!userHasAccessToAllStats && (
-        <span className="totalsDisclaimer">* Years with 5 students or less are NOT included in the total</span>
+        <span className="totalsDisclaimer">* Years with 5 students or fewer are NOT included in the total</span>
       )}
     </div>
   )

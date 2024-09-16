@@ -6,7 +6,7 @@ import { getGraduationStatsForStudytrack, GraduationTimes } from '../studyProgra
 import { getMedian } from '../studyProgramme/studyProgrammeHelpers'
 import { getStudyRightsInProgramme } from '../studyProgramme/studyRightFinders'
 import {
-  getStudytrackStatsForStudyprogramme,
+  getStudyTrackStatsForStudyProgramme,
   ProgrammeOrStudyTrackGraduationStats,
 } from '../studyProgramme/studyTrackStats'
 import type { ProgrammesOfOrganization } from './faculty'
@@ -39,7 +39,7 @@ const getStatsByGraduationYear = async (facultyProgrammes: ProgrammesOfOrganizat
       continue
     }
     const updatedStats = await getGraduationStatsForStudytrack({
-      studyprogramme: programme.code,
+      studyProgramme: programme.code,
       combinedProgramme: '',
       settings: {
         isAcademicYear: false,
@@ -127,7 +127,7 @@ const getStatsByGraduationYear = async (facultyProgrammes: ProgrammesOfOrganizat
 }
 
 const getStatsByStartYear = async (facultyProgrammes: ProgrammesOfOrganization) => {
-  const newStats: Array<Awaited<ReturnType<typeof getStudytrackStatsForStudyprogramme>>> = []
+  const newStats: Array<Awaited<ReturnType<typeof getStudyTrackStatsForStudyProgramme>>> = []
   const medians: Record<string, LevelGraduationStats[]> = {}
   const programmes: { medians: Record<string, Record<string, ProgrammeStats>> } = { medians: {} }
   const classSizes: Record<string, Record<string, number | Record<string, number>>> = { programmes: {} }
@@ -143,8 +143,8 @@ const getStatsByStartYear = async (facultyProgrammes: ProgrammesOfOrganization) 
     }
 
     const studyRightsOfProgramme = await getStudyRightsInProgramme(programme.code, false, true)
-    const updatedStats = await getStudytrackStatsForStudyprogramme({
-      studyprogramme: programme.code,
+    const updatedStats = await getStudyTrackStatsForStudyProgramme({
+      studyProgramme: programme.code,
       combinedProgramme: '',
       settings: {
         graduated: true,

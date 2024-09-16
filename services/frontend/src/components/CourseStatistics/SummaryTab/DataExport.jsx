@@ -16,7 +16,7 @@ export const DataExport = ({ data }) => {
     const rows = [{ Title, Passed, Failed, Passrate }, ...years]
     const obfuscatedRows = rows.map(row => {
       if (row.obfuscated) {
-        const obf = '5 or less students'
+        const obf = '5 or fewer students'
         return { Title: row.Title, Passed: obf, Failed: obf, Passrate: obf }
       }
       const { obfuscated, ...rest } = row

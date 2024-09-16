@@ -2,7 +2,10 @@ const { each } = require('async')
 
 const { selectAllFrom, selectAllFromSnapshots } = require('../db')
 const { Semester, Organization, CREDIT_TYPE_CODES } = require('../db/models')
-const { getObject: redisGet, setObject: redisSet, lock: redisLock, expire: redisExpire } = require('../utils/redis')
+const { redisClient, lock: redisLock } = require('../utils/redis')
+
+const getRedisJSON = async key => JSON.parse(await redisClient.get(key))
+const setRedisJSON = async (key, value) => redisClient.set(key, JSON.stringify(value))
 
 const TIME_LIMIT_BETWEEN_RELOADS = 1000 * 60 * 30
 const REDIS_INITIALIZED = 'INITIALIZED'
@@ -35,12 +38,12 @@ const localMaps = {
 
 const loadMapsFromRedis = async () =>
   each(Object.entries(localMapToRedisKey), async ([localMap, redisKey]) => {
-    localMaps[localMap] = await redisGet(redisKey)
+    localMaps[localMap] = await getRedisJSON(redisKey)
   })
 
 const initDaysToSemesters = async () => {
   const semesters = await Semester.findAll()
-  await redisSet(
+  await setRedisJSON(
     localMapToRedisKey.daysToSemesters,
     semesters.reduce((res, curr) => {
       const start = new Date(curr.startdate).getTime()
@@ -61,7 +64,7 @@ const initDaysToSemesters = async () => {
 const getSemesterByDate = date => localMaps.daysToSemesters[date.toDateString()]
 
 const initEducationTypes = async () =>
-  redisSet(
+  setRedisJSON(
     localMapToRedisKey.educationTypes,
     (await selectAllFrom('education_types')).reduce((acc, curr) => {
       acc[curr.id] = curr
@@ -72,7 +75,7 @@ const initEducationTypes = async () =>
 const getEducationType = id => localMaps.educationTypes[id]
 
 const initOrganisationIdToCode = async () =>
-  redisSet(
+  setRedisJSON(
     localMapToRedisKey.organisationIdToCode,
     (await Organization.findAll()).reduce((acc, curr) => {
       acc[curr.id] = curr.code
@@ -83,7 +86,7 @@ const initOrganisationIdToCode = async () =>
 const getOrganisationCode = id => localMaps.organisationIdToCode[id]
 
 const initEducationIdToEducation = async () =>
-  redisSet(
+  setRedisJSON(
     localMapToRedisKey.educationIdToEducation,
     (await selectAllFrom('educations')).reduce((acc, curr) => {
       acc[curr.id] = curr
@@ -94,7 +97,7 @@ const initEducationIdToEducation = async () =>
 const getEducation = id => localMaps.educationIdToEducation[id]
 
 const initGradeScaleIdToGradeIdsToGrades = async () =>
-  redisSet(
+  setRedisJSON(
     localMapToRedisKey.gradeScaleIdToGradeIdsToGrades,
     (await selectAllFrom('grade_scales')).reduce((res, curr) => {
       res[curr.id] = curr.grades.reduce((res, curr) => {
@@ -116,7 +119,7 @@ const getGrade = (scaleId, gradeId) => localMaps.gradeScaleIdToGradeIdsToGrades[
 
 const initOrgToUniOrgId = async () => {
   const organisations = await selectAllFromSnapshots('organisations')
-  await redisSet(
+  await setRedisJSON(
     localMapToRedisKey.orgToUniOrgId,
     organisations.reduce((res, curr) => {
       res[curr.id] = curr.university_org_id
@@ -128,7 +131,7 @@ const initOrgToUniOrgId = async () => {
 const getUniOrgId = orgId => localMaps.orgToUniOrgId[orgId]
 
 const initStartYearToSemesters = async () =>
-  redisSet(
+  setRedisJSON(
     localMapToRedisKey.startYearToSemesters,
     (await Semester.findAll()).reduce((res, curr) => {
       if (!res[curr.startYear]) {
@@ -149,12 +152,12 @@ const getSemester = (studyYearStartYear, termIndex) => {
 }
 
 const initCountries = async () =>
-  redisSet(
+  setRedisJSON(
     localMapToRedisKey.countries,
     (await selectAllFrom('countries')).reduce((res, curr) => {
       if (!res[curr.id]) res[curr.id] = curr
       return res
-    })
+    }, {})
   )
 
 const calculateMapsToRedis = async () =>
@@ -173,13 +176,13 @@ const loadMapsIfNeeded = async () => {
   const now = new Date().getTime()
   if (!loadedAt || now - loadedAt > TIME_LIMIT_BETWEEN_RELOADS) {
     const unlock = await redisLock(SHARED_LOCK, 1000 * 60 * 3)
-    const isInitialized = await redisGet(REDIS_INITIALIZED)
+    const isInitialized = await redisClient.get(REDIS_INITIALIZED)
     if (!isInitialized) {
       await calculateMapsToRedis()
-      await redisSet(REDIS_INITIALIZED, true)
-      await redisExpire(REDIS_INITIALIZED, 1800)
+      // Expire the key after 1800 seconds (30 minutes)
+      await redisClient.set(REDIS_INITIALIZED, 'true', { EX: 1800 })
     }
-    unlock()
+    await unlock()
     await loadMapsFromRedis()
     loadedAt = now
   }
@@ -189,9 +192,8 @@ const loadMapsOnDemand = async () => {
   // TODO: hotfix for frontend, refactor this to more logical place
   const unlock = await redisLock(SHARED_LOCK, 1000 * 60 * 3)
   await calculateMapsToRedis()
-  await redisSet(REDIS_INITIALIZED, true)
-  await redisExpire(REDIS_INITIALIZED, 1800)
-  unlock()
+  await redisClient.set(REDIS_INITIALIZED, 'true', { EX: 1800 })
+  await unlock()
   await loadMapsFromRedis()
   loadedAt = new Date().getTime()
 }

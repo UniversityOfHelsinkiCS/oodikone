@@ -1,45 +1,70 @@
-const { indexOf } = require('lodash')
+import { indexOf } from 'lodash'
 
-const { getSemestersAndYears } = require('../semesters')
-const {
+import { EnrollmentType, Name, SemesterEnrollment } from '../../types'
+import { getSemestersAndYears } from '../semesters'
+import {
   defineYear,
   getStartDate,
   getStatsBasis,
-  getYearsArray,
-  tableTitles,
   getStudyRightElementsWithPhase,
+  getYearsArray,
   hasTransferredFromOrToProgramme,
-} = require('./studyProgrammeHelpers')
-const { getStudyRightsInProgramme } = require('./studyRightFinders')
+  tableTitles,
+} from './studyProgrammeHelpers'
+import { getStudyRightsInProgramme } from './studyRightFinders'
 
-const getDateOfFirstSemesterPresent = (semesterEnrollments, semesters, currentSemester, since) => {
-  if (!semesterEnrollments) return null
+export const getDateOfFirstSemesterPresent = (
+  semesterEnrollments: SemesterEnrollment[] | null,
+  semesters: {
+    [semestercode: string]: { semestercode: number; name: Name; yearcode: number; startdate: Date; enddate: Date }
+  },
+  currentSemester: number,
+  since: Date
+) => {
+  if (!semesterEnrollments) {
+    return null
+  }
   for (const enrollment of semesterEnrollments) {
-    if (enrollment.type !== 1) continue
+    if (enrollment.type !== EnrollmentType.PRESENT) {
+      continue
+    }
     const semesterInfo = semesters[enrollment.semester]
     if (
       semesterInfo.startdate <= since &&
       since <= semesterInfo.enddate &&
       semesterInfo.semestercode <= currentSemester
-    )
+    ) {
       return semesterInfo.startdate
+    }
   }
   return null
 }
 
-const getStartedStats = async ({ studyprogramme, years, isAcademicYear }) => {
-  const studyRightsOfProgramme = await getStudyRightsInProgramme(studyprogramme, false)
+const getStartedStats = async ({
+  studyProgramme,
+  years,
+  isAcademicYear,
+}: {
+  studyProgramme: string
+  years: number[]
+  isAcademicYear: boolean
+}) => {
+  const studyRightsOfProgramme = await getStudyRightsInProgramme(studyProgramme, false)
   const startedStudying = getStatsBasis(years)
   const accepted = getStatsBasis(years)
   const { semesters } = await getSemestersAndYears()
-  const { semestercode: currentSemester } = Object.values(semesters).find(semester => semester.enddate >= new Date())
+  const { semestercode: currentSemester } = Object.values(semesters).find(semester => semester.enddate >= new Date())!
 
   for (const studyRight of studyRightsOfProgramme) {
-    const studyRightElement = studyRight.studyRightElements.find(sre => sre.code === studyprogramme)
+    const studyRightElement = studyRight.studyRightElements.find(element => element.code === studyProgramme)
+    if (!studyRightElement) {
+      continue
+    }
 
     const [, hasTransferredToProgramme] = hasTransferredFromOrToProgramme(studyRight, studyRightElement)
-
-    if (hasTransferredToProgramme) continue
+    if (hasTransferredToProgramme) {
+      continue
+    }
 
     const startedInProgramme = new Date(studyRightElement.startDate)
     const startedInProgrammeYear = defineYear(startedInProgramme, isAcademicYear)
@@ -66,16 +91,29 @@ const getStartedStats = async ({ studyprogramme, years, isAcademicYear }) => {
     startedStudying.graphStats[indexOf(years, startYear)] += 1
     startedStudying.tableStats[startYear] += 1
   }
+
   return { startedStudying, accepted }
 }
 
-const getGraduatedStats = async ({ studyprogramme, years, isAcademicYear, includeAllSpecials }) => {
+export const getGraduatedStats = async ({
+  studyProgramme,
+  years,
+  isAcademicYear,
+  includeAllSpecials,
+}: {
+  studyProgramme: string
+  years: number[]
+  isAcademicYear: boolean
+  includeAllSpecials: boolean
+}) => {
   const { graphStats, tableStats } = getStatsBasis(years)
-  const graduatedStudyRights = await getStudyRightsInProgramme(studyprogramme, true)
+  const graduatedStudyRights = await getStudyRightsInProgramme(studyProgramme, true)
 
   for (const studyRight of graduatedStudyRights) {
-    const correctStudyRightElement = studyRight.studyRightElements.find(element => element.code === studyprogramme)
-    if (!correctStudyRightElement) continue
+    const correctStudyRightElement = studyRight.studyRightElements.find(element => element.code === studyProgramme)
+    if (!correctStudyRightElement) {
+      continue
+    }
 
     const hasTransferred = hasTransferredFromOrToProgramme(studyRight, correctStudyRightElement)
     if (!includeAllSpecials && hasTransferred.some(fromOrTo => fromOrTo === true)) {
@@ -90,17 +128,29 @@ const getGraduatedStats = async ({ studyprogramme, years, isAcademicYear, includ
   return { graphStats, tableStats }
 }
 
-const getTransferredStats = async ({ studyprogramme, years, isAcademicYear, combinedProgramme }) => {
-  const studyRights = await getStudyRightsInProgramme(studyprogramme, false)
+const getTransferredStats = async ({
+  studyProgramme,
+  years,
+  isAcademicYear,
+  combinedProgramme,
+}: {
+  studyProgramme: string
+  years: number[]
+  isAcademicYear: boolean
+  combinedProgramme: string
+}) => {
+  const studyRights = await getStudyRightsInProgramme(studyProgramme, false)
   const secondStudyRights = combinedProgramme ? await getStudyRightsInProgramme(combinedProgramme, false) : []
   const transferredAway = getStatsBasis(years)
   const transferredTo = getStatsBasis(years)
 
-  const calculateTransferredStats = (studyRights, programme) => {
+  const calculateTransferredStats = (studyRights, programme: string) => {
     for (const studyRight of studyRights) {
       const studyRightElement = studyRight.studyRightElements.find(element => element.code === programme)
       const studyRightElementsWithSamePhase = getStudyRightElementsWithPhase(studyRight, studyRightElement.phase)
-      if (studyRightElementsWithSamePhase.length === 1) continue
+      if (studyRightElementsWithSamePhase.length === 1) {
+        continue
+      }
       const [firstStudyRightElementWithSamePhase] = studyRightElementsWithSamePhase
       if (
         firstStudyRightElementWithSamePhase.code !== studyRightElement.code &&
@@ -120,25 +170,30 @@ const getTransferredStats = async ({ studyprogramme, years, isAcademicYear, comb
     }
   }
 
-  calculateTransferredStats(studyRights, studyprogramme)
+  calculateTransferredStats(studyRights, studyProgramme)
   calculateTransferredStats(secondStudyRights, combinedProgramme)
 
   return { transferredAway, transferredTo }
 }
 
+type Stats = {
+  graphStats: number[]
+  tableStats: Record<string, number>
+}
+
 const initializeGraphStats = (
-  includeAllSpecials,
-  combinedProgramme,
-  started,
-  startedSecondProg,
-  accepted,
-  acceptedSecondProg,
-  graduated,
-  transferredAway,
-  transferredTo,
-  graduatedSecondProg
+  includeAllSpecials: boolean,
+  combinedProgramme: string,
+  started: Stats,
+  startedSecondProg: Stats,
+  accepted: Stats,
+  acceptedSecondProg: Stats,
+  graduated: Stats,
+  transferredAway: Stats,
+  transferredTo: Stats,
+  graduatedSecondProg: Stats
 ) => {
-  const basicTable = []
+  const basicTable = [] as Array<{ name: string; data: number[] }>
   if (combinedProgramme) {
     basicTable.push(
       { name: 'Started studying bachelor', data: started.graphStats },
@@ -155,7 +210,6 @@ const initializeGraphStats = (
       { name: 'Graduated', data: graduated.graphStats }
     )
   }
-
   if (includeAllSpecials) {
     basicTable.push(
       { name: 'Transferred away', data: transferredAway.graphStats },
@@ -166,17 +220,17 @@ const initializeGraphStats = (
 }
 
 const initializeTableStats = (
-  year,
-  combinedProgramme,
-  includeAllSpecials,
-  started,
-  startedSecondProg,
-  accepted,
-  acceptedSecondProg,
-  graduated,
-  graduatedSecondProg,
-  transferredAway,
-  transferredTo
+  year: number,
+  combinedProgramme: string,
+  includeAllSpecials: boolean,
+  started: Stats,
+  startedSecondProg: Stats,
+  accepted: Stats,
+  acceptedSecondProg: Stats,
+  graduated: Stats,
+  graduatedSecondProg: Stats,
+  transferredAway: Stats,
+  transferredTo: Stats
 ) => {
   if (includeAllSpecials && combinedProgramme) {
     return [
@@ -215,12 +269,23 @@ const initializeTableStats = (
   return [year, started.tableStats[year], accepted.tableStats[year], graduated.tableStats[year]]
 }
 
-const getBasicStatsForStudytrack = async ({ studyprogramme, combinedProgramme, settings }) => {
+export const getBasicStatsForStudytrack = async ({
+  studyProgramme,
+  combinedProgramme,
+  settings,
+}: {
+  studyProgramme: string
+  combinedProgramme: string
+  settings: {
+    isAcademicYear: boolean
+    includeAllSpecials: boolean
+  }
+}) => {
   const { includeAllSpecials, isAcademicYear } = settings
   const since = getStartDate(isAcademicYear)
-  const years = getYearsArray(since.getFullYear(), isAcademicYear)
-  const queryParameters = { studyprogramme, years, isAcademicYear, includeAllSpecials, combinedProgramme }
-  const queryParametersCombinedProg = { studyprogramme: combinedProgramme, years, isAcademicYear, includeAllSpecials }
+  const years = getYearsArray(since.getFullYear(), isAcademicYear) as number[]
+  const queryParameters = { studyProgramme, years, isAcademicYear, includeAllSpecials, combinedProgramme }
+  const queryParametersCombinedProg = { studyProgramme: combinedProgramme, years, isAcademicYear, includeAllSpecials }
   const { startedStudying, accepted } = await getStartedStats(queryParameters)
   const { startedStudying: startedStudyingSecondProg, accepted: acceptedSecondProg } =
     await getStartedStats(queryParametersCombinedProg)
@@ -229,9 +294,9 @@ const getBasicStatsForStudytrack = async ({ studyprogramme, combinedProgramme, s
   const graduatedSecondProg = await getGraduatedStats(queryParametersCombinedProg)
   const { transferredAway, transferredTo } = await getTransferredStats(queryParameters)
 
-  const reversedYears = getYearsArray(since.getFullYear(), isAcademicYear).reverse()
+  const reversedYears = getYearsArray(since.getFullYear(), isAcademicYear).reverse() as number[]
   const key = includeAllSpecials ? 'SPECIAL_INCLUDED' : 'SPECIAL_EXCLUDED'
-  const titles = tableTitles.basics[combinedProgramme ? `${key}_COMBINED_PROGRAMME` : key]
+  const titles = tableTitles.basics[combinedProgramme ? `${key}_COMBINED_PROGRAMME` : key] as string[]
   const tableStats = reversedYears.map(year =>
     initializeTableStats(
       year,
@@ -249,7 +314,7 @@ const getBasicStatsForStudytrack = async ({ studyprogramme, combinedProgramme, s
   )
 
   return {
-    id: combinedProgramme ? `${studyprogramme}-${combinedProgramme}` : studyprogramme,
+    id: combinedProgramme ? `${studyProgramme}-${combinedProgramme}` : studyProgramme,
     years,
     graphStats: initializeGraphStats(
       includeAllSpecials,
@@ -266,10 +331,4 @@ const getBasicStatsForStudytrack = async ({ studyprogramme, combinedProgramme, s
     tableStats,
     titles,
   }
-}
-
-module.exports = {
-  getBasicStatsForStudytrack,
-  getGraduatedStats,
-  getDateOfFirstSemesterPresent,
 }

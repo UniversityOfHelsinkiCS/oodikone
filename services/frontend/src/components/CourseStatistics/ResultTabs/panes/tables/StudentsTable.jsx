@@ -21,7 +21,7 @@ const getGradeColumns = grades =>
     })
   )
 
-const getColumns = (stats, showDetails, showGrades, userHasAccessToAllStats, alternatives, separate, unifyCourses) => {
+const getColumns = (stats, showGrades, userHasAccessToAllStats, alternatives, separate, unifyCourses) => {
   const showPopulation = (yearcode, years) => {
     const queryObject = {
       from: yearcode,
@@ -45,7 +45,7 @@ const getColumns = (stats, showDetails, showGrades, userHasAccessToAllStats, alt
           key: 'TIME',
           title: 'Time',
           filterType: 'range',
-          getRowVal: s => s.code + (2011 - 62),
+          getRowVal: s => s.code + 1949,
           getRowExportVal: s => s.name,
           getRowContent: s => (
             <div style={{ whiteSpace: 'nowrap' }}>
@@ -82,7 +82,7 @@ const getColumns = (stats, showDetails, showGrades, userHasAccessToAllStats, alt
       }),
       filterType: 'range',
       getRowVal: s => (s.rowObfuscated ? 5 : s.students.withEnrollments.total),
-      getRowContent: s => (s.rowObfuscated ? '5 or less students' : s.students.withEnrollments.total),
+      getRowContent: s => (s.rowObfuscated ? '5 or fewer students' : s.students.withEnrollments.total),
       getCellProps: s => defineCellColor(s.rowObfuscated),
     },
     {
@@ -118,7 +118,7 @@ const getColumns = (stats, showDetails, showGrades, userHasAccessToAllStats, alt
       filterType: 'range',
       helpText: 'Total count of students with a valid enrollment and no passing or failing grade.',
       getRowVal: s => (s.rowObfuscated ? 5 : s.students.enrolledStudentsWithNoGrade),
-      getRowContent: s => (s.rowObfuscated ? '5 or less students' : s.students.enrolledStudentsWithNoGrade),
+      getRowContent: s => (s.rowObfuscated ? '5 or fewer students' : s.students.enrolledStudentsWithNoGrade),
       cellProps: s => ({
         style: {
           textAlign: 'right',
@@ -131,7 +131,7 @@ const getColumns = (stats, showDetails, showGrades, userHasAccessToAllStats, alt
       title: 'Pass-%',
       getRowVal: s => (s.rowObfuscated ? 0 : s.students.withEnrollments.passRate * 100),
       getRowContent: s =>
-        s.rowObfuscated ? '5 or less students' : formatPercentage(s.students.withEnrollments.passRate),
+        s.rowObfuscated ? '5 or fewer students' : formatPercentage(s.students.withEnrollments.passRate),
       filterType: 'range',
       cellProps: s => ({
         style: {
@@ -139,32 +139,6 @@ const getColumns = (stats, showDetails, showGrades, userHasAccessToAllStats, alt
           color: s.rowObfuscated ? 'gray' : 'inherit',
         },
       }),
-    },
-    {
-      key: 'PASS_FIRST',
-      title: 'On first attempt',
-      filterType: 'range',
-      getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.categories.passedFirst || 0),
-      cellProps: s => ({
-        style: {
-          textAlign: 'right',
-          color: s.rowObfuscated ? 'gray' : 'inherit',
-        },
-      }),
-      onlyInDetailedView: true,
-    },
-    {
-      key: 'PASS_EVENTUALLY',
-      title: 'Eventually',
-      filterType: 'range',
-      getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.categories.passedEventually || 0),
-      cellProps: s => ({
-        style: {
-          textAlign: 'right',
-          color: s.rowObfuscated ? 'gray' : 'inherit',
-        },
-      }),
-      onlyInDetailedView: true,
     },
     {
       key: 'FAIL_RATE',
@@ -178,21 +152,19 @@ const getColumns = (stats, showDetails, showGrades, userHasAccessToAllStats, alt
           color: s.rowObfuscated ? 'gray' : 'inherit',
         },
       }),
-      onlyInDetailedView: true,
     },
   ]
 
   return columns.filter(column => {
-    if (showDetails && column.onlyInDetailedView) return true
     if (showGrades && column.onlyInGradeView) return true
     if (showGrades && column.hideWhenGradesVisible) return false
-    return !column.onlyInDetailedView && !column.onlyInGradeView
+    return !column.onlyInGradeView
   })
 }
 
 export const StudentsTable = ({
   data: { name, stats },
-  settings: { showDetails, separate, showGrades },
+  settings: { separate, showGrades },
   userHasAccessToAllStats,
   headerVisible = false,
 }) => {
@@ -200,15 +172,14 @@ export const StudentsTable = ({
   const unifyCourses = useSelector(state => state.courseSearch.openOrRegular)
 
   const columns = useMemo(
-    () => getColumns(stats, showDetails, showGrades, userHasAccessToAllStats, alternatives, separate, unifyCourses),
-    [stats, showDetails, showGrades, userHasAccessToAllStats, alternatives, separate, unifyCourses]
+    () => getColumns(stats, showGrades, userHasAccessToAllStats, alternatives, separate, unifyCourses),
+    [stats, showGrades, userHasAccessToAllStats, alternatives, separate, unifyCourses]
   )
 
   const data = stats.map(stats => {
     if (stats.name === 'Total') {
       return row(stats, { ignoreFilters: true })
     }
-
     return stats
   })
 
@@ -228,7 +199,7 @@ export const StudentsTable = ({
         title={`Student statistics for group ${name}`}
       />
       {!userHasAccessToAllStats && (
-        <span className="totalsDisclaimer">* Years with 5 students or less are NOT included in the total</span>
+        <span className="totalsDisclaimer">* Years with 5 students or fewer are NOT included in the total</span>
       )}
     </div>
   )

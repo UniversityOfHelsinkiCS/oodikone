@@ -1,32 +1,33 @@
+import { Name } from '../../types'
 import { getCreditsProduced } from '../providerCredits'
 import { isRelevantProgramme } from '../studyProgramme/studyProgrammeHelpers'
-import { getProgrammes } from './facultyService'
+import { getDegreeProgrammesOfFaculty } from './faculty'
 
 /**
  * Returns credits produced by the programmes of the faculty but
  * also the credits where the provider is the faculty itself
  */
 export const getFacultyCredits = async (facultyCode: string, isAcademicYear: boolean) => {
-  const allProgrammes = (await getProgrammes(facultyCode)).data
-  const programmes = allProgrammes.filter(({ code }) => isRelevantProgramme(code))
+  const programmes = (await getDegreeProgrammesOfFaculty(facultyCode, true)).filter(({ code }) =>
+    isRelevantProgramme(code)
+  )
   const facultyCredits = await getCreditsProduced(facultyCode, isAcademicYear)
 
   const stats = {
     [facultyCode]: facultyCredits,
     codes: [facultyCode],
-    programmeNames: {},
+    programmeNames: {} as Record<string, { code: string } & Name>,
     ids: [facultyCode],
   }
 
-  for (const programme of programmes) {
-    const programmeCode = programme.code
-    const programmeCredits = await getCreditsProduced(programmeCode, isAcademicYear)
-    stats[programme.progId] = programmeCredits
-    stats.codes.push(programmeCode)
-    stats.ids.push(programme.progId)
-    stats.programmeNames[programme.progId] = {
-      code: programmeCode,
-      ...programmes.find(programme => programme.code === programmeCode).name,
+  for (const { code, progId, name } of programmes) {
+    const programmeCredits = await getCreditsProduced(code, isAcademicYear)
+    stats[progId] = programmeCredits
+    stats.codes.push(code)
+    stats.ids.push(progId)
+    stats.programmeNames[progId] = {
+      code,
+      ...name,
     }
   }
 

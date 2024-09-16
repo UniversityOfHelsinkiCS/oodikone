@@ -2,24 +2,23 @@ import moment from 'moment'
 import { InferAttributes } from 'sequelize'
 
 import { Credit, SISStudyRight, SISStudyRightElement } from '../../models'
-import type { SemesterEnrollment } from '../../models/SISStudyRight'
-import { GenderCode, EnrollmentType, ExtentCode } from '../../types'
+import { GenderCode, EnrollmentType, ExtentCode, SemesterEnrollment } from '../../types'
 import { createLocaleComparator, keysOf } from '../../util'
 import { countTimeCategories } from '../graduationHelpers'
 import { getSemestersAndYears } from '../semesters'
 import { getDateOfFirstSemesterPresent } from './studyProgrammeBasics'
 import { calculateDurationOfStudies } from './studyProgrammeGraduations'
 import {
+  defineYear,
   getGoal,
   getMedian,
   getPercentage,
   getStartDate,
+  getStudyRightElementsWithPhase,
   getYearsArray,
   getYearsObject,
-  tableTitles,
-  defineYear,
-  getStudyRightElementsWithPhase,
   hasTransferredFromOrToProgramme,
+  tableTitles,
 } from './studyProgrammeHelpers'
 import { getStudyTracksForProgramme } from './studyRightFinders'
 
@@ -460,13 +459,13 @@ const getMainStatsByTrackAndYear = async (
 
 // Combines all the data for the Studytracks and class statistics page in study programme overview
 // At the moment combined programme is thought to have only one track, the programme itself
-export const getStudytrackStatsForStudyprogramme = async ({
-  studyprogramme,
+export const getStudyTrackStatsForStudyProgramme = async ({
+  studyProgramme,
   combinedProgramme,
   settings,
   studyRightsOfProgramme,
 }: {
-  studyprogramme: string
+  studyProgramme: string
   combinedProgramme?: string
   settings: { graduated: boolean; specialGroups: boolean }
   studyRightsOfProgramme: Array<InferAttributes<SISStudyRight>>
@@ -476,12 +475,12 @@ export const getStudytrackStatsForStudyprogramme = async ({
   const since = getStartDate(isAcademicYear)
   const years = getYearsArray(since.getFullYear(), isAcademicYear, includeYearsCombined)
 
-  const studytrackOptions = await getStudyTracksForProgramme(studyprogramme)
+  const studytrackOptions = await getStudyTracksForProgramme(studyProgramme)
 
-  const doCombo = studyprogramme.startsWith('MH') && !['MH30_001', 'MH30_003'].includes(studyprogramme)
+  const doCombo = studyProgramme.startsWith('MH') && !['MH30_001', 'MH30_003'].includes(studyProgramme)
   const stats = await getMainStatsByTrackAndYear(
     years,
-    studyprogramme,
+    studyProgramme,
     settings.graduated,
     settings.specialGroups,
     studyRightsOfProgramme,
@@ -494,7 +493,7 @@ export const getStudytrackStatsForStudyprogramme = async ({
   }
   const graduatedTitles = combinedProgramme ? getCorrectCombinedTitles() : tableTitles.studytracksBasic
   return {
-    id: combinedProgramme ? `${studyprogramme}-${combinedProgramme}` : studyprogramme,
+    id: combinedProgramme ? `${studyProgramme}-${combinedProgramme}` : studyProgramme,
     years,
     ...stats,
     doCombo,

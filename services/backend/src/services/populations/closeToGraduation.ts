@@ -1,9 +1,8 @@
 import { col, Op } from 'sequelize'
 
 import { Course, Credit, Organization, Student, Studyplan, SISStudyRight, SISStudyRightElement } from '../../models'
-import type { SemesterEnrollment } from '../../models/SISStudyRight'
 import { mapToProviders } from '../../shared/util/mapToProviders'
-import { CreditTypeCode, DegreeProgrammeType, ExtentCode, Name } from '../../types'
+import { CreditTypeCode, DegreeProgrammeType, ExtentCode, Name, SemesterEnrollment } from '../../types'
 import { redisClient } from '../redis'
 import { getCurriculumVersion } from './shared'
 
@@ -234,12 +233,12 @@ export const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =
 
 export const getCloseToGraduationData = async (studentNumbers?: string[]) => {
   if (!studentNumbers) {
-    const dataOnRedis = await redisClient.getAsync(CLOSE_TO_GRADUATION_REDIS_KEY)
+    const dataOnRedis = await redisClient.get(CLOSE_TO_GRADUATION_REDIS_KEY)
     if (dataOnRedis) {
       return JSON.parse(dataOnRedis)
     }
     const freshData = await findStudentsCloseToGraduation()
-    redisClient.setAsync(CLOSE_TO_GRADUATION_REDIS_KEY, JSON.stringify(freshData))
+    await redisClient.set(CLOSE_TO_GRADUATION_REDIS_KEY, JSON.stringify(freshData))
     return freshData
   }
   return findStudentsCloseToGraduation(studentNumbers)

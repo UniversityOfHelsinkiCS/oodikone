@@ -4,7 +4,7 @@ Data used in Oodikone contains some numeric types (or _magic numbers_) that are 
 
 ## Extent code
 
-Appears in model Studyright (db: `studyright`) as _extentcode_ (db: `extentcode`) and in model SISStudyRight (db: `sis_study_rights`) as _extentCode_ (db: `extent_code`). Values are defined in the database table `studyright_extents`.
+Appears in model SISStudyRight (db: `sis_study_rights`) as _extentCode_ (db: `extent_code`). Values are defined in the database table `studyright_extents`.
 
 | value | meaning                                             |
 | ----: | :-------------------------------------------------- |
@@ -26,33 +26,6 @@ Appears in model Studyright (db: `studyright`) as _extentcode_ (db: `extentcode`
 |    34 | Exchange studies (postgraduate studies)             |
 |    99 | Non-Degree studies                                  |
 
-## Priority code
-
-> [!WARNING]  
-> Obsolete, to be deprecated
-
-Appears in model Studyright (db: `studyright`) as _prioritycode_ (db: `prioritycode`).
-
-| value | meaning   | notes                                                                                       |
-| ----: | :-------- | :------------------------------------------------------------------------------------------ |
-|     1 | Primary   |                                                                                             |
-|     2 | Secondary |                                                                                             |
-|     5 | Rescinded | seemingly not in use anymore                                                                |
-|     6 | Option    | Ba+Ma students can add a master programme to their study plan before graduating as bachelor |
-|    30 | Graduated |                                                                                             |
-
-## Type
-
-> [!WARNING]  
-> Obsolete, to be deprecated
-
-Appears in model ElementDetails (db: `element_details`) as _type_ (db: `type`).
-
-| value | meaning                                          |
-| ----: | :----------------------------------------------- |
-|    20 | study programme                                  |
-|    30 | module, studytrack or kokonaisuus e.g. neurology |
-
 ## Phase
 
 Appears in model SISStudyRightElement (db: `sis_study_right_elements`) as _phase_ (db: `phase`).
@@ -72,7 +45,15 @@ The level of the programme (bachelor's, master's etc.) of the study right can be
 
 ## Enrollment type
 
-Appears in model SemesterEnrollment (db: `semester_enrollments`) as _enrollmenttype_ (db: `enrollmenttype`).
+This information is used in the model SISStudyRight (db: `sis_study_rights`), in the field _semesterEnrollments_ (db: `semester_enrollments`).
+
+The `semester_enrollments` column is an array of JSON objects. Each object contains:
+
+- `type` (the type of enrollment),
+- `semester` (the code for a semester),
+- and sometimes `statutoryAbsence` (this field is included only when the enrollment type is 2).
+
+The `type` field represents one of the following enrollment types. The `semester` field refers to a semester code, defined as `semestercode` in the model Semester.
 
 | value | meaning  | notes                            |
 | ----: | :------- | :------------------------------- |
@@ -83,8 +64,6 @@ Appears in model SemesterEnrollment (db: `semester_enrollments`) as _enrollmentt
 ## Credit type code
 
 Appears in model Credit (db: `credit`) as _credittypecode_ (db: `credittypecode`). Values are defined in the database table `credit_types`.
-
-Completed/Improved/Transferred/Failed
 
 | value | meaning          |
 | ----: | :--------------- |

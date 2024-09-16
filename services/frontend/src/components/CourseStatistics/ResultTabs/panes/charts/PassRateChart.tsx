@@ -14,7 +14,7 @@ exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
 accessibility(ReactHighcharts.Highcharts)
 
-const passRateAttemptGraphOptions = (isRelative, categories, max, title) => ({
+const passRateAttemptGraphOptions = (isRelative: boolean, categories: string[], max: number, title: string) => ({
   chart: {
     type: 'column',
   },
@@ -49,13 +49,13 @@ const passRateAttemptGraphOptions = (isRelative, categories, max, title) => ({
   },
 })
 
-const passRateStudentGraphOptions = (isRelative, categories, max, title) => ({
+const passRateStudentGraphOptions = (isRelative: boolean, categories: string[], max: number, title: string) => ({
   chart: {
     type: 'column',
   },
   colors: isRelative
-    ? [chartColor.greenLight, chartColor.greenDark, chartColor.redLight, chartColor.redDark]
-    : [chartColor.blue, chartColor.greenLight, chartColor.greenDark, chartColor.redLight, chartColor.redDark],
+    ? [chartColor.greenDark, chartColor.redDark, chartColor.redLight]
+    : [chartColor.blue, chartColor.greenDark, chartColor.redDark, chartColor.redLight],
   credits: {
     enabled: false,
   },
@@ -87,9 +87,9 @@ const passRateStudentGraphOptions = (isRelative, categories, max, title) => ({
 })
 
 const getPassRateAttemptSeriesFromStats = stats => {
-  const all = []
-  const passed = []
-  const failed = []
+  const all = [] as number[]
+  const passed = [] as number[]
+  const failed = [] as number[]
 
   stats.forEach(year => {
     const { passed: p, failed: f } = year.attempts.categories
@@ -112,11 +112,11 @@ const getPassRateAttemptSeriesFromStats = stats => {
 }
 
 const getPassRateStudentSeriesFromStats = stats => {
-  const all = []
-  const passedFirst = []
-  const passedEventually = []
-  const neverPassed = []
-  const enrolledNoGrade = []
+  const all = [] as number[]
+  const passedFirst = [] as number[]
+  const passedEventually = [] as number[]
+  const neverPassed = [] as number[]
+  const enrolledNoGrade = [] as number[]
 
   stats.forEach(year => {
     const { passedFirst: pf, passedEventually: pe, neverPassed: np } = year.students.categories
@@ -129,28 +129,35 @@ const getPassRateStudentSeriesFromStats = stats => {
     enrolledNoGrade.push(enrolledWithNoGrade || 0)
   })
 
+  const passed = passedFirst.map((value, index) => value + passedEventually[index])
+
   return {
     absolute: [
       getDataObject('all', all, 'a'),
-      getDataObject('passed on first try', passedFirst, 'b'),
-      getDataObject('passed eventually', passedEventually, 'b'),
+      getDataObject('passed', passed, 'b'),
       getDataObject('never passed', neverPassed, 'c'),
       getDataObject('enrolled, no grade', enrolledNoGrade, 'c'),
     ],
     relative: [
-      getDataObject('passed on first try', passedFirst.map(absoluteToRelative(all)), 'b'),
-      getDataObject('passed eventually', passedEventually.map(absoluteToRelative(all)), 'b'),
+      getDataObject('passed', passed.map(absoluteToRelative(all)), 'b'),
       getDataObject('never passed', neverPassed.map(absoluteToRelative(all)), 'c'),
       getDataObject('enrolled, no grade', enrolledNoGrade.map(absoluteToRelative(all)), 'c'),
     ],
   }
 }
 
-export const PassRateChart = ({ data, isRelative, userHasAccessToAllStats, viewMode }) => {
-  const isAttemptsMode = viewMode === 'ATTEMPTS'
+interface PassRateChartProps {
+  data: any
+  isRelative: boolean
+  userHasAccessToAllStats: boolean
+  viewMode: 'ATTEMPTS' | 'STUDENTS'
+}
 
+export const PassRateChart = ({ data, isRelative, userHasAccessToAllStats, viewMode }: PassRateChartProps) => {
   const stats = data.stats.filter(stat => stat.name !== 'Total')
   const statYears = stats.map(year => year.name)
+
+  const isAttemptsMode = viewMode === 'ATTEMPTS'
   const passGraphSeries = isAttemptsMode
     ? getPassRateAttemptSeriesFromStats(stats)
     : getPassRateStudentSeriesFromStats(stats)
@@ -165,7 +172,7 @@ export const PassRateChart = ({ data, isRelative, userHasAccessToAllStats, viewM
         config={{ ...primaryGraphOptions, series: isRelative ? passGraphSeries.relative : passGraphSeries.absolute }}
       />
       {!userHasAccessToAllStats && (
-        <span className="totalsDisclaimer">* Years with 5 students or less are shown as 0 in the chart</span>
+        <span className="totalsDisclaimer">* Years with 5 students or fewer are shown as 0 in the chart</span>
       )}
     </div>
   )

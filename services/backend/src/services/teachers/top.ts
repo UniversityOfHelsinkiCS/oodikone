@@ -20,14 +20,14 @@ const categories = {
 
 export const getTeacherStats = async (categoryId: string, yearCode: number) => {
   const { redisKey } = categories[categoryId]
-  const category = await redisClient.hgetAsync(redisKey, yearCode)
-  return JSON.parse(category) || []
+  const category = await redisClient.hGet(redisKey, `${yearCode}`)
+  return category ? JSON.parse(category) : []
 }
 
 const setTeacherStats = async (categoryId: string, yearCode: number, stats: TeacherStats[]) => {
   const { redisKey } = categories[categoryId]
   const data = { stats, updated: new Date() }
-  await redisClient.hsetAsync(redisKey, yearCode, JSON.stringify(data))
+  await redisClient.hSet(redisKey, yearCode, JSON.stringify(data))
 }
 
 export const getCategoriesAndYears = async () => {

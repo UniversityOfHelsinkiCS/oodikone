@@ -6,11 +6,12 @@ import { useLocalStorage } from '@/common/hooks'
 const titleStyle = { paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }
 
 /*
-  Takes in list of objects with properties: title (string), content (jsx)
+  Takes in list of objects with properties: title (string), content (jsx), and optionally alwaysRender (boolean)
   e.g.
-  [ { title: 'Credit accumulation', content: <>stuff</> }, 
+  [ { title: 'Credit accumulation', content: <>stuff</>, alwaysRender: true }, 
   ... ]
   falsy items are filtered out, so you can leave them in
+  Always rendering the panel might be necessary for example when the data needed in the parent component will be fetched inside the panel. Note that rendering doesn't mean that the content is visible, it's just rendered in the DOM.
 */
 export const PanelView = ({ panels: initialPanels, viewTitle }) => {
   const refs = useRef([])
@@ -47,7 +48,7 @@ export const PanelView = ({ panels: initialPanels, viewTitle }) => {
             ),
           },
           content: {
-            content: (
+            content: (activeIndex.includes(index) || panel.alwaysRender) && (
               <div
                 key={panel.key}
                 ref={element => {

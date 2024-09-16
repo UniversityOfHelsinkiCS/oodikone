@@ -11,7 +11,7 @@ const {
   scheduleByCourseCodes,
 } = require('./scheduler')
 const { logger } = require('./utils/logger')
-const { get: redisGet } = require('./utils/redis')
+const { redisClient } = require('./utils/redis')
 const { stan } = require('./utils/stan')
 
 const bakeMessage =
@@ -43,9 +43,9 @@ app.use(express.json())
 app.use(message)
 
 app.get('/v1/healthcheck', async (_, res) => {
-  const latest_message = await redisGet(REDIS_LATEST_MESSAGE_RECEIVED)
+  const latestMessage = await redisClient.get(REDIS_LATEST_MESSAGE_RECEIVED)
   const threshold = new Date().getTime() - 1000 * 60 * 60 * 6 // 6 hours ago
-  if (!latest_message || new Date(latest_message).getTime() < threshold) {
+  if (!latestMessage || new Date(latestMessage).getTime() < threshold) {
     return res.status(400).send()
   }
   res.status(200).send()

@@ -12,9 +12,14 @@ import { GeneralTab } from './GeneralTab'
 // from useFilters and making sure that it contains same students than the population
 // backend returns with population query below (so caching works)
 const StudyGuidanceGroupGeneralTabContainer = ({ group, ...props }) => {
-  const groupStudentNumbers = group?.members?.map(({ personStudentNumber }) => personStudentNumber) || []
-  const { tags } = group
-  const populations = useGetStudyGuidanceGroupPopulationQuery({ studentnumberlist: groupStudentNumbers, tags })
+  // Sorting is needed for RTK query cache to work properly
+  const groupStudentNumbers = group?.members?.map(({ personStudentNumber }) => personStudentNumber).sort() || []
+  const populations = useGetStudyGuidanceGroupPopulationQuery({
+    studentnumberlist: groupStudentNumbers,
+    tags: {
+      studyProgramme: group?.tags?.studyProgramme,
+    },
+  })
   return <GeneralTab group={group} populations={populations} {...props} />
 }
 

@@ -6,7 +6,7 @@ import { Graduated, SpecialGroups, Unarray } from '../../types'
 import { getStudytrackStats, setStudytrackStats } from '../analyticsService'
 import { getYearsArray } from '../studyProgramme/studyProgrammeHelpers'
 import { getStudyRightsInProgramme } from '../studyProgramme/studyRightFinders'
-import { getStudytrackStatsForStudyprogramme } from '../studyProgramme/studyTrackStats'
+import { getStudyTrackStatsForStudyProgramme } from '../studyProgramme/studyTrackStats'
 import { getDegreeProgrammesOfOrganization, ProgrammesOfOrganization } from './faculty'
 import { programmeTypes } from './facultyGraduationTimes'
 
@@ -99,14 +99,14 @@ export const combineFacultyStudentProgress = async (
   graduated: Graduated
 ) => {
   const since = new Date('2017-08-01')
-  const statsOfProgrammes: Array<Awaited<ReturnType<typeof getStudytrackStatsForStudyprogramme>>> = []
+  const statsOfProgrammes: Array<Awaited<ReturnType<typeof getStudyTrackStatsForStudyProgramme>>> = []
   const allDegreeProgrammes = await getDegreeProgrammesOfOrganization(rootOrgId, false)
   const creditCounts: Record<string, Record<string, number[]>> = {}
   const progressStats: Record<string, Record<string, number[][]>> = {}
   const yearlyTitles: Record<string, string[][]> = {}
 
-  for (const { code: studyprogramme } of programmes) {
-    const programmeInfo = allDegreeProgrammes.find(programme => programme.code === studyprogramme)
+  for (const { code: studyProgramme } of programmes) {
+    const programmeInfo = allDegreeProgrammes.find(programme => programme.code === studyProgramme)
     if (
       !programmeInfo ||
       programmeInfo.degreeProgrammeType == null ||
@@ -114,13 +114,13 @@ export const combineFacultyStudentProgress = async (
     ) {
       continue
     }
-    const statsFromRedis = await getStudytrackStats(studyprogramme, null, graduated, specialGroups)
+    const statsFromRedis = await getStudytrackStats(studyProgramme, null, graduated, specialGroups)
     if (statsFromRedis) {
       statsOfProgrammes.push(statsFromRedis)
     } else {
-      const studyRightsOfProgramme = await getStudyRightsInProgramme(studyprogramme, false, true)
-      const updatedStats = await getStudytrackStatsForStudyprogramme({
-        studyprogramme,
+      const studyRightsOfProgramme = await getStudyRightsInProgramme(studyProgramme, false, true)
+      const updatedStats = await getStudyTrackStatsForStudyProgramme({
+        studyProgramme,
         settings: {
           graduated: graduated === 'GRADUATED_INCLUDED',
           specialGroups: specialGroups === 'SPECIAL_INCLUDED',

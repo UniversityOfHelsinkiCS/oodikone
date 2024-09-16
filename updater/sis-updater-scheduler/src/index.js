@@ -10,7 +10,7 @@ const { scheduleHourly, scheduleWeekly, schedulePrePurge, schedulePurge, isUpdat
 const { startServer } = require('./server')
 const { schedule: scheduleCron } = require('./utils/cron')
 const { logger } = require('./utils/logger')
-const { set: redisSet } = require('./utils/redis')
+const { redisClient } = require('./utils/redis')
 const { stan } = require('./utils/stan')
 
 stan.on('error', error => {
@@ -88,7 +88,7 @@ knexConnection.on('connect', async () => {
       })
     }
 
-    await redisSet(REDIS_LAST_HOURLY_SCHEDULE, new Date())
+    await redisClient.set(REDIS_LAST_HOURLY_SCHEDULE, new Date().toISOString())
   })
 
   // Saturday at 4 AM
@@ -105,7 +105,7 @@ knexConnection.on('connect', async () => {
       })
     }
 
-    await redisSet(REDIS_LAST_WEEKLY_SCHEDULE, new Date())
+    await redisClient.set(REDIS_LAST_WEEKLY_SCHEDULE, new Date().toISOString())
   })
 
   // Monday at 12 AM

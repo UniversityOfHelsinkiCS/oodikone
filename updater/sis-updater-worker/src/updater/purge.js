@@ -72,7 +72,7 @@ const purge = async ({ table, before }) => {
     table,
     count: deletedCount,
   })
-  unlock()
+  await unlock()
 }
 
 const purgeByStudentNumber = async studentNumbers => {

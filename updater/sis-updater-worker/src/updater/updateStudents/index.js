@@ -234,7 +234,7 @@ const updateStudents = async (personIds, iteration = 0) => {
   }, {})
 
   const logError = (error, updatedItem) => {
-    logger.error({ message: `Failed to update ${updatedItem}`, meta: error })
+    logger.error({ message: `Failed to update ${updatedItem}`, error })
   }
 
   await Promise.all([

@@ -53,62 +53,73 @@ type DynamicEnrollments = {
   }
 }
 
-export class CourseStatsCounter {
-  private studentsInTotal: number
-  private course: {
-    code: string
-    name: string
-    disciplines: object
-    coursetypes: Record<string, Name>
-    substitutions: string[]
-  }
-  private students: {
-    all: Record<string, boolean>
-    passed: Record<string, boolean>
-    failed: Record<string, boolean>
-    retryPassed: Record<string, boolean>
-    failedMany: Record<string, boolean>
-    improvedPassedGrade: Record<string, boolean>
-    markedToSemester: Record<string, boolean>
-    enrolledNoGrade: Record<string, boolean>
-  }
-  private stats: {
-    students: number
-    passed: number
-    failed: number
-    failedMany: number
-    retryPassed: number
-    attempts: number
-    improvedPassedGrade: number
-    percentage: number | undefined
-    passedOfPopulation: number | undefined
-    triedOfPopulation: number | undefined
-    perStudent: number | undefined
-    passingSemesters: Record<string, number>
-    passingSemestersCumulative?: Record<string, number>
-    totalStudents?: number
-    totalEnrolledNoGrade?: number
-    percentageWithEnrollments?: number
-  }
-  private enrollments: DynamicEnrollments
-  private grades: {
-    [grade: string]: {
-      count: number
-      status: {
-        passingGrade: boolean
-        improvedGrade: boolean
-        failingGrade: boolean
-      }
+type Stats = {
+  students: number
+  passed: number
+  failed: number
+  failedMany: number
+  retryPassed: number
+  attempts: number
+  improvedPassedGrade: number
+  percentage: number | undefined
+  passedOfPopulation: number | undefined
+  triedOfPopulation: number | undefined
+  perStudent: number | undefined
+  passingSemesters: Record<string, number>
+  passingSemestersCumulative?: Record<string, number>
+  totalStudents?: number
+  totalEnrolledNoGrade?: number
+  percentageWithEnrollments?: number
+}
+
+type Students = {
+  all: Record<string, boolean>
+  passed: Record<string, boolean>
+  failed: Record<string, boolean>
+  retryPassed: Record<string, boolean>
+  failedMany: Record<string, boolean>
+  improvedPassedGrade: Record<string, boolean>
+  markedToSemester: Record<string, boolean>
+  enrolledNoGrade: Record<string, boolean>
+}
+
+type Course = {
+  code: string
+  name: Name
+  substitutions: string[]
+}
+
+type Grades = {
+  [grade: string]: {
+    count: number
+    status: {
+      passingGrade: boolean
+      improvedGrade: boolean
+      failingGrade: boolean
     }
   }
+}
 
-  constructor(code: string, name: string, studentsInTotal: number) {
+export type CourseStatistics = {
+  stats: Stats
+  students: Students
+  course: Course
+  grades: Grades
+}
+
+export class CourseStatsCounter {
+  private studentsInTotal: number
+  private course: Course
+  private students: Students
+  private stats: Stats
+  private enrollments: DynamicEnrollments
+  private grades: Grades
+
+  constructor(code: string, name: Name, studentsInTotal: number) {
     this.studentsInTotal = studentsInTotal
     this.course = {
       code,
       name,
-      disciplines: {},
-      coursetypes: {},
       substitutions: [],
     }
     this.students = {
@@ -239,10 +250,6 @@ export class CourseStatsCounter {
     this.grades[grade] = { count: gradeCount + 1, status: { passingGrade, improvedGrade, failingGrade } }
   }
 
-  public addCourseType(courseType: string, name: Name) {
-    this.course.coursetypes[courseType] = name
-  }
-
   public addCourseSubstitutions(substitutions: string[]) {
     this.course.substitutions = substitutions
   }
@@ -289,6 +296,6 @@ export class CourseStatsCounter {
     stats.totalEnrolledNoGrade = lengthOf(filteredEnrolledNoGrade)
     stats.percentageWithEnrollments = percentageOf(stats.passed, stats.totalStudents)
 
-    return { stats, students, course: this.course, grades: this.grades }
+    return { stats, students, course: this.course, grades: this.grades } as CourseStatistics
   }
 }

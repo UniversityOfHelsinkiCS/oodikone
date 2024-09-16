@@ -5,7 +5,7 @@ import { Op, QueryTypes } from 'sequelize'
 
 import { dbConnections } from '../../database/connection'
 import { Course, Credit, Enrollment, SISStudyRight, SISStudyRightElement, Student, Studyplan } from '../../models'
-import { TagStudent } from '../../models/kone'
+import { Tag, TagStudent } from '../../models/kone'
 import { Criteria, DegreeProgrammeType, Name, ParsedCourse } from '../../types'
 import { SemesterStart } from '../../util/semester'
 import { hasTransferredFromOrToProgramme } from '../studyProgramme/studyProgrammeHelpers'
@@ -286,7 +286,31 @@ export const dateMonthsFromNow = (date: string, months: number) => {
   return new Date(moment(date).add(months, 'months').format('YYYY-MM-DD'))
 }
 
-export const parseQueryParams = query => {
+export type Query = {
+  year: string
+  months: number
+  semesters: string[]
+  studyRights: string | string[]
+  selectedStudents?: string[]
+  selectedStudentsByYear?: Record<string, string[]>
+  studentStatuses?: string[]
+  years?: string[]
+  tag?: string
+  courses?: string[]
+}
+
+export type Params = {
+  startDate: string
+  endDate: string
+  exchangeStudents: boolean
+  nondegreeStudents: boolean
+  transferredStudents: boolean
+  studyRights: string[]
+  months: number
+  tag?: Tag
+}
+
+export const parseQueryParams = (query: Query) => {
   const { semesters, studentStatuses, studyRights, months, year, tag } = query
   const hasFall = semesters.includes('FALL')
   const hasSpring = semesters.includes('SPRING')
@@ -313,7 +337,7 @@ export const parseQueryParams = query => {
     startDate,
     endDate,
     tag,
-  }
+  } as Params
 }
 
 export const getOptionsForStudents = async (
@@ -454,30 +478,30 @@ const getSubstitutions = async (codes: string[]) => {
   return substitutions
 }
 
-const getCourseCodes = async (courses: string[]) => {
-  if (courses.length === 0) {
-    return ['DUMMY']
-  }
-  const courseCodes = await getSubstitutions(courses)
-  return courseCodes
-}
+export type QueryResult = Array<{
+  code: string
+  name: Name
+  coursetypecode: string
+  substitutions: string[]
+  main_course_code: string
+  course_type: Name
+  credits: Array<Pick<Credit, 'grade' | 'student_studentnumber' | 'attainment_date' | 'credittypecode' | 'course_code'>>
+  enrollments: Array<Pick<Enrollment, 'studentnumber' | 'state' | 'enrollment_date_time'>> | null
+}>
 
 // This duplicate code is added here to ensure that we get the enrollments in cases no credits found for the selected students
 export const findCourseEnrollments = async (studentNumbers: string[], beforeDate: Date, courses: string[] = []) => {
-  const courseCodes = await getCourseCodes(courses)
-  const res = await sequelize.query(
+  const courseCodes = courses.length === 0 ? ['DUMMY'] : await getSubstitutions(courses)
+  const result: QueryResult = await sequelize.query(
     `
       SELECT DISTINCT ON (course.id)
         course.code,
         course.name,
-        course.coursetypecode,
         course.substitutions,
         course.main_course_code,
-        course_types.name AS course_type,
         enrollment.data AS enrollments
       FROM course
-      INNER JOIN course_types ON course_types.coursetypecode = course.coursetypecode
-      LEFT JOIN (
+      INNER JOIN (
         SELECT
           course_id,
           ARRAY_AGG(JSON_BUILD_OBJECT(
@@ -490,7 +514,6 @@ export const findCourseEnrollments = async (studentNumbers: string[], beforeDate
         GROUP BY enrollment.course_id
       ) enrollment ON enrollment.course_id = course.id 
       WHERE :skipCourseCodeFilter OR course.code IN (:courseCodes)
-      -- GROUP BY 1, 2, 3, 4, 5, 6
     `,
     {
       replacements: {
@@ -502,20 +525,18 @@ export const findCourseEnrollments = async (studentNumbers: string[], beforeDate
       type: QueryTypes.SELECT,
     }
   )
-  return res
+  return result
 }
 
 export const findCourses = async (studentNumbers: string[], beforeDate: Date, courses: string[] = []) => {
-  const courseCodes = await getCourseCodes(courses)
-  const res = await sequelize.query(
+  const courseCodes = courses.length === 0 ? ['DUMMY'] : await getSubstitutions(courses)
+  const result: QueryResult = await sequelize.query(
     `
       SELECT DISTINCT ON (course.id)
         course.code,
         course.name,
-        course.coursetypecode,
         course.substitutions,
         course.main_course_code,
-        course_types.name AS course_type,
         credit.data AS credits,
         enrollment.data AS enrollments
       FROM course
@@ -533,7 +554,6 @@ export const findCourses = async (studentNumbers: string[], beforeDate: Date, co
         WHERE student_studentnumber IN (:studentnumbers) AND attainment_date < :beforeDate
         GROUP BY credit.course_code
       ) credit ON credit.course_code = course.code
-      INNER JOIN course_types ON course_types.coursetypecode = course.coursetypecode
       LEFT JOIN (
         SELECT
           course_id,
@@ -547,7 +567,6 @@ export const findCourses = async (studentNumbers: string[], beforeDate: Date, co
         GROUP BY enrollment.course_id
       ) enrollment ON enrollment.course_id = course.id 
       WHERE :skipCourseCodeFilter OR course.code IN (:courseCodes)
-      -- GROUP BY 1, 2, 3, 4, 5, 6
     `,
     {
       replacements: {
@@ -559,15 +578,18 @@ export const findCourses = async (studentNumbers: string[], beforeDate: Date, co
       type: QueryTypes.SELECT,
     }
   )
-
-  return res
+  return result
 }
 
-export const parseCreditInfo = (credit: Credit) => ({
-  studentnumber: credit.student_studentnumber,
-  grade: credit.grade,
-  passingGrade: Credit.passed(credit),
-  failingGrade: Credit.failed(credit),
-  improvedGrade: Credit.improved(credit),
-  date: credit.attainment_date,
-})
+export const parseCreditInfo = (
+  credit: Pick<Credit, 'grade' | 'student_studentnumber' | 'attainment_date' | 'credittypecode' | 'course_code'>
+) => {
+  return {
+    studentnumber: credit.student_studentnumber,
+    grade: credit.grade,
+    passingGrade: Credit.passed(credit),
+    failingGrade: Credit.failed(credit),
+    improvedGrade: Credit.improved(credit),
+    date: credit.attainment_date,
+  }
+}

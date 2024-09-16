@@ -64,7 +64,11 @@ const containsAmountOfStudents = (amount = 0) => {
 }
 
 const containsSpecificStudents = (studentnumbers = []) => {
-  cy.contains(`Students (${studentnumbers.length})`).click()
+  cy.contains(`Students (${studentnumbers.length})`)
+    .parent()
+    .then($parentDiv => {
+      if (!$parentDiv.hasClass('active')) cy.contains(`Students (${studentnumbers.length})`).click()
+    })
 
   studentnumbers.forEach(s => cy.contains(s))
 }
