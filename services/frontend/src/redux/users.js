@@ -66,7 +66,7 @@ const usersApi = RTKApi.injectEndpoints({
     deleteUser: builder.mutation({
       query: userId => ({
         url: '/users/delete',
-        method: 'POST',
+        method: 'DELETE',
         body: { userId },
       }),
     }),

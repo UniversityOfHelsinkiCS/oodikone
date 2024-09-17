@@ -55,7 +55,7 @@ router.post('/add', auth.roles(['admin']), async (req: AddUserRequest, res: Resp
   res.json(success)
 })
 
-router.post('/delete', auth.roles(['admin']), async (req: DeleteUserRequest, res: Response) => {
+router.delete('/delete', auth.roles(['admin']), async (req: DeleteUserRequest, res: Response) => {
   const { userId } = req.body
   try {
     await userService.deleteUserById(userId)
