@@ -158,13 +158,13 @@ export const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =
           attributes: ['completed_credits', 'included_courses', 'programme_code', 'curriculum_period_id'],
           where: {
             [Op.or]: [
-              { completed_credits: { [Op.gte]: 160 }, programme_code: { [Op.like]: 'KH%' } },
+              { completed_credits: { [Op.gte]: 140 }, programme_code: { [Op.like]: 'KH%' } },
               { completed_credits: { [Op.gte]: 150 }, programme_code: 'MH90_001' }, // De­gree Pro­gramme in Veter­in­ary Medi­cine
               { completed_credits: { [Op.gte]: 330 }, programme_code: 'MH30_001' }, // De­gree Pro­gramme in Medi­cine
               { completed_credits: { [Op.gte]: 300 }, programme_code: 'MH30_003' }, // De­gree Pro­gramme in Dentistry
               { completed_credits: { [Op.gte]: 115 }, programme_code: 'MH30_004' }, // Mas­ter's Pro­gramme in Psy­cho­logy
               {
-                completed_credits: { [Op.gte]: 85 },
+                completed_credits: { [Op.gte]: 70 },
                 programme_code: { [Op.like]: 'MH%', [Op.notIn]: ['MH90_001', 'MH30_001', 'MH30_003', 'MH30_004'] },
               },
             ],
