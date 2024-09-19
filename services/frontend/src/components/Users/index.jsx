@@ -30,7 +30,11 @@ export const Users = () => {
         Oodikone users
       </Header>
       {!userid && !isDefaultServiceProvider() && <NewUserSection onAddUser={onAddUser} />}
-      {userid ? <UserPage /> : <UserSearchList isError={isError} isLoading={isLoading} users={users} />}
+      {userid ? (
+        <UserPage />
+      ) : (
+        <UserSearchList getAllUsersQuery={getAllUsersQuery} isError={isError} isLoading={isLoading} users={users} />
+      )}
     </div>
   )
 }

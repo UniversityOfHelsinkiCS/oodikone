@@ -63,6 +63,13 @@ const usersApi = RTKApi.injectEndpoints({
         body: { user },
       }),
     }),
+    deleteUser: builder.mutation({
+      query: userId => ({
+        url: '/users/delete',
+        method: 'DELETE',
+        body: { userId },
+      }),
+    }),
   }),
   overrideExisting: false,
 })
@@ -79,4 +86,5 @@ export const {
   useSendUserAccessEmailMutation,
   useModifyLanguageMutation,
   useAddUserMutation,
+  useDeleteUserMutation,
 } = usersApi

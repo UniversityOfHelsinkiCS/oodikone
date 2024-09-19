@@ -202,6 +202,10 @@ export const findOne = async (id: string) => {
   return formattedUser
 }
 
+export const findByUsername = async (username: string) => {
+  return (await User.findOne({ where: { username } }))?.toJSON()
+}
+
 export const getOrganizationAccess = async (sisPersonId: string, iamGroups: string[]) => {
   if (!iamGroups.length) {
     return {}
@@ -302,14 +306,19 @@ export const getUserFd = async ({ username }: { username: string }) => {
 
 export const addNewUser = async user => {
   const name = user.first_name.concat(' ', user.last_name)
-  await User.upsert({
-    fullName: name,
-    username: user.eppn,
-    email: user.email_address,
-    sisuPersonId: user.id,
-    roles: [],
-    lastLogin: new Date(),
-  })
+  try {
+    await User.upsert({
+      fullName: name,
+      username: user.eppn,
+      email: user.email_address,
+      sisuPersonId: user.id,
+      roles: [],
+      lastLogin: new Date(),
+    })
+    return true
+  } catch (error) {
+    throw new Error('Could not add or update user.')
+  }
 }
 
 export const getUserFromSisuByEppn = async (requesterEppn: string, newUserEppn: string) => {
@@ -320,4 +329,12 @@ export const getUserFromSisuByEppn = async (requesterEppn: string, newUserEppn: 
     variables: { subjectUserId: newUserTokenData.personid },
   })
   return personData
+}
+
+export const deleteUserById = async userId => {
+  await User.destroy({
+    where: {
+      id: userId,
+    },
+  })
 }

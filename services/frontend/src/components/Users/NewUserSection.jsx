@@ -7,13 +7,16 @@ export const NewUserSection = ({ onAddUser }) => {
   const [eppn, setEppn] = useState('')
   const [user, setUser] = useState('')
   const [showAdded, setShowAdded] = useState(false)
+  const [showAddError, setShowAddError] = useState(false)
 
   const [
     getUserFromSisuByEppnQuery,
     { data: userFromApi, isLoading: isLoadingGetUser, isError: isErrorGetUser, isFetching },
   ] = useLazyGetUserFromSisuByEppnQuery()
-  const [addUserMutation, { data: addedUser, isLoading: isLoadingAddUser, isError: isErrorAddUser }] =
-    useAddUserMutation()
+  const [
+    addUserMutation,
+    { data: addedUser, isLoading: isLoadingAddUser, isError: isErrorAddUser, error: addUserError },
+  ] = useAddUserMutation()
 
   useEffect(() => {
     if (!isLoadingGetUser && !isErrorAddUser && !isFetching) {
@@ -22,12 +25,18 @@ export const NewUserSection = ({ onAddUser }) => {
   }, [userFromApi, isLoadingGetUser, isErrorGetUser, isFetching])
 
   useEffect(() => {
-    if (!isLoadingAddUser && !isErrorAddUser) {
+    if (!isLoadingAddUser && !isErrorAddUser && addedUser) {
       setUser('')
       setEppn('')
       onAddUser()
       setShowAdded(true)
       setTimeout(() => setShowAdded(false), 2000)
+    }
+    if (isErrorAddUser) {
+      if (addUserError.status === 400) {
+        setShowAddError(true)
+        setTimeout(() => setShowAddError(false), 2000)
+      }
     }
   }, [addedUser, isLoadingAddUser, isErrorAddUser])
 
@@ -62,7 +71,9 @@ export const NewUserSection = ({ onAddUser }) => {
 
       {isErrorGetUser && <h4>Something went wrong, please try a different eppn.</h4>}
 
-      {showAdded && addedUser && <h4> Added user to the Oodikone user-database.</h4>}
+      {showAdded && <h4> Added user to the Oodikone user-database.</h4>}
+
+      {showAddError && <h4 style={{ color: 'red' }}>The user already exists in Oodikone.</h4>}
 
       {!isErrorGetUser && user && (
         <SortableTable
