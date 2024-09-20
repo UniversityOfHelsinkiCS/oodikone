@@ -22,7 +22,7 @@ const checkNumbers = (numbers, numberOfColumns) => {
     cy.get('td').eq(0).contains('All courses total')
     numbers.forEach((number, index) => {
       cy.get('td')
-        .eq(index + 2)
+        .eq(index + 1)
         .contains(number)
     })
   })
