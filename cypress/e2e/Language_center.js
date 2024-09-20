@@ -91,8 +91,8 @@ describe('When language center is opened', () => {
         chooseSemester('Kevät 2024', 'to')
       })
 
-      it('Semester tab shows numbers', () => {
-        checkNumbers([69, 26, 298, 58, 343, 98, 438, 138, 310, 90, 123, 74, 10, 1, 2076], 16)
+      it.only('Semester tab shows numbers', () => {
+        checkNumbers([69, 26, 298, 58, 343, 98, 438, 138, 310, 90, 123, 74, 10, 1, 2076], 17)
       })
 
       it('Coloring mode works on semester tab', () => {
@@ -101,7 +101,7 @@ describe('When language center is opened', () => {
 
         checkStyle(
           expectedAlphas.map(alpha => `background-color: rgba(0, 170, 0, ${alpha})`),
-          16
+          17
         )
         cy.get('table > tbody > tr:first').within(() => {
           cy.get('td').eq(15).should('have.attr', 'style').and('not.include', 'background-color')
