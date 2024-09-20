@@ -122,16 +122,16 @@ const formatStudentForPopulationStatistics = (
   code: string,
   optionData: Record<string, { name: Name }>
 ) => {
-  const toCourse = (credit: Credit): ParsedCourse => {
+  const toCourse = (credit: Credit, normalizeDate: boolean): ParsedCourse => {
     const attainmentDateNormalized =
-      credit.attainment_date < new Date(startDate)
+      normalizeDate && credit.attainment_date < new Date(startDate)
         ? startDateMoment.clone().add(1, 'day').toISOString()
-        : credit.attainment_date
+        : credit.attainment_date.toISOString()
     const passed = Credit.passed({ credittypecode: credit.credittypecode })
 
     return {
       course_code: credit.course_code,
-      date: attainmentDateNormalized as string,
+      date: attainmentDateNormalized,
       passed,
       grade: passed ? credit.grade : 'Hyl.',
       credits: credit.credits,
@@ -219,7 +219,7 @@ const formatStudentForPopulationStatistics = (
 
     const academicYears = { first: 0, second: 0, third: 0, fourth: 0, fifth: 0, sixth: 0 }
     if (criteria.courses || criteria.credits) {
-      const courses = credits[studentnumber] ? credits[studentnumber].map(toCourse) : []
+      const courses = credits[studentnumber] ? credits[studentnumber].map(credit => toCourse(credit, true)) : []
       courses.forEach(course => {
         if (course.passed) {
           const correctCode = criteriaCoursesBySubstitutions[course.course_code]
@@ -257,7 +257,7 @@ const formatStudentForPopulationStatistics = (
     started,
     studentNumber: studentnumber,
     credits: creditcount || 0,
-    courses: credits[studentnumber] ? credits[studentnumber].map(toCourse) : [],
+    courses: credits[studentnumber] ? credits[studentnumber].map(credit => toCourse(credit, false)) : [],
     enrollments: enrollments[studentnumber],
     name: abbreviatedname,
     gender_code,
