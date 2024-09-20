@@ -1,8 +1,9 @@
-import { courseNameColumn, getColor } from '@/components/ColorizedCoursesTable/common'
+import { getColor, getCourseCodeColumn, getCourseNameColumn } from '@/components/ColorizedCoursesTable/common'
 
 export const getColumns = (getTextIn, semesters, numberMode, colorMode, allTotal) => {
   const columns = [
-    courseNameColumn(getTextIn),
+    getCourseCodeColumn(getTextIn),
+    getCourseNameColumn(getTextIn),
     ...semesters.map(semester => ({
       key: `${semester.semestercode}`,
       title: `${getTextIn(semester.name).replace(' ', '\n')}`,

@@ -222,11 +222,16 @@ export const OverallStatsTable = ({ studyProgramme, combinedProgramme, academicY
     return <Loader active style={{ marginTop: '10em' }} />
   }
 
-  if (error) return <h3>Something went wrong, please try refreshing the page.</h3>
+  if (error) {
+    return <h3>Something went wrong, please try refreshing the page.</h3>
+  }
 
   const handleYearChange = (_event, { name, value }) => {
-    if (name === 'fromYear' && value <= toYear) setFromYear(value)
-    else if (name === 'toYear' && value >= fromYear) setToYear(value)
+    if (name === 'fromYear' && value <= toYear) {
+      setFromYear(value)
+    } else if (name === 'toYear' && value >= fromYear) {
+      setToYear(value)
+    }
   }
 
   const filterDataByYear = (data, fromYear, toYear) => {

@@ -39,12 +39,15 @@ export const ColorizedCoursesTable = ({ fetchDataHook, studyProgramme, title, pa
   }, [semesterFilter])
 
   useEffect(() => {
-    if (!semesters?.length) return
-    if (!semesterFilter)
+    if (!semesters?.length) {
+      return
+    }
+    if (!semesterFilter) {
       setSemesterFilter({
         start: semesters[0].semestercode,
         end: semesters[semesters.length - 1].semestercode,
       })
+    }
   }, [semesters])
 
   const possiblePanes = [
@@ -62,7 +65,9 @@ export const ColorizedCoursesTable = ({ fetchDataHook, studyProgramme, title, pa
 
   const displayedPanes = panes.map(tab => possiblePanes.find(pane => pane.name === tab))
 
-  if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
+  if (isError) {
+    return <h3>Something went wrong, please try refreshing the page.</h3>
+  }
 
   if (!data || isFetching || isLoading || !semesterFilter || !semesters?.length) {
     return <Loader active style={{ marginTop: '15em' }} />

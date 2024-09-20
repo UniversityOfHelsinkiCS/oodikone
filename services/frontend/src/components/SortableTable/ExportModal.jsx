@@ -65,7 +65,7 @@ export const ExportModal = ({ open, onOpen, onClose, data, columns, featureName 
   )
 
   const handleExport = () => {
-    const columns = exportColumns.filter(ec => includes(selected, ec.key))
+    const columns = exportColumns.filter(column => includes(selected, column.key))
     const { rows } = ExportVisitor.visit(data, columns)
     const sheet = utils.json_to_sheet(rows)
     const book = utils.book_new()
@@ -76,7 +76,6 @@ export const ExportModal = ({ open, onOpen, onClose, data, columns, featureName 
   const toggleSelection = key => {
     setSelected(prev => {
       const i = prev.indexOf(key)
-
       if (i > -1) {
         const n = [...prev]
         n.splice(i, 1)

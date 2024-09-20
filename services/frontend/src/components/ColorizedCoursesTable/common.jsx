@@ -6,8 +6,8 @@ export const useColorizedCoursesTableContext = () => useContext(ColorizedCourses
 
 export const emptyFields = { completions: 0, enrollments: 0, difference: 0, rejected: 0 }
 
-export const courseNameColumn = getTextIn => ({
-  key: 'course-name',
+export const getCourseCodeColumn = getTextIn => ({
+  key: 'course-code',
   title: 'Course',
   getRowVal: row => row.code,
   getRowContent: row => (
@@ -16,6 +16,13 @@ export const courseNameColumn = getTextIn => ({
       <i style={{ color: 'gray', fontWeight: 'normal' }}>{row.name && getTextIn(row.name)}</i>
     </div>
   ),
+})
+
+export const getCourseNameColumn = getTextIn => ({
+  key: 'course-name',
+  title: 'Name',
+  getRowVal: row => getTextIn(row.name),
+  displayColumn: false,
 })
 
 export const calculateTotals = (courses, semesters, faculties) => {
