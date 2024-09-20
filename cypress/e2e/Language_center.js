@@ -91,7 +91,7 @@ describe('When language center is opened', () => {
         chooseSemester('Kevät 2024', 'to')
       })
 
-      it.only('Semester tab shows numbers', () => {
+      it('Semester tab shows numbers', () => {
         checkNumbers([69, 26, 298, 58, 343, 98, 438, 138, 310, 90, 123, 74, 10, 1, 2076], 17)
       })
 
