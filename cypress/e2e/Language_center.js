@@ -16,13 +16,14 @@ const chooseSemester = (semester, fromOrTo) => {
     })
 }
 
-const checkNumbers = (numbers, numberOfColumns) => {
+const checkNumbers = (numbers, numberOfColumns, mode) => {
+  const offset = mode === 'semesters' ? 2 : 1
   cy.get('table > tbody > tr:first').within(() => {
     cy.get('td').should('have.length', numberOfColumns)
     cy.get('td').eq(0).contains('All courses total')
     numbers.forEach((number, index) => {
       cy.get('td')
-        .eq(index + 1)
+        .eq(index + offset)
         .contains(number)
     })
   })
@@ -33,7 +34,7 @@ const checkStyle = (styles, numberOfColumns) => {
     cy.get('td').should('have.length', numberOfColumns)
     styles.forEach((style, index) => {
       cy.get('td')
-        .eq(index + 1)
+        .eq(index + 2)
         .should('have.attr', 'style')
         .and('include', style)
     })
@@ -92,7 +93,7 @@ describe('When language center is opened', () => {
       })
 
       it('Semester tab shows numbers', () => {
-        checkNumbers([69, 26, 298, 58, 343, 98, 438, 138, 310, 90, 123, 74, 10, 1, 2076], 17)
+        checkNumbers([69, 26, 298, 58, 343, 98, 438, 138, 310, 90, 123, 74, 10, 1, 2076], 17, 'semesters')
       })
 
       it('Coloring mode works on semester tab', () => {
@@ -104,7 +105,7 @@ describe('When language center is opened', () => {
           17
         )
         cy.get('table > tbody > tr:first').within(() => {
-          cy.get('td').eq(15).should('have.attr', 'style').and('not.include', 'background-color')
+          cy.get('td').eq(16).should('have.attr', 'style').and('not.include', 'background-color')
         })
       })
     })
