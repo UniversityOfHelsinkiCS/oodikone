@@ -105,8 +105,8 @@ const getPassRateAttemptSeriesFromStats = stats => {
       getDataObject('failed', failed, 'c'),
     ],
     relative: [
-      getDataObject('passed', passed.map(absoluteToRelative(all)), 'b'),
-      getDataObject('failed', failed.map(absoluteToRelative(all)), 'c'),
+      getDataObject('passed', passed.map(absoluteToRelative(all)), 'a'),
+      getDataObject('failed', failed.map(absoluteToRelative(all)), 'a'),
     ],
   }
 }
@@ -139,9 +139,9 @@ const getPassRateStudentSeriesFromStats = stats => {
       getDataObject('enrolled, no grade', enrolledNoGrade, 'c'),
     ],
     relative: [
-      getDataObject('passed', passed.map(absoluteToRelative(all)), 'b'),
-      getDataObject('never passed', neverPassed.map(absoluteToRelative(all)), 'c'),
-      getDataObject('enrolled, no grade', enrolledNoGrade.map(absoluteToRelative(all)), 'c'),
+      getDataObject('passed', passed.map(absoluteToRelative(all)), 'a'),
+      getDataObject('never passed', neverPassed.map(absoluteToRelative(all)), 'a'),
+      getDataObject('enrolled, no grade', enrolledNoGrade.map(absoluteToRelative(all)), 'a'),
     ],
   }
 }
