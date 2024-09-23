@@ -182,7 +182,7 @@ const accumulateGrades = (
 
       return acc
     },
-    { ...baseAccumulator }
+    { ...baseAccumulator } as Record<string, number[]>
   )
 }
 

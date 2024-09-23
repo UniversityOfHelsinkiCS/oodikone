@@ -555,8 +555,8 @@ export const GeneralTab = ({
         return reformatDate(latestDate, ISO_DATE_FORMAT)
       },
       helpText: getTextIn({
-        fi: 'Päivämäärä, jolloin opiskelija on viimeksi suorittanut hyväksytysti kurssin, joka sisältyy hänen HOPSiinsa.',
-        en: 'The date when the student last successfully completed a course included in their HOPS.',
+        fi: 'Päivämäärä, jolloin opiskelija on viimeksi suorittanut hyväksytysti kurssin, joka sisältyy hänen HOPSiinsa',
+        en: 'The date when the student last successfully completed a course included in their HOPS',
       }),
     },
     extent: {

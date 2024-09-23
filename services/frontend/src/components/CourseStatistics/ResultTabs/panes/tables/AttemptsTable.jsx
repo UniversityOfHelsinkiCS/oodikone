@@ -1,4 +1,4 @@
-import _, { uniq } from 'lodash'
+import { mapValues, uniq } from 'lodash'
 import qs from 'query-string'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
@@ -19,12 +19,13 @@ const getTableData = (stats, useThesisGrades, isRelative) =>
     const {
       name,
       code,
-      attempts: { grades },
+      attempts: { grades, totalEnrollments },
       coursecode,
       rowObfuscated,
     } = stat
 
-    const attempts = Object.values(grades).reduce((cur, acc) => acc + cur, 0)
+    const attemptsWithGrades = Object.values(grades).reduce((cur, acc) => acc + cur, 0)
+    const attempts = totalEnrollments || attemptsWithGrades
     const gradeSpread = useThesisGrades
       ? getThesisGradeSpread([grades], isRelative)
       : getGradeSpread([grades], isRelative)
@@ -38,9 +39,9 @@ const getTableData = (stats, useThesisGrades, isRelative) =>
       enrollmentsByState: stat.attempts.enrollmentsByState,
       totalEnrollments: stat.attempts.totalEnrollments,
       passRate: stat.attempts.passRate,
-      attempts,
+      attempts: stat.attempts.totalAttempts || attempts,
       rowObfuscated,
-      ..._.mapValues(gradeSpread, x => x[0]),
+      ...mapValues(gradeSpread, x => x[0]),
     }
 
     if (mapped.name === 'Total') {
@@ -50,14 +51,15 @@ const getTableData = (stats, useThesisGrades, isRelative) =>
     return mapped
   })
 
-const getGradeColumns = grades =>
-  grades.map(({ key, title }) =>
+const getGradeColumns = grades => {
+  return grades.map(({ key, title }) =>
     getSortableColumn({
       key,
       title,
       getRowVal: s => (s.rowObfuscated ? 'NA' : s[key] || 0),
     })
   )
+}
 
 export const AttemptsTable = ({
   data: { stats, name },
@@ -72,10 +74,10 @@ export const AttemptsTable = ({
   const alternatives = useSelector(getCourseAlternatives)
   const unifyCourses = useSelector(state => state.courseSearch.openOrRegular)
 
-  const showPopulation = (yearcode, years, unifyCourses) => {
+  const showPopulation = (yearCode, years, unifyCourses) => {
     const queryObject = {
-      from: yearcode,
-      to: yearcode,
+      from: yearCode,
+      to: yearCode,
       coursecodes: JSON.stringify(uniq(alternatives)),
       years,
       separate,
@@ -95,7 +97,7 @@ export const AttemptsTable = ({
         title: 'Time',
         filterType: 'range',
         cellProps: {},
-        getRowVal: s => s.code + (2011 - 62),
+        getRowVal: s => s.code + 1949,
         getRowExportVal: s => s.name,
         getRowContent: s => (
           <div>
@@ -144,30 +146,30 @@ export const AttemptsTable = ({
     getSortableColumn({
       key: 'TOTAL_ENROLLMENTS',
       title: 'Total\nenrollments',
-      helpText: 'All enrollments, including all rejected and aborted states.',
+      helpText: 'All enrollments, including all rejected and aborted states',
       getRowVal: s => (s.rowObfuscated ? 'NA' : s.totalEnrollments),
     }),
     getSortableColumn({
       key: 'ENROLLMENTS_ENROLLED',
       title: 'Enrolled',
-      helpText: 'All enrollments with enrolled or confirmed state.',
+      helpText: 'All enrollments with enrolled or confirmed state',
       getRowVal: s => (s.rowObfuscated ? 'NA' : s.enrollmentsByState.ENROLLED),
     }),
     getSortableColumn({
       key: 'ENROLLMENTS_REJECTED',
       title: 'Rejected',
-      helpText: 'All enrollments with rejected state.',
+      helpText: 'All enrollments with rejected state',
       getRowVal: s => (s.rowObfuscated ? 'NA' : s.enrollmentsByState.REJECTED),
     }),
     getSortableColumn({
       key: 'ENROLLMENTS_ABORTED',
       title: 'Aborted',
-      helpText: 'All enrollments with aborted by student or teacher state.',
+      helpText: 'All enrollments with aborted by student or teacher state',
       getRowVal: s => (s.rowObfuscated ? 'NA' : s.enrollmentsByState.ABORTED),
     }),
   ]
 
-  if (showGrades)
+  if (showGrades) {
     columns = [
       timeColumn,
       getSortableColumn({
@@ -177,6 +179,7 @@ export const AttemptsTable = ({
       }),
       ...getGradeColumns(resolveGrades(stats)),
     ]
+  }
 
   const data = getTableData(stats, useThesisGrades, isRelative)
 

@@ -64,8 +64,9 @@ export const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
         attempts: {
           categories: { passed, failed },
           grades: cgrades,
-          enrollmentsByState: { ...acc.attempts.enrollmentsByState },
+          totalAttempts: acc.attempts.totalAttempts + curr.attempts.totalEnrollments || passed + failed,
           totalEnrollments: acc.attempts.totalEnrollments + (curr.attempts.totalEnrollments || 0),
+          enrollmentsByState: { ...acc.attempts.enrollmentsByState },
         },
         students: {
           totalEnrollments: acc.students.totalEnrollments + (curr.students.totalEnrollments || 0),
@@ -99,6 +100,7 @@ export const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
         },
         passRate: 0,
         grades: {},
+        totalAttempts: 0,
         totalEnrollments: 0,
         enrollmentsByState: {
           ENROLLED: 0,
