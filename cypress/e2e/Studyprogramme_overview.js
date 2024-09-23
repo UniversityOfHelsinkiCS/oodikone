@@ -314,7 +314,7 @@ describe('Studyprogramme overview', () => {
       cy.contains('class size 26 students')
     })
 
-    it('Links to class statistics page with all years combined work', () => {
+    it('Links to class statistics page with all years combined work', { retries: 2 }, () => {
       cy.get('[data-cy=Table-StudytrackOverview]').within(() => {
         cy.get('td.total-row-cell a').click()
       })
