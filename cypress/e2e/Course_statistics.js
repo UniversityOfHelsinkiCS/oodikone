@@ -320,15 +320,15 @@ describe('Course Statistics tests', () => {
       const yearRange = { from: '2016-2017', to: '2023-2024' }
       const attemptsTableContents = [
         // [time, attempts, passed, failed]
-        ['Total', null, 156, 140, 16],
+        ['Total', null, 186, 140, 16],
       ]
 
       const gradesTableContents = [
         // [time, attempts, 0, 1, 2, 3, 4, 5, other passed]
-        ['Total', null, 156, 16, 3, 8, 5, 24, 99, 1],
-        ['2023-2024', null, 1, 0, 0, 0, 0, 0, 1, 0],
-        ['2022-2023', null, 27, 0, 0, 0, 0, 6, 21, 0],
-        ['2021-2022', null, 15, 0, 0, 0, 0, 2, 13, 0],
+        ['Total', null, 186, 16, 3, 8, 5, 24, 99, 1],
+        ['2023-2024', null, 6, 0, 0, 0, 0, 0, 1, 0],
+        ['2022-2023', null, 26, 0, 0, 0, 0, 6, 21, 0],
+        ['2021-2022', null, 41, 0, 0, 0, 0, 2, 13, 0],
         ['2020-2021', null, 23, 0, 0, 2, 0, 2, 18, 1],
         ['2019-2020', null, 29, 1, 1, 4, 1, 5, 17, 0],
         ['2018-2019', null, 32, 6, 2, 1, 2, 3, 18, 0],
@@ -393,15 +393,15 @@ describe('Course Statistics tests', () => {
       const yearRange = { from: '1999-2000', to: '2023-2024' }
       const attemptsTableContents = [
         // [time, passed, failed, passrate]
-        ['Total', null, 266, 241, 25],
+        ['Total', null, 288, 241, 25],
       ]
 
       const gradesTableContents = [
         // [time, attempts, 0, 1, 2, 3, 4, 5, other passed]
-        ['Total', null, 266, 25, 6, 15, 9, 37, 169, 5],
-        ['2023-2024', null, 2, 0, 0, 0, 0, 0, 2, 0],
+        ['Total', null, 288, 25, 6, 15, 9, 37, 169, 5],
+        ['2023-2024', null, 6, 0, 0, 0, 0, 0, 2, 0],
         ['2022-2023', null, 28, 0, 0, 0, 0, 6, 22, 0],
-        ['2021-2022', null, 27, 0, 0, 1, 0, 2, 24, 0],
+        ['2021-2022', null, 45, 0, 0, 1, 0, 2, 24, 0],
         ['2020-2021', null, 34, 0, 0, 2, 1, 2, 28, 1],
         ['2019-2020', null, 60, 3, 2, 5, 3, 9, 38, 0],
         ['2018-2019', null, 46, 7, 3, 3, 2, 6, 25, 0],
@@ -528,10 +528,10 @@ describe('Course Statistics tests', () => {
 
     const attemptsTableContents = [
       // [time, passed, failed, passrate, total enrollments, enrolled, rejected, aborted]
-      ['Total*', null, 237, 217, 20, '91.56 %', 73, 73, 0, 0],
+      ['Total*', null, 255, 217, 20, '91.56 %', 73, 73, 0, 0],
       emptyYear('2023-2024'),
       ['2022-2023', null, 28, 28, 0, '100.00 %', 28, 28, 0, 0],
-      ['2021-2022', null, 27, 27, 0, '100.00 %', 45, 45, 0, 0],
+      ['2021-2022', null, 45, 27, 0, '100.00 %', 45, 45, 0, 0],
       ['2020-2021', null, 34, 34, 0, '100.00 %'],
       ['2019-2020', null, 60, 57, 3, '95.00 %'],
       ['2018-2019', null, 46, 39, 7, '84.78 %'],
