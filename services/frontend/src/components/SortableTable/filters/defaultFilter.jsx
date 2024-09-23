@@ -62,12 +62,10 @@ const DefaultColumnFilterComponent = ({ column, options, dispatch }) => {
           }
         }
 
-        const text = column.formatValue ? column.formatValue(value) : value
-
         return (
           <Dropdown.Item
             icon={<Icon name={icon} style={{ color }} />}
-            key={text}
+            key={value}
             onClick={event => {
               dispatch({
                 type: 'CYCLE_VALUE_FILTER',
@@ -80,7 +78,7 @@ const DefaultColumnFilterComponent = ({ column, options, dispatch }) => {
               event.preventDefault()
               event.stopPropagation()
             }}
-            text={text != null ? `${text}` : <span style={{ color: 'gray', fontStyle: 'italic' }}>Empty</span>}
+            text={value != null ? `${value}` : <span style={{ color: 'gray', fontStyle: 'italic' }}>Empty</span>}
           />
         )
       })
