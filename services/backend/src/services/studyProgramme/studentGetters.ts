@@ -100,12 +100,6 @@ export const getOwnStudentsForProgrammeCourses = async (
       INNER JOIN
         course co
         ON cr.course_code = co.code
-      INNER JOIN
-        course_providers cp
-        ON cp.coursecode = co.id
-      INNER JOIN
-        organization o
-        ON o.id = cp.organizationcode
       WHERE
         cr.attainment_date BETWEEN :from AND :to
         AND cr.course_code IN (:programmeCourses)

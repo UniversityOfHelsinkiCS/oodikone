@@ -65,34 +65,41 @@ export const getNotCompletedForProgrammeCourses = async (from: Date, to: Date, p
 
     const credits = await Credit.findAll({
       attributes: ['course_code', 'student_studentnumber', 'credittypecode', 'isStudyModule'],
-      include: {
-        model: Course,
-        attributes: ['code', 'name'],
-        required: true,
-        where: {
-          code: programmeCourses,
-        },
-      },
       where: {
+        course_code: {
+          [Op.in]: programmeCourses,
+        },
         attainment_date: {
           [Op.between]: [from, to],
         },
       },
     })
 
+    const courseNames = (
+      await Course.findAll({
+        attributes: ['code', 'name'],
+        where: {
+          code: programmeCourses,
+        },
+      })
+    ).reduce<Map<string, Name>>((acc, val) => {
+      acc.set(val.code, val.name)
+      return acc
+    }, new Map())
+
     const creditCourses = credits.map(credit => {
       return {
         code: getCourseCode(credit.course_code),
         studentNumber: credit.student_studentnumber,
         creditTypeCode: credit.credittypecode,
-        courseName: credit.course.name,
+        courseName: courseNames.get(credit.course_code)!,
         isStudyModule: credit.isStudyModule,
       }
     })
 
     const passedByCourseCodes = {} as Record<string, string[]>
     const notCompletedByCourseCodes = {} as Record<string, string[]>
-    const courses = {} as Record<string, { code: string; name: Name; isStudyModule: boolean }>
+    const courses: Record<string, { code: string; name: Name; isStudyModule: boolean }> = {}
     for (const course of creditCourses) {
       if (!(course.code in courses)) {
         courses[course.code] = {
@@ -126,9 +133,9 @@ export const getNotCompletedForProgrammeCourses = async (from: Date, to: Date, p
     })
 
     return Object.keys(courses)
-      .reduce(
+      .reduce<Array<{ code: string; name: Name; isStudyModule: boolean }>>(
         (acc, val) => [...acc, { ...courses[val] }],
-        [] as Array<{ code: string; name: Name; isStudyModule: boolean }>
+        []
       )
       .map(course => ({
         code: course.code,
