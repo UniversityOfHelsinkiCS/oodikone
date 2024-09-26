@@ -11,10 +11,23 @@ export const StudytrackSelector = ({ track, setTrack, studytracks }) => {
     event.preventDefault()
     setTrack(value)
   }
+
   const getOptionName = track => {
     if (track !== 'All students of the programme') return getTextIn(track)
     return track
   }
+
+  const studyTrackOptions = Object.entries(studytracks)
+    .map(([code, track]) => ({
+      key: code,
+      value: code,
+      text: `${getOptionName(track)}, ${code}`,
+    }))
+    .sort((a, b) => {
+      if (a.text.startsWith('All students of the programme')) return -1
+      if (b.text.startsWith('All students of the programme')) return 1
+      return a.text.localeCompare(b.text, 'fi', { sensitivity: 'accent' })
+    })
 
   return (
     <div className="studytrack-selector">
@@ -23,12 +36,7 @@ export const StudytrackSelector = ({ track, setTrack, studytracks }) => {
         fluid
         name="studytrack"
         onChange={handleStudytrackChange}
-        options={Object.entries(studytracks).map(([code, track]) => ({
-          key: code,
-          value: code,
-          text: code === 'studyprogramme' ? getOptionName(track) : `${getOptionName(track)}, ${code}`,
-        }))}
-        placeholder="All students of the studyprogramme"
+        options={studyTrackOptions}
         selection
         value={track}
       />
