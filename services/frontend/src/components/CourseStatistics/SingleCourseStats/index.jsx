@@ -143,7 +143,9 @@ const SingleCourseStats = ({
         )
 
   const belongsToAtLeastOneProgramme = codes => {
-    if (codes.includes(ALL.value)) return () => true
+    if (codes.includes(ALL.value)) {
+      return () => true
+    }
 
     const { programmes } = stats
     const studentNumbers = new Set()
@@ -188,14 +190,12 @@ const SingleCourseStats = ({
       : filteredYears.find(year => year.text === name)
   }
 
-  const countAttemptStats = (attempts, filter) => {
-    // Count the stats for the Attempts- and Grades-tab
-    // Also used in Pass rate chart and Grade distribution chart
+  const countAttemptStats = (attempts, totalEnrollments, filter) => {
     const grades = countFilteredStudents(attempts.grades, filter)
     const categories = countFilteredStudents(attempts.categories, filter)
-
     const { failed, passed } = categories
-    const passRate = (100 * passed) / (passed + failed)
+    const total = passed + failed
+    const passRate = totalEnrollments ? (100 * passed) / totalEnrollments : (100 * passed) / total
 
     return {
       grades,
@@ -249,10 +249,11 @@ const SingleCourseStats = ({
   const countAttemptEnrollmentStats = (filteredEnrollments, displayEnrollments) => {
     const enrollmentsByState = countEnrollmentStates(filteredEnrollments)
     const totalEnrollments = displayEnrollments ? filteredEnrollments.length : undefined
-    if (!displayEnrollments)
-      Object.keys(enrollmentsByState).forEach(k => {
-        enrollmentsByState[k] = undefined
+    if (!displayEnrollments) {
+      Object.keys(enrollmentsByState).forEach(state => {
+        enrollmentsByState[state] = undefined
       })
+    }
     return { enrollmentsByState, totalEnrollments }
   }
 
@@ -267,8 +268,8 @@ const SingleCourseStats = ({
     })
     const enrollmentsByState = countEnrollmentStates(filteredEnrollments)
     if (!displayEnrollments) {
-      Object.keys(enrollmentsByState).forEach(k => {
-        enrollmentsByState[k] = undefined
+      Object.keys(enrollmentsByState).forEach(state => {
+        enrollmentsByState[state] = undefined
       })
       return { enrolledStudentsWithNoGrade: undefined, enrollmentsByState, totalEnrollments: undefined }
     }
@@ -300,9 +301,9 @@ const SingleCourseStats = ({
           const filteredEnrollments = enrollments.filter(({ studentnumber }) => filter(studentnumber))
           const filteredAllEnrollments = allEnrollments.filter(({ studentnumber }) => filter(studentnumber))
 
-          const attempts = countAttemptStats(allAttempts, filter)
           const attemptsEnrollments = countAttemptEnrollmentStats(filteredAllEnrollments, displayEnrollments)
           const studentsEnrollments = countStudentEnrollmentStats(allAttempts, filteredEnrollments, displayEnrollments)
+          const attempts = countAttemptStats(allAttempts, attemptsEnrollments.totalEnrollments, filter)
           const students = countStudentStats(allStudents, studentsEnrollments.enrolledStudentsWithNoGrade, filter)
           const parsedName = separate ? getTextIn(name) : name
 
@@ -335,37 +336,40 @@ const SingleCourseStats = ({
     if (name === 'primary') {
       setComparison(comparison.filter(programmeCode => programmeCode !== 'EXCLUDED'))
     }
-
     if ((!primary.includes(ALL.value) && value.includes(ALL.value)) || (name === 'primary' && value.length === 0)) {
       selected = [ALL.value]
     }
     if (name === 'primary') {
       setPrimary(selected)
     }
-
     if (name === 'comparison') {
       setComparison(selected)
     }
   }
 
   const handleYearChange = (_event, { name, value }) => {
-    if (name === 'fromYear' && value <= toYear) setFromYear(value)
-    else if (name === 'toYear' && value >= fromYear) setToYear(value)
+    if (name === 'fromYear' && value <= toYear) {
+      setFromYear(value)
+    } else if (name === 'toYear' && value >= fromYear) {
+      setToYear(value)
+    }
   }
 
   const filteredProgrammeStatistics = () => {
     const excludedProgrammes = getExcluded()
     const primaryProgrammes = primary
     const comparisonProgrammes = comparison.filter(code => validProgrammeCode(code))
-    if (comparison.includes('EXCLUDED')) comparisonProgrammes.push(...excludedProgrammes)
+    if (comparison.includes('EXCLUDED')) {
+      comparisonProgrammes.push(...excludedProgrammes)
+    }
 
-    const pstats = primaryProgrammes.length
+    const primaryStats = primaryProgrammes.length
       ? statsForProgrammes(
           primaryProgrammes,
           primaryProgrammes.length === 1 ? getProgrammeName(primaryProgrammes[0]) : 'Primary'
         )
       : undefined
-    const cstats = comparisonProgrammes.length
+    const comparisonStats = comparisonProgrammes.length
       ? statsForProgrammes(
           comparisonProgrammes,
           comparisonProgrammes.length === 1 ? getProgrammeName(comparisonProgrammes[0]) : 'Comparison'
@@ -373,8 +377,8 @@ const SingleCourseStats = ({
       : undefined
 
     return {
-      primary: pstats || undefined,
-      comparison: cstats || undefined,
+      primary: primaryStats || undefined,
+      comparison: comparisonStats || undefined,
     }
   }
 
@@ -433,7 +437,9 @@ const SingleCourseStats = ({
     })
     .filter(programme => programme.size > 0)
 
-  if (stats.statistics.length < 1) return <Segment>No data for selected course</Segment>
+  if (stats.statistics.length < 1) {
+    return <Segment>No data for selected course</Segment>
+  }
 
   const options = filteredProgrammes
     .map(({ text, ...rest }) => ({ text: typeof text === 'string' ? text : getTextIn(text), ...rest }))
