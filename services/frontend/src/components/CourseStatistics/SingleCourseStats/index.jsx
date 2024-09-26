@@ -16,16 +16,18 @@ import { setSelectedCourse, clearSelectedCourse } from '@/redux/singleCourseStat
 import { ALL, getAllStudyProgrammes } from '@/selectors/courseStats'
 import { countTotalStats } from './countTotalStats'
 
-const countFilteredStudents = (stat, filter) =>
-  stat
-    ? Object.entries(stat).reduce((acc, entry) => {
-        const [category, students] = entry
-        return {
-          ...acc,
-          [category]: students.filter(filter).length,
-        }
-      }, {})
-    : {}
+const countFilteredStudents = (stat, filter) => {
+  if (stat) {
+    return Object.entries(stat).reduce((acc, entry) => {
+      const [category, students] = entry
+      return {
+        ...acc,
+        [category]: students.filter(filter).length,
+      }
+    }, {})
+  }
+  return {}
+}
 
 const SingleCourseStats = ({
   stats,
@@ -134,13 +136,15 @@ const SingleCourseStats = ({
 
   const setExcludedToComparison = () => setComparison(primary.includes(ALL.value) ? [] : ['EXCLUDED'])
 
-  const getExcluded = () =>
-    primary.includes(ALL.value)
-      ? []
-      : difference(
-          programmes.map(programme => programme.value).filter(value => value !== ALL.value),
-          primary
-        )
+  const getExcluded = () => {
+    if (primary.includes(ALL.value)) {
+      return []
+    }
+    return difference(
+      programmes.map(programme => programme.value).filter(value => value !== ALL.value),
+      primary
+    )
+  }
 
   const belongsToAtLeastOneProgramme = codes => {
     if (codes.includes(ALL.value)) {
@@ -185,17 +189,18 @@ const SingleCourseStats = ({
     const timeFilter = ({ value }) => value >= fromYear && value <= toYear
     const filteredSemesters = semesters.filter(timeFilter)
     const filteredYears = years.filter(timeFilter)
-    return separate
-      ? filteredSemesters.find(year => year.texts.includes(getTextIn(name)))
-      : filteredYears.find(year => year.text === name)
+    if (separate) {
+      return filteredSemesters.find(year => year.texts.includes(getTextIn(name)))
+    }
+    return filteredYears.find(year => year.text === name)
   }
 
   const countAttemptStats = (attempts, totalEnrollments, filter) => {
     const grades = countFilteredStudents(attempts.grades, filter)
     const categories = countFilteredStudents(attempts.categories, filter)
     const { failed, passed } = categories
-    const total = passed + failed
-    const passRate = totalEnrollments ? (100 * passed) / totalEnrollments : (100 * passed) / total
+    const total = totalEnrollments || passed + failed
+    const passRate = 100 * (passed / total)
 
     return {
       grades,
