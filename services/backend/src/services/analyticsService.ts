@@ -21,15 +21,19 @@ const createRedisKeyForStudytrackStats = (id: string, graduated: Graduated, spec
   return `STUDYTRACK_STATS_${id}_${graduated}_${specialGroups}`
 }
 
+const shouldSaveToRedis = (id: unknown) => {
+  if (typeof id !== 'string') return false
+  if (isRelevantProgramme(id)) return true
+  const splitId = id.split('-')
+  return splitId.length === 2 && isRelevantProgramme(splitId[0]) && isRelevantProgramme(splitId[1])
+}
+
 export const getBasicStats = async (
   id: string,
   combinedProgramme: string | null,
   yearType: YearType,
   specialGroups: SpecialGroups
 ) => {
-  if (!isRelevantProgramme(id)) {
-    return null
-  }
   const searchkey = combinedProgramme ? `${id}-${combinedProgramme}` : id
   const redisKey = createRedisKeyForBasicStats(searchkey, yearType, specialGroups)
   const dataFromRedis = await redisClient.get(redisKey)
@@ -47,7 +51,7 @@ export const setBasicStats = async (data, yearType: YearType, specialGroups: Spe
     status: 'DONE',
     lastUpdated: moment().format(),
   }
-  if (!isRelevantProgramme(id)) {
+  if (!shouldSaveToRedis(id)) {
     return dataToRedis
   }
   const setOperationStatus = await redisClient.set(redisKey, JSON.stringify(dataToRedis))
@@ -98,9 +102,6 @@ export const getGraduationStats = async (
   yearType: YearType,
   specialGroups: SpecialGroups
 ) => {
-  if (!isRelevantProgramme(id)) {
-    return null
-  }
   const searchkey = combinedProgramme ? `${id}-${combinedProgramme}` : id
   const redisKey = createRedisKeyForGraduationStats(searchkey, yearType, specialGroups)
   const dataFromRedis = await redisClient.get(redisKey)
@@ -118,7 +119,7 @@ export const setGraduationStats = async (data, yearType: YearType, specialGroups
     status: 'DONE',
     lastUpdated: moment().format(),
   }
-  if (!isRelevantProgramme(id)) {
+  if (!shouldSaveToRedis(id)) {
     return dataToRedis
   }
   const setOperationStatus = await redisClient.set(redisKey, JSON.stringify(dataToRedis))
@@ -134,9 +135,6 @@ export const getStudytrackStats = async (
   graduated: Graduated,
   specialGroups: SpecialGroups
 ) => {
-  if (!isRelevantProgramme(id)) {
-    return null
-  }
   const searchkey = combinedProgramme ? `${id}-${combinedProgramme}` : id
   const redisKey = createRedisKeyForStudytrackStats(searchkey, graduated, specialGroups)
   const dataFromRedis = await redisClient.get(redisKey)
@@ -154,7 +152,7 @@ export const setStudytrackStats = async (data, graduated: Graduated, specialGrou
     status: 'DONE',
     lastUpdated: moment().format(),
   }
-  if (!isRelevantProgramme(id)) {
+  if (!shouldSaveToRedis(id)) {
     return dataToRedis
   }
   const setOperationStatus = await redisClient.set(redisKey, JSON.stringify(dataToRedis))

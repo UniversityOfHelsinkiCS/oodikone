@@ -24,6 +24,11 @@ export const updateBasicView = async (code: string, combinedProgramme: string) =
       const creditStats = await computeCreditsProduced(code, isAcademicYear)
       await setCreditStats(creditStats, isAcademicYear, includeAllSpecials)
 
+      if (combinedProgramme) {
+        const creditStats = await computeCreditsProduced(combinedProgramme, isAcademicYear)
+        await setCreditStats(creditStats, isAcademicYear, includeAllSpecials)
+      }
+
       const graduationStats = await getGraduationStatsForStudytrack({
         studyProgramme: code,
         combinedProgramme,
