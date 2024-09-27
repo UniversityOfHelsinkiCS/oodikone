@@ -122,9 +122,9 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
   await bulkCreate(Course, courses)
   await bulkCreate(
     CourseProvider,
-    uniqBy(courseProviders, cP => cP.composite),
+    uniqBy(courseProviders, cP => `${cP.coursecode}-${cP.organizationcode}`),
     null,
-    ['composite']
+    ['coursecode', 'organizationcode']
   )
 }
 

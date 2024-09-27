@@ -322,7 +322,6 @@ const updateAttainments = async (
           .filter(p => p.roleUrn === 'urn:code:attainment-acceptor-type:approved-by' && !!p.personId)
           .forEach(p => {
             creditTeachers.push({
-              composite: `${attainment.id}-${p.personId}`,
               credit_id: attainment.id,
               teacher_id: p.personId,
             })
@@ -337,15 +336,15 @@ const updateAttainments = async (
   await bulkCreate(Credit, credits)
   await bulkCreate(
     CreditTeacher,
-    _.uniqBy(creditTeachers, cT => cT.composite),
+    _.uniqBy(creditTeachers, cT => `${cT.credit_id}-${cT.teacher_id}`),
     null,
-    ['composite']
+    ['credit_id', 'teacher_id']
   )
   await bulkCreate(
     CourseProvider,
-    _.uniqBy(courseProvidersToBeCreated, cP => cP.composite),
+    _.uniqBy(courseProvidersToBeCreated, cP => `${cP.coursecode}-${cP.organizationcode}`),
     null,
-    ['composite']
+    ['coursecode', 'organizationcode']
   )
 }
 

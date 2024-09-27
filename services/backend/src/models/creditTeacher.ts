@@ -1,6 +1,6 @@
 /* eslint-disable import/no-cycle */
 import { InferAttributes } from 'sequelize'
-import { Column, CreatedAt, DataType, ForeignKey, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
+import { Column, CreatedAt, DataType, ForeignKey, Model, Table, UpdatedAt } from 'sequelize-typescript'
 
 import { Credit } from './credit'
 import { Teacher } from './teacher'
@@ -11,10 +11,6 @@ import { Teacher } from './teacher'
   tableName: 'credit_teachers',
 })
 export class CreditTeacher extends Model<InferAttributes<CreditTeacher>> {
-  @PrimaryKey
-  @Column(DataType.STRING)
-  composite!: string
-
   @ForeignKey(() => Credit)
   @Column(DataType.STRING)
   credit_id!: string

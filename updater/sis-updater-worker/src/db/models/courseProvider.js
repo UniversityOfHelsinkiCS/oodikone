@@ -6,10 +6,6 @@ class CourseProvider extends Model {}
 
 CourseProvider.init(
   {
-    composite: {
-      type: STRING,
-      primaryKey: true,
-    },
     coursecode: {
       type: STRING,
       references: {

@@ -224,7 +224,6 @@ const termRegistrationTypeToEnrollmenttype = termRegistrationType =>
 const courseProviderMapper =
   courseGroupId =>
   ({ organisationId, shares }) => ({
-    composite: `${courseGroupId}-${organisationId}`,
     coursecode: courseGroupId,
     organizationcode: organisationId,
     shares,

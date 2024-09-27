@@ -6,10 +6,6 @@ class CreditTeacher extends Model {}
 
 CreditTeacher.init(
   {
-    composite: {
-      type: STRING,
-      primaryKey: true,
-    },
     credit_id: {
       type: STRING,
       references: {
