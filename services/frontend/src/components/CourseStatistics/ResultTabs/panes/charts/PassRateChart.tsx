@@ -142,12 +142,12 @@ const getPassRateStudentSeriesFromStats = stats => {
     absolute: [
       getDataObject('all', all, 'a'),
       getDataObject('passed', passed, 'b'),
-      getDataObject('never passed', neverPassed, 'c'),
+      getDataObject('failed', neverPassed, 'c'),
       getDataObject('enrolled, no grade', enrolledNoGrade, 'c'),
     ],
     relative: [
       getDataObject('passed', passed.map(absoluteToRelative(all)), 'a'),
-      getDataObject('never passed', neverPassed.map(absoluteToRelative(all)), 'a'),
+      getDataObject('failed', neverPassed.map(absoluteToRelative(all)), 'a'),
       getDataObject('enrolled, no grade', enrolledNoGrade.map(absoluteToRelative(all)), 'a'),
     ],
   }
