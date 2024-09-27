@@ -79,6 +79,7 @@ const studentMapper = (attainments, studyRights, attainmentsToBeExluced) => stud
     oppija_id,
     date_of_birth,
     id,
+    has_personal_identity_code,
   } = student
 
   // Filter out test student from oodi data
@@ -126,6 +127,7 @@ const studentMapper = (attainments, studyRights, attainmentsToBeExluced) => stud
     home_country_sv: home_country ? home_country.name.sv : null,
     home_country_en: home_country ? home_country.name.en : null,
     sis_person_id: id,
+    hasPersonalIdentityCode: has_personal_identity_code,
   }
 }
 
