@@ -21,11 +21,6 @@ export const countTotalStats = (formattedStats, userHasAccessToAllStats: boolean
       grades: {},
       totalAttempts: 0,
       totalEnrollments: 0,
-      enrollmentsByState: {
-        ENROLLED: 0,
-        REJECTED: 0,
-        ABORTED: 0,
-      },
     },
     students: {
       categories: {
@@ -41,11 +36,6 @@ export const countTotalStats = (formattedStats, userHasAccessToAllStats: boolean
       totalFailed: 0,
       totalEnrollments: 0,
       enrolledStudentsWithNoGrade: 0,
-      enrollmentsByState: {
-        ENROLLED: 0,
-        REJECTED: 0,
-        ABORTED: 0,
-      },
       withEnrollments: {
         total: 0,
         totalFailed: 0,
@@ -100,16 +90,6 @@ export const countTotalStats = (formattedStats, userHasAccessToAllStats: boolean
       ? acc.students.categories.neverPassed + neverPassed
       : acc.students.categories.neverPassed
 
-    Object.keys(curr.students.enrollmentsByState).forEach(k => {
-      if (acc.students.enrollmentsByState[k] === undefined) acc.students.enrollmentsByState[k] = 0
-      acc.students.enrollmentsByState[k] += curr.students.enrollmentsByState[k] || 0
-    })
-
-    Object.keys(curr.attempts.enrollmentsByState).forEach(k => {
-      if (acc.attempts.enrollmentsByState[k] === undefined) acc.attempts.enrollmentsByState[k] = 0
-      acc.attempts.enrollmentsByState[k] += curr.attempts.enrollmentsByState[k] || 0
-    })
-
     return {
       ...acc,
       coursecode: curr.coursecode,
@@ -118,7 +98,6 @@ export const countTotalStats = (formattedStats, userHasAccessToAllStats: boolean
         grades: cgrades,
         totalAttempts: acc.attempts.totalAttempts + curr.attempts.totalEnrollments || passed + failed,
         totalEnrollments: acc.attempts.totalEnrollments + (curr.attempts.totalEnrollments || 0),
-        enrollmentsByState: { ...acc.attempts.enrollmentsByState },
       },
       students: {
         totalEnrollments: acc.students.totalEnrollments + (curr.students.totalEnrollments || 0),
@@ -132,7 +111,6 @@ export const countTotalStats = (formattedStats, userHasAccessToAllStats: boolean
           neverPassed: newNeverPassed,
         },
         grades: bestEffortGrades,
-        enrollmentsByState: { ...acc.students.enrollmentsByState },
         withEnrollments: {
           total: acc.students.withEnrollments.total + curr.students.withEnrollments.total,
           totalFailed: acc.students.withEnrollments.totalFailed + curr.students.withEnrollments.totalFailed,

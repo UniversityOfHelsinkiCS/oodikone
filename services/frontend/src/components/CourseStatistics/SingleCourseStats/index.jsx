@@ -234,34 +234,6 @@ const SingleCourseStats = ({
     }
   }
 
-  const countEnrollmentStates = filteredEnrollments => {
-    const combined = { CONFIRMED: 'ENROLLED', ABORTED_BY_TEACHER: 'ABORTED', ABORTED_BY_STUDENT: 'ABORTED' }
-    return filteredEnrollments.reduce(
-      (acc, enrollment) => {
-        const state = combined[enrollment.state] || enrollment.state
-        if (acc[state] === undefined) acc[state] = 0
-        acc[state] += 1
-        return acc
-      },
-      {
-        ENROLLED: 0,
-        REJECTED: 0,
-        ABORTED: 0,
-      }
-    )
-  }
-
-  const countAttemptEnrollmentStats = (filteredEnrollments, displayEnrollments) => {
-    const enrollmentsByState = countEnrollmentStates(filteredEnrollments)
-    const totalEnrollments = displayEnrollments ? filteredEnrollments.length : undefined
-    if (!displayEnrollments) {
-      Object.keys(enrollmentsByState).forEach(state => {
-        enrollmentsByState[state] = undefined
-      })
-    }
-    return { enrollmentsByState, totalEnrollments }
-  }
-
   const countStudentEnrollmentStats = (allAttempts, filteredEnrollments, displayEnrollments) => {
     const enrolledStudentsWithNoGrade = filteredEnrollments.filter(({ studentNumber, state }) => {
       if (state !== 'ENROLLED') {
@@ -271,16 +243,11 @@ const SingleCourseStats = ({
       const hasPassed = allAttempts.categories.passed ? allAttempts.categories.passed.includes(studentNumber) : false
       return !hasFailed && !hasPassed
     })
-    const enrollmentsByState = countEnrollmentStates(filteredEnrollments)
     if (!displayEnrollments) {
-      Object.keys(enrollmentsByState).forEach(state => {
-        enrollmentsByState[state] = undefined
-      })
-      return { enrolledStudentsWithNoGrade: undefined, enrollmentsByState, totalEnrollments: undefined }
+      return { enrolledStudentsWithNoGrade: undefined, totalEnrollments: undefined }
     }
     return {
       enrolledStudentsWithNoGrade: enrolledStudentsWithNoGrade.length,
-      enrollmentsByState,
       totalEnrollments: filteredEnrollments.length,
     }
   }
@@ -305,17 +272,17 @@ const SingleCourseStats = ({
           const displayEnrollments = yearcode >= 72 // Display enrollments only for Sisu era
           const filteredEnrollments = enrollments.filter(({ studentnumber }) => filter(studentnumber))
           const filteredAllEnrollments = allEnrollments.filter(({ studentnumber }) => filter(studentnumber))
+          const totalEnrollments = displayEnrollments ? filteredAllEnrollments.length : undefined
 
-          const attemptsEnrollments = countAttemptEnrollmentStats(filteredAllEnrollments, displayEnrollments)
           const studentsEnrollments = countStudentEnrollmentStats(allAttempts, filteredEnrollments, displayEnrollments)
-          const attempts = countAttemptStats(allAttempts, attemptsEnrollments.totalEnrollments, filter)
+          const attempts = countAttemptStats(allAttempts, totalEnrollments, filter)
           const students = countStudentStats(allStudents, studentsEnrollments.enrolledStudentsWithNoGrade, filter)
           const parsedName = separate ? getTextIn(name) : name
 
           return {
             name: parsedName,
             students: { ...students, ...studentsEnrollments },
-            attempts: { ...attempts, ...attemptsEnrollments },
+            attempts: { ...attempts, totalEnrollments },
             enrollments: filteredEnrollments,
             code,
             coursecode,
@@ -328,7 +295,7 @@ const SingleCourseStats = ({
     const totals = countTotalStats(formattedStats, userHasAccessToAllStats)
 
     return {
-      codes: programmeCodes.concat,
+      codes: programmeCodes,
       name,
       stats: formattedStats.concat(totals),
       userHasAccessToAllStats,
