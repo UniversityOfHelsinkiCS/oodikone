@@ -18,7 +18,9 @@ const passRateAttemptGraphOptions = (isRelative: boolean, categories: string[], 
   chart: {
     type: 'column',
   },
-  colors: isRelative ? [color.green, color.red] : [chartColor.blue, color.green, color.red],
+  colors: isRelative
+    ? [color.green, color.red, chartColor.redLight]
+    : [chartColor.blue, color.green, color.red, chartColor.redLight],
   credits: {
     enabled: false,
   },
@@ -90,12 +92,15 @@ const getPassRateAttemptSeriesFromStats = stats => {
   const all = [] as number[]
   const passed = [] as number[]
   const failed = [] as number[]
+  const enrolledNoGrade = [] as number[]
 
   stats.forEach(year => {
     const { passed: p, failed: f } = year.attempts.categories
-    all.push(p + f)
+    const { totalEnrollments } = year.attempts
+    all.push(totalEnrollments || p + f)
     passed.push(p)
     failed.push(f)
+    enrolledNoGrade.push(totalEnrollments - p - f)
   })
 
   return {
@@ -103,10 +108,12 @@ const getPassRateAttemptSeriesFromStats = stats => {
       getDataObject('all', all, 'a'),
       getDataObject('passed', passed, 'b'),
       getDataObject('failed', failed, 'c'),
+      getDataObject('enrolled, no grade', enrolledNoGrade, 'c'),
     ],
     relative: [
       getDataObject('passed', passed.map(absoluteToRelative(all)), 'a'),
       getDataObject('failed', failed.map(absoluteToRelative(all)), 'a'),
+      getDataObject('enrolled, no grade', enrolledNoGrade.map(absoluteToRelative(all)), 'a'),
     ],
   }
 }
@@ -158,18 +165,21 @@ export const PassRateChart = ({ data, isRelative, userHasAccessToAllStats, viewM
   const statYears = stats.map(year => year.name)
 
   const isAttemptsMode = viewMode === 'ATTEMPTS'
-  const passGraphSeries = isAttemptsMode
+  const passRateGraphSeries = isAttemptsMode
     ? getPassRateAttemptSeriesFromStats(stats)
     : getPassRateStudentSeriesFromStats(stats)
 
-  const maxPassRateVal = isRelative ? 100 : getMaxValueOfSeries(passGraphSeries.absolute)
+  const maxPassRateVal = isRelative ? 100 : getMaxValueOfSeries(passRateGraphSeries.absolute)
   const graphOptions = isAttemptsMode ? passRateAttemptGraphOptions : passRateStudentGraphOptions
   const primaryGraphOptions = graphOptions(isRelative, statYears, maxPassRateVal, `Pass rate for group ${data.name}`)
 
   return (
     <div>
       <ReactHighcharts
-        config={{ ...primaryGraphOptions, series: isRelative ? passGraphSeries.relative : passGraphSeries.absolute }}
+        config={{
+          ...primaryGraphOptions,
+          series: isRelative ? passRateGraphSeries.relative : passRateGraphSeries.absolute,
+        }}
       />
       {!userHasAccessToAllStats && (
         <span className="totalsDisclaimer">* Years with 5 students or fewer are shown as 0 in the chart</span>
