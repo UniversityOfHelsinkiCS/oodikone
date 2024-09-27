@@ -27,7 +27,7 @@ export class Student extends Model<InferAttributes<Student>> {
   @HasMany(() => Enrollment, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
   enrollments!: Enrollment[]
 
-  @HasMany(() => SISStudyRight)
+  @HasMany(() => SISStudyRight, { foreignKey: 'studentNumber', sourceKey: 'studentnumber' })
   studyRights!: SISStudyRight[]
 
   @HasMany(() => Studyplan, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })

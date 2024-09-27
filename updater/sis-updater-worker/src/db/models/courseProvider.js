@@ -8,7 +8,7 @@ CourseProvider.init(
   {
     composite: {
       type: STRING,
-      unique: true,
+      primaryKey: true,
     },
     coursecode: {
       type: STRING,
@@ -43,12 +43,6 @@ CourseProvider.init(
     sequelize: dbConnections.sequelize,
     modelName: 'course_provider',
     tableName: 'course_providers',
-    indexes: [
-      {
-        unique: true,
-        fields: ['coursecode', 'organizationcode'],
-      },
-    ],
   }
 )
 

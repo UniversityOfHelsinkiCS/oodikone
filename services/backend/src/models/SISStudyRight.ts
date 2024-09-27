@@ -50,7 +50,7 @@ export class SISStudyRight extends Model<InferAttributes<SISStudyRight>> {
   @Column(DataType.BOOLEAN)
   cancelled!: boolean
 
-  @ForeignKey(() => Student)
+  @BelongsTo(() => Student, { foreignKey: 'studentNumber', targetKey: 'studentnumber' })
   @Column(DataType.STRING)
   studentNumber!: string
 

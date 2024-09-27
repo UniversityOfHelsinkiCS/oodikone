@@ -9,12 +9,6 @@ import { Organization } from './organization'
   underscored: true,
   modelName: 'course_provider',
   tableName: 'course_providers',
-  indexes: [
-    {
-      unique: true,
-      fields: ['coursecode', 'organizationcode'],
-    },
-  ],
 })
 export class CourseProvider extends Model<InferAttributes<CourseProvider>> {
   @PrimaryKey

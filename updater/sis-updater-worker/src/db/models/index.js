@@ -54,14 +54,14 @@ Teacher.belongsToMany(Credit, { through: CreditTeacher, foreignKey: 'teacher_id'
 Studyplan.belongsTo(Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
 Student.hasMany(Studyplan, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
 
-SISStudyRightElement.belongsTo(SISStudyRight, { foreignKey: 'study_right_id', targetKey: 'id' })
-SISStudyRight.hasMany(SISStudyRightElement, { foreignKey: 'study_right_id', sourceKey: 'id' })
+SISStudyRightElement.belongsTo(SISStudyRight, { foreignKey: 'studyRightId', targetKey: 'id' })
+SISStudyRight.hasMany(SISStudyRightElement, { foreignKey: 'studyRightId', sourceKey: 'id' })
 
 Studyplan.belongsTo(SISStudyRight, { foreignKey: 'sis_study_right_id', targetKey: 'id' })
 SISStudyRight.hasMany(Studyplan, { foreignKey: 'sis_study_right_id', sourceKey: 'id' })
 
-SISStudyRight.belongsTo(Student, { foreignKey: 'student_number', targetKey: 'studentnumber' })
-Student.hasMany(SISStudyRight, { foreignKey: 'student_number', sourceKey: 'studentnumber' })
+SISStudyRight.belongsTo(Student, { foreignKey: 'studentNumber', targetKey: 'studentnumber' })
+Student.hasMany(SISStudyRight, { foreignKey: 'studentNumber', sourceKey: 'studentnumber' })
 
 Credit.belongsTo(Semester, { foreignKey: { name: 'semester_composite', allowNull: false } })
 

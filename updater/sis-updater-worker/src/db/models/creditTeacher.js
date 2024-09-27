@@ -8,7 +8,7 @@ CreditTeacher.init(
   {
     composite: {
       type: STRING,
-      unique: true,
+      primaryKey: true,
     },
     credit_id: {
       type: STRING,
