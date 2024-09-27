@@ -155,7 +155,7 @@ export const AttemptsTable = ({
       timeColumn,
       getSortableColumn({
         key: 'ATTEMPTS',
-        title: 'Total attempts',
+        title: 'Total\nattempts',
         getRowVal: s => (s.rowObfuscated ? '5 or fewer students' : s.attempts),
       }),
       ...getGradeColumns(resolveGrades(stats)),
