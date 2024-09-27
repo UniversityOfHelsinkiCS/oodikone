@@ -36,7 +36,6 @@ const getTableData = (stats, useThesisGrades, isRelative) =>
       coursecode,
       passed: stat.attempts.categories.passed,
       failed: stat.attempts.categories.failed,
-      enrollmentsByState: stat.attempts.enrollmentsByState,
       totalEnrollments: stat.attempts.totalEnrollments,
       passRate: stat.attempts.passRate,
       attempts: stat.attempts.totalAttempts || attempts,
@@ -148,24 +147,6 @@ export const AttemptsTable = ({
       title: 'Total\nenrollments',
       helpText: 'All enrollments, including all rejected and aborted states',
       getRowVal: s => (s.rowObfuscated ? 'NA' : s.totalEnrollments),
-    }),
-    getSortableColumn({
-      key: 'ENROLLMENTS_ENROLLED',
-      title: 'Enrolled',
-      helpText: 'All enrollments with enrolled or confirmed state',
-      getRowVal: s => (s.rowObfuscated ? 'NA' : s.enrollmentsByState.ENROLLED),
-    }),
-    getSortableColumn({
-      key: 'ENROLLMENTS_REJECTED',
-      title: 'Rejected',
-      helpText: 'All enrollments with rejected state',
-      getRowVal: s => (s.rowObfuscated ? 'NA' : s.enrollmentsByState.REJECTED),
-    }),
-    getSortableColumn({
-      key: 'ENROLLMENTS_ABORTED',
-      title: 'Aborted',
-      helpText: 'All enrollments with aborted by student or teacher state',
-      getRowVal: s => (s.rowObfuscated ? 'NA' : s.enrollmentsByState.ABORTED),
     }),
   ]
 
