@@ -253,6 +253,9 @@ const SingleCourseStats = ({
   }
 
   const statsForProgrammes = (programmeCodes, name) => {
+    if (programmeCodes.length === 0) {
+      return undefined
+    }
     const { statistics } = stats
     const filter = belongsToAtLeastOneProgramme(programmeCodes)
     const formattedStats = statistics
@@ -335,22 +338,18 @@ const SingleCourseStats = ({
       comparisonProgrammes.push(...excludedProgrammes)
     }
 
-    const primaryStats = primaryProgrammes.length
-      ? statsForProgrammes(
-          primaryProgrammes,
-          primaryProgrammes.length === 1 ? getProgrammeName(primaryProgrammes[0]) : 'Primary'
-        )
-      : undefined
-    const comparisonStats = comparisonProgrammes.length
-      ? statsForProgrammes(
-          comparisonProgrammes,
-          comparisonProgrammes.length === 1 ? getProgrammeName(comparisonProgrammes[0]) : 'Comparison'
-        )
-      : undefined
+    const primaryStats = statsForProgrammes(
+      primaryProgrammes,
+      primaryProgrammes.length === 1 ? getProgrammeName(primaryProgrammes[0]) : 'Primary'
+    )
+    const comparisonStats = statsForProgrammes(
+      comparisonProgrammes,
+      comparisonProgrammes.length === 1 ? getProgrammeName(comparisonProgrammes[0]) : 'Comparison'
+    )
 
     return {
-      primary: primaryStats || undefined,
-      comparison: comparisonStats || undefined,
+      primary: primaryStats,
+      comparison: comparisonStats,
     }
   }
 
