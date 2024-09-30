@@ -143,9 +143,9 @@ export const AttemptsTable = ({
       getRowContent: s => (s.rowObfuscated ? 'NA' : `${Number(s.passRate || 0).toFixed(2)} %`),
     }),
     getSortableColumn({
-      key: 'TOTAL_ENROLLMENTS',
-      title: 'Total\nenrollments',
-      helpText: 'All enrollments, including all rejected and aborted states',
+      key: 'ENROLLMENTS',
+      title: 'Enrollments',
+      helpText: 'All enrollments with enrolled state',
       getRowVal: s => (s.rowObfuscated ? 'NA' : s.totalEnrollments),
     }),
   ]
