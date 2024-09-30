@@ -273,8 +273,8 @@ const SingleCourseStats = ({
           yearcode,
         }) => {
           const displayEnrollments = yearcode >= 72 // Display enrollments only for Sisu era
-          const filteredEnrollments = enrollments.filter(({ studentnumber }) => filter(studentnumber))
-          const filteredAllEnrollments = allEnrollments.filter(({ studentnumber }) => filter(studentnumber))
+          const filteredEnrollments = enrollments.filter(({ studentNumber }) => filter(studentNumber))
+          const filteredAllEnrollments = allEnrollments.filter(({ studentNumber }) => filter(studentNumber))
           const totalEnrollments = displayEnrollments ? filteredAllEnrollments.length : undefined
 
           const studentsEnrollments = countStudentEnrollmentStats(allAttempts, filteredEnrollments, displayEnrollments)
