@@ -75,7 +75,7 @@ services:
       PGDATA: /data
       POSTGRES_DB: kone-db
       POSTGRES_HOST_AUTH_METHOD: trust
-    image: postgres:15.8
+    image: postgres:17.0
     ports:
       - 12349:5432
     volumes:
@@ -98,7 +98,7 @@ services:
       PGDATA: /data
       POSTGRES_DB: sis-db
       POSTGRES_HOST_AUTH_METHOD: trust
-    image: postgres:15.8
+    image: postgres:17.0
     volumes:
       - sis-db-data:/data
     shm_size: 2gb
@@ -175,7 +175,7 @@ services:
       PGDATA: /data
       POSTGRES_DB: user-db
       POSTGRES_HOST_AUTH_METHOD: trust
-    image: postgres:15.8
+    image: postgres:17.0
     volumes:
       - user-db-data:/data
     ports:
