@@ -99,7 +99,6 @@ type FormattedEnrollment = {
   semesterCode: number
   semesterName: Name
   courseCode: string
-  state: string
   enrollmentDateTime: Date
   studentNumber: string
   programmes: Array<Record<string, any>>
@@ -114,7 +113,6 @@ const parseEnrollment = (
   const {
     studentnumber: studentNumber,
     semester,
-    state,
     enrollment_date_time: enrollmentDateTime,
     course_code: courseCode,
   } = enrollment
@@ -128,7 +126,6 @@ const parseEnrollment = (
     semesterCode,
     semesterName,
     courseCode,
-    state,
     enrollmentDateTime,
     studentNumber,
     programmes: studyRightElements.map(formatStudyRightElement),
@@ -222,13 +219,13 @@ const getYearlyStatsOfNew = async (
   }
 
   enrollments.forEach(enrollment => {
-    const { studentNumber, semesterCode, semesterName, yearCode, yearName, courseCode, state, enrollmentDateTime } =
+    const { studentNumber, semesterCode, semesterName, yearCode, yearName, courseCode, enrollmentDateTime } =
       parseEnrollment(enrollment, anonymizationSalt, studentNumberToSrElementsMap)
 
     const groupCode = separate ? semesterCode : yearCode
     const groupName = separate ? semesterName : yearName
 
-    counter.markEnrollmentToGroup(studentNumber, state, enrollmentDateTime, groupCode, groupName, courseCode, yearCode)
+    counter.markEnrollmentToGroup(studentNumber, enrollmentDateTime, groupCode, groupName, courseCode, yearCode)
   })
 
   const statistics = counter.getFinalStatistics(anonymizationSalt)

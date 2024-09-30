@@ -95,7 +95,7 @@ export const getEnrollmentsForCourses = async (codes: string[], unification: Uni
         [Op.in]: codes,
       },
       enrollment_date_time: { [Op.gte]: new Date('2021-05-31') },
-      state: [EnrollmentState.ENROLLED, EnrollmentState.CONFIRMED],
+      state: EnrollmentState.ENROLLED,
       is_open: getIsOpen(unification),
     },
   })

@@ -1,4 +1,4 @@
-import { EnrollmentState, Name } from '../../types'
+import { Name } from '../../types'
 import { FormattedProgramme, OrganizationDetails } from './helpers'
 
 type Programme = {
@@ -49,8 +49,8 @@ type Group = {
   coursecode: string
   attempts: GroupAttempts
   students: GroupStudents
-  enrollments: { studentNumber: string; state: string; enrollmentDateTime: Date }[]
-  allEnrollments: { studentNumber: string; state: string; enrollmentDateTime: Date }[]
+  enrollments: { studentNumber: string; enrollmentDateTime: Date }[]
+  allEnrollments: { studentNumber: string; enrollmentDateTime: Date }[]
   yearcode: number
 }
 
@@ -211,7 +211,6 @@ export class CourseYearlyStatsCounter {
 
   public markEnrollmentToGroup(
     studentNumber: string,
-    state: string,
     enrollmentDateTime: Date,
     groupCode: number,
     groupName: string | Name,
@@ -221,22 +220,13 @@ export class CourseYearlyStatsCounter {
     if (!this.groups[groupCode]) {
       this.initGroup(groupCode, groupName, courseCode, yearCode)
     }
-    const enrollment = { studentNumber, state, enrollmentDateTime }
+    const enrollment = { studentNumber, enrollmentDateTime }
     this.groups[groupCode].allEnrollments.push(enrollment)
     const oldEnrollment = this.groups[groupCode].enrollments.find(
       enrollment => enrollment.studentNumber === studentNumber
     )
     if (!oldEnrollment) {
-      return this.groups[groupCode].enrollments.push({ studentNumber, state, enrollmentDateTime })
-    }
-    if (oldEnrollment.state === EnrollmentState.ENROLLED || oldEnrollment.state === EnrollmentState.CONFIRMED) {
-      return
-    }
-    if (state !== EnrollmentState.ENROLLED && state !== EnrollmentState.CONFIRMED) {
-      return
-    }
-    if (![EnrollmentState.ENROLLED, EnrollmentState.CONFIRMED].includes(state as EnrollmentState)) {
-      return
+      return this.groups[groupCode].enrollments.push({ studentNumber, enrollmentDateTime })
     }
     this.groups[groupCode].enrollments = this.groups[groupCode].enrollments
       .filter(enrollment => enrollment.studentNumber !== studentNumber)
