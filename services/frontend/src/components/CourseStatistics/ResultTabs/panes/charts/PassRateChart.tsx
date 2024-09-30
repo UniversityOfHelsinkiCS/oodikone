@@ -97,10 +97,11 @@ const getPassRateAttemptSeriesFromStats = stats => {
   stats.forEach(year => {
     const { passed: p, failed: f } = year.attempts.categories
     const { totalEnrollments } = year.attempts
+    const enrolledWithNoGrade = totalEnrollments > 0 ? totalEnrollments - p - f : 0
     all.push(totalEnrollments || p + f)
     passed.push(p)
     failed.push(f)
-    enrolledNoGrade.push(totalEnrollments - p - f)
+    enrolledNoGrade.push(enrolledWithNoGrade)
   })
 
   return {
