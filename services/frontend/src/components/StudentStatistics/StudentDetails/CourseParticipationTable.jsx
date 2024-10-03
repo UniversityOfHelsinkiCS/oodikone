@@ -20,9 +20,10 @@ const getAcademicYear = date => {
 }
 
 const getIcon = (credittypecode, isStudyModuleCredit, passed) => {
-  if (isStudyModuleCredit) return <Icon color="purple" name="certificate" />
-  if (credittypecode === 9) return <Icon color="green" name="clipboard check" title="Credit transfer" />
-  return passed ? <Icon color="green" name="check" /> : <Icon color="red" name="times" />
+  const style = { overflow: 'visible' }
+  if (isStudyModuleCredit) return <Icon color="purple" name="certificate" style={style} />
+  if (credittypecode === 9) return <Icon color="green" name="clipboard check" style={style} title="Credit transfer" />
+  return passed ? <Icon color="green" name="check" style={style} /> : <Icon color="red" name="times" style={style} />
 }
 
 export const CourseParticipationTable = ({ student, selectedStudyPlanId }) => {
@@ -54,7 +55,7 @@ export const CourseParticipationTable = ({ student, selectedStudyPlanId }) => {
           />
         )}
       </div>,
-      <div key={`${course.code}-${new Date(date).getTime()}-grade-${grade}`}>
+      <div key={`${course.code}-${new Date(date).getTime()}-grade-${grade}`} style={{ whiteSpace: 'nowrap' }}>
         {getIcon(credittypecode, isStudyModuleCredit, passed)}
         {grade}
       </div>,
