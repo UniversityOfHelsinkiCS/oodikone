@@ -249,16 +249,16 @@ describe('Course Statistics tests', () => {
       cy.contains('td', /^TKT10004/).click()
       cy.contains('Search for courses').should('not.exist')
 
+      cy.contains('AYTKT10004 Avoin yo: Tietokantojen perusteet')
+      cy.contains('A581328 Avoin yo: Tietokantojen perusteet')
       cy.contains('TKT10004 Tietokantojen perusteet')
       cy.contains('BSCS2001 Introduction to Databases')
       cy.contains('581328 Tietokantojen perusteet')
       cy.cs('providerCheckboxUniversity').should('have.class', 'checked').click()
       cy.cs('providerCheckboxOpenUni').should('have.class', 'checked').click()
       cy.contains('TKT10004 Tietokantojen perusteet')
-      cy.contains('AYTKT10004 Avoin yo: Tietokantojen perusteet')
       cy.contains('BSCS2001 Introduction to Databases')
       cy.contains('581328 Tietokantojen perusteet')
-      cy.contains('A581328 Avoin yo: Tietokantojen perusteet')
     })
 
     it('Searching course by name displays right courses, 10 credit courses', () => {
