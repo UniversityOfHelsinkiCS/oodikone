@@ -229,7 +229,7 @@ const getYearlyStatsOfNew = async (
 
   const statistics = counter.getFinalStatistics(anonymizationSalt)
 
-  let substitutionCourses: Course[] = []
+  let substitutionCourses: Course[] | undefined
   if (combineSubstitutions && courseForSubs && courseForSubs.substitutions && courseForSubs.substitutions.length > 0) {
     substitutionCourses = await Course.findAll({
       where: {
@@ -244,25 +244,26 @@ const getYearlyStatsOfNew = async (
   return {
     ...statistics,
     coursecode: courseCode,
-    alternatives: substitutionCourses,
+    alternatives: substitutionCourses || [{ code: courseForSubs!.code, name: courseForSubs!.name }],
     name: course?.name,
   }
 }
 
 export const maxYearsToCreatePopulationFrom = async (courseCodes: string[], unification: Unification) => {
-  const courses = await Course.findAll({
-    where: {
-      code: {
-        [Op.in]: courseCodes,
-      },
-    },
-    attributes: ['max_attainment_date'],
-  })
-
-  let maxAttainmentDate = new Date()
-  if (courses.length > 0) {
-    maxAttainmentDate = new Date(Math.max(...courses.map(course => new Date(course.max_attainment_date).getTime())))
-  }
+  const maxAttainmentDate = new Date(
+    Math.max(
+      ...(
+        await Course.findAll({
+          where: {
+            code: {
+              [Op.in]: courseCodes,
+            },
+          },
+          attributes: ['max_attainment_date'],
+        })
+      ).map(course => new Date(course.max_attainment_date).getTime())
+    )
+  )
 
   const attainmentThreshold = new Date(maxAttainmentDate.getFullYear(), 0, 1)
   attainmentThreshold.setFullYear(attainmentThreshold.getFullYear() - 6)
