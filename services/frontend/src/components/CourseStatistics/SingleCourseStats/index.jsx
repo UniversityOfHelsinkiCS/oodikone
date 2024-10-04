@@ -77,7 +77,7 @@ const SingleCourseStats = ({
   }
 
   const { data: maxYears } = useGetMaxYearsToCreatePopulationFromQuery({
-    courseCodes: JSON.stringify(stats.alternatives),
+    courseCodes: JSON.stringify(stats.alternatives.map(course => course.code)),
   })
 
   let maxYearsToCreatePopulationFrom = 0
@@ -487,7 +487,12 @@ const SingleCourseStats = ({
 
 SingleCourseStats.propTypes = {
   stats: shape({
-    alternatives: arrayOf(string),
+    alternatives: arrayOf(
+      shape({
+        code: string,
+        name: shape({ fi: string, en: string, sv: string }),
+      })
+    ),
     programmes: objectOf(
       shape({
         name: shape({}),

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import crypto from 'crypto'
 import { Op } from 'sequelize'
 
@@ -151,6 +150,18 @@ const getYearlyStatsOfNew = async (
     where: { code: courseCode },
   })
 
+  let substitutionCourses: Course[] = []
+  if (combineSubstitutions && courseForSubs && courseForSubs.substitutions && courseForSubs.substitutions.length > 0) {
+    substitutionCourses = await Course.findAll({
+      where: {
+        code: {
+          [Op.in]: courseForSubs.substitutions,
+        },
+      },
+      attributes: ['code', 'name'],
+    })
+  }
+
   let codes =
     combineSubstitutions && courseForSubs?.substitutions
       ? sortMainCode([...courseForSubs.substitutions, courseCode])
@@ -233,14 +244,12 @@ const getYearlyStatsOfNew = async (
   return {
     ...statistics,
     coursecode: courseCode,
-    alternatives: codes,
+    alternatives: substitutionCourses,
     name: course?.name,
   }
 }
 
 export const maxYearsToCreatePopulationFrom = async (courseCodes: string[], unification: Unification) => {
-  const is_open = getIsOpen(unification)
-
   const maxAttainmentDate = new Date(
     Math.max(
       ...(
@@ -267,7 +276,7 @@ export const maxYearsToCreatePopulationFrom = async (courseCodes: string[], unif
       attainment_date: {
         [Op.gt]: attainmentThreshold,
       },
-      is_open,
+      is_open: getIsOpen(unification),
     },
     order: [['attainment_date', 'ASC']],
   })

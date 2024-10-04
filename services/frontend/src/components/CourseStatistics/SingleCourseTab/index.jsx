@@ -1,4 +1,3 @@
-import { bool, number, oneOfType, string } from 'prop-types'
 import { useDispatch, useSelector } from 'react-redux'
 import { Divider, Form, Header, Label, Segment } from 'semantic-ui-react'
 
@@ -35,16 +34,22 @@ export const SingleCourseTab = ({ selected, setSelected, userHasAccessToAllStats
     text: `${getTextIn(name)} (${code})`,
   }))
 
-  if (!stats[selected]) return null
+  if (!stats[selected]) {
+    return null
+  }
 
   return (
     <div>
       <Segment>
         {courses.length > 1 && <CourseSelector courses={courses} selected={selected} setSelected={setSelected} />}
-        <Label
-          content={`${stats[selected].alternatives.map(code => ` ${code}`)} ${getTextIn(stats[selected].name)} `}
-          key={stats[selected].coursecode}
-        />
+        <Label color="blue" size="large">
+          {stats[selected].coursecode} {getTextIn(stats[selected].name)}
+        </Label>
+        {stats[selected].alternatives.map(course => (
+          <Label key={course.code} size="large" style={{ margin: 5 }}>
+            {course.code} {getTextIn(course.name)}
+          </Label>
+        ))}
       </Segment>
       <SingleCourseStats
         availableStats={availableStats[selected]}
@@ -53,9 +58,4 @@ export const SingleCourseTab = ({ selected, setSelected, userHasAccessToAllStats
       />
     </div>
   )
-}
-
-SingleCourseTab.propTypes = {
-  selected: oneOfType([number, string]).isRequired,
-  userHasAccessToAllStats: bool.isRequired,
 }
