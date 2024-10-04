@@ -90,7 +90,10 @@ describe('Course Statistics tests', () => {
         cy.get("input[placeholder='Search by a course code']").type('200012')
         cy.contains('td', '200012').click()
         cy.contains('Search for courses').should('not.exist')
-        cy.contains('ON-310, 200012 Tieteellisen kirjallisen työn ja tiedonhankinnan perustaidot')
+        cy.contains(
+          'ON-310 Tieteellisen kirjoittamisen seminaarin alkuopetus: Tieteellisen kirjallisen työn ja tiedonhankinnan perustaidot200012'
+        )
+        cy.contains('200012 Tieteellisen kirjallisen työn ja tiedonhankinnan perustaidot')
         cy.contains('Show population').should('be.enabled').click()
         cy.contains(
           'Population of course Tieteellisen kirjoittamisen seminaarin alkuopetus: Tieteellisen kirjallisen työn ja tiedonhankinnan perustaidot 2011-2018 (open and normal)'
@@ -247,7 +250,6 @@ describe('Course Statistics tests', () => {
       cy.contains('Search for courses').should('not.exist')
 
       cy.contains('TKT10004 Tietokantojen perusteet')
-      cy.contains('AYTKT10004 Avoin yo: Tietokantojen perusteet')
       cy.contains('BSCS2001 Introduction to Databases')
       cy.contains('581328 Tietokantojen perusteet')
       cy.cs('providerCheckboxUniversity').should('have.class', 'checked').click()
@@ -416,7 +418,11 @@ describe('Course Statistics tests', () => {
         cy.get("input[placeholder='Search by a course code']").type('TKT10002')
         cy.contains('td', /^TKT10002, BSCS1001, 581325, A581325, AYTKT10002$/).click()
         cy.contains('Search for courses').should('not.exist')
-        cy.contains('TKT10002, 581325, BSCS1001, AYTKT10002, A581325 Ohjelmoinnin perusteet')
+        cy.contains('TKT10002 Ohjelmoinnin perusteet')
+        cy.contains('AYTKT10002 Avoin yo: Ohjelmoinnin perusteet')
+        cy.contains('BSCS1001 Introduction to Programming')
+        cy.contains('581325 Ohjelmoinnin perusteet')
+        cy.contains('A581325 Avoin yo: Ohjelmoinnin perusteet')
       })
 
       // Statistics
