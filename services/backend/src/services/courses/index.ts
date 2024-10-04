@@ -250,20 +250,19 @@ const getYearlyStatsOfNew = async (
 }
 
 export const maxYearsToCreatePopulationFrom = async (courseCodes: string[], unification: Unification) => {
-  const maxAttainmentDate = new Date(
-    Math.max(
-      ...(
-        await Course.findAll({
-          where: {
-            code: {
-              [Op.in]: courseCodes,
-            },
-          },
-          attributes: ['max_attainment_date'],
-        })
-      ).map(course => new Date(course.max_attainment_date).getTime())
-    )
-  )
+  const courses = await Course.findAll({
+    where: {
+      code: {
+        [Op.in]: courseCodes,
+      },
+    },
+    attributes: ['max_attainment_date'],
+  })
+
+  let maxAttainmentDate = new Date()
+  if (courses.length > 0) {
+    maxAttainmentDate = new Date(Math.max(...courses.map(course => new Date(course.max_attainment_date).getTime())))
+  }
 
   const attainmentThreshold = new Date(maxAttainmentDate.getFullYear(), 0, 1)
   attainmentThreshold.setFullYear(attainmentThreshold.getFullYear() - 6)
