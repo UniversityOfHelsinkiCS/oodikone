@@ -150,18 +150,6 @@ const getYearlyStatsOfNew = async (
     where: { code: courseCode },
   })
 
-  let substitutionCourses: Course[] = []
-  if (combineSubstitutions && courseForSubs && courseForSubs.substitutions && courseForSubs.substitutions.length > 0) {
-    substitutionCourses = await Course.findAll({
-      where: {
-        code: {
-          [Op.in]: courseForSubs.substitutions,
-        },
-      },
-      attributes: ['code', 'name'],
-    })
-  }
-
   let codes =
     combineSubstitutions && courseForSubs?.substitutions
       ? sortMainCode([...courseForSubs.substitutions, courseCode])
@@ -240,6 +228,18 @@ const getYearlyStatsOfNew = async (
   })
 
   const statistics = counter.getFinalStatistics(anonymizationSalt)
+
+  let substitutionCourses: Course[] = []
+  if (combineSubstitutions && courseForSubs && courseForSubs.substitutions && courseForSubs.substitutions.length > 0) {
+    substitutionCourses = await Course.findAll({
+      where: {
+        code: {
+          [Op.in]: codes,
+        },
+      },
+      attributes: ['code', 'name'],
+    })
+  }
 
   return {
     ...statistics,
