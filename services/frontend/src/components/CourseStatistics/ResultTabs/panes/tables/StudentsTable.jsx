@@ -26,7 +26,7 @@ const getColumns = (stats, showGrades, userHasAccessToAllStats, alternatives, se
     const queryObject = {
       from: yearcode,
       to: yearcode,
-      coursecodes: JSON.stringify(uniq(alternatives)),
+      coursecodes: JSON.stringify(uniq(alternatives.map(course => course.code))),
       years,
       separate,
       unifyCourses,
