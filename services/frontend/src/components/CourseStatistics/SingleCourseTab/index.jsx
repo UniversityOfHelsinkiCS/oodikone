@@ -51,9 +51,13 @@ export const SingleCourseTab = ({ selected, setSelected, userHasAccessToAllStats
       <Segment>
         <Header as="h4">Selected courses</Header>
         {courses.length > 1 && <CourseSelector courses={courses} selected={selected} setSelected={setSelected} />}
-        <CourseLabel code={stats[selected].coursecode} name={getTextIn(stats[selected].name)} primary />
         {stats[selected].alternatives.map(course => (
-          <CourseLabel code={course.code} key={course.code} name={getTextIn(course.name)} />
+          <CourseLabel
+            code={course.code}
+            key={course.code}
+            name={getTextIn(course.name)}
+            primary={selected === course.code}
+          />
         ))}
       </Segment>
       <SingleCourseStats
