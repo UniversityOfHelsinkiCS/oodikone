@@ -24,6 +24,14 @@ const CourseSelector = ({ courses, selected, setSelected }) => {
   )
 }
 
+const CourseLabel = ({ code, name, primary }) => {
+  return (
+    <Label color={primary ? 'blue' : undefined} size="large" style={{ margin: 5 }}>
+      {code} {name}
+    </Label>
+  )
+}
+
 export const SingleCourseTab = ({ selected, setSelected, userHasAccessToAllStats }) => {
   const { getTextIn } = useLanguage()
   const stats = useSelector(getCourseStats)
@@ -41,14 +49,11 @@ export const SingleCourseTab = ({ selected, setSelected, userHasAccessToAllStats
   return (
     <div>
       <Segment>
+        <Header as="h4">Selected courses</Header>
         {courses.length > 1 && <CourseSelector courses={courses} selected={selected} setSelected={setSelected} />}
-        <Label color="blue" size="large">
-          {stats[selected].coursecode} {getTextIn(stats[selected].name)}
-        </Label>
+        <CourseLabel code={stats[selected].coursecode} name={getTextIn(stats[selected].name)} primary />
         {stats[selected].alternatives.map(course => (
-          <Label key={course.code} size="large" style={{ margin: 5 }}>
-            {course.code} {getTextIn(course.name)}
-          </Label>
+          <CourseLabel code={course.code} key={course.code} name={getTextIn(course.name)} />
         ))}
       </Segment>
       <SingleCourseStats
