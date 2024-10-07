@@ -14,9 +14,9 @@ const MedianDisplay = ({
   handleClick,
   level,
   levelProgrammeData,
+  mode,
   programmeData,
   programmeNames,
-  universityMode,
   year,
   yearLabel,
 }) => {
@@ -44,15 +44,13 @@ const MedianDisplay = ({
           data={data}
           goal={goal}
           handleClick={handleClick}
+          mode={mode}
           programmeNames={programmeNames}
-          universityMode={universityMode}
           yearLabel={yearLabel}
         />
         {!programmeData || !(year in levelProgrammeData) ? (
           <div className="graduations-message">
-            <Message compact>
-              Click a bar to view that year's {universityMode ? 'faculty' : 'programme'} level breakdown
-            </Message>
+            <Message compact>Click a bar to view that year's {mode} level breakdown</Message>
           </div>
         ) : (
           <MedianBarChart
@@ -63,8 +61,8 @@ const MedianDisplay = ({
             goalExceptions={goalExceptions}
             handleClick={handleClick}
             level={level}
+            mode={mode}
             programmeNames={programmeNames}
-            universityMode={universityMode}
             year={year}
             yearLabel={yearLabel}
           />
@@ -78,34 +76,27 @@ const BreakdownDisplay = ({
   data,
   handleClick,
   levelProgrammeData,
+  mode,
   programmeData,
   programmeNames,
-  universityMode,
   year,
   yearLabel,
 }) => {
   return (
     <div>
       <div className="graduations-chart-container">
-        <BreakdownBarChart
-          data={data}
-          handleClick={handleClick}
-          universityMode={universityMode}
-          yearLabel={yearLabel}
-        />
+        <BreakdownBarChart data={data} handleClick={handleClick} mode={mode} yearLabel={yearLabel} />
         {!programmeData || !(year in levelProgrammeData) ? (
           <div className="graduations-message">
-            <Message compact>
-              Click a bar to view that year's {universityMode ? 'faculty' : 'programme'} level breakdown
-            </Message>
+            <Message compact>Click a bar to view that year's {mode} level breakdown</Message>
           </div>
         ) : (
           <BreakdownBarChart
             data={levelProgrammeData[year].data}
             facultyGraph={false}
             handleClick={handleClick}
+            mode={mode}
             programmeNames={programmeNames}
-            universityMode={universityMode}
             year={year}
             yearLabel={yearLabel}
           />
@@ -123,10 +114,10 @@ export const GraduationTimes = ({
   groupBy,
   level,
   levelProgrammeData,
+  mode,
   programmeNames,
   showMedian,
   title,
-  universityMode,
   yearLabel,
 }) => {
   const [programmeData, setProgrammeData] = useState(false)
@@ -153,9 +144,9 @@ export const GraduationTimes = ({
           handleClick={handleClick}
           level={level}
           levelProgrammeData={levelProgrammeData}
+          mode={mode}
           programmeData={programmeData}
           programmeNames={programmeNames}
-          universityMode={universityMode}
           year={year}
           yearLabel={yearLabel}
         />
@@ -169,9 +160,9 @@ export const GraduationTimes = ({
           handleClick={handleClick}
           level={level}
           levelProgrammeData={levelProgrammeData}
+          mode={mode}
           programmeData={programmeData}
           programmeNames={programmeNames}
-          universityMode={universityMode}
           year={year}
           yearLabel={yearLabel}
         />

@@ -102,7 +102,7 @@ export const UniversityView = ({ isEvaluationOverview }) => {
             <div className="facultyLinkBox">
               {orderBy(allFaculties, 'code').map(faculty => (
                 <span key={faculty.code}>
-                  <Link style={{ marginTop: '5px' }} to={`/evaluationoverview/faculty/${faculty.code}`}>{`${
+                  <Link to={`/evaluationoverview/faculty/${faculty.code}`}>{`${
                     faculty.code
                   } ${getTextIn(faculty)}`}</Link>
                 </span>

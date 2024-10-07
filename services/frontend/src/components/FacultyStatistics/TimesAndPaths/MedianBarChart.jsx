@@ -17,8 +17,8 @@ export const MedianBarChart = ({
   handleClick,
   language = null,
   level,
+  mode,
   programmeNames,
-  universityMode,
   year,
   yearLabel,
 }) => {
@@ -85,10 +85,10 @@ export const MedianBarChart = ({
   }
 
   const getLabel = () => {
-    if (universityMode) {
+    if (mode === 'faculty') {
       return facultyGraph ? 'Graduation year' : 'Faculty'
     }
-    return facultyGraph ? yearLabel : 'Programme'
+    return facultyGraph ? yearLabel : `${mode.charAt(0).toUpperCase()}${mode.slice(1)}`
   }
 
   const config = {
@@ -102,9 +102,7 @@ export const MedianBarChart = ({
     tooltip: {
       backgroundColor: 'white',
       fontSize: '25px',
-      // outside: true,
-      // eslint-disable-next-line
-      formatter: function () {
+      formatter() {
         return getTooltipText(
           this.point.name,
           this.point.code ? this.point.code : this.point.name,
@@ -138,8 +136,7 @@ export const MedianBarChart = ({
             style: {
               textOutline: 'none',
             },
-            // eslint-disable-next-line
-            formatter: function () {
+            formatter() {
               return getDataLabel(this.point.amount, this.point.code ? this.point.code : this.point.name)
             },
           },

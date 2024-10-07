@@ -15,8 +15,8 @@ export const BreakdownBarChart = ({
   handleClick,
   facultyGraph = true,
   year = null,
+  mode,
   programmeNames,
-  universityMode,
   yearLabel,
 }) => {
   const { language } = useLanguage()
@@ -59,10 +59,10 @@ export const BreakdownBarChart = ({
   }
 
   const getLabel = () => {
-    if (universityMode) {
+    if (mode === 'faculty') {
       return facultyGraph ? 'Graduation year' : 'Faculty'
     }
-    return facultyGraph ? yearLabel : 'Programme'
+    return facultyGraph ? yearLabel : `${mode.charAt(0).toUpperCase()}${mode.slice(1)}`
   }
 
   const config = {
@@ -75,10 +75,7 @@ export const BreakdownBarChart = ({
     series: statData,
     tooltip: {
       backgroundColor: 'white',
-      fontSize: '25px',
-      // outside: true,
-      // eslint-disable-next-line
-      formatter: function () {
+      formatter() {
         return getTooltipText(this.x, this.series.name, this.y)
       },
     },

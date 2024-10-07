@@ -26,7 +26,7 @@ export const TimesAndPathsView = ({ faculty, setStudyProgrammes, studyProgrammes
   const programmeData = graduationStats?.data?.[groupBy].programmes.medians
   const programmeNames = graduationStats?.data?.programmeNames
   const classSizes = graduationStats?.data?.classSizes
-  const commonProps = { yearLabel, programmeNames, showMedian, classSizes, goalExceptions, groupBy }
+  const commonProps = { yearLabel, programmeNames, showMedian, classSizes, goalExceptions, groupBy, mode: 'programme' }
 
   const isFetchingOrLoading = graduationStats.isLoading || graduationStats.isFetching
 

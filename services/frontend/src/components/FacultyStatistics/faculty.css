@@ -113,8 +113,7 @@
 
 .facultyLinkBox {
   display: grid;
-  gap: 0 8px;
+  gap: 0.5rem 1rem;
   grid-auto-flow: column;
-  grid-template-columns: repeat(3, 30%);
-  grid-template-rows: repeat(4, 30%);
+  grid-template-rows: repeat(4, 1fr);
 }

@@ -9,7 +9,15 @@ export const FacultyGraduations = ({ faculty, graduationStats, groupByStartYear,
   const programmeData = graduationStats?.data?.[groupBy].programmes.medians
   const programmeNames = graduationStats?.data?.programmeNames
   const classSizes = graduationStats?.data?.classSizes
-  const commonProps = { yearLabel, programmeNames, showMedian, classSizes, goalExceptions, universityMode, groupBy }
+  const commonProps = {
+    yearLabel,
+    programmeNames,
+    showMedian,
+    classSizes,
+    goalExceptions,
+    groupBy,
+    mode: universityMode ? 'faculty' : 'programme',
+  }
 
   return (
     <div>

@@ -4,6 +4,7 @@ import { Divider, Loader, Message } from 'semantic-ui-react'
 import { getGraduationGraphTitle, getTargetCreditsForProgramme } from '@/common'
 import { studyProgrammeToolTips } from '@/common/InfoToolTips'
 import { calculateStats } from '@/components/FacultyStatistics/FacultyProgrammeOverview'
+import { GraduationTimes } from '@/components/FacultyStatistics/TimesAndPaths/GraduationTimes'
 import { InfoBox } from '@/components/InfoBox'
 import { BreakdownBarChart } from '@/components/StudyProgramme/BreakdownBarChart'
 import { MedianTimeBarChart } from '@/components/StudyProgramme/MedianTimeBarChart'
@@ -84,6 +85,55 @@ export const StudytrackOverview = ({
     })
   }
 
+  const studyTrackStatsGraduationStats = { basic: {}, combo: {} }
+
+  // One of the study track options is always the study programme itself
+  const studyProgrammeHasStudyTracks =
+    Object.keys(stats?.data?.studytrackOptions || {}).length > 1 && track === studyprogramme
+
+  const calculateStudyTrackStats = combo => {
+    const studyTrackStatsGraduationStats = Object.entries(stats.data.graduationTimes)
+      .filter(([key]) => key !== 'goals' && key !== studyprogramme)
+      .reduce((acc, [programme, { medians }]) => {
+        for (const { name, amount, statistics, y } of Object.values(combo ? medians.combo : medians.basic)) {
+          if (!acc[name]) {
+            acc[name] = { data: [], programmes: [programme] }
+          } else {
+            acc[name].programmes.push(programme)
+          }
+          acc[name].data.push({ amount, name: programme, statistics, code: programme, median: y })
+        }
+        return acc
+      }, {})
+
+    const studyTrackStatsClassSizes = {
+      programmes: Object.entries(stats.data.graduationTimes)
+        .filter(([key]) => key !== 'goals' && key !== studyprogramme)
+        .reduce((acc, [programme, { medians }]) => {
+          acc[programme] = {}
+          for (const { name, classSize } of Object.values(combo ? medians.combo : medians.basic)) {
+            acc[programme][name] = classSize
+          }
+          return acc
+        }, {}),
+      [studyprogramme]: Object.values(
+        stats.data.graduationTimes[studyprogramme].medians[combo ? 'combo' : 'basic']
+      ).reduce((acc, { name, classSize }) => {
+        acc[name] = classSize
+        return acc
+      }, {}),
+    }
+
+    return { studyTrackStatsGraduationStats, studyTrackStatsClassSizes }
+  }
+
+  if (studyProgrammeHasStudyTracks && Object.keys(stats?.data?.graduationTimes || {}).length > 0) {
+    studyTrackStatsGraduationStats.basic = calculateStudyTrackStats()
+    if (stats?.data?.doCombo) {
+      studyTrackStatsGraduationStats.combo = calculateStudyTrackStats(true)
+    }
+  }
+
   return (
     <div className="studytrack-overview">
       {stats.isLoading || stats.isFetching ? (
@@ -161,56 +211,101 @@ export const StudytrackOverview = ({
                 setValue={setShowMedian}
                 value={showMedian}
               />
-              <div className="section-container-centered">
-                {showMedian ? (
-                  <div className="section-container">
-                    {stats?.data.doCombo && (
+              {studyProgrammeHasStudyTracks ? (
+                <div className="section-container-centered">
+                  {stats?.data.doCombo && (
+                    <GraduationTimes
+                      classSizes={studyTrackStatsGraduationStats.combo.studyTrackStatsClassSizes}
+                      data={stats.data.graduationTimes[studyprogramme].medians.combo.map(year => ({
+                        amount: year.amount,
+                        name: year.name,
+                        statistics: year.statistics,
+                        times: null,
+                        median: year.y,
+                      }))}
+                      goal={stats.data.graduationTimes.goals.combo}
+                      goalExceptions={{ needed: false }}
+                      level={studyprogramme}
+                      levelProgrammeData={studyTrackStatsGraduationStats.combo.studyTrackStatsGraduationStats}
+                      mode="study track"
+                      programmeNames={stats.data.studytrackOptions}
+                      showMedian={showMedian}
+                      title={getGraduationGraphTitle(studyprogramme, true)}
+                      yearLabel="Start year"
+                    />
+                  )}
+                  <GraduationTimes
+                    classSizes={studyTrackStatsGraduationStats.basic.studyTrackStatsClassSizes}
+                    data={stats.data.graduationTimes[studyprogramme].medians.basic.map(year => ({
+                      amount: year.amount,
+                      name: year.name,
+                      statistics: year.statistics,
+                      times: null,
+                      median: year.y,
+                    }))}
+                    goal={stats.data.graduationTimes.goals.basic}
+                    goalExceptions={{ needed: false }}
+                    level={studyprogramme}
+                    levelProgrammeData={studyTrackStatsGraduationStats.basic.studyTrackStatsGraduationStats}
+                    mode="study track"
+                    programmeNames={stats.data.studytrackOptions}
+                    showMedian={showMedian}
+                    title={getGraduationGraphTitle(studyprogramme, false)}
+                    yearLabel="Start year"
+                  />
+                </div>
+              ) : (
+                <div className="section-container-centered">
+                  {showMedian ? (
+                    <div className="section-container">
+                      {stats?.data.doCombo && (
+                        <MedianTimeBarChart
+                          byStartYear
+                          data={stats?.data?.graduationTimes[track].medians.combo}
+                          goal={stats?.data?.graduationTimes.goals.combo}
+                          title={getGraduationGraphTitle(studyprogramme, stats?.data.doCombo)}
+                        />
+                      )}
                       <MedianTimeBarChart
                         byStartYear
-                        data={stats?.data?.graduationTimes[track].medians.combo}
-                        goal={stats?.data?.graduationTimes.goals.combo}
-                        title={getGraduationGraphTitle(studyprogramme, stats?.data.doCombo)}
+                        data={stats?.data?.graduationTimes[track].medians.basic}
+                        goal={stats?.data?.graduationTimes.goals.basic}
+                        title={getGraduationGraphTitle(studyprogramme, false)}
                       />
-                    )}
-                    <MedianTimeBarChart
-                      byStartYear
-                      data={stats?.data?.graduationTimes[track].medians.basic}
-                      goal={stats?.data?.graduationTimes.goals.basic}
-                      title={getGraduationGraphTitle(studyprogramme, false)}
-                    />
-                    {combinedProgramme && (
-                      <MedianTimeBarChart
-                        byStartYear
-                        data={stats?.data?.graduationTimesSecondProg[combinedProgramme]?.medians?.combo}
-                        goal={stats?.data?.graduationTimesSecondProg.goals.combo}
-                        title={getGraduationGraphTitle(combinedProgramme, true)}
-                      />
-                    )}
-                  </div>
-                ) : (
-                  <div className="section-container">
-                    {stats?.data.doCombo && (
+                      {combinedProgramme && (
+                        <MedianTimeBarChart
+                          byStartYear
+                          data={stats?.data?.graduationTimesSecondProg[combinedProgramme]?.medians?.combo}
+                          goal={stats?.data?.graduationTimesSecondProg.goals.combo}
+                          title={getGraduationGraphTitle(combinedProgramme, true)}
+                        />
+                      )}
+                    </div>
+                  ) : (
+                    <div className="section-container">
+                      {stats?.data.doCombo && (
+                        <BreakdownBarChart
+                          byStartYear
+                          data={stats?.data?.graduationTimes[track]?.medians?.combo}
+                          title={getGraduationGraphTitle(studyprogramme, stats?.data.doCombo)}
+                        />
+                      )}
                       <BreakdownBarChart
                         byStartYear
-                        data={stats?.data?.graduationTimes[track]?.medians?.combo}
-                        title={getGraduationGraphTitle(studyprogramme, stats?.data.doCombo)}
+                        data={stats?.data?.graduationTimes[track]?.medians?.basic}
+                        title={getGraduationGraphTitle(studyprogramme, false)}
                       />
-                    )}
-                    <BreakdownBarChart
-                      byStartYear
-                      data={stats?.data?.graduationTimes[track]?.medians?.basic}
-                      title={getGraduationGraphTitle(studyprogramme, false)}
-                    />
-                    {combinedProgramme && (
-                      <BreakdownBarChart
-                        byStartYear
-                        data={stats?.data?.graduationTimesSecondProg[combinedProgramme]?.medians?.combo}
-                        title={getGraduationGraphTitle(combinedProgramme, true)}
-                      />
-                    )}
-                  </div>
-                )}
-              </div>
+                      {combinedProgramme && (
+                        <BreakdownBarChart
+                          byStartYear
+                          data={stats?.data?.graduationTimesSecondProg[combinedProgramme]?.medians?.combo}
+                          title={getGraduationGraphTitle(combinedProgramme, true)}
+                        />
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
             </>
           )}
         </>
