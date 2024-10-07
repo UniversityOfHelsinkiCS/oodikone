@@ -117,7 +117,13 @@ const getChartData = (students, timeSlots, programme, timeDivision, cumulative, 
       name = 'Graduated'
     } else {
       const [min, max] = limit
-      name = `${min ?? '0'} - ${max ?? '∞'}`
+      if (min == null) {
+        name = `Credits < ${max}`
+      } else if (max == null) {
+        name = `Credits ≥ ${min}`
+      } else {
+        name = `${min} ≤ credits < ${max}`
+      }
     }
 
     return {
