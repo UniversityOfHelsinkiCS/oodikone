@@ -370,16 +370,24 @@ describe('Studyprogramme overview', () => {
       cy.get('[data-cy=Graph-StudytrackProgress]').contains('49.8%').trigger('mouseover', { force: true })
       cy.contains('At least 180 credits: 114')
 
-      cy.get("[data-cy='graduation-times-graph-breakdownBachelor']").within(() => {
+      cy.get("[data-cy='Section-KH50_001']").within(() => {
         cy.contains('Start year')
         cy.contains('2020 - 2021')
         cy.get('[aria-label="2020 - 2021, 15. On time."]').trigger('mouseover')
-        cy.contains('Graduated On time: 15 students')
+        cy.contains('On time: 15')
+        cy.contains("Click a bar to view that year's study track level breakdown")
+        cy.get('[aria-label="2019 - 2020, 22. On time."]').click()
+        cy.contains("Click a bar to view that year's study track level breakdown").should('not.exist')
+        cy.contains('Year 2019 - 2020 by start year')
+        cy.get('[aria-label="MAT-MAT, 14. On time."]').trigger('mouseover')
+        cy.contains('Matematiikka')
+        cy.contains('MAT-MAT')
+        cy.contains('On time: 14')
       })
 
       cy.get('[data-cy=GraduationTimeToggle]').click()
 
-      cy.get('[data-cy=graduation-times-graphBachelor]').within(() => {
+      cy.get("[data-cy='Section-KH50_001']").within(() => {
         cy.contains('Start year')
         cy.contains('2020 - 2021')
         cy.contains('19 graduated').trigger('mouseover')
