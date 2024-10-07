@@ -10,8 +10,7 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.3",
-    "@sentry/browser": "^6.18.2",
-    "@sentry/tracing": "^6.18.2",
+    "@sentry/browser": "^8.33.1",
     "axios": "^0.28.1",
     "highcharts": "^11.4.3",
     "immer": "^10.0.4",

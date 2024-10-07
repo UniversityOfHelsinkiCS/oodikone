@@ -1,5 +1,4 @@
 import * as Sentry from '@sentry/browser'
-import { Integrations } from '@sentry/tracing'
 
 import { runningInCypress, sentryEnvironment, sentryRelease, sentryDSN } from '@/conf'
 
@@ -10,7 +9,7 @@ export const initializeSentry = () => {
     dsn: sentryDSN,
     environment: sentryEnvironment,
     release: sentryRelease,
-    integrations: [new Integrations.BrowserTracing()],
+    integrations: [Sentry.browserTracingIntegration()],
     tracesSampleRate: 1.0,
   })
 }
