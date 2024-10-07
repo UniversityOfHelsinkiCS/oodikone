@@ -60,7 +60,6 @@ const SingleStudyGroupContent = ({ filteredStudents, group }) => {
   const coursesAreLoading = isLoading || isFetching
 
   const creditDateFilterActive = useFilterSelector(creditDateFilter.selectors.isActive)
-  const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions)
   const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive)
 
   const toggleCreditDateFilter = () => {
@@ -100,12 +99,7 @@ const SingleStudyGroupContent = ({ filteredStudents, group }) => {
           title: 'Credit statistics',
           content: !query?.years ? (
             <div>
-              <CreditGainStats
-                creditDateFilterOptions={creditDateFilterOptions}
-                filteredStudents={filteredStudents}
-                query={query}
-                year={group.tags.year}
-              />
+              <CreditGainStats filteredStudents={filteredStudents} query={query} year={group.tags.year} />
             </div>
           ) : (
             <div>This table is omitted when searching population of multiple years</div>

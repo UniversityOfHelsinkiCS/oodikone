@@ -1,8 +1,6 @@
-import { useCallback } from 'react'
 import { Tab } from 'semantic-ui-react'
 
 import { getMonthsForDegree } from '@/common'
-import { useTabChangeAnalytics } from '@/common/hooks'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { InfoBox } from '@/components/InfoBox'
 import { CreditDistributionDevelopment } from './CreditDistributionDevelopment'
@@ -10,57 +8,12 @@ import { CreditsGainedTab } from './CreditsGainedTab'
 import { StatisticsTab } from './StatisticsTab'
 import './creditGainStats.css'
 
-export const CreditGainStats = ({ creditDateFilterOptions, filteredStudents, query, year }) => {
+export const CreditGainStats = ({ filteredStudents, query, year }) => {
   const combinedProgramme = query?.studyRights?.combinedProgramme || ''
 
   const programmeGoalTime = combinedProgramme
     ? getMonthsForDegree(`${query?.studyRights?.programme}-${combinedProgramme}`)
     : getMonthsForDegree(query?.studyRights?.programme)
-
-  const renderCreditsGainTab = useCallback(() => {
-    return (
-      <Tab.Pane attached={false}>
-        <CreditsGainedTab
-          allStudents={filteredStudents}
-          creditDateFilterOptions={creditDateFilterOptions}
-          programmeGoalTime={programmeGoalTime}
-          query={query}
-          year={year}
-        />
-      </Tab.Pane>
-    )
-  }, [filteredStudents])
-
-  const renderQuartersTab = useCallback(() => {
-    return (
-      <Tab.Pane attached={false}>
-        <StatisticsTab allStudents={filteredStudents} query={query} />
-      </Tab.Pane>
-    )
-  }, [filteredStudents])
-
-  const renderDistributionDevelopment = useCallback(() => {
-    return (
-      <Tab.Pane attached={false}>
-        <CreditDistributionDevelopment
-          combinedProgramme=""
-          programme={query?.studyRights?.programme}
-          students={filteredStudents}
-          year={year}
-        />
-        {combinedProgramme && (
-          <CreditDistributionDevelopment
-            combinedProgramme={combinedProgramme}
-            programme={combinedProgramme}
-            students={filteredStudents}
-            year={year}
-          />
-        )}
-      </Tab.Pane>
-    )
-  }, [filteredStudents])
-
-  const { handleTabChange } = useTabChangeAnalytics()
 
   return (
     <div id="credit-gain-stats">
@@ -72,19 +25,48 @@ export const CreditGainStats = ({ creditDateFilterOptions, filteredStudents, que
           data-cy="credit-stats-tab"
           defaultActiveIndex={2}
           menu={{ pointing: true }}
-          onTabChange={handleTabChange}
           panes={[
             {
               menuItem: 'Credits gained',
-              render: renderCreditsGainTab,
+              render: () => (
+                <Tab.Pane>
+                  <CreditsGainedTab
+                    allStudents={filteredStudents}
+                    programmeGoalTime={programmeGoalTime}
+                    query={query}
+                    year={year}
+                  />
+                </Tab.Pane>
+              ),
             },
             {
               menuItem: 'Statistics',
-              render: renderQuartersTab,
+              render: () => (
+                <Tab.Pane>
+                  <StatisticsTab allStudents={filteredStudents} query={query} />
+                </Tab.Pane>
+              ),
             },
             {
               menuItem: 'Distribution development',
-              render: renderDistributionDevelopment,
+              render: () => (
+                <Tab.Pane>
+                  <CreditDistributionDevelopment
+                    combinedProgramme=""
+                    programme={query?.studyRights?.programme}
+                    students={filteredStudents}
+                    year={year}
+                  />
+                  {combinedProgramme && (
+                    <CreditDistributionDevelopment
+                      combinedProgramme={combinedProgramme}
+                      programme={combinedProgramme}
+                      students={filteredStudents}
+                      year={year}
+                    />
+                  )}
+                </Tab.Pane>
+              ),
             },
           ]}
         />

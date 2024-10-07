@@ -3,6 +3,7 @@
 }
 
 #credit-gain-stats .credits-gained-table {
+  max-width: 650px;
   margin: 10px auto;
 }
 

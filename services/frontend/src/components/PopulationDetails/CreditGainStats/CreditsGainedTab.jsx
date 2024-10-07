@@ -6,7 +6,7 @@ import { CreditsGainedTable } from './CreditsGainedTable'
 
 const admissionTypes = Object.values(ADMISSION_TYPES)
 
-export const CreditsGainedTab = ({ allStudents, creditDateFilterOptions, programmeGoalTime, query, year }) => {
+export const CreditsGainedTab = ({ allStudents, programmeGoalTime, query, year }) => {
   if (!allStudents || !allStudents.length || !query) return null
 
   const { studyRights } = query
@@ -16,7 +16,6 @@ export const CreditsGainedTab = ({ allStudents, creditDateFilterOptions, program
 
     return (
       <CreditsGainedTable
-        creditDateFilterOptions={creditDateFilterOptions}
         filteredStudents={filteredStudents}
         key={`creditsgainedtable-admissiontype-${type}`}
         programmeGoalTime={programmeGoalTime}
@@ -33,7 +32,6 @@ export const CreditsGainedTab = ({ allStudents, creditDateFilterOptions, program
     <Grid centered padded>
       <Grid.Row data-cy="credits-gained-main-table">
         <CreditsGainedTable
-          creditDateFilterOptions={creditDateFilterOptions}
           filteredStudents={allStudents}
           programmeGoalTime={programmeGoalTime}
           type="All students of the class"

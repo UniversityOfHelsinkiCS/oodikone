@@ -4,7 +4,7 @@ import { getFullStudyProgrammeRights } from '@/common'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { PanelView } from '@/components/common/PanelView'
 import { CreditAccumulationGraphHighCharts } from '@/components/CreditAccumulationGraphHighCharts'
-import { creditDateFilter, hopsFilter as studyPlanFilter } from '@/components/FilterView/filters'
+import { hopsFilter as studyPlanFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { InfoBox } from '@/components/InfoBox'
 import { PopulationStudentsContainer as PopulationStudents } from '@/components/PopulationStudents'
@@ -34,7 +34,6 @@ export const PopulationDetails = ({
     setStudentAmountLimit(Math.round(filteredStudents.length ? filteredStudents.length * 0.3 : 0))
   }, [filteredStudents.length])
 
-  const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions)
   const criteria = useGetProgressCriteriaQuery(
     { programmeCode: query?.studyRights?.programme },
     { skip: !query?.studyRights?.programme }
@@ -80,12 +79,7 @@ export const PopulationDetails = ({
     {
       title: 'Credit statistics',
       content: !query?.years ? (
-        <CreditGainStats
-          creditDateFilterOptions={creditDateFilterOptions}
-          filteredStudents={filteredStudents}
-          query={query}
-          year={query?.year}
-        />
+        <CreditGainStats filteredStudents={filteredStudents} query={query} year={query?.year} />
       ) : (
         <div>This table is omitted when searching population of multiple years</div>
       ),

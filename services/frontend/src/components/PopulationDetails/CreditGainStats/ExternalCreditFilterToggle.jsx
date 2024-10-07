@@ -1,27 +1,19 @@
-import qs from 'query-string'
-import { useLocation } from 'react-router-dom'
-
-import { creditsEarnedFilter as creditFilter } from '@/components/FilterView/filters'
+import { studentNumberFilter } from '@/components/FilterView/filters'
 import { FilterToggle } from '@/components/FilterView/FilterToggle'
 import { useFilters } from '@/components/FilterView/useFilters'
 
-export const ExternalCreditFilterToggle = ({ min, max }) => {
+export const ExternalCreditFilterToggle = ({ students, helpText }) => {
   const { filterDispatch, useFilterSelector } = useFilters()
-  const { min: currentMin, max: currentMax } = useFilterSelector(creditFilter.selectors.selectOptions)
-
-  const location = useLocation()
-  const { months } = qs.parse(location.search)
-  const limitedMax = max === 0 ? 1 : max
-  const active = currentMin === min && currentMax === limitedMax
+  const currentFilterIsActive = useFilterSelector(studentNumberFilter.selectors.studentListIsEqualToAllowlist(students))
+  const someFilterIsActive = useFilterSelector(studentNumberFilter.selectors.isActive)
 
   return (
     <FilterToggle
-      active={active}
-      applyFilter={() => filterDispatch(creditFilter.actions.setOptions({ min, max: limitedMax }))}
-      clearFilter={() => filterDispatch(creditFilter.actions.reset())}
-      filter={creditFilter}
-      filterName="Credit Filter"
-      popupContent={`Rajaa opiskelijat ensimmäisen ${months} kuukauden aikana saatujen opintopisteiden perusteella`}
+      active={currentFilterIsActive}
+      applyFilter={() => filterDispatch(studentNumberFilter.actions.setAllowlist(students))}
+      clearFilter={() => filterDispatch(studentNumberFilter.actions.setAllowlist([]))}
+      disabled={someFilterIsActive && !currentFilterIsActive}
+      popupContent={helpText}
     />
   )
 }

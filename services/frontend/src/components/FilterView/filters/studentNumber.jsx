@@ -1,4 +1,4 @@
-import { difference, includes, union } from 'lodash'
+import { difference, includes, isEqual, union } from 'lodash'
 import { useState } from 'react'
 import { Button, Icon } from 'semantic-ui-react'
 
@@ -197,5 +197,9 @@ export const studentNumberFilter = createFilter({
       const sns = Array.isArray(students) ? students : [students]
       options.blocklist = sns
     },
+  },
+
+  selectors: {
+    studentListIsEqualToAllowlist: ({ allowlist }, students) => students.length > 0 && isEqual(allowlist, students),
   },
 })

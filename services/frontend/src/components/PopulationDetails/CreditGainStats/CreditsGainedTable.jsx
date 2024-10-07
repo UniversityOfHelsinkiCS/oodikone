@@ -1,21 +1,25 @@
 import moment from 'moment/moment'
 import { Table } from 'semantic-ui-react'
 
-import { hopsFilter as studyPlanFilter } from '@/components/FilterView/filters'
+import { hopsFilter as studyPlanFilter, creditDateFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { DISPLAY_DATE_FORMAT, ISO_DATE_FORMAT } from '@/constants/date'
 import { CollapsibleCreditRow } from './CollapsibleCreditRow'
 
-export const CreditsGainedTable = ({ creditDateFilterOptions, filteredStudents, programmeGoalTime, type, year }) => {
+export const CreditsGainedTable = ({ filteredStudents, programmeGoalTime, type, year }) => {
   const { useFilterSelector } = useFilters()
+  const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions)
   const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive)
 
   if (!filteredStudents || !filteredStudents.length || !type) return null
   let creditList = []
-  const studentCount = (min, max = Infinity) =>
+
+  const getStudentsInCreditCategory = (min, max = Infinity) =>
     max === 0
-      ? creditList.filter(credits => credits === 0).length
-      : creditList.filter(credits => credits < max && credits >= min).length
+      ? creditList.filter(student => student.credits === 0).map(student => student.studentNumber)
+      : creditList
+          .filter(student => student.credits < max && student.credits >= min)
+          .map(student => student.studentNumber)
 
   const getMonths = (start, end) => {
     const lastDayOfMonth = moment(end).endOf('month')
@@ -25,54 +29,22 @@ export const CreditsGainedTable = ({ creditDateFilterOptions, filteredStudents, 
   const start = moment(`${year}-08-01`)
   const end = moment().format(ISO_DATE_FORMAT)
 
-  let title = ''
-  let months = 0
-  const { startDate, endDate } = creditDateFilterOptions || { start, end }
-  if (startDate !== null && endDate !== null) {
-    months = getMonths(startDate, endDate)
-    title = `${moment(startDate).format(DISPLAY_DATE_FORMAT)} and ${moment(endDate).format(DISPLAY_DATE_FORMAT)}`
-    creditList = filteredStudents.map(student =>
-      student.courses.length > 0
-        ? student.courses.reduce(
-            (results, course) =>
-              results +
-              (course.passed &&
-                startDate.isSameOrBefore(course.date, 'day') &&
-                endDate.isSameOrAfter(course.date, 'day'))
-                ? course.credits
-                : 0,
-            0
-          )
-        : 0
-    )
-  } else if (startDate !== null) {
-    months = getMonths(startDate, end)
-    title = `${moment(startDate).format(DISPLAY_DATE_FORMAT)} and ${moment(end).format(DISPLAY_DATE_FORMAT)}`
-    creditList = filteredStudents.map(student =>
-      student.courses.length > 0
-        ? student.courses.reduce(
-            (results, course) =>
-              results + (course.passed && startDate.isSameOrBefore(course.date, 'day')) ? course.credits : 0,
-            0
-          )
-        : 0
-    )
-  } else if (endDate !== null) {
-    months = getMonths(start, endDate)
-    title = `${moment(start).format(DISPLAY_DATE_FORMAT)} and ${moment(endDate).format(DISPLAY_DATE_FORMAT)}`
-    creditList = filteredStudents.map(student =>
-      student.courses.length > 0
-        ? student.courses.reduce(
-            (results, course) =>
-              results + (course.passed && endDate.isSameOrAfter(course.date, 'day')) ? course.credits : 0,
-            0
-          )
-        : 0
-    )
+  const { startDate, endDate } = creditDateFilterOptions
+  const months = getMonths(startDate ?? start, endDate ?? end)
+  const title = `${moment(startDate ?? start).format(DISPLAY_DATE_FORMAT)} and ${moment(endDate ?? end).format(DISPLAY_DATE_FORMAT)}`
+
+  if (startDate == null && endDate == null && !studyPlanFilterIsActive) {
+    creditList = filteredStudents.map(({ studentNumber, credits }) => ({ studentNumber, credits }))
+  } else if (studyPlanFilterIsActive) {
+    creditList = filteredStudents.map(({ studentNumber, hopsCredits: credits }) => ({ studentNumber, credits }))
   } else {
-    months = getMonths(start, end)
-    title = `${moment(start).format(DISPLAY_DATE_FORMAT)} and ${moment(end).format(DISPLAY_DATE_FORMAT)}`
-    creditList = filteredStudents.map(student => student.credits)
+    creditList = filteredStudents.map(({ studentNumber, courses }) => ({
+      studentNumber,
+      credits: courses.reduce(
+        (results, course) => results + (course.passed && !course.isStudyModuleCredit ? course.credits : 0),
+        0
+      ),
+    }))
   }
 
   const monthsForLimits = programmeGoalTime ? Math.min(months, programmeGoalTime) : months
@@ -86,19 +58,6 @@ export const CreditsGainedTable = ({ creditDateFilterOptions, filteredStudents, 
     [null, 0],
   ]
 
-  const monthString = months === 1 ? 'month' : 'months'
-
-  const CreditsHeader = () => {
-    if (studyPlanFilterIsActive) {
-      return <p>All credits in studyplan</p>
-    }
-    return (
-      <p>
-        Credits gained between <br /> {title} <br /> ({months} {monthString})
-      </p>
-    )
-  }
-
   return (
     <div className="credits-gained-table" data-cy={`credits-gained-table-${type}`}>
       <h3>{type}</h3>
@@ -107,7 +66,13 @@ export const CreditsGainedTable = ({ creditDateFilterOptions, filteredStudents, 
           <Table.Row key={`credits-gained-table-${type}`}>
             <Table.HeaderCell collapsing />
             <Table.HeaderCell key={`${title}-${type}`}>
-              <CreditsHeader />
+              {studyPlanFilterIsActive ? (
+                'All credits in studyplan'
+              ) : (
+                <div style={{ whiteSpace: 'break-spaces' }}>
+                  Credits gained between {title} ({months} {months === 1 ? 'month' : 'months'})
+                </div>
+              )}
             </Table.HeaderCell>
             <Table.HeaderCell key={`credits-number-of-students-${type}`}>
               Number of students
@@ -121,11 +86,13 @@ export const CreditsGainedTable = ({ creditDateFilterOptions, filteredStudents, 
           {limits.map(([min, max]) => (
             <CollapsibleCreditRow
               filteredLength={filteredStudents.length}
+              getStudentsInCreditCategory={getStudentsInCreditCategory}
               key={`credits-table-row-${min}-${max}-${type}`}
               max={max}
               min={min}
               months={monthsForLimits}
-              studentCount={studentCount}
+              monthsFromStart={months}
+              studyPlanFilterIsActive={studyPlanFilterIsActive}
             />
           ))}
         </Table.Body>
