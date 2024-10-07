@@ -23,7 +23,7 @@ export const populationStatisticsToolTips = {
 
   Taulukko kertoo opintopistekertymän valitulle opiskelijapopulaatiolle. Opintopisteluokat on suhteutettu tarkasteltavan populaation aloitusvuoteen. Ylin luokka kertoo siksi aina tavoiteajassa etenevien määrän ja suhteellisen osuuden. 
 
-  Opintopisteet sisältävät opiskelijoiden **kaikki opintopisteet**, eli siis myös ennen valitun tutkinnon alkamista suoritetut opinnot.
+  Jos *Personal study plan* -suodatin ei ole valittuna, suoritettuihin opintopisteisiin on laskettu **kaikki** taulukon otsikkorivillä ilmoitetulla aikavälillä suoritetut kurssit. Oletuksena aikavälin alkupäivä on 1.8. aloitusvuonna ja loppupäivä kuluva päivä. Alku- ja loppupäivää voi muuttaa sivun vasemman reunan *Date of course credits* -suodattimesta. *Personal study plan* -suodattimen ollessa valittuna huomioidaan kaikki valitun koulutusohjelman HOPSiin sijoitetut suoritukset. *Date of course credits* -suodattimen valinnalla ei tällöin ole vaikutusta taulukon tietoihin, vaan kaikki HOPSiin sijoitetut suoritukset huomioidaan joka tapauksessa.
 
   Huom! Nollasuorittajissa on mukana myös poissaolevaksi ilmoittautuneet, ellei heitä ole erikseen suodatettu populaatiosta pois.
 
