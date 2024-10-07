@@ -2,7 +2,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5em;
+  gap: 0.5rem;
 }
 
 .progress-bar-with-label .ui.progress {
@@ -13,4 +13,9 @@
 
 .progress-bar-with-label .ui.progress .bar {
   min-width: 0;
+}
+
+.progress-bar-with-label .progress-text {
+  width: 3.5rem;
+  text-align: right;
 }

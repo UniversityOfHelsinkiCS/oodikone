@@ -12,6 +12,6 @@ import './progressBarWithLabel.css'
 export const ProgressBarWithLabel = ({ value, total, numberOfDecimals = 1 }) => (
   <div className="progress-bar-with-label">
     <Progress total={total} value={value} />
-    {calculatePercentage(value, total, numberOfDecimals)}
+    <div className="progress-text">{calculatePercentage(value, total, numberOfDecimals)}</div>
   </div>
 )
