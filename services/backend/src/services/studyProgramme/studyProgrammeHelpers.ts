@@ -165,8 +165,10 @@ export const tableTitles = {
   studytracksEnd: ['Men', 'Women', 'Other/\nUnknown', 'Finland', 'Other'],
 } as const
 
-export const getId = (code: string) =>
-  code in programmeCodes ? programmeCodes[code as keyof typeof programmeCodes] : ''
+export const getId = (code: string) => {
+  if (serviceProvider !== 'fd') return code in programmeCodes ? programmeCodes[code as keyof typeof programmeCodes] : ''
+  return code
+}
 
 export const getGoal = (programme?: string) => {
   if (!programme) return 0

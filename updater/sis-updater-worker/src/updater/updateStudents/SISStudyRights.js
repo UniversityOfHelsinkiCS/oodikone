@@ -1,5 +1,6 @@
 const { selectAllFrom, bulkCreate, selectOneById } = require('../../db')
 const { SISStudyRight, SISStudyRightElement } = require('../../db/models')
+const { logger } = require('../../utils')
 const { termRegistrationTypeToEnrollmenttype } = require('../mapper')
 const {
   getEducation,
@@ -38,28 +39,33 @@ const getStudyRightSemesterEnrollments = semesterEnrollments => {
 }
 
 const studyRightMapper = (personIdToStudentNumber, admissionNamesById, semesterEnrollments) => studyRight => {
-  const semesterEnrollmentsForStudyRight = semesterEnrollments.find(
-    ({ study_right_id }) => study_right_id === studyRight.id
-  )?.term_registrations
-  const studyRightEducation = getEducation(studyRight.education_id)
-  if (!studyRightEducation) return null
+  try {
+    const semesterEnrollmentsForStudyRight = semesterEnrollments.find(
+      ({ study_right_id }) => study_right_id === studyRight.id
+    )?.term_registrations
+    const studyRightEducation = getEducation(studyRight.education_id)
+    if (!studyRightEducation) return null
 
-  const educationType = getEducationType(studyRightEducation.education_type)
-  const extentCode = educationTypeToExtentcode[educationType.id] || educationTypeToExtentcode[educationType.parent_id]
+    const educationType = getEducationType(studyRightEducation.education_type)
+    const extentCode = educationTypeToExtentcode[educationType.id] || educationTypeToExtentcode[educationType.parent_id]
 
-  return {
-    id: studyRight.id,
-    // validityPeriod of a study right always has a start date but not always an end date. The interval is end exclusive so we need to subtract one day from the end date to get the "real" end date.
-    startDate: new Date(studyRight.valid.startDate),
-    endDate: addDaysToDate(studyRight.valid.endDate, -1),
-    studyStartDate: studyRight.study_start_date ? new Date(studyRight.study_start_date) : null,
-    // cancellationType is always 'RESCINDED' or 'CANCELLED_BY_ADMINISTRATION'
-    cancelled: studyRight.study_right_cancellation != null,
-    studentNumber: personIdToStudentNumber[studyRight.person_id],
-    extentCode,
-    admissionType: admissionNamesById[studyRight.admission_type_urn],
-    semesterEnrollments: getStudyRightSemesterEnrollments(semesterEnrollmentsForStudyRight),
-    facultyCode: getOrganisationCode(studyRight.organisation_id),
+    return {
+      id: studyRight.id,
+      // validityPeriod of a study right always has a start date but not always an end date. The interval is end exclusive so we need to subtract one day from the end date to get the "real" end date.
+      startDate: new Date(studyRight.valid.startDate),
+      endDate: addDaysToDate(studyRight.valid.endDate, -1),
+      studyStartDate: studyRight.study_start_date ? new Date(studyRight.study_start_date) : null,
+      // cancellationType is always 'RESCINDED' or 'CANCELLED_BY_ADMINISTRATION'
+      cancelled: studyRight.study_right_cancellation != null,
+      studentNumber: personIdToStudentNumber[studyRight.person_id],
+      extentCode,
+      admissionType: admissionNamesById[studyRight.admission_type_urn],
+      semesterEnrollments: getStudyRightSemesterEnrollments(semesterEnrollmentsForStudyRight),
+      facultyCode: getOrganisationCode(studyRight.organisation_id),
+    }
+  } catch (error) {
+    logger.error(`Study right mapping failed for studyRightId ${studyRight.id}`, error)
+    return null
   }
 }
 

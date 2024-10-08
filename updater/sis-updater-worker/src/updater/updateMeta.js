@@ -11,6 +11,7 @@ const {
   Organization,
   StudyrightExtent,
 } = require('../db/models')
+const { logger } = require('../utils/logger')
 const {
   courseMapper,
   courseProviderMapper,
@@ -70,18 +71,23 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
       if (!courseUnitOrganisations) {
         continue
       }
-      for (const { share, organisationId, roleUrn, validityPeriod = {} } of courseUnitOrganisations) {
-        const effectiveValidityPeriod = Object.keys(validityPeriod).length ? validityPeriod : courseUnitValidityPeriod
-        const shareObj = {
-          share,
-          ...(effectiveValidityPeriod.startDate && { startDate: effectiveValidityPeriod.startDate }),
-          ...(effectiveValidityPeriod.endDate && { endDate: effectiveValidityPeriod.endDate }),
-        }
 
-        if (!organisationsById[organisationId]) {
-          organisationsById[organisationId] = { organisationId, roleUrn, shares: [shareObj] }
-        } else {
-          organisationsById[organisationId].shares.push(shareObj)
+      for (const { share, organisationId, roleUrn, validityPeriod = {} } of courseUnitOrganisations) {
+        try {
+          const effectiveValidityPeriod = Object.keys(validityPeriod).length ? validityPeriod : courseUnitValidityPeriod
+          const shareObj = {
+            share,
+            ...(effectiveValidityPeriod.startDate && { startDate: effectiveValidityPeriod.startDate }),
+            ...(effectiveValidityPeriod.endDate && { endDate: effectiveValidityPeriod.endDate }),
+          }
+
+          if (!organisationsById[organisationId]) {
+            organisationsById[organisationId] = { organisationId, roleUrn, shares: [shareObj] }
+          } else {
+            organisationsById[organisationId].shares.push(shareObj)
+          }
+        } catch (error) {
+          logger.error(`Error in course unit organisation handling for orgId ${organisationId}`)
         }
       }
     }

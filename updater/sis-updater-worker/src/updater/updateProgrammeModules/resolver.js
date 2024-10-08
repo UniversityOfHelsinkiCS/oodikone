@@ -1,3 +1,5 @@
+const { serviceProvider } = require('../../config')
+
 const anyModule = rule => ({ id: rule.localId, name: 'Any module' })
 const anyCourse = rule => ({ id: rule.localId, name: 'Any course' })
 const unknownRule = rule => ({ type: rule.type, fact: 'Unhandled rule' })
@@ -73,7 +75,7 @@ class ModuleResolver {
     const children = []
 
     for (const mod of modules) {
-      if (mod.code?.startsWith('KK-')) continue
+      if (serviceProvider !== 'fd' && mod.code?.startsWith('KK-')) continue
       let result = this.moduleCache[mod.id]
       if (!result) {
         result = await this.resolveSingleModule(mod)
