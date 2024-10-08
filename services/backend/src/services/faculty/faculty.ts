@@ -2,6 +2,7 @@ import { groupBy, orderBy } from 'lodash'
 import moment from 'moment'
 import { InferAttributes, QueryTypes } from 'sequelize'
 
+import { serviceProvider } from '../../config'
 import { programmeCodes } from '../../config/programmeCodes'
 import { dbConnections } from '../../database/connection'
 import { Organization, ProgrammeModule } from '../../models'
@@ -54,7 +55,9 @@ export const getDegreeProgrammesOfOrganization = async (organizationId: string, 
   const programmesWithProgIds = programmesOfOrganization.map(programme => ({
     ...programme,
     progId:
-      programme.code in programmeCodes ? programmeCodes[programme.code as keyof typeof programmeCodes] : programme.code,
+      programme.code in programmeCodes && serviceProvider !== 'fd'
+        ? programmeCodes[programme.code as keyof typeof programmeCodes]
+        : programme.code,
   }))
   const programmesGroupedByCode = groupBy(orderBy(programmesWithProgIds, ['valid_from'], ['desc']), prog => prog.code)
   const curriculumPeriods = await getCurriculumPeriods()

@@ -3,6 +3,7 @@ const { chunk } = require('lodash')
 const { bulkCreate, selectFromByIds } = require('../../db')
 const { dbConnections } = require('../../db/connection')
 const { ProgrammeModule, ProgrammeModuleChild } = require('../../db/models')
+const { logger } = require('../../utils/logger')
 const ModuleResolver = require('./resolver')
 
 const resolveProgramme = async programme => {
@@ -56,7 +57,14 @@ const recursiveWrite = (modArg, parentId, programmeMap, joinMap) => {
   if (parentId) joinMap[join.composite] = join
 
   if (!children) return
-  children.forEach(child => recursiveWrite(child, mod.id, programmeMap, joinMap))
+  try {
+    children.forEach(child => recursiveWrite(child, mod.id, programmeMap, joinMap))
+  } catch (error) {
+    logger.error(
+      `Could not update programme module with id ${mod.id} and parentId ${parentId} due to faulty children/rule handling`,
+      error
+    )
+  }
 }
 
 const updateProgrammeModulesChunk = async programmeIds => {
