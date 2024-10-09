@@ -16,19 +16,18 @@ import { CourseTableModeSelector } from './CurriculumPicker'
 import { PopulationCourses } from './PopulationCourses'
 
 export const PopulationDetails = ({
-  curriculum,
   filteredStudents,
   isLoading,
   programmeCodes,
   query,
   queryIsSet,
   selectedStudentsByYear,
-  setCurriculum,
 }) => {
   const { isLoading: authLoading, programmeRights, fullAccessToStudentData } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const { useFilterSelector } = useFilters()
   const [studentAmountLimit, setStudentAmountLimit] = useState(0)
+  const [curriculum, setCurriculum] = useState(null)
 
   useEffect(() => {
     setStudentAmountLimit(Math.round(filteredStudents.length ? filteredStudents.length * 0.3 : 0))

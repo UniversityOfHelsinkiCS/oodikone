@@ -26,6 +26,7 @@ export const getPopulationSelectedStudentCourses = ({
     years,
     tag,
     selectedStudentsByYear,
+    courses,
   }
   const body = {
     semesters,
