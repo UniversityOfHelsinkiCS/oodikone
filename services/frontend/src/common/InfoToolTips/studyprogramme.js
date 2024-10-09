@@ -93,7 +93,9 @@ export const studyProgrammeToolTips = {
 
   **Median time**: Näyttää valmistuneiden opiskelijoiden opintojen keston **mediaanin** kuukausina sekä heidän prosentuaalisen osuutensa koko vuosikurssista. Vihreä **katkoviiva** kuvastaa tavoiteaikaa. Keltainen katkoviiva on tavoiteaika + 12 kuukautta.
 
-  Valmistumisajoista on vähennetty lakisääteiset poissaolot.`,
+  Valmistumisajoista on vähennetty lakisääteiset poissaolot.
+  
+  Jos sivun yläosassa on valittuna ”All studyrights” (oletus), mukana ovat myös ohjelmaan siirtyneet ja ohjelmasta pois siirtyneet opiskelijat.`,
   ProgrammesBeforeOrAfter: `
   **Mikäli valittuna on kandiohjelma:** Sisältää maisteriohjelmat, joissa tämän kandiohjelman opiskelijat ovat aloittaneet valmistuttuaan kandeiksi. Vuosijaottelu on tehty maisteriohjelmassa aloittamisen perusteella.
 
@@ -158,5 +160,5 @@ studyProgrammeToolTips.StudytrackProgressEvaluationOverview = studyProgrammeTool
 studyProgrammeToolTips.AverageGraduationTimesStudytracksMaster =
   studyProgrammeToolTips.AverageGraduationTimesStudytracks.replace(
     'on valmistunut.',
-    'on valmistunut.\n\n**Bachelor + master studyright** -kuvaajassa vuosi on kandiohjelman aloitusvuosi.'
+    'on valmistunut.\n\n  Maisteriohjelmien tilastoissa opiskelijat on jaettu kahteen ryhmään:\n  - **Bachelor + master studyright** -kaaviossa ovat mukana ne opiskelijat, joilla on oikeus suorittaa **sekä kandidaatin että maisterin** tutkinto. Tässä kaaviossa aloitusvuosi tarkoittaa opiskelijan aloitusvuotta kandiohjelmassa.\n  - **Master studyright** -kaaviossa ovat mukana ne opiskelijat, joilla on oikeus suorittaa **ainoastaan maisterin** tutkinto.'
   )
