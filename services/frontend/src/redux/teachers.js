@@ -28,6 +28,6 @@ export const {
   useGetTeacherQuery,
   useFindTeachersQuery,
   useLazyGetTeacherStatisticsQuery,
-  useLazyGetTopTeachersQuery,
+  useGetTopTeachersQuery,
   useGetTopTeachersCategoriesQuery,
 } = teachersApi

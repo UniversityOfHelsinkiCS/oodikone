@@ -2,39 +2,33 @@ import moment from 'moment'
 import { useState } from 'react'
 import { Message, Segment } from 'semantic-ui-react'
 
-import { useGetTopTeachersCategoriesQuery, useLazyGetTopTeachersQuery } from '@/redux/teachers'
+import { useGetTopTeachersCategoriesQuery, useGetTopTeachersQuery } from '@/redux/teachers'
 import { TeacherStatisticsTable } from '../TeacherStatisticsTable'
 import { LeaderForm } from './LeaderForm'
 
 export const TeacherLeaderBoard = () => {
   const [selectedYear, setSelectedYear] = useState(null)
   const [selectedCategory, setSelectedCategory] = useState(null)
-  const [getTopTeachers, { data: topTeachers = [] }] = useLazyGetTopTeachersQuery()
-  const { data: yearsAndCategories, isLoading, isFetching } = useGetTopTeachersCategoriesQuery()
+  const { data: yearsAndCategories, isFetching: categoriesAreLoading } = useGetTopTeachersCategoriesQuery()
+  const { data: topTeachers = {}, isFetching: statsAreLoading } = useGetTopTeachersQuery(
+    { yearcode: selectedYear, category: selectedCategory },
+    { skip: !selectedYear || !selectedCategory }
+  )
 
-  const updateAndSubmitForm = args => {
-    const year = args.selectedYear || selectedYear
-    const category = args.selectedCategory || selectedCategory
-    getTopTeachers({ yearcode: year, category })
-  }
+  if (categoriesAreLoading) return <Segment basic loading />
 
   const initLeaderboard = (year, category) => {
     setSelectedYear(year)
     setSelectedCategory(category)
-    updateAndSubmitForm({ selectedYear: year, selectedCategory: category })
   }
 
   const handleYearChange = (_event, { value }) => {
     setSelectedYear(value)
-    updateAndSubmitForm({ selectedYear: value })
   }
 
   const handleCategoryChange = (_event, { value }) => {
     setSelectedCategory(value)
-    updateAndSubmitForm({ selectedCategory: value })
   }
-
-  if (isLoading || isFetching) return <Segment basic loading />
 
   const yearOptions = Object.values(yearsAndCategories.years)
     .map(({ yearcode, yearname }) => ({ key: yearcode, value: yearcode, text: yearname }))
@@ -53,8 +47,13 @@ export const TeacherLeaderBoard = () => {
     text: name,
   }))
 
-  const lastUpdated = new Date(topTeachers?.updated).toLocaleDateString(undefined, {
-    dateStyle: 'long',
+  const lastUpdated = new Date(topTeachers?.updated).toLocaleString(undefined, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    minute: 'numeric',
+    hour: 'numeric',
+    second: 'numeric',
   })
 
   return (
@@ -72,9 +71,9 @@ export const TeacherLeaderBoard = () => {
         selectedyear={selectedYear}
         yearoptions={yearOptions}
       />
-      <Segment>
-        {topTeachers.length > 0 && <Message>{`Last updated: ${lastUpdated}`}</Message>}
-        <TeacherStatisticsTable statistics={topTeachers?.stats || []} variant="leaderboard" />
+      <Segment loading={statsAreLoading}>
+        {topTeachers.stats?.length > 0 && <Message>{`Last updated: ${lastUpdated}`}</Message>}
+        <TeacherStatisticsTable statistics={topTeachers.stats ?? []} variant="leaderboard" />
       </Segment>
     </div>
   )

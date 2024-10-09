@@ -45,7 +45,12 @@ router.get('/top', async (req: GetTopTeachersRequest, res: Response) => {
   }
 
   const result = await getTeacherStats(category, Number(yearcode))
-  res.json(result)
+  if (result) {
+    return res.json(result)
+  }
+  await findAndSaveTeachers(Number(yearcode), Number(yearcode))
+  const updatedStats = await getTeacherStats(category, Number(yearcode))
+  res.json(updatedStats)
 })
 
 interface PostTopTeachersRequest extends Request {
