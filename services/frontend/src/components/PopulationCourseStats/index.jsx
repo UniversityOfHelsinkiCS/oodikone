@@ -110,11 +110,7 @@ const PopulationCourseStats = ({ filteredStudents, mandatoryCourses, courses, pe
       menuItem: 'Pass/fail',
       render: () => (
         <Tab.Pane>
-          <PassFailEnrollments
-            expandedGroups={expandedGroups}
-            onlyIamRights={onlyIamRights}
-            toggleGroupExpansion={toggleGroupExpansion}
-          />
+          <PassFailEnrollments onlyIamRights={onlyIamRights} />
         </Tab.Pane>
       ),
     },
