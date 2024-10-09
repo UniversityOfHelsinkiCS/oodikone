@@ -48,12 +48,8 @@ export const TeacherLeaderBoard = () => {
   }))
 
   const lastUpdated = new Date(topTeachers?.updated).toLocaleString(undefined, {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    minute: 'numeric',
-    hour: 'numeric',
-    second: 'numeric',
+    dateStyle: 'long',
+    timeStyle: 'medium',
   })
 
   return (
