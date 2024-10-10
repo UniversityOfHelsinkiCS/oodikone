@@ -37,7 +37,7 @@ const getColumns = (stats, showGrades, userHasAccessToAllStats, alternatives, se
 
   const columns = [
     {
-      key: 'TIME-PARENT',
+      key: 'TIME_PARENT',
       merge: true,
       mergeHeader: true,
       children: [
@@ -55,7 +55,7 @@ const getColumns = (stats, showGrades, userHasAccessToAllStats, alternatives, se
           ),
         },
         {
-          key: 'TIME-ICON',
+          key: 'TIME_ICON',
           export: false,
           getRowContent: s => {
             if (s.name !== 'Total' && userHasAccessToAllStats) {
@@ -71,7 +71,7 @@ const getColumns = (stats, showGrades, userHasAccessToAllStats, alternatives, se
       ],
     },
     {
-      key: 'TOTAL',
+      key: 'TOTAL_STUDENTS',
       title: 'Total\nstudents',
       helpText: 'Total count of students, including enrolled students with no grade',
       cellProps: s => ({
@@ -113,7 +113,7 @@ const getColumns = (stats, showGrades, userHasAccessToAllStats, alternatives, se
     },
     ...getGradeColumns(resolveGrades(stats)),
     {
-      key: 'ENROLLMENTS_MISSING_GRADE',
+      key: 'ENROLLED_NO_GRADE',
       title: 'Enrolled,\nno grade',
       filterType: 'range',
       helpText: 'Total count of students with a valid enrollment and no passing or failing grade',
