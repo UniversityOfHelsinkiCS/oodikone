@@ -94,6 +94,8 @@ const formatStudent = (student: Student) => {
       startDate: programmeStartDate,
       degreeProgrammeType,
     } = studyRightElements[0]
+    // here a study right needs to be linked to an organization that can be linked to attainments.
+    // how can this be done in a meaningful way?
     const programmeCodeToProviderCode = mapToProviders([programmeCode])[0]
     const { latestAttainmentDates, thesisData } = findThesisAndLatestAttainments(
       studyPlan,

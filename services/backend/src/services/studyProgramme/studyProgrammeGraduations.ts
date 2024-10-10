@@ -96,6 +96,7 @@ const getGraduationTimeAndThesisWriterStats = async ({
   const studyRights = await getStudyRightsInProgramme(studyProgramme, false)
   const studentNumbers = studyRights.map(studyRight => studyRight.studentNumber)
   const thesisType = await getThesisType(studyProgramme)
+  // here we want all thesisCredits associated to some study programme - is this associated via the study right?
   const thesisCredits = await getThesisCredits(mapToProviders([studyProgramme])[0], thesisType, studentNumbers)
   const thesisWriterMap = thesisCredits.reduce<Record<string, Date>>((acc, credit) => {
     acc[credit.student_studentnumber] = credit.attainment_date

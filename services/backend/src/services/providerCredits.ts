@@ -8,6 +8,7 @@ import { getCourseCodesOfProvider } from './providers'
 import { getCreditsForProvider, getTransferredCredits } from './studyProgramme/creditGetters'
 import { defineYear } from './studyProgramme/studyProgrammeHelpers'
 import { getSISStudyRightsOfStudents } from './studyProgramme/studyRightFinders'
+import { serviceProvider } from '../config'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const assertUnreachable = (x: never) => {
@@ -104,22 +105,30 @@ const getBasicDegreeStudyRight = (
 /* Calculates credits produced by provider (programme or faculty) */
 export const computeCreditsProduced = async (providerCode: string, isAcademicYear: boolean) => {
   const since = new Date('2017-01-01')
+
+  // here we need to map a study program or an organization to courses and attainments/credits
+  // should this be done via students that have a study right linked to that study program and which courses
+  // they have then taken -- or is there something in the course data that links it in some way to a
+  // study program?
   const rapoFormattedProviderCode = mapToProviders([providerCode])[0]
   const courses = await getCourseCodesOfProvider(rapoFormattedProviderCode)
   const credits = await getCreditsForProvider(rapoFormattedProviderCode, courses, since)
 
   // This part also adds oikis Vaasa which is provided by a different organization.
   // Unknown if there are other similar cases!
-  const vaasaCodes = {
-    '200-K001': '200-K0012',
-    '200-M001': '200-M0012',
-  } as const
-  const vaasaProvider =
-    rapoFormattedProviderCode in vaasaCodes ? vaasaCodes[rapoFormattedProviderCode as keyof typeof vaasaCodes] : null
-  if (vaasaProvider) {
-    const courses = await getCourseCodesOfProvider(vaasaProvider)
-    const vaasaCredits = await getCreditsForProvider(vaasaProvider, courses, since)
-    credits.push(...vaasaCredits)
+  let vaasaProvider: string | null = null
+  if (serviceProvider !== 'fd') {
+    const vaasaCodes = {
+      '200-K001': '200-K0012',
+      '200-M001': '200-M0012',
+    } as const
+    vaasaProvider =
+      rapoFormattedProviderCode in vaasaCodes ? vaasaCodes[rapoFormattedProviderCode as keyof typeof vaasaCodes] : null
+    if (vaasaProvider) {
+      const courses = await getCourseCodesOfProvider(vaasaProvider)
+      const vaasaCredits = await getCreditsForProvider(vaasaProvider, courses, since)
+      credits.push(...vaasaCredits)
+    }
   }
 
   const students = [...new Set(credits.map(({ studentNumber }) => studentNumber))]

@@ -363,6 +363,10 @@ router.get('/v3/populationstatisticsbycourse', async (req: GetPopulationStatisti
   }
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const rightsMappedToProviders = mapToProviders(fullStudyProgrammeRights)
+  // does this do the right thing here? this below checks for _some_ right, but does it not then give _all_ rights?
+  // compare with usage in teachers.ts where "every" is implemented
+  // but can we change the logic all together? What we want to know is whether the user has rights
+  // to see these courses, in some meaningful way that "rights" can be linked between a course and a study program
   const found = courseProviders.some(provider => rightsMappedToProviders.includes(provider))
 
   const studentsUserCanAccess =

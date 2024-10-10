@@ -85,6 +85,7 @@ router.get('/stats', async (req: GetTeacherStatsRequest, res: Response) => {
     return res.status(422).send('Missing required query parameters')
   }
 
+  // not very important for now, because used for teacher stats
   const providerRights = mapToProviders(fullStudyProgrammeRights)
   if (!(providers.every(provider => providerRights.includes(provider)) || roles.includes('admin'))) {
     return res.status(403).send('You do not have permission to see this data')

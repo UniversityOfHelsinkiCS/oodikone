@@ -59,6 +59,7 @@ export const TeacherStatistics = () => {
 
   const currentSemesterCode = getCurrentSemester(semesterData?.semesters)?.semestercode
 
+  // not important because teacher statistics is low priority for now
   const userProviders = mapToProviders(fullStudyProgrammeRights)
   const invalidQueryParams = providers.length === 0 || !semesterStart
   const providerOptions = isAdmin

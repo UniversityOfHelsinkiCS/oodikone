@@ -20,6 +20,7 @@ const getCurrentYearStartDate = () => {
 }
 
 const getAllStudyProgrammeCourses = async (studyProgramme: string) => {
+  // and here what we really want is all courses that have been taught "as a part of the studyprogramme" - how is this defined?
   const providerCode = mapToProviders([studyProgramme])[0]
   const normalCourses = await getAllProgrammeCourses(providerCode)
   return normalCourses.reduce((acc, curr) => {
@@ -126,6 +127,8 @@ type Course = {
 }
 
 export const getStudyProgrammeStatsForColorizedCoursesTable = async (studyProgramme: string) => {
+  // all courses in some meaningful way linked to a study programme.
+  // Would that be via which courses the students with a study right linked to a study programme have taken?
   const courses = await getAllProgrammeCourses(mapToProviders([studyProgramme])[0])
   const autumnSemester2017 = 135
   const courseCodes = courses.map(course => course.code)
