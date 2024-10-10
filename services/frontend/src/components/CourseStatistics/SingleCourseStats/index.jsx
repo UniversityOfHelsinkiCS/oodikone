@@ -505,7 +505,7 @@ SingleCourseStats.propTypes = {
     statistics: arrayOf(
       shape({
         code: oneOfType([number, string]),
-        name: string,
+        name: shape({ fi: string, en: string, sv: string }),
         attempts: objectOf(
           shape({
             failed: arrayOf(string),
