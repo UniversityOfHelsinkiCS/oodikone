@@ -31,9 +31,9 @@ describe('Course Statistics tests', () => {
     describe('It shows correct statistics for courses with other grades than 0-5', () => {
       it('Shows correct statistics for courses with scale HT-TT', () => {
         const gradesTableContents = [
-          [null, 'TT', 173],
+          [null, 'TT', 176],
           [null, 'No grade', 10],
-          [null, 'Hyl.', 8],
+          [null, 'Hyl.', 5],
           [null, 'HT', 176],
         ]
         cy.contains('Search for courses')
