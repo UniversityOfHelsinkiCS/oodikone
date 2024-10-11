@@ -40,7 +40,7 @@ const getCreditCount = (credits: Credit[], startDate: Date) =>
     .filter(credit => moment(credit.attainment_date).isSameOrAfter(startDate))
     .reduce((prev, curr) => prev + curr.credits, 0)
 
-const getGraduationTimeStats = (
+const getGraduationTimeStats = async (
   studyProgramme: string,
   graduationTimes: Record<string, Record<string, number[]>>,
   graduationTimesCombo: Record<string, Record<string, number[]>>,
@@ -54,7 +54,7 @@ const getGraduationTimeStats = (
     [programmeOrStudyTrack: string]: ProgrammeOrStudyTrackGraduationStats | Goals
   }
 
-  const goal = getGoal(combinedProgramme ?? studyProgramme)
+  const goal = await getGoal(combinedProgramme ?? studyProgramme)
   const finalGraduationTimes: GraduationTimes = { goals: { basic: goal, combo: goal + 36 } }
 
   const calculateGraduationTimes = (
@@ -431,14 +431,14 @@ const getMainStatsByTrackAndYear = async (
     combinedProgramme
   )
 
-  const finalGraduationTimes = getGraduationTimeStats(
+  const finalGraduationTimes = await getGraduationTimeStats(
     studyProgramme,
     graduationTimes,
     graduationTimesCombo,
     mainStatsByTrack
   )
 
-  const finalCombinedGraduationTimes = getGraduationTimeStats(
+  const finalCombinedGraduationTimes = await getGraduationTimeStats(
     studyProgramme,
     {},
     graduationTimesCombinedProgrammeCombo,

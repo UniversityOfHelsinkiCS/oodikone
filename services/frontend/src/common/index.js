@@ -45,8 +45,8 @@ export const isFall = semester => semester % 2 === 1
 
 export const getStudentTotalCredits = (student, includeTransferredCredits = true) => {
   const passedCourses = includeTransferredCredits
-    ? student.courses.filter(course => course.passed && !course.isStudyModuleCredit)
-    : student.courses.filter(course => course.passed && !course.isStudyModuleCredit && course.credittypecode !== 9)
+    ? student.courses.filter(course => [4, 9].includes(course.credittypecode) && !course.isStudyModuleCredit)
+    : student.courses.filter(course => course.credittypecode === 4 && !course.isStudyModuleCredit)
   return passedCourses.reduce((a, b) => a + b.credits, 0)
 }
 

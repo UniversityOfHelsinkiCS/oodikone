@@ -31,10 +31,10 @@ describe('Course Statistics tests', () => {
     describe('It shows correct statistics for courses with other grades than 0-5', () => {
       it('Shows correct statistics for courses with scale HT-TT', () => {
         const gradesTableContents = [
-          [null, 'TT', 173],
+          [null, 'TT', 176],
           [null, 'No grade', 10],
-          [null, 'Hyl.', 8],
-          [null, 'HT', 176],
+          [null, 'Hyl.', 5],
+          [null, 'HT', 177],
         ]
         cy.contains('Search for courses')
         cy.get("input[placeholder='Search by a course code']").type('KK-RUKIRJ')
@@ -59,7 +59,7 @@ describe('Course Statistics tests', () => {
         cy.contains(
           'Population of course Toisen kotimaisen kielen kirjallinen taito, ruotsi (CEFR B1) 2019-2024 (open and normal)'
         )
-        cy.contains('367 students out of 367 shown')
+        cy.contains('368 students out of 368 shown')
         checkGradeTable(gradesTableContents)
       })
 
@@ -163,7 +163,7 @@ describe('Course Statistics tests', () => {
       cy.get('.ui.contentSegment .ui.menu').contains('Course').click()
       cy.cs('course-selector').get('.active.selected.item').contains('TKT10002')
       cy.get('#CourseStatPanes table a.item:first').click()
-      cy.contains('Population of course Ohjelmoinnin perusteet')
+      cy.contains('Population of course Introduction to Programming 2023-2024 (open and normal)')
 
       cy.go('back')
       cy.get('.ui.contentSegment .ui.menu').contains('Course').click()

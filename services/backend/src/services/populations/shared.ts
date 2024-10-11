@@ -127,7 +127,9 @@ const formatStudentForPopulationStatistics = (
       normalizeDate && credit.attainment_date < new Date(startDate)
         ? startDateMoment.clone().add(1, 'day').toISOString()
         : credit.attainment_date.toISOString()
-    const passed = Credit.passed({ credittypecode: credit.credittypecode })
+    const passed =
+      Credit.passed({ credittypecode: credit.credittypecode }) ||
+      Credit.improved({ credittypecode: credit.credittypecode })
 
     return {
       course_code: credit.course_code,

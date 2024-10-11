@@ -1,9 +1,9 @@
 import { orderBy } from 'lodash'
-import { InferAttributes } from 'sequelize'
+import { InferAttributes, Op } from 'sequelize'
 
 import { serviceProvider } from '../../config'
 import { programmeCodes } from '../../config/programmeCodes'
-import { SISStudyRight, SISStudyRightElement } from '../../models'
+import { ProgrammeModule, SISStudyRight, SISStudyRightElement } from '../../models'
 import { DegreeProgrammeType, Phase } from '../../types'
 import { getDegreeProgrammeType } from '../../util'
 
@@ -170,28 +170,29 @@ export const getId = (code: string) => {
   return code
 }
 
-export const getGoal = (programme?: string) => {
+export const getGoal = async (programme?: string) => {
   if (!programme) return 0
-  if (programme.startsWith('KH') || programme.endsWith('-ba')) {
-    return 36
+  const programmeInfo = await ProgrammeModule.findAll({
+    attributes: ['degreeProgrammeType', 'minimumCredits'],
+    where: {
+      code: programme,
+      valid_from: {
+        [Op.lte]: new Date(),
+      },
+    },
+    order: [['valid_from', 'DESC']],
+  })
+  if (programmeInfo.length === 0) {
+    return 0
   }
-  if (programme.startsWith('MH') || programme.endsWith('-ma')) {
-    if (programme === 'MH90_001') return 36 // vetenary programme's licentiate is 36 months.
-    if (['MH30_004', '420420-ma'].includes(programme)) {
-      return 24 + 6
-    }
-    if (['MH30_001', 'MH30_003', '320011-ma', '320001-ma', '320002-ma'].includes(programme)) {
-      return 36 + 24 + 12 // medical, no separate bachelor
-    }
-    return 24
+  const { degreeProgrammeType, minimumCredits } = programmeInfo[0]
+  if (degreeProgrammeType === null || minimumCredits === null) {
+    return 0
   }
-  if (programme.includes('T')) {
+  if ([DegreeProgrammeType.DOCTOR, DegreeProgrammeType.LICENTIATE].includes(degreeProgrammeType)) {
     return 48
   }
-  if (programme.startsWith('LI')) {
-    return 78
-  }
-  return 48 // unknown, likely old doctor or licentiate
+  return (minimumCredits / 60) * 12
 }
 
 export const isRelevantProgramme = (code: string) => /^(KH|MH)\d{2}_\d{3}$/.test(code) || /^T\d{6}$/.test(code)

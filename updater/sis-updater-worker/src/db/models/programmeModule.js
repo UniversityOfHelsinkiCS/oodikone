@@ -47,6 +47,9 @@ ProgrammeModule.init(
     degreeProgrammeType: {
       type: STRING,
     },
+    minimumCredits: {
+      type: INTEGER,
+    },
     createdAt: {
       type: DATE,
     },
