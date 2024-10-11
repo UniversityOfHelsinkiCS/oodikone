@@ -217,17 +217,17 @@ const SingleCourseStats = ({
       return grade !== '0' ? total + grades[grade] : total
     }, 0)
     const totalFailed = grades['0'] + enrolledNoGrade
-    const totalStudents = totalGrades + enrolledNoGrade
-    const passRate = totalPassed / totalStudents
+    const total = totalGrades + enrolledNoGrade
+    const passRate = totalPassed / total
     const failRate = 1 - passRate
 
     return {
+      total,
       totalPassed,
       totalFailed,
       categories,
       passRate,
       failRate,
-      total: totalStudents,
       grades,
     }
   }
