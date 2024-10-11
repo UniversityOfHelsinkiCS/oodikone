@@ -81,8 +81,8 @@ const getColumns = (stats, showGrades, userHasAccessToAllStats, alternatives, se
         },
       }),
       filterType: 'range',
-      getRowVal: s => (s.rowObfuscated ? 5 : s.students.withEnrollments.total),
-      getRowContent: s => (s.rowObfuscated ? '5 or fewer students' : s.students.withEnrollments.total),
+      getRowVal: s => (s.rowObfuscated ? 5 : s.students.total),
+      getRowContent: s => (s.rowObfuscated ? '5 or fewer students' : s.students.total),
       getCellProps: s => defineCellColor(s.rowObfuscated),
     },
     {
@@ -129,9 +129,8 @@ const getColumns = (stats, showGrades, userHasAccessToAllStats, alternatives, se
     {
       key: 'PASS_RATE',
       title: 'Pass-%',
-      getRowVal: s => (s.rowObfuscated ? 0 : s.students.withEnrollments.passRate * 100),
-      getRowContent: s =>
-        s.rowObfuscated ? '5 or fewer students' : formatPercentage(s.students.withEnrollments.passRate),
+      getRowVal: s => (s.rowObfuscated ? 0 : s.students.passRate * 100),
+      getRowContent: s => (s.rowObfuscated ? '5 or fewer students' : formatPercentage(s.students.passRate)),
       filterType: 'range',
       cellProps: s => ({
         style: {
