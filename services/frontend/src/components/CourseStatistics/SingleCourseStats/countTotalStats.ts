@@ -99,7 +99,7 @@ export const countTotalStats = (formattedStats, userHasAccessToAllStats: boolean
         total: acc.students.total + curr.students.total,
         totalEnrollments: acc.students.totalEnrollments + (curr.students.totalEnrollments || 0),
         totalPassed: acc.students.totalPassed + curr.students.totalPassed,
-        totalFailed: acc.students.totalFailed + curr.students.totalFailed,
+        totalFailed: acc.students.totalFailed + (curr.students.totalFailed || 0),
         enrolledStudentsWithNoGrade:
           acc.students.enrolledStudentsWithNoGrade + (curr.students.enrolledStudentsWithNoGrade || 0),
         categories: {
