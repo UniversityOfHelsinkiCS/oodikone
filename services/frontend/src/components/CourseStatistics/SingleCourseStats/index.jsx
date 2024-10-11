@@ -17,16 +17,16 @@ import { ALL, getAllStudyProgrammes } from '@/selectors/courseStats'
 import { countTotalStats } from './countTotalStats'
 
 const countFilteredStudents = (stat, filter) => {
-  if (stat) {
-    return Object.entries(stat).reduce((acc, entry) => {
-      const [category, students] = entry
-      return {
-        ...acc,
-        [category]: students.filter(filter).length,
-      }
-    }, {})
+  if (!stat) {
+    return {}
   }
-  return {}
+  return Object.entries(stat).reduce((acc, entry) => {
+    const [category, students] = entry
+    return {
+      ...acc,
+      [category]: students.filter(filter).length,
+    }
+  }, {})
 }
 
 const SingleCourseStats = ({
@@ -209,27 +209,23 @@ const SingleCourseStats = ({
     }
   }
 
-  const countStudentStats = (allstudents, enrolledNoGrade = 0, filter) => {
-    const categories = countFilteredStudents(allstudents.categories, filter)
-    const grades = countFilteredStudents(allstudents.grades, filter)
-    const { passedFirst = 0, passedEventually = 0, neverPassed = 0 } = categories
-    const total = passedFirst + passedEventually + neverPassed
-    const passRate = (passedFirst + passedEventually) / total
-    const failRate = neverPassed / total
-    const withEnrollments = {
-      total: total + enrolledNoGrade,
-      passRate: (passedFirst + passedEventually) / (total + enrolledNoGrade),
-      failRate: (neverPassed + enrolledNoGrade) / (total + enrolledNoGrade),
-    }
+  const countStudentStats = (allStudents, enrolledNoGrade = 0, filter) => {
+    const grades = countFilteredStudents(allStudents.grades, filter)
+    const totalGrades = Object.values(grades).reduce((total, studentsWithGrade) => total + studentsWithGrade, 0)
+    const totalPassed = Object.keys(grades).reduce((total, grade) => {
+      return grade !== '0' ? total + grades[grade] : total
+    }, 0)
+    const totalFailed = grades['0'] + enrolledNoGrade
+    const total = totalGrades + enrolledNoGrade
+    const passRate = totalPassed / total
+    const failRate = 1 - passRate
 
     return {
-      totalPassed: passedFirst + passedEventually,
-      totalFailed: neverPassed,
-      categories,
+      total,
+      totalPassed,
+      totalFailed,
       passRate,
       failRate,
-      total,
-      withEnrollments,
       grades,
     }
   }
@@ -505,7 +501,7 @@ SingleCourseStats.propTypes = {
     statistics: arrayOf(
       shape({
         code: oneOfType([number, string]),
-        name: string,
+        name: shape({ fi: string, en: string, sv: string }),
         attempts: objectOf(
           shape({
             failed: arrayOf(string),

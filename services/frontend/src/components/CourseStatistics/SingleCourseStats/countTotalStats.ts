@@ -23,11 +23,6 @@ export const countTotalStats = (formattedStats, userHasAccessToAllStats: boolean
       totalEnrollments: 0,
     },
     students: {
-      categories: {
-        passedFirst: 0,
-        passedEventually: 0,
-        neverPassed: 0,
-      },
       grades: {},
       passRate: 0,
       failRate: 0,
@@ -36,10 +31,6 @@ export const countTotalStats = (formattedStats, userHasAccessToAllStats: boolean
       totalFailed: 0,
       totalEnrollments: 0,
       enrolledStudentsWithNoGrade: 0,
-      withEnrollments: {
-        total: 0,
-        totalFailed: 0,
-      },
     },
     studentnumbers: [],
   }
@@ -76,20 +67,6 @@ export const countTotalStats = (formattedStats, userHasAccessToAllStats: boolean
       bestEffortGrades[parsedGrade] += curr.students.grades[grade]
     })
 
-    const { passedFirst, passedEventually, neverPassed } = curr.students.categories
-
-    const newPassedFirst = passedFirst
-      ? acc.students.categories.passedFirst + passedFirst
-      : acc.students.categories.passedFirst
-
-    const newPassedEventually = passedEventually
-      ? acc.students.categories.passedEventually + passedEventually
-      : acc.students.categories.passedEventually
-
-    const newNeverPassed = neverPassed
-      ? acc.students.categories.neverPassed + neverPassed
-      : acc.students.categories.neverPassed
-
     return {
       ...acc,
       coursecode: curr.coursecode,
@@ -100,36 +77,19 @@ export const countTotalStats = (formattedStats, userHasAccessToAllStats: boolean
         totalEnrollments: acc.attempts.totalEnrollments + (curr.attempts.totalEnrollments || 0),
       },
       students: {
+        total: acc.students.total + curr.students.total,
         totalEnrollments: acc.students.totalEnrollments + (curr.students.totalEnrollments || 0),
         totalPassed: acc.students.totalPassed + curr.students.totalPassed,
-        totalFailed: acc.students.totalFailed + curr.students.totalFailed,
+        totalFailed: acc.students.totalFailed + (curr.students.totalFailed || 0),
         enrolledStudentsWithNoGrade:
           acc.students.enrolledStudentsWithNoGrade + (curr.students.enrolledStudentsWithNoGrade || 0),
-        categories: {
-          passedFirst: newPassedFirst,
-          passedEventually: newPassedEventually,
-          neverPassed: newNeverPassed,
-        },
         grades: bestEffortGrades,
-        withEnrollments: {
-          total: acc.students.withEnrollments.total + curr.students.withEnrollments.total,
-          totalFailed: acc.students.withEnrollments.totalFailed + curr.students.withEnrollments.totalFailed,
-        },
       },
     }
   }, initialStats)
 
-  const { passedFirst = 0, passedEventually = 0, neverPassed = 0 } = totals.students.categories
-  const { enrolledStudentsWithNoGrade = 0 } = totals.students
-  const total = passedFirst + passedEventually + neverPassed
-  totals.students.total = total
-  totals.students.passRate = (passedFirst + passedEventually) / total
-  totals.students.failRate = neverPassed / total
-
-  totals.students.withEnrollments.passRate = (passedFirst + passedEventually) / (total + enrolledStudentsWithNoGrade)
-  totals.students.withEnrollments.failRate =
-    (neverPassed + enrolledStudentsWithNoGrade) / (total + enrolledStudentsWithNoGrade)
-
+  totals.students.passRate = totals.students.totalPassed / totals.students.total
+  totals.students.failRate = 1 - totals.students.passRate
   const { failed, passed } = totals.attempts.categories
   totals.attempts.passRate = (100 * passed) / (passed + failed)
 
