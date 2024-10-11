@@ -212,10 +212,10 @@ const SingleCourseStats = ({
   const countStudentStats = (allStudents, enrolledNoGrade = 0, filter) => {
     const categories = countFilteredStudents(allStudents.categories, filter)
     const grades = countFilteredStudents(allStudents.grades, filter)
-    const { passedFirst = 0, passedEventually = 0, neverPassed = 0 } = categories
+    const { passedFirst = 0, passedEventually = 0 } = categories
     const total = Object.values(grades).reduce((acc, val) => acc + val, 0) + enrolledNoGrade
     const passRate = (passedFirst + passedEventually) / total
-    const failRate = (neverPassed + enrolledNoGrade) / total
+    const failRate = 1 - passRate
 
     return {
       totalPassed: passedFirst + passedEventually,
