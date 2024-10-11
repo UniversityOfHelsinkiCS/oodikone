@@ -23,11 +23,6 @@ export const countTotalStats = (formattedStats, userHasAccessToAllStats: boolean
       totalEnrollments: 0,
     },
     students: {
-      categories: {
-        passedFirst: 0,
-        passedEventually: 0,
-        neverPassed: 0,
-      },
       grades: {},
       passRate: 0,
       failRate: 0,
@@ -72,20 +67,6 @@ export const countTotalStats = (formattedStats, userHasAccessToAllStats: boolean
       bestEffortGrades[parsedGrade] += curr.students.grades[grade]
     })
 
-    const { passedFirst, passedEventually, neverPassed } = curr.students.categories
-
-    const newPassedFirst = passedFirst
-      ? acc.students.categories.passedFirst + passedFirst
-      : acc.students.categories.passedFirst
-
-    const newPassedEventually = passedEventually
-      ? acc.students.categories.passedEventually + passedEventually
-      : acc.students.categories.passedEventually
-
-    const newNeverPassed = neverPassed
-      ? acc.students.categories.neverPassed + neverPassed
-      : acc.students.categories.neverPassed
-
     return {
       ...acc,
       coursecode: curr.coursecode,
@@ -102,21 +83,13 @@ export const countTotalStats = (formattedStats, userHasAccessToAllStats: boolean
         totalFailed: acc.students.totalFailed + (curr.students.totalFailed || 0),
         enrolledStudentsWithNoGrade:
           acc.students.enrolledStudentsWithNoGrade + (curr.students.enrolledStudentsWithNoGrade || 0),
-        categories: {
-          passedFirst: newPassedFirst,
-          passedEventually: newPassedEventually,
-          neverPassed: newNeverPassed,
-        },
         grades: bestEffortGrades,
       },
     }
   }, initialStats)
 
-  const { passedFirst = 0, passedEventually = 0, neverPassed = 0 } = totals.students.categories
-  const { enrolledStudentsWithNoGrade = 0 } = totals.students
-  const total = passedFirst + passedEventually + neverPassed + enrolledStudentsWithNoGrade
-  totals.students.passRate = (passedFirst + passedEventually) / total
-  totals.students.failRate = neverPassed / total
+  totals.students.passRate = totals.students.totalPassed / totals.students.total
+  totals.students.failRate = 1 - totals.students.passRate
   const { failed, passed } = totals.attempts.categories
   totals.attempts.passRate = (100 * passed) / (passed + failed)
 

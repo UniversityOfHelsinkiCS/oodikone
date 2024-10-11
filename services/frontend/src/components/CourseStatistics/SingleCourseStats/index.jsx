@@ -210,7 +210,6 @@ const SingleCourseStats = ({
   }
 
   const countStudentStats = (allStudents, enrolledNoGrade = 0, filter) => {
-    const categories = countFilteredStudents(allStudents.categories, filter)
     const grades = countFilteredStudents(allStudents.grades, filter)
     const totalGrades = Object.values(grades).reduce((total, studentsWithGrade) => total + studentsWithGrade, 0)
     const totalPassed = Object.keys(grades).reduce((total, grade) => {
@@ -225,7 +224,6 @@ const SingleCourseStats = ({
       total,
       totalPassed,
       totalFailed,
-      categories,
       passRate,
       failRate,
       grades,
