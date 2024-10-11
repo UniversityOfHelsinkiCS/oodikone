@@ -17,16 +17,16 @@ import { ALL, getAllStudyProgrammes } from '@/selectors/courseStats'
 import { countTotalStats } from './countTotalStats'
 
 const countFilteredStudents = (stat, filter) => {
-  if (stat) {
-    return Object.entries(stat).reduce((acc, entry) => {
-      const [category, students] = entry
-      return {
-        ...acc,
-        [category]: students.filter(filter).length,
-      }
-    }, {})
+  if (!stat) {
+    return {}
   }
-  return {}
+  return Object.entries(stat).reduce((acc, entry) => {
+    const [category, students] = entry
+    return {
+      ...acc,
+      [category]: students.filter(filter).length,
+    }
+  }, {})
 }
 
 const SingleCourseStats = ({
@@ -212,18 +212,22 @@ const SingleCourseStats = ({
   const countStudentStats = (allStudents, enrolledNoGrade = 0, filter) => {
     const categories = countFilteredStudents(allStudents.categories, filter)
     const grades = countFilteredStudents(allStudents.grades, filter)
-    const { passedFirst = 0, passedEventually = 0 } = categories
-    const total = Object.values(grades).reduce((acc, val) => acc + val, 0) + enrolledNoGrade
-    const passRate = (passedFirst + passedEventually) / total
+    const totalGrades = Object.values(grades).reduce((total, studentsWithGrade) => total + studentsWithGrade, 0)
+    const totalPassed = Object.keys(grades).reduce((total, grade) => {
+      return grade !== '0' ? total + grades[grade] : total
+    }, 0)
+    const totalFailed = grades['0'] + enrolledNoGrade
+    const totalStudents = totalGrades + enrolledNoGrade
+    const passRate = totalPassed / totalStudents
     const failRate = 1 - passRate
 
     return {
-      totalPassed: passedFirst + passedEventually,
-      totalFailed: grades['0'] + enrolledNoGrade,
+      totalPassed,
+      totalFailed,
       categories,
       passRate,
       failRate,
-      total,
+      total: totalStudents,
       grades,
     }
   }

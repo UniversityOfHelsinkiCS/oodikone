@@ -11,8 +11,8 @@ import { getCourseAlternatives } from '@/selectors/courseStats'
 
 const formatPercentage = passRate => (Number.isNaN(passRate) ? '–' : `${(passRate * 100).toFixed(2)} %`)
 
-const getGradeColumns = grades =>
-  grades.map(({ key, title }) =>
+const getGradeColumns = grades => {
+  return grades.map(({ key, title }) =>
     getSortableColumn({
       key,
       title,
@@ -20,6 +20,7 @@ const getGradeColumns = grades =>
       onlyInGradeView: true,
     })
   )
+}
 
 const getColumns = (stats, showGrades, userHasAccessToAllStats, alternatives, separate, unifyCourses) => {
   const showPopulation = (yearcode, years) => {
@@ -128,7 +129,7 @@ const getColumns = (stats, showGrades, userHasAccessToAllStats, alternatives, se
     },
     {
       key: 'PASS_RATE',
-      title: 'Pass-%',
+      title: 'Pass rate',
       getRowVal: s => (s.rowObfuscated ? 0 : s.students.passRate * 100),
       getRowContent: s => (s.rowObfuscated ? '5 or fewer students' : formatPercentage(s.students.passRate)),
       filterType: 'range',
@@ -141,7 +142,7 @@ const getColumns = (stats, showGrades, userHasAccessToAllStats, alternatives, se
     },
     {
       key: 'FAIL_RATE',
-      title: 'Fail-%',
+      title: 'Fail rate',
       filterType: 'range',
       getRowVal: s => (s.rowObfuscated ? 'NA' : (s.students.failRate || 0) * 100),
       getRowContent: s => (s.rowObfuscated ? 'NA' : formatPercentage(s.students.failRate || 0)),
