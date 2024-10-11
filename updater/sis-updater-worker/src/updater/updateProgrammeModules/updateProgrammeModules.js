@@ -28,6 +28,7 @@ const resolveProgramme = async programme => {
     curriculum_period_ids: programme.curriculum_period_ids ?? [],
     order: 0,
     degreeProgrammeType: programme?.degree_program_type_urn ?? null,
+    minimumCredits: programme?.degree_program_type_urn ? programme.target_credits.min : null,
     children,
   }
 }

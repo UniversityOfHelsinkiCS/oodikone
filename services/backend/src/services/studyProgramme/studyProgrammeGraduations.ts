@@ -150,7 +150,7 @@ const getGraduationTimeAndThesisWriterStats = async ({
     }
   }
 
-  const goal = getGoal(studyProgramme)
+  const goal = await getGoal(studyProgramme)
   const times: GraduationTimes = { medians: [], goal }
   const comboTimes: GraduationTimes = { medians: [], goal: goal + 36 }
 
