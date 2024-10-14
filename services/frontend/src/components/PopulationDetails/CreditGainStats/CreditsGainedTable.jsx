@@ -39,7 +39,9 @@ export const CreditsGainedTable = ({ filteredStudents, programmeGoalTime, type, 
   } else {
     creditList = filteredStudents.map(({ studentNumber, courses }) => ({
       studentNumber,
-      credits: getStudentTotalCredits({ courses }),
+      credits: getStudentTotalCredits({
+        courses: courses.filter(course => moment(course.date).isBetween(startDate ?? start, endDate ?? end)),
+      }),
     }))
   }
 
