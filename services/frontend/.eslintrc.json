@@ -30,10 +30,8 @@
       },
       "rules": {
         "import/prefer-default-export": "off",
-        "@typescript-eslint/lines-between-class-members": "off",
         "@typescript-eslint/no-explicit-any": "off",
-        "@typescript-eslint/no-shadow": "off",
-        "@typescript-eslint/return-await": "off"
+        "@typescript-eslint/no-unnecessary-type-assertion": "error"
       }
     }
   ],

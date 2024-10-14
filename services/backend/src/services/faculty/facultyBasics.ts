@@ -106,7 +106,7 @@ const calculateCombinedStats = async (
     } else {
       for (let i = 0; i < tableStatsForProgramme.length; i++) {
         for (let j = 1; j < tableStatsForProgramme[i].length; j++) {
-          ;(combinedTableStats[i][j] as number) += tableStatsForProgramme[i][j] as number
+          ;(combinedTableStats[i][j] as number) += tableStatsForProgramme[i][j]
         }
       }
     }

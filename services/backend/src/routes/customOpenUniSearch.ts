@@ -19,7 +19,7 @@ interface GetSearchRequest extends Request {
 }
 
 router.get('/', async (req: GetSearchRequest, res: Response) => {
-  const courseCodes = JSON.parse(req.query?.courselist as string) || []
+  const courseCodes = JSON.parse(req.query?.courselist) || []
   const startDate = req.query?.startdate !== 'null' ? new Date(req.query.startdate) : new Date(2017, 7, 1, 0, 0, 0)
   const endDate = req.query?.enddate !== 'null' ? new Date(req.query.enddate) : new Date()
   if (req.query?.enddate === 'null') {
