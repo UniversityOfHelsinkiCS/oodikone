@@ -30,7 +30,9 @@ class ErrorBoundary extends Component {
     const { actionHistory } = this.props
     const cleanedActionHistory = actionHistory ? actionHistory.map(({ payload, ...rest }) => rest) : []
     const encoder = new TextEncoder()
-    if (sent === error) return
+    if (sent === error) {
+      return
+    }
     sent = error
     // Sentry's maximum for an individual extra data item is 16kB so let's make sure we don't exceed that
     while (encoder.encode(JSON.stringify(cleanedActionHistory)).length > 16000) {
@@ -48,7 +50,9 @@ class ErrorBoundary extends Component {
   render() {
     const { hasError } = this.state
     const { children } = this.props
-    if (!hasError) return children
+    if (!hasError) {
+      return children
+    }
 
     return (
       <Suspense fallback={<Loader active inline="centered" />}>
@@ -57,6 +61,7 @@ class ErrorBoundary extends Component {
     )
   }
 }
+
 const mapStateToProps = ({ actionHistory }) => ({ actionHistory })
 
 export const ConnectedErrorBoundary = connect(mapStateToProps, null)(ErrorBoundary)

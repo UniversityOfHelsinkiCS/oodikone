@@ -1,5 +1,5 @@
 import { flatten } from 'lodash'
-import { connect, useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Form, Header, Label, Segment } from 'semantic-ui-react'
 
 import { getFullStudyProgrammeRights } from '@/common'
@@ -20,18 +20,19 @@ import { DataExport } from './DataExport'
 const unObjectifyProperty = ({ obj, property }) => {
   const suspectField = obj[property]
   if (typeof suspectField === 'object' && suspectField !== null) {
-    if (suspectField.en) return { ...obj, [property]: suspectField.en }
-
+    if (suspectField.en) {
+      return { ...obj, [property]: suspectField.en }
+    }
     throw Error(`Invalid object being tried to pass to React: ${JSON.stringify(suspectField)}`)
   }
-
   return { ...obj, [property]: suspectField }
 }
 
-const SummaryTab = ({ setValue, onClickCourse }) => {
+export const SummaryTab = ({ onClickCourse }) => {
   const { roles, programmeRights } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const userHasAccessToAllStats = userHasAccessToAllCourseStats(roles, fullStudyProgrammeRights)
+  const dispatch = useDispatch()
   const programmes = useSelector(state => getAllStudyProgrammes(state))
   const form = useSelector(({ courseSummaryForm }) => courseSummaryForm)
   const statistics = useSelector(state => summaryStatistics(state, userHasAccessToAllStats))
@@ -43,7 +44,7 @@ const SummaryTab = ({ setValue, onClickCourse }) => {
     if ((!form.programmes.includes(ALL.value) && value.includes(ALL.value)) || value.length === 0) {
       selected = [ALL.value]
     }
-    setValue(name, selected)
+    dispatch(setValue(name, selected))
   }
 
   const data = statistics.map(stat => {
@@ -75,7 +76,7 @@ const SummaryTab = ({ setValue, onClickCourse }) => {
             <>
               <Header as="h4">Filter statistics by study programmes</Header>
               <ProgrammeDropdown
-                label="Study programmes:"
+                label="Study programmes"
                 name="programmes"
                 onChange={handleChange}
                 options={options}
@@ -84,7 +85,7 @@ const SummaryTab = ({ setValue, onClickCourse }) => {
             </>
           )}
           <Form.Field>
-            <label>Timeframe:</label>
+            <label>Timeframe</label>
             <Label.Group>
               {queryInfo.timeframe.map(objBeforeUbObjectifying => {
                 const obj = unObjectifyProperty({ obj: objBeforeUbObjectifying, property: 'name' })
@@ -110,5 +111,3 @@ const SummaryTab = ({ setValue, onClickCourse }) => {
     </div>
   )
 }
-
-export const ConnectedSummaryTab = connect(null, { setValue })(SummaryTab)
