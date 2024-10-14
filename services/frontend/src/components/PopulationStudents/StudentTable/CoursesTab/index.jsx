@@ -229,7 +229,7 @@ const CoursesTable = ({ curriculum, includeSubstitutions, populationCourses, stu
       if (!student.enrollments) {
         return false
       }
-      return student.enrollments.some(enrollment => enrollment.course_code === code && enrollment.state === 'ENROLLED')
+      return student.enrollments.some(enrollment => enrollment.course_code === code)
     }
 
     const getCompletionDate = (student, code) => {
@@ -238,9 +238,7 @@ const CoursesTable = ({ curriculum, includeSubstitutions, populationCourses, stu
     }
 
     const getEnrollmentDate = (student, code) => {
-      const enrollment = student.enrollments.find(
-        enrollment => enrollment.course_code === code && enrollment.state === 'ENROLLED'
-      )
+      const enrollment = student.enrollments.find(enrollment => enrollment.course_code === code)
       return enrollment.enrollment_date_time
     }
 

@@ -15,7 +15,6 @@ interface StudentCredit {
 interface StudentEnrollment {
   date: Date
   courseCode: string
-  state: EnrollmentState
   substitution: string | null
 }
 
@@ -95,9 +94,9 @@ const getCredits = async (
 }
 
 const getEnrollments = async (courses: Courses, fullCourseCodes: string[], studentNumbers: string[]) => {
-  const enrollments: Array<Pick<Enrollment, 'course_code' | 'enrollment_date_time' | 'studentnumber' | 'state'>> =
+  const enrollments: Array<Pick<Enrollment, 'course_code' | 'enrollment_date_time' | 'studentnumber'>> =
     await Enrollment.findAll({
-      attributes: ['course_code', 'enrollment_date_time', 'studentnumber', 'state'],
+      attributes: ['course_code', 'enrollment_date_time', 'studentnumber'],
       where: {
         course_code: {
           [Op.in]: fullCourseCodes,
@@ -117,7 +116,6 @@ const getEnrollments = async (courses: Courses, fullCourseCodes: string[], stude
       substitution: originalCode ? enrollment.course_code : null,
       studentNumber: enrollment.studentnumber,
       date: enrollment.enrollment_date_time,
-      state: enrollment.state,
     }
   })
   return formattedEnrollments
@@ -201,7 +199,6 @@ export const getCompletedCourses = async (studentNumbers: string[], courseCodes:
     studentCredits[enrollment.studentNumber].enrollments.push({
       date: enrollment.date,
       courseCode: enrollment.courseCode,
-      state: enrollment.state,
       substitution: enrollment.substitution,
     })
   })

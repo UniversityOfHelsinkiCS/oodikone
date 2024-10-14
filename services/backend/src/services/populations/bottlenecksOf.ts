@@ -11,7 +11,8 @@ import {
   parseCreditInfo,
   parseQueryParams,
   Query,
-  QueryResult,
+  CoursesQueryResult,
+  EnrollmentsQueryResult,
 } from './shared'
 import { getStudentNumbersWithAllStudyRightElements } from './studentNumbersWithAllElements'
 
@@ -20,7 +21,7 @@ const getStudentsAndCourses = async (
   selectedStudents: string[] | undefined,
   studentNumbers: string[] | null,
   courseCodes: string[] | undefined
-) => {
+): Promise<[number, CoursesQueryResult, EnrollmentsQueryResult]> => {
   if (!studentNumbers) {
     const { months, studyRights, startDate, endDate, exchangeStudents, nondegreeStudents, transferredStudents } = params
     const studentnumbers =
@@ -89,10 +90,10 @@ export const bottlenecksOf = async (query: Query, studentNumbers: string[] | nul
 
   // To fix failed and enrolled, no grade filter options some not so clean and nice solutions were added
   // Get the data with actual 1. courses and filtered students. 2. all students by year, if provided.
-  const [[allStudents, courses, courseEnrollements], [, allCourses]] = (await Promise.all([
+  const [[allStudents, courses, courseEnrollements], [, allCourses]] = await Promise.all([
     getStudentsAndCourses(params, query.selectedStudents, studentNumbers, query.courses),
     getStudentsAndCourses(params, allStudentsByYears, null, query.courses),
-  ])) as [[number, QueryResult, QueryResult], [number, QueryResult]]
+  ])
 
   // Get the substitution codes for the fetch data by selected students
   const substitutionCodes = Object.entries(courses).reduce(
@@ -112,7 +113,8 @@ export const bottlenecksOf = async (query: Query, studentNumbers: string[] | nul
 
   const stats = {} as Record<string, CourseStatsCounter>
   const startYear = parseInt(query.year, 10)
-  let coursesToLoop = courses.concat(substitutionCourses)
+  let coursesToLoop: Array<EnrollmentsQueryResult[number] | CoursesQueryResult[number]> =
+    courses.concat(substitutionCourses)
   const courseCodes = coursesToLoop.map(course => course.code)
 
   // This fixes a problem when "Enrolled, no grade" is chosen. The SQL query for fetching
@@ -146,7 +148,7 @@ export const bottlenecksOf = async (query: Query, studentNumbers: string[] | nul
         }
       })
     }
-    if (course.credits) {
+    if ('credits' in course) {
       course.credits.forEach(credit => {
         const { studentnumber, passingGrade, improvedGrade, failingGrade, grade, date } = parseCreditInfo(credit)
         if ((query?.selectedStudents && query?.selectedStudents.includes(studentnumber)) || !query?.selectedStudents) {

@@ -12,7 +12,7 @@ import {
   SISStudyRightElement,
 } from '../models'
 import { Tag, TagStudent } from '../models/kone'
-import { UnifyStatus } from '../types'
+import { EnrollmentState, UnifyStatus } from '../types'
 import { splitByEmptySpace } from '../util'
 import logger from '../util/logger'
 
@@ -182,11 +182,17 @@ export const findByCourseAndSemesters = async (
           AND e.course_code IN (:coursecodes)
           AND e.semestercode BETWEEN ${fromSemester} AND ${toSemester}
           AND e.enrollment_date_time >= '2021-05-31'
-          AND e.state IN ('ENROLLED', 'CONFIRMED')
+          AND e.state = :enrollmentState
       );
     `,
     {
-      replacements: { coursecodes, minYearCode: from, maxYearCode: to, isOpen: unifyStatus },
+      replacements: {
+        coursecodes,
+        minYearCode: from,
+        maxYearCode: to,
+        isOpen: unifyStatus,
+        enrollmentState: EnrollmentState.ENROLLED,
+      },
       type: QueryTypes.SELECT,
       raw: true,
     }

@@ -2,7 +2,7 @@ import crypto from 'crypto'
 import { Op } from 'sequelize'
 
 import { Course, Credit, Enrollment, Organization, SISStudyRightElement } from '../../models'
-import { Name, Unification } from '../../types'
+import { EnrollmentState, Name, Unification } from '../../types'
 import { isOpenUniCourseCode } from '../../util'
 import { getSortRank } from '../../util/sortRank'
 import { CourseYearlyStatsCounter } from './courseYearlyStatsCounter'
@@ -317,7 +317,12 @@ export const getCourseYearlyStats = async (
   })
   const enrollments = await Enrollment.findAll({
     attributes: ['studentnumber'],
-    where: { course_code: { [Op.in]: courseCodes } },
+    where: {
+      course_code: {
+        [Op.in]: courseCodes,
+      },
+      state: EnrollmentState.ENROLLED,
+    },
   })
 
   const studentNumbers = {}
