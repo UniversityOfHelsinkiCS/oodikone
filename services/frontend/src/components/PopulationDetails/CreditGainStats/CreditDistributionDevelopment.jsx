@@ -99,7 +99,13 @@ const getChartData = (students, timeSlots, programme, timeDivision, cumulative, 
 
               const [min, max] = limit
 
-              return (min === undefined || credits > min) && (max === undefined || credits <= max)
+              if (min == null) {
+                return credits < max
+              }
+              if (max == null) {
+                return credits >= min
+              }
+              return credits >= min && credits < max
             })
 
         data[rangeIndex][timeSlotIndex].y += 1
