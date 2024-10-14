@@ -26,7 +26,7 @@ const CourseSelector = ({ courses, selected, setSelected }) => {
 
 const CourseLabel = ({ code, name, primary }) => {
   return (
-    <Label color={primary ? 'blue' : undefined} size="large" style={{ margin: 5 }}>
+    <Label color={primary ? 'blue' : undefined} size="large" style={{ marginBottom: 5, marginRight: 5 }}>
       {code} {name}
     </Label>
   )
@@ -51,14 +51,14 @@ export const SingleCourseTab = ({ selected, setSelected, userHasAccessToAllStats
       <Segment>
         <Header as="h4">Selected courses</Header>
         {courses.length > 1 && <CourseSelector courses={courses} selected={selected} setSelected={setSelected} />}
-        {stats[selected].alternatives.map(course => (
-          <CourseLabel
-            code={course.code}
-            key={course.code}
-            name={getTextIn(course.name)}
-            primary={selected === course.code}
-          />
-        ))}
+        <Header as="h5">Course</Header>
+        <CourseLabel code={selected} key={selected} name={getTextIn(stats[selected].name)} primary />
+        <Header as="h5">Substitutions</Header>
+        {stats[selected].alternatives
+          .filter(course => course.code !== selected)
+          .map(course => (
+            <CourseLabel code={course.code} key={course.code} name={getTextIn(course.name)} />
+          ))}
       </Segment>
       <SingleCourseStats
         availableStats={availableStats[selected]}
