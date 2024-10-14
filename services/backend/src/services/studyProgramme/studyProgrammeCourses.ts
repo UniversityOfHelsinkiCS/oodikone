@@ -25,6 +25,7 @@ const getAllStudyProgrammeCourses = async (studyProgramme: string) => {
   const normalCourses = await getAllProgrammeCourses(providerCode)
   return normalCourses.reduce((acc, curr) => {
     acc.push(curr.code)
+    // note to FD: we probably don't want to change codes based on 'AY'-prefix
     if (curr.substitutions && curr.substitutions.includes(`AY${curr.code}`)) {
       acc.push(`AY${curr.code}`)
     }
