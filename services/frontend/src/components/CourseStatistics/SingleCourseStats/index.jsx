@@ -1,8 +1,7 @@
 import { difference, flatten, max, min, pickBy, uniq } from 'lodash'
-import { arrayOf, bool, func, number, objectOf, oneOfType, shape, string } from 'prop-types'
 import qs from 'query-string'
 import { useEffect, useMemo, useState } from 'react'
-import { connect } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useHistory, useLocation } from 'react-router-dom'
 import { Button, Form, Grid, Header, Popup, Segment } from 'semantic-ui-react'
 
@@ -29,23 +28,18 @@ const countFilteredStudents = (stat, filter) => {
   }, {})
 }
 
-const SingleCourseStats = ({
-  stats,
-  availableStats,
-  setSelectedCourse,
-  clearSelectedCourse,
-  programmes,
-  userHasAccessToAllStats,
-  unifyCourses,
-}) => {
+export const SingleCourseStats = ({ stats, availableStats, userHasAccessToAllStats }) => {
   const history = useHistory()
   const location = useLocation()
+  const dispatch = useDispatch()
   const { getTextIn } = useLanguage()
   const [primary, setPrimary] = useState([ALL.value])
   const [comparison, setComparison] = useState([])
   const [fromYear, setFromYear] = useState(0)
   const [toYear, setToYear] = useState(0)
   const [separate, setSeparate] = useState(null)
+  const programmes = useSelector(state => getAllStudyProgrammes(state))
+  const unifyCourses = useSelector(state => state.courseSearch.openOrRegular)
   const { coursecode } = stats
 
   const { data: semesterData } = useGetSemestersQuery()
@@ -99,15 +93,15 @@ const SingleCourseStats = ({
       const { separate } = parseQueryFromUrl()
       setSeparate(separate)
     }
-    setSelectedCourse(coursecode)
+    dispatch(setSelectedCourse(coursecode))
 
-    const yearcodes = stats.statistics.map(s => s.yearcode)
-    const initFromYear = min(yearcodes)
-    const initToYear = max(yearcodes)
+    const yearCodes = stats.statistics.map(s => s.yearcode)
+    const initFromYear = min(yearCodes)
+    const initToYear = max(yearCodes)
     setFromYear(initFromYear)
     setToYear(initToYear)
 
-    return () => clearSelectedCourse()
+    return () => dispatch(clearSelectedCourse())
   }, [])
 
   useEffect(() => {
@@ -483,52 +477,3 @@ const SingleCourseStats = ({
     </div>
   )
 }
-
-SingleCourseStats.propTypes = {
-  stats: shape({
-    alternatives: arrayOf(
-      shape({
-        code: string,
-        name: shape({ fi: string, en: string, sv: string }),
-      })
-    ),
-    programmes: objectOf(
-      shape({
-        name: shape({}),
-        students: shape({}),
-      })
-    ),
-    statistics: arrayOf(
-      shape({
-        code: oneOfType([number, string]),
-        name: shape({ fi: string, en: string, sv: string }),
-        attempts: objectOf(
-          shape({
-            failed: arrayOf(string),
-            passed: arrayOf(string),
-          })
-        ),
-      })
-    ),
-    name: shape({ fi: string, en: string, sv: string }),
-    coursecode: string,
-  }).isRequired,
-  programmes: arrayOf(shape({})).isRequired,
-  setSelectedCourse: func.isRequired,
-  clearSelectedCourse: func.isRequired,
-  userHasAccessToAllStats: bool.isRequired,
-}
-
-const mapStateToProps = state => {
-  return {
-    programmes: getAllStudyProgrammes(state),
-    unifyCourses: state.courseSearch.openOrRegular,
-  }
-}
-
-const mapDispatchToProps = {
-  setSelectedCourse,
-  clearSelectedCourse,
-}
-
-export const ConnectedSingleCourseStats = connect(mapStateToProps, mapDispatchToProps)(SingleCourseStats)

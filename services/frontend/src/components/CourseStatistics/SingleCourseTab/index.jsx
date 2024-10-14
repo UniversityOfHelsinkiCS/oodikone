@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { Divider, Form, Header, Label, Segment } from 'semantic-ui-react'
 
-import { ConnectedSingleCourseStats as SingleCourseStats } from '@/components/CourseStatistics/SingleCourseStats'
+import { SingleCourseStats } from '@/components/CourseStatistics/SingleCourseStats'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { setSelectedCourse } from '@/redux/singleCourseStats'
 import { getAvailableStats, getCourses, getCourseStats } from '@/selectors/courseStats'
