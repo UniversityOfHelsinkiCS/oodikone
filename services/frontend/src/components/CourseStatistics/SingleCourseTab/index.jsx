@@ -24,13 +24,11 @@ const CourseSelector = ({ courses, selected, setSelected }) => {
   )
 }
 
-const CourseLabel = ({ code, name, primary }) => {
-  return (
-    <Label color={primary ? 'blue' : undefined} size="large" style={{ marginBottom: 5, marginRight: 5 }}>
-      {code} {name}
-    </Label>
-  )
-}
+const CourseLabel = ({ code, name, primary }) => (
+  <Label color={primary ? 'blue' : undefined} size="large" style={{ marginBottom: 5, marginRight: 5 }}>
+    {code} {name}
+  </Label>
+)
 
 export const SingleCourseTab = ({ selected, setSelected, userHasAccessToAllStats }) => {
   const { getTextIn } = useLanguage()
