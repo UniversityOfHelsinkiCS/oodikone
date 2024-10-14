@@ -91,7 +91,7 @@ describe('Course Statistics tests', () => {
         cy.contains('td', '200012').click()
         cy.contains('Search for courses').should('not.exist')
         cy.contains(
-          'ON-310 Tieteellisen kirjoittamisen seminaarin alkuopetus: Tieteellisen kirjallisen työn ja tiedonhankinnan perustaidot200012'
+          'ON-310 Tieteellisen kirjoittamisen seminaarin alkuopetus: Tieteellisen kirjallisen työn ja tiedonhankinnan perustaidot'
         )
         cy.contains('200012 Tieteellisen kirjallisen työn ja tiedonhankinnan perustaidot')
         cy.contains('Show population').should('be.enabled').click()
