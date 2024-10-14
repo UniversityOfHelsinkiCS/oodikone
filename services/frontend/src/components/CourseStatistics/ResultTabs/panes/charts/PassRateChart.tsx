@@ -14,13 +14,14 @@ exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
 accessibility(ReactHighcharts.Highcharts)
 
+const colorsRelative = [color.green, color.red, chartColor.redLight]
+const colors = [chartColor.blue, ...colorsRelative]
+
 const passRateAttemptGraphOptions = (isRelative: boolean, categories: string[], max: number, title: string) => ({
   chart: {
     type: 'column',
   },
-  colors: isRelative
-    ? [color.green, color.red, chartColor.redLight]
-    : [chartColor.blue, color.green, color.red, chartColor.redLight],
+  colors: isRelative ? colorsRelative : colors,
   credits: {
     enabled: false,
   },
@@ -55,9 +56,7 @@ const passRateStudentGraphOptions = (isRelative: boolean, categories: string[], 
   chart: {
     type: 'column',
   },
-  colors: isRelative
-    ? [chartColor.greenDark, chartColor.redDark, chartColor.redLight]
-    : [chartColor.blue, chartColor.greenDark, chartColor.redDark, chartColor.redLight],
+  colors: isRelative ? colorsRelative : colors,
   credits: {
     enabled: false,
   },
