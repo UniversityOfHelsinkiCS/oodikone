@@ -2,7 +2,7 @@ import { InferAttributes, Op, WhereOptions } from 'sequelize'
 
 import { Course, Credit, Enrollment, Student, SISStudyRight } from '../../models'
 import { OpenUniPopulationSearch } from '../../models/kone'
-import { ExtentCode } from '../../types'
+import { EnrollmentState, ExtentCode } from '../../types'
 import { formatCourseInfo, formatOpenCredits, formatOpenEnrollments, formatStudentInfo } from './format'
 
 export const getCredits = async (courseCodes: string[], startdate: Date) =>
@@ -47,6 +47,7 @@ export const getEnrollments = async (courseCodes: string[], startDate: Date, end
             [Op.gte]: startDate,
           },
         },
+        state: EnrollmentState.ENROLLED,
       },
     })
   ).map(formatOpenEnrollments)

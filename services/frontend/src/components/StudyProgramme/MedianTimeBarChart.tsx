@@ -40,7 +40,7 @@ export const MedianTimeBarChart = ({ byStartYear, data, goal, title }: MedianTim
     return Number.isNaN(percent) ? 0 : percent
   }
 
-  const getDataLabel = (amount: number, classSize: number, title: string) => {
+  const getDataLabel = (amount: number, classSize: number) => {
     if (byStartYear && title !== 'Bachelor + master studyright') {
       return `${amount} graduated (${getPercentage(amount, classSize)} % of class)`
     }
@@ -52,14 +52,7 @@ export const MedianTimeBarChart = ({ byStartYear, data, goal, title }: MedianTim
     return data.length * multiplier + 100
   }
 
-  const getTooltipText = (
-    amount: number,
-    y: number,
-    year: string,
-    statistics: Statistics,
-    classSize: number,
-    title: string
-  ) => {
+  const getTooltipText = (amount: number, y: number, year: string, statistics: Statistics, classSize: number) => {
     const sortingText =
       byStartYear && title !== 'Bachelor + master studyright'
         ? `<b>From class of ${year}, ${amount}/${classSize} students have graduated</b>`
@@ -87,14 +80,7 @@ export const MedianTimeBarChart = ({ byStartYear, data, goal, title }: MedianTim
         y: number
         point: { amount: number; name: string; statistics: Statistics; classSize: number }
       }) {
-        return getTooltipText(
-          this.point.amount,
-          this.y,
-          this.point.name,
-          this.point.statistics,
-          this.point.classSize,
-          title
-        )
+        return getTooltipText(this.point.amount, this.y, this.point.name, this.point.statistics, this.point.classSize)
       },
     },
     plotOptions: {
@@ -118,7 +104,7 @@ export const MedianTimeBarChart = ({ byStartYear, data, goal, title }: MedianTim
               textOutline: 'none',
             },
             formatter: function (this: { point: { amount: number; classSize: number } }) {
-              return getDataLabel(this.point.amount, this.point.classSize, title)
+              return getDataLabel(this.point.amount, this.point.classSize)
             },
           },
         ],

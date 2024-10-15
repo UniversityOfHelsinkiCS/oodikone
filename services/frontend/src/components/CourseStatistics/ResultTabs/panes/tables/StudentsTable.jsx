@@ -11,8 +11,8 @@ import { getCourseAlternatives } from '@/selectors/courseStats'
 
 const formatPercentage = passRate => (Number.isNaN(passRate) ? '–' : `${(passRate * 100).toFixed(2)} %`)
 
-const getGradeColumns = grades =>
-  grades.map(({ key, title }) =>
+const getGradeColumns = grades => {
+  return grades.map(({ key, title }) =>
     getSortableColumn({
       key,
       title,
@@ -20,6 +20,7 @@ const getGradeColumns = grades =>
       onlyInGradeView: true,
     })
   )
+}
 
 const getColumns = (stats, showGrades, userHasAccessToAllStats, alternatives, separate, unifyCourses) => {
   const showPopulation = (yearcode, years) => {
@@ -37,7 +38,7 @@ const getColumns = (stats, showGrades, userHasAccessToAllStats, alternatives, se
 
   const columns = [
     {
-      key: 'TIME-PARENT',
+      key: 'TIME_PARENT',
       merge: true,
       mergeHeader: true,
       children: [
@@ -55,7 +56,7 @@ const getColumns = (stats, showGrades, userHasAccessToAllStats, alternatives, se
           ),
         },
         {
-          key: 'TIME-ICON',
+          key: 'TIME_ICON',
           export: false,
           getRowContent: s => {
             if (s.name !== 'Total' && userHasAccessToAllStats) {
@@ -71,7 +72,7 @@ const getColumns = (stats, showGrades, userHasAccessToAllStats, alternatives, se
       ],
     },
     {
-      key: 'TOTAL',
+      key: 'TOTAL_STUDENTS',
       title: 'Total\nstudents',
       helpText: 'Total count of students, including enrolled students with no grade',
       cellProps: s => ({
@@ -81,8 +82,8 @@ const getColumns = (stats, showGrades, userHasAccessToAllStats, alternatives, se
         },
       }),
       filterType: 'range',
-      getRowVal: s => (s.rowObfuscated ? 5 : s.students.withEnrollments.total),
-      getRowContent: s => (s.rowObfuscated ? '5 or fewer students' : s.students.withEnrollments.total),
+      getRowVal: s => (s.rowObfuscated ? 5 : s.students.total),
+      getRowContent: s => (s.rowObfuscated ? '5 or fewer students' : s.students.total),
       getCellProps: s => defineCellColor(s.rowObfuscated),
     },
     {
@@ -113,7 +114,7 @@ const getColumns = (stats, showGrades, userHasAccessToAllStats, alternatives, se
     },
     ...getGradeColumns(resolveGrades(stats)),
     {
-      key: 'ENROLLMENTS_MISSING_GRADE',
+      key: 'ENROLLED_NO_GRADE',
       title: 'Enrolled,\nno grade',
       filterType: 'range',
       helpText: 'Total count of students with a valid enrollment and no passing or failing grade',
@@ -128,10 +129,9 @@ const getColumns = (stats, showGrades, userHasAccessToAllStats, alternatives, se
     },
     {
       key: 'PASS_RATE',
-      title: 'Pass-%',
-      getRowVal: s => (s.rowObfuscated ? 0 : s.students.withEnrollments.passRate * 100),
-      getRowContent: s =>
-        s.rowObfuscated ? '5 or fewer students' : formatPercentage(s.students.withEnrollments.passRate),
+      title: 'Pass rate',
+      getRowVal: s => (s.rowObfuscated ? 0 : s.students.passRate * 100),
+      getRowContent: s => (s.rowObfuscated ? '5 or fewer students' : formatPercentage(s.students.passRate)),
       filterType: 'range',
       cellProps: s => ({
         style: {
@@ -142,7 +142,7 @@ const getColumns = (stats, showGrades, userHasAccessToAllStats, alternatives, se
     },
     {
       key: 'FAIL_RATE',
-      title: 'Fail-%',
+      title: 'Fail rate',
       filterType: 'range',
       getRowVal: s => (s.rowObfuscated ? 'NA' : (s.students.failRate || 0) * 100),
       getRowContent: s => (s.rowObfuscated ? 'NA' : formatPercentage(s.students.failRate || 0)),

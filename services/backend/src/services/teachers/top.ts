@@ -1,12 +1,11 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-import { Op } from 'sequelize'
+import { col, Op } from 'sequelize'
 
-import { Course, Credit, Semester, Teacher } from '../../models'
+import { Credit, Semester, Teacher } from '../../models'
 import { CreditTypeCode } from '../../types'
 import logger from '../../util/logger'
 import { redisClient } from '../redis'
 import { getCurrentSemester, getSemestersAndYears } from '../semesters'
-import { isRegularCourse, TeacherStats } from './helpers'
+import { TeacherStats } from './helpers'
 
 export enum CategoryID {
   ALL = 'all',
@@ -21,7 +20,7 @@ const categories = {
 export const getTeacherStats = async (categoryId: string, yearCode: number) => {
   const { redisKey } = categories[categoryId]
   const category = await redisClient.hGet(redisKey, `${yearCode}`)
-  return category ? JSON.parse(category) : []
+  return category ? JSON.parse(category) : null
 }
 
 const setTeacherStats = async (categoryId: string, yearCode: number, stats: TeacherStats[]) => {
@@ -38,33 +37,41 @@ export const getCategoriesAndYears = async () => {
   }
 }
 
-const getCreditsWithTeachersForYear = async (yearCode: number) => {
+const getCreditsWithTeachersForYear = async (semesters: string[]) => {
   const credits = await Credit.findAll({
-    attributes: ['id', 'credits', 'credittypecode', 'isStudyModule', 'is_open'],
-    include: [
-      {
-        model: Semester,
-        required: true,
+    attributes: [
+      'credits',
+      'credittypecode',
+      'isStudyModule',
+      'is_open',
+      [col('teachers.id'), 'teacherId'],
+      [col('teachers.name'), 'teacherName'],
+    ],
+    include: {
+      model: Teacher,
+      through: {
         attributes: [],
-        where: {
-          yearcode: {
-            [Op.eq]: yearCode,
-          },
+      },
+      attributes: [],
+      where: {
+        id: {
+          [Op.notLike]: 'hy-hlo-org%',
         },
       },
-      {
-        model: Teacher,
-        attributes: ['id', 'name'],
-        required: true,
+    },
+    where: {
+      semester_composite: {
+        [Op.in]: semesters,
       },
-      {
-        model: Course,
-        attributes: ['code', 'name', 'coursetypecode'],
-        required: true,
-      },
-    ],
+    },
+    raw: true,
   })
-  return credits
+  return credits as unknown as Array<
+    Pick<Credit, 'credits' | 'credittypecode' | 'isStudyModule' | 'is_open'> & {
+      teacherId: string
+      teacherName: string
+    }
+  >
 }
 
 const updatedStats = (
@@ -76,22 +83,17 @@ const updatedStats = (
   transferred: boolean
 ) => {
   const { id, name } = teacher
-  const stats = teacherStats[id] || { id, name, passed: 0, failed: 0, credits: 0, transferred: 0 }
+  if (!teacherStats[id]) {
+    teacherStats[id] = { id, name, passed: 0, failed: 0, credits: 0, transferred: 0 }
+  }
+  const stats = teacherStats[id]
   if (passed) {
-    return {
-      ...stats,
-      passed: stats.passed + 1,
-      credits: transferred ? stats.credits : stats.credits + credits,
-      transferred: transferred ? stats.transferred + credits : stats.transferred,
-    }
+    stats.passed += 1
+    stats.credits = transferred ? stats.credits : stats.credits + credits
+    stats.transferred = transferred ? stats.transferred + credits : stats.transferred
+  } else if (failed) {
+    stats.failed += 1
   }
-  if (failed) {
-    return {
-      ...stats,
-      failed: stats.failed + 1,
-    }
-  }
-  return stats
 }
 
 const filterTopTeachers = (stats: Record<string, TeacherStats>, limit: number = 50) => {
@@ -105,30 +107,30 @@ const filterTopTeachers = (stats: Record<string, TeacherStats>, limit: number = 
 }
 
 const findTopTeachers = async (yearCode: number) => {
-  const credits = await getCreditsWithTeachersForYear(yearCode)
-  const all = {} as Record<string, TeacherStats>
-  const openuni = {} as Record<string, TeacherStats>
-  credits
-    .filter(isRegularCourse)
-    .map(credit => {
-      const { credits, credittypecode, is_open } = credit
-      const teachers = credit.teachers
-        .filter(({ id }) => !id.includes('hy-hlo-org')) // Remove faculties from the leaderboards
-        .map(({ id, name }) => ({ id, name }))
-      const passed = Credit.passed(credit) || Credit.improved(credit)
-      const failed = Credit.failed(credit)
-      const transferred = credittypecode === CreditTypeCode.APPROVED
-      return { passed, failed, credits, teachers, is_open, transferred }
+  const semesters = (
+    await Semester.findAll({
+      where: {
+        yearcode: yearCode,
+      },
+      attributes: ['composite'],
     })
-    .forEach(credit => {
-      const { passed, failed, credits, teachers, is_open, transferred } = credit
-      teachers.forEach(teacher => {
-        all[teacher.id] = updatedStats(all, teacher, credits, passed, failed, transferred)
-        if (is_open) {
-          openuni[teacher.id] = updatedStats(openuni, teacher, credits, passed, failed, transferred)
-        }
-      })
-    })
+  ).map(({ composite }) => composite)
+  const credits = await getCreditsWithTeachersForYear(semesters)
+  const all: Record<string, TeacherStats> = {}
+  const openuni: Record<string, TeacherStats> = {}
+  for (const credit of credits) {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    const { credits, credittypecode, isStudyModule, is_open, teacherId, teacherName } = credit
+    if (isStudyModule) continue
+    const passed = Credit.passed(credit) || Credit.improved(credit)
+    const failed = Credit.failed(credit)
+    const transferred = credittypecode === CreditTypeCode.APPROVED
+    const teacher = { id: teacherId, name: teacherName }
+    updatedStats(all, teacher, credits, passed, failed, transferred)
+    if (is_open) {
+      updatedStats(openuni, teacher, credits, passed, failed, transferred)
+    }
+  }
   return {
     all: filterTopTeachers(all),
     openuni: filterTopTeachers(openuni),

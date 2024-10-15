@@ -6,7 +6,7 @@ import { Op, QueryTypes } from 'sequelize'
 import { dbConnections } from '../../database/connection'
 import { Course, Credit, Enrollment, SISStudyRight, SISStudyRightElement, Student, Studyplan } from '../../models'
 import { Tag, TagStudent } from '../../models/kone'
-import { Criteria, DegreeProgrammeType, Name, ParsedCourse } from '../../types'
+import { Criteria, DegreeProgrammeType, EnrollmentState, Name, ParsedCourse } from '../../types'
 import { SemesterStart } from '../../util/semester'
 import { hasTransferredFromOrToProgramme } from '../studyProgramme/studyProgrammeHelpers'
 
@@ -127,7 +127,9 @@ const formatStudentForPopulationStatistics = (
       normalizeDate && credit.attainment_date < new Date(startDate)
         ? startDateMoment.clone().add(1, 'day').toISOString()
         : credit.attainment_date.toISOString()
-    const passed = Credit.passed({ credittypecode: credit.credittypecode })
+    const passed =
+      Credit.passed({ credittypecode: credit.credittypecode }) ||
+      Credit.improved({ credittypecode: credit.credittypecode })
 
     return {
       course_code: credit.course_code,
@@ -478,21 +480,26 @@ const getSubstitutions = async (codes: string[]) => {
   return substitutions
 }
 
-export type QueryResult = Array<{
+export type EnrollmentsQueryResult = Array<{
   code: string
   name: Name
-  coursetypecode: string
   substitutions: string[]
   main_course_code: string
-  course_type: Name
-  credits: Array<Pick<Credit, 'grade' | 'student_studentnumber' | 'attainment_date' | 'credittypecode' | 'course_code'>>
   enrollments: Array<Pick<Enrollment, 'studentnumber' | 'state' | 'enrollment_date_time'>> | null
 }>
+
+type CreditPick = Pick<Credit, 'grade' | 'student_studentnumber' | 'attainment_date' | 'credittypecode' | 'course_code'>
+
+export type CoursesQueryResult = Array<
+  EnrollmentsQueryResult[number] & {
+    credits: Array<CreditPick>
+  }
+>
 
 // This duplicate code is added here to ensure that we get the enrollments in cases no credits found for the selected students
 export const findCourseEnrollments = async (studentNumbers: string[], beforeDate: Date, courses: string[] = []) => {
   const courseCodes = courses.length === 0 ? ['DUMMY'] : await getSubstitutions(courses)
-  const result: QueryResult = await sequelize.query(
+  const result: EnrollmentsQueryResult = await sequelize.query(
     `
       SELECT DISTINCT ON (course.id)
         course.code,
@@ -510,7 +517,7 @@ export const findCourseEnrollments = async (studentNumbers: string[], beforeDate
             'enrollment_date_time', enrollment_date_time
           )) AS data
         FROM enrollment
-        WHERE enrollment.studentnumber IN (:studentnumbers) AND enrollment.enrollment_date_time < :beforeDate
+        WHERE enrollment.studentnumber IN (:studentnumbers) AND enrollment.enrollment_date_time < :beforeDate AND enrollment.state = :enrollmentState
         GROUP BY enrollment.course_id
       ) enrollment ON enrollment.course_id = course.id 
       WHERE :skipCourseCodeFilter OR course.code IN (:courseCodes)
@@ -521,6 +528,7 @@ export const findCourseEnrollments = async (studentNumbers: string[], beforeDate
         beforeDate,
         courseCodes,
         skipCourseCodeFilter: courses.length === 0,
+        enrollmentState: EnrollmentState.ENROLLED,
       },
       type: QueryTypes.SELECT,
     }
@@ -530,7 +538,7 @@ export const findCourseEnrollments = async (studentNumbers: string[], beforeDate
 
 export const findCourses = async (studentNumbers: string[], beforeDate: Date, courses: string[] = []) => {
   const courseCodes = courses.length === 0 ? ['DUMMY'] : await getSubstitutions(courses)
-  const result: QueryResult = await sequelize.query(
+  const result: CoursesQueryResult = await sequelize.query(
     `
       SELECT DISTINCT ON (course.id)
         course.code,
@@ -563,7 +571,7 @@ export const findCourses = async (studentNumbers: string[], beforeDate: Date, co
             'enrollment_date_time', enrollment_date_time
           )) AS data
         FROM enrollment
-        WHERE enrollment.studentnumber IN (:studentnumbers) AND enrollment.enrollment_date_time < :beforeDate
+        WHERE enrollment.studentnumber IN (:studentnumbers) AND enrollment.enrollment_date_time < :beforeDate AND enrollment.state = :enrollmentState
         GROUP BY enrollment.course_id
       ) enrollment ON enrollment.course_id = course.id 
       WHERE :skipCourseCodeFilter OR course.code IN (:courseCodes)
@@ -574,6 +582,7 @@ export const findCourses = async (studentNumbers: string[], beforeDate: Date, co
         beforeDate,
         courseCodes,
         skipCourseCodeFilter: courses.length === 0,
+        enrollmentState: EnrollmentState.ENROLLED,
       },
       type: QueryTypes.SELECT,
     }
@@ -581,9 +590,7 @@ export const findCourses = async (studentNumbers: string[], beforeDate: Date, co
   return result
 }
 
-export const parseCreditInfo = (
-  credit: Pick<Credit, 'grade' | 'student_studentnumber' | 'attainment_date' | 'credittypecode' | 'course_code'>
-) => {
+export const parseCreditInfo = (credit: CreditPick) => {
   return {
     studentnumber: credit.student_studentnumber,
     grade: credit.grade,

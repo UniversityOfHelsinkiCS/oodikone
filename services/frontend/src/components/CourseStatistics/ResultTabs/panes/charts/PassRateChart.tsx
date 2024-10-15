@@ -14,13 +14,14 @@ exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
 accessibility(ReactHighcharts.Highcharts)
 
+const colorsRelative = [color.green, color.red, chartColor.redLight]
+const colors = [chartColor.blue, ...colorsRelative]
+
 const passRateAttemptGraphOptions = (isRelative: boolean, categories: string[], max: number, title: string) => ({
   chart: {
     type: 'column',
   },
-  colors: isRelative
-    ? [color.green, color.red, chartColor.redLight]
-    : [chartColor.blue, color.green, color.red, chartColor.redLight],
+  colors: isRelative ? colorsRelative : colors,
   credits: {
     enabled: false,
   },
@@ -55,9 +56,7 @@ const passRateStudentGraphOptions = (isRelative: boolean, categories: string[], 
   chart: {
     type: 'column',
   },
-  colors: isRelative
-    ? [chartColor.greenDark, chartColor.redDark, chartColor.redLight]
-    : [chartColor.blue, chartColor.greenDark, chartColor.redDark, chartColor.redLight],
+  colors: isRelative ? colorsRelative : colors,
   credits: {
     enabled: false,
   },
@@ -121,34 +120,27 @@ const getPassRateAttemptSeriesFromStats = stats => {
 
 const getPassRateStudentSeriesFromStats = stats => {
   const all = [] as number[]
-  const passedFirst = [] as number[]
-  const passedEventually = [] as number[]
-  const neverPassed = [] as number[]
+  const passed = [] as number[]
+  const failed = [] as number[]
   const enrolledNoGrade = [] as number[]
 
   stats.forEach(year => {
-    const { passedFirst: pf, passedEventually: pe, neverPassed: np } = year.students.categories
-    const enrolledWithNoGrade = year.students.enrolledStudentsWithNoGrade
-
-    all.push((pf || 0) + (pe || 0) + (np || 0) + (enrolledWithNoGrade || 0))
-    passedFirst.push(pf || 0)
-    passedEventually.push(pe || 0)
-    neverPassed.push(np || 0)
-    enrolledNoGrade.push(enrolledWithNoGrade || 0)
+    all.push(year.students.total || 0)
+    passed.push(year.students.totalPassed || 0)
+    failed.push(year.students.totalFailed || 0)
+    enrolledNoGrade.push(year.students.enrolledStudentsWithNoGrade || 0)
   })
-
-  const passed = passedFirst.map((value, index) => value + passedEventually[index])
 
   return {
     absolute: [
       getDataObject('all', all, 'a'),
       getDataObject('passed', passed, 'b'),
-      getDataObject('failed', neverPassed, 'c'),
+      getDataObject('failed', failed, 'c'),
       getDataObject('enrolled, no grade', enrolledNoGrade, 'c'),
     ],
     relative: [
       getDataObject('passed', passed.map(absoluteToRelative(all)), 'a'),
-      getDataObject('failed', neverPassed.map(absoluteToRelative(all)), 'a'),
+      getDataObject('failed', failed.map(absoluteToRelative(all)), 'a'),
       getDataObject('enrolled, no grade', enrolledNoGrade.map(absoluteToRelative(all)), 'a'),
     ],
   }

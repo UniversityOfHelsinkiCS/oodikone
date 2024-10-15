@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
 import { Header, Message, Segment } from 'semantic-ui-react'
@@ -44,7 +44,6 @@ export const PopulationStatistics = () => {
   const { language, getTextIn } = useLanguage()
   const courses = useSelector(store => store.populationSelectedStudentCourses.data?.coursestatistics)
   const { query, queryIsSet, isLoading, selectedStudentsByYear, samples } = useSelector(makePopulationsToData)
-  const [curriculum, setCurriculum] = useState(null)
   const currentSemester = useCurrentSemester()
 
   const { fullAccessToStudentData, programmeRights } = useGetAuthorizedUserQuery()
@@ -199,14 +198,12 @@ export const PopulationStatistics = () => {
             <PopulationSearch combinedProgrammeCode={combinedProgrammeCode} />
             {location.search !== '' && (
               <PopulationDetails
-                curriculum={curriculum}
                 filteredStudents={filteredStudents}
                 isLoading={isLoading}
                 programmeCodes={programmeCodes}
                 query={query}
                 queryIsSet={queryIsSet}
                 selectedStudentsByYear={selectedStudentsByYear}
-                setCurriculum={setCurriculum}
               />
             )}
           </Segment>

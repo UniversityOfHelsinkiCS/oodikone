@@ -97,14 +97,18 @@ const groupSISStudyRightSnapshots = studyrightSnapshots => {
 }
 
 const updateEnrollments = async (enrollments, personIdToStudentNumber, studyRightIdToEducationType) => {
+  // Other states are ABORTED_BY_STUDENT, ABORTED_BY_TEACHER, INVALID, NOT_ENROLLED, AND PROCESSING but we're only interested in ENROLLED and REJECTED
+  const validEnrollments = enrollments.filter(
+    ({ state, document_state }) => document_state === 'ACTIVE' && ['ENROLLED', 'REJECTED'].includes(state)
+  )
   const [courseUnitRealisations, courseUnits] = await Promise.all([
     selectFromByIds(
       'course_unit_realisations',
-      enrollments.map(({ course_unit_realisation_id }) => course_unit_realisation_id).filter(id => !!id)
+      validEnrollments.map(({ course_unit_realisation_id }) => course_unit_realisation_id).filter(id => !!id)
     ),
     selectFromByIds(
       'course_units',
-      enrollments.map(({ course_unit_id }) => course_unit_id).filter(id => !!id)
+      validEnrollments.map(({ course_unit_id }) => course_unit_id).filter(id => !!id)
     ),
   ])
 
@@ -138,10 +142,7 @@ const updateEnrollments = async (enrollments, personIdToStudentNumber, studyRigh
     studyRightIdToEducationType
   )
 
-  const mappedEnrollments = enrollments
-    .filter(({ document_state }) => document_state === 'ACTIVE')
-    .map(mapEnrollment)
-    .filter(({ studentnumber }) => studentnumber != null)
+  const mappedEnrollments = validEnrollments.map(mapEnrollment).filter(({ studentnumber }) => studentnumber != null)
   await bulkCreate(Enrollment, mappedEnrollments)
 }
 

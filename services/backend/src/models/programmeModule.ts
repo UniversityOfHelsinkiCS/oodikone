@@ -70,6 +70,9 @@ export class ProgrammeModule extends Model<InferAttributes<ProgrammeModule>> {
   @Column(DataType.STRING)
   degreeProgrammeType!: DegreeProgrammeType | null
 
+  @Column(DataType.INTEGER)
+  minimumCredits!: number | null
+
   @CreatedAt
   @Column(DataType.DATE)
   createdAt!: Date

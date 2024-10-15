@@ -29,9 +29,15 @@ const logger = winston.createLogger({
   format: combine(
     colorize(),
     timestamp({ format: isProduction ? 'D.M.YYYY,HH.mm.ss' : 'HH.mm.ss' }),
-    printf(({ level, message, timestamp, error }) => {
-      const log = `${timestamp} ${level}: ${message}`
-      return error?.stack ? `${log}\n${error.stack}` : log
+    printf(({ level, message, timestamp, error, meta }) => {
+      let log = `${timestamp} ${level}: ${message}`
+      if (error?.stack) {
+        log = `${log}\n${error.stack}`
+      }
+      if (Object.keys(meta || {}).length > 0) {
+        log = `${log}\n${JSON.stringify(meta, null, 2)}`
+      }
+      return log
     })
   ),
   transports,

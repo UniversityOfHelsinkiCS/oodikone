@@ -1,7 +1,7 @@
 const handleUnderscoreProgrammeCode = (programmeCode: string) => {
   const [left, right] = programmeCode.split('_')
-  const prefix = [...left!].filter(char => !Number.isNaN(Number(char))).join('')
-  const suffix = `${left![0]}${right}`
+  const prefix = [...left].filter(char => !Number.isNaN(Number(char))).join('')
+  const suffix = `${left[0]}${right}`
   return `${prefix}0-${suffix}`
 }
 

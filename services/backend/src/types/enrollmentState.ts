@@ -1,10 +1,4 @@
 export enum EnrollmentState {
-  ABORTED_BY_STUDENT = 'ABORTED_BY_STUDENT',
-  ABORTED_BY_TEACHER = 'ABORTED_BY_TEACHER',
-  CONFIRMED = 'CONFIRMED', // ? Does this state actually exist anymore?
   ENROLLED = 'ENROLLED',
-  INVALID = 'INVALID',
-  NOT_ENROLLED = 'NOT_ENROLLED',
-  PROCESSING = 'PROCESSING',
   REJECTED = 'REJECTED',
 }

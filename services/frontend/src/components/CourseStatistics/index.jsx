@@ -13,7 +13,7 @@ import { userHasAccessToAllCourseStats } from './courseStatisticsUtils'
 import { FacultyLevelStatistics } from './FacultyLevelStatistics'
 import { SearchForm } from './SearchForm'
 import { SingleCourseTab } from './SingleCourseTab'
-import { ConnectedSummaryTab as SummaryTab } from './SummaryTab'
+import { SummaryTab } from './SummaryTab'
 import './courseStatistics.css'
 
 const MENU = {

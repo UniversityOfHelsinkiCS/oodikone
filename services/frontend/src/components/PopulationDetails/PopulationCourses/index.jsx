@@ -1,7 +1,9 @@
+import { isEqual } from 'lodash'
 import { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Segment } from 'semantic-ui-react'
 
+import { useDeepMemo } from '@/common/hooks'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { InfoBox } from '@/components/InfoBox'
 import { ConnectedPopulationCourseStats as PopulationCourseStats } from '@/components/PopulationCourseStats'
@@ -24,10 +26,6 @@ export const PopulationCourses = ({
     ({ populationSelectedStudentCourses }) => populationSelectedStudentCourses
   )
 
-  const queryHasBeenUpdated = () => {
-    return populationSelectedStudentCourses.query.selectedStudents?.length === filteredStudents.length
-  }
-
   const getSelectedStudents = students =>
     onlyIamRights
       ? students.map(({ studentNumber, iv }) => ({ encryptedData: studentNumber, iv }))
@@ -45,15 +43,23 @@ export const PopulationCourses = ({
     )
   }
 
+  const programmeCodesToFetch = useDeepMemo(() => {
+    if (!mandatoryCourses) {
+      return null
+    }
+    const mandatoryCourseCodes = mandatoryCourses.defaultProgrammeCourses.map(({ code }) => code)
+    const mandatoryCourseCodesSecondProg = mandatoryCourses.secondProgrammeCourses.map(({ code }) => code)
+    return [...mandatoryCourseCodes, ...mandatoryCourseCodesSecondProg]
+  }, [mandatoryCourses])
+
   useEffect(() => {
-    if (mandatoryCourses && !queryHasBeenUpdated() && !populationSelectedStudentCourses.pending) {
-      // Mandatory courses is an object due to possibility of combined programmes (e.g. eläinlääkis)
-      const mandatoryCourseCodes = mandatoryCourses.defaultProgrammeCourses.map(({ code }) => code)
-      const mandatoryCourseCodesSecondProg = mandatoryCourses.secondProgrammeCourses.map(({ code }) => code)
-      const programmeCodesToFetch = [...mandatoryCourseCodes, ...mandatoryCourseCodesSecondProg]
+    if (
+      programmeCodesToFetch != null &&
+      !isEqual(programmeCodesToFetch, populationSelectedStudentCourses.query.courses)
+    ) {
       fetch(programmeCodesToFetch)
     }
-  }, [query, filteredStudents, mandatoryCourses, populationSelectedStudentCourses])
+  }, [programmeCodesToFetch])
 
   const pending = populationSelectedStudentCourses.pending || !mandatoryCourses
 

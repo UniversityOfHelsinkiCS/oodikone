@@ -1,6 +1,7 @@
 import moment from 'moment/moment'
 import { Table } from 'semantic-ui-react'
 
+import { getStudentTotalCredits } from '@/common'
 import { hopsFilter as studyPlanFilter, creditDateFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { DISPLAY_DATE_FORMAT, ISO_DATE_FORMAT } from '@/constants/date'
@@ -33,17 +34,14 @@ export const CreditsGainedTable = ({ filteredStudents, programmeGoalTime, type, 
   const months = getMonths(startDate ?? start, endDate ?? end)
   const title = `${moment(startDate ?? start).format(DISPLAY_DATE_FORMAT)} and ${moment(endDate ?? end).format(DISPLAY_DATE_FORMAT)}`
 
-  if (startDate == null && endDate == null && !studyPlanFilterIsActive) {
-    creditList = filteredStudents.map(({ studentNumber, credits }) => ({ studentNumber, credits }))
-  } else if (studyPlanFilterIsActive) {
+  if (studyPlanFilterIsActive) {
     creditList = filteredStudents.map(({ studentNumber, hopsCredits: credits }) => ({ studentNumber, credits }))
   } else {
     creditList = filteredStudents.map(({ studentNumber, courses }) => ({
       studentNumber,
-      credits: courses.reduce(
-        (results, course) => results + (course.passed && !course.isStudyModuleCredit ? course.credits : 0),
-        0
-      ),
+      credits: getStudentTotalCredits({
+        courses: courses.filter(course => moment(course.date).isBetween(startDate ?? start, endDate ?? end)),
+      }),
     }))
   }
 

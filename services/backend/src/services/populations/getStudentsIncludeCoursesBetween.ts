@@ -85,7 +85,7 @@ const getEnrollments = async (studentNumbers: string[], attainmentDateFrom: mome
       studentnumber: {
         [Op.in]: studentNumbers,
       },
-      state: [EnrollmentState.ENROLLED, EnrollmentState.CONFIRMED],
+      state: EnrollmentState.ENROLLED,
     },
     raw: true,
   })
