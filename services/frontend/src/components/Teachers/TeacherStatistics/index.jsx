@@ -59,7 +59,13 @@ export const TeacherStatistics = () => {
 
   const currentSemesterCode = getCurrentSemester(semesterData?.semesters)?.semestercode
 
-  // not important because teacher statistics is low priority for now
+  /*
+      HowTo:
+        Mostly the same point as in the backend file /routes/teachers.ts row 99 onwards.
+        One question, though, is the data actually filtered in the front end? I.e., is
+        the unfiltered data sent with the response, leading to unauthorized access to it
+        in the networks-tab? (Haven't checked the code in detail, so only asking.)
+  */
   const userProviders = mapToProviders(fullStudyProgrammeRights)
   const invalidQueryParams = providers.length === 0 || !semesterStart
   const providerOptions = isAdmin
