@@ -20,12 +20,17 @@ const getCurrentYearStartDate = () => {
 }
 
 const getAllStudyProgrammeCourses = async (studyProgramme: string) => {
-  // and here what we really want is all courses that have been taught "as a part of the studyprogramme" - how is this defined?
+  /* 
+    HowTo:
+      See the list of alternative solutions in the file 'providerCredits.ts row 116 onwards
+      for how to link courseUnits to a degree programme in a Sisu-correct way.
+  */
   const providerCode = mapToProviders([studyProgramme])[0]
   const normalCourses = await getAllProgrammeCourses(providerCode)
   return normalCourses.reduce((acc, curr) => {
     acc.push(curr.code)
-    // note to FD: we probably don't want to change codes based on 'AY'-prefix
+    // note also for FD environment: FD probably doesn't want to change codes based on 'AY'-prefix
+    // needs to be if-claused away depending on service provider
     if (curr.substitutions && curr.substitutions.includes(`AY${curr.code}`)) {
       acc.push(`AY${curr.code}`)
     }
