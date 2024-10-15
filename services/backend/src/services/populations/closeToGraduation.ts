@@ -145,7 +145,7 @@ const formatStudent = (student: Student) => {
 HowTo:
   Below the extent of programmes is deduced from specific codes. This will not work
   anywhere else than in HY. Here, instead of using letter-combinations or specific
-  codes, one should use the exact extent information for the programmes 
+  codes, one should use the exact target credit information for the programmes 
   that also was used when refactoring the getGoal-function.
  */
 

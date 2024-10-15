@@ -131,6 +131,9 @@ export const computeCreditsProduced = async (providerCode: string, isAcademicYea
 
   // This part also adds oikis Vaasa which is provided by a different organization.
   // Unknown if there are other similar cases!
+
+  // FD note: this is not very risky but of course we will need to if-clause it away in
+  // the FD environment, to avoid any confusion.
   let vaasaProvider: string | null = null
   if (serviceProvider !== 'fd') {
     const vaasaCodes = {
