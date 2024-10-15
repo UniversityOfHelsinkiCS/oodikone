@@ -128,8 +128,11 @@ type Course = {
 }
 
 export const getStudyProgrammeStatsForColorizedCoursesTable = async (studyProgramme: string) => {
-  // all courses in some meaningful way linked to a study programme.
-  // Would that be via which courses the students with a study right linked to a study programme have taken?
+  /* 
+    HowTo:
+      See the list of alternative solutions in the file 'providerCredits.ts row 116 onwards
+      for how to link courseUnits to a degree programme in a Sisu-correct way.
+  */
   const courses = await getAllProgrammeCourses(mapToProviders([studyProgramme])[0])
   const autumnSemester2017 = 135
   const courseCodes = courses.map(course => course.code)

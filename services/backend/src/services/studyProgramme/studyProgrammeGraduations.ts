@@ -96,7 +96,15 @@ const getGraduationTimeAndThesisWriterStats = async ({
   const studyRights = await getStudyRightsInProgramme(studyProgramme, false)
   const studentNumbers = studyRights.map(studyRight => studyRight.studentNumber)
   const thesisType = await getThesisType(studyProgramme)
-  // here we want all thesisCredits associated to some study programme - is this associated via the study right?
+
+  /*
+    HowTo:
+      1. check the students study rights to find those that are attached to the degree programme at hand  
+      2. find thesis attainment with the same study right id. 
+      
+      This is similar to what is described in closeToGraduation.ts row 99 onwards.
+  */
+
   const thesisCredits = await getThesisCredits(mapToProviders([studyProgramme])[0], thesisType, studentNumbers)
   const thesisWriterMap = thesisCredits.reduce<Record<string, Date>>((acc, credit) => {
     acc[credit.student_studentnumber] = credit.attainment_date

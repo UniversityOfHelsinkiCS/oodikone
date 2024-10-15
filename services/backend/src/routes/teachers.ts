@@ -85,13 +85,22 @@ router.get('/stats', async (req: GetTeacherStatsRequest, res: Response) => {
     return res.status(422).send('Missing required query parameters')
   }
 
-  // not very important for now, because used for teacher stats
   const providerRights = mapToProviders(fullStudyProgrammeRights)
   if (!(providers.every(provider => providerRights.includes(provider)) || roles.includes('admin'))) {
     return res.status(403).send('You do not have permission to see this data')
   }
 
-  // Combine provider list that may include programmes and faculties
+  /* 
+  HowTo: 
+    
+    #1: here we need rights linked to an organizational entity, not a degree programme.
+    To ponder upon: should there be an option in Oodikone to add rights based on 
+    an organization (laitos, tiedekunta). Perhaps there is in JAMI?
+
+    #2: if this is to be done using rights associated with degree programmes, one should 
+    parse a list of courses linked to a degree programme using the structure
+    in the degree programme "rules". The results of these courses could be shown to the user.
+  */
   const parsedProvidersSet = new Set<string>()
   for (const provider of providers) {
     if (isFaculty(provider)) {

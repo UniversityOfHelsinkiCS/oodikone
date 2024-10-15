@@ -94,8 +94,14 @@ const formatStudent = (student: Student) => {
       startDate: programmeStartDate,
       degreeProgrammeType,
     } = studyRightElements[0]
-    // here a study right needs to be linked to an organization that can be linked to attainments.
-    // how can this be done in a meaningful way?
+
+    /* 
+    HowTo:
+      Here one should not link the attainment (be it any courseUnit or thesis) via the organization, instead one should
+      use the studyRightId present in the attainment data to link it to the relevant study right (which is destructured
+      above, so this should not be a big problem).
+    */
+
     const programmeCodeToProviderCode = mapToProviders([programmeCode])[0]
     const { latestAttainmentDates, thesisData } = findThesisAndLatestAttainments(
       studyPlan,
@@ -134,6 +140,14 @@ const formatStudent = (student: Student) => {
     return acc
   }, [])
 }
+
+/* 
+HowTo:
+  Below the extent of programmes is deduced from specific codes. This will not work
+  anywhere else than in HY. Here, instead of using letter-combinations or specific
+  codes, one should use the exact extent information for the programmes 
+  that also was used when refactoring the getGoal-function.
+ */
 
 export const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =>
   (

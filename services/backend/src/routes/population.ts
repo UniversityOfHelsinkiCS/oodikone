@@ -363,10 +363,20 @@ router.get('/v3/populationstatisticsbycourse', async (req: GetPopulationStatisti
   }
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const rightsMappedToProviders = mapToProviders(fullStudyProgrammeRights)
-  // does this do the right thing here? this below checks for _some_ right, but does it not then give _all_ rights?
-  // compare with usage in teachers.ts where "every" is implemented
-  // but can we change the logic all together? What we want to know is whether the user has rights
-  // to see these courses, in some meaningful way that "rights" can be linked between a course and a study program
+  /* 
+  QUESTION: Where in the UI is the result of this route shown?
+    
+  HowTo: 
+    
+    #1: here we need rights linked to an organizational entity, not a degree programme.
+    To ponder upon: should there be an option in Oodikone to add rights based on 
+    an organization (laitos, tiedekunta). Perhaps there is in JAMI?
+
+    #2: if this is to be done in something similar to this fashion, one ought 
+    to look at the students, and to which degreeprogramme their studyRight is 
+    linked, and then decide based on that whether a user has "viewer rights"
+    for that DP.
+  */
   const found = courseProviders.some(provider => rightsMappedToProviders.includes(provider))
 
   const studentsUserCanAccess =

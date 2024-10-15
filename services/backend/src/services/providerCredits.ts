@@ -106,10 +106,25 @@ const getBasicDegreeStudyRight = (
 export const computeCreditsProduced = async (providerCode: string, isAcademicYear: boolean) => {
   const since = new Date('2017-01-01')
 
-  // here we need to map a study program or an organization to courses and attainments/credits
-  // should this be done via students that have a study right linked to that study program and which courses
-  // they have then taken -- or is there something in the course data that links it in some way to a
-  // study program?
+  /*
+  HowTo
+    In the case of a faculty:
+      1. Recursively traverse the organization tree downwards starting from the faculty to list
+      all organizations that are a part of that faculty's organization tree.
+      2. Use this list of organizations to filter relevant courses and hence also credits.
+    
+    In the case of a degree programme it's not as straight forward, so EITHER:
+      A. Find all students with a study right linked to the degree programme, then list all attainments
+      that these students have produced. This will then include attainments for courseUnits produced
+      anywhere at the university or even at other universities.
+      B. List all courseUnits associated with a degree programme by parsing a list of them from the
+      degree programme rules. Check which attainments that are produced by these. This will only
+      show attainments closely linked to the degree programme, and nothing else.
+      C. (This is already done as a special case in the Oodikone UI) List all courseUnits on primary
+      study plans of students with a study right for the degree programme and list attainments linked
+      to those.
+  */
+
   const rapoFormattedProviderCode = mapToProviders([providerCode])[0]
   const courses = await getCourseCodesOfProvider(rapoFormattedProviderCode)
   const credits = await getCreditsForProvider(rapoFormattedProviderCode, courses, since)
