@@ -1,5 +1,6 @@
 import { InferAttributes } from 'sequelize'
 
+import { serviceProvider } from '../config'
 import { SISStudyRight } from '../models'
 import { mapToProviders } from '../shared/util/mapToProviders'
 import { EnrollmentType, ExtentCode } from '../types'
@@ -8,7 +9,6 @@ import { getCourseCodesOfProvider } from './providers'
 import { getCreditsForProvider, getTransferredCredits } from './studyProgramme/creditGetters'
 import { defineYear } from './studyProgramme/studyProgrammeHelpers'
 import { getSISStudyRightsOfStudents } from './studyProgramme/studyRightFinders'
-import { serviceProvider } from '../config'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const assertUnreachable = (x: never) => {
