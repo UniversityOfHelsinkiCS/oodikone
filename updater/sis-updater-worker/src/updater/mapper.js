@@ -1,6 +1,7 @@
 const { sortBy, flatten, uniqBy } = require('lodash')
 
-const { getMinMaxDate } = require('../utils')
+const { serviceProvider } = require('../config')
+const { getMinMaxDate, logger } = require('../utils')
 const {
   educationTypeToExtentcode,
   getCountry,
@@ -145,76 +146,90 @@ const creditMapper =
     studyRightIdToEducationType
   ) =>
   attainment => {
-    const {
-      id,
-      credits,
-      person_id,
-      registration_date,
-      grade_scale_id,
-      grade_id,
-      organisations,
-      attainment_date,
-      type,
-      course_unit_id,
-      module_group_id,
-      study_right_id,
-      attainment_language_urn,
-    } = attainment
+    try {
+      const {
+        id,
+        credits,
+        person_id,
+        registration_date,
+        grade_scale_id,
+        grade_id,
+        organisations,
+        attainment_date,
+        type,
+        course_unit_id,
+        module_group_id,
+        study_right_id,
+        attainment_language_urn,
+      } = attainment
 
-    const responsibleOrg = organisations.find(o => o.roleUrn === 'urn:code:organisation-role:responsible-organisation')
-    const attainmentUniOrg = getUniOrgId(responsibleOrg.organisationId)
-    const targetSemester = getSemesterByDate(new Date(attainment_date))
-    const language = attainment_language_urn.split(':').pop()
+      const responsibleOrg = organisations.find(
+        o => o.roleUrn === 'urn:code:organisation-role:responsible-organisation'
+      )
+      const attainmentUniOrg = getUniOrgId(responsibleOrg.organisationId)
+      const targetSemester = getSemesterByDate(new Date(attainment_date))
+      const language = attainment_language_urn.split(':').pop()
 
-    if (!targetSemester) return null
+      if (!targetSemester) return null
 
-    const course_code = !isModule(type)
-      ? courseGroupIdToCourseCode[courseUnitIdToCourseGroupId[course_unit_id]]
-      : moduleGroupIdToModuleCode[module_group_id]
+      const course_code = !isModule(type)
+        ? courseGroupIdToCourseCode[courseUnitIdToCourseGroupId[course_unit_id]]
+        : moduleGroupIdToModuleCode[module_group_id]
 
-    const course_id = !isModule(type) ? courseUnitIdToCourseGroupId[course_unit_id] : module_group_id
+      const course_id = !isModule(type) ? courseUnitIdToCourseGroupId[course_unit_id] : module_group_id
 
-    let is_open = false
+      let is_open = false
 
-    // check if ay code or ay studyright or ay responsible organisation
-    if (course_code && !isModule(type)) {
-      if (course_code.match(/^AY?(.+?)(?:en|fi|sv)?$/)) {
-        is_open = true
-      } else if (study_right_id !== null) {
-        if (
-          studyRightIdToEducationType[study_right_id] ===
-          'urn:code:education-type:non-degree-education:open-university-studies'
-        )
-          is_open = true
-      } else if (
-        organisations
-          .filter(({ roleUrn }) => roleUrn === 'urn:code:organisation-role:responsible-organisation')
-          .some(org => org.organisationid === 'hy-org-48645785')
-      ) {
-        is_open = true
+      // check if ay code or ay study right or ay responsible organisation
+      // if fd is not service provider
+      if (serviceProvider !== 'fd') {
+        if (course_code && !isModule(type)) {
+          if (course_code.match(/^AY?(.+?)(?:en|fi|sv)?$/)) {
+            is_open = true
+          } else if (study_right_id !== null) {
+            if (
+              studyRightIdToEducationType[study_right_id] ===
+              'urn:code:education-type:non-degree-education:open-university-studies'
+            )
+              is_open = true
+          } else if (
+            organisations
+              .filter(({ roleUrn }) => roleUrn === 'urn:code:organisation-role:responsible-organisation')
+              .some(org => org.organisationid === 'hy-org-48645785')
+          ) {
+            is_open = true
+          }
+        }
       }
-    }
 
-    // Check if attainment is a module type
-    const isStudyModule = isModule(type)
+      // Check if attainment is a module type
+      const isStudyModule = isModule(type)
 
-    return {
-      id,
-      grade: getGrade(grade_scale_id, grade_id).value,
-      student_studentnumber: personIdToStudentNumber[person_id],
-      credits,
-      createdate: registration_date,
-      credittypecode: getCreditTypeCodeFromAttainment(attainment, getGrade(grade_scale_id, grade_id).passed),
-      attainment_date,
-      course_id,
-      course_code,
-      semestercode: targetSemester.semestercode,
-      semester_composite: targetSemester.composite,
-      isStudyModule,
-      org: attainmentUniOrg,
-      language,
-      is_open,
-      studyright_id: study_right_id,
+      const gradeObject = getGrade(grade_scale_id, grade_id)
+      const grade = gradeObject.value
+      const credittypecode = getCreditTypeCodeFromAttainment(attainment, gradeObject.passed)
+
+      return {
+        id,
+        grade,
+        student_studentnumber: personIdToStudentNumber[person_id],
+        credits,
+        createdate: registration_date,
+        credittypecode,
+        attainment_date,
+        course_id,
+        course_code,
+        semestercode: targetSemester.semestercode,
+        semester_composite: targetSemester.composite,
+        isStudyModule,
+        org: attainmentUniOrg,
+        language,
+        is_open,
+        studyright_id: study_right_id,
+      }
+    } catch (error) {
+      logger.error(`Error in attainment handling for attainment ${attainment.id}`, error)
+      return null
     }
   }
 

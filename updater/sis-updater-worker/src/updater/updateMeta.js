@@ -87,7 +87,7 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
             organisationsById[organisationId].shares.push(shareObj)
           }
         } catch (error) {
-          logger.error(`Error in course unit organisation handling for orgId ${organisationId}`)
+          logger.error(`Error in course unit organisation handling for orgId ${organisationId} with error`, error)
         }
       }
     }
