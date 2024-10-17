@@ -136,7 +136,6 @@ export class CourseYearlyStatsCounter {
     if (!this.facultyStats[yearCode]) {
       this.initFacultyYear(yearCode)
     }
-
     if (
       facultyCode &&
       !this.facultyStats[yearCode].faculties[facultyCode] &&
@@ -152,7 +151,6 @@ export class CourseYearlyStatsCounter {
       this.programmes[code].passed[yearCode] = []
       this.programmes[code].credits[yearCode] = 0
     }
-
     if (facultyCode && !this.facultyStats[yearCode].allStudents.includes(studentNumber)) {
       this.facultyStats[yearCode].allStudents.push(studentNumber)
       this.facultyStats[yearCode].faculties[facultyCode].students.push(studentNumber)
@@ -161,7 +159,6 @@ export class CourseYearlyStatsCounter {
       this.programmes[code].passed[yearCode].push(studentNumber)
       this.programmes[code].credits[yearCode] += credits
     }
-
     if (facultyCode && passed && !this.facultyStats[yearCode].allPassed.includes(studentNumber)) {
       this.facultyStats[yearCode].allPassed.push(studentNumber)
       this.facultyStats[yearCode].faculties[facultyCode].passed.push(studentNumber)
@@ -253,13 +250,13 @@ export class CourseYearlyStatsCounter {
 
   public markCreditToStudentCategories(studentNumber: string, attainmentDate: Date, groupCode: number) {
     if (!this.students.has(studentNumber)) {
-      this.addNewStudent(studentNumber, attainmentDate, groupCode)
+      this.addOrUpdateStudent(studentNumber, attainmentDate, groupCode)
     } else {
       this.updateExistingStudent(studentNumber, attainmentDate, groupCode)
     }
   }
 
-  private addNewStudent(studentNumber: string, attainmentDate: Date, groupCode: number) {
+  private addOrUpdateStudent(studentNumber: string, attainmentDate: Date, groupCode: number) {
     this.students.set(studentNumber, {
       earliestAttainment: attainmentDate,
       code: groupCode,
@@ -269,15 +266,8 @@ export class CourseYearlyStatsCounter {
   private updateExistingStudent(studentNumber: string, attainmentDate: Date, groupCode: number) {
     const student = this.students.get(studentNumber)
     if (attainmentDate < student!.earliestAttainment) {
-      this.updateCategoryForEarlierAttainment(studentNumber, attainmentDate, groupCode)
+      this.addOrUpdateStudent(studentNumber, attainmentDate, groupCode)
     }
-  }
-
-  private updateCategoryForEarlierAttainment(studentNumber: string, attainmentDate: Date, groupCode: number) {
-    this.students.set(studentNumber, {
-      earliestAttainment: attainmentDate,
-      code: groupCode,
-    })
   }
 
   private parseProgrammeStatistics(anonymizationSalt: string | null) {
