@@ -77,10 +77,8 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
           const effectiveValidityPeriod = Object.keys(validityPeriod).length ? validityPeriod : courseUnitValidityPeriod
           const shareObj = {
             share,
-            ...(effectiveValidityPeriod &&
-              effectiveValidityPeriod.startDate && { startDate: effectiveValidityPeriod.startDate }),
-            ...(effectiveValidityPeriod &&
-              effectiveValidityPeriod.endDate && { endDate: effectiveValidityPeriod.endDate }),
+            ...(effectiveValidityPeriod?.startDate && { startDate: effectiveValidityPeriod.startDate }),
+            ...(effectiveValidityPeriod?.endDate && { endDate: effectiveValidityPeriod.endDate }),
           }
 
           if (!organisationsById[organisationId]) {
