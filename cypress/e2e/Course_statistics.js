@@ -428,12 +428,32 @@ describe('Course Statistics tests', () => {
       // Statistics
       const yearRange = { from: '1999-2000', to: '2023-2024' }
       const attemptsTableContents = [
-        // [time, passed, failed, passrate]
+        // [Time, --, Total attempts, Passed, Failed]
         ['Total', null, 288, 241, 25],
+        ['2023-2024', null, 6, 2, 0],
+        ['2022-2023', null, 28, 28, 0],
+        ['2021-2022', null, 45, 27, 0],
+        ['2020-2021', null, 34, 34, 0],
+        ['2019-2020', null, 60, 57, 3],
+        ['2018-2019', null, 46, 39, 7],
+        ['2017-2018', null, 35, 26, 9],
+        ['2016-2017', null, 7, 6, 1],
+        ['2015-2016', null, 5, 3, 2],
+        ['2014-2015', null, 7, 6, 1],
+        ['2013-2014', null, 2, 1, 1],
+        ['2012-2013', null, 4, 4, 0],
+        ['2011-2012', null, 1, 1, 0],
+        ['2010-2011', null, 1, 1, 0],
+        ['2008-2009', null, 1, 0, 1],
+        ['2007-2008', null, 1, 1, 0],
+        ['2006-2007', null, 1, 1, 0],
+        ['2005-2006', null, 1, 1, 0],
+        ['2003-2004', null, 1, 1, 0],
+        ['1999-2000', null, 2, 2, 0],
       ]
 
       const gradesTableContents = [
-        // [time, attempts, 0, 1, 2, 3, 4, 5, other passed]
+        // [Time, --, Total attempts, Failed, 1, 2, 3, 4, 5, Other passed]
         ['Total', null, 288, 25, 6, 15, 9, 37, 169, 5],
         ['2023-2024', null, 6, 0, 0, 0, 0, 0, 2, 0],
         ['2022-2023', null, 28, 0, 0, 0, 0, 6, 22, 0],
