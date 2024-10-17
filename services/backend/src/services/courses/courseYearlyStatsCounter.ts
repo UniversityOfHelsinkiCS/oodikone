@@ -34,11 +34,6 @@ type GroupAttempts = {
 }
 
 type GroupStudents = {
-  categories: {
-    passedFirst: string[]
-    passedEventually: string[]
-    neverPassed: string[]
-  }
   grades: { [studentNumber: string]: { grade: string; passed: boolean } }
   studentNumbers: string[]
 }
@@ -56,7 +51,6 @@ type Group = {
 
 type Student = {
   earliestAttainment: Date
-  category: 'passedFirst' | 'passedEventually' | 'neverPassed'
   code: number
 }
 
@@ -117,11 +111,6 @@ export class CourseYearlyStatsCounter {
         },
       },
       students: {
-        categories: {
-          passedFirst: [],
-          passedEventually: [],
-          neverPassed: [],
-        },
         grades: {},
         studentNumbers: [],
       },
@@ -262,57 +251,33 @@ export class CourseYearlyStatsCounter {
     this.groups[groupCode].students.grades[studentNumber] = { grade, passed }
   }
 
-  public markCreditToStudentCategories(
-    studentNumber: string,
-    passed: boolean,
-    attainmentDate: Date,
-    groupCode: number
-  ) {
+  public markCreditToStudentCategories(studentNumber: string, attainmentDate: Date, groupCode: number) {
     if (!this.students.has(studentNumber)) {
-      this.addNewStudent(studentNumber, passed, attainmentDate, groupCode)
+      this.addNewStudent(studentNumber, attainmentDate, groupCode)
     } else {
-      this.updateExistingStudent(studentNumber, passed, attainmentDate, groupCode)
+      this.updateExistingStudent(studentNumber, attainmentDate, groupCode)
     }
   }
 
-  private addNewStudent(studentNumber: string, passed: boolean, attainmentDate: Date, groupCode: number) {
-    const category = passed ? 'passedFirst' : 'neverPassed'
+  private addNewStudent(studentNumber: string, attainmentDate: Date, groupCode: number) {
     this.students.set(studentNumber, {
       earliestAttainment: attainmentDate,
-      category,
       code: groupCode,
     })
   }
 
-  private updateExistingStudent(studentNumber: string, passed: boolean, attainmentDate: Date, groupCode: number) {
+  private updateExistingStudent(studentNumber: string, attainmentDate: Date, groupCode: number) {
     const student = this.students.get(studentNumber)
     if (attainmentDate < student!.earliestAttainment) {
-      this.updateCategoryForEarlierAttainment(studentNumber, passed, attainmentDate, groupCode, student!)
-    } else if (student!.category === 'neverPassed' && passed) {
-      this.students.set(studentNumber, { ...student!, category: 'passedEventually' })
+      this.updateCategoryForEarlierAttainment(studentNumber, attainmentDate, groupCode)
     }
   }
 
-  private updateCategoryForEarlierAttainment(
-    studentNumber: string,
-    passed: boolean,
-    attainmentDate: Date,
-    groupCode: number,
-    student: Student
-  ) {
-    if (passed) {
-      this.students.set(studentNumber, {
-        earliestAttainment: attainmentDate,
-        category: 'passedFirst',
-        code: groupCode,
-      })
-    } else if (student.category === 'passedFirst') {
-      this.students.set(studentNumber, {
-        earliestAttainment: attainmentDate,
-        category: 'passedEventually',
-        code: groupCode,
-      })
-    }
+  private updateCategoryForEarlierAttainment(studentNumber: string, attainmentDate: Date, groupCode: number) {
+    this.students.set(studentNumber, {
+      earliestAttainment: attainmentDate,
+      code: groupCode,
+    })
   }
 
   private parseProgrammeStatistics(anonymizationSalt: string | null) {
@@ -331,7 +296,6 @@ export class CourseYearlyStatsCounter {
 
   private parseGroupStatistics(anonymizationSalt: string | null) {
     for (const [studentNumber, data] of this.students) {
-      this.groups[data.code].students.categories[data.category].push(studentNumber)
       this.groups[data.code].students.studentNumbers.push(studentNumber)
     }
 
@@ -370,11 +334,6 @@ export class CourseYearlyStatsCounter {
           },
           yearcode: rest.yearcode,
           students: {
-            categories: {
-              passedFirst: [] as string[],
-              passedEventually: [] as string[],
-              neverPassed: [] as string[],
-            },
             studentNumbers: [] as string[],
           },
         }

@@ -214,7 +214,7 @@ const getYearlyStatsOfNew = async (
       credits
     )
     counter.markCreditToGroup(studentNumber, passed, grade, groupCode, groupName, courseCode, yearCode)
-    counter.markCreditToStudentCategories(studentNumber, passed, attainmentDate, groupCode)
+    counter.markCreditToStudentCategories(studentNumber, attainmentDate, groupCode)
   }
 
   enrollments.forEach(enrollment => {
