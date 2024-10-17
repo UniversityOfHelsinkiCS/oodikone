@@ -1,4 +1,4 @@
-const { chunk, isArray } = require('lodash')
+const { chunk } = require('lodash')
 
 const { bulkCreate, selectFromByIds } = require('../../db')
 const { dbConnections } = require('../../db/connection')
@@ -59,7 +59,7 @@ const recursiveWrite = (modArg, parentId, programmeMap, joinMap) => {
 
   // the "children" variable might contain the result of resolving, e.g., AnyCourseUnitRule, in which case
   // it is one single object, and the function should return, hence checking that it is an array below
-  if (!children || !isArray(children)) return
+  if (!children || !Array.isArray(children)) return
   try {
     children.forEach(child => recursiveWrite(child, mod.id, programmeMap, joinMap))
   } catch (error) {
