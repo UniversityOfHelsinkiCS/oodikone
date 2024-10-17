@@ -348,6 +348,7 @@ describe('Custom Population Statistics', () => {
   })
 
   it('Age filter works', () => {
+    cy.clock(MOCKED_DATE, ['Date'])
     runTestStepWithPreAndPostParts('Age', () => {
       testRangeFilter('Age-filter-card', 24, 28, 5)
     })
