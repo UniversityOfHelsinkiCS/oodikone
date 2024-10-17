@@ -67,18 +67,18 @@ export const FacultyLevelStatistics = () => {
   const openOrRegular = useSelector(state => state.courseSearch.openOrRegular)
   const courseStats = useSelector(state => state.courseStats.data)
 
-  const yearcodes = uniq(
+  const yearCodes = uniq(
     flatten(Object.values(courseStats).map(course => Object.keys(course[openOrRegular].facultyStats)))
   )
     .sort()
     .reverse()
 
-  const [selectedYear, setSelectedYear] = useState(yearcodes[0])
+  const [selectedYear, setSelectedYear] = useState(yearCodes[0])
 
-  const dropdownOptions = yearcodes.map(year => ({
-    key: year,
-    text: `${1949 + Number(year)}-${1950 + Number(year)}`,
-    value: year,
+  const dropdownOptions = yearCodes.map(yearCode => ({
+    key: yearCode,
+    text: `${1949 + Number(yearCode)}-${1950 + Number(yearCode)}`,
+    value: yearCode,
   }))
 
   const yearsCourseStats = Object.values(courseStats)

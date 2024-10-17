@@ -95,7 +95,7 @@ export const SingleCourseStats = ({ stats, availableStats, userHasAccessToAllSta
     }
     dispatch(setSelectedCourse(coursecode))
 
-    const yearCodes = stats.statistics.map(s => s.yearcode)
+    const yearCodes = stats.statistics.map(s => s.yearCode)
     const initFromYear = min(yearCodes)
     const initToYear = max(yearCodes)
     setFromYear(initFromYear)
@@ -163,9 +163,9 @@ export const SingleCourseStats = ({ stats, availableStats, userHasAccessToAllSta
   }
 
   const filteredYearsAndSemesters = () => {
-    const yearcodes = stats.statistics.map(s => s.yearcode)
-    const from = min(yearcodes)
-    const to = max(yearcodes)
+    const yearCodes = stats.statistics.map(s => s.yearCode)
+    const from = min(yearCodes)
+    const to = max(yearCodes)
     if (from == null || to == null) {
       return {
         filteredYears: years,
@@ -257,9 +257,9 @@ export const SingleCourseStats = ({ stats, availableStats, userHasAccessToAllSta
           obfuscated,
           enrollments = [],
           allEnrollments = [],
-          yearcode,
+          yearCode,
         }) => {
-          const displayEnrollments = yearcode >= 72 // Display enrollments only for Sisu era
+          const displayEnrollments = yearCode >= 72 // Display enrollments only for Sisu era
           const filteredEnrollments = enrollments.filter(({ studentNumber }) => filter(studentNumber))
           const filteredAllEnrollments = allEnrollments.filter(({ studentNumber }) => filter(studentNumber))
           const totalEnrollments = displayEnrollments ? filteredAllEnrollments.length : undefined

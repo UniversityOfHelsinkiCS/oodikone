@@ -46,7 +46,7 @@ type Group = {
   students: GroupStudents
   enrollments: { studentNumber: string; enrollmentDateTime: Date }[]
   allEnrollments: { studentNumber: string; enrollmentDateTime: Date }[]
-  yearcode: number
+  yearCode: number
 }
 
 type Student = {
@@ -116,7 +116,7 @@ export class CourseYearlyStatsCounter {
       },
       enrollments: [],
       allEnrollments: [],
-      yearcode: yearCode,
+      yearCode,
     }
   }
 
@@ -322,7 +322,7 @@ export class CourseYearlyStatsCounter {
             },
             grades: gradeSpread,
           },
-          yearcode: rest.yearcode,
+          yearCode: rest.yearCode,
           students: {
             studentNumbers: [] as string[],
           },
