@@ -77,8 +77,8 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
           const effectiveValidityPeriod = Object.keys(validityPeriod).length ? validityPeriod : courseUnitValidityPeriod
           const shareObj = {
             share,
-            ...(effectiveValidityPeriod.startDate && { startDate: effectiveValidityPeriod.startDate }),
-            ...(effectiveValidityPeriod.endDate && { endDate: effectiveValidityPeriod.endDate }),
+            ...(effectiveValidityPeriod?.startDate && { startDate: effectiveValidityPeriod.startDate }),
+            ...(effectiveValidityPeriod?.endDate && { endDate: effectiveValidityPeriod.endDate }),
           }
 
           if (!organisationsById[organisationId]) {
@@ -87,7 +87,9 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
             organisationsById[organisationId].shares.push(shareObj)
           }
         } catch (error) {
-          logger.error(`Error in course unit organisation handling for orgId ${organisationId}`)
+          // This try-catch-clause added because of a lot of failed updates due to these lines of code.
+          // If the null check for effectiveValidityPeriod fixes this, this try-clause might be removed
+          logger.error(`Error in course unit organisation handling for orgId ${organisationId} with error`, error)
         }
       }
     }

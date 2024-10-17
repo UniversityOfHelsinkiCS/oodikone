@@ -57,7 +57,9 @@ const recursiveWrite = (modArg, parentId, programmeMap, joinMap) => {
 
   if (parentId) joinMap[join.composite] = join
 
-  if (!children) return
+  // the "children" variable might contain the result of resolving, e.g., AnyCourseUnitRule, in which case
+  // it is one single object, and the function should return, hence checking that it is an array below
+  if (!children || !Array.isArray(children)) return
   try {
     children.forEach(child => recursiveWrite(child, mod.id, programmeMap, joinMap))
   } catch (error) {
