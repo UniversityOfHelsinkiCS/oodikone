@@ -32,7 +32,6 @@ export const countTotalStats = (formattedStats, userHasAccessToAllStats: boolean
       totalEnrollments: 0,
       enrolledStudentsWithNoGrade: 0,
     },
-    studentnumbers: [],
   }
 
   const totals = formattedStats.reduce((acc, curr) => {

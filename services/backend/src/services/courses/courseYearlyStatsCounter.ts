@@ -40,7 +40,7 @@ type GroupStudents = {
     neverPassed: string[]
   }
   grades: { [studentNumber: string]: { grade: string; passed: boolean } }
-  studentnumbers: string[]
+  studentNumbers: string[]
 }
 
 type Group = {
@@ -123,7 +123,7 @@ export class CourseYearlyStatsCounter {
           neverPassed: [],
         },
         grades: {},
-        studentnumbers: [],
+        studentNumbers: [],
       },
       enrollments: [],
       allEnrollments: [],
@@ -332,7 +332,7 @@ export class CourseYearlyStatsCounter {
   private parseGroupStatistics(anonymizationSalt: string | null) {
     for (const [studentNumber, data] of this.students) {
       this.groups[data.code].students.categories[data.category].push(studentNumber)
-      this.groups[data.code].students.studentnumbers.push(studentNumber)
+      this.groups[data.code].students.studentNumbers.push(studentNumber)
     }
 
     const groupStatistics = Object.values(this.groups).map(({ ...rest }) => {
@@ -350,7 +350,7 @@ export class CourseYearlyStatsCounter {
         ...rest,
         students: { ...students, grades },
       }
-      if (anonymizationSalt && normalStats.students.studentnumbers.length < 6) {
+      if (anonymizationSalt && normalStats.students.studentNumbers.length < 6) {
         this.obfuscated = true
         const gradeSpread = {} as Grades
         for (const grade of Object.keys(normalStats.attempts.grades)) {
@@ -375,7 +375,7 @@ export class CourseYearlyStatsCounter {
               passedEventually: [] as string[],
               neverPassed: [] as string[],
             },
-            studentnumbers: [] as string[],
+            studentNumbers: [] as string[],
           },
         }
         return obfuscatedStats

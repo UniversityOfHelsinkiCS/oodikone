@@ -154,7 +154,7 @@ export const SingleCourseStats = ({ stats, availableStats, userHasAccessToAllSta
       }
     })
 
-    return studentnumber => studentNumbers.has(studentnumber)
+    return studentNumber => studentNumbers.has(studentNumber)
   }
 
   const validProgrammeCode = code => {
