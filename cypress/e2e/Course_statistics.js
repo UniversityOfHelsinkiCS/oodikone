@@ -373,7 +373,7 @@ describe('Course Statistics tests', () => {
         // [Time, --, Total attempts, Passed, Failed, Pass rate, Enrollments]
         ['Total', null, 186, 140, 16, '89.74 %', 73],
         ['2023-2024', null, 6, 1, 0, '16.67 %', 6],
-        ['2022-2023', null, 26, 27, 0, '103.85 %', 26], // <-- pass rate over 100% ?
+        ['2022-2023', null, 26, 27, 0, '100.00 %', 26],
         ['2021-2022', null, 41, 15, 0, '36.59 %', 41],
         ['2020-2021', null, 23, 23, 0, '100.00 %', null],
         ['2019-2020', null, 29, 28, 1, '96.55 %', null],

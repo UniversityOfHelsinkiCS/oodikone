@@ -194,7 +194,7 @@ export const SingleCourseStats = ({ stats, availableStats, userHasAccessToAllSta
     const categories = countFilteredStudents(attempts.categories, filter)
     const { failed, passed } = categories
     const total = totalEnrollments || passed + failed
-    const passRate = 100 * (passed / total)
+    const passRate = Math.min(100 * (passed / total), 100)
 
     return {
       grades,
