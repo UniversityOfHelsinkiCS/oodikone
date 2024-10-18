@@ -1,6 +1,6 @@
 import { orderBy } from 'lodash'
 import { useEffect, useState } from 'react'
-import { connect, useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { Tab } from 'semantic-ui-react'
 
 import { useTabChangeAnalytics } from '@/common/hooks'
@@ -9,7 +9,6 @@ import { GradeDistribution } from './GradeDistribution'
 import { PassFailEnrollments } from './PassFailEnrollments'
 import { PassingSemesters } from './PassingSemesters'
 import { PopulationCourseContext } from './PopulationCourseContext'
-import { Students } from './Students'
 
 const visibleCoursesFilter = ({ course }, mandatoryCourses) =>
   mandatoryCourses.defaultProgrammeCourses?.some(
@@ -19,7 +18,7 @@ const visibleCoursesFilter = ({ course }, mandatoryCourses) =>
     programmeCourse => programmeCourse.code === course.code && programmeCourse.visible.visibility
   )
 
-const PopulationCourseStats = ({ filteredStudents, mandatoryCourses, courses, pending, onlyIamRights }) => {
+export const PopulationCourseStats = ({ mandatoryCourses, courses, pending, onlyIamRights }) => {
   const dispatch = useDispatch()
   const [modules, setModules] = useState([])
   const [expandedGroups, setExpandedGroups] = useState(new Set())
@@ -81,6 +80,7 @@ const PopulationCourseStats = ({ filteredStudents, mandatoryCourses, courses, pe
   const onGoToCourseStatisticsClick = () => {
     dispatch(clearCourseStats())
   }
+
   const toggleGroupExpansion = (code, close = false, all = null) => {
     if (all) {
       setExpandedGroups(new Set(all))
@@ -130,16 +130,7 @@ const PopulationCourseStats = ({ filteredStudents, mandatoryCourses, courses, pe
         </Tab.Pane>
       ),
     },
-    {
-      menuItem: 'Students',
-      hideIfOnlyIamRights: true,
-      render: () => (
-        <Tab.Pane>
-          <Students filteredStudents={filteredStudents} />
-        </Tab.Pane>
-      ),
-    },
-  ].filter(pane => !(pane.hideIfOnlyIamRights && onlyIamRights))
+  ]
 
   if (!courses || pending) {
     return null
@@ -153,5 +144,3 @@ const PopulationCourseStats = ({ filteredStudents, mandatoryCourses, courses, pe
     </div>
   )
 }
-
-export const ConnectedPopulationCourseStats = connect(null, { clearCourseStats })(PopulationCourseStats)

@@ -61,7 +61,7 @@ export const populationStatisticsToolTips = {
   Lisäksi kurssin nimi **name** ja koodisarakkeissa **code** suodatinkuvaketta klikkaamalla tulee esiin hakukentät suodattamista varten.
   Suodattimet saa tyhjennettyä painamalla kentän vieressä olevaa ruksia tai valitsemall valikon alaosasta **Reset column filter**.
 
-  **Huom! Nämä suodattimet vaikuttavat vain tähän taulukkoon, eivät koko populatioon.**
+  **Huom! Nämä suodattimet vaikuttavat vain tähän taulukkoon, eivät koko populaatioon.**
   Choose curriculum -valinta vaikuttaa siihen, minkä opetussuunnitelmakauden mukaiset kurssit näytetään taulukossa.
 
   **Taulukot**
@@ -70,7 +70,6 @@ export const populationStatisticsToolTips = {
     - **Enrolled, no grade** - sarake näyttää niiden opiskelijoiden määrän, joilla on ilmoittautuminen muttei arvosanaa eikä hylättyä suoritusta.
   - **Grades** - arvosanajakauma.
   - **When passed** - kurssisuorituksen ajankohta. Huom.! *Passed*-sarakkeen kokonaissumma ei välttämättä täsmää puolivuosittaisten lukumäärien summan kanssa johtuen tuplakirjauksista Oodissa.
-  - **Students** - opiskelijan arvosanat kursseittain.
   `,
   CoursesOfPopulation: `**Courses of Population**
 
@@ -85,7 +84,7 @@ export const populationStatisticsToolTips = {
   Lisäksi kurssin nimi **name** ja koodisarakkeissa **code** suodatinkuvaketta klikkaamalla tulee esiin hakukentät suodattamista varten.
   Suodattimet saa tyhjennettyä painamalla kentän vieressä olevaa ruksia tai valitsemall valikon alaosasta **Reset column filter**.
 
-  **Huom! Nämä suodattimet vaikuttavat vain tähän taulukkoon, eivät koko populatioon.**
+  **Huom! Nämä suodattimet vaikuttavat vain tähän taulukkoon, eivät koko populaatioon.**
 
   **Taulukot**
   - **Pass/fail** - näkymä sisältää kurssisuoritukset, hylätyt, yritykset sekä ilmoittautumistiedot. Huom.! ilmoittautumistiedot ovat saatavilla vain Sisun käyttöönoton jälkeiseltä ajalta.

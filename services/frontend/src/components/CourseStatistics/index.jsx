@@ -8,7 +8,7 @@ import { checkUserAccess, getFullStudyProgrammeRights } from '@/common'
 import { useProgress, useTitle } from '@/common/hooks'
 import { ProgressBar } from '@/components/ProgressBar'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
-import { clearCourseStats, getCourseStats } from '@/redux/coursestats'
+import { getCourseStats } from '@/redux/coursestats'
 import { userHasAccessToAllCourseStats } from './courseStatisticsUtils'
 import { FacultyLevelStatistics } from './FacultyLevelStatistics'
 import { SearchForm } from './SearchForm'
@@ -104,10 +104,7 @@ export const CourseStatistics = () => {
           content: MENU.QUERY,
           icon: 'search',
           position: 'right',
-          onClick: () => {
-            history.push('/coursestatistics')
-            dispatch(clearCourseStats)
-          },
+          onClick: () => history.push('/coursestatistics'),
         },
         render: () => null,
       },

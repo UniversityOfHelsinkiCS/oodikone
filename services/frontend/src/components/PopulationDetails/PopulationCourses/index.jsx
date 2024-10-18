@@ -6,7 +6,7 @@ import { Segment } from 'semantic-ui-react'
 import { useDeepMemo } from '@/common/hooks'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { InfoBox } from '@/components/InfoBox'
-import { ConnectedPopulationCourseStats as PopulationCourseStats } from '@/components/PopulationCourseStats'
+import { PopulationCourseStats } from '@/components/PopulationCourseStats'
 import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
 import { SegmentDimmer } from '@/components/SegmentDimmer'
 import { getPopulationSelectedStudentCourses } from '@/redux/populationSelectedStudentCourses'
@@ -85,7 +85,6 @@ export const PopulationCourses = ({
       {courseTableMode === 'curriculum' ? (
         <PopulationCourseStats
           courses={populationSelectedStudentCourses.data ?? []}
-          filteredStudents={filteredStudents}
           key={populationSelectedStudentCourses.query.uuid}
           mandatoryCourses={mandatoryCourses}
           onlyIamRights={onlyIamRights}

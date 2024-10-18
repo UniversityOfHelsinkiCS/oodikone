@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Form, Input, Segment } from 'semantic-ui-react'
 
-import { ConnectedPopulationCourseStats as PopulationCourseStats } from '@/components/PopulationCourseStats'
+import { PopulationCourseStats } from '@/components/PopulationCourseStats'
 import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
 import { CourseTableModeSelector } from '@/components/PopulationDetails/CurriculumPicker'
 
@@ -35,7 +35,7 @@ export const StudyGuidanceGroupPopulationCourses = ({
         />
       )}
       {courseTableMode === 'curriculum' ? (
-        <PopulationCourseStats courses={courses} filteredStudents={filteredStudents} mandatoryCourses={curriculum} />
+        <PopulationCourseStats courses={courses} mandatoryCourses={curriculum} />
       ) : (
         <>
           {!curriculumsAvailable && (
