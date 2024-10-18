@@ -21,6 +21,22 @@ const checkGradeTable = gradesTableContents => {
     })
 }
 
+const checkTableContents = contents => {
+  cy.get('#CourseStatPanes table>tbody').within(() => {
+    contents.forEach((values, trIndex) => {
+      cy.get('tr')
+        .eq(trIndex)
+        .within(() => {
+          values.forEach((value, tdIndex) => {
+            if (value === null) return
+            cy.get('td').eq(tdIndex).contains(value)
+          })
+        })
+    })
+    cy.get('tr').should('have.length', contents.length)
+  })
+}
+
 describe('Course Statistics tests', () => {
   describe('when using basic user', () => {
     beforeEach(() => {
@@ -348,14 +364,21 @@ describe('Course Statistics tests', () => {
       cy.contains('Search for courses').should('not.exist')
       cy.contains('TKT10002 Ohjelmoinnin perusteet')
 
-      // Statistics
       const yearRange = { from: '2016-2017', to: '2023-2024' }
       const attemptsTableContents = [
-        // [time, attempts, passed, failed]
-        ['Total', null, 186, 140, 16],
+        // [Time, --, Total attempts, Passed, Failed, Pass rate, Enrollments]
+        ['Total', null, 186, 140, 16, '89.74 %', 73],
+        ['2023-2024', null, 6, 1, 0, '16.67 %', 6],
+        ['2022-2023', null, 26, 27, 0, '103.85 %', 26], // <-- pass rate over 100% ?
+        ['2021-2022', null, 41, 15, 0, '36.59 %', 41],
+        ['2020-2021', null, 23, 23, 0, '100.00 %', null],
+        ['2019-2020', null, 29, 28, 1, '96.55 %', null],
+        ['2018-2019', null, 32, 26, 6, '81.25 %', null],
+        ['2017-2018', null, 28, 19, 9, '67.86 %', null],
+        ['2016-2017', null, 1, 1, 0, '100.00 %', null],
       ]
 
-      const gradesTableContents = [
+      const attemptsTableContentsWithGrades = [
         // [Time, --, Total attempts, 0, 1, 2, 3, 4, 5, Other passed]
         ['Total', null, 186, 16, 3, 8, 5, 24, 99, 1],
         ['2023-2024', null, 6, 0, 0, 0, 0, 0, 1, 0],
@@ -367,7 +390,7 @@ describe('Course Statistics tests', () => {
         ['2017-2018', null, 28, 9, 0, 1, 2, 5, 11, 0],
         ['2016-2017', null, 1, 0, 0, 0, 0, 1, 0, 0],
       ]
-      // Time range
+
       cy.get("div[name='fromYear']").within(() => {
         cy.get("div[role='option']").first().should('have.text', yearRange.to)
         cy.contains("div[role='option']", yearRange.from).should('have.class', 'selected')
@@ -382,33 +405,9 @@ describe('Course Statistics tests', () => {
       })
 
       cy.contains('#CourseStatPanes a.item', 'Attempts').click()
-      cy.get('#CourseStatPanes table>tbody').within(() => {
-        attemptsTableContents.forEach((values, trIndex) => {
-          cy.get('tr')
-            .eq(trIndex)
-            .within(() => {
-              values.forEach((value, tdIndex) => {
-                if (value === null) return
-                cy.get('td').eq(tdIndex).contains(value)
-              })
-            })
-        })
-        cy.get('tr').should('have.length', 9)
-      })
+      checkTableContents(attemptsTableContents)
       cy.get('[data-cy=gradeToggle]', { force: true }).click({ force: true })
-      cy.get('#CourseStatPanes table>tbody').within(() => {
-        gradesTableContents.forEach((values, trIndex) => {
-          cy.get('tr')
-            .eq(trIndex)
-            .within(() => {
-              values.forEach((value, tdIndex) => {
-                if (value === null) return
-                cy.get('td').eq(tdIndex).contains(value)
-              })
-            })
-        })
-        cy.get('tr').should('have.length', 9)
-      })
+      checkTableContents(attemptsTableContentsWithGrades)
     })
 
     describe('When searching unified course stats', () => {
@@ -495,33 +494,9 @@ describe('Course Statistics tests', () => {
       ]
 
       it('Students tab', () => {
-        cy.get('#CourseStatPanes table>tbody').within(() => {
-          studentsTableContents.forEach((values, trIndex) => {
-            cy.get('tr')
-              .eq(trIndex)
-              .within(() => {
-                values.forEach((value, tdIndex) => {
-                  if (value === null) return
-                  cy.get('td').eq(tdIndex).contains(value)
-                })
-              })
-          })
-          cy.get('tr').should('have.length', 21)
-        })
+        checkTableContents(studentsTableContents)
         cy.get('[data-cy=gradeToggle]', { force: true }).click({ force: true })
-        cy.get('#CourseStatPanes table>tbody').within(() => {
-          studentsTableContentsWithGrades.forEach((values, trIndex) => {
-            cy.get('tr')
-              .eq(trIndex)
-              .within(() => {
-                values.forEach((value, tdIndex) => {
-                  if (value === null) return
-                  cy.get('td').eq(tdIndex).contains(value)
-                })
-              })
-          })
-          cy.get('tr').should('have.length', 21)
-        })
+        checkTableContents(studentsTableContentsWithGrades)
       })
 
       const attemptsTableContents = [
@@ -576,33 +551,9 @@ describe('Course Statistics tests', () => {
 
       it('Attempts tab', () => {
         cy.contains('#CourseStatPanes a.item', 'Attempts').click()
-        cy.get('#CourseStatPanes table>tbody').within(() => {
-          attemptsTableContents.forEach((values, trIndex) => {
-            cy.get('tr')
-              .eq(trIndex)
-              .within(() => {
-                values.forEach((value, tdIndex) => {
-                  if (value === null) return
-                  cy.get('td').eq(tdIndex).contains(value)
-                })
-              })
-          })
-          cy.get('tr').should('have.length', 21)
-        })
+        checkTableContents(attemptsTableContents)
         cy.get('[data-cy=gradeToggle]', { force: true }).click({ force: true })
-        cy.get('#CourseStatPanes table>tbody').within(() => {
-          attemptsTableContentsWithGrades.forEach((values, trIndex) => {
-            cy.get('tr')
-              .eq(trIndex)
-              .within(() => {
-                values.forEach((value, tdIndex) => {
-                  if (value === null) return
-                  cy.get('td').eq(tdIndex).contains(value)
-                })
-              })
-          })
-          cy.get('tr').should('have.length', 21)
-        })
+        checkTableContents(attemptsTableContentsWithGrades)
       })
 
       it('After changing time range shows same stats', () => {
@@ -692,18 +643,6 @@ describe('Course Statistics tests', () => {
     ]
 
     cy.contains('#CourseStatPanes a.item', 'Attempts').click()
-    cy.get('#CourseStatPanes table>tbody').within(() => {
-      attemptsTableContents.forEach((values, trIndex) => {
-        cy.get('tr')
-          .eq(trIndex)
-          .within(() => {
-            values.forEach((value, tdIndex) => {
-              if (value === null) return
-              cy.get('td').eq(tdIndex).contains(value)
-            })
-          })
-      })
-      cy.get('tr').should('have.length', 21)
-    })
+    checkTableContents(attemptsTableContents)
   })
 })
