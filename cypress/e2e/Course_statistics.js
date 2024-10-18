@@ -37,6 +37,10 @@ const checkTableContents = contents => {
   })
 }
 
+const toggleShowGrades = () => {
+  cy.get('[data-cy=gradeToggle]', { force: true }).click({ force: true })
+}
+
 describe('Course Statistics tests', () => {
   describe('when using basic user', () => {
     beforeEach(() => {
@@ -406,7 +410,7 @@ describe('Course Statistics tests', () => {
 
       cy.contains('#CourseStatPanes a.item', 'Attempts').click()
       checkTableContents(attemptsTableContents)
-      cy.get('[data-cy=gradeToggle]', { force: true }).click({ force: true })
+      toggleShowGrades()
       checkTableContents(attemptsTableContentsWithGrades)
     })
 
@@ -495,7 +499,7 @@ describe('Course Statistics tests', () => {
 
       it('Students tab', () => {
         checkTableContents(studentsTableContents)
-        cy.get('[data-cy=gradeToggle]', { force: true }).click({ force: true })
+        toggleShowGrades()
         checkTableContents(studentsTableContentsWithGrades)
       })
 
@@ -552,7 +556,7 @@ describe('Course Statistics tests', () => {
       it('Attempts tab', () => {
         cy.contains('#CourseStatPanes a.item', 'Attempts').click()
         checkTableContents(attemptsTableContents)
-        cy.get('[data-cy=gradeToggle]', { force: true }).click({ force: true })
+        toggleShowGrades()
         checkTableContents(attemptsTableContentsWithGrades)
       })
 
