@@ -1,7 +1,7 @@
 const { sortBy, flatten, uniqBy } = require('lodash')
 
 const { serviceProvider } = require('../config')
-const { getMinMaxDate, logger } = require('../utils')
+const { getMinMaxDate, logger } = require('../utils/logger')
 const {
   educationTypeToExtentcode,
   getCountry,
