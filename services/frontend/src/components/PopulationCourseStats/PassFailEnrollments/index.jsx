@@ -127,18 +127,6 @@ export const PassFailEnrollments = ({ flat, onlyIamRights }) => {
             ],
           },
           {
-            key: 'passed-after-retry',
-            title: 'Passed\nafter retry',
-            filterType: 'range',
-            getRowVal: row => row.stats?.retryPassed ?? 0,
-          },
-          {
-            key: 'failed-many',
-            title: 'Failed\nmultiple times',
-            filterType: 'range',
-            getRowVal: row => row.stats?.failedMany ?? 0,
-          },
-          {
             key: 'of-population',
             title: 'Percentage of population',
             children: [
