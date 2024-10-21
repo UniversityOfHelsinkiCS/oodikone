@@ -11,7 +11,7 @@ import { Button, Radio } from 'semantic-ui-react'
 import { getStudyRightElementTargetDates } from '@/common'
 import { useDeepMemo } from '@/common/hooks'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { API_DATE_FORMAT, DISPLAY_DATE_FORMAT } from '@/constants/date'
+import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 import { reformatDate } from '@/util/timeAndDate'
 import { CreditGraphTooltip } from './CreditGraphTooltip'
 import './creditAccumulationGraphHC.css'
@@ -113,6 +113,9 @@ const createGraphOptions = ({
           }))
         ),
     },
+    rangeSelector: {
+      selected: 5, // Set default zoom to 'All'
+    },
     series: seriesData,
     chart: {
       height: graphHeight,
@@ -195,14 +198,7 @@ const reduceCreditsToPoints = ({ credits, points, singleStudent }, course) => {
   }
 }
 
-const getXAxisMonth = (date, startDate) =>
-  Math.max(moment(date, API_DATE_FORMAT).diff(moment(startDate, API_DATE_FORMAT), 'days') / 30, 0)
-
 const singleStudentTooltipFormatter = (point, student, getTextIn) => {
-  if (point.series.name === SINGLE_GRAPH_GOAL_SERIES_NAME) {
-    return null
-  }
-
   const targetCourse = sortCoursesByDate(student.courses).find(
     ({ course, date }) => point.key === course.code && point.x === new Date(date).getTime()
   )
@@ -226,61 +222,53 @@ const singleStudentTooltipFormatter = (point, student, getTextIn) => {
   return renderToString(<CreditGraphTooltip payload={payload} />)
 }
 
-const createGoalSeries = (starting, ending, absences) => {
-  const lastMonth = Math.ceil(getXAxisMonth(moment(ending), moment(starting)))
-
-  const getColor = (i, type) => {
-    if (i % 2 === 0) return '#96d7c3'
+const createGoalSeries = (graphStartDate, graphEndDate, absences) => {
+  const getColor = type => {
     if (type === 2) return '#ffb300'
-    if (type === -1) return '#e0e0e0'
-    return '#e53935'
+    if (type === 3) return '#e53935'
+    return '#96d7c3'
   }
 
-  let totalAbsenceMonths = 0
-  let previousTargetCreditsBeforeAbsence = 0
+  const absenceIsBetweenGraphDates = (startDate, endDate) =>
+    (graphStartDate <= startDate && startDate <= graphEndDate) || (graphStartDate <= endDate && endDate <= graphEndDate)
+
+  let totalAbsenceYears = 0
   const absencePoints = absences
-    .filter(a => a.startdate >= starting || (a.startdate <= starting && a.enddate >= starting))
+    .filter(a =>
+      a.enrollmenttype === 3
+        ? absenceIsBetweenGraphDates(a.startdate, a.enddate) && new Date(a.startdate).getTime() <= new Date().getTime()
+        : absenceIsBetweenGraphDates(a.startdate, a.enddate)
+    )
     .reduce((res, { startdate, enddate, enrollmenttype, statutoryAbsence }) => {
       const targetCreditsBeforeAbsence =
-        (Math.abs(moment(startdate).diff(moment(starting), 'months')) - totalAbsenceMonths) * (60 / 12)
-      const newCredits =
-        targetCreditsBeforeAbsence - previousTargetCreditsBeforeAbsence > 5 // Snap to previous credits when absent type changes
-          ? targetCreditsBeforeAbsence
-          : previousTargetCreditsBeforeAbsence
-      previousTargetCreditsBeforeAbsence = newCredits
-      res.push([startdate, newCredits, enrollmenttype, statutoryAbsence])
-      res.push([enddate, newCredits, enrollmenttype, statutoryAbsence])
-      totalAbsenceMonths += Math.abs(moment(enddate).diff(moment(startdate), 'months'))
+        (moment(startdate).diff(moment(graphStartDate), 'years', true) - totalAbsenceYears) * 60
+
+      const absenceInYears = moment(enddate).diff(moment(startdate), 'years', true)
+      totalAbsenceYears += absenceInYears
+
+      res.push([startdate, targetCreditsBeforeAbsence, null, null])
+      res.push([enddate, targetCreditsBeforeAbsence, enrollmenttype, statutoryAbsence])
       return res
     }, [])
 
-  const zoneStart = absencePoints.length ? [absencePoints[0][0]] : []
-  const zones = absencePoints.reduce((acc, [start, , enrollmenttype, statutoryAbsence], i) => {
-    return [
-      ...acc,
-      {
-        value: start,
-        color: getColor(i, enrollmenttype),
-        dashStyle: statutoryAbsence ? 'Dash' : 'Solid',
-      },
-    ]
-  }, zoneStart)
+  const zones = []
+  for (const [start, , enrollmenttype, statutoryAbsence] of absencePoints) {
+    zones.push({
+      value: start,
+      color: getColor(enrollmenttype),
+      dashStyle: statutoryAbsence ? 'Dash' : 'Solid',
+    })
+  }
+  zones.push({ color: '#96d7c3' })
 
-  const lastCredits = (lastMonth - totalAbsenceMonths) * (60 / 12)
-  const endingCredits = absences.some(a => moment(ending).isBetween(moment(a.startdate), moment(a.enddate)))
-    ? absencePoints[absencePoints.length - 1][1]
-    : lastCredits
-  const data = [...[[starting, 0], ...absencePoints, [ending, endingCredits]].sort((a, b) => a[0] - b[0])].filter(
-    r => r[0] <= ending
-  )
+  const yearsFromStart = moment(graphEndDate).diff(moment(graphStartDate), 'years', true)
+  const endingCredits = (yearsFromStart - totalAbsenceYears) * 60
+  const data = [[graphStartDate, 0], ...absencePoints, [graphEndDate, endingCredits]].sort((a, b) => a[0] - b[0])
+
   return {
     name: SINGLE_GRAPH_GOAL_SERIES_NAME,
     data,
-    seriesThreshold: 150,
-    color: '#96d7c3',
-    marker: {
-      enabled: false,
-    },
+    enableMouseTracking: false,
     zones,
     zoneAxis: 'x',
   }
