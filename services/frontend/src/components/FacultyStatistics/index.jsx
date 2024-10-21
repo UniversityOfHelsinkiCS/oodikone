@@ -17,8 +17,6 @@ export const FacultyStatistics = () => {
   const history = useHistory()
   const { facultyId } = useParams()
 
-  // const { encodedFacultyCode } = useParams()
-  // const facultyCode = decodeURIComponent(encodedFacultyCode)
   const { getTextIn } = useLanguage()
   const { data: faculties = [], isLoading } = useGetFacultiesQuery()
   const faculty = faculties.length > 0 && facultyId && faculties.find(faculty => faculty.id === facultyId)
