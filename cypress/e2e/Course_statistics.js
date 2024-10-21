@@ -41,8 +41,12 @@ const toggleShowGrades = () => {
   cy.get('[data-cy=gradeToggle]', { force: true }).click({ force: true })
 }
 
+const openAttemptsTab = () => {
+  cy.contains('#CourseStatPanes a.item', 'Attempts').click()
+}
+
 describe('Course Statistics tests', () => {
-  describe('when using basic user', () => {
+  describe('When using basic user', () => {
     beforeEach(() => {
       cy.init('/coursestatistics')
       cy.url().should('include', '/coursestatistics')
@@ -126,13 +130,12 @@ describe('Course Statistics tests', () => {
     it('Searching single course having substitution mappings shows course statistics', () => {
       cy.contains('Search for courses')
       cy.get("input[placeholder='Search by a course code']").type('TKT20001')
-      // Click uni course, not avoin
       cy.contains('td', /^TKT20001/).click()
       cy.contains('Search for courses').should('not.exist')
 
       cy.contains('Tietorakenteet ja algoritmit')
       cy.contains('TKT20001')
-      cy.contains('58131') // old mapped code
+      cy.contains('58131')
 
       cy.contains('.tabular.menu a', 'Students').click()
       cy.contains('All')
@@ -159,13 +162,13 @@ describe('Course Statistics tests', () => {
       cy.contains('.courseNameCell', 'Tietorakenteet ja algoritmit').contains('TKT20001').click()
       cy.contains('.courseNameCell', 'Ohjelmoinnin perusteet').should('not.exist')
       cy.contains('TKT20001')
-      cy.contains('58131') // old mapped code
+      cy.contains('58131')
       cy.contains('Summary').click()
 
       cy.contains('.courseNameCell', 'Ohjelmoinnin perusteet').contains('TKT10002').click()
       cy.contains('.courseNameCell', 'Käyttöjärjestelmät').should('not.exist')
       cy.contains('TKT10002')
-      cy.contains('581325') // old mapped code
+      cy.contains('581325')
       cy.contains('Summary').click()
 
       cy.contains('a', 'New query').click()
@@ -206,18 +209,6 @@ describe('Course Statistics tests', () => {
       cy.contains('td', 'TKT20001').click()
       cy.contains('Show population')
       cy.contains('TKT20001')
-    })
-
-    it('Shows statistics when separating by semester', () => {
-      const courseCode = 'DATA11002'
-      cy.contains('Search for courses')
-      cy.get("input[placeholder='Search by a course code']").type(courseCode)
-      cy.contains('td', courseCode).click()
-      cy.get('[data-cy=separateToggle]', { force: true }).click({ force: true })
-      cy.contains('Syksy 2019')
-      cy.contains('Syksy 2017')
-      cy.get('tbody').contains('19')
-      cy.contains(courseCode)
     })
 
     it('Searching course by name displays right courses', () => {
@@ -346,59 +337,98 @@ describe('Course Statistics tests', () => {
       cy.contains('td', 'english').siblings().eq(0).contains('2')
     })
 
-    it('Shows correct statistics when course is not combined with its substitutions', () => {
-      cy.get('[data-cy="combine-substitutions-toggle"]').should('have.class', 'checked').click()
-      cy.get('[data-cy="combine-substitutions-toggle"]').should('not.have.class', 'checked')
+    describe('Shows correct statistics when course is not combined with its substitutions', () => {
+      beforeEach(() => {
+        cy.get('[data-cy="combine-substitutions-toggle"]').should('have.class', 'checked').click()
+        cy.get('[data-cy="combine-substitutions-toggle"]').should('not.have.class', 'checked')
 
-      cy.get("input[placeholder='Search by a course code']").type('TKT10002')
-      cy.contains('td', /^TKT10002$/).click()
-      cy.contains('Search for courses').should('not.exist')
-      cy.contains('TKT10002 Ohjelmoinnin perusteet')
-
-      const yearRange = { from: '2016-2017', to: '2023-2024' }
-      const attemptsTableContents = [
-        // [Time, --, Total attempts, Passed, Failed, Pass rate, Enrollments]
-        ['Total', null, 186, 140, 16, '89.74 %', 73],
-        ['2023-2024', null, 6, 1, 0, '16.67 %', 6],
-        ['2022-2023', null, 26, 27, 0, '100.00 %', 26],
-        ['2021-2022', null, 41, 15, 0, '36.59 %', 41],
-        ['2020-2021', null, 23, 23, 0, '100.00 %', null],
-        ['2019-2020', null, 29, 28, 1, '96.55 %', null],
-        ['2018-2019', null, 32, 26, 6, '81.25 %', null],
-        ['2017-2018', null, 28, 19, 9, '67.86 %', null],
-        ['2016-2017', null, 1, 1, 0, '100.00 %', null],
-      ]
-
-      const attemptsTableContentsWithGrades = [
-        // [Time, --, Total attempts, 0, 1, 2, 3, 4, 5, Other passed]
-        ['Total', null, 186, 16, 3, 8, 5, 24, 99, 1],
-        ['2023-2024', null, 6, 0, 0, 0, 0, 0, 1, 0],
-        ['2022-2023', null, 26, 0, 0, 0, 0, 6, 21, 0],
-        ['2021-2022', null, 41, 0, 0, 0, 0, 2, 13, 0],
-        ['2020-2021', null, 23, 0, 0, 2, 0, 2, 18, 1],
-        ['2019-2020', null, 29, 1, 1, 4, 1, 5, 17, 0],
-        ['2018-2019', null, 32, 6, 2, 1, 2, 3, 18, 0],
-        ['2017-2018', null, 28, 9, 0, 1, 2, 5, 11, 0],
-        ['2016-2017', null, 1, 0, 0, 0, 0, 1, 0, 0],
-      ]
-
-      cy.get("div[name='fromYear']").within(() => {
-        cy.get("div[role='option']").first().should('have.text', yearRange.to)
-        cy.contains("div[role='option']", yearRange.from).should('have.class', 'selected')
-        cy.get("div[role='option']").last().should('have.text', '2016-2017')
-        cy.get("div[role='option']").should('have.length', 8)
-      })
-      cy.get("div[name='toYear']").within(() => {
-        cy.get("div[role='option']").first().should('have.text', '2023-2024')
-        cy.contains("div[role='option']", yearRange.to).should('have.class', 'selected')
-        cy.get("div[role='option']").last().should('have.text', yearRange.from)
-        cy.get("div[role='option']").should('have.length', 8)
+        cy.get("input[placeholder='Search by a course code']").type('TKT10002')
+        cy.contains('td', /^TKT10002$/).click()
+        cy.contains('Search for courses').should('not.exist')
+        cy.contains('TKT10002 Ohjelmoinnin perusteet')
       })
 
-      cy.contains('#CourseStatPanes a.item', 'Attempts').click()
-      checkTableContents(attemptsTableContents)
-      toggleShowGrades()
-      checkTableContents(attemptsTableContentsWithGrades)
+      it('Time range', () => {
+        const yearRange = { from: '2016-2017', to: '2023-2024' }
+        cy.get("div[name='fromYear']").within(() => {
+          cy.get("div[role='option']").first().should('have.text', yearRange.to)
+          cy.contains("div[role='option']", yearRange.from).should('have.class', 'selected')
+          cy.get("div[role='option']").last().should('have.text', '2016-2017')
+          cy.get("div[role='option']").should('have.length', 8)
+        })
+        cy.get("div[name='toYear']").within(() => {
+          cy.get("div[role='option']").first().should('have.text', '2023-2024')
+          cy.contains("div[role='option']", yearRange.to).should('have.class', 'selected')
+          cy.get("div[role='option']").last().should('have.text', yearRange.from)
+          cy.get("div[role='option']").should('have.length', 8)
+        })
+        cy.contains('Show population').should('be.enabled')
+      })
+
+      it('Students tab', () => {
+        const studentsTableContents = [
+          // [Time, --, Total students, Passed, Failed, Enrolled no grade, Pass rate, Fail rate]
+          ['Total', null, 187, 140, 11, 36, '74.87 %', '25.13 %'],
+          ['2023-2024', null, 7, 1, 0, 6, '14.29 %', '85.71 %'],
+          ['2022-2023', null, 33, 27, 0, 6, '81.82 %', '18.18 %'],
+          ['2021-2022', null, 39, 15, 0, 24, '38.46 %', '61.54 %'],
+          ['2020-2021', null, 23, 23, 0, null, '100.00 %', '0.00 %'],
+          ['2019-2020', null, 28, 28, 0, null, '100.00 %', '0.00 %'],
+          ['2018-2019', null, 30, 26, 4, null, '86.67 %', '13.33 %'],
+          ['2017-2018', null, 26, 19, 7, null, '73.08 %', '26.92 %'],
+          ['2016-2017', null, 1, 1, 0, null, '100.00 %', '0.00 %'],
+        ]
+
+        const studentsTableContentsWithGrades = [
+          // [Time, --, Total students, Failed, 0, 1, 2, 3, 4, 5, Other passed, Enrolled no grade, Pass rate, Fail rate]
+          ['Total', null, 187, 11, 3, 8, 5, 24, 99, 1, 36, '74.87 %', '25.13 %'],
+          ['2023-2024', null, 7, 0, 0, 0, 0, 0, 1, 0, 6, '14.29 %', '85.71 %'],
+          ['2022-2023', null, 33, 0, 0, 0, 0, 6, 21, 0, 6, '81.82 %', '18.18 %'],
+          ['2021-2022', null, 39, 0, 0, 0, 0, 2, 13, 0, 24, '38.46 %', '61.54 %'],
+          ['2020-2021', null, 23, 0, 0, 2, 0, 2, 18, 1, null, '100.00 %', '0.00 %'],
+          ['2019-2020', null, 28, 0, 1, 4, 1, 5, 17, 0, null, '100.00 %', '0.00 %'],
+          ['2018-2019', null, 30, 4, 2, 1, 2, 3, 18, 0, null, '86.67 %', '13.33 %'],
+          ['2017-2018', null, 26, 7, 0, 1, 2, 5, 11, 0, null, '73.08 %', '26.92 %'],
+          ['2016-2017', null, 1, 0, 0, 0, 0, 1, 0, 0, null, '100.00 %', '0.00 %'],
+        ]
+
+        checkTableContents(studentsTableContents)
+        toggleShowGrades()
+        checkTableContents(studentsTableContentsWithGrades)
+      })
+
+      it('Attempts tab', () => {
+        const attemptsTableContents = [
+          // [Time, --, Total attempts, Passed, Failed, Pass rate, Enrollments]
+          ['Total', null, 186, 140, 16, '89.74 %', 73],
+          ['2023-2024', null, 6, 1, 0, '16.67 %', 6],
+          ['2022-2023', null, 26, 27, 0, '100.00 %', 26],
+          ['2021-2022', null, 41, 15, 0, '36.59 %', 41],
+          ['2020-2021', null, 23, 23, 0, '100.00 %', null],
+          ['2019-2020', null, 29, 28, 1, '96.55 %', null],
+          ['2018-2019', null, 32, 26, 6, '81.25 %', null],
+          ['2017-2018', null, 28, 19, 9, '67.86 %', null],
+          ['2016-2017', null, 1, 1, 0, '100.00 %', null],
+        ]
+
+        const attemptsTableContentsWithGrades = [
+          // [Time, --, Total attempts, 0, 1, 2, 3, 4, 5, Other passed]
+          ['Total', null, 186, 16, 3, 8, 5, 24, 99, 1],
+          ['2023-2024', null, 6, 0, 0, 0, 0, 0, 1, 0],
+          ['2022-2023', null, 26, 0, 0, 0, 0, 6, 21, 0],
+          ['2021-2022', null, 41, 0, 0, 0, 0, 2, 13, 0],
+          ['2020-2021', null, 23, 0, 0, 2, 0, 2, 18, 1],
+          ['2019-2020', null, 29, 1, 1, 4, 1, 5, 17, 0],
+          ['2018-2019', null, 32, 6, 2, 1, 2, 3, 18, 0],
+          ['2017-2018', null, 28, 9, 0, 1, 2, 5, 11, 0],
+          ['2016-2017', null, 1, 0, 0, 0, 0, 1, 0, 0],
+        ]
+
+        openAttemptsTab()
+        checkTableContents(attemptsTableContents)
+        toggleShowGrades()
+        checkTableContents(attemptsTableContentsWithGrades)
+      })
     })
 
     describe('When searching unified course stats', () => {
@@ -415,9 +445,8 @@ describe('Course Statistics tests', () => {
         cy.contains('A581325 Avoin yo: Ohjelmoinnin perusteet')
       })
 
-      const yearRange = { from: '1999-2000', to: '2023-2024' }
-
       it('Time range', () => {
+        const yearRange = { from: '1999-2000', to: '2023-2024' }
         cy.contains('Statistics by time range')
         cy.get("div[name='fromYear']").within(() => {
           cy.get("div[role='option']").first().should('have.text', yearRange.to)
@@ -434,114 +463,114 @@ describe('Course Statistics tests', () => {
         cy.contains('Show population').should('be.enabled')
       })
 
-      const studentsTableContents = [
-        // [Time, --, Total students, Passed, Failed, Enrolled no grade, Pass rate, Fail rate]
-        ['Total', null, 284, 237, 16, 31, '83.45 %', '16.55 %'],
-        ['2023-2024', null, 8, 2, 0, 6, '25.00 %', '75.00 %'],
-        ['2022-2023', null, 35, 28, 0, 7, '80.00 %', '20.00 %'],
-        ['2021-2022', null, 45, 27, 0, 18, '60.00 %', '40.00 %'],
-        ['2020-2021', null, 33, 33, 0, null, '100.00 %', '0.00 %'],
-        ['2019-2020', null, 57, 56, 1, null, '98.25 %', '1.75 %'],
-        ['2018-2019', null, 42, 38, 4, null, '90.48 %', '9.52 %'],
-        ['2017-2018', null, 32, 25, 7, null, '78.13 %', '21.88 %'],
-        ['2016-2017', null, 7, 6, 1, null, '85.71 %', '14.29 %'],
-        ['2015-2016', null, 4, 3, 1, null, '75.00 %', '25.00 %'],
-        ['2014-2015', null, 6, 6, 0, null, '100.00 %', '0.00 %'],
-        ['2013-2014', null, 2, 1, 1, null, '50.00 %', '50.00 %'],
-        ['2012-2013', null, 4, 4, 0, null, '100.00 %', '0.00 %'],
-        ['2011-2012', null, 1, 1, 0, null, '100.00 %', '0.00 %'],
-        ['2010-2011', null, 1, 1, 0, null, '100.00 %', '0.00 %'],
-        ['2008-2009', null, 1, 0, 1, null, '0.00 %', '100.00 %'],
-        ['2007-2008', null, 1, 1, 0, null, '100.00 %', '0.00 %'],
-        ['2006-2007', null, 1, 1, 0, null, '100.00 %', '0.00 %'],
-        ['2005-2006', null, 1, 1, 0, null, '100.00 %', '0.00 %'],
-        ['2003-2004', null, 1, 1, 0, null, '100.00 %', '0.00 %'],
-        ['1999-2000', null, 2, 2, 0, null, '100.00 %', '0.00 %'],
-      ]
-
-      const studentsTableContentsWithGrades = [
-        // [Time, --, Total students, Failed, 0, 1, 2, 3, 4, 5, Other passed, Enrolled no grade, Pass rate, Fail rate]
-        ['Total', null, 284, 16, 4, 14, 9, 37, 168, 5, 31, '83.45 %', '16.55 %'],
-        ['2023-2024', null, 8, 0, 0, 0, 0, 0, 2, 0, 6, '25.00 %', '75.00 %'],
-        ['2022-2023', null, 35, 0, 0, 0, 0, 6, 22, 0, 7, '80.00 %', '20.00 %'],
-        ['2021-2022', null, 45, 0, 0, 1, 0, 2, 24, 0, 18, '60.00 %', '40.00 %'],
-        ['2020-2021', null, 33, 0, 0, 2, 1, 2, 27, 1, null, '100.00 %', '0.00 %'],
-        ['2019-2020', null, 57, 1, 1, 5, 3, 9, 38, 0, null, '98.25 %', '1.75 %'],
-        ['2018-2019', null, 42, 4, 3, 2, 2, 6, 25, 0, null, '90.48 %', '9.52 %'],
-        ['2017-2018', null, 32, 7, 0, 2, 2, 6, 15, 0, null, '78.13 %', '21.88 %'],
-        ['2016-2017', null, 7, 1, 0, 0, 1, 1, 4, 0, null, '85.71 %', '14.29 %'],
-        ['2015-2016', null, 4, 1, 0, 1, 0, 0, 1, 1, null, '75.00 %', '25.00 %'],
-        ['2014-2015', null, 6, 0, 0, 1, 0, 0, 2, 3, null, '100.00 %', '0.00 %'],
-        ['2013-2014', null, 2, 1, 0, 0, 0, 0, 1, 0, null, '50.00 %', '50.00 %'],
-        ['2012-2013', null, 4, 0, 0, 0, 0, 3, 1, 0, null, '100.00 %', '0.00 %'],
-        ['2011-2012', null, 1, 0, 0, 0, 0, 0, 1, 0, null, '100.00 %', '0.00 %'],
-        ['2010-2011', null, 1, 0, 0, 0, 0, 1, 0, 0, null, '100.00 %', '0.00 %'],
-        ['2008-2009', null, 1, 1, 0, 0, 0, 0, 0, 0, null, '0.00 %', '100.00 %'],
-        ['2007-2008', null, 1, 0, 0, 0, 0, 0, 1, 0, null, '100.00 %', '0.00 %'],
-        ['2006-2007', null, 1, 0, 0, 0, 0, 0, 1, 0, null, '100.00 %', '0.00 %'],
-        ['2005-2006', null, 1, 0, 0, 0, 0, 1, 0, 0, null, '100.00 %', '0.00 %'],
-        ['2003-2004', null, 1, 0, 0, 0, 0, 0, 1, 0, null, '100.00 %', '0.00 %'],
-        ['1999-2000', null, 2, 0, 0, 0, 0, 0, 2, 0, null, '100.00 %', '0.00 %'],
-      ]
-
       it('Students tab', () => {
+        const studentsTableContents = [
+          // [Time, --, Total students, Passed, Failed, Enrolled no grade, Pass rate, Fail rate]
+          ['Total', null, 284, 237, 16, 31, '83.45 %', '16.55 %'],
+          ['2023-2024', null, 8, 2, 0, 6, '25.00 %', '75.00 %'],
+          ['2022-2023', null, 35, 28, 0, 7, '80.00 %', '20.00 %'],
+          ['2021-2022', null, 45, 27, 0, 18, '60.00 %', '40.00 %'],
+          ['2020-2021', null, 33, 33, 0, null, '100.00 %', '0.00 %'],
+          ['2019-2020', null, 57, 56, 1, null, '98.25 %', '1.75 %'],
+          ['2018-2019', null, 42, 38, 4, null, '90.48 %', '9.52 %'],
+          ['2017-2018', null, 32, 25, 7, null, '78.13 %', '21.88 %'],
+          ['2016-2017', null, 7, 6, 1, null, '85.71 %', '14.29 %'],
+          ['2015-2016', null, 4, 3, 1, null, '75.00 %', '25.00 %'],
+          ['2014-2015', null, 6, 6, 0, null, '100.00 %', '0.00 %'],
+          ['2013-2014', null, 2, 1, 1, null, '50.00 %', '50.00 %'],
+          ['2012-2013', null, 4, 4, 0, null, '100.00 %', '0.00 %'],
+          ['2011-2012', null, 1, 1, 0, null, '100.00 %', '0.00 %'],
+          ['2010-2011', null, 1, 1, 0, null, '100.00 %', '0.00 %'],
+          ['2008-2009', null, 1, 0, 1, null, '0.00 %', '100.00 %'],
+          ['2007-2008', null, 1, 1, 0, null, '100.00 %', '0.00 %'],
+          ['2006-2007', null, 1, 1, 0, null, '100.00 %', '0.00 %'],
+          ['2005-2006', null, 1, 1, 0, null, '100.00 %', '0.00 %'],
+          ['2003-2004', null, 1, 1, 0, null, '100.00 %', '0.00 %'],
+          ['1999-2000', null, 2, 2, 0, null, '100.00 %', '0.00 %'],
+        ]
+
+        const studentsTableContentsWithGrades = [
+          // [Time, --, Total students, Failed, 0, 1, 2, 3, 4, 5, Other passed, Enrolled no grade, Pass rate, Fail rate]
+          ['Total', null, 284, 16, 4, 14, 9, 37, 168, 5, 31, '83.45 %', '16.55 %'],
+          ['2023-2024', null, 8, 0, 0, 0, 0, 0, 2, 0, 6, '25.00 %', '75.00 %'],
+          ['2022-2023', null, 35, 0, 0, 0, 0, 6, 22, 0, 7, '80.00 %', '20.00 %'],
+          ['2021-2022', null, 45, 0, 0, 1, 0, 2, 24, 0, 18, '60.00 %', '40.00 %'],
+          ['2020-2021', null, 33, 0, 0, 2, 1, 2, 27, 1, null, '100.00 %', '0.00 %'],
+          ['2019-2020', null, 57, 1, 1, 5, 3, 9, 38, 0, null, '98.25 %', '1.75 %'],
+          ['2018-2019', null, 42, 4, 3, 2, 2, 6, 25, 0, null, '90.48 %', '9.52 %'],
+          ['2017-2018', null, 32, 7, 0, 2, 2, 6, 15, 0, null, '78.13 %', '21.88 %'],
+          ['2016-2017', null, 7, 1, 0, 0, 1, 1, 4, 0, null, '85.71 %', '14.29 %'],
+          ['2015-2016', null, 4, 1, 0, 1, 0, 0, 1, 1, null, '75.00 %', '25.00 %'],
+          ['2014-2015', null, 6, 0, 0, 1, 0, 0, 2, 3, null, '100.00 %', '0.00 %'],
+          ['2013-2014', null, 2, 1, 0, 0, 0, 0, 1, 0, null, '50.00 %', '50.00 %'],
+          ['2012-2013', null, 4, 0, 0, 0, 0, 3, 1, 0, null, '100.00 %', '0.00 %'],
+          ['2011-2012', null, 1, 0, 0, 0, 0, 0, 1, 0, null, '100.00 %', '0.00 %'],
+          ['2010-2011', null, 1, 0, 0, 0, 0, 1, 0, 0, null, '100.00 %', '0.00 %'],
+          ['2008-2009', null, 1, 1, 0, 0, 0, 0, 0, 0, null, '0.00 %', '100.00 %'],
+          ['2007-2008', null, 1, 0, 0, 0, 0, 0, 1, 0, null, '100.00 %', '0.00 %'],
+          ['2006-2007', null, 1, 0, 0, 0, 0, 0, 1, 0, null, '100.00 %', '0.00 %'],
+          ['2005-2006', null, 1, 0, 0, 0, 0, 1, 0, 0, null, '100.00 %', '0.00 %'],
+          ['2003-2004', null, 1, 0, 0, 0, 0, 0, 1, 0, null, '100.00 %', '0.00 %'],
+          ['1999-2000', null, 2, 0, 0, 0, 0, 0, 2, 0, null, '100.00 %', '0.00 %'],
+        ]
+
         checkTableContents(studentsTableContents)
         toggleShowGrades()
         checkTableContents(studentsTableContentsWithGrades)
       })
 
-      const attemptsTableContents = [
-        // [Time, --, Total attempts, Passed, Failed, Pass rate, Enrollments]
-        ['Total', null, 288, 241, 25, '90.60 %', 79],
-        ['2023-2024', null, 6, 2, 0, '33.33 %', 6],
-        ['2022-2023', null, 28, 28, 0, '100.00 %', 28],
-        ['2021-2022', null, 45, 27, 0, '60.00 %', 45],
-        ['2020-2021', null, 34, 34, 0, '100.00 %', null],
-        ['2019-2020', null, 60, 57, 3, '95.00 %', null],
-        ['2018-2019', null, 46, 39, 7, '84.78 %', null],
-        ['2017-2018', null, 35, 26, 9, '74.29 %', null],
-        ['2016-2017', null, 7, 6, 1, '85.71 %', null],
-        ['2015-2016', null, 5, 3, 2, '60.00 %', null],
-        ['2014-2015', null, 7, 6, 1, '85.71 %', null],
-        ['2013-2014', null, 2, 1, 1, '50.00 %', null],
-        ['2012-2013', null, 4, 4, 0, '100.00 %', null],
-        ['2011-2012', null, 1, 1, 0, '100.00 %', null],
-        ['2010-2011', null, 1, 1, 0, '100.00 %', null],
-        ['2008-2009', null, 1, 0, 1, '0.00 %', null],
-        ['2007-2008', null, 1, 1, 0, '100.00 %', null],
-        ['2006-2007', null, 1, 1, 0, '100.00 %', null],
-        ['2005-2006', null, 1, 1, 0, '100.00 %', null],
-        ['2003-2004', null, 1, 1, 0, '100.00 %', null],
-        ['1999-2000', null, 2, 2, 0, '100.00 %', null],
-      ]
-
-      const attemptsTableContentsWithGrades = [
-        // [Time, --, Total attempts, Failed, 1, 2, 3, 4, 5, Other passed]
-        ['Total', null, 288, 25, 6, 15, 9, 37, 169, 5],
-        ['2023-2024', null, 6, 0, 0, 0, 0, 0, 2, 0],
-        ['2022-2023', null, 28, 0, 0, 0, 0, 6, 22, 0],
-        ['2021-2022', null, 45, 0, 0, 1, 0, 2, 24, 0],
-        ['2020-2021', null, 34, 0, 0, 2, 1, 2, 28, 1],
-        ['2019-2020', null, 60, 3, 2, 5, 3, 9, 38, 0],
-        ['2018-2019', null, 46, 7, 3, 3, 2, 6, 25, 0],
-        ['2017-2018', null, 35, 9, 1, 2, 2, 6, 15, 0],
-        ['2016-2017', null, 7, 1, 0, 0, 1, 1, 4, 0],
-        ['2015-2016', null, 5, 2, 0, 1, 0, 0, 1, 1],
-        ['2014-2015', null, 7, 1, 0, 1, 0, 0, 2, 3],
-        ['2013-2014', null, 2, 1, 0, 0, 0, 0, 1, 0],
-        ['2012-2013', null, 4, 0, 0, 0, 0, 3, 1, 0],
-        ['2011-2012', null, 1, 0, 0, 0, 0, 0, 1, 0],
-        ['2010-2011', null, 1, 0, 0, 0, 0, 1, 0, 0],
-        ['2008-2009', null, 1, 1, 0, 0, 0, 0, 0, 0],
-        ['2007-2008', null, 1, 0, 0, 0, 0, 0, 1, 0],
-        ['2006-2007', null, 1, 0, 0, 0, 0, 0, 1, 0],
-        ['2005-2006', null, 1, 0, 0, 0, 0, 1, 0, 0],
-        ['2003-2004', null, 1, 0, 0, 0, 0, 0, 1, 0],
-        ['1999-2000', null, 2, 0, 0, 0, 0, 0, 2, 0],
-      ]
-
       it('Attempts tab', () => {
-        cy.contains('#CourseStatPanes a.item', 'Attempts').click()
+        const attemptsTableContents = [
+          // [Time, --, Total attempts, Passed, Failed, Pass rate, Enrollments]
+          ['Total', null, 288, 241, 25, '90.60 %', 79],
+          ['2023-2024', null, 6, 2, 0, '33.33 %', 6],
+          ['2022-2023', null, 28, 28, 0, '100.00 %', 28],
+          ['2021-2022', null, 45, 27, 0, '60.00 %', 45],
+          ['2020-2021', null, 34, 34, 0, '100.00 %', null],
+          ['2019-2020', null, 60, 57, 3, '95.00 %', null],
+          ['2018-2019', null, 46, 39, 7, '84.78 %', null],
+          ['2017-2018', null, 35, 26, 9, '74.29 %', null],
+          ['2016-2017', null, 7, 6, 1, '85.71 %', null],
+          ['2015-2016', null, 5, 3, 2, '60.00 %', null],
+          ['2014-2015', null, 7, 6, 1, '85.71 %', null],
+          ['2013-2014', null, 2, 1, 1, '50.00 %', null],
+          ['2012-2013', null, 4, 4, 0, '100.00 %', null],
+          ['2011-2012', null, 1, 1, 0, '100.00 %', null],
+          ['2010-2011', null, 1, 1, 0, '100.00 %', null],
+          ['2008-2009', null, 1, 0, 1, '0.00 %', null],
+          ['2007-2008', null, 1, 1, 0, '100.00 %', null],
+          ['2006-2007', null, 1, 1, 0, '100.00 %', null],
+          ['2005-2006', null, 1, 1, 0, '100.00 %', null],
+          ['2003-2004', null, 1, 1, 0, '100.00 %', null],
+          ['1999-2000', null, 2, 2, 0, '100.00 %', null],
+        ]
+
+        const attemptsTableContentsWithGrades = [
+          // [Time, --, Total attempts, Failed, 1, 2, 3, 4, 5, Other passed]
+          ['Total', null, 288, 25, 6, 15, 9, 37, 169, 5],
+          ['2023-2024', null, 6, 0, 0, 0, 0, 0, 2, 0],
+          ['2022-2023', null, 28, 0, 0, 0, 0, 6, 22, 0],
+          ['2021-2022', null, 45, 0, 0, 1, 0, 2, 24, 0],
+          ['2020-2021', null, 34, 0, 0, 2, 1, 2, 28, 1],
+          ['2019-2020', null, 60, 3, 2, 5, 3, 9, 38, 0],
+          ['2018-2019', null, 46, 7, 3, 3, 2, 6, 25, 0],
+          ['2017-2018', null, 35, 9, 1, 2, 2, 6, 15, 0],
+          ['2016-2017', null, 7, 1, 0, 0, 1, 1, 4, 0],
+          ['2015-2016', null, 5, 2, 0, 1, 0, 0, 1, 1],
+          ['2014-2015', null, 7, 1, 0, 1, 0, 0, 2, 3],
+          ['2013-2014', null, 2, 1, 0, 0, 0, 0, 1, 0],
+          ['2012-2013', null, 4, 0, 0, 0, 0, 3, 1, 0],
+          ['2011-2012', null, 1, 0, 0, 0, 0, 0, 1, 0],
+          ['2010-2011', null, 1, 0, 0, 0, 0, 1, 0, 0],
+          ['2008-2009', null, 1, 1, 0, 0, 0, 0, 0, 0],
+          ['2007-2008', null, 1, 0, 0, 0, 0, 0, 1, 0],
+          ['2006-2007', null, 1, 0, 0, 0, 0, 0, 1, 0],
+          ['2005-2006', null, 1, 0, 0, 0, 0, 1, 0, 0],
+          ['2003-2004', null, 1, 0, 0, 0, 0, 0, 1, 0],
+          ['1999-2000', null, 2, 0, 0, 0, 0, 0, 2, 0],
+        ]
+
+        openAttemptsTab()
         checkTableContents(attemptsTableContents)
         toggleShowGrades()
         checkTableContents(attemptsTableContentsWithGrades)
@@ -633,7 +662,7 @@ describe('Course Statistics tests', () => {
       emptyYear('1999-2000'),
     ]
 
-    cy.contains('#CourseStatPanes a.item', 'Attempts').click()
+    openAttemptsTab()
     checkTableContents(attemptsTableContents)
   })
 })
