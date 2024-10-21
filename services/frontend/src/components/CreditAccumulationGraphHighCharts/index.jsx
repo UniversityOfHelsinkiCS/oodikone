@@ -14,7 +14,6 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 import { reformatDate } from '@/util/timeAndDate'
 import { CreditGraphTooltip } from './CreditGraphTooltip'
-import './creditAccumulationGraphHC.css'
 
 exporting(ReactHighstock.Highcharts)
 exportData(ReactHighstock.Highcharts)
@@ -209,7 +208,6 @@ const singleStudentTooltipFormatter = (point, student, getTextIn) => {
 
   const payload = [
     {
-      name: student.studentNumber,
       payload: {
         ...targetCourse,
         courseCode: targetCourse.course.code,
@@ -544,8 +542,8 @@ export const CreditAccumulationGraphHighCharts = ({
   )
 
   return (
-    <div className="graphContainer">
-      <div className="graph-options">
+    <div style={{ minWidth: '400px', marginBottom: '15px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '1rem 0' }}>
         <div>
           {!singleStudent && studyPlanFilterIsActive && (
             <Radio
