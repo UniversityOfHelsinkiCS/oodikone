@@ -1,7 +1,7 @@
 import { Request, Response, Router } from 'express'
 
 import * as auth from '../middleware/auth'
-import { getDegreeProgrammesOfFaculty } from '../services/faculty/faculty'
+import { getDegreeProgrammesOfFaculty, getFacultyCodeById } from '../services/faculty/faculty'
 import { combineFacultyBasics } from '../services/faculty/facultyBasics'
 import { getFacultyCredits } from '../services/faculty/facultyCredits'
 import { countGraduationTimes } from '../services/faculty/facultyGraduationTimes'
@@ -47,7 +47,8 @@ router.get(
   '/:id/basicstats',
   auth.roles(['facultyStatistics', 'katselmusViewer']),
   async (req: GetStatsRequest, res: Response) => {
-    const code = req.params.id
+    const facultyId = req.params.id
+    const code = await getFacultyCodeById(facultyId)
     if (!code) {
       return res.status(422).end()
     }
@@ -82,7 +83,8 @@ router.get(
   '/:id/creditstats',
   auth.roles(['facultyStatistics', 'katselmusViewer']),
   async (req: GetCreditStatsRequest, res: Response) => {
-    const code = req.params.id
+    const facultyId = req.params.id
+    const code = await getFacultyCodeById(facultyId)
     const { year_type: yearType } = req.query
     const stats = await getFacultyCredits(code, yearType === 'ACADEMIC_YEAR')
     return res.json(stats)
@@ -93,7 +95,8 @@ router.get(
   '/:id/thesisstats',
   auth.roles(['facultyStatistics', 'katselmusViewer']),
   async (req: GetStatsRequest, res: Response) => {
-    const code = req.params.id
+    const facultyId = req.params.id
+    const code = await getFacultyCodeById(facultyId)
     if (!code) {
       return res.status(422).end()
     }
@@ -127,7 +130,8 @@ router.get(
   '/:id/graduationtimes',
   auth.roles(['facultyStatistics', 'katselmusViewer']),
   async (req: GetGraduationStatsRequest, res: Response) => {
-    const code = req.params.id
+    const facultyId = req.params.id
+    const code = await getFacultyCodeById(facultyId)
     if (!code) {
       return res.status(422).end()
     }
@@ -162,7 +166,8 @@ router.get(
   '/:id/progressstats',
   auth.roles(['facultyStatistics', 'katselmusViewer']),
   async (req: GetProgressStatsRequest, res: Response) => {
-    const code = req.params.id
+    const facultyId = req.params.id
+    const code = await getFacultyCodeById(facultyId)
     if (!code) {
       return res.status(422).end()
     }
@@ -192,7 +197,8 @@ router.get(
   '/:id/studentstats',
   auth.roles(['facultyStatistics', 'katselmusViewer']),
   async (req: GetStudentStatsRequest, res: Response) => {
-    const code = req.params.id
+    const facultyId = req.params.id
+    const code = await getFacultyCodeById(facultyId)
     if (!code) {
       return res.status(422).end()
     }
@@ -227,7 +233,8 @@ router.get(
   '/:id/update_basicview',
   auth.roles(['facultyStatistics', 'katselmusViewer']),
   async (req: GetUpdateBasicViewRequest, res: Response) => {
-    const code = req.params.id
+    const facultyId = req.params.id
+    const code = await getFacultyCodeById(facultyId)
     if (!code) {
       return res.status(422).end()
     }
@@ -247,7 +254,8 @@ router.get(
   '/:id/update_progressview',
   auth.roles(['facultyStatistics', 'katselmusViewer']),
   async (req: Request, res: Response) => {
-    const code = req.params.id
+    const facultyId = req.params.id
+    const code = await getFacultyCodeById(facultyId)
     if (!code) {
       return res.status(422).end()
     }

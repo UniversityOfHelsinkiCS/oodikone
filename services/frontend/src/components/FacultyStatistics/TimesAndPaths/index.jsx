@@ -15,7 +15,7 @@ export const TimesAndPathsView = ({ faculty, setStudyProgrammes, studyProgrammes
   const [showMedian, setShowMedian] = useState(false)
   const [groupByStartYear, setGroupByStartYear] = useState(false)
   const studyProgrammeFilter = studyProgrammes ? 'ALL_PROGRAMMES' : 'NEW_STUDY_PROGRAMMES'
-  const graduationStats = useGetFacultyGraduationTimesQuery({ id: faculty?.code, studyProgrammeFilter })
+  const graduationStats = useGetFacultyGraduationTimesQuery({ id: faculty?.id, studyProgrammeFilter })
   const { getTextIn } = useLanguage()
 
   const groupBy = groupByStartYear ? 'byStartYear' : 'byGradYear'

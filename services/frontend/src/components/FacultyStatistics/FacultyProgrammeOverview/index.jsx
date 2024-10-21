@@ -107,12 +107,12 @@ export const FacultyProgrammeOverview = ({
   const graduated = graduatedGroup ? 'GRADUATED_EXCLUDED' : 'GRADUATED_INCLUDED'
   const { getTextIn } = useLanguage()
   const progressStats = useGetFacultyProgressStatsQuery({
-    id: faculty?.code,
+    id: faculty?.id,
     specialGroups: specials,
     graduated,
   })
   const studentStats = useGetFacultyStudentStatsQuery({
-    id: faculty.code,
+    id: faculty.id,
     specialGroups: specials,
     graduated,
   })

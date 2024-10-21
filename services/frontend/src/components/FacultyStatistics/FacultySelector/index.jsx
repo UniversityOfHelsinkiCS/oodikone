@@ -12,7 +12,7 @@ export const FacultySelector = ({ faculties, selected }) => {
   return (
     <div data-cy="select-faculty">
       {faculties.map(faculty => (
-        <FacultySegment faculty={faculty} key={faculty.code} />
+        <FacultySegment faculty={faculty} key={faculty.id} />
       ))}
     </div>
   )
