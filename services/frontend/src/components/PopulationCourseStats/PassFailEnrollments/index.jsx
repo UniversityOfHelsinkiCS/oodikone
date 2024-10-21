@@ -161,8 +161,9 @@ export const PassFailEnrollments = ({ flat, onlyIamRights }) => {
         ],
       },
     ]
-    if (onlyIamRights) columns[0].children[0].children.pop()
-
+    if (onlyIamRights) {
+      columns[0].children[0].children.pop()
+    }
     return columns
   }, [onGoToCourseStatisticsClick, courseStatistics])
 

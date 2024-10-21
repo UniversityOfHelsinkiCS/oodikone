@@ -44,14 +44,16 @@ export const SingleCourseTab = ({ selected, setSelected, userHasAccessToAllStats
     return null
   }
 
+  const hasSubstitutions = stats[selected].alternatives.length > 1
+
   return (
     <div>
       <Segment>
-        <Header as="h4">Selected courses</Header>
+        <Header as="h4">{hasSubstitutions ? 'Selected courses' : 'Selected course'}</Header>
         {courses.length > 1 && <CourseSelector courses={courses} selected={selected} setSelected={setSelected} />}
-        {stats[selected].alternatives.length > 1 && <Header as="h5">Course</Header>}
+        {hasSubstitutions && <Header as="h5">Course</Header>}
         <CourseLabel code={selected} key={selected} name={getTextIn(stats[selected].name)} primary />
-        {stats[selected].alternatives.length > 1 && <Header as="h5">Substitutions</Header>}
+        {hasSubstitutions && <Header as="h5">Substitutions</Header>}
         {stats[selected].alternatives
           .filter(course => course.code !== selected)
           .map(course => (
