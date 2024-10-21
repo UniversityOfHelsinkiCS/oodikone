@@ -249,19 +249,6 @@ describe('Course Statistics tests', () => {
       cy.contains('Select all search results')
     })
 
-    // Skipped for now, due to limit being removed. Subject to change after testing in production
-    it.skip('"Fetch statistics" button is disabled if over 40 courses are selected', () => {
-      cy.contains('Search for courses')
-      cy.get("input[placeholder='Search by a course code']").type('TKT')
-      cy.get('[data-cy="select-multiple-courses-toggle"]').should('not.have.class', 'checked').click()
-      cy.get('[data-cy="select-multiple-courses-toggle"]').should('have.class', 'checked')
-      cy.contains('Select all search results').click()
-      cy.contains('Fetch statistics').should('not.be.enabled').trigger('mouseover', { force: true })
-      cy.contains('Voit valita tarkasteltavaksi enintään 40 kurssia kerrallaan.')
-      cy.get("input[placeholder='Search by a course code']").type('21')
-      cy.contains('Fetch statistics').should('be.enabled')
-    })
-
     it('Provider organization toggle works', () => {
       cy.contains('Search for courses')
       cy.get("input[placeholder='Search by entering a course name']").type('tietokantojen perusteet')
