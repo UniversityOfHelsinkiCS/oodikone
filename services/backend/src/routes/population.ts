@@ -88,7 +88,7 @@ router.post('/v2/populationstatistics/courses', async (req: PostPopulationStatis
 
   if (req.body.years) {
     const upperYearBound = new Date().getFullYear() + 1
-    const multicoursestatPromises = Promise.all(
+    const multiCourseStatPromises = Promise.all(
       req.body.years.map(year => {
         if (req.body.selectedStudentsByYear) {
           req.body.selectedStudents = encrypted
@@ -101,8 +101,8 @@ router.post('/v2/populationstatistics/courses', async (req: PostPopulationStatis
         return coursestatistics
       })
     )
-    const multicoursestats = await multicoursestatPromises
-    const result = populationCourseStatsMerger(multicoursestats)
+    const multiCourseStats = await multiCourseStatPromises
+    const result = populationCourseStatsMerger(multiCourseStats)
     if (result.error) {
       return res.status(400).json(result)
     }
@@ -248,7 +248,7 @@ router.get('/v3/populationstatistics', async (req: GetPopulationStatisticsReques
 
   if (req.query.years) {
     const upperYearBound = new Date().getFullYear() + 1
-    const multipopulationstudentPromises = Promise.all(
+    const multiPopulationStudentPromises = Promise.all(
       req.query.years.map(year => {
         const newMonths = (upperYearBound - Number(year)) * 12
         const populationStudents = optimizedStatisticsOf({
@@ -260,10 +260,9 @@ router.get('/v3/populationstatistics', async (req: GetPopulationStatisticsReques
         return populationStudents
       })
     )
-    const multipopulationstudents = await multipopulationstudentPromises
+    const multiPopulationStudents = await multiPopulationStudentPromises
 
-    const result = populationStudentsMerger(multipopulationstudents)
-
+    const result = populationStudentsMerger(multiPopulationStudents)
     res.json(filterPersonalTags(result, userId))
   } else {
     const result: any = await optimizedStatisticsOf({

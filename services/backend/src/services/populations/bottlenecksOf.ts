@@ -4,15 +4,15 @@ import { getPassingSemester } from '../../util/semester'
 import { CourseStatistics, CourseStatsCounter } from '../courses/courseStatsCounter'
 import { encrypt } from '../encrypt'
 import {
+  CoursesQueryResult,
   dateMonthsFromNow,
+  EnrollmentsQueryResult,
   findCourses,
   findCourseEnrollments,
   Params,
   parseCreditInfo,
   parseQueryParams,
   Query,
-  CoursesQueryResult,
-  EnrollmentsQueryResult,
 } from './shared'
 import { getStudentNumbersWithAllStudyRightElements } from './studentNumbersWithAllElements'
 

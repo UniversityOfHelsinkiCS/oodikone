@@ -1,22 +1,25 @@
-const populationCourseStatsMerger = multiyearstats => {
-  const coursecodes = []
-  const stats = {}
+export const populationCourseStatsMerger = (multiYearStats: any) => {
+  const courseCodes = [] as string[]
+  const stats = {} as Record<string, any>
   stats.coursestatistics = []
   stats.allStudents = 0
 
-  multiyearstats.forEach(yearstats => {
-    stats.allStudents += yearstats.allStudents
-    yearstats.coursestatistics.forEach(courseStats => {
-      if (!coursecodes.includes(courseStats.course.code)) {
-        coursecodes.push(courseStats.course.code)
+  multiYearStats.forEach(yearStats => {
+    stats.allStudents += yearStats.allStudents
+    yearStats.coursestatistics.forEach(courseStats => {
+      if (!courseCodes.includes(courseStats.course.code)) {
+        courseCodes.push(courseStats.course.code)
         stats.coursestatistics.push(courseStats)
         return
       }
 
       const index = stats.coursestatistics.findIndex(s => s.course.code === courseStats.course.code)
+
       stats.coursestatistics[index].stats.attempts += courseStats.stats.attempts
       stats.coursestatistics[index].stats.failed += courseStats.stats.failed
       stats.coursestatistics[index].stats.improvedPassedGrade += courseStats.stats.improvedPassedGrade
+      stats.coursestatistics[index].stats.totalStudents += courseStats.stats.totalStudents
+      stats.coursestatistics[index].stats.totalEnrolledNoGrade += courseStats.stats.totalEnrolledNoGrade
       stats.coursestatistics[index].stats.passed += courseStats.stats.passed
       stats.coursestatistics[index].stats.students += courseStats.stats.students
 
@@ -70,11 +73,11 @@ const populationCourseStatsMerger = multiyearstats => {
   return stats
 }
 
-const populationStudentsMerger = multiyearstudents => {
-  const samples = { students: [], courses: [] }
-  const uniqueCourseCodes = new Set()
+export const populationStudentsMerger = (multiYearStudents: any) => {
+  const samples = { students: [], courses: [] as any[] }
+  const uniqueCourseCodes = new Set<string>()
 
-  for (const year of multiyearstudents) {
+  for (const year of multiYearStudents) {
     samples.students = samples.students.concat(year.students)
     for (const course of year.courses) {
       if (!uniqueCourseCodes.has(course.code)) {
@@ -85,9 +88,4 @@ const populationStudentsMerger = multiyearstudents => {
   }
 
   return samples
-}
-
-module.exports = {
-  populationCourseStatsMerger,
-  populationStudentsMerger,
 }
