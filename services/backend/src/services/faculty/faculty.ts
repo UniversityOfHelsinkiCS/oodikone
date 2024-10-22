@@ -109,3 +109,16 @@ export const getDegreeProgrammesOfFaculty = async (facultyCode: string, onlyCurr
   }
   return getDegreeProgrammesOfOrganization(organization.id, onlyCurrentProgrammes)
 }
+
+export const getFacultyCodeById = async (facultyId: string) => {
+  const organization = await Organization.findOne({
+    attributes: ['code'],
+    where: {
+      id: facultyId,
+    },
+  })
+  if (!organization) {
+    throw new Error(`The organization with the id ${facultyId} was not found.`)
+  }
+  return organization.code
+}

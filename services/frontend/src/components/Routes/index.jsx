@@ -34,7 +34,7 @@ const routes = {
   custompopulation: '/custompopulation',
   updater: '/updater',
   studyGuidanceGroups: '/studyguidancegroups/:groupid?',
-  faculties: '/faculties/:facultyCode?',
+  faculties: '/faculties/:facultyId?',
   customOpenUniPopulation: '/openunipopulation',
   evaluationOverview: '/evaluationoverview/:level?/:id?',
   university: '/university',

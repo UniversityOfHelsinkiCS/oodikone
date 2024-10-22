@@ -15,11 +15,12 @@ import { UpdateView } from './UpdateView'
 export const FacultyStatistics = () => {
   useTitle('Faculties')
   const history = useHistory()
-  const { facultyCode } = useParams()
+  const { facultyId } = useParams()
+
   const { getTextIn } = useLanguage()
   const { data: faculties = [], isLoading } = useGetFacultiesQuery()
-
-  const faculty = faculties.length > 0 && facultyCode && faculties.find(faculty => faculty.code === facultyCode)
+  const faculty = faculties.length > 0 && facultyId && faculties.find(faculty => faculty.id === facultyId)
+  const facultyCode = faculty && faculty.code
   const facultyName = faculty && getTextIn(faculty.name)
 
   const { isAdmin, fullAccessToStudentData, programmeRights } = useGetAuthorizedUserQuery()
@@ -85,7 +86,7 @@ export const FacultyStatistics = () => {
     if (isAdmin) {
       panes.push({
         menuItem: 'Update statistics',
-        render: () => <UpdateView faculty={faculty?.code} />,
+        render: () => <UpdateView faculty={faculty?.id} />,
       })
     }
 

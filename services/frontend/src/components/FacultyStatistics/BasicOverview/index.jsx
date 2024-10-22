@@ -53,21 +53,21 @@ export const BasicOverview = ({
   const special = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
 
   const basics = useGetFacultyBasicStatsQuery({
-    id: faculty?.code,
+    id: faculty?.id,
     yearType,
     studyProgrammeFilter,
     specialGroups: special,
   })
 
   const thesisWriters = useGetFacultyThesisStatsQuery({
-    id: faculty?.code,
+    id: faculty?.id,
     yearType,
     studyProgrammeFilter,
     specialGroups: special,
   })
 
   const credits = useGetFacultyCreditStatsQuery({
-    id: faculty?.code,
+    id: faculty?.id,
     yearType,
   })
 

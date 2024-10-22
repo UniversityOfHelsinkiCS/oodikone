@@ -28,7 +28,7 @@ export const FacultyView = ({ faculty }) => {
   const facultyName = facultyDetails && getTextIn(facultyDetails.name)
   const progressStats = useGetFacultyProgressStatsQuery(
     {
-      id: faculty,
+      id: facultyDetails?.id,
       studyProgrammeFilter,
       specialGroups: specials,
       graduated,
@@ -37,7 +37,7 @@ export const FacultyView = ({ faculty }) => {
   )
 
   const graduationStats = useGetFacultyGraduationTimesQuery(
-    { id: faculty, studyProgrammeFilter },
+    { id: facultyDetails?.id, studyProgrammeFilter },
     { skip: !facultyDetails }
   )
 

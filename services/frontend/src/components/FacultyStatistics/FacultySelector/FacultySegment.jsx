@@ -14,7 +14,7 @@ export const FacultySegment = ({ faculty }) => {
             {faculty.code}
           </Grid.Column>
           <Grid.Column width={9}>
-            <Link to={`/faculties/${faculty.code}`}>{getTextIn(faculty.name)}</Link>
+            <Link to={`/faculties/${faculty.id}`}>{getTextIn(faculty.name)}</Link>
           </Grid.Column>
         </Grid>
       </Segment>
