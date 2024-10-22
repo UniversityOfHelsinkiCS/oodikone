@@ -1,6 +1,6 @@
 export const populationCourseStatsMerger = (multiYearStats: any) => {
-  const courseCodes = [] as string[]
-  const stats = {} as Record<string, any>
+  const courseCodes: string[] = []
+  const stats: Record<string, any> = {}
   stats.coursestatistics = []
   stats.allStudents = 0
 

@@ -88,10 +88,10 @@ const passRateStudentGraphOptions = (isRelative: boolean, categories: string[], 
 })
 
 const getPassRateAttemptSeriesFromStats = stats => {
-  const all = [] as number[]
-  const passed = [] as number[]
-  const failed = [] as number[]
-  const enrolledNoGrade = [] as number[]
+  const all: number[] = []
+  const passed: number[] = []
+  const failed: number[] = []
+  const enrolledNoGrade: number[] = []
 
   stats.forEach(year => {
     const { passed: p, failed: f } = year.attempts.categories
@@ -119,10 +119,10 @@ const getPassRateAttemptSeriesFromStats = stats => {
 }
 
 const getPassRateStudentSeriesFromStats = stats => {
-  const all = [] as number[]
-  const passed = [] as number[]
-  const failed = [] as number[]
-  const enrolledNoGrade = [] as number[]
+  const all: number[] = []
+  const passed: number[] = []
+  const failed: number[] = []
+  const enrolledNoGrade: number[] = []
 
   stats.forEach(year => {
     all.push(year.students.total || 0)
