@@ -149,7 +149,9 @@ const getYearlyStatsOfNew = async (
   studentNumberToSrElementsMap: Record<string, SISStudyRightElement[]>
 ) => {
   if (serviceProvider === 'fd')
-    logger.info(`Debugging course yearly stats: entered getYearlyStatsOfNew with unification ${unification}`)
+    logger.info(
+      `Debugging course yearly stats: entered getYearlyStatsOfNew with courseCode ${courseCode} and unification ${unification}`
+    )
   const courseForSubs = await Course.findOne({
     where: { code: courseCode },
   })
@@ -175,7 +177,7 @@ const getYearlyStatsOfNew = async (
 
   if (serviceProvider === 'fd')
     logger.info(
-      `Debugging c.y.s., getYearlyStatsOfNew, unification ${unification}: got credits ${credits.length}, enrollments ${enrollments.length} and course ${course ? 'yes' : 'no'}`
+      `Debugging c.y.s., getYearlyStatsOfNew, courseCode ${courseCode} unification ${unification}: got credits ${credits.length}, enrollments ${enrollments.length} and course ${course ? 'yes' : 'no'}`
     )
 
   const counter = new CourseYearlyStatsCounter()
@@ -236,12 +238,16 @@ const getYearlyStatsOfNew = async (
     counter.markEnrollmentToGroup(studentNumber, enrollmentDateTime, groupCode, groupName, courseCode, yearCode)
   })
   if (serviceProvider === 'fd')
-    logger.info(`Debugging c.y.s., getYearlyStatsOfNew, unification ${unification}: finished looping through credits.`)
+    logger.info(
+      `Debugging c.y.s., getYearlyStatsOfNew, code ${courseCode} unification ${unification}: finished looping through credits.`
+    )
 
   const statistics = counter.getFinalStatistics(anonymizationSalt)
 
   if (serviceProvider === 'fd')
-    logger.info(`Debugging c.y.s., getYearlyStatsOfNew, unification ${unification}: got final statistics.`)
+    logger.info(
+      `Debugging c.y.s., getYearlyStatsOfNew, code ${courseCode} unification ${unification}: got final statistics.`
+    )
 
   let substitutionCourses: Course[] | undefined
   if (combineSubstitutions && courseForSubs && courseForSubs.substitutions && courseForSubs.substitutions.length > 0) {
@@ -257,7 +263,7 @@ const getYearlyStatsOfNew = async (
 
   if (serviceProvider === 'fd')
     logger.info(
-      `Debugging c.y.s., getYearlyStatsOfNew, unification ${unification}: got substitutionCourses ${substitutionCourses?.length} items.`
+      `Debugging c.y.s., getYearlyStatsOfNew, code ${courseCode} unification ${unification}: got substitutionCourses ${substitutionCourses?.length} items.`
     )
 
   return {
