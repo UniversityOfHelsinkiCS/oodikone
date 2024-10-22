@@ -92,8 +92,8 @@ export const PassFailEnrollments = ({ flat, onlyIamRights }) => {
             getRowVal: row => row.stats?.totalEnrolledNoGrade ?? 0,
           },
           {
-            key: 'passed-percentage',
-            title: 'Passed-%',
+            key: 'pass-rate',
+            title: 'Pass rate',
             cellStyle: { textAlign: 'right' },
             filterType: 'range',
             getRowVal: row => row.stats?.percentageWithEnrollments ?? 0,
