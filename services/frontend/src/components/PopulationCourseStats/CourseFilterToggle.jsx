@@ -26,11 +26,13 @@ export const CourseFilterToggle = ({ course }) => {
       }
       position="top right"
       trigger={
-        <FilterToggleIcon
-          isActive={isActive}
-          onClick={() => filterDispatch(toggleCourseSelection(course.code))}
-          style={{ cursor: 'pointer' }}
-        />
+        <div>
+          <FilterToggleIcon
+            isActive={isActive}
+            onClick={() => filterDispatch(toggleCourseSelection(course.code))}
+            style={{ cursor: 'pointer' }}
+          />
+        </div>
       }
     />
   )

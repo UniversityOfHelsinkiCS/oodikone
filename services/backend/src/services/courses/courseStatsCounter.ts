@@ -57,8 +57,6 @@ type Stats = {
   students: number
   passed: number
   failed: number
-  failedMany: number
-  retryPassed: number
   attempts: number
   improvedPassedGrade: number
   percentage: number | undefined
@@ -76,8 +74,6 @@ type Students = {
   all: Record<string, boolean>
   passed: Record<string, boolean>
   failed: Record<string, boolean>
-  retryPassed: Record<string, boolean>
-  failedMany: Record<string, boolean>
   improvedPassedGrade: Record<string, boolean>
   markedToSemester: Record<string, boolean>
   enrolledNoGrade: Record<string, boolean>
@@ -126,8 +122,6 @@ export class CourseStatsCounter {
       all: {},
       passed: {},
       failed: {},
-      retryPassed: {},
-      failedMany: {},
       improvedPassedGrade: {},
       markedToSemester: {},
       enrolledNoGrade: {},
@@ -136,8 +130,6 @@ export class CourseStatsCounter {
       students: 0,
       passed: 0,
       failed: 0,
-      failedMany: 0,
-      retryPassed: 0,
       attempts: 0,
       improvedPassedGrade: 0,
       percentage: undefined,
@@ -216,13 +208,11 @@ export class CourseStatsCounter {
 
   private removeFromFailed(studentNumber: string) {
     delete this.students.failed[studentNumber]
-    delete this.students.failedMany[studentNumber]
   }
 
   private markPassingGrade(studentNumber: string) {
     this.students.passed[studentNumber] = true
     if (this.failedBefore(studentNumber)) {
-      this.students.retryPassed[studentNumber] = true
       this.removeFromFailed(studentNumber)
     }
   }
@@ -235,12 +225,8 @@ export class CourseStatsCounter {
 
   private markFailedGrade(studentNumber: string) {
     if (this.passedBefore(studentNumber)) {
-      this.students.retryPassed[studentNumber] = true
       this.removeFromFailed(studentNumber)
     } else {
-      if (this.failedBefore(studentNumber)) {
-        this.students.failedMany[studentNumber] = true
-      }
       this.students.failed[studentNumber] = true
     }
   }
@@ -284,8 +270,6 @@ export class CourseStatsCounter {
     stats.students = lengthOf(students.all)
     stats.passed = lengthOf(students.passed)
     stats.failed = lengthOf(students.failed)
-    stats.failedMany = lengthOf(students.failedMany)
-    stats.retryPassed = lengthOf(students.retryPassed)
     stats.improvedPassedGrade = lengthOf(students.improvedPassedGrade)
     stats.percentage = percentageOf(stats.passed, stats.students)
     stats.passedOfPopulation = percentageOf(stats.passed, this.studentsInTotal)

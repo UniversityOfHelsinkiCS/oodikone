@@ -249,7 +249,7 @@ describe('Students tests', () => {
     it('When a study plan is selected, the time frame of the credit graph is updated', () => {
       cy.clock(new Date('2024-08-30').getTime(), ['Date'])
       cy.visit('/students/550789')
-      cy.contains('.highcharts-container text', '2 Aug 2020')
+      cy.contains('.highcharts-container text', '1 Aug 2020')
       cy.contains('.highcharts-container text', '30 Aug 2024')
       cy.contains('table tbody tr', 'Kulttuurien tutkimuksen kandiohjelma (01.08.2020–30.06.2023)').within(() => {
         cy.get('td').eq(0).click()
