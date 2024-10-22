@@ -8,6 +8,13 @@ import { CourseFilterToggle } from '../CourseFilterToggle'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
 import './passFailEnrollments.css'
 
+const calculatePassRate = (total, passed) => {
+  if (total === 0) {
+    return 0
+  }
+  return (100 * passed) / total
+}
+
 export const PassFailEnrollments = ({ flat, onlyIamRights }) => {
   const { modules, courseStatistics, onGoToCourseStatisticsClick, toggleGroupExpansion, expandedGroups } =
     UsePopulationCourseContext()
@@ -96,7 +103,7 @@ export const PassFailEnrollments = ({ flat, onlyIamRights }) => {
             title: 'Pass rate',
             cellStyle: { textAlign: 'right' },
             filterType: 'range',
-            getRowVal: row => row.stats?.percentageWithEnrollments ?? 0,
+            getRowVal: row => calculatePassRate(row.stats?.totalStudents, row.stats?.passed),
             formatValue: value =>
               value &&
               new Intl.NumberFormat('fi-FI', {
