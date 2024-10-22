@@ -150,7 +150,7 @@ const getYearlyStatsOfNew = async (
 ) => {
   if (serviceProvider === 'fd')
     logger.info(
-      `Debugging course yearly stats: entered getYearlyStatsOfNew with courseCode ${courseCode} and unification ${unification}`
+      `Debugging c.y.s.: entered getYearlyStatsOfNew with courseCode ${courseCode} and unification ${unification}`
     )
   const courseForSubs = await Course.findOne({
     where: { code: courseCode },
@@ -351,9 +351,7 @@ export const getCourseYearlyStats = async (
   })
 
   if (serviceProvider === 'fd')
-    logger.info(
-      `Debugging course yearly stats: got credits ${credits.length} items and enrollments ${enrollments.length} items`
-    )
+    logger.info(`Debugging c.y.s.: got credits ${credits.length} items and enrollments ${enrollments.length} items`)
 
   const studentNumbers = {}
 
@@ -368,7 +366,7 @@ export const getCourseYearlyStats = async (
 
   if (serviceProvider === 'fd')
     logger.info(
-      `Debugging course yearly stats: got a studentNumberToSrElementsMap of size ${Object.keys(studentNumberToSrElementsMap).length}`
+      `Debugging c.y.s.: got a studentNumberToSrElementsMap of size ${Object.keys(studentNumberToSrElementsMap).length}`
     )
 
   const statsRegular = await Promise.all(
@@ -402,7 +400,7 @@ export const getCourseYearlyStats = async (
     })
   )
 
-  if (serviceProvider === 'fd') logger.info(`Debugging course yearly stats: finished creating statsRegular`)
+  if (serviceProvider === 'fd') logger.info(`Debugging c.y.s.: finished creating statsRegular`)
 
   return statsRegular
 }

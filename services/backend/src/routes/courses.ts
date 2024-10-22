@@ -73,7 +73,7 @@ router.get('/v3/courseyearlystats', async (req: GetCourseYearlyStatsRequest, res
   const separate = req.query.separate === 'true'
 
   if (serviceProvider === 'fd')
-    logger.info('Debugging course yearly stats: got through authorization and collected req query params.')
+    logger.info('Debugging c.y.s.: got through authorization and collected req query params.')
 
   // Student numbers should be obfuscated to all other users except admins,
   // fullSisuAccess users, and users with rights to any specific study programmes
@@ -81,7 +81,7 @@ router.get('/v3/courseyearlystats', async (req: GetCourseYearlyStatsRequest, res
   const anonymizationSalt = anonymize ? crypto.randomBytes(12).toString('hex') : null
   const results = await getCourseYearlyStats(codes, separate, anonymizationSalt, combineSubstitutions)
   if (serviceProvider === 'fd')
-    logger.info('Debugging course yearly stats: getCourseYearlyStats returned and route should return result.')
+    logger.info('Debugging c.y.s.: getCourseYearlyStats returned and route should return result.')
   res.json(results)
 })
 
