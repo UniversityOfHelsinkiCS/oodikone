@@ -344,7 +344,7 @@ const getMainStatsByTrackAndYear = async (
     : {}
 
   for (const studyRight of studyRightsOfProgramme) {
-    if (!studyRight.semesterEnrollments) continue
+    if (!studyRight.semesterEnrollments || !studyRight.student) continue
     const studyRightElement = studyRight.studyRightElements.find(element => element.code === studyProgramme)
     if (!studyRightElement) continue
     if (!includeGraduated && studyRightElement.graduated) {
