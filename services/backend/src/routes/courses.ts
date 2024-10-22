@@ -1,10 +1,12 @@
 import crypto from 'crypto'
 import { Request, Response, Router } from 'express'
 
+import { serviceProvider } from '../config'
 import { getCourseYearlyStats } from '../services/courses'
 import { getCoursesByNameAndOrCode, getCoursesByCodes } from '../services/courses/courseFinders'
 import { CourseWithSubsId } from '../types'
 import { getFullStudyProgrammeRights, hasFullAccessToStudentData, validateParamLength } from '../util'
+import logger from '../util/logger'
 
 const router = Router()
 
@@ -70,11 +72,16 @@ router.get('/v3/courseyearlystats', async (req: GetCourseYearlyStatsRequest, res
   const combineSubstitutions = req.query.combineSubstitutions !== 'false'
   const separate = req.query.separate === 'true'
 
+  if (serviceProvider === 'fd')
+    logger.info('Debugging c.y.s.: got through authorization and collected req query params.')
+
   // Student numbers should be obfuscated to all other users except admins,
   // fullSisuAccess users, and users with rights to any specific study programmes
   const anonymize = !userHasFullAccessToStudentData && fullStudyProgrammeRights.length === 0
   const anonymizationSalt = anonymize ? crypto.randomBytes(12).toString('hex') : null
   const results = await getCourseYearlyStats(codes, separate, anonymizationSalt, combineSubstitutions)
+  if (serviceProvider === 'fd')
+    logger.info('Debugging c.y.s.: getCourseYearlyStats returned and route should return result.')
   res.json(results)
 })
 

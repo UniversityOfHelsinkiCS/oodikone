@@ -1,9 +1,11 @@
 import crypto from 'crypto'
 import { Op } from 'sequelize'
 
+import { serviceProvider } from '../../config'
 import { Course, Credit, Enrollment, Organization, SISStudyRightElement } from '../../models'
 import { EnrollmentState, Name, Unification } from '../../types'
 import { isOpenUniCourseCode } from '../../util'
+import logger from '../../util/logger'
 import { getSortRank } from '../../util/sortRank'
 import { CourseYearlyStatsCounter } from './courseYearlyStatsCounter'
 import {
@@ -146,6 +148,10 @@ const getYearlyStatsOfNew = async (
   combineSubstitutions: boolean,
   studentNumberToSrElementsMap: Record<string, SISStudyRightElement[]>
 ) => {
+  if (serviceProvider === 'fd')
+    logger.info(
+      `Debugging c.y.s.: entered getYearlyStatsOfNew with courseCode ${courseCode} and unification ${unification}`
+    )
   const courseForSubs = await Course.findOne({
     where: { code: courseCode },
   })
@@ -168,6 +174,11 @@ const getYearlyStatsOfNew = async (
       },
     }),
   ])
+
+  if (serviceProvider === 'fd')
+    logger.info(
+      `Debugging c.y.s., getYearlyStatsOfNew, courseCode ${courseCode} unification ${unification}: got credits ${credits.length}, enrollments ${enrollments.length} and course ${course ? 'yes' : 'no'}`
+    )
 
   const counter = new CourseYearlyStatsCounter()
 
@@ -226,8 +237,17 @@ const getYearlyStatsOfNew = async (
 
     counter.markEnrollmentToGroup(studentNumber, enrollmentDateTime, groupCode, groupName, courseCode, yearCode)
   })
+  if (serviceProvider === 'fd')
+    logger.info(
+      `Debugging c.y.s., getYearlyStatsOfNew, code ${courseCode} unification ${unification}: finished looping through credits.`
+    )
 
   const statistics = counter.getFinalStatistics(anonymizationSalt)
+
+  if (serviceProvider === 'fd')
+    logger.info(
+      `Debugging c.y.s., getYearlyStatsOfNew, code ${courseCode} unification ${unification}: got final statistics.`
+    )
 
   let substitutionCourses: Course[] | undefined
   if (combineSubstitutions && courseForSubs && courseForSubs.substitutions && courseForSubs.substitutions.length > 0) {
@@ -240,6 +260,11 @@ const getYearlyStatsOfNew = async (
       attributes: ['code', 'name'],
     })
   }
+
+  if (serviceProvider === 'fd')
+    logger.info(
+      `Debugging c.y.s., getYearlyStatsOfNew, code ${courseCode} unification ${unification}: got substitutionCourses ${substitutionCourses?.length} items.`
+    )
 
   return {
     ...statistics,
@@ -325,6 +350,9 @@ export const getCourseYearlyStats = async (
     },
   })
 
+  if (serviceProvider === 'fd')
+    logger.info(`Debugging c.y.s.: got credits ${credits.length} items and enrollments ${enrollments.length} items`)
+
   const studentNumbers = {}
 
   credits.forEach(credit => {
@@ -335,6 +363,11 @@ export const getCourseYearlyStats = async (
   })
 
   const studentNumberToSrElementsMap = await getStudentNumberToSrElementsMap(Object.keys(studentNumbers))
+
+  if (serviceProvider === 'fd')
+    logger.info(
+      `Debugging c.y.s.: got a studentNumberToSrElementsMap of size ${Object.keys(studentNumberToSrElementsMap).length}`
+    )
 
   const statsRegular = await Promise.all(
     courseCodes.map(async courseCode => {
@@ -366,6 +399,8 @@ export const getCourseYearlyStats = async (
       return { unifyStats, regularStats, openStats }
     })
   )
+
+  if (serviceProvider === 'fd') logger.info(`Debugging c.y.s.: finished creating statsRegular`)
 
   return statsRegular
 }
