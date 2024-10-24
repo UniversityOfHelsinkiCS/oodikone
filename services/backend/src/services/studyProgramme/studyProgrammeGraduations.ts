@@ -1,7 +1,7 @@
 import { indexOf, orderBy } from 'lodash'
 import moment from 'moment'
 
-import { mapToProviders } from '../../shared/util/mapToProviders'
+import { mapToProviders } from '../../shared/util'
 import { DegreeProgrammeType, ExtentCode, Name, SemesterEnrollment, StudyTrack } from '../../types'
 import { getDegreeProgrammeType, sortByProgrammeCode } from '../../util'
 import { countTimeCategories } from '../graduationHelpers'

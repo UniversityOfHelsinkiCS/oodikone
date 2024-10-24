@@ -1,10 +1,10 @@
+import { formatQueryParamsToArrays } from '../../shared/util'
 import { Criteria, DegreeProgrammeType, Name } from '../../types'
 import { getDegreeProgrammeType } from '../../util'
 import { getCriteria } from '../studyProgramme/studyProgrammeCriteria'
 import { getStudentsIncludeCoursesBetween } from './getStudentsIncludeCoursesBetween'
 import {
   dateMonthsFromNow,
-  formatQueryParamsToArrays,
   formatStudentsForApi,
   getOptionsForStudents,
   parseQueryParams,

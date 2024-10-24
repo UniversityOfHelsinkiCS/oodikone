@@ -17,6 +17,7 @@ import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { getPopulationStatistics, clearPopulations, useGetProgrammesQuery } from '@/redux/populations'
 import { clearSelected } from '@/redux/populationSelectedStudentCourses'
 import { useGetStudyProgrammePinsQuery } from '@/redux/studyProgrammePins'
+import { formatQueryParamsToArrays } from '@/shared/util'
 import { momentFromFormat, reformatDate } from '@/util/timeAndDate'
 import './populationSearch.css'
 
@@ -92,19 +93,6 @@ const PopulationSearchForm = ({ queries, onProgress, clearSelected, getPopulatio
     const sameTag = previousQuery.tag === query.tag
 
     return sameStudyrights && sameMonths && sameYear && sameSemesters && sameStudentStatuses && sameYears && sameTag
-  }
-
-  // Identical logic can be found in the backend (src/services/populations/shared.js)
-  // If the logic changes, remember to update the backend as well
-  const formatQueryParamsToArrays = (query, params) => {
-    const res = { ...query }
-    params.forEach(param => {
-      if (!res[param]) {
-        return
-      }
-      res[param] = Array.isArray(res[param]) ? res[param] : [res[param]]
-    })
-    return res
   }
 
   const fetchPopulation = async query => {

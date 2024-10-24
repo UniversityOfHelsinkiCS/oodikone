@@ -455,17 +455,6 @@ export const formatStudentsForApi = async (
   }
 }
 
-export const formatQueryParamsToArrays = (query: Record<string, any>, params: string[]) => {
-  const result = { ...query }
-  params.forEach(param => {
-    if (!result[param]) {
-      return
-    }
-    result[param] = Array.isArray(result[param]) ? result[param] : [result[param]]
-  })
-  return result
-}
-
 const getSubstitutions = async (codes: string[]) => {
   const courses = await Course.findAll({
     attributes: ['code', 'substitutions'],

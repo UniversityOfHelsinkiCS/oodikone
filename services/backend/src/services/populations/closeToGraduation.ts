@@ -1,7 +1,7 @@
 import { col, Op } from 'sequelize'
 
 import { Course, Credit, Organization, Student, Studyplan, SISStudyRight, SISStudyRightElement } from '../../models'
-import { mapToProviders } from '../../shared/util/mapToProviders'
+import { mapToProviders } from '../../shared/util'
 import { CreditTypeCode, DegreeProgrammeType, ExtentCode, Name, SemesterEnrollment } from '../../types'
 import { redisClient } from '../redis'
 import { getCurriculumVersion } from './shared'

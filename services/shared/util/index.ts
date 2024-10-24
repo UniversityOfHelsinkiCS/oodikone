@@ -30,3 +30,14 @@ const programmeCodeToProviderCode = (programmeCode: string) => {
 export const mapToProviders = (programmeCodes: string[]) => {
   return programmeCodes.map(programmeCodeToProviderCode)
 }
+
+export const formatQueryParamsToArrays = (query: Record<string, any>, params: string[]) => {
+  const result = { ...query }
+  params.forEach(param => {
+    if (!result[param]) {
+      return
+    }
+    result[param] = Array.isArray(result[param]) ? result[param] : [result[param]]
+  })
+  return result
+}

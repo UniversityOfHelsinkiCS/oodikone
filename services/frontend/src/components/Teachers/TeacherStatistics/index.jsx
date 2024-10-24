@@ -8,7 +8,7 @@ import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProvidersQuery } from '@/redux/providers'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { useLazyGetTeacherStatisticsQuery } from '@/redux/teachers'
-import { mapToProviders } from '@/shared/util/mapToProviders'
+import { mapToProviders } from '@/shared/util'
 
 export const TeacherStatistics = () => {
   const { getTextIn } = useLanguage()
