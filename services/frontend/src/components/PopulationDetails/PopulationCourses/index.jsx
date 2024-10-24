@@ -53,13 +53,21 @@ export const PopulationCourses = ({
   }, [mandatoryCourses])
 
   useEffect(() => {
+    if (programmeCodesToFetch == null || populationSelectedStudentCourses?.query == null) {
+      return
+    }
+    const { courses, selectedStudents } = populationSelectedStudentCourses.query
     if (
-      programmeCodesToFetch != null &&
-      !isEqual(programmeCodesToFetch, populationSelectedStudentCourses.query.courses)
+      !isEqual(programmeCodesToFetch, courses) ||
+      selectedStudents.length !== filteredStudents.length ||
+      !isEqual(
+        selectedStudents,
+        filteredStudents.map(({ studentNumber }) => studentNumber)
+      )
     ) {
       fetch(programmeCodesToFetch)
     }
-  }, [programmeCodesToFetch])
+  }, [programmeCodesToFetch, filteredStudents])
 
   const pending = populationSelectedStudentCourses.pending || !mandatoryCourses
 

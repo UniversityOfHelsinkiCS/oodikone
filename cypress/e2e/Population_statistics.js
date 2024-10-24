@@ -96,6 +96,46 @@ describe('Population Statistics tests', () => {
       cy.get('[data-cy=toggle-group-module-MAT-tyo]').should('not.exist')
     })
 
+    it('New fetch of courses data is done when curriculum is changed', () => {
+      cy.visit(pathToMathBSc2020)
+      cy.contains('Courses of class').click()
+      cy.intercept('/api/v2/populationstatistics/courses').as('courseData')
+      cy.get('[data-cy=curriculum-picker]').click().contains('2020 - 2023').click()
+      cy.wait('@courseData').then(({ response }) => {
+        expect(response.body).to.have.property('allStudents')
+        expect(response.body).to.have.property('coursestatistics')
+        expect(response.body.allStudents).to.equal(27)
+        expect(response.body.coursestatistics.some(stat => stat.course.code === 'DIGI-100')).to.be.true
+      })
+      cy.get('[data-cy=curriculum-picker]').click().contains('2023 - 2026').click()
+      cy.wait('@courseData').then(({ response }) => {
+        expect(response.body).to.have.property('allStudents')
+        expect(response.body).to.have.property('coursestatistics')
+        expect(response.body.allStudents).to.equal(27)
+        expect(response.body.coursestatistics.some(stat => stat.course.code === 'DIGI-100')).to.be.not.true
+      })
+    })
+
+    it('New fetch of courses data is done when filtered students change', () => {
+      cy.visit(pathToMathBSc2020)
+      cy.contains('Courses of class').click()
+      cy.intercept('/api/v2/populationstatistics/courses').as('courseData')
+      cy.wait('@courseData').then(({ response }) => {
+        expect(response.body).to.have.property('allStudents')
+        expect(response.body).to.have.property('coursestatistics')
+        expect(response.body.allStudents).to.equal(27)
+      })
+      cy.get('[data-cy=GraduatedFromProgramme-filter-card]').within(() => {
+        cy.get('[data-cy=GraduatedFromProgramme-header]').click()
+        cy.get('[data-cy=option-graduated-true]').click()
+        cy.wait('@courseData').then(({ response }) => {
+          expect(response.body).to.have.property('allStudents')
+          expect(response.body).to.have.property('coursestatistics')
+          expect(response.body.allStudents).to.equal(16)
+        })
+      })
+    })
+
     it("Empty 'tags' tab has a link to the page where tags can be created", { retries: 2 }, () => {
       cy.visit(pathToMathBSc2020)
       cy.contains('Students (27)')
