@@ -1,8 +1,7 @@
 import moment from 'moment'
-import { bool, object, shape } from 'prop-types'
 import qs from 'query-string'
 import { useState } from 'react'
-import { connect } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import { Button, Form } from 'semantic-ui-react'
 
@@ -17,16 +16,13 @@ const getMonths = (year, term) => {
   return Math.ceil(moment.duration(moment().diff(moment(start))).asMonths())
 }
 
-const PopulationSearchHistory = ({ populations }) => {
+export const PopulationSearchHistory = () => {
   const history = useHistory()
+  const populations = useSelector(state => state.populations)
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false)
-  const [semesters, setSemesters] = useState(
-    populations.query?.semesters ? populations.query?.semesters : ['FALL', 'SPRING']
-  )
-  const [studentStatuses, setStudentStatus] = useState(
-    populations.query?.studentStatuses ? populations.query?.studentStatuses : []
-  )
-  const [months, setMonths] = useState(populations.query?.months ? populations.query?.months : 0)
+  const [semesters, setSemesters] = useState(populations.query?.semesters || ['FALL', 'SPRING'])
+  const [studentStatuses, setStudentStatus] = useState(populations.query?.studentStatuses || [])
+  const [months, setMonths] = useState(populations.query?.months || 0)
 
   const handleSemesterSelection = (_event, { value }) => {
     const newSemesters = semesters.includes(value)
@@ -167,18 +163,3 @@ const PopulationSearchHistory = ({ populations }) => {
 
   return <div className="historyContainer">{renderQueryCards()}</div>
 }
-
-PopulationSearchHistory.propTypes = {
-  populations: shape({
-    pending: bool,
-    error: bool,
-    data: shape({}),
-    query: object,
-  }).isRequired,
-}
-
-const mapStateToProps = ({ populations }) => ({
-  populations,
-})
-
-export const ConnectedPopulationSearchHistory = connect(mapStateToProps)(PopulationSearchHistory)

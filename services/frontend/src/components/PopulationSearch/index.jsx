@@ -9,7 +9,7 @@ import { useFilters } from '@/components/FilterView/useFilters'
 import { InfoBox } from '@/components/InfoBox'
 import { ProgressBar } from '@/components/ProgressBar'
 import { ConnectedPopulationSearchForm as PopulationSearchForm } from './PopulationSearchForm'
-import { ConnectedPopulationSearchHistory as PopulationSearchHistory } from './PopulationSearchHistory'
+import { PopulationSearchHistory } from './PopulationSearchHistory'
 
 const PopulationSearch = ({ populationFound, loading, combinedProgrammeCode }) => {
   const history = useHistory()
