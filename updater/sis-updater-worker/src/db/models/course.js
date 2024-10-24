@@ -16,20 +16,11 @@ Course.init(
     name: {
       type: JSONB,
     },
-    latest_instance_date: {
-      type: DATE,
-    },
     is_study_module: {
       type: BOOLEAN,
     },
     coursetypecode: {
       type: STRING,
-    },
-    startdate: {
-      type: DATE,
-    },
-    enddate: {
-      type: DATE,
     },
     max_attainment_date: {
       type: DATE,

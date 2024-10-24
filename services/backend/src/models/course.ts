@@ -58,15 +58,6 @@ export class Course extends Model<InferAttributes<Course>> {
   name!: Name
 
   @Column(DataType.DATE)
-  latest_instance_date!: Date
-
-  @Column(DataType.DATE)
-  startdate!: Date
-
-  @Column(DataType.DATE)
-  enddate!: Date
-
-  @Column(DataType.DATE)
   max_attainment_date!: Date
 
   @Column(DataType.DATE)

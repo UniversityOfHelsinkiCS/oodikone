@@ -1,7 +1,6 @@
 const { sortBy, flatten, uniqBy } = require('lodash')
 
 const { serviceProvider } = require('../config')
-const { getMinMaxDate } = require('../utils')
 const { logger } = require('../utils/logger')
 const {
   educationTypeToExtentcode,
@@ -251,12 +250,6 @@ const courseMapper = courseIdToAttainments => (groupedCourse, substitutions) => 
   const [groupId, courses] = groupedCourse
   const { code, name, study_level: coursetypecode, course_unit_type } = courses[0]
 
-  const { min: startdate, max: enddate } = getMinMaxDate(
-    courses,
-    course => course.validity_period.startDate,
-    course => course.validity_period.endDate
-  )
-
   const { min_attainment_date, max_attainment_date } = courses.reduce(
     (res, curr) => {
       const courseAttainments = courseIdToAttainments[curr.id]
@@ -282,9 +275,6 @@ const courseMapper = courseIdToAttainments => (groupedCourse, substitutions) => 
     coursetypecode,
     min_attainment_date,
     max_attainment_date,
-    latest_instance_date: max_attainment_date,
-    startdate,
-    enddate,
     is_study_module: false, // VALIDATE THIS PLS
     substitutions,
     course_unit_type,
