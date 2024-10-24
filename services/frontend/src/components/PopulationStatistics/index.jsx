@@ -28,7 +28,7 @@ import {
 } from '@/components/FilterView/filters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { PopulationDetails } from '@/components/PopulationDetails'
-import { ConnectedPopulationSearch as PopulationSearch } from '@/components/PopulationSearch'
+import { PopulationSearch } from '@/components/PopulationSearch'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'

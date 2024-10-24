@@ -1,4 +1,4 @@
-import { connect } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { Link, useHistory, useLocation } from 'react-router-dom'
 import { Button, Divider, Form, Header, Icon, Segment } from 'semantic-ui-react'
 
@@ -11,9 +11,12 @@ import { ProgressBar } from '@/components/ProgressBar'
 import { PopulationSearchForm } from './PopulationSearchForm'
 import { PopulationSearchHistory } from './PopulationSearchHistory'
 
-const PopulationSearch = ({ populationFound, loading, combinedProgrammeCode }) => {
+export const PopulationSearch = ({ combinedProgrammeCode }) => {
   const history = useHistory()
   const location = useLocation()
+  const populations = useSelector(state => state.populations)
+  const populationFound = populations.data.students !== undefined
+  const loading = !!populations.pending
   const { onProgress, progress } = useProgress(loading)
   const { filterDispatch, useFilterSelector } = useFilters()
   const onlyHopsCredit = useFilterSelector(hopsFilter.selectors.isActive)
@@ -70,10 +73,3 @@ const PopulationSearch = ({ populationFound, loading, combinedProgrammeCode }) =
     </Segment>
   )
 }
-
-const mapStateToProps = ({ populations }) => ({
-  populationFound: populations.data.students !== undefined,
-  loading: !!populations.pending,
-})
-
-export const ConnectedPopulationSearch = connect(mapStateToProps)(PopulationSearch)
