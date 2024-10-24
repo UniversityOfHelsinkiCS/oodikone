@@ -1,4 +1,3 @@
-import moment from 'moment'
 import qs from 'query-string'
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
@@ -8,13 +7,9 @@ import { Button, Form } from 'semantic-ui-react'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { InfoBox } from '@/components/InfoBox'
 import { PopulationQueryCard } from '@/components/PopulationQueryCard'
+import { getMonths } from './common'
 import { FilterActiveNote } from './FilterActiveNote'
 import './populationSearch.css'
-
-const getMonths = (year, term) => {
-  const start = term === 'FALL' ? `${year}-08-01` : moment(`${year}-01-01`).add(1, 'years')
-  return Math.ceil(moment.duration(moment().diff(moment(start))).asMonths())
-}
 
 export const PopulationSearchHistory = () => {
   const history = useHistory()

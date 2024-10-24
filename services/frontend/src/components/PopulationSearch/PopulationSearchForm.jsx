@@ -19,19 +19,15 @@ import { clearSelected } from '@/redux/populationSelectedStudentCourses'
 import { useGetStudyProgrammePinsQuery } from '@/redux/studyProgrammePins'
 import { formatQueryParamsToArrays } from '@/shared/util'
 import { momentFromFormat, reformatDate } from '@/util/timeAndDate'
+import { getMonths } from './common'
 import './populationSearch.css'
-
-const months = (year, term) => {
-  const start = term === 'FALL' ? `${year}-08-01` : moment(`${year}-01-01`).add(1, 'years')
-  return Math.ceil(moment.duration(moment().diff(moment(start))).asMonths())
-}
 
 const initialQuery = () => ({
   year: '2017',
   semesters: ['FALL', 'SPRING'],
   studentStatuses: [],
   studyRights: {},
-  months: months('2017', 'FALL'),
+  months: getMonths('2017', 'FALL'),
 })
 
 export const PopulationSearchForm = ({ onProgress }) => {
@@ -256,7 +252,7 @@ export const PopulationSearchForm = ({ onProgress }) => {
       query: {
         ...query,
         year: reformatDate(momentYear, YEAR_DATE_FORMAT),
-        months: months(
+        months: getMonths(
           reformatDate(momentYear, YEAR_DATE_FORMAT),
           query.semesters.includes('FALL') ? 'FALL' : 'SPRING'
         ),
