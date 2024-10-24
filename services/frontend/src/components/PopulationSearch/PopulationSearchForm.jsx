@@ -1,9 +1,9 @@
-import { sortBy, isEqual } from 'lodash'
+import { isEqual, sortBy } from 'lodash'
 import moment from 'moment'
 import qs from 'query-string'
 import { useEffect, useRef, useState } from 'react'
 import Datetime from 'react-datetime'
-import { connect } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useHistory, useLocation } from 'react-router-dom'
 import { Button, Form, Grid, Icon, Message } from 'semantic-ui-react'
 
@@ -27,18 +27,21 @@ const months = (year, term) => {
 }
 
 const initialQuery = () => ({
-  year: Datetime.moment('2017-01-01').year(),
+  year: '2017',
   semesters: ['FALL', 'SPRING'],
   studentStatuses: [],
   studyRights: {},
   months: months('2017', 'FALL'),
 })
 
-const PopulationSearchForm = ({ queries, onProgress, clearSelected, getPopulationStatistics, clearPopulations }) => {
+export const PopulationSearchForm = ({ onProgress }) => {
   const history = useHistory()
   const location = useLocation()
-  const { fullAccessToStudentData } = useGetAuthorizedUserQuery()
+  const dispatch = useDispatch()
+  const populations = useSelector(state => state.populations)
+  const queries = populations.query || {}
   const { getTextIn } = useLanguage()
+  const { fullAccessToStudentData } = useGetAuthorizedUserQuery()
   const [totalState, setTotalState] = useState({
     query: initialQuery(),
     isLoading: false,
@@ -99,9 +102,9 @@ const PopulationSearchForm = ({ queries, onProgress, clearSelected, getPopulatio
     const formattedQueryParams = formatQueryParamsToArrays(query, ['semesters', 'studentStatuses', 'years'])
     const uuid = crypto.randomUUID()
     setState({ isLoading: true })
-    clearSelected()
+    dispatch(clearSelected())
     fetchPopulationPromises.current = cancelablePromise(
-      Promise.all([getPopulationStatistics({ ...formattedQueryParams, uuid, onProgress }), []])
+      Promise.all([dispatch(getPopulationStatistics({ ...formattedQueryParams, uuid, onProgress }), [])])
     )
     const success = await fetchPopulationPromises.current.promise
     if (success) {
@@ -178,7 +181,9 @@ const PopulationSearchForm = ({ queries, onProgress, clearSelected, getPopulatio
   })
 
   const pushQueryToUrl = query => {
-    if (!checkPreviousQuery(query, queries)) clearPopulations()
+    if (!checkPreviousQuery(query, queries)) {
+      dispatch(clearPopulations())
+    }
     // Just to be sure that the previous population's data has been cleared
     setTimeout(() => {
       const { studyRights, ...rest } = query
@@ -430,15 +435,3 @@ const PopulationSearchForm = ({ queries, onProgress, clearSelected, getPopulatio
     </Form>
   )
 }
-
-const mapStateToProps = ({ populations }) => {
-  return {
-    queries: populations.query || {},
-  }
-}
-
-export const ConnectedPopulationSearchForm = connect(mapStateToProps, {
-  getPopulationStatistics,
-  clearSelected,
-  clearPopulations,
-})(PopulationSearchForm)

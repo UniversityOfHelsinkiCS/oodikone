@@ -8,7 +8,7 @@ import { hopsFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { InfoBox } from '@/components/InfoBox'
 import { ProgressBar } from '@/components/ProgressBar'
-import { ConnectedPopulationSearchForm as PopulationSearchForm } from './PopulationSearchForm'
+import { PopulationSearchForm } from './PopulationSearchForm'
 import { PopulationSearchHistory } from './PopulationSearchHistory'
 
 const PopulationSearch = ({ populationFound, loading, combinedProgrammeCode }) => {
@@ -31,7 +31,6 @@ const PopulationSearch = ({ populationFound, loading, combinedProgrammeCode }) =
         </>
       )}
       <PopulationSearchForm onProgress={onProgress} />
-
       {location.search !== '' && !loading && (
         <Form>
           <Form.Field>
