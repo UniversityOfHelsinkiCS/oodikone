@@ -355,7 +355,7 @@ const PopulationSearchForm = ({ queries, onProgress, clearSelected, getPopulatio
     </Form.Field>
   )
 
-  const renderStudyGroupSelector = () => {
+  const renderStudyProgrammeSelector = () => {
     const { studyRights } = query
     if (programmesAreLoading || !didMount) {
       return <Icon color="black" loading name="spinner" size="big" style={{ marginLeft: '45%' }} />
@@ -392,31 +392,31 @@ const PopulationSearchForm = ({ queries, onProgress, clearSelected, getPopulatio
     return null
   }
 
-  let errorText = 'Selected population already in analysis'
-  let isQueryInvalid = false
+  let invalidQuery = false
+  let errorMessage = 'Selected population already in analysis'
 
   if (query.semesters.length === 0) {
-    isQueryInvalid = true
-    errorText = 'Select at least one semester'
+    invalidQuery = true
+    errorMessage = 'Select at least one semester'
   }
 
   if (!query.studyRights.programme) {
-    isQueryInvalid = true
-    errorText = 'Select studyprogramme'
+    invalidQuery = true
+    errorMessage = 'Select study programme'
   }
 
   return (
-    <Form error={isQueryInvalid} loading={isLoading}>
+    <Form error={invalidQuery} loading={isLoading}>
       <Grid divided padded="vertically">
         <Grid.Row>
           <Grid.Column width={10}>
             {renderEnrollmentDateSelector()}
-            {renderStudyGroupSelector()}
+            {renderStudyProgrammeSelector()}
+            <Message color="blue" error header={errorMessage} />
           </Grid.Column>
         </Grid.Row>
       </Grid>
-      <Message color="blue" error header={errorText} />
-      <Form.Button color="blue" disabled={isQueryInvalid || query.months < 0} onClick={handleSubmit}>
+      <Form.Button color="blue" disabled={invalidQuery || query.months < 0} onClick={handleSubmit}>
         See class
       </Form.Button>
       <SearchHistory
