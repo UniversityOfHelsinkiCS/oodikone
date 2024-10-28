@@ -4,8 +4,8 @@ export const studyProgrammeToolTips = {
   **Academic year**: Näyttää tilastot lukuvuosille jaoteltuna (esim. 1.8.2023–31.7.2024)
   `,
   StudentToggle: `
-  **All studyrights**: Valinnassa ovat mukana vaihto-opiskelijat, erillisoikeudella opiskelevat ja ohjelmaan siirtyneet opiskelijat sekä ohjelmasta pois siirtyneet opiskelijat.  
-  **Special studyrights excluded**: Valinnasta ja kaikista luvuista on poissuljettu kaikki edellä mainitut erikoisryhmät.
+  **All study rights**: Valinnassa ovat mukana vaihto-opiskelijat, erillisoikeudella opiskelevat ja ohjelmaan siirtyneet opiskelijat sekä ohjelmasta pois siirtyneet opiskelijat.  
+  **Special study rights excluded**: Valinnasta ja kaikista luvuista on poissuljettu kaikki edellä mainitut erikoisryhmät.
   `,
   GraduatedToggle: `
   **Graduated included**: Valinnassa ovat mukana ohjelmasta jo valmistuneet opiskelijat.  
@@ -95,7 +95,7 @@ export const studyProgrammeToolTips = {
 
   Valmistumisajoista on vähennetty lakisääteiset poissaolot.
   
-  Jos sivun yläosassa on valittuna ”All studyrights” (oletus), mukana ovat myös ohjelmaan siirtyneet ja ohjelmasta pois siirtyneet opiskelijat.`,
+  Jos sivun yläosassa on valittuna ”All study rights” (oletus), mukana ovat myös ohjelmaan siirtyneet ja ohjelmasta pois siirtyneet opiskelijat.`,
   ProgrammesBeforeOrAfter: `
   **Mikäli valittuna on kandiohjelma:** Sisältää maisteriohjelmat, joissa tämän kandiohjelman opiskelijat ovat aloittaneet valmistuttuaan kandeiksi. Vuosijaottelu on tehty maisteriohjelmassa aloittamisen perusteella.
 
@@ -103,7 +103,7 @@ export const studyProgrammeToolTips = {
 
   **Mikäli valittuna on maisteriohjelma:** Sisältää kandiohjelmat, joissa tämän ohjelman opiskelijat ovat opiskelleet ennen tuloaan maisteriohjelmaan. Vuosijaottelu on tehty maisteriohjelmassa aloittamisen perusteella.
   `,
-  StudytrackOverview: `
+  StudyTrackOverview: `
   - **All**: Opiskelijat, joiden opiskeluoikeus on alkanut kyseisenä lukuvuonna. Opiskelijoiden, joiden opiskeluoikeuteen kuuluu sekä kandidaatin että maisterin tutkinnon suoritusoikeus, aloituspäivä maisteriohjelmassa on kandidaatin tutkinnon valmistumispäivän jälkeinen päivä.
   - **Started studying**: Opiskelijat, jotka ovat ilmoittautuneet läsnäolevaksi samana lukuvuonna kuin heidän opiskeluoikeutensa on alkanut. Opiskelija on voinut myöhemmin keskeyttää opintonsa tai siirtyä pois ohjelmasta.
 
@@ -117,7 +117,7 @@ export const studyProgrammeToolTips = {
 
   Paksummilla pystyviivoilla eroteltujen kategorioiden (**Current status**, **Gender**, **Countries**) sarakkeet tuottavat yhteenlaskettuna kentän **All** arvon.
 
-  Jos sivun yläosassa on valittuna ”All studyrights” (oletus), mukana ovat myös ohjelmaan siirtyneet ja ohjelmasta pois siirtyneet opiskelijat.
+  Jos sivun yläosassa on valittuna ”All study rights” (oletus), mukana ovat myös ohjelmaan siirtyneet ja ohjelmasta pois siirtyneet opiskelijat.
 
   Yläosan valikosta on mahdollista valita tarkasteluun yhden opintosuunnan opiskelijat. Luvut kuvaavat tällöin kyseisen opintosuunnan opiskelijoita.
   `,
@@ -126,9 +126,9 @@ export const studyProgrammeToolTips = {
 
   Opintopistekertymään on laskettu kaikki suoritukset, jotka opiskelija on suorittanut koulutusohjelmaan siirryttyään. Myös hyväksiluetut ja muuhun kuin valittuun koulutusohjelmaan tai opintosuuntaan tehdyt suoritukset lasketaan mukaan.
 
-  Maisteriohjelmien tilastoissa opiskelijat jaetaan kahteen ryhmään: niihin, joilla on oikeus suorittaa sekä kandidaatin että maisterin tutkinto (**Bachelor + master studyright**) ja niihin, joilla on oikeus suorittaa vain maisterin tutkinto (**Master studyright**). *Bachelor + master studyright* -tilastoissa aloitusvuosi on opiskelijan aloitusvuosi kandiohjelmassa, ja mukana ovat kaikki suoritukset, jotka opiskelija on suorittanut aloitettuaan kandiohjelmassa.
+  Maisteriohjelmien tilastoissa opiskelijat jaetaan kahteen ryhmään: niihin, joilla on oikeus suorittaa sekä kandidaatin että maisterin tutkinto (**Bachelor + master study right**) ja niihin, joilla on oikeus suorittaa vain maisterin tutkinto (**Master study right**). *Bachelor + master study right* -tilastoissa aloitusvuosi on opiskelijan aloitusvuosi kandiohjelmassa, ja mukana ovat kaikki suoritukset, jotka opiskelija on suorittanut aloitettuaan kandiohjelmassa.
 
-  Jos sivun yläosassa on valittuna ”All studyrights” (oletus), mukana ovat myös ohjelmaan siirtyneet ja ohjelmasta pois siirtyneet opiskelijat.
+  Jos sivun yläosassa on valittuna ”All study rights” (oletus), mukana ovat myös ohjelmaan siirtyneet ja ohjelmasta pois siirtyneet opiskelijat.
   `,
   Name: `
   Pitkät kurssinimet on lyhennetty. Näet ne kokonaan laittamalla hiiren nimen yläpuolelle.
@@ -138,7 +138,7 @@ export const studyProgrammeToolTips = {
   `,
 }
 
-studyProgrammeToolTips.StudytrackOverviewCombinedProgramme = studyProgrammeToolTips.StudytrackOverview.replace(
+studyProgrammeToolTips.StudyTrackOverviewCombinedProgramme = studyProgrammeToolTips.StudyTrackOverview.replace(
   'Opiskelijoiden, joiden opiskeluoikeuteen kuuluu sekä kandidaatin että maisterin tutkinnon suoritusoikeus, aloituspäivä maisteriohjelmassa on kandidaatin tutkinnon valmistumispäivän jälkeinen päivä.',
   ''
 )
@@ -153,12 +153,12 @@ studyProgrammeToolTips.StudytrackOverviewCombinedProgramme = studyProgrammeToolT
   )
 
 studyProgrammeToolTips.StudytrackProgressEvaluationOverview = studyProgrammeToolTips.StudytrackProgress.replace(
-  'Jos sivun yläosassa on valittuna ”All studyrights” (oletus), mukana ovat myös ohjelmaan siirtyneet ja ohjelmasta pois siirtyneet opiskelijat.',
+  'Jos sivun yläosassa on valittuna ”All study rights” (oletus), mukana ovat myös ohjelmaan siirtyneet ja ohjelmasta pois siirtyneet opiskelijat.',
   ''
 )
 
 studyProgrammeToolTips.AverageGraduationTimesStudytracksMaster =
   studyProgrammeToolTips.AverageGraduationTimesStudytracks.replace(
     'on valmistunut.',
-    'on valmistunut.\n\n  Maisteriohjelmien tilastoissa opiskelijat on jaettu kahteen ryhmään:\n  - **Bachelor + master studyright** -kaaviossa ovat mukana ne opiskelijat, joilla on oikeus suorittaa **sekä kandidaatin että maisterin** tutkinto. Tässä kaaviossa aloitusvuosi tarkoittaa opiskelijan aloitusvuotta kandiohjelmassa.\n  - **Master studyright** -kaaviossa ovat mukana ne opiskelijat, joilla on oikeus suorittaa **ainoastaan maisterin** tutkinto.'
+    'on valmistunut.\n\n  Maisteriohjelmien tilastoissa opiskelijat on jaettu kahteen ryhmään:\n  - **Bachelor + master study right** -kaaviossa ovat mukana ne opiskelijat, joilla on oikeus suorittaa **sekä kandidaatin että maisterin** tutkinto. Tässä kaaviossa aloitusvuosi tarkoittaa opiskelijan aloitusvuotta kandiohjelmassa.\n  - **Master study right** -kaaviossa ovat mukana ne opiskelijat, joilla on oikeus suorittaa **ainoastaan maisterin** tutkinto.'
   )

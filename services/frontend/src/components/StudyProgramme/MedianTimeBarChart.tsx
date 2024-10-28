@@ -41,7 +41,7 @@ export const MedianTimeBarChart = ({ byStartYear, data, goal, title }: MedianTim
   }
 
   const getDataLabel = (amount: number, classSize: number) => {
-    if (byStartYear && title !== 'Bachelor + master studyright') {
+    if (byStartYear && title !== 'Bachelor + master study right') {
       return `${amount} graduated (${getPercentage(amount, classSize)} % of class)`
     }
     return `${amount} graduated`
@@ -54,7 +54,7 @@ export const MedianTimeBarChart = ({ byStartYear, data, goal, title }: MedianTim
 
   const getTooltipText = (amount: number, y: number, year: string, statistics: Statistics, classSize: number) => {
     const sortingText =
-      byStartYear && title !== 'Bachelor + master studyright'
+      byStartYear && title !== 'Bachelor + master study right'
         ? `<b>From class of ${year}, ${amount}/${classSize} students have graduated</b>`
         : `<b>${amount} students graduated in year ${year}</b>`
 

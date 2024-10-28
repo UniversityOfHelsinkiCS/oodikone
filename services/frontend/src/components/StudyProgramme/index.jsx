@@ -11,7 +11,7 @@ import { BasicOverview } from './BasicOverview'
 import { DegreeCoursesTable } from './DegreeCourses'
 import { ProgrammeCourses } from './ProgrammeCourses'
 import { StudyProgrammeSelector } from './StudyProgrammeSelector'
-import { StudytrackOverview } from './StudytrackOverview'
+import { StudyTrackOverview } from './StudyTrackOverview'
 import { Tags } from './Tags'
 import { UpdateView } from './UpdateView'
 
@@ -69,15 +69,15 @@ export const StudyProgramme = () => {
       ),
     })
     panes.push({
-      menuItem: 'Studytracks and class statistics',
+      menuItem: 'Study tracks and class statistics',
       render: () => (
-        <StudytrackOverview
+        <StudyTrackOverview
           combinedProgramme={secondProgrammeId}
           graduated={graduated}
           setGraduated={setGraduated}
           setSpecialGroupsExcluded={setSpecialGroupsExcluded}
           specialGroupsExcluded={specialGroupsExcluded}
-          studyprogramme={programmeId}
+          studyProgramme={programmeId}
         />
       ),
     })

@@ -154,8 +154,8 @@ export const BasicOverview = ({
         />
         <Toggle
           cypress="StudentToggle"
-          firstLabel="All studyrights"
-          secondLabel="Special studyrights excluded"
+          firstLabel="All study rights"
+          secondLabel="Special study rights excluded"
           setValue={setSpecialGroupsExcluded}
           toolTips={studyProgrammeToolTips.StudentToggle}
           value={specialGroupsExcluded}

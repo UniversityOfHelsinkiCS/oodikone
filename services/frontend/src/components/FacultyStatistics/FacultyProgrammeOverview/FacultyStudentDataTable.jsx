@@ -2,7 +2,7 @@ import { Fragment, useState } from 'react'
 import { Button, Icon, Label, Popup, Table } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { PopulationLink } from '@/components/StudyProgramme/StudytrackOverview/PopulationLink'
+import { PopulationLink } from '@/components/StudyProgramme/StudyTrackOverview/PopulationLink'
 import { Toggle } from '@/components/StudyProgramme/Toggle'
 
 const getStyle = index => {

@@ -278,14 +278,14 @@ const sortMainDataByYear = data => {
   return sortedData
 }
 
-export const StudytrackDataTable = ({
+export const StudyTrackDataTable = ({
   combinedProgramme,
   dataOfAllTracks,
   dataOfSingleTrack,
   otherCountriesStats,
   singleTrack,
-  studyprogramme,
-  studytracks,
+  studyProgramme,
+  studyTracks,
   titles,
   years,
 }) => {
@@ -373,7 +373,7 @@ export const StudytrackDataTable = ({
                     otherCountriesStats,
                     row,
                     showPercentages,
-                    studyprogramme,
+                    studyProgramme,
                   })
                 )
               : sortedMainStats?.map((yearlyData, index) =>
@@ -390,8 +390,8 @@ export const StudytrackDataTable = ({
                       setShow: () => firstCellClicked(index),
                       show: show[index],
                       showPercentages,
-                      studyprogramme,
-                      studytracks,
+                      studyProgramme,
+                      studyTracks,
                       years,
                       yearlyData,
                     })

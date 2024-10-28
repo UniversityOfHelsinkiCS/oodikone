@@ -85,7 +85,7 @@ export const FacultyView = ({ faculty }) => {
       <Message info>
         <Message.Header>This view is an abridged version of Oodikone's Faculty Overview</Message.Header>
         <p>
-          In these statistics, all special studyrights have been excluded, eg. exchange students and non-degree
+          In these statistics, all special study rights have been excluded, eg. exchange students and non-degree
           students.
         </p>
         <p>

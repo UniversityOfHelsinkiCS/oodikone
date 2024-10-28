@@ -187,8 +187,8 @@ export const FacultyProgrammeOverview = ({
       <div className="toggle-container">
         <Toggle
           cypress="StudentToggle"
-          firstLabel="All studyrights"
-          secondLabel="Special studyrights excluded"
+          firstLabel="All study rights"
+          secondLabel="Special study rights excluded"
           setValue={setSpecialGroups}
           toolTips={facultyToolTips.StudentToggle}
           value={specialGroups}

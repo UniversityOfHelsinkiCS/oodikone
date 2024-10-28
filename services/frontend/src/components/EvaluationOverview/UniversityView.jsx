@@ -66,7 +66,7 @@ export const UniversityView = ({ isEvaluationOverview }) => {
       <Message info>
         <Message.Header>This view is a combined version of Oodikone's Faculty Evaluation Overview</Message.Header>
         <p>
-          In these statistics, <b>all special studyrights have been excluded</b>, eg. exchange students and non-degree
+          In these statistics, <b>all special study rights have been excluded</b>, eg. exchange students and non-degree
           students.
         </p>
         <p>Access the full Faculty view of individual faculties by clicking 'Faculty' in the top navigation bar.</p>
@@ -131,8 +131,8 @@ export const UniversityView = ({ isEvaluationOverview }) => {
             {!isEvaluationOverview && (
               <Toggle
                 cypress="StudentToggle"
-                firstLabel="All studyrights"
-                secondLabel="Special studyrights excluded"
+                firstLabel="All study rights"
+                secondLabel="Special study rights excluded"
                 setValue={() => setIncludeSpecials(!excludeSpecials)}
                 toolTips={facultyToolTips.StudentToggle}
                 value={excludeSpecials}

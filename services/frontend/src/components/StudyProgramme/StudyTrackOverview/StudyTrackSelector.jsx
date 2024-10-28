@@ -3,9 +3,11 @@ import { Dropdown } from 'semantic-ui-react'
 import '../studyprogramme.css'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 
-export const StudytrackSelector = ({ track, setTrack, studytracks }) => {
+export const StudyTrackSelector = ({ track, setTrack, studyTracks }) => {
   const { getTextIn } = useLanguage()
-  if (!studytracks) return null
+  if (!studyTracks) {
+    return null
+  }
 
   const handleStudytrackChange = (event, { value }) => {
     event.preventDefault()
@@ -13,11 +15,13 @@ export const StudytrackSelector = ({ track, setTrack, studytracks }) => {
   }
 
   const getOptionName = track => {
-    if (track !== 'All students of the programme') return getTextIn(track)
+    if (track !== 'All students of the programme') {
+      return getTextIn(track)
+    }
     return track
   }
 
-  const studyTrackOptions = Object.entries(studytracks)
+  const studyTrackOptions = Object.entries(studyTracks)
     .map(([code, track]) => ({
       key: code,
       value: code,
@@ -31,10 +35,10 @@ export const StudytrackSelector = ({ track, setTrack, studytracks }) => {
 
   return (
     <div className="studytrack-selector">
-      <h4>Choose studytrack</h4>
+      <h4>Choose study track</h4>
       <Dropdown
         fluid
-        name="studytrack"
+        name="studyTrack"
         onChange={handleStudytrackChange}
         options={studyTrackOptions}
         selection
