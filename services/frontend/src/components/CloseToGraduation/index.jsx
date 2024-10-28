@@ -156,10 +156,8 @@ const getColumns = (
           if (!student.studyright.semesterEnrollments) {
             return 'Not enrolled'
           }
-          const enrollment = student.studyright.semesterEnrollments.find(
-            enrollment => enrollment.semestercode === semester
-          )
-          return getEnrollmentTypeTextForExcel(enrollment?.enrollmenttype, enrollment?.statutoryAbsence)
+          const enrollment = student.studyright.semesterEnrollments.find(enrollment => enrollment.semester === semester)
+          return getEnrollmentTypeTextForExcel(enrollment?.type, enrollment?.statutoryAbsence)
         },
       })),
     },
