@@ -67,7 +67,7 @@ facultyToolTips.StudentsStatsOfTheFaculty = studyProgrammeToolTips.StudyTrackOve
 )
 facultyToolTips.StudentsOfTheFaculty =
   'Taulukon luvut on laskettu **yhdistämällä** tiedekunnan koulutusohjelmien luvut. Näin ollen tämän näkymän luvut täsmäävät *Study programme* -näkymän lukuihin. Kategorioiden merkitykset ovat seuraavat:\n'
-    .concat(studyProgrammeToolTips.StudentsOfTheStudyprogramme)
+    .concat(studyProgrammeToolTips.StudentsOfTheStudyProgramme)
     .replace('Transferred away', 'Transferred out of programme')
     .replace('Transferred to', 'Transferred into programme')
 facultyToolTips.GraduatedToggle = studyProgrammeToolTips.GraduatedToggle

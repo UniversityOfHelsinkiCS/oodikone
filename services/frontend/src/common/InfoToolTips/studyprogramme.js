@@ -11,7 +11,7 @@ export const studyProgrammeToolTips = {
   **Graduated included**: Valinnassa ovat mukana ohjelmasta jo valmistuneet opiskelijat.  
   **Graduated excluded**: Valinnasta on poistettu ohjelmasta jo valmistuneet opiskelijat.
   `,
-  StudentsOfTheStudyprogramme: `
+  StudentsOfTheStudyProgramme: `
   **Started studying**: Sisältää opiskelijat, jotka ovat kyseisenä vuonna ilmoittautuneet ensimmäistä kertaa läsnäolevaksi koulutusohjelmassa. Opiskelija on voinut myös myöhemmin keskeyttää opintonsa tai siirtyä pois ohjelmasta.
 
   **Accepted**: Sisältää opiskelijat, joiden opiskeluoikeus koulutusohjelmassa on alkanut kyseisenä vuonna. Opiskelija on saattanut ilmoittautua poissaolevaksi tai jättää lukuvuosi-ilmoittautumisen kokonaan tekemättä.
@@ -22,7 +22,7 @@ export const studyProgrammeToolTips = {
   
   **Transferred to**: Sisältää kyseisenä vuonna ohjelmaan siirtyneet opiskelijat (opiskeluoikeudet). Ohjelmaan siirtyneiden määrä on erityisen suuri vuonna 2020, jolloin opiskelijat siirtyivät vanhoista koulutusohjelmista uusiin ohjelmiin.
   `,
-  CreditsProducedByTheStudyprogramme: `
+  CreditsProducedByTheStudyProgramme: `
   Sisältää opintopisteet suoritusvuosittain. Suoritukset on jaoteltu Sisussa näkyvän kurssin suorituspäivän mukaan. Kategoriat vastaavat Rapon kategorioita. Pistemäärät ovat osin epätarkkoja ennen vuotta 2022 sisu-oodi-erojen vuoksi.
 
   Total-lukuun lasketaan mukaan kaikki opintopisteet **hyväksiluettuja opintopisteitä lukuun ottamatta**.
@@ -84,7 +84,7 @@ export const studyProgrammeToolTips = {
   **Median time**: Näyttää kyseisenä kalenteri- tai lukuvuotena valmistuneiden opiskelijoiden opintojen keston **mediaanin** kuukausina. Vihreä **katkoviiva** kuvastaa tavoiteaikaa. Keltainen katkoviiva on tavoiteaika + 12 kuukautta.
 
   Valmistumisajoista on vähennetty lakisääteiset poissaolot.`,
-  AverageGraduationTimesStudytracks: `
+  AverageGraduationTimesStudyTracks: `
   Yksittäinen palkki kertoo, kuinka moni kyseisenä **lukuvuotena ALOITTANEISTA** opiskelijoista on valmistunut.
 
   Vihreä **vaakapalkki** kuvaa tavoiteajassa valmistuneita, keltainen 12 kuukauden sisällä tavoiteajasta valmistuneita ja punainen yli 12 kuukautta tavoiteajan ylittäneitä.
@@ -121,7 +121,7 @@ export const studyProgrammeToolTips = {
 
   Yläosan valikosta on mahdollista valita tarkasteluun yhden opintosuunnan opiskelijat. Luvut kuvaavat tällöin kyseisen opintosuunnan opiskelijoita.
   `,
-  StudytrackProgress: `
+  StudyTrackProgress: `
   Kuvaa koulutusohjelmassa tiettynä lukuvuonna aloittaneiden opiskelijoiden etenemistä opintopisteissä mitattuna. Esimerkiksi kategoriaan 20–40 kuuluvat opiskelijat, jotka ovat suorittaneet **vähintään 20**, mutta **alle 40** opintopistettä.
 
   Opintopistekertymään on laskettu kaikki suoritukset, jotka opiskelija on suorittanut koulutusohjelmaan siirryttyään. Myös hyväksiluetut ja muuhun kuin valittuun koulutusohjelmaan tai opintosuuntaan tehdyt suoritukset lasketaan mukaan.
@@ -152,13 +152,13 @@ studyProgrammeToolTips.StudyTrackOverviewCombinedProgramme = studyProgrammeToolT
     'kentän **All** arvon (lukuun ottamatta *Current status* -kategorian **Graduated bachelor** -saraketta).'
   )
 
-studyProgrammeToolTips.StudytrackProgressEvaluationOverview = studyProgrammeToolTips.StudytrackProgress.replace(
+studyProgrammeToolTips.StudyTrackProgressEvaluationOverview = studyProgrammeToolTips.StudyTrackProgress.replace(
   'Jos sivun yläosassa on valittuna ”All study rights” (oletus), mukana ovat myös ohjelmaan siirtyneet ja ohjelmasta pois siirtyneet opiskelijat.',
   ''
 )
 
-studyProgrammeToolTips.AverageGraduationTimesStudytracksMaster =
-  studyProgrammeToolTips.AverageGraduationTimesStudytracks.replace(
+studyProgrammeToolTips.AverageGraduationTimesStudyTracksMaster =
+  studyProgrammeToolTips.AverageGraduationTimesStudyTracks.replace(
     'on valmistunut.',
     'on valmistunut.\n\n  Maisteriohjelmien tilastoissa opiskelijat on jaettu kahteen ryhmään:\n  - **Bachelor + master study right** -kaaviossa ovat mukana ne opiskelijat, joilla on oikeus suorittaa **sekä kandidaatin että maisterin** tutkinto. Tässä kaaviossa aloitusvuosi tarkoittaa opiskelijan aloitusvuotta kandiohjelmassa.\n  - **Master study right** -kaaviossa ovat mukana ne opiskelijat, joilla on oikeus suorittaa **ainoastaan maisterin** tutkinto.'
   )

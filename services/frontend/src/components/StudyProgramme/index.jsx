@@ -116,7 +116,7 @@ export const StudyProgramme = () => {
     if (isAdmin) {
       panes.push({
         menuItem: 'Update statistics',
-        render: () => <UpdateView combinedProgramme={secondProgrammeId} studyprogramme={programmeId} />,
+        render: () => <UpdateView combinedProgramme={secondProgrammeId} studyProgramme={programmeId} />,
       })
     }
     return panes

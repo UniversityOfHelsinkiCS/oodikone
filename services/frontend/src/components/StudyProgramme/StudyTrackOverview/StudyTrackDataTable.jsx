@@ -30,10 +30,12 @@ const getStyleForCombined = index => {
   return {}
 }
 
-const createCountriesContent = ({ otherCountriesStats, studyprogramme, year }) => {
-  const countriesData = otherCountriesStats?.[studyprogramme]?.[year]
+const createCountriesContent = ({ otherCountriesStats, studyProgramme, year }) => {
+  const countriesData = otherCountriesStats?.[studyProgramme]?.[year]
 
-  if (!countriesData || Object.keys(countriesData).length === 0) return null
+  if (!countriesData || Object.keys(countriesData).length === 0) {
+    return null
+  }
 
   return Object.keys(countriesData)
     .sort()
@@ -55,11 +57,13 @@ const getBasicTableCell = ({ combinedProgramme, index, row, value }) => (
   </Table.Cell>
 )
 
-const getOtherCountriesCell = ({ combinedProgramme, index, otherCountriesStats, row, studyprogramme, value, year }) => {
-  const countriesPopupContent = createCountriesContent({ otherCountriesStats, studyprogramme, year })
+const getOtherCountriesCell = ({ combinedProgramme, index, otherCountriesStats, row, studyProgramme, value, year }) => {
+  const countriesPopupContent = createCountriesContent({ otherCountriesStats, studyProgramme, year })
   const tableCell = getBasicTableCell({ combinedProgramme, index, row, value })
-  if (!countriesPopupContent) return tableCell
-  return <Popup content={countriesPopupContent} key={`${studyprogramme}-${year}`} trigger={tableCell} />
+  if (!countriesPopupContent) {
+    return tableCell
+  }
+  return <Popup content={countriesPopupContent} key={`${studyProgramme}-${year}`} trigger={tableCell} />
 }
 
 const getFirstCell = ({
@@ -69,17 +73,17 @@ const getFirstCell = ({
   fullAccessToStudentData,
   setShow,
   show,
-  studyprogramme,
+  studyProgramme,
   year,
   yearlyData,
 }) => (
   <Table.Cell className={getCellClass(year)} key={year} onClick={setShow}>
     {yearlyData.length > 1 && <Icon name={`${show ? 'angle down' : 'angle right'}`} />}
     {year}
-    {(fullAccessToStudentData || allRights.includes(studyprogramme) || allRights.includes(combinedProgramme)) && (
+    {(fullAccessToStudentData || allRights.includes(studyProgramme) || allRights.includes(combinedProgramme)) && (
       <PopulationLink
         combinedProgramme={combinedProgramme}
-        studyprogramme={studyprogramme}
+        studyprogramme={studyProgramme}
         year={year}
         years={calendarYears}
       />
@@ -96,7 +100,7 @@ const getSingleTrackRow = ({
   otherCountriesStats,
   row,
   showPercentages,
-  studyprogramme,
+  studyProgramme,
 }) => (
   <Table.Row className="regular-row" key={`${code}-${row[0]}`}>
     {row.map((value, index) => {
@@ -107,7 +111,7 @@ const getSingleTrackRow = ({
           index,
           otherCountriesStats,
           row,
-          studyprogramme: code,
+          studyProgramme: code,
           value,
           year: row[0],
         })
@@ -122,11 +126,11 @@ const getSingleTrackRow = ({
           {value}
           {index === 0 &&
             (fullAccessToStudentData ||
-              allRights.includes(studyprogramme) ||
+              allRights.includes(studyProgramme) ||
               allRights.includes(combinedProgramme)) && (
               <PopulationLink
                 combinedProgramme={combinedProgramme}
-                studyprogramme={studyprogramme}
+                studyprogramme={studyProgramme}
                 studytrack={code}
                 year={row[0]}
                 years={calendarYears}
@@ -150,8 +154,8 @@ const getRow = ({
   setShow,
   show,
   showPercentages,
-  studyprogramme,
-  studytracks,
+  studyProgramme,
+  studyTracks,
   years,
   yearlyData,
 }) => {
@@ -170,7 +174,7 @@ const getRow = ({
               fullAccessToStudentData,
               setShow,
               show,
-              studyprogramme,
+              studyProgramme,
               year: row[0],
               yearlyData,
             })
@@ -180,7 +184,7 @@ const getRow = ({
               index,
               otherCountriesStats,
               row,
-              studyprogramme,
+              studyProgramme,
               value,
               year: row[0],
             })
@@ -196,9 +200,9 @@ const getRow = ({
 
   const correctStudytrack = row[0]
   const title =
-    studytracks[correctStudytrack] === undefined
+    studyTracks[correctStudytrack] === undefined
       ? correctStudytrack
-      : `${getTextIn(studytracks[correctStudytrack])}, ${correctStudytrack}`
+      : `${getTextIn(studyTracks[correctStudytrack])}, ${correctStudytrack}`
 
   return (
     <Table.Row className="regular-row" key={title}>
@@ -210,11 +214,11 @@ const getRow = ({
             <Table.Cell key={`${title}-${index}`} style={{ paddingLeft: '50px' }} textAlign="left">
               {title}
               {(fullAccessToStudentData ||
-                allRights.includes(studyprogramme) ||
+                allRights.includes(studyProgramme) ||
                 allRights.includes(combinedProgramme)) && (
                 <PopulationLink
                   combinedProgramme={combinedProgramme}
-                  studyprogramme={studyprogramme}
+                  studyprogramme={studyProgramme}
                   studytrack={correctStudytrack}
                   year={year}
                   years={calendarYears}

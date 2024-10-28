@@ -172,7 +172,7 @@ export const BasicOverview = ({
           )}
           {basics.isSuccess && basics.data && (
             <>
-              {getDivider('Students of the studyprogramme', 'StudentsOfTheStudyprogramme')}
+              {getDivider('Students of the study programme', 'StudentsOfTheStudyProgramme')}
               <div className="section-container">
                 <LineGraph
                   cypress="StudentsOfTheStudyprogramme"
@@ -189,7 +189,7 @@ export const BasicOverview = ({
           )}
           {credits?.data?.stats?.[studyprogramme]?.stats && (
             <>
-              {getDivider('Credits produced by the studyprogramme', 'CreditsProducedByTheStudyprogramme')}
+              {getDivider('Credits produced by the study programme', 'CreditsProducedByTheStudyProgramme')}
               <CreditsProduced
                 academicYear={academicYear}
                 data={credits?.data?.stats?.[studyprogramme]?.stats}

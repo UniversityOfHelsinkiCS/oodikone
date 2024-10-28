@@ -141,8 +141,8 @@ export const ProgrammeView = ({ studyprogramme }) => {
             </Message>
             <div>
               {getDivider(
-                'Progress of students of the studyprogramme by starting year',
-                'StudytrackProgressEvaluationOverview'
+                'Progress of students of the study programme by starting year',
+                'StudyTrackProgressEvaluationOverview'
               )}
               <Toggle
                 cypress="GraduatedToggle"

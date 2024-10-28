@@ -18,6 +18,6 @@ export const userToolTips = {
   **Full rights** are granted to the following people:  
   - education planning officer (koulutussuunnittelija) of the corresponding faculty.
   - vice dean responsible for education (opetusvaradekaani) of the corresponding faculty.
-  - head **and** member of the steering group of the studyprogramme (johtoryhmän jäsen ja koulutusohjelman johtaja).
+  - head **and** member of the steering group of the study programme (johtoryhmän jäsen ja koulutusohjelman johtaja).
   `,
 }

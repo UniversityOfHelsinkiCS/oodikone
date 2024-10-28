@@ -59,8 +59,8 @@ export const StudyTrackOverview = ({
   const noData = stats.isSuccess && stats.mainStatsByYear && !stats.mainStatsByYear.Total.length
   if (noData) return <h3>There is no data available for the selected programme between 2017-2022</h3>
   const infoTextGraduationTimes = studyProgramme.includes('MH')
-    ? 'AverageGraduationTimesStudytracksMaster'
-    : 'AverageGraduationTimesStudytracks'
+    ? 'AverageGraduationTimesStudyTracksMaster'
+    : 'AverageGraduationTimesStudyTracks'
   const infoTextStudentTable = combinedProgramme ? 'StudyTrackOverviewCombinedProgramme' : 'StudyTrackOverview'
 
   const programmeCode = combinedProgramme ? `${studyProgramme}-${combinedProgramme}` : studyProgramme
@@ -181,7 +181,7 @@ export const StudyTrackOverview = ({
 
           {track === '' || track === studyProgramme ? (
             <>
-              {getDivider('Progress of students of the study programme by starting year', 'Study trackProgress')}
+              {getDivider('Progress of students of the study programme by starting year', 'StudyTrackProgress')}
               <ProgressOfStudents
                 progressComboStats={progressComboStats}
                 progressStats={progressStats}
