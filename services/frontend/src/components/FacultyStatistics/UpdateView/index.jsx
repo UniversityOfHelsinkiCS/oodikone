@@ -9,14 +9,15 @@ export const UpdateView = ({ faculty }) => {
   const [skipCredits, setSkipCredits] = useState(true)
   const [skipThesis, setSkipThesis] = useState(true)
   const [skipProgressTab, setSkipProgressTab] = useState(true)
-  const basicBasicTabStats = useUpdateFacultyBasicViewQuery({ id: faculty, statsType: 'STUDENT' }, { skip: skipBasic })
 
+  const basicBasicTabStats = useUpdateFacultyBasicViewQuery({ id: faculty, statsType: 'STUDENT' }, { skip: skipBasic })
   const creditsBasicTabStats = useUpdateFacultyBasicViewQuery(
     { id: faculty, statsType: 'CREDITS' },
     { skip: skipCredits }
   )
   const thesisBasicTabStats = useUpdateFacultyBasicViewQuery({ id: faculty, statsType: 'THESIS' }, { skip: skipThesis })
   const progressViewStats = useUpdateFacultyProgressViewQuery({ id: faculty }, { skip: skipProgressTab })
+
   return (
     <div className="update-view">
       <div className="button-container">

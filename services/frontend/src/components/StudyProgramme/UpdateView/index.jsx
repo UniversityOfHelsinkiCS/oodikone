@@ -7,6 +7,7 @@ import { useUpdateBasicViewQuery, useUpdateStudyTrackViewQuery } from '@/redux/s
 export const UpdateView = ({ combinedProgramme, studyProgramme }) => {
   const [skipBasic, setSkipBasic] = useState(true)
   const [skipStudyTrack, setSkipStudyTrack] = useState(true)
+
   const basicStats = useUpdateBasicViewQuery({ id: studyProgramme, combinedProgramme }, { skip: skipBasic })
   const studyTrackStats = useUpdateStudyTrackViewQuery(
     { id: studyProgramme, combinedProgramme },
@@ -23,7 +24,7 @@ export const UpdateView = ({ combinedProgramme, studyProgramme }) => {
           disabled={basicStats.isLoading}
           onClick={() => setSkipBasic(false)}
         >
-          Update Basic information
+          Update
         </Button>
         <UpdateStatusIcon stats={basicStats} />
       </div>
@@ -35,7 +36,7 @@ export const UpdateView = ({ combinedProgramme, studyProgramme }) => {
           disabled={studyTrackStats.isLoading}
           onClick={() => setSkipStudyTrack()}
         >
-          Update Study tracks and class statistics
+          Update
         </Button>
         <UpdateStatusIcon stats={studyTrackStats} />
       </div>
