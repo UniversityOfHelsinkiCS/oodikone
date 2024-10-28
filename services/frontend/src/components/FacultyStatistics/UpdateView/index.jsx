@@ -1,14 +1,8 @@
 import { useState } from 'react'
-import { Button, Icon, Loader } from 'semantic-ui-react'
+import { Button } from 'semantic-ui-react'
 
+import { UpdateStatusIcon } from '@/components/common/UpdateStatusIcon'
 import { useUpdateFacultyBasicViewQuery, useUpdateFacultyProgressViewQuery } from '@/redux/facultyStats'
-
-const getStatusIcon = stats => {
-  if (stats.isLoading) return <Loader active />
-  if (stats.isSuccess) return <Icon color="green" name="check" />
-  if (stats.isError) return <Icon color="red" name="close" />
-  return ''
-}
 
 export const UpdateView = ({ faculty }) => {
   const [skipBasic, setSkipBasic] = useState(true)
@@ -34,22 +28,22 @@ export const UpdateView = ({ faculty }) => {
         <Button color="blue" disabled={basicBasicTabStats.isLoading} onClick={() => setSkipBasic(false)}>
           Update
         </Button>
-        {getStatusIcon(basicBasicTabStats)}
+        <UpdateStatusIcon stats={basicBasicTabStats} />
         <h4>Update credits data on Basic information view</h4>
         <Button color="blue" disabled={creditsBasicTabStats.isLoading} onClick={() => setSkipCredits(false)}>
           Update
         </Button>
-        {getStatusIcon(creditsBasicTabStats)}
+        <UpdateStatusIcon stats={creditsBasicTabStats} />
         <h4>Update thesis writers data on Basic information view</h4>
         <Button color="blue" disabled={thesisBasicTabStats.isLoading} onClick={() => setSkipThesis(false)}>
           Update
         </Button>
-        {getStatusIcon(thesisBasicTabStats)}
+        <UpdateStatusIcon stats={thesisBasicTabStats} />
         <h3>Update data in Progress and student populations tab</h3>
         <Button color="blue" disabled={progressViewStats.isLoading} onClick={() => setSkipProgressTab(false)}>
           Update
         </Button>
-        {getStatusIcon(progressViewStats)}
+        <UpdateStatusIcon stats={progressViewStats} />
       </div>
     </div>
   )

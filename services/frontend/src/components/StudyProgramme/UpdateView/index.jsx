@@ -1,14 +1,8 @@
 import { useState } from 'react'
-import { Button, Icon, Loader } from 'semantic-ui-react'
+import { Button } from 'semantic-ui-react'
 
+import { UpdateStatusIcon } from '@/components/common/UpdateStatusIcon'
 import { useUpdateBasicViewQuery, useUpdateStudyTrackViewQuery } from '@/redux/studyProgramme'
-
-const getStatusIcon = stats => {
-  if (stats.isLoading) return <Loader active />
-  if (stats.isSuccess) return <Icon color="green" name="check" />
-  if (stats.isError) return <Icon color="red" name="close" />
-  return ''
-}
 
 export const UpdateView = ({ combinedProgramme, studyProgramme }) => {
   const [skipBasic, setSkipBasic] = useState(true)
@@ -31,7 +25,7 @@ export const UpdateView = ({ combinedProgramme, studyProgramme }) => {
         >
           Update Basic information
         </Button>
-        {getStatusIcon(basicStats)}
+        <UpdateStatusIcon stats={basicStats} />
       </div>
       <div className="button-container">
         <h4>Update data on Study tracks and class statistics view</h4>
@@ -43,7 +37,7 @@ export const UpdateView = ({ combinedProgramme, studyProgramme }) => {
         >
           Update Study tracks and class statistics
         </Button>
-        {getStatusIcon(studyTrackStats)}
+        <UpdateStatusIcon stats={studyTrackStats} />
       </div>
     </div>
   )
