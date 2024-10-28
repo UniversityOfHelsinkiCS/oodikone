@@ -175,12 +175,12 @@ export const BasicOverview = ({
               {getDivider('Students of the study programme', 'StudentsOfTheStudyProgramme')}
               <div className="section-container">
                 <LineGraph
-                  cypress="StudentsOfTheStudyprogramme"
+                  cypress="StudentsOfTheStudyProgramme"
                   data={basics?.data}
                   exportFileName={`oodikone_StudentsOfTheStudyProgramme_${studyprogramme}_${getTimestamp()}`}
                 />
                 <DataTable
-                  cypress="StudentsOfTheStudyprogramme"
+                  cypress="StudentsOfTheStudyProgramme"
                   data={basics?.data?.tableStats}
                   titles={basics?.data?.titles}
                 />

@@ -9,7 +9,7 @@ const deleteTag = name => {
   cy.contains('td', name).should('not.exist')
 }
 
-describe('Studyprogramme overview', () => {
+describe('Study programme overview', () => {
   /* Basic information overview -tests */
   describe('Basic information view works for basic user', () => {
     beforeEach(() => {
@@ -93,7 +93,7 @@ describe('Studyprogramme overview', () => {
       cy.checkTableStats(tableContents, 'GraduatedAndThesisWritersOfTheProgramme')
     })
 
-    it('Special studyrights can be excluded and basic data changes accordingly', () => {
+    it('Special study rights can be excluded and basic data changes accordingly', () => {
       cy.get('[data-cy=StudentToggle]').click()
       const years = getEmptyYears()
       const studentTableContents = [
@@ -210,7 +210,7 @@ describe('Studyprogramme overview', () => {
 
       cy.get('[data-cy=GraduationTimeToggle]').click()
       cy.get('[data-cy=graduation-times-graphMaster]').within(() => {
-        cy.contains('Master studyright')
+        cy.contains('Master study right')
         cy.contains('Graduation year')
         cy.contains('2021')
         cy.contains('2 graduated').trigger('mouseover')
@@ -222,7 +222,7 @@ describe('Studyprogramme overview', () => {
       })
 
       cy.get('[data-cy=graduation-times-graphBachelor]').within(() => {
-        cy.contains('Bachelor + master studyright')
+        cy.contains('Bachelor + master study right')
         cy.contains('Graduation year')
         cy.contains('2023')
         cy.contains('11 graduated').trigger('mouseover')
@@ -250,7 +250,7 @@ describe('Studyprogramme overview', () => {
       cy.get('[data-cy=Section-AverageGraduationTimesStudyTracks]')
     })
 
-    it('Students of the studyprogramme are shown correctly', () => {
+    it('Students of the study programme are shown correctly', () => {
       const tableContents = [
         // [Year, All, Started studying, Present, Absent, Inactive, Graduated, Men, Women, Other/Unknown, Finland, Other]
         ['2023 - 2024', 8, 8, 0, 0, 8, 0, 5, 3, 0, 8, 0],
@@ -406,7 +406,9 @@ describe('Studyprogramme overview', () => {
       })
 
       it('Students of the study track are shown correctly', () => {
-        cy.get("[data-cy='Section-StudyTrackOverview']").contains('Students of the studytrack MAT-MAT by starting year')
+        cy.get("[data-cy='Section-StudyTrackOverview']").contains(
+          'Students of the study track MAT-MAT by starting year'
+        )
         const tableContents = [
           // [Year, All, Started studying, Present, Absent, Inactive, Graduated, Men, Women, Other/Unknown, Finland, Other]
           ['2022 - 2023', 3, 3, 0, 0, 1, 2, 2, 1, 0, 3, 0],
