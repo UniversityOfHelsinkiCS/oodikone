@@ -102,28 +102,6 @@ export const getUnifyTextIn = unifyCourses => {
   }
 }
 
-export const cancelablePromise = promise => {
-  let hasCanceled = false
-
-  // eslint-disable-next-line no-async-promise-executor
-  const wrappedPromise = new Promise(async (res, rej) => {
-    try {
-      await promise
-      if (hasCanceled) res(false)
-      res(true)
-    } catch (error) {
-      rej(error)
-    }
-  })
-
-  return {
-    promise: wrappedPromise,
-    cancel: () => {
-      hasCanceled = true
-    },
-  }
-}
-
 // Gives students course completion date
 export const getStudentToTargetCourseDateMap = (students, codes) => {
   const codeSet = new Set(codes)
