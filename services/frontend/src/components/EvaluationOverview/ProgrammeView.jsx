@@ -10,7 +10,7 @@ import { DataTable } from '@/components/StudyProgramme/BasicOverview/DataTable'
 import { StackedBarChart } from '@/components/StudyProgramme/BasicOverview/StackedBarChart'
 import { BreakdownBarChart } from '@/components/StudyProgramme/BreakdownBarChart'
 import { MedianTimeBarChart } from '@/components/StudyProgramme/MedianTimeBarChart'
-import { ProgressOfStudents } from '@/components/StudyProgramme/StudytrackOverview/ProgressOfStudents'
+import { ProgressOfStudents } from '@/components/StudyProgramme/StudyTrackOverview/ProgressOfStudents'
 import { Toggle } from '@/components/StudyProgramme/Toggle'
 import '@/components/StudyProgramme/studyprogramme.css'
 import { useGetEvaluationStatsQuery } from '@/redux/studyProgramme'
@@ -76,22 +76,24 @@ export const ProgrammeView = ({ studyprogramme }) => {
           byStartYear={false}
           data={graduationData?.comboTimes?.medians}
           goal={graduationData?.comboTimes?.goal}
-          title="Bachelor + Master studyright"
+          title="Bachelor + Master study right"
         />
       )}
       <MedianTimeBarChart
         byStartYear={false}
         data={graduationData?.graduationTimes?.medians}
         goal={graduationData?.graduationTimes?.goal}
-        title={doCombo ? 'Master studyright' : ' '}
+        title={doCombo ? 'Master study right' : ' '}
       />
     </>
   )
 
   const displayBreakdown = () => (
     <>
-      {doCombo && <BreakdownBarChart data={graduationData?.comboTimes?.medians} title="Bachelor + Master studyright" />}
-      <BreakdownBarChart data={timesData?.medians} title={doCombo ? 'Master studyright' : ' '} />
+      {doCombo && (
+        <BreakdownBarChart data={graduationData?.comboTimes?.medians} title="Bachelor + Master study right" />
+      )}
+      <BreakdownBarChart data={timesData?.medians} title={doCombo ? 'Master study right' : ' '} />
     </>
   )
 
@@ -139,8 +141,8 @@ export const ProgrammeView = ({ studyprogramme }) => {
             </Message>
             <div>
               {getDivider(
-                'Progress of students of the studyprogramme by starting year',
-                'StudytrackProgressEvaluationOverview'
+                'Progress of students of the study programme by starting year',
+                'StudyTrackProgressEvaluationOverview'
               )}
               <Toggle
                 cypress="GraduatedToggle"

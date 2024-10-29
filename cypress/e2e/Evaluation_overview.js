@@ -15,7 +15,7 @@ describe('Evaluation overview', () => {
     })
 
     it('Progress data is shown correctly with graduated included', () => {
-      cy.get('[data-cy="Graph-StudytrackProgress"]').within(() => {
+      cy.get('[data-cy="Graph-StudyTrackProgress"]').within(() => {
         const totalStats = ['12.9%', '6.9%', '9.7%', '9.2%', '3.7%', '6.0%', '51.6%']
         for (const stat of totalStats) {
           cy.contains(stat)
@@ -36,12 +36,12 @@ describe('Evaluation overview', () => {
         ['Total', 217, 28, 15, 21, 20, 8, 13, 112],
       ]
 
-      cy.checkTableStats(tableContents, 'StudytrackProgress')
+      cy.checkTableStats(tableContents, 'StudyTrackProgress')
     })
 
     it('Progress data is shown correctly with graduated excluded', () => {
       cy.get('[data-cy=GraduatedToggle]').click()
-      cy.get('[data-cy="Graph-StudytrackProgress"]').within(() => {
+      cy.get('[data-cy="Graph-StudyTrackProgress"]').within(() => {
         const totalStats = ['30.8%', '15.4%', '22.0%', '20.9%', '4.4%', '5.5%']
         for (const stat of totalStats) {
           cy.contains(stat)
@@ -62,7 +62,7 @@ describe('Evaluation overview', () => {
         ['Total', 91, 28, 14, 20, 19, 4, 1, 5],
       ]
 
-      cy.checkTableStats(tableContents, 'StudytrackProgress')
+      cy.checkTableStats(tableContents, 'StudyTrackProgress')
     })
 
     it('Graduation times breakdown data is shown correctly', () => {

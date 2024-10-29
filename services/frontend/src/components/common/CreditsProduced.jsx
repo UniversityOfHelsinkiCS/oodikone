@@ -89,23 +89,23 @@ export const CreditsProduced = ({ academicYear, data, secondData }) => {
       </div>
       <div className="section-container">
         <StackedBarChart
-          cypress="CreditsProducedByTheStudyprogramme"
+          cypress="CreditsProducedByTheStudyProgramme"
           data={creditGraphStats.data}
           labels={creditGraphStats.years}
         />
-        <DataTable cypress="CreditsProducedByTheStudyprogramme" data={tableStats.data} titles={tableStats.titles} />
+        <DataTable cypress="CreditsProducedByTheStudyProgramme" data={tableStats.data} titles={tableStats.titles} />
       </div>
       {secondData && (
         <div>
           <h4>Credits produced by the licentiate programme</h4>
           <div className="section-container">
             <StackedBarChart
-              cypress="CreditsProducedByTheStudyprogramme"
+              cypress="CreditsProducedByTheStudyProgramme"
               data={secondCreditGraphStats.data}
               labels={secondCreditGraphStats.years}
             />
             <DataTable
-              cypress="CreditsProducedByTheStudyprogramme"
+              cypress="CreditsProducedByTheStudyProgramme"
               data={secondTableStats.data}
               titles={secondTableStats.titles}
             />

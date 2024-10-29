@@ -9,18 +9,18 @@ const deleteTag = name => {
   cy.contains('td', name).should('not.exist')
 }
 
-describe('Studyprogramme overview', () => {
+describe('Study programme overview', () => {
   /* Basic information overview -tests */
-  describe('Basic information -view works for basic user', () => {
+  describe('Basic information view works for basic user', () => {
     beforeEach(() => {
       cy.init('/study-programme')
       cy.contains('a', 'Matemaattisten tieteiden kandiohjelma').click({ force: true })
     })
 
     // If the backend breaks for one of the sections, the section header is not rendered and this will fail
-    it('Basic information -tab loads', () => {
-      cy.get('[data-cy=Section-StudentsOfTheStudyprogramme]')
-      cy.get('[data-cy=Section-CreditsProducedByTheStudyprogramme]')
+    it('Basic information tab loads', () => {
+      cy.get('[data-cy=Section-StudentsOfTheStudyProgramme]')
+      cy.get('[data-cy=Section-CreditsProducedByTheStudyProgramme]')
       cy.get('[data-cy=Section-GraduatedAndThesisWritersOfTheProgramme]')
       cy.get('[data-cy=Section-ProgrammesBeforeOrAfter]')
       cy.get('[data-cy=Section-AverageGraduationTimes]')
@@ -40,7 +40,7 @@ describe('Studyprogramme overview', () => {
         [2017, 41, 47, 0, 0, 0],
       ]
 
-      cy.checkTableStats(tableContents, 'StudentsOfTheStudyprogramme')
+      cy.checkTableStats(tableContents, 'StudentsOfTheStudyProgramme')
     })
 
     it('Basic information contains correct credits', () => {
@@ -56,7 +56,7 @@ describe('Studyprogramme overview', () => {
         [2017, 1211, 1211, 0, 0, 189],
       ]
 
-      cy.checkTableStats(tableContents, 'CreditsProducedByTheStudyprogramme')
+      cy.checkTableStats(tableContents, 'CreditsProducedByTheStudyProgramme')
     })
 
     it("Toggling 'Show special categories' on displays additional information", () => {
@@ -73,7 +73,7 @@ describe('Studyprogramme overview', () => {
         [2017, 1211, 1211, 0, 0, 0, 0, 189],
       ]
 
-      cy.checkTableStats(tableContents, 'CreditsProducedByTheStudyprogramme')
+      cy.checkTableStats(tableContents, 'CreditsProducedByTheStudyProgramme')
     })
 
     it('Basic information contains correct thesis writers and graduates', () => {
@@ -93,7 +93,7 @@ describe('Studyprogramme overview', () => {
       cy.checkTableStats(tableContents, 'GraduatedAndThesisWritersOfTheProgramme')
     })
 
-    it('Special studyrights can be excluded and basic data changes accordingly', () => {
+    it('Special study rights can be excluded and basic data changes accordingly', () => {
       cy.get('[data-cy=StudentToggle]').click()
       const years = getEmptyYears()
       const studentTableContents = [
@@ -108,7 +108,7 @@ describe('Studyprogramme overview', () => {
         [2017, 41, 47, 0],
       ]
 
-      cy.checkTableStats(studentTableContents, 'StudentsOfTheStudyprogramme')
+      cy.checkTableStats(studentTableContents, 'StudentsOfTheStudyProgramme')
 
       const graduatedTableContents = [
         // [Year, Graduated, Wrote thesis]
@@ -140,7 +140,7 @@ describe('Studyprogramme overview', () => {
         ['2018 - 2019', 40, 45, 0, 0, 0],
         ['2017 - 2018', 41, 47, 0, 0, 0],
       ]
-      cy.checkTableStats(studentTableContents, 'StudentsOfTheStudyprogramme')
+      cy.checkTableStats(studentTableContents, 'StudentsOfTheStudyProgramme')
 
       const creditTableContents = [
         ...years.map(year => [year, 0, 0, 0, 0, 0]),
@@ -153,19 +153,19 @@ describe('Studyprogramme overview', () => {
         ['2017 - 2018', 2350, 2345, 0, 5, 26],
       ]
 
-      cy.checkTableStats(creditTableContents, 'CreditsProducedByTheStudyprogramme')
+      cy.checkTableStats(creditTableContents, 'CreditsProducedByTheStudyProgramme')
       cy.get('[data-cy=YearToggle]').click()
     })
 
     it('Basic information graphs render', () => {
-      cy.get('[data-cy=Graph-StudentsOfTheStudyprogramme')
+      cy.get('[data-cy=Graph-StudentsOfTheStudyProgramme')
         .should('contain', 'Started studying')
         .should('contain', 'Accepted')
         .should('contain', 'Graduated')
         .should('contain', 'Transferred away')
         .should('contain', 'Transferred to')
 
-      cy.get('[data-cy=Graph-CreditsProducedByTheStudyprogramme')
+      cy.get('[data-cy=Graph-CreditsProducedByTheStudyProgramme')
         .should('contain', 'Degree students')
         .should('contain', 'Transferred')
         .should('contain', 5796)
@@ -210,7 +210,7 @@ describe('Studyprogramme overview', () => {
 
       cy.get('[data-cy=GraduationTimeToggle]').click()
       cy.get('[data-cy=graduation-times-graphMaster]').within(() => {
-        cy.contains('Master studyright')
+        cy.contains('Master study right')
         cy.contains('Graduation year')
         cy.contains('2021')
         cy.contains('2 graduated').trigger('mouseover')
@@ -222,7 +222,7 @@ describe('Studyprogramme overview', () => {
       })
 
       cy.get('[data-cy=graduation-times-graphBachelor]').within(() => {
-        cy.contains('Bachelor + master studyright')
+        cy.contains('Bachelor + master study right')
         cy.contains('Graduation year')
         cy.contains('2023')
         cy.contains('11 graduated').trigger('mouseover')
@@ -235,22 +235,22 @@ describe('Studyprogramme overview', () => {
     })
   })
 
-  /* Studytrack overview -tests */
-  describe('Studytrack overview works for basic user', () => {
+  /* Study track overview tests */
+  describe('Study track overview works for basic user', () => {
     beforeEach(() => {
       cy.init('/study-programme')
       cy.contains('a', 'Matemaattisten tieteiden kandiohjelma').click()
-      cy.get('.attached').contains('Studytracks and class statistics').click()
+      cy.get('.attached').contains('Study tracks and class statistics').click()
     })
 
     // If the backend breaks for one of the sections, the section header is not rendered and this will fail
-    it('Studytracks and class statistics -tab loads', () => {
-      cy.get('[data-cy=Section-StudytrackOverview]')
-      cy.get('[data-cy=Section-StudytrackProgress]')
-      cy.get('[data-cy=Section-AverageGraduationTimesStudytracks]')
+    it('Study tracks and class statistics -tab loads', () => {
+      cy.get('[data-cy=Section-StudyTrackOverview]')
+      cy.get('[data-cy=Section-StudyTrackProgress]')
+      cy.get('[data-cy=Section-AverageGraduationTimesStudyTracks]')
     })
 
-    it('Students of the studyprogramme are shown correctly', () => {
+    it('Students of the study programme are shown correctly', () => {
       const tableContents = [
         // [Year, All, Started studying, Present, Absent, Inactive, Graduated, Men, Women, Other/Unknown, Finland, Other]
         ['2023 - 2024', 8, 8, 0, 0, 8, 0, 5, 3, 0, 8, 0],
@@ -263,11 +263,11 @@ describe('Studyprogramme overview', () => {
         ['Total', 229, 197, 0, 0, 95, 134, 147, 82, 0, 222, 7],
       ]
 
-      cy.checkTableStats(tableContents, 'StudytrackOverview')
+      cy.checkTableStats(tableContents, 'StudyTrackOverview')
     })
 
     it('Years in the students table can be expanded and study track data will be shown', () => {
-      cy.get('[data-cy=Table-StudytrackOverview]').within(() => {
+      cy.get('[data-cy=Table-StudyTrackOverview]').within(() => {
         cy.get('tbody tr.header-row')
           .eq(3)
           .within(() => {
@@ -302,7 +302,7 @@ describe('Studyprogramme overview', () => {
     })
 
     it('Links to class statistics page work', () => {
-      cy.get('[data-cy=Table-StudytrackOverview]').within(() => {
+      cy.get('[data-cy=Table-StudyTrackOverview]').within(() => {
         cy.get('tbody tr.header-row')
           .eq(1)
           .within(() => {
@@ -315,7 +315,7 @@ describe('Studyprogramme overview', () => {
     })
 
     it('Links to class statistics page with all years combined work', { retries: 2 }, () => {
-      cy.get('[data-cy=Table-StudytrackOverview]').within(() => {
+      cy.get('[data-cy=Table-StudyTrackOverview]').within(() => {
         cy.get('td.total-row-cell a').click()
       })
 
@@ -324,7 +324,7 @@ describe('Studyprogramme overview', () => {
     })
 
     it('Links to class statistics page with study track info included work', () => {
-      cy.get('[data-cy=Table-StudytrackOverview]').within(() => {
+      cy.get('[data-cy=Table-StudyTrackOverview]').within(() => {
         cy.get('tbody tr.header-row')
           .eq(3)
           .within(() => {
@@ -357,17 +357,17 @@ describe('Studyprogramme overview', () => {
         ['Total', 229, 28, 18, 24, 21, 10, 14, 114],
       ]
 
-      cy.checkTableStats(tableContents, 'StudytrackProgress')
+      cy.checkTableStats(tableContents, 'StudyTrackProgress')
     })
 
-    it('Studytrack overview graphs render', () => {
-      cy.get('[data-cy=Graph-StudytrackProgress]')
+    it('Study track overview graphs render', () => {
+      cy.get('[data-cy=Graph-StudyTrackProgress]')
         .should('contain', 'Less than 30 credits')
         .should('contain', '30–60 credits')
         .should('contain', 'At least 180 credits')
         .should('contain', '49.8%') // The percentage for total, at least 180 credits, to check that the graph renders
 
-      cy.get('[data-cy=Graph-StudytrackProgress]').contains('49.8%').trigger('mouseover', { force: true })
+      cy.get('[data-cy=Graph-StudyTrackProgress]').contains('49.8%').trigger('mouseover', { force: true })
       cy.contains('At least 180 credits: 114')
 
       cy.get("[data-cy='Section-KH50_001']").within(() => {
@@ -399,14 +399,16 @@ describe('Studyprogramme overview', () => {
       })
     })
 
-    describe('Studytrack can be changed', () => {
+    describe('Study track can be changed', () => {
       beforeEach(() => {
         cy.get('.studytrack-selector').contains('All students of the programme, KH50_001').click()
         cy.get('.studytrack-selector .visible.menu').contains('Matematiikka, MAT-MAT').click()
       })
 
       it('Students of the study track are shown correctly', () => {
-        cy.get("[data-cy='Section-StudytrackOverview']").contains('Students of the studytrack MAT-MAT by starting year')
+        cy.get("[data-cy='Section-StudyTrackOverview']").contains(
+          'Students of the study track MAT-MAT by starting year'
+        )
         const tableContents = [
           // [Year, All, Started studying, Present, Absent, Inactive, Graduated, Men, Women, Other/Unknown, Finland, Other]
           ['2022 - 2023', 3, 3, 0, 0, 1, 2, 2, 1, 0, 3, 0],
@@ -417,11 +419,11 @@ describe('Studyprogramme overview', () => {
           ['2017 - 2018', 28, 24, 0, 0, 1, 27, 15, 13, 0, 28, 0],
           ['Total', 89, 73, 0, 0, 6, 83, 48, 41, 0, 87, 2],
         ]
-        cy.checkTableStats(tableContents, 'StudytrackOverview')
+        cy.checkTableStats(tableContents, 'StudyTrackOverview')
       })
 
       it('Links to class statistics page with study track info included work', () => {
-        cy.get('[data-cy=Table-StudytrackOverview]').within(() => {
+        cy.get('[data-cy=Table-StudyTrackOverview]').within(() => {
           cy.get('tbody tr.regular-row')
             .eq(2)
             .within(() => {
@@ -436,7 +438,7 @@ describe('Studyprogramme overview', () => {
       })
 
       it('Info message about missing progress stats is displayed', () => {
-        cy.contains('.divider', 'Progress of students of the studytrack MAT-MAT by starting year')
+        cy.contains('.divider', 'Progress of students of the study track MAT-MAT by starting year')
         cy.contains(
           '.message',
           'Currently progress data is only available for all students of the study programme. Please select ”All students of the programme” to view the progress data.'
@@ -444,7 +446,7 @@ describe('Studyprogramme overview', () => {
       })
 
       it('Average graduation times are displayed correctly', () => {
-        cy.get("[data-cy='Section-AverageGraduationTimesStudytracks']")
+        cy.get("[data-cy='Section-AverageGraduationTimesStudyTracks']")
         cy.get("[data-cy='graduation-times-graph-breakdownBachelor']").within(() => {
           cy.contains('Start year')
           cy.contains('2020 - 2021')
@@ -764,7 +766,7 @@ describe('Studyprogramme overview', () => {
 
     it('can access programme and correct tabs are visible', () => {
       cy.contains('Basic information')
-      cy.contains('Studytracks and class statistics')
+      cy.contains('Study tracks and class statistics')
 
       cy.contains('Update statistics').should('not.exist')
       cy.contains('Degree courses').should('not.exist')
@@ -773,19 +775,19 @@ describe('Studyprogramme overview', () => {
     it('can access basic information', () => {
       cy.contains('Basic information').click()
 
-      cy.get('[data-cy=Section-StudentsOfTheStudyprogramme]')
-      cy.get('[data-cy=Section-CreditsProducedByTheStudyprogramme]')
+      cy.get('[data-cy=Section-StudentsOfTheStudyProgramme]')
+      cy.get('[data-cy=Section-CreditsProducedByTheStudyProgramme]')
       cy.get('[data-cy=Section-GraduatedAndThesisWritersOfTheProgramme]')
       cy.get('[data-cy=Section-ProgrammesBeforeOrAfter]')
       cy.get('[data-cy=Section-AverageGraduationTimes]')
     })
 
-    it('can access studytracks', () => {
-      cy.get('.attached').contains('Studytracks and class statistics').click()
+    it('can access study tracks', () => {
+      cy.get('.attached').contains('Study tracks and class statistics').click()
 
-      cy.get('[data-cy=Section-StudytrackOverview]')
-      cy.get('[data-cy=Section-StudytrackProgress]')
-      cy.get('[data-cy=Section-AverageGraduationTimesStudytracks]')
+      cy.get('[data-cy=Section-StudyTrackOverview]')
+      cy.get('[data-cy=Section-StudyTrackProgress]')
+      cy.get('[data-cy=Section-AverageGraduationTimesStudyTracks]')
     })
 
     it("doesn't see other tabs", () => {

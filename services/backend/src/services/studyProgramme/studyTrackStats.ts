@@ -457,7 +457,7 @@ const getMainStatsByTrackAndYear = async (
   }
 }
 
-// Combines all the data for the Studytracks and class statistics page in study programme overview
+// Combines all the data for the Study tracks and class statistics page in study programme overview
 // At the moment combined programme is thought to have only one track, the programme itself
 export const getStudyTrackStatsForStudyProgramme = async ({
   studyProgramme,

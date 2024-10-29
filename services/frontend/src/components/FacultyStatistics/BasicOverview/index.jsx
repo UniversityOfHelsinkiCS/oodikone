@@ -195,8 +195,8 @@ export const BasicOverview = ({
         />
         <Toggle
           cypress="StudentToggle"
-          firstLabel="All studyrights"
-          secondLabel="Special studyrights excluded"
+          firstLabel="All study rights"
+          secondLabel="Special study rights excluded"
           setValue={setSpecialGroups}
           toolTips={facultyToolTips.StudentToggle}
           value={specialGroups}
@@ -214,7 +214,7 @@ export const BasicOverview = ({
           )}
           {special === 'SPECIAL_EXCLUDED' && (
             <Message data-cy="FacultyExcludeSpecialsInfo">
-              Please note that excluding the special studyrights does not affect the "Credits produced by the faculty"
+              Please note that excluding the special study rights does not affect the "Credits produced by the faculty"
               view.
             </Message>
           )}

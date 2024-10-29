@@ -1,49 +1,44 @@
 import { useState } from 'react'
-import { Button, Icon, Loader } from 'semantic-ui-react'
+import { Button } from 'semantic-ui-react'
 
-import { useUpdateBasicViewQuery, useUpdateStudytrackViewQuery } from '@/redux/studyProgramme'
+import { UpdateStatusIcon } from '@/components/common/UpdateStatusIcon'
+import { useUpdateBasicViewQuery, useUpdateStudyTrackViewQuery } from '@/redux/studyProgramme'
 
-const getStatusIcon = stats => {
-  if (stats.isLoading) return <Loader active />
-  if (stats.isSuccess) return <Icon color="green" name="check" />
-  if (stats.isError) return <Icon color="red" name="close" />
-  return ''
-}
-
-export const UpdateView = ({ studyprogramme, combinedProgramme }) => {
+export const UpdateView = ({ combinedProgramme, studyProgramme }) => {
   const [skipBasic, setSkipBasic] = useState(true)
-  const [skipStudytrack, setSkipStudytrack] = useState(true)
-  const basicstats = useUpdateBasicViewQuery({ id: studyprogramme, combinedProgramme }, { skip: skipBasic })
-  const studytrackstats = useUpdateStudytrackViewQuery(
-    { id: studyprogramme, combinedProgramme },
-    { skip: skipStudytrack }
+  const [skipStudyTrack, setSkipStudyTrack] = useState(true)
+
+  const basicStats = useUpdateBasicViewQuery({ id: studyProgramme, combinedProgramme }, { skip: skipBasic })
+  const studyTrackStats = useUpdateStudyTrackViewQuery(
+    { id: studyProgramme, combinedProgramme },
+    { skip: skipStudyTrack }
   )
 
   return (
     <div className="update-view">
       <div className="button-container">
-        <h4>Update data on Basic Information view</h4>
+        <h4>Update data on Basic information view</h4>
         <Button
           color="blue"
           data-cy="updatebasicinfo"
-          disabled={basicstats.isLoading}
+          disabled={basicStats.isLoading}
           onClick={() => setSkipBasic(false)}
         >
-          Update Basic Information
+          Update
         </Button>
-        {getStatusIcon(basicstats)}
+        <UpdateStatusIcon stats={basicStats} />
       </div>
       <div className="button-container">
-        <h4>Update data on Populations and Studytracks view</h4>
+        <h4>Update data on Study tracks and class statistics view</h4>
         <Button
           color="blue"
           data-cy="updatepopulations"
-          disabled={studytrackstats.isLoading}
-          onClick={() => setSkipStudytrack()}
+          disabled={studyTrackStats.isLoading}
+          onClick={() => setSkipStudyTrack()}
         >
-          Update Populations and Studytracks
+          Update
         </Button>
-        {getStatusIcon(studytrackstats)}
+        <UpdateStatusIcon stats={studyTrackStats} />
       </div>
     </div>
   )

@@ -27,7 +27,7 @@ const studyProgrammeApi = RTKApi.injectEndpoints({
       query: ({ id, combinedProgramme }) =>
         `/v2/studyprogrammes/${id}/update_basicview?combined_programme=${combinedProgramme}`,
     }),
-    updateStudytrackView: builder.query({
+    updateStudyTrackView: builder.query({
       query: ({ id, combinedProgramme }) =>
         `/v2/studyprogrammes/${id}/update_studytrackview?combined_programme=${combinedProgramme}`,
     }),
@@ -52,7 +52,7 @@ export const {
   useGetGraduationStatsQuery,
   useGetStudytrackStatsQuery,
   useUpdateBasicViewQuery,
-  useUpdateStudytrackViewQuery,
+  useUpdateStudyTrackViewQuery,
   useGetProgrammeCoursesStatsQuery,
   useGetEvaluationStatsQuery,
   useGetColorizedTableCourseStatsQuery,

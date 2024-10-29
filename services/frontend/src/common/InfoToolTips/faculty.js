@@ -37,7 +37,7 @@ export const facultyToolTips = {
   - **Master**: Opiskelijat, joiden opiskeluoikeuteen kuuluu **vain** maisterin tutkinnon suoritusoikeus
   - **Doctor**: Tohtorin tutkinnon suorittaneet opiskelijat
 
-  Valmistumisajoista on **vähennetty lakisääteiset poissaolot**. Luvuissa ei ole mukana opiskelijoita, jotka ovat vaihtaneet koulutuohjelmaa saman opiskeluoikeuden sisällä (pois lukien kandiohjelmasta maisteriohjelmaan siirtyneet). Toisin sanoen luvut vastaavat *Study programme overview* -näkymän lukuja, kun näkymässä on valittuna *Special studyrights excluded*.
+  Valmistumisajoista on **vähennetty lakisääteiset poissaolot**. Luvuissa ei ole mukana opiskelijoita, jotka ovat vaihtaneet koulutuohjelmaa saman opiskeluoikeuden sisällä (pois lukien kandiohjelmasta maisteriohjelmaan siirtyneet). Toisin sanoen luvut vastaavat *Study programme overview* -näkymän lukuja, kun näkymässä on valittuna *Special study rights excluded*.
 
   - **Breakdown**/**Median study times**:
     - **Breakdown**: Näyttää, kuinka moni opiskelija valmistui tavoiteajassa (vihreä palkki), 12 kuukauden sisällä tavoiteajasta (keltainen palkki) tai tätä myöhemmin (punainen palkki).
@@ -61,13 +61,13 @@ export const facultyToolTips = {
   `,
 }
 
-facultyToolTips.StudentsStatsOfTheFaculty = studyProgrammeToolTips.StudytrackOverview.replace(
+facultyToolTips.StudentsStatsOfTheFaculty = studyProgrammeToolTips.StudyTrackOverview.replace(
   'Yläosan valikosta on mahdollista valita tarkasteluun yhden opintosuunnan opiskelijat. Luvut kuvaavat tällöin kyseisen opintosuunnan opiskelijoita.',
   ''
 )
 facultyToolTips.StudentsOfTheFaculty =
   'Taulukon luvut on laskettu **yhdistämällä** tiedekunnan koulutusohjelmien luvut. Näin ollen tämän näkymän luvut täsmäävät *Study programme* -näkymän lukuihin. Kategorioiden merkitykset ovat seuraavat:\n'
-    .concat(studyProgrammeToolTips.StudentsOfTheStudyprogramme)
+    .concat(studyProgrammeToolTips.StudentsOfTheStudyProgramme)
     .replace('Transferred away', 'Transferred out of programme')
     .replace('Transferred to', 'Transferred into programme')
 facultyToolTips.GraduatedToggle = studyProgrammeToolTips.GraduatedToggle

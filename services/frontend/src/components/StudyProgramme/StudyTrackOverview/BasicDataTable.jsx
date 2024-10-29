@@ -12,7 +12,7 @@ export const BasicDataTable = ({ data, titles, track }) => {
   })
 
   return (
-    <Table celled compact data-cy="Table-StudytrackProgress">
+    <Table celled compact data-cy="Table-StudyTrackProgress">
       <Table.Header>
         <Table.Row>
           {titles?.map(title => (
