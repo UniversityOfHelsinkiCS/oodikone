@@ -1,7 +1,7 @@
-import { setBasicStats, setCreditStats, setGraduationStats, setStudytrackStats } from '../analyticsService'
+import { setBasicStats, setCreditStats, setGraduationStats, setStudyTrackStats } from '../analyticsService'
 import { computeCreditsProduced } from '../providerCredits'
 import { getBasicStatsForStudytrack } from './studyProgrammeBasics'
-import { getGraduationStatsForStudytrack } from './studyProgrammeGraduations'
+import { getGraduationStatsForStudyTrack } from './studyProgrammeGraduations'
 import { getStudyRightsInProgramme } from './studyRightFinders'
 import { getStudyTrackStatsForStudyProgramme } from './studyTrackStats'
 
@@ -29,7 +29,7 @@ export const updateBasicView = async (code: string, combinedProgramme: string) =
         await setCreditStats(creditStats, isAcademicYear, includeAllSpecials)
       }
 
-      const graduationStats = await getGraduationStatsForStudytrack({
+      const graduationStats = await getGraduationStatsForStudyTrack({
         studyProgramme: code,
         combinedProgramme,
         settings: { isAcademicYear, includeAllSpecials },
@@ -41,7 +41,7 @@ export const updateBasicView = async (code: string, combinedProgramme: string) =
   return 'OK'
 }
 
-export const updateStudytrackView = async (code: string, combinedProgramme: string) => {
+export const updateStudyTrackView = async (code: string, combinedProgramme: string) => {
   const graduatedOptions = ['GRADUATED_INCLUDED', 'GRADUATED_EXCLUDED'] as const
   const specialGroupOptions = ['SPECIAL_INCLUDED', 'SPECIAL_EXCLUDED'] as const
   const studyRightsOfProgramme = await getStudyRightsInProgramme(code, false, true)
@@ -57,7 +57,7 @@ export const updateStudytrackView = async (code: string, combinedProgramme: stri
         },
         studyRightsOfProgramme,
       })
-      await setStudytrackStats(stats, graduated, specialGroup)
+      await setStudyTrackStats(stats, graduated, specialGroup)
     }
   }
 

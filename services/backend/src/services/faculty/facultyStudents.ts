@@ -1,5 +1,5 @@
 import { Unarray } from '../../types'
-import { getStudytrackStats, setStudytrackStats } from '../analyticsService'
+import { getStudyTrackStats, setStudyTrackStats } from '../analyticsService'
 import { getPercentage, tableTitles } from '../studyProgramme/studyProgrammeHelpers'
 import { getStudyRightsInProgramme } from '../studyProgramme/studyRightFinders'
 import { getStudyTrackStatsForStudyProgramme } from '../studyProgramme/studyTrackStats'
@@ -65,7 +65,7 @@ export const combineFacultyStudents = async (
   const newStats: StudyTrackStats[] = []
 
   for (const studyProgramme of programmeCodes) {
-    const statsFromRedis = await getStudytrackStats(studyProgramme, null, graduated, specialGroups)
+    const statsFromRedis = await getStudyTrackStats(studyProgramme, null, graduated, specialGroups)
     if (statsFromRedis) {
       newStats.push(statsFromRedis)
       if (!years.length) {
@@ -82,7 +82,7 @@ export const combineFacultyStudents = async (
       },
       studyRightsOfProgramme,
     })
-    setStudytrackStats(updatedStats, graduated, specialGroups)
+    setStudyTrackStats(updatedStats, graduated, specialGroups)
     if (!years.length) {
       years = updatedStats.years
     }
