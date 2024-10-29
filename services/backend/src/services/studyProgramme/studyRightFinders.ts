@@ -85,8 +85,8 @@ export const getStudyTracksForProgramme = async (studyProgramme: string) => {
     )
 }
 
-export const getSISStudyRightsOfStudents = async (studentNumbers: string[]) =>
-  (
+export const getSISStudyRightsOfStudents = async (studentNumbers: string[]) => {
+  return (
     await SISStudyRight.findAll({
       where: {
         studentNumber: {
@@ -96,3 +96,4 @@ export const getSISStudyRightsOfStudents = async (studentNumbers: string[]) =>
       attributes: ['id', 'studentNumber', 'extentCode', 'semesterEnrollments', 'startDate', 'endDate'],
     })
   ).map(studyRight => studyRight.toJSON())
+}

@@ -479,7 +479,7 @@ export const getStudyTrackStatsForStudyProgramme = async ({
   const since = getStartDate(isAcademicYear)
   const years = getYearsArray(since.getFullYear(), isAcademicYear, includeYearsCombined)
 
-  const studytrackOptions = await getStudyTracksForProgramme(studyProgramme)
+  const studyTracks = await getStudyTracksForProgramme(studyProgramme)
 
   const doCombo = studyProgramme.startsWith('MH') && !['MH30_001', 'MH30_003'].includes(studyProgramme)
   const stats = await getMainStatsByTrackAndYear(
@@ -501,7 +501,7 @@ export const getStudyTrackStatsForStudyProgramme = async ({
     years,
     ...stats,
     doCombo,
-    studytrackOptions,
+    studyTracks,
     includeGraduated: settings.graduated,
     populationTitles: [...tableTitles.studytracksStart, ...graduatedTitles, ...tableTitles.studytracksEnd],
   }

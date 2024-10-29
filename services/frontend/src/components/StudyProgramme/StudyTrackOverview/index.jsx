@@ -53,11 +53,15 @@ export const StudyTrackOverview = ({
   )
 
   const isError = (stats.isSuccess && !stats.data) || stats.isError
-
-  if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
+  if (isError) {
+    return <h3>Something went wrong, please try refreshing the page.</h3>
+  }
 
   const noData = stats.isSuccess && stats.mainStatsByYear && !stats.mainStatsByYear.Total.length
-  if (noData) return <h3>There is no data available for the selected programme between 2017-2022</h3>
+  if (noData) {
+    return <h3>There is no data available for the selected programme between 2017-2022</h3>
+  }
+
   const infoTextGraduationTimes = studyProgramme.includes('MH')
     ? 'AverageGraduationTimesStudyTracksMaster'
     : 'AverageGraduationTimesStudyTracks'
@@ -88,8 +92,7 @@ export const StudyTrackOverview = ({
   const studyTrackStatsGraduationStats = { basic: {}, combo: {} }
 
   // One of the study track options is always the study programme itself
-  const studyProgrammeHasStudyTracks =
-    Object.keys(stats?.data?.studytrackOptions || {}).length > 1 && track === studyProgramme
+  const programmeHasStudyTracks = Object.keys(stats?.data?.studyTracks || {}).length > 1 && track === studyProgramme
 
   const calculateStudyTrackStats = combo => {
     const studyTrackStatsGraduationStats = Object.entries(stats.data.graduationTimes)
@@ -127,7 +130,7 @@ export const StudyTrackOverview = ({
     return { studyTrackStatsGraduationStats, studyTrackStatsClassSizes }
   }
 
-  if (studyProgrammeHasStudyTracks && Object.keys(stats?.data?.graduationTimes || {}).length > 1) {
+  if (programmeHasStudyTracks && Object.keys(stats?.data?.graduationTimes || {}).length > 1) {
     studyTrackStatsGraduationStats.basic = calculateStudyTrackStats()
     if (stats?.data?.doCombo) {
       studyTrackStatsGraduationStats.combo = calculateStudyTrackStats(true)
@@ -140,7 +143,7 @@ export const StudyTrackOverview = ({
         <Loader active style={{ marginTop: '10em' }} />
       ) : (
         <>
-          <StudyTrackSelector setTrack={setTrack} studyTracks={stats?.data?.studytrackOptions} track={track} />
+          <StudyTrackSelector setTrack={setTrack} studyTracks={stats?.data?.studyTracks} track={track} />
           <div className="toggle-container">
             <Toggle
               cypress="StudentToggle"
@@ -174,7 +177,7 @@ export const StudyTrackOverview = ({
             otherCountriesStats={stats?.data?.otherCountriesCount}
             singleTrack={track !== studyProgramme && track}
             studyProgramme={studyProgramme}
-            studyTracks={stats?.data?.studytrackOptions}
+            studyTracks={stats?.data?.studyTracks}
             titles={stats?.data?.populationTitles}
             years={stats?.data?.years}
           />
@@ -211,7 +214,7 @@ export const StudyTrackOverview = ({
                 setValue={setShowMedian}
                 value={showMedian}
               />
-              {studyProgrammeHasStudyTracks ? (
+              {programmeHasStudyTracks ? (
                 <div className="section-container-centered">
                   {stats?.data.doCombo && (
                     <GraduationTimes
@@ -228,7 +231,7 @@ export const StudyTrackOverview = ({
                       level={studyProgramme}
                       levelProgrammeData={studyTrackStatsGraduationStats.combo.studyTrackStatsGraduationStats}
                       mode="study track"
-                      programmeNames={stats.data.studytrackOptions}
+                      programmeNames={stats.data.studyTracks}
                       showMedian={showMedian}
                       title={getGraduationGraphTitle(studyProgramme, true)}
                       yearLabel="Start year"
@@ -248,7 +251,7 @@ export const StudyTrackOverview = ({
                     level={studyProgramme}
                     levelProgrammeData={studyTrackStatsGraduationStats.basic.studyTrackStatsGraduationStats}
                     mode="study track"
-                    programmeNames={stats.data.studytrackOptions}
+                    programmeNames={stats.data.studyTracks}
                     showMedian={showMedian}
                     title={getGraduationGraphTitle(studyProgramme, false)}
                     yearLabel="Start year"
