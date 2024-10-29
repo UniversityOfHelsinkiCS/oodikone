@@ -127,7 +127,7 @@ export const StudyTrackOverview = ({
     return { studyTrackStatsGraduationStats, studyTrackStatsClassSizes }
   }
 
-  if (studyProgrammeHasStudyTracks && Object.keys(stats?.data?.graduationTimes || {}).length > 0) {
+  if (studyProgrammeHasStudyTracks && Object.keys(stats?.data?.graduationTimes || {}).length > 1) {
     studyTrackStatsGraduationStats.basic = calculateStudyTrackStats()
     if (stats?.data?.doCombo) {
       studyTrackStatsGraduationStats.combo = calculateStudyTrackStats(true)
