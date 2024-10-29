@@ -10,7 +10,7 @@ import { BreakdownBarChart } from '@/components/StudyProgramme/BreakdownBarChart
 import { MedianTimeBarChart } from '@/components/StudyProgramme/MedianTimeBarChart'
 import { Toggle } from '@/components/StudyProgramme/Toggle'
 import '@/components/StudyProgramme/studyprogramme.css'
-import { useGetStudytrackStatsQuery } from '@/redux/studyProgramme'
+import { useGetStudyTrackStatsQuery } from '@/redux/studyProgramme'
 import { ProgressOfStudents } from './ProgressOfStudents'
 import { StudyTrackDataTable } from './StudyTrackDataTable'
 import { StudyTrackSelector } from './StudyTrackSelector'
@@ -27,7 +27,7 @@ export const StudyTrackOverview = ({
   const [track, setTrack] = useState(studyProgramme)
   const special = specialGroupsExcluded ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
   const grad = graduated ? 'GRADUATED_EXCLUDED' : 'GRADUATED_INCLUDED'
-  const stats = useGetStudytrackStatsQuery({
+  const stats = useGetStudyTrackStatsQuery({
     id: studyProgramme,
     combinedProgramme,
     specialGroups: special,
