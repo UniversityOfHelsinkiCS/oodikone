@@ -17,7 +17,7 @@ import {
 } from '../services/studyProgramme/studyProgrammeCourses'
 import { getGraduationStatsForStudyTrack } from '../services/studyProgramme/studyProgrammeGraduations'
 import { updateBasicView, updateStudyTrackView } from '../services/studyProgramme/studyProgrammeUpdates'
-import { getStudyRightsInProgramme } from '../services/studyProgramme/studyRightFinders'
+import { getStudyRightsInProgramme, getStudyTracksForProgramme } from '../services/studyProgramme/studyRightFinders'
 import { getStudyTrackStatsForStudyProgramme } from '../services/studyProgramme/studyTrackStats'
 import { Graduated, SpecialGroups, YearType } from '../types'
 import logger from '../util/logger'
@@ -170,6 +170,19 @@ router.get('/:id/colorizedtablecoursestats', async (req: Request, res: Response)
     return res.json(data)
   } catch (error) {
     logger.error({ message: `Failed to get code ${code} colorized table course stats`, meta: `${error}` })
+  }
+})
+
+router.get('/:id/studytracks', async (req: Request, res: Response) => {
+  const code = req.params.id
+  if (!code) {
+    return res.status(422).end()
+  }
+  try {
+    const data = await getStudyTracksForProgramme(code)
+    return res.json(data)
+  } catch (error) {
+    logger.error({ message: `Failed to get study tracks for study programme ${code}`, meta: `${error}` })
   }
 })
 
