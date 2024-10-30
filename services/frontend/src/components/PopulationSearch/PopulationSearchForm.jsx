@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import Datetime from 'react-datetime'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory, useLocation } from 'react-router-dom'
-import { Button, Form, Icon, Message } from 'semantic-ui-react'
+import { Button, Form, Message } from 'semantic-ui-react'
 
 import { createPinnedFirstComparator, isNewStudyProgramme, textAndDescriptionSearch } from '@/common'
 import { useSearchHistory } from '@/common/hooks'
@@ -30,12 +30,6 @@ const initialQuery = () => ({
   studyRights: {},
   months: getMonths('2017', 'FALL'),
 })
-
-const LoadingIcon = () => (
-  <div style={{ margin: '20px 0px', textAlign: 'center' }}>
-    <Icon loading name="spinner" size="big" />
-  </div>
-)
 
 export const PopulationSearchForm = ({ onProgress }) => {
   const history = useHistory()
@@ -277,10 +271,6 @@ export const PopulationSearchForm = ({ onProgress }) => {
   }
 
   const renderStudyProgrammeSelector = () => {
-    const { studyRights } = query
-    if (programmesAreLoading) {
-      return <LoadingIcon />
-    }
     if (Object.values(studyProgrammes).length === 0 && !programmesAreLoading) {
       return (
         <Message
@@ -291,21 +281,19 @@ export const PopulationSearchForm = ({ onProgress }) => {
       )
     }
 
-    let programmesToRender
-    if (Object.values(studyProgrammes).length !== 0) {
-      let sortedStudyProgrammes = sortBy(studyProgrammes, programme => getTextIn(programme.name))
-      if (filterProgrammes) {
-        sortedStudyProgrammes = sortedStudyProgrammes.filter(programme => isNewStudyProgramme(programme.code))
-      }
-      programmesToRender = sortedStudyProgrammes.map(({ code, name }) => ({
-        code,
-        description: code,
-        icon: pinnedProgrammes.includes(code) ? 'pin' : '',
-        name,
-        text: getTextIn(name),
-        value: code,
-      }))
-    }
+    const studyProgrammesAvailable = Object.values(studyProgrammes).length > 0 && !programmesAreLoading
+    const programmesToRender = studyProgrammesAvailable
+      ? sortBy(studyProgrammes, programme => getTextIn(programme.name))
+          .filter(programme => !filterProgrammes || isNewStudyProgramme(programme.code))
+          .map(({ code, name }) => ({
+            code,
+            description: code,
+            icon: pinnedProgrammes.includes(code) ? 'pin' : '',
+            name,
+            text: getTextIn(name),
+            value: code,
+          }))
+      : []
     const pinnedFirstComparator = createPinnedFirstComparator(pinnedProgrammes)
 
     return (
@@ -315,6 +303,7 @@ export const PopulationSearchForm = ({ onProgress }) => {
           clearable
           closeOnChange
           data-cy="select-study-programme"
+          disabled={!studyProgrammesAvailable}
           fluid
           noResultsMessage="No selectable study programmes"
           onChange={handleProgrammeChange}
@@ -324,29 +313,25 @@ export const PopulationSearchForm = ({ onProgress }) => {
           selectOnBlur={false}
           selectOnNavigation={false}
           selection
-          value={studyRights.programme}
+          value={query.studyRights.programme}
         />
       </Form.Field>
     )
   }
 
   const renderStudyTrackSelector = () => {
-    if (studyTracksAreLoading) {
-      return <LoadingIcon />
-    }
-
-    let studyTracksToRender
-    if (Object.values(studyTracks).length > 1) {
-      studyTracksToRender = Object.keys(studyTracks)
-        .filter(studyTrack => studyTrack !== query.studyRights.programme)
-        .map(studyTrack => ({
-          code: studyTrack,
-          description: studyTrack,
-          icon: null,
-          text: getTextIn(studyTracks[studyTrack]),
-          value: studyTrack,
-        }))
-    }
+    const studyTracksAvailable = Object.values(studyTracks).length > 1 && !studyTracksAreLoading
+    const studyTracksToRender = studyTracksAvailable
+      ? Object.keys(studyTracks)
+          .filter(studyTrack => studyTrack !== query.studyRights.programme)
+          .map(studyTrack => ({
+            code: studyTrack,
+            description: studyTrack,
+            icon: null,
+            text: getTextIn(studyTracks[studyTrack]),
+            value: studyTrack,
+          }))
+      : []
 
     return (
       <Form.Field>
@@ -355,11 +340,12 @@ export const PopulationSearchForm = ({ onProgress }) => {
           clearable
           closeOnChange
           data-cy="select-study-track"
+          disabled={!studyTracksAvailable}
           fluid
           noResultsMessage="No selectable study tracks"
           onChange={handleStudyTrackChange}
           options={studyTracksToRender}
-          placeholder="Select study track"
+          placeholder={studyTracksAvailable ? 'Select study track' : 'No study tracks available for this programme'}
           search={textAndDescriptionSearch}
           selectOnBlur={false}
           selectOnNavigation={false}
