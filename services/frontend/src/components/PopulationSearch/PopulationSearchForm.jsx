@@ -378,14 +378,7 @@ export const PopulationSearchForm = ({ onProgress }) => {
       <Form.Button color="blue" disabled={invalidQuery} onClick={handleSubmit}>
         See class
       </Form.Button>
-      <SearchHistory
-        handleSearch={pushQueryToUrl}
-        items={searchHistory.map(item => {
-          item.date = new Date(item.date)
-          return item
-        })}
-        updateItem={updateItemInSearchHistory}
-      />
+      <SearchHistory handleSearch={pushQueryToUrl} items={searchHistory} updateItem={updateItemInSearchHistory} />
     </Form>
   )
 }
