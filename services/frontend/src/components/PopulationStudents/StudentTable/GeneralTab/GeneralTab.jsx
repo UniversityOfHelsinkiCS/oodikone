@@ -55,8 +55,6 @@ export const GeneralTab = ({
 
   const { data: populationStatistics, query } = populations
 
-  const showFullStudyPath = query?.showFullStudyPath === 'true'
-
   const queryStudyrights = query ? Object.values(query.studyRights) : []
   const cleanedQueryStudyrights = queryStudyrights.filter(studyright => !!studyright)
 
@@ -122,7 +120,6 @@ export const GeneralTab = ({
     year,
     getTextIn,
     currentSemester: currentSemester?.semestercode,
-    showFullStudyPath,
   })
 
   const transferFrom = student => getTextIn(programmes[student.transferSource]?.name) ?? student.transferSource
@@ -225,8 +222,10 @@ export const GeneralTab = ({
 
   const containsStudyTracks = filteredStudents.some(student => getStudyTracks(student.studyRights).length > 0)
 
-  const isBachelorsProgramme = degreeProgrammeTypes[programmeCode] === 'urn:code:degree-program-type:bachelors-degree'
-  const isMastersProgramme = degreeProgrammeTypes[programmeCode] === 'urn:code:degree-program-type:masters-degree'
+  const isBachelorsProgramme = Object.values(degreeProgrammeTypes).includes(
+    'urn:code:degree-program-type:bachelors-degree'
+  )
+  const isMastersProgramme = Object.values(degreeProgrammeTypes).includes('urn:code:degree-program-type:masters-degree')
 
   const shouldShowAdmissionType = parseInt(query?.year, 10) >= 2020 || parseInt(group?.tags?.year, 10) >= 2020
 
@@ -284,7 +283,6 @@ export const GeneralTab = ({
       studentToSecondStudyrightEndMap,
       studentToStudyrightEndMap,
       year,
-      semestersToAddToStart: showFullStudyPath && isMastersProgramme ? 6 : 0,
     })
 
   const availableCreditsColumns = {
@@ -305,22 +303,10 @@ export const GeneralTab = ({
     }),
     hopsCombinedProg: () => ({
       key: 'credits-hopsCombinedProg',
-      title: (() => {
-        if (combinedProgrammeCode === 'MH90_001') return 'Licentiate\nHOPS'
-        if (isBachelorsProgramme) return 'Master\nHOPS'
-        return 'Bachelor\nHOPS'
-      })(),
+      title: combinedProgrammeCode === 'MH90_001' ? 'Licentiate\nHOPS' : 'Master\nHOPS',
       filterType: 'range',
       getRowVal: student =>
-        student.studyplans?.find(plan => {
-          if (combinedProgrammeCode) {
-            return plan.programme_code === combinedProgrammeCode
-          }
-          const studyRightIdOfProgramme = student.studyRights.find(studyRight =>
-            studyRight.studyRightElements?.some(element => element.code === programmeCode)
-          )?.id
-          return plan.sis_study_right_id === studyRightIdOfProgramme && plan.programme_code !== programmeCode
-        })?.completed_credits ?? 0,
+        student.studyplans?.find(plan => plan.programme_code === combinedProgrammeCode)?.completed_credits ?? 0,
     }),
     studyright: sole => ({
       key: 'credits-studyright',
@@ -439,11 +425,7 @@ export const GeneralTab = ({
     },
     endDateCombinedProg: {
       key: 'endDateCombinedProg',
-      title: (() => {
-        if (combinedProgrammeCode === 'MH90_001') return 'Licentiate\ngraduation\ndate'
-        if (isBachelorsProgramme) return 'Master\ngraduation\ndate'
-        return 'Bachelor\ngraduation\ndate'
-      })(),
+      title: combinedProgrammeCode === 'MH90_001' ? 'Licentiate\ngraduation\ndate' : 'Master\ngraduation\ndate',
       filterType: 'date',
       getRowVal: student =>
         studentToSecondStudyrightEndMap[student.studentNumber]

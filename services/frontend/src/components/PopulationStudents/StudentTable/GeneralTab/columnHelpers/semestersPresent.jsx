@@ -12,7 +12,6 @@ export const getSemestersPresentFunctions = ({
   studentToSecondStudyrightEndMap,
   studentToStudyrightEndMap,
   year,
-  semestersToAddToStart,
 }) => {
   if (allSemesters?.length === 0 || !filteredStudents)
     return {
@@ -27,14 +26,10 @@ export const getSemestersPresentFunctions = ({
   const getFirstAndLastSemester = () => {
     const associatedYear = year !== 'All' && year
     if (associatedYear) {
-      let first = allSemesters.find(
-        semester => new Date(semester.startdate).getTime() === new Date(Date.UTC(associatedYear, 7, 1)).getTime()
-      ).semestercode
-      if (semestersToAddToStart) {
-        first -= semestersToAddToStart
-      }
       return {
-        first,
+        first: allSemesters.find(
+          semester => `${semester.yearcode + 1949}` === associatedYear && isFall(semester.semestercode)
+        )?.semestercode,
         last: isFall(currentSemesterCode) ? currentSemesterCode + 1 : currentSemesterCode,
       }
     }
@@ -71,10 +66,8 @@ export const getSemestersPresentFunctions = ({
     if (
       secondGraduation &&
       moment(secondGraduation).isBetween(allSemestersMap[semester].startdate, allSemestersMap[semester].enddate)
-    ) {
-      if (isMastersProgramme(programmeCode)) return 1
+    )
       return 2
-    }
     return 0
   }
 

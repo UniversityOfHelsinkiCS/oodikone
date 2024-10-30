@@ -106,12 +106,10 @@ export const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) =
     studyGuidanceGroup?.tags?.studyProgramme && studyGuidanceGroup?.tags?.studyProgramme.includes('+')
 
   if (
-    ((populations?.query?.studyRights?.combinedProgramme || populations?.query?.showFullStudyPath === 'true') &&
-      variant === 'population') ||
+    (populations?.query?.studyRights?.combinedProgramme && variant === 'population') ||
     (studyGuidanceGroupCombinedProgramme && variant === 'studyGuidanceGroupPopulation')
-  ) {
+  )
     columnsByVariant[variant].push('credits.hopsCombinedProg', 'endDateCombinedProg')
-  }
   const baseColumns = ['credits', 'credits.all', 'studentnumber', 'tags', 'updatedAt', 'phoneNumber']
   if (!populations?.query?.studyRights?.combinedProgramme) baseColumns.push('option')
   const nameColumnsToAdd = namesVisible ? ['email', 'lastname', 'firstname'] : []

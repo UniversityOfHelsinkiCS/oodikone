@@ -1,5 +1,3 @@
-import { orderBy } from 'lodash'
-
 import { findStudyRightForClass, getAllProgrammesOfStudent } from '@/common'
 
 export const createMaps = ({
@@ -10,7 +8,6 @@ export const createMaps = ({
   year,
   currentSemester,
   getTextIn,
-  showFullStudyPath,
 }) => {
   const studentToStudyrightStartMap = {}
   const studentToStudyrightEndMap = {}
@@ -19,33 +16,16 @@ export const createMaps = ({
   const studentToOtherProgrammesMap = {}
 
   for (const studentNumber of selectedStudents) {
-    const { studyRights = [] } = students[studentNumber]
+    const { studyRights } = students[studentNumber]
     const studyRight = findStudyRightForClass(studyRights, programmeCode, year)
-    if (studyRight?.studyRightElements == null) {
-      continue
-    }
-    const studyRightElement = studyRight.studyRightElements.find(element => element.code === programmeCode)
-    const secondStudyRightElement = orderBy(
-      studyRight.studyRightElements.filter(element => {
-        if (combinedProgrammeCode) {
-          return element.code === combinedProgrammeCode
-        }
-        if (showFullStudyPath && studyRightElement) {
-          const degreeProgrammeTypeToCheck =
-            studyRightElement.degreeProgrammeType === 'urn:code:degree-program-type:bachelors-degree'
-              ? 'urn:code:degree-program-type:masters-degree'
-              : 'urn:code:degree-program-type:bachelors-degree'
-          return element.degreeProgrammeType === degreeProgrammeTypeToCheck
-        }
-        return false
-      }),
-      ['startDate'],
-      ['desc']
-    )[0]
-    const programmes = getAllProgrammesOfStudent(studyRights, currentSemester)
+    const studyRightElement = studyRight?.studyRightElements?.find(element => element.code === programmeCode)
+    const secondStudyRightElement = studyRight?.studyRightElements?.find(
+      element => element.code === combinedProgrammeCode
+    )
+    const programmes = getAllProgrammesOfStudent(students[studentNumber]?.studyRights ?? [], currentSemester)
     const programmesToUse = programmeCode ? programmes.filter(p => p.code !== programmeCode) : programmes
 
-    studentToStudyrightStartMap[studentNumber] = studyRight.startDate ?? null
+    studentToStudyrightStartMap[studentNumber] = studyRight?.startDate ?? null
     studentToProgrammeStartMap[studentNumber] = studyRightElement?.startDate ?? null
     studentToStudyrightEndMap[studentNumber] = studyRightElement?.graduated ? studyRightElement.endDate : null
     studentToSecondStudyrightEndMap[studentNumber] = secondStudyRightElement?.graduated

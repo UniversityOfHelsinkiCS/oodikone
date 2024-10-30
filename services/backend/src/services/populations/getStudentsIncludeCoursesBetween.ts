@@ -128,16 +128,7 @@ const getStudents = async (studentNumbers: string[]) => {
           {
             model: SISStudyRightElement,
             required: true,
-            attributes: [
-              'code',
-              'name',
-              'studyTrack',
-              'graduated',
-              'startDate',
-              'endDate',
-              'phase',
-              'degreeProgrammeType',
-            ],
+            attributes: ['code', 'name', 'studyTrack', 'graduated', 'startDate', 'endDate', 'phase'],
           },
         ],
       },

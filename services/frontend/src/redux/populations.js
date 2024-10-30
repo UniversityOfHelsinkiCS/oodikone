@@ -19,7 +19,6 @@ export const getPopulationStatistics = ({
   years,
   onProgress,
   tag,
-  showFullStudyPath,
 }) => {
   const route = '/v3/populationstatistics/'
   const prefix = 'GET_POPULATION_STATISTICS_'
@@ -32,7 +31,6 @@ export const getPopulationStatistics = ({
     year,
     years,
     tag,
-    showFullStudyPath,
   }
   const params = {
     semesters,
@@ -71,7 +69,6 @@ const populationApi = RTKApi.injectEndpoints({
     }),
     getProgrammes: builder.query({
       query: () => '/v3/populationstatistics/studyprogrammes',
-      keepUnusedDataFor: 60 * 60,
     }),
   }),
   overrideExisting: false,
