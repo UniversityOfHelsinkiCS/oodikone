@@ -31,6 +31,12 @@ const initialQuery = () => ({
   months: getMonths('2017', 'FALL'),
 })
 
+const LoadingIcon = () => (
+  <div style={{ margin: '20px 0px', textAlign: 'center' }}>
+    <Icon loading name="spinner" size="big" />
+  </div>
+)
+
 export const PopulationSearchForm = ({ onProgress }) => {
   const history = useHistory()
   const location = useLocation()
@@ -273,7 +279,7 @@ export const PopulationSearchForm = ({ onProgress }) => {
   const renderStudyProgrammeSelector = () => {
     const { studyRights } = query
     if (programmesAreLoading) {
-      return <Icon color="black" loading name="spinner" size="big" style={{ marginLeft: '45%' }} />
+      return <LoadingIcon />
     }
     if (Object.values(studyProgrammes).length === 0 && !programmesAreLoading) {
       return (
@@ -326,7 +332,7 @@ export const PopulationSearchForm = ({ onProgress }) => {
 
   const renderStudyTrackSelector = () => {
     if (studyTracksAreLoading) {
-      return <Icon color="black" loading name="spinner" size="big" style={{ marginLeft: '45%' }} />
+      return <LoadingIcon />
     }
 
     let studyTracksToRender
