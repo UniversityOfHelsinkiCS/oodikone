@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import Datetime from 'react-datetime'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory, useLocation } from 'react-router-dom'
-import { Button, Form, Icon, Message } from 'semantic-ui-react'
+import { Button, Form, Message } from 'semantic-ui-react'
 
 import { createPinnedFirstComparator, isNewStudyProgramme, textAndDescriptionSearch } from '@/common'
 import { useSearchHistory } from '@/common/hooks'
@@ -16,6 +16,7 @@ import { YEAR_DATE_FORMAT } from '@/constants/date'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { getPopulationStatistics, clearPopulations, useGetProgrammesQuery } from '@/redux/populations'
 import { clearSelected } from '@/redux/populationSelectedStudentCourses'
+import { useGetStudyTracksQuery } from '@/redux/studyProgramme'
 import { useGetStudyProgrammePinsQuery } from '@/redux/studyProgrammePins'
 import { formatQueryParamsToArrays } from '@/shared/util'
 import { momentFromFormat, reformatDate } from '@/util/timeAndDate'
@@ -57,6 +58,9 @@ export const PopulationSearchForm = ({ onProgress }) => {
           },
         }
       : programmes
+  const { data: studyTracks = {}, isLoading: studyTracksAreLoading } = useGetStudyTracksQuery({
+    id: query.studyRights.programme,
+  })
   const { data: studyProgrammePins } = useGetStudyProgrammePinsQuery()
   const pinnedProgrammes = studyProgrammePins?.studyProgrammes || []
 
@@ -78,10 +82,9 @@ export const PopulationSearchForm = ({ onProgress }) => {
     const sameSemesters = isEqual(previousQuery.semesters, query.semesters)
     const sameStudentStatuses = isEqual(previousQuery.studentStatuses, query.studentStatuses)
     const sameYears = isEqual(previousQuery.years, query.years)
-    const sameStudyrights = isEqual(previousQuery.studyRights, query.studyRights)
-    const sameTag = previousQuery.tag === query.tag
-
-    return sameStudyrights && sameMonths && sameYear && sameSemesters && sameStudentStatuses && sameYears && sameTag
+    const sameStudyRights = isEqual(previousQuery.studyRights, query.studyRights)
+    const sameTag = query.tag === previousQuery.tag
+    return sameStudyRights && sameMonths && sameYear && sameSemesters && sameStudentStatuses && sameYears && sameTag
   }
 
   const fetchPopulation = async query => {
@@ -119,7 +122,18 @@ export const PopulationSearchForm = ({ onProgress }) => {
   const handleProgrammeChange = (_event, { value: programme }) => {
     setQuery({
       ...query,
-      studyRights: programme === '' ? {} : { programme },
+      studyRights:
+        programme === ''
+          ? { ...query.studyRights, studyTrack: undefined, programme: undefined }
+          : { ...query.studyRights, studyTrack: undefined, programme },
+    })
+  }
+
+  const handleStudyTrackChange = (_event, { value: studyTrack }) => {
+    setQuery({
+      ...query,
+      studyRights:
+        studyTrack === '' ? { ...query.studyRights, studyTrack: undefined } : { ...query.studyRights, studyTrack },
     })
   }
 
@@ -151,7 +165,7 @@ export const PopulationSearchForm = ({ onProgress }) => {
   const getSearchHistoryTextFromQuery = () => {
     const { studyRights, semesters, months, year, studentStatuses } = query
     const studyRightsText = `${getTextIn(studyProgrammes[studyRights.programme].name)} ${Object.values(studyRights)
-      .filter(studyright => studyright)
+      .filter(studyRight => studyRight)
       .join(', ')}`
     const timeText = `${semesters.join(', ')}/${year}-${parseInt(year, 10) + 1}, ${months} months`
     const studentStatusesText =
@@ -261,10 +275,6 @@ export const PopulationSearchForm = ({ onProgress }) => {
   }
 
   const renderStudyProgrammeSelector = () => {
-    const { studyRights } = query
-    if (programmesAreLoading) {
-      return <Icon color="black" loading name="spinner" size="big" style={{ marginLeft: '45%' }} />
-    }
     if (Object.values(studyProgrammes).length === 0 && !programmesAreLoading) {
       return (
         <Message
@@ -275,21 +285,19 @@ export const PopulationSearchForm = ({ onProgress }) => {
       )
     }
 
-    let programmesToRender
-    if (Object.values(studyProgrammes).length !== 0) {
-      let sortedStudyProgrammes = sortBy(studyProgrammes, programme => getTextIn(programme.name))
-      if (filterProgrammes) {
-        sortedStudyProgrammes = sortedStudyProgrammes.filter(programme => isNewStudyProgramme(programme.code))
-      }
-      programmesToRender = sortedStudyProgrammes.map(({ code, name }) => ({
-        code,
-        description: code,
-        icon: pinnedProgrammes.includes(code) ? 'pin' : '',
-        name,
-        text: getTextIn(name),
-        value: code,
-      }))
-    }
+    const studyProgrammesAvailable = Object.values(studyProgrammes).length > 0 && !programmesAreLoading
+    const programmesToRender = studyProgrammesAvailable
+      ? sortBy(studyProgrammes, programme => getTextIn(programme.name))
+          .filter(programme => !filterProgrammes || isNewStudyProgramme(programme.code))
+          .map(({ code, name }) => ({
+            code,
+            description: code,
+            icon: pinnedProgrammes.includes(code) ? 'pin' : '',
+            name,
+            text: getTextIn(name),
+            value: code,
+          }))
+      : []
     const pinnedFirstComparator = createPinnedFirstComparator(pinnedProgrammes)
 
     return (
@@ -299,6 +307,7 @@ export const PopulationSearchForm = ({ onProgress }) => {
           clearable
           closeOnChange
           data-cy="select-study-programme"
+          disabled={!studyProgrammesAvailable}
           fluid
           noResultsMessage="No selectable study programmes"
           onChange={handleProgrammeChange}
@@ -308,7 +317,44 @@ export const PopulationSearchForm = ({ onProgress }) => {
           selectOnBlur={false}
           selectOnNavigation={false}
           selection
-          value={studyRights.programme}
+          value={query.studyRights.programme}
+        />
+      </Form.Field>
+    )
+  }
+
+  const renderStudyTrackSelector = () => {
+    const studyTracksAvailable = Object.values(studyTracks).length > 1 && !studyTracksAreLoading
+    const studyTracksToRender = studyTracksAvailable
+      ? Object.keys(studyTracks)
+          .filter(studyTrack => studyTrack !== query.studyRights.programme)
+          .map(studyTrack => ({
+            code: studyTrack,
+            description: studyTrack,
+            icon: null,
+            text: getTextIn(studyTracks[studyTrack]),
+            value: studyTrack,
+          }))
+      : []
+
+    return (
+      <Form.Field>
+        <label>Study track (optional)</label>
+        <Form.Dropdown
+          clearable
+          closeOnChange
+          data-cy="select-study-track"
+          disabled={!studyTracksAvailable}
+          fluid
+          noResultsMessage="No selectable study tracks"
+          onChange={handleStudyTrackChange}
+          options={studyTracksToRender}
+          placeholder={studyTracksAvailable ? 'Select study track' : 'No study tracks available for this programme'}
+          search={textAndDescriptionSearch}
+          selectOnBlur={false}
+          selectOnNavigation={false}
+          selection
+          value={query.studyRights.studyTrack}
         />
       </Form.Field>
     )
@@ -318,30 +364,17 @@ export const PopulationSearchForm = ({ onProgress }) => {
     return null
   }
 
-  let invalidQuery = false
-  let errorMessage
-
-  if (!query.studyRights.programme) {
-    invalidQuery = true
-    errorMessage = 'Select study programme'
-  }
+  const invalidQuery = !query.studyRights.programme
 
   return (
     <Form error={invalidQuery}>
       {renderEnrollmentDateSelector()}
       {renderStudyProgrammeSelector()}
-      <Message color="blue" error header={errorMessage} />
+      {renderStudyTrackSelector()}
       <Form.Button color="blue" disabled={invalidQuery} onClick={handleSubmit}>
         See class
       </Form.Button>
-      <SearchHistory
-        handleSearch={pushQueryToUrl}
-        items={searchHistory.map(item => {
-          item.date = new Date(item.date)
-          return item
-        })}
-        updateItem={updateItemInSearchHistory}
-      />
+      <SearchHistory handleSearch={pushQueryToUrl} items={searchHistory} updateItem={updateItemInSearchHistory} />
     </Form>
   )
 }

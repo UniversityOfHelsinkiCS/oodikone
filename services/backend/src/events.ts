@@ -8,8 +8,8 @@ import { computeLanguageCenterData, LANGUAGE_CENTER_REDIS_KEY } from './services
 import { findStudentsCloseToGraduation, CLOSE_TO_GRADUATION_REDIS_KEY } from './services/populations/closeToGraduation'
 import { redisClient } from './services/redis'
 import { getCurrentSemester } from './services/semesters'
-import { combinedStudyprogrammes, isRelevantProgramme } from './services/studyProgramme/studyProgrammeHelpers'
-import { updateBasicView, updateStudytrackView } from './services/studyProgramme/studyProgrammeUpdates'
+import { combinedStudyProgrammes, isRelevantProgramme } from './services/studyProgramme/studyProgrammeHelpers'
+import { updateBasicView, updateStudyTrackView } from './services/studyProgramme/studyProgrammeUpdates'
 import { findAndSaveTeachers } from './services/teachers/top'
 import { deleteOutdatedUsers } from './services/userService'
 import logger from './util/logger'
@@ -61,10 +61,10 @@ const refreshProgrammesAndFaculties = async () => {
 
 export const refreshProgramme = async (code: string) => {
   await updateBasicView(code, '')
-  await updateStudytrackView(code, '')
-  const combinedProgramme = combinedStudyprogrammes[code] || ''
+  await updateStudyTrackView(code, '')
+  const combinedProgramme = combinedStudyProgrammes[code] || ''
   await updateBasicView(code, combinedProgramme)
-  await updateStudytrackView(code, combinedProgramme)
+  await updateStudyTrackView(code, combinedProgramme)
 }
 
 export const refreshProgrammes = async () => {

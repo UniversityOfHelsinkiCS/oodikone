@@ -292,7 +292,7 @@ const getProgrammesBeforeOrAfter = async (studyprogramme: string, queryParameter
   return null
 }
 
-export const getGraduationStatsForStudytrack = async ({
+export const getGraduationStatsForStudyTrack = async ({
   studyProgramme,
   combinedProgramme,
   settings,

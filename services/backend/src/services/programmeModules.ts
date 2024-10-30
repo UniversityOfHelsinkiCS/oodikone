@@ -5,7 +5,7 @@ import { ProgrammeModule } from '../models'
 import { ExcludedCourse } from '../models/kone'
 import { Name } from '../types'
 import logger from '../util/logger'
-import { combinedStudyprogrammes } from './studyProgramme/studyProgrammeHelpers'
+import { combinedStudyProgrammes } from './studyProgramme/studyProgrammeHelpers'
 
 export const getCurriculumVersions = async (code: string) => {
   try {
@@ -134,8 +134,8 @@ const getCoursesAndModulesForProgramme = async (code: string, periodIds: string)
 
 export const getCoursesAndModules = async (code: string, periodIds: string) => {
   const defaultProgrammeCourses = await getCoursesAndModulesForProgramme(code, periodIds)
-  if (code in combinedStudyprogrammes) {
-    const secondProgramme = combinedStudyprogrammes[code as keyof typeof combinedStudyprogrammes]
+  if (code in combinedStudyProgrammes) {
+    const secondProgramme = combinedStudyProgrammes[code as keyof typeof combinedStudyProgrammes]
     const secondProgrammeCourses = await getCoursesAndModulesForProgramme(secondProgramme, periodIds)
     return { defaultProgrammeCourses, secondProgrammeCourses }
   }

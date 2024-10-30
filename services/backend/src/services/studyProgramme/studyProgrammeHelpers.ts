@@ -78,7 +78,7 @@ export const getStartDate = (isAcademicYear: boolean) => {
 }
 
 // In the object programmes should be {bachelorCode: masterCode}
-export const combinedStudyprogrammes = { KH90_001: 'MH90_001' } as const
+export const combinedStudyProgrammes = { KH90_001: 'MH90_001' } as const
 
 // There are 9 course_unit_types
 // 1. urn:code:course-unit-type:regular

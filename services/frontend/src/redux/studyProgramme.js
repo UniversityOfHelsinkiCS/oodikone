@@ -9,19 +9,33 @@ const studyProgrammeApi = RTKApi.injectEndpoints({
       query: ({ id, yearType, specialGroups, combinedProgramme }) =>
         `/v2/studyprogrammes/${id}/basicstats?year_type=${yearType}&special_groups=${specialGroups}&combined_programme=${combinedProgramme}`,
     }),
+    getColorizedTableCourseStats: builder.query({
+      query: ({ id }) => `/v2/studyprogrammes/${id}/colorizedtablecoursestats`,
+    }),
     getCreditStats: builder.query({
       query: ({ codes, isAcademicYear, specialGroups }) =>
         `/v2/studyprogrammes/creditstats?codes=${JSON.stringify(
           codes
         )}&isAcademicYear=${isAcademicYear}&includeSpecials=${specialGroups}`,
     }),
+    getEvaluationStats: builder.query({
+      query: ({ id, yearType, specialGroups, graduated }) =>
+        `/v2/studyprogrammes/${id}/evaluationstats?year_type=${yearType}&special_groups=${specialGroups}&graduated=${graduated}`,
+    }),
     getGraduationStats: builder.query({
       query: ({ id, yearType, specialGroups, combinedProgramme }) =>
         `/v2/studyprogrammes/${id}/graduationstats?year_type=${yearType}&special_groups=${specialGroups}&combined_programme=${combinedProgramme}`,
     }),
-    getStudytrackStats: builder.query({
+    getStudyTrackStats: builder.query({
       query: ({ id, graduated, specialGroups, combinedProgramme }) =>
         `/v2/studyprogrammes/${id}/studytrackstats?graduated=${graduated}&special_groups=${specialGroups}&combined_programme=${combinedProgramme}`,
+    }),
+    getProgrammeCoursesStats: builder.query({
+      query: ({ id, academicyear, combinedProgramme }) =>
+        `/v2/studyprogrammes/${id}/coursestats?academicyear=${academicyear}&combined_programme=${combinedProgramme}`,
+    }),
+    getStudyTracks: builder.query({
+      query: ({ id }) => `/v2/studyprogrammes/${id}/studytracks`,
     }),
     updateBasicView: builder.query({
       query: ({ id, combinedProgramme }) =>
@@ -31,31 +45,21 @@ const studyProgrammeApi = RTKApi.injectEndpoints({
       query: ({ id, combinedProgramme }) =>
         `/v2/studyprogrammes/${id}/update_studytrackview?combined_programme=${combinedProgramme}`,
     }),
-    getProgrammeCoursesStats: builder.query({
-      query: ({ id, academicyear, combinedProgramme }) =>
-        `/v2/studyprogrammes/${id}/coursestats?academicyear=${academicyear}&combined_programme=${combinedProgramme}`,
-    }),
-    getEvaluationStats: builder.query({
-      query: ({ id, yearType, specialGroups, graduated }) =>
-        `/v2/studyprogrammes/${id}/evaluationstats?year_type=${yearType}&special_groups=${specialGroups}&graduated=${graduated}`,
-    }),
-    getColorizedTableCourseStats: builder.query({
-      query: ({ id }) => `/v2/studyprogrammes/${id}/colorizedtablecoursestats`,
-    }),
   }),
   overrideExisting: false,
 })
 
 export const {
   useGetBasicStatsQuery,
+  useGetColorizedTableCourseStatsQuery,
   useGetCreditStatsQuery,
+  useGetEvaluationStatsQuery,
   useGetGraduationStatsQuery,
-  useGetStudytrackStatsQuery,
+  useGetStudyTrackStatsQuery,
+  useGetProgrammeCoursesStatsQuery,
+  useGetStudyTracksQuery,
   useUpdateBasicViewQuery,
   useUpdateStudyTrackViewQuery,
-  useGetProgrammeCoursesStatsQuery,
-  useGetEvaluationStatsQuery,
-  useGetColorizedTableCourseStatsQuery,
 } = studyProgrammeApi
 
 const getFilteredAndFormattedStudyProgrammes = (getTextIn, studyProgrammes) => {

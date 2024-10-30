@@ -1,8 +1,8 @@
 import { cloneDeep, omit } from 'lodash'
 
 import { DegreeProgrammeType, Name } from '../../types'
-import { getGraduationStats, getStudytrackStats, setGraduationStats, setStudytrackStats } from '../analyticsService'
-import { getGraduationStatsForStudytrack, GraduationTimes } from '../studyProgramme/studyProgrammeGraduations'
+import { getGraduationStats, getStudyTrackStats, setGraduationStats, setStudyTrackStats } from '../analyticsService'
+import { getGraduationStatsForStudyTrack, GraduationTimes } from '../studyProgramme/studyProgrammeGraduations'
 import { getMedian } from '../studyProgramme/studyProgrammeHelpers'
 import { getStudyRightsInProgramme } from '../studyProgramme/studyRightFinders'
 import {
@@ -25,7 +25,7 @@ export const programmeTypes = {
 } as const
 
 const getStatsByGraduationYear = async (facultyProgrammes: ProgrammesOfOrganization) => {
-  const newStats: Array<Awaited<ReturnType<typeof getGraduationStatsForStudytrack>>> = []
+  const newStats: Array<Awaited<ReturnType<typeof getGraduationStatsForStudyTrack>>> = []
   const medians: Record<string, LevelGraduationStats[]> = {}
   const programmes: { medians: Record<string, Record<string, ProgrammeStats>> } = { medians: {} }
 
@@ -38,7 +38,7 @@ const getStatsByGraduationYear = async (facultyProgrammes: ProgrammesOfOrganizat
       newStats.push(statsFromRedis)
       continue
     }
-    const updatedStats = await getGraduationStatsForStudytrack({
+    const updatedStats = await getGraduationStatsForStudyTrack({
       studyProgramme: programme.code,
       combinedProgramme: '',
       settings: {
@@ -136,7 +136,7 @@ const getStatsByStartYear = async (facultyProgrammes: ProgrammesOfOrganization) 
     if (programme.degreeProgrammeType == null || !(programme.degreeProgrammeType in programmeTypes)) {
       continue
     }
-    const statsFromRedis = await getStudytrackStats(programme.code, '', 'GRADUATED_INCLUDED', 'SPECIAL_EXCLUDED')
+    const statsFromRedis = await getStudyTrackStats(programme.code, '', 'GRADUATED_INCLUDED', 'SPECIAL_EXCLUDED')
     if (statsFromRedis) {
       newStats.push(statsFromRedis)
       continue
@@ -152,7 +152,7 @@ const getStatsByStartYear = async (facultyProgrammes: ProgrammesOfOrganization) 
       },
       studyRightsOfProgramme,
     })
-    await setStudytrackStats(updatedStats, 'GRADUATED_INCLUDED', 'SPECIAL_EXCLUDED')
+    await setStudyTrackStats(updatedStats, 'GRADUATED_INCLUDED', 'SPECIAL_EXCLUDED')
     newStats.push(updatedStats)
   }
 

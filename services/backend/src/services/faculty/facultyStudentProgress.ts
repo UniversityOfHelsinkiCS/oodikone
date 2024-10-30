@@ -3,7 +3,7 @@ import moment from 'moment'
 
 import { rootOrgId } from '../../config'
 import { Graduated, SpecialGroups, Unarray } from '../../types'
-import { getStudytrackStats, setStudytrackStats } from '../analyticsService'
+import { getStudyTrackStats, setStudyTrackStats } from '../analyticsService'
 import { getYearsArray } from '../studyProgramme/studyProgrammeHelpers'
 import { getStudyRightsInProgramme } from '../studyProgramme/studyRightFinders'
 import { getStudyTrackStatsForStudyProgramme } from '../studyProgramme/studyTrackStats'
@@ -114,7 +114,7 @@ export const combineFacultyStudentProgress = async (
     ) {
       continue
     }
-    const statsFromRedis = await getStudytrackStats(studyProgramme, null, graduated, specialGroups)
+    const statsFromRedis = await getStudyTrackStats(studyProgramme, null, graduated, specialGroups)
     if (statsFromRedis) {
       statsOfProgrammes.push(statsFromRedis)
     } else {
@@ -128,7 +128,7 @@ export const combineFacultyStudentProgress = async (
         studyRightsOfProgramme,
       })
       statsOfProgrammes.push(updatedStats)
-      setStudytrackStats(updatedStats, graduated, specialGroups)
+      setStudyTrackStats(updatedStats, graduated, specialGroups)
     }
   }
 

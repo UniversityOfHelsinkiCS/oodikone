@@ -1,7 +1,7 @@
 import { sortBy } from 'lodash'
 import moment from 'moment'
 import { useState } from 'react'
-import { Form, Header, Icon, Segment } from 'semantic-ui-react'
+import { Form, Header, HeaderContent, Icon, Segment } from 'semantic-ui-react'
 
 import { DISPLAY_DATE_FORMAT_DEV } from '@/constants/date'
 
@@ -27,9 +27,9 @@ export const SearchHistory = ({ disabled, handleSearch, header = 'Previous searc
 
   return (
     <Segment>
-      <Header disabled={disabled}>
+      <Header disabled={disabled} size="small">
         <Icon name="clock outline" />
-        {header}
+        <HeaderContent>{header}</HeaderContent>
       </Header>
       <Form.Dropdown
         clearable

@@ -2,7 +2,7 @@ import { cloneDeep } from 'lodash'
 
 import { DegreeProgrammeType } from '../../types'
 import { getGraduationStats, setGraduationStats } from '../analyticsService'
-import { getGraduationStatsForStudytrack } from '../studyProgramme/studyProgrammeGraduations'
+import { getGraduationStatsForStudyTrack } from '../studyProgramme/studyProgrammeGraduations'
 import { getDegreeProgrammesOfFaculty, ProgrammesOfOrganization } from './faculty'
 
 type ProgrammeName = {
@@ -25,7 +25,7 @@ const calculateCombinedStats = async (
   ]
   const programmeTableStats: Record<string, Array<Array<string | number>>> = {}
 
-  const newStats: Array<Awaited<ReturnType<typeof getGraduationStatsForStudytrack>>> = []
+  const newStats: Array<Awaited<ReturnType<typeof getGraduationStatsForStudyTrack>>> = []
   const combinedTableStats: Array<Array<string | number>> = []
   let years: Array<string | number> = []
   const programmeNames: Record<string, ProgrammeName> = {}
@@ -47,7 +47,7 @@ const calculateCombinedStats = async (
       newStats.push(statsFromRedis)
       continue
     }
-    const updatedStats = await getGraduationStatsForStudytrack({
+    const updatedStats = await getGraduationStatsForStudyTrack({
       studyProgramme: programme.code,
       combinedProgramme: '',
       settings: {
