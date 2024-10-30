@@ -16,6 +16,7 @@ import { YEAR_DATE_FORMAT } from '@/constants/date'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { getPopulationStatistics, clearPopulations, useGetProgrammesQuery } from '@/redux/populations'
 import { clearSelected } from '@/redux/populationSelectedStudentCourses'
+import { useGetStudyTracksQuery } from '@/redux/studyProgramme'
 import { useGetStudyProgrammePinsQuery } from '@/redux/studyProgrammePins'
 import { formatQueryParamsToArrays } from '@/shared/util'
 import { momentFromFormat, reformatDate } from '@/util/timeAndDate'
@@ -57,6 +58,9 @@ export const PopulationSearchForm = ({ onProgress }) => {
           },
         }
       : programmes
+  const { data: studyTracks = {}, isLoading: studyTracksAreLoading } = useGetStudyTracksQuery({
+    id: query.studyRights.programme,
+  })
   const { data: studyProgrammePins } = useGetStudyProgrammePinsQuery()
   const pinnedProgrammes = studyProgrammePins?.studyProgrammes || []
 
@@ -78,10 +82,9 @@ export const PopulationSearchForm = ({ onProgress }) => {
     const sameSemesters = isEqual(previousQuery.semesters, query.semesters)
     const sameStudentStatuses = isEqual(previousQuery.studentStatuses, query.studentStatuses)
     const sameYears = isEqual(previousQuery.years, query.years)
-    const sameStudyrights = isEqual(previousQuery.studyRights, query.studyRights)
-    const sameTag = previousQuery.tag === query.tag
-
-    return sameStudyrights && sameMonths && sameYear && sameSemesters && sameStudentStatuses && sameYears && sameTag
+    const sameStudyRights = isEqual(previousQuery.studyRights, query.studyRights)
+    const sameTag = query.tag === previousQuery.tag
+    return sameStudyRights && sameMonths && sameYear && sameSemesters && sameStudentStatuses && sameYears && sameTag
   }
 
   const fetchPopulation = async query => {
@@ -119,7 +122,14 @@ export const PopulationSearchForm = ({ onProgress }) => {
   const handleProgrammeChange = (_event, { value: programme }) => {
     setQuery({
       ...query,
-      studyRights: programme === '' ? {} : { programme },
+      studyRights: programme === '' ? {} : { ...query.studyRights, programme },
+    })
+  }
+
+  const handleStudyTrackChange = (_event, { value: studyTrack }) => {
+    setQuery({
+      ...query,
+      studyRights: studyTrack === '' ? {} : { ...query.studyRights, studyTrack },
     })
   }
 
@@ -151,7 +161,7 @@ export const PopulationSearchForm = ({ onProgress }) => {
   const getSearchHistoryTextFromQuery = () => {
     const { studyRights, semesters, months, year, studentStatuses } = query
     const studyRightsText = `${getTextIn(studyProgrammes[studyRights.programme].name)} ${Object.values(studyRights)
-      .filter(studyright => studyright)
+      .filter(studyRight => studyRight)
       .join(', ')}`
     const timeText = `${semesters.join(', ')}/${year}-${parseInt(year, 10) + 1}, ${months} months`
     const studentStatusesText =
@@ -314,6 +324,46 @@ export const PopulationSearchForm = ({ onProgress }) => {
     )
   }
 
+  const renderStudyTrackSelector = () => {
+    if (studyTracksAreLoading) {
+      return <Icon color="black" loading name="spinner" size="big" style={{ marginLeft: '45%' }} />
+    }
+
+    let studyTracksToRender
+    if (Object.values(studyTracks).length > 1) {
+      studyTracksToRender = Object.keys(studyTracks)
+        .filter(studyTrack => studyTrack !== query.studyRights.programme)
+        .map(studyTrack => ({
+          code: studyTrack,
+          description: studyTrack,
+          icon: null,
+          text: getTextIn(studyTracks[studyTrack]),
+          value: studyTrack,
+        }))
+    }
+
+    return (
+      <Form.Field>
+        <label>Study track (optional)</label>
+        <Form.Dropdown
+          clearable
+          closeOnChange
+          data-cy="select-study-track"
+          fluid
+          noResultsMessage="No selectable study tracks"
+          onChange={handleStudyTrackChange}
+          options={studyTracksToRender}
+          placeholder="Select study track"
+          search={textAndDescriptionSearch}
+          selectOnBlur={false}
+          selectOnNavigation={false}
+          selection
+          value={query.studyRights.studyTrack}
+        />
+      </Form.Field>
+    )
+  }
+
   if (location.search !== '') {
     return null
   }
@@ -330,6 +380,7 @@ export const PopulationSearchForm = ({ onProgress }) => {
     <Form error={invalidQuery}>
       {renderEnrollmentDateSelector()}
       {renderStudyProgrammeSelector()}
+      {renderStudyTrackSelector()}
       <Message color="blue" error header={errorMessage} />
       <Form.Button color="blue" disabled={invalidQuery} onClick={handleSubmit}>
         See class
