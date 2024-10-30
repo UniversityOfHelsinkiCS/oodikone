@@ -95,6 +95,7 @@ export const populationStatisticsToolTips = {
 
   - **Class of**: lukuvuosi, jolloin opiskelija on ilmoittautunut ensimmäisen kerran (läsnä- tai poissaolevaksi) ohjelmaan. Ilmoittautumisen opinto-oikeus voi olla ensi- tai toissijainen.
   - **Study programme**: haluttu koulutusohjelma. Kiinnitetyt (suosikeiksi valitut) ohjelmat näkyvät ensimmäisinä valikossa. Kiinnitys on mahdollista koulutusohjelmalistauksessa.
+  - **Study track**: (valinnainen) koulutusohjelman opintosuunta. Valittavissa vain, jos ohjelmalla on opintosuuntia.
   `,
   StudentsGuidanceGroups: `**Students**
 
