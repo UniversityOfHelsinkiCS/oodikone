@@ -284,8 +284,8 @@ describe('Course Statistics', () => {
   it('Programme filter works', () => {
     runTestStepWithPreAndPostParts('Programme', () => {
       const card = cy.cs('Programme-filter-card')
-      const programmeDropdown = card.cs('Programme-filter-dropdown').selectFromDropdown(2)
-      checkFilteringResult(30)
+      const programmeDropdown = card.cs('Programme-filter-dropdown').selectFromDropdown(1)
+      checkFilteringResult(33)
       programmeDropdown.get('i.delete').click()
     })
   })
