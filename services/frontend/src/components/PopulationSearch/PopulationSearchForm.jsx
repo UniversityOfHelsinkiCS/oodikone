@@ -122,14 +122,18 @@ export const PopulationSearchForm = ({ onProgress }) => {
   const handleProgrammeChange = (_event, { value: programme }) => {
     setQuery({
       ...query,
-      studyRights: programme === '' ? {} : { ...query.studyRights, programme },
+      studyRights:
+        programme === ''
+          ? { ...query.studyRights, studyTrack: undefined, programme: undefined }
+          : { ...query.studyRights, studyTrack: undefined, programme },
     })
   }
 
   const handleStudyTrackChange = (_event, { value: studyTrack }) => {
     setQuery({
       ...query,
-      studyRights: studyTrack === '' ? {} : { ...query.studyRights, studyTrack },
+      studyRights:
+        studyTrack === '' ? { ...query.studyRights, studyTrack: undefined } : { ...query.studyRights, studyTrack },
     })
   }
 
