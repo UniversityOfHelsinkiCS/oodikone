@@ -368,20 +368,13 @@ export const PopulationSearchForm = ({ onProgress }) => {
     return null
   }
 
-  let invalidQuery = false
-  let errorMessage
-
-  if (!query.studyRights.programme) {
-    invalidQuery = true
-    errorMessage = 'Select study programme'
-  }
+  const invalidQuery = !query.studyRights.programme
 
   return (
     <Form error={invalidQuery}>
       {renderEnrollmentDateSelector()}
       {renderStudyProgrammeSelector()}
       {renderStudyTrackSelector()}
-      <Message color="blue" error header={errorMessage} />
       <Form.Button color="blue" disabled={invalidQuery} onClick={handleSubmit}>
         See class
       </Form.Button>
