@@ -48,6 +48,14 @@ describe('Population Statistics tests', () => {
         .contains('Matematiikan ja tilastotieteen maisteriohjelma')
         .click()
       cy.contains('See class').should('be.enabled')
+
+      cy.contains('Select study track')
+      cy.get('[data-cy=select-study-track]')
+        .click()
+        .children()
+        .contains('Matematiikka ja soveltava matematiikka')
+        .click()
+      cy.contains('See class').should('be.enabled')
     })
 
     it('Searching for population really shows population', () => {
@@ -105,14 +113,14 @@ describe('Population Statistics tests', () => {
         expect(response.body).to.have.property('allStudents')
         expect(response.body).to.have.property('coursestatistics')
         expect(response.body.allStudents).to.equal(27)
-        expect(response.body.coursestatistics.some(stat => stat.course.code === 'DIGI-100')).to.be.true
+        expect(response.body.coursestatistics.some(stat => stat.course.code === 'DIGI-100')).to.equal(true)
       })
       cy.get('[data-cy=curriculum-picker]').click().contains('2023 - 2026').click()
       cy.wait('@courseData').then(({ response }) => {
         expect(response.body).to.have.property('allStudents')
         expect(response.body).to.have.property('coursestatistics')
         expect(response.body.allStudents).to.equal(27)
-        expect(response.body.coursestatistics.some(stat => stat.course.code === 'DIGI-100')).to.be.not.true
+        expect(response.body.coursestatistics.some(stat => stat.course.code === 'DIGI-100')).to.equal(false)
       })
     })
 
