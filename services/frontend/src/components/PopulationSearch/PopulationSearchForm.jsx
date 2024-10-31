@@ -327,15 +327,18 @@ export const PopulationSearchForm = ({ onProgress }) => {
   const renderStudyTrackSelector = () => {
     const studyTracksAvailable = Object.values(studyTracks).length > 1 && !studyTracksAreLoading
     const studyTracksToRender = studyTracksAvailable
-      ? Object.keys(studyTracks)
-          .filter(studyTrack => studyTrack !== query.studyRights.programme)
-          .map(studyTrack => ({
-            code: studyTrack,
-            description: studyTrack,
-            icon: null,
-            text: getTextIn(studyTracks[studyTrack]),
-            value: studyTrack,
-          }))
+      ? sortBy(
+          Object.keys(studyTracks)
+            .filter(studyTrack => studyTrack !== query.studyRights.programme)
+            .map(studyTrack => ({
+              code: studyTrack,
+              description: studyTrack,
+              icon: null,
+              text: getTextIn(studyTracks[studyTrack]),
+              value: studyTrack,
+            })),
+          'text'
+        )
       : []
 
     return (

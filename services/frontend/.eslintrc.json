@@ -29,9 +29,10 @@
         "project": ["./services/frontend/tsconfig.json", "./services/frontend/tsconfig.node.json"]
       },
       "rules": {
-        "import/prefer-default-export": "off",
         "@typescript-eslint/no-explicit-any": "off",
-        "@typescript-eslint/no-unnecessary-type-assertion": "error"
+        "@typescript-eslint/no-unnecessary-type-assertion": "error",
+        "import/prefer-default-export": "off",
+        "react/require-default-props": "off"
       }
     }
   ],

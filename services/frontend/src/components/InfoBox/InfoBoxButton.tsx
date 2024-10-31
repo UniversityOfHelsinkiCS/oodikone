@@ -1,12 +1,17 @@
 import { Button, Icon } from 'semantic-ui-react'
 
-export const InfoBoxButton = ({ cypress, toggleOpen }) => {
+interface InfoBoxButtonProps {
+  cypress?: string
+  toggleOpen?: () => void
+}
+
+export const InfoBoxButton = ({ cypress, toggleOpen }: InfoBoxButtonProps) => {
   return (
     <Button
       basic
       className="ok-infobox-collapsed"
       color="green"
-      data-cy={`${cypress}-open-info`}
+      data-cy={cypress ? `${cypress}-open-info` : undefined}
       icon
       labelPosition="left"
       onClick={toggleOpen}
