@@ -58,9 +58,10 @@ export const PopulationSearchForm = ({ onProgress }) => {
           },
         }
       : programmes
-  const { data: studyTracks = {}, isLoading: studyTracksAreLoading } = useGetStudyTracksQuery({
-    id: query.studyRights.programme,
-  })
+  const { data: studyTracks = {}, isLoading: studyTracksAreLoading } = useGetStudyTracksQuery(
+    { id: query.studyRights.programme },
+    { skip: query.studyRights.programme == null }
+  )
   const { data: studyProgrammePins } = useGetStudyProgrammePinsQuery()
   const pinnedProgrammes = studyProgrammePins?.studyProgrammes || []
 
