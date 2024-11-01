@@ -114,7 +114,7 @@ export const StudyrightsTable = ({ handleStudyPlanChange, student, selectedStudy
                 {header}
                 {header === 'Status' && (
                   <HoverableHelpPopup
-                    content={<ReactMarkdown>{studentToolTips.StudyrightStatus}</ReactMarkdown>}
+                    content={<ReactMarkdown>{studentToolTips.studyRightStatus}</ReactMarkdown>}
                     size="mini"
                     style={{ marginLeft: '0.25rem' }}
                   />

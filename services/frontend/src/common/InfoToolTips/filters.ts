@@ -4,7 +4,7 @@ export const filterToolTips = {
     short:
       'Suodata opiskelijoita sen mukaan ovatko he joko ilmoittautuneet läsnä- tai poissaoleviksi tai jääneet passiivisiksi kyseiselle lukukaudelle. Huom. osa passiivisista opiskelijoista on jo valmistunut ko. ohjelmasta.',
   },
-  studyrightStatus: {
+  studyRightStatus: {
     label: 'Rajaa opiskelijoita opiskeluoikeuden statuksen mukaan',
     short: `
   Opiskeluoikeus on **aktiivinen** (active), jos opiskelija on ilmoittautunut läsnä- tai poissaolevaksi käynnissä olevalle lukukaudelle.

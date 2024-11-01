@@ -1,6 +1,6 @@
-import { studyProgrammeToolTips } from './studyprogramme'
+import { studyProgrammeToolTips } from './studyProgramme'
 
-export const facultyToolTips = {
+export const facultyToolTips: Record<string, string> = {
   ProgrammeToggle: `
   **New study programmes**: Näyttää kaikissa luvuissa ja kuvaajissa pelkästään uuden opetussuunnitelman ohjelmat.  
   **All study programmes**: Näyttää kaikissa luvuissa ja kuvaajissa kuvaajissa myös vanhan opetussuunnitelman ohjelmat.

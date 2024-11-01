@@ -72,7 +72,7 @@ export const studyrightStatusFilter = createFilter({
 
   title: 'Studyright status',
 
-  info: filterToolTips.studyrightStatus,
+  info: filterToolTips.studyRightStatus,
 
   defaultOptions: {
     activeProgramme: null,

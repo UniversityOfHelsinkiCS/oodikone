@@ -1,4 +1,4 @@
-export const studyProgrammeToolTips = {
+export const studyProgrammeToolTips: Record<string, string> = {
   YearToggle: `
   **Calendar year**: Näyttää tilastot kalenterivuosille jaoteltuna (esim. 1.1.–31.12.2024)  
   **Academic year**: Näyttää tilastot lukuvuosille jaoteltuna (esim. 1.8.2023–31.7.2024)
@@ -146,7 +146,7 @@ studyProgrammeToolTips.StudyTrackOverviewCombinedProgramme = studyProgrammeToolT
     '- **Graduated**: Koulutusohjelmasta valmistuneet opiskelijat',
     '- **Graduated bachelor**: Kandidaatiksi valmistuneet opiskelijat\n  - **Graduated licentiate**: Lisensiaatiksi valmistuneet opiskelijat'
   )
-  .replaceAll('valmistuneet koulutusohjelmasta', 'valmistuneet lisensiaatiksi')
+  .replace(/valmistuneet koulutusohjelmasta/g, 'valmistuneet lisensiaatiksi')
   .replace(
     'kentän **All** arvon.',
     'kentän **All** arvon (lukuun ottamatta *Current status* -kategorian **Graduated bachelor** -saraketta).'
