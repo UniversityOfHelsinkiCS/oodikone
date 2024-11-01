@@ -133,7 +133,6 @@ export const AccessRights = ({ user }) => {
         </div>
         <FilterOldProgrammesToggle
           checked={filterOldProgrammes}
-          marginTop="0"
           onChange={() => setFilterOldProgrammes(!filterOldProgrammes)}
         />
       </div>
