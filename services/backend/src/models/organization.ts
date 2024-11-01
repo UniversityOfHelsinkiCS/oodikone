@@ -12,7 +12,7 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
-import { Name } from '../types'
+import { Name } from '../shared/types'
 import { Course, CourseProvider, ProgrammeModule, SISStudyRight } from '.'
 
 @Table({

@@ -1,4 +1,5 @@
-import { EnrollmentState, Name } from '../../types'
+import { Name } from '../../shared/types'
+import { EnrollmentState } from '../../types'
 import { lengthOf, percentageOf } from '../../util'
 
 const fall: string[] = []

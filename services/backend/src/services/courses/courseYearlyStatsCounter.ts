@@ -1,4 +1,4 @@
-import { Name } from '../../types'
+import { Name } from '../../shared/types'
 import { FormattedProgramme, OrganizationDetails } from './helpers'
 
 type Programme = {

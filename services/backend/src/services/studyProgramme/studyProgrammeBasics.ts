@@ -1,6 +1,7 @@
 import { indexOf } from 'lodash'
 
-import { EnrollmentType, Name, SemesterEnrollment } from '../../types'
+import { Name } from '../../shared/types'
+import { EnrollmentType, SemesterEnrollment } from '../../types'
 import { getSemestersAndYears } from '../semesters'
 import {
   defineYear,

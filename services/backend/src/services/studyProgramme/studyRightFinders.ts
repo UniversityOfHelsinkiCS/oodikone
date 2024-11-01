@@ -1,7 +1,8 @@
 import { col, fn, Includeable, Op } from 'sequelize'
 
 import { Student, SISStudyRight, SISStudyRightElement, Credit } from '../../models'
-import { CreditTypeCode, Name } from '../../types'
+import { Name } from '../../shared/types'
+import { CreditTypeCode } from '../../types'
 
 export const getStudyRightsInProgramme = async (
   programmeCode: string,

@@ -1,7 +1,8 @@
 import { QueryTypes } from 'sequelize'
 
 import { dbConnections } from '../../database/connection'
-import { ExtentCode, Name } from '../../types'
+import { Name } from '../../shared/types'
+import { ExtentCode } from '../../types'
 import logger from '../../util/logger'
 
 const { sequelize } = dbConnections

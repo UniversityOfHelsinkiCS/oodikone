@@ -1,5 +1,6 @@
+import { Name } from '../../shared/types'
 import { formatQueryParamsToArrays } from '../../shared/util'
-import { Criteria, DegreeProgrammeType, Name } from '../../types'
+import { Criteria, DegreeProgrammeType } from '../../types'
 import { getDegreeProgrammeType } from '../../util'
 import { getCriteria } from '../studyProgramme/studyProgrammeCriteria'
 import { getStudentsIncludeCoursesBetween } from './getStudentsIncludeCoursesBetween'

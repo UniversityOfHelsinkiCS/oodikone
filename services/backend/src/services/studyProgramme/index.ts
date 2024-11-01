@@ -3,7 +3,8 @@ import { Op, QueryTypes } from 'sequelize'
 
 import { dbConnections } from '../../database/connection'
 import { Course, Credit, Enrollment, Organization, ProgrammeModule } from '../../models'
-import { CreditTypeCode, EnrollmentState, Name } from '../../types'
+import { Name } from '../../shared/types'
+import { CreditTypeCode, EnrollmentState } from '../../types'
 import logger from '../../util/logger'
 
 export const getAllProgrammeCourses = async (providerCode: string) => {
