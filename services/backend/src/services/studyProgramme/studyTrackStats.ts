@@ -7,7 +7,7 @@ import { createLocaleComparator, keysOf } from '../../util'
 import { countTimeCategories } from '../graduationHelpers'
 import { getSemestersAndYears } from '../semesters'
 import { getDateOfFirstSemesterPresent } from './studyProgrammeBasics'
-import { calculateDurationOfStudies } from './studyProgrammeGraduations'
+import { calculateDurationOfStudies, shouldIncludeComboStats } from './studyProgrammeGraduations'
 import {
   defineYear,
   getGoal,
@@ -194,6 +194,7 @@ const getMainStatsByTrackAndYear = async (
   studyProgramme: string,
   includeGraduated: boolean,
   includeAllSpecials: boolean,
+  doCombo: boolean,
   studyRightsOfProgramme: Array<InferAttributes<SISStudyRight>>,
   combinedProgramme?: string
 ) => {
@@ -202,7 +203,6 @@ const getMainStatsByTrackAndYear = async (
   const { semesters } = await getSemestersAndYears()
   const { semestercode: currentSemester } = Object.values(semesters).find(semester => semester.enddate >= new Date())!
 
-  const doCombo = studyProgramme.startsWith('MH') && !['MH30_001', 'MH30_003'].includes(studyProgramme)
   const graduationTimes: Record<string, Record<string, number[]>> = {}
   const graduationTimesCombo: Record<string, Record<string, number[]>> = {}
   const graduationTimesCombinedProgrammeCombo: Record<string, Record<string, number[]>> = {}
@@ -481,12 +481,13 @@ export const getStudyTrackStatsForStudyProgramme = async ({
 
   const studyTracks = await getStudyTracksForProgramme(studyProgramme)
 
-  const doCombo = studyProgramme.startsWith('MH') && !['MH30_001', 'MH30_003'].includes(studyProgramme)
+  const doCombo = await shouldIncludeComboStats(studyProgramme)
   const stats = await getMainStatsByTrackAndYear(
     years,
     studyProgramme,
     settings.graduated,
     settings.specialGroups,
+    doCombo,
     studyRightsOfProgramme,
     combinedProgramme
   )

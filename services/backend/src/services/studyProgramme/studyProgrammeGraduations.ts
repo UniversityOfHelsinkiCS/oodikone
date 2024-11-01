@@ -3,7 +3,7 @@ import moment from 'moment'
 
 import { mapToProviders } from '../../shared/util'
 import { DegreeProgrammeType, ExtentCode, Name, SemesterEnrollment, StudyTrack } from '../../types'
-import { getDegreeProgrammeType, sortByProgrammeCode } from '../../util'
+import { getDegreeProgrammeType, getMinimumCreditsOfProgramme, sortByProgrammeCode } from '../../util'
 import { countTimeCategories } from '../graduationHelpers'
 import { getSemestersAndYears } from '../semesters'
 import { getThesisCredits } from './creditGetters'
@@ -22,6 +22,19 @@ import {
   hasTransferredFromOrToProgramme,
 } from './studyProgrammeHelpers'
 import { getStudyRightsInProgramme } from './studyRightFinders'
+
+/**
+ * For bachelor + master study right combo. This rules out master's programmes that don't
+ * follow the two-phase degree structure (e.g. degree programmes in medicine and dentistry)
+ */
+export const shouldIncludeComboStats = async (studyProgramme: string) => {
+  const degreeProgrammeType = await getDegreeProgrammeType(studyProgramme)
+  if (degreeProgrammeType !== DegreeProgrammeType.MASTER) {
+    return false
+  }
+  const minimumCredits = await getMinimumCreditsOfProgramme(studyProgramme)
+  return minimumCredits !== null && minimumCredits <= 180
+}
 
 const calculateAbsenceInMonths = (
   absence: Awaited<ReturnType<typeof getSemestersAndYears>>['semesters'][string],
@@ -87,8 +100,7 @@ const getGraduationTimeAndThesisWriterStats = async ({
       thesisTableStats: tableStats,
     }
   }
-  // for bc+ms combo
-  const doCombo = studyProgramme.startsWith('MH') && !['MH30_001', 'MH30_003'].includes(studyProgramme)
+  const doCombo = await shouldIncludeComboStats(studyProgramme)
   const graduationTimes: Record<string, number[]> = getYearsObject({ years, emptyArrays: true })
   const graduationTimesCombo: Record<string, number[]> = getYearsObject({ years, emptyArrays: true })
   const { semesters } = await getSemestersAndYears()

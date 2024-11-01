@@ -93,3 +93,11 @@ export const getDegreeProgrammeType = async (programmeCode: string) => {
   })
   return programmeModule ? programmeModule.degreeProgrammeType : null
 }
+
+export const getMinimumCreditsOfProgramme = async (programmeCode: string) => {
+  const programmeModule = await ProgrammeModule.findOne({
+    attributes: ['minimumCredits'],
+    where: { code: programmeCode },
+  })
+  return programmeModule ? programmeModule.minimumCredits : null
+}
