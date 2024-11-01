@@ -168,7 +168,7 @@ export const AccessRights = ({ user }) => {
             content={`Current IAM group based study programme access rights (${currentIamAccessRights.length})`}
             size="small"
           />
-          <InfoBox content={userToolTips.IamGroupBasedAccess} />
+          <InfoBox content={userToolTips.iamGroupBasedAccess} />
           <List divided>
             {currentIamAccessRights.map(({ code, name, limited }) => (
               <List.Item key={code}>

@@ -116,7 +116,7 @@ export const UniversityView = ({ isEvaluationOverview }) => {
           {getDivider(
             'Progress of students of the university',
             'BachelorStudentsOfTheFacultyByStartingYear',
-            facultyToolTips.StudentProgress,
+            facultyToolTips.studentProgress,
             'InfoFacultyProgress'
           )}
           <div className="toggle-container">
@@ -125,7 +125,7 @@ export const UniversityView = ({ isEvaluationOverview }) => {
               firstLabel="Graduated included"
               secondLabel="Graduated excluded"
               setValue={setGraduatedGroup}
-              toolTips={facultyToolTips.GraduatedToggle}
+              toolTips={facultyToolTips.graduatedToggle}
               value={graduatedGroup}
             />
             {!isEvaluationOverview && (
@@ -134,14 +134,14 @@ export const UniversityView = ({ isEvaluationOverview }) => {
                 firstLabel="All study rights"
                 secondLabel="Special study rights excluded"
                 setValue={() => setIncludeSpecials(!excludeSpecials)}
-                toolTips={facultyToolTips.StudentToggle}
+                toolTips={facultyToolTips.studentToggle}
                 value={excludeSpecials}
               />
             )}
           </div>
           <FacultyProgress faculty="ALL" getDivider={getDivider} progressStats={progressStats} />
         </div>
-        {getDivider('Average graduation times', 'AverageGraduationTimes', facultyToolTips.AverageGraduationTimes)}
+        {getDivider('Average graduation times', 'AverageGraduationTimes', facultyToolTips.averageGraduationTimes)}
         <div className="toggle-container">
           <Toggle
             cypress="GraduationTimeToggle"

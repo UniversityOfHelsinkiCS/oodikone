@@ -80,7 +80,7 @@ const SingleStudyGroupContent = ({ filteredStudents, group }) => {
       title: `Credit accumulation (for ${filteredStudents.length} students)`,
       content: (
         <>
-          <InfoBox content={populationStatisticsToolTips.CreditAccumulation} />
+          <InfoBox content={populationStatisticsToolTips.creditAccumulation} />
           {group.tags?.year && (
             <Button onClick={() => toggleCreditDateFilter()} primary>
               {creditDateFilterActive ? 'Show all credits' : 'Show starting from associated year'}

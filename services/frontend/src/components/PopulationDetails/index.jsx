@@ -50,7 +50,7 @@ export const PopulationDetails = ({
     )
     return (
       <>
-        <InfoBox content={populationStatisticsToolTips.CreditAccumulation} />
+        <InfoBox content={populationStatisticsToolTips.creditAccumulation} />
         {filteredStudents.length > 0 && graphs}
       </>
     )

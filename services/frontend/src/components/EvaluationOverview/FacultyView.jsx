@@ -106,8 +106,8 @@ export const FacultyView = ({ faculty }) => {
               <>
                 {getDivider(
                   'Progress of students of the faculty ',
-                  'BachelorStudentsOfTheFacultyByStartingYear',
-                  facultyToolTips.StudentProgress,
+                  'bachelorStudentsOfTheFacultyByStartingYear',
+                  facultyToolTips.studentProgress,
                   'InfoFacultyProgress'
                 )}
                 <div className="toggle-container">
@@ -116,7 +116,7 @@ export const FacultyView = ({ faculty }) => {
                     firstLabel="Graduated included"
                     secondLabel="Graduated excluded"
                     setValue={setGraduatedGroup}
-                    toolTips={facultyToolTips.GraduatedToggle}
+                    toolTips={facultyToolTips.graduatedToggle}
                     value={graduatedGroup}
                   />
                 </div>
@@ -127,8 +127,8 @@ export const FacultyView = ({ faculty }) => {
               <>
                 {getDivider(
                   'Average graduation times',
-                  'AverageGraduationTimes',
-                  facultyToolTips.AverageGraduationTimes
+                  'averageGraduationTimes',
+                  facultyToolTips.averageGraduationTimes
                 )}
                 <div className="toggle-container">
                   <Toggle

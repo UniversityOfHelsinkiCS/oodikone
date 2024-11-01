@@ -212,19 +212,19 @@ export const PopulationStudentsContainer = ({ ...props }) => {
           !['MH30_001', 'MH30_003'].includes(props.programmeCode))
           ? ['General', 'Courses', 'Tags']
           : ['General', 'Courses', 'Tags', 'Progress'],
-      infotoolTipContent: populationStatisticsToolTips.StudentsClass,
+      infotoolTipContent: populationStatisticsToolTips.studentsClass,
     },
     coursePopulation: {
       panesToInclude: ['General'],
-      infotoolTipContent: coursePopulationToolTips.Students,
+      infotoolTipContent: coursePopulationToolTips.students,
     },
     customPopulation: {
       panesToInclude: ['General'],
-      infotoolTipContent: populationStatisticsToolTips.StudentsCustom,
+      infotoolTipContent: populationStatisticsToolTips.studentsCustom,
     },
     studyGuidanceGroupPopulation: {
       panesToInclude: getTabs(props.studyGuidanceGroup?.tags?.studyProgramme),
-      infotoolTipContent: populationStatisticsToolTips.StudentsGuidanceGroups,
+      infotoolTipContent: populationStatisticsToolTips.studentsGuidanceGroups,
     },
   }
 

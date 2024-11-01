@@ -76,11 +76,11 @@ export const PopulationCourses = ({
       <div style={{ display: 'flex' }}>
         {courseTableMode === 'curriculum' ? (
           <div style={{ marginBottom: '20px', marginRight: '10px' }}>
-            <InfoBox content={populationStatisticsToolTips.CoursesOfClass} />
+            <InfoBox content={populationStatisticsToolTips.coursesOfClass} />
           </div>
         ) : (
           <div style={{ marginBottom: '20px', marginRight: '10px' }}>
-            <InfoBox content={populationStatisticsToolTips.CoursesOfPopulation} />
+            <InfoBox content={populationStatisticsToolTips.coursesOfPopulation} />
           </div>
         )}
         {query.studyRights.programme && !onlyIamRights && (

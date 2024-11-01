@@ -182,7 +182,7 @@ export const BasicOverview = ({
           firstLabel="Calendar year"
           secondLabel="Academic year"
           setValue={setAcademicYear}
-          toolTips={facultyToolTips.YearToggle}
+          toolTips={facultyToolTips.yearToggle}
           value={academicYear}
         />
         <Toggle
@@ -190,7 +190,7 @@ export const BasicOverview = ({
           firstLabel="New study programmes"
           secondLabel="All study programmes"
           setValue={setStudyProgrammes}
-          toolTips={facultyToolTips.ProgrammeToggle}
+          toolTips={facultyToolTips.programmeToggle}
           value={studyProgrammes}
         />
         <Toggle
@@ -198,7 +198,7 @@ export const BasicOverview = ({
           firstLabel="All study rights"
           secondLabel="Special study rights excluded"
           setValue={setSpecialGroups}
-          toolTips={facultyToolTips.StudentToggle}
+          toolTips={facultyToolTips.studentToggle}
           value={specialGroups}
         />
       </div>
@@ -220,7 +220,7 @@ export const BasicOverview = ({
           )}
           {basics.isSuccess && basics.data && (
             <>
-              {getDivider('Students of the faculty', 'StudentsOfTheFaculty')}
+              {getDivider('Students of the faculty', 'studentsOfTheFaculty')}
               <div className="section-container">
                 <LineGraph
                   cypress="StudentsOfTheFaculty"
@@ -261,7 +261,7 @@ export const BasicOverview = ({
           )}
           {basics.isSuccess && basics.data && (
             <>
-              {getDivider('Graduated of the faculty', 'GraduatedOfTheFaculty')}
+              {getDivider('Graduated of the faculty', 'graduatedOfTheFaculty')}
               <div className="section-container">
                 <LineGraph
                   cypress="GraduatedOfTheFaculty"
@@ -300,7 +300,7 @@ export const BasicOverview = ({
           )}
           {thesisWriters.isSuccess && thesisWriters.data && (
             <>
-              {getDivider('Thesis writers of the faculty', 'ThesisWritersOfTheFaculty')}
+              {getDivider('Thesis writers of the faculty', 'thesisWritersOfTheFaculty')}
               <div className="section-container">
                 <LineGraph
                   cypress="ThesisWritersOfTheFaculty"
@@ -339,7 +339,7 @@ export const BasicOverview = ({
           )}
           {credits.isSuccess && credits.data && (
             <>
-              {getDivider('Credits produced by the faculty', 'CreditsProducedByTheFaculty')}
+              {getDivider('Credits produced by the faculty', 'creditsProducedByTheFaculty')}
               <div className="original-toggle-container">
                 <Radio checked={showAll} label="Show special categories" onChange={() => setShowAll(!showAll)} toggle />
               </div>
