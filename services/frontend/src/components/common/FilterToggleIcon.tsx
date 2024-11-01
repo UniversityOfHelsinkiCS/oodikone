@@ -1,15 +1,19 @@
 import { Icon } from 'semantic-ui-react'
 
-import './filterToggleIcon.css'
-
 interface FilterToggleIconProps {
   isActive: boolean
   onClick: () => void
 }
 
 export const FilterToggleIcon = ({ isActive, onClick }: FilterToggleIconProps) => (
-  <span className={`flexIcon ${isActive ? 'active' : ''}`} style={{ cursor: 'pointer' }}>
+  <span style={{ alignItems: 'flex-end', cursor: 'pointer', display: 'inline-flex' }}>
     <Icon name="filter" onClick={onClick} />
-    <Icon name={isActive ? 'remove' : 'add'} onClick={onClick} size="tiny" />
+    <Icon
+      color={isActive ? 'red' : undefined}
+      name={isActive ? 'remove' : 'add'}
+      onClick={onClick}
+      size="tiny"
+      style={{ marginLeft: '-9px' }}
+    />
   </span>
 )
