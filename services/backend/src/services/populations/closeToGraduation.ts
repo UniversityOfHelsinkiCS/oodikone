@@ -1,8 +1,7 @@
 import { col, Op } from 'sequelize'
 
-import { Course, Credit, Organization, Student, Studyplan, SISStudyRight, SISStudyRightElement } from '../../models'
+import { Course, Credit, Student, Studyplan, SISStudyRight, SISStudyRightElement } from '../../models'
 import { Name } from '../../shared/types'
-import { mapToProviders } from '../../shared/util'
 import { CreditTypeCode, DegreeProgrammeType, ExtentCode, SemesterEnrollment } from '../../types'
 import { redisClient } from '../redis'
 import { getCurriculumVersion } from './shared'
@@ -48,15 +47,23 @@ type AccumulatorType = {
   }
 }
 
-const findThesisAndLatestAttainments = (studyPlan: Studyplan, attainments: Credit[], providerCode: string) => {
-  let thesisData
+const findThesisAndLatestAttainments = (
+  studyPlan: Studyplan,
+  attainments: Credit[],
+  degreeProgrammeType: DegreeProgrammeType,
+  studyRightId: string
+) => {
+  let thesisData: Credit | undefined
   const latestAttainmentDates: LatestAttainmentDates = {}
-  const thesisCodes = ['urn:code:course-unit-type:bachelors-thesis', 'urn:code:course-unit-type:masters-thesis']
+  const thesisCodes = {
+    [DegreeProgrammeType.BACHELOR]: 'urn:code:course-unit-type:bachelors-thesis',
+    [DegreeProgrammeType.MASTER]: 'urn:code:course-unit-type:masters-thesis',
+  }
 
   for (const attainment of attainments) {
     if (
-      thesisCodes.includes(attainment.course?.course_unit_type) &&
-      attainment.course.organizations.some(org => org.code === providerCode)
+      attainment.course?.course_unit_type === thesisCodes[degreeProgrammeType] &&
+      attainment.studyright_id === studyRightId
     ) {
       thesisData = attainment
     }
@@ -86,7 +93,13 @@ const formatStudent = (student: Student) => {
   } = student
   return student.studyplans.reduce<AccumulatorType[]>((acc, studyPlan) => {
     const { studyRight } = studyPlan
-    const { studyRightElements, startDate: startOfStudyright, extentCode, semesterEnrollments } = studyRight
+    const {
+      id: studyRightId,
+      studyRightElements,
+      startDate: startOfStudyright,
+      extentCode,
+      semesterEnrollments,
+    } = studyRight
 
     const {
       code: programmeCode,
@@ -95,11 +108,11 @@ const formatStudent = (student: Student) => {
       startDate: programmeStartDate,
       degreeProgrammeType,
     } = studyRightElements[0]
-    const programmeCodeToProviderCode = mapToProviders([programmeCode])[0]
     const { latestAttainmentDates, thesisData } = findThesisAndLatestAttainments(
       studyPlan,
       student.credits,
-      programmeCodeToProviderCode
+      degreeProgrammeType,
+      studyRightId
     )
 
     acc.push({
@@ -174,7 +187,7 @@ export const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =
             {
               model: SISStudyRight,
               as: 'studyRight',
-              attributes: ['semesterEnrollments', 'startDate', 'extentCode'],
+              attributes: ['id', 'semesterEnrollments', 'startDate', 'extentCode'],
               where: { cancelled: false },
               include: [
                 {
@@ -188,6 +201,9 @@ export const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =
                     '$studyplans.programme_code$': {
                       [Op.eq]: col('studyplans->studyRight->studyRightElements.code'),
                     },
+                    degreeProgrammeType: {
+                      [Op.in]: [DegreeProgrammeType.BACHELOR, DegreeProgrammeType.MASTER],
+                    },
                   },
                   attributes: ['code', 'name', 'startDate', 'studyTrack', 'degreeProgrammeType'],
                 },
@@ -197,21 +213,12 @@ export const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =
         },
         {
           model: Credit,
-          attributes: ['attainment_date', 'grade'],
+          attributes: ['attainment_date', 'grade', 'studyright_id'],
           where: { credittypecode: CreditTypeCode.PASSED },
           include: [
             {
               model: Course,
               attributes: ['code', 'course_unit_type'],
-              include: [
-                {
-                  model: Organization,
-                  attributes: ['code'],
-                  through: {
-                    attributes: [],
-                  },
-                },
-              ],
             },
           ],
         },
@@ -238,7 +245,7 @@ export const getCloseToGraduationData = async (studentNumbers?: string[]) => {
     if (dataOnRedis) {
       return JSON.parse(dataOnRedis)
     }
-    const freshData = await findStudentsCloseToGraduation()
+    const freshData = { ...(await findStudentsCloseToGraduation()), lastUpdated: new Date().toISOString() }
     await redisClient.set(CLOSE_TO_GRADUATION_REDIS_KEY, JSON.stringify(freshData))
     return freshData
   }

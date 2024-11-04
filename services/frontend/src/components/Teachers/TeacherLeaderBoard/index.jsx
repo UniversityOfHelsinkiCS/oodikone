@@ -2,7 +2,9 @@ import moment from 'moment'
 import { useState } from 'react'
 import { Message, Segment } from 'semantic-ui-react'
 
+import { LONG_DATE_TIME_FORMAT } from '@/constants/date'
 import { useGetTopTeachersCategoriesQuery, useGetTopTeachersQuery } from '@/redux/teachers'
+import { reformatDate } from '@/util/timeAndDate'
 import { TeacherStatisticsTable } from '../TeacherStatisticsTable'
 import { LeaderForm } from './LeaderForm'
 
@@ -47,11 +49,6 @@ export const TeacherLeaderBoard = () => {
     text: name,
   }))
 
-  const lastUpdated = new Date(topTeachers?.updated).toLocaleString(undefined, {
-    dateStyle: 'long',
-    timeStyle: 'medium',
-  })
-
   return (
     <div>
       <Message>
@@ -68,7 +65,9 @@ export const TeacherLeaderBoard = () => {
         yearoptions={yearOptions}
       />
       <Segment loading={statsAreLoading}>
-        {topTeachers.stats?.length > 0 && <Message>{`Last updated: ${lastUpdated}`}</Message>}
+        {topTeachers.stats?.length > 0 && (
+          <Message>{`Last updated: ${reformatDate(topTeachers?.updated, LONG_DATE_TIME_FORMAT)}`}</Message>
+        )}
         <TeacherStatisticsTable statistics={topTeachers.stats ?? []} variant="leaderboard" />
       </Segment>
     </div>

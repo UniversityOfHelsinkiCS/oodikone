@@ -275,7 +275,7 @@ const courseMapper = courseIdToAttainments => (groupedCourse, substitutions) => 
     coursetypecode,
     min_attainment_date,
     max_attainment_date,
-    is_study_module: false, // VALIDATE THIS PLS
+    is_study_module: course_unit_type == null, // Only course units have a course_unit_type so if it's null, it must be a study module
     substitutions,
     course_unit_type,
   }
