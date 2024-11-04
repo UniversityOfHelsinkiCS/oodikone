@@ -1,5 +1,5 @@
 export const courseStatisticsToolTips = {
-  Tables: {
+  tables: {
     ATTEMPTS: `
       **Table - Attempts**
 
@@ -23,7 +23,7 @@ export const courseStatisticsToolTips = {
       Total-rivillä näkyy niiden opiskelijoiden kokonaismäärä, jotka ovat saaneet kurssista joskus arvosanan.
     `,
   },
-  PassRate: {
+  passRate: {
     ATTEMPTS: `
       **Pass rate - Attempts**
 
@@ -44,7 +44,7 @@ export const courseStatisticsToolTips = {
       Käyttämällä vipua "Show relative" saa näkyviin opiskelijoiden suhteellisen määrän.
     `,
   },
-  GradeDistribution: `
+  gradeDistribution: `
     **Grade distribution**
 
     Graafi näyttää suorituskertojen arvosanajakauman eri lukuvuosille. Arvosanaksi 0 lasketaan sekä hylätyt (Failed) arvosanat,

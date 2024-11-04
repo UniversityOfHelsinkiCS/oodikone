@@ -1,4 +1,4 @@
-// Replace with an enum when TypeScript is introduced
+// TODO: Replace with an enum
 
 export const DISPLAY_DATE_FORMAT = 'DD.MM.YYYY'
 export const DISPLAY_DATE_FORMAT_DEV = 'DD.MM.YYYY HH:mm:ss'

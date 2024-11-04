@@ -265,10 +265,12 @@ export const PopulationSearchForm = ({ onProgress }) => {
         </Form.Field>
         <Form.Field>
           {fullAccessToStudentData && (
-            <FilterOldProgrammesToggle
-              checked={filterProgrammes}
-              onChange={() => setFilterProgrammes(!filterProgrammes)}
-            />
+            <div style={{ marginTop: '20px' }}>
+              <FilterOldProgrammesToggle
+                checked={filterProgrammes}
+                onChange={() => setFilterProgrammes(!filterProgrammes)}
+              />
+            </div>
           )}
         </Form.Field>
       </Form.Group>

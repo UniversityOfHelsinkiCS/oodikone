@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Button, Icon, Message, Popup } from 'semantic-ui-react'
+
+import { formatContent } from '@/common'
 import { InfoBoxButton } from './InfoBoxButton'
 import './infoBox.css'
-
-const formatContent = (content: string) => content.replace(/\n +/g, '\n')
 
 interface InfoBoxProps {
   content: string
@@ -38,7 +38,7 @@ export const InfoBox = ({ content, cypress = '', popup = false }: InfoBoxProps) 
         <div className="content-container" data-cy={`${cypress}-info-content`}>
           <Icon name="info circle" size="huge" />
           <Message.Content className="ok-infobox content">
-            <ReactMarkdown>{content}</ReactMarkdown>
+            <ReactMarkdown>{formatContent(content)}</ReactMarkdown>
           </Message.Content>
         </div>
         <Button className="ok-infobox-close" data-cy={`${cypress}-close-info`} onClick={toggleOpen}>

@@ -99,7 +99,7 @@ export const TimesAndPathsView = ({ faculty, setStudyProgrammes, studyProgrammes
           </Divider>
         </div>
         <div style={{ marginBottom: '3em' }}>
-          <InfoBox content={facultyToolTips.AverageGraduationTimes} />
+          <InfoBox content={facultyToolTips.averageGraduationTimes} />
         </div>
         <Popup
           content="Download statistics as xlsx file"
@@ -175,7 +175,7 @@ export const TimesAndPathsView = ({ faculty, setStudyProgrammes, studyProgrammes
           firstLabel="New study programmes"
           secondLabel="All study programmes"
           setValue={setStudyProgrammes}
-          toolTips={facultyToolTips.ProgrammeToggle}
+          toolTips={facultyToolTips.programmeToggle}
           value={studyProgrammes}
         />
       </div>

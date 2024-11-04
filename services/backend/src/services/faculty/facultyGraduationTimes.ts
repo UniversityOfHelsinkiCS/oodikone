@@ -1,6 +1,7 @@
 import { cloneDeep, omit } from 'lodash'
 
-import { DegreeProgrammeType, Name } from '../../types'
+import { Name } from '../../shared/types'
+import { DegreeProgrammeType } from '../../types'
 import { getGraduationStats, getStudyTrackStats, setGraduationStats, setStudyTrackStats } from '../analyticsService'
 import { getGraduationStatsForStudyTrack, GraduationTimes } from '../studyProgramme/studyProgrammeGraduations'
 import { getMedian } from '../studyProgramme/studyProgrammeHelpers'

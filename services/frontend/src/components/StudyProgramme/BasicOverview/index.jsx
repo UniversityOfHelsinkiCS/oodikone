@@ -172,7 +172,7 @@ export const BasicOverview = ({
           )}
           {basics.isSuccess && basics.data && (
             <>
-              {getDivider('Students of the study programme', 'StudentsOfTheStudyProgramme')}
+              {getDivider('Students of the study programme', 'studentsOfTheStudyProgramme')}
               <div className="section-container">
                 <LineGraph
                   cypress="StudentsOfTheStudyProgramme"
@@ -189,7 +189,7 @@ export const BasicOverview = ({
           )}
           {credits?.data?.stats?.[studyprogramme]?.stats && (
             <>
-              {getDivider('Credits produced by the study programme', 'CreditsProducedByTheStudyProgramme')}
+              {getDivider('Credits produced by the study programme', 'creditsProducedByTheStudyProgramme')}
               <CreditsProduced
                 academicYear={academicYear}
                 data={credits?.data?.stats?.[studyprogramme]?.stats}
@@ -199,7 +199,7 @@ export const BasicOverview = ({
           )}
           {graduations.isSuccess && graduations.data && (
             <>
-              {getDivider(getGraduatedText(studyprogramme), 'GraduatedAndThesisWritersOfTheProgramme')}
+              {getDivider(getGraduatedText(studyprogramme), 'graduatedAndThesisWritersOfTheProgramme')}
               <div className="section-container">
                 <BarChart cypress="GraduatedAndThesisWritersOfTheProgramme" data={graduations?.data} />
                 <DataTable
@@ -208,7 +208,7 @@ export const BasicOverview = ({
                   titles={graduations?.data?.titles}
                 />
               </div>
-              {getDivider('Average graduation times by year of graduation', 'AverageGraduationTimes')}
+              {getDivider('Average graduation times by year of graduation', 'averageGraduationTimes')}
               <div className="toggle-container">
                 <Toggle
                   cypress="GraduationTimeToggle"
@@ -227,7 +227,7 @@ export const BasicOverview = ({
                     studyprogramme.includes('KH')
                       ? 'Primary master programme studies after this programme'
                       : 'Primary bachelor programme studies before this programme',
-                    'ProgrammesBeforeOrAfter'
+                    'programmesBeforeOrAfter'
                   )}
                   <div className="section-container">
                     <StackedBarChart

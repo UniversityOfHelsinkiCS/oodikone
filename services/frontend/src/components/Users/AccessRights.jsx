@@ -133,7 +133,6 @@ export const AccessRights = ({ user }) => {
         </div>
         <FilterOldProgrammesToggle
           checked={filterOldProgrammes}
-          marginTop="0"
           onChange={() => setFilterOldProgrammes(!filterOldProgrammes)}
         />
       </div>
@@ -168,7 +167,7 @@ export const AccessRights = ({ user }) => {
             content={`Current IAM group based study programme access rights (${currentIamAccessRights.length})`}
             size="small"
           />
-          <InfoBox content={userToolTips.IamGroupBasedAccess} />
+          <InfoBox content={userToolTips.iamGroupBasedAccess} />
           <List divided>
             {currentIamAccessRights.map(({ code, name, limited }) => (
               <List.Item key={code}>

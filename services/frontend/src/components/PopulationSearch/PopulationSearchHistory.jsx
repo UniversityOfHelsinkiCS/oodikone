@@ -132,7 +132,7 @@ export const PopulationSearchHistory = () => {
         <div>
           <PopulationQueryCard population={populations.data} query={populations.query} />
           <div style={{ marginLeft: '5px', marginTop: '15px' }}>
-            <InfoBox content={populationStatisticsToolTips.Advanced} />
+            <InfoBox content={populationStatisticsToolTips.advanced} />
           </div>
         </div>
         <div style={{ marginLeft: '100px' }}>

@@ -19,11 +19,11 @@ describe('Study programme overview', () => {
 
     // If the backend breaks for one of the sections, the section header is not rendered and this will fail
     it('Basic information tab loads', () => {
-      cy.get('[data-cy=Section-StudentsOfTheStudyProgramme]')
-      cy.get('[data-cy=Section-CreditsProducedByTheStudyProgramme]')
-      cy.get('[data-cy=Section-GraduatedAndThesisWritersOfTheProgramme]')
-      cy.get('[data-cy=Section-ProgrammesBeforeOrAfter]')
-      cy.get('[data-cy=Section-AverageGraduationTimes]')
+      cy.get('[data-cy=Section-studentsOfTheStudyProgramme]')
+      cy.get('[data-cy=Section-creditsProducedByTheStudyProgramme]')
+      cy.get('[data-cy=Section-graduatedAndThesisWritersOfTheProgramme]')
+      cy.get('[data-cy=Section-programmesBeforeOrAfter]')
+      cy.get('[data-cy=Section-averageGraduationTimes]')
     })
 
     it('Basic information contains correct students', () => {
@@ -775,11 +775,11 @@ describe('Study programme overview', () => {
     it('can access basic information', () => {
       cy.contains('Basic information').click()
 
-      cy.get('[data-cy=Section-StudentsOfTheStudyProgramme]')
-      cy.get('[data-cy=Section-CreditsProducedByTheStudyProgramme]')
-      cy.get('[data-cy=Section-GraduatedAndThesisWritersOfTheProgramme]')
-      cy.get('[data-cy=Section-ProgrammesBeforeOrAfter]')
-      cy.get('[data-cy=Section-AverageGraduationTimes]')
+      cy.get('[data-cy=Section-studentsOfTheStudyProgramme]')
+      cy.get('[data-cy=Section-creditsProducedByTheStudyProgramme]')
+      cy.get('[data-cy=Section-graduatedAndThesisWritersOfTheProgramme]')
+      cy.get('[data-cy=Section-programmesBeforeOrAfter]')
+      cy.get('[data-cy=Section-averageGraduationTimes]')
     })
 
     it('can access study tracks', () => {

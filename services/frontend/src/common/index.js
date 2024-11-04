@@ -436,3 +436,5 @@ export const getEnrollmentTypeTextForExcel = (type, statutoryAbsence) => {
 export const isDefaultServiceProvider = () => {
   return serviceProvider && serviceProvider === 'toska'
 }
+
+export const formatContent = content => content.replace(/\n +/g, '\n')

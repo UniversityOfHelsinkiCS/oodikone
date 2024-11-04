@@ -42,7 +42,8 @@ export const PassFailEnrollments = ({ flat, onlyIamRights }) => {
               {
                 key: 'filter-toggle',
                 export: false,
-                getRowContent: (row, isGroup) => !isGroup && <CourseFilterToggle course={row} />,
+                getRowContent: (row, isGroup) =>
+                  !isGroup && <CourseFilterToggle courseCode={row.code} courseName={row.name} />,
               },
               {
                 key: 'go-to-course',

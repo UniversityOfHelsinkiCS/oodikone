@@ -13,7 +13,8 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
-import { DegreeProgrammeType, Name } from '../types'
+import { Name } from '../shared/types'
+import { DegreeProgrammeType } from '../types'
 import { Organization } from './organization'
 import { ProgrammeModuleChild } from './programmeModuleChild'
 

@@ -31,8 +31,21 @@
       "rules": {
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-unnecessary-type-assertion": "error",
+        "import/no-unused-modules": [
+          "error",
+          {
+            "missingExports": true,
+            "unusedExports": true
+          }
+        ],
         "import/prefer-default-export": "off",
         "react/require-default-props": "off"
+      }
+    },
+    {
+      "files": ["**/*.js", "**/*.jsx"],
+      "rules": {
+        "import/no-unused-modules": "off"
       }
     }
   ],

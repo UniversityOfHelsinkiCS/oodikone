@@ -12,7 +12,8 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
-import { DegreeProgrammeType, Name, Phase, StudyTrack } from '../types'
+import { Name } from '../shared/types'
+import { DegreeProgrammeType, Phase, StudyTrack } from '../types'
 import { SISStudyRight } from './SISStudyRight'
 
 @Table({

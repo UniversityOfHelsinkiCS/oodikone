@@ -2,7 +2,8 @@
 import { InferAttributes } from 'sequelize'
 import { Column, CreatedAt, DataType, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
-import { CreditTypeCode, Name } from '../types'
+import { Name } from '../shared/types'
+import { CreditTypeCode } from '../types'
 
 @Table({
   underscored: true,

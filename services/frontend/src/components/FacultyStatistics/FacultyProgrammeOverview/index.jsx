@@ -190,7 +190,7 @@ export const FacultyProgrammeOverview = ({
           firstLabel="All study rights"
           secondLabel="Special study rights excluded"
           setValue={setSpecialGroups}
-          toolTips={facultyToolTips.StudentToggle}
+          toolTips={facultyToolTips.studentToggle}
           value={specialGroups}
         />
         <Toggle
@@ -198,7 +198,7 @@ export const FacultyProgrammeOverview = ({
           firstLabel="Graduated included"
           secondLabel="Graduated excluded"
           setValue={setGraduatedGroup}
-          toolTips={facultyToolTips.GraduatedToggle}
+          toolTips={facultyToolTips.graduatedToggle}
           value={graduatedGroup}
         />
       </div>
@@ -210,8 +210,8 @@ export const FacultyProgrammeOverview = ({
             <>
               {getDivider(
                 'Students of the faculty by starting year',
-                'StudentsOfTheFacultyByStartingYear',
-                facultyToolTips.StudentsStatsOfTheFaculty,
+                'studentsOfTheFacultyByStartingYear',
+                facultyToolTips.studentsStatsOfTheFaculty,
                 'InfoFacultyStudentTable'
               )}
               <Popup
@@ -253,8 +253,8 @@ export const FacultyProgrammeOverview = ({
             <>
               {getDivider(
                 'Progress of students of the faculty ',
-                'BachelorStudentsOfTheFacultyByStartingYear',
-                facultyToolTips.StudentProgress,
+                'bachelorStudentsOfTheFacultyByStartingYear',
+                facultyToolTips.studentProgress,
                 'InfoFacultyProgress'
               )}
               <Popup
@@ -283,7 +283,7 @@ export const FacultyProgrammeOverview = ({
               />
               {hasNonZeroStats(bachelorStats) && (
                 <>
-                  {getDivider('Bachelor', 'BachelorStudentsOfTheFacultyByStartingYear', 'no-infobox')}
+                  {getDivider('Bachelor', 'bachelorStudentsOfTheFacultyByStartingYear', 'no-infobox')}
                   <div className="section-container">
                     <div className="graph-container">
                       <FacultyBarChart
@@ -316,7 +316,7 @@ export const FacultyProgrammeOverview = ({
                 <>
                   {getDivider(
                     faculty.code === 'H90' ? 'Bachelor + Licentiate' : 'Bachelor + Master',
-                    'ProgressOfBachelorMaster',
+                    'progressOfBachelorMaster',
                     'no-infobox'
                   )}
                   <Message data-cy="FacultyProgrammesShownInfo">
@@ -353,7 +353,7 @@ export const FacultyProgrammeOverview = ({
               )}
               {hasNonZeroStats(masterStats) && !(faculty.code === 'H90') && (
                 <>
-                  {getDivider('Master', 'MasterStudentsOfTheFacultyByStartingYear', 'no-infobox')}
+                  {getDivider('Master', 'masterStudentsOfTheFacultyByStartingYear', 'no-infobox')}
                   <div className="section-container">
                     <div className="graph-container">
                       <FacultyBarChart
@@ -383,7 +383,7 @@ export const FacultyProgrammeOverview = ({
               )}
               {hasNonZeroStats(doctorStats) && (
                 <>
-                  {getDivider('Doctor', 'DoctoralStudentsOfTheFacultyByStartingYear', 'no-infobox')}
+                  {getDivider('Doctor', 'doctoralStudentsOfTheFacultyByStartingYear', 'no-infobox')}
                   <div className="section-container">
                     <div className="graph-container">
                       <FacultyBarChart

@@ -142,10 +142,12 @@ export const StudyProgrammeSelector = () => {
   return (
     <Segment className="contentSegment">
       <StudyProgrammeFilter handleFilterChange={handleFilterChange} studyProgrammes={studyProgrammes} />
-      <FilterOldProgrammesToggle
-        checked={!otherProgrammesVisible}
-        onChange={() => setOtherProgrammesVisible(!otherProgrammesVisible)}
-      />
+      <div style={{ marginTop: '20px' }}>
+        <FilterOldProgrammesToggle
+          checked={!otherProgrammesVisible}
+          onChange={() => setOtherProgrammesVisible(!otherProgrammesVisible)}
+        />
+      </div>
       {studyProgrammes.length > 0 && filteredStudyProgrammes.length === 0 && <Message>No programmes found</Message>}
       <StudyProgrammeTable
         header="Combined programmes"

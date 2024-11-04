@@ -3,7 +3,7 @@ import { AxiosError } from 'axios'
 import { uniq } from 'lodash'
 
 import { StudyGuidanceGroupTag } from '../models/kone'
-import { Name } from '../types'
+import { Name } from '../shared/types'
 import { getImporterClient } from '../util/importerClient'
 import logger from '../util/logger'
 

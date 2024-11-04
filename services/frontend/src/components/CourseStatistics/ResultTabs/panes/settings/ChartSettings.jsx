@@ -16,9 +16,9 @@ export const ChartSettings = ({ isRelative, setIsRelative, tab, viewMode }) => {
       </SegmentGroup>
       <div style={{ marginLeft: '20px' }}>
         {tab === 'GradeDistribution' ? (
-          <InfoBox content={courseStatisticsToolTips.GradeDistribution} popup />
+          <InfoBox content={courseStatisticsToolTips.gradeDistribution} popup />
         ) : (
-          <InfoBox content={courseStatisticsToolTips.PassRate[viewMode]} popup />
+          <InfoBox content={courseStatisticsToolTips.passRate[viewMode]} popup />
         )}
       </div>
     </div>

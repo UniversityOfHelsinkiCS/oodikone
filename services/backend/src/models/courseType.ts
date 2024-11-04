@@ -2,7 +2,7 @@
 import { InferAttributes } from 'sequelize'
 import { Column, CreatedAt, DataType, HasMany, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
-import { Name } from '../types'
+import { Name } from '../shared/types'
 import { Course } from './course'
 
 @Table({

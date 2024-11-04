@@ -111,7 +111,7 @@ export const CoursePopulation = () => {
       title: 'Grade distribution',
       content: (
         <div>
-          <InfoBox content={populationStatisticsToolTips.GradeDistributionCoursePopulation} />
+          <InfoBox content={populationStatisticsToolTips.gradeDistributionCoursePopulation} />
           <CoursePopulationGradeDist
             courseCodes={codes}
             from={dateFrom}
@@ -126,7 +126,7 @@ export const CoursePopulation = () => {
       title: 'Language distribution',
       content: (
         <div>
-          <InfoBox content={populationStatisticsToolTips.LanguageDistributionCoursePopulation} />
+          <InfoBox content={populationStatisticsToolTips.languageDistributionCoursePopulation} />
           <CoursePopulationLanguageDist codes={codes} from={dateFrom} samples={filtered} to={dateTo} />
         </div>
       ),
@@ -135,7 +135,7 @@ export const CoursePopulation = () => {
       title: 'Programme distribution',
       content: (
         <div>
-          <InfoBox content={populationStatisticsToolTips.ProgrammeDistributionCoursePopulation} />
+          <InfoBox content={populationStatisticsToolTips.programmeDistributionCoursePopulation} />
           <CustomPopulationProgrammeDist coursecode={codes} from={dateFrom} students={filtered} to={dateTo} />
         </div>
       ),
@@ -240,7 +240,7 @@ const CustomPopulationCoursesWrapper = ({ filteredStudents }) => {
 
   return (
     <>
-      <InfoBox content={populationStatisticsToolTips.CoursesOfPopulation} />
+      <InfoBox content={populationStatisticsToolTips.coursesOfPopulation} />
       <Form style={{ padding: '4px 4px 4px 8px' }}>
         <Form.Field inline>
           <label>Limit to courses where student number is at least</label>

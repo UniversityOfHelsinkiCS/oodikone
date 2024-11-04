@@ -135,7 +135,7 @@ const CustomPopulationContent = ({
       title: 'Programme distribution',
       content: (
         <div>
-          <InfoBox content={populationStatisticsToolTips.ProgrammeDistributionCustomPopulation} />
+          <InfoBox content={populationStatisticsToolTips.programmeDistributionCustomPopulation} />
           <CustomPopulationProgrammeDist students={filteredStudents} />
         </div>
       ),
@@ -144,7 +144,7 @@ const CustomPopulationContent = ({
       title: 'Courses of population',
       content: (
         <>
-          <InfoBox content={populationStatisticsToolTips.CoursesOfPopulation} />
+          <InfoBox content={populationStatisticsToolTips.coursesOfPopulation} />
           <Form style={{ padding: '4px 4px 4px 8px' }}>
             <Form.Field inline>
               <label>Limit to courses where student number is at least</label>

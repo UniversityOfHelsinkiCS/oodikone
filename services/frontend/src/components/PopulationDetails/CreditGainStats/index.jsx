@@ -18,7 +18,7 @@ export const CreditGainStats = ({ filteredStudents, query, year }) => {
   return (
     <div id="credit-gain-stats">
       <div style={{ marginBottom: '20px' }}>
-        <InfoBox content={populationStatisticsToolTips.CreditStatistics} />
+        <InfoBox content={populationStatisticsToolTips.creditStatistics} />
       </div>
       {filteredStudents && (
         <Tab

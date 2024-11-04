@@ -138,7 +138,7 @@ export const CoursePopulationCreditGainTable = ({ students, codes, from, to }) =
   return (
     <>
       <div style={{ marginBottom: '20px' }}>
-        <InfoBox content={populationStatisticsToolTips.CreditDistributionCoursePopulation} />
+        <InfoBox content={populationStatisticsToolTips.creditDistributionCoursePopulation} />
       </div>
       <Tab panes={panes} />
     </>

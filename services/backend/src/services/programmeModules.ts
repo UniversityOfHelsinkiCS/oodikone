@@ -3,7 +3,7 @@ import { Op, QueryTypes } from 'sequelize'
 import { dbConnections } from '../database/connection'
 import { ProgrammeModule } from '../models'
 import { ExcludedCourse } from '../models/kone'
-import { Name } from '../types'
+import { Name } from '../shared/types'
 import logger from '../util/logger'
 import { combinedStudyProgrammes } from './studyProgramme/studyProgrammeHelpers'
 

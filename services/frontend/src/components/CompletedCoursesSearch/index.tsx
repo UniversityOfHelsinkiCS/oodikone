@@ -7,7 +7,7 @@ import { CompletedCoursesSearchResults } from './CompletedCoursesSearchResults'
 
 export const CompletedCourses = () => {
   useTitle('Search completed courses')
-  const [searchValues, setValues] = useState({})
+  const [searchValues, setValues] = useState({ courseList: [], studentList: [] })
 
   return (
     <div className="segmentContainer">
