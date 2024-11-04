@@ -25,7 +25,10 @@ const schedule = (cronTime: string, onTick: () => void) => {
 export const refreshCloseToGraduating = async () => {
   logger.info('Refreshing students close to graduating')
   const updatedData = await findStudentsCloseToGraduation()
-  await redisClient.set(CLOSE_TO_GRADUATION_REDIS_KEY, JSON.stringify(updatedData))
+  await redisClient.set(
+    CLOSE_TO_GRADUATION_REDIS_KEY,
+    JSON.stringify({ ...updatedData, lastUpdated: new Date().toISOString() })
+  )
   logger.info('Students close to graduating updated!')
 }
 
