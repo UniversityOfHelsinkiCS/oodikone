@@ -1,1 +1,1 @@
-export { Name } from './name'
+export type { Name } from './name'
