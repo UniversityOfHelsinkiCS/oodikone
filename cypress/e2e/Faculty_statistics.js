@@ -23,7 +23,7 @@ describe('Faculty overview', () => {
     })
 
     it('Credits produced by faculty are shown', () => {
-      cy.get('[data-cy="Section-CreditsProducedByTheFaculty"]').should('be.visible')
+      cy.get('[data-cy="Section-creditsProducedByTheFaculty"]').should('be.visible')
       cy.get('[data-cy="Graph-CreditsProducedByTheFaculty"]').should('be.visible')
     })
 
@@ -75,11 +75,11 @@ describe('Faculty overview', () => {
     })
 
     it('Students of the faculty infobox works', () => {
-      cy.get('[data-cy="StudentsOfTheFaculty-info-content"]').should('not.exist')
-      cy.get('[data-cy="StudentsOfTheFaculty-open-info"]').click()
-      cy.get('[data-cy="StudentsOfTheFaculty-info-content"]').should('be.visible')
-      cy.get('[data-cy="StudentsOfTheFaculty-close-info"]').click()
-      cy.get('[data-cy="StudentsOfTheFaculty-info-content"]').should('not.exist')
+      cy.get('[data-cy="studentsOfTheFaculty-info-content"]').should('not.exist')
+      cy.get('[data-cy="studentsOfTheFaculty-open-info"]').click()
+      cy.get('[data-cy="studentsOfTheFaculty-info-content"]').should('be.visible')
+      cy.get('[data-cy="studentsOfTheFaculty-close-info"]').click()
+      cy.get('[data-cy="studentsOfTheFaculty-info-content"]').should('not.exist')
     })
 
     it('Data can be exported to Excel files', () => {
