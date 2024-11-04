@@ -11,7 +11,7 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { getSemestersPresentFunctions } from '@/components/PopulationStudents/StudentTable/GeneralTab/columnHelpers/semestersPresent'
 import { PaginatedSortableTable } from '@/components/SortableTable/PaginatedSortableTable'
 import { StudentNameVisibilityToggle, useStudentNameVisibility } from '@/components/StudentNameVisibilityToggle'
-import { ISO_DATE_FORMAT } from '@/constants/date'
+import { ISO_DATE_FORMAT, LONG_DATE_TIME_FORMAT } from '@/constants/date'
 import { useGetStudentsCloseToGraduationQuery } from '@/redux/closeToGraduation'
 import { useGetFacultiesQuery } from '@/redux/facultyStats'
 import { useGetSemestersQuery } from '@/redux/semesters'
@@ -178,7 +178,8 @@ const getColumns = (
               ].join('\n'),
             }
           : {},
-      helpText: 'You can see the attainment date, course code, and grade by hovering over the check mark',
+      helpText:
+        'The thesis attainment must be linked to the correct study right. You can see the attainment date, course code, and grade by hovering over the check mark.',
     },
     {
       key: 'latestAttainmentDates',
@@ -319,6 +320,9 @@ export const CloseToGraduation = () => {
               />
             </Form.Field>
           </Form>
+          <Message info style={{ width: '100%' }}>
+            {`Last updated: ${reformatDate(students.lastUpdated, LONG_DATE_TIME_FORMAT)}`}
+          </Message>
           <PaginatedSortableTable
             columns={columns}
             data={filteredStudents}
