@@ -65,7 +65,7 @@ export const PassingSemesters = ({ onlyIamRights }) => {
             getRowContent: (row, isGroup) => {
               if (isGroup) return null
 
-              return <CourseFilterToggle course={row} />
+              return <CourseFilterToggle courseCode={row.code} courseName={row.name} />
             },
           },
           {
