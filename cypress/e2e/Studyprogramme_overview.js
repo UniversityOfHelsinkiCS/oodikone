@@ -245,9 +245,9 @@ describe('Study programme overview', () => {
 
     // If the backend breaks for one of the sections, the section header is not rendered and this will fail
     it('Study tracks and class statistics -tab loads', () => {
-      cy.get('[data-cy=Section-StudyTrackOverview]')
-      cy.get('[data-cy=Section-StudyTrackProgress]')
-      cy.get('[data-cy=Section-AverageGraduationTimesStudyTracks]')
+      cy.get('[data-cy=Section-studyTrackOverview]')
+      cy.get('[data-cy=Section-studyTrackProgress]')
+      cy.get('[data-cy=Section-averageGraduationTimesStudyTracks]')
     })
 
     it('Students of the study programme are shown correctly', () => {
@@ -406,7 +406,7 @@ describe('Study programme overview', () => {
       })
 
       it('Students of the study track are shown correctly', () => {
-        cy.get("[data-cy='Section-StudyTrackOverview']").contains(
+        cy.get("[data-cy='Section-studyTrackOverview']").contains(
           'Students of the study track MAT-MAT by starting year'
         )
         const tableContents = [
@@ -446,7 +446,7 @@ describe('Study programme overview', () => {
       })
 
       it('Average graduation times are displayed correctly', () => {
-        cy.get("[data-cy='Section-AverageGraduationTimesStudyTracks']")
+        cy.get("[data-cy='Section-averageGraduationTimesStudyTracks']")
         cy.get("[data-cy='graduation-times-graph-breakdownBachelor']").within(() => {
           cy.contains('Start year')
           cy.contains('2020 - 2021')
@@ -785,9 +785,9 @@ describe('Study programme overview', () => {
     it('can access study tracks', () => {
       cy.get('.attached').contains('Study tracks and class statistics').click()
 
-      cy.get('[data-cy=Section-StudyTrackOverview]')
-      cy.get('[data-cy=Section-StudyTrackProgress]')
-      cy.get('[data-cy=Section-AverageGraduationTimesStudyTracks]')
+      cy.get('[data-cy=Section-studyTrackOverview]')
+      cy.get('[data-cy=Section-studyTrackProgress]')
+      cy.get('[data-cy=Section-averageGraduationTimesStudyTracks]')
     })
 
     it("doesn't see other tabs", () => {
