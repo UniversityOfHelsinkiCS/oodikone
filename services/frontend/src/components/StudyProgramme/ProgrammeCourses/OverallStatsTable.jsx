@@ -36,7 +36,7 @@ const getColumns = (getTextIn, showStudents) => {
       {
         key: 'name',
         title: 'Name',
-        helpText: studyProgrammeToolTips.Name,
+        helpText: studyProgrammeToolTips.name,
         getRowVal: course => getTextIn(course.name),
         formatValue: name => (
           <div style={{ maxWidth: '400px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</div>
@@ -109,7 +109,7 @@ const getColumns = (getTextIn, showStudents) => {
           {
             key: 'transfer',
             title: 'Transferred\nstudents',
-            helpText: studyProgrammeToolTips.TransferredCourses,
+            helpText: studyProgrammeToolTips.transferredCourses,
             cellStyle: { textAlign: 'right' },
             filterType: 'range',
             getRowVal: course => course.totalTransferStudents,
@@ -139,7 +139,7 @@ const getColumns = (getTextIn, showStudents) => {
       {
         key: 'name',
         title: 'Name',
-        helpText: studyProgrammeToolTips.Name,
+        helpText: studyProgrammeToolTips.name,
         getRowVal: course => getTextIn(course.name),
         formatValue: name => (
           <div style={{ maxWidth: '400px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</div>
@@ -311,8 +311,8 @@ export const OverallStatsTable = ({ studyProgramme, combinedProgramme, academicY
         <InfoBox
           content={
             showStudents
-              ? studyProgrammeToolTips.StudentsOfProgrammeCourses
-              : studyProgrammeToolTips.CreditsOfProgrammeCourses
+              ? studyProgrammeToolTips.studentsOfProgrammeCourses
+              : studyProgrammeToolTips.creditsOfProgrammeCourses
           }
           cypress="programme-courses"
         />

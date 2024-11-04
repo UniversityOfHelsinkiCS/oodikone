@@ -1,6 +1,5 @@
 import { orderBy } from 'lodash'
 import moment from 'moment'
-import ReactMarkdown from 'react-markdown'
 import { Link } from 'react-router-dom'
 import { Button, Divider, Header, Icon, Item, Popup, Table } from 'semantic-ui-react'
 
@@ -114,7 +113,7 @@ export const StudyrightsTable = ({ handleStudyPlanChange, student, selectedStudy
                 {header}
                 {header === 'Status' && (
                   <HoverableHelpPopup
-                    content={<ReactMarkdown>{studentToolTips.studyRightStatus}</ReactMarkdown>}
+                    content={studentToolTips.studyRightStatus}
                     size="mini"
                     style={{ marginLeft: '0.25rem' }}
                   />

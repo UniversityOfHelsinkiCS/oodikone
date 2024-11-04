@@ -63,9 +63,9 @@ export const StudyTrackOverview = ({
   }
 
   const infoTextGraduationTimes = studyProgramme.includes('MH')
-    ? 'AverageGraduationTimesStudyTracksMaster'
-    : 'AverageGraduationTimesStudyTracks'
-  const infoTextStudentTable = combinedProgramme ? 'StudyTrackOverviewCombinedProgramme' : 'StudyTrackOverview'
+    ? 'averageGraduationTimesStudyTracksMaster'
+    : 'averageGraduationTimesStudyTracks'
+  const infoTextStudentTable = combinedProgramme ? 'studyTrackOverviewCombinedProgramme' : 'studyTrackOverview'
 
   const programmeCode = combinedProgramme ? `${studyProgramme}-${combinedProgramme}` : studyProgramme
 
@@ -150,7 +150,7 @@ export const StudyTrackOverview = ({
               firstLabel="All study rights"
               secondLabel="Special study rights excluded"
               setValue={setSpecialGroupsExcluded}
-              toolTips={studyProgrammeToolTips.StudentToggle}
+              toolTips={studyProgrammeToolTips.studentToggle}
               value={specialGroupsExcluded}
             />
             <Toggle
@@ -158,7 +158,7 @@ export const StudyTrackOverview = ({
               firstLabel="Graduated included"
               secondLabel="Graduated excluded"
               setValue={setGraduated}
-              toolTips={studyProgrammeToolTips.GraduatedToggle}
+              toolTips={studyProgrammeToolTips.graduatedToggle}
               value={graduated}
             />
           </div>
@@ -184,7 +184,7 @@ export const StudyTrackOverview = ({
 
           {track === '' || track === studyProgramme ? (
             <>
-              {getDivider('Progress of students of the study programme by starting year', 'StudyTrackProgress')}
+              {getDivider('Progress of students of the study programme by starting year', 'studyTrackProgress')}
               <ProgressOfStudents
                 progressComboStats={progressComboStats}
                 progressStats={progressStats}

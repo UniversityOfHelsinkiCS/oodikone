@@ -149,7 +149,7 @@ export const BasicOverview = ({
           firstLabel="Calendar year"
           secondLabel="Academic year"
           setValue={setAcademicYear}
-          toolTips={studyProgrammeToolTips.YearToggle}
+          toolTips={studyProgrammeToolTips.yearToggle}
           value={academicYear}
         />
         <Toggle
@@ -157,7 +157,7 @@ export const BasicOverview = ({
           firstLabel="All study rights"
           secondLabel="Special study rights excluded"
           setValue={setSpecialGroupsExcluded}
-          toolTips={studyProgrammeToolTips.StudentToggle}
+          toolTips={studyProgrammeToolTips.studentToggle}
           value={specialGroupsExcluded}
         />
       </div>

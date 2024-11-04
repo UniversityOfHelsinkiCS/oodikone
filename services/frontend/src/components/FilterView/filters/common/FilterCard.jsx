@@ -1,6 +1,5 @@
 import { isEqual } from 'lodash'
 import { useState, useRef } from 'react'
-import ReactMarkdown from 'react-markdown'
 import { Icon, Header } from 'semantic-ui-react'
 
 import { HoverableHelpPopup } from '@/components/common/HoverableHelpPopup'
@@ -75,12 +74,7 @@ export const FilterCard = ({ filter, options, children, onClear }) => {
                 style={{ margin: 0 }}
               />
             )}
-            {info && (
-              <HoverableHelpPopup
-                content={<ReactMarkdown>{info.short}</ReactMarkdown>}
-                style={{ cursor: 'auto', margin: 0, color: '#888' }}
-              />
-            )}
+            {info && <HoverableHelpPopup content={info.short} style={{ cursor: 'auto', margin: 0, color: '#888' }} />}
           </div>
         </div>
       </div>

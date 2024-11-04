@@ -169,7 +169,9 @@ export const BasicOverview = ({
         } else {
           plotLinePlaces.push([i + 1, options[key]])
         }
-      } else if (programmeKeys[i + 1][1].startsWith('H')) plotLinePlaces.push([i + 1, 'Produced by faculty'])
+      } else if (programmeKeys[i + 1][1].startsWith('H')) {
+        plotLinePlaces.push([i + 1, 'Produced by faculty'])
+      }
     }
     return plotLinePlaces
   }

@@ -43,7 +43,7 @@ export const CourseYearFilter = ({ years, fromYear, toYear, handleChange, academ
         firstLabel="Calendar year"
         secondLabel="Academic year"
         setValue={setAcademicYear}
-        toolTips={studyProgrammeToolTips.YearToggle}
+        toolTips={studyProgrammeToolTips.yearToggle}
         value={academicYear}
       />
     </div>

@@ -142,14 +142,14 @@ export const ProgrammeView = ({ studyprogramme }) => {
             <div>
               {getDivider(
                 'Progress of students of the study programme by starting year',
-                'StudyTrackProgressEvaluationOverview'
+                'studyTrackProgressEvaluationOverview'
               )}
               <Toggle
                 cypress="GraduatedToggle"
                 firstLabel="Graduated included"
                 secondLabel="Graduated excluded"
                 setValue={setGraduated}
-                toolTips={studyProgrammeToolTips.GraduatedToggle}
+                toolTips={studyProgrammeToolTips.graduatedToggle}
                 value={graduated}
               />
               <ProgressOfStudents
@@ -158,7 +158,7 @@ export const ProgrammeView = ({ studyprogramme }) => {
                 track={studyprogramme}
                 years={statistics.data.years}
               />
-              {getDivider('Graduation times', 'AverageGraduationTimes')}
+              {getDivider('Graduation times', 'averageGraduationTimes')}
               <div className="toggle-container">
                 <Toggle
                   cypress="GraduationTimeToggle"
@@ -172,7 +172,7 @@ export const ProgrammeView = ({ studyprogramme }) => {
                   firstLabel="Calendar year"
                   secondLabel="Academic year"
                   setValue={setAcademicYear}
-                  toolTips={studyProgrammeToolTips.YearToggle}
+                  toolTips={studyProgrammeToolTips.yearToggle}
                   value={academicYear}
                 />
               </div>
@@ -185,7 +185,7 @@ export const ProgrammeView = ({ studyprogramme }) => {
                     studyprogramme.includes('KH')
                       ? 'Primary master programme studies after this programme'
                       : 'Primary bachelor programme studies before this programme',
-                    'ProgrammesBeforeOrAfter'
+                    'programmesBeforeOrAfter'
                   )}
                   <div className="section-container">
                     <StackedBarChart
