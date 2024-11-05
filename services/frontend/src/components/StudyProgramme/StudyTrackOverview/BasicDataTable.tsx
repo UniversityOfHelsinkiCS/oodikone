@@ -11,7 +11,7 @@ export const BasicDataTable = ({ data, titles, track }: BasicDataTableProps) => 
     return null
   }
 
-  const sortedData = [...data[track]].sort((a, b) => {
+  const sortedData = data[track].toSorted((a, b) => {
     if (a[0] === 'Total') return 1
     if (b[0] === 'Total') return -1
     return parseInt(String(b[0]).split(' - ')[0], 10) - parseInt(String(a[0]).split(' - ')[0], 10)
