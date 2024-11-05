@@ -1,4 +1,4 @@
-import { col, Op } from 'sequelize'
+import { col, Op, where } from 'sequelize'
 
 import { Course, Credit, Student, Studyplan, SISStudyRight, SISStudyRightElement } from '../../models'
 import { Name } from '../../shared/types'
@@ -170,19 +170,7 @@ export const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =
         {
           model: Studyplan,
           attributes: ['completed_credits', 'included_courses', 'programme_code', 'curriculum_period_id'],
-          where: {
-            [Op.or]: [
-              { completed_credits: { [Op.gte]: 140 }, programme_code: { [Op.like]: 'KH%' } },
-              { completed_credits: { [Op.gte]: 150 }, programme_code: 'MH90_001' }, // De­gree Pro­gramme in Veter­in­ary Medi­cine
-              { completed_credits: { [Op.gte]: 330 }, programme_code: 'MH30_001' }, // De­gree Pro­gramme in Medi­cine
-              { completed_credits: { [Op.gte]: 300 }, programme_code: 'MH30_003' }, // De­gree Pro­gramme in Dentistry
-              { completed_credits: { [Op.gte]: 115 }, programme_code: 'MH30_004' }, // Mas­ter's Pro­gramme in Psy­cho­logy
-              {
-                completed_credits: { [Op.gte]: 70 },
-                programme_code: { [Op.like]: 'MH%', [Op.notIn]: ['MH90_001', 'MH30_001', 'MH30_003', 'MH30_004'] },
-              },
-            ],
-          },
+          required: true,
           include: [
             {
               model: SISStudyRight,
@@ -201,9 +189,45 @@ export const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =
                     '$studyplans.programme_code$': {
                       [Op.eq]: col('studyplans->studyRight->studyRightElements.code'),
                     },
-                    degreeProgrammeType: {
-                      [Op.in]: [DegreeProgrammeType.BACHELOR, DegreeProgrammeType.MASTER],
-                    },
+                    [Op.or]: [
+                      {
+                        [Op.and]: [
+                          { degreeProgrammeType: DegreeProgrammeType.BACHELOR },
+                          where(col('studyplans.completed_credits'), Op.gte, 140),
+                        ],
+                      },
+                      {
+                        [Op.and]: [
+                          { degreeProgrammeType: DegreeProgrammeType.MASTER },
+                          where(col('studyplans.completed_credits'), Op.gte, 70),
+                          { code: { [Op.notIn]: ['MH30_001', 'MH30_003', 'MH30_004', 'MH90_001'] } },
+                        ],
+                      },
+                      {
+                        [Op.and]: [
+                          where(col('studyplans.completed_credits'), Op.gte, 330),
+                          { code: 'MH30_001' }, // De­gree Pro­gramme in Medi­cine
+                        ],
+                      },
+                      {
+                        [Op.and]: [
+                          where(col('studyplans.completed_credits'), Op.gte, 300),
+                          { code: 'MH30_003' }, // De­gree Pro­gramme in Dentistry
+                        ],
+                      },
+                      {
+                        [Op.and]: [
+                          where(col('studyplans.completed_credits'), Op.gte, 115),
+                          { code: 'MH30_004' }, // Mas­ter's Pro­gramme in Psy­cho­logy
+                        ],
+                      },
+                      {
+                        [Op.and]: [
+                          where(col('studyplans.completed_credits'), Op.gte, 150),
+                          { code: 'MH90_001' }, // De­gree Pro­gramme in Veter­in­ary Medi­cine
+                        ],
+                      },
+                    ],
                   },
                   attributes: ['code', 'name', 'startDate', 'studyTrack', 'degreeProgrammeType'],
                 },

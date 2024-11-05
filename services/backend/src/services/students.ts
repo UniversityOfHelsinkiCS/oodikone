@@ -14,7 +14,6 @@ import {
 import { Tag, TagStudent } from '../models/kone'
 import { EnrollmentState, UnifyStatus } from '../types'
 import { splitByEmptySpace } from '../util'
-import logger from '../util/logger'
 
 const { sequelize } = dbConnections
 
@@ -229,7 +228,7 @@ const formatSharedStudentData = ({
   updatedAt,
   createdAt,
   sis_person_id,
-}: Partial<Student>) => {
+}: InferAttributes<Student>) => {
   const toCourse = ({ grade, credits, credittypecode, is_open, attainment_date, course, isStudyModule }: Credit) => {
     course = course.toJSON()
 
@@ -272,31 +271,14 @@ const formatSharedStudentData = ({
   }
 }
 
-const formatStudent = (
-  studentData: Partial<Student> & {
-    tags: Array<InferAttributes<TagStudent> & { programme?: Pick<InferAttributes<ProgrammeModule>, 'code' | 'name'> }>
-  }
-) => {
-  const formattedData = formatSharedStudentData(studentData)
-  return {
-    ...formattedData,
-    tags: studentData.tags,
-  }
-}
-
-const formatStudentWithoutTags = (studentData: Partial<Student>) => {
-  return formatSharedStudentData(studentData)
-}
-
-export const withStudentNumber = async (studentNumber: string) => {
-  try {
-    const student = await byStudentNumber(studentNumber)
-    if (!student) return null
-    return formatStudent(student)
-  } catch (error) {
-    logger.error(`Error when fetching single student`)
-    logger.error(error)
+export const withStudentNumber = async (studentNumber: string, userId: string) => {
+  const student = await byStudentNumber(studentNumber)
+  if (student == null) {
     return null
+  }
+  return {
+    ...formatSharedStudentData(student),
+    tags: student.tags.filter(({ tag }) => !tag.personal_user_id || tag.personal_user_id === userId),
   }
 }
 
@@ -363,7 +345,7 @@ export const bySearchTermAndStudentNumbers = async (searchterm: string, studentN
           }
         : { [Op.or]: [nameLike(terms), studentnumberLike(terms)] },
     })
-  ).map(formatStudentWithoutTags)
+  ).map(formatSharedStudentData)
 }
 
 export const filterStudentnumbersByAccessrights = async (studentnumbers: string[], codes: string[]) =>

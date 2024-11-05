@@ -6,14 +6,6 @@ import { ApplicationError } from '../util/customErrors'
 
 const router = Router()
 
-const filterStudentTags = (student: Awaited<ReturnType<typeof withStudentNumber>>, userId: string) => {
-  if (!student) return null
-  return {
-    ...student,
-    tags: (student.tags ?? []).filter(({ tag }) => !tag.personal_user_id || tag.personal_user_id === userId),
-  }
-}
-
 interface GetStudentsRequest extends Request {
   query: {
     searchTerm: string
@@ -59,11 +51,15 @@ router.get('/:studentNumber', async (req: GetStudentRequest, res: Response) => {
   } = req
 
   if (!hasFullAccessToStudentData(roles) && !studentsUserCanAccess.includes(studentNumber)) {
-    throw new ApplicationError('Error finding student', 400)
+    return res
+      .status(403)
+      .json({ error: `User does not have permission to view data for student number ${studentNumber}.` })
   }
-  const student = await withStudentNumber(studentNumber)
-  const filteredTags = filterStudentTags(student, id)
-  res.json(filteredTags)
+  const student = await withStudentNumber(studentNumber, id)
+  if (!student) {
+    return res.status(404).json({ error: `Student not found with student number ${studentNumber}.` })
+  }
+  res.json(student)
 })
 
 export default router
