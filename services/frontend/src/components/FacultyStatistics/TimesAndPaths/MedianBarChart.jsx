@@ -19,6 +19,7 @@ export const MedianBarChart = ({
   level,
   mode,
   programmeNames,
+  title,
   year,
   yearLabel,
 }) => {
@@ -56,7 +57,7 @@ export const MedianBarChart = ({
   }
 
   const getDataLabel = (amount, category) => {
-    if (yearLabel === 'Start year') {
+    if (yearLabel === 'Start year' && title === 'Bachelor study right') {
       return `${amount} graduated (${getPercentage(amount, category)} % of class)`
     }
     return `${amount} graduated`
@@ -203,7 +204,9 @@ export const MedianBarChart = ({
     },
   }
 
-  if (!facultyGraph) config.title.text = `Year ${year} by ${yearLabel.toLowerCase()}`
+  if (!facultyGraph) {
+    config.title.text = `Year ${year} by ${yearLabel.toLowerCase()}`
+  }
 
   return (
     <div className={`${facultyGraph ? 'faculty' : 'programmes'}-graph`}>
