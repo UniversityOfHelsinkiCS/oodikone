@@ -1,31 +1,39 @@
-import { Dropdown } from 'semantic-ui-react'
+import { Dropdown, DropdownProps } from 'semantic-ui-react'
 
 import '../studyprogramme.css'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { Name } from '@/shared/types'
 
-export const StudyTrackSelector = ({ track, setTrack, studyTracks }) => {
+interface StudyTrackSelectorProps {
+  track: string
+  setTrack: (track: string) => void
+  studyTracks: Record<string, string | Name>
+}
+
+export const StudyTrackSelector = ({ track, setTrack, studyTracks }: StudyTrackSelectorProps) => {
   const { getTextIn } = useLanguage()
   if (!studyTracks) {
     return null
   }
 
-  const handleStudytrackChange = (event, { value }) => {
+  const handleStudyTrackChange = (event: React.SyntheticEvent, data: DropdownProps) => {
+    const { value } = data
     event.preventDefault()
-    setTrack(value)
+    setTrack(value as string)
   }
 
-  const getOptionName = track => {
-    if (track !== 'All students of the programme') {
-      return getTextIn(track)
+  const getOptionName = (studyTrack: string | Name) => {
+    if (studyTrack !== 'All students of the programme') {
+      return getTextIn(studyTrack)
     }
-    return track
+    return studyTrack
   }
 
   const studyTrackOptions = Object.entries(studyTracks)
-    .map(([code, track]) => ({
+    .map(([code, studyTrack]) => ({
       key: code,
       value: code,
-      text: `${getOptionName(track)}, ${code}`,
+      text: `${getOptionName(studyTrack)}, ${code}`,
     }))
     .sort((a, b) => {
       if (a.text.startsWith('All students of the programme')) return -1
@@ -39,7 +47,7 @@ export const StudyTrackSelector = ({ track, setTrack, studyTracks }) => {
       <Dropdown
         fluid
         name="studyTrack"
-        onChange={handleStudytrackChange}
+        onChange={handleStudyTrackChange}
         options={studyTrackOptions}
         selection
         value={track}

@@ -1,6 +1,10 @@
 import { Dimmer, Loader } from 'semantic-ui-react'
 
-export const SegmentDimmer = ({ isLoading = false }) => (
+interface SegmentDimmerProps {
+  isLoading?: boolean
+}
+
+export const SegmentDimmer = ({ isLoading = false }: SegmentDimmerProps) => (
   <Dimmer active={isLoading} inverted>
     <Loader>Loading</Loader>
   </Dimmer>

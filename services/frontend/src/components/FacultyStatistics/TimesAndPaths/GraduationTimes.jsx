@@ -17,6 +17,7 @@ const MedianDisplay = ({
   mode,
   programmeData,
   programmeNames,
+  title,
   year,
   yearLabel,
 }) => {
@@ -46,6 +47,7 @@ const MedianDisplay = ({
           handleClick={handleClick}
           mode={mode}
           programmeNames={programmeNames}
+          title={title}
           yearLabel={yearLabel}
         />
         {!programmeData || !(year in levelProgrammeData) ? (
@@ -63,6 +65,7 @@ const MedianDisplay = ({
             level={level}
             mode={mode}
             programmeNames={programmeNames}
+            title={title}
             year={year}
             yearLabel={yearLabel}
           />
@@ -163,6 +166,7 @@ export const GraduationTimes = ({
           mode={mode}
           programmeData={programmeData}
           programmeNames={programmeNames}
+          title={title}
           year={year}
           yearLabel={yearLabel}
         />

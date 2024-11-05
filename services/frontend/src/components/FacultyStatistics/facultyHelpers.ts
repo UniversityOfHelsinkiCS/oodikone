@@ -18,9 +18,9 @@ const regexValuesAll = [
   /^Y/,
   /\d$/,
   /^\d.*e$/,
-]
+] as const
 
-const testKey = value => {
+const testKey = (value: string) => {
   for (let i = 0; i < regexValuesAll.length; i++) {
     if (regexValuesAll[i].test(value)) {
       return i
@@ -29,7 +29,7 @@ const testKey = value => {
   return 6
 }
 
-export const sortProgrammeKeys = (programmeKeys, faculty) => {
+export const sortProgrammeKeys = (programmeKeys: string[][], faculty: string) => {
   try {
     return programmeKeys.sort((a, b) => {
       if (a[1].includes(faculty) && !b[1].includes(faculty)) return -1
@@ -38,9 +38,7 @@ export const sortProgrammeKeys = (programmeKeys, faculty) => {
       if (!a[1].includes(faculty) && b[1].startsWith('T') && !a[1].includes('T')) return 1
       if (a[1].startsWith('LIS') && !b[1].includes(faculty) && !b[1].includes('LIS')) return -1
       if (!a[1].includes(faculty) && b[1].startsWith('LIS') && !a[1].includes('LIS')) return 1
-      if (testKey(a[1]) - testKey(b[1]) === 0) {
-        return a[0].localeCompare(b[0])
-      }
+      if (testKey(a[1]) - testKey(b[1]) === 0) return a[0].localeCompare(b[0])
       return testKey(a[1]) - testKey(b[1])
     })
   } catch (error) {
@@ -48,20 +46,24 @@ export const sortProgrammeKeys = (programmeKeys, faculty) => {
   }
 }
 
-const isBetween = (number, lowerLimit, upperLimit) => {
+const isBetween = (number: number, lowerLimit: number, upperLimit: number) => {
   return (lowerLimit === undefined || number >= lowerLimit) && (upperLimit === undefined || number < upperLimit)
 }
 
 export const calculateStats = (
-  creditCounts,
-  maximumAmountOfCredits,
-  minimumAmountOfCredits = 0,
-  numberOfCreditCategories = 7
+  creditCounts: Record<string, number[]>,
+  maximumAmountOfCredits: number,
+  minimumAmountOfCredits: number = 0,
+  numberOfCreditCategories: number = 7
 ) => {
-  const tableStats = []
-  if (creditCounts === undefined) return null
+  const tableStats: Array<Array<number | string>> = []
+  if (creditCounts === undefined) {
+    return null
+  }
 
-  if (Object.keys(creditCounts).length === 0) return null
+  if (Object.keys(creditCounts).length === 0) {
+    return null
+  }
 
   const limits = getCreditCategories(
     true,
@@ -87,24 +89,25 @@ export const calculateStats = (
     }
   })
 
-  const totalCounts = ['Total']
+  const totalCounts: Array<number | string> = ['Total']
   for (let i = 1; i < tableStats[0].length; i++) {
     let columnSum = 0
     for (let j = 0; j < tableStats.length; j++) {
-      columnSum += tableStats[j][i]
+      columnSum += tableStats[j][i] as number
     }
     totalCounts.push(columnSum)
   }
   tableStats.push(totalCounts)
 
   // Calculate statistics for the bar chart (i.e., transpose the tableStats as rows are now columns and vice versa)
-  const chartStats = []
+  const chartStats: Array<{ data: number[]; name: string }> = []
   for (let i = 2; i < tableStats[0].length; i++) {
-    const column = []
+    const column: number[] = []
     for (let j = tableStats.length - 1; j >= 0; j--) {
-      column.push(tableStats[j][i])
+      column.push(tableStats[j][i] as number)
     }
     chartStats.push({ name: tableTitles[i].replace('<', 'Less than').replace('≥', 'At least'), data: column })
   }
+
   return { tableStats, chartStats, tableTitles }
 }

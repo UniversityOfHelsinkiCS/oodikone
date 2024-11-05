@@ -1,6 +1,12 @@
 import { Table } from 'semantic-ui-react'
 
-export const BasicDataTable = ({ data, titles, track }) => {
+interface BasicDataTableProps {
+  data: Record<string, Array<Array<string | number>>>
+  titles: string[]
+  track: string
+}
+
+export const BasicDataTable = ({ data, titles, track }: BasicDataTableProps) => {
   if (!data || !data[track]?.length || !titles) {
     return null
   }
@@ -8,7 +14,7 @@ export const BasicDataTable = ({ data, titles, track }) => {
   const sortedData = data[track].toSorted((a, b) => {
     if (a[0] === 'Total') return 1
     if (b[0] === 'Total') return -1
-    return parseInt(b[0].split(' - ')[0], 10) - parseInt(a[0].split(' - ')[0], 10)
+    return parseInt(String(b[0]).split(' - ')[0], 10) - parseInt(String(a[0]).split(' - ')[0], 10)
   })
 
   return (
@@ -23,11 +29,11 @@ export const BasicDataTable = ({ data, titles, track }) => {
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {sortedData.map(array => (
-          <Table.Row key={array[0]}>
-            {array.map((value, index) => (
+        {sortedData.map(row => (
+          <Table.Row key={row[0]}>
+            {row.map((value, index) => (
               <Table.Cell
-                className={array[0] === 'Total' ? 'total-row-cell' : ''}
+                className={row[0] === 'Total' ? 'total-row-cell' : ''}
                 // eslint-disable-next-line react/no-array-index-key
                 key={`${index}-${value}`}
                 textAlign={index === 0 ? 'center' : 'right'}

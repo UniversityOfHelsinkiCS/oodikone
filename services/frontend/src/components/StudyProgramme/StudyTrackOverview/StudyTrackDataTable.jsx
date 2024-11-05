@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Icon, Popup, Table } from 'semantic-ui-react'
 
+import { getCalendarYears } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Toggle } from '@/components/StudyProgramme/Toggle'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
@@ -83,7 +84,7 @@ const getFirstCell = ({
     {(fullAccessToStudentData || allRights.includes(studyProgramme) || allRights.includes(combinedProgramme)) && (
       <PopulationLink
         combinedProgramme={combinedProgramme}
-        studyprogramme={studyProgramme}
+        studyProgramme={studyProgramme}
         year={year}
         years={calendarYears}
       />
@@ -130,8 +131,8 @@ const getSingleTrackRow = ({
               allRights.includes(combinedProgramme)) && (
               <PopulationLink
                 combinedProgramme={combinedProgramme}
-                studyprogramme={studyProgramme}
-                studytrack={code}
+                studyProgramme={studyProgramme}
+                studyTrack={code}
                 year={row[0]}
                 years={calendarYears}
               />
@@ -198,11 +199,11 @@ const getRow = ({
     return null
   }
 
-  const correctStudytrack = row[0]
+  const correctStudyTrack = row[0]
   const title =
-    studyTracks[correctStudytrack] === undefined
-      ? correctStudytrack
-      : `${getTextIn(studyTracks[correctStudytrack])}, ${correctStudytrack}`
+    studyTracks[correctStudyTrack] === undefined
+      ? correctStudyTrack
+      : `${getTextIn(studyTracks[correctStudyTrack])}, ${correctStudyTrack}`
 
   return (
     <Table.Row className="regular-row" key={title}>
@@ -218,8 +219,8 @@ const getRow = ({
                 allRights.includes(combinedProgramme)) && (
                 <PopulationLink
                   combinedProgramme={combinedProgramme}
-                  studyprogramme={studyProgramme}
-                  studytrack={correctStudytrack}
+                  studyProgramme={studyProgramme}
+                  studyTrack={correctStudyTrack}
                   year={year}
                   years={calendarYears}
                 />
@@ -233,7 +234,7 @@ const getRow = ({
             index,
             otherCountriesStats,
             row,
-            studyprogramme: correctStudytrack,
+            studyProgramme: correctStudyTrack,
             value,
             year,
           })
@@ -306,10 +307,7 @@ export const StudyTrackDataTable = ({
   }
   const sortedMainStats = sortMainDataByYear(Object.values(dataOfAllTracks))
   const sortedTrackStats = sortTrackDataByYear(dataOfSingleTrack)
-  const calendarYears = years.reduce((all, year) => {
-    if (year === 'Total') return all
-    return all.concat(Number(year.slice(0, 4)))
-  }, [])
+  const calendarYears = getCalendarYears(years)
   const borderStyleArray = combinedProgramme ? [3, 8, 11] : [3, 7, 10]
   return (
     <div className="datatable">

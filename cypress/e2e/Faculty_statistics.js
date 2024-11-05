@@ -234,7 +234,7 @@ describe('Faculty overview', () => {
 
       cy.get('[data-cy="Section-bachelor"]').within(() => {
         cy.get('div[class="faculty-graph"]')
-        cy.contains('24 graduated (64.9 % of class)').trigger('mouseover')
+        cy.contains('24 graduated').trigger('mouseover')
         cy.contains('From class of 2020 - 2021, 24/37 students have graduated')
       })
 

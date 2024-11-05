@@ -1,6 +1,7 @@
 import { Fragment, useState } from 'react'
 import { Button, Icon, Label, Popup, Table } from 'semantic-ui-react'
 
+import { getCalendarYears } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { PopulationLink } from '@/components/StudyProgramme/StudyTrackOverview/PopulationLink'
 import { Toggle } from '@/components/StudyProgramme/Toggle'
@@ -105,12 +106,6 @@ export const FacultyStudentDataTable = ({
     arrayToModify[yearIndex] = !yearsVisible[yearIndex]
     setVisible(arrayToModify)
   }
-
-  const calendarYears = years.reduce((all, year) => {
-    if (year === 'Total') return all
-    return all.concat(Number(year.slice(0, 4)))
-  }, [])
-
   return (
     <div className="datatable">
       <Toggle
@@ -214,9 +209,9 @@ export const FacultyStudentDataTable = ({
                           {requiredRights.programmeRights?.includes(programmeNames[programme].code) ||
                             (requiredRights.fullAccessToStudentData && (
                               <PopulationLink
-                                studyprogramme={programmeNames[programme].code}
+                                studyProgramme={programmeNames[programme].code}
                                 year={year}
-                                years={calendarYears}
+                                years={getCalendarYears(years)}
                               />
                             ))}
                         </Table.Cell>

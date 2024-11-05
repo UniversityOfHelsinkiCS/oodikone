@@ -9,8 +9,19 @@ exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
 accessibility(ReactHighcharts.Highcharts)
 
-export const BarChart = ({ data, track }) => {
-  if (!data || !data.creditGraphStats || !data.creditGraphStats[track]) return null
+interface BarChartProps {
+  data: {
+    creditGraphStats: Record<string, { name: string; data: number[] }[]>
+    years: string[]
+  }
+  track: string
+}
+
+export const BarChart = ({ data, track }: BarChartProps) => {
+  if (!data || !data.creditGraphStats || !data.creditGraphStats[track]) {
+    return null
+  }
+
   const correctData = data.creditGraphStats[track]
   const colors = generateGradientColors(correctData.length)
   const dataWithColors = Object.values(correctData).map((series, index) => ({ ...series, color: colors[index] }))
