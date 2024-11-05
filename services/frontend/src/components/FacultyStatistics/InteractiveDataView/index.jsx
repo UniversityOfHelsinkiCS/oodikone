@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from 'react'
+import { Fragment, useState } from 'react'
 import { Icon, Menu, Popup, Table } from 'semantic-ui-react'
 
 import { CollapsedStackedBar } from './CollapsedStackedBar'
@@ -15,55 +15,47 @@ export const InteractiveDataTable = ({
   sortedKeys,
   studentsTable,
   titles,
-  yearsVisible,
 }) => {
-  const [keyOrder, setkeyOrder] = useState({})
   const [sorter, setSorter] = useState('Code')
   const [sortDir, setSortDir] = useState(1)
-  const [sortbyColumn, setSortByColumn] = useState(0)
   const [columnIndex, setSelectedIndex] = useState(0)
-  const [visible, setVisible] = useState(yearsVisible)
-
-  // Note: sorting is happening inside of the degree levels, e.g. bachelors, masters, etc...
-  const sortBySelectedColumn = () => {
-    const keys = {}
-    if (!(columnIndex === 0)) {
-      const numbersOfYears = dataStats.length
-      const data = sortedKeys?.map(programme => [programme, dataProgrammeStats[programme]])
-      const groupIndices = plotLinePlaces.length > 0 ? plotLinePlaces.map(value => value[0]) : []
-      for (let yearIndex = 0; yearIndex < numbersOfYears; yearIndex++) {
-        let yearlySortedKeys = []
-        if (groupIndices.length > 0) {
-          for (let i = 0; i < groupIndices.length; i++) {
-            const ending = i === groupIndices.length - 1 ? data.length : groupIndices[i + 1]
-            yearlySortedKeys = [
-              ...yearlySortedKeys,
-              ...data
-                .slice(groupIndices[i], ending)
-                .sort((a, b) => {
-                  if (sortDir === -1) return a[1][yearIndex][columnIndex] - b[1][yearIndex][columnIndex]
-                  return b[1][yearIndex][columnIndex] - a[1][yearIndex][columnIndex]
-                })
-                .map(yearlyProgrammes => yearlyProgrammes[0]),
-            ]
-          }
-        } else {
-          yearlySortedKeys = data
-            .sort((a, b) => {
-              if (sortDir === -1) return a[1][yearIndex][columnIndex] - b[1][yearIndex][columnIndex]
-              return b[1][yearIndex][columnIndex] - a[1][yearIndex][columnIndex]
-            })
-            .map(yearlyProgrammes => yearlyProgrammes[0])
-        }
-        keys[yearIndex] = yearlySortedKeys
-      }
-    }
-    setkeyOrder(keys)
-    setSortByColumn(columnIndex)
-  }
-  useEffect(sortBySelectedColumn, [columnIndex, dataStats, sortDir])
+  const [visible, setVisible] = useState(new Array(dataStats?.length ?? 0).fill(false))
 
   if (!dataStats || !titles || !dataProgrammeStats) return null
+
+  // Note: sorting is happening inside of the degree levels, e.g. bachelors, masters, etc...
+  const keyOrder = {}
+  if (!(columnIndex === 0)) {
+    const numbersOfYears = dataStats.length
+    const data = sortedKeys?.map(programme => [programme, dataProgrammeStats[programme]])
+    const groupIndices = plotLinePlaces.length > 0 ? plotLinePlaces.map(value => value[0]) : []
+    for (let yearIndex = 0; yearIndex < numbersOfYears; yearIndex++) {
+      let yearlySortedKeys = []
+      if (groupIndices.length > 0) {
+        for (let i = 0; i < groupIndices.length; i++) {
+          const ending = i === groupIndices.length - 1 ? data.length : groupIndices[i + 1]
+          yearlySortedKeys = [
+            ...yearlySortedKeys,
+            ...data
+              .slice(groupIndices[i], ending)
+              .sort((a, b) => {
+                if (sortDir === -1) return a[1][yearIndex][columnIndex] - b[1][yearIndex][columnIndex]
+                return b[1][yearIndex][columnIndex] - a[1][yearIndex][columnIndex]
+              })
+              .map(yearlyProgrammes => yearlyProgrammes[0]),
+          ]
+        }
+      } else {
+        yearlySortedKeys = data
+          .sort((a, b) => {
+            if (sortDir === -1) return a[1][yearIndex][columnIndex] - b[1][yearIndex][columnIndex]
+            return b[1][yearIndex][columnIndex] - a[1][yearIndex][columnIndex]
+          })
+          .map(yearlyProgrammes => yearlyProgrammes[0])
+      }
+      keyOrder[yearIndex] = yearlySortedKeys
+    }
+  }
 
   /* Calculation works as follows
    1. Calculate difference between current and previous year: current year - previous year
@@ -132,7 +124,7 @@ export const InteractiveDataTable = ({
       </Menu>
       <Table celled data-cy={`Table-${cypress}`}>
         <Table.Header>
-          <Table.Row key={`random-header-row-${Math.random()}`} textAlign="center">
+          <Table.Row textAlign="center">
             {titles?.map(title => (
               <Table.HeaderCell key={title}>{title}</Table.HeaderCell>
             ))}
@@ -140,7 +132,7 @@ export const InteractiveDataTable = ({
         </Table.Header>
         <Table.Body>
           {dataStats?.map((yearArray, yearIndex) => (
-            <Fragment key={`random-fragment-key-${Math.random()}`}>
+            <Fragment key={yearArray[0]}>
               <ExpandableRow
                 cypress={visible[yearIndex] ? `Hide-${cypress}` : `Show-${cypress}`}
                 icon={visible[yearIndex] ? 'angle down' : 'angle right'}
@@ -148,11 +140,11 @@ export const InteractiveDataTable = ({
                 yearArray={yearArray}
                 yearIndex={yearIndex}
               />
-              <Table.Row key={`stack-row-key-${Math.random()}`} style={{ display: visible[yearIndex] ? '' : 'none' }}>
-                <Table.Cell colSpan={100} data-cy={`Cell-${cypress}-${yearIndex}`} key={`stack-cell${Math.random()}`}>
+              <Table.Row style={{ display: visible[yearIndex] ? '' : 'none' }}>
+                <Table.Cell colSpan={100} data-cy={`Cell-${cypress}-${yearIndex}`}>
                   <CollapsedStackedBar
                     data={
-                      sortbyColumn === 0
+                      columnIndex === 0
                         ? sortedKeys
                             ?.map(programme =>
                               dataProgrammeStats[programme]
@@ -175,7 +167,7 @@ export const InteractiveDataTable = ({
                       }),
                       {}
                     )}
-                    labels={sortbyColumn === 0 ? sortedKeys : keyOrder[yearIndex]}
+                    labels={columnIndex === 0 ? sortedKeys : keyOrder[yearIndex]}
                     longLabels={programmeNames}
                     names={titles?.slice(sliceStart)}
                     plotLinePlaces={plotLinePlaces}

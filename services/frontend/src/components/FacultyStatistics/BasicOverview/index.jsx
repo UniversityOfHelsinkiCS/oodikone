@@ -3,7 +3,6 @@ import { Divider, Loader, Message, Radio } from 'semantic-ui-react'
 
 import { facultyToolTips } from '@/common/InfoToolTips'
 import { makeGraphData, makeTableStats } from '@/components/common/CreditsProduced'
-import { sortProgrammeKeys } from '@/components/FacultyStatistics/facultyHelpers'
 import { InteractiveDataTable } from '@/components/FacultyStatistics/InteractiveDataView'
 import { InfoBox } from '@/components/InfoBox'
 import { LineGraph } from '@/components/StudyProgramme/BasicOverview/LineGraph'
@@ -16,6 +15,7 @@ import {
   useGetFacultyCreditStatsQuery,
   useGetFacultyThesisStatsQuery,
 } from '@/redux/facultyStats'
+import { useGetProgrammesQuery } from '@/redux/populations'
 import { getTimestamp } from '@/util/timeAndDate'
 
 const calculateTotals = stats => {
@@ -35,6 +35,77 @@ const calculateTotals = stats => {
     }
   }
   return totals
+}
+
+const getSortedProgrammeIdsAndPlotLinePlaces = (data, degreeProgrammes, faculty) => {
+  if (!data || !degreeProgrammes) {
+    return { programmes: [], chartPlotLinePlaces: [] }
+  }
+
+  const programmeCodes = Object.values(data)
+    .map(prog => prog.code)
+    .reduce((acc, code) => {
+      acc[code] = degreeProgrammes[code]?.degreeProgrammeType ?? null
+      return acc
+    }, {})
+  const programmeIds = Object.entries(data).reduce((acc, [key, value]) => {
+    acc[value.code] = key
+    return acc
+  }, {})
+
+  const degreeTypes = [
+    {
+      types: ['urn:code:degree-program-type:bachelors-degree'],
+      key: 'Bachelors',
+      programmes: [],
+    },
+    {
+      types: ['urn:code:degree-program-type:masters-degree'],
+      key: 'Masters',
+      programmes: [],
+    },
+    {
+      types: ['urn:code:degree-program-type:doctor', 'urn:code:degree-program-type:lic'],
+      key: 'Doctors and Licentiates',
+      programmes: [],
+    },
+    {
+      types: ['urn:code:degree-program-type:postgraduate-professional'],
+      key: 'Postgraduate professionals',
+      programmes: [],
+    },
+  ]
+
+  for (const [programmeCode, degreeType] of Object.entries(programmeCodes)) {
+    const progId = programmeIds[programmeCode]
+    for (const degree of degreeTypes) {
+      if (degree.types.includes(degreeType)) {
+        degree.programmes.push(progId)
+        break
+      }
+    }
+  }
+
+  for (const degree of degreeTypes) {
+    degree.programmes.sort((a, b) => a.localeCompare(b))
+  }
+
+  const sortedProgrammes = []
+  const plotLinePlaces = []
+
+  for (const degree of degreeTypes) {
+    if (degree.programmes.length > 0) {
+      plotLinePlaces.push([sortedProgrammes.length, degree.key])
+      sortedProgrammes.push(...degree.programmes)
+    }
+  }
+
+  if (faculty) {
+    plotLinePlaces.push([sortedProgrammes.length, 'Produced by faculty'])
+    sortedProgrammes.push(faculty)
+  }
+
+  return { programmes: sortedProgrammes, plotLinePlaces }
 }
 
 export const BasicOverview = ({
@@ -70,6 +141,8 @@ export const BasicOverview = ({
     id: faculty?.id,
     yearType,
   })
+
+  const { data: degreeProgrammes } = useGetProgrammesQuery()
 
   const tableStats = credits.data ? makeTableStats(calculateTotals(credits.data), showAll, academicYear) : {}
   const graphStats = credits.data ? makeGraphData(calculateTotals(credits.data), showAll, academicYear) : null
@@ -118,63 +191,12 @@ export const BasicOverview = ({
     transferShortTitles.push('Transferred out', 'Transferred into')
   }
 
-  const options = {
-    KH: 'Bachelors',
-    MH: 'Masters',
-    T: 'Doctors and Licentiates',
-    LIS: 'Doctors and Licentiates',
-    OTHER: 'Other',
-    H: 'Provided by faculty',
-  }
-
-  const getChartPlotLinePlaces = programmeKeys => {
-    if (programmeKeys.length === 0) {
-      return []
-    }
-    let key = programmeKeys[0][1].slice(0, 2)
-    if (!['KH', 'MH', 'T', 'LIS'].includes(key)) {
-      key = 'OTHER'
-    }
-    const plotLinePlaces = [[0, options[key]]]
-    for (let i = 0; i < programmeKeys.length - 1; i++) {
-      if (
-        (programmeKeys[i][1].startsWith('KH') && programmeKeys[i + 1][1].startsWith('MH')) ||
-        (programmeKeys[i][1].startsWith('MH') && programmeKeys[i + 1][1].startsWith('KH')) ||
-        (programmeKeys[i][1].startsWith('MH') && programmeKeys[i + 1][1].startsWith('T')) ||
-        ((programmeKeys[i][1].startsWith('T') || programmeKeys[i][1].startsWith('LIS')) &&
-          (programmeKeys[i + 1][1].startsWith('KH') || programmeKeys[i + 1][1].startsWith('MH'))) ||
-        ((programmeKeys[i][1].startsWith('T') ||
-          programmeKeys[i][1].startsWith('LIS') ||
-          programmeKeys[i][1].startsWith('KH') ||
-          programmeKeys[i][1].startsWith('MH')) &&
-          programmeKeys[i + 1][1].startsWith('K-'))
-      ) {
-        let key = programmeKeys[i + 1][1].slice(0, 2)
-        if (!['KH', 'MH'].includes(key)) {
-          const keyT = programmeKeys[i + 1][1].slice(0, 1)
-          const keyLis = programmeKeys[i + 1][1].slice(0, 3)
-          if (keyT === 'T') {
-            key = keyT
-          } else if (keyLis === 'LIS') {
-            key = keyLis
-          } else {
-            key = 'OTHER'
-          }
-        }
-        if (
-          !programmeKeys[i + 1][1].includes(faculty.code) &&
-          (programmeKeys[i + 1][1].startsWith('MH') || programmeKeys[i + 1][1].startsWith('KH'))
-        ) {
-          plotLinePlaces.push([i + 1, `${options[key]} secondary`])
-        } else {
-          plotLinePlaces.push([i + 1, options[key]])
-        }
-      } else if (programmeKeys[i + 1][1].startsWith('H')) {
-        plotLinePlaces.push([i + 1, 'Produced by faculty'])
-      }
-    }
-    return plotLinePlaces
-  }
+  const { programmes: basicStatsProgrammes, plotLinePlaces: basicStatsPlotLinePlaces } =
+    getSortedProgrammeIdsAndPlotLinePlaces(basics.data?.programmeNames, degreeProgrammes)
+  const { programmes: thesisWriterStatsProgrammes, plotLinePlaces: thesisWriterStatsPlotLinePlaces } =
+    getSortedProgrammeIdsAndPlotLinePlaces(thesisWriters.data?.programmeNames, degreeProgrammes)
+  const { programmes: creditStatsProgrammes, plotLinePlaces: creditStatsPlotLinePlaces } =
+    getSortedProgrammeIdsAndPlotLinePlaces(credits.data?.programmeNames, degreeProgrammes, faculty.code)
 
   return (
     <div className="faculty-overview">
@@ -233,29 +255,14 @@ export const BasicOverview = ({
                 <div className="table-container-wide datatable">
                   <InteractiveDataTable
                     cypress="StudentsOfTheFaculty"
-                    dataProgrammeStats={basics?.data?.studentInfo.programmeTableStats}
-                    dataStats={basics?.data?.studentInfo.tableStats}
-                    plotLinePlaces={getChartPlotLinePlaces(
-                      sortProgrammeKeys(
-                        Object.keys(basics?.data?.studentInfo.programmeTableStats).map(obj => [
-                          obj,
-                          basics?.data?.programmeNames[obj].code,
-                        ]),
-                        faculty.code
-                      )
-                    )}
-                    programmeNames={basics?.data?.programmeNames}
+                    dataProgrammeStats={basics.data.studentInfo.programmeTableStats}
+                    dataStats={basics.data.studentInfo.tableStats}
+                    plotLinePlaces={basicStatsPlotLinePlaces}
+                    programmeNames={basics.data.programmeNames}
                     shortNames={transferShortTitles}
                     sliceStart={1}
-                    sortedKeys={sortProgrammeKeys(
-                      Object.keys(basics?.data?.studentInfo.programmeTableStats).map(obj => [
-                        obj,
-                        basics?.data?.programmeNames[obj].code,
-                      ]),
-                      faculty.code
-                    ).map(listObj => listObj[0])}
-                    titles={basics?.data?.studentInfo.titles}
-                    yearsVisible={Array(basics?.data?.studentInfo.tableStats.length).fill(false)}
+                    sortedKeys={basicStatsProgrammes}
+                    titles={basics.data.studentInfo.titles}
                   />
                 </div>
               </div>
@@ -273,28 +280,13 @@ export const BasicOverview = ({
                 <div className="table-container">
                   <InteractiveDataTable
                     cypress="GraduatedOfTheFaculty"
-                    dataProgrammeStats={basics?.data?.graduationInfo.programmeTableStats}
-                    dataStats={basics?.data?.graduationInfo.tableStats}
-                    plotLinePlaces={getChartPlotLinePlaces(
-                      sortProgrammeKeys(
-                        Object.keys(basics?.data?.graduationInfo.programmeTableStats).map(obj => [
-                          obj,
-                          basics?.data?.programmeNames[obj].code,
-                        ]),
-                        faculty.code
-                      )
-                    )}
-                    programmeNames={basics?.data?.programmeNames}
+                    dataProgrammeStats={basics.data.graduationInfo.programmeTableStats}
+                    dataStats={basics.data.graduationInfo.tableStats}
+                    plotLinePlaces={basicStatsPlotLinePlaces}
+                    programmeNames={basics.data.programmeNames}
                     sliceStart={2}
-                    sortedKeys={sortProgrammeKeys(
-                      Object.keys(basics?.data?.graduationInfo.programmeTableStats).map(obj => [
-                        obj,
-                        basics?.data?.programmeNames[obj].code,
-                      ]),
-                      faculty.code
-                    ).map(listObj => listObj[0])}
-                    titles={basics?.data?.graduationInfo.titles}
-                    yearsVisible={Array(basics?.data?.graduationInfo.tableStats.length).fill(false)}
+                    sortedKeys={basicStatsProgrammes}
+                    titles={basics.data.graduationInfo.titles}
                   />
                 </div>
               </div>
@@ -306,34 +298,19 @@ export const BasicOverview = ({
               <div className="section-container">
                 <LineGraph
                   cypress="ThesisWritersOfTheFaculty"
-                  data={{ ...thesisWriters?.data, years: thesisWriters?.data.years }}
+                  data={{ ...thesisWriters.data, years: thesisWriters.data.years }}
                   exportFileName={`oodikone_ThesisWritersOfTheFaculty_${faculty?.code}_${getTimestamp()}`}
                 />
                 <div className="table-container">
                   <InteractiveDataTable
                     cypress="ThesisWritersOfTheFaculty"
-                    dataProgrammeStats={thesisWriters?.data.programmeTableStats}
-                    dataStats={thesisWriters?.data.tableStats}
-                    plotLinePlaces={getChartPlotLinePlaces(
-                      sortProgrammeKeys(
-                        Object.keys(thesisWriters?.data?.programmeTableStats).map(obj => [
-                          obj,
-                          thesisWriters?.data?.programmeNames[obj].code,
-                        ]),
-                        faculty.code
-                      )
-                    )}
-                    programmeNames={thesisWriters?.data.programmeNames}
+                    dataProgrammeStats={thesisWriters.data.programmeTableStats}
+                    dataStats={thesisWriters.data.tableStats}
+                    plotLinePlaces={thesisWriterStatsPlotLinePlaces}
+                    programmeNames={thesisWriters.data.programmeNames}
                     sliceStart={2}
-                    sortedKeys={sortProgrammeKeys(
-                      Object.keys(thesisWriters?.data.programmeTableStats).map(obj => [
-                        obj,
-                        thesisWriters?.data?.programmeNames[obj].code,
-                      ]),
-                      faculty.code
-                    ).map(listObj => listObj[0])}
-                    titles={thesisWriters?.data?.titles}
-                    yearsVisible={Array(thesisWriters?.data.tableStats.length).fill(false)}
+                    sortedKeys={thesisWriterStatsProgrammes}
+                    titles={thesisWriters.data.titles}
                   />
                 </div>
               </div>
@@ -358,32 +335,15 @@ export const BasicOverview = ({
                     cypress="CreditsProducedByTheFaculty"
                     dataProgrammeStats={programmeStats}
                     dataStats={tableStats.data}
-                    plotLinePlaces={getChartPlotLinePlaces([
-                      ...sortProgrammeKeys(
-                        Object.keys(programmeStats)
-                          .filter(code => code !== faculty.code)
-                          .map(obj => [obj, credits.data.programmeNames[obj]?.code]),
-                        faculty.code
-                      ),
-                      [faculty.code, faculty.code],
-                    ])}
+                    plotLinePlaces={creditStatsPlotLinePlaces}
                     programmeNames={{
                       ...credits.data.programmeNames,
                       [faculty.code]: { ...faculty.name, code: faculty.code },
                     }}
                     shortNames={creditSortingTitles}
                     sliceStart={2}
-                    sortedKeys={[
-                      ...sortProgrammeKeys(
-                        Object.keys(programmeStats)
-                          .filter(code => code !== faculty.code)
-                          .map(obj => [obj, credits.data.programmeNames[obj]?.code]),
-                        faculty.code
-                      ),
-                      [faculty.code, faculty.code],
-                    ].map(listObj => listObj[0])}
+                    sortedKeys={creditStatsProgrammes}
                     titles={tableStats.titles}
-                    yearsVisible={Array(tableStats.data.length).fill(false)}
                   />
                 </div>
               </div>
