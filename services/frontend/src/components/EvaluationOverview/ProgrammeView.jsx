@@ -3,7 +3,7 @@ import { Divider, Header, Loader, Message, Segment } from 'semantic-ui-react'
 
 import { getTargetCreditsForProgramme } from '@/common'
 import { studyProgrammeToolTips } from '@/common/InfoToolTips'
-import { calculateStats } from '@/components/FacultyStatistics/FacultyProgrammeOverview'
+import { calculateStats } from '@/components/FacultyStatistics/facultyHelpers'
 import { InfoBox } from '@/components/InfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { DataTable } from '@/components/StudyProgramme/BasicOverview/DataTable'

@@ -1,8 +1,7 @@
 import { Button, Divider, Loader, Message, Popup } from 'semantic-ui-react'
 
-import { getCreditCategories } from '@/common'
 import { facultyToolTips } from '@/common/InfoToolTips'
-import { sortProgrammeKeys } from '@/components/FacultyStatistics/facultyHelpers'
+import { calculateStats, sortProgrammeKeys } from '@/components/FacultyStatistics/facultyHelpers'
 import { downloadProgressTable, downloadStudentTable } from '@/components/FacultyStatistics/xlsxFileDownloadHelper'
 import '@/components/FacultyStatistics/faculty.css'
 import { InfoBox } from '@/components/InfoBox'
@@ -32,67 +31,6 @@ const getKey = (programmeKeys, index) => {
     return 'KH'
   }
   return 'MH'
-}
-
-const isBetween = (number, lowerLimit, upperLimit) => {
-  return (lowerLimit === undefined || number >= lowerLimit) && (upperLimit === undefined || number < upperLimit)
-}
-
-export const calculateStats = (
-  creditCounts,
-  maximumAmountOfCredits,
-  minimumAmountOfCredits = 0,
-  numberOfCreditCategories = 7
-) => {
-  const tableStats = []
-  if (creditCounts === undefined) return null
-
-  if (Object.keys(creditCounts).length === 0) return null
-
-  const limits = getCreditCategories(
-    true,
-    'academic-year',
-    maximumAmountOfCredits,
-    Object.keys(creditCounts),
-    numberOfCreditCategories - 1,
-    minimumAmountOfCredits
-  )
-  const tableTitles = ['', 'All']
-  for (let i = 0; i < limits.length; i++) {
-    if (limits[i][0] === undefined) tableTitles.push(`< ${limits[i][1]} credits`)
-    else if (limits[i][1] === undefined) tableTitles.push(`≥ ${limits[i][0]} credits`)
-    else tableTitles.push(`${limits[i][0]}–${limits[i][1]} credits`)
-  }
-
-  Object.keys(creditCounts).forEach(year => {
-    const yearCreditCount = creditCounts[year]
-    const yearCounts = [year, yearCreditCount.length]
-    tableStats.push(yearCounts)
-    for (let i = 0; i < limits.length; i++) {
-      yearCounts.push(yearCreditCount.filter(credits => isBetween(credits, limits[i][0], limits[i][1])).length)
-    }
-  })
-
-  const totalCounts = ['Total']
-  for (let i = 1; i < tableStats[0].length; i++) {
-    let columnSum = 0
-    for (let j = 0; j < tableStats.length; j++) {
-      columnSum += tableStats[j][i]
-    }
-    totalCounts.push(columnSum)
-  }
-  tableStats.push(totalCounts)
-
-  // Calculate statistics for the bar chart (i.e., transpose the tableStats as rows are now columns and vice versa)
-  const chartStats = []
-  for (let i = 2; i < tableStats[0].length; i++) {
-    const column = []
-    for (let j = tableStats.length - 1; j >= 0; j--) {
-      column.push(tableStats[j][i])
-    }
-    chartStats.push({ name: tableTitles[i].replace('<', 'Less than').replace('≥', 'At least'), data: column })
-  }
-  return { tableStats, chartStats, tableTitles }
 }
 
 export const FacultyProgrammeOverview = ({
