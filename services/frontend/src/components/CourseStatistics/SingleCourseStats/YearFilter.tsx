@@ -1,7 +1,13 @@
-import { arrayOf, func, shape } from 'prop-types'
-import { Form } from 'semantic-ui-react'
+import { DropdownProps, Form } from 'semantic-ui-react'
 
-export const YearFilter = ({ years, fromYear, toYear, handleChange }) => (
+interface YearFilterProps {
+  years: Array<{ key: number; text: string; value: number }>
+  fromYear: number
+  toYear: number
+  handleChange: (event: React.SyntheticEvent, data: DropdownProps) => void
+}
+
+export const YearFilter = ({ years, fromYear, toYear, handleChange }: YearFilterProps) => (
   <Form>
     <Form.Group inline>
       <Form.Dropdown
@@ -31,8 +37,3 @@ export const YearFilter = ({ years, fromYear, toYear, handleChange }) => (
     </Form.Group>
   </Form>
 )
-
-YearFilter.propTypes = {
-  years: arrayOf(shape({})).isRequired,
-  handleChange: func.isRequired,
-}

@@ -7,13 +7,13 @@ import { Button, Form, Grid, Header, Popup, Segment } from 'semantic-ui-react'
 
 import { ProgrammeDropdown } from '@/components/CourseStatistics/ProgrammeDropdown'
 import { ResultTabs } from '@/components/CourseStatistics/ResultTabs'
-import { YearFilter } from '@/components/CourseStatistics/SearchForm/YearFilter'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useGetMaxYearsToCreatePopulationFromQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { setSelectedCourse, clearSelectedCourse } from '@/redux/singleCourseStats'
 import { ALL, getAllStudyProgrammes } from '@/selectors/courseStats'
 import { countTotalStats } from './countTotalStats'
+import { YearFilter } from './YearFilter'
 
 const countFilteredStudents = (stat, filter) => {
   if (!stat) {
