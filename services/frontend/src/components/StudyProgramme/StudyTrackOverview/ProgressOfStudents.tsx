@@ -1,7 +1,20 @@
 import { BarChart } from './BarChart'
 import { BasicDataTable } from './BasicDataTable'
 
-export const ProgressOfStudents = ({ progressStats, progressComboStats, track, years }) => {
+interface ProgressStats {
+  chartStats: Array<{ data: number[]; name: string }>
+  tableStats: Array<Array<string | number>>
+  tableTitles: string[]
+}
+
+interface ProgressOfStudentsProps {
+  progressStats: ProgressStats
+  progressComboStats: ProgressStats
+  track: string
+  years: string[]
+}
+
+export const ProgressOfStudents = ({ progressStats, progressComboStats, track, years }: ProgressOfStudentsProps) => {
   return (
     <div style={{ marginBottom: '4rem', textAlign: 'center' }}>
       {progressComboStats != null && (
