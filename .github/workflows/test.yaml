@@ -208,6 +208,7 @@ jobs:
           username: ${{ secrets.username }}
           password: ${{ secrets.password }}
           spec: ${{ matrix.spec }}
+          test_name: ${{ matrix.name }}
 
   # === Other tests ===
   test_service_exit_statuses:

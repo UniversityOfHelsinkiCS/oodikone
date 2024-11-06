@@ -68,3 +68,4 @@ jobs:
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
           spec: ${{ matrix.spec }}
+          test_name: ${{ matrix.name }}
