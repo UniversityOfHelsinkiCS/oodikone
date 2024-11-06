@@ -459,7 +459,11 @@ export const formatStudentsForApi = async (
 const getSubstitutions = async (codes: string[]) => {
   const courses = await Course.findAll({
     attributes: ['code', 'substitutions'],
-    where: { code: codes },
+    where: {
+      code: {
+        [Op.iLike]: { [Op.any]: codes },
+      },
+    },
     raw: true,
   })
 
