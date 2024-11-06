@@ -118,8 +118,10 @@ router.post('/v2/populationstatistics/courses', async (req: PostPopulationStatis
   try {
     const result = await bottlenecksOf(query, null, encrypted)
     return res.json(result)
-  } catch (error: any) {
-    Sentry.captureException(new Error(error.message))
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      Sentry.captureException(error)
+    }
     return res.status(400).end()
   }
 })
@@ -156,8 +158,10 @@ router.post(
         studentNumberList
       )
       return res.json(result)
-    } catch (error: any) {
-      Sentry.captureException(new Error(error.message))
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        Sentry.captureException(error)
+      }
       return res.status(400).end()
     }
   }
@@ -200,8 +204,10 @@ router.post(
         studentNumbers
       )
       return res.json(result)
-    } catch (error: any) {
-      Sentry.captureException(new Error(error.message))
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        Sentry.captureException(error)
+      }
       return res.status(400).end()
     }
   }
