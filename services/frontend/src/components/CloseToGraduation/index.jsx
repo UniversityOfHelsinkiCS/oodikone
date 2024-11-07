@@ -97,7 +97,7 @@ const getColumns = (
       filterType: 'date',
       displayColumn: !bachelorStudentsAreDisplayed,
       helpText:
-        "For students with only a study right in the master’s programme, this date is the same as 'Start of studyright'. For students with study rights in both the bachelor’s and master’s programmes, this date represents when they started in the master’s programme (i.e. one day after graduating from the bachelor’s programme).",
+        "For students with only a study right in the master’s programme, this date is the same as 'Start of study right'. For students with study rights in both the bachelor’s and master’s programmes, this date represents when they started in the master’s programme (i.e. one day after graduating from the bachelor’s programme).",
     },
     {
       key: 'credits',

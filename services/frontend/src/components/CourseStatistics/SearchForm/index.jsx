@@ -7,11 +7,10 @@ import { Form, Header, Message, Popup, Radio, Segment } from 'semantic-ui-react'
 
 import { validateInputLength } from '@/common'
 import { useSearchHistory, useToggle } from '@/common/hooks'
-import { TimeoutAutoSubmitSearchInput as AutoSubmitSearchInput } from '@/components/AutoSubmitSearchInput'
 import { MemoizedCourseTable as CourseTable } from '@/components/CourseStatistics/CourseTable'
+import { TimeoutAutoSubmitSearchInput as AutoSubmitSearchInput } from '@/components/CourseStatistics/SearchForm/AutoSubmitSearchInput'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SearchHistory } from '@/components/SearchHistory'
-import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { clearCourses, findCoursesV2 } from '@/redux/coursesearch'
 import { getCourseStats, clearCourseStats } from '@/redux/coursestats'
 import { getCourseSearchResults } from '@/selectors/courses'
@@ -44,11 +43,8 @@ export const SearchForm = ({ onProgress }) => {
   const [selectMultipleCoursesEnabled, toggleSelectMultipleCoursesEnabled] = useToggle(false)
   const matchingCourses = useSelector(state => getCourseSearchResults(state, combineSubstitutions))
   const [state, setState] = useState({ ...INITIAL })
-  const [searchHistory, addItemToSearchHistory, updateItemInSearchHistory] = useSearchHistory('courseSearch', 6)
-  const { programmeRights, fullAccessToStudentData } = useGetAuthorizedUserQuery()
-  const hasStudyProgrammeRights = programmeRights.length > 0 || fullAccessToStudentData
-
   const { courseName, courseCode, selectedCourses, separate } = state
+  const [searchHistory, addItemToSearchHistory, updateItemInSearchHistory] = useSearchHistory('courseSearch', 6)
 
   const parseQueryFromUrl = () => {
     const {
@@ -233,47 +229,30 @@ export const SearchForm = ({ onProgress }) => {
     })
   }
 
-  const newFeatureMessage = {
-    header: {
-      en: 'Are you looking for statistics of courses offered by a specific study programme?',
-      fi: 'Haluatko tarkastella tilastoja tietyn koulutusohjelman tarjoamista kursseista?',
-    },
-    content: {
-      en: 'You can now see the statistics of all courses offered by a study programme by selecting Programmes > Overview > Choose programme > Programme courses > By semester.',
-      fi: 'Voit nyt tarkastella tilastoja kaikista koulutusohjelman tarjoamista kursseista valitsemalla Programmes > Overview > Valitse ohjelma > Programme courses > By semester.',
-    },
-  }
-
   return (
     <>
       <Segment loading={isLoading}>
         <Form>
           <Header>Search for courses</Header>
-          {hasStudyProgrammeRights && (
-            <Message info>
-              <Message.Header>{getTextIn(newFeatureMessage.header)}</Message.Header>
-              <p>{getTextIn(newFeatureMessage.content)}</p>
-            </Message>
-          )}
           <div style={{ marginBottom: '15px' }}>
             <Form.Group>
-              <Form.Field width={8}>
-                <label>Name:</label>
+              <Form.Field width={7}>
+                <label>Name</label>
                 <AutoSubmitSearchInput
                   doSearch={fetchCourses}
                   loading={isLoading}
-                  onChange={cn => setState({ ...state, courseName: cn })}
+                  onChange={courseName => setState({ ...state, courseName })}
                   placeholder="Search by entering a course name"
                   value={courseName}
                 />
               </Form.Field>
-              <Form.Field width={3}>
-                <label>Code:</label>
+              <Form.Field width={4}>
+                <label>Code</label>
                 <AutoSubmitSearchInput
                   data-cy="course-code-input"
                   doSearch={fetchCourses}
                   loading={isLoading}
-                  onChange={cc => setState({ ...state, courseCode: cc })}
+                  onChange={courseCode => setState({ ...state, courseCode })}
                   placeholder="Search by a course code"
                   value={courseCode}
                 />
