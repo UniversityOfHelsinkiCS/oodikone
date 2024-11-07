@@ -3,10 +3,6 @@ const isDev = process.env.NODE_ENV === 'development'
 const isStaging = process.env.REACT_APP_STAGING === 'true'
 const isProduction = !isStaging && process.env.NODE_ENV === 'production'
 
-// Sentry
-const sentryRelease = process.env.SENTRY_RELEASE || ''
-const sentryEnvironment = process.env.SENTRY_ENVIRONMENT || ''
-const sentryDSN = process.env.SENTRY_DSN || ''
 const runningInCI = process.env.CI === 'true'
 
 // IAM group
@@ -84,9 +80,6 @@ module.exports = {
   SIS_DB_URL,
   SIS_UPDATER_URL,
   runningInCI,
-  sentryRelease,
-  sentryEnvironment,
-  sentryDSN,
   isProduction,
   pateToken,
   jamiUrl,

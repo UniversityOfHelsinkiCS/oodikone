@@ -36,14 +36,8 @@ import university from './routes/university'
 import updater from './routes/updater'
 import usersToska from './routes/users'
 import usersFd from './routes/usersFd'
-import initializeSentry from './util/sentry'
 
 const routes = (app: Express, url: string) => {
-  initializeSentry(app)
-
-  app.use(Sentry.Handlers.requestHandler())
-  app.use(Sentry.Handlers.tracingHandler())
-
   app.use(cors({ credentials: true, origin: frontUrl }))
   app.use(express.json())
   app.use(compression())
@@ -88,7 +82,7 @@ const routes = (app: Express, url: string) => {
     const results = { error: 'unknown endpoint' }
     res.status(404).json(results)
   })
-  app.use(Sentry.Handlers.errorHandler())
+  Sentry.setupExpressErrorHandler(app)
   app.use(errorHandler)
 }
 
