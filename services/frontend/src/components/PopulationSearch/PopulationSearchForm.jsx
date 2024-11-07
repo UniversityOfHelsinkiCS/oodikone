@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import Datetime from 'react-datetime'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory, useLocation } from 'react-router-dom'
-import { Button, Form, Message } from 'semantic-ui-react'
+import { Button, Form, Message, Radio } from 'semantic-ui-react'
 
 import { createPinnedFirstComparator, isNewStudyProgramme, textAndDescriptionSearch } from '@/common'
 import { useSearchHistory } from '@/common/hooks'
@@ -29,6 +29,7 @@ const initialQuery = () => ({
   studentStatuses: [],
   studyRights: {},
   months: getMonths('2017', 'FALL'),
+  showFullStudyPath: false,
 })
 
 export const PopulationSearchForm = ({ onProgress }) => {
@@ -38,8 +39,9 @@ export const PopulationSearchForm = ({ onProgress }) => {
   const populations = useSelector(state => state.populations)
   const previousQuery = populations.query || {}
   const { getTextIn } = useLanguage()
-  const { fullAccessToStudentData } = useGetAuthorizedUserQuery()
+  const { fullAccessToStudentData, isAdmin } = useGetAuthorizedUserQuery()
   const [query, setQuery] = useState(initialQuery())
+  const [showFullStudyPath, setShowFullStudyPath] = useState(false)
   const [searchHistory, addItemToSearchHistory, updateItemInSearchHistory] = useSearchHistory('populationSearch', 8)
   const [filterProgrammes, setFilterProgrammes] = useState(fullAccessToStudentData)
   const { data: programmes = {}, isLoading: programmesAreLoading } = useGetProgrammesQuery()
@@ -306,22 +308,37 @@ export const PopulationSearchForm = ({ onProgress }) => {
     return (
       <Form.Field>
         <label>Study programme</label>
-        <Form.Dropdown
-          clearable
-          closeOnChange
-          data-cy="select-study-programme"
-          disabled={!studyProgrammesAvailable}
-          fluid
-          noResultsMessage="No selectable study programmes"
-          onChange={handleProgrammeChange}
-          options={programmesToRender.sort(pinnedFirstComparator)}
-          placeholder="Select study programme"
-          search={textAndDescriptionSearch}
-          selectOnBlur={false}
-          selectOnNavigation={false}
-          selection
-          value={query.studyRights.programme}
-        />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }}>
+          <div style={{ flexGrow: 1 }}>
+            <Form.Dropdown
+              clearable
+              closeOnChange
+              data-cy="select-study-programme"
+              disabled={!studyProgrammesAvailable}
+              fluid
+              noResultsMessage="No selectable study programmes"
+              onChange={handleProgrammeChange}
+              options={programmesToRender.sort(pinnedFirstComparator)}
+              placeholder="Select study programme"
+              search={textAndDescriptionSearch}
+              selectOnBlur={false}
+              selectOnNavigation={false}
+              selection
+              value={query.studyRights.programme}
+            />
+          </div>
+          {isAdmin && (
+            <Radio
+              checked={showFullStudyPath}
+              label="Show full study path"
+              onChange={() => {
+                setQuery({ ...query, showFullStudyPath: !showFullStudyPath })
+                setShowFullStudyPath(!showFullStudyPath)
+              }}
+              toggle
+            />
+          )}
+        </div>
       </Form.Field>
     )
   }
