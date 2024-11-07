@@ -38,6 +38,8 @@ jobs:
           push: false
           tags: oodikone-backend:staging
           outputs: type=docker,dest=/tmp/backend.tar
+        env:
+          DOCKER_BUILD_SUMMARY: false
       - name: 'Upload image for other jobs'
         uses: actions/upload-artifact@v4
         with:
