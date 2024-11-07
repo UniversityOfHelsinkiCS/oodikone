@@ -90,6 +90,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           pattern: 'updater-{worker,scheduler}-image'
+      - run: ls -R
       - name: 'Load worker image'
         run: docker load --input worker.tar
       - name: 'Load scheduler image'
