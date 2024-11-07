@@ -199,7 +199,7 @@ const SingleStudyGroupFilterView = ({ courses, group, population, ...otherProps 
 
   if (group?.tags?.studyProgramme && isMastersProgramme(group.tags.studyProgramme)) {
     viewFilters.push(
-      filters.studyrightTypeFilter({
+      filters.studyRightTypeFilter({
         programme: group.tags.studyProgramme,
         year: group.tags.year,
       })

@@ -392,7 +392,7 @@ export const GeneralTab = ({
     },
     studyrightStart: {
       key: 'studyrightStart',
-      title: 'Start of\nstudyright',
+      title: 'Start of\nstudy right',
       filterType: 'date',
       getRowVal: student => reformatDate(studentToStudyrightStartMap[student.studentNumber], ISO_DATE_FORMAT),
     },

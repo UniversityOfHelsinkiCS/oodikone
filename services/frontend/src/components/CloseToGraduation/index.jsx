@@ -84,7 +84,7 @@ const getColumns = (
     },
     {
       key: 'startOfStudyright',
-      title: 'Start of studyright',
+      title: 'Start of\nstudy right',
       getRowVal: row => row.studyright.startDate,
       formatValue: date => reformatDate(date, ISO_DATE_FORMAT),
       filterType: 'date',
@@ -301,7 +301,7 @@ export const CloseToGraduation = () => {
                   setChosenProgrammes(chosenProgrammes.filter(p => value.includes(p.slice(1, 4))))
                 }}
                 options={facultyOptions}
-                placeholder="Choose faculties..."
+                placeholder="Choose faculties"
                 search
                 selection
                 value={chosenFaculties}
@@ -313,7 +313,7 @@ export const CloseToGraduation = () => {
                 multiple
                 onChange={(_, { value }) => setChosenProgrammes([...value])}
                 options={programmeOptions}
-                placeholder="Choose degree programmes..."
+                placeholder="Choose degree programmes"
                 search
                 selection
                 value={chosenProgrammes}

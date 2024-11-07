@@ -3,7 +3,7 @@ import { Form, Radio } from 'semantic-ui-react'
 import { filterToolTips } from '@/common/InfoToolTips'
 import { createFilter } from './createFilter'
 
-const StudyrightStatusFilterCard = ({ options, onOptionsChange, combinedProgrammeCode }) => {
+const StudyRightStatusFilterCard = ({ options, onOptionsChange, combinedProgrammeCode }) => {
   const { activeProgramme, activeCombinedProgramme } = options
 
   const toggle = (buttonValue, type) => () =>
@@ -18,7 +18,7 @@ const StudyrightStatusFilterCard = ({ options, onOptionsChange, combinedProgramm
             activeCombinedProgramme: null,
           }
     )
-  const restOfTitle = combinedProgrammeCode ? 'Bachelor studyright' : 'studyright'
+  const restOfTitle = combinedProgrammeCode ? 'Bachelor study right' : 'study right'
   const typeOfCombined = combinedProgrammeCode === 'MH90_001' ? 'Licentiate' : 'Master'
   return (
     <Form>
@@ -41,7 +41,7 @@ const StudyrightStatusFilterCard = ({ options, onOptionsChange, combinedProgramm
           <Radio
             checked={activeCombinedProgramme === true}
             data-cy="option-active-combined"
-            label={`Active ${typeOfCombined} studyright`}
+            label={`Active ${typeOfCombined} study right`}
             name="radioGroup"
             onChange={toggle(true, 'combinedProgramme')}
           />
@@ -57,7 +57,7 @@ const StudyrightStatusFilterCard = ({ options, onOptionsChange, combinedProgramm
           <Radio
             checked={activeCombinedProgramme === false}
             data-cy="option-inactive-combined"
-            label={`Inactive ${typeOfCombined} studyright`}
+            label={`Inactive ${typeOfCombined} study right`}
             name="radioGroup"
             onChange={toggle(false, 'combinedProgramme')}
           />
@@ -67,10 +67,10 @@ const StudyrightStatusFilterCard = ({ options, onOptionsChange, combinedProgramm
   )
 }
 
-export const studyrightStatusFilter = createFilter({
-  key: 'studyrightStatusFilter',
+export const studyRightStatusFilter = createFilter({
+  key: 'studyRightStatusFilter',
 
-  title: 'Studyright status',
+  title: 'Study right status',
 
   info: filterToolTips.studyRightStatus,
 
@@ -100,12 +100,12 @@ export const studyrightStatusFilter = createFilter({
     const currentSemesterCode = currentSemester.semestercode
     const enrollment = studyRight.semesterEnrollments?.find(enrollment => enrollment.semester === currentSemesterCode)
 
-    // Studyright is active if the student has enrolled (absent or present) for the current semester
+    // Study right is active if the student has enrolled (absent or present) for the current semester
     if (activeProgramme === true || activeCombinedProgramme === true) {
       return enrollment != null && [1, 2].includes(enrollment.type)
     }
 
-    // Studyright is inactive if the student has not enrolled for the current semester
+    // Study right is inactive if the student has not enrolled for the current semester
     if (activeProgramme === false || activeCombinedProgramme === false) {
       return enrollment == null || (enrollment && enrollment.type === 3)
     }
@@ -114,6 +114,6 @@ export const studyrightStatusFilter = createFilter({
   },
 
   render: (props, { args }) => (
-    <StudyrightStatusFilterCard {...props} combinedProgrammeCode={args.combinedProgrammeCode} />
+    <StudyRightStatusFilterCard {...props} combinedProgrammeCode={args.combinedProgrammeCode} />
   ),
 })

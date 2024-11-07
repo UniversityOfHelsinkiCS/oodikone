@@ -31,7 +31,7 @@ const TransferredToProgrammeFilterCard = ({ options, onOptionsChange }) => {
         <Radio
           checked={transferred === false}
           data-cy="option-havenot"
-          label="Not Transferred"
+          label="Not transferred"
           name="radioGroup"
           onChange={toggle(false)}
         />

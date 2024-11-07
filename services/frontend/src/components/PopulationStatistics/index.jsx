@@ -20,8 +20,8 @@ import {
   hopsFilter,
   startYearAtUniFilter,
   studentNumberFilter,
-  studyrightStatusFilter,
-  studyrightTypeFilter,
+  studyRightStatusFilter,
+  studyRightTypeFilter,
   studyTrackFilter,
   tagsFilter,
   transferredToProgrammeFilter,
@@ -86,7 +86,7 @@ export const PopulationStatistics = () => {
     studentNumberFilter,
     startYearAtUniFilter,
     studyTrackFilter({ code: programmeCode }),
-    studyrightStatusFilter({ code: programmeCode, combinedProgrammeCode, currentSemester }),
+    studyRightStatusFilter({ code: programmeCode, combinedProgrammeCode, currentSemester }),
     tagsFilter,
     transferredToProgrammeFilter,
   ].filter(Boolean)
@@ -95,7 +95,7 @@ export const PopulationStatistics = () => {
 
   if (programmeCode && degreeProgrammeType[programmeCode] === 'urn:code:degree-program-type:masters-degree') {
     filters.push(
-      studyrightTypeFilter({
+      studyRightTypeFilter({
         programme: programmeCode,
         year: query?.year,
       })

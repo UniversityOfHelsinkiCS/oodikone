@@ -127,7 +127,7 @@ export const populationStatisticsToolTips = {
     - **Credits**
       - **All** listaa opiskelijan suoritetut opintopisteet valitun tarkastelujakson ajalta
       - **Since** listaa opiskelijan suoritetut opintopisteet määritellystä ajankohdasta alkaen
-    - **Start of studyright**: Opiskelijan valittuun ohjelmaan liittyvän opinto-oikeuden alkupäivä
+    - **Start of study right**: Opiskelijan valittuun ohjelmaan liittyvän opinto-oikeuden alkupäivä
     - **Study programme**: Näyttää opiskelijan uusimman opinto-oikeuden. Opiskelijan kaikki opinto-oikeudet näkyvät uusimmasta vanhimpaan Excel-tiedostossa, sekä laittamalla hiiri solun päälle.
     - **Other programme**: Näkyy, jos ryhmälle on asetettu opinto-oikeus. Tämä korvaa Study programme -sarakkeen, ja toimii muuten samoin mutta näyttää opiskelijan muista opinto-oikeuksista uusimman.
     - **Started in programme**: Opiskelijan valitussa ohjelmassa aloituspäivämäärä. Kandi+maisteriopiskelijoille kandiksi valmistumispäivämäärä +1.
@@ -149,7 +149,7 @@ export const populationStatisticsToolTips = {
       - **HOPS** listaa opiskelijan kaikki HOPSiin sijoitut opintopisteet (myös aiemmat suoritukset, eli ne jotka tehty ennen valittuun tarkastelujaksoon ja populaatioon kuulumista)
       - **Since start in programme** listaa opiskelijan ohjelmassa aloittamisen jälkeen suoritut opintopisteet
     - **Transferred from**: Owpiskelijan vanha koulutusohjelma, josta opiskelija on siirtynyt uuteen.
-    - **Start of studyright**: Opiskelijan valittuun ohjelmaan liittyvän opinto-oikeuden alkupäivä
+    - **Start of study right**: Opiskelijan valittuun ohjelmaan liittyvän opinto-oikeuden alkupäivä
     - **Started in programme**: Opiskelijan ko. ohjelmassa aloituspäivämäärä. Kandi+maisteriopiskelijoille kandiksi valmistumispäivämäärä +1
     - **Semesters present**: Näyttää opiskelijan ilmoittautumiset lukukausittain. Laita hiiri solun yläpuolelle nähdäksesi tekstimuotoisen selityksen ilmoittautumisista.
       - Värikoodit:

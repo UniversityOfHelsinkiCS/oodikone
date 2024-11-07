@@ -8,13 +8,13 @@ const STUDYRIGHT_TYPES = {
   master: { label: 'Master only', value: 2 },
 }
 
-const StudyrightTypeFilterCard = ({ options, onOptionsChange }) => {
+const StudyRightTypeFilterCard = ({ options, onOptionsChange }) => {
   const { mode } = options
 
-  const modeOptions = Object.entries(STUDYRIGHT_TYPES).map(([key, studyrightType]) => ({
+  const modeOptions = Object.entries(STUDYRIGHT_TYPES).map(([key, studyRightType]) => ({
     key,
-    text: studyrightType.label,
-    value: studyrightType.value,
+    text: studyRightType.label,
+    value: studyRightType.value,
   }))
 
   return (
@@ -37,10 +37,10 @@ const StudyrightTypeFilterCard = ({ options, onOptionsChange }) => {
   )
 }
 
-export const studyrightTypeFilter = createFilter({
-  key: 'studyright-type',
+export const studyRightTypeFilter = createFilter({
+  key: 'studyRightTypeFilter',
 
-  title: 'Studyright type',
+  title: 'Study right type',
 
   defaultOptions: {
     mode: 0,
@@ -60,5 +60,5 @@ export const studyrightTypeFilter = createFilter({
     return mode === 1 ? studyRight.extentCode === 5 : studyRight.extentCode === 2
   },
 
-  component: StudyrightTypeFilterCard,
+  component: StudyRightTypeFilterCard,
 })
