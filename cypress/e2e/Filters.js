@@ -83,27 +83,27 @@ describe("Population statistics with a master's programme", () => {
     })
   })
 
-  describe('Studyright type filter', () => {
+  describe('Study right type filter', () => {
     it('is visible', () => {
-      cy.contains('Studyright type')
+      cy.contains('Study right type')
     })
 
     it('is set to all by default', () => {
-      runTestStepWithPreAndPostParts('studyright-type', () => {
-        const card = cy.cs('studyright-type-filter-card')
+      runTestStepWithPreAndPostParts('studyRightTypeFilter', () => {
+        const card = cy.cs('studyRightTypeFilter-filter-card')
         card.get('[data-cy="all"] input').should('be.checked')
       })
     })
 
     it('works', () => {
-      runTestStepWithPreAndPostParts('studyright-type', () => {
+      runTestStepWithPreAndPostParts('studyRightTypeFilter', () => {
         const expectedBaMaStudents = 24
         const expectedMasterOnlyStudents = 2
-        cy.cs('studyright-type-filter-card').cs('bama').click()
+        cy.cs('studyRightTypeFilter-filter-card').cs('bama').click()
         checkFilteringResult(expectedBaMaStudents)
-        cy.cs('studyright-type-filter-card').cs('master').click()
+        cy.cs('studyRightTypeFilter-filter-card').cs('master').click()
         checkFilteringResult(expectedMasterOnlyStudents)
-        cy.cs('studyright-type-filter-card').cs('all').click()
+        cy.cs('studyRightTypeFilter-filter-card').cs('all').click()
         checkFilteringResult(defaultAmountOfStudents)
       })
     })
@@ -249,8 +249,8 @@ describe('Population Statistics', () => {
     checkFilteringResult(defaultAmountOfStudents)
   })
 
-  it('Studyright type filter is not visible', () => {
-    cy.contains('Studyright type').should('not.exist')
+  it('Study right type filter is not visible', () => {
+    cy.contains('Study right type').should('not.exist')
   })
 })
 

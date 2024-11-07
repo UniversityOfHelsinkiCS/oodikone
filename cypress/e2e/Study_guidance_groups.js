@@ -132,7 +132,7 @@ describe('Study guidance group tests', () => {
         const firstRowHeadings = [
           'Student number',
           'Credits',
-          'Start of studyright',
+          'Start of study right',
           'Started in programme',
           'Semesters present',
           'Graduation date',
