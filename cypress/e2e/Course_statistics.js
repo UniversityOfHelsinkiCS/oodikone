@@ -49,6 +49,14 @@ const openAttemptsTab = () => {
   cy.contains('#CourseStatPanes a.item', 'Attempts').click()
 }
 
+const searchByCourseName = courseName => {
+  cy.get("input[placeholder='Search by course name']").type(courseName)
+}
+
+const searchByCourseCode = courseCode => {
+  cy.get("input[placeholder='Search by course code']").type(courseCode)
+}
+
 describe('Course Statistics tests', () => {
   describe('When using basic user', () => {
     beforeEach(() => {
@@ -65,7 +73,7 @@ describe('Course Statistics tests', () => {
           [null, 'HT', 177],
         ]
         cy.contains('Search for courses')
-        cy.get("input[placeholder='Search by a course code']").type('KK-RUKIRJ')
+        searchByCourseCode('KK-RUKIRJ')
         cy.contains('td', /^KK-RUKIRJ,/).click()
         cy.contains('Search for courses').should('not.exist')
         cy.contains('KK-RUKIRJ Toisen kotimaisen kielen kirjallinen taito, ruotsi (CEFR B1)')
@@ -99,7 +107,7 @@ describe('Course Statistics tests', () => {
           [null, 'CL', 1],
         ]
         cy.contains('Search for courses')
-        cy.get("input[placeholder='Search by a course code']").type('50131')
+        searchByCourseCode('50131')
         cy.contains('td', '50131').click()
         cy.contains('Search for courses').should('not.exist')
         cy.contains('50131 Pro gradu -tutkielma tietojenkäsittelytieteessä')
@@ -115,7 +123,7 @@ describe('Course Statistics tests', () => {
           [null, 'Hyl.', 1],
         ]
         cy.contains('Search for courses')
-        cy.get("input[placeholder='Search by a course code']").type('200012')
+        searchByCourseCode('200012')
         cy.contains('td', '200012').click()
         cy.contains('Search for courses').should('not.exist')
         cy.contains(
@@ -133,7 +141,7 @@ describe('Course Statistics tests', () => {
 
     it('Searching single course having substitution mappings shows course statistics', () => {
       cy.contains('Search for courses')
-      cy.get("input[placeholder='Search by a course code']").type('TKT20001')
+      searchByCourseCode('TKT20001')
       cy.contains('td', /^TKT20001/).click()
       cy.contains('Search for courses').should('not.exist')
 
@@ -157,7 +165,7 @@ describe('Course Statistics tests', () => {
       cy.contains('Search for courses')
       cy.cs('select-multiple-courses-toggle').should('not.have.class', 'checked').click()
       cy.cs('select-multiple-courses-toggle').should('have.class', 'checked')
-      cy.get("input[placeholder='Search by a course code']").type('TKT')
+      searchByCourseCode('TKT')
       cy.contains('td', /^TKT20001/).click()
       cy.contains('td', /^TKT10002/).click()
       cy.contains('Fetch statistics').should('be.enabled').click()
@@ -181,7 +189,7 @@ describe('Course Statistics tests', () => {
 
     it('On searches with multiple courses, has correct links on the Course tab', () => {
       cy.cs('select-multiple-courses-toggle').click()
-      cy.get("input[placeholder='Search by a course code']").type('TKT')
+      searchByCourseCode('TKT')
       cy.contains('td', /^TKT20001/).click()
       cy.contains('td', /^TKT10002/).click()
       cy.contains('Fetch statistics').click()
@@ -202,14 +210,14 @@ describe('Course Statistics tests', () => {
 
     it('On consecutive searches should not crash and search should work', () => {
       cy.contains('Search for courses')
-      cy.get("input[placeholder='Search by a course code']").type('TKT20003')
+      searchByCourseCode('TKT20003')
       cy.contains('td', 'TKT20003').click()
       cy.contains('Show population')
       cy.contains('TKT20003')
 
       cy.contains('Courses').click()
       cy.contains('Search for courses')
-      cy.get("input[placeholder='Search by a course code']").type('TKT20001')
+      searchByCourseCode('TKT20001')
       cy.contains('td', 'TKT20001').click()
       cy.contains('Show population')
       cy.contains('TKT20001')
@@ -217,7 +225,7 @@ describe('Course Statistics tests', () => {
 
     it('Searching course by name displays right courses', () => {
       cy.contains('Search for courses')
-      cy.get("input[placeholder='Search by entering a course name']").type('tietokantojen perusteet')
+      searchByCourseName('tietokantojen perusteet')
 
       cy.contains('Tietokantojen perusteet')
       cy.contains('td', 'TKT10004, BSCS2001, 581328, A581328, AYTKT10004').click()
@@ -235,7 +243,7 @@ describe('Course Statistics tests', () => {
 
     it('"Select all search results" button is not showing unless "Select multiple courses" toggle is on', () => {
       cy.contains('Search for courses')
-      cy.get("input[placeholder='Search by a course code']").type('TKT')
+      searchByCourseCode('TKT')
       cy.get('[data-cy="select-multiple-courses-toggle"]').should('not.have.class', 'checked')
       cy.contains('TKT10004, BSCS2001, 581328, A581328, AYTKT10004')
       cy.contains('Select all search results').should('not.exist')
@@ -246,7 +254,7 @@ describe('Course Statistics tests', () => {
 
     it('Provider organization toggle works', () => {
       cy.contains('Search for courses')
-      cy.get("input[placeholder='Search by entering a course name']").type('tietokantojen perusteet')
+      searchByCourseName('tietokantojen perusteet')
 
       cy.contains('td', /^TKT10004/).click()
       cy.contains('Search for courses').should('not.exist')
@@ -265,7 +273,7 @@ describe('Course Statistics tests', () => {
 
     it('Searching course by name displays right courses, 10 credit courses', () => {
       cy.contains('Search for courses')
-      cy.get("input[placeholder='Search by entering a course name']").type('tietorakenteet ja algoritmit')
+      searchByCourseName('tietorakenteet ja algoritmit')
       cy.contains('Tietorakenteet ja algoritmit')
       cy.contains('td', 'TKT20001, BSCS1003, 58131, AYTKT20001').click()
       cy.contains('Search for courses').should('not.exist')
@@ -276,7 +284,7 @@ describe('Course Statistics tests', () => {
       cy.contains('58131 Tietorakenteet')
       cy.get('.right').click()
       cy.contains('No results')
-      cy.get("input[placeholder='Search by entering a course name']").type('tietorakenteet ja algoritmit')
+      searchByCourseName('tietorakenteet ja algoritmit')
       cy.contains('td', 'TKT20001, BSCS1003, 58131, AYTKT20001').click()
 
       cy.contains('Search for courses').should('not.exist')
@@ -288,7 +296,7 @@ describe('Course Statistics tests', () => {
 
     it('Can find course population', () => {
       cy.contains('Search for courses')
-      cy.get("input[placeholder='Search by a course code']").type('TKT20003')
+      searchByCourseCode('TKT20003')
       cy.contains('tr', 'TKT20003').click()
       cy.contains('TKT20003 Käyttöjärjestelmät')
       cy.contains('582219 Käyttöjärjestelmät')
@@ -302,7 +310,7 @@ describe('Course Statistics tests', () => {
     })
 
     it('Population of course shows grades for each student', () => {
-      cy.get("input[placeholder='Search by a course code']").type('TKT20001')
+      searchByCourseCode('TKT20001')
       cy.contains('td', 'TKT20001, BSCS1003, 58131, AYTKT20001').click()
       cy.contains('TKT20001 Tietorakenteet ja algoritmit')
       cy.contains('AYTKT20001 Avoin yo: Tietorakenteet ja algoritmit')
@@ -316,7 +324,7 @@ describe('Course Statistics tests', () => {
     })
 
     it("In 'Course population' view, student numbers of students that the user isn't allowed to see are hidden", () => {
-      cy.get("input[placeholder='Search by a course code']").type('TKT20001')
+      searchByCourseCode('TKT20001')
       cy.contains('td', 'TKT20001, BSCS1003, 58131, AYTKT20001').click()
       cy.contains('TKT20001 Tietorakenteet ja algoritmit')
       cy.contains('AYTKT20001 Avoin yo: Tietorakenteet ja algoritmit')
@@ -329,7 +337,7 @@ describe('Course Statistics tests', () => {
     })
 
     it('Language distribution is correct', () => {
-      cy.get("input[placeholder='Search by a course code']").type('TKT20003')
+      searchByCourseCode('TKT20003')
       cy.contains('td', 'TKT20003, 582219').click()
       cy.contains('TKT20003 Käyttöjärjestelmät')
       cy.contains('582219 Käyttöjärjestelmät')
@@ -348,7 +356,7 @@ describe('Course Statistics tests', () => {
           cy.contains('Search for courses')
           cy.get('[data-cy="combine-substitutions-toggle"]').should('have.class', 'checked').click()
           cy.get('[data-cy="combine-substitutions-toggle"]').should('not.have.class', 'checked')
-          cy.get("input[placeholder='Search by a course code']").type('TKT10002')
+          searchByCourseCode('TKT10002')
           cy.contains('td', /^TKT10002$/).click()
           cy.contains('Search for courses').should('not.exist')
           cy.contains('TKT10002 Ohjelmoinnin perusteet')
@@ -544,7 +552,7 @@ describe('Course Statistics tests', () => {
         beforeEach(() => {
           cy.url().should('include', '/coursestatistics')
           cy.contains('Search for courses')
-          cy.get("input[placeholder='Search by a course code']").type('TKT10002')
+          searchByCourseCode('TKT10002')
           cy.contains('td', /^TKT10002, BSCS1001, 581325, A581325, AYTKT10002$/).click()
           cy.contains('Search for courses').should('not.exist')
           cy.contains('TKT10002 Ohjelmoinnin perusteet')
@@ -883,7 +891,7 @@ describe('Course Statistics tests', () => {
       })
 
       it('If no data available, provider organization(s) toggle is disabled', () => {
-        cy.get("input[placeholder='Search by a course code']").type('TKT20014')
+        searchByCourseCode('TKT20014')
         cy.contains('TKT20014').click()
         cy.contains('TKT20014 Kypsyysnäyte LuK')
         cy.contains('50036 Suomenkielinen kypsyysnäyte LuK')
