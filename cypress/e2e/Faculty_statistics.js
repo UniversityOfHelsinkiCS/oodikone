@@ -91,7 +91,7 @@ describe('Faculty overview', () => {
       ]
       sections.forEach(section => {
         cy.get(`[data-cy="Graph-${section}"]`).within(() => {
-          cy.get('[aria-label="View chart menu, Chart"]').click()
+          cy.get('[aria-label="View chart menu, Chart"]').click({ force: true })
           cy.contains('li.highcharts-menu-item', 'Download XLS').click()
           const downloadedFile = `oodikone_${section}_H50_${timestamp}.xls`
           cy.readFile(path.join(downloadsFolder, downloadedFile))
