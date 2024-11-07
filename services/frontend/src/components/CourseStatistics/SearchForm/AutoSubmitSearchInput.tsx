@@ -1,33 +1,39 @@
-import { func, string } from 'prop-types'
 import { useEffect, useState } from 'react'
 import { Input } from 'semantic-ui-react'
 
 import { Timeout } from '@/components/Timeout'
 
-const TIMEOUTS = {
-  FETCH: 'fetch',
-  SEARCH: 'search',
+enum Timeouts {
+  FETCH = 'fetch',
+  SEARCH = 'search',
+}
+
+interface AutoSubmitSearchInputProps {
+  cypress: string
+  doSearch: (searchTerm: string) => void
+  inputValue: string
+  loading: boolean
+  onChange: (searchTerm: string) => void
+  setTimeout: (timeout: Timeouts, callback: () => void, latency: number) => void
+  placeholder: string
 }
 
 const AutoSubmitSearchInput = ({
-  clearAllTimeouts,
-  clearTimeout,
+  cypress,
+  doSearch,
+  inputValue,
+  loading,
   onChange,
   setTimeout,
-  value,
-  latency = 250,
   placeholder,
-  minSearchLength = 0,
-  doSearch,
-  loading = false,
-  disabled = false,
-  ...rest
-}) => {
-  const [input, setInput] = useState(value)
+}: AutoSubmitSearchInputProps) => {
+  const [input, setInput] = useState(inputValue)
+  const latency = 250
+  const minSearchLength = 0
 
-  const executeSearch = searchterm => {
-    clearTimeout(TIMEOUTS.FETCH)
-    setTimeout(TIMEOUTS.FETCH, () => doSearch(searchterm), latency)
+  const executeSearch = (searchTerm: string) => {
+    clearTimeout(Timeouts.FETCH)
+    setTimeout(Timeouts.FETCH, () => doSearch(searchTerm), latency)
   }
 
   useEffect(() => {
@@ -36,47 +42,26 @@ const AutoSubmitSearchInput = ({
     }
   }, [input])
 
-  const resetComponent = () => {
-    onChange('')
-  }
-
-  const handleSearchChange = (_event, { value: val }) => {
-    clearTimeout(TIMEOUTS.SEARCH)
-    if (val.length >= 0) {
-      onChange(val)
-      setTimeout(
-        TIMEOUTS.SEARCH,
-        () => {
-          setInput(val)
-        },
-        latency
-      )
+  const handleSearchChange = (_event, { value }) => {
+    clearTimeout(Timeouts.SEARCH)
+    if (value.length >= 0) {
+      onChange(value)
+      setTimeout(Timeouts.SEARCH, () => setInput(value), latency)
     } else {
-      resetComponent()
+      onChange('')
     }
   }
   return (
     <Input
-      disabled={disabled}
+      data-cy={cypress}
       fluid
       icon="search"
       loading={loading}
       onChange={handleSearchChange}
       placeholder={placeholder}
-      value={value}
-      {...rest}
+      value={inputValue}
     />
   )
-}
-
-AutoSubmitSearchInput.propTypes = {
-  clearAllTimeouts: func.isRequired,
-  clearTimeout: func.isRequired,
-  setTimeout: func.isRequired,
-  doSearch: func.isRequired,
-  placeholder: string.isRequired,
-  value: string.isRequired,
-  onChange: func.isRequired,
 }
 
 export const TimeoutAutoSubmitSearchInput = Timeout(AutoSubmitSearchInput)

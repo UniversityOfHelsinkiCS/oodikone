@@ -191,7 +191,9 @@ export const SearchForm = ({ onProgress }) => {
       />
     )
 
-    if (noSelectedCourses) return null
+    if (noSelectedCourses) {
+      return null
+    }
 
     if (disabled) {
       return (
@@ -239,22 +241,23 @@ export const SearchForm = ({ onProgress }) => {
               <Form.Field width={7}>
                 <label>Name</label>
                 <AutoSubmitSearchInput
+                  cypress="course-name-input"
                   doSearch={fetchCourses}
+                  inputValue={courseName}
                   loading={isLoading}
                   onChange={courseName => setState({ ...state, courseName })}
-                  placeholder="Search by entering a course name"
-                  value={courseName}
+                  placeholder="Search by course name"
                 />
               </Form.Field>
               <Form.Field width={4}>
                 <label>Code</label>
                 <AutoSubmitSearchInput
-                  data-cy="course-code-input"
+                  cypress="course-code-input"
                   doSearch={fetchCourses}
+                  inputValue={courseCode}
                   loading={isLoading}
                   onChange={courseCode => setState({ ...state, courseCode })}
-                  placeholder="Search by a course code"
-                  value={courseCode}
+                  placeholder="Search by course code"
                 />
               </Form.Field>
               <Form.Field>
