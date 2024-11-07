@@ -1,73 +1,82 @@
 /// <reference types="cypress" />
 // Now "Class statistics" in UI
 
-describe('Population Statistics tests', () => {
-  const pathToMathBSc2020 =
-    '/populations?months=49&semesters=FALL&semesters=SPRING&studyRights=%7B"programme"%3A"KH50_001"%7D&year=2020'
-  const pathToMathMSc2020 =
-    '/populations?months=49&semesters=FALL&semesters=SPRING&studyRights=%7B"programme"%3A"MH50_001"%7D&year=2020'
-  describe('when using basic user', () => {
+const selectStudyProgramme = programme => {
+  cy.contains('Select study programme')
+  cy.get('[data-cy=select-study-programme]').click().children().contains(programme).click()
+}
+
+const selectStudyTrack = studyTrack => {
+  cy.contains('Select study track')
+  cy.get('[data-cy=select-study-track]').click().children().contains(studyTrack).click()
+}
+
+describe('Population statistics tests', () => {
+  const getPath = programme => {
+    return `/populations?months=49&semesters=FALL&semesters=SPRING&studyRights=%7B"programme"%3A"${programme}"%7D&year=2020`
+  }
+
+  const pathToMathBSc2020 = getPath('KH50_001')
+  const pathToMathMSc2020 = getPath('MH50_001')
+
+  describe('When using basic user', () => {
     beforeEach(() => {
       cy.init('/populations')
     })
 
-    it('Population statistics search infobox works', () => {
-      cy.get('[data-cy="PopulationSearch-info-content"]').should('not.exist')
-      cy.get('[data-cy="PopulationSearch-open-info"]').click()
-      cy.get('[data-cy="PopulationSearch-info-content"]').should('be.visible')
-      cy.get('[data-cy="PopulationSearch-info-content"]').should(
-        'contain',
-        'lukuvuosi, jolloin opiskelija on ilmoittautunut'
-      )
-      cy.get('[data-cy="PopulationSearch-close-info"]').click()
-      cy.get('[data-cy="PopulationSearch-info-content"]').should('not.exist')
-    })
+    describe('Population search', () => {
+      it('Info box works', () => {
+        cy.get('[data-cy="PopulationSearch-info-content"]').should('not.exist')
+        cy.get('[data-cy="PopulationSearch-open-info"]').click()
+        cy.get('[data-cy="PopulationSearch-info-content"]').should('be.visible')
+        cy.get('[data-cy="PopulationSearch-info-content"]').should('contain', 'Tässä osiossa voi tarkastella')
+        cy.get('[data-cy="PopulationSearch-close-info"]').click()
+        cy.get('[data-cy="PopulationSearch-info-content"]').should('not.exist')
+      })
 
-    it('Population statistics search form is usable', () => {
-      cy.contains('See class').should('be.disabled')
-      cy.contains('Search for class')
-      cy.contains('Class of')
-        .parent()
-        .within(() => {
-          cy.get('.form-control').as('enrollmentSelect')
+      it('Form is usable', () => {
+        cy.contains('Search for class')
+        cy.contains('See class').should('be.disabled')
+        cy.contains('Class of')
+          .parent()
+          .within(() => {
+            cy.get('.form-control').as('enrollmentSelect')
+          })
+
+        cy.get('@enrollmentSelect')
+          .its(`${[0]}.value`)
+          .then(beforeVal => {
+            cy.get('@enrollmentSelect').click()
+            cy.get('.yearSelectInput .rdtPrev').click({ force: true })
+            cy.get('.yearSelectInput table').contains('2018-2019').click({ force: true })
+            cy.get('@enrollmentSelect').should('not.have.value', beforeVal)
+          })
+
+        cy.contains('No study tracks available for this programme')
+        selectStudyProgramme('Matematiikan ja tilastotieteen maisteriohjelma')
+        cy.contains('See class').should('be.enabled')
+        selectStudyTrack('Matematiikka ja soveltava matematiikka')
+        cy.contains('See class').should('be.enabled')
+      })
+
+      describe('Correct population is shown for programme', () => {
+        it('without study tracks', () => {
+          cy.contains('Select study programme')
+          selectStudyProgramme('Matemaattisten tieteiden kandiohjelma')
+          cy.contains('See class').click()
+          cy.contains('Matemaattisten tieteiden kandiohjelma 2017 - 2018')
+          cy.contains('class size 47 students')
         })
 
-      cy.get('@enrollmentSelect')
-        .its(`${[0]}.value`)
-        .then(beforeVal => {
-          cy.get('@enrollmentSelect').click()
-          cy.get('.yearSelectInput .rdtPrev').click({ force: true })
-          cy.get('.yearSelectInput table').contains('2018-2019').click({ force: true })
-          cy.get('@enrollmentSelect').should('not.have.value', beforeVal)
+        it('with study tracks', () => {
+          selectStudyProgramme('Matematiikan ja tilastotieteen maisteriohjelma')
+          selectStudyTrack('Matematiikka ja soveltava matematiikka')
+          cy.contains('See class').click()
+          cy.contains('Matematiikan ja tilastotieteen maisteriohjelma 2017 - 2018')
+          cy.contains('studytrack MAST-MSM')
+          cy.contains('class size 1 students')
         })
-
-      cy.contains('Select study programme')
-      cy.get('[data-cy=select-study-programme]')
-        .click()
-        .children()
-        .contains('Matematiikan ja tilastotieteen maisteriohjelma')
-        .click()
-      cy.contains('See class').should('be.enabled')
-
-      cy.contains('Select study track')
-      cy.get('[data-cy=select-study-track]')
-        .click()
-        .children()
-        .contains('Matematiikka ja soveltava matematiikka')
-        .click()
-      cy.contains('See class').should('be.enabled')
-    })
-
-    it('Searching for population really shows population', () => {
-      cy.contains('Select study programme')
-      cy.get('[data-cy=select-study-programme]')
-        .click()
-        .children()
-        .contains('Matemaattisten tieteiden kandiohjelma')
-        .click()
-      cy.contains('See class').click()
-      cy.contains('Matemaattisten tieteiden kandiohjelma 2017 - 2018')
-      cy.contains('class size 47 students')
+      })
     })
 
     it('Population statistics is usable on general level', () => {
@@ -305,7 +314,7 @@ describe('Population Statistics tests', () => {
     })
   })
 
-  describe('when using admin', () => {
+  describe('When using admin', () => {
     it('Student list checking works as intended', () => {
       cy.init(pathToMathBSc2020, 'admin')
       const existing = '433237'
@@ -334,7 +343,7 @@ describe('Population Statistics tests', () => {
     })
   })
 
-  describe('when using IAM user', () => {
+  describe('When using IAM user', () => {
     beforeEach(() => {
       cy.init(pathToMathBSc2020, 'onlyiamrights')
       cy.contains('Matemaattisten tieteiden kandiohjelma 2020 - 2021')
