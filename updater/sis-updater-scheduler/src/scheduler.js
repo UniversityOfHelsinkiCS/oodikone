@@ -1,6 +1,6 @@
 const { eachLimit } = require('async')
+const crypto = require('crypto')
 const { chunk } = require('lodash')
-const uuid = require('uuid')
 
 const {
   NATS_GROUP,
@@ -43,7 +43,7 @@ const schedule = async (args, channel = SIS_UPDATER_SCHEDULE_CHANNEL) => {
     return
   }
 
-  const id = uuid.v4()
+  const id = crypto.randomUUID()
 
   const completionChannel = stan.subscribe(`SIS_COMPLETED_CHANNEL-${id}`, NATS_GROUP, opts)
 
