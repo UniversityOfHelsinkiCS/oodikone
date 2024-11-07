@@ -39,8 +39,9 @@ jobs:
           tags: oodikone-backend:staging
           outputs: type=docker,dest=/tmp/backend.tar
       - name: 'Upload image for other jobs'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
+          name: backend-image
           path: /tmp/backend.tar
 
   build_frontend:
@@ -106,9 +107,8 @@ jobs:
               - 'services/backend/src/database/migrations_kone/**'
               - '.github/workflows/test.yaml'
       - name: 'Download images'
-        uses: actions/download-artifact@v3
-        with:
-          path: /tmp/
+        uses: actions/download-artifact@v4
+      - run: ls -R
       - name: 'Load built backend image'
         run: docker load --input /tmp/artifact/backend.tar
       - name: 'Login to toska docker registry'
@@ -140,9 +140,8 @@ jobs:
               - 'services/backend/src/database/migrations_user/**'
               - '.github/workflows/test.yaml'
       - name: 'Download images'
-        uses: actions/download-artifact@v3
-        with:
-          path: /tmp/
+        uses: actions/download-artifact@v4
+      - run: ls -R
       - name: 'Load built backend image'
         run: docker load --input /tmp/artifact/backend.tar
       - name: 'Login to toska docker registry'
