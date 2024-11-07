@@ -219,12 +219,6 @@ const SingleStudyGroupFilterView = ({ courses, group, population, ...otherProps 
       ? group?.tags?.studyProgramme.split('+')
       : [group?.tags?.studyProgramme]
     viewFilters.push(
-      filters.graduatedFromProgrammeFilter({
-        code: programmes[0],
-        combinedProgrammeCode: programmes.length > 1 ? programmes[1] : '',
-      })
-    )
-    viewFilters.push(
       filters.hopsFilter({
         programmeCode: programmes[0],
         combinedProgrammeCode: programmes.length > 1 ? programmes[1] : '',
