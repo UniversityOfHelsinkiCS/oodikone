@@ -91,7 +91,6 @@ jobs:
         with:
           pattern: 'updater-{worker,scheduler}-image'
           merge-multiple: true
-      - run: ls -R
       - name: 'Load worker image'
         run: docker load --input worker.tar
       - name: 'Load scheduler image'
@@ -136,6 +135,9 @@ jobs:
           context: updater/sis-updater-worker
           containerfiles: |
             updater/sis-updater-worker/Dockerfile
+          build-args: |
+            SENTRY_RELEASE=${{ github.sha }}
+            SENTRY_ENVIRONMENT=production
 
       - name: Push to quay.io
         uses: redhat-actions/push-to-registry@v2
@@ -163,6 +165,9 @@ jobs:
           context: updater/sis-updater-scheduler
           containerfiles: |
             updater/sis-updater-scheduler/Dockerfile
+          build-args: |
+            SENTRY_RELEASE=${{ github.sha }}
+            SENTRY_ENVIRONMENT=production
 
       - name: Push to quay.io
         uses: redhat-actions/push-to-registry@v2
