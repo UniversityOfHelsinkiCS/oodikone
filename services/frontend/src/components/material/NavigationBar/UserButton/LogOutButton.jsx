@@ -4,7 +4,7 @@ import { ListItemIcon, MenuItem, Typography } from '@mui/material'
 import { isDev } from '@/conf'
 import { useLogoutMutation } from '@/redux/auth'
 
-export const LogoutButton = () => {
+export const LogOutButton = () => {
   const [logout] = useLogoutMutation()
 
   return (
@@ -12,7 +12,7 @@ export const LogoutButton = () => {
       <ListItemIcon>
         <Logout color="error" />
       </ListItemIcon>
-      <Typography color="error">Logout</Typography>
+      <Typography color="error">Log out</Typography>
     </MenuItem>
   )
 }

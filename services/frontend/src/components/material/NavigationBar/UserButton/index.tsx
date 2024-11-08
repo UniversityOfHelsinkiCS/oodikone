@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { LANGUAGE_CODES, LANGUAGE_TEXTS } from '@/shared/language'
-import { LogoutButton } from './LogoutButton'
+import { LogOutButton } from './LogOutButton'
 import { StopMockingButton } from './StopMockingButton'
 
 export const UserButton = () => {
@@ -63,7 +63,7 @@ export const UserButton = () => {
           </MenuItem>
         ))}
         <Divider />
-        {mockedBy ? <StopMockingButton /> : <LogoutButton />}
+        {mockedBy ? <StopMockingButton /> : <LogOutButton />}
       </Menu>
     </Box>
   )
