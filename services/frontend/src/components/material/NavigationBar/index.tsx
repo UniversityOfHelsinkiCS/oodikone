@@ -13,7 +13,7 @@ export const NavigationBar = () => {
   const { fullAccessToStudentData, isAdmin, isLoading, programmeRights, roles } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
 
-  const refreshNavigationRoutes = () => {
+  const getVisibleNavigationItems = () => {
     const visibleNavigationItems: Record<string, NavigationItem> = {}
     if (isLoading) {
       return visibleNavigationItems
@@ -49,22 +49,28 @@ export const NavigationBar = () => {
     return { ...visibleNavigationItems }
   }
 
-  const visibleNavigationItems = refreshNavigationRoutes()
+  const visibleNavigationItems = getVisibleNavigationItems()
 
   return (
     <AppBar position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Logo />
-          <Box sx={{ display: 'flex', flexGrow: 1 }}>
-            {Object.values(visibleNavigationItems).map(item => (
-              <Fragment key={item.key}>
-                {['feedback', 'admin'].includes(item.key) && <NavigationDivider />}
-                <NavigationButton item={item} />
-              </Fragment>
-            ))}
-          </Box>
-          <UserButton />
+          {!isLoading && (
+            <>
+              <Box sx={{ display: 'flex', flexGrow: 1, justifyContent: 'space-evenly', textAlign: 'center' }}>
+                <NavigationDivider />
+                {Object.values(visibleNavigationItems).map(item => (
+                  <Fragment key={item.key}>
+                    {['feedback', 'admin'].includes(item.key) && <NavigationDivider />}
+                    <NavigationButton item={item} />
+                  </Fragment>
+                ))}
+                <NavigationDivider />
+              </Box>
+              <UserButton />
+            </>
+          )}
         </Toolbar>
       </Container>
     </AppBar>

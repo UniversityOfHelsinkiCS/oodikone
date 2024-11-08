@@ -5,7 +5,7 @@ import { isDev } from '@/conf'
 
 export const Logo = () => {
   return (
-    <Stack alignItems="center" direction="row" gap={1} marginRight={2}>
+    <Stack alignItems="center" direction="row" gap={1}>
       <Typography
         component={Link}
         noWrap

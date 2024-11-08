@@ -1,16 +1,16 @@
-import { Check, Language, Logout } from '@mui/icons-material'
+import { Check, Language } from '@mui/icons-material'
 import { Avatar, Box, Divider, IconButton, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material'
 import { useState } from 'react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { isDev } from '@/conf'
-import { useGetAuthorizedUserQuery, useLogoutMutation } from '@/redux/auth'
+import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { LANGUAGE_CODES, LANGUAGE_TEXTS } from '@/shared/language'
+import { LogoutButton } from './LogoutButton'
+import { StopMockingButton } from './StopMockingButton'
 
 export const UserButton = () => {
-  const [logout] = useLogoutMutation()
   const { language, setLanguage } = useLanguage()
-  const { isLoading, username } = useGetAuthorizedUserQuery()
+  const { isLoading, mockedBy, username } = useGetAuthorizedUserQuery()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
   const currentLanguage: string = language as unknown as string // TODO: Fix the type in the origin
@@ -24,7 +24,7 @@ export const UserButton = () => {
   return (
     <Box sx={{ flexGrow: 0 }}>
       <IconButton onClick={event => setAnchorEl(event.currentTarget)} sx={{ p: 0 }}>
-        <Avatar />
+        <Avatar alt={username} />
       </IconButton>
       <Menu
         anchorEl={anchorEl}
@@ -45,7 +45,7 @@ export const UserButton = () => {
         {!isLoading && username && (
           <MenuItem sx={{ pointerEvents: 'none' }}>
             <Typography>
-              Logged in as <b>{username}</b>
+              {mockedBy ? 'Mocked' : 'Logged in'} as <b>{username}</b>
             </Typography>
           </MenuItem>
         )}
@@ -63,12 +63,7 @@ export const UserButton = () => {
           </MenuItem>
         ))}
         <Divider />
-        <MenuItem disabled={isDev} onClick={() => logout()}>
-          <ListItemIcon>
-            <Logout color="error" />
-          </ListItemIcon>
-          <Typography color="error">Logout</Typography>
-        </MenuItem>
+        {mockedBy ? <StopMockingButton /> : <LogoutButton />}
       </Menu>
     </Box>
   )
