@@ -40,6 +40,8 @@ export const NavigationBar = () => {
         if (!checkUserAccess(['admin', 'fullSisuAccess', 'facultyStatistics'], roles)) return
       } else if (key === 'feedback') {
         if (!isDefaultServiceProvider()) return
+      } else if (key === 'admin') {
+        if (!isAdmin) return
       }
       const { reqRights } = navigationItems[key]
       if (!reqRights || reqRights.every(r => roles.includes(r) || (key === 'teachers' && isAdmin))) {

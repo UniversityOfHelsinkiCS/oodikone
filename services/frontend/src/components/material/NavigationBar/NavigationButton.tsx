@@ -61,21 +61,20 @@ export const NavigationButton = ({ item }: { item: NavigationItem }) => {
     return false
   }
 
+  const style = {
+    color: 'inherit',
+    mx: 1,
+    '&:hover': {
+      color: 'inherit',
+      textDecoration: 'underline',
+    },
+    whiteSpace: 'nowrap',
+  }
+
   if (items) {
     return (
       <Fragment key={`menu-item-drop-${key}`}>
-        <Button
-          data-cy={`navbar-${key}`}
-          onClick={event => setAnchorEl(event.currentTarget)}
-          sx={{
-            color: 'inherit',
-            mx: 1,
-            '&:hover': {
-              color: 'inherit',
-              textDecoration: 'underline',
-            },
-          }}
-        >
+        <Button data-cy={`navbar-${key}`} onClick={event => setAnchorEl(event.currentTarget)} sx={style}>
           {label}
         </Button>
         <Menu anchorEl={anchorEl} onClose={() => setAnchorEl(null)} open={Boolean(anchorEl)}>
@@ -99,20 +98,7 @@ export const NavigationButton = ({ item }: { item: NavigationItem }) => {
   }
 
   return (
-    <Button
-      component={Link}
-      data-cy={`navbar-${key}`}
-      key={`menu-item-${path}`}
-      sx={{
-        color: 'inherit',
-        mx: 1,
-        '&:hover': {
-          color: 'inherit',
-          textDecoration: 'underline',
-        },
-      }}
-      to={path}
-    >
+    <Button component={Link} data-cy={`navbar-${key}`} key={`menu-item-${path}`} sx={style} to={path}>
       {label}
     </Button>
   )

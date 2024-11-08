@@ -24,7 +24,7 @@ export const UserButton = () => {
   return (
     <Box sx={{ flexGrow: 0 }}>
       <IconButton onClick={event => setAnchorEl(event.currentTarget)} sx={{ p: 0 }}>
-        <Avatar alt={username} />
+        <Avatar alt={username}>{username[0].toUpperCase()}</Avatar>
       </IconButton>
       <Menu
         anchorEl={anchorEl}
