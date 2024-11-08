@@ -15,9 +15,4 @@ module.exports.REDIS_LATEST_MESSAGE_RECEIVED = 'LATEST_MESSAGE_RECEIVED'
 module.exports.REDIS_LAST_COMPLETED_SCHEDULE = 'LAST_COMPLETED_SCHEDULE'
 module.exports.rootOrgId = process.env.ROOT_ORG_ID || 'hy-university-root-id'
 module.exports.serviceProvider = process.env.SERVICE_PROVIDER ? process.env.SERVICE_PROVIDER.toLowerCase() : ''
-
-// Sentry
-module.exports.sentryRelease = process.env.SENTRY_RELEASE || ''
-module.exports.sentryEnvironment = process.env.SENTRY_ENVIRONMENT || ''
-module.exports.sentryDSN = process.env.SENTRY_DSN || ''
 module.exports.runningInCI = process.env.CI === 'true'

@@ -22,9 +22,4 @@ module.exports.ENABLE_WORKER_REPORTING =
   module.exports.EXIT_AFTER_IMMEDIATES || process.env.ENABLE_WORKER_REPORTING === 'yes'
 module.exports.SLACK_WEBHOOK = process.env.SLACK_WEBHOOK
 module.exports.serviceProvider = process.env.SERVICE_PROVIDER ? process.env.SERVICE_PROVIDER.toLowerCase() : ''
-
-// Sentry
-module.exports.sentryRelease = process.env.SENTRY_RELEASE || ''
-module.exports.sentryEnvironment = process.env.SENTRY_ENVIRONMENT || ''
-module.exports.sentryDSN = process.env.SENTRY_DSN || ''
 module.exports.runningInCI = process.env.CI === 'true'
