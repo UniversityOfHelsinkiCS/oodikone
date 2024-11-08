@@ -11,7 +11,6 @@ export const Logo = () => {
         noWrap
         sx={{
           color: 'inherit',
-          fontFamily: 'monospace',
           fontWeight: 700,
           letterSpacing: '.1rem',
           '&:hover': {

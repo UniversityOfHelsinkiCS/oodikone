@@ -1,4 +1,12 @@
-export const statisticsItems = {
+export type NavigationItem = {
+  key: string
+  label: string
+  path?: string
+  reqRights?: string[]
+  items?: NavigationItem[]
+}
+
+export const navigationItems: Record<string, NavigationItem> = {
   university: { key: 'university', label: 'University', path: '/university' },
   faculty: { key: 'faculties', label: 'Faculties', path: '/faculties' },
   populations: {
@@ -29,13 +37,7 @@ export const statisticsItems = {
     ],
     label: 'Special populations',
   },
-}
-
-export const oodikoneItems = {
   feedback: { key: 'feedback', label: 'Feedback', path: '/feedback' },
-}
-
-export const adminItems = {
   admin: {
     key: 'admin',
     items: [
