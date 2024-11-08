@@ -1,3 +1,4 @@
+import { ArrowDropDown } from '@mui/icons-material'
 import { Button, Menu, MenuItem } from '@mui/material'
 import { Fragment, useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -63,7 +64,6 @@ export const NavigationButton = ({ item }: { item: NavigationItem }) => {
 
   const style = {
     color: 'inherit',
-    mx: 1,
     '&:hover': {
       color: 'inherit',
       textDecoration: 'underline',
@@ -74,7 +74,12 @@ export const NavigationButton = ({ item }: { item: NavigationItem }) => {
   if (items) {
     return (
       <Fragment key={`menu-item-drop-${key}`}>
-        <Button data-cy={`navbar-${key}`} onClick={event => setAnchorEl(event.currentTarget)} sx={style}>
+        <Button
+          data-cy={`navbar-${key}`}
+          endIcon={<ArrowDropDown />}
+          onClick={event => setAnchorEl(event.currentTarget)}
+          sx={style}
+        >
           {label}
         </Button>
         <Menu anchorEl={anchorEl} onClose={() => setAnchorEl(null)} open={Boolean(anchorEl)}>
