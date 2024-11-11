@@ -1,5 +1,5 @@
-import { Check, Language } from '@mui/icons-material'
-import { Avatar, Box, Divider, IconButton, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material'
+import { AccountCircle, Check, Language } from '@mui/icons-material'
+import { Box, Divider, IconButton, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material'
 import { useState } from 'react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -23,8 +23,8 @@ export const UserButton = () => {
 
   return (
     <Box sx={{ flexGrow: 0 }}>
-      <IconButton onClick={event => setAnchorEl(event.currentTarget)} sx={{ p: 0 }}>
-        <Avatar alt={username}>{username[0].toUpperCase()}</Avatar>
+      <IconButton color="inherit" onClick={event => setAnchorEl(event.currentTarget)} sx={{ p: 0 }}>
+        <AccountCircle />
       </IconButton>
       <Menu
         anchorEl={anchorEl}

@@ -1,7 +1,7 @@
 import { ArrowDropDown } from '@mui/icons-material'
 import { Button, Menu, MenuItem } from '@mui/material'
 import { Fragment, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 
 import { checkUserAccess, getFullStudyProgrammeRights, isDefaultServiceProvider } from '@/common'
 import { languageCenterViewEnabled } from '@/conf'
@@ -11,12 +11,13 @@ import { NavigationItem } from './navigationItems'
 export const NavigationButton = ({ item }: { item: NavigationItem }) => {
   const { iamGroups, programmeRights, roles } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
+  const location = useLocation()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
   const { key, label, path, items } = item
 
-  const showSearch = (subItemKey: string) => {
-    if (subItemKey === 'class' || subItemKey === 'overview') {
+  const showItem = (subItemKey: string) => {
+    if (['class', 'completedCoursesSearch', 'overview'].includes(subItemKey)) {
       return true
     }
 
@@ -33,10 +34,6 @@ export const NavigationButton = ({ item }: { item: NavigationItem }) => {
         fullStudyProgrammeRights.length > 0) &&
       subItemKey === 'customSearch'
     ) {
-      return true
-    }
-
-    if (subItemKey === 'completedCoursesSearch') {
       return true
     }
 
@@ -62,35 +59,46 @@ export const NavigationButton = ({ item }: { item: NavigationItem }) => {
     return false
   }
 
-  const style = {
+  const isActivePath = (mainPath: string | undefined, subPaths: (string | undefined)[] = []) => {
+    const allPaths = [mainPath, ...subPaths].filter(Boolean)
+    return allPaths.some(currentPath => location.pathname.includes(currentPath!))
+  }
+
+  const subItemPaths = items ? items.map(subItem => subItem.path) : []
+  const isActive = isActivePath(path, subItemPaths)
+
+  const buttonStyle = {
     color: 'inherit',
+    fontWeight: isActive ? 'bold' : 'normal',
+    textTransform: 'none',
+    whiteSpace: 'nowrap',
     '&:hover': {
       color: 'inherit',
       textDecoration: 'underline',
     },
-    whiteSpace: 'nowrap',
   }
 
   if (items) {
     return (
-      <Fragment key={`menu-item-drop-${key}`}>
+      <Fragment key={`men-item-drop-${key}`}>
         <Button
           data-cy={`navbar-${key}`}
           endIcon={<ArrowDropDown />}
           onClick={event => setAnchorEl(event.currentTarget)}
-          sx={style}
+          sx={buttonStyle}
         >
           {label}
         </Button>
         <Menu anchorEl={anchorEl} onClose={() => setAnchorEl(null)} open={Boolean(anchorEl)}>
           {items.map(
             subItem =>
-              showSearch(subItem.key) && (
+              showItem(subItem.key) && (
                 <MenuItem
                   component={Link}
                   data-cy={`navbar-${subItem.key}`}
-                  key={`menu-item-${subItem.path}`}
+                  key={subItem.path}
                   onClick={() => setAnchorEl(null)}
+                  selected={location.pathname.includes(subItem.path)}
                   to={subItem.path}
                 >
                   {subItem.label}
@@ -103,7 +111,7 @@ export const NavigationButton = ({ item }: { item: NavigationItem }) => {
   }
 
   return (
-    <Button component={Link} data-cy={`navbar-${key}`} key={`menu-item-${path}`} sx={style} to={path}>
+    <Button component={Link} data-cy={`navbar-${key}`} sx={buttonStyle} to={path}>
       {label}
     </Button>
   )
