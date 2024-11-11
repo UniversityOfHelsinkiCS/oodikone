@@ -912,7 +912,7 @@ describe('Course Statistics tests', () => {
 
   it('Some features of Course Statistics are hidden for courseStatistics-users without other rights', () => {
     cy.init('/coursestatistics', 'onlycoursestatistics')
-    cy.get('[data-cy=navbar-courseStatistics]').click()
+    cy.get('[data-cy=nav-bar-button-courseStatistics]').click()
     cy.get('[data-cy=course-code-input]').type('TKT10002')
     cy.contains('tr', 'TKT10002').click()
     cy.contains('Filter statistics by study programmes').should('not.exist')
