@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import exportData from 'highcharts/modules/export-data'
 import exporting from 'highcharts/modules/exporting'
 import { chain, flatten, flow } from 'lodash'

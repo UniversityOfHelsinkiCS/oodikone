@@ -432,10 +432,9 @@ router.post('/v3/populationstatisticsbystudentnumbers', async (req: PostByStuden
   const filteredStudentNumbers = hasFullAccessToStudentData(roles)
     ? studentnumberlist
     : intersection(studentnumberlist, studentsUserCanAccess)
-  const studyProgrammeCode =
-    tags?.studyProgramme && tags?.studyProgramme.includes('+')
-      ? tags?.studyProgramme.split('+')[0]
-      : tags?.studyProgramme
+  const studyProgrammeCode = tags?.studyProgramme?.includes('+')
+    ? tags?.studyProgramme.split('+')[0]
+    : tags?.studyProgramme
 
   const result = await optimizedStatisticsOf(
     {

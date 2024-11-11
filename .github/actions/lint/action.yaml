@@ -18,4 +18,4 @@ runs:
       run: npm run stylelint "services/frontend/src/**/*.css"
     - name: 'Run ESLint for JS and TS files'
       shell: bash
-      run: npm run eslint -- --ext .js,.jsx,.ts,.tsx services --report-unused-disable-directives
+      run: npm run eslint -- services

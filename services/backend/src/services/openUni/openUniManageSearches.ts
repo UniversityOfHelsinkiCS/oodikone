@@ -36,7 +36,7 @@ export const getOpenUniSearches = async (userId: string) => {
 
 export const createNewSearch = async (userId: string, name: string, courseCodes: string[]) => {
   const savedSearches = await getOpenUniSearchesByUser(userId)
-  if (savedSearches && savedSearches.some(search => search.name === name)) {
+  if (savedSearches?.some(search => search.name === name)) {
     return null
   }
   try {

@@ -1,5 +1,3 @@
-/* eslint-disable func-names */
-/* eslint-disable object-shorthand */
 /* eslint-disable react/no-this-in-sfc */
 import accessibility from 'highcharts/modules/accessibility'
 import exportData from 'highcharts/modules/export-data'
@@ -76,7 +74,7 @@ export const MedianTimeBarChart = ({ byStartYear, data, goal, title }: MedianTim
     tooltip: {
       backgroundColor: 'white',
       fontSize: '25px',
-      formatter: function (this: {
+      formatter(this: {
         y: number
         point: { amount: number; name: string; statistics: Statistics; classSize: number }
       }) {
@@ -103,7 +101,7 @@ export const MedianTimeBarChart = ({ byStartYear, data, goal, title }: MedianTim
             style: {
               textOutline: 'none',
             },
-            formatter: function (this: { point: { amount: number; classSize: number } }) {
+            formatter(this: { point: { amount: number; classSize: number } }) {
               return getDataLabel(this.point.amount, this.point.classSize)
             },
           },

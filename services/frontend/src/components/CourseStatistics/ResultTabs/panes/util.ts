@@ -33,33 +33,27 @@ export const isThesisGrades = (grades: Record<string, number>) => {
 }
 
 const isThesisSeries = (series: Array<Record<string, number>>) => {
-  return series && series.some(record => isThesisGrades(record))
+  return series?.some(record => isThesisGrades(record))
 }
 
 const isSecondNationalLanguageSeries = (series: Array<Record<string, number>>) => {
-  return (
-    series &&
-    series.every(record => {
-      const grades = Object.keys(record)
-      const hasPassFailGrades = grades.some(grade => PASS_FAIL_GRADES.includes(grade))
-      const hasNumericGrades = grades.some(grade => NUMERIC_GRADES.includes(grade))
-      const hasSecondNationalLanguageGrades = grades.some(grade => SECOND_NATIONAL_LANGUAGE_GRADES.includes(grade))
-      return !hasNumericGrades && hasPassFailGrades && hasSecondNationalLanguageGrades
-    })
-  )
+  return series?.every(record => {
+    const grades = Object.keys(record)
+    const hasPassFailGrades = grades.some(grade => PASS_FAIL_GRADES.includes(grade))
+    const hasNumericGrades = grades.some(grade => NUMERIC_GRADES.includes(grade))
+    const hasSecondNationalLanguageGrades = grades.some(grade => SECOND_NATIONAL_LANGUAGE_GRADES.includes(grade))
+    return !hasNumericGrades && hasPassFailGrades && hasSecondNationalLanguageGrades
+  })
 }
 
 const isPassFailSeries = (series: Array<Record<string, number>>) => {
-  return (
-    series &&
-    series.every(record => {
-      const grades = Object.keys(record)
-      const hasPassFailGrades = grades.some(grade => PASS_FAIL_GRADES.includes(grade))
-      const hasNumericGrades = grades.some(grade => NUMERIC_GRADES.includes(grade))
-      const hasSecondNationalLanguageGrades = grades.some(grade => SECOND_NATIONAL_LANGUAGE_GRADES.includes(grade))
-      return !hasNumericGrades && hasPassFailGrades && !hasSecondNationalLanguageGrades
-    })
-  )
+  return series?.every(record => {
+    const grades = Object.keys(record)
+    const hasPassFailGrades = grades.some(grade => PASS_FAIL_GRADES.includes(grade))
+    const hasNumericGrades = grades.some(grade => NUMERIC_GRADES.includes(grade))
+    const hasSecondNationalLanguageGrades = grades.some(grade => SECOND_NATIONAL_LANGUAGE_GRADES.includes(grade))
+    return !hasNumericGrades && hasPassFailGrades && !hasSecondNationalLanguageGrades
+  })
 }
 
 export const getSeriesType = (series: Array<Record<string, number>>) => {

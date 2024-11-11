@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { orderBy } from 'lodash'
 import moment from 'moment'
 import { Op, QueryTypes } from 'sequelize'
@@ -22,13 +21,12 @@ type CriteriaYear = {
 }
 
 const createEmptyCriteriaYear = (criteria: Criteria, year: string): CriteriaYear => {
-  const coursesSatisfied: CoursesSatisfied =
-    criteria?.courses && criteria?.courses[year]
-      ? criteria.courses[year]?.reduce((acc: CoursesSatisfied, course: string) => {
-          acc[course] = null
-          return acc
-        }, {} as CoursesSatisfied)
-      : {}
+  const coursesSatisfied: CoursesSatisfied = criteria?.courses?.[year]
+    ? criteria.courses[year]?.reduce((acc: CoursesSatisfied, course: string) => {
+        acc[course] = null
+        return acc
+      }, {} as CoursesSatisfied)
+    : {}
   return {
     credits: false,
     totalSatisfied: 0,
@@ -60,12 +58,10 @@ const updateCourseByYear = (
 ) => {
   // TODO: Clean up this mess
   if (
-    criteria?.courses &&
-    criteria?.courses[criteriaYear] &&
+    criteria?.courses?.[criteriaYear] &&
     (criteria.courses[criteriaYear].includes(course.course_code) ||
-      criteria.courses[criteriaYear].some(
-        (criteriaCourse: string) =>
-          criteria.allCourses[criteriaCourse] && criteria.allCourses[criteriaCourse].includes(course.course_code)
+      criteria.courses[criteriaYear].some((criteriaCourse: string) =>
+        criteria.allCourses[criteriaCourse]?.includes(course.course_code)
       ))
   ) {
     if (
@@ -268,7 +264,7 @@ const formatStudentForPopulationStatistics = (
     secondaryEmail: secondary_email,
     phoneNumber: phone_number,
     updatedAt: updatedAt || createdAt,
-    tags: tags || [],
+    tags: tags ?? [],
     studyrightStart: startDate,
     starting: moment(started).isBetween(startDateMoment, endDateMoment, null, '[]'),
     option,
@@ -326,9 +322,9 @@ export const parseQueryParams = (query: Query) => {
     ? new Date(`${year + 1}-${SemesterStart.FALL}`).toISOString()
     : new Date(`${year + 1}-${SemesterStart.SPRING}`).toISOString()
 
-  const exchangeStudents = studentStatuses != null && studentStatuses.includes('EXCHANGE')
-  const nondegreeStudents = studentStatuses != null && studentStatuses.includes('NONDEGREE')
-  const transferredStudents = studentStatuses != null && studentStatuses.includes('TRANSFERRED')
+  const exchangeStudents = studentStatuses?.includes('EXCHANGE')
+  const nondegreeStudents = studentStatuses?.includes('NONDEGREE')
+  const transferredStudents = studentStatuses?.includes('TRANSFERRED')
 
   return {
     exchangeStudents,
@@ -407,7 +403,7 @@ export const getOptionsForStudents = async (
   }, {})
 }
 
-export const formatStudentsForApi = async (
+export const formatStudentsForApi = (
   students: Array<Student & { tags?: TagStudent[] }>,
   enrollments: Enrollment[],
   credits: Credit[],

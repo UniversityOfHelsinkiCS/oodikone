@@ -1,4 +1,3 @@
-/* eslint-disable import/no-cycle */
 export { CourseWithSubsId, ParsedCourse } from './course'
 export { CreditTypeCode } from './creditTypeCode'
 export { Criteria } from './criteria'

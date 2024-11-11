@@ -7,6 +7,7 @@ import { mapToProviders } from '../../shared/util'
 import { CreditTypeCode, EnrollmentState } from '../../types'
 import { isOpenUniCourseCode } from '../../util'
 import { createArrayOfCourses } from '../languageCenterData'
+import { getCurrentStudyYearStartDate, getNotCompletedForProgrammeCourses, getAllProgrammeCourses } from '.'
 import {
   getOtherStudentsForProgrammeCourses,
   getOwnStudentsForProgrammeCourses,
@@ -14,7 +15,6 @@ import {
   getStudentsWithoutStudyRightForProgrammeCourses,
   getTransferStudentsForProgrammeCourses,
 } from './studentGetters'
-import { getCurrentStudyYearStartDate, getNotCompletedForProgrammeCourses, getAllProgrammeCourses } from '.'
 
 const getCurrentYearStartDate = () => {
   return new Date(new Date().getFullYear(), 0, 1)
@@ -25,7 +25,7 @@ const getAllStudyProgrammeCourses = async (studyProgramme: string) => {
   const normalCourses = await getAllProgrammeCourses(providerCode)
   return normalCourses.reduce((acc, curr) => {
     acc.push(curr.code)
-    if (curr.substitutions && curr.substitutions.includes(`AY${curr.code}`)) {
+    if (curr.substitutions?.includes(`AY${curr.code}`)) {
       acc.push(`AY${curr.code}`)
     }
     return acc
@@ -286,7 +286,7 @@ export const getStudyProgrammeCoursesForStudyTrack = async (
         acc[curr.code] = {
           code: curr.code,
           name: curr.name,
-          isStudyModule: curr.isStudyModule || false,
+          isStudyModule: curr.isStudyModule ?? false,
           years: {},
         }
       }

@@ -10,7 +10,7 @@ const isObjectWithKey = (obj: unknown, key: string): obj is Record<string, unkno
  * @param key The key to sort by (optional: if not given, the function will sort by the strings themselves)
  * @param desc If true, the function will sort in descending order (optional: defaults to `false`)
  */
-export const createLocaleComparator = (key?: string, desc: boolean = false) => {
+export const createLocaleComparator = (key?: string, desc = false) => {
   return (val1: unknown, val2: unknown): number => {
     let val1ToCompare: unknown
     let val2ToCompare: unknown
@@ -43,10 +43,10 @@ export const getFullStudyProgrammeRights = (detailedProgrammeRights: DetailedPro
 
 export const hasFullAccessToStudentData = (roles?: Role[]) => {
   const rolesWithFullAccess: Role[] = ['admin', 'fullSisuAccess']
-  return roles != null && roles.some(role => rolesWithFullAccess.includes(role))
+  return roles?.some(role => rolesWithFullAccess.includes(role))
 }
 
-export const isOpenUniCourseCode = (code: string) => code.match(/^AY?(.+?)(?:en|fi|sv)?$/)
+export const isOpenUniCourseCode = (code: string) => /^AY?(.+?)(?:en|fi|sv)?$/.exec(code)
 
 /**
  * Returns the keys of the given object as an array of strings, typed as the keys of the object.

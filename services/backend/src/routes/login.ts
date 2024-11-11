@@ -5,7 +5,7 @@ import { ApplicationError } from '../util/customErrors'
 
 const router = Router()
 
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', (req: Request, res: Response) => {
   const { user, logoutUrl } = req
 
   if (!user) {

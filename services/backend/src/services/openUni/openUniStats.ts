@@ -28,7 +28,7 @@ type StudentStats = {
 
 const uniq = objects => [...new Set(objects)]
 
-const calculateTotalsForStudent = async (studentStats: StudentStats, studentNumber: string) => {
+const calculateTotalsForStudent = (studentStats: StudentStats, studentNumber: string) => {
   Object.keys(studentStats[studentNumber].courseInfo).forEach(course => {
     const { status } = studentStats[studentNumber].courseInfo[course]
     if (status.passed) {
@@ -143,7 +143,7 @@ export const getCustomOpenUniCourses = async (courseCodes: string[], startDate: 
         updateUnfinishedStatus(studentCourses[courseCode], enrollmentDateTime)
       }
     }
-    await calculateTotalsForStudent(studentStats, studentNumber)
+    calculateTotalsForStudent(studentStats, studentNumber)
   }
   const openUniStats = { students: studentStats, courses }
   return openUniStats
