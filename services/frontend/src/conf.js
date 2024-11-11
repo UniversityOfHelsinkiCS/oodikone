@@ -9,14 +9,6 @@ export const sentryEnvironment = process.env.REACT_APP_SENTRY_ENVIRONMENT || ''
 export const sentryDSN = process.env.REACT_APP_SENTRY_DSN || ''
 export const runningInCypress = typeof window !== 'undefined' && !!window.Cypress
 
-// Adminer is only used in dev mode, imo hardcoding this url here is ok.
-const adminerBaseUrl = 'http://localhost:5050'
-const databaseNames = ['kone-db', 'sis-db', 'sis-importer-db', 'user-db']
-export const adminerUrls = databaseNames.map(db => ({
-  url: `${adminerBaseUrl}/?pgsql=${db}&username=postgres`,
-  text: db,
-}))
-
 // Base paths
 export const basePath = process.env.PUBLIC_URL || ''
 export const apiBasePath = `${basePath}/api`
