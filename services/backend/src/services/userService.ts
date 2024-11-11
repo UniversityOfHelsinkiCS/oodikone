@@ -100,7 +100,7 @@ const getStudyProgrammeRights = (
   return studyProgrammeRights
 }
 
-const formatUser = async (user: ExpandedUser, getStudentAccess: boolean = true) => {
+const formatUser = async (user: ExpandedUser, getStudentAccess = true) => {
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(user.detailedProgrammeRights)
   const shouldFetchStudentAccess = getStudentAccess && !hasFullAccessToStudentData(user.roles)
 

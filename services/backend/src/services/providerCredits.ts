@@ -178,11 +178,7 @@ export const computeCreditsProduced = async (providerCode: string, isAcademicYea
   return { stats, id: providerCode }
 }
 
-export const getCreditsProduced = async (
-  providerCode: string,
-  isAcademicYear: boolean,
-  specialIncluded: boolean = true
-) => {
+export const getCreditsProduced = async (providerCode: string, isAcademicYear: boolean, specialIncluded = true) => {
   let data = await getCreditStats(providerCode, isAcademicYear, specialIncluded)
   if (data) {
     return data

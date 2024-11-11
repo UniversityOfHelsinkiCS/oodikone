@@ -123,7 +123,7 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
     const sortedSubstitutions = [course.code, ...course.substitutions]
       .map(code => [code, getSubstitutionPriority(code)])
       .sort((a, b) => b[1] - a[1])
-    // eslint-disable-next-line prefer-destructuring
+
     course.mainCourseCode = sortedSubstitutions[0][0]
   }
 

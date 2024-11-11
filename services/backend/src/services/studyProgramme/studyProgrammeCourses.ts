@@ -7,6 +7,7 @@ import { mapToProviders } from '../../shared/util'
 import { CreditTypeCode, EnrollmentState } from '../../types'
 import { isOpenUniCourseCode } from '../../util'
 import { createArrayOfCourses } from '../languageCenterData'
+import { getCurrentStudyYearStartDate, getNotCompletedForProgrammeCourses, getAllProgrammeCourses } from '.'
 import {
   getOtherStudentsForProgrammeCourses,
   getOwnStudentsForProgrammeCourses,
@@ -14,7 +15,6 @@ import {
   getStudentsWithoutStudyRightForProgrammeCourses,
   getTransferStudentsForProgrammeCourses,
 } from './studentGetters'
-import { getCurrentStudyYearStartDate, getNotCompletedForProgrammeCourses, getAllProgrammeCourses } from '.'
 
 const getCurrentYearStartDate = () => {
   return new Date(new Date().getFullYear(), 0, 1)

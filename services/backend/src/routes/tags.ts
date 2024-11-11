@@ -69,7 +69,6 @@ interface PostTagRequest extends Request {
 
 router.post('/tags', async (req: PostTagRequest, res: Response) => {
   const {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     tag: { studytrack, tagname, year, personal_user_id },
   } = req.body
   const { roles, id, programmeRights } = req.user

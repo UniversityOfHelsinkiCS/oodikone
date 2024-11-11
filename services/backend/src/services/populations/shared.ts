@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { orderBy } from 'lodash'
 import moment from 'moment'
 import { Op, QueryTypes } from 'sequelize'
@@ -22,13 +21,12 @@ type CriteriaYear = {
 }
 
 const createEmptyCriteriaYear = (criteria: Criteria, year: string): CriteriaYear => {
-  const coursesSatisfied: CoursesSatisfied =
-    criteria?.courses && criteria?.courses[year]
-      ? criteria.courses[year]?.reduce((acc: CoursesSatisfied, course: string) => {
-          acc[course] = null
-          return acc
-        }, {} as CoursesSatisfied)
-      : {}
+  const coursesSatisfied: CoursesSatisfied = criteria?.courses?.[year]
+    ? criteria.courses[year]?.reduce((acc: CoursesSatisfied, course: string) => {
+        acc[course] = null
+        return acc
+      }, {} as CoursesSatisfied)
+    : {}
   return {
     credits: false,
     totalSatisfied: 0,
@@ -60,8 +58,7 @@ const updateCourseByYear = (
 ) => {
   // TODO: Clean up this mess
   if (
-    criteria?.courses &&
-    criteria?.courses[criteriaYear] &&
+    criteria?.courses?.[criteriaYear] &&
     (criteria.courses[criteriaYear].includes(course.course_code) ||
       criteria.courses[criteriaYear].some(
         (criteriaCourse: string) =>

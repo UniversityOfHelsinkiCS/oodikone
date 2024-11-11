@@ -1,4 +1,3 @@
-/* eslint-disable import/no-cycle */
 import { InferAttributes } from 'sequelize'
 import {
   BelongsTo,

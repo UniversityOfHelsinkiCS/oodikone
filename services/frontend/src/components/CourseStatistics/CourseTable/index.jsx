@@ -54,7 +54,7 @@ CourseTable.propTypes = {
   onSelectCourse: func.isRequired,
   hidden: bool.isRequired,
   title: string.isRequired,
-  // eslint-disable-next-line react/require-default-props
+
   controlIcon: string,
 }
 

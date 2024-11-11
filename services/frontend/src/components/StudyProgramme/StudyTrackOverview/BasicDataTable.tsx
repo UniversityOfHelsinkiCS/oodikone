@@ -7,7 +7,7 @@ interface BasicDataTableProps {
 }
 
 export const BasicDataTable = ({ data, titles, track }: BasicDataTableProps) => {
-  if (!data || !data[track]?.length || !titles) {
+  if (!data?.[track]?.length || !titles) {
     return null
   }
 

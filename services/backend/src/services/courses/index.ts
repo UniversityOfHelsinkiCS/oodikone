@@ -401,7 +401,7 @@ export const getCourseYearlyStats = async (
     })
   )
 
-  if (serviceProvider === 'fd') logger.info(`Debugging c.y.s.: finished creating statsRegular`)
+  if (serviceProvider === 'fd') logger.info('Debugging c.y.s.: finished creating statsRegular')
 
   return statsRegular
 }

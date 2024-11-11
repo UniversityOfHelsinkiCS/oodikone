@@ -253,12 +253,11 @@ const updateAttainments = async (
       if (!codeParts.length) return attainmentIdCodeMap
 
       let parsedCourseCode = ''
-      // eslint-disable-next-line prefer-destructuring
+
       if (codeParts.length === 1) parsedCourseCode = codeParts[0]
       else if (codeParts[1].length < 7) {
         parsedCourseCode = `${codeParts[0]}-${codeParts[1]}`
       } else {
-        // eslint-disable-next-line prefer-destructuring
         parsedCourseCode = codeParts[0]
       }
       return { ...attainmentIdCodeMap, [att.id]: parsedCourseCode }

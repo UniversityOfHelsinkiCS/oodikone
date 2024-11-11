@@ -43,12 +43,12 @@ const accessLogger = morgan((tokens, req: Request, res: Response): undefined => 
     `${(tokens['response-time'](req, res) || '0').split('.')[0]} ms`.padEnd(8, ' '),
     tokens.status(req, res),
     tokens.method(req, res),
-    decodeURIComponent(tokens.url(req, res) as string),
+    decodeURIComponent(tokens.url(req, res)!),
   ].join(' ')
 
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(user.programmeRights)
   const iamBasedRights = user.programmeRights.filter(right => right.isIamBased)
-  const usingIamRights = iamBasedRights.some(right => (tokens.url(req, res) as string).includes(right.code))
+  const usingIamRights = iamBasedRights.some(right => tokens.url(req, res)!.includes(right.code))
   const onlyIamRights = !user.isAdmin && fullStudyProgrammeRights.length === 0
 
   logger.info(message, {

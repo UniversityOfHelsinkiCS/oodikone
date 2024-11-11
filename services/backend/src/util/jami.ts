@@ -20,7 +20,7 @@ type UserIamAccess = {
 export const getUserIamAccess = async (
   sisPersonId: string,
   iamGroups: string[],
-  attempt: number = 1
+  attempt = 1
 ): Promise<UserIamAccess> => {
   if (iamGroups.length === 0) {
     return {}

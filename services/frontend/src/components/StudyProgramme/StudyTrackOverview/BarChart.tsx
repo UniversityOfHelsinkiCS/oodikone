@@ -18,7 +18,7 @@ interface BarChartProps {
 }
 
 export const BarChart = ({ data, track }: BarChartProps) => {
-  if (!data || !data.creditGraphStats || !data.creditGraphStats[track]) {
+  if (!data?.creditGraphStats?.[track]) {
     return null
   }
 

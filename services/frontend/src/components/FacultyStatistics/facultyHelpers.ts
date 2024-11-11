@@ -53,8 +53,8 @@ const isBetween = (number: number, lowerLimit: number, upperLimit: number) => {
 export const calculateStats = (
   creditCounts: Record<string, number[]>,
   maximumAmountOfCredits: number,
-  minimumAmountOfCredits: number = 0,
-  numberOfCreditCategories: number = 7
+  minimumAmountOfCredits = 0,
+  numberOfCreditCategories = 7
 ) => {
   const tableStats: Array<Array<number | string>> = []
   if (creditCounts === undefined) {

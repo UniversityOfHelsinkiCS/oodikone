@@ -61,7 +61,6 @@ export const creditDateFilter = createFilter({
   },
 
   selectors: {
-    // eslint-disable-next-line no-unused-vars
     selectedStartDate: ({ startDate }, _) => startDate,
   },
 

@@ -73,8 +73,8 @@ const toskaUserMiddleware = async (req: Request, _res: Response, next: NextFunct
     )
   }
 
-  const iamGroups = parseIamGroups(hygroupcn as string)
-  const { iamAccess = {}, specialGroup = {} } = await getOrganizationAccess(sisId as string, iamGroups)
+  const iamGroups = parseIamGroups(hygroupcn!)
+  const { iamAccess = {}, specialGroup = {} } = await getOrganizationAccess(sisId!, iamGroups)
   const iamRights = Object.keys(iamAccess)
 
   if (!hasRequiredIamGroup(iamGroups, iamRights)) {
@@ -93,7 +93,7 @@ const toskaUserMiddleware = async (req: Request, _res: Response, next: NextFunct
   Sentry.setUser({ username: user.mockedBy ?? username! })
 
   req.user = user
-  req.logoutUrl = logoutUrl as string
+  req.logoutUrl = logoutUrl!
 
   next()
 }

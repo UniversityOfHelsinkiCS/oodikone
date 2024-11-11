@@ -70,6 +70,6 @@ LeaderForm.propTypes = {
   initLeaderboard: func.isRequired,
   handleCategoryChange: func.isRequired,
   handleYearChange: func.isRequired,
-  selectedcategory: string, // eslint-disable-line
-  selectedyear: number, // eslint-disable-line
+  selectedcategory: string,
+  selectedyear: number,
 }

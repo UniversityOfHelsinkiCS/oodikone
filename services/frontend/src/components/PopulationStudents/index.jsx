@@ -145,7 +145,7 @@ const PopulationStudents = ({
     const programmes = studyGuidanceGroup.tags.studyProgramme.includes('+')
       ? studyGuidanceGroup.tags.studyProgramme.split('+')
       : [studyGuidanceGroup.tags.studyProgramme]
-    // eslint-disable-next-line prefer-destructuring
+
     mainProgramme = programmes[0]
     combinedProgramme = programmes.length > 1 ? programmes[1] : ''
   }

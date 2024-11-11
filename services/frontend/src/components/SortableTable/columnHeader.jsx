@@ -1,4 +1,3 @@
-/* eslint-disable no-return-assign */
 import { produce } from 'immer'
 import { chain, clone, includes, range, toPairs } from 'lodash'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
