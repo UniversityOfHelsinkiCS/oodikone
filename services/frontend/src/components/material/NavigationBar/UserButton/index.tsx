@@ -23,7 +23,12 @@ export const UserButton = () => {
 
   return (
     <Box sx={{ flexGrow: 0 }}>
-      <IconButton color="inherit" onClick={event => setAnchorEl(event.currentTarget)} sx={{ p: 0 }}>
+      <IconButton
+        color="inherit"
+        data-cy="nav-bar-user-button"
+        onClick={event => setAnchorEl(event.currentTarget)}
+        sx={{ p: 0 }}
+      >
         <AccountCircle />
       </IconButton>
       <Menu
@@ -45,7 +50,7 @@ export const UserButton = () => {
         {!isLoading && username && (
           <MenuItem sx={{ pointerEvents: 'none' }}>
             <Typography>
-              {mockedBy ? 'Mocked' : 'Logged in'} as <b>{username}</b>
+              {mockedBy ? 'Mocking' : 'Logged in'} as <b>{username}</b>
             </Typography>
           </MenuItem>
         )}

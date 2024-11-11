@@ -1,6 +1,6 @@
 import { ArrowDropDown } from '@mui/icons-material'
 import { Button, Menu, MenuItem } from '@mui/material'
-import { Fragment, useState } from 'react'
+import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
 import { checkUserAccess, getFullStudyProgrammeRights, isDefaultServiceProvider } from '@/common'
@@ -80,9 +80,9 @@ export const NavigationButton = ({ item }: { item: NavigationItem }) => {
 
   if (items) {
     return (
-      <Fragment key={`men-item-drop-${key}`}>
+      <>
         <Button
-          data-cy={`navbar-${key}`}
+          data-cy={`nav-bar-button-${key}`}
           endIcon={<ArrowDropDown />}
           onClick={event => setAnchorEl(event.currentTarget)}
           sx={buttonStyle}
@@ -95,7 +95,7 @@ export const NavigationButton = ({ item }: { item: NavigationItem }) => {
               showItem(subItem.key) && (
                 <MenuItem
                   component={Link}
-                  data-cy={`navbar-${subItem.key}`}
+                  data-cy={`nav-bar-button-${subItem.key}`}
                   key={subItem.path}
                   onClick={() => setAnchorEl(null)}
                   selected={location.pathname.includes(subItem.path)}
@@ -106,12 +106,12 @@ export const NavigationButton = ({ item }: { item: NavigationItem }) => {
               )
           )}
         </Menu>
-      </Fragment>
+      </>
     )
   }
 
   return (
-    <Button component={Link} data-cy={`navbar-${key}`} sx={buttonStyle} to={path}>
+    <Button component={Link} data-cy={`nav-bar-button-${key}`} sx={buttonStyle} to={path}>
       {label}
     </Button>
   )

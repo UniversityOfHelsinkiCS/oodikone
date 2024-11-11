@@ -60,7 +60,7 @@ export const NavigationBar = () => {
           <Logo />
           {!isLoading && (
             <>
-              <Box sx={{ display: 'flex', flexGrow: 1, justifyContent: 'space-between' }}>
+              <Box data-cy="nav-bar" sx={{ display: 'flex', flexGrow: 1, justifyContent: 'space-between' }}>
                 <NavigationDivider />
                 {Object.values(visibleNavigationItems).map(item => (
                   <Fragment key={item.key}>
