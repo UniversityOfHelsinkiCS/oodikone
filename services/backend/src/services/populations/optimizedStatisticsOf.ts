@@ -39,7 +39,7 @@ export const optimizedStatisticsOf = async (query: Query, studentNumberList?: st
     parseQueryParams(formattedQueryParams as FormattedQueryParams)
 
   const studentNumbers =
-    studentNumberList ||
+    studentNumberList ??
     (await getStudentNumbersWithAllStudyRightElements({
       studyRights,
       startDate,
@@ -68,7 +68,7 @@ export const optimizedStatisticsOf = async (query: Query, studentNumberList?: st
     tag
   )
 
-  const formattedStudents = await formatStudentsForApi(
+  const formattedStudents = formatStudentsForApi(
     students,
     enrollments,
     credits,

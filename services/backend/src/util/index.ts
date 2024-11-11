@@ -43,7 +43,7 @@ export const getFullStudyProgrammeRights = (detailedProgrammeRights: DetailedPro
 
 export const hasFullAccessToStudentData = (roles?: Role[]) => {
   const rolesWithFullAccess: Role[] = ['admin', 'fullSisuAccess']
-  return roles != null && roles.some(role => rolesWithFullAccess.includes(role))
+  return roles?.some(role => rolesWithFullAccess.includes(role))
 }
 
 export const isOpenUniCourseCode = (code: string) => /^AY?(.+?)(?:en|fi|sv)?$/.exec(code)

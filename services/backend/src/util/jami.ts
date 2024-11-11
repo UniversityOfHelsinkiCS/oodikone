@@ -69,17 +69,14 @@ export const getAllUserAccess = async (userIds: string[]) => {
   return data as Access[]
 }
 
-const testJami = async () => {
-  try {
-    await jamiClient.get('/ping', { timeout: 4000 })
-    logger.info('JAMI connected')
-  } catch (error) {
-    logger.error(error)
-    logger.warn('JAMI not responding :(')
-    logger.info('Are you sure you are using the latest JAMI image?')
-  }
-}
-
 if (serviceProvider === 'toska') {
-  testJami()
+  jamiClient
+    .get('/ping', { timeout: 4000 })
+    .then(() => {
+      logger.info('JAMI connected')
+    })
+    .catch(error => {
+      logger.error('JAMI not responding :(', { error })
+      logger.info('Are you sure you are using the latest JAMI image?')
+    })
 }

@@ -128,7 +128,7 @@ export const combineFacultyStudentProgress = async (
         studyRightsOfProgramme,
       })
       statsOfProgrammes.push(updatedStats)
-      setStudyTrackStats(updatedStats, graduated, specialGroups)
+      await setStudyTrackStats(updatedStats, graduated, specialGroups)
     }
   }
 

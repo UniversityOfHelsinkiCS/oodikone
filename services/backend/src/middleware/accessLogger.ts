@@ -40,7 +40,7 @@ const accessLogger = morgan((tokens, req: Request, res: Response): undefined => 
 
   const message = [
     `${user.mockedBy ? '(mocking) ' : ''}${user.name}`,
-    `${(tokens['response-time'](req, res) || '0').split('.')[0]} ms`.padEnd(8, ' '),
+    `${(tokens['response-time'](req, res) ?? '0').split('.')[0]} ms`.padEnd(8, ' '),
     tokens.status(req, res),
     tokens.method(req, res),
     decodeURIComponent(tokens.url(req, res)!),

@@ -1,15 +1,10 @@
 import moment from 'moment'
 
-enum SpringSemester {
-  START_MONTH = 0,
-  END_MONTH = 6,
+const isSpring = (date: moment.Moment) => {
+  return 0 <= date.month() && date.month() <= 6
 }
 
-const isSpring = (date: moment.Moment): boolean => {
-  return SpringSemester.START_MONTH <= date.month() && date.month() <= SpringSemester.END_MONTH
-}
-
-const getSemester = (date: moment.Moment): 'FALL' | 'SPRING' => (isSpring(date) ? 'SPRING' : 'FALL')
+const getSemester = (date: moment.Moment) => (isSpring(date) ? 'SPRING' : 'FALL')
 
 export enum SemesterStart {
   SPRING = '01-01',

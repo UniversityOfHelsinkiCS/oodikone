@@ -25,7 +25,7 @@ const getStudentsAndCourses = async (
   if (!studentNumbers) {
     const { months, studyRights, startDate, endDate, exchangeStudents, nondegreeStudents, transferredStudents } = params
     const studentnumbers =
-      selectedStudents ||
+      selectedStudents ??
       (await getStudentNumbersWithAllStudyRightElements({
         studyRights,
         startDate,

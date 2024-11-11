@@ -69,7 +69,7 @@ const diff = (rapoData, okData, code) => {
   }
 }
 
-const process = async data => {
+const processProgrammes = async data => {
   let programmeCounter = 0
   const rapoProgrammeData = formatData(data.slice(1))
   const allProgrammeCodes = [...new Set(Object.keys(rapoProgrammeData))]
@@ -88,7 +88,7 @@ const process = async data => {
 
 const programmeCreditsDiff = async fileName => {
   console.log('Running studyprogramme credits diff')
-  await parseCsv(fileName, process)
+  await parseCsv(fileName, processProgrammes)
   console.log('Diff completed.')
 }
 

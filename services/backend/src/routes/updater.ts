@@ -80,7 +80,7 @@ router.get('/refresh_redis_cache', async (req: Request, res: Response) => {
   }
 })
 
-router.post('/refresh-teacher-leaderboard', async (req: Request, res: Response) => {
+router.post('/refresh-teacher-leaderboard', (req: Request, res: Response) => {
   logger.info(
     `${req.user.username} requested refresh of teacher leaderboard for the current and previous academic year`
   )
@@ -90,17 +90,17 @@ router.post('/refresh-teacher-leaderboard', async (req: Request, res: Response) 
 
 router.post('/refresh_study_programmes_v2', async (req: Request, res: Response) => {
   logger.info(`${req.user.username} requested refresh of study programmes`)
-  refreshProgrammes()
+  await refreshProgrammes()
   res.status(200).json('Added job for refreshing study programme overviews')
 })
 
 router.post('/refresh_faculties_v2', async (req: Request, res: Response) => {
   logger.info(`${req.user.username} requested refresh of faculties`)
-  refreshFaculties()
+  await refreshFaculties()
   res.status(200).json('Added job for refreshing faculties')
 })
 
-router.post('/refresh_language_center_data', async (req: Request, res: Response) => {
+router.post('/refresh_language_center_data', (req: Request, res: Response) => {
   logger.info(`${req.user.username} requested refresh of language center data`)
   if (!languageCenterViewEnabled)
     res.status(418).json({ error: 'The language center functionality is not activated in your environment.' })
@@ -108,7 +108,7 @@ router.post('/refresh_language_center_data', async (req: Request, res: Response)
   res.status(200).json('Added job for refreshing language center data')
 })
 
-router.post('/refresh-close-to-graduation', async (req: Request, res: Response) => {
+router.post('/refresh-close-to-graduation', (req: Request, res: Response) => {
   logger.info(`${req.user.username} requested refresh of close to graduation data`)
   jobMaker.closeToGraduation()
   res.status(200).json('Added job for refreshing close to graduation data')

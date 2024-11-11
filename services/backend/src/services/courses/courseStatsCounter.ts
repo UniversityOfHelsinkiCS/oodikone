@@ -22,26 +22,16 @@ const initializePassingSemesters = () => {
   return passingSemesters
 }
 
-const getEnrolledStudents = (enrollments: DynamicEnrollments) => {
-  if (enrollments) {
-    return Object.keys(enrollments)
-      .filter(key => key !== EnrollmentState.ENROLLED && key !== 'semesters')
-      .reduce((acc, key) => [...acc, ...[...enrollments[key]].map(studentNumber => studentNumber)], [] as string[])
+const getFilteredEnrolledNoGrade = (enrollments: DynamicEnrollments, allStudents: string[]) => {
+  const enrolledStudents = [...(enrollments[EnrollmentState.ENROLLED] ?? [])]
+  const result: Record<string, boolean> = {}
+  for (const student of enrolledStudents) {
+    if (allStudents.includes(student)) {
+      continue
+    }
+    result[student] = true
   }
-  return []
-}
-
-const getFilteredEnrolledNoGrade = (
-  enrollments: DynamicEnrollments,
-  enrolledStudents: string[],
-  allStudents: string[]
-) => {
-  if (enrollments[EnrollmentState.ENROLLED]) {
-    return [...enrollments[EnrollmentState.ENROLLED]]
-      .filter(student => !enrolledStudents.includes(student) && !allStudents.includes(student))
-      .reduce((acc, student) => ({ ...acc, [student]: true }), {} as Record<string, boolean>)
-  }
-  return {} as Record<string, boolean>
+  return result
 }
 
 type DynamicEnrollments = {
@@ -262,9 +252,8 @@ export class CourseStatsCounter {
 
   public getFinalStats() {
     const { stats, students } = this
-    const enrolledStudents = getEnrolledStudents(this.enrollments)
-    const allStudents = Object.keys(students.all).map(student => student)
-    const filteredEnrolledNoGrade = getFilteredEnrolledNoGrade(this.enrollments, enrolledStudents, allStudents)
+    const allStudents = Object.keys(students.all)
+    const filteredEnrolledNoGrade = getFilteredEnrolledNoGrade(this.enrollments, allStudents)
 
     students.all = { ...students.all, ...filteredEnrolledNoGrade }
     students.enrolledNoGrade = filteredEnrolledNoGrade

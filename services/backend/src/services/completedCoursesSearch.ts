@@ -83,7 +83,7 @@ const getCredits = async (
       ? null
       : courses.find(course => course.substitutions.includes(credit.course_code))?.code
     return {
-      courseCode: originalCode || credit.course_code,
+      courseCode: originalCode ?? credit.course_code,
       substitution: originalCode ? credit.course_code : null,
       studentNumber: credit.student_studentnumber,
       creditType: credit.credittypecode,
@@ -112,7 +112,7 @@ const getEnrollments = async (courses: Courses, fullCourseCodes: string[], stude
   const formattedEnrollments = enrollments.map(enrollment => {
     const originalCode = courses.find(course => course.substitutions.includes(enrollment.course_code))?.code
     return {
-      courseCode: originalCode || enrollment.course_code,
+      courseCode: originalCode ?? enrollment.course_code,
       substitution: originalCode ? enrollment.course_code : null,
       studentNumber: enrollment.studentnumber,
       date: enrollment.enrollment_date_time,

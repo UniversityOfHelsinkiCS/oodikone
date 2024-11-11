@@ -293,7 +293,7 @@ export const getUserFd = async ({ username }: { username: string }) => {
   }
 
   userFromDbOrm.lastLogin = new Date()
-  userFromDbOrm.save()
+  await userFromDbOrm.save()
 
   const userFromDb = userFromDbOrm.toJSON()
 

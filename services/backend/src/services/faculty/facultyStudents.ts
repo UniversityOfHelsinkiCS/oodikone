@@ -82,7 +82,7 @@ export const combineFacultyStudents = async (
       },
       studyRightsOfProgramme,
     })
-    setStudyTrackStats(updatedStats, graduated, specialGroups)
+    await setStudyTrackStats(updatedStats, graduated, specialGroups)
     if (!years.length) {
       years = updatedStats.years
     }
