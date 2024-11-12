@@ -124,8 +124,16 @@ export const Feedback = () => {
             Sending feedback to Toska
           </Typography>
           <Box display="flex" justifyContent="space-between">
-            <Button onClick={() => setModalOpen(false)}>Cancel</Button>
-            <Button color="primary" disabled={isLoading} endIcon={<Send />} onClick={handleSubmit} variant="contained">
+            <Button disabled={isLoading} onClick={() => setModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              color="primary"
+              disabled={!feedback.trim().length || isLoading}
+              endIcon={<Send />}
+              onClick={handleSubmit}
+              variant="contained"
+            >
               Send
             </Button>
           </Box>
