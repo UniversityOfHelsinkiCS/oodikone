@@ -120,7 +120,7 @@ export const Feedback = () => {
           }}
           width="100%"
         >
-          <Typography component="h3" mb={2} variant="h6">
+          <Typography mb={2} variant="h6">
             Sending feedback to Toska
           </Typography>
           <Box display="flex" justifyContent="space-between">

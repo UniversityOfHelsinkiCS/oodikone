@@ -1,4 +1,4 @@
-import { Request, Router } from 'express'
+import { Request, Response, Router } from 'express'
 
 import { sendFeedbackToToska } from '../services/mailService'
 import { ApplicationError } from '../util/customErrors'
@@ -12,7 +12,7 @@ interface EmailRequest extends Request {
   }
 }
 
-router.post('/email', async (req: EmailRequest) => {
+router.post('/email', async (req: EmailRequest, res: Response) => {
   const { content } = req.body
   const { user } = req
 
@@ -26,6 +26,7 @@ router.post('/email', async (req: EmailRequest) => {
   })
 
   logger.info(`${user.userId} succesfully sent feedback to Toska`)
+  return res.status(200).end()
 })
 
 export default router
