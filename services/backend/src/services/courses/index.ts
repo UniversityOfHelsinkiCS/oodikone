@@ -251,7 +251,7 @@ const getYearlyStatsOfNew = async (
     )
 
   let substitutionCourses: Course[] | undefined
-  if (combineSubstitutions && courseForSubs && courseForSubs.substitutions && courseForSubs.substitutions.length > 0) {
+  if (combineSubstitutions && courseForSubs?.substitutions && courseForSubs.substitutions.length > 0) {
     substitutionCourses = await Course.findAll({
       where: {
         code: {
@@ -270,7 +270,7 @@ const getYearlyStatsOfNew = async (
   return {
     ...statistics,
     coursecode: courseCode,
-    alternatives: substitutionCourses || [{ code: courseForSubs!.code, name: courseForSubs!.name }],
+    alternatives: substitutionCourses ?? [{ code: courseForSubs!.code, name: courseForSubs!.name }],
     name: course?.name,
   }
 }
@@ -401,7 +401,7 @@ export const getCourseYearlyStats = async (
     })
   )
 
-  if (serviceProvider === 'fd') logger.info(`Debugging c.y.s.: finished creating statsRegular`)
+  if (serviceProvider === 'fd') logger.info('Debugging c.y.s.: finished creating statsRegular')
 
   return statsRegular
 }

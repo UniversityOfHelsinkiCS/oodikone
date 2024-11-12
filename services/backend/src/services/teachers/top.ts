@@ -96,7 +96,7 @@ const updatedStats = (
   }
 }
 
-const filterTopTeachers = (stats: Record<string, TeacherStats>, limit: number = 50) => {
+const filterTopTeachers = (stats: Record<string, TeacherStats>, limit = 50) => {
   return Object.values(stats)
     .sort((t1, t2) => t2.credits - t1.credits)
     .slice(0, limit)
@@ -119,7 +119,6 @@ const findTopTeachers = async (yearCode: number) => {
   const all: Record<string, TeacherStats> = {}
   const openuni: Record<string, TeacherStats> = {}
   for (const credit of credits) {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     const { credits, credittypecode, isStudyModule, is_open, teacherId, teacherName } = credit
     if (isStudyModule) continue
     const passed = Credit.passed(credit) || Credit.improved(credit)
@@ -143,7 +142,7 @@ const findAndSaveTopTeachers = async (yearCode: number) => {
   await setTeacherStats(CategoryID.ALL, yearCode, all)
 }
 
-export const findAndSaveTeachers = async (endCode?: number, startCode: number = 1) => {
+export const findAndSaveTeachers = async (endCode?: number, startCode = 1) => {
   const endYearCode = endCode ?? (await getCurrentSemester()).getDataValue('yearcode')
   for (let code = startCode; code <= endYearCode; code++) {
     await findAndSaveTopTeachers(code)

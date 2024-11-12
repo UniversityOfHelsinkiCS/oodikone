@@ -92,11 +92,9 @@ const getBasicDegreeStudyRight = (
     const rightDates =
       new Date(studyRight.startDate).getTime() <= new Date(date).getTime() &&
       new Date(date).getTime() <= new Date(studyRight.endDate).getTime()
-    const enrolledAsPresent =
-      studyRight.semesterEnrollments != null &&
-      studyRight.semesterEnrollments.some(
-        enrollment => enrollment.semester === semestercode && enrollment.type === EnrollmentType.PRESENT
-      )
+    const enrolledAsPresent = studyRight.semesterEnrollments?.some(
+      enrollment => enrollment.semester === semestercode && enrollment.type === EnrollmentType.PRESENT
+    )
     return basicDegreeExtentCodes.includes(studyRight.extentCode) && rightDates && enrolledAsPresent
   })
 }
@@ -178,11 +176,7 @@ export const computeCreditsProduced = async (providerCode: string, isAcademicYea
   return { stats, id: providerCode }
 }
 
-export const getCreditsProduced = async (
-  providerCode: string,
-  isAcademicYear: boolean,
-  specialIncluded: boolean = true
-) => {
+export const getCreditsProduced = async (providerCode: string, isAcademicYear: boolean, specialIncluded = true) => {
   let data = await getCreditStats(providerCode, isAcademicYear, specialIncluded)
   if (data) {
     return data

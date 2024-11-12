@@ -53,8 +53,8 @@ const isBetween = (number: number, lowerLimit: number, upperLimit: number) => {
 export const calculateStats = (
   creditCounts: Record<string, number[]>,
   maximumAmountOfCredits: number,
-  minimumAmountOfCredits: number = 0,
-  numberOfCreditCategories: number = 7
+  minimumAmountOfCredits = 0,
+  numberOfCreditCategories = 7
 ) => {
   const tableStats: Array<Array<number | string>> = []
   if (creditCounts === undefined) {
@@ -74,26 +74,26 @@ export const calculateStats = (
     minimumAmountOfCredits
   )
   const tableTitles = ['', 'All']
-  for (let i = 0; i < limits.length; i++) {
-    if (limits[i][0] === undefined) tableTitles.push(`< ${limits[i][1]} credits`)
-    else if (limits[i][1] === undefined) tableTitles.push(`≥ ${limits[i][0]} credits`)
-    else tableTitles.push(`${limits[i][0]}–${limits[i][1]} credits`)
+  for (const limit of limits) {
+    if (limit[0] === undefined) tableTitles.push(`< ${limit[1]} credits`)
+    else if (limit[1] === undefined) tableTitles.push(`≥ ${limit[0]} credits`)
+    else tableTitles.push(`${limit[0]}–${limit[1]} credits`)
   }
 
   Object.keys(creditCounts).forEach(year => {
     const yearCreditCount = creditCounts[year]
     const yearCounts = [year, yearCreditCount.length]
     tableStats.push(yearCounts)
-    for (let i = 0; i < limits.length; i++) {
-      yearCounts.push(yearCreditCount.filter(credits => isBetween(credits, limits[i][0], limits[i][1])).length)
+    for (const limit of limits) {
+      yearCounts.push(yearCreditCount.filter(credits => isBetween(credits, limit[0], limit[1])).length)
     }
   })
 
   const totalCounts: Array<number | string> = ['Total']
   for (let i = 1; i < tableStats[0].length; i++) {
     let columnSum = 0
-    for (let j = 0; j < tableStats.length; j++) {
-      columnSum += tableStats[j][i] as number
+    for (const stats of tableStats) {
+      columnSum += stats[i] as number
     }
     totalCounts.push(columnSum)
   }

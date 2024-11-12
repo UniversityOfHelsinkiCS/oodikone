@@ -3,7 +3,7 @@ import moment from 'moment'
 
 import { Name } from '../../shared/types'
 import { mapToProviders } from '../../shared/util'
-import { DegreeProgrammeType, ExtentCode, SemesterEnrollment, StudyTrack } from '../../types'
+import { DegreeProgrammeType, ExtentCode, Phase, SemesterEnrollment, StudyTrack } from '../../types'
 import { getDegreeProgrammeType, getMinimumCreditsOfProgramme, sortByProgrammeCode } from '../../util'
 import { countTimeCategories } from '../graduationHelpers'
 import { getSemestersAndYears } from '../semesters'
@@ -232,7 +232,7 @@ const getProgrammesBeforeStarting = async ({
     if (!studyRightElement) return acc
     // If the extent code is something else, that means the student hasn't continued from a bachelor's programme
     if (studyRight.extentCode !== ExtentCode.BACHELOR_AND_MASTER) return acc
-    const phase1Programmes = studyRight.studyRightElements.filter(elem => elem.phase === 1)
+    const phase1Programmes = studyRight.studyRightElements.filter(elem => elem.phase === Phase.ANY)
     const [latestPhase1Programme] = orderBy(phase1Programmes, ['endDate'], ['desc'])
     if (!acc[latestPhase1Programme.code]) {
       const programmeWithYears: ProgrammeWithYears = {
@@ -242,7 +242,7 @@ const getProgrammesBeforeStarting = async ({
       }
       acc[latestPhase1Programme.code] = programmeWithYears
     }
-    const phase2Programmes = studyRight.studyRightElements.filter(elem => elem.phase === 2)
+    const phase2Programmes = studyRight.studyRightElements.filter(elem => elem.phase === Phase.MASTER)
 
     const hasTransferred = hasTransferredFromOrToProgramme(studyRight, studyRightElement)
 
@@ -273,7 +273,7 @@ const getProgrammesAfterGraduation = async ({
 
     if (!includeAllSpecials && hasTransferred.some(fromOrTo => fromOrTo === true)) return acc
 
-    const phase2Programmes = studyRight.studyRightElements.filter(elem => elem.phase === 2)
+    const phase2Programmes = studyRight.studyRightElements.filter(elem => elem.phase === Phase.MASTER)
     const [firstPhase2Programme] = orderBy(phase2Programmes, ['startDate'], ['asc'])
     if (!firstPhase2Programme) return acc
 
@@ -319,7 +319,7 @@ export const getGraduationStatsForStudyTrack = async ({
   const years = getYearsArray(since.getFullYear(), isAcademicYear) as number[]
   const queryParameters = { studyProgramme, since, years, isAcademicYear, includeAllSpecials }
   const combinedQueryParameters = {
-    studyProgramme: combinedProgramme || '',
+    studyProgramme: combinedProgramme ?? '',
     since,
     years,
     isAcademicYear,

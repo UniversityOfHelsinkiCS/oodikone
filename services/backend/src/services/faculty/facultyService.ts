@@ -193,11 +193,7 @@ export const setGraduationStats = async (data: GraduationData, programmeFilter: 
   return dataToRedis
 }
 
-export const getGraduationStats = async (
-  id: string,
-  programmeFilter: ProgrammeFilter,
-  keepGraduationTimes: boolean = false
-) => {
+export const getGraduationStats = async (id: string, programmeFilter: ProgrammeFilter, keepGraduationTimes = false) => {
   const redisKey = createRedisKeyForGraduationTimeStats(id, programmeFilter)
   const dataFromRedis = await redisClient.get(redisKey)
   if (!dataFromRedis) {

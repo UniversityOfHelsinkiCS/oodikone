@@ -1,7 +1,8 @@
 const { orderBy } = require('lodash')
 
 // dbConnections must be imported to avoid Sequelize errors even if it's not used
-// eslint-disable-next-line no-unused-vars
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const { dbConnections } = require('../database/connection')
 const { computeCreditsProduced } = require('../services/providerCredits')
 const { parseCsv, printProgressBar } = require('./helpers')
@@ -68,7 +69,7 @@ const diff = (rapoData, okData, code) => {
   }
 }
 
-const process = async data => {
+const processProgrammes = async data => {
   let programmeCounter = 0
   const rapoProgrammeData = formatData(data.slice(1))
   const allProgrammeCodes = [...new Set(Object.keys(rapoProgrammeData))]
@@ -87,7 +88,7 @@ const process = async data => {
 
 const programmeCreditsDiff = async fileName => {
   console.log('Running studyprogramme credits diff')
-  await parseCsv(fileName, process)
+  await parseCsv(fileName, processProgrammes)
   console.log('Diff completed.')
 }
 

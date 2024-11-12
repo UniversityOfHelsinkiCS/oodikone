@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 const getUserIamAccess = async (_, __, ___) => {
   return {}
 }

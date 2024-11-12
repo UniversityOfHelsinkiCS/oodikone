@@ -25,7 +25,7 @@ const getStudentsAndCourses = async (
   if (!studentNumbers) {
     const { months, studyRights, startDate, endDate, exchangeStudents, nondegreeStudents, transferredStudents } = params
     const studentnumbers =
-      selectedStudents ||
+      selectedStudents ??
       (await getStudentNumbersWithAllStudyRightElements({
         studyRights,
         startDate,
@@ -64,7 +64,7 @@ type Bottlenecks = {
   allStudents: number
 }
 
-export const bottlenecksOf = async (query: Query, studentNumbers: string[] | null, encryptData: boolean = false) => {
+export const bottlenecksOf = async (query: Query, studentNumbers: string[] | null, encryptData = false) => {
   const encryptStudentNumbers = (bottlenecks: Bottlenecks) => {
     for (const course of Object.keys(bottlenecks.coursestatistics)) {
       const encryptedStudentStats = {}
@@ -142,7 +142,7 @@ export const bottlenecksOf = async (query: Query, studentNumbers: string[] | nul
     coursestats.addCourseSubstitutions(course.substitutions)
     if (course.enrollments) {
       course.enrollments.forEach(({ studentnumber, state, enrollment_date_time }) => {
-        if ((query?.selectedStudents && query?.selectedStudents.includes(studentnumber)) || !query?.selectedStudents) {
+        if (query?.selectedStudents?.includes(studentnumber) || !query?.selectedStudents) {
           const semester = getPassingSemester(startYear, enrollment_date_time)
           coursestats.markEnrollment(studentnumber, state, semester)
         }
@@ -151,7 +151,7 @@ export const bottlenecksOf = async (query: Query, studentNumbers: string[] | nul
     if ('credits' in course) {
       course.credits.forEach(credit => {
         const { studentnumber, passingGrade, improvedGrade, failingGrade, grade, date } = parseCreditInfo(credit)
-        if ((query?.selectedStudents && query?.selectedStudents.includes(studentnumber)) || !query?.selectedStudents) {
+        if (query?.selectedStudents?.includes(studentnumber) || !query?.selectedStudents) {
           const semester = getPassingSemester(startYear, date)
           coursestats.markCredit(studentnumber, grade, passingGrade, failingGrade, improvedGrade, semester)
         }

@@ -100,7 +100,7 @@ const getStudyProgrammeRights = (
   return studyProgrammeRights
 }
 
-const formatUser = async (user: ExpandedUser, getStudentAccess: boolean = true) => {
+const formatUser = async (user: ExpandedUser, getStudentAccess = true) => {
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(user.detailedProgrammeRights)
   const shouldFetchStudentAccess = getStudentAccess && !hasFullAccessToStudentData(user.roles)
 
@@ -293,7 +293,7 @@ export const getUserFd = async ({ username }: { username: string }) => {
   }
 
   userFromDbOrm.lastLogin = new Date()
-  userFromDbOrm.save()
+  await userFromDbOrm.save()
 
   const userFromDb = userFromDbOrm.toJSON()
 

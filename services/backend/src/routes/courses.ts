@@ -56,7 +56,7 @@ router.get('/v3/courseyearlystats', async (req: GetCourseYearlyStatsRequest, res
   const { roles, programmeRights } = req.user
 
   const userHasFullAccessToStudentData = hasFullAccessToStudentData(roles)
-  const userHasCorrectRole = userHasFullAccessToStudentData || roles.includes('courseStatistics')
+  const userHasCorrectRole = userHasFullAccessToStudentData === true || roles.includes('courseStatistics')
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
 
   // If user has rights to see at least one programme, then they are allowed to see all of them

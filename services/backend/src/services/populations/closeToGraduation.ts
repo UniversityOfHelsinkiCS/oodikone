@@ -85,7 +85,7 @@ const formatStudent = (student: Student) => {
   const {
     studentnumber: studentNumber,
     abbreviatedname: name,
-    // eslint-disable-next-line @typescript-eslint/naming-convention
+
     sis_person_id,
     email,
     phone_number: phoneNumber,

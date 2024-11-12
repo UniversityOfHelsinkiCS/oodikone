@@ -1,4 +1,5 @@
 const Sentry = require('@sentry/node')
+// eslint-disable-next-line no-redeclare
 const { Worker } = require('bullmq')
 const moment = require('moment')
 

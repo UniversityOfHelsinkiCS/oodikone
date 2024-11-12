@@ -57,7 +57,7 @@ router.get('/:id/basicstats', async (req: GetStatsRequest, res: Response) => {
     return res.status(422).end()
   }
 
-  logInfoForGrafana(code, combinedProgramme)
+  void logInfoForGrafana(code, combinedProgramme)
   const data = await getBasicStats(code, combinedProgramme, yearType, specialGroups)
   if (data) {
     return res.json(data)
@@ -117,7 +117,7 @@ router.get('/:id/coursestats', async (req: GetCourseStatsRequest, res: Response)
   const combinedProgramme = req.query?.combined_programme
   const date = new Date()
   date.setHours(23, 59, 59, 999)
-  logInfoForGrafana(code, combinedProgramme)
+  void logInfoForGrafana(code, combinedProgramme)
   try {
     const data = await getStudyProgrammeCoursesForStudyTrack(date.getTime(), code, showByYear, combinedProgramme)
     return res.json(data)
@@ -141,7 +141,7 @@ router.get('/:id/studytrackstats', async (req: GetStudyTrackStatsRequest, res: R
     return res.status(422).end()
   }
 
-  logInfoForGrafana(code, combinedProgramme)
+  void logInfoForGrafana(code, combinedProgramme)
   const data = await getStudyTrackStats(code, combinedProgramme, graduated, specialGroups)
   if (data) {
     return res.json(data)

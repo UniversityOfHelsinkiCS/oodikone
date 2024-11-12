@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 
 import { Role } from '../types'
 
-export const roles = (requiredRoles: Role[]) => async (req: Request, res: Response, next: NextFunction) => {
+export const roles = (requiredRoles: Role[]) => (req: Request, res: Response, next: NextFunction) => {
   const { roles } = req.user
   if (requiredRoles.some(role => roles.includes(role)) || roles.includes('admin')) {
     return next()

@@ -15,7 +15,7 @@ router.get('/', auth.roles(['admin']), async (_req: Request, res: Response) => {
   res.json(results)
 })
 
-router.get('/access_groups', auth.roles(['admin']), async (_req: Request, res: Response) => {
+router.get('/access_groups', auth.roles(['admin']), (_req: Request, res: Response) => {
   res.json(roles)
 })
 

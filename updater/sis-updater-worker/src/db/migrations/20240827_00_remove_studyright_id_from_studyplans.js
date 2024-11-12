@@ -1,3 +1,5 @@
+const { STRING } = require('sequelize')
+
 module.exports = {
   up: async queryInterface => {
     await queryInterface.removeColumn('studyplan', 'studyrightid')

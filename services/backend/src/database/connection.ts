@@ -118,7 +118,7 @@ const sequelizeKone = new Sequelize(conf.DB_URL_KONE!, {
   ],
 })
 
-sequelizeKone.query(`SET SESSION search_path to ${conf.DB_SCHEMA_KONE}`)
+void sequelizeKone.query(`SET SESSION search_path to ${conf.DB_SCHEMA_KONE}`)
 
 const sequelizeUser = new Sequelize(conf.DB_URL_USER!, {
   logging: false,

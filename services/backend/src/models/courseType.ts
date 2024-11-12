@@ -1,4 +1,3 @@
-/* eslint-disable import/no-cycle */
 import { InferAttributes } from 'sequelize'
 import { Column, CreatedAt, DataType, HasMany, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 

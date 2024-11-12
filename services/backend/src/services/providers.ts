@@ -23,7 +23,7 @@ export const getCourseCodesOfProvider = async (provider: string) => {
   })
 
   const coursesWithOpenUniSubstitutions = coursesByProvider.map(({ code, substitutions }) => {
-    if (!substitutions || !substitutions.length) {
+    if (!substitutions?.length) {
       return [code]
     }
     const alternatives = [`AY-${code}`, `AY${code}`, `A-${code}`]

@@ -78,9 +78,8 @@ const routes = (app: Express, url: string) => {
   app.use(`${url}/close-to-graduation`, auth.roles(['fullSisuAccess', 'studyGuidanceGroups']), closeToGraduation)
   app.use(`${url}/study-programme-pins`, studyProgrammePins)
   app.use(`${url}/curriculum-periods`, curriculumPeriods)
-  app.get('*', async (_, res) => {
-    const results = { error: 'unknown endpoint' }
-    res.status(404).json(results)
+  app.get('*', (_, res) => {
+    res.status(404).json({ error: 'unknown endpoint' })
   })
   Sentry.setupExpressErrorHandler(app)
   app.use(errorHandler)

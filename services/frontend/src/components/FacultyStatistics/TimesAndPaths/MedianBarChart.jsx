@@ -27,17 +27,17 @@ export const MedianBarChart = ({
   if (!facultyGraph && goalExceptions.needed && ['master', 'bcMsCombo'].includes(level)) {
     // change colors for longer medicine goal times
     modData = JSON.parse(JSON.stringify(data))
-    for (let i = 0; i < modData.length; i++) {
-      if (Object.keys(goalExceptions).includes(modData[i].code)) {
-        const realGoal = goal + goalExceptions[modData[i].code]
-        if (modData[i].median <= realGoal) {
-          modData[i].color = '#90A959'
-        } else if (modData[i].median <= realGoal + 12) {
-          modData[i].color = '#FEE191'
+    for (const data of modData) {
+      if (Object.keys(goalExceptions).includes(data.code)) {
+        const realGoal = goal + goalExceptions[data.code]
+        if (data.median <= realGoal) {
+          data.color = '#90A959'
+        } else if (data.median <= realGoal + 12) {
+          data.color = '#FEE191'
         } else {
-          modData[i].color = '#FB6962'
+          data.color = '#FB6962'
         }
-        modData[i].realGoal = realGoal
+        data.realGoal = realGoal
       }
     }
   }
