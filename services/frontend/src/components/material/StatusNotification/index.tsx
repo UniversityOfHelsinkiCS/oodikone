@@ -1,4 +1,4 @@
-import { Alert, Snackbar } from '@mui/material'
+import { Alert, AlertProps, Snackbar } from '@mui/material'
 
 /**
  * A temporary notification message to give feedback on the status of an action.
@@ -17,7 +17,7 @@ export const StatusNotification = ({
   message: string
   onClose: () => void
   open: boolean
-  severity: 'success' | 'info' | 'warning' | 'error'
+  severity: AlertProps['severity']
 }) => {
   return (
     <Snackbar
