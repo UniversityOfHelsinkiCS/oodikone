@@ -139,6 +139,7 @@ export default [
     rules: {
       '@typescript-eslint/no-require-imports': 'off',
       'import/no-commonjs': 'off',
+      'import/no-unused-modules': 'off',
     },
   },
   {
