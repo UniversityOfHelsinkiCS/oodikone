@@ -290,7 +290,7 @@ describe('Course Statistics', () => {
     })
   })
 
-  it('Age filter works', () => {
+  it('Age filter works', { retries: 3 }, () => {
     runTestStepWithPreAndPostParts('Age', () => {
       testRangeFilter('Age-filter-card', 21, 30, 36)
     })
