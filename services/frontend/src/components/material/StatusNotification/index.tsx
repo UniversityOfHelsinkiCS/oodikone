@@ -22,7 +22,7 @@ export const StatusNotification = ({
   return (
     <Snackbar
       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-      autoHideDuration={10000}
+      autoHideDuration={30000}
       onClose={onClose}
       open={open}
     >
