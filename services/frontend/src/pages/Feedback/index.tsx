@@ -41,8 +41,8 @@ export const Feedback = () => {
     setFeedback(event.target.value)
   }
 
-  const handleSubmit = () => {
-    sendFeedback({ content: feedback })
+  const handleSubmit = async () => {
+    await sendFeedback({ content: feedback })
     setModalOpen(false)
   }
 
