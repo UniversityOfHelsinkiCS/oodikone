@@ -107,9 +107,9 @@ describe('Population statistics tests', () => {
     it('Courses of class curriculum selection works', () => {
       cy.visit(pathToMathBSc2020)
       cy.contains('Courses of class').click()
-      cy.get('[data-cy=curriculum-picker]').contains('2020 - 2023')
+      cy.get('[data-cy=curriculum-picker]').contains('2020–2023')
       cy.get('[data-cy=toggle-group-module-MAT-tyo]')
-      cy.get('[data-cy=curriculum-picker]').click().contains('2023 - 2026').click()
+      cy.get('[data-cy=curriculum-picker]').click().contains('2023–2026').click()
       cy.get('[data-cy=toggle-group-module-MAT-tyo]').should('not.exist')
     })
 
@@ -117,14 +117,14 @@ describe('Population statistics tests', () => {
       cy.visit(pathToMathBSc2020)
       cy.contains('Courses of class').click()
       cy.intercept('/api/v2/populationstatistics/courses').as('courseData')
-      cy.get('[data-cy=curriculum-picker]').click().contains('2020 - 2023').click()
+      cy.get('[data-cy=curriculum-picker]').click().contains('2020–2023').click()
       cy.wait('@courseData').then(({ response }) => {
         expect(response.body).to.have.property('allStudents')
         expect(response.body).to.have.property('coursestatistics')
         expect(response.body.allStudents).to.equal(27)
         expect(response.body.coursestatistics.some(stat => stat.course.code === 'DIGI-100')).to.equal(true)
       })
-      cy.get('[data-cy=curriculum-picker]').click().contains('2023 - 2026').click()
+      cy.get('[data-cy=curriculum-picker]').click().contains('2023–2026').click()
       cy.wait('@courseData').then(({ response }) => {
         expect(response.body).to.have.property('allStudents')
         expect(response.body).to.have.property('coursestatistics')
