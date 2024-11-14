@@ -2,15 +2,16 @@ import { col, Op, where } from 'sequelize'
 
 import { Course, Credit, Student, Studyplan, SISStudyRight, SISStudyRightElement } from '../../models'
 import { Name } from '../../shared/types'
-import { CreditTypeCode, DegreeProgrammeType, ExtentCode, SemesterEnrollment } from '../../types'
+import { CreditTypeCode, DegreeProgrammeType, EnrollmentType, ExtentCode, SemesterEnrollment } from '../../types'
 import { redisClient } from '../redis'
 import { getCurriculumVersion } from './shared'
 
 export const CLOSE_TO_GRADUATION_REDIS_KEY = 'CLOSE_TO_GRADUATION_DATA'
 
-type LatestAttainmentDates = {
-  total?: Date
-  hops?: Date
+type AttainmentDates = {
+  latestTotal?: Date
+  latestHops?: Date
+  earliestHops?: Date
 }
 
 type AccumulatorType = {
@@ -39,7 +40,8 @@ type AccumulatorType = {
     startedAt: Date
     degreeProgrammeType: DegreeProgrammeType
   }
-  latestAttainmentDates: LatestAttainmentDates
+  attainmentDates: AttainmentDates
+  numberOfAbsentSemesters: number
   curriculumPeriod: string | null
   credits: {
     hops: number
@@ -47,14 +49,14 @@ type AccumulatorType = {
   }
 }
 
-const findThesisAndLatestAttainments = (
+const findThesisAndLatestAndEarliestAttainments = (
   studyPlan: Studyplan,
   attainments: Credit[],
   degreeProgrammeType: DegreeProgrammeType,
   studyRightId: string
 ) => {
   let thesisData: Credit | undefined
-  const latestAttainmentDates: LatestAttainmentDates = {}
+  const attainmentDates: AttainmentDates = {}
   const thesisCodes = {
     [DegreeProgrammeType.BACHELOR]: 'urn:code:course-unit-type:bachelors-thesis',
     [DegreeProgrammeType.MASTER]: 'urn:code:course-unit-type:masters-thesis',
@@ -67,25 +69,29 @@ const findThesisAndLatestAttainments = (
     ) {
       thesisData = attainment
     }
-    if (!latestAttainmentDates.total) {
-      latestAttainmentDates.total = attainment.attainment_date
+    if (!attainmentDates.latestTotal) {
+      attainmentDates.latestTotal = attainment.attainment_date
     }
-    if (!latestAttainmentDates.hops && studyPlan.included_courses.includes(attainment.course?.code)) {
-      latestAttainmentDates.hops = attainment.attainment_date
-    }
-    if (thesisData && latestAttainmentDates.total && latestAttainmentDates.hops) {
-      break
+    if (studyPlan.included_courses.includes(attainment.course?.code)) {
+      if (!attainmentDates.latestHops) {
+        attainmentDates.latestHops = attainment.attainment_date
+      }
+      if (
+        !attainmentDates.earliestHops ||
+        attainment.attainment_date.getTime() < attainmentDates.earliestHops.getTime()
+      ) {
+        attainmentDates.earliestHops = attainment.attainment_date
+      }
     }
   }
 
-  return { latestAttainmentDates, thesisData }
+  return { attainmentDates, thesisData }
 }
 
 const formatStudent = (student: Student) => {
   const {
     studentnumber: studentNumber,
     abbreviatedname: name,
-
     sis_person_id,
     email,
     phone_number: phoneNumber,
@@ -101,6 +107,11 @@ const formatStudent = (student: Student) => {
       semesterEnrollments,
     } = studyRight
 
+    const numberOfAbsentSemesters = (semesterEnrollments ?? []).reduce(
+      (acc, enrollment) => (enrollment.type === EnrollmentType.ABSENT ? acc + 1 : acc),
+      0
+    )
+
     const {
       code: programmeCode,
       name: programmeName,
@@ -108,7 +119,7 @@ const formatStudent = (student: Student) => {
       startDate: programmeStartDate,
       degreeProgrammeType,
     } = studyRightElements[0]
-    const { latestAttainmentDates, thesisData } = findThesisAndLatestAttainments(
+    const { attainmentDates, thesisData } = findThesisAndLatestAndEarliestAttainments(
       studyPlan,
       student.credits,
       degreeProgrammeType,
@@ -136,7 +147,8 @@ const formatStudent = (student: Student) => {
         startedAt: programmeStartDate,
         degreeProgrammeType,
       },
-      latestAttainmentDates,
+      attainmentDates,
+      numberOfAbsentSemesters,
       curriculumPeriod: getCurriculumVersion(studyPlan.curriculum_period_id),
       credits: {
         hops: studyPlan.completed_credits,
