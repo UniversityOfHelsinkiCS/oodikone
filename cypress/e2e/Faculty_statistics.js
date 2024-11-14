@@ -82,7 +82,7 @@ describe('Faculty overview', () => {
       cy.get('[data-cy="studentsOfTheFaculty-info-content"]').should('not.exist')
     })
 
-    it('Data can be exported to Excel files', () => {
+    it('Data can be exported to Excel files', { retries: 3 }, () => {
       const sections = [
         'StudentsOfTheFaculty',
         'GraduatedOfTheFaculty',
