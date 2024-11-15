@@ -15,4 +15,6 @@ redisClient
     logger.error('Failed to connect to Redis', error)
   })
 
+redisClient.on('error', error => logger.error('Redis Client Error', { error }))
+
 module.exports = { redisClient }
