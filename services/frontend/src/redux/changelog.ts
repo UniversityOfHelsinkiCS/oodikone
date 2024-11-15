@@ -1,9 +1,9 @@
 import { RTKApi } from '@/apiConnection'
-import { ChangelogData } from '@/shared/types'
+import { Release } from '@/shared/types'
 
 const changelogApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
-    getChangelog: builder.query<ChangelogData, void>({
+    getChangelog: builder.query<Release[], void>({
       query: () => 'changelog',
     }),
   }),
