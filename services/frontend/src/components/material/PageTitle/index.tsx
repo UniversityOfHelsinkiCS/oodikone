@@ -13,7 +13,7 @@ export const PageTitle = ({ subtitle, title }: { subtitle?: string; title: strin
         {title}
       </Typography>
       {subtitle && (
-        <Typography color="textSecondary" component="h2" variant="h5">
+        <Typography color="text.secondary" component="h2" variant="h6">
           {subtitle}
         </Typography>
       )}
