@@ -1,5 +1,5 @@
 export type Release = {
   description: string
-  time: Date
+  time: string
   title: string
 }

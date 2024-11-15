@@ -1,0 +1,94 @@
+import { Button, Container, Divider, List, ListItem, Stack } from '@mui/material'
+import { useEffect, useState } from 'react'
+
+import { checkUserAccess, getFullStudyProgrammeRights, isDefaultServiceProvider } from '@/common'
+import { useTitle } from '@/common/hooks'
+import { PageTitle } from '@/components/material/PageTitle'
+import { useGetAuthorizedUserQuery } from '@/redux/auth'
+import { useGetChangelogQuery } from '@/redux/changelog'
+import { Release } from '@/shared/types'
+import { FeatureItem } from './FeatureItem'
+import { ReleaseItem } from './ReleaseItem'
+import { SectionTitle } from './SectionTitle'
+
+export const FrontPage = () => {
+  useTitle()
+
+  const { data: releaseData, isLoading } = useGetChangelogQuery()
+  const { roles, programmeRights } = useGetAuthorizedUserQuery()
+  const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
+  const [visibleReleases, setVisibleReleases] = useState<Release[]>([])
+
+  const featureItems = [
+    {
+      show: true,
+      title: 'University',
+      content: 'View tables and diagrams about study progress of different faculties',
+    },
+    {
+      show: checkUserAccess(['admin', 'fullSisuAccess'], roles) || programmeRights.length > 0,
+      title: 'Programmes',
+      content: (
+        <List>
+          <ListItem>Class statistics: View details of a specific year of a study programme</ListItem>
+          <ListItem>Overview: View statistics of a programme across all years</ListItem>
+        </List>
+      ),
+    },
+    {
+      show: checkUserAccess(['courseStatistics', 'admin'], roles) || fullStudyProgrammeRights.length > 0,
+      title: 'Courses',
+      content: 'View statistics about course attempts, completions and grades',
+    },
+    {
+      show: checkUserAccess(['studyGuidanceGroups', 'admin'], roles) || fullStudyProgrammeRights.length > 0,
+      title: 'Students',
+      content: 'View detailed information for a given student',
+    },
+    {
+      show: isDefaultServiceProvider(),
+      title: 'Feedback',
+      content: (
+        <p>
+          For questions and suggestions, please use the{' '}
+          <a href="https://oodikone.helsinki.fi/feedback">feedback form</a> or shoot an email to{' '}
+          <a href="mailto:grp-toska@helsinki.fi">grp-toska@helsinki.fi</a>.
+        </p>
+      ),
+    },
+  ]
+
+  const filterInternalReleases = (release: Release) => !release.title.startsWith('Internal:')
+
+  useEffect(() => {
+    if (!releaseData) {
+      return
+    }
+    setVisibleReleases([...releaseData.filter(filterInternalReleases).slice(0, 2)])
+  }, [releaseData])
+
+  return (
+    <Container maxWidth="lg">
+      <PageTitle subtitle="Exploratory Research on Study Data" title="Oodikone" />
+      <Stack direction={{ sm: 'column', md: 'row' }} divider={<Divider flexItem orientation="vertical" />} gap={3}>
+        <Stack direction="column" gap={2} sx={{ width: { sm: '100%', md: '50%' } }}>
+          <SectionTitle title="Features" />
+          <Stack direction="column" divider={<Divider flexItem orientation="horizontal" />} gap={2}>
+            {featureItems.map(
+              item => item.show && <FeatureItem content={item.content} key={item.title} title={item.title} />
+            )}
+          </Stack>
+        </Stack>
+        <Stack direction="column" gap={2} sx={{ width: { sm: '100%', md: '50%' } }}>
+          <SectionTitle title="Latest updates" />
+          <Stack direction="column" divider={<Divider flexItem orientation="horizontal" />} gap={2}>
+            {visibleReleases.map(release => (
+              <ReleaseItem isLoading={isLoading} key={release.title} release={release} />
+            ))}
+          </Stack>
+          <Button variant="contained">View full changelog</Button>
+        </Stack>
+      </Stack>
+    </Container>
+  )
+}
