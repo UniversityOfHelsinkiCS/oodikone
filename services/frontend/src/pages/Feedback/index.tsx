@@ -60,8 +60,8 @@ export const Feedback = () => {
         open={showError}
         severity="error"
       />
+      <PageTitle title="Feedback" />
       <Box textAlign="center">
-        <PageTitle title="Feedback" />
         <Typography>
           We are constantly improving Oodikone. Please share your thoughts using the form below, or contact us at
           <br />
