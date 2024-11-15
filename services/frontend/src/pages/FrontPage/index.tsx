@@ -1,7 +1,13 @@
-import { Button, Container, Divider, List, ListItem, Stack } from '@mui/material'
+import { Box, Button, Container, Divider, Stack } from '@mui/material'
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 
-import { checkUserAccess, getFullStudyProgrammeRights, isDefaultServiceProvider } from '@/common'
+import {
+  checkUserAccess,
+  filterInternalReleases,
+  getFullStudyProgrammeRights,
+  isDefaultServiceProvider,
+} from '@/common'
 import { useTitle } from '@/common/hooks'
 import { PageTitle } from '@/components/material/PageTitle'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
@@ -19,6 +25,7 @@ export const FrontPage = () => {
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const [visibleReleases, setVisibleReleases] = useState<Release[]>([])
 
+  // TODO: Add missing features and extract access right checking
   const featureItems = [
     {
       show: true,
@@ -29,10 +36,10 @@ export const FrontPage = () => {
       show: checkUserAccess(['admin', 'fullSisuAccess'], roles) || programmeRights.length > 0,
       title: 'Programmes',
       content: (
-        <List>
-          <ListItem>Class statistics: View details of a specific year of a study programme</ListItem>
-          <ListItem>Overview: View statistics of a programme across all years</ListItem>
-        </List>
+        <ul>
+          <li>Class statistics: View details of a specific year of a study programme</li>
+          <li>Overview: View statistics of a programme across all years</li>
+        </ul>
       ),
     },
     {
@@ -57,8 +64,6 @@ export const FrontPage = () => {
       ),
     },
   ]
-
-  const filterInternalReleases = (release: Release) => !release.title.startsWith('Internal:')
 
   useEffect(() => {
     if (!releaseData) {
@@ -86,7 +91,11 @@ export const FrontPage = () => {
               <ReleaseItem isLoading={isLoading} key={release.title} release={release} />
             ))}
           </Stack>
-          <Button variant="contained">View full changelog</Button>
+          <Box sx={{ justifyContent: 'center', display: 'flex' }}>
+            <Button component={Link} to="/changelog" variant="contained">
+              View more
+            </Button>
+          </Box>
         </Stack>
       </Stack>
     </Container>

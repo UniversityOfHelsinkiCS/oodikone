@@ -450,3 +450,14 @@ export const getCalendarYears = years => {
     return all.concat(Number(year.slice(0, 4)))
   }, [])
 }
+
+export const filterInternalReleases = release => !release.title.startsWith('Internal:')
+
+export const getDescription = description => {
+  const lines = description.split('\n')
+  const internalIndex = lines.findIndex(line => line.toLowerCase().includes('internal'))
+  if (internalIndex === -1 || internalIndex === 0) {
+    return description
+  }
+  return lines.slice(0, internalIndex).join('\n')
+}

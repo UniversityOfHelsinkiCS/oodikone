@@ -20,6 +20,7 @@ import { Teachers } from '@/components/Teachers'
 import { Updater } from '@/components/Updater'
 import { Users } from '@/components/Users'
 import { languageCenterViewEnabled } from '@/conf'
+import { Changelog } from '@/pages/Changelog'
 import { Feedback } from '@/pages/Feedback'
 import { FrontPage } from '@/pages/FrontPage'
 import { ProtectedRoute } from './ProtectedRoute'
@@ -43,12 +44,14 @@ const routes = {
   closeToGraduation: '/close-to-graduation',
   populations: '/populations',
   studyProgramme: '/study-programme/:studyProgrammeId?',
+  changelog: '/changelog',
 }
 
 export const Routes = () => (
   <Suspense fallback={<SegmentDimmer isLoading />}>
     <Switch>
       <Route component={FrontPage} exact path="/" />
+      <Route component={Changelog} exact path={routes.changelog} />
       {isDefaultServiceProvider() && <Route component={Feedback} exact path={routes.feedback} />}
       <ProtectedRoute
         component={PopulationStatistics}
