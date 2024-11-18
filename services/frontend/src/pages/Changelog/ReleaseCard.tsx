@@ -8,7 +8,7 @@ import { reformatDate } from '@/util/timeAndDate'
 
 export const ReleaseCard = ({ isLoading, release }: { isLoading: boolean; release: Release }) => {
   return (
-    <Card elevation={1} sx={{ padding: 2 }} variant="outlined">
+    <Card sx={{ padding: 2 }} variant="outlined">
       <Typography component="h4" sx={{ mb: 1 }} variant="h6">
         {isLoading ? 'Loading title...' : release.title}
       </Typography>
