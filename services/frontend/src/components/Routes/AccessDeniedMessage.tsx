@@ -1,4 +1,4 @@
-import { ErrorOutline } from '@mui/icons-material'
+import { DoNotDisturb } from '@mui/icons-material'
 import { Container, Box, Link, Paper, Typography } from '@mui/material'
 
 import { useTitle } from '@/common/hooks'
@@ -14,10 +14,10 @@ export const AccessDeniedMessage = () => {
           bgcolor: 'error.light',
           color: 'common.white',
           display: 'flex',
-          p: 2,
+          padding: 2,
         }}
       >
-        <ErrorOutline fontSize="large" sx={{ marginRight: 2 }} />
+        <DoNotDisturb fontSize="large" sx={{ marginRight: 2 }} />
         <Box>
           <Typography component="h2" variant="h6">
             Access denied
