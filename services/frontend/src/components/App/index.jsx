@@ -1,15 +1,16 @@
+import { CssBaseline } from '@mui/material'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 import * as Sentry from '@sentry/browser'
 import { useEffect } from 'react'
 import { initShibbolethPinger } from 'unfuck-spa-shibboleth-session'
 
 import { AccessDenied } from '@/components/AccessDenied'
+import { Footer } from '@/components/material/Footer'
 import { NavigationBar } from '@/components/material/NavigationBar'
 import { Routes } from '@/components/Routes'
 import { SegmentDimmer } from '@/components/SegmentDimmer'
 import { isProduction } from '@/conf'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
-import './app.css'
 
 const addUserDetailsToLoggers = ({ id, username, mockedBy }) => {
   if (!isProduction || !id || !username) {
@@ -18,16 +19,22 @@ const addUserDetailsToLoggers = ({ id, username, mockedBy }) => {
   Sentry.setUser({ id, username, mockedBy })
 }
 
-const theme = createTheme({})
+const theme = createTheme({ palette: { mode: 'dark' } })
 
 const Layout = ({ children }) => (
-  <div className="appContainer">
-    <main className="routeViewContainer">
-      <ThemeProvider theme={theme}>
-        <NavigationBar />
-        {children}
-      </ThemeProvider>
-    </main>
+  <div
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      minHeight: '100vh',
+    }}
+  >
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <NavigationBar />
+      <main style={{ flex: 1 }}>{children}</main>
+      <Footer />
+    </ThemeProvider>
   </div>
 )
 
