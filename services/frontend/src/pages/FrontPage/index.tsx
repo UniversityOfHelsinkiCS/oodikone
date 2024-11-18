@@ -14,6 +14,7 @@ import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetChangelogQuery } from '@/redux/changelog'
 import { Release } from '@/shared/types'
 import { FeatureItem } from './FeatureItem'
+import { MaterialInfoCard } from './MaterialInfoCard'
 import { ReleaseItem } from './ReleaseItem'
 import { SectionTitle } from './SectionTitle'
 
@@ -86,6 +87,7 @@ export const FrontPage = () => {
         </Stack>
         <Stack direction="column" gap={2} sx={{ width: { sm: '100%', md: '50%' } }}>
           <SectionTitle title="Latest updates" />
+          <MaterialInfoCard />
           <Stack direction="column" divider={<Divider flexItem orientation="horizontal" />} gap={2}>
             {visibleReleases.map(release => (
               <ReleaseItem isLoading={isLoading} key={release.title} release={release} />
