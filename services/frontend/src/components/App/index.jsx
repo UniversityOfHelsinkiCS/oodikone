@@ -19,7 +19,7 @@ const addUserDetailsToLoggers = ({ id, username, mockedBy }) => {
   Sentry.setUser({ id, username, mockedBy })
 }
 
-const theme = createTheme({ palette: { mode: 'dark' } })
+const theme = createTheme({})
 
 const Layout = ({ children }) => (
   <div
