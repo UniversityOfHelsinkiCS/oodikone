@@ -148,7 +148,7 @@ const updateAccessGroups = async (
   specialGroup: Record<string, boolean>,
   sisId: string
 ) => {
-  const { jory, hyOne, superAdmin, openUni, katselmusViewer, fullSisuAccess } = specialGroup
+  const { jory, superAdmin, openUni, katselmusViewer, fullSisuAccess } = specialGroup
   const userFromDb = await User.findOne({ where: { username } })
   if (!userFromDb) {
     throw new Error(`User ${username} not found`)
@@ -161,7 +161,7 @@ const updateAccessGroups = async (
       : []),
     ...(iamGroups.includes(courseStatisticsGroup) ? ['courseStatistics'] : []),
     ...(jory || iamGroups.includes(facultyStatisticsGroup) ? ['facultyStatistics'] : []),
-    ...(hyOne || currentAccessGroups.includes('teachers') ? ['teachers'] : []),
+    ...(currentAccessGroups.includes('teachers') ? ['teachers'] : []),
     ...(superAdmin || currentAccessGroups.includes('admin') ? ['admin'] : []),
     ...(openUni ? ['openUniSearch'] : []),
     ...(katselmusViewer ? ['katselmusViewer'] : []),

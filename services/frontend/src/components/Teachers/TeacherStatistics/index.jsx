@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import ReactMarkdown from 'react-markdown'
 import { Button, Dropdown, Form, Message, Segment } from 'semantic-ui-react'
 
 import { createLocaleComparator, getCurrentSemester, getFullStudyProgrammeRights } from '@/common'
@@ -9,13 +10,14 @@ import { useGetProvidersQuery } from '@/redux/providers'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { useLazyGetTeacherStatisticsQuery } from '@/redux/teachers'
 import { mapToProviders } from '@/shared/util'
+import { hasFullAccessToTeacherData } from '../util'
 
 export const TeacherStatistics = () => {
   const { getTextIn } = useLanguage()
   const [semesterStart, setSemesterStart] = useState(null)
   const [semesterEnd, setSemesterEnd] = useState(null)
   const [providers, setProviders] = useState([])
-  const { programmeRights, isAdmin } = useGetAuthorizedUserQuery()
+  const { programmeRights, roles, iamGroups } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const [getTeacherStatistics, { data: teacherData, isFetching, isLoading }] = useLazyGetTeacherStatisticsQuery()
   const { data: providersData = [] } = useGetProvidersQuery()
@@ -61,7 +63,7 @@ export const TeacherStatistics = () => {
 
   const userProviders = mapToProviders(fullStudyProgrammeRights)
   const invalidQueryParams = providers.length === 0 || !semesterStart
-  const providerOptions = isAdmin
+  const providerOptions = hasFullAccessToTeacherData(roles, iamGroups)
     ? providersData
     : providersData.filter(provider => userProviders.includes(provider.code))
   const localizedProviderOptions = providerOptions
@@ -76,11 +78,17 @@ export const TeacherStatistics = () => {
   return (
     <div>
       <Message
-        content={`
-          Statistics for teachers that admitted credits during and between
-          the given semesters for one of the given course providers.
-        `}
+        content={
+          <ReactMarkdown>
+            Statistics for teachers who admitted credits during or between the selected semesters for one of the
+            specified course providers. This is determined by the acceptor person(s) of the attainment. While the
+            acceptor person is often the responsible teacher for the course, this is not always the case. If an
+            attainment has multiple acceptors, the full amount of credits is given to each acceptor (i.e., the credits
+            are **not** divided between the acceptors).
+          </ReactMarkdown>
+        }
         header="Teacher statistics by course providers"
+        info
       />
       <Segment>
         <Form loading={isLoading || isFetching}>

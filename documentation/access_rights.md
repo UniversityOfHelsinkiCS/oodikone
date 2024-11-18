@@ -13,7 +13,7 @@ Roles are defined [here](../services/backend/src/config/roles.ts). Criteria for 
 - studyGuidanceGroups
 - teachers
 
-The roles `openUniSearch`, `teachers` and `studyGuidanceGroups` simply enable certain views (_Open uni student population_, _Teachers_ and _Guidance groups_ respectively).
+The roles `openUniSearch` and `studyGuidanceGroups` simply enable certain views (_Open uni student population_ and _Guidance groups_ respectively).
 
 ### courseStatistics
 
@@ -26,6 +26,12 @@ The roles `openUniSearch`, `teachers` and `studyGuidanceGroups` simply enable ce
 ### katselemusViewer
 
 - Enables the _Evaluation overview_ view
+
+### teachers
+
+- By default, the role only allows seeing the statistics of course providers (study programmes) they have full rights to (see [Programmes](#programmes))
+- This role always needs to be given and removed manually
+- If the user is a member of the `hy-dekaanit` or `hy-varadekaanit-opetus` IAM group (or is an admin), they can see leaderboards, information about individual teachers, and statistics of all course providers. They don't need to be given the `teachers` role manually.
 
 ### Other roles
 
@@ -67,7 +73,6 @@ A user must be a member of either the `grp-oodikone-basic-users` or `grp-oodikon
 | grp-oodikone-users       | facultyStatistics             |
 | grp-toska                | admin                         |
 | grp-katselmus-\*         | katselmusViewer               |
-| hy-one                   | teachers                      |
 | hy-ypa-opa-dojo          | openUniSearch                 |
 
 `grp-oodikone-basic-users`: basically the whole staff (hy-\*-allstaff)

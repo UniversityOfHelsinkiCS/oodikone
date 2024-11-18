@@ -65,7 +65,7 @@ const routes = (app: Express, url: string) => {
   app.use(`${url}/faculties`, faculties)
   app.use(`${url}/university`, university)
   app.use(`${url}/updater`, auth.roles(['admin']), updater)
-  app.use(`${url}/teachers`, auth.roles(['teachers']), teachers)
+  app.use(`${url}/teachers`, teachers)
   if (serviceProvider === 'toska') {
     app.use(`${url}/users`, usersToska)
   } else {

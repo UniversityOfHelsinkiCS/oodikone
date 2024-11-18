@@ -3,6 +3,7 @@ import { Container, Icon, Message } from 'semantic-ui-react'
 
 import { checkUserAccess } from '@/common'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
+import { hasFullAccessToTeacherData } from '../Teachers/util'
 
 const NoAccessToPageBanner = () => (
   <Container style={{ paddingTop: 50 }} text textAlign="justified">
@@ -38,6 +39,9 @@ export const ProtectedRoute = ({ requiredRoles = [], requireUserHasRights = fals
     }
     if (rest.path.includes('evaluationoverview')) {
       return rest.location.pathname.includes('university') ? true : hasRequiredRoles
+    }
+    if (rest.path.includes('teachers')) {
+      return hasRequiredRoles || hasFullAccessToTeacherData(roles, iamGroups)
     }
 
     return hasRequiredRoles && hasRequiredRights
