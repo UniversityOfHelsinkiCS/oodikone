@@ -1,5 +1,6 @@
 import { ProgrammeModule } from '../models'
-import { DetailedProgrammeRights, Role } from '../types'
+import { Role } from '../shared/types'
+import { DetailedProgrammeRights } from '../types'
 
 const isObjectWithKey = (obj: unknown, key: string): obj is Record<string, unknown> => {
   return typeof obj === 'object' && obj !== null && key in obj
