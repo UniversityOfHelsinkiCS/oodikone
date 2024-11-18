@@ -43,6 +43,7 @@ A collection of useful tools, documentation and other resources.
 ## User interface
 
 - [Material UI documentation](https://mui.com/material-ui/getting-started/)
+  - [Material Icons](https://mui.com/material-ui/material-icons/)
 - [Semantic UI React documentation](https://react.semantic-ui.com)
 
 <!--
