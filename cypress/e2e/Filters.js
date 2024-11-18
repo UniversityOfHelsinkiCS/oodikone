@@ -18,7 +18,6 @@ const clearSingleDropdownSelection = dataCyAttribute => {
 }
 
 const testRangeFilter = (parentEl, min, max, expected) => {
-  cy.clock(MOCKED_DATE, ['Date'])
   cy.cs(parentEl)
     .cs('range-selector-min')
     .find('input')
@@ -29,13 +28,17 @@ const testRangeFilter = (parentEl, min, max, expected) => {
         .find('input')
         .invoke('val')
         .then(initialMax => {
-          cy.cs(parentEl).cs('range-selector-min').find('input').type(`{selectall}{backspace}${min}`).blur()
-          cy.cs(parentEl).cs('range-selector-max').find('input').type(`{selectall}{backspace}${max}`).blur()
+          cy.cs(parentEl).cs('range-selector-min').find('input').clear()
+          cy.cs(parentEl).cs('range-selector-min').find('input').type(min)
+          cy.cs(parentEl).cs('range-selector-max').find('input').clear()
+          cy.cs(parentEl).cs('range-selector-max').find('input').type(max)
 
           checkFilteringResult(expected)
 
-          cy.cs(parentEl).cs('range-selector-min').find('input').type(`{selectall}{backspace}${initialMin}`).blur()
-          cy.cs(parentEl).cs('range-selector-max').find('input').type(`{selectall}{backspace}${initialMax}`).blur()
+          cy.cs(parentEl).cs('range-selector-min').find('input').clear()
+          cy.cs(parentEl).cs('range-selector-min').find('input').type(initialMin)
+          cy.cs(parentEl).cs('range-selector-max').find('input').clear()
+          cy.cs(parentEl).cs('range-selector-max').find('input').type(initialMax)
         })
     })
 }
@@ -169,6 +172,7 @@ describe('Population Statistics', () => {
   })
 
   it('Age filter works', { retries: 3 }, () => {
+    cy.clock(MOCKED_DATE, ['Date'])
     runTestStepWithPreAndPostParts('Age', () => {
       testRangeFilter('Age-filter-card', 23, 30, 21)
     })
@@ -228,6 +232,7 @@ describe('Population Statistics', () => {
   })
 
   it('Filter combinations work', () => {
+    cy.clock(MOCKED_DATE, ['Date'])
     runTestStepWithPreAndPostParts('GraduatedFromProgramme', () => {
       runTestStepWithPreAndPostParts('Age', () => {
         const getCard = () => cy.cs('GraduatedFromProgramme-filter-card')
@@ -291,6 +296,7 @@ describe('Course Statistics', () => {
   })
 
   it('Age filter works', { retries: 3 }, () => {
+    cy.clock(MOCKED_DATE, ['Date'])
     runTestStepWithPreAndPostParts('Age', () => {
       testRangeFilter('Age-filter-card', 21, 30, 36)
     })
@@ -322,6 +328,7 @@ describe('Course Statistics', () => {
   })
 
   it('Filter combinations work', () => {
+    cy.clock(MOCKED_DATE, ['Date'])
     runTestStepWithPreAndPostParts('Grade', () => {
       runTestStepWithPreAndPostParts('Age', () => {
         cy.cs('gradeFilter-5').click()
