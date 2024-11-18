@@ -21,7 +21,12 @@ export const Footer = () => {
     >
       <Divider sx={{ my: 2 }} />
       <Container maxWidth="lg">
-        <Stack direction={{ sm: 'column', md: 'row' }} gap={2} justifyContent="space-between">
+        <Stack
+          alignItems={{ md: 'center' }}
+          direction={{ sm: 'column', md: 'row' }}
+          gap={2}
+          justifyContent="space-between"
+        >
           <Stack direction={{ sm: 'column', md: 'row' }} gap={{ sm: 2, md: 4 }}>
             <Stack>
               <Typography variant="subtitle1">Oodikone</Typography>
