@@ -14,7 +14,7 @@ import {
   TagFromFrontend,
   StudentTagFromFrontend,
 } from '../services/tags'
-import { Role } from '../types'
+import { Role } from '../shared/types'
 import { getFullStudyProgrammeRights, hasFullAccessToStudentData } from '../util'
 
 const router = Router()

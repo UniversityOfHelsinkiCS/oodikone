@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 
-import { Role } from '../types'
+import { Role } from '../shared/types'
 
 export const roles =
   (requiredRoles: Role[], requiredIamGroups?: string[]) => (req: Request, res: Response, next: NextFunction) => {

@@ -1,7 +1,8 @@
 import { CreationOptional, InferAttributes, InferCreationAttributes } from 'sequelize'
 import { AutoIncrement, Column, DataType, Default, Model, PrimaryKey, Table, Unique } from 'sequelize-typescript'
 
-import { Language, Role } from '../types'
+import { Role } from '../shared/types'
+import { Language } from '../types'
 
 @Table({
   underscored: true,
