@@ -1,5 +1,5 @@
 import { InfoOutlined } from '@mui/icons-material'
-import { Alert, AlertTitle, Link } from '@mui/material'
+import { Alert, AlertTitle, Box, Link } from '@mui/material'
 import { NavLink } from 'react-router-dom'
 
 /**
@@ -8,7 +8,20 @@ import { NavLink } from 'react-router-dom'
  */
 export const MaterialInfoCard = () => {
   return (
-    <Alert icon={<InfoOutlined />} severity="info" variant="outlined">
+    <Alert
+      icon={
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
+          <InfoOutlined />
+        </Box>
+      }
+      severity="info"
+      variant="outlined"
+    >
       <AlertTitle>New user interface</AlertTitle>
       Oodikone is getting a new look! We are gradually updating each view to the new design.{' '}
       <Link component={NavLink} to="/feedback">
