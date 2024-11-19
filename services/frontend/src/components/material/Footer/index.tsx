@@ -1,8 +1,8 @@
 import { Box, Container, Divider, Stack, Typography } from '@mui/material'
 
 import { isDefaultServiceProvider } from '@/common'
-import { builtAt, dataProtectionUrl, licenseUrl, sourceCodeUrl } from '@/conf'
-import { DISPLAY_DATE_FORMAT } from '@/constants/date'
+import { builtAt, dataProtectionUrl, licenseUrl, sentryRelease, sourceCodeUrl } from '@/conf'
+import { DISPLAY_DATETIME_FORMAT } from '@/constants/date'
 import { reformatDate } from '@/util/timeAndDate'
 import { ExternalLink } from './ExternalLink'
 import { InternalLink } from './InternalLink'
@@ -38,7 +38,10 @@ export const Footer = () => {
               <Typography variant="subtitle1">Build</Typography>
               <InternalLink href="/changelog" text="Changelog" />
               <Typography color="text.secondary" variant="body2">
-                Updated on {reformatDate(builtAt || new Date().toISOString(), DISPLAY_DATE_FORMAT)}
+                Updated {reformatDate(builtAt || new Date().toISOString(), DISPLAY_DATETIME_FORMAT)}
+              </Typography>
+              <Typography color="text.secondary" variant="body2">
+                Version {sentryRelease || 'dev'}
               </Typography>
             </Stack>
           </Stack>
