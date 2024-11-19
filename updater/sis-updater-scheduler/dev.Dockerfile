@@ -1,4 +1,4 @@
-FROM node:20-alpine
+FROM node:22-alpine
 
 WORKDIR /opt/app-root/src
 
@@ -10,4 +10,4 @@ COPY . .
 
 EXPOSE 8082
 
-CMD ["node_modules/.bin/nodemon", "src/index.js"]
+CMD ["node", "--watch", "src/index.js"]
