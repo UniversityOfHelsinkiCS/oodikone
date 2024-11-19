@@ -129,7 +129,7 @@ export const CustomPopulationSearch = ({ setCustomPopulationState }) => {
           />
         </Form>
         <SearchHistory
-          handleSearch={({ id }) => onSelectSearch(id)}
+          handleSearch={selected => onSelectSearch(selected?.id)}
           header="Saved populations"
           items={searches.map(search => ({
             ...search,
