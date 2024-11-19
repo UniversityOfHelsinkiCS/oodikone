@@ -82,6 +82,7 @@ export default [
       'no-return-assign': 'error',
       'no-return-await': 'error',
       'object-shorthand': ['error', 'always'],
+      'prefer-const': 'error',
       'prefer-destructuring': ['error', { VariableDeclarator: { object: true } }],
       quotes: ['error', 'single', { avoidEscape: true, allowTemplateLiterals: false }],
       'react/display-name': 'off', // TODO: Delete this override
