@@ -1,10 +1,18 @@
 import { HelpOutline } from '@mui/icons-material'
-import { Box, Button, Tooltip, Typography } from '@mui/material'
+import { Box, Button, IconButton, Tooltip, Typography } from '@mui/material'
 import ReactMarkdown from 'react-markdown'
 
 import { formatContent } from '@/common'
 
-export const InfoBox = ({ content, cypress = '' }: { content: string; cypress?: string }) => {
+export const InfoBox = ({
+  content,
+  cypress = '',
+  mini = false,
+}: {
+  content: string
+  cypress?: string
+  mini?: boolean
+}) => {
   return (
     <Tooltip
       arrow
@@ -16,9 +24,15 @@ export const InfoBox = ({ content, cypress = '' }: { content: string; cypress?: 
         </Box>
       }
     >
-      <Button color="info" startIcon={<HelpOutline />} variant="outlined">
-        Info
-      </Button>
+      {mini ? (
+        <IconButton>
+          <HelpOutline fontSize="small" />
+        </IconButton>
+      ) : (
+        <Button color="info" startIcon={<HelpOutline />} variant="outlined">
+          Info
+        </Button>
+      )}
     </Tooltip>
   )
 }
