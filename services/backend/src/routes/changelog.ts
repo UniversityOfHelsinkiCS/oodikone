@@ -35,7 +35,7 @@ router.get('/', async (_req: Request, res: Response) => {
   const response = await axios.get('https://api.github.com/repos/UniversityOfHelsinkiCS/oodikone/releases')
   const releasesFromAPI: Release[] = response.data.map((release: Record<string, any>) => ({
     description: release.body,
-    time: release.created_at,
+    time: release.published_at,
     title: release.name,
   }))
   changelog.data = releasesFromAPI
