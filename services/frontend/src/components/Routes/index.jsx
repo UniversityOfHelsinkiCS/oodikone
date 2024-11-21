@@ -9,7 +9,6 @@ import { CourseStatistics } from '@/components/CourseStatistics'
 import { CustomOpenUniPopulation } from '@/components/CustomOpenUniPopulation'
 import { CustomPopulation } from '@/components/CustomPopulation'
 import { EvaluationOverview } from '@/components/EvaluationOverview'
-import { UniversityViewPage } from '@/components/EvaluationOverview/UniversityView'
 import { FacultyStatistics } from '@/components/FacultyStatistics'
 import { LanguageCenterView } from '@/components/LanguageCenterView'
 import { PopulationStatistics } from '@/components/PopulationStatistics'
@@ -24,6 +23,7 @@ import { languageCenterViewEnabled } from '@/conf'
 import { Changelog } from '@/pages/Changelog'
 import { Feedback } from '@/pages/Feedback'
 import { FrontPage } from '@/pages/FrontPage'
+import { University } from '@/pages/University'
 import { ProtectedRoute } from './ProtectedRoute'
 
 const routes = {
@@ -124,7 +124,7 @@ export const Routes = () => (
         path={routes.evaluationOverview}
         requiredRoles={['admin', 'fullSisuAccess', 'katselmusViewer']}
       />
-      <ProtectedRoute component={UniversityViewPage} path={routes.university} />
+      <ProtectedRoute component={University} path={routes.university} />
       <ProtectedRoute
         component={CloseToGraduation}
         path={routes.closeToGraduation}
