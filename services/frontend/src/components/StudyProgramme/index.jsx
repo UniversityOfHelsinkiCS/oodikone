@@ -5,6 +5,7 @@ import { Container, Header, Menu, Segment, Tab } from 'semantic-ui-react'
 import { getFullStudyProgrammeRights, getUnifiedProgrammeName } from '@/common'
 import { useTabs, useTitle } from '@/common/hooks'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { serviceProvider } from '@/conf.js'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { BasicOverview } from './BasicOverview'
@@ -87,17 +88,19 @@ export const StudyProgramme = () => {
       fullStudyProgrammeRights.includes(programmeId) ||
       fullStudyProgrammeRights.includes(secondProgrammeId)
     ) {
-      panes.push({
-        menuItem: <Menu.Item key="Programme courses">Programme courses</Menu.Item>,
-        render: () => (
-          <ProgrammeCourses
-            academicYear={academicYear}
-            combinedProgramme={secondProgrammeId}
-            setAcademicYear={setAcademicYear}
-            studyProgramme={programmeId}
-          />
-        ),
-      })
+      if (serviceProvider === 'toska') {
+        panes.push({
+          menuItem: <Menu.Item key="Programme courses">Programme courses</Menu.Item>,
+          render: () => (
+            <ProgrammeCourses
+              academicYear={academicYear}
+              combinedProgramme={secondProgrammeId}
+              setAcademicYear={setAcademicYear}
+              studyProgramme={programmeId}
+            />
+          ),
+        })
+      }
       panes.push({
         menuItem: 'Degree courses',
         render: () => (

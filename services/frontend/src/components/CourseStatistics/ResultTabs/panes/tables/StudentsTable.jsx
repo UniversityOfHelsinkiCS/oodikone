@@ -7,6 +7,7 @@ import { Header, Icon, Item } from 'semantic-ui-react'
 
 import { defineCellColor, getSortableColumn, resolveGrades } from '@/components/CourseStatistics/ResultTabs/panes/util'
 import { SortableTable, row } from '@/components/SortableTable'
+import { serviceProvider } from '@/conf.js'
 import { getCourseAlternatives } from '@/selectors/courseStats'
 
 const formatPercentage = passRate => (Number.isNaN(passRate) ? '–' : `${(passRate * 100).toFixed(2)} %`)
@@ -35,8 +36,7 @@ const getColumns = (stats, showGrades, userHasAccessToAllStats, alternatives, se
     const searchString = qs.stringify(queryObject)
     return `/coursepopulation?${searchString}`
   }
-
-  const columns = [
+  const toskaColumns = [
     {
       key: 'TIME_PARENT',
       merge: true,
@@ -155,6 +155,13 @@ const getColumns = (stats, showGrades, userHasAccessToAllStats, alternatives, se
     },
   ]
 
+  const fdColums = [...toskaColumns]
+  const index = fdColums.findIndex(o => o.key === 'TIME_PARENT')
+  if (index !== -1) {
+    fdColums[index].children = fdColums[index].children.filter(o => o.key === 'TIME')
+  }
+
+  const columns = serviceProvider === 'toska' ? toskaColumns : fdColums
   return columns.filter(column => {
     if (showGrades && column.onlyInGradeView) return true
     if (showGrades && column.hideWhenGradesVisible) return false

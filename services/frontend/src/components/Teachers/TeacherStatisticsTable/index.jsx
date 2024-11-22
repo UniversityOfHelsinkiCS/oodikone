@@ -4,6 +4,7 @@ import { Segment, Icon, Item } from 'semantic-ui-react'
 
 import { calculatePercentage } from '@/common'
 import { SortableTable } from '@/components/SortableTable'
+import { serviceProvider } from '@/conf.js'
 
 const createColumnWithTitle = title => ({
   key: title,
@@ -39,9 +40,11 @@ export const TeacherStatisticsTable = ({ statistics, variant }) => {
         getRowContent: row => (
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5em' }}>
             {row.name}
-            <Item as={Link} target="_blank" to={`/teachers/${row.id}`}>
-              <Icon name="level up alternate" />
-            </Item>
+            {serviceProvider === 'toska' && (
+              <Item as={Link} target="_blank" to={`/teachers/${row.id}`}>
+                <Icon name="level up alternate" />
+              </Item>
+            )}
           </div>
         ),
       })
