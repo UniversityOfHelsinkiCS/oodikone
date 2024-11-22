@@ -1,5 +1,5 @@
 import { HelpOutline } from '@mui/icons-material'
-import { Box, Button, IconButton, Tooltip, Typography } from '@mui/material'
+import { Button, IconButton, Tooltip, Typography } from '@mui/material'
 import ReactMarkdown from 'react-markdown'
 
 import { formatContent } from '@/common'
@@ -17,11 +17,9 @@ export const InfoBox = ({
     <Tooltip
       arrow
       title={
-        <Box sx={{ padding: 1 }}>
-          <Typography data-cy={`${cypress}-info-content`} variant="body2">
-            <ReactMarkdown>{formatContent(content)}</ReactMarkdown>
-          </Typography>
-        </Box>
+        <Typography component="div" data-cy={`${cypress}-info-content`} sx={{ padding: 1 }} variant="body2">
+          <ReactMarkdown>{formatContent(content)}</ReactMarkdown>
+        </Typography>
       }
     >
       {mini ? (

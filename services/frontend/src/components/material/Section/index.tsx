@@ -37,7 +37,7 @@ export const Section = ({
         </Typography>
         {infoBoxContent && <InfoBox content={infoBoxContent} cypress={cypress} />}
       </Stack>
-      <Box sx={{ marginTop: 2 }}>{isLoading ? <LoadingSkeleton /> : isError ? <ErrorMessage /> : children}</Box>
+      <Box sx={{ marginTop: 2 }}>{isError ? <ErrorMessage /> : isLoading ? <LoadingSkeleton /> : children}</Box>
     </Paper>
   )
 }

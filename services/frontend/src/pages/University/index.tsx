@@ -53,7 +53,7 @@ export const University = () => {
             infoBoxContent={facultyToolTips.studentProgress}
             title="Progress of students of the university"
           >
-            <Stack direction="row" justifyContent="space-around">
+            <Stack alignItems="center" direction={{ sm: 'column', md: 'row' }} justifyContent="space-around">
               <Toggle
                 cypress="GraduatedToggle"
                 firstLabel="Graduated included"
