@@ -1,3 +1,4 @@
+import { Paper } from '@mui/material'
 import { OptionsStackingValue, SeriesColumnOptions } from 'highcharts'
 import accessibility from 'highcharts/modules/accessibility'
 import exportData from 'highcharts/modules/export-data'
@@ -76,8 +77,8 @@ export const FacultyBarChart = ({
   }
 
   return (
-    <div data-cy={`Graph-${cypress}`}>
+    <Paper data-cy={`Graph-${cypress}`} sx={{ padding: 2 }} variant="outlined">
       <ReactHighcharts config={config} />
-    </div>
+    </Paper>
   )
 }

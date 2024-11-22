@@ -1,4 +1,4 @@
-import { Alert, Box, Typography } from '@mui/material'
+import { Alert, Stack, Typography } from '@mui/material'
 
 import { calculateStats, sortProgrammeKeys } from '@/components/FacultyStatistics/facultyHelpers'
 import { FacultyBarChart } from '@/components/material/FacultyBarChart'
@@ -37,7 +37,7 @@ export const FacultyProgress = ({
     <>
       <Section isError={isError} isLoading={isLoading && !bachelorStats} title="Bachelor">
         {bachelorStats && (
-          <Box>
+          <Stack gap={2}>
             <FacultyBarChart
               cypress="FacultyBachelorsProgress"
               data={{
@@ -61,13 +61,13 @@ export const FacultyProgress = ({
               ).map(listObj => listObj[0])}
               titles={bachelorStats?.tableTitles}
             />
-          </Box>
+          </Stack>
         )}
       </Section>
       <Section isError={isError} isLoading={isLoading && !bachelorMasterStats} title="Bachelor + Master">
         {bachelorMasterStats && (
-          <>
-            <Alert data-cy="FacultyProgrammesShownInfo" severity="info" sx={{ marginBottom: 2 }} variant="outlined">
+          <Stack gap={2}>
+            <Alert data-cy="FacultyProgrammesShownInfo" severity="info" variant="outlined">
               <Typography component="p" variant="body2">
                 The starting year is the study right start in the bachelor programme. The credits are computed by the
                 start date of the bachelor programme and at the moment, they do not include any transferred credits.
@@ -97,12 +97,12 @@ export const FacultyProgress = ({
               ).map(listObj => listObj[0])}
               titles={bachelorMasterStats.tableTitles}
             />
-          </>
+          </Stack>
         )}
       </Section>
       <Section isError={isError} isLoading={isLoading && !masterStats} title="Master">
         {masterStats && faculty !== 'H90' && (
-          <Box>
+          <Stack gap={2}>
             <FacultyBarChart
               cypress="FacultyMastersProgress"
               data={{
@@ -126,12 +126,12 @@ export const FacultyProgress = ({
               ).map(listObj => listObj[0])}
               titles={masterStats.tableTitles}
             />
-          </Box>
+          </Stack>
         )}
       </Section>
       <Section isError={isError} isLoading={isLoading && !doctorStats} title="Doctor">
         {doctorStats && (
-          <Box>
+          <Stack gap={2}>
             <FacultyBarChart
               cypress="FacultyDoctoralProgress"
               data={{
@@ -154,7 +154,7 @@ export const FacultyProgress = ({
               ).map(listObj => listObj[0])}
               titles={doctorStats.tableTitles}
             />
-          </Box>
+          </Stack>
         )}
       </Section>
     </>

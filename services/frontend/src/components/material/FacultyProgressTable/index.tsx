@@ -37,9 +37,9 @@ export const FacultyProgressTable = ({
   const getKey = (value: number | string, index: number) => `${value}-${index}`
 
   return (
-    <Paper>
+    <Paper sx={{ padding: 2 }} variant="outlined">
       <TableContainer>
-        <Table data-cy={cypress}>
+        <Table data-cy={cypress} size="small">
           <TableHead>
             <TableRow>
               {titles.map(title => (
@@ -86,7 +86,7 @@ export const FacultyProgressTable = ({
                   <TableRow>
                     {yearArray.map((value, index) => (
                       <TableCell align="right" key={getKey(value, index)}>
-                        {value}
+                        <b>{value}</b>
                       </TableCell>
                     ))}
                   </TableRow>
