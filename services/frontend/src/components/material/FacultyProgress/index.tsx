@@ -1,8 +1,8 @@
 import { Alert, Box, Typography } from '@mui/material'
 
 import { calculateStats, sortProgrammeKeys } from '@/components/FacultyStatistics/facultyHelpers'
-import { FacultyBarChart } from '@/components/FacultyStatistics/FacultyProgrammeOverview/FacultyBarChart'
 import { FacultyProgressTable } from '@/components/FacultyStatistics/FacultyProgrammeOverview/FacultyProgressTable'
+import { FacultyBarChart } from '@/components/material/FacultyBarChart'
 import { Section } from '@/components/material/Section'
 import { useGetAllFacultiesProgressStatsQuery } from '@/redux/facultyStats'
 
