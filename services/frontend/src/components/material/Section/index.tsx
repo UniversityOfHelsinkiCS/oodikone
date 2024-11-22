@@ -11,7 +11,7 @@ const ErrorMessage = () => {
 }
 
 const LoadingSkeleton = () => {
-  return <Skeleton height={200} variant="rectangular" />
+  return <Skeleton height={400} variant="rectangular" />
 }
 
 export const Section = ({
