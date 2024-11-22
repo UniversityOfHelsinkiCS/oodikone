@@ -1,5 +1,6 @@
-import { Alert, Stack, Typography } from '@mui/material'
+import { Stack } from '@mui/material'
 
+import { facultyToolTips } from '@/common/InfoToolTips'
 import { calculateStats, sortProgrammeKeys } from '@/components/FacultyStatistics/facultyHelpers'
 import { FacultyBarChart } from '@/components/material/FacultyBarChart'
 import { FacultyProgressTable } from '@/components/material/FacultyProgressTable'
@@ -64,16 +65,14 @@ export const FacultyProgress = ({
           </Stack>
         )}
       </Section>
-      <Section isError={isError} isLoading={isLoading && !bachelorMasterStats} title="Bachelor + Master">
+      <Section
+        infoBoxContent={facultyToolTips.bachelorMasterProgress}
+        isError={isError}
+        isLoading={isLoading && !bachelorMasterStats}
+        title="Bachelor + Master"
+      >
         {bachelorMasterStats && (
           <Stack gap={2}>
-            <Alert data-cy="FacultyProgrammesShownInfo" severity="info" variant="outlined">
-              <Typography component="p" variant="body2">
-                The starting year is the study right start in the bachelor programme. The credits are computed by the
-                start date of the bachelor programme and at the moment, they do not include any transferred credits.
-                Thus, in these statistics some students have fewer credits than in reality.
-              </Typography>
-            </Alert>
             <FacultyBarChart
               cypress="FacultyBachelorMastersProgress"
               data={{

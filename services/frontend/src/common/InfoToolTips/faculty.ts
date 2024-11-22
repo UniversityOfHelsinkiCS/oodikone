@@ -68,6 +68,11 @@ export const facultyToolTips: Record<string, string> = {
 
     Mukana ovat oletusarvoisesti myös ohjelmaan siirtyneet.
   `,
+  bachelorMasterProgress: `
+    The starting year is the study right start in the bachelor programme. The credits are computed by the
+    start date of the bachelor programme and at the moment, they do not include any transferred credits.
+    Thus, in these statistics some students have fewer credits than in reality.
+  `,
 }
 
 facultyToolTips.studentsStatsOfTheFaculty = studyProgrammeToolTips.studyTrackOverview.replace(
