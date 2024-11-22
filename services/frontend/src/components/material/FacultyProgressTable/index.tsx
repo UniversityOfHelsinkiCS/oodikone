@@ -17,8 +17,8 @@ export const FacultyProgressTable = ({
 }: {
   cypress: string
   data: (number | string)[][]
-  programmeNames: Record<string, Name>
-  programmeStats: Record<string, number[]>
+  programmeNames: Record<string, Name & { code: string }>
+  programmeStats: Record<string, number[][]>
   progressTitles?: string[][]
   sortedKeys: string[]
   titles: string[]

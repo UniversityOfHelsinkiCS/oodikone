@@ -21,15 +21,12 @@ export const FacultyProgress = ({
     includeSpecials: !excludeSpecials,
   })
 
-  const bachelorStats = calculateStats(progressStats?.data?.creditCounts?.bachelor, 180)
-  const bachelorMasterStats = calculateStats(
-    progressStats?.data?.creditCounts?.bachelorMaster,
-    faculty === 'H90' ? 360 : 300,
-    180,
-    7
-  )
-  const masterStats = calculateStats(progressStats?.data?.creditCounts?.master, 120)
-  const doctorStats = calculateStats(progressStats?.data?.creditCounts?.doctor, 40, 0, 5)
+  const creditCounts = progressStats?.data?.creditCounts
+
+  const bachelorStats = calculateStats(creditCounts?.bachelor, 180)
+  const bachelorMasterStats = calculateStats(creditCounts?.bachelorMaster, faculty === 'H90' ? 360 : 300, 180, 7)
+  const masterStats = calculateStats(creditCounts?.master, 120)
+  const doctorStats = calculateStats(creditCounts?.doctor, 40, 0, 5)
 
   const isError = progressStats.isError || (progressStats.isSuccess && !progressStats.data)
   const isLoading = progressStats.isFetching || progressStats.isLoading
