@@ -82,6 +82,7 @@ export default [
       'no-return-assign': 'error',
       'no-return-await': 'error',
       'object-shorthand': ['error', 'always'],
+      'prefer-const': 'error',
       'prefer-destructuring': ['error', { VariableDeclarator: { object: true } }],
       quotes: ['error', 'single', { avoidEscape: true, allowTemplateLiterals: false }],
       'react/display-name': 'off', // TODO: Delete this override
@@ -105,7 +106,6 @@ export default [
       '@typescript-eslint/no-empty-function': 'off',
       '@typescript-eslint/no-empty-object-type': ['error', { allowInterfaces: 'with-single-extends' }],
       '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-floating-promises': 'off', // TODO: Disable only for .jsx and .tsx files
       '@typescript-eslint/no-misused-promises': 'off', // Most of these errors come from Express route handlers that are handled correctly by express-async-errors
       '@typescript-eslint/no-unsafe-argument': 'off',
       '@typescript-eslint/no-unsafe-assignment': 'off',
@@ -140,6 +140,7 @@ export default [
     rules: {
       '@typescript-eslint/no-require-imports': 'off',
       'import/no-commonjs': 'off',
+      'import/no-unused-modules': 'off',
     },
   },
   {

@@ -2,6 +2,7 @@ import { AppBar, Box, Container, Toolbar } from '@mui/material'
 import { Fragment } from 'react'
 
 import { checkUserAccess, getFullStudyProgrammeRights, isDefaultServiceProvider } from '@/common'
+import { hasFullAccessToTeacherData } from '@/components/Teachers/util'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { Logo } from './Logo'
 import { NavigationButton } from './NavigationButton'
@@ -10,7 +11,7 @@ import { NavigationItem, navigationItems } from './navigationItems'
 import { UserButton } from './UserButton'
 
 export const NavigationBar = () => {
-  const { fullAccessToStudentData, isAdmin, isLoading, programmeRights, roles } = useGetAuthorizedUserQuery()
+  const { fullAccessToStudentData, isAdmin, isLoading, programmeRights, roles, iamGroups } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
 
   const getVisibleNavigationItems = () => {
@@ -42,9 +43,13 @@ export const NavigationBar = () => {
         if (!isDefaultServiceProvider()) return
       } else if (key === 'admin') {
         if (!isAdmin) return
+      } else if (key === 'teachers') {
+        if (!checkUserAccess(['teachers'], roles) && !hasFullAccessToTeacherData(roles, iamGroups)) {
+          return
+        }
       }
       const { reqRights } = navigationItems[key]
-      if (!reqRights || reqRights.every(r => roles.includes(r) || (key === 'teachers' && isAdmin))) {
+      if (!reqRights || reqRights.every(role => roles.includes(role))) {
         visibleNavigationItems[key] = navigationItems[key]
       }
     })

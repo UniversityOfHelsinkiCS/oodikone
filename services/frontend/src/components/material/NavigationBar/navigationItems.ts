@@ -19,7 +19,7 @@ export const navigationItems: Record<string, NavigationItem> = {
   },
   courseStatistics: { key: 'courseStatistics', label: 'Courses', path: '/coursestatistics' },
   students: { key: 'students', label: 'Students', path: '/students' },
-  teachers: { key: 'teachers', label: 'Teachers', path: '/teachers', reqRights: ['teachers'] },
+  teachers: { key: 'teachers', label: 'Teachers', path: '/teachers' },
   studyGuidanceGroups: {
     key: 'studyGuidanceGroups',
     label: 'Guidance groups',

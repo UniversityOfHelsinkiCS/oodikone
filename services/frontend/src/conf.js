@@ -13,8 +13,11 @@ export const runningInCypress = typeof window !== 'undefined' && !!window.Cypres
 export const basePath = process.env.PUBLIC_URL || ''
 export const apiBasePath = `${basePath}/api`
 
-// Update time for frontpage
+// Footer information
 export const builtAt = process.env.REACT_APP_BUILT_AT || ''
+export const sourceCodeUrl = 'https://github.com/UniversityOfHelsinkiCS/oodikone'
+export const licenseUrl = `${sourceCodeUrl}/blob/master/LICENSE`
+export const dataProtectionUrl = `${sourceCodeUrl}/blob/master/documentation/tietosuoja.md`
 
 // Service provider depending this hiding some not needed features default value toska
 export const serviceProvider = process.env.REACT_APP_SERVICE_PROVIDER

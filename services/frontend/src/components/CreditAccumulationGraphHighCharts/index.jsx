@@ -144,15 +144,7 @@ const filterCoursesByStudyPlan = (plan, courses) => {
 
 const filterCoursesByDate = (courses, date) => courses.filter(course => moment(course.date).isSameOrAfter(moment(date)))
 
-const filterCourses = (
-  student,
-  singleStudent,
-  byStudyPlanOfCode,
-  cutStudyPlanCredits,
-  startDate,
-  customStudyStartYear,
-  studyrightid
-) => {
+const filterCourses = (student, singleStudent, byStudyPlanOfCode, cutStudyPlanCredits, startDate, studyrightid) => {
   if (byStudyPlanOfCode && cutStudyPlanCredits)
     return filterCoursesByDate(
       filterCoursesByStudyPlan(
@@ -161,7 +153,7 @@ const filterCourses = (
         ),
         student.courses
       ),
-      customStudyStartYear || student.studyrightStart
+      student.studyrightStart
     )
   if (byStudyPlanOfCode)
     return filterCoursesByStudyPlan(
@@ -321,12 +313,23 @@ const addGraduation = (points, graduationDate, notFirst) => {
   points.sort((a, b) => a.x - b.x)
 }
 
-const findGraduationsByCodes = (student, programmeCodes) =>
-  student.studyRights
+const findGraduationsByCodes = (student, programmeCodes, showFullStudyPath) => {
+  if (showFullStudyPath) {
+    return (
+      student.studyRights
+        .find(studyRight => studyRight.studyRightElements.some(element => programmeCodes.includes(element.code)))
+        ?.studyRightElements.filter(({ graduated }) => graduated === true) ?? []
+    )
+      .map(({ endDate }) => new Date(endDate).getTime())
+      .sort((a, b) => a - b)
+  }
+
+  return student.studyRights
     .flatMap(studyRight => studyRight.studyRightElements)
     .filter(({ graduated, code }) => graduated === true && programmeCodes.includes(code))
     .map(({ endDate }) => new Date(endDate).getTime())
     .sort((a, b) => a - b)
+}
 
 const createStudentCreditLines = (
   students,
@@ -336,34 +339,31 @@ const createStudentCreditLines = (
   studyPlanFilterIsActive,
   cutStudyPlanCredits,
   programmeCodes,
-  customStudyStartYear,
-  selectedStudyPlan
+  selectedStudyPlan,
+  showFullStudyPath
 ) =>
   students.map(student => {
     const { studyrightStart } = student
-    const startDate = singleStudent ? selectedStartDate : studyrightStart
+    let startDate = singleStudent ? selectedStartDate : studyrightStart
+    if (showFullStudyPath) {
+      startDate =
+        student.studyRights.find(studyRight =>
+          studyRight.studyRightElements.some(element => element.code === programmeCodes[0])
+        )?.startDate ?? studyrightStart
+    }
     const code = selectedStudyPlan?.programme_code
     const studyPlanProgrammeCode = singleStudent
       ? code
       : studyPlanFilterIsActive && programmeCodes?.length > 0 && programmeCodes[0]
 
     const { points } = flow(
-      () =>
-        filterCourses(
-          student,
-          singleStudent,
-          studyPlanProgrammeCode,
-          cutStudyPlanCredits,
-          startDate,
-          customStudyStartYear,
-          studyRightId
-        ),
+      () => filterCourses(student, singleStudent, studyPlanProgrammeCode, cutStudyPlanCredits, startDate, studyRightId),
       courses => [...courses].filter(({ date }) => new Date(date) <= new Date()),
       sortCoursesByDate,
       courses => courses.reduce(reduceCreditsToPoints, { credits: 0, points: [], singleStudent })
     )(student.courses)
 
-    const graduationDates = programmeCodes ? findGraduationsByCodes(student, programmeCodes) : []
+    const graduationDates = programmeCodes ? findGraduationsByCodes(student, programmeCodes, showFullStudyPath) : []
 
     if (points?.length > 0) {
       if (!singleStudent && points[0].y !== 0 && students.length < 100) {
@@ -413,8 +413,8 @@ export const CreditAccumulationGraphHighCharts = ({
   programmeCodes,
   customPopulation = false,
   studyPlanFilterIsActive,
-  customStudyStartYear,
   selectedStudyPlan,
+  showFullStudyPath,
 }) => {
   const chartRef = useRef()
   const { getTextIn } = useLanguage()
@@ -433,8 +433,8 @@ export const CreditAccumulationGraphHighCharts = ({
         studyPlanFilterIsActive,
         cutStudyPlanCredits,
         programmeCodes,
-        customStudyStartYear,
-        selectedStudyPlan
+        selectedStudyPlan,
+        showFullStudyPath
       ),
     [
       students,
@@ -444,8 +444,8 @@ export const CreditAccumulationGraphHighCharts = ({
       studyPlanFilterIsActive,
       cutStudyPlanCredits,
       programmeCodes,
-      customStudyStartYear,
       selectedStudyPlan,
+      showFullStudyPath,
     ]
   )
 
@@ -482,7 +482,6 @@ export const CreditAccumulationGraphHighCharts = ({
     seriesData.push(createGoalSeries(starting, ending, filteredAbsences))
   }
   const getStudyRightStart = () => {
-    if (customStudyStartYear) return new Date(customStudyStartYear).getTime()
     const studyRightStartFromStudent = new Date(students[0]?.studyrightStart ?? new Date(null))
     if (studyRightStartFromStudent.getFullYear() < 2000)
       return Math.min(...flatten(students.map(({ courses }) => courses.map(({ date }) => new Date(date).getTime()))))
@@ -514,8 +513,8 @@ export const CreditAccumulationGraphHighCharts = ({
   const graduations = singleStudent ? filterGraduations(students[0], selectedStudyRight, getTextIn) : []
   const transfers = singleStudent ? filterTransfers(students[0], getTextIn) : []
   const studyRightStartLine =
-    !singleStudent && studyPlanFilterIsActive && (customStudyStartYear || students[0]?.studyrightStart)
-      ? [new Date(customStudyStartYear || students[0].studyrightStart).getTime()]
+    !singleStudent && studyPlanFilterIsActive && students[0]?.studyrightStart
+      ? [new Date(students[0].studyrightStart).getTime()]
       : []
 
   const options = createGraphOptions({

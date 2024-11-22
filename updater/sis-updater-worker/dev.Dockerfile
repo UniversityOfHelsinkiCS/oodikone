@@ -1,4 +1,4 @@
-FROM node:20-alpine
+FROM node:22-alpine
 
 WORKDIR /opt/app-root/src
 
@@ -8,4 +8,4 @@ COPY ./package* ./
 RUN npm ci
 COPY . .
 
-CMD ["node_modules/.bin/nodemon", "src/index.js"]
+CMD ["node", "--watch", "src/index.js"]

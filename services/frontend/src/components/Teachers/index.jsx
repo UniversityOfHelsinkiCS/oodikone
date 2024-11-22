@@ -7,6 +7,7 @@ import { TeacherDetails } from './TeacherDetails'
 import { TeacherLeaderBoard } from './TeacherLeaderBoard'
 import { TeacherSearchTab } from './TeacherSearchTab'
 import { TeacherStatistics } from './TeacherStatistics'
+import { hasFullAccessToTeacherData } from './util'
 
 const pane = (title, Content, icon) => ({
   menuItem: { key: title, content: title, icon },
@@ -19,10 +20,10 @@ const pane = (title, Content, icon) => ({
 
 const TeachersTabs = () => {
   const history = useHistory()
-  const { isAdmin } = useGetAuthorizedUserQuery()
+  const { roles, iamGroups } = useGetAuthorizedUserQuery()
   const [tab, setTab] = useTabs('t_tab', 0, history)
   const panes = [pane('Statistics', TeacherStatistics, 'table')]
-  if (isAdmin) {
+  if (hasFullAccessToTeacherData(roles, iamGroups)) {
     panes.push(pane('Leaderboard', TeacherLeaderBoard, 'trophy'), pane('Search', TeacherSearchTab, 'user'))
   }
 

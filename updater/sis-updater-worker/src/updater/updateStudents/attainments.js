@@ -302,31 +302,35 @@ const updateAttainments = async (
     studyRightIdToEducationType
   )
 
-  const credits = fixedAttainments
-    .filter(attainment => attainment !== null)
-    .filter(attainment => attainment.id !== null)
-    .filter(
-      attainment =>
-        validAttainmentTypes.includes(attainment.type) &&
-        !attainment.misregistration &&
-        !attainmentsToBeExluced.has(attainment.id) &&
-        !doubleAttachment(attainment, fixedAttainments)
-    )
-    .map(attainment => {
-      const mappedCredit = mapCredit(attainment)
-      if (mappedCredit) {
-        attainment.acceptor_persons
-          .filter(p => p.roleUrn === 'urn:code:attainment-acceptor-type:approved-by' && !!p.personId)
-          .forEach(p => {
+  const credits = []
+
+  for (const attainment of fixedAttainments) {
+    if (
+      attainment == null ||
+      attainment.id == null ||
+      !validAttainmentTypes.includes(attainment.type) ||
+      attainment.misregistration ||
+      attainmentsToBeExluced.has(attainment.id) ||
+      doubleAttachment(attainment, fixedAttainments)
+    ) {
+      continue
+    }
+    const mappedCredit = mapCredit(attainment)
+    if (mappedCredit) {
+      for (const person of attainment.acceptor_persons) {
+        if (person.roleUrn === 'urn:code:attainment-acceptor-type:approved-by' && person.personId) {
+          const teacher = await Teacher.findOne({ where: { id: person.personId } })
+          if (teacher !== null) {
             creditTeachers.push({
               credit_id: attainment.id,
-              teacher_id: p.personId,
+              teacher_id: person.personId,
             })
-          })
+          }
+        }
       }
-      return mappedCredit
-    })
-    .filter(credit => !!credit)
+      credits.push(mappedCredit)
+    }
+  }
 
   const courses = Array.from(coursesToBeCreated.values())
   await bulkCreate(Course, courses)

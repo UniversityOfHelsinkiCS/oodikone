@@ -666,7 +666,7 @@ describe('Study programme overview', () => {
 
     it('content loads', () => {
       cy.contains('h3', 'Select curriculum to edit:')
-      cy.get('[data-cy=curriculum-picker]').contains('2023 - 2026')
+      cy.get('[data-cy=curriculum-picker]').contains('2023–2026')
       cy.contains('Change visibility of degree courses and select criteria for academic years')
       cy.contains('form', 'First year (12 months) last set: 0')
       cy.get('table').within(() => {

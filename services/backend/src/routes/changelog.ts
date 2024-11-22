@@ -2,39 +2,44 @@ import axios from 'axios'
 import { Request, Response, Router } from 'express'
 
 import { isDev } from '../config'
+import { Release } from '../shared/types'
 
 const router = Router()
 
-type ChangeLogData = {
-  description: string
-  time: Date
-  title: string
-}
-
-const changelog: { data?: ChangeLogData[] } = {}
+const changelog: { data?: Release[] } = {}
 
 router.get('/', async (_req: Request, res: Response) => {
   if (changelog.data) {
     return res.status(200).send(changelog.data)
   }
   if (isDev) {
-    const fakeChangeLogData: ChangeLogData[] = [
+    const fakeRelease: Release[] = [
       {
-        description: "### Fake release\nLet's not spam the GitHub API in development!",
-        title: 'Fake title for fake release',
-        time: new Date(),
+        description: '**Feature 1**\n- Added a fancy new feature \n\n**Feature 2**\n- Fixed a bug\n- Fixed another bug',
+        title: 'Release 1',
+        time: new Date().toISOString(),
+      },
+      {
+        description: "Let's not spam the GitHub API in development!",
+        title: 'Release 2',
+        time: new Date().toISOString(),
+      },
+      {
+        description: 'This release should not be visible on the frontpage',
+        title: 'Release 3',
+        time: new Date().toISOString(),
       },
     ]
-    return res.status(200).json(fakeChangeLogData)
+    return res.status(200).json(fakeRelease)
   }
   const response = await axios.get('https://api.github.com/repos/UniversityOfHelsinkiCS/oodikone/releases')
-  const newChangelogData = response.data.map((release: Record<string, any>) => ({
+  const releasesFromAPI: Release[] = response.data.map((release: Record<string, any>) => ({
     description: release.body,
-    time: release.created_at,
+    time: release.published_at,
     title: release.name,
   }))
-  changelog.data = newChangelogData
-  res.status(200).send(newChangelogData)
+  changelog.data = releasesFromAPI
+  res.status(200).json(releasesFromAPI)
 })
 
 export default router

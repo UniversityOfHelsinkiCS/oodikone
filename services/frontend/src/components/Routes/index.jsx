@@ -1,5 +1,6 @@
 import { Suspense } from 'react'
 import { Redirect, Route, Switch } from 'react-router-dom'
+
 import { isDefaultServiceProvider } from '@/common'
 import { CloseToGraduation } from '@/components/CloseToGraduation'
 import { CompletedCourses } from '@/components/CompletedCoursesSearch'
@@ -10,7 +11,6 @@ import { CustomPopulation } from '@/components/CustomPopulation'
 import { EvaluationOverview } from '@/components/EvaluationOverview'
 import { UniversityViewPage } from '@/components/EvaluationOverview/UniversityView'
 import { FacultyStatistics } from '@/components/FacultyStatistics'
-import { FrontPage } from '@/components/Frontpage'
 import { LanguageCenterView } from '@/components/LanguageCenterView'
 import { PopulationStatistics } from '@/components/PopulationStatistics'
 import { SegmentDimmer } from '@/components/SegmentDimmer'
@@ -21,7 +21,9 @@ import { Teachers } from '@/components/Teachers'
 import { Updater } from '@/components/Updater'
 import { Users } from '@/components/Users'
 import { languageCenterViewEnabled } from '@/conf'
+import { Changelog } from '@/pages/Changelog'
 import { Feedback } from '@/pages/Feedback'
+import { FrontPage } from '@/pages/FrontPage'
 import { ProtectedRoute } from './ProtectedRoute'
 
 const routes = {
@@ -43,43 +45,40 @@ const routes = {
   closeToGraduation: '/close-to-graduation',
   populations: '/populations',
   studyProgramme: '/study-programme/:studyProgrammeId?',
+  changelog: '/changelog',
 }
 
 export const Routes = () => (
   <Suspense fallback={<SegmentDimmer isLoading />}>
     <Switch>
       <Route component={FrontPage} exact path="/" />
+      <Route component={Changelog} exact path={routes.changelog} />
       {isDefaultServiceProvider() && <Route component={Feedback} exact path={routes.feedback} />}
       <ProtectedRoute
         component={PopulationStatistics}
-        exact
         path={routes.populations}
         requireUserHasRights
         requiredRoles={['fullSisuAccess']}
       />
       <ProtectedRoute
         component={FacultyStatistics}
-        exact
         path={routes.faculties}
         requiredRoles={['admin', 'fullSisuAccess', 'facultyStatistics']}
       />
       <ProtectedRoute
         component={StudyProgramme}
-        exact
         path={routes.studyProgramme}
         requireUserHasRights
         requiredRoles={['fullSisuAccess']}
       />
       <ProtectedRoute
         component={StudentStatistics}
-        exact
         path={routes.students}
         requireUserHasRights
         requiredRoles={['admin', 'fullSisuAccess', 'studyGuidanceGroups']}
       />
       <ProtectedRoute
         component={CourseStatistics}
-        exact
         path={routes.courseStatistics}
         requireUserHasRights
         requiredRoles={['fullSisuAccess', 'courseStatistics']}
@@ -89,7 +88,6 @@ export const Routes = () => (
       {isDefaultServiceProvider() && (
         <ProtectedRoute
           component={CoursePopulation}
-          exact
           path={routes.coursepopulation}
           requireUserHasRights
           requiredRoles={['fullSisuAccess']}
@@ -97,7 +95,6 @@ export const Routes = () => (
       )}
       <ProtectedRoute
         component={CustomPopulation}
-        exact
         path={routes.custompopulation}
         requireUserHasRights
         requiredRoles={['admin', 'fullSisuAccess', 'studyGuidanceGroups']}
@@ -105,23 +102,20 @@ export const Routes = () => (
       {isDefaultServiceProvider() && (
         <ProtectedRoute
           component={CustomOpenUniPopulation}
-          exact
           path={routes.customOpenUniPopulation}
           requiredRoles={['admin', 'openUniSearch']}
         />
       )}
-      <ProtectedRoute component={CompletedCourses} exact path={routes.completedCoursesSearch} />
-      <ProtectedRoute component={Updater} exact path={routes.updater} requireUserHasRights requiredRoles={['admin']} />
+      <ProtectedRoute component={CompletedCourses} path={routes.completedCoursesSearch} />
+      <ProtectedRoute component={Updater} path={routes.updater} requireUserHasRights requiredRoles={['admin']} />
       <ProtectedRoute
         component={StudyGuidanceGroups}
-        exact
         path={routes.studyGuidanceGroups}
         requiredRoles={['studyGuidanceGroups']}
       />
       {languageCenterViewEnabled && (
         <ProtectedRoute
           component={LanguageCenterView}
-          exact
           path={routes.languageCenterView}
           requireUserHasRights
           requiredRoles={['admin']}
@@ -129,14 +123,12 @@ export const Routes = () => (
       )}
       <ProtectedRoute
         component={EvaluationOverview}
-        exact
         path={routes.evaluationOverview}
         requiredRoles={['admin', 'fullSisuAccess', 'katselmusViewer']}
       />
-      <ProtectedRoute component={UniversityViewPage} exact path={routes.university} />
+      <ProtectedRoute component={UniversityViewPage} path={routes.university} />
       <ProtectedRoute
         component={CloseToGraduation}
-        exact
         path={routes.closeToGraduation}
         requiredRoles={['fullSisuAccess', 'studyGuidanceGroups']}
       />

@@ -1,7 +1,7 @@
 import { Op, QueryTypes } from 'sequelize'
 
 import { dbConnections } from '../database/connection'
-import { ProgrammeModule } from '../models'
+import { CurriculumPeriod, ProgrammeModule } from '../models'
 import { ExcludedCourse } from '../models/kone'
 import { Name } from '../shared/types'
 import logger from '../util/logger'
@@ -9,7 +9,25 @@ import { combinedStudyProgrammes } from './studyProgramme/studyProgrammeHelpers'
 
 export const getCurriculumVersions = async (code: string) => {
   try {
-    const result = await ProgrammeModule.findAll({ where: { code } })
+    const result: Array<ProgrammeModule & { curriculumName?: string }> = await ProgrammeModule.findAll({
+      where: { code },
+      order: [['valid_from', 'DESC']],
+      raw: true,
+    })
+    for (const curriculum of result) {
+      const curriculumPeriods = await CurriculumPeriod.findAll({
+        attributes: ['startDate', 'endDate'],
+        where: {
+          id: {
+            [Op.in]: curriculum.curriculum_period_ids,
+          },
+        },
+        raw: true,
+      })
+      const startYear = curriculumPeriods.map(({ startDate }) => startDate).sort((a, b) => a.getTime() - b.getTime())[0]
+      const endYear = curriculumPeriods.map(({ endDate }) => endDate).sort((a, b) => b.getTime() - a.getTime())[0]
+      curriculum.curriculumName = `${startYear.getFullYear()}–${endYear.getFullYear()}`
+    }
     return result
   } catch (error) {
     logger.error(`Error when searching curriculum versions for code: ${code}`)

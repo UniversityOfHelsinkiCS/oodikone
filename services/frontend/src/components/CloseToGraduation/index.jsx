@@ -145,6 +145,13 @@ const getColumns = (
       getRowVal: row => getSemesterEnrollmentsVal(row.student, row.studyright),
     },
     {
+      key: 'semestersAbsent',
+      title: 'Semesters\nabsent',
+      getRowVal: row => row.numberOfAbsentSemesters,
+      helpText:
+        'The number of semesters the student has been absent (both statutory and non-statutory absences) during their study right',
+    },
+    {
       key: 'semesterEnrollmentsForExcel',
       title: 'Enrollment status',
       displayColumn: false,
@@ -188,16 +195,29 @@ const getColumns = (
         {
           key: 'latestAttainmentHops',
           title: 'HOPS',
-          getRowVal: row => reformatDate(row.latestAttainmentDates.hops, ISO_DATE_FORMAT),
+          getRowVal: row => reformatDate(row.attainmentDates.latestHops, ISO_DATE_FORMAT),
           filterType: 'date',
           helpText: 'The date when the student last completed a course in their primary study plan',
         },
         {
           key: 'latestAttainmentTotal',
           title: 'Total',
-          getRowVal: row => reformatDate(row.latestAttainmentDates.total, ISO_DATE_FORMAT),
+          getRowVal: row => reformatDate(row.attainmentDates.latestTotal, ISO_DATE_FORMAT),
           filterType: 'date',
           helpText: 'The date when the student last completed any course at the university',
+        },
+      ],
+    },
+    {
+      key: 'earliestAttainmentDates',
+      title: 'Earliest\nattainment date',
+      children: [
+        {
+          key: 'earliestAttainmentHops',
+          title: 'HOPS',
+          getRowVal: row => reformatDate(row.attainmentDates.earliestHops, ISO_DATE_FORMAT),
+          filterType: 'date',
+          helpText: 'The date when the student first completed a course in their primary study plan',
         },
       ],
     },

@@ -38,23 +38,7 @@ export const PopulationDetails = ({
     { skip: !query?.studyRights?.programme }
   )
   const [courseTableMode, setCourseTableMode] = useState('curriculum')
-  const RenderCreditGainGraphs = () => {
-    const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive)
-
-    const graphs = (
-      <CreditAccumulationGraphHighCharts
-        programmeCodes={programmeCodes}
-        students={filteredStudents}
-        studyPlanFilterIsActive={studyPlanFilterIsActive}
-      />
-    )
-    return (
-      <>
-        <InfoBox content={populationStatisticsToolTips.creditAccumulation} />
-        {filteredStudents.length > 0 && graphs}
-      </>
-    )
-  }
+  const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive)
 
   const onStudentAmountLimitChange = value => {
     setStudentAmountLimit(Number.isNaN(Number(value)) ? studentAmountLimit : Number(value))
@@ -73,7 +57,19 @@ export const PopulationDetails = ({
   const panels = [
     {
       title: `Credit accumulation (for ${filteredStudents.length} students)`,
-      content: <div>{RenderCreditGainGraphs()}</div>,
+      content: (
+        <div>
+          <InfoBox content={populationStatisticsToolTips.creditAccumulation} />
+          {filteredStudents.length > 0 && (
+            <CreditAccumulationGraphHighCharts
+              programmeCodes={programmeCodes}
+              showFullStudyPath={query?.showFullStudyPath}
+              students={filteredStudents}
+              studyPlanFilterIsActive={studyPlanFilterIsActive}
+            />
+          )}
+        </div>
+      ),
     },
     {
       title: 'Credit statistics',

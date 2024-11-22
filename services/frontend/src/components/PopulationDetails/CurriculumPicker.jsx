@@ -1,14 +1,7 @@
-import { sortBy } from 'lodash'
 import { useEffect, useState } from 'react'
 import { Dropdown, Form, Input, Radio } from 'semantic-ui-react'
 
 import { useGetCurriculumsQuery, useGetCurriculumOptionsQuery } from '@/redux/populationCourses'
-
-const convertPeriodIdToStartYear = curriculumPeriodId => {
-  const versionNumber = parseInt(curriculumPeriodId.slice(-2), 10)
-  const year = versionNumber + 1949
-  return year
-}
 
 const chooseCurriculumToFetch = (curriculums, selectedCurriculum, startYear) => {
   if (selectedCurriculum?.curriculum_period_ids) {
@@ -18,8 +11,8 @@ const chooseCurriculumToFetch = (curriculums, selectedCurriculum, startYear) => 
     if (!startYear) {
       return curriculums[0]
     }
-    const defaultCurriculum = curriculums.find(curriculum =>
-      curriculum.curriculum_period_ids.some(id => `${convertPeriodIdToStartYear(id)}` === startYear)
+    const defaultCurriculum = curriculums.find(
+      curriculum => new Date(curriculum.valid_from) <= new Date(`${startYear}-08-01`)
     )
     return defaultCurriculum ?? curriculums[0]
   }
@@ -49,14 +42,6 @@ export const CurriculumPicker = ({ setCurriculum, programmeCodes, disabled, year
     setCurriculum({ ...chosenCurriculumData, version: chosenCurriculum?.curriculum_period_ids })
   }, [chosenCurriculumData])
 
-  const formatCurriculumOptions = curriculum => {
-    const years = sortBy(curriculum.curriculum_period_ids.map(convertPeriodIdToStartYear))
-    if (years.length === 0) {
-      return 'error'
-    }
-    return `${years[0]} - ${years[years.length - 1] + 1}`
-  }
-
   if (curriculums.length === 0) return null
 
   return (
@@ -65,14 +50,11 @@ export const CurriculumPicker = ({ setCurriculum, programmeCodes, disabled, year
       data-cy="curriculum-picker"
       disabled={disabled}
       onChange={(_, { value }) => setSelectedCurriculum(curriculums.find(curriculum => curriculum.id === value))}
-      options={sortBy(
-        curriculums.map(curriculum => ({
-          key: sortBy(curriculum.curriculum_period_ids).join(', '),
-          value: curriculum.id,
-          text: formatCurriculumOptions(curriculum),
-        })),
-        'key'
-      )}
+      options={curriculums.map(curriculum => ({
+        key: curriculum.curriculum_period_ids.toSorted().join(', '),
+        value: curriculum.id,
+        text: curriculum.curriculumName,
+      }))}
       style={{
         background: '#e3e3e3',
         marginLeft: '10px',
