@@ -1,4 +1,6 @@
 /* eslint-disable react/no-this-in-sfc */
+import { Box } from '@mui/material'
+import Highcharts from 'highcharts'
 import accessibility from 'highcharts/modules/accessibility'
 import exportData from 'highcharts/modules/export-data'
 import exporting from 'highcharts/modules/exporting'
@@ -15,33 +17,33 @@ export const MedianBarChart = ({
   classSizes,
   data,
   facultyGraph = true,
+  facultyNames,
   goal,
   goalExceptions,
   handleClick,
   level,
   mode,
-  programmeNames,
   title,
   year,
   yearLabel,
 }: {
   classSizes: Record<string, number> | Record<string, Record<string, number>>
   data: GraduationStats[]
-  facultyGraph: boolean
+  facultyGraph?: boolean
+  facultyNames: Record<string, NameWithCode>
   goal: number
-  goalExceptions: Record<string, number> & { needed: boolean }
-  handleClick
-  level: 'bachelor' | 'bcMsCombo' | 'master' | 'doctor'
+  goalExceptions?: Record<string, number> & { needed: boolean }
+  handleClick: (event, isFacultyGraph: boolean, seriesCategory?: number) => void
+  level?: 'bachelor' | 'bcMsCombo' | 'master' | 'doctor'
   mode: 'faculty' | 'programme'
-  programmeNames: Record<string, NameWithCode>
   title: string
-  year: number | null
+  year?: number | null
   yearLabel: 'Graduation year' | 'Start year'
 }) => {
   const { language } = useLanguage()
 
-  let modData = null
-  if (!facultyGraph && goalExceptions.needed && ['master', 'bcMsCombo'].includes(level)) {
+  let modData
+  if (!facultyGraph && goalExceptions?.needed && level && ['master', 'bcMsCombo'].includes(level)) {
     // change colors for longer medicine goal times
     modData = JSON.parse(JSON.stringify(data))
     for (const data of modData) {
@@ -63,17 +65,19 @@ export const MedianBarChart = ({
     return median > max ? median : max
   }, goal * 2)
 
-  const getClassSize = category => {
-    if (facultyGraph) return classSizes[category]
-    return classSizes[category][year]
+  const getClassSize = (category: string) => {
+    if (facultyGraph) {
+      return classSizes[category]
+    }
+    return classSizes[category][year!]
   }
 
-  const getPercentage = (amount, category) => {
+  const getPercentage = (amount: number, category: string) => {
     const percent = Math.round((amount / getClassSize(category)) * 100 * 10) / 10
     return Number.isNaN(percent) ? 0 : percent
   }
 
-  const getDataLabel = (amount, category) => {
+  const getDataLabel = (amount: number, category: string) => {
     if (yearLabel === 'Start year' && title === 'Bachelor study right') {
       return `${amount} graduated (${getPercentage(amount, category)} % of class)`
     }
@@ -85,7 +89,14 @@ export const MedianBarChart = ({
     return data.length * multiplier + 100
   }
 
-  const getTooltipText = (name, code, amount, median, statistics, realGoal) => {
+  const getTooltipText = (
+    name: number,
+    code: string,
+    amount: number,
+    median: number,
+    statistics: { onTime: number; yearOver: number; wayOver: number },
+    realGoal: number | undefined
+  ) => {
     const sortingText =
       yearLabel === 'Start year'
         ? `<b>From class of ${facultyGraph ? name : year}, ${amount}/${getClassSize(code)} students have graduated</b>`
@@ -96,7 +107,7 @@ export const MedianBarChart = ({
     if (!facultyGraph) {
       const goalText = realGoal ? `<br /><p><b>** Exceptional goal time: ${realGoal} months **</b></p>` : ''
       return `<b>${
-        programmeNames[code]?.[language] ?? programmeNames[code]?.fi
+        facultyNames[code]?.[language] ? facultyNames[code]?.[language] : facultyNames[code]?.fi
       }</b><br />${code}${timeText}${statisticsText}${goalText}`
     }
     return `${timeText}${statisticsText}`
@@ -109,17 +120,16 @@ export const MedianBarChart = ({
     return facultyGraph ? yearLabel : `${mode.charAt(0).toUpperCase()}${mode.slice(1)}`
   }
 
-  const config = {
+  const config: Highcharts.Options = {
     chart: {
       type: 'bar',
       width: 700,
       margin: [70, 0],
       height: getHeight(),
     },
-    title: { text: ' ' },
+    title: { text: !facultyGraph ? `Year ${year} by ${yearLabel.toLowerCase()}` : '' },
     tooltip: {
       backgroundColor: 'white',
-      fontSize: '25px',
       formatter() {
         return getTooltipText(
           this.point.name,
@@ -144,7 +154,7 @@ export const MedianBarChart = ({
     },
     series: [
       {
-        data: (modData || data).map(item => ({
+        data: (modData ?? data).map(item => ({
           ...item,
           y: item.median,
         })),
@@ -222,9 +232,9 @@ export const MedianBarChart = ({
     },
   }
 
-  if (!facultyGraph) {
-    config.title.text = `Year ${year} by ${yearLabel.toLowerCase()}`
-  }
-
-  return <ReactHighcharts config={config} />
+  return (
+    <Box width={{ sm: '100%', md: '50%' }}>
+      <ReactHighcharts config={config} />
+    </Box>
+  )
 }

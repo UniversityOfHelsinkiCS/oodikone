@@ -1,4 +1,7 @@
 /* eslint-disable react/no-this-in-sfc */
+import { Box } from '@mui/material'
+import { green, red, yellow } from '@mui/material/colors'
+import HighCharts from 'highcharts'
 import accessibility from 'highcharts/modules/accessibility'
 import exportData from 'highcharts/modules/export-data'
 import exporting from 'highcharts/modules/exporting'
@@ -15,28 +18,29 @@ export const BreakdownBarChart = ({
   data,
   handleClick,
   facultyGraph = true,
+  facultyNames,
   year = null,
   mode,
-  programmeNames,
   yearLabel,
 }: {
-  data: GraduationStats[]
-  handleClick
-  facultyGraph: boolean
-  year: number | null
+  data: Array<GraduationStats & { code?: string }>
+  handleClick: (event, isFacultyGraph: boolean, seriesCategory?: number) => void
+  facultyGraph?: boolean
+  facultyNames?: Record<string, NameWithCode>
+  year?: number | null
   mode: 'faculty' | 'programme'
-  programmeNames?: Record<string, NameWithCode>
   yearLabel?: 'Graduation year' | 'Start year'
 }) => {
   const { language } = useLanguage()
 
+  const shade = 400
   const statData = [
-    { name: 'On time', color: '#90A959', data: [] },
-    { name: 'Max. year overtime', color: '#FEE191', data: [] },
-    { name: 'Overtime', color: '#FB6962', data: [] },
+    { name: 'On time', color: green[shade], data: [] as number[] },
+    { name: 'Max. year overtime', color: yellow[shade], data: [] as number[] },
+    { name: 'Overtime', color: red[shade], data: [] as number[] },
   ]
 
-  let categories = []
+  let categories: number[] = []
   const codeMap = {}
 
   for (const item of data) {
@@ -45,7 +49,7 @@ export const BreakdownBarChart = ({
     statData[2].data = [...statData[2].data, item.statistics.wayOver]
     categories = [...categories, item.name]
     if (!facultyGraph) {
-      codeMap[item.name || item.code] = item.code
+      codeMap[item.name || item.code!] = item.code
     }
   }
 
@@ -57,12 +61,17 @@ export const BreakdownBarChart = ({
     return data.length * multiplier + 100
   }
 
-  const getTooltipText = (programmeId, seriesName, amount) => {
+  const getFacultyName = (code: string) => {
+    if (!facultyNames) {
+      return ''
+    }
+    return facultyNames[code]?.[language] ?? facultyNames[code]?.fi
+  }
+
+  const getTooltipText = (id: string, seriesName: string, amount: number) => {
     if (!facultyGraph) {
-      const code = codeMap[programmeId]
-      return `<b>${
-        programmeNames[code]?.[language] ? programmeNames[code]?.[language] : programmeNames[code]?.fi
-      }</b><br />${code}<br /><b>${seriesName}</b>: ${amount}`
+      const code = codeMap[id]
+      return `<b>${getFacultyName(code)}</b> • ${code}<br /><b>${seriesName}</b>: ${amount}`
     }
     return `<b>${seriesName}</b>: ${amount}`
   }
@@ -74,23 +83,23 @@ export const BreakdownBarChart = ({
     return facultyGraph ? yearLabel : `${mode.charAt(0).toUpperCase()}${mode.slice(1)}`
   }
 
-  const config = {
+  const config: HighCharts.Options = {
     chart: {
       type: 'bar',
       height: getHeight(),
       margin: [70, 0],
     },
-    title: { text: ' ' },
+    title: { text: !facultyGraph ? `Year ${year} by ${yearLabel!.toLowerCase()}` : '' },
     series: statData,
     tooltip: {
       backgroundColor: 'white',
       formatter() {
-        return getTooltipText(this.x, this.series.name, this.y)
+        return getTooltipText(this.x as string, this.series.name, this.y!)
       },
     },
     xAxis: {
       type: 'category',
-      categories,
+      categories: categories.map(category => category.toString()),
       title: {
         text: getLabel(),
         align: 'high',
@@ -140,9 +149,9 @@ export const BreakdownBarChart = ({
     },
   }
 
-  if (!facultyGraph) {
-    config.title.text = `Year ${year} by ${yearLabel.toLowerCase()}`
-  }
-
-  return <ReactHighcharts config={config} />
+  return (
+    <Box width={{ sm: '100%', md: '50%' }}>
+      <ReactHighcharts config={config} />
+    </Box>
+  )
 }

@@ -12,19 +12,21 @@ export const FacultyGraduations = ({
   showMedian: boolean
   universityMode?: boolean
 }) => {
-  const graduationStats = useGetAllFacultiesGraduationStatsQuery()
-  const data = graduationStats?.data?.byGradYear.medians
-  const goals = graduationStats?.data?.goals
+  const { data, isFetching, isLoading, isError } = useGetAllFacultiesGraduationStatsQuery()
+  const medians = data?.byGradYear.medians
+  const goals = data?.goals
   const goalExceptions = { ...goals?.exceptions, needed: faculty === 'H30' }
-  const programmeData = graduationStats?.data?.byGradYear.programmes.medians
-  const programmeNames = graduationStats?.data?.programmeNames
-  const classSizes = graduationStats?.data?.classSizes
+  const programmeData = data?.byGradYear.programmes.medians
+  const facultyNames = data?.programmeNames
+  const classSizes = data?.classSizes
   const commonProps = {
     classSizes,
+    facultyNames,
     goalExceptions,
     groupBy: 'byGradYear',
+    isError,
+    isLoading: isLoading || isFetching,
     mode: universityMode ? 'faculty' : 'programme',
-    programmeNames,
     showMedian,
     yearLabel: 'Graduation year',
   }
@@ -32,7 +34,7 @@ export const FacultyGraduations = ({
   return (
     <Box>
       <GraduationTimes
-        data={data?.bachelor}
+        data={medians?.bachelor}
         goal={goals?.bachelor}
         level="bachelor"
         levelProgrammeData={programmeData?.bachelor}
@@ -40,7 +42,7 @@ export const FacultyGraduations = ({
         {...commonProps}
       />
       <GraduationTimes
-        data={data?.bcMsCombo}
+        data={medians?.bcMsCombo}
         goal={goals?.bcMsCombo}
         level="bcMsCombo"
         levelProgrammeData={programmeData?.bcMsCombo}
@@ -48,7 +50,7 @@ export const FacultyGraduations = ({
         {...commonProps}
       />
       <GraduationTimes
-        data={data?.master}
+        data={medians?.master}
         goal={goals?.master}
         level="master"
         levelProgrammeData={programmeData?.master}
@@ -56,7 +58,7 @@ export const FacultyGraduations = ({
         {...commonProps}
       />
       <GraduationTimes
-        data={data?.doctor}
+        data={medians?.doctor}
         goal={goals?.doctor}
         level="doctor"
         levelProgrammeData={programmeData?.doctor}

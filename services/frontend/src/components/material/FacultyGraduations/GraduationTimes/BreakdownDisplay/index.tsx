@@ -1,51 +1,50 @@
-import { Message } from 'semantic-ui-react'
+import { Box, Stack, Typography } from '@mui/material'
 
 import { GraduationStats, NameWithCode } from '@/shared/types'
 import { BreakdownBarChart } from './BreakdownBarChart'
 
 export const BreakdownDisplay = ({
   data,
+  facultyNames,
   handleClick,
   levelProgrammeData,
   mode,
   programmeDataVisible,
-  programmeNames,
   year,
   yearLabel,
 }: {
   data: GraduationStats[]
-  handleClick: () => void
+  facultyNames: Record<string, NameWithCode>
+  handleClick: (event, isFacultyGraph: boolean, seriesCategory?: number) => void
   levelProgrammeData: Record<
     number,
     {
-      data: GraduationStats[]
+      data: Array<GraduationStats & { code: string }>
       programmes: string[]
     }
   >
   mode: 'faculty' | 'programme'
   programmeDataVisible: boolean
-  programmeNames: Record<string, NameWithCode>
   year: number | null
   yearLabel: 'Graduation year' | 'Start year'
 }) => {
   return (
-    <div>
-      <div className="graduations-chart-container">
+    <Box>
+      <Typography>Click a bar to view that year's {mode} level breakdown</Typography>
+      <Stack direction={{ sm: 'column', md: 'row' }}>
         <BreakdownBarChart data={data} handleClick={handleClick} mode={mode} />
-        {!programmeDataVisible || !(year in levelProgrammeData) ? (
-          <Message compact>Click a bar to view that year's {mode} level breakdown</Message>
-        ) : (
+        {programmeDataVisible && year && year in levelProgrammeData && (
           <BreakdownBarChart
             data={levelProgrammeData[year].data}
             facultyGraph={false}
+            facultyNames={facultyNames}
             handleClick={handleClick}
             mode={mode}
-            programmeNames={programmeNames}
             year={year}
             yearLabel={yearLabel}
           />
         )}
-      </div>
-    </div>
+      </Stack>
+    </Box>
   )
 }
