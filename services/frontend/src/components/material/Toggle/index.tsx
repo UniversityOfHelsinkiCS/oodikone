@@ -4,6 +4,7 @@ import { InfoBox } from '@/components/material/InfoBox'
 
 export const Toggle = ({
   cypress,
+  disabled = false,
   firstLabel,
   secondLabel,
   value,
@@ -11,6 +12,7 @@ export const Toggle = ({
   infoBoxContent,
 }: {
   cypress?: string
+  disabled?: boolean
   firstLabel: string
   secondLabel: string
   value: boolean
@@ -19,9 +21,9 @@ export const Toggle = ({
 }) => {
   return (
     <Stack alignItems="center" direction="row">
-      <Typography>{firstLabel}</Typography>
-      <Switch checked={value} data-cy={cypress} onChange={() => setValue(!value)} />
-      <Typography>{secondLabel}</Typography>
+      <Typography color={disabled ? 'text.secondary' : 'text.primary'}>{firstLabel}</Typography>
+      <Switch checked={value} data-cy={cypress} disabled={disabled} onChange={() => setValue(!value)} />
+      <Typography color={disabled ? 'text.secondary' : 'text.primary'}>{secondLabel}</Typography>
       {infoBoxContent && <InfoBox content={infoBoxContent} mini />}
     </Stack>
   )

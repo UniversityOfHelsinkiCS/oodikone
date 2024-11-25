@@ -1,18 +1,23 @@
 import { Box } from '@mui/material'
 
-import { useGetAllFacultiesGraduationStatsQuery } from '@/redux/facultyStats'
+import { AllGraduationStatsResponse } from '@/shared/types'
 import { GraduationTimes } from './GraduationTimes'
 
 export const FacultyGraduations = ({
+  data,
   faculty,
+  isError,
+  isLoading,
   showMedian,
   universityMode,
 }: {
+  data: AllGraduationStatsResponse | undefined
+  isError: boolean
+  isLoading: boolean
   faculty?: string
   showMedian: boolean
   universityMode?: boolean
 }) => {
-  const { data, isFetching, isLoading, isError } = useGetAllFacultiesGraduationStatsQuery()
   const medians = data?.byGradYear.medians
   const goals = data?.goals
   const goalExceptions = { ...goals?.exceptions, needed: faculty === 'H30' }
@@ -25,7 +30,7 @@ export const FacultyGraduations = ({
     goalExceptions,
     groupBy: 'byGradYear' as const,
     isError,
-    isLoading: isLoading || isFetching,
+    isLoading,
     mode: universityMode ? ('faculty' as const) : ('programme' as const),
     showMedian,
     yearLabel: 'Graduation year' as const,

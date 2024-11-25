@@ -5,8 +5,11 @@ import { facultyToolTips } from '@/common/InfoToolTips'
 import { FacultyGraduations } from '@/components/material/FacultyGraduations'
 import { Section } from '@/components/material/Section'
 import { Toggle } from '@/components/material/Toggle'
+import { useGetAllFacultiesGraduationStatsQuery } from '@/redux/facultyStats'
 
 export const FacultyGraduationsTab = () => {
+  const { data, isFetching, isLoading, isError } = useGetAllFacultiesGraduationStatsQuery()
+
   const [medianMode, setMedianMode] = useState(false)
 
   return (
@@ -15,6 +18,7 @@ export const FacultyGraduationsTab = () => {
         <Box display="flex" justifyContent="center">
           <Toggle
             cypress="GraduationTimeToggle"
+            disabled={isFetching || isLoading || isError}
             firstLabel="Breakdown"
             secondLabel="Median times"
             setValue={() => setMedianMode(!medianMode)}
@@ -22,7 +26,13 @@ export const FacultyGraduationsTab = () => {
           />
         </Box>
       </Section>
-      <FacultyGraduations showMedian={medianMode} universityMode />
+      <FacultyGraduations
+        data={data}
+        isError={isError}
+        isLoading={isFetching || isLoading}
+        showMedian={medianMode}
+        universityMode
+      />
     </Box>
   )
 }
