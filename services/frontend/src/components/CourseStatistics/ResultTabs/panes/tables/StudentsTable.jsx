@@ -5,9 +5,9 @@ import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Header, Icon, Item } from 'semantic-ui-react'
 
+import { isDefaultServiceProvider } from '@/common'
 import { defineCellColor, getSortableColumn, resolveGrades } from '@/components/CourseStatistics/ResultTabs/panes/util'
 import { SortableTable, row } from '@/components/SortableTable'
-import { serviceProvider } from '@/conf.js'
 import { getCourseAlternatives } from '@/selectors/courseStats'
 
 const formatPercentage = passRate => (Number.isNaN(passRate) ? '–' : `${(passRate * 100).toFixed(2)} %`)
@@ -161,7 +161,7 @@ const getColumns = (stats, showGrades, userHasAccessToAllStats, alternatives, se
     fdColums[index].children = fdColums[index].children.filter(o => o.key === 'TIME')
   }
 
-  const columns = serviceProvider === 'toska' ? toskaColumns : fdColums
+  const columns = isDefaultServiceProvider() ? toskaColumns : fdColums
   return columns.filter(column => {
     if (showGrades && column.onlyInGradeView) return true
     if (showGrades && column.hideWhenGradesVisible) return false

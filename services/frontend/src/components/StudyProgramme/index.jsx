@@ -2,10 +2,9 @@ import { useState } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
 import { Container, Header, Menu, Segment, Tab } from 'semantic-ui-react'
 
-import { getFullStudyProgrammeRights, getUnifiedProgrammeName } from '@/common'
+import { getFullStudyProgrammeRights, getUnifiedProgrammeName, isDefaultServiceProvider } from '@/common'
 import { useTabs, useTitle } from '@/common/hooks'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { serviceProvider } from '@/conf.js'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { BasicOverview } from './BasicOverview'
@@ -88,7 +87,7 @@ export const StudyProgramme = () => {
       fullStudyProgrammeRights.includes(programmeId) ||
       fullStudyProgrammeRights.includes(secondProgrammeId)
     ) {
-      if (serviceProvider === 'toska') {
+      if (isDefaultServiceProvider()) {
         panes.push({
           menuItem: <Menu.Item key="Programme courses">Programme courses</Menu.Item>,
           render: () => (

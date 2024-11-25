@@ -2,9 +2,8 @@ import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Segment, Icon, Item } from 'semantic-ui-react'
 
-import { calculatePercentage } from '@/common'
+import { calculatePercentage, isDefaultServiceProvider } from '@/common'
 import { SortableTable } from '@/components/SortableTable'
-import { serviceProvider } from '@/conf.js'
 
 const createColumnWithTitle = title => ({
   key: title,
@@ -40,7 +39,7 @@ export const TeacherStatisticsTable = ({ statistics, variant }) => {
         getRowContent: row => (
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5em' }}>
             {row.name}
-            {serviceProvider === 'toska' && (
+            {isDefaultServiceProvider() && (
               <Item as={Link} target="_blank" to={`/teachers/${row.id}`}>
                 <Icon name="level up alternate" />
               </Item>

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Divider, Loader, Message } from 'semantic-ui-react'
 
-import { getGraduationGraphTitle } from '@/common'
+import { getGraduationGraphTitle, isDefaultServiceProvider } from '@/common'
 import { studyProgrammeToolTips } from '@/common/InfoToolTips'
 import { CreditsProduced } from '@/components/common/CreditsProduced'
 import { InfoBox } from '@/components/InfoBox'
@@ -10,7 +10,6 @@ import { BreakdownBarChart } from '@/components/StudyProgramme/BreakdownBarChart
 import { MedianTimeBarChart } from '@/components/StudyProgramme/MedianTimeBarChart'
 import { Toggle } from '@/components/StudyProgramme/Toggle'
 import '@/components/StudyProgramme/studyprogramme.css'
-import { serviceProvider } from '@/conf.js'
 import { useGetBasicStatsQuery, useGetCreditStatsQuery, useGetGraduationStatsQuery } from '@/redux/studyProgramme'
 import { getTimestamp } from '@/util/timeAndDate'
 import { BarChart } from './BarChart'
@@ -188,7 +187,7 @@ export const BasicOverview = ({
               </div>
             </>
           )}
-          {credits?.data?.stats?.[studyprogramme]?.stats && serviceProvider === 'toska' && (
+          {credits?.data?.stats?.[studyprogramme]?.stats && isDefaultServiceProvider() && (
             <>
               {getDivider('Credits produced by the study programme', 'creditsProducedByTheStudyProgramme')}
               <CreditsProduced
