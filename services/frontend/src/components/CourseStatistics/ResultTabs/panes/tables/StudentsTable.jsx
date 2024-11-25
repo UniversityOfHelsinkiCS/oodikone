@@ -1,4 +1,4 @@
-import { uniq } from 'lodash'
+import { cloneDeep, uniq } from 'lodash'
 import qs from 'query-string'
 import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
@@ -155,7 +155,7 @@ const getColumns = (stats, showGrades, userHasAccessToAllStats, alternatives, se
     },
   ]
 
-  const fdColums = [...toskaColumns]
+  const fdColums = cloneDeep(toskaColumns)
   const index = fdColums.findIndex(o => o.key === 'TIME_PARENT')
   if (index !== -1) {
     fdColums[index].children = fdColums[index].children.filter(o => o.key === 'TIME')
