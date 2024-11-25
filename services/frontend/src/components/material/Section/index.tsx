@@ -1,4 +1,4 @@
-import { Alert, Box, Paper, Skeleton, Stack, Typography } from '@mui/material'
+import { Alert, Box, CircularProgress, Paper, Skeleton, Stack, Typography } from '@mui/material'
 
 import { InfoBox } from '@/components/material/InfoBox'
 
@@ -11,7 +11,21 @@ const ErrorMessage = () => {
 }
 
 const LoadingSkeleton = () => {
-  return <Skeleton height={400} variant="rectangular" />
+  return (
+    <Box sx={{ height: 400, position: 'relative' }}>
+      <Skeleton height={400} variant="rectangular" />
+      <Box
+        sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    </Box>
+  )
 }
 
 export const Section = ({
