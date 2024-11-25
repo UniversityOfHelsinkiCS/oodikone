@@ -24,7 +24,11 @@ export const BarChart = ({ data, track }: BarChartProps) => {
 
   const correctData = data.creditGraphStats[track]
   const colors = generateGradientColors(correctData.length)
-  const dataWithColors = Object.values(correctData).map((series, index) => ({ ...series, color: colors[index] }))
+  const dataWithColors = Object.values(correctData).map((series, index) => ({
+    ...series,
+    color: colors[index],
+    type: 'column' as const,
+  }))
 
   const config = {
     title: {
@@ -43,7 +47,7 @@ export const BarChart = ({ data, track }: BarChartProps) => {
     },
     plotOptions: {
       column: {
-        stacking: 'percent',
+        stacking: 'percent' as const,
         dataLabels: {
           enabled: true,
           format: '{point.percentage:.1f}%',
@@ -54,7 +58,9 @@ export const BarChart = ({ data, track }: BarChartProps) => {
       filename: `oodikone_progress_of_students_of_the_studyprogramme_${track}_by_starting_year`,
     },
     yAxis: {
-      title: '',
+      title: {
+        text: '',
+      },
     },
   }
 

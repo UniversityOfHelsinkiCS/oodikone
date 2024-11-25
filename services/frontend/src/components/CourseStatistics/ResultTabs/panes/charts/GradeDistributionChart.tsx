@@ -50,7 +50,7 @@ const getGradeGraphOptions = (
   },
   plotOptions: {
     column: {
-      stacking: 'normal',
+      stacking: 'normal' as const,
       borderRadius: 2,
     },
     series: {

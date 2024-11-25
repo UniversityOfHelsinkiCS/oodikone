@@ -6,6 +6,7 @@ type Series = {
   name: string
   data: number[]
   stack: string
+  type: 'column'
 }
 
 export const getDataObject = (name: string, data: number[], stack: string): Series => {
@@ -13,6 +14,7 @@ export const getDataObject = (name: string, data: number[], stack: string): Seri
     name,
     data,
     stack,
+    type: 'column' as const,
   }
 }
 

@@ -37,12 +37,9 @@ export const useLanguage = () => {
   const [state, setState] = useContext(LanguageContext)
   const [changeLanguage] = useModifyLanguageMutation()
 
-  const getTextIn = useCallback(
-    (text: Record<string, string>): string | null => getTextInWithLanguage(text, state),
-    [state]
-  )
+  const getTextIn = useCallback((text: Record<string, string>) => getTextInWithLanguage(text, state), [state])
 
-  const getTextInWrapped = (item: Record<string, string>, lang: Language): string | null => {
+  const getTextInWrapped = (item: any, lang?: Language) => {
     if (!lang) {
       return getTextIn(item)
     }
