@@ -1,26 +1,36 @@
-import { GraduationTimes } from '@/components/FacultyStatistics/TimesAndPaths/GraduationTimes'
+import { Box } from '@mui/material'
 
-export const FacultyGraduations = ({ faculty, graduationStats, groupByStartYear, showMedian, universityMode }) => {
-  const groupBy = groupByStartYear ? 'byStartYear' : 'byGradYear'
-  const yearLabel = groupByStartYear ? 'Start year' : 'Graduation year'
-  const data = graduationStats?.data?.[groupBy].medians
+import { useGetAllFacultiesGraduationStatsQuery } from '@/redux/facultyStats'
+import { GraduationTimes } from './GraduationTimes'
+
+export const FacultyGraduations = ({
+  faculty,
+  showMedian,
+  universityMode,
+}: {
+  faculty?: string
+  showMedian: boolean
+  universityMode?: boolean
+}) => {
+  const graduationStats = useGetAllFacultiesGraduationStatsQuery()
+  const data = graduationStats?.data?.byGradYear.medians
   const goals = graduationStats?.data?.goals
   const goalExceptions = { ...goals?.exceptions, needed: faculty === 'H30' }
-  const programmeData = graduationStats?.data?.[groupBy].programmes.medians
+  const programmeData = graduationStats?.data?.byGradYear.programmes.medians
   const programmeNames = graduationStats?.data?.programmeNames
   const classSizes = graduationStats?.data?.classSizes
   const commonProps = {
-    yearLabel,
-    programmeNames,
-    showMedian,
     classSizes,
     goalExceptions,
-    groupBy,
+    groupBy: 'byGradYear',
     mode: universityMode ? 'faculty' : 'programme',
+    programmeNames,
+    showMedian,
+    yearLabel: 'Graduation year',
   }
 
   return (
-    <div>
+    <Box>
       <GraduationTimes
         data={data?.bachelor}
         goal={goals?.bachelor}
@@ -53,6 +63,6 @@ export const FacultyGraduations = ({ faculty, graduationStats, groupByStartYear,
         title="Doctor"
         {...commonProps}
       />
-    </div>
+    </Box>
   )
 }

@@ -5,12 +5,9 @@ import { facultyToolTips } from '@/common/InfoToolTips'
 import { FacultyGraduations } from '@/components/material/FacultyGraduations'
 import { Section } from '@/components/material/Section'
 import { Toggle } from '@/components/material/Toggle'
-import { useGetAllFacultiesGraduationStatsQuery } from '@/redux/facultyStats'
 
 export const FacultyGraduationsTab = () => {
   const [medianMode, setMedianMode] = useState(false)
-
-  const graduationStats = useGetAllFacultiesGraduationStatsQuery({})
 
   return (
     <Box>
@@ -25,12 +22,7 @@ export const FacultyGraduationsTab = () => {
           />
         </Box>
       </Section>
-      <FacultyGraduations
-        graduationStats={graduationStats}
-        groupByStartYear={false}
-        showMedian={medianMode}
-        universityMode
-      />
+      <FacultyGraduations showMedian={medianMode} universityMode />
     </Box>
   )
 }
