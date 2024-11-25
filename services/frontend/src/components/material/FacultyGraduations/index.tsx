@@ -23,12 +23,12 @@ export const FacultyGraduations = ({
     classSizes,
     facultyNames,
     goalExceptions,
-    groupBy: 'byGradYear',
+    groupBy: 'byGradYear' as const,
     isError,
     isLoading: isLoading || isFetching,
-    mode: universityMode ? 'faculty' : 'programme',
+    mode: universityMode ? ('faculty' as const) : ('programme' as const),
     showMedian,
-    yearLabel: 'Graduation year',
+    yearLabel: 'Graduation year' as const,
   }
 
   return (

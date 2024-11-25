@@ -1,5 +1,6 @@
 /* eslint-disable react/no-this-in-sfc */
 import { Box } from '@mui/material'
+import { green, red, yellow } from '@mui/material/colors'
 import Highcharts from 'highcharts'
 import accessibility from 'highcharts/modules/accessibility'
 import exportData from 'highcharts/modules/export-data'
@@ -27,12 +28,21 @@ export const MedianBarChart = ({
   year,
   yearLabel,
 }: {
-  classSizes: Record<string, number> | Record<string, Record<string, number>>
+  classSizes:
+    | Record<string, number>
+    | {
+        [code: string]: {
+          bachelor: Record<string, number>
+          bcMsCombo: Record<string, number>
+          master: Record<string, number>
+          doctor: Record<string, number>
+        }
+      }
   data: GraduationStats[]
   facultyGraph?: boolean
   facultyNames: Record<string, NameWithCode>
   goal: number
-  goalExceptions?: Record<string, number> & { needed: boolean }
+  goalExceptions?: Record<string, number> | { needed: boolean }
   handleClick: (event, isFacultyGraph: boolean, seriesCategory?: number) => void
   level?: 'bachelor' | 'bcMsCombo' | 'master' | 'doctor'
   mode: 'faculty' | 'programme'
@@ -42,19 +52,27 @@ export const MedianBarChart = ({
 }) => {
   const { language } = useLanguage()
 
-  let modData
+  // TODO: Move to theme
+  const shade = 400
+  const colors = {
+    onTime: green[shade],
+    yearOver: yellow[shade],
+    wayOver: red[shade],
+  }
+
+  let modData: Array<GraduationStats & { code: string; color: string; realGoal?: number }> | null = null
   if (!facultyGraph && goalExceptions?.needed && level && ['master', 'bcMsCombo'].includes(level)) {
     // change colors for longer medicine goal times
     modData = JSON.parse(JSON.stringify(data))
-    for (const data of modData) {
+    for (const data of modData!) {
       if (Object.keys(goalExceptions).includes(data.code)) {
         const realGoal = goal + goalExceptions[data.code]
         if (data.median <= realGoal) {
-          data.color = '#90A959'
+          data.color = colors.onTime
         } else if (data.median <= realGoal + 12) {
-          data.color = '#FEE191'
+          data.color = colors.yearOver
         } else {
-          data.color = '#FB6962'
+          data.color = colors.wayOver
         }
         data.realGoal = realGoal
       }
@@ -89,8 +107,15 @@ export const MedianBarChart = ({
     return data.length * multiplier + 100
   }
 
+  const getFacultyName = (code: string) => {
+    if (!facultyNames) {
+      return ''
+    }
+    return facultyNames[code]?.[language] ?? facultyNames[code]?.fi
+  }
+
   const getTooltipText = (
-    name: number,
+    name: string,
     code: string,
     amount: number,
     median: number,
@@ -106,9 +131,7 @@ export const MedianBarChart = ({
 
     if (!facultyGraph) {
       const goalText = realGoal ? `<br /><p><b>** Exceptional goal time: ${realGoal} months **</b></p>` : ''
-      return `<b>${
-        facultyNames[code]?.[language] ? facultyNames[code]?.[language] : facultyNames[code]?.fi
-      }</b><br />${code}${timeText}${statisticsText}${goalText}`
+      return `<b>${getFacultyName(code)}</b> • ${code}<br />${timeText}${statisticsText}${goalText}`
     }
     return `${timeText}${statisticsText}`
   }
@@ -123,7 +146,6 @@ export const MedianBarChart = ({
   const config: Highcharts.Options = {
     chart: {
       type: 'bar',
-      width: 700,
       margin: [70, 0],
       height: getHeight(),
     },
@@ -131,13 +153,23 @@ export const MedianBarChart = ({
     tooltip: {
       backgroundColor: 'white',
       formatter() {
+        const point = this.point as Highcharts.Point & {
+          code?: string
+          amount?: number
+          statistics?: {
+            onTime: number
+            yearOver: number
+            wayOver: number
+          }
+          realGoal?: number
+        }
         return getTooltipText(
-          this.point.name,
-          this.point.code ? this.point.code : this.point.name,
-          this.point.amount,
-          this.y,
-          this.point.statistics,
-          this.point?.realGoal
+          point.name,
+          point.code ? point.code : point.name,
+          point.amount!,
+          this.y!,
+          point.statistics!,
+          point.realGoal
         )
       },
     },
@@ -149,39 +181,42 @@ export const MedianBarChart = ({
           inside: true,
           overflow: 'allow',
         },
-        pointPadding: 0.0,
       },
     },
     series: [
       {
+        type: 'bar',
         data: (modData ?? data).map(item => ({
           ...item,
           y: item.median,
+          name: item.name.toString(),
         })),
-        dataLabels: [
-          {
-            align: 'left',
-            color: '#424949',
-            style: {
-              textOutline: 'none',
-            },
-            formatter() {
-              return getDataLabel(this.point.amount, this.point.code ? this.point.code : this.point.name)
-            },
+        dataLabels: {
+          align: 'left',
+          color: '#424949',
+          style: {
+            textOutline: 'none',
           },
-        ],
+          formatter() {
+            const point = this.point as Highcharts.Point & {
+              code?: string
+              amount?: number
+            }
+            return getDataLabel(point.amount!, point.code ? point.code : point.name)
+          },
+        },
         showInLegend: false,
         zones: [
           {
             value: goal + 0.1,
-            color: '#90A959',
+            color: colors.onTime,
           },
           {
             value: goal + 12.1,
-            color: '#FEE191',
+            color: colors.yearOver,
           },
           {
-            color: '#FB6962',
+            color: colors.wayOver,
           },
         ],
         point: {
@@ -214,16 +249,16 @@ export const MedianBarChart = ({
       showFirstLabel: false,
       plotLines: [
         {
-          color: '#90A959',
+          color: colors.onTime,
           width: 2,
           value: goal,
-          dashStyle: 'shortDash',
+          dashStyle: 'ShortDash',
         },
         {
-          color: '#FEE191',
+          color: colors.yearOver,
           width: 2,
           value: goal + 12,
-          dashStyle: 'shortDash',
+          dashStyle: 'ShortDash',
         },
       ],
     },

@@ -34,19 +34,19 @@ export const BreakdownBarChart = ({
   const { language } = useLanguage()
 
   const shade = 400
-  const statData = [
-    { name: 'On time', color: green[shade], data: [] as number[] },
-    { name: 'Max. year overtime', color: yellow[shade], data: [] as number[] },
-    { name: 'Overtime', color: red[shade], data: [] as number[] },
+  const statData: HighCharts.SeriesBarOptions[] = [
+    { type: 'bar', name: 'On time', color: green[shade], data: [] },
+    { type: 'bar', name: 'Max. year overtime', color: yellow[shade], data: [] },
+    { type: 'bar', name: 'Overtime', color: red[shade], data: [] },
   ]
 
   let categories: number[] = []
   const codeMap = {}
 
   for (const item of data) {
-    statData[0].data = [...statData[0].data, item.statistics.onTime]
-    statData[1].data = [...statData[1].data, item.statistics.yearOver]
-    statData[2].data = [...statData[2].data, item.statistics.wayOver]
+    ;(statData[0].data as number[]).push(item.statistics.onTime)
+    ;(statData[1].data as number[]).push(item.statistics.yearOver)
+    ;(statData[2].data as number[]).push(item.statistics.wayOver)
     categories = [...categories, item.name]
     if (!facultyGraph) {
       codeMap[item.name || item.code!] = item.code
@@ -80,7 +80,7 @@ export const BreakdownBarChart = ({
     if (mode === 'faculty') {
       return facultyGraph ? 'Graduation year' : 'Faculty'
     }
-    return facultyGraph ? yearLabel : `${mode.charAt(0).toUpperCase()}${mode.slice(1)}`
+    return facultyGraph ? yearLabel! : `${mode.charAt(0).toUpperCase()}${mode.slice(1)}`
   }
 
   const config: HighCharts.Options = {
@@ -90,7 +90,11 @@ export const BreakdownBarChart = ({
       margin: [70, 0],
     },
     title: { text: !facultyGraph ? `Year ${year} by ${yearLabel!.toLowerCase()}` : '' },
-    series: statData,
+    series: statData.map(series => ({
+      ...series,
+      pointWidth: data.length > 8 ? 16 : 20,
+      groupPadding: 0.15,
+    })),
     tooltip: {
       backgroundColor: 'white',
       formatter() {
@@ -136,8 +140,6 @@ export const BreakdownBarChart = ({
       },
       series: {
         animation: false,
-        pointWidth: data.length > 8 ? 16 : 20,
-        groupPadding: 0.15,
         point: {
           events: {
             click(event) {

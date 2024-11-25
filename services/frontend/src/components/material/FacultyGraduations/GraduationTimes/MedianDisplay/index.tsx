@@ -24,12 +24,19 @@ export const MedianDisplay = ({
     bcMsCombo: Record<string, number>
     master: Record<string, number>
     doctor: Record<string, number>
-    programmes: Record<string, Record<string, number>>
+    programmes: {
+      [code: string]: {
+        bachelor: Record<string, number>
+        bcMsCombo: Record<string, number>
+        master: Record<string, number>
+        doctor: Record<string, number>
+      }
+    }
   }
   data: GraduationStats[]
   facultyNames: Record<string, NameWithCode>
   goal: number
-  goalExceptions: Record<string, number> & { needed: boolean }
+  goalExceptions: Record<string, number> | { needed: boolean }
   groupBy: 'byGradYear' | 'byStartYear'
   handleClick: (event, isFacultyGraph: boolean, seriesCategory?: number) => void
   level: 'bachelor' | 'bcMsCombo' | 'master' | 'doctor'

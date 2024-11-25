@@ -22,10 +22,10 @@ export interface AllGraduationStatsResponse {
     }
     programmes: {
       medians: {
-        bachelor: Record<string, { data: GraduationStats[] & { code: string }; programmes: string[] }>
-        bcMsCombo: Record<string, { data: GraduationStats[] & { code: string }; programmes: string[] }>
-        doctor: Record<string, { data: GraduationStats[] & { code: string }; programmes: string[] }>
-        master: Record<string, { data: GraduationStats[] & { code: string }; programmes: string[] }>
+        bachelor: Record<number, { data: Array<GraduationStats & { code: string }>; programmes: string[] }>
+        bcMsCombo: Record<number, { data: Array<GraduationStats & { code: string }>; programmes: string[] }>
+        doctor: Record<number, { data: Array<GraduationStats & { code: string }>; programmes: string[] }>
+        master: Record<number, { data: Array<GraduationStats & { code: string }>; programmes: string[] }>
       }
     }
   }
@@ -34,6 +34,14 @@ export interface AllGraduationStatsResponse {
     bcMsCombo: Record<string, number>
     doctor: Record<string, number>
     master: Record<string, number>
+    programmes: {
+      [code: string]: {
+        bachelor: Record<string, number>
+        bcMsCombo: Record<string, number>
+        master: Record<string, number>
+        doctor: Record<string, number>
+      }
+    }
   }
   goals: {
     bachelor: number
