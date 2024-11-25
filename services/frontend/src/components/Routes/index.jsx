@@ -83,14 +83,16 @@ export const Routes = () => (
         requireUserHasRights
         requiredRoles={['fullSisuAccess', 'courseStatistics']}
       />
-      <ProtectedRoute component={Users} path={routes.users} requiredRoles={['admin']} />
-      <ProtectedRoute component={Teachers} path={routes.teachers} requiredRoles={['teachers']} />
-      <ProtectedRoute
-        component={CoursePopulation}
-        path={routes.coursepopulation}
-        requireUserHasRights
-        requiredRoles={['fullSisuAccess']}
-      />
+      <ProtectedRoute component={Users} exact path={routes.users} requiredRoles={['admin']} />
+      <ProtectedRoute component={Teachers} exact path={routes.teachers} requiredRoles={['teachers']} />
+      {isDefaultServiceProvider() && (
+        <ProtectedRoute
+          component={CoursePopulation}
+          path={routes.coursepopulation}
+          requireUserHasRights
+          requiredRoles={['fullSisuAccess']}
+        />
+      )}
       <ProtectedRoute
         component={CustomPopulation}
         path={routes.custompopulation}

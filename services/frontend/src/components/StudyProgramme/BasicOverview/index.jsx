@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Divider, Loader, Message } from 'semantic-ui-react'
 
-import { getGraduationGraphTitle } from '@/common'
+import { getGraduationGraphTitle, isDefaultServiceProvider } from '@/common'
 import { studyProgrammeToolTips } from '@/common/InfoToolTips'
 import { CreditsProduced } from '@/components/common/CreditsProduced'
 import { InfoBox } from '@/components/InfoBox'
@@ -187,7 +187,7 @@ export const BasicOverview = ({
               </div>
             </>
           )}
-          {credits?.data?.stats?.[studyprogramme]?.stats && (
+          {credits?.data?.stats?.[studyprogramme]?.stats && isDefaultServiceProvider() && (
             <>
               {getDivider('Credits produced by the study programme', 'creditsProducedByTheStudyProgramme')}
               <CreditsProduced

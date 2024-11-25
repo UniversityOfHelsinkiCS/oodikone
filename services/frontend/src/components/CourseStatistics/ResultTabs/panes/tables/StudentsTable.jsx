@@ -1,10 +1,11 @@
-import { uniq } from 'lodash'
+import { cloneDeep, uniq } from 'lodash'
 import qs from 'query-string'
 import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Header, Icon, Item } from 'semantic-ui-react'
 
+import { isDefaultServiceProvider } from '@/common'
 import { defineCellColor, getSortableColumn, resolveGrades } from '@/components/CourseStatistics/ResultTabs/panes/util'
 import { SortableTable, row } from '@/components/SortableTable'
 import { getCourseAlternatives } from '@/selectors/courseStats'
@@ -35,8 +36,7 @@ const getColumns = (stats, showGrades, userHasAccessToAllStats, alternatives, se
     const searchString = qs.stringify(queryObject)
     return `/coursepopulation?${searchString}`
   }
-
-  const columns = [
+  const toskaColumns = [
     {
       key: 'TIME_PARENT',
       merge: true,
@@ -155,6 +155,13 @@ const getColumns = (stats, showGrades, userHasAccessToAllStats, alternatives, se
     },
   ]
 
+  const fdColums = cloneDeep(toskaColumns)
+  const index = fdColums.findIndex(o => o.key === 'TIME_PARENT')
+  if (index !== -1) {
+    fdColums[index].children = fdColums[index].children.filter(o => o.key === 'TIME')
+  }
+
+  const columns = isDefaultServiceProvider() ? toskaColumns : fdColums
   return columns.filter(column => {
     if (showGrades && column.onlyInGradeView) return true
     if (showGrades && column.hideWhenGradesVisible) return false
