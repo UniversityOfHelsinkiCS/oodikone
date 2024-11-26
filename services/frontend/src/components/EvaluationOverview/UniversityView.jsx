@@ -1,7 +1,7 @@
 import { orderBy } from 'lodash'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Divider, Header, Loader, Message, Segment } from 'semantic-ui-react'
+import { Divider, Header, Loader, Message } from 'semantic-ui-react'
 
 import { useTitle } from '@/common/hooks'
 import { facultyToolTips } from '@/common/InfoToolTips'
@@ -13,16 +13,6 @@ import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetAllFacultiesGraduationStatsQuery, useGetAllFacultiesProgressStatsQuery } from '@/redux/facultyStats'
 import { FacultyGraduations } from './FacultyGraduations'
 import { FacultyProgress } from './FacultyProgress'
-
-export const UniversityViewPage = () => {
-  return (
-    <div className="segmentContainer">
-      <Segment className="contentSegment">
-        <UniversityView />
-      </Segment>
-    </div>
-  )
-}
 
 export const UniversityView = ({ isEvaluationOverview }) => {
   useTitle('University')

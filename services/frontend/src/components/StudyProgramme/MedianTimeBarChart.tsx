@@ -1,4 +1,5 @@
 /* eslint-disable react/no-this-in-sfc */
+import Highcharts from 'highcharts'
 import accessibility from 'highcharts/modules/accessibility'
 import exportData from 'highcharts/modules/export-data'
 import exporting from 'highcharts/modules/exporting'
@@ -63,7 +64,7 @@ export const MedianTimeBarChart = ({ byStartYear, data, goal, title }: MedianTim
     return `${timeText}${statisticsText}`
   }
 
-  const config = {
+  const config: Highcharts.Options = {
     chart: {
       type: 'bar',
       width: 700,
@@ -73,12 +74,14 @@ export const MedianTimeBarChart = ({ byStartYear, data, goal, title }: MedianTim
     title: { text: title },
     tooltip: {
       backgroundColor: 'white',
-      fontSize: '25px',
-      formatter(this: {
-        y: number
-        point: { amount: number; name: string; statistics: Statistics; classSize: number }
-      }) {
-        return getTooltipText(this.point.amount, this.y, this.point.name, this.point.statistics, this.point.classSize)
+      formatter() {
+        const point = this.point as Highcharts.Point & {
+          amount: number
+          name: string
+          statistics: Statistics
+          classSize: number
+        }
+        return getTooltipText(point.amount, this.y!, point.name, point.statistics, point.classSize)
       },
     },
     plotOptions: {
@@ -86,26 +89,25 @@ export const MedianTimeBarChart = ({ byStartYear, data, goal, title }: MedianTim
         dataLabels: {
           enabled: true,
           inside: true,
-          overflow: 'allow',
+          overflow: 'allow' as const,
         },
-        pointPadding: 0.0,
       },
     },
     series: [
       {
+        type: 'bar',
         data,
-        dataLabels: [
-          {
-            align: 'left',
-            color: '#424949',
-            style: {
-              textOutline: 'none',
-            },
-            formatter(this: { point: { amount: number; classSize: number } }) {
-              return getDataLabel(this.point.amount, this.point.classSize)
-            },
+        dataLabels: {
+          align: 'left',
+          color: '#424949',
+          style: {
+            textOutline: 'none',
           },
-        ],
+          formatter() {
+            const point = this.point as Highcharts.Point & { amount: number; classSize: number }
+            return getDataLabel(point.amount, point.classSize)
+          },
+        },
         showInLegend: false,
         zones: [
           {
@@ -146,13 +148,13 @@ export const MedianTimeBarChart = ({ byStartYear, data, goal, title }: MedianTim
           color: '#90A959',
           width: 2,
           value: goal,
-          dashStyle: 'shortDash',
+          dashStyle: 'ShortDash',
         },
         {
           color: '#FEE191',
           width: 2,
           value: goal + 12,
-          dashStyle: 'shortDash',
+          dashStyle: 'ShortDash',
         },
       ],
     },

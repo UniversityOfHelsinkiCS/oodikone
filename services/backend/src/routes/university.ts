@@ -1,4 +1,3 @@
-// const router = require('express').Router()
 import { Request, Response, Router } from 'express'
 import { cloneDeep } from 'lodash'
 
@@ -16,6 +15,7 @@ import {
 } from '../services/faculty/facultyService'
 import { combineFacultyStudentProgress, FacultyProgressData } from '../services/faculty/facultyStudentProgress'
 import { getMedian } from '../services/studyProgramme/studyProgrammeHelpers'
+import { NameWithCode } from '../shared/types'
 import { Graduated } from '../types'
 import logger from '../util/logger'
 
@@ -24,7 +24,7 @@ const router = Router()
 const degreeNames = ['bachelor', 'bachelorMaster', 'master', 'doctor'] as const
 
 const getProgrammeNames = (faculties: Organization[]) => {
-  return faculties.reduce<Record<string, { code: string; en?: string; fi?: string; sv?: string }>>((obj, faculty) => {
+  return faculties.reduce<Record<string, NameWithCode>>((obj, faculty) => {
     const { name, code } = faculty.dataValues
     obj[faculty.code] = { code, ...name }
     return obj

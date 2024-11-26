@@ -41,7 +41,7 @@ const passRateAttemptGraphOptions = (isRelative: boolean, categories: string[], 
   },
   plotOptions: {
     column: {
-      stacking: 'normal',
+      stacking: 'normal' as const,
       borderRadius: 3,
     },
     series: {
@@ -76,7 +76,7 @@ const passRateStudentGraphOptions = (isRelative: boolean, categories: string[], 
   },
   plotOptions: {
     column: {
-      stacking: 'normal',
+      stacking: 'normal' as const,
       borderRadius: 1,
     },
     series: {

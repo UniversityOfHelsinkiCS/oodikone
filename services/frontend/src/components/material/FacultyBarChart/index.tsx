@@ -1,3 +1,5 @@
+import { Paper } from '@mui/material'
+import { OptionsStackingValue, SeriesColumnOptions } from 'highcharts'
 import accessibility from 'highcharts/modules/accessibility'
 import exportData from 'highcharts/modules/export-data'
 import exporting from 'highcharts/modules/exporting'
@@ -9,25 +11,29 @@ exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
 accessibility(ReactHighcharts.Highcharts)
 
-interface BarChartProps {
+export const FacultyBarChart = ({
+  cypress,
+  data,
+}: {
+  cypress: string
   data: {
-    creditGraphStats: Record<string, { name: string; data: number[] }[]>
+    id: string
+    stats: {
+      data: number[]
+      name: string
+    }[]
     years: string[]
   }
-  track: string
-}
-
-export const BarChart = ({ data, track }: BarChartProps) => {
-  if (!data?.creditGraphStats?.[track]) {
+}) => {
+  if (!data.stats) {
     return null
   }
 
-  const correctData = data.creditGraphStats[track]
-  const colors = generateGradientColors(correctData.length)
-  const dataWithColors = Object.values(correctData).map((series, index) => ({
+  const colors = generateGradientColors(Object.keys(data.stats).length)
+  const dataWithColors: SeriesColumnOptions[] = Object.values(data.stats).map((series, index) => ({
     ...series,
     color: colors[index],
-    type: 'column' as const,
+    type: 'column',
   }))
 
   const config = {
@@ -47,22 +53,32 @@ export const BarChart = ({ data, track }: BarChartProps) => {
     },
     plotOptions: {
       column: {
-        stacking: 'percent' as const,
+        stacking: 'percent' as OptionsStackingValue,
         dataLabels: {
           enabled: true,
           format: '{point.percentage:.1f}%',
         },
       },
+      series: {
+        animation: false,
+      },
     },
     exporting: {
-      filename: `oodikone_progress_of_students_of_the_studyprogramme_${track}_by_starting_year`,
+      filename: `oodikone_progress_of_students_in_${data?.id}_by_study_start_year`,
     },
     yAxis: {
+      allowDecimals: false,
+      min: 0,
+      reversed: false,
       title: {
         text: '',
       },
     },
   }
 
-  return <ReactHighcharts config={config} />
+  return (
+    <Paper data-cy={`${cypress}BarChart`} sx={{ padding: 2 }} variant="outlined">
+      <ReactHighcharts config={config} />
+    </Paper>
+  )
 }

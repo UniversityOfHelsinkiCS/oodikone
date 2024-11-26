@@ -3,3 +3,7 @@ export interface Name {
   en?: string
   sv?: string
 }
+
+export interface NameWithCode extends Name {
+  code: string
+}
