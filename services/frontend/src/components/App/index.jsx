@@ -1,5 +1,5 @@
 import { CssBaseline } from '@mui/material'
-import { createTheme, ThemeProvider } from '@mui/material/styles'
+import { ThemeProvider } from '@mui/material/styles'
 import * as Sentry from '@sentry/browser'
 import { useEffect } from 'react'
 import { initShibbolethPinger } from 'unfuck-spa-shibboleth-session'
@@ -11,6 +11,7 @@ import { Routes } from '@/components/Routes'
 import { SegmentDimmer } from '@/components/SegmentDimmer'
 import { isProduction } from '@/conf'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
+import { theme } from '@/theme'
 
 const addUserDetailsToLoggers = ({ id, username, mockedBy }) => {
   if (!isProduction || !id || !username) {
@@ -18,8 +19,6 @@ const addUserDetailsToLoggers = ({ id, username, mockedBy }) => {
   }
   Sentry.setUser({ id, username, mockedBy })
 }
-
-const theme = createTheme({})
 
 const Layout = ({ children }) => (
   <div

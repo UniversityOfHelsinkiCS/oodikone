@@ -1,6 +1,5 @@
 /* eslint-disable react/no-this-in-sfc */
-import { Box } from '@mui/material'
-import { green, red, yellow } from '@mui/material/colors'
+import { Box, useTheme } from '@mui/material'
 import Highcharts from 'highcharts'
 import accessibility from 'highcharts/modules/accessibility'
 import exportData from 'highcharts/modules/export-data'
@@ -53,14 +52,7 @@ export const MedianBarChart = ({
   yearLabel: 'Graduation year' | 'Start year'
 }) => {
   const { language } = useLanguage()
-
-  // TODO: Move to theme
-  const shade = 400
-  const colors = {
-    onTime: green[shade],
-    yearOver: yellow[shade],
-    wayOver: red[shade],
-  }
+  const theme = useTheme()
 
   let modData: Array<GraduationStats & { code: string; color: string; realGoal?: number }> | null = null
   if (!facultyGraph && goalExceptions?.needed && level && ['master', 'bcMsCombo'].includes(level)) {
@@ -70,11 +62,11 @@ export const MedianBarChart = ({
       if (Object.keys(goalExceptions).includes(data.code)) {
         const realGoal = goal + goalExceptions[data.code]
         if (data.median <= realGoal) {
-          data.color = colors.onTime
+          data.color = theme.graduationTimes.onTime
         } else if (data.median <= realGoal + 12) {
-          data.color = colors.yearOver
+          data.color = theme.graduationTimes.yearOver
         } else {
-          data.color = colors.wayOver
+          data.color = theme.graduationTimes.wayOver
         }
         data.realGoal = realGoal
       }
@@ -211,14 +203,14 @@ export const MedianBarChart = ({
         zones: [
           {
             value: goal + 0.1,
-            color: colors.onTime,
+            color: theme.graduationTimes.onTime,
           },
           {
             value: goal + 12.1,
-            color: colors.yearOver,
+            color: theme.graduationTimes.yearOver,
           },
           {
-            color: colors.wayOver,
+            color: theme.graduationTimes.wayOver,
           },
         ],
         point: {
@@ -251,13 +243,13 @@ export const MedianBarChart = ({
       showFirstLabel: false,
       plotLines: [
         {
-          color: colors.onTime,
+          color: theme.graduationTimes.onTime,
           width: 2,
           value: goal,
           dashStyle: 'ShortDash',
         },
         {
-          color: colors.yearOver,
+          color: theme.graduationTimes.yearOver,
           width: 2,
           value: goal + 12,
           dashStyle: 'ShortDash',

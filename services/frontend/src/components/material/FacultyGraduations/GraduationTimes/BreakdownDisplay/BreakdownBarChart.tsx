@@ -1,6 +1,5 @@
 /* eslint-disable react/no-this-in-sfc */
-import { Box } from '@mui/material'
-import { green, red, yellow } from '@mui/material/colors'
+import { Box, useTheme } from '@mui/material'
 import HighCharts from 'highcharts'
 import accessibility from 'highcharts/modules/accessibility'
 import exportData from 'highcharts/modules/export-data'
@@ -34,12 +33,12 @@ export const BreakdownBarChart = ({
   yearLabel?: 'Graduation year' | 'Start year'
 }) => {
   const { language } = useLanguage()
+  const theme = useTheme()
 
-  const shade = 400
   const statData: HighCharts.SeriesBarOptions[] = [
-    { type: 'bar', name: 'On time', color: green[shade], data: [] },
-    { type: 'bar', name: 'Max. year overtime', color: yellow[shade], data: [] },
-    { type: 'bar', name: 'Overtime', color: red[shade], data: [] },
+    { type: 'bar', name: 'On time', color: theme.graduationTimes.onTime, data: [] },
+    { type: 'bar', name: 'Max. year overtime', color: theme.graduationTimes.yearOver, data: [] },
+    { type: 'bar', name: 'Overtime', color: theme.graduationTimes.wayOver, data: [] },
   ]
 
   let categories: number[] = []
