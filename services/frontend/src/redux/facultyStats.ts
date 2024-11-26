@@ -1,5 +1,5 @@
 import { RTKApi } from '@/apiConnection'
-import { AllGraduationStatsResponse } from '@/shared/types'
+import { AllGraduationStatsResponse, AllProgressStatsRequest, AllProgressStatsResponse } from '@/shared/types'
 
 const facultystatsApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
@@ -26,7 +26,7 @@ const facultystatsApi = RTKApi.injectEndpoints({
       query: ({ id, specialGroups, graduated }) =>
         `/faculties/${id}/progressstats?special_groups=${specialGroups}&graduated=${graduated}`,
     }),
-    getAllFacultiesProgressStats: builder.query({
+    getAllFacultiesProgressStats: builder.query<AllProgressStatsResponse, AllProgressStatsRequest>({
       query: ({ graduated, includeSpecials }) =>
         `/university/allprogressstats?graduated=${graduated}&specialsIncluded=${includeSpecials}`,
     }),

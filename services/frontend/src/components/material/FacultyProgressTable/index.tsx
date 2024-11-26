@@ -2,7 +2,7 @@ import { KeyboardArrowDown, KeyboardArrowRight } from '@mui/icons-material'
 import { Box, Collapse, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
 import { Fragment, useState } from 'react'
 
-import { Name } from '@/shared/types'
+import { NameWithCode } from '@/shared/types'
 import { ExpandableRow } from './ExpandableRow'
 import { ProgrammeProgressChart } from './ProgrammeProgressChart'
 
@@ -17,7 +17,7 @@ export const FacultyProgressTable = ({
 }: {
   cypress: string
   data: (number | string)[][]
-  programmeNames: Record<string, Name & { code: string }>
+  programmeNames: Record<string, NameWithCode>
   programmeStats: Record<string, number[][]>
   progressTitles?: string[][]
   sortedKeys: string[]

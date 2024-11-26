@@ -5,6 +5,7 @@ import { calculateStats, sortProgrammeKeys } from '@/components/FacultyStatistic
 import { FacultyBarChart } from '@/components/material/FacultyBarChart'
 import { FacultyProgressTable } from '@/components/material/FacultyProgressTable'
 import { Section } from '@/components/material/Section'
+import { AllProgressStatsResponse } from '@/shared/types'
 
 export const FacultyProgress = ({
   faculty,
@@ -15,7 +16,7 @@ export const FacultyProgress = ({
   faculty: string
   isError: boolean
   isLoading: boolean
-  progressStats: any // TODO: Type via RTKApi
+  progressStats: AllProgressStatsResponse | undefined
 }) => {
   const creditCounts = progressStats?.creditCounts
 
@@ -34,19 +35,19 @@ export const FacultyProgress = ({
               data={{
                 id: faculty,
                 stats: bachelorStats?.chartStats,
-                years: progressStats?.years,
+                years: progressStats!.years,
               }}
             />
             <FacultyProgressTable
               cypress="FacultyBachelorsProgressTable"
               data={bachelorStats?.tableStats}
-              programmeNames={progressStats?.programmeNames}
-              programmeStats={progressStats?.bachelorsProgStats}
+              programmeNames={progressStats!.programmeNames}
+              programmeStats={progressStats!.bachelorsProgStats}
               progressTitles={progressStats?.yearlyBachelorTitles}
               sortedKeys={sortProgrammeKeys(
-                Object.keys(progressStats?.bachelorsProgStats).map(obj => [
-                  obj,
-                  progressStats?.programmeNames[obj].code,
+                Object.keys(progressStats!.bachelorsProgStats).map(facultyId => [
+                  facultyId,
+                  progressStats!.programmeNames[facultyId].code,
                 ]),
                 faculty
               ).map(listObj => listObj[0])}
@@ -69,17 +70,20 @@ export const FacultyProgress = ({
               data={{
                 id: faculty,
                 stats: bachelorMasterStats.chartStats,
-                years: progressStats?.years,
+                years: progressStats!.years,
               }}
             />
             <FacultyProgressTable
               cypress="FacultyBachelorMastersProgressTable"
               data={bachelorMasterStats.tableStats}
-              programmeNames={progressStats?.programmeNames}
-              programmeStats={progressStats?.bcMsProgStats}
+              programmeNames={progressStats!.programmeNames}
+              programmeStats={progressStats!.bcMsProgStats}
               progressTitles={progressStats?.yearlyBcMsTitles}
               sortedKeys={sortProgrammeKeys(
-                Object.keys(progressStats?.bcMsProgStats).map(obj => [obj, progressStats?.programmeNames[obj].code]),
+                Object.keys(progressStats!.bcMsProgStats).map(facultyId => [
+                  facultyId,
+                  progressStats!.programmeNames[facultyId].code,
+                ]),
                 faculty
               ).map(listObj => listObj[0])}
               titles={bachelorMasterStats.tableTitles}
@@ -95,17 +99,20 @@ export const FacultyProgress = ({
               data={{
                 id: faculty,
                 stats: masterStats.chartStats,
-                years: progressStats?.years,
+                years: progressStats!.years,
               }}
             />
             <FacultyProgressTable
               cypress="FacultyMastersProgressTable"
               data={masterStats.tableStats}
-              programmeNames={progressStats?.programmeNames}
-              programmeStats={progressStats?.mastersProgStats}
+              programmeNames={progressStats!.programmeNames}
+              programmeStats={progressStats!.mastersProgStats}
               progressTitles={progressStats?.yearlyMasterTitles}
               sortedKeys={sortProgrammeKeys(
-                Object.keys(progressStats?.mastersProgStats).map(obj => [obj, progressStats?.programmeNames[obj].code]),
+                Object.keys(progressStats!.mastersProgStats).map(facultyId => [
+                  facultyId,
+                  progressStats!.programmeNames[facultyId].code,
+                ]),
                 faculty
               ).map(listObj => listObj[0])}
               titles={masterStats.tableTitles}
@@ -121,18 +128,18 @@ export const FacultyProgress = ({
               data={{
                 id: faculty,
                 stats: doctorStats.chartStats,
-                years: progressStats?.years,
+                years: progressStats!.years,
               }}
             />
             <FacultyProgressTable
               cypress="FacultyDoctoralProgressTable"
               data={doctorStats.tableStats}
-              programmeNames={progressStats?.programmeNames}
-              programmeStats={progressStats?.doctoralProgStats}
+              programmeNames={progressStats!.programmeNames}
+              programmeStats={progressStats!.doctoralProgStats}
               sortedKeys={sortProgrammeKeys(
-                Object.keys(progressStats?.doctoralProgStats).map(obj => [
-                  obj,
-                  progressStats?.programmeNames[obj].code,
+                Object.keys(progressStats!.doctoralProgStats).map(facultyId => [
+                  facultyId,
+                  progressStats!.programmeNames[facultyId].code,
                 ]),
                 faculty
               ).map(listObj => listObj[0])}

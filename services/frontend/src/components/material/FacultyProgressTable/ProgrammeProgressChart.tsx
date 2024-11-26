@@ -8,7 +8,7 @@ import ReactHighcharts from 'react-highcharts'
 
 import { generateGradientColors } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { Name } from '@/shared/types'
+import { NameWithCode } from '@/shared/types'
 
 exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
@@ -22,7 +22,7 @@ export const ProgrammeProgressChart = ({
 }: {
   data: number[][]
   labels: string[]
-  longLabels: Record<string, Name & { code: string }>
+  longLabels: Record<string, NameWithCode>
   names: string[]
 }) => {
   const { getTextIn } = useLanguage()
