@@ -77,7 +77,7 @@ export const FacultyBarChart = ({
   }
 
   return (
-    <Paper data-cy={`Graph-${cypress}`} sx={{ padding: 2 }} variant="outlined">
+    <Paper data-cy={`${cypress}BarChart`} sx={{ padding: 2 }} variant="outlined">
       <ReactHighcharts config={config} />
     </Paper>
   )

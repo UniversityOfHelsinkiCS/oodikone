@@ -17,17 +17,17 @@ export const InfoBox = ({
     <Tooltip
       arrow
       title={
-        <Typography component="div" data-cy={`${cypress}-info-content`} sx={{ padding: 1 }} variant="body2">
+        <Typography component="div" data-cy={`${cypress}InfoBoxContent`} sx={{ padding: 1 }} variant="body2">
           <ReactMarkdown>{formatContent(content)}</ReactMarkdown>
         </Typography>
       }
     >
       {mini ? (
-        <IconButton>
+        <IconButton data-cy={`${cypress}InfoBoxButton`}>
           <HelpOutline fontSize="small" />
         </IconButton>
       ) : (
-        <Button color="info" startIcon={<HelpOutline />} variant="outlined">
+        <Button color="info" data-cy={`${cypress}InfoBoxButton`} startIcon={<HelpOutline />} variant="outlined">
           Info
         </Button>
       )}

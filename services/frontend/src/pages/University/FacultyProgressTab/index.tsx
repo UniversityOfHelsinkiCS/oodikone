@@ -19,7 +19,7 @@ export const FacultyProgressTab = () => {
   return (
     <Box>
       <Section
-        cypress="InfoFacultyProgress"
+        cypress="FacultyProgress"
         infoBoxContent={facultyToolTips.studentProgress}
         title="Progress of students of the university"
       >
@@ -34,7 +34,7 @@ export const FacultyProgressTab = () => {
             value={excludeGraduated}
           />
           <Toggle
-            cypress="StudentToggle"
+            cypress="StudyRightToggle"
             disabled={progressStats.isLoading || progressStats.isError}
             firstLabel="All study rights"
             infoBoxContent={facultyToolTips.studentToggle}

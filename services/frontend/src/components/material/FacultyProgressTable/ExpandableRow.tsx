@@ -7,17 +7,17 @@ const roundValue = (value: number | string | undefined) => {
 const getKey = (value: number | string, index: number) => `${value}-${index}`
 
 export const ExpandableRow = ({
-  icon,
-  yearArray,
   cypress,
-  yearIndex,
+  icon,
   toggleVisibility,
+  yearArray,
+  yearIndex,
 }: {
-  icon: React.ReactNode
-  yearArray: (number | string)[]
   cypress: string
-  yearIndex: number
+  icon: React.ReactNode
   toggleVisibility: () => void
+  yearArray: (number | string)[]
+  yearIndex: number
 }) => {
   return (
     <TableRow>
@@ -25,7 +25,7 @@ export const ExpandableRow = ({
         <TableCell align={index === 0 ? 'center' : 'right'} key={getKey(value, index)}>
           {index === 0 ? (
             <Box alignItems="center" display="flex" justifyContent="center">
-              <IconButton data-cy={`Button-${cypress}-${yearIndex}`} onClick={toggleVisibility} size="small">
+              <IconButton data-cy={`${cypress}${yearIndex}`} onClick={toggleVisibility} size="small">
                 {icon}
               </IconButton>
               <Typography variant="body2">{value}</Typography>

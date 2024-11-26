@@ -16,6 +16,7 @@ accessibility(ReactHighcharts.Highcharts)
 
 export const MedianBarChart = ({
   classSizes,
+  cypress,
   data,
   facultyGraph = true,
   facultyNames,
@@ -38,6 +39,7 @@ export const MedianBarChart = ({
           doctor: Record<string, number>
         }
       }
+  cypress: string
   data: GraduationStats[]
   facultyGraph?: boolean
   facultyNames: Record<string, NameWithCode>
@@ -268,7 +270,7 @@ export const MedianBarChart = ({
   }
 
   return (
-    <Box width={{ sm: '100%', md: '50%' }}>
+    <Box data-cy={cypress} width={{ sm: '100%', md: '50%' }}>
       <ReactHighcharts config={config} />
     </Box>
   )

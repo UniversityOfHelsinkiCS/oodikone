@@ -15,6 +15,7 @@ exportData(ReactHighcharts.Highcharts)
 accessibility(ReactHighcharts.Highcharts)
 
 export const BreakdownBarChart = ({
+  cypress,
   data,
   handleClick,
   facultyGraph = true,
@@ -23,6 +24,7 @@ export const BreakdownBarChart = ({
   mode,
   yearLabel,
 }: {
+  cypress: string
   data: Array<GraduationStats & { code?: string }>
   handleClick: (event, isFacultyGraph: boolean, seriesCategory?: number) => void
   facultyGraph?: boolean
@@ -152,7 +154,7 @@ export const BreakdownBarChart = ({
   }
 
   return (
-    <Box width={{ sm: '100%', md: '50%' }}>
+    <Box data-cy={cypress} width={{ sm: '100%', md: '50%' }}>
       <ReactHighcharts config={config} />
     </Box>
   )

@@ -75,7 +75,7 @@ export const GraduationTimes = ({
   const dataIsLoaded = classSizes && data && facultyNames && goal && levelProgrammeData
 
   return (
-    <Section cypress={`section-${level}`} isError={isError} isLoading={isLoading && !dataIsLoaded} title={title}>
+    <Section cypress={`${level}GraduationTimes`} isError={isError} isLoading={isLoading && !dataIsLoaded} title={title}>
       {showMedian && dataIsLoaded && (
         <MedianDisplay
           classSizes={classSizes}
@@ -94,11 +94,12 @@ export const GraduationTimes = ({
           yearLabel={yearLabel}
         />
       )}
-      {dataIsLoaded && (
+      {!showMedian && dataIsLoaded && (
         <BreakdownDisplay
           data={data}
           facultyNames={facultyNames}
           handleClick={handleClick}
+          level={level}
           levelProgrammeData={levelProgrammeData}
           mode={mode}
           programmeDataVisible={programmeDataVisible}

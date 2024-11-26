@@ -14,7 +14,11 @@ export const FacultyGraduationsTab = () => {
 
   return (
     <Box>
-      <Section infoBoxContent={facultyToolTips.averageGraduationTimes} title="Average graduation times">
+      <Section
+        cypress="AverageGraduationTimes"
+        infoBoxContent={facultyToolTips.averageGraduationTimes}
+        title="Average graduation times"
+      >
         <Box display="flex" justifyContent="center">
           <Toggle
             cypress="GraduationTimeToggle"

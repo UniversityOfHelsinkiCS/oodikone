@@ -7,6 +7,7 @@ export const BreakdownDisplay = ({
   data,
   facultyNames,
   handleClick,
+  level,
   levelProgrammeData,
   mode,
   programmeDataVisible,
@@ -16,6 +17,7 @@ export const BreakdownDisplay = ({
   data: GraduationStats[]
   facultyNames: Record<string, NameWithCode>
   handleClick: (event, isFacultyGraph: boolean, seriesCategory?: number) => void
+  level: 'bachelor' | 'bcMsCombo' | 'master' | 'doctor'
   levelProgrammeData: Record<
     number,
     {
@@ -32,9 +34,10 @@ export const BreakdownDisplay = ({
     <Box>
       <Typography>Click a bar to view that year's {mode} level breakdown</Typography>
       <Stack direction={{ sm: 'column', md: 'row' }}>
-        <BreakdownBarChart data={data} handleClick={handleClick} mode={mode} />
+        <BreakdownBarChart cypress={`${level}BreakdownBarChart`} data={data} handleClick={handleClick} mode={mode} />
         {programmeDataVisible && year && year in levelProgrammeData && (
           <BreakdownBarChart
+            cypress={`${level}BreakdownBarChartFaculty`}
             data={levelProgrammeData[year].data}
             facultyGraph={false}
             facultyNames={facultyNames}

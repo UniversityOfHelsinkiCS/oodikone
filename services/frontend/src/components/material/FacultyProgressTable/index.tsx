@@ -55,7 +55,7 @@ export const FacultyProgressTable = ({
                 {!isTotalRow(yearArray) ? (
                   <>
                     <ExpandableRow
-                      cypress={visibleYears[yearIndex] ? `Hide-${cypress}` : `Show-${cypress}`}
+                      cypress={visibleYears[yearIndex] ? `${cypress}HideButton` : `${cypress}ShowButton`}
                       icon={visibleYears[yearIndex] ? <KeyboardArrowDown /> : <KeyboardArrowRight />}
                       toggleVisibility={() => toggleVisibility(yearIndex)}
                       yearArray={yearArray}
@@ -70,7 +70,7 @@ export const FacultyProgressTable = ({
                         }}
                       >
                         <Collapse in={visibleYears[yearIndex]} timeout="auto" unmountOnExit>
-                          <Box data-cy={`Cell-${cypress}-${yearIndex}`} padding={1}>
+                          <Box padding={1}>
                             <ProgrammeProgressChart
                               data={sortedKeys?.map(programme => programmeStats[programme][yearIndex])}
                               labels={sortedKeys}

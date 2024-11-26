@@ -34,8 +34,8 @@ export const University = () => {
       <PageTitle title="University" />
       <ExcludedMessage />
       <Tabs onChange={handleTabChange} sx={{ marginBottom: 2 }} value={activeTab}>
-        <Tab label="Faculty progress" />
-        <Tab label="Faculty graduations" />
+        <Tab data-cy="FacultyProgressTab" label="Faculty progress" />
+        <Tab data-cy="FacultyGraduationsTab" label="Faculty graduations" />
       </Tabs>
       {activeTab === 0 && <FacultyProgressTab />}
       {activeTab === 1 && <FacultyGraduationsTab />}

@@ -38,7 +38,7 @@ export const FacultyProgress = ({
               }}
             />
             <FacultyProgressTable
-              cypress="Table-FacultyBachelorsProgress"
+              cypress="FacultyBachelorsProgressTable"
               data={bachelorStats?.tableStats}
               programmeNames={progressStats?.programmeNames}
               programmeStats={progressStats?.bachelorsProgStats}
@@ -56,6 +56,7 @@ export const FacultyProgress = ({
         )}
       </Section>
       <Section
+        cypress="FacultyBachelorMastersProgress"
         infoBoxContent={facultyToolTips.bachelorMasterProgress}
         isError={isError}
         isLoading={isLoading && !bachelorMasterStats}
@@ -72,7 +73,7 @@ export const FacultyProgress = ({
               }}
             />
             <FacultyProgressTable
-              cypress="Table-FacultyBachelorMastersProgress"
+              cypress="FacultyBachelorMastersProgressTable"
               data={bachelorMasterStats.tableStats}
               programmeNames={progressStats?.programmeNames}
               programmeStats={progressStats?.bcMsProgStats}
@@ -98,7 +99,7 @@ export const FacultyProgress = ({
               }}
             />
             <FacultyProgressTable
-              cypress="Table-FacultyMastersProgress"
+              cypress="FacultyMastersProgressTable"
               data={masterStats.tableStats}
               programmeNames={progressStats?.programmeNames}
               programmeStats={progressStats?.mastersProgStats}
@@ -124,7 +125,7 @@ export const FacultyProgress = ({
               }}
             />
             <FacultyProgressTable
-              cypress="Table-FacultyDoctoralProgress"
+              cypress="FacultyDoctoralProgressTable"
               data={doctorStats.tableStats}
               programmeNames={progressStats?.programmeNames}
               programmeStats={progressStats?.doctoralProgStats}
