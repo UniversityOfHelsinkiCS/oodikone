@@ -1,6 +1,6 @@
 import { Box, Stack, Typography } from '@mui/material'
 
-import { GraduationStats, NameWithCode } from '@/shared/types'
+import { GraduationStats, NameWithCode, ProgrammeMedians } from '@/shared/types'
 import { MedianBarChart } from './MedianBarChart'
 
 export const MedianDisplay = ({
@@ -40,13 +40,7 @@ export const MedianDisplay = ({
   groupBy: 'byGradYear' | 'byStartYear'
   handleClick: (event, isFacultyGraph: boolean, seriesCategory?: number) => void
   level: 'bachelor' | 'bcMsCombo' | 'master' | 'doctor'
-  levelProgrammeData: Record<
-    string,
-    {
-      data: Array<GraduationStats & { code: string }>
-      programmes: string[]
-    }
-  >
+  levelProgrammeData: ProgrammeMedians
   mode: 'faculty' | 'programme'
   programmeDataVisible: boolean
   title: string

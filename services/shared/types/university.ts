@@ -12,6 +12,8 @@ export type GraduationStats = {
   times: number[]
 }
 
+export type ProgrammeMedians = Record<number, { data: Array<GraduationStats & { code: string }>; programmes: string[] }>
+
 export interface AllGraduationStatsResponse {
   byGradYear: {
     medians: {
@@ -22,10 +24,10 @@ export interface AllGraduationStatsResponse {
     }
     programmes: {
       medians: {
-        bachelor: Record<number, { data: Array<GraduationStats & { code: string }>; programmes: string[] }>
-        bcMsCombo: Record<number, { data: Array<GraduationStats & { code: string }>; programmes: string[] }>
-        doctor: Record<number, { data: Array<GraduationStats & { code: string }>; programmes: string[] }>
-        master: Record<number, { data: Array<GraduationStats & { code: string }>; programmes: string[] }>
+        bachelor: ProgrammeMedians
+        bcMsCombo: ProgrammeMedians
+        doctor: ProgrammeMedians
+        master: ProgrammeMedians
       }
     }
   }
