@@ -2,62 +2,55 @@ import { createContext, useCallback, useContext, useEffect, useState, ReactNode 
 
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useModifyLanguageMutation } from '@/redux/users'
-import { DEFAULT_LANG, LANGUAGE_CODES } from '@/shared/language'
-import { Language } from '@/shared/types'
+import { DEFAULT_LANG, isLanguage, Language } from '@/shared/language'
+import { Name } from '@/shared/types'
 
-const LanguageContext = createContext<[Language, (language: Language) => void]>([DEFAULT_LANG, () => {}])
+type LanguageContextType = [Language, React.Dispatch<React.SetStateAction<Language>>]
+
+const LanguageContext = createContext<LanguageContextType>([DEFAULT_LANG, () => {}])
 LanguageContext.displayName = 'Language'
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  let language: Language = DEFAULT_LANG
-  const [state, setState] = useState<Language>(language)
-
+  const [state, setState] = useState<Language>(DEFAULT_LANG)
   const user = useGetAuthorizedUserQuery()
-  if (user) {
-    language = user.language
-  }
 
   useEffect(() => {
-    if (LANGUAGE_CODES.includes(user?.language)) {
-      setState(user.language)
+    const userLanguage = user?.language
+    if (isLanguage(userLanguage)) {
+      setState(userLanguage)
     }
-  }, [language])
+  }, [user?.language])
 
   return <LanguageContext.Provider value={[state, setState]}>{children}</LanguageContext.Provider>
-}
-
-const getTextInWithLanguage = (texts: Record<string, string>, language: Language) => {
-  if (texts) {
-    return texts[language] || texts.fi || texts.en || texts.sv || Object.values(texts)[0]
-  }
-  return null
 }
 
 export const useLanguage = () => {
   const [state, setState] = useContext(LanguageContext)
   const [changeLanguage] = useModifyLanguageMutation()
 
-  const getTextIn = useCallback((text: Record<string, string>) => getTextInWithLanguage(text, state), [state])
+  const getTextIn = useCallback(
+    (text: Name | null | undefined, lang?: string): string | null | undefined => {
+      if (text == null || Object.values(text).length === 0) {
+        return null
+      }
+      const languageToUse = lang ?? state
+      return text[languageToUse] ?? text.fi ?? text.en ?? text.sv ?? Object.values(text)[0]
+    },
+    [state]
+  )
 
-  const getTextInWrapped = (item: any, lang?: Language) => {
-    if (!lang) {
-      return getTextIn(item)
-    }
-    return getTextInWithLanguage(item, lang)
-  }
-
-  const setLanguage = (newLanguage: Language) => {
-    if (!LANGUAGE_CODES.includes(newLanguage)) {
-      throw new Error('Illegal language code passed to useLanguage hook!')
+  const setLanguage = async (newLanguage: unknown) => {
+    if (!isLanguage(newLanguage)) {
+      throw new Error(`Illegal language code ${newLanguage} passed to useLanguage hook!`)
     }
 
     setState(newLanguage)
-    void changeLanguage({ language: newLanguage })
+    await changeLanguage({ language: newLanguage })
   }
 
   return {
     language: state,
     setLanguage,
-    getTextIn: getTextInWrapped,
+    getTextIn,
   }
 }

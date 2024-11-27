@@ -1,7 +1,8 @@
 import { InferAttributes } from 'sequelize'
 
 import { User } from '../models/user'
-import { Language, Role } from '../shared/types'
+import { Language } from '../shared/language'
+import { Role } from '../shared/types'
 import { DetailedProgrammeRights } from './detailedProgrammeRights'
 
 export type ExpandedUser = InferAttributes<User> & {

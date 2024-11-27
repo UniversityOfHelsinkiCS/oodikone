@@ -4,8 +4,7 @@ import { roles } from '../config/roles'
 import * as auth from '../middleware/auth'
 import { sendNotificationAboutAccessToUser, previewNotificationAboutAccessToUser } from '../services/mailService'
 import * as userService from '../services/userService'
-import { LANGUAGE_CODES } from '../shared/language'
-import { Language } from '../shared/types'
+import { LANGUAGE_CODES, Language } from '../shared/language'
 import logger from '../util/logger'
 
 const router = Router()

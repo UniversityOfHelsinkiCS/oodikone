@@ -23,10 +23,7 @@ export const StudyTrackSelector = ({ track, setTrack, studyTracks }: StudyTrackS
   }
 
   const getOptionName = (studyTrack: string | Name) => {
-    if (studyTrack !== 'All students of the programme') {
-      return getTextIn(studyTrack)
-    }
-    return studyTrack
+    return typeof studyTrack === 'string' ? studyTrack : getTextIn(studyTrack)
   }
 
   const studyTrackOptions = Object.entries(studyTracks)
