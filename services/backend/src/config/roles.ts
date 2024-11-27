@@ -3,7 +3,6 @@ export const roles = [
   'courseStatistics',
   'facultyStatistics',
   'fullSisuAccess',
-  'katselmusViewer',
   'openUniSearch',
   'studyGuidanceGroups',
   'teachers',

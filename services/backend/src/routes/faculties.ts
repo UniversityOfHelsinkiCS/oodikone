@@ -43,35 +43,31 @@ interface GetStatsRequest extends Request {
   }
 }
 
-router.get(
-  '/:id/basicstats',
-  auth.roles(['facultyStatistics', 'katselmusViewer']),
-  async (req: GetStatsRequest, res: Response) => {
-    const facultyId = req.params.id
-    const code = await getFacultyCodeById(facultyId)
-    if (!code) {
-      return res.status(422).end()
-    }
-
-    const { year_type: yearType, programme_filter: programmeFilter, special_groups: specialGroups } = req.query
-    const data = await getBasicStats(code, yearType, programmeFilter, specialGroups)
-    if (data) {
-      return res.json(data)
-    }
-
-    const programmes = await getDegreeProgrammesOfFaculty(code, programmeFilter === 'NEW_STUDY_PROGRAMMES')
-    if (!programmes.length) {
-      return res.status(422).end()
-    }
-
-    // TODO: The types could be handled better. Possible null value is causing issues with TS.
-    let updatedStats: any = await combineFacultyBasics(code, programmes, yearType, specialGroups)
-    if (updatedStats) {
-      updatedStats = await setBasicStats(updatedStats, yearType, programmeFilter, specialGroups)
-    }
-    return res.json(updatedStats)
+router.get('/:id/basicstats', auth.roles(['facultyStatistics']), async (req: GetStatsRequest, res: Response) => {
+  const facultyId = req.params.id
+  const code = await getFacultyCodeById(facultyId)
+  if (!code) {
+    return res.status(422).end()
   }
-)
+
+  const { year_type: yearType, programme_filter: programmeFilter, special_groups: specialGroups } = req.query
+  const data = await getBasicStats(code, yearType, programmeFilter, specialGroups)
+  if (data) {
+    return res.json(data)
+  }
+
+  const programmes = await getDegreeProgrammesOfFaculty(code, programmeFilter === 'NEW_STUDY_PROGRAMMES')
+  if (!programmes.length) {
+    return res.status(422).end()
+  }
+
+  // TODO: The types could be handled better. Possible null value is causing issues with TS.
+  let updatedStats: any = await combineFacultyBasics(code, programmes, yearType, specialGroups)
+  if (updatedStats) {
+    updatedStats = await setBasicStats(updatedStats, yearType, programmeFilter, specialGroups)
+  }
+  return res.json(updatedStats)
+})
 
 interface GetCreditStatsRequest extends Request {
   query: {
@@ -79,46 +75,38 @@ interface GetCreditStatsRequest extends Request {
   }
 }
 
-router.get(
-  '/:id/creditstats',
-  auth.roles(['facultyStatistics', 'katselmusViewer']),
-  async (req: GetCreditStatsRequest, res: Response) => {
-    const facultyId = req.params.id
-    const code = await getFacultyCodeById(facultyId)
-    const { year_type: yearType } = req.query
-    const stats = await getFacultyCredits(code, yearType === 'ACADEMIC_YEAR')
-    return res.json(stats)
+router.get('/:id/creditstats', auth.roles(['facultyStatistics']), async (req: GetCreditStatsRequest, res: Response) => {
+  const facultyId = req.params.id
+  const code = await getFacultyCodeById(facultyId)
+  const { year_type: yearType } = req.query
+  const stats = await getFacultyCredits(code, yearType === 'ACADEMIC_YEAR')
+  return res.json(stats)
+})
+
+router.get('/:id/thesisstats', auth.roles(['facultyStatistics']), async (req: GetStatsRequest, res: Response) => {
+  const facultyId = req.params.id
+  const code = await getFacultyCodeById(facultyId)
+  if (!code) {
+    return res.status(422).end()
   }
-)
 
-router.get(
-  '/:id/thesisstats',
-  auth.roles(['facultyStatistics', 'katselmusViewer']),
-  async (req: GetStatsRequest, res: Response) => {
-    const facultyId = req.params.id
-    const code = await getFacultyCodeById(facultyId)
-    if (!code) {
-      return res.status(422).end()
-    }
-
-    const { year_type: yearType, programme_filter: programmeFilter, special_groups: specialGroups } = req.query
-    const data = await getThesisWritersStats(code, yearType, programmeFilter, specialGroups)
-    if (data) {
-      return res.json(data)
-    }
-
-    const programmes = await getDegreeProgrammesOfFaculty(code, programmeFilter === 'NEW_STUDY_PROGRAMMES')
-    if (!programmes.length) {
-      return res.status(422).end()
-    }
-
-    let updatedStats: any = await combineFacultyThesisWriters(code, programmes, yearType, specialGroups)
-    if (updatedStats) {
-      updatedStats = await setThesisWritersStats(updatedStats, yearType, programmeFilter, specialGroups)
-    }
-    return res.json(updatedStats)
+  const { year_type: yearType, programme_filter: programmeFilter, special_groups: specialGroups } = req.query
+  const data = await getThesisWritersStats(code, yearType, programmeFilter, specialGroups)
+  if (data) {
+    return res.json(data)
   }
-)
+
+  const programmes = await getDegreeProgrammesOfFaculty(code, programmeFilter === 'NEW_STUDY_PROGRAMMES')
+  if (!programmes.length) {
+    return res.status(422).end()
+  }
+
+  let updatedStats: any = await combineFacultyThesisWriters(code, programmes, yearType, specialGroups)
+  if (updatedStats) {
+    updatedStats = await setThesisWritersStats(updatedStats, yearType, programmeFilter, specialGroups)
+  }
+  return res.json(updatedStats)
+})
 
 interface GetGraduationStatsRequest extends Request {
   query: {
@@ -128,7 +116,7 @@ interface GetGraduationStatsRequest extends Request {
 
 router.get(
   '/:id/graduationtimes',
-  auth.roles(['facultyStatistics', 'katselmusViewer']),
+  auth.roles(['facultyStatistics']),
   async (req: GetGraduationStatsRequest, res: Response) => {
     const facultyId = req.params.id
     const code = await getFacultyCodeById(facultyId)
@@ -164,7 +152,7 @@ interface GetProgressStatsRequest extends Request {
 
 router.get(
   '/:id/progressstats',
-  auth.roles(['facultyStatistics', 'katselmusViewer']),
+  auth.roles(['facultyStatistics']),
   async (req: GetProgressStatsRequest, res: Response) => {
     const facultyId = req.params.id
     const code = await getFacultyCodeById(facultyId)
@@ -195,7 +183,7 @@ interface GetStudentStatsRequest extends GetProgressStatsRequest {}
 
 router.get(
   '/:id/studentstats',
-  auth.roles(['facultyStatistics', 'katselmusViewer']),
+  auth.roles(['facultyStatistics']),
   async (req: GetStudentStatsRequest, res: Response) => {
     const facultyId = req.params.id
     const code = await getFacultyCodeById(facultyId)
@@ -231,7 +219,7 @@ interface GetUpdateBasicViewRequest extends Request {
 
 router.get(
   '/:id/update_basicview',
-  auth.roles(['facultyStatistics', 'katselmusViewer']),
+  auth.roles(['facultyStatistics']),
   async (req: GetUpdateBasicViewRequest, res: Response) => {
     const facultyId = req.params.id
     const code = await getFacultyCodeById(facultyId)
@@ -250,24 +238,20 @@ router.get(
   }
 )
 
-router.get(
-  '/:id/update_progressview',
-  auth.roles(['facultyStatistics', 'katselmusViewer']),
-  async (req: Request, res: Response) => {
-    const facultyId = req.params.id
-    const code = await getFacultyCodeById(facultyId)
-    if (!code) {
-      return res.status(422).end()
-    }
-    try {
-      const result = await updateFacultyProgressOverview(code)
-      return res.json(result)
-    } catch (error) {
-      const message = `Failed to update progress tab stats for faculty ${code}`
-      logger.error(message, { error })
-      return res.status(500).json({ error: message })
-    }
+router.get('/:id/update_progressview', auth.roles(['facultyStatistics']), async (req: Request, res: Response) => {
+  const facultyId = req.params.id
+  const code = await getFacultyCodeById(facultyId)
+  if (!code) {
+    return res.status(422).end()
   }
-)
+  try {
+    const result = await updateFacultyProgressOverview(code)
+    return res.json(result)
+  } catch (error) {
+    const message = `Failed to update progress tab stats for faculty ${code}`
+    logger.error(message, { error })
+    return res.status(500).json({ error: message })
+  }
+})
 
 export default router
