@@ -13,8 +13,6 @@ export const UserButton = () => {
   const { isLoading, mockedBy, username } = useGetAuthorizedUserQuery()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
-  const currentLanguage: string = language as unknown as string // TODO: Fix the type in the origin
-
   const languageOptions = LANGUAGE_CODES.map(code => ({
     key: code,
     text: LANGUAGE_TEXTS[code],
@@ -24,10 +22,12 @@ export const UserButton = () => {
   return (
     <Box sx={{ flexGrow: 0 }}>
       <IconButton
-        color="inherit"
         data-cy="nav-bar-user-button"
         onClick={event => setAnchorEl(event.currentTarget)}
-        sx={{ p: 0 }}
+        sx={{
+          color: mockedBy ? theme => theme.palette.warning.light : 'inherit',
+          padding: 0,
+        }}
       >
         <AccountCircle />
       </IconButton>
@@ -62,9 +62,9 @@ export const UserButton = () => {
           <Typography>Language</Typography>
         </MenuItem>
         {languageOptions.map(({ key, text, value }) => (
-          <MenuItem key={key} onClick={() => setLanguage(value)} selected={currentLanguage === value}>
-            <ListItemIcon>{currentLanguage === value ? <Check fontSize="small" /> : null}</ListItemIcon>
-            <Typography fontWeight={currentLanguage === value ? 'bold' : 'normal'}>{text}</Typography>
+          <MenuItem key={key} onClick={() => setLanguage(value)} selected={language === value}>
+            <ListItemIcon>{language === value ? <Check fontSize="small" /> : null}</ListItemIcon>
+            <Typography fontWeight={language === value ? 'bold' : 'normal'}>{text}</Typography>
           </MenuItem>
         ))}
         <Divider />
