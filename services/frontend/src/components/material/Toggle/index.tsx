@@ -20,10 +20,12 @@ export const Toggle = ({
   infoBoxContent?: string
 }) => {
   return (
-    <Stack alignItems="center" direction="row">
-      <Typography color={disabled ? 'text.secondary' : 'text.primary'}>{firstLabel}</Typography>
-      <Switch checked={value} data-cy={cypress} disabled={disabled} onChange={() => setValue(!value)} />
-      <Typography color={disabled ? 'text.secondary' : 'text.primary'}>{secondLabel}</Typography>
+    <Stack alignItems="center" direction="row" gap={1}>
+      <Stack alignItems="center" direction="row">
+        <Typography color={disabled ? 'text.secondary' : 'text.primary'}>{firstLabel}</Typography>
+        <Switch checked={value} data-cy={cypress} disabled={disabled} onChange={() => setValue(!value)} />
+        <Typography color={disabled ? 'text.secondary' : 'text.primary'}>{secondLabel}</Typography>
+      </Stack>
       {infoBoxContent && <InfoBox content={infoBoxContent} mini />}
     </Stack>
   )

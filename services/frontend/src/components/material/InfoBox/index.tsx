@@ -23,7 +23,7 @@ export const InfoBox = ({
       }
     >
       {mini ? (
-        <IconButton data-cy={`${cypress}InfoBoxButton`}>
+        <IconButton data-cy={`${cypress}InfoBoxButton`} sx={{ padding: 0 }}>
           <HelpOutline fontSize="small" />
         </IconButton>
       ) : (
