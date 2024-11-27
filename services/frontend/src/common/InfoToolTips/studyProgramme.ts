@@ -155,11 +155,6 @@ studyProgrammeToolTips.studyTrackOverviewCombinedProgramme = studyProgrammeToolT
     'kentän **All** arvon (lukuun ottamatta *Current status* -kategorian **Graduated bachelor** -saraketta).'
   )
 
-studyProgrammeToolTips.studyTrackProgressEvaluationOverview = studyProgrammeToolTips.studyTrackProgress.replace(
-  'Jos sivun yläosassa on valittuna ”All study rights” (oletus), mukana ovat myös ohjelmaan siirtyneet ja ohjelmasta pois siirtyneet opiskelijat.',
-  ''
-)
-
 studyProgrammeToolTips.averageGraduationTimesStudyTracksMaster =
   studyProgrammeToolTips.averageGraduationTimesStudyTracks.replace(
     'on valmistunut.',

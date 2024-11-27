@@ -18,10 +18,6 @@ const studyProgrammeApi = RTKApi.injectEndpoints({
           codes
         )}&isAcademicYear=${isAcademicYear}&includeSpecials=${specialGroups}`,
     }),
-    getEvaluationStats: builder.query({
-      query: ({ id, yearType, specialGroups, graduated }) =>
-        `/v2/studyprogrammes/${id}/evaluationstats?year_type=${yearType}&special_groups=${specialGroups}&graduated=${graduated}`,
-    }),
     getGraduationStats: builder.query({
       query: ({ id, yearType, specialGroups, combinedProgramme }) =>
         `/v2/studyprogrammes/${id}/graduationstats?year_type=${yearType}&special_groups=${specialGroups}&combined_programme=${combinedProgramme}`,
@@ -53,7 +49,6 @@ export const {
   useGetBasicStatsQuery,
   useGetColorizedTableCourseStatsQuery,
   useGetCreditStatsQuery,
-  useGetEvaluationStatsQuery,
   useGetGraduationStatsQuery,
   useGetStudyTrackStatsQuery,
   useGetProgrammeCoursesStatsQuery,
