@@ -13,7 +13,7 @@ export const isWithinSixMonths = (date: string) => moment(date) > moment().subtr
 
 export const momentFromFormat = (date: string, format: string) => moment(date, format)
 
-export const reformatDate = (date: string, outputFormat: string) => {
+export const reformatDate = (date: string | Date | null | undefined, outputFormat: string) => {
   if (!date) {
     return 'Unavailable'
   }

@@ -1,6 +1,15 @@
-import { col, Op, where } from 'sequelize'
+import { col, InferAttributes, Op, where } from 'sequelize'
 
-import { Course, Credit, Student, Studyplan, SISStudyRight, SISStudyRightElement } from '../../models'
+import {
+  Course,
+  Credit,
+  Organization,
+  ProgrammeModule,
+  Student,
+  Studyplan,
+  SISStudyRight,
+  SISStudyRightElement,
+} from '../../models'
 import { Name } from '../../shared/types'
 import { CreditTypeCode, DegreeProgrammeType, EnrollmentType, ExtentCode, SemesterEnrollment } from '../../types'
 import { redisClient } from '../redis'
@@ -40,6 +49,7 @@ type AccumulatorType = {
     startedAt: Date
     degreeProgrammeType: DegreeProgrammeType
   }
+  faculty: Name
   attainmentDates: AttainmentDates
   numberOfAbsentSemesters: number
   curriculumPeriod: string | null
@@ -88,7 +98,7 @@ const findThesisAndLatestAndEarliestAttainments = (
   return { attainmentDates, thesisData }
 }
 
-const formatStudent = (student: Student) => {
+const formatStudent = (student: InferAttributes<Student>, facultyMap: Record<string, Name>) => {
   const {
     studentnumber: studentNumber,
     abbreviatedname: name,
@@ -147,6 +157,7 @@ const formatStudent = (student: Student) => {
         startedAt: programmeStartDate,
         degreeProgrammeType,
       },
+      faculty: facultyMap[programmeCode],
       attainmentDates,
       numberOfAbsentSemesters,
       curriculumPeriod: getCurriculumVersion(studyPlan.curriculum_period_id),
@@ -159,8 +170,8 @@ const formatStudent = (student: Student) => {
   }, [])
 }
 
-export const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =>
-  (
+export const findStudentsCloseToGraduation = async (studentNumbers?: string[]) => {
+  const students = (
     await Student.findAll({
       attributes: [
         'abbreviatedname',
@@ -261,8 +272,30 @@ export const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =
       ],
       order: [[{ model: Credit, as: 'credits' }, 'attainment_date', 'DESC']],
     })
-  )
-    .flatMap(student => formatStudent(student.toJSON()))
+  ).map(student => student.toJSON())
+
+  const programmeCodes = [...new Set(students.flatMap(student => student.studyplans.map(sp => sp.programme_code)))]
+  const programmesWithFaculties = await ProgrammeModule.findAll({
+    attributes: ['code'],
+    where: {
+      code: {
+        [Op.in]: programmeCodes,
+      },
+    },
+    include: {
+      model: Organization,
+      attributes: ['name'],
+    },
+    raw: true,
+  })
+
+  const facultyMap: Record<string, Name> = {}
+  for (const programme of programmesWithFaculties) {
+    facultyMap[programme.code] = programme['organization.name']
+  }
+
+  return students
+    .flatMap(student => formatStudent(student, facultyMap))
     .reduce(
       (acc, student) => {
         if (student.programme.degreeProgrammeType === DegreeProgrammeType.BACHELOR) {
@@ -274,6 +307,7 @@ export const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =
       },
       { bachelor: [] as AccumulatorType[], masterAndLicentiate: [] as AccumulatorType[] }
     )
+}
 
 export const getCloseToGraduationData = async (studentNumbers?: string[]) => {
   if (!studentNumbers) {

@@ -16,7 +16,7 @@ export const getSemestersPresentFunctions = ({
 }) => {
   if (allSemesters?.length === 0 || !filteredStudents)
     return {
-      getSemesterEnrollmentsContent: () => {},
+      getSemesterEnrollmentsContent: () => null,
       getSemesterEnrollmentsVal: () => {},
       getFirstSemester: () => {},
       getLastSemester: () => {},
