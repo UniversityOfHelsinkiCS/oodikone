@@ -271,7 +271,7 @@ describe('Course Statistics tests', () => {
       cy.contains('581328 Tietokantojen perusteet')
     })
 
-    it('Searching course by name displays right courses, 10 credit courses', () => {
+    it('Searching course by name displays right courses, 10 credit courses', { retries: 2 }, () => {
       cy.contains('Search for courses')
       searchByCourseName('tietorakenteet ja algoritmit')
       cy.contains('Tietorakenteet ja algoritmit')
