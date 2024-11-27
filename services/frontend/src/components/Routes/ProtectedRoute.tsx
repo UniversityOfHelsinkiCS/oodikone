@@ -44,7 +44,7 @@ export const ProtectedRoute = ({
   }
 
   if (hasAccessToRoute()) {
-    return <Route component={component} exact location={location} path={path} {...rest} />
+    return <Route component={component} location={location} path={path} {...rest} />
   }
 
   return <AccessDeniedMessage />
