@@ -9,7 +9,6 @@ import {
   setStudyTrackStats,
 } from '../services/analyticsService'
 import { getCreditsProduced } from '../services/providerCredits'
-import { getProgrammeName } from '../services/studyProgramme'
 import { getBasicStatsForStudytrack } from '../services/studyProgramme/studyProgrammeBasics'
 import {
   getStudyProgrammeCoursesForStudyTrack,
@@ -222,75 +221,6 @@ router.get('/:id/update_studytrackview', async (req: GetUpdateViewRequest, res: 
     logger.error(message, { error })
     return res.status(500).json({ error: message })
   }
-})
-
-interface GetEvaluationStatsRequest extends Request {
-  query: {
-    graduated: Graduated
-    year_type: YearType
-    special_groups: SpecialGroups
-  }
-}
-
-router.get('/:id/evaluationstats', async (req: GetEvaluationStatsRequest, res: Response) => {
-  const code = req.params.id
-  const { graduated, year_type: yearType, special_groups: specialGroups } = req.query
-  if (!code) {
-    return res.status(422).end()
-  }
-  // Statistics for Tilannekuvalomake view
-  const combinedProgramme = ''
-  let gradData = await getGraduationStats(code, combinedProgramme, yearType, specialGroups)
-  if (!gradData) {
-    const updatedStats = await getGraduationStatsForStudyTrack({
-      studyProgramme: code,
-      combinedProgramme,
-      settings: {
-        isAcademicYear: yearType === 'ACADEMIC_YEAR',
-        includeAllSpecials: specialGroups === 'SPECIAL_INCLUDED',
-      },
-    })
-    if (updatedStats) {
-      await setGraduationStats(updatedStats, yearType, specialGroups)
-      gradData = updatedStats
-    }
-  }
-
-  let progressData = await getStudyTrackStats(code, combinedProgramme, graduated, specialGroups)
-  if (!progressData) {
-    const studyRightsOfProgramme = await getStudyRightsInProgramme(code, false, true)
-    const updated = await getStudyTrackStatsForStudyProgramme({
-      studyProgramme: code,
-      combinedProgramme,
-      settings: {
-        graduated: graduated === 'GRADUATED_INCLUDED',
-        specialGroups: specialGroups === 'SPECIAL_INCLUDED',
-      },
-      studyRightsOfProgramme,
-    })
-    if (updated) {
-      await setStudyTrackStats(updated, graduated, specialGroups)
-      progressData = updated
-    }
-  }
-
-  const programmeName = await getProgrammeName(code)
-
-  delete gradData.tableStats
-  delete gradData.graphStats
-  delete gradData.titles
-  const data = {
-    id: code,
-    programmeName,
-    status: gradData?.status,
-    lastUpdated: gradData.lastUpdated,
-    graduations: gradData,
-    creditCounts: progressData?.creditCounts,
-    creditCountsCombo: progressData?.creditCountsCombo,
-    years: progressData?.years,
-  }
-
-  return res.json(data)
 })
 
 export default router

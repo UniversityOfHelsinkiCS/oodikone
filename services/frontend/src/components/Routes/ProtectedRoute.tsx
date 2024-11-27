@@ -36,9 +36,6 @@ export const ProtectedRoute = ({
     if (path.includes('languagecenterview')) {
       return iamGroups.includes('grp-kielikeskus-esihenkilot')
     }
-    if (path.includes('evaluationoverview')) {
-      return location.pathname.includes('university') ? true : hasRequiredRoles
-    }
     if (path.includes('teachers')) {
       return hasRequiredRoles || hasFullAccessToTeacherData(roles, iamGroups)
     }

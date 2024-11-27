@@ -23,9 +23,9 @@ The roles `openUniSearch` and `studyGuidanceGroups` simply enable certain views 
 
 - Can see statistics of every course and year
 
-### katselemusViewer
+### katselmusViewer
 
-- Enables the _Evaluation overview_ view
+- Enables the _Evaluation overview_ view (deprecated)
 
 ### teachers
 

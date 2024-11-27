@@ -8,7 +8,6 @@ import { CoursePopulation } from '@/components/CoursePopulation'
 import { CourseStatistics } from '@/components/CourseStatistics'
 import { CustomOpenUniPopulation } from '@/components/CustomOpenUniPopulation'
 import { CustomPopulation } from '@/components/CustomPopulation'
-import { EvaluationOverview } from '@/components/EvaluationOverview'
 import { FacultyStatistics } from '@/components/FacultyStatistics'
 import { LanguageCenterView } from '@/components/LanguageCenterView'
 import { PopulationStatistics } from '@/components/PopulationStatistics'
@@ -38,7 +37,6 @@ const routes = {
   studyGuidanceGroups: '/studyguidancegroups/:groupid?',
   faculties: '/faculties/:facultyId?',
   customOpenUniPopulation: '/openunipopulation',
-  evaluationOverview: '/evaluationoverview/:level?/:id?',
   university: '/university',
   completedCoursesSearch: '/completedcoursessearch',
   languageCenterView: '/languagecenterview',
@@ -121,11 +119,6 @@ export const Routes = () => (
           requiredRoles={['admin']}
         />
       )}
-      <ProtectedRoute
-        component={EvaluationOverview}
-        path={routes.evaluationOverview}
-        requiredRoles={['admin', 'fullSisuAccess', 'katselmusViewer']}
-      />
       <ProtectedRoute component={University} path={routes.university} />
       <ProtectedRoute
         component={CloseToGraduation}
