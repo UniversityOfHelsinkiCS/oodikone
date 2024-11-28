@@ -41,7 +41,7 @@ type StudyGuidanceGroup = {
 }
 
 const getGroupsFromImporter = async (sisPersonId: string) => {
-  if (!importerClient) {
+  if (!importerClient || !sisPersonId) {
     return []
   }
   const answerTimeout = new Promise(resolve => setTimeout(resolve, 2000))

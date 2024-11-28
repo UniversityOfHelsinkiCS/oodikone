@@ -26,10 +26,11 @@ export const getUserIamAccess = async (
     return {}
   }
   try {
+    const getSisuAccess = !isStaging && sisPersonId != null && sisPersonId !== ''
     const { data: iamAccess } = await jamiClient.post('/', {
       userId: sisPersonId,
       iamGroups,
-      getSisuAccess: !isStaging,
+      getSisuAccess,
     })
     const { specialGroup } = iamAccess as { specialGroup: Record<string, boolean> }
     delete iamAccess.specialGroup
