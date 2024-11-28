@@ -7,7 +7,7 @@ import moment from 'moment'
 import { useEffect } from 'react'
 import { initShibbolethPinger } from 'unfuck-spa-shibboleth-session'
 
-import { AccessDenied } from '@/components/AccessDenied'
+import { AccessDenied } from '@/components/material/AccessDenied'
 import { Footer } from '@/components/material/Footer'
 import { NavigationBar } from '@/components/material/NavigationBar'
 import { Routes } from '@/components/Routes'
