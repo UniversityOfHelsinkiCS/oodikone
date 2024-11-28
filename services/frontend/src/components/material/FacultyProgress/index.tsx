@@ -25,6 +25,13 @@ export const FacultyProgress = ({
   const masterStats = calculateStats(creditCounts?.master, 120)
   const doctorStats = calculateStats(creditCounts?.doctor, 40, 0, 5)
 
+  const sortKeys = (stats: Record<string, number[][]>) => {
+    return sortProgrammeKeys(
+      Object.keys(stats).map(facultyId => [facultyId, progressStats!.programmeNames[facultyId].code]),
+      faculty
+    ).map(listObj => listObj[0])
+  }
+
   return (
     <>
       <Section isError={isError} isLoading={isLoading && !bachelorStats} title="Bachelor">
@@ -44,13 +51,7 @@ export const FacultyProgress = ({
               programmeNames={progressStats!.programmeNames}
               programmeStats={progressStats!.bachelorsProgStats}
               progressTitles={progressStats?.yearlyBachelorTitles}
-              sortedKeys={sortProgrammeKeys(
-                Object.keys(progressStats!.bachelorsProgStats).map(facultyId => [
-                  facultyId,
-                  progressStats!.programmeNames[facultyId].code,
-                ]),
-                faculty
-              ).map(listObj => listObj[0])}
+              sortedKeys={sortKeys(progressStats!.bachelorsProgStats)}
               titles={bachelorStats?.tableTitles}
             />
           </Stack>
@@ -79,13 +80,7 @@ export const FacultyProgress = ({
               programmeNames={progressStats!.programmeNames}
               programmeStats={progressStats!.bcMsProgStats}
               progressTitles={progressStats?.yearlyBcMsTitles}
-              sortedKeys={sortProgrammeKeys(
-                Object.keys(progressStats!.bcMsProgStats).map(facultyId => [
-                  facultyId,
-                  progressStats!.programmeNames[facultyId].code,
-                ]),
-                faculty
-              ).map(listObj => listObj[0])}
+              sortedKeys={sortKeys(progressStats!.bcMsProgStats)}
               titles={bachelorMasterStats.tableTitles}
             />
           </Stack>
@@ -108,13 +103,7 @@ export const FacultyProgress = ({
               programmeNames={progressStats!.programmeNames}
               programmeStats={progressStats!.mastersProgStats}
               progressTitles={progressStats?.yearlyMasterTitles}
-              sortedKeys={sortProgrammeKeys(
-                Object.keys(progressStats!.mastersProgStats).map(facultyId => [
-                  facultyId,
-                  progressStats!.programmeNames[facultyId].code,
-                ]),
-                faculty
-              ).map(listObj => listObj[0])}
+              sortedKeys={sortKeys(progressStats!.mastersProgStats)}
               titles={masterStats.tableTitles}
             />
           </Stack>
@@ -136,13 +125,7 @@ export const FacultyProgress = ({
               data={doctorStats.tableStats}
               programmeNames={progressStats!.programmeNames}
               programmeStats={progressStats!.doctoralProgStats}
-              sortedKeys={sortProgrammeKeys(
-                Object.keys(progressStats!.doctoralProgStats).map(facultyId => [
-                  facultyId,
-                  progressStats!.programmeNames[facultyId].code,
-                ]),
-                faculty
-              ).map(listObj => listObj[0])}
+              sortedKeys={sortKeys(progressStats!.doctoralProgStats)}
               titles={doctorStats.tableTitles}
             />
           </Stack>
