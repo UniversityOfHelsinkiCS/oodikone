@@ -1,8 +1,17 @@
 import { HelpOutline } from '@mui/icons-material'
-import { Button, IconButton, Tooltip, Typography } from '@mui/material'
+import { Button, IconButton, Tooltip, tooltipClasses, TooltipProps, Typography } from '@mui/material'
+import { styled } from '@mui/material/styles'
 import ReactMarkdown from 'react-markdown'
 
 import { formatContent } from '@/common'
+
+const CustomWidthTooltip = styled(({ className, ...props }: TooltipProps) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))({
+  [`& .${tooltipClasses.tooltip}`]: {
+    maxWidth: 500,
+  },
+})
 
 export const InfoBox = ({
   content,
@@ -14,7 +23,7 @@ export const InfoBox = ({
   mini?: boolean
 }) => {
   return (
-    <Tooltip
+    <CustomWidthTooltip
       arrow
       title={
         <Typography component="div" data-cy={`${cypress}InfoBoxContent`} sx={{ padding: 1 }} variant="body2">
@@ -27,10 +36,10 @@ export const InfoBox = ({
           <HelpOutline fontSize="small" />
         </IconButton>
       ) : (
-        <Button color="info" data-cy={`${cypress}InfoBoxButton`} startIcon={<HelpOutline />} variant="outlined">
+        <Button color="info" data-cy={`${cypress}InfoBoxButton`} startIcon={<HelpOutline />} variant="contained">
           Info
         </Button>
       )}
-    </Tooltip>
+    </CustomWidthTooltip>
   )
 }
