@@ -48,17 +48,18 @@ export const CloseToGraduation = () => {
       {
         accessorKey: 'student.studentNumber',
         header: 'Student number',
-        enableColumnFilter: false,
         Cell: ({ cell }) => (
           <StudentInfoItem
             sisPersonId={cell.row.original.student.sis_person_id}
             studentNumber={cell.getValue<string>()}
           />
         ),
+        filterFn: 'startsWith',
       },
       {
         accessorKey: 'student.name',
         header: 'Name',
+        filterFn: 'startsWith',
       },
       {
         accessorKey: 'student.phoneNumber',
@@ -95,6 +96,7 @@ export const CloseToGraduation = () => {
         id: 'startOfStudyRight',
         Cell: ({ cell }) => reformatDate(cell.getValue<Date>(), ISO_DATE_FORMAT),
         header: 'Start of study right',
+        filterVariant: 'date-range',
       },
       {
         accessorFn: row => new Date(row.programme.startedAt),
@@ -107,6 +109,7 @@ export const CloseToGraduation = () => {
             tooltipText="For students with only a study right in the master’s programme, this date is the same as 'Start of study right'. For students with study rights in both the bachelor’s and master’s programmes, this date represents when they started in the master’s programme (i.e. one day after graduating from the bachelor’s programme)."
           />
         ),
+        filterVariant: 'date-range',
       },
       {
         header: 'Completed credits – HOPS',
@@ -176,7 +179,6 @@ export const CloseToGraduation = () => {
             visible={cell.getValue<boolean>()}
           />
         ),
-
         Header: (
           <TableHeaderWithTooltip
             header="Thesis completed"
@@ -195,6 +197,7 @@ export const CloseToGraduation = () => {
             tooltipText="The date when the student last completed a course in their primary study plan"
           />
         ),
+        filterVariant: 'date-range',
       },
       {
         header: 'Latest attainment date – Total',
@@ -207,6 +210,7 @@ export const CloseToGraduation = () => {
             tooltipText="The date when the student last completed any course at the university"
           />
         ),
+        filterVariant: 'date-range',
       },
       {
         header: 'Earliest attainment date – HOPS',
@@ -219,6 +223,7 @@ export const CloseToGraduation = () => {
             tooltipText="The date when the student first completed a course in their primary study plan"
           />
         ),
+        filterVariant: 'date-range',
       },
     ],
     [getSemesterEnrollmentsContent, getSemesterEnrollmentsVal, getTextIn]

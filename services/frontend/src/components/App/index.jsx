@@ -1,6 +1,9 @@
 import { CssBaseline } from '@mui/material'
 import { ThemeProvider } from '@mui/material/styles'
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import * as Sentry from '@sentry/browser'
+import moment from 'moment'
 import { useEffect } from 'react'
 import { initShibbolethPinger } from 'unfuck-spa-shibboleth-session'
 
@@ -12,6 +15,12 @@ import { SegmentDimmer } from '@/components/SegmentDimmer'
 import { isProduction } from '@/conf'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { theme } from '@/theme'
+
+moment.updateLocale('en', {
+  week: {
+    dow: 1, // First day of week is Monday
+  },
+})
 
 const addUserDetailsToLoggers = ({ id, username, mockedBy }) => {
   if (!isProduction || !id || !username) {
@@ -28,12 +37,14 @@ const Layout = ({ children }) => (
       minHeight: '100vh',
     }}
   >
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <NavigationBar />
-      <main style={{ flex: 1 }}>{children}</main>
-      <Footer />
-    </ThemeProvider>
+    <LocalizationProvider dateAdapter={AdapterMoment}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <NavigationBar />
+        <main style={{ flex: 1 }}>{children}</main>
+        <Footer />
+      </ThemeProvider>
+    </LocalizationProvider>
   </div>
 )
 
