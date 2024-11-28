@@ -28,21 +28,30 @@ export const getDefaultMRTOptions = <TData extends MRT_RowData>(
   }
 
   return {
+    defaultColumn: {
+      muiFilterDatePickerProps: {
+        format: 'YYYY-MM-DD',
+      },
+    },
     enableColumnOrdering: true,
-    enableColumnPinning: true,
+    enableColumnDragging: false,
     enableFacetedValues: true,
     enableStickyHeader: true,
     initialState: {
       density: 'compact',
       pagination: {
-        pageSize: 100,
+        pageSize: 200,
         pageIndex: 0,
       },
+      showColumnFilters: true,
     },
     localization: language === 'fi' ? MRT_Localization_FI : MRT_Localization_EN,
+    muiPaginationProps: {
+      rowsPerPageOptions: [50, 100, 200, 300, 400, 500],
+    },
     muiTableHeadCellProps: {
       sx: theme => ({
-        verticalAlign: 'middle',
+        verticalAlign: 'bottom',
         borderWidth: '1px 1px 1px 0',
         borderStyle: 'solid',
         borderColor: theme.palette.grey[300],
