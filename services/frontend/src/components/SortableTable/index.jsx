@@ -40,8 +40,6 @@ export const SortableTable = ({
   hideHeaderBar,
   maxHeight = '80vh',
   onlyExportColumns = [],
-  pageNumber,
-  rowsPerPage,
   singleLine = true,
   stretch,
   striped = true,
@@ -142,14 +140,11 @@ export const SortableTable = ({
   }
 
   const content = () => {
-    const indexOfFirstColumn = (pageNumber - 1) * rowsPerPage
-    const dataBeingDisplayed =
-      rowsPerPage && pageNumber ? sortedData.slice(indexOfFirstColumn, indexOfFirstColumn + rowsPerPage) : sortedData
     return (
       <table className={classNames.join(' ')} id={tableId} style={tableStyles}>
         <thead>{headers}</thead>
         <tbody>
-          {dataBeingDisplayed.map(item => (
+          {sortedData.map(item => (
             <DataItem item={item} key={`dataItem-${getKey(item)}`} />
           ))}
         </tbody>

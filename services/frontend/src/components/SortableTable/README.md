@@ -25,8 +25,6 @@ Properties are optional unless they are in **bold**.
 | maxHeight                 | Overwrite the maximum height. Defaults to 80vh if not set.                                                                  |
 | useFilteredDataOnExport   | If true, uses filtered data (the data that's shown after applying all the selected filters) on exports. Defaults to true.   |
 | handleDisplayedDataChange | A function that is called with the displayed data when it changes. Can be used to update the state in the parent component. |
-| pageNumber                | The current page number, used for pagination (should be used through the component PaginatedSortableTable).                 |
-| rowsPerPage               | The number of rows per page, used for pagination (should be used through the component PaginatedSortableTable).             |
 
 ### Column/header settings
 

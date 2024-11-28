@@ -2,7 +2,6 @@ import { Suspense } from 'react'
 import { Redirect, Route, Switch } from 'react-router-dom'
 
 import { isDefaultServiceProvider } from '@/common'
-import { CloseToGraduation } from '@/components/CloseToGraduation'
 import { CompletedCourses } from '@/components/CompletedCoursesSearch'
 import { CoursePopulation } from '@/components/CoursePopulation'
 import { CourseStatistics } from '@/components/CourseStatistics'
@@ -20,7 +19,7 @@ import { Updater } from '@/components/Updater'
 import { Users } from '@/components/Users'
 import { languageCenterViewEnabled } from '@/conf'
 import { Changelog } from '@/pages/Changelog'
-import { CloseToGraduation as NewCloseToGraduation } from '@/pages/CloseToGraduation'
+import { CloseToGraduation } from '@/pages/CloseToGraduation'
 import { Feedback } from '@/pages/Feedback'
 import { FrontPage } from '@/pages/FrontPage'
 import { University } from '@/pages/University'
@@ -131,7 +130,6 @@ export const Routes = () => (
         />
       )}
       <ProtectedRoute component={University} exact path={routes.university} />
-      <ProtectedRoute component={NewCloseToGraduation} exact path="/close-to-graduation/new" />
       <ProtectedRoute
         component={CloseToGraduation}
         exact
