@@ -1,7 +1,10 @@
 import { Box, Container, Tab, Tabs, Typography } from '@mui/material'
+import { range } from 'lodash'
 import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from 'material-react-table'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
+import { getEnrollmentTypeTextForExcel, isFall } from '@/common'
+import { useCurrentSemester } from '@/common/hooks'
 import { closeToGraduationToolTips } from '@/common/InfoToolTips'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { CheckIconWithTitle } from '@/components/material/CheckIconWithTitle'
@@ -26,22 +29,35 @@ export const CloseToGraduation = () => {
   const [exportModalOpen, setExportModalOpen] = useState(false)
   const [exportData, setExportData] = useState<Record<string, unknown>[]>([])
   const { getTextIn, language } = useLanguage()
-  const allSemesters = Object.values(semesterData?.semesters ?? {})
-  const allSemestersMap = allSemesters.reduce<Record<string, (typeof allSemesters)[number]>>((acc, cur) => {
-    acc[cur.semestercode] = cur
-    return acc
-  }, {})
-  const { getSemesterEnrollmentsContent, getSemesterEnrollmentsVal } = getSemestersPresentFunctions({
-    getTextIn,
-    allSemesters,
-    allSemestersMap,
-    filteredStudents: students,
-    year: `${new Date().getFullYear() - Math.floor(NUMBER_OF_DISPLAYED_SEMESTERS / 2)}`,
-    programmeCode: null,
-    studentToSecondStudyrightEndMap: null,
-    studentToStudyrightEndMap: null,
-    semestersToAddToStart: null,
-  })
+  const allSemesters = useMemo(() => Object.values(semesterData?.semesters ?? {}), [semesterData?.semesters])
+  const { getSemesterEnrollmentsContent, getSemesterEnrollmentsVal } = useMemo(
+    () =>
+      getSemestersPresentFunctions({
+        getTextIn,
+        allSemesters,
+        allSemestersMap: semesterData?.semesters ?? {},
+        filteredStudents: students,
+        year: `${new Date().getFullYear() - Math.floor(NUMBER_OF_DISPLAYED_SEMESTERS / 2)}`,
+        programmeCode: null,
+        studentToSecondStudyrightEndMap: null,
+        studentToStudyrightEndMap: null,
+        semestersToAddToStart: null,
+      }),
+    [allSemesters, getTextIn, semesterData?.semesters, students]
+  )
+  const currentSemesterCode = useCurrentSemester()?.semestercode
+  const semestersToInclude = useMemo(
+    () =>
+      currentSemesterCode != null
+        ? range(
+            isFall(currentSemesterCode)
+              ? currentSemesterCode - NUMBER_OF_DISPLAYED_SEMESTERS + 2
+              : currentSemesterCode - NUMBER_OF_DISPLAYED_SEMESTERS + 1,
+            isFall(currentSemesterCode) ? currentSemesterCode + 2 : currentSemesterCode + 1
+          )
+        : [],
+    [currentSemesterCode]
+  )
 
   const columns = useMemo<MRT_ColumnDef<any>[]>(
     () => [
@@ -136,6 +152,7 @@ export const CloseToGraduation = () => {
       {
         header: 'Curriculum period',
         accessorKey: 'curriculumPeriod',
+        filterVariant: 'multi-select',
         Header: (
           <TableHeaderWithTooltip
             header="Curriculum period"
@@ -225,9 +242,39 @@ export const CloseToGraduation = () => {
         ),
         filterVariant: 'date-range',
       },
+      ...semestersToInclude.map(semester => ({
+        id: getTextIn(semesterData?.semesters[`${semester}`]?.name)!,
+        header: `Enrollment status – ${getTextIn(semesterData?.semesters[`${semester}`]?.name)}`,
+        accessorFn: row => {
+          if (!row.studyright.semesterEnrollments) {
+            return 'Not enrolled'
+          }
+          const enrollment = row.studyright.semesterEnrollments.find(enrollment => enrollment.semester === semester)
+          return getEnrollmentTypeTextForExcel(enrollment?.type, enrollment?.statutoryAbsence)
+        },
+        visibleInShowHideMenu: false,
+      })),
     ],
-    [getSemesterEnrollmentsContent, getSemesterEnrollmentsVal, getTextIn]
+    [getSemesterEnrollmentsContent, getSemesterEnrollmentsVal, getTextIn, semesterData?.semesters, semestersToInclude]
   )
+
+  const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
+    'student.name': false,
+    'student.phoneNumber': false,
+    'student.email': false,
+    'student.secondaryEmail': false,
+    semesterEnrollments: false,
+  })
+
+  useEffect(() => {
+    const hiddenColumns: Record<string, boolean> = {}
+    for (const column of columns) {
+      if (column.visibleInShowHideMenu === false) {
+        hiddenColumns[column.id ?? column.header] = false
+      }
+    }
+    setColumnVisibility(prev => ({ ...prev, ...hiddenColumns }))
+  }, [columns])
 
   const displayedData = (selectedTab === 0 ? students?.bachelor : students?.masterAndLicentiate) ?? []
 
@@ -240,14 +287,9 @@ export const CloseToGraduation = () => {
     initialState: {
       ...defaultOptions.initialState,
       sorting: [{ id: 'programme', desc: false }],
-      columnVisibility: {
-        'student.name': false,
-        'student.phoneNumber': false,
-        'student.email': false,
-        'student.secondaryEmail': false,
-        semesterEnrollments: false,
-      },
     },
+    state: { columnVisibility },
+    onColumnVisibilityChange: setColumnVisibility,
   })
 
   return (
