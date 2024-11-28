@@ -1,4 +1,3 @@
-import { green, red, yellow } from '@mui/material/colors'
 import { createTheme } from '@mui/material/styles'
 
 declare module '@mui/material/styles' {
@@ -20,8 +19,8 @@ declare module '@mui/material/styles' {
 
 export const theme = createTheme({
   graduationTimes: {
-    onTime: green[400],
-    yearOver: yellow[400],
-    wayOver: red[400],
+    onTime: '#90a959',
+    yearOver: '#fee191',
+    wayOver: '#fb6962',
   },
 })
