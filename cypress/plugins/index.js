@@ -19,4 +19,17 @@
 module.exports = (on, config) => {
   // `on` is used to hook into various events Cypress emits
   // `config` is the resolved Cypress config
+  on('before:browser:launch', (browser = {}, launchOptions) => {
+    // By manually setting the browser width and height in headless
+    // mode, screenshots and videos will have a better quality
+    // https://www.cypress.io/blog/generate-high-resolution-videos-and-screenshots
+    const width = 2560
+    const height = 1440
+
+    if (browser.name === 'chrome' && browser.isHeadless) {
+      launchOptions.args.push(`--window-size=${width},${height}`)
+      launchOptions.args.push('--force-device-scale-factor=1')
+    }
+    return launchOptions
+  })
 }
