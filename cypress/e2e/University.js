@@ -28,7 +28,6 @@ describe('University view', () => {
   beforeEach(() => {
     cy.init('/university')
     cy.contains('University')
-    cy.contains('Programme MH90_001 (Veterinary medicine bachelor + licentiate) is currently excluded.')
   })
 
   describe('Faculty progress tab', () => {

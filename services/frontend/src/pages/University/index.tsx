@@ -4,7 +4,6 @@ import { useHistory, useLocation } from 'react-router-dom'
 
 import { useTitle } from '@/common/hooks'
 import { PageTitle } from '@/components/material/PageTitle'
-import { ExcludedMessage } from './ExcludedMessage'
 import { FacultyGraduationsTab } from './FacultyGraduationsTab'
 import { FacultyProgressTab } from './FacultyProgressTab'
 
@@ -32,7 +31,6 @@ export const University = () => {
   return (
     <Container maxWidth="lg">
       <PageTitle title="University" />
-      <ExcludedMessage />
       <Tabs onChange={handleTabChange} sx={{ marginBottom: 2 }} value={activeTab}>
         <Tab data-cy="FacultyProgressTab" label="Faculty progress" />
         <Tab data-cy="FacultyGraduationsTab" label="Faculty graduations" />
