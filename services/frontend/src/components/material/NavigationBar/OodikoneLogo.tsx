@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 
 import { isDev } from '@/conf'
 
-export const Logo = () => {
+export const OodikoneLogo = () => {
   return (
     <Stack alignItems="center" direction="row" gap={1}>
       <Typography

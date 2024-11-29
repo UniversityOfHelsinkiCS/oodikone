@@ -1,18 +1,26 @@
-import { AppBar, Box, Container, Toolbar } from '@mui/material'
-import { Fragment } from 'react'
+import { AppBar, Box, Container, Tab, Tabs, Toolbar } from '@mui/material'
+import { useState, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 
 import { checkUserAccess, getFullStudyProgrammeRights, isDefaultServiceProvider } from '@/common'
 import { hasFullAccessToTeacherData } from '@/components/Teachers/util'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
-import { Logo } from './Logo'
 import { NavigationButton } from './NavigationButton'
-import { NavigationDivider } from './NavigationDivider'
 import { NavigationItem, navigationItems } from './navigationItems'
+import { OodikoneLogo } from './OodikoneLogo'
 import { UserButton } from './UserButton'
 
 export const NavigationBar = () => {
+  const location = useLocation()
   const { fullAccessToStudentData, isAdmin, isLoading, programmeRights, roles, iamGroups } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
+
+  const [activeTab, setActiveTab] = useState<number | null>(null)
+
+  const isActivePath = (mainPath: string | undefined, subPaths: (string | undefined)[] = []) => {
+    const allPaths = [mainPath, ...subPaths].filter(Boolean)
+    return allPaths.some(currentPath => location.pathname.includes(currentPath!))
+  }
 
   const getVisibleNavigationItems = () => {
     const visibleNavigationItems: Record<string, NavigationItem> = {}
@@ -58,26 +66,42 @@ export const NavigationBar = () => {
 
   const visibleNavigationItems = getVisibleNavigationItems()
 
+  useEffect(() => {
+    const activeTabIndex = Object.entries(visibleNavigationItems).findIndex(([_key, item]) => {
+      const subItemPaths = item.items ? item.items.map(subItem => subItem.path) : []
+      return isActivePath(item.path, subItemPaths)
+    })
+
+    if (activeTabIndex >= 0) {
+      setActiveTab(activeTabIndex)
+    } else {
+      setActiveTab(null)
+    }
+  }, [location.pathname])
+
   return (
     <AppBar position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <Logo />
-          {!isLoading && (
-            <>
-              <Box data-cy="nav-bar" sx={{ display: 'flex', flexGrow: 1, justifyContent: 'space-between' }}>
-                <NavigationDivider />
-                {Object.values(visibleNavigationItems).map(item => (
-                  <Fragment key={item.key}>
-                    {['feedback', 'admin'].includes(item.key) && <NavigationDivider />}
-                    <NavigationButton item={item} />
-                  </Fragment>
+          <Box
+            data-cy="nav-bar"
+            sx={{
+              alignItems: 'center',
+              display: 'flex',
+              justifyContent: 'space-between',
+              width: '100%',
+            }}
+          >
+            <OodikoneLogo />
+            {!isLoading && (
+              <Tabs textColor="inherit" value={activeTab} variant="scrollable">
+                {Object.entries(visibleNavigationItems).map(([key, item]) => (
+                  <Tab key={key} label={<NavigationButton item={item} />} />
                 ))}
-                <NavigationDivider />
-              </Box>
-              <UserButton />
-            </>
-          )}
+              </Tabs>
+            )}
+            <UserButton />
+          </Box>
         </Toolbar>
       </Container>
     </AppBar>

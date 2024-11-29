@@ -8,10 +8,6 @@ const visibleLinks = {
 visibleLinks.basic = [...visibleLinks.onlycoursestatistics, 'Faculties', 'Programmes', 'Students']
 visibleLinks.admin = [...visibleLinks.basic, 'Teachers', 'Admin']
 
-const hasVisibleItems = visibleItems => {
-  cy.get('[data-cy=nav-bar]').children().should('have.length', visibleItems)
-}
-
 const containsLinks = links => {
   cy.get('[data-cy=nav-bar]').within(() => {
     for (const link of links) {
@@ -34,7 +30,6 @@ describe('Users tests', () => {
   describe('Using as user with just grp-oodikone-user, no other rights', () => {
     it('shows correct tabs', () => {
       cy.init('', 'norights')
-      hasVisibleItems(7)
       containsLinks(visibleLinks.norights)
       userButtonWorks('norights')
     })
@@ -43,7 +38,6 @@ describe('Users tests', () => {
   describe('Using as coursestatistics user', () => {
     it('shows correct tabs', () => {
       cy.init('', 'onlycoursestatistics')
-      hasVisibleItems(7)
       containsLinks(visibleLinks.onlycoursestatistics)
       userButtonWorks('onlycoursestatistics')
     })
@@ -52,7 +46,6 @@ describe('Users tests', () => {
   describe('Using as basic user', () => {
     it('shows correct tabs', () => {
       cy.init('')
-      hasVisibleItems(10)
       containsLinks(visibleLinks.basic)
       userButtonWorks('basic')
     })
@@ -64,7 +57,6 @@ describe('Users tests', () => {
     })
 
     it('should see more stuff than others', () => {
-      hasVisibleItems(13)
       containsLinks(visibleLinks.admin)
       userButtonWorks('admin')
     })

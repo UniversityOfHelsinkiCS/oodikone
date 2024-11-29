@@ -20,7 +20,7 @@ export const UserButton = () => {
   }))
 
   return (
-    <Box sx={{ flexGrow: 0 }}>
+    <Box>
       <IconButton
         data-cy="nav-bar-user-button"
         onClick={event => setAnchorEl(event.currentTarget)}
