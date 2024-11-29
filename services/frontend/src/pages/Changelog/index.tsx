@@ -18,7 +18,7 @@ export const Changelog = () => {
     if (!releaseData) {
       return
     }
-    setVisibleReleases([...releaseData.filter(filterInternalReleases).slice(0, 10)])
+    setVisibleReleases([...releaseData.filter(filterInternalReleases).slice(0, 20)])
   }, [releaseData])
 
   return (
