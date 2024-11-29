@@ -16,18 +16,21 @@ router.get('/', async (_req: Request, res: Response) => {
     const fakeRelease: Release[] = [
       {
         description: '**Feature 1**\n- Added a fancy new feature \n\n**Feature 2**\n- Fixed a bug\n- Fixed another bug',
-        title: 'Release 1',
+        title: 'Release 3',
         time: new Date().toISOString(),
+        version: '0.0.3',
       },
       {
         description: "Let's not spam the GitHub API in development!",
         title: 'Release 2',
         time: new Date().toISOString(),
+        version: '0.0.2',
       },
       {
         description: 'This release should not be visible on the frontpage',
-        title: 'Release 3',
+        title: 'Release 1',
         time: new Date().toISOString(),
+        version: '0.0.1',
       },
     ]
     return res.status(200).json(fakeRelease)
@@ -37,6 +40,7 @@ router.get('/', async (_req: Request, res: Response) => {
     description: release.body,
     time: release.published_at,
     title: release.name,
+    version: release.tag_name,
   }))
   changelog.data = releasesFromAPI
   res.status(200).json(releasesFromAPI)

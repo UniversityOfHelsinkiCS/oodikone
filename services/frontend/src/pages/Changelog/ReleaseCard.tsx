@@ -13,7 +13,9 @@ export const ReleaseCard = ({ isLoading, release }: { isLoading: boolean; releas
         {isLoading ? 'Loading title...' : release.title}
       </Typography>
       <Typography component="p" sx={{ color: 'text.secondary', mb: 2 }} variant="caption">
-        {isLoading ? 'Loading date...' : `Released on ${reformatDate(release.time, DISPLAY_DATE_FORMAT)}`}
+        {isLoading
+          ? 'Loading date...'
+          : `Version ${release.version} • Released on ${reformatDate(release.time, DISPLAY_DATE_FORMAT)}`}
       </Typography>
       <ReactMarkdown>{isLoading ? 'Loading description...' : getDescription(release.description)}</ReactMarkdown>
     </Card>
