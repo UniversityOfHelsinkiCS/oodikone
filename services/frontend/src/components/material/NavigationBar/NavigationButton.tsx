@@ -1,5 +1,5 @@
-import { ArrowDropDown } from '@mui/icons-material'
-import { Button, Menu, MenuItem } from '@mui/material'
+import { ArrowDropDown as ArrowDropDownIcon } from '@mui/icons-material'
+import { Menu, MenuItem, Typography } from '@mui/material'
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
@@ -59,36 +59,18 @@ export const NavigationButton = ({ item }: { item: NavigationItem }) => {
     return false
   }
 
-  const isActivePath = (mainPath: string | undefined, subPaths: (string | undefined)[] = []) => {
-    const allPaths = [mainPath, ...subPaths].filter(Boolean)
-    return allPaths.some(currentPath => location.pathname.includes(currentPath!))
-  }
-
-  const subItemPaths = items ? items.map(subItem => subItem.path) : []
-  const isActive = isActivePath(path, subItemPaths)
-
-  const buttonStyle = {
-    color: 'inherit',
-    fontWeight: isActive ? 'bold' : 'normal',
-    textTransform: 'none',
-    whiteSpace: 'nowrap',
-    '&:hover': {
-      color: 'inherit',
-      textDecoration: 'underline',
-    },
-  }
-
   if (items) {
     return (
       <>
-        <Button
+        <Typography
+          color="inherit"
           data-cy={`nav-bar-button-${key}`}
-          endIcon={<ArrowDropDown />}
           onClick={event => setAnchorEl(event.currentTarget)}
-          sx={buttonStyle}
+          sx={{ display: 'flex' }}
+          variant="button"
         >
-          {label}
-        </Button>
+          {label} <ArrowDropDownIcon />
+        </Typography>
         <Menu anchorEl={anchorEl} onClose={() => setAnchorEl(null)} open={Boolean(anchorEl)}>
           {items.map(
             subItem =>
@@ -111,8 +93,15 @@ export const NavigationButton = ({ item }: { item: NavigationItem }) => {
   }
 
   return (
-    <Button component={Link} data-cy={`nav-bar-button-${key}`} sx={buttonStyle} to={path}>
+    <Typography
+      color="inherit"
+      component={Link}
+      data-cy={`nav-bar-button-${key}`}
+      sx={{ '&:hover': { color: 'inherit' } }}
+      to={path}
+      variant="button"
+    >
       {label}
-    </Button>
+    </Typography>
   )
 }
