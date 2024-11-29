@@ -24,10 +24,10 @@ export const Footer = () => {
         <Stack
           alignItems={{ md: 'center' }}
           direction={{ sm: 'column', md: 'row' }}
-          gap={2}
+          gap={3}
           justifyContent="space-between"
         >
-          <Stack direction={{ sm: 'column', md: 'row' }} gap={{ sm: 2, md: 4 }}>
+          <Stack direction={{ sm: 'column', md: 'row' }} gap={{ sm: 3, md: 4 }}>
             <Stack>
               <Typography variant="subtitle1">Oodikone</Typography>
               {isDefaultServiceProvider() && <ExternalLink href={dataProtectionUrl} text="Data protection" />}
