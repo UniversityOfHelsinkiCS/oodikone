@@ -14,7 +14,7 @@ export const NavigationButton = ({ item }: { item: NavigationItem }) => {
   const location = useLocation()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
-  const { key, label, path, items } = item
+  const { key, label, items } = item
 
   const showItem = (subItemKey: string) => {
     if (['class', 'completedCoursesSearch', 'overview'].includes(subItemKey)) {
@@ -93,14 +93,7 @@ export const NavigationButton = ({ item }: { item: NavigationItem }) => {
   }
 
   return (
-    <Typography
-      color="inherit"
-      component={Link}
-      data-cy={`nav-bar-button-${key}`}
-      sx={{ '&:hover': { color: 'inherit' } }}
-      to={path}
-      variant="button"
-    >
+    <Typography color="inherit" data-cy={`nav-bar-button-${key}`} variant="button">
       {label}
     </Typography>
   )

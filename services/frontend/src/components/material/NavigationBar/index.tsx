@@ -1,6 +1,6 @@
 import { AppBar, Box, Container, Tab, Tabs, Toolbar } from '@mui/material'
 import { useState, useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 
 import { checkUserAccess, getFullStudyProgrammeRights, isDefaultServiceProvider } from '@/common'
 import { hasFullAccessToTeacherData } from '@/components/Teachers/util'
@@ -92,7 +92,13 @@ export const NavigationBar = () => {
             {!isLoading && (
               <Tabs textColor="inherit" value={activeTab} variant="scrollable">
                 {Object.entries(visibleNavigationItems).map(([key, item]) => (
-                  <Tab key={key} label={<NavigationButton item={item} />} />
+                  <Tab
+                    component={Link}
+                    key={key}
+                    label={<NavigationButton item={item} />}
+                    sx={{ '&:hover': { color: 'inherit' } }}
+                    to={item.path}
+                  />
                 ))}
               </Tabs>
             )}
