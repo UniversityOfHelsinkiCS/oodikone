@@ -24,6 +24,7 @@ export const useTabChangeAnalytics = () => {
   return { handleTabChange }
 }
 
+// Use @/hooks/tabs for MUI components instead
 export const useTabs = (id, initialTab, { location, replace }) => {
   const [tab, setTab] = useState(-1)
   const [didMount, setDidMount] = useState(false)

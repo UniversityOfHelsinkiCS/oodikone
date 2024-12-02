@@ -27,7 +27,7 @@ export const Footer = () => {
           gap={3}
           justifyContent="space-between"
         >
-          <Stack direction={{ sm: 'column', md: 'row' }} gap={{ sm: 3, md: 4 }}>
+          <Stack direction={{ sm: 'column', md: 'row' }} gap={{ xs: 3, md: 4 }}>
             <Stack>
               <Typography variant="subtitle1">Oodikone</Typography>
               {isDefaultServiceProvider() && <ExternalLink href={dataProtectionUrl} text="Data protection" />}
