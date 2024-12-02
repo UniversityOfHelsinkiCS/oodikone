@@ -1,7 +1,7 @@
 import { NameWithCode } from '../name'
 import { GraduationStats, ProgrammeMedians } from '../university'
 
-export interface AllGraduationStatsResponse {
+export interface GetAllGraduationStatsResponse {
   byGradYear: {
     medians: {
       bachelor: GraduationStats[]
