@@ -1,5 +1,11 @@
 import { Name, NameWithCode } from '../name'
 
+export type Graduated = 'GRADUATED_INCLUDED' | 'GRADUATED_EXCLUDED'
+export type SpecialGroups = 'SPECIAL_INCLUDED' | 'SPECIAL_EXCLUDED'
+export type ProgrammeFilter = 'NEW_STUDY_PROGRAMMES' | 'ALL_PROGRAMMES'
+export type YearType = 'ACADEMIC_YEAR' | 'CALENDAR_YEAR'
+export type StatsType = 'ALL' | 'CREDITS' | 'STUDENT' | 'THESIS'
+
 export interface GetFacultiesResponse {
   code: string
   id: string
@@ -7,7 +13,7 @@ export interface GetFacultiesResponse {
 }
 
 export interface GetAllProgressStatsRequest {
-  graduated: 'GRADUATED_EXCLUDED' | 'GRADUATED_INCLUDED'
+  graduated: Graduated
   includeSpecials: boolean
 }
 

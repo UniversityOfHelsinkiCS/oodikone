@@ -33,7 +33,7 @@ const getProgrammeNames = (faculties: Organization[]) => {
 
 interface GetProgressStatsRequest extends Request {
   query: {
-    specialsIncluded: 'true' | undefined
+    specialsIncluded: 'true' | 'false'
     graduated: Graduated
   }
 }

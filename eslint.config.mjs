@@ -133,7 +133,7 @@ export default [
     },
   },
   {
-    files: ['services/shared/**/*'],
+    files: ['services/**/shared/**/*'],
     rules: {
       'import/no-unused-modules': 'off',
     },

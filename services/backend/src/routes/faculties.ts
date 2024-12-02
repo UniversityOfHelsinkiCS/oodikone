@@ -22,7 +22,7 @@ import { combineFacultyStudentProgress } from '../services/faculty/facultyStuden
 import { combineFacultyStudents } from '../services/faculty/facultyStudents'
 import { combineFacultyThesisWriters } from '../services/faculty/facultyThesisWriters'
 import { updateFacultyOverview, updateFacultyProgressOverview } from '../services/faculty/facultyUpdates'
-import { Graduated, ProgrammeFilter, SpecialGroups, StatsType, YearType } from '../types'
+import { Graduated, ProgrammeFilter, SpecialGroups, StatsType, YearType } from '../shared/types/api/faculty'
 import logger from '../util/logger'
 
 // Faculty uses a lot of tools designed for Study programme.
