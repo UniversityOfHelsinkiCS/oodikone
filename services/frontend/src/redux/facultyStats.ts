@@ -1,10 +1,14 @@
 import { RTKApi } from '@/apiConnection'
-import { AllProgressStatsRequest, AllProgressStatsResponse } from '@/shared/types/api/faculty'
-import { AllGraduationStatsResponse } from '@/shared/types/api/university'
+import {
+  GetAllProgressStatsRequest,
+  GetAllProgressStatsResponse,
+  GetFacultiesResponse,
+} from '@/shared/types/api/faculty'
+import { GetAllGraduationStatsResponse } from '@/shared/types/api/university'
 
 const facultystatsApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
-    getFaculties: builder.query({
+    getFaculties: builder.query<GetFacultiesResponse[], void>({
       query: () => '/faculties',
       keepUnusedDataFor: 24 * 60 * 60, // 24 hours
     }),
@@ -27,11 +31,11 @@ const facultystatsApi = RTKApi.injectEndpoints({
       query: ({ id, specialGroups, graduated }) =>
         `/faculties/${id}/progressstats?special_groups=${specialGroups}&graduated=${graduated}`,
     }),
-    getAllFacultiesProgressStats: builder.query<AllProgressStatsResponse, AllProgressStatsRequest>({
+    getAllFacultiesProgressStats: builder.query<GetAllProgressStatsResponse, GetAllProgressStatsRequest>({
       query: ({ graduated, includeSpecials }) =>
         `/university/allprogressstats?graduated=${graduated}&specialsIncluded=${includeSpecials}`,
     }),
-    getAllFacultiesGraduationStats: builder.query<AllGraduationStatsResponse, void>({
+    getAllFacultiesGraduationStats: builder.query<GetAllGraduationStatsResponse, void>({
       query: () => '/university/allgraduationstats',
     }),
     getFacultyStudentStats: builder.query({

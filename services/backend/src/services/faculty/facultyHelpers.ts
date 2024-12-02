@@ -14,3 +14,12 @@ export const getSortedFaculties = async () => {
     return nameA.localeCompare(nameB)
   })
 }
+
+export const getFacultiesForFacultyList = async () => {
+  const faculties = await getSortedFaculties()
+  return faculties.map(faculty => ({
+    code: faculty.code,
+    id: faculty.id,
+    name: faculty.name,
+  }))
+}

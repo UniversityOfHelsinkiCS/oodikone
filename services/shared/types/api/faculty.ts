@@ -2,11 +2,8 @@ import { Name, NameWithCode } from '../name'
 
 export interface GetFacultiesResponse {
   code: string
-  createdAt: string
   id: string
   name: Name
-  parent_id: string
-  updatedAt: string
 }
 
 export interface GetAllProgressStatsRequest {

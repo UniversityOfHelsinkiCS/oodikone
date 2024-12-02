@@ -5,7 +5,7 @@ import { getDegreeProgrammesOfFaculty, getFacultyCodeById } from '../services/fa
 import { combineFacultyBasics } from '../services/faculty/facultyBasics'
 import { getFacultyCredits } from '../services/faculty/facultyCredits'
 import { countGraduationTimes } from '../services/faculty/facultyGraduationTimes'
-import { getSortedFaculties } from '../services/faculty/facultyHelpers'
+import { getFacultiesForFacultyList } from '../services/faculty/facultyHelpers'
 import {
   getBasicStats,
   setBasicStats,
@@ -31,7 +31,7 @@ import logger from '../util/logger'
 const router = Router()
 
 router.get('/', async (_req: Request, res: Response) => {
-  const faculties = await getSortedFaculties()
+  const faculties = await getFacultiesForFacultyList()
   res.json(faculties)
 })
 

@@ -1,6 +1,6 @@
 import { Box } from '@mui/material'
 
-import { AllGraduationStatsResponse } from '@/shared/types'
+import { GetAllGraduationStatsResponse } from '@/shared/types/api/university'
 import { GraduationTimes } from './GraduationTimes'
 
 export const FacultyGraduations = ({
@@ -11,7 +11,7 @@ export const FacultyGraduations = ({
   showMedian,
   universityMode,
 }: {
-  data: AllGraduationStatsResponse | undefined
+  data: GetAllGraduationStatsResponse | undefined
   isError: boolean
   isLoading: boolean
   faculty?: string
