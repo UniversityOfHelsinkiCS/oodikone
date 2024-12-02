@@ -59,9 +59,6 @@ export const FacultyBarChart = ({
           format: '{point.percentage:.1f}%',
         },
       },
-      series: {
-        animation: false,
-      },
     },
     exporting: {
       filename: `oodikone_progress_of_students_in_${data?.id}_by_study_start_year`,

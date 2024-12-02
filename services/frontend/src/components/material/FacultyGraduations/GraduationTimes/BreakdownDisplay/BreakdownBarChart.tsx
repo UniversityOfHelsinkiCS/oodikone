@@ -140,7 +140,6 @@ export const BreakdownBarChart = ({
         },
       },
       series: {
-        animation: false,
         point: {
           events: {
             click(event) {

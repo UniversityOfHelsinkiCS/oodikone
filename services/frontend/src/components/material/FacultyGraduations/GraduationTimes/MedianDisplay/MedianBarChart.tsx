@@ -169,7 +169,6 @@ export const MedianBarChart = ({
     },
     plotOptions: {
       series: {
-        animation: false,
         dataLabels: {
           enabled: true,
           inside: true,
