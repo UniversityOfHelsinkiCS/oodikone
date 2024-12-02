@@ -19,7 +19,7 @@ export const NavigationBar = () => {
 
   const isActivePath = (mainPath: string | undefined, subPaths: (string | undefined)[] = []) => {
     const allPaths = [mainPath, ...subPaths].filter(Boolean)
-    return allPaths.some(currentPath => location.pathname === currentPath)
+    return allPaths.some(currentPath => location.pathname.includes(currentPath))
   }
 
   const getVisibleNavigationItems = () => {
