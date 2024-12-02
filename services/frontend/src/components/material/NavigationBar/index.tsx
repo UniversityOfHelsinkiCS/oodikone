@@ -15,11 +15,11 @@ export const NavigationBar = () => {
   const { fullAccessToStudentData, isAdmin, isLoading, programmeRights, roles, iamGroups } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
 
-  const [activeTab, setActiveTab] = useState<number | null>(null)
+  const [activeTab, setActiveTab] = useState<number | false>(false)
 
   const isActivePath = (mainPath: string | undefined, subPaths: (string | undefined)[] = []) => {
     const allPaths = [mainPath, ...subPaths].filter(Boolean)
-    return allPaths.some(currentPath => location.pathname.includes(currentPath!))
+    return allPaths.some(currentPath => location.pathname === currentPath)
   }
 
   const getVisibleNavigationItems = () => {
@@ -72,12 +72,8 @@ export const NavigationBar = () => {
       return isActivePath(item.path, subItemPaths)
     })
 
-    if (activeTabIndex >= 0) {
-      setActiveTab(activeTabIndex)
-    } else {
-      setActiveTab(null)
-    }
-  }, [location.pathname])
+    setActiveTab(activeTabIndex >= 0 ? activeTabIndex : false)
+  }, [location.pathname, visibleNavigationItems])
 
   return (
     <AppBar position="static">
