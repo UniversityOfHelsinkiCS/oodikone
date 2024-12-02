@@ -1,4 +1,4 @@
-import { StatsType } from '../../types'
+import { StatsType } from '../../shared/types/api/faculty'
 import { setCreditStats } from '../analyticsService'
 import { computeCreditsProduced } from '../providerCredits'
 import { getDegreeProgrammesOfFaculty } from './faculty'
