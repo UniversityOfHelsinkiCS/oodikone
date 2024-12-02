@@ -133,6 +133,12 @@ export default [
     },
   },
   {
+    files: ['services/shared/**/*'],
+    rules: {
+      'import/no-unused-modules': 'off',
+    },
+  },
+  {
     files: ['cypress/**/*.js', 'services/backend/**/*.js', 'updater/**/*.js'],
     languageOptions: {
       sourceType: 'commonjs',
