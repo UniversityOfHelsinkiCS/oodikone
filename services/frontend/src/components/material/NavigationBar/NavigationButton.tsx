@@ -14,7 +14,7 @@ export const NavigationButton = ({ item }: { item: NavigationItem }) => {
   const location = useLocation()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
-  const { key, label, items } = item
+  const { label, items } = item
 
   const showItem = (subItemKey: string) => {
     if (['class', 'completedCoursesSearch', 'overview'].includes(subItemKey)) {
@@ -64,7 +64,6 @@ export const NavigationButton = ({ item }: { item: NavigationItem }) => {
       <>
         <Typography
           color="inherit"
-          data-cy={`nav-bar-button-${key}`}
           onClick={event => setAnchorEl(event.currentTarget)}
           sx={{ display: 'flex' }}
           variant="button"
@@ -77,10 +76,9 @@ export const NavigationButton = ({ item }: { item: NavigationItem }) => {
               showItem(subItem.key) && (
                 <MenuItem
                   component={Link}
-                  data-cy={`nav-bar-button-${subItem.key}`}
                   key={subItem.path}
                   onClick={() => setAnchorEl(null)}
-                  selected={location.pathname.includes(subItem.path)}
+                  selected={location.pathname?.includes(subItem.path)}
                   to={subItem.path}
                 >
                   {subItem.label}
@@ -93,7 +91,7 @@ export const NavigationButton = ({ item }: { item: NavigationItem }) => {
   }
 
   return (
-    <Typography color="inherit" data-cy={`nav-bar-button-${key}`} variant="button">
+    <Typography color="inherit" variant="button">
       {label}
     </Typography>
   )

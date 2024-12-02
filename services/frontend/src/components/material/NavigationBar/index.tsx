@@ -89,15 +89,16 @@ export const NavigationBar = () => {
             }}
           >
             <OodikoneLogo />
-            {!isLoading && (
+            {!isLoading && location && (
               <Tabs textColor="inherit" value={activeTab} variant="scrollable">
                 {Object.entries(visibleNavigationItems).map(([key, item]) => (
                   <Tab
-                    component={Link}
+                    component={item.path ? Link : 'div'}
+                    data-cy={`nav-bar-button-${key}`}
                     key={key}
                     label={<NavigationButton item={item} />}
                     sx={{ '&:hover': { color: 'inherit' } }}
-                    to={item.path}
+                    to={item.path ?? ''}
                   />
                 ))}
               </Tabs>

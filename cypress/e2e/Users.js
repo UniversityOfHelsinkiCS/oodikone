@@ -72,8 +72,7 @@ describe('Users tests', () => {
       })
 
       it("only the mocked user's programmes are visible", () => {
-        cy.get('[data-cy=nav-bar-button-studyProgramme]').click()
-        cy.get('[data-cy=nav-bar-button-class]').click()
+        cy.visit('/populations')
         cy.contains('label', 'Study programme')
           .siblings()
           .within(() => {
