@@ -5,7 +5,7 @@ import { calculateStats, sortProgrammeKeys } from '@/components/FacultyStatistic
 import { FacultyBarChart } from '@/components/material/FacultyBarChart'
 import { FacultyProgressTable } from '@/components/material/FacultyProgressTable'
 import { Section } from '@/components/material/Section'
-import { AllProgressStatsResponse } from '@/shared/types'
+import { AllProgressStatsResponse } from '@/shared/types/api/faculty'
 
 export const FacultyProgress = ({
   faculty,

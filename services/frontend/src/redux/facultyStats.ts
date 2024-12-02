@@ -1,5 +1,6 @@
 import { RTKApi } from '@/apiConnection'
-import { AllGraduationStatsResponse, AllProgressStatsRequest, AllProgressStatsResponse } from '@/shared/types'
+import { AllProgressStatsRequest, AllProgressStatsResponse } from '@/shared/types/api/faculty'
+import { AllGraduationStatsResponse } from '@/shared/types/api/university'
 
 const facultystatsApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
