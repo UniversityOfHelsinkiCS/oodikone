@@ -1,12 +1,28 @@
-import { Alert, Box, CircularProgress, Paper, Skeleton, Stack, Typography } from '@mui/material'
+import { ErrorOutline as ErrorIcon } from '@mui/icons-material'
+import { Box, CircularProgress, Paper, Skeleton, Stack, Typography } from '@mui/material'
 
 import { InfoBox } from '@/components/material/InfoBox'
 
 const ErrorMessage = () => {
   return (
-    <Alert severity="error">
-      <Typography variant="body1">Something went wrong, please try refreshing the page.</Typography>
-    </Alert>
+    <Box
+      sx={{
+        alignItems: 'center',
+        border: 1,
+        borderRadius: 1,
+        color: theme => theme.palette.error.main,
+        display: 'flex',
+        height: 400,
+        justifyContent: 'center',
+      }}
+    >
+      <Stack alignItems="center" direction="column" gap={2}>
+        <ErrorIcon fontSize="large" />
+        <Typography color="inherit" fontStyle="italic" textAlign="center" variant="body1">
+          Something went wrong, please try refreshing the page
+        </Typography>
+      </Stack>
+    </Box>
   )
 }
 
@@ -22,7 +38,12 @@ const LoadingSkeleton = () => {
           transform: 'translate(-50%, -50%)',
         }}
       >
-        <CircularProgress />
+        <Stack alignItems="center" direction="column" gap={2}>
+          <CircularProgress />
+          <Typography color="text.secondary" fontStyle="italic" variant="body1">
+            Loading content
+          </Typography>
+        </Stack>
       </Box>
     </Box>
   )
@@ -31,27 +52,31 @@ const LoadingSkeleton = () => {
 export const Section = ({
   children,
   cypress,
+  infoBoxContent,
   isLoading,
   isError,
   title,
-  infoBoxContent,
 }: {
   children: React.ReactNode
   cypress?: string
+  infoBoxContent?: string
   isLoading?: boolean
   isError?: boolean
-  title: string
-  infoBoxContent?: string
+  title?: string
 }) => {
   return (
     <Paper sx={{ marginBottom: 2, padding: 2 }} variant="outlined">
-      <Stack alignItems="center" direction="row" justifyContent="space-between">
-        <Typography component="h2" variant="h5">
-          {title}
-        </Typography>
-        {infoBoxContent && <InfoBox content={infoBoxContent} cypress={cypress} />}
-      </Stack>
-      <Box sx={{ marginTop: 2 }}>{isError ? <ErrorMessage /> : isLoading ? <LoadingSkeleton /> : children}</Box>
+      {title && (
+        <Stack alignItems="center" direction="row" justifyContent="space-between">
+          <Typography component="h2" variant="h5">
+            {title}
+          </Typography>
+          {infoBoxContent && <InfoBox content={infoBoxContent} cypress={cypress} />}
+        </Stack>
+      )}
+      <Box sx={{ marginTop: title ? 2 : 0 }}>
+        {isError ? <ErrorMessage /> : isLoading ? <LoadingSkeleton /> : children}
+      </Box>
     </Paper>
   )
 }
