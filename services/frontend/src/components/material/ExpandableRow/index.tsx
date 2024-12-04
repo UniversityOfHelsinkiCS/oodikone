@@ -1,3 +1,7 @@
+import {
+  KeyboardArrowDown as KeyboardArrowDownIcon,
+  KeyboardArrowRight as KeyboardArrowRightIcon,
+} from '@mui/icons-material'
 import { Box, IconButton, TableCell, TableRow, Typography } from '@mui/material'
 
 const roundValue = (value: number | string | undefined) => {
@@ -8,14 +12,14 @@ const getKey = (value: number | string, index: number) => `${value}-${index}`
 
 export const ExpandableRow = ({
   cypress,
-  icon,
   toggleVisibility,
+  visible,
   yearArray,
   yearIndex,
 }: {
   cypress: string
-  icon: React.ReactNode
   toggleVisibility: () => void
+  visible: boolean
   yearArray: (number | string)[]
   yearIndex: number
 }) => {
@@ -26,7 +30,7 @@ export const ExpandableRow = ({
           {index === 0 ? (
             <Box alignItems="center" display="flex" justifyContent="center">
               <IconButton data-cy={`${cypress}${yearIndex}`} onClick={toggleVisibility} size="small">
-                {icon}
+                {visible ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
               </IconButton>
               <Typography variant="body2">{value}</Typography>
             </Box>

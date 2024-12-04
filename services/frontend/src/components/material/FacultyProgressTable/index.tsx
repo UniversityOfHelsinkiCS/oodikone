@@ -1,9 +1,8 @@
-import { KeyboardArrowDown, KeyboardArrowRight } from '@mui/icons-material'
 import { Box, Collapse, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
 import { Fragment, useState } from 'react'
 
+import { ExpandableRow } from '@/components/material/ExpandableRow'
 import { NameWithCode } from '@/shared/types'
-import { ExpandableRow } from './ExpandableRow'
 import { ProgrammeProgressChart } from './ProgrammeProgressChart'
 
 export const FacultyProgressTable = ({
@@ -23,7 +22,7 @@ export const FacultyProgressTable = ({
   sortedKeys: string[]
   titles: string[]
 }) => {
-  const [visibleYears, setVisibleYears] = useState(new Array(data.length).fill(false))
+  const [visibleYears, setVisibleYears] = useState(new Array<boolean>(data.length).fill(false))
 
   const toggleVisibility = (yearIndex: number) => {
     setVisibleYears(prev => prev.map((visible, index) => (index === yearIndex ? !visible : visible)))
@@ -43,7 +42,7 @@ export const FacultyProgressTable = ({
           <TableHead>
             <TableRow>
               {titles.map(title => (
-                <TableCell align="center" key={title}>
+                <TableCell align="right" key={title}>
                   {title}
                 </TableCell>
               ))}
@@ -56,8 +55,8 @@ export const FacultyProgressTable = ({
                   <>
                     <ExpandableRow
                       cypress={visibleYears[yearIndex] ? `${cypress}HideButton` : `${cypress}ShowButton`}
-                      icon={visibleYears[yearIndex] ? <KeyboardArrowDown /> : <KeyboardArrowRight />}
                       toggleVisibility={() => toggleVisibility(yearIndex)}
+                      visible={visibleYears[yearIndex]}
                       yearArray={yearArray}
                       yearIndex={yearIndex}
                     />
