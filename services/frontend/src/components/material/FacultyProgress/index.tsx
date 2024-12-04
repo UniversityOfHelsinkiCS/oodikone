@@ -33,7 +33,7 @@ export const FacultyProgress = ({
   }
 
   return (
-    <>
+    <Stack spacing={2}>
       <Section isError={isError} isLoading={isLoading && !bachelorStats} title="Bachelor">
         {bachelorStats && (
           <Stack gap={2}>
@@ -131,6 +131,6 @@ export const FacultyProgress = ({
           </Stack>
         )}
       </Section>
-    </>
+    </Stack>
   )
 }

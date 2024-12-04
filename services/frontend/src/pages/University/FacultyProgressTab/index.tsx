@@ -1,4 +1,4 @@
-import { Box, Stack } from '@mui/material'
+import { Stack } from '@mui/material'
 import { useState } from 'react'
 
 import { facultyToolTips } from '@/common/InfoToolTips'
@@ -17,7 +17,7 @@ export const FacultyProgressTab = () => {
   })
 
   return (
-    <Box>
+    <Stack gap={2}>
       <Section
         cypress="FacultyProgress"
         infoBoxContent={facultyToolTips.studentProgress}
@@ -50,6 +50,6 @@ export const FacultyProgressTab = () => {
         isLoading={progressStats?.isLoading}
         progressStats={progressStats?.data}
       />
-    </Box>
+    </Stack>
   )
 }

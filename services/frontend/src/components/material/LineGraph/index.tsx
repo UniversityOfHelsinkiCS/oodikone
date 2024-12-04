@@ -1,9 +1,9 @@
-import { Paper } from '@mui/material'
 import accessibility from 'highcharts/modules/accessibility'
 import exportData from 'highcharts/modules/export-data'
 import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
 
+import { Section } from '@/components/material/Section'
 import { GraphStat } from '@/shared/types/api/faculty'
 
 exporting(ReactHighcharts.Highcharts)
@@ -62,8 +62,8 @@ export const LineGraph = ({
   }
 
   return (
-    <Paper data-cy={`Graph-${cypress}`} sx={{ padding: 2 }} variant="outlined">
+    <Section data-cy={`Graph-${cypress}`}>
       <ReactHighcharts config={config} />
-    </Paper>
+    </Section>
   )
 }

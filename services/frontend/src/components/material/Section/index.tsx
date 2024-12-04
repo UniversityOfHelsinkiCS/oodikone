@@ -65,7 +65,7 @@ export const Section = ({
   title?: string
 }) => {
   return (
-    <Paper sx={{ marginBottom: 2, padding: 2 }} variant="outlined">
+    <Paper sx={{ padding: 2 }} variant="outlined">
       {title && (
         <Stack alignItems="center" direction="row" justifyContent="space-between">
           <Typography component="h2" variant="h5">

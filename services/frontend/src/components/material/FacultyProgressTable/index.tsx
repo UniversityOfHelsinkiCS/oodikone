@@ -1,7 +1,8 @@
-import { Box, Collapse, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
+import { Box, Collapse, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
 import { Fragment, useState } from 'react'
 
 import { ExpandableRow } from '@/components/material/ExpandableRow'
+import { Section } from '@/components/material/Section'
 import { NameWithCode } from '@/shared/types'
 import { ProgrammeProgressChart } from './ProgrammeProgressChart'
 
@@ -36,7 +37,7 @@ export const FacultyProgressTable = ({
   const getKey = (value: number | string, index: number) => `${value}-${index}`
 
   return (
-    <Paper sx={{ padding: 2 }} variant="outlined">
+    <Section>
       <TableContainer>
         <Table data-cy={cypress} size="small">
           <TableHead>
@@ -95,6 +96,6 @@ export const FacultyProgressTable = ({
           </TableBody>
         </Table>
       </TableContainer>
-    </Paper>
+    </Section>
   )
 }
