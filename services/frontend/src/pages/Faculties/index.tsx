@@ -1,7 +1,6 @@
 import { Container, Tab, Tabs } from '@mui/material'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { Loader } from 'semantic-ui-react'
 
 import { useTitle } from '@/common/hooks'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -10,7 +9,7 @@ import { useTabs } from '@/hooks/tabs'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetFacultiesQuery } from '@/redux/facultyStats'
 import { GetFacultiesResponse } from '@/shared/types/api/faculty'
-import { BasicOverview } from './BasicOverview'
+import { BasicInformation } from './BasicInformation'
 import { FacultyList } from './FacultyList'
 import { FacultyProgrammeOverview } from './FacultyProgrammeOverview'
 import { TimesAndPathsView } from './TimesAndPaths'
@@ -20,7 +19,7 @@ export const Faculties = () => {
   const { getTextIn } = useLanguage()
   const { facultyId } = useParams()
 
-  const { data: faculties = [], isLoading } = useGetFacultiesQuery()
+  const { data: faculties = [] } = useGetFacultiesQuery()
   const faculty: GetFacultiesResponse | undefined =
     faculties.length > 0 && facultyId && faculties.find(faculty => faculty.id === facultyId)
   const facultyCode = faculty?.code
@@ -35,11 +34,6 @@ export const Faculties = () => {
   const [specialGroups, setSpecialGroups] = useState(false)
   const [graduatedGroup, setGraduatedGroup] = useState(false)
   const requiredRights = { fullAccessToStudentData, programmeRights }
-
-  if (isLoading) {
-    // TODO: Replace with Section
-    return <Loader active style={{ marginTop: '10em' }} />
-  }
 
   if (!facultyCode) {
     const sortedFaculties = faculties.toSorted((a, b) => a.code.localeCompare(b.code))
@@ -60,7 +54,7 @@ export const Faculties = () => {
         <Tab data-cy="UpdateStatisticsTab" label="Update statistics" />
       </Tabs>
       {tab === 0 && (
-        <BasicOverview
+        <BasicInformation
           academicYear={academicYear}
           faculty={faculty}
           setAcademicYear={setAcademicYear}
