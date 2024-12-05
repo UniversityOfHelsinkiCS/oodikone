@@ -16,20 +16,20 @@ accessibility(ReactHighcharts.Highcharts)
 export const BreakdownBarChart = ({
   cypress,
   data,
-  handleClick,
   facultyGraph = true,
-  facultyNames,
-  year = null,
+  handleClick,
   mode,
+  names,
+  year = null,
   yearLabel,
 }: {
   cypress: string
   data: Array<GraduationStats & { code?: string }>
-  handleClick: (event, isFacultyGraph: boolean, seriesCategory?: number) => void
   facultyGraph?: boolean
-  facultyNames?: Record<string, NameWithCode>
-  year?: number | null
+  handleClick: (event, isFacultyGraph: boolean, seriesCategory?: number) => void
   mode: 'faculty' | 'programme'
+  names?: Record<string, NameWithCode>
+  year?: number | null
   yearLabel?: 'Graduation year' | 'Start year'
 }) => {
   const { language } = useLanguage()
@@ -62,17 +62,17 @@ export const BreakdownBarChart = ({
     return data.length * multiplier + 100
   }
 
-  const getFacultyName = (code: string) => {
-    if (!facultyNames) {
+  const getFacultyOrProgrammeName = (code: string) => {
+    if (!names) {
       return ''
     }
-    return facultyNames[code]?.[language] ?? facultyNames[code]?.fi
+    return names[code]?.[language] ?? names[code]?.fi
   }
 
   const getTooltipText = (id: string, seriesName: string, amount: number) => {
     if (!facultyGraph) {
       const code = codeMap[id]
-      return `<b>${getFacultyName(code)}</b> • ${code}<br /><b>${seriesName}</b>: ${amount}`
+      return `<b>${getFacultyOrProgrammeName(code)}</b> • ${code}<br /><b>${seriesName}</b>: ${amount}`
     }
     return `<b>${seriesName}</b>: ${amount}`
   }

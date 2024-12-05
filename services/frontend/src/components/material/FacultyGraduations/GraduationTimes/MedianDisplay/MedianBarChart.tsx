@@ -18,12 +18,12 @@ export const MedianBarChart = ({
   cypress,
   data,
   facultyGraph = true,
-  facultyNames,
   goal,
   goalExceptions,
   handleClick,
   level,
   mode,
+  names,
   title,
   year,
   yearLabel,
@@ -41,12 +41,12 @@ export const MedianBarChart = ({
   cypress: string
   data: GraduationStats[]
   facultyGraph?: boolean
-  facultyNames: Record<string, NameWithCode>
   goal: number
   goalExceptions?: Record<string, number> | { needed: boolean }
   handleClick: (event, isFacultyGraph: boolean, seriesCategory?: number) => void
   level?: 'bachelor' | 'bcMsCombo' | 'master' | 'doctor'
   mode: 'faculty' | 'programme'
+  names: Record<string, NameWithCode>
   title: string
   year?: number | null
   yearLabel: 'Graduation year' | 'Start year'
@@ -101,11 +101,11 @@ export const MedianBarChart = ({
     return data.length * multiplier + 100
   }
 
-  const getFacultyName = (code: string) => {
-    if (!facultyNames) {
+  const getFacultyOrProgrammeName = (code: string) => {
+    if (!names) {
       return ''
     }
-    return facultyNames[code]?.[language] ?? facultyNames[code]?.fi
+    return names[code]?.[language] ?? names[code]?.fi
   }
 
   const getTooltipText = (
@@ -125,7 +125,7 @@ export const MedianBarChart = ({
 
     if (!facultyGraph) {
       const goalText = realGoal ? `<br /><p><b>** Exceptional goal time: ${realGoal} months **</b></p>` : ''
-      return `<b>${getFacultyName(code)}</b> • ${code}<br />${timeText}${statisticsText}${goalText}`
+      return `<b>${getFacultyOrProgrammeName(code)}</b> • ${code}<br />${timeText}${statisticsText}${goalText}`
     }
     return `${timeText}${statisticsText}`
   }

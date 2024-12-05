@@ -1,6 +1,6 @@
 import { Stack } from '@mui/material'
 
-import { GetAllGraduationStatsResponse } from '@/shared/types/api/university'
+import { GetAllGraduationStatsResponse } from '@/types/api/university'
 import { GraduationTimes } from './GraduationTimes'
 
 export const FacultyGraduations = ({
@@ -26,7 +26,7 @@ export const FacultyGraduations = ({
   const classSizes = data?.classSizes
   const commonProps = {
     classSizes,
-    facultyNames,
+    names: facultyNames,
     goalExceptions,
     groupBy: 'byGradYear' as const,
     isError,
