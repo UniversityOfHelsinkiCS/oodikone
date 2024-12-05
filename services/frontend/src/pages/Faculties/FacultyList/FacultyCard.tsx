@@ -2,7 +2,7 @@ import { Card, Stack, Typography } from '@mui/material'
 import { Link } from 'react-router-dom'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { GetFacultiesResponse } from '@/shared/types/api/faculty'
+import { GetFacultiesResponse } from '@/types/api/faculty'
 
 export const FacultyCard = ({ faculty }: { faculty: GetFacultiesResponse }) => {
   const { getTextIn } = useLanguage()

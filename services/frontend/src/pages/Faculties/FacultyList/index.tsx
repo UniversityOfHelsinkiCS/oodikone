@@ -2,7 +2,7 @@ import { Container, Stack } from '@mui/material'
 
 import { PageTitle } from '@/components/material/PageTitle'
 import { AccessDeniedMessage } from '@/components/Routes/AccessDeniedMessage'
-import { GetFacultiesResponse } from '@/shared/types/api/faculty'
+import { GetFacultiesResponse } from '@/types/api/faculty'
 import { FacultyCard } from './FacultyCard'
 
 export const FacultyList = ({ faculties }: { faculties: GetFacultiesResponse[] }) => {

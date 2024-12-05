@@ -1,10 +1,18 @@
 import { RTKApi } from '@/apiConnection'
 import {
-  GetAllProgressStatsRequest,
-  GetAllProgressStatsResponse,
   GetFacultiesResponse,
-} from '@/shared/types/api/faculty'
-import { GetAllGraduationStatsResponse } from '@/shared/types/api/university'
+  GetFacultyBasicStatsResponse,
+  GetFacultyBasicStatsRequest,
+  GetFacultyCreditStatsResponse,
+  GetFacultyCreditStatsRequest,
+  GetFacultyThesisStatsResponse,
+  GetFacultyThesisStatsRequest,
+  GetFacultyGraduationTimesResponse,
+  GetFacultyGraduationTimesRequest,
+  GetAllProgressStatsResponse,
+  GetAllProgressStatsRequest,
+} from '@/types/api/faculty'
+import { GetAllGraduationStatsResponse } from '@/types/api/university'
 
 const facultystatsApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
@@ -12,18 +20,18 @@ const facultystatsApi = RTKApi.injectEndpoints({
       query: () => '/faculties',
       keepUnusedDataFor: 24 * 60 * 60, // 24 hours
     }),
-    getFacultyBasicStats: builder.query({
+    getFacultyBasicStats: builder.query<GetFacultyBasicStatsResponse, GetFacultyBasicStatsRequest>({
       query: ({ id, yearType, studyProgrammeFilter, specialGroups }) =>
         `/faculties/${id}/basicstats?year_type=${yearType}&programme_filter=${studyProgrammeFilter}&special_groups=${specialGroups}`,
     }),
-    getFacultyCreditStats: builder.query({
+    getFacultyCreditStats: builder.query<GetFacultyCreditStatsResponse, GetFacultyCreditStatsRequest>({
       query: ({ id, yearType }) => `/faculties/${id}/creditstats?year_type=${yearType}`,
     }),
-    getFacultyThesisStats: builder.query({
+    getFacultyThesisStats: builder.query<GetFacultyThesisStatsResponse, GetFacultyThesisStatsRequest>({
       query: ({ id, yearType, studyProgrammeFilter, specialGroups }) =>
         `/faculties/${id}/thesisstats?year_type=${yearType}&programme_filter=${studyProgrammeFilter}&special_groups=${specialGroups}`,
     }),
-    getFacultyGraduationTimes: builder.query({
+    getFacultyGraduationTimes: builder.query<GetFacultyGraduationTimesResponse, GetFacultyGraduationTimesRequest>({
       query: ({ id, studyProgrammeFilter }) =>
         `/faculties/${id}/graduationtimes?programme_filter=${studyProgrammeFilter}`,
     }),

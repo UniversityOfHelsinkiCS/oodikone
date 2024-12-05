@@ -1,0 +1,136 @@
+import { GraduationStats, Name, NameWithCode, ProgrammeMedians } from '@/shared/types'
+import { Graduated, ProgrammeFilter, SpecialGroups, YearType } from '@/shared/types/faculty'
+
+export type GraphStat = {
+  data: number[]
+  name: string
+}
+
+type Info = {
+  graphStats: GraphStat[]
+  programmeTableStats: Record<string, number[][]>
+  tableStats: number[][]
+  titles: string[]
+}
+
+type FacultyStats = {
+  graduationInfo: Info
+  id: string
+  lastUpdated: string
+  programmeNames: Record<string, NameWithCode>
+  status: string
+  studentInfo: Info
+  years: number[]
+}
+
+export type GetFacultyBasicStatsResponse = FacultyStats
+
+export type GetFacultyBasicStatsRequest = {
+  id: string
+  yearType: YearType
+  studyProgrammeFilter: ProgrammeFilter
+  specialGroups: SpecialGroups
+}
+
+export type GetFacultyCreditStatsResponse = {
+  codes: string[]
+  ids: string[]
+  programmeNames: Record<string, NameWithCode>
+}
+
+export type GetFacultyCreditStatsRequest = {
+  id: string
+  yearType: YearType
+}
+
+export type GetFacultyThesisStatsResponse = {
+  graphStats: GraphStat[]
+  id: string
+  lastUpdated: string
+  programmeNames: Record<string, NameWithCode>
+  programmeTableStats: Record<string, number[][]>
+  status: string
+  tableStats: number[][]
+  titles: string[]
+  years: number[]
+}
+
+export type GetFacultyThesisStatsRequest = {
+  id: string
+  yearType: YearType
+  studyProgrammeFilter: ProgrammeFilter
+  specialGroups: SpecialGroups
+}
+
+export type GetFacultyGraduationTimesResponse = {
+  byGradYear: {
+    medians: {
+      bachelor: GraduationStats[]
+      bcMsCombo: GraduationStats[]
+      doctor: GraduationStats[]
+      master: GraduationStats[]
+    }
+    programmes: {
+      medians: {
+        bachelor: ProgrammeMedians
+        bcMsCombo: ProgrammeMedians
+        doctor: ProgrammeMedians
+        master: ProgrammeMedians
+      }
+    }
+  }
+  classSizes: {
+    bachelor: Record<string, number>
+    bcMsCombo: Record<string, number>
+    doctor: Record<string, number>
+    master: Record<string, number>
+    programmes: {
+      [code: string]: {
+        bachelor: Record<string, number>
+        bcMsCombo: Record<string, number>
+        master: Record<string, number>
+        doctor: Record<string, number>
+      }
+    }
+  }
+  goals: {
+    bachelor: number
+    bcMsCombo: number
+    doctor: number
+    master: number
+    exceptions?: Record<string, number> // ? Is this used or needed?
+  }
+  id: string
+  lastUpdated: string
+  programmeNames: Record<string, Name>
+  status: string
+}
+
+export type GetFacultyGraduationTimesRequest = {
+  id: string
+  studyProgrammeFilter: ProgrammeFilter
+}
+
+export type GetFacultiesResponse = {
+  code: string
+  id: string
+  name: Name
+}
+
+export type GetAllProgressStatsRequest = {
+  graduated: Graduated
+  includeSpecials: boolean
+}
+
+export type GetAllProgressStatsResponse = {
+  bachelorsProgStats: Record<string, number[][]>
+  bcMsProgStats: Record<string, number[][]>
+  creditCounts: Record<string, Record<string, number[]>>
+  doctoralProgStats: Record<string, number[][]>
+  mastersProgStats: Record<string, number[][]>
+  programmeNames: Record<string, NameWithCode>
+  yearlyBachelorTitles: string[][]
+  yearlyBcMsTitles: string[][]
+  yearlyMasterTitles: string[][]
+  years: string[]
+}

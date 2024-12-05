@@ -8,11 +8,11 @@ import { PageTitle } from '@/components/material/PageTitle'
 import { useTabs } from '@/hooks/tabs'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetFacultiesQuery } from '@/redux/facultyStats'
-import { GetFacultiesResponse } from '@/shared/types/api/faculty'
+import { GetFacultiesResponse } from '@/types/api/faculty'
 import { BasicInformation } from './BasicInformation'
 import { FacultyList } from './FacultyList'
 import { FacultyProgrammeOverview } from './FacultyProgrammeOverview'
-import { TimesAndPathsView } from './TimesAndPaths'
+import { GraduationTimesTab } from './GraduationTimesTab'
 import { UpdateView } from './UpdateView'
 
 export const Faculties = () => {
@@ -75,7 +75,7 @@ export const Faculties = () => {
         />
       )}
       {tab === 2 && (
-        <TimesAndPathsView
+        <GraduationTimesTab
           faculty={faculty}
           setStudyProgrammes={setStudyProgrammes}
           studyProgrammes={studyProgrammes}

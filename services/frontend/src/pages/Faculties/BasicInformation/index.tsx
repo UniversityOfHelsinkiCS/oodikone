@@ -14,7 +14,7 @@ import {
 } from '@/redux/facultyStats'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { Name, NameWithCode } from '@/shared/types'
-import { GetFacultiesResponse } from '@/shared/types/api/faculty'
+import { GetFacultiesResponse } from '@/types/api/faculty'
 import { getTimestamp } from '@/util/timeAndDate'
 import { InteractiveDataTable } from './InteractiveDataTable'
 
