@@ -1,6 +1,6 @@
 import { Box, Stack, Typography } from '@mui/material'
 
-import { GraduationStats, NameWithCode, ProgrammeMedians } from '@/shared/types'
+import { GraduationStats, Name, NameWithCode, ProgrammeMedians } from '@/shared/types'
 import { MedianBarChart } from './MedianBarChart'
 
 export const MedianDisplay = ({
@@ -41,7 +41,7 @@ export const MedianDisplay = ({
   level: 'bachelor' | 'bcMsCombo' | 'master' | 'doctor'
   levelProgrammeData: ProgrammeMedians
   mode: 'faculty' | 'programme'
-  names: Record<string, NameWithCode>
+  names: Record<string, Name | NameWithCode>
   programmeDataVisible: boolean
   title: string
   year: number | null

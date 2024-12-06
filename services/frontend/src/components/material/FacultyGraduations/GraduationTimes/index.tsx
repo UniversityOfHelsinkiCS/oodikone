@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 import { Section } from '@/components/material/Section'
-import { GraduationStats, NameWithCode, ProgrammeMedians } from '@/shared/types'
+import { GraduationStats, Name, NameWithCode, ProgrammeMedians } from '@/shared/types'
 import { BreakdownDisplay } from './BreakdownDisplay'
 import { MedianDisplay } from './MedianDisplay'
 
@@ -46,7 +46,7 @@ export const GraduationTimes = ({
   level: 'bachelor' | 'bcMsCombo' | 'master' | 'doctor'
   levelProgrammeData: ProgrammeMedians | undefined
   mode: 'faculty' | 'programme'
-  names: Record<string, NameWithCode> | undefined
+  names: Record<string, Name | NameWithCode> | undefined
   showMedian: boolean
   title: string
   yearLabel: 'Graduation year' | 'Start year'

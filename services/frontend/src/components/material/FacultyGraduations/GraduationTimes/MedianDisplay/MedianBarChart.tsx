@@ -7,7 +7,7 @@ import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { GraduationStats, NameWithCode } from '@/shared/types'
+import { GraduationStats, Name, NameWithCode } from '@/shared/types'
 
 exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
@@ -46,7 +46,7 @@ export const MedianBarChart = ({
   handleClick: (event, isFacultyGraph: boolean, seriesCategory?: number) => void
   level?: 'bachelor' | 'bcMsCombo' | 'master' | 'doctor'
   mode: 'faculty' | 'programme'
-  names: Record<string, NameWithCode>
+  names: Record<string, Name | NameWithCode>
   title: string
   year?: number | null
   yearLabel: 'Graduation year' | 'Start year'

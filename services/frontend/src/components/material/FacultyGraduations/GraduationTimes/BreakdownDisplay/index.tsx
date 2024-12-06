@@ -1,6 +1,6 @@
 import { Box, Stack, Typography } from '@mui/material'
 
-import { GraduationStats, NameWithCode, ProgrammeMedians } from '@/shared/types'
+import { GraduationStats, Name, NameWithCode, ProgrammeMedians } from '@/shared/types'
 import { BreakdownBarChart } from './BreakdownBarChart'
 
 export const BreakdownDisplay = ({
@@ -19,7 +19,7 @@ export const BreakdownDisplay = ({
   level: 'bachelor' | 'bcMsCombo' | 'master' | 'doctor'
   levelProgrammeData: ProgrammeMedians
   mode: 'faculty' | 'programme'
-  names: Record<string, NameWithCode>
+  names: Record<string, Name | NameWithCode>
   programmeDataVisible: boolean
   year: number | null
   yearLabel: 'Graduation year' | 'Start year'

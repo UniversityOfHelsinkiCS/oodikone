@@ -7,7 +7,7 @@ import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { GraduationStats, NameWithCode } from '@/shared/types'
+import { GraduationStats, Name, NameWithCode } from '@/shared/types'
 
 exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
@@ -28,7 +28,7 @@ export const BreakdownBarChart = ({
   facultyGraph?: boolean
   handleClick: (event, isFacultyGraph: boolean, seriesCategory?: number) => void
   mode: 'faculty' | 'programme'
-  names?: Record<string, NameWithCode>
+  names?: Record<string, Name | NameWithCode>
   year?: number | null
   yearLabel?: 'Graduation year' | 'Start year'
 }) => {
