@@ -36,9 +36,9 @@ export const BreakdownBarChart = ({
   const theme = useTheme()
 
   const statData: HighCharts.SeriesBarOptions[] = [
-    { type: 'bar', name: 'On time', color: theme.graduationTimes.onTime, data: [] },
-    { type: 'bar', name: 'Max. year overtime', color: theme.graduationTimes.yearOver, data: [] },
-    { type: 'bar', name: 'Overtime', color: theme.graduationTimes.wayOver, data: [] },
+    { type: 'bar', name: 'On time', color: theme.palette.graduationTimes.onTime, data: [] },
+    { type: 'bar', name: 'Max. year overtime', color: theme.palette.graduationTimes.yearOver, data: [] },
+    { type: 'bar', name: 'Overtime', color: theme.palette.graduationTimes.wayOver, data: [] },
   ]
 
   let categories: number[] = []

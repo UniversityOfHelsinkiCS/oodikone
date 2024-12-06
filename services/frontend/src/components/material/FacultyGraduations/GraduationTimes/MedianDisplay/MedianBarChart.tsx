@@ -62,11 +62,11 @@ export const MedianBarChart = ({
       if (Object.keys(goalExceptions).includes(data.code)) {
         const realGoal = goal + goalExceptions[data.code]
         if (data.median <= realGoal) {
-          data.color = theme.graduationTimes.onTime
+          data.color = theme.palette.graduationTimes.onTime
         } else if (data.median <= realGoal + 12) {
-          data.color = theme.graduationTimes.yearOver
+          data.color = theme.palette.graduationTimes.yearOver
         } else {
-          data.color = theme.graduationTimes.wayOver
+          data.color = theme.palette.graduationTimes.wayOver
         }
         data.realGoal = realGoal
       }
@@ -202,14 +202,14 @@ export const MedianBarChart = ({
         zones: [
           {
             value: goal + 0.1,
-            color: theme.graduationTimes.onTime,
+            color: theme.palette.graduationTimes.onTime,
           },
           {
             value: goal + 12.1,
-            color: theme.graduationTimes.yearOver,
+            color: theme.palette.graduationTimes.yearOver,
           },
           {
-            color: theme.graduationTimes.wayOver,
+            color: theme.palette.graduationTimes.wayOver,
           },
         ],
         point: {
@@ -242,13 +242,13 @@ export const MedianBarChart = ({
       showFirstLabel: false,
       plotLines: [
         {
-          color: theme.graduationTimes.onTime,
+          color: theme.palette.graduationTimes.onTime,
           width: 2,
           value: goal,
           dashStyle: 'ShortDash',
         },
         {
-          color: theme.graduationTimes.yearOver,
+          color: theme.palette.graduationTimes.yearOver,
           width: 2,
           value: goal + 12,
           dashStyle: 'ShortDash',
