@@ -13,8 +13,8 @@ import {
   useGetFacultyThesisStatsQuery,
 } from '@/redux/facultyStats'
 import { useGetProgrammesQuery } from '@/redux/populations'
-import { Name, NameWithCode } from '@/shared/types'
-import { GetFacultiesResponse } from '@/types/api/faculty'
+import { NameWithCode } from '@/shared/types'
+import { DegreeProgramme, GetFacultiesResponse } from '@/types/api/faculty'
 import { getTimestamp } from '@/util/timeAndDate'
 import { InteractiveDataTable } from './InteractiveDataTable'
 
@@ -35,13 +35,6 @@ const calculateTotals = stats => {
     }
   }
   return totals
-}
-
-type DegreeProgramme = {
-  code: string
-  degreeProgrammeType: string
-  name: Name
-  progId: string
 }
 
 const getSortedProgrammeIdsAndPlotLinePlaces = (
