@@ -135,6 +135,32 @@ export type GetAllProgressStatsResponse = {
   years: string[]
 }
 
+export type GetFacultyStudentStatsResponse = {
+  facultyTableStats: Record<string, (number | string)[]>
+  facultyTableStatsExtra: Record<string, Record<string, Record<string, number>>>
+  id: string
+  lastUpdated: string
+  programmeNames: Record<
+    string,
+    {
+      code: string
+      degreeProgrammeType: string
+      name: Name
+      progId: string
+    }
+  >
+  programmeStats: Record<string, Record<string, (number | string)[]>>
+  status: string
+  titles: string[]
+  years: string[]
+}
+
+export type GetFacultyStudentStatsRequest = {
+  id: string
+  specialGroups: SpecialGroups
+  graduated: Graduated
+}
+
 export type UpdateFacultyBasicTabResponse = undefined
 
 export type UpdateFacultyBasicTabRequest = {
