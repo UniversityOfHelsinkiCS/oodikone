@@ -119,7 +119,7 @@ const getSortedProgrammeIdsAndPlotLinePlaces = (
   return { programmes: sortedProgrammes, plotLinePlaces }
 }
 
-export const BasicInformation = ({
+export const BasicInformationTab = ({
   academicYear,
   faculty,
   setAcademicYear,

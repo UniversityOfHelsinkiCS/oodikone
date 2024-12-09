@@ -9,7 +9,7 @@ import { useTabs } from '@/hooks/tabs'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetFacultiesQuery } from '@/redux/facultyStats'
 import { GetFacultiesResponse } from '@/types/api/faculty'
-import { BasicInformation } from './BasicInformation'
+import { BasicInformationTab } from './BasicInformationTab'
 import { FacultyList } from './FacultyList'
 import { GraduationTimesTab } from './GraduationTimesTab'
 import { ProgressTab } from './ProgressTab'
@@ -56,7 +56,7 @@ export const Faculties = () => {
         <Tab data-cy="UpdateStatisticsTab" label="Update statistics" />
       </Tabs>
       {tab === 0 && (
-        <BasicInformation
+        <BasicInformationTab
           academicYear={academicYear}
           faculty={faculty}
           setAcademicYear={setAcademicYear}
