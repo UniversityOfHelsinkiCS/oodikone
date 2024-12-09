@@ -11,9 +11,9 @@ import { useGetFacultiesQuery } from '@/redux/facultyStats'
 import { GetFacultiesResponse } from '@/types/api/faculty'
 import { BasicInformation } from './BasicInformation'
 import { FacultyList } from './FacultyList'
-import { FacultyProgrammeOverview } from './FacultyProgrammeOverview'
 import { GraduationTimesTab } from './GraduationTimesTab'
-import { UpdateView } from './UpdateView'
+import { ProgrammesAndStudentPopulationsTab } from './ProgrammesAndStudentPopulationsTab'
+import { UpdateStatisticsTab } from './UpdateStatisticsTab'
 
 export const Faculties = () => {
   const { getTextIn } = useLanguage()
@@ -65,7 +65,7 @@ export const Faculties = () => {
         />
       )}
       {tab === 1 && (
-        <FacultyProgrammeOverview
+        <ProgrammesAndStudentPopulationsTab
           faculty={faculty}
           graduatedGroup={graduatedGroup}
           requiredRights={requiredRights}
@@ -81,7 +81,7 @@ export const Faculties = () => {
           studyProgrammes={studyProgrammes}
         />
       )}
-      {tab === 3 && isAdmin && <UpdateView faculty={faculty?.id} />}
+      {tab === 3 && isAdmin && <UpdateStatisticsTab id={faculty?.id} />}
     </Container>
   )
 }

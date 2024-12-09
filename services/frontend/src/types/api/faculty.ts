@@ -134,3 +134,16 @@ export type GetAllProgressStatsResponse = {
   yearlyMasterTitles: string[][]
   years: string[]
 }
+
+export type UpdateFacultyBasicTabResponse = undefined
+
+export type UpdateFacultyBasicTabRequest = {
+  id: string
+  statsType: 'CREDITS' | 'STUDENT' | 'THESIS'
+}
+
+export type UpdateFacultyProgressTabResponse = undefined
+
+export type UpdateFacultyProgressTabRequest = {
+  id: string
+}
