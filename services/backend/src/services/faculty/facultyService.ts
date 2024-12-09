@@ -1,7 +1,6 @@
 import moment from 'moment'
 
-import { Name } from '../../shared/types'
-import { Graduated, ProgrammeFilter, SpecialGroups, YearType } from '../../shared/types/api/faculty'
+import { Graduated, Name, ProgrammeFilter, SpecialGroups, YearType } from '../../shared/types'
 import { DegreeProgrammeType } from '../../types'
 import { redisClient } from '../redis'
 import { FacultyProgressData } from './facultyStudentProgress'

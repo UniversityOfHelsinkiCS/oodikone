@@ -15,8 +15,7 @@ import {
 } from '../services/faculty/facultyService'
 import { combineFacultyStudentProgress, FacultyProgressData } from '../services/faculty/facultyStudentProgress'
 import { getMedian } from '../services/studyProgramme/studyProgrammeHelpers'
-import { NameWithCode } from '../shared/types'
-import { Graduated } from '../shared/types/api/faculty'
+import { Graduated, NameWithCode } from '../shared/types'
 import logger from '../util/logger'
 
 const router = Router()
