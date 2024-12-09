@@ -1,7 +1,6 @@
 import { Stack } from '@mui/material'
 
 import { facultyToolTips } from '@/common/InfoToolTips'
-import { calculateStats, sortProgrammeKeys } from '@/components/FacultyStatistics/facultyHelpers'
 import { downloadProgressTable } from '@/components/FacultyStatistics/xlsxFileDownloadHelper'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { FacultyBarChart } from '@/components/material/FacultyBarChart'
@@ -10,6 +9,7 @@ import { Section } from '@/components/material/Section'
 import { Toggle } from '@/components/material/Toggle'
 import { useGetFacultyProgressStatsQuery } from '@/redux/facultyStats'
 import { GetFacultiesResponse } from '@/types/api/faculty'
+import { calculateStats, sortProgrammeKeys } from '@/util/faculty'
 
 export const ProgressTab = ({
   faculty,
