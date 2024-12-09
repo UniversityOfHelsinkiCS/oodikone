@@ -1,7 +1,6 @@
 import { Stack } from '@mui/material'
 
 import { facultyToolTips } from '@/common/InfoToolTips'
-import { downloadProgressTable } from '@/components/FacultyStatistics/xlsxFileDownloadHelper'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { FacultyBarChart } from '@/components/material/FacultyBarChart'
 import { FacultyProgressTable } from '@/components/material/FacultyProgressTable'
@@ -10,6 +9,7 @@ import { Toggle } from '@/components/material/Toggle'
 import { useGetFacultyProgressStatsQuery } from '@/redux/facultyStats'
 import { GetFacultiesResponse } from '@/types/api/faculty'
 import { calculateStats, sortProgrammeKeys } from '@/util/faculty'
+import { exportProgressTable } from './export'
 
 export const ProgressTab = ({
   faculty,
@@ -66,7 +66,7 @@ export const ProgressTab = ({
       <Section
         cypress="InfoFacultyProgress"
         exportOnClick={() =>
-          downloadProgressTable(
+          exportProgressTable(
             {
               ...progressStats,
               bachelorStats,
@@ -75,7 +75,7 @@ export const ProgressTab = ({
               doctorStats,
             },
             progressStats?.data?.programmeNames,
-            faculty,
+            faculty.code,
             getTextIn
           )
         }

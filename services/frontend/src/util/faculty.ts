@@ -29,7 +29,7 @@ const testKey = (value: string) => {
   return 6
 }
 
-export const sortProgrammeKeys = (programmeKeys: string[][], faculty: string) => {
+export const sortProgrammeKeys = (programmeKeys: string[] | string[][], faculty: string) => {
   try {
     return programmeKeys.sort((a, b) => {
       if (a[1].includes(faculty) && !b[1].includes(faculty)) return -1

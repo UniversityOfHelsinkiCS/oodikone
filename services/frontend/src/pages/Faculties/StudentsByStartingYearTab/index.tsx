@@ -2,12 +2,12 @@ import { Stack } from '@mui/material'
 import { useState } from 'react'
 
 import { facultyToolTips } from '@/common/InfoToolTips'
-import { downloadStudentTable } from '@/components/FacultyStatistics/xlsxFileDownloadHelper'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Section } from '@/components/material/Section'
 import { Toggle } from '@/components/material/Toggle'
 import { useGetFacultyStudentStatsQuery } from '@/redux/facultyStats'
 import { GetFacultiesResponse } from '@/types/api/faculty'
+import { exportStudentTable } from './export'
 import { FacultyStudentDataTable } from './FacultyStudentDataTable'
 
 const getKey = (programmeKeys: string[][], index: number) => {
@@ -120,10 +120,10 @@ export const StudentsByStartingYearTab = ({
       <Section
         cypress="InfoFacultyStudentTable"
         exportOnClick={() =>
-          downloadStudentTable(
-            studentStats,
+          exportStudentTable(
+            studentStats?.data,
             studentStats?.data?.programmeNames,
-            faculty,
+            faculty.code,
             sortedProgrammeKeysStudents.map(listObj => listObj[1]),
             getTextIn
           )
